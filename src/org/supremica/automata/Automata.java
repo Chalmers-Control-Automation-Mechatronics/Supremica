@@ -1267,9 +1267,12 @@ public class Automata
 		return sbuf.toString();
 	}
 
+	/**
+	 * Only care about the size of the automata
+	 */
 	public boolean sanityCheck(Gui gui, int minSize)
 	{
-		return sanityCheck(gui, minSize, false, false, false);
+		return sanityCheck(gui, minSize, false, false, false, false);
 	}
 
 	/**
@@ -1285,7 +1288,7 @@ public class Automata
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, boolean mustBeControllabilityConsistent)
+	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, boolean mustBeControllabilityConsistent, boolean examineStructure)
 	{
 		// Is this automata empty? If so, just bail out.
 		if (size() <= 0)
@@ -1293,16 +1296,20 @@ public class Automata
 			return false;
 		}
 
-		// Warns if there are events with equal (lowercase) names.
+		// Warns if there are events with equal (lowercase) names. 
+		//Always do this check
 		isEventNamesSafe();
 
 
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
-		isSeveralSystems();
+		if (examineStructure)
+		{
+			isSeveralSystems();
+		}
 
 		// Examines controllability consistency
-		if (mustBeControllabilityConsistent &&!isEventControllabilityConsistent())
+		if (mustBeControllabilityConsistent && !isEventControllabilityConsistent())
 		{
 			return false;
 		}
@@ -1324,33 +1331,13 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton " + currAutomaton + " does not have an initial state.\n" + "Please specify an initial state.";
+						String message = "The automaton " + currAutomaton + 
+							" does not have an initial state.\n" + "Please specify an initial state.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-
-						/*
-						String message = "The automaton " + currAutomaton +
-								" does not have an initial state.\n" +
-								"Skip this automaton or Cancel the whole operation?";
-						Object[] options = { "Skip", "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-						OptionPane.OK_CANCEL_OPTION,
-						JOptionPane.WARNING_MESSAGE, null,
-						options, options[1]);
-
-						if(cont == JOptionPane.OK_OPTION)
-						{   // Skip
-								// Unselect the automaton
-								gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
-								// Skip this automaton (remove it from this)
-								autIt.remove();
-						}
-						else // JOptionPane.CANCEL_OPTION
-						{   // Cancel
-								// This is iNsanE!
-								return false;
-						}
-						*/
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
+																JOptionPane.OK_OPTION, 
+																JOptionPane.WARNING_MESSAGE, null, 
+																options, options[0]);
 					}
 					else
 					{
@@ -1368,7 +1355,6 @@ public class Automata
 		{
 			// All automata must have a defined type, i.e. must not be of type "Undefined".
 			Iterator autIt = iterator();
-
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
@@ -1378,37 +1364,18 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton " + currAutomaton + " is of type 'Undefined'.\n" + "Please specify a type.";
+						String message = "The automaton " + currAutomaton + " is of type 'Undefined'.\n" + 
+							"Please specify a type.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-
-						/*
-						String message = "The automaton " + currAutomaton. +
-							" is of type 'Undefined'.\n" +
-								"Skip this automaton or Cancel the whole operation?";
-						Object[] options = { "Skip", "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																										JOptionPane.OK_CANCEL_OPTION,
-																										JOptionPane.WARNING_MESSAGE, null,
-																										options, options[1]);
-
-						if(cont == JOptionPane.OK_OPTION)
-						{   // Skip
-								// Unselect the automaton
-								gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
-								// Skip this automaton (remove it from this)
-								autIt.remove();
-						}
-						else // JOptionPane.CANCEL_OPTION
-						{   // Cancel
-								// This is iNsaNe!
-								return false;
-						}
-						*/
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
+																JOptionPane.OK_OPTION, 
+																JOptionPane.WARNING_MESSAGE, null, 
+																options, options[0]);
 					}
 					else
 					{
-						logger.error("The automaton " + currAutomaton + " is of type 'Undefined'. Please specify a type.");
+						logger.error("The automaton " + currAutomaton + 
+									 " is of type 'Undefined'. Please specify a type.");
 					}
 
 					// This is iNsaNe!
