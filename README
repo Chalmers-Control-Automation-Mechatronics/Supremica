@@ -57,27 +57,17 @@ Supremica is following.
 	The first time you compile after a checkout you should write:
 	> ant initialize
 	
-	followed by
-	
-	> ant rebuild
-	
-	You should also run the previous commands as soon
+	You should also run the previous command as soon
 	as a there is a new or updated file in Supremica/lib.
 
-	For compiling the sources there are three main
+	For compiling the sources there are two main
 	alternatives.
 	
 	i. Compile all files changed since last compilation
 	> ant compile
 	
-	ii. Compile all files changed since last compilation and
-	build a jar file.
+	ii. Compile all files and build a jar file.
 	> ant build
-	
-	iii. Compile all files and build a jar file.
-	> ant rebuild
-	First all existing class files are deleted, then
-	a compilation of all java files are done.
 	
 	Alternative iii, is the preferred alternative, and is
 	also the one executed if you run ant without arguments.

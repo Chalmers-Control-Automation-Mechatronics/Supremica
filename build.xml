@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<project name="Supremica" default="rebuild" basedir=".">
+<project name="Supremica" default="build" basedir=".">
 
 <property file="build.properties"/>    
 
@@ -79,7 +79,7 @@
 	</delete>
 </target>
 
-<target name="initialize" depends="clean">
+<target name="initialize_dirs">
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${build}" />
@@ -104,7 +104,15 @@
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${resources}" />
 	</delete>
-	
+
+	<mkdir dir="${lib}/${unjared}/META-INF"/>
+	<delete includeEmptyDirs="true">
+		<fileset dir="${lib}/${unjared}/META-INF"/>
+	</delete>
+
+</target>
+
+<target name="initialize_jars">	
  	<unjar src="${lib}/rpcdocdbClient.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
@@ -161,12 +169,9 @@
 	<unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	-->	
+</target>
 
-	<mkdir dir="${lib}/${unjared}/META-INF"/>
-	<delete includeEmptyDirs="true">
-		<fileset dir="${lib}/${unjared}/META-INF"/>
-	</delete>
-
+<target name="initialize" depends="clean,initialize_dirs,initialize_jars,version,build,jar_supremica_lib">
 </target>
 
 <target name="init">
@@ -177,10 +182,18 @@
 	<mkdir dir="${build}"/>
 	<delete dir="${build}" includeEmptyDirs="true"/>
 	<mkdir dir="${build}"/>
+
+	<mkdir dir="${testsbuild}"/>
+	<delete dir="${testsbuild}" includeEmptyDirs="true"/>
+	<mkdir dir="${testsbuild}"/>
 </target>
 
 
-<target name="clean" depends="clean_build">
+<target name="clean">
+	<mkdir dir="${build}"/>
+	<delete dir="${build}" includeEmptyDirs="true"/>
+	<mkdir dir="${build}"/>
+
 	<mkdir dir="${testsbuild}"/>
 	<delete dir="${testsbuild}" includeEmptyDirs="true"/>
 	<mkdir dir="${testsbuild}"/>
@@ -390,7 +403,7 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild" depends="clean,version,build,jar_supremica_lib">
+<target name="rebuild" depends="build">
 </target>
 
 <!-- Build:
