@@ -336,6 +336,10 @@ public class AutomataToSMV
 
 					pw.print("(");
 					String enableConditionPlant = getEnableCondition(currEvent, true, true);
+					if (enableConditionPlant.equals(""))
+					{
+						enableConditionPlant = "FALSE";
+					}
 					pw.print(enableConditionPlant);
 					// First find conditions for when this event is enabled in the plant
 					//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
@@ -351,6 +355,10 @@ public class AutomataToSMV
 					// enabled in the supervisor/specification
 					pw.print(" -> ");
 					String enableConditionSpecSup = getEnableCondition(currEvent, true, false);
+					if (enableConditionSpecSup.equals(""))
+					{
+						enableConditionSpecSup = "FALSE";
+					}
 					pw.print(enableConditionSpecSup);
 					//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 					//{
