@@ -178,6 +178,9 @@ public class SearchStates
 			states = s;
 			composite = c;
 			index = 0;
+
+			//logger.debug("getState states: " + states);
+			//logger.debug("getState composite: " + states);
 		}
 
 		public boolean hasNext()
@@ -191,6 +194,9 @@ public class SearchStates
 		{
 
 			// get the current state of the current automaton
+			//logger.debug("getState index: " + index);
+			//logger.debug("getState states.length: " + statesInner.length);
+			//logger.debug("getState composite.length: " + composite.length);
 			return states[index][composite[index]];
 		}
 
