@@ -54,9 +54,11 @@ import java.util.*;
 public class LabeledEvent
 	implements Comparable
 {
-	// The id is the local identifier of an event, should be different from any other id:s in the same automaton
+	// The id is the local identifier of an event, should be 
+	// different from any other id:s in the same automaton
 	private String id = "";
-	// The label is what shows in the dot-figures, this is the global identifier of an event, appearing in the alphabet
+	// The label is what shows in the dot-figures, this is the
+	// global identifier of an event, appearing in the alphabet
 	private String label = "";
 
 	private boolean controllable = true;
@@ -108,7 +110,7 @@ public class LabeledEvent
 	/*
 	 *  public void execute()
 	 *  {
-	 *  notifyExceutionListeners();
+	 *      notifyExceutionListeners();
 	 *  }
 	 */
 
@@ -193,7 +195,6 @@ public class LabeledEvent
 
 	public boolean equals(String label)
 	{
-
 		// System.err.println("equalsString");
 		return this.label.equals(label);
 	}
@@ -240,7 +241,6 @@ public class LabeledEvent
 
 	public int compareTo(Object event)
 	{
-
 		// System.err.println("CompareTo");
 		return label.compareTo(((LabeledEvent) event).label);
 	}

@@ -208,22 +208,6 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Method called from external class stopping AutomataVerifier as soon as possible.
-	 *
-	 * @see  ExecutionDialog
-	 */
-	public void requestStop()
-	{
-		logger.debug("AutomataVerifier requested to stop.");
-		stopRequested = true;
-
-		for (int i = 0; i < synchronizationExecuters.size(); i++)
-		{
-			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
-		}
-	}
-
-	/**
 	 * This is an attempt to clean up this interface.
 	 */
 	public boolean verify()
@@ -1524,5 +1508,22 @@ public class AutomataVerifier
 		}
 		
 		return theAutomaton.nbrOfStates() == 0;
+	}
+
+
+	/**
+	 * Method called from external class stopping AutomataVerifier as soon as possible.
+	 *
+	 * @see  ExecutionDialog
+	 */
+	public void requestStop()
+	{
+		logger.debug("AutomataVerifier requested to stop.");
+		stopRequested = true;
+
+		for (int i = 0; i < synchronizationExecuters.size(); i++)
+		{
+			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
+		}
 	}
 }

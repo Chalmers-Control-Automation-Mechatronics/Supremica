@@ -229,8 +229,11 @@ public class AutomataVerificationWorker
 			logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
 		
-		// We're finished! Stop everything!
-		requestStop();
+		// We're finished! Bail out! Kill the ExecutionDialog!
+		if (executionDialog != null)
+		{
+			executionDialog.setMode(ExecutionDialogMode.hide);
+		}
 	}
 
 	private void prepareAutomataForLanguageInclusion()

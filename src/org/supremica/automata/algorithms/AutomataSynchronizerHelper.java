@@ -460,7 +460,7 @@ public final class AutomataSynchronizerHelper
 
 	public void setDeadlocked(int[] state, boolean deadlocked)
 	{
-		logger.debug(AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
+		logger.debug("Deadlocked state:\n" + AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
 		logger.debug(displayTrace(state));
 		int currStatus = state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END];
 
@@ -517,6 +517,7 @@ public final class AutomataSynchronizerHelper
 	{
 		automataIsControllable = isControllable;
 	}
+
 	// automataIsControllable is set to false by AutomataSynchronizerhelper, AutomataOnlineSynchronizer
 	// when an uncontrollable state is found.
 	public boolean getAutomataIsControllable()
@@ -715,7 +716,8 @@ public final class AutomataSynchronizerHelper
 				}
 				else
 				{
-					logger.error("Could not find an event between prevState and currState");
+					logger.error("Error in AutomataSynchronizerHelper");
+					logger.error("Could not find an event between prevState and currState\n");
 					logger.error("Current state, index: " + theStates.getIndex(currState));
 					logger.error(AutomataIndexFormHelper.dumpVerboseState(currState, theAutomataIndexForm));
 					logger.error("Previous state, index: " + theStates.getIndex(prevState));
