@@ -39,7 +39,7 @@ import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
-
+import org.supremica.util.SupremicaMenuItem;
 
 
 public class MainMenuBar
