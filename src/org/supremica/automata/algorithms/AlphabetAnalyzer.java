@@ -311,4 +311,31 @@ public class AlphabetAnalyzer
 		 *  " #newUnique: " + newUnique);
 		 */
 	}
+
+	// -----------------------------------------------------------------
+	/**
+	 * returns the events that always blocked in an automaton.
+	 * assumes that the automaton is trim, or it will give an underaproximated answer.
+	 *
+	 */
+	public static HashSet getBlockedEvents(Automaton a)
+	{
+		HashSet ret = new HashSet();
+
+		Alphabet alfa = a.getAlphabet();
+		for (EventIterator evIt = alfa.iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			ret.add( currEvent.getLabel() );
+		}
+
+		for(ArcIterator ai = a.arcIterator();  ai.hasNext();)
+		{
+			Arc currArc = ai.nextArc();
+			currArc.getEvent().extra1 = 1;
+			ret.remove( currArc.getEvent().getLabel() );
+		}
+
+		return ret;
+	}
 }

@@ -3804,38 +3804,32 @@ public class ActionMan
 	// ------------------------------------------------------------------
 
 	/**
-	 * Mark (select) automata in the dependency group of the selected automata.
+	 * select the following subset of automata in the gui
 	 *
-	 * ok, this should go in the automata.algorithms package, but we can move it later
 	 */
-	public static void markDependencySet() {
-		Automata selected = gui.getSelectedAutomata();
-		Automata unselected = gui.getUnselectedAutomata();
-		Vector toSelect = new Vector();
+	private static void selectSubset(Automata all, Vector subset)
+	{
+		gui.clearSelection();
+		int [] sel = new int[ subset.size() ];
+		int i = 0;
+		for (Enumeration e = subset.elements() ; e.hasMoreElements() ; i++)
+		{
+			Automaton a = (Automaton) e.nextElement();
+			sel[i] = all.getAutomatonIndex(a);
+		}
+		gui.selectAutomata(sel);
+	}
 
+	/**
+	 * Mark (select) automata in the dependency group of the selected automata.
+	 */
+	public static void markDependencySet()
+	{
 		try
 		{
-			Alphabet  selectedAlphabet = AlphabetHelpers.getUnionAlphabet(selected, false, false);
-			for (AutomatonIterator it = unselected.iterator(); it.hasNext(); )
-			{
-				Automaton a = it.nextAutomaton();
-
-				Alphabet alfa = a.getAlphabet();
-				if(alfa.overlap(selectedAlphabet))
-				{
-					toSelect.add(a);
-				}
-			}
-
-			int [] sel = new int[ toSelect.size() ];
-			int i = 0;
-			for (Enumeration e = toSelect.elements() ; e.hasMoreElements() ; i++)
-			{
-				Automaton a = (Automaton) e.nextElement();
-				sel[i] = gui.getVisualProjectContainer().getActiveProject().getAutomatonIndex(a);
-			}
-			gui.selectAutomata(sel);
-
+			Automata all = gui.getVisualProjectContainer().getActiveProject();
+			Vector v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
+			selectSubset(all, v);
 		}
 		catch (Exception ex)
 		{
@@ -3846,61 +3840,46 @@ public class ActionMan
 	/**
 	 * select the maximal component the current selection is a part of
 	 * (the current selection must be connected!)
-	 *
-	 * this should too go in the automata.algorithms package :(
 	 */
-	public static void markMaximalComponent() {
-		Automata selected = gui.getSelectedAutomata();
-		Automata unselected = gui.getUnselectedAutomata();
-		Vector toSelect = new Vector();
-
+	public static void markMaximalComponent()
+	{
 		try
 		{
-
-
-			boolean done;
-			do
-			{
-				done = true;
-				Alphabet  selectedAlphabet = AlphabetHelpers.getUnionAlphabet(selected, false, false);
-
-				for (AutomatonIterator it = unselected.iterator(); it.hasNext(); )
-				{
-					Automaton a = it.nextAutomaton();
-
-					Alphabet alfa = a.getAlphabet();
-					if(alfa.overlap(selectedAlphabet))
-					{
-						toSelect.add(a);
-						selected.addAutomaton(a);
-						done = false;
-					}
-				}
-
-				for (Enumeration e = toSelect.elements() ; e.hasMoreElements() ;)
-				{
-					Automaton a = (Automaton) e.nextElement();
-					unselected.removeAutomaton(a);
-				}
-
-			}
-			while(! done);
-
-			int [] sel = new int[ toSelect.size() ];
-			int i = 0;
-			for (Enumeration e = toSelect.elements() ; e.hasMoreElements() ; i++)
-			{
-				Automaton a = (Automaton) e.nextElement();
-				sel[i] = gui.getVisualProjectContainer().getActiveProject().getAutomatonIndex(a);
-
-			}
-			gui.selectAutomata(sel);
-
+			Automata all = gui.getVisualProjectContainer().getActiveProject();
+			Vector v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
+			selectSubset(all, v);
 		}
 		catch (Exception ex)
 		{
 			logger.error(ex);
 		}
+	}
+
+	/**
+	 * Simplify the Supremica project.
+	 *
+	 */
+	public static void simplifyProject()
+	{
+		try
+		{
+
+			Project all = gui.getVisualProjectContainer().getActiveProject();
+			Automata new_ = AutomataSimplifier.simplify(all);
+
+			// clear the current automata
+			gui.getVisualProjectContainer().getActiveProject().clear();
+			gui.clearSelection();
+			gui.getVisualProjectContainer().getActiveProject().setProjectFile(null);
+
+			// insert the new project
+			gui.addAutomata(new_);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+
 	}
 
 }

@@ -67,6 +67,12 @@ public class LabeledEvent
 	private int expansionPriority = -1;
 	private int synchIndex = -1;
 
+	/**
+	 * extra variable used to speed up algorithms.
+	 * dont store your stuff here, it may be changed by other algos
+	 */
+	public int extra1;
+
 	// private Action theAction = null;
 	public LabeledEvent() {}
 
