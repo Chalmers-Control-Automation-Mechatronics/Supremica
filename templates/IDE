@@ -1,4 +1,11 @@
-#/bin/sh
+#!/bin/sh
 
-env LD_LIBRARY_PATH=. java -cp Supremica.jar:SupremicaLib.jar -enableassertions org.supremica.gui.ide.IDE
+cd `dirname $0`
+DIR=`pwd`
+
+export LD_LIBRARY_PATH=$DIR
+
+cd "../examples/waters"
+java -cp "$DIR/Supremica.jar:$DIR/SupremicaLib.jar" -enableassertions \
+  org.supremica.gui.ide.IDE $*
 
