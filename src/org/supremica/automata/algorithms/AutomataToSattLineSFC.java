@@ -85,7 +85,7 @@ public class AutomataToSattLineSFC
 		// Start of file header
 		Date theDate = new Date();
 
-		logger.info(theDate.toString());
+		//logger.info(theDate.toString());
 		pw.println("\"Syntax version 2.19, date: 2001-08-10-10:42:24.724 N\"");
 		pw.println("\"Original file date: ---\"");
 		pw.print("\"Program date: 2001-08-10-10:42:24.724, name: ");    // Should perhaps get current date and time

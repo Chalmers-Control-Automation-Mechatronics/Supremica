@@ -1735,20 +1735,20 @@ public class ActionMan
 				if (!currFile.isDirectory())
 				{
 					String prefixName = null;
+					String pathName = currFile.getAbsolutePath();
 
+					if (pathName.endsWith(".s"))
+					{
+						prefixName = pathName.substring(0, pathName.length() - 2);
+					}
+					else
+					{
+						prefixName = pathName;
+					}
 					try
 					{
 						AutomataToSattLineSFC exporter = new AutomataToSattLineSFC(selectedAutomata);
-						String pathName = currFile.getAbsolutePath();
 
-						if (pathName.endsWith(".s"))
-						{
-							prefixName = pathName.substring(0, pathName.length() - 2);
-						}
-						else
-						{
-							prefixName = pathName;
-						}
 
 						PrintWriter pw_s = new PrintWriter(new FileWriter(prefixName + ".s"));
 						PrintWriter pw_g = new PrintWriter(new FileWriter(prefixName + ".g"));
@@ -1768,7 +1768,10 @@ public class ActionMan
 					{
 						ex.printStackTrace();
 						gui.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+						return;
 					}
+					logger.info("SattLine files successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+
 				}
 			}
 		}
@@ -1805,24 +1808,23 @@ public class ActionMan
 			{
 				if (!currFile.isDirectory())
 				{
+					String pathName = currFile.getAbsolutePath();
 					String prefixName = null;
-
+					if (pathName.endsWith(".prj"))
+					{
+						prefixName = pathName.substring(0, pathName.length() - 4);
+					}
+					else
+					{
+						prefixName = pathName;
+					}
+					File appFile = new File(prefixName + ".app");
+					File prjFile = new File(prefixName + ".prj");
 					try
 					{
 						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedAutomata);
-						String pathName = currFile.getAbsolutePath();
 
-						if (pathName.endsWith(".prj"))
-						{
-							prefixName = pathName.substring(0, pathName.length() - 4);
-						}
-						else
-						{
-							prefixName = pathName;
-						}
-
-						File appFile = new File(prefixName + ".app");
-						PrintWriter pw_prj = new PrintWriter(new FileWriter(prefixName + ".prj"));
+						PrintWriter pw_prj = new PrintWriter(new FileWriter(prjFile));
 
 						exporter.serialize_app(appFile);
 						exporter.serialize_prj(pw_prj);
@@ -1833,7 +1835,9 @@ public class ActionMan
 					{
 						ex.printStackTrace();
 						gui.error("Exception while generating ControlBuilder code to files " + prefixName + "{\".prj\", \".app\"}");
+						return;
 					}
+					logger.info("ControlBuilder files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
 				}
 			}
 		}

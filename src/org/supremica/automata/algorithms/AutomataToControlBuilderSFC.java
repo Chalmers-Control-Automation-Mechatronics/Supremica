@@ -117,7 +117,7 @@ public class AutomataToControlBuilderSFC
 		Date theDate = new Date();
 
 		// Should perhaps get current date and time, but how do I format it?
-		logger.info(theDate.toString());
+		//logger.info(theDate.toString());
 		pw.println("HEADER SyntaxVersion_ '3.1' ChangedDate_ '2002-01-25-22:20:41.631'");
 		pw.println("OfficialDate_ '2002-01-25-22:20:41.631'");
 		pw.println("ProductVersion_ '2.2-0'");
