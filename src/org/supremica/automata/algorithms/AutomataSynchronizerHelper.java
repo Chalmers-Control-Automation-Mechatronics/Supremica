@@ -931,7 +931,7 @@ public final class AutomataSynchronizerHelper
 			return nbrOfDeadlockedStates;
 		}
 
-	    	public void setNumberOfReachableStates(long n)
+		public void setNumberOfReachableStates(long n)
 		{
 		    nbrOfAddedStates = n;
 		}

@@ -225,7 +225,6 @@ public class AutomataSynthesizer
 			theTimer.start();
 			MonolithicReturnValue retval = doMonolithic(theAutomata, true);
 			theTimer.stop();
-			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 			gui.addAutomaton(retval.automaton); // let the user choose the name later
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
@@ -234,7 +233,7 @@ public class AutomataSynthesizer
 			// monolithic case, just whack the entire stuff into the monolithic algo
 			MonolithicReturnValue retval = doMonolithic(theAutomata, false);
 			theTimer.stop();
-			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+			// retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 			gui.addAutomaton(retval.automaton); // let the user choose the name later
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) // modular case
@@ -333,7 +332,7 @@ public class AutomataSynthesizer
 			MonolithicReturnValue retval = doMonolithic(automata);
 			if (retval.didSomething)
 			{
-				retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+				// retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 
 				Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
 				if(synthesizerOptions.getMaximallyPermissive()) // If we should care about max perm...
@@ -342,7 +341,7 @@ public class AutomataSynthesizer
 					{
 						automata = selector.addPlants(disabledEvents);
 						retval = doMonolithic(automata); // now we're *guaranteed* max perm
-						retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+						//retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 						disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
 					}
 				}
@@ -366,6 +365,7 @@ public class AutomataSynthesizer
 					}
 				}
 
+				/*
 				// Should we reduce the supervisor?
 				if (synthesizerOptions.getReduceSupervisors())
 				{	// Add the reduced supervisor
@@ -377,6 +377,8 @@ public class AutomataSynthesizer
 				{	// Add the supervisor as is
 					modSupervisors.addAutomaton(retval.automaton);
 				}
+				*/
+				modSupervisors.addAutomaton(retval.automaton);
 			}
 		}
 
@@ -459,7 +461,7 @@ public class AutomataSynthesizer
 
 			if (problemEvents.size() > 0)
 			{
-				Automata newAutomata = new Automata(automata); // Make copy sine we will change controllability
+				Automata newAutomata = new Automata(automata); // Make copy since we will change controllability
 
 				// Iterate over all the automata and change
 				// controllability of the problem events
@@ -523,6 +525,18 @@ public class AutomataSynthesizer
 		retval.disabledEvents = synthesizer.getDisabledEvents();
 		retval.automaton = synthesizer.getAutomaton();
 
+		// Set an apropriate name...
+		retval.automaton.setComment("sup(" + retval.automaton.getName() + ")");
+
+		// Shall we reduce the supervisor?
+		if (synthesizerOptions.getReduceSupervisors())
+		{	// Add the reduced supervisor
+			Automaton supervisor = retval.automaton;
+			Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(supervisor, automata);
+			retval.automaton = reducedSupervisor;
+		}
+
+		// Return the result
 		return retval;
 	}
 

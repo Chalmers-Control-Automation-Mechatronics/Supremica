@@ -94,6 +94,7 @@ public class AutomataSynchronizer
 		Iterator autIt = theAutomata.iterator();
 		StringBuffer comment = new StringBuffer();;
 
+		// Set an apropriate comment on the automaton
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -104,7 +105,6 @@ public class AutomataSynchronizer
 			comment.append(currAutomaton.getName());
 			comment.append("||");
 		}
-
 		comment.delete(comment.length()-2, comment.length());
 		synchHelper.addState(initialState);
 		synchHelper.addComment(comment.toString());
@@ -116,6 +116,7 @@ public class AutomataSynchronizer
 			currExec.start();
 		}
 
+		// Wait for completion
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).join();

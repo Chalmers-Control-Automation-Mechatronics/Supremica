@@ -395,7 +395,7 @@ public class MutuallyNonblockingVerifier
 				// Remove as many transitions of uniqueEvents as you dare...
 				if (uniqueEvents != null && uniqueEvents.size() > 0)
 					count = count + removeUniqueEventTransitions(currSynchAutomaton, uniqueEvents);
-				
+
 				/*
 				// Show automaton with only unique events! Oh if we only could remove
 				// those unnecessary states!

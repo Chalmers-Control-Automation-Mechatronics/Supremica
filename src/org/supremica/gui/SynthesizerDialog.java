@@ -131,19 +131,6 @@ class SynthesizerDialogStandardPanel
 	}
 
 	class NonblockNote
-/*		extends JPanel
-	{
-		public NonblockNote()
-		{
-			super.setLayout(new GridLayout(5,1));
-			super.add(new JLabel("Note:"));
-			super.add(new JLabel("Currently, the modular nonblocking algorithm"));
-			super.add(new JLabel("does not gurantee global nonblocking. The only"));
-			super.add(new JLabel("gurantee is that each supervisor is nonblockng"));
-			super.add(new JLabel("with respect to the plants that it controls"));
-		}
-
-	}*/ // Just showing off the power of correct structuring
 		extends JTextArea
 	{
 		private final int transparent = 0;
@@ -161,7 +148,6 @@ class SynthesizerDialogStandardPanel
 
 	public SynthesizerDialogStandardPanel(int num)
 	{
-
 		algorithmTypeBox = AlgorithmSelector.create(num);
 		algorithmTypeBox.addActionListener(this);
 
@@ -212,14 +198,13 @@ class SynthesizerDialogStandardPanel
 		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
 			optimizeBox.setEnabled(false);
-			nbNote.setVisible(false);
 		}
 		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
 			optimizeBox.setEnabled(false);
-			nbNote.setVisible(false);
 		}
-		else // modular
+
+		if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Modular)
 		{
 			optimizeBox.setEnabled(true);
 			if(synthesisTypeBox.getType() == SynthesisType.Controllable)
@@ -231,14 +216,19 @@ class SynthesizerDialogStandardPanel
 				nbNote.setVisible(true);
 			}
 		}
+		else
+		{
+				nbNote.setVisible(false);
+		}
 	}
 }
 
 class SynthesizerDialogAdvancedPanel
-	extends SynthesizerPanel
+	extends SynthesizerPanel implements ActionListener
 {
 	private JCheckBox maximallyPermissiveBox;
 	private JCheckBox reduceSupervisorsBox;
+	private JTextArea note;
 
 	public SynthesizerDialogAdvancedPanel()
 	{
@@ -246,9 +236,18 @@ class SynthesizerDialogAdvancedPanel
 
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
 		reduceSupervisorsBox = new JCheckBox("Reduce supervisors");
+		reduceSupervisorsBox.addActionListener(this);
 		advancedBox.add(maximallyPermissiveBox);
 		advancedBox.add(reduceSupervisorsBox);
-		this.add(advancedBox);
+
+		note = new JTextArea("Note:\n" +
+				"'Purge result' must be selected for supervisor\n" +
+				"reduction to work.\n");
+		note.setBackground(new Color(0,0,0,0));
+		note.setVisible(false);
+
+		this.add(advancedBox, BorderLayout.CENTER);
+		this.add(note, BorderLayout.SOUTH);
 	}
 
 	public void update(SynthesizerOptions synthesizerOptions)
@@ -261,6 +260,19 @@ class SynthesizerDialogAdvancedPanel
 	{
 		synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
 		synthesizerOptions.setReduceSupervisors(reduceSupervisorsBox.isSelected());
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		if(reduceSupervisorsBox.isSelected())
+		{
+			// purgeBox.setSelected(true);
+			note.setVisible(true);
+		}
+		if(!reduceSupervisorsBox.isSelected())
+		{
+			note.setVisible(false);
+		}
 	}
 }
 

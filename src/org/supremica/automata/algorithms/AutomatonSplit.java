@@ -165,7 +165,8 @@ public class AutomatonSplit
 		}
 
 		// Give the new automaton an appropriate comment
-		result.setComment("red(" + supervisor.getComment() + ")");
+		//result.setComment("red(" + supervisor.getComment() + ")");
+		result.setComment("red(" + supervisor.getName() + ")");
 
 		// Set the right type
 		result.setType(supervisor.getType());  // should be a supervisor...
