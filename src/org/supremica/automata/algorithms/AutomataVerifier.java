@@ -238,7 +238,6 @@ public class AutomataVerifier
 					{	// Check module
 						allModulesControllable = allModulesControllable && checkModule(selectedAutomata);
 	
-						System.out.println("Krsach?");
 						// Stop if uncontrollable						
 						if (!allModulesControllable)
 							return false;
