@@ -7,6 +7,8 @@ public class InteractiveChoice
 	extends Dialog
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
+
 	private Button bOK, bRandom;
 	private java.awt.List choice;
 	private int selected_;
@@ -53,14 +55,14 @@ public class InteractiveChoice
 
 			if (selected_ != -1)
 			{
-				hide();    // we are done
+				setVisible(false);    // we are done
 			}
 		}
 		else if (src == bRandom)
 		{
 			selected_ = (int) (choice.getItemCount() * Math.random());
 
-			hide();    // we are done
+			setVisible(false);    // we are done
 		}
 	}
 }

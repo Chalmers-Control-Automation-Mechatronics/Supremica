@@ -355,7 +355,7 @@ public class PresentStates
 
 	public void execute()
 	{
-		frame.show();
+		frame.setVisible(true);
 
 		if (dispose_frame)
 		{

@@ -1133,6 +1133,6 @@ public class FindStates
 	public void execute(VisualProject theProject, Automata theAutomata)
 		throws Exception
 	{
-		new FindStatesFrame(theProject, theAutomata).show();
+		new FindStatesFrame(theProject, theAutomata).setVisible(true);
 	}
 }

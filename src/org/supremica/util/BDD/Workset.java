@@ -133,7 +133,7 @@ public class Workset
 			}
 		}
 
-		ic.show();
+		ic.setVisible(true);
 
 		return queue[ic.getSelected()];
 	}

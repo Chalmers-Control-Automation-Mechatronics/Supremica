@@ -816,7 +816,7 @@ public abstract class DotViewer
 
 		public void show()
 		{
-			dialog.show();
+			dialog.setVisible(true);
 			dialog.dispose();
 
 			// Is this the right thing to do? It seems to work, but the manuals...

@@ -8,6 +8,8 @@ public class PCGFrame
 	extends Dialog
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
+
 	private PCGNode[] nodes;
 	private int[] perm;
 	private int size;
@@ -68,7 +70,7 @@ public class PCGFrame
 
 	public void getUserPermutation()
 	{
-		show();
+		setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent e)

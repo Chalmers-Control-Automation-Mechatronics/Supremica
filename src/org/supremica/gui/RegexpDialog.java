@@ -223,7 +223,7 @@ public class RegexpDialog
 		setLocation(Utility.getPosForCenter(dim));
 		setResizable(false);
 		reg_exp.selectAll();    // set the whole string as selected
-		show();
+		setVisible(true);
 
 		if (ok)
 		{

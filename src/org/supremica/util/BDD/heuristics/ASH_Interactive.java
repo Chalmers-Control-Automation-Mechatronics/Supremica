@@ -26,7 +26,7 @@ public class ASH_Interactive
 			ic.add(list[queue[i]].getName());
 		}
 
-		ic.show();
+		ic.setVisible(true);
 
 		int sel = ic.getSelected();
 

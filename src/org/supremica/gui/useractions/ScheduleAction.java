@@ -10,6 +10,8 @@ import org.supremica.gui.ScheduleDialog;
 public class ScheduleAction
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
 
 	public ScheduleAction()
@@ -23,7 +25,7 @@ public class ScheduleAction
 	{
 		ScheduleDialog dlg = new ScheduleDialog();
 
-		dlg.show();
+		dlg.setVisible(true);
 
 /*              Automata automata = ActionMan.getGui().getSelectedAutomata();
 				try

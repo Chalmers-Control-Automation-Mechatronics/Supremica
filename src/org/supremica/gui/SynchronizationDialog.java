@@ -278,7 +278,7 @@ public class SynchronizationDialog
 
 	public void show()
 	{
-		dialog.show();
+		dialog.setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent event)

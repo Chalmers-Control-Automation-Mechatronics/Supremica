@@ -680,7 +680,7 @@ class SelectOperatorEventsDialog
 		getContentPane().add(panel);
 		Utility.setupFrame(this, 600, 600);
 		pack();
-		show();
+		setVisible(true);
 	}
 
 	private void doRestrict()
@@ -769,7 +769,7 @@ public class SelectEventsWindow
 			dlg = new SelectOperatorEventsDialog(theAlphabet, name, selectOperator);
 		}
 
-		dlg.show();
+		dlg.setVisible(true);
 	}
 
 	public Alphabet getSelectedEvents()

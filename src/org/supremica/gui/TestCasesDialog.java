@@ -719,7 +719,7 @@ public class TestCasesDialog
 		// We know that this is actually also a TestCase (right?)
 		TestCase tc = (TestCase) comp;
 		
-		hide();
+		setVisible(false);
 		
 		project = tc.doIt();    // Should return a Project (named)
 		

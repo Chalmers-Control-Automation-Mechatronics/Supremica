@@ -115,7 +115,7 @@ public class ErrorDialog
 		Point point = Utility.getPosForCenter(getSize());
 
 		setLocation(point);
-		show();
+		setVisible(true);
 	}
 
 	public ErrorDialog(JFrame frame, String message)

@@ -413,7 +413,7 @@ class LanguageRestrictorDialog
 		getContentPane().add(panel);
 		Utility.setupFrame(this, 600, 600);
 		pack();
-		show();
+		setVisible(true);
 	}
 
 	protected void shutWindow()

@@ -7,6 +7,8 @@ import java.awt.event.*;
 
 
 public class LevelGraph extends Frame implements WindowListener {
+	private static final long serialVersionUID = 1L;
+
 	private static final int HEIGHT = 100;
 	private static final int WIDTH = 128;
 
@@ -42,7 +44,7 @@ public class LevelGraph extends Frame implements WindowListener {
 
 		addWindowListener(this);
 		pack();
-		show();
+		setVisible(true);
 	}
 
 	// ---------------------------------------------------
@@ -98,6 +100,8 @@ public class LevelGraph extends Frame implements WindowListener {
 
 
 class LevelCanvas extends Canvas {
+	private static final long serialVersionUID = 1L;
+
 	private static final int W_GAP = 5;
 	private static final int H_GAP = 5;
 

@@ -134,7 +134,7 @@ public final class ExecutionDialog
 
 		// Hit it!
 		setMode(ExecutionDialogMode.uninitialized);
-		show();
+		setVisible(true);
 	}
 
 	/**

@@ -29,7 +29,7 @@ public class TextFrame
 		getContentPane().add(textpanel, BorderLayout.CENTER);
 		pack();
 		Utility.setupFrame(this, WIDTH, HEIGHT);
-		show();
+		setVisible(true);
 	}
 
 	TextPanel getTextPanel()

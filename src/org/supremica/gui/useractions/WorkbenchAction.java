@@ -56,6 +56,6 @@ public class WorkbenchAction
 		}
 
 		wb = new Workbench(theProject, theAutomata);
-		wb.show();
+		wb.setVisible(true);
 	}
 }

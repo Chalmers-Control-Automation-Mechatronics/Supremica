@@ -75,7 +75,7 @@ public class EditCommentDialog
 		Point point = Utility.getPosForCenter(getSize());
 
 		setLocation(point);
-		show();
+		setVisible(true);
 	}
 
 	public String getComment()

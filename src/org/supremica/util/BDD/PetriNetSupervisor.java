@@ -148,7 +148,7 @@ public class PetriNetSupervisor
 			return -1;
 		}
 
-		ic.show();
+		ic.setVisible(true);
 
 		return queue[ic.getSelected()];
 	}

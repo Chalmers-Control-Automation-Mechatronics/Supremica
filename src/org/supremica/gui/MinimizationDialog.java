@@ -130,7 +130,7 @@ public class MinimizationDialog
 
 	public void show()
 	{
-		dialog.show();
+		dialog.setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent event)
@@ -168,6 +168,8 @@ public class MinimizationDialog
 		extends MinimizationPanel
 		implements ActionListener
 	{
+		private static final long serialVersionUID = 1L;
+
 		private JComboBox minimizationTypeBox;
 		private JCheckBox alsoTransitions;
 		private JCheckBox keepOriginal;
@@ -286,6 +288,8 @@ public class MinimizationDialog
 		extends MinimizationPanel
 		implements ActionListener
 	{
+		private static final long serialVersionUID = 1L;
+
 		private JCheckBox compositionalMinimization;
 		private JComboBox minimizationStrategy;
 		private Alphabet unionAlphabet;

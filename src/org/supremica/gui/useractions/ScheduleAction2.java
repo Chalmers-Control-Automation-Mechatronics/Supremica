@@ -13,6 +13,8 @@ import org.supremica.gui.*;
 public class ScheduleAction2
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(ScheduleAction2.class);
 
 	public ScheduleAction2()
@@ -34,7 +36,7 @@ public class ScheduleAction2
 		{
 			ScheduleDialog2 dlg = new ScheduleDialog2();
 
-			dlg.show();
+			dlg.setVisible(true);
 		}
 		else
 		{
