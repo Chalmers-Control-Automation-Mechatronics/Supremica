@@ -779,16 +779,17 @@ class SoftPLCPanel
 /** BDD specific stuff, what a f**king mess! */
 class BDDPanel1
 	extends JPanel
+	implements ActionListener
 {
 	private PreferencesDialog theDialog = null;
 	private JCheckBox alterPCG, traceOn, ucOptimistic, nbOptimistic;
 	/* package access */
 	JCheckBox debugOn;
-	private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn,
-					  burstMode;
+	private JCheckBox sizeWatch, profileOn;
 	private JComboBox algorithmFamily, dssiHeuristics, ndasHeuristics;
-	private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics,
-					  frontierStrategy;
+	private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics;
+	private JComboBox showGrow, frontierStrategy;
+	private JButton bProofFile;
 
 	public BDDPanel1(PreferencesDialog theDialog)
 	{
@@ -801,9 +802,9 @@ class BDDPanel1
 
 		// pLeft.add(tmp = new JLabel("Please don't touch anything", SwingConstants.CENTER), BorderLayout.NORTH);
 		// tmp.setForeground(Color.red);
-		JPanel pWest = new JPanel(new GridLayout(10, 1));
-
+		JPanel pWest = new JPanel(new GridLayout(7, 1));
 		pLeft.add(pWest, BorderLayout.CENTER);
+
 		pWest.add(tmp = new JLabel("User interaction and reports:", SwingConstants.LEFT));
 		tmp.setForeground(Color.blue);
 		pWest.add(alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG));
@@ -811,16 +812,24 @@ class BDDPanel1
 		pWest.add(debugOn = new JCheckBox("Verbose", Options.debug_on));
 		pWest.add(profileOn = new JCheckBox("Profile", Options.profile_on));
 		pWest.add(sizeWatch = new JCheckBox("report nodcount", Options.size_watch));
-		pWest.add(tmp = new JLabel("Computation options:"));
-		tmp.setForeground(Color.blue);
 
-		// pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
-		// pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
-		pWest.add(localSaturation = new JCheckBox("Locally saturate", Options.local_saturation));
-		localSaturation.setEnabled(false);
-		pWest.add(encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars));
-		encodingFill.setEnabled(false);
-		pWest.add(burstMode = new JCheckBox("Burst-mode workset", Options.burst_mode));
+
+		JPanel pWest2 = new JPanel(new GridLayout(2, 1));
+		pLeft.add(pWest2, BorderLayout.SOUTH);
+
+		JPanel pGrow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		pWest2.add(pGrow);
+		pGrow.add(new JLabel("BDD graphs"));
+		pGrow.add(showGrow = new JComboBox());
+		insert(showGrow, Options.SHOW_GROW_NAMES, Options.show_grow);
+
+		JPanel pProof = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+		pProof.add(bProofFile = new JButton("Set proof file"));
+		pProof.add(new JLabel(" (verbose and slow!)"));
+		bProofFile.addActionListener(this);
+		pWest2.add(pProof);
+
 
 		// -------------------------------------------------------
 		Box p = new Box(BoxLayout.Y_AXIS);
@@ -907,35 +916,76 @@ class BDDPanel1
 		Options.es_heuristics = esHeuristics.getSelectedIndex();
 		Options.dssi_heuristics = dssiHeuristics.getSelectedIndex();
 		Options.user_alters_PCG = alterPCG.isSelected();
-
-		// Options.uc_optimistic    = ucOptimistic.isSelected();
-		// Options.nb_optimistic    = nbOptimistic.isSelected();
-		Options.burst_mode = burstMode.isSelected();
 		Options.trace_on = traceOn.isSelected();
 		Options.profile_on = profileOn.isSelected();
 		Options.debug_on = debugOn.isSelected();
 		Options.size_watch = sizeWatch.isSelected();
-		Options.local_saturation = localSaturation.isSelected();
-		Options.fill_statevars = encodingFill.isSelected();
+		Options.show_grow = showGrow.getSelectedIndex();
 
 		return true;
 	}
 
 	public void update() {}
+
+
+	// ---------------------------------------------------------
+	public void actionPerformed(ActionEvent e)
+	{
+		Object src = e.getSource();
+
+		if (src == bProofFile)
+		{
+			onSetProofFile();
+		}
+	}
+
+	private void onSetProofFile()
+	{
+
+		// AWT is much better than Swing
+		FileDialog fd = new FileDialog(theDialog.getOwnerFrame(), "Choose a proof file", FileDialog.SAVE);
+
+		fd.show();
+
+		if (fd.getFile() != null)
+		{
+			String path = fd.getDirectory() + fd.getFile();
+
+			try
+			{
+				FileOutputStream fos = new FileOutputStream(path, true);
+				PrintStream ps = new PrintStream(fos);
+
+				Options.out = ps;
+
+				theDialog.theBDDPanel1.debugOn.setSelected(true);    // enable debug!
+
+				Date now = new Date();
+
+				Options.out.println("\n Proof file opened at " + now);
+				System.out.println("Proof file: " + path);
+			}
+			catch (IOException exx)
+			{
+				System.err.println("Unable to set proof file: " + exx);
+			}
+		}
+	}
 }
+
+
 
 /** more BDD specific stuff, still a mess! */
 class BDDPanel2
 	extends JPanel
-	implements ActionListener
 {
 	private PreferencesDialog theDialog = null;
-	private JComboBox cbReordering, showGrow, countAlgorithm,
+	private JComboBox cbReordering, countAlgorithm,
 					  orderingAlgorithm, encodingAlgorithm;
-	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup,
-					  cReorderGroupFree;
+	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup;
+	private JCheckBox localSaturation, encodingFill,  cReorderGroupFree;
+	private JCheckBox burstMode, supCreachableonly;
 	private JTextField maxPartitionSize, extraLibDir;
-	private JButton bProofFile;
 
 	public BDDPanel2(PreferencesDialog theDialog)
 	{
@@ -1020,6 +1070,21 @@ class BDDPanel2
 		pTopRight.add(pExtraLib);
 
 		// BOTTOM RIGHT
+		JPanel pBottomRight = new JPanel(new GridLayout(5, 1));
+		pRight.add(pBottomRight, BorderLayout.SOUTH);
+
+		pBottomRight.add(tmp = new JLabel("Computation options:"));
+		tmp.setForeground(Color.blue);
+		// pBottomRight.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
+		// pBottomRight.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
+		pBottomRight.add(localSaturation = new JCheckBox("Locally saturate", Options.local_saturation));
+		localSaturation.setEnabled(false);
+		pBottomRight.add(encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars));
+		encodingFill.setEnabled(false);
+		pBottomRight.add(burstMode = new JCheckBox("Burst-mode workset", Options.burst_mode));
+		pBottomRight.add(supCreachableonly = new JCheckBox("uncontrollable(P||Sp) must be reahcable in supNBC ", Options.restrict_subC_to_reachables));
+
+		/*
 		JPanel pBottomRight = new JPanel(new GridLayout(3, 1));
 
 		pRight.add(pBottomRight, BorderLayout.SOUTH);
@@ -1039,6 +1104,7 @@ class BDDPanel2
 		pProof.add(new JLabel(" (verbose and slow!)"));
 		bProofFile.addActionListener(this);
 		pBottomRight.add(pProof);
+		*/
 	}
 
 	public boolean doApply()
@@ -1059,9 +1125,13 @@ class BDDPanel2
 		Options.reorder_within_group = cReorderGroupFree.isSelected();
 		Options.ordering_algorithm = orderingAlgorithm.getSelectedIndex();
 		Options.encoding_algorithm = encodingAlgorithm.getSelectedIndex();
-		Options.show_grow = showGrow.getSelectedIndex();
 		Options.count_algo = countAlgorithm.getSelectedIndex();
-
+		Options.local_saturation = localSaturation.isSelected();
+		Options.fill_statevars = encodingFill.isSelected();
+		// Options.uc_optimistic    = ucOptimistic.isSelected();
+		// Options.nb_optimistic    = nbOptimistic.isSelected();
+		Options.burst_mode = burstMode.isSelected();
+		Options.restrict_subC_to_reachables = supCreachableonly.isSelected();
 		return true;
 	}
 
@@ -1078,52 +1148,8 @@ class BDDPanel2
 		cb.setSelectedIndex(def);
 		cb.setMaximumRowCount(20);
 	}
-
-	// ---------------------------------------------------------
-	public void actionPerformed(ActionEvent e)
-	{
-		Object src = e.getSource();
-
-		if (src == bProofFile)
-		{
-			onSetProofFile();
-		}
-	}
-
-	private void onSetProofFile()
-	{
-
-		// AWT is much better than Swing
-		FileDialog fd = new FileDialog(theDialog.getOwnerFrame(), "Choose a proof file", FileDialog.SAVE);
-
-		fd.show();
-
-		if (fd.getFile() != null)
-		{
-			String path = fd.getDirectory() + fd.getFile();
-
-			try
-			{
-				FileOutputStream fos = new FileOutputStream(path, true);
-				PrintStream ps = new PrintStream(fos);
-
-				Options.out = ps;
-
-				theDialog.theBDDPanel1.debugOn.setSelected(true);    // enable debug!
-
-				Date now = new Date();
-
-				Options.out.println("\n Proof file opened at " + now);
-				System.out.println("Proof file: " + path);
-			}
-			catch (IOException exx)
-			{
-				System.err.println("Unable to set proof file: " + exx);
-			}
-		}
-	}
 }
-;
+
 
 class SimulationPanel
 	extends JPanel

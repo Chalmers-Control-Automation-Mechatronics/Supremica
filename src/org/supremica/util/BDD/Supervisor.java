@@ -1003,6 +1003,21 @@ public class Supervisor
 
 		int marked = GroupHelper.getM(manager, spec, plant);
 
+		if(Options.restrict_subC_to_reachables)
+		{
+			Timer t2 = null;
+			if(Options.profile_on)
+			{
+				t2 = new Timer("Supervisor.getSafeStatesNBC");
+			}
+			int forward = getReachables();
+			x = manager.andTo(x, forward);
+
+			if(Options.profile_on)
+			{
+				t2.report("computed the intersection of reachable states and uncontrollables");
+			}
+		}
 
 
 		int implicitly_forbidden = manager.computeF();

@@ -242,6 +242,7 @@ public class Options
 	public static boolean uc_optimistic = true;
 	public static boolean nb_optimistic = true;
 	public static boolean burst_mode = false;
+	public static boolean restrict_subC_to_reachables = false; // P||Sp uncontrollable states should be reachable only!
 
 	/** initial burst mode: to do some initial work before the reachability algo realy starts */
 

@@ -165,7 +165,9 @@ public final class SupremicaProperties
 	private static final String BDD_H2 = "bddH2";    // ndas_heuristics
 	private static final String BDD_DSSI_HEURISTIC = "bddDelayedStarSelection";    // dssi_heuristics
 	private static final String BDD_PARTITION_MAX = "bddMaxPartitionSize";    // max_partition_size
-	private static final String BDD_ENCODING_ALGO = "bddSatteEncodingAlgorithm";    // encoding_algorithm
+	private static final String BDD_ENCODING_ALGO = "bddStateEncodingAlgorithm";    // encoding_algorithm
+	private static final String BDD_SYNC_UC_IN_SUP = "bddSyncUcInSupMustBeReachable";    // restrict_subC_to_reachables
+
 
 	// Simulation stuff
 	private static final String SIMULATION_IS_EXTERNAL = "simulationIsExternal";
@@ -1379,6 +1381,7 @@ public static String getLocalPrefsDirectory()
 			setOption(BDD_DSSI_HEURISTIC, Options.dssi_heuristics);
 			setOption(BDD_PARTITION_MAX, Options.max_partition_size);
 			setOption(BDD_ENCODING_ALGO, Options.encoding_algorithm);
+			setOption(BDD_SYNC_UC_IN_SUP, Options.restrict_subC_to_reachables);
 			setOption(BDD_LIB_PATH, Options.extraLibPath);
 		}
 		else
@@ -1404,6 +1407,7 @@ public static String getLocalPrefsDirectory()
 			Options.dssi_heuristics = optionAsInt(BDD_DSSI_HEURISTIC, Options.dssi_heuristics);
 			Options.max_partition_size = optionAsInt(BDD_PARTITION_MAX, Options.max_partition_size);
 			Options.encoding_algorithm = optionAsInt(BDD_ENCODING_ALGO, Options.encoding_algorithm);
+			Options.restrict_subC_to_reachables = optionAsBoolean(BDD_SYNC_UC_IN_SUP, Options.restrict_subC_to_reachables);
 			Options.extraLibPath = optionAsString(BDD_LIB_PATH, Options.extraLibPath);
 		}
 	}
