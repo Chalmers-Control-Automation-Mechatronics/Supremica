@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="RobotAssemblyCell"  major="0"  minor="9" >
+<Automaton name="Zone8" type="Plant">
+	<Events>
+		<Event id="e_3_48" label="e_3_48"/>
+		<Event id="e_3_68" label="e_3_68"/>
+		<Event id="e_4_48" label="e_4_48"/>
+		<Event id="e_4_68" label="e_4_68"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_3_48"/>
+		<Transition source="q_0" dest="q_2" event="e_4_48"/>
+		<Transition source="q_1" dest="q_0" event="e_3_68"/>
+		<Transition source="q_2" dest="q_0" event="e_4_68"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone7" type="Plant">
+	<Events>
+		<Event id="e_2_47" label="e_2_47"/>
+		<Event id="e_2_67" label="e_2_67"/>
+		<Event id="e_3_47" label="e_3_47"/>
+		<Event id="e_3_67" label="e_3_67"/>
+		<Event id="e_6_47" label="e_6_47"/>
+		<Event id="e_6_67" label="e_6_67"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+		<State id="q_3"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_2_47"/>
+		<Transition source="q_0" dest="q_2" event="e_3_47"/>
+		<Transition source="q_0" dest="q_3" event="e_6_47"/>
+		<Transition source="q_1" dest="q_0" event="e_2_67"/>
+		<Transition source="q_2" dest="q_0" event="e_3_67"/>
+		<Transition source="q_3" dest="q_0" event="e_6_67"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone5" type="Plant">
+	<Events>
+		<Event id="e_4_45" label="e_4_45"/>
+		<Event id="e_4_65" label="e_4_65"/>
+		<Event id="e_7_45" label="e_7_45"/>
+		<Event id="e_7_65" label="e_7_65"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_4_45"/>
+		<Transition source="q_0" dest="q_2" event="e_7_45"/>
+		<Transition source="q_1" dest="q_0" event="e_4_65"/>
+		<Transition source="q_2" dest="q_0" event="e_7_65"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone4" type="Plant">
+	<Events>
+		<Event id="e_3_44" label="e_3_44"/>
+		<Event id="e_3_64" label="e_3_64"/>
+		<Event id="e_4_44" label="e_4_44"/>
+		<Event id="e_4_64" label="e_4_64"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_4_44"/>
+		<Transition source="q_0" dest="q_2" event="e_3_44"/>
+		<Transition source="q_1" dest="q_0" event="e_4_64"/>
+		<Transition source="q_2" dest="q_0" event="e_3_64"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone16" type="Plant">
+	<Events>
+		<Event id="e_1_56" label="e_1_56"/>
+		<Event id="e_1_76" label="e_1_76"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_1_56"/>
+		<Transition source="q_1" dest="q_0" event="e_1_76"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone2" type="Plant">
+	<Events>
+		<Event id="e_1_42" label="e_1_42"/>
+		<Event id="e_1_62" label="e_1_62"/>
+		<Event id="e_2_42" label="e_2_42"/>
+		<Event id="e_2_62" label="e_2_62"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_1_42"/>
+		<Transition source="q_0" dest="q_2" event="e_2_42"/>
+		<Transition source="q_1" dest="q_0" event="e_1_62"/>
+		<Transition source="q_2" dest="q_0" event="e_2_62"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone1" type="Plant">
+	<Events>
+		<Event id="e_1_41" label="e_1_41"/>
+		<Event id="e_1_61" label="e_1_61"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_1_41"/>
+		<Transition source="q_1" dest="q_0" event="e_1_61"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone12" type="Plant">
+	<Events>
+		<Event id="e_3_52" label="e_3_52"/>
+		<Event id="e_3_72" label="e_3_72"/>
+		<Event id="e_4_52" label="e_4_52"/>
+		<Event id="e_4_52b" label="e_4_52b"/>
+		<Event id="e_4_72" label="e_4_72"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_3_52"/>
+		<Transition source="q_0" dest="q_2" event="e_4_52"/>
+		<Transition source="q_0" dest="q_2" event="e_4_52b"/>
+		<Transition source="q_1" dest="q_0" event="e_3_72"/>
+		<Transition source="q_2" dest="q_0" event="e_4_72"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone11" type="Plant">
+	<Events>
+		<Event id="e_3_51" label="e_3_51"/>
+		<Event id="e_3_51b" label="e_3_51b"/>
+		<Event id="e_3_71" label="e_3_71"/>
+		<Event id="e_4_51" label="e_4_51"/>
+		<Event id="e_4_71" label="e_4_71"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_3_51"/>
+		<Transition source="q_0" dest="q_2" event="e_4_51"/>
+		<Transition source="q_0" dest="q_1" event="e_3_51b"/>
+		<Transition source="q_1" dest="q_0" event="e_3_71"/>
+		<Transition source="q_2" dest="q_0" event="e_4_71"/>
+	</Transitions>
+</Automaton>
+<Automaton name="NB_Monitor1" type="Supervisor">
+	<Events>
+		<Event id="e_3_51b" label="e_3_51b"/>
+		<Event id="e_3_52" label="e_3_52"/>
+		<Event id="e_4_51" label="e_4_51"/>
+		<Event id="e_4_52b" label="e_4_52b"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_3_51b"/>
+		<Transition source="q_0" dest="q_2" event="e_4_52b"/>
+		<Transition source="q_1" dest="q_0" event="e_3_52"/>
+		<Transition source="q_2" dest="q_0" event="e_4_51"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Gate2" type="Specification">
+	<Events>
+		<Event id="e_7_45" label="e_7_45"/>
+		<Event id="e_7_65" label="e_7_65"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_7_45"/>
+		<Transition source="q_1" dest="q_0" event="e_7_65"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Gate1" type="Specification">
+	<Events>
+		<Event id="e_6_47" label="e_6_47"/>
+		<Event id="e_6_67" label="e_6_67"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_6_47"/>
+		<Transition source="q_1" dest="q_0" event="e_6_67"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Robot4" type="Specification">
+	<Events>
+		<Event id="e_4_44" label="e_4_44"/>
+		<Event id="e_4_45" label="e_4_45"/>
+		<Event id="e_4_48" label="e_4_48"/>
+		<Event id="e_4_51" label="e_4_51"/>
+		<Event id="e_4_52" label="e_4_52"/>
+		<Event id="e_4_52b" label="e_4_52b"/>
+		<Event id="e_4_64" label="e_4_64"/>
+		<Event id="e_4_65" label="e_4_65"/>
+		<Event id="e_4_68" label="e_4_68"/>
+		<Event id="e_4_71" label="e_4_71"/>
+		<Event id="e_4_72" label="e_4_72"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+		<State id="q_3"/>
+		<State id="q_4"/>
+		<State id="q_5"/>
+		<State id="q_6"/>
+		<State id="q_7"/>
+		<State id="q_8"/>
+		<State id="q_9"/>
+		<State id="q_10"/>
+		<State id="q_11"/>
+		<State id="q_12"/>
+		<State id="q_13"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_4_52"/>
+		<Transition source="q_1" dest="q_2" event="e_4_44"/>
+		<Transition source="q_2" dest="q_3" event="e_4_72"/>
+		<Transition source="q_3" dest="q_4" event="e_4_64"/>
+		<Transition source="q_4" dest="q_5" event="e_4_52b"/>
+		<Transition source="q_5" dest="q_6" event="e_4_51"/>
+		<Transition source="q_6" dest="q_7" event="e_4_48"/>
+		<Transition source="q_7" dest="q_8" event="e_4_44"/>
+		<Transition source="q_8" dest="q_9" event="e_4_45"/>
+		<Transition source="q_9" dest="q_10" event="e_4_71"/>
+		<Transition source="q_10" dest="q_11" event="e_4_72"/>
+		<Transition source="q_11" dest="q_12" event="e_4_64"/>
+		<Transition source="q_12" dest="q_13" event="e_4_65"/>
+		<Transition source="q_13" dest="q_0" event="e_4_68"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Robot3" type="Specification">
+	<Events>
+		<Event id="e_3_44" label="e_3_44"/>
+		<Event id="e_3_47" label="e_3_47"/>
+		<Event id="e_3_48" label="e_3_48"/>
+		<Event id="e_3_51" label="e_3_51"/>
+		<Event id="e_3_51b" label="e_3_51b"/>
+		<Event id="e_3_52" label="e_3_52"/>
+		<Event id="e_3_64" label="e_3_64"/>
+		<Event id="e_3_67" label="e_3_67"/>
+		<Event id="e_3_68" label="e_3_68"/>
+		<Event id="e_3_71" label="e_3_71"/>
+		<Event id="e_3_72" label="e_3_72"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+		<State id="q_3"/>
+		<State id="q_4"/>
+		<State id="q_5"/>
+		<State id="q_6"/>
+		<State id="q_7"/>
+		<State id="q_8"/>
+		<State id="q_9"/>
+		<State id="q_10"/>
+		<State id="q_11"/>
+		<State id="q_12"/>
+		<State id="q_13"/>
+		<State id="q_14"/>
+		<State id="q_15"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_3_51"/>
+		<Transition source="q_1" dest="q_2" event="e_3_47"/>
+		<Transition source="q_2" dest="q_3" event="e_3_48"/>
+		<Transition source="q_3" dest="q_4" event="e_3_71"/>
+		<Transition source="q_4" dest="q_5" event="e_3_68"/>
+		<Transition source="q_5" dest="q_6" event="e_3_67"/>
+		<Transition source="q_6" dest="q_7" event="e_3_51b"/>
+		<Transition source="q_7" dest="q_8" event="e_3_52"/>
+		<Transition source="q_8" dest="q_9" event="e_3_44"/>
+		<Transition source="q_9" dest="q_10" event="e_3_47"/>
+		<Transition source="q_10" dest="q_11" event="e_3_48"/>
+		<Transition source="q_11" dest="q_12" event="e_3_72"/>
+		<Transition source="q_12" dest="q_13" event="e_3_71"/>
+		<Transition source="q_13" dest="q_14" event="e_3_64"/>
+		<Transition source="q_14" dest="q_15" event="e_3_68"/>
+		<Transition source="q_15" dest="q_0" event="e_3_67"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Robot2" type="Specification">
+	<Events>
+		<Event id="e_2_42" label="e_2_42"/>
+		<Event id="e_2_47" label="e_2_47"/>
+		<Event id="e_2_62" label="e_2_62"/>
+		<Event id="e_2_67" label="e_2_67"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+		<State id="q_3"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_2_42"/>
+		<Transition source="q_1" dest="q_2" event="e_2_47"/>
+		<Transition source="q_2" dest="q_3" event="e_2_62"/>
+		<Transition source="q_3" dest="q_0" event="e_2_67"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Robot1" type="Specification">
+	<Events>
+		<Event id="e_1_41" label="e_1_41"/>
+		<Event id="e_1_42" label="e_1_42"/>
+		<Event id="e_1_56" label="e_1_56"/>
+		<Event id="e_1_61" label="e_1_61"/>
+		<Event id="e_1_62" label="e_1_62"/>
+		<Event id="e_1_76" label="e_1_76"/>
+	</Events>
+	<States>
+		<State id="q_0" initial="true" accepting="true"/>
+		<State id="q_1"/>
+		<State id="q_2"/>
+		<State id="q_3"/>
+		<State id="q_4"/>
+		<State id="q_5"/>
+	</States>
+	<Transitions>
+		<Transition source="q_0" dest="q_1" event="e_1_41"/>
+		<Transition source="q_1" dest="q_2" event="e_1_56"/>
+		<Transition source="q_2" dest="q_3" event="e_1_42"/>
+		<Transition source="q_3" dest="q_4" event="e_1_62"/>
+		<Transition source="q_4" dest="q_5" event="e_1_76"/>
+		<Transition source="q_5" dest="q_0" event="e_1_61"/>
+	</Transitions>
+</Automaton>
+</Automata>

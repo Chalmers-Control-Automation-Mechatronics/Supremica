@@ -209,9 +209,9 @@ deleteTrailingComments                    = false
 deleteEndOfLineComments                   = false
 
 formatBlockComments                       = false
-formatSingleLineComments                  = true
-formatTrailingComments                    = true
-formatEndOfLineComments                   = true
+formatSingleLineComments                  = false
+formatTrailingComments                    = false
+formatEndOfLineComments                   = false
 
 
 ### Comments -- Exceptions

@@ -47,77 +47,54 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+/**
+ * The files in this package are not pure test cases, instead they are used
+ * by test cases in other packages. Please, do not store pure test cases in
+ * this directory.
+ */
+package org.supremica.testhelpers;
 
-import org.supremica.testhelpers.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
+import java.util.*;
 import java.io.*;
 
-public class TestAutomataToXml
-	extends TestCase
+public class TestFiles
 {
-	private static final String tempFilePrefix = "SupremicaDummyFile";
-	private static final String tempFileSuffix = "xml";
+	private static List collection = new LinkedList();
+	public static final TestFiles AGV = new TestFiles("agv.xml");
+	public static final TestFiles CatMouse = new TestFiles("catmouse.xml");
+	public static final TestFiles CentralLocking3Doors = new TestFiles("centralLocking3Doors.xml");
+	public static final TestFiles CircularTable = new TestFiles("circularTable.xml");
+	public static final TestFiles FlexibleManufacturingCell = new TestFiles("flexibleManufacturingCell.xml");
+	public static final TestFiles FlexibleManufacturingSystem = new TestFiles("flexibleManufacturingSystem.xml");
+	public static final TestFiles robotAssemblyCell = new TestFiles("robotAssemblyCell.xml");
+	private static final String testFilePrefix = "./tests/testfiles/";
 
-	public TestAutomataToXml(String name)
+	private String filename;
+
+	private TestFiles(String filename)
 	{
-		super(name);
+		collection.add(this);
+		this.filename = filename;
 	}
 
-	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
+	public static Iterator iterator()
 	{
+		return collection.iterator();
 	}
 
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
+	public String toString()
 	{
+		return filename;
 	}
 
-	/**
-	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
-	 */
-	public static Test suite()
+	public static Object[] toArray()
 	{
-		TestSuite suite = new TestSuite(TestProjectToXml.class);
-		return suite;
+		return collection.toArray();
 	}
 
-	public void testReadWriteRead()
+	public static File getFile(TestFiles theTestFile)
 	{
-		try
-		{
-			File testFileAgv = TestFiles.getFile(TestFiles.AGV);
-			ProjectBuildFromXml originalBuilder = new ProjectBuildFromXml();
-			Project theOriginalProject = originalBuilder.build(testFileAgv);
-			assertTrue(theOriginalProject.nbrOfAutomata() > 0);
-			File tempFile = File.createTempFile(tempFilePrefix, tempFileSuffix);
-			AutomataToXml exporter = new AutomataToXml(theOriginalProject);
-			exporter.serialize(tempFile);
-			ProjectBuildFromXml secondBuilder = new ProjectBuildFromXml();
-			Project theSecondProject = secondBuilder.build(tempFile);
-			tempFile.delete();
-			assertTrue(theOriginalProject != null);
-			assertTrue(theSecondProject != null);
-			assertTrue(theOriginalProject.equalProject(theSecondProject));
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
+		return new File(testFilePrefix + theTestFile);
 	}
-
 }
