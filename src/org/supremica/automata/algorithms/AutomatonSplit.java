@@ -141,6 +141,7 @@ public class AutomatonSplit
 
 		try
 		{
+			// Remove event and examine if it was redundant
 			for (EventIterator evIt = result.eventIterator(); evIt.hasNext();)
 			{
 				LabeledEvent event = evIt.nextEvent();
@@ -149,7 +150,7 @@ public class AutomatonSplit
 				if (!parentUnion.containsEqualEvent(event))
 					continue;
 
-				// Remove one event from the supervisor´s alphabet
+				// Remove one event from the automaton´s alphabet
 				Automaton reduction = removeEvent(result, event);
 
 				// Have we removed something vital? (If not, that's good!)
@@ -161,6 +162,26 @@ public class AutomatonSplit
 					result = reduction;
 				}
 			}
+
+			/*
+			// Merge states and examine if it was redundant
+			for (ArcIterator arcIt = result.arcIterator(); arcIt.hasNext();)
+			{
+				Arc arc = arcIt.nextArc();
+
+				// Merge states in transition, make selfloop
+				Automaton reduction = removeTransition(result, arc);
+
+				// Have we removed something vital? (If not, that's good!)
+				Automata automataA = new Automata();
+				automataA.addAutomaton(reduction);
+				automataA.addAutomata(parents);
+				if (AutomataVerifier.verifyInclusion(automataA, automataB))
+				{   // Removing the event didn't make a difference!
+					result = reduction;
+				}
+			}
+			*/
 		}
 		catch (Exception ex)
 		{
@@ -200,6 +221,39 @@ public class AutomatonSplit
 		// Set comment and return
 		Automaton result = minimizer.getMinimizedAutomaton();
 		result.setComment(automaton + "\\" + restrictAlphabet);
+		return result;
+	}
+
+	/**
+	 * Merges the from and to states of a transition, the transition itself
+	 * becomes a self loop.
+	 */
+	private static Automaton removeTransition(Automaton automaton, Arc arc)
+		throws Exception
+	{
+		State fromState = arc.getFromState();
+		State toState = arc.getToState();
+
+		for (ArcIterator arcIt = toState.incomingArcsIterator(); arcIt.hasNext();)
+		{
+			Arc currArc = arcIt.nextArc();
+			currArc.setToState(fromState);
+		}
+		for (ArcIterator arcIt = toState.outgoingArcsIterator(); arcIt.hasNext();)
+		{
+			Arc currArc = arcIt.nextArc();
+			currArc.setFromState(fromState);
+		}
+
+		// Make deterministic
+		Determinizer detm = new Determinizer(automaton);
+		detm.execute();
+		Automaton deterministic = detm.getNewAutomaton();
+
+		// Minimize
+		AutomatonMinimizer minimizer = new AutomatonMinimizer(deterministic);
+		Automaton result = minimizer.getMinimizedAutomaton();
+
 		return result;
 	}
 }

@@ -292,10 +292,8 @@ public class Determinizer
 		return stateset;
 	}
 
-
-
 	// Calc the epsilon closure for this set of states
-	// For each state, calc its closure and return teh union of the lot
+	// For each state, calc its closure and return the union of the lot
 	private StateSet epsilonClosure(StateSet states)
 	{
 		debugPrint("(eCSS) epsilonClosure(" + states.toString() + ")", true);

@@ -85,7 +85,7 @@ public class StateSet
 	{
 		return theSet.addAll(collection);
 	}
-	
+
 	public void clear()
 	{
 		theSet.clear();
@@ -167,9 +167,9 @@ public class StateSet
 		return (State)iterator().next();
 	}
 
-	/** 
+	/**
 	 *	Creates a new state named as the composition of the states in this set
-	 *  Should use the globally defined state separator (and thus, this method 
+	 *  Should use the globally defined state separator (and thus, this method
 	 *	should not even be here)
 	 */
 	public State createNewState()
@@ -202,5 +202,4 @@ public class StateSet
 
 		return newstate;
 	}
-
 }

@@ -53,7 +53,7 @@ import org.supremica.log.*;
 public class Arc
 {
 	private static Logger logger = LoggerFactory.createLogger(Arc.class);
-	
+
 	private LabeledEvent event;
 	private State fromState;
 	private State toState;
@@ -70,10 +70,10 @@ public class Arc
 	private int beginY = -1;
 	private int endX = -1;
 	private int endY = -1;
-	
+
 	/**
-	 * This variable indicates which (initial) automata are "the brains behind" 
-	 * this Arc. It has only a reasonable value if synchronization is performed. 
+	 * This variable indicates which (initial) automata are "the brains behind"
+	 * this Arc. It has only a reasonable value if synchronization is performed.
 	 */
 	private boolean[] firingAutomata = null;
 
@@ -282,7 +282,7 @@ public class Arc
 
 		return angle;
 	}
-	
+
 	/**
 	 *	Returns a boolean vector where true means that the corresponding automata
 	 *	is (one of the) "responsible(s)" for the transition.
@@ -290,12 +290,12 @@ public class Arc
 	 *	@return firingAutomata
 	 */
 	 public boolean[] getFiringAutomata() { return firingAutomata; }
-	
+
 	// For debugging (etc)
 	public String toString()
 	{
 		StringBuffer sbuf = new StringBuffer();
-		
+
 		sbuf.append("<");
 		sbuf.append(getFromState().toString());
 		sbuf.append(", ");
@@ -305,7 +305,7 @@ public class Arc
 		sbuf.append(">");
 		return sbuf.toString();
 	}
-	
+
 	/**
 	 *	Initializes the array of firingAutomata
 	 *
@@ -313,8 +313,8 @@ public class Arc
 	 */
 	private void initFiringAutomata(int size)
 	{
-		firingAutomata = new boolean[size];	
-		
+		firingAutomata = new boolean[size];
+
 		for (int i=0; i<size; i++)
 			firingAutomata[i] = false;
 	}
