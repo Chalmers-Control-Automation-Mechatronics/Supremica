@@ -59,6 +59,7 @@ public final class SynthesizerOptions
 	private boolean purge;
 	private boolean optimize;
 	private boolean maximallyPermissive;
+	private boolean rememberDisabledEvents;
 
 	public SynthesizerOptions()
 	{
@@ -123,6 +124,16 @@ public final class SynthesizerOptions
 	public boolean doPurge()
 	{
 		return purge;
+	}
+
+	public void setRememberDisabledEvents(boolean remember)
+	{
+		rememberDisabledEvents = remember;
+	}
+
+	public boolean doRememberDisabledEvents()
+	{
+		return rememberDisabledEvents;
 	}
 
 	public void setOptimize(boolean bool)

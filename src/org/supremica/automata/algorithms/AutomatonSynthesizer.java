@@ -53,6 +53,7 @@ import org.supremica.log.*;
 import org.supremica.gui.*;
 import java.util.*;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
@@ -72,6 +73,8 @@ public class AutomatonSynthesizer
 	private LinkedList acceptingStates = new LinkedList();
 	private Gui workbench;
 	private SynthesizerOptions synthesizerOptions;
+	private boolean rememberDisabledEvents = false;
+	private Alphabet disabledEvents;
 	private final static boolean debugMode = false;
 
 	public AutomatonSynthesizer(Gui workbench, Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
@@ -110,6 +113,11 @@ public class AutomatonSynthesizer
 		else if (synthesisType == SynthesisType.Both)
 		{
 			didSomething = synthesizeControllableNonblocking();
+		}
+
+		if (synthesizerOptions.doRememberDisabledEvents())
+		{
+			computeDisabledEvents();
 		}
 
 		if (synthesizerOptions.doPurge())
@@ -482,6 +490,48 @@ public class AutomatonSynthesizer
 
 	}
 
+	/**
+	 * Returns the set of uncontrollable events that needed to be disabled in the synthesis.
+	 * If not rememberDisabledEvents are set to true then null is returned.
+	 * This method might only be called after synthesize has returned.
+	 */
+	public Alphabet getDisabledEvents()
+	{
+		return disabledEvents;
+	}
+
+	private void computeDisabledEvents()
+	{
+		disabledEvents = new Alphabet();
+
+		for (Iterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext();)
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.getCost() == State.MAX_COST)
+			{
+				for (Iterator evIt = theAutomaton.incomingEventsIterator(currState); evIt.hasNext(); )
+				{
+					LabeledEvent currEvent = (LabeledEvent) evIt.next();
+					if (!currEvent.isControllable())
+					{
+						try
+						{
+							if (!disabledEvents.containsEventWithLabel(currEvent.getLabel()))
+							{
+								disabledEvents.addEvent(currEvent);
+							}
+						}
+						catch (Exception ex)
+						{
+							logger.error("AutomatonSynthesizer::computeDisabledEvents: " + ex.getMessage());
+						}
+					}
+				}
+			}
+		}
+	}
+
 	private void purge()
 	{
 		LinkedList stateList = new LinkedList();
@@ -495,6 +545,7 @@ public class AutomatonSynthesizer
 			{
 				stateList.addLast(currState);
 			}
+
 		}
 
 		stateIt = stateList.iterator();
@@ -508,4 +559,5 @@ public class AutomatonSynthesizer
 
 		stateList.clear();
 	}
+
 }

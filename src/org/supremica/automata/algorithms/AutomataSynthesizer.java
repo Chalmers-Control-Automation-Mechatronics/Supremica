@@ -159,6 +159,7 @@ class MonolithicReturnValue
 {
 	public Automaton automaton;
 	public boolean didSomething;
+	public Alphabet disabledEvents;
 }
 
 public class AutomataSynthesizer
@@ -185,6 +186,9 @@ public class AutomataSynthesizer
 	{
 		Automaton currAutomaton;
 		State currInitialState;
+
+		// Fix this later
+		synthesizerOptions.setRememberDisabledEvents(true);
 
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
@@ -278,28 +282,11 @@ public class AutomataSynthesizer
 	public void execute()
 		throws Exception
 	{
-		/* -- MF -- Old stuff (slightly refactored) *
-		if(modularControllability()) // only add if something has been synthesized
-		{
-			if (synthesizerOptions.getOptimize())
-			{
-				optimize(theAutomata, newAutomata); // new Automata(newAutomata)); // optimize makes its own copy
-			}
-
-			// theVisualProjectContainer.add(newAutomata);
-			gui.addAutomata(newAutomata);
-		}
-		else // nothing was synthesized, the system can be used as is - but what about non-blocking?
-		{
-			logger.info("No uncontrollabilities found, the specifications can be used as supervisors, as is");
-		}
-
-		*///* -- MF -- new stuff
 
 		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
 			// monolithic case, just whack the entire stuff into the monolithic algo
-			Boolean didSomething = new Boolean(false);
+			//Boolean didSomething = new Boolean(false);
 			MonolithicReturnValue retval = doMonolithic(theAutomata); // we always do something, at least we synch
 			// if purge, that's already been done
 			gui.addAutomaton(retval.automaton); // let the user choose the name
@@ -318,6 +305,32 @@ public class AutomataSynthesizer
 					if(retval.didSomething)
 					{
 						modSupervisors.addAutomaton(retval.automaton);
+						Alphabet disabledEvents = retval.disabledEvents;
+						if (disabledEvents != null)
+						{
+							for (Iterator autIt = automata.iterator(); autIt.hasNext();)
+							{
+								Automaton currAutomaton = (Automaton) autIt.next();
+								if (currAutomaton.isSupervisor() || currAutomaton.isSpecification())
+								{
+									Alphabet currAlphabet = currAutomaton.getAlphabet();
+									disabledEvents.minus(currAlphabet);
+								}
+							}
+						}
+						if (disabledEvents.size() > 0)
+						{
+							logger.info("The synthesized supervisor might not be maximally permissive due to:");
+							for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
+							{
+								LabeledEvent currEvent = (LabeledEvent)evIt.next();
+								logger.info(currEvent.getLabel() + " is included in the plant but not in the supervisor");
+							}
+						}
+						else
+						{
+							logger.info("The synthesized supervisor is maximally permissive.");
+						}
 					}
 				}
 			}
@@ -371,6 +384,7 @@ public class AutomataSynthesizer
 
 		AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(gui, retval.automaton, synthesizerOptions);
 		retval.didSomething |= synthesizer.synthesize(); // should also be able to interrupt this one....
+		retval.disabledEvents = synthesizer.getDisabledEvents();
 
 		return retval;
 	}
