@@ -1,25 +1,26 @@
 package org.supremica.external.shoefactory.plantBuilder;
 
-import org.jgrafchart.*;
+// import org.jgrafchart.*;
 import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import com.nwoods.jgo.*;
-import org.jgrafchart.*;
+// import org.jgrafchart.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-import org.jgrafchart.Transitions.*;
-import org.jgrafchart.Actions.*;
+// import org.jgrafchart.Transitions.*;
+// import org.jgrafchart.Actions.*;
 import java.util.*;
 
 public class JGrafbuilder
 {
-	private GrafchartStorage topGrafcharts = new GrafchartStorage();
+//	private GrafchartStorage topGrafcharts = new GrafchartStorage();
 
 	public JGrafbuilder()
 	{
+/*
 		Basic2GC bla = new Basic2GC();
 		GCDocument doc = new GCDocument();
 		doc.setName("ShoeFactory");
@@ -146,5 +147,6 @@ public class JGrafbuilder
 
 		//GC.myActionLabel.setText("S i=0;"); funkar bara om public myActionLabel i GCStep.java
 		//var1.myName.setText("test");funkar bara om public myName i InternalVariable.java
+*/
 	}
 }
