@@ -9,7 +9,7 @@ import java_cup.runtime.Symbol;
 %%
 
 %class Lexer
-//%public
+%public
 
 %{
   private int comment_count = 0;
