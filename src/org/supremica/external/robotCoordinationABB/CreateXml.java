@@ -1003,7 +1003,7 @@ public class CreateXml
 					IPath movingPath = robot.getPaths().item(var(movingPathName));
 
 					// execute the sub-path
-					
+
 					org.supremica.automata.algorithms.RobotStudioLink.moveRobotAlongPath(robot, movingPath);
 					Thread.sleep(3500);    // it should wait for a response from RobotStudio:see Hugo's code RobotStudioLink
 				}
@@ -2053,7 +2053,8 @@ public class CreateXml
 	private static void save()
 		throws IOException
 	{
-		XMLOutputter outputter = new XMLOutputter("     ", true);
+		XMLOutputter outputter = new XMLOutputter();
+		outputter.setFormat(org.jdom.output.Format.getPrettyFormat());
 		FileWriter writer = new FileWriter(file);
 
 		outputter.output(stationDocument, writer);
