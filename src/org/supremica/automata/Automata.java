@@ -188,33 +188,6 @@ public class Automata
 		return newHash;
 	}
 
-	/**
-	 * Set a synchronization index in all states and events.
-	 */
-	public void setSynchronizationIndicies()
-		throws Exception
-	{
-		AutomataSynchronizerHelper syncHelper = new AutomataSynchronizerHelper(this, new SynchronizationOptions());
-	}
-
-	/**
-	 * If you want the synchronization indicies to be valid then you have to call setSynchronizationIndicies
-	 * before calling this method.
-	 */
-	/*
-	private Alphabet getUnionAlphabet()
-		throws Exception
-	{
-		return getUnionAlphabet(true, true);
-	}
-
-	private Alphabet getUnionAlphabet(boolean requireConsistentControllability, boolean requireConsistentImmediate)
-		throws Exception
-	{
-		return AlphabetHelpers.getUnionAlphabet(this, requireConsistentControllability, requireConsistentImmediate);
-	}
-	*/
-
 	public Iterator iterator()
 	{
 		return theAutomata.iterator();

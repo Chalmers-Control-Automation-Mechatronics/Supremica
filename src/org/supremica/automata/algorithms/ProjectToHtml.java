@@ -84,7 +84,7 @@ public class ProjectToHtml
 	public void serialize()
 		throws Exception
 	{
-		project.setSynchronizationIndicies();
+		project.setIndicies();
 		serializeProject();
 
 		// Serialize all automata
