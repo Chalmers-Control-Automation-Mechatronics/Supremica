@@ -594,7 +594,7 @@ public class Configit extends JFrame
 											ctrl_mngr.getValueName(0, ctrl_mngr.getSelectedValue(0)), ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)),
 											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)));
 
-					FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
+					//FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();

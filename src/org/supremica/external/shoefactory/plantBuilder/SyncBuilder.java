@@ -70,7 +70,7 @@ import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;
 import org.supremica.external.shoefactory.plantBuilder.*;
-import org.supremica.external.shoefactory.Animator.*;
+//import org.supremica.external.shoefactory.Animator.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;

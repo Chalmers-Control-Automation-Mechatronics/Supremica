@@ -74,7 +74,7 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;
 import org.supremica.external.robotCoordinationABB.*;
 import org.supremica.external.shoefactory.plantBuilder.*;
-import org.supremica.external.shoefactory.Animator.*;
+//import org.supremica.external.shoefactory.Animator.*;
 import org.supremica.external.shoefactory.Configurator.*;
 
 import org.supremica.log.*;
