@@ -31,6 +31,7 @@
 
 <property name="project.name" value="Supremica"/>
 <property name="backup.dir" value="../backup"/>
+<property name="installer.dir" value="C:\Supremica Installer"/>
 <property name="javalibs.dir" value="lib/unjared"/>
 
 
@@ -531,38 +532,22 @@
 	<copy file="${dist}/Supremica.jar" todir="H:\public_html\Supremica\updates\noarch"/>	
 	<copy file="${dist}/SupremicaLib.jar" todir="H:\public_html\Supremica\updates\noarch"/>	
 	<copy file="${dist}/SupremicaVersion.txt" todir="H:\public_html\Supremica\updates\noarch"/>
-	<copy file="${dist}/Supremica.jar" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
-	<copy file="${dist}/SupremicaLib.jar" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
-	<copy file="${dist}/SupremicaVersion.txt" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
+	<copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
+	<copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
+	<copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
+	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
+	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
+	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
+	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
 	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
-		<arg value="U:\temp\SupremicaInstaller\SupremicaDist.iss"/>
+		<arg value="C:\Supremica Installer\SupremicaDist.iss"/>
 	</exec>
-	<copy file="U:\temp\SupremicaInstaller\Output\setup.exe" todir="H:\public_html\Supremica\distributions\windows"/>	
+	<copy file="C:\Supremica Installer\Output\setup.exe" todir="H:\public_html\Supremica\distributions\windows"/>	
 </target>
 
-<!--
-<target name="deploy9X">
-	<copy file="${dist}/Supremica.jar" todir="U:\temp\SupremicaInstallerX\SupremicaDist\Runtime\NoArch"/>	
-	<copy file="${dist}/SupremicaVersion.txt" todir="U:\temp\SupremicaInstallerX\SupremicaDist\Runtime\NoArch"/>
-	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
-		<arg value="U:\temp\SupremicaInstallerX\SupremicaDist.iss"/>
-	</exec>
-	<copy file="U:\temp\SupremicaInstallerX\Output\setup.exe" todir="H:\public_html\Supremica\distributions\windows9x"/>	
-</target>
-
-<target name="deploySecret" depends="deploySecretNT">
-</target>
-
-<target name="deploySecretNT">
-	<copy file="${dist}/Supremica.jar" todir="H:\public_html\Supremica\updates\noarch"/>	
-	<copy file="${dist}/SupremicaVersion.txt" todir="H:\public_html\Supremica\updates\noarch"/>
-	<copy file="${dist}/Supremica.jar" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
-	<copy file="${dist}/SupremicaVersion.txt" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
-	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
-		<arg value="U:\temp\SupremicaInstaller\SupremicaDist.iss"/>
-	</exec>
-	<copy file="U:\temp\SupremicaInstaller\Output\setup.exe" tofile="H:\public_html\Supremica\distributions\windows\setupSecret.exe"/>	
-</target>
--->
 </project>
        

@@ -82,7 +82,16 @@ public class Automata
 	{
 		this(oldAutomata, false);
 	}
-
+	
+	/**
+	 * Construct an Automata object with a single automaton.
+	 **/
+	public Automata(Automaton theAutomaton)
+	{
+		this();
+		addAutomaton(theAutomaton);	
+	}
+	
 	/**
 	 * Does not make a new copy of the contained automata unless shallowCopy is false
 	 */
@@ -159,9 +168,9 @@ public class Automata
 			secondAutomatonIndex = firstAutomatonIndex - 1;
 		else
 			secondAutomatonIndex = firstAutomatonIndex + 1;
-		
+
 		Automaton firstAutomaton = aut;
-		Automaton secondAutomaton = (Automaton) theAutomata.get(secondAutomatonIndex); 
+		Automaton secondAutomaton = (Automaton) theAutomata.get(secondAutomatonIndex);
 		theAutomata.set(firstAutomatonIndex, secondAutomaton);
 		theAutomata.set(secondAutomatonIndex, firstAutomaton);
 		notifyListeners();
@@ -171,7 +180,6 @@ public class Automata
 	{
 		aut.setName(newName);
 	}
-
 
 	public void setOwner(String owner)
 	{
@@ -210,7 +218,7 @@ public class Automata
 	}
 
 	/**
-	 * Iterates backwars through the automata... necessary 
+	 * Iterates backwars through the automata... necessary
 	 * in the automataMove_actionPerformed in ActionMan when
 	 * moving down
 	 *
@@ -393,13 +401,13 @@ public class Automata
 		for (Iterator autIt = iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			
+
 			if (currAutomaton.getType() != AutomatonType.Plant)
 			{
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -823,7 +831,7 @@ public class Automata
 	public String toString()
 	{
 		StringBuffer sbuf = new StringBuffer();
-		
+
 		for(Iterator it = iterator(); it.hasNext(); )
 		{
 			Automaton automaton = (Automaton)it.next();
@@ -849,7 +857,7 @@ public class Automata
 			sbuf.append("automata.addAutomaton(" + automaton.getName() + ");");
 			sbuf.append("\n");
 		}
-		
+
 		return sbuf.toString();
 	}
 
@@ -864,7 +872,7 @@ public class Automata
 			sbuf.append(state.getName() + ".");
 			++i;
 		}
-		
+
 		return sbuf.toString();
 	}
 
