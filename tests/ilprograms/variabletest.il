@@ -78,12 +78,12 @@ CAL PRINTLN("Testing LDN/STN")
    STN BB1
    CAL PRINT("?? false == ", BB1)
    CAL PRINTLN("")
-   
+
    LD  TRUE
    STN  BB1
    CAL PRINT("?? false == ", BB1)
    CAL PRINTLN("")
-	
+
    LD TRUE
    ST  BB2
    LDN BB2
@@ -102,7 +102,7 @@ CAL PRINTLN("Testing LDN/STN")
    STN BB1
    CAL PRINT("?? false == ", BB1)
    CAL PRINTLN("")
-   
+
    LD  FALSE
    STN  BB1
    CAL PRINT("?? true == ", BB1)
@@ -123,13 +123,13 @@ CAL PRINTLN("Tests of DINT constants and variables")
    ST DD1
    CAL PRINT("?? 0 == ", DD1)
    CAL PRINTLN("")
-   
+
    (*DINT*)
    LD DINT#-1
    ST DD1
    CAL PRINT("?? -1 == ", DD1)
    CAL PRINTLN("")
-   
+
    (*DINT*)
    LD DINT#1
    ST DD1
@@ -280,11 +280,11 @@ CAL PRINTLN("Tests of WSTRING constants and variables")
    CAL PRINTLN("")
 
 (*XXX error, see further comments*)
-   LD "234567890-=`{}[]:;$"'<>$\,.?/$"  
+   LD "234567890-=`{}[]:;$"'<>$\,.?/$"
 			(* XXX ¤ does not work*)
 			(* XXX $\ should print as \
 			   XXX $" should print as "
-			*)				
+			*)
    ST WW1
    CAL PRINTLN("?? 234567890-=`{}[]:;$"'<>$\,.?/$ == ")
    CAL PRINT("   ", WW1)
@@ -306,23 +306,23 @@ FUNCTION_BLOCK LDSTfbfoo
 END_FUNCTION_BLOCK
 
 FUNCTION_BLOCK LDSTfbtestfb
-(*This FB is only a holder of vars, its run method doesn't 
+(*This FB is only a holder of vars, its run method doesn't
   do anything essential*)
    VAR_IN_OUT
 	BB1, BB2 : BOOL;
 	DD1, DD2 : DINT;
 	RR1, RR2 : REAL;
 	WW1, WW2 : WSTRING;
-	FF1, FF2 : LDSTfbfoo;
+	FF : LDSTfbfoo;
    END_VAR
 	LD BB1
-	ST BB2   
+	ST BB2
 	LD DD1
-	ST DD2   
+	ST DD2
 	LD RR1
-	ST RR2   
+	ST RR2
 	LD WW1
-	ST WW2   
+	ST WW2
 END_FUNCTION_BLOCK
 
 PROGRAM LDSTfbtest
@@ -347,7 +347,7 @@ CAL PRINTLN("Testing LD & ST of BOOL,DINT,REAL,WSTRING to/from FBs")
    LD REAL#123.345
    ST RR1
    ST FB1.RR1
-   
+
    LD "abcdef"
    ST WW1
    ST FB1.WW1
@@ -372,12 +372,15 @@ CAL PRINTLN("Testing LD & ST of BOOL,DINT,REAL,WSTRING to/from FBs")
    CAL PRINT("?? ",WW1," == ",WW2)
    CAL PRINTLN("")
 (* Thomas titta på detta*)
+
+
 (*
 CAL PRINTLN("Testing LD & ST of FBs to/from FBs")
+*)
    LD FB2
    ST FB1.FF
    LD FB1.FF
    ST FB2
-*)
+
 END_PROGRAM
 
