@@ -71,7 +71,7 @@ public class LabeledEvent
 	 * extra variable used to speed up algorithms.
 	 * dont store your stuff here, it may be changed by other algos
 	 */
-	public int extra1;
+//	public int extra1;
 
 	// private Action theAction = null;
 	public LabeledEvent() {}
