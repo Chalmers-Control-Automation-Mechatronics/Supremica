@@ -103,7 +103,9 @@ public class Configit extends JFrame
    	JButton JB = new JButton ("Cancel");
 	JButton JR = new JButton ("Reset");
 	JButton JC = new JButton ("Order");
-
+	//-----------------------------------------
+	JButton JQ = new JButton ("Quick pick");
+	//-----------------------------------------
 	ButtonGroup lGend = new ButtonGroup();
 	ButtonGroup lGT = new ButtonGroup();
 	JRadioButton lGend1 = new JRadioButton("Male");
@@ -252,6 +254,7 @@ public class Configit extends JFrame
 		buttonPanel.add(JR, FlowLayout.LEFT);
 		buttonPanel.add(JB, FlowLayout.CENTER);
 		buttonPanel.add(JC, FlowLayout.RIGHT);
+		buttonPanel.add(JQ, FlowLayout.RIGHT);
 
 		lGend1.addActionListener(this);
 		lGend2.addActionListener(this);
@@ -265,6 +268,7 @@ public class Configit extends JFrame
 		JB.addActionListener(this);
 		JR.addActionListener(this);
 		JC.addActionListener(this);
+		JQ.addActionListener(this);
 
 		pack();
     }
@@ -564,6 +568,7 @@ public class Configit extends JFrame
       	if(e.getSource() == JB){
 			dispose();
 		}
+		
 		if(e.getSource() == JR)
 		{
 			ctrl_mngr.resetConf();
@@ -594,7 +599,7 @@ public class Configit extends JFrame
 											ctrl_mngr.getValueName(0, ctrl_mngr.getSelectedValue(0)), ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)),
 											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)));
 
-					//FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
+					FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();
@@ -602,6 +607,12 @@ public class Configit extends JFrame
 					JL.setText("You have not selected anything yet. Available combinations: "+ctrl_mngr.getSolutionCount());
 				}
 			}
+		}
+		
+		if(e.getSource() == JQ)
+		{
+			ConfigConverter cc = new ConfigConverter("red","40","Adult","Male","typeA","Hiking");
+			FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
 		}
 
 		if(e.getSource() == lGend1)
