@@ -100,6 +100,8 @@ public final class MinimizationOptions
 
 	/** Use conflict equivalence rule A? */
 	private boolean useRuleA = true;
+	/** Use conflict equivalence rule AA? */
+	private boolean useRuleAA = true;
 	/** Use conflict equivalence rule B? */
 	private boolean useRuleB = true;
 	/** Use conflict equivalence rule F? */
@@ -257,6 +259,14 @@ public final class MinimizationOptions
 	public boolean getUseRuleA()
 	{
 		return useRuleA;
+	}
+	public void setUseRuleAA(boolean bool)
+	{
+		useRuleAA = bool;
+	}
+	public boolean getUseRuleAA()
+	{
+		return useRuleAA;
 	}
 	public void setUseRuleB(boolean bool)
 	{

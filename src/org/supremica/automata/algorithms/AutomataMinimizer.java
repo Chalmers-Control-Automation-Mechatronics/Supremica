@@ -197,23 +197,9 @@ public class AutomataMinimizer
 			}
 		}
 
-		if (AutomatonMinimizer.debug)
-		{
-			// Print total reduction statistics
-			AutomatonMinimizer.printTotal();
-			AutomatonMinimizer.resetTotal();
-		}
-
-		/*
-		try
-		{
-			Thread.sleep(1000);
-		}
-		catch (Exception apa)
-		{
-		}
-		ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomata(theAutomata);
-		*/
+		// Print total reduction statistics
+		AutomatonMinimizer.printTotal();
+		AutomatonMinimizer.resetTotal();
 
 		// Present largest automaton size
 		logger.verbose("The largest automaton examined had " + largestAutomatonSize + " states.");

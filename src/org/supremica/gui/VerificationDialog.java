@@ -341,6 +341,7 @@ public class VerificationDialog
 	{
 		JComboBox minimizationStrategy;
 		JCheckBox ruleA;
+		JCheckBox ruleAA;
 		JCheckBox ruleB;
 		JCheckBox ruleF;
 
@@ -355,9 +356,11 @@ public class VerificationDialog
 			this.add(strategyBox);
 
 			ruleA = new JCheckBox("Rule A");
+			ruleAA = new JCheckBox("Rule AA");
 			ruleB = new JCheckBox("Rule B");
 			ruleF = new JCheckBox("Rule F");
 			this.add(ruleA);
+			this.add(ruleAA);
 			this.add(ruleB);
 			this.add(ruleF);
 		}
@@ -366,6 +369,7 @@ public class VerificationDialog
 		{
 			minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
 			ruleA.setSelected(options.getUseRuleA());
+			ruleAA.setSelected(options.getUseRuleAA());
 			ruleB.setSelected(options.getUseRuleB());
 			ruleF.setSelected(options.getUseRuleF());
 		}
@@ -374,6 +378,7 @@ public class VerificationDialog
 		{
 			options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
 			options.setUseRuleA(ruleA.isSelected());
+			options.setUseRuleA(ruleAA.isSelected());
 			options.setUseRuleB(ruleB.isSelected());
 			options.setUseRuleF(ruleF.isSelected());
 		}

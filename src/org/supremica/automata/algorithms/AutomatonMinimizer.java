@@ -969,7 +969,12 @@ public class AutomatonMinimizer
 				int countA = 0;
 				if (options.getUseRuleA())
 				{
-					countA = ruleAA(aut);
+					countA += ruleA(aut);
+					totalA += countA;
+				}
+				if (options.getUseRuleA())
+				{
+					countA += ruleAA(aut);
 					totalA += countA;
 				}
 				if (countA > 0)
@@ -980,7 +985,7 @@ public class AutomatonMinimizer
 				int countB = 0;
 				if (options.getUseRuleB())
 				{
-					countB = ruleB(aut);
+					countB += ruleB(aut);
 					totalB += countB;
 				}
 				if (countB > 0)
@@ -994,7 +999,7 @@ public class AutomatonMinimizer
 				int countF = 0;
 				if (options.getUseRuleF())
 				{
-					countF = ruleF(aut);
+					countF += ruleF(aut);
 					totalF += countF;
 				}
 
@@ -1122,8 +1127,8 @@ public class AutomatonMinimizer
 		// Count the removed states
 		int countA = 0;
 
-		// If there is at least one outgoing epsilon transition AND this is not the initial state AND
-		// all incoming transitions are epsilon!
+		// If there is at least one outgoing epsilon transition AND this is not the initial 
+		// state AND all incoming transitions are epsilon!
 		// Copy the outgoing of this state to all the previous states, and remove this state!
 		StateSet statesToExamine = new StateSet(aut.getStateSet());
 		loop: while (statesToExamine.size() != 0)
@@ -1389,7 +1394,7 @@ public class AutomatonMinimizer
  										toBeRemoved.add(currArc);
 									}
 									else
-									{
+								{
 										fail = true;
 									}
 								}
@@ -1466,7 +1471,7 @@ public class AutomatonMinimizer
 		/*
 		// States that can reach marked states by epsilon events only can be considered marked
 		LinkedList toBeMarked = new LinkedList();
-		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+		for (StateIterator stateIt = aut.suateIterator(); stateIt.hasNext();)
 		{
 			State currState = stateIt.nextState();
 			if (!currState.isAccepting())
@@ -1630,7 +1635,7 @@ public class AutomatonMinimizer
 
 	public static void printTotal()
 	{
-		logger.warn("Totally: A: " + totalA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+		logger.verbose("Totally: A: " + totalA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
 	}
 	public static void resetTotal()
 	{
