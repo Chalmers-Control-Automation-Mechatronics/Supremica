@@ -69,6 +69,8 @@ public class AutomataToJava
 	public class GenerationException
 		extends SupremicaException
 	{
+		private static final long serialVersionUID = 1L;
+
 		public GenerationException()
 		{
 			super();
@@ -774,8 +776,7 @@ public class AutomataToJava
 				}
 				else
 				{
-
-					// assert false;
+					assert false;
 					System.err.println("Error in AutomataToJava.java");
 
 					return;
