@@ -74,11 +74,21 @@ PROGRAM PortVaktstest
 		tmpb   : BOOL;
 		tmpd   : DINT;		
 		Init  : BOOL := TRUE;
+
+		(*Printing*)
+		WPrintln : PrintlnWSTRING;
+		DPrintln : PrintlnDINT;
+		BPrintln : PrintlnBOOL;
+		RPrintln : PrintlnREAL;
+		WPrint   : PrintWSTRING;
+		DPrint   : PrintDINT;
+		BPrint   : PrintBOOL;
+		RPrint   : PrintREAL;
 	END_VAR
 (*init*)
 	LD Init
 	JMPCN end_init
-		CAL PRINTLN("Initialising......!!")
+		CAL WPrintln("Initialising......!!")
 		LD DINT#300 
 		ST delay8.tonPT
 		ST delay88.tonPT
@@ -125,7 +135,7 @@ END1 :
 			LD  delay2.tonQ
 			STN InPortvakt
 			STN tmpb
-			CAL PRINTLN(tmpb)
+			CAL BPrintln(tmpb)
 			JMPCN e2
 				LD FALSE
 				ST delay2.tonIN
@@ -229,8 +239,8 @@ END6:
 		LD StorKula
 		OR LitenKula
 		JMPCN noMat
-		CAL PRINT("Läser av=", StorKula)
-		CAL PRINTLN("")
+		CAL WPrint("Läser av=")
+		CAL BPrintln(StorKula)
 		LD StorKula
 		ST IsStorKula
 		(*lägg till lite bättre logik*)
@@ -340,8 +350,150 @@ END11:
 		CAL delay10 
 END12:
 
-CAL PRINTLN("IsStorKula= ",IsStorKula)
-CAL PRINTLN("")
+CAL WPrint("IsStorKula= ")
+CAL BPrintln(IsStorKula)
 
 END_PROGRAM
+
+
+(*JAVA_BLOCKS for printing (no newline)*)
+(*=====================================*)
+
+JAVA_BLOCK JPrintWSTRING
+	VAR_IN_OUT
+		output: WSTRING;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintWSTRING
+	VAR_IN_OUT
+		output: WSTRING;
+	END_VAR
+	VAR
+		jblock: JPrintWSTRING;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
+
+JAVA_BLOCK JPrintDINT
+	VAR_IN_OUT
+		output: DINT;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintDINT
+	VAR_IN_OUT
+		output: DINT;
+	END_VAR
+	VAR
+		jblock: JPrintDINT;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
+JAVA_BLOCK JPrintREAL
+	VAR_IN_OUT
+		output:REAL;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintREAL
+	VAR_IN_OUT
+		output:REAL;
+	END_VAR
+	VAR
+		jblock:JPrintREAL;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
+
+JAVA_BLOCK JPrintBOOL
+	VAR_IN_OUT
+		output: BOOL;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintBOOL
+	VAR_IN_OUT
+		output: BOOL;
+	END_VAR
+	VAR
+		jblock: JPrintBOOL;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
+
+(*JAVA_BLOCKS for printing (newline)*)
+(*=====================================*)
+
+JAVA_BLOCK JPrintlnWSTRING
+	VAR_IN_OUT
+		output: WSTRING;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintlnWSTRING
+	VAR_IN_OUT
+		output: WSTRING;
+	END_VAR
+	VAR
+		jblock: JPrintlnWSTRING;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
+
+JAVA_BLOCK JPrintlnDINT
+	VAR_IN_OUT
+		output: DINT;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintlnDINT
+	VAR_IN_OUT
+		output: DINT;
+	END_VAR
+	VAR
+		jblock: JPrintlnDINT;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
+
+JAVA_BLOCK JPrintlnREAL
+	VAR_IN_OUT
+		output:REAL;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintlnREAL
+	VAR_IN_OUT
+		output:REAL;
+	END_VAR
+	VAR
+		jblock:JPrintlnREAL;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
+
+JAVA_BLOCK JPrintlnBOOL
+	VAR_IN_OUT
+		output: BOOL;
+	END_VAR
+END_JAVA_BLOCK
+FUNCTION_BLOCK PrintlnBOOL
+	VAR_IN_OUT
+		output: BOOL;
+	END_VAR
+	VAR
+		jblock: JPrintlnBOOL;
+	END_VAR
+	LD output
+	ST jblock.output
+	CAL jblock
+END_FUNCTION_BLOCK
 
