@@ -454,8 +454,8 @@
 </target>
 
 <target name="startfiles_local_supremica">
-	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>    	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
+	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	

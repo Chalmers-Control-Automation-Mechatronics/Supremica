@@ -1,0 +1,9 @@
+#/bin/sh
+
+cd ../resources/jgrafchart/bin
+export LIB=../lib
+export CODE=../Code
+export OUTPUT=../Code
+
+env LD_LIBRARY_PATH=. java -cp Supremica.jar:SupremicaLib.jar -enableassertions org.supremica.apps.Supremica -p SupremicaProperties.cfg
+
