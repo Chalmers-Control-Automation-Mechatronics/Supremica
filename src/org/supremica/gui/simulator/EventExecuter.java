@@ -1,7 +1,6 @@
 package org.supremica.gui.simulator;
 
 
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.properties.SupremicaProperties;

@@ -2,9 +2,6 @@ package org.supremica.util.BDD.graphs;
 
 import org.supremica.util.BDD.*;
 
-import java.awt.*;
-import java.awt.event.*;
-
 
 /** Show the node grow AND the logaritmic satcount  in two different windows */
 public class BDDNodeANDSATLogGrow extends BDDNodeGrow {

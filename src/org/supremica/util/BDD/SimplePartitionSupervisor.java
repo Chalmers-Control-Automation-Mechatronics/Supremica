@@ -2,8 +2,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * A simple partitioned and smoothing supervisor that supports reachability in subset-of-BDDAutomata.
  * The idea is to have a very simple reachability procedure the is fast to initialize and still gives

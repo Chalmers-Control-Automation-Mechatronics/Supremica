@@ -1,8 +1,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * This class optimize the number and BDD size of disjunctive transition relations
  */

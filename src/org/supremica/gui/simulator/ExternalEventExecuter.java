@@ -2,7 +2,6 @@ package org.supremica.gui.simulator;
 
 
 import org.supremica.automata.*;
-import org.supremica.log.*;
 
 import java.util.*;
 

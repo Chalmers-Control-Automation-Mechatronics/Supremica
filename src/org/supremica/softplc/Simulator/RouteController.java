@@ -2,7 +2,6 @@ package org.supremica.softplc.Simulator;
 
 import java.util.*;
 import javax.swing.*;
-import java.lang.*;
 
 /**
  * @author Anders Röding

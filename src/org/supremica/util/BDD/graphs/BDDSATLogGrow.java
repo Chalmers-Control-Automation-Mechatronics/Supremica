@@ -5,10 +5,6 @@ package org.supremica.util.BDD.graphs;
 
 import org.supremica.util.BDD.*;
 
-import java.awt.*;
-import java.awt.event.*;
-
-
 /** show the [1000 * log_10] number of minterms (i.e. the size of SAT) for each tree */
 public class BDDSATLogGrow extends GrowFrame {
 	private BDDAutomata manager;

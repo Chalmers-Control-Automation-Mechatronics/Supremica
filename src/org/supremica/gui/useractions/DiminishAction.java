@@ -6,18 +6,15 @@
 // (Is it that simple? We don't know, but let's try it.)
 package org.supremica.gui.useractions;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
-import javax.help.*;
 
 import org.supremica.log.*;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.gui.Gui;
-import org.supremica.gui.Supremica;
 import org.supremica.gui.ActionMan;
 
 public class DiminishAction

@@ -6,10 +6,6 @@
 package org.supremica.gui.texteditor;
 
 import java.io.*;
-import java.awt.*;
-import java.lang.*;
-import java.util.*;
-import javax.swing.*;
 
 class TextWriter
 	extends Writer

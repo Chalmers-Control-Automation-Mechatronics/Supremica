@@ -2,11 +2,6 @@
 package org.supremica.util.BDD;
 
 
-import java.io.*;
-import java.util.*;
-
-
-
 public class PerEventTransitionSystem {
 	private BDDAutomata manager;
 	private int size;

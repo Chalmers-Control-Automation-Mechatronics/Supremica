@@ -53,14 +53,10 @@ import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import javax.swing.*;
 import java.util.*;
-import org.supremica.properties.SupremicaProperties;
-import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Project;
-import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
@@ -72,7 +68,6 @@ import uk.ac.ic.doc.scenebeans.event.AnimationListener;
 import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
 import uk.ac.ic.doc.scenebeans.animation.Animation;
 import uk.ac.ic.doc.scenebeans.animation.CommandException;
-import uk.ac.ic.doc.scenebeans.animation.ResetActivityCommand;
 
 public class SimulatorExecuter
 	extends JFrame

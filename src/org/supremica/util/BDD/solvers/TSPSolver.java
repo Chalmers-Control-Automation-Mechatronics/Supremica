@@ -3,8 +3,6 @@ package org.supremica.util.BDD.solvers;
 
 import org.supremica.util.BDD.*;
 
-import java.util.*;
-
 /**
  * TSP ordering: solve a TSP problem by a 2-step lookahead greedy algo.
  * note thet the weights are DYNAMIC, so this is not really TSP.

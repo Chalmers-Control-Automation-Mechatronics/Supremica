@@ -2,8 +2,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * monotonicly increased smoothed reachability based on conjunctive transition relations
  * the difference to SmoothSupervisor.java is that SmoothWorksetSupervisor.java picks

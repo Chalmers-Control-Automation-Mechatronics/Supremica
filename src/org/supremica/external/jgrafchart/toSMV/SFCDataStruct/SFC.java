@@ -1,7 +1,6 @@
 package org.supremica.external.jgrafchart.toSMV.SFCDataStruct;
 import java.util.*;
 import org.jdom.*;
-import org.jdom.input.*;
 
 public class SFC
 {

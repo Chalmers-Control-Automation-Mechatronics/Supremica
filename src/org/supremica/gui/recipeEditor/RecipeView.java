@@ -15,7 +15,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.*;
 import java.awt.dnd.*;
-import java.awt.datatransfer.*;
 import java.awt.geom.*;
 import javax.swing.*;
 import java.util.*;

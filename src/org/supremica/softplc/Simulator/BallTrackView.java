@@ -4,8 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.util.*;
 import java.awt.event.*;
-import java.awt.Color.*;
-import java.lang.*;
 import org.supremica.gui.Utility;
 
 /**Class BallTrackView paints the background ball track and possibly several

@@ -2,8 +2,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * this will probably be a priorityqueue of BDDAutomaton some day...
  *

@@ -3,10 +3,6 @@ package org.supremica.util.BDD.graphs;
 
 import org.supremica.util.BDD.*;
 
-import java.awt.*;
-import java.awt.event.*;
-
-
 /** show the number of nodes in the trees */
 public class BDDNodeGrow extends GrowFrame {
 	private BDDAutomata manager;

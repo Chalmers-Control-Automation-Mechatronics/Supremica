@@ -3,10 +3,7 @@ package org.supremica.softplc.RunTime;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.*;
-import java.util.*;
 import java.lang.reflect.*;
-import java.text.*;
-import java.io.File;
 
 /**
  * Schedule a task that executes once every x ms.

@@ -2,8 +2,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * Handles the optimization of the frontier set.
  * During image computation we may choose to go forward

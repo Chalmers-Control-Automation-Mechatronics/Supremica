@@ -1,10 +1,8 @@
 /********************** ScheduleDialog.java *****************/
 package org.supremica.gui;
 
-import java.awt.event.*;
 import javax.swing.*;
 import java.awt.GridLayout;
-import java.util.Iterator;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;

@@ -3,9 +3,6 @@
 package org.supremica.util.BDD.heuristics;
 
 import org.supremica.util.BDD.*;
-import org.supremica.util.BDD.solvers.*;
-
-import java.util.*;
 
 /**
  * Non-deteministic (?) choice of equally good candidates

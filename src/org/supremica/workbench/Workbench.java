@@ -4,14 +4,11 @@
 
 package org.supremica.workbench;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.supremica.*;
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.algorithms.*;

@@ -3,7 +3,6 @@ package org.supremica.softplc.CompILer.Checker;
 //import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import org.supremica.softplc.CompILer.Parser.*;
 import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
-import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import java.util.*;
 import java.util.LinkedList;
 

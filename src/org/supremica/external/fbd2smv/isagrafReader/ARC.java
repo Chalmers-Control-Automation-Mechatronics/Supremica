@@ -1,8 +1,5 @@
 package org.supremica.external.fbd2smv.isagrafReader;
 
-import java.io.*;
-import java.util.*;
-
 public class ARC
 {
     private int sourceIndex;

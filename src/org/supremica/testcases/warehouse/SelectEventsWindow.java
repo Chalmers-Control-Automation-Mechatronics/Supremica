@@ -20,16 +20,12 @@ import javax.swing.tree.*;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.EventIterator;
-import org.supremica.automata.algorithms.standard.Determinizer;
 
 import org.supremica.gui.treeview.*;
 import org.supremica.gui.Utility;
-import org.supremica.gui.ActionMan;
 
 // To be able to show disabled tree nodes, we need a custom renderer
 class EventNodeRenderer

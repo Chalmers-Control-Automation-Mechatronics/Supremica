@@ -1,17 +1,9 @@
 package org.supremica.external.shoefactory.Animator;
 
-import java.awt.datatransfer.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.print.*;
-import javax.swing.*;
-import javax.swing.border.*;
 import grafchart.sfc.*;
 import org.supremica.automata.*;
 import org.supremica.gui.*;
-import java.util.*;
-import org.supremica.external.jgrafchart.*;
 
 public class JgrafSupervisorDEMO
 {

@@ -2,7 +2,6 @@ package org.supremica.external.fbd2smv.fbd2smv;
 
 import java.io.*;
 import java.util.*;
-import org.supremica.external.fbd2smv.fbd2smv.*;
 import org.supremica.external.fbd2smv.fbdProject.*;
 import org.supremica.external.fbd2smv.isagrafReader.*;
 

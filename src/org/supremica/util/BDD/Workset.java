@@ -5,9 +5,6 @@ package org.supremica.util.BDD;
 
 import org.supremica.util.BDD.heuristics.*;
 
-import java.util.*;
-
-
 /**
  * The workset algorithms works just like the PetriNet reachability algo, but it treats zappsp
  * each automaton in the same way as a single transition should be treated...

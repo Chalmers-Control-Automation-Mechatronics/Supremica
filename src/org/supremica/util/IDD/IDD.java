@@ -51,7 +51,6 @@ package org.supremica.util.IDD;
 
 import java.util.*;
 import java.io.*;
-import org.supremica.gui.*;
 import org.supremica.log.*;
 
 public final class IDD

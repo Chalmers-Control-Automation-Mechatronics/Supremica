@@ -1,11 +1,6 @@
 
 package org.supremica.util.BDD.solvers;
 
-import org.supremica.util.BDD.*;
-
-import java.util.*;
-
-
 /**
  * STCT:SA code, but start with a godd initial solution (from TSP)
  *

@@ -1,6 +1,5 @@
 package org.supremica.util.BDD;
 
-import java.util.*;
 import org.supremica.util.BDD.heuristics.*;
 
 

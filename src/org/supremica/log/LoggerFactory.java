@@ -48,7 +48,6 @@
  */
 package org.supremica.log;
 
-import java.lang.*;
 import org.apache.log4j.*;
 import org.supremica.properties.*;
 

@@ -9,7 +9,6 @@ package org.supremica.automata.algorithms.standard;
 
 import org.supremica.log.*;
 
-import java.util.HashSet;
 import java.util.Iterator;
 
 import org.supremica.automata.*;

@@ -1,11 +1,7 @@
 package org.supremica.gui.useractions;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.*;
-import javax.help.*;
-import java.net.URL;
 
 import org.supremica.gui.Supremica;
 import org.supremica.gui.ActionMan;

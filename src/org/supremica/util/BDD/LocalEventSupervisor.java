@@ -3,8 +3,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 public class LocalEventSupervisor
     extends ConjSupervisor
 {

@@ -17,7 +17,6 @@
 
 package org.supremica.automata.algorithms.scheduling;
 
-import java.io.*;
 import java.util.*;
 
 import org.supremica.log.*;

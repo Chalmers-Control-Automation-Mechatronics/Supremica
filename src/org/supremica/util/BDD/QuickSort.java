@@ -1,7 +1,5 @@
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 // NOTE:
 //
 // !!! THIS CLASS HAS NOT BEEN TESTED YET!!!

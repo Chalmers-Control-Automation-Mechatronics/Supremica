@@ -2,8 +2,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * This is an implementation of Valmari's P1 and P2 Fixed-point
  * heuristics

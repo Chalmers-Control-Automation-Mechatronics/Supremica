@@ -1,7 +1,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
 import java.io.*;
 
 public class DependencySet {

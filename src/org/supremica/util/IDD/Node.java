@@ -49,8 +49,6 @@
  */
 package org.supremica.util.IDD;
 
-import java.util.*;
-
 public final class Node
 {
 

@@ -1,7 +1,6 @@
 package org.supremica.external.jgrafchart.toSMV;
 
 import org.jdom.*;
-import org.jdom.filter.ElementFilter;
 import org.jdom.input.*;
 import java.io.*;
 import java.util.*;

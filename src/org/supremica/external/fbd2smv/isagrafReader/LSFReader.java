@@ -2,7 +2,6 @@ package org.supremica.external.fbd2smv.isagrafReader;
 
 import java.io.*;
 import java.util.*;
-import org.supremica.external.fbd2smv.isagrafReader.*;
 
 public class LSFReader
 {

@@ -1,7 +1,6 @@
 package org.supremica.softplc.RunTime;
 
 import javax.swing.UIManager;
-import java.awt.*;
 
 /**
  * Title:

@@ -3,8 +3,6 @@ package org.supremica.util.BDD.solvers;
 
 import org.supremica.util.BDD.*;
 
-import java.util.*;
-
 /**
  * This will replace the PCG ordering herusitics.
  * The code is so messy, even I cant remember what it does :(

@@ -3,8 +3,6 @@ package org.supremica.util.BDD;
 
 
 import org.supremica.util.BDD.graphs.*;
-import java.awt.*;
-import java.awt.event.*;
 
 /**
  * This is a sort of 'factory' class for the BDD grow graphs.

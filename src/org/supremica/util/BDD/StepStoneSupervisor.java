@@ -2,8 +2,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * StepStone reachability, a mixture of the workset algo and Valmari's P1 Fixed-point
  * heuristics

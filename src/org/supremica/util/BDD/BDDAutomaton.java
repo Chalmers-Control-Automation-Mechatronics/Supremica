@@ -2,7 +2,6 @@ package org.supremica.util.BDD;
 
 // NEW CUDD: FIXED
 import java.io.*;
-import java.util.*;
 
 public class BDDAutomaton
 	implements WeightedObject

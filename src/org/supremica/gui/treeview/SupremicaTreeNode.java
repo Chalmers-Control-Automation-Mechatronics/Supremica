@@ -5,11 +5,8 @@
 
 package org.supremica.gui.treeview;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
-import java.util.*;
 
 public class SupremicaTreeNode
 	extends DefaultMutableTreeNode

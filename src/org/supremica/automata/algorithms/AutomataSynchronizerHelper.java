@@ -53,7 +53,6 @@ import org.supremica.gui.*;
 import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;

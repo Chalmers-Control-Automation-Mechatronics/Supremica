@@ -63,8 +63,6 @@ import java.util.Stack;
 import java.util.Vector;
 import org.xml.sax.AttributeList;
 import org.xml.sax.HandlerBase;
-import org.xml.sax.InputSource;
-import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -90,7 +88,7 @@ import javax.xml.parsers.*;
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
- * @version $Id: XmlRpc.java,v 1.1 2004-02-02 15:56:19 vahidi Exp $
+ * @version $Id: XmlRpc.java,v 1.2 2004-04-26 08:35:37 torda Exp $
  */
 public abstract class XmlRpc extends HandlerBase
 {

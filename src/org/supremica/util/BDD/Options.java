@@ -1,7 +1,6 @@
 package org.supremica.util.BDD;
 
 import java.io.*;
-import org.supremica.properties.SupremicaProperties;
 
 public class Options
 {

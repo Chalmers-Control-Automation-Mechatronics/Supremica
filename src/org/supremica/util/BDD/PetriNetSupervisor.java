@@ -2,8 +2,6 @@ package org.supremica.util.BDD;
 
 
 
-import java.util.*;
-
 /**
  * Petri net supervisor does reachability somehow like Petri Nets (surrprise!).
  * The basic algorithm is

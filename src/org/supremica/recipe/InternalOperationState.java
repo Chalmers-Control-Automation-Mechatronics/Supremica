@@ -49,8 +49,6 @@
  */
 package org.supremica.recipe;
 
-import java.util.*;
-
 public class InternalOperationState
 {
 	private String[] activeOperations;

@@ -49,9 +49,6 @@
  */
 package org.supremica.util.IDD;
 
-import java.util.*;
-import java.io.*;
-
 public final class IDDBuilder
 {
 	private IDD theIDD = null;

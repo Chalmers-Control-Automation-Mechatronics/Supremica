@@ -55,7 +55,6 @@ package org.apache.xmlrpc;
  * <http://www.apache.org/>.
  */
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.EmptyStackException;
 import java.util.Stack;

@@ -1,6 +1,5 @@
 package org.supremica.gui.simulator;
 
-import org.supremica.gui.*;
 import org.supremica.log.*;
 import java.util.*;
 import uk.ac.ic.doc.scenebeans.event.AnimationListener;

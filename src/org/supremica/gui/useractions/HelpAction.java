@@ -3,7 +3,6 @@
 
 package org.supremica.gui.useractions;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.help.*;

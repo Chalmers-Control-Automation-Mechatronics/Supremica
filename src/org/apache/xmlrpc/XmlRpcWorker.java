@@ -56,7 +56,6 @@ package org.apache.xmlrpc;
  */
 
 import java.io.InputStream;
-import java.io.IOException;
 
 /**
  * Tie together the XmlRequestProcessor and XmlResponseProcessor to handle

@@ -1,7 +1,5 @@
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 
 public class PathSmoothSupervisor extends DisjSupervisor
 {

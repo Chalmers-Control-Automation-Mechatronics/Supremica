@@ -49,8 +49,6 @@
  */
 package org.supremica.recipe;
 
-import java.util.*;
-
 // Remove this class
 class PlantConnections
 {

@@ -4,7 +4,6 @@ package org.supremica.testcases;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
-import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;

@@ -1,9 +1,9 @@
 package org.apache.xmlrpc;
 
 /*
- * $Header: /cvs/Supremica2SVN/Supremica/src/org/apache/xmlrpc/Base64.java,v 1.1 2004-02-02 15:56:16 vahidi Exp $
- * $Revision: 1.1 $
- * $Date: 2004-02-02 15:56:16 $
+ * $Header: /cvs/Supremica2SVN/Supremica/src/org/apache/xmlrpc/Base64.java,v 1.2 2004-04-26 08:35:37 torda Exp $
+ * $Revision: 1.2 $
+ * $Date: 2004-04-26 08:35:37 $
  *
  * ====================================================================
  *
@@ -62,9 +62,6 @@ package org.apache.xmlrpc;
  * [Additional notices, if required by prior licensing conditions]
  *
  */
-
-import java.util.Enumeration;
-import java.util.Vector;
 
 /**
  * This class provides encode/decode for RFC 2045 Base64 as defined by

@@ -48,9 +48,7 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.*;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
 
 public class AutomatonAllAccepting
 {

@@ -1,10 +1,6 @@
 
 package org.supremica.util.BDD.solvers;
 
-import org.supremica.util.BDD.*;
-
-import java.util.*;
-
 
 /**
  * depth first ordering, AKA topological sort

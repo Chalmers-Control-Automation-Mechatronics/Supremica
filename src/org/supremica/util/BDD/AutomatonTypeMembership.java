@@ -1,8 +1,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * Decides if a BDDAutomaton is Plant or Supervisor/Spec
  */

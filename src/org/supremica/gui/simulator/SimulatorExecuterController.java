@@ -49,23 +49,9 @@
  */
 package org.supremica.gui.simulator;
 
-import org.supremica.gui.*;
-import org.supremica.automata.algorithms.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import javax.swing.*;
-import java.util.*;
-import org.supremica.properties.SupremicaProperties;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Project;
-import org.supremica.automata.Automata;
-import org.supremica.automata.AutomataIndexFormHelper;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonListener;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
 
 class SimulatorExecuterController
 	extends JPanel

@@ -3,8 +3,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * Disjunctive transition relation
  * NO CLUSTRING exists yet, so these algorithms may be SLOWER than the

@@ -49,7 +49,6 @@
  */
 package org.supremica.petrinet.algorithms;
 
-import org.supremica.petrinet.*;
 import org.supremica.automata.State;
 
 public class Marking

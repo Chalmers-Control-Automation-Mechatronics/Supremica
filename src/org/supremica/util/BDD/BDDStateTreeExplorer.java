@@ -1,8 +1,5 @@
 package org.supremica.util.BDD;
 
-import java.io.*;
-import java.util.*;
-
 public class BDDStateTreeExplorer
 {
 	private BDDAutomata automata;

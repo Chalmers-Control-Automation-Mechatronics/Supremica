@@ -4,14 +4,10 @@ import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Animator.*;
 import org.supremica.gui.*;
 import grafchart.sfc.*;
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.io.*;
 import java.net.URL;
 import java.util.*;
 import org.supremica.automata.*;
-import org.supremica.log.*;
 
 public class FactoryExecutorDEMO extends JFrame
 {

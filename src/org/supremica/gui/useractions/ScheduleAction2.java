@@ -6,7 +6,6 @@ import javax.swing.*;
 
 import org.supremica.log.*;
 import org.supremica.gui.*;
-import org.supremica.automata.Automata;
 
 /**
  *	Implements the dialog box allowing to choose different scheduling techniques. 

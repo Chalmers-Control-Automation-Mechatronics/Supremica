@@ -49,7 +49,6 @@
 package org.supremica.automata.IO;
 
 import java.io.*;
-import java.util.*;
 
 public class BallProcessHelper
 	extends SattLineHelper

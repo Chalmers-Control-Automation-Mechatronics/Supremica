@@ -1,6 +1,5 @@
 package org.supremica.softplc.Simulator;
 
-import java.lang.*;
 import java.awt.*;
 
 /**Class Ball is used to model balls

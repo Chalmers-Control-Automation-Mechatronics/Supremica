@@ -3,9 +3,6 @@ package org.supremica.util.BDD.solvers;
 
 import org.supremica.util.BDD.*;
 
-import java.util.*;
-
-
 /** Internal Node class */
 public class Node  {
 	PCGNode org;

@@ -2,8 +2,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 public class DisjSupervisor extends ConjSupervisor {
     protected DisjOptimizer dop;
     protected DisjPartition disj_partition;

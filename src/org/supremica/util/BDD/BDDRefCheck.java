@@ -1,7 +1,5 @@
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 
 /**
  * This class will, given a set of BDDs, check if their ref-count has CHANGED.

@@ -1,11 +1,9 @@
 package org.supremica.testcases.warehouse;
 
 import java.util.*;
-import java.io.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.automata.IO.*;
 import org.supremica.automata.execution.*;
 
 class Resource

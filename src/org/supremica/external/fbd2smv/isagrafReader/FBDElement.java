@@ -1,6 +1,5 @@
 package org.supremica.external.fbd2smv.isagrafReader;
 
-import java.util.*;
 //import org.supremica.external.fbd2smv.isagrafReader.*;
 
 public class FBDElement implements java.lang.Comparable

@@ -4,8 +4,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 /**
  * This class re-creates the automaton-list by merging two groups and using
  * the original ordering (according to BDDAutomaton.index)

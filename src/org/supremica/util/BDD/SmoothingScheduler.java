@@ -1,8 +1,6 @@
 
 package org.supremica.util.BDD;
 
-import java.util.*;
-
 public class SmoothingScheduler {
 
 	private int size;

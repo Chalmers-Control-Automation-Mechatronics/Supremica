@@ -1,8 +1,5 @@
 package org.supremica.softplc.CompILer.CodeGen;
 
-import org.supremica.softplc.CompILer.Parser.*;
-import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
-import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import org.supremica.log.Logger;
 import de.fub.bytecode.generic.*;

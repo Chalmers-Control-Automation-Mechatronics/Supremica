@@ -6,7 +6,6 @@ import org.supremica.util.BDD.*;
 import org.supremica.util.BDD.li.*;
 
 
-import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 import org.supremica.automata.algorithms.*;
 
@@ -302,6 +301,9 @@ public class TestAlgo {
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.9  2004/04/08 11:10:20  vahidi
+ encoding bug originated from IntQueue fixed. more tests added to discover all such stupid problems in future :(
+
  Revision 1.8  2004/01/30 14:45:04  vahidi
  testing log keywork, ignore this one
 

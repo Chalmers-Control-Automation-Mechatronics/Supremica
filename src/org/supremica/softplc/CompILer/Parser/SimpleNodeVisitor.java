@@ -1,7 +1,6 @@
 package org.supremica.softplc.CompILer.Parser;
 
 import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
-import java.lang.Exception;
 
 public interface SimpleNodeVisitor
 {

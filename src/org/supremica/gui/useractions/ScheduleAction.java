@@ -1,22 +1,12 @@
 /*************************** ScheduleAction.java ***************/
 package org.supremica.gui.useractions;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import java.util.*;
-import javax.help.*;
 
 import org.supremica.log.*;
 
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.gui.Gui;
-import org.supremica.gui.Supremica;
-import org.supremica.gui.ActionMan;
 import org.supremica.gui.ScheduleDialog;
-
-import org.supremica.automata.algorithms.scheduling.*;
 
 public class ScheduleAction
 	extends AbstractAction

@@ -48,10 +48,8 @@
  */
 package org.supremica.log;
 
-import java.lang.*;
 import org.apache.log4j.*;
 import org.apache.log4j.spi.*;
-import org.supremica.properties.*;
 
 public class LoggerFilter
 	extends Filter

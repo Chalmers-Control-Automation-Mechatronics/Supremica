@@ -49,8 +49,6 @@
 package org.supremica.log;
 
 import java.awt.Color;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
@@ -59,7 +57,6 @@ import javax.swing.*;
 import javax.swing.text.*;
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.helpers.Loader;
 import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.helpers.OptionConverter;
 import org.supremica.util.VPopupMenu;

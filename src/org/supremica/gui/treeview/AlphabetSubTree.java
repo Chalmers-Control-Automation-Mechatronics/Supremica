@@ -2,14 +2,10 @@
 
 package org.supremica.gui.treeview;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.tree.*;
 import java.util.*;
 
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.Supremica;
 
