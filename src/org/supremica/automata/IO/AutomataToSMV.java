@@ -158,7 +158,8 @@ public class AutomataToSMV
 				LabeledEvent currEvent = (LabeledEvent)evIt.next();
 				pw.print("\t\t\t(s.event = e_" + currEvent.getSynchIndex() + ") & ");
 				pw.print("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currState.getSynchIndex() + ") & ");
-				pw.print(getEnableCondition(currEvent));
+				pw.print("TRUE"); // Broadcast synchronization
+				//pw.print(getEnableCondition(currEvent)); // Prioritized synchronization
 				pw.print(" : ");
 				State nextState = currState.nextState(currEvent);
 				pw.println("q_" + currAutomatonIndex + "_" + nextState.getSynchIndex() + ";");
