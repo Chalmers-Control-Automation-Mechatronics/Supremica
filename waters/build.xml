@@ -154,7 +154,7 @@
   </target>
 
   <target name="test-compile" depends="waters-jar">
-    <javac srcdir="${supremica.src}" destdir="${classes}" 
+    <javac srcdir="${supremica.testsrc}" destdir="${classes}" 
            includes="net/sourceforge/waters/junit**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath>
