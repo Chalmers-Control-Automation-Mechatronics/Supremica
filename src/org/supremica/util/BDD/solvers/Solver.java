@@ -71,4 +71,20 @@ public abstract class Solver {
 		}
 		return best_index;
 	}
+
+
+	/**
+	 * just sort so the automaton with largest dependency gets places on top of stack and
+	 * therefor traversed first :)
+	 */
+	protected final void sort(int [] data, int start, int end, int parent) {
+		for(int i = start; i < end; i++) {
+			int min = i;
+			for(int j = i+1; j < end; j++)
+				if( org[data[j]].wlocal[parent]  <  org[data[min]].wlocal[parent])
+					min = j;
+
+			int tmp = data[min]; data[min] = data[i]; data[i] = tmp;
+		}
+	}
 }

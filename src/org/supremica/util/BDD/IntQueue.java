@@ -28,8 +28,10 @@ public class IntQueue {
 	}
 
 	public boolean empty() { return (read == write); }
-
 	public void reset() { read = write = 0; }
+	public int size() { return write; }
+	public int [] getArray() { return data; }
+
 
 /*
 	public static void main(String [] args) {
