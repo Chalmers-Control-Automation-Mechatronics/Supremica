@@ -147,50 +147,6 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Performs verification using the AutomataSynchronizerExecuter.
-	 *
-	 *@return  true if controllable, false if not or false if don't know (along with log message).
-	 *@exception  Exception Description of the Exception
-	 *@deprecated  this is done in AutomataVerificationWorker.
-	 *@see  AutomataSynchronizerExecuter
-	 */
-
-	/*
-	 * public boolean execute()
-	 *       throws Exception
-	 * {
-	 *       if (verificationOptions.getAlgorithmType() == 0)
-	 *       {
-	 *
-	 *               // Modular...
-	 *               return modularControllabilityVerification();
-	 *       }
-	 *       else if (verificationOptions.getAlgorithmType() == 1)
-	 *       {
-	 *
-	 *               // Monolithic...
-	 *               return monolithicControllabilityVerification();
-	 *       }
-	 *       else if (verificationOptions.getAlgorithmType() == 2)
-	 *       {
-	 *
-	 *               // IDD...
-	 *               logger.error("Option not implemented...");
-	 *
-	 *               return false;
-	 *       }
-	 *       else
-	 *       {
-	 *
-	 *               // Error...
-	 *               logger.error("Unavailable option chosen.");
-	 *
-	 *               return false;
-	 *       }
-	 * }
-	 */
-
-	/**
 	 * Method called from external class stopping AutomataVerifier as soon as possible.
 	 *
 	 *@see  CancelDialog

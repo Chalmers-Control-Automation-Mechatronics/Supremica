@@ -194,28 +194,6 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 *@param  plantIndex Description of the Parameter
-	 *@param  supervisorIndex Description of the Parameter
-	 *@exception  Exception Description of the Exception
-	 *@deprecated  Used by deprecated method AutomataPairWiseCheck.
-	 */
-
-	// Only used by AutomataPairWiseCheck (removable)
-	// Select two automata
-	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
-		throws Exception
-	{
-		automataIndices = new int[2];
-		automataIndices[0] = plantIndex;
-		automataIndices[1] = supervisorIndex;
-
-		if (exhaustiveSearch)
-		{
-			throw new Exception("Exhaustive search used wrong way!");
-		}
-	}
-
-	/**
 	 * Selects the automata in the ArrayList for synchronization.
 	 *
 	 *@param  automataToBeSelected Description of the Parameter
