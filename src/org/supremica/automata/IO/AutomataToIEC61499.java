@@ -233,7 +233,7 @@ public class AutomataToIEC61499
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
-				theHelper.printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),2);
+				theHelper.printBooleanVariableDeclaration(pw, "Q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),1);
 			}
 		}
 		
@@ -296,29 +296,43 @@ public class AutomataToIEC61499
 		// RESET algorithm resets the automata in the function block. In other words it
 		// makes automata enter the initial state.
 		pw.println("ALGORITHM RESET IN ST :");
-		pw.println("\tinitialized := FALSE;");
+		// Not needed anymore
+		//pw.println("\tinitialized := FALSE;");
 		// theAutomataToIEC1131.printInitializationStructureAsST(pw);
 		//pw.println("\n\t(* Set the initial state *)");
 		//pw.println("\tIF (NOT initialized)");
 		//pw.println("\tTHEN");
 
+		// Set all state variables to FALSE
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			
+			int currAutomatonIndex = currAutomaton.getSynchIndex();
+
+			for (Iterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+			{
+				State currState = (State) stateIt.next();
+				int currStateIndex = currState.getSynchIndex();
+
+				pw.println("\tQ_" + currAutomatonIndex + "_" + currStateIndex + " := FALSE;");
+			}
+		}
+
+		// Then set the initital states to TRUE
+		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			if (currAutomaton.getInitialState() == null)
 			{
-				String errMessage = "AutomataToIEC61499.printAlgorithmDeclarations: "
-									+ "all automata must have an initial state but automaton "
-									+ currAutomaton.getName()
-									+ "doesn't";
+				String errMessage = "AutomataToIEC61499.printAlgorithmDeclarations: " + "all automata must have an initial state but automaton " + currAutomaton.getName() + "doesn't";
 
 				logger.error(errMessage);
 
 				throw new IllegalStateException(errMessage);
 			}
 
-			pw.println("\t\tq_" + currAutomaton.getSynchIndex() + "_" + currAutomaton.getInitialState().getSynchIndex() + " := TRUE;");
+			pw.println("\tQ_" + currAutomaton.getSynchIndex() + "_" + currAutomaton.getInitialState().getSynchIndex() + " := TRUE;");
 		}
 
 		//pw.println("\t\tinitialized := TRUE;");
@@ -328,8 +342,7 @@ public class AutomataToIEC61499
 
 
 		
-		// TRANSITION algorithm makes the transition corresponding to the automaton event
-		// that occurred.
+		// TRANSITION algorithm makes the transition corresponding to the automaton event that occurred.
 		pw.println("ALGORITHM TRANSITION IN ST :");
 		
 		// input variables to internal variables
@@ -342,6 +355,7 @@ public class AutomataToIEC61499
 		
 		
 		// Already done by COMP_ENABLED algorithm, just use the output variables
+		
 		//	theAutomataToIEC1131.printComputeEnabledEventsAsST(pw);
 		//pw.println("\n\tenabledEvent = FALSE;");
 		//pw.println("\n\t(* Compute the enabled events *)");
@@ -430,8 +444,8 @@ public class AutomataToIEC61499
 		// Not needed.
 
 		//	theAutomataToIEC1131.printChangeStateTransitionsAsST(pw); 
-		//pw.println("\n\t(* Change state in the automata *)");
-		//pw.println("\t(* It is in general not safe to have more than one event set to true at this point *)");
+		pw.println("\n\t(* Change state in the automata *)");
+		pw.println("\t(* It is in general not safe to have more than one event set to true at this point *)");
 
 		// Iterate over all events and make transitions for the enabled events
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
@@ -443,8 +457,7 @@ public class AutomataToIEC61499
 
 			boolean previousCondition = false;
 
-			//pw.println("\tIF (EI_" + currEventIndex + " AND EO_" + currEventIndex + ")");
-			pw.println("\tIF (e_" + currEventIndex + ")");
+			pw.println("\tIF (EI_" + currEventIndex + " AND EO_" + currEventIndex + ")");
 			pw.println("\tTHEN");
 
 			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
@@ -492,14 +505,14 @@ public class AutomataToIEC61499
 								pw.print("\t\tELSIF");
 							}
 
-							pw.println(" (q_" + currAutomatonIndex + "_" + currStateIndex + ")");
+							pw.println(" (Q_" + currAutomatonIndex + "_" + currStateIndex + ")");
 							pw.println("\t\tTHEN");
-							pw.println("\t\t\tq_" + currAutomatonIndex + "_" + toStateIndex + " := TRUE;");
-							pw.println("\t\t\tq_" + currAutomatonIndex + "_" + currStateIndex + " := FALSE;");
+							pw.println("\t\t\tQ_" + currAutomatonIndex + "_" + toStateIndex + " := TRUE;");
+							pw.println("\t\t\tQ_" + currAutomatonIndex + "_" + currStateIndex + " := FALSE;");
 						}
 						else
 						{
-							pw.println("\t\t(* q_" + currAutomatonIndex + "_" + currStateIndex + "  has e_" + currEventIndex + " as self loop, no transition *)");
+							pw.println("\t\t(* Q_" + currAutomatonIndex + "_" + currStateIndex + "  has EI_" + currEventIndex + " as self loop, no transition *)");
 						}
 					}
 
@@ -521,7 +534,7 @@ public class AutomataToIEC61499
 		// the transition.
 		pw.println("ALGORITHM COMP_ENABLED IN ST :");
 		//theAutomataToIEC1131.printComputeEnabledEventsAsST(pw);
-		pw.println("\n\tenabledEvent = FALSE;");
+		//pw.println("\n\tenabledEvent = FALSE;");
 		pw.println("\n\t(* Compute the enabled events *)");
 
 		// Iterate over all events and compute which events that are enabled
@@ -536,7 +549,7 @@ public class AutomataToIEC61499
 
 				boolean previousCondition = false;
 
-				pw.print("\te_" + currEventIndex + " := ");
+				pw.print("\tEO_" + currEventIndex + " := ");
 
 				for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 				{
@@ -579,7 +592,7 @@ public class AutomataToIEC61499
 									previousState = true;
 								}
 
-								pw.print("q_" + currAutomatonIndex + "_" + currStateIndex);
+								pw.print("Q_" + currAutomatonIndex + "_" + currStateIndex);
 							}
 
 							if (!previousState)
@@ -605,14 +618,15 @@ public class AutomataToIEC61499
 		}
 
 
+		// Not needed anymore
 		// internal variables to output variables
-		pw.println();
-		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
-		{
-			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			pw.println("\tEO_" + currEvent.getSynchIndex() + " := " + "\te_" + currEvent.getSynchIndex() + ";");
-		}
-		pw.println();
+		//pw.println();
+		//for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		//{
+		//	LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+		//	pw.println("\tEO_" + currEvent.getSynchIndex() + " := " + "\te_" + currEvent.getSynchIndex() + ";");
+		//}
+		//pw.println();
 		pw.println("END_ALGORITHM");
 
 	}
