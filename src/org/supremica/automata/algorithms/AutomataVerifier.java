@@ -704,6 +704,8 @@ public class AutomataVerifier
 	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
+		// WOHOOBS! Eventuellt är det listigt att göra ny onlinesynchronizer, 
+		// med den nya automataIndices varje gång... tänk på det. FIXA!
 		if (uncontrollabilityCheckHelper == null)
 		{
 			AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
@@ -740,9 +742,6 @@ public class AutomataVerifier
 			AutomataSynchronizerExecuter currExec =
 				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
 			currExec.selectAllAutomata();
-			// The next line... /nbrOfExecuters is because the stopCount is counted in all executers simultaneously....
-			// currExec.stopAfter((int) (2000/nbrOfExecuters)); 
-			// currExec.stopAfter((int) (1000*java.lang.Math.pow(10, attempt)/nbrOfExecuters)); 
 			currExec.start();
 		}
 		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();

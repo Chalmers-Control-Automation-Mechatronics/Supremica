@@ -432,7 +432,7 @@ public final class AutomataSynchronizerExecuter
 		}
 		
 		if (coExecute)
-		{   // In co-execution mode, a enabledEvents-method in another executer
+		{   // In co-execution mode, an enabledEvents-method in another executer
 			// follows the automaton we're suspecting has uncontrollable states.
 			int insertionIndex = 0;
 			int i = 0;
@@ -506,8 +506,7 @@ public final class AutomataSynchronizerExecuter
 				int currEventIndex = currEnabledEvents[i];
 				// Handle all events
 				while (currEventIndex != Integer.MAX_VALUE)
-				{
-					// Generate an array that contains the indicies of each state
+				{	// Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
 
 					// Iterate over all automata to construct the new state
@@ -887,36 +886,4 @@ public final class AutomataSynchronizerExecuter
 	{
 		currUncontrollableEvent = event.getSynchIndex();
 	}
-
-// 	public boolean isEnabled(int eventIndex)
-// 	{
-// 		int i = 0;
-// 		currEventIndex = currEnabledEvent[i];
-// 		while (currEventIndex != Integer.MAX_VALUE)
-// 		{
-// 			if (currEventIndex == eventIndex)
-// 				return true;
-// 			currEventIndex = currEnabledEvents[++i];
-// 		}
-// 		return false;
-// 	}
-
-// 	public void doTransition(int eventIndex)
-// 	{
-// 		// Construct new state
-// 		System.arraycopy(currState, 0, nextState, 0, fromState.length);
-// 		// Iterate over all automata to construct the new state
-// 		for (int j = 0; j < nbrOfAutomata; j++)
-// 		{
-// 			int currAutomatonIndex = j;
-// 			int currSingleNextState =
-// 				nextStateTable[currAutomatonIndex][fromState[currAutomatonIndex]][eventIndex];
-// 			// Jump in all automata that have this event active.
-// 			if (currSingleNextState != Integer.MAX_VALUE)
-// 			{
-// 				nextState[currAutomatonIndex] = currSingleNextState;
-// 			}
-// 		}
-// 		enabledEvents(nextState);
-// 	}
 }
