@@ -904,7 +904,6 @@ class BDDPanel2
 	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup, cReorderGroupFree;
 	private JTextField maxPartitionSize, extraLibDir;
 	private JButton bProofFile;
-	private int maxsize;
 
 	public BDDPanel2(PreferencesDialog theDialog)
     {
@@ -1025,7 +1024,7 @@ class BDDPanel2
 		if(maxsize == Integer.MIN_VALUE) return false;
 
 		Options.extraLibPath         = extraLibDir.getText();
-		Options.max_partition_size   =  maxsize;
+		Options.max_partition_size   = maxsize;
 		Options.reorder_algo         = cbReordering.getSelectedIndex();
 		Options.reorder_dyanmic      = cReorderDynamic.isSelected();
 		Options.reorder_after_build  = cReorderBuild.isSelected();

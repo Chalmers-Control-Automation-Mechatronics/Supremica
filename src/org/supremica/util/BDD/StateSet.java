@@ -31,28 +31,28 @@ public class StateSet
 	public State getByName(String name)
 	    throws BDDException
 	{
-		State by_id = null;
+		State by_name = null;
 
 		if(closed) {
 			for(int i = 0; i < states.length; i++) {
 				if(states[i].name_id.equals(name))	return states[i];
-				if(states[i].name.equals(name)) by_id = states[i];
+				if(states[i].name.equals(name)) by_name = states[i];
 			}
 		} else {
 
 			for (Enumeration e = elements(); e.hasMoreElements(); ) {
 				State s = (State) e.nextElement();
 				if (s.name_id.equals(name))		return s;
-				if(s.name.equals(name))			by_id = s;
+				if(s.name.equals(name))			by_name = s;
 			}
 		}
 
 
 
-		if(by_id != null)
+		if(by_name != null)
 		{
-			System.err.println("[StateSet.getByName] BAD MODEL, uses name " + by_id.name + " instead of " + by_id.name_id);
-			return by_id;
+			System.err.println("[StateSet.getByName] BAD MODEL, uses name " + by_name.name + " instead of ID " + by_name.name_id);
+			return by_name;
 		}
 
 

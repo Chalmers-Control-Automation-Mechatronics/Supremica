@@ -314,9 +314,10 @@ public class AlphabetAnalyzer
 
 	// -----------------------------------------------------------------
 	/**
-	 * returns the events that always blocked in an automaton.
+	 * returns the events that are always blocked in an automaton.
 	 * assumes that the automaton is trim, or it will give an underapproximated answer.
 	 *
+	 * FIXME: this algorithm is currently not working :(
 	 */
 	public static HashSet getBlockedEvents(Automaton a)
 	{

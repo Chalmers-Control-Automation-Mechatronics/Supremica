@@ -34,6 +34,8 @@ public interface Gui
 
 	void selectAutomata(int[] a);
 
+	void selectAutomata(Collection a);
+
 	void unselectAutomaton(int s);
 
 	void close();
@@ -70,6 +72,6 @@ public interface Gui
 	Project getSelectedProject();
 
 	FileSecurity getFileSecurity();
-	
+
 	void show();
 }

@@ -173,37 +173,47 @@ public class IncrementalLI extends BaseLI {
 				int Qreachable = sup.getReachables(locals);
 				int bdd_theta_enabled = ba.and(bdd_theta, bdd_local_events_plant);
 				int tmp_bdd = ba.and(bdd_theta_enabled, Qreachable);
-				boolean not_exist = (tmp_bdd == ba.getZero());
 
-				ba.deref(tmp_bdd);
 				ba.deref(bdd_theta_enabled);
 				ba.deref(bdd_initial);
 
 				bdd_initial = Qreachable;
 
-				if(!not_exist ) {
+				if(tmp_bdd != ba.getZero() ) {
 					if(Options.debug_on) {
 						Options.out.println("*** IncrLC:A bad state was reachable by a _local_ string");
 						ba.show_events(bdd_local_events, "LocalEvents");
 						ba.show_events(bdd_local_events_plant, "PlantLocalEvents");
+						dump_failure(tmp_bdd);
 					}
+					ba.deref(tmp_bdd);
 					return false;
 				}
 
+				ba.deref(tmp_bdd);
+
+
 			} else if(last_locals > 0) {
+
 				// maybe the initial state is among them, no need for any local transitions then?
 				int tmp = ba.and(bdd_initial, bdd_theta);
 				if(tmp != ba.getZero() ) {
+
 					int tmp2 = ba.and(tmp, bdd_local_events_plant);
-					boolean enabled = tmp2 != ba.getOne();
-					ba.deref(tmp2);
-					if(enabled) {
-						ba.deref(tmp);
-						if(Options.debug_on)  Options.out.println("*** IncrLC:The initial state is in Theta and P-enabled");
+					ba.deref(tmp);
+
+
+					if(tmp2 != ba.getZero() ) {
+						if(Options.debug_on)  {
+							Options.out.println("*** IncrLC:The initial state is in Theta and P-enabled");
+							dump_failure(tmp2);
+						}
+						ba.deref(tmp2);
 						return false;
 					}
+					ba.deref(tmp2);
+
 				}
-				ba.deref(tmp);
 			}
 
 
@@ -271,4 +281,7 @@ public class IncrementalLI extends BaseLI {
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.4  2004/02/03 11:03:19  vahidi
+saving documents to a centeral database (via XML-RPC) is now supported. the new jar rpcdocdb.jar has been added for this reason
+
 */

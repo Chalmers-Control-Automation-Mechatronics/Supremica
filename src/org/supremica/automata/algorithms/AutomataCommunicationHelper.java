@@ -16,11 +16,12 @@ public class AutomataCommunicationHelper {
 	 * returns the dependency group
 	 *
 	 */
-	public static Vector getDependencyGroup(Automata selected, Automata all)
+	public static Collection getDependencyGroup(Automata selected, Automata all)
 		throws Exception
 	{
 		all = new Automata(all, true);
-		Vector toSelect = new Vector();
+		Collection toSelect = new HashSet();
+
 
 		for (AutomatonIterator it = selected.iterator(); it.hasNext(); )
 		{
@@ -30,6 +31,7 @@ public class AutomataCommunicationHelper {
 		}
 
 		Alphabet  selectedAlphabet = AlphabetHelpers.getUnionAlphabet(selected, false, false);
+
 		for (AutomatonIterator it = all.iterator(); it.hasNext(); )
 		{
 			Automaton a = it.nextAutomaton();
@@ -53,13 +55,13 @@ public class AutomataCommunicationHelper {
 	 * @retruns Vector of Automaton which is v, such that selected SUBSET-EQUAL v SUBSET-EQUAL all.
 	 */
 
-	public static Vector getMaximalComponent(Automata selected, Automata all)
+	public static Collection getMaximalComponent(Automata selected, Automata all)
 		throws Exception
 	{
 
 		boolean done;
 		all = new Automata(all, true);
-		Vector toSelect = new Vector();
+		Collection toSelect = new HashSet();
 
 		for (AutomatonIterator it = selected.iterator(); it.hasNext(); )
 		{
@@ -85,9 +87,9 @@ public class AutomataCommunicationHelper {
 				}
 			}
 
-			for (Enumeration e = toSelect.elements() ; e.hasMoreElements() ;)
+			for (Iterator it = toSelect.iterator() ; it.hasNext() ;)
 			{
-				Automaton a = (Automaton) e.nextElement();
+				Automaton a = (Automaton) it.next();
 				all.removeAutomaton(a);
 			}
 
@@ -102,10 +104,10 @@ public class AutomataCommunicationHelper {
 	 *
 	 * @returns Vector of Automata whose alphabet share no common events
 	 */
-	 public static Vector split(Automata all)
+	 public static Collection split(Automata all)
 	 	throws Exception
 	 {
-		 Vector v = new Vector();
+		 Collection v = new LinkedList();
 		 all = new Automata(all, true);
 
 		while(all.size() > 0)   {
@@ -113,12 +115,13 @@ public class AutomataCommunicationHelper {
 			Automaton first = all.iterator().nextAutomaton();
 			Automata firstAut = new Automata(first);
 
-			Vector component = getMaximalComponent(firstAut, all);
 
 			Automata componentAut = new Automata();
-			for (Enumeration e = component.elements() ; e.hasMoreElements() ;)
+			Collection component = getMaximalComponent(firstAut, all);
+
+			for (Iterator it = component.iterator() ; it.hasNext() ;)
 			{
-				Automaton a = (Automaton) e.nextElement();
+				Automaton a = (Automaton) it.next();
 				all.removeAutomaton(a);
 				componentAut.addAutomaton(a);
 			}

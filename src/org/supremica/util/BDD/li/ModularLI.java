@@ -67,11 +67,11 @@ public class ModularLI extends BaseLI {
 		bdd_local_events       = ba.ref( ba.getZero() );
 		bdd_sigma_w            = ba.getAlphabetSubsetAsBDD(workset_events);
 
-
 		BDDAutomaton next;
 		while( (next = ac.next() ) != null) {
 			num_automata_added++;
 			num_syncs_done++;
+
 
 			if(Options.debug_on) Options.out.println("\t +++ Adding " + next.getName() + "\n");
 			if(ac.lastWasSpec() )	Ip.add(next);
@@ -88,7 +88,10 @@ public class ModularLI extends BaseLI {
 
 
 			// More verbose crap
-			if(Options.debug_on) ac.dump();
+			if(Options.debug_on) {
+				Options.out.println("\n\n\n After adding " + next.getName() + ":\n");
+				ac.dump();
+			}
 
 			// some gymnatics needed to get the VALID subset of bdd_sigma_w (see computeReachableLanguageDifference() for reason)
 			int bdd_sigma = ba.and( Ip.getSigma() , Jp.getSigma() );
@@ -101,7 +104,7 @@ public class ModularLI extends BaseLI {
 			boolean ret = (bdd_bad == ba.getZero());
 
 
-			// all nc-arcs where considred and found to be unreachable
+			// all nc-arcs were considred and found to be unreachable
 			if(ret && ac.allPlantEventsIncluded()) {
 				if(Options.debug_on) ba.getEventManager().dumpSubset("*** Removed events (all)", workset_events);
 				return true;
@@ -113,11 +116,14 @@ public class ModularLI extends BaseLI {
 			int new_plant_locals = ac.getNumOfLocalPlantEvents();
 			if(last_plant_locals  <  new_plant_locals ) {
 				boolean [] plocals = ac.getLocalPlantEvents();
-				if(Options.debug_on) ba.getEventManager().dumpSubset("*** ModLC:(" + (new_plant_locals - last_locals) + " new) PlantLocalEvents", plocals);
 				last_plant_locals = new_plant_locals;
 
 				if(bdd_local_events_plant  != -1) ba.deref(bdd_local_events_plant);
 				bdd_local_events_plant = ba.getAlphabetSubsetAsBDD(ac.getLocalPlantEvents());
+
+				if(Options.debug_on) {
+					ba.getEventManager().dumpSubset("*** ModLC:(" + (new_plant_locals - last_locals) + " new) PlantLocalEvents", plocals);
+				}
 			}
 
 
@@ -133,23 +139,34 @@ public class ModularLI extends BaseLI {
 				bdd_local_events = ba.getAlphabetSubsetAsBDD(locals);
 
 				// Early termination check starts here
-				int bdd_bad_enabled = ba.and(bdd_bad, last_plant_locals);
+				int bdd_bad_enabled = ba.and(bdd_bad, bdd_local_events_plant);
+
 
 				if(bdd_bad_enabled == ba.getZero() ) {
-					if(Options.debug_on) Options.out.println("No enabled half-transitions, skipping local-reachability");
+					// we cant proof the a half transition is enabled, better to skipp it all
+					if(Options.debug_on) {
+						Options.out.println("No enabled half-transitions, skipping local-reachability");
+					}
+
 				} else {
+					// we can proof that some half transition are enabled, lets see if they are "bad" too:
 
 					int Qreachable = sup.getReachables(locals);
-					int tmp_bdd = ba.and(Qreachable, bdd_bad_enabled);		ba.deref(Qreachable);
-					boolean not_exist = (tmp_bdd == ba.getZero()); 			ba.deref(tmp_bdd);
-					if(!not_exist ) {
+					int tmp_bdd = ba.and(Qreachable, bdd_bad_enabled);
+					ba.deref(Qreachable);
+
+					if(tmp_bdd != ba.getZero() ) {
 						if(Options.debug_on) {
 							Options.out.println("*** ModLC:A bad state was reachable by a _local_ string");
 							ba.show_events(bdd_local_events, "LocalEvents");
 							ba.show_events(bdd_local_events_plant, "PlantLocalEvents");
+							dump_failure(tmp_bdd);
 						}
+						ba.deref(tmp_bdd);
 						return false;
 					}
+
+					ba.deref(tmp_bdd);
 				}
 
 				ba.deref(bdd_bad_enabled);
@@ -158,7 +175,11 @@ public class ModularLI extends BaseLI {
 
 		}
 
-		if(Options.debug_on) Options.out.println("Nothing more to add. Automaton must be uncontrollable");
+		if(Options.debug_on) {
+			Options.out.println("Nothing more to add. Automaton must be uncontrollable");
+			dump_failure(bdd_bad);
+		}
+
 		return false;
 	}
 

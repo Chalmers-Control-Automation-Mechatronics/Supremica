@@ -130,6 +130,8 @@ public class BaseLI {
  		BDDAutomaton[] specs = L1.getMembers();
  		for(int i = 0; i < L1.getSize();i++) specs[i].extra2 = 1;
 		for(int i = 0; i < all.length; i++) if(all[i].extra2 == 1) is_spec[i] = true;
+
+
 	}
 
 	// ------------------------------------------------------
@@ -219,4 +221,13 @@ public class BaseLI {
 		return true;
 	}
 
+	// -----------------------------------------------------------------------
+	/** given the set of failing transitions, dump ONE transition in it */
+	public void dump_failure(int half_transition) {
+		Options.out.println("*** LI: failed due to the following (half)-transition:");
+		int one_bad = ba.satOne(half_transition);
+		ba.show_half_transitions(one_bad);
+		ba.deref(one_bad);
+		Options.out.println();
+	}
 }

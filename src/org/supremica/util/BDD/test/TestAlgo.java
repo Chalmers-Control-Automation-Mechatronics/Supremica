@@ -24,6 +24,7 @@ public class TestAlgo {
 	 * non-blocking test only if can do reachability and co-reachability
 	 */
 	private static final String [] TEST_FILES = {
+		"../examples/includeInJarFile/OtherExamples/parallelManufacturingExample.xml",
 		"../examples/includeInJarFile/OtherExamples/agv.xml" ,
 		"../examples/includeInJarFile/OtherExamples/catmouse.xml",
 		"../examples/includeInJarFile/OtherExamples/circularTable.xml",
@@ -31,12 +32,14 @@ public class TestAlgo {
 		"../examples/benchmark/simple1.xml",
 		"../examples/includeInJarFile/OtherExamples/aip/System4_system4.xml",
 		"../examples/c3.xml"
+	};
 
-		};
-	private static final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, 1.101504E7, -1};
-	private static final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1, -1};
-	private static final boolean controllable[] = { false, false, false, true, true, false, true};
-	private static final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */, true /* dont know */};
+	// XXX: 	these number probably haev double-floating-point  overflows, so if we count them in some other way we might not
+	//        get exactly the same number for the big ones!
+	private static final double reachables[] = { 5702550, 25731072, 18, 199, 2274519862886400.0, 10000000, 1.101504E7, -1};
+	private static final double coreachables[] = {  5702550, 343692864, 20, 432, 2274519862886400.0, 10000000, -1, -1};
+	private static final boolean controllable[] = { true, false, false, false, true, true, true, true};
+	private static final boolean nonblocking[] = { true, true, true, false, false, true, true /* dont know */, true /* dont know */};
 
 
 	// ----------------------------------------------------------------------------------
@@ -67,6 +70,21 @@ public class TestAlgo {
 	}
 	// ----------------------------------------------------------------------------------
 
+	private void error(String msg) {
+		System.err.println("\nERROR: " + msg);
+
+		System.err.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+		System.err.println("Encoding algo: " + Options.ENCODING_NAMES[Options.encoding_algorithm]);
+		System.err.println("Ordering algo: " + Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
+		System.err.println();
+
+		System.exit(20); // comment out to allow ALL tests to run before stopped
+
+		fail++;
+	}
+
+	// ----------------------------------------------------------------------------------
+
 	private void testC(boolean result, double reachables) {
 		// WHAT IS THIS?
 		// if(Options.inclsuion_algorithm != Options.INCLUSION_ALGO_MONOLITHIC) return; // not monolithic!
@@ -77,8 +95,7 @@ public class TestAlgo {
 		boolean is_controllable = verifier.isControllable();
 
 		if(is_controllable != result) {
-			System.out.println("\nERROR: [controllability] got " + is_controllable + ", expected " + result);
-			fail ++;
+			error("[controllability] got " + is_controllable + ", expected " + result);
 			return;
 		}
 		pass++;
@@ -93,8 +110,7 @@ public class TestAlgo {
 		int bdd_r = supervisor.getReachables();
 		double got = automata2.count_states(bdd_r);
 		if(got != states_r) {
-			System.err.println("ERROR: [reachability] " + got + " states reachable, expected " + states_r);
-			fail ++;
+			error("[reachability] " + got + " states reachable, expected " + states_r);
 			return;
 		}
 		pass++;
@@ -108,8 +124,7 @@ public class TestAlgo {
 		int bdd_r = supervisor.getCoReachables();
 		double got = automata2.count_states(bdd_r);
 		if(got != states_cr) {
-			System.err.println("ERROR: [co-reachability] " + got + " states reachable, expected " + states_cr);
-			fail ++;
+			error("[co-reachability] " + got + " states reachable, expected " + states_cr);
 			return;
 		}
 		pass++;
@@ -123,8 +138,7 @@ public class TestAlgo {
 		boolean nb = verifier.isNonBlocking();
 
 		if(nb != result) {
-			System.err.println("ERROR: [non-blocking] got " + nb + ", expected " + result);
-			fail ++;
+			error("[non-blocking] got " + nb + ", expected " + result);
 			return;
 		}
 		pass++;
@@ -139,8 +153,7 @@ public class TestAlgo {
 		ili.cleanup();
 
 		if(is_controllable != result) {
-			System.err.println("ERROR: [incremental controllability] got " + is_controllable + ", expected " + result);
-			fail ++;
+			error("[incremental controllability] got " + is_controllable + ", expected " + result);
 			return;
 		}
 		pass++;
@@ -154,8 +167,7 @@ public class TestAlgo {
 		mli.cleanup();
 
 		if(is_controllable != result) {
-			System.err.println("ERROR: [modular controllability] got " + is_controllable + ", expected " + result);
-			fail ++;
+			error("[modular controllability] got " + is_controllable + ", expected " + result);
 			return;
 		}
 		pass++;
@@ -183,58 +195,59 @@ public class TestAlgo {
 		int len = TEST_FILES.length;
 
 
-		System.out.println("NOTE: test target for the first phase is : " + TEST_FILES[0]);
+		for(int k = 0; k < 3; k++) {
+			System.out.println("\nTarget #" + k + " is " + TEST_FILES[k]);
 
-		// test different algos
-		System.out.println("\n***** Testing all search algorithms");
-		int save_algo_family = Options.algo_family; // save the default crap
-		load(TEST_FILES[0]);
-		for(int i = 0; i < Options.REACH_ALGO_NAMES.length; i++) {
-			Options.algo_family = i;
-			adjust(Options.REACH_ALGO_NAMES[Options.algo_family], 40);
-			testR(reachables[0]);
-			testCR(coreachables[0]);
 
-			if(i == save_algo_family) System.out.print("   (DEFAULT) ");
-			System.out.println();
-		}
-		verifier.cleanup();
-		Options.algo_family = save_algo_family;
+			// test different algos
+			System.out.println("\n***** Testing all search algorithms");
+			int save_algo_family = Options.algo_family; // save the default crap
+			load(TEST_FILES[k]);
+			for(int i = 0; i < Options.REACH_ALGO_NAMES.length; i++) {
+				Options.algo_family = i;
+				adjust(Options.REACH_ALGO_NAMES[Options.algo_family], 40);
+				testR(reachables[k]);
+				testCR(coreachables[k]);
+
+				if(i == save_algo_family) System.out.print("   (DEFAULT) ");
+				System.out.println();
+			}
+			verifier.cleanup();
+			Options.algo_family = save_algo_family;
+
+		// test different encodings
+			System.out.println("\n***** Testing all encoding functions");
+			int save_encoding = Options.encoding_algorithm;
+			for(int i = 0; i < Options.ENCODING_NAMES.length; i++) {
+				load(TEST_FILES[k]);
+				Options.encoding_algorithm = i;
+				adjust(Options.ENCODING_NAMES[Options.encoding_algorithm], 40);
+				testR(reachables[k]);
+				testCR(coreachables[k]);
+				verifier.cleanup();
+
+				if(i == save_encoding) System.out.print("   (DEFAULT) ");
+				System.out.println();
+			}
+			Options.encoding_algorithm = save_encoding;
+
 
 	// test different encodings
-		System.out.println("\n***** Testing all encoding functions");
-		int save_encoding = Options.encoding_algorithm;
-		for(int i = 0; i < Options.ENCODING_NAMES.length; i++) {
-			load(TEST_FILES[0]);
-			Options.encoding_algorithm = i;
-			adjust(Options.ENCODING_NAMES[Options.encoding_algorithm], 40);
-			testR(reachables[0]);
-			testCR(coreachables[0]);
-			verifier.cleanup();
+			System.out.println("\n***** Testing all encoding functions");
+			int save_ordering = Options.ordering_algorithm;
+			for(int i = 0; i < Options.ORDERING_ALGORITHM_NAMES.length; i++) {
+				load(TEST_FILES[k]);
+				Options.ordering_algorithm = i;
+				adjust(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], 40);
+				testR(reachables[k]);
+				testCR(coreachables[k]);
+				verifier.cleanup();
 
-			if(i == save_encoding) System.out.print("   (DEFAULT) ");
-			System.out.println();
+				if(i == save_ordering) System.out.print("   (DEFAULT) ");
+				System.out.println();
+			}
+			Options.ordering_algorithm = save_ordering;
 		}
-		Options.encoding_algorithm = save_encoding;
-		System.out.println("NOTE: default algorithm is " + Options.ENCODING_NAMES[Options.encoding_algorithm]);
-
-
-// test different encodings
-		System.out.println("\n***** Testing all encoding functions");
-		int save_ordering = Options.ordering_algorithm;
-		for(int i = 0; i < Options.ORDERING_ALGORITHM_NAMES.length; i++) {
-			load(TEST_FILES[0]);
-			Options.ordering_algorithm = i;
-			adjust(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], 40);
-			testR(reachables[0]);
-			testCR(coreachables[0]);
-			verifier.cleanup();
-
-			if(i == save_ordering) System.out.print("   (DEFAULT) ");
-			System.out.println();
-		}
-		Options.ordering_algorithm = save_ordering;
-		System.out.println("NOTE: default algorithm is " + Options.ENCODING_NAMES[Options.ordering_algorithm]);
 
 
 
@@ -304,12 +317,15 @@ public class TestAlgo {
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.12  2004/05/04 10:01:08  vahidi
+ EPS files created via DOT can now fit an A4 page. It is on by default and cannot be disabled, see AutomatonToDot.java
+
  Revision 1.11  2004/05/03 08:11:48  torda
  Made some constants static
 
  Revision 1.10  2004/04/26 08:35:44  torda
  Removed all(?) unused import statements (hundreds) for the following reasons:
- 
+
  - Unused imports can be confusing
  - They give unnessesary dependencies
  - Eclipse marked out everyone so it was easily done

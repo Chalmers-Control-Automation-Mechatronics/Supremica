@@ -37,6 +37,7 @@ public class  DelayedSmoothSupervisor extends SmoothSupervisor {
 			if(gf != null)    gf.add( r );
 
 		} while(r != r_old);
+
 		if(gf != null) gf.mark( "Releasing " + c.toString() );
 		return r;
 	}

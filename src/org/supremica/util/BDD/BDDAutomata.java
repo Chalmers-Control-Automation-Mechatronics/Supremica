@@ -154,6 +154,7 @@ public class BDDAutomata
 
 			original_automata.getAlphabeth().showEncoding(this);
 		}
+
 	}
 
 	private void createEvents()

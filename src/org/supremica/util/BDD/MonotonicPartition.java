@@ -73,16 +73,16 @@ public class MonotonicPartition {
      */
     public int image(int q_k) {
 
-	int front = manager.getZero(); manager.ref(front);
-	for(int i = 0; i < curr; i++) {
-	    int tmp = manager.relProd(delta[i], q_k, cube);
-	    front = manager.orTo(front, tmp);
-	    manager.deref(tmp);
-	}
+			int front = manager.getZero(); manager.ref(front);
+		 	for(int i = 0; i < curr; i++) {
+				int tmp = manager.relProd(delta[i], q_k, cube);
+				front = manager.orTo(front, tmp);
+				manager.deref(tmp);
+			}
 
-	int front_s = manager.replace( front, sp2s);
-	manager.deref(front);
-	return front_s;
+			int front_s = manager.replace( front, sp2s);
+			manager.deref(front);
+			return front_s;
     }
 
     /** 1-step backward reachables.<br>
@@ -92,16 +92,16 @@ public class MonotonicPartition {
      */
     public int preImage(int q_k) {
 
-	int front = manager.getZero(); manager.ref(front);
-	for(int i = 0; i < curr; i++) {
-	    int tmp = manager.relProd(delta[i], q_k, cubep);
-	    front = manager.orTo(front, tmp);
-	    manager.deref(tmp);
-	}
+			int front = manager.getZero(); manager.ref(front);
+			for(int i = 0; i < curr; i++) {
+		    int tmp = manager.relProd(delta[i], q_k, cubep);
+		    front = manager.orTo(front, tmp);
+		    manager.deref(tmp);
+			}
 
-	int q_kplus1 = manager.replace( front, s2sp);
-	manager.deref(front);
-	return q_kplus1;
+			int q_kplus1 = manager.replace( front, s2sp);
+			manager.deref(front);
+			return q_kplus1;
     }
 
 
@@ -118,7 +118,6 @@ public class MonotonicPartition {
 			manager.deref(front);
 			if(gf != null)    gf.add( q_k );
 		} while(q_k_minus1 != q_k && !limit.stopped());
-
 
 		return q_k;
 	}

@@ -108,6 +108,7 @@ public class Coverage {
 					if(Options.debug_on) {
 						Options.out.println("  \tLC: added automaton " + li.all[ i ].getName() +
 							", type: " + ( li.is_spec[i] ? "Spec" : "Plant")
+							// + ", " + Automaton.getType ( li.all[ i ].getType() )
 							);
 
 					}

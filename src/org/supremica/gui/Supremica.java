@@ -395,7 +395,48 @@ public class Supremica
 
 
 	public void selectAutomaton(Automaton a) {
+		// XXX: where is my implementation dude???
 	}
+
+	public void selectAutomata(Collection whichAutomata)
+	{
+
+		// make it a name set. reason: automata object may be _equal_ but not _same_ :(
+		Collection which = new HashSet();
+		for (Iterator it = whichAutomata.iterator() ; it.hasNext() ;)
+		{
+			Automaton a = (Automaton) it.next();
+			which.add( a.getName() );
+		}
+
+
+		theAutomatonTable.clearSelection();
+
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+		for (int i=0; i<theAutomatonTable.getRowCount(); i++)
+		{
+			try
+			{
+				int orgIndex = theTableSorter.getOriginalRowIndex(i);
+				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
+
+				boolean should_select = which.contains(currAutomaton.getName() );
+
+				if(should_select)
+				{
+					theAutomatonTable.changeSelection(i, 0, true, false);
+				}
+			}
+			catch (Exception ex)
+			{
+				logger.error("Trying to get an automaton that does not exist. Index: " + i);
+				logger.debug(ex.getStackTrace());
+			}
+		}
+	}
+
+
 	/**
 	 * Selects the automata indicated by selectionIndices
 	 */
@@ -638,7 +679,7 @@ public class Supremica
 	/*
 	public void updateFromJGrafchart()
 	{
-		
+
 	}
 */
 	public String getNewProjectName()

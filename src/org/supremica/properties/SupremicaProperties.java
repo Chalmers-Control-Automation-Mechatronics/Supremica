@@ -60,6 +60,11 @@ import org.supremica.util.BDD.Options;
 /**
  * Properties for Supremica.
  *
+ *
+ * Note: As the BDD part also is a stand-alone application and have its own configuration
+ *       classes, we must when loading/saving property files also sync with the BDD
+ *       configurator. this is done from the updateBDDOptions() function.
+ *
  **/
 public final class SupremicaProperties
 	extends Properties
@@ -144,17 +149,29 @@ public final class SupremicaProperties
 	private static final String SYNTHESIS_REDUCE_SUPERVISORS = "synthesisReduceSupervisors";
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
 
-    // BDD Options
-    private static final String BDD_SHOW_GROW = "bddShowGrowth";
-    private static final String BDD_ALTER_PCG = "bddAlterPCG";
-    private static final String BDD_TRACE_ON  = "bddTraceOn";
-    private static final String BDD_DEBUG_ON  = "bddDebugOn";
-    private static final String BDD_ALGORITHM = "bddAlgorithm";
-    private static final String BDD_COUNT_ALGO= "bddCountAlgorithm";
-    private static final String BDD_LOCAL_SATURATION = "bddLocalSaturation";
-    private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
-    private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
-    private static final String BDD_LIB_PATH = "bddLibPath";
+	// BDD Options. note that these mirror the stuff in org.supremica.util.BDD.Options
+	private static final String BDD_SHOW_GROW = "bddShowGrowth";
+	private static final String BDD_ALTER_PCG = "bddAlterPCG";
+	private static final String BDD_TRACE_ON  = "bddTraceOn";
+	private static final String BDD_DEBUG_ON  = "bddDebugOn";
+	private static final String BDD_ALGORITHM = "bddAlgorithm";
+	private static final String BDD_COUNT_ALGO= "bddCountAlgorithm";
+	private static final String BDD_LOCAL_SATURATION = "bddLocalSaturation";
+	private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
+	private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
+	private static final String BDD_LIB_PATH = "bddLibPath";
+	private static final String BDD_LI_ALGO = "bddLanguageInclusionAlgorithm";	// inclsuion_algorithm
+	private static final String BDD_ORDER_ALGO = "bddAutomataOrderingAlgorithm";	// ordering_algorithm
+	private static final String BDD_AS_HEURISTIC = "bddAutomataSelectionHeuristics";	// as_heuristics
+	private static final String BDD_FRONTIER_TYPE = "bddFrontierType";	// frontier_strategy
+	private static final String BDD_H1 = "bddH1";	// es_heuristics
+	private static final String BDD_H2 = "bddH2";	// ndas_heuristics
+	private static final String BDD_DSSI_HEURISTIC = "bddDelayedStarSelection";	// dssi_heuristics
+	private static final String BDD_PARTITION_MAX = "bddMaxPartitionSize";	// max_partition_size
+	private static final String BDD_ENCODING_ALGO = "bddSatteEncodingAlgorithm";	// encoding_algorithm
+
+
+
 
 	// Simulation stuff
 	private static final String SIMULATION_IS_EXTERNAL = "simulationIsExternal";
@@ -187,13 +204,13 @@ public final class SupremicaProperties
 
 	private Set forbidExternalModification = new HashSet();
 
-    // There is a reason why we do the initialization like this.
-    // dont touch this code!!      /Arash
-    private static SupremicaProperties wp = null;
-    static {
-	wp = new SupremicaProperties();
-	updateBDDOptions(false);
-    }
+	// There is a good reason why we do the initialization like this.
+	// dont touch this code!!      /Arash
+	private static SupremicaProperties wp = null;
+	static {
+		wp = new SupremicaProperties();
+		updateBDDOptions(false);
+	}
 
 	private SupremicaProperties()
 	{
@@ -272,21 +289,47 @@ public final class SupremicaProperties
 		setProperty(SHOW_COORDINATION_ABB, "false", false);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
-
-		// BDD stuff
-		setProperty(BDD_SHOW_GROW , toString(Options.show_grow), true);
-		setProperty(BDD_ALTER_PCG , toString(Options.user_alters_PCG), true);
-		setProperty(BDD_TRACE_ON  , toString(Options.trace_on), true);
-		setProperty(BDD_DEBUG_ON  , toString(Options.debug_on), true);
-		setProperty(BDD_UC_OPTIMISTIC, toString(Options.uc_optimistic), true);
-		setProperty(BDD_NB_OPTIMISTIC, toString(Options.nb_optimistic), true);
-		setProperty(BDD_LOCAL_SATURATION, toString(Options.local_saturation), true);
-		setProperty(BDD_ALGORITHM , toString(Options.algo_family), true);
-		setProperty(BDD_COUNT_ALGO, toString(Options.count_algo), true);
-
 		// Simulation stuff
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
+	}
+
+
+
+	// --------------------------------------------------------------
+
+	public static void setOption(String name, int value)
+	{
+		 wp.setProperty(name, toString(value));
+	}
+
+	public static void setOption(String name, boolean value)
+	{
+		wp.setProperty(name, toString(value));
+	}
+
+	public static void setOption(String name, String value)
+	{
+		wp.setProperty(name, value);
+	}
+
+	public static boolean optionAsBoolean(String name, boolean default_)
+	{
+		String got = wp.getProperty(name);
+		return (got == null) ? default_ : toBoolean(got);
+	}
+
+
+	public static int optionAsInt(String name, int default_)
+	{
+		String got = wp.getProperty(name);
+		return (got == null) ? default_ : toInt(got);
+	}
+
+	public static String optionAsString(String name, String default_)
+	{
+			String got = wp.getProperty(name);
+			return (got == null) ? default_ : got;
 	}
 
 
@@ -364,6 +407,9 @@ public final class SupremicaProperties
 	public static final void savePropperties(String name)
 		throws IOException
 	{
+
+		updateBDDOptions(true); // first sync from BDD options
+
 		// CODE STOLEN FROM THE OTIGINAL Properties.java FILE FROM JDK :(
 		OutputStream os = new FileOutputStream(name);
 		BufferedWriter awriter = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
@@ -1108,69 +1154,63 @@ public final class SupremicaProperties
 	public static void setSimulationCycleTime(int a){  wp.setProperty(SIMULATION_CYCLE_TIME, toString(a));    }
 
 
-    // BDD
-    public static String getBDDLibPath() { return wp.getProperty(BDD_LIB_PATH); }
+	// BDD
+	/*
+	 * The problem is that we got to copies of BDD Options.
+	 * This will make sure they are both updated
+	 */
+	public static void updateBDDOptions(boolean from_Options) {
 
-    	public static int getBDDAlgorithm(){  return toInt(wp.getProperty(BDD_ALGORITHM));    }
-    	public static void setBDDAlgorithm(int a){  wp.setProperty(BDD_ALGORITHM, toString(a));    }
+		if(from_Options) {
+			// Options -> Properties
+			setOption(BDD_ALGORITHM, Options.algo_family);
+			setOption(BDD_SHOW_GROW , Options.show_grow);
+			setOption(BDD_ALTER_PCG , Options.user_alters_PCG);
+			setOption(BDD_DEBUG_ON , Options.debug_on);
+			setOption(BDD_UC_OPTIMISTIC , Options.uc_optimistic);
+			setOption(BDD_NB_OPTIMISTIC , Options.nb_optimistic);
+			setOption(BDD_LOCAL_SATURATION , Options.local_saturation);
+			setOption(BDD_TRACE_ON , Options.trace_on);
+			setOption(BDD_COUNT_ALGO , Options.count_algo);
+			setOption(BDD_LI_ALGO , Options.inclsuion_algorithm);
+			setOption(BDD_ORDER_ALGO , Options.ordering_algorithm);
+			setOption(BDD_AS_HEURISTIC , Options.as_heuristics);
+			setOption(BDD_FRONTIER_TYPE , Options.frontier_strategy);
+			setOption(BDD_H1 , Options.es_heuristics);
+			setOption(BDD_H2 , Options.ndas_heuristics);
+			setOption(BDD_DSSI_HEURISTIC , Options.dssi_heuristics);
+			setOption(BDD_PARTITION_MAX , Options.max_partition_size);
+			setOption(BDD_ENCODING_ALGO , Options.encoding_algorithm);
+			setOption(BDD_LIB_PATH , Options.extraLibPath);
 
-    	public static int getBDDCountAlgorithm(){  return toInt(wp.getProperty(BDD_COUNT_ALGO));    }
-    	public static void setBDDCountAlgorithm(int a){  wp.setProperty(BDD_COUNT_ALGO, toString(a));    }
 
+		} else {
+			// Properties -> Options
+			Options.algo_family 				= optionAsInt(BDD_ALGORITHM, Options.algo_family);
+			Options.show_grow 					= optionAsInt(BDD_SHOW_GROW , Options.show_grow);
+			Options.user_alters_PCG 		= optionAsBoolean(BDD_ALTER_PCG , Options.user_alters_PCG);
+			Options.debug_on 						= optionAsBoolean(BDD_DEBUG_ON , Options.debug_on);
+			Options.uc_optimistic 			= optionAsBoolean(BDD_UC_OPTIMISTIC , Options.uc_optimistic);
+			Options.nb_optimistic 			= optionAsBoolean(BDD_NB_OPTIMISTIC , Options.nb_optimistic);
+			Options.local_saturation 		= optionAsBoolean(BDD_LOCAL_SATURATION , Options.local_saturation);
+			Options.trace_on 						= optionAsBoolean(BDD_TRACE_ON , Options.trace_on);
+			Options.count_algo 					= optionAsInt(BDD_COUNT_ALGO , Options.count_algo);
+			Options.inclsuion_algorithm = optionAsInt(BDD_LI_ALGO , Options.inclsuion_algorithm);
+			Options.ordering_algorithm 	= optionAsInt(BDD_ORDER_ALGO , Options.ordering_algorithm);
+			Options.as_heuristics 			= optionAsInt(BDD_AS_HEURISTIC , Options.as_heuristics);
+			Options.frontier_strategy 	= optionAsInt(BDD_FRONTIER_TYPE , Options.frontier_strategy);
+			Options.es_heuristics 			= optionAsInt(BDD_H1 , Options.es_heuristics);
+			Options.ndas_heuristics 		= optionAsInt(BDD_H2 , Options.ndas_heuristics);
+			Options.dssi_heuristics 		= optionAsInt(BDD_DSSI_HEURISTIC , Options.dssi_heuristics);
+			Options.max_partition_size 	= optionAsInt(BDD_PARTITION_MAX , Options.max_partition_size);
+			Options.encoding_algorithm 	= optionAsInt(BDD_ENCODING_ALGO , Options.encoding_algorithm);
+			Options.extraLibPath 				= optionAsString(BDD_LIB_PATH , Options.extraLibPath);
 
-	public static int getBDDShowGrow(){  return toInt(wp.getProperty(BDD_SHOW_GROW));    }
-    public static void setBDDShowGrow(int a){  wp.setProperty(BDD_SHOW_GROW, toString(a));    }
-
-	public static boolean getBDDAlterPCG(){  return toBoolean(wp.getProperty(BDD_ALTER_PCG));    }
-    	public static void setBDDAlterPCG(boolean a){  wp.setProperty(BDD_ALTER_PCG, toString(a));    }
-
-	public static boolean getBDDTraceOn(){  return toBoolean(wp.getProperty(BDD_TRACE_ON));    }
-    	public static void setBDDTraceOn(boolean a){  wp.setProperty(BDD_TRACE_ON, toString(a));    }
-
-	public static boolean getBDDDebugOn(){  return toBoolean(wp.getProperty(BDD_DEBUG_ON));    }
-    	public static void setBDDDebugOn(boolean a){  wp.setProperty(BDD_DEBUG_ON, toString(a));    }
-
-	public static boolean getBDDLocalSaturation(){  return toBoolean(wp.getProperty(BDD_LOCAL_SATURATION));    }
-    	public static void setBDDLocalSaturation(boolean a){  wp.setProperty(BDD_LOCAL_SATURATION, toString(a));    }
-
-	public static boolean isBDDUCOptimistic(){  return toBoolean(wp.getProperty(BDD_UC_OPTIMISTIC));    }
-    	public static void setBDDUCOptimistic(boolean a){  wp.setProperty(BDD_UC_OPTIMISTIC, toString(a));    }
-
-	public static boolean isBDDNBOptimistic(){  return toBoolean(wp.getProperty(BDD_NB_OPTIMISTIC));    }
-    	public static void setBDDNBOptimistic(boolean a){  wp.setProperty(BDD_NB_OPTIMISTIC, toString(a));    }
-
-    /*
-     * The problem is that we got to copies of BDD Options.
-     * This will make sure they are both updated
-     */
-    public static void updateBDDOptions(boolean from_Options) {
-
-	if(from_Options) {
-	    // Options -> Properties
-	    setBDDAlgorithm(Options.algo_family);
-	    setBDDShowGrow(Options.show_grow);
-	    setBDDAlterPCG(Options.user_alters_PCG);
-	    setBDDDebugOn(Options.debug_on);
-	    setBDDUCOptimistic(Options.uc_optimistic);
-	    setBDDNBOptimistic(Options.nb_optimistic);
-	    setBDDLocalSaturation(Options.local_saturation);
-	    setBDDTraceOn(Options.trace_on);
-	    setBDDCountAlgorithm(Options.count_algo);
-	} else {
-	    // Properties -> Options
-	    Options.algo_family      = getBDDAlgorithm();
-	    Options.show_grow        = getBDDShowGrow();
-	    Options.user_alters_PCG  = getBDDAlterPCG();
-	    Options.uc_optimistic    = isBDDUCOptimistic();
-	    Options.nb_optimistic    = isBDDNBOptimistic();
-	    Options.debug_on         = getBDDDebugOn();
-	    Options.trace_on         = getBDDTraceOn();
-	    Options.local_saturation = getBDDLocalSaturation();
-	    Options.count_algo       = getBDDCountAlgorithm();
-	    if(getBDDLibPath() != null) Options.extraLibPath = getBDDLibPath() ;
+		}
 	}
-    }
 
+
+	// --------------------------------------------------------------------------------------
 
 	public static boolean showGeneticAlgorithms()
 	{
@@ -1260,6 +1300,8 @@ public final class SupremicaProperties
 
 
 		wp.setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, enabled_developer_mode ? "true" : "false", true);
+
+		updateBDDOptions(false); // sync BDD options to the newly loaded options
 	}
 
 }

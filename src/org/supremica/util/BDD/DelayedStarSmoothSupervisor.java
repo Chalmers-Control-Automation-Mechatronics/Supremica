@@ -3,6 +3,9 @@ package org.supremica.util.BDD;
 import org.supremica.util.BDD.heuristics.*;
 
 
+// XXX: we should check if the first insertion (the new cluster!) does anything good
+//      and if not. abort the whole series to save time!
+
 /**
  *
  * When I finally code this, it should delay all _each_ automata, such that
@@ -63,6 +66,7 @@ public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
 			delay_partition.add( dih.next().twave );
 			r = delay_partition.forward(gf, limit, r);
 		}
+
 		if(gf != null)    gf.mark("Released* " + c.toString());
 		delay_partition.cleanup();
 		return r;

@@ -31,6 +31,14 @@ public class Builder {
 		return Automaton.TYPE_SUPERVISOR;
 	    }
 
+
+	// XXX: this is really playing with fire. we dont know if interface is a plant or spec
+	if (name.equals("interface"))
+	    {
+		// return Automaton.TYPE_SUPERVISOR;
+		return Automaton.TYPE_PLANT;
+	    }
+
 	return Automaton.TYPE_UNKNOWN;
     }
 

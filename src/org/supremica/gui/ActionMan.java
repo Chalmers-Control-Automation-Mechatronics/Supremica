@@ -202,9 +202,9 @@ public class ActionMan
 	//public static void updateFromJGrafchart(Gui gui)
 	//{
 
-		
-	//}	
-	
+
+	//}
+
 	// File.Login action performed
 	public static void fileLogin(Gui gui)
 	{
@@ -3164,7 +3164,7 @@ public class ActionMan
 			logger.error("Exception while getting JGrafchart Editor");
 			logger.debug(ex.getStackTrace());
 			return;
-		}		
+		}
 	}
 
 	//shoeFactory - Config
@@ -3856,23 +3856,6 @@ public class ActionMan
 	// ------------------------------------------------------------------
 
 	/**
-	 * select the following subset of automata in the gui
-	 *
-	 */
-	private static void selectSubset(Automata all, Vector subset)
-	{
-		gui.clearSelection();
-		int [] sel = new int[ subset.size() ];
-		int i = 0;
-		for (Enumeration e = subset.elements() ; e.hasMoreElements() ; i++)
-		{
-			Automaton a = (Automaton) e.nextElement();
-			sel[i] = all.getAutomatonIndex(a);
-		}
-		gui.selectAutomata(sel);
-	}
-
-	/**
 	 * Mark (select) automata in the dependency group of the selected automata.
 	 */
 	public static void markDependencySet()
@@ -3880,8 +3863,8 @@ public class ActionMan
 		try
 		{
 			Automata all = gui.getVisualProjectContainer().getActiveProject();
-			Vector v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
-			selectSubset(all, v);
+			Collection v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
+			gui.selectAutomata(v);
 		}
 		catch (Exception ex)
 		{
@@ -3898,8 +3881,8 @@ public class ActionMan
 		try
 		{
 			Automata all = gui.getVisualProjectContainer().getActiveProject();
-			Vector v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
-			selectSubset(all, v);
+			Collection v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
+			gui.selectAutomata(v);
 		}
 		catch (Exception ex)
 		{

@@ -42,13 +42,15 @@ public class Supervisor
 
 		for (int i = 0; i < automata.length; i++)
 		{
-			if (automata[i].getType() == Automaton.TYPE_SPEC)
-			{
-				spec.add(automata[i]);
-			}
-			else if (automata[i].getType() == Automaton.TYPE_PLANT)
+
+			// XXX: if it is not a plant, it is a spec ??
+			if (automata[i].getType() == Automaton.TYPE_PLANT)
 			{
 				plant.add(automata[i]);
+			}
+			else
+			{
+				spec.add(automata[i]);
 			}
 		}
 
