@@ -78,7 +78,7 @@ public class AboutBox
 	GridLayout gridLayout1 = new GridLayout();
 	String product = "Supremica";
 	String version = new Version().toString();
-	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, 2000, 2001";
+	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, Arash Vahidi 1999-2001";
 	String comments = "";
 
 	// "Chalmers University of Technology, Sweden\nUniversity of Illinois at Urbana-Champaign, USA";

@@ -184,7 +184,7 @@ public class AutomataBuildFromXml
 		this.locator = locator;
 	}
 
-	public final void startElement(String name, AttributeList attributes)
+	public void startElement(String name, AttributeList attributes)
 		throws SAXException
 	{
 

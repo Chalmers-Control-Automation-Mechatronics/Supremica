@@ -132,4 +132,14 @@ public class Project
 
 	// What is this supposed to do!!?
 	public void close() {}
+
+	public Actions getActions()
+	{
+		return theActions;
+	}
+
+	public Controls getControls()
+	{
+		return theControls;
+	}
 }
