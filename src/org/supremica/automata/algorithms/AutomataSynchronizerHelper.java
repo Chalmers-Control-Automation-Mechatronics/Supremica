@@ -580,14 +580,12 @@ public final class AutomataSynchronizerHelper
 
 			if (currEvent.getExpansionPriority() < 0)
 			{
-
 				// The events are already ordered after synchIndex!
 				// eventPriority[currEvent.getSynchIndex()] = 10;
 				eventPriority[index++] = 10;
 			}
 			else
 			{
-
 				// The events are already ordered after synchIndex!
 				// eventPriority[currEvent.getSynchIndex()] = currEvent.getExpansionPriority();
 				eventPriority[index++] = currEvent.getExpansionPriority();
@@ -888,6 +886,10 @@ public final class AutomataSynchronizerHelper
 		this.stopExecutionLimit = stopExecutionLimit;
 	}
 
+	/**
+	 * Redefines the controllableEventsTable so that all events are considered uncontrollable.
+	 * Used in the AutomataVerifier when performing language inclusion verifications.
+	 */
 	public void considerAllEventsUncontrollable()
 	{
 		boolean[] controllableEventsTable = theAutomataIndexForm.getControllableEventsTable();

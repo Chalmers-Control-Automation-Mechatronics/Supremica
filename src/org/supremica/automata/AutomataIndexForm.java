@@ -87,6 +87,9 @@ public final class AutomataIndexForm
 	// <automaton> -> <isPlant>
 	private boolean[] typeIsPlantTable;
 
+	// <automaton> -> <isSupervisor||isSpecification>
+	private boolean[] typeIsSupSpecTable;
+
 	// <event> -> <priority>
 	private int[] eventPriority;
 
@@ -153,6 +156,7 @@ public final class AutomataIndexForm
 			stateTable = generateCopy2DStateArray(indexForm.stateTable);
 			stateStatusTable = generateCopy2DIntArray(indexForm.stateStatusTable);
 			typeIsPlantTable = generateCopy1DBooleanArray(indexForm.typeIsPlantTable);
+			typeIsSupSpecTable = generateCopy1DBooleanArray(indexForm.typeIsSupSpecTable);
 			controllableEventsTable = generateCopy1DBooleanArray(indexForm.controllableEventsTable);
 			immediateEventsTable = generateCopy1DBooleanArray(indexForm.immediateEventsTable);
 			automataSize = generateCopy1DIntArray(indexForm.automataSize);
@@ -168,6 +172,7 @@ public final class AutomataIndexForm
 			stateTable = indexForm.stateTable;
 			stateStatusTable = indexForm.stateStatusTable;
 			typeIsPlantTable = indexForm.typeIsPlantTable;
+			typeIsSupSpecTable = indexForm.typeIsSupSpecTable;
 			controllableEventsTable = indexForm.controllableEventsTable;
 			immediateEventsTable = indexForm.immediateEventsTable;
 			automataSize = indexForm.automataSize;
@@ -181,6 +186,7 @@ public final class AutomataIndexForm
 		// Remember that this index must be consistent with
 		// getAutomatonAt(int) in Automata
 		typeIsPlantTable = new boolean[theAutomata.size()];
+		typeIsSupSpecTable = new boolean[theAutomata.size()];
 		automataSize = new int[theAutomata.size()];
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
@@ -189,21 +195,28 @@ public final class AutomataIndexForm
 
 			int i = currAutomaton.getIndex();
 
-			typeIsPlantTable[i] = currAutomaton.getType() == AutomatonType.Plant;
+			AutomatonType currAutomatonType = currAutomaton.getType();
+			typeIsPlantTable[i] = currAutomatonType == AutomatonType.Plant;
+			typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.Supervisor) || 
+									 (currAutomatonType == AutomatonType.Specification));
 			automataSize[i] = currAutomaton.nbrOfStates();
 		}
 	}
 
 	/**
-	 * Defines the typeIsPlantTable to "point to" the automata in anAutomata
+	 * Defines the typeIsPlantTable to "point to" the automata in plantAutomata
 	 * in spite of what these automata (or the other automata in theAutomata, 
-	 * for that matter) really are!!
+	 * for that matter) really are!! The other automata are considered Supervisors.
+	 *
+	 *@param plantAutomata The automata that should be considered plants. 
+	 * The other automata are considered upervisors.
 	 */
-	public void defineTypeIsPlantTable(Automata anAutomata)
+	public void defineTypeIsPlantTable(Automata plantAutomata)
 	{
 		for (int i=0,j=0; i<theAutomata.size(); i++)
 		{
-			typeIsPlantTable[i] = (j < anAutomata.size()) && (i == anAutomata.getAutomatonAt(j).getIndex());
+			typeIsPlantTable[i] = (j < plantAutomata.size()) && (i == plantAutomata.getAutomatonAt(j).getIndex());
+			typeIsSupSpecTable[i] = !typeIsPlantTable[i];
 			if (typeIsPlantTable[i])
 				j++;
 		}
@@ -580,6 +593,11 @@ public final class AutomataIndexForm
 	public boolean[] getTypeIsPlantTable()
 	{
 		return typeIsPlantTable;
+	}
+
+	public boolean[] getTypeIsSupSpecTable()
+	{
+		return typeIsSupSpecTable;
 	}
 
 	public boolean[] getControllableEventsTable()

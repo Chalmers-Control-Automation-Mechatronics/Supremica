@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -317,6 +316,7 @@ public class ExecutionDialog
 
 		if (showValues)
 		{
+			// It was incredibly ugly when -1 appeared in the dialog  //Hguo.
 			if (value >= 0)
 				infoValue.setText(String.valueOf(value));
 			else

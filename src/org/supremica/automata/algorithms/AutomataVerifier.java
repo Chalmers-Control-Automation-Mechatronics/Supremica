@@ -292,8 +292,9 @@ public class AutomataVerifier
 		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);				
+
 		// This last one is not really good... we'd like to do this only once! Perhaps
-		// a switch in the synchronizeroptions instead? FIXA!!
+		// a switch in the synchronizeroptions or verificationsptions instead? FIXA!!
 		synchHelper.considerAllEventsUncontrollable();
 	}
 
@@ -322,7 +323,8 @@ public class AutomataVerifier
 		Iterator plantIterator;
 		boolean allModulesControllable = true;
 		Iterator supervisorIterator = theAutomata.iterator();
-		boolean[] typeIsPlantTable = synchHelper.getAutomataIndexForm().getTypeIsPlantTable();
+		// boolean[] typeIsPlantTable = synchHelper.getAutomataIndexForm().getTypeIsPlantTable();
+		boolean[] typeIsSupSpecTable = synchHelper.getAutomataIndexForm().getTypeIsSupSpecTable();
 		boolean[] controllableEventsTable = synchHelper.getAutomataIndexForm().getControllableEventsTable();
 
 		loop:
@@ -331,8 +333,10 @@ public class AutomataVerifier
 			// Iterate over supervisors/specifications
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
 
+			// To enable the overriding the AutomatonType of automata!
 			// if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
-			if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
+			// if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
+			if (typeIsSupSpecTable[currSupervisorAutomaton.getIndex()])
 			{
 				// logger.info("Supervisor: " + currSupervisorAutomaton.getName());
 				// Examine uncontrollable events in currSupervisorAutomaton 
@@ -342,11 +346,15 @@ public class AutomataVerifier
 				while (eventIterator.hasNext())
 				{
 					currEvent = (LabeledEvent) eventIterator.next();
+
+					// To enable overriding the controllability status of events!
 					//if (!currEvent.isControllable())
 					if (!controllableEventsTable[currEvent.getSynchIndex()])
 					{
 						if (uncontrollableEventToPlantMap.get(currEvent) != null)
 						{
+							// Note that in the language inclusion case, the 
+							// uncontrollableEventToPlantMap has been adjusted...
 							plantIterator = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
 							while (plantIterator.hasNext())
 							{
@@ -1444,6 +1452,7 @@ public class AutomataVerifier
 	 *
 	 * This method presupposes that all events are uncontrollable!... very not intuitive! //Hguo.
 	 */
+	/*
 	private boolean behaviouralInclusionVerification(Automata automataA, Automata automataB)
 		throws Exception
 	{
@@ -1471,6 +1480,7 @@ public class AutomataVerifier
 		// can be performed as a controllability check...
 		return modularControllabilityVerification();
 	}
+	*/
 
 	/**
 	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines non-blocking modularily

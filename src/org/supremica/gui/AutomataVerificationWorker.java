@@ -154,14 +154,14 @@ public class AutomataVerificationWorker
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
-			// Language inclusion
+			// Language inclusion verification...
 			successMessage = "The language of the unselected automata is \n" +
 				             "included in the language of the selected automata.";
 			failureMessage = "The language of the unselected automata is \n" +
 				             "NOT included in the language of the selected automata.";
 			
 			// In language inclusion, not only the currently selected automata are used!
-			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
+			theAutomata = workbench.getVisualProjectContainer().getActiveProject();			
 			
 			// Reservation!!
 			JOptionPane.showMessageDialog(workbench.getFrame(), 

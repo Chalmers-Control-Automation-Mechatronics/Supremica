@@ -311,8 +311,6 @@ public class Automata
 		return newAutomata;
 	}
 
-
-
 	public Iterator interfaceIterator()
 	{
 		return new AutomatonTypeIterator(AutomatonType.Interface);
