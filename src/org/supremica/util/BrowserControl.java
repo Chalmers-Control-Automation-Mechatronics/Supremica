@@ -59,6 +59,7 @@ public class BrowserControl
                     // wait for exit code -- if it's 0, command worked,
                     // otherwise we need to start the browser up.
                     int exitCode = p.waitFor();
+                    logger.info("displayURL exitCode: " + exitCode);
                     if (exitCode != 0)
                     {
                         // Command failed, start up the browser
