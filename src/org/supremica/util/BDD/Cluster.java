@@ -9,6 +9,7 @@ import java.util.*;
  * memory usage and speed. Currently in Supremica, clusters are most often singletons.
  */
 
+// TODO: include dependency heuristc too!
 public class Cluster
 {
 	private Collection members;    /* list of BDDAutomaton */
@@ -16,6 +17,9 @@ public class Cluster
 	private boolean [] event_care; /** what events are included in this cluster ? */
 	private int included_events; /** number of events that are used in this cluster, equals the cardinality of the care-set */
 	private int state_vector_bits; /** size of the state vector, good for estimating T~ size ?*/
+	private boolean active;	/** an inactive cluster can be ignored during reachability (decided by the optimizer) */
+	private int dep_size; /** size of the dependency set */
+	private HashSet dep_set; /** the dependency set itself */
 	private BDDAutomata manager;
 
 	/**
@@ -35,8 +39,11 @@ public class Cluster
 
 		this.manager = manager;
 		this.members = new LinkedList();
+		this.dep_set = new HashSet();
 
 		this.state_vector_bits = 0;
+		this.active = true;
+		this.dep_size = 0;
 
 		// initialize BDDs
 		this.twave   = manager.ref(manager.getZero() );
@@ -57,9 +64,24 @@ public class Cluster
 		{
 			addAutomaton(a);
 		}
-
-
 	}
+
+
+	/**
+	 * this function is called when we are done with this cluster
+	 */
+	public void cleanup()
+	{
+
+		manager.deref(twave);
+		manager.deref(twaveu);
+		manager.deref(cube);
+		manager.deref(cubep);
+
+		members.clear();
+	}
+
+	// --------------------------------------------------------
 
 	/**
 	 * Add an automaton to this cluster
@@ -88,21 +110,26 @@ public class Cluster
 				event_care[i] |= cs[i];
 				if(event_care[i]) included_events ++;
 			}
+
+			updateDepSize(a);
 		}
 	}
 
 	/**
-	 * this function is called when we are done with this cluster
+	 *
+	 * calc the size of the (union of the ) dependency set for the automaton (automata) in this cluster
 	 */
-	public void cleanup()
+	private void updateDepSize(BDDAutomaton a)
 	{
 
-		manager.deref(twave);
-		manager.deref(twaveu);
-		manager.deref(cube);
-		manager.deref(cubep);
+		BDDAutomaton[] ld1 = a.getDependencySet().getSet(); // level-1 dependency set
 
-		members.clear();
+		dep_set.add(a);
+		for(int i = 0; i < ld1.length; i++)
+		{
+			dep_set.add(ld1[i]);
+		}
+		dep_size = dep_set.size();
 	}
 
 	/**
@@ -178,6 +205,12 @@ public class Cluster
 		return manager.nodeCount(twave);
 	}
 
+	/** level-1 dependency set size for this cluster */
+	public int getDependencySize()
+	{
+		return dep_size;
+	}
+
 	public Iterator iterator()
 	{
 		return members.iterator();
@@ -247,8 +280,25 @@ public class Cluster
 		return that.getAlphabetSize() - sharedEvents(that);
 	}
 
-	// ------------------------------------------------
 
+	// ------------------------------------------------
+	/**
+	 * returns true if this cluster is active after optimization
+	 */
+	public boolean isActive()
+	{
+		return active;
+	}
+
+	/**
+	 * set the active state of the cluster
+	 */
+	public void setActive(boolean active)
+	{
+		this.active = active;
+	}
+
+	// ------------------------------------------------
 
 	public String toString()
 	{
@@ -278,4 +328,4 @@ public class Cluster
 		return buf.toString();
 	}
 }
-;
+

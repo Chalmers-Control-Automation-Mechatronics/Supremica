@@ -165,12 +165,25 @@ public class Supervisor
 		}
 
 		// event-selection
-		if ((Options.algo_family == Options.ALGO_PETRINET) || (Options.algo_family == Options.ALGO_DISJUNCTIVE_WORKSET) || (Options.algo_family == Options.ALGO_SMOOTHED_MONO_WORKSET))
+		if ((Options.algo_family == Options.ALGO_PETRINET) || (Options.algo_family == Options.ALGO_DISJUNCTIVE_WORKSET)
+			|| (Options.algo_family == Options.ALGO_SMOOTHED_MONO_WORKSET) || (Options.algo_family == Options.ALGO_DISJUNCTIVE_STEPSTONE))
 		{
 			sb.append(Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
 			sb.append(" + NDAS:");
 			sb.append(Options.NDAS_HEURISTIC_NAMES[Options.ndas_heuristics]);
-			sb.append(". ");
+			sb.append(", ");
+		}
+
+
+		// disj optimization:
+		if(
+			(Options.algo_family == Options.ALGO_DISJUNCTIVE) ||
+			(Options.algo_family == Options.ALGO_SMOOTHED_MONO) ||
+			(Options.algo_family == Options.ALGO_SMOOTHED_DELAYED_MONO) ||
+			(Options.algo_family == Options.ALGO_SMOOTHED_DELAYED_STAR_MONO)
+			)
+		{
+			sb.append("DisjOPtimizer: " + Options.DISJ_OPTIMIZER_NAMES[Options.disj_optimizer_algo]);
 		}
 
 		return sb.toString();

@@ -138,4 +138,18 @@ public class IndexedSet
 			left[i] |= right[i];
 		}
 	}
+
+	/** left <= right? */
+	public static boolean subseteq(boolean[] left, boolean[] right)
+	{
+		int len = left.length;
+		for (int i = 0; i < len; i++)
+		{
+			if(left[i] && !right[i])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 }

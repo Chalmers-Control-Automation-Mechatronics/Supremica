@@ -26,17 +26,36 @@ public class DisjPartition
 		Vector cv = new Vector();
 		Cluster[] old = dop.getClusters();
 
+		// this new cold will ignore those that are inactive (marked by optimizer)
+		Cluster current = null;
+		for(int i = 0; i < max_size; i++)
+		{
+			if(old[i].isActive())
+			{
+				if(current == null) // the very first:
+				{
+					current = old[i].copy();
+					cv.addElement(current);
+				} else {
+					add(cv, old[i]);
+				}
+
+			}
+		}
+
+		/*
 		if (max_size > 0)
 		{
 			Cluster current = old[0];
-
 			cv.addElement(current.copy());
 
 			for (int i = 1; i < max_size; i++)
 			{
 				add(cv, old[i]);
 			}
+
 		}
+		*/
 
 		/* create a array from that Vector: */
 		curr = cv.size();

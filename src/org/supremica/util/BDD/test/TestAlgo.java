@@ -24,11 +24,13 @@ public class TestAlgo
 	 * supNBC only if supstates != -1
 	 */
 	private static final String[] TEST_FILES = {
+												// the first four (or was it number 2,3,4) are used in some slower tests
 												"../examples/SynthesizerTest.xml",
-												"../examples/includeInJarFile/OtherExamples/parallelManufacturingExample.xml",
 												 "../examples/includeInJarFile/OtherExamples/agv.xml",
 												 "../examples/includeInJarFile/OtherExamples/catmouse.xml",
 												 "../examples/includeInJarFile/OtherExamples/circularTable.xml",
+												 // and the rest...
+												 "../examples/includeInJarFile/OtherExamples/parallelManufacturingExample.xml",
 												 "../examples/includeInJarFile/OtherExamples/flexibleManufacturingSystem.xml",
 												 "../examples/benchmark/simple1.xml",
 												 "../examples/includeInJarFile/OtherExamples/aip/System4_system4.xml",
@@ -50,15 +52,15 @@ public class TestAlgo
 	// XXX:         these number probably haev double-floating-point  overflows, so if we count them in some other way we might not
 	//        get exactly the same number for the big ones!
 	private static final double reachables[] = { 10,
-		5702550, 25731072, 18, 199, 2274519862886400.0, 10000000,1.101504E7, -1 };
+		25731072, 18, 199, 5702550, 2274519862886400.0, 10000000,1.101504E7, -1 };
 	private static final double coreachables[] = {  6,
-			5702550, 343692864, 20, 432, 2274519862886400.0,10000000, -1, -1 };
+			343692864, 20, 432, 5702550, 2274519862886400.0,10000000, -1, -1 };
 
 
 	private static final boolean controllable[] = { false,
-		true, false, false, false, true, true, true, true };
+		false, false, false, true, true, true, true, true };
 	private static final boolean nonblocking[] = { false,
-		true, true, true, false, false, true, true /* [2]*/, true /* [2] */
+		true, true, false, true, false, true, true /* [2]*/, true /* [2] */
 	};
 
 	// these are the classes that have their own sup algos (we replaced conjunctive with
@@ -69,6 +71,15 @@ public class TestAlgo
 		Options.ALGO_DISJUNCTIVE_STEPSTONE
 	};
 
+
+	// The reachability algos that currently use the disjunctive optimization
+	private static final int [] DISJ_OPT_ALGOS = {
+		Options.ALGO_DISJUNCTIVE,
+		// Options.ALGO_SMOOTHED_MONO_WORKSET,
+		Options.ALGO_SMOOTHED_MONO,
+		Options.ALGO_SMOOTHED_DELAYED_MONO,
+		Options.ALGO_SMOOTHED_DELAYED_STAR_MONO,
+	};
 
 	// ----------------------------------------------------------------------------------
 	private static int find_AGV()
@@ -386,6 +397,9 @@ public class TestAlgo
 	{
 		fail = pass = 0;
 
+		// we will use AGV in this experiment
+		int agv = find_AGV();
+
 
 		for (int k = 0; k < 4; k++)
 		{
@@ -446,9 +460,7 @@ public class TestAlgo
 
 			// test different encodings
 			System.out.println("\n***** Testing all ordering algorithms (slow!)");
-
 			int save_ordering = Options.ordering_algorithm;
-
 			for (int i = 0; i < Options.ORDERING_ALGORITHM_NAMES.length; i++)
 			{
 				load(TEST_FILES[k]);
@@ -473,17 +485,50 @@ public class TestAlgo
 
 
 
+		// test the disjunctive optimization:
+		System.out.println("\n***** Testing disjunctive optimization, using AGV");
+		int oldalgo = Options.algo_family;
+		int oldopt = Options.disj_optimizer_algo;
+		for(int i = 0; i < DISJ_OPT_ALGOS.length; i++)
+		{
+			Options.algo_family = DISJ_OPT_ALGOS[i];
+			System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+
+			for(int k = 0; k < Options.DISJ_OPTIMIZER_NAMES.length; k++)
+			{
+				Options.disj_optimizer_algo = k;
+				announce("  optimizer " + Options.DISJ_OPTIMIZER_NAMES[k] );
+
+				load(TEST_FILES[agv]);
+				testR(reachables[agv]);
+				testCR(coreachables[agv]);
+
+				if (k == oldopt)
+				{
+					System.out.print(" (DEFAULT) ");
+				}
+
+				verifier.cleanup();
+				System.out.println();
+
+			}
+		}
+		Options.algo_family = oldalgo;
+		Options.disj_optimizer_algo = oldopt;
+
+
+
+
 		// We also test the H1/H2 heuristics. note that we dont test performance here
-		System.out.println("\n***** Testing H1 and H2 heuristics");
+		System.out.println("\n***** Testing H1 and H2 heuristics, using AGV");
 		int oldh1 = Options.es_heuristics;
 		int oldh2 = Options.ndas_heuristics;
-		int oldalgo = Options.algo_family;
-		int agv = find_AGV(); // we will use AGV in this experiment
+		oldalgo = Options.algo_family;
 
 		for(int r = 0; r < 2; r++) {
 			// H1 and H2 works only with workset and mono workset
 			Options.algo_family = (r == 0) ? Options.ALGO_DISJUNCTIVE_WORKSET : Options.ALGO_SMOOTHED_MONO_WORKSET;
-			System.err.println("Reachability Algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+			System.out.println("Reachability Algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 
 			// test H1:
 			Options.ndas_heuristics = Options.NDAS_RANDOM; // fix H2 to random
@@ -604,6 +649,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.19  2004/08/03 12:23:24  vahidi
+ The testbed now also tests the H1 and H2 heuristics with workset and monotonic-workset
+
  Revision 1.18  2004/07/22 11:50:39  vahidi
  1. cleaned up in the BDD panels in PreferencesDialog.
  2. supNBC can now choose level of reachability (non, uc only, total) [TestAlgo updated for this]

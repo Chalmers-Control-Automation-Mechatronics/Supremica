@@ -58,141 +58,108 @@ public class DisjOptimizer
 
 	// ----------------------------------------------------
 
-	/** DEBUG
-	public void check(String place){
-			refcheck.check(place);
-			for(int i = 0; i < size; i++) clusters[i].check(place);
-	}
-	*/
-	// ----------------------------------------------------
 	public int getSize()
 	{
-
-		// DEBUG check("getSize()");
 		return size;
 	}
 
 	public Cluster[] getClusters()
 	{
-
-		// DEBUG check("getClusters()");
 		return clusters;
 	}
 
+
 	// ----------------------------------------------------
 
-	/*
-	void optimize() {
-	// BDD size optimization: DOES NOT WORK
-
-		// TODO: we only need to look at those that are dependent!
-
-		int current = 0;
-		for(int i = 0; i < size; i++) {
-
-			for(int j = i+1; j < size; j++) {
-				int l = twave[i]; // lower bound
-				int u = twave[j]; // upper bound
-				int notu = manager.not(u);
-				int c = manager.or(notu, l); // c = l + ~u
-
-				int f = manager.restrict(l, c);
-				// int f = manager.constrain(l,c);
-
-				manager.deref(notu);
-				manager.deref(c);
-
-				int s0 = manager.nodeCount(l); // old size
-				int s1 = manager.nodeCount(f); // new size
-
-				Options.out.println("s0 = " + s0 + ", s1 = " + s1);
-				if(f == manager.getZero()) {
-					Options.out.println("f == 0");
-					return;
-				} else if(f == manager.getOne()) {
-					Options.out.println("f == 1");
-				} else if(s1 < s0) {
-					Options.out.println("|f| < |l|");
-
-
-					// START OF DEBUG CODE
-					int less = manager.and(l,f);
-					if(less != l) {
-						Options.out.println("f is less than l");
-						int add = manager.not(f);
-						add = manager.andTo(l, f);
-						Util.showBDD(manager,add,"add"+i);
-						return;
-					}
-
-					int both = manager.or(u,l);
-					int more = manager.or(both,f);
-					if(more != both) {
-						Options.out.println("f is more than u");
-						int notboth = manager.not(both);
-						int extra = manager.and(f, both);
-						manager.printSet(extra);
-						Util.showBDD(manager,f,"f");
-						Util.showBDD(manager,both, "both");
-						manager.show_transitions(extra);
-						return;
-					}
-
-					manager.deref(less);
-					manager.deref(more);
-					// END OF DEBUG CODE
-				}
-
-
-				manager.deref(f);
-			}
-		}
-	}
-	*/
-	private void optimize()
+	/**
+	 * optimize the disjunctive transfer functions, by some algorithm.
+	 */
+	void optimize()
 	{
 
-		// BDD undfolding: works, but makes the smotthing useless
+		// no optimization??
+		if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_NONE)
+		{
+			for(int i = 0; i < size; i++)
+			{
+				clusters[i].setActive(true);
+			}
+			return;
+		}
 
-		/*
-		int current = 0;
-		int max_nodes = 500;
+		// this is the re-ordered copy we will use:
+		Cluster [] copy = new Cluster [size];
 
+		// now, get the order: first, see if it is random
+		if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_RANDOM)
+		{
 
-		twave2[current] = twave[0];
+			int [] perm = Util.permutate(size);
+			for(int i = 0; i < size; i++)
+			{
+				copy[i] = clusters[ perm[i]];
+			}
+		}
+		else  // ot if it is not random:
+		{
+			double [] weight = new double[size];
+			for(int i = 0; i < size; i++)
+			{
+				copy[i] = clusters[i];
+				if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_STATE_VECTOR_SIZE)
+				{
+					weight[i] = clusters[i].getSizeOfS();
+				}
+				else if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_DEPENDENCY_SIZE)
+				{
+					weight[i] = clusters[i].getDependencySize();
+				}
+				else if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_INV_DEPENDENCY_SIZE)
+				{
+					weight[i] = 1 / clusters[i].getDependencySize(); // it is never zero (includes itself, remember)?
+				}
 
-		for(int i = 1; i < size; i++) {
-			if(manager.nodeCount(twave[i]) > max_nodes) {
-				current ++;
-				twave2[current] = twave[i];
-			} else {
-				int new_t = manager.or(twave2[current], twave[i]);
-				if(manager.nodeCount(new_t) < max_nodes) {
-					// keep
-					manager.deref(twave2[current]);
-					manager.deref(twave[i]);
-					twave2[current] = new_t;
-				} else {
-					// next
-					manager.deref(new_t);
-					current++;
-					twave2[current] = twave[i];
+				else
+				{
+					// should not happen:
+					throw new RuntimeException("INTERNAL ERROR: bad optimizer algo: " + Options.disj_optimizer_algo);
 				}
 			}
+
+			// now, sort it with whatever that weight is:
+			QuickSort.sort(copy, weight, size, true);
+
 		}
 
 
-		current ++;
 
-		SizeWatch.setOwner("DisjOptimizer.optimize");
-		for(int i = 0; i < size; i++) SizeWatch.report(twave[i],"old Ti");
-		for(int i = 0; i < current; i++) SizeWatch.report(twave2[i],"new Ti");
 
-		size = current;
-		int [] swap = twave2;
-		twave2 = twave;
-		twave = swap;
+		// create a set for the added events
+		boolean [] events_have = new boolean[ manager.getEvents().length ];
+		IndexedSet.empty(events_have);
 
-		*/
+		// and do the insertation
+		int current = 0;
+		for(int i = 0; i < size; i++)
+		{
+			boolean [] new_events = copy[i].getCareSet();
+
+			if(IndexedSet.subseteq(new_events, events_have))
+			{
+				copy[i].setActive(false);
+				if(Options.debug_on)
+				{
+					Options.out.println("Cluster removed by optimizer: " + copy[i]);
+				}
+			}
+			else
+			{
+				IndexedSet.add(events_have, new_events);
+				copy[i].setActive(true);
+			}
+		}
 	}
+
 }
+
+

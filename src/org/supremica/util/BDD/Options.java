@@ -72,7 +72,17 @@ public class Options
 							ALGO_PETRINET = 14;
 	public static int algo_family = ALGO_DISJUNCTIVE_WORKSET;
 
-	/** reachability algorithm */
+	/** disjunctive optimization algorithm */
+	public static final String [] DISJ_OPTIMIZER_NAMES = {
+			"none", "random", "state-vector size", "dependency size", "1/dependency size" };
+	public static final int
+		DISJ_OPTIMIZER_NONE = 0,
+		DISJ_OPTIMIZER_RANDOM = 1,
+		DISJ_OPTIMIZER_STATE_VECTOR_SIZE = 2,
+		DISJ_OPTIMIZER_DEPENDENCY_SIZE = 3,
+		DISJ_OPTIMIZER_INV_DEPENDENCY_SIZE = 4
+		;
+	public static int disj_optimizer_algo = DISJ_OPTIMIZER_NONE;
 
 	/** language controllability/inclusion algorithms */
 	public static final String[] INCLUSION_ALGORITHM_NAMES = { "Monolithic      ",
@@ -159,6 +169,7 @@ public class Options
 														"Min follow",
 														"Smallest additional alphabet",
 														"Larggest shared alphabet",
+														"Adaptive",
 														};
 	public static final int ES_HEURISTIC_INTERACTIVE = 0,
 							ES_HEURISTIC_ANY = 1, ES_HEURISTIC_TOPDOWN = 2,
@@ -168,7 +179,9 @@ public class Options
 							ES_HEURISTIC_MOST_MEMBERS = 6,
 							ES_HEURISTIC_LEAST_MEMBERS = 7,
 							ES_LEAST_ADDITIONAL_EVENTS = 8,
-							ES_MOST_SHARED_EVENTS = 9;
+							ES_MOST_SHARED_EVENTS = 9,
+							ES_ADAPTIVE = 10;
+
 	public static int es_heuristics = ES_HEURISTIC_MOST_MEMBERS;
 
 	/** BDD grow graph */

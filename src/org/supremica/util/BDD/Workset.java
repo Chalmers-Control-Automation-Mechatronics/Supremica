@@ -10,16 +10,43 @@ import org.supremica.util.BDD.heuristics.*;
  */
 public class Workset
 {
+	/** the state of the adaptive algo: */
+	private final static int STATE_INITIAL = 0, STATE_TOO_GOOD = 1, STATE_TOO_BAD = 2;
+
 	private int[] workset, queue;
-	private int[][] dependent;
-	private boolean[] remaining;    // this is for the exclusive stuff
-	private int size, heuristic;
-	private int workset_count;    // sum of workset_i
-	private int last_choice; // the last cluster that was chosen
+	private boolean[] remaining;    /** this is for the exclusive stuff, true if the automaton has never been selected */
+	private int size, heuristic;		/** number of the clusters and the H1 heuristics*/
+	private int workset_count;    /** sum of workset_i */
+	private int last_choice; 			/** the last cluster that was chosen */
+	private int internal_state; /** for the adaptive heuristics */
 	private Cluster[] clusters;
 	private InteractiveChoice ic = null;
 	private NDAS_Choice ndas = null;
 
+	/**
+	 * we keep track of the number of (not) advancing choices in a row.
+	 * in future it will be used to alarm when a heuristics is performing very bad
+	 */
+	private int track_advanced, track_not_advanced;
+
+	/**
+	 * dependency matrix:  n = dependent[automata][0] is the number of dependent automata.
+   * dependent[automata][1] .. dependent[automata][n] are the dependent automata.
+   * @see WorksetSupervisor
+	 */
+	 private int[][] dependent;
+
+
+
+	// -----------------------------------------------------------------------
+	/**
+	 * Start a workset, with the given cluster and size (note that size might be
+	 * less than clusters.length due to (future) optimization).
+	 *
+	 * <p>
+	 * dependent is the automata dependency map, d: A -> 2^A.
+	 * the first field is the size, the reset are the dependent automata
+	 */
 	public Workset(Cluster[] clusters, int size, int[][] dependent)
 	{
 		this.size = size;
@@ -37,6 +64,10 @@ public class Workset
 		}
 	}
 
+	/**
+	 * initialzie and reset internal data.
+	 *
+	 */
 	public void init_workset(boolean exclusive)
 	{
 
@@ -58,6 +89,8 @@ public class Workset
 		}
 
 		ndas.reset();
+		track_advanced = track_not_advanced = 0;
+		internal_state = STATE_INITIAL; // internal state of the adaptive heuristic
 	}
 
 	public void done()
@@ -256,8 +289,32 @@ public class Workset
 		return queue_size;
 	}
 
-	/** and here is where they are called from: */
+	/** adaptive heuristic. dont try to understand this one :) */
+	private int h1_adaptive(boolean exclusive)
+	{
+		switch(internal_state)
+		{
+			case STATE_INITIAL:
+				if(track_advanced > 5) internal_state = STATE_TOO_GOOD;
+				else if(track_not_advanced > 3) internal_state = STATE_TOO_BAD;
+				break;
+			case STATE_TOO_GOOD:
+				if(track_not_advanced > 2) internal_state = STATE_INITIAL;
+				break;
+			case STATE_TOO_BAD:
+				if(track_not_advanced > 2 || track_advanced > 5) internal_state = STATE_INITIAL;
+				break;
+			default: // something is wrong
+				internal_state = STATE_INITIAL;
+		}
 
+		if(internal_state == STATE_TOO_GOOD) return h1_most_shared_events(exclusive);
+		if(internal_state == STATE_TOO_BAD) return h1_all(exclusive);
+		/* if(internal_state == STATE_INITIAL)  */ return h1_most_followers(false, exclusive);
+	}
+
+	// -------------------------------------------------------------------------------
+	/** and here is where they are called from: */
 	private int h1_heuristic(int h1, boolean exclusive)
 	{
 			switch (h1)
@@ -282,6 +339,8 @@ public class Workset
 				return h1_most_followers(false, exclusive);
 			case Options.ES_HEURISTIC_LEAST_MEMBERS :
 				return h1_most_followers(true, exclusive);
+			case Options.ES_ADAPTIVE:
+				return h1_adaptive(exclusive);
 			default:
 				System.err.println("unknown h1 heuristic: " + h1);
 				return 0; // ERROR
@@ -335,6 +394,7 @@ public class Workset
 		}
 
 		ndas.advance(automaton, changed);
+		keep_track(changed);
 	}
 
 	/**
@@ -352,7 +412,25 @@ public class Workset
 		}
 
 		ndas.advance(automaton, changed);
+		keep_track(changed);
 	}
+
+	/**
+	 * Keep track of series of advanced or not advanced choices
+	 */
+	 private void keep_track(boolean changed)
+	 {
+		 if(changed)
+		 {
+			 track_advanced++;
+			 track_not_advanced = 0;
+		 }
+		 else
+		 {
+			 track_advanced = 0;
+			 track_not_advanced ++;
+		 }
+	 }
 
 
 	// a change in "automaton" was seen, track the consequences by adding the dependent automata to the workset

@@ -32,7 +32,7 @@ public class WorksetSupervisor
 
 	/**
 	 * dependency matrix:  n = dependent[automata][0] is the number of dependent automata.
- * dependent[automata][1] .. dependent[automata][n] are the dependent automata.
+   * dependent[automata][1] .. dependent[automata][n] are the dependent automata.
 	 */
 	protected int[][] dependent;
 	protected int size;
@@ -182,6 +182,7 @@ public class WorksetSupervisor
 		{
 			int p = workset.pickOne();
 			int r_all_org = r_all;
+
 
 			do
 			{

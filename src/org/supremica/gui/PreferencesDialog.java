@@ -69,6 +69,7 @@ public class PreferencesDialog
 	/* yes, it has package access! */
 	BDDPanel1 theBDDPanel1 = null;
 	private BDDPanel2 theBDDPanel2 = null;
+	private BDDPanel3 theBDDPanel3 = null;
 	private LayoutPanel theLayoutPanel = null;
 	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
 	private SoftPLCPanel theSoftPLCPanel = null;
@@ -108,6 +109,10 @@ public class PreferencesDialog
 		theBDDPanel2 = new BDDPanel2(this);
 
 		theTabbedPanel.add("BDD 2", theBDDPanel2);
+
+		theBDDPanel3 = new BDDPanel3(this);
+
+		theTabbedPanel.add("BDD 3", theBDDPanel3);
 
 		theSimulationPanel = new SimulationPanel(this);
 
@@ -204,6 +209,7 @@ public class PreferencesDialog
 		theSimulationPanel.update();
 		theBDDPanel1.update();
 		theBDDPanel2.update();
+		theBDDPanel3.update();
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
 		theSynchronizationPanel.update();
@@ -223,6 +229,14 @@ public class PreferencesDialog
 		if (theBDDPanel2 != null)
 		{
 			if (!theBDDPanel2.doApply())
+			{
+				return false;
+			}
+		}
+
+		if (theBDDPanel3 != null)
+		{
+			if (!theBDDPanel3.doApply())
 			{
 				return false;
 			}
@@ -959,7 +973,7 @@ class BDDPanel2
 	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup;
 	private JCheckBox localSaturation, encodingFill,  cReorderGroupFree;
 	private JCheckBox burstMode;
-	private JTextField maxPartitionSize, extraLibDir;
+	private JTextField extraLibDir;
 
 	public BDDPanel2(PreferencesDialog theDialog)
 	{
@@ -1006,11 +1020,6 @@ class BDDPanel2
 
 		countAlgorithm = BDDPanel1.addCombo(pTopRight,"State enumeration algorithm", Options.COUNT_ALGO_NAMES, Options.count_algo);
 
-		JPanel pPartitionSize = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		pPartitionSize.add(new JLabel("Max BDD nodes/cluster"));
-		pPartitionSize.add(maxPartitionSize = new JTextField("" + Options.max_partition_size, 5));
-		pTopRight.add(pPartitionSize);
 
 		JPanel pExtraLib = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
@@ -1035,15 +1044,8 @@ class BDDPanel2
 
 	public boolean doApply()
 	{
-		int maxsize = PreferencesDialog.getInt("Max cluster size", maxPartitionSize.getText(), 0);
-
-		if (maxsize == Integer.MIN_VALUE)
-		{
-			return false;
-		}
 
 		Options.extraLibPath = extraLibDir.getText();
-		Options.max_partition_size = maxsize;
 		Options.reorder_algo = cbReordering.getSelectedIndex();
 		Options.reorder_dyanmic = cReorderDynamic.isSelected();
 		Options.reorder_after_build = cReorderBuild.isSelected();
@@ -1063,6 +1065,64 @@ class BDDPanel2
 	public void update() {}
 
 }
+
+
+
+
+
+/** even more BDD specific stuff, does this nightmare ever end?*/
+class BDDPanel3
+	extends JPanel
+{
+	private PreferencesDialog theDialog = null;
+	private JComboBox cbDisjOpt;
+	private JTextField maxPartitionSize;
+
+	public BDDPanel3(PreferencesDialog theDialog)
+	{
+		super( new GridLayout(1,2, 10, 10));
+		this.theDialog = theDialog;
+
+		// -------------------------------------- LEFT
+		JPanel pLeft = new JPanel(new GridLayout(8, 1));
+		add(pLeft);
+		BDDPanel1.addCaption(pLeft, "Disjunctive Partitioning");
+
+		cbDisjOpt = BDDPanel1.addCombo(pLeft,"Optimizer selection heuristics", Options.DISJ_OPTIMIZER_NAMES, Options.disj_optimizer_algo);
+
+		JPanel pPartitionSize = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		pPartitionSize.add(new JLabel("Max BDD nodes/cluster"));
+		pPartitionSize.add(maxPartitionSize = new JTextField("" + Options.max_partition_size, 5));
+		pLeft.add(pPartitionSize);
+
+
+		// -------------------------------------- RIGHT
+		JPanel pRight = new JPanel(new GridLayout(8, 1));
+		add(pRight);
+		BDDPanel1.addCaption(pRight, "Misc.");
+
+	}
+
+	public boolean doApply()
+	{
+
+		int maxsize = PreferencesDialog.getInt("Max cluster size", maxPartitionSize.getText(), 0);
+		if (maxsize == Integer.MIN_VALUE)
+		{
+			return false;
+		}
+
+
+		Options.max_partition_size = maxsize;
+		Options.disj_optimizer_algo = cbDisjOpt.getSelectedIndex();
+		return true;
+	}
+
+	public void update() {}
+
+}
+
+
 
 
 class SimulationPanel

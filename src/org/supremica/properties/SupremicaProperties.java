@@ -167,6 +167,7 @@ public final class SupremicaProperties
 	private static final String BDD_PARTITION_MAX = "bddMaxPartitionSize";    // max_partition_size
 	private static final String BDD_ENCODING_ALGO = "bddStateEncodingAlgorithm";    // encoding_algorithm
 	private static final String BDD_SUP_REACHABILITY = "bddSupReachability";    // sup_reachability_type
+	private static final String BDD_DISJ_OPTIMIZER_ALGO = "BDDDisjOptimizerAlgo"; // disj_optimizer_algo
 
 
 	// Simulation stuff
@@ -1383,6 +1384,7 @@ public static String getLocalPrefsDirectory()
 			setOption(BDD_ENCODING_ALGO, Options.encoding_algorithm);
 			setOption(BDD_LIB_PATH, Options.extraLibPath);
 			setOption(BDD_SUP_REACHABILITY, Options.sup_reachability_type);
+			setOption(BDD_DISJ_OPTIMIZER_ALGO, Options.disj_optimizer_algo);
 		}
 		else
 		{
@@ -1409,6 +1411,7 @@ public static String getLocalPrefsDirectory()
 			Options.encoding_algorithm = optionAsInt(BDD_ENCODING_ALGO, Options.encoding_algorithm);
 			Options.extraLibPath = optionAsString(BDD_LIB_PATH, Options.extraLibPath);
 			Options.sup_reachability_type = optionAsInt(BDD_SUP_REACHABILITY, Options.sup_reachability_type);
+			Options.disj_optimizer_algo = optionAsInt(BDD_DISJ_OPTIMIZER_ALGO, Options.disj_optimizer_algo);
 		}
 	}
 

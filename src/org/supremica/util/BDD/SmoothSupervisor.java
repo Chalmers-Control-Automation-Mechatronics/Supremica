@@ -140,6 +140,9 @@ public class SmoothSupervisor
 			{
 				remaining[a] = false;
 
+				if(!clusters[a].isActive()) // bail out, we dont need this cluster anyway!
+					continue;
+
 				dp.add(clusters[a].getTwave() );
 
 				if (gf != null)
@@ -217,6 +220,9 @@ public class SmoothSupervisor
 			if (remaining[a])
 			{
 				remaining[a] = false;
+
+				if(!clusters[a].isActive()) // bail out, we dont need this cluster anyway!
+					continue;
 
 				dp.add(clusters[a].getTwave() );
 
