@@ -2418,7 +2418,37 @@ public class ActionMan
 				robotStudioLink.start();
 			}
 		};
+	}
 
+/*
+	public static void robotStudioCreateMutexZones(Gui gui)
+	{
+		RobotStudioLink.createMutexZones();
+	}
+
+	public static void robotStudioExtractRobotAutomata(Gui gui)
+	{
+		RobotStudioLink.extractRobotAutomata();
+	}
+*/
+
+	public static void robotStudioExecuteRobot(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() != 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		RobotStudioLink.executeRobotAutomaton(selectedAutomata.getAutomatonAt(0));
+	}
+
+	public static void robotStudioKill()
+	{
+		RobotStudioLink.kill();
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata

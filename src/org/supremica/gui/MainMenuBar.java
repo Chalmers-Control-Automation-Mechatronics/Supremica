@@ -868,15 +868,61 @@ public class MainMenuBar
 			menuRobotStudioLink.setText("RobotStudio");
 			menuTools.add(menuRobotStudioLink);
 
-			// EvoComp.CalculateSynchTable
-			JMenuItem robLink= new JMenuItem();
-			robLink.setText("RobotStudio test");
+			// RobotStudioTest
+			JMenuItem robLink = new JMenuItem();
+			robLink.setText("Extract Automata From Station...");
 			menuRobotStudioLink.add(robLink);
 			robLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
 						ActionMan.robotStudioTest(ActionMan.getGui());
+					}
+				});
+/*
+			// RobotStudioCreateMutexZones
+			JMenuItem robMutex = new JMenuItem();
+			robMutex.setText("Create Mutex Zones");
+			menuRobotStudioLink.add(robMutex);
+			robMutex.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioCreateMutexZones(ActionMan.getGui());
+					}
+				});
+			// RobotStudioExtractAutomata
+			JMenuItem robExtract = new JMenuItem();
+			robExtract.setText("Extract Robot Automata");
+			menuRobotStudioLink.add(robExtract);
+			robExtract.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioExtractRobotAutomata(ActionMan.getGui());
+					}
+				});
+*/
+			// RobotStudioExecuteAutomaton
+			JMenuItem robExec = new JMenuItem();
+			robExec.setText("Execute Robot Automaton...");
+			menuRobotStudioLink.add(robExec);
+			robExec.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioExecuteRobot(ActionMan.getGui());
+					}
+				});
+			// RobotStudioRelease
+			JMenuItem robKill = new JMenuItem();
+			robKill.setText("Kill RobotStudio Link");
+			menuRobotStudioLink.add(robKill);
+			robKill.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioKill();
 					}
 				});
 		}
