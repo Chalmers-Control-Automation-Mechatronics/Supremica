@@ -89,7 +89,6 @@ public class Automaton
 		alphabet = new Alphabet();
 		idStateMap = new HashMap();
 		indexStateMap = new HashMap();
-		// theStates = new LinkedList();
 		theArcs = new ArcSet();
 		masterAutomata = new Automata();
 		slaveAutomata = new Automata();
@@ -317,6 +316,15 @@ public class Automaton
 		return initialState;
 	}
 
+	/**
+	 * Returns true if this is the null automaton, i.e. this
+	 * automaton does not have an initial state.
+	 */
+	public boolean isNullAutomaton()
+	{
+		return !hasInitialState();
+	}
+
 	// This is a fixx, for now - see bug report
 	public void setInitialState(State state)
 		throws IllegalArgumentException
@@ -331,7 +339,7 @@ public class Automaton
 		State newinit = getState(state);
 		if(newinit == null)
 		{
-			throw new RuntimeException("No such state. id = " + state.getId());
+			throw new IllegalStateException("No such state. id = " + state.getId());
 		}
 
 		newinit.setInitial(true);
@@ -561,6 +569,7 @@ public class Automaton
 	 * Use isInAlphabet instead
 	 * @deprecated
 	 */
+/*
 	public boolean containsEventWithLabel(String eventLabel)
 	{
 		return hasEventInAlphabet(eventLabel);
@@ -570,6 +579,7 @@ public class Automaton
 	{
 		return alphabet.containsEventWithLabel(eventLabel);
 	}
+*/
 	// The above stuff should be removed -- use teh Alphabet and the Arc methods instead
 
 	/**
@@ -593,6 +603,7 @@ public class Automaton
 	 * automaton. If the event is not included in this automaton or is not
 	 * prioritized then it returns false.
 	 */
+/*
 	public boolean isEventPrioritized(String eventLabel)
 		throws IllegalArgumentException
 	{
@@ -600,24 +611,17 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("EventLabel must be non-null");
 		}
-
-		if (!containsEventWithLabel(eventLabel))
+		if (alphabet.containsEventWithLabel(eventLabel))
+		{
+			LabeledEvent thisEvent = alphabet.getEventWithLabel(eventLabel);
+			return thisEvent.isPrioritized();
+		}
+		else
 		{
 			return false;
 		}
-		LabeledEvent thisEvent = null;
-		try
-		{
-			thisEvent = getEventWithLabel(eventLabel);
-		}
-		catch (Exception ex)
-		{
-			logger.error("Automaton.isEventPrioritzed: Error in getEventWithLabel", ex);
-			logger.debug(ex.getStackTrace());
-			return false;
-		}
-		return thisEvent.isPrioritized();
 	}
+*/
 
 	public LabeledEvent getEventWithLabel(String eventLabel)
 		throws Exception

@@ -53,8 +53,7 @@ import java.util.*;
 
 public class Arc
 {
-	// private String eventId;	// why not event here??
-	private LabeledEvent event;	// xperimental
+	private LabeledEvent event;
 	private State fromState;
 	private State toState;
 	private ArcListeners listeners = null;
@@ -71,7 +70,7 @@ public class Arc
 	private int endX = -1;
 	private int endY = -1;
 
-	private Arc(State from, State to) // , String eventId)
+	private Arc(State from, State to)
 		throws IllegalArgumentException
 	{
 		if (from == null)
@@ -96,12 +95,7 @@ public class Arc
 		this(from, to);
 		this.event = event;
 	}
-/*
-	private String getEventId()
-	{
-		return event.getId();
-	}
-*/
+
 	public void setEvent(LabeledEvent event)
 	{
 		this.event = event;

@@ -341,6 +341,42 @@ public class Alphabet
 	}
 
 	/**
+	 * Returns true if this alphabet contains an event with the same label as other.
+	 */
+	public boolean containsEqualEvent(LabeledEvent otherEvent)
+	{
+		return containsEventWithLabel(otherEvent.getLabel());
+	}
+
+	/**
+	 * Returns true if the event with same label as other event is prioritized in this alphabet.
+	 */
+	public boolean isPrioritized(LabeledEvent otherEvent)
+		throws IllegalArgumentException
+	{
+		if (!containsEqualEvent(otherEvent))
+		{
+			throw new IllegalArgumentException();
+		}
+		LabeledEvent thisEvent = getEventWithLabel(otherEvent.getLabel());
+		return thisEvent.isPrioritized();
+	}
+
+	/**
+	 * Returns true if the event with same label as other event is controllable in this alphabet.
+	 */
+	public boolean isControllable(LabeledEvent otherEvent)
+		throws IllegalArgumentException
+	{
+		if (!containsEqualEvent(otherEvent))
+		{
+			throw new IllegalArgumentException();
+		}
+		LabeledEvent thisEvent = getEventWithLabel(otherEvent.getLabel());
+		return thisEvent.isControllable();
+	}
+
+	/**
 	 * Remove event from alphabet.
 	 *
 	 *@param  event Description of the Parameter
