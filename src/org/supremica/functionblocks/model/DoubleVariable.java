@@ -49,30 +49,29 @@
 
 package org.supremica.functionblocks.model;
 
-import java.lang.Boolean;
+import java.lang.Double;
 
-public class BooleanVariable extends Variable
+public class DoubleVariable extends Variable
 {
 	
-	private Boolean value = new Boolean(false);
+	private Double value;
 
-	private BooleanVariable() {}
+	private DoubleVariable() {}
 
-	public BooleanVariable(String t, boolean b)
+	public DoubleVariable(String t,double f)
 	{
-		type = t;
-		value = new Boolean(b);
+		type=t;
+		value = new Double(f);
 	}
 
-	public void setValue(Boolean v)
+	public void setValue(double i)
 	{
-		value = v;
+		value = new Double(i);
 	}
 
-	public Boolean getValue()
+	public Double getValue()
 	{
 		return value;
-		
 	}
     
 }

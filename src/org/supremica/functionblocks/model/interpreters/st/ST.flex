@@ -58,9 +58,15 @@ IDENT = {ALPHA} ( {ALPHA} | {DIGIT} | _ )*
   "(" 			{ /*System.out.println("LPAREN");*/ return new Symbol(Symbols.LPAREN); }
   ")" 			{ /*System.out.println("RPAREN");*/ return new Symbol(Symbols.RPAREN); }
 
-  \"{STRING_TEXT}\" 	{ /*System.out.println("STRING:" + yytext());*/ return new Symbol(Symbols.STRING,yytext()); } 
+  \"{STRING_TEXT}\" 	{ /*System.out.println("STRING:" + yytext());*/ return new Symbol(Symbols.STRING,yytext().substring(1,yylength()-1)); } 
+
   {DIGIT}+ 		{ /*System.out.println("INT:" + yytext());*/ return new Symbol(Symbols.INT , new Integer(yytext())); }  
-  {DIGIT}+"."{DIGIT}+	{ /*System.out.println("FLOAT:" + yytext());*/ return new Symbol(Symbols.FLOAT , new Float(yytext())); }
+
+{DIGIT}+"."{DIGIT}+	{ /*System.out.println("DOUBLE:" + yytext());*/ return new Symbol(Symbols.DOUBLE , new Double(yytext())); }
+{DIGIT}+"."{DIGIT}+"e"{DIGIT}+ { /*System.out.println("DOUBLE:" + yytext());*/ return new Symbol(Symbols.DOUBLE , new Double(yytext())); }
+
+{DIGIT}+"."{DIGIT}+"F" 	{ /*System.out.println("FLOAT:" + yytext());*/ return new Symbol(Symbols.FLOAT , new Float(yytext())); }
+
   "TRUE"		{ /*System.out.println("TRUE");*/ return new Symbol(Symbols.BOOL,new Boolean(true)); }
   "FALSE"		{ /*System.out.println("FALSE");*/ return new Symbol(Symbols.BOOL,new Boolean(false)); }
 

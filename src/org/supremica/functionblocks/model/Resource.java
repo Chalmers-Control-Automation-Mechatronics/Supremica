@@ -84,11 +84,32 @@ public class Resource
 	Variables testVars = new Variables();
 	testVars.addVariable("bvar", new BooleanVariable("Local", true));
 	testVars.addVariable("ivar", new IntegerVariable("Local", 10));
-	testVars.addVariable("fvar", new FloatVariable("Local", 3.14));
+	testVars.addVariable("dvar", new DoubleVariable("Local", 3.14));
+	testVars.addVariable("fvar", new FloatVariable("Local", 3.18F));
 	testVars.addVariable("svar", new StringVariable("Local", "TestString"));
 
-	ECCondition testCond = new ECCondition("5+3"); 
-	System.out.println("Resource: evaluation result: " + testCond.evaluate(testVars));
+	System.out.println("Resource("+ name +"): Testing Expressions:");
+	System.out.println("Testing Primary Expressions:");
+	ECCondition testCond = new ECCondition("TRUE"); 
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("3.18F");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("3.14");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("3");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("\"blah\"");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("bvar");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("ivar");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("dvar");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("fvar");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+	testCond.set("svar");
+	System.out.println("evaluation result: " + testCond.evaluate(testVars));
 
 	
     }

@@ -56,6 +56,7 @@ import org.supremica.functionblocks.model.Variables;
 import org.supremica.functionblocks.model.Variable;
 import org.supremica.functionblocks.model.StringVariable;
 import org.supremica.functionblocks.model.IntegerVariable;
+import org.supremica.functionblocks.model.DoubleVariable;
 import org.supremica.functionblocks.model.FloatVariable;
 import org.supremica.functionblocks.model.BooleanVariable;
 
@@ -164,9 +165,9 @@ public class Evaluator {
 				{
 					return new Boolean(((Integer) a).intValue() == ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Integer) a).intValue() == ((Float) b).floatValue());
+					return new Boolean(((Integer) a).intValue() == ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -175,16 +176,16 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((Eq) e).b);
 				if(b instanceof Integer)
 				{
-					return new Boolean(((Float) a).floatValue() == ((Integer) b).intValue());
+					return new Boolean(((Double) a).doubleValue() == ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Float) a).floatValue() == ((Float) b).floatValue());
+					return new Boolean(((Double) a).doubleValue() == ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -224,9 +225,9 @@ public class Evaluator {
 				{
 					return new Boolean(((Integer) a).intValue() != ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Integer) a).intValue() != ((Float) b).floatValue());
+					return new Boolean(((Integer) a).intValue() != ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -235,16 +236,16 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((Neq) e).b);
 				if(b instanceof Integer)
 				{
-					return new Boolean(((Float) a).floatValue() != ((Integer) b).intValue());
+					return new Boolean(((Double) a).doubleValue() != ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Float) a).floatValue() != ((Float) b).floatValue());
+					return new Boolean(((Double) a).doubleValue() != ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -284,9 +285,9 @@ public class Evaluator {
 				{
 					return new Boolean(((Integer) a).intValue() < ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Integer) a).intValue() < ((Float) b).floatValue());
+					return new Boolean(((Integer) a).intValue() < ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -295,16 +296,16 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((Less) e).b);
 				if(b instanceof Integer)
 				{
-					return new Boolean(((Float) a).floatValue() < ((Integer) b).intValue());
+					return new Boolean(((Double) a).doubleValue() < ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Float) a).floatValue() < ((Float) b).floatValue());
+					return new Boolean(((Double) a).doubleValue() < ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -330,9 +331,9 @@ public class Evaluator {
 				{
 					return new Boolean(((Integer) a).intValue() <= ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Integer) a).intValue() <= ((Float) b).floatValue());
+					return new Boolean(((Integer) a).intValue() <= ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -341,16 +342,16 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((LessEq) e).b);
 				if(b instanceof Integer)
 				{
-					return new Boolean(((Float) a).floatValue() <= ((Integer) b).intValue());
+					return new Boolean(((Double) a).doubleValue() <= ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Float) a).floatValue() <= ((Float) b).floatValue());
+					return new Boolean(((Double) a).doubleValue() <= ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -376,9 +377,9 @@ public class Evaluator {
 				{
 					return new Boolean(((Integer) a).intValue() > ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Integer) a).intValue() > ((Float) b).floatValue());
+					return new Boolean(((Integer) a).intValue() > ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -387,16 +388,16 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((More) e).b);
 				if(b instanceof Integer)
 				{
-					return new Boolean(((Float) a).floatValue() > ((Integer) b).intValue());
+					return new Boolean(((Double) a).doubleValue() > ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Float) a).floatValue() > ((Float) b).floatValue());
+					return new Boolean(((Double) a).doubleValue() > ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -422,9 +423,9 @@ public class Evaluator {
 				{
 					return new Boolean(((Integer) a).intValue() >= ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Integer) a).intValue() >= ((Float) b).floatValue());
+					return new Boolean(((Integer) a).intValue() >= ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -433,16 +434,16 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((MoreEq) e).b);
 				if(b instanceof Integer)
 				{
-					return new Boolean(((Float) a).floatValue() >= ((Integer) b).intValue());
+					return new Boolean(((Double) a).doubleValue() >= ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Boolean(((Float) a).floatValue() >= ((Float) b).floatValue());
+					return new Boolean(((Double) a).doubleValue() >= ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -486,12 +487,12 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((Plus) e).b);
-				if(b instanceof Float)
+				if(b instanceof Double)
 				{
-					return new Float(((Float) a).floatValue() + ((Float) b).floatValue());
+					return new Double(((Double) a).doubleValue() + ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -524,12 +525,12 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalAddExpression(((Minus) e).b);
-				if(b instanceof Float)
+				if(b instanceof Double)
 				{
-					return new Float(((Float) a).floatValue() - ((Float) b).floatValue());
+					return new Double(((Double) a).doubleValue() - ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -573,12 +574,12 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalTerm(((Times) e).b);
-				if(b instanceof Float)
+				if(b instanceof Double)
 				{
-					return new Float(((Float) a).floatValue() * ((Float) b).floatValue());
+					return new Double(((Double) a).doubleValue() * ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -611,12 +612,12 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalTerm(((Div) e).b);
-				if(b instanceof Float)
+				if(b instanceof Double)
 				{
-					return new Float(((Float) a).floatValue() / ((Float) b).floatValue());
+					return new Double(((Double) a).doubleValue() / ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -642,9 +643,9 @@ public class Evaluator {
 				{
 					return new Integer(((Integer) a).intValue() % ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Float(((Integer) a).intValue() % ((Float) b).floatValue());
+					return new Double(((Integer) a).intValue() % ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -653,16 +654,16 @@ public class Evaluator {
 					throw new Exception();
 				}
 			}
-			else if (a instanceof Float)
+			else if (a instanceof Double)
 			{
 				Object b = evalTerm(((Div) e).b);
 				if(b instanceof Integer)
 				{
-					return new Float(((Float) a).floatValue() % ((Integer) b).intValue());
+					return new Double(((Double) a).doubleValue() % ((Integer) b).intValue());
 				}
-				else if(b instanceof Float)
+				else if(b instanceof Double)
 				{
-					return new Float(((Float) a).floatValue() % ((Float) b).floatValue());
+					return new Double(((Double) a).doubleValue() % ((Double) b).doubleValue());
 				}
 				else
 				{
@@ -720,6 +721,10 @@ public class Evaluator {
 			{
 				return new Integer(-((Integer) a).intValue());
 			}
+			else if (a instanceof Double)
+			{
+				return new Double(-((Double) a).doubleValue());
+			}
 			else if (a instanceof Float)
 			{
 				return new Float(-((Float) a).floatValue());
@@ -763,6 +768,10 @@ public class Evaluator {
 			{
 				return ((IntegerVariable) var).getValue();			
 			}
+			else if (var instanceof DoubleVariable)
+			{
+				return ((DoubleVariable) var).getValue();			
+			}
 			else if (var instanceof FloatVariable)
 			{
 				return ((FloatVariable) var).getValue();			
@@ -779,6 +788,10 @@ public class Evaluator {
 		else if (e instanceof PrimaryInt)
 		{ 
 			return ((PrimaryInt) e).a;
+		}
+		else if (e instanceof PrimaryDouble)
+		{ 
+			return ((PrimaryDouble) e).a;
 		}
 		else if (e instanceof PrimaryFloat)
 		{ 

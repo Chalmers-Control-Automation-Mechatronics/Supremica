@@ -55,9 +55,15 @@ import java.lang.Exception;
 import java.io.StringReader;
 import java.io.FileReader;
 import java.io.Reader;
+
 import java_cup.runtime.Scanner;
 import java_cup.runtime.Symbol;
-import org.supremica.functionblocks.model.interpreters.st.*;
+
+import org.supremica.functionblocks.model.interpreters.st.Lexer;
+import org.supremica.functionblocks.model.interpreters.st.Parser;
+import org.supremica.functionblocks.model.interpreters.st.Evaluator;
+import org.supremica.functionblocks.model.interpreters.st.Printer;
+
 import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.Expression;
 
 
@@ -73,13 +79,15 @@ public class ECCondition
 	public ECCondition(String condition)
 	{
 		
-		System.out.println("ECCondition: New instance: " + condition);
+		System.out.println("ECCondition(" + condition + ")");
 		set(condition);
 	}
 
 	public void set(String cond)
 	{
 	
+		System.out.println("ECCondition.set(" + cond + ")");
+
 		condition = cond;
 		
 		StringReader stringReader = new StringReader(condition);
@@ -90,7 +98,6 @@ public class ECCondition
 
 		try 
 		{
-			System.out.println("ECCondition: Parsing...");
 			abstractSyntax = (Expression) parser.parse().value;
 		} 
 		catch(Exception e) 
@@ -107,8 +114,6 @@ public class ECCondition
 
 	public Object evaluate(Variables vars)
 	{
-		
-		System.out.println("ECCondition: evaluate()");
 		try 
 		{ 
 			return (new Evaluator(vars)).evalExpression(abstractSyntax);

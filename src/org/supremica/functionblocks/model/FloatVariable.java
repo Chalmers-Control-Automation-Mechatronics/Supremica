@@ -54,11 +54,13 @@ import java.lang.Float;
 public class FloatVariable extends Variable
 {
 	
-	private Float value = new Float(0.0);
+	private Float value;
 
-	public FloatVariable(String type,double f)
+	private FloatVariable() {}
+
+	public FloatVariable(String t,double f)
 	{
-		super(type);
+		type=t;
 		value = new Float(f);
 	}
 

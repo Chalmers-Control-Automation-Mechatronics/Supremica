@@ -18,6 +18,7 @@ terminal            NOT;
 terminal            LPAREN, RPAREN;
 terminal String	    STRING;
 terminal Integer    INT;
+terminal Double     DOUBLE;
 terminal Float      FLOAT;
 terminal Boolean    BOOL;
 terminal String     IDENT;
@@ -89,5 +90,6 @@ unary_expression ::= LPAREN expression:a RPAREN			{: RESULT = new UnaryExpressio
 primary_expression ::= IDENT:a					{: RESULT = new PrimaryIdent(a); :}
 		     | STRING:a 				{: RESULT = new PrimaryString(a); :}
 		     | INT:a					{: RESULT = new PrimaryInt(a); :}
+	  	     | DOUBLE:a 				{: RESULT = new PrimaryDouble(a); :}
 	  	     | FLOAT:a 					{: RESULT = new PrimaryFloat(a); :}
 	  	     | BOOL:a					{: RESULT = new PrimaryBool(a); :};

@@ -46,33 +46,19 @@
  *
  * Supremica is owned and represented by KA.
  */
+/*
+ * @author cengic
+ */
+package org.supremica.functionblocks.model.interpreters.st.abstractsyntax;
 
-package org.supremica.functionblocks.model;
 
-import java.lang.Boolean;
-
-public class BooleanVariable extends Variable
+public class PrimaryDouble extends PrimaryExpression
 {
+
+	public Double a;
 	
-	private Boolean value = new Boolean(false);
-
-	private BooleanVariable() {}
-
-	public BooleanVariable(String t, boolean b)
-	{
-		type = t;
-		value = new Boolean(b);
-	}
-
-	public void setValue(Boolean v)
-	{
-		value = v;
-	}
-
-	public Boolean getValue()
-	{
-		return value;
-		
-	}
-    
+	private PrimaryDouble() {}
+	
+	public PrimaryDouble(Double aa) {a=aa;}
+	
 }

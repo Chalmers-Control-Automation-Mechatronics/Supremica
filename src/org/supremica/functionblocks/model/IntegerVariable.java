@@ -56,9 +56,11 @@ public class IntegerVariable extends Variable
 	
 	private Integer value = new Integer(0);
 
-	public IntegerVariable(String type, int i)
+	private IntegerVariable() {}
+
+	public IntegerVariable(String t, int i)
 	{
-		super(type);
+		type=t;
 		value = new Integer(i);
 	}
 
