@@ -49,7 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.gui.WorkbenchProperties;
+import org.supremica.properties.SupremicaProperties;
 
 public final class VerificationOptions
 {
@@ -63,7 +63,7 @@ public final class VerificationOptions
 
 	public VerificationOptions()
 	{
-		this(WorkbenchProperties.verifyVerificationType(), WorkbenchProperties.verifyAlgorithmType(), WorkbenchProperties.verifyExclusionStateLimit(), WorkbenchProperties.verifyReachabilityStateLimit(), WorkbenchProperties.verifyOneEventAtATime(), WorkbenchProperties.verifySkipUncontrollabilityCheck());
+		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck());
 	}
 
 	public VerificationOptions(int verificationType, int algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
@@ -90,7 +90,7 @@ public final class VerificationOptions
 	{
 		verificationType = index;
 
-		WorkbenchProperties.setVerifyVerificationType(index);
+		SupremicaProperties.setVerifyVerificationType(index);
 	}
 
 	public int getVerificationType()
@@ -102,7 +102,7 @@ public final class VerificationOptions
 	{
 		algorithmType = index;
 
-		WorkbenchProperties.setVerifyAlgorithmType(index);
+		SupremicaProperties.setVerifyAlgorithmType(index);
 	}
 
 	public int getAlgorithmType()
@@ -114,7 +114,7 @@ public final class VerificationOptions
 	{
 		exclusionStateLimit = limit;
 
-		WorkbenchProperties.setVerifyExclusionStateLimit(limit);
+		SupremicaProperties.setVerifyExclusionStateLimit(limit);
 	}
 
 	public int getExclusionStateLimit()
@@ -126,7 +126,7 @@ public final class VerificationOptions
 	{
 		reachabilityStateLimit = limit;
 
-		WorkbenchProperties.setVerifyReachabilityStateLimit(limit);
+		SupremicaProperties.setVerifyReachabilityStateLimit(limit);
 	}
 
 	public int getReachabilityStateLimit()
@@ -138,7 +138,7 @@ public final class VerificationOptions
 	{
 		oneEventAtATime = bool;
 
-		WorkbenchProperties.setVerifyOneEventAtATime(bool);
+		SupremicaProperties.setVerifyOneEventAtATime(bool);
 	}
 
 	public boolean getOneEventAtATime()
@@ -150,7 +150,7 @@ public final class VerificationOptions
 	{
 		skipUncontrollabilityCheck = bool;
 
-		WorkbenchProperties.setVerifySkipUncontrollabilityCheck(bool);
+		SupremicaProperties.setVerifySkipUncontrollabilityCheck(bool);
 	}
 
 	public boolean getSkipUncontrollabilityCheck()

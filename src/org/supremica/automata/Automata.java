@@ -51,7 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 
 /**
  * A collection of Automaton-objects.
@@ -59,7 +59,7 @@ import org.apache.log4j.*;
  */
 public class Automata
 {
-	private static Category thisCategory = LogDisplay.createCategory(Automata.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(Automata.class);
 	private ArrayList theAutomata;    // Efficiency reasons
 	private HashMap nameMap;
 	private String name = null;

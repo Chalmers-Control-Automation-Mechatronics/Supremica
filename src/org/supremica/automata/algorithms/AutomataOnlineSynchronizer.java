@@ -50,7 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.util.Arrays;
 
 // For the automata selection methods
@@ -70,7 +70,7 @@ public final class AutomataOnlineSynchronizer
 {
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
-	private static Category thisCategory = LogDisplay.createCategory(AutomataOnlineSynchronizer.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataOnlineSynchronizer.class);
 	private final int nbrOfAutomata;
 	private int nbrOfSelectedAutomata;
 	private final int nbrOfEvents;
@@ -332,7 +332,7 @@ public final class AutomataOnlineSynchronizer
 				}
 				else
 				{
-					thisCategory.error("Unknown SynchronizationType");
+					logger.error("Unknown SynchronizationType");
 
 					// throw new Exception("Unknown SynchronizationType");
 				}
@@ -390,7 +390,7 @@ public final class AutomataOnlineSynchronizer
 
 				if (exhaustiveSearch)
 				{
-					thisCategory.info("The automata is uncontrollable.");
+					logger.info("The automata is uncontrollable.");
 					System.err.println("Uncontrollable state found!!!!!");
 
 					return;
@@ -429,18 +429,18 @@ public final class AutomataOnlineSynchronizer
 				}
 			}
 
-			// thisCategory.debug("Current state has " + i + " enabled events...");
+			// logger.debug("Current state has " + i + " enabled events...");
 			// ... or if no events are prioritized, take the first two...
 			if (insertionIndex == 0)
 			{
 
-				// thisCategory.debug("Wandering aimlessly among the events...");
+				// logger.debug("Wandering aimlessly among the events...");
 				insertionIndex = 2;
 			}
 			else
 			{
 
-				// thisCategory.debug("Executing prioritized events (there are " + insertionIndex + " with priority " + currPrio + " to choose from)...");
+				// logger.debug("Executing prioritized events (there are " + insertionIndex + " with priority " + currPrio + " to choose from)...");
 			}
 
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;

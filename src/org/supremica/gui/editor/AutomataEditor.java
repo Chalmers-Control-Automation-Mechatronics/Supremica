@@ -58,6 +58,7 @@ import java.util.HashMap;
 import com.nwoods.jgo.*;
 import com.nwoods.jgo.layout.JGoNetwork;
 import java.beans.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 import org.supremica.automata.AutomatonContainer;
 import org.supremica.automata.Automaton;
@@ -435,7 +436,7 @@ public class AutomataEditor
 
 		separatorNeeded = true;
 
-		if (WorkbenchProperties.fileAllowOpen())
+		if (SupremicaProperties.fileAllowOpen())
 		{
 			JButton openButton = new JButton();
 
@@ -457,7 +458,7 @@ public class AutomataEditor
 			separatorNeeded = true;
 		}
 
-		if (WorkbenchProperties.fileAllowSave())
+		if (SupremicaProperties.fileAllowSave())
 		{
 			JButton saveButton = new JButton();
 

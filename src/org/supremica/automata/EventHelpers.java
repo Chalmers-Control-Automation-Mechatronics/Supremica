@@ -51,7 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 
 /**
  * A collection of useful methods for manipulating Event.
@@ -62,7 +62,7 @@ import org.apache.log4j.*;
  */
 public class EventHelpers
 {
-	private static Category thisCategory = LogDisplay.createCategory(EventHelpers.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(EventHelpers.class);
 
 	/**
 	 * Creates a new event from a set of events

@@ -43,7 +43,7 @@
  *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
  *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ *  suffered by Licensee from the use of this oftware.
  *
  *  Supremica is owned and represented by KA.
  */
@@ -51,7 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 
 /**
  * Similar to Events, but with allows for the fast lookup of an event based on the id.
@@ -69,7 +69,7 @@ import org.apache.log4j.*;
 public class Alphabet
 	extends Events
 {
-	private static Category thisCategory = LogDisplay.createCategory(Alphabet.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
 	private HashMap idMap;
 	private int idIndex = 0;
 	private Listeners listeners = null;
@@ -183,7 +183,7 @@ public class Alphabet
 				}
 				catch (Exception e)
 				{    // This should be impossible
-					thisCategory.error("Alphabet.minus. Trying to remove a non-existing event.");
+					logger.error("Alphabet.minus. Trying to remove a non-existing event.");
 				}
 			}
 		}
@@ -212,7 +212,7 @@ public class Alphabet
 				}
 				catch (Exception e)
 				{    // This should be impossible
-					thisCategory.error("Alphabet.plus. Trying to add an existing event.");
+					logger.error("Alphabet.plus. Trying to add an existing event.");
 				}
 			}
 		}

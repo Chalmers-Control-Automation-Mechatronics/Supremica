@@ -49,6 +49,7 @@
  */
 package org.supremica.gui;
 
+import org.supremica.properties.SupremicaProperties;
 import javax.swing.filechooser.*;
 import javax.swing.*;
 
@@ -204,7 +205,7 @@ public class FileDialogs
 			fileImporter = new JFileChooser();
 
 			fileImporter.setDialogType(JFileChooser.SAVE_DIALOG);
-			fileImporter.setCurrentDirectory(new java.io.File(WorkbenchProperties.getFileOpenPath()));
+			fileImporter.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileOpenPath()));
 			fileImporter.setMultiSelectionEnabled(true);
 		}
 
@@ -218,7 +219,7 @@ public class FileDialogs
 			fileExporter = new JFileChooser();
 
 			fileExporter.setDialogType(JFileChooser.OPEN_DIALOG);
-			fileExporter.setCurrentDirectory(new java.io.File(WorkbenchProperties.getFileSavePath()));
+			fileExporter.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileSavePath()));
 			fileExporter.setMultiSelectionEnabled(false);
 		}
 
@@ -232,7 +233,7 @@ public class FileDialogs
 			fileSaveAs = new JFileChooser();
 
 			fileSaveAs.setDialogType(JFileChooser.OPEN_DIALOG);
-			fileSaveAs.setCurrentDirectory(new java.io.File(WorkbenchProperties.getFileSavePath()));
+			fileSaveAs.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileSavePath()));
 			fileSaveAs.setMultiSelectionEnabled(false);
 		}
 

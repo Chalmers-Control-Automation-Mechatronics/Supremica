@@ -52,7 +52,7 @@ package org.supremica.automata.algorithms;
 import org.supremica.gui.*;
 import java.io.*;
 import java.util.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Arc;
@@ -64,7 +64,7 @@ import org.supremica.automata.EventLabel;
 public class AutomataToSattLineSFC
 	implements AutomataSerializer
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataToSattLineSFC.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataToSattLineSFC.class);
 	private Automata automata;
 	private Automaton automaton;
 	private boolean debugMode = false;
@@ -127,7 +127,7 @@ public class AutomataToSattLineSFC
 		}
 		catch (Exception ex)
 		{
-			thisCategory.error("Failed getting union of alphabets of the selected automata. Code generation aborted.");
+			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted.");
 
 			return;
 		}
@@ -248,7 +248,7 @@ public class AutomataToSattLineSFC
 
 				endAlternativeLevel--;
 
-				thisCategory.info("endAlternativeLevel = " + endAlternativeLevel);
+				logger.info("endAlternativeLevel = " + endAlternativeLevel);
 			}
 
 			Arc arc = (Arc) outgoingArcsIt.next();
@@ -268,7 +268,7 @@ public class AutomataToSattLineSFC
 
 				// pw.println("ENDALTERNATIVE"); // End of this subsequence
 				// alternativeEnded = true;
-				// thisCategory.info("EndAlternative");
+				// logger.info("EndAlternative");
 			}
 		}
 
@@ -282,7 +282,7 @@ public class AutomataToSattLineSFC
 			pw.println("ENDALTERNATIVE");
 
 			// End of this subsequence
-			thisCategory.info("EndAlternative");
+			logger.info("EndAlternative");
 		}
 	}
 
@@ -312,7 +312,7 @@ public class AutomataToSattLineSFC
 		}
 		catch (Exception ex)
 		{
-			thisCategory.error("Failed getting event label. Code generation aborted.");
+			logger.error("Failed getting event label. Code generation aborted.");
 
 			return;
 		}

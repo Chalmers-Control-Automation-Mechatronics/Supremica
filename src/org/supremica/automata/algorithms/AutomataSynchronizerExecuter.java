@@ -50,7 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.util.Arrays;
 
 // For the automata selection methods
@@ -78,7 +78,7 @@ public final class AutomataSynchronizerExecuter
 {
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
-	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerExecuter.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerExecuter.class);
 	private final int nbrOfAutomata;
 	private final int nbrOfEvents;
 	private final int[][][] nextStateTable;
@@ -401,7 +401,7 @@ public final class AutomataSynchronizerExecuter
 				}
 				else
 				{
-					thisCategory.error("Unknown SynchronizationType");
+					logger.error("Unknown SynchronizationType");
 
 					// throw new Exception("Unknown SynchronizationType");
 				}
@@ -479,7 +479,7 @@ public final class AutomataSynchronizerExecuter
 					// Stop when uncontrollable state found
 					if (verboseMode)
 					{
-						thisCategory.info("Uncontrollable state found.");
+						logger.info("Uncontrollable state found.");
 					}
 
 					return;
@@ -553,7 +553,7 @@ public final class AutomataSynchronizerExecuter
 				// /*
 				if (verboseMode)
 				{
-					thisCategory.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
+					logger.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
 				}
 
 				// */
@@ -568,7 +568,7 @@ public final class AutomataSynchronizerExecuter
 				// /*
 				if (verboseMode)
 				{
-					thisCategory.debug("Following transitions in the suspect automaton, there are " + insertionIndex + " such transitions...");
+					logger.debug("Following transitions in the suspect automaton, there are " + insertionIndex + " such transitions...");
 				}
 
 				// */
@@ -661,7 +661,7 @@ public final class AutomataSynchronizerExecuter
 					catch (Exception e)
 					{
 						System.err.println(e);
-						thisCategory.error("Error in SynchronizerExecuter");
+						logger.error("Error in SynchronizerExecuter");
 
 						return;
 					}

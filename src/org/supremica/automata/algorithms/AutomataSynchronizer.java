@@ -52,14 +52,14 @@ package org.supremica.automata.algorithms;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.util.*;
 import java.io.PrintWriter;
 
 public class AutomataSynchronizer
 	implements Stoppable
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizer.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizer.class);
 	private Automata theAutomata;
 	private AutomataSynchronizerHelper synchHelper;
 	private SynchronizationOptions syncOptions;
@@ -139,7 +139,7 @@ public class AutomataSynchronizer
 		}
 		catch (Exception ex)
 		{
-			thisCategory.error(ex.toString());
+			logger.error(ex.toString());
 
 			throw ex;
 		}

@@ -50,7 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.util.ArrayList;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -68,7 +68,7 @@ import org.supremica.automata.EventLabel;
 public final class AutomataFastControllabilityCheckExecuter
 	extends Thread
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheckExecuter.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataFastControllabilityCheckExecuter.class);
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
 	private final int nbrOfAutomata;

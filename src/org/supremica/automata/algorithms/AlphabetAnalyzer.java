@@ -51,7 +51,7 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -60,7 +60,7 @@ import org.supremica.automata.EventLabel;
 
 public class AlphabetAnalyzer
 {
-	private static Category thisCategory = LogDisplay.createCategory(AlphabetAnalyzer.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AlphabetAnalyzer.class);
 	private Automata theAutomata;
 
 	/**
@@ -190,7 +190,7 @@ public class AlphabetAnalyzer
 
 			if (isUnsynchronizedEvent(currEvent))
 			{
-				thisCategory.info("UnsynchronizedEvent: " + currEvent.getLabel());
+				logger.info("UnsynchronizedEvent: " + currEvent.getLabel());
 			}
 		}
 	}
@@ -263,18 +263,18 @@ public class AlphabetAnalyzer
 
 		if ((nbrOnlyLeft == 0) && (nbrOnlyRight == 0))
 		{
-			thisCategory.info("Alphabet: " + leftAut.getName() + " == " + rightAut.getName() + " new unsych: " + newUnique);
+			logger.info("Alphabet: " + leftAut.getName() + " == " + rightAut.getName() + " new unsych: " + newUnique);
 		}
 		else
 		{
 			if (nbrOnlyLeft == 0)
 			{
-				thisCategory.info("Alphabet: " + leftAut.getName() + " <= " + rightAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + leftAut.getName() + " <= " + rightAut.getName() + " new unsych: " + newUnique);
 			}
 
 			if (nbrOnlyRight == 0)
 			{
-				thisCategory.info("Alphabet: " + rightAut.getName() + " <= " + leftAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + rightAut.getName() + " <= " + leftAut.getName() + " new unsych: " + newUnique);
 			}
 		}
 

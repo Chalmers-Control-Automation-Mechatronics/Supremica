@@ -52,6 +52,7 @@ package org.supremica.automata.algorithms;
 import org.supremica.gui.*;
 import java.io.*;
 import java.util.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -97,7 +98,7 @@ public class AutomataToXml
 		pw.print(" major=\"" + majorFileVersion + "\" ");
 		pw.print(" minor=\"" + minorFileVersion + "\" ");
 
-		if (WorkbenchProperties.generalUseSecurity())
+		if (SupremicaProperties.generalUseSecurity())
 		{
 			pw.print(" owner=\"" + automata.getOwner() + "\"");
 			pw.print(" hash=\"" + automata.getHash() + "\"");

@@ -55,6 +55,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
@@ -82,7 +83,7 @@ public class AutomataExplorer
 	{
 		this.theAutomata = theAutomata;
 
-		SynchronizationOptions syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), WorkbenchProperties.syncForbidUncontrollableStates(), WorkbenchProperties.syncExpandForbiddenStates(), false, false, false, WorkbenchProperties.verboseMode());
+		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode());
 
 		helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 

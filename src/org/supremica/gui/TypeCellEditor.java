@@ -7,7 +7,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import javax.help.*;
 import org.supremica.*;
 import org.supremica.automata.algorithms.*;
@@ -25,7 +25,7 @@ class TypeCellEditor
 	private TableSorter theTableSorter;
 	private JComboBox automatonTypeCombo;
 	private AutomatonContainer theAutomatonContainer;
-	private static Category thisCategory = LogDisplay.createCategory(TypeCellEditor.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(TypeCellEditor.class);
 
 	public TypeCellEditor(JTable theTable, TableSorter theTableSorter, AutomatonContainer theAutomatonContainer)
 	{

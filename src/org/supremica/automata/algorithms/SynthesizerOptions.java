@@ -49,7 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.gui.WorkbenchProperties;
+import org.supremica.properties.SupremicaProperties;
 
 public final class SynthesizerOptions
 {
@@ -62,7 +62,7 @@ public final class SynthesizerOptions
 
 	public SynthesizerOptions()
 	{
-		this(WorkbenchProperties.synthesisSynthesisType(), WorkbenchProperties.synthesisAlgorithmType(), WorkbenchProperties.synthesisPurge(), WorkbenchProperties.synthesisOptimize(), WorkbenchProperties.synthesisMaximallyPermissive());
+		this(SupremicaProperties.synthesisSynthesisType(), SupremicaProperties.synthesisAlgorithmType(), SupremicaProperties.synthesisPurge(), SupremicaProperties.synthesisOptimize(), SupremicaProperties.synthesisMaximallyPermissive());
 	}
 
 	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive)
@@ -93,7 +93,7 @@ public final class SynthesizerOptions
 	{
 		synthesisType = type;
 
-		WorkbenchProperties.setSynthesisSynthesisType(type);
+		SupremicaProperties.setSynthesisSynthesisType(type);
 	}
 
 	public SynthesisType getSynthesisType()
@@ -105,7 +105,7 @@ public final class SynthesizerOptions
 	{
 		synthesisAlgorithm = algorithm;
 
-		WorkbenchProperties.setSynthesisAlgorithmType(algorithm);
+		SupremicaProperties.setSynthesisAlgorithmType(algorithm);
 	}
 
 	public SynthesisAlgorithm getSynthesisAlgorithm()
@@ -117,7 +117,7 @@ public final class SynthesizerOptions
 	{
 		purge = bool;
 
-		WorkbenchProperties.setSynthesisPurge(bool);
+		SupremicaProperties.setSynthesisPurge(bool);
 	}
 
 	public boolean doPurge()
@@ -129,7 +129,7 @@ public final class SynthesizerOptions
 	{
 		optimize = bool;
 
-		WorkbenchProperties.setSynthesisOptimize(bool);
+		SupremicaProperties.setSynthesisOptimize(bool);
 	}
 
 	public boolean getOptimize()
@@ -141,7 +141,7 @@ public final class SynthesizerOptions
 	{
 		maximallyPermissive = bool;
 
-		WorkbenchProperties.setSynthesisMaximallyPermissive(bool);
+		SupremicaProperties.setSynthesisMaximallyPermissive(bool);
 	}
 
 	public boolean getMaximallyPermissive()

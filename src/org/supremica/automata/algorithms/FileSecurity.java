@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 import org.supremica.automata.Automata;
 
@@ -57,7 +58,7 @@ public class FileSecurity
 {
 	private Set superUsers = new HashSet();
 	private String currentUser = null;
-	private final static String superuserIdentity = WorkbenchProperties.getSuperuserIdentity();
+	private final static String superuserIdentity = SupremicaProperties.getSuperuserIdentity();
 
 	public FileSecurity()
 	{
@@ -93,7 +94,7 @@ public class FileSecurity
 			return true;
 		}
 
-		if (!WorkbenchProperties.generalUseSecurity())
+		if (!SupremicaProperties.generalUseSecurity())
 		{
 			return true;
 		}
@@ -132,6 +133,6 @@ public class FileSecurity
 
 	public boolean allowSuperUserLogin()
 	{
-		return WorkbenchProperties.allowSuperUserLogin();
+		return SupremicaProperties.allowSuperUserLogin();
 	}
 }

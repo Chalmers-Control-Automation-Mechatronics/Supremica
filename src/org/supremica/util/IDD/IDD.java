@@ -52,11 +52,11 @@ package org.supremica.util.IDD;
 import java.util.*;
 import java.io.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 
 public final class IDD
 {
-	private static Category thisCategory = LogDisplay.createCategory(IDD.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(IDD.class);
 	private final int nbrOfLevels;
 	private final int[] nbrOfBranches;
 	private final List[] theNodes;

@@ -50,11 +50,12 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
+import org.supremica.properties.SupremicaProperties;
 
 public final class SynchronizationOptions
 {
-	private static Category thisCategory = LogDisplay.createCategory(SynchronizationOptions.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
 	private final SynchronizationType syncType;
 	private final boolean forbidUnconStates;
 	private final boolean expandForbiddenStates;
@@ -69,7 +70,7 @@ public final class SynchronizationOptions
 	public SynchronizationOptions()
 		throws Exception
 	{
-		this(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), WorkbenchProperties.syncForbidUncontrollableStates(), WorkbenchProperties.syncExpandForbiddenStates(), false, false, true, WorkbenchProperties.verboseMode());
+		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode());
 	}
 
 	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode)

@@ -47,7 +47,7 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.gui;
+package org.supremica.log;
 
 import java.awt.Color;
 import java.awt.Image;
@@ -73,9 +73,8 @@ import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.Loader;
 import org.apache.log4j.helpers.QuietWriter;
-
-// import org.apache.log4j.helpers.TracerPrintWriter;
 import org.apache.log4j.helpers.OptionConverter;
+import org.supremica.gui.*;
 
 public class LogDisplay
 	extends AppenderSkeleton

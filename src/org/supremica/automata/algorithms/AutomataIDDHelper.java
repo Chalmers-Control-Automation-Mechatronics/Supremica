@@ -52,7 +52,7 @@ package org.supremica.automata.algorithms;
 import org.supremica.util.*;
 import org.supremica.gui.*;
 import org.supremica.util.IDD.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
@@ -63,7 +63,7 @@ import org.supremica.automata.EventsSet;
 
 public final class AutomataIDDHelper
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerHelper.class);
 	private AutomataIndexForm theAutomataIndexForm;
 	private Automata theAutomata;
 	private Automaton theAutomaton;
@@ -107,7 +107,7 @@ public final class AutomataIDDHelper
 		}
 		catch (Exception e)
 		{
-			thisCategory.error("Error while generating union alphabet: " + e);
+			logger.error("Error while generating union alphabet: " + e);
 
 			throw e;
 		}
@@ -118,7 +118,7 @@ public final class AutomataIDDHelper
 		}
 		catch (Exception e)
 		{
-			thisCategory.error("Error while computing AutomataIndexForm");
+			logger.error("Error while computing AutomataIndexForm");
 
 			throw e;
 		}

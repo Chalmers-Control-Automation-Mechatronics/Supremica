@@ -50,13 +50,14 @@
 package org.supremica.gui;
 
 import org.supremica.automata.algorithms.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import att.grappa.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
@@ -76,12 +77,12 @@ public class AutomatonViewer
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private boolean updateNeeded = false;
-	private JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout Left to right", WorkbenchProperties.isDotLeftToRight());
-	private JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", WorkbenchProperties.isDotWithCircles());
-	private JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", WorkbenchProperties.isDotWithStateLabels());
-	private JCheckBoxMenuItem useColorsCheckBox = new JCheckBoxMenuItem("Draw colors", WorkbenchProperties.isDotUseColors());
-	private JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", WorkbenchProperties.isDotAutomaticUpdate());
-	private static Category thisCategory = LogDisplay.createCategory(AutomatonViewer.class.getName());
+	private JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout Left to right", SupremicaProperties.isDotLeftToRight());
+	private JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", SupremicaProperties.isDotWithCircles());
+	private JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", SupremicaProperties.isDotWithStateLabels());
+	private JCheckBoxMenuItem useColorsCheckBox = new JCheckBoxMenuItem("Draw colors", SupremicaProperties.isDotUseColors());
+	private JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", SupremicaProperties.isDotAutomaticUpdate());
+	private static Logger logger = LoggerFactory.createLogger(AutomatonViewer.class);
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5, MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
 
@@ -140,7 +141,7 @@ public class AutomatonViewer
 		}
 		catch (Exception e)
 		{
-			thisCategory.error("Error while displaying " + theAutomaton.getName());
+			logger.error("Error while displaying " + theAutomaton.getName());
 		}
 	}
 
@@ -157,7 +158,7 @@ public class AutomatonViewer
 			}
 			catch (Exception e)
 			{
-				thisCategory.error("Error while displaying " + theAutomaton.getName());
+				logger.error("Error while displaying " + theAutomaton.getName());
 			}
 		}
 	}
@@ -365,7 +366,7 @@ public class AutomatonViewer
 			}
 			catch (Exception e)
 			{
-				thisCategory.error("Error while viewing " + theAutomaton.getName() + "\n");
+				logger.error("Error while viewing " + theAutomaton.getName() + "\n");
 			}
 		}
 	}
@@ -406,7 +407,7 @@ public class AutomatonViewer
 		}
 		catch (Exception ex)
 		{
-			thisCategory.error("Exception while serializing automaton", ex);
+			logger.error("Exception while serializing automaton", ex);
 
 			return;
 		}
@@ -424,7 +425,7 @@ public class AutomatonViewer
 		}
 		catch (Exception ex)
 		{
-			thisCategory.error("Exception while parsing dot file", ex);
+			logger.error("Exception while parsing dot file", ex);
 
 			throw ex;
 		}
@@ -439,7 +440,7 @@ public class AutomatonViewer
 		}
 		catch (Exception ex)
 		{
-			thisCategory.error("Exception while getting dot graph", ex);
+			logger.error("Exception while getting dot graph", ex);
 
 			throw ex;
 		}
@@ -448,14 +449,14 @@ public class AutomatonViewer
 	public void draw()
 	{
 
-		// thisCategory.debug("Before creating panel");
+		// logger.debug("Before creating panel");
 		// theGraph.printGraph(System.err);
 		automatonPanel = new GrappaPanel(theGraph);
 
 		automatonPanel.setScaleToFit(false);
 		automatonPanel.multiplyScaleFactor(scaleFactor);
 
-		// thisCategory.debug("After creating panel");
+		// logger.debug("After creating panel");
 		JScrollPane scrollPanel = new JScrollPane(automatonPanel);
 		JViewport vp = scrollPanel.getViewport();
 
@@ -482,11 +483,11 @@ public class AutomatonViewer
 
 		try
 		{
-			dotProcess = Runtime.getRuntime().exec(WorkbenchProperties.getDotExecuteCommand() + " " + arguments);
+			dotProcess = Runtime.getRuntime().exec(SupremicaProperties.getDotExecuteCommand() + " " + arguments);
 		}
 		catch (IOException ex)
 		{
-			thisCategory.error("Cannot run dot. Make sure dot is in the path.");
+			logger.error("Cannot run dot. Make sure dot is in the path.");
 
 			throw ex;
 		}
@@ -590,7 +591,7 @@ public class AutomatonViewer
 					}
 					catch (Exception ex)
 					{
-						thisCategory.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
+						logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
 
 						return;
 					}
@@ -607,7 +608,7 @@ class Builder
 	private final static int BUILD = 1;
 	private final static int DRAW = 2;
 	private int mode = BUILD;
-	private static Category thisCategory = LogDisplay.createCategory(Builder.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(Builder.class);
 
 	public Builder(AutomatonViewer theViewer)
 	{
@@ -624,7 +625,7 @@ class Builder
 			}
 			catch (Exception ex)
 			{
-				thisCategory.error("Cannot display the automaton.");
+				logger.error("Cannot display the automaton.");
 
 				return;
 			}

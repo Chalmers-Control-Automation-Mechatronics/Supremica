@@ -51,14 +51,14 @@ package org.supremica.automata.algorithms;
 
 // Skräp
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Hashtable;
 
 public final class StateMemorizer
 {    // Skräp
-	private static Category thisCategory = LogDisplay.createCategory(StateMemorizer.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(StateMemorizer.class);
 
 	private class HashtableHolder
 	{

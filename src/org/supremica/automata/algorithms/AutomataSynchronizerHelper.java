@@ -51,7 +51,7 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
@@ -72,7 +72,7 @@ public final class AutomataSynchronizerHelper
 {
 	private AutomataIndexForm theAutomataIndexForm;
 	private IntArrayHashTable theStates;
-	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerHelper.class);
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
 
@@ -144,7 +144,7 @@ public final class AutomataSynchronizerHelper
 		}
 		catch (Exception e)
 		{
-			thisCategory.error("Error while computing AutomataIndexForm");
+			logger.error("Error while computing AutomataIndexForm");
 
 			throw e;
 		}
@@ -259,7 +259,7 @@ public final class AutomataSynchronizerHelper
 
 					if (stateTrace.size() == 0)
 					{
-						thisCategory.error("Error when recording trace.");
+						logger.error("Error when recording trace.");
 					}
 
 					fromStateList.removeLast();
@@ -315,7 +315,7 @@ public final class AutomataSynchronizerHelper
 
 			/*
 			 *  if (verboseMode && helperData.getNbrOfAddedStates() % 10000 == 0)
-			 *  thisCategory.debug(nbrOfAddedStates + " new states found so far.");
+			 *  logger.debug(nbrOfAddedStates + " new states found so far.");
 			 */
 		}
 		else
@@ -341,7 +341,7 @@ public final class AutomataSynchronizerHelper
 
 			/*
 			 *  if (verboseMode && helperData.getNbrOfCheckedStates() % 10000 == 0)
-			 *  thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
+			 *  logger.debug(nbrOfCheckedStates + " states checked so far.");
 			 */
 		}
 	}
@@ -541,10 +541,10 @@ public final class AutomataSynchronizerHelper
 	public void displayInfo()
 	{
 
-		// thisCategory.info("During the execution, " + helperData.getNbrOfCheckedStates() + " states were examined.");
-		// thisCategory.info("During the execution, " + helperData.getNbrOfAddedStates() + " new states were found.");
-		thisCategory.info("During the execution, " + helperData.nbrOfCheckedStates + " states were examined.");
-		thisCategory.info("During the execution, " + helperData.nbrOfAddedStates + " new states were found.");
+		// logger.info("During the execution, " + helperData.getNbrOfCheckedStates() + " states were examined.");
+		// logger.info("During the execution, " + helperData.getNbrOfAddedStates() + " new states were found.");
+		logger.info("During the execution, " + helperData.nbrOfCheckedStates + " states were examined.");
+		logger.info("During the execution, " + helperData.nbrOfAddedStates + " new states were found.");
 	}
 
 	/**
@@ -595,7 +595,7 @@ public final class AutomataSynchronizerHelper
 		 *  {
 		 *  int index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
 		 *  if (index >= 0)
-		 *  { // thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
+		 *  { // logger.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
 		 *  trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
 		 *  if (j != stateTrace.size() - 1)
 		 *  {
@@ -603,7 +603,7 @@ public final class AutomataSynchronizerHelper
 		 *  }
 		 *  if (j > i+1)
 		 *  {
-		 *  thisCategory.debug("Shortcut found from state number " + i + " to state number " + j + ".");
+		 *  logger.debug("Shortcut found from state number " + i + " to state number " + j + ".");
 		 *  }
 		 *  i = j-1;
 		 *  break;
@@ -615,18 +615,18 @@ public final class AutomataSynchronizerHelper
 		 *  }
 		 *  }
 		 */
-		thisCategory.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
+		logger.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
 
 		/*
-		 *  thisCategory.error("And again...");
+		 *  logger.error("And again...");
 		 *
 		 *  while (stateTrace.size() > 1)
 		 *  {
 		 *  index = executer.findTransition((int[]) stateTrace.removeFirst(), (int[]) stateTrace.getFirst());
 		 *  if (index >= 0)
-		 *  thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
+		 *  logger.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
 		 *  else
-		 *  thisCategory.error("Possible error?");
+		 *  logger.error("Possible error?");
 		 *  }
 		 */
 	}
@@ -708,7 +708,7 @@ public final class AutomataSynchronizerHelper
 
 			String reason = "the uncontrollable event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + " in the plant " + problemAutomaton.getName() + " is enabled.";
 
-			thisCategory.error("The state: " + state.toString() + " is uncontrollable since " + reason);
+			logger.error("The state: " + state.toString() + " is uncontrollable since " + reason);
 		}
 	}
 
@@ -801,7 +801,7 @@ public final class AutomataSynchronizerHelper
 	 *  catch (Exception e)
 	 *  {
 	 *  System.err.println("Error while generating union alphabet: " + e);
-	 *  thisCategory.error("Error while generating union alphabet: " + e);
+	 *  logger.error("Error while generating union alphabet: " + e);
 	 *  throw e;
 	 *  }
 	 *  }

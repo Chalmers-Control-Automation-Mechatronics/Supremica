@@ -52,13 +52,14 @@ package org.supremica.apps;
 import java.io.*;
 import java.awt.*;
 import javax.swing.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.gui.*;
+import org.supremica.properties.SupremicaProperties;
 
 public class SupremicaApplet
 	extends JApplet
 {
-	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(org.supremica.gui.Supremica.class);
 	private org.supremica.gui.Supremica workbench;
 	private SplashWindow splash;
 
@@ -73,14 +74,14 @@ public class SupremicaApplet
 
 	private void setProperties()
 	{
-		WorkbenchProperties.setFileAllowOpen(false);
-		WorkbenchProperties.setFileAllowSave(false);
-		WorkbenchProperties.setFileAllowImport(false);
-		WorkbenchProperties.setFileAllowExport(false);
-		WorkbenchProperties.setFileAllowQuit(false);
-		WorkbenchProperties.setFileAllowExport(false);
-		WorkbenchProperties.setXmlRpcActive(false);
-		WorkbenchProperties.setUseDot(false);
+		SupremicaProperties.setFileAllowOpen(false);
+		SupremicaProperties.setFileAllowSave(false);
+		SupremicaProperties.setFileAllowImport(false);
+		SupremicaProperties.setFileAllowExport(false);
+		SupremicaProperties.setFileAllowQuit(false);
+		SupremicaProperties.setFileAllowExport(false);
+		SupremicaProperties.setXmlRpcActive(false);
+		SupremicaProperties.setUseDot(false);
 	}
 
 	public void init()

@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.apache.log4j.Category;
+import org.supremica.log.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.SearchStates;
 
@@ -75,11 +75,11 @@ class PresentStatesTable
 class PresentStatesFrame
 	extends JFrame
 {
-	private static Category thisCategory = LogDisplay.createCategory(PresentStatesFrame.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
 
 	private static void debug(String s)
 	{
-		thisCategory.debug(s);
+		logger.debug(s);
 	}
 
 	private JButton setDefaultButton(JButton b)
@@ -132,7 +132,7 @@ class PresentStatesFrame
 	}
 }
 
-// 
+//
 class NoStatesFoundFrame
 	extends JFrame
 {
@@ -147,7 +147,7 @@ class NoStatesFoundFrame
 	}
 }
 
-// 
+//
 class UserInterruptFrame
 	extends JFrame
 {
@@ -158,7 +158,7 @@ class UserInterruptFrame
 	}
 }
 
-// 
+//
 public class PresentStates
 {
 	private JFrame frame = null;

@@ -54,6 +54,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
+import org.supremica.properties.SupremicaProperties;
 
 public class PreferencesDialog
 	extends JDialog
@@ -87,7 +88,7 @@ public class PreferencesDialog
 
 		theTabbedPanel.add("Communication", theCommunicationPanel);
 
-		if (WorkbenchProperties.fileAllowOpen() || WorkbenchProperties.fileAllowSave())
+		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
 		{
 			theFilePanel = new FilePanel(this);
 
@@ -254,16 +255,16 @@ class FilePanel
 
 	public boolean doApply()
 	{
-		WorkbenchProperties.setFileOpenPath(fileOpenPath.getText());
-		WorkbenchProperties.setFileSavePath(fileSavePath.getText());
+		SupremicaProperties.setFileOpenPath(fileOpenPath.getText());
+		SupremicaProperties.setFileSavePath(fileSavePath.getText());
 
 		return true;
 	}
 
 	public void update()
 	{
-		fileOpenPath.setText(WorkbenchProperties.getFileOpenPath());
-		fileSavePath.setText(WorkbenchProperties.getFileSavePath());
+		fileOpenPath.setText(SupremicaProperties.getFileOpenPath());
+		fileSavePath.setText(SupremicaProperties.getFileSavePath());
 	}
 }
 
@@ -297,7 +298,7 @@ class CommunicationPanel
 
 	public boolean doApply()
 	{
-		WorkbenchProperties.setXmlRpcActive(useXmlRpc.isSelected());
+		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
 
 		int port = theDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
 
@@ -306,15 +307,15 @@ class CommunicationPanel
 			return false;
 		}
 
-		WorkbenchProperties.setXmlRpcPort(port);
+		SupremicaProperties.setXmlRpcPort(port);
 
 		return true;
 	}
 
 	public void update()
 	{
-		useXmlRpc.setSelected(WorkbenchProperties.isXmlRpcActive());
-		xmlRpcPort.setText(Integer.toString(WorkbenchProperties.getXmlRpcPort()));
+		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
+		xmlRpcPort.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
 	}
 }
 
@@ -377,12 +378,12 @@ class LayoutPanel
 
 	public boolean doApply()
 	{
-		WorkbenchProperties.setDotLeftToRight(dotLeftToRight.isSelected());
-		WorkbenchProperties.setDotWithStateLabels(dotWithStateLabels.isSelected());
-		WorkbenchProperties.setDotWithCircles(dotWithCircles.isSelected());
-		WorkbenchProperties.setDotUseColors(dotUseColors.isSelected());
-		WorkbenchProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
-		WorkbenchProperties.setDotExecuteCommand(dotCommand.getText());
+		SupremicaProperties.setDotLeftToRight(dotLeftToRight.isSelected());
+		SupremicaProperties.setDotWithStateLabels(dotWithStateLabels.isSelected());
+		SupremicaProperties.setDotWithCircles(dotWithCircles.isSelected());
+		SupremicaProperties.setDotUseColors(dotUseColors.isSelected());
+		SupremicaProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
+		SupremicaProperties.setDotExecuteCommand(dotCommand.getText());
 
 		int maxNbrOfStates = theDialog.getInt("Max number of states without warning", dotMaxNbrOfStates.getText(), 0);
 
@@ -391,20 +392,20 @@ class LayoutPanel
 			return false;
 		}
 
-		WorkbenchProperties.setDotMaxNbrOfStatesWithoutWarning(maxNbrOfStates);
+		SupremicaProperties.setDotMaxNbrOfStatesWithoutWarning(maxNbrOfStates);
 
 		return true;
 	}
 
 	public void update()
 	{
-		dotLeftToRight.setSelected(WorkbenchProperties.isDotLeftToRight());
-		dotWithStateLabels.setSelected(WorkbenchProperties.isDotWithStateLabels());
-		dotWithCircles.setSelected(WorkbenchProperties.isDotWithCircles());
-		dotUseColors.setSelected(WorkbenchProperties.isDotUseColors());
-		dotUseMultipleLabels.setSelected(WorkbenchProperties.isDotUseMultipleLabels());
-		dotCommand.setText(WorkbenchProperties.getDotExecuteCommand());
-		dotMaxNbrOfStates.setText(Integer.toString(WorkbenchProperties.getDotMaxNbrOfStatesWithoutWarning()));
+		dotLeftToRight.setSelected(SupremicaProperties.isDotLeftToRight());
+		dotWithStateLabels.setSelected(SupremicaProperties.isDotWithStateLabels());
+		dotWithCircles.setSelected(SupremicaProperties.isDotWithCircles());
+		dotUseColors.setSelected(SupremicaProperties.isDotUseColors());
+		dotUseMultipleLabels.setSelected(SupremicaProperties.isDotUseMultipleLabels());
+		dotCommand.setText(SupremicaProperties.getDotExecuteCommand());
+		dotMaxNbrOfStates.setText(Integer.toString(SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning()));
 	}
 }
 
@@ -462,10 +463,10 @@ class SynchronizationPanel
 
 	public boolean doApply()
 	{
-		WorkbenchProperties.setSyncForbidUncontrollableStates(forbidUncontrollableStates.isSelected());
-		WorkbenchProperties.setSyncExpandForbiddenStates(expandForbiddenStates.isSelected());
-		WorkbenchProperties.setSyncExpandHashtable(expandHashtable.isSelected());
-		WorkbenchProperties.setVerboseMode(verboseMode.isSelected());
+		SupremicaProperties.setSyncForbidUncontrollableStates(forbidUncontrollableStates.isSelected());
+		SupremicaProperties.setSyncExpandForbiddenStates(expandForbiddenStates.isSelected());
+		SupremicaProperties.setSyncExpandHashtable(expandHashtable.isSelected());
+		SupremicaProperties.setVerboseMode(verboseMode.isSelected());
 
 		int size = theDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
 
@@ -474,7 +475,7 @@ class SynchronizationPanel
 			return false;
 		}
 
-		WorkbenchProperties.setSyncInitialHashtableSize(size);
+		SupremicaProperties.setSyncInitialHashtableSize(size);
 
 		int nbrOfThreads = theDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
 
@@ -483,19 +484,19 @@ class SynchronizationPanel
 			return false;
 		}
 
-		WorkbenchProperties.setSyncNbrOfExecuters(nbrOfThreads);
+		SupremicaProperties.setSyncNbrOfExecuters(nbrOfThreads);
 
 		return true;
 	}
 
 	public void update()
 	{
-		forbidUncontrollableStates.setSelected(WorkbenchProperties.syncForbidUncontrollableStates());
-		expandForbiddenStates.setSelected(WorkbenchProperties.syncExpandForbiddenStates());
-		expandHashtable.setSelected(WorkbenchProperties.syncExpandHashtable());
-		verboseMode.setSelected(WorkbenchProperties.verboseMode());
-		hashtableSize.setText(Integer.toString(WorkbenchProperties.syncInitialHashtableSize()));
-		nbrOfExecuters.setText(Integer.toString(WorkbenchProperties.syncNbrOfExecuters()));
+		forbidUncontrollableStates.setSelected(SupremicaProperties.syncForbidUncontrollableStates());
+		expandForbiddenStates.setSelected(SupremicaProperties.syncExpandForbiddenStates());
+		expandHashtable.setSelected(SupremicaProperties.syncExpandHashtable());
+		verboseMode.setSelected(SupremicaProperties.verboseMode());
+		hashtableSize.setText(Integer.toString(SupremicaProperties.syncInitialHashtableSize()));
+		nbrOfExecuters.setText(Integer.toString(SupremicaProperties.syncNbrOfExecuters()));
 	}
 }
 

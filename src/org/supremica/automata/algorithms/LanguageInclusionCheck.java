@@ -53,7 +53,7 @@ import java.util.*;
 import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -70,7 +70,7 @@ import org.supremica.automata.EventLabel;
  */
 public class LanguageInclusionCheck
 {
-	private static Category thisCategory = LogDisplay.createCategory(LanguageInclusionCheck.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(LanguageInclusionCheck.class);
 	private Automata AutomataA;
 	private Automata AutomataB;
 	private SynchronizationOptions syncOptions;

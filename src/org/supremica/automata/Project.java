@@ -51,7 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.gui.*;
 
 /**
@@ -61,7 +61,7 @@ import org.supremica.gui.*;
 public class Project
 	extends Automata
 {
-	private static Category thisCategory = LogDisplay.createCategory(Project.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(Project.class);
 	private AutomatonContainer theContainer = null;
 
 	public Project()
@@ -81,7 +81,7 @@ public class Project
 		}
 		catch (Exception e)
 		{
-			thisCategory.error("Error while copying project");
+			logger.error("Error while copying project");
 		}
 	}
 

@@ -56,7 +56,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import javax.help.*;
 import org.supremica.*;
 import org.supremica.automata.algorithms.*;
@@ -64,6 +64,7 @@ import org.supremica.automata.templates.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonContainer;
@@ -88,7 +89,7 @@ public class Supremica
 	private MenuHandler menuHandler;
 
 	// MF -- made publically available
-	private static Category thisCategory = LogDisplay.createCategory(Supremica.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(Supremica.class);
 	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JSplitPane splitPaneVertical;
 	private Server xmlRpcServer = null;
@@ -113,26 +114,26 @@ public class Supremica
 	{
 		theAutomatonContainer = new AutomatonContainer(this);
 
-		thisCategory.info("Supremica version: " + (new Version()).toString());
+		logger.info("Supremica version: " + (new Version()).toString());
 
-		if (WorkbenchProperties.isXmlRpcActive())
+		if (SupremicaProperties.isXmlRpcActive())
 		{
 			boolean serverStarted = true;
 
 			try
 			{
-				xmlRpcServer = new Server(theAutomatonContainer, WorkbenchProperties.getXmlRpcPort());
+				xmlRpcServer = new Server(theAutomatonContainer, SupremicaProperties.getXmlRpcPort());
 			}
 			catch (Exception e)
 			{
 				serverStarted = false;
 
-				thisCategory.warn("Another server already running on port " + WorkbenchProperties.getXmlRpcPort() + ". XML-RPC server not started!");
+				logger.warn("Another server already running on port " + SupremicaProperties.getXmlRpcPort() + ". XML-RPC server not started!");
 			}
 
 			if (serverStarted)
 			{
-				thisCategory.info("XML-RPC server running on port " + WorkbenchProperties.getXmlRpcPort());
+				logger.info("XML-RPC server running on port " + SupremicaProperties.getXmlRpcPort());
 			}
 		}
 
@@ -214,13 +215,14 @@ public class Supremica
 		// --------------------------------------//
 	}
 
-	// MF -- added to allow a single commandline arg
 	public Supremica(String arg)
 	{
 		this();
 
-		// this calls the default constructor(?)
-		openAutomataXMLFile(new File(arg));
+		if (arg != null)
+		{
+			openAutomataXMLFile(new File(arg));
+		}
 	}
 
 	private JFrame getCurrentFrame()
@@ -348,7 +350,7 @@ public class Supremica
 			}
 		}
 
-		if (WorkbenchProperties.fileAllowOpen())
+		if (SupremicaProperties.fileAllowOpen())
 		{
 
 			// File.Open
@@ -367,7 +369,7 @@ public class Supremica
 			separatorNeeded = true;
 		}
 
-		if (WorkbenchProperties.fileAllowSave())
+		if (SupremicaProperties.fileAllowSave())
 		{
 
 			// File.Save
@@ -407,7 +409,7 @@ public class Supremica
 			separatorNeeded = false;
 		}
 
-		if (WorkbenchProperties.fileAllowImport())
+		if (SupremicaProperties.fileAllowImport())
 		{
 
 			// File.Import
@@ -475,7 +477,7 @@ public class Supremica
 			separatorNeeded = true;
 		}
 
-		if (WorkbenchProperties.fileAllowExport())
+		if (SupremicaProperties.fileAllowExport())
 		{
 
 			// File.Export
@@ -566,7 +568,7 @@ public class Supremica
 			separatorNeeded = false;
 		}
 
-		if (WorkbenchProperties.generalUseSecurity())
+		if (SupremicaProperties.generalUseSecurity())
 		{
 
 			// File.Login
@@ -592,7 +594,7 @@ public class Supremica
 			separatorNeeded = false;
 		}
 
-		if (WorkbenchProperties.fileAllowQuit())
+		if (SupremicaProperties.fileAllowQuit())
 		{
 
 			// File.Exit
@@ -674,7 +676,7 @@ public class Supremica
 		});
 
 		// Tools.AutomataEditor
-		if (WorkbenchProperties.includeEditor())
+		if (SupremicaProperties.includeEditor())
 		{
 			menuTools.add(new JSeparator());
 
@@ -789,7 +791,7 @@ public class Supremica
 	{
 		Insets tmpInsets = new Insets(0, 0, 0, 0);
 
-		if (WorkbenchProperties.fileAllowOpen())
+		if (SupremicaProperties.fileAllowOpen())
 		{
 
 			// Create buttons
@@ -811,7 +813,7 @@ public class Supremica
 			toolBar.add(openButton, "WEST");
 		}
 
-		if (WorkbenchProperties.fileAllowSave())
+		if (SupremicaProperties.fileAllowSave())
 		{
 			JButton saveButton = new JButton();
 
@@ -882,22 +884,22 @@ public class Supremica
 	// ** MF ** Implementation of Gui stuff
 	public void error(String msg)
 	{
-		thisCategory.error(msg);
+		logger.error(msg);
 	}
 
 	public void error(String msg, Throwable t)
 	{
-		thisCategory.error(msg, t);
+		logger.error(msg, t);
 	}
 
 	public void info(String msg)
 	{
-		thisCategory.info(msg);
+		logger.info(msg);
 	}
 
 	public void debug(String msg)
 	{
-		thisCategory.debug(msg);
+		logger.debug(msg);
 	}
 
 	public void clearSelection()
@@ -942,7 +944,7 @@ public class Supremica
 			}
 			catch (Exception ex)
 			{
-				thisCategory.error("Trying to get an automaton that does not exist. Index: " + i);
+				logger.error("Trying to get an automaton that does not exist. Index: " + i);
 			}
 		}
 
@@ -966,7 +968,7 @@ public class Supremica
 			}
 			catch (Exception ex)
 			{
-				thisCategory.error("Trying to get an automaton that does not exist. Index: " + i);
+				logger.error("Trying to get an automaton that does not exist. Index: " + i);
 			}
 		}
 
@@ -1114,7 +1116,7 @@ public class Supremica
 	{
 		Automata currAutomata = null;
 
-		thisCategory.info("Opening " + file.getAbsolutePath() + " ...");
+		logger.info("Opening " + file.getAbsolutePath() + " ...");
 
 		try
 		{
@@ -1124,7 +1126,7 @@ public class Supremica
 		{
 
 			// this exception is caught while opening
-			thisCategory.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
+			logger.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
 
 			return;
 		}
@@ -1135,11 +1137,11 @@ public class Supremica
 		{
 			int nbrOfAddedAutomata = addAutomata(currAutomata);
 
-			thisCategory.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
+			logger.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
 		}
 		catch (Exception excp)
 		{
-			thisCategory.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
+			logger.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
 
 			return;
 		}
@@ -1151,7 +1153,7 @@ public class Supremica
 			if (projectName != null)
 			{
 				theAutomatonContainer.setProjectName(projectName);
-				thisCategory.info("Project name changed to \"" + projectName + "\"");
+				logger.info("Project name changed to \"" + projectName + "\"");
 				theAutomatonContainer.updateFrameTitles();
 			}
 		}
@@ -1173,7 +1175,7 @@ public class Supremica
 
 	public void importValidFile(File file)
 	{
-		thisCategory.info("Importing " + file.getAbsolutePath() + " ...");
+		logger.info("Importing " + file.getAbsolutePath() + " ...");
 
 		// int nbrOfAddedAutomata = 0;
 		try
@@ -1181,11 +1183,11 @@ public class Supremica
 			Automata currAutomata = AutomataBuildFromVALID.build(file);
 			int nbrOfAddedAutomata = addAutomata(currAutomata);
 
-			thisCategory.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+			logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		}
 		catch (Exception e)
 		{
-			thisCategory.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
+			logger.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
 
 			return;
 		}
@@ -1283,7 +1285,7 @@ public class Supremica
 		{
 
 			// should never occur, we test for this condition already
-			thisCategory.error("Error while adding: " + excp.getMessage());
+			logger.error("Error while adding: " + excp.getMessage());
 		}
 
 		return true;

@@ -53,7 +53,7 @@ import java.util.*;
 import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -73,7 +73,7 @@ import org.supremica.automata.EventLabel;
 public class AutomataVerifier
 	implements Stoppable
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataVerifier.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataVerifier.class);
 	private Automata theAutomata;
 	private int nbrOfExecuters;
 
@@ -172,7 +172,7 @@ public class AutomataVerifier
 		{
 
 			// IDD...
-			thisCategory.error("Option not implemented...");
+			logger.error("Option not implemented...");
 
 			return false;
 		}
@@ -180,7 +180,7 @@ public class AutomataVerifier
 		{
 
 			// Error...
-			thisCategory.error("Unavailable option chosen.");
+			logger.error("Unavailable option chosen.");
 
 			return false;
 		}
@@ -323,7 +323,7 @@ public class AutomataVerifier
 		// loop finished.
 		if (failure)
 		{
-			thisCategory.error("Supremica's modular verification algorithm can't solve this problem. Try the monolithic algorithm instead. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this system uncontrollable.");
+			logger.error("Supremica's modular verification algorithm can't solve this problem. Try the monolithic algorithm instead. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this system uncontrollable.");
 		}
 
 		return allModulesControllable;
@@ -406,7 +406,7 @@ public class AutomataVerifier
 
 			if (verboseMode)
 			{
-				thisCategory.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
+				logger.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
 			}
 
 			// Sort automata in order of similar alphabets
@@ -433,7 +433,7 @@ public class AutomataVerifier
 
 			if (verboseMode)
 			{
-				thisCategory.info("There are " + similarAutomata.length + " automata with similar alphabets...");
+				logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			}
 
 			stateAmount = 1;
@@ -444,7 +444,7 @@ public class AutomataVerifier
 				// Make five attempts on prooving controllability and uncontrollability
 				if (verboseMode)
 				{
-					thisCategory.info("Attempt number " + attempt + ".");
+					logger.info("Attempt number " + attempt + ".");
 				}
 
 				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
@@ -458,7 +458,7 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							thisCategory.info("All similar automata are already added, trying to add some more...");
+							logger.info("All similar automata are already added, trying to add some more...");
 						}
 
 						System.arraycopy(similarAutomata, 0, newSimilarAutomata, 0, similarAutomata.length);
@@ -470,7 +470,7 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							thisCategory.info("All similar automata are already added, no chance for controllability.");
+							logger.info("All similar automata are already added, no chance for controllability.");
 
 							// Print the uncontrollable state(s)...
 							synchHelper.printUncontrollableStates();
@@ -498,7 +498,7 @@ public class AutomataVerifier
 				{
 					if (verboseMode)
 					{
-						thisCategory.info("Couldn't proove controllability, trying to proove uncontrollability...");
+						logger.info("Couldn't proove controllability, trying to proove uncontrollability...");
 					}
 
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
@@ -529,7 +529,7 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							thisCategory.info("Skipped uncontrollability check!");
+							logger.info("Skipped uncontrollability check!");
 						}
 					}
 				}
@@ -537,7 +537,7 @@ public class AutomataVerifier
 				{
 
 					// All uncontrollable states were removed!
-					// thisCategory.info("The supervisor " + ((Automaton) selectedAutomata.get(0)).getName() + " was found to be controllable afterall!");
+					// logger.info("The supervisor " + ((Automaton) selectedAutomata.get(0)).getName() + " was found to be controllable afterall!");
 					break;
 				}
 			}
@@ -551,7 +551,7 @@ public class AutomataVerifier
 				// Print remaining suspected uncontrollable state(s)
 				if (verboseMode)
 				{
-					thisCategory.info("Unfortunately the following states might be uncontrollable...");
+					logger.info("Unfortunately the following states might be uncontrollable...");
 					synchHelper.printUncontrollableStates(automataIndices);
 				}
 
@@ -564,7 +564,7 @@ public class AutomataVerifier
 		// Nothing bad has happened. Very nice!
 		if (verboseMode)
 		{
-			thisCategory.info(automataNames + "is controllable.");
+			logger.info(automataNames + "is controllable.");
 		}
 
 		return true;
@@ -771,7 +771,7 @@ public class AutomataVerifier
 
 		if (verboseMode)
 		{
-			thisCategory.info("stateAmountLimit: " + stateAmountLimit + ".");
+			logger.info("stateAmountLimit: " + stateAmountLimit + ".");
 		}
 
 		synchHelper.clear();
@@ -844,7 +844,7 @@ public class AutomataVerifier
 
 				if (verboseMode)
 				{
-					thisCategory.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
+					logger.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 				}
 
 				stateAmount = stateCount;
@@ -861,7 +861,7 @@ public class AutomataVerifier
 				{
 					if (verboseMode)
 					{
-						thisCategory.info("No uncontrollable states left after adding" + addedAutomata + ", this subsystem is controllable.");
+						logger.info("No uncontrollable states left after adding" + addedAutomata + ", this subsystem is controllable.");
 					}
 
 					return;
@@ -870,14 +870,14 @@ public class AutomataVerifier
 				{
 					if (verboseMode)
 					{
-						thisCategory.info("Still one state left after adding" + addedAutomata + ".");
+						logger.info("Still one state left after adding" + addedAutomata + ".");
 					}
 				}
 				else
 				{
 					if (verboseMode)
 					{
-						thisCategory.info("Still " + statesLeft + " states left after adding" + addedAutomata + ".");
+						logger.info("Still " + statesLeft + " states left after adding" + addedAutomata + ".");
 					}
 				}
 

@@ -60,6 +60,7 @@ import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
 import org.supremica.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
@@ -768,7 +769,7 @@ public class ActionMan
 
 		try
 		{
-			syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), WorkbenchProperties.syncForbidUncontrollableStates(), WorkbenchProperties.syncExpandForbiddenStates(), false, false, true, WorkbenchProperties.verboseMode());
+			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode());
 		}
 		catch (Exception ex)
 		{
@@ -809,10 +810,10 @@ public class ActionMan
 
 			try
 			{
-				syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), true,
+				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), true,
 
-				// WorkbenchProperties.syncForbidUncontrollableStates(),
-				WorkbenchProperties.syncExpandForbiddenStates(), false, false, true, WorkbenchProperties.verboseMode());
+				// SupremicaProperties.syncForbidUncontrollableStates(),
+				SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode());
 			}
 			catch (Exception ex)
 			{
@@ -972,7 +973,7 @@ public class ActionMan
 			catch (Exception ex)
 			{
 
-				// thisCategory.error("Exception in AlphabetViewer. Automaton: " + currAutomaton.getName());
+				// logger.error("Exception in AlphabetViewer. Automaton: " + currAutomaton.getName());
 				gui.error("Exception in AlphabetViewer. Automaton: " + currAutomaton.getName());
 			}
 		}
@@ -1009,7 +1010,7 @@ public class ActionMan
 		 *  }
 		 *  catch (Exception ex)
 		 *  {
-		 *  thisCategory.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
+		 *  logger.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
 		 *  }
 		 *  }
 		 *  }
@@ -1033,7 +1034,7 @@ public class ActionMan
 			catch (Exception ex)
 			{
 
-				// thisCategory.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
+				// logger.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
 				gui.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
 			}
 		}
@@ -1068,7 +1069,7 @@ public class ActionMan
 			catch (Exception ex)
 			{
 
-				// thisCategory.error("Exception in AutomataExplorer.");
+				// logger.error("Exception in AutomataExplorer.");
 				gui.error("Exception in AutomataExplorer.");
 			}
 		}
@@ -1109,7 +1110,7 @@ public class ActionMan
 			catch (Exception ex)
 			{
 
-				// thisCategory.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
+				// logger.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
 				gui.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
 			}
 		}
@@ -1119,7 +1120,7 @@ public class ActionMan
 	public static void automatonStatus_actionPerformed(Gui gui)
 	{
 
-		// thisCategory.info("Number of automata: " + gui.getAutomatonContainer().getSize());
+		// logger.info("Number of automata: " + gui.getAutomatonContainer().getSize());
 		gui.info("Number of automata: " + gui.getAutomatonContainer().getSize());
 
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
@@ -1144,7 +1145,7 @@ public class ActionMan
 
 		infoStr.append("\n\tNumber of potential states: " + potentialNumberOfStates);
 
-		// thisCategory.info(infoStr.toString());
+		// logger.info(infoStr.toString());
 		gui.info(infoStr.toString());
 
 		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -1165,7 +1166,7 @@ public class ActionMan
 				statusStr.append("\n\tNumber of accepting and forbidden states: " + acceptingAndForbiddenStates);
 			}
 
-			// thisCategory.info(statusStr.toString());
+			// logger.info(statusStr.toString());
 			gui.info(statusStr.toString());
 		}
 	}
@@ -1190,7 +1191,7 @@ public class ActionMan
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
-			int maxNbrOfStates = WorkbenchProperties.getDotMaxNbrOfStatesWithoutWarning();
+			int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
 
 			if (maxNbrOfStates < currAutomaton.nbrOfStates())
 			{
@@ -1224,7 +1225,7 @@ public class ActionMan
 			catch (Exception ex)
 			{
 
-				// thisCategory.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName());
+				// logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName());
 				gui.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName());
 
 				return;
@@ -1248,7 +1249,7 @@ public class ActionMan
 	// File.Exit action performed
 	public static void fileExit(Gui gui)
 	{
-		if (WorkbenchProperties.fileAllowQuit())
+		if (SupremicaProperties.fileAllowQuit())
 		{
 			System.exit(0);
 		}
@@ -1261,7 +1262,7 @@ public class ActionMan
 	// File.Close action performed
 	public static void fileClose(Gui gui)
 	{
-		if (WorkbenchProperties.fileAllowQuit())
+		if (SupremicaProperties.fileAllowQuit())
 		{
 			System.exit(0);
 		}
@@ -1451,7 +1452,7 @@ public class ActionMan
 			return;
 		}
 
-		if (WorkbenchProperties.generalUseSecurity())
+		if (SupremicaProperties.generalUseSecurity())
 		{
 			FileSecurity fileSecurity = gui.getFileSecurity();
 
@@ -1527,7 +1528,7 @@ public class ActionMan
 				{
 					FileSecurity fileSecurity = gui.getFileSecurity();
 
-					if (WorkbenchProperties.generalUseSecurity())
+					if (SupremicaProperties.generalUseSecurity())
 					{
 						if (!fileSecurity.hasCurrentUser())
 						{
@@ -1547,7 +1548,7 @@ public class ActionMan
 				catch (Exception ex)
 				{
 
-					// thisCategory.error("Exception while saveAs " + currFile.getAbsolutePath());
+					// logger.error("Exception while saveAs " + currFile.getAbsolutePath());
 					gui.error("Exception while saveAs " + currFile.getAbsolutePath());
 				}
 			}
@@ -1559,7 +1560,7 @@ public class ActionMan
 	{
 		FileSecurity fileSecurity = gui.getFileSecurity();
 
-		if (WorkbenchProperties.generalUseSecurity())
+		if (SupremicaProperties.generalUseSecurity())
 		{
 			if (!fileSecurity.hasCurrentUser())
 			{
@@ -1613,7 +1614,7 @@ public class ActionMan
 	public static void importValidFile(Gui gui, File file)
 	{
 
-		// thisCategory.info("Importing " + file.getAbsolutePath() + " ...");
+		// logger.info("Importing " + file.getAbsolutePath() + " ...");
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
 
 		try
@@ -1658,8 +1659,8 @@ public class ActionMan
 			catch (Exception ex)
 			{
 
-				// thisCategory.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName());
-				// thisCategory.error(ex);
+				// logger.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName());
+				// logger.error(ex);
 				gui.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName(), ex);
 				ex.printStackTrace();
 			}
@@ -1674,7 +1675,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	// 
+	//
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);
@@ -1686,7 +1687,7 @@ public class ActionMan
 		catch (Exception ex)
 		{
 
-			// thisCategory.error(excp.toString());
+			// logger.error(excp.toString());
 			gui.error(ex.toString());
 		}
 	}

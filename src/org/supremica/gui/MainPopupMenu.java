@@ -7,6 +7,7 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
@@ -44,7 +45,7 @@ class MainPopupMenu
 
 		menuHandler.add(alphabetItem, 1);
 
-		if (WorkbenchProperties.useDot())
+		if (SupremicaProperties.useDot())
 		{
 			JMenuItem viewItem = new JMenuItem("View graph");
 
@@ -91,7 +92,7 @@ class MainPopupMenu
 		menuHandler.add(complementItem, 1);
 		menuHandler.addSeparator();
 
-		if (WorkbenchProperties.includeBoundedUnconTools())
+		if (SupremicaProperties.includeBoundedUnconTools())
 		{
 			JMenuItem extendItem = new JMenuItem("Extend");
 
@@ -203,7 +204,7 @@ class MainPopupMenu
 
 		// JMenuItem saveAsItem = new JMenuItem("Save As...");
 		// menuHandler.add(saveAsItem, 1);
-		if (WorkbenchProperties.fileAllowExport())
+		if (SupremicaProperties.fileAllowExport())
 		{
 			JMenuItem exportItem = new JMenuItem("Export...");
 

@@ -51,12 +51,12 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.util.IDD.*;
 
 public final class AutomataIDDForm
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataIDDForm.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataIDDForm.class);
 	private Automata theAutomata;
 	private AutomataIndexForm theAutomataIndexForm;
 	private Automaton theAutomaton;

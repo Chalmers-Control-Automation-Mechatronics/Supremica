@@ -47,7 +47,7 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.gui;
+package org.supremica.properties;
 
 import java.util.*;
 import java.io.*;
@@ -64,7 +64,7 @@ import org.supremica.automata.algorithms.SynthesisAlgorithm;
  * Properties for Supremica.
  *
  **/
-public final class WorkbenchProperties
+public final class SupremicaProperties
 	extends Properties
 {
 	private static final String XML_RPC_ACTIVE = "xmlRpcActive";
@@ -83,6 +83,10 @@ public final class WorkbenchProperties
 	private static final String VERBOSE_MODE = "verboseMode";
 	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
 	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
+
+	// Logging options
+	private static final String LOG_TO_CONSOLE = "logToConsole";
+	private static final String LOG_TO_GUI = "logToGUI";
 
 	// File Options
 	private static final String FILE_OPEN_PATH = "fileOpenPath";
@@ -115,9 +119,9 @@ public final class WorkbenchProperties
 	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
-	private static final WorkbenchProperties wp = new WorkbenchProperties();
+	private static final SupremicaProperties wp = new SupremicaProperties();
 
-	private WorkbenchProperties()
+	private SupremicaProperties()
 	{
 		setProperty(FILE_OPEN_PATH, "../examples/");
 		setProperty(FILE_SAVE_PATH, ".");
@@ -141,6 +145,10 @@ public final class WorkbenchProperties
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false");
 		setProperty(VERBOSE_MODE, "false");
 		setProperty(SUPERUSER_IDENTITY, "ESS030");
+
+		setProperty(LOG_TO_CONSOLE, "false");
+		setProperty(LOG_TO_GUI, "false");
+
 		setProperty(ALLOW_SUPERUSER_LOGIN, "true");
 		setProperty(SYNC_FORBID_UNCON_STATES, "true");
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true");
@@ -383,6 +391,27 @@ public final class WorkbenchProperties
 	public static boolean allowSuperUserLogin()
 	{
 		return toBoolean(wp.getProperty(ALLOW_SUPERUSER_LOGIN));
+	}
+
+
+	public static boolean logToConsole()
+	{
+		return toBoolean(wp.getProperty(LOG_TO_CONSOLE));
+	}
+
+	public static void setLogToConsole(boolean mode)
+	{
+		wp.setProperty(LOG_TO_CONSOLE, toString(mode));
+	}
+
+	public static boolean logToGUI()
+	{
+		return toBoolean(wp.getProperty(LOG_TO_GUI));
+	}
+
+	public static void setLogToGUI(boolean mode)
+	{
+		wp.setProperty(LOG_TO_GUI, toString(mode));
 	}
 
 	// Synchronization...

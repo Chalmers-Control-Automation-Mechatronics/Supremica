@@ -51,7 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 
 public final class AutomataIndexForm
 {
@@ -97,7 +97,7 @@ public final class AutomataIndexForm
 	private int[][][] enableEventsTable;
 
 	// <automaton, event> -> <state[]>
-	private static Category thisCategory = LogDisplay.createCategory(AutomataIndexForm.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataIndexForm.class);
 
 	/**
 	 *@param  theAutomata The automata to be synchronized.
@@ -115,7 +115,7 @@ public final class AutomataIndexForm
 		}
 		catch (Exception e)
 		{
-			thisCategory.error("Error while generating AutomataIndexForm", e);
+			logger.error("Error while generating AutomataIndexForm", e);
 
 			throw e;
 		}

@@ -56,16 +56,24 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.*;
 import org.supremica.automata.AutomatonContainer;
+import org.supremica.properties.SupremicaProperties;
 
 public class SupremicaServer
 {
-	private static Category thisCategory = LogDisplay.createCategory(SupremicaServer.class.getName());
+	static
+	{
+		SupremicaProperties.setLogToConsole(true);
+		SupremicaProperties.setLogToGUI(false);
+	}
+
+	private static Logger logger = LoggerFactory.createLogger(SupremicaServer.class);
+
 	private AutomatonContainer theAutomatonContainer = null;
 	private Server xmlRpcServer = null;
 
@@ -74,24 +82,24 @@ public class SupremicaServer
 	{
 		theAutomatonContainer = new AutomatonContainer();
 
-		thisCategory.info("Supremica version: " + (new Version()).toString());
+		logger.info("Supremica version: " + (new Version()).toString());
 
 		boolean serverStarted = true;
 
 		try
 		{
-			xmlRpcServer = new Server(theAutomatonContainer, WorkbenchProperties.getXmlRpcPort());
+			xmlRpcServer = new Server(theAutomatonContainer, SupremicaProperties.getXmlRpcPort());
 		}
 		catch (Exception e)
 		{
 			serverStarted = false;
 
-			thisCategory.error("Error while starting XML-RPC server");
+			logger.error("Error while starting XML-RPC server");
 		}
 
 		if (serverStarted)
 		{
-			thisCategory.info("XML-RPC server running on port " + WorkbenchProperties.getXmlRpcPort());
+			logger.info("XML-RPC server running on port " + SupremicaProperties.getXmlRpcPort());
 		}
 	}
 

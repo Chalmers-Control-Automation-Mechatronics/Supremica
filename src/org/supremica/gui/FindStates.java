@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.apache.oro.text.regex.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
@@ -31,6 +31,7 @@ class CompilerFactory
 class FindStatesTableModel
 	extends AbstractTableModel
 {
+	private static Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
 	private Pattern[] patterns = null;
 	private PatternCompiler comp = null;
 	private String[] columnNames = { "Automaton", "Type", "Regular Expression" };
@@ -109,7 +110,7 @@ class FindStatesTableModel
 			}
 			catch (MalformedPatternException excp)
 			{
-				LogDisplay.createCategory(FindStatesTableModel.class.getName()).debug("FindStatesTable::Incorrect pattern \"" + (String) obj + "\"");
+				logger.debug("FindStatesTable::Incorrect pattern \"" + (String) obj + "\"");
 				JOptionPane.showMessageDialog(null, "Incorrect pattern: " + (String) obj, "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -253,7 +254,7 @@ class FindStatesTable
 						setRowSelectionInterval(row, row);
 					}
 
-					// 
+					//
 					if (getStatesTableModel().isRegexpColumn(col))
 					{
 						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
@@ -484,11 +485,11 @@ class FindStatesFrame
 	private JTabbedPane tabbedPane = null;
 	private JButton find_button = null;
 	private QuitButton quit_button = null;
-	private static Category thisCategory = LogDisplay.createCategory(FindStatesFrame.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
 
 	private static void debug(String s)
 	{
-		thisCategory.debug(s);
+		logger.debug(s);
 	}
 
 	private Automata getAutomata()

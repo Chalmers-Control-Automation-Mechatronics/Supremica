@@ -51,13 +51,21 @@ package org.supremica.apps;
 
 import java.io.*;
 import java.awt.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
+import org.supremica.log.*;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 
 // import org.jgrafchart.*;
 public class Supremica
 {
-	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
+	static
+	{
+		SupremicaProperties.setLogToConsole(true);
+		SupremicaProperties.setLogToGUI(true);
+	}
+
+	private static Logger logger = LoggerFactory.createLogger(org.supremica.gui.Supremica.class);
 	private static org.supremica.gui.Supremica workbench;
 	private static SplashWindow splash;
 
@@ -72,20 +80,12 @@ public class Supremica
 
 	public static void startSupremica()
 	{
-		doSplash();
-
-		workbench = new org.supremica.gui.Supremica();
-
-		init();
+		startSupremica(null);
 	}
 
 	public static void startSupremica(String arg)
 	{
 
-		// if (args.length >= 1)
-		// {
-		// workbench.openAutomataXMLFile(new File(args[0]));
-		// }
 		doSplash();
 
 		workbench = new org.supremica.gui.Supremica(arg);
@@ -130,13 +130,6 @@ public class Supremica
 		PreLoader preLoader = PreLoader.getPreLoader();
 	}
 
-	/*
-	 *       public static void startJGrafChart()
-	 *       {
-	 *       Basic2GC app = new Basic2GC();
-	 *       app.updateActions();
-	 *       }
-	 */
 
 	// Main method
 	public static void main(String[] args)

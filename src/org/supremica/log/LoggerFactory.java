@@ -47,15 +47,51 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.log;
 
-import org.supremica.gui.*;
-import org.supremica.log.*;
+import java.lang.*;
+import org.apache.log4j.*;
+import org.supremica.properties.*;
 
-public final class IDDOptions
+public class LoggerFactory
 {
-	private static Logger logger = LoggerFactory.createLogger(IDDOptions.class);
+	private static boolean logToGui = SupremicaProperties.logToGUI();
+	private static boolean logToConsole = SupremicaProperties.logToConsole();
+	private static final PatternLayout layout = new PatternLayout("%-5p %m%n");
+	private static ConsoleAppender consoleAppender = null;
 
-	public IDDOptions()
-		throws Exception {}
+	private LoggerFactory()
+	{
+	}
+
+	public synchronized static Logger createLogger(Class theClass)
+	{
+		return createLogger(theClass.getName());
+	}
+
+	public synchronized static Logger createLogger(String name)
+	{
+		Category thisCategory = Category.getInstance(name);
+		if (logToConsole)
+		{
+			if (consoleAppender == null)
+			{
+				consoleAppender = new ConsoleAppender(layout);
+			}
+			thisCategory.addAppender(consoleAppender);
+		}
+		if (logToGui)
+		{
+			thisCategory.addAppender(LogDisplay.getInstance());
+		}
+		SupremicaCategory supremicaCategory = new SupremicaCategory(thisCategory);
+		return supremicaCategory;
+	}
+
+	public synchronized static void updateLoggers()
+	{
+		logToGui = SupremicaProperties.logToGUI();
+		logToConsole = SupremicaProperties.logToConsole();
+	}
+
 }

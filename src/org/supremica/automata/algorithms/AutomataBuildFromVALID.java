@@ -54,7 +54,7 @@ import java.io.*;
 import org.jdom.*;
 import org.jdom.input.*;
 import org.jdom.output.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -66,7 +66,7 @@ import org.supremica.automata.EventLabel;
 
 public class AutomataBuildFromVALID
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataBuildFromVALID.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataBuildFromVALID.class);
 	private static AutomataBuildFromVALID builder = null;
 	private static Automata currAutomata = null;
 

@@ -54,7 +54,7 @@ import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
 
-// import org.apache.log4j.*;
+// import org.supremica.log.*;
 import org.supremica.gui.Gui;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
@@ -69,7 +69,7 @@ import org.supremica.automata.EventLabel;
 public class AutomataSynthesizer
 {
 
-	// private static Category thisCategory = LogDisplay.createCategory(AutomataSynthesizer.class.getName());
+	// private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
 	private Automata theAutomata;
 	private int nbrOfExecuters;
 	private HashMap eventToAutomataMap = new HashMap();
@@ -278,7 +278,7 @@ public class AutomataSynthesizer
 							automataNames = automataNames + " || " + ((Automaton) automatonArray[i]).getName();
 						}
 
-						// -- MF -- thisCategory.info(automataNames);
+						// -- MF -- logger.info(automataNames);
 						workbench.info(automataNames);
 
 						AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
@@ -303,7 +303,7 @@ public class AutomataSynthesizer
 						catch (Exception ex)
 						{
 
-							// -- MF -- thisCategory.error("Exception while adding the new automaton.");
+							// -- MF -- logger.error("Exception while adding the new automaton.");
 							workbench.error("Exception while adding the new automaton.");
 						}
 					}
@@ -352,7 +352,7 @@ public class AutomataSynthesizer
 		{
 
 			// System.err.println("Error while generating union alphabet: " + e);
-			// -- MF -- thisCategory.error("Error while generating union alphabet: " + e);
+			// -- MF -- logger.error("Error while generating union alphabet: " + e);
 			workbench.error("Error while generating union alphabet: " + e);
 
 			throw e;
@@ -394,7 +394,7 @@ public class AutomataSynthesizer
 		catch (Exception ex)
 		{
 
-			// -- MF -- thisCategory.error("Exception in SynchronizationOptions." + ex);
+			// -- MF -- logger.error("Exception in SynchronizationOptions." + ex);
 			workbench.error("Exception in SynchronizationOptions." + ex);
 
 			return;
@@ -437,7 +437,7 @@ public class AutomataSynthesizer
 			catch (Exception ex)
 			{
 
-				// -- MF -- thisCategory.error("Exception in AutomataSynthesizer.optimize. " + ex);
+				// -- MF -- logger.error("Exception in AutomataSynthesizer.optimize. " + ex);
 				workbench.error("Exception in AutomataSynthesizer.optimize. " + ex);
 
 				return;

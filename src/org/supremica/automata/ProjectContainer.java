@@ -51,12 +51,12 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.gui.*;
 
 public class ProjectContainer
 {
-	private static Category thisCategory = LogDisplay.createCategory(ProjectContainer.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(ProjectContainer.class);
 	private List theProjects;
 
 	public ProjectContainer()

@@ -47,15 +47,20 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.log;
 
-import org.supremica.gui.*;
-import org.supremica.log.*;
-
-public final class IDDOptions
+public interface Logger
 {
-	private static Logger logger = LoggerFactory.createLogger(IDDOptions.class);
+	public void debug(Object message);
+	public void debug(Object message, Throwable t);
+	public void error(Object message);
+	public void error(Object message, Throwable t);
+	public void fatal(Object message);
+	public void fatal(Object message, Throwable t);
+	public void warn(Object message);
+	public void warn(Object message, Throwable t);
+	public void info(Object message);
+	public void info(Object message, Throwable t);
+	public boolean isDebugEnabled();
 
-	public IDDOptions()
-		throws Exception {}
 }

@@ -50,11 +50,11 @@
 package org.supremica.gui;
 
 import javax.swing.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 
 public class InterfaceManager
 {
-	private static Category thisCategory = LogDisplay.createCategory(InterfaceManager.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(InterfaceManager.class);
 	private static InterfaceManager instance = null;
 
 	private InterfaceManager()
@@ -65,7 +65,7 @@ public class InterfaceManager
 		}
 		catch (Exception e)
 		{
-			thisCategory.fatal("Error while setting LookAndFeel");
+			logger.fatal("Error while setting LookAndFeel");
 			System.exit(0);
 		}
 	}

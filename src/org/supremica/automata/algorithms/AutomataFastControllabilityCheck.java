@@ -53,7 +53,7 @@ import java.util.*;
 import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -74,7 +74,7 @@ import org.supremica.automata.EventLabel;
  */
 public class AutomataFastControllabilityCheck
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheck.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(AutomataFastControllabilityCheck.class);
 	private Automata theAutomata;
 	private int nbrOfExecuters;
 
@@ -255,7 +255,7 @@ public class AutomataFastControllabilityCheck
 						// Very nice
 						if (verboseMode)
 						{
-							thisCategory.info(automataNames + "is controllable.");
+							logger.info(automataNames + "is controllable.");
 						}
 					}
 					else
@@ -272,7 +272,7 @@ public class AutomataFastControllabilityCheck
 
 						if (verboseMode)
 						{
-							thisCategory.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
+							logger.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
 						}
 
 						// Sort automata in order of similar alphabets
@@ -282,7 +282,7 @@ public class AutomataFastControllabilityCheck
 						{
 							if (verboseMode)
 							{
-								thisCategory.info("There are " + similarAutomata.length + " automata with similar alphabets...");
+								logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 							}
 						}
 
@@ -290,7 +290,7 @@ public class AutomataFastControllabilityCheck
 						{
 							if (verboseMode)
 							{
-								thisCategory.info("Attempt number " + attempt + ", stateAmountLimit: " + stateAmountLimit + ".");
+								logger.info("Attempt number " + attempt + ", stateAmountLimit: " + stateAmountLimit + ".");
 							}
 
 							if (similarAutomata != null)
@@ -305,7 +305,7 @@ public class AutomataFastControllabilityCheck
 							{
 								if (verboseMode)
 								{
-									thisCategory.info("Couldn't proove controllability, trying to proove uncontrollability...");
+									logger.info("Couldn't proove controllability, trying to proove uncontrollability...");
 								}
 
 								// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
@@ -331,7 +331,7 @@ public class AutomataFastControllabilityCheck
 							{
 
 								// All uncontrollable states were removed!
-								// thisCategory.info("The supervisor " + ((Automaton) selectedAutomata.get(0)).getName() + " was found to be controllable afterall!");
+								// logger.info("The supervisor " + ((Automaton) selectedAutomata.get(0)).getName() + " was found to be controllable afterall!");
 								break;
 							}
 						}
@@ -343,7 +343,7 @@ public class AutomataFastControllabilityCheck
 							// Print remaining suspected uncontrollable state(s)
 							if (verboseMode)
 							{
-								thisCategory.info("Unfortunately the following states might be uncontrollable...");
+								logger.info("Unfortunately the following states might be uncontrollable...");
 								synchHelper.printUncontrollableStates(automataIndices);
 							}
 
@@ -360,7 +360,7 @@ public class AutomataFastControllabilityCheck
 		{
 			if (verboseMode)
 			{
-				thisCategory.info("Can't proove either controllability or uncontrollability. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes theese automata uncontrollable.");
+				logger.info("Can't proove either controllability or uncontrollability. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes theese automata uncontrollable.");
 			}
 		}
 
@@ -549,7 +549,7 @@ public class AutomataFastControllabilityCheck
 			// Already added all similar automata
 			if (verboseMode)
 			{
-				thisCategory.info("All similar automata are already added, there is no hope for prooving controllability...");
+				logger.info("All similar automata are already added, there is no hope for prooving controllability...");
 			}
 
 			return;
@@ -622,7 +622,7 @@ public class AutomataFastControllabilityCheck
 
 				if (verboseMode)
 				{
-					thisCategory.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
+					logger.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 				}
 
 				stateAmount = stateCount;
@@ -639,7 +639,7 @@ public class AutomataFastControllabilityCheck
 				{
 					if (verboseMode)
 					{
-						thisCategory.info("No uncontrollable states left after adding" + addedAutomata + ", the automata is controllable.");
+						logger.info("No uncontrollable states left after adding" + addedAutomata + ", the automata is controllable.");
 					}
 
 					return;
@@ -650,11 +650,11 @@ public class AutomataFastControllabilityCheck
 					{
 						if (verboseMode)
 						{
-							thisCategory.info("Still one state left after adding" + addedAutomata + ".");
+							logger.info("Still one state left after adding" + addedAutomata + ".");
 						}
 						else if (verboseMode)
 						{
-							thisCategory.info("Still " + statesLeft + " states left after adding" + addedAutomata + ".");
+							logger.info("Still " + statesLeft + " states left after adding" + addedAutomata + ".");
 						}
 					}
 				}
@@ -679,7 +679,7 @@ public class AutomataFastControllabilityCheck
 	 *  synchHelper.setRememberTrace(true);
 	 *  synchHelper.addState(initialState);
 	 *
-	 *  thisCategory.debug("Searching for uncontrollable states...");
+	 *  logger.debug("Searching for uncontrollable states...");
 	 *
 	 *  // Set expansion priority
 	 *  Iterator eventIterator;
@@ -695,7 +695,7 @@ public class AutomataFastControllabilityCheck
 	 *  {
 	 *  currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
 	 *  currEvent.setExpansionPriority(2);
-	 *  // thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
+	 *  // logger.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
 	 *  }
 	 *  }
 	 *  for (int i = 0; i < automataIndices.length; i++)
@@ -706,7 +706,7 @@ public class AutomataFastControllabilityCheck
 	 *  {
 	 *  currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
 	 *  currEvent.setExpansionPriority(1);
-	 *  // thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
+	 *  // logger.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
 	 *  }
 	 *  }
 	 *

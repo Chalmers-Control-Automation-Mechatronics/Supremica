@@ -51,12 +51,12 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+import org.supremica.log.*;
 
 public class ActionAlphabet
 	extends Alphabet
 {
-	private static Category thisCategory = LogDisplay.createCategory(ActionAlphabet.class.getName());
+	private static Logger logger = LoggerFactory.createLogger(ActionAlphabet.class);
 
 	public ActionAlphabet() {}
 

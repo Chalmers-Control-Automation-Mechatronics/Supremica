@@ -75,7 +75,7 @@ public class AutomataVerificationWorker
 	implements Stoppable
 {
 
-	// private static Category thisCategory = LogDisplay.createCategory(AutomataVerificationWorker.class.getName());
+	// private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
 	// -- MF --      private Supremica workbench = null;
 	private Gui workbench = null;
 	private Automata theAutomata = null;
@@ -161,7 +161,7 @@ public class AutomataVerificationWorker
 				requestStop();
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
-				// thisCategory.error(e.getMessage());
+				// logger.error(e.getMessage());
 				workbench.error(e.getMessage());
 
 				return;
@@ -189,7 +189,7 @@ public class AutomataVerificationWorker
 					// IDD...
 					requestStop();
 
-					// thisCategory.error("Option not implemented...");
+					// logger.error("Option not implemented...");
 					workbench.error("Option not implemented...");
 
 					return;
@@ -200,7 +200,7 @@ public class AutomataVerificationWorker
 					// Error...
 					requestStop();
 
-					// thisCategory.error("Unavailable option chosen.");
+					// logger.error("Unavailable option chosen.");
 					workbench.error("Unavailable option chosen.");
 
 					return;
@@ -210,7 +210,7 @@ public class AutomataVerificationWorker
 			{
 				requestStop();
 
-				// thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				// logger.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 
 				return;
@@ -237,7 +237,7 @@ public class AutomataVerificationWorker
 			// Non-blocking verification...
 			requestStop();
 
-			// thisCategory.error("Option not implemented...");
+			// logger.error("Option not implemented...");
 			workbench.error("Option not implemented...");
 
 			return;
@@ -265,7 +265,7 @@ public class AutomataVerificationWorker
 				{
 					requestStop();
 
-					// thisCategory.error("Exception in AutomatonContainer.");
+					// logger.error("Exception in AutomatonContainer.");
 					workbench.error("Exception in AutomatonContainer.");
 
 					return;
@@ -294,7 +294,7 @@ public class AutomataVerificationWorker
 			if ((automataA.size() < 1) || (automataB.size() < 1))
 			{
 
-				// thisCategory.error("At least one automaton must be unselected.");
+				// logger.error("At least one automaton must be unselected.");
 				workbench.error("At least one automaton must be unselected.");
 				requestStop();
 
@@ -340,7 +340,7 @@ public class AutomataVerificationWorker
 				{
 					requestStop();
 
-					// thisCategory.error("Error when calculating union alphabet. " + e);
+					// logger.error("Error when calculating union alphabet. " + e);
 					workbench.error("Error when calculating union alphabet. " + e);
 
 					return;
@@ -400,7 +400,7 @@ public class AutomataVerificationWorker
 				requestStop();
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
-				// thisCategory.error(e.getMessage());
+				// logger.error(e.getMessage());
 				workbench.error(e.getMessage());
 
 				return;
@@ -428,7 +428,7 @@ public class AutomataVerificationWorker
 					// IDD...
 					requestStop();
 
-					// thisCategory.error("Option not implemented...");
+					// logger.error("Option not implemented...");
 					workbench.error("Option not implemented...");
 
 					return;
@@ -439,7 +439,7 @@ public class AutomataVerificationWorker
 					// Error...
 					requestStop();
 
-					// thisCategory.error("Unavailable option chosen.");
+					// logger.error("Unavailable option chosen.");
 					workbench.error("Unavailable option chosen.");
 
 					return;
@@ -449,7 +449,7 @@ public class AutomataVerificationWorker
 			{
 				requestStop();
 
-				// thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				// logger.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 
 				return;
@@ -476,7 +476,7 @@ public class AutomataVerificationWorker
 			// Error...
 			requestStop();
 
-			// thisCategory.error("Unavailable option chosen.");
+			// logger.error("Unavailable option chosen.");
 			workbench.error("Unavailable option chosen.");
 
 			return;
@@ -488,13 +488,13 @@ public class AutomataVerificationWorker
 		if (!stopRequested)
 		{
 
-			// thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			// logger.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 			workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
 		}
 		else
 		{
 
-			// thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			// logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 			workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
 		}
 
