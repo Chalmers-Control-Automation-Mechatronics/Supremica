@@ -61,14 +61,8 @@ public class BasicFBType extends FBType
 
 	private ECC theECC = new ECC();
 	private Map instances = new HashMap();
-	private Map algorithms = new HashMap();
 
-	// Name to variable type mappings
-	private Map eventInputs = new HashMap();
-	private Map eventOutputs = new HashMap();
-	private Map dataInputs = new HashMap();
-	private Map dataOutputs = new HashMap();
-	private Map localVariables = new HashMap();
+	private Variables variables = new Variables();
 
 
 	// Constructors
@@ -99,35 +93,9 @@ public class BasicFBType extends FBType
 		return theECC;
 	}
 
-	public void addEventInput(String name, Variable var)
+	public void addVariable(String name, Variable var)
 	{
-		eventInputs.put(name,var);
-	}
-	public void addEventOutput(String name, Variable var)
-	{
-		eventOutputs.put(name,var);
-	}
-	public void addDataInput(String name, Variable var)
-	{
-		dataInputs.put(name,var);
-	}
-	public void addDataOutput(String name, Variable var)
-	{
-		dataOutputs.put(name,var);
-	}
-	public void addLocalVariable(String name, Variable var)
-	{
-		localVariables.put(name,var);
+		variables.addVariable(name,var);
 	}
 	
-	public void addAlgorithm(String name, Algorithm algorithm)
-	{
-		algorithms.put(name, algorithm);
-	}
-
-	public Algorithm getAlgorithm()
-	{
-		return (Algorithm) algorithms.get("TestAlgorithm");
-	}
-
 }

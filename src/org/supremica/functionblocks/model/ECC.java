@@ -46,7 +46,9 @@ public class ECC
 {
 	
 
-	private List ecStates = new LinkedList();
+	// Map: String name -> ECState state
+	private Map ecStates = new HashMap();
+	// List: ECTransition
 	private List ecTransitions = new LinkedList();
 
 	private ECState initialState = null;
@@ -55,13 +57,13 @@ public class ECC
 
 	ECC()
 	{
-		System.out.println("ECC(): Creating new empty ECC");
+		System.out.println("ECC(): Creating empty ECC");
 	}
 
-	void addInitialState(ECState initial)
+	void addInitialState(String initial)
 	{
-		addECState(initial);
-		initialState = initial;
+		addState(initial);
+		initialState = getState(initial);
 	}
 	
 	ECState getInitialState()
@@ -70,14 +72,19 @@ public class ECC
 	}
 
 
-	void addECState(ECState state)
+	void addState(String state)
 	{
-		ecStates.add(state);
+		ecStates.put(state,new ECState(state));
 	}
 
-	void addECTransition(ECTransition trans)
+	ECState getState(String state)
 	{
-		ecTransitions.add(trans);
+		return (ECState) ecStates.get(state);
+	}
+
+	void addTransition(String source, String dest, String cond)
+	{
+		ecTransitions.add(new ECTransition(getState(source), getState(dest), new ECCondition(cond)));
 	}
 
 	ECState execute(ECState currentECState, Variables vars)

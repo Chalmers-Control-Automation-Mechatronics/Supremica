@@ -53,11 +53,18 @@ import java.util.*;
 
 public class Event
 {
-    String type = null;
-    String comment = null;
+	private String name;
+	private String type;
+	private String comment;
 
-    
-    public Event()
-    {
-    }
+	public Event(String n)
+	{
+		name = n;
+	}
+	
+	public String getName()
+	{
+		return name;
+	}
+
 }

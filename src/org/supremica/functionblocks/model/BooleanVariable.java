@@ -56,17 +56,15 @@ public class BooleanVariable extends Variable
 	
 	private Boolean value = new Boolean(false);
 
-	private BooleanVariable() {}
-
-	public BooleanVariable(String t, boolean b)
+	public BooleanVariable(String type, boolean b)
 	{
-		type = t;
+		super(type);
 		value = new Boolean(b);
 	}
 
-	public void setValue(Boolean v)
+	public void setValue(boolean v)
 	{
-		value = v;
+		value = new Boolean(v);
 	}
 
 	public Boolean getValue()

@@ -59,15 +59,20 @@ import java.util.*;
 
 public class EventQueue
 {
-    private LinkedList queue = new LinkedList();
-    
-    public Event remove()
-    {
-        return (Event) queue.removeFirst();
-    }
-
-    public void add(Event e)
-    {
-	queue.add(e);
-    }
+	private LinkedList queue = new LinkedList();
+	
+	public int size()
+	{
+		return queue.size();
+	}
+	
+	public Event remove()
+	{
+		return (Event) queue.removeFirst();
+	}
+	
+	public void add(Event e)
+	{
+		queue.add(e);
+	}
 }

@@ -56,11 +56,9 @@ public class StringVariable extends Variable
 	
 	private String value = "";
 
-	private StringVariable() {}
-
-	public StringVariable(String t, String s)
+	public StringVariable(String type, String s)
 	{
-		type=t;
+		super(type);
 		value=s;
 	}
 

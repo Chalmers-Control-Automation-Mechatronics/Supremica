@@ -67,7 +67,7 @@ public class ECAction
 	return algorithm;
     }
 
-    public String getOutputEventName()
+    public String getOutput()
     {
 	return outputEventName;
     }

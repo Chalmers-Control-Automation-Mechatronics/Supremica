@@ -54,14 +54,12 @@ import java.lang.Double;
 public class DoubleVariable extends Variable
 {
 	
-	private Double value;
+	private Double value = new Double(0.0);
 
-	private DoubleVariable() {}
-
-	public DoubleVariable(String t,double f)
+	public DoubleVariable(String type, double d)
 	{
-		type=t;
-		value = new Double(f);
+		super(type);
+		value = new Double(d);
 	}
 
 	public void setValue(double i)

@@ -65,12 +65,17 @@ public class ECState extends NamedObject
 	}
     
 
-	void addECAction(ECAction action)
+	void addAction(Algorithm alg, String evout)
 	{
-		ecActions.add(action);
+		ecActions.add(new ECAction(alg,evout));
 	}
 
-	Iterator actionIterator()
+	int getNumberOfActions()
+	{
+		return ecActions.size();
+	}
+
+	Iterator actionsIterator()
 	{
 		return ecActions.iterator();
 	}

@@ -72,19 +72,25 @@ public class Resource
 		this.name = name;
 		scheduler = new Scheduler(this);
 
-		// creat the application from the Sync paper for testing
+		// creat the test application
 	
 		BasicFBType fbType = new BasicFBType("P1", this);
-		fbType.addEventInput("OCCURED", new BooleanVariable("EventInput",false));
-		fbType.addEventOutput("DONE", new BooleanVariable("EventOutput",false));
 
-		fbType.addAlgorithm("TestAlgorithm", new TestAlgorithm());
-
+		// only one event input and output for now
+		fbType.addVariable("OCCURED", new BooleanVariable("EventInput",false));
+		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
+		fbType.addVariable("invoked", new IntegerVariable("Local",0));
+		// Build ECC 
+		fbType.getECC().addInitialState("INIT");
+		fbType.getECC().addState("STATE");
+		fbType.getECC().addTransition("INIT", "STATE", "OCCURRED");
+		fbType.getECC().addTransition("STATE", "INIT", "TRUE");
+		fbType.getECC().getState("STATE").addAction(new TestAlgorithm(), "DONE");
 
 		fbInstance = fbType.createInstance("P1inst");
+		fbInstance.addEventInputQueue("OCCURRED");
 
-		fbInstance.addEventInputQueue(new EventQueue());
-		fbInstance.queueEvent("DummyEventInput");
+		fbInstance.queueEvent("OCCURRED");
 	
 		//Interpreter tester
 		//new Tester();

@@ -44,7 +44,7 @@
  * Supremica or KA shall not be liable for any damages
  * suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+((IntegerVariable) vars.getVariable("invoked")) * Supremica is owned and represented by KA.
  */
 
 package org.supremica.functionblocks.model;
@@ -56,17 +56,15 @@ public class IntegerVariable extends Variable
 	
 	private Integer value = new Integer(0);
 
-	private IntegerVariable() {}
-
-	public IntegerVariable(String t, int i)
+	public IntegerVariable(String type, int i)
 	{
-		type=t;
+		super(type);
 		value = new Integer(i);
 	}
 
-	public void setValue(Integer i)
+	public void setValue(int i)
 	{
-		value = i;
+		value = new Integer(i);
 	}
 
 	public Integer getValue()
