@@ -81,7 +81,7 @@ import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
-import org.supremica.gui.animators.tsim.*;
+//import org.supremica.gui.animators.tsim.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -106,8 +105,6 @@ public class SimulatorStateViewer
 
 		add(stateEventSplitter, BorderLayout.CENTER);
 		//theAnimationSignals.registerInterest(this);
-
-
 
 		this.executerIsExternal = executerIsExternal;
 		theExecuter = executerIsExternal ?

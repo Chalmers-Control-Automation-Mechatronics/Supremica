@@ -455,7 +455,6 @@ public class VisualProject
 		}
 	}
 
-
 	public ActionAndControlViewer getActionAndControlViewer()
 		throws Exception
 	{

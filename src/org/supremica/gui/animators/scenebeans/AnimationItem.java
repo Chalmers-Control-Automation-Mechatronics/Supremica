@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -47,6 +46,7 @@
  *
  *  Supremica is owned and represented by KA.
  */
+
 package org.supremica.gui.animators.scenebeans;
 
 import java.net.URL;
@@ -91,7 +91,8 @@ public class AnimationItem
 			if (url == null)
 			{ // The class loader could not find the file
 
-			}*/
+			}
+			*/
 
 			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
 

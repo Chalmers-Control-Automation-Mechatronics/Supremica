@@ -610,7 +610,6 @@ public class MainMenuBar
 			menuToolsShoeFactory.add(menuBuildPlant);
 		}
 
-
 		// Tools.JGrafchart
 		if (SupremicaProperties.includeJGrafchart())
 		{
@@ -1102,7 +1101,23 @@ public class MainMenuBar
 					}
 				});
 		}
-
+		
+		/*
+		// Tools.TrainSimulator
+		menuTools.add(new JSeparator());
+		
+		JMenuItem trainSimulator = new JMenuItem();
+		trainSimulator.setText("Train Simulator");
+		menuTools.add(trainSimulator);
+		trainSimulator.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.trainSimulator(ActionMan.getGui());
+				}
+			});
+		*/
+		
 		// Configure
 		JMenu menuConfigure = new JMenu();
 

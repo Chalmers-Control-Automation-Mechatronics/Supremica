@@ -74,8 +74,6 @@ import uk.ac.ic.doc.scenebeans.animation.Animation;
 import uk.ac.ic.doc.scenebeans.animation.CommandException;
 import uk.ac.ic.doc.scenebeans.animation.ResetActivityCommand;
 
-
-
 public class SimulatorExecuter
 	extends JFrame
 	implements AutomatonListener, AnimationListener
@@ -98,7 +96,6 @@ public class SimulatorExecuter
 	private AnimationSignals theAnimationSignals;
 	private int[] currState;
 
-
 	public SimulatorExecuter(VisualProject theProject, boolean useExternalExecuter)
 		throws Exception
 	{
@@ -113,21 +110,22 @@ public class SimulatorExecuter
 			logger.error(msg);
 			throw new Exception("Could not open animator: " + theProject.getAnimationURL());
 		}
-
+		
 		theAnimation = theAnimator.getAnimation();
 		theAnimation.addAnimationListener(this);
-
+		
 		theAnimationSignals = new AnimationSignals(theAnimation);
-
-		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true, false);
-
+		
+		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		//SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true, false);
+		
 		helper = new AutomataSynchronizerHelper(theProject, syncOptions);
-
+		
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
 		int[] initialState = AutomataIndexFormHelper.createState(this.theProject.size());
-
+		
 		// + 1 status field
 		Iterator autIt = this.theProject.iterator();
 
@@ -155,7 +153,7 @@ public class SimulatorExecuter
 		contentPane.setLayout(layout);
 
 		// contentPane.add(toolBar, BorderLayout.NORTH);
-		// / setTitle(theAutomaton.getName());
+		// setTitle(theAutomaton.getName());
 		setTitle("Supremica Simulator");
 		setSize(400, 500);
 
@@ -272,7 +270,6 @@ public class SimulatorExecuter
 		updated(aut);
 	}
 
-
 	public void animationEvent(AnimationEvent ev)
 	{
 		//logger.info("AnimationEvent: " + ev.getName());
@@ -299,6 +296,7 @@ public class SimulatorExecuter
 		theAnimationSignals.updateSignals();
 	}
 */
+
 	public boolean executeEvent(LabeledEvent event)
 	{
 		String label = event.getLabel();
@@ -339,7 +337,7 @@ public class SimulatorExecuter
 		}
 		else
 		{
-			logger.error("The event " + event.getLabel() + " is not enabled");
+			logger.error("The event " + event + " is not enabled");
 		}
 		return currState != null;
 	}
