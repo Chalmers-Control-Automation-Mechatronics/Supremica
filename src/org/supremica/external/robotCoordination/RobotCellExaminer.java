@@ -97,29 +97,34 @@ public class RobotCellExaminer
 		});
 		contentPane.add(collisionButton);
 
-		JButton demoButton = new JButton("Run demo (RobotStudio)");
-		demoButton.addActionListener(new ActionListener()
+		File file = new File("C:/temp/DomStations/DemoSafe.stn");
+		if (file.exists())
 		{
-			public void actionPerformed(ActionEvent e)
+			JButton demoButton = new JButton("Run demo (RobotStudio)");
+			demoButton.addActionListener(new ActionListener()
 			{
-				// Open file if it exists...
-				//File file = new File("C:/temp/RobSuprTestStation/RobSuprTest.stn");
-				File file = new File("C:/temp/DomStations/DemoSafe.stn");
-				if (file.exists())
-				{
-					openCell(file, RobotSimulatorType.RobotStudio);
-					generateSpans();
-					intersectSpans();
-					generateAutomata();
-					examineCollisions();
-				}
-				else
-				{
-					logger.error("File " + file + " does not exist.");
-				}
-			}
-		});
-		contentPane.add(demoButton);
+					public void actionPerformed(ActionEvent e)
+					{
+						// Open file if it exists...
+						//File file = new File("C:/temp/RobSuprTestStation/RobSuprTest.stn");
+						File file = new File("C:/temp/DomStations/DemoSafe.stn");
+						if (file.exists())
+						{
+							openCell(file, RobotSimulatorType.RobotStudio);
+							generateSpans();
+							intersectSpans();
+							generateAutomata();
+							examineCollisions();
+						}
+						else
+						{
+							logger.error("File " + file + " does not exist.");
+						}
+					}
+			});
+			contentPane.add(demoButton);
+		}
+
 		pack();
 		init();
 	}
@@ -164,6 +169,12 @@ public class RobotCellExaminer
 	 */
 	private void generateSpans()
 	{
+		if (cell == null)
+		{
+			logger.error("No cell opened.");
+			return;
+		}
+
 		try
 		{
 			// For each robot, generate spans
@@ -208,6 +219,12 @@ public class RobotCellExaminer
 	 */
 	private void intersectSpans()
 	{
+		if (cell == null)
+		{
+			logger.error("No cell opened.");
+			return;
+		}
+
 		try
 		{
 			// Intersect spans of robots, pairwise
@@ -259,6 +276,12 @@ public class RobotCellExaminer
 	 */
 	private void examineCollisions()
 	{
+		if (cell == null)
+		{
+			logger.error("No cell opened.");
+			return;
+		}
+
 		try
 		{
 			// For each robot
