@@ -2951,8 +2951,8 @@ public class ActionMan
 			//trainSimulator.exec();
 	}
 	*/
-	static RobotCellExaminer theRobotCellExaminer = null;
 
+	static RobotCellExaminer theRobotCellExaminer = null;
 	public static void showRobotCellExaminer(Gui gui)
 	{
 		Thread thread = new Thread(new Runnable()
@@ -2961,7 +2961,8 @@ public class ActionMan
 			{
 				if (theRobotCellExaminer == null)
 				{
-					theRobotCellExaminer = new RobotCellExaminer(ActionMan.getGui().getFrame());
+					//theRobotCellExaminer = new RobotCellExaminer(ActionMan.getGui().getFrame());
+					theRobotCellExaminer = new RobotCellExaminer(null);
 				}
 
 				theRobotCellExaminer.setVisible(true);

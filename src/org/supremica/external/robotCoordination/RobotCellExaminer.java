@@ -54,8 +54,8 @@ public class RobotCellExaminer
 						openCell(file, RobotSimulatorType.RobotStudio);
 					}
 					else
-					{						
-						logger.error("The file " + cellName + " is not a robot station or is " + 
+					{
+						logger.error("The file " + cellName + " is not a robot station or is " +
 									 "not a of a type supported by Supremica.");
 					}
 				}
@@ -102,20 +102,18 @@ public class RobotCellExaminer
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				//openCell("C:/temp/RobSuprTestStation/RobSuprTest.stn", RobotSimulatorType.RobotStudio);
 				// Open file if it exists...
 				//File file = new File("C:/temp/RobSuprTestStation/RobSuprTest.stn");
 				File file = new File("C:/temp/DomStations/DemoSafe.stn");
 				if (file.exists())
 				{
-					//openCell("C:/temp/DomStations/DemoSafe.stn", RobotSimulatorType.RobotStudio);
 					openCell(file, RobotSimulatorType.RobotStudio);
 					generateSpans();
 					intersectSpans();
 					generateAutomata();
 					examineCollisions();
 				}
-				else 
+				else
 				{
 					logger.error("File " + file + " does not exist.");
 				}
@@ -148,7 +146,7 @@ public class RobotCellExaminer
 		{
 			// Here, it would be a good thing to examine if RobotStudio is
 			// properly installed...
-			
+
 			// Open cell
 			cell = new RobotStudioInterface.RSRobotCell(file);
 		}
@@ -156,7 +154,7 @@ public class RobotCellExaminer
 		{
 			logger.error("Unknown robot simulation environment specified.");
 		}
-		
+
 		// Initialize
 		init();
 	}

@@ -302,7 +302,6 @@ public class MainMenuBar
 			// /* WHAT'S THE DIFFERENCE BETWEEN THESE TWO? THERE IS NO DOCUMENTATION!!! AAAAARGH!!
 			if (SupremicaProperties.generalUseRobotCoordination() || true)
 			{
-
 				//File.Import.RobotCoordination
 				JMenuItem menuFileImportRobotCoordination = new JMenuItem();
 
