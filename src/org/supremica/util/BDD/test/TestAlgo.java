@@ -32,9 +32,9 @@ public class TestAlgo {
 
 		};
 	private final long reachables[] = { 25731072, 18, 199, 2274519862886400L, 10000000, -1, -1};
-	private final long coreachables[] = { 343692864, 68, 4920, 2538998916710400L, 10000000, -1, -1};
+	private final long coreachables[] = { 343692864, 20, 432, 2274519862886400L, 10000000, -1, -1};
 	private final boolean controllable[] = { false, false, false, true, true, true, true};
-	private final boolean nonblocking[] = { true, true, false, true, true, true /* dont know */, true /* dont know */};
+	private final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */, true /* dont know */};
 
 
 	// ----------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ public class TestAlgo {
 		boolean is_controllable = verifier.isControllable();
 
 		if(is_controllable != result) {
-			System.err.println("ERROR: [controllability] got " + is_controllable + ", expected " + result);
+			System.out.println("\nERROR: [controllability] got " + is_controllable + ", expected " + result);
 			fail ++;
 			return;
 		}

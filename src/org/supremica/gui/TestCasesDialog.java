@@ -15,6 +15,7 @@ import org.supremica.testcases.AllocationBatch;
 import org.supremica.testcases.Counters;
 import org.supremica.testcases.RandomAutomata;
 import org.supremica.testcases.TransferLine;
+import org.supremica.testcases.PigeonHole;
 import org.supremica.testcases.warehouse.Warehouse;
 import org.supremica.testcases.warehouse.SelectEventsWindow;
 
@@ -188,7 +189,7 @@ class WarehousePanel
 	IntegerField nbr_events_l = new IntegerField("1", 6);
 	SelectEventsWindow selectOperatorEventsWindow = null;
 	SelectEventsWindow selectUnobservableEventsWindow = null;
-	
+
 	WarehousePanel()
 	{
 		JPanel panel  = new JPanel( new GridLayout(3,2));
@@ -199,7 +200,7 @@ class WarehousePanel
 
 		panel.add(new JLabel("Number of supervisor events (l): "));
 		panel.add(nbr_events_l);
-		
+
 		JButton selectOperatorEventsButton = new JButton("Select operator events");
 		selectOperatorEventsButton.addActionListener(new ActionListener()
 		{
@@ -216,7 +217,7 @@ class WarehousePanel
 
 		panel.add(selectOperatorEventsButton);
 
-		
+
 		//JButton selectControlEventsButton = new JButton("Select control events");
 		//panel.add(selectControlEventsButton);
 
@@ -418,8 +419,12 @@ class TransferLinePanel
 	public TransferLinePanel()
 	{
 
-		JPanel panel  = new JPanel( new GridLayout(3,2));
+		JPanel panel  = new JPanel( new GridLayout(4,2));
 		add(panel, BorderLayout.CENTER);
+
+
+		panel.add(new JLabel("Ref: \"Notes on Control of Discrete",  SwingConstants.RIGHT) );
+		panel.add(new JLabel("-Event Systems\", W.M. Wonham", SwingConstants.LEFT ));
 
 		panel.add(new JLabel("Number of cells: "));
 		panel.add(int_cells = new IntegerField("3", 5));
@@ -446,6 +451,43 @@ class TransferLinePanel
 }
 
 
+class PigeonHolePanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField int_pigeons = null;
+	IntegerField int_holes = null;
+
+	public PigeonHolePanel()
+	{
+
+		JPanel panel  = new JPanel( new GridLayout(3,2));
+		add(panel, BorderLayout.NORTH);
+
+		panel.add(new JLabel("Ref: \"The Intractability",  SwingConstants.RIGHT) );
+		panel.add(new JLabel(" of Resolution\", Armin Haken", SwingConstants.LEFT ));
+
+		panel.add(new JLabel("Number of pigeons: "));
+		panel.add(int_pigeons = new IntegerField("5", 3));
+
+		panel.add(new JLabel("Number of holes: "));
+		panel.add(int_holes = new IntegerField("6", 3));
+
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		int p = int_pigeons.get();
+		int h = int_holes.get();
+		if(p < 1 || h < 1) throw new Exception("Weird configuration...");
+
+		PigeonHole ph = new PigeonHole(p, h);
+		return ph.getProject();
+	}
+}
+
+
 
 class ExampleTab
 	extends JTabbedPane
@@ -459,6 +501,7 @@ class ExampleTab
 		addTab("Transfer Line", null, new TransferLinePanel(), "Transfer Line");
 		addTab("Counters", null, new CountersPanel(), "Independent Counters");
 		addTab("Random automata", null, new RandomPanel(), "Random automata");
+		addTab("Pigeon-Hole", null, new PigeonHolePanel(), "Pigeon-Hole");
 		addTab("Warehouse", null, new WarehousePanel(), "Warehouse");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
