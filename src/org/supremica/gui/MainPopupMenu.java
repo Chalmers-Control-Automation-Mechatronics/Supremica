@@ -70,20 +70,17 @@ class MainPopupMenu
 		menuHandler.addSeparator();
 
 		JMenuItem synchronizeItem = new JMenuItem("Synchronize");
-
 		menuHandler.add(synchronizeItem, 2);
 
 		JMenuItem verifyItem = new JMenuItem("Verify");
-
 		menuHandler.add(verifyItem, 1);
 
-		JMenuItem synthesizeItem = new JMenuItem("Synthesize");
-
+		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
 		menuHandler.add(synthesizeItem, 1);
+		
 		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
-
 		menuHandler.add(purgeItem, 1);
 
 		// These are the "standard" algorithms
@@ -298,6 +295,7 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
+		/* Taken care of by SynthesizeAction -- all in one place y'know.
 		synthesizeItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -306,6 +304,7 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
+		*/
 		purgeItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

@@ -156,7 +156,6 @@ public class AutomatonSynthesizer
 			if (currState.isAccepting() && !currState.isForbidden())
 			{
 				acceptingStates.addLast(currState);
-				currState.setCost(State.MIN_COST);
 			}
 		}
 	}
@@ -177,7 +176,6 @@ public class AutomatonSynthesizer
 			if (currState.isAccepting() && !currState.isForbidden())
 			{
 				acceptingStates.addLast(currState);
-				currState.setCost(State.MIN_COST);
 			}
 
 			if (currState.isForbidden())
@@ -205,20 +203,15 @@ public class AutomatonSynthesizer
 
 		doReachable();
 
-		// Set MIN_COST to all safe states
-		// Forbid the rest
-		boolean didSomething = false; //-- MF -- records whether we actually did anything
+		// Forbid the states with MAX_COST set
+		boolean didSomething = false;
 		stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
 		{
 			State currState = (State) stateIt.next();
 
-			if (currState.getCost() != State.MAX_COST)
-			{
-				currState.setCost(State.MIN_COST);
-			}
-			else
+			if(currState.getCost() == State.MAX_COST)
 			{
 				currState.setForbidden(true);
 				didSomething = true;
@@ -246,7 +239,6 @@ public class AutomatonSynthesizer
 			if (currState.isAccepting() &&!currState.isForbidden())
 			{
 				acceptingStates.addLast(currState);
-				currState.setCost(State.MIN_COST);
 			}
 
 			if (currState.isForbidden())
@@ -260,20 +252,15 @@ public class AutomatonSynthesizer
 		doControllable(stateList);
 		doReachable();
 
-		// Set MIN_COST to all safe states
-		// Forbid the rest
-		boolean didSomething = false; //-- MF -- records whether we actually did anything
+		// Forbid the states with MAX_COST
+		boolean didSomething = false;
 		stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
 		{
 			State currState = (State) stateIt.next();
 
-			if (currState.getCost() != State.MAX_COST)
-			{
-				currState.setCost(State.MIN_COST);
-			}
-			else
+			if (currState.getCost() == State.MAX_COST)
 			{
 				currState.setForbidden(true);
 				didSomething = true;
@@ -303,20 +290,15 @@ public class AutomatonSynthesizer
 
 		doReachable();
 
-		// Set MIN_COST to all safe states
-		// Forbid the rest
-		boolean didSomething = false; //-- MF -- records whether we actually did anything
+		// Forbid the states with MAX_COST set
+		boolean didSomething = false;
 		Iterator stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
 		{
 			State currState = (State) stateIt.next();
 
-			if (currState.getCost() != State.MAX_COST)
-			{
-				currState.setCost(State.MIN_COST);
-			}
-			else
+			if(currState.getCost() == State.MAX_COST)
 			{
 				currState.setForbidden(true);
 				didSomething = true;
@@ -408,9 +390,9 @@ public class AutomatonSynthesizer
 
 				if (!currEvent.isControllable())
 				{
-					State fromState = currArc.getFromState();
+					State fromState = currArc.getFromState();	// backwards over this uc-event
 
-					if (fromState.getCost() != State.MAX_COST)
+					if (fromState.getCost() != State.MAX_COST)	// if not already forbidden, forbid it
 					{
 						nbrOfNewUnsafeStates++;
 
@@ -558,5 +540,4 @@ public class AutomatonSynthesizer
 
 		stateList.clear();
 	}
-
 }

@@ -236,7 +236,6 @@ class SynthesizerDialogAdvancedPanel
 		Box advancedBox = Box.createVerticalBox();
 
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
-
 		advancedBox.add(maximallyPermissiveBox);
 		this.add(advancedBox);
 	}

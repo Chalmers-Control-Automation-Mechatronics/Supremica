@@ -174,7 +174,7 @@ class AutomataSelector
 		}
 		return partialSet; // return the updated set
 	}
-
+	
 	public Automata addPlants(Alphabet events)
 	{
 		for(Iterator it = events.iterator(); it.hasNext(); )
@@ -183,6 +183,7 @@ class AutomataSelector
 		}
 		return partialSet;
 	}
+	
 
 	// Return wether we've seen a spec/sup or not
 	boolean hadSpec()
@@ -380,7 +381,7 @@ public class AutomataSynthesizer
 						{
 							logger.info("The synthesized supervisor " + retval.automaton.getComment() + " is maximally permissive.");
 						}
-
+						
 						modSupervisors.addAutomaton(retval.automaton);
 					}
 				}

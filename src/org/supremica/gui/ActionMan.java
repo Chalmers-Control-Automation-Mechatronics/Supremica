@@ -110,14 +110,16 @@ public class ActionMan
 	private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
 
 	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
-	// gui here is filled in by
+	// gui here is filled in by (who?)
 	public static Gui gui = null;
+	
 	public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
 	public static final FindStates findStates = new FindStates();
 	public static final StateEnumerator stateEnumerator = new StateEnumerator();
 	public static final HelpAction helpAction = new HelpAction();
 	public static final OpenAction openAction = new OpenAction(); // defined in MainToolBar (just for fun :-)
-
+	public static final SynthesizeAction synthesizeAction = new SynthesizeAction();
+	
 	public static Gui getGui()
 	{
 		return gui;
