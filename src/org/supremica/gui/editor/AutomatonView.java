@@ -369,10 +369,12 @@ public class AutomatonView
 			{
 				obj = obj.getParent();
 			}
+/*
 			if (obj instanceof StateNode)
 			{
 				((StateNode)obj).colorChange();
 			}
+*/
 		}
 		else
 		{
