@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.8 2005-03-11 09:25:31 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.9 2005-03-15 05:32:34 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -40,8 +40,9 @@ public class EditorLabelGroup
 	private final ArrayList events;
 	/** Holds labels that are shown on EditorSurface. */
 	private final JPanel panel;
-	/** Has copies of the labels, to show as a "shadow"s on EditorSurface. */
+	/*
 	private final JPanel shadowPanel;
+	*/
 
 	public static final int DEFAULTOFFSETX = 0;
 	public static final int DEFAULTOFFSETY = 10;
@@ -49,7 +50,9 @@ public class EditorLabelGroup
 	public void removeFromSurface(EditorSurface e)
 	{
 		e.remove(panel);
+		/*
 		e.remove(shadowPanel);
+		*/
 	}
 
 	public EditorEdge getParent()
@@ -69,6 +72,11 @@ public class EditorLabelGroup
 		selectedLabel = -1;
 
 		return (r.contains(ex, ey));
+	}
+
+	public Rectangle getBounds()
+	{
+		return panel.getBounds();
 	}
 
 	public void setHighlighted(boolean s)
@@ -105,8 +113,11 @@ public class EditorLabelGroup
 		int y = (int) (proxy.getGeometry().getOffset().getY() + parent.getTPointY());    // - ((double)(verticalA / 2) * panel.getHeight()));
 
 		panel.setLocation(x, y);
+		/*
 		shadowPanel.setLocation(x+2, y+2);
+		*/
 
+		/*
 		// Draw shadow
 		if (isHighlighted())
 		{
@@ -122,6 +133,7 @@ public class EditorLabelGroup
 		{
 			shadowPanel.setVisible(false);
 		}
+		*/
 		
 		for (int i = 0; i < events.size(); i++)
 		{
@@ -133,6 +145,20 @@ public class EditorLabelGroup
 			{
 				l.setForeground(Color.RED);
 			}
+
+			/*
+			// Draw shadow
+			if (isHighlighted())
+			{
+				//l.setOpaque(true);
+				l.setBackground(getShadowColor());
+			}
+			else
+			{
+				//l.setOpaque(false);
+				l.setBackground(EditorColor.INVISIBLE);
+			}
+			*/
 		}
 	}
 
@@ -167,7 +193,9 @@ public class EditorLabelGroup
 	{
 		events.remove(i);
 		panel.remove(i);
+		/*
 		shadowPanel.remove(i);
+		*/
 
 		/* This looked wierd... the indices i and j are used... what's the loop for if i is used anyway?
 		JLabel l = (JLabel) events.get(i);
@@ -245,10 +273,13 @@ public class EditorLabelGroup
 
 		l.setBorder(new EmptyBorder(0, 0, 0, 0));
 		l.setOpaque(false);
+		l.setBackground(getShadowColor());
 
 		events.add(l);
 		panel.add(l);
+		/*
 		shadowPanel.add(new JLabel(l.getText()));
+		*/
 	}
 
 	private void resizePanel()
@@ -262,9 +293,11 @@ public class EditorLabelGroup
 			c.setLocation(0, height);
 			c.setSize(c.getPreferredSize());
 
+			/*
 			c = (JComponent) shadowPanel.getComponent(i);
 			c.setLocation(0, height);
 			c.setSize(c.getPreferredSize());
+			*/
 
 			height += c.getHeight();
 
@@ -275,7 +308,11 @@ public class EditorLabelGroup
 		}
 
 		panel.setSize(width, height);
+		/*
 		shadowPanel.setSize(width, height);
+		*/
+
+		panel.repaint();
 	}
 
 	public int getX()
@@ -304,15 +341,19 @@ public class EditorLabelGroup
 		parent = par;
 		events = new ArrayList();
 		panel = new JPanel();
+		/*
 		shadowPanel = new JPanel();
+		*/
 
 		panel.setVisible(true);
 		panel.setOpaque(false);
 		panel.setLayout(null);
 
+		/*
 		shadowPanel.setVisible(true);
 		shadowPanel.setOpaque(false);
 		shadowPanel.setLayout(null);
+		*/
 
 		if (proxy.getGeometry() == null)
 		{
@@ -330,7 +371,9 @@ public class EditorLabelGroup
 		}
 
 		resizePanel();
+		/*
 		e.add(shadowPanel);
+		*/
 		e.add(panel);
 		setPanelLocation();
 
@@ -352,7 +395,9 @@ public class EditorLabelGroup
 					// Clear all lists
 					events.clear();
 					panel.removeAll();
+					/*
 					shadowPanel.removeAll();
+					*/
 
 					for (int j = 0; j < proxy.size(); j++)
 					{
@@ -361,7 +406,9 @@ public class EditorLabelGroup
 
 					resizePanel();
 					panel.repaint();
+					/*
 					shadowPanel.repaint();
+					*/
 
 					selectedLabel--;
 				}
@@ -383,7 +430,9 @@ public class EditorLabelGroup
 					// Clear all lists
 					events.clear();
 					panel.removeAll();
+					/*
 					shadowPanel.removeAll();
+					*/
 
 					for (int j = 0; j < proxy.size(); j++)
 					{
@@ -392,7 +441,9 @@ public class EditorLabelGroup
 
 					resizePanel();
 					panel.repaint();
+					/*
 					shadowPanel.repaint();
+					*/
 
 					selectedLabel++;
 				}

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.18 2005-03-11 09:25:31 flordal Exp $
+//# $Id: EditorSurface.java,v 1.19 2005-03-15 05:32:34 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -266,6 +266,18 @@ public class EditorSurface
 			EditorLabelGroup l = (EditorLabelGroup) events.get(i);
 
 			l.setPanelLocation();
+
+			// Why is this done here? Why are labelgroups treated differently?
+			// Draw shadow
+			if (l.isHighlighted())
+			{
+				Rectangle bounds = l.getBounds();
+				g.setColor(l.getShadowColor());
+				int adjust = 2;
+				g.fillRoundRect((int) bounds.getX()-adjust, (int) bounds.getY()-adjust, 
+								(int) bounds.getWidth()+2*adjust, (int) bounds.getHeight()+2*adjust, 
+								20, 20);
+			}
 		}
 
 		for (int i = 0; i < lines.size(); i++)

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.9 2005-03-11 09:25:31 flordal Exp $
+//# $Id: EditorObject.java,v 1.10 2005-03-15 05:32:34 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -38,7 +38,7 @@ public class EditorObject
 	// Different pens for drawing
 	public final Stroke BASICSTROKE = new BasicStroke();
 	public final Stroke DOUBLESTROKE = new BasicStroke(2); 	
-	public final Stroke SHADOWSTROKE = new BasicStroke(5); 	
+	public final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND); 	
 
 	public void drawObject(Graphics g)
 	{
