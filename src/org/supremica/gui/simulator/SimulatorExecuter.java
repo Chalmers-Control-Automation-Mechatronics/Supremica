@@ -176,8 +176,7 @@ public class SimulatorExecuter
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				setVisible(false);
-				dispose();
+				close();
 			}
 		});
 		initMenubar();
@@ -226,6 +225,16 @@ public class SimulatorExecuter
 		});
 	}
 
+	private void close()
+	{
+		setVisible(false);
+		dispose();
+		if (stateViewer != null)
+		{
+			stateViewer.close();
+		}
+	}
+
 	public void updated(Object o)
 	{
 
@@ -266,7 +275,7 @@ public class SimulatorExecuter
 	{
 		//logger.info("AnimationEvent: " + ev.getName());
 	}
-	
+
 	public int[] getCurrentState()
 	{
 		return currState;
@@ -274,9 +283,9 @@ public class SimulatorExecuter
 
 	public void registerSignalObserver(SignalObserver listener)
 	{
-		theAnimationSignals.registerInterest(listener);		
+		theAnimationSignals.registerInterest(listener);
 	}
-	
+
 	public boolean isTrue(Condition theCondition)
 	{
 		return theAnimationSignals.isTrue(theCondition.getLabel());
@@ -317,13 +326,13 @@ public class SimulatorExecuter
 		onlineSynchronizer.setCurrState(currState);
 		if (onlineSynchronizer.isEnabled(event))
 		{
-			currState = onlineSynchronizer.doTransition(event);		
+			currState = onlineSynchronizer.doTransition(event);
 //		return onlineSynchronizer.doTransition(events[index]);
 			update();
 		}
 		else
 		{
-			logger.error("The event " + event.getLabel() + " is not enabled");	
+			logger.error("The event " + event.getLabel() + " is not enabled");
 		}
 		return currState != null;
 	}
@@ -341,7 +350,7 @@ public class SimulatorExecuter
 
 	public void update()
 	{
-		theAnimationSignals.notifyObservers();			
+		theAnimationSignals.notifyObservers();
 	}
 }
 

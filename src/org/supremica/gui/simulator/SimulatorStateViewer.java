@@ -147,7 +147,7 @@ public class SimulatorStateViewer
 //		setCurrState(SimulatorExecuterHelper.getInitialState(), false);
 //		simulator.resetAnimation();
 //	}
-//	
+//
 //	public void undoState()
 //	{
 //		if (prevStates.size() > 0)
@@ -189,10 +189,10 @@ public class SimulatorStateViewer
 //		stateDisplayer.setCurrState(currState);
 //		controller.update();
 //	}
-	
+
 //	public void signalUpdated()
 //	{
-//		update();	
+//		update();
 //	}
 
 //	public void executeEvent(LabeledEvent event, int[] newState)
@@ -205,20 +205,28 @@ public class SimulatorStateViewer
 	{
 		this.controller = controller;
 	}
-	
+
 	public void executeControllableEvents(boolean doExecute)
 	{
-		theExecuter.executeControllableEvents(doExecute);	
+		theExecuter.executeControllableEvents(doExecute);
 	}
-	
+
 	public void executeUncontrollableEvents(boolean doExecute)
 	{
-		theExecuter.executeUncontrollableEvents(doExecute);	
+		theExecuter.executeUncontrollableEvents(doExecute);
 	}
-	
+
+	public void close()
+	{
+		if (theExecuter != null)
+		{
+			theExecuter.requestStop();
+		}
+	}
+
 //	public SimulatorExecuter getSimulatorExecuter()
 //	{
-//		return simulator;	
+//		return simulator;
 //	}
 }
 
