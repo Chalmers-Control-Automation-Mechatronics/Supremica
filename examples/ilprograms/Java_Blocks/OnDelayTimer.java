@@ -7,10 +7,10 @@ public class OnDelayTimer{
 	private long zeroTime;
 	private boolean prevIN;
 
-	public boolean IN;
-	public int PT;
-	public int ET;
-	public boolean Q;
+	public boolean tonIN;
+	public int tonPT;
+	public int tonET;
+	public boolean tonQ;
 
 
 
@@ -18,16 +18,16 @@ public class OnDelayTimer{
 	}
 
 
-	public int getET() {
+	public int gettonET() {
 		/* Om vi befinner oss i fasen då IN är true och tiden
          * som har gått sedan IN sattes till true inte har uppnått
-         * PT, ska denna tid läggas in i ET (rampfunktion)
+         * tonPT, ska denna tid läggas in i tonET (rampfunktion)
          */
-		if (IN && ET < PT) {
-			ET = (int)(System.currentTimeMillis()-zeroTime);
+		if (tonIN && tonET < tonPT) {
+			tonET = (int)(System.currentTimeMillis()-zeroTime);
 		}
 
-		return ET;
+		return tonET;
 	}
 
 
@@ -36,25 +36,25 @@ public class OnDelayTimer{
          * En ny timer ska endast startas om insignalen går från false
          * till true
          */
-		if (!prevIN && IN) {
+		if (!prevIN && tonIN) {
 
 
 			zeroTime = System.currentTimeMillis();
 			timer = new Timer();
 
-			timer.schedule(new DelayTask(), PT);
+			timer.schedule(new DelayTask(), tonPT);
 		}
 
-		prevIN = IN;
+		prevIN = tonIN;
 
-		if (IN) {
-			ET = getET();
+		if (tonIN) {
+			tonET = gettonET();
 		} else {
-			/* Om IN är false, stoppa timern *
-			 * och sätt ET till 0            */
+			/* Om tonIN är false, stoppa timern *
+			 * och sätt tonET till 0            */
 			timer.cancel();
-			Q = IN;
-			ET = 0;
+			tonQ = tonIN;
+			tonET = 0;
 		}
 
 	}
@@ -62,10 +62,10 @@ public class OnDelayTimer{
 
 	class DelayTask extends TimerTask {
 		public void run() {
-			/* När tiden specificerad av PT har gått,
-			   sätts utvärdet Q till invärdet IN */
-			Q = IN;
-			ET = PT;
+			/* När tiden specificerad av tonPT har gått,
+			   sätts utvärdet tonQ till invärdet tonIN */
+			tonQ = tonIN;
+			tonET = tonPT;
 
 			/* Terminate the timer thread */
 			timer.cancel();
