@@ -111,6 +111,16 @@ public class IEC61131Helper
 		pw.println();
 	}
 
+	public void printTimerVariableDeclaration(PrintWriter pw, String variableName, String comment)
+	{
+		pw.print("\t\t" + variableName + " : TON; ");
+		if (comment != null)
+		{
+			pw.print("(* " + comment + " *)");
+		}
+		pw.println();
+	}
+
 	// Start AT %IX24 : BOOL;
 	public void printBooleanInputVariableDeclaration(PrintWriter pw, String variableName, int port, String comment)
 	{

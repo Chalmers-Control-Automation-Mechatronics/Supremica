@@ -158,6 +158,24 @@ public class AutomataToIEC1131
 		theHelper.printBooleanVariableDeclaration(pw, "initialized", "Set the inital state the first scan cycle");
 	}
 
+	void printTimerVariables(PrintWriter pw)
+	{
+		for (Iterator theIt = theProject.timersIterator(); theIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)theIt.next();
+			String startEvent = currTimer.getStartEvent();
+
+			if (!allEvents.containsEventWithLabel(startEvent))
+			{
+				throw new IllegalStateException("Could not find event: " + startEvent);
+			}
+			LabeledEvent startLabeledEvent = allEvents.getEventWithLabel(startEvent);
+			int currIndex = startLabeledEvent.getSynchIndex();
+
+			theHelper.printTimerVariableDeclaration(pw, "timer_" + currIndex, currTimer.getName());
+		}
+	}
+
 	public void printILBegin(PrintWriter pw)
 	{
 		theHelper.printILBegin(pw);
