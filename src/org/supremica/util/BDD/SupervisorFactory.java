@@ -16,7 +16,8 @@ public class SupervisorFactory {
 	switch(Options.algo_family) {
 	case Options.ALGO_MONOLITHIC: return new Supervisor(manager, automata);	    
 	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,automata);
-
+	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,automata);
+	case Options.ALGO_SMOOTHED: return new SmoothSupervisor(manager,automata);
 	}
 
 	// the type is not supported:
@@ -29,7 +30,9 @@ public class SupervisorFactory {
     {
 	switch(Options.algo_family) {
 	case Options.ALGO_MONOLITHIC: return new Supervisor(manager, plant,spec);
-	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,plant, spec);    
+	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,plant, spec);   
+ 	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,plant, spec);
+	case Options.ALGO_SMOOTHED: return new SmoothSupervisor(manager,plant, spec);
 	}
 
 	// the type is not supported:

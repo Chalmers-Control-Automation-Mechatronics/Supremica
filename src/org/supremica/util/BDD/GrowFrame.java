@@ -94,6 +94,8 @@ public class GrowFrame
 			int size_y = (max - min);
 			int marg_y = (dims.height * 1) / 10;
 
+			if(size_y < 1) size_y = 1; // avoid DIV BY ZERO
+
 			dims.height -= 2 * marg_y;
 
 			int old_x = -1, old_y = -1;    // initilized to junk (or jikes will complain)

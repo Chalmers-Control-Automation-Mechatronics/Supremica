@@ -118,6 +118,9 @@ public class Automaton
 	}
 
 	// ------------------------------------------------------------
+    public boolean interact(Automaton a) {
+	return eventSet.overlap(a.eventSet);
+    }
 	public String getName()
 	{
 		return name;

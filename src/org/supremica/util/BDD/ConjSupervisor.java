@@ -15,15 +15,31 @@ public class ConjSupervisor
 {
 
 
+    
+    private GroupHelper gh;
+    private int [] tpri;
+    private int size;
+
     /** Constructor, passes to the base-class */
     public ConjSupervisor(BDDAutomata manager, Group plant, Group spec) {
 	super(manager, plant, spec);
+	init_conj();
     }
     /** Constructor, passes to the base-class */
     public ConjSupervisor(BDDAutomata manager, BDDAutomaton[] automata) {
 	super(manager, automata);
+	init_conj();
     }
 
+    // -----------------------------------------------------------------
+    private void init_conj() {
+	// get the ordred automata list!
+	gh = new GroupHelper(plant, spec);
+	tpri = gh.getTpri();
+	size = gh.getSize();
+    }
+
+    // -----------------------------------------------------------------
     // TODO
 
     // protected int computeLanguageDifference(int considred_events) 
@@ -99,12 +115,7 @@ public class ConjSupervisor
 
 	int front = r_all;
 	manager.ref(front); // gets derefed by andTo
-	
-
-	// get the ordred automata list!
-	GroupHelper gh = new GroupHelper(plant, spec);
-	int [] tpri = gh.getTpri();
-	int size = gh.getSize();
+		
 
 	do {
 	    r_all_p = r_all;
@@ -112,7 +123,7 @@ public class ConjSupervisor
 
 	    // apply the conjunctive transition relations in reverse order
 	    // (to build the BDD bottom up ?)
-	    for(int i = size-1; i >= 0; --i) 
+	    for(int i = 0; i < size; i++) 
 		front = manager.andTo( front, tpri[i]);
 
 	    int tmp = manager.exists(front, cube);
@@ -156,14 +167,7 @@ public class ConjSupervisor
 		int cube = manager.and(manager.getStatepCube(), manager.getEventCube());
 		int permute1 = manager.getPermuteS2Sp();
 		int permute2 = manager.getPermuteSp2S();
-
-
-		
-		// get the ordred automata list!
-		GroupHelper gh = new GroupHelper(plant, spec);
-		int [] tpri = gh.getTpri();
-		int size = gh.getSize();
-
+	      
 
 		int m_all = GroupHelper.getM(manager, spec, plant);
 
@@ -177,7 +181,7 @@ public class ConjSupervisor
 		{
 			r_all_p = r_all;
 			
-			for(int i = size-1; i >= 0; --i) 
+			for(int i = i = 0; i < size; i++) 
 			    front = manager.andTo( front, tpri[i]);
 			
 			int tmp = manager.exists(front, cube);

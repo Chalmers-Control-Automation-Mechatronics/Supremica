@@ -8,6 +8,7 @@ public class BDDAutomaton
 {
 	private BDDAutomata manager;
 	private Automaton automaton;
+    private DependencySet dependency = null;
     private int index;
 	private int num_bits, num_states, num_arcs;
 	private State[] states;
@@ -166,9 +167,18 @@ public class BDDAutomaton
 		check("Cleanup");
 		manager.deletePair(permute_s2sp);
 		manager.deletePair(permute_sp2s);
+		if(dependency != null) {
+		    dependency.cleanup();
+		    dependency = null;
+		}
 	}
 
 	// ------------------------------------------------------------------
+    public DependencySet getDependencySet() {
+	if(dependency == null) dependency = new DependencySet(manager,this);
+	return dependency;
+    }
+
 	public int[] getVar()
 	{
 		return var_s;
@@ -307,6 +317,9 @@ public class BDDAutomaton
 		return num_bits;
 	}
 
+    public boolean interact(BDDAutomaton ba) {
+	return automaton.interact(ba.automaton);
+    }
 	// ------------------------------------------------------------------
 	private void createI()
 	{

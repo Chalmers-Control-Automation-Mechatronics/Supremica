@@ -102,6 +102,15 @@ public class EventSet
 		return events[index];
 	}
 
+    public boolean overlap(EventSet es) {
+	for(int t = 0; t < total; t++) 
+	    if(events[t] != null && es.events[t] != null)
+		return true;
+
+	return false;
+    }
+ 	// -------------------------------------------------------
+  
 	void close(EventManager alphabet)
 	{
 		BDDAssert.internalCheck(!closed, "[EventSet.close] BAD FUNCTION CALL!");
