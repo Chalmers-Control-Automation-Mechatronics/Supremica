@@ -426,10 +426,14 @@ public class AutomataToSattLineSFCForBallProcess
 			{
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getName() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
 			}
-			/*else if (event.getLabel().equalsIgnoreCase("IP.ManuellStart") || event.getLabel().equalsIgnoreCase("IP.AutoStart"))
+			else if (event.getLabel().equalsIgnoreCase("timermätlyft"))
 			{
-				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + "NOT " + event.getLabel() + theHelper.getTransitionConditionSuffix());
-			}*/
+				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getName() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
+			}
+			else if (event.getLabel().equalsIgnoreCase("timerhiss"))
+			{
+				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getName() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
+			}
 			else
 			{
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel() + theHelper.getTransitionConditionSuffix());
