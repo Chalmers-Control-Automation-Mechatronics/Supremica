@@ -854,11 +854,11 @@ class BDDPanel2
 
 		JLabel tmp;
 
-		pTopLeft.add( tmp = new JLabel("Automata to BDD", SwingConstants.LEFT)  );
+		pTopLeft.add( tmp = new JLabel("Automata --> BDD conversion", SwingConstants.LEFT)  );
 		tmp.setForeground(Color.blue);
 
 		JPanel pOrdering = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
-		pOrdering.add( new JLabel("Automaton (not BDD) ordering"));
+		pOrdering.add( new JLabel("Automaton ordering"));
 		pOrdering.add( orderingAlgorithm = new JComboBox());
 		insert( orderingAlgorithm, Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
 		pTopLeft.add(pOrdering);

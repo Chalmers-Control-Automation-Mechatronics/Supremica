@@ -14,11 +14,6 @@ public class TSPSolver extends Solver {
 
 	public TSPSolver(Node [] org_ ) {  super(org_); }
 
-	private double cost(int from, int to, int distance) {
-		// this is VERY non-theoretical :)
-		return Math.pow(org[from].wlocal[to], Math.log(1 + Math.abs(distance)));
-		// return org[from].wlocal[to] * Math.abs(distance); // <-- not that powerful
-	}
 	public void solve() {
 		int [] tour = TSP_tour();
 

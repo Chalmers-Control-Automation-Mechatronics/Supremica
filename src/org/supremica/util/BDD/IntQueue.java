@@ -29,6 +29,8 @@ public class IntQueue {
 
 	public boolean empty() { return (read == write); }
 
+	public void reset() { read = write = 0; }
+
 /*
 	public static void main(String [] args) {
 		IntQueue q = new IntQueue (5);

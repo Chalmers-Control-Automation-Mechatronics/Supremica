@@ -135,8 +135,8 @@ public class WorksetSupervisor extends DisjSupervisor
 
 		Workset workset = getWorkset(false);
 
-		int r_all_p, r_all = bdd_i;
-		manager.ref(r_all);
+		int r_all_p, r_all = manager.ref(bdd_i);
+
 
 		while(!workset.empty()) {
 			int p = workset.pickOne();
@@ -147,6 +147,7 @@ public class WorksetSupervisor extends DisjSupervisor
 				int tmp = manager.relProd(clusters[p].getTwave() , r_all, s_cube);
 				int tmp2 = manager.replace(tmp, perm_sp2s);
 				manager.deref(tmp);
+
 				r_all = manager.orTo(r_all, tmp2);
 				manager.deref(tmp2);
 

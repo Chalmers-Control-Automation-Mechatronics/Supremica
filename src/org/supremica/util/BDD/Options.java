@@ -105,7 +105,7 @@ public class Options
     	AO_HEURISTIC_TSP_STCT = 6,
     	AO_HEURISTIC_TSP_SIFT = 7;
 
-	public static int ordering_algorithm = AO_HEURISTIC_TSP;
+	public static int ordering_algorithm = AO_HEURISTIC_BFS;
 
 
 	/** Automaton selection heuristics  */

@@ -28,6 +28,10 @@ public class DFSSolver extends Solver {
 		// WAS: dfs(0); // start with the first state
 		dfs( get_least_connected() );
 
+
+		// fix those with no ordering:
+		for(int i = 0; i < size; i++) if(org[i].extra1 == 0)  org[i].extra2 = count++;
+
 		// now, sort according to our new DFS order
 		for(int i = 0; i < size; i++) solved[ org[i].extra2 ] = org[i];
 
@@ -46,21 +50,4 @@ public class DFSSolver extends Solver {
 		}
 	}
 
-
-	/** get the node with least number of connections */
-	private int get_least_connected() {
-		int best_index = 0;
-		int best = Integer.MAX_VALUE;
-
-		for(int i = 0; i < size; i++) {
-			int curr = 0;
-			for(int j = 0; j < size; j++) if(i != j && org[i].wlocal[j] >0 ) curr++;
-
-			if(curr < best) {
-				best = curr;
-				best_index = i;
-			}
-		}
-		return best_index;
-	}
 }
