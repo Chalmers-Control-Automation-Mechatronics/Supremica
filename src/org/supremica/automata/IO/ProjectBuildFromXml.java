@@ -1147,9 +1147,7 @@ public class ProjectBuildFromXml
 			}
 			else if ((url == null) && (inputProtocol == InputProtocol.JarProtocol))
 			{
-				logger.info("Tried to load from jar: " + path);
 				url = ProjectBuildFromXml.class.getResource(path);
-				logger.info("Tried to load from jar 2: " + url);
 			}
 		}
 		catch (MalformedURLException ex)
@@ -1158,7 +1156,6 @@ public class ProjectBuildFromXml
 			logger.error(ex);
 		}
 
-		logger.info("Loaded user interface from: " + url);
 		currProject.setUserInterfaceURL(url);
 	}
 

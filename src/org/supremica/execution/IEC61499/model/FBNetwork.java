@@ -48,87 +48,87 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.gui;
+package org.supremica.execution.IEC61499.model;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.util.*;
+/*
+<!ELEMENT FBNetwork (FB*,EventConnections?,DataConnections?,AdapterConnections?)>
+<!ELEMENT FB EMPTY>
+<!ATTLIST FB
+ Name CDATA #REQUIRED
+ Type CDATA #REQUIRED
+ Comment CDATA #IMPLIED
+  x CDATA #IMPLIED
+  y CDATA #IMPLIED
+>
 
-public class ErrorDialog
-	extends JDialog
+*/
+
+public class FBNetwork
 {
-	JEditorPane text;
+	List FB = new LinkedList();
+	EventConnections eventConnections = null;
+	DataConnections dataConnections = null;
+	AdapterConnections adapterConnections = null;
 
-	private ErrorDialog()
+	String name;
+	String type;
+	String comment;
+	int x;
+	int y;
+
+	private FBNetwork()
 	{
 	}
 
-	public ErrorDialog(JFrame frame, String message, Exception ex)
+	public FBNetwork(String name, String type)
 	{
-		super(frame, "Unexpected error", true);
-
-		setSize(new Dimension(350, 250));
-
-		// Add the stuff to the dialog
-		Container pane = getContentPane();
-
-		pane.setLayout(new BorderLayout(10, 10));
-
-		JPanel labelPane = new JPanel();
-
-		// Create the label
-		JLabel label = new JLabel(message);
-		labelPane.add(label);
-		pane.add(labelPane, BorderLayout.NORTH);
-
-		// Show stacktrace if there is an exception
-		if (ex != null)
-		{
-			text = new JEditorPane("text/plain", message);
-			text.setEditable(false);
-			JScrollPane textPane = new JScrollPane(text);
-			pane.add(textPane, BorderLayout.CENTER);
-		}
-
-
-		// Create labels
-		JPanel buttonPane = new JPanel();
-		JButton okButton = new JButton("OK");
-
-		okButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				dispose();
-			}
-		});
-
-		buttonPane.add(okButton);
-		pane.add(buttonPane, BorderLayout.SOUTH);
-
-
-		// Center over the Supremica window
-		Point point = Utility.getPosForCenter(getSize());
-
-		setLocation(point);
-		show();
+		this.name = name;
+		this.type = type;
 	}
 
-	public ErrorDialog(JFrame frame, String message)
+	public boolean hasEventConnections()
 	{
-		this(frame, message, null);
+		return eventConnections != null;
 	}
 
-	public static String getStackTrace(Throwable aThrowable)
+	public EventConnections getEventConnections()
 	{
-		Writer result = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(result);
-		aThrowable.printStackTrace(printWriter);
-		return result.toString();
+		return eventConnections;
 	}
 
+	public void setEventConnections(EventConnections theConnections)
+	{
+		this.eventConnections = theConnections;
+	}
 
+	public boolean hasDataConnections()
+	{
+		return dataConnections != null;
+	}
+
+	public DataConnections getDataConnections()
+	{
+		return dataConnections;
+	}
+
+	public void setDataConnections(DataConnections theConnections)
+	{
+		this.dataConnections = theConnections;
+	}
+
+	public boolean hasAdapterConnections()
+	{
+		return adapterConnections != null;
+	}
+
+	public AdapterConnections getAdapterConnections()
+	{
+		return adapterConnections;
+	}
+
+	public void setAdapterConnections(AdapterConnections theConnections)
+	{
+		this.adapterConnections = theConnections;
+	}
 }

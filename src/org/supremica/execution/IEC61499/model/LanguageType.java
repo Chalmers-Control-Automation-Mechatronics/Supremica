@@ -47,88 +47,83 @@
  *
  * Supremica is owned and represented by KA.
  */
+package org.supremica.execution.IEC61499.model;
 
-package org.supremica.gui;
+import java.util.*;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+/*
+<!ELEMENT Compiler EMPTY>
+<!ATTLIST Compiler
+ Language (Java | Cpp | C | Other) #REQUIRED
+ Vendor CDATA #REQUIRED
+ Product CDATA #REQUIRED
+ Version CDATA #REQUIRED
+>
+*/
 
-public class ErrorDialog
-	extends JDialog
+public class LanguageType
 {
-	JEditorPane text;
+	private static List collection = new LinkedList();
+	public static final LanguageType Java = new LanguageType("Java");
+	public static final LanguageType Cpp = new LanguageType("Cpp");
+	public static final LanguageType C = new LanguageType("C");
+	public static final LanguageType Other = new LanguageType("Other");
 
-	private ErrorDialog()
+	private String identifier;
+
+	private LanguageType(String identifier)
 	{
+		collection.add(this);
+		this.identifier = identifier;
 	}
 
-	public ErrorDialog(JFrame frame, String message, Exception ex)
+	public static Iterator iterator()
 	{
-		super(frame, "Unexpected error", true);
+		return collection.iterator();
+	}
 
-		setSize(new Dimension(350, 250));
+	public String toString()
+	{
+		return identifier;
+	}
 
-		// Add the stuff to the dialog
-		Container pane = getContentPane();
-
-		pane.setLayout(new BorderLayout(10, 10));
-
-		JPanel labelPane = new JPanel();
-
-		// Create the label
-		JLabel label = new JLabel(message);
-		labelPane.add(label);
-		pane.add(labelPane, BorderLayout.NORTH);
-
-		// Show stacktrace if there is an exception
-		if (ex != null)
+	public static LanguageType toType(String type)
+	{
+		if (equalType(Java, type))
 		{
-			text = new JEditorPane("text/plain", message);
-			text.setEditable(false);
-			JScrollPane textPane = new JScrollPane(text);
-			pane.add(textPane, BorderLayout.CENTER);
+			return Java;
 		}
 
-
-		// Create labels
-		JPanel buttonPane = new JPanel();
-		JButton okButton = new JButton("OK");
-
-		okButton.addActionListener(new ActionListener()
+		if (equalType(Cpp, type))
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				dispose();
-			}
-		});
+			return Cpp;
+		}
 
-		buttonPane.add(okButton);
-		pane.add(buttonPane, BorderLayout.SOUTH);
+		if (equalType(C, type))
+		{
+			return C;
+		}
 
+		if (equalType(Other, type))
+		{
+			return Other;
+		}
 
-		// Center over the Supremica window
-		Point point = Utility.getPosForCenter(getSize());
-
-		setLocation(point);
-		show();
+		return Other;
 	}
 
-	public ErrorDialog(JFrame frame, String message)
+	public static Object[] toArray()
 	{
-		this(frame, message, null);
+		return collection.toArray();
 	}
 
-	public static String getStackTrace(Throwable aThrowable)
+	private static boolean equalType(LanguageType type, String ident)
 	{
-		Writer result = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(result);
-		aThrowable.printStackTrace(printWriter);
-		return result.toString();
+		if ((type == null) || (ident == null))
+		{
+			return false;
+		}
+
+		return ident.toLowerCase().equals(type.toString().toLowerCase());
 	}
-
-
 }
