@@ -4,13 +4,14 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.2 2005-03-03 13:32:55 knut Exp $
+//# $Id: EditorWindowInterface.java,v 1.3 2005-03-04 05:40:22 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import java.util.List;
 import net.sourceforge.waters.model.expr.IdentifierProxy;
 import javax.swing.JFrame;
+import java.io.File;
 
 
 
@@ -35,4 +36,6 @@ public interface EditorWindowInterface
 	public void repaint();
 
 	void copyAsWMFToClipboard();
+	void createPDF(File f);
+
 }

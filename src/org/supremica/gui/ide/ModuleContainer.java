@@ -117,9 +117,9 @@ public class ModuleContainer
 		return theVisualProject;
 	}
 
-	public EditorWindowInterface getEditorWindowInterface()
+	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
-		return null;
+		return getEditorPanel().getActiveEditorWindowInterface();
 	}
 
 	public void updateAutomata()

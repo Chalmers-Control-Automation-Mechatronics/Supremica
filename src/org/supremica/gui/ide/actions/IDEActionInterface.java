@@ -18,5 +18,5 @@ public interface IDEActionInterface
 	public IDE getIDE();
 	public void repaint();
 	public void setEditorMode(IDEAction theAction);
-	public EditorWindowInterface getEditorWindowInterface();
+	public EditorWindowInterface getActiveEditorWindowInterface();
 }

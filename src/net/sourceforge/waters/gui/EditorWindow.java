@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.10 2005-03-03 13:32:55 knut Exp $
+//# $Id: EditorWindow.java,v 1.11 2005-03-04 05:40:22 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -22,6 +22,13 @@ import java.util.ArrayList;
 import net.sourceforge.waters.model.expr.IdentifierProxy;
 import org.supremica.gui.GraphicsToClipboard;
 import java.awt.geom.Rectangle2D;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
+
+
 
 public class EditorWindow
 	extends JFrame
@@ -152,22 +159,72 @@ public class EditorWindow
 			toClipboard = GraphicsToClipboard.getInstance();
 		}
 
-		//Rectangle2D bb = surface.getBoundingBox();
-		//double minX = bb.getMinX();
-		//double maxX = bb.getMaxX();
-		//double minY = bb.getMinY();
-		//double maxY = bb.getMaxY();
-		//logger.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
-		//create a WMF object
-		//int width = (int)(maxX - minX) + 1;
-		//int height = (int)(maxY - minY) + 1;
-		// Copy a larger area, approx 10 percent, there seems to be
-		// a problem with the size of wmf-data
-		//width += (int)0.1*width;
-		//height += (int)0.1*height;
 		Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
 
 		surface.print(theGraphics);
 		toClipboard.copyToClipboard();
+	}
+
+	public void createPDF(File file)
+	{
+		System.out.println("Hello World");
+
+		// step 1: creation of a document-object
+		int width = surface.getWidth();
+		int height = surface.getHeight();
+		Document document = new Document(new com.lowagie.text.Rectangle(width, height));
+
+		try
+		{
+			// step 2:
+			// we create a writer that listens to the document
+			// and directs a PDF-stream to a file
+			PdfWriter writer= PdfWriter.getInstance(document,
+					new FileOutputStream("c:/Temp/test.pdf"));
+
+			document.addAuthor("Supremica");
+
+
+			// step 3: we open the document
+			document.open();
+			// step 4: we add a paragraph to the document
+			//document.add(new Paragraph("Hej Knut!"));
+
+            PdfContentByte cb = writer.getDirectContent();
+            PdfTemplate tp = cb.createTemplate(width, height);
+            Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
+            surface.print(g2);
+            //Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, width, height);
+            //chart.draw(g2, rectangle2D);
+            g2.dispose();
+            cb.addTemplate(tp, 0, 0);
+
+		}
+		catch (DocumentException de)
+		{
+			System.err.println(de.getMessage());
+		}
+		catch (IOException ioe)
+		{
+			System.err.println(ioe.getMessage());
+		}
+
+		// step 5: we close the document
+		document.close();
+
+/*
+		if (toClipboard == null)
+		{
+			toClipboard = GraphicsToClipboard.getInstance();
+		}
+
+		Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
+
+		surface.print(theGraphics);
+		toClipboard.copyToClipboard();
+*/
+
+
+
 	}
 }

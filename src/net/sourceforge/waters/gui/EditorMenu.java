@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.10 2005-03-03 23:40:20 knut Exp $
+//# $Id: EditorMenu.java,v 1.11 2005-03-04 05:40:22 knut Exp $
 //###########################################################################
 
 
@@ -37,6 +37,7 @@ public class EditorMenu
 	public final JMenuItem ToolsOptionsMenu;
 	public final JMenuItem editDeleteMenu;
 	public final JMenuItem editCopyAsWMFMenu;
+	public final JMenuItem editCreatePDFMenu;
 	EditorWindowInterface root;
 	ControlledSurface C;
 	JFileChooser fileChooser;
@@ -99,6 +100,12 @@ public class EditorMenu
 		menuItem.addActionListener(this);
 
 		editCopyAsWMFMenu = menuItem;
+
+		menuItem = new JMenuItem("Create PDF");
+		menu.add(menuItem);
+		menuItem.addActionListener(this);
+
+		editCreatePDFMenu = menuItem;
 
 		menuItem = new JMenuItem("Cut");
 		menuItem.setEnabled(false);
@@ -222,6 +229,12 @@ public class EditorMenu
 		if (e.getSource() == editCopyAsWMFMenu)
 		{
 			root.copyAsWMFToClipboard();
+		}
+
+		if (e.getSource() == editCreatePDFMenu)
+		{
+			File f = new File("C:/Temp/test.pdf");
+			root.createPDF(f);
 		}
 
 	}

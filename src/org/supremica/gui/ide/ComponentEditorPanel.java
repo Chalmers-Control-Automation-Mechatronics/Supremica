@@ -157,4 +157,9 @@ public class ComponentEditorPanel
 		surface.print(theGraphics);
 		toClipboard.copyToClipboard();
 	}
+
+	public void createPDF(File f)
+	{
+
+	}
 }

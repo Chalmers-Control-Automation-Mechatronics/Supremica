@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import net.sourceforge.waters.gui.EditorWindowInterface;
 
 public class EditorPanel
 	extends MainPanel
@@ -81,11 +82,10 @@ public class EditorPanel
 		getActions().enableEditorActions(true);
 	}
 
-/*
-	public EditorWindowInterface getEditorWindowInterface()
+	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
 		return null;
 //		return getEditorWindowInterface();
 	}
-*/
+
 }

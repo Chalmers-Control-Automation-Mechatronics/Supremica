@@ -250,9 +250,9 @@ public class IDE
 
 	}
 
-	public EditorWindowInterface getEditorWindowInterface()
+	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
-		return getActiveModuleContainer().getEditorWindowInterface();
+		return getActiveModuleContainer().getActiveEditorWindowInterface();
 	}
 
 	public static void main(String args[])
