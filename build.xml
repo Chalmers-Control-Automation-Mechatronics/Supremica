@@ -138,6 +138,7 @@
 		classpath="${lib}/${unjared}"
 		includeJavaRuntime="yes"
 		deprecation="false"
+		verbose="false"
 		excludes="
 			${my_basedir}/sattline/**,
 			${my_basedir}/supervisor/**"	

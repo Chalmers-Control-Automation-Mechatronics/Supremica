@@ -71,7 +71,7 @@ public final class IntArrayList
 
     public IntArrayList()
     {
-		this(1024);
+		this(128);
     }
 
     public IntArrayList(int blockSize)
@@ -193,7 +193,9 @@ public final class IntArrayList
 		{
 			currMinBlockIndex = 0;
 			blocks.removeFirst();
+			firstBlock = (int[][])blocks.getFirst();
 		}
+		size--;
 		return currArray;
 	}
 
@@ -212,9 +214,11 @@ public final class IntArrayList
 		{
 			currMaxBlockIndex = blockSize;
 			blocks.removeLast();
+			lastBlock = (int[][])blocks.getLast();
 		}
 		int[] currArray = lastBlock[--currMaxBlockIndex];
 		lastBlock[currMaxBlockIndex] = null;
+		size--;
 		return currArray;
 	}
 
@@ -243,23 +247,7 @@ public final class IntArrayList
 		for (Iterator it = iterator(); it.hasNext();)
 		{
 			int[] currEntry = (int[]) it.next();
-			if (currEntry != null)
-			{
-				sb.append("[");
-				for (int i = 0; i < currEntry.length; i++)
-				{
-					if (i > 0)
-					{
-						sb.append(" ");
-					}
-					sb.append(currEntry[i]);
-				}
-				sb.append("]");
-			}
-			else
-			{
-				sb.append("[null]");
-			}
+			sb.append(toString(currEntry));
 			sb.append("\n");
 		}
 		return sb.toString();
@@ -278,46 +266,41 @@ public final class IntArrayList
 
 	private static String toString(int[][] theArray)
 	{
-		StringBuffer sb = new StringBuffer("int[][]=");
+		StringBuffer sb = new StringBuffer();
 		if (theArray == null)
 		{
-			sb.append("[[null]]");
+			sb.append("[\nnull\n]\n");
 			return sb.toString();
 		}
+		sb.append("[\n");
 		for (int i = 0; i < theArray.length; i++)
 		{
-			int[] currEntry = (int[])theArray[i];
-			if (currEntry != null)
-			{
-				sb.append("[");
-				sb.append(toString(currEntry));
-				sb.append("]");
-			}
-			else
-			{
-				sb.append("[null]");
-			}
-			sb.append("\n");
+			sb.append(toString(theArray[i]) + "\n");
 		}
+		sb.append("]\n");
 		return sb.toString();
 	}
 
 
 	private static String toString(int[] theArray)
 	{
-		StringBuffer sb = new StringBuffer("int[]=");
+		StringBuffer sb = new StringBuffer();
 		if (theArray == null)
 		{
 			sb.append("[null]");
 			return sb.toString();
 		}
-
+	
+		sb.append("[");
 		for (int i = 0; i < theArray.length; i++)
 		{
-			int currEntry = theArray[i];
-			sb.append(currEntry + " ");
-			sb.append("\n");
+			if (i != 0)
+			{
+				sb.append(" ");	
+			}
+			sb.append(theArray[i]);
 		}
+		sb.append("]");
 		return sb.toString();
 	}
 
@@ -332,9 +315,9 @@ public final class IntArrayList
 
 		public IntArrayListIterator()
 		{
-			currBlock = firstBlock;
 			currIndex = currMinBlockIndex;
 			blockIterator = blocks.iterator();
+			currBlock = (int[][])blockIterator.next();			
 			currSize = size();
 			currElement = 0;
 		}
@@ -404,6 +387,46 @@ public final class IntArrayList
 		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
 
 		System.out.println(theList.blocksToString());
+		
+		
+		System.out.println("new");
+		
+		theList.removeFirst();
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());	
+		System.out.println(theList.blocksToString());		
+
+		theList.removeLast();	
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+		System.out.println(theList.blocksToString());	
+		
+		theList.addFirst(dummy0);
+		theList.addLast(dummy3);
+
+		System.out.println(theList.toString(theList.getFirst()));
+		System.out.println(theList.toString(theList.getLast()));
+
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+		System.out.println(theList.blocksToString());	
+
+		theList.addFirst(dummy3);
+		theList.addLast(dummy0);
+
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+		System.out.println(theList.blocksToString());	
+
+
+		theList.removeFirst();
+		theList.removeLast();						
+		theList.removeFirst();
+		theList.removeLast();	
+		theList.removeFirst();
+		theList.removeLast();
+
+		theList.add(dummy2);
+		theList.add(dummy2);
+		
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+		System.out.println(theList.blocksToString());	
 	}
 
 }
