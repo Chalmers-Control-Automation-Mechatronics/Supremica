@@ -1,6 +1,7 @@
 package org.supremica.util.BDD;
 
 
+
 import java.util.*;
 
 /**
@@ -86,12 +87,12 @@ public class PetriNetSupervisor
 	 * as usual, it returns -1  if no more events are found...
 	 */
 	private int pickOneInteractive(boolean forward) {
-		ic.choice.removeAll();
+		ic.removeAll();
 
 		int queue_size = 0;
 		for(int i = 0; i < size; i++)
 			if(workset[i] > 0 ) {
-				ic.choice.add( pet[i].toString() );
+				ic.add( pet[i].toString() );
 				queue[queue_size++] = i;
 			}
 
