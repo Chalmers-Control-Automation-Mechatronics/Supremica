@@ -156,6 +156,18 @@ public class Animator
 		_dispatcher = new MouseDispatcher(_canvas.getSceneGraph(), _canvas);
 
 		_dispatcher.attachTo(_canvas);
+
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent ev)
+			{
+				dispose();
+			}
+
+			public void windowClosed(WindowEvent ev)
+			{
+			}
+		});
 	}
 
 	public void setAnimation(Animation anim)

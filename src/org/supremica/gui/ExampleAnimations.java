@@ -76,7 +76,16 @@ public class ExampleAnimations
 
 		allGroups.add(thisGroup);
 
+		thisGroup.addItem(new AnimationItem("Bridge", prefix + "bridge.xml"));
+		thisGroup.addItem(new AnimationItem("Channel", prefix + "channel.xml"));
 		thisGroup.addItem(new AnimationItem("Dining philosophers", prefix + "diners.xml"));
+		thisGroup.addItem(new AnimationItem("Flexible Manufacturing Cell", prefix + "fmc.xml"));
+		thisGroup.addItem(new AnimationItem("Helicopter", prefix + "copter_track.xml"));
+		thisGroup.addItem(new AnimationItem("Lottery", prefix + "lottery.xml"));
+		thisGroup.addItem(new AnimationItem("Maze", prefix + "maze.xml"));
+		thisGroup.addItem(new AnimationItem("Puzzle", prefix + "puzzle.xml"));
+		thisGroup.addItem(new AnimationItem("Tic Tac Toe", prefix + "tictactoe.xml"));
+		thisGroup.addItem(new AnimationItem("Window", prefix + "window.xml"));
 	}
 
 

@@ -96,19 +96,6 @@ public class AnimationItem
 
 			final Animator view = new Animator(description + " path: " + path);
 
-			view.addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent ev)
-				{
-					view.dispose();
-				}
-
-				public void windowClosed(WindowEvent ev)
-				{
-					view.dispose();
-				}
-			});
-
 			URL url = AnimationItem.class.getResource(path);
 			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
 
