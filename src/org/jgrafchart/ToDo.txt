@@ -1,0 +1,47 @@
+Gå till:
+
+/home/batch/JGo/JGo
+
+Och skriv:
+
+java -classpath /home/rasmus/JGo/:/home/rasmus/JGo/JGo.jar org.jgrafchart.Basic2GC
+
+---------------------------------------------------------------------------
+
+- Input blocks
+
+  - Digital In
+    - namn 
+    - kanal
+    - value
+    - oldval
+
+  - AnalogIn
+
+
+- Output blocks
+
+   - Analog resp digital ut
+
+- Internal variables
+
+   - analog resp digital
+
+- Parallel split resp join (kan vänta med)
+
+- Step actions
+
+  - Action block som kan kopplas till steg 
+
+  - Antingen
+
+      2 JGoText - en för Impulse actions o en för Normal (Level)
+      actions
+
+    eller
+
+     3 JGoText - en för initial actions en för periodic o en för final
+     (ung för som Grafchart actions, samma som Sattline
+
+- Macrosteg - en senare sak.
+
