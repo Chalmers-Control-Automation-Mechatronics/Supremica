@@ -5,6 +5,7 @@ import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
+import java.io.File;
 
 /** The class FunctionBlockBuilder is used to generate code parts that
  *  are specific to Function Blocks and not common with Programs. The
@@ -21,6 +22,8 @@ public class FunctionBlockBuilder
 	 */
 	InstructionList ilRunArgs = new InstructionList();
 	MethodGen mgRunArgs;
+
+    public File getTempFile() {return null;};
 
 	/**Constructor ProgramBuilder constructs a new frame for
 	 * IL program generation

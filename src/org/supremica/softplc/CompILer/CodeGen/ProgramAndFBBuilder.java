@@ -6,6 +6,7 @@ import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
+import java.io.File;
 
 /**The class ProgramAndFBBuilder handles all common parts of code generation
  * for its sub classes.
@@ -35,6 +36,9 @@ public abstract class ProgramAndFBBuilder
 	InstructionList ilRun = new InstructionList();
 	InstructionList ilInit = new InstructionList();
 	InstructionFactory fac;
+
+
+    
 
 	/**dumpCode should be called when the IL POU generation is finished.
 	 * This method will then dump the generated code to a class file.
