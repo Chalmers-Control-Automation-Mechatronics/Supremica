@@ -228,6 +228,11 @@ public class State
 		return forbidden;
 	}
 
+	public boolean isDeadlock()
+	{
+		return outgoingArcs.size() == 0;
+	}
+
 	public void setForbidden(boolean forbidden)
 	{
 		this.forbidden = forbidden;

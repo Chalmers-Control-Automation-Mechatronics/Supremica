@@ -53,23 +53,31 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.supremica.automata.algorithms.StateMatcher;
 import org.supremica.automata.algorithms.SearchStates;
+import org.supremica.automata.State;
 
 public class FixedformMatcher
 	implements StateMatcher
 {
 	private Pattern[] patterns;
+	private StateMatcherOptions[] options;
 
-	public FixedformMatcher(Pattern[] p)
+	public FixedformMatcher(Pattern[] patterns, StateMatcherOptions[] options)
 	{
-		patterns = p;
+		this.patterns = patterns;
+		this.options = options;
 	}
 
 	public boolean matches(SearchStates.StateIterator it)
 	{
 		for (int i = 0; it.hasNext(); ++i, it.inc())
 		{
-			Matcher matcher = patterns[i].matcher(it.getState().getName());
+			State currState = it.getState();
+			Matcher matcher = patterns[i].matcher(currState.getName());
 			if (!matcher.matches())
+			{
+				return false;
+			}
+			if (!options[i].matches(currState))
 			{
 				return false;
 			}

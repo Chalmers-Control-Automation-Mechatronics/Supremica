@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
+import org.supremica.automata.State;
 
 public class StateMatcherOptions
 {
@@ -153,12 +154,122 @@ public class StateMatcherOptions
 		}
 	}
 
+	public static class Deadlock
+	{
+		private static Collection types = new LinkedList();
+		public static final Deadlock DontCare = new Deadlock("Don't care");
+		public static final Deadlock Yes = new Deadlock("Yes");
+		public static final Deadlock No = new Deadlock("No");
+		private String description = null;
+
+		private Deadlock(String description)
+		{
+			this.description = description;
+			types.add(this);
+		}
+
+		public static Iterator iterator()
+		{
+			return types.iterator();
+		}
+
+		public String toString()
+		{
+			return description;
+		}
+
+		public static Deadlock toType(String type)
+		{
+			if (type.equals(DontCare.toString()))
+			{
+				return DontCare;
+			}
+
+			if (type.equals(Yes.toString()))
+			{
+				return Yes;
+			}
+
+			if (type.equals(No.toString()))
+			{
+				return No;
+			}
+
+			return null;
+		}
+
+		public static Object[] toArray()
+		{
+			return types.toArray();
+		}
+	}
+
+
 	private Accepting acceptingCondition = Accepting.DontCare;
 	private Forbidden forbiddenCondition = Forbidden.DontCare;
+	private Deadlock deadlockCondition = Deadlock.DontCare;
+
 
 	public StateMatcherOptions()
 	{
 
+	}
+
+	public boolean matches(State theState)
+	{
+		if (acceptingCondition != Accepting.DontCare)
+		{
+			if (acceptingCondition == Accepting.Yes)
+			{
+				if (!theState.isAccepting())
+				{
+					return false;
+				}
+			}
+			else if (acceptingCondition == Accepting.No)
+			{
+				if (theState.isAccepting())
+				{
+					return false;
+				}
+			}
+
+		}
+		if (forbiddenCondition != Forbidden.DontCare)
+		{
+			if (forbiddenCondition == Forbidden.Yes)
+			{
+				if (!theState.isForbidden())
+				{
+					return false;
+				}
+			}
+			else if (forbiddenCondition == Forbidden.No)
+			{
+				if (theState.isForbidden())
+				{
+					return false;
+				}
+			}
+		}
+		if (deadlockCondition != Deadlock.DontCare)
+		{
+			if (deadlockCondition == Deadlock.Yes)
+			{
+				if (!theState.isDeadlock())
+				{
+					return false;
+				}
+			}
+			else if (deadlockCondition == Deadlock.No)
+			{
+				if (theState.isDeadlock())
+				{
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	public void setAcceptingCondition(Accepting value)
@@ -171,6 +282,11 @@ public class StateMatcherOptions
 		forbiddenCondition = value;
 	}
 
+	public void setDeadlockCondition(Deadlock value)
+	{
+		deadlockCondition = value;
+	}
+
 	public Accepting getAcceptingCondition()
 	{
 		return acceptingCondition;
@@ -179,6 +295,11 @@ public class StateMatcherOptions
 	public Forbidden getForbiddenCondition()
 	{
 		return forbiddenCondition;
+	}
+
+	public Deadlock getDeadlockCondition()
+	{
+		return deadlockCondition;
 	}
 }
 

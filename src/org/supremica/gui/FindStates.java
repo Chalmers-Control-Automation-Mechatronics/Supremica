@@ -94,16 +94,18 @@ class FindStatesTableModel
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
 	// private Pattern[] patterns = null;
 	// private PatternCompiler comp = null;
-	private String[] columnNames = { "Automaton", "Type", "Regular Expression", "Accepting", "Forbidden" };
+	private String[] columnNames = { "Automaton", "Type", "Regular Expression", "Accepting", "Forbidden", "Deadlock" };
 	// private Object[][] cells = null;
 	private Automata automata;
-	private HashMap hashmap = new HashMap();
+	private HashMap patternMap = new HashMap();
+	private HashMap stateMatcherOptionsMap = new HashMap();
 
 	public final static int AUTOMATON_COL = 0;
 	public final static int TYPE_COL = AUTOMATON_COL + 1;
 	public final static int REGEXP_COL = TYPE_COL + 1;
 	public final static int ACCEPTING_COL = REGEXP_COL + 1;
 	public final static int FORBIDDEN_COL = ACCEPTING_COL + 1;
+	public final static int DEADLOCK_COL = FORBIDDEN_COL + 1;
 
 	public FindStatesTableModel(Automata a)
 	{
@@ -119,12 +121,14 @@ class FindStatesTableModel
 
 			for(Iterator it = a.iterator(); it.hasNext(); )
 			{
-				hashmap.put(it.next(), Pattern.compile(".*"));
+				Automaton currAutomaton = (Automaton)it.next();
+				patternMap.put(currAutomaton, Pattern.compile(".*"));
+				stateMatcherOptionsMap.put(currAutomaton, new StateMatcherOptions());
 			}
 		}
 		catch (PatternSyntaxException excp)
 		{
-			System.err.println("This should never happen!");
+			logger.error("FindStatesTableModel: This should never happen!");
 		}
 	}
 
@@ -152,14 +156,32 @@ class FindStatesTableModel
 	public Object getValueAt(int row, int col)
 	{
 		Automaton automaton = automata.getAutomatonAt(row);
-		switch(col)
+		if (col == AUTOMATON_COL)
 		{
-			case AUTOMATON_COL: return automaton.getName();
-			case TYPE_COL: return automaton.getType();
-			case REGEXP_COL: return ((Pattern)hashmap.get(automaton)).pattern();
-			case ACCEPTING_COL: return StateMatcherOptions.Accepting.DontCare;
-			case FORBIDDEN_COL: return StateMatcherOptions.Forbidden.DontCare;
-
+			return automaton.getName();
+		}
+		if (col == TYPE_COL)
+		{
+			return automaton.getType();
+		}
+		if (col == REGEXP_COL)
+		{
+			return ((Pattern)patternMap.get(automaton)).pattern();
+		}
+		if (col == ACCEPTING_COL)
+		{
+			StateMatcherOptions currOptions = (StateMatcherOptions)stateMatcherOptionsMap.get(automaton);
+			return currOptions.getAcceptingCondition();
+		}
+		if (col == FORBIDDEN_COL)
+		{
+			StateMatcherOptions currOptions = (StateMatcherOptions)stateMatcherOptionsMap.get(automaton);
+			return currOptions.getForbiddenCondition();
+		}
+		if (col == DEADLOCK_COL)
+		{
+			StateMatcherOptions currOptions = (StateMatcherOptions)stateMatcherOptionsMap.get(automaton);
+			return currOptions.getDeadlockCondition();
 		}
 		return null;
 		// return cells[row][col];
@@ -169,13 +191,24 @@ class FindStatesTableModel
 	{
 		// cells[row][col] = obj;
 
+		//logger.error("row: " + row + " col: " + col);
+		if (row < 0)
+		{
+			return;
+		}
+
+		if (col < 0)
+		{
+			return;
+		}
+
 		if (isRegexpColumn(col))
 		{
 			try
 			{
 				Automaton automaton = automata.getAutomatonAt(row);
 				// patterns[row] = comp.compile((String) obj);
-				hashmap.put(automaton, Pattern.compile((String) obj));
+				patternMap.put(automaton, Pattern.compile((String) obj));
 			}
 			catch (PatternSyntaxException excp)
 			{
@@ -183,13 +216,49 @@ class FindStatesTableModel
 				JOptionPane.showMessageDialog(null, "Incorrect pattern: " + (String) obj, "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+		else if (isAcceptingColumn(col))
+		{
+			Automaton automaton = automata.getAutomatonAt(row);
+			StateMatcherOptions currOptions = (StateMatcherOptions)stateMatcherOptionsMap.get(automaton);
+			if (currOptions != null)
+			{
+				currOptions.setAcceptingCondition((StateMatcherOptions.Accepting)obj);
+			}
+		}
+		else if (isForbiddenColumn(col))
+		{
+			Automaton automaton = automata.getAutomatonAt(row);
+			StateMatcherOptions currOptions = (StateMatcherOptions)stateMatcherOptionsMap.get(automaton);
+			if (currOptions != null)
+			{
+				currOptions.setForbiddenCondition((StateMatcherOptions.Forbidden)obj);
+			}
+		}
+		else if (isDeadlockColumn(col))
+		{
+			Automaton automaton = automata.getAutomatonAt(row);
+			StateMatcherOptions currOptions = (StateMatcherOptions)stateMatcherOptionsMap.get(automaton);
+			if (currOptions != null)
+			{
+				currOptions.setDeadlockCondition((StateMatcherOptions.Deadlock)obj);
+			}
+		}
 	}
 
 	public boolean isCellEditable(int row, int col)
 	{
-		// the one and only editable column
-		// return col == REGEXP_COL;
-		// Dec'01 no (directly) editable column
+		if (isAcceptingColumn(col))
+		{
+			return true;
+		}
+		if (isForbiddenColumn(col))
+		{
+			return true;
+		}
+		if (isDeadlockColumn(col))
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -198,14 +267,59 @@ class FindStatesTableModel
 		return col == REGEXP_COL;
 	}
 
+	public boolean isAcceptingColumn(int col)
+	{
+		return col == ACCEPTING_COL;
+	}
+
+	public boolean isForbiddenColumn(int col)
+	{
+		return col == FORBIDDEN_COL;
+	}
+
+	public boolean isDeadlockColumn(int col)
+	{
+		return col == DEADLOCK_COL;
+	}
+
+	public int getRegexpColumn()
+	{
+		return REGEXP_COL;
+	}
+
+	public int getAcceptingColumn()
+	{
+		return ACCEPTING_COL;
+	}
+
+	public int getForbiddenColumn()
+	{
+		return FORBIDDEN_COL;
+	}
+
+	public int getDeadlockColumn()
+	{
+		return DEADLOCK_COL;
+	}
+
 	public Pattern[] getRegexpPatterns()
 	{
 		Pattern[] patterns = new Pattern[automata.size()];
 		for(int i = 0; i < automata.size(); ++i)
 		{
-			patterns[i] = (Pattern)hashmap.get(automata.getAutomatonAt(i));
+			patterns[i] = (Pattern)patternMap.get(automata.getAutomatonAt(i));
 		}
 		return patterns;
+	}
+
+	public StateMatcherOptions[] getStateMatcherOptions()
+	{
+		StateMatcherOptions[] options = new StateMatcherOptions[automata.size()];
+		for(int i = 0; i < automata.size(); ++i)
+		{
+			options[i] = (StateMatcherOptions)stateMatcherOptionsMap.get(automata.getAutomatonAt(i));
+		}
+		return options;
 	}
 
 	// implementation of AutomataListener interface
@@ -223,7 +337,8 @@ class FindStatesTableModel
 	public void automatonRemoved(Automata automata, Automaton automaton)
 	{
 		// need to remove its pattern
-		hashmap.remove(automaton);
+		patternMap.remove(automaton);
+		stateMatcherOptionsMap.remove(automaton);
 		updateListeners();
 	}
 
@@ -246,6 +361,10 @@ class FindStatesTable
 
 	private Automata automata;
 	private JFrame frame;
+	private StateMatcherAcceptingCellEditor acceptingEditor;
+	private StateMatcherForbiddenCellEditor forbiddenEditor;
+	private StateMatcherDeadlockCellEditor deadlockEditor;
+
 
 	// local utility functions
 	private TableSorter getTableSorterModel()
@@ -331,6 +450,151 @@ class FindStatesTable
 		}
 	}
 
+	class StateMatcherAcceptingCellEditor
+		implements CellEditorListener
+	{
+		private JComboBox stateMatcherTypeCombo;
+		private FindStatesTableModel theTableModel;
+
+		StateMatcherAcceptingCellEditor()
+		{
+			stateMatcherTypeCombo = new JComboBox();
+
+			Iterator typeIt = StateMatcherOptions.Accepting.iterator();
+
+			while (typeIt.hasNext())
+			{
+				stateMatcherTypeCombo.addItem(typeIt.next());
+			}
+			theTableModel = getStatesTableModel();
+
+			TableColumnModel columnModel = getColumnModel();
+			TableColumn typeColumn = columnModel.getColumn(theTableModel.getAcceptingColumn());
+			DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
+
+			cellEditor.setClickCountToStart(2);
+			typeColumn.setCellEditor(cellEditor);
+			cellEditor.addCellEditorListener(this);
+		}
+
+		public void editingCanceled(ChangeEvent e) {}
+
+		public void editingStopped(ChangeEvent e)
+		{
+			// logger.info("editing stopped: " + getSelectedRow());
+
+			if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
+			{
+				StateMatcherOptions.Accepting selectedValue = (StateMatcherOptions.Accepting) stateMatcherTypeCombo.getSelectedItem();
+
+				if (selectedValue != null)
+				{
+					int selectedRow = getSelectedRow();
+					getModel().setValueAt(selectedValue, selectedRow, theTableModel.getAcceptingColumn());
+				}
+			}
+		}
+
+	}
+
+	class StateMatcherForbiddenCellEditor
+		implements CellEditorListener
+	{
+		private JComboBox stateMatcherTypeCombo;
+		private FindStatesTableModel theTableModel;
+
+		StateMatcherForbiddenCellEditor()
+		{
+			stateMatcherTypeCombo = new JComboBox();
+
+			Iterator typeIt = StateMatcherOptions.Forbidden.iterator();
+
+			while (typeIt.hasNext())
+			{
+				stateMatcherTypeCombo.addItem(typeIt.next());
+			}
+			theTableModel = getStatesTableModel();
+
+			TableColumnModel columnModel = getColumnModel();
+			TableColumn typeColumn = columnModel.getColumn(theTableModel.getForbiddenColumn());
+			DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
+
+			cellEditor.setClickCountToStart(2);
+			typeColumn.setCellEditor(cellEditor);
+			cellEditor.addCellEditorListener(this);
+		}
+
+		public void editingCanceled(ChangeEvent e) {}
+
+		public void editingStopped(ChangeEvent e)
+		{
+			//logger.info("editing stopped: " + getSelectedRow());
+
+			if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
+			{
+				StateMatcherOptions.Forbidden selectedValue = (StateMatcherOptions.Forbidden) stateMatcherTypeCombo.getSelectedItem();
+
+				if (selectedValue != null)
+				{
+					int selectedRow = getSelectedRow();
+					getModel().setValueAt(selectedValue, selectedRow, theTableModel.getForbiddenColumn());
+				}
+			}
+		}
+
+	}
+
+	class StateMatcherDeadlockCellEditor
+		implements CellEditorListener
+	{
+		private JComboBox stateMatcherTypeCombo;
+		private FindStatesTableModel theTableModel;
+
+		StateMatcherDeadlockCellEditor()
+		{
+			stateMatcherTypeCombo = new JComboBox();
+
+			Iterator typeIt = StateMatcherOptions.Deadlock.iterator();
+
+			while (typeIt.hasNext())
+			{
+				stateMatcherTypeCombo.addItem(typeIt.next());
+			}
+			theTableModel = getStatesTableModel();
+
+			TableColumnModel columnModel = getColumnModel();
+			TableColumn typeColumn = columnModel.getColumn(theTableModel.getDeadlockColumn());
+			DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
+
+			cellEditor.setClickCountToStart(2);
+			typeColumn.setCellEditor(cellEditor);
+			cellEditor.addCellEditorListener(this);
+		}
+
+		public void editingCanceled(ChangeEvent e)
+		{
+		}
+
+		public void editingStopped(ChangeEvent e)
+		{
+			if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
+			{
+				StateMatcherOptions.Deadlock selectedValue = (StateMatcherOptions.Deadlock) stateMatcherTypeCombo.getSelectedItem();
+
+				if (selectedValue != null)
+				{
+					int selectedRow = getSelectedRow();
+					if (selectedRow >= 0)
+					{
+						getModel().setValueAt(selectedValue, selectedRow, theTableModel.getDeadlockColumn());
+					}
+				}
+			}
+		}
+
+	}
+
+
 	// Wrap the FindStatesTableModel inside a sort filter
 	private static TableSorter makeTableModel(Automata a)
 	{
@@ -347,9 +611,6 @@ class FindStatesTable
 
 		this.automata = a;
 		this.frame = frame;
-
-		getTableSorterModel().addMouseListenerToHeaderInTable(this);
-		getStatesTableModel().addTableModelListener(this);
 
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);// no use allowing multirow selection here (is there?)
 
@@ -373,22 +634,28 @@ class FindStatesTable
 
 			private void maybeShowPopup(MouseEvent e)
 			{
+				//logger.info("maybeShowpopup");
+
 				int col = columnAtPoint(new Point(e.getX(), e.getY()));
+				int row = rowAtPoint(new Point(e.getX(), e.getY()));
+
+				//logger.info("row " + row + " col " + col);
+
+				if (row < 0)
+				{
+					return;
+				}
+
+				if (!isRowSelected(row))
+				{
+					//logger.info("changing selection");
+
+					clearSelection();
+					setRowSelectionInterval(row, row);
+				}
 
 				if (e.isPopupTrigger())
 				{
-					int row = rowAtPoint(new Point(e.getX(), e.getY()));
-
-					if (row < 0)
-					{
-						return;
-					}
-
-					if (!isRowSelected(row))
-					{
-						clearSelection();
-						setRowSelectionInterval(row, row);
-					}
 
 					// Dec'01, only edit through the dialog and through click in any column
 					//if (getStatesTableModel().isRegexpColumn(col))
@@ -406,12 +673,25 @@ class FindStatesTable
 				}
 			}
 		});
+
+		getTableSorterModel().addMouseListenerToHeaderInTable(this);
+		getStatesTableModel().addTableModelListener(this);
+		acceptingEditor = new StateMatcherAcceptingCellEditor();
+		forbiddenEditor = new StateMatcherForbiddenCellEditor();
+		deadlockEditor = new StateMatcherDeadlockCellEditor();
+
 	}
 
 	public Pattern[] getRegexpPatterns()
 	{
 		return getStatesTableModel().getRegexpPatterns();
 	}
+
+	public StateMatcherOptions[] getStateMatcherOptions()
+	{
+		return getStatesTableModel().getStateMatcherOptions();
+	}
+
 }
 
 
@@ -591,7 +871,7 @@ class FixedFormPanel
 
 	public StateMatcher getMatcher()
 	{
-		return new FixedformMatcher(table.getRegexpPatterns());
+		return new FixedformMatcher(table.getRegexpPatterns(), table.getStateMatcherOptions());
 	}
 }
 
@@ -614,7 +894,7 @@ class FindStatesFrame
 
 	public FindStatesFrame(VisualProject theVisualProject, Automata selectedAutomata)
 	{
-		Utility.setupFrame(this, 500, 300);
+		Utility.setupFrame(this, 650, 300);
 		setTitle("Find States");
 
 		this.theVisualProject = theVisualProject;
