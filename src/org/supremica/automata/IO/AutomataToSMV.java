@@ -92,6 +92,7 @@ public class AutomataToSMV
 			pw.println("--    Automaton: " + currAutomaton.getName());
 		}
 
+		pw.println();
 		//pw.println("\ntask main()");
 		//pw.println("{");
 	}
@@ -141,8 +142,43 @@ public class AutomataToSMV
 
 			pw.println("};" + " -- " + currAutomaton.getName());
 		}
+		pw.print("\tevent : {");
+		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		{
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.print("e_" + currEventIndex);
+			if (alphIt.hasNext())
+			{
+				pw.print(", ");
+			}
+		}
+		pw.println("};");
+
+		pw.println();
 	}
 
+
+	void printAutomatonModule(PrintWriter pw, Automaton currAutomaton)
+	{
+		pw.println("MODULE Automaton_" + currAutomaton.getSynchIndex() + "(s)");
+		pw.println("ASSIGN");
+		pw.println("\tnext(s.q_"+ currAutomaton.getSynchIndex() + ") :=");
+		pw.println("\t\tcase");
+
+		pw.println("\t\t\t1 : s.q_" + currAutomaton.getSynchIndex() + "; -- default");
+		pw.println("\t\tesac;");
+		pw.println();
+	}
+
+	void printAutomataModules(PrintWriter pw)
+	{
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			printAutomatonModule(pw, currAutomaton);
+		}
+	}
 
 	void printInitialStates(PrintWriter pw)
 		throws Exception
@@ -164,8 +200,22 @@ public class AutomataToSMV
 			{
 				pw.print("& ");
 			}
-			pw.println(" -- " + initialState.getName() + " in " + currAutomaton.getName() + "\n");
+			pw.println(" -- " + initialState.getName() + " in " + currAutomaton.getName());
 		}
+		pw.println();
+	}
+
+	void printMainModule(PrintWriter pw)
+	{
+		pw.println("MODULE main");
+		pw.println("VAR");
+		pw.println("\ts: state;");
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			pw.println("\tAut_" + currAutomaton.getSynchIndex() + " : Automaton_" + currAutomaton.getSynchIndex() + "(s);");
+		}
+		pw.println();
 	}
 
 	// Remove this
@@ -538,9 +588,12 @@ public class AutomataToSMV
 	{
 		initialize();
 		printBeginProgram(pw);
-		printInitialStates(pw);
 		//printEventVariables(pw);
 		printStateModule(pw);
+		printInitialStates(pw);
+		printAutomataModules(pw);
+		printMainModule(pw);
+
 		//printBeginScanCycle(pw);
 		//printComputeEnabledEvents(pw);
 		//printComputeExternalEnabledEvents(pw);
