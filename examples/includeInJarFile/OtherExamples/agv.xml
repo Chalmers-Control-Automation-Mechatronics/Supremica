@@ -560,7 +560,7 @@
 		<Action label="u42">
 			<Command command="agv4.go"/>
 		</Action>
-		<Action label="w37">
+		<Action label="w31">
 			<Command command="agv4.addpart"/>
 			<Command command="ws3.removepart"/>
 		</Action>	
@@ -756,7 +756,7 @@
 		<Control label="u42">
 			<Condition condition="agv4.end"/>
 		</Control>
-		<Control label="w37">
+		<Control label="w31">
 			<Condition condition="agv4.end"/>
 			<Condition condition="ws3.end"/>
 		</Control>	

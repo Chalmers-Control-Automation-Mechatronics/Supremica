@@ -228,11 +228,11 @@ public class SimulatorExecuter
 	private void close()
 	{
 		setVisible(false);
-		dispose();
 		if (stateViewer != null)
 		{
 			stateViewer.close();
 		}
+		dispose();
 	}
 
 	public void updated(Object o)
