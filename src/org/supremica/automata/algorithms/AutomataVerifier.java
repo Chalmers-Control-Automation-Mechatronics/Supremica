@@ -704,8 +704,8 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines controllability by synchronizing all automata in the system and in each state check if some uncontrollable 
-	 * event is enabled in a plant and not in a supervisor. 
+	 * Examines controllability by synchronizing all automata in the system and in each state check if some  
+	 * uncontrollable event is enabled in a plant and not in a supervisor. 
 	 * @see AutomataSynchronizerExecuter
 	 */
 	public boolean monolithicControllabilityVerification()

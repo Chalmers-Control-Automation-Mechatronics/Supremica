@@ -156,7 +156,8 @@ public class AutomataSynthesizer
 								if (!selectedAutomata.contains(currPlantAutomaton))
 								{
 									selectedAutomata.add(currPlantAutomaton);
-									// FIXA! Undersök icke styrbara händelser som finns i plantsen också...
+									// We want to add plants with uncontrollable events 
+									// common to the already added plants too...
 									eventList.addAll(currPlantAutomaton.eventCollection());
 								}
 							}

@@ -9,3 +9,5 @@ dåligt, men för sakens skull).
 
 * Fixa så att man kan tömma log-fönstret... det blir lätt fullt av trams. 
 
+* Fixa så att ordningen på automaterna inte blippar om sig så fort man gör
+något. Man vill ha kvar sin egen sortering så länge man inte ber om nå't annat.

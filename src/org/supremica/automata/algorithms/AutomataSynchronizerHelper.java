@@ -385,7 +385,10 @@ public final class AutomataSynchronizerHelper
     	return theStates.toString();
     }
 
-	// Used by AutomataControllabilityCheckExecuter... AutomataSynchronizerExecuter
+	/**
+	 * Used for getting the synchronization result to the worker-class.
+	 * @see AutomataSynchronizerExecuter
+	 */
 	public void setAutomataIsControllable(boolean isControllable)
 	{
 		automataIsControllable = isControllable;
@@ -464,12 +467,18 @@ public final class AutomataSynchronizerHelper
 		this.rememberTrace = rememberTrace;
 	}
 
+	/**
+	 * Displats the amount of states examined during the execution.
+	 */
 	public void displayInfo()
 	{
 		thisCategory.info("During the execution, " + nbrOfCheckedStates + " states were examined.");
 		thisCategory.info("During the execution, " + nbrOfAddedStates + " new states were found.");
 	}
 
+	/**
+	 * Displats the event-trace leading to the uncontrollable state.
+	 */
 	public void displayTrace()
 		throws Exception
 	{
