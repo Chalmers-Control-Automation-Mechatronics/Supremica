@@ -17,6 +17,7 @@ public class PerEventTransition {
 	private int others_s2sp, others_sp2s;
 	private boolean [] automata_cover;
 	private int [] next_event, prev_event;
+	private String name;
 
 	PerEventTransition(BDDAutomata manager, BDDAutomaton [] all, int event, boolean [] careset) {
 		this.manager = manager;
@@ -26,6 +27,9 @@ public class PerEventTransition {
 		EventManager alphabet = manager.getEventManager();
 		Event [] all_events = alphabet.getEventVector();
 		Event theEvent= all_events[event];
+
+
+		name = theEvent.label;
 
 		int ec = all_events.length;
 		int ac = all.length;
@@ -108,6 +112,7 @@ public class PerEventTransition {
 	public int [] getNextEventCount() { return next_event; }
 	public int [] getPrevEventCount() { return prev_event; }
 
+	public String toString () { return name; }
 
 	// ---------------------------------------------------------------------------
 	// reachability stuff:

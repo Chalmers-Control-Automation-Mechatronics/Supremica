@@ -9,17 +9,26 @@ public class Workset
 	private int [] workset, queue;
 	private int [][] dependent;
 	private boolean [] remaining;// this is for the exclusive stuff
-	private int size;
+	private int size, heuristic;
 	private int workset_count;// sum of workset_i
+	private Cluster [] clusters;
+	private InteractiveChoice ic = null;
 
-	public Workset(int size, int [][]dependent)
+	public Workset(Cluster [] clusters, int size, int [][]dependent)
 	{
 		this.size = size;
 		this.dependent = dependent;
 		this.workset = new int[size];
 		this.queue = new int[size];
+		this.clusters = clusters;
 
 		remaining = new boolean[size];
+
+		heuristic = Options.es_heuristics;
+
+		if(heuristic == Options.ES_HEURISTIC_INTERACTIVE) {
+			ic = new InteractiveChoice("Workset interactive automaton selection");
+		}
 
 	}
 
@@ -38,6 +47,20 @@ public class Workset
 	}
 
 
+	private int pickOneInteractive(boolean exclusive) {
+		ic.choice.removeAll();
+
+		int queue_size = 0;
+		for(int i = 0; i < size; i++)
+			if(( !exclusive || remaining[i]) && workset[i] > 0 ) {
+				ic.choice.add( clusters[i].toString() );
+				queue[queue_size++] = i;
+			}
+
+		ic.show();
+		return queue[ ic.getSelected() ];
+	}
+
 	/**
 	 * choose the next automaton
 	 *
@@ -47,7 +70,10 @@ public class Workset
 
 		int best, queue_size = 0;
 
-		switch(Options.es_heuristics) {
+		switch(heuristic) {
+			case Options.ES_HEURISTIC_INTERACTIVE:
+				return pickOneInteractive(false);
+
 			case Options.ES_HEURISTIC_RANDOM:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(workset[i] > 0)  queue[queue_size++] = i;
@@ -139,7 +165,10 @@ public class Workset
 
 		int best, queue_size = 0;
 
-		switch(Options.es_heuristics) {
+		switch(heuristic) {
+			case Options.ES_HEURISTIC_INTERACTIVE:
+				return pickOneInteractive(true);
+
 			case Options.ES_HEURISTIC_RANDOM:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(remaining[i] && workset[i] > 0)  queue[queue_size++] = i;
@@ -231,13 +260,20 @@ public class Workset
 	 */
 	public void advance(int automaton, boolean changed)
 	{
-		workset_count -= workset[automaton];
+		// workset_count -= workset[automaton];
 		workset[automaton] = 0;
+		workset_count --;
 
 		if(changed) {
 			int count = dependent[automaton][0];
-			for(int i = 0 ; i < count; i++) workset[  dependent[automaton][i + 1] ] ++;
-			workset_count += count;
+			// for(int i = 1 ; i <= count; i++) workset[  dependent[automaton][i] ] ++;
+			// workset_count += count;
+			for(int i = 1 ; i <= count; i++) {
+				int a = dependent[automaton][i];
+				if(workset[a] == 0) workset_count++;
+				workset[a] ++;
+			}
+
 		}
 
 	}

@@ -39,6 +39,33 @@ public class AutomataBDDVerifier {
 
     }
 
+
+    /**
+     * creates a verification object, uses only the given (subset of )Alphabet
+     *
+     * depeding one the type of algorithm used, this call might take a while
+     * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
+     * @see cleanup()
+     */
+    public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata,
+    	org.supremica.automata.Alphabet alphabet,
+		AutomataSynchronizerHelper.HelperData hd)
+	throws Exception
+    {
+		this.theAutomata = theAutomata;
+		this.hd          = hd;
+
+		try {
+			Builder bu = new Builder(theAutomata, alphabet);
+			ba = bu.getBDDAutomata();
+			sup = SupervisorFactory.createSupervisor(ba, ba.getAutomataVector());
+		} catch(Exception pass) {
+			cleanup();
+			throw pass;
+		}
+
+    }
+
     /**
      * creates a verification object for LANGUAGE INCLUSION test.
      * depeding one the type of algorithm used, this call might take a while

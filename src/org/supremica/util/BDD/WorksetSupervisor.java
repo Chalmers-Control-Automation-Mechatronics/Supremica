@@ -88,7 +88,7 @@ public class WorksetSupervisor extends DisjSupervisor
 	/** workset to start from: all automata are enabled */
 	protected Workset getWorkset(boolean monotonic)
 	{
-		if(workset == null) workset = new Workset(size, dependent);
+		if(workset == null) workset = new Workset(clusters, size, dependent);
 		workset.init_workset(monotonic);
 		return workset;
 	}

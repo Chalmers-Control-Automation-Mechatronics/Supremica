@@ -34,9 +34,10 @@ public class PetriNetSupervisor
    extends ConjSupervisor
 {
 
-	private int size; /** Number of events */
+	private int size, heuristic; /** Number of events */
 	private PerEventTransition [] pet; /** one 'transition' system per event, see comments on the top */
 	private int [] workset, queue; /** workset as above, queue is the set of suggested events, see algo again */
+	private InteractiveChoice ic = null;
 
     /** Constructor, passes to the base-class */
     public PetriNetSupervisor(BDDAutomata manager, Group plant, Group spec) {
@@ -64,6 +65,12 @@ public class PetriNetSupervisor
 		workset = new int[size];
 
 		queue = new int[size]; // use by the heuristics
+
+		heuristic = Options.es_heuristics;
+
+		if(heuristic == Options.ES_HEURISTIC_INTERACTIVE) {
+			ic = new InteractiveChoice("Petri net interactive event selection");
+		}
 	}
 
     // -----------------------------------------------------------------
@@ -74,7 +81,24 @@ public class PetriNetSupervisor
 	}
 
 
+	/**
+	 * The user os always right, so lets ask him :)
+	 * as usual, it returns -1  if no more events are found...
+	 */
+	private int pickOneInteractive(boolean forward) {
+		ic.choice.removeAll();
 
+		int queue_size = 0;
+		for(int i = 0; i < size; i++)
+			if(workset[i] > 0 ) {
+				ic.choice.add( pet[i].toString() );
+				queue[queue_size++] = i;
+			}
+
+		if(queue_size == 0) return -1;
+		ic.show();
+		return queue[ ic.getSelected() ];
+	}
 
 	//---------------------------------------------------------------------------
 	/**
@@ -94,7 +118,10 @@ public class PetriNetSupervisor
 
 		// the idea is to put the 'best' events in a queue and choose one on random
 
-		switch(Options.es_heuristics) {
+		switch(heuristic) {
+			case Options.ES_HEURISTIC_INTERACTIVE:
+				return pickOneInteractive(forward);
+
 			case Options.ES_HEURISTIC_RANDOM:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(workset[i] > 0)  queue[queue_size++] = i;

@@ -45,6 +45,7 @@ public class Options
 		"Smoothed: Workset",  "Smoothed: Monotonic", "Smoothed: Delayed Monotonic",
 		"Smoothed: Delayed* Monotonic","Smoothed: Monotonic/Workset",
 		"Smoothed: Path (V1)", "Smoothed: Keep (V2)", "Smoothed: Partitioned (P1)",
+		"Smoothed: Partitioned (P2)",
 		"PetriNet-style"
 	};
     /** constants for the above*/
@@ -61,7 +62,8 @@ public class Options
 	ALGO_SMOOTHED_PATH = 9,
 	ALGO_SMOOTHED_KEEP = 10,
 	ALGO_SMOOTHED_PART = 11,
-	ALGO_PETRINET = 12;
+	ALGO_SMOOTHED_PART2 = 12,
+	ALGO_PETRINET = 13;
 	public static int algo_family = ALGO_DISJUNCTIVE_WORKSET; /** reachability algorithm */
 
 
@@ -142,7 +144,7 @@ public class Options
 	/** Event (Transition) selection heuristics, see petrinet related stuff */
 	public static final String [] ES_HEURISTIC_NAMES =  {
 		"Random", "Top-down", "Max pending req.","Min pending req.","Max follow","Min follow",
-		"Largest cover", "Smallest cover"
+		"Largest cover", "Smallest cover" , "Interactive"
 	};
 	public static final int
 		ES_HEURISTIC_RANDOM = 0,
@@ -152,7 +154,9 @@ public class Options
 		ES_HEURISTIC_MOST_FOLLOWERS = 4,
 		ES_HEURISTIC_LEAST_FOLLOWERS = 5,
 		ES_HEURISTIC_MOST_MEMBERS = 6,
-		ES_HEURISTIC_LEAST_MEMBERS = 7;
+		ES_HEURISTIC_LEAST_MEMBERS = 7,
+		ES_HEURISTIC_INTERACTIVE = 8;
+		;
 	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
 
 

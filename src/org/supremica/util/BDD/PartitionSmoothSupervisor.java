@@ -4,18 +4,26 @@ package org.supremica.util.BDD;
 
 import java.util.*;
 
+/**
+ * This is an implementation of Valmari's P1 and P2 Fixed-point
+ * heuristics
+ *
+ */
+
 public class PartitionSmoothSupervisor extends DisjSupervisor {
+	private boolean p1;
     /** Constructor, passes to the base-class */
-    public PartitionSmoothSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
+    public PartitionSmoothSupervisor(BDDAutomata manager, BDDAutomaton [] as, boolean p1) {
 	super(manager,as);
+	this.p1 = p1;
 
     }
 
 
     /** Constructor, passes to the base-class */
-    public PartitionSmoothSupervisor(BDDAutomata manager, Group plant, Group spec) {
+    public PartitionSmoothSupervisor(BDDAutomata manager, Group plant, Group spec, boolean p1) {
 	super(manager, plant, spec);
-
+	this.p1 = p1;
     }
 
     /** C++-style Destructor to cleanup unused BDD trees*/
@@ -47,7 +55,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 			// Util.notify("i = " + i + ", j = " + j + ", n = " + size);
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(clusters[j].getTwave(), r_all, s_cube);
+			int tmp = manager.relProd(clusters[p1 ? j : i ].getTwave(), r_all, s_cube);
 			int front= manager.replace( tmp, perm_sp2s);
 			r_all = manager.orTo(r_all, front);
 			manager.deref(front);
@@ -55,7 +63,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 
 			if(r_all_p == r_all) {
 				i =  i + 1;
-				j = (j + 1) % size;
+				j = (j + 1) % size; // only for P1
 			} else i = 0;
 
 			if(gf != null)    gf.add( r_all );
@@ -97,7 +105,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		do {
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(clusters[j].getTwave(), r_all, sp_cube);
+			int tmp = manager.relProd(clusters[p1 ? j : i].getTwave(), r_all, sp_cube);
 			int tmp2= manager.replace( tmp, perm_s2sp);
 			r_all = manager.orTo(r_all, tmp2);
 			manager.deref(tmp2);

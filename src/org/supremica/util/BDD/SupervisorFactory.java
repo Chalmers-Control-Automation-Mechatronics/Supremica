@@ -29,7 +29,8 @@ public class SupervisorFactory {
 
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,automata);
-	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,automata);
+	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,automata, true);
+	case Options.ALGO_SMOOTHED_PART2: return new PartitionSmoothSupervisor(manager,automata, false);
 
 	case Options.ALGO_PETRINET: return new PetriNetSupervisor(manager,automata);
 
@@ -59,7 +60,8 @@ public class SupervisorFactory {
 
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,plant, spec);
-	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,plant, spec);
+	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,plant, spec, true);
+	case Options.ALGO_SMOOTHED_PART2: return new PartitionSmoothSupervisor(manager,plant, spec, false);
 
 	case Options.ALGO_PETRINET: return new PetriNetSupervisor(manager,plant, spec);
 

@@ -37,6 +37,12 @@ public class Builder {
     public Builder(org.supremica.automata.Automata s_automata)
 	throws BDDException
     {
+		this(s_automata, null);
+	}
+
+	public Builder(org.supremica.automata.Automata s_automata, org.supremica.automata.Alphabet alphabet)
+		throws BDDException
+    {
 	this.s_automata = s_automata;
 	automata = new Automata();
 
@@ -52,10 +58,10 @@ public class Builder {
 		a.setType(convertType(s_a.getType()));
 
 		// insert events
-
-		// insert events
 		for(EventIterator ei = s_a.eventIterator(); ei.hasNext(); ) {
 		    LabeledEvent le = (LabeledEvent) ei.next();
+		    if(alphabet != null && !alphabet.contains(le)) continue;
+
 		    String id = le.getLabel(); // le.getId() has DEFAULT ACCESS, why??
 		    String label = le.getLabel();
 		    if(label == null) label = id;
@@ -91,6 +97,8 @@ public class Builder {
 			     eit.hasNext(); )
 			    {
 				LabeledEvent le = (LabeledEvent) eit.next();
+				if(alphabet != null && !alphabet.contains(le)) continue;
+
 				org.supremica.automata.State s_to = s_st.nextState(le);
 				String e_name = le.getLabel();    // or getID() ???
 				String to_name = s_to.getName();
