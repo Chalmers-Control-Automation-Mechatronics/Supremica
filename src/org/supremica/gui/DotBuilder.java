@@ -22,19 +22,21 @@ public class DotBuilder
 	private PrintWriter toDotWriter;
 	private InputStream fromDotStream;
 	private Process dotProcess;
+	private String dotArguments;
 	Graph theGraph = null;
 
-	private DotBuilder(DotBuilderObserver theObserver, AutomataSerializer theSerializer)
+	private DotBuilder(DotBuilderObserver theObserver, AutomataSerializer theSerializer, String dotArguments)
 	{
 		this.theObserver = theObserver;
 		this.theSerializer = theSerializer;
+		this.dotArguments = dotArguments;
 
 		setPriority(Thread.MIN_PRIORITY);
 	}
 
-	public static DotBuilder getDotBuilder(DotBuilderObserver theObserver, AutomataSerializer theSerializer)
+	public static DotBuilder getDotBuilder(DotBuilderObserver theObserver, AutomataSerializer theSerializer, String dotArguments)
 	{
-		DotBuilder dotBuilder = new DotBuilder(theObserver, theSerializer);
+		DotBuilder dotBuilder = new DotBuilder(theObserver, theSerializer, dotArguments);
 		dotBuilder.start();
 		return dotBuilder;
 	}
@@ -86,7 +88,7 @@ public class DotBuilder
 
 		try
 		{
-			initializeStreams("");
+			initializeStreams(dotArguments);
 		}
 		catch (Exception ex)
 		{
@@ -159,7 +161,6 @@ public class DotBuilder
 	}
 
 	private void initializeStreams(String arguments)
-		throws Exception
 	{
 		try
 		{
@@ -167,10 +168,8 @@ public class DotBuilder
 		}
 		catch (IOException ex)
 		{
-			logger.error("Cannot run dot. Make sure dot is in the path.");
-			logger.debug(ex.getStackTrace());
-
-			throw ex;
+			logger.error("Cannot run dot. Make sure dot is in the path.", ex);
+			return;
 		}
 
 		OutputStream pOut = dotProcess.getOutputStream();

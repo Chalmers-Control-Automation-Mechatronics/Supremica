@@ -101,6 +101,8 @@ public class IDE
 		logger.info("Supremica version: " + (new Version()).toString());
     }
 
+
+
 	public Actions getActions()
 	{
 		return theActions;
@@ -261,6 +263,8 @@ public class IDE
 
 		IDE ide = new IDE();
 		ide.setVisible(true);
+
+
 	}
 
 }

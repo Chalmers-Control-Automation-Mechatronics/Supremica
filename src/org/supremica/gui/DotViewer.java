@@ -86,8 +86,9 @@ public abstract class DotViewer
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5,
 								MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
-	private DotBuilder builder;
+	DotBuilder builder;
 	private String objectName = "";
+	private InputStream dotReturnStream;
 	private GraphicsToClipboard toClipboard = null;
 
 	public DotViewer()
@@ -452,7 +453,7 @@ public abstract class DotViewer
 	public void build()
 		throws Exception
 	{
-		DotBuilder builder = DotBuilder.getDotBuilder(this, getSerializer());
+		DotBuilder builder = DotBuilder.getDotBuilder(this, getSerializer(), "");
 		//builder = new DotBuilder(this);
 
 		//builder.start();
@@ -598,11 +599,184 @@ public abstract class DotViewer
 		}
 	}
 
+
+	public void setGraph(Graph theGraph)
+	{
+		this.theGraph = theGraph;
+		draw();
+	}
+
+	public void setInputStream(InputStream theInputStream)
+	{
+		// Do nothing
+	}
+
+	public abstract AutomataSerializer getSerializer();
+
+	public void fileExport_actionPerformed(ActionEvent e)
+	{
+		ExportDialog dlg = new ExportDialog(this);
+
+		dlg.show();
+
+		if (dlg.wasCancelled())    // never mind...
+		{
+			return;
+		}
+
+		// Ugly duplication of code here, but a man can only do so much...
+		// (the real reason is that there's no (obvious) conversion from Writer to OutputStream)
+		if (dlg.toDebugView())
+		{
+			AutomataSerializer serializer = getSerializer();
+
+			DotBuilder.getDotBuilder(new DotDebugViewer(), serializer, dlg.getDotArgument());
+			return;
+		}
+		else
+		{
+
+			JFileChooser fileExporter = dlg.getFileExporter();
+
+			// Suggest a reasonable filename based on the name of the automaton...
+			fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" + objectName + "." + dlg.getSelectedValue()));
+
+			if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+			{
+				File currFile = fileExporter.getSelectedFile();
+
+				if (currFile != null)
+				{
+					if (!currFile.isDirectory())
+					{
+						try
+						{
+							AutomataSerializer serializer = getSerializer();
+
+							DotBuilder.getDotBuilder(new DotFileViewer(currFile), serializer, dlg.getDotArgument());
+
+						}
+						catch (Exception ex)
+						{
+							logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
+							logger.debug(ex.getStackTrace());
+
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	class DotDebugViewer
+		implements DotBuilderObserver
+	{
+
+		public DotDebugViewer()
+		{
+
+		}
+
+		public void setGraph(Graph theGraph)
+		{
+		}
+
+		public void setInputStream(InputStream theInputStream)
+		{
+			BufferedInputStream buffInStream = null;
+			try
+			{
+				buffInStream = new BufferedInputStream(theInputStream);
+				TextFrame debugview = new TextFrame("Dot debug output");
+				Writer writer = debugview.getPrintWriter();
+				int currChar = buffInStream.read();
+
+				while (currChar != -1)
+				{
+					writer.write(currChar);
+
+					currChar = buffInStream.read();
+
+					// Toolkit.getDefaultToolkit().beep();
+				}
+				if (buffInStream != null)
+				{
+					buffInStream.close();
+				}
+			}
+			catch (IOException ex)
+			{
+				logger.error(ex);
+			}
+			finally
+			{
+			}
+
+		}
+	}
+
+	class DotFileViewer
+		implements DotBuilderObserver
+	{
+		File theFile;
+
+		public DotFileViewer(File theFile)
+		{
+			this.theFile = theFile;
+		}
+
+
+		public void setGraph(Graph theGraph)
+		{
+		}
+
+		public void setInputStream(InputStream theInputStream)
+		{
+			BufferedInputStream buffInStream = null;
+			BufferedOutputStream buffOutStream = null;
+
+			try
+			{
+				// Send the response to a file
+				buffInStream = new BufferedInputStream(theInputStream);
+				FileOutputStream fw = new FileOutputStream(theFile);
+				buffOutStream = new BufferedOutputStream(fw);
+				int currChar = buffInStream.read();
+
+				while (currChar != -1)
+				{
+					buffOutStream.write(currChar);
+
+					currChar = buffInStream.read();
+				}
+
+				if (buffInStream != null)
+				{
+					buffInStream.close();
+				}
+				if (buffOutStream != null)
+				{
+					buffOutStream.close();
+				}
+
+			}
+
+			catch (IOException ex)
+			{
+				logger.error(ex);
+			}
+			finally
+			{
+			}
+		}
+	}
+
+
 	// This class is almost identical to the same named class in ActionMan
 	// Should really merge and fixx, but for now.... Should I bother?
 	static class ExportDialog
-
-	//      extends JDialog
 	{
 		private static final String epsString = "eps";
 		private static final String mifString = "mif";
@@ -713,119 +887,5 @@ public abstract class DotViewer
 		}
 	}
 
-	public void setGraph(Graph theGraph)
-	{
-		this.theGraph = theGraph;
-		draw();
-	}
 
-	public abstract AutomataSerializer getSerializer();
-
-	// ToDo
-	public void fileExport_actionPerformed(ActionEvent e)
-	{}
-
-/*
-	public void fileExport_actionPerformed(ActionEvent e)
-	{
-		ExportDialog dlg = new ExportDialog(this);
-
-		dlg.show();
-
-		if (dlg.wasCancelled())    // never mind...
-		{
-			return;
-		}
-
-		// Ugly duplication of code here, but a man can only do so much...
-		// (the real reason is that there's no (obvious) conversion from Writer to OutputStream)
-		if (dlg.toDebugView())
-		{
-			try
-			{
-				AutomataSerializer serializer = getSerializer();
-
-				initializeStreams(dlg.getDotArgument());
-
-				// Send the file to dot
-				serializer.serialize(toDotWriter);
-				toDotWriter.close();
-
-				// Send the response to the debugview
-				BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
-				TextFrame debugview = new TextFrame("Dot debug output");
-				Writer writer = debugview.getPrintWriter();
-				int currChar = buffInStream.read();
-
-				while (currChar != -1)
-				{
-					writer.write(currChar);
-
-					currChar = buffInStream.read();
-
-					// Toolkit.getDefaultToolkit().beep();
-				}
-
-				buffInStream.close();
-			}
-			catch (Exception excp)
-			{
-				logger.error("Error while writing to the debugview", excp);
-				logger.debug(excp.getStackTrace());
-			}
-
-			return;
-		}
-
-		JFileChooser fileExporter = dlg.getFileExporter();
-
-		// Suggest a reasonable filename based on the name of the automaton...
-		fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" + objectName + "." + dlg.getSelectedValue()));
-
-		if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
-		{
-			File currFile = fileExporter.getSelectedFile();
-
-			if (currFile != null)
-			{
-				if (!currFile.isDirectory())
-				{
-					try
-					{
-						AutomataSerializer serializer = getSerializer();
-
-						initializeStreams(dlg.getDotArgument());
-
-						// Send the file to dot
-						serializer.serialize(toDotWriter);
-						toDotWriter.close();
-
-						// Send the response to a file
-						BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
-						FileOutputStream fw = new FileOutputStream(currFile);
-						BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
-						int currChar = buffInStream.read();
-
-						while (currChar != -1)
-						{
-							buffOutStream.write(currChar);
-
-							currChar = buffInStream.read();
-						}
-
-						buffInStream.close();
-						buffOutStream.close();
-					}
-					catch (Exception ex)
-					{
-						logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
-						logger.debug(ex.getStackTrace());
-
-						return;
-					}
-				}
-			}
-		}
-	}
-*/
 }

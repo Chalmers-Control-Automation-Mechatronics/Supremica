@@ -99,6 +99,7 @@ public final class SupremicaProperties
 	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
 	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
 	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
+//	private static final String GENERAL_USE_SWT = "generalUseSWT";
 
 	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
 
@@ -261,6 +262,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
+//		setProperty(GENERAL_USE_SWT, "false", false);
 
 		//setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
@@ -715,6 +717,12 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(FILE_ALLOW_SAVE, toString(allow));
 	}
+
+	public static boolean useSWT()
+	{
+		return isWindows();
+	}
+
 
 	public static boolean generalUseRCP()
 	{

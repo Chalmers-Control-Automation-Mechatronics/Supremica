@@ -13,6 +13,7 @@ public class Actions
 
 	public NewAction newAction;
 	public OpenAction openAction;
+//	public ImportAction importAction;
 	public CloseAction closeAction;
 	public SaveAction saveAction;
 
@@ -47,6 +48,7 @@ public class Actions
 
 		newAction = new NewAction(ide);
 		openAction = new OpenAction(ide);
+//		importAction = new ImportAction(ide);
 		closeAction = new CloseAction(ide);
 		saveAction = new SaveAction(ide);
 

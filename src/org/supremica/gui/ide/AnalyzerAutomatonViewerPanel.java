@@ -2,6 +2,7 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import java.awt.Dimension;
+import java.io.InputStream;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.DotBuilder;
@@ -57,7 +58,7 @@ class AnalyzerAutomatonViewerPanel
 
 	private void build()
 	{
-		builder = DotBuilder.getDotBuilder(this, new AutomatonToDot(theAutomaton));
+		builder = DotBuilder.getDotBuilder(this, new AutomatonToDot(theAutomaton), "");
 
 		//builder.start();
 	}
@@ -72,6 +73,10 @@ class AnalyzerAutomatonViewerPanel
 		getViewport().setPreferredSize(getPreferredSize());
 		getViewport().setMinimumSize(getMinimumSize());
 		validate();
+	}
+
+	public void setInputStream(InputStream inputStream)
+	{
 	}
 
 }
