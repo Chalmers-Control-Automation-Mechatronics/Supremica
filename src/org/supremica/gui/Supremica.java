@@ -320,6 +320,25 @@ public class Supremica
 		setIconImage(Supremica.cornerImage);
 		setVisible(true);
 		splitPaneVertical.setDividerLocation(0.7);
+		int tableWidth = theAutomatonTable.getWidth();
+		int tableWidthEntity = tableWidth/12;
+		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
+		for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
+		{
+			TableColumn currColumn = theTableColumnModel.getColumn(i);
+			if (i == 0)
+			{
+				currColumn.setPreferredWidth(tableWidthEntity*5);
+			}
+			else if (i == 1)
+			{
+				currColumn.setPreferredWidth(tableWidthEntity*3);
+			}
+			else
+			{
+				currColumn.setPreferredWidth(tableWidthEntity*2);
+			}
+		}
 		setVisible(false);
 	}
 
