@@ -83,7 +83,7 @@ public class Automata
 	}
 
 	/**
-	 * Does not make a new copy of the contained automata.
+	 * Does not make a new copy of the contained automata unless shallowCopy is false
 	 **/
 	public Automata(Automata oldAutomata, boolean shallowCopy)
 	{
