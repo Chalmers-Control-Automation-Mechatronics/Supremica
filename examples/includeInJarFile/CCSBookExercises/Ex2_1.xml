@@ -46,7 +46,7 @@
 		<Transition source="2" dest="3" event="2"/>
 		<Transition source="2" dest="0" event="3"/>
 		<Transition source="2" dest="0" event="4"/>
-		<Transition source="2" dest="1" event="5"/>
+		<Transition source="2" dest="2" event="5"/>
 		<Transition source="2" dest="0" event="6"/>
 		<Transition source="2" dest="0" event="7"/>
 		<Transition source="2" dest="0" event="8"/>
