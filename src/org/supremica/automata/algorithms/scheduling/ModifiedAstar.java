@@ -446,6 +446,9 @@ public class ModifiedAstar
 	}
 	public Automaton getAutomaton(Element elem)
 	{
+		String theTrace = trace(elem);
+		logger.info(theTrace);
+
 		Automaton automaton = new Automaton();
 		automaton.setComment("Schedule");
 

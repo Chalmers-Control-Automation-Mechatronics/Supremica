@@ -419,6 +419,7 @@
 	</Transitions>
 </Automaton>
 <!-- Only one AGV at the input statiosn at a time -->
+<!--
 <Automaton name="ZonX" type="Specification">
   <Events>
    <Event id="u11" label="u11" controllable="false" prioritized="true" />
@@ -438,6 +439,7 @@
    <Transition event="c3" source="q2" dest="q0" />
   </Transitions>
  </Automaton>
+-->
 <Execution>
 	<Actions>
 
