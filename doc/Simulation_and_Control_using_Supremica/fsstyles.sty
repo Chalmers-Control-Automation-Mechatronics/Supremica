@@ -1,0 +1,101 @@
+\NeedsTeXFormat{LaTeX2e}
+\usepackage{ulem}
+\usepackage{latexsym}
+
+\newcommand{\theDefinition}{\arabic{FSDefinition}}
+\newcommand{\theFsExample}{\arabic{FSExample}}
+\newcommand{\theTheorem}   {\arabic{FSTheorem}}
+\newcommand{\theLemma}   {\arabic{FSLemma}}
+
+\newcounter{FSDefinition}
+\newenvironment{fsdefinition}[1][]{
+    \refstepcounter{FSDefinition}
+    \setbox\@tempboxa\hbox{#1}
+    \bigskip\par\noindent
+    \ifdim\wd\@tempboxa > 0pt
+      \textbf{Definition~\theDefinition~\textsl{[#1]}.}
+    \else
+      \textbf{Definition~\theDefinition.}
+    \fi
+    \begingroup \slshape
+  }
+  {
+    \endgroup
+    \par\bigskip
+}
+
+\newcounter{FSExample}
+\newenvironment{fsexample}[1][]{
+    \refstepcounter{FSExample}
+    \setbox\@tempboxa\hbox{#1}
+    \bigskip\hrule\par\noindent
+    \vrule height1ex \hfill \vrule height1ex
+%    \nopagebrake
+    \par\noindent
+    \ifdim\wd\@tempboxa > 0pt
+      \textbf{Example~\theFsExample~\textsl{[#1]}.}
+    \else
+      \textbf{Example~\theFsExample.}
+    \fi
+    \begingroup
+  }
+  {
+    \endgroup
+%    \nopagebrake
+    \par\noindent
+    \vrule height1ex \hfill \vrule height1ex
+    \hrule\bigskip
+}
+
+\newcounter{FSTheorem}
+\newenvironment{fstheorem}[1][]{
+    \refstepcounter{FSTheorem}
+    \setbox\@tempboxa\hbox{#1}
+    \bigskip\par\noindent
+    \ifdim\wd\@tempboxa > 0pt
+      \textbf{Theorem~\theTheorem~\textsl{[#1]}.}
+    \else
+      \textbf{Theorem~\theTheorem.}
+    \fi
+    \begingroup \slshape
+  }
+  {
+    \endgroup
+    \par\bigskip
+}
+    
+\newcounter{FSLemma}
+\newenvironment{fslemma}[1][]{
+    \refstepcounter{FSLemma}
+    \setbox\@tempboxa\hbox{#1}
+    \bigskip\par\noindent
+    \ifdim\wd\@tempboxa > 0pt
+      \textbf{Lemma~\theLemma~\textsl{[#1]}.}
+    \else
+      \textbf{Lemma~\theLemma.}
+    \fi
+    \begingroup \slshape
+  }
+  {
+    \endgroup
+    \par\bigskip
+}
+    
+\newenvironment{fsproof}[1][]{
+    \setbox\@tempboxa\hbox{#1}
+    \par\noindent
+    \ifdim\wd\@tempboxa > 0pt
+      \textbf{Proof~\textsl{[#1]}.}
+    \else
+      \textbf{Proof.}
+    \fi
+    \begingroup
+  }
+  {
+    \endgroup
+    \hfill$\Box$\par\bigskip
+}
+
+\normalem
+
+%\newcommand{\ME}[1]{\textsc{Meta:} #1}

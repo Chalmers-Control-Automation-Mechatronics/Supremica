@@ -1,0 +1,50 @@
+\documentclass[10pt,a4paper]{book}
+
+\usepackage{cdesbook}
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}[chapter]
+
+\usepackage{epic}
+\usepackage{eepic}
+\usepackage{units}
+\usepackage{color}
+\usepackage[round]{natbib} % replaces apalike citations
+
+\usepackage{fsstyles}
+
+\usepackage{latexsym}
+
+\usepackage{makeidx}
+%\makeindex
+
+%%% BEGIN %%%
+%%% Flyttat från thesis sty
+\def\schoolname{\textit{Chalmers University of Technology}}
+\def\thesisname{\textit{Simulation and Control using Supremica}}
+\def\authorname{\textit{Goran Cengic and Knut Åkesson}}
+% \def\theLogo{\includegraphics[height=30mm]{gronbil.ps}}
+\def\theLogo{}
+\def\releaseplace{\textit{Göteborg}}
+\def\releaseyear{\textit{2004}}
+%%% END %%%
+
+
+\makeindex
+\begin{document}
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+
+\vfill
+%\section*{Nomenclature}
+
+\cleardoublepage
+\pagenumbering{arabic}
+%\include{intro}
+
+\include{functionblocks}
+
+\printindex
+
+\end{document}
