@@ -755,7 +755,6 @@ public class DotViewer
 				BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
 				TextFrame debugview = new TextFrame("Dot debug output");
 				Writer writer = debugview.getPrintWriter();
-
 				int currChar = buffInStream.read();
 
 				while (currChar != -1)
@@ -763,6 +762,7 @@ public class DotViewer
 					writer.write(currChar);
 
 					currChar = buffInStream.read();
+					// Toolkit.getDefaultToolkit().beep();
 				}
 
 				buffInStream.close();

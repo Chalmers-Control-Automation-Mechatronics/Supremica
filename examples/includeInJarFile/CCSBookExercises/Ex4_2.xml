@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Ex4_2">
+<Automaton name="M1" type="Plant">
+	<Events>
+		<Event id="a1"/>
+		<Event id="c1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="m0" name="m10" initial="true" accepting="true"/>
+		<State id="m1" name="m11"/>
+	</States>
+	<Transitions>
+		<Transition source="m0" dest="m1" event="a1"/>
+		<Transition source="m1" dest="m0" event="c1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M2" type="Plant">
+	<Events>
+		<Event id="a2"/>
+		<Event id="c2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="m0" name="m20" initial="true" accepting="true"/>
+		<State id="m1" name="m21"/>
+	</States>
+	<Transitions>
+		<Transition source="m0" dest="m1" event="a2"/>
+		<Transition source="m1" dest="m0" event="c2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="AGV" type="Plant">
+	<Events>
+		<Event id="c1" controllable="false"/>
+		<Event id="a2"/>
+		<Event id="c2" controllable="false"/>
+		<Event id="a3"/>
+	</Events>
+	<States>
+		<State id="a0" name="x0" initial="true" accepting="true"/>
+		<State id="a1" name="x1"/>
+		<State id="a2" name="x2"/>
+	</States>
+	<Transitions>
+		<Transition source="a0" dest="a1" event="c1"/>
+		<Transition source="a1" dest="a0" event="a2"/>
+		<Transition source="a0" dest="a2" event="c2"/>
+		<Transition source="a2" dest="a0" event="a3"/>
+	</Transitions>
+</Automaton>
+</Automata>
