@@ -1,1 +1,1 @@
-java -cp .:../../images:../../lib/unjared:../../build org.supremica.softplc.RunTime.DigitalIODisplay org.supremica.softplc.Simulator.BTSim
+java -cp .;..\..\images;..\..\lib\unjared;..\..\build org.supremica.softplc.RunTime.DigitalIODisplay org.supremica.softplc.Simulator.BTSim
