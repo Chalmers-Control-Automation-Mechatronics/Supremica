@@ -78,15 +78,13 @@ public class ECCondition
 
 	public ECCondition(String condition)
 	{
-		
-		System.out.println("ECCondition(" + condition + ")");
 		set(condition);
 	}
 
 	public void set(String cond)
 	{
 	
-		System.out.println("ECCondition.set(" + cond + ")");
+		//System.out.println("ECCondition.set(" + cond + ")");
 
 		condition = cond;
 		

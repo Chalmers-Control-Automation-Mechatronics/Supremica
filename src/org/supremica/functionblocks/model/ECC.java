@@ -57,7 +57,7 @@ public class ECC
 
 	ECC()
 	{
-		System.out.println("ECC(): Creating empty ECC");
+		//System.out.println("ECC(): Creating empty ECC");
 	}
 
 	void addInitialState(String initial)

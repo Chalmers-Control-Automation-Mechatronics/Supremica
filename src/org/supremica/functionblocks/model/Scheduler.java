@@ -110,7 +110,7 @@ public class Scheduler
 			//System.out.println("all FB instances are busy handling an event!");
 			return null;
 		} 
-		System.out.println("Scheduler.selectFBInstanceToHandleEvent(): found idle FB instance!");
+		//System.out.println("Scheduler.selectFBInstanceToHandleEvent(): found idle FB instance!");
 		return resource.fbInstance;
 	}
 	
@@ -125,7 +125,7 @@ public class Scheduler
 			{
 				Job finishedJob = (Job) iter.next();
 				finishedJob.getInstance().finishedJob(finishedJob);
-				System.out.println("Scheduler.notifyFinished(): notified one");
+				//System.out.println("Scheduler.notifyFinished(): notified one");
 				iter.remove();
 			}
 		}
@@ -154,7 +154,7 @@ public class Scheduler
     
 	public void scheduleJob(Job j)
 	{
-		System.out.println("Scheduler.scheduleJob()");
+		//System.out.println("Scheduler.scheduleJob()");
 		scheduledJobs.add(j);
 	}
     

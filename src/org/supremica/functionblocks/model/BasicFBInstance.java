@@ -107,7 +107,7 @@ public class BasicFBInstance extends FBInstance
 
 	public void queueEvent(String eventInput)
 	{
-		System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
+		//System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
 		EventQueue tempQueue = (EventQueue) eventInputQueues.get(eventInput);
 		if(tempQueue != null)
 		{
@@ -115,13 +115,14 @@ public class BasicFBInstance extends FBInstance
 		}
 		else
 		{
-			System.out.println("BasicFBInstance: No even input " + eventInput);
+			System.out.println("BasicFBInstance: No event input " + eventInput);
+			System.exit(0);
 		}
 	}
 	
 	public void handleEvent()
 	{
-		System.out.println("BasicFBInstance.handleEvent()");
+		//System.out.println("BasicFBInstance.handleEvent()");
 		
 		currentEvent = selectEventToHandle();
 		if(currentEvent != null)
@@ -143,7 +144,7 @@ public class BasicFBInstance extends FBInstance
 	
 	public void finishedJob(Job theJob)
 	{
-		System.out.println("BasicFBInstance.finishedJob()");
+		//System.out.println("BasicFBInstance.finishedJob()");
 		setVariables(theJob.getVariables());
 		sendOutput();
 		handleState();
@@ -151,7 +152,7 @@ public class BasicFBInstance extends FBInstance
 
 	private Event selectEventToHandle()
 	{
-		System.out.println("BasicFBInstace.selectEventToHandle()");
+		//System.out.println("BasicFBInstace.selectEventToHandle()");
 		// TODO: Implement better event selection
 		// For the skeleton the first event of the first queue will do
 		if( ((EventQueue) eventInputQueues.get("OCCURRED")).size() > 0 )
@@ -204,7 +205,7 @@ public class BasicFBInstance extends FBInstance
 			else
 			{
 				// we're done with the event
-				System.out.println("BasicFBInstance: Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
+				//System.out.println("BasicFBInstance: Done with event " + currentEvent.getName() + " and in ECState " + currentECState.getName());
 				handlingEvent = false;
 			}
 		}

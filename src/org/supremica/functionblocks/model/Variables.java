@@ -59,11 +59,10 @@ public class Variables
 	
 	private Map variables = new HashMap();
 
-	private Map eventInputVariables = new HashMap();
-	private Map eventOutputVariables = new HashMap();
-	private Map dataInputVariables = new HashMap();
-	private Map dataOutputVariables = new HashMap();
-	private Map localVariables = new HashMap();
+	public void addVariable(String name, Variable var)
+	{
+		variables.put(name,var);
+	}
 
 	public Variable getVariable(String name)
 	{
@@ -76,10 +75,6 @@ public class Variables
 		return (Variable) variables.get(name);
 	}
 
-	public void addVariable(String name, Variable value)
-	{
-		variables.put(name,value);
-	}
 
 	public Iterator iterator()
 	{

@@ -74,13 +74,12 @@ public class Resource
 
 		// creat the test application
 	
+		// FB types
 		BasicFBType fbType = new BasicFBType("P1", this);
-
 		// only one event input and output for now
-		fbType.addVariable("OCURRED", new BooleanVariable("EventInput",false));
+		fbType.addVariable("OCCURRED", new BooleanVariable("EventInput",false));
 		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
 		fbType.addVariable("invoked", new IntegerVariable("Local",0));
-
 		// Build ECC 
 		fbType.getECC().addInitialState("INIT");
 		fbType.getECC().addState("STATE");
@@ -88,8 +87,10 @@ public class Resource
 		fbType.getECC().addTransition("STATE", "INIT", "TRUE");
 		fbType.getECC().getState("STATE").addAction(new TestAlgorithm(), "DONE");
 
+		// FB instances
 		fbInstance = fbType.createInstance("P1inst");
-		fbInstance.addEventInputQueue("OCCURRED");
+
+		// connections
 		fbInstance.addEventOutputConnection("DONE", new Connection(fbInstance,"OCCURRED"));
 
 		fbInstance.queueEvent("OCCURRED");
