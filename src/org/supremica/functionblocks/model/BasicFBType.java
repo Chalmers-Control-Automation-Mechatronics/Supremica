@@ -85,7 +85,16 @@ public class BasicFBType extends FBType
 		System.out.println("BasicFBType.createInstace(" + name + ")");
 		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
 
-		// construct the newInstance
+		// construct Events for all EventInputs
+		for(Iterator iter = variables.iterator();iter.hasNext();)
+		{
+			String curName = (String) iter.next();
+			Variable curVar = (Variable) variables.getVariable(curName);
+			if(curVar.getType().equals("EventInput"))
+			{
+				newInstance.addInputEvent(curName,new Event(curName));
+			}
+		}
 
 		//System.out.println("BasicFBType.createInstace(" + name + "): cloning variables");
 		newInstance.setVariables((Variables) variables.clone());

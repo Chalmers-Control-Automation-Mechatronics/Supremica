@@ -51,6 +51,8 @@ public class BasicFBInstance extends FBInstance
 	private Resource resource;
 	private BasicFBType fbType;
 
+	private Map inputEvents = new HashMap();
+
 	private EventQueue eventInputQueue = new EventQueue();
 
 	private Map eventOutputConnections = new HashMap();
@@ -84,6 +86,11 @@ public class BasicFBInstance extends FBInstance
 	{
 		variables.addVariable(name,var);
 	}
+
+	public void addInputEvent(String name, Event ev)
+	{
+		inputEvents.put(name,ev);
+	}
 	
 	public void addEventOutputConnection(String output, Connection cnt)
 	{
@@ -95,18 +102,13 @@ public class BasicFBInstance extends FBInstance
 
 	}
 
-	public boolean isHandlingEvent()
-	{
-		return handlingEvent;
-	}
-
 	public void queueEvent(String eventInput)
 	{
 		//System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
 		if(variables.getVariable(eventInput) != null)
 			if(variables.getVariable(eventInput).getType().equals("EventInput"))
 			{
-				eventInputQueue.add(new Event(eventInput));
+				eventInputQueue.add((Event) inputEvents.get(eventInput));
 				resource.getScheduler().scheduleFBInstance(this);
 			}
 			else
