@@ -1741,7 +1741,7 @@ public class Automaton
 	public void hide(Alphabet alpha)
 	{
 		// Don't hide nothing!
-		if (alpha.size() == 0)
+		if ((alpha == null) || (alpha.size() == 0))
 		{
 			return;
 		}

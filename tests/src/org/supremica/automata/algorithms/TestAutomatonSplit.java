@@ -98,8 +98,8 @@ public class TestAutomatonSplit
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Split));
 			Automaton q = theProject.getAutomaton("q");
 			Automata split = AutomatonSplit.split(q);
-			assertTrue(AutomataVerifier.verifyInclusion(new Automata(q), split));
-			assertTrue(AutomataVerifier.verifyInclusion(split, new Automata(q)));
+			assertTrue(AutomataVerifier.verifyModularInclusion(new Automata(q), split));
+			assertTrue(AutomataVerifier.verifyModularInclusion(split, new Automata(q)));
 		}
 		catch (Exception ex)
 		{

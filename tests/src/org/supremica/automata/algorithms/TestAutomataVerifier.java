@@ -102,7 +102,7 @@ public class TestAutomataVerifier
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
 			assertTrue(theVerifier.verify());
 			// The same test again (hopefully)
-			assertTrue(AutomataVerifier.verifyControllability(theProject));
+			assertTrue(AutomataVerifier.verifyModularControllability(theProject));
 		}
 		catch (Exception ex)
 		{
@@ -123,7 +123,7 @@ public class TestAutomataVerifier
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
 			assertTrue(!theVerifier.verify());
 			// The same test again (hopefully)
-			assertTrue(!AutomataVerifier.verifyControllability(theProject));
+			assertTrue(!AutomataVerifier.verifyModularControllability(theProject));
 		}
 		catch (Exception ex)
 		{
@@ -132,7 +132,55 @@ public class TestAutomataVerifier
 		}
 	}
 
+	public void testMonolithicNonblocking()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
+
+			assertTrue(AutomataVerifier.verifyMonolithicNonblocking(theProject));
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);			
+		}
+	}
+
 	public void testModularNonblocking()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
+
+			assertTrue(AutomataVerifier.verifyModularNonblocking(theProject));
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);			
+		}
+	}
+
+	public void testMonolithicBlocking()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
+
+			assertTrue(!AutomataVerifier.verifyMonolithicNonblocking(theProject));
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);			
+		}
+	}
+
+	public void testModularBlocking()
 	{
 		try
 		{
@@ -165,7 +213,7 @@ public class TestAutomataVerifier
 			verificationOptions.setInclusionAutomata(inclusionAutomata);
 			assertTrue(theVerifier.verify());
 			// The same test again (hopefully)
-			assertTrue(AutomataVerifier.verifyInclusion(inclusionAutomata, targetAutomata));
+			assertTrue(AutomataVerifier.verifyModularInclusion(inclusionAutomata, targetAutomata));
 		}
 		catch (Exception ex)
 		{
@@ -191,7 +239,7 @@ public class TestAutomataVerifier
 			verificationOptions.setInclusionAutomata(inclusionAutomata);
 			assertTrue(!theVerifier.verify());
 			// The same test again (hopefully)
-			assertTrue(!AutomataVerifier.verifyInclusion(inclusionAutomata, targetAutomata));
+			assertTrue(!AutomataVerifier.verifyModularInclusion(inclusionAutomata, targetAutomata));
 		}
 		catch (Exception ex)
 		{

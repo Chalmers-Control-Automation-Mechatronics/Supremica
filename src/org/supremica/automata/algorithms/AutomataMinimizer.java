@@ -71,7 +71,8 @@ public class AutomataMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
-	//AutomataMinimizer minimizer = this;
+	/* Largest single automaton considered */
+	int largestAutomatonSize = 0;
 
 	/**
 	 * Basic constructor.
@@ -131,6 +132,7 @@ public class AutomataMinimizer
 			// "unique to total" (number of events) ratio
 			double bestUniqueRatio = 0;
 			double bestCommonRatio = 0;
+			int bestSize = Integer.MAX_VALUE;
 			Automaton bestAutB = null;
 			Alphabet hideThese = null;
 			for (int i=1; i<theAutomata.size(); i++)
@@ -142,6 +144,12 @@ public class AutomataMinimizer
 				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
 				if (nbrOfCommonEvents == 0)
 				{
+					if ((bestUniqueRatio == 0) && (bestCommonRatio == 0) && (autB.nbrOfStates() < bestSize))
+					{
+						bestAutB = autB;
+						bestSize = autB.nbrOfStates();
+						hideThese = null;
+					}
 					continue;
 				}
 
@@ -188,7 +196,7 @@ public class AutomataMinimizer
 				{
 					bestAutB = autB;
 					bestCommonRatio = thisCommonRatio;
-					hideThese = new Alphabet();
+					hideThese = null;
 				}
 			}
 
@@ -197,44 +205,49 @@ public class AutomataMinimizer
 				return null;
 			}
 
-			if ((bestUniqueRatio > 0) || (bestCommonRatio > 0))
+			// Generate automata to minimize
+			Automata automata = new Automata();
+			automata.addAutomaton(autA);
+			automata.addAutomaton(bestAutB);
+			
+			// Was the system disjoint?
+			if (!((bestUniqueRatio > 0) || (bestCommonRatio > 0)))
 			{
-				Automata automata = new Automata();
-				automata.addAutomaton(autA);
-				automata.addAutomaton(bestAutB);
-
-				// Minimize this part, but always spare events from targetAlphabet!
-				hideThese.minus(options.getTargetAlphabet());
-
-				// Compose and minimize!
-				Automaton min = monolithicMinimization(automata, hideThese);
-				if (stopRequested)
-				{
-					return null;
-				}
-				min.remapStateIndices();
-				theAutomata.removeAutomata(automata);
-				theAutomata.addAutomaton(min);
-
-				/*
-				// Update gui
-				ActionMan.getGui().getVisualProjectContainer().getActiveProject().removeAutomata(automata);
-				ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(min);
-				try
-				{
-					Thread.sleep(1000);
-				}
-				catch (Exception apa)
-				{
-
-				}
-				*/
+				logger.warn("The system has disjoint parts. Preferrably, they should " + 
+							"be treated separately if possible.");
 			}
-			else
+
+			/* Already taken care of above
+			// Minimize this part, but always spare events from targetAlphabet!
+			if (hideThese != null)
 			{
-				logger.error("Disjoint system?");
+				hideThese.minus(options.getTargetAlphabet());
+			}
+			*/
+			
+			// Compose and minimize!
+			Automaton min = monolithicMinimization(automata, hideThese);
+			if (stopRequested)
+			{
 				return null;
 			}
+			//min.remapStateIndices(); // Why did I do that?
+			theAutomata.removeAutomata(automata);
+			theAutomata.addAutomaton(min);
+			
+			/*
+			// Update gui
+			ActionMan.getGui().getVisualProjectContainer().getActiveProject().removeAutomata(automata);
+			ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(min);
+			try
+			{
+			    Thread.sleep(1000); // Doesn't help much, but removes some of the error messages...
+			}
+			catch (Exception apa)
+			{
+			
+			}
+			*/
 
 			// Update execution dialog
 			if (executionDialog != null)
@@ -254,6 +267,9 @@ public class AutomataMinimizer
 		ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomata(theAutomata);
 		*/
 
+		// Present largest automaton size
+		logger.verbose("The largest automaton examined had " + largestAutomatonSize + " states.");
+
 		// Return the result of the minimization!
 		return theAutomata.getFirstAutomaton();
 	}
@@ -268,6 +284,12 @@ public class AutomataMinimizer
 		// Synch and hide
 		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata);
 		aut.hide(hideThese);
+
+		// Examine for largest automaton size
+		if (aut.nbrOfStates() > largestAutomatonSize)
+		{
+			largestAutomatonSize = aut.nbrOfStates();
+		}
 
 		// Message
 		int before = aut.nbrOfStates();

@@ -235,31 +235,21 @@ public class AutomataVerifier
 	{
 		try
 		{
-			// Need initialisation?
+			// Find out what should be done and do it!
 			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
-			 	(verificationOptions.getVerificationType() == VerificationType.InverseControllability) ||
-				(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion))
+			   	(verificationOptions.getVerificationType() == VerificationType.InverseControllability))
 			{
 				// We're gonna do some serious synchronization! Initialize a synchronization helper!
 				synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 				synchHelper.setExecutionDialog(executionDialog);
 
-				// Are further preparations needed?
-				if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
-				{
-					// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
-					prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
-				}
+				// Inverse controllability? Invert controllability!
 				if (verificationOptions.getVerificationType() == VerificationType.InverseControllability)
 				{
 					prepareForInverseControllability();
 				}
-			}
 
-			// Find out what should be done and do it!
-			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
-			   	(verificationOptions.getVerificationType() == VerificationType.InverseControllability))
-			{
+				// Work!
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
 					return monolithicControllabilityVerification();
@@ -281,6 +271,11 @@ public class AutomataVerifier
 			{
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
+					// We're gonna do some serious synchronization! Initialize a synchronization helper!
+					synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+					synchHelper.setExecutionDialog(executionDialog);
+					
+					// Work!
 					return monolithicNonblockingVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
@@ -304,6 +299,7 @@ public class AutomataVerifier
 			}
 			else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
 			{
+				// Work!
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 					// This algorithm is under implementation!!
@@ -316,6 +312,14 @@ public class AutomataVerifier
 			}
 			else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 			{
+				// We're gonna do some serious synchronization! Initialize a synchronization helper!
+				synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+				synchHelper.setExecutionDialog(executionDialog);
+
+				// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
+				prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
+
+				// Work!
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				{
 					return BDDLanguageInclusionVerification();
@@ -1464,7 +1468,6 @@ public class AutomataVerifier
 		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 
@@ -1472,12 +1475,10 @@ public class AutomataVerifier
 		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
-
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 
 		// Get the synchronized automaton
@@ -2048,10 +2049,19 @@ public class AutomataVerifier
 	/**
 	 * Standard method for monolithic nonblocking verification on theAutomaton.
 	 */
-	public static boolean verifyNonblocking(Automaton theAutomaton)
+	public static boolean verifyMonolithicNonblocking(Automata automata)
 		throws Exception
 	{
-		return moduleIsNonblocking(theAutomaton);
+		SynchronizationOptions synchronizationOptions;
+		VerificationOptions verificationOptions;
+
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
+		verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
+
+		AutomataVerifier verifier = new AutomataVerifier(automata, synchronizationOptions, verificationOptions);
+
+		return verifier.verify();
 	}
 
 	/**
@@ -2074,7 +2084,7 @@ public class AutomataVerifier
 	/**
 	 * Standard method for performing modular controllability verification on theAutomata.
 	 */
-	public static boolean verifyControllability(Automata theAutomata)
+	public static boolean verifyModularControllability(Automata theAutomata)
 		throws Exception
 	{
 		SynchronizationOptions synchronizationOptions;
@@ -2096,7 +2106,7 @@ public class AutomataVerifier
 	 * @param automataB the automata that should include
 	 * @return true if "L(automataA)" is included in "L^-1(automataB)".
 	 */
-	public static boolean verifyInclusion(Automata automataA, Automata automataB)
+	public static boolean verifyModularInclusion(Automata automataA, Automata automataB)
 		throws Exception
 	{
 		SynchronizationOptions synchronizationOptions;

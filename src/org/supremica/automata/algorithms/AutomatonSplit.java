@@ -168,7 +168,7 @@ public class AutomatonSplit
 				automataA.addAutomaton(reduction);
 				automataA.addAutomata(parents);
 
-				if (AutomataVerifier.verifyInclusion(automataA, automataB))
+				if (AutomataVerifier.verifyModularInclusion(automataA, automataB))
 				{    // Removing the event didn't make a difference!
 					result = reduction;
 				}
