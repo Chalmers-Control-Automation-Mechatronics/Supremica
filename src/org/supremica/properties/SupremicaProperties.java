@@ -78,6 +78,7 @@ public final class SupremicaProperties
 	private static final String INCLUDE_EDITOR = "includeEditor";
 	private static final String INCLUDE_CELLEDITOR = "includeCellEditor";
 	private static final String INCLUDE_BOUNDED_UNCON_TOOLS = "includeBoundedUnconTools";
+	private static final String INCLUDE_EXPERIMENTAL_ALGORITHMS = "includeExperimentalAlgorithms";
 	private static final String VERBOSE_MODE = "verboseMode";
 	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
 	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
@@ -183,7 +184,7 @@ public final class SupremicaProperties
 		setProperty(FILE_ALLOW_OPEN, "true", true);
 		setProperty(FILE_ALLOW_SAVE, "true", true);
 		setProperty(FILE_ALLOW_IMPORT, "true", true);
-		setProperty(FILE_ALLOW_EXPORT, "false", true);
+		setProperty(FILE_ALLOW_EXPORT, "true", true);
 		setProperty(FILE_ALLOW_QUIT, "true", true);
 		setProperty(XML_RPC_ACTIVE, "false", true);
 		setProperty(XML_RPC_PORT, "9112", true);
@@ -208,6 +209,9 @@ public final class SupremicaProperties
 		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
 		setProperty(INCLUDE_SOFTPLC, "false", true);
 		setProperty(INCLUDE_JGRAFCHART, "false", true);
+		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
+		setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, "false", true);
+
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
 		setProperty(SUPERUSER_IDENTITY, "ESS030", false);
@@ -570,6 +574,11 @@ public final class SupremicaProperties
 	public static boolean includeEditor()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_EDITOR));
+	}
+
+	public static boolean includeExperimentalAlgorithms()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS));
 	}
 
 	public static boolean includeSoftPLC()

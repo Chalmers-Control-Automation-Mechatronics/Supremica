@@ -313,14 +313,13 @@ public class MainMenuBar
 			separatorNeeded = true;
 		}
 
-		if (SupremicaProperties.fileAllowExport())
+		if (false && SupremicaProperties.fileAllowExport())
 		{
 			// File.Export
 			JMenu menuFileExport = new JMenu();
 			menuFileExport.setText("Export");
 			menuFile.add(menuFileExport);
 
-/*
 			// File.Export.Html
 			JMenuItem menuFileExportHtml = new JMenuItem();
 			menuFileExportHtml.setText("To Html...");
@@ -332,7 +331,7 @@ public class MainMenuBar
 					ActionMan.fileExportHtml(ActionMan.getGui());
 				}
 			});
-*/
+
 
 			// File.Export.Desco
 			JMenuItem menuFileExportDesco = new JMenuItem();
@@ -358,21 +357,6 @@ public class MainMenuBar
 					ActionMan.fileExportUMDES(ActionMan.getGui());
 				}
 			});
-
-/*
-			// File.Export.Valid
-			JMenuItem menuFileExportValid = new JMenuItem();
-			menuFileExportValid.setEnabled(false);
-			menuFileExportValid.setText("To Valid...");
-			menuFileExport.add(menuFileExportValid);
-			menuFileExportValid.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.fileExportValid(ActionMan.getGui());
-				}
-			});
-*/
 
 			// ++ ARASH:
 			// File.Export.RCP

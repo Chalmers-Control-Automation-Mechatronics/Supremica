@@ -116,13 +116,23 @@ class MainPopupMenu
 		});*/
 
 		// Strictly EXPERIMENTAL
-		JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
-		menuHandler.add(automatonDiminisher, 1);
-		JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
-		menuHandler.add(automatonDeterminizer, 1);
-		JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
-		menuHandler.add(automataScheduler, 1);
+		if (SupremicaProperties.includeExperimentalAlgorithms())
+		{
+			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
+			menuHandler.add(automatonDiminisher, 1);
+		}
 
+		if (SupremicaProperties.includeExperimentalAlgorithms())
+		{
+			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
+			menuHandler.add(automatonDeterminizer, 1);
+		}
+
+		if (SupremicaProperties.includeExperimentalAlgorithms())
+		{
+			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
+			menuHandler.add(automataScheduler, 1);
+		}
 
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 		//menuHandler.add(interfaceItem, 1);
