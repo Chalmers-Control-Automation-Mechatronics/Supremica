@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name=""  major="0"  minor="9" >
+<Automaton name="arm" type="Plant">
+	<Events>
+		<Event id="0" label="finished_arm" controllable="false"/>
+		<Event id="1" label="start_arm"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="conveyor" type="Plant">
+	<Events>
+		<Event id="0" label="finished_con" controllable="false"/>
+		<Event id="1" label="start_con"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="operation" type="Plant">
+	<Events>
+		<Event id="0" label="finished_op" controllable="false"/>
+		<Event id="1" label="start_op"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec1" type="Specification">
+	<Events>
+		<Event id="0" label="finished_con" controllable="false"/>
+		<Event id="1" label="finished_op" controllable="false"/>
+		<Event id="2" label="finished_test" controllable="false"/>
+		<Event id="3" label="start_tab"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec2-1" type="Specification">
+	<Events>
+		<Event id="0" label="finished_con" controllable="false"/>
+		<Event id="1" label="finished_tab" controllable="false"/>
+		<Event id="2" label="start_con"/>
+		<Event id="3" label="start_tab"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec2-2" type="Specification">
+	<Events>
+		<Event id="0" label="finished_op" controllable="false"/>
+		<Event id="1" label="finished_tab" controllable="false"/>
+		<Event id="2" label="start_op"/>
+		<Event id="3" label="start_tab"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec2-3" type="Specification">
+	<Events>
+		<Event id="0" label="finished_tab" controllable="false"/>
+		<Event id="1" label="finished_test" controllable="false"/>
+		<Event id="2" label="start_tab"/>
+		<Event id="3" label="start_test"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec2-4" type="Specification">
+	<Events>
+		<Event id="0" label="finished_arm" controllable="false"/>
+		<Event id="1" label="finished_tab" controllable="false"/>
+		<Event id="2" label="start_arm"/>
+		<Event id="3" label="start_tab"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec3_1" type="Specification">
+	<Events>
+		<Event id="0" label="finished_con" controllable="false"/>
+		<Event id="1" label="start_op"/>
+		<Event id="2" label="start_tab"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+		<State id="2" name="q_2"/>
+		<State id="3" name="q_3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="3" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec3_2" type="Specification">
+	<Events>
+		<Event id="0" label="finished_op" controllable="false"/>
+		<Event id="1" label="start_tab"/>
+		<Event id="2" label="start_test"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+		<State id="2" name="q_2"/>
+		<State id="3" name="q_3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="3" dest="1" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="spec3_3" type="Specification">
+	<Events>
+		<Event id="0" label="finished_test" controllable="false"/>
+		<Event id="1" label="start_arm"/>
+		<Event id="2" label="start_tab"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+		<State id="2" name="q_2"/>
+		<State id="3" name="q_3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="3" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="table" type="Plant">
+	<Events>
+		<Event id="0" label="finished_tab" controllable="false"/>
+		<Event id="1" label="start_tab"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="test" type="Plant">
+	<Events>
+		<Event id="0" label="finished_test" controllable="false"/>
+		<Event id="1" label="start_test"/>
+	</Events>
+	<States>
+		<State id="0" name="q_0" initial="true" accepting="true"/>
+		<State id="1" name="q_1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="table_startup" type="Plant">
+	<Events>
+		<Event id="0" label="finished_con" controllable="false"/>
+		<Event id="1" label="finished_tab" controllable="false"/>
+		<Event id="2" label="start_con"/>
+		<Event id="3" label="start_tab"/>
+		<Event id="4" label="start_tab_1"/>
+		<Event id="5" label="start_tab_2"/>
+		<Event id="6" label="start_tab_3"/>
+	</Events>
+	<States>
+		<State id="0" name="0stibord" initial="true"/>
+		<State id="1" name="1bord"/>
+		<State id="2" name="con2"/>
+		<State id="3" name="con2_1"/>
+		<State id="4" name="con3"/>
+		<State id="5" name="con3start"/>
+		<State id="6" name="const"/>
+		<State id="7" name="q_16"/>
+		<State id="8" name="tab1"/>
+		<State id="9" name="tab1_2"/>
+		<State id="10" name="tab2"/>
+		<State id="11" name="tab2_2"/>
+		<State id="12" name="tab2_3"/>
+		<State id="13" name="tab3"/>
+		<State id="14" name="tab3_1"/>
+		<State id="15" name="tab3_2"/>
+		<State id="16" name="tabdone"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="6" event="2"/>
+		<Transition source="1" dest="8" event="3"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="3" dest="11" event="3"/>
+		<Transition source="4" dest="13" event="0"/>
+		<Transition source="5" dest="13" event="0"/>
+		<Transition source="6" dest="1" event="0"/>
+		<Transition source="7" dest="4" event="2"/>
+		<Transition source="8" dest="9" event="4"/>
+		<Transition source="9" dest="10" event="1"/>
+		<Transition source="10" dest="2" event="2"/>
+		<Transition source="11" dest="12" event="5"/>
+		<Transition source="12" dest="7" event="1"/>
+		<Transition source="13" dest="14" event="3"/>
+		<Transition source="14" dest="15" event="6"/>
+		<Transition source="15" dest="16" event="1"/>
+		<Transition source="16" dest="5" event="2"/>
+	</Transitions>
+</Automaton>
+
+<Execution>
+	<Actions>
+		<Action label="start_tab">
+			<Command command="start_tab"/>
+		</Action>	
+		<Action label="start_tab_1">
+			<Command command="start_tab_1"/>
+		</Action>
+		<Action label="start_tab_2">
+			<Command command="start_tab_2"/>
+		</Action>
+		<Action label="start_tab_3">
+			<Command command="start_tab_3"/>
+		</Action>
+		<Action label="start_op">
+			<Command command="start_op"/>
+		</Action>
+		<Action label="start_con">
+			<Command command="start_con"/>
+		</Action>		
+		<Action label="start_test">
+			<Command command="start_test"/>
+		</Action>
+		<Action label="start_arm">
+			<Command command="start_arm"/>
+		</Action>
+
+	</Actions>
+	<Controls>
+
+		<Control label="start_tab_1">
+			<Condition condition="finished_con"/>
+		</Control>
+		<Control label="start_tab_2">
+			<Condition condition="finished_con"/>
+			<Condition condition="finished_op"/>
+		</Control>
+		<Control label="start_tab_3">
+			<Condition condition="finished_con"/>
+			<Condition condition="finished_op"/>
+			<Condition condition="finished_test"/>
+			<Condition condition="finished_arm"/>
+		</Control>
+		<Control label="start_con">
+			<Condition condition="finished_tab"/>
+		</Control>
+			<Control label="start_test">
+			<Condition condition="finished_tab"/>
+		</Control>
+			<Control label="start_op">
+			<Condition condition="finished_tab"/>
+		</Control>
+			<Control label="start_arm">
+			<Condition condition="finished_tab"/>
+		</Control>
+	</Controls>
+	<Animation path="/scenebeans/rotationTable/rotationTable.xml"/>
+</Execution>
+
+</Automata>

@@ -1,0 +1,325 @@
+<?xml version="1.0"?>
+
+<animation width="500" height="500">
+
+
+<!-- 
+***************Behaviours******************* 
+-->
+
+<behaviour id="start_con" algorithm="move" event="finished_con">
+  <param name="from" value = "0" />
+  <param name="to"   value="180"/>
+  <param name="duration" value="2"/>
+</behaviour>
+
+<behaviour id="start_tab" algorithm="move" event="finished_tab">
+  <param name="from" value = "0" /> 
+  <param name="to"   value="-pi/2"/>
+  <param name="duration" value="1"/>
+</behaviour>
+
+<behaviour id="start_op" algorithm="timer" event="finished_op">
+	<param name="duration"  value = "4"/>
+</behaviour>
+
+<behaviour id="start_test" algorithm="timer" event="finished_test">
+	<param name="duration"  value = "3"/>
+</behaviour>
+
+<behaviour id="start_arm" algorithm="move" event="start_arm">
+  <param name="from" value = "0" />
+  <param name="to"   value="pi/2"/>
+  <param name="duration" value="1"/>
+</behaviour>
+
+<behaviour id="return_arm" algorithm="move" event="finished_arm">
+  <param name="from" value = "pi/2" />
+  <param name="to"   value="0"/>
+  <param name="duration" value="1"/>
+</behaviour>
+
+<behaviour id = "con_move" algorithm = "copyPoint">
+       <animate param="x" behaviour="start_con"/>
+</behaviour>
+
+<!-- 
+*************Definitions**************   
+-->
+
+<define id ="part_con"> 	     	     				
+	<transform type="translate">
+	     	<animate param = "translation" behaviour = "con_move"/>
+	     	<compose id = "part_con_sw" type = "switch">
+	     		<primitive type = "null"/>	     				 
+			 <primitive type = "sprite">
+	       			<param name = "src" value="partB.gif" />
+			   	<param name = "hotspot" value = "(12,12)" />
+			 </primitive>
+		</compose>
+	</transform>
+</define>	
+
+<define id ="part_arm">		
+	<transform type="rotate">  			
+		 <animate param = "angle" behaviour = "start_arm"/>
+		 <compose id = "part_arm_sw" type = "switch">
+		 	<primitive type = "null"/>
+		 	<primitive type = "sprite">
+		 	      	<param name = "src" value="partB.gif" />
+		 		<param name = "hotspot" value = "(12,-35)" />
+		 	</primitive>
+		 </compose>
+	</transform>		 		 	
+</define>
+
+
+ <define id ="table">
+ 	<transform type="rotate">
+ 	<animate param = "angle" behaviour = "start_tab"/>
+ 		<compose id = "table_switch" type = "switch">	     		     			 
+		 	<primitive type = "sprite">
+	       			<param name = "src" value="cirkel.gif" />
+		   		<param name = "hotspot" value = "(110,110)" />
+		 	</primitive>			     		 		 	
+		 	<primitive type = "sprite">
+	       			<param name = "src" value="cirkel1.gif" />
+		   		<param name = "hotspot" value = "(110,110)" />
+		 	</primitive>		 	     			 	
+		 	<primitive type = "sprite">
+	       			<param name = "src" value="cirkel2.gif" />
+		   		<param name = "hotspot" value = "(110,110)" />
+		 	</primitive>	     	
+		 	<primitive type = "sprite">
+	       			<param name = "src" value="cirkel3.gif" />
+		   		<param name = "hotspot" value = "(110,110)" />
+		 	</primitive>		 		 
+		</compose>
+	</transform>
+</define> 
+
+ <define id ="op_lamp">
+ 	<compose id = "lamp_switch" type = "switch">
+ 		<style type="RGBAColor">
+ 			<param name="color" value="00ff00"/>
+		 	<primitive type = "circle">
+	       			<param name = "radius" value="10" />
+		 	</primitive>
+		 </style>
+		<style type="RGBAColor">
+ 			<param name="color" value="ff0000"/>
+		 	<primitive type = "circle">
+	       			<param name = "radius" value="10" />
+		 	</primitive>
+		 </style>		 	     			 			 		 
+	</compose>
+</define> 
+
+ <define id ="test_lamp">
+ 	<compose id = "test_switch" type = "switch">
+ 		<style type="RGBAColor">
+ 			<param name="color" value="00ff00"/>
+		 	<primitive type = "circle">
+	       			<param name = "radius" value="10" />
+		 	</primitive>
+		 </style>
+		<style type="RGBAColor">
+ 			<param name="color" value="ff0000"/>
+		 	<primitive type = "circle">
+	       			<param name = "radius" value="10" />
+		 	</primitive>
+		 </style>		 	     			 			 		 
+	</compose>
+</define>
+
+ <define id ="test">
+	<transform type="translate">
+	   <param name ="y" value ="230"/>   
+	   <transform type="translate">
+	     <param name ="x" value ="323"/>
+		 <primitive type = "sprite">
+	       <param name = "src" value="drill2.gif" />
+		   <param name = "hotspot" value = "(0,50)" />
+		 </primitive>
+	   </transform>
+    </transform>
+</define>
+
+ <define id ="op">
+	<transform type="translate">
+	   <param name ="x" value ="250"/>   
+	   <transform type="translate">
+	     <param name ="y" value ="320"/>
+		<primitive type = "sprite">
+	       		<param name = "src" value="test2.gif" />
+		   	<param name = "hotspot" value = "(40,0)" />
+		</primitive>
+	</transform>
+</transform>
+</define>
+
+<define id ="arm">
+	<transform type="translate">
+	   <param name ="y" value ="120"/>   
+	   <transform type="translate">
+	   	<param name ="x" value ="250"/>
+	        	<transform type="rotate">
+	     			<animate param = "angle" behaviour = "start_arm"/>
+	     			<animate param = "angle" behaviour = "return_arm"/>
+		 		<primitive type = "sprite">
+	       				<param name = "src" value="robot2.gif" />
+		   			<param name = "hotspot" value = "(50,35)" />
+		 		</primitive>
+	   		</transform>
+	   	</transform>
+    </transform>
+</define>
+
+<!-- 
+**********Draw objects*****************  
+-->
+<draw>
+	<paste object = "arm"/>	
+	<transform type="translate">
+		<param name ="translation" value ="(-12,250)"/> 
+		<paste object = "part_con"/>
+	</transform>
+	
+	<transform type="translate">
+	   	<param name ="translation" value ="(250,115)"/> 
+		<paste object = "part_arm"/>
+	</transform>
+	<transform type="translate">
+	   	<param name ="translation" value ="(250,120)"/> 
+		<paste object = "part_arm"/>
+	</transform>
+	<transform type="translate">
+	   	<param name ="translation" value ="(249,335)"/> 	
+		<paste object = "op_lamp"/>
+	</transform>
+	<transform type="translate">
+	   	<param name ="translation" value ="(380,250)"/> 	
+		<paste object = "test_lamp"/>
+	</transform>
+	<paste object = "op"/>
+	<paste object = "test"/>
+	    
+	<transform type="translate">
+		<param name="translation" value ="(-10,220)"/>   
+		 <primitive type = "sprite">
+	       		<param name = "src" value="conveyer.gif" />
+		   	<param name = "hotspot" value = "(0,0)" />
+		 </primitive>
+    	</transform> 
+	<transform type="translate">
+	   <param name ="translation" value ="(250,250)"/>
+		<paste object = "table"/>
+	</transform>
+</draw>
+
+<!-- 
+************Commands*********   
+-->
+<command name="start_con">
+	<set object="part_con_sw" param="current" value="1" />
+	<announce event = "~finished_con"/>
+	<reset behaviour="start_con"/>
+	<start behaviour="start_con"/>
+	<start behaviour="con_move"/>
+</command>
+
+<command name="start_tab">
+
+</command>
+
+<command name="start_tab_1">
+	<announce event = "~finished_tab"/>
+	<reset behaviour="start_tab"/>
+	<start behaviour="start_tab"/>
+	<set object="part_con_sw" param="current" value="0" />
+	<set object="part_con" param="translation" value ="(-12,250)"/> 
+	<set object="table_switch" param="current" value="1" />
+</command>
+<command name="start_tab_2">
+	<announce event = "~finished_tab"/>
+	<reset behaviour="start_tab"/>
+	<start behaviour="start_tab"/>
+	<set object="part_con_sw" param="current" value="0" />
+	<set object="part_con" param="translation" value ="(-12,250)"/> 
+	<set object="table_switch" param="current" value="2" />
+</command>
+<command name="start_tab_3">
+	<announce event = "~finished_tab"/>
+	<reset behaviour="start_tab"/>
+	<start behaviour="start_tab"/>
+	<set object="part_con_sw" param="current" value="0" />
+	<set object="part_con" param="translation" value ="(-12,250)"/> 
+	<set object="table_switch" param="current" value="3" />
+</command>
+
+
+<command name="start_op">
+  <announce event = "~start_op"/>
+  <reset behaviour="start_op"/>
+  <start behaviour="start_op"/>
+  <set object="lamp_switch" param="current" value="1" />
+</command>
+
+<command name="start_test">
+  <announce event = "~finished_test"/>
+  <reset behaviour="start_test"/>
+  <start behaviour="start_test"/>
+  <set object="test_switch" param="current" value="1" />
+</command>
+
+
+<command name="start_arm">	
+	<announce event = "~start_arm"/>
+	<reset behaviour="start_arm"/>
+	<start behaviour="start_arm"/>
+	<set object="table_switch" param="current" value="2" />
+	<set object="part_arm_sw" param="current" value="1" />
+	<set object="table" param="angle" value="-pi/2" />
+</command>
+
+<!-- 
+*********Events*********    
+-->
+<event object="start_con" event="finished_con">
+	<announce event="finished_con"/>
+	<stop behaviour = "start_con"/>
+	<stop behaviour= "con_move"/>
+</event>
+
+<event object="start_tab" event="finished_tab"> 
+	<announce event="finished_tab"/>
+	<stop behaviour = "start_tab"/>
+</event>
+
+<event object="start_op" event="finished_op">
+	<announce event="finished_op"/>
+	<stop behaviour = "start_op"/>
+	<set object="lamp_switch" param="current" value="0" />
+</event>
+
+<event object="start_test" event="finished_test">
+	<announce event="finished_test"/>
+	<set object="test_switch" param="current" value="0" />
+	<stop behaviour = "start_test"/>
+</event>
+
+<event object="start_arm" event="start_arm">
+	<announce event="start_arm"/>
+	<stop behaviour = "start_arm"/> 
+	<reset behaviour="return_arm"/>
+	<start behaviour="return_arm"/>
+</event>
+
+<event object="return_arm" event="finished_arm">
+	<announce event="finished_arm"/>
+	<stop behaviour = "return_arm"/> 
+	<set object="part_arm_sw" param="current" value="0" />
+	<set object="part_arm" param="angle" value="0" />
+</event>
+
+</animation>
