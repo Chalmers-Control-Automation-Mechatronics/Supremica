@@ -27,6 +27,8 @@ import org.supremica.util.SupremicaException;
 class IntegerField
 	extends JTextField
 {
+	private static final long serialVersionUID = 1L;
+
 	public IntegerField(String init, int cols)
 	{
 		super(init, cols);
@@ -41,6 +43,8 @@ class IntegerField
 class DoubleField
 	extends JTextField
 {
+	private static final long serialVersionUID = 1L;
+
 	public DoubleField(String init, int cols)
 	{
 		super(init, cols);
@@ -64,6 +68,7 @@ class UsersPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField int_num = null;
 	IntegerField int_rsc = null;
 	JCheckBox req = new JCheckBox("request (a)");
@@ -104,6 +109,7 @@ class PhilosPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField int_num = new IntegerField("5", 6);
 	JCheckBox l_take = new JCheckBox("take left fork", true);
 	JCheckBox r_take = new JCheckBox("take right fork", true);
@@ -153,6 +159,7 @@ class BricksPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField num_rows = new IntegerField("4", 6);
 	IntegerField num_cols = new IntegerField("4", 6);
 
@@ -180,6 +187,7 @@ class WarehousePanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	Warehouse warehouse = new Warehouse();
 	IntegerField nbr_events_k = new IntegerField("3", 6);
 	IntegerField nbr_events_m = new IntegerField("1", 6);
@@ -250,6 +258,7 @@ class StickGamePanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField num_players = new IntegerField("2", 6);
 	IntegerField num_sticks = new IntegerField("7", 6);
 
@@ -279,6 +288,7 @@ class AllocationBatchPanel
 	extends JPanel
 	implements TestCase, ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	JTextField filename;
 	JButton browse;
 
@@ -336,6 +346,7 @@ class CountersPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField int_num = null;
 	IntegerField int_size = null;
 
@@ -363,6 +374,7 @@ class RandomPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField int_num = null;
 	IntegerField int_size = null;
 	IntegerField int_events = null;
@@ -396,6 +408,7 @@ class TransferLinePanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField int_cap1 = null;
 	IntegerField int_cap2 = null;
 	IntegerField int_cells = null;
@@ -436,6 +449,7 @@ class PigeonHolePanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField int_pigeons = null;
 	IntegerField int_holes = null;
 
@@ -480,6 +494,7 @@ class SanchezPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField int_blocks = null;
 	JComboBox choice = null;
 	static final String[] choice_items = { "#1: Async prod", "#2: Synch prod",
@@ -513,6 +528,7 @@ class RoundRobinPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField num_proc = new IntegerField("4", 2);
 
 	public RoundRobinPanel()
@@ -546,6 +562,7 @@ class ArbiterPanel
 	extends JPanel
 	implements TestCase
 {
+	private static final long serialVersionUID = 1L;
 	IntegerField num_users = new IntegerField("4", 2);
 	JCheckBox synchronize = new JCheckBox("Synchronize arbiter cells (yields an appealing hierarchy)", true);
 
@@ -592,6 +609,8 @@ class ArbiterPanel
 class ExampleTab
 	extends JTabbedPane
 {
+	private static final long serialVersionUID = 1L;
+
 	ExampleTab()
 	{
 		addTab("Users", null, new UsersPanel(), "Mutual exclusion users");
@@ -614,6 +633,7 @@ class ExampleTab
 public class TestCasesDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(TestCasesDialog.class);
 	private ExampleTab extab = new ExampleTab();
 	private Project project = null;
@@ -622,6 +642,8 @@ public class TestCasesDialog
 	class DoitButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		DoitButton()
 		{
 			super("Do it");
@@ -652,6 +674,8 @@ public class TestCasesDialog
 	class CancelButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		CancelButton()
 		{
 			super("Cancel");
@@ -675,6 +699,8 @@ public class TestCasesDialog
 	class HelpButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		HelpButton()
 		{
 			super("Help");

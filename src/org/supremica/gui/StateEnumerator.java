@@ -14,6 +14,7 @@ import org.supremica.automata.Automata;
 public class StateEnumerator
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(StateEnumerator.class);
 
 	public StateEnumerator()
