@@ -89,6 +89,7 @@ class VerificationDialogStandardPanel
 		{
 			super(VerificationAlgorithm.toArray());
 		}
+		// Martin: Can you fix this? /Knut
 		public void forceMonolithic()
 		{
 			//removeItemAt(MODULAR);

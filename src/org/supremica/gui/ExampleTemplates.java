@@ -60,6 +60,7 @@ public class ExampleTemplates
 	private final TemplateGroup CCSCourseAssignments = new TemplateGroup(TemplateTypes.CCSCourseAssignment);
 	private final TemplateGroup CCSCourseAssignmentSolutions = new TemplateGroup(TemplateTypes.CCSCourseAssignmentSolutions);
 	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
+	private final TemplateGroup AIPExamples = new TemplateGroup(TemplateTypes.AIPExample);
 	private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
 	private static final String extraPrefix = "/includeInJarFile";
 	private List allGroups = new LinkedList();
@@ -76,6 +77,7 @@ public class ExampleTemplates
 		initializeCCSCourseAssignments();
 		initializeCCSCourseAssignmentSolutions();
 		initializeOtherExamples();
+		initializeAIPExamples();
 		initializeStandardComponents();
 	}
 
@@ -136,6 +138,16 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml"));
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicle", prefix + "agv.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
+	}
+
+	private void initializeAIPExamples()
+	{
+		TemplateGroup thisGroup = AIPExamples;
+
+		allGroups.add(thisGroup);
+
+		String prefix = extraPrefix + "/OtherExamples/";
+
 		thisGroup.addItem(new TemplateItem("AIP System 1 - System 1", prefix + "aip/System1_system1.xml"));
 		thisGroup.addItem(new TemplateItem("AIP System 1 - Top AS 1", prefix + "aip/System1_Top_AS1.xml"));
 		thisGroup.addItem(new TemplateItem("AIP System 2 - System 2", prefix + "aip/System2_system2.xml"));
