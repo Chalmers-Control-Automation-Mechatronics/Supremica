@@ -574,6 +574,7 @@ class SoftPLCPanel
         JLabel jLabel2 = new JLabel();
         JButton removeButton = new JButton();
         JButton addButton    = new JButton();
+        Hashtable paths = new Hashtable();
 
 	public SoftPLCPanel(PreferencesDialog theDialog)
 	{
@@ -593,6 +594,9 @@ class SoftPLCPanel
                 addButton.setText("Add");
                 ioInterface.add("BTSim");
                 ioInterface.add("ProjectSoftPLC");
+
+                paths.put("Test1", "Test11");
+                paths.put("Test2", "Test22");
 
                 addButton.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -624,7 +628,7 @@ class SoftPLCPanel
 
 	}
 
-         void addButton_actionPerformed(ActionEvent e) {
+        void addButton_actionPerformed(ActionEvent e) {
 		JFileChooser outputDir = new JFileChooser();
 
 		if (outputDir.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
@@ -634,17 +638,19 @@ class SoftPLCPanel
 			{
 				if (!currFile.isDirectory())
 				{
+                                        paths.put(currFile.getName(), currFile.getAbsolutePath());
                                         ioInterface.add(currFile.getName());
                                         ioInterfaceList.updateUI();
 				}
 			}
                 }
-         }
+        }
 
-         void removeButton_actionPerformed(ActionEvent e) {
-                 ioInterface.remove(ioInterfaceList.getSelectedIndex());
-                 ioInterfaceList.updateUI();
-         }
+        void removeButton_actionPerformed(ActionEvent e) {
+                paths.remove(ioInterfaceList.getSelectedValue());
+                ioInterface.remove(ioInterfaceList.getSelectedIndex());
+                ioInterfaceList.updateUI();
+        }
 
 	public boolean doApply()
 	{
