@@ -12,7 +12,7 @@ import java.util.*;
 import javax.help.*;
 import java.net.URL;
 
-import org.supremica.gui.help.ContentHelp;
+// import org.supremica.gui.help.ContentHelp;
 import org.supremica.properties.SupremicaProperties;
 
 // Prototypical implementations, should be in own files and shared between menus, but for now...
@@ -88,20 +88,20 @@ public class MainToolBar
 	extends JToolBar
 {
 	private static Supremica supremica;
- 	private ContentHelp help = null;
-	private CSH.DisplayHelpFromSource helpDisplayer = null;
+// 	private ContentHelp help = null;
+//	private CSH.DisplayHelpFromSource helpDisplayer = null;
 
 	private static final OpenAction openAction = new OpenAction();
 	private static final SaveAction saveAction = new SaveAction();
 	private static final SaveAsAction saveAsAction = new SaveAsAction();
 	private static final EditAction editAction = new EditAction(supremica);
-	private static final HelpAction helpAction = new HelpAction();	
+	// private static final HelpAction helpAction = new HelpAction();	
 	
 	public MainToolBar(Supremica supremica)
 	{
 		this.supremica = supremica;
-		this.help = new ContentHelp();
-		this.helpDisplayer = new CSH.DisplayHelpFromSource(help.getStandardHelpBroker());
+//		this.help = new ContentHelp();
+//		this.helpDisplayer = new CSH.DisplayHelpFromSource(help.getStandardHelpBroker());
 
 		initToolBar();
 		setRollover(true);
