@@ -732,9 +732,9 @@ public final class AutomataSynchronizerExecuter
 				if (currStateTable[i] != null)
 				{
 					int[] currState = currStateTable[i];
-					State newState = new State();
+					State newState = null;
 
-					newState.setAutomataSynchronizerExecutorIndex(i);
+					//newState.setAutomataSynchronizerExecutorIndex(i);
 
 					if (longformId)
 					{
@@ -746,12 +746,14 @@ public final class AutomataSynchronizerExecuter
 							sb.append(stateTable[j][currState[j]].getId());
 						}
 
-						newState.setId(sb.toString());
+						newState = new State(sb.toString());
 					}
 					else
 					{
-						newState.setId("q" + stateNumber++);
+						newState = new State("q" + stateNumber++);
 					}
+
+					newState.setAutomataSynchronizerExecutorIndex(i);
 
 					newState.setName(newState.getId());
 					newState.setInitial(AutomataIndexFormHelper.isInitial(currState));

@@ -144,6 +144,7 @@ public class AutomataSynchronizerWorker
 
 					// -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					workbench.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
+					ex.printStackTrace();
 					// logger.debug(ex.getStackTrace());
 					return;
 				}

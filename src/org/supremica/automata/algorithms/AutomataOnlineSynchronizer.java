@@ -66,7 +66,7 @@ import org.supremica.automata.Automaton;
  *@created  November 28, 2001
  */
 public final class AutomataOnlineSynchronizer
-	extends Thread
+//	extends Thread
 {
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
@@ -110,7 +110,7 @@ public final class AutomataOnlineSynchronizer
 
 	public AutomataOnlineSynchronizer(AutomataSynchronizerHelper synchronizerHelper)
 	{
-		setPriority(Thread.MIN_PRIORITY);
+		//setPriority(Thread.MIN_PRIORITY);
 
 		helper = synchronizerHelper;
 		indexForm = helper.getAutomataIndexForm();

@@ -5,7 +5,7 @@ import java.io.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.IO.*;
-
+import org.supremica.automata.execution.*;
 
 class Resource
 {
@@ -15,10 +15,14 @@ class Resource
 	private LinkedList u2NextResources = new LinkedList();
 	private User u1;
 	private User u2;
+	private int x;
+	private int y;
 
-	public Resource(String identity, boolean exclusive, User u1, User u2)
+	public Resource(int x, int y, boolean exclusive, User u1, User u2)
 	{
-		this.identity = identity;
+		this.x = x;
+		this.y = y;
+		this.identity = Integer.toString(x) + Integer.toString(y);
 		this.exclusive = exclusive;
 		this.u1 = u1;
 		this.u2 = u2;
@@ -37,6 +41,16 @@ class Resource
 	public int hashCode()
 	{
 		return identity.hashCode();
+	}
+
+	public int getX()
+	{
+		return x;
+	}
+
+	public int getY()
+	{
+		return y;
 	}
 }
 
@@ -282,11 +296,13 @@ class User
 	private String identity;
 	private LinkedList transitions = new LinkedList();
 	private Resource initial;
+	private Project theProject;
 
-	public User(String identity, boolean controllable)
+	public User(String identity, boolean controllable, Project theProject)
 	{
 		this.identity = identity;
 		this.controllable = controllable;
+		this.theProject = theProject;
 	}
 
 	public void addTransition(Resource fromResource, Resource[] toResources)
@@ -315,16 +331,16 @@ class User
 		{
 			ArrayList currTransition = (ArrayList)transitionIt.next();
 			Resource resource = (Resource)currTransition.get(0);
-			State resourceState = new State();
+			State resourceState = new State(resource.getIdentity());
 			//resourceState.setAccepting(true);
 			//resourceState.setId(resource.getIdentity());
-			resourceState.setName(resource.getIdentity());
-			if (identity.equals("truck") && resource.getIdentity().equals("r27"))
+			//resourceState.setName(resource.getIdentity());
+			if (identity.equals("truck") && resource.getIdentity().equals("16"))
 			{
 				resourceState.setInitial(true);
 				resourceState.setAccepting(true);
 			}
-			if (identity.equals("agv") && resource.getIdentity().equals("r41"))
+			if (identity.equals("agv") && resource.getIdentity().equals("41"))
 			{
 				resourceState.setInitial(true);
 				resourceState.setAccepting(true);
@@ -332,6 +348,9 @@ class User
 			resourceMap.put(resource, resourceState);
 			theAutomaton.addState(resourceState);
 		}
+
+		Actions theActions = theProject.getActions();
+		Controls theControls = theProject.getControls();
 
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		// For each resource add an arc
@@ -341,13 +360,26 @@ class User
 			Resource sourceResource = (Resource)currTransition.get(0);
 			State sourceState = (State)resourceMap.get(sourceResource);
 			// System.err.println(identity + sourceResource.getIdentity());
-			LabeledEvent currEvent = new LabeledEvent(identity + sourceResource.getIdentity());
+			String label = identity + sourceResource.getIdentity();
+			LabeledEvent currEvent = new LabeledEvent(label);
 			//currEvent.setId(identity + sourceResource.getIdentity());
 			if (!controllable)
 			{
 				currEvent.setControllable(false);
 			}
 			theAlphabet.addEvent(currEvent);
+
+			// Add actions
+			Action theAction = new Action(label);
+			theAction.addCommand(identity + ".goX." + sourceResource.getX());
+			theAction.addCommand(identity + ".goY." + sourceResource.getY());
+			theActions.addAction(theAction);
+
+			// Add controls
+			Control theControl = new Control(label);
+			theControl.addCondition(identity + "X.end");
+			theControl.addCondition(identity + "Y.end");
+			theControls.addControl(theControl);
 		}
 
 		// For each transition add an arc
@@ -367,7 +399,7 @@ class User
 					System.err.println("currEvent is null");
 					System.exit(0);
 				}
-				System.err.println("sourceState: " + sourceState + " destState: " + destState);
+				//System.err.println("sourceState: " + sourceState + " destState: " + destState);
 				if (theAutomaton.getState(sourceState) == null)
 				{
 					System.err.println("source state is null");
@@ -384,7 +416,7 @@ class User
 		}
 
 		//theAutomaton.setAlphabet(theAlphabet);
-
+		theAutomaton.setType(AutomatonType.Plant);
 		return theAutomaton;
 	}
 }
@@ -397,35 +429,37 @@ public class ExampleGenerator
 		throws Exception
 	{
 
-		User u1 = new User("agv", true);
-		User u2 = new User("truck", false);
+		Project theAutomata = new Project();
 
-		Resource r11 = new Resource("r11", true, u1, u2);
-		Resource r12 = new Resource("r12", true, u1, u2);
-		Resource r13 = new Resource("r13", true, u1, u2);
-		Resource r14 = new Resource("r14", true, u1, u2);
-		Resource r15 = new Resource("r15", true, u1, u2);
-		Resource r16 = new Resource("r16", true, u1, u2);
-		Resource r17 = new Resource("r17", true, u1, u2);
-		Resource r18 = new Resource("r18", true, u1, u2);
-		Resource r19 = new Resource("r19", true, u1, u2);
+		User u1 = new User("agv", true, theAutomata);
+		User u2 = new User("truck", false, theAutomata);
 
-		Resource r21 = new Resource("r21", true, u1, u2);
-		Resource r22 = new Resource("r22", true, u1, u2);
-		Resource r23 = new Resource("r23", true, u1, u2);
-		Resource r24 = new Resource("r24", true, u1, u2);
-		Resource r25 = new Resource("r25", true, u1, u2);
-		Resource r26 = new Resource("r26", true, u1, u2);
-		Resource r27 = new Resource("r27", true, u1, u2);
-		Resource r28 = new Resource("r28", true, u1, u2);
-		Resource r29 = new Resource("r29", true, u1, u2);
+		Resource r11 = new Resource(1, 0, true, u1, u2);
+		Resource r12 = new Resource(2, 0, true, u1, u2);
+		Resource r13 = new Resource(3, 0, true, u1, u2);
+		Resource r14 = new Resource(1, 1, true, u1, u2);
+		Resource r15 = new Resource(2, 1, true, u1, u2);
+		Resource r16 = new Resource(3, 1, true, u1, u2);
+		Resource r17 = new Resource(1, 2, true, u1, u2);
+		Resource r18 = new Resource(2, 2, true, u1, u2);
+		Resource r19 = new Resource(3, 2, true, u1, u2);
 
-		Resource r31 = new Resource("r31", true, u1, u2);
-		Resource r32 = new Resource("r32", true, u1, u2);
-		Resource r33 = new Resource("r33", true, u1, u2);
+		Resource r21 = new Resource(1, 4, true, u1, u2);
+		Resource r22 = new Resource(2, 4, true, u1, u2);
+		Resource r23 = new Resource(3, 4, true, u1, u2);
+		Resource r24 = new Resource(1, 5, true, u1, u2);
+		Resource r25 = new Resource(2, 5, true, u1, u2);
+		Resource r26 = new Resource(3, 5, true, u1, u2);
+		Resource r27 = new Resource(1, 6, true, u1, u2);
+		Resource r28 = new Resource(2, 6, true, u1, u2);
+		Resource r29 = new Resource(3, 6, true, u1, u2);
 
-		Resource r41 = new Resource("r41", true, u1, u2);
-		Resource r42 = new Resource("r42", true, u1, u2);
+		Resource r31 = new Resource(0, 0, true, u1, u2);
+		Resource r32 = new Resource(0, 3, true, u1, u2);
+		Resource r33 = new Resource(0, 6, true, u1, u2);
+
+		Resource r41 = new Resource(4, 1, true, u1, u2);
+		Resource r42 = new Resource(4, 5, true, u1, u2);
 
 		// agv
 		u1.addTransition(r11, new Resource[]{r12, r14, r31});
@@ -480,7 +514,6 @@ public class ExampleGenerator
 		u2.addTransition(r32, new Resource[]{r31, r33});
 		u2.addTransition(r33, new Resource[]{r32, r27});
 
-		Project theAutomata = new Project();
 		theAutomata.addAutomaton(u1.build());
 		theAutomata.addAutomaton(u2.build());
 
@@ -496,8 +529,8 @@ public class ExampleGenerator
 		theAutomata.addAutomaton(r9.build());
 */
 
-//		ProjectToSP exporter = new ProjectToSP(theAutomata);
-		AutomataToXml exporter = new AutomataToXml(theAutomata);
+		ProjectToSP exporter = new ProjectToSP(theAutomata);
+//		AutomataToXml exporter = new AutomataToXml(theAutomata);
 		exporter.serialize(new PrintWriter(System.out));
 
 	}

@@ -152,7 +152,7 @@ public class SimulatorExecuter
 
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		// / setTitle(theAutomaton.getName());
-		setTitle("Simulator");
+		setTitle("Supremica Simulator");
 		setSize(400, 500);
 
 		// Center the window

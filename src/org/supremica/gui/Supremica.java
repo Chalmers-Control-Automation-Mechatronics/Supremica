@@ -288,7 +288,7 @@ public class Supremica
 		{
 			String projectName = currProject.getName();
 
-			setTitle("Supremica - " + projectName);
+			setTitle("Supremica " + projectName);
 		}
 		else
 		{

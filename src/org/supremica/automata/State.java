@@ -88,7 +88,7 @@ public class State
 	private List outgoingArcSets = new LinkedList();
 	private Listeners listeners = null;
 
-	public State() {}
+	protected State() {}
 
 	public State(String id)
 	{
