@@ -50,31 +50,48 @@
 package org.supremica.apps;
 
 import java.io.*;
+import java.awt.*;
 
 import org.apache.log4j.*;
 import org.supremica.gui.*;
-import java.awt.*;
 
 // import org.jgrafchart.*;
 
 public class Supremica
 {
 	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
-
+	private static org.supremica.gui.Supremica workbench;
+	private static SplashWindow splash;
+	
 	private Supremica()
 	{
 	}
 
+	private static void doSplash()
+	{
+		splash = new SplashWindow();
+		splash.setVisible(true);
+	}
+	
 	public static void startSupremica()
 	{
-		SplashWindow splash = new SplashWindow();
-		splash.setVisible(true);
-
-		org.supremica.gui.Supremica workbench = new org.supremica.gui.Supremica();
+		doSplash();
+		workbench = new org.supremica.gui.Supremica();
+		init();
+	}
+	public static void startSupremica(String arg)
+	{
 //		if (args.length >= 1)
 //		{
 //			workbench.openAutomataXMLFile(new File(args[0]));
 //		}
+		doSplash();
+		workbench = new org.supremica.gui.Supremica(arg);
+		init();
+	}
+	
+	public static void init()
+	{
 		// workbench.setupMainFrame();
 
 		boolean packFrame = false;
@@ -131,7 +148,7 @@ public class Supremica
 //			}
 			else
 			{
-				startSupremica();
+				startSupremica(args[0]);
 			}
 		}
 		else

@@ -56,11 +56,12 @@ import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 
 import org.supremica.gui.*;
-import org.apache.log4j.*;
+// import org.apache.log4j.*;
+import org.supremica.gui.Gui;
 
 public class AutomataSynthesizer
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataSynthesizer.class.getName());
+	// private static Category thisCategory = LogDisplay.createCategory(AutomataSynthesizer.class.getName());
 
     private Automata theAutomata;
 	private int nbrOfExecuters;
@@ -74,11 +75,13 @@ public class AutomataSynthesizer
 
 	private AutomatonContainer theAutomatonContainer;
 
+	private Gui workbench;
+	
 	// For the optimization...
 	private Automata newAutomata = new Automata();
 	private boolean maximallyPermissive;
 
-    public AutomataSynthesizer(Supremica workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
+    public AutomataSynthesizer(/* Supremica workbench */Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws IllegalArgumentException
     {
 		Automaton currAutomaton;
@@ -90,6 +93,7 @@ public class AutomataSynthesizer
 	    initialState = new int[this.theAutomata.size() + 1]; // + 1 status field
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
 
+		this.workbench = workbench;
 		theAutomatonContainer = workbench.getAutomatonContainer();
 		maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
@@ -111,7 +115,8 @@ public class AutomataSynthesizer
 		}
 		catch (Exception e)
 	    {
-         	System.err.println("Error while initializing synchronization helper. " + e);
+         	//-- MF -- System.err.println("Error while initializing synchronization helper. " + e);
+         	workbench.error("Error while initializing synchronization helper. " + e);
 			// e.printStackTrace();
           	System.exit(0);
 	    }
@@ -202,7 +207,8 @@ public class AutomataSynthesizer
 						String automataNames = ((Automaton) automatonArray[0]).getName();
 						for (int i = 1; i < automatonArray.length; i++)
 							automataNames = automataNames + " || " + ((Automaton) automatonArray[i]).getName();
-						thisCategory.info(automataNames);
+						//-- MF -- thisCategory.info(automataNames);
+						workbench.info(automataNames);
 
 						AutomataSynchronizerExecuter currExec =
 							(AutomataSynchronizerExecuter)synchronizationExecuters.get(0);
@@ -219,11 +225,20 @@ public class AutomataSynthesizer
 							if (synthesizerOptions.getSynthesisType() == 0)
 								synthesizer.synthesizeControllable();
 							else if (synthesizerOptions.getSynthesisType() == 1)
-								thisCategory.error("Option not implemented...");
+							{
+								//-- MF -- thisCategory.error("Option not implemented...");
+								workbench.error("Option not implemented...");
+							}
 							else if (synthesizerOptions.getSynthesisType() == 2)
-								thisCategory.error("Option not implemented...");
+							{
+								//-- MF -- thisCategory.error("Option not implemented...");
+								workbench.error("Option not implemented...");
+							}
 							else
-								thisCategory.error("Unavailable option chosen.");
+							{
+								//-- MF -- thisCategory.error("Unavailable option chosen.");
+								workbench.error("Unavailable option chosen.");
+							}
 							if (synthesizerOptions.getPurge())
 							{
 								AutomatonPurge automatonPurge = new AutomatonPurge(theAutomaton);
@@ -233,7 +248,8 @@ public class AutomataSynthesizer
 						}
 						catch (Exception ex)
 						{
-							thisCategory.error("Exception while adding the new automaton.");
+							//-- MF -- thisCategory.error("Exception while adding the new automaton.");
+							workbench.error("Exception while adding the new automaton.");
 						}
 					}
 				}
@@ -270,8 +286,9 @@ public class AutomataSynthesizer
 		}
   		catch (Exception e)
     	{
-			System.err.println("Error while generating union alphabet: " + e);
- 			thisCategory.error("Error while generating union alphabet: " + e);
+			// System.err.println("Error while generating union alphabet: " + e);
+ 			//-- MF -- thisCategory.error("Error while generating union alphabet: " + e);
+ 			workbench.error("Error while generating union alphabet: " + e);
         	throw e;
      	}
 
@@ -305,7 +322,8 @@ public class AutomataSynthesizer
 		}
 		catch (Exception ex)
 		{
-			thisCategory.error("Exception in SynchronizationOptions." + ex);
+			//-- MF -- thisCategory.error("Exception in SynchronizationOptions." + ex);
+			workbench.error("Exception in SynchronizationOptions." + ex);
 			return;
 		}
 
@@ -335,7 +353,8 @@ public class AutomataSynthesizer
 			}
 			catch (Exception ex)
 			{
-				thisCategory.error("Exception in AutomataSynthesizer.optimize. " + ex);
+				//-- MF -- thisCategory.error("Exception in AutomataSynthesizer.optimize. " + ex);
+				workbench.error("Exception in AutomataSynthesizer.optimize. " + ex);
 				return;
 			}
 		}

@@ -50,7 +50,7 @@
 package org.supremica.automata;
 
 import java.util.*;
-import org.supremica.gui.editor.*;
+// import org.supremica.gui.editor.*; //** MF ** The model should know _zilch_ about the view/UI
 import java.awt.Point;
 
 public class State
@@ -78,7 +78,7 @@ public class State
 	private int y = UNDEF_POS;
 	private int radius = 9;
 	private boolean selected = false;
-	private StateNode stateNode = null;
+//	private StateNode stateNode = null;
 
 	private LinkedList incomingArcs = new LinkedList();
 	private LinkedList outgoingArcs = new LinkedList();
@@ -93,6 +93,12 @@ public class State
 	{
 		this();
 		setId(id);
+		//** MF ** if I instantiate with only the id, I (probably) want the name to be the same (not?)
+		//** MF ** adding this cannot break any code, cannit?
+		setName(id);
+		//** MF ** Note also teh discrepancy with Event, where it is the extrernal name that is set
+		//** MF ** at instantiation, and not the id.
+
 	}
 
 	/**
@@ -370,7 +376,7 @@ public class State
 	{
 		return cost < MAX_COST;
 	}
-
+/** MF ** I assume these have something with the view/UI to do
 	public void setStateNode(StateNode stateNode)
 	{
 		this.stateNode = stateNode;
@@ -380,7 +386,7 @@ public class State
 	{
 		return stateNode;
 	}
-
+**/
 	/**
 	 * Follow the event e and return the next state.
 	 * If e is not active then return null.

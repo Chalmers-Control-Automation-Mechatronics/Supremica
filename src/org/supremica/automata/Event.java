@@ -69,6 +69,9 @@ public class Event
 	public Event(String label)
 	{
 		this.label = label;
+		//** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
+		//** MF ** adding this cannot break any code, cannit?
+		this.id = label;
 	}
 
 	public Event(Event e)

@@ -61,7 +61,6 @@ import com.nwoods.jgo.*;
 import com.nwoods.jgo.layout.JGoNetwork;
 import java.beans.*;
 
-
 import org.supremica.gui.*;
 import org.supremica.automata.AutomatonContainer;
 import org.supremica.automata.Automaton;
@@ -71,7 +70,8 @@ public class AutomataEditor
 	implements TableModelListener
 {
 	private JPanel contentPane;
-	private Supremica workbench = null;
+// 	private Supremica workbench = null;
+	private Gui workbench = null;
 	private AutomatonContainer theAutomatonContainer = null;
 
 	private JToolBar toolBar = new JToolBar();
@@ -84,7 +84,7 @@ public class AutomataEditor
 
 	private EditorActions theActions;
 
-  public AutomataEditor(Supremica workbench)
+  public AutomataEditor(/* Supremica */ Gui workbench)
   {
 	this.workbench = workbench;
 	this.theAutomatonContainer = workbench.getAutomatonContainer();
@@ -940,17 +940,20 @@ public class AutomataEditor
 
 	public void fileOpen()
 	{
-		workbench.fileOpen(getCurrentFrame());
+		// workbench.fileOpen(getCurrentFrame());
+		ActionMan.fileOpen(workbench);
 	}
 
 	public void fileSave()
 	{
-		workbench.fileSave();
+		// workbench.fileSave();
+		ActionMan.fileSave(workbench);
 	}
 
 	public void fileSaveAs()
 	{
-		workbench.fileSaveAs();
+		// workbench.fileSaveAs();
+		ActionMan.fileSaveAs(workbench);
 	}
 
 	public void filePrint()

@@ -117,7 +117,11 @@ class FindStatesTableModel extends AbstractTableModel
 //-----------------------------------
 class FindStatesTable extends JTable
 {
+	// local utility functions
+	private TableSorter getTableSorterModel() { return (TableSorter)getModel(); }
+	private FindStatesTableModel getStatesTableModel() { return (FindStatesTableModel)getTableSorterModel().getModel(); }
 	private void doRepaint() { repaint(); }
+	private FindStatesTable getThisTable() { return this; }
 	
 	//** Inner class, needs access to the model
 	class RegexpPopupMenu extends JPopupMenu
@@ -149,9 +153,6 @@ class FindStatesTable extends JTable
 	
 	}
 	
-	// utility functions
-	private TableSorter getTableSorterModel() { return (TableSorter)getModel(); }
-	private FindStatesTableModel getStatesTableModel() { return (FindStatesTableModel)getTableSorterModel().getModel(); }
 	
 	// Wrap the FindStatesTableModel inside a sort filter
 	private static TableSorter makeTableModel(Automata a)
@@ -187,7 +188,7 @@ class FindStatesTable extends JTable
 			private void maybeShowPopup(MouseEvent e)
 			{
 				int col = columnAtPoint(new Point(e.getX(), e.getY()));
-				if(e.isPopupTrigger() && getStatesTableModel().isRegexpColumn(col))
+				if(e.isPopupTrigger())
 				{
 					int row = rowAtPoint(new Point(e.getX(), e.getY()));
 					if (row < 0)
@@ -199,8 +200,17 @@ class FindStatesTable extends JTable
 						clearSelection();
 						setRowSelectionInterval(row, row);
 					}
-					RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
-					regexp_popup.show(e.getComponent(), e.getX(), e.getY());
+					//
+					if(getStatesTableModel().isRegexpColumn(col))
+					{
+						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
+						regexp_popup.show(e.getComponent(), e.getX(), e.getY());
+					}
+					else // in table but not in the regexp column - show main menu
+					{
+						// Supremica.menuHandler.getDisabledPopupMenu(getThisTable()).show(e.getComponent(), e.getX(), e.getY());
+						// getMainPopupMenu().show(getThisTable().getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
+					}
 				}
 			}
 		});

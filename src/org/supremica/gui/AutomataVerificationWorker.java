@@ -52,7 +52,8 @@ package org.supremica.gui;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
-import org.apache.log4j.*;
+// import org.apache.log4j.*;
+import org.supremica.gui.Gui;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -67,9 +68,10 @@ public class AutomataVerificationWorker
 	extends Thread
 	implements Stoppable
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataVerificationWorker.class.getName());
+//	private static Category thisCategory = LogDisplay.createCategory(AutomataVerificationWorker.class.getName());
 
-	private Supremica workbench = null;
+//-- MF --	private Supremica workbench = null;
+	private Gui workbench = null;
 	private Automata theAutomata = null;
 	private AutomatonContainer theAutomatonContainer = null;
 	// private String newAutomatonName = null;
@@ -81,7 +83,7 @@ public class AutomataVerificationWorker
 
 	private EventQueue eventQueue = new EventQueue();
 
-	public AutomataVerificationWorker(Supremica workbench,
+	public AutomataVerificationWorker(/* Supremica workbench,*/ Gui workbench,
 									  Automata theAutomata,
 									  SynchronizationOptions synchronizationOptions,
 									  VerificationOptions verificationOptions)
@@ -119,7 +121,7 @@ public class AutomataVerificationWorker
 
 			if (theAutomata.size() < 2)
 			{
-				JOptionPane.showMessageDialog(workbench, "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(workbench.getFrame(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 				requestStop();
 				return;
 			}
@@ -139,8 +141,9 @@ public class AutomataVerificationWorker
 			catch (Exception e)
 			{
 				requestStop();
-				JOptionPane.showMessageDialog(workbench, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				thisCategory.error(e.getMessage());
+				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				// thisCategory.error(e.getMessage());
+				workbench.error(e.getMessage());
 				return;
 			}
 
@@ -158,20 +161,23 @@ public class AutomataVerificationWorker
 				else if (verificationOptions.getAlgorithmType() == 2)
 				{   // IDD...
 					requestStop();
-					thisCategory.error("Option not implemented...");
+					// thisCategory.error("Option not implemented...");
+					workbench.error("Option not implemented...");
 					return;
 				}
 				else
 				{   // Error...
 					requestStop();
-					thisCategory.error("Unavailable option chosen.");
+					// thisCategory.error("Unavailable option chosen.");
+					workbench.error("Unavailable option chosen.");
 					return;
 				}
 			}
 			catch (Exception e)
 			{
 				requestStop();
-				thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				// thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 				return;
 			}
 			endDate = new Date();
@@ -181,12 +187,12 @@ public class AutomataVerificationWorker
 			{
 				if (isControllable)
 				{
-					JOptionPane.showMessageDialog(workbench, "The automata is controllable!",
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The automata is controllable!",
 												  "Good news", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(workbench, "The automata is NOT controllable!",
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The automata is NOT controllable!",
 												  "Bad news", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
@@ -194,7 +200,8 @@ public class AutomataVerificationWorker
 		else if (verificationOptions.getVerificationType() == 1)
 		{	// Non-blocking verification...
 			requestStop();
-			thisCategory.error("Option not implemented...");
+			// thisCategory.error("Option not implemented...");
+			workbench.error("Option not implemented...");
 			return;
 		}
 		else if (verificationOptions.getVerificationType() == 2)
@@ -218,14 +225,15 @@ public class AutomataVerificationWorker
 				catch (Exception ex)
 				{
 					requestStop();
-					thisCategory.error("Exception in AutomatonContainer.");
+					// thisCategory.error("Exception in AutomatonContainer.");
+					workbench.error("Exception in AutomatonContainer.");
 					return;
 				}
 				currAutomatonName = currAutomaton.getName();
 				if (currAutomaton.getInitialState() == null)
 				{
 					requestStop();
-					JOptionPane.showMessageDialog(workbench, "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (selectedAutomata.contains(currAutomaton))
@@ -236,7 +244,8 @@ public class AutomataVerificationWorker
 
 			if (automataA.size() < 1 || automataB.size() < 1)
 			{
-				thisCategory.error("At least one automaton must be unselected.");
+				// thisCategory.error("At least one automaton must be unselected.");
+				workbench.error("At least one automaton must be unselected.");
 				requestStop();
 				return;
 			}
@@ -271,7 +280,8 @@ public class AutomataVerificationWorker
 				catch (Exception e)
 				{
 					requestStop();
-					thisCategory.error("Error when calculating union alphabet. " + e);
+					// thisCategory.error("Error when calculating union alphabet. " + e);
+					workbench.error("Error when calculating union alphabet. " + e);
 					return;
 				}
 			}
@@ -314,8 +324,9 @@ public class AutomataVerificationWorker
 			catch (Exception e)
 			{
 				requestStop();
-				JOptionPane.showMessageDialog(workbench, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				thisCategory.error(e.getMessage());
+				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				// thisCategory.error(e.getMessage());
+				workbench.error(e.getMessage());
 				return;
 			}
 
@@ -333,20 +344,23 @@ public class AutomataVerificationWorker
 				else if (verificationOptions.getAlgorithmType() == 2)
 				{   // IDD...
 					requestStop();
-					thisCategory.error("Option not implemented...");
+					// thisCategory.error("Option not implemented...");
+					workbench.error("Option not implemented...");
 					return;
 				}
 				else
 				{   // Error...
 					requestStop();
-					thisCategory.error("Unavailable option chosen.");
+					// thisCategory.error("Unavailable option chosen.");
+					workbench.error("Unavailable option chosen.");
 					return;
 				}
 			}
 			catch (Exception e)
 			{
 				requestStop();
-				thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				// thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 				return;
 			}
 			endDate = new Date();
@@ -356,18 +370,19 @@ public class AutomataVerificationWorker
 			{
 				if (isIncluded)
 				{
-					JOptionPane.showMessageDialog(workbench, "The language of the unselected automata is included in the language of the selected automata.", "Good news", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is included in the language of the selected automata.", "Good news", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(workbench, "The language of the unselected automata is NOT included in the language of the selected automata.", "Bad news", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is NOT included in the language of the selected automata.", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		}
 		else
 		{   // Error...
 			requestStop();
-			thisCategory.error("Unavailable option chosen.");
+			// thisCategory.error("Unavailable option chosen.");
+			workbench.error("Unavailable option chosen.");
 			return;
 		}
 
@@ -375,13 +390,13 @@ public class AutomataVerificationWorker
 		automataVerifier.getHelper().displayInfo();
 		if (!stopRequested)
 		{
-			thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 +
-							  " seconds.");
+			// thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			workbench.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
 		else
 		{
-			thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 +
-							  " seconds.");
+			// thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			workbench.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
 		requestStop();
 	}

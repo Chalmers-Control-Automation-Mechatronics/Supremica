@@ -68,10 +68,13 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
+import org.supremica.gui.Gui;
+import org.supremica.gui.ActionMan;
+
 
 public class Supremica
 	extends JFrame
-	implements TableModelListener
+	implements TableModelListener, Gui
 {
 	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 
@@ -79,7 +82,8 @@ public class Supremica
 	private JMenuBar menuBar = new JMenuBar();
 	private JToolBar toolBar = new JToolBar();
 	// private JPopupMenu regionPopup;
-
+	private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
+	
 	private AutomatonContainer theAutomatonContainer;
 	private TypeCellEditor typeEditor;
 	private PreferencesDialog thePreferencesDialog = null;
@@ -91,7 +95,7 @@ public class Supremica
 	private TableModel fullTableModel;
 
 	private JScrollPane theAutomatonTableScrollPane;
-	private MenuHandler menuHandler;
+	private MenuHandler menuHandler; // MF -- made publically available
 
 	private static Category thisCategory = LogDisplay.createCategory(Supremica.class.getName());
 
@@ -112,6 +116,9 @@ public class Supremica
 	public static ImageIcon cornerIcon = (new ImageIcon(Supremica.class.getResource("/icons/cornerIcon.gif")));
 	public static Image cornerImage = cornerIcon.getImage();
 
+	// local helper utility
+	Gui getGui() { return this; }
+	
 	// Construct the frame
 	public Supremica()
 	{
@@ -143,7 +150,7 @@ public class Supremica
 		theAutomatonTable = new JTable(theTableSorter);
 		theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
 
-		menuHandler = new MenuHandler(theAutomatonTable);
+		menuHandler = new MenuHandler(/* theAutomatonTable */);
 
 		theAutomatonTableScrollPane = new JScrollPane(theAutomatonTable);
 		JViewport vp = theAutomatonTableScrollPane.getViewport();
@@ -165,8 +172,53 @@ public class Supremica
 		{
 			e.printStackTrace();
 		}
+
+// This code used to be in the popup menu -------------
+		theAutomatonTable.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				// This is needed for the Linux platform
+				// where isPopupTrigger is true only on mousePressed.
+				maybeShowPopup(e);
+			}
+
+			public void mouseReleased(MouseEvent e)
+			{
+				// This is for triggering the popup on Windows platforms
+				maybeShowPopup(e);
+			}
+
+			private void maybeShowPopup(MouseEvent e)
+			{
+				if (e.isPopupTrigger())
+				{
+					int currRow = theAutomatonTable.rowAtPoint(new Point(e.getX(), e.getY()));
+					if (currRow < 0)
+					{
+						return;
+					}
+					if (!theAutomatonTable.isRowSelected(currRow))
+					{
+						theAutomatonTable.clearSelection();
+						theAutomatonTable.setRowSelectionInterval(currRow, currRow);
+					}
+					// JPopupMenu regionPopup = menuHandler.getDisabledPopupMenu(theAutomatonTable);
+					// regionPopup.show(e.getComponent(), e.getX(), e.getY());
+					mainPopupMenu.show(theAutomatonTable.getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
+//--------------------------------------//
 	}
 
+	// MF -- added to allow a single commandline arg
+	public Supremica(String arg)
+	{
+		this(); // this calls the default constructor(?)
+		openAutomataXMLFile(new File(arg));
+	}
+	
 	private JFrame getCurrentFrame()
 	{
 		return this;
@@ -198,7 +250,7 @@ public class Supremica
 				{
 					if (e.getKeyCode() == KeyEvent.VK_DELETE)
 					{
-						automataDelete_actionPerformed();
+						ActionMan.automataDelete_actionPerformed(getGui());
 					}
 				}
 
@@ -220,7 +272,7 @@ public class Supremica
 
 		initMenubar();
 		initToolbar();
-		initPopups();
+//		initPopups();
 	}
 
 	public void initialize()
@@ -249,7 +301,8 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileOpen(getCurrentFrame());
+					// fileOpen(this, getCurrentFrame());
+					ActionMan.fileOpen(getGui());
 				}
 			});
 
@@ -262,7 +315,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileSave();
+					ActionMan.fileSave(getGui());
 				}
 			});
 
@@ -274,7 +327,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileSaveAs();
+					ActionMan.fileSaveAs(getGui());
 				}
 			});
 
@@ -293,7 +346,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileImportDesco();
+					ActionMan.fileImportDesco(getGui());
 				}
 			});
 
@@ -306,7 +359,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					//fileImportTCT();
+					//ActionMan.fileImportTCT(getGui());
 				}
 			});
 
@@ -319,7 +372,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					//fileImportUMDES();
+					//ActionMan.fileImportUMDES(this);
 				}
 			});
 
@@ -331,7 +384,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileImportValid();
+					ActionMan.fileImportValid(getGui());
 				}
 			});
 
@@ -348,7 +401,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileExportDesco();
+					ActionMan.fileExportDesco(getGui());
 				}
 			});
 
@@ -361,7 +414,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					//fileExportTCT();
+					//ActionMan.fileExportTCT(getGui());
 				}
 			});
 
@@ -374,7 +427,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					//fileExportUMDES();
+					//ActionMan.fileExportUMDES(getGui());
 				}
 			});
 
@@ -387,7 +440,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileExportValid();
+					ActionMan.fileExportValid(getGui());
 				}
 			});
 
@@ -402,7 +455,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileExit();
+					ActionMan.fileExit(getGui());
 				}
 			});
 
@@ -492,7 +545,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					configurePreferences_actionPerformed(e);
+					ActionMan.configurePreferences_actionPerformed(getGui());
 				}
 			});
 
@@ -539,7 +592,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileOpen(getCurrentFrame());
+					ActionMan.fileOpen(getGui());
 				}
 			});
 
@@ -552,7 +605,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileSave();
+					ActionMan.fileSave(getGui());
 				}
 			});
 
@@ -565,7 +618,7 @@ public class Supremica
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					fileSaveAs();
+					ActionMan.fileSaveAs(getGui());
 				}
 			});
 
@@ -606,7 +659,46 @@ public class Supremica
 		toolBar.addSeparator();
 		toolBar.add(helpButton, "EAST");
 	}
-
+	//** MF ** Implementation of Gui stuff
+	public void error(Object msg)
+	{
+		thisCategory.error(msg);
+	}
+	public void error(Object msg, Throwable t)
+	{
+		thisCategory.error(msg, t);
+	}
+	public void info(String msg)
+	{
+		thisCategory.info(msg);
+	}
+	public void debug(String msg)
+	{
+		thisCategory.debug(msg);
+	}
+	// public void repaint(); // implemented through JFrame
+	// public String getNewAutomatonName(String str, String def); // see below
+	public void clearSelection()
+	{
+		theAutomatonTable.clearSelection();
+	}
+	public void selectAll()
+	{
+		theAutomatonTable.selectAll();
+	}
+	
+	public Component getComponent()
+	{
+		return this;
+	}
+	public JFrame getFrame()
+	{
+		return this;
+	}
+	// public AutomatonContainer getAutomatonContainer(); // see below
+	// public Collection getSelectedAutomataAsCollection(); // see below
+	// public Automata getSelectedAutomata(); // see below
+/************
 	public void initPopups()
 	{
 		JMenuItem selectAllItem = new JMenuItem("Select all");
@@ -645,7 +737,7 @@ public class Supremica
 
 		JMenuItem verifyItem = new JMenuItem("Verify");
 		menuHandler.add(verifyItem, 1);
-
+*************/
 		/*
 		JMenuItem controllabilityCheckItem = new JMenuItem("Controllability check");
 		menuHandler.add(controllabilityCheckItem, 2);
@@ -665,7 +757,7 @@ public class Supremica
 		JMenuItem languageInclusionCheckItem = new JMenuItem("Language inclusion check");
 		menuHandler.add(languageInclusionCheckItem, 1);
 		*/
-
+/*********
 		JMenuItem synthesizeItem = new JMenuItem("Synthesize");
 		menuHandler.add(synthesizeItem, 1);
 
@@ -850,7 +942,7 @@ public class Supremica
 					repaint();
 				}
 			});
-
+***************/
 		/*
 		controllabilityCheckItem.addActionListener(new ActionListener()
 			{
@@ -894,7 +986,7 @@ public class Supremica
 				}
 			});
 		*/
-
+/***************
 		synthesizeItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -1024,14 +1116,14 @@ public class Supremica
 							theAutomatonTable.clearSelection();
 							theAutomatonTable.setRowSelectionInterval(currRow, currRow);
 						}
-						JPopupMenu regionPopup = menuHandler.getDisabledPopupMenu();
+						JPopupMenu regionPopup = menuHandler.getDisabledPopupMenu(theAutomatonTable);
 						regionPopup.show(e.getComponent(),
 										 e.getX(), e.getY());
 					}
 				}
 			});
 	}
-
+**********/
 	/**
 	 * This is a deprecated method, use getSelectedAutomata instead.
 	 */
@@ -1080,7 +1172,7 @@ public class Supremica
 
 		return selectedAutomata;
 	}
-
+/*****************
 	// File.Open action performed
 	public void fileOpen(JFrame parent)
 	{
@@ -1105,7 +1197,7 @@ public class Supremica
 
 	public void fileImportDesco()
 	{
-		/*
+********//*
 		JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
 		if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 		{
@@ -1123,7 +1215,7 @@ public class Supremica
 			repaint();
 			theAutomatonTable.repaint();
        	}
-       	*/
+       	*//***************
     }
 
 	public void fileImportValid()
@@ -1161,13 +1253,13 @@ public class Supremica
     {
         System.exit(0);
     }
-
+******/
     // Tools.AutomataEditor
     public void toolsAutomataEditor()
     {
         theAutomatonContainer.getAutomataEditor();
     }
-
+/**********
     // selectAll action performed
     public void selectAll_actionPerformed(ActionEvent e)
     {
@@ -1278,6 +1370,7 @@ public class Supremica
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+***************/
 		/*
 		while (autIt.hasNext())
 		{
@@ -1299,7 +1392,7 @@ public class Supremica
 				}
 			}
 		}
-		*/
+		*//************************
 
 		if (selectedAutomata.size() == 1)
 		{   // One automata selected
@@ -1495,7 +1588,7 @@ public class Supremica
 
 		AutomataVerificationWorker worker = new AutomataVerificationWorker(this, currAutomata, syncOptions, verificationOptions);
 	}
-
+********************/
 /*
 	// Automaton.Synchronize action performed
 	public void automataSynchronize_actionPerformed(ActionEvent e)
@@ -1569,7 +1662,7 @@ public class Supremica
 	// Automaton.ControllabilityCheck action performed
 	/**
 	 * @deprecated use AutomataVerifier instead.
-	 */
+	 *//******************
 	public void automataControllabilityCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
@@ -1626,11 +1719,11 @@ public class Supremica
 			JOptionPane.showMessageDialog(this, "The automata is not controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 		}
 	 }
-
+***************/
 
 	/**
 	 * @deprecated use AutomataVerifier instead.
-	 */
+	 *//*******************
 	public void automataFastControllabilityCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
@@ -1686,7 +1779,7 @@ public class Supremica
 			JOptionPane.showMessageDialog(this, "The automata is NOT controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
-
+*****************/
 	/*
 	// Automaton.PairwiseCheck action performed
 	public void automataPairwiseCheck_actionPerformed(ActionEvent e)
@@ -1749,7 +1842,7 @@ public class Supremica
 	// Automaton.LanguageInclusionCheck action performed
 	/**
 	 * @deprecated use AutomataVerifier instead.
-	 */
+	 *//*******************
 	public void languageInclusionCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
@@ -2517,7 +2610,7 @@ public class Supremica
 			}
 		}
 	}
-
+*****************/
 	public void renameProject()
 	{
 		String newName = getNewProjectName();
@@ -2547,7 +2640,7 @@ public class Supremica
         super.processWindowEvent(e);
         if (e.getID() == WindowEvent.WINDOW_CLOSING)
         {
-            fileExit();
+            ActionMan.fileExit(this);
         }
     }
 
@@ -2797,68 +2890,17 @@ public class Supremica
 	{
 		return theAutomatonContainer;
 	}
+	public MainPopupMenu getMainPopupMenu()
+	{
+		return mainPopupMenu;
+	}
+/*****	
+	public MenuHandler getMenuHandler()
+	{
+		return menuHandler;
+	}
+*****/
 }
 
-class TypeCellEditor
-	implements CellEditorListener
-{
-	private JTable theTable;
-	private TableSorter theTableSorter;
-	private JComboBox automatonTypeCombo;
-	private AutomatonContainer theAutomatonContainer;
-	private static Category thisCategory = LogDisplay.createCategory(TypeCellEditor.class.getName());
-
-	public TypeCellEditor(JTable theTable, TableSorter theTableSorter, AutomatonContainer theAutomatonContainer)
-	{
-		this.theTable = theTable;
-		this.theAutomatonContainer = theAutomatonContainer;
-		this.theTableSorter = theTableSorter;
-
-		automatonTypeCombo = new JComboBox();
-		Iterator typeIt = AutomatonType.iterator();
-		while (typeIt.hasNext())
-		{
-			automatonTypeCombo.addItem(typeIt.next());
-		}
-		TableColumnModel columnModel = theTable.getColumnModel();
-		TableColumn typeColumn = columnModel.getColumn(Supremica.TABLE_TYPE_COLUMN);
-		DefaultCellEditor cellEditor = new DefaultCellEditor(automatonTypeCombo);
-		cellEditor.setClickCountToStart(2);
-		typeColumn.setCellEditor(cellEditor);
-		cellEditor.addCellEditorListener(this);
-	}
-
-	public void editingCanceled(ChangeEvent e)
-	{
-	}
-
-	public void editingStopped(ChangeEvent e)
-	{
-		if (automatonTypeCombo.getSelectedIndex() >= 0)
-		{
-			AutomatonType selectedValue = (AutomatonType)automatonTypeCombo.getSelectedItem();
-
-			if (selectedValue != null)
-			{
-				int selectedRow = theTable.getSelectedRow();
-				int orgRow = theTableSorter.getOriginalRowIndex(selectedRow);
-				if (selectedRow >= 0)
-				{
-					Automaton currAutomaton = null;
-					try
-					{
-						currAutomaton = theAutomatonContainer.getAutomatonAt(orgRow);
-					}
-					catch (Exception ex)
-					{
-						ex.printStackTrace();
-						System.exit(0);
-					}
-					currAutomaton.setType(selectedValue);
-				}
-			}
-		}
-	}
-}
 
 

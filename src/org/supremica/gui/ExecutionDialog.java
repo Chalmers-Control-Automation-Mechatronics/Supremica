@@ -89,7 +89,8 @@ public class ExecutionDialog
 
 	private int value = -1;
 
-	private Supremica workbench;
+//-- MF -- Changed to use a Gui instead
+//-- MF --	private Supremica workbench;
 
 	private ExecutionDialogMode currentMode = null;
 
@@ -101,11 +102,11 @@ public class ExecutionDialog
 	 * Creates dialog box for canceling the Stoppable classes in the supplied List.
 	 * @see Stoppable
 	 */
-	public ExecutionDialog(Supremica workbench, String title, List executers)
+	public ExecutionDialog(/* Supremica workbench */ Gui workbench, String title, List executers)
 	{
-		super(workbench);
+		super(workbench.getFrame());
 
-		this.workbench = workbench;
+//		this.workbench = workbench;
 		this.executers = executers;
 
 		setTitle(title);

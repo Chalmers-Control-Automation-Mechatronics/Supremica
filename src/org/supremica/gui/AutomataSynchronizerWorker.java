@@ -52,7 +52,7 @@ package org.supremica.gui;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
-import org.apache.log4j.*;
+// import org.apache.log4j.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -64,11 +64,13 @@ public class AutomataSynchronizerWorker
 	extends Thread
 	implements Stoppable
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerWorker.class.getName());
+//-- MF --	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerWorker.class.getName());
 
-	private Supremica workbench = null;
+//-- MF --	private Supremica workbench = null;
+	private Gui workbench = null;
+	
 	private Automata theAutomata = null;
-	private AutomatonContainer container = null;
+//-- MF --	private AutomatonContainer container = null;
 	private String newAutomatonName = null;
 	private static final int MODE_SYNC = 1;
 	private static final int MODE_UPDATE = 2;
@@ -77,15 +79,17 @@ public class AutomataSynchronizerWorker
 	private SynchronizationOptions syncOptions;
 
 	private boolean stopRequested = false;
+	
+//-- MF -- Changed stuff here to route output through the Gui
 
-	public AutomataSynchronizerWorker(Supremica workbench,
+	public AutomataSynchronizerWorker(Gui workbench, //-- MF -- Supremica workbench,
 		Automata theAutomata,
 		String newAutomatonName,
 		SynchronizationOptions syncOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
-		container = workbench.getAutomatonContainer();
+//-- MF --		container = workbench.getAutomatonContainer();
 		this.newAutomatonName = newAutomatonName;
 		this.syncOptions = syncOptions;
 		this.start();
@@ -105,8 +109,12 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception e)
 			{
-				JOptionPane.showMessageDialog(workbench, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				thisCategory.error(e.getMessage());
+				//-- MF -- should really put up a message box here? Why not let the Gui manage that?
+				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				//-- MF -- was only 'workbench' here^^^^^^^^^^^^^^
+				
+				// thisCategory.error(e.getMessage());
+				workbench.error(e.getMessage());
 				return;
 			}
 
@@ -124,7 +132,8 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception ex)
 			{
-				thisCategory.error("Exception while executing AutomataSynchronizer");
+				workbench.error("Exception while executing AutomataSynchronizer");
+				// thisCategory.error("Exception while executing AutomataSynchronizer");
 				return;
 			}
 
@@ -137,7 +146,8 @@ public class AutomataSynchronizerWorker
 				}
 				catch (Exception ex)
 				{
-					thisCategory.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
+					//-- MF -- thisCategory.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
+					workbench.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					return;
 				}
 			}
@@ -150,12 +160,14 @@ public class AutomataSynchronizerWorker
 				java.awt.EventQueue.invokeLater(this);
 
 				Date endDate = new Date();
-				thisCategory.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
+				// thisCategory.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
+				workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
 			}
 			else
 			{
 				Date endDate = new Date();
-				thisCategory.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
+				// thisCategory.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
+				workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
 			}
 
 			executionDialog.setMode(ExecutionDialogMode.hide);
@@ -167,12 +179,14 @@ public class AutomataSynchronizerWorker
 			{
 				if (theAutomaton != null)
 				{
-					container.add(theAutomaton);
+					//-- MF -- container.add(theAutomaton);
+					workbench.getAutomatonContainer().add(theAutomaton);
 				}
 			}
 			catch (Exception ex)
 			{
-				thisCategory.error("Could not add the new automaton after synchronization");
+				// thisCategory.error("Could not add the new automaton after synchronization");
+				workbench.error("Could not add the new automaton after synchronization");
 				return;
 			}
 		}

@@ -53,10 +53,12 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
+// MF -- Small changes here to make the main popup menu usefable from other tables
+// MF -- Instead of hardwiring the menuhandler to a certain table, it takes a table param where appropriate
+// MF -- I also made the menuhandler accessible from org.supremica.gui.Supremica
 public class MenuHandler
 {
-	private final JTable theTable;
+	// private final JTable theTable;
 
 	private final JPopupMenu oneAutomataMenu = new JPopupMenu();
 	private final JPopupMenu twoAutomataMenu = new JPopupMenu();
@@ -68,9 +70,9 @@ public class MenuHandler
 	private final LinkedList oneAutomataItems = new LinkedList();
 	private final LinkedList twoAutomataItems = new LinkedList();
 
-	public MenuHandler(JTable theTable)
+	public MenuHandler(/* JTable theTable */)
 	{
-		this.theTable = theTable;
+		// this.theTable = theTable;
 	}
 
 	public void add(JMenuItem theMenuItem, int minNbrOfAutomata)
@@ -118,9 +120,10 @@ public class MenuHandler
 		}
 	}
 
-	public JPopupMenu getDisabledPopupMenu()
+// Shoudl not knwo anything about table, doesnät even need to know about gui
+	public JPopupMenu getDisabledPopupMenu(int nbrOfAutomata/* JTable theTable */)
 	{
-		int nbrOfAutomata = theTable.getSelectedRowCount();
+		// int nbrOfAutomata = theTable.getSelectedRowCount();
 		setEnabled(twoAutomataItems, nbrOfAutomata >= 2);
 		setEnabled(oneAutomataItems, nbrOfAutomata >= 1);
 		setEnabled(zeroAutomataItems, nbrOfAutomata >= 0);
@@ -128,7 +131,7 @@ public class MenuHandler
 	}
 
 
-	public JPopupMenu getTrimmedPopupMenu()
+	public JPopupMenu getTrimmedPopupMenu(JTable theTable)
 	{
 		int nbrOfAutomata = theTable.getSelectedRowCount();
 		if (nbrOfAutomata >= 2)
