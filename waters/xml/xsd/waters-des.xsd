@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  targetNamespace="http://waters.sourceforge.net/xsd/des"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+  xmlns:B="http://waters.sourceforge.net/xsd/base"
+  xmlns:D="http://waters.sourceforge.net/xsd/des"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+<xs:import 
+  namespace="http://waters.sourceforge.net/xsd/base"
+  schemaLocation="waters-base.xsd"/>
+
+
+<!-- ==================================================================== -->
+<!-- Product DES                                                          -->
+<!-- ==================================================================== -->
+
+<xs:element name="ProductDES">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType">
+        <xs:sequence>
+          <xs:element ref="D:EventList" minOccurs="0"/>
+          <xs:element ref="D:AutomataList" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+<!-- ==================================================================== -->
+<!-- Events                                                               -->
+<!-- ==================================================================== -->
+
+<xs:element name="EventList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:Event" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Event">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType">
+	<xs:attribute name="Kind" type="B:EventKind" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EventRefList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:EventRef" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EventRef">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+<!-- ==================================================================== -->
+<!-- Automata                                                             -->
+<!-- ==================================================================== -->
+
+<xs:element name="AutomataList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:Automaton" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Automaton">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType">
+        <xs:sequence>
+          <xs:element ref="D:EventRefList" minOccurs="0"/>
+          <xs:element ref="D:StateList" minOccurs="0"/>
+          <xs:element ref="D:TransitionList" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="Kind" type="B:ComponentKind" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="StateList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:State" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="State">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType">
+        <xs:sequence>
+          <xs:element ref="D:EventRefList" minOccurs="0">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Propositions"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="Initial" type="xs:boolean" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="TransitionList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:Transition" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Transition">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:attribute name="Source" type="xs:string" use="required"/>
+        <xs:attribute name="Event" type="xs:string" use="required"/>
+        <xs:attribute name="Target" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+</xs:schema>

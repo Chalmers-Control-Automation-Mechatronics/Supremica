@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  targetNamespace="http://waters.sourceforge.net/xsd/module"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+  xmlns:B="http://waters.sourceforge.net/xsd/base"
+  xmlns:M="http://waters.sourceforge.net/xsd/module"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+<xs:import 
+  namespace="http://waters.sourceforge.net/xsd/base"
+  schemaLocation="waters-base.xsd"/>
+
+
+<!-- ==================================================================== -->
+<!-- Module                                                               -->
+<!-- ==================================================================== -->
+
+<xs:element name="Module">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType">
+        <xs:sequence>
+          <xs:element ref="M:ParameterList" minOccurs="0"/>
+          <xs:element ref="M:ConstantAliasList" minOccurs="0"/>
+          <xs:element ref="M:EventDeclList" minOccurs="0"/>
+          <xs:element ref="M:EventAliasList" minOccurs="0"/>
+          <xs:element ref="M:ComponentList" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+<!-- ==================================================================== -->
+<!-- Parameters                                                           -->
+<!-- ==================================================================== -->
+
+<xs:element name="ParameterList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:AbstractParameter" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="AbstractParameter" abstract="true"/>
+
+<xs:element name="IntParameter" substitutionGroup="M:AbstractParameter">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleParameterType">
+        <xs:group ref="M:ArithmeticExpression">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="Default"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="RangeParameter" substitutionGroup="M:AbstractParameter">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleParameterType">
+        <xs:group ref="M:RangeExpression">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="Default"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EventParameter" substitutionGroup="M:AbstractParameter">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:EventBaseType">
+        <xs:attribute name="Required" type="xs:boolean" default="true"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="SimpleParameterType">
+  <xs:complexContent>
+    <xs:extension base="B:NamedType">
+      <xs:attribute name="Required" type="xs:boolean" default="true"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+<!-- ==================================================================== -->
+<!-- Aliases                                                              -->
+<!-- ==================================================================== -->
+
+<xs:element name="ConstantAliasList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:ConstantAlias" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ConstantAlias">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifiedType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticOrRangeExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Expression"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EventAliasList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:EventAlias" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="AbstractEventAlias" abstract="true"/>
+
+<xs:element name="EventAlias" substitutionGroup="M:AbstractEventAlias">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifiedType">
+        <xs:sequence>
+          <xs:element ref="M:EventListExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Expression"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ForeachEventAlias" substitutionGroup="M:AbstractEventAlias">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:ForeachType">
+        <xs:sequence>
+          <xs:element ref="M:EventAliasList" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+<!-- ==================================================================== -->
+<!-- Event Declarations                                                   -->
+<!-- ==================================================================== -->
+
+<xs:element name="EventDeclList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:EventDecl" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EventDecl">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:EventBaseType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="EventBaseType">
+  <xs:complexContent>
+    <xs:extension base="B:NamedType">
+      <xs:sequence>
+        <xs:group ref="M:RangeExpression" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="Ranges"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+        <xs:element name="Comment" type="xs:string" minOccurs="0"/> 
+        <xs:element ref="M:ColorGeometry" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="Kind" type="B:EventKind" use="required"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+<!-- ==================================================================== -->
+<!-- Event Lists                                                          -->
+<!-- ==================================================================== -->
+
+<xs:complexType name="ExpressionType">
+  <xs:complexContent>
+    <xs:extension base="B:ElementType"/>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="EventListExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:ExpressionType">
+        <xs:sequence>
+          <xs:element ref="M:EventList" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EventList" type="M:EventListType"/>
+
+<xs:complexType name="EventListType">
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:sequence>
+        <xs:group ref="M:EventListMember" maxOccurs="unbounded">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="List"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:group name="EventListMember">
+  <xs:choice>
+    <xs:group ref="M:Identifier"/>
+    <xs:element ref="M:ForeachEvent"/>
+  </xs:choice>
+</xs:group>
+
+<xs:element name="ForeachEvent">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:ForeachType">
+        <xs:sequence>
+          <xs:element ref="M:EventList" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:group name="Expression">
+  <xs:choice>
+    <xs:element ref="M:SimpleExpression"/>
+    <xs:element ref="M:EventListExpression"/>
+  </xs:choice>
+</xs:group>
+
+
+<!-- ==================================================================== -->
+<!-- Components                                                           -->
+<!-- ==================================================================== -->
+
+<xs:element name="ComponentList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:AbstractComponent" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="AbstractComponent" abstract="true"/>
+
+<xs:element name="SimpleComponent" substitutionGroup="M:AbstractComponent">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifiedType">
+        <xs:sequence>
+          <xs:element ref="M:Graph"/>
+        </xs:sequence>
+        <xs:attribute name="Kind" type="B:ComponentKind" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+      
+<xs:element name="Instance" substitutionGroup="M:AbstractComponent">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifiedType">
+        <xs:sequence>
+          <xs:element ref="M:ParameterBinding"
+		      minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Bindings"/>
+            </xs:appinfo></xs:annotation>
+	  </xs:element>
+        </xs:sequence>
+        <xs:attribute name="ModuleName" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ParameterBinding">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType">
+        <xs:sequence>
+          <xs:group ref="M:Expression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Expression"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ForeachComponent" substitutionGroup="M:AbstractComponent">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:ForeachType">
+        <xs:sequence>
+          <xs:element ref="M:ComponentList" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+ 
+<!-- ==================================================================== -->
+<!-- Graph                                                                -->
+<!-- ==================================================================== -->
+
+<xs:element name="Graph">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:EventList" minOccurs="0">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="BlockedEvents"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+          <xs:element ref="M:NodeList" minOccurs="0"/>
+          <xs:element ref="M:EdgeList" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="Deterministic" type="xs:boolean" default="true"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="NodeList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:AbstractNode" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EdgeList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:Edge" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="AbstractNode" abstract="true"/>
+  
+<xs:complexType name="NodeType">
+  <xs:complexContent>
+    <xs:extension base="B:NamedType">
+      <xs:sequence>
+        <xs:element ref="M:EventList" minOccurs="0">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="Propositions"/>
+          </xs:appinfo></xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="SimpleNode" substitutionGroup="M:AbstractNode">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:NodeType">
+        <xs:sequence>
+          <xs:element ref="M:PointGeometry" minOccurs="0"/>
+          <xs:element ref="M:LabelGeometry" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="Initial" type="xs:boolean" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+  
+<xs:element name="GroupNode" substitutionGroup="M:AbstractNode">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:NodeType">
+        <xs:sequence>
+          <xs:element ref="M:NodeRef" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Nodes"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+          <xs:element ref="M:BoxGeometry" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+  
+<xs:element name="NodeRef">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Edge">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:LabelBlock"/>
+          <xs:element ref="M:StartPointGeometry" minOccurs="0"/>
+          <xs:element ref="M:SplineGeometry" minOccurs="0"/>
+          <xs:element ref="M:EndPointGeometry" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="Source" type="xs:string" use="required"/>
+        <xs:attribute name="Target" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="LabelBlock">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:EventListType">
+        <xs:sequence>
+          <xs:element ref="M:LabelGeometry" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+<!-- ==================================================================== -->
+<!-- Geometry                                                             -->
+<!-- ==================================================================== -->
+
+<xs:complexType name="PointGeometryType">
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:sequence>
+        <xs:element ref="M:Point"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="PointGeometry" type="M:PointGeometryType"/>
+<xs:element name="StartPointGeometry" type="M:PointGeometryType"/>
+<xs:element name="EndPointGeometry" type="M:PointGeometryType"/>
+
+<xs:element name="BoxGeometry">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:Box"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="LabelGeometry">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:Point"/>
+        </xs:sequence>
+        <xs:attribute name="Anchor" type="M:AnchorPosition" default="SW"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="SplineGeometry">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:Point" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Points"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute
+          name="Kind" type="M:SplineKind" default="INTERPOLATING"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ColorGeometry">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:Color"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Point">
+  <xs:complexType>
+    <xs:attribute name="X" type="xs:int" use="required"/>
+    <xs:attribute name="Y" type="xs:int" use="required"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Box">
+  <xs:complexType>
+    <xs:attribute name="X" type="xs:int" use="required"/>
+    <xs:attribute name="Y" type="xs:int" use="required"/>
+    <xs:attribute name="Width" type="xs:int" use="required"/>
+    <xs:attribute name="Height" type="xs:int" use="required"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:simpleType name="AnchorPosition">
+  <xs:annotation><xs:appinfo>
+    <jaxb:typesafeEnumClass/>
+  </xs:appinfo></xs:annotation>
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="NW"/>
+    <xs:enumeration value="N"/>
+    <xs:enumeration value="NE"/>
+    <xs:enumeration value="W"/>
+    <xs:enumeration value="C"/>
+    <xs:enumeration value="E"/>
+    <xs:enumeration value="SW"/>
+    <xs:enumeration value="S"/>
+    <xs:enumeration value="SE"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="SplineKind">
+  <xs:annotation><xs:appinfo>
+    <jaxb:typesafeEnumClass/>
+  </xs:appinfo></xs:annotation>
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="INTERPOLATING"/>
+    <xs:enumeration value="BEZIER"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:element name="Color">
+  <xs:complexType>
+    <xs:attribute name="Red" type="xs:int" use="required"/>
+    <xs:attribute name="Green" type="xs:int" use="required"/>
+    <xs:attribute name="Blue" type="xs:int" use="required"/>
+  </xs:complexType>
+</xs:element>
+
+
+<!-- ==================================================================== -->
+<!-- Expressions                                                          -->
+<!-- ==================================================================== -->
+
+<xs:complexType name="SimpleExpressionType">
+  <xs:complexContent>
+    <xs:extension base="M:ExpressionType"/>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="SimpleExpression" type="M:SimpleExpressionType"
+    abstract="true"/>
+
+<xs:complexType name="IdentifierType">
+  <xs:complexContent>
+    <xs:extension base="M:SimpleExpressionType">
+      <xs:attribute name="Name" type="xs:string" use="required"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="SimpleIdentifier" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifierType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="IndexedIdentifier" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifierType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression"
+                    minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Indexes"/>
+            </xs:appinfo></xs:annotation>
+	  </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="IntConstant" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:attribute name="Value" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="UnaryExpression" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="SubTerm"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+        <xs:attribute name="Operator" type="M:UnaryOperator" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="BinaryExpression" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Left"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Right"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+        <xs:attribute name="Operator" type="M:BinaryOperator" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="IntRangeExpression" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Lower"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Upper"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EnumSetExpression" substitutionGroup="M:SimpleExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:element ref="M:SimpleIdentifier" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Items"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:group name="Identifier">
+  <xs:choice>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IndexedIdentifier"/>
+  </xs:choice>
+</xs:group>
+
+<xs:group name="RangeExpression">
+  <xs:choice>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IntRangeExpression"/>
+    <xs:element ref="M:EnumSetExpression"/>
+  </xs:choice>
+</xs:group>
+
+<xs:group name="ArithmeticExpression">
+  <xs:choice>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:UnaryExpression"/>
+    <xs:element ref="M:BinaryExpression"/>
+  </xs:choice>
+</xs:group>
+
+<xs:group name="ArithmeticOrRangeExpression">
+  <xs:choice>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:UnaryExpression"/>
+    <xs:element ref="M:BinaryExpression"/>
+    <xs:element ref="M:IntRangeExpression"/>
+    <xs:element ref="M:EnumSetExpression"/>
+  </xs:choice>
+</xs:group>
+
+<xs:simpleType name="UnaryOperator">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="-"/>
+    <xs:enumeration value="!"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="BinaryOperator">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="+"/>
+    <xs:enumeration value="-"/>
+    <xs:enumeration value="*"/>
+    <xs:enumeration value="/"/>
+    <xs:enumeration value="%"/>
+    <xs:enumeration value="=="/>
+    <xs:enumeration value="&lt;"/>
+    <xs:enumeration value="&lt;="/>
+    <xs:enumeration value="&gt;"/>
+    <xs:enumeration value="&gt;="/>
+    <xs:enumeration value="!="/>
+    <xs:enumeration value="&amp;"/>
+    <xs:enumeration value="|"/>
+  </xs:restriction>
+</xs:simpleType>
+
+
+<!-- ==================================================================== -->
+<!-- Types                                                                -->
+<!-- ==================================================================== -->
+
+<xs:complexType name="ForeachType">
+  <xs:complexContent>
+    <xs:extension base="B:NamedType">
+      <xs:sequence>
+        <xs:group ref="M:RangeExpression">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="Range"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+        <xs:group ref="M:ArithmeticExpression" minOccurs="0">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="Guard"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="IdentifiedType">
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:sequence>
+        <xs:group ref="M:Identifier">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="Identifier"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+</xs:schema>

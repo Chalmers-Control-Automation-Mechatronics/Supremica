@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  targetNamespace="http://waters.sourceforge.net/xsd/base"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+  xmlns:B="http://waters.sourceforge.net/xsd/base"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+<!-- ==================================================================== -->
+<!-- Common Baseclass                                                     -->
+<!-- ==================================================================== -->
+
+<xs:complexType name="ElementType"/>
+
+<xs:complexType name="NamedType">
+  <xs:complexContent>
+    <xs:extension base="B:ElementType">
+      <xs:attribute name="Name" type="xs:string" use="required"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+
+<!-- ==================================================================== -->
+<!-- Enumerations                                                         -->
+<!-- ==================================================================== -->
+
+<xs:simpleType name="EventKind">
+  <xs:annotation><xs:appinfo>
+    <jaxb:typesafeEnumClass/>
+  </xs:appinfo></xs:annotation>
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="CONTROLLABLE"/>
+    <xs:enumeration value="UNCONTROLLABLE"/>
+    <xs:enumeration value="PROPOSITION"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="ComponentKind">
+  <xs:annotation><xs:appinfo>
+    <jaxb:typesafeEnumClass/>
+  </xs:appinfo></xs:annotation>
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="PLANT"/>
+    <xs:enumeration value="SPEC"/>
+    <xs:enumeration value="PROPERTY"/>
+  </xs:restriction>
+</xs:simpleType>
+
+
+</xs:schema>
