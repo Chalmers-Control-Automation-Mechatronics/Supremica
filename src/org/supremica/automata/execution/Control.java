@@ -54,6 +54,11 @@ public class Control
 	private String label = null;
 	private String condition = null;
 
+	public Control(String label)
+	{
+		this.label = label;
+	}
+
 	public Control(String label, String condition)
 	{
 		this.label = label;
@@ -73,6 +78,11 @@ public class Control
 	public String getCondition()
 	{
 		return condition;
+	}
+
+	public void setCondition(String condition)
+	{
+		this.condition = condition;
 	}
 
 	public boolean equals(Object other)

@@ -88,7 +88,6 @@ public class Action
 	public void removeCommand(String command)
 	{
 		commands.remove(command);
-		;
 	}
 
 	public Iterator commandIterator()

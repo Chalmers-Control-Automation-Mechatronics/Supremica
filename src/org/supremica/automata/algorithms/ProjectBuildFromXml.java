@@ -54,10 +54,13 @@ import java.io.*;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 import org.supremica.automata.*;
+import org.supremica.automata.execution.*;
+
 
 public class ProjectBuildFromXml
-	extends HandlerBase
+	extends DefaultHandler
 {
 	private final static String automataStr = "Automata";
 	private final static String automatonStr = "Automaton";
@@ -88,6 +91,8 @@ public class ProjectBuildFromXml
 	private final static String actionStr = "Action";
 	private final static String controlsStr = "Controls";
 	private final static String controlStr = "Control";
+	private final static String commandStr = "Command";
+	private final static String conditionStr = "Condition";
 	private final static String interfacesStr = "Interfaces";
 	private final static String interfaceStr = "Interface";
 	private final static String mastersStr = "Masters";
@@ -100,6 +105,10 @@ public class ProjectBuildFromXml
 	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
 	private Locator locator = null;
+	private Controls currControls = null;
+	private Actions currActions = null;
+	private Action currAction = null;
+	private Control currControl = null;
 
 	public ProjectBuildFromXml(ProjectFactory theProjectFactory)
 	{
@@ -199,7 +208,7 @@ public class ProjectBuildFromXml
 		this.locator = locator;
 	}
 
-	public void startElement(String name, AttributeList attributes)
+	public void startElement(String uri, String localName, String name, Attributes attributes)
 		throws SAXException
 	{
 
@@ -240,7 +249,6 @@ public class ProjectBuildFromXml
 		{
 			doExecution(attributes);
 		}
-/*
 		else if (actionsStr.equals(name))
 		{
 			doActions(attributes);
@@ -257,7 +265,14 @@ public class ProjectBuildFromXml
 		{
 			doControl(attributes);
 		}
-*/
+		else if (commandStr.equals(name))
+		{
+			doCommand(attributes);
+		}
+		else if (conditionStr.equals(name))
+		{
+			doCondition(attributes);
+		}
 		else if (eventsStr.equals(name)) {}
 		else if (statesStr.equals(name)) {}
 		else if (transitionsStr.equals(name)) {}
@@ -268,13 +283,13 @@ public class ProjectBuildFromXml
 		}
 	}
 
-	public final void doAutomata(AttributeList attributes)
+	public final void doAutomata(Attributes attributes)
 		throws SAXException
 	{
 		doProject(attributes);
 	}
 
-	public final void doAutomaton(AttributeList attributes)
+	public final void doAutomaton(Attributes attributes)
 		throws SAXException
 	{
 		currAutomaton = new Automaton();
@@ -300,7 +315,7 @@ public class ProjectBuildFromXml
 		currProject.addAutomaton(currAutomaton);
 	}
 
-	public final void doEvent(AttributeList attributes)
+	public final void doEvent(Attributes attributes)
 		throws SAXException
 	{
 		String id = null;
@@ -313,7 +328,7 @@ public class ProjectBuildFromXml
 
 		for (int i = 0; i < length; i++)
 		{
-			currName = attributes.getName(i);
+			currName = attributes.getQName(i);
 
 			if (idStr.equals(currName))
 			{
@@ -365,7 +380,7 @@ public class ProjectBuildFromXml
 		}
 	}
 
-	public final void doState(AttributeList attributes)
+	public final void doState(Attributes attributes)
 		throws SAXException
 	{
 		String id = null;
@@ -378,7 +393,7 @@ public class ProjectBuildFromXml
 
 		for (int i = 0; i < length; i++)
 		{
-			currName = attributes.getName(i);
+			currName = attributes.getQName(i);
 
 			if (idStr.equals(currName))
 			{
@@ -422,7 +437,7 @@ public class ProjectBuildFromXml
 		currAutomaton.addState(currState);
 	}
 
-	public final void doTransition(AttributeList attributes)
+	public final void doTransition(Attributes attributes)
 		throws SAXException
 	{
 		String source = attributes.getValue("source");
@@ -483,7 +498,7 @@ public class ProjectBuildFromXml
 	}
 
 
-	public final void doProject(AttributeList attributes)
+	public final void doProject(Attributes attributes)
 		throws SAXException
 	{
 		currProject = theProjectFactory.getProject();
@@ -537,7 +552,7 @@ public class ProjectBuildFromXml
 	}
 
 
-	public final void doLayout(AttributeList attributes)
+	public final void doLayout(Attributes attributes)
 		throws SAXException
 	{
 		String width = attributes.getValue("width");
@@ -557,7 +572,7 @@ public class ProjectBuildFromXml
 		currAutomaton.setHasLayout(true);
 	}
 
-	public final void doStateLayout(AttributeList attributes)
+	public final void doStateLayout(Attributes attributes)
 		throws SAXException
 	{
 		String id = attributes.getValue("id");
@@ -584,14 +599,100 @@ public class ProjectBuildFromXml
 		}
 	}
 
-	public final void doTransitionLayout(AttributeList attributes)
+	public final void doTransitionLayout(Attributes attributes)
 		throws SAXException
 	{
 	}
 
-	public final void doExecution(AttributeList attributes)
+	public final void doExecution(Attributes attributes)
+		throws SAXException
+	{
+		if (currProject == null)
+		{
+			currActions = null;
+			currControls = null;
+			return;
+		}
+		currActions = currProject.getActions();
+		currControls = currProject.getControls();
+	}
+
+	public final void doActions(Attributes attributes)
+		throws SAXException
+	{
+		if (currProject == null)
+		{
+			throwException("Project section is missing");
+		}
+		currActions = currProject.getActions();
+	}
+
+	public final void doAction(Attributes attributes)
+		throws SAXException
+	{
+		if (currActions == null)
+		{
+			throwException("Actions section is missing");
+		}
+
+		String label = attributes.getValue("label");
+
+		if (label == null)
+		{
+			throwException("label attribute is missing");
+		}
+
+		if (currActions.hasAction(label))
+		{
+			throwException("Multiple actions of " + label);
+		}
+		currAction = new Action(label);
+
+		currActions.addAction(currAction);
+	}
+
+	public final void doControls(Attributes attributes)
+		throws SAXException
+	{
+		if (currProject == null)
+		{
+			currControls = null;
+			return;
+		}
+		currControls = currProject.getControls();
+	}
+
+	public final void doControl(Attributes attributes)
+		throws SAXException
+	{
+		if (currControls == null)
+		{
+			throwException("Controls section is missing");
+		}
+		String label = attributes.getValue("label");
+
+		if (label == null)
+		{
+			throwException("label attribute is missing");
+		}
+
+		if (currControls.hasControl(label))
+		{
+			throwException("Multiple controls of " + label);
+		}
+		currControl = new Control(label);
+
+		currControls.addControl(currControl);
+	}
+
+	public final void doCommand(Attributes attributes)
+		throws SAXException
+	{
+
+	}
+
+	public final void doCondition(Attributes attributes)
 		throws SAXException
 	{
 	}
-
 }
