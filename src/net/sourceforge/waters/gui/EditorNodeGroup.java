@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.8 2005-03-08 11:35:14 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.9 2005-03-09 06:29:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -36,10 +36,9 @@ public class EditorNodeGroup
 	private static int UPPERRIGHT = 1;
 	private static int LOWERRIGHT = 2;
 	private static int LOWERLEFT = 3;
-	private static int WIDTHD = 4; // Width of drawn corners
-	private static int WIDTHS = 5; // Don't know what this is...
 	private static int CORNERDIAMETER = 15;
 	private static int TOLERANCE = 8;
+	private static int HANDLEWIDTH = 4;
 
 	public EditorNodeGroup(GroupNodeProxy gn)
 	{
@@ -68,15 +67,20 @@ public class EditorNodeGroup
 
 		type = NODEGROUP;
 
-		setHash(gn.hashCode());
+		//setHash(gn.hashCode());
+	}
+
+	public int hashCode()
+	{
+		return proxy.hashCode();
 	}
 
 	private void setCorners()
 	{
-		corners[UPPERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMinY(), bounds.getMinX() + WIDTHS, bounds.getMinY() + WIDTHS);
-		corners[UPPERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMinY(), bounds.getMaxX() + WIDTHS, bounds.getMinY() + WIDTHS);
-		corners[LOWERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMaxY(), bounds.getMinX() + WIDTHS, bounds.getMaxY() + WIDTHS);
-		corners[LOWERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMaxY(), bounds.getMaxX() + WIDTHS, bounds.getMaxY() + WIDTHS);
+		corners[UPPERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMinY(), bounds.getMinX() + TOLERANCE, bounds.getMinY() + TOLERANCE);
+		corners[UPPERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMinY(), bounds.getMaxX() + TOLERANCE, bounds.getMinY() + TOLERANCE);
+		corners[LOWERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMaxY(), bounds.getMinX() + TOLERANCE, bounds.getMaxY() + TOLERANCE);
+		corners[LOWERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMaxY(), bounds.getMaxX() + TOLERANCE, bounds.getMaxY() + TOLERANCE);
 	}
 
 	public boolean getResizing()
@@ -201,8 +205,18 @@ public class EditorNodeGroup
 
 	public void removePosition(Point2D.Double p)
 	{
+		for (int j = 0; j< points.size(); j++)
+		{
+			Point2D.Double point = (Point2D.Double) points.get(j);
+		}
+
 		int i = points.indexOf(p);
 
+		if (i < 0)
+		{
+			// Already removed?
+			return;
+		}
 		points.remove(i);
 		ratios.remove(i);
 		edges.remove(i);
@@ -274,7 +288,10 @@ public class EditorNodeGroup
 		return proxy;
 	}
 
-	public void setChildNodes(ArrayList children, JComponent c)
+	/**
+	 * @return false if something went wrong, true otherwise.
+	 */
+	public boolean setChildNodes(ArrayList children, JComponent c)
 	{
 		boolean fail = false;
 		ArrayList a = new ArrayList(children.size());
@@ -310,10 +327,12 @@ public class EditorNodeGroup
 
 		if (fail)
 		{
-			return;
+			return false;
 		}
 
 		immediateChildren = children;
+
+		return true;
 	}
 
 	public void setSelected(boolean s)
@@ -340,10 +359,11 @@ public class EditorNodeGroup
 
 		if (isSelected())
 		{
+			// Draw handles
 			for (int i = 0; i < 4; i++)
 			{
-				//g2d.fillRect((int) corners[i].getCenterX() - WIDTHD, (int) corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
-				g2d.drawOval((int) corners[i].getCenterX() - WIDTHD, (int) corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
+				g2d.fillRect((int) corners[i].getCenterX() - HANDLEWIDTH/2, (int) corners[i].getCenterY() - HANDLEWIDTH/2, HANDLEWIDTH, HANDLEWIDTH);
+				//g2d.drawOval((int) corners[i].getCenterX() - HANDLEWIDTH/2, (int) corners[i].getCenterY() - HANDLEWIDTH/2, HANDLEWIDTH, HANDLEWIDTH);
 			}
 		}
 

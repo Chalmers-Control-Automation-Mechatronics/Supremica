@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.7 2005-02-20 23:32:54 robi Exp $
+//# $Id: ModuleWindow.java,v 1.8 2005-03-09 06:29:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -47,6 +47,7 @@ public class ModuleWindow
 	private JMenuItem FileNewMenu;
 	private JMenuItem FileOpenMenu;
 	private JMenuItem FileSaveMenu;
+	private JMenuItem FileSaveAsMenu;
 	private JMenuItem FileExitMenu;
 	private JMenuItem analysisExportSupremicaMenu;
 	private JTree ModuleSelectTree = null;
@@ -524,16 +525,17 @@ public class ModuleWindow
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem(WLang.FileSaveMenu, KeyEvent.VK_S);
-		FileSaveMenu = menuItem;
-
 		menuItem.addActionListener(this);
-		menu.add(menuItem);
-
-		menuItem = new JMenuItem(WLang.FileSaveAsMenu, KeyEvent.VK_A);
-
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
+		FileSaveMenu = menuItem;
+
+		menuItem = new JMenuItem(WLang.FileSaveAsMenu, KeyEvent.VK_A);
+		menuItem.addActionListener(this);
+		menu.add(menuItem);
+		FileSaveAsMenu = menuItem;
+
 		menu.addSeparator();
 
 		menuItem = new JMenuItem(WLang.FilePageSetupMenu, KeyEvent.VK_G);
@@ -751,12 +753,11 @@ public class ModuleWindow
 			}
 			else
 			{
-
 				// Open cancelled...  do nothing
 			}
 		}
 
-		if (e.getSource() == FileSaveMenu)
+		if (e.getSource() == FileSaveAsMenu)
 		{
 			int returnVal = fileSaveChooser.showSaveDialog(this);
 
@@ -772,8 +773,7 @@ public class ModuleWindow
 			}
 			else
 			{
-
-				// Open cancelled...  do nothing
+				// SaveAs cancelled...  do nothing
 			}
 		}
 

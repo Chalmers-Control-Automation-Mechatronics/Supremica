@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.16 2005-03-08 02:51:18 flordal Exp $
+//# $Id: EditorSurface.java,v 1.17 2005-03-09 06:29:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -45,7 +45,7 @@ public class EditorSurface
 	protected EditorWindowInterface root;
 	protected int gridSize = 16;
 	protected Color backgroundColor = new Color(1.0f, 1.0f, 1.0f);
-	protected Color gridColor = new Color(0.0f, 0.0f, 0.0f);
+	protected Color gridColor = new Color(0.9f, 0.9f, 0.9f);
 	protected ArrayList nodes;
 	protected ArrayList nodeGroups;
 	protected ArrayList edges;
@@ -214,7 +214,14 @@ public class EditorSurface
 			}
 
 			children.addAll(groups);
-			n.setChildNodes(children, (JComponent) this);
+			boolean ok = n.setChildNodes(children, (JComponent) this);
+			if (!ok)
+			{
+				JOptionPane.showMessageDialog(this, "Removing nodegroup.");
+
+				delNodeGroup(n);
+				break;
+			}
 		}
 
 		for (int i = 0; i < edges.size(); i++)
@@ -290,49 +297,82 @@ public class EditorSurface
 	{
 		SimpleNodeProxy np = new SimpleNodeProxy(name);
 
+		// Add proxy
 		graph.getNodes().add(np);
 
 		EditorNode n = new EditorNode(x, y, shade, np, this);
 
-		nodes.add(n);
-		addLabel(n, name);
-		minimizeSize();
-		repaint();
+		addNode(n);
 	}
 
 	public void addNode(SimpleNodeProxy np)
 	{
 		EditorNode n = new EditorNode(shade, np, this);
 
+		addNode(n);
+	}
+
+	public void addNode(EditorNode n)
+	{
 		nodes.add(n);
-		addLabel(n, np.getName());
+		addLabel(n, n.getName());
 		minimizeSize();
+		repaint();
+	}
+
+	public void delNode(EditorNode n)
+	{
+		for (int i = 0; i < edges.size(); i++)
+		{
+			EditorEdge e = (EditorEdge) edges.get(i);
+
+			if ((e.getStartNode() == n) || (e.getEndNode() == n))
+			{
+				delEdge(e);
+				//delNode(n); // Recursive call?
+			}
+		}
+
+		for (int i = 0; i < labels.size(); i++)
+		{
+			EditorLabel e = (EditorLabel) labels.get(i);
+
+			if (e.getParent() == (EditorObject) n)
+			{
+				delLabel(e);
+				//delNode(n); // Recursive call?
+			}
+		}
+
+		nodes.remove(n);
+		graph.getNodes().remove(n.getProxy());
+		examineCollisions();
 		repaint();
 	}
 
 	public EditorNodeGroup addNodeGroup(int x, int y, int w, int h)
 	{
 		GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
-
 		n.setGeometry(new BoxGeometryProxy(x, y, w, h));
 
+		// Add proxy
+		graph.getNodes().add(n);
+
+		return addNodeGroup(n);
+	}
+
+	public EditorNodeGroup addNodeGroup(GroupNodeProxy n)
+	{
 		EditorNodeGroup g = new EditorNodeGroup(n);
 
 		nodeGroups.add(g);
-		graph.getNodes().add(n);
+		examineCollisions();
 		repaint();
 
 		return g;
 	}
 
-	public void addNodeGroup(GroupNodeProxy n)
-	{
-		EditorNodeGroup g = new EditorNodeGroup(n);
-
-		nodeGroups.add(g);
-		repaint();
-	}
-
+	/*
 	public EditorNodeGroup getLastNodeGroup()
 	{
 		if (!nodeGroups.isEmpty())
@@ -352,6 +392,7 @@ public class EditorSurface
 
 		return null;
 	}
+	*/
 
 	public EditorNode findNodeByHash(int hash)
 	{
@@ -359,7 +400,7 @@ public class EditorSurface
 		{
 			EditorNode n = (EditorNode) nodes.get(i);
 
-			if (n.getHash() == hash)
+			if (n.hashCode() == hash)
 			{
 				return n;
 			}
@@ -374,7 +415,7 @@ public class EditorSurface
 		{
 			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
 
-			if (n.getHash() == hash)
+			if (n.hashCode() == hash)
 			{
 				return n;
 			}
@@ -383,10 +424,10 @@ public class EditorSurface
 		return null;
 	}
 
-	public void addEdge(EditorObject n1, EditorNode n2, int x, int y)
+	public EditorEdge addEdge(EditorObject n1, EditorNode n2, int x, int y)
 	{
+		// Create a new EdgeProxy
 		EdgeProxy ep;
-
 		if (n1.getType() == EditorObject.NODE)
 		{
 			ep = new EdgeProxy((NodeProxy) ((EditorNode) n1).getProxy(), (NodeProxy) n2.getProxy());
@@ -396,17 +437,19 @@ public class EditorSurface
 			ep = new EdgeProxy((NodeProxy) ((EditorNodeGroup) n1).getProxy(), (NodeProxy) n2.getProxy());
 		}
 
+		// Add proxy to graph
 		graph.getEdges().add(ep);
-
+		
 		EditorEdge e = new EditorEdge(n1, n2, x, y, ep);
-
-		edges.add(e);
+        edges.add(e);
 		addLabelGroup(e);
 		minimizeSize();
-		repaint();
+        repaint();
+
+		return e;
 	}
 
-	public void addEdge(EditorObject n1, EditorNode n2, EdgeProxy ep)
+	public EditorEdge addEdge(EditorObject n1, EditorNode n2, EdgeProxy ep)
 	{
 		int x = n2.getX();
 		int y = n2.getY();
@@ -423,8 +466,34 @@ public class EditorSurface
 		addLabelGroup(e);
 		minimizeSize();
 		repaint();
+
+		return e;
 	}
 
+	public void delEdge(EditorEdge e)
+	{
+		for (int i = 0; i < events.size(); i++)
+		{
+			EditorLabelGroup g = (EditorLabelGroup) events.get(i);
+
+			if (g.getParent() == (EditorObject) e)
+			{
+				delLabelGroup(g);
+				//delEdge(e); // Recursive call!??
+			}
+		}
+
+		if (e.getStartNode().getType() == EditorObject.NODEGROUP)
+		{
+			((EditorNodeGroup) e.getStartNode()).removePosition(e.getStartPoint());
+		}
+
+		edges.remove(e);
+		graph.getEdges().remove(e.getProxy());
+		repaint();
+	}
+
+	/*
 	public EditorEdge getLastEdge()
 	{
 		if (edges.size() > 0)
@@ -434,6 +503,7 @@ public class EditorSurface
 
 		return null;
 	}
+	*/
 
 	public void addLabel(EditorNode o, String label)
 	{
@@ -453,6 +523,7 @@ public class EditorSurface
 		repaint();
 	}
 
+	/*
 	public EditorLabel getLastLabel()
 	{
 		if (labels.size() > 0)
@@ -462,6 +533,7 @@ public class EditorSurface
 
 		return null;
 	}
+	*/
 
 	public EditorLabel getLabel(EditorNode n)
 	{
@@ -493,36 +565,6 @@ public class EditorSurface
 		return null;
 	}
 
-	public void delNode(EditorNode n)
-	{
-		for (int i = 0; i < edges.size(); i++)
-		{
-			EditorEdge e = (EditorEdge) edges.get(i);
-
-			if ((e.getStartNode() == n) || (e.getEndNode() == n))
-			{
-				delEdge(e);
-				delNode(n);
-			}
-		}
-
-		for (int i = 0; i < labels.size(); i++)
-		{
-			EditorLabel e = (EditorLabel) labels.get(i);
-
-			if (e.getParent() == (EditorObject) n)
-			{
-				delLabel(e);
-				delNode(n);
-			}
-		}
-
-		nodes.remove(n);
-		graph.getNodes().remove(n.getProxy());
-		examineCollisions();
-		repaint();
-	}
-
 	public void delNodeGroup(EditorNodeGroup n)
 	{
 		for (int i = 0; i < edges.size(); i++)
@@ -538,29 +580,6 @@ public class EditorSurface
 		nodeGroups.remove(n);
 		graph.getNodes().remove(n.getProxy());
 		examineCollisions();
-		repaint();
-	}
-
-	public void delEdge(EditorEdge e)
-	{
-		for (int i = 0; i < events.size(); i++)
-		{
-			EditorLabelGroup g = (EditorLabelGroup) events.get(i);
-
-			if (g.getParent() == (EditorObject) e)
-			{
-				delLabelGroup(g);
-				delEdge(e);
-			}
-		}
-
-		if (e.getStartNode().getType() == EditorObject.NODEGROUP)
-		{
-			((EditorNodeGroup) e.getStartNode()).removePosition(e.getStartPoint());
-		}
-
-		edges.remove(e);
-		graph.getEdges().remove(e);
 		repaint();
 	}
 
@@ -1027,8 +1046,8 @@ public class EditorSurface
 
 					if ((s != null) && (t != null))
 					{
-						addEdge(s, t, e);
-						getLastEdge().setHash(e.hashCode());
+						EditorEdge edge = addEdge(s, t, e);
+						//edge.setHash(e.hashCode());
 					}
 					else
 					{

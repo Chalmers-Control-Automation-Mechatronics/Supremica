@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.15 2005-03-08 02:51:18 flordal Exp $
+//# $Id: EditorEdge.java,v 1.16 2005-03-09 06:29:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -457,6 +457,11 @@ public class EditorEdge
 		}
 
 		center.setFrameFromCenter(tPoint.getX(), tPoint.getY(), tPoint.getX() + WIDTHD, tPoint.getY() + WIDTHD);
+	}
+
+	public int hashCode()
+	{
+		return proxy.hashCode(); 
 	}
 
 	/**

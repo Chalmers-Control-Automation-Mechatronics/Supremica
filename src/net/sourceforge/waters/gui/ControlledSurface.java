@@ -24,7 +24,6 @@ public class ControlledSurface
 	private EditorToolbar T;
 	private EditorOptions options;
 	private EditorNode sNode = null;
-	private int lastLineIndex = 0;
 	private int lastX = 0;
 	private int lastY = 0;
 	private int xoff = 0;
@@ -147,6 +146,7 @@ public class ControlledSurface
 		super.deselectAll();
 	}
 
+	/*
 	private void selectChange(EditorObject o)
 	{
 		// Only if SELECT is chosen multiple selection is possible...
@@ -165,6 +165,7 @@ public class ControlledSurface
 			select(o);
 		}
 	}
+	*/
 
 	private boolean nodeIsSelected()
 	{
@@ -205,6 +206,14 @@ public class ControlledSurface
 		return false;
 	}
 
+	/**
+	 * Returns the closest coordinate (works for both x and y) lying on the grid.
+	 */
+	private int findGrid(int x)
+	{
+		return (x+gridSize/2)/gridSize*gridSize;
+	}
+
    	public void mousePressed(MouseEvent e)
 	{
 		// This is for triggering the popup 
@@ -243,7 +252,7 @@ public class ControlledSurface
 					EditorNodeGroup nodeGroup;
 					if (nodesSnap)
 					{
-						nodeGroup = addNodeGroup(Math.round(e.getX() / gridSize) * gridSize, Math.round(e.getY() / gridSize) * gridSize, 0, 0);
+						nodeGroup = addNodeGroup(findGrid(e.getX()), findGrid(e.getY()), 0, 0);
 					}
 					else
 					{
@@ -251,13 +260,12 @@ public class ControlledSurface
 					}
 					select(nodeGroup);
 				}
-
-				return;
 			}
 			else
 			{
 				// Clicking on something!
 
+				// Should we deselect the currently selected objects?
 				if (!selectedObjects.contains(o))
 				{
 					// If control is down, we may select multiple things...
@@ -288,35 +296,35 @@ public class ControlledSurface
 				{
 					select(o);
 				}	   
-			}
 
-			/*
-			if (o.getType() == EditorObject.EDGE)
-			{
-				EditorEdge edge = (EditorEdge) o;
-				if (edge.wasClicked(e.getX(), e.getY()))
+				/*
+				if (o.getType() == EditorObject.EDGE)
 				{
-				 	return;
+					EditorEdge edge = (EditorEdge) o;
+					if (edge.wasClicked(e.getX(), e.getY()))
+					{
+						return;
+					}
 				}
-			}
-			*/
-
-			// Find offset values if a label or group was clicked
-			if (o.getType() == EditorObject.LABELGROUP)
-			{
-				xoff = e.getX() - ((EditorLabelGroup) o).getX();
-				yoff = e.getY() - ((EditorLabelGroup) o).getY();
-			}
-			else if (o.getType() == EditorObject.LABEL)
-			{
-				xoff = e.getX() - ((EditorLabel) o).getX();
-				yoff = e.getY() - ((EditorLabel) o).getY();
-			}
-			else if (o.getType() == EditorObject.NODEGROUP)
-			{
-				// We need this offset to place new edges
-				xoff = e.getX() - ((EditorNodeGroup) o).getX();
-				yoff = e.getY() - ((EditorNodeGroup) o).getY();
+				*/
+				
+				// Find offset values if a label or group was clicked
+				if (o.getType() == EditorObject.LABELGROUP)
+				{
+					xoff = e.getX() - ((EditorLabelGroup) o).getX();
+					yoff = e.getY() - ((EditorLabelGroup) o).getY();
+				}
+				else if (o.getType() == EditorObject.LABEL)
+				{
+					xoff = e.getX() - ((EditorLabel) o).getX();
+					yoff = e.getY() - ((EditorLabel) o).getY();
+				}
+				else if (o.getType() == EditorObject.NODEGROUP)
+				{
+					// We need this offset to place new edges
+					xoff = e.getX() - ((EditorNodeGroup) o).getX();
+					yoff = e.getY() - ((EditorNodeGroup) o).getY();
+				}
 			}
 		}
 		else if (e.getButton() == MouseEvent.BUTTON2)
@@ -398,9 +406,31 @@ public class ControlledSurface
 			if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap)
 				//if (nodesSnap)
 			{
-				lastX = lastX/gridSize * gridSize;
-				lastY = lastY/gridSize * gridSize;
+				lastX = findGrid(lastX);
+				lastY = findGrid(lastY);
 				
+				int currX = findGrid(e.getX());
+				int currY = findGrid(e.getY());
+				
+				// If the first selected node or nodegroup is not correctly aligned already, we need
+				// a modifyer to get it on the grid again...
+				int modX = 0;
+				int modY = 0;
+				for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
+				{
+					EditorObject o = (EditorObject) it.next();
+					if ((o.getType() == EditorObject.NODE)
+						|| (o.getType() == EditorObject.NODEGROUP))
+					{
+						modX = findGrid(o.getX()) - o.getX();
+						modY = findGrid(o.getY()) - o.getY();
+					}
+				}
+
+				dx = currX - lastX + modX;
+				dy = currY - lastY + modY;
+
+				/*
 				while (dx + gridSize < e.getX())
 				{
 					dx += gridSize;
@@ -422,10 +452,11 @@ public class ControlledSurface
 				{
 					dy += gridSize;
 				}
-				
+
 				// So the actual delta values are...
 				dx -= lastX;
 				dy -= lastY;
+				*/
 			}
 			else
 			{
@@ -556,7 +587,7 @@ public class ControlledSurface
 						{
 							if (nodesSnap)
 							{
-								nodeGroup.resize(Math.round(e.getX() / gridSize) * gridSize, Math.round(e.getY() / gridSize) * gridSize);
+								nodeGroup.resize(findGrid(e.getX()), findGrid(e.getY()));
 							}
 							else
 							{
@@ -575,6 +606,7 @@ public class ControlledSurface
 								nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 							}
 							*/
+
 							nodeGroup.moveGroup(dx, dy);
 						}
 
@@ -713,7 +745,7 @@ public class ControlledSurface
 					{
 						if (nodesSnap)
 						{
-							nodeGroup.resize(Math.round(e.getX() / gridSize) * gridSize, Math.round(e.getY() / gridSize) * gridSize);
+							nodeGroup.resize(findGrid(e.getX()), findGrid(e.getY()));
 						}
 						else
 						{
@@ -803,7 +835,7 @@ public class ControlledSurface
 				while (selectedObjects.size() != 0)
 				{
 					// This is thus the startingpoint
-					EditorObject n1 = (EditorObject) selectedObjects.remove(0);
+					EditorObject n1 = (EditorObject) selectedObjects.get(0);
 					deselect(n1);
 
 					// This is the targetpoint
@@ -850,7 +882,7 @@ public class ControlledSurface
 			// Stop resizing nodegroup
 			if (nodeGroupIsSelected() && (selectedObjects.size() == 1))
 			{
-				EditorNodeGroup ng = (EditorNodeGroup) selectedObjects.remove(0);
+				EditorNodeGroup ng = (EditorNodeGroup) selectedObjects.get(0);
 				ng.setResizingFalse();
 
 				if (ng.isEmpty())
@@ -971,11 +1003,12 @@ public class ControlledSurface
 			{				
 				if (T.getPlace() == EditorToolbar.NODE)
 				{
-					int posX = 0;
-					int posY = 0;
+					int posX;
+					int posY;
 					
 					if (nodesSnap)
 					{
+						/*
 						while (posX + gridSize < e.getX())
 						{
 							posX += gridSize;
@@ -997,6 +1030,10 @@ public class ControlledSurface
 						{
 							posY += gridSize;
 						}
+						*/
+
+						posX = findGrid(e.getX());
+						posY = findGrid(e.getY());
 					}
 					else
 					{
@@ -1165,7 +1202,6 @@ public class ControlledSurface
 		S = this;
 		T = et;
 		root = r;
-		gridColor = new Color(0.9f, 0.9f, 0.9f);
 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);

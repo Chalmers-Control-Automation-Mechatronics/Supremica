@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.7 2005-03-04 11:52:45 flordal Exp $
+//# $Id: EditorObject.java,v 1.8 2005-03-09 06:29:15 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -42,6 +42,7 @@ public class EditorObject
 		;
 	}
 
+	/* Replaced by hashCode()-methods in extending  classes.
 	public void setHash(int hash)
 	{
 		this.hash = hash;
@@ -50,6 +51,16 @@ public class EditorObject
 	public int getHash()
 	{
 		return hash;
+	}
+	*/
+
+	public int getX()
+	{
+		return 0;
+	}
+	public int getY()
+	{
+		return 0;
 	}
 
 	public int getType()

@@ -12,7 +12,8 @@ import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
-/** <p>The internal editor representation of node objects.</p>
+/** 
+x * <p>The internal editor representation of node objects.</p>
  *
  * <p>Nodes store geometry and {@link EditorShade} information.</p>
  *
@@ -42,18 +43,13 @@ public class EditorNode
 		propGroup = new EditorPropGroup(this, e);
 	}
 
-	public EditorPropGroup getPropGroup()
-	{
-		return propGroup;
-	}
-
 	public EditorNode(EditorShade s, SimpleNodeProxy np, EditorSurface e)
 	{
 		type = NODE;
 		shade = s;
 		proxy = np;
 
-		setHash(np.hashCode());
+		//setHash(np.hashCode());
 
 		if (proxy.getPointGeometry() == null)
 		{
@@ -71,9 +67,19 @@ public class EditorNode
 		propGroup = new EditorPropGroup(this, e);
 	}
 
+	public EditorPropGroup getPropGroup()
+	{
+		return propGroup;
+	}
+
 	public void setInitial(boolean newinitial)
 	{
 		proxy.setInitial(newinitial);
+	}
+
+	public int hashCode()
+	{
+		return proxy.hashCode();
 	}
 
 	public boolean isInitial()

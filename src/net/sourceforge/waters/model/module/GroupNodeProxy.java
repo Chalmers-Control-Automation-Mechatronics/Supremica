@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   GroupNodeProxy
 //###########################################################################
-//# $Id: GroupNodeProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: GroupNodeProxy.java,v 1.2 2005-03-09 06:29:15 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -182,21 +182,25 @@ public class GroupNodeProxy extends NodeProxy {
   public void setImmediateChildNodes(final Collection children)
     throws CyclicGroupNodeException, DuplicateNameException
   {
-    try {
-      final SetProxy newnodes = new HashSetProxy(children);
-      final NodeSetProxy owner = (NodeSetProxy) getMap();
-      mUnmodifiableNodes = Collections.unmodifiableSet(newnodes);
-      if (owner != null) {
-	owner.rearrangeGroupNodes();
-      }
-      mNodes = newnodes;
-    } catch (final CyclicGroupNodeException exception) {
-      mUnmodifiableNodes = Collections.unmodifiableSet(mNodes);
-      exception.putOperation("Changing children of '" + getName() + "'");
-      throw exception;
-    }    
+	  try 
+	  {
+		  final SetProxy newnodes = new HashSetProxy(children);
+		  final NodeSetProxy owner = (NodeSetProxy) getMap();
+		  mUnmodifiableNodes = Collections.unmodifiableSet(newnodes);
+		  if (owner != null) 
+		  {
+			  owner.rearrangeGroupNodes();
+		  }
+		  mNodes = newnodes;
+	  } 
+	  catch (final CyclicGroupNodeException exception) 
+	  {
+		  mUnmodifiableNodes = Collections.unmodifiableSet(mNodes);
+		  exception.putOperation("Changing children of '" + getName() + "'");
+		  throw exception;
+	  }    
   }
-
+	
   public Iterator getImmediateChildNodeIterator()
   {
     return mUnmodifiableNodes.iterator();

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="WineMerchant" comment="An elegant (?) solution to the classical 'Wine Merchant's Problem'. A wine merchant has three bottles, capable of storing 3, 5 and 8 litres of wine respectively. Initially, he has 8 litres in the third bottle but he wants to split this volume in half, i.e. two bottles of four litres each. How does he do that if he can not use any measuring equipment except for the three bottles which, of course, are not graded. That is, how do you move from the state '008' to the state '044' in as few steps as possible? The event called '1>2', for example, means that the contents of bottle 1 is poured into bottle 2, until bottle 2 is full or bottle 1 is empty (whichever happens first). Try solving the problem using 'Explore states' from the popup menu.">
+<Automata name="WineMerchant" comment="An elegant (?) solution to the classical 'Wine Merchant's Problem'. A wine merchant has three bottles, capable of storing 3, 5 and 8 litres of wine respectively. Initially, he has 8 litres in the third bottle but he wants to split this volume in half, i.e. two bottles of four litres each. How does he do that if he can not use any measuring equipment except for the three bottles which, of course, are not graded. That is, how do you move from the state '008' to the state '044' in as few steps as possible? The event called '1-2', for example, means that the contents of bottle 1 is poured into bottle 2, until bottle 2 is full or bottle 1 is empty (whichever happens first). Try solving the problem using 'Explore states' from the popup menu.">
 <Automaton name="WineMerchant" type="Plant">
 	<Events>
-		<Event id="12" label="1>2"/>
-		<Event id="13" label="1>3"/>
-		<Event id="21" label="2>1"/>
-		<Event id="23" label="2>3"/>
-		<Event id="31" label="3>1"/>
-		<Event id="32" label="3>2"/>
+		<Event id="12" label="1-2"/>
+		<Event id="13" label="1-3"/>
+		<Event id="21" label="2-1"/>
+		<Event id="23" label="2-3"/>
+		<Event id="31" label="3-1"/>
+		<Event id="32" label="3-2"/>
 	</Events>
 	<States>
 		<State id="008" initial="true"/>
