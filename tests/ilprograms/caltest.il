@@ -201,6 +201,7 @@ FUNCTION_BLOCK ANDER
 		in_1 : BOOL;
 	    in_2 : BOOL;
 		out  : BOOL;
+
 	END_VAR
 
 	LD in_1
@@ -234,6 +235,7 @@ PROGRAM CALTEST
       	Result_DINT  : DINT;
 		Result_BOOL  : BOOL;
 	END_VAR
+
 
 	LD DINT#10
 	ST N1

@@ -8,6 +8,11 @@ import java.util.*;
 import java.lang.Exception;
 import java.util.LinkedList;
 
+
+/**
+ * Checks a IEC 6-1131 Instruction List syntax tree
+ * @author Thomas Isakson
+ */
 public class VariableChecker implements SimpleNodeVisitor {
 
 	/*
@@ -29,28 +34,65 @@ public class VariableChecker implements SimpleNodeVisitor {
      *    ett fel returneras.
      */
 
-	//	List declaredDataTypes = new LinkedList();
-	Hashtable locatedVariables;
+
+
+	/* Hashtable with symbolic variables placed 
+	 * in the PROGRAM block 
+	 * Keys  : variable names
+	 * Values: variable types
+	 */
 	Hashtable symbolicVariables;
+
+	/* Hashtable with located variables placed 
+	 * in the PROGRAM block 
+	 * Keys  : locations
+	 * Values: variable names
+	 */
+	Hashtable locatedVariables;
+
+	/* Hashtable with all function blocks 
+	 * Keys  : function block names
+	 * Values: hashtables with symbolic variables
+	 */
 	Hashtable functionBlocks;
+
+	/* Object that is passed down the tree by the 
+     * visitor 
+     */
 	VCinfo    VC;
+
+	/* When an error such as an undeclared variable is 
+     * encountered by the checker, success is set to 
+     * FALSE
+     */
 	boolean success = true;
 
 	SimpleNode abstractSyntaxTreeRoot;
+
 
     public VariableChecker(SimpleNode abstractSyntaxTreeRoot){
 		this.abstractSyntaxTreeRoot = abstractSyntaxTreeRoot;
     }
 
-
+    /**
+     * Checks the syntax tree
+     * @return true if no errors were encountered
+	 */
 	public boolean check() {
-		locatedVariables  = new Hashtable();
 		symbolicVariables = new Hashtable();
+		locatedVariables  = new Hashtable();
 		functionBlocks    = new Hashtable();
 		VC                = new VCinfo();
 
         Node[] children;
 
+		/* The tree is visited twice:
+		 *  - the first time, only the declaration parts
+         *    are visited, and the variables are put in 
+         *    hashtables for later retrieval
+         *  - the second time, the rest of the program
+         *    is checked
+         */
 		for(int j=1; j<3; j++) {
 			((VCinfo)VC).pass = j;
 
@@ -69,47 +111,49 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 
 
-	//skall troligen tas bort när vi är färdiga
-	public Object visitStandard(SimpleNode n, Object o){
-		System.out.println(n.toString() + "WARNING: visitStandard");
-		return null;
-	}
 
-
-
-
-	public ASTil_simple_operation create_LD_Node(String type, String value, String blockName) {
+	/**
+	 * Creates a "LD" simple operation node.
+	 *
+	 * @param type Can be one of "numeric_literal", 
+	 *                           "character_string", 
+	 *                           "boolean_literal" or
+	 *                           "symbolic_variable"
+	 *
+	 * @param value If type is "symbolic_variable", value 
+	 *              should be the variable name.
+	 *
+	 * @param blockName If the current location in the syntax
+     *                  tree is the program block, blockName
+	 *                  should be null. Otherwise, blockName
+	 *                  should be the name of the function
+	 *                  block of the current location.
+	 */
+	private ASTil_simple_operation create_LD_Node(String type, String value, String blockName) {
 		ASTil_simple_operation jjtn_simple_op;
-		ASTnumeric_literal     jjtn_numeric_literal;
-		ASTboolean_literal     jjtn_boolean_literal;
-		ASTcharacter_string    jjtn_character_string;
-		ASTvariable            jjtn_variable;
-
-		Variable               v;
 
 		jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
 		jjtn_simple_op.setName("LD");
 
-
 		if (type == "numeric_literal") {
-			jjtn_numeric_literal = new ASTnumeric_literal(parserTreeConstants.JJTNUMERIC_LITERAL);
+			ASTnumeric_literal jjtn_numeric_literal = new ASTnumeric_literal(parserTreeConstants.JJTNUMERIC_LITERAL);
 			jjtn_numeric_literal.setName(value);
 			jjtn_simple_op.jjtAddChild(jjtn_numeric_literal, 0);
 
 		} else if (type == "character_string") {
-			jjtn_character_string = new ASTcharacter_string(parserTreeConstants.JJTCHARACTER_STRING);
+			ASTcharacter_string jjtn_character_string = new ASTcharacter_string(parserTreeConstants.JJTCHARACTER_STRING);
 			jjtn_character_string.setName(value);
 			jjtn_simple_op.jjtAddChild(jjtn_character_string, 0);
 
 		} else if (type == "boolean_literal") {
-			jjtn_boolean_literal = new ASTboolean_literal(parserTreeConstants.JJTBOOLEAN_LITERAL);
+			ASTboolean_literal jjtn_boolean_literal = new ASTboolean_literal(parserTreeConstants.JJTBOOLEAN_LITERAL);
 			jjtn_boolean_literal.setName(value);
 			jjtn_simple_op.jjtAddChild(jjtn_boolean_literal, 0);
 
 		} else if (type == "symbolic_variable") {
-			v = getVariableInfo(value, blockName);
+			Variable v = getVariable(value, blockName);
 
-			jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
+			ASTvariable jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
 			jjtn_variable.setName(v.name);
 			jjtn_variable.setTypeName(v.typeName);
 			jjtn_variable.setIsDirectVariable(v.directVariable);
@@ -121,26 +165,35 @@ public class VariableChecker implements SimpleNodeVisitor {
 		}
 
 		return jjtn_simple_op;
-
 	}
 
 
-	public ASTil_simple_operation create_ST_Node(String variableName, String blockName) {
+
+	/**
+	 * Creates a "ST" simple operation node.
+	 *
+	 * @param variableName
+	 *
+	 * @param blockName If the current location in the syntax
+     *                  tree is the program block, blockName
+	 *                  should be null. Otherwise, blockName
+	 *                  should be the name of the function
+	 *                  block of the current location.
+	 */
+	private ASTil_simple_operation create_ST_Node(String variableName, String blockName) {
 		ASTil_simple_operation jjtn_simple_op;
 		ASTvariable            jjtn_variable;
-
 		Variable               v;
 
 		jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
 		jjtn_simple_op.setName("ST");
 
-
-		v = getVariableInfo(variableName, blockName);
+		v = getVariable(variableName, blockName);
 
 		if (v==null) {
+			/* The variable was not declared */
 			return null;
 		} else {
-
 			jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
 			jjtn_variable.setName(v.name);
 			jjtn_variable.setTypeName(v.typeName);
@@ -157,11 +210,26 @@ public class VariableChecker implements SimpleNodeVisitor {
 	}
 
 
-	public Variable getVariableInfo(String variableName, String blockName) {
-		Variable v = new Variable();
-		Hashtable fbVariables;
 
+	/**
+	 * Returns a Variable object with all available
+	 * properties of the requested variable
+	 *
+	 * @param variableName Can be a simple symbolic variable or a
+	 *                     function block variable, i.e. 
+	 *                     "myfb.myfieldselector"
+	 *
+	 * @param blockName If the current location in the syntax
+     *                  tree is the program block, blockName
+	 *                  should be null. Otherwise, blockName
+	 *                  should be the name of the function
+	 *                  block of the current location.
+	 */
+	private Variable getVariable(String variableName, String blockName) {
+		Hashtable fbVariables;
+		Variable v = new Variable();
 		StringTokenizer tokens = new StringTokenizer(variableName, ".", false);
+
 		int TokenCount = tokens.countTokens();
 		v.name = tokens.nextToken();
 
@@ -170,14 +238,12 @@ public class VariableChecker implements SimpleNodeVisitor {
 			v.fieldSelector = tokens.nextToken();
 		}
 
-
-
-
 		/*
-         * Kolla att variabeln är deklarerad och hämta typeName
+         * Check that the variable is declared, and retrieve
+		 * the variable's type.
          */
 		if (blockName == null)
-			/* variabeln finns i ett program */
+			/* Look for the variable in the program's declarations */
 			{
 				if (!(   symbolicVariables.containsKey(v.name)
 						 || locatedVariables.containsKey(v.name)
@@ -190,13 +256,13 @@ public class VariableChecker implements SimpleNodeVisitor {
 				v.typeName = (String)symbolicVariables.get(v.name);
 			}
 		else
-			/* variabeln finns i ett function block */
+			/* Look for the variable in the function block's declarations */
 			{
 				fbVariables = (Hashtable)functionBlocks.get(blockName);
 
 				if (!fbVariables.containsKey(v.name)) {
 					success = false;
-					System.err.println("Error: Undeclared variable: " + v.name);
+					System.err.println("Error in function block " + blockName + ": Undeclared variable: " + v.name);
 					return null;
 				}
 
@@ -1286,6 +1352,13 @@ public class VariableChecker implements SimpleNodeVisitor {
 			}
 		}
         return null;
+	}
+
+
+	// skall troligen tas bort när vi är färdiga
+	public Object visitStandard(SimpleNode n, Object o){
+		System.out.println(n.toString() + "WARNING: visitStandard");
+		return null;
 	}
 
 
