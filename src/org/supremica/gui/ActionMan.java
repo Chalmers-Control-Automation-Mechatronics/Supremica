@@ -3733,6 +3733,56 @@ public class ActionMan
 		}
 	}
 
+	// Generate IEC-61499 Function Block
+	public static void ProjectToIEC61499(Gui gui) {
+
+		// Automata selectedProject = gui.getselectedProject();
+		Project selectedProject = gui.getSelectedProject();
+
+		if (selectedProject.size() < 1) {
+			JOptionPane.showMessageDialog(
+				gui.getComponent(),
+				"At least one automaton must be selected!",
+				"Alert",
+				JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.FBT);
+
+		if (fileExporter.showSaveDialog(gui.getComponent())
+			== JFileChooser.APPROVE_OPTION) {
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null) {
+				if (!currFile.isDirectory()) {
+					try {
+						AutomataToIEC61499 exporter =
+							new AutomataToIEC61499(selectedProject);
+						PrintWriter theWriter =
+							new PrintWriter(new FileWriter(currFile));
+
+						exporter.serializeStructuredText(theWriter);
+						theWriter.close();
+					} catch (Exception ex) {
+						logger.error(
+							"Exception while generating IEC-61499 Function Block code to file "
+								+ currFile.getAbsolutePath());
+						logger.debug(ex.getMessage());
+						logger.debug(ex.getStackTrace());
+
+						return;
+					}
+
+					logger.info(
+						"IEC-61499 Function Block file successfully generated at "
+							+ currFile.getAbsolutePath());
+				}
+			}
+		}
+	}
+
 	// Generate 1131 Structured Text
 	public static void ProjectTo1131ST(Gui gui)
 	{
