@@ -16,6 +16,12 @@ FUNCTION_BLOCK Delayer
 		JMP LOOP
 ENDING:
 END_FUNCTION_BLOCK	
+JAVA_BLOCK JDelayer
+	VAR_IN_OUT
+		LOOPS : DINT;
+	END_VAR
+END_JAVA_BLOCK
+
 PROGRAM PortVaktstest
 	VAR
 		(*Insignaler*)
@@ -33,7 +39,7 @@ PROGRAM PortVaktstest
 		tmp  : BOOL;
 	END_VAR
 	VAR
-		delay : Delayer;
+		delay : JDelayer;
 	END_VAR
 
 (*Print start*)
