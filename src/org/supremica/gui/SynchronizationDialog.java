@@ -82,8 +82,8 @@ class SynchronizationDialogStandardPanel
 		expandForbiddenStatesBox.setToolTipText("If cheched, transitions from forbidden states are " + 
 												"examined, otherwise, the states are considered terminal");
 		expandForbiddenStatesBox.addActionListener(this);
-		rememberDisabledEventsBox = new JCheckBox("Add disabled events to a forbidden state");
-		rememberDisabledEventsBox.setToolTipText("Adds transitions from the uncontrollable states to a new 'dump'-state along the (uncontrollable) event that caused the uncontrollability");
+		rememberDisabledEventsBox = new JCheckBox("Add disabled transitions to a forbidden state");
+		rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in the plant that are disabled by the specification");
 		buildAutomatonBox = new JCheckBox("Build a full automaton model");
 		buildAutomatonBox.setToolTipText("If not checked, the only output is statistics about the operation (saves computation)");
 
