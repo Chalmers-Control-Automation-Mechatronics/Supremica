@@ -124,6 +124,10 @@ public final class SupremicaProperties
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
 
+        // SoftPLC Options
+       	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
+        private static Vector softplcInterfaces = new Vector();
+
 	private Set forbidExternalModification = new HashSet();
 
 	private static final SupremicaProperties wp = new SupremicaProperties();
@@ -179,6 +183,10 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		//setProperty(ANIMATOR_IN_USE, "false", true);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
+		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
+
+                softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
+
 	}
 
 
@@ -709,6 +717,26 @@ public final class SupremicaProperties
 		wp.setProperty(INCLUDE_ANIMATOR, toString(includeAnimator));
 	}
 
+	public static int getSoftplcCycleTime()
+	{
+		return toInt(wp.getProperty(SOFTPLC_CYCLE_TIME));
+	}
+
+	public static void setSoftplcCycleTime(int cycleTime)
+	{
+		wp.setProperty(SOFTPLC_CYCLE_TIME, toString(cycleTime));
+	}
+
+	public static Vector getSoftplcInterfaces()
+	{
+		return softplcInterfaces;
+	}
+
+	public static void setSoftplcInterfaces(Vector interfaces)
+	{
+		softplcInterfaces = interfaces;
+	}
+
 	private static String toString(boolean b)
 	{
 		if (b)
@@ -738,7 +766,7 @@ public final class SupremicaProperties
 
 
 	/**
-	 * Looks for "-p propertyFile", and load it it exists.
+	 * Looks for "-p propertyFile", and loads it if it exists.
 	 */
 	public static void loadProperties(String[] args)
 	{

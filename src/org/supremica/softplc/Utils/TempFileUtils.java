@@ -50,17 +50,6 @@ public class TempFileUtils {
 			if (tempDir.mkdir())
 				return tempDir;
 		}
-		throw new IOException("Could not create directory in " +
-							  systemTempDir);
+		throw new IOException("Could not create directory in " + systemTempDir);
 	}
-
-
-
-
-
-
-
-
-
-
 }

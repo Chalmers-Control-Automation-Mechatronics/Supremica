@@ -2666,6 +2666,7 @@ public class ActionMan
 	public static void RunSimulation(Gui gui)
 	{
 		Project selectedProject = gui.getSelectedProject();
+                File tmpdir;
 
 		if (selectedProject.size() < 1)
 		{
@@ -2674,8 +2675,13 @@ public class ActionMan
 			return;
 		}
 
+                SoftplcSimulationDialog d = new SoftplcSimulationDialog(null, "Run Simulation...", true);
 
-	    try
+                if (!d.showDialog())
+                        return;
+
+                System.out.println(d.getIOInterface().getPath());
+                try
 		{
 			File tmpFile  = File.createTempFile("softplc", ".il");
 			tmpFile.deleteOnExit();
@@ -2685,7 +2691,11 @@ public class ActionMan
 			exporter.serializeInstructionList(theWriter);
 			theWriter.close();
 
-			new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), "/tmp");
+                        tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
+
+			new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), tmpdir.getAbsolutePath());
+                        new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
+
 		}
 		catch (Exception ex)
 		{
@@ -2693,6 +2703,7 @@ public class ActionMan
 			logger.debug(ex.getStackTrace());
 			return;
 		}
+
 		logger.info("Java Bytecode file successfully generated");
 	}
 }

@@ -163,6 +163,7 @@ public class PreferencesDialog
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
 		theSynchronizationPanel.update();
+                theSoftPLCPanel.update();
 	}
 
 	private boolean setAttributes()
@@ -186,6 +187,11 @@ public class PreferencesDialog
 		}
 
 		if (!theSynchronizationPanel.doApply())
+		{
+			return false;
+		}
+
+       		if (!theSoftPLCPanel.doApply())
 		{
 			return false;
 		}
@@ -564,39 +570,27 @@ class SoftPLCPanel
 {
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null;
-        JTextField cycleTime = new JTextField("");
-        private JList ioInterfaceList = new JList();
-        private Vector ioInterface = new Vector();
-
-        JPanel contentPane = new JPanel();
-        GridBagLayout gridBagLayout1 = new GridBagLayout();
-        JLabel jLabel1 = new JLabel();
-        JLabel jLabel2 = new JLabel();
-        JButton removeButton = new JButton();
-        JButton addButton    = new JButton();
-        Hashtable paths = new Hashtable();
+        private JTextField cycleTime = new JTextField();
+        private Vector interfaces = new Vector();
+        private JList ioInterfaceList;
 
 	public SoftPLCPanel(PreferencesDialog theDialog)
 	{
 		this.theDialog = theDialog;
 
-		//		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
-		//add(propertiesBox, BorderLayout.CENTER);
-
-		//
+                JPanel contentPane = new JPanel();
+                GridBagLayout gridBagLayout1 = new GridBagLayout();
+                JLabel jLabel1 = new JLabel("Default cycle time (ms)");
+                JLabel jLabel2 = new JLabel("Available IO-interfaces");
+                JButton removeButton = new JButton("Remove");
+                JButton addButton    = new JButton("Add");
+                JScrollPane interfaceScrollPane = new JScrollPane();
+                interfaces = SupremicaProperties.getSoftplcInterfaces();
+                ioInterfaceList = new JList(interfaces);
 
                 contentPane.setLayout(gridBagLayout1);
                 ioInterfaceList.setVisibleRowCount(2);
-
-                jLabel1.setText("Default cycle time (ms)");
-                jLabel2.setText("Available IO-interfaces");
-                removeButton.setText("Remove");
-                addButton.setText("Add");
-                ioInterface.add("BTSim");
-                ioInterface.add("ProjectSoftPLC");
-
-                paths.put("Test1", "Test11");
-                paths.put("Test2", "Test22");
+                interfaceScrollPane.getViewport().setView(ioInterfaceList);
 
                 addButton.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(ActionEvent e) {
@@ -610,8 +604,7 @@ class SoftPLCPanel
                         }
                 });
 
-                ioInterfaceList.setListData(ioInterface);
-                contentPane.add(ioInterfaceList,                              new GridBagConstraints(0, 3, 1, 2, 1.0, 1.0
+                contentPane.add(interfaceScrollPane,                              new GridBagConstraints(0, 3, 1, 2, 1.0, 1.0
                     ,GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 80, 60, 20), 60, 0));
                 contentPane.add(jLabel1,               new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0
                     ,GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 81, 3, 40), 199, 0));
@@ -625,7 +618,6 @@ class SoftPLCPanel
                     ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 81, 9, 10), 0, 0));
 
                 add(contentPane, BorderLayout.CENTER);
-
 	}
 
         void addButton_actionPerformed(ActionEvent e) {
@@ -638,8 +630,7 @@ class SoftPLCPanel
 			{
 				if (!currFile.isDirectory())
 				{
-                                        paths.put(currFile.getName(), currFile.getAbsolutePath());
-                                        ioInterface.add(currFile.getName());
+                                        interfaces.add(new SoftplcInterface(currFile.getPath()));
                                         ioInterfaceList.updateUI();
 				}
 			}
@@ -647,31 +638,22 @@ class SoftPLCPanel
         }
 
         void removeButton_actionPerformed(ActionEvent e) {
-                paths.remove(ioInterfaceList.getSelectedValue());
-                ioInterface.remove(ioInterfaceList.getSelectedIndex());
+                interfaces.removeElementAt(ioInterfaceList.getSelectedIndex());
                 ioInterfaceList.updateUI();
         }
 
 	public boolean doApply()
 	{
-		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
-
-		//int cycleTime = theDialog.getInt("XML-RPC Port", cycleTime.getText(), 1);
-		int cycleTime = 10;
-
-		if (cycleTime == Integer.MIN_VALUE)
-		{
-			return false;
-		}
-
-		SupremicaProperties.setXmlRpcPort(cycleTime);
+		int cycleTimeInt = theDialog.getInt("Cycle time", cycleTime.getText());
+		SupremicaProperties.setSoftplcCycleTime(cycleTimeInt);
+                SupremicaProperties.setSoftplcInterfaces(interfaces);
 
 		return true;
 	}
 
 	public void update()
 	{
-		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
-		cycleTime.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
+		cycleTime.setText(Integer.toString(SupremicaProperties.getSoftplcCycleTime()));
+                ioInterfaceList.updateUI();
 	}
 }

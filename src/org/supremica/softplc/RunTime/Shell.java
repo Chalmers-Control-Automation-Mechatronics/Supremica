@@ -6,6 +6,7 @@ import org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.*;
 import java.util.*;
 import java.lang.reflect.*;
 import java.text.*;
+import java.io.File;
 
 /**
  * Schedule a task that executes once every x ms.
@@ -30,12 +31,10 @@ public class Shell
     Object[] constructorArgs = { inSignals, outSignals };
     Class ILClass;
 
-    //    public boolean isInitialized = false;
-
-    public Shell(String io, String il)
+    public Shell(String io, String path, String name)
     {
 
-	if (io.length() > 0 && il.length() > 0) {
+	if (io.length() > 0 && name.length() > 0) {
 	    Class IOClass;
 
 	    try
@@ -46,8 +45,8 @@ public class Shell
 		    driver = (DigitalIODriver) IOClass.newInstance();
 		    nr_Of_Signals_In = driver.getNrOfSignalsIn();
 		    nr_Of_Signals_Out = driver.getNrOfSignalsOut();
-            inSignals = new boolean[nr_Of_Signals_In];
-            outSignals = new boolean[nr_Of_Signals_Out];
+                    inSignals = new boolean[nr_Of_Signals_In];
+                    outSignals = new boolean[nr_Of_Signals_Out];
 		}
 	    catch (Exception e)
 		{
@@ -56,9 +55,9 @@ public class Shell
 		    System.exit(-1);
 		}
 
-	    ILShell(il);
+	    ILShell(path, name);
 	}
-	else if (io.length() > 0 && il.length() == 0) {
+	else if (io.length() > 0 && name.length() == 0) {
 
 	    try {
 		DigitalIODisplayView frame = new DigitalIODisplayView(io);
@@ -71,18 +70,18 @@ public class Shell
 
     }
 
-
-    public void ILShell(String dynClass)
+    public void ILShell(String path, String name)
     {
 	try
 	    {
-		ILClass = Class.forName(dynClass);
+                org.supremica.util.FileClassLoader loader = new org.supremica.util.FileClassLoader(path);
+                ILClass = loader.loadClass(name);
 		classConstructor = ILClass.getConstructor(constructorArgumentTypes);
 	    }
 	catch (Exception e)
 	    {
 		System.err.println("1: " + e);
-		System.exit(-1);
+		System.err.println(e.getMessage());
 	    }
 
 	timer = new Timer();
@@ -98,7 +97,7 @@ public class Shell
 
 	public ILTask(boolean[] inputSignals, boolean[] outputSignals)
 	{
- 
+
 	    try
 		{
 		    il_program = (IEC_Program) classConstructor.newInstance(new Object[]{inputSignals, outputSignals});
@@ -106,8 +105,7 @@ public class Shell
 	    catch (Exception exc)
 		{
 		    exc.printStackTrace();
-		    System.err.println("2: " + exc);
-		    System.exit(-1);
+		    System.err.println("2: " + exc.getMessage());
 		}
 	}
 
@@ -118,7 +116,7 @@ public class Shell
 		    System.err.println("=============================");
 		    System.err.println("The time limit was exceeded!");
 		    System.err.println("=============================");
-		}	
+		}
 
 	    try
 		{
@@ -174,7 +172,7 @@ public class Shell
     public static void main(String args[])
     {
 	process_args(args);
-	new Shell(ioclass, ilclass);
+	new Shell(ioclass, ilclass, "");
 
 	/*
 	 *  case 1:
