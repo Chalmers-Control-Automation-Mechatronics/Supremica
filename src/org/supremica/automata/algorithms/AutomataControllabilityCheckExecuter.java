@@ -55,6 +55,9 @@ import org.apache.log4j.*;
 
 import java.util.ArrayList;
 
+/**  
+ * @deprecated DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
+ */
 public final class AutomataControllabilityCheckExecuter
 	extends Thread
 {

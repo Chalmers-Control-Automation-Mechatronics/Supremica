@@ -58,6 +58,10 @@ import java.io.PrintWriter;
 import org.supremica.gui.*;
 import org.apache.log4j.*;
 
+/**
+ * For performing controllability verification. Uses AutomataSynchronizerExecuter for the actual verification work.
+ * @see AutomataSynchronizerExecuter
+ */
 public class AutomataFastControllabilityCheck
 {
 	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheck.class.getName());
@@ -75,14 +79,14 @@ public class AutomataFastControllabilityCheck
 
 	private int nbrOfUncontrollableStates = 0;
 	private int nbrOfUncontrollableSpecifications = 0;
-	private double[] arraySortValue; // Skall vara i findSimilarAutomata()-metoden egentligen!! FIXA!!
 	private Alphabet unionAlphabet;
 
 	// Used in excludeUncontrollableStates
 	private int stateAmount = 1;
 	private int stateAmountLimit = 1000;
 
-	// Verbose mode
+	/** Determines if more detailed information on the progress of things should be displayed.
+	 * @see SynchronizationOptions */
 	private boolean verboseMode;
 
     public AutomataFastControllabilityCheck(Automata theAutomata, SynchronizationOptions syncOptions)
@@ -124,7 +128,10 @@ public class AutomataFastControllabilityCheck
 	    }
     }
 
-	// Boolean, returns true if controllable, false if not or false if don't know.
+	/**
+	 * Performs verification.
+	 * @return true if controllable, false if not or false if don't know.
+	 */
     public boolean execute()
 		throws Exception
 	{
@@ -165,11 +172,10 @@ public class AutomataFastControllabilityCheck
 							}
 						}
 					}
-				}					
+				}
 				
 				if (selectedAutomata.size() > 1)
-				{
-					// Clear the hash-table and set some variables in the synchronization helper
+				{	// Clear the hash-table and set some variables in the synchronization helper
 					synchHelper.clear();
 					synchHelper.setRememberUncontrollable(true);
 					synchHelper.addState(initialState);
@@ -194,11 +200,17 @@ public class AutomataFastControllabilityCheck
 					}
 					((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
 
-					// Print the names of the automata in selectedAutomata
-					Object[] automatonArray = selectedAutomata.toArray();
 					String automataNames = "";
-					for (int i = 0; i < automatonArray.length; i++)
-						automataNames = automataNames + ((Automaton) automatonArray[i]).getName() + " ";
+					if (verboseMode)
+					{	// For printing the names of the automata in selectedAutomata
+						// Object[] automatonArray = selectedAutomata.toArray();
+						Iterator autIt = selectedAutomata.iterator();
+						automataNames = "";
+						// for (int i = 0; i < automatonArray.length; i++)
+						//automataNames = automataNames + ((Automaton) automatonArray[i]).getName() + " ";
+						while (autIt.hasNext())
+							automataNames = automataNames + ((Automaton) autIt.next()).getName() + " ";
+					}
 
 					if (synchHelper.getAutomataIsControllable())
 					{	// Very nice
@@ -240,7 +252,7 @@ public class AutomataFastControllabilityCheck
 									thisCategory.info("Couldn't proove controllability, trying to proove uncontrollability...");
 								
 								// Try to prove remaining states in the stateMemorizer as beeing uncontrollable	
-								if (findUncontrollableStates(theAutomata, automataIndices))
+								if (findUncontrollableStates(automataIndices))
 								{   // Print the uncontrollable state(s)...
 									if (verboseMode)
 										synchHelper.printUncontrollableStates();
@@ -279,18 +291,28 @@ public class AutomataFastControllabilityCheck
 		if (nbrOfUncontrollableStates > 1)
 		{
 			if (verboseMode)
-				thisCategory.info("Can't proove either controllability or uncontrollability. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this automata uncontrollable.");
+				thisCategory.info("Can't proove either controllability or uncontrollability. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes theese automata uncontrollable.");
 		}
 		if (verboseMode)
 			synchHelper.displayInfo();
 		return allSupervisorsControllable;
 	}
 
-	// Finds similar automata and sorts the automata in a smart way...
+	/** 
+	 * Finds similar automata and sorts the automata in a smart way...
+	 * @param selectedAutomata the collection automata in the current "composition".
+	 * @param theAutomata reference to the global variable with the same name... eh... 
+	 * @see #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
+	 * @see #excludeUncontrollableStates(int[], java.util.ArrayList, int[])
+	 */
 	private int[] findSimilarAutomata(Automata theAutomata, ArrayList selectedAutomata)
 		throws Exception
 	{
-		if (theAutomata.size()-selectedAutomata.size() == 0)
+		int amountOfSelected = selectedAutomata.size();
+		int amountOfAutomata = theAutomata.size();
+		int amountOfUnselected = amountOfAutomata - amountOfSelected;
+		// Are there any automata to find in the first place?
+		if (amountOfAutomata == 0)
 			return null;
 
   		// Compute the union alphabet of the automata in selectedAutomata
@@ -305,9 +327,8 @@ public class AutomataFastControllabilityCheck
 		}
 		unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "");
 
-		int[] tempArray = new int[theAutomata.size()-selectedAutomata.size()];
-		// double[] arraySortValue = new double[theAutomata.size()-selectedAutomata.size()];
-	    arraySortValue = new double[theAutomata.size()-selectedAutomata.size()];
+		int[] tempArray = new int[amountOfUnselected];
+	    double[] arraySortValue = new double[amountOfUnselected];
 		int count = 0;
 		boolean found = false;
 		Iterator automataIterator = theAutomata.iterator();
@@ -317,14 +338,14 @@ public class AutomataFastControllabilityCheck
 			arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), unionAlphabet);
 			if (arraySortValue[count] > 0)
 			{
-				for (int i = 0; i < selectedAutomata.size(); i++)
+				for (int i = 0; i < amountOfSelected; i++)
 				{
 					if (currAutomaton == (Automaton) selectedAutomata.get(i))
 						found = true;
 				}
 				if (!found)
 					tempArray[count++] = currAutomaton.getIndex();
-				if (count == theAutomata.size()-selectedAutomata.size())
+				if (count == amountOfUnselected)
 					break;
 				found = false;
 			}
@@ -334,7 +355,7 @@ public class AutomataFastControllabilityCheck
 			return null;
 		int[] outArray = new int[count];
 
-		// Bubblesort the array according to arraySortValue
+		// Bubblesort the array according to arraySortValue... bubblesort? FIXA!
 		double tempDouble = 0;
 		int tempInt = 0;
 		int changes = 1;
@@ -342,7 +363,7 @@ public class AutomataFastControllabilityCheck
 		{
 			changes = 0;
 			for (int i = 0; i < count-1; i++)
-				if (arraySortValue[i] < arraySortValue [i+1])
+				if (arraySortValue[i] < arraySortValue[i+1])
 				{
 					tempInt = tempArray[i];
 					tempArray[i] = tempArray[i+1];
@@ -357,7 +378,13 @@ public class AutomataFastControllabilityCheck
 		return outArray;
 	}
 
-	// Returns double representing how similar the two alphabets are...
+	/**
+	 * Compares two alphabets for determining how similar they are, in some sense. All events in rightAlphabet are
+	 * examined if they are unique to rightAlphabet or appear in leftAlphabet too. 
+	 * @return double representing how similar the two alphabets are. Returns quota between common events in the alphabets and unique events in rightAlphabet.
+	 * @param leftAlphabet the alphabet to compare.
+	 * @param rightAlphabet the alphabet to compare to.
+	 */
 	private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
 	{
 		int amountOfCommon = 0;
@@ -381,6 +408,14 @@ public class AutomataFastControllabilityCheck
 			return Double.MAX_VALUE;
 	}
 
+	/**
+	 * Excudes potentially uncontrollable states from potentiallyUncontrollableStates by synchronizing the 
+	 * automata in the current composition with automata with similar alphabets.
+	 * @param similarAutomata integer array with indices of automata with similar alphabets (from similarAutomata()).
+	 * @param selectedAutomata ArrayList of the Automaton-objects currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier rins of this method).
+	 * @param automataIndices integer array with indices of automata in the current "composition". 
+	 * @see #findSimilarAutomata(org.supremica.automata.Automata, java.util.ArrayList)
+	 */
 	private void excludeUncontrollableStates(int[] similarAutomata, ArrayList selectedAutomata, int[] automataIndices)
 		throws Exception
 	{
@@ -537,7 +572,14 @@ public class AutomataFastControllabilityCheck
 	}
 	*/
 
-	private boolean findUncontrollableStates(Automata theAutomata, int[] automataIndices)
+	/**
+	 * Makes attempt on finding states in the total synchronization that REALLY are uncontrollable. 
+	 * This is done without doing a full synchronization but a full synchronization limited by 
+	 * in the gratest extent possible following the enabled transitions in the current "composition".
+	 *
+	 * @param automataIndices integer array with indices of automata in the current "composition". 
+	 */
+	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
 		synchHelper.clear();

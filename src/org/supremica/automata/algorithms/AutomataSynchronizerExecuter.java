@@ -58,6 +58,13 @@ import java.util.Arrays;
 // For the automata selection methods
 import java.util.ArrayList;
 
+/** 
+ * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis. 
+ *
+ * @see AutomataSynchronizer
+ * @see AutomataFastControllabilityCheck
+ * @see AutomataSynthesizer
+ */
 public final class AutomataSynchronizerExecuter
 	extends Thread
 {
@@ -82,11 +89,23 @@ public final class AutomataSynchronizerExecuter
 	private int[] nextState;
 	private int[] currEnabledEvents;
 	private boolean controllableState;
-
+	
+	/** Options determining how the synchronization should be performed.
+	 */
 	private final SynchronizationOptions syncOptions;
-	private final SynchronizationType syncType;
+	/** Determines if uncontrollable states should be marked as forbidden.
+	 * @see SynchronizationOptions */
 	private boolean forbidUncontrollableStates;
+	/** Determines if uncontrollable states should be expanded in the synchronization.
+	 * @see SynchronizationOptions */
 	private boolean expandForbiddenStates;
+	/** Determines if more detailed information on the progress of things should be displayed.
+	 * @see SynchronizationOptions */
+	private boolean verboseMode;
+	/** Determines synchronization type.
+	 * @see SynchronizationType
+	 * @see SynchronizationOptions */
+	private final SynchronizationType syncType;
 
 	// For AutomataFastControllabilityCheck...
 	private int problemPlant = Integer.MAX_VALUE;
@@ -100,15 +119,15 @@ public final class AutomataSynchronizerExecuter
 	private boolean coExecute = false;
 	private AutomataOnlineSynchronizer coExecuter = null;
 
-	// For "one event at a time"-execution
+	/** For "one event at a time"-execution. */
 	private int currUncontrollableEvent = -1;
 
-	// For stopping of thread
+	/** For stopping of thread. */
 	private boolean stopRequested = false;
 
-	// Verbose mode
-	private boolean verboseMode;
-
+	/**
+	 * @param synchronizerHelper helper for multithread execution.
+	 */
     public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
     {
         helper = synchronizerHelper;
@@ -144,6 +163,9 @@ public final class AutomataSynchronizerExecuter
 		}
     }
 
+	/**
+	 * @deprecated Used by deprecated method AutomataPairWiseCheck.
+	 */
 	// Only used by AutomataPairWiseCheck (removable)
 	// Select two automata
 	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
@@ -156,7 +178,9 @@ public final class AutomataSynchronizerExecuter
 			throw new Exception("Exhaustive search used wrong way!");
 	}
 
-	// Select some automata
+	/**
+	 * Selects the automata in the ArrayList for synchronization.
+	 */
 	public void selectAutomata(ArrayList automataToBeSelected)
 		throws Exception
 	{
@@ -170,7 +194,9 @@ public final class AutomataSynchronizerExecuter
 			throw new Exception("Exhaustive search used wrong way!");
 	}
 
-	// Select some automata
+	/**
+	 * Selects the automata with the indices in automataIndices for synchronization
+	 */
 	public void selectAutomata(int[] automataIndices)
 		throws Exception
 	{
@@ -179,7 +205,9 @@ public final class AutomataSynchronizerExecuter
 			throw new Exception("Exhaustive search used wrong way!");
 	}
 
-	// Selects all automata
+	/**
+	 * Selects all automata for synchronization.
+	 */
 	public void selectAllAutomata()
 	{
 		automataIndices = new int[nbrOfAutomata];
@@ -189,7 +217,9 @@ public final class AutomataSynchronizerExecuter
 		}
 	}
 
-	// ÄNdrad till public istället för private... för att kunna köra findTransistion
+	/**
+	 * Initializes variables vital for the synchronization.
+	 */
 	public final void initialize()
 	{
 		currOutgoingEvents = new int[nbrOfAutomata][];
@@ -202,6 +232,12 @@ public final class AutomataSynchronizerExecuter
 		currEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
 	}
 
+	/**
+	 * Calculates what events are enabled from the state <tt>currState</tt>, if the state turns out
+	 * uncontrollable the boolean controllableState is set false.
+	 *
+	 * @param currState the (full) state to be examined.
+	 */
  	private final void enabledEvents(int[] currState)
   	{
 		int currMinEventIndex = Integer.MAX_VALUE;
@@ -348,11 +384,12 @@ public final class AutomataSynchronizerExecuter
 			{
 				currEnabledEvents[nbrOfEnabledEvents++] = currEventIndex;
 			}
+
 			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
-			{
+			{   // Uncontrollable state found
 				controllableState = false;
 				helper.setAutomataIsControllable(false);
-				//
+
 				if (exhaustiveSearch)
 				{   // Stop when uncontrollable state found
 					if (verboseMode)
@@ -395,7 +432,8 @@ public final class AutomataSynchronizerExecuter
 		}
 
 		if (coExecute)
-		{
+		{   // In co-execution mode, a enabledEvents-method in another executer 
+			// follows the automaton we're suspecting has controllable states.
 			int insertionIndex = 0;
 			int i = 0;
 			int currEvent = currEnabledEvents[i++];
@@ -408,19 +446,25 @@ public final class AutomataSynchronizerExecuter
 				currEvent = currEnabledEvents[i++];
 			}
 			if (insertionIndex == 0)
-			{
-				// thisCategory.debug("Wandering aimlessly...");
+			{   // Found no corresponding transitions in the suspect automaton...
+				if (verboseMode)				
+					thisCategory.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
+				// Here, the insertionIndex sets the maximium amount of states that are examined from such states...
 				// insertionIndex = 2;
 				insertionIndex = 20;
 			}
 			else
-			{
-				// thisCategory.debug("Following the problematic automata, there are " + insertionIndex + " transitions...");
+			{   // There are transitions in the suspect automaton...
+				if (verboseMode)
+					thisCategory.debug("Following transitions in the suspect automaton, there are " + insertionIndex + " such transitions...");
 			}
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;
 		}
 	}
 
+	/**
+	 * Performs the synchronization.
+	 */
     public void run()
     {
     	initialize();
@@ -495,16 +539,33 @@ public final class AutomataSynchronizerExecuter
         }
     }
 
+	/**
+	 * A call to this method stops the execution of the run-method or the buildAutomaton-method as soon as possible.
+	 * The call is made from the AutomataSynchronizer.
+	 *
+	 * @see AutomataSynchronizer
+	 */
 	public void requestStop()
 	{
 		stopRequested = true;
 	}
 
+	/**
+	 * Builds automaton using concatenates state names as new state names.
+	 * 
+	 * @return true if build successful, false if build is stopped with requestStop().
+	 */
 	public boolean buildAutomaton()
     {
 		return buildAutomaton(true);
 	}
 	
+	/**
+	 * Builds automaton using either concatenated state names or new, short, unique names as new state names.
+	 * 
+	 * @param longformId true for concateated state names, false for new names.
+	 * @return true if build successful, false if build is stopped with requestStop().
+	 */
 	public boolean buildAutomaton(boolean longformId)
     {
         Automaton theAutomaton = helper.getAutomaton();
@@ -514,13 +575,24 @@ public final class AutomataSynchronizerExecuter
         int[][] currStateTable = helper.getStateTable();
 		int stateNumber = 0;
 
+		// /*
+		CancelDialog cancelDialog = helper.getCancelDialog();
+		cancelDialog.updateHeader("Building states...");
+		cancelDialog.makeProgressBar(0, currStateTable.length);		
+		// */
+
         // Create all states
 		for (int i = 0; i < currStateTable.length; i++)
   		{
+			// /*
+			if (i % 100 == 0) 
+				cancelDialog.updateCounter(i);
+			// */
+
 			if (stopRequested)
 			{
-				theAlphabet = null;
-				theAutomaton = null;
+				// theAlphabet = null;
+				// theAutomaton = null;
 				// theAutomaton.setDisabled(true);
 				// System.out.println(theAutomaton == null);
 				// System.out.println(helper.getAutomaton() == null);
@@ -558,11 +630,18 @@ public final class AutomataSynchronizerExecuter
 			}
         }
 
-		System.out.println("State building complete...");
+		// /*
+		cancelDialog.updateHeader("Building transitions...");
+		// */
 
         // Create all transitions
  		for (int k = 0; k < currStateTable.length; k++)
   		{
+			// /*
+			if (k % 100 == 0) 
+				cancelDialog.updateCounter(k);
+			// */
+
 			if (stopRequested)
 			{
 				theAlphabet = null;
@@ -624,8 +703,6 @@ public final class AutomataSynchronizerExecuter
           	}
         }
 
-		System.out.println("Transition building complete...");
-
         if (helper.isAllAutomataPlants())
         {
 			theAutomaton.setType(AutomatonType.Plant);
@@ -646,7 +723,7 @@ public final class AutomataSynchronizerExecuter
 		return true;
     }
 
-    public String printTypeIsPlantTable()
+   private String printTypeIsPlantTable()
     {
 		StringBuffer sb = new StringBuffer();
 		sb.append("[");
@@ -737,7 +814,14 @@ public final class AutomataSynchronizerExecuter
     }
 */
 
-	// Returns index of one (of perhaps many) transitions between fromState and toState or -1 if none exists.
+	/**
+	 * Method for finding transitions between states. Used by displayTrace() in AutomataSynchronizerHelper.
+	 *
+	 * @param fromState state to find transition from.
+	 * @param toState state to find transition to.
+	 * @see AutomataSynchronizerHelper#displayTrace()
+	 * @return index of one (of perhaps many) transitions between fromState and toState or -1 if none exists.
+	 */
 	public int findTransition(int[] fromState, int[] toState)
 	{
 		enabledEvents(fromState);
@@ -768,8 +852,11 @@ public final class AutomataSynchronizerExecuter
 		return -1;
 	}
 
-	// Compares int arrays, except for the last element (the status field)
-	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
+	/**
+	 * Compares two arrays, except for the last element (the status field)
+	 * @return true if equal, false otherwise.
+	 */
+ 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
  	{	// Assume that the last element is a status field
 		for (int i = 0; i < firstArray.length - 1; i++)
   		{
@@ -779,6 +866,10 @@ public final class AutomataSynchronizerExecuter
         return true;
 	}
 
+	/** 
+	 * Select uncontrollable event (for "one event at a time"-execution).
+	 * @param event the current uncontrollable event the synchronization should focus on.
+	 */
 	public void setCurrUncontrollableEvent(Event event)
 	{
 		currUncontrollableEvent = event.getSynchIndex();

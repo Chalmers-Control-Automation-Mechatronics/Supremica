@@ -55,10 +55,12 @@ import org.apache.log4j.*;
 
 import java.util.ArrayList;
 
+/**  
+ * @deprecated DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
+ */
 public final class AutomataFastControllabilityCheckExecuter
 	extends Thread
 {
-	/* // DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
 	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheckExecuter.class.getName());
 
 	private final AutomataSynchronizerHelper helper;

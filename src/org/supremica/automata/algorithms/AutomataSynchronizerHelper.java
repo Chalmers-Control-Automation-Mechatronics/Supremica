@@ -173,6 +173,7 @@ public final class AutomataSynchronizerHelper
 		automataIsControllable = true;
 		theStates.clear();
 		coExecute = false;
+		coExecuter = null;
 		rememberTrace = false;
 		exhaustiveSearch = false;
 		rememberUncontrollable = false;
