@@ -4,7 +4,7 @@
 	<Events>
 		<Event id="a" label="a" controllable="true" prioritized="true"/>
 		<Event id="b" label="b" controllable="true" prioritized="true"/>
-		<Event id="c" label="b" controllable="false" prioritized="true"/>
+		<Event id="c" label="c" controllable="true" prioritized="true"/>
 	</Events>
 	<States>
 		<State id="r1" name="r1" initial="true" accepting="true"/>
