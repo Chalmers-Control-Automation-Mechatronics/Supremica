@@ -51,9 +51,12 @@ package org.supremica.gui.animators.scenebeans;
 
 import java.net.URL;
 import uk.ac.ic.doc.scenebeans.animation.parse.*;
+import org.supremica.log.*;
 
 public class AnimationItem
 {
+	private static Logger logger = LoggerFactory.createLogger(AnimationItem.class);
+
 	private String description;
 	private URL url;
 
@@ -76,12 +79,14 @@ public class AnimationItem
 	public Animator createInstance()
 		throws Exception
 	{
+		logger.debug("createInstance no url");
 		return AnimationItem.createInstance(url);
 	}
 
 	public static Animator createInstance(URL url)
 		throws Exception
 	{
+		logger.debug("createInstance url: " + url);
 		try
 		{
 			final Animator view = new Animator(" Path: " + url.toString());

@@ -284,7 +284,7 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_REDUCE_SUPERVISORS, "false", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
-		setProperty(INCLUDE_USERINTERFACE, "true", true);
+		setProperty(INCLUDE_USERINTERFACE, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
 		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
