@@ -7,7 +7,6 @@ import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import org.supremica.log.Logger;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
-//import java.io.File;
 
 /**The class ProgramAndFBBuilder handles all common parts of code generation
  * for its sub classes.
@@ -1311,7 +1310,13 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitMOD arg1 mod arg2: returns 0 when arg1 MOD 0, else arg1 - (arg1/arg2)*arg2
+    /**emitMOD DINT: arg1 mod arg2: returns 0 when arg1 MOD 0, else arg1 - (arg1/arg2)*arg2
+     * REAL: where neither operand is an infinity, a zero, or NaN, the floating-point remainder
+     * result from a dividend value1' and a divisor value2' is defined by the mathematical relation
+     * result = value1' - (value2' * q), where q is an integer that is negative only if value1' / value2'
+     * is negative and positive only if value1' / value2' is positive, and whose magnitude is as large
+     * as possible without exceeding the magnitude of the true mathematical quotient of
+     * value1' and value2'.
      * @param arg an IL BOOL-variable
      */
     private void emitMOD(Object arg)
@@ -1344,9 +1349,14 @@ public abstract class ProgramAndFBBuilder
 			ifeq.setTarget(mod_0);
 			jmp.setTarget(end_mod);
 		    }
+		else if (t == TypeConstant.T_REAL)
+		    {
+			ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
+			ilRun.append(InstructionConstants.FREM);
+		    }
 		else
 		    {
-			error("Type error using MOD, only DINT allowed");
+			error("Type error using MOD");
 		    }
 	    }
 	else if (arg instanceof IECVariable)
@@ -1383,9 +1393,14 @@ public abstract class ProgramAndFBBuilder
 			ifeq.setTarget(mod_0);
 			jmp.setTarget(end_mod);
 		    }
+		else if (t == TypeConstant.T_REAL)
+		    {
+			ilRun.append(emitLoadVariable(var));
+			ilRun.append(InstructionConstants.FREM);
+		    }
 		else
 		    {
-			error("Type error using MOD, only DINT allowed");
+			error("Type error using MOD");
 		    }
 	    }
 	else
@@ -1422,6 +1437,7 @@ public abstract class ProgramAndFBBuilder
 			    {
 				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
 				ilRun.append(InstructionConstants.FSUB);
+				ilRun.append(InstructionConstants.F2I);
 			    }			    
 			InstructionHandle if_true;
 			BranchInstruction ifeq = new IFEQ(null);
@@ -1456,13 +1472,14 @@ public abstract class ProgramAndFBBuilder
 		    }
 
 		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT
-		    ||  t == TypeConstant.T_REAL) {
+		                             ||  t == TypeConstant.T_REAL) {
 		    ilRun.append(emitLoadVariable(var));
 		    if (t == TypeConstant.T_BOOL || t == TypeConstant.T_DINT) {
 			ilRun.append(InstructionConstants.ISUB);
 		    }
 		    else {
 			ilRun.append(InstructionConstants.FSUB);
+			ilRun.append(InstructionConstants.F2I);
 		    }			    
 
 		    InstructionHandle if_true;
@@ -1499,25 +1516,39 @@ public abstract class ProgramAndFBBuilder
 	    {
 		TypeConstant t = ((IECConstant) arg).getType();
 
-		if (t == TypeConstant.T_DINT)
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT ||
+		    t == TypeConstant.T_REAL)
 		    {
-			ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
-			ilRun.append(InstructionConstants.ISUB);
-
+			if (t == TypeConstant.T_BOOL)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else if (t == TypeConstant.T_DINT)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
+				ilRun.append(InstructionConstants.FSUB);
+				ilRun.append(InstructionConstants.F2I);
+			    }
 			InstructionHandle if_true;
 			BranchInstruction ifgt = new IFGT(null);
-
+			
 			ilRun.append(ifgt);    // if condition is true, jump to if_true
 			ilRun.append(new PUSH(constPoolGen, false));
-
+			
 			InstructionHandle end;
 			BranchInstruction jmp = new GOTO(null);
-
+			
 			ilRun.append(jmp);    // always jump to end
-
+			
 			if_true = ilRun.append(new PUSH(constPoolGen, true));
 			end = ilRun.append(InstructionConstants.NOP);
-
+			
 			ifgt.setTarget(if_true);
 			jmp.setTarget(end);
 		    }
@@ -1536,28 +1567,34 @@ public abstract class ProgramAndFBBuilder
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
 
-		if (t == TypeConstant.T_DINT)
-		    {
-			ilRun.append(emitLoadVariable(var));
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT
+		                             ||  t == TypeConstant.T_REAL) {
+		    ilRun.append(emitLoadVariable(var));
+		    if (t == TypeConstant.T_BOOL || t == TypeConstant.T_DINT) {
 			ilRun.append(InstructionConstants.ISUB);
-
-			InstructionHandle if_true;
-			BranchInstruction ifgt = new IFGT(null);
-
-			ilRun.append(ifgt);    // if condition is true, jump to if_true
-			ilRun.append(new PUSH(constPoolGen, false));
-
-			InstructionHandle end;
-			BranchInstruction jmp = new GOTO(null);
-
-			ilRun.append(jmp);    // always jump to end
-
-			if_true = ilRun.append(new PUSH(constPoolGen, true));
-			end = ilRun.append(InstructionConstants.NOP);
-
-			ifgt.setTarget(if_true);
-			jmp.setTarget(end);
 		    }
+		    else {
+			ilRun.append(InstructionConstants.FSUB);
+			ilRun.append(InstructionConstants.F2I);
+		    }
+		    
+		    InstructionHandle if_true;
+		    BranchInstruction ifgt = new IFGT(null);
+		    
+		    ilRun.append(ifgt);    // if condition is true, jump to if_true
+		    ilRun.append(new PUSH(constPoolGen, false));
+		    
+		    InstructionHandle end;
+		    BranchInstruction jmp = new GOTO(null);
+		    
+		    ilRun.append(jmp);    // always jump to end
+		    
+		    if_true = ilRun.append(new PUSH(constPoolGen, true));
+		    end = ilRun.append(InstructionConstants.NOP);
+		    
+		    ifgt.setTarget(if_true);
+		    jmp.setTarget(end);
+		}
 		else
 		    {
 			error("Type error using GT");
@@ -1578,11 +1615,26 @@ public abstract class ProgramAndFBBuilder
 	    {
 		TypeConstant t = ((IECConstant) arg).getType();
 
-		if (t == TypeConstant.T_DINT)
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT ||
+		    t == TypeConstant.T_REAL)
 		    {
-			ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
-			ilRun.append(InstructionConstants.ISUB);    // preperation for comparison by
-
+			if (t == TypeConstant.T_BOOL)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else if (t == TypeConstant.T_DINT)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
+				ilRun.append(InstructionConstants.FSUB);
+				ilRun.append(InstructionConstants.F2I);
+			    }
+			
 			// subtracting values on the stack
 			InstructionHandle if_true;
 			BranchInstruction ifge = new IFGE(null);
@@ -1616,28 +1668,34 @@ public abstract class ProgramAndFBBuilder
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
 
-		if (t == TypeConstant.T_DINT)
-		    {
-			ilRun.append(emitLoadVariable(var));
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT
+		                             ||  t == TypeConstant.T_REAL) {
+		    ilRun.append(emitLoadVariable(var));
+		    if (t == TypeConstant.T_BOOL || t == TypeConstant.T_DINT) {
 			ilRun.append(InstructionConstants.ISUB);
-
-			InstructionHandle if_true;
-			BranchInstruction ifge = new IFGE(null);
-
-			ilRun.append(ifge);    // if condition is true, jump to if_true
-			ilRun.append(new PUSH(constPoolGen, false));
-
-			InstructionHandle end;
-			BranchInstruction jmp = new GOTO(null);
-
-			ilRun.append(jmp);    // always jump to end
-
-			if_true = ilRun.append(new PUSH(constPoolGen, true));
-			end = ilRun.append(InstructionConstants.NOP);
-
-			ifge.setTarget(if_true);
-			jmp.setTarget(end);
 		    }
+		    else {
+			ilRun.append(InstructionConstants.FSUB);
+			ilRun.append(InstructionConstants.F2I);
+		    }
+		    
+		    InstructionHandle if_true;
+		    BranchInstruction ifge = new IFGE(null);
+		    
+		    ilRun.append(ifge);    // if condition is true, jump to if_true
+		    ilRun.append(new PUSH(constPoolGen, false));
+		    
+		    InstructionHandle end;
+		    BranchInstruction jmp = new GOTO(null);
+		    
+		    ilRun.append(jmp);    // always jump to end
+		    
+		    if_true = ilRun.append(new PUSH(constPoolGen, true));
+		    end = ilRun.append(InstructionConstants.NOP);
+		    
+		    ifge.setTarget(if_true);
+		    jmp.setTarget(end);
+		}
 		else
 		    {
 			error("Type error using GE");
@@ -1658,10 +1716,25 @@ public abstract class ProgramAndFBBuilder
 	    {
 		TypeConstant t = ((IECConstant) arg).getType();
 
-		if (t == TypeConstant.T_DINT)
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT ||
+		    t == TypeConstant.T_REAL)
 		    {
-			ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
-			ilRun.append(InstructionConstants.ISUB);    // preperation for comparison by
+			if (t == TypeConstant.T_BOOL)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else if (t == TypeConstant.T_DINT)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
+				ilRun.append(InstructionConstants.FSUB);
+				ilRun.append(InstructionConstants.F2I);
+			    }
 
 			// subtracting values on the stack
 			InstructionHandle if_true;
@@ -1696,28 +1769,34 @@ public abstract class ProgramAndFBBuilder
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
 
-		if (t == TypeConstant.T_DINT)
-		    {
-			ilRun.append(emitLoadVariable(var));
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT
+		                             ||  t == TypeConstant.T_REAL) {
+		    ilRun.append(emitLoadVariable(var));
+		    if (t == TypeConstant.T_BOOL || t == TypeConstant.T_DINT) {
 			ilRun.append(InstructionConstants.ISUB);
-
-			InstructionHandle if_true;
-			BranchInstruction iflt = new IFLT(null);
-
-			ilRun.append(iflt);    // if condition is true, jump to if_true
-			ilRun.append(new PUSH(constPoolGen, false));
-
-			InstructionHandle end;
-			BranchInstruction jmp = new GOTO(null);
-
-			ilRun.append(jmp);    // always jump to end
-
-			if_true = ilRun.append(new PUSH(constPoolGen, true));
-			end = ilRun.append(InstructionConstants.NOP);
-
-			iflt.setTarget(if_true);
-			jmp.setTarget(end);
 		    }
+		    else {
+			ilRun.append(InstructionConstants.FSUB);
+			ilRun.append(InstructionConstants.F2I);
+		    }
+			
+		    InstructionHandle if_true;
+		    BranchInstruction iflt = new IFLT(null);
+		    
+		    ilRun.append(iflt);    // if condition is true, jump to if_true
+		    ilRun.append(new PUSH(constPoolGen, false));
+		    
+		    InstructionHandle end;
+		    BranchInstruction jmp = new GOTO(null);
+		    
+		    ilRun.append(jmp);    // always jump to end
+
+		    if_true = ilRun.append(new PUSH(constPoolGen, true));
+		    end = ilRun.append(InstructionConstants.NOP);
+		    
+		    iflt.setTarget(if_true);
+		    jmp.setTarget(end);
+		}
 		else
 		    {
 			error("Type error using LT");
@@ -1738,10 +1817,25 @@ public abstract class ProgramAndFBBuilder
 	    {
 		TypeConstant t = ((IECConstant) arg).getType();
 
-		if (t == TypeConstant.T_DINT)
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT ||
+		    t == TypeConstant.T_REAL)
 		    {
-			ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
-			ilRun.append(InstructionConstants.ISUB);    // preperation for comparison by
+			if (t == TypeConstant.T_BOOL)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else if (t == TypeConstant.T_DINT)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
+				ilRun.append(InstructionConstants.FSUB);
+				ilRun.append(InstructionConstants.F2I);
+			    }
 
 			// subtracting values on the stack
 			InstructionHandle if_true;
@@ -1776,28 +1870,34 @@ public abstract class ProgramAndFBBuilder
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
 
-		if (t == TypeConstant.T_DINT)
-		    {
-			ilRun.append(emitLoadVariable(var));
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT
+		                             ||  t == TypeConstant.T_REAL) {
+		    ilRun.append(emitLoadVariable(var));
+		    if (t == TypeConstant.T_BOOL || t == TypeConstant.T_DINT) {
 			ilRun.append(InstructionConstants.ISUB);
-
-			InstructionHandle if_true;
-			BranchInstruction ifle = new IFLE(null);
-
-			ilRun.append(ifle);    // if condition is true, jump to if_true
-			ilRun.append(new PUSH(constPoolGen, false));
-
-			InstructionHandle end;
-			BranchInstruction jmp = new GOTO(null);
-
-			ilRun.append(jmp);    // always jump to end
-
-			if_true = ilRun.append(new PUSH(constPoolGen, true));
-			end = ilRun.append(InstructionConstants.NOP);
-
-			ifle.setTarget(if_true);
-			jmp.setTarget(end);
 		    }
+		    else {
+			ilRun.append(InstructionConstants.FSUB);
+			ilRun.append(InstructionConstants.F2I);
+		    }
+
+		    InstructionHandle if_true;
+		    BranchInstruction ifle = new IFLE(null);
+		    
+		    ilRun.append(ifle);    // if condition is true, jump to if_true
+		    ilRun.append(new PUSH(constPoolGen, false));
+		    
+		    InstructionHandle end;
+		    BranchInstruction jmp = new GOTO(null);
+		    
+		    ilRun.append(jmp);    // always jump to end
+		    
+		    if_true = ilRun.append(new PUSH(constPoolGen, true));
+		    end = ilRun.append(InstructionConstants.NOP);
+		    
+		    ifle.setTarget(if_true);
+		    jmp.setTarget(end);
+		}
 		else
 		    {
 			error("Type error using LE");
@@ -1818,35 +1918,26 @@ public abstract class ProgramAndFBBuilder
 	    {
 		TypeConstant t = ((IECConstant) arg).getType();
 
-		if (t == TypeConstant.T_BOOL)
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT ||
+		    t == TypeConstant.T_REAL)
 		    {
-			ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
-			ilRun.append(InstructionConstants.ISUB);
+			if (t == TypeConstant.T_BOOL)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else if (t == TypeConstant.T_DINT)
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
+				ilRun.append(InstructionConstants.ISUB);
+			    }
+			else
+			    {
+				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
+				ilRun.append(InstructionConstants.FSUB);
+				ilRun.append(InstructionConstants.F2I);
+			    }
 
-			InstructionHandle if_true;
-			BranchInstruction ifne = new IFNE(null);
-
-			ilRun.append(ifne);    // if condition is true, jump to if_true
-			ilRun.append(new PUSH(constPoolGen, false));
-
-			InstructionHandle end;
-			BranchInstruction jmp = new GOTO(null);
-
-			ilRun.append(jmp);    // always jump to end
-
-			if_true = ilRun.append(new PUSH(constPoolGen, true));
-			end = ilRun.append(InstructionConstants.NOP);
-
-			ifne.setTarget(if_true);
-			jmp.setTarget(end);
-		    }
-			
-		else if (t == TypeConstant.T_DINT)
-		    {
-			ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
-			ilRun.append(InstructionConstants.ISUB);    // preperation for comparison by
-
-			// subtracting values on the stack
 			InstructionHandle if_true;
 			BranchInstruction ifne = new IFNE(null);
 
@@ -1879,28 +1970,34 @@ public abstract class ProgramAndFBBuilder
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
 
-		if (t == TypeConstant.T_DINT)
-		    {
-			ilRun.append(emitLoadVariable(var));
+		if (t == TypeConstant.T_BOOL ||  t == TypeConstant.T_DINT
+		                             ||  t == TypeConstant.T_REAL) {
+		    ilRun.append(emitLoadVariable(var));
+		    if (t == TypeConstant.T_BOOL || t == TypeConstant.T_DINT) {
 			ilRun.append(InstructionConstants.ISUB);
-
-			InstructionHandle if_true;
-			BranchInstruction ifne = new IFNE(null);
-
-			ilRun.append(ifne);    // if condition is true, jump to if_true
-			ilRun.append(new PUSH(constPoolGen, false));
-
-			InstructionHandle end;
-			BranchInstruction jmp = new GOTO(null);
-
-			ilRun.append(jmp);    // always jump to end
-
-			if_true = ilRun.append(new PUSH(constPoolGen, true));
-			end = ilRun.append(InstructionConstants.NOP);
-
-			ifne.setTarget(if_true);
-			jmp.setTarget(end);
 		    }
+		    else {
+			ilRun.append(InstructionConstants.FSUB);
+			ilRun.append(InstructionConstants.F2I);
+		    }
+			
+		    InstructionHandle if_true;
+		    BranchInstruction ifne = new IFNE(null);
+		    
+		    ilRun.append(ifne);    // if condition is true, jump to if_true
+		    ilRun.append(new PUSH(constPoolGen, false));
+		    
+		    InstructionHandle end;
+		    BranchInstruction jmp = new GOTO(null);
+
+		    ilRun.append(jmp);    // always jump to end
+		    
+		    if_true = ilRun.append(new PUSH(constPoolGen, true));
+		    end = ilRun.append(InstructionConstants.NOP);
+		    
+		    ifne.setTarget(if_true);
+		    jmp.setTarget(end);
+		}
 		else
 		    {
 			error("Type error using NE");
