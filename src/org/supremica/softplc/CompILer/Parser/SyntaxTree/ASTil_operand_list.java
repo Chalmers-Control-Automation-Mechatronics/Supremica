@@ -2,6 +2,7 @@
 package org.supremica.softplc.CompILer.Parser.SyntaxTree;
 
 import org.supremica.softplc.CompILer.Parser.*;
+import java.util.LinkedList;
 
 public class ASTil_operand_list
 	extends SimpleNode
@@ -17,6 +18,17 @@ public class ASTil_operand_list
 	}
 
 	// Appended
+
+	private LinkedList operands = new LinkedList();
+
+	public void addOperand(Operand o) {
+		operands.add(o);
+	}
+
+	public LinkedList getOperands() {
+		return operands;
+	}
+
 	public Object visit(SimpleNodeVisitor v, Object o)
 	{
 		return v.visitIL_OPERAND_LIST(this, o);

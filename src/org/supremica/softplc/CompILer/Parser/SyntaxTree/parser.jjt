@@ -1924,9 +1924,11 @@ Operand il_operand() #void :
 
 
 void il_operand_list() :
-{}
 {
-	il_operand() ("," il_operand())*
+	Operand o;
+}
+{
+	o = il_operand() {jjtThis.addOperand(o);} ("," o = il_operand() {jjtThis.addOperand(o);})*
 }
 
 

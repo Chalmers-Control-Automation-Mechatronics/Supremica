@@ -5805,14 +5805,16 @@ Operand il_operand()       :
 
 void il_operand_list() :
 {/*@bgen(jjtree) il_operand_list */
-  ASTil_operand_list jjtn000 = new ASTil_operand_list(JJTIL_OPERAND_LIST);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_operand_list jjtn000 = new ASTil_operand_list(JJTIL_OPERAND_LIST);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Operand o;
+}
 {/*@bgen(jjtree) il_operand_list */
         try {
 /*@egen*/
-	il_operand() ("," il_operand())*/*@bgen(jjtree)*/
+	o = il_operand() {jjtn000.addOperand(o);} ("," o = il_operand() {jjtn000.addOperand(o);})*/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
