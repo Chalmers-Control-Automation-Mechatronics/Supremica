@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.9 2005-03-03 05:36:29 flordal Exp $
+//# $Id: EditorSurface.java,v 1.10 2005-03-03 09:42:02 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -722,11 +722,22 @@ public class EditorSurface
 
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			EditorNode n = (EditorNode) nodes.get(i);
+			EditorNode ng = (EditorNode) nodes.get(i);
 			
-			if (r.getBounds().contains(n.getPosition()))
+			if (r.getBounds().contains(ng.getPosition()))
 			{
-				selection.add(n);
+				selection.add(ng);
+			}
+		}
+		
+		for (int i = 0; i < edges.size(); i++)
+		{
+			EditorEdge e = (EditorEdge) edges.get(i);
+			
+			Rectangle bounds = r.getBounds();
+			if (bounds.contains(e.getSourceHandle()) && bounds.contains(e.getCenterHandle()) && bounds.contains(e.getTargetHandle()))
+			{
+				selection.add(e);
 			}
 		}
 		

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.11 2005-03-03 05:36:29 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.12 2005-03-03 09:42:02 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -121,6 +121,7 @@ public class ControlledSurface
 			selectedObjects.add(o);
 			o.setSelected(true);
 
+			// Select children
 			LinkedList children = getChildren(o);
 			while (children.size() != 0)
 			{
@@ -135,7 +136,13 @@ public class ControlledSurface
 		{
 			selectedObjects.remove(o);
 			o.setSelected(false);
-			//deselectAllWithParent(o);
+
+			// Deselect children
+			LinkedList children = getChildren(o);
+			while (children.size() != 0)
+			{
+				((EditorObject) children.remove(0)).setSelected(false);
+			}
 		}
 	}
 
@@ -516,16 +523,16 @@ public class ControlledSurface
 						{
 							for (int i = 0; i < edges.size(); i++)
 							{
-								EditorEdge f = (EditorEdge) edges.get(i);
+								EditorEdge edge = (EditorEdge) edges.get(i);
 
-								if (f.getStartNode() == node)
+								if (edge.getStartNode() == node)
 								{
-									f.updateControlPoint(oldx, oldy, true);
+									edge.updateControlPoint(oldx, oldy, true);
 								}
 
-								if (f.getEndNode() == node)
+								if (edge.getEndNode() == node)
 								{
-									f.updateControlPoint(oldx, oldy, false);
+									edge.updateControlPoint(oldx, oldy, false);
 								}
 							}
 						}

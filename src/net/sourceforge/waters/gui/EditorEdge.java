@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.9 2005-03-03 05:36:29 flordal Exp $
+//# $Id: EditorEdge.java,v 1.10 2005-03-03 09:42:02 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -36,13 +36,17 @@ public class EditorEdge
 	EditorObject startNode;
 	EditorNode endNode;
 	private Point2D.Double tPoint;
+
+	/** Boolean keeping track of whether the edge is a straight line or not. */
 	private boolean straight;
-	private boolean dragC = false;
-	private boolean dragS = false;
-	private boolean dragT = false;
+
 	private Rectangle2D.Double source = new Rectangle2D.Double();
-	private Rectangle2D.Double target = new Rectangle2D.Double();
+	private boolean dragS = false;
+	private Rectangle2D.Double target = new Rectangle2D.Double();	
+	private boolean dragT = false;	
 	private Rectangle2D.Double center = new Rectangle2D.Double();
+	private boolean dragC = false;
+
 	private EdgeProxy proxy;
 	private Point2D.Double start;
 	private static double tearRatio = .8;
@@ -128,6 +132,9 @@ public class EditorEdge
 			}
 		}
 
+		// Initialize the edge
+		updateControlPoint(getCPointX(), getCPointY(), false);
+
 		type = EDGE;
 	}
 
@@ -206,18 +213,33 @@ public class EditorEdge
 		return start;
 	}
 
+	public Rectangle2D.Double getSourceHandle()
+	{
+		return source;
+	}
+
+	public Rectangle2D.Double getTargetHandle()
+	{
+		return target;
+	}
+
+	public Rectangle2D.Double getCenterHandle()
+	{
+		return center;
+	}
+
 	public void setSource(int x, int y)
 	{
 		source.setRect(x, y, 0, 0);
-		target.setRect(endNode.getX(), endNode.getY(), 0, 0);
 		center.setRect(0, 0, 0, 0);
+		target.setRect(endNode.getX(), endNode.getY(), 0, 0);
 	}
 
 	public void setTarget(int x, int y)
 	{
-		target.setRect(x, y, 0, 0);
 		source.setRect(start.getX(), start.getY(), 0, 0);
 		center.setRect(0, 0, 0, 0);
+		target.setRect(x, y, 0, 0);
 	}
 
 	public void setStartNode(EditorObject newstartNode, int x, int y)
