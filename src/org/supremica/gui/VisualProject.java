@@ -107,6 +107,43 @@ public class VisualProject
 		projectFile = null;
 	}
 
+	public void automatonRenamed(Automaton aut, String oldName)
+	{
+		AutomatonViewer theViewer = (AutomatonViewer)theAutomatonViewerContainer.get(oldName);
+		if (theViewer != null)
+		{
+			theAutomatonViewerContainer.remove(oldName);
+			theAutomatonViewerContainer.put(aut.getName(), theViewer);
+		}
+		AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(oldName);
+		if (theExplorer != null)
+		{
+			theAutomatonExplorerContainer.remove(oldName);
+			theAutomatonExplorerContainer.put(aut.getName(), theExplorer);
+		}
+		JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(oldName);
+		if (theFrame != null)
+		{
+			theAutomatonFrameContainer.remove(oldName);
+			theAutomatonFrameContainer.put(aut.getName(), theFrame);
+		}
+		AutomatonDocument theDocument = (AutomatonDocument) theAutomatonDocumentContainer.get(oldName);
+		if (theDocument != null)
+		{
+			theAutomatonDocumentContainer.remove(oldName);
+			theAutomatonDocumentContainer.put(aut.getName(), theDocument);
+
+		}
+		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAutomatonDocumentContainer.get(oldName);
+		if (theAlphabetViewer != null)
+		{
+			theAutomatonDocumentContainer.remove(oldName);
+			theAutomatonDocumentContainer.put(aut.getName(), theAlphabetViewer);
+		}
+		super.automatonRenamed(aut, oldName);
+
+	}
+
 	public void removeAutomaton(Automaton aut)
 	{
 		super.removeAutomaton(aut);

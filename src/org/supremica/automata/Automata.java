@@ -57,6 +57,7 @@ import org.supremica.log.*;
  * @see Automaton
  */
 public class Automata
+	implements AutomatonListener
 {
 	private static Logger logger = LoggerFactory.createLogger(Automata.class);
 	private ArrayList theAutomata;
@@ -118,6 +119,7 @@ public class Automata
 	{
 		theAutomata.add(aut);
 		nameMap.put(aut.getName(), aut);
+		aut.addListener(this);
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
 
 		// logger.debug("Automata.addAutomaton: " + aut.getName());
@@ -150,11 +152,9 @@ public class Automata
 
 	public void renameAutomaton(Automaton aut, String newName)
 	{
-		nameMap.remove(aut.getName());
 		aut.setName(newName);
-		nameMap.put(aut.getName(), aut);
-		notifyListeners(AutomataListeners.MODE_AUTOMATON_RENAMED, aut);
 	}
+
 
 	public void setOwner(String owner)
 	{
@@ -371,6 +371,38 @@ public class Automata
 		while (containsAutomaton(newName));
 
 		return newName;
+	}
+
+	public void stateAdded(Automaton aut, State q)
+	{ // Do nothing
+	}
+
+	public void stateRemoved(Automaton aut, State q)
+	{ // Do nothing
+	}
+
+	public void arcAdded(Automaton aut, Arc a)
+	{ // Do nothing
+	}
+
+	public void arcRemoved(Automaton aut, Arc a)
+	{ // Do nothing
+	}
+
+	public void attributeChanged(Automaton aut)
+	{ // Do nothing
+	}
+
+	public void automatonRenamed(Automaton aut, String oldName)
+	{
+		nameMap.remove(oldName);
+		nameMap.put(aut.getName(), aut);
+		notifyListeners(AutomataListeners.MODE_AUTOMATON_RENAMED, aut);
+	}
+
+	public void updated(Object obj)
+	{
+		notifyListeners();
 	}
 
 	public AutomataListeners getListeners()

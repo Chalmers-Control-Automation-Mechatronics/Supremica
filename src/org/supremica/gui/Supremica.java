@@ -796,7 +796,7 @@ public class Supremica
 
 		JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
 
-		menuToolsCodeGenerationIL.setText("IEC-1131 Instruction List...");
+		menuToolsCodeGenerationIL.setText("IEC-61131 Instruction List...");
 		menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
 		menuToolsCodeGenerationIL.addActionListener(new ActionListener()
 		{
@@ -809,7 +809,7 @@ public class Supremica
 
 		JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
 
-		menuToolsCodeGeneration1131ST.setText("IEC-1131 Structured Text...");
+		menuToolsCodeGeneration1131ST.setText("IEC-61131 Structured Text...");
 		menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
 		menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
 		{

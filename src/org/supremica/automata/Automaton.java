@@ -146,8 +146,8 @@ public class Automaton
 		}
 		catch (Exception e)
 		{
-			System.err.println("Error while copying transitions");
-			System.exit(0);
+			logger.error("Automaton.Automaton(Automaton): Error while copying transitions");
+			return;
 		}
 	}
 
