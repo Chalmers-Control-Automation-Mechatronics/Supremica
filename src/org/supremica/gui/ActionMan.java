@@ -1452,16 +1452,21 @@ public class ActionMan
 			return;
 		}
 
+		FileSecurity fileSecurity = gui.getFileSecurity();
 		if (SupremicaProperties.generalUseSecurity())
 		{
-			FileSecurity fileSecurity = gui.getFileSecurity();
-
 			if (!fileSecurity.allowOpening(currAutomata))
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to open this file", "alert", JOptionPane.ERROR_MESSAGE);
 
 				return;
 			}
+		}
+
+		// We should always check owner and hash when it is present
+		if (!(currAutomata.getOwner() == null && currAutomata.getHash() == null) && !fileSecurity.hasCorrectHash(currAutomata))
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "The automata has an invalid hash", "alert", JOptionPane.WARNING_MESSAGE);
 		}
 
 		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
@@ -1675,7 +1680,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	// 
+	//
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);

@@ -63,7 +63,7 @@ public class Automata
 	private HashMap nameMap;
 	private String name = null;
 	private AutomataListeners listeners = null;
-	private String owner = "Supremica";
+	private String owner = null;
 	private String hash = null;
 
 	public Automata()
