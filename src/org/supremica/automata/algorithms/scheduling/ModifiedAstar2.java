@@ -1,4 +1,4 @@
-
+ 
 /******************** ModifiedAstar2.java **************************
  * AKs implementation of Tobbes modified Astar search algo
  * Basically this is a guided tree-search algorithm, like
@@ -18,8 +18,12 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
+
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
+import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
+import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.util.ActionTimer;
 
 public class ModifiedAstar2
@@ -31,27 +35,45 @@ public class ModifiedAstar2
 
 	/** Contains "opened" but not yet examined (i.e. not "closed") nodes. */
 	private ArrayList openList;
-
 	/** Contains already examined (i.e. "closed") nodes. */
 	private ArrayList closedList;
-
-	/** The automaton to be scheduled. */
+	
+	private TreeMap openMap, closedMap;
+	
+	
+	/** Hashtable containing the estimated cost, having states as keys. **/
+	private Hashtable oneProdRelax; 
+	
+	/** Needed for online expansion of the Nodes **/
+	private AutomataSynchronizerExecuter onlineSynchronizer;
+	
+	/** Det kanske kan inte behövs utan kan fixas genom helper (???) **/ 
+	private AutomataIndexForm autoIndexForm;
 
 	//Den kanske man inte behöver spara... AK
 	private Automaton theAutomaton;
+	
+	private Automata theAutomata;
 
 	public ModifiedAstar2(Automaton theAutomaton)
 	{
 		this.theAutomaton = theAutomaton;
-
 		init();
 	}
 
+	public ModifiedAstar2(Automata theAutomata) {
+		this.theAutomata = theAutomata;
+		init();
+	}
+	
 	private void init()
 	{
 		timer = new ActionTimer();
 		openList = new ArrayList();
 		closedList = new ArrayList();
+		oneProdRelax = new Hashtable();
+		openMap = new TreeMap();
+		closedMap = new TreeMap();
 	}
 
 	/**
@@ -59,36 +81,292 @@ public class ModifiedAstar2
 	 */
 	public Node walk()
 	{
-		timer.start();
-
-		int counter = 0;
-
-		openList.add(new Node(((State) theAutomaton.getInitialState())));
-
-		while (!openList.isEmpty())
-		{
-			Node currNode = (Node) openList.remove(0);
-
-			counter++;
-
-			if (insertIntoClosedList(currNode))
+		// Den här if/else-slingan är ful och borde snyggas till (ersättas) en dag. 
+		// Körs igång om en synkning har valts som schemaläggningsoffer.
+		if (theAutomata == null) {
+			timer.start();
+	
+			int counter = 0;
+	
+			openList.add(new Node(((State) theAutomaton.getInitialState())));
+	
+			while (!openList.isEmpty())
 			{
-				if (currNode.isAccepting())
+				Node currNode = (Node) openList.remove(0);
+	
+				counter++;
+	
+				if (insertIntoClosedList(currNode))
 				{
-					timer.stop();
-					logger.info("Nr of searched states = " + counter);
-
+					if (currNode.isAccepting())
+					{
+						timer.stop();
+						logger.info("Nr of searched states = " + counter);
+	
+						return currNode;
+					}
+	
+					StateIterator states = currNode.getCorrespondingState().nextStateIterator();
+	
+					while (states.hasNext())
+					{
+						Node currChildNode = new Node((State) states.nextState(), currNode);
+	
+						insertIntoOpenList(currChildNode);
+					}
+				}
+			}
+	
+			return null;
+		}
+		// Om istället flera automater skall online-synkas-och-schemaläggas...
+		else {
+			timer.start();		
+			
+			preprocess();
+			initOnlineSynchronizer();
+			
+			logger.info("Time for preprocessing: " + timer.elapsedTime() + " ms");
+			timer.start();
+			
+			while (!openList.isEmpty()) {
+				Node currNode = (Node) openList.remove(0);				
+				closedList.add(currNode);
+				
+				if (currNode.isAccepting()) {
+					logger.info(currNode + ". States searched: " + closedList.size() + " in time: " + timer.elapsedTime() + " ms.");
 					return currNode;
 				}
+				
+				int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
+				for (int i=0; i<currNode.size(); i++) 
+					currStateIndex[i] = currNode.getState(i).getIndex();
+				
+				int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
+				for (int i=0; i<currOutgoingEvents.length; i++) {
+					if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
+						int[] nextState = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+						State[] theStates = new State[theAutomata.size()];
+						
+						for (int j=0; j<theAutomata.size(); j++)
+							theStates[j] = autoIndexForm.getState(j, nextState[j]);
+						
+						Node childNode = new Node(theStates, currNode);
+						if (!isOnAList(childNode))
+							putOnOpenList(childNode);
+					}		
+				}				
+			}
 
-				StateIterator states = currNode.getCorrespondingState().nextStateIterator();
+			logger.error("Inget markerat tillstånd kunde hittas............");
+			return null;
+		}
+	}
+	
+	/**
+	 * 			Inserts the node into the openList according to the estimatedCost (ascending).
+	 * @param 	node
+	 */
+	private void putOnOpenList(Node node) {
+		int estimatedCost = calcEstimatedCost(node);
+		int counter = 0;
+		Iterator iter = openList.iterator();
+		
+		while (iter.hasNext()) {
+			Node n = (Node)iter.next();
+			if (estimatedCost < calcEstimatedCost(n)) {
+				openList.add(counter, node);
+				return;
+			}
+			counter++;
+		}
+		
+		openList.add(node);
+	}
 
-				while (states.hasNext())
-				{
-					Node currChildNode = new Node((State) states.nextState(), currNode);
-
-					insertIntoOpenList(currChildNode);
+	/**
+	 * 			Checks if some node is on the closedList.
+	 * @param 	node
+	 * @return 	true if node is already on the closedList and has an estimated cost not lower than 
+	 * 		   	the guy on the closedList. 
+	 */
+	// Också lite fult...
+	private boolean isOnAList(Node node) {
+		int estimatedCost = calcEstimatedCost(node);
+		
+		Iterator iter = openList.iterator();
+		while (iter.hasNext()) {
+			Node n = (Node)iter.next();
+			if (node.equals(n)) {
+				if (estimatedCost >= calcEstimatedCost(n))
+					return true;
+				else {
+					openList.remove(openList.indexOf(n));
+					return false;
 				}
+			}
+		}
+		
+		iter = closedList.iterator();
+		
+		while(iter.hasNext()) {
+			Node n = (Node)iter.next();
+			if (node.equals(n)) {
+				if (estimatedCost >= calcEstimatedCost(n))
+					return true;
+				else {
+					closedList.remove(closedList.indexOf(n));
+					return false;
+				}
+			}			
+		}
+		
+		return false;
+	}
+
+	/**
+	 * @param initialState
+	 */
+	private void initOnlineSynchronizer() {
+		//	Get current options
+		SynchronizationOptions syncOptions = new SynchronizationOptions();
+		syncOptions.setBuildAutomaton(false);
+		syncOptions.setRequireConsistentControllability(false);
+
+		try {
+			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+			onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
+			onlineSynchronizer.initialize();
+			autoIndexForm = helper.getAutomataIndexForm();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//helper.setCoExecuter(onlineSynchronizer);	
+	}
+
+	private int[] makeInitialState() {
+		// Build the initial state
+		Automaton currAutomaton;
+		State currInitialState;
+		int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
+
+		// + 1 status field
+		Iterator autIt = theAutomata.iterator();
+		
+		while (autIt.hasNext())
+		{
+			currAutomaton = (Automaton) autIt.next();
+			currInitialState = currAutomaton.getInitialState();	
+			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+		}
+
+		return initialState;
+	}
+
+	/**
+	 * 			Calculates the costs for a one-product relaxation (i.e. as if there 
+	 * 			would only be one robot in the cell) and stores it in the hashtable
+	 * 			oneProdRelax.
+	 * 
+	 * @return	false, if any of the automata to be scheduled does not contain 
+	 * 			an accepting state. 
+	 * @return 	true, otherwise
+	 */
+	private boolean preprocess() {	
+		int plantCounter = 0;
+		
+		for (int i=0; i<theAutomata.size(); i++) {
+			if (theAutomata.getAutomatonAt(i).getInitialState().getCost() != -1) {
+				plantCounter++;
+				
+				Automaton theAuto = theAutomata.getAutomatonAt(i);
+				State markedState = findAcceptingState(theAuto);
+				ArrayList estList = new ArrayList();
+				
+				if (markedState == null)
+					return false;
+				else {
+					Hashtable subHashtable = new Hashtable();
+					
+					subHashtable.put(markedState, new Integer(0));
+					estList.add(markedState);
+					
+					while (!estList.isEmpty()) {
+						ArcIterator incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
+						
+						while (incomingArcIterator.hasNext()) {
+								Arc currArc = incomingArcIterator.nextArc();
+								State currState = currArc.getFromState();
+								int remainingCost = ((Integer)(subHashtable.get(currArc.getToState()))).intValue();
+								
+								if (subHashtable.get(currState) == null) {
+									subHashtable.put(currState, new Integer(remainingCost + currArc.getToState().getCost()));							
+									estList.add(currState);
+								}
+								else {
+									int currRemainingCost = ((Integer)(subHashtable.get(currState))).intValue();
+									int newRemainingCost = currArc.getToState().getCost() + remainingCost;
+									
+									if (newRemainingCost < currRemainingCost) {
+										subHashtable.remove(currState);
+										subHashtable.put(currState, new Integer(newRemainingCost));
+									}
+								}
+							
+						}
+					}
+				
+					oneProdRelax.put(theAuto.getName(),subHashtable);
+				}				
+			}	
+		}
+		
+		State[] theStates = new State[theAutomata.size()];
+		
+		for (int i=0; i<theStates.length; i++) 
+			theStates[i] = theAutomata.getAutomatonAt(i).getInitialState(); 
+		
+		Node initialNode = new Node(theStates);
+		openList.add(initialNode);
+		//openMap.put(makeMapKey(initialNode), initialNode);
+		
+		return true;
+	}
+	
+	private int calcEstimatedCost(Node theNode) {
+		return theNode.getAccumulatedCost() + getOneProdRelaxation(theNode);
+	}
+	
+	private int getOneProdRelaxation(Node theNode) {
+		Automata plantAutomata = theAutomata.getPlantAutomata();
+		int estimate = 0;
+		
+		//fult...... Asfult............
+		for (int i=0; i<plantAutomata.size(); i++) {
+			int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)((Hashtable) oneProdRelax.get(plantAutomata.getAutomatonAt(i).getName())).get(theNode.getState(i))).intValue();
+			if (altEstimate > estimate)
+				estimate = altEstimate;	
+		}
+
+		return estimate;
+	}
+	
+	// Borde kanske ligga i "Automaton.java" men det kanske inte är tillräckligt
+	// generellt för det. Om man inte har att göra med schemaläggning, kan det väl
+	// finnas flera markerade tillstånd. 
+	/**
+	 * Returns some accepting state if it finds one, else returns null.
+	 * Iterates over all states _only_if_ no accepting states exist (or only
+	 * the last one is accepting)
+	 */
+	public State findAcceptingState(Automaton auto) {
+		for (StateIterator stateIt = auto.stateIterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+
+			if (currState.isAccepting())
+			{
+				return currState;
 			}
 		}
 
@@ -153,42 +431,40 @@ public class ModifiedAstar2
 
 		return true;
 	}
-
+	
 	public Automaton buildScheduleAutomaton(Node currNode)
 	{
 		Automaton scheduleAuto = new Automaton();
-
 		scheduleAuto.setComment("Schedule");
-		logger.info("optimal cost = " + currNode.getAccumulatedCost() + "; search time = " + timer.elapsedTime() + " milliseconds");
-
-		State nextState = new State(currNode.getCorrespondingState());
-
+		
+		State nextState = new State(currNode.toString());
+		nextState.setAccepting(true);
 		scheduleAuto.addState(nextState);
 
 		while (currNode.getParent() != null)
 		{
 			try
 			{
-				State currState = currNode.getParent().getCorrespondingState();
-				Arc currArc = findCurrentArc(currState, nextState);
-
-				currState = new State(currState);
+				State currState = new State(currNode.getParent().toString());
+				LabeledEvent event = findCurrentEvent(currNode.getParent(), currNode);
 
 				scheduleAuto.addState(currState);
-				scheduleAuto.getAlphabet().addEvent(currArc.getEvent());
-				scheduleAuto.addArc(new Arc(currState, nextState, currArc.getEvent()));
-
+				scheduleAuto.getAlphabet().addEvent(event);
+				scheduleAuto.addArc(new Arc(currState, nextState, event));
+				
 				currNode = currNode.getParent();
 				nextState = currState;
 			}
-			catch (NullPointerException ex)
+			catch (Exception ex)
 			{
 				logger.error("ModifiedAstar2::buildScheduleAutomaton() --> Could not find the arc between " + currNode + " and " + currNode.getParent());
 				logger.debug(ex.getStackTrace());
 			}
 		}
 
-		scheduleAuto.addState(currNode.getCorrespondingState());
+		State initState = new State(currNode.toString());
+		initState.setInitial(true);
+		scheduleAuto.addState(initState);
 
 		return scheduleAuto;
 	}
@@ -197,6 +473,7 @@ public class ModifiedAstar2
 	 *      Returns the Arc between two States.
 	 *      @return null if the Arc doesn't exist (this must not happen).
 	 */
+	// Kan (och bör) nog tas bort så småningom (vid städning)
 	private Arc findCurrentArc(State parent, State child)
 	{
 		ArcIterator it = parent.outgoingArcsIterator();
@@ -215,6 +492,30 @@ public class ModifiedAstar2
 		assert(false);
 
 		return null;
+	}
+	
+	private LabeledEvent findCurrentEvent(Node fromNode, Node toNode) throws Exception {
+		for (int i=0; i<fromNode.size(); i++) {
+			if (!fromNode.getState(i).getName().equals(toNode.getState(i).getName())) {
+				return theAutomata.getAutomatonAt(i).getLabeledEvent(fromNode.getState(i), toNode.getState(i));
+			}
+		}
+		
+		return null;
+	}
+	
+	public Integer makeMapKey(Node node)
+	{
+		int hash = 1;
+		
+		for (int i = 0; i < node.size(); i++) {
+			hash += hash * node.getState(i).getIndex();
+			hash *= 10;
+		}
+		
+		hash += hash * 100 * calcEstimatedCost(node);
+		
+		return new Integer(hash);
 	}
 
 	/**
