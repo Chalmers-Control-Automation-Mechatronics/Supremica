@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Single Visual Project"  major="0"  minor="9" >
+<Automaton name="Untitled SM" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d"/>
+		<Event id="epsilon" label="epsilon"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5" accepting="true"/>
+		<State id="q6"/>
+		<State id="q7"/>
+		<State id="q8"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q3" event="b"/>
+		<Transition source="q0" dest="q1" event="a"/>
+		<Transition source="q0" dest="q6" event="c"/>
+		<Transition source="q1" dest="q2" event="a"/>
+		<Transition source="q2" dest="q2" event="a"/>
+		<Transition source="q3" dest="q4" event="epsilon"/>
+		<Transition source="q4" dest="q5" event="epsilon"/>
+		<Transition source="q4" dest="q4" event="epsilon"/>
+		<Transition source="q5" dest="q5" event="epsilon"/>
+		<Transition source="q6" dest="q7" event="epsilon"/>
+		<Transition source="q7" dest="q8" event="d"/>
+		<Transition source="q7" dest="q7" event="epsilon"/>
+	</Transitions>
+</Automaton>
+<Automaton name="min" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d"/>
+		<Event id="epsilon" label="epsilon"/>
+	</Events>
+	<States>
+		<State id="q0" name="" initial="true"/>
+		<State id="q1" name="" accepting="true"/>
+		<State id="q2" name=""/>
+		<State id="q3" name=""/>
+		<State id="q4" name=""/>
+		<State id="q5" name=""/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q3" event="b"/>
+		<Transition source="q0" dest="q1" event="a"/>
+		<Transition source="q0" dest="q4" event="c"/>
+		<Transition source="q1" dest="q1" event="a"/>
+		<Transition source="q2" dest="q5" event="d"/>
+		<Transition source="q2" dest="q2" event="epsilon"/>
+		<Transition source="q3" dest="q3" event="epsilon"/>
+		<Transition source="q4" dest="q2" event="epsilon"/>
+	</Transitions>
+</Automaton>
+</Automata>
