@@ -197,32 +197,32 @@ public class CompositeState extends State
 	 *	accumulatedCost of the previously visited state is kept. 
 	 */
 	public void updateCosts(int[] prevCurrentCosts, boolean[] firingAutomata, int prevAccumulatedCost) 
-	{
-		if (isTimed()) 
-		{			
-			int costAddition = 0;
-			
-			// The value of costAddition is set as the maximal cost for the firing/active automata
-			for (int i=0; i<firingAutomata.length; i++)
+	{		
+		int costAddition = 0;
+		
+		// The value of costAddition is set as the maximal cost for the firing/active automata
+		for (int i=0; i<firingAutomata.length; i++)
+		{
+			if ((firingAutomata[i] == true) && (prevCurrentCosts[i] > costAddition))
+				costAddition = prevCurrentCosts[i];	
+		}
+		
+		// The currentCosts-vector is updated
+		for (int i=0; i<firingAutomata.length; i++)
+		{
+			if (firingAutomata[i] == false) 
 			{
-				if ((firingAutomata[i] == true) && (prevCurrentCosts[i] > costAddition))
-					costAddition = prevCurrentCosts[i];	
-			}
-			
-			// The currentCosts-vector is updated
-			for (int i=0; i<firingAutomata.length; i++)
-			{
-				if (firingAutomata[i] == false) 
+				if (prevCurrentCosts[i] > -1)
 					currentCosts[i] = Math.max(0, prevCurrentCosts[i] - costAddition);
 				else
-					currentCosts[i] = compositeCosts[i]; 	
+					currentCosts[i] = -1;
 			}
-			
-			// The accumulatedCost is updated
-			accumulatedCost = prevAccumulatedCost + costAddition;
+			else
+				currentCosts[i] = compositeCosts[i]; 	
 		}
-		else
-			accumulatedCost = prevAccumulatedCost;
+		
+		// The accumulatedCost is updated
+		accumulatedCost = prevAccumulatedCost + costAddition;		
 	}
 	
 	/**
@@ -233,18 +233,23 @@ public class CompositeState extends State
 	{
 		if (prevState.isUpdatingCosts()) 
 		{
-			boolean[] firingAutomata = new boolean[compositeIndices.length];
-			int[] prevCompositeIndices = prevState.getCompositeIndices();
-			
-			for (int i=0; i<firingAutomata.length; i++) 
+			if (prevState.isTimed())
 			{
-				if (compositeIndices[i] == prevCompositeIndices[i])
-					firingAutomata[i] = false;
-				else
-					firingAutomata[i] = true;
-			}	
-			
-			updateCosts(prevState.getCurrentCosts(), firingAutomata, prevState.getAccumulatedCost());
+				boolean[] firingAutomata = new boolean[compositeIndices.length];
+				int[] prevCompositeIndices = prevState.getCompositeIndices();
+				
+				for (int i=0; i<firingAutomata.length; i++) 
+				{
+					if (compositeIndices[i] == prevCompositeIndices[i])
+						firingAutomata[i] = false;
+					else
+						firingAutomata[i] = true;
+				}	
+				
+				updateCosts(prevState.getCurrentCosts(), firingAutomata, prevState.getAccumulatedCost());
+			}
+			else
+				accumulatedCost = prevState.getAccumulatedCost();
 		}
 	}
 	
