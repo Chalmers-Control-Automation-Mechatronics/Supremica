@@ -52,6 +52,9 @@ public class BrowserControl
                 // check for an exit value.  If the exit command is 0,
                 // it worked, otherwise we need to start the browser.
                 // cmd = 'netscape -remote openURL(http://www.javaworld.com)'
+               	cmd = UNIX_PATH + " "  + url;
+               	Process p = Runtime.getRuntime().exec(cmd);
+				/* // This doesnot work on Hugo's Netscape 4.77, RH Linux
                 cmd = UNIX_PATH + " " + UNIX_FLAG + "(" + url + ")";
                 Process p = Runtime.getRuntime().exec(cmd);
                 try
@@ -67,13 +70,7 @@ public class BrowserControl
                         cmd = UNIX_PATH + " "  + url;
                         p = Runtime.getRuntime().exec(cmd);
                     }
-                }
-                catch(InterruptedException x)
-                {
-                    logger.error("Error bringing up browser, cmd='" +
-                                       cmd + "'");
-                    logger.error("Caught: " + x);
-                }
+                } */
             }
         }
         catch(IOException x)
