@@ -373,6 +373,11 @@ public class Automata
 
 	public String getUniqueAutomatonName(String prefix)
 	{
+		if (prefix == null)
+		{
+			return getUniqueAutomatonName();
+		}
+
 		if (!containsAutomaton(prefix))
 		{
 			return prefix;
