@@ -44,7 +44,7 @@ public class RegexpDialog extends JDialog /* implements ActionListener */
 	{
 		public RegexpMenuBar()
 		{
-			JMenu menu = new JMenu("Perl");
+			JMenu menu = new JMenu("Expressions");
 			menu.add(new RegexpMenuItem("any string", ".*"));
 			menu.add(new RegexpMenuItem("any uppercase", "[A-Z]"));
 			menu.add(new RegexpMenuItem("any lowercase", "[a-z]"));
@@ -74,7 +74,7 @@ public class RegexpDialog extends JDialog /* implements ActionListener */
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-							action(e);
+						action(e);
 					}
 				});
 		}

@@ -19,67 +19,7 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
 
-// Really a tester class
-interface Matcher
-{
-	public boolean matches(SearchStates.StateIterator it);
-}
-
-class PartsMatcher implements Matcher
-{
-	private PatternMatcher matcher;
-	private Pattern[] patterns;
-	
-	PartsMatcher(PatternMatcher m, Pattern[] p)
-	{
-		matcher = m;
-		patterns = p;
-	}
-	
-	public boolean matches(SearchStates.StateIterator it)
-	{
-		for(int i = 0; it.hasNext(); ++i, it.inc())
-		{
-			if(!matcher.matches(it.getState().getName(), patterns[i]))
-				return false;
-		}
-		return true;
-	}
-}
-// 
-class FreeformMatcher implements Matcher
-{
-	private PatternMatcher matcher;
-	private Pattern pattern;
-	
-	FreeformMatcher(PatternMatcher m, Pattern p)
-	{
-		matcher = m;
-		pattern = p;
-		// dbg: System.err.println("FreeformMatcher::constructing");
-	}
-	
-	public boolean matches(SearchStates.StateIterator it)
-	{
-		// Make up a global name
-		StringBuffer state_name = new StringBuffer();
-		
-		while(it.hasNext())
-		{
-			state_name.append(it.getState().getName());
-			it.inc();
-			if(it.hasNext())	// should the user have control over how this string is built?
-				state_name.append(','); 
-
-		}
-		/* Debug stuff
-		boolean result = matcher.matches(state_name.toString(), pattern);
-		System.err.println("FreeformMatcher::matching(\"" + state_name.toString() + "\"," + pattern.getPattern() + ") = " + new Boolean(result).toString());
-		return result;
-		*/
-		return matcher.matches(state_name.toString(), pattern);
-	}
-}
+import org.supremica.automata.algorithms.Matcher;
 
 // 
 public class SearchStates
@@ -87,7 +27,7 @@ public class SearchStates
 	private AutomataSynchronizer syncher = null;
 	private IntArrayList list = null;
 	
-	private void search(Matcher matcher) throws Exception
+	public void search(Matcher matcher) throws Exception
 	{
 		syncher.execute();
 		list = new IntArrayList();
@@ -109,18 +49,18 @@ public class SearchStates
 		//!!Throws exception if automata is empty or has only one automaton!!
 		syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
 	}
-	
+/*	
 	// Search based on a pattern for each automaton
 	public void search(PatternMatcher pm, Pattern[] ps) throws Exception
 	{
-		search(new PartsMatcher(pm, ps)); 
+		search(new FixedformMatcher(pm, ps)); 
 	}
 	// Search based on a freeform pattern for the global states
 	public void search(PatternMatcher pm, Pattern p) throws Exception
 	{
 		search(new FreeformMatcher(pm, p));
 	}
-	
+*/
 	public int numberFound()
 	{
 		return list.size();

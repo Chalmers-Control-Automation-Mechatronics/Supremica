@@ -222,11 +222,125 @@ class FindStatesTable extends JTable
 		return getStatesTableModel().getRegexpPatterns();
 	}
 }
+//------------------------------------------
+abstract class FindStatesPanel extends JPanel
+{
+	public String title;
+	public String tip;
+	
+	FindStatesPanel(String title, String tip)
+	{
+		this.title = title;
+		this.tip = tip;
+	}
+	abstract public Matcher getMatcher();
+}
+
+class FreeFormPanel extends FindStatesPanel
+{
+	private JTextField reg_exp;
+	private boolean ok = false;
+
+	private void setOk() { ok = true; }
+	private void doRepaint() { repaint(); }
+	private void replaceSelection(String s)	{ reg_exp.replaceSelection(s); }
+
+	class RegexpMenuItem extends JMenuItem implements ActionListener
+	{
+		String pattern; 
+		
+		public RegexpMenuItem(String s, String p)
+		{
+			super(s + " - " + p);
+			pattern = p;
+			addActionListener(this);
+		}
+	   
+		public void actionPerformed(ActionEvent event) 
+		{
+			replaceSelection(pattern);
+			doRepaint();
+		}
+	
+	}
+
+	class RegexpMenuBar extends JMenuBar
+	{
+		public RegexpMenuBar()
+		{
+			JMenu menu = new JMenu("Expressions");
+			menu.add(new RegexpMenuItem("any string", ".*"));
+			menu.add(new RegexpMenuItem("any uppercase", "[A-Z]"));
+			menu.add(new RegexpMenuItem("any lowercase", "[a-z]"));
+			menu.add(new RegexpMenuItem("any alphabetic", "[a-zA-Z]"));
+			menu.add(new RegexpMenuItem("any digit", "[0-9]"));
+			
+			this.add(menu);
+			
+			JMenu help = new JMenu("Help");
+			help.add(new JMenuItem("Help Topics"));
+			help.add(new JSeparator());
+			help.add(new JMenuItem("About..."));
+			
+			this.add(help);
+		}
+		
+	}
+	
+	FreeFormPanel()
+	{
+		super("Free Form", "Search with a free form regexp");
+		setLayout(new BorderLayout());
+		
+		add(new RegexpMenuBar(), BorderLayout.NORTH);
+		JPanel p1 = new JPanel();
+		p1.add(new JLabel("Regexp:"));
+		p1.add(reg_exp = new JTextField(new String(), 30));
+		add("Center", p1);
+		
+	}
+	
+	public Matcher getMatcher()
+	{
+		while(true)
+		{
+			try
+			{
+				Pattern pattern = CompilerFactory.getCompiler().compile(reg_exp.getText());
+				return new FreeformMatcher(new Perl5Matcher(), pattern);
+			}
+			catch(MalformedPatternException excp)
+			{
+				// debug("FindStatesTable::Incorrect pattern \"" + reg_exp.getText() +"\"");
+				JOptionPane.showMessageDialog(null, "Incorrect pattern: " + reg_exp.getText(), "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+}
+class FixedFormPanel extends FindStatesPanel
+{
+	FindStatesTable table =null;
+	
+	FixedFormPanel(FindStatesTable table)
+	{
+		super("Fixed Form", "Search with state specific content");
+		this.table = table;
+		add(new WhitePane(table), "Center");
+	}
+	
+	public Matcher getMatcher()
+	{
+		return new FixedformMatcher(new Perl5Matcher(), table.getRegexpPatterns());
+	}
+}
 //-----------------------------------------
 class FindStatesFrame extends JFrame /* CenteredFrame */
 {
 	private FindStatesTable table = null;
 	private Automata automata = null;
+	// private FreeFormPanel freeformPanel = null;
+	// private FixedFormPanel fixedformPanel = null;
+	private JTabbedPane tabbedPane = null;
 	
 	private static Category thisCategory = LogDisplay.createCategory(FindStatesFrame.class.getName());
 	private static void debug(String s) { thisCategory.debug(s); }
@@ -235,6 +349,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 	private Pattern[] getRegexpPatterns() { return table.getRegexpPatterns(); }
 	private JButton setDefaultButton(JButton b) { getRootPane().setDefaultButton(b); return b; }
 	private void doRepaint() { repaint(); }
+	private FindStatesPanel getSelectedComponent() { return (FindStatesPanel)tabbedPane.getSelectedComponent(); }
 
 	private void showCompositeStates(SearchStates ss)
 	{
@@ -267,8 +382,9 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			try
 			{
 				SearchStates ss = new SearchStates(getAutomata());
-				Pattern[] patterns = getRegexpPatterns();
-				ss.search(new Perl5Matcher(), patterns);
+				// Pattern[] patterns = getRegexpPatterns();
+				// ss.search(new Perl5Matcher(), patterns);
+				ss.search(((FindStatesPanel)getSelectedComponent()).getMatcher());
 				showCompositeStates(ss);
 
 			}
@@ -285,7 +401,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 	{
 		public QuitButton()
 		{
-			super("Quit");
+			super("Close");
 			setToolTipText("Enough of finding states");
 			addActionListener(
 				new ActionListener()
@@ -303,7 +419,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			dispose();
 		}
 	}
-
+/**
 	class FreeFormButton extends JButton
 	{
 		private PatternCompiler comp = null;
@@ -368,24 +484,35 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			}
 		}
 	}
-	
+***/	
 	public FindStatesFrame(Automata a)
 	{
 		// super(400, 300); // for CenteredFrame inheritance
-		Utility.setupFrame(this, 400, 300);
+		Utility.setupFrame(this, 500, 300);
 		setTitle("Find States");
 
 		automata = a;
 		table = new FindStatesTable(a);
 
-		JPanel panel = new JPanel();
-		panel.add(setDefaultButton(new FindButton()));
-		panel.add(new QuitButton());
-		panel.add(new FreeFormButton(CompilerFactory.getCompiler()));
+		FixedFormPanel fixedformPanel = new FixedFormPanel(table);
+		FreeFormPanel freeformPanel = new FreeFormPanel();
+		
+        tabbedPane = new JTabbedPane();
+        tabbedPane.addTab(fixedformPanel.title, null,
+                          fixedformPanel,
+                          fixedformPanel.tip);
+        tabbedPane.addTab(freeformPanel.title, null,
+                          freeformPanel,
+                          freeformPanel.tip);
 
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(setDefaultButton(new FindButton()));
+		buttonPanel.add(new QuitButton());
+		
 		Container contentPane = getContentPane();
-		contentPane.add(new WhitePane(table), "Center");
-		contentPane.add(panel, "South");
+		contentPane.add(tabbedPane, "Center");
+		contentPane.add(buttonPanel, "South");
+		
 	}
 }
 
