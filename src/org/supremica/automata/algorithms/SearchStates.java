@@ -20,12 +20,17 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
 
 // Really a tester class
-class Matcher
+interface Matcher
+{
+	public boolean matches(SearchStates.StateIterator it);
+}
+
+class PartsMatcher implements Matcher
 {
 	private PatternMatcher matcher;
 	private Pattern[] patterns;
 	
-	Matcher(PatternMatcher m, Pattern[] p)
+	PartsMatcher(PatternMatcher m, Pattern[] p)
 	{
 		matcher = m;
 		patterns = p;
@@ -41,30 +46,73 @@ class Matcher
 		return true;
 	}
 }
+// 
+class FreeformMatcher implements Matcher
+{
+	private PatternMatcher matcher;
+	private Pattern pattern;
+	
+	FreeformMatcher(PatternMatcher m, Pattern p)
+	{
+		matcher = m;
+		pattern = p;
+	}
+	
+	public boolean matches(SearchStates.StateIterator it)
+	{
+		// Make up a global name
+		StringBuffer state_name = new StringBuffer();
+		
+		while(it.hasNext())
+		{
+			state_name.append(it.getState().getName());
+			it.inc();
+			if(it.hasNext())	// should the user have control over how this string is built?
+				state_name.append(','); 
 
+		}
+		return matcher.matches(state_name.toString(), pattern);
+	}
+}
+
+// 
 public class SearchStates
 {
 	private AutomataSynchronizer syncher = null;
 	private IntArrayList list = null;
 	
-	public SearchStates(Automata automata) throws Exception
-	{
-		syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
-	}
-	
-	public void search(PatternMatcher pm, Pattern[] ps) throws Exception
+	private void search(Matcher matcher) throws Exception
 	{
 		syncher.execute();
-		Matcher matcher = new Matcher(pm, ps); 
 		list = new IntArrayList();
+		// Note the difference between the two getStateIterator. 
+		// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
 		for(Iterator it = syncher.getHelper().getStateIterator(); it.hasNext(); )
 		{
 			int[] composite_state = (int[])it.next();
+			// and this is SearchStates::getStateIterator, returns SearchStates::StateIterator
 			if(matcher.matches(getStateIterator(composite_state)))
 			{
 				list.add(composite_state);
 			}
 		}
+	}
+	
+	public SearchStates(Automata automata) throws Exception
+	{
+		//!!Throws exception if automata is empty or has only one automaton!!
+		syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
+	}
+	
+	// Search based on a pattern for each automaton
+	public void search(PatternMatcher pm, Pattern[] ps) throws Exception
+	{
+		search(new PartsMatcher(pm, ps)); 
+	}
+	// Search based on a freeform pattern for the global states
+	public void search(PatternMatcher pm, Pattern p) throws Exception
+	{
+		search(new FreeformMatcher(pm, p));
 	}
 	
 	public int numberFound()

@@ -64,7 +64,7 @@ public class EventsHelpers
 	public static Events union(EventsSet eventsSet)
 		throws IllegalArgumentException, Exception
 	{
-		if (eventsSet.size() >= 2)
+		if (eventsSet.size() >= 1) // this was >= 2 but why could we not have union over 1 or even 0 number of elements??
 		{
 			// Build the new set of events
 			Iterator eventsSetIt = eventsSet.iterator();
@@ -88,7 +88,7 @@ public class EventsHelpers
 			return theEvents;
 		}
 
-		// at least two arguments are necessary
+		// at least 1 (not two ::MF) arguments are necessary
 		throw new IllegalArgumentException("Not enough elements of events");
 	}
 }

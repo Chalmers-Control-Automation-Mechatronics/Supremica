@@ -111,7 +111,9 @@ class FindStatesTableModel extends AbstractTableModel
 //-----------------------------------
 class FindStatesTable extends JTable
 {
-	//** Inner class, needs access to teh model
+	private void doRepaint() { repaint(); }
+	
+	//** Inner class, needs access to the model
 	class RegexpPopupMenu extends JPopupMenu
 	{
 		int row;
@@ -128,12 +130,11 @@ class FindStatesTable extends JTable
 			{	// anonymous class 
 				public void actionPerformed(ActionEvent e)
 				{
-					FindStatesTableModel table_model = getStatesTableModel();
-					String str = (String)table_model.getValueAt(row, col);
+					String str = (String)getModel().getValueAt(row, col);
 					RegexpDialog regexp_dialog = new RegexpDialog(null, str);
 					if(regexp_dialog.isOk())
 					{
-						table_model.setValueAt(regexp_dialog.getText(), row, col);
+						getModel().setValueAt(regexp_dialog.getText(), row, col);
 					}
 					doRepaint(); // for resolving ambiguity
 				}
@@ -142,18 +143,12 @@ class FindStatesTable extends JTable
 	
 	}
 	
-	void doRepaint()
-	{
-		repaint();
-	}
+	// utility functions
+	private TableSorter getTableSorterModel() { return (TableSorter)getModel(); }
+	private FindStatesTableModel getStatesTableModel() { return (FindStatesTableModel)getTableSorterModel().getModel(); }
 	
-	FindStatesTableModel getStatesTableModel()
-	{
-		return (FindStatesTableModel)((TableSorter)getModel()).getModel();
-	}
-	
-	//** Wrap the FindStatesTableModel inside a sort filter
-	static TableSorter makeTableModel(Automata a)
+	// Wrap the FindStatesTableModel inside a sort filter
+	private static TableSorter makeTableModel(Automata a)
 	{
 		TableSorter sorter = new TableSorter();
 		sorter.setModel(new FindStatesTableModel(a, new Perl5Compiler())); // compiler type should be adjustable
@@ -165,10 +160,8 @@ class FindStatesTable extends JTable
 		//** super(new TableSorter(new FindStatesTableModel(a)));
 		super(makeTableModel(a));
 
-		((TableSorter)getModel()).addMouseListenerToHeaderInTable(this);
+		getTableSorterModel().addMouseListenerToHeaderInTable(this);
 
-		// addMouseListener(new localMouseAdapter());
-			
 		// Note! This code is duplicated (almost) from Supremica.java
 		addMouseListener(new MouseAdapter()
 		{
@@ -208,11 +201,6 @@ class FindStatesTable extends JTable
 
 	}
 
-	public FindStatesTable getTable()
-	{
-		return this;
-	}
-
 	public Pattern[] getRegexpPatterns()
 	{
 		return getStatesTableModel().getRegexpPatterns();
@@ -225,11 +213,11 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 	private Automata automata = null;
 	
 	private static Category thisCategory = LogDisplay.createCategory(FindStatesFrame.class.getName());
-	void Debug(String s) { thisCategory.debug(s); }
+	private void Debug(String s) { thisCategory.debug(s); }
 
 	private Automata getAutomata() { return automata; }
 	private Pattern[] getRegexpPatterns() { return table.getRegexpPatterns(); }
-	private JRootPane getOurRootPane() { return getRootPane(); }
+	private JButton setDefaultButton(JButton b) { getRootPane().setDefaultButton(b); return b; }
 
 	class FindButton extends JButton
 	{
@@ -238,7 +226,6 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 		{
 			super("Find");
 			setToolTipText("Go ahead and find");
-			getOurRootPane().setDefaultButton(this);
 
 			addActionListener(
 				new ActionListener()
@@ -257,10 +244,10 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			try
 			{
 				SearchStates ss = new SearchStates(getAutomata());
-				Debug("SearchStates == " + (ss == null ? "null" : "ok"));
+				// Debug("SearchStates == " + (ss == null ? "null" : "ok"));
 				Pattern[] patterns = getRegexpPatterns();
 				ss.search(new Perl5Matcher(), patterns);
-				Debug("Show composite states");
+				// Debug("Show composite states");
 				showCompositeStates(ss);
 
 			}
@@ -268,22 +255,13 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			{
 				// Let it silently die, how the f*** do get these excp specs to work?
 				Debug("FindButton - " + excp);
+				excp.printStackTrace();
 			}
 		}
 		void showCompositeStates(SearchStates ss)
 		{
-			System.out.println("Number of states found: " + ss.numberFound());
-			for(Iterator it1 = ss.iterator(); it1.hasNext(); )
-			{
-				System.out.print("<");
-
-				for(SearchStates.StateIterator it2 = ss.getStateIterator((int[])it1.next()); it2.hasNext(); it2.inc())
-				{
-					System.out.print(it2.getState().getName() + ",");
-				}
-
-				System.out.println(">");
-			}
+			PresentStates present_states = new PresentStates(ss, getAutomata());
+			present_states.execute();
 		}
 	}
 
@@ -310,9 +288,6 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 		}
 	}
 
-	private JButton findButton;
-	private JButton quitButton;
-
 	public FindStatesFrame(Automata a)
 	{
 		// super(400, 300); // for CenteredFrame inheritance
@@ -323,7 +298,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 		table = new FindStatesTable(a);
 
 		JPanel panel = new JPanel();
-		panel.add(new FindButton());
+		panel.add(setDefaultButton(new FindButton()));
 		panel.add(new QuitButton());
 
 		Container contentPane = getContentPane();
@@ -334,12 +309,10 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 
 public class FindStates
 {
-	private Automata automata;
-	private JFrame frame;
+	private JFrame frame = null;
 
 	public FindStates(Automata a)
 	{
-		automata = a;
 		frame = new FindStatesFrame(a);
 	}
 
