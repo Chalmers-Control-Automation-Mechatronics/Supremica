@@ -116,6 +116,7 @@ public class ExampleTemplates
 
 		thisGroup.addItem(new TemplateItem("Central locking system - 3 doors", prefix + "centralLocking3Doors.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacturing system", prefix + "flexibleManufacturingSystem.xml"));
+		thisGroup.addItem(new TemplateItem("Robot assembly cell", prefix + "robotAssemblyCell.xml"));
 	}
 
 	private void initializeStandardComponents()

@@ -70,6 +70,7 @@ public class AutomataToSattLineSFC
 	private boolean debugMode = false;
 	private int transitionCounter = 0;
 	private int eventMonitorCounter = 0;
+	private int automatonCounter = 1;
 
 	public AutomataToSattLineSFC(Automata automata)
 	{
@@ -88,13 +89,15 @@ public class AutomataToSattLineSFC
 	{
 
 		// Start of file header
+		Date theDate = new Date();
+		logger.info(theDate.toString());
 		pw.println("\"Syntax version 2.19, date: 2001-08-10-10:42:24.724 N\"");
 		pw.println("\"Original file date: ---\"");
 		pw.print("\"Program date: 2001-08-10-10:42:24.724, name: ");    // Should perhaps get current date and time
 
 		if (automata.getName() != null)
 		{
-			pw.println(" " + automata.getName() + " \"");
+			pw.println(" " + automata.getName().replace('.', '_') + " \"");
 		}
 		else
 		{
@@ -145,11 +148,11 @@ public class AutomataToSattLineSFC
 			{
 				firstEvent = false;
 
-				pw.print(normalize(currEvent.getLabel()));
+				pw.print(currEvent.getLabel().replace('.', '_'));
 			}
 			else
 			{
-				pw.print(", " + normalize(currEvent.getLabel()));
+				pw.print(", " + currEvent.getLabel().replace('.', '_'));
 			}
 			lineLength = lineLength + currEvent.getLabel().length() + 2;
 			if (lineLength > 80)
@@ -160,8 +163,8 @@ public class AutomataToSattLineSFC
 
 		}
 
-		pw.println(": boolean;\n");
-		pw.println("ProgStationData: ProgStationData;");
+		pw.println(": boolean;");
+		pw.println("ProgStationData: ProgStationData;\n");
 		// End of variable declarations.
 		// Start of submodule invocations
 		pw.println("SUBMODULES");
@@ -197,19 +200,33 @@ public class AutomataToSattLineSFC
 
 			if (aut.getName().length() > 16)
 			{
-				logger.warn("Automaton name may be too long. SattLine's maximum identifier length is 20. (fix it yourself!)");
+				logger.warn("The name of automaton " + aut.getName() + " is too long. Identifiers are limited to 20 characters in SattLine. The new name is Automaton_" + automatonCounter);
+				aut.setName("Automaton_" + automatonCounter++);
 			}
 
 			// If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
 			// Won't check that for now ...
 			// Might want to parameterise COORD so that sequences are not drawn on top of each other.
-			pw.println("SEQUENCE " + aut.getName() + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
-
 			State initState = aut.getInitialState();
+			if (initState.nbrOfIncomingArcs() > 0)
+			{
+				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
+			}
+			else
+			{
+				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
+			}
 
 			printSequence(aut, initState, pw);
 			aut.clearVisitedStates();
-			pw.println("ENDSEQUENCE\n\n");
+			if (initState.nbrOfIncomingArcs() > 0)
+			{
+				pw.println("ENDSEQUENCE\n\n");
+			}
+			else
+			{
+				pw.println("ENDOPENSEQUENCE\n\n");
+			}
 		}    // End of automata conversion
 
 		// Event Monitors should be generated here.
@@ -371,11 +388,11 @@ public class AutomataToSattLineSFC
 		{
 			Automaton aut = (Automaton) autIt.next();
 
-			logger.debug(aut.getName());
+			logger.debug(aut.getName().replace('.', '_'));
 
 			if (aut.containsEventWithLabel(theEvent.getLabel()))
 			{
-				logger.debug("The event " + theEvent.getLabel() + " exsits in the automaton " + aut.getName());
+				logger.debug("The event " + theEvent.getLabel() + " exsits in the automaton " + aut.getName().replace('.', '_'));
 
 				// The event exists in this automaton. What arcs?
 				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
@@ -483,9 +500,9 @@ public class AutomataToSattLineSFC
 			// (b) Create step with action e
 			pw.println("SEQSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
 			pw.println("ENTERCODE");
-			pw.println(normalize(currEvent.getLabel()) + " = True;");
+			pw.println(currEvent.getLabel().replace('.', '_') + " = True;");
 			pw.println("EXITCODE");
-			pw.println(normalize(currEvent.getLabel()) + " = False;");
+			pw.println(currEvent.getLabel().replace('.', '_') + " = False;");
 
 			// (c) Create transition t' with t'.C = not preset()
 			transitionCondition = computeCeaseCondition(theAutomata, currEvent);
@@ -503,17 +520,18 @@ public class AutomataToSattLineSFC
 	{
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstAutomaton = true;
+		boolean nextAutomaton = false;
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton)autIt.next();
 			if (aut.containsEventWithLabel(theEvent.getLabel()))
 			{
 				// The event exists in this automaton
-				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName());
+				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName().replace('.', '_'));
 				boolean stateFound = false;
+				boolean firstState = true;
 				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
 				{
-					boolean firstState = true;
 					Arc anArc = (Arc) arcIt.next();
 					try
 					{
@@ -528,19 +546,20 @@ public class AutomataToSattLineSFC
 							{
 								firstAutomaton = false;
 							}
-							else
+							else if (nextAutomaton)
 							{
+								nextAutomaton = false;
 								theCondition.append(" AND ");
 							}
 							if (firstState)
 							{
 								firstState = false;
-								theCondition.append("(" + aut.getName() + "_" + sourceState.getId() + ".X");
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
-								theCondition.append(" OR " + aut.getName() + "_" + sourceState.getId() + ".X");
+								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
 							}
 						}
 					}
@@ -559,6 +578,7 @@ public class AutomataToSattLineSFC
 				{
 					theCondition.append(")");
 				}
+				nextAutomaton = true;
 			}
 		}
 		return theCondition.toString();
@@ -568,17 +588,18 @@ public class AutomataToSattLineSFC
 	{
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstAutomaton = true;
+		boolean nextAutomaton = false;
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton)autIt.next();
 			if (aut.containsEventWithLabel(theEvent.getLabel()))
 			{
 				// The event exists in this automaton
-				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName());
+				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName().replace('.', '_'));
 				boolean stateFound = false;
+				boolean firstState = true;
 				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
 				{
-					boolean firstState = true;
 					Arc anArc = (Arc) arcIt.next();
 					try
 					{
@@ -594,19 +615,20 @@ public class AutomataToSattLineSFC
 								firstAutomaton = false;
 								theCondition.append("NOT (");
 							}
-							else
+							else if (nextAutomaton)
 							{
+								nextAutomaton = false;
 								theCondition.append(" OR ");
 							}
 							if (firstState)
 							{
 								firstState = false;
-								theCondition.append("(" + aut.getName() + "_" + sourceState.getId() + ".X");
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
-								theCondition.append(" AND " + aut.getName() + "_" + sourceState.getId() + ".X");
+								theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
 							}
 						}
 					}
@@ -625,6 +647,7 @@ public class AutomataToSattLineSFC
 				{
 					theCondition.append(")");
 				}
+				nextAutomaton = true;
 			}
 		}
 		theCondition.append(")");
@@ -699,11 +722,11 @@ public class AutomataToSattLineSFC
 	{
 		if (theState.isInitial())
 		{
-			pw.println("SEQINITSTEP " + theAutomaton.getName() + "_" + theState.getId());
+			pw.println("SEQINITSTEP " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId());
 		}
 		else
 		{
-			pw.println("SEQSTEP " + theAutomaton.getName() + "_" + theState.getId());
+			pw.println("SEQSTEP " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId());
 		}
 	}
 
@@ -713,7 +736,7 @@ public class AutomataToSattLineSFC
 		{
 			EventLabel event = theAutomaton.getEvent(theArc.getEventId());
 
-			pw.println("SEQTRANSITION " + theAutomaton.getName() + "_Tr" + transitionCounter + " WAIT_FOR " + normalize(event.getLabel()));
+			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter + " WAIT_FOR " + event.getLabel().replace('.', '_'));
 
 			transitionCounter++;
 		}
@@ -727,73 +750,6 @@ public class AutomataToSattLineSFC
 
 	private void printFork(Automaton theAutomaton, State theState, PrintWriter pw)
 	{
-		pw.println("SEQFORK " + theAutomaton.getName() + "_" + theState.getId() + " SEQBREAK");
-	}
-
-	private String normalize(String s)
-	{
-		StringBuffer str = new StringBuffer();
-		int len = (s != null)
-				  ? s.length()
-				  : 0;
-
-		for (int i = 0; i < len; i++)
-		{
-			char ch = s.charAt(i);
-
-			switch (ch)
-			{
-
-			case '<' :
-			{
-				str.append("&lt;");
-
-				break;
-			}
-			case '>' :
-			{
-				str.append("&gt;");
-
-				break;
-			}
-			case '&' :
-			{
-				str.append("&amp;");
-
-				break;
-			}
-			case '"' :
-			{
-				str.append("&quot;");
-
-				break;
-			}
-			case '.' :
-			{
-				str.append("_");
-
-				break;
-			}
-			case '\r' :
-			case '\n' :
-			{
-
-				// if (canonical)
-				// {
-				// str.append("&#");
-				// str.append(Integer.toString(ch));
-				// str.append(';');
-				// break;
-				// }
-				// else, default append char
-			}
-			default :
-			{
-				str.append(ch);
-			}
-			}
-		}
-
-		return str.toString();
+		pw.println("SEQFORK " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId() + " SEQBREAK");
 	}
 }
