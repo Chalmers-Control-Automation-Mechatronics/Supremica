@@ -23,7 +23,7 @@ public class JgrafSupervisor
 	private static String[] getEventsB = {"get_T6","get_T7","get_T8","get_T9","get_T10L","get_T10R","get_T11","get_T12"};
 	private static String[] getEventsC = {"get_T6_S0","get_T6_S1","get_T6_S2","get_T6_S3","get_T6_S4","get_T7_S5","get_T7_S6","get_T7_S7","get_T7_S8","get_T8_S9","get_T8_S10","get_T8_S11","get_T9_S12","get_T9_S13","get_T9_S14","get_T9_S15","get_T12_S16","get_T12_S17","get_T12_S18","get_T12_S19","get_T10_S20","get_T11_S21","get_T11_S22","get_T11_S23"};
 	
-	private String actionString = "S getRot=\"Shoe\"+index+\".nrOfRot\";\nS currTable = \"Shoe\"+index+\".currentTable\";\nS gotoString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".goto\";\nS errorEvent = random()<0.01 & applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Error\"+index);\n";
+	private String actionString = "S getRot=\"Shoe\"+index+\".nrOfRot\";\nS currTable = \"Shoe\"+index+\".currentTable\";\nS gotoString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".goto\";\nS errorEvent = random()<0.0 & applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Error\"+index);\n";
 	private String conditionString = "";
 	
 	public JgrafSupervisor(GCDocument doc, int nr)
