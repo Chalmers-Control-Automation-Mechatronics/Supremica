@@ -850,6 +850,12 @@ public class JavaBytecodeGenerator
 		return null;
 	}
 
+	public Object visitIL_PARAM_LIST(ASTil_param_list n, Object o)
+	{
+		return null;
+	}
+
+
     public File getTempFile() {
     	        return temp;
     }
