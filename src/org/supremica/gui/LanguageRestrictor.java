@@ -28,6 +28,8 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.util.VPopupMenu;
 import org.supremica.automata.algorithms.standard.Determinizer;
 
+import org.supremica.gui.treeview.*;
+
 // To be able to show disabled tree nodes, we need a custom renderer
 class EventNodeRenderer 
 	extends DefaultTreeCellRenderer 
@@ -82,7 +84,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 	
 	private void init()
 	{
-		theTree.setCellRenderer(new EventNodeRenderer());
+		theTree.setCellRenderer(new SupremicaTreeCellRenderer()); // EventNodeRenderer());
 		theTree.setSelectionModel(new EventSelectionModel());
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(200, 400));
@@ -126,13 +128,8 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 						Automaton auto = (Automaton)autoit.next();
 						if(auto.getAlphabet().contains(event))
 						{
-							// AlphabetViewerSubTree autonode = automatonTreeCache.lookup(auto);
-							// if(autonode == null)
-							// {
-							// 	autonode = new AlphabetViewerSubTree(auto);
-							// 	automatonTreeCache.store(auto, autonode);
-							// }
-							AlphabetViewerSubTree autonode = new AlphabetViewerSubTree(auto);
+							// AlphabetViewerSubTree autonode = new AlphabetViewerSubTree(auto);
+							AutomatonSubTree autonode = new AutomatonSubTree(auto, true, false);
 							eventsubtree.add(autonode);
 						}
 					}
@@ -187,7 +184,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 			
 			// If the number of children is not the same as the number of automata plus the number in EventSubTree
 			// Then it has to be disabled/hidden/unselectable
-			if(node.getChildCount()-EventSubTree.numChildren() != automata.size())
+			if(node.getChildCount() - node.numDirectLeafs() != automata.size())
 			{
 				node.setEnabled(false);
 			}
@@ -235,13 +232,13 @@ class RestrictEventsViewerPanel
 {
 	private JTree tree = null;
 	private JScrollPane scrollpane = null;
-	private AlphabetViewerSubTree root = null;
+	private AutomatonSubTree root = null;
 	boolean erase = true;
 	private Automaton automaton = new Automaton("Erase These Events");
 	
 	public RestrictEventsViewerPanel()
 	{
-		this.root = new AlphabetViewerSubTree(automaton);
+		this.root = new AutomatonSubTree(automaton, true, false);
 		this.tree = new JTree(root);
 		this.scrollpane = new JScrollPane(tree);
 
@@ -284,7 +281,7 @@ class RestrictEventsViewerPanel
 	// If the alphabet has changed, you have to rebuild
 	public void rebuild()
 	{
-		this.root = new AlphabetViewerSubTree(automaton);
+		this.root = new AutomatonSubTree(automaton, true, false);
 		((DefaultTreeModel)tree.getModel()).setRoot(root);
 		revalidate();
 	}

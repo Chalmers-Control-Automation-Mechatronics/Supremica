@@ -60,7 +60,9 @@ public class Automaton
 	private Alphabet alphabet;
 	private String name;
 	private String comment;
-	private List theStates;
+	// private List theStates = new LinkedList();
+	private StateSet theStates = new StateSet();
+	
 	private int index = -1;
 	private Map idStateMap;	// Want fast lookup on both id and index (but not name?)
 	private Map indexStateMap;
@@ -87,7 +89,7 @@ public class Automaton
 		alphabet = new Alphabet();
 		idStateMap = new HashMap();
 		indexStateMap = new HashMap();
-		theStates = new LinkedList();
+		// theStates = new LinkedList();
 		theArcs = new ArcSet();
 		masterAutomata = new Automata();
 		slaveAutomata = new Automata();
@@ -411,23 +413,32 @@ public class Automaton
 		return idStateMap.containsKey(state.getId());
 	}
 
+	// Is this getter good design?
+	public StateSet getStateSet()
+	{
+		return theStates;
+	}
+	
 	public State getState(State state)
 	{
 		return (State) idStateMap.get(state.getId());
 	}
 
-	public boolean containsStateWithId(String id)
+	private boolean containsStateWithId(String id)
 	{
 		return idStateMap.containsKey(id);
 	}
 
+	// used by automata/algorithms/ProjectBuildFromXml.java
+	// used by automata/algorithms/AutomataBuildFromVALID.java
 	public State getStateWithId(String id)
 	{
 		return (State) idStateMap.get(id);
 	}
 
+	// The index stuff should be exclusive to AutomataIndexForm, but how to manage that?
 	/**
-	 * This is an ugly method that only are needed when dealing
+	 * This is an ugly method that is only needed when dealing
 	 * with automataIndexForm. All methods that works with index
 	 * needs special initialisation that is not automatically done.
 	 * This method is not recommended for general use.
@@ -452,7 +463,8 @@ public class Automaton
 	{
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
-
+	// end index stuff
+	
 	public LabeledEvent getEvent(String eventId)
 		throws Exception
 	{
@@ -472,7 +484,7 @@ public class Automaton
 		return theEvent.getLabel();
 	}
 
-	/**
+	/** Room for improvement - our problem domain deals with states and events, not ids and labels!
 	 * Use isInAlphabet instead
 	 * @deprecated
 	 */
@@ -607,7 +619,8 @@ public class Automaton
 	 */
 	public Iterator safeStateIterator()
 	{
-		return (new LinkedList(theStates)).iterator();
+		// return (new LinkedList(theStates)).iterator();
+		return (new StateSet(theStates)).iterator();
 	}
 
 	public Iterator arcIterator()

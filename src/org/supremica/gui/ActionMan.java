@@ -1194,10 +1194,11 @@ public class ActionMan
 			}
 		}
 	*/
-		// Why not simpy instantiate an AlphabetViewer with the given automata object??
+		// Why not simpy instantiate an AlphabetViewer with the given automata object?? Use AutomataViewer instead!
 		try
 		{
-			AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
+			// AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
+			AutomataViewer alphabetviewer = new AutomataViewer(selectedAutomata, true, false);
 			alphabetviewer.setVisible(true);
 		}
 		catch(Exception excp)
@@ -1459,19 +1460,16 @@ public class ActionMan
 	// Automaton.View action performed
 	public static void automatonView_actionPerformed(Gui gui)
 	{
-
 		// gui.debug("ActionMan to the rescue!");
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1490,7 +1488,6 @@ public class ActionMan
 
 				if (res == 0)
 				{
-
 					// Abort - YES
 					return;
 				}
@@ -1499,7 +1496,6 @@ public class ActionMan
 			if (!currAutomaton.hasInitialState())
 			{
 				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 				return;
 			}
 
@@ -1509,7 +1505,6 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-
 				// logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName());
 				gui.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName());
 

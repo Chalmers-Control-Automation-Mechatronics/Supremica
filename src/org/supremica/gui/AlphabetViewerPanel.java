@@ -164,12 +164,12 @@ public class AlphabetViewerPanel
 **/
 	public void build()
 	{
-		SupremicaTreeNode root = new SupremicaTreeNode();
+		SupremicaTreeNode root = new SupremicaTreeNode(); // Really AutomataSubTree(theAutomata, showalpha, nostates)?
 		
 		Iterator autit = theAutomata.iterator();
 		while(autit.hasNext())
 		{
-			root.add(new AlphabetViewerSubTree((Automaton)autit.next()));
+			root.add(new AutomatonSubTree((Automaton)autit.next(), true, false));
 		}
 		
 		DefaultTreeModel treeModel = new DefaultTreeModel(root);
