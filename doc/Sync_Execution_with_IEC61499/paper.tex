@@ -92,18 +92,18 @@ changes of the system make it time consuming and expensive
 to update the control system application to reflect the
 changes. The same problem applies to both system types
 mentioned above and it becomes even larger in mission
-critical control applications since the strict requirenment
+critical control applications since the strict requirement
 of guaranteeing the correct operation is imposed. Thus,
 there is a need to introduce algorithms and tools to make it
 simple and as safe as possible to modify the control system.
 The supervisory control theory,\cite{rw:con:1989}, is a
 promising framework that might be useful for this purpose.
 
-% suprevisory control
+% supervisory control
 Many man-made systems can, at some abstraction level, be
 modeled by discrete event models. A useful class of discrete
 event models is the deterministic finite automata which can
-be used in suprevisory control theory. In the theory these
+be used in supervisory control theory. In the theory these
 models are used, together with a formal specification of the
 desired behavior, to automatically generate a control
 function which makes the system behave within specification.
@@ -125,11 +125,11 @@ environment. A new method presented in this paper uses the
 emerging standard for distributed control systems to remedy
 that.
 
-% paper organisation
+% paper organization
 Mathematical definitions that are used in the paper are
 presented in the next section. After that, the most
-important definitions and results of suprevisory control
-theory are introduced followed by an exampel showing how
+important definitions and results of supervisory control
+theory are introduced followed by an example showing how
 supervisory control theory can be applied in implementation
 of control application for a small system. After the example
 a method for implementation of the synchronization operator
@@ -224,31 +224,31 @@ where
   \end{cases}
 \end{equation}
 $\Box$\\
-What this definiton states is that in a group of automatons
+What this definition states is that in a group of automatons
 that share one event if there is one automaton that does not
 have that event enabled in its current state, than the event
 is not allowed to occur in any of the other automatons in
 the group. That is, one automaton is able to prevent all the
 others from executing an event if it does not enable it at
 the same time as all the other automatons. This property of
-the definiton is used to construct a supervisor which
+the definition is used to construct a supervisor which
 prevents events from occurring. The concept of supervisor is
 explained further in the next section which introduces the
 supervisory control theory.
 
 \section{Supervisory Control Theory}
 \label{sec:sct}
-Suprevisory control theory provides algorithms for
-calcuation of allowed behavior of the system from discrete
+Supervisory control theory provides algorithms for
+calculation of allowed behavior of the system from discrete
 event models of possible behavior and desired behavior. The
 model of the possible behavior is called the plant, the
 model of the desired behavior is called the specification,
-and the result of the computation is called the suprevisor.
+and the result of the computation is called the supervisor.
 
 In the supervisory control theory, the plant is assumed to
 generate all events and the purpose of the supervisor is to
 prevent the plant from generating events that will violate
-the specfication. The assumption that the plant generates
+the specification. The assumption that the plant generates
 all events might seem like a restriction. However, it is
 often possible to introduce a controller which will initiate
 the events between the supervisor and the resource. Treating
@@ -361,7 +361,7 @@ fulfilled. The conditions upon which transitions occur are
 boolean expressions involving event input variables,
 internal variables, input variables, and output variables.
 When the expression evaluates to \texttt{true} the
-transition occur. Special case is transition labled with
+transition occur. Special case is transition labeled with
 \texttt{1}, it is taken as soon as the algorithms finish
 execution.
 \begin{figure}
@@ -469,7 +469,7 @@ blocks together is shown in Fig.~\ref{fig:app}. Small
 circles in the figure are event multiplexer and
 demultiplexer. Event multiplexer generates an event on the
 output every time an event arrives at any one of the inputs.
-Event demultiplexer does the opossite and generates an event
+Event demultiplexer does the opposite and generates an event
 on all of the outputs whenever an event arrives at the
 input.
 \begin{figure}
@@ -560,7 +560,7 @@ When algorithm is generated what is left is to connect
 instances of the model function blocks with the
 synchronization function block to generate the control
 application. Some further considerations for the
-implementaion of supervisory control theory are presented in
+implementation of supervisory control theory are presented in
 the following section.
 
 \section{Applications in supervisory control theory}
@@ -573,10 +573,10 @@ using supervisory control theory.
 Today implementation of a distributed control application is
 done using application structure similar to the structure in
 Fig.~\ref{fig:old_app_struct}. Supervisor \texttt{S} in
-the application is manualy crafted using informal
-specificatons of the system behavior, and transfered to the
+the application is manually crafted using informal
+specifications of the system behavior, and transfered to the
 PLC-code. For each application the communication between the
-suprevisor and the plants has to be implemented in a
+supervisor and the plants has to be implemented in a
 application specific way since the existing standards for
 communication between PLCs are at a low level of
 abstraction. Using IEC 61499 the communication part of the
@@ -584,7 +584,7 @@ application is abstracted far away from the hardware level
 and the control engineer is only considering the event and
 data passing between the functional parts of the
 application, i.e. function block instances. When the system
-plants are upgraded or chaged the procedure of supervisor
+plants are upgraded or changed the procedure of supervisor
 crafting has to be done once again and very small parts of
 the code from the application already implemented are
 reused, i.e. the communication parts.
@@ -597,12 +597,12 @@ reused, i.e. the communication parts.
 
 In software tool Supremica \cite{aff:sup:2003,www:sup:2004},
 algorithms from supervisory control theory are implemented
-so that a supervisor can be synthesised from automata models
+so that a supervisor can be synthesized from automata models
 of the plants and specifications. The algorithm that
 implements the general method for synchronization according
 to this paper is also implemented in the same tool. What
 this means is that the control engineer can focus on the
-correct modeling of the plants and transfering of the
+correct modeling of the plants and transferring of the
 informal specifications to the specification models for use
 in the Supremica tool. Then the tool automatically generates
 the supervisor in form of an automaton model, function block
@@ -610,7 +610,7 @@ types that implement the skeleton for the plants, the
 supervisor automaton, synchronous composition function block
 and finally the control application that connects the
 instances of the generated function block types as seen in
-Fig.~\ref{fig:app} for the example. The sekelton in this
+Fig.~\ref{fig:app} for the example. The skeleton in this
 case refers to the fact that the communication with the
 hardware has to be implemented by hand but all the behavior
 of the models is automatically generated. Using the tool to
@@ -631,10 +631,10 @@ automatically.
 When trying to implement the control application for complex
 systems with many plants and specifications the problem of
 state space explosion is encountered when trying to
-synthesise the supervisor model. There are methods that
+synthesize the supervisor model. There are methods that
 represent the plants, specifications and the supervisor in
 different ways to try to cope with the problem. For example,
-a supervisor may be expressed as a singel automaton,
+a supervisor may be expressed as a single automaton,
 multiple automata, and a binary decision diagram for
 off-line synthesis. Or the supervisor may be synthesized
 on-line while the control application is executing. The
@@ -647,7 +647,7 @@ discrete event models.
 \section{Conclusion}
 Using supervisory control theory in construction of control
 applications can significantly reduce development time but
-until now it was dificult to apply the theory to
+until now it was difficult to apply the theory to
 implementation of distributed control applications. Using
 the emerging standard IEC 61499 it becomes significantly
 easier. The method presented in this paper brings
