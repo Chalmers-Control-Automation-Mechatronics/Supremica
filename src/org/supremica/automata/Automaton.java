@@ -540,8 +540,7 @@ public class Automaton
 		return idStateMap.containsKey(id);
 	}
 
-	// used by automata/algorithms/ProjectBuildFromXml.java
-	// used by automata/algorithms/AutomataBuildFromVALID.java
+
 	private State getStateWithId(String id)
 	{
 		return (State) idStateMap.get(id);

@@ -480,10 +480,9 @@ public class ProjectBuildFromXml
 			name = id;
 		}
 
-		State currState = new State();
-
-		currState.setId(id);
-		currState.setName(name);
+		State currState = new State(name);
+		// currState.setId(id);
+		// currState.setName(name);
 		currState.setInitial(initial);
 		currState.setAccepting(accepting);
 		currState.setForbidden(forbidden);
