@@ -1,3 +1,5 @@
+% -*- TeX-master:"main" -*-
+
 \chapter{IEC~61499 Standard}
 \label{functionblocks}
 
@@ -79,7 +81,7 @@ IEC~61499-1 has provided a set of models for describing
 distributed systems that have been programmed using function
 blocks.
 
-\subsection{System Model} 
+\subsection*{System Model} 
 At the physical level, a distributed system consists of a
 set of co-operating {\it applications}. An application can
 exist on a single system such as application C in figure
@@ -96,7 +98,7 @@ a number of devices such as applications A and B in Figure
   \end{center}
 \end{figure}
 
-\subsection{Device Model} 
+\subsection*{Device Model} 
 A resource provides independent execution and control of
 networks of function blocks. It supports zero or more {\it
   resources} and has at least one interface. The interface
@@ -116,7 +118,7 @@ in remote devices. The device model is illustrated in Figure
   \end{center}
 \end{figure}
 
-\subsection{Resource Model} 
+\subsection*{Resource Model} 
 A resource is an independent functional unit, contained in a
 device which has independent control of its operation. The
 resource can be created, configured, parameterized, started
@@ -146,7 +148,7 @@ interface of the resource.
   \end{center}
 \end{figure}
   
-\subsection{Application Model} 
+\subsection*{Application Model} 
 An application is defined as a network of interconnected
 function blocks, linked by data and event flows. An
 application can be fragmented and distributed over many
@@ -169,7 +171,7 @@ either a function block or a subapplication.
   \end{center}
 \end{figure}
   
-\subsection{Function Block Model} 
+\subsection*{Function Block Model} 
 A function block is a functional unit of software that its
 own data structure which can be manipulated by one or more
 algorithms. The formal description of the data structure is
@@ -225,7 +227,7 @@ block type is analogous to the class definition in
 object-oriented programming while function block instances
 correspond to the object instances of the classes.
 
-\subsection{Basic Function Block Types} 
+\subsection*{Basic Function Blocks} 
 The behavior of basic function blocks is defined in terms of
 algorithms that are invoked in response to input events. As
 algorithms execute, they trigger output events to signal
@@ -249,7 +251,7 @@ block.
   \end{center}
 \end{figure}
   
-\subsection{Composite Function Blocks} 
+\subsection*{Composite Function Blocks} 
 The behavior of a composite function block is described in
 terms of the event and data connections between its
 component function blocks. A composite function block can be
@@ -267,7 +269,7 @@ Figure \ref{f:Composite_Block}.
   \end{center}
 \end{figure}
 
-\subsection{Service Interface Function Blocks} 
+\subsection*{Service Interface Function Blocks} 
 Service interface function blocks provide an interface
 between the function block domain and the external services.
 Since a service interface function block is primarily
@@ -277,7 +279,7 @@ blocks are communication blocks for publishing and
 subscribing over a network and management blocks for
 dynamically creating component blocks and event connections.
   
-\subsection{Event Function Blocks} 
+\subsection*{Event Function Blocks} 
 Event function blocks are some special basic function blocks
 defined in the standard to ease the management of events.
 These blocks are used for control, generation and detection
