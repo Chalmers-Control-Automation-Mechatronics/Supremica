@@ -560,11 +560,14 @@ public final class AutomataOnlineSynchronizer
 	public int[] doTransition(int eventIndex)
 	{
 
+		//System.err.println("doTransition: eventIndex " + eventIndex);
 		// Counting on correct input here... only enabled events, please...
 		// Construct new state
 		int[] nextState = new int[currState.length];
 
 		System.arraycopy(currState, 0, nextState, 0, currState.length);
+
+		//System.err.println("doTransition: nbrOfSelectedAutomata " + nbrOfSelectedAutomata);
 
 		// Iterate over all automata to construct the new state
 		for (int j = 0; j < nbrOfSelectedAutomata; j++)

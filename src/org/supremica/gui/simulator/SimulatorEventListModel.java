@@ -224,8 +224,10 @@ public class SimulatorEventListModel
 
 		return currEvent;
 	}
+
 	public int[] getStateAt(int index)
 	{
+		//System.err.println("getStateAt: " + index);
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 
 		return onlineSynchronizer.doTransition(events[index]);
