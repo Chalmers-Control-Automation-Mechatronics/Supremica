@@ -37,6 +37,13 @@ public class BTSim
 	public synchronized void setSignalArray(boolean[] values)
 		throws Exception
 	{
+	    boolean[] temp = new boolean[values.length];
+	    temp = values;
+	    for (int i=8;i<18;i++)
+	    {
+		values[i] = false;
+		values[i+3] = temp[i];
+	    }
 
 		// när skall vi ge exception???
 		System.arraycopy(values, 0, inSignals, 0, inSignals.length);
