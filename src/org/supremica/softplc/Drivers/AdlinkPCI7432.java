@@ -39,7 +39,7 @@ public class AdlinkPCI7432
 	public AdlinkPCI7432(int cardNumber)
 		throws Exception
 	{
-		this(cardNumber, false, false);
+		this(cardNumber, false, true);
 	}
 
 	public AdlinkPCI7432(int cardNumber, boolean invertInputs, boolean invertOutputs)
@@ -104,7 +104,7 @@ public class AdlinkPCI7432
 
 		int value = toInt(outputs, invertOutputs);
 
-		System.err.println("Wrote: " + value);
+		//		System.err.println("Wrote: " + value);
 		AdlinkPCI7432.WritePort(card, (short) 0, value);
 	}
 

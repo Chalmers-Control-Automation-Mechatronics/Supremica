@@ -1,3 +1,19 @@
+(*
+FUNCTION_BLOCK Delayer
+	VAR_IN_OUT
+		LOOPS : DINT;
+		L : DINT;
+	END_VAR
+	LD DINT#0
+	ST L
+LOOP :  LD L
+	EQ LOOPS
+	JMPC ENDING
+	CAL PRINT("HEJ")
+	JMP LOOP
+ENDING:
+END_FUNCTION_BLOCK	
+*)
 PROGRAM PortVaktstest
 	VAR
 		(*Insignaler*)
@@ -8,17 +24,39 @@ PROGRAM PortVaktstest
 		(*Utsignaler*)
 		InPortvakt   AT %QX0  : BOOL;
 		UrPortvakt   AT %QX1  : BOOL;
+		Matlyft      AT %QX2  : BOOL;
 	END_VAR
+	VAR
+		Lcnt : DINT;
+		tmp  : BOOL;
+	END_VAR
+(*
+	VAR
+		delay : Delayer;
+	END_VAR
+*)
 
-(*	if (Start && !(KulaPortvakt || UrPortvakt))
+(*Print start*)
+CAL PRINTLN("Start =", Start)
+CAL PRINTLN("Urportvakt=", UrPortvakt)
+	LD FALSE
+	ST %QX1
+
+
+(*	if !(Start || (KulaPortvakt || UrPortvakt))
 		Släpp in kula
 	fi
 *)
 		LD Start
-		ANDN(KulaPortvakt
-		 	OR UrPortvakt
+		OR(KulaPortvakt
+		   OR UrPortvakt
 		)
-		JMPCN END1
+		ST tmp
+		CAL PRINTLN("TMP=",tmp)
+		CAL PRINTLN("KulaPvakt=",KulaPortvakt)
+		CAL PRINTLN("UrPortvakt=",UrPortvakt)
+		JMPC END1
+			
 			LD TRUE
 			ST InPortvakt
 END1 :
@@ -59,11 +97,35 @@ END3 :
 			LD FALSE
 			ST UrPortvakt
 END4 :
-END_PROGRAM
+
 (*
 	bonus
 	if (KulaMätlyft && MätlyftNere)
 
 *)
+(*	LD DINT#600
+	ST delay.LOOPS
+*)
+
+	LD KulaMatlyft
+	AND MatlyftNere
+	JMPCN END5
 
 
+		LD DINT#0
+		ST Lcnt
+	LOOP :  LD Lcnt
+		EQ DINT#400
+		JMPC ENDING
+		CAL PRINT("HEJ")
+		LD DINT#1
+		ADD Lcnt
+		ST Lcnt
+		JMP LOOP
+	ENDING:
+
+		LD TRUE
+		ST Matlyft
+END5:
+
+END_PROGRAM
