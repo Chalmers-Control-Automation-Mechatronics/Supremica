@@ -65,8 +65,13 @@ import org.supremica.automata.LabeledEvent;
 public class ProjectBuildFromXml
 	extends AutomataBuildFromXml
 {
-/*
-	private final static String projectStr = "Project";
+/*	private final static String projectStr = "Project";
+	private final static String layoutStr = "Layout";
+	private final static String executionStr = "Execution";
+	private final static String actionsStr = "Actions";
+	private final static String actionStr = "Action";
+	private final static String controlsStr = "Controls";
+	private final static String controlStr = "Control";
 
 	private Project currProject = null;
 
@@ -185,6 +190,30 @@ public class ProjectBuildFromXml
 		{
 			doProject(attributes);
 		}
+		else if (layoutStr.equals(name))
+		{
+			doLayout(attributes);
+		}
+		else if (executionStr.equals(name))
+		{
+			doExecution(attributes);
+		}
+		else if (actionsStr.equals(name))
+		{
+			doActions(attributes);
+		}
+		else if (actionStr.equals(name))
+		{
+			doAction(attributes);
+		}
+		else if (controlsStr.equals(name))
+		{
+			doControls(attributes);
+		}
+		else if (controlStr.equals(name))
+		{
+			doControl(attributes);
+		}
 		else if (eventsStr.equals(name)) {}
 		else if (statesStr.equals(name)) {}
 		else if (transitionsStr.equals(name)) {}
@@ -195,6 +224,113 @@ public class ProjectBuildFromXml
 	}
 
 	public final void doProject(AttributeList attributes)
+		throws SAXException
+	{
+		currProject = new Project();
+
+		String name = attributes.getValue("name");
+
+		if (name != null)
+		{
+			currAutomata.setName(name);
+		}
+
+		String owner = attributes.getValue("owner");
+
+		if (name != null)
+		{
+			currAutomata.setOwner(owner);
+		}
+
+		String hash = attributes.getValue("hash");
+
+		if (hash != null)
+		{
+			currAutomata.setHash(hash);
+		}
+
+		int majorVersion = 0;
+		String majorStringVersion = attributes.getValue("major");
+
+		if (majorStringVersion != null)
+		{
+			majorVersion = Integer.parseInt(majorStringVersion);
+		}
+
+		int minorVersion = 0;
+		String minorStringVersion = attributes.getValue("minor");
+
+		if (minorStringVersion != null)
+		{
+			minorVersion = Integer.parseInt(minorStringVersion);
+		}
+
+		if (majorVersion > 0)
+		{
+			throw new SAXException("Unsupported file format.");
+		}
+
+		if (minorVersion > 9)
+		{
+			throw new SAXException("Unsupported file format.");
+		}
+	}
+
+
+	public final void doLayout(AttributeList attributes)
+		throws SAXException
+	{
+		currProject = new Project();
+
+		String name = attributes.getValue("name");
+
+		if (name != null)
+		{
+			currAutomata.setName(name);
+		}
+
+		String owner = attributes.getValue("owner");
+
+		if (name != null)
+		{
+			currAutomata.setOwner(owner);
+		}
+
+		String hash = attributes.getValue("hash");
+
+		if (hash != null)
+		{
+			currAutomata.setHash(hash);
+		}
+
+		int majorVersion = 0;
+		String majorStringVersion = attributes.getValue("major");
+
+		if (majorStringVersion != null)
+		{
+			majorVersion = Integer.parseInt(majorStringVersion);
+		}
+
+		int minorVersion = 0;
+		String minorStringVersion = attributes.getValue("minor");
+
+		if (minorStringVersion != null)
+		{
+			minorVersion = Integer.parseInt(minorStringVersion);
+		}
+
+		if (majorVersion > 0)
+		{
+			throw new SAXException("Unsupported file format.");
+		}
+
+		if (minorVersion > 9)
+		{
+			throw new SAXException("Unsupported file format.");
+		}
+	}
+
+	public final void doExecution(AttributeList attributes)
 		throws SAXException
 	{
 		currProject = new Project();

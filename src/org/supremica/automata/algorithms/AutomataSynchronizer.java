@@ -110,6 +110,7 @@ public class AutomataSynchronizer
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+			currExec.setPriority(Thread.MIN_PRIORITY);
 
 			currExec.start();
 		}
