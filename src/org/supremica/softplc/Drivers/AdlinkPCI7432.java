@@ -30,7 +30,7 @@ public class AdlinkPCI7432
 	private static final short nrOfSignalsIn = 32;
 	private static final short nrOfSignalsOut = 32;
         
-        private boolean[] outputs = null;
+	private boolean[] outputs = null;
 
 	public AdlinkPCI7432()
 		throws Exception
