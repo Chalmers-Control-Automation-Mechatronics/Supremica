@@ -88,7 +88,7 @@ public class Supremica
 	private MainMenuBar menuBar = new MainMenuBar(this);
 	private MainToolBar toolBar = new MainToolBar(this);
 	private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
-	
+
 	private VisualProjectContainer theVisualProjectContainer;
 	private TypeCellEditor typeEditor;
 	private PreferencesDialog thePreferencesDialog = null;
@@ -119,7 +119,7 @@ public class Supremica
 
 		theVisualProjectContainer.addListener(this);
 
-		VisualProject theVisualProject = new VisualProject("Single Visual Project");
+		VisualProject theVisualProject = new VisualProject("");
 
 		theVisualProjectContainer.addProject(theVisualProject);
 		setActiveProject(theVisualProject);
@@ -690,7 +690,7 @@ public class Supremica
 			if (projectName != null)
 			{
 				getActiveProject().setName(projectName);
-				logger.info("Project name changed to \"" + projectName + "\"");
+				logger.debug("Project name changed to \"" + projectName + "\"");
 			}
 		}
 

@@ -173,6 +173,7 @@ public class ExampleTemplates
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OperatorSupervisor/";
+		thisGroup.addItem(new TemplateItem("Warehouse", prefix + "warehouse.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=2", prefix + "warehouse_k2.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=13", prefix + "warehouse_k13.xml"));
 	}

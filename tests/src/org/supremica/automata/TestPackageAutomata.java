@@ -54,6 +54,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.supremica.automata.algorithms.TestPackageAlgorithms;
+import org.supremica.automata.IO.TestPackageIO;
 
 public class TestPackageAutomata
 	extends TestCase
@@ -76,6 +77,7 @@ public class TestPackageAutomata
 		suite.addTest(TestAutomata.suite());
 		suite.addTest(TestStateSet.suite());
 		suite.addTest(TestPackageAlgorithms.suite());
+		suite.addTest(TestPackageIO.suite());
 		return suite;
 	}
 }
