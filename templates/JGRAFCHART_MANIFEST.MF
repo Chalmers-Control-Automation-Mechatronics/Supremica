@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Created-By: Karl-Erik Arzen 
+Main-Class: org.jgrafchart.Basic2GC
+
+
+
