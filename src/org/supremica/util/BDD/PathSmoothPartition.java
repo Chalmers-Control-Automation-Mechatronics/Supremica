@@ -147,17 +147,14 @@ public class PathSmoothPartition
 			this.bdd_curr_t = -1;
 
 			// get the size of state vector, create the initial lock
-			bits = current = 0;
+			current = 0;
 			bdd_curr_i = manager.getOne();
 
 			manager.ref(bdd_curr_i);
 
-			for (Enumeration e = cluster.members.elements();
-					e.hasMoreElements(); )
-			{
-				BDDAutomaton a = (BDDAutomaton) e.nextElement();
+			for (Iterator it = cluster.iterator(); it.hasNext(); ) {
+				BDDAutomaton a = (BDDAutomaton) it.next();
 
-				bits += a.getNumStateBits();
 
 				/** possible problem here: if we are going backward, nothing garanties that
 				  * there is a single marked state? manye all states are marked?
@@ -187,13 +184,13 @@ public class PathSmoothPartition
 			manager.deref(tmp);
 
 			// get the actual S' bits:
+			int bits = cluster.getSizeOfS();
 			v_cubep = new int[bits];
 			bits = 0;
 
-			for (Enumeration e = cluster.members.elements();
-					e.hasMoreElements(); )
-			{
-				BDDAutomaton a = (BDDAutomaton) e.nextElement();
+			for (Iterator it = cluster.iterator(); it.hasNext(); ) {
+				BDDAutomaton a = (BDDAutomaton) it.next();
+
 				int size = a.getNumStateBits();
 				int[] vp = a.getVarp();
 

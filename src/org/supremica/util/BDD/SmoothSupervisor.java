@@ -140,7 +140,7 @@ public class SmoothSupervisor
 			{
 				remaining[a] = false;
 
-				dp.add(clusters[a].twave);
+				dp.add(clusters[a].getTwave() );
 
 				if (gf != null)
 				{
@@ -218,7 +218,7 @@ public class SmoothSupervisor
 			{
 				remaining[a] = false;
 
-				dp.add(clusters[a].twave);
+				dp.add(clusters[a].getTwave() );
 
 				if (gf != null)
 				{

@@ -100,7 +100,7 @@ public void check(String place){
 		for (Enumeration e = v.elements(); e.hasMoreElements(); )
 		{
 			Cluster c2 = (Cluster) e.nextElement();
-			int tmp = manager.or(c2.twave, c.twave);
+			int tmp = manager.or(c2.getTwave(), c.getTwave());
 
 			if (manager.nodeCount(tmp) < Options.max_partition_size)
 			{
@@ -124,7 +124,7 @@ public void check(String place){
 
 		for (int i = 0; i < curr; i++)
 		{
-			SizeWatch.report(clusters[i].twave, "Cluster " + (i + 1));
+			SizeWatch.report(clusters[i].getTwave(), "Cluster " + (i + 1));
 		}
 	}
 
@@ -139,7 +139,7 @@ public void check(String place){
 
 		for (int i = 0; i < curr; i++)
 		{
-			int tmp = manager.relProd(clusters[i].twave, q_k, cube);
+			int tmp = manager.relProd(clusters[i].getTwave(), q_k, cube);
 
 			front = manager.orTo(front, tmp);
 
@@ -165,7 +165,7 @@ public void check(String place){
 
 		for (int i = 0; i < curr; i++)
 		{
-			int tmp = manager.relProd(clusters[i].twave, q_k, cubep);
+			int tmp = manager.relProd(clusters[i].getTwave(), q_k, cubep);
 
 			front = manager.orTo(front, tmp);
 

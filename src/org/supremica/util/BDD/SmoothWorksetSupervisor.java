@@ -49,7 +49,7 @@ public class SmoothWorksetSupervisor
 		{
 			int p = workset.pickOneExcelsuive();
 
-			dp.add(clusters[p].twave);
+			dp.add(clusters[p].getTwave());
 
 			if (gf != null)
 			{
@@ -129,7 +129,7 @@ public class SmoothWorksetSupervisor
 		{
 			int p = workset.pickOneExcelsuive();
 
-			dp.add(clusters[p].twave);
+			dp.add(clusters[p].getTwave());
 
 			if (gf != null)
 			{

@@ -25,7 +25,7 @@ public class DelayedSmoothSupervisor
 	// compute the forward image
 	protected int delay_forward(GrowFrame gf, Cluster c, int r)
 	{
-		int r_old = r, t = c.twave;
+		int r_old = r, t = c.getTwave() ;
 
 		do
 		{
@@ -57,7 +57,7 @@ public class DelayedSmoothSupervisor
 
 	protected int delay_backward(GrowFrame gf, Cluster c, int r)
 	{
-		int r_old = r, t = c.twave;
+		int r_old = r, t = c.getTwave();
 
 		do
 		{

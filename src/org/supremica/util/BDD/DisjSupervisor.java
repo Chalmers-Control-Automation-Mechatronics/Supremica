@@ -72,7 +72,7 @@ public class DisjSupervisor
 
 		for (int i = 0; i < size; i++)
 		{
-			ret += manager.nodeCount(cs[i].twave);
+			ret += manager.nodeCount(cs[i].getTwave() );
 		}
 
 		return ret;

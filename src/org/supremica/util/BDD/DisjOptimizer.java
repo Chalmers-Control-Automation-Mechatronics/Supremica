@@ -28,8 +28,6 @@ public class DisjOptimizer
 
 		int[] tmp = gh.getTwave();
 		int[] tmp2 = gh.getTwaveUncontrollable();
-		int[] cube = gh.getCube();
-		int[] cubep = gh.getCubep();
 		BDDAutomaton[] automata = gh.getSortedList();
 
 		// DEBUG refcheck = new BDDRefCheck(manager, "DisjOptimizer");
@@ -40,12 +38,7 @@ public class DisjOptimizer
 			twave[i] = manager.ref( tmp[i] );
 			twave_u[i] = manager.ref( tmp2[i] );
 
-
-			// THIS solves many problmes (why?)
-			// manager.ref( cube[i] );
-			clusters[i] = new Cluster(manager, twave[i], twave_u[i], cube[i], cubep[i]);
-			clusters[i].members.addElement(automata[i]);
-
+			clusters[i] = new Cluster(manager, automata[i]);
 		}
 
 		optimize();

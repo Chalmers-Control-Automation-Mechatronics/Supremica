@@ -68,7 +68,7 @@ public class DelayedStarSmoothSupervisor
 
 		for (int i = 0; i < cluster_tos; i++)
 		{
-			delay_partition.add(dih.next().twave);
+			delay_partition.add(dih.next().getTwave());
 
 			r = delay_partition.forward(gf, limit, r);
 		}
@@ -93,7 +93,7 @@ public class DelayedStarSmoothSupervisor
 
 		for (int i = 0; i < cluster_tos; i++)
 		{
-			delay_partition.add(dih.next().twave);
+			delay_partition.add(dih.next().getTwave());
 
 			r = delay_partition.backward(gf, limit, r);
 		}

@@ -274,29 +274,20 @@ public class KeepSmoothSupervisor
 				this.bdd_curr_t = -1;
 
 				// get the size of state vector, create the initial lock
-				bits = current = 0;
-				bdd_curr_keep = manager.getOne();
+				current = 0;
 
-				manager.ref(bdd_curr_keep);
 
-				for (Enumeration e = cluster.members.elements();
-						e.hasMoreElements(); )
-				{
-					BDDAutomaton a = (BDDAutomaton) e.nextElement();
-
-					bits += a.getNumStateBits();
-					bdd_curr_keep = manager.andTo(bdd_curr_keep, a.getKeep());
-				}
+				bdd_curr_keep = cluster.getKeep();
+				bits = cluster.getSizeOfS();
 
 				// TODO: do have the right BDD order here? (cant sort bdd _trees_ ?)
 				// get the actual S' bits:
 				v_vars = new int[bits];
 				bits = 0;
 
-				for (Enumeration e = cluster.members.elements();
-						e.hasMoreElements(); )
-				{
-					BDDAutomaton a = (BDDAutomaton) e.nextElement();
+				for (Iterator it = cluster.iterator(); it.hasNext(); ) {
+					BDDAutomaton a = (BDDAutomaton) it.next();
+
 					int size = a.getNumStateBits();
 					int[] vp = a.getVar();
 					int[] v = a.getVarp();
@@ -313,7 +304,6 @@ public class KeepSmoothSupervisor
 
 			public void cleanup()
 			{
-				manager.deref(bdd_curr_keep);
 
 				if (bdd_curr_t != -1)
 				{
