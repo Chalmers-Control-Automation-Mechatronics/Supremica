@@ -40,7 +40,7 @@
 <property name="javalibs.dir" value="lib/unjared"/>
 
 <!-- Waters -->
-<property name="xml" location="xml"/>
+<property name="xml" location="waters/xml"/>
 <property name="xsd" location="${xml}/xsd"/>
 <property name="xsl" location="${xml}/xsl"/>
 <property name="logs" location="logs"/>
@@ -366,7 +366,7 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build" depends="compile,jar,startfiles_supremica">
+<target name="build" depends="compile,jar_supremica,startfiles_supremica">
 </target>
 
 <!-- Rebuild:
@@ -469,8 +469,11 @@
 		<fileset dir="${animations}"/>		
 		<fileset dir="${userinterfaces}"/>	
 		<fileset dir="${runtimesoftplcbuild}"/>			
+		<zipfileset file="${xsl}/vw.xsl"
+			fullpath="net/sourceforge/waters/valid/vw.xsl"/>
 	</jar>
 </target>
+
 
 <!--
 <target name="compile_robotstudiointerface" depends="startfiles_local_supremica">
@@ -525,6 +528,8 @@
 	</jar>
 </target>
 
+
+<!--
 <target name="jar">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/ALL_MANIFEST.MF"> 
 		<fileset dir="${build}"/>
@@ -535,6 +540,7 @@
 		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
+-->
 
 <target name="jar_jaxb">
 	<jar jarfile="${lib}/waters_jaxb.jar"> 
@@ -559,8 +565,8 @@
 </target>
 
 <target name="startfiles_local_supremica">
-        <copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>    	
-        <chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
+	<copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>    	
+	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
 	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>		
 	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>		
