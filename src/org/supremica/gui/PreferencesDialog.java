@@ -65,6 +65,7 @@ public class PreferencesDialog
 	private CommunicationPanel theCommunicationPanel = null;
 	private LayoutPanel theLayoutPanel = null;
 	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
+	private SoftPLCPanel theSoftPLCPanel = null;
 	private PreferencesControllerPanel theControllerPanel = null;
 
 	public PreferencesDialog(Frame owner)
@@ -87,6 +88,10 @@ public class PreferencesDialog
 		theCommunicationPanel = new CommunicationPanel(this);
 
 		theTabbedPanel.add("Communication", theCommunicationPanel);
+
+		theSoftPLCPanel = new SoftPLCPanel(this);
+
+		theTabbedPanel.add("SoftPLC", theSoftPLCPanel);
 
 		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
 		{
@@ -551,5 +556,53 @@ class PreferencesControllerPanel
 	public void apply_actionPerformed(ActionEvent e)
 	{
 		theDialog.doApply();
+	}
+}
+
+class SoftPLCPanel
+	extends JPanel
+{
+	private PreferencesDialog theDialog = null;
+	private JCheckBox useXmlRpc = null;
+	private JTextField cykelTime = null;
+
+	public SoftPLCPanel(PreferencesDialog theDialog)
+	{
+		this.theDialog = theDialog;
+
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+
+		add(propertiesBox, BorderLayout.CENTER);
+
+		JLabel cykelTimeLabel = new JLabel("Default cykel time (ms)");
+
+		propertiesBox.add(cykelTimeLabel);
+
+		cykelTime = new JTextField();
+
+		propertiesBox.add(cykelTime);
+	}
+
+	public boolean doApply()
+	{
+		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
+
+		//int cykelTime = theDialog.getInt("XML-RPC Port", cykelTime.getText(), 1);
+		int cykelTime = 10;
+
+		if (cykelTime == Integer.MIN_VALUE)
+		{
+			return false;
+		}
+
+		SupremicaProperties.setXmlRpcPort(cykelTime);
+
+		return true;
+	}
+
+	public void update()
+	{
+		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
+		cykelTime.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
 	}
 }
