@@ -641,6 +641,11 @@ public class AutomataVerifier
 				{
 					// Try to find more similarities
 					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
+					if (moreSimilarAutomata == null)
+					{
+						// There were no more automata to add!
+						return false;
+					}
 					int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
 
 					if (moreSimilarAutomata != null)
