@@ -152,6 +152,7 @@ public class ExecutionDialog
 	public ExecutionDialog(JFrame frame, String title, List executers)
 	{
 		super(frame);
+		setVisible(false);
 
 		// this.workbench = workbench;
 		this.executers = executers;
@@ -229,6 +230,16 @@ public class ExecutionDialog
 		// Update labels
 		if (newMode)
 		{
+			if (currentMode == ExecutionDialogMode.hide)
+			{
+				setVisible(false);
+				return;
+			}
+			else if (!isVisible())
+			{
+				setVisible(true);
+			}
+
 			if (currCenterPanel != null)
 			{
 				contentPanel.remove(currCenterPanel);
@@ -286,12 +297,6 @@ public class ExecutionDialog
 				
 				currCenterPanel = infoPanel;
 			}
-			else if (currentMode == ExecutionDialogMode.hide)
-			{
-
-				// Do nothing
-				// -- MF -- What happens if we do setText, add, etc, here?
-			}
 
 			/*
 			 * This is what it should look like - let the mode keep track of itself
@@ -302,6 +307,7 @@ public class ExecutionDialog
 			 * currCenterPanel = infoPanel;
 			 *
 			 */
+
 			newMode = false;
 		}
 
@@ -311,16 +317,14 @@ public class ExecutionDialog
 
 		if (showValues)
 		{
-			infoValue.setText(String.valueOf(value));
+			if (value >= 0)
+				infoValue.setText(String.valueOf(value));
+			else
+				infoValue.setText("");
 		}
 		else if (showProgress)
 		{
 			progressBar.setValue(progressValue);
-		}
-		else if (currentMode == ExecutionDialogMode.hide)
-		{
-			setVisible(false);
-			//dispose();
 		}
 	}
 

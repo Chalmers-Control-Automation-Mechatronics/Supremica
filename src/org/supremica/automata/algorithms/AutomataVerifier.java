@@ -83,7 +83,7 @@ public class AutomataVerifier
 	 *
 	 *@see  AlphabetAnalyzer
 	 */
-	private HashMap uncontrollableEventToPlantMap; // = new HashMap();
+	private HashMap uncontrollableEventToPlantMap = null; 
 	private AutomataSynchronizerHelper synchHelper;
 	private ArrayList synchronizationExecuters = new ArrayList();
 	private StateMemorizer potentiallyUncontrollableStates;
@@ -129,11 +129,9 @@ public class AutomataVerifier
 		verboseMode = synchronizationOptions.verboseMode();
 		oneEventAtATime = verificationOptions.getOneEventAtATime();
 
-		// The helper must be initialized here only because of the executionDialog, I think...
+		// The helper must be initialized here (this early) only because of the 
+		// executionDialog, I think...
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-
-		// Allocate the synchronizationExecuters
-		// synchronizationExecuters = new ArrayList(nbrOfExecuters);
 
 		// Build the initial state  (including 2 status fields)
 		initialState = AutomataIndexFormHelper.createState(theAutomata.size());
@@ -182,7 +180,7 @@ public class AutomataVerifier
 
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
-				// return "The modular nonblocking algorithm \n" + "is not fully implemented!";
+				return "The modular nonblocking algorithm \n" + "is not fully implemented!";
 			}
 		}
 
@@ -283,6 +281,23 @@ public class AutomataVerifier
 	}
 
 	/**
+	 * Prepares the helper and the automataindexform for language inclusion...
+	 *
+	 *@param inclusionAutomata The automata that should be verified for inclusion
+	 */
+	public void prepareForLanguageInclusion(Automata inclusionAutomata)
+	{
+		// After these preparations, the modular controllability 
+		// verification verifies language inclusion
+		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
+		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
+		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);				
+		// This last one is not really good... we'd like to do this only once! Perhaps
+		// a switch in the synchronizeroptions instead? FIXA!!
+		synchHelper.considerAllEventsUncontrollable();
+	}
+
+	/**
 	 * Performs modular controllablity verification on theAutomata..
 	 *
 	 *@return  true if controllable, false if not or false (with error message) if don't know.
@@ -293,17 +308,9 @@ public class AutomataVerifier
 		throws Exception
 	{
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-		if (!(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion))
-		{   // Standard case, map uncontrollable events to plants
+		if (uncontrollableEventToPlantMap == null)
+		{
 			uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
-		}
-		else
-		{   // Language inclusion, all events should be considered uncontrollable and
-			// this changes the uncontrollableEventToPlantMap.
-			synchHelper.considerAllEventsUncontrollable();
-			Automata plantAutomata = ActionMan.getGui().getUnselectedAutomata();
-			synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(plantAutomata);
-			uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(plantAutomata);
 		}
 
 		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
@@ -327,7 +334,7 @@ public class AutomataVerifier
 			// if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
 			{
-				//logger.info("Supervisor: " + currSupervisorAutomaton.getName());
+				// logger.info("Supervisor: " + currSupervisorAutomaton.getName());
 				// Examine uncontrollable events in currSupervisorAutomaton 
 				// and select plants containing these events
 				selectedAutomata.add(currSupervisorAutomaton);
@@ -346,7 +353,7 @@ public class AutomataVerifier
 								currPlantAutomaton = (Automaton) plantIterator.next();
 								if (!selectedAutomata.contains(currPlantAutomaton))
 								{
-									//logger.info("Plant: " + currPlantAutomaton.getName());
+									// logger.info("Plant: " + currPlantAutomaton.getName());
 									selectedAutomata.add(currPlantAutomaton);
 								}
 							}
@@ -1291,16 +1298,25 @@ public class AutomataVerifier
 		{
 			currAutomaton = new Automaton((Automaton) autIt.next());
 			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
+			if (stopRequested)
+			{
+				return false;
+			}
+
 			if (!allIndividuallyNonblocking)
 			{
 				logger.error("The automaton " + currAutomaton.getName() + " is individually blocking!");
+				logger.error("Aborting verification...");
+				requestStop();
+				return false;
 			}
 		}		
 		if (allIndividuallyNonblocking)
 		{
 			logger.info("This system has no individually blocking automata!");
 		}
-	
+
+		/*
 		// Preparations for the global nonblocking verification...
 	    ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
 		if (executionDialog != null) // The executionDialog might not have been initialized yet! FIXA!
@@ -1329,7 +1345,48 @@ public class AutomataVerifier
 				((LabeledEvent) eventIterator.next()).setControllable(false);
 			}
 		}
+		*/
 
+		// Preparations for the global nonblocking verification...
+		java.awt.EventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
+					executionDialog.initProgressBar(0, theAutomata.size());
+					executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+				}
+			});
+		// Ensure global nonblocking...
+		boolean allIncluded = true;
+		boolean automatonIsIncluded;
+		Automata currAutomata = new Automata();
+		autIt = theAutomata.iterator();
+		while (autIt.hasNext())
+		{
+			currAutomaton = (Automaton) autIt.next();
+			currAutomata.addAutomaton(currAutomaton);
+			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
+			automatonIsIncluded = modularLanguageinclusionVerification(currAutomata);
+			allIncluded = allIncluded && automatonIsIncluded;
+			currAutomata.removeAutomaton(currAutomaton);
+
+			if (stopRequested)
+			{
+				return false;
+			}
+			if (synchHelper.getExecutionDialog() != null)
+			{
+				synchHelper.getExecutionDialog().setProgress(theAutomata.getAutomatonIndex(currAutomaton));
+			}			
+			if (!automatonIsIncluded)
+			{
+				logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
+			}
+		}
+		return allIncluded && allIndividuallyNonblocking;			
+			
+		/*
 		// Ensure global nonblocking...
 		boolean allIncluded = true;
 		boolean automatonIsIncluded;
@@ -1349,14 +1406,35 @@ public class AutomataVerifier
 			automatonIsIncluded = behaviouralInclusionVerification(currAutomata, theAutomata);
 			allIncluded = allIncluded && automatonIsIncluded;
 			currAutomata.removeAutomaton(currAutomaton); // Examine one automaton at a time...
+
+			if (stopRequested)
+			{
+				return false;
+			}
+
 			if (!automatonIsIncluded)
 			{
 				logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
 			}
 		}
 		return allIncluded && allIndividuallyNonblocking;
+		*/
 	}
 	
+	private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
+		throws Exception
+	{
+		prepareForLanguageInclusion(inclusionAutomata);
+		return modularControllabilityVerification();
+	}
+
+	private boolean monolithicLanguageinclusionVerification(Automata inclusionAutomata)
+		throws Exception
+	{
+		prepareForLanguageInclusion(inclusionAutomata);
+		return monolithicControllabilityVerification();
+	}
+
 	/**
 	 * Verifies behavioural inclusion of the language of automataA in automataB. 
 	 * I.e. "Is the behaviour of automataA included in automataB?"

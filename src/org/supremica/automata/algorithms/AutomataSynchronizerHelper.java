@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -377,29 +376,23 @@ public final class AutomataSynchronizerHelper
 				// Add initial state
 				stateTrace.add(newState);
 			}
-
+			
 			addStatus(newState);
 			addStateToProcess(newState);
-
+			
 			// helperData.incrNbrOfAddedStates();
 			helperData.nbrOfAddedStates++;
 		}
-		else
+		else if (rememberTrace && (fromStateList.size() != 0))
 		{
-			if (rememberTrace && (fromStateList.size() != 0))
-			{
-				fromStateList.removeLast();
-			}
+			fromStateList.removeLast();
 		}
-
+		
 		helperData.nbrOfCheckedStates++;
 
-		if (helperData.nbrOfCheckedStates % 2000 == 0)
+		if ((executionDialog != null) && (helperData.nbrOfCheckedStates % 2000 == 0))
 		{
-			if (executionDialog != null)
-			{
-				executionDialog.setValue(helperData.nbrOfCheckedStates);
-			}
+			executionDialog.setValue(helperData.nbrOfCheckedStates);
 		}
 	}
 
@@ -903,7 +896,7 @@ public final class AutomataSynchronizerHelper
 			controllableEventsTable[i] = false;
 		}
 	}
-
+	
 	public class HelperData
 	{
 		public int nbrOfAddedStates = 0;

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -132,13 +131,9 @@ public class TestAutomataVerifier
 		}
 	}
 
-	/*
 	public void testModularLanguageInclusion()
 	{
-		// Note that the TestFiles have been altered... so that language 
-		// inclusion is simply verified as controllability. This is really
-		// just another controllability test...
-		try
+	 	try
 		{
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageInclusion));
@@ -146,6 +141,9 @@ public class TestAutomataVerifier
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			Automata inclusionAutomata = new Automata(theProject,true);
+			inclusionAutomata.removeAutomaton(theProject.getAutomaton("sicherheit_vr3"));
+			theVerifier.prepareForLanguageInclusion(inclusionAutomata);
 			assertTrue(theVerifier.verify());
 		}
 		catch (Exception ex)
@@ -154,12 +152,9 @@ public class TestAutomataVerifier
 			assertTrue(false);
 		}		
 	}
-
+	
 	public void testModularLanguageExclusion()
 	{
-		// Note that the TestFiles have been altered... so that language 
-		// inclusion is simply verified as controllability. This is really
-		// just another controllability test...
 		try
 		{
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
@@ -168,6 +163,9 @@ public class TestAutomataVerifier
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			Automata inclusionAutomata = new Automata(theProject,true);
+			inclusionAutomata.removeAutomaton(theProject.getAutomaton("sicherheit_er"));
+			theVerifier.prepareForLanguageInclusion(inclusionAutomata);
 			assertTrue(!theVerifier.verify());
 		}
 		catch (Exception ex)
@@ -176,5 +174,4 @@ public class TestAutomataVerifier
 			assertTrue(false);
 		}		
 	}
-	*/
 }
