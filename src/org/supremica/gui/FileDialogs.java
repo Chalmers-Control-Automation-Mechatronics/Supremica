@@ -72,6 +72,9 @@ public class FileDialogs
 	private FileFilter sFilter = null;
 	private FileFilter prjFilter = null;
 	private FileFilter autFilter = null;
+	private FileFilter stFilter = null;
+	private FileFilter ilFilter = null;
+
 	private static FileDialogs fd = new FileDialogs();
 
 	private FileDialogs() {}
@@ -228,6 +231,26 @@ public class FileDialogs
 		return fileExporter;
 	}
 
+	public static JFileChooser getSTFileExporter()
+	{
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getSTFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getILFileExporter()
+	{
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getILFilter());
+
+		return fileExporter;
+	}
+
 	public static JFileChooser getAutFileImporter()
 	{
 		JFileChooser autFileImporter = fd.getFileImporter();
@@ -244,7 +267,7 @@ public class FileDialogs
 		{
 			fileImporter = new JFileChooser();
 
-			fileImporter.setDialogType(JFileChooser.SAVE_DIALOG);
+			fileImporter.setDialogType(JFileChooser.OPEN_DIALOG);
 			fileImporter.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileOpenPath()));
 			fileImporter.setMultiSelectionEnabled(true);
 		}
@@ -256,9 +279,9 @@ public class FileDialogs
 	{
 		if (fileExporter == null)
 		{
-			fileExporter = new JFileChooser();
+			fileExporter = new StandardExtensionFileChooser();
 
-			fileExporter.setDialogType(JFileChooser.OPEN_DIALOG);
+			fileExporter.setDialogType(JFileChooser.SAVE_DIALOG);
 			fileExporter.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileSavePath()));
 			fileExporter.setMultiSelectionEnabled(false);
 		}
@@ -270,9 +293,9 @@ public class FileDialogs
 	{
 		if (fileSaveAs == null)
 		{
-			fileSaveAs = new JFileChooser();
+			fileSaveAs = new StandardExtensionFileChooser();
 
-			fileSaveAs.setDialogType(JFileChooser.OPEN_DIALOG);
+			fileSaveAs.setDialogType(JFileChooser.SAVE_DIALOG);
 			fileSaveAs.setCurrentDirectory(new java.io.File(SupremicaProperties.getFileSavePath()));
 			fileSaveAs.setMultiSelectionEnabled(false);
 		}
@@ -284,18 +307,7 @@ public class FileDialogs
 	// Note, could not have variable referred to in anonymous class
 	private FileFilter makeFileFilter(final String ext, final String description)
 	{
-		return new FileFilter()
-		{
-			public boolean accept(java.io.File f)
-			{
-				return f.getName().toLowerCase().endsWith(ext) || f.isDirectory();
-			}
-
-			public String getDescription()
-			{
-				return description;
-			}
-		};
+		return new StandardExtensionFileFilter(ext, description);
 	}
 
 	private FileFilter getRCPFilter()
@@ -436,5 +448,25 @@ public class FileDialogs
 		}
 
 		return prjFilter;
+	}
+
+	private FileFilter getSTFilter()
+	{
+		if (stFilter == null)
+		{
+			stFilter = makeFileFilter(".st", "IEC-1131 Structured Text files (*.st)");
+		}
+
+		return stFilter;
+	}
+
+	private FileFilter getILFilter()
+	{
+		if (ilFilter == null)
+		{
+			ilFilter = makeFileFilter(".il", "IEC-1131 Instruction List files (*.il)");
+		}
+
+		return ilFilter;
 	}
 }

@@ -1,0 +1,116 @@
+
+/*
+ * Supremica Software License Agreement
+ *
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
+ *
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
+ *
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
+ *
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
+ *
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
+ *
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
+ *
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
+ *
+ * Supremica is owned and represented by KA.
+ */
+package org.supremica.gui;
+
+import javax.swing.filechooser.*;
+import javax.swing.*;
+import java.io.File;
+import org.supremica.log.*;
+
+public class StandardExtensionFileChooser
+	extends JFileChooser
+{
+	private static Logger logger = LoggerFactory.createLogger(StandardExtensionFileChooser.class);
+
+
+	public StandardExtensionFileChooser()
+	{
+	}
+
+
+	/**
+	 * Adds the standard extension if nothing else is specificed.
+	 */
+
+	public File getSelectedFile()
+	{
+		File orgFile = super.getSelectedFile();
+		if (getDialogType() != JFileChooser.SAVE_DIALOG)
+		{
+			return orgFile;
+		}
+		if (orgFile == null)
+		{
+			return orgFile;
+		}
+		FileFilter theFilter = getFileFilter();
+		if (theFilter == null)
+		{
+			return orgFile;
+		}
+		if (!(theFilter instanceof StandardExtensionFileFilter))
+		{
+			return orgFile;
+		}
+		StandardExtensionFileFilter standardFileFilter = (StandardExtensionFileFilter)theFilter;
+		if ("All Files".equals(theFilter.getDescription()))
+		{
+			return orgFile;
+		}
+		String fileName = getName(orgFile);
+		if (fileName == null)
+		{
+			return orgFile;
+		}
+		if (fileName.startsWith("\"") && fileName.endsWith("\""))
+		{
+			File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
+			return newFile;
+		}
+		if (!standardFileFilter.hasExtension(fileName))
+		{
+			File newFile = new File(orgFile.getAbsolutePath() + standardFileFilter.getExtension());
+			return newFile;
+		}
+
+		return orgFile;
+	}
+
+}

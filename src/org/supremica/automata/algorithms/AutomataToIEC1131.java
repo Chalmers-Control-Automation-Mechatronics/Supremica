@@ -79,6 +79,63 @@ public class AutomataToIEC1131
 		allEvents = syncHelper.getUnionAlphabet();
 	}
 
+
+	/**
+	 * Set the initial state the first time the code is executed.
+	 *
+	 * In Structured Text:
+	 *
+	 * if (NOT initialized)
+	 * {
+	 *		q_1_0 := TRUE;
+	 *		q_2_0 := TRUE;
+	 *		initialized := TRUE;
+	 * }
+	 *
+	 * In Instruction List
+	 *
+	 * 			LD initialized
+	 *			JMPC after_initialization
+	 *			LD TRUE
+	 *			S q_1_0
+	 *			S q_2_0
+	 *			S initialized;
+	 *
+	 * after_initialization:
+	 */
+	void printInitializationStructureAsST(PrintWriter pw)
+	{
+
+	}
+
+	/**
+	 * Set the initial state the first time the code is executed.
+	 *
+	 * In Structured Text:
+	 *
+	 * if (NOT initialized)
+	 * {
+	 *		q_1_0 := TRUE;
+	 *		q_2_0 := TRUE;
+	 *		initialized := TRUE;
+	 * }
+	 *
+	 * In Instruction List
+	 *
+	 * 			LD initialized
+	 *			JMPC after_initialization
+	 *			LD TRUE
+	 *			S q_1_0
+	 *			S q_2_0
+	 *			S initialized;
+	 *
+	 * after_initialization:
+	 */
+	void printInitializationStructureAsIL(PrintWriter pw)
+	{
+
+	}
+
 	/**
 	 * Compute which events that are enabled
 	 *
@@ -105,7 +162,7 @@ public class AutomataToIEC1131
 	 * ST e_1
 	 */
 
-	void printComputeEnabledEventsStructuredText(PrintWriter pw)
+	void printComputeEnabledEventsAsST(PrintWriter pw)
 		throws Exception
 	{
 		// Iterate over all events and compute which events that are enabled
@@ -117,9 +174,12 @@ public class AutomataToIEC1131
 				int currEventIndex = currEvent.getSynchIndex();
 				pw.println("(* Enable condition for event \"" + currEvent.getLabel() + "\"*)");
 				boolean previousCondition = false;
+				pw.print("e_" + currEventIndex + " := ");
 				for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 				{
 					Automaton currAutomaton = (Automaton)autIt.next();
+
+					int currAutomatonIndex = currAutomaton.getSynchIndex();
 
 					if (syncType == SynchronizationType.Prioritized)
 					{ // All automata that has this event as prioritized must be able to execute it
@@ -127,11 +187,37 @@ public class AutomataToIEC1131
 						{ // Find all states that enables this event
 						  // Use OR between states in the same automaton.
 						  // Use AND between states in different automata.
+							if (previousCondition)
+							{
+								pw.print(" AND ");
+							}
+							else
+							{
+								previousCondition = true;
+							}
+
+							boolean previousState = false;
+							pw.print("(");
 							for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
 							{
 								State currState = (State)stateIt.next();
+								int currStateIndex = currState.getSynchIndex();
+								if (previousState)
+								{
+									pw.print(" OR ");
+								}
+								else
+								{
+									previousState = true;
+								}
+								pw.print("q_" + currAutomatonIndex + "_" + currStateIndex);
 
 							}
+							if (!previousState)
+							{
+								pw.print(" FALSE ");
+							}
+							pw.print(")");
 						}
 					}
 					else if (syncType == SynchronizationType.Full)
@@ -156,6 +242,7 @@ public class AutomataToIEC1131
 						throw new Exception("Unknown SynchronizationType");
 					}
 				}
+				pw.println(";");
 			}
 		}
 	}
@@ -246,17 +333,17 @@ public class AutomataToIEC1131
 	{
 
 	}
-
+*/
 	public void serialize_StructuredText(PrintWriter pw)
+		throws Exception
 	{
-		this.pw = pw;
 		initialize();
-		printComputeEnabledEventsStructuredText(pw);
+		printComputeEnabledEventsAsST(pw);
 	}
-
+/*
 	public void serialize_InstructionList(PrintWriter pw)
+		throws Exception
 	{
-		this.pw = pw;
 		initialize();
 		printComputeEnabledEventsInstructionList(pw);
 	}

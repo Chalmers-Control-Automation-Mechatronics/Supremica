@@ -847,6 +847,19 @@ public class Supremica
 		});
 
 
+		JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
+
+		menuToolsCodeGeneration1131ST.setText("IEC 1131 ST...");
+		menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
+		menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.AutomataTo1131ST(getGui());
+			}
+		});
+
+
 		// Configure
 		JMenu menuConfigure = new JMenu();
 

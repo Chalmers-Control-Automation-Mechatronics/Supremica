@@ -1828,6 +1828,73 @@ public class ActionMan
 			}
 		}
 	}
+
+
+	// Generate 1131 Structured Text
+	public static void AutomataTo1131ST(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+			//File currFile = Utility.getFile(fileExporter);
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String prefixName = null;
+
+					try
+					{
+						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedAutomata);
+						String pathName = currFile.getAbsolutePath();
+
+						if (pathName.endsWith(".prj"))
+						{
+							prefixName = pathName.substring(0, pathName.length() - 4);
+						}
+						else
+						{
+							prefixName = pathName;
+						}
+
+						File appFile = new File(prefixName + ".app");
+						//PrintWriter pw_app = new PrintWriter(new FileWriter(prefixName + ".app"));
+						PrintWriter pw_prj = new PrintWriter(new FileWriter(prefixName + ".prj"));
+						// These are not necessary?
+						//PrintWriter pw_prc = new PrintWriter(new FileWriter(prefixName + ".prc"));
+						//PrintWriter pw_wsp = new PrintWriter(new FileWriter(prefixName + ".wsp"));
+
+						exporter.serialize_app(appFile);
+						//exporter.serialize_app(pw_app);
+						exporter.serialize_prj(pw_prj);
+						//exporter.serialize_prc(pw_prc);
+						//exporter.serialize_wsp(pw_wsp);
+						//pw_app.close();
+						pw_prj.close();
+						//pw_prc.close();
+						//pw_wsp.close();
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						gui.error("Exception while generating ControlBuilder code to files " + prefixName + "{\".prj\", \".app\"}");
+					}
+				}
+			}
+		}
+	}
 }
 
 // ActionMan

@@ -597,6 +597,11 @@ public class Automaton
 		return index;
 	}
 
+	public int getSynchIndex()
+	{
+		return getIndex();
+	}
+
 	public String getUniqueStateId()
 	{
 		String newId;

@@ -163,6 +163,11 @@ public class State
 		return index;
 	}
 
+	public int getSynchIndex()
+	{
+		return getIndex();
+	}
+
 	public boolean isFirst()
 	{
 		return first;
