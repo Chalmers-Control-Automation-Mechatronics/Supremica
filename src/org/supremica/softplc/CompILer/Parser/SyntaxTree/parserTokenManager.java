@@ -6,6 +6,8 @@ import java.util.StringTokenizer;
 
 public class parserTokenManager implements parserConstants
 {
+  public static  java.io.PrintStream debugStream = System.out;
+  public static  void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }
 private static final int jjStopStringLiteralDfa_0(int pos, long active0, long active1)
 {
    switch (pos)
@@ -4924,22 +4926,22 @@ static final long[] jjtoSkip = {
 static final long[] jjtoMore = {
    0x80L, 0x0L, 
 };
-static private ASCII_CharStream input_stream;
+static private SimpleCharStream input_stream;
 static private final int[] jjrounds = new int[472];
 static private final int[] jjstateSet = new int[944];
 static protected char curChar;
-public parserTokenManager(ASCII_CharStream stream)
+public parserTokenManager(SimpleCharStream stream)
 {
    if (input_stream != null)
       throw new TokenMgrError("ERROR: Second call to constructor of static lexer. You must use ReInit() to initialize the static variables.", TokenMgrError.STATIC_LEXER_ERROR);
    input_stream = stream;
 }
-public parserTokenManager(ASCII_CharStream stream, int lexState)
+public parserTokenManager(SimpleCharStream stream, int lexState)
 {
    this(stream);
    SwitchTo(lexState);
 }
-static public void ReInit(ASCII_CharStream stream)
+static public void ReInit(SimpleCharStream stream)
 {
    jjmatchedPos = jjnewStateCnt = 0;
    curLexState = defaultLexState;
@@ -4953,7 +4955,7 @@ static private final void ReInitRounds()
    for (i = 472; i-- > 0;)
       jjrounds[i] = 0x80000000;
 }
-static public void ReInit(ASCII_CharStream stream, int lexState)
+static public void ReInit(SimpleCharStream stream, int lexState)
 {
    ReInit(stream);
    SwitchTo(lexState);
