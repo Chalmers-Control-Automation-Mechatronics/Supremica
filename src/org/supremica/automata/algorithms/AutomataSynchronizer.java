@@ -120,7 +120,6 @@ public class AutomataSynchronizer
 		{
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).join();
 		}
-
 	}
 
 	public void displayInfo()

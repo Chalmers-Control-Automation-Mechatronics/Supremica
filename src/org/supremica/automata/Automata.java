@@ -224,9 +224,9 @@ public class Automata
 		return newHash;
 	}
 
-	public Iterator iterator()
+	public AutomatonIterator iterator()
 	{
-		return theAutomata.iterator();
+		return new AutomatonIterator(theAutomata.iterator());
 	}
 
 	/**
@@ -497,8 +497,6 @@ public class Automata
 		return true;
 	}
 
-
-
 	/**
 	 * True if NONE of the automata are plants.
 	 */
@@ -537,8 +535,6 @@ public class Automata
 		return true;
 	}
 
-
-
 	/**
 	 * Returns true if at least one automaton has the event as prioritized.
 	 * Returns false if the event is not included in any alphabet or
@@ -563,6 +559,42 @@ public class Automata
 	 */
 	public boolean isEventControllabilityConsistent()
 	{
+		// Get the union alphabet, ignoring consistency for now
+		Alphabet unionAlphabet = null;
+		try
+		{
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+		
+		// Iterate over the alphabet and examine all automata
+		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext();)
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			
+			// Examine each automata
+			for (AutomatonIterator autIt = iterator(); autIt.hasNext();)
+			{
+				Alphabet currAlpha = autIt.nextAutomaton().getAlphabet();
+				
+				if (currAlpha.containsEventWithLabel(currEvent.getLabel()))
+				{
+					if (currEvent.isControllable() != 
+						currAlpha.getEventWithLabel(currEvent.getLabel()).isControllable())
+					{
+						logger.error("The event " + currEvent + " is not controllability consistent.");
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+
+		/*
+		// ?(/¤#)=%&# WHAT IS THIS! IT'S NOT DOING WHAT THE METHOD SAYS IT DOES!! %"#¤&#%/" /hugo
 		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
@@ -573,6 +605,7 @@ public class Automata
 			}
 		}
 		return true;
+		*/
 	}
 
 	/**
@@ -605,7 +638,6 @@ public class Automata
 	/**
 	 * Use nbrOfAutomata instead.
 	 */
-
 	public int getNbrOfAutomata()
 	{
 		return nbrOfAutomata();
@@ -632,6 +664,7 @@ public class Automata
 	 */
 	public Alphabet setIndicies()
 	{
+		// Get the union alphabet
 		Alphabet theAlphabet;
 		try
 		{
@@ -642,6 +675,8 @@ public class Automata
 		{
 			throw new RuntimeException(ex);
 		}
+
+		// Adjust the indices
 		theAlphabet.setIndicies();
 		int i = 0;
 		for (Iterator autIt = iterator(); autIt.hasNext();)
@@ -904,7 +939,6 @@ public class Automata
 		}
 	}
 
-
 	class AutomatonTypeIterator
 		implements Iterator
 	{
@@ -1017,6 +1051,11 @@ public class Automata
 		return sbuf.toString();
 	}
 
+	public boolean sanityCheck(Gui gui, int minSize)
+	{
+		return sanityCheck(gui, minSize, false, false, false);
+	}
+
 	/**
 	 * Examines automata size and, optionally, if all automata
 	 * has initial states and/or a defined type.
@@ -1029,8 +1068,13 @@ public class Automata
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
 	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial,
-											   boolean mustHaveValidType)
+							   boolean mustHaveValidType, boolean mustBeControllabilityConsistent)
 	{
+		if (mustBeControllabilityConsistent && !isEventControllabilityConsistent())
+		{
+			return false;
+		}
+
 		if (mustHaveInitial)
 		{
 			// All automata must have initial states.
@@ -1070,6 +1114,8 @@ public class Automata
 					}
 					else
 					{
+						logger.error("The automaton " + currAutomaton + " has no initial state.");
+
 						// This is iNsaNe!
 						return false;
 					}
@@ -1093,13 +1139,12 @@ public class Automata
 						String message = "The automaton " + currAutomaton +
 							" is of type 'Undefined'.\n" +
 							"Please specify a type.";
+
 						Object[] options = { "Cancel" };
 						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
 																JOptionPane.OK_OPTION,
 																JOptionPane.WARNING_MESSAGE, null,
 																options, options[0]);
-
-						return false;
 
 						/*
 						String message = "The automaton " + currAutomaton. +
@@ -1127,9 +1172,12 @@ public class Automata
 					}
 					else
 					{
-						// This is iNsaNe!
-						return false;
+						logger.error("The automaton " + currAutomaton + 
+									 " is of type 'Undefined'. Please specify a type.");
 					}
+
+ 					// This is iNsaNe!
+					return false;
 				}
 			}
 		}
@@ -1137,19 +1185,26 @@ public class Automata
 		// Make sure the automata has the right size!
 		if (minSize > 0 && size() < minSize)
 		{
+			String size;
+			if (minSize == 1)
+				size = "one automaton";
+			else if (minSize == 2)
+				size = "two automata";
+			else
+				size = minSize + " automata";
+			String message = "At least " + size + " must be selected!";
+
+			// Present result
 			if (gui != null)
 			{
-				String size;
-				if (minSize == 1)
-					size = "one automaton";
-				else if (minSize == 2)
-					size = "two automata";
-				else
-					size = minSize + " automata";
-				JOptionPane.showMessageDialog(gui.getFrame(), "At least " +
-											  size + " must be selected!",
+				JOptionPane.showMessageDialog(gui.getFrame(), message,
 											  "Alert", JOptionPane.ERROR_MESSAGE);
 			}
+			else
+			{
+				logger.error(message);
+			}
+
 			// This is inSaNe!
 			return false;
 		}

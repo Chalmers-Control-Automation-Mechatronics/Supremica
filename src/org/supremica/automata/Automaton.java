@@ -1166,6 +1166,7 @@ public class Automaton
 		this.alphabet = alphabet;
 	}
 */
+
 	/**
 	 * In some situation, for example in the dot output
 	 * not all state identities can be accepeted. For examepl

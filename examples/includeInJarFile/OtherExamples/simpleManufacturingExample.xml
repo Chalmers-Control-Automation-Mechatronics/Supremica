@@ -67,7 +67,8 @@
 		<Event id="start_pol" controllable="true"/>
 		<Event id="compl_pol" controllable="true"/>
 		<Event id="part_lv1" controllable="true"/>
-		<Event id="part_lvExit" controllable="false"/>
+        <!-- Leduc is confusing here, it's probably controllable, though -->
+		<Event id="part_lvExit" controllable="true"/>
 		<Event id="part_arr2" controllable="false"/>
 		<Event id="recog_A" controllable="false"/>
 		<Event id="recog_B" controllable="false"/>

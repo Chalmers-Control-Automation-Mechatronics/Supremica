@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -78,7 +77,6 @@ public class EventHelpers
 		return createEvent(eventSet, /* prefix,*/ true, true);
 	}
 
-
 	/**
 	 * Creates a new event from a set of events
 	 *
@@ -88,7 +86,8 @@ public class EventHelpers
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	static LabeledEvent createEvent(EventsSet eventSet, /* String prefix,*/ boolean requireConsistentControllability, boolean requireConsistentImmediate)
+	static LabeledEvent createEvent(EventsSet eventSet, /* String prefix,*/ 
+									boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws IllegalArgumentException, Exception
 	{
 		if (eventSet.size() <= 0)
@@ -124,7 +123,7 @@ public class EventHelpers
 				throw new Exception("All events must have the same label");
 			}
 
-			if (requireConsistentControllability && controllable != tmpEvent.isControllable())
+			if (requireConsistentControllability && (controllable != tmpEvent.isControllable()))
 			{
 				String errorMsg = "Controllability of an event must be the same in all automata. Controllability of " + label + " is not consistent.";
 
@@ -144,7 +143,6 @@ public class EventHelpers
 
 				throw new Exception(errorMsg);
 			}
-
 
 			if (observable != tmpEvent.isObservable())
 			{

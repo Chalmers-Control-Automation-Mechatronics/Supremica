@@ -85,7 +85,6 @@ public class ExampleTemplates
 	private void initializeCCSBookExamples()
 	{
 		TemplateGroup thisGroup = CCSBookExamples;
-
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSBookExamples/";
@@ -112,12 +111,14 @@ public class ExampleTemplates
 	private void initializeCCSBookExercises()
 	{
 		TemplateGroup thisGroup = CCSBookExercises;
-
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSBookExercises/";
 
 		thisGroup.addItem(new TemplateItem("2.1 - PIN Code Reader", prefix + "Ex2_1.xml"));
+		thisGroup.addItem(new TemplateItem("2.6 - Man, Wolf, Goat, Cabbage", prefix + "Ex2_6.xml"));
+		thisGroup.addItem(new TemplateItem("4.1 - Man, Wolf, Goat, Cabbage Revisited", prefix + "Ex4_1.xml"));
+		thisGroup.addItem(new TemplateItem("4.4 - Cat & Mouse", prefix + "Ex4_4.xml"));
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: All events controllable", prefix + "Ex4_5_all_con.xml"));
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: Put is uncontrollable", prefix + "Ex4_5_b_uncon.xml"));
 	}
@@ -125,10 +126,10 @@ public class ExampleTemplates
 	private void initializeCCSCourseAssignments()
 	{
 		TemplateGroup thisGroup = CCSCourseAssignments;
-
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSCourseAssignments/";
+
 		thisGroup.addItem(new TemplateItem("FMS line", prefix + "FMSLine.xml"));
 		thisGroup.addItem(new TemplateItem("Production system", prefix + "ProdSysStudent.xml"));
 		thisGroup.addItem(new TemplateItem("Communication channel", prefix + "CommunicationChannel.xml"));
@@ -137,10 +138,10 @@ public class ExampleTemplates
 	private void initializeCCSCourseAssignmentSolutions()
 	{
 		TemplateGroup thisGroup = CCSCourseAssignmentSolutions;
-
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSCourseAssignments/solutions/";
+
 		thisGroup.addItem(new TemplateItem("FMS without feedback", prefix + "FMSLine.xml"));
 		thisGroup.addItem(new TemplateItem("FMS with feedback", prefix + "FMSLoop.xml"));
 		thisGroup.addItem(new TemplateItem("Communication channel Specification", prefix + "comm_spec.xml"));
@@ -149,7 +150,6 @@ public class ExampleTemplates
 	private void initializeOtherExamples()
 	{
 		TemplateGroup thisGroup = OtherExamples;
-
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OtherExamples/";
@@ -158,7 +158,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Flexible manufacturing system", prefix + "flexibleManufacturingSystem.xml"));
 		thisGroup.addItem(new TemplateItem("Robot assembly cell", prefix + "robotAssemblyCell.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacuring cell", prefix + "flexibleManufacturingCell.xml"));
-		thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml"));
+		//thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml")); // A variant of this one is included in the CCSBookExercises above
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicle", prefix + "agv.xml"));
 		//thisGroup.addItem(new TemplateItem("Automated Guided Vehicle, immediate events", prefix + "agvImmediate.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
@@ -173,7 +173,6 @@ public class ExampleTemplates
 	private void initializeAIPExamples()
 	{
 		TemplateGroup thisGroup = AIPExamples;
-
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OtherExamples/";
@@ -191,16 +190,15 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("AIP System 6 - System 6", prefix + "aip/System6_system6.xml"));
 		thisGroup.addItem(new TemplateItem("AIP System 7 - System 7", prefix + "aip/System7_system7.xml"));
 		thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "aip/System7_Top_TU4.xml"));
-
 	}
 
 	private void initializeOperatorSupervisorExamples()
 	{
 		TemplateGroup thisGroup = OperatorSupervisorExamples;
-
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OperatorSupervisor/";
+
 		thisGroup.addItem(new TemplateItem("Warehouse", prefix + "warehouse.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=2", prefix + "warehouse_k2.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=5", prefix + "warehouse_k5.xml"));

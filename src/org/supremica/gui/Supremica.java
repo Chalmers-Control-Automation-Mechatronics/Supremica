@@ -907,8 +907,13 @@ public class Supremica
 
 		if (theProject.getComment() != "")
 		{
-			// logger.info(theProject.getComment());
 			JOptionPane.showMessageDialog(this, EncodingHelper.linebreakAdjust(theProject.getComment()), 
+										  "Info", JOptionPane.INFORMATION_MESSAGE);
+		}
+
+		if (theProject.hasAnimation())
+		{
+			JOptionPane.showMessageDialog(this, "This project includes an animation.",
 										  "Info", JOptionPane.INFORMATION_MESSAGE);
 		}
 

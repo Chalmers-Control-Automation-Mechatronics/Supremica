@@ -820,7 +820,9 @@ public final class AutomataSynchronizerExecuter
 
 						for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
 						{
-							sb.append(stateTable[j][currState[j]].getId());
+							// It should be name here, right? That's what the method description says...
+							//sb.append(stateTable[j][currState[j]].getId());
+							sb.append(stateTable[j][currState[j]].getName());
 						}
 
 						newState = new State(sb.toString());

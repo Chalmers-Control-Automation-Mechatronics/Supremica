@@ -128,7 +128,6 @@ public class LogDisplay
 		{
 			public void mousePressed(MouseEvent e)
 			{
-
 				// This is needed for the Linux platform
 				// where isPopupTrigger is true only on mousePressed.
 				maybeShowPopup(e);
@@ -136,7 +135,6 @@ public class LogDisplay
 
 			public void mouseReleased(MouseEvent e)
 			{
-
 				// This is for triggering the popup on Windows platforms
 				maybeShowPopup(e);
 			}
@@ -261,11 +259,9 @@ public class LogDisplay
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.WARN), new Color(255,127,0)); // Color.orange);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.INFO), new Color(0, 80, 0));
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.DEBUG), Color.blue);
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.FATAL), Color.red);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.FATAL), Color.black);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.ALL), Color.blue);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.OFF), Color.red);
-
-
 	}
 
 	public void close() {}
@@ -286,8 +282,11 @@ public class LogDisplay
 	}
 
 	/** ARASH: temp fix until we get the imagaes working... */
-	private ImageIcon getIcon(String file) {
-		URL url = Supremica.class.getResource("/icons/BlackFlag.gif");
+	private ImageIcon getIcon(String file) 
+	{
+		// What the f**k is this?
+		//URL url = Supremica.class.getResource("/icons/BlackFlag.gif");
+		URL url = Supremica.class.getResource(file);
 		return  (url == null) ? new ImageIcon() : new ImageIcon(url);
 	}
 

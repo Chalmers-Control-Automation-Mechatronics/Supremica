@@ -254,13 +254,13 @@ public class MutuallyNonblockingVerifier
 
 				/*
 				// Add automaton to gui
-				Gui gui = ActionMan.getGui();
+ 				Gui gui = ActionMan.getGui();
 				currSynchAutomaton.setName(currSynchAutomaton.getComment());
 				gui.getVisualProjectContainer().getActiveProject().addAutomaton(currSynchAutomaton);
 				*/
 
 				// ok = (currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates());
-				// Ignore all uncontrollable (forbidden) states!!
+				// Assuming the system is controllable, we can ignore all uncontrollable (forbidden) states!!
 				ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
 				logger.fatal("states: " + currSynchAutomaton.nbrOfStates() + " forb: " + currSynchAutomaton.nbrOfForbiddenStates() + " mutnotforb: " + currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates() + " mut: " + currSynchAutomaton.nbrOfMutuallyAcceptingStates());
 			}

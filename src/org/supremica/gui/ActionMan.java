@@ -223,7 +223,7 @@ public class ActionMan
 	public static void alphabetAnalyzer_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 2, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 2, false, false, true))
 		{
 			return;
 		}
@@ -323,7 +323,7 @@ public class ActionMan
 	public static void automataAddSelfLoopArcs_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -360,7 +360,7 @@ public class ActionMan
 	public static void automataAllAccepting_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -398,7 +398,7 @@ public class ActionMan
 	public static void automataComplement_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -445,7 +445,7 @@ public class ActionMan
 	public static void automataCopy_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -492,7 +492,7 @@ public class ActionMan
 	public static void automataDelete_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -546,7 +546,7 @@ public class ActionMan
 	public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -749,7 +749,7 @@ public class ActionMan
 	public static void automataExport(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -776,7 +776,7 @@ public class ActionMan
 	public static void automataExport(Gui gui, int exportMode)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1096,7 +1096,7 @@ public class ActionMan
 	public static void automataExtend_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1138,7 +1138,7 @@ public class ActionMan
 	public static void automataLifting_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1165,7 +1165,7 @@ public class ActionMan
 	public static void automataPurge_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1192,7 +1192,7 @@ public class ActionMan
 	public static void automataRemovePass_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1219,7 +1219,7 @@ public class ActionMan
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1245,7 +1245,7 @@ public class ActionMan
 	public static void automataRename_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1278,7 +1278,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 2, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 2, true, false, true))
 		{
 			return;
 		}
@@ -1337,7 +1337,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, true, true))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, true, true))
 		{
 			return;
 		}
@@ -1516,7 +1516,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, false, true))
 		{
 			return;
 		}
@@ -1565,7 +1565,7 @@ public class ActionMan
 		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
 		{
 			return;
 		}
@@ -1626,7 +1626,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, false, false))
 		{
 			return;
 		}
@@ -1754,7 +1754,7 @@ public class ActionMan
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -1795,7 +1795,7 @@ public class ActionMan
 		gui.info("Number of automata: " + gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata());
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
 		{
 			return;
 		}
@@ -1851,7 +1851,7 @@ public class ActionMan
 	public static void hierarchyView_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 2, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 2, false, false, true))
 		{
 			return;
 		}
@@ -1879,7 +1879,7 @@ public class ActionMan
 
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, false, false))
 		{
 			return;
 		}
@@ -2402,7 +2402,7 @@ public class ActionMan
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
 		{
 			return;
 		}
@@ -2530,7 +2530,7 @@ public class ActionMan
 	public static void evoCompSynchTable(Gui gui, boolean append)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
@@ -2594,7 +2594,7 @@ public class ActionMan
 	public static void evoCompPredictSize(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}

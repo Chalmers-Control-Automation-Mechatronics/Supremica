@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Ex2_6">
+<Automaton name="Man, Wolf, Goat, Cabbage" type="Undefined">
+	<Events>
+		<Event id="m"/>
+		<Event id="mw"/>
+		<Event id="mg"/>
+		<Event id="mc"/>
+	</Events>
+	<States>
+		<State id="MWGC-0" initial="true"/>
+		<State id="WGC-M" forbidden="true"/>
+		<State id="MWG-C"/>
+		<State id="WG-MC" forbidden="true"/>
+		<State id="MGC-W"/>
+		<State id="GC-MW" forbidden="true"/>
+		<State id="MWC-G"/>
+		<State id="WC-MG"/>
+		<State id="MW-GC" forbidden="true"/>
+		<State id="W-MGC"/>
+		<State id="MG-WC"/>
+		<State id="G-MWC"/>
+		<State id="MC-WG" forbidden="true"/>
+		<State id="C-MWG"/>
+		<State id="M-WGC" forbidden="true"/>
+		<State id="0-MWGC" accepting="true"/>
+	</States>
+	<Transitions>
+        <!-- Going there... -->
+		<Transition source="MWGC-0" dest="WGC-M" event="m"/>
+		<Transition source="MWGC-0" dest="GC-MW" event="mw"/>
+		<Transition source="MWGC-0" dest="WC-MG" event="mg"/>
+		<Transition source="MWGC-0" dest="WG-MC" event="mc"/>
+		<Transition source="MWG-C" dest="WG-MC" event="m"/>
+		<Transition source="MWG-C" dest="G-MWC" event="mw"/>
+		<Transition source="MWG-C" dest="W-MGC" event="mg"/>
+		<Transition source="MWC-G" dest="WC-MG" event="m"/>
+		<Transition source="MWC-G" dest="C-MWG" event="mw"/>
+		<Transition source="MWC-G" dest="W-MGC" event="mc"/>
+		<Transition source="MGC-W" dest="GC-MW" event="m"/>
+		<Transition source="MGC-W" dest="C-MWG" event="mg"/>
+		<Transition source="MGC-W" dest="G-MWC" event="mc"/>
+		<Transition source="MW-GC" dest="W-MGC" event="m"/>
+		<Transition source="MW-GC" dest="0-MWGC" event="mw"/>
+		<Transition source="MG-WC" dest="G-MWC" event="m"/>
+		<Transition source="MG-WC" dest="0-MWGC" event="mg"/>
+		<Transition source="MC-WG" dest="C-MWG" event="m"/>
+		<Transition source="MC-WG" dest="0-MWGC" event="mc"/>
+		<Transition source="M-WGC" dest="0-MWGC" event="m"/>
+        <!-- ... and back again... -->
+		<Transition dest="MWGC-0" source="WGC-M" event="m"/>
+		<Transition dest="MWGC-0" source="GC-MW" event="mw"/>
+		<Transition dest="MWGC-0" source="WC-MG" event="mg"/>
+		<Transition dest="MWGC-0" source="WG-MC" event="mc"/>
+		<Transition dest="MWG-C" source="WG-MC" event="m"/>
+		<Transition dest="MWG-C" source="G-MWC" event="mw"/>
+		<Transition dest="MWG-C" source="W-MGC" event="mg"/>
+		<Transition dest="MWC-G" source="WC-MG" event="m"/>
+		<Transition dest="MWC-G" source="C-MWG" event="mw"/>
+		<Transition dest="MWC-G" source="W-MGC" event="mc"/>
+		<Transition dest="MGC-W" source="GC-MW" event="m"/>
+		<Transition dest="MGC-W" source="C-MWG" event="mg"/>
+		<Transition dest="MGC-W" source="G-MWC" event="mc"/>
+		<Transition dest="MW-GC" source="W-MGC" event="m"/>
+		<Transition dest="MW-GC" source="0-MWGC" event="mw"/>
+		<Transition dest="MG-WC" source="G-MWC" event="m"/>
+		<Transition dest="MG-WC" source="0-MWGC" event="mg"/>
+		<Transition dest="MC-WG" source="C-MWG" event="m"/>
+		<Transition dest="MC-WG" source="0-MWGC" event="mc"/>
+		<Transition dest="M-WGC" source="0-MWGC" event="m"/>
+	</Transitions>
+</Automaton>
+</Automata>
