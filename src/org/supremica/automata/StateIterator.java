@@ -70,7 +70,7 @@ public class StateIterator
 	public Object next()
 		throws NoSuchElementException
 	{
-		return (State) theIterator.next();
+		return theIterator.next();
 	}
 
 	public State nextState()

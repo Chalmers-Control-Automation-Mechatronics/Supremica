@@ -141,9 +141,14 @@ public class ProjectBuildFromHYB
 		boolean initialState = true;
 
 		// Loop over lines
-		String currLine = reader.readLine();
-		while (currLine != null)
+		for (String currLine = reader.readLine(); currLine != null; currLine = reader.readLine())
 		{
+			// Avoid null lines (can't be?) and comment lines (starting with '#')
+			if ((currLine == null) || (currLine.startsWith("#")))
+			{
+				continue;
+			}
+
 			// Each line is a transition, a state, an event and another state
 			State fromState;
 			LabeledEvent event;
@@ -162,6 +167,7 @@ public class ProjectBuildFromHYB
 				else
 				{
 					fromState = new State(currToken);
+					fromState.setAccepting(true);
 
 					// Initialstate?
 					if (currAutomaton.nbrOfStates() == 0)
@@ -173,19 +179,24 @@ public class ProjectBuildFromHYB
 				}
 
 				// Read event
+				// 'c_' stands for 'command', i.e. issued by supervisor/controller - i.e. controllable
+				// 'r_' and 'E_' stands for 'response' and 'event' respectively, appearing in the plant - 
+				// i.e. uncontrollable
 				currToken = tokenizer.nextToken();
 				event = new LabeledEvent(currToken);
-				if (currToken.startsWith("c_"))
+				if (currToken.startsWith("c_")) 
 				{
 					event.setControllable(true);
 				}
-				else if (currToken.startsWith("E_"))
+				else if (currToken.startsWith("r_") || currToken.startsWith("E_"))
 				{
 					event.setControllable(false);
 				}
 				else
 				{
-					throw new Exception("Unknown event prefix '" + currToken.substring(1,2)+ "'");
+					logger.warn("Unknown event prefix '" + currToken.substring(0,2)+ 
+								"' for event " + currToken + ", treating event as controllable.");
+					event.setControllable(true);
 				}
 				if (!currAlphabet.contains(event))
 				{
@@ -201,6 +212,7 @@ public class ProjectBuildFromHYB
 				else
 				{
 					toState = new State(currToken);
+					toState.setAccepting(true);
 					currAutomaton.addState(toState);
 				}
 
@@ -208,11 +220,8 @@ public class ProjectBuildFromHYB
 				Arc currArc = new Arc(fromState, toState, event);
 				currAutomaton.addArc(currArc);
 
-				logger.info("Add trans " + fromState + " " + toState + " " + event);
+				//logger.info("Add trans " + fromState + " " + toState + " " + event);
 			}
-
-			// Next line
-			currLine = reader.readLine();
 		}
 
 		// Return

@@ -2596,7 +2596,7 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.error("Error while importing " + file.getAbsolutePath() + ". ", ex);
 			logger.debug(ex.getStackTrace());
 
 			return;
@@ -2617,7 +2617,7 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.error("Error while importing " + file.getAbsolutePath() + ". ", ex);
 			logger.debug(ex.getStackTrace());
 
 			return;
@@ -2638,7 +2638,7 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error while importing " + file.getAbsolutePath() + " ", ex);
+			logger.error("Error while importing " + file.getAbsolutePath() + ". ", ex);
 			logger.debug(ex.getStackTrace());
 
 			return;

@@ -68,7 +68,6 @@ public class RobotCellExaminer
 		contentPane.add(openButton);
 
 		JButton spanButton = new JButton("Generate spans");
-
 		spanButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -79,7 +78,6 @@ public class RobotCellExaminer
 		contentPane.add(spanButton);
 
 		JButton cutButton = new JButton("Intersect spans");
-
 		cutButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -90,7 +88,6 @@ public class RobotCellExaminer
 		contentPane.add(cutButton);
 
 		JButton collisionButton = new JButton("Examine collisions");
-
 		collisionButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -101,7 +98,6 @@ public class RobotCellExaminer
 		contentPane.add(collisionButton);
 
 		JButton demoButton = new JButton("Run demo (RobotStudio)");
-
 		demoButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -163,10 +159,8 @@ public class RobotCellExaminer
 	{
 		try
 		{
-
 			// For each robot, generate spans
 			LinkedList robots = cell.getRobots();
-
 			for (Iterator robotIt = robots.iterator(); robotIt.hasNext(); )
 			{
 				Robot robot = (Robot) robotIt.next();
@@ -208,7 +202,6 @@ public class RobotCellExaminer
 	{
 		try
 		{
-
 			// Intersect spans of robots, pairwise
 			LinkedList robots = cell.getRobots();
 
@@ -260,10 +253,8 @@ public class RobotCellExaminer
 	{
 		try
 		{
-
 			// For each robot
 			LinkedList robots = cell.getRobots();
-
 			for (Iterator robotIt = robots.iterator(); robotIt.hasNext(); )
 			{
 				Robot robot = (Robot) robotIt.next();
@@ -273,7 +264,6 @@ public class RobotCellExaminer
 
 				// Examine collisions for each "path", i.e. unique pair of positions
 				LinkedList positions = robot.getPositions();
-
 				for (int i = 0; i < positions.size(); i++)
 				{
 					Position from = (Position) positions.get(i);
