@@ -9,7 +9,7 @@ LD      Xar  Xar  Xar  Xar     Xar       ej imp 25.4
 LDN     Xar  -    -    -       ??
 ST      Xar  Xar  Xar  Xar     Xar
 STN     Xar  -    -    -       ??
-//XXX NOT 
+NOT 
 S
 R
 // S1  

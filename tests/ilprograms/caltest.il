@@ -1,55 +1,3 @@
-(*JAVA_BLOCKS for time handling*)
-(*=============================*)
-JAVA_BLOCK OnDelayTimer
-	VAR_IN_OUT
-		tonIN : BOOL;
-		tonPT : DINT;
-		tonET : DINT;
-		tonQ  : BOOL;
-	END_VAR
-END_JAVA_BLOCK
-FUNCTION_BLOCK TON
-	VAR_IN_OUT
-		tonIN : BOOL;
-		tonPT : DINT;
-		tonET : DINT;
-		tonQ  : BOOL;
-	END_VAR
-	VAR
-		odt : OnDelayTimer;
-	END_VAR
-	LD tonIN
-	ST odt.tonIN
-	LD tonPT
-	ST odt.tonPT
-	CAL odt
-	LD odt.tonET
-	ST tonET
-	LD odt.tonQ
-	ST tonQ
-(*
-	CAL PRINT("tid =", tonET)
-	CAL PRINTLN("") 
-*)
-END_FUNCTION_BLOCK
-PROGRAM TONtest
-	VAR
-		t : TON;
-		b : BOOL;
-		tid : DINT;
-	END_VAR
-	LD DINT#3000
-	ST t.tonPT
-	LD TRUE
-	ST t.tonIN
-	CAL t
-	LD t.tonQ
-	ST b
-	LD t.tonET
-	ST tid
-	(*CAL PRINTLN("b= ",b,tid)*)
-END_PROGRAM
-
 (*JAVA_BLOCKS for printing (no newline)*)
 (*=====================================*)
 
@@ -70,6 +18,7 @@ FUNCTION_BLOCK PrintWSTRING
 	CAL jblock
 END_FUNCTION_BLOCK
 
+
 JAVA_BLOCK JPrintDINT
 	VAR_IN_OUT
 		output: DINT;
@@ -86,6 +35,8 @@ FUNCTION_BLOCK PrintDINT
 	ST jblock.output
 	CAL jblock
 END_FUNCTION_BLOCK
+
+
 JAVA_BLOCK JPrintREAL
 	VAR_IN_OUT
 		output:REAL;
@@ -103,6 +54,7 @@ FUNCTION_BLOCK PrintREAL
 	CAL jblock
 END_FUNCTION_BLOCK
 
+
 JAVA_BLOCK JPrintBOOL
 	VAR_IN_OUT
 		output: BOOL;
@@ -119,32 +71,6 @@ FUNCTION_BLOCK PrintBOOL
 	ST jblock.output
 	CAL jblock
 END_FUNCTION_BLOCK
-
-
-(*testprogram for printing (no newline)*)
-PROGRAM PRINTtest
-	VAR
-		WSp : PrintWSTRING;
-		Dp  : PrintDINT;
-		Rp  : PrintREAL;
-		Bp  : PrintBOOL;
-	END_VAR
-	LD  "HELLO"
-	ST  WSp.output
-	CAL WSp
-	
-	LD  DINT#5677
-	ST  Dp.output
-	CAL Dp
-	
-	LD  REAL#45.5667
-	ST  Rp.output
-	CAL Rp
-	
-	LD  TRUE
-	ST  Bp.output
-	CAL Bp
-END_PROGRAM
 
 
 (*JAVA_BLOCKS for printing (newline)*)
@@ -167,6 +93,7 @@ FUNCTION_BLOCK PrintlnWSTRING
 	CAL jblock
 END_FUNCTION_BLOCK
 
+
 JAVA_BLOCK JPrintlnDINT
 	VAR_IN_OUT
 		output: DINT;
@@ -183,6 +110,8 @@ FUNCTION_BLOCK PrintlnDINT
 	ST jblock.output
 	CAL jblock
 END_FUNCTION_BLOCK
+
+
 JAVA_BLOCK JPrintlnREAL
 	VAR_IN_OUT
 		output:REAL;
@@ -218,29 +147,63 @@ FUNCTION_BLOCK PrintlnBOOL
 END_FUNCTION_BLOCK
 
 
-(*testprogram for printing (no newline)*)
-PROGRAM PRINTLNtest
-	VAR
-		WSpln : PrintlnWSTRING;
-		Dpln  : PrintlnDINT;
-		Rpln  : PrintlnREAL;
-		Bpln  : PrintlnBOOL;
-	END_VAR
-	LD  "HELLO"
-	ST  WSpln.output
-	CAL WSpln
-	
-	LD  DINT#5677
-	ST  Dpln.output
-	CAL Dpln
-	
-	LD  REAL#45.5667
-	ST  Rpln.output
-	CAL Rpln
-	
-	LD  TRUE
-	ST  Bpln.output
-	CAL Bpln
 
-	CAL WSpln(output:="hej!!!")
+FUNCTION_BLOCK DOUBLER
+   VAR_IN_OUT
+      A : DINT;
+   END_VAR
+
+   LD A
+   ADD A
+
+   ST A
+
+END_FUNCTION_BLOCK
+
+
+PROGRAM CALTEST
+	VAR
+		print_WS   : PrintWSTRING;
+		print_DINT : PrintDINT;
+		print_REAL : PrintREAL;
+		print_BOOL : PrintBOOL;
+
+		println_WS   : PrintlnWSTRING;
+		println_DINT : PrintlnDINT;
+		println_REAL : PrintlnREAL;
+		println_BOOL : PrintlnBOOL;
+
+      	db1          : DOUBLER;
+      	Result       : DINT;
+   END_VAR
+
+
+(*
+	LD DINT#5
+    ST db1.A
+    CAL db1
+    LD db1.A
+
+    ST println_DINT.output 
+    CAL println_DINT
+*)
+
+
+    CAL db1(A:=DINT#7)
+    LD db1.A
+
+	ST Result
+
+(*
+    ST println_DINT.output 
+    CAL println_DINT
+*)
+
+CAL println_DINT(output:=Result)
+
+
+
+
+   
+
 END_PROGRAM
