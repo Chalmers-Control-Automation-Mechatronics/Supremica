@@ -883,6 +883,12 @@ public class AutomataVerifier
 	 */
 	private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
 	{
+		//
+		//
+		// USE Alphabet.nbrOfCommonEvents INSTEAD!!!!
+		//
+		//
+
 		int amountOfCommon = 0;
 		int amountOfUnique = 0;
 		Iterator eventIterator = rightAlphabet.iterator();
@@ -904,14 +910,12 @@ public class AutomataVerifier
 
 		if (amountOfCommon < 1)
 		{
-
 			// Perhaps <= 1? Only one event won't do much good?
 			return 0;
 		}
 
 		if (amountOfUnique > 0)
 		{
-
 			// return (double)amountOfCommon; // Another way of doing it...
 			return (double) amountOfCommon / (double) amountOfUnique;
 		}

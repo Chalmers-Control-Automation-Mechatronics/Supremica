@@ -1157,7 +1157,7 @@ public class ActionMan
 			return;
 		}
 
-		SynchronizationOptions synchronizationOptions = null;
+		SynchronizationOptions synchronizationOptions;
 
 		try
 		{
@@ -2282,6 +2282,112 @@ public class ActionMan
 	public static void automataInvert_actionPerformed(Gui gui)
 	{
 		gui.invertSelection();
+	}
+
+	/**
+	 * Calculates table with information for use with an (external) genetic programming system.
+	 * This is a part of a project in a course in Evolutionary Computation, FFR105 (2002) at 
+	 * Chalmers University of Technology. 
+	 *
+	 * Writes 8 columns of data and a correct value on each line of an output file
+	 *
+	 * @author Hugo Flordal, hugo@s2.chalmers.se
+	 */
+	public static void evoCompSynchTable(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		
+		Automaton automatonA;
+		Automaton automatonB;
+		Automaton synchAutomaton;
+		FileWriter outFile = null;
+
+		Iterator automataAIterator = selectedAutomata.iterator();
+		Iterator automataBIterator;
+		Automata theTwoAutomata = new Automata();
+
+		SynchronizationOptions syncOptions;
+		AutomataSynchronizer theSynchronizer;
+
+		int[] data = new int[8];
+		int correctValue = 0;
+
+		try
+		{
+			// Synchronize the automata using default options (this will 
+			// probably be a problem if there are non-prioritized events)
+			syncOptions = new SynchronizationOptions();
+			outFile = new FileWriter("SynchTable.txt", false);
+
+			while (automataAIterator.hasNext())
+			{
+				automatonA = (Automaton) automataAIterator.next();
+				theTwoAutomata.clear();
+				theTwoAutomata.addAutomaton(automatonA);
+				
+				automataBIterator = selectedAutomata.iterator();				
+				while (automataBIterator.hasNext())
+				{
+					automatonB = (Automaton) automataBIterator.next();
+
+					if (automatonA != automatonB)
+						// Just add it
+						theTwoAutomata.addAutomaton(automatonB);
+					else
+						// Got to make a copy...
+						theTwoAutomata.addAutomaton(new Automaton(automatonB));
+					
+					theSynchronizer = new AutomataSynchronizer(theTwoAutomata, syncOptions);
+					theSynchronizer.execute();
+					
+					// Number of states in automataA
+					data[0] = automatonA.nbrOfStates();
+					// Number of events in automataA
+					data[1] = automatonA.nbrOfEvents();
+					// Number of transitions in automataA
+					data[2] = automatonA.nbrOfTransitions();
+					
+					// Number of states in automataB
+					data[3] = automatonB.nbrOfStates();
+					// Number of events in automataB
+					data[4] = automatonB.nbrOfEvents();
+					// Number of transitions in automataB
+					data[5] = automatonB.nbrOfTransitions();
+					
+					// Number of common events between the automata
+					data[6] = automatonA.getAlphabet().nbrOfCommonEvents(automatonB.getAlphabet());
+					
+					// Worst case synchronization size
+					data[7] = data[0] * data[3];
+					
+					// OTHER CONCEIVABLE DATA THAT MIGHT BE OF INTEREST
+					// * Amount of selfloops
+					// * Number of prioritized events (overkill)
+					// * AutomatonType
+					// * Maximum depth of automata
+					
+					// The correct value, the number of states in the synchronization
+					correctValue = theSynchronizer.getNumberOfStates();
+					
+					// Writes data[0]..data[7] and correctValue to the file
+					for (int i=0;i<data.length;i++)
+					{
+						outFile.write(data[i] + "\t");
+					}
+					outFile.write(correctValue + " " + automatonA.getName() + " " + automatonB.getName() + "\n");
+					theTwoAutomata.removeAutomaton(automatonB);
+					outFile.flush();
+				}
+				theTwoAutomata.removeAutomaton(automatonA);
+			}
+			
+			outFile.close();			
+		}
+		catch (Exception ex)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Error in ActionMan.evoCompSynchTable(): " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata

@@ -524,6 +524,25 @@ public class Alphabet
 		}
 	}
 
+	public int nbrOfCommonEvents(Alphabet otherAlphabet)
+	{
+		int nbrOfCommon = 0;
+		Iterator eventIterator = this.iterator();
+		LabeledEvent currEvent;
+
+		while (eventIterator.hasNext())
+		{
+			currEvent = (LabeledEvent) eventIterator.next();
+
+			if (otherAlphabet.containsEventWithLabel(currEvent.getLabel()))
+			{
+				nbrOfCommon++;
+			}
+		}
+
+		return nbrOfCommon;
+	}
+
 	// Must be called after an event label or id is modified
 	public void rehash()
 	{

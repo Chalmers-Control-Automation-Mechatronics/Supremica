@@ -147,7 +147,6 @@ public class AutomataSynchronizer
 		{
 			if (currExec.buildAutomaton())
 			{
-
 				// System.out.println(synchHelper.getAutomaton() == null);
 				return synchHelper.getAutomaton();
 			}
@@ -168,6 +167,20 @@ public class AutomataSynchronizer
 	{
 		return synchHelper;
 	}
+
+	/* GAAAH! The garbage collection is too slow... and this won't make it faster...
+	public void clear()
+	{
+		synchHelper = null;
+		for (int i = 0; i < synchronizationExecuters.size(); i++)
+		{
+			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+			
+			currExec = null;
+		}
+		synchronizationExecuters = null;
+	}
+	*/
 
 	public void requestStop()
 	{

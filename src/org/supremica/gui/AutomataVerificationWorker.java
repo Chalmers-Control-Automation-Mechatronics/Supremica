@@ -91,8 +91,8 @@ public class AutomataVerificationWorker
 	private EventQueue eventQueue = new EventQueue();
 
 	// Make sure these match what's defined in VerificationDialogStandardPanel
-	private static final int MODULAR = 1;
 	private static final int MONOLITHIC = 0;
+	private static final int MODULAR = 1;
 	private static final int IDD = 2;
 	
 	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
@@ -175,7 +175,8 @@ public class AutomataVerificationWorker
 		{
 			// Error... this can't happen!
 			requestStop();
-			logger.error("Unavailable option chosen... this can't happen.");
+			logger.error("Unavailable option chosen... this can't happen...\n" +
+						 "don't ever do whatever you just did again, please.");
 			return;
 		}
 

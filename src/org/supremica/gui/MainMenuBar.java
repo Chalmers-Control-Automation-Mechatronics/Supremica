@@ -250,7 +250,6 @@ public class MainMenuBar
 		if (separatorNeeded)
 		{
 			menuFile.addSeparator();
-
 			separatorNeeded = false;
 		}
 
@@ -571,6 +570,37 @@ public class MainMenuBar
 			});
 		}
 
+		// Evolution
+		// boolean showGA = true;
+		boolean showGA = false;
+		if (showGA)
+		{
+			JMenu menuEvoComp = new JMenu();
+			
+			menuEvoComp.setText("EvoComp");
+			menuEvoComp.setMnemonic(KeyEvent.VK_E);
+			add(menuEvoComp);
+
+			// EvoComp.CalculateSynchTable
+			JMenuItem synchTable = new JMenuItem();
+			synchTable.setText("Calculate Synchtable");
+			menuEvoComp.add(synchTable);
+			synchTable.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						try
+						{
+							ActionMan.evoCompSynchTable(ActionMan.getGui());
+						}
+						catch (Exception excp)
+						{
+							// what the f*** do we do?
+						}
+					}
+				});
+		}
+
 		// Tools
 		JMenu menuTools = new JMenu();
 
@@ -593,7 +623,6 @@ public class MainMenuBar
 				}
 				catch (Exception excp)
 				{
-
 					// what the f*** do we do?
 				}
 			}

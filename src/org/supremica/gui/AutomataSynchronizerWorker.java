@@ -139,7 +139,6 @@ public class AutomataSynchronizerWorker
 				}
 				catch (Exception ex)
 				{
-
 					// -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					workbench.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					ex.printStackTrace();
@@ -164,7 +163,6 @@ public class AutomataSynchronizerWorker
 					// Remove trailing "||"
 					theAutomaton.setComment(buf.substring(0, buf.length()-2));
 				}
-				/**/
 				mode = MODE_UPDATE;
 
 				java.awt.EventQueue.invokeLater(this);
@@ -187,13 +185,11 @@ public class AutomataSynchronizerWorker
 		}
 		else if (mode == MODE_UPDATE)
 		{
-
 			// Display automaton
 			try
 			{
 				if (theAutomaton != null)
 				{
-
 					// -- MF -- container.add(theAutomaton);
 					// workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
 					workbench.addAutomaton(theAutomaton);
@@ -201,7 +197,6 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception ex)
 			{
-
 				// logger.error("Could not add the new automaton after synchronization");
 				// logger.debug(ex.getStackTrace());
 				workbench.error("Could not add the new automaton after synchronization");
