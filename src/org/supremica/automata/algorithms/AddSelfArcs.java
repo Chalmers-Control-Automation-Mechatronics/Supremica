@@ -77,7 +77,7 @@ public class AddSelfArcs
 	{
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		LabeledEvent passEvent = null;
-		String passEventId = null;
+		// String passEventId = null;
 
 		if (expandedSystem)
 		{
@@ -91,7 +91,7 @@ public class AddSelfArcs
 			{
 				theAlphabet.removeEvent(passEvent);
 
-				passEventId = passEvent.getId();
+				// passEventId = passEvent.getId();
 			}
 		}
 
@@ -105,9 +105,11 @@ public class AddSelfArcs
 			{
 				State currState = (State) stateIt.next();
 
-				if (containsPassEvent(currState, theAlphabet, passEventId))
+//				if (containsPassEvent(currState, theAlphabet, passEventId))
+				if(containsPassEvent(currState, theAlphabet, passEvent))
 				{
-					doPassState(currState, theAutomaton, passEventId);
+//					doPassState(currState, theAutomaton, passEventId);
+					doPassState(currState, theAutomaton, passEvent);
 				}
 			}
 
@@ -117,23 +119,24 @@ public class AddSelfArcs
 			{
 				State currState = (State) stateIt.next();
 
-				if (!containsPassEvent(currState, theAlphabet, passEventId))
+//				if (!containsPassEvent(currState, theAlphabet, passEventId))
+				if (!containsPassEvent(currState, theAlphabet, passEvent))
 				{
-					doState(currState, theAutomaton, passEventId);
+//					doState(currState, theAutomaton, passEventId);
+					doState(currState, theAutomaton, passEvent);
 				}
 			}
 		}
 		else
 		{
-
 			// The standard case
 			Iterator stateIt = theAutomaton.stateIterator();
-
 			while (stateIt.hasNext())
 			{
 				State currState = (State) stateIt.next();
 
-				doState(currState, theAutomaton, passEventId);
+//				doState(currState, theAutomaton, passEventId);
+				doState(currState, theAutomaton, passEvent);
 			}
 		}
 
@@ -142,23 +145,23 @@ public class AddSelfArcs
 			theAlphabet.addEvent(passEvent);
 		}
 	}
-
-	private static void doState(State currState, Automaton theAutomaton, String passEventId)
+/*
+	private static void x_doState(State currState, Automaton theAutomaton, String passEventId)
 		throws Exception
 	{
 		Alphabet currAlphabet = new Alphabet(theAutomaton.getAlphabet());
 
-		// Remove all events that is possible from the current state
+		// Remove all events that are possible from the current state
 		Iterator arcIt = currState.outgoingArcsIterator();
 
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();
-			String currEventId = currArc.getEventId();
+			// String currEventId = currArc.getEventId();
 
 			if ((passEventId == null) ||!passEventId.equals(currEventId))
 			{
-				LabeledEvent currEvent = currAlphabet.getEventWithId(currEventId);
+				LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(currEventId);
 
 				currAlphabet.removeEvent(currEvent);
 			}
@@ -177,22 +180,22 @@ public class AddSelfArcs
 		}
 	}
 
-	private static void doPassState(State currState, Automaton theAutomaton, String passEventId)
+	private static void x_doPassState(State currState, Automaton theAutomaton, String passEventId)
 		throws Exception
 	{
 		Alphabet currAlphabet = new Alphabet(theAutomaton.getAlphabet());
 
-		// Remove all events that is possible from the current state
+		// Remove all events that are possible from the current state
 		Iterator arcIt = currState.outgoingArcsIterator();
 
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();
-			String currEventId = currArc.getEventId();
+			// String currEventId = currArc.getEventId();
 
-			if ((passEventId == null) ||!passEventId.equals(currEventId))
+			if ((passEventId == null) || !passEventId.equals(currEventId))
 			{
-				LabeledEvent currEvent = currAlphabet.getEventWithId(currEventId);
+				LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(currEventId);
 
 				if (currEvent.getLabel().equals("pass"))
 				{
@@ -228,7 +231,7 @@ public class AddSelfArcs
 		}
 	}
 
-	private static boolean containsPassEvent(State theState, Alphabet currAlphabet, String passEventId)
+	private static boolean x_containsPassEvent(State theState, Alphabet currAlphabet, String passEventId)
 		throws Exception
 	{
 		if (passEventId == null)
@@ -250,5 +253,116 @@ public class AddSelfArcs
 		}
 
 		return false;
+	}
+*/
+	private static void doState(State currState, Automaton theAutomaton, LabeledEvent passEvent)
+		throws Exception
+	{
+		Alphabet currAlphabet = new Alphabet(theAutomaton.getAlphabet());
+
+		// Remove all events that are possible from the current state
+		Iterator arcIt = currState.outgoingArcsIterator();
+
+		while (arcIt.hasNext())
+		{
+			Arc currArc = (Arc) arcIt.next();
+			// String currEventId = currArc.getEventId();
+			LabeledEvent currEvent = currArc.getEvent();
+
+			if ((passEvent == null) || !passEvent.equals(currEvent))
+			{
+				// LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(currEventId);
+
+				currAlphabet.removeEvent(currEvent);
+			}
+		}
+
+		// Add all remaining events as self loop to the current state
+		Iterator eventIt = currAlphabet.iterator();
+
+		while (eventIt.hasNext())
+		{
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+			// Arc currArc = new Arc(currState, currState, currEvent.getId());
+			Arc currArc = new Arc(currState, currState, currEvent);
+
+			theAutomaton.addArc(currArc);
+		}
+	}
+
+	private static void doPassState(State currState, Automaton theAutomaton, LabeledEvent passEvent)
+		throws Exception
+	{
+		Alphabet currAlphabet = new Alphabet(theAutomaton.getAlphabet());
+
+		// Remove all events that are possible from the current state
+		Iterator arcIt = currState.outgoingArcsIterator();
+
+		while (arcIt.hasNext())
+		{
+			Arc currArc = (Arc) arcIt.next();
+			// String currEventId = currArc.getEventId();
+			LabeledEvent currEvent = currArc.getEvent();
+			
+			if ((passEvent == null) || !passEvent.equals(currEvent))
+			{
+				// LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(currEventId);
+
+				if (currEvent.getLabel().equals("pass"))
+				{
+					State toState = currArc.getToState();
+					Iterator passArcIt = toState.outgoingArcsIterator();
+
+					while (arcIt.hasNext())
+					{
+						Arc currPassArc = (Arc) passArcIt.next();
+						// String currPassEventId = currPassArc.getEventId();
+						LabeledEvent currPassEvent = currPassArc.getEvent(); // currAlphabet.getEventWithId(currEventId);
+
+						currAlphabet.removeEvent(currPassEvent);
+					}
+				}
+				else
+				{
+					currAlphabet.removeEvent(currEvent);
+				}
+			}
+		}
+
+		// Add all remaining events as self loop to the current state
+		Iterator eventIt = currAlphabet.iterator();
+
+		while (eventIt.hasNext())
+		{
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+			// Arc currArc = new Arc(currState, currState, currEvent.getId());
+			Arc currArc = new Arc(currState, currState, currEvent);
+
+			theAutomaton.addArc(currArc);
+		}
+	}
+	
+	private static boolean containsPassEvent(State theState, Alphabet currAlpha, LabeledEvent passEvent)
+	{
+		if (passEvent == null)
+		{
+			return false;
+		}
+		
+		Iterator arcIt = theState.outgoingArcsIterator();
+		while (arcIt.hasNext())
+		{
+			Arc currArc = (Arc) arcIt.next();
+			// String currEventId = currArc.getEventId();
+			LabeledEvent currEvent = currArc.getEvent();
+
+			if (/* (passEventId == null) || */ !passEvent.equals(currEvent))
+			{
+				return true;
+			}
+		}
+
+		return false;
+
 	}
 }

@@ -94,6 +94,7 @@ public class SupremicaServer
 			serverStarted = false;
 
 			logger.error("Error while starting XML-RPC server");
+			logger.debug(e.getStackTrace());
 		}
 
 		if (serverStarted)

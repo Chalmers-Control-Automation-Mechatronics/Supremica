@@ -97,7 +97,8 @@ public class AutomatonComplement
 
 				while (outgoingArcsIterator.hasNext())
 				{
-					if (currEvent.equalId(((Arc) outgoingArcsIterator.next()).getEventId()))
+					Arc currArc = (Arc) outgoingArcsIterator.next();
+					if (currEvent.equals(currArc.getEvent())) // equalId(((Arc) outgoingArcsIterator.next()).getEventId()))
 					{
 						found = true;
 

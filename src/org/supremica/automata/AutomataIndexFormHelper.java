@@ -201,8 +201,9 @@ public final class AutomataIndexFormHelper
 
 				newState[i++] = tmpInt;
 			}
-			catch (NumberFormatException e)
+			catch (NumberFormatException ex)
 			{
+				// logger.debug(ex.getStackTrace());
 				return null;
 			}
 		}

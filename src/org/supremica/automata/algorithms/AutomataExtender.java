@@ -100,8 +100,8 @@ public class AutomataExtender
 
 		Alphabet orgAlphabet = orgAut.getAlphabet();
 		Alphabet newAlphabet = new Alphabet(orgAlphabet);
-		String passEventId = orgAlphabet.getUniqueId(newAut.getName());
-		LabeledEvent passEvent = new LabeledEvent("pass", passEventId);
+		// String passEventId = orgAlphabet.getUniqueId(newAut.getName());
+		LabeledEvent passEvent = new LabeledEvent("pass", "3.1415926");
 		newAlphabet.addEvent(passEvent);
 
 		if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
@@ -109,7 +109,7 @@ public class AutomataExtender
 			// LabeledEvent passEvent = new LabeledEvent("pass");
 
 			passEvent.setControllable(true);
-			passEvent.setId(passEventId);
+//			passEvent.setId(passEventId);
 			newAlphabet.addEvent(passEvent);
 		}
 
@@ -130,21 +130,18 @@ public class AutomataExtender
 
 				if (!currEvent.isControllable())
 				{
-					LabeledEvent newEvent = new LabeledEvent(currEvent);
-
+					LabeledEvent newEvent = new LabeledEvent(currEvent.getLabel(), currEvent.getLabel() + "_c");
+					newEvent.setPrioritized(currEvent.isPrioritized());
 					newEvent.setControllable(true);
-					newEvent.setLabel(currEvent.getLabel());
-					newEvent.setId(currEvent.getId() + "_c");
 					newEvents.add(newEvent);
 				}
 			}
 
+			// add the events to the new alphabet
 			eventIt = newEvents.iterator();
-
 			while (eventIt.hasNext())
 			{
 				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-
 				newAlphabet.addEvent(currEvent);
 			}
 		}
@@ -207,7 +204,7 @@ public class AutomataExtender
 					State orgDestState = orgArc.getToState();
 					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 					// BIG WARNING, Red Flag here, may be broken...
-					LabeledEvent currEvent = newAlphabet.getEventWithId(orgArc.getEventId());
+					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent()); // newAlphabet.getEventWithId(orgArc.getEventId());
 
 					if (i < k)
 					{
@@ -258,7 +255,7 @@ public class AutomataExtender
 								// WARNING Red Flag, may be broken...
 								// Do we know this event id (currEvent.getId() + "_c") exists? What if not?
 								// It does, it was created above and added to newAlphabet
-								LabeledEvent cEvent = newAlphabet.getEventWithId(currEvent.getId() + "_c");
+								LabeledEvent cEvent = newAlphabet.getEvent(new LabeledEvent()); // newAlphabet.getEventWithId(currEvent.getId() + "_c");
 								Arc newArc = new Arc(newSourceState, newDestState, cEvent);
 
 								newAut.addArc(newArc);

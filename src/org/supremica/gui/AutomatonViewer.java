@@ -145,9 +145,10 @@ public class AutomatonViewer
 		{
 			build();
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			logger.error("Error while displaying " + theAutomaton.getName());
+			logger.error("Error while displaying " + theAutomaton.getName(), ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -162,9 +163,10 @@ public class AutomatonViewer
 					update();
 				}
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				logger.error("Error while displaying " + theAutomaton.getName());
+				logger.error("Error while displaying " + theAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -445,9 +447,10 @@ public class AutomatonViewer
 
 				updateNeeded = false;
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				logger.error("Error while viewing " + theAutomaton.getName() + "\n");
+				logger.error("Error while viewing " + theAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -477,7 +480,7 @@ public class AutomatonViewer
 		catch (Exception ex)
 		{
 			toDotWriter.close();
-
+			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 
@@ -489,7 +492,7 @@ public class AutomatonViewer
 		catch (Exception ex)
 		{
 			logger.error("Exception while serializing automaton", ex);
-
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 		finally
@@ -507,7 +510,7 @@ public class AutomatonViewer
 		catch (Exception ex)
 		{
 			logger.error("Exception while parsing dot file", ex);
-
+			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 		finally
@@ -523,7 +526,7 @@ public class AutomatonViewer
 		catch (Exception ex)
 		{
 			logger.error("Exception while getting dot graph", ex);
-
+			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 	}
@@ -583,7 +586,7 @@ public class AutomatonViewer
 		catch (IOException ex)
 		{
 			logger.error("Cannot run dot. Make sure dot is in the path.");
-
+			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 
@@ -734,7 +737,7 @@ public class AutomatonViewer
 					catch (Exception ex)
 					{
 						logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
-
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 				}
@@ -769,7 +772,7 @@ class Builder
 			catch (Exception ex)
 			{
 				logger.error("Cannot display the automaton.");
-
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 

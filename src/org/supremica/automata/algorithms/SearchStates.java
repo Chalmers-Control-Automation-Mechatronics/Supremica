@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.regex.*;
 
+import org.supremica.log.*;
+
 import org.supremica.util.IntArrayList;
 import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
@@ -29,6 +31,8 @@ import org.supremica.gui.MonitorableThread;
 public class SearchStates
 	extends MonitorableThread
 {
+	private static Logger logger = LoggerFactory.createLogger(SearchStates.class);
+
 	private AutomataSynchronizer syncher = null;
 	private IntArrayVector container = null;
 	private StateMatcher matcher = null;
@@ -64,6 +68,7 @@ public class SearchStates
 		{
 
 			// How to work this (exception in a worker thread)??
+			logger.debug(excp.getStackTrace());
 			return;
 		}
 	}

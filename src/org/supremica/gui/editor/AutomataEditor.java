@@ -714,7 +714,7 @@ public class AutomataEditor
 		catch (Throwable t)
 		{
 			logger.error(t);
-			t.printStackTrace();
+			logger.debug(t.getStackTrace());
 			return;
 		}
 
@@ -787,8 +787,8 @@ public class AutomataEditor
 					}
 					catch (Exception ex)
 					{
-						System.err.println("Error while displaying the automaton");
-
+						logger.error("Error while displaying the automaton", ex);
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 				}
@@ -1097,10 +1097,10 @@ public class AutomataEditor
 		{
 			theVisualProject.addAutomaton(newAutomaton);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			System.err.println("Error while adding the automaton to the container");
-
+			logger.error("Error while adding the automaton to the container", ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 

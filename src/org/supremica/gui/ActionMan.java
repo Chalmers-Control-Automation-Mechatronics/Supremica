@@ -72,6 +72,8 @@ import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 
+import org.supremica.gui.texteditor.TextFrame;
+
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
 abstract class FileImporter
@@ -133,9 +135,10 @@ public class ActionMan
 				theIntValue = Integer.parseInt(theInteger);
 				finished = true;
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
 				JOptionPane.showMessageDialog(parent, "Not a valid integer", "Alert", JOptionPane.ERROR_MESSAGE);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 
@@ -163,6 +166,7 @@ public class ActionMan
 		catch (Exception ex)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Error while creating the template!", "Alert", JOptionPane.ERROR_MESSAGE);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -234,7 +238,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AlphabetAnalyzer");
+				logger.error("Exception in AlphabetAnalyzer ", ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 		else
@@ -280,9 +285,8 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-
-			// logger.error(excp.toString());
-			gui.error(ex.toString());
+			logger.error(ex.toString());
+			logger.debug(ex.getStackTrace());
 		}
 
 	}
@@ -311,7 +315,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AutomataAddSelfLoopArcs. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomataAddSelfLoopArcs. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -341,7 +346,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AutomataAllAccepting. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomataAllAccepting. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -380,8 +386,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
-				gui.error("Exception in AutomatonComplement. Automaton: " + currAutomaton.getName() + " Message: " + ex);
+				logger.error("Exception in AutomatonComplement. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -419,7 +425,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception while copying the automaton");
+				logger.error("Exception while copying the automaton ", ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -449,8 +456,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
-				gui.error("Exception while removing " + currAutomatonName);
+				logger.error("Exception while removing " + currAutomatonName, ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 
@@ -561,7 +568,11 @@ public class ActionMan
 
 			if (exportMode == FORMAT_XML)
 			{
-				fileExporter = FileDialogs.getXMLFileExporter();
+				// fileExporter = FileDialogs.getXMLFileExporter();
+				AutomataToXml xport = new AutomataToXml(gui.getSelectedProject());
+				TextFrame textframe = new TextFrame("Debug output");
+				xport.serialize(textframe.getPrintWriter());
+				return;
 			}
 			else if (exportMode == FORMAT_SP)
 			{
@@ -601,7 +612,8 @@ public class ActionMan
 						}
 						catch (Exception ex)
 						{
-							gui.error("Exception while exporting " + currFile.getAbsolutePath() + " : " + ex.toString());
+							logger.error("Exception while exporting " + currFile.getAbsolutePath(), ex);
+							logger.debug(ex.getStackTrace());
 						}
 					}
 				}
@@ -710,7 +722,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						gui.error("Exception while exporting " + currFile.getAbsolutePath() + " : " + ex.toString());
+						logger.error("Exception while exporting " + currFile.getAbsolutePath(), ex);
+						logger.debug(ex.getStackTrace());
 					}
 				}
 			}
@@ -757,7 +770,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AutomataExtend. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomataExtend. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -787,7 +801,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AutomataPurge. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomataPurge. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -816,7 +831,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AutomataRemovePass. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomataRemovePass. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -845,7 +861,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in RemoveSelfArcs. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in RemoveSelfArcs. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -880,7 +897,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception while renaming the automaton " + currAutomatonName, ex);
+				logger.error("Exception while renaming the automaton " + currAutomatonName, ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -906,7 +924,7 @@ public class ActionMan
 		catch (Exception ex)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Error constructing synchronizationOptions: " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
-
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -1002,7 +1020,7 @@ public class ActionMan
 			catch (Exception ex)
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "Invalid synchronizationOptions", "Alert", JOptionPane.ERROR_MESSAGE);
-
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 
@@ -1060,8 +1078,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AutomataSynthesizer: " + ex);
-				ex.printStackTrace();
+				logger.error("Exception in AutomataSynthesizer. ", ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 		else // single automaton selected
@@ -1077,10 +1095,10 @@ public class ActionMan
 				{
 					synthesizer = new AutomatonSynthesizer(gui, currAutomaton, synthesizerOptions);
 				}
-				catch (Exception e)
+				catch (Exception ex)
 				{
-					JOptionPane.showMessageDialog(gui.getComponent(), e.toString(), "Alert", JOptionPane.ERROR_MESSAGE);
-
+					JOptionPane.showMessageDialog(gui.getComponent(), ex.toString(), "Alert", JOptionPane.ERROR_MESSAGE);
+					logger.debug(ex.getStackTrace());
 					return;
 				}
 
@@ -1090,7 +1108,8 @@ public class ActionMan
 				}
 				catch (Exception ex)
 				{
-					gui.error("Exception in AutomatonSynthesizer. Automaton: " + currAutomaton.getName());
+					logger.error("Exception in AutomatonSynthesizer. Automaton: " + currAutomaton.getName(), ex);
+					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
@@ -1136,7 +1155,6 @@ public class ActionMan
 			if (currAutomaton.getInitialState() == null)
 			{
 				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 				return;
 			}
 
@@ -1152,7 +1170,7 @@ public class ActionMan
 		catch (Exception ex)
 		{
 			JOptionPane.showMessageDialog(gui.getFrame(), "Invalid synchronizationOptions", "Alert", JOptionPane.ERROR_MESSAGE);
-
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -1201,10 +1219,10 @@ public class ActionMan
 			AutomataViewer alphabetviewer = new AutomataViewer(selectedAutomata, true, false);
 			alphabetviewer.setVisible(true);
 		}
-		catch(Exception excp)
+		catch(Exception ex)
 		{
-			logger.error("Exception in AlphabetViewer");
-			logger.error(excp);
+			logger.error("Exception in AlphabetViewer", ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 	}
@@ -1237,7 +1255,8 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			gui.error("Exception while getting Animator.");
+			logger.error("Exception while getting Animator.", ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -1273,9 +1292,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-
-				// logger.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
-				gui.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 		else
@@ -1308,9 +1326,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-
-				// logger.error("Exception in AutomataExplorer.");
-				gui.error("Exception in AutomataExplorer.");
+				logger.error("Exception in AutomataExplorer.", ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -1336,7 +1353,8 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("Exception in Simulator");
+			logger.error("Exception in Simulator", ex);
+			logger.debug(ex.getStackTrace());
 		}
 
 	}
@@ -1391,10 +1409,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-
-				logger.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
-				// ex.printStackTrace();
-				// gui.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -1505,8 +1521,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				// logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName());
-				gui.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName());
+				logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 
 				return;
 			}
@@ -1585,8 +1601,8 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("fileExportHtml: Exception - " + ex.getMessage());
-			ex.printStackTrace();
+			logger.error("fileExportHtml: Exception - ", ex);
+			logger.debug(ex.getStackTrace());
 		}
 
 	}
@@ -1662,12 +1678,11 @@ public class ActionMan
 
 			currProject = builder.build(file);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-
 			// this exception is caught while opening
-			gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
-
+			logger.error("Error while opening " + file.getAbsolutePath(), ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -1707,8 +1722,8 @@ public class ActionMan
 		}
 		catch (Exception excp)
 		{
-			excp.printStackTrace();
-			gui.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
+			logger.error("Error adding automata " + file.getAbsolutePath(), excp);
+			logger.debug(excp.getStackTrace());
 
 			return;
 		}
@@ -1781,9 +1796,8 @@ public class ActionMan
 				}
 				catch (Exception ex)
 				{
-
-					// logger.error("Exception while saveAs " + currFile.getAbsolutePath());
-					gui.error("Exception while saveAs " + currFile.getAbsolutePath());
+					logger.error("Exception while Save As " + currFile.getAbsolutePath(), ex);
+					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
@@ -1837,10 +1851,10 @@ public class ActionMan
 
 			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
-
+			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 	}
@@ -1859,10 +1873,10 @@ public class ActionMan
 
 			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
-
+			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 	}
@@ -1893,11 +1907,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-
-				// logger.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName());
-				// logger.error(ex);
-				gui.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName(), ex);
-				ex.printStackTrace();
+				logger.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -1924,8 +1935,8 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			// logger.error(excp.toString());
-			gui.error(ex.toString());
+			logger.error("Exception in Find States. ", ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -1964,7 +1975,8 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+			logger.error("Exception in animator.", ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -2032,8 +2044,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						ex.printStackTrace();
-						gui.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+						logger.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 					logger.info("SattLine SFC files successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
@@ -2098,8 +2110,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						ex.printStackTrace();
-						gui.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 					logger.info("ABB Control Builder SFC files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
@@ -2153,8 +2165,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						ex.printStackTrace();
-						gui.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 					logger.info("ABB Control Builder IL files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
@@ -2206,8 +2218,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						ex.printStackTrace();
-						gui.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 					logger.info("ABB Control Builder ST files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
@@ -2252,8 +2264,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						ex.printStackTrace();
-						gui.error("Exception while generating Mindstorm NQC text code to file " + currFile.getAbsolutePath());
+						logger.error("Exception while generating Mindstorm NQC text code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 					logger.info("Mindstorm NQC file successfully generated at " + currFile.getAbsolutePath());
@@ -2298,8 +2310,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						ex.printStackTrace();
-						gui.error("Exception while generating 1131 Structured text code to file " + currFile.getAbsolutePath());
+						logger.error("Exception while generating 1131 Structured text code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 					logger.info("IEC-61131 ST file successfully generated at " + currFile.getAbsolutePath());
@@ -2345,8 +2357,8 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
-						ex.printStackTrace();
-						gui.error("Exception while generating 1131 Instruction list code to file " + currFile.getAbsolutePath());
+						logger.error("Exception while generating 1131 Instruction list code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 					logger.info("IEC-61131 IL file successfully generated at " + currFile.getAbsolutePath());

@@ -123,7 +123,7 @@ class TypeCellEditor
 					catch (Exception ex)
 					{
 						logger.error("Could not find automaton at row " + orgRow);
-						ex.printStackTrace();
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 

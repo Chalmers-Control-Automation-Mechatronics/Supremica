@@ -289,6 +289,7 @@ public class SimulatorExecuter
 					catch (CommandException ex)
 					{
 						logger.error("Exception while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
+						logger.debug(ex.getStackTrace());
 					}
 				}
 			}

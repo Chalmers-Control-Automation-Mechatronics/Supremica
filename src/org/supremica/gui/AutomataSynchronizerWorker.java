@@ -128,6 +128,7 @@ public class AutomataSynchronizerWorker
 				workbench.error("Exception while executing AutomataSynchronizer");
 
 				// logger.error("Exception while executing AutomataSynchronizer");
+				// logger.debug(ex.getStackTrace());
 				return;
 			}
 
@@ -143,7 +144,7 @@ public class AutomataSynchronizerWorker
 
 					// -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					workbench.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
-
+					// logger.debug(ex.getStackTrace());
 					return;
 				}
 			}
@@ -194,6 +195,7 @@ public class AutomataSynchronizerWorker
 			{
 
 				// logger.error("Could not add the new automaton after synchronization");
+				// logger.debug(ex.getStackTrace());
 				workbench.error("Could not add the new automaton after synchronization");
 
 				return;

@@ -222,7 +222,8 @@ public class Animator
 			}
 			catch (CommandException ex)
 			{
-				System.err.println(ex.getMessage());
+				logger.error(ex.getMessage());
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}
@@ -269,7 +270,8 @@ public class Animator
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+			logger.error("Error in Animator. ", ex);
+			logger.debug(ex.getStackTrace());
 			System.exit(1);
 		}
 	}

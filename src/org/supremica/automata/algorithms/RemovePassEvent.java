@@ -84,8 +84,8 @@ public class RemovePassEvent
 			while (arcIt.hasNext())
 			{
 				Arc currArc = (Arc) arcIt.next();
-				String currEventId = currArc.getEventId();
-				LabeledEvent currEvent = theAlphabet.getEventWithId(currEventId);
+				// String currEventId = currArc.getEventId();
+				LabeledEvent currEvent = currArc.getEvent(); // theAlphabet.getEventWithId(currEventId);
 
 				if (currEvent.getLabel().equals("pass"))
 				{
@@ -98,8 +98,8 @@ public class RemovePassEvent
 					while (nextArcIt.hasNext())
 					{
 						Arc nextArc = (Arc) nextArcIt.next();
-						String nextEventId = nextArc.getEventId();
-						LabeledEvent nextEvent = theAlphabet.getEventWithId(nextEventId);
+						// String nextEventId = nextArc.getEventId();
+						LabeledEvent nextEvent = nextArc.getEvent(); // theAlphabet.getEventWithId(nextEventId);
 
 						if (!nextEvent.isControllable())
 						{

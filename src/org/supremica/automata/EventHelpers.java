@@ -68,15 +68,15 @@ public class EventHelpers
 	 * Creates a new event from a set of events
 	 *
 	 *@param  eventSet Description of the Parameter
-	 *@param  prefix Description of the Parameter
+	 *@param  prefix ??? Never used, what was it good for ???
 	 *@return  Description of the Return Value
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	public static LabeledEvent createEvent(EventsSet eventSet, String prefix)
+	private static LabeledEvent createEvent(EventsSet eventSet) // , String prefix)
 		throws IllegalArgumentException, Exception
 	{
-		return createEvent(eventSet, prefix, true, true);
+		return createEvent(eventSet, /* prefix,*/ true, true);
 	}
 
 
@@ -84,12 +84,12 @@ public class EventHelpers
 	 * Creates a new event from a set of events
 	 *
 	 *@param  eventSet Description of the Parameter
-	 *@param  prefix Description of the Parameter
+	 *@param  prefix ??? Never used, what was it good for ???
 	 *@return  Description of the Return Value
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	public static LabeledEvent createEvent(EventsSet eventSet, String prefix, boolean requireConsistentControllability, boolean requireConsistentImmediate)
+	static LabeledEvent createEvent(EventsSet eventSet, /* String prefix,*/ boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws IllegalArgumentException, Exception
 	{
 		if (eventSet.size() <= 0)
@@ -105,7 +105,10 @@ public class EventHelpers
 		LabeledEvent tmpEvent = (LabeledEvent) eventIt.next();
 
 		// Some initializations
-		String id = tmpEvent.getId();
+// This function (createEvent) is only used by AlphabetHelpers::getUnionAlphabet
+// That function (getUnionAlphabet) manages the id by itself, so avoiding id-fddlng here would seem to be safe 
+//		String id = tmpEvent.getId();
+
 		String label = tmpEvent.getLabel();
 		boolean controllable = tmpEvent.isControllable();
 		boolean prioritized = tmpEvent.isPrioritized();
@@ -137,9 +140,9 @@ public class EventHelpers
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 
-		LabeledEvent theEvent = new LabeledEvent(label);
+		LabeledEvent theEvent = new LabeledEvent(label); // , id);
 
-		theEvent.setId(id);
+		// theEvent.setId(id);
 
 		// Do I need to tweak the id???
 		theEvent.setControllable(controllable);

@@ -337,6 +337,7 @@ public final class AutomataFastControllabilityCheckExecuter
 					catch (Exception e)
 					{
 						logger.error(e + " Execution aborted");
+						logger.debug(e.getStackTrace());
 						return;
 					}
 
@@ -463,8 +464,10 @@ public final class AutomataFastControllabilityCheckExecuter
 					}
 					catch (Exception e)
 					{
-						System.err.println(e);
-						System.exit(0);
+						// System.err.println(e);
+						// System.exit(0);
+						logger.error("Exception when adding arc: " + e);
+						logger.debug(e.getStackTrace());
 					}
 
 					currEventIndex = currEnabledEvents[++i];

@@ -121,7 +121,7 @@ public class AutomataBuildFromVALID
 		}
 		catch (Exception ex)
 		{
-			throw new Exception(ex.getMessage());
+			throw new Exception(ex.getMessage()); // why not simply throw ex;?
 		}
 
 		return currAutomata;
@@ -355,17 +355,16 @@ public class AutomataBuildFromVALID
 
 		while (i.hasNext())
 		{
-			LabeledEvent currEvent = new LabeledEvent();
-
 			element = (Element) i.next();
 
-			String eventId = element.getAttributeValue("name");
-			currEvent.setId(eventId);
-			currEvent.setLabel(eventId);
+			String eventName = element.getAttributeValue("name");
+// 			currEvent.setId(eventName);
+//			currEvent.setLabel(eventName);
+			LabeledEvent currEvent = new LabeledEvent(eventName);
 			currEvent.setControllable(element.getAttributeValue("controllable").equals("1"));
 			currEvent.setPrioritized(true);
 			
-			idEventMap.put(eventId, currEvent);
+			idEventMap.put(eventName, currEvent);
 			
 			currAlphabet.addEvent(currEvent);
 		}
@@ -379,17 +378,17 @@ public class AutomataBuildFromVALID
 
 		while (i.hasNext())
 		{
-			State currState = new State();
-
 			element = (Element) i.next();
 
-			String stateId = element.getChild("label").getAttributeValue("name");
-			currState.setId(stateId);
-			currState.setName(stateId);	// id and name, always the same
+			String stateName = element.getChild("label").getAttributeValue("name");
+//			currState.setId(stateName);
+//			currState.setName(stateName);	// id and name, always the same
+
+			State currState = new State(stateName);
 			currState.setInitial(element.getAttributeValue("initial").equals("1"));
 			currState.setAccepting(element.getAttributeValue("marked").equals("1"));
 			
-			idStateMap.put(stateId, currState);
+			idStateMap.put(stateName, currState);
 			
 			currAutomaton.addState(currState);
 		}

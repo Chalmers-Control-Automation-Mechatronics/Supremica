@@ -107,12 +107,14 @@ public class LabeledEvent
 	 *  notifyExceutionListeners();
 	 *  }
 	 */
-	public String getId()
+	 
+	// get/setId are now _only_ used by Alphabet
+	String getId() // default access, accessible within package, not outside (poor java mans friend declaration)
 	{
 		return id;
 	}
 
-	public void setId(String id)
+	void setId(String id)
 	{
 		this.id = id;
 	}
@@ -167,13 +169,22 @@ public class LabeledEvent
 		return expansionPriority;
 	}
 
+	// This method must exist and work, since every map from event to something-else calls this one		
 	public boolean equals(Object obj)
 	{
-
+		return equals((LabeledEvent)obj);
+//		throw new RuntimeException("LabeledEvent::equals(Object), not expected to be called!");
+		
 		// System.err.println("equalsObject");
-		return this.label.equals(((LabeledEvent) obj).label);
+		// return this.label.equals(((LabeledEvent) obj).label);
 	}
-
+	// NOTE -- this one's experimental, while migrating to the real problem domain
+	// The Java people have messed it all up with inheriting equals(Object)
+	public boolean equals(LabeledEvent event)
+	{
+		return getId().equals(event.getId());
+	}
+	
 	public boolean equals(String label)
 	{
 
@@ -196,12 +207,12 @@ public class LabeledEvent
 		epsilon = b;
 	}
 	
-	public boolean equalId(Object obj)
+	private boolean equalId(Object obj)
 	{
 		return this.id.equals(((LabeledEvent) obj).id);
 	}
 
-	public boolean equalId(String id)
+	private boolean equalId(String id)
 	{
 		return this.id.equals(id);
 	}

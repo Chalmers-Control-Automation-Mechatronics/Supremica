@@ -73,11 +73,12 @@ public class BrowserControl
                 } */
             }
         }
-        catch(IOException x)
+        catch(IOException ex)
         {
             // couldn't exec browser
             logger.error("Could not invoke browser, command=" + cmd);
-            logger.error("Caught: " + x);
+            logger.error("Caught: " + ex);
+            logger.debug(ex.getStackTrace());
         }
     }
     /**

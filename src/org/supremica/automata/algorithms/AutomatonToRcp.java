@@ -129,8 +129,9 @@ public class AutomatonToRcp
 			{
 				Arc arc = (Arc) outgoingArcs.next();
 				State destState = arc.getToState();
-				String event = aut.getAlphabet().getEventWithId(arc.getEventId()).getLabel();
-				Allocation al = getAllocation(event);
+				// String event = aut.getAlphabet().getEventWithId(arc.getEventId()).getLabel();
+				String label = arc.getEvent().getLabel();
+				Allocation al = getAllocation(label);
 
 				pw.println(sourceName + " { " + (al.book
 												 ? ""

@@ -177,9 +177,9 @@ public class Supremica
 		{
 			jbInit();
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			e.printStackTrace();
+			logger.debug(ex.getStackTrace());
 		}
 
 		// This code used to be in the popup menu -------------
@@ -1248,6 +1248,7 @@ public class Supremica
 			catch (Exception ex)
 			{
 				logger.error("Trying to get an automaton that does not exist. Index: " + i);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 
@@ -1272,6 +1273,7 @@ public class Supremica
 			catch (Exception ex)
 			{
 				logger.error("Trying to get an automaton that does not exist. Index: " + i);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 
@@ -1297,6 +1299,7 @@ public class Supremica
 			catch (Exception ex)
 			{
 				logger.error("Trying to get an automaton that does not exist. Index: " + i);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 		Project activeProject = getActiveProject();
@@ -1460,12 +1463,12 @@ public class Supremica
 
 			currProject = builder.build(file);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
 
 			// this exception is caught while opening
-			logger.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
-
+			logger.error("Error while opening " + file.getAbsolutePath() + " " + ex.getMessage());
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -1477,10 +1480,10 @@ public class Supremica
 
 			logger.info("Successfully opened and added " + nbrOfAddedProject + " automata.");
 		}
-		catch (Exception excp)
+		catch (Exception ex)
 		{
-			logger.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
-
+			logger.error("Error adding automata " + file.getAbsolutePath() + " " + ex.getMessage());
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -1626,11 +1629,11 @@ public class Supremica
 			// logger.debug("Supremica.addAutomaton");
 			getActiveProject().addAutomaton(currAutomaton);
 		}
-		catch (Exception excp)
+		catch (Exception ex)
 		{
-
 			// should never occur, we test for this condition already
-			logger.error("Error while adding: " + excp.getMessage());
+			logger.error("Error while adding: " + ex.getMessage());
+			logger.debug(ex.getStackTrace());
 		}
 
 		return true;

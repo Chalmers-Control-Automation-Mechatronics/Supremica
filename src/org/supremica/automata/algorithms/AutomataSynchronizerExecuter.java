@@ -647,9 +647,9 @@ public final class AutomataSynchronizerExecuter
 					}
 					catch (Exception e)
 					{
-						System.err.println(e);
+						// System.err.println(e);
 						logger.error("Error in SynchronizerExecuter");
-
+						logger.debug(e.getStackTrace());
 						return;
 					}
 
@@ -839,8 +839,10 @@ public final class AutomataSynchronizerExecuter
 						}
 						catch (Exception e)
 						{
-							System.err.println(e);
-							System.exit(0);
+							// System.err.println(e);
+							// System.exit(0);
+							logger.error("Exception when checking next state. " + e);
+							logger.debug(e.getStackTrace());
 						}
 
 						currEventIndex = currEnabledEvents[++i];
@@ -869,7 +871,7 @@ public final class AutomataSynchronizerExecuter
 		}
 		catch (OutOfMemoryError ex)
 		{
-			throw new Exception("Out of memory. Try to increase the JVM heap.");
+			throw new Exception("Out of memory. Try to increase the JVM heap.");	// why not throw new Exception(ex)?
 		}
 	}
 

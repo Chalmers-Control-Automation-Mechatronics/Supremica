@@ -94,6 +94,7 @@ public class AlphabetAnalyzer
 		catch (Exception e)
 		{
 			logger.error("Error in AlphabetAnalyzer. " + e);
+			logger.debug(e.getStackTrace());
 			throw e;
 		}
 

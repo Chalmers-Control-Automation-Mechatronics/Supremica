@@ -91,7 +91,7 @@ public class PreLoader
 		catch (Exception ex)
 		{
 			logger.error("Exception in PreLoader");
-
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 

@@ -124,6 +124,7 @@ public class AutomataFastControllabilityCheck
 		catch (Exception e)
 		{
 			logger.error("Error while initializing synchronization helper. " + e);
+			logger.debug(e.getStackTrace());
 			throw e;
 		}
 
@@ -416,7 +417,7 @@ public class AutomataFastControllabilityCheck
 			theAlphabets.add(currAlphabet);
 		}
 
-		unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "");
+		unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
 
 		int[] tempArray = new int[amountOfUnselected];
 		double[] arraySortValue = new double[amountOfUnselected];

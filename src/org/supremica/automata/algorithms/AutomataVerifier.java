@@ -79,7 +79,7 @@ public class AutomataVerifier
 	private int nbrOfExecuters;
 
 	/**
-	 * Map from an uncontrollable Event-object to the Set of plant-type Automaton-objects that contains this event.
+	 * Map from an uc LabeledEvent to the Set of plant Automaton-objects that contain this event
 	 *
 	 *@see  AlphabetAnalyzer
 	 */
@@ -567,7 +567,7 @@ public class AutomataVerifier
 			theAlphabets.add(currAlphabet);
 		}
 
-		unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "");
+		unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
 
 		int[] tempArray = new int[amountOfUnselected];
 		double[] arraySortValue = new double[amountOfUnselected];
@@ -1053,7 +1053,7 @@ public class AutomataVerifier
 		catch (Exception ex)
 		{
 			logger.error("Error when building automaton: " + ex.toString());
-
+			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 

@@ -353,7 +353,7 @@ public class AutomatonSynthesizer
 			while (arcIt.hasNext())
 			{
 				Arc currArc = (Arc) arcIt.next();
-				LabeledEvent currEvent = theAutomaton.getEvent(currArc.getEventId());
+				LabeledEvent currEvent = currArc.getEvent(); // theAutomaton.getEvent(currArc.getEventId());
 				State fromState = currArc.getFromState();
 
 				if ((fromState.getCost() != State.MAX_COST) &&!fromState.isVisited())
@@ -404,7 +404,7 @@ public class AutomatonSynthesizer
 			while (arcIt.hasNext())
 			{
 				Arc currArc = (Arc) arcIt.next();
-				LabeledEvent currEvent = theAutomaton.getEvent(currArc.getEventId());
+				LabeledEvent currEvent = currArc.getEvent(); // theAutomaton.getEvent(currArc.getEventId());
 
 				if (!currEvent.isControllable())
 				{
@@ -525,6 +525,7 @@ public class AutomatonSynthesizer
 						catch (Exception ex)
 						{
 							logger.error("AutomatonSynthesizer::computeDisabledEvents: " + ex.getMessage());
+							logger.debug(ex.getStackTrace());
 						}
 					}
 				}

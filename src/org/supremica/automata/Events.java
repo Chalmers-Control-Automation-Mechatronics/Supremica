@@ -54,12 +54,12 @@ import java.util.*;
 /**
  * Contains a collection of events.
  * Implements functionality for quickly
- * returning a event with a given label.
+ * returning an event with a given label.
  *
  * Important note:
  * If an event label is changed after it is inserted in
  * an Events object, then rehash must be called otherwise
- * the strange errors will arise.
+ * strange errors will arise as the set may become unordered.
  *
  *@author  ka
  *@created  November 28, 2001
@@ -127,7 +127,7 @@ public class Events
 	 *@exception  Exception Description of the Exception
 	 */
 	public void addEvent(LabeledEvent ev)
-		throws Exception
+		throws Exception // ClassCastException, NullPointerException // only these are really thrown by TreeMap::put
 	{
 		theEvents.put(ev.getLabel(), ev);
 	}
@@ -304,4 +304,5 @@ public class Events
 
 		theEvents = newEvents;
 	}
+	
 }

@@ -201,13 +201,13 @@ public class Automata
 	 * If you want the synchronization indicies to be valid then you have to call setSynchronizationIndicies
 	 * before calling this method.
 	 */
-	public Alphabet getUnionAlphabet()
+	private Alphabet getUnionAlphabet()
 		throws Exception
 	{
 		return getUnionAlphabet(true, true);
 	}
 
-	public Alphabet getUnionAlphabet(boolean requireConsistentControllability, boolean requireConsistentImmediate)
+	private Alphabet getUnionAlphabet(boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws Exception
 	{
 		return AlphabetHelpers.getUnionAlphabet(this, requireConsistentControllability, requireConsistentImmediate);

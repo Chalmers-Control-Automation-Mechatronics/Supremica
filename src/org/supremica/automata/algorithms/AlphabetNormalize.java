@@ -100,13 +100,16 @@ public class AlphabetNormalize
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();
-			String eventId = currArc.getEventId();
-			LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
+			// WARNING, Red Flag, may be broken code...
+//			String eventId = currArc.getEventId();
+//			LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
+			LabeledEvent currEvent = currArc.getEvent();
 			String currLabel = currEvent.getLabel();
 			LinkedList currList = (LinkedList) labelMap.get(currLabel);
 			LabeledEvent firstEvent = (LabeledEvent) currList.getFirst();
 
-			currArc.setEvent(firstEvent.getId());
+			// currArc.setEvent(firstEvent.getId());
+			currArc.setEvent(firstEvent);
 		}
 	}
 
@@ -164,9 +167,9 @@ public class AlphabetNormalize
 			{
 				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
-				System.err.println("   " + currEvent.getId() + "   " + (currEvent.isControllable()
-																		? ""
-																		: "!") + currEvent.getLabel());
+				System.err.println("   " + currEvent.toString() // getId() 
+											+ "   " + (currEvent.isControllable() ? "" : "!") 
+											+ currEvent.getLabel());
 			}
 		}
 	}

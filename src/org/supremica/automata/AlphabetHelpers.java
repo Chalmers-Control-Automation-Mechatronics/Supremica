@@ -73,13 +73,19 @@ public class AlphabetHelpers
 			eventsSet.add(currAlphabet);
 		}
 
-		return getUnionAlphabet(eventsSet, "a", requireConsistentControllability, requireConsistentImmediate);
+		return getUnionAlphabet(eventsSet, /* "a", */ requireConsistentControllability, requireConsistentImmediate);
 	}
 
-	public static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
+	public static Alphabet getUnionAlphabet(EventsSet alphas)
 		throws IllegalArgumentException, Exception
 	{
-		return getUnionAlphabet(alphabets, idPrefix, true, true);
+		return getUnionAlphabet(alphas, /* "", */ true, true);
+	}
+	
+	private static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
+		throws IllegalArgumentException, Exception
+	{
+		return getUnionAlphabet(alphabets, /* idPrefix, */ true, true);
 	}
 
 
@@ -93,7 +99,7 @@ public class AlphabetHelpers
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	public static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix, boolean requireConsistentControllability, boolean requireConsistentImmediate)
+	private static Alphabet getUnionAlphabet(EventsSet alphabets, /* String idPrefix, */ boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws IllegalArgumentException, Exception
 	{
 		if (alphabets.size() < 1)
@@ -105,9 +111,8 @@ public class AlphabetHelpers
 		Events unionEvents = EventsHelpers.union(alphabets);
 		Alphabet newAlphabet = new Alphabet();
 
-		// Iterate over all events
+		// Iterate over all events - check consistency and add one for each label
 		Iterator eventsIt = unionEvents.iterator();
-
 		while (eventsIt.hasNext())
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventsIt.next();
@@ -128,10 +133,12 @@ public class AlphabetHelpers
 				}
 			}
 
-			LabeledEvent newEvent = EventHelpers.createEvent(eventSet, idPrefix, requireConsistentControllability, requireConsistentImmediate);
-
-			newEvent.setId(newAlphabet.getUniqueId(idPrefix));
-			newAlphabet.addEvent(newEvent);
+			LabeledEvent newEvent = EventHelpers.createEvent(eventSet, requireConsistentControllability, requireConsistentImmediate);
+			
+			// If we get here, the events are consistent (or consistency is not to be checked)
+			
+			// newEvent.setId(newAlphabet.getUniqueId(idPrefix));
+			newAlphabet.addEvent(newEvent, false);
 		}
 
 		return newAlphabet;

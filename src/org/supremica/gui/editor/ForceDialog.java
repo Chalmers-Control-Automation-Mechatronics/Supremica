@@ -147,7 +147,8 @@ public class ForceDialog
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+			// logger.debug(ex.getStackTrace());
+			throw new RuntimeException(ex);
 		}
 	}
 

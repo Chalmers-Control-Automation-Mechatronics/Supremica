@@ -57,6 +57,7 @@ import java.util.*;
 import com.nwoods.jgo.*;
 import org.supremica.automata.*;
 import org.supremica.gui.*;
+import org.supremica.log.*;
 
 // AutomatonDocument, for this example, has just a few properties:
 // Location and Link Pen.
@@ -66,6 +67,7 @@ import org.supremica.gui.*;
 public class AutomatonDocument
 	extends JGoDocument
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomatonDocument.class);
 
 	// Event hints
 	public final static int NameChanged = JGoDocumentEvent.LAST + 1;
@@ -151,10 +153,10 @@ public class AutomatonDocument
 		{
 			labels = new Labels(this, theArcSet);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			e.printStackTrace();
-			System.err.println("AutomatonDocement: exception while constructing labels");
+			logger.error("AutomatonDocement: exception while constructing labels", ex);
+			logger.debug(ex.getStackTrace());
 		}
 
 		ll.setMidLabel(labels);

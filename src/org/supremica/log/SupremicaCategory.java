@@ -71,6 +71,15 @@ public final class SupremicaCategory
 		category.debug(message, t);
 	}
 
+	// Print the stack trace on the debug pane
+	public void debug(StackTraceElement[] trace)
+	{
+		for(int i = 0; i < trace.length; ++i)
+		{
+			category.debug(trace[i].toString());
+		}
+	}
+	
 	public void error(Object message)
 	{
 		category.error(message);

@@ -114,7 +114,8 @@ public class LayerDialog
 		}
 		catch (Exception ex)
 		{
-			ex.printStackTrace();
+			// logger.debug(ex.getStackTrace());
+			throw new RuntimeException(ex);
 		}
 	}
 

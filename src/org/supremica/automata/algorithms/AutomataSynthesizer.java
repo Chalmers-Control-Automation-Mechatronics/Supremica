@@ -230,13 +230,9 @@ public class AutomataSynthesizer
 		}
 		catch (Exception e)
 		{
-
-			// -- MF -- System.err.println("Error while initializing synchronization helper. " + e);
 			logger.error("Error while initializing synchronization helper. " + e);
-
+			logger.debug(e.getStackTrace());
 			throw e;
-
-			// e.printStackTrace();
 		}
 	}
 
@@ -423,12 +419,14 @@ public class AutomataSynthesizer
 		return retval;
 	}
 
-	// This synthesizes modular controllable supervisors (no non-blocking, that is)
-	// This is the original one
+	/* This synthesizes modular controllable supervisors (no non-blocking, that is)
+	// This is the original one -- not used anymore!
 	// Returns whether anything has been synthesized
 	private boolean modularControllability()
 		throws Exception
 	{
+		logger.debug("AutomataSynthesizer.modularControllability()");
+		
 		LabeledEvent currEvent;
 		Automaton theAutomaton;
 		Automaton currPlantAutomaton;
@@ -436,12 +434,8 @@ public class AutomataSynthesizer
 		ArrayList selectedAutomata = new ArrayList();
 		boolean foundUncontrollable = false;
 
-		// Iterator eventIterator;
-		Iterator plantIterator;
-
 		// Loop over supervisors/specifications and find plants containing equal uncontrollable events
 		Iterator supervisorIterator = theAutomata.iterator();
-
 		while (supervisorIterator.hasNext())
 		{
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
@@ -457,7 +451,6 @@ public class AutomataSynthesizer
 				// while (eventIterator.hasNext())
 				while (!eventList.isEmpty())
 				{
-
 					// currEvent = (Event) eventIterator.next();
 					currEvent = (LabeledEvent) eventList.remove(0);
 
@@ -465,8 +458,7 @@ public class AutomataSynthesizer
 					{
 						if (eventToAutomataMap.get(currEvent) != null)
 						{
-							plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
-
+							Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
 							while (plantIterator.hasNext())
 							{
 								currPlantAutomaton = (Automaton) plantIterator.next();
@@ -491,7 +483,7 @@ public class AutomataSynthesizer
 
 				if (selectedAutomata.size() > 1)
 				{
-
+					logger.debug("selectedAutomata.size() > 1");
 					// Clear the hash-table and set some variables in the synchronization helper
 					synchHelper.clear();
 					synchHelper.addState(initialState);
@@ -522,6 +514,7 @@ public class AutomataSynthesizer
 
 					if (!synchHelper.getAutomataIsControllable())
 					{
+						logger.debug("synchHelper.getAutomataIsControllable() == false");
 						foundUncontrollable = true;
 
 						// Only add supervisors with uncontrollable states
@@ -557,9 +550,8 @@ public class AutomataSynthesizer
 						}
 						catch (Exception ex)
 						{
-
-							// -- MF -- logger.error("Exception while adding the new automaton.");
-							logger.error("Exception while adding the new automaton.");
+							logger.error("Exception while adding the new automaton.", ex);
+							logger.debug(ex.getStackTrace());
 						}
 					}
 				}
@@ -567,36 +559,37 @@ public class AutomataSynthesizer
 				selectedAutomata.clear();
 			}
 		}
-/*
-		if (synthesizerOptions.getOptimize())
-		{
-			optimize(theAutomata, new Automata(newAutomata));
-		}
 
-		if(foundUncontrollable) // only add if something has been synthesized
-		{
-			// theVisualProjectContainer.add(newAutomata);
-			gui.addAutomata(newAutomata);
-		}
-		else // nothing was synthesized, the system can be used as is - but what about non-blocking?
-		{
-			logger.info("No uncontrollabilities found, the specifications can be used as supervisors, as is");
-		}
-*/
+//		if (synthesizerOptions.getOptimize())
+//		{
+//			optimize(theAutomata, new Automata(newAutomata));
+//		}
+//
+//		if(foundUncontrollable) // only add if something has been synthesized
+//		{
+//			// theVisualProjectContainer.add(newAutomata);
+//			gui.addAutomata(newAutomata);
+//		}
+//		else // nothing was synthesized, the system can be used as is - but what about non-blocking?
+//		{
+//			logger.info("No uncontrollabilities found, the specifications can be used as supervisors, as is");
+//		}
+
 		return foundUncontrollable;
 	}
-
+	*/
 	/**
 	 * Returns union alphabet of the automata in selectedAutomata
 	 *
 	 *@param  selectedAutomata Description of the Parameter
 	 *@return  Description of the Return Value
 	 *@exception  Exception Description of the Exception
-	 */
+	 *
 	public Alphabet unionAlphabet(ArrayList selectedAutomata)
 		throws Exception
 	{
-		Alphabet theAlphabet = new Alphabet();
+		logger.debug("AutomataSynthesizer::unionAlphabet");
+		
 		EventsSet theAlphabets = new EventsSet();
 		Iterator autIt = selectedAutomata.iterator();
 
@@ -608,37 +601,41 @@ public class AutomataSynthesizer
 			theAlphabets.add(currAlphabet);
 		}
 
+		Alphabet theAlphabet = null;
 		try
 		{
 			theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-
-			// System.err.println("Error while generating union alphabet: " + e);
-			// -- MF -- logger.error("Error while generating union alphabet: " + e);
-			gui.error("Error while generating union alphabet: " + e);
-
-			throw e;
+			logger.error("Error while generating union alphabet: ", ex);
+			logger.debug(ex.getStackTrace());
+			throw ex;
 		}
 
+		// What does this do and why? AutomataSynchronizerHelper has already generated the union alphabet (in the constructor)
+		// Why do we again generate the union in this method, and why do we adjust the ids?
+		
 		// Correct the id:s on the events...
 		Alphabet unionAlphabet = synchHelper.getAutomaton().getAlphabet();
-		Iterator eventIt = theAlphabet.iterator();
-		LabeledEvent currEvent;
 
+		logger.debug("theAlphabet : " + theAlphabet.toString());
+		logger.debug("unionAlphabet : " + unionAlphabet.toString());		
+		
+		Iterator eventIt = theAlphabet.iterator();
 		while (eventIt.hasNext())
 		{
-			currEvent = (LabeledEvent) eventIt.next();
-
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 			currEvent.setId(unionAlphabet.getEventWithLabel(currEvent.getLabel()).getId());
 		}
 
 		theAlphabet.rehash();
 
+		logger.debug("theAlphabet: " + theAlphabet.toString());
+		
 		return theAlphabet;
 	}
-
+	*/
 	/**
 	 * Removes unnecessary automata, i.e. synthesized supervisors that don't affect the controllability.
 	 * Note: At the moment, only controllability checked, no nonblocking.
@@ -659,7 +656,7 @@ public class AutomataSynthesizer
 		catch (Exception ex)
 		{
 			logger.error("Exception in SynchronizationOptions." + ex);
-
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -702,13 +699,13 @@ public class AutomataSynthesizer
 			catch(IllegalArgumentException ex)
 			{
 				logger.error("AutomataSynthesizer.optimize: Illegal argument " + ex);
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 			catch (Exception ex)
 			{
 				logger.error("Exception in AutomataSynthesizer.optimize. " + ex);
-				ex.printStackTrace();
-
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 		}

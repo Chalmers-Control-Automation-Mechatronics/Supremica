@@ -89,8 +89,8 @@ public class Labels
 		for (Iterator arcIt = theArcSet.iterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = (Arc) arcIt.next();
-			String eventId = currArc.getEventId();
-			LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
+			// String eventId = currArc.getEventId();
+			LabeledEvent currEvent = currArc.getEvent(); // theAlphabet.getEventWithId(eventId);
 			JGoText theText = new JGoText(currEvent.getLabel());
 
 			addObjectAtTail(theText);

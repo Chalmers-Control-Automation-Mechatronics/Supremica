@@ -138,6 +138,7 @@ class PresentStatesTable
 		catch (Exception ex)
 		{
 			logger.error("Could not create AutomatonExplorer.");
+			logger.debug(ex.getStackTrace());
 		}
 	}
 

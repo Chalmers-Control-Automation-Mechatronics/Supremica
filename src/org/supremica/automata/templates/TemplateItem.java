@@ -90,9 +90,8 @@ public class TemplateItem
 		}
 		catch (Exception ex)
 		{
-			System.err.println(ex);
-			ex.printStackTrace();
-
+			// logger.error("Exception building project." + ex);
+			// logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 	}

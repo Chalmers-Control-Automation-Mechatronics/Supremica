@@ -114,11 +114,11 @@ public final class AutomataIndexForm
 		{
 			generateEventIndices(theAutomata, theAutomaton);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			logger.error("Error while generating AutomataIndexForm", e);
-
-			throw e;
+			logger.error("Error while generating AutomataIndexForm", ex);
+			logger.debug(ex.getStackTrace());
+			throw ex;
 		}
 
 		generateStateIndices(theAutomata);
@@ -383,8 +383,8 @@ public final class AutomataIndexForm
 					Arc currArc = (Arc) outgoingArcsIt.next();
 
 					// Get the event from the automaton
-					String eventId = currArc.getEventId();
-					LabeledEvent currEvent = currAlphabet.getEventWithId(eventId);
+					// String eventId = currArc.getEventId();
+					LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(eventId);
 					LabeledEvent theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
@@ -489,8 +489,8 @@ public final class AutomataIndexForm
 					Arc currArc = (Arc) incomingArcsIt.next();
 
 					// Get the event from the automaton
-					String eventId = currArc.getEventId();
-					LabeledEvent currEvent = currAlphabet.getEventWithId(eventId);
+					// String eventId = currArc.getEventId();
+					LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(eventId);
 					LabeledEvent theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 

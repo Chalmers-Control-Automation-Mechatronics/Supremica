@@ -156,7 +156,7 @@ public class AutomataSynchronizer
 		catch (Exception ex)
 		{
 			logger.error(ex.toString());
-
+			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 	}

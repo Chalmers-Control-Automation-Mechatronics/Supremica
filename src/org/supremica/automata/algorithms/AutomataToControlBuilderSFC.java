@@ -106,7 +106,8 @@ public class AutomataToControlBuilderSFC
 		}
 		catch (Exception ex)
 		{
-			logger.error("Exception while generating ControlBuilder code");
+			logger.error("Exception while generating ControlBuilder code. " + ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -145,8 +146,8 @@ public class AutomataToControlBuilderSFC
 		}
 		catch (Exception ex)
 		{
-			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted.");
-
+			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -272,8 +273,8 @@ public class AutomataToControlBuilderSFC
 		}
 		catch (Exception ex)
 		{
-			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted.");
-
+			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 
@@ -316,8 +317,8 @@ public class AutomataToControlBuilderSFC
 		{
 
 			// This should not happen since theExtConfAlphabet is empty.
-			logger.error("Failed adding event when computing extended conflict. Code generation erroneous");
-
+			logger.error("Failed adding event when computing extended conflict. Code generation erroneous. " + ex);
+			logger.debug(ex.getStackTrace());
 			return theExtConfAlphabet;
 		}
 
@@ -337,7 +338,7 @@ public class AutomataToControlBuilderSFC
 					// Step 3. Let C = C + Conflict(e), D = D + {e}.
 					Alphabet conflictAlphabet = computeConflict(theAutomata, confEvent);
 
-					theExtConfAlphabet.plus(conflictAlphabet);
+					theExtConfAlphabet.union(conflictAlphabet);
 
 					try
 					{
@@ -347,8 +348,8 @@ public class AutomataToControlBuilderSFC
 					{
 
 						// This should not happen since testAlphabet didn't contain the event.
-						logger.error("Failed adding event when computing extended conflict. Code generation erroneous");
-
+						logger.error("Failed adding event when computing extended conflict. Code generation erroneous " + ex);
+						logger.debug(ex.getStackTrace());
 						return theExtConfAlphabet;
 					}
 				}
@@ -378,8 +379,8 @@ public class AutomataToControlBuilderSFC
 		{
 
 			// This should not happen since confAlphabet is empty.
-			logger.error("Failed adding event when computing conflict.");
-
+			logger.error("Failed adding event when computing conflict. " + ex);
+			logger.debug(ex.getStackTrace());
 			return confAlphabet;
 		}
 
@@ -403,7 +404,7 @@ public class AutomataToControlBuilderSFC
 
 					try
 					{
-						LabeledEvent arcEvent = (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -424,21 +425,22 @@ public class AutomataToControlBuilderSFC
 
 									try
 									{
-										LabeledEvent currArcEvent = (LabeledEvent) aut.getEvent(currArc.getEventId());
+										LabeledEvent currArcEvent = currArc.getEvent(); // (LabeledEvent) aut.getEvent(currArc.getEventId());
 										Alphabet dummyAlphabet = new Alphabet();
 
 										try
 										{
 											dummyAlphabet.addEvent(currArcEvent);
 											logger.debug("Event " + currArcEvent.getLabel() + " is in conflict with " + theEvent.getLabel());
-											confAlphabet.plus(dummyAlphabet);
+											
+											confAlphabet.union(dummyAlphabet);
 										}
 										catch (Exception ex)
 										{
 
 											// This should not happen since dummyAlphabet is empty.
-											logger.error("Failed adding event when computing conflict.");
-
+											logger.error("Failed adding event when computing conflict. " + ex);
+											logger.debug(ex.getStackTrace());
 											return confAlphabet;
 										}
 									}
@@ -446,8 +448,8 @@ public class AutomataToControlBuilderSFC
 									{
 
 										// This should not happen since the event exists in the automaton.
-										logger.error("Failed getting event label. Code generation erroneous.");
-
+										logger.error("Failed getting event label. Code generation erroneous. " + ex);
+										logger.debug(ex.getStackTrace());
 										return confAlphabet;
 									}
 								}
@@ -458,8 +460,8 @@ public class AutomataToControlBuilderSFC
 					{
 
 						// This should not happen since the event exists in the automaton.
-						logger.error("Failed getting event label. Code generation erroneous.");
-
+						logger.error("Failed getting event label. Code generation erroneous. " + ex);
+						logger.debug(ex.getStackTrace());
 						return confAlphabet;
 					}
 				}
@@ -551,7 +553,7 @@ public class AutomataToControlBuilderSFC
 
 					try
 					{
-						LabeledEvent arcEvent = (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -591,8 +593,8 @@ public class AutomataToControlBuilderSFC
 					{
 
 						// This should not happen since the event exists in the automaton.
-						logger.error("Failed getting event label. Code generation erroneous.");
-
+						logger.error("Failed getting event label. Code generation erroneous. " + ex);
+						logger.debug(ex.getStackTrace());
 						return theCondition.toString();
 					}
 				}
@@ -638,7 +640,7 @@ public class AutomataToControlBuilderSFC
 
 					try
 					{
-						LabeledEvent arcEvent = (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -680,8 +682,8 @@ public class AutomataToControlBuilderSFC
 					{
 
 						// This should not happen since the event exists in the automaton.
-						logger.error("Failed getting event label. Code generation erroneous.");
-
+						logger.error("Failed getting event label. Code generation erroneous. " + ex);
+						logger.debug(ex.getStackTrace());
 						return theCondition.toString();
 					}
 				}
@@ -784,14 +786,14 @@ public class AutomataToControlBuilderSFC
 	{
 		try
 		{
-			LabeledEvent event = theAutomaton.getEvent(theArc.getEventId());
+			LabeledEvent event = theArc.getEvent(); // theAutomaton.getEvent(theArc.getEventId());
 
 			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + transitionConditionPrefix + event.getLabel().replace('.', '_') + transitionConditionSuffix);
 		}
 		catch (Exception ex)
 		{
-			logger.error("Failed getting event label. Code generation aborted.");
-
+			logger.error("Failed getting event label. Code generation aborted. " + ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 	}

@@ -69,10 +69,20 @@ public class Alphabet
 	extends Events
 {
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
+
 	private HashMap idMap;
 	private int idIndex = 0;
 	private Listeners listeners = null;
 
+	public class IdExistsException 
+		extends Exception
+	{
+		public IdExistsException(String str)
+		{
+			super(str);
+		}
+	}
+	
 	public Alphabet()
 	{
 		idMap = new HashMap();
@@ -96,7 +106,7 @@ public class Alphabet
 	 *@param  prefix Description of the Parameter
 	 *@return  The uniqueId value
 	 */
-	public String getUniqueId(String prefix)
+	private String getUniqueId(String prefix)
 	{
 		String newId = null;
 
@@ -115,7 +125,7 @@ public class Alphabet
 	 *@param  id Description of the Parameter
 	 *@return  Description of the Return Value
 	 */
-	public boolean containsEventWithId(String id)
+	private boolean containsEventWithId(String id)
 	{
 		return idMap.containsKey(id);
 	}
@@ -133,7 +143,7 @@ public class Alphabet
 	 *@return  The eventWithId value
 	 *@exception  Exception Description of the Exception
 	 */
-	public LabeledEvent getEventWithId(String id)
+	private LabeledEvent getEventWithId(String id)
 		throws Exception
 	{
 		if (containsEventWithId(id))
@@ -147,6 +157,17 @@ public class Alphabet
 	}
 
 	/**
+	 * Given an event, returns an "equal" event from this alphabet
+	 * The def of "equal" is an internal matter. 
+	 * Use this method instead of fiddling with event ids in user code
+	 */
+	public LabeledEvent getEvent(LabeledEvent event)
+		throws Exception
+	{
+		return getEventWithId(event.getId());
+	}
+	
+	/**
 	 * Add an event to the alphabet. Check with containsEventWithId to make
 	 * sure that an event with the id not already exists.
 	 * If trying to add an event with an id that already exists, an exception is thrown.
@@ -157,31 +178,54 @@ public class Alphabet
 	public void addEvent(LabeledEvent event)
 		throws Exception
 	{
+		addEvent(event, true);
+	}
+	
+
+	/**
+	 * Add an event to the alphabet. If an event with the same id already exists
+	 * and doThrow is true, then throw an exception, else generate a unique id
+	 * and really add it. Note, may throw an event, even for doThrow == false, if
+	 * Events::addEvent throws or if idMap::put throws. However, doThrow == false
+	 * means that no event will be thrown because of same id
+	 */ 
+	public void addEvent(LabeledEvent event, boolean doThrow)
+	{
 		if (!containsEventWithId(event.getId()))
 		{
-			idMap.put(event.getId(), event);
-			super.addEvent(event);
-		}
-		else
-		{
-			throw new Exception("Alphabet.addEvent: An event with id \"" + event.getId() + "\" already exists");
-		}
-	}
-
-	public void addEvent(LabeledEvent event, boolean b)
-	{
-		try
-		{
-			addEvent(event);
-		}
-		catch(Exception excp)
-		{
-			if(b == true)
+			try
 			{
-				throw new RuntimeException(excp);
+				super.addEvent(event);
+				idMap.put(event.getId(), event);
+			}
+			catch(Exception ex)
+			{
+				throw new RuntimeException(ex);
+			}
+			return;
+		}
+
+		// Here containsEventWithId(event.getId()) == true
+
+		if(doThrow == true)
+		{
+			throw new RuntimeException("Alphabet.addEvent: An event with id \"" + event.getId() + "\" already exists");
+		}
+		else // doThrow == false => construct unique id, and add for real
+		{
+			event.setId(getUniqueId("x"));
+			try
+			{
+				super.addEvent(event);
+				idMap.put(event.getId(), event);
+			}
+			catch(Exception ex) // cannot throw Exception, since then an exception spec is necessary
+			{
+				throw new RuntimeException(ex);
 			}
 		}
 	}
+		
 	/**
 	 * Computes A \ B (difference) where A is this alphabet and B is other
 	 *
@@ -199,20 +243,59 @@ public class Alphabet
 				{
 					removeEvent(currEvent.getLabel());
 				}
-				catch (Exception e)
+				catch (Exception ex)
 				{    // This should be impossible
-					logger.error("Alphabet.minus. Trying to remove a non-existing event.");
+					logger.error("Alphabet.minus. Trying to remove a non-existing event. " + ex);
+					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
 	}
-
+	static public Alphabet minus(Alphabet op1, Alphabet op2)
+	{
+		Alphabet result = new Alphabet(op1);
+		result. minus(op2);
+		return result;
+	}
+	
 	/**
-	 * Computes A + B (union) where A is this alphabet and B is other
+	 * Computes A intersection B, where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
 	 */
-	public void plus(Alphabet other)
+	public void intersect(Alphabet other)
+	{
+		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
+
+			if(!containsEventWithLabel(currEvent.getLabel()))
+			{
+				try
+				{
+					removeEvent(currEvent.getLabel());
+				}
+				catch (Exception ex)
+				{    // This should be impossible
+					logger.error("Alphabet.intersect. Trying to remove a non-existing event. " + ex);
+					logger.debug(ex.getStackTrace());
+				}
+			}
+		}
+	}
+	public static Alphabet intersect(Alphabet op1, Alphabet op2)
+	{
+		Alphabet result = new Alphabet(op1);
+		result.intersect(op2);
+		return result;
+	}
+	
+	/**
+	 * Computes A union B, where A is this alphabet and B is other
+	 *
+	 *@param  other The other alphabet
+	 */
+	public void union(Alphabet other)
 	{
 		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
 		{
@@ -221,21 +304,28 @@ public class Alphabet
 			if (!containsEventWithLabel(currEvent.getLabel()))
 			{
 				LabeledEvent newEvent = new LabeledEvent(currEvent);
-
-				newEvent.setId(getUniqueId("e"));
+				// newEvent.setId(getUniqueId("e"));
 
 				try
 				{
-					addEvent(newEvent);
+					addEvent(newEvent, false);
 				}
-				catch (Exception e)
+				catch (Exception ex)
 				{    // This should be impossible
-					logger.error("Alphabet.plus. Trying to add an existing event.");
+					logger.error("Alphabet.union. Trying to add an existing event. " + ex);
+					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
 	}
 
+	static public Alphabet union(Alphabet op1, Alphabet op2)
+	{
+		Alphabet result = new Alphabet(op1);
+		result.union(op2);
+		return result;
+	}
+	
 	public boolean isAllEventsPrioritized()
 	{
 		for (Iterator evIt = eventIterator(); evIt.hasNext(); )
@@ -348,7 +438,7 @@ public class Alphabet
 		}
 	}
 
-	/** Must be called after an event label or id is modified. */
+	// Must be called after an event label or id is modified
 	public void rehash()
 	{
 		super.rehash();
@@ -361,8 +451,23 @@ public class Alphabet
 		while (eventIt.hasNext())
 		{
 			event = (LabeledEvent) eventIt.next();
-
 			idMap.put(event.getId(), event);
 		}
 	}
+	
+	public static void main(String[] args)
+	{
+		Alphabet sigma1 = new Alphabet();
+		sigma1.addEvent(new LabeledEvent("e1", "id1"), true);
+		sigma1.addEvent(new LabeledEvent("e2", "id2"), true);
+		
+		Alphabet sigma2 = new Alphabet();
+		sigma2.addEvent(new LabeledEvent("e2", "id2"), true);
+		sigma2.addEvent(new LabeledEvent("e3", "id3"), true);
+		
+		sigma1.union(sigma2);
+		System.out.println("sigma1 + sigma2 = " + sigma1.toString()); // no event with id == "id3" exists in sigma1
+		
+	}
+		
 }

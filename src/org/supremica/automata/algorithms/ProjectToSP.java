@@ -59,7 +59,7 @@ public class ProjectToSP
 	implements AutomataSerializer
 {
 	private Project project;
-	private boolean canonical;
+	private boolean canonical = false;
 	private boolean includeCost = false;
 	private boolean debugMode = false;
 	private boolean includeLayout = true;
@@ -67,10 +67,13 @@ public class ProjectToSP
 	private final static int majorFileVersion = 0;
 	private final static int minorFileVersion = 10;
 
+	// mappings between state/event and id
+	private Map stateIdMap = new HashMap();
+	private Map eventIdMap = new HashMap();
+
 	public ProjectToSP(Project project)
 	{
 		this.project = project;
-		canonical = false;
 	}
 
 	public void setIncludeLayout(boolean includeLayout)
@@ -113,12 +116,17 @@ public class ProjectToSP
 			// Print all events
 			pw.println("\t<Events>");
 
+			int eventId = 0;	// need to make up ids
+
 			for (Iterator eventIt = aut.eventIterator(); eventIt.hasNext(); )
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
-
-				pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
-
+				eventIdMap.put(event, new Integer(eventId));
+				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				eventId++;
+				//--
+				// pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				//--
 				if (!event.isControllable())
 				{
 					pw.print(" controllable=\"false\"");
@@ -147,17 +155,24 @@ public class ProjectToSP
 			// Print all states
 			pw.println("\t<States>");
 
+			int stateId = 0; // we need to make up ids
+			
 			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 			{
 				State state = (State) stateIt.next();
-
-				pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
-
-				if (!state.getId().equals(state.getName()))
-				{
-					pw.print(" name=\"" + normalize(state.getName()) + "\"");
-				}
-
+				stateIdMap.put(state, new Integer(stateId)); // The arc must be able to find it fast
+				pw.print("\t\t<State id=\"" + stateId + "\""); // no longer need to normalize
+				stateId++;
+				//--
+				// pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
+				//--
+				pw.print(" name=\"" + normalize(state.getName()) + "\""); // always print the name
+				//--
+				// if (!state.getId().equals(state.getName()))
+				// {
+				// 	pw.print(" name=\"" + normalize(state.getName()) + "\"");
+				// }
+				//--
 				if (state.isInitial())
 				{
 					pw.print(" initial=\"true\"");
@@ -199,15 +214,23 @@ public class ProjectToSP
 			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 			{
 				State sourceState = (State) stateIt.next();
+				Object sourceId = stateIdMap.get(sourceState);
 
 				for (Iterator outgoingArcsIt = sourceState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
 				{
 					Arc arc = (Arc) outgoingArcsIt.next();
 					State destState = arc.getToState();
-
-					pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-					pw.print("\" dest=\"" + normalize(destState.getId()));
-					pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+					Object destId = stateIdMap.get(destState);
+					LabeledEvent event = arc.getEvent();
+					Object eventID = eventIdMap.get(event);
+					pw.print("\t\t<Transition source=\"" + sourceId);
+					pw.print("\" dest=\"" + destId);
+					pw.println("\" event=\"" + eventID + "\"/>");
+					//--
+					// pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
+					// pw.print("\" dest=\"" + normalize(destState.getId()));
+					// pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+					//--
 				}
 			}
 

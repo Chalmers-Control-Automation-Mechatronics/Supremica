@@ -284,10 +284,10 @@ public class TestCasesDialog
 					{
 						doit();
 					}
-					catch (Exception excp)
+					catch (Exception ex)
 					{
-						excp.printStackTrace();
-						logger.error("Exception while constructing test case: " + excp);
+						logger.error("Exception while constructing test case: ", ex);
+						logger.debug(ex.getStackTrace());
 						// what are we supposed to do?
 					}
 				}

@@ -479,12 +479,13 @@ class EventListModel
 	public Object getElementAt(int index)
 	{
 		Arc currArc = (Arc) currArcs.get(index);
-		String eventId = currArc.getEventId();
-		org.supremica.automata.LabeledEvent currEvent;
+		// String eventId = currArc.getEventId();
+		org.supremica.automata.LabeledEvent currEvent = currArc.getEvent();
 
+/** Can this exception ever occur? Arc::getEvent does not throw anything
 		try
 		{
-			currEvent = theAlphabet.getEventWithId(eventId);
+			currEvent = currArc.getEvent(); // theAlphabet.getEventWithId(eventId);
 		}
 		catch (Exception e)
 		{
@@ -492,7 +493,7 @@ class EventListModel
 
 			return null;
 		}
-
+**/
 		StringBuffer responseString = new StringBuffer();
 
 		boolean terminateFont = false;
@@ -774,8 +775,8 @@ class ExplorerController
 		}
 		catch (Exception ex)
 		{
-
 			logger.error(ex.toString());
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -789,6 +790,7 @@ class ExplorerController
 		catch (Exception ex)
 		{
 			logger.error("Error when performing route: " + ex.getMessage());
+			logger.debug(ex.getStackTrace());
 		}
 		stateViewer.update();
 	}

@@ -54,6 +54,7 @@ import org.supremica.gui.*;
 import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
@@ -137,9 +138,8 @@ public final class AutomataSynchronizerHelper
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
 
-		//System.err.println(syncOptions.requireConsistentControllability());
-		//System.err.println(syncOptions.requireConsistentImmediate());
-		Alphabet theAlphabet = theAutomata.getUnionAlphabet(syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
+		// Alphabet theAlphabet = theAutomata.getUnionAlphabet(syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
+		Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
 
 		theAutomaton.setAlphabet(theAlphabet);
 
@@ -150,7 +150,7 @@ public final class AutomataSynchronizerHelper
 		catch (Exception e)
 		{
 			logger.error("Error while computing AutomataIndexForm");
-
+			logger.debug(e.getStackTrace());
 			throw e;
 		}
 	}
@@ -466,7 +466,8 @@ public final class AutomataSynchronizerHelper
 	{
 		automataIsControllable = isControllable;
 	}
-
+	// automataIsControllable is set to false by AutomataSynchronizerhelper, AutomataOnlineSynchronizer, AutomataFastControllabilityCheckExecuter
+	// when an uncontrollable state is found.
 	public boolean getAutomataIsControllable()
 	{
 		return automataIsControllable;
@@ -808,6 +809,7 @@ public final class AutomataSynchronizerHelper
 	 *  {
 	 *  System.err.println("Error while generating union alphabet: " + e);
 	 *  logger.error("Error while generating union alphabet: " + e);
+	 *	logger.debug(e.getStackTrace());
 	 *  throw e;
 	 *  }
 	 *  }

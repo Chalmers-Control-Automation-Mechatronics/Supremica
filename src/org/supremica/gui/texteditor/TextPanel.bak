@@ -1,0 +1,138 @@
+/******************* TextPanel.java *********************/
+// Simple editor implementation for output, especially
+// useful during debug. TextWriter encapsulates this
+// panel so all writer functions can write to TextPanel
+
+package org.supremica.gui;
+
+import java.io.*;
+import java.awt.*;
+import java.lang.*;
+import java.util.*;
+import javax.swing.*;
+
+class TextWriter
+	extends Writer
+{
+	TextPanel panel = null;
+	boolean open = true; // instantiating implicitly opens the writer
+	
+	TextWriter(TextPanel panel)
+	{
+		this.panel = panel;
+	}
+	
+	public void write(char[] cbuf, int off, int len)
+		throws IOException
+	{
+		String str = new String(cbuf, off, len);
+		
+		panel.append(str);
+	}
+	
+	public void flush()
+		throws IOException
+	{
+		if(!open)
+		{
+			throw new IOException("Flushing closed Writer");
+		}
+	}
+	
+	public void close()
+		throws IOException
+	{
+		if(open)
+		{
+			flush();
+		}
+		open = false;
+	}
+}
+
+public class TextPanel
+	extends JPanel
+{
+	JTextArea textarea = null;
+	
+	public TextPanel(int width, int height)
+	{
+		this.textarea = new JTextArea();
+		init(width, height);
+	}
+	
+	public TextPanel(String str, int width, int height)
+	{
+		this.textarea = new JTextArea(str);
+		init(width, height);
+	}
+	
+	private void init(int width, int height)
+	{
+		textarea.setFont(new Font("monospaced", Font.PLAIN, 12));
+		textarea.setLineWrap(true);
+		textarea.setWrapStyleWord(true);
+		textarea.setTabSize(4);
+		
+        JScrollPane areaScrollPane = new JScrollPane(textarea);
+//        areaScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        areaScrollPane.setPreferredSize(new Dimension(width, height));
+ /*       areaScrollPane.setBorder(
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createCompoundBorder(
+                                BorderFactory.createTitledBorder("Plain Text"),
+                                BorderFactory.createEmptyBorder(5,5,5,5)),
+                areaScrollPane.getBorder()));*/
+		// JViewport port = scroller.getViewport();
+		// port.add(textarea);
+		add(areaScrollPane);
+	}
+	
+	public void append(String str)
+	{
+		textarea.append(str);
+	}
+	
+	JTextArea getTextArea()
+	{
+		return textarea;
+	}
+	
+	public static void main(String[] args)
+	{
+		TextFrame textframe = new TextFrame("Testing...");
+		
+		PrintWriter pw = textframe.getPrintWriter();
+		pw.println("Hello World!");
+	}
+}
+
+class TextFrame
+	extends JFrame
+{
+	TextPanel textpanel = null;
+	static final int WIDTH = 500;
+	static final int HEIGHT = 600;
+	
+	public TextFrame(String title)
+	{
+		super(title);
+		this.textpanel = new TextPanel(WIDTH-20, HEIGHT-36);
+		getContentPane().setLayout(new BorderLayout());
+		getContentPane().add(textpanel, BorderLayout.CENTER);
+
+		pack();
+		Utility.setupFrame(this, WIDTH, HEIGHT);
+		show();
+	}
+	
+	TextPanel getTextPanel()
+	{
+		return textpanel;
+	}
+	
+	public PrintWriter getPrintWriter()
+	{
+		return new PrintWriter(new TextWriter(textpanel));
+	}
+}

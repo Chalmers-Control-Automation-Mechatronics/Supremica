@@ -156,9 +156,10 @@ public class AlphabetViewerPanel
 
 				updateNeeded = false;
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				System.err.println("Error while updating AlphabetViewer");
+				logger.error("Error while updating AlphabetViewer", ex);
+				logger.debug(ex.getStackTrace());
 			}
 		}
 	}

@@ -140,8 +140,9 @@ public class Automaton
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
-
-					LabeledEvent currEvent = newAlphabet.getEventWithId(orgArc.getEventId());
+					
+					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent());
+					// LabeledEvent currEvent = newAlphabet.getEventWithId(orgArc.getEventId());
 					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
@@ -151,9 +152,10 @@ public class Automaton
 				}
 			}
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			System.err.println("Error while copying transitions");
+			logger.error("Error while copying transitions", ex);
+			logger.debug(ex.getStackTrace());
 			System.exit(0);
 		}
 	}
@@ -474,17 +476,21 @@ public class Automaton
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
 	// end index stuff
+	
+	// What the f*** are these doing here?
 
-	public LabeledEvent getEvent(String eventId)
+	private LabeledEvent getEvent(String eventId)
 		throws Exception
 	{
-		return alphabet.getEventWithId(eventId);
+		// return alphabet.getEventWithId(eventId);
+		return alphabet.getEvent(new LabeledEvent(eventId));
 	}
 
 	public LabeledEvent getEvent(Arc theArc)
 		throws Exception
 	{
-		return getEvent(theArc.getEventId());
+		// return getEvent(theArc.getEventId());
+		return theArc.getEvent();
 	}
 
 	public String getLabel(Arc theArc)
@@ -493,7 +499,6 @@ public class Automaton
 		LabeledEvent theEvent = getEvent(theArc);
 		return theEvent.getLabel();
 	}
-
 	/** Room for improvement - our problem domain deals with states and events, not ids and labels!
 	 * Use isInAlphabet instead
 	 * @deprecated
@@ -507,6 +512,7 @@ public class Automaton
 	{
 		return alphabet.containsEventWithLabel(eventLabel);
 	}
+	// The above stuff should be removed -- use teh Alphabet and the Arc methods instead
 
 	/**
 	 * Returns an iterator to all states in this automaton
@@ -536,7 +542,8 @@ public class Automaton
 		}
 		catch (Exception ex)
 		{
-			logger.error("Automaton.isEventPrioritzed: Error in getEventWithLabel");
+			logger.error("Automaton.isEventPrioritzed: Error in getEventWithLabel", ex);
+			logger.debug(ex.getStackTrace());
 			return false;
 		}
 		return thisEvent.isPrioritized();
@@ -898,8 +905,8 @@ public class Automaton
 	}
 
 	/**
-	 * Returns a event on a arc that starts in fromState and ens in toState.
-	 * If no such event exists, then null is returned.
+	 * Returns a event on a arc that starts in fromState and ends in toState.
+	 * If no such event exists, null is returned.
 	 */
 	public LabeledEvent getLabeledEvent(State fromState, State toState)
 		throws Exception
@@ -910,7 +917,7 @@ public class Automaton
 			State currToState = currArc.getToState();
 			if (currToState == toState)
 			{
-				return getEvent(currArc.getEventId());
+				return currArc.getEvent(); // getEvent(currArc.getEventId());
 			}
 		}
 		return null;
@@ -1249,18 +1256,19 @@ public class Automaton
 			return arcIt.hasNext();
 		}
 
-		public Object next()
+		public Object next() // really returns LabeledEvent
 		{
 			Arc nextArc = (Arc)arcIt.next();
-			String eventId = nextArc.getEventId();
+			// String eventId = nextArc.getEventId();
 			LabeledEvent nextEvent = null;
 			try
 			{
-				nextEvent = getEvent(eventId);
+				nextEvent = nextArc.getEvent(); // eventId);
 			}
 			catch (Exception ex)
 			{
-				logger.error("Automaton::EventIterator.next: Error in getEvent");
+				logger.error("Automaton::EventIterator.next: Error in getEvent", ex);
+				logger.debug(ex.getStackTrace());
 			}
 			return nextEvent;
 		}
@@ -1317,7 +1325,8 @@ public class Automaton
 				}
 				catch (Exception ex)
 				{
-					logger.error("Automaton::StateIterator.findNext: Error in getLabel");
+					logger.error("Automaton::StateIterator.findNext: Error in getLabel", ex);
+					logger.debug(ex.getStackTrace());
 				}
 				if (eventLabel.equals(currLabel))
 				{

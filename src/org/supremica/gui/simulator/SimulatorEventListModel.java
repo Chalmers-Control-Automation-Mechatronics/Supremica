@@ -131,6 +131,7 @@ public class SimulatorEventListModel
 				catch (Exception ex)
 				{
 					//logger.error("Exception in SimulatorEventListModel.update");
+					logger.debug(ex.getStackTrace());
 					return;
 				}
 				if (theControls.hasControl(currEvent.getLabel()))
@@ -187,10 +188,10 @@ public class SimulatorEventListModel
 		{
 			currEvent = theAlphabet.getEventWithIndex(events[index]);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			System.err.println("Error: Could not find event in alphabet!\n");
-
+			logger.error("Error: Could not find event in alphabet.", ex);
+			logger.debug(ex.getStackTrace());
 			return null;
 		}
 
@@ -214,10 +215,10 @@ public class SimulatorEventListModel
 		{
 			currEvent = theAlphabet.getEventWithIndex(events[index]);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			System.err.println("Error: Could not find event in alphabet!\n");
-
+			logger.error("Error: Could not find event in alphabet.", ex);
+			logger.debug(ex.getStackTrace());
 			return null;
 		}
 

@@ -49,12 +49,15 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
+
+import org.supremica.log.*;
+import org.supremica.automata.algorithms.*;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -75,7 +78,7 @@ public class AutomataVerificationWorker
 	implements Stoppable
 {
 
-	// private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
+	private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
 	// -- MF --      private Supremica workbench = null;
 	private Gui workbench = null;
 	private Automata theAutomata = null;
@@ -161,13 +164,13 @@ public class AutomataVerificationWorker
 				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
 				requestStop();
-				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
-				// logger.error(e.getMessage());
-				workbench.error(e.getMessage());
+				logger.error(ex.getMessage());
+				logger.debug(ex.getStackTrace());
 
 				return;
 			}
@@ -178,46 +181,34 @@ public class AutomataVerificationWorker
 			{
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
-
 					// Modular...
 					isControllable = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
-
 					// Monolithic...
 					isControllable = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
-
 					// IDD...
 					requestStop();
-
-					// logger.error("Option not implemented...");
-					workbench.error("Option not implemented...");
-
+					logger.error("IDD option not yet implemented...");
 					return;
 				}
 				else
 				{
-
 					// Error...
 					requestStop();
-
-					// logger.error("Unavailable option chosen.");
-					workbench.error("Unavailable option chosen.");
-
+					logger.error("Unavailable controllability option chosen.");
 					return;
 				}
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
 				requestStop();
-
-				// logger.error("Error in AutomataVerificationWorker when verifying automata. " + e);
-				workbench.error("Error in AutomataVerificationWorker when verifying controllability. " + e);
-
+				logger.error("Error in AutomataVerificationWorker when verifying controllability. " + ex);
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 
@@ -250,7 +241,6 @@ public class AutomataVerificationWorker
 			{
 				JOptionPane.showMessageDialog(workbench.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 				requestStop();
-
 				return;
 			}
 
@@ -269,14 +259,12 @@ public class AutomataVerificationWorker
 				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
 				requestStop();
-				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-				// logger.error(e.getMessage());
-				workbench.error(e.getMessage());
-
+				JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				logger.error(ex.getMessage());
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 
@@ -290,8 +278,7 @@ public class AutomataVerificationWorker
 					// Modular...
 					requestStop();
 
-					// logger.error("Option not implemented...");
-					workbench.error("Option not implemented... try the monolithic algorithm instead, it's great!!");
+					logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead, it's great!!");
 
 					return;
 				}
@@ -303,34 +290,24 @@ public class AutomataVerificationWorker
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
-
 					// IDD...
 					requestStop();
-
-					// logger.error("Option not implemented...");
-					workbench.error("Option not implemented...");
-
+					logger.error("Sorry. Nonblocking IDD verifictaion not yet implemented...");
 					return;
 				}
 				else
 				{
-
 					// Error...
 					requestStop();
-
-					// logger.error("Unavailable option chosen.");
-					workbench.error("Unavailable option chosen.");
-
+					logger.error("Unavailable nonblocking option chosen.");
 					return;
 				}
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
 				requestStop();
-
-				// logger.error("Error in AutomataVerificationWorker when verifying automata. " + e);
-				workbench.error("Error in AutomataVerificationWorker when verifying non-blocking. " + e);
-
+				logger.error("Error in AutomataVerificationWorker when verifying non-blocking. " + ex);
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 
@@ -371,10 +348,8 @@ public class AutomataVerificationWorker
 				catch (Exception ex)
 				{
 					requestStop();
-
-					// logger.error("Exception in VisualProjectContainer.");
-					workbench.error("Exception in VisualProjectContainer.");
-
+					logger.error("Exception in VisualProjectContainer. " + ex);
+					logger.debug(ex.getStackTrace());
 					return;
 				}
 
@@ -401,10 +376,8 @@ public class AutomataVerificationWorker
 			if ((automataA.size() < 1) || (automataB.size() < 1))
 			{
 
-				// logger.error("At least one automaton must be unselected.");
-				workbench.error("At least one automaton must be unselected.");
+				logger.error("At least one automaton must be unselected.");
 				requestStop();
-
 				return;
 			}
 
@@ -441,15 +414,13 @@ public class AutomataVerificationWorker
 			{
 				try
 				{
-					unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "");
+					unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); // , "");
 				}
-				catch (Exception e)
+				catch (Exception ex)
 				{
 					requestStop();
-
-					// logger.error("Error when calculating union alphabet. " + e);
-					workbench.error("Error when calculating union alphabet. " + e);
-
+					logger.error("Error when calculating union alphabet. " + ex);
+					logger.debug(ex.getStackTrace());
 					return;
 				}
 			}
@@ -502,14 +473,12 @@ public class AutomataVerificationWorker
 				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
 				requestStop();
-				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-				// logger.error(e.getMessage());
-				workbench.error(e.getMessage());
-
+				JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				logger.error(ex.getMessage());
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 
@@ -519,25 +488,19 @@ public class AutomataVerificationWorker
 			{
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
-
 					// Modular...
 					isIncluded = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
-
 					// Monolithic...
 					isIncluded = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
-
 					// IDD...
 					requestStop();
-
-					// logger.error("Option not implemented...");
-					workbench.error("Option not implemented...");
-
+					logger.error("Language Inclusion IDD option not yet implemented...");
 					return;
 				}
 				else
@@ -545,20 +508,15 @@ public class AutomataVerificationWorker
 
 					// Error...
 					requestStop();
-
-					// logger.error("Unavailable option chosen.");
-					workbench.error("Unavailable option chosen.");
-
+					logger.error("Language Inclusion, unavailable option chosen.");
 					return;
 				}
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
 				requestStop();
-
-				// logger.error("Error in AutomataVerificationWorker when verifying automata. " + e);
-				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
-
+				logger.error("Error in AutomataVerificationWorker when verifying language inclusion. ", ex);
+				logger.debug(ex.getStackTrace());
 				return;
 			}
 
@@ -579,13 +537,9 @@ public class AutomataVerificationWorker
 		}
 		else
 		{
-
 			// Error...
 			requestStop();
-
-			// logger.error("Unavailable option chosen.");
-			workbench.error("Unavailable option chosen.");
-
+			logger.error("Unavailable option chosen.");
 			return;
 		}
 
@@ -594,15 +548,11 @@ public class AutomataVerificationWorker
 
 		if (!stopRequested)
 		{
-
-			// logger.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
-			workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
+			logger.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
 		else
 		{
-
-			// logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
-			workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
+			logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
 
 		requestStop();

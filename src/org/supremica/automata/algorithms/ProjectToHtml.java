@@ -95,7 +95,7 @@ public class ProjectToHtml
 		}
 
 		// Serialize all events
-		Alphabet projectAlphabet = project.getUnionAlphabet();
+		Alphabet projectAlphabet = AlphabetHelpers.getUnionAlphabet(project, true, true); // project.getUnionAlphabet();
 		for (Iterator alphIt = projectAlphabet.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent ev = (LabeledEvent) alphIt.next();
@@ -237,7 +237,7 @@ public class ProjectToHtml
 					catch (IOException ex)
 					{
 						logger.error("Cannot run dot. Make sure dot is in the path.");
-
+						logger.debug(ex.getStackTrace());
 						throw ex;
 					}
 
@@ -270,7 +270,7 @@ public class ProjectToHtml
 				catch (Exception ex)
 				{
 					logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
-
+					logger.debug(ex.getStackTrace());
 					return false;
 				}
 			}

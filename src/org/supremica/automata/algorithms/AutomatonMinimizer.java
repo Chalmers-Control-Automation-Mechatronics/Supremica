@@ -134,11 +134,11 @@ public class AutomatonMinimizer
 		{
 			doMinimization(equivClasses);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			e.printStackTrace(System.err);
-
-			throw e;
+			// e.printStackTrace(System.err);
+			logger.debug(ex.getStackTrace());
+			throw ex;
 		}
 
 		Automaton newAutomaton = buildAutomaton(equivClasses);
@@ -171,11 +171,11 @@ public class AutomatonMinimizer
 			{
 				doMinimization(equivClasses);
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				e.printStackTrace(System.err);
-
-				throw e;
+				// ex.printStackTrace(System.err);
+				logger.debug(ex.getStackTrace());
+				throw ex;
 			}
 
 			Automaton newAutomaton = buildAutomaton(equivClasses);
@@ -346,7 +346,8 @@ public class AutomatonMinimizer
 		catch(Exception excp)
 		{
 			logger.error(excp);
-			excp.printStackTrace();
+			logger.debug(excp.getStackTrace());
+			// excp.printStackTrace();
 			return;
 		}
 	}

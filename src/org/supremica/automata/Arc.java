@@ -53,13 +53,13 @@ import java.util.*;
 
 public class Arc
 {
-	private String eventId;	// why not event here??
+	// private String eventId;	// why not event here??
 	private LabeledEvent event;	// xperimental
 	private State fromState;
 	private State toState;
 	private ArcListeners listeners = null;
 
-	// Internal use for graphical representation
+	// Internal use for graphical representation -- should be in GraphicalArc?
 	private double outgoingAngle = 0;
 	private double incomingAngle = 0;
 	private int dxControlPointBegin = 0;
@@ -71,7 +71,7 @@ public class Arc
 	private int endX = -1;
 	private int endY = -1;
 
-	private Arc(State from, State to, String eventId)
+	private Arc(State from, State to) // , String eventId)
 		throws IllegalArgumentException
 	{
 		if (from == null)
@@ -84,7 +84,7 @@ public class Arc
 		}
 		this.fromState = from;
 		this.toState = to;
-		this.eventId = eventId;
+		// this.eventId = eventId;
 
 		from.addOutgoingArc(this);
 		to.addIncomingArc(this);
@@ -93,20 +93,20 @@ public class Arc
 	public Arc(State from, State to, LabeledEvent event)
 		throws IllegalArgumentException
 	{
-		this(from, to, event.getId());
+		this(from, to);
+		this.event = event;
+	}
+/*	
+	private String getEventId()
+	{
+		return event.getId();
+	}
+*/
+	public void setEvent(LabeledEvent event)
+	{
 		this.event = event;
 	}
 	
-	public String getEventId()
-	{
-		return eventId;
-	}
-
-	public void setEvent(String eventId)
-	{
-		this.eventId = eventId;
-	}
-
 	public State getToState()
 	{
 		return toState;
@@ -142,13 +142,16 @@ public class Arc
 			toState.removeIncomingArc(this);
 		}
 
-		eventId = null;
+		// eventId = null;
+		event = null;
 		fromState = null;
 		toState = null;
 
 		notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
 	}
 
+	// This does not belong here, does it?
+	// Should have a "GraphicalArc" that includes (by inheritance?) Arc
 	public void computeDefaultDisplayParameters()
 	{
 		int x1 = fromState.getX();

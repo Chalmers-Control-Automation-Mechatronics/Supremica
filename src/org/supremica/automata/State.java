@@ -504,16 +504,18 @@ public class State
 	 *@param  e Description of the Parameter
 	 *@return  Description of the Return Value
 	 */
-	public State nextState(LabeledEvent e)
+	public State nextState(LabeledEvent event)
 	{
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
-		String eventId = e.getId();
+		// String eventId = e.getId();
+
 
 		while (outgoingArcsIt.hasNext())
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
 
-			if (currArc.getEventId().equals(eventId))
+			// if (currArc.getEventId().equals(eventId))
+			if(currArc.getEvent().equals(event))
 			{
 				return currArc.getToState();
 			}

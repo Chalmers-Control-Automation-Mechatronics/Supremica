@@ -126,9 +126,10 @@ class FindStatesTableModel
 				stateMatcherOptionsMap.put(currAutomaton, new StateMatcherOptions());
 			}
 		}
-		catch (PatternSyntaxException excp)
+		catch (PatternSyntaxException ex)
 		{
-			logger.error("FindStatesTableModel: This should never happen!");
+			logger.error("FindStatesTableModel: This should never happen!", ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
@@ -212,8 +213,9 @@ class FindStatesTableModel
 			}
 			catch (PatternSyntaxException excp)
 			{
-				logger.debug("FindStatesTable::Incorrect pattern \"" + (String) obj + "\"");
 				JOptionPane.showMessageDialog(null, "Incorrect pattern: " + (String) obj, "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
+				logger.debug("FindStatesTable::Incorrect pattern \"" + (String) obj + "\"");
+				logger.debug(excp.getStackTrace());
 			}
 		}
 		else if (isAcceptingColumn(col))
@@ -841,12 +843,12 @@ class FreeFormPanel
 
 			return new FreeformMatcher(pattern, sep_str.getText());
 		}
-		catch (PatternSyntaxException excp)
+		catch (PatternSyntaxException ex)
 		{
 
 			// debug("FindStatesTable::Incorrect pattern \"" + reg_exp.getText() +"\"");
 			JOptionPane.showMessageDialog(null, "Incorrect pattern: " + reg_exp.getText(), "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
-
+			// logger.debug(ex.getStackTrace());
 			return null;
 		}
 	}
@@ -899,6 +901,7 @@ class FindStatesFrame
 	extends JFrame
 {
 	private static Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
+
 	private FindStatesTable table = null;
 	private Automata automata = null;
 	private JTabbedPane tabbedPane = null;
@@ -1021,9 +1024,10 @@ class FindStatesFrame
 				{
 					ss = new SearchStates(getAutomata(), matcher);
 				}
-				catch (Exception e)
+				catch (Exception ex)
 				{
-					logger.error("Exception while constructing SearchState. Operation aborted. " + e.getMessage());
+					logger.error("Exception while constructing SearchState. Operation aborted. " + ex.getMessage());
+					logger.debug(ex.getStackTrace());
 					return;
 				}
 				ss.start();    // Start the synchronization thread
@@ -1038,12 +1042,12 @@ class FindStatesFrame
 
 			// else do nothing
 		}
-		catch (Exception excp)
+		catch (Exception ex)
 		{
 
 			// Let it silently die, how the f*** do get these excp specs to work?
-			debug("FindButton - " + excp);
-			excp.printStackTrace();
+			debug("FindButton - " + ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 

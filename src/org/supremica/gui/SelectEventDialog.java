@@ -222,11 +222,11 @@ class CreateEventPanel
 				{
 					JOptionPane.showMessageDialog(null, "Existing event", "An event " + currLabel + "does already exists", JOptionPane.ERROR_MESSAGE);
 				}
-				else
+				else //it does not contain an event with this label, just add it
 				{
 					LabeledEvent newEvent = new LabeledEvent(currLabel);
 
-					newEvent.setId(alph.getUniqueId("e"));
+					// newEvent.setId(alph.getUniqueId("e"));
 
 					try
 					{
@@ -234,7 +234,8 @@ class CreateEventPanel
 					}
 					catch (Exception ex)
 					{
-						logger.error("Exception in Alphabet.addEvent");
+						logger.error("Exception in Alphabet.addEvent", ex);
+						logger.debug(ex.getStackTrace());
 						return;
 					}
 				}

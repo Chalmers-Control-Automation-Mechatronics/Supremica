@@ -400,7 +400,6 @@ public class ProjectBuildFromXml
 			}
 		}
 
-		LabeledEvent currEvent = new LabeledEvent();
 
 		if (id == null)
 		{
@@ -412,8 +411,9 @@ public class ProjectBuildFromXml
 			label = id;
 		}
 
-		currEvent.setId(id);
-		currEvent.setLabel(label);
+		LabeledEvent currEvent = new LabeledEvent(label, id);
+//		currEvent.setId(id);
+//		currEvent.setLabel(label);
 		currEvent.setControllable(controllable);
 		currEvent.setPrioritized(prioritized);
 		currEvent.setImmediate(immediate);
@@ -425,9 +425,11 @@ public class ProjectBuildFromXml
 		{
 			currAlphabet.addEvent(currEvent);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			e.printStackTrace(System.err);
+			// logger.error("Exception adding event. " + ex);
+			// logger.debug(ex.getStackTrace());
+			throw new RuntimeException(ex);
 		}
 	}
 

@@ -283,6 +283,7 @@ public class Determinizer
 				catch(Exception excp)
 				{
 					logger.error(excp);
+					logger.debug(excp.getStackTrace());
 				}
 			}
 		}
@@ -476,7 +477,7 @@ public class Determinizer
 			// perform correctly, else the automaton is broken and we are lost anyway.
 			catch(Exception excp)
 			{
-				excp.printStackTrace();
+				logger.debug(excp.getStackTrace());
 				throw new RuntimeException(excp);
 			}
 		}
@@ -563,6 +564,7 @@ public class Determinizer
 		catch(Exception excp)
 		{
 			logger.error(excp);
+			logger.debug(excp.getStackTrace());
 		}
 
 

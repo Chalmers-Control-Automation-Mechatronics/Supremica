@@ -76,9 +76,10 @@ public class InterfaceManager
 				UIManager.setLookAndFeel(lookAndFeel);
 			}
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
 			logger.fatal("Error while setting LookAndFeel");
+			logger.debug(ex.getStackTrace());
 			System.exit(0);
 		}
 	}

@@ -156,7 +156,8 @@ public class ActionAndControlViewerPanel
 		}
 		catch (Exception ex)
 		{
-			logger.error("ActionAndControlViewerPanel::rebuild " + ex);
+			logger.error("ActionAndControlViewerPanel::rebuild ", ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 

@@ -215,7 +215,7 @@ public class AutomatonToDot
 				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
 				{
 					Arc currArc = (Arc) arcIt.next();
-					LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
+					LabeledEvent thisEvent = currArc.getEvent(); // theAlphabet.getEventWithId(currArc.getEventId());
 
 					if (!thisEvent.isControllable())
 					{

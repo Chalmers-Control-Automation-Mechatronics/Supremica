@@ -53,6 +53,8 @@ public interface Logger
 {
 	public void debug(Object message);
 
+	public void debug(StackTraceElement[] stackTrace);
+	
 	public void debug(Object message, Throwable t);
 
 	public void error(Object message);

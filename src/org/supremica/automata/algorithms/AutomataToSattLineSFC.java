@@ -120,8 +120,8 @@ public class AutomataToSattLineSFC
 		}
 		catch (Exception ex)
 		{
-			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted.");
-
+			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
+			logger.debug(ex.getStackTrace());
 			return;
 		}
 

@@ -607,10 +607,10 @@ class LanguageRestrictorDialog
 			ActionMan.gui.addAutomata(newautomata);
 			logger.debug("LanguageRestriction::doRestrict() -- ok");
 		}
-		catch(Exception excp)
+		catch(Exception ex)
 		{
-			logger.debug("LanguageRestriction::doRestrict() -- error");
-			excp.printStackTrace();
+			logger.debug("LanguageRestriction::doRestrict() -- ", ex);
+			logger.debug(ex.getStackTrace());
 		}
 	}
 
