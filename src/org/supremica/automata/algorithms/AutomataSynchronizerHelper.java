@@ -76,6 +76,10 @@ public final class AutomataSynchronizerHelper
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
 
+	private int totalNbrOfStates = 0;
+	private int nbrOfUncontrollableStates = 0;
+	private int nbrOfDeadlockedStates = 0;
+
 	// Two locks are used to limit the access the statesToProcess
 	private Object gettingFromStatesToProcessLock = new Object();
 	private Object addingToStatesToProcessLock = new Object();
@@ -187,6 +191,7 @@ public final class AutomataSynchronizerHelper
 		// Should be an external option?!? FIXA!
 		// Is there anything else that needs to be cleared?...
 	}
+
 
 	public SynchronizationOptions getSynchronizationOptions()
 	{
@@ -313,10 +318,6 @@ public final class AutomataSynchronizerHelper
 			// helperData.incrNbrOfAddedStates();
 			helperData.nbrOfAddedStates++;
 
-			/*
-			 *  if (verboseMode && helperData.getNbrOfAddedStates() % 10000 == 0)
-			 *  logger.debug(nbrOfAddedStates + " new states found so far.");
-			 */
 		}
 		else
 		{
@@ -326,23 +327,15 @@ public final class AutomataSynchronizerHelper
 			}
 		}
 
-		// helperData.incrNbrOfCheckedStates();
 		helperData.nbrOfCheckedStates++;
 
-		// if (helperData.getNbrOfCheckedStates() % 2000 == 0)
 		if (helperData.nbrOfCheckedStates % 2000 == 0)
 		{
 			if (executionDialog != null)
 			{
 
-				// executionDialog.setValue(helperData.getNbrOfCheckedStates());
 				executionDialog.setValue(helperData.nbrOfCheckedStates);
 			}
-
-			/*
-			 *  if (verboseMode && helperData.getNbrOfCheckedStates() % 10000 == 0)
-			 *  logger.debug(nbrOfCheckedStates + " states checked so far.");
-			 */
 		}
 	}
 
@@ -540,11 +533,7 @@ public final class AutomataSynchronizerHelper
 	/** Displats the amount of states examined during the execution. */
 	public void displayInfo()
 	{
-
-		// logger.info("During the execution, " + helperData.getNbrOfCheckedStates() + " states were examined.");
-		// logger.info("During the execution, " + helperData.getNbrOfAddedStates() + " new states were found.");
-		logger.info("During the execution, " + helperData.nbrOfCheckedStates + " states were examined.");
-		logger.info("During the execution, " + helperData.nbrOfAddedStates + " new states were found.");
+		logger.info("During the execution, " + helperData.nbrOfCheckedStates + " states were examined. " + helperData.nbrOfAddedStates + " new states were found.");
 	}
 
 	/**
@@ -811,34 +800,34 @@ public final class AutomataSynchronizerHelper
 		this.stopExecutionLimit = stopExecutionLimit;
 	}
 
-	private class HelperData
+	public class HelperData
 	{
 
-		// private int nbrOfAddedStates = 0;
-		// private int nbrOfCheckedStates = 0;
 		public int nbrOfAddedStates = 0;
 		public int nbrOfCheckedStates = 0;
+		public int nbrOfUncontrollableStates = 0;
+		public int nbrOfDeadlockedStates = 0;
 
 		public HelperData() {}
 
-		public void incrNbrOfAddedStates()
-		{
-			nbrOfAddedStates++;
-		}
-
-		public int getNbrOfAddedStates()
+		public int getNumberOfStates()
 		{
 			return nbrOfAddedStates;
-		}
-
-		public void incrNbrOfCheckedStates()
-		{
-			nbrOfCheckedStates++;
 		}
 
 		public int getNbrOfCheckedStates()
 		{
 			return nbrOfCheckedStates;
+		}
+
+		public int getNumberOfUncontrollableStates()
+		{
+			return nbrOfUncontrollableStates;
+		}
+
+		public int getNumberOfDeadlockedStates()
+		{
+			return nbrOfDeadlockedStates;
 		}
 	}
 }

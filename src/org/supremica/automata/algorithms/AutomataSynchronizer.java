@@ -118,6 +118,11 @@ public class AutomataSynchronizer
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 	}
 
+	public void displayInfo()
+	{
+		synchHelper.displayInfo();
+	}
+
 	public Automaton getAutomaton()
 		throws Exception
 	{

@@ -759,14 +759,16 @@ public class ActionMan
 			return;
 		}
 
-
-		String newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
-
-		if (newAutomatonName == null)
+		String newAutomatonName = "Dummy";
+		if (synchronizationOptions.buildAutomaton())
 		{
-			return;
-		}
+			newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
 
+			if (newAutomatonName == null)
+			{
+				return;
+			}
+		}
 		Automata currAutomata = new Automata();
 		Iterator autIt = selectedAutomata.iterator();
 

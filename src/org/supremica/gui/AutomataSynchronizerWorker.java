@@ -143,7 +143,7 @@ public class AutomataSynchronizerWorker
 			}
 
 			// Build automaton
-			if (!stopRequested)
+			if (!stopRequested && syncOptions.buildAutomaton())
 			{
 				try
 				{
@@ -162,7 +162,10 @@ public class AutomataSynchronizerWorker
 			// Present result
 			if (!stopRequested)
 			{
-				theAutomaton.setName(newAutomatonName);
+				if (theAutomaton != null)
+				{
+					theAutomaton.setName(newAutomatonName);
+				}
 
 				mode = MODE_UPDATE;
 
@@ -180,6 +183,7 @@ public class AutomataSynchronizerWorker
 				// logger.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
 				workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
 			}
+			theSynchronizer.displayInfo();
 
 			executionDialog.setMode(ExecutionDialogMode.hide);
 		}
