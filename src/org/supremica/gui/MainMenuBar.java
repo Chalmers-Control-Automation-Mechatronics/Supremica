@@ -91,7 +91,7 @@ import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
 import org.supremica.util.SupremicaMenuItem;
 import org.supremica.automata.algorithms.GeneticAlgorithms;
-//import org.supremica.external.RobotStudioLink;
+import org.supremica.automata.algorithms.RobotStudioLink;
 
 public class MainMenuBar
 	extends JMenuBar
@@ -463,7 +463,6 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowQuit())
 		{
-
 			// File.Exit
 			JMenuItem menuFileExit = new JMenuItem();
 
@@ -479,7 +478,6 @@ public class MainMenuBar
 		}
 		else
 		{
-
 			// File.Close
 			JMenuItem menuFileExit = new JMenuItem();
 
@@ -569,28 +567,6 @@ public class MainMenuBar
 					ActionMan.simulatorClear_actionPerformed(ActionMan.getGui());
 				}
 			});
-		}
-
-		// Supremica - Robotstudio link
-		if (SupremicaProperties.showRobotstudioLink())
-		{
-			JMenu menuRobotStudioLink = new JMenu();
-
-			menuRobotStudioLink.setText("RobotStudio");
-			menuRobotStudioLink.setMnemonic(KeyEvent.VK_R);
-			add(menuRobotStudioLink);
-
-			// EvoComp.CalculateSynchTable
-			JMenuItem robLink= new JMenuItem();
-			robLink.setText("RobotStudio test");
-			menuRobotStudioLink.add(robLink);
-			robLink.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioTest(ActionMan.getGui());
-					}
-				});
 		}
 
 		// Tools
@@ -883,12 +859,34 @@ public class MainMenuBar
 		});
 */
 
+		// Tools.RobotStudio
+		if (SupremicaProperties.showRobotstudioLink()&&SupremicaProperties.useActiveXBridge())
+		{
+			menuTools.add(new JSeparator());
+
+			JMenu menuRobotStudioLink = new JMenu();
+			menuRobotStudioLink.setText("RobotStudio");
+			menuTools.add(menuRobotStudioLink);
+
+			// EvoComp.CalculateSynchTable
+			JMenuItem robLink= new JMenuItem();
+			robLink.setText("RobotStudio test");
+			menuRobotStudioLink.add(robLink);
+			robLink.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioTest(ActionMan.getGui());
+					}
+				});
+		}
 
 		// Tools.Evolution
 		if (SupremicaProperties.showGeneticAlgorithms())
 		{
-			JMenu menuEvoComp = new JMenu();
+			menuTools.add(new JSeparator());
 
+			JMenu menuEvoComp = new JMenu();
 			menuEvoComp.setText("Evolution");
 			menuTools.add(menuEvoComp);
 

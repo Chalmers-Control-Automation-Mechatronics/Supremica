@@ -208,21 +208,19 @@ public final class SupremicaProperties
 		//setProperty(ANIMATOR_IN_USE, "false", true);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
-		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
-		setProperty(USE_ACTIVEX_BRIDGE, "false", true);
-
+		setProperty(SHOW_GENETIC_ALGORITHMS, "false", false);
+		setProperty(SHOW_ROBOTSTUDIO_LINK, "true", false);
+		setProperty(USE_ACTIVEX_BRIDGE, "false", false);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 
-		// BDD stuffs
+		// BDD stuff
 		setProperty(BDD_SHOW_GROW , toString(Options.show_grow), true);
 		setProperty(BDD_ALTER_PCG , toString(Options.user_alters_PCG), true);
 		setProperty(BDD_TRACE_ON  , toString(Options.trace_on), true);
 		setProperty(BDD_DEBUG_ON  , toString(Options.debug_on), true);
 		setProperty(BDD_ALGORITHM , toString(Options.algo_family), true);
 		setProperty(BDD_COUNT_ALGO, toString(Options.count_algo), true);
-
 	}
 
 

@@ -73,7 +73,7 @@ import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
-//import org.supremica.external.RobotStudioLink;
+import org.supremica.automata.algorithms.RobotStudioLink;
 
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
@@ -2304,8 +2304,8 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", 
-										  "Alert", JOptionPane.ERROR_MESSAGE);			
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!",
+										  "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -2368,10 +2368,10 @@ public class ActionMan
 	public static void evoCompPredictSize(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		
+
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", 
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!",
 										  "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -2403,8 +2403,9 @@ public class ActionMan
 
 	public static void robotStudioTest(Gui gui)
 	{
-		//RobotStudioLink robotStudioLink = new RobotStudioLink();
-		//robotStudioLink.test();
+		// Start thread
+		RobotStudioLink robotStudioLink = new RobotStudioLink(gui);
+		robotStudioLink.start();
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata
@@ -2999,13 +3000,13 @@ public class ActionMan
 			return;
 		}
 
-                SoftplcSimulationDialog d = new SoftplcSimulationDialog(null, "Run Simulation...", true);
+        SoftplcSimulationDialog d = new SoftplcSimulationDialog(null, "Run Simulation...", true);
 
-                if (!d.showDialog())
-                        return;
+        if (!d.showDialog())
+        	return;
 
-                System.out.println(d.getIOInterface().getPath());
-                try
+        System.out.println(d.getIOInterface().getPath());
+        try
 		{
 			File tmpFile  = File.createTempFile("softplc", ".il");
 			tmpFile.deleteOnExit();
@@ -3015,11 +3016,10 @@ public class ActionMan
 			exporter.serializeInstructionList(theWriter);
 			theWriter.close();
 
-                        tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
+   			tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
 
 			new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), tmpdir.getAbsolutePath());
-                        new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
-
+   			new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
 		}
 		catch (Exception ex)
 		{

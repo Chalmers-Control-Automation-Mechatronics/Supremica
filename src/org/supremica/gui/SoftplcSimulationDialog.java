@@ -8,7 +8,7 @@ import org.supremica.properties.SupremicaProperties;
 
 public class SoftplcSimulationDialog extends JDialog {
 
-        private boolean ok = true;
+        private boolean ok = false;
         private JComboBox interfaces;
         private Vector interfacesVector;
 
@@ -86,5 +86,6 @@ public class SoftplcSimulationDialog extends JDialog {
 
         void simulateButton_actionPerformed(ActionEvent e) {
                 this.setVisible(false);
+				ok = true;
         }
 }

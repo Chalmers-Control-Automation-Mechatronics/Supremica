@@ -158,7 +158,7 @@ public class Supremica
 
 		menuHandler = new MenuHandler(
 
-		/*
+		/**
 		 *  theAutomatonTable
 		 */
 		);
@@ -404,12 +404,12 @@ public class Supremica
 		theAutomatonTable.clearSelection();
 	}
 
-	/** 
+	/**
 	 * Selects the automata indicated by selectionIndices
 	 */
  	public void selectAutomata(int[] selectionIndices)
-	{		
-		// We must set the autoscrolls property false for esthetical reasons 
+	{
+		// We must set the autoscrolls property false for esthetical reasons
 		// but keep it unchanged after the operation for consistency
 		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
 		theAutomatonTable.setAutoscrolls(false);
@@ -425,7 +425,7 @@ public class Supremica
 	 */
 	public void invertSelection()
 	{
-		// We must set the autoscrolls property false for esthetical reasons 
+		// We must set the autoscrolls property false for esthetical reasons
 		// but keep it unchanged after the operation for consistency
 		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
 		theAutomatonTable.setAutoscrolls(false);
@@ -433,7 +433,7 @@ public class Supremica
 			theAutomatonTable.changeSelection(i,1,true,false);
 		theAutomatonTable.setAutoscrolls(autoscrolls);
 	}
-	
+
 	public void selectAll()
 	{
 		theAutomatonTable.selectAll();
@@ -516,11 +516,11 @@ public class Supremica
 		   invertSelection();
 		   return unSelectedAutomata;
 		*/
-		
+
 		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
 		Automata unselectedAutomata = new Automata();
 		int j = 0;
-		
+
 		for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
 		{
 			if ((j >= selectedRowIndices.length) || (i != selectedRowIndices[j]))
@@ -530,7 +530,7 @@ public class Supremica
 					int currIndex = i;
 					int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
 					Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-					
+
 					unselectedAutomata.addAutomaton(currAutomaton);
 				}
 				catch (Exception ex)

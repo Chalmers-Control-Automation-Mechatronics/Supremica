@@ -1,0 +1,53 @@
+package org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio;
+
+// interface IView Declaration
+public interface IView extends com.inzoom.comjni.IDispatch {
+  public static com.inzoom.util.Guid IID = new com.inzoom.util.Guid(0xA88F09F7,(short)0xE2C5,(short)0x11D3,new char[]{0x80,0xC3,0x00,0xC0,0x4F,0x60,0xF7,0x93});
+  public String getName() throws com.inzoom.comjni.ComJniException;
+  public void setName(String pVal) throws com.inzoom.comjni.ComJniException;
+  public int getTop() throws com.inzoom.comjni.ComJniException;
+  public void setTop(int pVal) throws com.inzoom.comjni.ComJniException;
+  public int getLeft() throws com.inzoom.comjni.ComJniException;
+  public void setLeft(int pVal) throws com.inzoom.comjni.ComJniException;
+  public int getWidth() throws com.inzoom.comjni.ComJniException;
+  public void setWidth(int pVal) throws com.inzoom.comjni.ComJniException;
+  public int getHeight() throws com.inzoom.comjni.ComJniException;
+  public void setHeight(int pVal) throws com.inzoom.comjni.ComJniException;
+  public org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IStation2 getParent() throws com.inzoom.comjni.ComJniException;
+  public void setPresetView(int rhs) throws com.inzoom.comjni.ComJniException;
+  public int getLockView() throws com.inzoom.comjni.ComJniException;
+  public void setLockView(int pVal) throws com.inzoom.comjni.ComJniException;
+  public boolean getLockWindowSize() throws com.inzoom.comjni.ComJniException;
+  public void setLockWindowSize(boolean pVal) throws com.inzoom.comjni.ComJniException;
+  public int getProjection() throws com.inzoom.comjni.ComJniException;
+  public void setProjection(int pVal) throws com.inzoom.comjni.ComJniException;
+  public double getFieldOfView() throws com.inzoom.comjni.ComJniException;
+  public void setFieldOfView(double angle) throws com.inzoom.comjni.ComJniException;
+  public void redraw() throws com.inzoom.comjni.ComJniException;
+  public boolean getLockWindowPos() throws com.inzoom.comjni.ComJniException;
+  public void setLockWindowPos(boolean pVal) throws com.inzoom.comjni.ComJniException;
+  public int getShowState() throws com.inzoom.comjni.ComJniException;
+  public void setShowState(int pVal) throws com.inzoom.comjni.ComJniException;
+  public void delete() throws com.inzoom.comjni.ComJniException;
+  public void setFocus() throws com.inzoom.comjni.ComJniException;
+  public void sendToBack() throws com.inzoom.comjni.ComJniException;
+  public void bringToFront() throws com.inzoom.comjni.ComJniException;
+  public org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IApplication3 getApplication() throws com.inzoom.comjni.ComJniException;
+  public org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IPosition getLookAt() throws com.inzoom.comjni.ComJniException;
+  public void setLookAt(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IPosition pVal) throws com.inzoom.comjni.ComJniException;
+  public org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IPosition getLookFrom() throws com.inzoom.comjni.ComJniException;
+  public void setLookFrom(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IPosition pVal) throws com.inzoom.comjni.ComJniException;
+  public void hideObject(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IRsObject pObj) throws com.inzoom.comjni.ComJniException;
+  public void showObject(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.IRsObject pObj) throws com.inzoom.comjni.ComJniException;
+  public int getScreenSizeCulling() throws com.inzoom.comjni.ComJniException;
+  public void setScreenSizeCulling(int pVal) throws com.inzoom.comjni.ComJniException;
+  public double getNavigationSensitivity() throws com.inzoom.comjni.ComJniException;
+  public void setNavigationSensitivity(double pVal) throws com.inzoom.comjni.ComJniException;
+  public boolean getDragDropEnabled() throws com.inzoom.comjni.ComJniException;
+  public void setDragDropEnabled(boolean pVal) throws com.inzoom.comjni.ComJniException;
+  public boolean getCaptureMouse() throws com.inzoom.comjni.ComJniException;
+  public void setCaptureMouse(boolean pVal) throws com.inzoom.comjni.ComJniException;
+  public int getHWnd() throws com.inzoom.comjni.ComJniException;
+  public com.inzoom.comjni.Variant screenPosDirection(int x,int y) throws com.inzoom.comjni.ComJniException;
+  public com.inzoom.comjni.Variant screenPosOrigin(int x,int y) throws com.inzoom.comjni.ComJniException;
+}
