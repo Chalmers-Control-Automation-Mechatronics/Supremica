@@ -770,13 +770,10 @@ class ExplorerController
 	{
 		Automata theAutomata = new Automata();
 		theAutomata.addAutomaton(theAutomaton);
-		// FindStates find_states = new FindStates(theProject, theAutomata);
-		FindStatesFrame find_frame = new FindStatesFrame(theProject, theAutomata);
 
 		try
 		{
-			// find_states.execute();
-			find_frame.show();
+			new FindStates(theProject, theAutomata);
 		}
 		catch (Exception ex)
 		{
