@@ -12,10 +12,10 @@ import java.awt.*;
 /**
  * Online BDD-supervisor:
  *
- * This supervisor object is NOT an automaton. It does not reject or accept any paths.
+ * This supervisor object is NOT an automaton. It does not reject or accept any events/strings.
  * It does however tell you if a certain global state is "safe", that is, if you from
- * some [safe] state "x" do a transition to a safe state "y" you are guranteed to
- * still be in the NBC sub-space.
+ * some safe state "x" do a transition to another safe state "y" you are guaranteed to
+ * stay the NBC sub-space.
  *
  * This object is a bit complex, however, if you follow the instructions below,
  * everything should work just fine...
