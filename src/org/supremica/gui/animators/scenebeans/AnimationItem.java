@@ -93,7 +93,8 @@ public class AnimationItem
 	{
 		try
 		{
-			final Animator view = new Animator(description + " path: " + path);
+			// final Animator view = new Animator(description + " path: " + path);
+			final Animator view = new Animator(description);
 			URL url = AnimationItem.class.getResource(path);
 			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
 

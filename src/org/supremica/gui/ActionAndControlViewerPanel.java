@@ -127,9 +127,10 @@ public class ActionAndControlViewerPanel
 				Control currControl = (Control)conIt.next();
 				DefaultMutableTreeNode currControlNode = new DefaultMutableTreeNode(currControl.getLabel());
 				controlsNode.add(currControlNode);
-				if (currControl.getCondition() != null)
+				for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext();)
 				{
-					DefaultMutableTreeNode currConditionNode = new DefaultMutableTreeNode(currControl.getCondition());
+					String currCondition = (String)condIt.next();
+					DefaultMutableTreeNode currConditionNode = new DefaultMutableTreeNode(currCondition);
 					currControlNode.add(currConditionNode);
 				}
 			}

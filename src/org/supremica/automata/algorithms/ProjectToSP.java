@@ -306,10 +306,19 @@ public class ProjectToSP
 					Control currControl = (Control) controlIt.next();
 
 					pw.println("\t\t<Control label=\"" + normalize(currControl.getLabel()) + "\">");
+
+					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext(); )
+					{
+						String currCondition = (String) condIt.next();
+
+						pw.println("\t\t\t<Condition condition=\"" + normalize(currCondition) + "\"/>");
+					}
+					/*
 					if (currControl.getCondition() != null && !currControl.getCondition().equals(""))
 					{
 						pw.println("\t\t\t<Condition condition=\"" + normalize(currControl.getCondition()) + "\"/>");
 					}
+					*/
 					pw.println("\t\t</Control>");
 				}
 			}

@@ -137,8 +137,13 @@ public class SimulatorEventListModel
 				{
 					//logger.info("hasControl: " + currEvent.getLabel());
 					Control currControl = theControls.getControl(currEvent.getLabel());
-					String condition = currControl.getCondition();
-					if (theSignals.isTrue(condition))
+					boolean conditionsFulfilled = true;
+					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext();)
+					{
+						String condition = (String)condIt.next();
+						conditionsFulfilled = conditionsFulfilled && theSignals.isTrue(condition);
+					}
+					if (conditionsFulfilled)
 					{
 						events[nbrOfEvents] = events[currEventIndex];
 						nbrOfEvents++;

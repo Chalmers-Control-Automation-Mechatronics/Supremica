@@ -145,7 +145,7 @@ public class ActionMan
 		{
 			newAutomata = item.createInstance(new VisualProjectFactory());
 
-			gui.addAutomata(newAutomata);
+			gui.addProject((Project)newAutomata);
 
 			// logger.debug("ActionMan.fileNewFromTemplate");
 		}
@@ -670,6 +670,7 @@ public class ActionMan
 							Project newProject = new Project();
 							newProject.addActions(selectedProject.getActions());
 							newProject.addControls(selectedProject.getControls());
+							newProject.setAnimationPath(selectedProject.getAnimationPath());
 
 							ProjectToSP exporter = new ProjectToSP(newProject);
 
@@ -1600,9 +1601,9 @@ public class ActionMan
 
 		try
 		{
-			int nbrOfAddedAutomata = gui.addAutomata(currProject);
-			gui.addActions(currProject.getActions());
-			gui.addControls(currProject.getControls());
+			int nbrOfAddedAutomata = gui.addProject(currProject);
+			//gui.addActions(currProject.getActions());
+			//gui.addControls(currProject.getControls());
 
 			gui.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
 		}

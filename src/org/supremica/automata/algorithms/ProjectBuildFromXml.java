@@ -712,7 +712,7 @@ public class ProjectBuildFromXml
 			throwException("condition attribute is missing");
 		}
 
-		currControl.setCondition(condition);
+		currControl.addCondition(condition);
 	}
 
 	public final void doAnimation(Attributes attributes)

@@ -445,7 +445,7 @@ public class DiningPhilosophers
 
 				Control lPutControl = new Control(lPut.getLabel());
 				currControls.addControl(lPutControl);
-				lPutControl.setCondition("phil." + id + ".eating.end");
+				lPutControl.addCondition("phil." + id + ".eating.end");
 
 				Action rPutAction = new Action(rPut.getLabel());
 				currActions.addAction(rPutAction);
@@ -454,7 +454,7 @@ public class DiningPhilosophers
 
 				Control rPutControl = new Control(rPut.getLabel());
 				currControls.addControl(rPutControl);
-				rPutControl.setCondition("phil." + id + ".eating.end");
+				rPutControl.addCondition("phil." + id + ".eating.end");
 
 				Action startEatingAction = new Action(startEating.getLabel());
 				currActions.addAction(startEatingAction);

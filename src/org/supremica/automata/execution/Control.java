@@ -49,25 +49,29 @@
  */
 package org.supremica.automata.execution;
 
+import java.util.*;
+
 public class Control
 {
 	private String label = null;
-	private String condition = null;
+	private List conditions = null;
 
 	public Control(String label)
 	{
 		this.label = label;
+		conditions = new LinkedList();
 	}
 
 	public Control(String label, String condition)
 	{
-		this.label = label;
-		this.condition = condition;
+		this(label);
+		addCondition(condition);
 	}
 
 	public Control(Control otherControl)
 	{
-		this(otherControl.label, otherControl.condition);
+		this(otherControl.label);
+		conditions = new LinkedList(otherControl.conditions);
 	}
 
 	public String getLabel()
@@ -75,14 +79,19 @@ public class Control
 		return label;
 	}
 
-	public String getCondition()
+	public void addCondition(String condition)
 	{
-		return condition;
+		conditions.add(condition);
 	}
 
-	public void setCondition(String condition)
+	public void removeCondition(String condition)
 	{
-		this.condition = condition;
+		conditions.remove(condition);
+	}
+
+	public Iterator conditionIterator()
+	{
+		return conditions.iterator();
 	}
 
 	public boolean equals(Object other)
@@ -94,7 +103,7 @@ public class Control
 
 		Control otherControl = (Control) other;
 
-		return label.equals(otherControl.label) && condition.equals(otherControl.condition);
+		return label.equals(otherControl.label) && conditions.equals(otherControl.conditions);
 	}
 
 	public int hashCode()
