@@ -244,7 +244,6 @@ public class ModifiedAstar
 			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
 		}
 
-//		AutomataExplorerHelper.setInitialState(initialState);
 
 		AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
 
@@ -323,6 +322,7 @@ public class ModifiedAstar
 	
 	public static void main(String args[])
 	{
+		// See Alorithm 1, Fig 5.16, p.47 in Tobbes lic
 		Automaton p1 = new Automaton("P1");
 		State q10 = new State("p1_0");	q10.setCost(0);		p1.addState(q10);	p1.setInitialState(q10);
 		State q11 = new State("p1M1");	q11.setCost(3);		p1.addState(q11);
@@ -364,10 +364,10 @@ public class ModifiedAstar
 		Automaton m2 = new Automaton("M2");
 		State m20 = new State("m20");			m2.addState(m20);	m2.setInitialState(m20);
 		State m21 = new State("m21");			m2.addState(m21);
-		LabeledEvent em21 = new LabeledEvent("p1 ut ur m1 in i m2");			m2.getAlphabet().addEvent(em21);
-		LabeledEvent em22 = new LabeledEvent("p2 ut ur m1 in i m2");			m2.getAlphabet().addEvent(em22);
-		LabeledEvent em23 = new LabeledEvent("p1 ut ur m2");m2.getAlphabet().addEvent(em23);
-		LabeledEvent em24 = new LabeledEvent("p2 ut ur m2");m2.getAlphabet().addEvent(em24);
+		LabeledEvent em21 = new LabeledEvent("p1 ut ur m1 in i m2");m2.getAlphabet().addEvent(em21);
+		LabeledEvent em22 = new LabeledEvent("p2 ut ur m1 in i m2");m2.getAlphabet().addEvent(em22);
+		LabeledEvent em23 = new LabeledEvent("p1 ut ur m2");		m2.getAlphabet().addEvent(em23);
+		LabeledEvent em24 = new LabeledEvent("p2 ut ur m2");		m2.getAlphabet().addEvent(em24);
 		
 		Automata automata = new Automata();
 		automata.addAutomaton(p1);
