@@ -55,6 +55,7 @@ import org.supremica.properties.*;
 import org.supremica.automata.*;
 
 public class MutuallyNonblockingVerifier
+	implements Stoppable
 {
 	private static Logger logger = LoggerFactory.createLogger(MutuallyNonblockingVerifier.class);
 
@@ -62,12 +63,25 @@ public class MutuallyNonblockingVerifier
 	protected AlphabetAnalyzer theAlphabetAnalyzer;
 	private AutomataToEventMap safeEventsMap;
 
+	private ExecutionDialog executionDialog = null;
+	private AutomataSynchronizerHelper synchHelper = null;
+
+	// Global so that it can be stopped
+	private AutomataVerifier theVerifier = null;	
+	private boolean stopRequested = false;
+
 	public MutuallyNonblockingVerifier(Automata theAutomata)
 	{
 		this.theAutomata = theAutomata;
 		safeEventsMap = new AutomataToEventMap();
 	}
 
+	public MutuallyNonblockingVerifier(Automata theAutomata, AutomataSynchronizerHelper synchHelper)
+	{
+		this(theAutomata);
+		this.synchHelper = synchHelper;
+	}
+	
 	public boolean isMutuallyNonblocking()
 	{
 		theAlphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
@@ -91,8 +105,28 @@ public class MutuallyNonblockingVerifier
 		logger.info(unsynchronizedEvents + " unsynchronized events.");
 		logger.info(synchronizedEvents + " synchronized events.");
 
+		java.awt.EventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					executionDialog = synchHelper.getExecutionDialog();
+					executionDialog.setMode(ExecutionDialogMode.verifyingMutualNonblocking);
+					executionDialog.initProgressBar(0, theAutomata.size());
+				}
+			});
+
+		// return synchTest();
+		return safeEventsTest();
+	}
+
+	private boolean safeEventsTest()
+	{
+		// Find safe events in the respective automata
 		buildSafeEvents();
 		logger.debug(safeEventsMap.toString());
+					
+		if (stopRequested)
+			return false;
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
@@ -109,18 +143,60 @@ public class MutuallyNonblockingVerifier
 			Automaton currAutomaton = (Automaton)autIt.next();
 			if (currAutomaton.nbrOfStates() != currAutomaton.nbrOfMutuallyAcceptingStates())
 			{
-				logger.warn("Automaton " + currAutomaton.getName() + " might cause blocks.");
+				logger.warn("Automaton " + currAutomaton + " might cause blocks.");
 				allMutuallyNonblocking = false;
 				// return false;
 			}
 			else
 			{
-				logger.info("Automaton " + currAutomaton.getName() + " is mutually nonblocking!");
+				logger.info("Automaton " + currAutomaton + " is mutually nonblocking!");
 				nbrMutuallyNonblocking++;
 			}
+			logger.info("Safe events: " + safeEventsMap.getEvents(currAutomaton));
 		}
-		logger.info("At least " + nbrMutuallyNonblocking + " out of the total " + theAutomata.size() + " automata were mutually nonblocking.");
+		logger.info("At least " + nbrMutuallyNonblocking + " out of the total " + 
+					theAutomata.size() + " automata were mutually nonblocking.");
 		return allMutuallyNonblocking;
+	}
+
+	private boolean synchTest()
+	{
+		Automata newAutomata = new Automata();
+		for (Iterator autItOne = theAutomata.iterator(); autItOne.hasNext(); )
+		{
+			Automata synchAutomata = new Automata();
+			Automaton currAutomaton = (Automaton)autItOne.next();
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
+
+			for (Iterator autItTwo = theAutomata.iterator(); autItTwo.hasNext(); )
+			{
+				Automaton otherAutomaton = (Automaton)autItTwo.next();
+				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
+				
+				Alphabet.intersect(currAlphabet, otherAlphabet);
+
+				if (Alphabet.intersect(currAlphabet, otherAlphabet).size() != 0)
+				{
+					synchAutomata.addAutomaton(otherAutomaton);
+				}
+			}
+
+			logger.info("Synchronizing " + synchAutomata);
+
+			try
+			{
+				Automaton synchAutomaton = AutomataSynchronizer.synchronizeAutomata(synchAutomata);
+				newAutomata.addAutomaton(synchAutomaton);
+			}
+			catch (Exception ojsan)
+			{
+				logger.error(ojsan);
+			}
+		}
+
+		theAutomata.addAutomata(newAutomata);
+
+		return false;
 	}
 
 	/**
@@ -138,18 +214,29 @@ public class MutuallyNonblockingVerifier
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			logger.info("Building safe events for automaton '" + currAutomaton.getName() + "'...");
+			logger.info("Building safe events for automaton " + currAutomaton + "...");
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 			for (Iterator evIt = currAlphabet.iterator(); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = (LabeledEvent)evIt.next();
-				logger.info("Event: '" + currEvent.getLabel() + "'...");
+				logger.info("Event: " + currEvent + " (" + (currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
+
+				if (stopRequested)
+					return;
 
 				boolean isSafe = checkSafeness(newAutomata, currAutomaton, currEvent);
 				if (isSafe)
 				{
 					safeEventsMap.addEvent(currAutomaton, currEvent);
 				}
+
+				if (stopRequested)
+					return;
+			}
+
+			if (executionDialog != null)
+			{
+				executionDialog.setProgress(currAutomaton.getIndex());
 			}
 		}
 	}
@@ -202,14 +289,12 @@ public class MutuallyNonblockingVerifier
 													  SupremicaProperties.verifyNbrOfAttempts());
 		*/		
 
-		AutomataVerifier theVerifier = null;
 		boolean isSafe = false;
-
 		try
 		{
 			theVerifier = new AutomataVerifier(totalSystem, synchronizationOptions, verificationOptions);
 			isSafe = theVerifier.verify();
-			logger.debug(new Boolean(isSafe));
+			// logger.debug(new Boolean(isSafe));
 		}
 		catch (Exception ex)
 		{
@@ -217,6 +302,22 @@ public class MutuallyNonblockingVerifier
 			// logger.debug(ex);
 		}
 		return isSafe;
+	}
+
+	/**
+	 * Method that stops MutuallyNonblockingVerifier as soon as possible.
+	 *
+	 * @see  ExecutionDialog
+	 */
+	public void requestStop()
+	{
+		stopRequested = true;
+		logger.debug("MutuallyNonblockingVerifier requested to stop.");
+
+		if (theVerifier != null)
+		{
+			theVerifier.requestStop();
+		}
 	}
 }
 

@@ -811,10 +811,10 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 
-			String reason = "the uncontrollable event \"" + 
-				theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + 
-				"\" is enabled in the plant \"" + problemAutomaton.getName() + "\"";
-			logger.info("The state \"" + state.toString() + "\" is uncontrollable since " + reason + ".");
+			String reason = "the uncontrollable event " + 
+				theAutomaton.getAlphabet().getEventWithIndex(problemEvent).toString() + 
+				" is enabled in the plant " + problemAutomaton.toString();
+			logger.info("The state '" + state.toString() + "' is uncontrollable since " + reason + ".");
 		}
 	}
 

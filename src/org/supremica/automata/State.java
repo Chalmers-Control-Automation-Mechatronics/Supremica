@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -226,7 +225,7 @@ public class State
 
 	public String toString()
 	{
-		return getName();
+		return "'" + getName() + "'";
 	}
 
 	public boolean isInitial()

@@ -306,12 +306,28 @@ public class Events
 		return theEvents.containsValue(theEvent);
 	}
 
-	public String toString()
+	public String toDebugString()
 	{
-		//StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
 		StringBuffer tmpBuf = new StringBuffer(theEvents.toString());
 
 		return tmpBuf.toString();
+	}
+
+	public String toString()
+	{
+		StringBuffer sbuf = new StringBuffer();
+
+		if (size() > 0)
+		{
+			for(EventIterator it = iterator(); it.hasNext(); )
+			{
+				LabeledEvent event = it.nextEvent();
+				sbuf.append(event.toString() + ", ");
+			}
+			sbuf.delete(sbuf.length()-2, sbuf.length());
+		}
+
+		return sbuf.toString();
 	}
 
 	/**

@@ -933,8 +933,9 @@ public class Automata
 			theAutomaton = null;
 		}
 	}
+
 	// Useful for debugging (among other things)
-	public String toString()
+	public String toDebugString()
 	{
 		StringBuffer sbuf = new StringBuffer();
 
@@ -946,6 +947,24 @@ public class Automata
 		}
 		return sbuf.toString();
 	}
+
+	public String toString()
+	{
+		StringBuffer sbuf = new StringBuffer();
+
+		if (size() > 0)
+		{
+			for(Iterator it = iterator(); it.hasNext(); )
+			{
+				Automaton automaton = (Automaton)it.next();
+				sbuf.append(automaton.toString() + ", ");
+			}
+			sbuf.delete(sbuf.length()-2, sbuf.length());
+		}
+
+		return sbuf.toString();
+	}
+
 	// Useful for debugging (among other things) - writes Java code
 	public String toCode()
 	{

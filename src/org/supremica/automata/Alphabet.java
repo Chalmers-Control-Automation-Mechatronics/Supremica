@@ -258,28 +258,42 @@ public class Alphabet
 	}
 
 	/**
-	 * Computes A intersection B, where A is this alphabet and B is other
+	 * Computes A intersection B, where A is this alphabet and B the other
 	 *
 	 *@param  other The other alphabet
 	 */
 	public void intersect(Alphabet other)
 	{
+		ArrayList removeList = new ArrayList();
+
 		for (Iterator alphIt = this.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 			
 			if(!other.containsEventWithLabel(currEvent.getLabel()))
 			{
+				removeList.add(currEvent);
+				//removeList.add(currEvent.getLabel());
+
+				/*
 				try
 				{
-					removeEvent(currEvent.getLabel());
+				    removeEvent(currEvent.getLabel());
 				}
 				catch (Exception ex)
 				{   // This should be impossible
 					logger.error("Alphabet.intersect. Trying to remove a non-existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}
+				*/
 			}
+		}
+
+		for (Iterator removeIt = removeList.iterator(); removeIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent) removeIt.next();
+			//String currEvent = (String) removeIt.next();
+			removeEvent(currEvent);
 		}
 	}
 	

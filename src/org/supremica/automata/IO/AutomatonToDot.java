@@ -108,6 +108,11 @@ public class AutomatonToDot
 			return ", color = green";
 		}
 
+		if (s.isMutuallyAccepting() &&!s.isForbidden())
+		{
+			return ", color = yellow";
+		}
+
 		if (s.isForbidden())
 		{
 			return ", color = red";
@@ -124,6 +129,7 @@ public class AutomatonToDot
 
 		String standardShape = null;
 		String acceptingShape = null;
+		String mutuallyAcceptingShape = null;
 		String forbiddenShape = null;
 
 		pw.println("digraph state_automaton {");
@@ -138,13 +144,21 @@ public class AutomatonToDot
 		{
 			standardShape = "circle";
 			acceptingShape = "doublecircle";
+			mutuallyAcceptingShape = "doublecircle";
 			forbiddenShape = "box";
 		}
 		else
 		{
 			standardShape = "plaintext";
 			acceptingShape = "ellipse";
+			mutuallyAcceptingShape = "ellipse";
 			forbiddenShape = "box";
+		}
+
+		// The mutually accepting states are not shown if we aren't using colors...
+		if (!useColors)
+		{
+			mutuallyAcceptingShape = "plaintext";
 		}
 
 		if (!aut.hasInitialState())
@@ -170,6 +184,10 @@ public class AutomatonToDot
 			if (state.isAccepting() && !state.isForbidden())
 			{
 				pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getId() + "\"};");
+			}
+			if (state.isMutuallyAccepting() && !state.isForbidden())
+			{
+				pw.println("\t{node [shape = " + mutuallyAcceptingShape + "] \"" + state.getId() + "\"};");
 			}
 			else if (state.isForbidden())
 			{

@@ -98,7 +98,7 @@ public class LabeledEvent
 
 	public String toString()
 	{
-		return label; //  + " (" + id + ")";
+		return "'" + label + "'"; //  + " (" + id + ")";
 	}
 
 	/**

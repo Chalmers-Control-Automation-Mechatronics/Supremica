@@ -116,18 +116,6 @@ public class AutomataVerificationWorker
 		boolean verificationSuccess;
 		String successMessage;
 		String failureMessage;
-
-		// Initialize the ExecutionDialog
-		final ArrayList threadsToStop = new ArrayList();
-		threadsToStop.add(this);
-		eventQueue.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
-					executionDialog.setMode(ExecutionDialogMode.hide);
-				}
-			});
 		
 		// Examine the validity of the chosen options
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
@@ -188,15 +176,6 @@ public class AutomataVerificationWorker
 		{
 			automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, 
 													verificationOptions);
-			eventQueue.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						executionDialog.setMode(ExecutionDialogMode.verifying);
-						automataVerifier.getHelper().setExecutionDialog(executionDialog);
-					}
-				});
-			threadsToStop.add(automataVerifier);
 		}
 		catch (Exception ex)
 		{
@@ -216,6 +195,22 @@ public class AutomataVerificationWorker
 			automataVerifier.prepareForLanguageInclusion(workbench.getUnselectedAutomata());
 		}
 
+		// Initialize the ExecutionDialog
+		final ArrayList threadsToStop = new ArrayList();
+		threadsToStop.add(this);
+		threadsToStop.add(automataVerifier);
+		
+		eventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
+					// executionDialog.setMode(ExecutionDialogMode.hide);
+					executionDialog.setMode(ExecutionDialogMode.verifying);
+					automataVerifier.getHelper().setExecutionDialog(executionDialog);
+				}
+			});
+		
 		// Solve the problem (and measure the time to)!
 		ActionTimer timer = new ActionTimer();
 		timer.start();
@@ -274,12 +269,12 @@ public class AutomataVerificationWorker
 	 */
 	public void requestStop()
 	{
+		stopRequested = true;
 		logger.debug("AutomataVerificationWorker requested to stop.");
+
 		if (executionDialog != null)
 		{
 			executionDialog.setMode(ExecutionDialogMode.hide);
 		}
-
-		stopRequested = true;
 	}
 }

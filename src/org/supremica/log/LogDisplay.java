@@ -262,7 +262,8 @@ public class LogDisplay
 		{
 			if (prio[i].equals(Priority.FATAL))
 			{
-				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+				//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/BlackFlag.gif")));
 			}
 
 			if (prio[i].equals(Priority.ERROR))
@@ -272,7 +273,8 @@ public class LogDisplay
 
 			if (prio[i].equals(Priority.WARN))
 			{
-				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+				//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/OrangeFlag.gif")));
 			}
 
 			if (prio[i].equals(Priority.INFO))

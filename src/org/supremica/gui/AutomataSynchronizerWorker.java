@@ -104,7 +104,6 @@ public class AutomataSynchronizerWorker
 				// -- MF -- should really put up a message box here? Why not let the Gui manage that?
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
-				// -- MF -- was only 'workbench' here^^^^^^^^^^^^^^
 				// logger.error(e.getMessage());
 				workbench.error(e.getMessage());
 
@@ -112,12 +111,10 @@ public class AutomataSynchronizerWorker
 			}
 
 			ArrayList threadsToStop = new ArrayList();
-
 			threadsToStop.add(theSynchronizer);
 			threadsToStop.add(this);
 
 			ExecutionDialog executionDialog = new ExecutionDialog(workbench.getFrame(), "Synchronizing", threadsToStop);
-
 			theSynchronizer.getHelper().setExecutionDialog(executionDialog);
 			executionDialog.setMode(ExecutionDialogMode.synchronizing);
 

@@ -116,6 +116,7 @@ public class AutomataVerifier
 
 	/** For stopping execution. */
 	private boolean stopRequested = false;
+	private Stoppable threadToStop = null;
 
 	/** For verifying supervisors by one uncontrollable event at a time. */
 	private boolean oneEventAtATime;
@@ -140,6 +141,7 @@ public class AutomataVerifier
 
 		// The helper must be initialized here (this early) only because of the
 		// executionDialog, I think...
+		// BUT THE EXECUTIONDIALOG IS NOT USED UNTIL MUCH LATER?!!!
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 		// Build the initial state  (including 2 status fields)
@@ -370,7 +372,12 @@ public class AutomataVerifier
 	private boolean modularMutuallyNonblockingVerification()
 		throws Exception
 	{
-		MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata);
+		//MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata);
+		MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata, synchHelper);
+
+		// Prepare for stopping the verifier
+		threadToStop = theVerifier;
+
 		return theVerifier.isMutuallyNonblocking();
 	}
 
@@ -607,10 +614,10 @@ public class AutomataVerifier
 		// loop finished.
 		if (failure)
 		{
-			logger.warn("Supremica's modular verification algorithm can't solve this\n" +
+			logger.warn("Supremica's modular verification algorithm can't solve this " +
 						 "problem. Try the monolithic algorithm instead. There are " +
-						 potentiallyUncontrollableStates.size() + "\n" +
-						 "states that perhaps makes this system uncontrollable.");
+						 potentiallyUncontrollableStates.size() +
+						 " states that perhaps makes this system uncontrollable.");
 			return false;
 		}
 
@@ -695,7 +702,7 @@ public class AutomataVerifier
 				else
 					states = potentiallyUncontrollableStates.size(automataIndices) + " states";
 
-				logger.info("\"" + automataNames + "\" has " + states +
+				logger.info("'" + automataNames + "' has " + states +
 							 " that might be uncontrollable...");
 			}
 
@@ -781,6 +788,7 @@ public class AutomataVerifier
 					return false;
 				}
 
+				// Are there any potentially uncontrollable states?
 				if (potentiallyUncontrollableStates.size(automataIndices) > 0)
 				{
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
@@ -1054,7 +1062,7 @@ public class AutomataVerifier
 			// Add automaton
 			selectedAutomata.add(theAutomata.getAutomatonAt(similarAutomata[i]));
 
-			addedAutomata = addedAutomata + " \"" + theAutomata.getAutomatonAt(similarAutomata[i]).getName() + "\"";
+			addedAutomata = addedAutomata + " '" + theAutomata.getAutomatonAt(similarAutomata[i]).getName() + "'";
 			stateAmount = stateAmount * theAutomata.getAutomatonAt(similarAutomata[i]).nbrOfStates();
 
 			if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
@@ -1142,6 +1150,7 @@ public class AutomataVerifier
 						message = "Still " + statesLeft + " states ";
 					}
 					logger.info(message + "left after adding" + addedAutomata + ".");
+					//logger.info(message + "left after adding" + selectedAutomata + ".");
 				}
 
 				if (statesLeft == 0)
@@ -1523,7 +1532,7 @@ public class AutomataVerifier
 
 			if (!allIndividuallyNonblocking)
 			{
-				logger.error("The automaton " + currAutomaton.getName() + " is individually blocking!");
+				logger.error("The automaton " + currAutomaton.toString() + " is individually blocking!");
 				logger.error("Aborting verification...");
 				requestStop();
 				return false;
@@ -1600,7 +1609,7 @@ public class AutomataVerifier
 
 			if (!allIndividuallyNonblocking)
 			{
-				logger.error("The automaton " + currAutomaton.getName() + " is individually blocking!");
+				logger.error("The automaton " + currAutomaton.toString() + " is individually blocking!");
 				logger.error("Aborting verification...");
 				requestStop();
 				return false;
@@ -1652,6 +1661,7 @@ public class AutomataVerifier
 					executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
 				}
 			});
+
 		// Ensure global nonblocking...
 		boolean allIncluded = true;
 		boolean automatonIsIncluded;
@@ -1661,7 +1671,7 @@ public class AutomataVerifier
 		{
 			currAutomaton = (Automaton) autIt.next();
 			currAutomata.addAutomaton(currAutomaton);
-			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
+			logger.info("Examining the automaton " + currAutomaton.toString() + ".");
 			automatonIsIncluded = modularLanguageinclusionVerification(currAutomata);
 			allIncluded = allIncluded && automatonIsIncluded;
 			currAutomata.removeAutomaton(currAutomaton);
@@ -1677,7 +1687,7 @@ public class AutomataVerifier
 			}
 			if (!automatonIsIncluded)
 			{
-				logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
+				logger.error("The automaton " + currAutomaton.toString() + " is blocked by some other automaton!");
 			}
 		}
 		// timer.stop();
@@ -2022,12 +2032,17 @@ public class AutomataVerifier
 	 */
 	public void requestStop()
 	{
-		logger.debug("AutomataVerifier requested to stop.");
 		stopRequested = true;
+		logger.debug("AutomataVerifier requested to stop.");
 
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
+		}
+
+		if (threadToStop != null)
+		{
+			threadToStop.requestStop();
 		}
 	}
 

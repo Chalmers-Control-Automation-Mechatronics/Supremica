@@ -64,7 +64,7 @@ public class ExecutionDialog
 	extends JDialog
 	implements ActionListener, Runnable
 {
-	private List executers;
+	private List threadsToStop;
 	private JPanel contentPanel = null;
 	private JLabel operationLabel = null;
 	private JPanel infoPanel = null;
@@ -148,32 +148,26 @@ public class ExecutionDialog
 	 * Creates dialog box for canceling the Stoppable classes in the supplied List.
 	 * @see Stoppable
 	 */
-	public ExecutionDialog(JFrame frame, String title, List executers)
+	public ExecutionDialog(JFrame frame, String title, List threadsToStop)
 	{
 		super(frame);
 		setVisible(false);
 
-		// this.workbench = workbench;
-		this.executers = executers;
+		this.threadsToStop = threadsToStop;
 
 		Init(title);
 	}
 
 	// -- MF -- Special case when you've got only one thread to watch
-	public ExecutionDialog(JFrame frame, String title, Stoppable thread)
+	public ExecutionDialog(JFrame frame, String title, Stoppable threadToStop)
 	{
-		// Nicer? /Hugo.
 		this(frame, title, new ArrayList());
-		executers.add(thread);
+		addThreadToStop(threadToStop);
+	}
 
-		/* 
-		  super(frame);
-		  
-		  this.executers = new ArrayList();
-		  
-		  executers.add(thread);
-		  Init(title);
-		*/
+	public void addThreadToStop(Stoppable threadToStop)
+	{
+		threadsToStop.add(threadToStop);
 	}
 
 	public void setMode(ExecutionDialogMode mode)
@@ -296,6 +290,13 @@ public class ExecutionDialog
 				
 				currCenterPanel = infoPanel;
 			}
+			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblocking)
+			{
+				operationLabel.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
+				contentPanel.add(progressPanel, BorderLayout.CENTER);
+				
+				currCenterPanel = infoPanel;
+			}
 
 			/*
 			 * This is what it should look like - let the mode keep track of itself
@@ -334,14 +335,14 @@ public class ExecutionDialog
 
 		if (source == stopButton)
 		{
-			if (executers != null)
+			if (threadsToStop != null)
 			{
-				for (Iterator exIt = executers.iterator(); exIt.hasNext(); )
+				for (Iterator exIt = threadsToStop.iterator(); exIt.hasNext(); )
 				{
 					((Stoppable) exIt.next()).requestStop();
 				}
 
-				executers = null;    // Helping the garbage collector...
+				threadsToStop = null;    // Helping the garbage collector...
 			}
 
 			setMode(ExecutionDialogMode.hide);

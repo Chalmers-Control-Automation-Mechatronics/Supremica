@@ -1676,7 +1676,7 @@ public class Automaton
 	}
 
 	// These are useful for debugging (etc)
-	public String toString()
+	public String toDebugString()
 	{
 		StringBuffer sbuf = new StringBuffer();
 
@@ -1690,6 +1690,12 @@ public class Automaton
 		}
 		return sbuf.toString();
 	}
+
+	public String toString()
+	{
+		return "'" + getName() + "'";
+	}
+
 	// toCode writes Java code - Note, the names are used as-is, which means there may be blanks in variabel names!
 	public String toCode()
 	{

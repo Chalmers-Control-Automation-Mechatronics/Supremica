@@ -616,7 +616,7 @@ public class Supremica
 		if (newComment != null)
 		{
 			getActiveProject().setComment(newComment);
-			getActiveProject().setProjectFile(null);
+			//getActiveProject().setProjectFile(null);
 		}
 	}
 

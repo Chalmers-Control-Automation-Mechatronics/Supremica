@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -65,6 +64,8 @@ public class ExecutionDialogMode
 		new ExecutionDialogMode("Matching States...", "", false, true);
 	public static ExecutionDialogMode verifyingNonblocking = 
 		new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
+	public static ExecutionDialogMode verifyingMutualNonblocking = 
+		new ExecutionDialogMode("Verifying mutual nonblocking...", "", false, true);
 	public static ExecutionDialogMode hide = 
 		new ExecutionDialogMode("Hide", "", false, false);
 	public static ExecutionDialogMode uninitialized = 
