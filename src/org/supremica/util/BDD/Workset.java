@@ -280,6 +280,17 @@ public class Workset
 
 	// --------------------------------------------------------------------------------
 
+
+
+	/**
+	 * we how worked but we may not be DONE with this automaton yet (no fixpoint reached?).
+	 * if changed is new, then something has changed and we should consider the
+	 * affect of this by adding automata that are directly connected with our automaton
+	 */
+	public void exclusive_advance(int automaton, boolean changed) {
+		internal_advance(automaton, changed, true);
+	}
+
 	/**
 	 * we are done with this automaton.
 	 * if changed is new, then something has changed and we should consider the
@@ -287,10 +298,16 @@ public class Workset
 	 */
 	public void advance(int automaton, boolean changed)
 	{
-		// workset_count -= workset[automaton];
-		workset[automaton] = 0;
-		workset_count --;
-		ndas.advance(automaton, changed);
+		internal_advance(automaton, changed, false);
+	}
+
+	public void internal_advance(int automaton, boolean changed, boolean exclusive) {
+
+		if(!changed || !exclusive) {
+			workset[automaton] = 0;
+			workset_count --;
+			ndas.advance(automaton, changed);
+		}
 
 		if(changed) {
 			int count = dependent[automaton][0];
@@ -310,4 +327,7 @@ public class Workset
 	{
 		return workset_count <= 0;
 	}
+
+
+
 }

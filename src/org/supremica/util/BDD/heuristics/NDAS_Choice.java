@@ -19,6 +19,7 @@ public class NDAS_Choice {
 
 
 
+	/** ring is used in the ring choice to remember the last one and pick one higher */
 	private int ndas, ring, max_activity, num_access, num_advance;
 	private int [] activity = null, queue2 = null;
 	private boolean punish_inactive;
@@ -43,7 +44,7 @@ public class NDAS_Choice {
 
 
 	public void reset() {
-		ring = 0;
+		ring = -1;
 		num_access =  num_advance = 0;
 		if(activity != null) for(int i = 0; i < activity.length; i++) activity[i] = 0;
 	}
@@ -66,14 +67,13 @@ public class NDAS_Choice {
 			case Options.NDAS_FIRST:	return queue[0];
 			case Options.NDAS_LAST: 	return queue[size-1];
 			case Options.NDAS_RANDOM:	return queue[ (int)(Math.random() * size) ];
-			case Options.NDAS_RING:		return queue[ ring++ % size ];
+			// case Options.NDAS_RING:		return queue[ ring++ % size ];
+			case Options.NDAS_RING:		return ring_choice(queue, size);
 			case Options.NDAS_RL:       return find_best_active(queue, size);
-
 		}
 
 		return -1; // ERROR: unknown option
 	}
-
 
 	public void advance(int automaton, boolean changed)	{
 
@@ -114,6 +114,47 @@ public class NDAS_Choice {
 
 		return queue2[ (int)(Math.random() * count) ];
 	}
+
+	// ---------------------------------------------------
+
+	/**
+	 * ring choice stuff:
+	 * try to choose "next" automata in a particular order (definition order)
+	 */
+	private int ring_choice(int [] queue, int size) {
+		ring  = pick_larger_than(queue, size, ring);
+		if(ring == -1) { // no smaller, start from the beginning
+			ring = pick_smallest(queue, size);
+		}
+		return ring;
+	}
+
+
+	/**
+	 * return the smallest number larger than "last", -1 if no such
+	 */
+	private int pick_larger_than(int []queue, int size, int last) {
+		int choice = -1;
+		for(int i =0; i < size; i++) {
+			if(queue[i] > last) {
+				if(choice == -1 || choice > queue[i])
+					choice = queue[i];
+			}
+		}
+		return choice;
+	}
+
+	/** return the firs (smallest) number in the queue. queue may NOT be empty ! */
+	private int pick_smallest(int []queue, int size) {
+		int choice = queue[0];
+		for(int i = 1; i < size; i++) {
+			if(choice > queue[i] ) {
+				choice = queue[i];
+			}
+		}
+		return choice;
+	}
+
 }
 
 

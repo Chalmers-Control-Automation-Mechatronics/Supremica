@@ -42,7 +42,8 @@ public class Options
 	/** REACHABILITY search algorithms */
 	public static final String [] REACH_ALGO_NAMES =  {
 		"Monolithic", "Conjunctive", "LatticeWalk", "Disjunctive",
-		"Smoothed: Workset",  "Smoothed: Monotonic", "Smoothed: Delayed Monotonic",
+		"Smoothed: Workset",  "Smoothed: StepStone",
+		"Smoothed: Monotonic", "Smoothed: Delayed Monotonic",
 		"Smoothed: Delayed* Monotonic","Smoothed: Monotonic/Workset",
 		"Smoothed: Path (V1)", "Smoothed: Keep (V2)", "Smoothed: Partitioned (P1)",
 		"Smoothed: Partitioned (P2)",
@@ -55,15 +56,16 @@ public class Options
 	ALGO_CONJUNCTIVE_LOCAL_EVENT = 2,
 	ALGO_DISJUNCTIVE = 3,
 	ALGO_DISJUNCTIVE_WORKSET = 4,
-	ALGO_SMOOTHED_MONO = 5,
-	ALGO_SMOOTHED_DELAYED_MONO = 6,
-	ALGO_SMOOTHED_DELAYED_STAR_MONO = 7,
-	ALGO_SMOOTHED_MONO_WORKSET = 8,
-	ALGO_SMOOTHED_PATH = 9,
-	ALGO_SMOOTHED_KEEP = 10,
-	ALGO_SMOOTHED_PART = 11,
-	ALGO_SMOOTHED_PART2 = 12,
-	ALGO_PETRINET = 13;
+	ALGO_DISJUNCTIVE_STEPSTONE = 5,
+	ALGO_SMOOTHED_MONO = 6,
+	ALGO_SMOOTHED_DELAYED_MONO = 7,
+	ALGO_SMOOTHED_DELAYED_STAR_MONO = 8,
+	ALGO_SMOOTHED_MONO_WORKSET = 9,
+	ALGO_SMOOTHED_PATH = 10,
+	ALGO_SMOOTHED_KEEP = 11,
+	ALGO_SMOOTHED_PART = 12,
+	ALGO_SMOOTHED_PART2 = 13,
+	ALGO_PETRINET = 14;
 	public static int algo_family = ALGO_DISJUNCTIVE_WORKSET; /** reachability algorithm */
 
 

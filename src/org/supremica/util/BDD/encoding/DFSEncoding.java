@@ -26,7 +26,6 @@ public class DFSEncoding implements Encoding {
 		int [] codes = new int[size];
 		int tos = 0;
 
-		// not reached
 		for(int i = 0; i < size; i++){
 			states[i].extra1 = i;
 			codes[i] = -1; // not reached
@@ -39,8 +38,6 @@ public class DFSEncoding implements Encoding {
 
 		while(tos > 0) {
 			State state = stack[--tos];
-
-
 
 			for(Enumeration e = from_i ? state.out() : state.in(); e.hasMoreElements(); ) {
 				Arc arc = (Arc)e.nextElement();

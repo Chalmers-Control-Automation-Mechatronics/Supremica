@@ -21,6 +21,7 @@ public class SupervisorFactory {
 
 	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,automata);
 	case Options.ALGO_DISJUNCTIVE_WORKSET: return new WorksetSupervisor(manager,automata);
+	case Options.ALGO_DISJUNCTIVE_STEPSTONE: return new StepStoneSupervisor(manager,automata);
 
 	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_DELAYED_MONO: return new DelayedSmoothSupervisor(manager,automata);
@@ -52,6 +53,8 @@ public class SupervisorFactory {
 
  	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,plant, spec);
  	case Options.ALGO_DISJUNCTIVE_WORKSET: return new WorksetSupervisor(manager,plant, spec);
+ 	case Options.ALGO_DISJUNCTIVE_STEPSTONE: return new StepStoneSupervisor(manager,plant, spec);
+
 
 	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_DELAYED_MONO: return new DelayedSmoothSupervisor(manager,plant, spec);

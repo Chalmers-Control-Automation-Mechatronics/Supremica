@@ -37,11 +37,11 @@ public class WorksetSupervisor extends DisjSupervisor
 	 * dependency matrix:  n = dependent[automata][0] is the number of dependent automata.
      * dependent[automata][1] .. dependent[automata][n] are the dependent automata.
 	 */
-	private int [][] dependent ;
-	private int size;
-	private BDDAutomaton [] bas;
-	private Cluster [] clusters;
-	private Workset workset;
+	protected int [][] dependent ;
+	protected int size;
+	protected BDDAutomaton [] bas;
+	protected Cluster [] clusters;
+	protected Workset workset;
 
     /** Constructor, passes to the base-class */
     public WorksetSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
@@ -125,7 +125,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		bdd_reachables = ret;
 	}
 
-	private int internal_computeReachablesWorkset(int bdd_i) {
+	protected int internal_computeReachablesWorkset(int bdd_i) {
 
 		// statistic stuffs
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
@@ -189,6 +189,14 @@ public class WorksetSupervisor extends DisjSupervisor
 	// ---------------------------------------------------------------------------------------
 
    protected void computeCoReachables() {
+	   int m_all = GroupHelper.getM(manager,spec, plant);
+	   bdd_coreachables = internal_computeCoReachablesWorkset(m_all);
+	   has_coreachables = true;
+	   manager.deref(m_all);
+   }
+
+   protected int internal_computeCoReachablesWorkset(int m_all)
+   {
 
 		// statistic stuffs
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
@@ -198,10 +206,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
 		Workset workset = getWorkset(false);
 
-		int m_all = GroupHelper.getM(manager,spec, plant);
 		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
-		manager.deref(m_all);
-
 
 
 		// initial burst mode:
@@ -243,12 +248,10 @@ public class WorksetSupervisor extends DisjSupervisor
 		int ret = manager.replace(r_all, perm_sp2s);
 		manager.deref(r_all);
 
-		has_coreachables = true;
-		bdd_coreachables = ret;
-
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Backward reachables found (workset)");
 		workset.done();
+		return ret;
 	}
 }
