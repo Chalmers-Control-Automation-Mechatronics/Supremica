@@ -79,7 +79,8 @@ public class VisualProject
 	private AutomataEditor theAutomataEditor = null;    // Lazy construction
 	private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
 	private Animator theAnimator = null;    // Lazy construction
-	private SwingEngine theUserInterface = null;    // Lazy construction
+	private SwingEngine theSwingEngine = null;    // Lazy construction
+	private Container theUserInterface = null;    // Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private SimulatorExecuter theSimulator = null;    // Lazy construction
 	private RecipeEditor theRecipeEditor = null;    // Lazy construction
@@ -498,6 +499,22 @@ public class VisualProject
 	}
 
 
+	public Container getUserInterface()
+		throws Exception
+	{
+		if (!hasUserInterface())
+		{
+			return null;
+		}
+
+		if (theUserInterface == null)
+		{
+			getSwingEngine();
+		}
+
+		return theUserInterface;
+	}
+
 	public SwingEngine getSwingEngine()
 		throws Exception
 	{
@@ -506,28 +523,28 @@ public class VisualProject
 			return null;
 		}
 
-		try
+		if (theSwingEngine == null)
 		{
-			theUserInterface = new SwingEngine();
-			Container container = null;
-			container = theUserInterface.render(getUserInterfaceURL());
-			if (container instanceof JDialog)
+			try
 			{
-				((JDialog) container).pack();
-				container.setVisible(true);
+				theSwingEngine = new SwingEngine();
+				theUserInterface = theSwingEngine.render(getUserInterfaceURL());
+				if (theUserInterface instanceof JDialog)
+				{
+					((JDialog) theUserInterface).pack();
+				}
+				if (theUserInterface instanceof JFrame)
+				{
+					((JFrame) theUserInterface).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				}
 			}
-			if (container instanceof JFrame)
+			catch (Exception ex)
 			{
-				((JFrame)container).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				container.setVisible(true);
+				logger.error(ex);
 			}
-		}
-		catch (Exception exception)
-		{
-			exception.printStackTrace();
 		}
 
-		return theUserInterface;
+		return theSwingEngine;
 	}
 
 	public SimulatorExecuter getSimulator()

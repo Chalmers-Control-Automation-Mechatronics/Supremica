@@ -3,6 +3,6 @@
   <panel constraints="BorderLayout.CENTER">
     <label LabelFor="tf" Font="Comic Sans MS-BOLD-12" Foreground="blue" text="Hello World!"/>
     <textfield id="tf" Columns="20" Text="Swixml"/>
-    <button Text="Click Here" Action="submit"/>
+    <button id="button" Text="Click Here" Action="submit"/>
   </panel>
 </frame>

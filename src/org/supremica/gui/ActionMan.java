@@ -1755,7 +1755,49 @@ public class ActionMan
 				return;
 			}
 
+			Container userInterface = currProject.getUserInterface();
+			userInterface.show();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception while getting user interface.", ex);
+			logger.debug(ex.getStackTrace());
+		}
+	}
+
+	// ActionMan.userInterface_action performed
+	public static void generateUserInterfaceAutomata_actionPerformed(Gui gui)
+	{
+		try
+		{
+			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+
+			if (!currProject.hasUserInterface())
+			{
+				logger.info("No user interface present");
+
+				return;
+			}
+
 			SwingEngine swingEngine = currProject.getSwingEngine();
+			ProjectBuildFromSwingEngine projectBuilder = new ProjectBuildFromSwingEngine();
+
+
+			try
+			{
+				Project newProject = projectBuilder.build(swingEngine);
+				int nbrOfAddedAutomata = gui.addAutomata(newProject);
+
+				gui.info("Successfully created " + nbrOfAddedAutomata + " user interface automata.");
+			}
+			catch (Exception ex)
+			{
+				logger.error("Error while creating user interface automata", ex);
+				logger.debug(ex.getStackTrace());
+
+				return;
+			}
+
 		}
 		catch (Exception ex)
 		{

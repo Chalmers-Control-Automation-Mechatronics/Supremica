@@ -518,6 +518,21 @@ public class MainMenuBar
 					ActionMan.userInterface_actionPerformed(ActionMan.getGui());
 				}
 			});
+
+			// Project.UserInterface
+			JMenuItem menuProjectGenerateUserInterfaceAutomata = new JMenuItem();
+
+			menuProjectGenerateUserInterfaceAutomata.setText("Generate User Interface Automata");
+			menuProject.add(menuProjectGenerateUserInterfaceAutomata);
+			menuProjectGenerateUserInterfaceAutomata.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.generateUserInterfaceAutomata_actionPerformed(ActionMan.getGui());
+				}
+			});
+
+			menuProject.addSeparator();
 		}
 
 
