@@ -59,6 +59,8 @@ import att.grappa.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.IO.*;
 import org.supremica.gui.texteditor.TextFrame;
+import com.pietjonas.wmfwriter2d.*;
+import java.awt.geom.Rectangle2D;
 
 public class DotViewer
 	extends JFrame
@@ -85,6 +87,10 @@ public class DotViewer
 	private Process dotProcess;
 	private Builder builder;
 	private String objectName = "";
+	private ClipboardCopy clipboardCopy = null;
+
+	private int wmfWidth = 0;
+	private int wmfHeight = 0;
 
 	public DotViewer()
 		throws Exception
@@ -183,6 +189,20 @@ public class DotViewer
 		menuFileClose.setText("Close");
 		menuFile.add(menuFileClose);
 
+		// File
+		JMenu menuEdit = new JMenu();
+
+		menuEdit.setText("Edit");
+		menuEdit.setMnemonic(KeyEvent.VK_E);
+		menuBar.add(menuEdit);
+
+		// Edit
+		JMenuItem menuEditCopy = new JMenuItem();
+
+		menuEditCopy.setText("Copy");
+		menuEditCopy.setMnemonic(KeyEvent.VK_C);
+		menuEdit.add(menuEditCopy);
+
 		// Layout
 		JMenu menuLayout = new JMenu();
 
@@ -263,6 +283,16 @@ public class DotViewer
 				//dispose();
 			}
 		});
+
+		menuEditCopy.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				copyWMF();
+			}
+		});
+
+
 		leftToRightCheckBox.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -571,6 +601,74 @@ public class DotViewer
 		currScrollPanel = scrollPanel;
 	}
 
+
+	private void saveTo(String name, boolean withHeader)
+		throws FileNotFoundException, IOException
+	{
+		Rectangle2D bb = theGraph.getBoundingBox();
+
+		double minX = bb.getMinX();
+		double maxX = bb.getMaxX();
+		double minY = bb.getMinY();
+		double maxY = bb.getMaxY();
+
+		System.out.println("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
+
+		//create a WMF object
+		wmfWidth = (int)(maxX - minX) + 1;
+		wmfHeight = (int)(maxY - minY) + 1;
+		WMF wmf = new WMF();
+		WMFGraphics2D wmfg = new WMFGraphics2D(wmf, wmfWidth, wmfHeight);
+
+		viewerPanel.paint(wmfg);
+
+		//save the WMF to an OutputStream with a placeable WMF header
+		FileOutputStream out = new FileOutputStream(name);
+		if (withHeader)
+		{
+			wmf.writePlaceableWMF(out, 0, 0, wmfWidth, wmfHeight, Toolkit.getDefaultToolkit().getScreenResolution());
+		}
+		else
+		{
+			wmf.writeWMF(out);
+		}
+		out.close();
+	}
+
+
+	private void copyWMF()
+	{
+		if (clipboardCopy == null)
+		{
+			try
+			{
+				clipboardCopy = new ClipboardCopy();
+			}
+			catch (Exception e)
+			{
+				logger.error("Can't access clipboard: " + e);
+				return;
+			}
+		}
+		try
+		{
+			copyToClipboard();
+		}
+		catch (IOException e)
+		{
+			logger.error("IO Exception while saving WMF:" + e);
+		}
+	}
+
+	private void copyToClipboard()
+		throws FileNotFoundException, IOException
+	{
+		File temp = File.createTempFile("SupremicaWMF", ".wmf");
+		temp.deleteOnExit();
+		saveTo(temp.getAbsolutePath(), false);
+		clipboardCopy.copyWithPixelSize(temp.getAbsolutePath(), wmfWidth, wmfHeight, false);
+		temp.delete();
+	}
 	private void initializeStreams(String arguments)
 		throws Exception
 	{
@@ -865,6 +963,9 @@ public class DotViewer
 			draw();
 	}
 	*/
+
+
+
 }
 
 class Builder

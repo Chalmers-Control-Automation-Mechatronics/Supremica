@@ -127,6 +127,7 @@
 	<unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/interfaceRobotStudio3_0.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
 	
 	<!-- Ant 1.6.0 is not able to unjar empty jar files -->
@@ -454,8 +455,10 @@
 </target>
 
 <target name="startfiles_local_supremica">
-        <copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>    	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
-	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
+        <copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>    	
+        <chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
+	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	
@@ -487,6 +490,8 @@
 	<chmod file="${dist}/izmjnicom.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${dist}"/>	
 	<chmod file="${dist}/21100280.LIC" perm="644"/>
+	<copy file="${platform}/win.x86/lib/JavaClipboard.dll" todir="${dist}"/>	
+	<chmod file="${dist}/JavaClipboard.dll" perm="644"/>
 	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>	
 	<chmod file="${dist}/libbuddy.so" perm="644"/>
 </target>
