@@ -65,6 +65,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.supremica.gui.*;
 import org.supremica.log.*;
+import org.supremica.external.shoefactory.Executor.*;
 
 public class Configit extends JFrame
 	implements ActionListener
@@ -74,7 +75,6 @@ public class Configit extends JFrame
 	CS_CtrlMngr ctrl_mngr = null;
 	Container c;
 	private boolean resetok = true;
-	private double Solutions;
 
     private String [] Gender = {"Male" ,"Female"};
 	private String [] GeneralType = {"Children", "Adult" };
@@ -142,7 +142,6 @@ public class Configit extends JFrame
 			return;
 		}
 		ctrl_mngr = new CS_CtrlMngr(vtStream, CS_CtrlMngr.CONFIG_STATIC);
-		//ctrl_mngr = new CS_CtrlMngr("../src/org/supremica/external/shoefactory/Configurator/ShoeFactory.vt", CS_CtrlMngr.CONFIG_STATIC);
 
    		Size = new String [ctrl_mngr.getDomainSize(1)];
 		Color = new String [ctrl_mngr.getDomainSize(3)];
@@ -507,7 +506,7 @@ public class Configit extends JFrame
 			{
     			S = printValueState(ctrl_mngr, var, val);
 
-				if (S.compareTo("Selectable")==0 || S.compareTo("System Selected")==0)
+				if (S.compareTo("Selectable")==0)
 				{
 					if(var ==0)
 						Allowed_Gender[val]=0;
@@ -539,7 +538,7 @@ public class Configit extends JFrame
 						Allowed_ShoeType[val]=1;
 				}
 
-				else if (S.compareTo("User Selected")==0)
+				else if (S.compareTo("User Selected")==0 || S.compareTo("System Selected")==0)
 				{
 					if(var ==0)
 						Allowed_Gender[val]=2;
@@ -588,6 +587,13 @@ public class Configit extends JFrame
 				if(selection == JOptionPane.OK_OPTION)
 				{
 					ctrl_mngr.completeConf();
+					ConfigConverter cc = new ConfigConverter(ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)),
+											ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(2)), ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(2)),
+											ctrl_mngr.getValueName(0, ctrl_mngr.getSelectedValue(0)), ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)),
+											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)));
+					//FactoryExecutor fe = new FactoryExecutor(cc.stationVisit);
+					//fe.setPriority(Thread.NORM_PRIORITY);
+					//fe.start();
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();
@@ -600,32 +606,28 @@ public class Configit extends JFrame
 		if(e.getSource() == lGend1)
 		{
 			assign(0,0);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
+			JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 			resetok=true;
 		}
 
 		if(e.getSource() == lGend2)
 		{
 			assign(0,1);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
+			JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 			resetok=true;
 		}
 
 		if(e.getSource() == lGT1)
 		{
    			assign(2,0);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
+			JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 			resetok=true;
 		}
 
 		if(e.getSource() == lGT2)
 		{
    			assign(2,1);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
+			JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 			resetok=true;
 		}
 
@@ -637,8 +639,7 @@ public class Configit extends JFrame
 				if(lCol.getSelectedIndex()==i )
 				{
 					assign(3,i);
-					Solutions=ctrl_mngr.getSolutionCount();
-					JL.setText("Available combinations: " + Solutions);
+					JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 				}
 			}
 		}
@@ -651,8 +652,7 @@ public class Configit extends JFrame
 				if(lSole.getSelectedIndex()==i)
 				{
 					assign(4,i);
-					Solutions=ctrl_mngr.getSolutionCount();
-					JL.setText("Available combinations: " +Solutions);
+					JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 				}
 			}
 		}
@@ -665,8 +665,7 @@ public class Configit extends JFrame
 				if(lSize.getSelectedIndex()==i )
 				{
 					assign(1,i);
-					Solutions=ctrl_mngr.getSolutionCount();
-					JL.setText("Available combinations: " +Solutions);
+					JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 				}
 			}
 		}
@@ -679,8 +678,7 @@ public class Configit extends JFrame
 				if(lShoeType.getSelectedIndex()==i)
 				{
 					assign(5,i);
-					Solutions=ctrl_mngr.getSolutionCount();
-					JL.setText("Available combinations: " +Solutions);
+					JL.setText("Available combinations: " +ctrl_mngr.getSolutionCount());
 				}
 			}
 		}
