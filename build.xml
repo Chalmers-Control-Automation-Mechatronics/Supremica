@@ -194,7 +194,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile_supremica">
+<target name="compile_supremica" depends="startfiles_local_supremica">
 	<javac
 		srcdir="${src}"
 		destdir="${build}"
@@ -417,7 +417,14 @@
 	</jar>
 </target>
 
-<target name="startfiles_supremica" depends="startfiles_supremica_student,startfiles_supremica_teacher">
+<target name="startfiles_local_supremica">
+	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
+	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaLocal" perm="644"/>
+</target>
+
+<target name="startfiles_supremica" depends="startfiles_local_supremica,startfiles_supremica_student,startfiles_supremica_teacher">
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	

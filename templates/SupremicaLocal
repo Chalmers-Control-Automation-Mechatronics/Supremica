@@ -1,0 +1,4 @@
+#/bin/sh
+
+java -cp ../build:../lib/unjared:../images org.supremica.apps.Supremica -p SupremicaProperties.cfg
+
