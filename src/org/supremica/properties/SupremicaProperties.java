@@ -127,7 +127,7 @@ public final class SupremicaProperties
     private static final String BDD_SHOW_GROW = "bddShowGrowth";
     private static final String BDD_ALTER_PCG = "bddAlterPCG";
     private static final String BDD_TRACE_ON  = "bddTraceOn";
-    private static final String BDD_DEBUG_ON  = "bddDebugOn";    
+    private static final String BDD_DEBUG_ON  = "bddDebugOn";
     private static final String BDD_ALGORITHM = "bddAlgorithm";
 
 
@@ -142,11 +142,15 @@ public final class SupremicaProperties
 	private static final String SHOW_GENETIC_ALGORITHMS = "showGeneticAlgorithms";
 	private static final String SHOW_ROBOTSTUDIO_LINK = "showRobotstudioLink";
 
+	// ActiveXBridge
+	private static final String USE_ACTIVEX_BRIDGE = "useActiveXBridge";
+
+
 	private Set forbidExternalModification = new HashSet();
 
     // There is a reason why we do the initialization like this.
     // dont touch this code!!      /Arash
-    private static SupremicaProperties wp = null; 
+    private static SupremicaProperties wp = null;
     static {
 	wp = new SupremicaProperties();
 	updateBDDOptions(false);
@@ -206,8 +210,10 @@ public final class SupremicaProperties
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
 		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
+		setProperty(USE_ACTIVEX_BRIDGE, "false", true);
 
-                softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
+
+		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 
 		// BDD stuffs
 		setProperty(BDD_SHOW_GROW, toString(Options.show_grow), true);
@@ -216,7 +222,7 @@ public final class SupremicaProperties
 		setProperty(BDD_DEBUG_ON , toString(Options.debug_on), true);
 		setProperty(BDD_ALGORITHM, toString(Options.algo_family), true);
 
-	
+
 	}
 
 
@@ -272,7 +278,7 @@ public final class SupremicaProperties
 		// System.err.println("PropertiesLoad");
 		FileInputStream fileStream = new FileInputStream(fileName);
 
-		wp.load(fileStream);		
+		wp.load(fileStream);
 	}
 
 	public static String getFileOpenPath()
@@ -771,10 +777,10 @@ public final class SupremicaProperties
 	}
 
 
-    // BDD 
+    // BDD
     	public static int getBDDAlgorithm(){  return toInt(wp.getProperty(BDD_ALGORITHM));    }
     	public static void setBDDAlgorithm(int a){  wp.setProperty(BDD_ALGORITHM, toString(a));    }
-    
+
 	public static boolean getBDDShowGrow(){  return toBoolean(wp.getProperty(BDD_SHOW_GROW));    }
     	public static void setBDDShowGrow(boolean a){  wp.setProperty(BDD_SHOW_GROW, toString(a));    }
 
@@ -788,7 +794,7 @@ public final class SupremicaProperties
     	public static void setBDDDebugOn(boolean a){  wp.setProperty(BDD_DEBUG_ON, toString(a));    }
 
     /*
-     * The problem is that we got to copies of BDD Options.    
+     * The problem is that we got to copies of BDD Options.
      * This will make sure they are both updated
      */
     public static void updateBDDOptions(boolean from_Options) {
@@ -801,14 +807,14 @@ public final class SupremicaProperties
 	    setBDDTraceOn(Options.trace_on);
 	} else {
 	    // Properties -> Options
-	    Options.algo_family     = getBDDAlgorithm(); 
+	    Options.algo_family     = getBDDAlgorithm();
 	    Options.show_grow       = getBDDShowGrow();
 	    Options.user_alters_PCG = getBDDAlterPCG();
 	    Options.debug_on        = getBDDDebugOn();
 	    Options.trace_on        = getBDDTraceOn();
 	}
     }
-    
+
 
 	public static boolean showGeneticAlgorithms()
 	{
@@ -820,6 +826,10 @@ public final class SupremicaProperties
 		return toBoolean(wp.getProperty(SHOW_ROBOTSTUDIO_LINK));
 	}
 
+	public static boolean useActiveXBridge()
+	{
+		return toBoolean(wp.getProperty(USE_ACTIVEX_BRIDGE));
+	}
 
 	private static String toString(boolean b)
 	{
