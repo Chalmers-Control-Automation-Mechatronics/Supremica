@@ -81,6 +81,13 @@ public class TestAlgo
 		Options.ALGO_SMOOTHED_DELAYED_STAR_MONO,
 	};
 
+	// These are the algorithms that use the H1/H2 heuristic paris
+	private static final int [] H1H2_HEURISTIC_ALGOS = {
+		Options.ALGO_DISJUNCTIVE_WORKSET,
+		Options.ALGO_SMOOTHED_MONO_WORKSET,
+		Options.ALGO_PETRINET,
+	};
+
 	// ----------------------------------------------------------------------------------
 	private static int find(String file)
 	{
@@ -555,13 +562,14 @@ public class TestAlgo
 		int oldh2 = Options.ndas_heuristics;
 		oldalgo = Options.algo_family;
 
-		for(int r = 0; r < 2; r++) {
+		for(int r = 0; r < H1H2_HEURISTIC_ALGOS.length; r++) {
 			// H1 and H2 works only with workset and mono workset
-			Options.algo_family = (r == 0) ? Options.ALGO_DISJUNCTIVE_WORKSET : Options.ALGO_SMOOTHED_MONO_WORKSET;
+			Options.algo_family = H1H2_HEURISTIC_ALGOS[r];
 			System.out.println("Reachability Algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 
 			// test H1:
 			Options.ndas_heuristics = Options.NDAS_RANDOM; // fix H2 to random
+
 			for(int i = 1; i < Options.ES_HEURISTIC_NAMES.length; i++) // first one is interactive!
 			{
 				announce("  H1=" + Options.ES_HEURISTIC_NAMES[i]);
@@ -636,17 +644,23 @@ public class TestAlgo
 		}
 
 
+		System.out.println("\n\n");
 		if (fail == 0)
 		{
-			System.out.println("All " + pass + " tests passed ");
+			System.out.println("All " + pass + " tests PASSED");
 		}
 		else
 		{
 			System.out.println("" + fail + ((fail == 1)
 											? " test FAILED"
 											: " tests FAILED"));
-			System.exit(20);    // old C habbit...
 		}
+
+		System.out.println("\n\n");
+
+		// old C habbit, makes the launcher (Make, ANT, etc) to fail too
+		System.exit( fail == 0 ? 0 : 20);
+
 	}
 
 	public static void main(String[] args)
@@ -689,6 +703,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.23  2004/10/13 13:25:42  vahidi
+ *** empty log message ***
+
  Revision 1.22  2004/09/29 12:40:17  vahidi
  minor or major changed related to ordering
 

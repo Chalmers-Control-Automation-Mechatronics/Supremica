@@ -16,7 +16,6 @@ public class BDDSimpleGrow
 	private BDDAutomata manager;
 	private SimpleStatCanvas canvas;
 
-	private double sum;
 	private int curr;
 	private boolean working;
 
@@ -26,7 +25,6 @@ public class BDDSimpleGrow
 		this.manager = manager;
 
 		curr = 0;
-		sum = 0.0;
 		working = true;
 
 		setVisible(false);
@@ -41,7 +39,6 @@ public class BDDSimpleGrow
 	public void add(int bdd)
 	{
 		curr = manager.nodeCount(bdd);
-		sum += curr;
 		super.add(curr);
 	}
 
@@ -81,19 +78,16 @@ public class BDDSimpleGrow
 
 		public void paint(Graphics g) {
 
-
 			// color depends on if we are done or not
 			g.setColor( working ? Color.black : Color.red);
 
-
 			int count =  iterations();
-			g.drawString("Iterations   : " + iterations(), 10,30);
+			g.drawString("Iterations   : " + count, 10,30);
 			g.drawString("Last size    : " + finalValue() , 10,50);
 			g.drawString("Max size     : " + maxValue() , 10,70);
 
 			if(count > 0) {
-				int avg = (int)( sum /  count);
-				g.drawString("Average Size : " + avg, 10, 90);
+				g.drawString("Average Size : " + average() , 10, 90);
 			}
 		}
 	}

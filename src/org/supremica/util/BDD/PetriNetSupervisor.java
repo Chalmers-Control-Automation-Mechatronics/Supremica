@@ -88,6 +88,11 @@ public class PetriNetSupervisor
 		{
 			ic = new InteractiveChoice("Petri net interactive event selection");
 		}
+			else if(heuristic == Options.ES_ADAPTIVE)
+		{
+			// XXX: no adaptive heuristics exists here yet, lets switch to something that we know works most of the time:
+			heuristic = Options.ES_HEURISTIC_MOST_MEMBERS;
+		}
 	}
 
 	// -----------------------------------------------------------------
@@ -230,60 +235,6 @@ public class PetriNetSupervisor
 			}
 			break;
 
-/*
-		// currently removed, becuase these names are rembed from automata H1 heurtsics
-		// and we dont want to duplicate everything now
-		case Options.ES_PN_HEURISTIC_MOST_FOLLOWERS :
-			best = 0;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (workset[i] > 0)
-				{
-					int c = forward
-							? pet[i].getNumberOfNextEvents()
-							: pet[i].getNumberOfPrevEvents();
-
-					if (c > best)
-					{
-						best = c;
-						queue_size = 0;
-					}
-
-					if (c == best)
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-
-		case Options.ES_PN_HEURISTIC_LEAST_FOLLOWERS :
-			best = Integer.MAX_VALUE;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (workset[i] > 0)
-				{
-					int c = forward
-							? pet[i].getNumberOfNextEvents()
-							: pet[i].getNumberOfPrevEvents();
-
-					if (c < best)
-					{
-						best = c;
-						queue_size = 0;
-					}
-
-					if (c == best)
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-		*/
-
 		case Options.ES_HEURISTIC_MOST_MEMBERS :
 			best = 0;
 
@@ -315,6 +266,58 @@ public class PetriNetSupervisor
 				if (workset[i] > 0)
 				{
 					int c = pet[i].getNumberOfAutomata();
+
+					if (c < best)
+					{
+						best = c;
+						queue_size = 0;
+					}
+
+					if (c == best)
+					{
+						queue[queue_size++] = i;
+					}
+				}
+			}
+			break;
+
+		// These last two does not exactly work the same way their automata counterparts work.
+		// So we chose something that seemed to work good enough
+		case Options.ES_LEAST_ADDITIONAL_EVENTS :
+			best = 0;
+
+			for (int i = 0; i < size; i++)
+			{
+				if (workset[i] > 0)
+				{
+					int c = forward
+							? pet[i].getNumberOfNextEvents()
+							: pet[i].getNumberOfPrevEvents();
+
+					if (c > best)
+					{
+						best = c;
+						queue_size = 0;
+					}
+
+					if (c == best)
+					{
+						queue[queue_size++] = i;
+					}
+				}
+			}
+			break;
+
+		case Options.ES_MOST_SHARED_EVENTS :
+			best = Integer.MAX_VALUE;
+
+			for (int i = 0; i < size; i++)
+			{
+				if (workset[i] > 0)
+				{
+					int c = forward
+							? pet[i].getNumberOfNextEvents()
+							: pet[i].getNumberOfPrevEvents();
 
 					if (c < best)
 					{

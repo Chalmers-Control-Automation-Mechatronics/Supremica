@@ -101,7 +101,7 @@ public final class SupremicaProperties
 
 	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
 
-	// WHAT IS RCP!?!?!???! IS THAT INTUITIVELY CLEAR OR HAD IT BEEN A GOOD IDEA TO WRITE 
+	// WHAT IS RCP!?!?!???! IS THAT INTUITIVELY CLEAR OR HAD IT BEEN A GOOD IDEA TO WRITE
 	// AN ENLIGHTENING COMMENT??!! Grrrrrrr...
 	private static final String GENERAL_USE_RCP = "generalUseRcp";
 
@@ -149,6 +149,7 @@ public final class SupremicaProperties
 
 	// BDD Options. note that these mirror the stuff in org.supremica.util.BDD.Options
 	private static final String BDD_SHOW_GROW = "bddShowGrowth";
+	private static final String BDD_SIZE_WATCH = "bddSizeWatch";
 	private static final String BDD_ALTER_PCG = "bddAlterPCG";
 	private static final String BDD_TRACE_ON = "bddTraceOn";
 	private static final String BDD_DEBUG_ON = "bddDebugOn";
@@ -196,7 +197,7 @@ public final class SupremicaProperties
 	private static Vector softplcInterfaces = new Vector();
 
 	// Robot coordination Options
-	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination"; 
+	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
 
 	// Junk
 	private static final String SHOW_ROBOTSTUDIO_LINK = "showRobotstudioLink"; // Hugo's old stuff
@@ -304,7 +305,7 @@ public final class SupremicaProperties
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
 		setProperty(SHOW_COORDINATION_ABB, "false", true);
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
-		
+
 		// Junk
 		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
 	}
@@ -723,7 +724,7 @@ public final class SupremicaProperties
 		wp.setProperty(GENERAL_USE_ROBOTCOORDINATION, toString(allow));
 	}
 
-	/* WHAT'S THE DIFFERENCE!??!? WHY IS THERE A DIFFERENCE!! WASN'T THE WHOLE BLOODY 
+	/* WHAT'S THE DIFFERENCE!??!? WHY IS THERE A DIFFERENCE!! WASN'T THE WHOLE BLOODY
 	   POINT THAT THERE WOULDN'T BE A DIFFERENCE? AAARGH. I'M SO UPSET!!!
 	public static boolean generalUseRobotCoordinationABB()
 	{
@@ -1375,6 +1376,7 @@ public final class SupremicaProperties
 			// Options -> Properties
 			setOption(BDD_ALGORITHM, Options.algo_family);
 			setOption(BDD_SHOW_GROW, Options.show_grow);
+			setOption(BDD_SIZE_WATCH, Options.size_watch);
 			setOption(BDD_ALTER_PCG, Options.user_alters_PCG);
 			setOption(BDD_DEBUG_ON, Options.debug_on);
 			setOption(BDD_PROFILE_ON, Options.profile_on);
@@ -1404,6 +1406,7 @@ public final class SupremicaProperties
 			// Properties -> Options
 			Options.algo_family = optionAsInt(BDD_ALGORITHM, Options.algo_family);
 			Options.show_grow = optionAsInt(BDD_SHOW_GROW, Options.show_grow);
+			Options.size_watch = optionAsBoolean(BDD_SIZE_WATCH, Options.size_watch);
 			Options.user_alters_PCG = optionAsBoolean(BDD_ALTER_PCG, Options.user_alters_PCG);
 			Options.debug_on = optionAsBoolean(BDD_DEBUG_ON, Options.debug_on);
 			Options.uc_optimistic = optionAsBoolean(BDD_UC_OPTIMISTIC, Options.uc_optimistic);

@@ -22,6 +22,7 @@ public class GrowFrame
 	private Marker marker_root, marker_last;
 	protected String title;
 	protected int min_value, max_value, last_value, count;
+	private double sum;
 
 
 	// ---------------------------------------------------------------
@@ -73,6 +74,7 @@ public class GrowFrame
 		this.min_value = Integer.MAX_VALUE;
 		this.last_value = 0;
 		this.count = 0;
+		this.sum = 0.0;
 
 		add(status = new Label(), BorderLayout.SOUTH);
 
@@ -101,8 +103,18 @@ public class GrowFrame
 	 */
 	public void stopTimer()
 	{
+
+		if(stopped) return; // already stopped
+
 		end_time = System.currentTimeMillis();
 		stopped = true;
+
+		// print some stats
+		if(Options.profile_on) {
+			Options.out.println("[GrowFrame] Fixpoint in " + iterations() + " iterations and " + totalTime() + " [ms]:");
+			Options.out.println("[GrowFrame] VALUES: final=" + finalValue() + ", max=" + maxValue() + ", average=" + average() );
+		}
+
 
 		bAbort.setVisible(false);
 
@@ -115,6 +127,7 @@ public class GrowFrame
 		end_time = System.currentTimeMillis();
 
 		// remeber it
+		sum += value;
 		count++;
 		last_value = value;
 
@@ -218,6 +231,10 @@ public class GrowFrame
 		fw.close();
 	}
 
+	public int average() {
+		if(count == 0) return 0;
+		else return (int)(sum / count);
+	}
 	// -------------------------------------------------------------
 	private void onDump()
 	{

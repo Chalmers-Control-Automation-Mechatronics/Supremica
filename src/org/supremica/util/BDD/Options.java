@@ -226,7 +226,7 @@ public class Options
 														  "Topologically last",
 														  "Ring",
 														  "Reinforcement learning",
-														  "Reinforcement learning (taboo)" };
+														  "Reinforcement learning/Taboo" };
 	public static final int NDAS_RANDOM = 0, NDAS_FIRST = 1, NDAS_LAST = 2,
 							NDAS_RING = 3, NDAS_RL = 4, NDAS_RL_TABU = 5;
 	public static int ndas_heuristics = NDAS_RL_TABU;

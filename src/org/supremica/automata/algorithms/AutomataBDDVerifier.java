@@ -185,6 +185,11 @@ public class AutomataBDDVerifier
 		ba.deref(intersection);
 		ba.deref(not_c);
 
+		if(Options.debug_on)
+		{
+			Options.out.println("[AutomataBDDVerifier] The system is " + (is_nonblocking ? "non-blocking" : "blocking"));
+		}
+
 		return is_nonblocking;
 	}
 
@@ -214,6 +219,11 @@ public class AutomataBDDVerifier
 		}
 
 		ba.deref(Q_u);    // we own this BDD
+
+		if(Options.debug_on)
+		{
+			Options.out.println("[AutomataBDDVerifier] The system is " + (is_controllable ? "controllable" : "uncontrollable"));
+		}
 
 		return is_controllable;
 	}

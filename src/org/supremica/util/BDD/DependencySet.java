@@ -43,7 +43,6 @@ public class DependencySet
 			map_dependency[i] = true;
 		}
 
-		SizeWatch.setOwner("DependencySet -> " + getName());
 
 		// get dependet set, compute bdd_keep_others at the same time
 		BDDAutomaton[] queue = new BDDAutomaton[all.length];
@@ -77,6 +76,7 @@ public class DependencySet
 
 					// tmp.add( all[i]);
 					bdd_cube = manager.and(bdd_cube, all[i].getCube());
+
 				}
 				else
 				{
@@ -87,6 +87,7 @@ public class DependencySet
 			}
 		}
 
+		SizeWatch.setOwner(getName() + " (" + len + ")"); // XXX: we set owner first here because we need the dependency size!
 		SizeWatch.report(bdd_keep_others, "keep_others");
 
 		// get an array with correct size:
@@ -104,7 +105,8 @@ public class DependencySet
 
 		for (i = 0; i < len; i++)
 		{
-			BDDAutomaton a_i = dependent[len - i - 1];
+			// XXX: if we do this (i) in reverse order, thing get much slower for some reason:
+			BDDAutomaton a_i = dependent[i];
 
 			// TWave
 			int common_events = manager.and(a_i.getSigma(), me.getSigma());
@@ -121,7 +123,11 @@ public class DependencySet
 			manager.deref(keep);
 			SizeWatch.report(dep_move, "dep-move_" + a_i.getName());
 
-			follow = manager.andTo(follow, dep_move);
+			// DEBUG
+			// Options.out.println("SIZE dep_move = " + manager.nodeCount(dep_move) );
+			// Options.out.println("SIZE follow = " + manager.nodeCount(follow) );
+
+			follow = manager.andTo(follow, dep_move);	// XXX: here things get a bit slow
 
 			manager.deref(dep_move);
 
