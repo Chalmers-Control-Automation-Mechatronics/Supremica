@@ -147,7 +147,7 @@ public class Events
  	public Event getEventWithIndex(int index)
 		throws Exception
 	{
-     	Iterator eventIt = iterator();
+     		Iterator eventIt = iterator();
 
 		while (eventIt.hasNext())
   		{
@@ -178,6 +178,21 @@ public class Events
 	public Collection values()
 	{
 		return theEvents.values();
+	}
+
+	public final void rebuild()
+	{
+		TreeMap newEvents = new TreeMap();
+		// theEvents = new TreeMap(orgEvents.theEvents);
+		// Deep copy
+		for(Iterator it = iterator(); it.hasNext(); )
+		{
+
+			Event currEvent = (Event)it.next();
+			newEvents.put(currEvent.getLabel(), currEvent);
+		}
+		theEvents.clear();
+		theEvents = newEvents;
 	}
 
 }

@@ -172,6 +172,7 @@ public class Alphabet
 
 	public void rehash()
 	{
+		rebuild();
 		Event event;
 		Iterator eventIt = iterator();
 		idMap.clear();

@@ -12,13 +12,15 @@ import org.supremica.automata.Arc;
 // Builds a Philo automaton
 class Philosopher
 {
-	static State[] states = { 	new State("s0"), 
-								new State("lu"), // left fork picked up
-								new State("ru"), // right fork picked up
-								new State("eat"),
-								new State("ld"), // left fork put down
-								new State("rd") // right fork put down
- 							};
+	static State[] states =
+	{
+		new State("s0"),
+		new State("lu"), // left fork picked up
+		new State("ru"), // right fork picked up
+		new State("eat"),
+		new State("ld"), // left fork put down
+		new State("rd") // right fork put down
+ 	};
  							
  	static final int INIT = 0;
  	static final int L_UP = 1;
@@ -27,11 +29,13 @@ class Philosopher
  	static final int L_DN = 4;
  	static final int R_DN = 5;
  	
-	static Event[] events = { 	new Event("L_take"), // pick up left
-								new Event("R_take"), // pick up right
-								new Event("L_put"), // put down left
-								new Event("R_put"), // put down right
-							};
+	static Event[] events = 
+	{ 	
+		new Event("L_take"), // pick up left
+		new Event("R_take"), // pick up right
+		new Event("L_put"), // put down left
+		new Event("R_put"), // put down right
+	};
 	
 	static final int L_TAKE = 0;
 	static final int R_TAKE = 1;
@@ -45,7 +49,9 @@ class Philosopher
 		throws Exception
 	{
 		if(inited)
+		{
 			return;
+		}
 
 		// Here we create the "template" automaton, philo
 		philo = new Automaton("Philo template");
@@ -59,7 +65,8 @@ class Philosopher
 			philo.addState(states[i]);
 		}
 		
-		// Now the events, these should be (re)named uniquely for each philosopher (each fork-pair, actually)
+		// Now the events, these should be (re)named uniquely for each philosopher 
+		// (each fork-pair, actually)
 		events[L_TAKE].setControllable(l_take);
 		events[R_TAKE].setControllable(r_take);
 		events[L_PUT].setControllable(l_put);
@@ -70,7 +77,8 @@ class Philosopher
 			philo.getAlphabet().addEvent(events[i]);
 		}
 
-		// And finally the arcs - first the left side (where the left is picked up and put down first)
+		// And finally the arcs - first the left side (where the left is picked up 
+		// and put down first)
 		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE].getId()));
 		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE].getId()));
 		philo.addArc(new Arc(states[EAT], states[L_DN], events[L_PUT].getId()));
@@ -95,10 +103,11 @@ class Philosopher
 		// L_put becomes put<id>.<l_fork>
 		// R_put becomes put<id>.<r_fork>
 		Alphabet alpha = sm.getAlphabet();
-		alpha.getEventWithId("L_take").setLabel("take" + id +"." + l_fork);
-		alpha.getEventWithId("R_take").setLabel("take" + id +"." + r_fork);
-		alpha.getEventWithId("L_put").setLabel("put" + id +"." + l_fork);
-		alpha.getEventWithId("R_put").setLabel("put" + id +"." + r_fork);
+		alpha.getEventWithId("L_take").setLabel("take" + id + "." + l_fork);
+		alpha.getEventWithId("R_take").setLabel("take" + id + "." + r_fork);
+		alpha.getEventWithId("L_put").setLabel("put" + id + "." + l_fork);
+		alpha.getEventWithId("R_put").setLabel("put" + id + "." + r_fork);
+		alpha.rehash();
 		return sm;
 	}
 }
@@ -106,11 +115,18 @@ class Philosopher
 // Builds a chopstick automaton
 class Chopstick
 {
-	static State[] states = { new State("0"), new State("1") };
-	static Event[] events = { 	new Event("L_up"), 
-								new Event("R_up"), 
-								new Event("L_dn"), 
-								new Event("R_dn") };
+	static State[] states = 
+	{ 
+		new State("0"), 
+		new State("1") 
+	};
+	static Event[] events = 
+	{
+		new Event("L_up"), 
+		new Event("R_up"), 
+		new Event("L_dn"), 
+		new Event("R_dn") 
+	};
 	static final int L_TAKE = 0;
 	static final int R_TAKE = 1;
 	static final int L_PUT = 2;
@@ -163,7 +179,7 @@ class Chopstick
 		alpha.getEventWithId("R_up").setLabel("take" + r_philo + "." + id);		
 		alpha.getEventWithId("L_dn").setLabel("put" + l_philo + "." + id);		
 		alpha.getEventWithId("R_dn").setLabel("put" + r_philo + "." + id);	
-			
+		alpha.rehash();
 		return sm;	
 	}
 }
