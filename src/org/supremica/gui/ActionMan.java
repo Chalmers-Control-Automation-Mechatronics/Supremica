@@ -18,7 +18,7 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.Gui;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
-import org.supremica.gui.TestCasesDialog;
+// import org.supremica.gui.TestCasesDialog;
 
 public class ActionMan
 {
@@ -918,7 +918,7 @@ public class ActionMan
 	static PreferencesDialog thePreferencesDialog = null;
 	public static void configurePreferences_actionPerformed(Gui gui)
 	{
-		
+
 		if (thePreferencesDialog == null)
 		{
 			thePreferencesDialog = new PreferencesDialog(gui.getFrame());
@@ -1023,7 +1023,7 @@ public class ActionMan
 	{
 		openAutomataXMLFile(gui, file);
 	}
-	
+
 	public static void openAutomataXMLFile(Gui gui, File file)
 	{
 		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
@@ -1287,9 +1287,10 @@ public class ActionMan
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata
-	public static void testCases(Gui gui) 
+	public static void testCases(Gui gui)
 		throws Exception
 	{
+		/*
 		TestCasesDialog tc_dlg = new TestCasesDialog(gui.getFrame());
 		tc_dlg.show();
 		Automata automata = tc_dlg.getAutomata();
@@ -1297,7 +1298,7 @@ public class ActionMan
 		{
 			gui.addAutomata(automata);
 		}
+		*/
 	}
-	
+
 } // ActionMan
-	
