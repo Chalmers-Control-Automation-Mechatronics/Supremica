@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	xmlns:B="http://supremica.org/xsd"
+	version="1.0">  
+  
+ <xsd:element name='DataType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Identification' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref='VersionInfo' maxOccurs='unbounded'/>
+    <xsd:element ref='CompilerInfo' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref='ASN1Tag' minOccurs='0' maxOccurs='1'/>
+    <xsd:choice>
+     <xsd:element ref='DirectlyDerivedType'/>
+     <xsd:element ref='EnumeratedType'/>
+     <xsd:element ref='SubrangeType'/>
+     <xsd:element ref='ArrayType'/>
+     <xsd:element ref='StructuredType'/>
+    </xsd:choice>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Identification'>
+  <xsd:complexType>
+   <xsd:attribute name='Standard' type='xsd:string' use='optional'/>
+   <xsd:attribute name='Classification' type='xsd:string' use='optional'/>
+   <xsd:attribute name='ApplicationDomain' type='xsd:string' use='optional'/>
+   <xsd:attribute name='Function' type='xsd:string' use='optional'/>
+   <xsd:attribute name='Type' type='xsd:string' use='optional'/>
+   <xsd:attribute name='Description' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='VersionInfo'>
+  <xsd:complexType>
+   <xsd:attribute name='Organization' type='xsd:string' use='required'/>
+   <xsd:attribute name='Version' type='xsd:string' use='required'/>
+   <xsd:attribute name='Author' type='xsd:string' use='required'/>
+   <xsd:attribute name='Date' type='xsd:string' use='required'/>
+   <xsd:attribute name='Remarks' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ASN1Tag'>
+  <xsd:complexType>
+   <xsd:attribute name='Class' use='optional'>
+       <xsd:annotation>
+       <xsd:appinfo>
+          <jaxb:property name="ASNClass"/>
+       </xsd:appinfo>
+       </xsd:annotation>
+
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='UNIVERSAL'/>
+      <xsd:enumeration value='APPLICATION'/>
+      <xsd:enumeration value='CONTEXT'/>
+      <xsd:enumeration value='PRIVATE'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='Number' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='CompilerInfo'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Compiler' minOccurs='0' maxOccurs='unbounded'/>
+   </xsd:sequence>
+   <xsd:attribute name='header' type='xsd:string' use='optional'/>
+   <xsd:attribute name='classdef' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Compiler'>
+  <xsd:complexType>
+   <xsd:attribute name='Language' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='Java'/>
+      <xsd:enumeration value='Cpp'/>
+      <xsd:enumeration value='C'/>
+      <xsd:enumeration value='Other'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='Vendor' type='xsd:string' use='required'/>
+   <xsd:attribute name='Product' type='xsd:string' use='required'/>
+   <xsd:attribute name='Version' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='DirectlyDerivedType'>
+  <xsd:complexType>
+   <xsd:attribute name='BaseType' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='BOOL'/>
+      <xsd:enumeration value='SINT'/>
+      <xsd:enumeration value='INT'/>
+      <xsd:enumeration value='DINT'/>
+      <xsd:enumeration value='LINT'/>
+      <xsd:enumeration value='USINT'/>
+      <xsd:enumeration value='UINT'/>
+      <xsd:enumeration value='UDINT'/>
+      <xsd:enumeration value='ULINT'/>
+      <xsd:enumeration value='REAL'/>
+      <xsd:enumeration value='LREAL'/>
+      <xsd:enumeration value='TIME'/>
+      <xsd:enumeration value='DATE'/>
+      <xsd:enumeration value='TIME_OF_DAY'/>
+      <xsd:enumeration value='DATE_AND_TIME'/>
+      <xsd:enumeration value='STRING'/>
+      <xsd:enumeration value='BYTE'/>
+      <xsd:enumeration value='WORD'/>
+      <xsd:enumeration value='DWORD'/>
+      <xsd:enumeration value='LWORD'/>
+      <xsd:enumeration value='WSTRING'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='EnumeratedType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='EnumeratedValue' maxOccurs='unbounded'/>
+   </xsd:sequence>
+   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='EnumeratedValue'>
+  <xsd:complexType>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='SubrangeType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange'/>
+   </xsd:sequence>
+   <xsd:attribute name='BaseType' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='SINT'/>
+      <xsd:enumeration value='INT'/>
+      <xsd:enumeration value='DINT'/>
+      <xsd:enumeration value='LINT'/>
+      <xsd:enumeration value='USINT'/>
+      <xsd:enumeration value='UINT'/>
+      <xsd:enumeration value='UDINT'/>
+      <xsd:enumeration value='ULINT'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='InitialValue' type='xsd:int' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Subrange'>
+  <xsd:complexType>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="SubrangeInternalType"/>
+   </xsd:appinfo>
+  </xsd:annotation>
+   <xsd:attribute name='LowerLimit' type='xsd:int' use='required'/>
+   <xsd:attribute name='UpperLimit' type='xsd:int' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ArrayType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange' maxOccurs='unbounded'/>
+   </xsd:sequence>
+   <xsd:attribute name='BaseType' type='xsd:string' use='required'/>
+   <xsd:attribute name='InitialValues' type='xsd:string' use='optional'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='StructuredType'>
+  <xsd:complexType>
+   <xsd:choice maxOccurs='unbounded'>
+    <xsd:element ref='VarDeclaration'/>
+    <xsd:element ref='ArrayVarDeclaration'/>
+    <xsd:element ref='SubrangeVarDeclaration'/>
+   </xsd:choice>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='VarDeclaration'>
+  <xsd:complexType>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ArrayVarDeclaration'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange' maxOccurs='unbounded'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name='InitialValues' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='SubrangeVarDeclaration'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange' minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Type' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='SINT'/>
+      <xsd:enumeration value='INT'/>
+      <xsd:enumeration value='DINT'/>
+      <xsd:enumeration value='LINT'/>
+      <xsd:enumeration value='USINT'/>
+      <xsd:enumeration value='UINT'/>
+      <xsd:enumeration value='UDINT'/>
+      <xsd:enumeration value='ULINT'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='Comment' type='xsd:string' use='optional'/>
+   <xsd:attribute name='InitialValue' type='xsd:int' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+</xsd:schema>
+

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	xmlns:B="http://supremica.org/xsd"
+	version="1.0">  
+
+ <xsd:element name='Request'>
+  <xsd:complexType>
+   <xsd:choice>
+    <xsd:element ref='FB'/>
+    <xsd:element ref='Connection'/>
+    <xsd:element ref='FBType'/>
+    <xsd:element ref='AdapterType'/>
+    <xsd:element ref='DataType'/>
+   </xsd:choice>
+   <xsd:attribute name='ID' type='xsd:string' use='required'/>
+   <xsd:attribute name='Action' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='CREATE'/>
+      <xsd:enumeration value='DELETE'/>
+      <xsd:enumeration value='START'/>
+      <xsd:enumeration value='STOP'/>
+      <xsd:enumeration value='KILL'/>
+      <xsd:enumeration value='QUERY'/>
+      <xsd:enumeration value='READ'/>
+      <xsd:enumeration value='WRITE'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Response'>
+  <xsd:complexType>
+   <xsd:choice minOccurs='0' maxOccurs='1'>
+    <xsd:element ref='FB'/>
+    <xsd:sequence>
+     <xsd:element ref='Connection' minOccurs="1" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:element ref='FBType'/>
+    <xsd:element ref='AdapterType'/>
+    <xsd:element ref='DataType'/>
+    <xsd:element ref='NameList'/>
+    <xsd:element ref='FBList'/>
+    <xsd:element ref='EndpointList'/>
+    <xsd:element ref='FBStatus'/>
+   </xsd:choice>
+   <xsd:attribute name='ID' type='xsd:string' use='required'/>
+   <xsd:attribute name='Reason' use='optional'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='NOT_READY'/>
+      <xsd:enumeration value='UNSUPPORTED_CMD'/>
+      <xsd:enumeration value='UNSUPPORTED_TYPE'/>
+      <xsd:enumeration value='NO_SUCH_OBJECT'/>
+      <xsd:enumeration value='INVALID_OBJECT'/>
+      <xsd:enumeration value='INVALID_OPERATION'/>
+      <xsd:enumeration value='INVALID_STATE'/>
+      <xsd:enumeration value='OVERFLOW'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='NameList'>
+  <xsd:complexType mixed='true'>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='FBList'>
+  <xsd:complexType mixed='true'>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='EndpointList'>
+  <xsd:complexType mixed='true'>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='FBStatus'>
+  <xsd:complexType>
+   <xsd:attribute name='Status' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='INITIALIZED'/>
+      <xsd:enumeration value='WAITING'/>
+      <xsd:enumeration value='EVALUATING'/>
+      <xsd:enumeration value='PROCESSING'/>
+      <xsd:enumeration value='STOPPED'/>
+      <xsd:enumeration value='KILLED'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ByteData'>
+  <xsd:complexType mixed='true'>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='VersionInfo'>
+  <xsd:complexType>
+   <xsd:attribute name='Organization' type='xsd:string' use='required'/>
+   <xsd:attribute name='Version' type='xsd:string' use='required'/>
+   <xsd:attribute name='Date' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='FB'>
+  <xsd:complexType>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="FBInternalType"/>
+   </xsd:appinfo>
+  </xsd:annotation>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Connection'>
+  <xsd:complexType>
+   <xsd:attribute name='Source' type='xsd:string' use='required'/>
+   <xsd:attribute name='Destination' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='VarDeclaration'>
+  <xsd:complexType>
+   <xsd:attribute name='Name' type='xsd:ID' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+   <xsd:attribute name='ArraySize' type='xsd:int' use='optional'/>
+   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='FBType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='VersionInfo'/>
+    <xsd:element ref='InterfaceList'/>
+    <xsd:element ref='ByteData' minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='InterfaceList'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='EventInputs' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref='EventOutputs' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref='InputVars' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref='OutputVars' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref='Sockets' minOccurs='0' maxOccurs='1'/>
+    <xsd:element ref='Plugs' minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='EventInputs'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Event' maxOccurs='unbounded'/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='EventOutputs'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Event' maxOccurs='unbounded'/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='InputVars'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='VarDeclaration' maxOccurs='unbounded'/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='OutputVars'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='VarDeclaration' maxOccurs='unbounded'/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Sockets'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='AdapterDeclaration' maxOccurs='unbounded'/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Plugs'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='AdapterDeclaration' maxOccurs='unbounded'/>
+   </xsd:sequence>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Event'>
+  <xsd:complexType>
+   <xsd:attribute name='Name' type='xsd:ID' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='optional'/>
+   <xsd:attribute name='With' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='AdapterDeclaration'>
+  <xsd:complexType>
+   <xsd:attribute name='Name' type='xsd:ID' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='AdapterType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='VersionInfo'/>
+    <xsd:element ref='InterfaceList'/>
+    <xsd:element ref='ByteData' minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:ID' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='DataType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='VersionInfo'/>
+    <xsd:element ref='ASN1Tag'/>
+    <xsd:choice>
+     <xsd:element ref='DirectlyDerivedType'/>
+     <xsd:element ref='EnumeratedType'/>
+     <xsd:element ref='SubrangeType'/>
+     <xsd:element ref='ArrayType'/>
+     <xsd:element ref='StructuredType'/>
+    </xsd:choice>
+    <xsd:element ref='ByteData' minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:ID' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ASN1Tag'>
+  <xsd:complexType>
+   <xsd:attribute name='Class' use='optional'>
+       <xsd:annotation>
+       <xsd:appinfo>
+          <jaxb:property name="ASNClass"/>
+       </xsd:appinfo>
+       </xsd:annotation>
+       
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='UNIVERSAL'/>
+      <xsd:enumeration value='APPLICATION'/>
+      <xsd:enumeration value='CONTEXT'/>
+      <xsd:enumeration value='PRIVATE'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='Number' type='xsd:string' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='DirectlyDerivedType'>
+  <xsd:complexType>
+   <xsd:attribute name='BaseType' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='BOOL'/>
+      <xsd:enumeration value='SINT'/>
+      <xsd:enumeration value='INT'/>
+      <xsd:enumeration value='DINT'/>
+      <xsd:enumeration value='LINT'/>
+      <xsd:enumeration value='USINT'/>
+      <xsd:enumeration value='UINT'/>
+      <xsd:enumeration value='UDINT'/>
+      <xsd:enumeration value='ULINT'/>
+      <xsd:enumeration value='REAL'/>
+      <xsd:enumeration value='LREAL'/>
+      <xsd:enumeration value='TIME'/>
+      <xsd:enumeration value='DATE'/>
+      <xsd:enumeration value='TIME_OF_DAY'/>
+      <xsd:enumeration value='DATE_AND_TIME'/>
+      <xsd:enumeration value='STRING'/>
+      <xsd:enumeration value='BYTE'/>
+      <xsd:enumeration value='WORD'/>
+      <xsd:enumeration value='DWORD'/>
+      <xsd:enumeration value='LWORD'/>
+      <xsd:enumeration value='WSTRING'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='EnumeratedType'>
+  <xsd:complexType mixed='true'>
+   <xsd:attribute name='InitialValue' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='SubrangeType'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange'/>
+   </xsd:sequence>
+   <xsd:attribute name='BaseType' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='SINT'/>
+      <xsd:enumeration value='INT'/>
+      <xsd:enumeration value='DINT'/>
+      <xsd:enumeration value='LINT'/>
+      <xsd:enumeration value='USINT'/>
+      <xsd:enumeration value='UINT'/>
+      <xsd:enumeration value='UDINT'/>
+      <xsd:enumeration value='ULINT'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='InitialValue' type='xsd:int' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='Subrange'>
+  <xsd:complexType>
+  <xsd:annotation>
+   <xsd:appinfo>
+    <jaxb:class name="SubrangeInternalType"/>
+   </xsd:appinfo>
+  </xsd:annotation>
+   <xsd:attribute name='LowerLimit' type='xsd:int' use='required'/>
+   <xsd:attribute name='UpperLimit' type='xsd:int' use='required'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ArrayType'>
+  <xsd:complexType>
+   <xsd:sequence maxOccurs='unbounded'>
+    <xsd:element ref='Subrange'/>
+   </xsd:sequence>
+   <xsd:attribute name='BaseType' type='xsd:string' use='required'/>
+   <xsd:attribute name='InitialValues' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='StructuredType'>
+  <xsd:complexType>
+   <xsd:choice maxOccurs='unbounded'>
+    <xsd:element ref='VarDeclaration'/>
+    <xsd:element ref='ArrayVarDeclaration'/>
+    <xsd:element ref='SubrangeVarDeclaration'/>
+   </xsd:choice>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='ArrayVarDeclaration'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange' maxOccurs='unbounded'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:ID' use='required'/>
+   <xsd:attribute name='Type' type='xsd:string' use='required'/>
+   <xsd:attribute name='InitialValues' type='xsd:string' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+
+ <xsd:element name='SubrangeVarDeclaration'>
+  <xsd:complexType>
+   <xsd:sequence>
+    <xsd:element ref='Subrange' minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
+   <xsd:attribute name='Name' type='xsd:ID' use='required'/>
+   <xsd:attribute name='Type' use='required'>
+    <xsd:simpleType>
+     <xsd:restriction base='xsd:string'>
+      <xsd:enumeration value='SINT'/>
+      <xsd:enumeration value='INT'/>
+      <xsd:enumeration value='DINT'/>
+      <xsd:enumeration value='LINT'/>
+      <xsd:enumeration value='USINT'/>
+      <xsd:enumeration value='UINT'/>
+      <xsd:enumeration value='UDINT'/>
+      <xsd:enumeration value='ULINT'/>
+     </xsd:restriction>
+    </xsd:simpleType>
+   </xsd:attribute>
+   <xsd:attribute name='InitialValue' type='xsd:int' use='optional'/>
+  </xsd:complexType>
+ </xsd:element>
+</xsd:schema>
