@@ -462,7 +462,14 @@ public class ProjectBuildFromXml
 
 		Arc a = new Arc(sourceState, destState, event);
 
-		currAutomaton.addArc(a);
+		try
+		{
+			currAutomaton.addArc(a);
+		}
+		catch (Exception ex)
+		{
+			throw new SAXException(ex);
+		}
 	}
 
 	public final void throwException(String msg)

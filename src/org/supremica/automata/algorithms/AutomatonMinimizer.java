@@ -169,6 +169,7 @@ public class AutomatonMinimizer
 	}
 
 	private Automaton buildAutomaton(EquivalenceClasses equivClasses)
+		throws Exception
 	{
 		Automaton newAutomaton = new Automaton();
 

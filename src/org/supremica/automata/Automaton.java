@@ -299,8 +299,13 @@ public class Automaton
 	 * behavior is undefined.
 	 */
 	public void addArc(Arc arc)
+		throws Exception
 	{
 		arc.getListeners().addListener(this);
+		if (!containsEvent(arc.getEventId()))
+		{
+			throw new Exception("Automaton.addArc: " + arc.getEventId() + " is not included in the alphabet");
+		}
 		theArcs.addArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
 	}
@@ -357,6 +362,11 @@ public class Automaton
 	public String getStateNameWithIndex(int index)
 	{
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
+	}
+
+	public boolean containsEvent(String eventId)
+	{
+		return alphabet.containsEventWithId(eventId);
 	}
 
 	public LabeledEvent getEvent(String eventId)

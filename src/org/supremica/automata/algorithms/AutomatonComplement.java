@@ -66,6 +66,7 @@ public class AutomatonComplement
 	}
 
 	public Automaton execute()
+		throws Exception
 	{
 		Alphabet alphabet = theAutomaton.getAlphabet();
 		State newState = null;
