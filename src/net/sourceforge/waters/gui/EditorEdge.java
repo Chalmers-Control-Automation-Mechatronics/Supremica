@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.12 2005-03-04 03:52:47 flordal Exp $
+//# $Id: EditorEdge.java,v 1.13 2005-03-04 04:03:55 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -135,8 +135,8 @@ public class EditorEdge
 			}
 		}
 
-		// Initialize the edge
-		//updateControlPoint(getCPointX(), getCPointY(), false);
+		// Initialize the edge (somehow this strange call does exactly what we want)
+		setTPoint(getTPointX(), getTPointY());
 
 		type = EDGE;
 	}
@@ -510,6 +510,10 @@ public class EditorEdge
 
 		// If ox and oy are 0, this becomes 0...
 		double divide = Math.pow(ox, 2) + Math.pow(oy, 2);
+		if (divide == 0)
+		{
+			divide += Double.MIN_VALUE;
+		}
 
 		// ... which is not good here!
 		double a1 = (Newx * ox + oy * Newy) / divide;
