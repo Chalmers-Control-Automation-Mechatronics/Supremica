@@ -571,6 +571,8 @@
 <target name="startfiles_supremica" depends="startfiles_local_supremica,startfiles_supremica_student,startfiles_supremica_teacher">
 	<copy file="${templates}/Waters.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Waters.cmd" perm="644"/>
+	<copy file="${templates}/Waters" todir="${dist}"/>	
+	<chmod file="${dist}/Waters" perm="644"/>	
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	

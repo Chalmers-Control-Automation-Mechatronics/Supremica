@@ -48,9 +48,13 @@ Supremica is following.
 	Note, if you do not have licensed versions of JGo then the trial version
 	will be used. The trial JGo files are in the CVS, but not the licensed 
 	files. This implies that you have to manually update the licensed files.
-	
 
-2. Compiling
+2. Create a build.properties file
+
+	Copy build.properties.sample (in the Supremica root directory)
+	to build.properties. Update the paths inside the file.
+
+3. Compiling
 
 	To compile Supremica you need to have Ant, Jikes and JAXB installed.
 	See the links at the bottom of the page.
@@ -91,7 +95,7 @@ Supremica is following.
 		compile_supremica, build_supremica, rebuild_supremica,
 		compile_jgrafchart, build_jgrafchart, rebuild_jgrafchart.
 	
-3. Run
+4. Run
 	Two alternatives:
 	
 	i. Enter Supremica/dist, write:
@@ -110,15 +114,15 @@ Supremica is following.
 	be able to double-click on Supremica/dist/Supremica.jar
 	in the Explorer.
 
-4. Update
+5. Update
 	Enter the Supremica directory, write:
 	> cvs update -d -P
 
-5. Commit changes
+6. Commit changes
  	Enter the Supremica directory, write:
 	> cvs commit
 
-6. Add a new file into cvs
+7. Add a new file into cvs
 	Enter the directory where the file resides, write:
 	cvs add filename.java
 
