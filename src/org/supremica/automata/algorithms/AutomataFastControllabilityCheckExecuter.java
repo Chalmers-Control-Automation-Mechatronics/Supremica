@@ -58,6 +58,7 @@ import java.util.ArrayList;
 public final class AutomataFastControllabilityCheckExecuter
 	extends Thread
 {
+	/* // DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
 	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheckExecuter.class.getName());
 
 	private final AutomataSynchronizerHelper helper;
@@ -265,7 +266,6 @@ public final class AutomataFastControllabilityCheckExecuter
 		currEnabledEvents[nbrOfEnabledEvents] = Integer.MAX_VALUE;
     }
 
-
     public void run()
     {
     	initialize();
@@ -431,7 +431,7 @@ public final class AutomataFastControllabilityCheckExecuter
 		    }
 	    }
     }
-
+	
     public String printArray(int[] theArray)
     {
 		StringBuffer sb = new StringBuffer();
@@ -522,6 +522,6 @@ public final class AutomataFastControllabilityCheckExecuter
 	  }
 	  }
     */
-
+	// */
 }
 

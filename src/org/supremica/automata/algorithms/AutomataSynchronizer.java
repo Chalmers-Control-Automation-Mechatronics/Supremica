@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.gui.*;
 import org.apache.log4j.*;
 
@@ -57,6 +58,7 @@ import java.util.*;
 import java.io.PrintWriter;
 
 public class AutomataSynchronizer
+	implements Stoppable
 {
    	private static Category thisCategory =
 		LogDisplay.createCategory(AutomataSynchronizer.class.getName());
@@ -67,6 +69,9 @@ public class AutomataSynchronizer
 	private SynchronizationOptions syncOptions;
 
    	private ArrayList synchronizationExecuters;
+
+	// For stopping execution
+	private boolean stopRequested = false;
 
 	public AutomataSynchronizer(Automata theAutomata,
 		SynchronizationOptions syncOptions)
@@ -113,14 +118,35 @@ public class AutomataSynchronizer
 				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
 			currExec.start();
 		}
-  		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+		// synchHelper.setCancelDialog(cancelDialog);
+		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+		// cancelDialog.destroy();
 	}
-
+	
  	public Automaton getAutomaton()
   	{
 		AutomataSynchronizerExecuter currExec =
 			(AutomataSynchronizerExecuter)synchronizationExecuters.get(0);
-		currExec.buildAutomaton();
-   		return synchHelper.getAutomaton();
+		if (currExec.buildAutomaton())
+		{
+			// System.out.println(synchHelper.getAutomaton() == null);
+			return synchHelper.getAutomaton();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	public AutomataSynchronizerHelper getHelper()
+	{
+		return synchHelper;
+	}
+
+	public void requestStop()
+	{
+		stopRequested = true;		
+		for (int i = 0; i < synchronizationExecuters.size(); i++)
+			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
 	}
 }

@@ -65,6 +65,7 @@ public final class SynchronizationOptions
 	private final boolean terminateIfUnconState;
 	private final boolean buildAutomaton;
 	private final boolean expandEventsUsingPriority;
+	private final boolean verboseMode;
 
 
 	public SynchronizationOptions()
@@ -79,7 +80,8 @@ public final class SynchronizationOptions
 			WorkbenchProperties.syncExpandForbiddenStates(),
 			false,
 			false,
-			true
+			true,
+			WorkbenchProperties.verboseMode()
 		);
 	}
 
@@ -91,7 +93,8 @@ public final class SynchronizationOptions
 		boolean expandForbiddenStates,
 		boolean terminateIfUnconState,
 		boolean expandEventsUsingPriority,
-		boolean buildAutomaton)
+		boolean buildAutomaton,
+		boolean verboseMode)
 		throws Exception
 	{
 		if (syncType == null)
@@ -114,8 +117,8 @@ public final class SynchronizationOptions
 		this.expandForbiddenStates = expandForbiddenStates;
 		this.terminateIfUnconState = terminateIfUnconState;
 		this.expandEventsUsingPriority = expandEventsUsingPriority;
-
 		this.buildAutomaton = buildAutomaton;
+		this.verboseMode = verboseMode;
 	}
 
 	public int getNbrOfExecuters()
@@ -156,6 +159,11 @@ public final class SynchronizationOptions
 	public boolean expandEventsUsingPriority()
 	{
 		return expandEventsUsingPriority;
+	}
+
+	public boolean verboseMode()
+	{
+		return verboseMode;
 	}
 
 	/**

@@ -101,6 +101,12 @@ public final class AutomataSynchronizerHelper
 
 	// For synchronizing without recalculating the AutomataIndexForm
 	private boolean[] activeAutomata;
+
+	// For counting states in cancelDialog
+	private CancelDialog cancelDialog = null;
+
+	// Verbose mode
+	private boolean verboseMode;
 	
  	public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
  		throws Exception
@@ -116,6 +122,7 @@ public final class AutomataSynchronizerHelper
 
 		this.theAutomata = theAutomata;
 		this.syncOptions = syncOptions;
+		verboseMode = syncOptions.verboseMode();
     	statesToProcess = new LinkedList();
 		nbrOfStatesToProcess = 0;
 
@@ -265,10 +272,9 @@ public final class AutomataSynchronizerHelper
 			}
             addStatus(newState);
         	addStateToProcess(newState);
-			if (++nbrOfAddedStates % 10000 == 0)
-			{
-				thisCategory.debug(nbrOfAddedStates + " new states found so far.");
-			}
+			if (verboseMode)
+				if (++nbrOfAddedStates % 10000 == 0)
+					thisCategory.debug(nbrOfAddedStates + " new states found so far.");
         }
 		else
 		{
@@ -277,11 +283,25 @@ public final class AutomataSynchronizerHelper
 				fromStateList.removeLast();
 			}
 		}
-  		if (++nbrOfCheckedStates % 10000 == 0)
+  		if (++nbrOfCheckedStates % 1000 == 0)
 		{
-			thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
+			if (cancelDialog != null)
+				cancelDialog.updateCounter(nbrOfCheckedStates);
+			if (verboseMode)
+				if (nbrOfCheckedStates % 10000 == 0)
+					thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
 		}
     }
+
+   	public void setCancelDialog(CancelDialog cancelDialog)
+	{
+		this.cancelDialog = cancelDialog;
+	}
+
+	public CancelDialog getCancelDialog()
+	{
+		return cancelDialog;
+	}
 
     /**
      * If the toState does not exist then make a copy of this state

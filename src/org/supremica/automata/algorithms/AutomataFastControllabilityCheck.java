@@ -82,8 +82,8 @@ public class AutomataFastControllabilityCheck
 	private int stateAmount = 1;
 	private int stateAmountLimit = 1000;
 
-	// Quiet mode
-	private boolean quiet = true;
+	// Verbose mode
+	private boolean verboseMode;
 
     public AutomataFastControllabilityCheck(Automata theAutomata, SynchronizationOptions syncOptions)
 		throws IllegalArgumentException
@@ -95,6 +95,7 @@ public class AutomataFastControllabilityCheck
 
 	    initialState = new int[theAutomata.size() + 1]; // + 1 status field
 		nbrOfExecuters = syncOptions.getNbrOfExecuters();
+		verboseMode = syncOptions.verboseMode();
 		this.syncOptions = syncOptions;
 
 		try
@@ -201,7 +202,7 @@ public class AutomataFastControllabilityCheck
 
 					if (synchHelper.getAutomataIsControllable())
 					{	// Very nice
-						if (!quiet)
+						if (verboseMode)
 							thisCategory.info(automataNames + "is controllable.");
 					}
 					else
@@ -213,18 +214,18 @@ public class AutomataFastControllabilityCheck
 						{
 							automataIndices[i] = ((Automaton) selectedAutomata.get(i)).getIndex();
 						}
-						if (!quiet)
+						if (verboseMode)
 							thisCategory.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
 
 						// Sort automata in order of similar alphabets
 						int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 						if (similarAutomata != null)
-							if (!quiet)
+							if (verboseMode)
 								thisCategory.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 
 						for (int attempt = 1; attempt <= 5; attempt++)
 						{
-							if (!quiet)
+							if (verboseMode)
 								thisCategory.info("Attempt number " + attempt + ", stateAmountLimit: " + stateAmountLimit + ".");
 							
 							if (similarAutomata != null)
@@ -235,19 +236,19 @@ public class AutomataFastControllabilityCheck
 							
 							if (potentiallyUncontrollableStates.size(automataIndices) > 0)
 							{
-								if (!quiet)
+								if (verboseMode)
 									thisCategory.info("Couldn't proove controllability, trying to proove uncontrollability...");
 								
 								// Try to prove remaining states in the stateMemorizer as beeing uncontrollable	
 								if (findUncontrollableStates(theAutomata, automataIndices))
 								{   // Print the uncontrollable state(s)...
-									if (!quiet)
+									if (verboseMode)
 										synchHelper.printUncontrollableStates();
 									// Print event trace reaching uncontrollable state
-									if (!quiet)
+									if (verboseMode)
 										synchHelper.displayTrace();
 									// Print info on amount of states examined
-									if (!quiet)
+									if (verboseMode)
 										synchHelper.displayInfo();
 									return false;
 								}
@@ -263,7 +264,7 @@ public class AutomataFastControllabilityCheck
 						{
 							// We now have no idea what so ever on the controllability... we choose to give up.
 							// Print remaining suspected uncontrollable state(s)
-							if (!quiet)
+							if (verboseMode)
 							{
 								thisCategory.info("Unfortunately the following states might be uncontrollable...");
 								synchHelper.printUncontrollableStates(automataIndices);
@@ -277,10 +278,10 @@ public class AutomataFastControllabilityCheck
 		}
 		if (nbrOfUncontrollableStates > 1)
 		{
-			if (!quiet)
+			if (verboseMode)
 				thisCategory.info("Can't proove either controllability or uncontrollability. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this automata uncontrollable.");
 		}
-		if (!quiet)
+		if (verboseMode)
 			synchHelper.displayInfo();
 		return allSupervisorsControllable;
 	}
@@ -388,7 +389,7 @@ public class AutomataFastControllabilityCheck
 
 		if (start == similarAutomata.length)
 		{   // Already added all similar automata
-			if (!quiet)
+			if (verboseMode)
 				thisCategory.info("All similar automata are already added, there is no hope for prooving controllability...");
 			return;
 		}
@@ -436,7 +437,7 @@ public class AutomataFastControllabilityCheck
  						stateCount++;
 					}
 				}
-				if (!quiet)
+				if (verboseMode)
 					thisCategory.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 				stateAmount = stateCount;
 				// Remove states in the stateMemorizer that are not represented in the new
@@ -448,17 +449,17 @@ public class AutomataFastControllabilityCheck
 				int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
 				if  (statesLeft == 0)
 				{
-					if (!quiet)
+					if (verboseMode)
 						thisCategory.info("No uncontrollable states left after adding" + addedAutomata + ".");
 					return;
 				}
 				else
 				{
 					if  (statesLeft == 1)
-						if (!quiet)
+						if (verboseMode)
 							thisCategory.info("Still one state left after adding" + addedAutomata + ".");
 					else
-						if (!quiet)
+						if (verboseMode)
 							thisCategory.info("Still " + statesLeft + " states left after adding" + addedAutomata + ".");
 				}
 

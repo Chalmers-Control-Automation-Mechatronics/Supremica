@@ -103,6 +103,12 @@ public final class AutomataSynchronizerExecuter
 	// For "one event at a time"-execution
 	private int currUncontrollableEvent = -1;
 
+	// For stopping of thread
+	private boolean stopRequested = false;
+
+	// Verbose mode
+	private boolean verboseMode;
+
     public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
     {
         helper = synchronizerHelper;
@@ -131,6 +137,7 @@ public final class AutomataSynchronizerExecuter
 		syncType = syncOptions.getSynchronizationType();
 		forbidUncontrollableStates = syncOptions.forbidUncontrollableStates();
 		expandForbiddenStates = syncOptions.expandForbiddenStates();
+		verboseMode = syncOptions.verboseMode();
 		if (rememberUncontrollable)
 		{
 			expandForbiddenStates = false;
@@ -348,8 +355,8 @@ public final class AutomataSynchronizerExecuter
 				//
 				if (exhaustiveSearch)
 				{   // Stop when uncontrollable state found
-					// thisCategory.info("The automata is uncontrollable.");
-					// System.err.println("Uncontrollable state found!!!!!");
+					if (verboseMode)
+						thisCategory.info("Uncontrollable state found.");
 					return;
 				}
 			}
@@ -422,7 +429,7 @@ public final class AutomataSynchronizerExecuter
        	int[] currState = helper.getStateToProcess();
 
  		// main loop
-     	while (currState != null)
+     	while (currState != null && !stopRequested)
      	{
 			if (coExecute)
 				coExecuter.setCurrState(currState);
@@ -488,12 +495,17 @@ public final class AutomataSynchronizerExecuter
         }
     }
 
-	public void buildAutomaton()
+	public void requestStop()
+	{
+		stopRequested = true;
+	}
+
+	public boolean buildAutomaton()
     {
-		buildAutomaton(true);
+		return buildAutomaton(true);
 	}
 	
-	public void buildAutomaton(boolean longformId)
+	public boolean buildAutomaton(boolean longformId)
     {
         Automaton theAutomaton = helper.getAutomaton();
         theAutomaton.setName("regaut");
@@ -505,6 +517,15 @@ public final class AutomataSynchronizerExecuter
         // Create all states
 		for (int i = 0; i < currStateTable.length; i++)
   		{
+			if (stopRequested)
+			{
+				theAlphabet = null;
+				theAutomaton = null;
+				// theAutomaton.setDisabled(true);
+				// System.out.println(theAutomaton == null);
+				// System.out.println(helper.getAutomaton() == null);
+				return false;
+			}
 			if (currStateTable[i] != null)
    			{
 				int[] currState = currStateTable[i];
@@ -534,12 +555,23 @@ public final class AutomataSynchronizerExecuter
           		newState.setLast(AutomataIndexFormHelper.isLast(currState));
 
           		theAutomaton.addState(newState);
-          	}
+			}
         }
+
+		System.out.println("State building complete...");
 
         // Create all transitions
  		for (int k = 0; k < currStateTable.length; k++)
   		{
+			if (stopRequested)
+			{
+				theAlphabet = null;
+				theAutomaton = null;
+				// theAutomaton.setDisabled(true);
+				// System.out.println(theAutomaton == null);
+				// System.out.println(helper.getAutomaton() == null);
+				return false;
+			}
 			if (currStateTable[k] != null)
    			{
 				int[] currState = currStateTable[k];
@@ -592,6 +624,8 @@ public final class AutomataSynchronizerExecuter
           	}
         }
 
+		System.out.println("Transition building complete...");
+
         if (helper.isAllAutomataPlants())
         {
 			theAutomaton.setType(AutomatonType.Plant);
@@ -608,6 +642,8 @@ public final class AutomataSynchronizerExecuter
 		{
 			theAutomaton.setType(AutomatonType.Undefined);
 		}
+		
+		return true;
     }
 
     public String printTypeIsPlantTable()
