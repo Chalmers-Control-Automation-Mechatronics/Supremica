@@ -64,6 +64,9 @@ import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.Animator;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
+import org.supremica.gui.recipeEditor.RecipeEditor;
+import org.supremica.gui.cellEditor.CellEditor;
+
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -79,6 +82,8 @@ public class VisualProject
 	private Animator theAnimator = null;	// Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private SimulatorExecuter theSimulator = null;	// Lazy construction
+	private RecipeEditor theRecipeEditor = null;	// Lazy construction
+	private CellEditor theCellEditor = null;	// Lazy construction
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
 	private HashMap theAutomatonDocumentContainer = new HashMap();
@@ -488,6 +493,29 @@ public class VisualProject
 		theSimulator.setVisible(true);
 		return theSimulator;
 	}
+
+	public CellEditor getCellEditor()
+		throws Exception
+	{
+		if (theCellEditor == null)
+		{
+			theCellEditor = org.supremica.gui.cellEditor.CellEditor.createEditor(this);
+		}
+		theCellEditor.setVisible(true);
+		return theCellEditor;
+	}
+
+	public RecipeEditor getRecipeEditor()
+		throws Exception
+	{
+		if (theRecipeEditor == null)
+		{
+			theRecipeEditor = org.supremica.gui.recipeEditor.RecipeEditor.createEditor(this);
+		}
+		theRecipeEditor.setVisible(true);
+		return theRecipeEditor;
+	}
+
 
 	public void clearSimulationData()
 	{

@@ -5,15 +5,10 @@
 
 
 
-###
-### Jindent 3.5b1 property file -- http://www.jindent.com
-###
-
-
 
 ### Jindent property format
 
-version                                   = "3.5b1"
+version                                   = "3.5"
 
 
 
@@ -61,7 +56,7 @@ blankLinesAfterFooter                     = 0
 tabulatorSize                             = 4
 indentSize                                = 4
 firstLevelIndent                          = 0
-indentCaseFromSwitch                      = false
+indentCaseFromSwitch                      = 0
 labelNewLine                              = true
 indentLabels                              = true
 
@@ -376,3 +371,6 @@ alwaysWrapImplements                      = true
 indentWrappedThrows                       = 4
 indentWrappedExtends                      = 4
 indentWrappedImplements                   = 4
+
+spaceBeforeAssertColon                    = true
+spaceAfterAssertColon                     = true

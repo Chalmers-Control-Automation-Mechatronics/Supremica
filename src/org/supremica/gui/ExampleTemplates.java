@@ -145,6 +145,8 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
 		thisGroup.addItem(new TemplateItem("Rotation Table", prefix + "rotationTable.xml"));
+		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));
+
 	}
 
 	private void initializeAIPExamples()

@@ -68,6 +68,8 @@ import org.supremica.gui.help.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
+import org.supremica.gui.recipeEditor.RecipeEditor;
+import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
@@ -3027,6 +3029,38 @@ public class ActionMan
 		}
 
 		logger.info("Java Bytecode file successfully generated");
+	}
+
+	public static void startRecipeEditor(Gui gui)
+	{
+		try
+		{
+			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
+			VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
+			theProject.getRecipeEditor();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception while getting Recipe Editor");
+			logger.debug(ex.getStackTrace());
+			return;
+		}
+	}
+
+	public static void startCellEditor(Gui gui)
+	{
+		try
+		{
+			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
+			VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
+			theProject.getCellEditor();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception while getting Recipe Editor");
+			logger.debug(ex.getStackTrace());
+			return;
+		}
 	}
 }
 

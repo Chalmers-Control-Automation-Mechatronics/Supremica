@@ -668,6 +668,34 @@ public class MainMenuBar
 			});
 		}
 
+		menuTools.add(new JSeparator());
+
+		JMenuItem menuToolsCellEditor = new JMenuItem();
+
+		menuToolsCellEditor.setText("Cell Editor...");
+		menuTools.add(menuToolsCellEditor);
+		menuToolsCellEditor.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.startCellEditor(ActionMan.getGui());
+			}
+		});
+
+		JMenuItem menuToolsRecipeEditor = new JMenuItem();
+
+		menuToolsRecipeEditor.setText("Recipe Editor...");
+		menuTools.add(menuToolsRecipeEditor);
+		menuToolsRecipeEditor.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.startRecipeEditor(ActionMan.getGui());
+			}
+		});
+
+		menuTools.add(new JSeparator());
+
 		// Tools.CodeGeneration
 		JMenu menuToolsCodeGeneration = new JMenu();
 
