@@ -137,7 +137,7 @@ public class AutomatonDocument
 	{
 
 		JGoLabeledLink ll = new JGoLabeledLink(from.getPort(), to.getPort());
-/*		//JGoText textLabel = new JGoText(label);
+		//JGoText textLabel = new JGoText(label);
 		Labels labels = null;
 		try
 		{
@@ -152,7 +152,6 @@ public class AutomatonDocument
 		ll.setPen(getLinkPen());
 		addObjectAtHead(ll);
 		ll.setArrowHeads(false, true);
-*/
 		return ll;
 	}
 
@@ -248,7 +247,7 @@ public class AutomatonDocument
 
 	public void build()
 	{
-/*
+
 		HashMap stateToStateNodeMap = new HashMap(theAutomaton.nbrOfStates());
 
 		// First add all states
@@ -279,7 +278,6 @@ public class AutomatonDocument
 
 		setLayoutNeeded(true);
 		//setLayoutNeeded(!theAutomaton.hasLayout());
-*/
 	}
 
 }
