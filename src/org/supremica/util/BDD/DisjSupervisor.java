@@ -41,9 +41,13 @@ public class DisjSupervisor
 	// --------------------------------------------------------
 	private void init_disj()
 	{
+
+		timer.reset();
 		disj_partition = null;    // not needed yet
 		dop = new DisjOptimizer(manager, gh);
 		disj_size = dop.getSize();
+
+		timer.report("Disjunctive partitions created");
 	}
 
 	protected DisjPartition getDisjPartition()

@@ -29,8 +29,8 @@ public class AOH_Force
 
 	// some internal constants
 	private final static int MAX_ROUNDS = 10;	// number of rounds
-	private final static int MIN_ITR = 10;	// min iterations in a round
-	private final static double STOP_CONST_C = 4; // constant c in the paper
+	private final static int MIN_ITR = 20;	// min iterations in a round
+	private final static double STOP_CONST_C = 6; // constant c in the paper
 
 
 	private int[] order;
@@ -82,11 +82,13 @@ public class AOH_Force
 		double best_span = Double.MAX_VALUE;
 
 
-		for(int rounds = 0; rounds < 55; rounds ++) {
+		for(int rounds = 0; rounds < 100; rounds ++) {
 
 			// get inital order
-			if(rounds < MAX_ROUNDS / 2) 	create_dfs_order();
-			else create_random_order();
+			switch( rounds % 2) {
+				case 0: create_dfs_order(); break;
+				case 1: create_random_order(); break;
+			}
 
 
 			// do a series of iterations

@@ -98,15 +98,21 @@ public class DependencySet
 			dependent[i] = queue[i];
 		}
 
-		// calc Twave etc
-		int follow = manager.ref(manager.getOne());
 
+
+		// calc Twave etc
 		bdd_i = manager.ref(me.getI());
+
+
+		BDDArrayOperation bao = new BDDArrayOperation(manager); // NEW
+		bao.add(me.getT() ); // NEW
+
 
 		for (i = 0; i < len; i++)
 		{
 			// XXX: if we do this (i) in reverse order, thing get much slower for some reason:
 			BDDAutomaton a_i = dependent[i];
+
 
 			// TWave
 			int common_events = manager.and(a_i.getSigma(), me.getSigma());
@@ -123,21 +129,16 @@ public class DependencySet
 			manager.deref(keep);
 			SizeWatch.report(dep_move, "dep-move_" + a_i.getName());
 
-			// DEBUG
-			// Options.out.println("SIZE dep_move = " + manager.nodeCount(dep_move) );
-			// Options.out.println("SIZE follow = " + manager.nodeCount(follow) );
-
-			follow = manager.andTo(follow, dep_move);	// XXX: here things get a bit slow
-
+			bao.add(dep_move); // NEW
 			manager.deref(dep_move);
 
 			// I
 			bdd_i = manager.andTo(bdd_i, a_i.getI());
 		}
 
-		int tmp3 = manager.and(me.getT(), follow);
 
-		manager.deref(follow);
+		int tmp3 = bao.andAll(); // NEW
+		bao.cleanup(); // NEW
 
 		tmp3 = manager.andTo(tmp3, event_mask);    // <-- must remove unused crap!
 		bdd_t_wave_isolated = manager.exists(tmp3, manager.getEventCube());    // XXX: why dones this one includes event-variables ??
