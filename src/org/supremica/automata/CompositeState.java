@@ -53,13 +53,10 @@ import org.supremica.log.*;
 
 public class CompositeState extends State
 {
-	//private ArrayList theStates;
-//	private int[] theStates;
-
 	private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
 	
 	/** The indices of the underlying states */
-//rivate int[] compositeIndices = null;
+//private int[] compositeIndices = null;
 	
 	/** The costs corresponding to the underlying states */
 	private int[] compositeCosts = null;
@@ -71,20 +68,9 @@ public class CompositeState extends State
 	 */
 	private int[] currentCosts = null;
 	
-	/** 
-	 * Stores the cost accumulated from the initial state until this one.
-	 * The value depends normally (if synchronized automaton) on the path to this state.
-	 */
-	private int accumulatedCost = -1;
-	
 	private ArrayList composingStates;
 	
-	// Behövs den??? )(och theStates också...)
-/*	public CompositeState(int capacity)
-	{
-		theStates = new ArrayList(capacity);
-	}
-*/	
+	
 	public CompositeState(State state) 
 	{
 		super(state);	
@@ -92,6 +78,10 @@ public class CompositeState extends State
 	
 	public CompositeState(String id) {
 		super(id);	
+	}
+	
+	public CompositeState(int[] indices, Automata compositeAutomata) {
+		this("non_def", indices, compositeAutomata);
 	}
 	
 	public CompositeState(String id, int[] indices, Automata compositeAutomata) 
@@ -151,16 +141,6 @@ public class CompositeState extends State
 		accumulatedCost = 0;
 	}
 
-/*	public State getStateAt(int index)
-	{
-		return (State) theStates.get(index);
-	}
-
-	public void setStateAt(int index, State state)
-	{
-		theStates.add(index, state);
-	}
-*/	
 	/**
 	 *	Returns the indices of the underlying states.
 	 */
@@ -183,12 +163,6 @@ public class CompositeState extends State
 	 *	the @link getCost() method in org.supremica.automata.State.java. 
 	 */
 	public int[] getCompositeCosts() { return compositeCosts; }
-	
-	/**
-	 *	Returns the cost accumulated when this state is reached. Note that the 
-	 *	path to the state is of importance. 
-	 */
-	public int getAccumulatedCost() { return accumulatedCost; }
 	
 	/**
 	 *	Returns the current costs associated to this state (keeping in mind the 
@@ -235,39 +209,45 @@ public class CompositeState extends State
 	 *	Calculates the firing automata and other necessary parameters and calls 
 	 *	updateCosts(int[], boolean[], int);
 	 */
-	public void updateCosts(CompositeState prevState) 
+	public void updateCosts(State state) 
 	{
-		if (prevState.isUpdatingCosts()) 
-		{
-			if (prevState.isTimed())
+		if (state instanceof CompositeState) {
+			CompositeState prevState = (CompositeState) state;
+			
+			if (prevState.isUpdatingCosts()) 
 			{
-				boolean[] firingAutomata = new boolean[composingStates.size()];
-				ArrayList prevComposingStates = prevState.getComposingStates();
-				
-				for (int i=0; i<firingAutomata.length; i++) 
+				if (prevState.isTimed())
 				{
-					if (composingStates.get(i).equals(prevComposingStates.get(i)))
-						firingAutomata[i] = false;
-					else
-						firingAutomata[i] = true;
-				}	
-				
-				updateCosts(prevState.getCurrentCosts(), firingAutomata, prevState.getAccumulatedCost());
+					updateCosts(prevState.getCurrentCosts(), getFiringAutomata(prevState), prevState.getAccumulatedCost());
+				}
+				else
+					accumulatedCost = prevState.getAccumulatedCost();
 			}
-			else
-				accumulatedCost = prevState.getAccumulatedCost();
 		}
+		else 
+			super.updateCosts(state);
 	}
 	
 	/**
-	 *	The cost cannot be updated if the path from the initial state to the current
-	 *	state is not remembered. Then the updating shoul be closed. 
+	 *	Calculates the automaton/a that fired the transition from to this state. 
+	 *
+	 *	@param	CompositeState prevState - previously visited state
 	 */
-/*	public void closeCostUpdating() 
-	{
-		accumulatedCost = null;	
+	public boolean[] getFiringAutomata(CompositeState prevState) {
+		boolean[] firingAutomata = new boolean[composingStates.size()];
+		ArrayList prevComposingStates = prevState.getComposingStates();
+		
+		for (int i=0; i<firingAutomata.length; i++) 
+		{
+			if (composingStates.get(i).equals(prevComposingStates.get(i)))
+				firingAutomata[i] = false;
+			else
+				firingAutomata[i] = true;
+		}	
+		
+		return firingAutomata;
 	}
-*/	
+	
 	/**
 	 *	This method checks if this state has underlying costs associated to it. 
 	 *	Otherwise the updating of costs would not make sense. 
@@ -294,40 +274,38 @@ public class CompositeState extends State
 		return (accumulatedCost	> -1);
 	}
 	
+	public ArrayList getComposingStates() { return composingStates; }
+	
 	/**
-	 *	Returns the compositeIndices on a string form (maybe not always very necessary).
+	 *	Copies this state and its variables, 
+	 *	setting the costs undefined (i.e. equal to -1 or 0). 
 	 */
-/*	public String getCompositeIndicesAsString() 
-	{
-		StringBuffer str = new StringBuffer("[");
-		for (int i=0; i<compositeIndices.length-1; i++)
-		{
-			str.append(compositeIndices[i] + " ");
+/*	public State copy() {
+		int size = this.composingStates.size();
+		
+		CompositeState copiedState = new CompositeState(this);
+		
+		copiedState.composingStates = new ArrayList(size);
+		copiedState.compositeCosts = new int[size];
+		copiedState.currentCosts = new int[size];
+		
+		for (int i=0; i<size; i++) {
+			copiedState.compositeCosts[i] = this.compositeCosts[i];
+			
+			if (isInitial())
+				copiedState.currentCosts[i] = this.currentCosts[i];
+			else
+				copiedState.currentCosts[i] = UNDEF_COST;
 		}
 		
-		str.append(compositeIndices[compositeIndices.length-1] + "]");
+		if (isTimed()) 
+			copiedState.accumulatedCost = MIN_COST;
+		else
+			copiedState.accumulatedCost = UNDEF_COST;
+			
+		copiedState.composingStates.addAll(0, this.composingStates);
 		
-		return new String(str);
-	}
-*/	
-	/**
-	 *	Returns the cost vector representing the cost for choosing to move every 
-	 *	one of the composing automata. 
-	 */
-/*	public int[] getNextCosts() { return nextCosts; }
-	
-	public void setNextCosts(int[] costs) {}
-*/	
-/*	public boolean equals(Object state)
-	{
-		return theStates.equals(((CompositeState) state).theStates);
+		return copiedState;
 	}
 */
-/*	public int hashCode()
-	{
-		return theStates.hashCode();
-	}	
-*/
-
-	public ArrayList getComposingStates() { return composingStates; }
 }

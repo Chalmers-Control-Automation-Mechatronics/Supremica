@@ -106,14 +106,16 @@ public class ScheduleDialog2
 				Automaton automaton = mastar.getAutomaton(elem);
 				ActionMan.getGui().addAutomaton(automaton);
 	*/
-				State acceptingState = mastar.walk();
+//				State acceptingState = mastar.walk();
 
-				if(acceptingState == null)
+				Node acceptingNode = mastar.walk();
+
+				if(acceptingNode == null)
 				{
 					throw new RuntimeException("no marked state found");
 				}
-				
-				Automaton schedule = mastar.buildScheduleAutomaton(acceptingState);
+
+				Automaton schedule = mastar.buildScheduleAutomaton(acceptingNode);
 				ActionMan.getGui().addAutomaton(schedule);
 			}		
 		}
