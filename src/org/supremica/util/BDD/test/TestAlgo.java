@@ -34,6 +34,19 @@ public class TestAlgo
 												 "../examples/includeInJarFile/OtherExamples/aip/System4_system4.xml",
 												 "../examples/c3.xml" };
 
+	/**
+	 * Same as TEST_FILES, but for supNBC only. small enough for supNBC algo
+	 */
+	private static final String[] TEST_FILES_SUP = {
+		"../examples/SynthesizerTest.xml",
+		"../examples/includeInJarFile/OtherExamples/catmouse.xml",
+		"../examples/includeInJarFile/OtherExamples/circularTable.xml",
+		"../examples/includeInJarFile/OtherExamples/dosingUnit.xml",
+		"../examples/includeInJarFile/OtherExamples/telecommunicationsNetwork.xml",
+		"../examples/benchmark/simple1.xml",
+		"../examples/includeInJarFile/OtherExamples/agv.xml" // FAILS !!
+	};
+
 	// XXX:         these number probably haev double-floating-point  overflows, so if we count them in some other way we might not
 	//        get exactly the same number for the big ones!
 	private static final double reachables[] = { 10,
@@ -55,9 +68,6 @@ public class TestAlgo
 		Options.ALGO_DISJUNCTIVE_WORKSET,
 		Options.ALGO_DISJUNCTIVE_STEPSTONE
 	};
-
-// which models should we test for sup synthesis??
-	private static final boolean testsup[] = { true, false, true, true, true, false, false, false, false };
 
 
 	// ----------------------------------------------------------------------------------
@@ -363,7 +373,6 @@ public class TestAlgo
 		throws Exception
 	{
 		fail = pass = 0;
-		int len = TEST_FILES.length;
 
 		for (int k = 0; k < 4; k++)
 		{
@@ -451,8 +460,8 @@ public class TestAlgo
 
 
 
-		System.out.println("\n***** Testing DES/SCT algorithms");
-		for (int i = 0; i < len; i++)
+		System.out.println("\n***** Testing DES and SCT/verification algorithms");
+		for (int i = 0; i < TEST_FILES.length; i++)
 		{
 			announce(TEST_FILES[i]);
 			load(TEST_FILES[i]);
@@ -469,12 +478,19 @@ public class TestAlgo
 		}
 
 		System.out.println("\n***** Testing SCT/synthesis algorithms");
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < TEST_FILES_SUP.length; i++)
 		{
-			if(testsup[i]) {
-				System.out.println("Loading " + TEST_FILES[i] + "...");
-				testSupNBC(TEST_FILES[i]);
-			}
+			System.out.println("Loading " + TEST_FILES_SUP[i] + "...");
+
+			// once with reachables
+			System.out.println(" Reachable controllability mode");
+			Options.restrict_subC_to_reachables = true;
+			testSupNBC(TEST_FILES_SUP[i]);
+
+			// once with anything
+			System.out.println(" Dont-care controllability mode");
+			Options.restrict_subC_to_reachables = false;
+			testSupNBC(TEST_FILES_SUP[i]);
 		}
 
 
@@ -533,6 +549,16 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.16  2004/07/09 14:56:01  vahidi
+
+ safe state supNBC support added to the StepStoneSupervisor (not working yet)
+
+
+ testSupNBC have been re-written.
+
+
+ NOTE: testSupNBC fails currently on StepStoneSupervisor and AGV.xml
+
  Revision 1.15  2004/06/29 14:57:14  vahidi
 
  Added workset support for the supNBC algo ==> faster synthesis.
