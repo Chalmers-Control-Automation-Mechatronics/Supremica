@@ -12,8 +12,6 @@ import org.supremica.util.BDD.*;
 
 public class ASH_MostLocal extends AutomatonSelectionHeuristic  {
 	public void choose(int queue_size) {
-
-
 		// further steps:
 		int max = 0;
 		for(int i = 0; i < queue_size; i++) {
@@ -36,8 +34,6 @@ public class ASH_MostLocal extends AutomatonSelectionHeuristic  {
 			}
 			queue_costs[i] += max * count;
 		}
-
-
 
 
 		// sort

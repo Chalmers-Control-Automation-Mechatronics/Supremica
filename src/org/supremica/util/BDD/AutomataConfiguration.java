@@ -111,6 +111,13 @@ public class AutomataConfiguration {
 						int [] current_events_usage)
 	{
 
+		// chrck for trivial solution:
+		if( IndexedSet.cardinality(workset_events) == 0) {
+			if(Options.debug_on)
+				Options.out.println("No need to check " + automaton.getName() + ", no relevant events here...");
+			return false;
+		}
+
 		selected = 1;
 		resetQueue();
 
@@ -143,20 +150,13 @@ public class AutomataConfiguration {
 		}
 		selection[my_index] = true;
 
-
-
 		// events used for dependency analysis!!
-		IndexedSet.copy(automaton.getEventCareSet(false), current_events );
-
-		if( IndexedSet.cardinality(workset_events) == 0) {
-			if(Options.debug_on)
-				Options.out.println("No need to check " + automaton.getName() + ", no relevant events here...");
-			return false;
-		}
+		IndexedSet.copy(current_events, automaton.getEventCareSet(false) );
 
 		// copy the events that should but have not been used in the plants yet:
 		for(int i = 0; i < workset_events.length; i++)
 			workset_events_to_be_used_in_plant[i] = workset_events[i] ? 1 : 0;
+			// workset_events_to_be_used_in_plant[i] = event_care[i] ? 1 : 0;
 
 		addIfInteractWithMe(current_events);
 
@@ -175,11 +175,16 @@ public class AutomataConfiguration {
 		IndexedSet.diff(events, remove, events);
 		IndexedSet.diff(current_events, remove, current_events);
 
+		// we _somehow_ removed these events, so we will ignore from now
+		for(int i = 0; i < workset_events.length; i++)
+			if(remove[i]) workset_events_to_be_used_in_plant[i] = 0;
+
 		// clean what we have on the stack:
 		emptyQueue();
 
 		// and put those that are syill relevant back again
 		addIfInteractWithMe(current_events);
+
 	}
 
 
@@ -237,7 +242,7 @@ public class AutomataConfiguration {
 	private void addIfInteractWith(boolean [] event_careset)
 	{
 		for(int i = 0; i < size_all; i++)
-			if(!selection[i] && all[i].interact(event_careset) && i != my_index) {
+			if(!selection[i]  && i != my_index && all[i].interact(event_careset)) {
 				addSelection(i);
 			}
 	}
@@ -253,13 +258,13 @@ public class AutomataConfiguration {
 	{
 
 		// get new care set:
-		IndexedSet.copy(event_careset, tmp_events);
+		IndexedSet.copy(tmp_events, event_careset);
 		for(int i = 0; i < size_all; i++)
 		{
 			if(selection[i])
 			{
 				// NOT WORKING (same results but more computation)
-				// IndexedSet.copy(event_careset, tmp_events); // we do this copying to avoid adding recursive dependencies
+				// IndexedSet.copy(tmp_events, event_careset); // we do this copying to avoid adding recursive dependencies
 				// all[i].addEventCareSet(tmp_events, false /* all events*/ );
 				// IndexedSet.add(event_careset, tmp_events);
 
@@ -285,7 +290,6 @@ public class AutomataConfiguration {
 	}
 
 	// -- [ helper ] --------------------------------------------------------
-
 
 	/**
 	 * Returns true if the plants toghether include all the considred (uncontrollable for C, all otherwise).
@@ -354,7 +358,7 @@ public class AutomataConfiguration {
 	// -- [ queue ordering heuristics ] ------------------------------------
 
 	private void sort_queue() {
-		heuristic.choose(queue_size /*  , workset_events */);
+		heuristic.choose(queue_size /* , workset_events */);
 		queue_sorted = true;
 	}
 
@@ -371,4 +375,16 @@ public class AutomataConfiguration {
 		bf.append("};");
 		return bf.toString();
 	}
+
+
+	/*
+	// -------- debug
+	public boolean [] heuristic_relevant_events() { return heuristic.getRelevantEvents(); }
+	public boolean [] heuristic_workset_events_to_be_used_in_plant() {
+		boolean [] temp = new boolean[ workset_events.length ];
+		for(int i = 0; i < workset_events.length; i++)
+			temp[i] = workset_events_to_be_used_in_plant[i] > 0;
+		return temp;
+	}
+	*/
 };

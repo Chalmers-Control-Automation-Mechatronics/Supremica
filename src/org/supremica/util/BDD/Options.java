@@ -141,8 +141,8 @@ public class Options
 		// FRONTIER_STRATEGY_RESTRICT = 5,
 		// FRONTIER_STRATEGY_CONSTRAIN = 6,
 		;
-	// public static int frontier_strategy  = FRONTIER_STRATEGY_R;
-	public static int frontier_strategy  = FRONTIER_STRATEGY_FRONT_MINUS_R;
+	public static int frontier_strategy  = FRONTIER_STRATEGY_R;
+	// public static int frontier_strategy  = FRONTIER_STRATEGY_FRONT_MINUS_R;
 
 
 

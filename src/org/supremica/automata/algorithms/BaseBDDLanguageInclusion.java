@@ -24,6 +24,12 @@ import org.supremica.util.BDD.*;
   */
 
 public abstract class BaseBDDLanguageInclusion {
+
+	// these are for any algo that is interested in our statistics!
+	public static int stat_sync_count = 0;
+	public static int stat_sync_max_depth = 0;
+	public static int stat_specs_test = 0;
+
 	protected AutomataSynchronizerHelper.HelperData hd;
 	protected org.supremica.automata.Automata theAutomata;
 
@@ -57,7 +63,7 @@ public abstract class BaseBDDLanguageInclusion {
 	protected int local_events_found = 0, local_events_found_plants = 0;
 
 	/** bd for the local events */
-	protected int bdd_local_events, bdd_local_events_plants;
+	protected int bdd_local_events, bdd_local_events_plants, bdd_events_plants;
 
     /**
      * creates a verification object for LANGUAGE INCLUSION test.
@@ -136,8 +142,14 @@ public abstract class BaseBDDLanguageInclusion {
     public void cleanup() {
 		if(Options.profile_on)	showStatistics();
 
+		// save our statistics if anyone is intrested
+		stat_sync_count = num_syncs_done;
+		stat_sync_max_depth = max_sync_depth+1;
+		stat_specs_test = num_specs_tested;
+
 		if(bdd_local_events != -1) ba.deref(bdd_local_events);
 		if(bdd_local_events_plants != -1) ba.deref(bdd_local_events_plants);
+		if(bdd_events_plants != -1) ba.deref(bdd_events_plants);
 
 		if(work1 != null) work1.cleanup();
 		if(work2 != null) work2.cleanup();
@@ -152,6 +164,7 @@ public abstract class BaseBDDLanguageInclusion {
 
 		bdd_local_events = -1;
 		bdd_local_events_plants = -1;
+		bdd_events_plants = -1;
 
 		// get our working sets
 		work1 = new Group(ba, all.length, "work1");
@@ -254,14 +267,6 @@ public abstract class BaseBDDLanguageInclusion {
 
 	/** intiailize event-counting related stuff for detecting local events */
 	private void init_local_event_detection() {
-		// clean up previous rounds shit
-		if(bdd_local_events != -1) ba.deref(bdd_local_events);
-		if(bdd_local_events_plants != -1) ba.deref(bdd_local_events_plants);
-
-		bdd_local_events_plants = bdd_local_events = ba.getOne();
-		ba.ref(bdd_local_events);
-		ba.ref(bdd_local_events_plants);
-
 
 		// update event_usage_count and event_usage_count_plants
 		ba.getEventManager().getUsageCount(event_usage_count);
@@ -278,16 +283,6 @@ public abstract class BaseBDDLanguageInclusion {
 				event_usage_count_plants[i] = event_usage_count[i];
 			L1.removeEventUsage(event_usage_count_plants);
 		}
-
-
-
-		// initialize local_events_found!! some events might not have been used at all!
-		local_events_found = local_events_found_plants = 0;
-		int len = event_usage_count.length;
-		for(int i = 0; i < len; i++) {
-			if(event_usage_count[i] == 0) local_events_found++;
-			if(event_usage_count_plants[i] == 0) local_events_found_plants++;
-		}
 	}
 
 
@@ -296,11 +291,28 @@ public abstract class BaseBDDLanguageInclusion {
 	 * sp is ALWAYS assumbed to be Spec!
 	 */
 	protected void initialize_event_usage(BDDAutomaton sp) {
-		int len = event_usage_count.length;
 
+		// initialize local_events_found!! some events might not have been used at all!
+		int len = event_usage_count.length;
+		local_events_found_plants = local_events_found = 0;
 		for(int i = 0; i < len; i++) {
 			current_event_usage[i] = event_usage_count[i];
 			current_event_usage_plants[i] = event_usage_count_plants[i];
+
+			/*
+			// -- this is not correct. it added events not in P at too
+			if((local_events_plants[i] = (current_event_usage_plants[i] == 0)) )
+				local_events_found_plants++;
+			*/
+
+
+			// ++ this is better: ignore Sp-only events
+			if(current_event_usage_plants[i] == 0) current_event_usage_plants[i] = Integer.MAX_VALUE;
+			local_events_plants[i] = false;
+
+
+			if( (local_events[i] = (current_event_usage[i] == 0)) )
+				local_events_found++;
 		}
 
 		// since sp is Spec, this wont affect current_event_usage
@@ -310,6 +322,30 @@ public abstract class BaseBDDLanguageInclusion {
 			sp.removeEventUsage(current_event_usage);
 		}
 
+		// clean up previous rounds shit
+		if(bdd_local_events != -1) ba.deref(bdd_local_events);
+		if(bdd_local_events_plants != -1) ba.deref(bdd_local_events_plants);
+		if(bdd_events_plants != -1) ba.deref(bdd_events_plants);
+
+
+		bdd_local_events_plants = ba.getAlphabetSubsetAsBDD(local_events_plants);
+		bdd_local_events        = ba.getAlphabetSubsetAsBDD(local_events);
+		bdd_events_plants       = ba.getZero();
+
+
+		// some debugging stuff
+		if(Options.debug_on && local_events_found_plants  > 0) {
+			Options.out.println("   LL " + local_events_found_plants +
+				" INITIAL plant-local (not in Sigma_P at all) exists.");
+			ba.getEventManager().dumpSubset("   LL initial plant-local events", local_events_plants);
+		}
+
+		if(Options.debug_on && local_events_found > 0) {
+			Options.out.println("   LL " + local_events_found +
+				" INITIAL local exists [this should _not_ happen!]");
+			ba.getEventManager().dumpSubset("   LL initial local events", local_events);
+			// System.exit(0);
+		}
 
 	}
 
@@ -356,6 +392,7 @@ public abstract class BaseBDDLanguageInclusion {
 			}
 		}
 
+		bdd_events_plants = ba.orTo(bdd_events_plants, at.getSigma() );
 		return count;
 	}
 	// -------------------------------------------------------------------------------
@@ -368,10 +405,11 @@ public abstract class BaseBDDLanguageInclusion {
 	 */
 	private boolean handle_addition(BDDAutomaton at) {
 		int local_events_current = register_automaton_addition(at);
+
 		if(local_events_current > local_events_found ) {
 			if(Options.debug_on) {
 				Options.out.println("   LL " + (local_events_current - local_events_found) +
-				" new local events found.");
+					" new local events found.");
 				ba.getEventManager().dumpSubset("   LL Local events", local_events);
 			}
 			local_events_found  = local_events_current;
@@ -380,7 +418,12 @@ public abstract class BaseBDDLanguageInclusion {
 			ba.deref(bdd_local_events);
 			bdd_local_events = ba.getAlphabetSubsetAsBDD(local_events);
 			return true;
+
+		}  else if( local_events_current < local_events_found) {
+			Options.out.println("INTERNAL ERROR!\nhandle_addition returned " + local_events_current + ", had " + local_events_found);
+			System.exit(20);
 		}
+
 		return false;
 	}
 
@@ -394,19 +437,24 @@ public abstract class BaseBDDLanguageInclusion {
 
 		int local_events_plants_current = register_plant_automaton_addition(at);
 		if( local_events_plants_current > local_events_found_plants) {
+
 			if(Options.debug_on) {
 				Options.out.println("   LL " + (local_events_plants_current - local_events_found_plants) +
-				" new plant-local events found.");
+					" new plant-local events found.");
 				ba.getEventManager().dumpSubset("   LL plant-local events", local_events_plants);
 			}
-			local_events_found_plants  = local_events_plants_current;
+
+			local_events_found_plants = local_events_plants_current;
 
 			// update its BDD:
 			ba.deref(bdd_local_events_plants);
 			bdd_local_events_plants = ba.getAlphabetSubsetAsBDD(local_events_plants);
-			return true;
-		}
 
+			return true;
+		} else if( local_events_plants_current < local_events_found_plants) {
+			Options.out.println("INTERNAL ERROR!\nhandle_plant_addition returned " + local_events_plants_current + ", had " + local_events_found_plants);
+			System.exit(20);
+		}
 		return false;
 	}
 
@@ -471,48 +519,73 @@ public abstract class BaseBDDLanguageInclusion {
 	 *
 	 */
 	protected int try_and_remember_local_reachability(Supervisor sup, BDDAutomaton at,
-		boolean is_plant,
-		int bdd_uc, int initial_states)
+		boolean is_plant, int bdd_uc, int initial_states)
 		{
 
 		boolean changed = handle_addition(at);
 		if(is_plant) handle_plant_addition(at);
 
 		if(changed) {
+			// -- OLD CODE
 			// make sure the transition itself is always P-enabled.
 			// this is done by taking does who cannot be blocked anymore:
 			// "all relevant automata alread added --> event is local"
 			// NOTE 1: This is just a lower-bound APPROXIMATION, folks!
 			// NOTE 2: It is sufficient to check only the plants, specs are
 			//         already _proved_ to block this event
-
 			// int bdd_uc_local = ba.and(bdd_uc, bdd_local_events);
+			// int bdd_uc_local = ba.and(bdd_uc, bdd_local_events_plants);
+
+			/*
+			// ++ NEW CODE
+			// make sure we only consider that subset of THETA where its events are also in our
+			// alphabet of plant subset Sigma(J'), and are enabled [they are enabled when they are local]
+			// NOTE that bdd_local_events_plants  is NOT a subset if bdd_events_plants, since the former
+			// also includes events _not_ in P [i.e. in Sigma(J) ] at all
+			int tmp_enabled_AND_used_by_plant = ba.and(bdd_local_events_plants, bdd_events_plants);
+			int bdd_uc_local = ba.and(bdd_uc, tmp_enabled_AND_used_by_plant);
+			ba.deref(tmp_enabled_AND_used_by_plant);
+			*/
+
+			// ++ ++ NEW CODE
+			// this should be ok now, when we are ignoring Sp-only events (see initialize_event_usage() )
 			int bdd_uc_local = ba.and(bdd_uc, bdd_local_events_plants);
+
+
+
+			// XXX: at this stage, we could check if bdd_uc_local is ZERO and omitt the reachability,
+			///     but maybe the gain of finding new locally-reachables for the next round is higher
+			//      than what it costs ???
 
 
 			// now check if that state is still reachable given only those events:
 			int local_r = sup.getReachables(local_events);
 			int tmp_bdd = ba.and(bdd_uc_local, local_r);
 			boolean not_exist = (tmp_bdd == ba.getZero());
+			ba.deref(tmp_bdd);
 			ba.deref(bdd_uc_local);
-
 
 
 			if(not_exist) {
 				// ok, nothing to worry about, we will carry one. just clean up the mess
 				if(Options.debug_on)
 					Options.out.println("Could not prove reachability using local events, continuing...");
-				ba.deref(tmp_bdd);
+
 				return local_r;
 			} else {
 				// we have proved that the a bad state was reachable using LOCAL EVENTS!
 				// no need to proceed, we now we are screwed ;(
-				if(Options.debug_on)
+				if(Options.debug_on) {
 					Options.out.println("A 'bad' state was proved to be reachable by _local events_. we are done!");
 
-				if(Options.trace_on) show_trace(sup, tmp_bdd);
+					// DEBUG stuff
+					// ba.show_events(bdd_events_plants, "plant events");
+					// ba.show_events(bdd_local_events_plants, "local-plant events");
+					// if(bdd_uc_local == ba.getZero()) Options.out.println("bdd_uc_local is ZERO");
+					// if(tmp_enabled_AND_used_by_plant == ba.getZero()) Options.out.println("tmp_enabled_AND_used_by_plant is ZERO");
+				}
 
-				ba.deref(tmp_bdd);
+
 				ba.deref(local_r); // throw this one, we wont need it anymore
 				return ba.getZero();
 			}

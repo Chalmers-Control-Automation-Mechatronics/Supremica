@@ -83,10 +83,10 @@ public class SupervisorFactory {
 
 		if(s1 > Options.MAX_MONOLITHIC_GROUP_SIZE || s1 > Options.MAX_MONOLITHIC_GROUP_SIZE
 			|| (s1 + s2) > Options.MAX_MONOLITHIC_TOTAL_SIZE) {
-			// return new ConjSupervisor(manager,plant, spec);
+			return new ConjSupervisor(manager,plant, spec);
 			// return new PetriNetSupervisor(manager,plant, spec);
 			// System.out.println("\n\n\n----------------- SWITHICHNG\n\n\n\n");
-			return new WorksetSupervisor(manager,plant, spec);
+			// return new WorksetSupervisor(manager,plant, spec);
 		} else {
 			return new Supervisor(manager, plant,spec);
 		}

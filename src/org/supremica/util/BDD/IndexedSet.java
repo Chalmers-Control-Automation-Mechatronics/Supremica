@@ -51,32 +51,32 @@ public class IndexedSet {
 	}
 
 
-	/** create an empty set */
+	/** x := emptyset */
 	public static void empty(boolean [] x)  {
 		int len = x.length;
 		for(int i = 0; i < len; i++) x[i] = false;
 	}
 
-	/** create a  full subset (all elements are memmbers, a universe set) */
+	/** x := universe set */
 	public static void full(boolean [] x)  {
 		int len = x.length;
 		for(int i = 0; i < len; i++) x[i] = true;
 	}
 
-	/** set inverse*/
+	/** set inverse, x - universe */
 	public static void negate(boolean [] x)  {
 		int len = x.length;
 		for(int i = 0; i < len; i++) x[i] = ! x[i];
 	}
 
-	/** create a  full subset (all elements are memmbers, a universe set) */
-	public static void copy(boolean [] src, boolean[] dst)  {
+	/** dst := src */
+	public static void copy(boolean [] dst, boolean[] src)  {
 		int len = src.length;
 		for(int i = 0; i < len; i++) dst[i] = src[i];
 	}
 
 
-	/** compute set diff, left += right, return cardinality */
+	/** left += right */
 	public static void add(boolean [] left, boolean [] right) {
 		int len = left.length;
 		for(int i = 0; i < len; i++)

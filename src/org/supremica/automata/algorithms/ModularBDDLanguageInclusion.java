@@ -107,12 +107,12 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				sup = SupervisorFactory.suggestSupervisorForModularReachability(ba, work2, work1);
 
 
-
+				if(bdd_bad != -1)	ba.deref(bdd_bad);
 				bdd_bad = sup.computeReachableLanguageDifference(bdd_events);
 				boolean ret = (bdd_bad == ba.getZero());
 
 				// proof non-reachability:
-				if(ret) {
+				if(ret && ac.plantIncludesAllConsidredEvents()) {
 					cleanup_bdds();
 					return true;
 				}
@@ -125,24 +125,15 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				}
 
 
-			// XXX: this messes up things. events that are not in P (yet) will be removed and declared
-			//      ok while they are not! this is due to or "dirty trick" in the function
-			// Supervisor.computeLanguageDifference(...) :
-			// tmp2 = manager.andTo(tmp2, plant.getSigma());
-			// anyway, it seems that we can do without it...
-
-			// XXX: On Second Thought, I am not sure if above is correct
+			// TODO: we could remove events that are proved to be ok.
+			//       _but_ we must make sure such events are actually in P, since all events not in P
+			//       are automatically declared OK by Supervisor.computeLanguageDifference(...) :
 
 /*
 				// *** see if some events are proved to be unrachable and can be removed
 				if(event_included(bdd_bad, workset_events, changes) > 0) {
-
-					if(Options.debug_on)
-						ba.getEventManager().dumpSubset("*** Removed events", changes);
-
-					// and remove the targets in the queue waiting to be added
-					ac.removeTargets(workset_events, changes);
-
+					if(Options.debug_on) ba.getEventManager().dumpSubset("*** Removed events", changes);
+					ac.removeTargets(workset_events, changes) // and remove the targets in the queue waiting to be added
 					ba.deref(bdd_events);
 					bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
 				}

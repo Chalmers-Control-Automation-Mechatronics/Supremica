@@ -545,6 +545,7 @@ public class BDDAutomata
 		// the easy way
 		int new_bdd = removeDontCareS(bdd);
 		double states = satCount(new_bdd);
+		// System.out.println("states= " + states + ", div = 2^" + (2 * size_states + size_events));
 		if(states != -1)
 		    states /= Math.pow(2, 2 * size_states + size_events);
 		deref(new_bdd);

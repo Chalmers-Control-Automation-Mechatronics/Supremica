@@ -40,4 +40,10 @@ public abstract class AutomatonSelectionHeuristic {
 	}
 
 	public abstract void choose(int queue_size);
+
+
+	// for debugging only:
+	public boolean [] getRelevantEvents() {
+		return relevant_events;
+	}
 }

@@ -98,6 +98,13 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		if(!sane) return true; // nothing to check
 
 
+		/*
+		// DEBUG STUFF:
+		ba.getEventManager().dumpSubset("+++++++++++ considred_events:",  considred_events);
+		ba.getEventManager().dumpSubset("+++++++++++ workset_events:",  workset_events);
+		// ba.getEventManager().dumpSubset("+++++++++++ current_event_usage:",  current_event_usage);
+		*/
+
 
 		// initialize the table of event usage
 		initialize_event_usage(k);
@@ -168,15 +175,14 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				sup = SupervisorFactory.suggestSupervisorForModularReachability(ba, work2, work1);
 				int r = sup.getReachables(bdd_initial_states);
 
-				bdd_theta= ba.andTo(bdd_theta, r); // see how much of uc was reachable
+				bdd_theta = ba.andTo(bdd_theta, r); // see how much of uc was reachable
 				boolean ret = (bdd_theta == ba.getZero());
 
 
-
-				if(ret) {
+				if(ret && ac.plantIncludesAllConsidredEvents()) {
 					// show that all and nc-arcs where unreachable
 					if(Options.debug_on)
-						ba.getEventManager().dumpSubset("*** Removed events", workset_events);
+						ba.getEventManager().dumpSubset("*** Removed events (all)", workset_events);
 
 					cleanup_bdds();
 					return true;
@@ -293,6 +299,14 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
+			/*
+			// DEBUG:
+			ba.getEventManager().dumpSubset("DEBUG: relevant-events: ", ac.heuristic_relevant_events() );
+			Options.out.println("DEBUG: ac.plantIncludesAllConsidredEvents() = " + ac.plantIncludesAllConsidredEvents());
+			ba.getEventManager().dumpSubset("DEBUG: ac.heuristic_workset_events_to_be_used_in_plant(): ", ac.heuristic_workset_events_to_be_used_in_plant());
+			*/
+
+
 			boolean was_plant = ac.lastAutomatonWasPlant();
 
 			// ++new code
@@ -342,8 +356,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				boolean ret = (bdd_theta == ba.getZero());
 
 
-
-				if(ret) {
+				if(ret && ac.plantIncludesAllConsidredEvents()) {
 					// show that all and nc-arcs where unreachable
 					if(Options.debug_on)
 						ba.getEventManager().dumpSubset("*** Removed events (all)", workset_events);
@@ -361,11 +374,9 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 					// int bdd_theta_relevant = ba.and(bdd_theta, work2.getSigma() );
 					// remember that try_and_remember_local_reachability considers only P-enabled uc-arcs
 
-
-					// resuing local reachables now:
+					// re-using local reachables now:
 					int locals = try_and_remember_local_reachability(sup, next, was_plant,
 																	bdd_theta, bdd_initial_states);
-
 
 					if(locals == ba.getZero() ) {
 						cleanup_bdds();
@@ -457,3 +468,58 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 
 
+
+
+/*
+INCREMENTAL ERROR ISOLATED ?
+
+
+*** Verifiying h_DetWhichStnUp, considred events {StnDwn.AS1, StnDwn.AS2, StnUp.AS1, StnUp.AS2};
+
+
+   ++ Putting automaton h_HndlComEventsAS on the queue (directly dependent)
+   ++ Putting automaton h_ManageTU1 on the queue (directly dependent)
+   ++ Putting automaton h_OFProtEL1 on the queue (directly dependent)
+   ++ Putting automaton h_ManageTU2 on the queue (directly dependent)
+   ++ Putting automaton h_OFProtEL2 on the queue (directly dependent)
+   ++ Putting automaton h_ManageTU3 on the queue (directly dependent)
+   ++ Putting automaton h_ASStoreUpState.AS2 on the queue (directly dependent)
+   ++ Putting automaton h_IntfTU3 on the queue (directly dependent)
+   ++ Putting automaton h_ASStoreUpState.AS1 on the queue (directly dependent)
+   LL 1 INITIAL plant-local (not in Sigma_P at all) exists.
+   LL initial plant-local events {DetStnsUp};
+   -- Adding automaton h_HndlComEventsAS (taken from the queue)...
+
+ -----------------------------------------------------------
+
+Check C({}, {h_DetWhichStnUp, h_HndlComEventsAS}) ?
+Group work2 = {};
+Group work1 = {h_DetWhichStnUp, h_HndlComEventsAS};
+CHANGED: false
+DEBUG: LOCAL EVENTS  {};
+Events_LOCAL EVENTS 2 0 = { };
+DEBUG: PLANT LOCAL EVENTS  {DetStnsUp};
+Events_PLANT LOCAL EVENTS 2 1210 = { DetStnsUp };
+
+
+   -- Adding automaton h_ManageTU3 (taken from the queue)...
+
+ -----------------------------------------------------------
+
+Check C({}, {h_DetWhichStnUp, h_HndlComEventsAS, h_ManageTU3}) ?
+Group work2 = {};
+Group work1 = {h_DetWhichStnUp, h_HndlComEventsAS, h_ManageTU3};
+   LL 1 new local events found.
+   LL Local events {DetStnsUp};
+CHANGED: true
+DEBUG: LOCAL EVENTS  {DetStnsUp};
+Events_LOCAL EVENTS 2 1210 = { DetStnsUp };
+DEBUG: PLANT LOCAL EVENTS  {DetStnsUp};
+Events_PLANT LOCAL EVENTS 2 1210 = { DetStnsUp };
+
+
+A 'bad' state was proved to be reachable by _local events_. we are done!
+h_DetWhichStnUp FAILED language containment test.
+
+
+*/
