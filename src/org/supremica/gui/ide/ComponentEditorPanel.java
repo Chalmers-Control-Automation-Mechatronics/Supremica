@@ -154,7 +154,7 @@ public class ComponentEditorPanel
 		//height += (int)0.1*height;
 		Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
 
-		surface.paint(theGraphics);
+		surface.print(theGraphics);
 		toClipboard.copyToClipboard();
 	}
 }

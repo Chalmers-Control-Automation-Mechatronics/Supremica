@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
+import net.sourceforge.waters.gui.EditorWindowInterface;
 import javax.swing.JFrame;
 
 public interface IDEActionInterface
@@ -17,4 +18,5 @@ public interface IDEActionInterface
 	public IDE getIDE();
 	public void repaint();
 	public void setEditorMode(IDEAction theAction);
+	public EditorWindowInterface getEditorWindowInterface();
 }

@@ -171,11 +171,14 @@
 	<tstamp/>
 </target>
 
-<target name="clean">
+<target name="clean_build">
 	<mkdir dir="${build}"/>
 	<delete dir="${build}" includeEmptyDirs="true"/>
 	<mkdir dir="${build}"/>
+</target>
 
+
+<target name="clean" depends="clean_build">
 	<mkdir dir="${testsbuild}"/>
 	<delete dir="${testsbuild}" includeEmptyDirs="true"/>
 	<mkdir dir="${testsbuild}"/>
@@ -349,7 +352,7 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build" depends="compile,jar_supremica,startfiles_supremica">
+<target name="build" depends="clean_build,compile,jar_supremica,startfiles_supremica">
 </target>
 
 <!-- Rebuild:

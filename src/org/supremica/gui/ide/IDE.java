@@ -3,6 +3,8 @@ package org.supremica.gui.ide;
 
 import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
+import net.sourceforge.waters.gui.EditorWindowInterface;
+
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -72,16 +74,6 @@ public class IDE
     	setJMenuBar(menuBar);
 
 		setToolBar(createToolBar());
-/*
-    	ideToolBar = new IDEToolBar(this);
-
-		// Set standard actions
-		ideToolBar.add(getActions().newAction);
-		ideToolBar.add(getActions().openAction);
-		ideToolBar.add(getActions().saveAction);
-
-    	setToolBar(ideToolBar);
-*/
 
 		tabPanel = new JTabbedPane();
 		tabPanel.addChangeListener(this);
@@ -192,7 +184,6 @@ public class IDE
 	}
 	private void setToolBar(JToolBar toolBar)
 	{
-		//System.err.println("setToolBar");
 		if (toolBar == null)
 		{
 			return;
@@ -244,9 +235,9 @@ public class IDE
 			getActiveModuleContainer().getEditorPanel().disablePanel();
 			getActiveModuleContainer().getAnalyzerPanel().enablePanel();
 		}
-//		if (currTab == getActiveModuleContainer().getEditorPanel())
+		if (currTab == getActiveModuleContainer().getEditorPanel())
 		{
-			setToolBar(getActiveModuleContainer().getEditorPanel().getToolBar(ideToolBar));
+//			setToolBar(getActiveModuleContainer().getEditorPanel().getToolBar(ideToolBar));
 			getActiveModuleContainer().getEditorPanel().enablePanel();
 			getActiveModuleContainer().getAnalyzerPanel().disablePanel();
 		}
@@ -257,6 +248,11 @@ public class IDE
 	public void setEditorMode(IDEAction theAction)
 	{
 
+	}
+
+	public EditorWindowInterface getEditorWindowInterface()
+	{
+		return getActiveModuleContainer().getEditorWindowInterface();
 	}
 
 	public static void main(String args[])

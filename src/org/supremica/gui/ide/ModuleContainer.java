@@ -10,6 +10,7 @@ import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.gui.VisualProject;
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.actions.Actions;
+import net.sourceforge.waters.gui.EditorWindowInterface;
 
 public class ModuleContainer
 {
@@ -116,12 +117,11 @@ public class ModuleContainer
 		return theVisualProject;
 	}
 
-/*
 	public EditorWindowInterface getEditorWindowInterface()
 	{
 		return null;
 	}
-*/
+
 	public void updateAutomata()
 	{
 		ModuleProxy currModule = getModuleProxy();
