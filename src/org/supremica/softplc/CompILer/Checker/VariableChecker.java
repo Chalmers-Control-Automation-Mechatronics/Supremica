@@ -441,7 +441,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 					/*
                      * LD
                      */
-					jjtn_simple_op = create_LD_Node(p.parameterType, fb_name + "." + p.parameter, functionBlockName);
+					jjtn_simple_op = create_LD_Node("symbolic_variable", fb_name + "." + p.parameter, functionBlockName);
 
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
 

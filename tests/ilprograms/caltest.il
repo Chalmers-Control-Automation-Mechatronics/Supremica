@@ -280,9 +280,9 @@ PROGRAM CALTEST
 	CAL println_DINT(Result_DINT)	
 	
 
-	CAL ander(in_1:=TRUE, in_2:=TRUE, out=>Result_BOOL)
-	CAL println_BOOL(Result_BOOL)
 
+	CAL ander(in_1:=FALSE, in_2:=TRUE, out=>%QX1)
+	CAL println_BOOL(%QX1)
 
 
 
