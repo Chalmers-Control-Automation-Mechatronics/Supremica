@@ -78,8 +78,8 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 	EventsViewerPanel(Automata automata)
 	{
 		this.automata = automata;
-		init();
 		build(false);
+		init();
 	}
 	
 	private void init()
@@ -604,7 +604,6 @@ class LanguageRestrictorDialog
 			logger.debug(ex.getStackTrace());
 		}
 	}
-
 }
 
 public class LanguageRestrictor
@@ -621,7 +620,7 @@ public class LanguageRestrictor
 	public void actionPerformed(ActionEvent event)
 	{
 		// Get the selected automata
-		Automata automata = ActionMan.gui.getSelectedAutomata();
+		Automata automata = ActionMan.getGui().getSelectedAutomata();
 		// Throw up the dialog, let the user select the alphabet
 
 		LanguageRestrictorDialog dlg = new LanguageRestrictorDialog(automata);

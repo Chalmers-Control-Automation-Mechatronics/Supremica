@@ -1735,6 +1735,21 @@ public class ActionMan
 
 			gui.info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
 		}
+
+		try
+		{
+			AutomataHierarchyViewer viewer = new AutomataHierarchyViewer(selectedAutomata);
+			
+			viewer.setVisible(true);
+			//viewer.setState(Frame.NORMAL);
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception in AutomataHierarchyViewer.", ex);
+			logger.debug(ex.getStackTrace());
+			
+			return;
+		}
 	}
 
 	// Automaton.View action performed
@@ -2334,7 +2349,7 @@ public class ActionMan
 	 *
 	 * To use this you have to set a boolean in GeneticAlgorithms.java.
 	 *
-	 * Writes 8 columns of data and a correct value on each line of an output file
+	 * Writes 16 columns of data and a correct value on each line of an output file
 	 *
 	 * @author Hugo Flordal, hugo@s2.chalmers.se
 	 */

@@ -50,66 +50,62 @@ package org.supremica.gui;
 
 import org.supremica.automata.IO.*;
 
+import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonListener;
-import org.supremica.automata.State;
-import org.supremica.automata.Arc;
+import org.supremica.automata.AutomataListener;
 
-public class AutomatonViewer
+public class AutomataHierarchyViewer
 	extends DotViewer
-	implements AutomatonListener
+	implements AutomataListener
 {
-	private Automaton theAutomaton;
+	private Automata theAutomata;
 
-	public AutomatonViewer(Automaton theAutomaton)
+	public AutomataHierarchyViewer(Automata theAutomata)
 		throws Exception
 	{
-		this.theAutomaton = theAutomaton;
-		super.setObjectName(theAutomaton.getName());
-		theAutomaton.getListeners().addListener(this);
+		this.theAutomata = theAutomata;
+		super.setObjectName("Hierarchy " + theAutomata.getName());
+		theAutomata.getListeners().addListener(this);
 	}
 
-	// Implementation of AutomatonListener interface
-	public void stateAdded(Automaton aut, State q)
+	// Implementation of AutomataListener interface
+	public void automatonAdded(Automata automata, Automaton automaton)
 	{
-		updated(aut, theAutomaton);
+		updated(automata, theAutomata);
 	}
 
-	public void stateRemoved(Automaton aut, State q)
+	public void automatonRemoved(Automata automata, Automaton automaton)
 	{
-		updated(aut, theAutomaton);
+		updated(automata, theAutomata);
 	}
-
-	public void arcAdded(Automaton aut, Arc a)
+	
+	public void automatonRenamed(Automata automata, Automaton automaton)
 	{
-		updated(aut, theAutomaton);
+		updated(automata, theAutomata);
 	}
-
-	public void arcRemoved(Automaton aut, Arc a)
+	
+	public void actionsOrControlsChanged(Automata automata)
 	{
-		updated(aut, theAutomaton);
-	}
-
-	public void attributeChanged(Automaton aut)
-	{
-		updated(aut, theAutomaton);
-	}
-
-	public void automatonRenamed(Automaton aut, String oldName)
-	{
-		setObjectName(aut.getName());
-		updated(aut, theAutomaton);
+		updated(automata, theAutomata);
 	}
 	// End of interface implementation
 
 	public AutomataSerializer getSerializer()
 	{
-		AutomatonToDot serializer = new AutomatonToDot(theAutomaton);
+		AutomataToHierarchyToDot serializer = new AutomataToHierarchyToDot(theAutomata);
 
 		serializer.setLeftToRight(leftToRightCheckBox.isSelected());
 		serializer.setWithLabels(withLabelsCheckBox.isSelected());
 		serializer.setWithCircles(withCirclesCheckBox.isSelected());
 		serializer.setUseColors(useColorsCheckBox.isSelected());
+		
+		try
+		{
+			serializer.serialize("Output.txt");
+		}
+		catch (Exception tjenis)
+		{
+		}
 
 		return serializer;
 	}

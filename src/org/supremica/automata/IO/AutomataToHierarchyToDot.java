@@ -53,22 +53,23 @@ import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.ArcSet;
+import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 
-public class AutomatonToDot
+public class AutomataToHierarchyToDot
 	implements AutomataSerializer
 {
-	private Automaton aut;
+	private Automata theAutomata;
 	private boolean leftToRight = false;
 	private boolean withLabel = true;
 	private boolean withCircles = false;
 	private boolean useColors = false;
 
-	public AutomatonToDot(Automaton aut)
+	public AutomataToHierarchyToDot(Automata aut)
 	{
-		this.aut = aut;
+		this.theAutomata = aut;
 	}
 
 	public boolean isLeftToRight()
@@ -96,21 +97,26 @@ public class AutomatonToDot
 		this.useColors = useColors;
 	}
 
-	private String getColor(State s)
+	private String getColor(Automaton aut)
 	{
 		if (!useColors)
 		{
 			return "";
 		}
 
-		if (s.isAccepting() &&!s.isForbidden())
+		if (aut.isInterface())
 		{
-			return ", color = green";
+			return ", color = yellow";
 		}
 
-		if (s.isForbidden())
+		if (aut.isPlant())
 		{
 			return ", color = red";
+		}
+
+		if (aut.isSupervisor() || aut.isSpecification())
+		{
+			return ", color = green";
 		}
 
 		return "";
@@ -119,16 +125,69 @@ public class AutomatonToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
+		pw.println("graph hierarchy {");
+		// pw.println("\tcenter = true;");
+
+		// Left to right or top to bottom?
+		if (leftToRight)
+		{
+			pw.println("\trankdir = LR;");
+		}
+
+		// Circles?
+		if (withCircles)
+		{
+			pw.println("\tnode [shape = circle];");
+		}
+		else
+		{
+			//pw.println("\tnode [shape = plaintext];");
+			pw.println("\tnode [shape = ellipse];");
+		}
+		// Filled?
+		pw.println("\tnode [style = filled];");
+
+		// The automata are nodes in the graph		
+		//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		for (int i=0; i<theAutomata.size(); i++)
+		{
+			//Automaton currAutomaton = (Automaton) autIt.next();			
+			Automaton currAutomaton = theAutomata.getAutomatonAt(i);			
+			
+			pw.print("\t\"" + currAutomaton.getName() + "\" [label = \"");			
+			if (withLabel)
+			{
+				pw.print(EncodingHelper.normalize(currAutomaton.getName()));
+			}			
+			pw.println("\"" + getColor(currAutomaton) + "]; ");
+
+			// The arcs in the graph represent common events in the respective alphabets
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
+			//for (Iterator otherIt = theAutomata.iterator(); otherIt.hasNext(); )
+			for (int j=i+1; j<theAutomata.size(); j++)
+			{
+				//Automaton otherAutomaton = (Automaton) otherIt.next();
+				Automaton otherAutomaton = theAutomata.getAutomatonAt(j);
+				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
+				
+				if (currAlphabet.nbrOfCommonEvents(otherAlphabet) > 0)
+				{
+					pw.println("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\"[weight = 0.0];");		
+				}
+			}
+		}
+
+		pw.println("}");
+		pw.flush();
+		pw.close();
+
+		/* // The way it's done in AutomatonViewer
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
 
 		pw.println("digraph state_automaton {");
 		pw.println("\tcenter = true;");
 
-		if (leftToRight)
-		{
-			pw.println("\trankdir = LR;");
-		}
 
 		if (!aut.hasInitialState())
 		{
@@ -258,6 +317,7 @@ public class AutomatonToDot
 		pw.println("}");
 		pw.flush();
 		pw.close();
+		*/
 	}
 
 	public void serialize(String fileName)

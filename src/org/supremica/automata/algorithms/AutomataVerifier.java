@@ -64,6 +64,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.util.ActionTimer;
+import org.supremica.automata.algorithms.standard.Determinizer;
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
@@ -1399,10 +1400,88 @@ public class AutomataVerifier
 		return moduleIsNonblocking(theAutomaton);
 	}
 
+
 	/**
 	 * Examines non-blocking modularily... not fully implemented yet!
 	 */
 	private boolean modularNonBlockingVerification()
+		throws Exception
+	{
+		// Is this really a modular system?
+		if (theAutomata.size() == 1)
+		{
+			logger.info("The selected system has only one automaton - using monolithic verification...");
+			return monolithicNonblockingVerification();
+		}
+
+		// Ensure individual nonblocking
+		boolean allIndividuallyNonblocking = true;
+		Iterator autIt = theAutomata.iterator();
+		Automaton currAutomaton;
+		while (autIt.hasNext())
+		{
+			currAutomaton = new Automaton((Automaton) autIt.next());
+			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
+			if (stopRequested)
+			{
+				return false;
+			}
+
+			if (!allIndividuallyNonblocking)
+			{
+				logger.error("The automaton " + currAutomaton.getName() + " is individually blocking!");
+				logger.error("Aborting verification...");
+				requestStop();
+				return false;
+			}
+		}
+		if (allIndividuallyNonblocking)
+		{
+			logger.info("This system has no individually blocking automata!");
+		}
+
+		// Do some tests...
+		Iterator targetIt = theAutomata.iterator();
+		Automaton newAutomaton;
+		Automata newAutomata = new Automata();
+		Automata restrictedAutomata = null;
+		while (targetIt.hasNext())
+		{
+			// Iterate over theAutomata
+		    Automaton targetAutomaton = new Automaton((Automaton) targetIt.next());
+			Alphabet targetAlphabet = targetAutomaton.getAlphabet();
+
+			// Restrict the other automata to this automations alphabet and synchronize the result
+			restrictedAutomata = new Automata();
+			Iterator restrictIt = theAutomata.iterator();
+			while (restrictIt.hasNext())
+			{
+				Automaton restrictAutomaton = new Automaton((Automaton) restrictIt.next());
+				if (targetAutomaton.equalAutomaton(restrictAutomaton))
+					continue;
+				
+				Determinizer determinizer = new Determinizer(restrictAutomaton, targetAlphabet, false);
+				determinizer.execute();
+				newAutomaton = determinizer.getNewAutomaton();
+				newAutomaton.setName(restrictAutomaton.getName() + "_REST");
+				restrictedAutomata.addAutomaton(newAutomaton);
+			}
+
+			Automaton synchAutomaton = AutomataSynchronizer.synchronizeAutomata(restrictedAutomata);
+			synchAutomaton.setName(targetAutomaton.getName() + "_BLOB");
+			newAutomata.addAutomaton(synchAutomaton);
+		}		
+		
+		ActionMan.getGui().addAutomata(newAutomata);
+		//ActionMan.getGui().addAutomata(restrictedAutomata);
+
+		return false;
+	}
+
+	/**
+	 * Examines non-blocking modularily... not fully implemented yet!
+	 */
+	private boolean modularNonBlockingVerification2()
 		throws Exception
 	{
 		// Is this really a modular system?

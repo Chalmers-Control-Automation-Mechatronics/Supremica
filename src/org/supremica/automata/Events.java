@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -173,10 +172,20 @@ public class Events
 	}
 
 	/**
+	 * True, if there exists an event with the same label, false otherwise.
+	 *
+	 *@param  event The event with an interesting label
+	 */
+	public boolean containsEventWithLabel(LabeledEvent event)
+		throws IllegalArgumentException
+	{
+		return containsEventWithLabel(event.getLabel());
+	}
+
+	/**
 	 * True, if it exists an event with the label, false otherwise.
 	 *
-	 *@param  label Description of the Parameter
-	 *@return  Description of the Return Value
+	 *@param  label The label of interest
 	 */
 	public boolean containsEventWithLabel(String label)
 		throws IllegalArgumentException

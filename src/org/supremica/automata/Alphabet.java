@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -120,7 +119,7 @@ public class Alphabet
 	}
 
 	/**
-	 * True, if an event with this id, is already in the alphabet, false otherwise.
+	 * True, if an event with this id is already in the alphabet, false otherwise.
 	 *
 	 *@param  id Description of the Parameter
 	 *@return  Description of the Return Value
@@ -289,6 +288,11 @@ public class Alphabet
 	 */
 	public static Alphabet intersect(Alphabet a1, Alphabet a2)
 	{
+		Alphabet result = new Alphabet(a1);
+		result.intersect(a2);
+		return result;
+
+		/*
 		Alphabet result = new Alphabet();
 		
 		for (Iterator alphIt = a2.iterator(); alphIt.hasNext(); )
@@ -309,6 +313,7 @@ public class Alphabet
 			}			
 		}
 		return result;
+		*/
 	}
 
 	/**
@@ -519,7 +524,9 @@ public class Alphabet
 		for(Iterator it = iterator(); it.hasNext(); )
 		{
 			LabeledEvent ev = (LabeledEvent)it.next();
-			buf.append(ev.getLabel() + ", ");
+			buf.append(ev.getLabel());
+			if (it.hasNext())
+				buf.append(", ");
 		}
 		buf.append("}");
 		return buf.toString();
@@ -543,26 +550,25 @@ public class Alphabet
 		}
 	}
 
-	/*
+	// Why was this method out-commented before? Something wrong? Or... did I do that?  /hguo
 	public int nbrOfCommonEvents(Alphabet otherAlphabet)
 	{
 		int nbrOfCommon = 0;
-		Iterator eventIterator = this.iterator();
+		EventIterator eventIterator = this.eventIterator();
 		LabeledEvent currEvent;
 
 		while (eventIterator.hasNext())
 		{
-			currEvent = (LabeledEvent) eventIterator.next();
-
+			currEvent = eventIterator.nextEvent();
+			
 			if (otherAlphabet.containsEventWithLabel(currEvent.getLabel()))
 			{
 				nbrOfCommon++;
 			}
 		}
-
+		
 		return nbrOfCommon;
 	}
-	*/
 
 	// Must be called after an event label or id is modified
 	public void rehash()

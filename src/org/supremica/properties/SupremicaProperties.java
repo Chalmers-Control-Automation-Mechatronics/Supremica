@@ -183,7 +183,7 @@ public final class SupremicaProperties
 		setProperty(DOT_EXECUTE_COMMAND, "dot", true);
 		setProperty(DOT_MAX_NBR_OF_STATES, "40", true);
 		setProperty(DOT_LEFT_TO_RIGHT, "false", true);
-		setProperty(DOT_WITH_STATE_LABELS, "false", true);
+		setProperty(DOT_WITH_STATE_LABELS, "true", true);
 		setProperty(DOT_WITH_CIRCLES, "false", true);
 		setProperty(DOT_USE_COLORS, "true", true);
 		setProperty(DOT_USE_MULTI_LABELS, "true", true);

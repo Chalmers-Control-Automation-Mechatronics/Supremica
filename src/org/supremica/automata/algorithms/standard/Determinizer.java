@@ -166,12 +166,12 @@ class AlphaEpsilonTester
 			return events.contains(event);
 		}
 		*/
-		return notin^events.contains(event);
+		return notin^events.containsEventWithLabel(event);
 	}
 	
 	public String showWhatYouGot()
 	{
-		if(notin)
+		if (notin)
 			return "keeping " + events.toString();
 		else
 			return "removing " + events.toString();

@@ -1,5 +1,5 @@
 /***************** SupremicaTreeCellRenderer.java ************/
-// Tree cell renderer, manages the icosn etc
+// Tree cell renderer, manages the icons etc
 
 package org.supremica.gui.treeview;
 
@@ -10,7 +10,6 @@ import javax.swing.tree.*;
 public class SupremicaTreeCellRenderer
 	extends DefaultTreeCellRenderer
 {
-
 	public Component getTreeCellRendererComponent(JTree tree, Object value, 
 													boolean selected,	//
 													boolean expanded,	// true => openIcon, else closedIcon
@@ -19,8 +18,8 @@ public class SupremicaTreeCellRenderer
     {
         super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         
-        SupremicaTreeNode node = (SupremicaTreeNode)value;
-        if(node.isEnabled() == false)
+        SupremicaTreeNode node = (SupremicaTreeNode) value;
+		if(node.isEnabled() == false)
         {
         	Icon icon = node.getDisabledIcon();
         	if(icon == null)

@@ -47,7 +47,7 @@
  * Supremica is owned and represented by KA.
  */
 
-/**
+ /**
  * A sorter for TableModels. The sorter has a model (conforming to TableModel)
  * and itself implements TableModel. TableSorter does not store or copy
  * the data in the TableModel, instead it maintains an array of
