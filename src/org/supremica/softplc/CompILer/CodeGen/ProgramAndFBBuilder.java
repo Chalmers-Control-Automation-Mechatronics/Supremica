@@ -705,7 +705,7 @@ public abstract class ProgramAndFBBuilder
 			ilRun.append(ifeq);    //if stack == false jump
 			ilRun.append(new PUSH(constPoolGen, false));
 			ilRun.append(jmp);
-			iffalse = ilRun.append(new PUSH(constPoolGen, true)
+			iffalse = ilRun.append(new PUSH(constPoolGen, true));
 			end_ldn = ilRun.append(InstructionConstants.NOP);
 			ifeq.setTarget(iffalse);
 			jmp.setTarget(end_ldn);
