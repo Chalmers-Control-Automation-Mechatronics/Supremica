@@ -1455,13 +1455,13 @@ public class Basic2GC
 
 		// GrafcetProcedure gp = new GrafcetProcedure(new Point(45,630), "Proc1");
 		// paletteDoc.addObjectAtTail(gp);
-		// 
+		//
 		// es = new EnterStep(new Point(200, 70), "S1");
 		// gp.myContentDocument.addObjectAtHead(es);
-		// 
+		//
 		// ex = new ExitStep(new Point(200, 200), "S2");
 		// gp.myContentDocument.addObjectAtHead(ex);
-		// 
+		//
 		// ProcedureStep pst = new ProcedureStep(new Point(45,760), "P1");
 		// paletteDoc.addObjectAtTail(pst);
 		DigitalIn digIn = new DigitalIn(new Point(45, 700));

@@ -72,7 +72,9 @@ import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;
-import org.supremica.external.shoeFactory.plantBuilder.Plant;
+import org.supremica.external.shoeFactory.plantBuilder.*;
+import org.supremica.external.shoeFactory.Animator.*;
+import org.supremica.external.shoeFactory.Configurator.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
@@ -2715,24 +2717,60 @@ public class ActionMan
 		}
 	}
 
+	//shoeFactory - Config
+	public static void shoeFactoryConfigurator()
+	{
+		Configit con = new Configit();
+		try
+		{
+			con.show();
+		}
+		catch (Exception ex)
+		{
+			logger.error("shoeFactoryConfigurator: " + ex.getMessage());
+		}
+	}
 
+	//shoeFactory - animate
+	public static void shoeFactoryAnimator(Gui gui)
+	{
+		JFrame frame = new Factory();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			try
+			{
+				frame.show();
+			}
+			catch (Exception ex)
+			{
+				logger.error("shoeFactoryBuildPlant: " + ex.getMessage());
+			}
+	}
 
 	// shoeFactory - build plant
 	public static void shoeFactoryBuildPlant(Gui gui)
 	{
 //		Project selectedProject = gui.getSelectedProject();
-
 		Plant newPlant = new Plant();
-		newPlant.createTable("Table1");
 		Project newProject = newPlant.getPlant();
 		try
 		{
 			gui.addProject(newProject);
+
 		}
 		catch (Exception ex)
 		{
 			logger.error("shoeFactoryBuildPlant: " + ex.getMessage());
 		}
+		int[] syncAutomata = {0,1};
+		SyncBuilder syncPlant = new SyncBuilder(gui, newProject, syncAutomata);
+		syncPlant.synchronizePlants("Synchronized");
+		syncPlant.synthesizePlants("Synthesized");
+	}
+
+	//shoeFactory - SFC
+	public static void shoeFactorySFC()
+	{
+		JGrafbuilder JGR = new JGrafbuilder();
 	}
 
 	// Generate ABB Control Builder IL

@@ -82,7 +82,7 @@ public class AutomataSynchronizerWorker
 		this.syncOptions = syncOptions;
 
 		// Order this thread to begin execution; the Jvm calls the run method of this thread.
-		this.start();    
+		this.start();
 	}
 
 	public void run()
@@ -160,7 +160,7 @@ public class AutomataSynchronizerWorker
 				/*-- MF -- Removed the name-fiddling let the project handle this -- But who, where?? */
 				if (theAutomaton != null)
 				{
-					// theAutomaton.setName(newAutomatonName);
+					//theAutomaton.setName(newAutomatonName);
 					StringBuffer buf = new StringBuffer();
 					for(Iterator it = theAutomata.iterator(); it.hasNext(); )
 					{
