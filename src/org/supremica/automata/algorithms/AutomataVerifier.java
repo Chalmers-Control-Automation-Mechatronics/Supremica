@@ -1215,7 +1215,7 @@ public class AutomataVerifier
 	{
 		logger.info("Synchronizing " + AutomatonA.getName() + " and " + AutomatonB.getName());
 
-		// Synchroniza the two automata and verify nonblocking on the result
+		// Synchronize the two automata and verify nonblocking on the result
 		Automaton AutomataSynk;
 		ArrayList selectedAutomata = new ArrayList();
 
@@ -1331,7 +1331,7 @@ public class AutomataVerifier
 			//System.out.println("Blocking state: " + ((State) stateIterator.next()).getName());
 			logger.info("Blocking state: " + ((State) stateIterator.next()).getName());
 		}
-
+		
 		return theAutomaton.nbrOfStates() == 0;
 	}
 }
