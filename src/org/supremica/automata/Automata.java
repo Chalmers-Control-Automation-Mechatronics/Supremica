@@ -140,12 +140,7 @@ public class Automata
 	{
 		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
-			if (containsAutomaton(currAutomaton.getName()))
-			{
-				removeAutomaton(currAutomaton.getName());
-			}
-			addAutomaton(currAutomaton);
+			addAutomaton((Automaton) autIt.next());
 		}
 	}
 
@@ -158,9 +153,15 @@ public class Automata
 	 */
 	public void updateAutomata(Automata automata)
 	{
+
 		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
-			addAutomaton((Automaton) autIt.next());
+			Automaton currAutomaton = (Automaton)autIt.next();
+			if (containsAutomaton(currAutomaton.getName()))
+			{
+				removeAutomaton(currAutomaton.getName());
+			}
+			addAutomaton(currAutomaton);
 		}
 	}
 	

@@ -596,11 +596,10 @@
 			<pathelement location="${dist}/SupremicaLib.jar" />
 			<pathelement path="${java.class.path}" />
 		</classpath>
-<!-- Not yet supported by the ant version on linnea and temporary. Upgrade request sent to medic.		
 		<assertions>
 			 <enable/>
 		</assertions>		 
--->	
+
 	</java>
 </target>
 

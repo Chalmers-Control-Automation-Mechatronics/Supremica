@@ -57,7 +57,7 @@ import javax.swing.*;
 import com.nwoods.jgo.*;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.gui.VisualProject;
+//import org.supremica.gui.VisualProject;
 
 // Provide a view of a AutomatonDocument
 // Implement various command handlers

@@ -57,7 +57,7 @@ import javax.swing.table.*;
 import java.util.HashMap;
 import com.nwoods.jgo.*;
 import java.beans.*;
-import org.supremica.properties.SupremicaProperties;
+//import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;

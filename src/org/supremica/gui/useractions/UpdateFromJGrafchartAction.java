@@ -69,38 +69,133 @@ public class UpdateFromJGrafchartAction
 
 	public Automaton buildAutomaton(WorkspaceObject theWorkspace)
 	{
-		Alphabet theEvents = new Alphabet();
+		HashMap stepToStateMap = new HashMap();
 		
 		Automaton currAutomaton = new Automaton(JGrafchartReader.getName(theWorkspace));
+		Alphabet theAlphabet = currAutomaton.getAlphabet();
 		currAutomaton.setType(JGrafchartReader.getType(theWorkspace));
 		GCDocument theDocument = theWorkspace.myContentDocument;
 		
+		// First create all states
 		JGoListPosition pos = theDocument.getFirstObjectPos();
 		while (pos != null)
 		{
 			Object currObject = theDocument.getObjectAtPos(pos);
 			pos = theDocument.getNextObjectPosAtTop(pos);
-	        logger.debug("The class of " + currObject + " is " + currObject.getClass().getName());
 			
 			if (currObject instanceof GCStep)
 			{
 				GCStep currStep = (GCStep)currObject;
-				State newState = new State(JGrafchartReader.getName(currStep));
-				newState.setInitial(JGrafchartReader.isInitial(currStep));
+				String stateName = JGrafchartReader.getName(currStep);
+				if (stateName == null || stateName.equals(""))
+				{
+					stateName = "q";
+				}
+				State newState = currAutomaton.createAndAddUniqueState(stateName);
+				if (JGrafchartReader.isInitial(currStep))
+				{
+					newState.setInitial(true);
+					currAutomaton.setInitialState(newState);
+				}
 				newState.setAccepting(JGrafchartReader.isAccepting(currStep));
-				currAutomaton.addState(newState);
+				stepToStateMap.put(currStep, newState);
+
 			}
-			else if (currObject instanceof GCTransition)
+		}
+
+		// Then create all transitions
+		pos = theDocument.getFirstObjectPos();
+		while (pos != null)
+		{	
+			Object currObject = theDocument.getObjectAtPos(pos);
+			pos = theDocument.getNextObjectPosAtTop(pos);
+			
+			if (currObject instanceof GCTransition)
 			{
-				logger.info("Found GCTransition: " + currObject);
+
+				GCTransition currTransition = (GCTransition)currObject;
+				String label = currTransition.getLabelText();
+				//logger.info("Found GCTransition: " + label );	
 				
-			}
-			else if (currObject instanceof GCLink)
-			{
-				logger.info("Found GCLink: " + currObject);
-				GCLink currLink = (GCLink)currObject;
-				JGoPort fromPort = currLink.getFromPort();
-				JGoPort toPort = currLink.getToPort();				
+				// Find preceding step
+				GCStep precedingStep = null;
+				GCTransitionInPort transInPort = currTransition.getInPort(); 
+				JGoListPosition currLinkPos = transInPort.getFirstLinkPos();
+				while (currLinkPos != null)
+				{
+					JGoLink currLink = transInPort.getLinkAtPos(currLinkPos);
+					currLinkPos = transInPort.getNextLinkPos(currLinkPos);
+					if (currLinkPos != null)
+					{
+						logger.error("Multiple incoming links to a transition is not allowed");
+					}
+			
+					JGoPort fromPort = currLink.getOtherPort(transInPort);
+					
+					Object currParent = fromPort.getParent();
+					if (currParent instanceof GCStep)
+					{
+						precedingStep = (GCStep)currParent;
+						logger.info("precedingStep: "  + precedingStep.getName());
+					}		
+					else
+					{
+						logger.error("fromPort.getParent() is not a GCStep");
+					}
+
+				}				
+				
+				// Find preceding step
+				GCStep succeedingStep = null;
+				GCTransitionOutPort transOutPort = currTransition.getOutPort(); 
+				currLinkPos = transOutPort.getFirstLinkPos();
+				while (currLinkPos != null)
+				{
+					JGoLink currLink = transOutPort.getLinkAtPos(currLinkPos);
+					currLinkPos = transOutPort.getNextLinkPos(currLinkPos);
+					if (currLinkPos != null)
+					{
+						logger.error("Multiple outgoing links from a transition is not allowed");
+					}
+			
+					JGoPort toPort = currLink.getOtherPort(transOutPort);				
+					
+					Object currParent = toPort.getParent();
+					if (currParent instanceof GCStep)
+					{
+						succeedingStep = (GCStep)currParent;
+						logger.info("precedingStep: "  + succeedingStep.getName());
+					}		
+					else
+					{
+						logger.error("toPort.getParent() is not a GCStep");
+					}
+
+				}				
+				State precedingState = (State)stepToStateMap.get(precedingStep);		
+				if (precedingState == null)
+				{
+					logger.error("Could not find preceding state");
+					return null;
+				}				
+				State succeedingState = (State)stepToStateMap.get(succeedingStep);		
+				if (succeedingState == null)
+				{
+					logger.error("Could not find succeeding state");
+					return null;
+				}	
+			
+				LabeledEvent currEvent = new LabeledEvent(label);
+				if (!theAlphabet.contains(currEvent))
+				{
+					theAlphabet.addEvent(currEvent);
+				}
+				else
+				{
+					currEvent = theAlphabet.getEvent(currEvent);
+				}
+				Arc newArc = new Arc(precedingState, succeedingState, currEvent);
+				currAutomaton.addArc(newArc);
 				
 			}
 		}	
@@ -132,12 +227,13 @@ public class UpdateFromJGrafchartAction
 
 		}
 */		
+		//currAutomaton.setAlphabet(theAlphabet);
 		return currAutomaton;
 	}	
 	
 	public Project buildProject(GCDocument theDocument)
 	{
-		logger.info("Top Workspace (" + theDocument.getNumObjects() +"," + theDocument.workspaces.size() + "): " + theDocument.getName());
+		// logger.info("Top Workspace (" + theDocument.getNumObjects() +"," + theDocument.workspaces.size() + "): " + theDocument.getName());
 		
 		Project currProject = new Project(theDocument.getName());
 	
@@ -147,7 +243,7 @@ public class UpdateFromJGrafchartAction
 		{
 			Object currObject = theDocument.getObjectAtPos(pos);
 			pos = theDocument.getNextObjectPosAtTop(pos);
-	        logger.debug("The class of " + currObject + " is " + currObject.getClass().getName());
+//	        logger.debug("The class of " + currObject + " is " + currObject.getClass().getName());
 			
 	        if (currObject instanceof WorkspaceObject)
 	        {
@@ -155,16 +251,11 @@ public class UpdateFromJGrafchartAction
 	        	Automaton currAutomaton = buildAutomaton(currWorkspace);
 	        	currProject.addAutomaton(currAutomaton);
 	        }
-	        /*
-			if (currObject instanceof GCDocument)
+			else if (currObject instanceof GCStep || currObject instanceof GCTransition)
 			{
-				logger.info("Found GCDocument: " + ((GCDocument)theDocument).getName());
+				logger.warn("Found a step or transition in top-level workspace. Each automaton should have its own workspace and the automaton workspace should be inside the top-level workspace.");
 			}
-			if (currObject instanceof GCVariable)
-			{
-				logger.info("Found GCVariable: " + ((GCDocument)theDocument).getName());
-			}
-			*/
+
 		}
 		
 /*		
@@ -201,7 +292,7 @@ public class UpdateFromJGrafchartAction
 		}	
 		
 
-		GCDocument workspace1 = theEditor.newWorkspace();				
+		//GCDocument workspace1 = theEditor.newWorkspace();				
 		//fillDocument(workspace1);
 		
 		// Print top level workspaces
