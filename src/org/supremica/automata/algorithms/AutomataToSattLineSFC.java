@@ -79,19 +79,150 @@ public class AutomataToSattLineSFC
 
 	public void serialize_s(PrintWriter pw)
 	{
-		pw.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-		pw.println("</Automata>");
+
+		// Start of file header
+
+		pw.println("\"Syntax version 2.19, date: 2001-08-10-10:42:24.724 N\"");
+		pw.println("\"Original file date: ---\"");
+		pw.print("\"Program date: 2001-08-10-10:42:24.724, name: "); // Should perhaps get current date and time
+		if (automata.getName() != null)
+		{
+			pw.println(" " + automata.getName() + " \"");
+		}
+		else
+		{
+			pw.println("\"");
+		}
+		pw.println("(* This program unit was created by Supremica. *)");
+		pw.println("");
+
+		// End of file header
+
+		// Start of BasePicture Invocation
+
+		pw.println("BasePicture Invocation");
+		pw.println("   ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 ");
+		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896"); // Don't know importance of DateCode
+		pw.println("\n");
+
+		// End of basePicture Invocation
+
+		// Start of Module definition.
+
+		pw.println("ModuleDef");
+		pw.println("ClippingBounds = ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
+		pw.println("ZoomLimits = 0.0 0.01");
+
+		//End of Module definition
+
+		// Start of Module code.
+		// Here comes the automata, the tricky part.
+
+		Iterator automataIt = automata.iterator();
+		while (automataIt.hasNext())
+		{
+			Automaton aut = (Automaton)automataIt.next();
+
+			// Each automaton is translated into a SattLine Sequence.
+			// A sequence has the following structure. Step - Transition - Step - Transition ...
+			// A step may be followed by an ALTERNATIVSEQuence which has ALTERNATIVEBRANCHes.
+			// This is the case if there is more than one transition from a state.
+			// A transition may be followed by a PARALLELSEQuence which has PARALLELBRANCHes.
+			// This cannot happen for an automaton.
+
+			// If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
+			// Won't check that for now ...
+
+			// Might want to parameterise COORD so that sequences are not drawn on top of each other.
+			pw.println("SEQUENCE" + aut.getName() + " COORD -0.3, 0.5 OBJSIZE 0.5, 0.5\"");
+
+			Iterator eventIt = aut.eventIterator();
+			while (eventIt.hasNext())
+			{
+				Event event = (Event)eventIt.next();
+				//pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				if (!event.isControllable())
+					pw.print(" controllable=\"false\"");
+				if (!event.isPrioritized())
+					pw.print(" prioritized=\"false\"");
+				if (event.isImmediate())
+					pw.print(" immediate=\"true\"");
+				if (debugMode)
+					pw.print(" synchIndex=" + event.getSynchIndex());
+				pw.println("/>");
+			}
+			pw.println("\t</Events>");
+
+			// Print all states
+			pw.println("\t<States>");
+			Iterator stateIt2 = aut.stateIterator();
+			while (stateIt2.hasNext())
+			{
+				State state = (State)stateIt2.next();
+				//pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
+				if (!state.getId().equals(state.getName()))
+				//	pw.print(" name=\"" + normalize(state.getName()) + "\"");
+				if (state.isInitial())
+					pw.print(" initial=\"true\"");
+				if (state.isAccepting())
+					pw.print(" accepting=\"true\"");
+				if (state.isForbidden())
+					pw.print(" forbidden=\"true\"");
+				int value = state.getCost();
+				if (value != State.UNDEF_COST)
+					pw.print(" cost=\"" + value + "\"");
+				if (debugMode)
+					pw.print(" synchIndex=" + state.getIndex());
+     			// printIntArray(pw, ((StateRegular)state).getOutgoingEventsIndicies());
+				pw.println("/>");
+			}
+			pw.println("\t</States>");
+
+
+			// Print all transitions
+			pw.println("\t<Transitions>");
+			// stateIt = aut.stateIterator();
+			// while (stateIt.hasNext())
+			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+			{
+				State sourceState = (State)stateIt.next();
+				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
+				while (outgoingArcsIt.hasNext())
+				{
+					Arc arc = (Arc)outgoingArcsIt.next();
+					State destState = arc.getToState();
+				//	pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
+				//	pw.print("\" dest=\"" + normalize(destState.getId()));
+				//	pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+				}
+			}
+			pw.println("\t</Transitions>");
+			pw.println("</Automaton>");
+		}
+
 		pw.flush();
 		pw.close();
 	}
 
 	public void serialize_g(PrintWriter pw)
 	{
+		pw.println("\" Syntax version 2.19, date: 2001-11-20-14:16:07.401 N \" ");
 
+		pw.flush();
+		pw.close();
 	}
 
 	public void serialize_p(PrintWriter pw)
 	{
+		pw.println("DistributionData");
+		pw.println(" ( Version \"Distributiondata version 1.0\" )");
+		pw.println("SourceCodeSystems");
+		pw.println(" (  )");
+		pw.println("ExecutingSystems");
+		pw.println(" (  )");
+
+		pw.flush();
+		pw.close();
 
 	}
 
@@ -100,4 +231,9 @@ public class AutomataToSattLineSFC
 
 	}
 
+	public void serialize_s(String fileName)
+		throws IOException
+	{
+		serialize(new PrintWriter(new FileWriter(fileName)));
+	}
 }

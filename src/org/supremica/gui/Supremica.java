@@ -680,7 +680,8 @@ public class Supremica
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						//toolsAutomataEditor();
+						// ah is fucking up
+						ActionMan.AutomataToSattLineSFC(getGui());
 					}
 				});
 		}

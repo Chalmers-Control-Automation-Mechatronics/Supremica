@@ -1533,5 +1533,23 @@ public class ActionMan
 			gui.addAutomata(automata);
 		}
 	}
+	// Generate SattLine SFCs
+	public static void AutomataToSattLineSFC(Gui gui)
+	{
+		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		/*for (Iterator sfcIt = selectedAutomata.iterator(); sfcIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton)sfcIt.next();
+			JFileChooser fileExporter = null;
+				fileExporter = FileDialogs.getSFCFileExporter();
+		}
+		AutomataToSattLineSFC exporter = new AutomataToSattLineSFC(currAutomata);*/
+	}
 
 } // ActionMan
