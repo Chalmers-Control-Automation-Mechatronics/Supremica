@@ -4,9 +4,11 @@ package org.supremica.gui.ide;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
+import java.util.*;
 import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
+import net.sourceforge.waters.model.module.ModuleProxy;
 
 public class IDE
     extends JFrame
@@ -27,6 +29,10 @@ public class IDE
 
 	private JTabbedPane tabPanel;
 	private JSplitPane splitPanelVertical;
+
+	private LinkedList modules = new LinkedList();
+
+	private int newModuleCounter = 1;
 
     public IDE()
     {
@@ -65,6 +71,7 @@ public class IDE
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
+
     }
 
 	public Actions getActions()
@@ -82,6 +89,51 @@ public class IDE
 		{
 			getActions().exitAction.doAction();
 		}
+	}
+
+	public String getNewModuleName(String prefix)
+	{
+		String nameSuggestion = prefix + newModuleCounter++;
+		while (getModule(nameSuggestion) != null)
+		{
+			nameSuggestion = prefix + newModuleCounter++;
+		}
+		return nameSuggestion;
+
+	}
+
+	public ModuleProxy getModule(String name)
+	{
+		for(Iterator modIt = modules.iterator(); modIt.hasNext(); )
+		{
+			ModuleProxy currModule = (ModuleProxy)modIt.next();
+			if (name.equals(currModule.getName()))
+			{
+				return currModule;
+			}
+		}
+		return null;
+	}
+
+	public void add(ModuleProxy module)
+	{
+		modules.addFirst(module);
+	}
+
+	public void remove(ModuleProxy module)
+	{
+		modules.remove(module);
+	}
+
+	public void setActiveModule(ModuleProxy module)
+	{
+		remove(module);
+		add(module);
+	}
+
+	public ModuleProxy getActiveModule()
+	{
+		return (ModuleProxy)modules.getFirst();
 	}
 
 	public static void main(String args[])

@@ -20,6 +20,11 @@ public class IDEMenuBar
 
     private void initMenubar()
     {
+
+		//
+		// File
+		//
+
 		JMenu menuFile = new JMenu("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		add(menuFile);
@@ -31,5 +36,13 @@ public class IDEMenuBar
 
 		menuFile.add(new JMenuItem(ide.getActions().exitAction));
 
+
+		//
+		// Module
+		//
+
+		JMenu menuModule = new JMenu("Module");
+		menuModule.setMnemonic(KeyEvent.VK_M);
+		add(menuModule);
 	}
 }
