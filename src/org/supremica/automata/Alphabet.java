@@ -259,19 +259,18 @@ public class Alphabet
 		return result;
 	}
 
-	/* WHO THE FUNK WROTE THIS METHOD?  /Hguo.
 	/**
 	 * Computes A intersection B, where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
-	 /
+	 */
 	public void intersect(Alphabet other)
 	{
-		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
+		for (Iterator alphIt = this.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-
-			if(!containsEventWithLabel(currEvent.getLabel()))
+			
+			if(!other.containsEventWithLabel(currEvent.getLabel()))
 			{
 				try
 				{
@@ -285,7 +284,6 @@ public class Alphabet
 			}
 		}
 	}
-	*/
 	
 	/**
 	 * Computes and returns "A intersection B"

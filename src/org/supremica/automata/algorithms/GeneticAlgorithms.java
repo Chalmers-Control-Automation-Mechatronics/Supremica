@@ -229,6 +229,14 @@ public class GeneticAlgorithms
 	}
 
 	/**
+	 * This is an manually generated class
+	 */
+	private static class ManualPredictionFunction 
+	{
+
+	}
+
+	/**
 	 * This is an automatically generated class
 	 */
 	private static class PredictionFunction 
