@@ -147,6 +147,7 @@
 	<unjar src="${lib}/relaxngDatatype.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/xsdlib.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
+	<unjar src="${lib}/functionblocks_jaxb.jar" dest="${lib}/${unjared}"/>		
 	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>		
 	<unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
@@ -201,6 +202,14 @@
 			</patternset>
 		</fileset>
 	</delete>	
+
+	<delete>
+		<fileset dir="${src}/org/supremica/functionblocks/xsd">
+			<patternset id="cleanjaxbfiles">
+				<include name="**"/>
+			</patternset>
+		</fileset>
+	</delete>
 
 	<mkdir dir="${src}/org/w3"/>
 	<delete>
@@ -529,7 +538,7 @@
 </target>
 -->
 
-<target name="jar_jaxb">
+<target name="jar_waters_jaxb">
 	<jar jarfile="${lib}/waters_jaxb.jar"> 
 		<fileset dir="${build}/">
 			<include name="org/w3/**"/>
@@ -549,6 +558,28 @@
 		</fileset>
 	</delete>
 	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
+</target>
+
+<target name="jar_functionblocks_jaxb">
+	<jar jarfile="${lib}/functionblocks_jaxb.jar"> 
+		<fileset dir="${build}/">
+			<include name="org/w3/**"/>
+			<include name="org/supremica/functionblocks/xsd/**"/>
+		</fileset>
+		<fileset dir="${src}/">
+			<include name="**/*.properties"/>
+			<include name="**/*.ser"/>
+		</fileset>
+	</jar>
+	<delete>
+		<fileset dir="${lib}">
+			<patternset id="cleanjaxdbunjaredclassfiles">
+				<include name="org/w3/**"/>
+				<include name="org/supremica/functionblocks/xsd/**"/>
+			</patternset>
+		</fileset>
+	</delete>
+	<unjar src="${lib}/functionblocks_jaxb.jar" dest="${lib}/${unjared}"/>		
 </target>
 
 <target name="startfiles_local_supremica">

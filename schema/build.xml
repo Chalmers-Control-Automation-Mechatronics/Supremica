@@ -3,230 +3,31 @@
   </description>
 
   <property file="build.properties"/>                                    
-  <property name="cpp" location="cpp"/>
-  <property name="cpplib" location="${cpp}/lib"/>
-  <property name="src" location="java/src"/>
+
+  <property name="src" location="../src"/>
   <property name="classes" location="java/classes"/>
   <property name="docsrc" location="java/javadoc"/>
   <property name="jar" location="java/jar"/>
   <property name="jar.file" location="${jar}/waters.jar"/>
   <property name="javadoc" location="java/docs"/>
-  <property name="javah.dir" location="${cpp}/src/waters/javah"/>
-  <property name="javah.file" location="${javah.dir}/Invocations.h"/>
-  <property name="jniglue.indir" location="${cpp}/src/jni/templates"/>
-  <property name="jniglue.outdir" location="${cpp}/src/jni/glue"/>
-  <property name="jniglue.jar" location="${jar}/jniglue.jar"/>
-  <property name="logs" location="logs"/>
-  <property name="xml" location="xml"/>
-  <property name="xsd" location="${xml}/xsd"/>
+  <property name="xsd_61499" location="iec61499/xsd"/>
   <property name="xsl" location="${xml}/xsl"/>
-  <property name="examples" location="examples"/>
-  <property name="zip" location="archives"/>
-  <property name="zip.file" location="${zip}/waters.zip"/>
+
 
   <path id="external-classpath">
     <pathelement path="${jwsdp.classpath}"/>
   </path>
 
-  <target name="init">
-    <tstamp/>
-    <mkdir dir="${classes}"/>
-    <mkdir dir="${jar}"/>
-  </target>
-
-  <target name="gen" depends="init"
-    description="Generate JAXB classes.">
+  <target name="gen" description="Generate JAXB classes.">
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
       <classpath>
         <pathelement path="${jwsdp.classpath}"/>
       </classpath>
     </taskdef>
     <xjc target="${src}" extension="true" removeOldOutput="yes">
-      <schema dir="${xsd}" includes="waters-des.xsd waters-module.xsd"/>
-      <produces dir="${src}/net/sourceforge/waters/xsd/"
-                includes="base/* base/impl/* des/* des/impl/* module/* module/impl/*"/>
+      <schema dir="${xsd_61499}" includes="DataType.xsd FBMGT.xsd LibraryElement.xsd"/>
+      <produces dir="${src}/org/supremica/functionblocks/xsd/"/>
     </xjc>
   </target>
 
-  <target name="compile" depends="gen"
-          description="Compile all sources.">
-    <javac srcdir="${src}" destdir="${classes}" 
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
-      <classpath refid="external-classpath"/>
-    </javac>
-  </target>
-
-  <target name="javah" depends="compile"
-          description="Create JNI headers.">
-    <mkdir dir="${javah.dir}"/>
-    <javah outputFile="${javah.file}" classpath="${classes}">
-      <class name="net.sourceforge.waters.model.analysis.ProductDESCopier"/>
-    </javah>
-  </target>
-
-  <target name="jniglue-jar" depends="compile">
-    <jar jarfile="${jniglue.jar}">
-      <fileset dir="${classes}">
-        <include name="net/sourceforge/waters/build/jniglue/*.class"/>
-      </fileset>
-    </jar>
-  </target>
-
-  <target name="jar" depends="compile"
-          description="Generate the waters.jar file.">
-    <jar jarfile="${jar.file}">
-      <fileset dir="${classes}">
-        <include name="**/*.class"/>
-        <exclude name="net/sourceforge/waters/build/jniglue/*"/>
-      </fileset>
-      <fileset dir="${src}">
-        <include name="**/*.properties"/>
-        <include name="**/*.ser"/>
-	<include name="**/*.gif"/>
-      </fileset>
-      <zipfileset file="${xsl}/vw.xsl"
-	          fullpath="net/sourceforge/waters/valid/vw.xsl"/>
-    </jar>
-  </target>
-
-  <target name="jniglue" depends="jniglue-jar,jar"
-          description="Create JNI Glue C++ files.">
-    <mkdir dir="${jniglue.outdir}"/>
-    <java classname="net.sourceforge.waters.build.jniglue.GlueCompiler"
-          fork="true" failonerror="true">
-      <classpath>
-        <pathelement location="${jniglue.jar}"/>
-        <pathelement location="${jar.file}"/>
-        <path refid="external-classpath"/>
-      </classpath>
-      <arg file="${jniglue.indir}"/>
-      <arg file="${jniglue.outdir}"/>
-      <arg file="${src}"/>
-      <arg file="${jniglue.jar}"/>
-    </java> 
-  </target>
-
-  <target name="cpp" depends="javah,jniglue"
-          description="Build native library.">
-    <exec executable="make" dir="${cpp}" failonerror="true"/>
-  </target>
-
-  <target name="run" depends="jar" description="Run the Waters Editor.">
-    <mkdir dir="${logs}/gui"/>
-    <java classname="net.sourceforge.waters.gui.ModuleWindow"
-          fork="true" dir="${examples}" output="${logs}/gui/output.txt">
-      <classpath>
-        <path refid="external-classpath"/>
-        <pathelement location="${jar.file}"/>
-      </classpath>
-    </java> 
-  </target>
-
-  <target name="xsl">
-    <xslt in="examples/valid/small_main.vmod"
-          out="examples/valid/small.wmod"
-          style="${xsl}/vw.xsl"/>
-  </target>
-
-  <target name="test" depends="jar,cpp">
-    <mkdir dir="${logs}/des"/>
-    <mkdir dir="${logs}/module"/>
-    <mkdir dir="${logs}/expression"/>
-    <mkdir dir="${logs}/compiler"/>
-    <mkdir dir="${logs}/algorithms"/>
-    <mkdir dir="${logs}/analysis"/>
-    <mkdir dir="${logs}/maze"/>
-    <mkdir dir="${logs}/valid"/>
-    <junit printsummary="on" fork="true">
-      <formatter type="brief" extension=".log"/>
-      <test name="net.sourceforge.waters.junit.ProductDESTest"
-	    outfile="logs/des/testrun"/>
-      <test name="net.sourceforge.waters.junit.ModuleTest"
-	    outfile="logs/module/testrun"/>
-      <test name="net.sourceforge.waters.junit.ExpressionTest"
-	    outfile="logs/expression/testrun"/>
-      <test name="net.sourceforge.waters.junit.CompilerTest"
-	    outfile="logs/compiler/testrun"/>
-      <test name="net.sourceforge.waters.junit.AnalysisTest"
-	    outfile="logs/analysis/testrun"/>
-      <test name="net.sourceforge.waters.junit.AlgorithmsTest"
-	    outfile="logs/algorithms/testrun"/>
-      <test name="net.sourceforge.waters.junit.MazeTest"
-	    outfile="logs/maze/testrun"/>
-      <test name="net.sourceforge.waters.junit.ValidTest"
-	    outfile="logs/valid/testrun"/>
-      <classpath>
-        <path refid="external-classpath"/>
-        <pathelement location="${jar.file}"/>
-      </classpath>
-      <env key="LD_LIBRARY_PATH" path="${cpplib}"/>
-    </junit>
-  </target>
-
-  <target name="doc" depends="gen"
-          description="Generate Javadoc documentation.">
-    <mkdir dir="${javadoc}"/>
-    <javadoc destdir="${javadoc}">
-      <packageset dir="${src}">
-        <include name="net/sourceforge/waters/**/*"/>
-        <exclude name="net/sourceforge/waters/build/**"/>
-        <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
-      </packageset>
-      <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
-      <link href="${java14.api.url}"
-            offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
-      <link href="${jaxme.api.url}"
-            offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
-      <link href="${junit.api.url}"
-            offline="true" packagelistLoc="${docsrc}/offline/junit"/>
-      <classpath>
-        <path refid="external-classpath"/>
-        <pathelement location="${junit.jar}"/>
-      </classpath>
-    </javadoc>
-  </target>
-
-  <target name="www" depends="doc"
-          description="Install javadocs on local web server.">
-    <delete dir="${javadoc.targetdir}"/>
-    <copy todir="${javadoc.targetdir}">
-      <fileset dir="${javadoc}"/>
-    </copy>
-  </target>
-
-  <target name="pack" description="Generate the source archive.">
-    <mkdir dir="${zip}"/>
-    <zip destfile="${zip.file}">
-      <zipfileset dir=".">
-        <include name="build.xml"/>
-      </zipfileset>
-      <zipfileset dir="${src}" prefix="java/src">
-        <include name="net/sourceforge/waters/**/*.java"/>
-        <exclude name="net/sourceforge/waters/xsd/**/*.java"/>
-      </zipfileset>
-      <zipfileset dir="${xml}" prefix="xml">
-        <include name="**/*.xsd"/>
-        <include name="**/*.xsl"/>
-      </zipfileset>
-      <zipfileset dir="${examples}" prefix="examples">
-        <include name="**/*.wdes"/>
-        <include name="**/*.wmod"/>
-        <include name="**/*.vmod"/>
-        <include name="**/*.dgrf"/>
-        <include name="**/*.txt"/>
-      </zipfileset>
-    </zip>
-  </target>
-
-  <target name="clean" description="Clean up.">
-    <delete dir="${src}/net/sourceforge/waters/xsd/"/>
-    <delete dir="${classes}"/>
-    <delete dir="${jar}"/>
-    <delete dir="${javadoc}"/>
-    <delete dir="${javah.dir}"/>
-    <delete dir="${jniglue.outdir}"/>
-    <exec executable="make" dir="${cpp}">
-      <arg value="clean"/>
-    </exec>
-  </target>
 </project>
