@@ -243,6 +243,21 @@ public class Automaton
 		return isDisabled;
 	}
 
+	// Quick and ugly fixx, see bug report
+	// When working with the state-indices, sometimes, somehow the indices in 
+	// indexStateMap become different from the indices stored in the States
+	// This func iterates over the states and rebuilds the map
+	// Used by ModifiedAstar
+	public void remapStateIndices()
+	{
+		indexStateMap.clear();
+		for(StateIterator stit = stateIterator(); stit.hasNext(); )
+		{
+			State state = stit.nextState();
+			indexStateMap.put(new Integer(state.getIndex()), state);
+		}
+	}
+	
 	public void addState(State state)
 		throws IllegalArgumentException
 	{
