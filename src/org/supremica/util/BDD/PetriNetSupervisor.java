@@ -3,6 +3,7 @@ package org.supremica.util.BDD;
 
 
 import org.supremica.util.BDD.heuristics.*;
+import org.supremica.util.BDD.graphs.*;
 
 
 /**
@@ -47,6 +48,9 @@ public class PetriNetSupervisor
 
 	/** workset as above, queue is the set of suggested events, see algo again */
 	private InteractiveChoice ic = null;
+
+	/** H1 fill graph */
+	private LevelGraph levelGraph = null;
 
 	/** Constructor, passes to the base-class */
 	public PetriNetSupervisor(BDDAutomata manager, Group plant, Group spec)
@@ -120,6 +124,11 @@ public class PetriNetSupervisor
 			// XXX: no adaptive heuristics exists here yet, lets switch to something that we know works most of the time:
 			heuristic = Options.ES_HEURISTIC_MOST_MEMBERS;
 		}
+
+		if(Options.show_level_graph)
+		{
+			levelGraph = new LevelGraph(size);
+		}
 	}
 
 	// -----------------------------------------------------------------
@@ -182,6 +191,15 @@ public class PetriNetSupervisor
 	private int pick_one_event(boolean forward)
 	{
 		int index = -1, best, queue_size = 0;
+
+		if(levelGraph != null) {
+			int c = 0;
+			for (int i = 0; i < size; i++)
+				if (workset[i] > 0 )
+					c++;
+
+			levelGraph.add(c);
+		}
 
 		// the idea is to put the 'best' events in a queue and choose one on random
 		switch (heuristic)

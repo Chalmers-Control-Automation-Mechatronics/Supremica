@@ -237,7 +237,8 @@ public class Options
 							SHOW_GROW_NODES_AND_SATCOUNT_DIFF = 9;
 	public static int show_grow = SHOW_GROW_NONE;
 
-	/** type of the BDD graph shown by GrowFrame */
+
+
 
 	/** insertation heuristic for Delayed* smoothing algorithm */
 	public static final String[] DSSI_HEURISTIC_NAMES = { "Random",
@@ -308,6 +309,7 @@ public class Options
 	public static boolean burst_mode = false;
 	public static boolean test_integrity = false; /** enables some internal test routines that are usually turned off to save time */
 	public static boolean interleaved_variables = true; /** interleaved or seperated variable orders */
+	public static boolean show_level_graph = false; /** shows the fillness of the workset sent to H1 */
 
 
 

@@ -867,7 +867,7 @@ class BDDPanel1
 	private JCheckBox alterPCG, traceOn, ucOptimistic, nbOptimistic;
 	/* package access */
 	JCheckBox debugOn;
-	private JCheckBox sizeWatch, profileOn;
+	private JCheckBox sizeWatch, profileOn, levelGraph;
 	private JComboBox algorithmFamily, dssiHeuristics, ndasHeuristics;
 	private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics;
 	private JComboBox showGrow, frontierStrategy, supReachability;
@@ -894,6 +894,7 @@ class BDDPanel1
 		pWest.add(debugOn = new JCheckBox("Verbose", Options.debug_on));
 		pWest.add(profileOn = new JCheckBox("Profile", Options.profile_on));
 		pWest.add(sizeWatch = new JCheckBox("report nodcount", Options.size_watch));
+		pWest.add(levelGraph = new JCheckBox("H1 level graphs", Options.show_level_graph));
 
 
 		JPanel pWest2 = new JPanel(new GridLayout(2, 1));
@@ -946,6 +947,7 @@ class BDDPanel1
 		Options.profile_on = profileOn.isSelected();
 		Options.debug_on = debugOn.isSelected();
 		Options.size_watch = sizeWatch.isSelected();
+		Options.show_level_graph = levelGraph.isSelected();
 		Options.show_grow = showGrow.getSelectedIndex();
 		Options.sup_reachability_type = supReachability.getSelectedIndex();
 

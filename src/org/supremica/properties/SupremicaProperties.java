@@ -181,7 +181,7 @@ public final class SupremicaProperties
 	private static final String BDD_DISJ_OPTIMIZER_ALGO = "bddDisjOptimizerAlgo"; // disj_optimizer_algo
 	private static final String BDD_TRANSITION_OPTIMIZER_ALGO = "bddTransitionOptimizerAlgo"; // transition_optimizer_algo
 	private static final String BDD_INTERLEAVED_VARIABLES = "bddInterleavedVariables"; // interleaved_variables
-
+	private static final String BDD_LEVEL_GRAPHS = "bddLevelGraphs"; // show_level_graph
 
 
 	// Simulation stuff
@@ -1365,6 +1365,7 @@ public final class SupremicaProperties
 			setOption(BDD_DISJ_OPTIMIZER_ALGO, Options.disj_optimizer_algo);
 			setOption(BDD_TRANSITION_OPTIMIZER_ALGO, Options.transition_optimizer_algo);
 			setOption(BDD_INTERLEAVED_VARIABLES, Options.interleaved_variables);
+			setOption(BDD_LEVEL_GRAPHS, Options.show_level_graph);
 
 		}
 		else
@@ -1397,7 +1398,7 @@ public final class SupremicaProperties
 			Options.disj_optimizer_algo = optionAsInt(BDD_DISJ_OPTIMIZER_ALGO, Options.disj_optimizer_algo);
 			Options.transition_optimizer_algo = optionAsInt(BDD_TRANSITION_OPTIMIZER_ALGO, Options.transition_optimizer_algo);
 			Options.interleaved_variables = optionAsBoolean(BDD_INTERLEAVED_VARIABLES, Options.interleaved_variables);
-
+			Options.show_level_graph = optionAsBoolean(BDD_LEVEL_GRAPHS, Options.show_level_graph);
 		}
 	}
 

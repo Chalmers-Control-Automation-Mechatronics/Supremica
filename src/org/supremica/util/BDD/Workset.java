@@ -1,6 +1,8 @@
 package org.supremica.util.BDD;
 
 import org.supremica.util.BDD.heuristics.*;
+import org.supremica.util.BDD.graphs.*;
+
 
 /**
  * The workset algorithms works just like the PetriNet reachability algo, but it treats zappsp
@@ -22,6 +24,7 @@ public class Workset
 	private Cluster[] clusters;
 	private InteractiveChoice ic = null;
 	private NDAS_Choice ndas = null;
+	private LevelGraph levelGraph = null;
 
 	/**
 	 * we keep track of the number of (not) advancing choices in a row.
@@ -61,6 +64,11 @@ public class Workset
 		if (heuristic == Options.ES_HEURISTIC_INTERACTIVE)
 		{
 			ic = new InteractiveChoice("Workset interactive automaton selection");
+		}
+
+		if(Options.show_level_graph)
+		{
+			levelGraph = new LevelGraph(size);
 		}
 	}
 
@@ -317,6 +325,19 @@ public class Workset
 	/** and here is where they are called from: */
 	private int h1_heuristic(int h1, boolean exclusive)
 	{
+
+
+		if(levelGraph != null) {
+			int c = 0;
+			for (int i = 0; i < size; i++)
+				if (workset[i] > 0 && (!exclusive || remaining[i]) )
+					c++;
+
+			levelGraph.add(c);
+		}
+
+
+
 			switch (h1)
 			{
 			case Options.ES_HEURISTIC_INTERACTIVE :
