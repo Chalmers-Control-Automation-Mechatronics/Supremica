@@ -46,6 +46,7 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.external.shoefactory.plantBuilder;
 
 import org.supremica.automata.*;
@@ -62,15 +63,24 @@ public class Specification
 	LabeledEvent get1Event,get2Event,get3Event,get4Event,get5Event;
 	LabeledEvent put7Event,put8Event,put9Event,put10Event,put11Event,put12Event;
 	LabeledEvent get7Event,get8Event,get9Event,get10Event,get11Event,get12Event;
+	
+	LabeledEvent putR1Event,putR2Event,putR3Event,putR4Event,putR5Event,putR10Event;
+	LabeledEvent getL1Event,getL2Event,getL3Event,getL4Event,getL5Event,getL10Event;
+	
 
-	State tab1,tab2,tab3,tab4,tab5,g1,g2,g3,g4,g5,g6,g7;
+	State tab1,tab2,tab3,tab4,tab5,g1,g2,g3,g4,g5,g6,g7 ;
+	State h1,h2,h3,h4,h5,h6,h7;
+	State i1,i2,i3,i4,i5,i6,i7;
+	State s0ret3,s0ret4,s0ret5,s0ret6,s0ret7,s0ret8,s0ret9,s0ret10,s0ret11,s0ret12,s0ret13,s0ret14,s0ret15;
 	State tab7,tab8,tab9,tab10,tab11,tab12;
 
+	
 	public Specification(int nr, boolean[] sv)
 	{
 		theSpec = new Project();
 		shoeNr = nr;
 
+	
 		Automaton currShoe = new Automaton("Shoe"+nr+" spec");
 	  	currShoe.setType(AutomatonType.Specification);
 	   	currAlphabet = currShoe.getAlphabet();
@@ -81,38 +91,50 @@ public class Specification
 		currShoe.setInitialState(sInitial);
 		State s0 = currShoe.createAndAddUniqueState("q");
 
-		LabeledEvent put0Event = new LabeledEvent("Shoe_"+nr+"put_T0");
-		LabeledEvent get0Event = new LabeledEvent("Shoe_"+nr+"get_T0");
-		currAlphabet.addEvent(put0Event);
-		currAlphabet.addEvent(get0Event);
+		LabeledEvent put0LEvent = new LabeledEvent("Shoe_"+nr+"put_T0L");
+		LabeledEvent get0LEvent = new LabeledEvent("Shoe_"+nr+"get_T0L");
+		currAlphabet.addEvent(put0LEvent);
+		currAlphabet.addEvent(get0LEvent);
+		
+		LabeledEvent put0REvent = new LabeledEvent("Shoe_"+nr+"put_T0R");
+		LabeledEvent get0REvent = new LabeledEvent("Shoe_"+nr+"get_T0R");
+		currAlphabet.addEvent(put0REvent);
+		currAlphabet.addEvent(get0REvent);
 
-		Arc putArc = new Arc(sInitial, s0, put0Event);
-		Arc getArc = new Arc(s0,sInitial, get0Event);
+		Arc putArc = new Arc(sInitial, s0, put0LEvent);
+		State s0ret1 = currShoe.createAndAddUniqueState("q");
+		State s0ret2 = currShoe.createAndAddUniqueState("q");
+		
+		Arc getArc = new Arc(s0ret1,sInitial, get0LEvent);
+	    
 	    g1 = currShoe.createAndAddUniqueState("q");
-		Arc tmp6g =new Arc(s0,g1,get0Event);
-		Arc tmp6p =new Arc(g1,s0,put0Event);
+		
+		Arc tmp6g =new Arc(s0,g1,get0REvent);
+		Arc tmp6p =new Arc(s0ret2,s0ret1,put0REvent);
+		s0ret14 =currShoe.createAndAddUniqueState("q");
+	
 		
 		if(sv[0] || sv[1] || sv[2] || sv[3] || sv[4])
 		{
-			System.out.println("ok0");
+			
 			LabeledEvent put6Event = createPutEvent(6);
 			LabeledEvent get6Event = createGetEvent(6);
-			System.out.println("ok01");
 			
-			System.out.println("ok02");
+			
+			
 			State tab6 = currShoe.createAndAddUniqueState("q");
-			System.out.println("ok02");
+			
 			if(sv[0])
 			{
-				System.out.println("ok1in");
+				
 				LabeledEvent pt6s0 =new LabeledEvent("Shoe_"+shoeNr+"put_T6_S0"); 
 				LabeledEvent gt6s0 =new LabeledEvent("Shoe_"+shoeNr+"get_T6_S0"); 
 				currAlphabet.addEvent(pt6s0);
 				currAlphabet.addEvent(gt6s0);
-				System.out.println("ok1");
+				
 				State stat0 = currShoe.createAndAddUniqueState("q");
-				Arc putstat0 = new Arc(tab6 ,stat0,pt6s0);
-				Arc getstat0 = new Arc( stat0,tab6 ,gt6s0);	 
+				Arc putstat0 = new Arc(tab6 ,stat0,gt6s0);
+				Arc getstat0 = new Arc( stat0,tab6 ,pt6s0);	 
 			
 			}
 			
@@ -123,8 +145,8 @@ public class Specification
 				currAlphabet.addEvent(pt6s1);
 				currAlphabet.addEvent(gt6s1);
 				State stat1 = currShoe.createAndAddUniqueState("q");
-				Arc putstat1 = new Arc(tab6 ,stat1, pt6s1);
-				Arc getstat1 = new Arc( stat1,tab6 , gt6s1);	 
+				Arc putstat1 = new Arc(tab6 ,stat1, gt6s1);
+				Arc getstat1 = new Arc( stat1,tab6 , pt6s1);	 
 			}
 			
 			if(sv[2])
@@ -134,8 +156,8 @@ public class Specification
 				currAlphabet.addEvent(pt6s2);
 				currAlphabet.addEvent(gt6s2);
 				State stat2 = currShoe.createAndAddUniqueState("q");
-				Arc putstat2 = new Arc(tab6 ,stat2, pt6s2);
-				Arc getstat2 = new Arc( stat2,tab6 , gt6s2);	 
+				Arc putstat2 = new Arc(tab6 ,stat2, gt6s2);
+				Arc getstat2 = new Arc( stat2,tab6 , pt6s2);	 
 			}
 			
 			if(sv[3])
@@ -145,8 +167,8 @@ public class Specification
 				currAlphabet.addEvent(pt6s3);
 				currAlphabet.addEvent(gt6s3);
 				State stat3 = currShoe.createAndAddUniqueState("q");
-				Arc putstat3 = new Arc(tab6 ,stat3, pt6s3);
-				Arc getstat3 = new Arc( stat3,tab6 , gt6s3);	 
+				Arc putstat3 = new Arc(tab6 ,stat3, gt6s3);
+				Arc getstat3 = new Arc( stat3,tab6 , pt6s3);	 
 			}
 			
 			if(sv[4])
@@ -156,14 +178,15 @@ public class Specification
 				currAlphabet.addEvent(pt6s4);
 				currAlphabet.addEvent(gt6s4);
 				State stat4 = currShoe.createAndAddUniqueState("q");
-				Arc putstat4 = new Arc(tab6 ,stat4, pt6s4);
-				Arc getstat4 = new Arc( stat4,tab6 , gt6s4);	 
+				Arc putstat4 = new Arc(tab6 ,stat4, gt6s4);
+				Arc getstat4 = new Arc( stat4,tab6 , pt6s4);	 
 			}
-			System.out.println("ok1");
-			Arc putArc6 = new Arc( g1, tab6 , put6Event);
-			Arc getArc6 = new Arc( tab6 ,g1, get6Event);
+			
+			Arc putArc6 = new Arc( g1,tab6,put6Event);
+			h1=currShoe.createAndAddUniqueState("q");
+			Arc getArc6 = new Arc( tab6,h1,get6Event);
 		
-			System.out.println("ok1");
+			
 		}
 
 
@@ -204,8 +227,10 @@ public class Specification
 		}
 		if(sv[20])
 		{
-			put10Event = createPutEvent(10);
-			get10Event = createGetEvent(10);
+			put10Event = new LabeledEvent("Shoe_"+shoeNr+"put_T10L");
+			currAlphabet.addEvent(put10Event);
+			get10Event = new LabeledEvent("Shoe_"+shoeNr+"get_T10R");
+			currAlphabet.addEvent(get10Event);
 			midtab[0]=true;
 			midtab[1]=true;
 			midtab[2]=true;
@@ -229,62 +254,144 @@ public class Specification
 	{
 		if(midtab[0])
 		{
-		put1Event = createPutEvent(1);
-		get1Event =createGetEvent(1);
+		put1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1L");
+		currAlphabet.addEvent(put1Event);
+		
+		get1Event =new LabeledEvent("Shoe_"+shoeNr+"get_T1R");
+		currAlphabet.addEvent(get1Event);
+		
+		
+		putR1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1R");
+		currAlphabet.addEvent(putR1Event);
+		
+		getL1Event =new LabeledEvent("Shoe_"+shoeNr+"get_T1L");
+		currAlphabet.addEvent(getL1Event);
+		
+		s0ret3 =currShoe.createAndAddUniqueState("q");
+		s0ret4 =currShoe.createAndAddUniqueState("q");
+		Arc ag3p = new Arc( s0ret4,s0ret3 , putR1Event);
+		Arc ag2p = new Arc( s0ret3,s0ret2 , getL1Event);
+				
+		
 		tab1 = currShoe.createAndAddUniqueState("q");
 		g2 = currShoe.createAndAddUniqueState("q");
+	
 		Arc ag2 = new Arc( tab1, g2 , get1Event);
-		Arc ag2p = new Arc( g2,tab1 , put1Event);
+		//Arc ag2p = new Arc( g2,tab1 , put1Event);
 		Arc putArc1 = new Arc( g1, tab1 , put1Event);
-		Arc getArc1 = new Arc( tab1 ,g1, get1Event);
+		//Arc getArc1 = new Arc( tab1 ,g1, get1Event);
 		midtab[0]=false;
 		}
 
 		if(midtab[1])
 		{
-		put2Event = createPutEvent(2);
-		get2Event =createGetEvent(2);
+		put2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2L");
+		currAlphabet.addEvent(put2Event);
+		get2Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T2R");
+		currAlphabet.addEvent(get2Event);
+		
+		
+		putR2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2R");
+		currAlphabet.addEvent(putR2Event);
+		
+		getL2Event =new LabeledEvent("Shoe_"+shoeNr+"get_T2L");
+		currAlphabet.addEvent(getL2Event);
+		
+		s0ret5 =currShoe.createAndAddUniqueState("q");
+		s0ret6 =currShoe.createAndAddUniqueState("q");
+		Arc ag3p = new Arc( s0ret6,s0ret5 , putR2Event);
+		Arc ag2p = new Arc( s0ret5,s0ret4 , getL2Event);
+		
+		
 		tab2 = currShoe.createAndAddUniqueState("q");
 		g3 = currShoe.createAndAddUniqueState("q");
 		Arc ag3 = new Arc( tab2, g3 , get2Event);
-		Arc ag3p = new Arc( g3,tab2 , put2Event);
+		//Arc ag3p = new Arc( g3,tab2 , put2Event);
 		Arc putArc2 = new Arc( g2 ,tab2, put2Event);
-		Arc getArc2 = new Arc( tab2 ,g2, get2Event);
+		//Arc getArc2 = new Arc( tab2 ,g2, get2Event);
 		midtab[1]=false;
 		}
 		if(midtab[2])
 		{
-		put3Event = createPutEvent(3);
-		get3Event =createGetEvent(3);
+	
+		put3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3L");
+		currAlphabet.addEvent(put3Event);
+		get3Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T3R");
+		currAlphabet.addEvent(get3Event);
 		tab3 = currShoe.createAndAddUniqueState("q");
 		g4 = currShoe.createAndAddUniqueState("q");
+		
+		
+		putR3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3R");
+		currAlphabet.addEvent(putR3Event);
+		getL3Event =new LabeledEvent("Shoe_"+shoeNr+"get_T3L");
+		currAlphabet.addEvent(getL3Event);
+		s0ret7 =currShoe.createAndAddUniqueState("q");
+		s0ret8 =currShoe.createAndAddUniqueState("q");
+		
+		Arc ag5p = new Arc( s0ret8,s0ret7 ,putR3Event);
+		Arc ag4p = new Arc( s0ret7,s0ret6 ,getL3Event);
+		
+		
+		
 		Arc ag4 = new Arc( tab3, g4 , get3Event);
-		Arc ag4p = new Arc( g4,tab3 , put3Event);
+		//Arc ag4p = new Arc( g4,tab3 , put3Event);
 		Arc putArc3 = new Arc( g3 ,tab3, put3Event);
-		Arc getArc3 = new Arc( tab3 ,g3, get3Event);
+		//Arc getArc3 = new Arc( tab3 ,g3, get3Event);
 		midtab[2]=false;
 		}
 
-		System.out.println("Början");
+		
 		if(midtab[3])
 		{
-		put4Event = createPutEvent(4);
-		get4Event =createGetEvent(4);
+		put4Event = new LabeledEvent("Shoe_"+shoeNr+"put_T4L");
+		currAlphabet.addEvent(put4Event);
+		get4Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T4R");
+		currAlphabet.addEvent(get4Event);
+		
 		tab4 = currShoe.createAndAddUniqueState("q");
 		g5 = currShoe.createAndAddUniqueState("q");
+		
+		putR4Event = new LabeledEvent("Shoe_"+shoeNr+"put_T4R");
+		currAlphabet.addEvent(putR4Event);
+		getL4Event =new LabeledEvent("Shoe_"+shoeNr+"get_T4L");
+		currAlphabet.addEvent(getL4Event);
+		s0ret9 =currShoe.createAndAddUniqueState("q");
+		s0ret10 =currShoe.createAndAddUniqueState("q");
+		
+		Arc ag7p = new Arc( s0ret10,s0ret9 ,putR4Event);
+		Arc ag6p = new Arc( s0ret9,s0ret8 ,getL4Event);
+		
+		
+		
 		Arc ag5 = new Arc( tab4, g5 , get4Event);
-		Arc ag5p = new Arc( g5,tab4 , put4Event);
+		//Arc ag5p = new Arc( g5,tab4 , put4Event);
 		Arc putArc4 = new Arc( g4 ,tab4, put4Event);
-		Arc getArc4 = new Arc( tab4 ,g4, get4Event);
+	//	Arc getArc4 = new Arc( tab4 ,g4, get4Event);
 		midtab[3]=false;
 		}
 		if(midtab[4])
 		{
-		put5Event = createPutEvent(5);
-		get5Event =createGetEvent(5);
+		put5Event = new LabeledEvent("Shoe_"+shoeNr+"put_T5L");
+		currAlphabet.addEvent(put5Event);
+		get5Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T5R");
+		currAlphabet.addEvent(get5Event);
+		
+		putR5Event = new LabeledEvent("Shoe_"+shoeNr+"put_T5R");
+		currAlphabet.addEvent(putR5Event);
+		getL5Event =new LabeledEvent("Shoe_"+shoeNr+"get_T5L");
+		currAlphabet.addEvent(getL5Event);
+		
+		s0ret11 =currShoe.createAndAddUniqueState("q");
+		s0ret12 =currShoe.createAndAddUniqueState("q");
+		
+		Arc ag9p = new Arc( s0ret12,s0ret11 ,putR5Event);
+		Arc ag8p = new Arc( s0ret11,s0ret10 ,getL5Event);
+		
+		
 		tab5 = currShoe.createAndAddUniqueState("q");
-		Arc putArc5 = new Arc( g5 ,tab5, put5Event);
-		Arc getArc5 = new Arc( tab5 ,g5, get5Event);
+		//Arc putArc5 = new Arc( g5 ,tab5, put5Event);
+		//Arc getArc5 = new Arc( tab5 ,s0ret10,get5Event);
 		midtab[4]=false;
 		}
 		tab11 =currShoe.createAndAddUniqueState("q");
@@ -296,8 +403,8 @@ public class Specification
 		currAlphabet.addEvent(pt11s21);
 		currAlphabet.addEvent(gt11s21);
 		State stat21 = currShoe.createAndAddUniqueState("q");
-		Arc putstat21 = new Arc(tab11 ,stat21, pt11s21);
-		Arc getstat21 = new Arc( stat21,tab11 , gt11s21);	 
+		Arc putstat21 = new Arc(tab11 ,stat21, gt11s21);
+		Arc getstat21 = new Arc( stat21,tab11 , pt11s21);	 
 		}	
 	if(sv[22])
 		{
@@ -306,8 +413,8 @@ public class Specification
 		currAlphabet.addEvent(pt11s22);
 		currAlphabet.addEvent(gt11s22);
 		State stat22 = currShoe.createAndAddUniqueState("q");
-		Arc putstat22 = new Arc(tab11 ,stat22, pt11s22);
-		Arc getstat22 = new Arc( stat22,tab11 , gt11s22);	 
+		Arc putstat22 = new Arc(tab11 ,stat22, gt11s22);
+		Arc getstat22 = new Arc( stat22,tab11 , pt11s22);	 
 		}	
 	
 	if(sv[23])
@@ -317,67 +424,121 @@ public class Specification
 		currAlphabet.addEvent(pt11s23);
 		currAlphabet.addEvent(gt11s23);
 		State stat23 = currShoe.createAndAddUniqueState("q");
-		Arc putstat23 = new Arc(tab11 ,stat23, pt11s23);
-		Arc getstat23 = new Arc( stat23,tab11 , gt11s23);	 
+		Arc putstat23 = new Arc(tab11 ,stat23, gt11s23);
+		Arc getstat23 = new Arc( stat23,tab11 , pt11s23);	 
 		}	
 		
 		g7 = currShoe.createAndAddUniqueState("q");
 		Arc ag7 = new Arc( tab5, g7 , get5Event);
-		Arc ag7p = new Arc( g7,tab5 , put5Event);
-		if(g7 ==null ||tab11==null)
-			System.out.println("11null");
+		Arc ag7p = new Arc( s0ret14,tab5 , put5Event);
+					
+	
 		Arc putArc11 = new Arc( g7,tab11, put11Event);
-		Arc getArc11 = new Arc( tab11,g7, get11Event);
+		Arc getArc11 = new Arc( tab11,s0ret12,get11Event);
 		
-			System.out.println("ok2");
+	
 	}
 
-	//System.out.println("Mitten");
 
 		if(sv[20])
 		{
+			
+			
+			
 			if(midtab[0])
 			{
-			put1Event = createPutEvent(1);
-			get1Event =createGetEvent(1);
+			put1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1L");
+			currAlphabet.addEvent(put1Event);
+			get1Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T1R");
+			currAlphabet.addEvent(get1Event);
 			tab1 = currShoe.createAndAddUniqueState("q");
 		    g2 = currShoe.createAndAddUniqueState("q");
+			
 			Arc ag2 = new Arc( tab1, g2 , get1Event);
-			Arc ag2p = new Arc( g2,tab1 , put1Event);
+			
+			putR1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1R");
+			currAlphabet.addEvent(putR1Event);
+		
+			getL1Event =new LabeledEvent("Shoe_"+shoeNr+"get_T1L");
+			currAlphabet.addEvent(getL1Event);
+		
+			s0ret3 =currShoe.createAndAddUniqueState("q");
+			Arc	ag2p = new Arc( s0ret3,s0ret2 , getL1Event);
+			s0ret4 =currShoe.createAndAddUniqueState("q");
+			Arc ag3p = new Arc( s0ret4,s0ret3 , putR1Event);
+			
+			
 			Arc putArc1 = new Arc( g1, tab1 , put1Event);
-			Arc getArc1 = new Arc( tab1 ,g1, get1Event);
+			
 			midtab[0]=false;
 			}
 			if(midtab[1])
 			{
-			put2Event = createPutEvent(2);
-			get2Event =createGetEvent(2);
+			put2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2L");
+			currAlphabet.addEvent(put2Event);
+			get2Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T2R");
+			currAlphabet.addEvent(get2Event);
 			tab2 = currShoe.createAndAddUniqueState("q");
 			g3 = currShoe.createAndAddUniqueState("q");
+			
+			putR2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2R");
+			currAlphabet.addEvent(putR2Event);
+			getL2Event =new LabeledEvent("Shoe_"+shoeNr+"get_T2L");
+			currAlphabet.addEvent(getL2Event);
+			s0ret5 =currShoe.createAndAddUniqueState("q");
+			s0ret6 =currShoe.createAndAddUniqueState("q");
+			
+			Arc ag3p = new Arc( s0ret6,s0ret5 , putR2Event);
+			Arc ag2p = new Arc( s0ret5,s0ret4 , getL2Event);
+		
+			
+			
 			Arc ag3 = new Arc( tab2, g3 , get2Event);
-			Arc ag3p = new Arc( g3,tab2 , put2Event);
+			
 			Arc putArc2 = new Arc( g2 ,tab2, put2Event);
-			Arc getArc2 = new Arc( tab2 ,g2, get2Event);
+			
 			midtab[1]=false;
 			}
 			if(midtab[2])
 			{
-			put3Event = createPutEvent(3);
-			get3Event =createGetEvent(3);
+			put3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3L");
+			currAlphabet.addEvent(put3Event);
+			get3Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T3R");
+			currAlphabet.addEvent(get3Event);
 			tab3 = currShoe.createAndAddUniqueState("q");
 			g4 = currShoe.createAndAddUniqueState("q");
+			
+			putR3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3R");
+			currAlphabet.addEvent(putR2Event);
+			getL3Event =new LabeledEvent("Shoe_"+shoeNr+"get_T3L");
+			currAlphabet.addEvent(getL2Event);
+			s0ret7 =currShoe.createAndAddUniqueState("q");
+			s0ret8 =currShoe.createAndAddUniqueState("q");
+			
+			Arc ag5p = new Arc( s0ret8,s0ret7 , putR3Event);
+			Arc ag4p = new Arc( s0ret7,s0ret6 , getL3Event);
+			
+			
 			Arc ag4 = new Arc( tab3, g4 , get3Event);
-			Arc ag4p = new Arc( g4,tab3 , put3Event);
+			
+			
+			
 			Arc putArc3 = new Arc( g3 ,tab3, put3Event);
-			Arc getArc3 = new Arc( tab3 ,g3, get3Event);
+			
+			
 			midtab[2]=false;
 			}
+			
 			if(midtab[3])
 			{
-			put4Event = createPutEvent(4);
-			get4Event =createGetEvent(4);
+			put4Event = new LabeledEvent("Shoe_"+shoeNr+"put_T4L");
+			currAlphabet.addEvent(put4Event);
+			get4Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T4R");
+			currAlphabet.addEvent(get4Event);
 			tab4 = currShoe.createAndAddUniqueState("q");
 			g5 = currShoe.createAndAddUniqueState("q");
+			
+						
 			Arc ag5 = new Arc( tab4, g5 , get4Event);
 			Arc ag5p = new Arc( g5,tab4 , put4Event);
 			
@@ -387,19 +548,28 @@ public class Specification
 			}
 			tab10 =currShoe.createAndAddUniqueState("q");
 			
-			LabeledEvent pt10s20 =new LabeledEvent("Shoe_"+shoeNr+"put_T10_S20"); 
-			LabeledEvent gt10s20 =new LabeledEvent("Shoe_"+shoeNr+"get_T10_S20"); 
-			currAlphabet.addEvent(pt10s20);
-			currAlphabet.addEvent(gt10s20);
-			State stat20 = currShoe.createAndAddUniqueState("q");
-			Arc putstat20 = new Arc(tab10 ,stat20, pt10s20);
-			Arc getstat20 = new Arc( stat20,tab10 , gt10s20);	 
+			
+			
+			State if10 = currShoe.createAndAddUniqueState("q");
+			State ret10 = currShoe.createAndAddUniqueState("q");
+			
+			putR10Event= new LabeledEvent("Shoe_"+shoeNr+"put_T10R");
+			currAlphabet.addEvent(putR10Event);
+			
+			getL10Event= new LabeledEvent("Shoe_"+shoeNr+"get_T10L");
+			currAlphabet.addEvent(getL10Event);
+			
+			
+			//Arc getstat20 = new Arc(if10 ,stat20, gt10s20);
+			//Arc putstat20 = new Arc( stat20,ret10 ,pt10s20);	 
 				
 			
-			if(g5 ==null ||tab10==null)
-			System.out.println("10null");
-			Arc putArc10 = new Arc( g5,tab10, put10Event);
-			Arc getArc10 = new Arc( tab10,g5, get10Event);
+		
+			
+			Arc putArc10 = new Arc( g5,if10,put10Event);
+		//	Arc getArc10 = new Arc( ret10,tab10,get10Event);
+			Arc getArc10 = new Arc( if10,tab10,get10Event);
+			
 			}
 
 
@@ -407,58 +577,120 @@ public class Specification
 		{
 			if(midtab[0])
 		{
-			put1Event = createPutEvent(1);
-			get1Event =createGetEvent(1);
+			put1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1L");
+			currAlphabet.addEvent(put1Event);
+			get1Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T1R");
+			currAlphabet.addEvent(get1Event);
 			tab1 = currShoe.createAndAddUniqueState("q");
 			g2 = currShoe.createAndAddUniqueState("q");
+			
+			putR1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1R");
+			currAlphabet.addEvent(putR1Event);
+			getL1Event =new LabeledEvent("Shoe_"+shoeNr+"get_T1L");
+			currAlphabet.addEvent(getL1Event);
+			s0ret3 =currShoe.createAndAddUniqueState("q");
+			Arc ag2p = new Arc( s0ret3,s0ret2 , getL1Event);
+			
+			s0ret4 =currShoe.createAndAddUniqueState("q");
+			Arc ag3p = new Arc( s0ret4,s0ret3 , putR1Event);
 			Arc ag2 = new Arc( tab1, g2 , get1Event);
-			Arc ag2p = new Arc( g2,tab1 , put1Event);
+			//Arc ag2p = new Arc( g2,tab1 , put1Event);
 			Arc putArc1 = new Arc( g1, tab1 , put1Event);
-			Arc getArc1 = new Arc( tab1 ,g1, get1Event);
+			//Arc getArc1 = new Arc( tab1 ,g1, get1Event);
 			midtab[0]=false;
 			}
 			if(midtab[1])
 			{
-			put2Event = createPutEvent(2);
-			get2Event =createGetEvent(2);
+			put2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2L");
+			currAlphabet.addEvent(put2Event);
+			get2Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T2R");
+			currAlphabet.addEvent(get2Event);
 			tab2 = currShoe.createAndAddUniqueState("q");
 			g3 = currShoe.createAndAddUniqueState("q");
+			
+			putR2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2R");
+			currAlphabet.addEvent(putR2Event);
+			getL2Event =new LabeledEvent("Shoe_"+shoeNr+"get_T2L");
+			currAlphabet.addEvent(getL2Event);
+			s0ret5 =currShoe.createAndAddUniqueState("q");
+			s0ret6 =currShoe.createAndAddUniqueState("q");
+			Arc ag3p = new Arc( s0ret6,s0ret5 , putR2Event);
+			Arc ag2p = new Arc( s0ret5,s0ret4 , getL2Event);
+		
+			
 			Arc ag3 = new Arc( tab2, g3 , get2Event);
-			Arc ag3p = new Arc( g3,tab2 , put2Event);
+			//Arc ag3p = new Arc( g3,tab2 , put2Event);
 			Arc putArc2 = new Arc( g2 ,tab2, put2Event);
-			Arc getArc2 = new Arc( tab2 ,g2, get2Event);
+			//Arc getArc2 = new Arc( tab2 ,g2, get2Event);
 			midtab[1]=false;
 			}
 			if(midtab[2])
 			{
-			put3Event = createPutEvent(3);
-			get3Event =createGetEvent(3);
+			put3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3L");
+			currAlphabet.addEvent(put3Event);
+			get3Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T3R");
+			currAlphabet.addEvent(get3Event);
 			tab3 = currShoe.createAndAddUniqueState("q");
 			g4 = currShoe.createAndAddUniqueState("q");
+			
+			putR3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3R");
+			currAlphabet.addEvent(putR2Event);
+			getL3Event =new LabeledEvent("Shoe_"+shoeNr+"get_T3L");
+			currAlphabet.addEvent(getL2Event);
+			s0ret7 =currShoe.createAndAddUniqueState("q");
+			s0ret8 =currShoe.createAndAddUniqueState("q");
+			Arc ag5p = new Arc( s0ret8,s0ret7 , putR3Event);
+			Arc ag4p = new Arc( s0ret7,s0ret6 , getL3Event);
+			
 			Arc ag4 = new Arc( tab3, g4 , get3Event);
-			Arc ag4p = new Arc( g4,tab3 , put3Event);
+			//Arc ag4p = new Arc( g4,tab3 , put3Event);
 			Arc putArc3 = new Arc( g3 ,tab3, put3Event);
-			Arc getArc3 = new Arc( tab3 ,g3, get3Event);
+			//Arc getArc3 = new Arc( tab3 ,g3, get3Event);
 			midtab[2]=false;
 			}
 			if(midtab[3])
 			{
-			put4Event = createPutEvent(4);
-			get4Event =createGetEvent(4);
+			put4Event = new LabeledEvent("Shoe_"+shoeNr+"put_T4L");
+			currAlphabet.addEvent(put4Event);
+			get4Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T4R");
+			currAlphabet.addEvent(get4Event);
 			tab4 = currShoe.createAndAddUniqueState("q");
 			g5 = currShoe.createAndAddUniqueState("q");
+			
+			putR4Event = new LabeledEvent("Shoe_"+shoeNr+"put_T4R");
+			currAlphabet.addEvent(putR4Event);
+			getL4Event =new LabeledEvent("Shoe_"+shoeNr+"get_T4L");
+			currAlphabet.addEvent(getL4Event);
+			s0ret9 =currShoe.createAndAddUniqueState("q");
+			s0ret10 =currShoe.createAndAddUniqueState("q");
+		
+			Arc ag7p = new Arc( s0ret10,s0ret9 ,putR4Event);
+			Arc ag6p = new Arc( s0ret9,s0ret8 ,getL4Event);
+			
+			
 			Arc ag5 = new Arc( tab4, g5 , get4Event);
-			Arc ag5p = new Arc( g5,tab4 , put4Event);
+			//Arc ag5p = new Arc( g5,tab4 , put4Event);
 			Arc putArc4 = new Arc( g4 ,tab4, put4Event);
-			Arc getArc4 = new Arc( tab4 ,g4, get4Event);
+			//Arc getArc4 = new Arc( tab4 ,g4, get4Event);
 
 			midtab[3]=false;
 			}
 			if(!sv[20])
 			{
-				tab10 =currShoe.createAndAddUniqueState("q");
-				Arc putArc10 = new Arc( tab4,tab10, put10Event);
-				Arc getArc10 = new Arc( tab10,tab4, get10Event);
+			   putR10Event= new LabeledEvent("Shoe_"+shoeNr+"put_T10R");
+			   currAlphabet.addEvent(putR10Event);
+			   getL10Event= new LabeledEvent("Shoe_"+shoeNr+"get_T10L");
+			   currAlphabet.addEvent(getL10Event);
+			   
+			   put10Event= new LabeledEvent("Shoe_"+shoeNr+"put_T10L");
+			   currAlphabet.addEvent(put10Event);
+			   get10Event= new LabeledEvent("Shoe_"+shoeNr+"get_T10R");
+			   currAlphabet.addEvent(get10Event);
+			   
+			   tab10 =currShoe.createAndAddUniqueState("q");
+				State not10 =currShoe.createAndAddUniqueState("q");
+				Arc putArc10 = new Arc( g5,not10,put10Event);
+				Arc getArc10 = new Arc( not10,tab10, get10Event);
 			}
 			tab12 =currShoe.createAndAddUniqueState("q");
 			
@@ -469,8 +701,8 @@ public class Specification
 				currAlphabet.addEvent(pt12s16);
 				currAlphabet.addEvent(gt12s16);
 				State stat16 = currShoe.createAndAddUniqueState("q");
-				Arc putstat16 = new Arc(tab12 ,stat16, pt12s16);
-				Arc getstat16 = new Arc( stat16,tab12 , gt12s16);	 
+				Arc putstat16 = new Arc(tab12 ,stat16, gt12s16);
+				Arc getstat16 = new Arc( stat16,tab12 , pt12s16);	 
 				}	
 				
 		if(sv[17])
@@ -480,8 +712,8 @@ public class Specification
 				currAlphabet.addEvent(pt12s17);
 				currAlphabet.addEvent(gt12s17);
 				State stat17 = currShoe.createAndAddUniqueState("q");
-				Arc putstat17 = new Arc(tab12 ,stat17, pt12s17);
-				Arc getstat17 = new Arc( stat17,tab12 , gt12s17);	 
+				Arc putstat17 = new Arc(tab12 ,stat17, gt12s17);
+				Arc getstat17 = new Arc( stat17,tab12 ,pt12s17);	 
 				}			
 			
 		if(sv[18])
@@ -491,8 +723,8 @@ public class Specification
 				currAlphabet.addEvent(pt12s18);
 				currAlphabet.addEvent(gt12s18);
 				State stat18 = currShoe.createAndAddUniqueState("q");
-				Arc putstat18 = new Arc(tab12 ,stat18, pt12s18);
-				Arc getstat18 = new Arc( stat18,tab12 , gt12s18);	 
+				Arc putstat18 = new Arc(tab12 ,stat18, gt12s18);
+				Arc getstat18 = new Arc( stat18,tab12 ,pt12s18);	 
 				}	
 		if(sv[19])
 				{
@@ -501,21 +733,43 @@ public class Specification
 				currAlphabet.addEvent(pt12s19);
 				currAlphabet.addEvent(gt12s19);
 				State stat19 = currShoe.createAndAddUniqueState("q");
-				Arc putstat19 = new Arc(tab12 ,stat19, pt12s19);
-				Arc getstat19 = new Arc( stat19,tab12 , gt12s19);	 
+				Arc putstat19 = new Arc(tab12 ,stat19, gt12s19);
+				Arc getstat19 = new Arc( stat19,tab12 ,pt12s19);	 
 				}	
 		
 			g6 = currShoe.createAndAddUniqueState("q");
-			if(g6 ==null ||tab10==null)
-			System.out.println("12null");
-			Arc ag6 = new Arc( tab10, g6 , get10Event);
-			Arc ag6p = new Arc( g6,tab10 , put10Event);
+		
 			
-			if(g6 ==null ||tab12==null)
-			System.out.println("12null");
-			Arc putArc12 = new Arc( g6,tab12, put12Event);
+			s0ret13 =currShoe.createAndAddUniqueState("q");
+			
+			
+			
+			Arc ag6p = new Arc( g6,s0ret13, putR10Event);
+			
+			if(sv[20])
+			{
+				LabeledEvent pt10s20 =new LabeledEvent("Shoe_"+shoeNr+"put_T10_S20"); 
+				LabeledEvent gt10s20 =new LabeledEvent("Shoe_"+shoeNr+"get_T10_S20"); 
+				currAlphabet.addEvent(pt10s20);
+				currAlphabet.addEvent(gt10s20);
+				State stat20 = currShoe.createAndAddUniqueState("q");
+				State s0ret15=currShoe.createAndAddUniqueState("q");
+				
+				Arc bla1 = new Arc( s0ret13,stat20, gt10s20);
+				Arc bla2 = new Arc( stat20,s0ret15,pt10s20);
+				Arc ag6 = new Arc( s0ret15,s0ret14,getL10Event);
+			}
+			
+			else
+			{
+				Arc ag6 = new Arc( s0ret13,s0ret14,getL10Event);		
+			}	
+			
+			
+		
+			Arc putArc12 = new Arc( tab10,tab12,put12Event);
 			Arc getArc12 = new Arc( tab12,g6, get12Event);
-				System.out.println("ok3");
+		
 			}
 
 			
@@ -523,38 +777,75 @@ public class Specification
 			{
 			if(midtab[0])
 			{
-			put1Event = createPutEvent(1);
-			get1Event =createGetEvent(1);
+			put1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1L");
+			currAlphabet.addEvent(put1Event);
+			get1Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T1R");
+			currAlphabet.addEvent(get1Event);
 			tab1 = currShoe.createAndAddUniqueState("q");
 			g2 = currShoe.createAndAddUniqueState("q");
+			putR1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1R");
+			currAlphabet.addEvent(putR1Event);
+			getL1Event =new LabeledEvent("Shoe_"+shoeNr+"get_T1L");
+			currAlphabet.addEvent(getL1Event);
+			s0ret3 =currShoe.createAndAddUniqueState("q");
+			Arc ag2p = new Arc( s0ret3,s0ret2 , getL1Event);
+		
+			s0ret4 =currShoe.createAndAddUniqueState("q");
+			Arc ag3p = new Arc( s0ret4,s0ret3 , putR1Event);
 			Arc ag2 = new Arc( tab1, g2 , get1Event);
-			Arc ag2p = new Arc( g2,tab1 , put1Event);
+			//Arc ag2p = new Arc( g2,tab1 , put1Event);
 			Arc putArc1 = new Arc( g1 ,tab1, put1Event);
-			Arc getArc1 = new Arc( tab1 ,g1, get1Event);
+			//Arc getArc1 = new Arc( tab1 ,g1, get1Event);
 			midtab[0]=false;
 			}
 			if(midtab[1])
 			{
-			put2Event = createPutEvent(2);
-			get2Event =createGetEvent(2);
+			put2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2L");
+			currAlphabet.addEvent(put2Event);
+			get2Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T2R");
+			currAlphabet.addEvent(get2Event);
 			tab2 = currShoe.createAndAddUniqueState("q");
 			g3 = currShoe.createAndAddUniqueState("q");
+			
+			putR2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2R");
+			currAlphabet.addEvent(putR2Event);
+			getL2Event =new LabeledEvent("Shoe_"+shoeNr+"get_T2L");
+			currAlphabet.addEvent(getL2Event);
+			s0ret5 =currShoe.createAndAddUniqueState("q");
+			s0ret6 =currShoe.createAndAddUniqueState("q");
+			Arc ag3p = new Arc( s0ret6,s0ret5 , putR2Event);
+			Arc ag2p = new Arc( s0ret5,s0ret4 , getL2Event);
+		
+			
 			Arc ag3 = new Arc( tab2, g3 , get2Event);
-			Arc ag3p = new Arc( g3,tab2 , put2Event);
+			//Arc ag3p = new Arc( g3,tab2 , put2Event);
 			Arc putArc2 = new Arc( g2 ,tab2, put2Event);
-			Arc getArc2 = new Arc( tab2 ,g2, get2Event);
+			//Arc getArc2 = new Arc( tab2 ,g2, get2Event);
 			midtab[1]=false;
 			}
 			if(midtab[2])
 			{
-			put3Event = createPutEvent(3);
-			get3Event =createGetEvent(3);
+			put3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3L");
+			currAlphabet.addEvent(put3Event);
+			get3Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T3R");
+			currAlphabet.addEvent(get3Event);
 			tab3 = currShoe.createAndAddUniqueState("q");
 			g4 = currShoe.createAndAddUniqueState("q");
+			
+			putR3Event = new LabeledEvent("Shoe_"+shoeNr+"put_T3R");
+			currAlphabet.addEvent(putR2Event);
+			getL3Event =new LabeledEvent("Shoe_"+shoeNr+"get_T3L");
+			currAlphabet.addEvent(getL2Event);
+			s0ret7 =currShoe.createAndAddUniqueState("q");
+			s0ret8 =currShoe.createAndAddUniqueState("q");
+			Arc ag5p = new Arc( s0ret8,s0ret7 , putR3Event);
+			Arc ag4p = new Arc( s0ret7,s0ret6 , getL3Event);
+			
+			
 			Arc ag4 = new Arc( tab3, g4 , get3Event);
-			Arc ag4p = new Arc( g4,tab3 , put3Event);
+			//Arc ag4p = new Arc( g4,tab3 , put3Event);
 			Arc putArc3 = new Arc( g3 ,tab3, put3Event);
-			Arc getArc3 = new Arc( tab3 ,tab2, get3Event);
+			//Arc getArc3 = new Arc( tab3 ,tab2, get3Event);
 			midtab[2]=false;
 			}
 			tab9 =currShoe.createAndAddUniqueState("q");
@@ -566,8 +857,8 @@ public class Specification
 				currAlphabet.addEvent(pt9s12);
 				currAlphabet.addEvent(gt9s12);
 				State stat12 = currShoe.createAndAddUniqueState("q");
-				Arc putstat12 = new Arc(tab9 ,stat12, pt9s12);
-				Arc getstat12 = new Arc( stat12,tab9 , gt9s12);	 
+				Arc putstat12 = new Arc(tab9 ,stat12, gt9s12);
+				Arc getstat12 = new Arc( stat12,tab9 ,pt9s12);	 
 				}
 			if(sv[13])
 				{
@@ -576,8 +867,8 @@ public class Specification
 				currAlphabet.addEvent(pt9s13);
 				currAlphabet.addEvent(gt9s13);
 				State stat13 = currShoe.createAndAddUniqueState("q");
-				Arc putstat13 = new Arc(tab9 ,stat13, pt9s13);
-				Arc getstat13 = new Arc( stat13,tab9 , gt9s13);	 
+				Arc putstat13 = new Arc(tab9 ,stat13, gt9s13);
+				Arc getstat13 = new Arc( stat13,tab9 ,pt9s13);	 
 				}
 			
 			if(sv[14])
@@ -587,8 +878,8 @@ public class Specification
 				currAlphabet.addEvent(pt9s14);
 				currAlphabet.addEvent(gt9s14);
 				State stat14 = currShoe.createAndAddUniqueState("q");
-				Arc putstat14 = new Arc(tab9 ,stat14, pt9s14);
-				Arc getstat14 = new Arc( stat14,tab9 , gt9s14);	 
+				Arc putstat14 = new Arc(tab9 ,stat14, gt9s14);
+				Arc getstat14 = new Arc( stat14,tab9 ,pt9s14);	 
 				}
 				
 			if(sv[15])
@@ -598,44 +889,69 @@ public class Specification
 				currAlphabet.addEvent(pt9s15);
 				currAlphabet.addEvent(gt9s15);
 				State stat15 = currShoe.createAndAddUniqueState("q");
-				Arc putstat15 = new Arc(tab9 ,stat15, pt9s15);
-				Arc getstat15 = new Arc( stat15,tab9 , gt9s15);	 
+				Arc putstat15 = new Arc(tab9 ,stat15, gt9s15);
+				Arc getstat15 = new Arc( stat15,tab9 ,pt9s15);	 
 				}	
 			
-			if(g4 ==null ||tab9==null)
-			System.out.println("9null");
+			
 			Arc putArc9 = new Arc( g4,tab9, put9Event);
 			Arc getArc9 = new Arc( tab9,g4, get9Event);
-				System.out.println("ok4");
+			
 			}
 
-			//System.out.println("Senare");
+		
 
 
 		if(sv[9] || sv[10] || sv[11])
 			{
+				
 			if(midtab[0])
 			{
-			put1Event = createPutEvent(1);
-			get1Event =createGetEvent(1);
+			put1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1L");
+			currAlphabet.addEvent(put1Event);
+			get1Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T1R");
+			currAlphabet.addEvent(get1Event);
 			tab1 = currShoe.createAndAddUniqueState("q");
 			g2 = currShoe.createAndAddUniqueState("q");
+			putR1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1R");
+			currAlphabet.addEvent(putR1Event);
+			getL1Event =new LabeledEvent("Shoe_"+shoeNr+"get_T1L");
+			currAlphabet.addEvent(getL1Event);
+		
+			s0ret3 =currShoe.createAndAddUniqueState("q");
+			Arc ag2p = new Arc( s0ret3,s0ret2 , getL1Event);
+				
+			s0ret4 =currShoe.createAndAddUniqueState("q");
+			Arc ag3p = new Arc( s0ret4,s0ret3 , putR1Event);
 			Arc ag2 = new Arc( tab1, g2 , get1Event);
-			Arc ag2p = new Arc( g2,tab1 , put1Event);
+			//Arc ag2p = new Arc( g2,tab1 , put1Event);
 			Arc putArc1 = new Arc( g1 ,tab1, put1Event);
-			Arc getArc1 = new Arc( tab1 ,g1, get1Event);
+			//Arc getArc1 = new Arc( tab1 ,g1, get1Event);
 			midtab[0]=false;
 			}
 			if(midtab[1])
 			{
-			put2Event = createPutEvent(2);
-			get2Event =createGetEvent(2);
+			put2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2L");
+			currAlphabet.addEvent(put2Event);
+			get2Event =	new LabeledEvent("Shoe_"+shoeNr+"get_T2R");
+			currAlphabet.addEvent(get2Event);
 			tab2 = currShoe.createAndAddUniqueState("q");
 			g3 = currShoe.createAndAddUniqueState("q");
+			
+			putR2Event = new LabeledEvent("Shoe_"+shoeNr+"put_T2R");
+			currAlphabet.addEvent(putR2Event);
+			getL2Event =new LabeledEvent("Shoe_"+shoeNr+"get_T2L");
+			currAlphabet.addEvent(getL2Event);
+			s0ret5 =currShoe.createAndAddUniqueState("q");
+			s0ret6 =currShoe.createAndAddUniqueState("q");
+			Arc ag3p = new Arc( s0ret6,s0ret5 , putR2Event);
+			Arc ag2p = new Arc( s0ret5,s0ret4 , getL2Event);
+		
+			
 			Arc ag3 = new Arc( tab2, g3 , get2Event);
-			Arc ag3p = new Arc( g3,tab2 , put2Event);
+			//Arc ag3p = new Arc( g3,tab2 , put2Event);
 			Arc putArc2 = new Arc( g2 ,tab2, put2Event);
-			Arc getArc2 = new Arc( tab2 ,g2, get2Event);
+			//Arc getArc2 = new Arc( tab2 ,g2, get2Event);
 			midtab[1]=false;
 			}
 			tab8 =currShoe.createAndAddUniqueState("q");
@@ -647,8 +963,8 @@ public class Specification
 				currAlphabet.addEvent(pt8s9);
 				currAlphabet.addEvent(gt8s9);
 				State stat9= currShoe.createAndAddUniqueState("q");
-				Arc putstat9 = new Arc(tab8 ,stat9, pt8s9);
-				Arc getstat9 = new Arc( stat9,tab8 , gt8s9);	 
+				Arc putstat9 = new Arc(tab8 ,stat9, gt8s9);
+				Arc getstat9 = new Arc( stat9,tab8 ,pt8s9);	 
 				}
 			
 			if(sv[10])
@@ -658,8 +974,8 @@ public class Specification
 				currAlphabet.addEvent(pt8s10);
 				currAlphabet.addEvent(gt8s10);
 				State stat10 = currShoe.createAndAddUniqueState("q");
-				Arc putstat10 = new Arc(tab8 ,stat10, pt8s10);
-				Arc getstat10 = new Arc( stat10,tab8 , gt8s10);	 
+				Arc putstat10 = new Arc(tab8 ,stat10, gt8s10);
+				Arc getstat10 = new Arc( stat10,tab8 ,pt8s10);	 
 				}
 			
 			if(sv[11])
@@ -669,28 +985,39 @@ public class Specification
 				currAlphabet.addEvent(pt8s11);
 				currAlphabet.addEvent(gt8s11);
 				State stat11 = currShoe.createAndAddUniqueState("q");
-				Arc putstat11 = new Arc(tab8 ,stat11, pt8s11);
-				Arc getstat11 = new Arc( stat11,tab8 , gt8s11);	 
+				Arc putstat11 = new Arc(tab8 ,stat11,gt8s11);
+				Arc getstat11 = new Arc( stat11,tab8 ,pt8s11);	 
 				}
 			
-				if(g3 ==null ||tab8==null)
-					System.out.println("8null");
+				
 				Arc putArc8 = new Arc( g3,tab8, put8Event);
 				Arc getArc8 = new Arc( tab8,g3, get8Event);
 				}
 
 		if(sv[5] || sv[6] || sv[7] || sv[8])
 			{
+			
+			
 			if(midtab[0])
 			{
-				put1Event = createPutEvent(1);
+				put1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1L");
+				currAlphabet.addEvent(put1Event);
 				get1Event =createGetEvent(1);
 				tab1 = currShoe.createAndAddUniqueState("q");
 				g2 = currShoe.createAndAddUniqueState("q");
+			
+				putR1Event = new LabeledEvent("Shoe_"+shoeNr+"put_T1R");
+				currAlphabet.addEvent(putR1Event);
+				getL1Event =new LabeledEvent("Shoe_"+shoeNr+"get_T1L");
+				currAlphabet.addEvent(getL1Event);
+				s0ret3 =currShoe.createAndAddUniqueState("q");
+				Arc ag2p = new Arc( s0ret3,s0ret2 , getL1Event);
+				s0ret4 =currShoe.createAndAddUniqueState("q");
+				Arc ag3p = new Arc( s0ret4,s0ret3 , putR1Event);		
 				Arc ag2 	= new Arc( tab1, g2 , get1Event);
-				Arc ag2p = new Arc( g2,tab1 , put1Event);
+				//Arc ag2p = new Arc( g2,tab1 , put1Event);
 				Arc putArc1 = new Arc( g1 ,tab1, put1Event);
-				Arc getArc1 = new Arc( tab1 ,g1, get1Event);
+			//	Arc getArc1 = new Arc( tab1 ,g1, get1Event);
 				midtab[0]=false;
 			}
 				tab7 =currShoe.createAndAddUniqueState("q");
@@ -701,8 +1028,8 @@ public class Specification
 				currAlphabet.addEvent(pt7s5);
 				currAlphabet.addEvent(gt7s5);
 				State stat5 = currShoe.createAndAddUniqueState("q");
-				Arc putstat5 = new Arc(tab7 ,stat5, pt7s5);
-				Arc getstat5 = new Arc( stat5,tab7 , gt7s5);	 
+				Arc putstat5 = new Arc(tab7 ,stat5, gt7s5);
+				Arc getstat5 = new Arc( stat5,tab7 ,pt7s5);	 
 				}
 			if(sv[6])
 				{
@@ -711,8 +1038,8 @@ public class Specification
 				currAlphabet.addEvent(pt7s6);
 				currAlphabet.addEvent(gt7s6);
 				State stat6 = currShoe.createAndAddUniqueState("q");
-				Arc putstat6 = new Arc(tab7 ,stat6, pt7s6);
-				Arc getstat6 = new Arc( stat6,tab7 , gt7s6);	 
+				Arc putstat6 = new Arc(tab7 ,stat6, gt7s6);
+				Arc getstat6 = new Arc( stat6,tab7 ,pt7s6);	 
 				}
 			
 			if(sv[7])
@@ -722,8 +1049,8 @@ public class Specification
 				currAlphabet.addEvent(pt7s7);
 				currAlphabet.addEvent(gt7s7);
 				State stat7= currShoe.createAndAddUniqueState("q");
-				Arc putstat7 = new Arc(tab7 ,stat7, pt7s7);
-				Arc getstat7 = new Arc( stat7, tab7 , gt7s7);	 
+				Arc putstat7 = new Arc(tab7 ,stat7, gt7s7);
+				Arc getstat7 = new Arc( stat7, tab7 ,pt7s7);	 
 				}
 			
 			if(sv[8])
@@ -733,17 +1060,42 @@ public class Specification
 				currAlphabet.addEvent(pt7s8);
 				currAlphabet.addEvent(gt7s8);
 				State stat8 = currShoe.createAndAddUniqueState("q");
-				Arc putstat8 = new Arc(tab7 ,stat8, pt7s8);
-				Arc getstat8 = new Arc( stat8,tab7 , gt7s8);	 
+				Arc putstat8 = new Arc(tab7 ,stat8, gt7s8);
+				Arc getstat8 = new Arc( stat8,tab7 ,pt7s8);	 
 				}
 			
 			
-				
+			i1=	currShoe.createAndAddUniqueState("q");
 			Arc putArc7 = new Arc( g2,tab7, put7Event);
-			Arc getArc7 = new Arc( tab7,g2, get7Event);
+			Arc getArc7 = new Arc( tab7,i1, get7Event);
 			}
-
-
+			
+			
+			h2=	currShoe.createAndAddUniqueState("q");
+			h3= currShoe.createAndAddUniqueState("q");
+			h4= currShoe.createAndAddUniqueState("q");
+			h5= currShoe.createAndAddUniqueState("q");
+			
+			i2=	currShoe.createAndAddUniqueState("q");
+			i3= currShoe.createAndAddUniqueState("q");
+			
+			
+			Arc aft6_1 = new Arc( h1,h2, put1Event);
+			Arc aft6_2 = new Arc( h2,h3, get1Event);
+			Arc aft6_3 = new Arc( h3,h4, put2Event);
+			Arc aft6_4 = new Arc( h4,h5, get2Event);
+			Arc aft6_5 = new Arc( h5,tab3, put3Event);
+			
+			Arc aft7_1 = new Arc( i1,i2, put2Event);
+			Arc aft7_2 = new Arc( i2,i3, get2Event);
+			Arc aft7_3 = new Arc( i3,tab3, put3Event);
+			
+			
+			
+			
+			
+			
+				
 			// Create arcs
 
 
