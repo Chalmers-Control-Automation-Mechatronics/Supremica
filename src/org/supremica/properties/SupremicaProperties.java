@@ -77,6 +77,8 @@ public final class SupremicaProperties
 	private static final String VERBOSE_MODE = "verboseMode";
 	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
 	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
+	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
+	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
 
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
@@ -138,6 +140,8 @@ public final class SupremicaProperties
 		setProperty(DOT_USE_COLORS, "true", true);
 		setProperty(DOT_USE_MULTI_LABELS, "true", true);
 		setProperty(DOT_AUTOMATIC_UPDATE, "true", true);
+		setProperty(GENERAL_REDIRECT_STDOUT, "false", true);
+		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(INCLUDE_EDITOR, "true", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
@@ -309,6 +313,26 @@ public final class SupremicaProperties
 	public static void setXmlRpcPort(int port)
 	{
 		wp.setProperty(XML_RPC_PORT, toString(port));
+	}
+
+	public static boolean generalRedirectStdout()
+	{
+		return toBoolean(wp.getProperty(GENERAL_REDIRECT_STDOUT));
+	}
+
+	public static void setGeneralRedirectStdout(boolean allow)
+	{
+		wp.setProperty(GENERAL_REDIRECT_STDOUT, toString(allow));
+	}
+
+	public static boolean generalRedirectStderr()
+	{
+		return toBoolean(wp.getProperty(GENERAL_REDIRECT_STDERR));
+	}
+
+	public static void setGeneralRedirectStderr(boolean allow)
+	{
+		wp.setProperty(GENERAL_REDIRECT_STDERR, toString(allow));
 	}
 
 	public static boolean useDot()

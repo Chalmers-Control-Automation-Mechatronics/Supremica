@@ -64,9 +64,11 @@ import org.apache.log4j.helpers.Loader;
 import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.helpers.OptionConverter;
 import org.supremica.gui.*;
+import org.supremica.properties.*;
 
 public class LogDisplay
 	extends AppenderSkeleton
+	implements Runnable
 {
 	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private static LogDisplay theLogDisplay = null;
@@ -82,6 +84,13 @@ public class LogDisplay
 	private Hashtable icons;
 	private String label;
 	private boolean fancy;
+	private Thread reader;
+	private Thread reader2;
+	private boolean quit;
+
+	private final PipedInputStream pin=new PipedInputStream();
+	private final PipedInputStream pin2=new PipedInputStream();
+
 	final String LABEL_OPTION = "Label";
 	final String COLOR_OPTION_FATAL = "Color.Emerg";
 	final String COLOR_OPTION_ERROR = "Color.Error";
@@ -142,6 +151,56 @@ public class LogDisplay
 		});
 
 		// --------------------------------------//
+
+		if (SupremicaProperties.generalRedirectStdout())
+		{
+			try
+			{
+				PipedOutputStream pout=new PipedOutputStream(this.pin);
+				System.setOut(new PrintStream(pout,true));
+			}
+			catch (java.io.IOException io)
+			{
+				String text = "Couldn't redirect STDOUT to this console\n"+io.getMessage();
+				//doc.insertString(doc.getLength(), text);
+				System.err.println(text);
+			}
+			catch (SecurityException se)
+			{
+				String text = "Couldn't redirect STDOUT to this console\n"+se.getMessage();
+				//doc.insertString(doc.getLength(), text);
+				System.err.println(text);
+			}
+			reader=new Thread(this);
+			reader.setDaemon(true);
+			reader.start();
+		}
+
+		if (SupremicaProperties.generalRedirectStderr())
+		{
+			try
+			{
+				PipedOutputStream pout2=new PipedOutputStream(this.pin2);
+				System.setErr(new PrintStream(pout2,true));
+			}
+			catch (java.io.IOException io)
+			{
+				String text = "Couldn't redirect STDERR to this console\n"+io.getMessage();
+				//doc.insertString(doc.getLength(), text);
+				System.err.println(text);
+			}
+			catch (SecurityException se)
+			{
+				String text = "Couldn't redirect STDERR to this console\n"+se.getMessage();
+				//doc.insertString(doc.getLength(), text);
+				System.err.println(text);
+			}
+			reader2=new Thread(this);
+			reader2.setDaemon(true);
+			reader2.start();
+		}
+
+		quit=false; // signals the Threads that they should exit
 	}
 
 	public synchronized static LogDisplay getInstance()
@@ -595,5 +654,54 @@ public class LogDisplay
 		{
 			filter.setAllowFatal(allow);
 		}
+	}
+
+	public synchronized void run()
+	{
+		Logger logger = LoggerFactory.createLogger(LogDisplay.class);
+
+		try
+		{
+			while (Thread.currentThread()==reader)
+			{
+				try { this.wait(100);}catch(InterruptedException ie) {}
+				if (pin.available()!=0)
+				{
+					String input=this.readLine(pin);
+					logger.error(input);
+				}
+				if (quit) return;
+			}
+
+			while (Thread.currentThread()==reader2)
+			{
+				try { this.wait(100);}catch(InterruptedException ie) {}
+				if (pin2.available()!=0)
+				{
+					String input=this.readLine(pin2);
+					logger.error(input);
+				}
+				if (quit) return;
+			}
+		} catch (Exception e)
+		{
+			logger.error("\nLogDiplay reports an internal error.");
+			logger.error("The error is: "+e);
+		}
+
+	}
+
+	public synchronized String readLine(PipedInputStream in) throws IOException
+	{
+		String input="";
+		do
+		{
+			int available=in.available();
+			if (available==0) break;
+			byte b[]=new byte[available];
+			in.read(b);
+			input=input+new String(b,0,b.length);
+		}while( !input.endsWith("\n") &&  !input.endsWith("\r\n") && !quit);
+		return input;
 	}
 }
