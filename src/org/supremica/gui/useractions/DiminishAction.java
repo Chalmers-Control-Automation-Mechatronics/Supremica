@@ -24,6 +24,7 @@ public class DiminishAction
 	extends AbstractAction
 {
 	private static Logger logger = LoggerFactory.createLogger(DiminishAction.class);
+	private Automata newautomata = new Automata();
 	private int statenbr = 0;
 	
 	public DiminishAction()
@@ -34,7 +35,7 @@ public class DiminishAction
 
 	public void actionPerformed(ActionEvent e)
 	{
-		logger.debug("DiminishAction.actionPerformed");
+		logger.debug("DiminishAction::actionPerformed");
 		
 		Gui gui = ActionMan.getGui();
 		Automata automata = gui.getSelectedAutomata();
@@ -42,13 +43,32 @@ public class DiminishAction
 		// Iterate over all automata
 		for(Iterator autit = automata.iterator(); autit.hasNext(); )
 		{
-			Automaton automaton = (Automaton)autit.next();
+			Automaton automaton = new Automaton((Automaton)autit.next());	// make a copy
 			if(diminish(automaton))	// If any states forbidden, remove them, but delicately
 			{
 				purgeDelicately(automaton);
+				automaton.setComment("dim(" + automaton.getName() + ")");
+				automaton.setName("");
+				newautomata.addAutomaton(automaton);
 			}
 		}
-		logger.debug("DiminishAction.actionPerformed done");
+		
+		if(newautomata.nbrOfAutomata() > 0)
+		{
+			try
+			{
+				ActionMan.gui.addAutomata(newautomata);
+				newautomata = new Automata();
+			}
+			catch(Exception ex)
+			{
+				logger.debug("DiminishAction::actionPerformed() -- ", ex);
+				logger.debug(ex.getStackTrace());
+			}
+
+		}
+
+		logger.debug("DiminishAction::actionPerformed done");
 	}
 	
 	private boolean diminish(Automaton automaton)

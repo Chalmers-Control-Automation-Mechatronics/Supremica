@@ -195,7 +195,7 @@ public class AutomatonMinimizer
 
 		newAutomaton.setType(theAutomaton.getType());
 		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet());
-		newAutomaton.setName("min" + theAutomaton.getName());
+		// newAutomaton.setName("min" + theAutomaton.getName());
 
 		// Associate one state with each equivalence class
 		int currNbrOfStates = 0;

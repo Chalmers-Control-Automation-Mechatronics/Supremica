@@ -1182,7 +1182,7 @@ public class ActionMan
 		//-- MF - Isn't this "wrong". An automaton can exist without a name.
 		//-- MF - The name is a gui-thing, and should be handled there
 		//-- MF - When an unnamed automatan is added, the gui should ask for a name
-		/** Yes, it's wrong, let it be handled elsewhere -- But where?? **/
+		/** Yes, it's wrong, let it be handled elsewhere -- But where?? **/ /* Below, that's where
 		String newAutomatonName = "Dummy";
 
 		if (synchronizationOptions.buildAutomaton())
@@ -1193,7 +1193,7 @@ public class ActionMan
 			{
 				return;
 			}
-		}/**/
+		} */
 
 		Automata currAutomata = new Automata();
 		Iterator autIt = selectedAutomata.iterator();
@@ -1213,7 +1213,7 @@ public class ActionMan
 			currAutomata.addAutomaton(currAutomaton);
 		}
 
-		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, currAutomata, newAutomatonName, synchronizationOptions);
+		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, currAutomata, "" /* newAutomatonName */, synchronizationOptions);
 	}
 
 	// ** Synthesize
@@ -1652,21 +1652,23 @@ public class ActionMan
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			String newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
+			/* String newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
 
 			if (newAutomatonName == null)
 			{
 				return;
 			}
-
+			*/
 			try
 			{
 				AutomatonMinimizer autMinimizer = new AutomatonMinimizer(currAutomaton);
 				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton();
 				// Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(true);
 
-				newAutomaton.setName(newAutomatonName);
-				gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
+				// newAutomaton.setName(newAutomatonName);
+				newAutomaton.setComment("min(" + currAutomaton.getName() + ")");
+				// gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
+				gui.addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{

@@ -337,6 +337,7 @@ public class AutomataSynthesizer
 			// if purge, that's already been done
 			theTimer.stop();
 
+			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 			gui.addAutomaton(retval.automaton); // let the user choose the name
 
 		}

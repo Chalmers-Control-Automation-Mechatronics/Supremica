@@ -490,11 +490,20 @@ public class Alphabet
 	 */
 	public String toString()
 	{
-		StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
+	/*	StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
 
 		tmpBuf.append(super.toString());
 
 		return tmpBuf.toString();
+	*/
+		StringBuffer buf = new StringBuffer("{");
+		for(Iterator it = iterator(); it.hasNext(); )
+		{
+			LabeledEvent ev = (LabeledEvent)it.next();
+			buf.append(ev.getLabel() + ", ");
+		}
+		buf.append("}");
+		return buf.toString();
 	}
 
 	public Listeners getListeners()

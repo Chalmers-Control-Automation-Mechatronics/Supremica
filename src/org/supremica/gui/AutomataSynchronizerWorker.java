@@ -154,7 +154,15 @@ public class AutomataSynchronizerWorker
 				/*-- MF -- Removed the name-fiddling let the project handle this -- But who, where?? */
 				if (theAutomaton != null)
 				{
-					theAutomaton.setName(newAutomatonName);
+					// theAutomaton.setName(newAutomatonName);
+					StringBuffer buf = new StringBuffer();
+					for(Iterator it = theAutomata.iterator(); it.hasNext(); )
+					{
+						Automaton automaton = (Automaton)it.next();
+						buf.append(automaton.getName() + "||");
+					}
+					// Remove trailing "||"
+					theAutomaton.setComment(buf.substring(0, buf.length()-2));
 				}
 				/**/
 				mode = MODE_UPDATE;
@@ -187,7 +195,8 @@ public class AutomataSynchronizerWorker
 				{
 
 					// -- MF -- container.add(theAutomaton);
-					workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
+					// workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
+					workbench.addAutomaton(theAutomaton);
 				}
 			}
 			catch (Exception ex)
