@@ -3,7 +3,7 @@ README
 
 To run Supremica you need a Java 1.4 compliant JVM.
 All development is done with Sun's JDK 1.4. You also need
-Ant - the Java build system. Secure shell (SSH) are needed 
+Ant - the Java build system. Secure shell (SSH) is needed 
 for secure communication with the computers at the Department
 of Signals and Systems. For fastest compiling you should install Jikes, 
 the Java compiler from IBM.
@@ -18,12 +18,12 @@ send email to knut@supremica.org
 If you run benchmark problems in Supremica, please give me a chance to 
 comment the results before publishing.
 
-A short tutorial of how to compile and run
+A short tutorial on how to compile and run
 Supremica is following. 
 
 1. Checkout
 	Enter a directory where you want to store
-	the Supremica files, e.g. "/home/ka/projects". The checkout the
+	the Supremica files, e.g. "/home/ka/projects". To checkout the
 	sources, write:
 	
 	If you are at one of S2's Unix computers:
