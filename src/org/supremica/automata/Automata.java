@@ -734,7 +734,7 @@ public class Automata
 	}
 
 	public long checksum()
-	{    // Ad-hoc checksum algorithm
+	{   // Ad-hoc checksum algorithm
 		long checksum = 53562951413L;
 
 		for (Iterator aIt = iterator(); aIt.hasNext(); )
@@ -760,7 +760,6 @@ public class Automata
 		// logger.debug("Automata.notifyListeners Start");
 		if (listeners != null)
 		{
-
 			// logger.debug("Automata.notifyListeners");
 			listeners.notifyListeners(mode, a);
 		}

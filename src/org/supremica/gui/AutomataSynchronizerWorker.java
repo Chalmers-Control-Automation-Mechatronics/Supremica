@@ -81,7 +81,8 @@ public class AutomataSynchronizerWorker
 		this.newAutomatonName = newAutomatonName;
 		this.syncOptions = syncOptions;
 
-		this.start();    // Causes this thread to begin execution; the Jvm calls the run method of this thread.
+		// Order this thread to begin execution; the Jvm calls the run method of this thread.
+		this.start();    
 	}
 
 	public void run()

@@ -167,20 +167,9 @@ public class AutomataVerificationWorker
 
 			// In language inclusion, not only the currently selected automata are used!
 			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
-
-			/*
-			// Reservation!!
-			JOptionPane.showMessageDialog(workbench.getFrame(),
-										  "Note that the language inclusion check is guaranteed to \n" +
-										  "work only when the alphabets of the respective automata \n" +
-										  "sets are equal. Also know that this is prefix-closed \n" +
-										  "language verification only.", "Important information!",
-										  JOptionPane.INFORMATION_MESSAGE);
-			*/
 		}
 		else
-		{
-			// Error... this can't happen!
+		{	// Error... this can't happen!
 			requestStop();
 			logger.error("Unavailable option chosen... this can't happen...\n" +
 						 "don't ever do whatever you just did again, please.");
@@ -196,7 +185,8 @@ public class AutomataVerificationWorker
 		// Initialize the AutomataVerifier
 		try
 		{
-			automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+			automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, 
+													verificationOptions);
 			eventQueue.invokeLater(new Runnable()
 				{
 					public void run()
@@ -261,7 +251,7 @@ public class AutomataVerificationWorker
 	}
 
 	/**
-	 * Method called from external class stopping AutomataVerifier as soon as possible.
+	 * Method that stops AutomataVerifier as soon as possible.
 	 *
 	 *@see  ExecutionDialog
 	 */

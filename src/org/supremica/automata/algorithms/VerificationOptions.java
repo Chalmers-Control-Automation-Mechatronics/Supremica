@@ -157,4 +157,41 @@ public final class VerificationOptions
 	{
 		return skipUncontrollabilityCheck;
 	}
+
+
+
+	/**
+	 * Returns the default options for verification. This is the same as 
+	 * in the default constructor in this class.
+	 */
+	public static VerificationOptions getDefaultVerificationOptions()
+	{
+		return new VerificationOptions();
+	}
+
+	/**
+	 * Returns the default options for controllability verification.
+	 */
+	public static VerificationOptions getDefaultControllabilityOptions()
+	{
+		return new VerificationOptions(VerificationType.Controllability, 
+									   VerificationAlgorithm.Modular,
+									   SupremicaProperties.verifyExclusionStateLimit(), 
+									   SupremicaProperties.verifyReachabilityStateLimit(), 
+									   SupremicaProperties.verifyOneEventAtATime(), 
+									   SupremicaProperties.verifySkipUncontrollabilityCheck());
+	}
+
+	/**
+	 * Returns the default options for language inclusion verification.
+	 */
+	public static VerificationOptions getDefaultLanguageInclusionOptions()
+	{
+		return new VerificationOptions(VerificationType.LanguageInclusion,
+									   VerificationAlgorithm.Modular,
+									   SupremicaProperties.verifyExclusionStateLimit(),
+									   SupremicaProperties.verifyReachabilityStateLimit(),
+									   SupremicaProperties.verifyOneEventAtATime(),
+									   SupremicaProperties.verifySkipUncontrollabilityCheck());
+	}
 }

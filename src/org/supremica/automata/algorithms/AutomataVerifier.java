@@ -294,7 +294,6 @@ public class AutomataVerifier
 			}
 			else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 			{
-
 			    if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				{
 					return BDDLanguageInclusionVerification();
@@ -333,8 +332,7 @@ public class AutomataVerifier
 	 */
 	public void prepareForLanguageInclusion(Automata inclusionAutomata)
 	{
-		// After these preparations, the modular controllability
-		// verification verifies language inclusion
+		// After these preparations, controllability verification verifies language inclusion
 		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);
@@ -641,7 +639,6 @@ public class AutomataVerifier
 		}
 
 		StringBuffer automataNames = new StringBuffer();
-
 		if (verboseMode)
 		{
 			// For printing the names of the automata in selectedAutomata
@@ -667,7 +664,9 @@ public class AutomataVerifier
 
 			if (verboseMode)
 			{
-				logger.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
+				logger.error(automataNames + "has " + 
+							 potentiallyUncontrollableStates.size(automataIndices) + 
+							 " states that might be uncontrollable...");
 			}
 
 			// Sort automata in order of similar alphabets
@@ -679,11 +678,6 @@ public class AutomataVerifier
 				{
 					// Print the uncontrollable state(s)...
 					synchHelper.printUncontrollableStates();
-
-					// Print event trace reaching uncontrollable state
-					// synchHelper.displayTrace();  // CAN'T BE DONE... TRACE NOT REMEMBERED... FIXA!
-					// Print info on amount of states examined
-					// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
 				}
 
 				return false;
@@ -694,9 +688,9 @@ public class AutomataVerifier
 				logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			}
 
+			// Make five attempts on prooving controllability and 
+			// uncontrollability and then give up
 			stateAmount = 1;
-
-			// Make five attempts on prooving controllability and uncontrollability and then give up
 			for (attempt = 1; attempt <= 5; attempt++)
 			{
 				if (verboseMode)
@@ -714,11 +708,14 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							logger.info("All similar automata are already added, trying to add some more...");
+							logger.info("All similar automata are already added, " + 
+										"trying to add some more...");
 						}
 
-						System.arraycopy(similarAutomata, 0, newSimilarAutomata, 0, similarAutomata.length);
-						System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata, similarAutomata.length, moreSimilarAutomata.length);
+						System.arraycopy(similarAutomata, 0, newSimilarAutomata, 
+										 0, similarAutomata.length);
+						System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata, 
+										 similarAutomata.length, moreSimilarAutomata.length);
 
 						similarAutomata = newSimilarAutomata;
 					}
@@ -1846,9 +1843,8 @@ public class AutomataVerifier
 		return theAutomaton.nbrOfStates() == 0;
 	}
 
-
 	/**
-	 * Method called from external class stopping AutomataVerifier as soon as possible.
+	 * Method that stops AutomataVerifier as soon as possible.
 	 *
 	 * @see  ExecutionDialog
 	 */
@@ -1861,5 +1857,48 @@ public class AutomataVerifier
 		{
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
 		}
+	}
+
+	/**
+	 * Standard method for performing modular controllability verification on theAutomata.
+	 */
+	public static boolean verifyControllability(Automata theAutomata)
+		throws Exception
+	{
+		SynchronizationOptions synchronizationOptions;
+		VerificationOptions verificationOptions;
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
+
+		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, 
+														 verificationOptions);
+		return verifier.verify();
+	}
+
+	/**
+	 * Standard method for performing languageInclusion verification on automataA 
+	 * and automataB.
+	 * 
+	 * @param automataA the automata that should be included.
+	 * @param automataB the automata that should include
+	 * @return true if automataA is included in "L^-1(automataB)".
+	 */
+	public static boolean verifyInclusion(Automata automataA, Automata automataB)
+		throws Exception
+	{
+		SynchronizationOptions synchronizationOptions;
+		VerificationOptions verificationOptions;
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		verificationOptions = VerificationOptions.getDefaultLanguageInclusionOptions();
+
+		Automata theAutomata = new Automata();
+		theAutomata.addAutomata(automataA);
+		theAutomata.addAutomata(automataB);
+		//theAutomata.setIndicies();
+
+		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, 
+														 verificationOptions);
+		verifier.prepareForLanguageInclusion(automataA);
+		return verifier.verify();
 	}
 }

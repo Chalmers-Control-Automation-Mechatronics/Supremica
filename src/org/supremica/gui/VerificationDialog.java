@@ -168,11 +168,11 @@ class VerificationDialogStandardPanel
 		{
 			algorithmSelector.allowAll();
 			note.setText("Note:\n" +
-						 "This verifies whether the language of the selected\n" + 
+						 "This verifies whether the language of the unselected\n" + 
 						 "automata is included in the inverse projection of\n" +
-						 "the language of the unselected automata.\n" +
-						 "  The alphabet of the selected automata must\n" + 
-						 "include the alphabet of the unselected automata.\n");
+						 "the language of the selected automata.\n" +
+						 "  The alphabet of the unselected automata must\n" + 
+						 "include the alphabet of the selected automata.\n");
 			note.setVisible(true);
 		}
 		else // Something else is selected

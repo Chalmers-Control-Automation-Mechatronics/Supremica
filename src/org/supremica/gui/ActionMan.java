@@ -1210,10 +1210,9 @@ public class ActionMan
 			}
 		} */
 
-
 		// Do a sanity check, does all automata have initial states?
 		// There is a method for this, Automata.hasInitialState(), but 
-		// it doesn't tell what automaton breaks the test...
+		// it doesn't tell which automaton breaks the test...
 		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
 		{
@@ -1260,6 +1259,8 @@ public class ActionMan
 			SynchronizationOptions syncOptions;
 			try
 			{
+				syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+				/*
 				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
 														 SynchronizationType.Prioritized,
 														 SupremicaProperties.syncInitialHashtableSize(),
@@ -1272,6 +1273,7 @@ public class ActionMan
 														 SupremicaProperties.verboseMode(),
 														 true,
 														 true);
+				*/
 			}
 			catch (Exception ex)
 			{
@@ -1428,6 +1430,9 @@ public class ActionMan
 
 		try
 		{
+			syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
+
+			/*
 			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
 													 SynchronizationType.Prioritized,
 													 SupremicaProperties.syncInitialHashtableSize(),
@@ -1440,6 +1445,7 @@ public class ActionMan
 													 SupremicaProperties.verboseMode(),
 													 true,
 													 true);
+			*/
 		}
 		catch (Exception ex)
 		{
@@ -1465,28 +1471,8 @@ public class ActionMan
 			return;
 		}
 
-	/* I don't understand all this, and I don't see the meaning (and there are no comments to explain)
-
-		Iterator autIt = selectedAutomata.iterator();
-
-		while (autIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-			String currAutomatonName = currAutomaton.getName();
-
-			try
-			{
-				AlphabetViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAlphabetViewer(currAutomatonName);
-			}
-			catch (Exception ex)
-			{
-
-				// logger.error("Exception in AlphabetViewer. Automaton: " + currAutomaton.getName());
-				gui.error("Exception in AlphabetViewer. Automaton: " + currAutomaton.getName());
-			}
-		}
-	*/
-		// Why not simpy instantiate an AlphabetViewer with the given automata object?? Use AutomataViewer instead!
+		// Why not simpy instantiate an AlphabetViewer with the given
+		// automata object?? Use AutomataViewer instead!
 		try
 		{
 			// AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);

@@ -104,6 +104,8 @@ public class TestAutomataVerifier
 			verificationOptions.setVerificationType(VerificationType.Controllability);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
 			assertTrue(theVerifier.verify());
+			// The same test again (hopefully)
+			assertTrue(AutomataVerifier.verifyControllability(theProject));
 		}
 		catch (Exception ex)
 		{
@@ -123,6 +125,8 @@ public class TestAutomataVerifier
 			verificationOptions.setVerificationType(VerificationType.Controllability);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
 			assertTrue(!theVerifier.verify());
+			// The same test again (hopefully)
+			assertTrue(!AutomataVerifier.verifyControllability(theProject));
 		}
 		catch (Exception ex)
 		{
@@ -140,11 +144,15 @@ public class TestAutomataVerifier
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
-			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, 
+																verificationOptions);
 			Automata inclusionAutomata = new Automata(theProject,true);
-			inclusionAutomata.removeAutomaton(theProject.getAutomaton("sicherheit_vr3"));
+			inclusionAutomata.removeAutomaton("sicherheit_vr3");
+			Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_vr3"));
 			theVerifier.prepareForLanguageInclusion(inclusionAutomata);
 			assertTrue(theVerifier.verify());
+			// The same test again (hopefully)
+			assertTrue(AutomataVerifier.verifyInclusion(inclusionAutomata, targetAutomata));
 		}
 		catch (Exception ex)
 		{
@@ -162,11 +170,15 @@ public class TestAutomataVerifier
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
-			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, 
+																verificationOptions);
 			Automata inclusionAutomata = new Automata(theProject,true);
-			inclusionAutomata.removeAutomaton(theProject.getAutomaton("sicherheit_er"));
+			inclusionAutomata.removeAutomaton("sicherheit_er");
+			Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_er"));
 			theVerifier.prepareForLanguageInclusion(inclusionAutomata);
 			assertTrue(!theVerifier.verify());
+			// The same test again (hopefully)
+			assertTrue(!AutomataVerifier.verifyInclusion(inclusionAutomata, targetAutomata));
 		}
 		catch (Exception ex)
 		{

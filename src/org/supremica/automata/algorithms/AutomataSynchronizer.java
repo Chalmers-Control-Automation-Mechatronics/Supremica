@@ -190,4 +190,19 @@ public class AutomataSynchronizer
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
 		}
 	}
+
+	/**
+	 * Standard method for synchronizing automata with default options.
+	 */
+	public static Automaton synchronizeAutomata(Automata theAutomata)
+		throws Exception
+	{
+		SynchronizationOptions syncOptions;
+		syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+
+		AutomataSynchronizer synchronizer = new AutomataSynchronizer(theAutomata, syncOptions);
+		synchronizer.execute();
+		
+		return synchronizer.getAutomaton();
+	}
 }
