@@ -53,6 +53,12 @@ import java.util.*;
 
 /**
  * Similar to Events, but with allows for the fast lookup of an event based on the id.
+ *
+ * Important note:
+ * If an event label is changed after it is inserted in
+ * an Events object, then rehash must be called otherwise
+ * the strange errors will arise.
+ *
  * @see org.supremica.automata.Events
  * @see org.supremica.automata.AlphabetHelpers
  */
@@ -170,9 +176,12 @@ public class Alphabet
 		}
 	}
 
+	/**
+	 * Must be called after an event label or id is modified.
+	 */
 	public void rehash()
 	{
-		rebuild();
+		super.rehash();
 		Event event;
 		Iterator eventIt = iterator();
 		idMap.clear();

@@ -52,8 +52,15 @@ package org.supremica.automata;
 import java.util.*;
 
 /**
- * Contains a collection of events. Implements functionality for quickly
+ * Contains a collection of events. 
+ * Implements functionality for quickly
  * returning a event with a given label.
+ *
+ * Important note:
+ * If an event label is changed after it is inserted in
+ * an Events object, then rehash must be called otherwise
+ * the strange errors will arise.
+ *
  * @see org.supremica.automata.Alphabet
  * @see org.supremica.automata.EventsHelpers
  */
@@ -130,18 +137,23 @@ public class Events
 		return theEvents.containsKey(label);
 	}
 
-    /**
-     * Return the event with the given label.
-     * Throw an exception if it does not exist.
-	 */
+	/**
+	* Return the event with the given label.
+	* Throw an exception if it does not exist.
+	*/
 	public Event getEventWithLabel(String label)
 		throws Exception
 	{
-     	// System.err.println(label);
+		// System.err.println(label);
+
 		if (containsEventWithLabel(label))
+		{
 			return (Event)theEvents.get(label);
+		}
 		else
+		{
 			throw new Exception("The event '" + label + "' does not exist.");
+		}
 	}
 
  	public Event getEventWithIndex(int index)
@@ -168,7 +180,7 @@ public class Events
 
 	public String toString()
 	{
-     	StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
+		StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
 		return tmpBuf.toString();
 	}
 
@@ -180,7 +192,10 @@ public class Events
 		return theEvents.values();
 	}
 
-	public final void rebuild()
+	/**
+	 * Must be called after an event label or id is modified.
+	 */
+	public void rehash()
 	{
 		TreeMap newEvents = new TreeMap();
 		// theEvents = new TreeMap(orgEvents.theEvents);
