@@ -31,4 +31,6 @@ public class Arc
 	Vector next; /* arc proceeding this one */
 	Vector prev; /* arc preceeding this one */
 
+	public State fromState() { return o_from; }
+	public State toState() { return o_to; }
 }

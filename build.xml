@@ -518,7 +518,14 @@
 
 
 <target name="bdd_tests" depends="compile_supremica,startfiles_supremica">
-	<java dir="dist" fork="yes" classname="org.supremica.util.BDD.test.TestAlgo" taskname="bdd_tests" failonerror="true">		
+	<!-- 
+	ok, the description should go 
+	"Run BDD specific tests, requires the BDD library for your architecture to be accessible"
+	but if i add this, only bdd_tests will show up with a "ant -projecthelp", since no one else
+	has cared to create a description
+	-->
+	<java dir="${dist}" fork="yes" classname="org.supremica.util.BDD.test.TestAlgo" taskname="bdd_tests" failonerror="true">		
+	<!-- ok, this is funny. if fork is "yes", we do start in ${dist}, otherwise in the Supremica-root -->
 		<classpath>	
 			<pathelement location="${build}" />
 			<pathelement location="${testsbuild}" />

@@ -1,5 +1,8 @@
 package org.supremica.util.BDD;
 
+
+import org.supremica.util.BDD.encoding.*;
+
 // NEW CUDD: FIXED
 import java.io.*;
 import java.util.*;
@@ -67,11 +70,19 @@ public class BDDAutomata
 		if(Options.reorder_dyanmic) reorder_enableDyanamic(true);
 
 
+
+		// lets change the state encoding now:
+		Encoding enc = EncodingFactory.getEncoder();
+		for(Enumeration e = v.elements(); e.hasMoreElements(); )
+		{
+			Automaton automaton  = (Automaton) e.nextElement();
+			enc.encode(automaton);
+		}
+
 		// first we create all automata  ...
 		int i = 0;
 		size_states = 0;
-		Enumeration e = v.elements();
-		while (e.hasMoreElements())
+		for(Enumeration e = v.elements(); e.hasMoreElements(); )
 		{
 			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);
 			size_states += automata[i].getNumStateBits();

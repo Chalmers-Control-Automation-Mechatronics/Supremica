@@ -148,7 +148,7 @@ public class Options
 
 	/** Event (Transition) selection heuristics, see petrinet related stuff */
 	public static final String [] ES_HEURISTIC_NAMES =  {
-		"Interactive", "Any", "Top-down", "Max pending req.","Min pending req.","Max follow","Min follow",
+		"Interactive", "Any", "Topological order", "Max pending req.","Min pending req.","Max follow","Min follow",
 		"Largest cover", "Smallest cover"
 	};
 	public static final int
@@ -199,7 +199,7 @@ public class Options
 
 	/** Non-deteministic Automata Selection: how to use between equally expensive automata ? (see for example Workset.java) */
 	public static final String [] NDAS_HEURISTIC_NAMES =
-		{ "Random          ", "First", "Last", "Ring", "Activity (reward/punish)", "Activity (reward/fade)" };
+		{ "Random          ", "Topologically first", "Topologically last", "Ring", "Activity (reward/punish)", "Activity (reward/fade)" };
 	public static final int
 		NDAS_RANDOM = 0,
 		NDAS_FIRST = 1,
@@ -209,6 +209,17 @@ public class Options
 		NDAS_ACTIVITY2 = 5;
 	public static int ndas_heuristics = NDAS_RANDOM;
 
+
+	/** state encoding of states in an automaton */
+	public static final String [] ENCODING_NAMES = { "Default", "Random", "DFS-I", "DFS-M", "BFS-I", "BFS-M" };
+	public static final int
+		ENCODING_DEFAULT = 0,
+		ENCODING_RANDOM = 1,
+		ENCODING_DFS_I = 2,
+		ENCODING_DFS_M = 3,
+		ENCODING_BFS_I = 4,
+		ENCODING_BFS_M = 5;
+	public static int encoding_algorithm = ENCODING_BFS_I;
 
 
 

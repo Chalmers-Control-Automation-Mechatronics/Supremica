@@ -684,7 +684,7 @@ class BDDPanel1
     /* package access */ JCheckBox debugOn;
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
 
-    private JComboBox algorithmFamily, orderingAlgorithm, dssiHeuristics, ndasHeuristics;
+    private JComboBox algorithmFamily, dssiHeuristics, ndasHeuristics;
     private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics, frontierStrategy;
 
     public BDDPanel1(PreferencesDialog theDialog)
@@ -731,12 +731,6 @@ class BDDPanel1
 		p.add( pLabel);
 		pLabel.add( tmp = new JLabel("Algorithm selection:"));
 		tmp.setForeground(Color.blue);
-
-		JPanel pOrdering = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
-		p.add(pOrdering);
-		pOrdering.add( new JLabel("Automaton (not BDD) ordering"));
-		pOrdering.add( orderingAlgorithm = new JComboBox());
-		insert( orderingAlgorithm, Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
 
 
 		JPanel pFrontier = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
@@ -805,7 +799,6 @@ class BDDPanel1
 		Options.algo_family      = algorithmFamily.getSelectedIndex();
 		Options.frontier_strategy= frontierStrategy.getSelectedIndex();
 
-		Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
 		Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
 		Options.as_heuristics = asHeuristics.getSelectedIndex();
 		Options.ndas_heuristics = ndasHeuristics.getSelectedIndex();
@@ -841,7 +834,7 @@ class BDDPanel2
     implements ActionListener
 {
 	private PreferencesDialog theDialog = null;
-	private JComboBox cbReordering, showGrow, countAlgorithm;
+	private JComboBox cbReordering, showGrow, countAlgorithm, orderingAlgorithm, encodingAlgorithm;
 	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup, cReorderGroupFree;
 	private JTextField maxPartitionSize, extraLibDir;
 	private JButton bProofFile;
@@ -856,10 +849,30 @@ class BDDPanel2
 		add(pLeft, BorderLayout.WEST);
 
 		// TOP LEFT
-		JPanel pTopLeft  = new JPanel( new GridLayout(2,1) );
+		JPanel pTopLeft  = new JPanel( new GridLayout(5,1) );
 		pLeft.add(pTopLeft, BorderLayout.NORTH);
 
 		JLabel tmp;
+
+		pTopLeft.add( tmp = new JLabel("Automata to BDD", SwingConstants.LEFT)  );
+		tmp.setForeground(Color.blue);
+
+		JPanel pOrdering = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+		pOrdering.add( new JLabel("Automaton (not BDD) ordering"));
+		pOrdering.add( orderingAlgorithm = new JComboBox());
+		insert( orderingAlgorithm, Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
+		pTopLeft.add(pOrdering);
+
+
+		JPanel pEncoding = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+		pEncoding.add( new JLabel("State encoding"));
+		pEncoding.add( encodingAlgorithm = new JComboBox());
+		insert( encodingAlgorithm, Options.ENCODING_NAMES, Options.encoding_algorithm);
+		pTopLeft.add(pEncoding);
+
+
+
+
 		pTopLeft.add( tmp = new JLabel("Dynamic variable ordering (NOT recommended)", SwingConstants.LEFT)  );
 		tmp.setForeground(Color.blue);
 
@@ -952,6 +965,8 @@ class BDDPanel2
 		Options.reorder_after_build  = cReorderBuild.isSelected();
 		Options.reorder_with_groups  = cReorderGroup.isSelected();
 		Options.reorder_within_group = cReorderGroupFree.isSelected();
+		Options.ordering_algorithm   = orderingAlgorithm.getSelectedIndex();
+		Options.encoding_algorithm   = encodingAlgorithm.getSelectedIndex();
 
 		Options.show_grow        = showGrow.getSelectedIndex();
 		Options.count_algo       = countAlgorithm.getSelectedIndex();

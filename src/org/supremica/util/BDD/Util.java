@@ -55,6 +55,14 @@ public class Util
 		}
 	}
 
+	/** shuffle/permutate a list of integers */
+	public static int [] permutate(int size) {
+		int [] x = new int[size];
+		for(int i = 0; i < size; i++) x[i] = i;
+		permutate(x, size);
+		return x;
+	}
+
 	// -------------------------------------------------
 
 	public static int suggest_nodecount(Automata a)
