@@ -146,8 +146,8 @@ public class Automaton
 		}
 		catch (Exception e)
 		{
-			logger.error("Automaton.Automaton(Automaton): Error while copying transitions");
-			return;
+			System.err.println("Error while copying transitions");
+			System.exit(0);
 		}
 	}
 
@@ -253,7 +253,33 @@ public class Automaton
 	{
 		return initialState;
 	}
+	
+	/**
+	 * Returns a uniquely named (and id'ed) state.
+	 * Does not add it to the state set
+	 * Passing null or empty prefix sets prefix to 'q'
+	 */
+	public State createUniqueState(String prefix)
+	{
+		StringBuffer name = null;
+		if(prefix == null || prefix.equals(""))
+		{
+			name = new StringBuffer("q");
+		}
+		else
+		{
+			name = new StringBuffer(prefix);
+		}
 
+		Random rand = new Random();
+		
+		while(containsStateWithId(name.toString()))
+		{
+			name.append(rand.nextInt(10));
+		}
+		
+		return new State(name.toString());
+	}
 	/**
 	 * Returns true if it finds one accepting state, else returns false
 	 * Iterates over all states _only_if_ no accepting states exist (or only
@@ -282,7 +308,7 @@ public class Automaton
 			Arc currArc = (Arc)arcIt.next();
 			if (currArc.isSelfLoop())
 			{
-				return true;
+				return false;
 			}
 		}
 		return false;
@@ -321,13 +347,8 @@ public class Automaton
 	 * behavior is undefined.
 	 */
 	public void addArc(Arc arc)
-		throws Exception
 	{
 		arc.getListeners().addListener(this);
-		if (!containsEvent(arc.getEventId()))
-		{
-			throw new Exception("Automaton.addArc: " + arc.getEventId() + " is not included in the alphabet");
-		}
 		theArcs.addArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
 	}
@@ -384,11 +405,6 @@ public class Automaton
 	public String getStateNameWithIndex(int index)
 	{
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
-	}
-
-	public boolean containsEvent(String eventId)
-	{
-		return alphabet.containsEventWithId(eventId);
 	}
 
 	public LabeledEvent getEvent(String eventId)
@@ -652,7 +668,8 @@ public class Automaton
 		return getIndex();
 	}
 
-	public String getUniqueStateId()
+	// Don't do this in public
+	private String getUniqueStateId()
 	{
 		String newId;
 
@@ -665,7 +682,8 @@ public class Automaton
 		return newId;
 	}
 
-	public int getUniqueStateIndex()
+	// Don't do this in public
+	private int getUniqueStateIndex()
 	{
 		while (containsStateWithIndex(uniqueStateIndex))
 		{
