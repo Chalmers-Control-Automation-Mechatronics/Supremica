@@ -140,6 +140,8 @@ public class Scheduler
 	    }
 	    notifyFinished();
 	    //resource.handleConfigurationRequests();
+
+
 	}
     }
     

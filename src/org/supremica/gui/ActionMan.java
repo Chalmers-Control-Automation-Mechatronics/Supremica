@@ -3724,7 +3724,7 @@ public class ActionMan
 						PrintWriter theWriter =
 							new PrintWriter(new FileWriter(currFile));
 
-						exporter.printSource(theWriter);
+						exporter.printSources(theWriter);
 						theWriter.close();
 					} catch (Exception ex) {
 						logger.error(

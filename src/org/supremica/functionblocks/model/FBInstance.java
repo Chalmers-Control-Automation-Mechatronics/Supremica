@@ -55,6 +55,7 @@ package org.supremica.functionblocks.model;
 public abstract class FBInstance
 {
     String name;
+    
     public abstract void handleEvent();
 
 }
