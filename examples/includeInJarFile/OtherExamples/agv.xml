@@ -343,11 +343,11 @@
    <Event id="u27" label="u27" controllable="false" prioritized="true" />
   </Events>
   <States>
-   <State id="q0" accepting="true" />
+   <State id="q0" />
    <State id="q1" />
    <State id="q2" />
    <State id="q3" />
-   <State id="q4" initial="true" />
+   <State id="q4" initial="true" accepting="true"/>
   </States>
   <Transitions>
    <Transition event="c6" source="q0" dest="q1" />
@@ -427,8 +427,8 @@
    <Event id="c3" label="c3" controllable="true" prioritized="true" />
   </Events>
   <States>
-   <State id="q0" initial="true" accepting="true" />
-   <State id="q1" />
+   <State id="q0" />
+   <State id="q1" initial="true" accepting="true"/>
    <State id="q2" />
   </States>
   <Transitions>
