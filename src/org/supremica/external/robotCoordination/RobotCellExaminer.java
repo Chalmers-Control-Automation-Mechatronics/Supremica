@@ -24,6 +24,10 @@ public class RobotCellExaminer
 	private Automata zoneAutomata;
 	private Automata robotAutomata;
 
+	// Demo file
+	// final String DEMOSTATION_FILENAME = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
+	final String DEMOSTATION_FILENAME = "C:/temp/DomStations/DemoSafe.stn";
+
 	/**
 	 * Dialog for manipulating the simulation environment.
 	 */
@@ -57,6 +61,7 @@ public class RobotCellExaminer
 					{
 						logger.error("The file " + cellName + " is not a robot station or is " +
 									 "not a of a type supported by Supremica.");
+						return;
 					}
 				}
 				else
@@ -97,7 +102,8 @@ public class RobotCellExaminer
 		});
 		contentPane.add(collisionButton);
 
-		File file = new File("C:/temp/DomStations/DemoSafe.stn");
+		// Demo button (only if demo file exists)
+		File file = new File(DEMOSTATION_FILENAME);
 		if (file.exists())
 		{
 			JButton demoButton = new JButton("Run demo (RobotStudio)");
@@ -106,8 +112,7 @@ public class RobotCellExaminer
 					public void actionPerformed(ActionEvent e)
 					{
 						// Open file if it exists...
-						//File file = new File("C:/temp/RobSuprTestStation/RobSuprTest.stn");
-						File file = new File("C:/temp/DomStations/DemoSafe.stn");
+						File file = new File(DEMOSTATION_FILENAME);
 						if (file.exists())
 						{
 							openCell(file, RobotSimulatorType.RobotStudio);

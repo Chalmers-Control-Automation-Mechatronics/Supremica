@@ -30,6 +30,7 @@ public class RobotStudioInterface
 
 	/** The name of the IPart containing the mutex zones. */
 	private final static String ZONEPART_NAME = "MutexZones";
+
 	private final static String ZONEENTITY_BASENAME = "MutexZone";
 	private final static String FREESTATE_NAME = "Free";
 	private final static String BOOKEDSTATE_NAME = "Booked";
@@ -97,15 +98,16 @@ public class RobotStudioInterface
 				}
 
 				try
-				{    // Already got a zones part?
+				{
+					// Already got a zones part?
 					zones = Part.getPartFromUnknown(station.getParts().item(var(ZONEPART_NAME)));
 				}
 				catch (Exception ex)
-				{    // No such part?
+				{   
+					// No such part?
 					zones = Part.getPartFromUnknown(station.getParts().add());
+					zones.setName(ZONEPART_NAME);
 				}
-
-				zones.setName(ZONEPART_NAME);
 			}
 			catch (Exception e)
 			{
