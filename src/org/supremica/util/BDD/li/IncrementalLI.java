@@ -175,10 +175,9 @@ public class IncrementalLI
 
 			// test over-approximated reachability of bad states (as in theta)
 			int Qr = sup.getReachables(bdd_initial);
-
 			bdd_theta = ba.andTo(bdd_theta, Qr);
-
 			boolean ret = (bdd_theta == ba.getZero());
+
 
 			// all nc-arcs where considred and found to be unreachable
 			if (ret && ac.allPlantEventsIncluded())
@@ -218,11 +217,17 @@ public class IncrementalLI
 
 			if (changed > 0)
 			{
-				ba.deref(bdd_sigma_w);
 
+				ba.deref(bdd_sigma_w);
 				bdd_sigma_w = ba.getAlphabetSubsetAsBDD(workset_events);
-				bdd_theta_i = ba.andTo(bdd_theta_i, bdd_sigma_w);
-				bdd_theta_j = ba.andTo(bdd_theta_j, bdd_sigma_w);
+
+				if(controllaibilty_test)
+				{
+					// these are not used in the language inclusion test
+					bdd_theta_i = ba.andTo(bdd_theta_i, bdd_sigma_w);
+					bdd_theta_j = ba.andTo(bdd_theta_j, bdd_sigma_w);
+				}
+
 
 				// bdd_theta alread updated.
 				if (Options.debug_on)
@@ -437,6 +442,9 @@ public class IncrementalLI
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.6  2004/06/11 21:12:52  knut
+After running JIndent
+
 Revision 1.5  2004/05/21 15:28:08  vahidi
 
 major  bugfix patch:
