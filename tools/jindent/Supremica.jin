@@ -208,7 +208,7 @@ deleteSingleLineComments                  = false
 deleteTrailingComments                    = false
 deleteEndOfLineComments                   = false
 
-formatBlockComments                       = true
+formatBlockComments                       = false
 formatSingleLineComments                  = true
 formatTrailingComments                    = true
 formatEndOfLineComments                   = true
