@@ -57,15 +57,6 @@ public class JavaBytecodeGenerator
 		Node[] children = abstractSyntaxTreeRoot.getChildren();
 
 		visitChildren(0, children);
-
-//          if (children != null) {
-//              for (int i = 0; i < children.length; i++) {
-//                  SimpleNode n = (SimpleNode)children[i];
-//                  if (n != null) {
-//                      n.visit(this,null);
-//                  }
-//              }
-//          }
 	}
 
 	/**visitChildren is used to visit all nodes in an array (
@@ -91,8 +82,8 @@ public class JavaBytecodeGenerator
 		}
 	}
 
-	// skall troligen tas bort när vi är färdiga
-	// eller ge "hårdare" felmeddelande dvs. kör inte vidare efter detta
+	//XXX skall troligen tas bort när vi är färdiga
+	//XXX eller ge "hårdare" felmeddelande dvs. kör inte vidare efter detta
 	public Object visitStandard(SimpleNode n, Object o)
 	{
 		System.out.println(n.toString() + "  WARNING: visitStandard");
@@ -107,13 +98,6 @@ public class JavaBytecodeGenerator
 		Node[] children = n.getChildren();
 
 		visitChildren(0, children);
-
-//              for (int i=0; i < children.length; i++) {
-//              SimpleNode c = (SimpleNode)children[i];
-//              if (c != null) {
-//                  c.visit(this,null);
-//              }
-//          }
 		return null;
 	}
 
@@ -158,9 +142,7 @@ public class JavaBytecodeGenerator
 		if (children.length == 0)
 		{
 			System.err.println("IL_EXPRESSION missing operand(s)");
-
 			return null;
-
 			// what should happen when a il_expression doesn't have
 			// any operands at all, typeChecker??
 		}
@@ -191,8 +173,8 @@ public class JavaBytecodeGenerator
 
 		builder.emitIL_EXPRESSION(operator, TypeConstant.T_BOOL, null);
 
-		// typen för argumentet till expr_operator måste läggas in i
-		// ASTn av typcheckaren ist. för att sättas till T_BOOL
+		//XXX typen för argumentet till expr_operator måste läggas in i
+		//XXX ASTn av typcheckaren ist. för att sättas till T_BOOL
 		return null;
 	}
 
@@ -237,18 +219,16 @@ public class JavaBytecodeGenerator
 
 		if (p == null)
 		{
-			System.err.println("This constant type is not implemented: " + n.getName() + ". Try typed constant " + "(e.g. DINT#5)");
-
+			System.err.println("This constant type is not implemented: " + n.getName() + 
+					   ". Try typed constant " + "(e.g. DINT#5)");
 			// errorsPresent = true;
 		}
-
 		return p;
 	}
 
 	public Object visitBOOLEAN_LITERAL(ASTboolean_literal n, Object o)
 	{
 		System.out.println("   " + n.toString());
-
 		return HelpMethods.parseBOOL(n.getName());
 	}
 
@@ -264,12 +244,12 @@ public class JavaBytecodeGenerator
 		{
 			if (n.isFunctionBlock())
 			{
-				return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), n.getFieldSelector(), n.getFieldSelectorType());
+				return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
+							       n.getFieldSelector(), n.getFieldSelectorType());
 			}
 			else
 			{
 				System.err.println("Function blocks are the only derived " + "datatypes allowed");
-
 				// errorsPresent = true;
 				return null;
 			}
@@ -287,7 +267,6 @@ public class JavaBytecodeGenerator
 		return n.getName();
 	}
 
-	/* temporärmetod för att uppfylla SimpleNodeVisitor */
 	public Object visitFIELD_SELECTOR(ASTfield_selector n, Object o)
 	{
 		System.out.println("   " + n.toString());

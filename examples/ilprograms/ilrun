@@ -1,5 +1,7 @@
 #/bin/sh
 
-export LD_LIBRARY_PATH=.
-java -cp .:${SUPREMICADEV_PATH}build:${SUPREMICADEV_PATH}/lib/unjared org.supremica.softplc.RunTime.Shell -IO org.supremica.softplc.Drivers.AdlinkPCI7432 -IL $*
+#SUPREMICADEV_PATH skall innehålla sökvägen till Supremica-katalogen
+#På våra puff-konton blir det 
+export LD_LIBRARY_PATH=${SUPREMICADEV_PATH}/examples/ilprograms
+java -cp .:${SUPREMICADEV_PATH}/build:${SUPREMICADEV_PATH}/lib/unjared org.supremica.softplc.RunTime.Shell -IO org.supremica.softplc.Drivers.AdlinkPCI7432 -IL $*
 
