@@ -113,23 +113,20 @@ public class Builder
 
 				a.addState(name, name_id, initial, marked, forbidden);
 
-				// Insert ARCS
-				for (EventIterator eit = s_a.outgoingEventsIterator(s_st);
-						eit.hasNext(); )
+				// add arcs
+				for(ArcIterator ait = s_st.outgoingArcsIterator(); ait.hasNext(); )
 				{
-					LabeledEvent le = (LabeledEvent) eit.next();
+					org.supremica.automata.Arc arc = (org.supremica.automata.Arc) ait.next();
+					org.supremica.automata.State s_to = arc.getToState();
+					org.supremica.automata.LabeledEvent event = arc.getEvent();
 
-					if ((alphabet != null) &&!alphabet.contains(le))
-					{
-						continue;
-					}
-
-					org.supremica.automata.State s_to = s_st.nextState(le);
-					String e_name = le.getLabel();    // or getID() ???
+					String e_name = event.getLabel();    // or getID() ???
 					String to_name = s_to.getName();
 
 					a.addArc(e_name, name, to_name);
 				}
+
+
 			}
 
 			// Close automaton:

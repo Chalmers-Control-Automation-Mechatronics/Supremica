@@ -33,7 +33,7 @@ public class ModularLI
 
 	public void cleanup()
 	{
-		bdd_cleanup();
+		if(ba != null) bdd_cleanup();
 		super.cleanup();
 	}
 

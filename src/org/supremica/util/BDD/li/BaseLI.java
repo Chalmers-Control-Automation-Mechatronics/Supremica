@@ -105,6 +105,7 @@ public class BaseLI
 	public BaseLI(org.supremica.automata.Automata theAutomata, AutomataSynchronizerHelper.HelperData hd)
 		throws Exception
 	{
+		this.ba = null; // for safety
 		this.hd = hd;
 		this.controllaibilty_test = true;
 		this.theAutomata = theAutomata;
@@ -156,6 +157,7 @@ public class BaseLI
 		if (ba != null)
 		{
 			ba.cleanup();
+			ba = null;
 		}
 	}
 

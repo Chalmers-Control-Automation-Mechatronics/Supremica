@@ -34,7 +34,7 @@ public class IncrementalLI
 
 	public void cleanup()
 	{
-		bdd_cleanup();
+		if(ba != null) bdd_cleanup();
 		super.cleanup();
 	}
 
@@ -442,6 +442,9 @@ public class IncrementalLI
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.7  2004/07/05 14:42:30  vahidi
+stupid bug fixed in the incremental language inclusion test (can understand that we didnt saw that earlier)
+
 Revision 1.6  2004/06/11 21:12:52  knut
 After running JIndent
 
