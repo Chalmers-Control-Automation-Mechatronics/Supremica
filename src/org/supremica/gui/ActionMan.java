@@ -2414,6 +2414,58 @@ public class ActionMan
 		}
 	}
 
+	public static void robotStudioOpenStation(Gui gui)
+	{
+		new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				String stationName;
+				stationName = f.getAbsolutePath();
+
+				RobotStudioLink robotStudioLink = new RobotStudioLink(g, stationName);
+				robotStudioLink.init();
+			}
+		};
+	}
+
+	public static void robotStudioCreateMutexZones(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.createMutexZones();
+			}
+		});
+		thread.start();
+	}
+
+	public static void robotStudioCreateMutexZonesFromSpan(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.NEWcreateMutexZones();
+			}
+		});
+		thread.start();
+	}
+
+	public static void robotStudioExtractAutomata(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				RobotStudioLink.extractAutomata();
+			}
+		});
+		thread.start();
+	}
+
+/*
 	public static void robotStudioLink(Gui gui)
 	{
 		new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
@@ -2428,17 +2480,6 @@ public class ActionMan
 				robotStudioLink.start();
 			}
 		};
-	}
-
-/*
-	public static void robotStudioCreateMutexZones(Gui gui)
-	{
-		RobotStudioLink.createMutexZones();
-	}
-
-	public static void robotStudioExtractRobotAutomata(Gui gui)
-	{
-		RobotStudioLink.extractRobotAutomata();
 	}
 */
 
@@ -2466,7 +2507,7 @@ public class ActionMan
 		RobotStudioLink.test(gui);
 	}
 
-	// TestCases... - open the test cases dialog, and add the result to the current set of automata
+	// TestCases... - open the test cases dialog, and add the result to the current set of automata	public static void testCases(Gui gui)
 	public static void testCases(Gui gui)
 		throws Exception
 	{
