@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Untitled"  major="0"  minor="9" >
+<Automaton name="M5" type="Plant">
+	<Events>
+		<Event id="f5" label="f5" controllable="false"/>
+		<Event id="s5" label="s5"/>
+	</Events>
+	<States>
+		<State id="m50" initial="true" accepting="true"/>
+		<State id="m51"/>
+	</States>
+	<Transitions>
+		<Transition source="m50" dest="m51" event="s5"/>
+		<Transition source="m51" dest="m50" event="f5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M4" type="Plant">
+	<Events>
+		<Event id="f4" label="f4" controllable="false"/>
+		<Event id="s4" label="s4"/>
+	</Events>
+	<States>
+		<State id="m40" initial="true" accepting="true"/>
+		<State id="m41"/>
+	</States>
+	<Transitions>
+		<Transition source="m40" dest="m41" event="s4"/>
+		<Transition source="m41" dest="m40" event="f4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M3" type="Plant">
+	<Events>
+		<Event id="f3" label="f3" controllable="false"/>
+		<Event id="s3" label="s3"/>
+	</Events>
+	<States>
+		<State id="m30" initial="true" accepting="true"/>
+		<State id="m31"/>
+	</States>
+	<Transitions>
+		<Transition source="m30" dest="m31" event="s3"/>
+		<Transition source="m31" dest="m30" event="f3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M2" type="Plant">
+	<Events>
+		<Event id="f2" label="f2" controllable="false"/>
+		<Event id="s2" label="s2"/>
+	</Events>
+	<States>
+		<State id="m20" initial="true" accepting="true"/>
+		<State id="m21"/>
+	</States>
+	<Transitions>
+		<Transition source="m20" dest="m21" event="s2"/>
+		<Transition source="m21" dest="m20" event="f2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M1" type="Plant">
+	<Events>
+		<Event id="f1" label="f1" controllable="false"/>
+		<Event id="s1" label="s1"/>
+	</Events>
+	<States>
+		<State id="m10" initial="true" accepting="true"/>
+		<State id="m11"/>
+	</States>
+	<Transitions>
+		<Transition source="m10" dest="m11" event="s1"/>
+		<Transition source="m11" dest="m10" event="f1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="BC" type="Specification">
+	<Events>
+		<Event id="f2" label="f2" controllable="false"/>
+		<Event id="f4" label="f4" controllable="false"/>
+		<Event id="s5" label="s5"/>
+	</Events>
+	<States>
+		<State id="bc0" initial="true" accepting="true"/>
+		<State id="bc1"/>
+	</States>
+	<Transitions>
+		<Transition source="bc0" dest="bc1" event="f2"/>
+		<Transition source="bc0" dest="bc1" event="f4"/>
+		<Transition source="bc1" dest="bc0" event="s5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="BB" type="Specification">
+	<Events>
+		<Event id="f3" label="f3" controllable="false"/>
+		<Event id="s4" label="s4"/>
+	</Events>
+	<States>
+		<State id="bb0" initial="true" accepting="true"/>
+		<State id="bb1"/>
+	</States>
+	<Transitions>
+		<Transition source="bb0" dest="bb1" event="f3"/>
+		<Transition source="bb1" dest="bb0" event="s4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="BA" type="Specification">
+	<Events>
+		<Event id="f1" label="f1" controllable="false"/>
+		<Event id="s2" label="s2"/>
+	</Events>
+	<States>
+		<State id="ba0" initial="true" accepting="true"/>
+		<State id="ba1"/>
+	</States>
+	<Transitions>
+		<Transition source="ba0" dest="ba1" event="f1"/>
+		<Transition source="ba1" dest="ba0" event="s2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="BD" type="Specification">
+	<Events>
+		<Event id="f5" label="f5" controllable="false"/>
+		<Event id="s6" label="s6"/>
+	</Events>
+	<States>
+		<State id="bd0" initial="true" accepting="true"/>
+		<State id="bd1"/>
+	</States>
+	<Transitions>
+		<Transition source="bd0" dest="bd1" event="f5"/>
+		<Transition source="bd1" dest="bd0" event="s6"/>
+	</Transitions>
+</Automaton>
+</Automata>
