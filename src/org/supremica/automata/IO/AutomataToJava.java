@@ -379,7 +379,6 @@ public class AutomataToJava
 	 * @param pw
 	 */
 	private void printInternallyEnabledFunction(PrintWriter pw)
-		throws GenerationException
 	{
 		pw.println();
 		pw.println("\t/**");
@@ -436,7 +435,7 @@ public class AutomataToJava
 					}
 				}
 				else
-					throw new GenerationException("Unsupported SynchronizationType");
+					assert false;
 			}
 			pw.println(";");
 		}
