@@ -57,7 +57,7 @@ public class SynthesisAlgorithm
 
 	public static final SynthesisAlgorithm Monolithic = new SynthesisAlgorithm("Monolithic");
 	public static final SynthesisAlgorithm Modular = new SynthesisAlgorithm("Modular");
-	public static final SynthesisAlgorithm IDD = new SynthesisAlgorithm("IDD");
+	public static final SynthesisAlgorithm IDD = new SynthesisAlgorithm("IDD", false);
 	public static final SynthesisAlgorithm Unknown = new SynthesisAlgorithm("Unknown", false);
 
 	private String description = null;

@@ -51,6 +51,8 @@ package org.supremica.gui;
 
 import java.util.*;
 import java.io.*;
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
 public final class WorkbenchProperties
 	extends Properties
@@ -92,7 +94,7 @@ public final class WorkbenchProperties
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
-	
+
 	private static final WorkbenchProperties wp = new WorkbenchProperties();
 
 	private WorkbenchProperties()
@@ -124,8 +126,8 @@ public final class WorkbenchProperties
 		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000");
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false");
 		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false");
-		setProperty(SYNTHESIS_SYNTHESIS_TYPE, "0");
-		setProperty(SYNTHESIS_ALGORITHM_TYPE, "0");
+		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Controllable.toString());
+		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Modular.toString());
 		setProperty(SYNTHESIS_PURGE, "true");
 		setProperty(SYNTHESIS_OPTIMIZE, "true");
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true");
@@ -402,26 +404,26 @@ public final class WorkbenchProperties
 	{
 		wp.setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, toString(bool));
 	}
-	
+
 	// Synthesis...
-	public static int synthesisSynthesisType()
+	public static SynthesisType synthesisSynthesisType()
 	{
-		return toInt(wp.getProperty(SYNTHESIS_SYNTHESIS_TYPE));
+		return SynthesisType.toType(wp.getProperty(SYNTHESIS_SYNTHESIS_TYPE));
 	}
 
-	public static void setSynthesisSynthesisType(int type)
+	public static void setSynthesisSynthesisType(SynthesisType type)
 	{
-		wp.setProperty(SYNTHESIS_SYNTHESIS_TYPE, toString(type));
+		wp.setProperty(SYNTHESIS_SYNTHESIS_TYPE, type.toString());
 	}
 
-	public static int synthesisAlgorithmType()
+	public static SynthesisAlgorithm synthesisAlgorithmType()
 	{
-		return toInt(wp.getProperty(SYNTHESIS_ALGORITHM_TYPE));
+		return SynthesisAlgorithm.toAlgorithm(wp.getProperty(SYNTHESIS_ALGORITHM_TYPE));
 	}
 
-	public static void setSynthesisAlgorithmType(int type)
+	public static void setSynthesisAlgorithmType(SynthesisAlgorithm type)
 	{
-		wp.setProperty(SYNTHESIS_ALGORITHM_TYPE, toString(type));
+		wp.setProperty(SYNTHESIS_ALGORITHM_TYPE, type.toString());
 	}
 
 	public static boolean synthesisPurge()

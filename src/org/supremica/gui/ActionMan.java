@@ -18,7 +18,7 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.Gui;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
-// import org.supremica.gui.TestCasesDialog;
+import org.supremica.gui.TestCasesDialog;
 
 public class ActionMan
 {
@@ -518,13 +518,13 @@ public class ActionMan
 		}
 
 		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, currAutomata, newAutomatonName, syncOptions);
-	}														//!! was 'this' here^^^^^^^^^^^^, now takes a Gui
+	}
 	//** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
 		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), synthesizerOptions);
-		synthesizerDialog.show();				//!! was 'this' here^^^^^^^^^^^^, takes a JFrame
+		synthesizerDialog.show();
 
 		if (!synthesizerOptions.getDialogOK())
 			return;
@@ -598,14 +598,30 @@ public class ActionMan
 				try
 				{
 					AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(currAutomaton);
-					if (synthesizerOptions.getSynthesisType() == 0)      // Controllable
+					if (synthesizerOptions.getSynthesisType() == SynthesisType.Controllable)
+					{
 						synthesizer.synthesizeControllable();
-					else if (synthesizerOptions.getSynthesisType() == 1) // Non-blocking
-						gui.error("Option not implemented...");
-					else if (synthesizerOptions.getSynthesisType() == 2) // Both
+					}
+					else if (synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking)
+					{
+						JOptionPane.showMessageDialog(gui.getComponent(),
+													  "Option not implemented.",
+													  "Alert",
+													  JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					else if (synthesizerOptions.getSynthesisType() == SynthesisType.Both)
+					{
 						synthesizer.synthesize();
+					}
 					else
-						gui.error("Unavailable option chosen.");
+					{
+						JOptionPane.showMessageDialog(gui.getComponent(),
+													  "Unavailable option chosen.",
+													  "Alert",
+													  JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					if (synthesizerOptions.getPurge())
 					{
 						AutomatonPurge automatonPurge = new AutomatonPurge(currAutomaton);
@@ -1040,12 +1056,12 @@ public class ActionMan
 		}
 
 		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
-		
+
 		try
 		{
 			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 			gui.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
-		}	
+		}
 		catch(Exception excp)
 		{
 			gui.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
