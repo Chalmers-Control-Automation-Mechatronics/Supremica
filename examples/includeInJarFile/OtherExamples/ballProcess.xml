@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Ball Process" comment="There is an error in this model. All events in these automata are not controllability consistent! Find whoever is responsible and tell him (yes him, not her) off!">
+<Automata name="Ball Process">
 
 	<!-- -->
 	<!-- Progress specs -->
@@ -384,7 +384,7 @@
 	<Automaton name="Interaction spec: EM and ES" type="Specification">
 		<Events>
 			<Event id="em.measure.has_ball" label="em.measure.has_ball" controllable="false" prioritized="true" />		
-			<Event id="es.enter_ball" label="es.enter_ball" controllable="false" prioritized="true" />						
+			<Event id="es.enter_ball" label="es.enter_ball" controllable="true" prioritized="true" />						
 		</Events>
 		<States>
 			<State id="q_0" initial="true" accepting="true" />
@@ -578,7 +578,7 @@
 			<Event id="e5" label="gk.in.is_out" />
 			<Event id="e6" label="gk.out.is_in" />
 			<Event id="e7" label="gk.out.is_out" />
-			<Event id="e8" label="button.automatic.pressed" />
+			<Event id="e8" label="button.automatic.pressed" controllable="false" />
 			<Event id="e9" label="em.putter.is_out" />
 			<Event id="e10" label="em.putter.is_in" />
 			<Event id="e11" label="arm.allocate_lower_buffer" />
