@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 4 - Extending">
+<Automaton name="A" type="Undefined">
+	<Events>
+		<Event id="c" label="c"/>
+		<Event id="u" label="uc" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+		<State id="7" name="q7" forbidden="true"/>
+		<State id="8" name="q8"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="c"/>
+		<Transition source="1" dest="2" event="u"/>
+		<Transition source="2" dest="3" event="c"/>
+		<Transition source="2" dest="4" event="c"/>
+		<Transition source="3" dest="5" event="u"/>
+		<Transition source="4" dest="5" event="c"/>
+		<Transition source="5" dest="7" event="u"/>
+		<Transition source="5" dest="8" event="u"/>
+		<Transition source="4" dest="6" event="u"/>
+		<Transition source="6" dest="8" event="c"/>
+		<Transition source="6" dest="0" event="c"/>
+	</Transitions>
+</Automaton>
+</Automata>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 4 - Extending">
+<Automaton name="S11" type="Supervisor">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="0" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="S12" type="Supervisor">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="1" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="S21" type="Supervisor">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="2" dest="0" event="b"/>
+	</Transitions>
+</Automaton>
+
+<Automaton name="S22" type="Supervisor">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="2" dest="0" event="a"/>
+	</Transitions>
+</Automaton>
+</Automata>

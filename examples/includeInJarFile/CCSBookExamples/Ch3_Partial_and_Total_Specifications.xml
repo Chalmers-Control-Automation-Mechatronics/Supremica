@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 3 - Specification">
+<Automaton name="P" type="Plant">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="p0" initial="true"/>
+		<State id="1" name="p1"/>
+		<State id="2" name="p2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="a"/>
+		<Transition source="0" dest="1" event="b"/>
+		<Transition source="2" dest="0" event="b"/>
+		<Transition source="1" dest="0" event="a"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Sp3" type="Specification">
+	<Events>
+		<Event id="a" label="a"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true"/>
+		<State id="1" name="s1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+	</Transitions>
+</Automaton>
+</Automata>

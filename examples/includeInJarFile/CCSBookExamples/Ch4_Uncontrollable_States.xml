@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 4 - Uncontrollable States">
+<Automaton name="P" type="Plant">
+	<Events>
+		<Event id="a1" label="a1"/>
+		<Event id="a2" label="a2"/>
+		<Event id="c1" label="c1" controllable="false"/>
+		<Event id="c2" label="c2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a1"/>
+		<Transition source="1" dest="0" event="c1"/>
+		<Transition source="1" dest="2" event="a2"/>
+		<Transition source="2" dest="1" event="c2"/>
+		<Transition source="2" dest="3" event="c1"/>
+		<Transition source="3" dest="2" event="a1"/>
+		<Transition source="3" dest="0" event="c2"/>
+		<Transition source="0" dest="3" event="a2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Sp" type="Specification">
+	<Events>
+		<Event id="a2" label="a2"/>
+		<Event id="c1" label="c1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="p0" initial="true"/>
+		<State id="1" name="p1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="c1"/>
+		<Transition source="1" dest="0" event="a2"/>
+	</Transitions>
+</Automaton>
+</Automata>

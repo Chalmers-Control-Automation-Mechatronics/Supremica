@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 2 - Sub-automata and Refinement">
+<Automaton name="P" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+		<State id="6" name="q6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="b"/>
+		<Transition source="0" dest="3" event="c"/>
+		<Transition source="0" dest="4" event="d"/>
+		<Transition source="1" dest="5" event="b"/>
+		<Transition source="2" dest="5" event="a"/>
+		<Transition source="3" dest="6" event="d"/>
+		<Transition source="4" dest="6" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="S" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="5" name="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="b"/>
+		<Transition source="1" dest="5" event="b"/>
+		<Transition source="2" dest="5" event="a"/>
+	</Transitions>
+</Automaton>
+<Automaton name="F" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="5" name="q5a"/>
+		<State id="6" name="q5b"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="b"/>
+		<Transition source="1" dest="5" event="b"/>
+		<Transition source="2" dest="6" event="a"/>
+	</Transitions>
+</Automaton>
+</Automata>

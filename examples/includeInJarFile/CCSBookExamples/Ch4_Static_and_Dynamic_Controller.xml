@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 3 - Static and Dynamic Controller">
+<Automaton name="P1" type="Plant">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="p0" initial="true"/>
+		<State id="1" name="p1"/>
+		<State id="2" name="p2"/>
+		<State id="3" name="p3"/>
+		<State id="4" name="p4"/>
+		<State id="5" name="p5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="a"/>
+		<Transition source="2" dest="3" event="b"/>
+		<Transition source="1" dest="4" event="b"/>
+		<Transition source="2" dest="5" event="a"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Sp1" type="Specification">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="a"/>
+		<Transition source="2" dest="3" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="P2" type="Plant">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4"/>
+		<State id="5" name="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="1" event="b"/>
+		<Transition source="1" dest="2" event="a"/>
+		<Transition source="1" dest="3" event="b"/>
+		<Transition source="2" dest="4" event="b"/>
+		<Transition source="3" dest="5" event="a"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Sp2" type="Specification">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="2" dest="3" event="a"/>
+		<Transition source="0" dest="4" event="b"/>
+		<Transition source="4" dest="5" event="a"/>
+		<Transition source="5" dest="6" event="b"/>
+	</Transitions>
+</Automaton>
+</Automata>

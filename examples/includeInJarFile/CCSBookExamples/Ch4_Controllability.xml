@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 4 - Controllability">
+<Automaton name="P" type="Plant">
+	<Events>
+		<Event id="c1" label="c1"/>
+		<Event id="c2" label="c2"/>
+		<Event id="u" label="u" controllable="false"/>
+		<Event id="s" label="s"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true"/>
+		<State id="1" name="qp"/>
+		<State id="2" name="1"/>
+		<State id="3" name="2"/>
+		<State id="4" name="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="s"/>
+		<Transition source="1" dest="2" event="u"/>
+		<Transition source="1" dest="3" event="c1"/>
+		<Transition source="1" dest="4" event="c2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="S" type="Supervisor">
+	<Events>
+		<Event id="c1" label="c1"/>
+		<Event id="c2" label="c2"/>
+		<Event id="u" label="u" controllable="false"/>
+		<Event id="s" label="s"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true"/>
+		<State id="1" name="qs"/>
+		<State id="2" name="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="s"/>
+		<Transition source="1" dest="2" event="c2"/>
+	</Transitions>
+</Automaton>
+</Automata>

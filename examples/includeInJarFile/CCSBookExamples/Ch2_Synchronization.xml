@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 2 - Synchronization">
+<Automaton name="A" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+	</Transitions>
+</Automaton><Automaton name="B" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="C" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="2" dest="3" event="c"/>
+	</Transitions>
+</Automaton>
+</Automata>

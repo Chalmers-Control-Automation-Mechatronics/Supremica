@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 4 - Trimming">
+<Automaton name="A1" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3" accepting="true"/>
+		<State id="5" name="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="3" event="c"/>
+		<Transition source="0" dest="2" event="b"/>
+		<Transition source="2" dest="3" event="c"/>
+		<Transition source="2" dest="5" event="d"/>
+	</Transitions>
+</Automaton>
+<Automaton name="A2" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" forbidden="true"/>
+		<State id="3" name="q3" accepting="true"/>
+		<State id="5" name="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="3" event="c"/>
+		<Transition source="0" dest="2" event="b"/>
+		<Transition source="2" dest="3" event="c"/>
+		<Transition source="2" dest="5" event="d"/>
+	</Transitions>
+</Automaton>
+</Automata>

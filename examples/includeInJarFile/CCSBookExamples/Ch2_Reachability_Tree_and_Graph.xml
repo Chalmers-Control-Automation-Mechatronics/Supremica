@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Example from Chapter 2 - Reachability Tree and Graph">
+<Automaton name="Reachability Tree" type="Undefined">
+	<Events>
+		<Event id="1" label="t1"/>
+		<Event id="2" label="t2"/>
+		<Event id="3" label="t3"/>
+		<Event id="4" label="t4"/>
+	</Events>
+	<States>
+		<State id="0" name="1100" initial="true"/>
+		<State id="1" name="0011"/>
+		<State id="2" name="1001"/>
+		<State id="3" name="0110"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+</Automata>
