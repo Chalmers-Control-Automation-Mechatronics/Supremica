@@ -3,7 +3,9 @@
 <project name="Supremica and JGrafChart" default="rebuild" basedir=".">
 
 <property name="src" value="src"/>
+<property name="testssrc" value="tests/src"/>
 <property name="build" value="build"/>
+<property name="testsbuild" value="tests/build"/>
 <property name="dist"  value="dist"/>
 <property name="doc" value="doc"/>
 <property name="examples" value="examples"/>
@@ -46,6 +48,11 @@
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${build}" />
+	</delete>
+
+ 	<mkdir dir="${testsbuild}"/>
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${testsbuild}" />
 	</delete>
 
  	<mkdir dir="${dist}"/>
@@ -103,6 +110,10 @@
 	<mkdir dir="${build}"/>
 	<delete dir="${build}" includeEmptyDirs="true"/>
 	<mkdir dir="${build}"/>
+
+	<mkdir dir="${testsbuild}"/>
+	<delete dir="${testsbuild}" includeEmptyDirs="true"/>
+	<mkdir dir="${testsbuild}"/>
 
 	<mkdir dir="${dist}"/>	
 	<delete>
@@ -182,6 +193,26 @@
 
 </target>
 
+<!-- Compile Supremica Tests
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile_supremica_tests">
+	<javac
+		srcdir="${testssrc}"
+		destdir="${testsbuild}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false" >
+		
+		<classpath>	
+			<pathelement location="${build}" />
+			<pathelement path="${lib}/${unjared}" />
+		</classpath>
+	</javac>
+
+</target>
+
 <!-- Compile:
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
@@ -221,21 +252,21 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build_supremica" depends="compile_supremica,jar_supremica,startfiles_supremica">
+<target name="build_supremica" depends="compile_supremica,compile_supremica_tests,jar_supremica,startfiles_supremica">
 </target>
 
 <!-- Build:
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build_supremica_student" depends="compile_supremica,jar_supremica_student,startfiles_supremica_student">
+<target name="build_supremica_student" depends="compile_supremica,compile_supremica_tests,jar_supremica_student,startfiles_supremica_student">
 </target>
 
 <!-- Build:
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build_supremica_teacher" depends="compile_supremica,jar_supremica_teacher,startfiles_supremica_teacher">
+<target name="build_supremica_teacher" depends="compile_supremica,compile_supremica_tests,jar_supremica_teacher,startfiles_supremica_teacher">
 </target>
 
 <!-- Rebuild:
@@ -380,6 +411,18 @@
 <target name="doc" depends="doc_supremica,doc_jgrafchart">
 </target>
 
+<target name="run_supremica_tests" depends="compile_supremica,compile_supremica_tests">
+	<java fork="yes" classname="junit.textui.TestRunner"
+		taskname="junit" failonerror="true">
+		<arg value="org.supremica.TestPackageSupremica"/>
+		<classpath>	
+			<pathelement location="${build}" />
+			<pathelement location="${testsbuild}" />
+			<pathelement path="${lib}/${unjared}" />
+			<pathelement path="${java.class.path}" />
+		</classpath>	
+	</java>
+</target>
 
 <target name="doc_supremica">
 	<javadoc
