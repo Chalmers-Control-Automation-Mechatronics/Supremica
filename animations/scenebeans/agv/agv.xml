@@ -41,6 +41,144 @@
 		
 		<param name="point" index="4" value="(46,166)" />	
 	</behaviour>
+
+	<behaviour id="output.go" algorithm="Track" event="output.end">
+		<param name="pointCount" value="5" />
+
+		<param name="point" index="0" value="(379,659)" />
+		<param name="duration" index="0" value="1" />
+		<param name="event" index="0" value="output.end" />
+
+		<param name="point" index="1" value="(345,653)" />
+		<param name="duration" index="1" value="1" />
+		
+		<param name="point" index="2" value="(345,633)" />
+		<param name="duration" index="2" value="1" />
+		
+		<param name="point" index="3" value="(379,633)" />
+		<param name="duration" index="3" value="1" />		
+		<param name="event" index="3" value="output.end" />
+		
+		<param name="point" index="4" value="(379,659)" />	
+	</behaviour>
+
+	<behaviour id="ws1_part1.go" algorithm="Track" event="ws1_part1.end">
+		<param name="pointCount" value="5" />
+
+		<param name="point" index="0" value="(44,396)" />
+		<param name="duration" index="0" value="1" />
+		<param name="event" index="0" value="ws1_part1.end" />
+
+		<param name="point" index="1" value="(44,462)" />
+		<param name="duration" index="1" value="1" />
+		<param name="event" index="1" value="ws1_part1.end" />
+		
+		<param name="point" index="2" value="(44,518)" />
+		<param name="duration" index="2" value="1" />
+		<param name="event" index="2" value="ws1_part1.end" />
+		
+		<param name="point" index="3" value="(44,314)" />
+		<param name="duration" index="3" value="1" />		
+		<param name="event" index="3" value="ws1_part1.end" />
+		
+		<param name="point" index="4" value="(44,396)" />	
+	</behaviour>
+
+	<behaviour id="ws1_part2.go" algorithm="Track" event="ws1_part2.end">
+		<param name="pointCount" value="7" />
+
+		<param name="point" index="0" value="(67,407)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(53,407)" />
+		<param name="duration" index="1" value="1" />
+		<param name="event" index="1" value="ws1_part2.end" />
+		
+		<param name="point" index="2" value="(53,462)" />
+		<param name="duration" index="2" value="1" />
+		<param name="event" index="2" value="ws1_part2.end" />
+		
+		<param name="point" index="3" value="(53,518)" />
+		<param name="duration" index="3" value="1" />		
+		<param name="event" index="3" value="ws1_part2.end" />
+		
+		<param name="point" index="4" value="(80,433)" />	
+		<param name="duration" index="4" value="1" />		
+
+		<param name="point" index="5" value="(80,407)" />
+		<param name="duration" index="5" value="1" />
+		<param name="event" index="5" value="ws1_part2.end" />
+		
+		<param name="point" index="6" value="(67,407)" />
+	</behaviour>
+
+	<behaviour id="ws2.go" algorithm="Track" event="ws2.end">
+		<param name="pointCount" value="9" />
+
+		<param name="point" index="0" value="(379,243)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(379,329)" />
+		<param name="duration" index="1" value="1" />
+		
+		<param name="point" index="2" value="(346,329)" />
+		<param name="duration" index="2" value="1" />
+		<param name="event" index="2" value="ws2.end" />
+		
+		<param name="point" index="3" value="(346,314)" />
+		<param name="duration" index="3" value="1" />		
+		<param name="event" index="3" value="ws2.end" />
+		
+		<param name="point" index="4" value="(346,39)" />	
+		<param name="duration" index="4" value="1" />		
+
+		<param name="point" index="5" value="(346,22)" />
+		<param name="duration" index="5" value="1" />
+
+		<param name="point" index="6" value="(379,22)" />
+		<param name="duration" index="6" value="1" />		
+		<param name="event" index="6" value="ws2.end" />
+		
+		<param name="point" index="7" value="(379,87)" />	
+		<param name="duration" index="7" value="3" />		
+		<param name="event" index="7" value="ws2.end" />
+
+		<param name="point" index="8" value="(379,243)" />
+	</behaviour>
+
+	<behaviour id="ws3.go" algorithm="Track" event="ws3.end">
+		<param name="pointCount" value="9" />
+
+		<param name="point" index="0" value="(345,558)" />
+		<param name="duration" index="0" value="1" />
+		<param name="event" index="0" value="ws3.end" />
+
+		<param name="point" index="1" value="(345,420)" />
+		<param name="duration" index="1" value="1" />
+		
+		<param name="point" index="2" value="(345,406)" />
+		<param name="duration" index="2" value="1" />
+		
+		<param name="point" index="3" value="(380,406)" />
+		<param name="duration" index="3" value="1" />		
+		<param name="event" index="3" value="ws3.end" />
+		
+		<param name="point" index="4" value="(380,446)" />	
+		<param name="duration" index="4" value="1" />		
+		<param name="event" index="4" value="ws3.end" />
+		
+		<param name="point" index="5" value="(380,512)" />
+		<param name="duration" index="5" value="1" />
+
+		<param name="point" index="6" value="(380,571)" />
+		<param name="duration" index="6" value="1" />		
+		
+		<param name="point" index="7" value="(345,571)" />	
+		<param name="duration" index="7" value="3" />		
+		<param name="event" index="7" value="ws3.end" />
+
+		<param name="point" index="8" value="(345,558)" />
+	</behaviour>
 	
 	<behaviour id="agv1.go" algorithm="Track" event="agv1.end">
 		<param name="pointCount" value="11" />
@@ -362,6 +500,52 @@
 			</primitive>
 		</compose>
 	</define>
+	<define id="ws1_part1_primitive">
+		<compose id ="ws1_part1_primitive_switch" type = "switch">
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part1.gif"/>
+				<param name =  "hotspot" value = "(13,4)"/>
+			</primitive>
+			<primitive type="null"/>
+		</compose>
+	</define>	
+	<define id="ws1_part2_primitive">
+		<compose id ="ws1_part2_primitive_switch" type = "switch">
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(13,4)"/>
+			</primitive>
+			<primitive type="null"/>
+		</compose>
+	</define>
+	<define id="ws2_primitive">
+		<compose id ="ws2_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part1.gif"/>
+				<param name =  "hotspot" value = "(13,4)"/>
+			</primitive>
+		</compose>
+	</define>	
+	<define id="ws3_primitive">
+		<compose id ="ws3_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(13,4)"/>
+			</primitive>
+		</compose>
+	</define>
+	<define id="output_primitive">
+	<!-- Add part1 too -->
+		<compose id ="output_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(13,4)"/>
+			</primitive>
+		</compose>
+	</define>
 	<define id="agv1_primitive">
 		<primitive type = "sprite">
 			<param name = "src" value = "image/agv_red.gif"/>
@@ -570,6 +754,89 @@
 		<stop behaviour = "input3.go"/>
 	</event>
 
+	<!-- WS 1 Commands -->
+	<command name="ws1.addpart1">
+		<announce event = "~ws1_part1.end"/>
+		<set object="ws1_part1_primitive_switch" param="current" value="0" />
+		<start behaviour="ws1_part1.go"/>
+	</command>
+	<command name="ws1.removepart1">
+		<announce event = "~ws1_part1.end"/>
+		<set object="ws1_part1_primitive_switch" param="current" value="1" />
+		<reset behaviour="ws1_part1.go"/>
+		<start behaviour="ws1_part1.go"/>
+	</command>	
+	<command name="ws1.addpart2">
+		<announce event = "~ws1_part2.end"/>
+		<set object="ws1_part2_primitive_switch" param="current" value="0" />
+		<start behaviour="ws1_part2.go"/>
+	</command>
+	<command name="ws1.removepart2">
+		<announce event = "~ws1_part2.end"/>
+		<set object="ws1_part2_primitive_switch" param="current" value="1" />
+		<reset behaviour="ws1_part2.go"/>
+		<start behaviour="ws1_part2.go"/>
+	</command>
+	<event object="ws1_part1.go" event="ws1_part1.end">
+		<announce event="ws1_part1.end"/>
+		<stop behaviour = "ws1_part1.go"/>
+	</event>
+	<event object="ws1_part2.go" event="ws1_part2.end">
+		<announce event="ws1_part2.end"/>
+		<stop behaviour = "ws1_part2.go"/>
+	</event>
+
+	<!-- WS 2 Commands -->
+	<command name="ws2.addpart">
+		<announce event = "~ws2.end"/>
+		<set object="ws2_primitive_switch" param="current" value="1" />
+		<start behaviour="ws2.go"/>
+	</command>
+	<command name="ws2.removepart">
+		<announce event = "~ws2.end"/>
+		<set object="ws2_primitive_switch" param="current" value="0" />
+		<reset behaviour="ws2.go"/>
+		<start behaviour="ws2.go"/>
+	</command>	
+	<event object="ws2.go" event="ws2.end">
+		<announce event="ws2.end"/>
+		<stop behaviour = "ws2.go"/>
+	</event>
+
+	<!-- WS 3 Commands -->
+	<command name="ws3.addpart">
+		<announce event = "~ws3.end"/>
+		<set object="ws3_primitive_switch" param="current" value="1" />
+		<start behaviour="ws3.go"/>
+	</command>
+	<command name="ws3.removepart">
+		<announce event = "~ws3.end"/>
+		<set object="ws3_primitive_switch" param="current" value="0" />
+		<reset behaviour="ws3.go"/>
+		<start behaviour="ws3.go"/>
+	</command>	
+	<event object="ws3.go" event="ws3.end">
+		<announce event="ws3.end"/>
+		<stop behaviour = "ws3.go"/>
+	</event>	
+
+	<!-- Output Commands -->
+	<command name="output.addpart">
+		<announce event = "~output.end"/>
+		<set object="output_primitive_switch" param="current" value="1" />
+		<start behaviour="output.go"/>
+	</command>
+	<command name="output.removepart">
+		<announce event = "~output.end"/>
+		<set object="output_primitive_switch" param="current" value="0" />
+		<reset behaviour="output.go"/>
+		<start behaviour="output.go"/>
+	</command>	
+	<event object="output.go" event="output.end">
+		<announce event="output.end"/>
+		<stop behaviour = "output.go"/>
+	</event>
+	
 	<!-- AGV 1 Commands -->
 	<command name="agv1.go">
 		<announce event = "~agv1.end"/>
