@@ -77,6 +77,8 @@ public class FileFormats
 	public static final FileFormats ST = new FileFormats(false, true, "ST", ".st", "IEC-1131 Structured Text files (*.st)");
 	public static final FileFormats IL = new FileFormats(false, true, "IL", ".il", "IEC-1131 Instruction List files (*.il)");
 	public static final FileFormats NQC = new FileFormats(false, true, "NQC", ".nqc", "Mindstorm NQC files (*.nqc)");
+	public static final FileFormats C = new FileFormats(false, true, "C", ".c", "C files (*.c)");
+
 
 	// Input only
 	public static final FileFormats VPRJ = new FileFormats(true, false, "VPRJ", ".vprj", "Valid Project files (*.vprj)");

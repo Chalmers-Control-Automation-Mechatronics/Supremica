@@ -2415,6 +2415,51 @@ public class ActionMan
 		}
 	}
 
+	// Generate C-code
+	public static void AutomataToC(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.C);
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					try
+					{
+
+						AutomataToC exporter = new AutomataToC(selectedAutomata);
+
+						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
+
+						exporter.serialize(theWriter);
+
+						theWriter.close();
+
+					}
+					catch (Exception ex)
+					{
+						logger.error("Exception while generating C code to file " + currFile.getAbsolutePath());						logger.debug(ex.getStackTrace());
+						return;
+					}
+					logger.info("C file successfully generated at " + currFile.getAbsolutePath());
+				}
+			}
+		}
+	}
+
 	// Generate Mindstorm NQC (Not Quite C)
 	public static void AutomataToMindstormNQC(Gui gui)
 	{

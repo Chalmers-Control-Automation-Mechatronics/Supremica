@@ -690,6 +690,20 @@ public class MainMenuBar
 			}
 		});
 
+		JMenuItem menuToolsCodeGenerationC = new JMenuItem();
+
+		menuToolsCodeGenerationC.setText("ANSI C...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationC);
+		menuToolsCodeGenerationC.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				ActionMan.AutomataToC(ActionMan.getGui());
+			}
+		});
+
+
 		JMenuItem menuToolsCodeGenerationNQC = new JMenuItem();
 
 		menuToolsCodeGenerationNQC.setText("Lego Mindstorm NQC...");
