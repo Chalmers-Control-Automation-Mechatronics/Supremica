@@ -18,7 +18,7 @@ public class AutomataOrderingHeuristicFactory {
 		AutomataOrderingHeuristic aoh = null;
 
 		switch(Options.ordering_algorithm) {
-			case Options.AS_HEURISTIC_PCG:
+			case Options.AO_HEURISTIC_PCG:
 				aoh = new AOH_PCG();
 				break;
 
@@ -27,8 +27,8 @@ public class AutomataOrderingHeuristicFactory {
 				break;
 
 			// all these use the same engine, the solver is different and the selection is handled internally...
-			case Options.AS_HEURISTIC_TSP:
-			case Options.AS_HEURISTIC_DFS:
+			case Options.AO_HEURISTIC_TSP:
+			case Options.AO_HEURISTIC_DFS:
 				aoh = new AOH_Solver();
 				break;
 		 	default:

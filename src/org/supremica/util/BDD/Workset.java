@@ -1,7 +1,19 @@
 
 package org.supremica.util.BDD;
 
+
+
+import org.supremica.util.BDD.heuristics.*;
+
 import java.util.*;
+
+
+/**
+ * The workset algorithms works just like the PetriNet reachability algo, but it treats zappsp
+ * each automaton in the same way as a single transition should be treated...
+ *
+ * It has very good time and memory performance with the "right" heuristics!
+ */
 
 public class Workset
 {
@@ -13,6 +25,7 @@ public class Workset
 	private int workset_count;// sum of workset_i
 	private Cluster [] clusters;
 	private InteractiveChoice ic = null;
+	private NDAS_Choice ndas = null;
 
 	public Workset(Cluster [] clusters, int size, int [][]dependent)
 	{
@@ -23,8 +36,9 @@ public class Workset
 		this.clusters = clusters;
 
 		remaining = new boolean[size];
-
 		heuristic = Options.es_heuristics;
+
+		ndas = new NDAS_Choice(size);
 
 		if(heuristic == Options.ES_HEURISTIC_INTERACTIVE) {
 			ic = new InteractiveChoice("Workset interactive automaton selection");
@@ -74,10 +88,12 @@ public class Workset
 			case Options.ES_HEURISTIC_INTERACTIVE:
 				return pickOneInteractive(false);
 
-			case Options.ES_HEURISTIC_RANDOM:
+
+			case Options.ES_HEURISTIC_ANY:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(workset[i] > 0)  queue[queue_size++] = i;
 				break;
+
 			case Options.ES_HEURISTIC_TOPDOWN:
 				for(int i = 0; i < size; i++)
 					if(workset[i] > 0)  return i;
@@ -141,12 +157,7 @@ public class Workset
 		}
 
 
-		// choose one by random
-		if(queue_size > 1) {
-			return queue[ (int)(Math.random() * queue_size) ];
-		} else {
-			return (queue_size == 1) ? queue[0] : -1;
-		}
+		return ndas.choose(queue, queue_size);
 	}
 
 
@@ -169,10 +180,11 @@ public class Workset
 			case Options.ES_HEURISTIC_INTERACTIVE:
 				return pickOneInteractive(true);
 
-			case Options.ES_HEURISTIC_RANDOM:
+			case Options.ES_HEURISTIC_ANY:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(remaining[i] && workset[i] > 0)  queue[queue_size++] = i;
 				break;
+
 			case Options.ES_HEURISTIC_TOPDOWN:
 				for(int i = 0; i < size; i++)
 					if(remaining[i] && workset[i] > 0) {
@@ -241,17 +253,14 @@ public class Workset
 		}
 
 
-		if(queue_size > 1) {
-			// choose one by random
-			best = queue[ (int)(Math.random() * queue_size) ];
-		} else {
-			if(queue_size == 0) return -1;
-			best = queue[0]; // no neead to call random, since "random() * 0 = 0"
-		}
 
+		best = ndas.choose(queue, queue_size);
 		remaining[best] = false;
 		return best;
 	}
+
+
+	// --------------------------------------------------------------------------------
 
 	/**
 	 * we are done with this automaton.
@@ -263,6 +272,7 @@ public class Workset
 		// workset_count -= workset[automaton];
 		workset[automaton] = 0;
 		workset_count --;
+		ndas.advance(automaton, changed);
 
 		if(changed) {
 			int count = dependent[automaton][0];

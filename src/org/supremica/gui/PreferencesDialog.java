@@ -684,7 +684,7 @@ class BDDPanel1
     /* package access */ JCheckBox debugOn;
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
 
-    private JComboBox algorithmFamily, orderingAlgorithm, dssiHeuristics;
+    private JComboBox algorithmFamily, orderingAlgorithm, dssiHeuristics, ndasHeuristics;
     private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics, frontierStrategy;
 
     public BDDPanel1(PreferencesDialog theDialog)
@@ -764,8 +764,12 @@ class BDDPanel1
 		p.add(pHeuristics);
 		pHeuristics.add( new JLabel("Automaton selection heuristic"));
 		pHeuristics.add( asHeuristics = new JComboBox());
-
 		insert(asHeuristics, Options.AS_HEURISTIC_NAMES, Options.as_heuristics);
+
+
+
+
+
 
 		JPanel pDelayed= new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pDelayed);
@@ -778,6 +782,13 @@ class BDDPanel1
 		pHeuristics.add( new JLabel("PN-event and workset-automata selection"));
 		pHeuristics.add( esHeuristics = new JComboBox());
 		insert(esHeuristics, Options.ES_HEURISTIC_NAMES, Options.es_heuristics);
+
+		JPanel pNdas = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+		p.add(pNdas);
+		pNdas.add( new JLabel("Non-deteministic selection of equals"));
+		pNdas.add( ndasHeuristics = new JComboBox());
+		insert(ndasHeuristics, Options.NDAS_HEURISTIC_NAMES, Options.ndas_heuristics);
+
     }
 
 	// ------------------------------------------
@@ -797,6 +808,7 @@ class BDDPanel1
 		Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
 		Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
 		Options.as_heuristics = asHeuristics.getSelectedIndex();
+		Options.ndas_heuristics = ndasHeuristics.getSelectedIndex();
 		Options.es_heuristics = esHeuristics.getSelectedIndex();
 		Options.dssi_heuristics = dssiHeuristics.getSelectedIndex();
 

@@ -41,7 +41,7 @@ public class Options
 
 	/** REACHABILITY search algorithms */
 	public static final String [] REACH_ALGO_NAMES =  {
-		"monotonic", "Conjunctive", "LatticeWalk", "Disjunctive",
+		"Monolithic", "Conjunctive", "LatticeWalk", "Disjunctive",
 		"Smoothed: Workset",  "Smoothed: Monotonic", "Smoothed: Delayed Monotonic",
 		"Smoothed: Delayed* Monotonic","Smoothed: Monotonic/Workset",
 		"Smoothed: Path (V1)", "Smoothed: Keep (V2)", "Smoothed: Partitioned (P1)",
@@ -95,10 +95,10 @@ public class Options
 		"Random (!)", "PCG search",  "modified TSP", "Topological sort (DFS)    " };
     public static final int
     	AO_HEURISTIC_RANDOM = 0,
-    	AS_HEURISTIC_PCG = 1,
-    	AS_HEURISTIC_TSP = 2,
-    	AS_HEURISTIC_DFS = 3;
-	public static int ordering_algorithm = AS_HEURISTIC_TSP;
+    	AO_HEURISTIC_PCG = 1,
+    	AO_HEURISTIC_TSP = 2,
+    	AO_HEURISTIC_DFS = 3;
+	public static int ordering_algorithm = AO_HEURISTIC_TSP;
 
 
 	/** Automaton selection heuristics  */
@@ -143,19 +143,19 @@ public class Options
 
 	/** Event (Transition) selection heuristics, see petrinet related stuff */
 	public static final String [] ES_HEURISTIC_NAMES =  {
-		"Random", "Top-down", "Max pending req.","Min pending req.","Max follow","Min follow",
-		"Largest cover", "Smallest cover" , "Interactive"
+		"Interactive", "Any", "Top-down", "Max pending req.","Min pending req.","Max follow","Min follow",
+		"Largest cover", "Smallest cover"
 	};
 	public static final int
-		ES_HEURISTIC_RANDOM = 0,
-		ES_HEURISTIC_TOPDOWN = 1,
-		ES_HEURISTIC_MOST_PENDING = 2,
-		ES_HEURISTIC_LEAST_PENDING = 3,
-		ES_HEURISTIC_MOST_FOLLOWERS = 4,
-		ES_HEURISTIC_LEAST_FOLLOWERS = 5,
-		ES_HEURISTIC_MOST_MEMBERS = 6,
-		ES_HEURISTIC_LEAST_MEMBERS = 7,
-		ES_HEURISTIC_INTERACTIVE = 8;
+		ES_HEURISTIC_INTERACTIVE = 0,
+		ES_HEURISTIC_ANY = 1,
+		ES_HEURISTIC_TOPDOWN = 2,
+		ES_HEURISTIC_MOST_PENDING = 3,
+		ES_HEURISTIC_LEAST_PENDING = 4,
+		ES_HEURISTIC_MOST_FOLLOWERS = 5,
+		ES_HEURISTIC_LEAST_FOLLOWERS = 6,
+		ES_HEURISTIC_MOST_MEMBERS = 7,
+		ES_HEURISTIC_LEAST_MEMBERS = 8;
 		;
 	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
 
@@ -180,7 +180,7 @@ public class Options
 
 	/** insertation heuristic for Delayed* smoothing algorithm */
 	public static final String [] DSSI_HEURISTIC_NAMES =  {
-		"Random", "Stack", "FIFO", "Smallest BDD", "Largest BDD"
+		"Random          ", "Stack", "FIFO", "Smallest BDD", "Largest BDD"
 	};
 	public static final int
 		DSSI_RANDOM = 0,
@@ -189,6 +189,19 @@ public class Options
 		DSSI_SMALLEST_BDD = 3,
 		DSSI_LARGEST_BDD = 4;
 	public static int dssi_heuristics = DSSI_STACK;
+
+
+	/** Non-deteministic Automata Selection: how to use between equally expensive automata ? (see for example Workset.java) */
+	public static final String [] NDAS_HEURISTIC_NAMES =
+		{ "Random          ", "First", "Last", "Ring", "Activity (reward/punish)", "Activity (reward/fade)" };
+	public static final int
+		NDAS_RANDOM = 0,
+		NDAS_FIRST = 1,
+		NDAS_LAST = 2,
+		NDAS_RING = 3,
+		NDAS_ACTIVITY = 4,
+		NDAS_ACTIVITY2 = 5;
+	public static int ndas_heuristics = NDAS_RANDOM;
 
 
 

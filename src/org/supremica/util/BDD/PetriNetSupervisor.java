@@ -122,7 +122,7 @@ public class PetriNetSupervisor
 			case Options.ES_HEURISTIC_INTERACTIVE:
 				return pickOneInteractive(forward);
 
-			case Options.ES_HEURISTIC_RANDOM:
+			case Options.ES_HEURISTIC_ANY:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(workset[i] > 0)  queue[queue_size++] = i;
 				break;

@@ -154,8 +154,13 @@ public class Supervisor
 			Options.algo_family == Options.ALGO_DISJUNCTIVE_WORKSET  ||
 			Options.algo_family == Options.ALGO_SMOOTHED_MONO_WORKSET) {
 			sb.append( Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
-			sb.append( "/");
+			sb.append( " + NDAS:");
+
+			sb.append( Options.NDAS_HEURISTIC_NAMES[Options.ndas_heuristics]);
+			sb.append( ". ");
 		}
+
+
 		return sb.toString();
 	}
 

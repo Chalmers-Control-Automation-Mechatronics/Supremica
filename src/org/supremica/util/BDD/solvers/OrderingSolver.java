@@ -104,10 +104,10 @@ public class OrderingSolver {
     private Node [] getShortestPath(Node [] nods) {
 		Solver sol = null;
 		switch(Options.ordering_algorithm) {
-			case Options.AS_HEURISTIC_TSP:
+			case Options.AO_HEURISTIC_TSP:
 				sol = new TSPSolver(nods);
 				break;
-			case Options.AS_HEURISTIC_DFS:
+			case Options.AO_HEURISTIC_DFS:
 				sol = new DFSSolver(nods);
 				break;
 			default:
