@@ -8,10 +8,12 @@ import java.awt.event.*;
 
 public class LevelGraph extends Frame implements WindowListener {
 	private static final int HEIGHT = 100;
-	private static final int WIDTH = 50;
+	private static final int WIDTH = 128;
 
 	private int max;
-	private LevelCanvas can1, can2, can3;
+	private LevelCanvas can11, can12;
+	private LevelCanvas can21, can22;
+	private Label msg;
 
 	public LevelGraph(int max) {
 		super("Level Graph");
@@ -19,17 +21,24 @@ public class LevelGraph extends Frame implements WindowListener {
 		this.max = max;
 
 
-		Panel mid = new Panel( new GridLayout(1,2, 5,5) );
+		add (msg = new Label(), BorderLayout.NORTH);
+
+		Panel mid = new Panel( new GridLayout(2,2, 5,5) );
 		add(mid, BorderLayout.CENTER);
 
-		mid.add( can3 = new LevelCanvas(WIDTH, HEIGHT));
-		mid.add( can2 = new LevelCanvas(WIDTH, HEIGHT));
+		mid.add( can12 = new LevelCanvas(WIDTH, HEIGHT));
+		mid.add( can11 = new LevelCanvas(WIDTH, HEIGHT));
 
-		add( can1 = new LevelCanvas(100, HEIGHT), BorderLayout.SOUTH);
+		mid.add( can22 = new LevelCanvas(WIDTH, HEIGHT));
+		mid.add( can21 = new LevelCanvas(WIDTH, HEIGHT));
 
 
-		can2.setTitle("" + can1.length()  + "-moving average");
-		can3.setTitle("" + (can1.length() * can2.length() ) + "-moving average");
+		can12.setTitle("" + can11.length()  + "-moving average");
+		can22.setTitle("" + can21.length()  + "-moving average");
+
+		can11.setTitle("Workset");
+		can21.setTitle("H1(Workset)");
+
 
 		addWindowListener(this);
 		pack();
@@ -37,22 +46,44 @@ public class LevelGraph extends Frame implements WindowListener {
 	}
 
 	// ---------------------------------------------------
+	public void setLabel(String label) {
+		msg.setText(label);
+	}
+	// ---------------------------------------------------
 
-	public void add(int n) {
+	public void add_workset(int n) {
 		if(n < 0 || n> max) return; // XXX: we should warn
 
-		if( can1.addOne((HEIGHT * n) / max) ) {
-			int avg = can1.getAverage();
-			if( can2.addOne(avg) ) {
-				avg = can2.getAverage();
-				can3.addOne(avg);
-				can3.force_repaint();
-			}
-			can2.force_repaint();
+		if( can11.addOne((HEIGHT * n) / max) ) {
+			int avg = can11.getAverage();
+			can12.addOne(avg);
+			can12.force_repaint();
 		}
-		can1.force_repaint();
+		can11.force_repaint();
 	}
 
+	public void add_h1(int n) {
+		if(n < 0 || n> max) return; // XXX: we should warn
+
+		if( can21.addOne((HEIGHT * n) / max) ) {
+			int avg = can21.getAverage();
+			can22.addOne(avg);
+			can22.force_repaint();
+		}
+		can21.force_repaint();
+	}
+/*
+	public void add_h2(int n) {
+		if(n < 0 || n> max) return; // XXX: we should warn
+
+		if( can31.addOne((HEIGHT * n) / max) ) {
+			int avg = can31.getAverage();
+			can32.addOne(avg);
+			can32.force_repaint();
+		}
+		can31.force_repaint();
+	}
+	*/
 	// ---------------------------------------------------
 	public void windowActivated(WindowEvent e) { }
 	public void windowClosed(WindowEvent e) { }
@@ -69,7 +100,6 @@ public class LevelGraph extends Frame implements WindowListener {
 class LevelCanvas extends Canvas {
 	private static final int W_GAP = 5;
 	private static final int H_GAP = 5;
-	private static final int MUL = 4;
 
 	private int w, h, tot_x, tot_y, offset;
 	private int [] data;
@@ -81,7 +111,7 @@ class LevelCanvas extends Canvas {
 		this.data = new int[w];
 		this.offset = 0;
 
-		this.tot_x = MUL * w + 2 * W_GAP;
+		this.tot_x = w + 2 * W_GAP;
 		this.tot_y = h + H_GAP;
 		this.title = null;
 
@@ -115,20 +145,22 @@ class LevelCanvas extends Canvas {
 	public void paint(Graphics g) {
 
 		g.setColor( Color.red);
-		g.drawRect(W_GAP, H_GAP, W_GAP + w * MUL-1,	 h-1);
+		g.drawRect(W_GAP, H_GAP, W_GAP + w -1,	 h-1);
 
 		g.setColor( Color.black);
 		for(int i = 0; i < w; i++) {
 			int val = data[ (i + offset) % w ];
 			if(val != -1) {
-				int x = W_GAP + i * MUL;
-				int y = H_GAP + h - val;
-				g.fillRect(x, y,MUL,h-y);
+				int x = W_GAP + i;
+				int y = h - val;
+				g.drawLine(x, y, x, h);
 			}
 		}
 
-		if(title != null)
+		if(title != null) {
+			g.setColor( Color.red);
 			g.drawString(title,W_GAP,20); // NOTE: hard-coded coordinates!
+		}
 	}
 
 

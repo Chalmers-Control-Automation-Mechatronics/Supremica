@@ -125,10 +125,6 @@ public class PetriNetSupervisor
 			heuristic = Options.ES_HEURISTIC_MOST_MEMBERS;
 		}
 
-		if(Options.show_level_graph)
-		{
-			levelGraph = new LevelGraph(size);
-		}
 	}
 
 	// -----------------------------------------------------------------
@@ -198,7 +194,7 @@ public class PetriNetSupervisor
 				if (workset[i] > 0 )
 					c++;
 
-			levelGraph.add(c);
+			levelGraph.add_workset(c);
 		}
 
 		// the idea is to put the 'best' events in a queue and choose one on random
@@ -425,8 +421,15 @@ public class PetriNetSupervisor
 			workset[i] = 1;
 		}
 
+
+		if(Options.show_level_graph)
+		{
+			levelGraph = new LevelGraph(size);
+		}
+
 		// reset H2 heuristics
-		ndas.reset();
+		ndas.reset(levelGraph);
+
 
 	}
 	private void stop_search()

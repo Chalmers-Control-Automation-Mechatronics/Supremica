@@ -894,7 +894,7 @@ class BDDPanel1
 		pWest.add(debugOn = new JCheckBox("Verbose", Options.debug_on));
 		pWest.add(profileOn = new JCheckBox("Profile", Options.profile_on));
 		pWest.add(sizeWatch = new JCheckBox("report nodcount", Options.size_watch));
-		pWest.add(levelGraph = new JCheckBox("H1 level graphs", Options.show_level_graph));
+		pWest.add(levelGraph = new JCheckBox("Selection-set cardinality graphs", Options.show_level_graph));
 
 
 		JPanel pWest2 = new JPanel(new GridLayout(2, 1));

@@ -1,6 +1,7 @@
 package org.supremica.util.BDD.heuristics;
 
 import org.supremica.util.BDD.*;
+import org.supremica.util.BDD.graphs.*;
 
 /**
  * Non-deteministic (?) choice of equally good candidates
@@ -14,6 +15,7 @@ public class NDAS_Choice
 	private int ndas, ring, max_activity, num_access, num_advance;
 	private int[] activity = null, queue2 = null;
 	private boolean punish_inactive;
+	private LevelGraph levelGraph = null;
 
 	public NDAS_Choice(int size)
 	{
@@ -39,8 +41,9 @@ public class NDAS_Choice
 		}
 	}
 
-	public void reset()
+	public void reset(LevelGraph levelGraph)
 	{
+		this.levelGraph = levelGraph;
 		ring = -1;
 		num_access = num_advance = 0;
 
@@ -59,6 +62,8 @@ public class NDAS_Choice
 		{
 			Options.out.println("NDAS advances: " + ((100 * num_advance) / num_access) + "%");
 		}
+
+		this.levelGraph = null;
 	}
 
 	// --------------------------------------------------------------------------
@@ -73,6 +78,8 @@ public class NDAS_Choice
 		{
 			return -1;    // ERROR, no choices!
 		}
+
+		if(levelGraph != null) levelGraph.add_h1(size);
 
 		if (size == 1)
 		{

@@ -66,10 +66,6 @@ public class Workset
 			ic = new InteractiveChoice("Workset interactive automaton selection");
 		}
 
-		if(Options.show_level_graph)
-		{
-			levelGraph = new LevelGraph(size);
-		}
 	}
 
 	/**
@@ -96,9 +92,17 @@ public class Workset
 			}
 		}
 
-		ndas.reset();
+
 		track_advanced = track_not_advanced = 0;
 		internal_state = STATE_INITIAL; // internal state of the adaptive heuristic
+
+		if(Options.show_level_graph)
+		{
+			levelGraph = new LevelGraph(size);
+		}
+
+		ndas.reset(levelGraph);
+
 	}
 
 	public void done()
@@ -333,7 +337,7 @@ public class Workset
 				if (workset[i] > 0 && (!exclusive || remaining[i]) )
 					c++;
 
-			levelGraph.add(c);
+			levelGraph.add_workset(c);
 		}
 
 
