@@ -110,7 +110,7 @@ public class Supremica
 	public static void startJGrafChart()
 	{
     	Basic2GC app = new Basic2GC();
-    	app.updateActions();;	
+    	app.updateActions();
 	}
 
 	// Main method

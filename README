@@ -9,6 +9,10 @@ for secure communication with the computers at the Department
 of Signals and Systems. For fastest compiling you should install Jikes, 
 the Java compiler from IBM.
 
+From 2001-09-27 JGrafChart is included. JGrafChart is a Grafcet/SFC 
+modeling tool. JGrafChart is developed by Karl-Erik Arzen, at Lund
+Institute of Technology. Karl-Erik can be reached at karlerik@control.lth.se.
+
 To report problems or ask questions
 send email to knut@supremica.org
 
@@ -74,7 +78,12 @@ Supremica is following.
 	i. Enter Supremica/dist, write:
 	> Supremica    (for Windows)
 	> ./Supremica  (for Unix)
-		
+	
+	or 
+	
+	> JGrafChart    (for Windows)
+	> ./JGrafChart  (for Unix)
+			
 	ii. Run Supremica through Ant. Enter Supremica and write
 	> ant run
 	
