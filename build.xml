@@ -70,10 +70,7 @@
 	</delete>
 </target>
 
-<target name="initialize" depends="builddirectories,rebuild">
-</target>
-
-<target name="builddirectories" depends="clean">
+<target name="initialize" depends="clean">
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${build}" />

@@ -1306,7 +1306,7 @@ public class CreateXml
 		// trying to check every endcollision if exists a real collision
 		public synchronized void tick(double time)
 		{
-
+/* // This method resulted in a compiler warning,
 			try
 			{
 				;
@@ -1316,7 +1316,7 @@ public class CreateXml
 				logger.error("Error");
 				return;
 			}
-
+*/
 		}
 
 
