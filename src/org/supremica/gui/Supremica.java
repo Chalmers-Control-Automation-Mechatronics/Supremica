@@ -774,6 +774,19 @@ public class Supremica
 			}
 		});
 
+		// Project.Animator
+		JMenuItem menuProjectAnimator = new JMenuItem();
+
+		menuProjectAnimator.setText("Show Animator...");
+		menuProject.add(menuProjectAnimator);
+		menuProjectAnimator.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.animator_actionPerformed(getGui());
+			}
+		});
+
 		// Tools
 		JMenu menuTools = new JMenu();
 

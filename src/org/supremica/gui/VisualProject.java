@@ -58,6 +58,9 @@ import javax.swing.table.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 import org.supremica.gui.editor.*;
+import uk.ac.ic.doc.scenebeans.animation.Animation;
+import org.supremica.gui.animators.scenebeans.AnimationItem;
+import org.supremica.gui.animators.scenebeans.Animator;
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -70,6 +73,7 @@ public class VisualProject
 	private Automata selectedAutomata = null;
 	private AutomataEditor theAutomataEditor = null;    // Lazy construction
 	private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
+	private Animator theAnimator = null;	// Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
@@ -436,17 +440,24 @@ public class VisualProject
 		if (theActionAndControlViewer == null)
 		{
 			theActionAndControlViewer = new ActionAndControlViewer(this);
-
-			theActionAndControlViewer.setVisible(true);
-
-			return theActionAndControlViewer;
 		}
-		else
+		theActionAndControlViewer.setVisible(true);
+		return theActionAndControlViewer;
+	}
+
+	public Animator getAnimator()
+		throws Exception
+	{
+		if (!hasAnimation())
 		{
-			theActionAndControlViewer.setVisible(true);
-
-			return theActionAndControlViewer;
+			return null;
 		}
+		if (theAnimator == null)
+		{
+			theAnimator = AnimationItem.createInstance(getAnimationPath());
+		}
+		theAnimator.setVisible(true);
+		return theAnimator;
 	}
 
 	public int getSize()

@@ -315,6 +315,12 @@ public class ProjectToSP
 			}
 
 			pw.println("\t</Controls>");
+
+			if (project.hasAnimation())
+			{
+				pw.println("\t<Animation path=\"" + normalize(project.getAnimationPath()) + "\"/>");
+			}
+
 			pw.println("</Execution>");
 		}
 

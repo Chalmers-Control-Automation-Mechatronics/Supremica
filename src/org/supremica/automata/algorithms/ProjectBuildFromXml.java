@@ -99,6 +99,7 @@ public class ProjectBuildFromXml
 	private final static String masterStr = "Master";
 	private final static String slavesStr = "Slaves";
 	private final static String slaveStr = "Slave";
+	private final static String animationStr = "Animation";
 
 	private ProjectFactory theProjectFactory = null;
 	private Project currProject = null;
@@ -272,6 +273,10 @@ public class ProjectBuildFromXml
 		else if (conditionStr.equals(name))
 		{
 			doCondition(attributes);
+		}
+		else if (animationStr.equals(name))
+		{
+			doAnimation(attributes);
 		}
 		else if (eventsStr.equals(name)) {}
 		else if (statesStr.equals(name)) {}
@@ -708,5 +713,22 @@ public class ProjectBuildFromXml
 		}
 
 		currControl.setCondition(condition);
+	}
+
+	public final void doAnimation(Attributes attributes)
+		throws SAXException
+	{
+		if (currProject == null)
+		{
+			throwException("Project section is missing");
+		}
+		String path = attributes.getValue("path");
+
+		if (path == null)
+		{
+			throwException("path attribute is missing");
+		}
+
+		currProject.setAnimationPath(path);
 	}
 }

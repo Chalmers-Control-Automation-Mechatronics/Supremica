@@ -64,6 +64,7 @@ public class Project
 	private static Logger logger = LoggerFactory.createLogger(Project.class);
 	private Actions theActions = null;
 	private Controls theControls = null;
+	private String animationPath = null;
 
 	public Project()
 	{
@@ -95,6 +96,29 @@ public class Project
 	public Controls getControls()
 	{
 		return theControls;
+	}
+
+	public boolean hasAnimation()
+	{
+		if (animationPath == null)
+		{
+			return false;
+		}
+		if (animationPath.equals(""))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public String getAnimationPath()
+	{
+		return animationPath;
+	}
+
+	public void setAnimationPath(String path)
+	{
+		animationPath = path;
 	}
 
 	public void addActions(Actions otherActions)

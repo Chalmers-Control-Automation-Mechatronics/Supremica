@@ -109,4 +109,26 @@ public class AnimationItem
 			throw ex;
 		}
 	}
+
+	public static Animator createInstance(String path)
+		throws Exception
+	{
+		try
+		{
+			final Animator view = new Animator("Path: " + path);
+			URL url = AnimationItem.class.getResource(path);
+			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
+
+			view.setAnimation(parser.parseAnimation());
+
+			return view;
+		}
+		catch (Exception ex)
+		{
+			System.err.println(ex);
+			ex.printStackTrace();
+
+			throw ex;
+		}
+	}
 }

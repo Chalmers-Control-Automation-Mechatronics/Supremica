@@ -1121,7 +1121,7 @@ public class ActionMan
 		}
 	}
 
-	// Automaton.Alphabet action performed
+	// Automaton.ActionAndControlViewer action performed
 	public static void actionAndControlViewer_actionPerformed(Gui gui)
 	{
 		try
@@ -1131,6 +1131,19 @@ public class ActionMan
 		catch (Exception ex)
 		{
 			gui.error("Exception in ActionAndControlViewer.");
+		}
+	}
+
+	// Automaton.ActionAndControlViewer action performed
+	public static void animator_actionPerformed(Gui gui)
+	{
+		try
+		{
+			Animator animator = gui.getVisualProjectContainer().getActiveProject().getAnimator();
+		}
+		catch (Exception ex)
+		{
+			gui.error("Exception while getting Animator.");
 		}
 	}
 
