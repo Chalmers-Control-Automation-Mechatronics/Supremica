@@ -102,7 +102,7 @@ public class GrowFrame
 	}
 	private void update_screen() {
 		status.setText("Time " + (end_time - start_time) + " [ms]");
-		canvas.repaint();
+		canvas.force_repaint();
 	}
 
 
@@ -209,6 +209,19 @@ public class GrowFrame
 			this.resize(400, 300);
 		}
 
+
+		/** this is to force repainting right away even if the AWT thread is busy */
+		public void force_repaint() {
+			if(!showGraph) return;
+
+			Graphics g = getGraphics();
+			if(g!= null)
+			{
+				g.clearRect(0,0, getWidth(), getHeight() );
+				paint(g);
+			}
+
+		}
 		public void paint(Graphics g)
 		{
 			if(!showGraph) return;

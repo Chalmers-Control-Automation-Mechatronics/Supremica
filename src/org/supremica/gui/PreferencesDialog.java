@@ -695,7 +695,7 @@ class BDDPanel
 		JLabel tmp;
 
 
-	JPanel pWest  = new JPanel( new GridLayout(14,1));
+	JPanel pWest  = new JPanel( new GridLayout(11,1));
 	add(pWest, BorderLayout.WEST);
 
 
@@ -841,17 +841,18 @@ class BDDPanel
 	pGrow.add( showGrow = new JComboBox());
 	showGrow.addItem("None");
 	showGrow.addItem("Node count");
-	showGrow.addItem("Node count (log scale)      ");
+	showGrow.addItem("Node count (log scale)");
 	showGrow.addItem("Node count delta");
 	showGrow.addItem("SAT count");
 	showGrow.addItem("SAT count (log scale)");
 	showGrow.addItem("SAT count delta");
+	showGrow.addItem("Node count + SAT count (log scale)      ");
 	showGrow.setSelectedIndex( Options.show_grow);
 
 	JPanel pCount = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 	p.add(pCount);
 
-	pCount.add( new JLabel("State-counting algorithm"));
+	pCount.add( new JLabel("State enumeration algorithm"));
 	pCount.add(countAlgorithm = new JComboBox());
 
 	countAlgorithm.addItem("No counting         ");

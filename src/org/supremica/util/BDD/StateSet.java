@@ -33,6 +33,8 @@ public class StateSet
 	{
 		BDDAssert.bddAssert(!closed, "[StateSet.getIdByName]BAD FUNCTION CALL!");
 
+		State by_id = null;
+
 		for (Enumeration e = elements(); e.hasMoreElements(); )
 		{
 			State s = (State) e.nextElement();
@@ -41,6 +43,19 @@ public class StateSet
 			{
 				return s;
 			}
+
+			if(s.name.equals(name))
+			{
+				by_id = null;
+			}
+		}
+
+
+
+		if(by_id != null)
+		{
+			System.err.println("[StateSet.getByName] BAD MODEL, uses name " + by_id.name + " instead of " + by_id.name_id);
+			return by_id;
 		}
 
 		return null;

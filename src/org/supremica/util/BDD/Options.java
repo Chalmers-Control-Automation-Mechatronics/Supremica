@@ -93,7 +93,9 @@ public class Options
 
 		SHOW_GROW_SATCOUNT = 4,
 		SHOW_GROW_SATCOUNT_LOG = 5,
-		SHOW_GROW_SATCOUNT_DIFF = 6;
+		SHOW_GROW_SATCOUNT_DIFF = 6,
+
+		SHOW_GROW_NODES_AND_SATCOUNT_LOG = 7;
 
     // constants
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
