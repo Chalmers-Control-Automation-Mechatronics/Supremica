@@ -50,6 +50,8 @@
 package org.supremica.automata;
 
 import java.util.*;
+import org.supremica.gui.*;
+import org.apache.log4j.*;
 
 /**
  * Similar to Events, but with allows for the fast lookup of an event based on the id.
@@ -67,6 +69,8 @@ import java.util.*;
 public class Alphabet
 	extends Events
 {
+	private static Category thisCategory = LogDisplay.createCategory(Alphabet.class.getName());
+
 	private HashMap idMap;
 	private int idIndex = 0;
 	private Listeners listeners = null;
@@ -154,15 +158,54 @@ public class Alphabet
 	}
 
 	/**
+	 * Computes A \ B where A is this alphabet and B is other
+	 *
+	 *@param  other The other alphabet
+	 */
+	public void minus(Alphabet other)
+	{
+		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
+		{
+			EventLabel currEvent = (EventLabel) alphIt.next();
+			if (containsEventWithLabel(currEvent.getLabel()))
+			{
+				try
+				{
+					removeEvent(currEvent.getLabel());
+				}
+				catch (Exception e)
+				{ // This should be impossible
+					thisCategory.error("Alphabet.minus. Trying to remove a non-existing event.");
+				}
+			}
+		}
+	}
+
+	/**
 	 * Remove event from alphabet.
 	 *
 	 *@param  event Description of the Parameter
 	 */
 	public void removeEvent(EventLabel event)
+		throws Exception
 	{
 		idMap.remove(event.getId());
 		super.removeEvent(event);
 	}
+
+	/**
+	 * Remove event from alphabet.
+	 *
+	 *@param  event Description of the Parameter
+	 */
+	public void removeEvent(String label)
+		throws Exception
+	{
+		EventLabel currEvent = getEventWithLabel(label);
+		idMap.remove(currEvent.getId());
+		super.removeEvent(label);
+	}
+
 
 	/**
 	 * Do not use this, use iterator instead.

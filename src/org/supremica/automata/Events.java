@@ -133,8 +133,15 @@ public class Events
 	}
 
 	public void removeEvent(EventLabel ev)
+		throws Exception
 	{
-		theEvents.remove(ev.getLabel());
+		removeEvent(ev.getLabel());
+	}
+
+	public void removeEvent(String label)
+		throws Exception
+	{
+		theEvents.remove(label);
 	}
 
 	/**
