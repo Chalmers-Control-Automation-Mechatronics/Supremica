@@ -68,6 +68,8 @@ public class AutomatonViewer
 	extends JFrame
 	implements AutomatonListener
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomatonViewer.class);
+
 	private Automaton theAutomaton;
 	private Graph theGraph;
 	private PrintWriter toDotWriter;
@@ -84,7 +86,6 @@ public class AutomatonViewer
 	private JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", SupremicaProperties.isDotWithStateLabels());
 	private JCheckBoxMenuItem useColorsCheckBox = new JCheckBoxMenuItem("Draw colors", SupremicaProperties.isDotUseColors());
 	private JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", SupremicaProperties.isDotAutomaticUpdate());
-	private static Logger logger = LoggerFactory.createLogger(AutomatonViewer.class);
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5, MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
 	private Process dotProcess;
@@ -122,7 +123,7 @@ public class AutomatonViewer
 //		setIconImage(Supremica.cornerImage);
 
 		Utility.setupFrame(this, 400, 500);
-		
+
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)

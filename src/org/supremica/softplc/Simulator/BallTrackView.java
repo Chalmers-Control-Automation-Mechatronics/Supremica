@@ -6,6 +6,7 @@ import java.util.*;
 import java.awt.event.*;
 import java.awt.Color.*;
 import java.lang.*;
+import org.supremica.gui.Utility;
 
 /**Class BallTrackView paints the background ball track and possibly several
  * balls in a window
@@ -62,7 +63,8 @@ public class BallTrackView
 	rController = rcont;
 	size = framesize;
 
-	setSize(size, size + 45);
+		Utility.setupFrame(this, size, size + 45);
+	//setSize(size, size + 45);
 	setTitle("Ballprocess Simulator");
 	setVisible(true);
 

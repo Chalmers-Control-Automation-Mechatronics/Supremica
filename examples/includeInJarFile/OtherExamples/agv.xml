@@ -612,8 +612,8 @@
 
 		<!-- WS1 -->
 		<Action label="w11">
-			<Command command="ws1_part1.go"/>
-			<Command command="ws1_part2.go"/>
+			<Command command="ws1_part1.reset"/>
+			<Command command="ws1_part2.reset"/>
 		</Action>
 		<Action label="w12">
 			<Command command="ws1_part1.go"/>
