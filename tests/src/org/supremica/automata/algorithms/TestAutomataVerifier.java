@@ -47,34 +47,87 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.algorithms;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.automata.algorithms.TestPackageAlgorithms;
+import org.supremica.testhelpers.*;
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
+import java.io.*;
 
-public class TestPackageAutomata
+public class TestAutomataVerifier
 	extends TestCase
 {
-
-	public TestPackageAutomata(String name)
+	public TestAutomataVerifier(String name)
 	{
 		super(name);
 	}
 
 	/**
+	 * Sets up the test fixture.
+	 * Called before every test case method.
+	 */
+	protected void setUp()
+	{
+	}
+
+	/**
+	 * Tears down the test fixture.
+	 * Called after every test case method.
+	 */
+	protected void tearDown()
+	{
+	}
+
+	/**
 	 * Assembles and returns a test suite
-	 * containing all known tests.
+	 * for all the test methods of this test case.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestAutomaton.suite());
-		suite.addTest(TestAutomataToXml.suite());
-		suite.addTest(TestProjectToSP.suite());
-		suite.addTest(TestPackageAlgorithms.suite());
+		TestSuite suite = new TestSuite(TestAutomataVerifier.class);
 		return suite;
 	}
+
+	public void testModularControllable()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3));
+			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+			VerificationOptions verificationOptions = new VerificationOptions();
+			verificationOptions.setVerificationType(VerificationType.Controllability);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			assertTrue(theVerifier.modularControllabilityVerification());
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+	public void testModularUncontrollable()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3Uncontrollable));
+			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+			VerificationOptions verificationOptions = new VerificationOptions();
+			verificationOptions.setVerificationType(VerificationType.Controllability);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			assertTrue(!theVerifier.modularControllabilityVerification());
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
 }

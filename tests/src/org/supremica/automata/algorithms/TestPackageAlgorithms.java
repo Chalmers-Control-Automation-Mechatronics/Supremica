@@ -47,58 +47,29 @@
  *
  *  Supremica is owned and represented by KA.
  */
+package org.supremica.automata.algorithms;
 
-/**
- * The files in this package are not pure test cases, instead they are used
- * by test cases in other packages. Please, do not store pure test cases in
- * this directory.
- */
-package org.supremica.testhelpers;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-import java.util.*;
-import java.io.*;
-
-public class TestFiles
+public class TestPackageAlgorithms
+	extends TestCase
 {
-	private static List collection = new LinkedList();
-	public static final TestFiles AGV = new TestFiles("agv.xml");
-	public static final TestFiles CatMouse = new TestFiles("catmouse.xml");
-	public static final TestFiles CentralLocking3Doors = new TestFiles("centralLocking3Doors.xml");
-	public static final TestFiles CircularTable = new TestFiles("circularTable.xml");
-	public static final TestFiles FlexibleManufacturingCell = new TestFiles("flexibleManufacturingCell.xml");
-	public static final TestFiles FlexibleManufacturingSystem = new TestFiles("flexibleManufacturingSystem.xml");
-	public static final TestFiles robotAssemblyCell = new TestFiles("robotAssemblyCell.xml");
-	public static final TestFiles Verriegel3 = new TestFiles("verriegel3.xml");
-	public static final TestFiles Verriegel3Language = new TestFiles("verriegel3_language.xml");
-	public static final TestFiles Verriegel3Uncontrollable = new TestFiles("verriegel3_uncontrollable.xml");
 
-	private static final String testFilePrefix = "./tests/testfiles/";
-
-	private String filename;
-
-	private TestFiles(String filename)
+	public TestPackageAlgorithms(String name)
 	{
-		collection.add(this);
-		this.filename = filename;
+		super(name);
 	}
 
-	public static Iterator iterator()
+	/**
+	 * Assembles and returns a test suite
+	 * containing all known tests.
+	 */
+	public static Test suite()
 	{
-		return collection.iterator();
-	}
-
-	public String toString()
-	{
-		return filename;
-	}
-
-	public static Object[] toArray()
-	{
-		return collection.toArray();
-	}
-
-	public static File getFile(TestFiles theTestFile)
-	{
-		return new File(testFilePrefix + theTestFile);
+		TestSuite suite = new TestSuite();
+		suite.addTest(TestAutomataVerifier.suite());
+		return suite;
 	}
 }
