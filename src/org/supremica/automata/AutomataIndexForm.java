@@ -148,6 +148,7 @@ public final class AutomataIndexForm
 		//   heller. Min gissning är att det är State.index som blir fel t.ex. om man gör merge. /hguo igen
 		generateNextStateTransitionIndices(theAutomata, theAutomaton);
 		generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
+
 		generateEventsTables(theAutomaton);
 	}
 

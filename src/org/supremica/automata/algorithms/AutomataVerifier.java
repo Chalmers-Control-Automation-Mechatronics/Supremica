@@ -108,11 +108,11 @@ public class AutomataVerifier
 	 *
 	 *@see SynchronizationOptions
 	 */
-	private boolean verboseMode;
 	private VerificationOptions verificationOptions;
 	private SynchronizationOptions synchronizationOptions;
 
 	/** For stopping execution. */
+	private ExecutionDialog executionDialog = null;
 	private boolean stopRequested = false;
 	private Stoppable threadToStop = null;
 
@@ -132,21 +132,18 @@ public class AutomataVerifier
 		this.theAutomata = theAutomata;
 		this.verificationOptions = verificationOptions;
 		this.synchronizationOptions = synchronizationOptions;
+
+		// We don't need to do this here (not at all, actually!). It's ugly.
 		nbrOfExecuters = synchronizationOptions.getNbrOfExecuters();
-		verboseMode = synchronizationOptions.verboseMode();
 		oneEventAtATime = verificationOptions.getOneEventAtATime();
 
-		// The helper must be initialized here (this early) only because of the
-		// executionDialog, I think...
-		// BUT THE EXECUTIONDIALOG IS NOT USED UNTIL MUCH LATER?!!!
-		//  That's right.
+		// We're gonna do some serious synchronization! Initialize a synchronization helper!
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 		// Build the initial state  (including 2 status fields)
 		initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
 		Iterator autIt = theAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			currAutomaton = (Automaton) autIt.next();
@@ -261,6 +258,18 @@ public class AutomataVerifier
 	{
 		try
 		{
+			/*
+			// Need initialisation?
+			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
+				(verificationOptions.getVerificationType() == VerificationType.InverseControllability) ||
+				(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion))
+			{
+				// We're gonna do some serious synchronization! Initialize a synchronization helper!
+				synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+			}
+			*/
+
+			// Find out what should be done and do it!
 			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
 			   	(verificationOptions.getVerificationType() == VerificationType.InverseControllability))
 			{
@@ -390,7 +399,7 @@ public class AutomataVerifier
 		}
 
 		// The "exclusionAutomata"'s alphabet must be included in the "inclusionAutomata"
-		if (Alphabet.minus(exclusionAutomata.getUnionAlphabet(),inclusionAutomata.getUnionAlphabet()).size() > 0)
+		if (Alphabet.minus(exclusionAutomata.getUnionAlphabet(), inclusionAutomata.getUnionAlphabet()).size() > 0)
 		{
 			logger.warn("Warning, the alphabets are not well related for language inclusion.");
 		}
@@ -515,10 +524,7 @@ public class AutomataVerifier
 									// Stop if uncontrollable
 									if (!allModulesControllable)
 									{
-										if (verboseMode)
-										{
-											logger.info("Uncontrollable state found.");
-										}
+										logger.verbose("Uncontrollable state found.");
 
 										break loop;
 									}
@@ -548,10 +554,7 @@ public class AutomataVerifier
 						// Stop if uncontrollable
 						if (!allModulesControllable)
 						{
-							if (verboseMode)
-							{
-								logger.info("Uncontrollable state found.");
-							}
+							logger.verbose("Uncontrollable state found.");
 
 							break loop;
 						}
@@ -605,7 +608,8 @@ public class AutomataVerifier
 
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
-			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+			AutomataSynchronizerExecuter currSynchronizationExecuter = 
+				new AutomataSynchronizerExecuter(synchHelper);
 
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
@@ -614,7 +618,8 @@ public class AutomataVerifier
 		// For the moment we assume that we only have one thread
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
-			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+			AutomataSynchronizerExecuter currExec = 
+				(AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
 
 			currExec.selectAutomata(selectedAutomata);
 			currExec.start();
@@ -630,9 +635,8 @@ public class AutomataVerifier
 		// The name of the "synchronized" automata
 		StringBuffer automataNames = new StringBuffer();
 
-		if (verboseMode)
+		if (SupremicaProperties.verboseMode())
 		{
-
 			// For printing the names of the automata in selectedAutomata
 			for (Iterator autIt = selectedAutomata.iterator();
 					autIt.hasNext(); )
@@ -660,7 +664,7 @@ public class AutomataVerifier
 				automataIndices[i++] = autIt.nextAutomaton().getIndex();
 			}
 
-			if (verboseMode)
+			if (SupremicaProperties.verboseMode())
 			{
 				String states;
 				int size = potentiallyUncontrollableStates.size(automataIndices);
@@ -683,11 +687,10 @@ public class AutomataVerifier
 
 			// Get a sorted array of indexes of automata with similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
-
 			if (similarAutomata == null)
 			{
 				// There are no similar automata, this module must be uncontrollable
-				if (verboseMode)
+				if (SupremicaProperties.verboseMode())
 				{
 					// Print the uncontrollable state(s)...
 					synchHelper.printUncontrollableStates(automataIndices);
@@ -696,7 +699,7 @@ public class AutomataVerifier
 				return false;
 			}
 
-			if (verboseMode)
+			if (SupremicaProperties.verboseMode())
 			{
 				logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			}
@@ -709,10 +712,7 @@ public class AutomataVerifier
 
 			for (attempt = 1; attempt <= nbrOfAttempts; attempt++)
 			{
-				if (verboseMode)
-				{
-					logger.debug("Attempt number " + attempt + ".");
-				}
+				logger.debug("Attempt number " + attempt + ".");
 
 				// Have we already added all similar automata?
 				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
@@ -730,7 +730,7 @@ public class AutomataVerifier
 
 					if (moreSimilarAutomata != null)
 					{
-						if (verboseMode)
+						if (SupremicaProperties.verboseMode())
 						{
 							logger.info("All similar automata are already added, " + "trying to add some more...");
 						}
@@ -742,17 +742,16 @@ public class AutomataVerifier
 					}
 					else
 					{
-						if (verboseMode)
+						if (SupremicaProperties.verboseMode())
 						{
-							logger.info("All similar automata are already added, " + "no chance for controllability.");
-
+							logger.info("All similar automata are already added, " + 
+										"no chance for controllability.");
+							
 							// Print the uncontrollable state(s)...
 							synchHelper.printUncontrollableStates();
 
 							// Print event trace reaching uncontrollable state
 							// synchHelper.displayTrace();  // CAN'T BE DONE... TRACE NOT REMEMBERED... FIXA!
-							// Print info on amount of states examined
-							// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
 						}
 
 						return false;
@@ -773,16 +772,14 @@ public class AutomataVerifier
 				{
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
 					{
-						if (verboseMode)
-						{
-							logger.info("Couldn't prove controllability, " + "trying to prove uncontrollability...");
-						}
+						logger.verbose("Couldn't prove controllability, " + 
+									   "trying to prove uncontrollability...");
 
 						// Try to prove remaining states in the stateMemorizer as being uncontrollable
 						if (findUncontrollableStates(automataIndices))
 						{
 							// Uncontrollable state found!
-							if (verboseMode)
+							if (SupremicaProperties.verboseMode())
 							{    // Print the uncontrollable state(s)...
 								uncontrollabilityCheckHelper.printUncontrollableStates();
 
@@ -795,15 +792,11 @@ public class AutomataVerifier
 					}
 					else
 					{
-						if (verboseMode)
-						{
-							logger.info("Skipped uncontrollability check!");
-						}
+						logger.verbose("Skipped uncontrollability check!");
 					}
 				}
 				else
 				{
-
 					// All uncontrollable states were removed!
 					break;
 				}
@@ -815,7 +808,7 @@ public class AutomataVerifier
 				// controllable or uncontrollable. We now have no idea what so ever on the
 				// controllability so... we chicken out and give up.
 				// Print remaining suspected uncontrollable state(s)
-				if (verboseMode)
+				if (SupremicaProperties.verboseMode())
 				{
 					logger.info("Unfortunately the following states might be uncontrollable...");
 					synchHelper.printUncontrollableStates(automataIndices);
@@ -828,10 +821,7 @@ public class AutomataVerifier
 		}
 
 		// Nothing bad has happened. Very nice!
-		if (verboseMode)
-		{
-			logger.info("'" + automataNames + "' is controllable.");
-		}
+		logger.verbose("'" + automataNames + "' is controllable.");
 
 		return true;
 	}
@@ -1025,10 +1015,7 @@ public class AutomataVerifier
 			stateAmountLimit = stateAmountLimit * 5;
 		}
 
-		if (verboseMode)
-		{
-			logger.info("stateAmountLimit: " + stateAmountLimit + ".");
-		}
+		logger.verbose("stateAmountLimit: " + stateAmountLimit + ".");
 
 		synchHelper.clear();
 
@@ -1101,10 +1088,7 @@ public class AutomataVerifier
 					}
 				}
 
-				if (verboseMode)
-				{
-					logger.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
-				}
+				logger.verbose("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 
 				stateAmount = stateCount;
 
@@ -1116,7 +1100,7 @@ public class AutomataVerifier
 				// Print result
 				int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
 
-				if (verboseMode)
+				if (SupremicaProperties.verboseMode())
 				{
 					String message = "";
 
@@ -1187,7 +1171,7 @@ public class AutomataVerifier
 
 			uncontrollabilityCheckHelper = new AutomataSynchronizerHelper(synchHelper);
 
-			if (verboseMode)
+			if (SupremicaProperties.verboseMode())
 			{
 				// It's important that setRememberTrace occurs before addState(initialState)!
 				uncontrollabilityCheckHelper.setRememberTrace(true);
@@ -1233,7 +1217,7 @@ public class AutomataVerifier
 		 * onlineSynchronizer.selectAutomata(automataIndices);
 		 * onlineSynchronizer.initialize();
 		 *
-		 * if (verboseMode)
+		 * if (SupremicaProperties.verboseMode())
 		 * {       // It's important that setRememberTrace occurs before addState!
 		 * synchHelper.setRememberTrace(true);
 		 * }
@@ -1836,6 +1820,7 @@ public class AutomataVerifier
 		{
 			requestStop();
 			logger.error("Error in AutomataVerifier when verifying nonblocking compositionally. " + ex);
+			logger.error(ex.getStackTrace());
 			return false;
 		}
 
@@ -1845,7 +1830,7 @@ public class AutomataVerifier
 		}
 
 		// Present result!
-		return verifyNonblocking(result);
+		return moduleIsNonblocking(result, true);
 	}
 
 	/**
@@ -2222,25 +2207,52 @@ public class AutomataVerifier
 	}
 
 	/**
+	 * Displays info about the previous operation.
+	 */
+	public void displayInfo()
+	{
+		if (synchHelper != null)
+		{
+			synchHelper.displayInfo();
+		}
+	}
+
+	/**
+	 * Assigns the verifier an execution dialog.
+	 */
+	public void setExecutionDialog(ExecutionDialog executionDialog)
+	{
+		this.executionDialog = executionDialog;
+
+		if (synchHelper != null)
+		{
+			synchHelper.setExecutionDialog(executionDialog);
+		}
+	}
+
+	/**
 	 * Method that stops AutomataVerifier as soon as possible.
 	 *
 	 * @see  ExecutionDialog
 	 */
 	public void requestStop()
 	{
-		stopRequested = true;
-
 		logger.debug("AutomataVerifier requested to stop.");
 
+		stopRequested = true;
+		
+		// Stop everything!
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
 		}
-
 		if (threadToStop != null)
 		{
 			threadToStop.requestStop();
 		}
+
+		// Clear!
+		executionDialog = null;
 	}
 
 	/**

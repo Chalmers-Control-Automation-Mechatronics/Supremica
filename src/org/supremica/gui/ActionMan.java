@@ -1612,7 +1612,6 @@ public class ActionMan
 			SwingEngine swingEngine = currProject.getSwingEngine();
 			ProjectBuildFromSwingEngine projectBuilder = new ProjectBuildFromSwingEngine();
 
-
 			try
 			{
 				Project newProject = projectBuilder.build(swingEngine);

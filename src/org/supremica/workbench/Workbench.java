@@ -124,7 +124,6 @@ class SynchButton
 		synch_ops.setExpandForbiddenStates(true); // (may be explicit ones)
 		synch_ops.setExpandEventsUsingPriority(false);
 		synch_ops.setBuildAutomaton(true);
-		synch_ops.setVerboseMode(false);
 		synch_ops.setRequireConsistentControllability(true);
 		synch_ops.setRequireConsistentImmediate(false);
 		synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
@@ -192,7 +191,6 @@ class CompareButton
 			synch_ops.setExpandForbiddenStates(true); // (may be explicit ones)
 			synch_ops.setExpandEventsUsingPriority(false);
 			synch_ops.setBuildAutomaton(true);
-			synch_ops.setVerboseMode(false);
 			synch_ops.setRequireConsistentControllability(true);
 			synch_ops.setRequireConsistentImmediate(false);
 			synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
@@ -209,7 +207,6 @@ class CompareButton
 			}
 			catch (Exception excp)
 			{
-
 				// synchronizer may throw. what then?
 				logger.error(excp + " in CompareButton::action");
 				logger.debug(excp.getStackTrace());
@@ -224,7 +221,6 @@ class CompareButton
 			synch_ops.setExpandForbiddenStates(true); // (may be explicit ones)
 			synch_ops.setExpandEventsUsingPriority(false);
 			synch_ops.setBuildAutomaton(true);
-			synch_ops.setVerboseMode(false);
 			synch_ops.setRequireConsistentControllability(true);
 			synch_ops.setRequireConsistentImmediate(false);
 			synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state

@@ -63,7 +63,6 @@ public final class SynchronizationOptions
 	private int nbrOfExecuters;
 	private boolean buildAutomaton;    // add also the arcs
 	private boolean expandEventsUsingPriority;    // ??
-	private boolean verboseMode;    // write stuff on debug window
 	private boolean requireConsistentControllability;    // check that common events have same controllability
 	private boolean requireConsistentImmediate;    // check that common evenst have same immediaticity
 	private boolean rememberDisabledEvents;    // redirect disabled transitions to forbidden dump-state
@@ -78,7 +77,6 @@ public final class SynchronizationOptions
 		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(),
 			 false,                                   // expandEventsUsingPriority
 			 true,                                    // buildAutomaton
-			 SupremicaProperties.verboseMode(),       // Should always be decided by user! Doesn't belong here!?
 			 true,                                    // requireConsistentControllability
 			 true,                                    // requireConsistentImmediate
 			 false);                                  // rememberDisabledEvents
@@ -90,7 +88,7 @@ public final class SynchronizationOptions
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
 	 */
-	private SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
+	private SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
 		throws IllegalArgumentException
 	{
 		if (syncType == null)
@@ -116,7 +114,6 @@ public final class SynchronizationOptions
 		this.expandForbiddenStates = expandForbiddenStates;
 		this.expandEventsUsingPriority = expandEventsUsingPriority;
 		this.buildAutomaton = buildAutomaton;
-		this.verboseMode = verboseMode;
 		this.requireConsistentControllability = requireConsistentControllability;
 		this.requireConsistentImmediate = requireConsistentImmediate;
 		this.rememberDisabledEvents = rememberDisabledEvents;
@@ -190,16 +187,6 @@ public final class SynchronizationOptions
 	public boolean expandEventsUsingPriority()
 	{
 		return expandEventsUsingPriority;
-	}
-
-	public void setVerboseMode(boolean set)
-	{
-		verboseMode = set;
-	}
-
-	public boolean verboseMode()
-	{
-		return verboseMode;
 	}
 
 	public boolean requireConsistentControllability()

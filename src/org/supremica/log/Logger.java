@@ -81,6 +81,11 @@ public interface Logger
 
 	void info(Object message, Throwable t);
 
+	/**
+	 * Logs the message as an "info"-message only if currently in "verbose mode".
+	 */
+	void verbose(Object message);
+
 	boolean isDebugEnabled();
 
 	void setLogToConsole(boolean log);

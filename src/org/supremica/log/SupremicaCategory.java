@@ -50,6 +50,7 @@
 package org.supremica.log;
 
 import org.apache.log4j.*;
+import org.supremica.properties.SupremicaProperties;
 
 public final class SupremicaCategory
 	implements Logger
@@ -155,6 +156,17 @@ public final class SupremicaCategory
 	public void info(Object message, Throwable t)
 	{
 		category.info(message, t);
+	}
+
+	/**
+	 * Logs the message as an "info"-message only if Supremica is currently in "verbose mode".
+	 */
+	public void verbose(Object message)
+	{
+		if (SupremicaProperties.verboseMode())
+		{
+			info(message);
+		}
 	}
 
 	/**

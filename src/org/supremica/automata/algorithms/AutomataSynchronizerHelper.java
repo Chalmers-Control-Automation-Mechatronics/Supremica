@@ -117,9 +117,6 @@ public final class AutomataSynchronizerHelper
 	// For counting states in executionDialog
 	private ExecutionDialog executionDialog = null;
 
-	// Verbose mode
-	private boolean verboseMode;
-
 	// Stop execution after amount of state
 	private int stopExecutionLimit = -1;
 
@@ -138,7 +135,6 @@ public final class AutomataSynchronizerHelper
 
 		this.theAutomata = theAutomata;
 		this.syncOptions = syncOptions;
-		verboseMode = syncOptions.verboseMode();
 		helperData = new HelperData();
 		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
@@ -175,7 +171,6 @@ public final class AutomataSynchronizerHelper
 		theAutomaton = orgHelper.getAutomaton();
 		theAutomataIndexForm = orgHelper.getAutomataIndexForm();
 		syncOptions = orgHelper.getSynchronizationOptions();
-		verboseMode = syncOptions.verboseMode();
 		helperData = orgHelper.getHelperData();
 		executionDialog = orgHelper.getExecutionDialog();
 		statesToProcess = new IntArrayList();

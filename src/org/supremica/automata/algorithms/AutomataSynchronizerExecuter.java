@@ -126,13 +126,6 @@ public final class AutomataSynchronizerExecuter
 	private boolean expandForbiddenStates;
 
 	/**
-	 * Determines if more detailed information on the progress of things should be displayed.
-	 *
-	 *@see  SynchronizationOptions
-	 */
-	private boolean verboseMode;
-
-	/**
 	 * If true then an arc for all disabled events to a forbidden state is added.
 	 * This is used when synthesizing supervisors with partial observability.
 	 *
@@ -209,7 +202,6 @@ public final class AutomataSynchronizerExecuter
 		syncType = syncOptions.getSynchronizationType();
 		forbidUncontrollableStates = syncOptions.forbidUncontrollableStates();
 		expandForbiddenStates = syncOptions.expandForbiddenStates();
-		verboseMode = syncOptions.verboseMode();
 		rememberDisabledEvents = syncOptions.rememberDisabledEvents();
 
 		// Overrides
@@ -524,10 +516,7 @@ public final class AutomataSynchronizerExecuter
 				if (exhaustiveSearch)
 				{
 					// Stop when uncontrollable state found
-					if (verboseMode)
-					{
-						logger.info("Uncontrollable state found.");
-					}
+					logger.verbose("Uncontrollable state found.");
 
 					return;
 				}
@@ -598,13 +587,11 @@ public final class AutomataSynchronizerExecuter
 			if (insertionIndex == 0)
 			{
 				// Found no corresponding transitions in the suspect automaton...
-				// /*
-				if (verboseMode)
+				if (SupremicaProperties.verboseMode())
 				{
 					logger.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
 				}
 
-				// */
 				// Here, the insertionIndex sets the maximium amount of states
 				// that are examined...
 				// insertionIndex = 2;
@@ -615,7 +602,7 @@ public final class AutomataSynchronizerExecuter
 
 				// There are transitions in the suspect automaton...
 				// /*
-				if (verboseMode)
+				if (SupremicaProperties.verboseMode())
 				{
 					logger.debug("Following transitions in the suspect automaton. There are " + insertionIndex + " such transitions...");
 				}

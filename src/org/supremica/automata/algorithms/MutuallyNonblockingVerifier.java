@@ -53,6 +53,7 @@ import java.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.properties.SupremicaProperties;
 
 public class MutuallyNonblockingVerifier
 	implements Stoppable
@@ -73,9 +74,6 @@ public class MutuallyNonblockingVerifier
 	private static final int MUTUALLY_NONBLOCKING_MAYBE = 1;
 	private static final int MUTUALLY_NONBLOCKING_NO = 2;
 	private int[] automatonIsMutuallyNonblocking;
-
-	// SynchronizationOptions
-	private boolean verboseMode = false;
 
 	// Largest amount of synchronized automata during execution
 	private int maxSynchronized = 0;
@@ -103,7 +101,6 @@ public class MutuallyNonblockingVerifier
 		this(theAutomata);
 
 		this.synchHelper = synchHelper;
-		verboseMode = synchHelper.getSynchronizationOptions().verboseMode();
 	}
 
 	public boolean isMutuallyNonblocking()
@@ -1056,7 +1053,7 @@ public class MutuallyNonblockingVerifier
 
 			if (isSafe)
 			{
-				if (verboseMode)
+				if (SupremicaProperties.verboseMode())
 				{
 					logger.debug("The event " + currEvent + " is safe.");
 				}
@@ -1073,7 +1070,7 @@ public class MutuallyNonblockingVerifier
 			}
 			else
 			{
-				if (verboseMode)
+				if (SupremicaProperties.verboseMode())
 				{
 					logger.debug("The event " + currEvent + " is unsafe.");
 				}

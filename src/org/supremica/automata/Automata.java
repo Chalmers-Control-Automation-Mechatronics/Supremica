@@ -687,18 +687,18 @@ public class Automata
 				}
 				Alphabet alpha = theAut.getAlphabet();
 
+				/*
 				// Compare the alphabets!
-				Alphabet diff = Alphabet.minus(alpha, unionAlpha);
-				if (diff.size() == alpha.size())
+				Alphabet diff = Alphabet.minus(unionAlpha, alpha);
+				if (diff.size() == unionAlpha.size())
 				{
 					// Disjoint (so far)
-
 				}
 				else if (diff.size() > 0)
 				{
 					// Not disjoint, new events in unionAlpha!
 					autA.addAutomaton(theAut);
-					unionAlpha = autA.getUnionAlphabet();
+					unionAlpha.union(theAut.getAlphabet());
 					change = true;
 				}
 				else
@@ -706,16 +706,28 @@ public class Automata
 					// Not disjoint, no change!
 					autA.addAutomaton(theAut);
 				}
+				*/
+				if (alpha.hasCommonEvents(unionAlpha))
+				{
+					// Not disjoint!
+					autA.addAutomaton(theAut);
+					unionAlpha.union(theAut.getAlphabet());
+					change = true;
+				}
 			}
 		}
 
 		// What's the result?
-		if (unionAlpha.size() < this.getUnionAlphabet().size())
+		if (autA.size() < this.size())
 		{
 			if (autA.size() > 1)
-				logger.warn("Some of the selected automata share no events with the other selected automata. For example, the automata " + autA + " are disconnected from the rest.");
+				logger.warn("Some of the selected automata share no events with the other " + 
+							"selected automata. For example, the automata " + autA + 
+							" are disconnected from the rest.");
 			else
-				logger.warn("Some of the selected automata share no events with the other selected automata. For example, the automaton " + autA.getFirstAutomaton() + " is disconnected from the rest.");
+				logger.warn("Some of the selected automata share no events with the other " + 
+							"selected automata. For example, the automaton " + 
+							autA.getFirstAutomaton() + " is disconnected from the rest.");
 			return true;
 		}
 

@@ -203,7 +203,7 @@ public class AutomataVerificationWorker
 		threadsToStop.add(automataVerifier);
 		executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
 		executionDialog.setMode(ExecutionDialogMode.verifying);
-		automataVerifier.getHelper().setExecutionDialog(executionDialog);
+		automataVerifier.setExecutionDialog(executionDialog);
 
 		// Solve the problem (and measure the time)!
 		ActionTimer timer = new ActionTimer();
@@ -214,8 +214,6 @@ public class AutomataVerificationWorker
 		threadsToStop.clear();
 
 		// Make sure(?) the ExecutionDialog is hidden!
-		// I thought this wouldn't work... but it seems
-		// it does!! /hguo
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()
@@ -240,13 +238,13 @@ public class AutomataVerificationWorker
 				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.INFORMATION_MESSAGE);
 			}
 
-			automataVerifier.getHelper().displayInfo();
+			automataVerifier.displayInfo();
 			logger.info("Execution completed after " + timer.toString());
 		}
 		else
 		{
 			JOptionPane.showMessageDialog(workbench.getFrame(), "Execution stopped after " + timer.toString(), "Execution stopped", JOptionPane.INFORMATION_MESSAGE);
-			automataVerifier.getHelper().displayInfo();
+			automataVerifier.displayInfo();
 			logger.info("Execution stopped after " + timer.toString());
 		}
 

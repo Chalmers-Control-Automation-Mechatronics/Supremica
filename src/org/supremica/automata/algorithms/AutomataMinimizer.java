@@ -265,35 +265,17 @@ public class AutomataMinimizer
 	private Automaton monolithicMinimization(Automata automata, Alphabet hideThese)
 		throws Exception
 	{
-		AutomatonIterator autIt = automata.iterator();
-		for (Automaton currAut = autIt.nextAutomaton(); autIt.hasNext(); 
-			 currAut = autIt.nextAutomaton())
-		{
-			if (currAut.nbrOfForbiddenStates() != 0)
-			{
-				logger.info("FORB! in " + currAut);
-			}
-		}
-		
+		// Synch and hide
 		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata);
-		
-		if (aut.nbrOfForbiddenStates() != 0)
-		{
-			logger.info("FORB1!");
-			aut.setName("FORB! " + aut);
-			if (ActionMan.getGui() != null)
-				ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(new Automaton(aut));		
-			aut.setName(null);
-		}
-		
 		aut.hide(hideThese);
-		
+
+		// Message
 		int before = aut.nbrOfStates();
 		int epsilons = aut.nbrOfEpsilonTransitions();
 		int total = aut.nbrOfTransitions();
-		logger.debug("Minimizing " + aut + " with " + before +
-					" states and " + epsilons + " epsilon transitions (" + 
-					((double) epsilons)*100/total + "%).");
+		logger.verbose("Minimizing " + aut + " with " + before +
+					   " states and " + epsilons + " epsilon transitions (" + 
+					   ((double) epsilons)*100/total + "%).");
 		
 		// Is it at all possible to minimize?
 		if (epsilons > 0)
@@ -302,11 +284,17 @@ public class AutomataMinimizer
 			threadToStop = minimizer;
 			aut = minimizer.getMinimizedAutomaton(options);
 			threadToStop = null;
-			
+
+			if (stopRequested)
+			{
+				return null;
+			}
+
+			// Message
 			int after = aut.nbrOfStates();
-			logger.debug("There were " + before + " states before and " + after + 
-						" states after the minimization. Reduction: " + 
-						((double) (before-after))*100/before + "%.");
+			logger.verbose("There were " + before + " states before and " + after + 
+						   " states after the minimization. Reduction: " + 
+						   ((double) (before-after))*100/before + "%.");
 		}
 		
 		return aut;

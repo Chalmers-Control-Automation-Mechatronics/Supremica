@@ -143,7 +143,7 @@ public class AutomatonMinimizer
 		}
 
 		if (debug)
-			logger.info("X");
+			logger.info("A");
 
 		// Find out what to do
 		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
@@ -185,7 +185,7 @@ public class AutomatonMinimizer
 		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 		{
 			if (debug)
-				logger.info("Z");
+				logger.info("B");
 
 			// Merge silent loops and other obvious OE stuff (to save computation later)
 			// (Almost like cheating.)
@@ -197,7 +197,7 @@ public class AutomatonMinimizer
 			}
 			
 			if (debug)
-				logger.info("A");
+				logger.info("C");
 		
 			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
 			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
@@ -206,7 +206,7 @@ public class AutomatonMinimizer
 			doTransitiveClosure(theAutomaton);
 
 			if (debug)
-				logger.info("B");
+				logger.info("D");
 
 			// Adjust marking based on epsilon transitions (it IS ok (actually necessary)
 			// to do this AFTER doTransitiveClosure). This is not an expensive computation.
@@ -238,7 +238,7 @@ public class AutomatonMinimizer
 			}
 
 			if (debug)
-				logger.info("C");
+				logger.info("E");
 
 			// Minimize
 			findCoarsestPartitioning(equivClasses);
@@ -251,6 +251,9 @@ public class AutomatonMinimizer
 			throw ex;
 		}
 
+		if (debug)
+			logger.info("F");
+
 		// Build the minimized automaton
 		Automaton newAutomaton = buildAutomaton(equivClasses);
 
@@ -260,7 +263,7 @@ public class AutomatonMinimizer
 		}
 
 		if (debug)
-			logger.info("D");
+			logger.info("G");
 
 		// Should we remove redundant transitions to minimize also with respect to transitions?
 		if (options.getAlsoTransitions())
@@ -269,7 +272,7 @@ public class AutomatonMinimizer
 		}
 
 		if (debug)
-			logger.info("E");
+			logger.info("H");
 
 		// Post minimization adjustments
 		if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
@@ -300,7 +303,7 @@ public class AutomatonMinimizer
 		removeUnusedEpsilonEvents(newAutomaton);
 
 		if (debug)
-			logger.info("F");
+			logger.info("I");
 
 		// Return the result of the minimization!
 		return newAutomaton;
@@ -460,7 +463,12 @@ public class AutomatonMinimizer
 			for (int i=0; i<array.length; i++)
 			{
 				EquivalenceClass currClass = (EquivalenceClass) array[i];
-				refined = partition(equivClasses, currClass) || refined;
+				
+				// Don't try to refine single-state classes!
+				if (currClass.size() > 1)
+				{
+					refined = partition(equivClasses, currClass) || refined;
+				}
 			}
 		}
 		while (refined);

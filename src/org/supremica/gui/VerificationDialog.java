@@ -74,7 +74,7 @@ class VerificationDialogStandardPanel
 
 	//private JTextArea note;// = new JTextArea("Bananas...");
 	//final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake!
-	//   "nonblocking",       // No! God has nothing to do with programming!!
+	//   "nonblocking",        // No! God has nothing to do with programming!!
 	//   "Language inclusion"};// Programming is fate-driven!
 	static class AlgorithmSelector
 		extends JComboBox
@@ -155,7 +155,17 @@ class VerificationDialogStandardPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
-		if ((verificationTypeBox.getSelectedItem()) == VerificationType.Nonblocking)
+		if ((verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking) || 
+			(verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking))
+		{
+			// Hide advanced controllability options!
+		}
+		else
+		{
+			// Show advanced controllability options!
+		}
+
+		if (verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking)
 		{
 			// Force the monolithic algorithm
 			//algorithmSelector.forceMonolithic();
@@ -165,14 +175,14 @@ class VerificationDialogStandardPanel
 						 "respect to conflict equivalence.");
 			note.setVisible(true);
 		}
-		else if ((verificationTypeBox.getSelectedItem()) == VerificationType.MutuallyNonblocking)
+		else if (verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking)
 		{
 			// Force the modular algorithm
 			algorithmSelector.forceModular();
 			note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" + "and hence there is no monolithic algoritm.");
 			note.setVisible(true);
 		}
-		else if ((verificationTypeBox.getSelectedItem()) == VerificationType.LanguageInclusion)
+		else if (verificationTypeBox.getSelectedItem() == VerificationType.LanguageInclusion)
 		{
 			algorithmSelector.allowAll();
 			note.setText("Note:\n" + "This verifies whether the language of the unselected\n" + "automata is included in the inverse projection of\n" + "the language of the selected automata.\n" + "  The alphabet of the unselected automata must\n" + "include the alphabet of the selected automata.\n");
@@ -186,7 +196,7 @@ class VerificationDialogStandardPanel
 	}
 }
 
-class VerificationDialogAdvancedPanel
+class VerificationDialogAdvancedPanelControllability
 	extends JPanel
 	implements VerificationPanel
 {
@@ -196,7 +206,7 @@ class VerificationDialogAdvancedPanel
 	private JCheckBox skipUncontrollabilityBox;
 	private JTextField nbrOfAttempts;
 
-	public VerificationDialogAdvancedPanel()
+	public VerificationDialogAdvancedPanelControllability()
 	{
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
@@ -250,7 +260,7 @@ public class VerificationDialog
 	private JButton cancelButton;
 	private VerificationOptions verificationOptions;
 	private VerificationDialogStandardPanel standardPanel;
-	private VerificationDialogAdvancedPanel advancedPanel;
+	private VerificationDialogAdvancedPanelControllability advancedPanelControllability;
 	private JDialog dialog;
 
 	/**
@@ -268,12 +278,12 @@ public class VerificationDialog
 		Container contentPane = dialog.getContentPane();
 
 		standardPanel = new VerificationDialogStandardPanel();
-		advancedPanel = new VerificationDialogAdvancedPanel();
+		advancedPanelControllability = new VerificationDialogAdvancedPanelControllability();
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
-		tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
+		tabbedPane.addTab("Advanced options", null, advancedPanelControllability, "Advanced options");
 
 		// buttonPanel;
 		JPanel buttonPanel = new JPanel();
@@ -300,7 +310,7 @@ public class VerificationDialog
 	public void update()
 	{
 		standardPanel.update(verificationOptions);
-		advancedPanel.update(verificationOptions);
+		advancedPanelControllability.update(verificationOptions);
 	}
 
 	private JButton addButton(Container container, String name)
@@ -326,7 +336,7 @@ public class VerificationDialog
 		{
 			// Remember the selections
 			standardPanel.regain(verificationOptions);
-			advancedPanel.regain(verificationOptions);
+			advancedPanelControllability.regain(verificationOptions);
 			verificationOptions.saveOptions();
 			verificationOptions.setDialogOK(true);
 			dialog.setVisible(false);

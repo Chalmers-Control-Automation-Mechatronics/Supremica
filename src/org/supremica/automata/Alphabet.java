@@ -891,6 +891,23 @@ public class Alphabet
 		return nbrOfCommon;
 	}
 
+	public boolean hasCommonEvents(Alphabet otherAlphabet)
+	{
+		EventIterator eventIterator = iterator();
+		while (eventIterator.hasNext())
+		{
+			LabeledEvent currEvent;
+			currEvent = eventIterator.nextEvent();
+
+			if (otherAlphabet.contains(currEvent))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns true if the alphabet has alphabetically (ignoring case) equal event names.
 	 */
