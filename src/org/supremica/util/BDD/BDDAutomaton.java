@@ -471,7 +471,7 @@ public class BDDAutomaton
 
 	/**
 	 * See Automaton.getEventFlow() for more info :(
-	 * After which events just fired, we may do a transition
+	 * After which events just fired, we may do a transition ?
 	 *
 	 */
 	public boolean[] getEventFlow(boolean forward)

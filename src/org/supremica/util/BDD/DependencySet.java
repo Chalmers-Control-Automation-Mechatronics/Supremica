@@ -140,6 +140,8 @@ public class DependencySet
 		int tmp3 = bao.andAll(); // NEW
 		bao.cleanup(); // NEW
 
+		SizeWatch.report(tmp3, "Twave - keep"); // NEW
+
 		tmp3 = manager.andTo(tmp3, event_mask);    // <-- must remove unused crap!
 		bdd_t_wave_isolated = manager.exists(tmp3, manager.getEventCube());    // XXX: why dones this one includes event-variables ??
 		bdd_t_wave = manager.relProd(tmp3, bdd_keep_others, manager.getEventCube());

@@ -72,6 +72,7 @@ public class Options
 							ALGO_PETRINET = 14;
 	public static int algo_family = ALGO_DISJUNCTIVE_WORKSET;
 
+
 	/** disjunctive optimization algorithm */
 	public static final String [] DISJ_OPTIMIZER_NAMES = {
 			"none", "random", "largest Q first", "largest LD-1 first",
@@ -88,6 +89,20 @@ public class Options
 		DISJ_OPTIMIZER_TWAVE_SIZE = 6
 		;
 	public static int disj_optimizer_algo = DISJ_OPTIMIZER_STATE_VECTOR_SIZE;
+
+
+	/** (PN) transition optimization algorithm */
+	public static final String [] TRANSITION_OPTIMIZER_NAMES = {
+			"none", "random"
+			};
+
+	public static final int
+		TRANSITION_OPTIMIZER_NONE = 0,
+		TRANSITION_OPTIMIZER_RANDOM = 1
+		;
+
+	public static int transition_optimizer_algo = TRANSITION_OPTIMIZER_NONE;
+
 
 	/** language controllability/inclusion algorithms */
 	public static final String[] INCLUSION_ALGORITHM_NAMES = { "Monolithic      ",

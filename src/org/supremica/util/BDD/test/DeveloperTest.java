@@ -28,6 +28,7 @@ public class DeveloperTest
 		{
 			automata.cleanup();
 
+			exx.printStackTrace(); // DEBUG!
 			throw new BDDException("SupervisorFactory.createSupervisor factory failed: " + exx);
 		}
 	}

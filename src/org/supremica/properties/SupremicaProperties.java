@@ -178,6 +178,7 @@ public final class SupremicaProperties
 	private static final String BDD_ENCODING_ALGO = "bddStateEncodingAlgorithm";    // encoding_algorithm
 	private static final String BDD_SUP_REACHABILITY = "bddSupReachability";    // sup_reachability_type
 	private static final String BDD_DISJ_OPTIMIZER_ALGO = "bddDisjOptimizerAlgo"; // disj_optimizer_algo
+	private static final String BDD_TRANSITION_OPTIMIZER_ALGO = "bddTransitionOptimizerAlgo"; // transition_optimizer_algo
 	private static final String BDD_INTERLEAVED_VARIABLES = "bddInterleavedVariables"; // interleaved_variables
 
 
@@ -1360,6 +1361,7 @@ public final class SupremicaProperties
 			setOption(BDD_LIB_PATH, Options.extraLibPath);
 			setOption(BDD_SUP_REACHABILITY, Options.sup_reachability_type);
 			setOption(BDD_DISJ_OPTIMIZER_ALGO, Options.disj_optimizer_algo);
+			setOption(BDD_TRANSITION_OPTIMIZER_ALGO, Options.transition_optimizer_algo);
 			setOption(BDD_INTERLEAVED_VARIABLES, Options.interleaved_variables);
 
 		}
@@ -1390,6 +1392,7 @@ public final class SupremicaProperties
 			Options.extraLibPath = optionAsString(BDD_LIB_PATH, Options.extraLibPath);
 			Options.sup_reachability_type = optionAsInt(BDD_SUP_REACHABILITY, Options.sup_reachability_type);
 			Options.disj_optimizer_algo = optionAsInt(BDD_DISJ_OPTIMIZER_ALGO, Options.disj_optimizer_algo);
+			Options.transition_optimizer_algo = optionAsInt(BDD_TRANSITION_OPTIMIZER_ALGO, Options.transition_optimizer_algo);
 			Options.interleaved_variables = optionAsBoolean(BDD_INTERLEAVED_VARIABLES, Options.interleaved_variables);
 
 		}

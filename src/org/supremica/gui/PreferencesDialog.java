@@ -278,14 +278,14 @@ public class PreferencesDialog
 		{
 			return false;
 		}
-		
+
 		/*
 		if (!theRobotCoordinationPanel.doApply())
 		{
 			return false;
 		}
 		*/
-		
+
 		return true;
 	}
 
@@ -584,14 +584,14 @@ class GeneralPanel
 		JLabel nbrOfExecutersLabel = new JLabel("Nbr of threads");
 		propertiesBox.add(nbrOfExecutersLabel);
 		nbrOfExecuters = new JTextField();
-		nbrOfExecuters.setToolTipText("The number of threads that can run in parallel " + 
+		nbrOfExecuters.setToolTipText("The number of threads that can run in parallel " +
 									  "(not fully implemented)");
 		propertiesBox.add(nbrOfExecuters);
 
 		JLabel stateSeparatorLabel = new JLabel("State separator");
 		propertiesBox.add(stateSeparatorLabel);
 		stateSeparator = new JTextField();
-		stateSeparator.setToolTipText("The symbol that separate state names for example " + 
+		stateSeparator.setToolTipText("The symbol that separate state names for example " +
 									  "after synchronization");
 		propertiesBox.add(stateSeparator);
 
@@ -641,18 +641,18 @@ class SynchronizationPropertiesPanel
 		add(propertiesBox, BorderLayout.CENTER);
 
 		forbidUncontrollableStates = new JCheckBox("Forbid uncontrollable states");
-		forbidUncontrollableStates.setToolTipText("If cheched, uncontrollable states are marked as " + 
+		forbidUncontrollableStates.setToolTipText("If cheched, uncontrollable states are marked as " +
 												  "forbidden during synchronization");
 		propertiesBox.add(forbidUncontrollableStates);
 
 		expandForbiddenStates = new JCheckBox("Expand forbidden states");
-		expandForbiddenStates.setToolTipText("If this option is checked, forbidden states are expanded " + 
-											 "during synchronization, otherwise they are considered " + 
+		expandForbiddenStates.setToolTipText("If this option is checked, forbidden states are expanded " +
+											 "during synchronization, otherwise they are considered " +
 											 "terminal");
 		propertiesBox.add(expandForbiddenStates);
 
 		expandHashtable = new JCheckBox("Expand hashtable");
-		expandHashtable.setToolTipText("If checked, the hashtable is expanded when it becomes full, " + 
+		expandHashtable.setToolTipText("If checked, the hashtable is expanded when it becomes full, " +
 									   "for faster lookup but at a one-time cost for expanding the table");
 		propertiesBox.add(expandHashtable);
 
@@ -688,7 +688,7 @@ class SynchronizationPropertiesPanel
 			return false;
 		}
 		SupremicaProperties.setSyncInitialHashtableSize(size);
-		
+
 		/*
 		int nbrOfThreads = PreferencesDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
 		if (nbrOfThreads == Integer.MIN_VALUE)
@@ -1145,7 +1145,7 @@ class BDDPanel3
 	extends JPanel
 {
 	private PreferencesDialog theDialog = null;
-	private JComboBox cbDisjOpt;
+	private JComboBox cbDisjOpt, cbTransitionOpt;
 	private JTextField maxPartitionSize;
 
 	public BDDPanel3(PreferencesDialog theDialog)
@@ -1158,7 +1158,9 @@ class BDDPanel3
 		add(pLeft);
 		BDDPanel1.addCaption(pLeft, "Disjunctive Partitioning");
 
-		cbDisjOpt = BDDPanel1.addCombo(pLeft,"Optimizer selection heuristics", Options.DISJ_OPTIMIZER_NAMES, Options.disj_optimizer_algo);
+		cbDisjOpt = BDDPanel1.addCombo(pLeft,"Automata optimizer heuristics", Options.DISJ_OPTIMIZER_NAMES, Options.disj_optimizer_algo);
+		cbTransitionOpt = BDDPanel1.addCombo(pLeft,"Transition optimizer heuristics", Options.TRANSITION_OPTIMIZER_NAMES, Options.transition_optimizer_algo);
+
 
 		JPanel pPartitionSize = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		pPartitionSize.add(new JLabel("Max BDD nodes/cluster"));
@@ -1185,6 +1187,7 @@ class BDDPanel3
 
 		Options.max_partition_size = maxsize;
 		Options.disj_optimizer_algo = cbDisjOpt.getSelectedIndex();
+		Options.transition_optimizer_algo = cbTransitionOpt.getSelectedIndex();
 		return true;
 	}
 

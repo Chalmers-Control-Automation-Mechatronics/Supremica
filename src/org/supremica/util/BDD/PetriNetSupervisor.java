@@ -74,10 +74,17 @@ public class PetriNetSupervisor
 		size = events.length;
 		pet = new PerEventTransition[size];
 
+		SizeWatch.setOwner("PetriNetSupervisor");
+
 		for (int i = 0; i < size; i++)
 		{
 			pet[i] = new PerEventTransition(manager, all, i, null);
+			SizeWatch.report(pet[i].getLocalT() , pet[i].toString() );
 		}
+
+		// optimze it!
+		pet = TransitionOptimizer.optimize(pet, all);
+		size = pet.length; // may have changed!
 
 		workset = new int[size];
 		queue = new int[size];    // use by the heuristics

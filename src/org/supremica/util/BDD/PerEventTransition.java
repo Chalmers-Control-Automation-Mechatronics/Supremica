@@ -8,19 +8,159 @@ package org.supremica.util.BDD;
 public class PerEventTransition
 {
 	private BDDAutomata manager;
-	private BDDAutomaton[] all;
-	private int bdd_t, bdd_keep;
-	private int event_index, members, next_events, prev_events;
+	private int bdd_t, bdd_keep; /** the generated T and keep BDDs */
+	private int members, next_events, prev_events, events_used;
 	private int others_s2sp, others_sp2s;
 	private boolean[] automata_cover;
 	private int[] next_event, prev_event;
+	private int[] event_list; /** list of events associated with this transition, usually a singlton */
 	private String name;
 
-	PerEventTransition(BDDAutomata manager, BDDAutomaton[] all, int event, boolean[] careset)
+
+	// -----------------------------------------------------------------------------------
+
+	/**
+	 * create a transition model as a combination of two previously created transitions
+	 */
+
+	/* package */ PerEventTransition(PerEventTransition p1, PerEventTransition p2, BDDAutomaton[] all) {
+		// TODO: assert if p1 != p2 and if the managers are the same!
+
+		this.manager = p1.manager;
+		this.events_used = p1.events_used + p2.events_used;
+
+
+		this.name = p1.name + "+" + p2.name;
+
+
+		int ac = all.length;
+		int ec = p1.next_event.length;
+
+		automata_cover = new boolean[ ac];
+		next_event = new int[ec];
+		prev_event = new int[ec];
+
+		for (int i = 0; i < ec; i++)
+		{
+			next_event[i] = prev_event[i] = 0;
+		}
+
+
+		// get the combined lists of events:
+		int idx = 0;
+		event_list = new int[events_used];
+		for(int i = 0; i < p1.events_used; i++)  event_list[idx++] = p1.event_list[i];
+		for(int i = 0; i < p2.events_used; i++)  event_list[idx++] = p2.event_list[i];
+
+
+
+		IntArray ia1 = new IntArray(), ia2 = new IntArray();
+
+		// get ready...
+		this.members = 0;
+		this.bdd_keep = manager.ref( manager.getOne() );
+		int k1 = manager.ref( manager.getOne() ); // p1 stay, p2 moves
+		int k2 = manager.ref( manager.getOne() ); // p2 stay, p1 moves
+
+		// and search the automata list for things that concerns either p1 or p2
+		for(int i = 0; i < ac; i++) {
+			automata_cover [i] = p1.automata_cover[i] | p2.automata_cover[i];
+
+			if(automata_cover[i]) {
+				members++;
+
+
+				// get flow for this automata
+				boolean[] f1 = all[i].getEventFlow(true);
+				boolean[] f2 = all[i].getEventFlow(false);
+
+
+				for (int j = 0; j < ec; j++)
+				{
+					if (f1[j])
+					{
+						next_event[j]++;
+					}
+
+					if (f2[j])
+					{
+						prev_event[j]++;
+					}
+				}
+
+
+				// see if one is moving but the other one is not:
+				if(!p1.automata_cover[i]) k1 = manager.andTo(k1, all[i].getKeep());
+				if(!p2.automata_cover[i]) k2 = manager.andTo(k2, all[i].getKeep());
+
+			} else {
+
+				bdd_keep = manager.andTo(bdd_keep, all[i].getKeep());
+
+				// need its events for our special permutation
+				int[] var = all[i].getVar(), varp = all[i].getVarp();
+				int len = var.length;
+
+				for (int j = 0; j < len; j++)
+				{
+					ia1.add(var[j]);
+					ia2.add(varp[j]);
+				}
+			}
+		}
+
+		// the new T works like this: (p1 moves OR p2 moves)
+		// but this means that p1 must add keep w.r.t. p2 and vice versa!
+
+		int t1 = manager.and(p1.bdd_t, k1);
+		int t2 = manager.and(p2.bdd_t, k2);
+		manager.deref(k1);
+		manager.deref(k2);
+
+		this.bdd_t = manager.or(t1, t2);
+		manager.deref(t1);
+		manager.deref(t2);
+
+
+
+		// permutation that does the same job as "keep"
+		int[] others_s = ia1.copy(), others_sp = ia2.copy();
+
+		others_s2sp = manager.createPair(others_s, others_sp);
+		others_sp2s = manager.createPair(others_sp, others_s);
+
+
+		next_events = ec - Util.countEQ(next_event, 0);
+		prev_events = ec - Util.countEQ(prev_event, 0);
+
+		/*
+		// DEBUG:
+		p1.dump();
+		p2.dump();
+		Options.out.println("GIVES ==>");
+		this.dump();
+		Options.out.println();
+		*/
+	}
+
+
+
+	// -----------------------------------------------------------------------------------
+
+
+	/**
+	 * create a transition for a single event
+	 */
+
+	/* package */ PerEventTransition(BDDAutomata manager, BDDAutomaton[] all, int event, boolean[] careset)
 	{
 		this.manager = manager;
-		this.event_index = event;
-		this.all = all;
+		this.events_used = 1;
+
+		// save the event we are working with
+		this.event_list = new int[1];
+		this.event_list[0] = event;
+
 
 		EventManager alphabet = manager.getEventManager();
 		Event[] all_events = alphabet.getEventVector();
@@ -131,6 +271,27 @@ public class PerEventTransition
 		manager.deref(bdd_keep);
 	}
 
+	// ----------------------------------------------------------
+
+	/**
+	 * This is the BDD for the local T, without the keep
+	 */
+	public int getLocalT()
+	{
+		return bdd_t;
+	}
+
+	/**
+	 * This is the keep constraint that completes the local T
+	 */
+	public int getKeep()
+	{
+		return bdd_keep;
+	}
+
+	/**
+	 * number of automata involved in this local transition
+	 */
 	public int getNumberOfAutomata()
 	{
 		return members;
@@ -258,4 +419,77 @@ public class PerEventTransition
 
 		return ret;
 	}
+
+
+	// -----------------------------------------------------------------------------------
+	/**
+	 * call this when the evets has been modified, for example renamed by joining
+	 * multiple transitions into a new one.
+	 *
+	 *<p>perm: N -> 0 ...new_size-1 (where N is an old transition)
+	 *
+	 * this must be called after a join
+	 */
+
+	/* package */ void renameEvent(int [] perm, int new_size)
+	{
+		int []tmp1 = new int[new_size];
+		int []tmp2 = new int[new_size];
+
+		// start clean
+		for(int i = 0; i < new_size; i++)
+		{
+			tmp1[i] = tmp2[i] = 0;
+		}
+
+		// ... and fil it up
+		for(int i = 0; i < next_event.length; i++)
+		{
+			tmp1[ perm[i] ] += next_event[i];
+			tmp2[ perm[i] ] += prev_event[i];
+		}
+
+		next_event = tmp1;
+		prev_event = tmp2;
+
+		// XXX: do not touch the event_list! that the original and must be kept intact!
+	}
+
+	/**
+	 * fill my changes. used for renaming
+	 * @see #renameEvent
+	 */
+	/* package */ void fillPerm(int [] perm, int my_id)
+	{
+		for(int i = 0; i < event_list.length; i++)
+		{
+			perm[ event_list[i] ] = my_id;
+		}
+	}
+
+	// ------------------------------------------------------------------------------------
+	public void dump()
+	{
+		Options.out.println("Transition system " + name + ", size=" + members + ", events="+events_used);
+
+		Options.out.print("Automata cover:");
+		for(int i = 0; i < automata_cover.length; i++) if(automata_cover[i]) Options.out.print(" " + i);
+		Options.out.println();
+
+		Options.out.print("Event-list:");
+		for(int i = 0; i < event_list.length; i++) Options.out.print(" " + event_list[i]);
+		Options.out.println();
+
+
+		Options.out.print("" + next_events + " next-events:");
+		for(int i = 0; i < next_event.length; i++) if(next_event[i] > 0) Options.out.print(" " + i + ":" + next_event[i]);
+		Options.out.println();
+
+		Options.out.print("" + prev_events + " prev-events:");
+		for(int i = 0; i < prev_event.length; i++) if(prev_event[i] > 0) Options.out.print(" " + i + ":" + prev_event[i]);
+		Options.out.println();
+
+		Options.out.println();
+	}
+
 }

@@ -61,6 +61,25 @@ public class Util
 		return ret;
 	}
 
+	/**
+	 * count the number of occurrence of 'v' in x.
+	 *
+	 */
+	public static int countEQ(boolean [] x, boolean v)
+	{
+		int ret = 0, len = x.length;
+
+		for (int i = 0; i < len; i++)
+		{
+			if (x[i] == v)
+			{
+				ret++;
+			}
+		}
+
+		return ret;
+	}
+
 	/** shuffle/permutate a list of integers */
 	public static void permutate(int[] list, int size)
 	{
