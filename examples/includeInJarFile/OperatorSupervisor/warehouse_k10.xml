@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SupremicaProject name="Warehouse"  major="0"  minor="10" >
+<Automaton name="agv and truck, k=10" type="Supervisor">
+	<Events>
+		<Event id="0" label="agv00"/>
+		<Event id="1" label="agv03"/>
+		<Event id="2" label="agv06"/>
+		<Event id="3" label="agv10"/>
+		<Event id="4" label="agv11"/>
+		<Event id="5" label="agv12"/>
+		<Event id="6" label="agv14"/>
+		<Event id="7" label="agv15"/>
+		<Event id="8" label="agv16"/>
+		<Event id="9" label="agv20"/>
+		<Event id="10" label="agv21"/>
+		<Event id="11" label="agv22"/>
+		<Event id="12" label="agv24"/>
+		<Event id="13" label="agv25"/>
+		<Event id="14" label="agv26"/>
+		<Event id="15" label="agv30"/>
+		<Event id="16" label="agv31"/>
+		<Event id="17" label="agv32"/>
+		<Event id="18" label="agv34"/>
+		<Event id="19" label="agv35"/>
+		<Event id="20" label="agv36"/>
+		<Event id="21" label="agv41"/>
+		<Event id="22" label="agv45"/>
+		<Event id="23" label="truck00" controllable="false"/>
+		<Event id="24" label="truck03" controllable="false"/>
+		<Event id="25" label="truck06" controllable="false"/>
+		<Event id="26" label="truck10" controllable="false"/>
+		<Event id="27" label="truck11" controllable="false"/>
+		<Event id="28" label="truck12" controllable="false"/>
+		<Event id="29" label="truck14" controllable="false"/>
+		<Event id="30" label="truck15" controllable="false"/>
+		<Event id="31" label="truck16" controllable="false"/>
+		<Event id="32" label="truck20" controllable="false"/>
+		<Event id="33" label="truck21" controllable="false"/>
+		<Event id="34" label="truck22" controllable="false"/>
+		<Event id="35" label="truck24" controllable="false"/>
+		<Event id="36" label="truck25" controllable="false"/>
+		<Event id="37" label="truck30" controllable="false"/>
+		<Event id="38" label="truck31" controllable="false"/>
+		<Event id="39" label="truck32" controllable="false"/>
+		<Event id="40" label="truck34" controllable="false"/>
+		<Event id="41" label="truck35" controllable="false"/>
+		<Event id="42" label="truck36" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="26002600p2600pp2600ppp2600pppp2600ppppp2600pppppp2600ppppppp2600pppppppp2600ppppppppp2600pppppppppp"/>
+		<State id="1" name="26032603p2603pp2603ppp2603pppp2603ppppp2603pppppp2603ppppppp2603pppppppp2603ppppppppp2603pppppppppp"/>
+		<State id="2" name="26062606p2606pp2606ppp2606pppp2606ppppp2606pppppp2606ppppppp2606pppppppp2606ppppppppp2606pppppppppp"/>
+		<State id="3" name="26102610p2610pp2610ppp2610pppp2610ppppp2610pppppp2610ppppppp2610pppppppp2610ppppppppp2610pppppppppp"/>
+		<State id="4" name="26112611p2611pp2611ppp2611pppp2611ppppp2611pppppp2611ppppppp2611pppppppp2611ppppppppp2611pppppppppp"/>
+		<State id="5" name="26122612p2612pp2612ppp2612pppp2612ppppp2612pppppp2612ppppppp2612pppppppp2612ppppppppp2612pppppppppp26212621p2621pp2621ppp2621pppp2621ppppp2621pppppp2621ppppppp2621pppppppp2621ppppppppp2621pppppppppp"/>
+		<State id="6" name="26142614p2614pp2614ppp2614pppp2614ppppp2614pppppp2614ppppppp2614pppppppp2614ppppppppp2614pppppppppp26252625p2625pp2625ppp2625pppp2625ppppp2625pppppp2625ppppppp2625pppppppp2625ppppppppp2625pppppppppp"/>
+		<State id="7" name="26152615p2615pp2615ppp2615pppp2615ppppp2615pppppp2615ppppppp2615pppppppp2615ppppppppp2615pppppppppp"/>
+		<State id="8" name="26162616p2616pp2616ppp2616pppp2616ppppp2616pppppp2616ppppppp2616pppppppp2616ppppppppp2616pppppppppp"/>
+		<State id="9" name="26202620p2620pp2620ppp2620pppp2620ppppp2620pppppp2620ppppppp2620pppppppp2620ppppppppp2620pppppppppp"/>
+		<State id="10" name="26222622p2622pp2622ppp2622pppp2622ppppp2622pppppp2622ppppppp2622pppppppp2622ppppppppp2622pppppppppp"/>
+		<State id="11" name="26242624p2624pp2624ppp2624pppp2624ppppp2624pppppp2624ppppppp2624pppppppp2624ppppppppp2624pppppppppp"/>
+		<State id="12" name="26302630p2630pp2630ppp2630pppp2630ppppp2630pppppp2630ppppppp2630pppppppp2630ppppppppp2630pppppppppp"/>
+		<State id="13" name="26312631p2631pp2631ppp2631pppp2631ppppp2631pppppp2631ppppppp2631pppppppp2631ppppppppp2631pppppppppp"/>
+		<State id="14" name="26322632p2632pp2632ppp2632pppp2632ppppp2632pppppp2632ppppppp2632pppppppp2632ppppppppp2632pppppppppp"/>
+		<State id="15" name="26342634p2634pp2634ppp2634pppp2634ppppp2634pppppp2634ppppppp2634pppppppp2634ppppppppp2634pppppppppp"/>
+		<State id="16" name="26352635p2635pp2635ppp2635pppp2635ppppp2635pppppp2635ppppppp2635pppppppp2635ppppppppp2635pppppppppp"/>
+		<State id="17" name="2636p2636pp2636ppp2636pppp2636ppppp2636pppppp2636ppppppp2636pppppppp2636ppppppppp2636pppppppppp"/>
+		<State id="18" name="3100ppppppp3100pppppppp3100ppppppppp3100pppppppppp"/>
+		<State id="19" name="3103pppppp3103ppppppp3103pppppppp3103ppppppppp3103pppppppppp"/>
+		<State id="20" name="3106ppppp3106pppppp3106ppppppp3106pppppppp3106ppppppppp3106pppppppppp"/>
+		<State id="21" name="3110pppppppp3110ppppppppp3110pppppppppp"/>
+		<State id="22" name="3111ppppppppp3111pppppppppp"/>
+		<State id="23" name="3112ppppppppp3112pppppppppp3121ppppppppp3121pppppppppp"/>
+		<State id="24" name="3114pp3114ppp3114pppp3114ppppp3114pppppp3114ppppppp3114pppppppp3114ppppppppp3114pppppppppp3125pp3125ppp3125pppp3125ppppp3125pppppp3125ppppppp3125pppppppp3125ppppppppp3125pppppppppp"/>
+		<State id="25" name="3115ppp3115pppp3115ppppp3115pppppp3115ppppppp3115pppppppp3115ppppppppp3115pppppppppp"/>
+		<State id="26" name="3116pppp3116ppppp3116pppppp3116ppppppp3116pppppppp3116ppppppppp3116pppppppppp"/>
+		<State id="27" name="3120ppppppppp3120pppppppppp"/>
+		<State id="28" name="3122ppppppppp3122pppppppppp"/>
+		<State id="29" name="3124p3124pp3124ppp3124pppp3124ppppp3124pppppp3124ppppppp3124pppppppp3124ppppppppp3124pppppppppp"/>
+		<State id="30" name="3130pppppppppp"/>
+		<State id="31" name="3132pppppppppp"/>
+		<State id="32" name="31343134p3134pp3134ppp3134pppp3134ppppp3134pppppp3134ppppppp3134pppppppp3134ppppppppp3134pppppppppp"/>
+		<State id="33" name="31353135p3135pp3135ppp3135pppp3135ppppp3135pppppp3135ppppppp3135pppppppp3135ppppppppp3135pppppppppp"/>
+		<State id="34" name="31363136p3136pp3136ppp3136pppp3136ppppp3136pppppp3136ppppppp3136pppppppp3136ppppppppp3136pppppppppp"/>
+		<State id="35" name="3500ppp3500pppp3500ppppp3500pppppp3500ppppppp3500pppppppp3500ppppppppp3500pppppppppp"/>
+		<State id="36" name="3503pppp3503ppppp3503pppppp3503ppppppp3503pppppppp3503ppppppppp3503pppppppppp"/>
+		<State id="37" name="3506ppppp3506pppppp3506ppppppp3506pppppppp3506ppppppppp3506pppppppppp"/>
+		<State id="38" name="3510pp3510ppp3510pppp3510ppppp3510pppppp3510ppppppp3510pppppppp3510ppppppppp3510pppppppppp"/>
+		<State id="39" name="3511p3511pp3511ppp3511pppp3511ppppp3511pppppp3511ppppppp3511pppppppp3511ppppppppp3511pppppppppp"/>
+		<State id="40" name="35123512p3512pp3512ppp3512pppp3512ppppp3512pppppp3512ppppppp3512pppppppp3512ppppppppp3512pppppppppp35213521p3521pp3521ppp3521pppp3521ppppp3521pppppp3521ppppppp3521pppppppp3521ppppppppp3521pppppppppp"/>
+		<State id="41" name="3514pppppppp3514ppppppppp3514pppppppppp3525pppppppp3525ppppppppp3525pppppppppp"/>
+		<State id="42" name="3515ppppppp3515pppppppp3515ppppppppp3515pppppppppp"/>
+		<State id="43" name="3516pppppp3516ppppppp3516pppppppp3516ppppppppp3516pppppppppp"/>
+		<State id="44" name="3520p3520pp3520ppp3520pppp3520ppppp3520pppppp3520ppppppp3520pppppppp3520ppppppppp3520pppppppppp"/>
+		<State id="45" name="35223522p3522pp3522ppp3522pppp3522ppppp3522pppppp3522ppppppp3522pppppppp3522ppppppppp3522pppppppppp"/>
+		<State id="46" name="3524ppppppppp3524pppppppppp"/>
+		<State id="47" name="35303530p3530pp3530ppp3530pppp3530ppppp3530pppppp3530ppppppp3530pppppppp3530ppppppppp3530pppppppppp"/>
+		<State id="48" name="35313531p3531pp3531ppp3531pppp3531ppppp3531pppppp3531ppppppp3531pppppppp3531ppppppppp3531pppppppppp"/>
+		<State id="49" name="35323532p3532pp3532ppp3532pppp3532ppppp3532pppppp3532ppppppp3532pppppppp3532ppppppppp3532pppppppppp"/>
+		<State id="50" name="3534pppppppppp"/>
+		<State id="51" name="3600pp3600ppp3600pppp3600ppppp3600pppppp3600ppppppp3600pppppppp3600ppppppppp3600pppppppppp"/>
+		<State id="52" name="3603ppp3603pppp3603ppppp3603pppppp3603ppppppp3603pppppppp3603ppppppppp3603pppppppppp"/>
+		<State id="53" name="3606pppp3606ppppp3606pppppp3606ppppppp3606pppppppp3606ppppppppp3606pppppppppp"/>
+		<State id="54" name="3610p3610pp3610ppp3610pppp3610ppppp3610pppppp3610ppppppp3610pppppppp3610ppppppppp3610pppppppppp"/>
+		<State id="55" name="36113611p3611pp3611ppp3611pppp3611ppppp3611pppppp3611ppppppp3611pppppppp3611ppppppppp3611pppppppppp"/>
+		<State id="56" name="36123612p3612pp3612ppp3612pppp3612ppppp3612pppppp3612ppppppp3612pppppppp3612ppppppppp3612pppppppppp36213621p3621pp3621ppp3621pppp3621ppppp3621pppppp3621ppppppp3621pppppppp3621ppppppppp3621pppppppppp"/>
+		<State id="57" name="3614ppppppp3614pppppppp3614ppppppppp3614pppppppppp3625ppppppp3625pppppppp3625ppppppppp3625pppppppppp"/>
+		<State id="58" name="3615pppppp3615ppppppp3615pppppppp3615ppppppppp3615pppppppppp"/>
+		<State id="59" name="3616ppppp3616pppppp3616ppppppp3616pppppppp3616ppppppppp3616pppppppppp"/>
+		<State id="60" name="36203620p3620pp3620ppp3620pppp3620ppppp3620pppppp3620ppppppp3620pppppppp3620ppppppppp3620pppppppppp"/>
+		<State id="61" name="36223622p3622pp3622ppp3622pppp3622ppppp3622pppppp3622ppppppp3622pppppppp3622ppppppppp3622pppppppppp"/>
+		<State id="62" name="3624pppppppp3624ppppppppp3624pppppppppp"/>
+		<State id="63" name="36303630p3630pp3630ppp3630pppp3630ppppp3630pppppp3630ppppppp3630pppppppp3630ppppppppp3630pppppppppp"/>
+		<State id="64" name="36313631p3631pp3631ppp3631pppp3631ppppp3631pppppp3631ppppppp3631pppppppp3631ppppppppp3631pppppppppp"/>
+		<State id="65" name="36323632p3632pp3632ppp3632pppp3632ppppp3632pppppp3632ppppppp3632pppppppp3632ppppppppp3632pppppppppp"/>
+		<State id="66" name="3634ppppppppp3634pppppppppp"/>
+		<State id="67" name="3635pppppppppp"/>
+		<State id="68" name="41004100p4100pp4100ppp4100pppp4100ppppp4100pppppp4100ppppppp4100pppppppp4100ppppppppp4100pppppppppp"/>
+		<State id="69" name="41034103p4103pp4103ppp4103pppp4103ppppp4103pppppp4103ppppppp4103pppppppp4103ppppppppp4103pppppppppp"/>
+		<State id="70" name="41064106p4106pp4106ppp4106pppp4106ppppp4106pppppp4106ppppppp4106pppppppp4106ppppppppp4106pppppppppp"/>
+		<State id="71" name="41104110p4110pp4110ppp4110pppp4110ppppp4110pppppp4110ppppppp4110pppppppp4110ppppppppp4110pppppppppp"/>
+		<State id="72" name="41114111p4111pp4111ppp4111pppp4111ppppp4111pppppp4111ppppppp4111pppppppp4111ppppppppp4111pppppppppp"/>
+		<State id="73" name="41124112p4112pp4112ppp4112pppp4112ppppp4112pppppp4112ppppppp4112pppppppp4112ppppppppp4112pppppppppp41214121p4121pp4121ppp4121pppp4121ppppp4121pppppp4121ppppppp4121pppppppp4121ppppppppp4121pppppppppp"/>
+		<State id="74" name="41144114p4114pp4114ppp4114pppp4114ppppp4114pppppp4114ppppppp4114pppppppp4114ppppppppp4114pppppppppp41254125p4125pp4125ppp4125pppp4125ppppp4125pppppp4125ppppppp4125pppppppp4125ppppppppp4125pppppppppp"/>
+		<State id="75" name="41154115p4115pp4115ppp4115pppp4115ppppp4115pppppp4115ppppppp4115pppppppp4115ppppppppp4115pppppppppp"/>
+		<State id="76" name="41164116p4116pp4116ppp4116pppp4116ppppp4116pppppp4116ppppppp4116pppppppp4116ppppppppp4116pppppppppp" initial="true" accepting="true"/>
+		<State id="77" name="41204120p4120pp4120ppp4120pppp4120ppppp4120pppppp4120ppppppp4120pppppppp4120ppppppppp4120pppppppppp"/>
+		<State id="78" name="41224122p4122pp4122ppp4122pppp4122ppppp4122pppppp4122ppppppp4122pppppppp4122ppppppppp4122pppppppppp"/>
+		<State id="79" name="41244124p4124pp4124ppp4124pppp4124ppppp4124pppppp4124ppppppp4124pppppppp4124ppppppppp4124pppppppppp"/>
+		<State id="80" name="41304130p4130pp4130ppp4130pppp4130ppppp4130pppppp4130ppppppp4130pppppppp4130ppppppppp4130pppppppppp"/>
+		<State id="81" name="41314131p4131pp4131ppp4131pppp4131ppppp4131pppppp4131ppppppp4131pppppppp4131ppppppppp4131pppppppppp"/>
+		<State id="82" name="41324132p4132pp4132ppp4132pppp4132ppppp4132pppppp4132ppppppp4132pppppppp4132ppppppppp4132pppppppppp"/>
+		<State id="83" name="41344134p4134pp4134ppp4134pppp4134ppppp4134pppppp4134ppppppp4134pppppppp4134ppppppppp4134pppppppppp"/>
+		<State id="84" name="41354135p4135pp4135ppp4135pppp4135ppppp4135pppppp4135ppppppp4135pppppppp4135ppppppppp4135pppppppppp"/>
+		<State id="85" name="41364136p4136pp4136ppp4136pppp4136ppppp4136pppppp4136ppppppp4136pppppppp4136ppppppppp4136pppppppppp"/>
+		<State id="86" name="45004500p4500pp4500ppp4500pppp4500ppppp4500pppppp4500ppppppp4500pppppppp4500ppppppppp4500pppppppppp"/>
+		<State id="87" name="45034503p4503pp4503ppp4503pppp4503ppppp4503pppppp4503ppppppp4503pppppppp4503ppppppppp4503pppppppppp"/>
+		<State id="88" name="45064506p4506pp4506ppp4506pppp4506ppppp4506pppppp4506ppppppp4506pppppppp4506ppppppppp4506pppppppppp"/>
+		<State id="89" name="45104510p4510pp4510ppp4510pppp4510ppppp4510pppppp4510ppppppp4510pppppppp4510ppppppppp4510pppppppppp"/>
+		<State id="90" name="45114511p4511pp4511ppp4511pppp4511ppppp4511pppppp4511ppppppp4511pppppppp4511ppppppppp4511pppppppppp"/>
+		<State id="91" name="45124512p4512pp4512ppp4512pppp4512ppppp4512pppppp4512ppppppp4512pppppppp4512ppppppppp4512pppppppppp45214521p4521pp4521ppp4521pppp4521ppppp4521pppppp4521ppppppp4521pppppppp4521ppppppppp4521pppppppppp"/>
+		<State id="92" name="45144514p4514pp4514ppp4514pppp4514ppppp4514pppppp4514ppppppp4514pppppppp4514ppppppppp4514pppppppppp45254525p4525pp4525ppp4525pppp4525ppppp4525pppppp4525ppppppp4525pppppppp4525ppppppppp4525pppppppppp"/>
+		<State id="93" name="45154515p4515pp4515ppp4515pppp4515ppppp4515pppppp4515ppppppp4515pppppppp4515ppppppppp4515pppppppppp"/>
+		<State id="94" name="45164516p4516pp4516ppp4516pppp4516ppppp4516pppppp4516ppppppp4516pppppppp4516ppppppppp4516pppppppppp"/>
+		<State id="95" name="45204520p4520pp4520ppp4520pppp4520ppppp4520pppppp4520ppppppp4520pppppppp4520ppppppppp4520pppppppppp"/>
+		<State id="96" name="45224522p4522pp4522ppp4522pppp4522ppppp4522pppppp4522ppppppp4522pppppppp4522ppppppppp4522pppppppppp"/>
+		<State id="97" name="45244524p4524pp4524ppp4524pppp4524ppppp4524pppppp4524ppppppp4524pppppppp4524ppppppppp4524pppppppppp"/>
+		<State id="98" name="45304530p4530pp4530ppp4530pppp4530ppppp4530pppppp4530ppppppp4530pppppppp4530ppppppppp4530pppppppppp"/>
+		<State id="99" name="45314531p4531pp4531ppp4531pppp4531ppppp4531pppppp4531ppppppp4531pppppppp4531ppppppppp4531pppppppppp"/>
+		<State id="100" name="45324532p4532pp4532ppp4532pppp4532ppppp4532pppppp4532ppppppp4532pppppppp4532ppppppppp4532pppppppppp"/>
+		<State id="101" name="45344534p4534pp4534ppp4534pppp4534ppppp4534pppppp4534ppppppp4534pppppppp4534ppppppppp4534pppppppppp"/>
+		<State id="102" name="45354535p4535pp4535ppp4535pppp4535ppppp4535pppppp4535ppppppp4535pppppppp4535ppppppppp4535pppppppppp"/>
+		<State id="103" name="45364536p4536pp4536ppp4536pppp4536ppppp4536pppppp4536ppppppp4536pppppppp4536ppppppppp4536pppppppppp"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="24"/>
+		<Transition source="0" dest="3" event="26"/>
+		<Transition source="1" dest="0" event="23"/>
+		<Transition source="1" dest="2" event="25"/>
+		<Transition source="2" dest="1" event="24"/>
+		<Transition source="2" dest="8" event="31"/>
+		<Transition source="3" dest="0" event="23"/>
+		<Transition source="3" dest="4" event="27"/>
+		<Transition source="3" dest="9" event="32"/>
+		<Transition source="4" dest="55" event="20"/>
+		<Transition source="4" dest="3" event="26"/>
+		<Transition source="4" dest="5" event="28"/>
+		<Transition source="4" dest="5" event="33"/>
+		<Transition source="5" dest="56" event="20"/>
+		<Transition source="5" dest="4" event="27"/>
+		<Transition source="5" dest="10" event="34"/>
+		<Transition source="6" dest="7" event="30"/>
+		<Transition source="6" dest="11" event="35"/>
+		<Transition source="7" dest="6" event="29"/>
+		<Transition source="7" dest="8" event="31"/>
+		<Transition source="7" dest="6" event="36"/>
+		<Transition source="8" dest="2" event="25"/>
+		<Transition source="8" dest="7" event="30"/>
+		<Transition source="9" dest="60" event="20"/>
+		<Transition source="9" dest="3" event="26"/>
+		<Transition source="9" dest="12" event="37"/>
+		<Transition source="10" dest="61" event="20"/>
+		<Transition source="10" dest="5" event="28"/>
+		<Transition source="10" dest="5" event="33"/>
+		<Transition source="10" dest="14" event="39"/>
+		<Transition source="11" dest="6" event="29"/>
+		<Transition source="11" dest="6" event="36"/>
+		<Transition source="11" dest="15" event="40"/>
+		<Transition source="12" dest="63" event="20"/>
+		<Transition source="12" dest="9" event="32"/>
+		<Transition source="12" dest="13" event="38"/>
+		<Transition source="13" dest="64" event="20"/>
+		<Transition source="13" dest="12" event="37"/>
+		<Transition source="13" dest="14" event="39"/>
+		<Transition source="14" dest="65" event="20"/>
+		<Transition source="14" dest="10" event="34"/>
+		<Transition source="14" dest="13" event="38"/>
+		<Transition source="15" dest="11" event="35"/>
+		<Transition source="15" dest="16" event="41"/>
+		<Transition source="16" dest="15" event="40"/>
+		<Transition source="16" dest="17" event="42"/>
+		<Transition source="17" dest="16" event="41"/>
+		<Transition source="18" dest="68" event="21"/>
+		<Transition source="18" dest="19" event="24"/>
+		<Transition source="18" dest="21" event="26"/>
+		<Transition source="19" dest="69" event="21"/>
+		<Transition source="19" dest="18" event="23"/>
+		<Transition source="19" dest="20" event="25"/>
+		<Transition source="20" dest="70" event="21"/>
+		<Transition source="20" dest="19" event="24"/>
+		<Transition source="20" dest="26" event="31"/>
+		<Transition source="21" dest="71" event="21"/>
+		<Transition source="21" dest="18" event="23"/>
+		<Transition source="21" dest="22" event="27"/>
+		<Transition source="21" dest="27" event="32"/>
+		<Transition source="22" dest="72" event="21"/>
+		<Transition source="22" dest="21" event="26"/>
+		<Transition source="22" dest="23" event="28"/>
+		<Transition source="22" dest="23" event="33"/>
+		<Transition source="23" dest="73" event="21"/>
+		<Transition source="23" dest="22" event="27"/>
+		<Transition source="23" dest="28" event="34"/>
+		<Transition source="24" dest="74" event="21"/>
+		<Transition source="24" dest="25" event="30"/>
+		<Transition source="24" dest="29" event="35"/>
+		<Transition source="25" dest="75" event="21"/>
+		<Transition source="25" dest="24" event="29"/>
+		<Transition source="25" dest="26" event="31"/>
+		<Transition source="25" dest="24" event="36"/>
+		<Transition source="26" dest="76" event="21"/>
+		<Transition source="26" dest="20" event="25"/>
+		<Transition source="26" dest="25" event="30"/>
+		<Transition source="27" dest="77" event="21"/>
+		<Transition source="27" dest="21" event="26"/>
+		<Transition source="27" dest="30" event="37"/>
+		<Transition source="28" dest="78" event="21"/>
+		<Transition source="28" dest="23" event="28"/>
+		<Transition source="28" dest="23" event="33"/>
+		<Transition source="28" dest="31" event="39"/>
+		<Transition source="29" dest="79" event="21"/>
+		<Transition source="29" dest="24" event="29"/>
+		<Transition source="29" dest="24" event="36"/>
+		<Transition source="29" dest="32" event="40"/>
+		<Transition source="30" dest="80" event="21"/>
+		<Transition source="31" dest="82" event="21"/>
+		<Transition source="32" dest="83" event="21"/>
+		<Transition source="32" dest="29" event="35"/>
+		<Transition source="32" dest="33" event="41"/>
+		<Transition source="33" dest="84" event="21"/>
+		<Transition source="33" dest="32" event="40"/>
+		<Transition source="33" dest="34" event="42"/>
+		<Transition source="34" dest="85" event="21"/>
+		<Transition source="34" dest="33" event="41"/>
+		<Transition source="35" dest="86" event="22"/>
+		<Transition source="35" dest="36" event="24"/>
+		<Transition source="35" dest="38" event="26"/>
+		<Transition source="36" dest="87" event="22"/>
+		<Transition source="36" dest="35" event="23"/>
+		<Transition source="36" dest="37" event="25"/>
+		<Transition source="37" dest="88" event="22"/>
+		<Transition source="37" dest="36" event="24"/>
+		<Transition source="37" dest="43" event="31"/>
+		<Transition source="38" dest="89" event="22"/>
+		<Transition source="38" dest="35" event="23"/>
+		<Transition source="38" dest="39" event="27"/>
+		<Transition source="38" dest="44" event="32"/>
+		<Transition source="39" dest="55" event="20"/>
+		<Transition source="39" dest="90" event="22"/>
+		<Transition source="39" dest="38" event="26"/>
+		<Transition source="39" dest="40" event="28"/>
+		<Transition source="39" dest="40" event="33"/>
+		<Transition source="40" dest="56" event="20"/>
+		<Transition source="40" dest="91" event="22"/>
+		<Transition source="40" dest="39" event="27"/>
+		<Transition source="40" dest="45" event="34"/>
+		<Transition source="41" dest="92" event="22"/>
+		<Transition source="41" dest="42" event="30"/>
+		<Transition source="41" dest="46" event="35"/>
+		<Transition source="42" dest="93" event="22"/>
+		<Transition source="42" dest="41" event="29"/>
+		<Transition source="42" dest="43" event="31"/>
+		<Transition source="42" dest="41" event="36"/>
+		<Transition source="43" dest="94" event="22"/>
+		<Transition source="43" dest="37" event="25"/>
+		<Transition source="43" dest="42" event="30"/>
+		<Transition source="44" dest="60" event="20"/>
+		<Transition source="44" dest="95" event="22"/>
+		<Transition source="44" dest="38" event="26"/>
+		<Transition source="44" dest="47" event="37"/>
+		<Transition source="45" dest="61" event="20"/>
+		<Transition source="45" dest="96" event="22"/>
+		<Transition source="45" dest="40" event="28"/>
+		<Transition source="45" dest="40" event="33"/>
+		<Transition source="45" dest="49" event="39"/>
+		<Transition source="46" dest="97" event="22"/>
+		<Transition source="46" dest="41" event="29"/>
+		<Transition source="46" dest="41" event="36"/>
+		<Transition source="46" dest="50" event="40"/>
+		<Transition source="47" dest="63" event="20"/>
+		<Transition source="47" dest="98" event="22"/>
+		<Transition source="47" dest="44" event="32"/>
+		<Transition source="47" dest="48" event="38"/>
+		<Transition source="48" dest="64" event="20"/>
+		<Transition source="48" dest="99" event="22"/>
+		<Transition source="48" dest="47" event="37"/>
+		<Transition source="48" dest="49" event="39"/>
+		<Transition source="49" dest="65" event="20"/>
+		<Transition source="49" dest="100" event="22"/>
+		<Transition source="49" dest="45" event="34"/>
+		<Transition source="49" dest="48" event="38"/>
+		<Transition source="50" dest="101" event="22"/>
+		<Transition source="51" dest="0" event="14"/>
+		<Transition source="51" dest="52" event="24"/>
+		<Transition source="51" dest="54" event="26"/>
+		<Transition source="52" dest="1" event="14"/>
+		<Transition source="52" dest="51" event="23"/>
+		<Transition source="52" dest="53" event="25"/>
+		<Transition source="53" dest="2" event="14"/>
+		<Transition source="53" dest="52" event="24"/>
+		<Transition source="53" dest="59" event="31"/>
+		<Transition source="54" dest="3" event="14"/>
+		<Transition source="54" dest="51" event="23"/>
+		<Transition source="54" dest="55" event="27"/>
+		<Transition source="54" dest="60" event="32"/>
+		<Transition source="55" dest="4" event="14"/>
+		<Transition source="55" dest="54" event="26"/>
+		<Transition source="55" dest="56" event="28"/>
+		<Transition source="55" dest="56" event="33"/>
+		<Transition source="56" dest="5" event="14"/>
+		<Transition source="56" dest="40" event="19"/>
+		<Transition source="56" dest="55" event="27"/>
+		<Transition source="56" dest="61" event="34"/>
+		<Transition source="57" dest="6" event="14"/>
+		<Transition source="57" dest="58" event="30"/>
+		<Transition source="57" dest="62" event="35"/>
+		<Transition source="58" dest="7" event="14"/>
+		<Transition source="58" dest="57" event="29"/>
+		<Transition source="58" dest="59" event="31"/>
+		<Transition source="58" dest="57" event="36"/>
+		<Transition source="59" dest="8" event="14"/>
+		<Transition source="59" dest="53" event="25"/>
+		<Transition source="59" dest="58" event="30"/>
+		<Transition source="60" dest="9" event="14"/>
+		<Transition source="60" dest="54" event="26"/>
+		<Transition source="60" dest="63" event="37"/>
+		<Transition source="61" dest="10" event="14"/>
+		<Transition source="61" dest="45" event="19"/>
+		<Transition source="61" dest="56" event="28"/>
+		<Transition source="61" dest="56" event="33"/>
+		<Transition source="61" dest="65" event="39"/>
+		<Transition source="62" dest="11" event="14"/>
+		<Transition source="62" dest="57" event="29"/>
+		<Transition source="62" dest="57" event="36"/>
+		<Transition source="62" dest="66" event="40"/>
+		<Transition source="63" dest="12" event="14"/>
+		<Transition source="63" dest="47" event="19"/>
+		<Transition source="63" dest="60" event="32"/>
+		<Transition source="63" dest="64" event="38"/>
+		<Transition source="64" dest="13" event="14"/>
+		<Transition source="64" dest="48" event="19"/>
+		<Transition source="64" dest="63" event="37"/>
+		<Transition source="64" dest="65" event="39"/>
+		<Transition source="65" dest="14" event="14"/>
+		<Transition source="65" dest="49" event="19"/>
+		<Transition source="65" dest="61" event="34"/>
+		<Transition source="65" dest="64" event="38"/>
+		<Transition source="66" dest="15" event="14"/>
+		<Transition source="66" dest="62" event="35"/>
+		<Transition source="66" dest="67" event="41"/>
+		<Transition source="67" dest="16" event="14"/>
+		<Transition source="68" dest="86" event="22"/>
+		<Transition source="68" dest="69" event="24"/>
+		<Transition source="68" dest="71" event="26"/>
+		<Transition source="69" dest="87" event="22"/>
+		<Transition source="69" dest="68" event="23"/>
+		<Transition source="69" dest="70" event="25"/>
+		<Transition source="70" dest="88" event="22"/>
+		<Transition source="70" dest="69" event="24"/>
+		<Transition source="70" dest="76" event="31"/>
+		<Transition source="71" dest="89" event="22"/>
+		<Transition source="71" dest="68" event="23"/>
+		<Transition source="71" dest="72" event="27"/>
+		<Transition source="71" dest="77" event="32"/>
+		<Transition source="72" dest="90" event="22"/>
+		<Transition source="72" dest="71" event="26"/>
+		<Transition source="72" dest="73" event="28"/>
+		<Transition source="72" dest="73" event="33"/>
+		<Transition source="73" dest="91" event="22"/>
+		<Transition source="73" dest="72" event="27"/>
+		<Transition source="73" dest="78" event="34"/>
+		<Transition source="74" dest="92" event="22"/>
+		<Transition source="74" dest="75" event="30"/>
+		<Transition source="74" dest="79" event="35"/>
+		<Transition source="75" dest="93" event="22"/>
+		<Transition source="75" dest="74" event="29"/>
+		<Transition source="75" dest="76" event="31"/>
+		<Transition source="75" dest="74" event="36"/>
+		<Transition source="76" dest="94" event="22"/>
+		<Transition source="76" dest="70" event="25"/>
+		<Transition source="76" dest="75" event="30"/>
+		<Transition source="77" dest="95" event="22"/>
+		<Transition source="77" dest="71" event="26"/>
+		<Transition source="77" dest="80" event="37"/>
+		<Transition source="78" dest="96" event="22"/>
+		<Transition source="78" dest="73" event="28"/>
+		<Transition source="78" dest="73" event="33"/>
+		<Transition source="78" dest="82" event="39"/>
+		<Transition source="79" dest="97" event="22"/>
+		<Transition source="79" dest="74" event="29"/>
+		<Transition source="79" dest="74" event="36"/>
+		<Transition source="79" dest="83" event="40"/>
+		<Transition source="80" dest="98" event="22"/>
+		<Transition source="80" dest="77" event="32"/>
+		<Transition source="80" dest="81" event="38"/>
+		<Transition source="81" dest="99" event="22"/>
+		<Transition source="81" dest="80" event="37"/>
+		<Transition source="81" dest="82" event="39"/>
+		<Transition source="82" dest="100" event="22"/>
+		<Transition source="82" dest="78" event="34"/>
+		<Transition source="82" dest="81" event="38"/>
+		<Transition source="83" dest="32" event="16"/>
+		<Transition source="83" dest="101" event="22"/>
+		<Transition source="83" dest="79" event="35"/>
+		<Transition source="83" dest="84" event="41"/>
+		<Transition source="84" dest="33" event="16"/>
+		<Transition source="84" dest="102" event="22"/>
+		<Transition source="84" dest="83" event="40"/>
+		<Transition source="84" dest="85" event="42"/>
+		<Transition source="85" dest="34" event="16"/>
+		<Transition source="85" dest="103" event="22"/>
+		<Transition source="85" dest="84" event="41"/>
+		<Transition source="86" dest="68" event="21"/>
+		<Transition source="86" dest="87" event="24"/>
+		<Transition source="86" dest="89" event="26"/>
+		<Transition source="87" dest="69" event="21"/>
+		<Transition source="87" dest="86" event="23"/>
+		<Transition source="87" dest="88" event="25"/>
+		<Transition source="88" dest="70" event="21"/>
+		<Transition source="88" dest="87" event="24"/>
+		<Transition source="88" dest="94" event="31"/>
+		<Transition source="89" dest="71" event="21"/>
+		<Transition source="89" dest="86" event="23"/>
+		<Transition source="89" dest="90" event="27"/>
+		<Transition source="89" dest="95" event="32"/>
+		<Transition source="90" dest="72" event="21"/>
+		<Transition source="90" dest="89" event="26"/>
+		<Transition source="90" dest="91" event="28"/>
+		<Transition source="90" dest="91" event="33"/>
+		<Transition source="91" dest="40" event="19"/>
+		<Transition source="91" dest="73" event="21"/>
+		<Transition source="91" dest="90" event="27"/>
+		<Transition source="91" dest="96" event="34"/>
+		<Transition source="92" dest="74" event="21"/>
+		<Transition source="92" dest="93" event="30"/>
+		<Transition source="92" dest="97" event="35"/>
+		<Transition source="93" dest="75" event="21"/>
+		<Transition source="93" dest="92" event="29"/>
+		<Transition source="93" dest="94" event="31"/>
+		<Transition source="93" dest="92" event="36"/>
+		<Transition source="94" dest="76" event="21"/>
+		<Transition source="94" dest="88" event="25"/>
+		<Transition source="94" dest="93" event="30"/>
+		<Transition source="95" dest="77" event="21"/>
+		<Transition source="95" dest="89" event="26"/>
+		<Transition source="95" dest="98" event="37"/>
+		<Transition source="96" dest="45" event="19"/>
+		<Transition source="96" dest="78" event="21"/>
+		<Transition source="96" dest="91" event="28"/>
+		<Transition source="96" dest="91" event="33"/>
+		<Transition source="96" dest="100" event="39"/>
+		<Transition source="97" dest="79" event="21"/>
+		<Transition source="97" dest="92" event="29"/>
+		<Transition source="97" dest="92" event="36"/>
+		<Transition source="97" dest="101" event="40"/>
+		<Transition source="98" dest="47" event="19"/>
+		<Transition source="98" dest="80" event="21"/>
+		<Transition source="98" dest="95" event="32"/>
+		<Transition source="98" dest="99" event="38"/>
+		<Transition source="99" dest="48" event="19"/>
+		<Transition source="99" dest="81" event="21"/>
+		<Transition source="99" dest="98" event="37"/>
+		<Transition source="99" dest="100" event="39"/>
+		<Transition source="100" dest="49" event="19"/>
+		<Transition source="100" dest="82" event="21"/>
+		<Transition source="100" dest="96" event="34"/>
+		<Transition source="100" dest="99" event="38"/>
+		<Transition source="101" dest="83" event="21"/>
+		<Transition source="101" dest="97" event="35"/>
+		<Transition source="101" dest="102" event="41"/>
+		<Transition source="102" dest="84" event="21"/>
+		<Transition source="102" dest="101" event="40"/>
+		<Transition source="102" dest="103" event="42"/>
+		<Transition source="103" dest="85" event="21"/>
+		<Transition source="103" dest="102" event="41"/>
+	</Transitions>
+</Automaton>
+<Execution>
+	<Actions>
+		<Action label="truck11">
+			<Command command="truck.goX.1"/>
+			<Command command="truck.goY.1"/>
+		</Action>
+		<Action label="truck10">
+			<Command command="truck.goX.1"/>
+			<Command command="truck.goY.0"/>
+		</Action>
+		<Action label="truck32">
+			<Command command="truck.goX.3"/>
+			<Command command="truck.goY.2"/>
+		</Action>
+		<Action label="truck31">
+			<Command command="truck.goX.3"/>
+			<Command command="truck.goY.1"/>
+		</Action>
+		<Action label="truck30">
+			<Command command="truck.goX.3"/>
+			<Command command="truck.goY.0"/>
+		</Action>
+		<Action label="agv16">
+			<Command command="agv.goX.1"/>
+			<Command command="agv.goY.6"/>
+		</Action>
+		<Action label="agv15">
+			<Command command="agv.goX.1"/>
+			<Command command="agv.goY.5"/>
+		</Action>
+		<Action label="agv36">
+			<Command command="agv.goX.3"/>
+			<Command command="agv.goY.6"/>
+		</Action>
+		<Action label="agv14">
+			<Command command="agv.goX.1"/>
+			<Command command="agv.goY.4"/>
+		</Action>
+		<Action label="agv35">
+			<Command command="agv.goX.3"/>
+			<Command command="agv.goY.5"/>
+		</Action>
+		<Action label="agv12">
+			<Command command="agv.goX.1"/>
+			<Command command="agv.goY.2"/>
+		</Action>
+		<Action label="agv34">
+			<Command command="agv.goX.3"/>
+			<Command command="agv.goY.4"/>
+		</Action>
+		<Action label="agv11">
+			<Command command="agv.goX.1"/>
+			<Command command="agv.goY.1"/>
+		</Action>
+		<Action label="agv10">
+			<Command command="agv.goX.1"/>
+			<Command command="agv.goY.0"/>
+		</Action>
+		<Action label="agv32">
+			<Command command="agv.goX.3"/>
+			<Command command="agv.goY.2"/>
+		</Action>
+		<Action label="agv31">
+			<Command command="agv.goX.3"/>
+			<Command command="agv.goY.1"/>
+		</Action>
+		<Action label="agv30">
+			<Command command="agv.goX.3"/>
+			<Command command="agv.goY.0"/>
+		</Action>
+		<Action label="truck06">
+			<Command command="truck.goX.0"/>
+			<Command command="truck.goY.6"/>
+		</Action>
+		<Action label="truck03">
+			<Command command="truck.goX.0"/>
+			<Command command="truck.goY.3"/>
+		</Action>
+		<Action label="truck25">
+			<Command command="truck.goX.2"/>
+			<Command command="truck.goY.5"/>
+		</Action>
+		<Action label="truck24">
+			<Command command="truck.goX.2"/>
+			<Command command="truck.goY.4"/>
+		</Action>
+		<Action label="truck00">
+			<Command command="truck.goX.0"/>
+			<Command command="truck.goY.0"/>
+		</Action>
+		<Action label="truck22">
+			<Command command="truck.goX.2"/>
+			<Command command="truck.goY.2"/>
+		</Action>
+		<Action label="truck21">
+			<Command command="truck.goX.2"/>
+			<Command command="truck.goY.1"/>
+		</Action>
+		<Action label="truck20">
+			<Command command="truck.goX.2"/>
+			<Command command="truck.goY.0"/>
+		</Action>
+		<Action label="agv06">
+			<Command command="agv.goX.0"/>
+			<Command command="agv.goY.6"/>
+		</Action>
+		<Action label="agv26">
+			<Command command="agv.goX.2"/>
+			<Command command="agv.goY.6"/>
+		</Action>
+		<Action label="agv03">
+			<Command command="agv.goX.0"/>
+			<Command command="agv.goY.3"/>
+		</Action>
+		<Action label="agv25">
+			<Command command="agv.goX.2"/>
+			<Command command="agv.goY.5"/>
+		</Action>
+		<Action label="agv24">
+			<Command command="agv.goX.2"/>
+			<Command command="agv.goY.4"/>
+		</Action>
+		<Action label="agv45">
+			<Command command="agv.goX.4"/>
+			<Command command="agv.goY.5"/>
+		</Action>
+		<Action label="agv00">
+			<Command command="agv.goX.0"/>
+			<Command command="agv.goY.0"/>
+		</Action>
+		<Action label="agv22">
+			<Command command="agv.goX.2"/>
+			<Command command="agv.goY.2"/>
+		</Action>
+		<Action label="agv21">
+			<Command command="agv.goX.2"/>
+			<Command command="agv.goY.1"/>
+		</Action>
+		<Action label="agv20">
+			<Command command="agv.goX.2"/>
+			<Command command="agv.goY.0"/>
+		</Action>
+		<Action label="agv41">
+			<Command command="agv.goX.4"/>
+			<Command command="agv.goY.1"/>
+		</Action>
+		<Action label="truck16">
+			<Command command="truck.goX.1"/>
+			<Command command="truck.goY.6"/>
+		</Action>
+		<Action label="truck15">
+			<Command command="truck.goX.1"/>
+			<Command command="truck.goY.5"/>
+		</Action>
+		<Action label="truck14">
+			<Command command="truck.goX.1"/>
+			<Command command="truck.goY.4"/>
+		</Action>
+		<Action label="truck36">
+			<Command command="truck.goX.3"/>
+			<Command command="truck.goY.6"/>
+		</Action>
+		<Action label="truck35">
+			<Command command="truck.goX.3"/>
+			<Command command="truck.goY.5"/>
+		</Action>
+		<Action label="truck12">
+			<Command command="truck.goX.1"/>
+			<Command command="truck.goY.2"/>
+		</Action>
+		<Action label="truck34">
+			<Command command="truck.goX.3"/>
+			<Command command="truck.goY.4"/>
+		</Action>
+	</Actions>
+	<Controls>
+		<Control label="truck11">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck10">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck32">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck31">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck30">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="agv16">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv15">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv36">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv14">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv35">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv12">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv34">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv11">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv10">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv32">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv31">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv30">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="truck06">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck03">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck25">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck24">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck00">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck22">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck21">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck20">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="agv06">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv26">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv03">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv25">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv24">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv45">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv00">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv22">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv21">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv20">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="agv41">
+			<Condition condition="agvX.end"/>
+			<Condition condition="agvY.end"/>
+		</Control>
+		<Control label="truck16">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck15">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck14">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck36">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck35">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck12">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+		<Control label="truck34">
+			<Condition condition="truckX.end"/>
+			<Condition condition="truckY.end"/>
+		</Control>
+	</Controls>
+	<Animation path="/scenebeans/warehouse/warehouse.xml"/>
+</Execution>
+</SupremicaProject>

@@ -175,6 +175,9 @@ public class ExampleTemplates
 		String prefix = extraPrefix + "/OperatorSupervisor/";
 		thisGroup.addItem(new TemplateItem("Warehouse", prefix + "warehouse.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=2", prefix + "warehouse_k2.xml"));
+		thisGroup.addItem(new TemplateItem("Warehouse k=5", prefix + "warehouse_k5.xml"));
+		thisGroup.addItem(new TemplateItem("Warehouse k=7", prefix + "warehouse_k7.xml"));
+		thisGroup.addItem(new TemplateItem("Warehouse k=10", prefix + "warehouse_k10.xml"));
 		thisGroup.addItem(new TemplateItem("Warehouse k=13", prefix + "warehouse_k13.xml"));
 	}
 
