@@ -48,6 +48,7 @@
  */
 package org.supremica.functionblocks.model;
 
+import org.supremica.functionblocks.model.interpreters.st.Tester;
 import java.util.*;
 
 /**
@@ -55,83 +56,60 @@ import java.util.*;
  */
 public class Resource
 {
-
-    private String name;
-    private Scheduler scheduler;
-    private List applicationFragments = new ArrayList();
-
-    // attributes for the one instance prototype
-    BasicFBInstance fbInstance = null;
-    BasicFBType fbType = null;
-
-    private Resource() {}
-
-    public Resource(String name)
-    {
-	System.out.println("Resource(" + name + ")");
-
-        this.name = name;
-	scheduler = new Scheduler(this);
-
-	// creat the application from the Sync paper for testing
-	fbType = new BasicFBType("DummyFBType", this);
-	fbType.addAlgorithm(new TestAlgorithm("DummyAlgorithm"));
-	fbInstance = fbType.createInstance("DummyFBInstance");
-	fbInstance.addEventInputQueue(new EventQueue());
-	fbInstance.queueEvent("DummyEventInput");
 	
-	// Test ST interpreter
-	Variables testVars = new Variables();
-	testVars.addVariable("bvar", new BooleanVariable("Local", true));
-	testVars.addVariable("ivar", new IntegerVariable("Local", 10));
-	testVars.addVariable("dvar", new DoubleVariable("Local", 3.14));
-	testVars.addVariable("fvar", new FloatVariable("Local", 3.18F));
-	testVars.addVariable("svar", new StringVariable("Local", "TestString"));
+	private String name;
+	private Scheduler scheduler;
+	private List applicationFragments = new ArrayList();
+	
+	BasicFBInstance fbInstance;
+	
+	private Resource() {}
+	
+	public Resource(String name)
+	{
+		System.out.println("Resource(" + name + ")");
 
-	System.out.println("Resource("+ name +"): Testing Expressions:");
-	System.out.println("Testing Primary Expressions:");
-	ECCondition testCond = new ECCondition("TRUE"); 
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("3.18F");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("3.14");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("3");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("\"blah\"");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("bvar");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("ivar");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("dvar");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("fvar");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
-	testCond.set("svar");
-	System.out.println("evaluation result: " + testCond.evaluate(testVars));
+		this.name = name;
+		scheduler = new Scheduler(this);
+
+		// creat the application from the Sync paper for testing
+	
+		BasicFBType fbType = new BasicFBType("P1", this);
+		fbType.addEventInput("OCCURED", new BooleanVariable("EventInput",false));
+		fbType.addEventOutput("DONE", new BooleanVariable("EventOutput",false));
+
+		fbType.addAlgorithm("TestAlgorithm", new TestAlgorithm());
+
+
+		fbInstance = fbType.createInstance("P1inst");
+
+		fbInstance.addEventInputQueue(new EventQueue());
+		fbInstance.queueEvent("DummyEventInput");
+	
+		//Interpreter tester
+		//new Tester();
 
 	
-    }
+	}
 
-    void handleConfigurationRequests()
-    {
-	System.out.println("Resource.handleConfigurationRequests()");
-    }
+	void handleConfigurationRequests()
+	{
+		System.out.println("Resource.handleConfigurationRequests()");
+	}
     
-    void runResource()
-    {
-	System.out.println("Resource.runResource()");	
-	scheduler.runEvents();
-    }
+	void runResource()
+	{
+		System.out.println("Resource.runResource()");	
+		scheduler.runEvents();
+	}
 
-    String getName()
-    {
-	return name;
-    }
+	String getName()
+	{
+		return name;
+	}
 
-    Scheduler getScheduler()
-    {
-	return scheduler;
-    }
+	Scheduler getScheduler()
+	{
+		return scheduler;
+	}
 }

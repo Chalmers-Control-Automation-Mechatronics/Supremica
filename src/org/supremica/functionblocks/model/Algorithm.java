@@ -51,12 +51,9 @@ package org.supremica.functionblocks.model;
 
 import java.util.*;
 
-public class Algorithm
+public abstract class Algorithm
 {
 
-    String name;
-    private String comment;
-    
     public void execute(Variables variables)
     {
 	

@@ -54,12 +54,6 @@ import java.util.*;
 public class TestAlgorithm extends Algorithm
 {
     
-    public TestAlgorithm(String name)
-    {
-	super();
-	this.name=name;
-    }
-    
     public void execute(Variables variables)
     {
 	System.out.println("TestAlgorithm.execute()");

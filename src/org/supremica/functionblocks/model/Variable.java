@@ -55,7 +55,7 @@ public abstract class Variable
 {
 	
 	// The types are: "EventInput", "EventOutput", "DataInput", "DataOutput", "Local"
-	String type;
+	private String type;
 	
 	void setType(String t)
 	{

@@ -59,47 +59,75 @@ import java.util.*;
 public class BasicFBType extends FBType
 {
 
-    private ECC theECC = new ECC();
-    // TODO: HashMap name,instance?
-    private List instances = new ArrayList();
-    // TODO: HashMap name,algorithm
-    private List algorithms = new ArrayList();
+	private ECC theECC = new ECC();
+	private Map instances = new HashMap();
+	private Map algorithms = new HashMap();
 
-    private BasicFBType() {}
+	// Name to variable type mappings
+	private Map eventInputs = new HashMap();
+	private Map eventOutputs = new HashMap();
+	private Map dataInputs = new HashMap();
+	private Map dataOutputs = new HashMap();
+	private Map localVariables = new HashMap();
 
-    public BasicFBType(String name, Resource r)
-    {
-	System.out.println("BasicFBType(" + name + "," + r.getName()  + ")");
-	this.name = name;
-	resource = r;
-    }
 
-   
-    public BasicFBInstance createInstance(String name)
-    {
-        System.out.println("BasicFBType.createInstace(" + name + ")");
-        BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
-        // construct the newInstance
-	//instances.add(newInstance); // not yet
-        return newInstance;
-    }
+	// Constructors
+	private BasicFBType() {}
 
-    public ECC getECC()
-    {
-        System.out.println("BasicFBType.getECC()");
-        return theECC;
-    }
+	public BasicFBType(String name, Resource r)
+	{
+		System.out.println("BasicFBType(" + name + "," + r.getName()  + ")");
+		this.name = name;
+		resource = r;
+	}
 
-    public void addAlgorithm(Algorithm a)
-    {
-	// TODO: this needs to be solved (look att design patterns for something suitable)
-	// TODO: the problem: name of the algorithm class is unknown before FB app is developed
-	algorithms.add(a);
-    }
 
-    public Algorithm getAlgorithm()
-    {
-	return (Algorithm) algorithms.get(0);
-    }
+
+	// Methods 
+	public BasicFBInstance createInstance(String name)
+	{
+		System.out.println("BasicFBType.createInstace(" + name + ")");
+		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
+		// construct the newInstance
+		//instances.add(newInstance); // not yet
+		return newInstance;
+	}
+
+	public ECC getECC()
+	{
+		System.out.println("BasicFBType.getECC()");
+		return theECC;
+	}
+
+	public void addEventInput(String name, Variable var)
+	{
+		eventInputs.put(name,var);
+	}
+	public void addEventOutput(String name, Variable var)
+	{
+		eventOutputs.put(name,var);
+	}
+	public void addDataInput(String name, Variable var)
+	{
+		dataInputs.put(name,var);
+	}
+	public void addDataOutput(String name, Variable var)
+	{
+		dataOutputs.put(name,var);
+	}
+	public void addLocalVariable(String name, Variable var)
+	{
+		localVariables.put(name,var);
+	}
+	
+	public void addAlgorithm(String name, Algorithm algorithm)
+	{
+		algorithms.put(name, algorithm);
+	}
+
+	public Algorithm getAlgorithm()
+	{
+		return (Algorithm) algorithms.get("TestAlgorithm");
+	}
 
 }
