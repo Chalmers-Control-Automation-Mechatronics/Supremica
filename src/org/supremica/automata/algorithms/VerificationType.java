@@ -57,7 +57,7 @@ public class VerificationType
 	public static final VerificationType Controllability = new VerificationType("Controllability");
 	public static final VerificationType InverseControllability = new VerificationType("Inverse Controllability");
 	public static final VerificationType Nonblocking = new VerificationType("Nonblocking");
-	public static final VerificationType MutuallyNonblocking = new VerificationType("Mutual Nonblocking");
+	public static final VerificationType MutuallyNonblocking = new VerificationType("Mutual Nonblocking", false);
 	public static final VerificationType LanguageInclusion = new VerificationType("Language Inclusion");
 	public static final VerificationType Unknown = new VerificationType("Unknown", false);
 	private String description = null;
