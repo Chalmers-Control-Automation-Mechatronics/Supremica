@@ -12,7 +12,7 @@ public class DisjOptimizer
 {
 	private GroupHelper gh;
 	private BDDAutomata manager;
-	private int max_size, size;
+	private int max_size, size, algo;
 	private int[] twave, twave_u;
 	private Cluster[] clusters;
 
@@ -41,6 +41,7 @@ public class DisjOptimizer
 			clusters[i] = new Cluster(manager, automata[i]);
 		}
 
+		algo = Options.disj_optimizer_algo;
 		optimize();
 	}
 
@@ -78,7 +79,7 @@ public class DisjOptimizer
 	{
 
 		// no optimization??
-		if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_NONE)
+		if(algo == Options.DISJ_OPTIMIZER_NONE)
 		{
 			for(int i = 0; i < size; i++)
 			{
@@ -87,11 +88,13 @@ public class DisjOptimizer
 			return;
 		}
 
+		Timer timer = new Timer("DisjOptimizer");
+
 		// this is the re-ordered copy we will use:
 		Cluster [] copy = new Cluster [size];
 
 		// now, get the order: first, see if it is random
-		if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_RANDOM)
+		if(algo == Options.DISJ_OPTIMIZER_RANDOM)
 		{
 
 			int [] perm = Util.permutate(size);
@@ -106,23 +109,32 @@ public class DisjOptimizer
 			for(int i = 0; i < size; i++)
 			{
 				copy[i] = clusters[i];
-				if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_STATE_VECTOR_SIZE)
-				{
-					weight[i] = clusters[i].getSizeOfS();
-				}
-				else if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_DEPENDENCY_SIZE)
-				{
-					weight[i] = clusters[i].getDependencySize();
-				}
-				else if(Options.disj_optimizer_algo == Options.DISJ_OPTIMIZER_INV_DEPENDENCY_SIZE)
-				{
-					weight[i] = 1 / clusters[i].getDependencySize(); // it is never zero (includes itself, remember)?
-				}
 
-				else
+				switch(algo)
 				{
-					// should not happen:
-					throw new RuntimeException("INTERNAL ERROR: bad optimizer algo: " + Options.disj_optimizer_algo);
+					case Options.DISJ_OPTIMIZER_STATE_VECTOR_SIZE:
+						weight[i] = clusters[i].getSizeOfS();
+						break;
+
+					case Options.DISJ_OPTIMIZER_DEPENDENCY_SIZE:
+						weight[i] = clusters[i].getDependencySize();
+						break;
+
+					case Options.DISJ_OPTIMIZER_INV_DEPENDENCY_SIZE:
+						weight[i] = 1 / clusters[i].getDependencySize(); // it is never zero (includes itself, remember)?
+						break;
+
+					case Options.DISJ_OPTIMIZER_ALPHABET_SIZE:
+						weight[i] =  clusters[i].getAlphabetSize();
+						break;
+
+					case Options.DISJ_OPTIMIZER_TWAVE_SIZE:
+						weight[i] =  1 / ( 1 + clusters[i].getBDDSize() ) ;
+						break;
+
+					default:
+						// should not happen:
+						throw new RuntimeException("INTERNAL ERROR: bad optimizer algo: " + Options.disj_optimizer_algo);
 				}
 			}
 
@@ -158,6 +170,9 @@ public class DisjOptimizer
 				copy[i].setActive(true);
 			}
 		}
+
+
+		timer.report("Optimization of disjunctive partitions finished");
 	}
 
 }

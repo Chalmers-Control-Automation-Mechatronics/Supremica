@@ -54,7 +54,7 @@ public class GrowFrame
 		canvas = new GrowCanvas();
 
 		add(canvas, BorderLayout.CENTER);
-		add(ta = new TextArea(20, 60), BorderLayout.WEST);
+		add(ta = new TextArea(25, 80), BorderLayout.WEST);
 		ta.setVisible(false);
 
 		start_time = last_time = -1;

@@ -74,15 +74,20 @@ public class Options
 
 	/** disjunctive optimization algorithm */
 	public static final String [] DISJ_OPTIMIZER_NAMES = {
-			"none", "random", "state-vector size", "dependency size", "1/dependency size" };
+			"none", "random", "largest Q first", "largest LD-1 first",
+			"smallest LD-1 first", "largest alphabet first",
+			"smallest T~ first"
+			};
 	public static final int
 		DISJ_OPTIMIZER_NONE = 0,
 		DISJ_OPTIMIZER_RANDOM = 1,
 		DISJ_OPTIMIZER_STATE_VECTOR_SIZE = 2,
 		DISJ_OPTIMIZER_DEPENDENCY_SIZE = 3,
-		DISJ_OPTIMIZER_INV_DEPENDENCY_SIZE = 4
+		DISJ_OPTIMIZER_INV_DEPENDENCY_SIZE = 4,
+		DISJ_OPTIMIZER_ALPHABET_SIZE = 5,
+		DISJ_OPTIMIZER_TWAVE_SIZE = 6
 		;
-	public static int disj_optimizer_algo = DISJ_OPTIMIZER_NONE;
+	public static int disj_optimizer_algo = DISJ_OPTIMIZER_STATE_VECTOR_SIZE;
 
 	/** language controllability/inclusion algorithms */
 	public static final String[] INCLUSION_ALGORITHM_NAMES = { "Monolithic      ",
@@ -236,7 +241,8 @@ public class Options
 	/** In safe-state supervisor synthesis, we must decide to include reachability or not */
 	public static final String[] SUP_REACHABILITY_NAMES = {
 		"ignored", "forbid dont-care states",
-		"uc(P||Sp) must be reachable", "total reachability constraint"
+		"uc(P||Sp) must be reachable",
+		"total reachability constraint"
 	};
 	public static final int SUP_REACHABILITY_IGNORE = 0,
 		SUP_REACHABILITY_DONTCARE = 1,

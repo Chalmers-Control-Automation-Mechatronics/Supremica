@@ -183,7 +183,6 @@ public class WorksetSupervisor
 			int p = workset.pickOne();
 			int r_all_org = r_all;
 
-
 			do
 			{
 				r_all_p = r_all;

@@ -125,7 +125,7 @@ public class StepStoneSupervisor
 
 
 	// --- [ safe state supervisory stuff ] -----------------------------------------
-	// XXX: this fails when doing supNBC on AGV!!
+	// XXX: this used to fail when doing supNBC on AGV, dont know why and dont know why it stopped :)
 	protected int restrictedBackward(int marked, int forbidden)
 	{
 
@@ -183,8 +183,6 @@ public class StepStoneSupervisor
 
 
 	// -------------------------------------------------------
-
-	// XXX: maybe this also fails, but just not on the AGV model???
 	protected int uncontrollableBackward(int states)
 	{
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "uncontrollableBackward " + type());
