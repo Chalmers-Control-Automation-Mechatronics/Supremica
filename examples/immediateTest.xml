@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata>
+<Automaton name="A1" type="Plant">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b" immediate="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="a"/>
+		<Transition source="q2" dest="q3" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="A2" type="Plant">
+	<Events>
+		<Event id="c" label="c"/>
+		<Event id="d" label="d" immediate="true"/>
+	</Events>
+	<States>
+		<State id="q1" initial="true"/>
+		<State id="q2"/>
+		<State id="q3"/>
+	</States>
+	<Transitions>
+		<Transition source="q1" dest="q2" event="c"/>
+		<Transition source="q2" dest="q3" event="d"/>
+	</Transitions>
+</Automaton>
+</Automata>
