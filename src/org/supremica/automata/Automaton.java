@@ -419,6 +419,9 @@ public class Automaton
 		return false;
 	}
 
+	/**
+	 * True if automaton has at least one self loop.
+	 */
 	public boolean hasSelfLoop()
 	{
 		for(ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext();)
@@ -698,6 +701,40 @@ public class Automaton
 		return theArcs.size();
 	}
 
+	/**
+	 * Amount of selfloops in automaton.
+	 */
+	public int nbrOfSelfLoops()
+	{
+		int amount = 0;
+		for(ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext();)
+		{
+			Arc currArc = arcIt.nextArc();
+			if (currArc.isSelfLoop())
+			{
+				amount++;
+			}
+		}
+		return amount;
+	}
+
+	/**
+	 * Amount of selfloops of the events in anAlphabet
+	 */
+	public int nbrOfSelfLoops(Alphabet anAlphabet)
+	{
+		int amount = 0;
+		for(ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext();)
+		{
+			Arc currArc = arcIt.nextArc();
+			if (currArc.isSelfLoop() && anAlphabet.contains(currArc.getEvent()))
+			{
+				amount++;
+			}
+		}
+		return amount;
+	}
+
 	public int nbrOfAcceptingStates()
 	{
 		int nbrOfAcceptingStates = 0;
@@ -750,6 +787,67 @@ public class Automaton
 		return nbrOfAcceptingAndForbiddenStates;
 	}
 
+	/**
+	 * Returns depth of automaton.
+	 */
+	public int depth()
+	{
+		int depth=0;
+		
+		for (StateIterator stateIterator = stateIterator(); stateIterator.hasNext();)
+		{
+			// Measure the shortest trace to the state.
+			State currState = stateIterator.nextState();
+			int stateDepth;
+			try
+			{
+				stateDepth = getTrace(currState).size();
+			}
+			catch (Exception ex)
+			{
+				logger.error(ex);
+				return Integer.MAX_VALUE;
+			}
+			if (stateDepth>depth)
+				depth = stateDepth;
+		}
+		
+		return depth;
+	}
+
+	/**
+	 * Returns mean depth of transitions of events in anAlphabet.
+	 */
+	public int depthSum(Alphabet anAlphabet)
+	{
+		int depthSum = 0;
+		
+		for (StateIterator stateIterator = stateIterator(); stateIterator.hasNext();)
+		{
+			// Measure the shortest trace to the state.
+			State currState = stateIterator.nextState();
+			int stateDepth;
+			try
+			{
+				stateDepth = getTrace(currState).size();
+			}
+			catch (Exception ex)
+			{
+				logger.error(ex);
+				return Integer.MAX_VALUE;
+			}
+
+			// Calculate sum of
+			for (ArcIterator arcIterator = currState.outgoingArcsIterator();arcIterator.hasNext();)
+			{
+				if (anAlphabet.contains(arcIterator.nextEvent()))
+					depthSum += stateDepth;
+			}
+		}		
+		
+		return depthSum;
+	}
+	
 	public StateIterator stateIterator()
 	{
 		return new StateIterator(theStates.iterator());

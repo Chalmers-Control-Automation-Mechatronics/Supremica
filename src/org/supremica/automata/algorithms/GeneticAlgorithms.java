@@ -62,12 +62,15 @@ public class GeneticAlgorithms
 {
 	private static Logger logger = LoggerFactory.createLogger(GeneticAlgorithms.class);
 
-	private static final int GA_DATA_SIZE = 8;
+	private static final int GA_DATA_SIZE = 16;
 
 	public static double[] extractData(Automaton autA, Automaton autB)
 	{
 		double[] data = new double[GA_DATA_SIZE];
-
+		
+		for (int i=0; i<GA_DATA_SIZE; i++)
+			data[i] = 0.0;
+		
 		/* // OLD ATTEMPT... NO GOOD... DON'T USE THIS AGAIN!
 		  // Amount of states in autA
 		  data[0] = autA.nbrOfStates();
@@ -98,35 +101,91 @@ public class GeneticAlgorithms
 
 		Alphabet alphabetIntersection = Alphabet.intersect(autA.getAlphabet(), autB.getAlphabet());
 		// Percentage of common events in autA
-		data[2] = ((double) alphabetIntersection.size())/((double) (autA.nbrOfEvents()));
+		data[2] = ((double) alphabetIntersection.size())/((double) autA.nbrOfEvents());
 		// Percentage of common events in autB
-		data[3] = ((double) alphabetIntersection.size())/((double) (autB.nbrOfEvents()));
+		data[3] = ((double) alphabetIntersection.size())/((double) autB.nbrOfEvents());
 
 		// Amount of transitions in autA
 		data[4] = autA.nbrOfTransitions();
 		// Amount of transitions in autB
 		data[5] = autB.nbrOfTransitions();
 
+		// Percentage of selfloops among transitions in autA
+		if (data[4] == 0)
+			data[8] = 0;
+		else
+			data[8] = ((double) autA.nbrOfSelfLoops())/data[4];
+		// Percentage of selfloops among transitions in autB
+		if (data[5] == 0)
+			data[9] = 0;
+		else
+			data[9] = ((double) autB.nbrOfSelfLoops())/data[5];
+
 		// Percentage of transitions with common events in autA
 		ArcIterator arcIterator = autA.arcIterator();
-		int commonTransitions = 0;
+		int commonTransitionsA = 0;
 		while (arcIterator.hasNext())
 			if (alphabetIntersection.contains(arcIterator.nextEvent()))
-				commonTransitions++;
-		data[6] = ((double) commonTransitions)/((double) autA.nbrOfTransitions());
+				commonTransitionsA++;
+		data[6] = ((double) commonTransitionsA)/((double) autA.nbrOfTransitions());
+		// Percentage of common transitions that are selfloops in autA
+		if (commonTransitionsA == 0)
+			data[10] = 0;
+		else
+			data[10] = ((double) autA.nbrOfSelfLoops(alphabetIntersection))/commonTransitionsA;
 		// Percentage of transitions with common events in autB
 		arcIterator = autB.arcIterator();
-		commonTransitions = 0;
+		int commonTransitionsB = 0;
 		while (arcIterator.hasNext())
 			if (alphabetIntersection.contains(arcIterator.nextEvent()))
-				commonTransitions++;
-		data[7] = ((double) commonTransitions)/((double) autB.nbrOfTransitions());
+				commonTransitionsB++;
+		data[7] = ((double) commonTransitionsB)/((double) autB.nbrOfTransitions());
+		// Percentage of common transitions that are selfloops in autB
+		if (commonTransitionsB == 0)
+			data[11] = 0;
+		else
+			data[11] = ((double) autB.nbrOfSelfLoops(alphabetIntersection))/commonTransitionsB;
+		
+		// Depth of autA
+		data[12] = autA.depth();
+		// Depth of autB
+		data[13] = autB.depth();		
+		
+		// Mean depth of occurences of common events in autA
+		if (commonTransitionsA*data[12] == 0)
+			data[14] = 0;
+		else
+			data[14] = autA.depthSum(alphabetIntersection)/((double) commonTransitionsA*data[12]);
+		// Mean depth of occurences of common events in autB
+		if (commonTransitionsB*data[13] == 0)
+			data[15] = 0;
+		else
+			data[15] = autB.depthSum(alphabetIntersection)/((double) commonTransitionsB*data[13]);
 
+		/*
 		// Rounding... just for esthetical reasons
-		data[2] = Math.round(100000*data[2])/100000.0;
-		data[3] = Math.round(100000*data[3])/100000.0;
-		data[6] = Math.round(100000*data[6])/100000.0;
-		data[7] = Math.round(100000*data[7])/100000.0;
+		data[2] = Math.round(100000.0*data[2])/100000.0;
+		data[3] = Math.round(100000.0*data[3])/100000.0;
+		data[6] = Math.round(100000.0*data[6])/100000.0;
+		data[7] = Math.round(100000.0*data[7])/100000.0;
+		data[8] = Math.round(100000.0*data[8])/100000.0;
+		data[9] = Math.round(100000.0*data[9])/100000.0;
+		data[10] = Math.round(100000.0*data[10])/100000.0;
+		data[11] = Math.round(100000.0*data[11])/100000.0;
+		data[14] = Math.round(100000.0*data[14])/100000.0;
+		data[15] = Math.round(100000.0*data[15])/100000.0;
+		*/
+
+		data[2] = ((int) (100000.0*data[2]))/100000.0;
+		data[3] = ((int) (100000.0*data[3]))/100000.0;
+		data[6] = ((int) (100000.0*data[6]))/100000.0;
+		data[7] = ((int) (100000.0*data[7]))/100000.0;
+		data[8] = ((int) (100000.0*data[8]))/100000.0;
+		data[9] = ((int) (100000.0*data[9]))/100000.0;
+		data[10] = ((int) (100000.0*data[10]))/100000.0;
+		data[11] = ((int) (100000.0*data[11]))/100000.0;
+		data[14] = ((int) (100000.0*data[14]))/100000.0;
+		data[15] = ((int) (100000.0*data[15]))/100000.0;
 
 		// CONCEIVABLE DATA THAT MIGHT BE OF INTEREST
 		// * Amount of states

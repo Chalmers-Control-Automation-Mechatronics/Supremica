@@ -182,7 +182,6 @@ public class Alphabet
 		addEvent(event, true);
 	}
 
-
 	/**
 	 * Add an event to the alphabet. If an event with the same id already exists
 	 * and doThrow is true, then throw an exception, else generate a unique id
@@ -300,7 +299,7 @@ public class Alphabet
 				LabeledEvent newEvent = new LabeledEvent(currEvent);
 				try
 				{
-					result.addEvent(newEvent, false);
+					result.addEvent(newEvent);
 				}
 				catch (Exception ex)
 				{   // This should be impossible

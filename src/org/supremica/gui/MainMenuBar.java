@@ -571,40 +571,6 @@ public class MainMenuBar
 			});
 		}
 
-		// Evolution
-		if (SupremicaProperties.showGeneticAlgorithms())
-		{
-			JMenu menuEvoComp = new JMenu();
-
-			menuEvoComp.setText("EvoComp");
-			menuEvoComp.setMnemonic(KeyEvent.VK_E);
-			add(menuEvoComp);
-
-			// EvoComp.CalculateSynchTable
-			JMenuItem synchTable = new JMenuItem();
-			synchTable.setText("Calculate Synchtable");
-			menuEvoComp.add(synchTable);
-			synchTable.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
-					}
-				});
-
-			// EvoComp.PredictSize
-			JMenuItem predictSize = new JMenuItem();
-			predictSize.setText("Predict Synchronization Size");
-			menuEvoComp.add(predictSize);
-			predictSize.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.evoCompPredictSize(ActionMan.getGui());
-					}
-				});
-		}
-
 		// Supremica - Robotstudio link
 		if (SupremicaProperties.showRobotstudioLink())
 		{
@@ -702,6 +668,7 @@ public class MainMenuBar
 			});
 		}
 
+		// Tools.CodeGeneration
 		JMenu menuToolsCodeGeneration = new JMenu();
 
 		menuToolsCodeGeneration.setText("Code Generation");
@@ -848,6 +815,79 @@ public class MainMenuBar
 			}
 		});
 
+
+
+
+
+
+
+
+/*
+		// Tools.CodeGeneration
+		JMenu menuToolsCodeGeneration = new JMenu();
+
+		menuToolsCodeGeneration.setText("Code Generation");
+		menuTools.add(menuToolsCodeGeneration);
+
+		JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
+
+		menuToolsCodeGenerationIL.setText("IEC-61131 Instruction List...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
+		menuToolsCodeGenerationIL.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				ActionMan.ProjectTo1131IL(ActionMan.getGui());
+			}
+		});
+
+		JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
+
+		menuToolsCodeGeneration1131ST.setText("IEC-61131 Structured Text...");
+		menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
+		menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.ProjectTo1131ST(ActionMan.getGui());
+			}
+		});
+*/
+
+
+		// Tools.Evolution
+		if (SupremicaProperties.showGeneticAlgorithms())
+		{
+			JMenu menuEvoComp = new JMenu();
+
+			menuEvoComp.setText("Evolution");
+			menuTools.add(menuEvoComp);
+
+			// EvoComp.CalculateSynchTable
+			JMenuItem synchTable = new JMenuItem();
+			synchTable.setText("Calculate Synchtable");
+			menuEvoComp.add(synchTable);
+			synchTable.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
+					}
+				});
+
+			// EvoComp.PredictSize
+			JMenuItem predictSize = new JMenuItem();
+			predictSize.setText("Predict Synchronization Size");
+			menuEvoComp.add(predictSize);
+			predictSize.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.evoCompPredictSize(ActionMan.getGui());
+					}
+				});
+		}
 
 		// Configure
 		JMenu menuConfigure = new JMenu();

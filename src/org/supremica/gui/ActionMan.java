@@ -2300,6 +2300,13 @@ public class ActionMan
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", 
+										  "Alert", JOptionPane.ERROR_MESSAGE);			
+			return;
+		}
+
 		Automaton automatonA;
 		Automaton automatonB;
 		FileWriter outFile = null;
@@ -2316,13 +2323,13 @@ public class ActionMan
 			syncOptions = new SynchronizationOptions();
 			outFile = new FileWriter("SynchTable.txt", append);
 
-			int dataAmount = 500;
+			int dataAmount = 1000;
 			for (int i=0; i<dataAmount; i++)
 			{
 				// Find two random automata
 				automatonA = selectedAutomata.getAutomatonAt((int) (Math.random()*selectedAutomata.size()));
 				automatonB = selectedAutomata.getAutomatonAt((int) (Math.random()*selectedAutomata.size()));
-				//System.out.println(automatonA.getName() + automatonB.getName());
+				//System.out.println(automatonA.getName() + " " + automatonB.getName());
 
 				data = GeneticAlgorithms.extractData(automatonA, automatonB);
 				Automata theTwoAutomata = new Automata();
@@ -2337,7 +2344,7 @@ public class ActionMan
 				}
 				else
 				{
-					// Writes data[0]..data[7] and correctValue to the file
+					// Writes data[0]..data[GA_DATA_SIZE] and correctValue to the file
 					for (int j=0;j<data.length;j++)
 					{
 						outFile.write(data[j] + "\t");
@@ -2359,6 +2366,13 @@ public class ActionMan
 	public static void evoCompPredictSize(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+		
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", 
+										  "Alert", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 
 		double predictedSize = GeneticAlgorithms.predictSynchronizationSize(selectedAutomata);
 
@@ -2385,17 +2399,6 @@ public class ActionMan
 		}
 	}
 
-	/**
-	 * Calculates table with information for use with an (external) genetic programming system.
-	 * This is a part of a project in a course in Evolutionary Computation, FFR105 (2002) at
-	 * Chalmers University of Technology.
-	 *
-	 * To use this you have to set a boolean in GeneticAlgorithms.java.
-	 *
-	 * Writes 8 columns of data and a correct value on each line of an output file
-	 *
-	 * @author Hugo Flordal, hugo@s2.chalmers.se
-	 */
 	public static void robotStudioTest(Gui gui)
 	{
 		//RobotStudioLink robotStudioLink = new RobotStudioLink();
