@@ -2,70 +2,51 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import java.awt.Component;
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import org.supremica.gui.WhiteScrollPane;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 
-class EditorPanel
-	extends JPanel
+public class EditorPanel
+	extends MainPanel
 {
-	private ModuleContainer moduleContainer;
-	private String name;
-	private IDEToolBar editorToolBar = null;
-	private IDEToolBar currParentToolBar = null;
 	private JTabbedPane tabPanel;
-	private JPanel componentEditorPanel;
-	private JPanel emptyComponentEditorPanel;
+	private JComponent componentEditorPanel;
 
 	private EditorParametersPanel parametersPanel;
 	private EditorEventsPanel eventsPanel;
 	private EditorAliasesPanel aliasesPanel;
 	private EditorComponentsPanel componentsPanel;
-	private JSplitPane splitPanelHorizontal;
-	private Dimension panelPreferredSize;
-	private Dimension panelMinimumSize;
-	private int preferredHeight = 400;
 
-	EditorPanel(ModuleContainer moduleContainer, String name)
+	public EditorPanel(ModuleContainer moduleContainer, String name)
 	{
-		this.moduleContainer = moduleContainer;
-		this.name = name;
-
-		panelPreferredSize = new Dimension(250, preferredHeight);
-		panelMinimumSize = new Dimension(100, 100);
-		setPreferredSize(panelPreferredSize);
-		setMinimumSize(panelMinimumSize);
+		super(moduleContainer, name);
 
 		tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
-		tabPanel.setPreferredSize(panelPreferredSize);
-		tabPanel.setMinimumSize(panelMinimumSize);
+		tabPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+		tabPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 
 		aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
-		aliasesPanel.setPreferredSize(panelPreferredSize);
-		aliasesPanel.setMinimumSize(panelMinimumSize);
+		aliasesPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+		aliasesPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(aliasesPanel);
 
 		componentsPanel = new EditorComponentsPanel(moduleContainer, "Components");
-		componentsPanel.setPreferredSize(panelPreferredSize);
-		componentsPanel.setMinimumSize(panelMinimumSize);
+		componentsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+		componentsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(componentsPanel);
 
 		eventsPanel = new EditorEventsPanel(moduleContainer, "Events");
-		eventsPanel.setPreferredSize(panelPreferredSize);
-		eventsPanel.setMinimumSize(panelMinimumSize);
+		eventsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+		eventsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(eventsPanel);
 
 		parametersPanel = new EditorParametersPanel(moduleContainer, "Parameters");
-		parametersPanel.setPreferredSize(panelPreferredSize);
-		parametersPanel.setMinimumSize(panelMinimumSize);
+		parametersPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+		parametersPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(parametersPanel);
 
 		tabPanel.setSelectedComponent(componentsPanel);
 
-		emptyComponentEditorPanel = new EmptyComponentEditorPanel();
-		componentEditorPanel = emptyComponentEditorPanel;
+		componentEditorPanel = getEmptyRightPanel();
 
 		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, componentEditorPanel);
 		splitPanelHorizontal.setContinuousLayout(false);
@@ -73,82 +54,15 @@ class EditorPanel
 		splitPanelHorizontal.setDividerLocation(0.2);
 		splitPanelHorizontal.setResizeWeight(0.0);
 
-		final GridBagLayout gridbag = new GridBagLayout();
-		final GridBagConstraints constraints = new GridBagConstraints();
-
-		constraints.gridy = 0;
-		constraints.weighty = 1.0;
-		constraints.anchor = GridBagConstraints.NORTH;
-
-		setLayout(gridbag);
-
-		constraints.weightx = 1.0;
-		constraints.fill = GridBagConstraints.BOTH;
-
-		gridbag.setConstraints(splitPanelHorizontal, constraints);
+		((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
 		add(splitPanelHorizontal);
-
-
 	}
 
-	public String getName()
+
+	public void addToolBarEntries(JToolBar toolBar)
 	{
-		return name;
+		toolBar.addSeparator();
+		toolBar.addSeparator();
 	}
 
-
-	public void setActiveComponentEditorPanel(JPanel newPanel)
-	{
-		Component oldPanel = splitPanelHorizontal.getRightComponent();
-		if (oldPanel != newPanel)
-		{
-			Dimension oldSize = emptyComponentEditorPanel.getSize();
-
-			if (oldPanel != null)
-			{
-				splitPanelHorizontal.remove(oldPanel);
-				oldSize = oldPanel.getSize();
-			}
-
-			if (newPanel == null)
-			{
-				emptyComponentEditorPanel.setPreferredSize(oldSize);
-				splitPanelHorizontal.setRightComponent(emptyComponentEditorPanel);
-			}
-			else
-			{
-				newPanel.setPreferredSize(oldSize);
-				splitPanelHorizontal.setRightComponent(newPanel);
-			}
-		}
-
-		validate();
-
-	}
-
-	public JToolBar getToolBar(JToolBar parentToolBar)
-	{
-		if (parentToolBar instanceof IDEToolBar)
-		{
-			if (parentToolBar == currParentToolBar)
-			{
-				return editorToolBar;
-			}
-			editorToolBar = new IDEToolBar((IDEToolBar)parentToolBar);
-			editorToolBar.addSeparator();
-			currParentToolBar = (IDEToolBar)parentToolBar;
-			return editorToolBar;
-		}
-		return null;
-	}
-
- 	class EmptyComponentEditorPanel
- 		extends JPanel
- 	{
-		public EmptyComponentEditorPanel()
-		{
-			setPreferredSize(new Dimension(600, preferredHeight));
-			setMinimumSize(panelMinimumSize);
-		}
-	}
 }

@@ -12,7 +12,13 @@ public class Actions
 	public CloseAction closeAction;
 	public SaveAction saveAction;
 	public ExitAction exitAction;
-	public NewEventAction newEventAction;
+
+	public EditorSelectAction editorSelectAction;
+
+	public EditorAddStateAction editorAddStateAction;
+	public EditorAddNodeGroupAction editorAddNodeGroupAction;
+	public EditorAddTransitionAction editorAddTransitionAction;
+	public EditorAddEventAction editorAddEventAction;
 
 	public Actions(IDE ide)
 	{
@@ -24,7 +30,11 @@ public class Actions
 		saveAction = new SaveAction(ide);
 		exitAction = new ExitAction(ide);
 
-		newEventAction = new NewEventAction(ide);
+		editorSelectAction = new EditorSelectAction(ide);
 
+		editorAddStateAction = new EditorAddStateAction(ide);
+		editorAddNodeGroupAction = new EditorAddNodeGroupAction(ide);
+		editorAddTransitionAction = new EditorAddTransitionAction(ide);
+		editorAddEventAction = new EditorAddEventAction(ide);
 	}
 }

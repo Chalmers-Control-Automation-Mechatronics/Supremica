@@ -9,6 +9,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.gui.VisualProject;
 import org.supremica.automata.Project;
+import org.supremica.gui.ide.actions.Actions;
 
 public class ModuleContainer
 {
@@ -47,6 +48,11 @@ public class ModuleContainer
 	public JToolBar getAnalyzerPanel(JToolBar mainToolBar)
 	{
 		return getAnalyzerPanel().getToolBar(mainToolBar);
+	}
+
+	public Actions getActions()
+	{
+		return ide.getActions();
 	}
 
 	public EditorPanel getEditorPanel()

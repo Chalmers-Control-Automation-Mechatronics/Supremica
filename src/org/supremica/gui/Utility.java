@@ -27,6 +27,11 @@ public class Utility
 		frame.setIconImage(Supremica.cornerImage);    // from Frame
 	}
 
+	public static void setupFrame(JFrame frame, Dimension dimension)
+	{
+		setupFrame(frame, (int)dimension.getWidth(), (int)dimension.getHeight());
+	}
+
 	public static void setupPane(JScrollPane pane)
 	{
 		pane.getViewport().setBackground(Color.white);

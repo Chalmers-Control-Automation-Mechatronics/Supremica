@@ -156,7 +156,7 @@ class AnalyzerAutomataPanel
 						{
 							Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
 							AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel(moduleContainer, "Dot View", selectedAutomaton);
-							analyzerPanel.setActiveAutomatonViewerPanel(automatonPanel);
+							analyzerPanel.setRightComponent(automatonPanel);
 						}
 						else
 						{

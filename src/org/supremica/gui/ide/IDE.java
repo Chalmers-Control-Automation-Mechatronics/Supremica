@@ -39,7 +39,7 @@ public class IDE
 
     public IDE()
     {
-		Utility.setupFrame(this, 1000, 700);
+		Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
 		setTitle(getName());
 		moduleContainers = new ModuleContainers(this);
 		ModuleContainer defaultModule = createNewModuleContainer();
@@ -67,7 +67,6 @@ public class IDE
 
 		tabPanel = new JTabbedPane();
 		tabPanel.addChangeListener(this);
-//		tabPanel.setLayout(new BorderLayout());
 
 		ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
 		tabPanel.add(currModuleContainer.getEditorPanel());
@@ -170,7 +169,7 @@ public class IDE
 
 	private void setToolBar(JToolBar toolBar)
 	{
-		System.err.println("setToolBar");
+		//System.err.println("setToolBar");
 		if (toolBar == null)
 		{
 			return;

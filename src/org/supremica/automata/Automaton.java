@@ -167,8 +167,9 @@ public class Automaton
 		}
 		catch (Exception ex)
 		{
+//			logger.error(ex);
 			logger.error("Error while copying transitions", ex);
-			ex.printStackTrace();
+			//ex.printStackTrace();
 			logger.debug(ex.getStackTrace());
 		}
 	}
