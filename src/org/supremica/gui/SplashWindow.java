@@ -12,8 +12,8 @@ public class SplashWindow
         {
                 super(new Frame());
 
-                int height = splashIcon.getHeight();
-                int width = splashIcon.getWidth();
+                int height = splashIcon.getIconHeight();
+                int width = splashIcon.getIconWidth();
 
                 this.setSize(new Dimension(width, height));
 
