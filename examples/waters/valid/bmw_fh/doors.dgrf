@@ -1,0 +1,11 @@
+dgrf2.4.7
+//s 198 81
+2
+u CLOSE.DOOR
+u OPEN.DOOR
+2
+112 80 8 1 1 -54 6 closed
+208 80 8 0 0 14 4 open
+2
+3 open closed 159 63 -43 -7 1 0 0 0
+3 closed open 159 96 -40 19 1 1 0 0

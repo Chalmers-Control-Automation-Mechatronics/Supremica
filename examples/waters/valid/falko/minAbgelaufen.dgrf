@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="minAbgelaufen" version="1.0" valid="1"
+	hasGeometry="1" width="212" height="99"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 06:34:22 GMT" modificationDate="2004-09-07 06:34:22 GMT">
+	<events>
+		<event controllable="1" name="abfahrBereit"/>
+		<event controllable="0" name="minAbgelaufen"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="96"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="96"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="168" y="119"/></rendering>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-48" y="19"/></rendering>
+				<label name="minAbgelaufen"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="164" y="72"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-8"/></rendering>
+				<label name="abfahrBereit"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="262" y="79"/></rendering>
+			<source name="s1"/>
+			<labelGroup>
+				<rendering><point x="-43" y="-16"/></rendering>
+				<label name="minAbgelaufen"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

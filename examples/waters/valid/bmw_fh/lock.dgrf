@@ -1,0 +1,21 @@
+dgrf2.0.2
+//s 198 209
+6
+u KEY_PLUG
+u KEY_UNPLUG
+u KL_50_OFF
+u KL_50_ON
+u KL_R_OFF
+u KL_R_ON
+4
+176 48 8 1 1 -54 4 no_key
+176 112 8 0 0 -36 3 key
+176 240 8 0 0 -50 4 starter
+176 176 8 0 0 -42 5 radio
+6
+3 starter radio 160 208 -76 4 1 2 0 0
+3 no_key key 188 78 8 4 1 0 0 0
+3 key no_key 162 80 -92 4 1 1 0 0
+3 key radio 193 142 3 3 1 5 0 0
+3 radio starter 192 209 7 2 1 3 0 0
+3 radio key 160 144 -68 4 1 4 0 0

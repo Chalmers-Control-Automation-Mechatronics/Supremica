@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="eingabe_er" version="1.0" valid="1"
+	hasGeometry="1" width="327" height="359"
+	generatorName="DGE" generatorVersion="2.7.5"
+	creationDate="2000-11-09 14:20:19 GMT+00:00" modificationDate="2000-11-09 14:20:19 GMT+00:00">
+	<events>
+		<event controllable="1" name="CS_ok"/>
+		<event controllable="1" name="ER"/>
+		<event controllable="0" name="ER_BT"/>
+		<event controllable="0" name="ER_FS"/>
+		<event controllable="0" name="ER_FT"/>
+		<event controllable="0" name="ER_HK"/>
+		<event controllable="1" name="soft_CS"/>
+		<event controllable="0" name="TASTVR"/>
+		<event controllable="0" name="VR_BT"/>
+		<event controllable="0" name="VR_FS"/>
+		<event controllable="0" name="VR_FT"/>
+		<event controllable="0" name="VR_HK"/>
+		<event controllable="1" name="WSP"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="160"/></rendering>
+			<label name="IN">
+				<rendering><point x="-21" y="-6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="272" y="160"/></rendering>
+			<label name="ER">
+				<rendering><point x="6" y="-8"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="112" y="320"/></rendering>
+			<label name="C2">
+				<rendering><point x="-22" y="14"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="272" y="320"/></rendering>
+			<label name="C1">
+				<rendering><point x="7" y="16"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="75" y="135"/></rendering>
+			<source name="IN"/>
+			<labelGroup>
+				<rendering><point x="-42" y="-40"/></rendering>
+				<label name="WSP"/>
+				<label name="ER_FT">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="ER_FS">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="VR_FT">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="VR_BT">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="VR_HK">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+				<label name="VR_FS">
+					<rendering><point x="0" y="96"/></rendering>
+				</label>
+				<label name="TASTVR">
+					<rendering><point x="0" y="112"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="C1"/>
+			<labelGroup>
+				<rendering><point x="1" y="-3"/></rendering>
+				<label name="soft_CS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="ER"/>
+			<labelGroup>
+				<rendering><point x="5" y="-1"/></rendering>
+				<label name="ER_BT"/>
+				<label name="ER_HK">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="307" y="351"/></rendering>
+			<source name="C1"/>
+			<labelGroup>
+				<rendering><point x="-5" y="-72"/></rendering>
+				<label name="ER_FS"/>
+				<label name="VR_FT">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="VR_BT">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="VR_HK">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="VR_FS">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="TASTVR">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="C1"/>
+			<target name="C2"/>
+			<labelGroup>
+				<rendering><point x="-15" y="-2"/></rendering>
+				<label name="ER_FT"/>
+				<label name="ER_BT">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="ER_HK">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="C2"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="2" y="2"/></rendering>
+				<label name="CS_ok"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="76" y="347"/></rendering>
+			<source name="C2"/>
+			<labelGroup>
+				<rendering><point x="-43" y="-111"/></rendering>
+				<label name="ER_FT"/>
+				<label name="ER_BT">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="ER_HK">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="ER_FS">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="VR_FT">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="VR_BT">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+				<label name="VR_HK">
+					<rendering><point x="0" y="96"/></rendering>
+				</label>
+				<label name="VR_FS">
+					<rendering><point x="0" y="112"/></rendering>
+				</label>
+				<label name="TASTVR">
+					<rendering><point x="0" y="128"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="192" y="136"/></rendering>
+			<source name="ER"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-106"/></rendering>
+				<label name="ER_FT"/>
+				<label name="ER_FS">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="VR_FT">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="VR_BT">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="VR_HK">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="VR_FS">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+				<label name="TASTVR">
+					<rendering><point x="0" y="96"/></rendering>
+				</label>
+				<label name="ER">
+					<rendering><point x="0" y="112"/></rendering>
+				</label>
+				<label name="WSP">
+					<rendering><point x="0" y="128"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ER"/>
+			<target name="C1"/>
+			<labelGroup>
+				<rendering><point x="4" y="3"/></rendering>
+				<label name="soft_CS"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="299" y="133"/></rendering>
+			<source name="ER"/>
+			<labelGroup>
+				<rendering><point x="2" y="-7"/></rendering>
+				<label name="ER_BT"/>
+				<label name="ER_HK">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

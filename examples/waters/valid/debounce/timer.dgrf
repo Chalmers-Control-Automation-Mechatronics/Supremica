@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="timer" version="1.0" valid="1"
+	hasGeometry="1" width="152" height="93"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-05 08:28:04 GMT+00:00" modificationDate="2000-10-05 08:28:04 GMT+00:00">
+	<events>
+		<event controllable="1" name="reset.I"/>
+		<event controllable="0" name="timeout.I"/>
+		<event controllable="1" name="timer.I"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="144" y="48"/></rendering>
+			<label name="on">
+				<rendering><point x="12" y="5"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="48" y="48"/></rendering>
+			<label name="off">
+				<rendering><point x="-25" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="97" y="65"/></rendering>
+			<source name="off"/>
+			<target name="on"/>
+			<labelGroup>
+				<rendering><point x="-16" y="16"/></rendering>
+				<label name="timer.I"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="96" y="32"/></rendering>
+			<source name="on"/>
+			<target name="off"/>
+			<labelGroup>
+				<rendering><point x="-21" y="-19"/></rendering>
+				<label name="reset.I"/>
+				<label name="timeout.I">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

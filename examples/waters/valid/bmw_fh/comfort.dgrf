@@ -1,0 +1,52 @@
+dgrf2.0.2
+//s 598 468
+11
+c CMFT_BACK.FUNC
+c cmft_cond_doors
+c cmft_cond_key
+c CMFT_FRONT.FUNC
+c CMFT_ROOF.FUNC
+c cmft_start
+u REQ.FUNC
+u REQ.STOP
+c reset
+u timeout
+c timer
+12
+528 176 8 0 0 14 9 request
+336 288 8 1 1 -4 -21 init
+96 208 8 0 0 -84 1 timeout_roof
+224 528 8 0 0 -37 24 timer_front
+144 480 8 0 0 -82 16 timeout_front
+160 112 8 0 0 -44 0 roof
+560 304 8 0 0 13 7 timer
+80 304 8 0 0 -69 4 timer_roof
+336 544 8 0 0 -12 20 back
+96 400 8 0 0 -40 4 front
+464 512 8 0 0 13 4 start
+544 432 8 0 0 15 3 timeout
+24
+1 timer_roof timeout_roof -58 -4 1 9 0 0
+3 timer_roof init 185 280 -53 -8 3 7 0 0 1 0 16 2 0 32
+1 start back 0 24 1 0 0 0
+3 start init 378 423 -5 17 3 7 0 0 1 0 16 2 0 32
+3 timeout_roof init 203 225 -52 -17 3 7 0 0 1 0 16 2 0 32
+1 timeout_roof roof -107 -14 1 4 0 0
+1 front timer_roof -39 10 1 10 0 0
+3 front init 183 332 -48 -1 3 7 0 0 1 0 16 2 0 32
+1 timeout start 9 13 1 5 0 0
+3 timeout init 420 391 6 -7 3 7 0 0 1 0 16 2 0 32
+3 back init 301 432 -8 55 3 7 0 0 1 0 16 2 0 32
+1 back timer_front -12 20 1 10 0 0
+2 init 337 249 -17 -106 7 9 0 0 8 0 16 10 0 32 7 0 48 1 0 64 2 0 80 5 0 96
+3 init request 430 230 -21 -31 1 6 0 0
+3 timer_front init 251 405 -50 42 3 7 0 0 1 0 16 2 0 32
+1 timer_front timeout_front -40 20 1 9 0 0
+1 timer timeout 9 1 1 9 0 0
+3 timer init 442 333 -12 -14 3 7 0 0 1 0 16 2 0 32
+1 timeout_front front -108 23 1 3 0 0
+3 timeout_front init 207 380 -43 9 3 7 0 0 1 0 16 2 0 32
+3 roof init 254 157 -68 -25 3 7 0 0 1 0 16 2 0 32
+3 request init 445 257 -34 0 3 7 0 0 1 0 16 2 0 32
+1 request timer 9 2 1 10 0 0
+2 request 546 142 -67 -18 2 9 0 0 8 0 16

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="machine" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name="@omega"/>
+        <Event Kind="UNCONTROLLABLE" Name="break"/>
+        <Event Kind="UNCONTROLLABLE" Name="finish"/>
+        <Event Kind="CONTROLLABLE" Name="repair"/>
+        <Event Kind="CONTROLLABLE" Name="start"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="PLANT" Name="machine">
+            <EventRefList>
+                <EventRef Name="@omega"/>
+                <EventRef Name="break"/>
+                <EventRef Name="finish"/>
+                <EventRef Name="repair"/>
+                <EventRef Name="start"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="false" Name="down"/>
+                <State Initial="true" Name="idle">
+                    <EventRefList>
+                        <EventRef Name="@omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="working"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="start" Source="idle" Target="working"/>
+                <Transition Event="finish" Source="working" Target="idle"/>
+                <Transition Event="break" Source="working" Target="down"/>
+                <Transition Event="repair" Source="down" Target="idle"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

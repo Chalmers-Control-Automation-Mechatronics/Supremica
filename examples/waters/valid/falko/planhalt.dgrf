@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="planhalt" version="1.0" valid="1"
+	hasGeometry="1" width="253" height="104"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 06:34:18 GMT" modificationDate="2004-09-07 06:34:18 GMT">
+	<events>
+		<event controllable="1" name="bereitFahrt"/>
+		<event controllable="0" name="zugAn.PH"/>
+		<event controllable="0" name="zugAn.WH"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="80" y="80"/></rendering>
+			<label name="notInPlanhalt">
+				<rendering><point x="-34" y="23"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="192" y="80"/></rendering>
+			<label name="inPlanhalt">
+				<rendering><point x="-2" y="22"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="134" y="100"/></rendering>
+			<source name="notInPlanhalt"/>
+			<target name="inPlanhalt"/>
+			<labelGroup>
+				<rendering><point x="-24" y="18"/></rendering>
+				<label name="zugAn.PH"/>
+				<label name="zugAn.WH">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="134" y="60"/></rendering>
+			<source name="inPlanhalt"/>
+			<target name="notInPlanhalt"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-3"/></rendering>
+				<label name="bereitFahrt"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="219" y="53"/></rendering>
+			<source name="inPlanhalt"/>
+			<labelGroup>
+				<rendering><point x="10" y="0"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

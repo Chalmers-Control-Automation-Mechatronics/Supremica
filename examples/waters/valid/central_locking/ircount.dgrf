@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="ircount" version="1.0" valid="1"
+	hasGeometry="1" width="179" height="81"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:48:45 GMT" modificationDate="2004-09-07 08:48:45 GMT">
+	<events>
+		<event controllable="0" name="ctr_ge_max.NAME"/>
+		<event controllable="0" name="ctr_lt_max.NAME"/>
+		<event controllable="1" name="inc_ctr.NAME"/>
+		<event controllable="1" name="reset_ctr.NAME"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="64" y="32"/></rendering>
+			<label name="IN">
+				<rendering><point x="-21" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="144" y="32"/></rendering>
+			<label name="RUN">
+				<rendering><point x="10" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="104" y="47"/></rendering>
+			<source name="RUN"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-42" y="13"/></rendering>
+				<label name="ctr_lt_max.NAME"/>
+				<label name="ctr_ge_max.NAME">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="105" y="20"/></rendering>
+			<source name="IN"/>
+			<target name="RUN"/>
+			<labelGroup>
+				<rendering><point x="-4" y="-2"/></rendering>
+				<label name="inc_ctr.NAME"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="31" y="28"/></rendering>
+			<source name="IN"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-9"/></rendering>
+				<label name="reset_ctr.NAME"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

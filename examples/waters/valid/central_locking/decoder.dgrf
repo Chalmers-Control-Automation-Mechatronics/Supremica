@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="decoder" version="1.0" valid="1"
+	hasGeometry="1" width="485" height="430"
+	generatorName="DGE" generatorVersion="2.7.5"
+	creationDate="2000-10-31 13:07:28 GMT+00:00" modificationDate="2000-11-09 15:11:43 GMT+00:00">
+	<events>
+		<event controllable="1" name="autom_VR"/>
+		<event controllable="1" name="ER"/>
+		<event controllable="1" name="is_cod_er"/>
+		<event controllable="1" name="is_cod_ser"/>
+		<event controllable="1" name="SER"/>
+		<event controllable="1" name="SERFS"/>
+		<event controllable="1" name="soft_CS"/>
+		<event controllable="1" name="soft_ER"/>
+		<event controllable="1" name="soft_SER.FT"/>
+		<event controllable="1" name="soft_VR"/>
+		<event controllable="1" name="soft_ZS"/>
+		<event controllable="1" name="TAST"/>
+		<event controllable="1" name="ZS"/>
+		<event controllable="1" name="ZSA"/>
+		<event controllable="1" name="ZSI"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="112" y="176"/></rendering>
+			<label name="RQSER">
+				<rendering><point x="-17" y="-11"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="176"/></rendering>
+			<label name="RQER">
+				<rendering><point x="-28" y="-9"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="368" y="176"/></rendering>
+			<label name="RQVR">
+				<rendering><point x="1" y="-9"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="496" y="176"/></rendering>
+			<label name="RQZS">
+				<rendering><point x="-11" y="-10"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="288"/></rendering>
+			<label name="TSTZS">
+				<rendering><point x="-2" y="18"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="288"/></rendering>
+			<label name="COD">
+				<rendering><point x="-20" y="20"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="496" y="400"/></rendering>
+			<label name="ZS">
+				<rendering><point x="-2" y="18"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="368" y="400"/></rendering>
+			<label name="VR">
+				<rendering><point x="6" y="16"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="112" y="400"/></rendering>
+			<label name="SER">
+				<rendering><point x="-11" y="18"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="240" y="400"/></rendering>
+			<label name="ER">
+				<rendering><point x="7" y="18"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="304" y="64"/></rendering>
+			<label name="IN">
+				<rendering><point x="-4" y="-11"/></rendering>
+			</label>
+		</node>
+		<nodeGroup id="$1">
+			<rendering>
+				<boundary><rectangle x="64" y="32" width="480" height="416"/></boundary>
+			</rendering>
+			<nodeElement name="RQSER"/>
+			<nodeElement name="RQER"/>
+			<nodeElement name="RQVR"/>
+			<nodeElement name="RQZS"/>
+			<nodeElement name="TSTZS"/>
+			<nodeElement name="COD"/>
+			<nodeElement name="ZS"/>
+			<nodeElement name="VR"/>
+			<nodeElement name="SER"/>
+			<nodeElement name="ER"/>
+			<nodeElement name="IN"/>
+		</nodeGroup>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="SER"/>
+			<target name="RQVR"/>
+			<labelGroup>
+				<rendering><point x="-105" y="82"/></rendering>
+				<label name="autom_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="148" y="272"/></rendering>
+			<source name="SER"/>
+			<target name="RQER"/>
+			<labelGroup>
+				<rendering><point x="-39" y="14"/></rendering>
+				<label name="ER"/>
+				<label name="SER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="SERFS">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="TAST">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="SER"/>
+			<target name="TSTZS"/>
+			<labelGroup>
+				<rendering><point x="11" y="-12"/></rendering>
+				<label name="ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="RQVR"/>
+			<labelGroup>
+				<rendering><point x="-15" y="-2"/></rendering>
+				<label name="TAST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="204" y="120"/></rendering>
+			<source name="IN"/>
+			<target name="COD"/>
+			<labelGroup>
+				<rendering><point x="-13" y="-23"/></rendering>
+				<label name="SER"/>
+				<label name="SERFS">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="RQER"/>
+			<labelGroup>
+				<rendering><point x="-12" y="1"/></rendering>
+				<label name="ER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="401" y="120"/></rendering>
+			<source name="IN"/>
+			<target name="TSTZS"/>
+			<labelGroup>
+				<rendering><point x="-9" y="-17"/></rendering>
+				<label name="ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="502" y="290"/></rendering>
+			<source name="RQZS"/>
+			<target name="ZS"/>
+			<labelGroup>
+				<rendering><point x="-12" y="-7"/></rendering>
+				<label name="soft_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="RQVR"/>
+			<target name="VR"/>
+			<labelGroup>
+				<rendering><point x="-23" y="-34"/></rendering>
+				<label name="soft_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="$1"/>
+			<target name="ER"/>
+			<labelGroup>
+				<rendering><point x="-52" y="5"/></rendering>
+				<label name="soft_CS">
+					<actualSource name="RQSER"/>
+					<actualSource name="RQER"/>
+					<actualSource name="RQVR"/>
+					<actualSource name="RQZS"/>
+					<actualSource name="TSTZS"/>
+					<actualSource name="COD"/>
+					<actualSource name="ZS"/>
+					<actualSource name="VR"/>
+					<actualSource name="SER"/>
+					<actualSource name="ER"/>
+					<actualSource name="IN"/>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ER"/>
+			<target name="RQVR"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-25"/></rendering>
+				<label name="TAST"/>
+				<label name="autom_VR">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="231" y="288"/></rendering>
+			<source name="ER"/>
+			<target name="RQER"/>
+			<labelGroup>
+				<rendering><point x="-11" y="2"/></rendering>
+				<label name="ER"/>
+				<label name="SER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="SERFS">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ER"/>
+			<target name="TSTZS"/>
+			<labelGroup>
+				<rendering><point x="9" y="7"/></rendering>
+				<label name="ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="COD"/>
+			<target name="RQSER"/>
+			<labelGroup>
+				<rendering><point x="-35" y="-12"/></rendering>
+				<label name="is_cod_ser"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="COD"/>
+			<target name="RQER"/>
+			<labelGroup>
+				<rendering><point x="-24" y="1"/></rendering>
+				<label name="is_cod_er"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="267" y="354"/></rendering>
+			<source name="VR"/>
+			<target name="COD"/>
+			<labelGroup>
+				<rendering><point x="-82" y="-24"/></rendering>
+				<label name="SER"/>
+				<label name="SERFS">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="293" y="294"/></rendering>
+			<source name="VR"/>
+			<target name="RQER"/>
+			<labelGroup>
+				<rendering><point x="16" y="27"/></rendering>
+				<label name="ER"/>
+				<label name="TAST">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="VR"/>
+			<target name="TSTZS"/>
+			<labelGroup>
+				<rendering><point x="-4" y="16"/></rendering>
+				<label name="ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="95" y="288"/></rendering>
+			<source name="RQSER"/>
+			<target name="SER"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-28"/></rendering>
+				<label name="soft_SER.FT"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="247" y="288"/></rendering>
+			<source name="RQER"/>
+			<target name="ER"/>
+			<labelGroup>
+				<rendering><point x="-16" y="-50"/></rendering>
+				<label name="soft_ER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="TSTZS"/>
+			<target name="RQZS"/>
+			<labelGroup>
+				<rendering><point x="-17" y="-15"/></rendering>
+				<label name="ZSA"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="TSTZS"/>
+			<target name="RQVR"/>
+			<labelGroup>
+				<rendering><point x="-4" y="-15"/></rendering>
+				<label name="ZSI"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="479" y="289"/></rendering>
+			<source name="ZS"/>
+			<target name="RQZS"/>
+			<labelGroup>
+				<rendering><point x="-17" y="46"/></rendering>
+				<label name="ZS"/>
+				<label name="TAST">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="327" y="370"/></rendering>
+			<source name="ZS"/>
+			<target name="COD"/>
+			<labelGroup>
+				<rendering><point x="98" y="29"/></rendering>
+				<label name="SER"/>
+				<label name="SERFS">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="368" y="289"/></rendering>
+			<source name="ZS"/>
+			<target name="RQER"/>
+			<labelGroup>
+				<rendering><point x="-26" y="0"/></rendering>
+				<label name="ER"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

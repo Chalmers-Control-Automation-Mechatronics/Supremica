@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Module xmlns="http://waters.sourceforge.net/xsd/module"
+        Name="small_factory_n">
+<ParameterList>
+  <IntParameter Name="n">
+    <IntConstant Value="2"/>
+  </IntParameter>
+</ParameterList>
+<EventDeclList>
+  <EventDecl Name="start" Kind="CONTROLLABLE">
+    <IntRangeExpression>
+      <IntConstant Value="1"/>
+      <SimpleIdentifier Name="n"/>
+    </IntRangeExpression>
+    <Comment>This is just to test whether I can have text in here.</Comment>
+  </EventDecl>
+  <EventDecl Name="finish" Kind="UNCONTROLLABLE">
+    <IntRangeExpression>
+      <IntConstant Value="1"/>
+      <SimpleIdentifier Name="n"/>
+    </IntRangeExpression>
+  </EventDecl>
+  <EventDecl Name="@omega" Kind="PROPOSITION"/>
+</EventDeclList>
+<ComponentList>
+  <ForeachComponent Name="i">
+    <IntRangeExpression>
+      <IntConstant Value="1"/>
+      <SimpleIdentifier Name="n"/>
+    </IntRangeExpression>
+    <ComponentList>
+      <Instance ModuleName="machine_break">
+        <IndexedIdentifier Name="machine">
+          <SimpleIdentifier Name="i"/>
+        </IndexedIdentifier>
+        <ParameterBinding Name="start">
+          <IndexedIdentifier Name="start">
+            <SimpleIdentifier Name="i"/>
+          </IndexedIdentifier>
+        </ParameterBinding>
+        <ParameterBinding Name="finish">
+          <IndexedIdentifier Name="finish">
+            <SimpleIdentifier Name="i"/>
+          </IndexedIdentifier>
+        </ParameterBinding>
+        <ParameterBinding Name="@omega">
+          <SimpleIdentifier Name="@omega"/>
+        </ParameterBinding>
+      </Instance>
+    </ComponentList>
+  </ForeachComponent>
+  <ForeachComponent Name="i">
+    <IntRangeExpression>
+      <IntConstant Value="1"/>
+      <BinaryExpression Operator="-">
+        <SimpleIdentifier Name="n"/>
+        <IntConstant Value="1"/>
+      </BinaryExpression>
+    </IntRangeExpression>
+    <ComponentList>
+      <Instance ModuleName="buffer_sf1">
+        <IndexedIdentifier Name="buffer">
+          <SimpleIdentifier Name="i"/>
+        </IndexedIdentifier>
+        <ParameterBinding Name="start_before">
+          <IndexedIdentifier Name="start">
+            <SimpleIdentifier Name="i"/>
+          </IndexedIdentifier>
+        </ParameterBinding>
+        <ParameterBinding Name="finish_before">
+          <IndexedIdentifier Name="finish">
+            <SimpleIdentifier Name="i"/>
+          </IndexedIdentifier>
+        </ParameterBinding>
+        <ParameterBinding Name="start_after">
+          <IndexedIdentifier Name="start">
+            <BinaryExpression Operator="+">
+              <SimpleIdentifier Name="i"/>
+              <IntConstant Value="1"/>
+            </BinaryExpression>
+          </IndexedIdentifier>
+        </ParameterBinding>
+        <ParameterBinding Name="@omega">
+          <SimpleIdentifier Name="@omega"/>
+        </ParameterBinding>
+      </Instance>
+    </ComponentList>
+  </ForeachComponent>
+</ComponentList>
+</Module>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="tuermodell" version="1.0" valid="1"
+	hasGeometry="1" width="311" height="229"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2000-10-05 08:18:14 GMT" modificationDate="2004-09-07 08:27:00 GMT">
+	<events>
+		<event controllable="1" name="CS_ok"/>
+		<event controllable="1" name="done_ER"/>
+		<event controllable="1" name="done_SER.FT"/>
+		<event controllable="1" name="done_VR"/>
+		<event controllable="1" name="done_ZS"/>
+		<event controllable="1" name="soft_CS"/>
+		<event controllable="1" name="soft_ER"/>
+		<event controllable="1" name="soft_SER.FT"/>
+		<event controllable="1" name="soft_VR"/>
+		<event controllable="1" name="soft_ZS"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="384" y="96"/></rendering>
+			<label name="CS">
+				<rendering><point x="-26" y="3"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="224" y="160"/></rendering>
+			<label name="IN">
+				<rendering><point x="-20" y="-10"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="128" y="160"/></rendering>
+			<label name="VR">
+				<rendering><point x="-26" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="320" y="160"/></rendering>
+			<label name="ZS">
+				<rendering><point x="11" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="256"/></rendering>
+			<label name="SER">
+				<rendering><point x="-35" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="64"/></rendering>
+			<label name="ER">
+				<rendering><point x="-27" y="5"/></rendering>
+			</label>
+		</node>
+		<nodeGroup id="$0">
+			<rendering>
+				<boundary><rectangle x="96" y="48" width="256" height="224"/></boundary>
+			</rendering>
+			<nodeElement name="IN"/>
+			<nodeElement name="VR"/>
+			<nodeElement name="ZS"/>
+			<nodeElement name="SER"/>
+			<nodeElement name="ER"/>
+		</nodeGroup>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="272" y="170"/></rendering>
+			<source name="ZS"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-24" y="13"/></rendering>
+				<label name="done_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="214" y="208"/></rendering>
+			<source name="SER"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-79" y="5"/></rendering>
+				<label name="done_SER.FT"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="176" y="150"/></rendering>
+			<source name="VR"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-25" y="-7"/></rendering>
+				<label name="done_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="272" y="150"/></rendering>
+			<source name="IN"/>
+			<target name="ZS"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-7"/></rendering>
+				<label name="soft_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="234" y="208"/></rendering>
+			<source name="IN"/>
+			<target name="SER"/>
+			<labelGroup>
+				<rendering><point x="4" y="5"/></rendering>
+				<label name="soft_SER.FT"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="176" y="170"/></rendering>
+			<source name="IN"/>
+			<target name="VR"/>
+			<labelGroup>
+				<rendering><point x="-22" y="15"/></rendering>
+				<label name="soft_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="215" y="112"/></rendering>
+			<source name="IN"/>
+			<target name="ER"/>
+			<labelGroup>
+				<rendering><point x="-51" y="1"/></rendering>
+				<label name="soft_ER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="340" y="85"/></rendering>
+			<source name="CS"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="23" y="-13"/></rendering>
+				<label name="CS_ok"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="369" y="122"/></rendering>
+			<source name="$0"/>
+			<target name="CS"/>
+			<labelGroup>
+				<rendering><point x="-10" y="10"/></rendering>
+				<label name="soft_CS">
+					<actualSource name="IN"/>
+					<actualSource name="VR"/>
+					<actualSource name="ZS"/>
+					<actualSource name="SER"/>
+					<actualSource name="ER"/>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="233" y="112"/></rendering>
+			<source name="ER"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="7" y="2"/></rendering>
+				<label name="done_ER"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

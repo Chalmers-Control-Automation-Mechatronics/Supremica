@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="passagierhalt" version="1.0" valid="1"
+	hasGeometry="1" width="472" height="151"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 06:34:20 GMT" modificationDate="2004-09-07 06:34:20 GMT">
+	<events>
+		<event controllable="1" name="abfahrBereit"/>
+		<event controllable="0" name="ausstiegBeendet"/>
+		<event controllable="0" name="notAktiv.PH"/>
+		<event controllable="0" name="tuerenGeoeffnet"/>
+		<event controllable="0" name="tuerenGeschlossen"/>
+		<event controllable="0" name="zugAn.PH"/>
+	</events>
+	<nodes>
+		<node marked="1">
+			<rendering><point x="352" y="208"/></rendering>
+			<label name="einstieg">
+				<rendering><point x="-17" y="44"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="448" y="208"/></rendering>
+			<label name="schliessen">
+				<rendering><point x="-29" y="42"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="256" y="208"/></rendering>
+			<label name="ausstieg">
+				<rendering><point x="-18" y="44"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="160" y="208"/></rendering>
+			<label name="oeffnen">
+				<rendering><point x="-21" y="44"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="64" y="208"/></rendering>
+			<label name="inaktiv">
+				<rendering><point x="-18" y="46"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="ausstieg"/>
+			<target name="einstieg"/>
+			<labelGroup>
+				<rendering><point x="-41" y="17"/></rendering>
+				<label name="ausstiegBeendet"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="oeffnen"/>
+			<target name="ausstieg"/>
+			<labelGroup>
+				<rendering><point x="-54" y="18"/></rendering>
+				<label name="tuerenGeoeffnet"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="einstieg"/>
+			<target name="schliessen"/>
+			<labelGroup>
+				<rendering><point x="-32" y="17"/></rendering>
+				<label name="abfahrBereit"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="inaktiv"/>
+			<target name="oeffnen"/>
+			<labelGroup>
+				<rendering><point x="-30" y="19"/></rendering>
+				<label name="zugAn.PH"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="34" y="178"/></rendering>
+			<source name="inaktiv"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-14"/></rendering>
+				<label name="notAktiv.PH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="244" y="130"/></rendering>
+			<source name="schliessen"/>
+			<target name="inaktiv"/>
+			<labelGroup>
+				<rendering><point x="-40" y="-5"/></rendering>
+				<label name="tuerenGeschlossen"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="debouncing_ok" version="1.0" valid="1"
+	hasGeometry="1" width="200" height="277"
+	generatorName="DGE" generatorVersion="2.7.8"
+	creationDate="2000-10-05 08:28:07 GMT" modificationDate="2000-12-08 08:46:35 GMT">
+	<events>
+		<event controllable="1" name="chg_value.I"/>
+		<event controllable="0" name="new_value.I"/>
+		<event controllable="1" name="reset.I"/>
+		<event controllable="0" name="timeout.I"/>
+		<event controllable="1" name="timer.I"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="256" y="176"/></rendering>
+			<label name="FLIP">
+				<rendering><point x="11" y="7"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="256" y="96"/></rendering>
+			<label name="INIT">
+				<rendering><point x="11" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="336"/></rendering>
+			<label name="CHG">
+				<rendering><point x="12" y="7"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="256"/></rendering>
+			<label name="WAIT">
+				<rendering><point x="11" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="159" y="217"/></rendering>
+			<source name="CHG"/>
+			<target name="INIT"/>
+			<labelGroup>
+				<rendering><point x="11" y="79"/></rendering>
+				<label name="new_value.I"/>
+				<label name="chg_value.I">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="296" y="96"/></rendering>
+			<source name="INIT"/>
+			<labelGroup>
+				<rendering><point x="5" y="-7"/></rendering>
+				<label name="reset.I"/>
+				<label name="timeout.I">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="INIT"/>
+			<target name="FLIP"/>
+			<labelGroup>
+				<rendering><point x="4" y="3"/></rendering>
+				<label name="new_value.I"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="WAIT"/>
+			<target name="CHG"/>
+			<labelGroup>
+				<rendering><point x="5" y="4"/></rendering>
+				<label name="timeout.I"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="191" y="177"/></rendering>
+			<source name="WAIT"/>
+			<target name="INIT"/>
+			<labelGroup>
+				<rendering><point x="-19" y="40"/></rendering>
+				<label name="new_value.I"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="223" y="137"/></rendering>
+			<source name="FLIP"/>
+			<target name="INIT"/>
+			<labelGroup>
+				<rendering><point x="-48" y="31"/></rendering>
+				<label name="new_value.I"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="256" y="216"/></rendering>
+			<source name="FLIP"/>
+			<target name="WAIT"/>
+			<labelGroup>
+				<rendering><point x="6" y="4"/></rendering>
+				<label name="timer.I"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="296" y="177"/></rendering>
+			<source name="FLIP"/>
+			<labelGroup>
+				<rendering><point x="3" y="-5"/></rendering>
+				<label name="reset.I"/>
+				<label name="timeout.I">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="observer_L2x" version="1.0" valid="1"
+	hasGeometry="1" width="927" height="733"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:12:09 GMT+00:00" modificationDate="2000-10-10 08:12:09 GMT+00:00">
+	<events>
+		<event controllable="1" name="init_done"/>
+		<event controllable="0" name="L_at_X2.2"/>
+		<event controllable="0" name="L_at_X3.2"/>
+		<event controllable="0" name="L_at_X4.2"/>
+		<event controllable="0" name="L_at_X5.2"/>
+		<event controllable="0" name="L_at_X6.2"/>
+		<event controllable="0" name="L_at_X7.2"/>
+		<event controllable="0" name="L_at_X8.2"/>
+		<event controllable="1" name="L_left.2"/>
+		<event controllable="1" name="L_right.2"/>
+		<event controllable="0" name="T_X2"/>
+		<event controllable="0" name="T_X3"/>
+		<event controllable="0" name="T_X4"/>
+		<event controllable="0" name="T_X5"/>
+		<event controllable="0" name="T_X6"/>
+		<event controllable="0" name="T_X7"/>
+		<event controllable="0" name="T_X8"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="832" y="720"/></rendering>
+			<label name="start">
+				<rendering><point x="-39" y="14"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="400"/></rendering>
+			<label name="L2_X6fromX5">
+				<rendering><point x="-91" y="0"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="496"/></rendering>
+			<label name="L2_X6fromX7">
+				<rendering><point x="8" y="13"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="640" y="496"/></rendering>
+			<label name="L2_X7fromX6">
+				<rendering><point x="-91" y="-3"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="208"/></rendering>
+			<label name="L2_X4fromX3">
+				<rendering><point x="-92" y="1"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="304"/></rendering>
+			<label name="L2_X4fromX5">
+				<rendering><point x="8" y="16"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="640" y="592"/></rendering>
+			<label name="L2_X7fromX8">
+				<rendering><point x="5" y="15"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="80" y="160"/></rendering>
+			<label name="L2_X3_X2">
+				<rendering><point x="-73" y="7"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="160"/></rendering>
+			<label name="L2_X3_X4">
+				<rendering><point x="6" y="14"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="352"/></rendering>
+			<label name="L2_X5_X4">
+				<rendering><point x="-74" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="352"/></rendering>
+			<label name="L2_X5_X6">
+				<rendering><point x="9" y="12"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="544"/></rendering>
+			<label name="L2_X7_X6">
+				<rendering><point x="-74" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="80" y="112"/></rendering>
+			<label name="L2_X2fromX3">
+				<rendering><point x="9" y="12"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="752" y="544"/></rendering>
+			<label name="L2_X7_X8">
+				<rendering><point x="9" y="11"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="752" y="592"/></rendering>
+			<label name="L2_X8fromX7">
+				<rendering><point x="-90" y="-1"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="416" y="304"/></rendering>
+			<label name="L2_X5fromX4">
+				<rendering><point x="-91" y="2"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="416" y="400"/></rendering>
+			<label name="L2_X5fromX6">
+				<rendering><point x="6" y="17"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="192" y="64"/></rendering>
+			<label name="L2_X2_X3">
+				<rendering><point x="11" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="192" y="256"/></rendering>
+			<label name="L2_X4_X3">
+				<rendering><point x="-75" y="2"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="192" y="112"/></rendering>
+			<label name="L2_X3fromX2">
+				<rendering><point x="-89" y="-7"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="416" y="256"/></rendering>
+			<label name="L2_X4_X5">
+				<rendering><point x="4" y="15"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="192" y="208"/></rendering>
+			<label name="L2_X3fromX4">
+				<rendering><point x="3" y="19"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="416" y="448"/></rendering>
+			<label name="L2_X6_X5">
+				<rendering><point x="-76" y="2"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="80" y="64"/></rendering>
+			<label name="L2_X2">
+				<rendering><point x="-49" y="3"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="192" y="160"/></rendering>
+			<label name="L2_X3">
+				<rendering><point x="-46" y="15"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="640" y="448"/></rendering>
+			<label name="L2_X6_X7">
+				<rendering><point x="9" y="12"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="304" y="256"/></rendering>
+			<label name="L2_X4">
+				<rendering><point x="-45" y="15"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="416" y="352"/></rendering>
+			<label name="L2_X5">
+				<rendering><point x="-46" y="15"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="528" y="448"/></rendering>
+			<label name="L2_X6">
+				<rendering><point x="-46" y="17"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="640" y="640"/></rendering>
+			<label name="L2_X8_X7">
+				<rendering><point x="-70" y="12"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="640" y="544"/></rendering>
+			<label name="L2_X7">
+				<rendering><point x="-46" y="15"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="768" y="704"/></rendering>
+			<label name="initialized">
+				<rendering><point x="10" y="-2"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="752" y="640"/></rendering>
+			<label name="L2_X8">
+				<rendering><point x="-43" y="17"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="331" y="229"/></rendering>
+			<source name="L2_X4"/>
+			<labelGroup>
+				<rendering><point x="9" y="-4"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X4"/>
+			<target name="L2_X4_X3"/>
+			<labelGroup>
+				<rendering><point x="-21" y="-4"/></rendering>
+				<label name="L_left.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X4"/>
+			<target name="L2_X4_X5"/>
+			<labelGroup>
+				<rendering><point x="-30" y="13"/></rendering>
+				<label name="L_right.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X4fromX5"/>
+			<target name="L2_X4"/>
+			<labelGroup>
+				<rendering><point x="5" y="7"/></rendering>
+				<label name="L_at_X4.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="267" y="309"/></rendering>
+			<source name="L2_X4fromX5"/>
+			<labelGroup>
+				<rendering><point x="-35" y="-2"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="779" y="565"/></rendering>
+			<source name="L2_X8fromX7"/>
+			<labelGroup>
+				<rendering><point x="47" y="-29"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="T_X6">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X8fromX7"/>
+			<target name="L2_X8"/>
+			<labelGroup>
+				<rendering><point x="-62" y="2"/></rendering>
+				<label name="L_at_X8.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="171" y="291"/></rendering>
+			<source name="L2_X4_X3"/>
+			<labelGroup>
+				<rendering><point x="-46" y="-10"/></rendering>
+				<label name="T_X2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X4_X3"/>
+			<target name="L2_X3fromX4"/>
+			<labelGroup>
+				<rendering><point x="-35" y="12"/></rendering>
+				<label name="T_X3"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X4fromX3"/>
+			<target name="L2_X4"/>
+			<labelGroup>
+				<rendering><point x="-60" y="5"/></rendering>
+				<label name="L_at_X4.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="331" y="181"/></rendering>
+			<source name="L2_X4fromX3"/>
+			<labelGroup>
+				<rendering><point x="8" y="13"/></rendering>
+				<label name="T_X2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="219" y="133"/></rendering>
+			<source name="L2_X3"/>
+			<labelGroup>
+				<rendering><point x="3" y="-2"/></rendering>
+				<label name="T_X2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X3"/>
+			<target name="L2_X3_X4"/>
+			<labelGroup>
+				<rendering><point x="-28" y="13"/></rendering>
+				<label name="L_right.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X3"/>
+			<target name="L2_X3_X2"/>
+			<labelGroup>
+				<rendering><point x="-23" y="-5"/></rendering>
+				<label name="L_left.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="555" y="373"/></rendering>
+			<source name="L2_X6fromX5"/>
+			<labelGroup>
+				<rendering><point x="51" y="-7"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X6fromX5"/>
+			<target name="L2_X6"/>
+			<labelGroup>
+				<rendering><point x="-60" y="4"/></rendering>
+				<label name="L_at_X6.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X2"/>
+			<target name="L2_X2_X3"/>
+			<labelGroup>
+				<rendering><point x="-28" y="13"/></rendering>
+				<label name="L_right.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X7_X8"/>
+			<target name="L2_X8fromX7"/>
+			<labelGroup>
+				<rendering><point x="-37" y="2"/></rendering>
+				<label name="T_X8"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="779" y="517"/></rendering>
+			<source name="L2_X7_X8"/>
+			<labelGroup>
+				<rendering><point x="10" y="-31"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="T_X6">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X3fromX2"/>
+			<target name="L2_X3"/>
+			<labelGroup>
+				<rendering><point x="-60" y="0"/></rendering>
+				<label name="L_at_X3.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="667" y="469"/></rendering>
+			<source name="L2_X7fromX6"/>
+			<labelGroup>
+				<rendering><point x="46" y="-15"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X7fromX6"/>
+			<target name="L2_X7"/>
+			<labelGroup>
+				<rendering><point x="-60" y="3"/></rendering>
+				<label name="L_at_X7.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X2_X3"/>
+			<target name="L2_X3fromX2"/>
+			<labelGroup>
+				<rendering><point x="-34" y="-1"/></rendering>
+				<label name="T_X3"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X3_X4"/>
+			<target name="L2_X4fromX3"/>
+			<labelGroup>
+				<rendering><point x="-39" y="3"/></rendering>
+				<label name="T_X4"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="331" y="133"/></rendering>
+			<source name="L2_X3_X4"/>
+			<labelGroup>
+				<rendering><point x="11" y="8"/></rendering>
+				<label name="T_X2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="779" y="613"/></rendering>
+			<source name="L2_X8"/>
+			<labelGroup>
+				<rendering><point x="8" y="-43"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="T_X6">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="T_X7">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+				<label name="L_right.2">
+					<rendering><point x="0" y="96"/></rendering>
+				</label>
+				<label name="T_X8">
+					<rendering><point x="0" y="112"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="747" y="675"/></rendering>
+			<source name="L2_X8"/>
+			<target name="initialized"/>
+			<labelGroup>
+				<rendering><point x="-61" y="12"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X8"/>
+			<target name="L2_X8_X7"/>
+			<labelGroup>
+				<rendering><point x="-18" y="-3"/></rendering>
+				<label name="L_left.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="606" y="595"/></rendering>
+			<source name="L2_X7fromX8"/>
+			<labelGroup>
+				<rendering><point x="-37" y="-19"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="T_X6">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X7fromX8"/>
+			<target name="L2_X7"/>
+			<labelGroup>
+				<rendering><point x="3" y="6"/></rendering>
+				<label name="L_at_X7.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="443" y="325"/></rendering>
+			<source name="L2_X5"/>
+			<labelGroup>
+				<rendering><point x="9" y="-6"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X5"/>
+			<target name="L2_X5_X4"/>
+			<labelGroup>
+				<rendering><point x="-17" y="-5"/></rendering>
+				<label name="L_left.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X5"/>
+			<target name="L2_X5_X6"/>
+			<labelGroup>
+				<rendering><point x="-31" y="13"/></rendering>
+				<label name="L_right.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="555" y="421"/></rendering>
+			<source name="L2_X6"/>
+			<labelGroup>
+				<rendering><point x="10" y="-17"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X6"/>
+			<target name="L2_X6_X7"/>
+			<labelGroup>
+				<rendering><point x="-30" y="13"/></rendering>
+				<label name="L_right.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X6"/>
+			<target name="L2_X6_X5"/>
+			<labelGroup>
+				<rendering><point x="-21" y="-5"/></rendering>
+				<label name="L_left.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="443" y="229"/></rendering>
+			<source name="L2_X4_X5"/>
+			<labelGroup>
+				<rendering><point x="8" y="3"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X4_X5"/>
+			<target name="L2_X5fromX4"/>
+			<labelGroup>
+				<rendering><point x="-38" y="-1"/></rendering>
+				<label name="T_X5"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X3_X2"/>
+			<target name="L2_X2fromX3"/>
+			<labelGroup>
+				<rendering><point x="-35" y="8"/></rendering>
+				<label name="T_X2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X6fromX7"/>
+			<target name="L2_X6"/>
+			<labelGroup>
+				<rendering><point x="4" y="5"/></rendering>
+				<label name="L_at_X6.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="494" y="500"/></rendering>
+			<source name="L2_X6fromX7"/>
+			<labelGroup>
+				<rendering><point x="-41" y="-18"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X5_X4"/>
+			<target name="L2_X4fromX5"/>
+			<labelGroup>
+				<rendering><point x="-36" y="7"/></rendering>
+				<label name="T_X4"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="287" y="387"/></rendering>
+			<source name="L2_X5_X4"/>
+			<labelGroup>
+				<rendering><point x="-45" y="-8"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="777" y="676"/></rendering>
+			<source name="initialized"/>
+			<target name="L2_X8"/>
+			<labelGroup>
+				<rendering><point x="5" y="7"/></rendering>
+				<label name="L_at_X8.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X7"/>
+			<target name="L2_X7_X8"/>
+			<labelGroup>
+				<rendering><point x="-29" y="15"/></rendering>
+				<label name="L_right.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="667" y="517"/></rendering>
+			<source name="L2_X7"/>
+			<labelGroup>
+				<rendering><point x="10" y="-27"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="T_X6">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X7"/>
+			<target name="L2_X7_X6"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-4"/></rendering>
+				<label name="L_left.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X3fromX4"/>
+			<target name="L2_X3"/>
+			<labelGroup>
+				<rendering><point x="3" y="7"/></rendering>
+				<label name="L_at_X3.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="160" y="213"/></rendering>
+			<source name="L2_X3fromX4"/>
+			<labelGroup>
+				<rendering><point x="-38" y="3"/></rendering>
+				<label name="T_X2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X6_X7"/>
+			<target name="L2_X7fromX6"/>
+			<labelGroup>
+				<rendering><point x="-39" y="7"/></rendering>
+				<label name="T_X7"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="667" y="421"/></rendering>
+			<source name="L2_X6_X7"/>
+			<labelGroup>
+				<rendering><point x="8" y="-18"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="400" y="479"/></rendering>
+			<source name="L2_X6_X5"/>
+			<labelGroup>
+				<rendering><point x="-44" y="-8"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X6_X5"/>
+			<target name="L2_X5fromX6"/>
+			<labelGroup>
+				<rendering><point x="-35" y="6"/></rendering>
+				<label name="T_X5"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="initialized"/>
+			<labelGroup>
+				<rendering><point x="-63" y="12"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="868" y="738"/></rendering>
+			<source name="start"/>
+			<labelGroup>
+				<rendering><point x="11" y="-73"/></rendering>
+				<label name="L_right.2"/>
+				<label name="T_X2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X3">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="T_X6">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+				<label name="T_X7">
+					<rendering><point x="0" y="96"/></rendering>
+				</label>
+				<label name="T_X8">
+					<rendering><point x="0" y="112"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X7_X6"/>
+			<target name="L2_X6fromX7"/>
+			<labelGroup>
+				<rendering><point x="-36" y="5"/></rendering>
+				<label name="T_X6"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="513" y="576"/></rendering>
+			<source name="L2_X7_X6"/>
+			<labelGroup>
+				<rendering><point x="-47" y="-11"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X5fromX4"/>
+			<target name="L2_X5"/>
+			<labelGroup>
+				<rendering><point x="-60" y="2"/></rendering>
+				<label name="L_at_X5.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="443" y="277"/></rendering>
+			<source name="L2_X5fromX4"/>
+			<labelGroup>
+				<rendering><point x="8" y="9"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X8_X7"/>
+			<target name="L2_X7fromX8"/>
+			<labelGroup>
+				<rendering><point x="-33" y="5"/></rendering>
+				<label name="T_X7"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="635" y="672"/></rendering>
+			<source name="L2_X8_X7"/>
+			<labelGroup>
+				<rendering><point x="-46" y="-3"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="T_X5">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="T_X6">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X2fromX3"/>
+			<target name="L2_X2"/>
+			<labelGroup>
+				<rendering><point x="4" y="3"/></rendering>
+				<label name="L_at_X2.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X5fromX6"/>
+			<target name="L2_X5"/>
+			<labelGroup>
+				<rendering><point x="4" y="6"/></rendering>
+				<label name="L_at_X5.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="377" y="400"/></rendering>
+			<source name="L2_X5fromX6"/>
+			<labelGroup>
+				<rendering><point x="-36" y="-10"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L2_X5_X6"/>
+			<target name="L2_X6fromX5"/>
+			<labelGroup>
+				<rendering><point x="-39" y="9"/></rendering>
+				<label name="T_X6"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="555" y="325"/></rendering>
+			<source name="L2_X5_X6"/>
+			<labelGroup>
+				<rendering><point x="9" y="-9"/></rendering>
+				<label name="T_X2"/>
+				<label name="T_X3">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="T_X4">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

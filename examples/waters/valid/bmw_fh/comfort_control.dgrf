@@ -1,0 +1,33 @@
+dgrf2.3.3
+//s 426 311
+11
+c CMFT_BACK.CLOSE
+c CMFT_BACK.OPEN
+c cmft_cond_doors
+c cmft_cond_key
+c cmft_start
+c CMFT_STOP
+c FH_UNLOCK
+u REQ.CLOSE
+u REQ.OPEN
+u REQ.STOP
+c timer
+5
+256 144 8 0 0 29 -6 request
+256 224 8 0 0 -38 4 cmft
+112 144 8 1 1 -32 11 off
+256 320 8 0 0 19 4 esc
+384 320 8 0 0 15 5 esc_req
+12
+2 cmft 295 227 5 3 1 10 0 0
+3 cmft esc 256 271 -66 -12 3 9 0 0 2 0 13 3 0 26
+1 request cmft -16 3 2 1 0 0 0 0 13
+2 request 276 113 11 -15 2 10 0 0 4 0 13
+3 request off 185 160 -51 12 3 9 0 0 2 0 13 3 0 26
+2 esc 239 347 -43 17 1 9 0 0
+3 esc esc_req 317 303 -18 -22 2 8 0 0 7 0 13
+3 esc off 164 296 -80 3 1 5 0 0
+3 esc_req request 358 176 18 13 1 5 0 0
+3 esc_req esc 319 340 -29 17 3 9 0 0 2 0 13 3 0 26
+3 off request 182 127 -29 -22 2 7 0 0 8 0 13
+2 off 90 116 -63 -27 2 9 0 0 6 0 13

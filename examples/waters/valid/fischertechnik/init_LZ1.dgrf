@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="init_LZ1" version="1.0" valid="1"
+	hasGeometry="1" width="312" height="194"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:04:35 GMT+00:00" modificationDate="2000-10-10 08:04:35 GMT+00:00">
+	<events>
+		<event controllable="1" name="init"/>
+		<event controllable="1" name="init_done"/>
+		<event controllable="1" name="L_up.i"/>
+		<event controllable="0" name="TL_Z1.i"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="128" y="256"/></rendering>
+			<label name="start">
+				<rendering><point x="-19" y="23"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="272" y="256"/></rendering>
+			<label name="L_move">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="272" y="176"/></rendering>
+			<label name="L_reached">
+				<rendering><point x="8" y="17"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="128" y="176"/></rendering>
+			<label name="initialized">
+				<rendering><point x="-70" y="16"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="113" y="141"/></rendering>
+			<source name="initialized"/>
+			<labelGroup>
+				<rendering><point x="-66" y="-32"/></rendering>
+				<label name="TL_Z1.i"/>
+				<label name="L_up.i">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="initialized"/>
+			<target name="start"/>
+			<labelGroup>
+				<rendering><point x="-34" y="6"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_reached"/>
+			<target name="initialized"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-5"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="299" y="149"/></rendering>
+			<source name="L_reached"/>
+			<labelGroup>
+				<rendering><point x="-33" y="-12"/></rendering>
+				<label name="TL_Z1.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_move"/>
+			<target name="L_reached"/>
+			<labelGroup>
+				<rendering><point x="3" y="6"/></rendering>
+				<label name="TL_Z1.i"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="307" y="248"/></rendering>
+			<source name="L_move"/>
+			<labelGroup>
+				<rendering><point x="9" y="8"/></rendering>
+				<label name="L_up.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="L_reached"/>
+			<labelGroup>
+				<rendering><point x="3" y="11"/></rendering>
+				<label name="TL_Z1.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="L_move"/>
+			<labelGroup>
+				<rendering><point x="-35" y="15"/></rendering>
+				<label name="L_up.i"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

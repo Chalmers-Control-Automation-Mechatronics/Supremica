@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="tklemme" version="1.0" valid="1"
+	hasGeometry="1" width="135" height="68"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:50:19 GMT" modificationDate="2004-09-07 08:50:19 GMT">
+	<events>
+		<event controllable="0" name="tuer_auf.TUER"/>
+		<event controllable="0" name="tuer_zu.TUER"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="160" y="96"/></rendering>
+			<label name="AUF">
+				<rendering><point x="-1" y="20"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="64" y="96"/></rendering>
+			<label name="ZU">
+				<rendering><point x="-13" y="21"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="109" y="110"/></rendering>
+			<source name="ZU"/>
+			<target name="AUF"/>
+			<labelGroup>
+				<rendering><point x="-36" y="13"/></rendering>
+				<label name="tuer_auf.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="112" y="82"/></rendering>
+			<source name="AUF"/>
+			<target name="ZU"/>
+			<labelGroup>
+				<rendering><point x="-35" y="-3"/></rendering>
+				<label name="tuer_zu.TUER"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

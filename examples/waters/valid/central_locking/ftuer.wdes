@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="ftuer" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="CONTROLLABLE" Name="CS_ok"/>
+        <Event Kind="CONTROLLABLE" Name="MER_an[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="MER_aus[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="MVR_an[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="MVR_aus[TUER]"/>
+        <Event Kind="UNCONTROLLABLE" Name="STZV[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="async[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="done_ER"/>
+        <Event Kind="CONTROLLABLE" Name="done_SER[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="done_VR"/>
+        <Event Kind="CONTROLLABLE" Name="done_ZS"/>
+        <Event Kind="CONTROLLABLE" Name="reset[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="soft_CS"/>
+        <Event Kind="CONTROLLABLE" Name="soft_ER"/>
+        <Event Kind="CONTROLLABLE" Name="soft_SER[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="soft_VR"/>
+        <Event Kind="CONTROLLABLE" Name="soft_ZS"/>
+        <Event Kind="CONTROLLABLE" Name="start_ER[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="start_VR[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="start_ZS[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="stop_ER[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="stop_VR[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="stop_ZS[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="sync[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="time_ER[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="time_VR[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="time_W[TUER]"/>
+        <Event Kind="CONTROLLABLE" Name="time_ZS[TUER]"/>
+        <Event Kind="UNCONTROLLABLE" Name="timeout[TUER]"/>
+        <Event Kind="UNCONTROLLABLE" Name="tuer_auf[TUER]"/>
+        <Event Kind="UNCONTROLLABLE" Name="tuer_zu[TUER]"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="SPEC" Name="ftuer">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="CS_ok"/>
+                <EventRef Name="async[TUER]"/>
+                <EventRef Name="done_ER"/>
+                <EventRef Name="done_SER[TUER]"/>
+                <EventRef Name="done_VR"/>
+                <EventRef Name="done_ZS"/>
+                <EventRef Name="reset[TUER]"/>
+                <EventRef Name="soft_CS"/>
+                <EventRef Name="soft_ER"/>
+                <EventRef Name="soft_SER[TUER]"/>
+                <EventRef Name="soft_VR"/>
+                <EventRef Name="soft_ZS"/>
+                <EventRef Name="start_ER[TUER]"/>
+                <EventRef Name="start_VR[TUER]"/>
+                <EventRef Name="start_ZS[TUER]"/>
+                <EventRef Name="stop_ER[TUER]"/>
+                <EventRef Name="stop_VR[TUER]"/>
+                <EventRef Name="stop_ZS[TUER]"/>
+                <EventRef Name="sync[TUER]"/>
+                <EventRef Name="time_W[TUER]"/>
+                <EventRef Name="timeout[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="false" Name="ER">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="true" Name="IN"/>
+                <State Initial="false" Name="VR">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="ZS">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="cs1"/>
+                <State Initial="false" Name="cs2"/>
+                <State Initial="false" Name="cs3"/>
+                <State Initial="false" Name="er1"/>
+                <State Initial="false" Name="er2"/>
+                <State Initial="false" Name="er3"/>
+                <State Initial="false" Name="vr1"/>
+                <State Initial="false" Name="vr2"/>
+                <State Initial="false" Name="vr3"/>
+                <State Initial="false" Name="vr4"/>
+                <State Initial="false" Name="vr5"/>
+                <State Initial="false" Name="vr6"/>
+                <State Initial="false" Name="vr7"/>
+                <State Initial="false" Name="vr8"/>
+                <State Initial="false" Name="zs1"/>
+                <State Initial="false" Name="zs2"/>
+                <State Initial="false" Name="zs3"/>
+                <State Initial="false" Name="zs4"/>
+                <State Initial="false" Name="zs5"/>
+                <State Initial="false" Name="zs6"/>
+                <State Initial="false" Name="zs7"/>
+                <State Initial="false" Name="zs8"/>
+                <State Initial="false" Name="zs9"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="CS_ok" Source="cs3" Target="ER"/>
+                <Transition Event="reset[TUER]" Source="cs1" Target="cs1"/>
+                <Transition Event="timeout[TUER]" Source="cs1" Target="cs1"/>
+                <Transition Event="start_ER[TUER]" Source="cs1" Target="cs2"/>
+                <Transition Event="timeout[TUER]" Source="cs2" Target="cs2"/>
+                <Transition Event="stop_ER[TUER]" Source="cs2" Target="cs3"/>
+                <Transition Event="async[TUER]" Source="vr8" Target="vr1"/>
+                <Transition Event="sync[TUER]" Source="vr8" Target="vr7"/>
+                <Transition Event="soft_ER" Source="VR" Target="er1"/>
+                <Transition Event="soft_SER[TUER]" Source="VR" Target="er1"/>
+                <Transition Event="soft_VR" Source="VR" Target="vr8"/>
+                <Transition Event="soft_ZS" Source="VR" Target="zs9"/>
+                <Transition Event="done_VR" Source="vr7" Target="VR"/>
+                <Transition Event="reset[TUER]" Source="vr6" Target="vr6"/>
+                <Transition Event="timeout[TUER]" Source="vr6" Target="vr6"/>
+                <Transition Event="stop_VR[TUER]" Source="vr6" Target="vr7"/>
+                <Transition Event="start_VR[TUER]" Source="vr5" Target="vr6"/>
+                <Transition Event="timeout[TUER]" Source="vr4" Target="vr5"/>
+                <Transition Event="time_W[TUER]" Source="vr3" Target="vr4"/>
+                <Transition Event="start_ER[TUER]" Source="vr1" Target="vr2"/>
+                <Transition Event="stop_ER[TUER]" Source="vr2" Target="vr3"/>
+                <Transition Event="reset[TUER]" Source="vr2" Target="vr2"/>
+                <Transition Event="timeout[TUER]" Source="vr2" Target="vr2"/>
+                <Transition Event="async[TUER]" Source="zs9" Target="zs1"/>
+                <Transition Event="sync[TUER]" Source="zs9" Target="zs5"/>
+                <Transition Event="soft_VR" Source="IN" Target="vr1"/>
+                <Transition Event="soft_ER" Source="IN" Target="er1"/>
+                <Transition Event="soft_SER[TUER]" Source="IN" Target="er1"/>
+                <Transition Event="soft_ZS" Source="IN" Target="zs1"/>
+                <Transition Event="start_ER[TUER]" Source="er1" Target="er2"/>
+                <Transition Event="reset[TUER]" Source="er2" Target="er2"/>
+                <Transition Event="timeout[TUER]" Source="er2" Target="er2"/>
+                <Transition Event="stop_ER[TUER]" Source="er2" Target="er3"/>
+                <Transition Event="done_ER" Source="er3" Target="ER"/>
+                <Transition Event="done_SER[TUER]" Source="er3" Target="ER"/>
+                <Transition Event="soft_VR" Source="ER" Target="vr5"/>
+                <Transition Event="soft_ER" Source="ER" Target="er3"/>
+                <Transition Event="soft_SER[TUER]" Source="ER" Target="er3"/>
+                <Transition Event="soft_ZS" Source="ER" Target="zs5"/>
+                <Transition Event="start_ER[TUER]" Source="zs1" Target="zs2"/>
+                <Transition Event="reset[TUER]" Source="zs2" Target="zs2"/>
+                <Transition Event="timeout[TUER]" Source="zs2" Target="zs2"/>
+                <Transition Event="stop_ER[TUER]" Source="zs2" Target="zs3"/>
+                <Transition Event="time_W[TUER]" Source="zs3" Target="zs4"/>
+                <Transition Event="timeout[TUER]" Source="zs4" Target="zs5"/>
+                <Transition Event="start_ZS[TUER]" Source="zs5" Target="zs6"/>
+                <Transition Event="stop_ZS[TUER]" Source="zs6" Target="zs7"/>
+                <Transition Event="reset[TUER]" Source="zs6" Target="zs6"/>
+                <Transition Event="timeout[TUER]" Source="zs6" Target="zs6"/>
+                <Transition Event="done_ZS" Source="zs7" Target="ZS"/>
+                <Transition Event="soft_VR" Source="ZS" Target="vr1"/>
+                <Transition Event="soft_ZS" Source="ZS" Target="zs8"/>
+                <Transition Event="soft_ER" Source="ZS" Target="er1"/>
+                <Transition Event="soft_SER[TUER]" Source="ZS" Target="er1"/>
+                <Transition Event="sync[TUER]" Source="zs8" Target="zs7"/>
+                <Transition Event="async[TUER]" Source="zs8" Target="zs1"/>
+                <Transition Event="soft_CS" Source="zs4" Target="cs1"/>
+                <Transition Event="soft_CS" Source="er2" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs7" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs1" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr6" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs9" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs5" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr1" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr5" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs8" Target="cs1"/>
+                <Transition Event="soft_CS" Source="ER" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr3" Target="cs1"/>
+                <Transition Event="soft_CS" Source="VR" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs2" Target="cs1"/>
+                <Transition Event="soft_CS" Source="ZS" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr2" Target="cs1"/>
+                <Transition Event="soft_CS" Source="er1" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr8" Target="cs1"/>
+                <Transition Event="soft_CS" Source="er3" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr4" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs3" Target="cs1"/>
+                <Transition Event="soft_CS" Source="zs6" Target="cs1"/>
+                <Transition Event="soft_CS" Source="IN" Target="cs1"/>
+                <Transition Event="soft_CS" Source="vr7" Target="cs1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="mer">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="MER_an[TUER]"/>
+                <EventRef Name="MER_aus[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="IDLE">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="RUN"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="MER_an[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="MER_aus[TUER]" Source="RUN" Target="IDLE"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="merguard">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="MER_an[TUER]"/>
+                <EventRef Name="MER_aus[TUER]"/>
+                <EventRef Name="start_ER[TUER]"/>
+                <EventRef Name="start_VR[TUER]"/>
+                <EventRef Name="start_ZS[TUER]"/>
+                <EventRef Name="stop_ER[TUER]"/>
+                <EventRef Name="stop_VR[TUER]"/>
+                <EventRef Name="stop_ZS[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="IDLE">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="RUN"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="start_ER[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_ER[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="start_VR[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_VR[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="start_ZS[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_ZS[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="MER_an[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="MER_aus[TUER]" Source="RUN" Target="IDLE"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="mvrguard">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="MVR_an[TUER]"/>
+                <EventRef Name="MVR_aus[TUER]"/>
+                <EventRef Name="start_ER[TUER]"/>
+                <EventRef Name="start_VR[TUER]"/>
+                <EventRef Name="start_ZS[TUER]"/>
+                <EventRef Name="stop_ER[TUER]"/>
+                <EventRef Name="stop_VR[TUER]"/>
+                <EventRef Name="stop_ZS[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="IDLE">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="RUN"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="MVR_an[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="start_ER[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_ER[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="start_VR[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_VR[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="start_ZS[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_ZS[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="MVR_aus[TUER]" Source="RUN" Target="IDLE"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="mvrstzv">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="MVR_an[TUER]"/>
+                <EventRef Name="MVR_aus[TUER]"/>
+                <EventRef Name="STZV[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="IDLE">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="RUN"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="MVR_an[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="MVR_aus[TUER]" Source="RUN" Target="IDLE"/>
+                <Transition Event="STZV[TUER]" Source="RUN" Target="RUN"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="sync">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="async[TUER]"/>
+                <EventRef Name="start_VR[TUER]"/>
+                <EventRef Name="start_ZS[TUER]"/>
+                <EventRef Name="stop_ER[TUER]"/>
+                <EventRef Name="sync[TUER]"/>
+                <EventRef Name="tuer_auf[TUER]"/>
+                <EventRef Name="tuer_zu[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="ASY"/>
+                <State Initial="false" Name="AUF"/>
+                <State Initial="false" Name="AZU"/>
+                <State Initial="false" Name="VR">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="ZU">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="sync[TUER]" Source="AUF" Target="AUF"/>
+                <Transition Event="stop_ER[TUER]" Source="AUF" Target="AUF"/>
+                <Transition Event="start_VR[TUER]" Source="AUF" Target="ASY"/>
+                <Transition Event="start_ZS[TUER]" Source="AUF" Target="ASY"/>
+                <Transition Event="tuer_zu[TUER]" Source="AUF" Target="ZU"/>
+                <Transition Event="async[TUER]" Source="AZU" Target="AZU"/>
+                <Transition Event="start_VR[TUER]" Source="AZU" Target="AZU"/>
+                <Transition Event="start_ZS[TUER]" Source="AZU" Target="AZU"/>
+                <Transition Event="tuer_auf[TUER]" Source="AZU" Target="ASY"/>
+                <Transition Event="stop_ER[TUER]" Source="AZU" Target="ZU"/>
+                <Transition Event="tuer_auf[TUER]" Source="ZU" Target="AUF"/>
+                <Transition Event="start_VR[TUER]" Source="ZU" Target="VR"/>
+                <Transition Event="start_ZS[TUER]" Source="ZU" Target="VR"/>
+                <Transition Event="sync[TUER]" Source="ZU" Target="ZU"/>
+                <Transition Event="stop_ER[TUER]" Source="ZU" Target="ZU"/>
+                <Transition Event="stop_ER[TUER]" Source="ASY" Target="AUF"/>
+                <Transition Event="tuer_zu[TUER]" Source="ASY" Target="AZU"/>
+                <Transition Event="start_VR[TUER]" Source="ASY" Target="ASY"/>
+                <Transition Event="start_ZS[TUER]" Source="ASY" Target="ASY"/>
+                <Transition Event="async[TUER]" Source="ASY" Target="ASY"/>
+                <Transition Event="tuer_auf[TUER]" Source="VR" Target="ASY"/>
+                <Transition Event="start_VR[TUER]" Source="VR" Target="VR"/>
+                <Transition Event="start_ZS[TUER]" Source="VR" Target="VR"/>
+                <Transition Event="sync[TUER]" Source="VR" Target="VR"/>
+                <Transition Event="stop_ER[TUER]" Source="VR" Target="ZU"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="tklemme">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="tuer_auf[TUER]"/>
+                <EventRef Name="tuer_zu[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="AUF"/>
+                <State Initial="false" Name="ZU">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="tuer_zu[TUER]" Source="AUF" Target="ZU"/>
+                <Transition Event="tuer_auf[TUER]" Source="ZU" Target="AUF"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="tmotor1">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="MER_an[TUER]"/>
+                <EventRef Name="MER_aus[TUER]"/>
+                <EventRef Name="MVR_an[TUER]"/>
+                <EventRef Name="MVR_aus[TUER]"/>
+                <EventRef Name="STZV[TUER]"/>
+                <EventRef Name="reset[TUER]"/>
+                <EventRef Name="soft_CS"/>
+                <EventRef Name="start_ER[TUER]"/>
+                <EventRef Name="start_VR[TUER]"/>
+                <EventRef Name="start_ZS[TUER]"/>
+                <EventRef Name="stop_ER[TUER]"/>
+                <EventRef Name="stop_VR[TUER]"/>
+                <EventRef Name="stop_ZS[TUER]"/>
+                <EventRef Name="time_ER[TUER]"/>
+                <EventRef Name="time_VR[TUER]"/>
+                <EventRef Name="time_ZS[TUER]"/>
+                <EventRef Name="timeout[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="IN">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="er1"/>
+                <State Initial="false" Name="er2"/>
+                <State Initial="false" Name="er3"/>
+                <State Initial="false" Name="er4"/>
+                <State Initial="false" Name="vr1"/>
+                <State Initial="false" Name="vr2"/>
+                <State Initial="false" Name="vr3"/>
+                <State Initial="false" Name="vr4"/>
+                <State Initial="false" Name="vr5"/>
+                <State Initial="false" Name="zs1"/>
+                <State Initial="false" Name="zs2"/>
+                <State Initial="false" Name="zs3"/>
+                <State Initial="false" Name="zs4"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="time_ER[TUER]" Source="er1" Target="er2"/>
+                <Transition Event="time_ZS[TUER]" Source="zs1" Target="zs2"/>
+                <Transition Event="timeout[TUER]" Source="er2" Target="er4"/>
+                <Transition Event="MER_an[TUER]" Source="er2" Target="er3"/>
+                <Transition Event="MVR_an[TUER]" Source="zs2" Target="zs3"/>
+                <Transition Event="timeout[TUER]" Source="zs2" Target="zs4"/>
+                <Transition Event="timeout[TUER]" Source="er3" Target="er4"/>
+                <Transition Event="STZV[TUER]" Source="zs3" Target="zs3"/>
+                <Transition Event="timeout[TUER]" Source="zs3" Target="zs4"/>
+                <Transition Event="MER_aus[TUER]" Source="er4" Target="er4"/>
+                <Transition Event="stop_ER[TUER]" Source="er4" Target="IN"/>
+                <Transition Event="MVR_aus[TUER]" Source="zs4" Target="zs4"/>
+                <Transition Event="STZV[TUER]" Source="zs4" Target="zs4"/>
+                <Transition Event="stop_ZS[TUER]" Source="zs4" Target="IN"/>
+                <Transition Event="start_ER[TUER]" Source="IN" Target="er1"/>
+                <Transition Event="start_VR[TUER]" Source="IN" Target="vr1"/>
+                <Transition Event="MER_aus[TUER]" Source="IN" Target="IN"/>
+                <Transition Event="MVR_aus[TUER]" Source="IN" Target="IN"/>
+                <Transition Event="reset[TUER]" Source="IN" Target="IN"/>
+                <Transition Event="STZV[TUER]" Source="IN" Target="IN"/>
+                <Transition Event="timeout[TUER]" Source="IN" Target="IN"/>
+                <Transition Event="start_ZS[TUER]" Source="IN" Target="zs1"/>
+                <Transition Event="time_VR[TUER]" Source="vr1" Target="vr2"/>
+                <Transition Event="timeout[TUER]" Source="vr2" Target="vr5"/>
+                <Transition Event="MVR_an[TUER]" Source="vr2" Target="vr3"/>
+                <Transition Event="STZV[TUER]" Source="vr3" Target="vr4"/>
+                <Transition Event="timeout[TUER]" Source="vr3" Target="vr4"/>
+                <Transition Event="MVR_aus[TUER]" Source="vr4" Target="vr5"/>
+                <Transition Event="STZV[TUER]" Source="vr4" Target="vr4"/>
+                <Transition Event="timeout[TUER]" Source="vr4" Target="vr4"/>
+                <Transition Event="reset[TUER]" Source="vr5" Target="vr5"/>
+                <Transition Event="timeout[TUER]" Source="vr5" Target="vr5"/>
+                <Transition Event="stop_VR[TUER]" Source="vr5" Target="IN"/>
+                <Transition Event="soft_CS" Source="zs4" Target="IN"/>
+                <Transition Event="soft_CS" Source="er2" Target="IN"/>
+                <Transition Event="soft_CS" Source="zs1" Target="IN"/>
+                <Transition Event="soft_CS" Source="vr1" Target="IN"/>
+                <Transition Event="soft_CS" Source="vr5" Target="IN"/>
+                <Transition Event="soft_CS" Source="er4" Target="IN"/>
+                <Transition Event="soft_CS" Source="vr3" Target="IN"/>
+                <Transition Event="soft_CS" Source="zs2" Target="IN"/>
+                <Transition Event="soft_CS" Source="vr2" Target="IN"/>
+                <Transition Event="soft_CS" Source="er1" Target="IN"/>
+                <Transition Event="soft_CS" Source="er3" Target="IN"/>
+                <Transition Event="soft_CS" Source="vr4" Target="IN"/>
+                <Transition Event="soft_CS" Source="zs3" Target="IN"/>
+                <Transition Event="soft_CS" Source="IN" Target="IN"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="ttimer">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="reset[TUER]"/>
+                <EventRef Name="time_ER[TUER]"/>
+                <EventRef Name="time_VR[TUER]"/>
+                <EventRef Name="time_W[TUER]"/>
+                <EventRef Name="time_ZS[TUER]"/>
+                <EventRef Name="timeout[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="IDLE">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="RUN"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="time_W[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="time_ER[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="time_VR[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="time_ZS[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="reset[TUER]" Source="RUN" Target="IDLE"/>
+                <Transition Event="timeout[TUER]" Source="RUN" Target="IDLE"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="ttimguard">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="reset[TUER]"/>
+                <EventRef Name="start_ER[TUER]"/>
+                <EventRef Name="start_VR[TUER]"/>
+                <EventRef Name="start_ZS[TUER]"/>
+                <EventRef Name="stop_ER[TUER]"/>
+                <EventRef Name="stop_VR[TUER]"/>
+                <EventRef Name="stop_ZS[TUER]"/>
+                <EventRef Name="time_ER[TUER]"/>
+                <EventRef Name="time_VR[TUER]"/>
+                <EventRef Name="time_W[TUER]"/>
+                <EventRef Name="time_ZS[TUER]"/>
+                <EventRef Name="timeout[TUER]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="IDLE">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="RUN"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="time_W[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="time_ER[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="time_VR[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="time_ZS[TUER]" Source="IDLE" Target="RUN"/>
+                <Transition Event="start_ER[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_ER[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="start_VR[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_VR[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="start_ZS[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="stop_ZS[TUER]" Source="IDLE" Target="IDLE"/>
+                <Transition Event="timeout[TUER]" Source="RUN" Target="IDLE"/>
+                <Transition Event="reset[TUER]" Source="RUN" Target="IDLE"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="tuermodell[TUER]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="CS_ok"/>
+                <EventRef Name="done_ER"/>
+                <EventRef Name="done_SER[TUER]"/>
+                <EventRef Name="done_VR"/>
+                <EventRef Name="done_ZS"/>
+                <EventRef Name="soft_CS"/>
+                <EventRef Name="soft_ER"/>
+                <EventRef Name="soft_SER[TUER]"/>
+                <EventRef Name="soft_VR"/>
+                <EventRef Name="soft_ZS"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="false" Name="CS"/>
+                <State Initial="false" Name="ER"/>
+                <State Initial="true" Name="IN">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="SER"/>
+                <State Initial="false" Name="VR"/>
+                <State Initial="false" Name="ZS"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="CS_ok" Source="CS" Target="IN"/>
+                <Transition Event="soft_ZS" Source="IN" Target="ZS"/>
+                <Transition Event="soft_SER[TUER]" Source="IN" Target="SER"/>
+                <Transition Event="soft_VR" Source="IN" Target="VR"/>
+                <Transition Event="soft_ER" Source="IN" Target="ER"/>
+                <Transition Event="done_VR" Source="VR" Target="IN"/>
+                <Transition Event="done_ZS" Source="ZS" Target="IN"/>
+                <Transition Event="done_SER[TUER]" Source="SER" Target="IN"/>
+                <Transition Event="done_ER" Source="ER" Target="IN"/>
+                <Transition Event="soft_CS" Source="ER" Target="CS"/>
+                <Transition Event="soft_CS" Source="VR" Target="CS"/>
+                <Transition Event="soft_CS" Source="SER" Target="CS"/>
+                <Transition Event="soft_CS" Source="ZS" Target="CS"/>
+                <Transition Event="soft_CS" Source="IN" Target="CS"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

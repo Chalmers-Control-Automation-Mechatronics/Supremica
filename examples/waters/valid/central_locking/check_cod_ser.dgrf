@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="check_cod_ser" version="1.0" valid="1"
+	hasGeometry="1" width="219" height="64"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:47:51 GMT" modificationDate="2004-09-07 08:47:51 GMT">
+	<events>
+		<event controllable="0" name="cod_er"/>
+		<event controllable="0" name="cod_ser"/>
+		<event controllable="1" name="is_cod_er"/>
+		<event controllable="1" name="is_cod_ser"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="208" y="64"/></rendering>
+			<label name="SER">
+				<rendering><point x="-12" y="21"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="64"/></rendering>
+			<label name="ER">
+				<rendering><point x="-8" y="21"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="240" y="64"/></rendering>
+			<source name="SER"/>
+			<labelGroup>
+				<rendering><point x="-32" y="-18"/></rendering>
+				<label name="is_cod_ser"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="159" y="57"/></rendering>
+			<source name="SER"/>
+			<target name="ER"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-7"/></rendering>
+				<label name="cod_er"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="160" y="72"/></rendering>
+			<source name="ER"/>
+			<target name="SER"/>
+			<labelGroup>
+				<rendering><point x="-28" y="14"/></rendering>
+				<label name="cod_ser"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="80" y="65"/></rendering>
+			<source name="ER"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-16"/></rendering>
+				<label name="is_cod_er"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

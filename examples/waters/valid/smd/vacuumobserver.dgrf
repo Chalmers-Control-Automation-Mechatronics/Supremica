@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="vacuumobserver" version="1.0" valid="1"
+	hasGeometry="1" width="176" height="178"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-05 08:22:44 GMT" modificationDate="2004-09-05 08:22:44 GMT">
+	<events>
+		<event controllable="0" name="done_recover"/>
+		<event controllable="0" name="done_vacuum"/>
+		<event controllable="0" name="error_vacuum"/>
+		<event controllable="1" name="recover"/>
+		<event controllable="1" name="vacuum"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="80" y="160"/></rendering>
+			<label name="s0">
+				<rendering><point x="-14" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="192" y="160"/></rendering>
+			<label name="s1">
+				<rendering><point x="-4" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="80" y="64"/></rendering>
+			<label name="s2">
+				<rendering><point x="-7" y="-11"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="s0"/>
+			<target name="s2"/>
+			<labelGroup>
+				<rendering><point x="-47" y="6"/></rendering>
+				<label name="recover"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-15" y="-7"/></rendering>
+				<label name="vacuum"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="109" y="112"/></rendering>
+			<source name="s2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-13" y="8"/></rendering>
+				<label name="done_recover"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="136" y="194"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-34" y="0"/></rendering>
+				<label name="done_vacuum"/>
+				<label name="error_vacuum">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

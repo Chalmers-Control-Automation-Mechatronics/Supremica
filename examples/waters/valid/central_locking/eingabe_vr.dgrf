@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="eingabe_vr" version="1.0" valid="1"
+	hasGeometry="1" width="219" height="208"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:48:29 GMT" modificationDate="2004-09-07 08:48:29 GMT">
+	<events>
+		<event controllable="1" name="CS_ok"/>
+		<event controllable="0" name="ER_BT"/>
+		<event controllable="0" name="ER_FS"/>
+		<event controllable="0" name="ER_FT"/>
+		<event controllable="0" name="ER_HK"/>
+		<event controllable="1" name="soft_CS"/>
+		<event controllable="1" name="TAST"/>
+		<event controllable="0" name="TASTVR"/>
+		<event controllable="0" name="VR_BT"/>
+		<event controllable="0" name="VR_FS"/>
+		<event controllable="0" name="VR_FT"/>
+		<event controllable="0" name="VR_HK"/>
+		<event controllable="1" name="WSP"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="64" y="176"/></rendering>
+			<label name="IN">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="176"/></rendering>
+			<label name="VR">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="212" y="175"/></rendering>
+			<source name="VR"/>
+			<labelGroup>
+				<rendering><point x="-44" y="-16"/></rendering>
+				<label name="TASTVR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="120" y="159"/></rendering>
+			<source name="VR"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-4" y="-139"/></rendering>
+				<label name="ER_FT"/>
+				<label name="ER_BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="ER_HK">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="ER_FS">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="VR_FT">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="VR_BT">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="VR_HK">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+				<label name="VR_FS">
+					<rendering><point x="0" y="105"/></rendering>
+				</label>
+				<label name="TAST">
+					<rendering><point x="0" y="120"/></rendering>
+				</label>
+				<label name="WSP">
+					<rendering><point x="0" y="135"/></rendering>
+				</label>
+				<label name="soft_CS">
+					<rendering><point x="0" y="150"/></rendering>
+				</label>
+				<label name="CS_ok">
+					<rendering><point x="0" y="165"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="120" y="193"/></rendering>
+			<source name="IN"/>
+			<target name="VR"/>
+			<labelGroup>
+				<rendering><point x="-40" y="11"/></rendering>
+				<label name="TASTVR"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="27" y="174"/></rendering>
+			<source name="IN"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-133"/></rendering>
+				<label name="WSP"/>
+				<label name="soft_CS">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="CS_ok">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="ER_FT">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="ER_BT">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="ER_HK">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="ER_FS">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+				<label name="VR_FT">
+					<rendering><point x="0" y="105"/></rendering>
+				</label>
+				<label name="VR_BT">
+					<rendering><point x="0" y="120"/></rendering>
+				</label>
+				<label name="VR_HK">
+					<rendering><point x="0" y="135"/></rendering>
+				</label>
+				<label name="VR_FS">
+					<rendering><point x="0" y="150"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

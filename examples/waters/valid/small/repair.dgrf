@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="repair" version="1.0" valid="1"
+	hasGeometry="1" width="233" height="78"
+	generatorName="DGE" generatorVersion="2.7.1"
+	creationDate="2000-09-27 12:59:58 GMT+00:00" modificationDate="2000-09-27 12:59:58 GMT+00:00">
+	<events>
+		<event controllable="0" name="break.2"/>
+		<event controllable="1" name="repair.1"/>
+		<event controllable="1" name="repair.2"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="176" y="176"/></rendering>
+			<label name="m1">
+				<rendering><point x="-7" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="176"/></rendering>
+			<label name="m2">
+				<rendering><point x="-7" y="20"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="134" y="176"/></rendering>
+			<source name="m1"/>
+			<labelGroup>
+				<rendering><point x="-45" y="3"/></rendering>
+				<label name="repair.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="238" y="160"/></rendering>
+			<source name="m1"/>
+			<target name="m2"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-5"/></rendering>
+				<label name="break.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="237" y="192"/></rendering>
+			<source name="m2"/>
+			<target name="m1"/>
+			<labelGroup>
+				<rendering><point x="-19" y="16"/></rendering>
+				<label name="repair.2"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

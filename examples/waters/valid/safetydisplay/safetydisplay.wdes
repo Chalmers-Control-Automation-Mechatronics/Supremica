@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="safetydisplay" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="CONTROLLABLE" Name="displayoff"/>
+        <Event Kind="CONTROLLABLE" Name="displayon[1]"/>
+        <Event Kind="CONTROLLABLE" Name="displayon[2]"/>
+        <Event Kind="CONTROLLABLE" Name="displayon[3]"/>
+        <Event Kind="UNCONTROLLABLE" Name="switchoff[1]"/>
+        <Event Kind="UNCONTROLLABLE" Name="switchoff[2]"/>
+        <Event Kind="UNCONTROLLABLE" Name="switchoff[3]"/>
+        <Event Kind="UNCONTROLLABLE" Name="switchon[1]"/>
+        <Event Kind="UNCONTROLLABLE" Name="switchon[2]"/>
+        <Event Kind="UNCONTROLLABLE" Name="switchon[3]"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="PLANT" Name="display">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="displayoff"/>
+                <EventRef Name="displayon[1]"/>
+                <EventRef Name="displayon[2]"/>
+                <EventRef Name="displayon[3]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+                <State Name="s2"/>
+                <State Name="s3"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="displayoff" Source="s2" Target="s0"/>
+                <Transition Event="displayoff" Source="s1" Target="s0"/>
+                <Transition Event="displayoff" Source="s3" Target="s0"/>
+                <Transition Event="displayon[3]" Source="s0" Target="s2"/>
+                <Transition Event="displayon[2]" Source="s0" Target="s1"/>
+                <Transition Event="displayon[1]" Source="s0" Target="s3"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="displaypriority">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="displayoff"/>
+                <EventRef Name="displayon[1]"/>
+                <EventRef Name="displayon[2]"/>
+                <EventRef Name="displayon[3]"/>
+                <EventRef Name="switchoff[1]"/>
+                <EventRef Name="switchoff[2]"/>
+                <EventRef Name="switchoff[3]"/>
+                <EventRef Name="switchon[1]"/>
+                <EventRef Name="switchon[2]"/>
+                <EventRef Name="switchon[3]"/>
+            </EventRefList>
+            <StateList>
+                <State Name="off"/>
+                <State Name="on1"/>
+                <State Name="on12"/>
+                <State Initial="true" Name="on123">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="on13"/>
+                <State Name="on2"/>
+                <State Name="on23"/>
+                <State Name="on3"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="displayon[1]" Source="on23" Target="on23"/>
+                <Transition Event="switchon[2]" Source="on23" Target="on23"/>
+                <Transition Event="switchon[3]" Source="on23" Target="on23"/>
+                <Transition Event="switchoff[2]" Source="on23" Target="on3"/>
+                <Transition Event="switchon[1]" Source="on23" Target="on123"/>
+                <Transition Event="switchoff[3]" Source="on23" Target="on2"/>
+                <Transition Event="displayon[2]" Source="on13" Target="on13"/>
+                <Transition Event="switchon[3]" Source="on13" Target="on13"/>
+                <Transition Event="switchon[1]" Source="on13" Target="on13"/>
+                <Transition Event="switchoff[1]" Source="on13" Target="on3"/>
+                <Transition Event="switchoff[3]" Source="on13" Target="on1"/>
+                <Transition Event="switchon[2]" Source="on13" Target="on123"/>
+                <Transition Event="switchon[2]" Source="on3" Target="on23"/>
+                <Transition Event="switchon[1]" Source="on3" Target="on13"/>
+                <Transition Event="displayon[1]" Source="on3" Target="on3"/>
+                <Transition Event="switchon[3]" Source="on3" Target="on3"/>
+                <Transition Event="switchoff[3]" Source="on3" Target="off"/>
+                <Transition Event="displayon[3]" Source="on12" Target="on12"/>
+                <Transition Event="switchon[1]" Source="on12" Target="on12"/>
+                <Transition Event="switchon[2]" Source="on12" Target="on12"/>
+                <Transition Event="switchoff[2]" Source="on12" Target="on1"/>
+                <Transition Event="switchon[3]" Source="on12" Target="on123"/>
+                <Transition Event="switchoff[1]" Source="on12" Target="on2"/>
+                <Transition Event="switchon[3]" Source="on1" Target="on13"/>
+                <Transition Event="switchon[2]" Source="on1" Target="on12"/>
+                <Transition Event="displayon[2]" Source="on1" Target="on1"/>
+                <Transition Event="switchon[1]" Source="on1" Target="on1"/>
+                <Transition Event="switchoff[1]" Source="on1" Target="off"/>
+                <Transition Event="switchon[3]" Source="off" Target="on3"/>
+                <Transition Event="switchon[1]" Source="off" Target="on1"/>
+                <Transition Event="displayon[1]" Source="off" Target="off"/>
+                <Transition Event="switchon[2]" Source="off" Target="on2"/>
+                <Transition Event="switchoff[1]" Source="on123" Target="on23"/>
+                <Transition Event="switchoff[2]" Source="on123" Target="on13"/>
+                <Transition Event="switchoff[3]" Source="on123" Target="on12"/>
+                <Transition Event="displayoff" Source="on123" Target="on123"/>
+                <Transition Event="switchon[2]" Source="on123" Target="on123"/>
+                <Transition Event="switchon[3]" Source="on123" Target="on123"/>
+                <Transition Event="switchon[1]" Source="on123" Target="on123"/>
+                <Transition Event="switchon[3]" Source="on2" Target="on23"/>
+                <Transition Event="switchon[1]" Source="on2" Target="on12"/>
+                <Transition Event="switchoff[2]" Source="on2" Target="off"/>
+                <Transition Event="displayon[1]" Source="on2" Target="on2"/>
+                <Transition Event="switchon[2]" Source="on2" Target="on2"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="door[1]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="switchoff[1]"/>
+                <EventRef Name="switchon[1]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="init"/>
+                <State Name="off">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="on">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="switchoff[1]" Source="on" Target="off"/>
+                <Transition Event="switchon[1]" Source="off" Target="on"/>
+                <Transition Event="switchon[1]" Source="init" Target="on"/>
+                <Transition Event="switchoff[1]" Source="init" Target="off"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="door[2]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="switchoff[2]"/>
+                <EventRef Name="switchon[2]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="init"/>
+                <State Name="off">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="on">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="switchoff[2]" Source="on" Target="off"/>
+                <Transition Event="switchon[2]" Source="off" Target="on"/>
+                <Transition Event="switchon[2]" Source="init" Target="on"/>
+                <Transition Event="switchoff[2]" Source="init" Target="off"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="door[3]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="switchoff[3]"/>
+                <EventRef Name="switchon[3]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="init"/>
+                <State Name="off">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="on">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="switchoff[3]" Source="on" Target="off"/>
+                <Transition Event="switchon[3]" Source="off" Target="on"/>
+                <Transition Event="switchon[3]" Source="init" Target="on"/>
+                <Transition Event="switchoff[3]" Source="init" Target="off"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

@@ -1,0 +1,2968 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="fischertechnik" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="CONTROLLABLE" Name="B1_start"/>
+<Event Kind="CONTROLLABLE" Name="B1_stop"/>
+<Event Kind="CONTROLLABLE" Name="LED_off[S1]"/>
+<Event Kind="CONTROLLABLE" Name="LED_off[S2]"/>
+<Event Kind="CONTROLLABLE" Name="LED_off[S3]"/>
+<Event Kind="CONTROLLABLE" Name="LED_off[S4]"/>
+<Event Kind="CONTROLLABLE" Name="LED_on[S1]"/>
+<Event Kind="CONTROLLABLE" Name="LED_on[S2]"/>
+<Event Kind="CONTROLLABLE" Name="LED_on[S3]"/>
+<Event Kind="CONTROLLABLE" Name="LED_on[S4]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS1_off_B2[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_off[S1]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_off[S2]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_off[S3]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_off[S4]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_off_B1[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_on[S1]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_on[S2]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_on[S3]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_on[S4]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_on_B1[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_on_B1[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="LS_on_B2[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X1[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X2[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X2[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X3[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X3[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X4[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X4[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X5[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X5[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X6[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X6[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X7[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X7[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="L_at_X8[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_back[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_back[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_down[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_down[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S1][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S1][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S2][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S2][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S3][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S3][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S4][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S4][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_dropS[S][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_drop_B2[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_forward[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_forward[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_left[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_left[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX1[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX2[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX2[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX3[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX3[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX4[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX4[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX5[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX5[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX6[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX6[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX7[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX7[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mX8[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mY1[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mY1[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mY2[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mY2[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mY3[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mY3[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mag_off[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mag_off[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_mag_on[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_mag_on[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S1][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S1][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S2][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S2][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S3][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S3][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S4][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S4][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S][1]"/>
+<Event Kind="CONTROLLABLE" Name="L_pickS[S][2]"/>
+<Event Kind="CONTROLLABLE" Name="L_pick_B1[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_right[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_right[2]"/>
+<Event Kind="CONTROLLABLE" Name="L_up[1]"/>
+<Event Kind="CONTROLLABLE" Name="L_up[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_X1[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_X8[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Y1[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Y1[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Y2[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Y2[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Y3[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Y3[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Z1[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Z1[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Z2[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="TL_Z2[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X1"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X2"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X3"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X4"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X5"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X6"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X7"/>
+<Event Kind="UNCONTROLLABLE" Name="T_X8"/>
+<Event Kind="CONTROLLABLE" Name="init"/>
+<Event Kind="CONTROLLABLE" Name="init_done"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="belt">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="B1_start"/>
+<EventRef Name="B1_stop"/>
+<EventRef Name="LS_off_B1[2]"/>
+<EventRef Name="LS_on_B1[1]"/>
+<EventRef Name="LS_on_B1[2]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="belt_ready">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="belt_running"/>
+<State Name="belt_stopped"/>
+<State Name="init"/>
+<State Name="part_at_begin"/>
+<State Name="part_at_end"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="LS_on_B1[1]" Source="belt_running" Target="belt_running"/>
+<Transition Event="LS_off_B1[2]" Source="belt_running" Target="belt_running"/>
+<Transition Event="LS_on_B1[2]" Source="belt_running" Target="part_at_end"/>
+<Transition Event="LS_on_B1[1]" Source="belt_stopped" Target="belt_stopped"/>
+<Transition Event="LS_on_B1[2]" Source="belt_stopped" Target="belt_stopped"/>
+<Transition Event="LS_off_B1[2]" Source="belt_stopped" Target="belt_ready"/>
+<Transition Event="LS_on_B1[1]" Source="start" Target="start"/>
+<Transition Event="LS_on_B1[2]" Source="start" Target="start"/>
+<Transition Event="LS_off_B1[2]" Source="start" Target="start"/>
+<Transition Event="B1_stop" Source="start" Target="init"/>
+<Transition Event="LS_on_B1[2]" Source="belt_ready" Target="belt_stopped"/>
+<Transition Event="LS_off_B1[2]" Source="belt_ready" Target="belt_ready"/>
+<Transition Event="LS_on_B1[1]" Source="belt_ready" Target="part_at_begin"/>
+<Transition Event="init_done" Source="init" Target="belt_ready"/>
+<Transition Event="LS_on_B1[1]" Source="init" Target="init"/>
+<Transition Event="LS_on_B1[2]" Source="init" Target="init"/>
+<Transition Event="LS_off_B1[2]" Source="init" Target="init"/>
+<Transition Event="B1_stop" Source="part_at_end" Target="belt_stopped"/>
+<Transition Event="LS_on_B1[1]" Source="part_at_end" Target="part_at_end"/>
+<Transition Event="LS_on_B1[2]" Source="part_at_end" Target="part_at_end"/>
+<Transition Event="LS_off_B1[2]" Source="part_at_end" Target="part_at_end"/>
+<Transition Event="B1_start" Source="part_at_begin" Target="belt_running"/>
+<Transition Event="LS_on_B1[2]" Source="part_at_begin" Target="belt_stopped"/>
+<Transition Event="LS_on_B1[1]" Source="part_at_begin" Target="part_at_begin"/>
+<Transition Event="LS_off_B1[2]" Source="part_at_begin" Target="part_at_begin"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="belt_drop">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LS1_off_B2[1]"/>
+<EventRef Name="LS_on_B2[1]"/>
+<EventRef Name="L_drop_B2[2]"/>
+</EventRefList>
+<StateList>
+<State Name="B2begin_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="B2begin_occupied"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="LS1_off_B2[1]" Source="B2begin_empty" Target="B2begin_empty"/>
+<Transition Event="L_drop_B2[2]" Source="B2begin_empty" Target="B2begin_occupied"/>
+<Transition Event="LS_on_B2[1]" Source="B2begin_empty" Target="B2begin_occupied"/>
+<Transition Event="LS1_off_B2[1]" Source="B2begin_occupied" Target="B2begin_empty"/>
+<Transition Event="LS_on_B2[1]" Source="B2begin_occupied" Target="B2begin_occupied"/>
+<Transition Event="LS1_off_B2[1]" Source="start" Target="B2begin_empty"/>
+<Transition Event="LS_on_B2[1]" Source="start" Target="B2begin_occupied"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="belt_pick">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LS_off_B1[2]"/>
+<EventRef Name="LS_on_B1[2]"/>
+<EventRef Name="L_pick_B1[1]"/>
+</EventRefList>
+<StateList>
+<State Name="B1end_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="B1end_occupied"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="LS_off_B1[2]" Source="B1end_empty" Target="B1end_empty"/>
+<Transition Event="LS_on_B1[2]" Source="B1end_empty" Target="B1end_occupied"/>
+<Transition Event="LS_off_B1[2]" Source="start" Target="B1end_empty"/>
+<Transition Event="LS_on_B1[2]" Source="start" Target="B1end_occupied"/>
+<Transition Event="L_pick_B1[1]" Source="B1end_occupied" Target="B1end_empty"/>
+<Transition Event="LS_off_B1[2]" Source="B1end_occupied" Target="B1end_empty"/>
+<Transition Event="LS_on_B1[2]" Source="B1end_occupied" Target="B1end_occupied"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="drop_on_station[S1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LS_off[S1]"/>
+<EventRef Name="LS_on[S1]"/>
+<EventRef Name="L_dropS[S1][1]"/>
+<EventRef Name="L_dropS[S1][2]"/>
+<EventRef Name="L_pickS[S1][1]"/>
+<EventRef Name="L_pickS[S1][2]"/>
+</EventRefList>
+<StateList>
+<State Name="part_dropped"/>
+<State Name="part_pickedup"/>
+<State Initial="true" Name="start"/>
+<State Name="station_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="station_occupied">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="LS_off[S1]" Source="start" Target="station_empty"/>
+<Transition Event="LS_on[S1]" Source="start" Target="station_occupied"/>
+<Transition Event="LS_off[S1]" Source="station_empty" Target="station_empty"/>
+<Transition Event="L_dropS[S1][1]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="L_dropS[S1][2]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S1]" Source="station_empty" Target="part_pickedup"/>
+<Transition Event="LS_off[S1]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S1]" Source="part_dropped" Target="station_occupied"/>
+<Transition Event="LS_off[S1]" Source="station_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S1]" Source="station_occupied" Target="station_occupied"/>
+<Transition Event="L_pickS[S1][1]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="L_pickS[S1][2]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="LS_off[S1]" Source="part_pickedup" Target="station_empty"/>
+<Transition Event="LS_on[S1]" Source="part_pickedup" Target="part_pickedup"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="drop_on_station[S2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LS_off[S2]"/>
+<EventRef Name="LS_on[S2]"/>
+<EventRef Name="L_dropS[S2][1]"/>
+<EventRef Name="L_dropS[S2][2]"/>
+<EventRef Name="L_pickS[S2][1]"/>
+<EventRef Name="L_pickS[S2][2]"/>
+</EventRefList>
+<StateList>
+<State Name="part_dropped"/>
+<State Name="part_pickedup"/>
+<State Initial="true" Name="start"/>
+<State Name="station_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="station_occupied">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="LS_off[S2]" Source="start" Target="station_empty"/>
+<Transition Event="LS_on[S2]" Source="start" Target="station_occupied"/>
+<Transition Event="LS_off[S2]" Source="station_empty" Target="station_empty"/>
+<Transition Event="L_dropS[S2][1]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="L_dropS[S2][2]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S2]" Source="station_empty" Target="part_pickedup"/>
+<Transition Event="LS_off[S2]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S2]" Source="part_dropped" Target="station_occupied"/>
+<Transition Event="LS_off[S2]" Source="station_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S2]" Source="station_occupied" Target="station_occupied"/>
+<Transition Event="L_pickS[S2][1]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="L_pickS[S2][2]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="LS_off[S2]" Source="part_pickedup" Target="station_empty"/>
+<Transition Event="LS_on[S2]" Source="part_pickedup" Target="part_pickedup"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="drop_on_station[S3]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LS_off[S3]"/>
+<EventRef Name="LS_on[S3]"/>
+<EventRef Name="L_dropS[S3][1]"/>
+<EventRef Name="L_dropS[S3][2]"/>
+<EventRef Name="L_pickS[S3][1]"/>
+<EventRef Name="L_pickS[S3][2]"/>
+</EventRefList>
+<StateList>
+<State Name="part_dropped"/>
+<State Name="part_pickedup"/>
+<State Initial="true" Name="start"/>
+<State Name="station_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="station_occupied">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="LS_off[S3]" Source="start" Target="station_empty"/>
+<Transition Event="LS_on[S3]" Source="start" Target="station_occupied"/>
+<Transition Event="LS_off[S3]" Source="station_empty" Target="station_empty"/>
+<Transition Event="L_dropS[S3][1]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="L_dropS[S3][2]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S3]" Source="station_empty" Target="part_pickedup"/>
+<Transition Event="LS_off[S3]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S3]" Source="part_dropped" Target="station_occupied"/>
+<Transition Event="LS_off[S3]" Source="station_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S3]" Source="station_occupied" Target="station_occupied"/>
+<Transition Event="L_pickS[S3][1]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="L_pickS[S3][2]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="LS_off[S3]" Source="part_pickedup" Target="station_empty"/>
+<Transition Event="LS_on[S3]" Source="part_pickedup" Target="part_pickedup"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="drop_on_station[S4]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LS_off[S4]"/>
+<EventRef Name="LS_on[S4]"/>
+<EventRef Name="L_dropS[S4][1]"/>
+<EventRef Name="L_dropS[S4][2]"/>
+<EventRef Name="L_pickS[S4][1]"/>
+<EventRef Name="L_pickS[S4][2]"/>
+</EventRefList>
+<StateList>
+<State Name="part_dropped"/>
+<State Name="part_pickedup"/>
+<State Initial="true" Name="start"/>
+<State Name="station_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="station_occupied">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Event="LS_off[S4]" Source="start" Target="station_empty"/>
+<Transition Event="LS_on[S4]" Source="start" Target="station_occupied"/>
+<Transition Event="LS_off[S4]" Source="station_empty" Target="station_empty"/>
+<Transition Event="L_dropS[S4][1]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="L_dropS[S4][2]" Source="station_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S4]" Source="station_empty" Target="part_pickedup"/>
+<Transition Event="LS_off[S4]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S4]" Source="part_dropped" Target="station_occupied"/>
+<Transition Event="LS_off[S4]" Source="station_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S4]" Source="station_occupied" Target="station_occupied"/>
+<Transition Event="L_pickS[S4][1]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="L_pickS[S4][2]" Source="station_occupied" Target="part_pickedup"/>
+<Transition Event="LS_off[S4]" Source="part_pickedup" Target="station_empty"/>
+<Transition Event="LS_on[S4]" Source="part_pickedup" Target="part_pickedup"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="init">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_dropS[S][1]"/>
+<EventRef Name="L_dropS[S][2]"/>
+<EventRef Name="L_drop_B2[2]"/>
+<EventRef Name="L_mX1[1]"/>
+<EventRef Name="L_mX2[1]"/>
+<EventRef Name="L_mX3[1]"/>
+<EventRef Name="L_mX4[1]"/>
+<EventRef Name="L_mX5[1]"/>
+<EventRef Name="L_mX6[1]"/>
+<EventRef Name="L_mX7[1]"/>
+<EventRef Name="L_pickS[S][1]"/>
+<EventRef Name="L_pickS[S][2]"/>
+<EventRef Name="L_pick_B1[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="s0">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="s1"/>
+</StateList>
+<TransitionList>
+<Transition Event="init_done" Source="s1" Target="s0"/>
+<Transition Event="init" Source="s0" Target="s1"/>
+<Transition Event="L_mX1[1]" Source="s0" Target="s0"/>
+<Transition Event="L_mX2[1]" Source="s0" Target="s0"/>
+<Transition Event="L_mX3[1]" Source="s0" Target="s0"/>
+<Transition Event="L_mX4[1]" Source="s0" Target="s0"/>
+<Transition Event="L_mX5[1]" Source="s0" Target="s0"/>
+<Transition Event="L_mX6[1]" Source="s0" Target="s0"/>
+<Transition Event="L_mX7[1]" Source="s0" Target="s0"/>
+<Transition Event="L_drop_B2[2]" Source="s0" Target="s0"/>
+<Transition Event="L_dropS[S][1]" Source="s0" Target="s0"/>
+<Transition Event="L_dropS[S][2]" Source="s0" Target="s0"/>
+<Transition Event="L_pickS[S][1]" Source="s0" Target="s0"/>
+<Transition Event="L_pickS[S][2]" Source="s0" Target="s0"/>
+<Transition Event="L_pick_B1[1]" Source="s0" Target="s0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="init_L1X1">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_left[1]"/>
+<EventRef Name="TL_X1[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_move"/>
+<State Name="L_reached"/>
+<State Name="initialized">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_X1[1]" Source="L_reached" Target="L_reached"/>
+<Transition Event="init_done" Source="L_reached" Target="initialized"/>
+<Transition Event="TL_X1[1]" Source="L_move" Target="L_reached"/>
+<Transition Event="L_left[1]" Source="L_move" Target="L_move"/>
+<Transition Event="TL_X1[1]" Source="start" Target="L_reached"/>
+<Transition Event="L_left[1]" Source="start" Target="L_move"/>
+<Transition Event="init" Source="initialized" Target="start"/>
+<Transition Event="TL_X1[1]" Source="initialized" Target="initialized"/>
+<Transition Event="L_left[1]" Source="initialized" Target="initialized"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="init_L2X8">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_right[2]"/>
+<EventRef Name="TL_X8[2]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_move"/>
+<State Name="L_reached"/>
+<State Name="initialized">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_right[2]" Source="L_move" Target="L_move"/>
+<Transition Event="TL_X8[2]" Source="L_move" Target="L_reached"/>
+<Transition Event="TL_X8[2]" Source="initialized" Target="initialized"/>
+<Transition Event="L_right[2]" Source="initialized" Target="initialized"/>
+<Transition Event="init" Source="initialized" Target="start"/>
+<Transition Event="L_right[2]" Source="start" Target="L_move"/>
+<Transition Event="TL_X8[2]" Source="start" Target="L_reached"/>
+<Transition Event="init_done" Source="L_reached" Target="initialized"/>
+<Transition Event="TL_X8[2]" Source="L_reached" Target="L_reached"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="init_LZ1[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_up[1]"/>
+<EventRef Name="TL_Z1[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_move"/>
+<State Name="L_reached"/>
+<State Name="initialized">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Z1[1]" Source="initialized" Target="initialized"/>
+<Transition Event="L_up[1]" Source="initialized" Target="initialized"/>
+<Transition Event="init" Source="initialized" Target="start"/>
+<Transition Event="init_done" Source="L_reached" Target="initialized"/>
+<Transition Event="TL_Z1[1]" Source="L_reached" Target="L_reached"/>
+<Transition Event="TL_Z1[1]" Source="L_move" Target="L_reached"/>
+<Transition Event="L_up[1]" Source="L_move" Target="L_move"/>
+<Transition Event="TL_Z1[1]" Source="start" Target="L_reached"/>
+<Transition Event="L_up[1]" Source="start" Target="L_move"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="init_LZ1[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_up[2]"/>
+<EventRef Name="TL_Z1[2]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_move"/>
+<State Name="L_reached"/>
+<State Name="initialized">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Z1[2]" Source="initialized" Target="initialized"/>
+<Transition Event="L_up[2]" Source="initialized" Target="initialized"/>
+<Transition Event="init" Source="initialized" Target="start"/>
+<Transition Event="init_done" Source="L_reached" Target="initialized"/>
+<Transition Event="TL_Z1[2]" Source="L_reached" Target="L_reached"/>
+<Transition Event="TL_Z1[2]" Source="L_move" Target="L_reached"/>
+<Transition Event="L_up[2]" Source="L_move" Target="L_move"/>
+<Transition Event="TL_Z1[2]" Source="start" Target="L_reached"/>
+<Transition Event="L_up[2]" Source="start" Target="L_move"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="init_Y[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[1]"/>
+<EventRef Name="L_forward[1]"/>
+<EventRef Name="L_mY1[1]"/>
+<EventRef Name="L_mY3[1]"/>
+<EventRef Name="TL_Y1[1]"/>
+<EventRef Name="TL_Y2[1]"/>
+<EventRef Name="TL_Y3[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Y1"/>
+<State Name="L_Y1Y2"/>
+<State Name="L_Y2"/>
+<State Name="L_Y3"/>
+<State Name="L_Y3Y2"/>
+<State Name="initialized">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_forward[1]" Source="start" Target="start"/>
+<Transition Event="L_back[1]" Source="start" Target="start"/>
+<Transition Event="TL_Y1[1]" Source="start" Target="L_Y1"/>
+<Transition Event="TL_Y3[1]" Source="start" Target="L_Y3"/>
+<Transition Event="TL_Y2[1]" Source="start" Target="L_Y2"/>
+<Transition Event="TL_Y1[1]" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="L_forward[1]" Source="L_Y1" Target="L_Y1Y2"/>
+<Transition Event="TL_Y2[1]" Source="L_Y1" Target="L_Y2"/>
+<Transition Event="TL_Y1[1]" Source="L_Y1Y2" Target="L_Y1Y2"/>
+<Transition Event="TL_Y2[1]" Source="L_Y1Y2" Target="L_Y2"/>
+<Transition Event="TL_Y3[1]" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="L_back[1]" Source="L_Y3" Target="L_Y3Y2"/>
+<Transition Event="TL_Y2[1]" Source="L_Y3" Target="L_Y2"/>
+<Transition Event="TL_Y3[1]" Source="L_Y3Y2" Target="L_Y3Y2"/>
+<Transition Event="TL_Y2[1]" Source="L_Y3Y2" Target="L_Y2"/>
+<Transition Event="TL_Y2[1]" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init_done" Source="L_Y2" Target="initialized"/>
+<Transition Event="init" Source="initialized" Target="start"/>
+<Transition Event="TL_Y1[1]" Source="initialized" Target="initialized"/>
+<Transition Event="TL_Y2[1]" Source="initialized" Target="initialized"/>
+<Transition Event="TL_Y3[1]" Source="initialized" Target="initialized"/>
+<Transition Event="L_forward[1]" Source="initialized" Target="initialized"/>
+<Transition Event="L_back[1]" Source="initialized" Target="initialized"/>
+<Transition Event="L_mY1[1]" Source="initialized" Target="initialized"/>
+<Transition Event="L_mY3[1]" Source="initialized" Target="initialized"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="init_Y[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[2]"/>
+<EventRef Name="L_forward[2]"/>
+<EventRef Name="L_mY1[2]"/>
+<EventRef Name="L_mY3[2]"/>
+<EventRef Name="TL_Y1[2]"/>
+<EventRef Name="TL_Y2[2]"/>
+<EventRef Name="TL_Y3[2]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Y1"/>
+<State Name="L_Y1Y2"/>
+<State Name="L_Y2"/>
+<State Name="L_Y3"/>
+<State Name="L_Y3Y2"/>
+<State Name="initialized">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_forward[2]" Source="start" Target="start"/>
+<Transition Event="L_back[2]" Source="start" Target="start"/>
+<Transition Event="TL_Y1[2]" Source="start" Target="L_Y1"/>
+<Transition Event="TL_Y3[2]" Source="start" Target="L_Y3"/>
+<Transition Event="TL_Y2[2]" Source="start" Target="L_Y2"/>
+<Transition Event="TL_Y1[2]" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="L_forward[2]" Source="L_Y1" Target="L_Y1Y2"/>
+<Transition Event="TL_Y2[2]" Source="L_Y1" Target="L_Y2"/>
+<Transition Event="TL_Y1[2]" Source="L_Y1Y2" Target="L_Y1Y2"/>
+<Transition Event="TL_Y2[2]" Source="L_Y1Y2" Target="L_Y2"/>
+<Transition Event="TL_Y3[2]" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="L_back[2]" Source="L_Y3" Target="L_Y3Y2"/>
+<Transition Event="TL_Y2[2]" Source="L_Y3" Target="L_Y2"/>
+<Transition Event="TL_Y3[2]" Source="L_Y3Y2" Target="L_Y3Y2"/>
+<Transition Event="TL_Y2[2]" Source="L_Y3Y2" Target="L_Y2"/>
+<Transition Event="TL_Y2[2]" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init_done" Source="L_Y2" Target="initialized"/>
+<Transition Event="init" Source="initialized" Target="start"/>
+<Transition Event="TL_Y1[2]" Source="initialized" Target="initialized"/>
+<Transition Event="TL_Y2[2]" Source="initialized" Target="initialized"/>
+<Transition Event="TL_Y3[2]" Source="initialized" Target="initialized"/>
+<Transition Event="L_forward[2]" Source="initialized" Target="initialized"/>
+<Transition Event="L_back[2]" Source="initialized" Target="initialized"/>
+<Transition Event="L_mY1[2]" Source="initialized" Target="initialized"/>
+<Transition Event="L_mY3[2]" Source="initialized" Target="initialized"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="magnet[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_mag_off[1]"/>
+<EventRef Name="L_mag_on[1]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="init"/>
+<State Name="mag_off">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="mag_on">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="init_done" Source="init" Target="mag_off"/>
+<Transition Event="init_done" Source="mag_off" Target="mag_off"/>
+<Transition Event="L_mag_on[1]" Source="mag_off" Target="mag_on"/>
+<Transition Event="L_mag_off[1]" Source="start" Target="init"/>
+<Transition Event="L_mag_off[1]" Source="mag_on" Target="mag_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="magnet[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_mag_off[2]"/>
+<EventRef Name="L_mag_on[2]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="init"/>
+<State Name="mag_off">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="mag_on">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="init_done" Source="init" Target="mag_off"/>
+<Transition Event="init_done" Source="mag_off" Target="mag_off"/>
+<Transition Event="L_mag_on[2]" Source="mag_off" Target="mag_on"/>
+<Transition Event="L_mag_off[2]" Source="start" Target="init"/>
+<Transition Event="L_mag_off[2]" Source="mag_on" Target="mag_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="magnet_L1">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X1[1]"/>
+<EventRef Name="L_at_X2[1]"/>
+<EventRef Name="L_at_X3[1]"/>
+<EventRef Name="L_at_X4[1]"/>
+<EventRef Name="L_at_X5[1]"/>
+<EventRef Name="L_at_X6[1]"/>
+<EventRef Name="L_at_X7[1]"/>
+<EventRef Name="L_mag_off[1]"/>
+<EventRef Name="L_mag_on[1]"/>
+<EventRef Name="TL_Y1[1]"/>
+<EventRef Name="TL_Y2[1]"/>
+<EventRef Name="TL_Y3[1]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="L1_UK"/>
+<State Name="X1Y1"/>
+<State Name="X1Y2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X1Y3"/>
+<State Name="X3Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X3Y2"/>
+<State Name="X3Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X6Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X6Y2"/>
+<State Name="X6Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="XY1"/>
+<State Name="XY2"/>
+<State Name="XY3"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_at_X2[1]" Source="XY1" Target="XY1"/>
+<Transition Event="L_at_X4[1]" Source="XY1" Target="XY1"/>
+<Transition Event="L_at_X5[1]" Source="XY1" Target="XY1"/>
+<Transition Event="L_at_X7[1]" Source="XY1" Target="XY1"/>
+<Transition Event="TL_Y1[1]" Source="XY1" Target="XY1"/>
+<Transition Event="L_at_X3[1]" Source="XY1" Target="X3Y1"/>
+<Transition Event="TL_Y2[1]" Source="XY1" Target="XY2"/>
+<Transition Event="L_at_X1[1]" Source="XY1" Target="X1Y1"/>
+<Transition Event="L_at_X6[1]" Source="XY1" Target="X6Y1"/>
+<Transition Event="L_mag_off[1]" Source="XY1" Target="X6Y1"/>
+<Transition Event="L_mag_off[1]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="L_mag_on[1]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="L_at_X6[1]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="TL_Y3[1]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="TL_Y2[1]" Source="X6Y3" Target="X6Y2"/>
+<Transition Event="L_at_X5[1]" Source="X6Y3" Target="XY3"/>
+<Transition Event="L_at_X7[1]" Source="X6Y3" Target="XY3"/>
+<Transition Event="L_at_X2[1]" Source="X3Y1" Target="XY1"/>
+<Transition Event="L_at_X4[1]" Source="X3Y1" Target="XY1"/>
+<Transition Event="L_mag_off[1]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="L_mag_on[1]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="L_at_X3[1]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="TL_Y1[1]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="TL_Y2[1]" Source="X3Y1" Target="X3Y2"/>
+<Transition Event="TL_Y3[1]" Source="X6Y2" Target="X6Y3"/>
+<Transition Event="L_at_X6[1]" Source="X6Y2" Target="X6Y2"/>
+<Transition Event="TL_Y2[1]" Source="X6Y2" Target="X6Y2"/>
+<Transition Event="L_at_X5[1]" Source="X6Y2" Target="XY2"/>
+<Transition Event="L_at_X7[1]" Source="X6Y2" Target="XY2"/>
+<Transition Event="TL_Y1[1]" Source="X6Y2" Target="X6Y1"/>
+<Transition Event="L_at_X4[1]" Source="X6Y2" Target="X6Y1"/>
+<Transition Event="L_at_X6[1]" Source="XY3" Target="X6Y3"/>
+<Transition Event="L_at_X2[1]" Source="XY3" Target="XY3"/>
+<Transition Event="L_at_X4[1]" Source="XY3" Target="XY3"/>
+<Transition Event="L_at_X5[1]" Source="XY3" Target="XY3"/>
+<Transition Event="L_at_X7[1]" Source="XY3" Target="XY3"/>
+<Transition Event="TL_Y3[1]" Source="XY3" Target="XY3"/>
+<Transition Event="TL_Y2[1]" Source="XY3" Target="XY2"/>
+<Transition Event="L_at_X1[1]" Source="XY3" Target="X1Y3"/>
+<Transition Event="L_at_X3[1]" Source="XY3" Target="X3Y3"/>
+<Transition Event="TL_Y1[1]" Source="XY2" Target="XY1"/>
+<Transition Event="L_at_X6[1]" Source="XY2" Target="X6Y2"/>
+<Transition Event="TL_Y3[1]" Source="XY2" Target="XY3"/>
+<Transition Event="L_at_X2[1]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X4[1]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X5[1]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X7[1]" Source="XY2" Target="XY2"/>
+<Transition Event="TL_Y2[1]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X1[1]" Source="XY2" Target="X1Y2"/>
+<Transition Event="L_at_X3[1]" Source="XY2" Target="X3Y2"/>
+<Transition Event="L_at_X2[1]" Source="X1Y1" Target="XY1"/>
+<Transition Event="L_at_X1[1]" Source="X1Y1" Target="X1Y1"/>
+<Transition Event="TL_Y1[1]" Source="X1Y1" Target="X1Y1"/>
+<Transition Event="TL_Y2[1]" Source="X1Y1" Target="X1Y2"/>
+<Transition Event="L_at_X5[1]" Source="X6Y1" Target="XY1"/>
+<Transition Event="L_at_X7[1]" Source="X6Y1" Target="XY1"/>
+<Transition Event="TL_Y2[1]" Source="X6Y1" Target="X6Y2"/>
+<Transition Event="L_mag_off[1]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="L_mag_on[1]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="L_at_X6[1]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="TL_Y1[1]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="L_at_X2[1]" Source="X1Y3" Target="XY3"/>
+<Transition Event="L_at_X1[1]" Source="X1Y3" Target="X1Y3"/>
+<Transition Event="TL_Y3[1]" Source="X1Y3" Target="X1Y3"/>
+<Transition Event="TL_Y2[1]" Source="X1Y3" Target="X1Y2"/>
+<Transition Event="L_mag_off[1]" Source="L1_UK" Target="L1_UK"/>
+<Transition Event="TL_Y2[1]" Source="L1_UK" Target="L1_UK"/>
+<Transition Event="TL_Y1[1]" Source="L1_UK" Target="L1_UK"/>
+<Transition Event="TL_Y3[1]" Source="L1_UK" Target="L1_UK"/>
+<Transition Event="init_done" Source="L1_UK" Target="X1Y2"/>
+<Transition Event="L_at_X2[1]" Source="X1Y2" Target="XY2"/>
+<Transition Event="TL_Y1[1]" Source="X1Y2" Target="X1Y1"/>
+<Transition Event="TL_Y3[1]" Source="X1Y2" Target="X1Y3"/>
+<Transition Event="L_mag_on[1]" Source="X1Y2" Target="X1Y2"/>
+<Transition Event="L_at_X1[1]" Source="X1Y2" Target="X1Y2"/>
+<Transition Event="TL_Y2[1]" Source="X1Y2" Target="X1Y2"/>
+<Transition Event="init_done" Source="X1Y2" Target="X1Y2"/>
+<Transition Event="L_mag_off[1]" Source="X1Y2" Target="X1Y2"/>
+<Transition Event="TL_Y1[1]" Source="X3Y2" Target="X3Y1"/>
+<Transition Event="L_at_X2[1]" Source="X3Y2" Target="XY2"/>
+<Transition Event="L_at_X4[1]" Source="X3Y2" Target="XY2"/>
+<Transition Event="L_at_X3[1]" Source="X3Y2" Target="X3Y2"/>
+<Transition Event="TL_Y2[1]" Source="X3Y2" Target="X3Y2"/>
+<Transition Event="TL_Y3[1]" Source="X3Y2" Target="X3Y3"/>
+<Transition Event="L_at_X2[1]" Source="X3Y3" Target="XY3"/>
+<Transition Event="L_at_X4[1]" Source="X3Y3" Target="XY3"/>
+<Transition Event="TL_Y2[1]" Source="X3Y3" Target="X3Y2"/>
+<Transition Event="L_mag_off[1]" Source="X3Y3" Target="X3Y3"/>
+<Transition Event="L_mag_on[1]" Source="X3Y3" Target="X3Y3"/>
+<Transition Event="L_at_X3[1]" Source="X3Y3" Target="X3Y3"/>
+<Transition Event="TL_Y3[1]" Source="X3Y3" Target="X3Y3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="magnet_L2">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X2[2]"/>
+<EventRef Name="L_at_X3[2]"/>
+<EventRef Name="L_at_X4[2]"/>
+<EventRef Name="L_at_X5[2]"/>
+<EventRef Name="L_at_X6[2]"/>
+<EventRef Name="L_at_X7[2]"/>
+<EventRef Name="L_at_X8[2]"/>
+<EventRef Name="L_mag_off[2]"/>
+<EventRef Name="L_mag_on[2]"/>
+<EventRef Name="TL_Y1[2]"/>
+<EventRef Name="TL_Y2[2]"/>
+<EventRef Name="TL_Y3[2]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="L2_UK"/>
+<State Name="X3Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X3Y2"/>
+<State Name="X3Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X6Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X6Y2"/>
+<State Name="X6Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X8Y1"/>
+<State Name="X8Y2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X8Y3"/>
+<State Name="XY1"/>
+<State Name="XY2"/>
+<State Name="XY3"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_mag_off[2]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="L_mag_on[2]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="L_at_X6[2]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="TL_Y3[2]" Source="X6Y3" Target="X6Y3"/>
+<Transition Event="L_at_X5[2]" Source="X6Y3" Target="XY3"/>
+<Transition Event="L_at_X7[2]" Source="X6Y3" Target="XY3"/>
+<Transition Event="TL_Y2[2]" Source="X6Y3" Target="X6Y2"/>
+<Transition Event="L_at_X8[2]" Source="X8Y3" Target="X8Y3"/>
+<Transition Event="TL_Y3[2]" Source="X8Y3" Target="X8Y3"/>
+<Transition Event="L_at_X7[2]" Source="X8Y3" Target="XY3"/>
+<Transition Event="TL_Y2[2]" Source="X8Y3" Target="X8Y2"/>
+<Transition Event="L_at_X8[2]" Source="X8Y1" Target="X8Y1"/>
+<Transition Event="TL_Y1[2]" Source="X8Y1" Target="X8Y1"/>
+<Transition Event="L_at_X2[2]" Source="X8Y1" Target="X8Y1"/>
+<Transition Event="L_at_X4[2]" Source="X8Y1" Target="X8Y1"/>
+<Transition Event="L_at_X7[2]" Source="X8Y1" Target="XY1"/>
+<Transition Event="TL_Y2[2]" Source="X8Y1" Target="X8Y2"/>
+<Transition Event="L_at_X2[2]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X4[2]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X5[2]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X7[2]" Source="XY2" Target="XY2"/>
+<Transition Event="TL_Y2[2]" Source="XY2" Target="XY2"/>
+<Transition Event="L_at_X3[2]" Source="XY2" Target="X3Y2"/>
+<Transition Event="TL_Y3[2]" Source="XY2" Target="XY3"/>
+<Transition Event="TL_Y1[2]" Source="XY2" Target="XY1"/>
+<Transition Event="L_at_X6[2]" Source="XY2" Target="X6Y2"/>
+<Transition Event="L_at_X8[2]" Source="XY2" Target="X8Y2"/>
+<Transition Event="L_mag_off[2]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="L_mag_on[2]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="L_at_X6[2]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="TL_Y1[2]" Source="X6Y1" Target="X6Y1"/>
+<Transition Event="L_at_X5[2]" Source="X6Y1" Target="XY1"/>
+<Transition Event="L_at_X7[2]" Source="X6Y1" Target="XY1"/>
+<Transition Event="TL_Y2[2]" Source="X6Y1" Target="X6Y2"/>
+<Transition Event="L_at_X2[2]" Source="X3Y2" Target="XY2"/>
+<Transition Event="L_at_X4[2]" Source="X3Y2" Target="XY2"/>
+<Transition Event="L_at_X3[2]" Source="X3Y2" Target="X3Y2"/>
+<Transition Event="TL_Y2[2]" Source="X3Y2" Target="X3Y2"/>
+<Transition Event="TL_Y1[2]" Source="X3Y2" Target="X3Y1"/>
+<Transition Event="TL_Y3[2]" Source="X3Y2" Target="X3Y3"/>
+<Transition Event="TL_Y2[2]" Source="X3Y1" Target="X3Y2"/>
+<Transition Event="L_mag_off[2]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="L_mag_on[2]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="L_at_X3[2]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="TL_Y1[2]" Source="X3Y1" Target="X3Y1"/>
+<Transition Event="L_at_X2[2]" Source="X3Y1" Target="XY1"/>
+<Transition Event="L_at_X4[2]" Source="X3Y1" Target="XY1"/>
+<Transition Event="L_at_X6[2]" Source="XY3" Target="X6Y3"/>
+<Transition Event="L_at_X8[2]" Source="XY3" Target="X8Y3"/>
+<Transition Event="TL_Y2[2]" Source="XY3" Target="XY2"/>
+<Transition Event="L_at_X2[2]" Source="XY3" Target="XY3"/>
+<Transition Event="L_at_X4[2]" Source="XY3" Target="XY3"/>
+<Transition Event="L_at_X5[2]" Source="XY3" Target="XY3"/>
+<Transition Event="L_at_X7[2]" Source="XY3" Target="XY3"/>
+<Transition Event="TL_Y3[2]" Source="XY3" Target="XY3"/>
+<Transition Event="L_at_X3[2]" Source="XY3" Target="X3Y3"/>
+<Transition Event="L_at_X8[2]" Source="XY1" Target="X8Y1"/>
+<Transition Event="TL_Y2[2]" Source="XY1" Target="XY2"/>
+<Transition Event="L_at_X6[2]" Source="XY1" Target="X6Y1"/>
+<Transition Event="L_at_X3[2]" Source="XY1" Target="X3Y1"/>
+<Transition Event="L_at_X2[2]" Source="XY1" Target="XY1"/>
+<Transition Event="L_at_X4[2]" Source="XY1" Target="XY1"/>
+<Transition Event="L_at_X5[2]" Source="XY1" Target="XY1"/>
+<Transition Event="L_at_X7[2]" Source="XY1" Target="XY1"/>
+<Transition Event="TL_Y1[2]" Source="XY1" Target="XY1"/>
+<Transition Event="TL_Y3[2]" Source="X6Y2" Target="X6Y3"/>
+<Transition Event="L_at_X5[2]" Source="X6Y2" Target="XY2"/>
+<Transition Event="L_at_X7[2]" Source="X6Y2" Target="XY2"/>
+<Transition Event="TL_Y1[2]" Source="X6Y2" Target="X6Y1"/>
+<Transition Event="L_at_X6[2]" Source="X6Y2" Target="X6Y2"/>
+<Transition Event="TL_Y2[2]" Source="X6Y2" Target="X6Y2"/>
+<Transition Event="TL_Y2[2]" Source="X3Y3" Target="X3Y2"/>
+<Transition Event="L_at_X2[2]" Source="X3Y3" Target="XY3"/>
+<Transition Event="L_at_X4[2]" Source="X3Y3" Target="XY3"/>
+<Transition Event="L_mag_off[2]" Source="X3Y3" Target="X3Y3"/>
+<Transition Event="L_mag_on[2]" Source="X3Y3" Target="X3Y3"/>
+<Transition Event="L_at_X3[2]" Source="X3Y3" Target="X3Y3"/>
+<Transition Event="TL_Y3[2]" Source="X3Y3" Target="X3Y3"/>
+<Transition Event="TL_Y3[2]" Source="X8Y2" Target="X8Y3"/>
+<Transition Event="TL_Y1[2]" Source="X8Y2" Target="X8Y1"/>
+<Transition Event="L_at_X5[2]" Source="X8Y2" Target="X8Y1"/>
+<Transition Event="L_at_X7[2]" Source="X8Y2" Target="XY2"/>
+<Transition Event="L_mag_off[2]" Source="X8Y2" Target="X8Y2"/>
+<Transition Event="L_at_X8[2]" Source="X8Y2" Target="X8Y2"/>
+<Transition Event="TL_Y2[2]" Source="X8Y2" Target="X8Y2"/>
+<Transition Event="init_done" Source="X8Y2" Target="X8Y2"/>
+<Transition Event="init_done" Source="L2_UK" Target="X8Y2"/>
+<Transition Event="L_mag_off[2]" Source="L2_UK" Target="L2_UK"/>
+<Transition Event="TL_Y2[2]" Source="L2_UK" Target="L2_UK"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="observer_L1x">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X1[1]"/>
+<EventRef Name="L_at_X2[1]"/>
+<EventRef Name="L_at_X3[1]"/>
+<EventRef Name="L_at_X4[1]"/>
+<EventRef Name="L_at_X5[1]"/>
+<EventRef Name="L_at_X6[1]"/>
+<EventRef Name="L_at_X7[1]"/>
+<EventRef Name="L_left[1]"/>
+<EventRef Name="L_right[1]"/>
+<EventRef Name="T_X1"/>
+<EventRef Name="T_X2"/>
+<EventRef Name="T_X3"/>
+<EventRef Name="T_X4"/>
+<EventRef Name="T_X5"/>
+<EventRef Name="T_X6"/>
+<EventRef Name="T_X7"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L1_X1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X1_X2"/>
+<State Name="L1_X1fromX2"/>
+<State Name="L1_X2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X2_X1"/>
+<State Name="L1_X2_X3"/>
+<State Name="L1_X2fromX1"/>
+<State Name="L1_X2fromX3"/>
+<State Name="L1_X3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X3_X2"/>
+<State Name="L1_X3_X4"/>
+<State Name="L1_X3fromX2"/>
+<State Name="L1_X3fromX4"/>
+<State Name="L1_X4">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X4_X3"/>
+<State Name="L1_X4_X5"/>
+<State Name="L1_X4fromX3"/>
+<State Name="L1_X4fromX5"/>
+<State Name="L1_X5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X5_X4"/>
+<State Name="L1_X5_X6"/>
+<State Name="L1_X5fromX4"/>
+<State Name="L1_X5fromX6"/>
+<State Name="L1_X6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X6_X5"/>
+<State Name="L1_X6_X7"/>
+<State Name="L1_X6fromX5"/>
+<State Name="L1_X6fromX7"/>
+<State Name="L1_X7">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X7_X6"/>
+<State Name="L1_X7fromX6"/>
+<State Name="initialized"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_at_X7[1]" Source="L1_X7fromX6" Target="L1_X7"/>
+<Transition Event="T_X2" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="T_X3" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="T_X4" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="T_X5" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="T_X6" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="T_X7" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_left[1]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="T_X1" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="init_done" Source="L1_X1" Target="initialized"/>
+<Transition Event="L_right[1]" Source="L1_X1" Target="L1_X1_X2"/>
+<Transition Event="T_X3" Source="L1_X2_X1" Target="L1_X2_X1"/>
+<Transition Event="T_X4" Source="L1_X2_X1" Target="L1_X2_X1"/>
+<Transition Event="T_X5" Source="L1_X2_X1" Target="L1_X2_X1"/>
+<Transition Event="T_X6" Source="L1_X2_X1" Target="L1_X2_X1"/>
+<Transition Event="T_X7" Source="L1_X2_X1" Target="L1_X2_X1"/>
+<Transition Event="T_X1" Source="L1_X2_X1" Target="L1_X1fromX2"/>
+<Transition Event="T_X4" Source="L1_X3_X2" Target="L1_X3_X2"/>
+<Transition Event="T_X5" Source="L1_X3_X2" Target="L1_X3_X2"/>
+<Transition Event="T_X6" Source="L1_X3_X2" Target="L1_X3_X2"/>
+<Transition Event="T_X7" Source="L1_X3_X2" Target="L1_X3_X2"/>
+<Transition Event="T_X2" Source="L1_X3_X2" Target="L1_X2fromX3"/>
+<Transition Event="T_X4" Source="L1_X2_X3" Target="L1_X2_X3"/>
+<Transition Event="T_X5" Source="L1_X2_X3" Target="L1_X2_X3"/>
+<Transition Event="T_X6" Source="L1_X2_X3" Target="L1_X2_X3"/>
+<Transition Event="T_X7" Source="L1_X2_X3" Target="L1_X2_X3"/>
+<Transition Event="T_X3" Source="L1_X2_X3" Target="L1_X3fromX2"/>
+<Transition Event="T_X6" Source="L1_X7_X6" Target="L1_X6fromX7"/>
+<Transition Event="T_X6" Source="L1_X5_X4" Target="L1_X5_X4"/>
+<Transition Event="T_X7" Source="L1_X5_X4" Target="L1_X5_X4"/>
+<Transition Event="T_X4" Source="L1_X5_X4" Target="L1_X4fromX5"/>
+<Transition Event="T_X5" Source="L1_X4" Target="L1_X4"/>
+<Transition Event="T_X6" Source="L1_X4" Target="L1_X4"/>
+<Transition Event="T_X7" Source="L1_X4" Target="L1_X4"/>
+<Transition Event="L_right[1]" Source="L1_X4" Target="L1_X4_X5"/>
+<Transition Event="L_left[1]" Source="L1_X4" Target="L1_X4_X3"/>
+<Transition Event="L_left[1]" Source="L1_X5" Target="L1_X5_X4"/>
+<Transition Event="T_X6" Source="L1_X5" Target="L1_X5"/>
+<Transition Event="T_X7" Source="L1_X5" Target="L1_X5"/>
+<Transition Event="L_right[1]" Source="L1_X5" Target="L1_X5_X6"/>
+<Transition Event="T_X4" Source="L1_X2fromX3" Target="L1_X2fromX3"/>
+<Transition Event="T_X5" Source="L1_X2fromX3" Target="L1_X2fromX3"/>
+<Transition Event="T_X6" Source="L1_X2fromX3" Target="L1_X2fromX3"/>
+<Transition Event="T_X7" Source="L1_X2fromX3" Target="L1_X2fromX3"/>
+<Transition Event="L_at_X2[1]" Source="L1_X2fromX3" Target="L1_X2"/>
+<Transition Event="T_X7" Source="L1_X6fromX5" Target="L1_X6fromX5"/>
+<Transition Event="L_at_X6[1]" Source="L1_X6fromX5" Target="L1_X6"/>
+<Transition Event="L_at_X5[1]" Source="L1_X5fromX4" Target="L1_X5"/>
+<Transition Event="T_X6" Source="L1_X5fromX4" Target="L1_X5fromX4"/>
+<Transition Event="T_X7" Source="L1_X5fromX4" Target="L1_X5fromX4"/>
+<Transition Event="L_left[1]" Source="L1_X2" Target="L1_X2_X1"/>
+<Transition Event="L_right[1]" Source="L1_X2" Target="L1_X2_X3"/>
+<Transition Event="T_X3" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="T_X4" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="T_X5" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="T_X6" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="T_X7" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="T_X5" Source="L1_X3fromX4" Target="L1_X3fromX4"/>
+<Transition Event="T_X6" Source="L1_X3fromX4" Target="L1_X3fromX4"/>
+<Transition Event="T_X7" Source="L1_X3fromX4" Target="L1_X3fromX4"/>
+<Transition Event="L_at_X3[1]" Source="L1_X3fromX4" Target="L1_X3"/>
+<Transition Event="L_at_X6[1]" Source="L1_X6fromX7" Target="L1_X6"/>
+<Transition Event="T_X5" Source="L1_X3_X4" Target="L1_X3_X4"/>
+<Transition Event="T_X6" Source="L1_X3_X4" Target="L1_X3_X4"/>
+<Transition Event="T_X7" Source="L1_X3_X4" Target="L1_X3_X4"/>
+<Transition Event="T_X4" Source="L1_X3_X4" Target="L1_X4fromX3"/>
+<Transition Event="T_X5" Source="L1_X4_X5" Target="L1_X5fromX4"/>
+<Transition Event="T_X6" Source="L1_X4_X5" Target="L1_X4_X5"/>
+<Transition Event="T_X7" Source="L1_X4_X5" Target="L1_X4_X5"/>
+<Transition Event="L_left[1]" Source="L1_X3" Target="L1_X3_X2"/>
+<Transition Event="L_right[1]" Source="L1_X3" Target="L1_X3_X4"/>
+<Transition Event="T_X4" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="T_X5" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="T_X6" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="T_X7" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="L_at_X1[1]" Source="initialized" Target="L1_X1"/>
+<Transition Event="init_done" Source="start" Target="initialized"/>
+<Transition Event="L_left[1]" Source="start" Target="start"/>
+<Transition Event="T_X1" Source="start" Target="start"/>
+<Transition Event="T_X2" Source="start" Target="start"/>
+<Transition Event="T_X3" Source="start" Target="start"/>
+<Transition Event="T_X4" Source="start" Target="start"/>
+<Transition Event="T_X5" Source="start" Target="start"/>
+<Transition Event="T_X6" Source="start" Target="start"/>
+<Transition Event="T_X7" Source="start" Target="start"/>
+<Transition Event="T_X7" Source="L1_X6" Target="L1_X6"/>
+<Transition Event="L_left[1]" Source="L1_X6" Target="L1_X6_X5"/>
+<Transition Event="L_right[1]" Source="L1_X6" Target="L1_X6_X7"/>
+<Transition Event="L_at_X4[1]" Source="L1_X4fromX5" Target="L1_X4"/>
+<Transition Event="T_X6" Source="L1_X4fromX5" Target="L1_X4fromX5"/>
+<Transition Event="T_X7" Source="L1_X4fromX5" Target="L1_X4fromX5"/>
+<Transition Event="L_at_X5[1]" Source="L1_X5fromX6" Target="L1_X5"/>
+<Transition Event="T_X7" Source="L1_X5fromX6" Target="L1_X5fromX6"/>
+<Transition Event="L_left[1]" Source="L1_X7" Target="L1_X7_X6"/>
+<Transition Event="T_X6" Source="L1_X5_X6" Target="L1_X6fromX5"/>
+<Transition Event="T_X7" Source="L1_X5_X6" Target="L1_X5_X6"/>
+<Transition Event="L_at_X4[1]" Source="L1_X4fromX3" Target="L1_X4"/>
+<Transition Event="T_X5" Source="L1_X4fromX3" Target="L1_X4fromX3"/>
+<Transition Event="T_X6" Source="L1_X4fromX3" Target="L1_X4fromX3"/>
+<Transition Event="T_X7" Source="L1_X4fromX3" Target="L1_X4fromX3"/>
+<Transition Event="L_at_X2[1]" Source="L1_X2fromX1" Target="L1_X2"/>
+<Transition Event="T_X3" Source="L1_X2fromX1" Target="L1_X2fromX1"/>
+<Transition Event="T_X4" Source="L1_X2fromX1" Target="L1_X2fromX1"/>
+<Transition Event="T_X5" Source="L1_X2fromX1" Target="L1_X2fromX1"/>
+<Transition Event="T_X6" Source="L1_X2fromX1" Target="L1_X2fromX1"/>
+<Transition Event="T_X7" Source="L1_X2fromX1" Target="L1_X2fromX1"/>
+<Transition Event="T_X5" Source="L1_X6_X5" Target="L1_X5fromX6"/>
+<Transition Event="T_X7" Source="L1_X6_X5" Target="L1_X6_X5"/>
+<Transition Event="T_X2" Source="L1_X1_X2" Target="L1_X2fromX1"/>
+<Transition Event="T_X3" Source="L1_X1_X2" Target="L1_X1_X2"/>
+<Transition Event="T_X4" Source="L1_X1_X2" Target="L1_X1_X2"/>
+<Transition Event="T_X5" Source="L1_X1_X2" Target="L1_X1_X2"/>
+<Transition Event="T_X6" Source="L1_X1_X2" Target="L1_X1_X2"/>
+<Transition Event="T_X7" Source="L1_X1_X2" Target="L1_X1_X2"/>
+<Transition Event="T_X3" Source="L1_X4_X3" Target="L1_X3fromX4"/>
+<Transition Event="T_X5" Source="L1_X4_X3" Target="L1_X4_X3"/>
+<Transition Event="T_X6" Source="L1_X4_X3" Target="L1_X4_X3"/>
+<Transition Event="T_X7" Source="L1_X4_X3" Target="L1_X4_X3"/>
+<Transition Event="T_X7" Source="L1_X6_X7" Target="L1_X7fromX6"/>
+<Transition Event="L_at_X3[1]" Source="L1_X3fromX2" Target="L1_X3"/>
+<Transition Event="T_X4" Source="L1_X3fromX2" Target="L1_X3fromX2"/>
+<Transition Event="T_X5" Source="L1_X3fromX2" Target="L1_X3fromX2"/>
+<Transition Event="T_X6" Source="L1_X3fromX2" Target="L1_X3fromX2"/>
+<Transition Event="T_X7" Source="L1_X3fromX2" Target="L1_X3fromX2"/>
+<Transition Event="L_at_X1[1]" Source="L1_X1fromX2" Target="L1_X1"/>
+<Transition Event="T_X3" Source="L1_X1fromX2" Target="L1_X1fromX2"/>
+<Transition Event="T_X4" Source="L1_X1fromX2" Target="L1_X1fromX2"/>
+<Transition Event="T_X5" Source="L1_X1fromX2" Target="L1_X1fromX2"/>
+<Transition Event="T_X6" Source="L1_X1fromX2" Target="L1_X1fromX2"/>
+<Transition Event="T_X7" Source="L1_X1fromX2" Target="L1_X1fromX2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="observer_L2x">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X2[2]"/>
+<EventRef Name="L_at_X3[2]"/>
+<EventRef Name="L_at_X4[2]"/>
+<EventRef Name="L_at_X5[2]"/>
+<EventRef Name="L_at_X6[2]"/>
+<EventRef Name="L_at_X7[2]"/>
+<EventRef Name="L_at_X8[2]"/>
+<EventRef Name="L_left[2]"/>
+<EventRef Name="L_right[2]"/>
+<EventRef Name="T_X2"/>
+<EventRef Name="T_X3"/>
+<EventRef Name="T_X4"/>
+<EventRef Name="T_X5"/>
+<EventRef Name="T_X6"/>
+<EventRef Name="T_X7"/>
+<EventRef Name="T_X8"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L2_X2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X2_X3"/>
+<State Name="L2_X2fromX3"/>
+<State Name="L2_X3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X3_X2"/>
+<State Name="L2_X3_X4"/>
+<State Name="L2_X3fromX2"/>
+<State Name="L2_X3fromX4"/>
+<State Name="L2_X4">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X4_X3"/>
+<State Name="L2_X4_X5"/>
+<State Name="L2_X4fromX3"/>
+<State Name="L2_X4fromX5"/>
+<State Name="L2_X5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X5_X4"/>
+<State Name="L2_X5_X6"/>
+<State Name="L2_X5fromX4"/>
+<State Name="L2_X5fromX6"/>
+<State Name="L2_X6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X6_X5"/>
+<State Name="L2_X6_X7"/>
+<State Name="L2_X6fromX5"/>
+<State Name="L2_X6fromX7"/>
+<State Name="L2_X7">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X7_X6"/>
+<State Name="L2_X7_X8"/>
+<State Name="L2_X7fromX6"/>
+<State Name="L2_X7fromX8"/>
+<State Name="L2_X8">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X8_X7"/>
+<State Name="L2_X8fromX7"/>
+<State Name="initialized"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="T_X2" Source="L2_X4" Target="L2_X4"/>
+<Transition Event="T_X3" Source="L2_X4" Target="L2_X4"/>
+<Transition Event="L_left[2]" Source="L2_X4" Target="L2_X4_X3"/>
+<Transition Event="L_right[2]" Source="L2_X4" Target="L2_X4_X5"/>
+<Transition Event="L_at_X4[2]" Source="L2_X4fromX5" Target="L2_X4"/>
+<Transition Event="T_X2" Source="L2_X4fromX5" Target="L2_X4fromX5"/>
+<Transition Event="T_X3" Source="L2_X4fromX5" Target="L2_X4fromX5"/>
+<Transition Event="T_X2" Source="L2_X8fromX7" Target="L2_X8fromX7"/>
+<Transition Event="T_X3" Source="L2_X8fromX7" Target="L2_X8fromX7"/>
+<Transition Event="T_X4" Source="L2_X8fromX7" Target="L2_X8fromX7"/>
+<Transition Event="T_X5" Source="L2_X8fromX7" Target="L2_X8fromX7"/>
+<Transition Event="T_X6" Source="L2_X8fromX7" Target="L2_X8fromX7"/>
+<Transition Event="L_at_X8[2]" Source="L2_X8fromX7" Target="L2_X8"/>
+<Transition Event="T_X2" Source="L2_X4_X3" Target="L2_X4_X3"/>
+<Transition Event="T_X3" Source="L2_X4_X3" Target="L2_X3fromX4"/>
+<Transition Event="L_at_X4[2]" Source="L2_X4fromX3" Target="L2_X4"/>
+<Transition Event="T_X2" Source="L2_X4fromX3" Target="L2_X4fromX3"/>
+<Transition Event="T_X2" Source="L2_X3" Target="L2_X3"/>
+<Transition Event="L_right[2]" Source="L2_X3" Target="L2_X3_X4"/>
+<Transition Event="L_left[2]" Source="L2_X3" Target="L2_X3_X2"/>
+<Transition Event="T_X2" Source="L2_X6fromX5" Target="L2_X6fromX5"/>
+<Transition Event="T_X3" Source="L2_X6fromX5" Target="L2_X6fromX5"/>
+<Transition Event="T_X4" Source="L2_X6fromX5" Target="L2_X6fromX5"/>
+<Transition Event="L_at_X6[2]" Source="L2_X6fromX5" Target="L2_X6"/>
+<Transition Event="L_right[2]" Source="L2_X2" Target="L2_X2_X3"/>
+<Transition Event="T_X8" Source="L2_X7_X8" Target="L2_X8fromX7"/>
+<Transition Event="T_X2" Source="L2_X7_X8" Target="L2_X7_X8"/>
+<Transition Event="T_X3" Source="L2_X7_X8" Target="L2_X7_X8"/>
+<Transition Event="T_X4" Source="L2_X7_X8" Target="L2_X7_X8"/>
+<Transition Event="T_X5" Source="L2_X7_X8" Target="L2_X7_X8"/>
+<Transition Event="T_X6" Source="L2_X7_X8" Target="L2_X7_X8"/>
+<Transition Event="L_at_X3[2]" Source="L2_X3fromX2" Target="L2_X3"/>
+<Transition Event="T_X2" Source="L2_X7fromX6" Target="L2_X7fromX6"/>
+<Transition Event="T_X3" Source="L2_X7fromX6" Target="L2_X7fromX6"/>
+<Transition Event="T_X4" Source="L2_X7fromX6" Target="L2_X7fromX6"/>
+<Transition Event="T_X5" Source="L2_X7fromX6" Target="L2_X7fromX6"/>
+<Transition Event="L_at_X7[2]" Source="L2_X7fromX6" Target="L2_X7"/>
+<Transition Event="T_X3" Source="L2_X2_X3" Target="L2_X3fromX2"/>
+<Transition Event="T_X4" Source="L2_X3_X4" Target="L2_X4fromX3"/>
+<Transition Event="T_X2" Source="L2_X3_X4" Target="L2_X3_X4"/>
+<Transition Event="T_X2" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="T_X3" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="T_X4" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="T_X5" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="T_X6" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="T_X7" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_right[2]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="T_X8" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="init_done" Source="L2_X8" Target="initialized"/>
+<Transition Event="L_left[2]" Source="L2_X8" Target="L2_X8_X7"/>
+<Transition Event="T_X2" Source="L2_X7fromX8" Target="L2_X7fromX8"/>
+<Transition Event="T_X3" Source="L2_X7fromX8" Target="L2_X7fromX8"/>
+<Transition Event="T_X4" Source="L2_X7fromX8" Target="L2_X7fromX8"/>
+<Transition Event="T_X5" Source="L2_X7fromX8" Target="L2_X7fromX8"/>
+<Transition Event="T_X6" Source="L2_X7fromX8" Target="L2_X7fromX8"/>
+<Transition Event="L_at_X7[2]" Source="L2_X7fromX8" Target="L2_X7"/>
+<Transition Event="T_X2" Source="L2_X5" Target="L2_X5"/>
+<Transition Event="T_X3" Source="L2_X5" Target="L2_X5"/>
+<Transition Event="T_X4" Source="L2_X5" Target="L2_X5"/>
+<Transition Event="L_left[2]" Source="L2_X5" Target="L2_X5_X4"/>
+<Transition Event="L_right[2]" Source="L2_X5" Target="L2_X5_X6"/>
+<Transition Event="T_X2" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="T_X3" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="T_X4" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="T_X5" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="L_right[2]" Source="L2_X6" Target="L2_X6_X7"/>
+<Transition Event="L_left[2]" Source="L2_X6" Target="L2_X6_X5"/>
+<Transition Event="T_X2" Source="L2_X4_X5" Target="L2_X4_X5"/>
+<Transition Event="T_X3" Source="L2_X4_X5" Target="L2_X4_X5"/>
+<Transition Event="T_X5" Source="L2_X4_X5" Target="L2_X5fromX4"/>
+<Transition Event="T_X2" Source="L2_X3_X2" Target="L2_X2fromX3"/>
+<Transition Event="L_at_X6[2]" Source="L2_X6fromX7" Target="L2_X6"/>
+<Transition Event="T_X2" Source="L2_X6fromX7" Target="L2_X6fromX7"/>
+<Transition Event="T_X3" Source="L2_X6fromX7" Target="L2_X6fromX7"/>
+<Transition Event="T_X4" Source="L2_X6fromX7" Target="L2_X6fromX7"/>
+<Transition Event="T_X5" Source="L2_X6fromX7" Target="L2_X6fromX7"/>
+<Transition Event="T_X4" Source="L2_X5_X4" Target="L2_X4fromX5"/>
+<Transition Event="T_X2" Source="L2_X5_X4" Target="L2_X5_X4"/>
+<Transition Event="T_X3" Source="L2_X5_X4" Target="L2_X5_X4"/>
+<Transition Event="L_at_X8[2]" Source="initialized" Target="L2_X8"/>
+<Transition Event="L_right[2]" Source="L2_X7" Target="L2_X7_X8"/>
+<Transition Event="T_X2" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="T_X3" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="T_X4" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="T_X5" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="T_X6" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="L_left[2]" Source="L2_X7" Target="L2_X7_X6"/>
+<Transition Event="L_at_X3[2]" Source="L2_X3fromX4" Target="L2_X3"/>
+<Transition Event="T_X2" Source="L2_X3fromX4" Target="L2_X3fromX4"/>
+<Transition Event="T_X7" Source="L2_X6_X7" Target="L2_X7fromX6"/>
+<Transition Event="T_X2" Source="L2_X6_X7" Target="L2_X6_X7"/>
+<Transition Event="T_X3" Source="L2_X6_X7" Target="L2_X6_X7"/>
+<Transition Event="T_X4" Source="L2_X6_X7" Target="L2_X6_X7"/>
+<Transition Event="T_X5" Source="L2_X6_X7" Target="L2_X6_X7"/>
+<Transition Event="T_X2" Source="L2_X6_X5" Target="L2_X6_X5"/>
+<Transition Event="T_X3" Source="L2_X6_X5" Target="L2_X6_X5"/>
+<Transition Event="T_X4" Source="L2_X6_X5" Target="L2_X6_X5"/>
+<Transition Event="T_X5" Source="L2_X6_X5" Target="L2_X5fromX6"/>
+<Transition Event="init_done" Source="start" Target="initialized"/>
+<Transition Event="L_right[2]" Source="start" Target="start"/>
+<Transition Event="T_X2" Source="start" Target="start"/>
+<Transition Event="T_X3" Source="start" Target="start"/>
+<Transition Event="T_X4" Source="start" Target="start"/>
+<Transition Event="T_X5" Source="start" Target="start"/>
+<Transition Event="T_X6" Source="start" Target="start"/>
+<Transition Event="T_X7" Source="start" Target="start"/>
+<Transition Event="T_X8" Source="start" Target="start"/>
+<Transition Event="T_X6" Source="L2_X7_X6" Target="L2_X6fromX7"/>
+<Transition Event="T_X2" Source="L2_X7_X6" Target="L2_X7_X6"/>
+<Transition Event="T_X3" Source="L2_X7_X6" Target="L2_X7_X6"/>
+<Transition Event="T_X4" Source="L2_X7_X6" Target="L2_X7_X6"/>
+<Transition Event="T_X5" Source="L2_X7_X6" Target="L2_X7_X6"/>
+<Transition Event="L_at_X5[2]" Source="L2_X5fromX4" Target="L2_X5"/>
+<Transition Event="T_X2" Source="L2_X5fromX4" Target="L2_X5fromX4"/>
+<Transition Event="T_X3" Source="L2_X5fromX4" Target="L2_X5fromX4"/>
+<Transition Event="T_X7" Source="L2_X8_X7" Target="L2_X7fromX8"/>
+<Transition Event="T_X2" Source="L2_X8_X7" Target="L2_X8_X7"/>
+<Transition Event="T_X3" Source="L2_X8_X7" Target="L2_X8_X7"/>
+<Transition Event="T_X4" Source="L2_X8_X7" Target="L2_X8_X7"/>
+<Transition Event="T_X5" Source="L2_X8_X7" Target="L2_X8_X7"/>
+<Transition Event="T_X6" Source="L2_X8_X7" Target="L2_X8_X7"/>
+<Transition Event="L_at_X2[2]" Source="L2_X2fromX3" Target="L2_X2"/>
+<Transition Event="L_at_X5[2]" Source="L2_X5fromX6" Target="L2_X5"/>
+<Transition Event="T_X2" Source="L2_X5fromX6" Target="L2_X5fromX6"/>
+<Transition Event="T_X3" Source="L2_X5fromX6" Target="L2_X5fromX6"/>
+<Transition Event="T_X4" Source="L2_X5fromX6" Target="L2_X5fromX6"/>
+<Transition Event="T_X6" Source="L2_X5_X6" Target="L2_X6fromX5"/>
+<Transition Event="T_X2" Source="L2_X5_X6" Target="L2_X5_X6"/>
+<Transition Event="T_X3" Source="L2_X5_X6" Target="L2_X5_X6"/>
+<Transition Event="T_X4" Source="L2_X5_X6" Target="L2_X5_X6"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="plant_move_L1x">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X1[1]"/>
+<EventRef Name="L_at_X2[1]"/>
+<EventRef Name="L_at_X3[1]"/>
+<EventRef Name="L_at_X4[1]"/>
+<EventRef Name="L_at_X5[1]"/>
+<EventRef Name="L_at_X6[1]"/>
+<EventRef Name="L_at_X7[1]"/>
+<EventRef Name="L_left[1]"/>
+<EventRef Name="L_mX1[1]"/>
+<EventRef Name="L_mX2[1]"/>
+<EventRef Name="L_mX3[1]"/>
+<EventRef Name="L_mX4[1]"/>
+<EventRef Name="L_mX5[1]"/>
+<EventRef Name="L_mX6[1]"/>
+<EventRef Name="L_mX7[1]"/>
+<EventRef Name="L_right[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Xi">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi1_Xi"/>
+<State Name="L_Xi1_Xi2"/>
+<State Name="L_Xi2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi2_Xi1"/>
+<State Name="L_Xi2_Xi3"/>
+<State Name="L_Xi3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi3_Xi2"/>
+<State Name="L_Xi3_Xi4"/>
+<State Name="L_Xi4">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi4_Xi3"/>
+<State Name="L_Xi4_Xi5"/>
+<State Name="L_Xi5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi5_Xi4"/>
+<State Name="L_Xi5_Xi6"/>
+<State Name="L_Xi6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi6_Xi5"/>
+<State Name="L_Xi_Xi1"/>
+<State Name="L_leave_Xi1f"/>
+<State Name="L_leave_Xi1t"/>
+<State Name="L_leave_Xi2f"/>
+<State Name="L_leave_Xi2t"/>
+<State Name="L_leave_Xi3f"/>
+<State Name="L_leave_Xi3t"/>
+<State Name="L_leave_Xi4f"/>
+<State Name="L_leave_Xi4t"/>
+<State Name="L_leave_Xi5f"/>
+<State Name="L_leave_Xi5t"/>
+<State Name="L_leave_Xi6t"/>
+<State Name="L_leave_Xif"/>
+<State Name="initialized"/>
+<State Name="s0"/>
+<State Initial="true" Name="start1"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_mX1[1]" Source="L_Xi3" Target="L_leave_Xi3t"/>
+<Transition Event="L_mX2[1]" Source="L_Xi3" Target="L_leave_Xi3t"/>
+<Transition Event="L_mX3[1]" Source="L_Xi3" Target="L_leave_Xi3t"/>
+<Transition Event="init" Source="L_Xi3" Target="s0"/>
+<Transition Event="L_mX5[1]" Source="L_Xi3" Target="L_leave_Xi3f"/>
+<Transition Event="L_mX6[1]" Source="L_Xi3" Target="L_leave_Xi3f"/>
+<Transition Event="L_mX7[1]" Source="L_Xi3" Target="L_leave_Xi3f"/>
+<Transition Event="init" Source="L_leave_Xi3t" Target="s0"/>
+<Transition Event="L_left[1]" Source="L_leave_Xi3t" Target="L_Xi3_Xi2"/>
+<Transition Event="init" Source="L_Xi3_Xi4" Target="s0"/>
+<Transition Event="L_at_X5[1]" Source="L_Xi3_Xi4" Target="L_Xi4"/>
+<Transition Event="L_left[1]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X2[1]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X3[1]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X4[1]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X5[1]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X6[1]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X7[1]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X1[1]" Source="s0" Target="L_Xi"/>
+<Transition Event="init" Source="L_leave_Xi1t" Target="L_leave_Xi1t"/>
+<Transition Event="L_left[1]" Source="L_leave_Xi1t" Target="L_Xi1_Xi"/>
+<Transition Event="init" Source="L_leave_Xi2t" Target="s0"/>
+<Transition Event="L_left[1]" Source="L_leave_Xi2t" Target="L_Xi2_Xi1"/>
+<Transition Event="init" Source="L_Xi6_Xi5" Target="s0"/>
+<Transition Event="L_at_X6[1]" Source="L_Xi6_Xi5" Target="L_Xi5"/>
+<Transition Event="init" Source="L_leave_Xi1f" Target="s0"/>
+<Transition Event="L_right[1]" Source="L_leave_Xi1f" Target="L_Xi1_Xi2"/>
+<Transition Event="init" Source="L_Xi4_Xi5" Target="s0"/>
+<Transition Event="L_at_X6[1]" Source="L_Xi4_Xi5" Target="L_Xi5"/>
+<Transition Event="init" Source="L_Xi5" Target="s0"/>
+<Transition Event="L_mX1[1]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX2[1]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX3[1]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX4[1]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX5[1]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX7[1]" Source="L_Xi5" Target="L_leave_Xi5f"/>
+<Transition Event="init" Source="L_Xi5_Xi6" Target="s0"/>
+<Transition Event="L_at_X7[1]" Source="L_Xi5_Xi6" Target="L_Xi6"/>
+<Transition Event="L_left[1]" Source="start1" Target="start1"/>
+<Transition Event="init_done" Source="start1" Target="initialized"/>
+<Transition Event="init" Source="L_leave_Xi2f" Target="s0"/>
+<Transition Event="L_right[1]" Source="L_leave_Xi2f" Target="L_Xi2_Xi3"/>
+<Transition Event="init" Source="L_Xi_Xi1" Target="s0"/>
+<Transition Event="L_at_X2[1]" Source="L_Xi_Xi1" Target="L_Xi1"/>
+<Transition Event="init" Source="L_leave_Xi5t" Target="s0"/>
+<Transition Event="L_left[1]" Source="L_leave_Xi5t" Target="L_Xi5_Xi4"/>
+<Transition Event="init" Source="L_Xi1_Xi2" Target="s0"/>
+<Transition Event="L_at_X3[1]" Source="L_Xi1_Xi2" Target="L_Xi2"/>
+<Transition Event="init" Source="L_Xi" Target="L_Xi"/>
+<Transition Event="init_done" Source="L_Xi" Target="initialized"/>
+<Transition Event="L_mX2[1]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX3[1]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX4[1]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX5[1]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX6[1]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX7[1]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_right[1]" Source="L_leave_Xi3f" Target="L_Xi3_Xi4"/>
+<Transition Event="init" Source="L_leave_Xi3f" Target="s0"/>
+<Transition Event="init" Source="L_leave_Xi6t" Target="s0"/>
+<Transition Event="L_left[1]" Source="L_leave_Xi6t" Target="L_Xi6_Xi5"/>
+<Transition Event="init" Source="L_Xi6" Target="s0"/>
+<Transition Event="L_mX1[1]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX2[1]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX3[1]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX4[1]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX5[1]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX6[1]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="init" Source="L_Xi3_Xi2" Target="s0"/>
+<Transition Event="L_at_X3[1]" Source="L_Xi3_Xi2" Target="L_Xi2"/>
+<Transition Event="L_at_X4[1]" Source="L_Xi4_Xi3" Target="L_Xi3"/>
+<Transition Event="init" Source="L_Xi4_Xi3" Target="s0"/>
+<Transition Event="L_at_X1[1]" Source="initialized" Target="L_Xi"/>
+<Transition Event="L_at_X4[1]" Source="L_Xi2_Xi3" Target="L_Xi3"/>
+<Transition Event="init" Source="L_Xi2_Xi3" Target="s0"/>
+<Transition Event="init" Source="L_Xi4" Target="s0"/>
+<Transition Event="L_mX6[1]" Source="L_Xi4" Target="L_leave_Xi4f"/>
+<Transition Event="L_mX7[1]" Source="L_Xi4" Target="L_leave_Xi4f"/>
+<Transition Event="L_mX1[1]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="L_mX2[1]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="L_mX3[1]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="L_mX4[1]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="init" Source="L_leave_Xi4f" Target="s0"/>
+<Transition Event="L_right[1]" Source="L_leave_Xi4f" Target="L_Xi4_Xi5"/>
+<Transition Event="init" Source="L_Xi1" Target="s0"/>
+<Transition Event="L_mX1[1]" Source="L_Xi1" Target="L_leave_Xi1t"/>
+<Transition Event="L_mX3[1]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX4[1]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX5[1]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX6[1]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX7[1]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="init" Source="L_Xi2_Xi1" Target="s0"/>
+<Transition Event="L_at_X2[1]" Source="L_Xi2_Xi1" Target="L_Xi1"/>
+<Transition Event="L_at_X1[1]" Source="L_Xi1_Xi" Target="L_Xi"/>
+<Transition Event="init" Source="L_Xi1_Xi" Target="L_Xi1_Xi"/>
+<Transition Event="init" Source="L_leave_Xi5f" Target="s0"/>
+<Transition Event="L_right[1]" Source="L_leave_Xi5f" Target="L_Xi5_Xi6"/>
+<Transition Event="L_right[1]" Source="L_leave_Xif" Target="L_Xi_Xi1"/>
+<Transition Event="init" Source="L_leave_Xif" Target="L_Xi"/>
+<Transition Event="init" Source="L_Xi2" Target="s0"/>
+<Transition Event="L_mX1[1]" Source="L_Xi2" Target="L_leave_Xi2t"/>
+<Transition Event="L_mX2[1]" Source="L_Xi2" Target="L_leave_Xi2t"/>
+<Transition Event="L_mX4[1]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="L_mX5[1]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="L_mX6[1]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="L_mX7[1]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="init" Source="L_leave_Xi4t" Target="s0"/>
+<Transition Event="L_left[1]" Source="L_leave_Xi4t" Target="L_Xi4_Xi3"/>
+<Transition Event="init" Source="L_Xi5_Xi4" Target="s0"/>
+<Transition Event="L_at_X5[1]" Source="L_Xi5_Xi4" Target="L_Xi4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="plant_move_L2x">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X2[2]"/>
+<EventRef Name="L_at_X3[2]"/>
+<EventRef Name="L_at_X4[2]"/>
+<EventRef Name="L_at_X5[2]"/>
+<EventRef Name="L_at_X6[2]"/>
+<EventRef Name="L_at_X7[2]"/>
+<EventRef Name="L_at_X8[2]"/>
+<EventRef Name="L_left[2]"/>
+<EventRef Name="L_mX2[2]"/>
+<EventRef Name="L_mX3[2]"/>
+<EventRef Name="L_mX4[2]"/>
+<EventRef Name="L_mX5[2]"/>
+<EventRef Name="L_mX6[2]"/>
+<EventRef Name="L_mX7[2]"/>
+<EventRef Name="L_mX8[2]"/>
+<EventRef Name="L_right[2]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Xi">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi1_Xi"/>
+<State Name="L_Xi1_Xi2"/>
+<State Name="L_Xi2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi2_Xi1"/>
+<State Name="L_Xi2_Xi3"/>
+<State Name="L_Xi3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi3_Xi2"/>
+<State Name="L_Xi3_Xi4"/>
+<State Name="L_Xi4">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi4_Xi3"/>
+<State Name="L_Xi4_Xi5"/>
+<State Name="L_Xi5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi5_Xi4"/>
+<State Name="L_Xi5_Xi6"/>
+<State Name="L_Xi6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Xi6_Xi5"/>
+<State Name="L_Xi_Xi1"/>
+<State Name="L_leave_Xi1f"/>
+<State Name="L_leave_Xi1t"/>
+<State Name="L_leave_Xi2f"/>
+<State Name="L_leave_Xi2t"/>
+<State Name="L_leave_Xi3f"/>
+<State Name="L_leave_Xi3t"/>
+<State Name="L_leave_Xi4f"/>
+<State Name="L_leave_Xi4t"/>
+<State Name="L_leave_Xi5f"/>
+<State Name="L_leave_Xi5t"/>
+<State Name="L_leave_Xi6t"/>
+<State Name="L_leave_Xif"/>
+<State Name="initialized"/>
+<State Name="s0"/>
+<State Initial="true" Name="start1"/>
+</StateList>
+<TransitionList>
+<Transition Event="init" Source="L_leave_Xi2t" Target="s0"/>
+<Transition Event="L_left[2]" Source="L_leave_Xi2t" Target="L_Xi2_Xi1"/>
+<Transition Event="init" Source="L_Xi3_Xi2" Target="s0"/>
+<Transition Event="L_at_X6[2]" Source="L_Xi3_Xi2" Target="L_Xi2"/>
+<Transition Event="init" Source="L_leave_Xi1f" Target="s0"/>
+<Transition Event="L_right[2]" Source="L_leave_Xi1f" Target="L_Xi1_Xi2"/>
+<Transition Event="init" Source="L_leave_Xi6t" Target="s0"/>
+<Transition Event="L_left[2]" Source="L_leave_Xi6t" Target="L_Xi6_Xi5"/>
+<Transition Event="L_left[2]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X7[2]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X6[2]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X5[2]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X4[2]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X3[2]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X2[2]" Source="s0" Target="s0"/>
+<Transition Event="L_at_X8[2]" Source="s0" Target="L_Xi"/>
+<Transition Event="L_left[2]" Source="L_leave_Xi3t" Target="L_Xi3_Xi2"/>
+<Transition Event="init" Source="L_leave_Xi3t" Target="s0"/>
+<Transition Event="init" Source="L_leave_Xi3f" Target="s0"/>
+<Transition Event="L_right[2]" Source="L_leave_Xi3f" Target="L_Xi3_Xi4"/>
+<Transition Event="L_at_X8[2]" Source="initialized" Target="L_Xi"/>
+<Transition Event="L_mX8[2]" Source="L_Xi2" Target="L_leave_Xi2t"/>
+<Transition Event="L_mX7[2]" Source="L_Xi2" Target="L_leave_Xi2t"/>
+<Transition Event="init" Source="L_Xi2" Target="s0"/>
+<Transition Event="L_mX5[2]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="L_mX4[2]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="L_mX3[2]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="L_mX2[2]" Source="L_Xi2" Target="L_leave_Xi2f"/>
+<Transition Event="init" Source="L_Xi5_Xi4" Target="s0"/>
+<Transition Event="L_at_X4[2]" Source="L_Xi5_Xi4" Target="L_Xi4"/>
+<Transition Event="init" Source="L_Xi1_Xi2" Target="s0"/>
+<Transition Event="L_at_X6[2]" Source="L_Xi1_Xi2" Target="L_Xi2"/>
+<Transition Event="init" Source="L_Xi3" Target="s0"/>
+<Transition Event="L_mX8[2]" Source="L_Xi3" Target="L_leave_Xi3t"/>
+<Transition Event="L_mX7[2]" Source="L_Xi3" Target="L_leave_Xi3t"/>
+<Transition Event="L_mX6[2]" Source="L_Xi3" Target="L_leave_Xi3t"/>
+<Transition Event="L_mX4[2]" Source="L_Xi3" Target="L_leave_Xi3f"/>
+<Transition Event="L_mX3[2]" Source="L_Xi3" Target="L_leave_Xi3f"/>
+<Transition Event="L_mX2[2]" Source="L_Xi3" Target="L_leave_Xi3f"/>
+<Transition Event="init" Source="L_Xi5_Xi6" Target="s0"/>
+<Transition Event="L_at_X2[2]" Source="L_Xi5_Xi6" Target="L_Xi6"/>
+<Transition Event="init" Source="L_Xi4_Xi5" Target="s0"/>
+<Transition Event="L_at_X3[2]" Source="L_Xi4_Xi5" Target="L_Xi5"/>
+<Transition Event="init" Source="L_Xi2_Xi3" Target="s0"/>
+<Transition Event="L_at_X5[2]" Source="L_Xi2_Xi3" Target="L_Xi3"/>
+<Transition Event="L_mX6[2]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX5[2]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX4[2]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX3[2]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="L_mX2[2]" Source="L_Xi1" Target="L_leave_Xi1f"/>
+<Transition Event="init" Source="L_Xi1" Target="s0"/>
+<Transition Event="L_mX8[2]" Source="L_Xi1" Target="L_leave_Xi1t"/>
+<Transition Event="init" Source="L_leave_Xi4t" Target="s0"/>
+<Transition Event="L_left[2]" Source="L_leave_Xi4t" Target="L_Xi4_Xi3"/>
+<Transition Event="init" Source="L_Xi3_Xi4" Target="s0"/>
+<Transition Event="L_at_X4[2]" Source="L_Xi3_Xi4" Target="L_Xi4"/>
+<Transition Event="init" Source="L_Xi4" Target="s0"/>
+<Transition Event="L_mX8[2]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="L_mX7[2]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="L_mX6[2]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="L_mX5[2]" Source="L_Xi4" Target="L_leave_Xi4t"/>
+<Transition Event="L_mX3[2]" Source="L_Xi4" Target="L_leave_Xi4f"/>
+<Transition Event="L_mX2[2]" Source="L_Xi4" Target="L_leave_Xi4f"/>
+<Transition Event="init" Source="L_leave_Xi5t" Target="s0"/>
+<Transition Event="L_left[2]" Source="L_leave_Xi5t" Target="L_Xi5_Xi4"/>
+<Transition Event="init" Source="L_Xi4_Xi3" Target="s0"/>
+<Transition Event="L_at_X5[2]" Source="L_Xi4_Xi3" Target="L_Xi3"/>
+<Transition Event="init" Source="L_leave_Xi4f" Target="s0"/>
+<Transition Event="L_right[2]" Source="L_leave_Xi4f" Target="L_Xi4_Xi5"/>
+<Transition Event="init" Source="L_Xi2_Xi1" Target="s0"/>
+<Transition Event="L_at_X7[2]" Source="L_Xi2_Xi1" Target="L_Xi1"/>
+<Transition Event="init" Source="L_leave_Xif" Target="L_Xi"/>
+<Transition Event="L_right[2]" Source="L_leave_Xif" Target="L_Xi_Xi1"/>
+<Transition Event="init_done" Source="L_Xi" Target="initialized"/>
+<Transition Event="L_mX7[2]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX6[2]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX5[2]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX4[2]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX3[2]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="L_mX2[2]" Source="L_Xi" Target="L_leave_Xif"/>
+<Transition Event="init" Source="L_Xi" Target="L_Xi"/>
+<Transition Event="init" Source="L_Xi6_Xi5" Target="s0"/>
+<Transition Event="L_at_X3[2]" Source="L_Xi6_Xi5" Target="L_Xi5"/>
+<Transition Event="L_at_X8[2]" Source="L_Xi1_Xi" Target="L_Xi"/>
+<Transition Event="init" Source="L_Xi1_Xi" Target="L_Xi1_Xi"/>
+<Transition Event="init" Source="L_Xi_Xi1" Target="s0"/>
+<Transition Event="L_at_X7[2]" Source="L_Xi_Xi1" Target="L_Xi1"/>
+<Transition Event="init" Source="L_leave_Xi2f" Target="s0"/>
+<Transition Event="L_right[2]" Source="L_leave_Xi2f" Target="L_Xi2_Xi3"/>
+<Transition Event="L_left[2]" Source="L_leave_Xi1t" Target="L_Xi1_Xi"/>
+<Transition Event="init" Source="L_leave_Xi1t" Target="L_leave_Xi1t"/>
+<Transition Event="L_mX8[2]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX7[2]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX6[2]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX5[2]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX4[2]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="L_mX3[2]" Source="L_Xi6" Target="L_leave_Xi6t"/>
+<Transition Event="init" Source="L_Xi6" Target="s0"/>
+<Transition Event="init" Source="L_Xi5" Target="s0"/>
+<Transition Event="L_mX8[2]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX7[2]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX6[2]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX5[2]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX4[2]" Source="L_Xi5" Target="L_leave_Xi5t"/>
+<Transition Event="L_mX2[2]" Source="L_Xi5" Target="L_leave_Xi5f"/>
+<Transition Event="init_done" Source="start1" Target="initialized"/>
+<Transition Event="L_left[2]" Source="start1" Target="start1"/>
+<Transition Event="init" Source="L_leave_Xi5f" Target="s0"/>
+<Transition Event="L_right[2]" Source="L_leave_Xi5f" Target="L_Xi5_Xi6"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="plant_move_Ly[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[1]"/>
+<EventRef Name="L_forward[1]"/>
+<EventRef Name="TL_Y1[1]"/>
+<EventRef Name="TL_Y2[1]"/>
+<EventRef Name="TL_Y3[1]"/>
+<EventRef Name="init"/>
+</EventRefList>
+<StateList>
+<State Name="L_Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y1_Y2"/>
+<State Name="L_Y2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y2_Y1"/>
+<State Name="L_Y2_Y3"/>
+<State Name="L_Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y3_Y2"/>
+<State Name="s0"/>
+<State Name="s1"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Y3[1]" Source="L_Y3_Y2" Target="L_Y3_Y2"/>
+<Transition Event="init" Source="L_Y3_Y2" Target="s1"/>
+<Transition Event="TL_Y2[1]" Source="L_Y3_Y2" Target="L_Y2"/>
+<Transition Event="TL_Y3[1]" Source="s1" Target="L_Y3"/>
+<Transition Event="TL_Y2[1]" Source="s1" Target="L_Y2"/>
+<Transition Event="L_back[1]" Source="L_Y3" Target="L_Y3_Y2"/>
+<Transition Event="TL_Y3[1]" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="init" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y1[1]" Source="L_Y1_Y2" Target="L_Y1_Y2"/>
+<Transition Event="init" Source="L_Y1_Y2" Target="s0"/>
+<Transition Event="TL_Y2[1]" Source="L_Y1_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y2_Y3" Target="s1"/>
+<Transition Event="TL_Y3[1]" Source="L_Y2_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y2[1]" Source="L_Y2_Y3" Target="L_Y2_Y3"/>
+<Transition Event="TL_Y2[1]" Source="L_Y2_Y1" Target="L_Y2_Y1"/>
+<Transition Event="init" Source="L_Y2_Y1" Target="s0"/>
+<Transition Event="TL_Y1[1]" Source="L_Y2_Y1" Target="L_Y1"/>
+<Transition Event="TL_Y1[1]" Source="s0" Target="L_Y1"/>
+<Transition Event="TL_Y2[1]" Source="s0" Target="L_Y2"/>
+<Transition Event="TL_Y3[1]" Source="start" Target="L_Y3"/>
+<Transition Event="TL_Y1[1]" Source="start" Target="L_Y1"/>
+<Transition Event="TL_Y2[1]" Source="start" Target="L_Y2"/>
+<Transition Event="L_forward[1]" Source="L_Y1" Target="L_Y1_Y2"/>
+<Transition Event="TL_Y1[1]" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="init" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="L_forward[1]" Source="L_Y2" Target="L_Y2_Y3"/>
+<Transition Event="L_back[1]" Source="L_Y2" Target="L_Y2_Y1"/>
+<Transition Event="TL_Y2[1]" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y2" Target="L_Y2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="plant_move_Ly[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[2]"/>
+<EventRef Name="L_forward[2]"/>
+<EventRef Name="TL_Y1[2]"/>
+<EventRef Name="TL_Y2[2]"/>
+<EventRef Name="TL_Y3[2]"/>
+<EventRef Name="init"/>
+</EventRefList>
+<StateList>
+<State Name="L_Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y1_Y2"/>
+<State Name="L_Y2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y2_Y1"/>
+<State Name="L_Y2_Y3"/>
+<State Name="L_Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y3_Y2"/>
+<State Name="s0"/>
+<State Name="s1"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Y3[2]" Source="L_Y3_Y2" Target="L_Y3_Y2"/>
+<Transition Event="init" Source="L_Y3_Y2" Target="s1"/>
+<Transition Event="TL_Y2[2]" Source="L_Y3_Y2" Target="L_Y2"/>
+<Transition Event="TL_Y3[2]" Source="s1" Target="L_Y3"/>
+<Transition Event="TL_Y2[2]" Source="s1" Target="L_Y2"/>
+<Transition Event="L_back[2]" Source="L_Y3" Target="L_Y3_Y2"/>
+<Transition Event="TL_Y3[2]" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="init" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y1[2]" Source="L_Y1_Y2" Target="L_Y1_Y2"/>
+<Transition Event="init" Source="L_Y1_Y2" Target="s0"/>
+<Transition Event="TL_Y2[2]" Source="L_Y1_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y2_Y3" Target="s1"/>
+<Transition Event="TL_Y3[2]" Source="L_Y2_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y2[2]" Source="L_Y2_Y3" Target="L_Y2_Y3"/>
+<Transition Event="TL_Y2[2]" Source="L_Y2_Y1" Target="L_Y2_Y1"/>
+<Transition Event="init" Source="L_Y2_Y1" Target="s0"/>
+<Transition Event="TL_Y1[2]" Source="L_Y2_Y1" Target="L_Y1"/>
+<Transition Event="TL_Y1[2]" Source="s0" Target="L_Y1"/>
+<Transition Event="TL_Y2[2]" Source="s0" Target="L_Y2"/>
+<Transition Event="TL_Y3[2]" Source="start" Target="L_Y3"/>
+<Transition Event="TL_Y1[2]" Source="start" Target="L_Y1"/>
+<Transition Event="TL_Y2[2]" Source="start" Target="L_Y2"/>
+<Transition Event="L_forward[2]" Source="L_Y1" Target="L_Y1_Y2"/>
+<Transition Event="TL_Y1[2]" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="init" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="L_forward[2]" Source="L_Y2" Target="L_Y2_Y3"/>
+<Transition Event="L_back[2]" Source="L_Y2" Target="L_Y2_Y1"/>
+<Transition Event="TL_Y2[2]" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y2" Target="L_Y2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="plant_move_Lz[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_down[1]"/>
+<EventRef Name="L_up[1]"/>
+<EventRef Name="TL_Z1[1]"/>
+<EventRef Name="TL_Z2[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Z1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z1_Z2"/>
+<State Name="L_Z2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z2_Z1"/>
+<State Name="s0"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Z1[1]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init_done" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_down[1]" Source="L_Z1" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z1[1]" Source="s0" Target="L_Z1"/>
+<Transition Event="TL_Z2[1]" Source="s0" Target="L_Z2"/>
+<Transition Event="TL_Z2[1]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="init" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_up[1]" Source="L_Z2" Target="L_Z2_Z1"/>
+<Transition Event="TL_Z1[1]" Source="L_Z2_Z1" Target="L_Z1"/>
+<Transition Event="init" Source="L_Z2_Z1" Target="s0"/>
+<Transition Event="TL_Z2[1]" Source="L_Z2_Z1" Target="L_Z2_Z1"/>
+<Transition Event="init" Source="L_Z1_Z2" Target="s0"/>
+<Transition Event="TL_Z2[1]" Source="L_Z1_Z2" Target="L_Z2"/>
+<Transition Event="TL_Z1[1]" Source="L_Z1_Z2" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z1[1]" Source="start" Target="L_Z1"/>
+<Transition Event="TL_Z2[1]" Source="start" Target="L_Z2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="plant_move_Lz[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_down[2]"/>
+<EventRef Name="L_up[2]"/>
+<EventRef Name="TL_Z1[2]"/>
+<EventRef Name="TL_Z2[2]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Z1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z1_Z2"/>
+<State Name="L_Z2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z2_Z1"/>
+<State Name="s0"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Z1[2]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init_done" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_down[2]" Source="L_Z1" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z1[2]" Source="s0" Target="L_Z1"/>
+<Transition Event="TL_Z2[2]" Source="s0" Target="L_Z2"/>
+<Transition Event="TL_Z2[2]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="init" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_up[2]" Source="L_Z2" Target="L_Z2_Z1"/>
+<Transition Event="TL_Z1[2]" Source="L_Z2_Z1" Target="L_Z1"/>
+<Transition Event="init" Source="L_Z2_Z1" Target="s0"/>
+<Transition Event="TL_Z2[2]" Source="L_Z2_Z1" Target="L_Z2_Z1"/>
+<Transition Event="init" Source="L_Z1_Z2" Target="s0"/>
+<Transition Event="TL_Z2[2]" Source="L_Z1_Z2" Target="L_Z2"/>
+<Transition Event="TL_Z1[2]" Source="L_Z1_Z2" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z1[2]" Source="start" Target="L_Z1"/>
+<Transition Event="TL_Z2[2]" Source="start" Target="L_Z2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="safety2L1">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X1[1]"/>
+<EventRef Name="L_at_X2[1]"/>
+<EventRef Name="L_at_X2[2]"/>
+<EventRef Name="L_at_X3[1]"/>
+<EventRef Name="L_at_X3[2]"/>
+<EventRef Name="L_at_X4[1]"/>
+<EventRef Name="L_at_X4[2]"/>
+<EventRef Name="L_at_X5[1]"/>
+<EventRef Name="L_at_X5[2]"/>
+<EventRef Name="L_at_X6[1]"/>
+<EventRef Name="L_at_X6[2]"/>
+<EventRef Name="L_at_X7[2]"/>
+<EventRef Name="L_at_X8[2]"/>
+<EventRef Name="L_left[2]"/>
+<EventRef Name="L_right[1]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L1_X1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X4">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L1_X6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X1X2"/>
+<State Name="X1X3"/>
+<State Name="X2X3"/>
+<State Name="X2X4"/>
+<State Name="X3X4"/>
+<State Name="X3X5"/>
+<State Name="X4X5"/>
+<State Name="X4X6"/>
+<State Name="X5X6"/>
+<State Name="X5X7"/>
+<State Name="X6X7"/>
+<State Name="X7X8"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_at_X8[2]" Source="X7X8" Target="X7X8"/>
+<Transition Event="L_at_X6[1]" Source="X7X8" Target="L1_X6"/>
+<Transition Event="L_at_X1[1]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_at_X4[2]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_at_X5[2]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_at_X6[2]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_at_X7[2]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_at_X8[2]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_left[2]" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="init_done" Source="L1_X1" Target="L1_X1"/>
+<Transition Event="L_at_X3[2]" Source="L1_X1" Target="X1X3"/>
+<Transition Event="L_right[1]" Source="L1_X1" Target="L1_X2"/>
+<Transition Event="L_at_X2[2]" Source="L1_X1" Target="X1X2"/>
+<Transition Event="L_at_X7[2]" Source="X5X7" Target="X5X7"/>
+<Transition Event="L_at_X5[1]" Source="X5X7" Target="X5X7"/>
+<Transition Event="L_at_X4[1]" Source="X5X7" Target="L1_X4"/>
+<Transition Event="L_left[2]" Source="X5X7" Target="X5X6"/>
+<Transition Event="L_right[1]" Source="X5X7" Target="X6X7"/>
+<Transition Event="L_at_X8[2]" Source="X5X7" Target="L1_X5"/>
+<Transition Event="L_at_X1[1]" Source="X2X3" Target="L1_X1"/>
+<Transition Event="L_at_X3[2]" Source="X2X3" Target="X2X3"/>
+<Transition Event="L_at_X2[1]" Source="X2X3" Target="X2X3"/>
+<Transition Event="L_at_X4[2]" Source="X2X3" Target="X2X4"/>
+<Transition Event="L_at_X4[1]" Source="L1_X4" Target="L1_X4"/>
+<Transition Event="L_at_X7[2]" Source="L1_X4" Target="L1_X4"/>
+<Transition Event="L_at_X8[2]" Source="L1_X4" Target="L1_X4"/>
+<Transition Event="L_left[2]" Source="L1_X4" Target="L1_X4"/>
+<Transition Event="L_at_X3[1]" Source="L1_X4" Target="L1_X3"/>
+<Transition Event="L_at_X6[2]" Source="L1_X4" Target="X4X6"/>
+<Transition Event="L_right[1]" Source="L1_X4" Target="L1_X5"/>
+<Transition Event="L_at_X5[2]" Source="L1_X4" Target="X4X5"/>
+<Transition Event="L_at_X4[2]" Source="X1X3" Target="L1_X1"/>
+<Transition Event="L_right[1]" Source="X1X3" Target="X2X3"/>
+<Transition Event="L_at_X3[2]" Source="X1X3" Target="X1X3"/>
+<Transition Event="L_at_X1[1]" Source="X1X3" Target="X1X3"/>
+<Transition Event="L_left[2]" Source="X1X3" Target="X1X2"/>
+<Transition Event="L_at_X7[2]" Source="X5X6" Target="X5X7"/>
+<Transition Event="L_at_X4[1]" Source="X5X6" Target="L1_X4"/>
+<Transition Event="L_at_X6[2]" Source="X5X6" Target="X5X6"/>
+<Transition Event="L_at_X5[1]" Source="X5X6" Target="X5X6"/>
+<Transition Event="L_at_X5[2]" Source="X3X5" Target="X3X5"/>
+<Transition Event="L_at_X3[1]" Source="X3X5" Target="X3X5"/>
+<Transition Event="L_at_X6[2]" Source="X3X5" Target="L1_X3"/>
+<Transition Event="L_left[2]" Source="X3X5" Target="X3X4"/>
+<Transition Event="L_at_X2[1]" Source="X3X5" Target="L1_X2"/>
+<Transition Event="L_right[1]" Source="X3X5" Target="X4X5"/>
+<Transition Event="L_right[1]" Source="L1_X3" Target="L1_X4"/>
+<Transition Event="L_at_X5[2]" Source="L1_X3" Target="X3X5"/>
+<Transition Event="L_at_X3[1]" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="L_at_X6[2]" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="L_at_X7[2]" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="L_at_X8[2]" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="L_left[2]" Source="L1_X3" Target="L1_X3"/>
+<Transition Event="L_at_X4[2]" Source="L1_X3" Target="X3X4"/>
+<Transition Event="L_at_X2[1]" Source="L1_X3" Target="L1_X2"/>
+<Transition Event="L_at_X7[2]" Source="X6X7" Target="X6X7"/>
+<Transition Event="L_at_X6[1]" Source="X6X7" Target="X6X7"/>
+<Transition Event="L_at_X5[1]" Source="X6X7" Target="L1_X5"/>
+<Transition Event="L_at_X8[2]" Source="X6X7" Target="L1_X6"/>
+<Transition Event="L_at_X7[2]" Source="X4X6" Target="L1_X4"/>
+<Transition Event="L_right[1]" Source="X4X6" Target="X5X6"/>
+<Transition Event="L_at_X3[1]" Source="X4X6" Target="L1_X3"/>
+<Transition Event="L_at_X6[2]" Source="X4X6" Target="X4X6"/>
+<Transition Event="L_at_X4[1]" Source="X4X6" Target="X4X6"/>
+<Transition Event="L_left[2]" Source="X4X6" Target="X4X5"/>
+<Transition Event="L_at_X7[2]" Source="L1_X5" Target="X5X7"/>
+<Transition Event="L_at_X4[1]" Source="L1_X5" Target="L1_X4"/>
+<Transition Event="L_at_X6[2]" Source="L1_X5" Target="X5X6"/>
+<Transition Event="L_at_X5[1]" Source="L1_X5" Target="L1_X5"/>
+<Transition Event="L_at_X8[2]" Source="L1_X5" Target="L1_X5"/>
+<Transition Event="L_left[2]" Source="L1_X5" Target="L1_X5"/>
+<Transition Event="L_right[1]" Source="L1_X5" Target="L1_X6"/>
+<Transition Event="L_at_X5[2]" Source="X3X4" Target="X3X5"/>
+<Transition Event="L_at_X4[2]" Source="X3X4" Target="X3X4"/>
+<Transition Event="L_at_X3[1]" Source="X3X4" Target="X3X4"/>
+<Transition Event="L_at_X2[1]" Source="X3X4" Target="L1_X2"/>
+<Transition Event="L_at_X1[1]" Source="X2X4" Target="L1_X1"/>
+<Transition Event="L_left[2]" Source="X2X4" Target="X2X3"/>
+<Transition Event="L_right[1]" Source="X2X4" Target="X3X4"/>
+<Transition Event="L_at_X4[2]" Source="X2X4" Target="X2X4"/>
+<Transition Event="L_at_X2[1]" Source="X2X4" Target="X2X4"/>
+<Transition Event="L_at_X5[2]" Source="X2X4" Target="L1_X2"/>
+<Transition Event="L_at_X1[1]" Source="L1_X2" Target="L1_X1"/>
+<Transition Event="L_at_X3[2]" Source="L1_X2" Target="X2X3"/>
+<Transition Event="L_right[1]" Source="L1_X2" Target="L1_X3"/>
+<Transition Event="L_at_X4[2]" Source="L1_X2" Target="X2X4"/>
+<Transition Event="L_at_X2[1]" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="L_at_X5[2]" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="L_at_X6[2]" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="L_at_X7[2]" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="L_at_X8[2]" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="L_left[2]" Source="L1_X2" Target="L1_X2"/>
+<Transition Event="init_done" Source="start" Target="L1_X1"/>
+<Transition Event="L_at_X3[1]" Source="X4X5" Target="L1_X3"/>
+<Transition Event="L_at_X6[2]" Source="X4X5" Target="X4X6"/>
+<Transition Event="L_at_X5[2]" Source="X4X5" Target="X4X5"/>
+<Transition Event="L_at_X4[1]" Source="X4X5" Target="X4X5"/>
+<Transition Event="L_right[1]" Source="L1_X6" Target="X7X8"/>
+<Transition Event="L_left[2]" Source="L1_X6" Target="X6X7"/>
+<Transition Event="L_at_X7[2]" Source="L1_X6" Target="X6X7"/>
+<Transition Event="L_at_X5[1]" Source="L1_X6" Target="L1_X5"/>
+<Transition Event="L_at_X6[1]" Source="L1_X6" Target="L1_X6"/>
+<Transition Event="L_at_X8[2]" Source="L1_X6" Target="L1_X6"/>
+<Transition Event="L_at_X3[2]" Source="X1X2" Target="X1X3"/>
+<Transition Event="L_at_X2[2]" Source="X1X2" Target="X1X2"/>
+<Transition Event="L_at_X1[1]" Source="X1X2" Target="X1X2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="safety2L2">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_at_X1[1]"/>
+<EventRef Name="L_at_X2[1]"/>
+<EventRef Name="L_at_X3[1]"/>
+<EventRef Name="L_at_X3[2]"/>
+<EventRef Name="L_at_X4[1]"/>
+<EventRef Name="L_at_X4[2]"/>
+<EventRef Name="L_at_X5[1]"/>
+<EventRef Name="L_at_X5[2]"/>
+<EventRef Name="L_at_X6[1]"/>
+<EventRef Name="L_at_X6[2]"/>
+<EventRef Name="L_at_X7[1]"/>
+<EventRef Name="L_at_X7[2]"/>
+<EventRef Name="L_at_X8[2]"/>
+<EventRef Name="L_left[2]"/>
+<EventRef Name="L_right[1]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L2_X3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X4">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X5">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X6">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X7">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L2_X8">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="X1X2"/>
+<State Name="X2X3"/>
+<State Name="X2X4"/>
+<State Name="X3X4"/>
+<State Name="X3X5"/>
+<State Name="X4X5"/>
+<State Name="X4X6"/>
+<State Name="X5X6"/>
+<State Name="X5X7"/>
+<State Name="X6X7"/>
+<State Name="X6X8"/>
+<State Name="X7X8"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="L_at_X4[2]" Source="L2_X4" Target="L2_X4"/>
+<Transition Event="L_at_X1[1]" Source="L2_X4" Target="L2_X4"/>
+<Transition Event="L_right[1]" Source="L2_X4" Target="L2_X4"/>
+<Transition Event="L_at_X5[2]" Source="L2_X4" Target="L2_X5"/>
+<Transition Event="L_left[2]" Source="L2_X4" Target="L2_X3"/>
+<Transition Event="L_at_X2[1]" Source="L2_X4" Target="X2X4"/>
+<Transition Event="L_at_X3[1]" Source="L2_X4" Target="X3X4"/>
+<Transition Event="L_at_X4[1]" Source="X4X6" Target="X4X6"/>
+<Transition Event="L_at_X6[2]" Source="X4X6" Target="X4X6"/>
+<Transition Event="L_left[2]" Source="X4X6" Target="X4X5"/>
+<Transition Event="L_at_X3[1]" Source="X4X6" Target="L2_X6"/>
+<Transition Event="L_at_X7[2]" Source="X4X6" Target="L2_X7"/>
+<Transition Event="L_right[1]" Source="X4X6" Target="X5X6"/>
+<Transition Event="L_at_X8[2]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_at_X1[1]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_at_X2[1]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_at_X3[1]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_at_X4[1]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_at_X5[1]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_right[1]" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="init_done" Source="L2_X8" Target="L2_X8"/>
+<Transition Event="L_at_X6[1]" Source="L2_X8" Target="X6X8"/>
+<Transition Event="L_left[2]" Source="L2_X8" Target="L2_X7"/>
+<Transition Event="L_at_X7[1]" Source="L2_X8" Target="X7X8"/>
+<Transition Event="L_at_X3[1]" Source="X3X5" Target="X3X5"/>
+<Transition Event="L_at_X5[2]" Source="X3X5" Target="X3X5"/>
+<Transition Event="L_at_X2[1]" Source="X3X5" Target="L2_X5"/>
+<Transition Event="L_right[1]" Source="X3X5" Target="X4X5"/>
+<Transition Event="L_at_X6[2]" Source="X3X5" Target="L2_X6"/>
+<Transition Event="L_left[2]" Source="X3X5" Target="X3X4"/>
+<Transition Event="L_left[2]" Source="L2_X5" Target="L2_X4"/>
+<Transition Event="L_at_X3[1]" Source="L2_X5" Target="X3X5"/>
+<Transition Event="L_at_X5[2]" Source="L2_X5" Target="L2_X5"/>
+<Transition Event="L_at_X1[1]" Source="L2_X5" Target="L2_X5"/>
+<Transition Event="L_at_X2[1]" Source="L2_X5" Target="L2_X5"/>
+<Transition Event="L_right[1]" Source="L2_X5" Target="L2_X5"/>
+<Transition Event="L_at_X4[1]" Source="L2_X5" Target="X4X5"/>
+<Transition Event="L_at_X6[2]" Source="L2_X5" Target="L2_X6"/>
+<Transition Event="L_at_X8[2]" Source="X5X7" Target="L2_X8"/>
+<Transition Event="L_at_X5[1]" Source="X5X7" Target="X5X7"/>
+<Transition Event="L_at_X7[2]" Source="X5X7" Target="X5X7"/>
+<Transition Event="L_right[1]" Source="X5X7" Target="X6X7"/>
+<Transition Event="L_at_X4[1]" Source="X5X7" Target="L2_X7"/>
+<Transition Event="L_left[2]" Source="X5X7" Target="X5X6"/>
+<Transition Event="L_at_X4[2]" Source="L2_X3" Target="L2_X4"/>
+<Transition Event="L_at_X3[2]" Source="L2_X3" Target="L2_X3"/>
+<Transition Event="L_at_X1[1]" Source="L2_X3" Target="L2_X3"/>
+<Transition Event="L_right[1]" Source="L2_X3" Target="X2X3"/>
+<Transition Event="L_at_X2[1]" Source="L2_X3" Target="X2X3"/>
+<Transition Event="L_left[2]" Source="L2_X3" Target="X1X2"/>
+<Transition Event="L_at_X5[1]" Source="X6X8" Target="L2_X8"/>
+<Transition Event="L_at_X6[1]" Source="X6X8" Target="X6X8"/>
+<Transition Event="L_at_X8[2]" Source="X6X8" Target="X6X8"/>
+<Transition Event="L_left[2]" Source="X6X8" Target="X6X7"/>
+<Transition Event="L_right[1]" Source="X6X8" Target="X7X8"/>
+<Transition Event="L_at_X4[2]" Source="X2X3" Target="L2_X4"/>
+<Transition Event="L_at_X1[1]" Source="X2X3" Target="L2_X3"/>
+<Transition Event="L_at_X2[1]" Source="X2X3" Target="X2X3"/>
+<Transition Event="L_at_X3[2]" Source="X2X3" Target="X2X3"/>
+<Transition Event="L_at_X3[1]" Source="X4X5" Target="X3X5"/>
+<Transition Event="L_at_X4[1]" Source="X4X5" Target="X4X5"/>
+<Transition Event="L_at_X5[2]" Source="X4X5" Target="X4X5"/>
+<Transition Event="L_at_X6[2]" Source="X4X5" Target="L2_X6"/>
+<Transition Event="L_at_X3[2]" Source="X1X2" Target="L2_X3"/>
+<Transition Event="L_at_X1[1]" Source="X1X2" Target="X1X2"/>
+<Transition Event="L_at_X4[1]" Source="L2_X6" Target="X4X6"/>
+<Transition Event="L_left[2]" Source="L2_X6" Target="L2_X5"/>
+<Transition Event="L_at_X6[2]" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="L_at_X1[1]" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="L_at_X2[1]" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="L_at_X3[1]" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="L_right[1]" Source="L2_X6" Target="L2_X6"/>
+<Transition Event="L_at_X7[2]" Source="L2_X6" Target="L2_X7"/>
+<Transition Event="L_at_X5[1]" Source="L2_X6" Target="X5X6"/>
+<Transition Event="init_done" Source="start" Target="L2_X8"/>
+<Transition Event="L_at_X1[1]" Source="X2X4" Target="L2_X4"/>
+<Transition Event="L_at_X5[2]" Source="X2X4" Target="L2_X5"/>
+<Transition Event="L_left[2]" Source="X2X4" Target="X2X3"/>
+<Transition Event="L_at_X2[1]" Source="X2X4" Target="X2X4"/>
+<Transition Event="L_at_X4[2]" Source="X2X4" Target="X2X4"/>
+<Transition Event="L_right[1]" Source="X2X4" Target="X3X4"/>
+<Transition Event="L_at_X8[2]" Source="X6X7" Target="L2_X8"/>
+<Transition Event="L_at_X5[1]" Source="X6X7" Target="X5X7"/>
+<Transition Event="L_at_X6[1]" Source="X6X7" Target="X6X7"/>
+<Transition Event="L_at_X7[2]" Source="X6X7" Target="X6X7"/>
+<Transition Event="L_at_X8[2]" Source="L2_X7" Target="L2_X8"/>
+<Transition Event="L_at_X5[1]" Source="L2_X7" Target="X5X7"/>
+<Transition Event="L_left[2]" Source="L2_X7" Target="L2_X6"/>
+<Transition Event="L_at_X6[1]" Source="L2_X7" Target="X6X7"/>
+<Transition Event="L_at_X7[2]" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="L_at_X1[1]" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="L_at_X2[1]" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="L_at_X3[1]" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="L_at_X4[1]" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="L_right[1]" Source="L2_X7" Target="L2_X7"/>
+<Transition Event="L_at_X6[1]" Source="X7X8" Target="X6X8"/>
+<Transition Event="L_at_X7[1]" Source="X7X8" Target="X7X8"/>
+<Transition Event="L_at_X8[2]" Source="X7X8" Target="X7X8"/>
+<Transition Event="L_at_X4[1]" Source="X5X6" Target="X4X6"/>
+<Transition Event="L_at_X7[2]" Source="X5X6" Target="L2_X7"/>
+<Transition Event="L_at_X5[1]" Source="X5X6" Target="X5X6"/>
+<Transition Event="L_at_X6[2]" Source="X5X6" Target="X5X6"/>
+<Transition Event="L_at_X5[2]" Source="X3X4" Target="L2_X5"/>
+<Transition Event="L_at_X2[1]" Source="X3X4" Target="X2X4"/>
+<Transition Event="L_at_X3[1]" Source="X3X4" Target="X3X4"/>
+<Transition Event="L_at_X4[2]" Source="X3X4" Target="X3X4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="spec_move_Ly[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[1]"/>
+<EventRef Name="L_forward[1]"/>
+<EventRef Name="L_mY1[1]"/>
+<EventRef Name="L_mY2[1]"/>
+<EventRef Name="L_mY3[1]"/>
+<EventRef Name="TL_Y1[1]"/>
+<EventRef Name="TL_Y2[1]"/>
+<EventRef Name="TL_Y3[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y1_Y2"/>
+<State Name="L_Y2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y2_Y1"/>
+<State Name="L_Y2_Y3"/>
+<State Name="L_Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y3_Y2"/>
+<State Name="L_leave_Y1v"/>
+<State Name="L_leave_Y2h"/>
+<State Name="L_leave_Y2v"/>
+<State Name="L_leave_Y3h"/>
+<State Name="s0"/>
+<State Name="s1"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Y1[1]" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="L_mY2[1]" Source="L_Y1" Target="L_leave_Y1v"/>
+<Transition Event="L_mY3[1]" Source="L_Y1" Target="L_leave_Y1v"/>
+<Transition Event="init" Source="L_Y1" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y2[1]" Source="s1" Target="L_Y2"/>
+<Transition Event="TL_Y3[1]" Source="s1" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_Y2_Y3" Target="s1"/>
+<Transition Event="TL_Y2[1]" Source="L_Y2_Y3" Target="L_Y2_Y3"/>
+<Transition Event="TL_Y3[1]" Source="L_Y2_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y2[1]" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init_done" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="L_mY3[1]" Source="L_Y2" Target="L_leave_Y2v"/>
+<Transition Event="L_mY1[1]" Source="L_Y2" Target="L_leave_Y2h"/>
+<Transition Event="L_forward[1]" Source="L_leave_Y2v" Target="L_Y2_Y3"/>
+<Transition Event="init" Source="L_leave_Y2v" Target="L_Y2"/>
+<Transition Event="TL_Y2[1]" Source="L_leave_Y2v" Target="L_leave_Y2v"/>
+<Transition Event="init" Source="L_Y3_Y2" Target="s1"/>
+<Transition Event="TL_Y2[1]" Source="L_Y3_Y2" Target="L_Y2"/>
+<Transition Event="TL_Y3[1]" Source="L_Y3_Y2" Target="L_Y3_Y2"/>
+<Transition Event="TL_Y2[1]" Source="start" Target="L_Y2"/>
+<Transition Event="TL_Y1[1]" Source="start" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y3[1]" Source="start" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_leave_Y1v" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y1[1]" Source="L_leave_Y1v" Target="L_leave_Y1v"/>
+<Transition Event="L_forward[1]" Source="L_leave_Y1v" Target="L_Y1_Y2"/>
+<Transition Event="TL_Y1[1]" Source="L_Y2_Y1" Target="L_Y1"/>
+<Transition Event="TL_Y2[1]" Source="L_Y2_Y1" Target="L_Y2_Y1"/>
+<Transition Event="init" Source="L_Y2_Y1" Target="s0"/>
+<Transition Event="L_back[1]" Source="L_leave_Y3h" Target="L_Y3_Y2"/>
+<Transition Event="init" Source="L_leave_Y3h" Target="L_leave_Y3h"/>
+<Transition Event="TL_Y3[1]" Source="L_leave_Y3h" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_leave_Y2h" Target="L_Y2"/>
+<Transition Event="L_back[1]" Source="L_leave_Y2h" Target="L_Y2_Y1"/>
+<Transition Event="TL_Y2[1]" Source="L_leave_Y2h" Target="L_leave_Y2h"/>
+<Transition Event="L_mY1[1]" Source="L_Y3" Target="L_leave_Y3h"/>
+<Transition Event="L_mY2[1]" Source="L_Y3" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_Y3" Target="L_leave_Y3h"/>
+<Transition Event="TL_Y3[1]" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y2[1]" Source="s0" Target="L_Y2"/>
+<Transition Event="TL_Y1[1]" Source="s0" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y2[1]" Source="L_Y1_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y1_Y2" Target="s0"/>
+<Transition Event="TL_Y1[1]" Source="L_Y1_Y2" Target="L_Y1_Y2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="spec_move_Ly[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[2]"/>
+<EventRef Name="L_forward[2]"/>
+<EventRef Name="L_mY1[2]"/>
+<EventRef Name="L_mY2[2]"/>
+<EventRef Name="L_mY3[2]"/>
+<EventRef Name="TL_Y1[2]"/>
+<EventRef Name="TL_Y2[2]"/>
+<EventRef Name="TL_Y3[2]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Y1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y1_Y2"/>
+<State Name="L_Y2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y2_Y1"/>
+<State Name="L_Y2_Y3"/>
+<State Name="L_Y3">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Y3_Y2"/>
+<State Name="L_leave_Y1v"/>
+<State Name="L_leave_Y2h"/>
+<State Name="L_leave_Y2v"/>
+<State Name="L_leave_Y3h"/>
+<State Name="s0"/>
+<State Name="s1"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Y1[2]" Source="L_Y1" Target="L_Y1"/>
+<Transition Event="L_mY2[2]" Source="L_Y1" Target="L_leave_Y1v"/>
+<Transition Event="L_mY3[2]" Source="L_Y1" Target="L_leave_Y1v"/>
+<Transition Event="init" Source="L_Y1" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y2[2]" Source="s1" Target="L_Y2"/>
+<Transition Event="TL_Y3[2]" Source="s1" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_Y2_Y3" Target="s1"/>
+<Transition Event="TL_Y2[2]" Source="L_Y2_Y3" Target="L_Y2_Y3"/>
+<Transition Event="TL_Y3[2]" Source="L_Y2_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y2[2]" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init_done" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y2" Target="L_Y2"/>
+<Transition Event="L_mY3[2]" Source="L_Y2" Target="L_leave_Y2v"/>
+<Transition Event="L_mY1[2]" Source="L_Y2" Target="L_leave_Y2h"/>
+<Transition Event="L_forward[2]" Source="L_leave_Y2v" Target="L_Y2_Y3"/>
+<Transition Event="init" Source="L_leave_Y2v" Target="L_Y2"/>
+<Transition Event="TL_Y2[2]" Source="L_leave_Y2v" Target="L_leave_Y2v"/>
+<Transition Event="init" Source="L_Y3_Y2" Target="s1"/>
+<Transition Event="TL_Y2[2]" Source="L_Y3_Y2" Target="L_Y2"/>
+<Transition Event="TL_Y3[2]" Source="L_Y3_Y2" Target="L_Y3_Y2"/>
+<Transition Event="TL_Y2[2]" Source="start" Target="L_Y2"/>
+<Transition Event="TL_Y1[2]" Source="start" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y3[2]" Source="start" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_leave_Y1v" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y1[2]" Source="L_leave_Y1v" Target="L_leave_Y1v"/>
+<Transition Event="L_forward[2]" Source="L_leave_Y1v" Target="L_Y1_Y2"/>
+<Transition Event="TL_Y1[2]" Source="L_Y2_Y1" Target="L_Y1"/>
+<Transition Event="TL_Y2[2]" Source="L_Y2_Y1" Target="L_Y2_Y1"/>
+<Transition Event="init" Source="L_Y2_Y1" Target="s0"/>
+<Transition Event="L_back[2]" Source="L_leave_Y3h" Target="L_Y3_Y2"/>
+<Transition Event="init" Source="L_leave_Y3h" Target="L_leave_Y3h"/>
+<Transition Event="TL_Y3[2]" Source="L_leave_Y3h" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_leave_Y2h" Target="L_Y2"/>
+<Transition Event="L_back[2]" Source="L_leave_Y2h" Target="L_Y2_Y1"/>
+<Transition Event="TL_Y2[2]" Source="L_leave_Y2h" Target="L_leave_Y2h"/>
+<Transition Event="L_mY1[2]" Source="L_Y3" Target="L_leave_Y3h"/>
+<Transition Event="L_mY2[2]" Source="L_Y3" Target="L_leave_Y3h"/>
+<Transition Event="init" Source="L_Y3" Target="L_leave_Y3h"/>
+<Transition Event="TL_Y3[2]" Source="L_Y3" Target="L_Y3"/>
+<Transition Event="TL_Y2[2]" Source="s0" Target="L_Y2"/>
+<Transition Event="TL_Y1[2]" Source="s0" Target="L_leave_Y1v"/>
+<Transition Event="TL_Y2[2]" Source="L_Y1_Y2" Target="L_Y2"/>
+<Transition Event="init" Source="L_Y1_Y2" Target="s0"/>
+<Transition Event="TL_Y1[2]" Source="L_Y1_Y2" Target="L_Y1_Y2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="spec_move_Lz[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[1]"/>
+<EventRef Name="L_down[1]"/>
+<EventRef Name="L_dropS[S][1]"/>
+<EventRef Name="L_dropS[S][2]"/>
+<EventRef Name="L_drop_B2[2]"/>
+<EventRef Name="L_forward[1]"/>
+<EventRef Name="L_left[1]"/>
+<EventRef Name="L_mX1[1]"/>
+<EventRef Name="L_mX2[1]"/>
+<EventRef Name="L_mX3[1]"/>
+<EventRef Name="L_mX4[1]"/>
+<EventRef Name="L_mX5[1]"/>
+<EventRef Name="L_mX6[1]"/>
+<EventRef Name="L_mX7[1]"/>
+<EventRef Name="L_mX8[2]"/>
+<EventRef Name="L_mY1[1]"/>
+<EventRef Name="L_mY2[1]"/>
+<EventRef Name="L_mY3[1]"/>
+<EventRef Name="L_mag_off[1]"/>
+<EventRef Name="L_mag_on[1]"/>
+<EventRef Name="L_pickS[S][1]"/>
+<EventRef Name="L_pickS[S][2]"/>
+<EventRef Name="L_pick_B1[1]"/>
+<EventRef Name="L_right[1]"/>
+<EventRef Name="L_up[1]"/>
+<EventRef Name="TL_Z1[1]"/>
+<EventRef Name="TL_Z2[1]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Z1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z1_Z2"/>
+<State Name="L_Z2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z2_Z1"/>
+<State Name="L_leave_Z1"/>
+<State Name="L_leave_Z2"/>
+<State Name="s0"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Z1[1]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_right[1]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_left[1]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_forward[1]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_back[1]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init_done" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_pickS[S][2]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_pickS[S][1]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_dropS[S][2]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_dropS[S][1]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_pick_B1[1]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_drop_B2[2]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="TL_Z1[1]" Source="L_Z1_Z2" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z2[1]" Source="L_Z1_Z2" Target="L_Z2"/>
+<Transition Event="init" Source="L_Z1_Z2" Target="s0"/>
+<Transition Event="TL_Z2[1]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_mag_on[1]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_mag_off[1]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="init" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_mX1[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX2[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX3[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX4[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX5[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX6[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX7[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX8[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mY1[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mY2[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mY3[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="init" Source="L_leave_Z1" Target="L_Z1"/>
+<Transition Event="L_down[1]" Source="L_leave_Z1" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z1[1]" Source="L_leave_Z1" Target="L_leave_Z1"/>
+<Transition Event="TL_Z2[1]" Source="L_leave_Z2" Target="L_leave_Z2"/>
+<Transition Event="init" Source="L_leave_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_up[1]" Source="L_leave_Z2" Target="L_Z2_Z1"/>
+<Transition Event="TL_Z1[1]" Source="start" Target="L_Z1"/>
+<Transition Event="TL_Z2[1]" Source="start" Target="L_Z2"/>
+<Transition Event="L_up[1]" Source="start" Target="start"/>
+<Transition Event="TL_Z1[1]" Source="L_Z2_Z1" Target="L_Z1"/>
+<Transition Event="TL_Z2[1]" Source="L_Z2_Z1" Target="L_Z2_Z1"/>
+<Transition Event="init" Source="L_Z2_Z1" Target="s0"/>
+<Transition Event="TL_Z1[1]" Source="s0" Target="L_Z1"/>
+<Transition Event="TL_Z2[1]" Source="s0" Target="L_Z2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="spec_move_Lz[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="L_back[2]"/>
+<EventRef Name="L_down[2]"/>
+<EventRef Name="L_dropS[S][1]"/>
+<EventRef Name="L_dropS[S][2]"/>
+<EventRef Name="L_drop_B2[2]"/>
+<EventRef Name="L_forward[2]"/>
+<EventRef Name="L_left[2]"/>
+<EventRef Name="L_mX1[1]"/>
+<EventRef Name="L_mX2[2]"/>
+<EventRef Name="L_mX3[2]"/>
+<EventRef Name="L_mX4[2]"/>
+<EventRef Name="L_mX5[2]"/>
+<EventRef Name="L_mX6[2]"/>
+<EventRef Name="L_mX7[2]"/>
+<EventRef Name="L_mX8[2]"/>
+<EventRef Name="L_mY1[2]"/>
+<EventRef Name="L_mY2[2]"/>
+<EventRef Name="L_mY3[2]"/>
+<EventRef Name="L_mag_off[2]"/>
+<EventRef Name="L_mag_on[2]"/>
+<EventRef Name="L_pickS[S][1]"/>
+<EventRef Name="L_pickS[S][2]"/>
+<EventRef Name="L_pick_B1[1]"/>
+<EventRef Name="L_right[2]"/>
+<EventRef Name="L_up[2]"/>
+<EventRef Name="TL_Z1[2]"/>
+<EventRef Name="TL_Z2[2]"/>
+<EventRef Name="init"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="L_Z1">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z1_Z2"/>
+<State Name="L_Z2">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="L_Z2_Z1"/>
+<State Name="L_leave_Z1"/>
+<State Name="L_leave_Z2"/>
+<State Name="s0"/>
+<State Initial="true" Name="start"/>
+</StateList>
+<TransitionList>
+<Transition Event="TL_Z1[2]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_right[2]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_left[2]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_forward[2]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_back[2]" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init_done" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="init" Source="L_Z1" Target="L_Z1"/>
+<Transition Event="L_pickS[S][2]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_pickS[S][1]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_dropS[S][2]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_dropS[S][1]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_pick_B1[1]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="L_drop_B2[2]" Source="L_Z1" Target="L_leave_Z1"/>
+<Transition Event="TL_Z1[2]" Source="L_Z1_Z2" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z2[2]" Source="L_Z1_Z2" Target="L_Z2"/>
+<Transition Event="init" Source="L_Z1_Z2" Target="s0"/>
+<Transition Event="TL_Z2[2]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_mag_on[2]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_mag_off[2]" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="init" Source="L_Z2" Target="L_Z2"/>
+<Transition Event="L_mX1[1]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX2[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX3[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX4[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX5[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX6[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX7[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mX8[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mY1[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mY2[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_mY3[2]" Source="L_Z2" Target="L_leave_Z2"/>
+<Transition Event="init" Source="L_leave_Z1" Target="L_Z1"/>
+<Transition Event="L_down[2]" Source="L_leave_Z1" Target="L_Z1_Z2"/>
+<Transition Event="TL_Z1[2]" Source="L_leave_Z1" Target="L_leave_Z1"/>
+<Transition Event="TL_Z2[2]" Source="L_leave_Z2" Target="L_leave_Z2"/>
+<Transition Event="init" Source="L_leave_Z2" Target="L_leave_Z2"/>
+<Transition Event="L_up[2]" Source="L_leave_Z2" Target="L_Z2_Z1"/>
+<Transition Event="TL_Z1[2]" Source="start" Target="L_Z1"/>
+<Transition Event="TL_Z2[2]" Source="start" Target="L_Z2"/>
+<Transition Event="L_up[2]" Source="start" Target="start"/>
+<Transition Event="TL_Z1[2]" Source="L_Z2_Z1" Target="L_Z1"/>
+<Transition Event="TL_Z2[2]" Source="L_Z2_Z1" Target="L_Z2_Z1"/>
+<Transition Event="init" Source="L_Z2_Z1" Target="s0"/>
+<Transition Event="TL_Z1[2]" Source="s0" Target="L_Z1"/>
+<Transition Event="TL_Z2[2]" Source="s0" Target="L_Z2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="station[S1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LED_off[S1]"/>
+<EventRef Name="LED_on[S1]"/>
+<EventRef Name="LS_off[S1]"/>
+<EventRef Name="LS_on[S1]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="S_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="S_init"/>
+<State Name="S_occupied"/>
+<State Initial="true" Name="S_start"/>
+<State Name="part_dropped"/>
+<State Name="part_removed"/>
+<State Name="s0"/>
+</StateList>
+<TransitionList>
+<Transition Event="LS_on[S1]" Source="S_occupied" Target="S_occupied"/>
+<Transition Event="LS_off[S1]" Source="S_occupied" Target="part_removed"/>
+<Transition Event="LED_on[S1]" Source="S_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S1]" Source="part_removed" Target="S_occupied"/>
+<Transition Event="LS_off[S1]" Source="part_removed" Target="part_removed"/>
+<Transition Event="LED_off[S1]" Source="S_empty" Target="part_removed"/>
+<Transition Event="LS_off[S1]" Source="S_empty" Target="S_empty"/>
+<Transition Event="LS_on[S1]" Source="S_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S1]" Source="S_start" Target="S_start"/>
+<Transition Event="LS_off[S1]" Source="S_start" Target="S_start"/>
+<Transition Event="LED_off[S1]" Source="S_start" Target="S_init"/>
+<Transition Event="LS_on[S1]" Source="S_init" Target="S_init"/>
+<Transition Event="LS_off[S1]" Source="S_init" Target="S_init"/>
+<Transition Event="init_done" Source="S_init" Target="s0"/>
+<Transition Event="LS_off[S1]" Source="part_dropped" Target="S_empty"/>
+<Transition Event="LS_on[S1]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S1]" Source="s0" Target="S_occupied"/>
+<Transition Event="LS_off[S1]" Source="s0" Target="S_empty"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="station[S2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LED_off[S2]"/>
+<EventRef Name="LED_on[S2]"/>
+<EventRef Name="LS_off[S2]"/>
+<EventRef Name="LS_on[S2]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="S_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="S_init"/>
+<State Name="S_occupied"/>
+<State Initial="true" Name="S_start"/>
+<State Name="part_dropped"/>
+<State Name="part_removed"/>
+<State Name="s0"/>
+</StateList>
+<TransitionList>
+<Transition Event="LS_on[S2]" Source="S_occupied" Target="S_occupied"/>
+<Transition Event="LS_off[S2]" Source="S_occupied" Target="part_removed"/>
+<Transition Event="LED_on[S2]" Source="S_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S2]" Source="part_removed" Target="S_occupied"/>
+<Transition Event="LS_off[S2]" Source="part_removed" Target="part_removed"/>
+<Transition Event="LED_off[S2]" Source="S_empty" Target="part_removed"/>
+<Transition Event="LS_off[S2]" Source="S_empty" Target="S_empty"/>
+<Transition Event="LS_on[S2]" Source="S_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S2]" Source="S_start" Target="S_start"/>
+<Transition Event="LS_off[S2]" Source="S_start" Target="S_start"/>
+<Transition Event="LED_off[S2]" Source="S_start" Target="S_init"/>
+<Transition Event="LS_on[S2]" Source="S_init" Target="S_init"/>
+<Transition Event="LS_off[S2]" Source="S_init" Target="S_init"/>
+<Transition Event="init_done" Source="S_init" Target="s0"/>
+<Transition Event="LS_off[S2]" Source="part_dropped" Target="S_empty"/>
+<Transition Event="LS_on[S2]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S2]" Source="s0" Target="S_occupied"/>
+<Transition Event="LS_off[S2]" Source="s0" Target="S_empty"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="station[S3]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LED_off[S3]"/>
+<EventRef Name="LED_on[S3]"/>
+<EventRef Name="LS_off[S3]"/>
+<EventRef Name="LS_on[S3]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="S_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="S_init"/>
+<State Name="S_occupied"/>
+<State Initial="true" Name="S_start"/>
+<State Name="part_dropped"/>
+<State Name="part_removed"/>
+<State Name="s0"/>
+</StateList>
+<TransitionList>
+<Transition Event="LS_on[S3]" Source="S_occupied" Target="S_occupied"/>
+<Transition Event="LS_off[S3]" Source="S_occupied" Target="part_removed"/>
+<Transition Event="LED_on[S3]" Source="S_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S3]" Source="part_removed" Target="S_occupied"/>
+<Transition Event="LS_off[S3]" Source="part_removed" Target="part_removed"/>
+<Transition Event="LED_off[S3]" Source="S_empty" Target="part_removed"/>
+<Transition Event="LS_off[S3]" Source="S_empty" Target="S_empty"/>
+<Transition Event="LS_on[S3]" Source="S_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S3]" Source="S_start" Target="S_start"/>
+<Transition Event="LS_off[S3]" Source="S_start" Target="S_start"/>
+<Transition Event="LED_off[S3]" Source="S_start" Target="S_init"/>
+<Transition Event="LS_on[S3]" Source="S_init" Target="S_init"/>
+<Transition Event="LS_off[S3]" Source="S_init" Target="S_init"/>
+<Transition Event="init_done" Source="S_init" Target="s0"/>
+<Transition Event="LS_off[S3]" Source="part_dropped" Target="S_empty"/>
+<Transition Event="LS_on[S3]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S3]" Source="s0" Target="S_occupied"/>
+<Transition Event="LS_off[S3]" Source="s0" Target="S_empty"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="station[S4]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="LED_off[S4]"/>
+<EventRef Name="LED_on[S4]"/>
+<EventRef Name="LS_off[S4]"/>
+<EventRef Name="LS_on[S4]"/>
+<EventRef Name="init_done"/>
+</EventRefList>
+<StateList>
+<State Name="S_empty">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="S_init"/>
+<State Name="S_occupied"/>
+<State Initial="true" Name="S_start"/>
+<State Name="part_dropped"/>
+<State Name="part_removed"/>
+<State Name="s0"/>
+</StateList>
+<TransitionList>
+<Transition Event="LS_on[S4]" Source="S_occupied" Target="S_occupied"/>
+<Transition Event="LS_off[S4]" Source="S_occupied" Target="part_removed"/>
+<Transition Event="LED_on[S4]" Source="S_occupied" Target="part_dropped"/>
+<Transition Event="LS_on[S4]" Source="part_removed" Target="S_occupied"/>
+<Transition Event="LS_off[S4]" Source="part_removed" Target="part_removed"/>
+<Transition Event="LED_off[S4]" Source="S_empty" Target="part_removed"/>
+<Transition Event="LS_off[S4]" Source="S_empty" Target="S_empty"/>
+<Transition Event="LS_on[S4]" Source="S_empty" Target="part_dropped"/>
+<Transition Event="LS_on[S4]" Source="S_start" Target="S_start"/>
+<Transition Event="LS_off[S4]" Source="S_start" Target="S_start"/>
+<Transition Event="LED_off[S4]" Source="S_start" Target="S_init"/>
+<Transition Event="LS_on[S4]" Source="S_init" Target="S_init"/>
+<Transition Event="LS_off[S4]" Source="S_init" Target="S_init"/>
+<Transition Event="init_done" Source="S_init" Target="s0"/>
+<Transition Event="LS_off[S4]" Source="part_dropped" Target="S_empty"/>
+<Transition Event="LS_on[S4]" Source="part_dropped" Target="part_dropped"/>
+<Transition Event="LS_on[S4]" Source="s0" Target="S_occupied"/>
+<Transition Event="LS_off[S4]" Source="s0" Target="S_empty"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="abfahrBereitFrei" version="1.0" valid="1"
+	hasGeometry="1" width="165" height="98"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 06:34:21 GMT" modificationDate="2004-09-07 06:34:21 GMT">
+	<events>
+		<event controllable="1" name="abfahrBereit"/>
+		<event controllable="0" name="frei"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="96"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="96"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="262" y="79"/></rendering>
+			<source name="s1"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-17"/></rendering>
+				<label name="frei"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="164" y="72"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-11"/></rendering>
+				<label name="abfahrBereit"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="168" y="119"/></rendering>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-12" y="16"/></rendering>
+				<label name="frei"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

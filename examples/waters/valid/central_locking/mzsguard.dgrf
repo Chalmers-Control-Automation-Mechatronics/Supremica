@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="mzsguard" version="1.0" valid="1"
+	hasGeometry="1" width="209" height="99"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:49:52 GMT" modificationDate="2004-09-07 08:49:52 GMT">
+	<events>
+		<event controllable="1" name="MZS_an.TUER"/>
+		<event controllable="1" name="MZS_aus.TUER"/>
+		<event controllable="1" name="start_ER.TUER"/>
+		<event controllable="1" name="start_VR.TUER"/>
+		<event controllable="1" name="start_ZS.TUER"/>
+		<event controllable="1" name="stop_ER.TUER"/>
+		<event controllable="1" name="stop_VR.TUER"/>
+		<event controllable="1" name="stop_ZS.TUER"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="128" y="160"/></rendering>
+			<label name="IDLE">
+				<rendering><point x="12" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="160"/></rendering>
+			<label name="RUN">
+				<rendering><point x="-40" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="89" y="158"/></rendering>
+			<source name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="-59" y="-34"/></rendering>
+				<label name="start_ER.TUER"/>
+				<label name="stop_ER.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="start_VR.TUER">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="stop_VR.TUER">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="start_ZS.TUER">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="stop_ZS.TUER">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="176" y="175"/></rendering>
+			<source name="IDLE"/>
+			<target name="RUN"/>
+			<labelGroup>
+				<rendering><point x="-41" y="11"/></rendering>
+				<label name="MZS_an.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="176" y="146"/></rendering>
+			<source name="RUN"/>
+			<target name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="-42" y="-3"/></rendering>
+				<label name="MZS_aus.TUER"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

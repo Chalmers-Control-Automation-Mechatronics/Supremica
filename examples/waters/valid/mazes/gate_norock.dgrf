@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="gate_norock" version="1.0" valid="1"
+	hasGeometry="1" width="186" height="209"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-11-30 21:20:13 GMT" modificationDate="2004-11-30 21:21:28 GMT">
+	<events>
+		<event controllable="1" name="enter"/>
+		<event controllable="1" name="exit"/>
+		<event controllable="1" name="unlock"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="128" y="208"/></rendering>
+			<label name="gate">
+				<rendering><point x="-35" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="48"/></rendering>
+			<label name="free">
+				<rendering><point x="-10" y="-14"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="208"/></rendering>
+			<label name="unlocked">
+				<rendering><point x="14" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="128"/></rendering>
+			<label name="hero">
+				<rendering><point x="14" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="192" y="90"/></rendering>
+			<source name="free"/>
+			<target name="hero"/>
+			<labelGroup>
+				<rendering><point x="-35" y="2"/></rendering>
+				<label name="enter"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="gate"/>
+			<target name="unlocked"/>
+			<labelGroup>
+				<rendering><point x="-21" y="13"/></rendering>
+				<label name="unlock"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="unlocked"/>
+			<target name="hero"/>
+			<labelGroup>
+				<rendering><point x="5" y="4"/></rendering>
+				<label name="enter"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="223" y="87"/></rendering>
+			<source name="hero"/>
+			<target name="free"/>
+			<labelGroup>
+				<rendering><point x="5" y="5"/></rendering>
+				<label name="exit"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="Sicherheit_ER" version="1.0" valid="1"
+	hasGeometry="1" width="234" height="109"
+	generatorName="DGE" generatorVersion="2.7.5"
+	creationDate="2000-11-09 14:27:18 GMT+00:00" modificationDate="2000-11-09 14:27:18 GMT+00:00">
+	<events>
+		<event controllable="0" name="CS"/>
+		<event controllable="0" name="ER_BT"/>
+		<event controllable="0" name="ER_FS"/>
+		<event controllable="0" name="ER_FT"/>
+		<event controllable="0" name="ER_HK"/>
+		<event controllable="1" name="MER_an.FT"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="160" y="80"/></rendering>
+			<label name="RQ">
+				<rendering><point x="-9" y="23"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="48" y="80"/></rendering>
+			<label name="IN">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="202" y="75"/></rendering>
+			<source name="RQ"/>
+			<labelGroup>
+				<rendering><point x="1" y="-56"/></rendering>
+				<label name="ER_FT"/>
+				<label name="ER_BT">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="ER_HK">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="ER_FS">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="CS">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="MER_an.FT">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="RQ"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-62"/></rendering>
+				<label name="ER_FT"/>
+				<label name="ER_BT">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="ER_HK">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="ER_FS">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="CS">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="sensor_and_filter" version="1.0" valid="1"
+	hasGeometry="1" width="125" height="65"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-05 08:28:05 GMT+00:00" modificationDate="2000-10-05 08:28:05 GMT+00:00">
+	<events>
+		<event controllable="0" name="new_value.I"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="183" y="195"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="210" y="168"/></rendering>
+			<source name="s0"/>
+			<labelGroup>
+				<rendering><point x="14" y="17"/></rendering>
+				<label name="new_value.I"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="display" version="1.0" valid="1"
+	hasGeometry="1" width="309" height="209"
+	generatorName="DGE" generatorVersion="2.7.9"
+	creationDate="2001-06-19 08:08:56 GMT" modificationDate="2001-06-19 08:08:56 GMT">
+	<events>
+		<event controllable="1" name="displayoff"/>
+		<event controllable="1" name="displayon.1"/>
+		<event controllable="1" name="displayon.2"/>
+		<event controllable="1" name="displayon.3"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="248" y="126"/></rendering>
+			<label name="s0">
+				<rendering><point x="-14" y="-13"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="108" y="126"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="248" y="245"/></rendering>
+			<label name="s2">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="396" y="126"/></rendering>
+			<label name="s3">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="292" y="181"/></rendering>
+			<source name="s2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="6" y="4"/></rendering>
+				<label name="displayoff"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="179" y="165"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-27" y="14"/></rendering>
+				<label name="displayoff"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="320" y="89"/></rendering>
+			<source name="s3"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-23" y="-6"/></rendering>
+				<label name="displayoff"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s2"/>
+			<labelGroup>
+				<rendering><point x="-65" y="18"/></rendering>
+				<label name="displayon.3"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-6"/></rendering>
+				<label name="displayon.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s3"/>
+			<labelGroup>
+				<rendering><point x="-24" y="16"/></rendering>
+				<label name="displayon.1"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="door_rock" xmlns="http://waters.sourceforge.net/xsd/module">
+<ParameterList>
+<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="crush"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="clear"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="unlock"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="door_rock"/>
+<Graph>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="208" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="door">
+<PointGeometry>
+<Point X="112" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-12" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry>
+<Point X="-15" Y="11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry>
+<Point X="-25" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry>
+<Point X="-22" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="197" Y="131"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry>
+<Point X="-33" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="door" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="unlock"/>
+<LabelGeometry>
+<Point X="-18" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry>
+<Point X="7" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="219" Y="126"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

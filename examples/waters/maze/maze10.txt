@@ -1,0 +1,6 @@
+2/6 - key(gold). 4/6. 5/6. 7/6 - exit. 
+2/5. 4/5. 5/5. 7/5 - gate(gold). 11/5 - key(meta). 
+1/4 - exit. 2/4. 3/4 - door(meta). 4/4. 5/4. 6/4 - gate(silver). 7/4. 8/4 - door(meta). 9/4 - key(silver). 10/4. 11/4. 
+5/3 - door(meta). 7/3 - door(meta). 9/3 - door(meta). 11/3 - door(meta). 
+5/2. 6/2 - rock. 7/2. 8/2 - rock. 9/2. 10/2. 11/2. 
+5/1 - hero. 6/1. 7/1. 8/1. 9/1. 10/1. 11/1. 

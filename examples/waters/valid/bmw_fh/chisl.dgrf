@@ -1,0 +1,31 @@
+dgrf2.0.2
+//s 511 297
+8
+c CHISL_OFF
+c CHISL_ON
+u CHISL_TASTER_OFF
+u CHISL_TASTER_ON
+c REQ_CHISL_OFF
+c REQ_CHISL_ON
+u SET_CHISL_OFF
+u SET_CHISL_ON
+6
+368 176 8 0 0 16 13 request
+368 96 8 0 0 14 6 taster
+192 176 8 0 0 -63 20 request0
+192 256 8 0 0 -72 21 taster0
+192 96 8 1 1 -70 15 chisl_off
+368 256 8 0 0 13 -11 chisl_on
+12
+1 taster request 8 -13 1 5 0 0
+3 taster chisl_off 280 79 -55 -5 1 2 0 0
+2 request0 157 155 -130 5 2 2 0 0 3 0 16
+1 request0 chisl_off -107 -2 1 6 0 0
+2 request 395 149 16 2 2 2 0 0 3 0 16
+1 request chisl_on 9 1 1 7 0 0
+2 chisl_on 399 273 -42 25 2 1 0 0 2 0 16
+3 chisl_on taster0 280 240 -64 -7 1 3 0 0
+1 taster0 request0 -108 12 1 4 0 0
+3 taster0 chisl_on 281 273 -69 16 1 2 0 0
+3 chisl_off taster 277 112 -55 15 1 3 0 0
+2 chisl_off 169 65 -107 -28 2 0 0 0 2 0 16

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="falko_main"
+        legacy="1"
+        arity="0"
+        generatorName="Dpr2Vmod"
+        generatorVersion="2.8"
+        version="1.0"
+        creationDate="2004-09-05 20:19:33 GMT+12:00"
+        modificationDate="2004-09-07 18:34:13 GMT+12:00">
+<interface/>
+<definitions>
+<typeDefinition name="modus" expression="{WH PH}"/>
+</definitions>
+<local>
+<event name="notAktiv"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{PH WH}">
+<alias old="notAktiv.$_0" new="notAktiv[$_0]"/>
+</foreach-alias>
+<event name="wendeVollzogen"
+       controllable="0"
+       arity="0">
+</event>
+<event name="abfahrBereit"
+       controllable="1"
+       arity="0">
+</event>
+<event name="minAbgelaufen"
+       controllable="0"
+       arity="0">
+</event>
+<event name="tuerenGeschlossen"
+       controllable="0"
+       arity="0">
+</event>
+<event name="frei"
+       controllable="0"
+       arity="0">
+</event>
+<event name="tuerenGeoeffnet"
+       controllable="0"
+       arity="0">
+</event>
+<event name="zugAn"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{PH WH}">
+<alias old="zugAn.$_0" new="zugAn[$_0]"/>
+</foreach-alias>
+<event name="fastAbfahrt"
+       controllable="0"
+       arity="0">
+</event>
+<event name="ausstiegBeendet"
+       controllable="0"
+       arity="0">
+</event>
+<event name="abfahrt"
+       controllable="0"
+       arity="0">
+</event>
+<event name="bereitFahrt"
+       controllable="1"
+       arity="0">
+</event>
+<event name="einstiegBeendet"
+       controllable="0"
+       arity="0">
+</event>
+</local>
+<parts>
+<component graph="minAbgelaufen" kind="spec"/>
+<component graph="wendehalt" kind="plant"/>
+<component graph="abfahrBereitFrei" kind="spec"/>
+<component graph="andConditionAbfahrt" kind="spec"/>
+<foreach-instance dummy="i" range="$modus">
+<instance name="abfahrBereitAbort[$i]" module="abfahrBereitAbort_spec">
+<nameParam name="bereitFahrt" value="bereitFahrt"/>
+<nameParam name="notAktiv" value="notAktiv[$i]"/>
+<nameParam name="zugAn" value="zugAn[$i]"/>
+</instance>
+</foreach-instance>
+<component graph="passagierhalt" kind="plant"/>
+<component graph="fastAbfahrt" kind="spec"/>
+<component graph="andConditionFrei" kind="spec"/>
+<component graph="bereitFahrtAbort" kind="spec"/>
+<component graph="planhalt" kind="plant"/>
+<component graph="einstiegBeendet" kind="spec"/>
+</parts>
+</module>

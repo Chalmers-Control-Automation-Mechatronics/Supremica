@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="mazes" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="CONTROLLABLE" Name="clear"/>
+<Event Kind="CONTROLLABLE" Name="crush"/>
+<Event Kind="CONTROLLABLE" Name="enter"/>
+<Event Kind="CONTROLLABLE" Name="escape"/>
+<Event Kind="CONTROLLABLE" Name="exit"/>
+<Event Kind="CONTROLLABLE" Name="pickup"/>
+<Event Kind="CONTROLLABLE" Name="unlock"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="door_norock">
+<EventRefList>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+<EventRef Name="unlock"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="door"/>
+<State Name="free"/>
+<State Name="hero"/>
+</StateList>
+<TransitionList>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="unlock" Source="door" Target="free"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="door_rock">
+<EventRefList>
+<EventRef Name="clear"/>
+<EventRef Name="crush"/>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+<EventRef Name="unlock"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="door"/>
+<State Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Event="crush" Source="free" Target="rock"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="crush" Source="door" Target="rock"/>
+<Transition Event="unlock" Source="door" Target="free"/>
+<Transition Event="clear" Source="rock" Target="hero"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="exit_norock">
+<EventRefList>
+<EventRef Name="enter"/>
+<EventRef Name="escape"/>
+<EventRef Name="exit"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="exit"/>
+<State Name="gone"/>
+</StateList>
+<TransitionList>
+<Transition Event="escape" Source="exit" Target="gone"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="exit_rock">
+<EventRefList>
+<EventRef Name="clear"/>
+<EventRef Name="crush"/>
+<EventRef Name="enter"/>
+<EventRef Name="escape"/>
+<EventRef Name="exit"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="exit"/>
+<State Name="free"/>
+<State Name="gone"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Event="crush" Source="exit" Target="rock"/>
+<Transition Event="escape" Source="exit" Target="gone"/>
+<Transition Event="clear" Source="rock" Target="hero"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="crush" Source="free" Target="rock"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="free_norock">
+<EventRefList>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+</StateList>
+<TransitionList>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="free_rock">
+<EventRefList>
+<EventRef Name="clear"/>
+<EventRef Name="crush"/>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="crush" Source="free" Target="rock"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="clear" Source="rock" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="gate_norock">
+<EventRefList>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+<EventRef Name="unlock"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Initial="true" Name="gate"/>
+<State Name="hero"/>
+<State Name="unlocked"/>
+</StateList>
+<TransitionList>
+<Transition Event="unlock" Source="gate" Target="unlocked"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="enter" Source="unlocked" Target="hero"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="gate_rock">
+<EventRefList>
+<EventRef Name="clear"/>
+<EventRef Name="crush"/>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+<EventRef Name="unlock"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Initial="true" Name="gate"/>
+<State Name="hero"/>
+<State Name="rock"/>
+<State Name="unlocked"/>
+</StateList>
+<TransitionList>
+<Transition Event="crush" Source="free" Target="rock"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="clear" Source="rock" Target="hero"/>
+<Transition Event="unlock" Source="gate" Target="unlocked"/>
+<Transition Event="enter" Source="unlocked" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="hero_norock">
+<EventRefList>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Initial="true" Name="hero"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="hero_rock">
+<EventRefList>
+<EventRef Name="clear"/>
+<EventRef Name="crush"/>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Initial="true" Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="crush" Source="free" Target="rock"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="clear" Source="rock" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="key_norock">
+<EventRefList>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+<EventRef Name="pickup"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="key"/>
+</StateList>
+<TransitionList>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="pickup" Source="key" Target="hero"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="key_rock">
+<EventRefList>
+<EventRef Name="clear"/>
+<EventRef Name="crush"/>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+<EventRef Name="pickup"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="key"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="crush" Source="free" Target="rock"/>
+<Transition Event="pickup" Source="key" Target="hero"/>
+<Transition Event="crush" Source="key" Target="rock"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="clear" Source="rock" Target="hero"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="rock">
+<EventRefList>
+<EventRef Name="clear"/>
+<EventRef Name="crush"/>
+<EventRef Name="enter"/>
+<EventRef Name="exit"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Event="clear" Source="rock" Target="hero"/>
+<Transition Event="exit" Source="hero" Target="free"/>
+<Transition Event="enter" Source="free" Target="hero"/>
+<Transition Event="crush" Source="free" Target="rock"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

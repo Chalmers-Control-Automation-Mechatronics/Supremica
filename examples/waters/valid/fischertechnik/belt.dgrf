@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="belt" version="1.0" valid="1"
+	hasGeometry="1" width="501" height="282"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:12:00 GMT+00:00" modificationDate="2000-10-10 08:12:00 GMT+00:00">
+	<events>
+		<event controllable="1" name="B1_start"/>
+		<event controllable="1" name="B1_stop"/>
+		<event controllable="1" name="init_done"/>
+		<event controllable="0" name="LS_off_B1.2"/>
+		<event controllable="0" name="LS_on_B1.1"/>
+		<event controllable="0" name="LS_on_B1.2"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="256" y="224"/></rendering>
+			<label name="belt_stopped">
+				<rendering><point x="8" y="19"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="160" y="80"/></rendering>
+			<label name="start">
+				<rendering><point x="-45" y="7"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="320" y="128"/></rendering>
+			<label name="part_at_begin">
+				<rendering><point x="-36" y="26"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="160" y="176"/></rendering>
+			<label name="belt_ready">
+				<rendering><point x="-51" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="128"/></rendering>
+			<label name="init">
+				<rendering><point x="-41" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="480" y="176"/></rendering>
+			<label name="belt_running">
+				<rendering><point x="-13" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="384" y="224"/></rendering>
+			<label name="part_at_end">
+				<rendering><point x="23" y="1"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="507" y="149"/></rendering>
+			<source name="belt_running"/>
+			<labelGroup>
+				<rendering><point x="-34" y="-23"/></rendering>
+				<label name="LS_on_B1.1"/>
+				<label name="LS_off_B1.2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="belt_running"/>
+			<target name="part_at_end"/>
+			<labelGroup>
+				<rendering><point x="-63" y="-4"/></rendering>
+				<label name="LS_on_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="228" y="253"/></rendering>
+			<source name="belt_stopped"/>
+			<labelGroup>
+				<rendering><point x="-37" y="18"/></rendering>
+				<label name="LS_on_B1.1"/>
+				<label name="LS_on_B1.2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="205" y="210"/></rendering>
+			<source name="belt_stopped"/>
+			<target name="belt_ready"/>
+			<labelGroup>
+				<rendering><point x="-60" y="19"/></rendering>
+				<label name="LS_off_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="187" y="53"/></rendering>
+			<source name="start"/>
+			<labelGroup>
+				<rendering><point x="12" y="-12"/></rendering>
+				<label name="LS_on_B1.1"/>
+				<label name="LS_on_B1.2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="LS_off_B1.2">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="init"/>
+			<labelGroup>
+				<rendering><point x="-53" y="4"/></rendering>
+				<label name="B1_stop"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="215" y="194"/></rendering>
+			<source name="belt_ready"/>
+			<target name="belt_stopped"/>
+			<labelGroup>
+				<rendering><point x="-32" y="2"/></rendering>
+				<label name="LS_on_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="125" y="162"/></rendering>
+			<source name="belt_ready"/>
+			<labelGroup>
+				<rendering><point x="-72" y="15"/></rendering>
+				<label name="LS_off_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="belt_ready"/>
+			<target name="part_at_begin"/>
+			<labelGroup>
+				<rendering><point x="-58" y="-3"/></rendering>
+				<label name="LS_on_B1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="init"/>
+			<target name="belt_ready"/>
+			<labelGroup>
+				<rendering><point x="-65" y="-5"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="187" y="101"/></rendering>
+			<source name="init"/>
+			<labelGroup>
+				<rendering><point x="9" y="-6"/></rendering>
+				<label name="LS_on_B1.1"/>
+				<label name="LS_on_B1.2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="LS_off_B1.2">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="part_at_end"/>
+			<target name="belt_stopped"/>
+			<labelGroup>
+				<rendering><point x="-16" y="-6"/></rendering>
+				<label name="B1_stop"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="410" y="253"/></rendering>
+			<source name="part_at_end"/>
+			<labelGroup>
+				<rendering><point x="-39" y="13"/></rendering>
+				<label name="LS_on_B1.1"/>
+				<label name="LS_on_B1.2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="LS_off_B1.2">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="part_at_begin"/>
+			<target name="belt_running"/>
+			<labelGroup>
+				<rendering><point x="0" y="-6"/></rendering>
+				<label name="B1_start"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="part_at_begin"/>
+			<target name="belt_stopped"/>
+			<labelGroup>
+				<rendering><point x="-69" y="0"/></rendering>
+				<label name="LS_on_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="347" y="101"/></rendering>
+			<source name="part_at_begin"/>
+			<labelGroup>
+				<rendering><point x="-47" y="-24"/></rendering>
+				<label name="LS_on_B1.1"/>
+				<label name="LS_off_B1.2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

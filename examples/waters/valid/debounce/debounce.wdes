@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="debounce" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="CONTROLLABLE" Name="chg_value[1]"/>
+        <Event Kind="UNCONTROLLABLE" Name="new_value[1]"/>
+        <Event Kind="CONTROLLABLE" Name="reset[1]"/>
+        <Event Kind="UNCONTROLLABLE" Name="timeout[1]"/>
+        <Event Kind="CONTROLLABLE" Name="timer[1]"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="SPEC" Name="debouncing_ok[1]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="chg_value[1]"/>
+                <EventRef Name="new_value[1]"/>
+                <EventRef Name="reset[1]"/>
+                <EventRef Name="timeout[1]"/>
+                <EventRef Name="timer[1]"/>
+            </EventRefList>
+            <StateList>
+                <State Name="CHG"/>
+                <State Name="FLIP"/>
+                <State Initial="true" Name="INIT">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="WAIT"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="new_value[1]" Source="CHG" Target="INIT"/>
+                <Transition Event="chg_value[1]" Source="CHG" Target="INIT"/>
+                <Transition Event="reset[1]" Source="INIT" Target="INIT"/>
+                <Transition Event="timeout[1]" Source="INIT" Target="INIT"/>
+                <Transition Event="new_value[1]" Source="INIT" Target="FLIP"/>
+                <Transition Event="timeout[1]" Source="WAIT" Target="CHG"/>
+                <Transition Event="new_value[1]" Source="WAIT" Target="INIT"/>
+                <Transition Event="new_value[1]" Source="FLIP" Target="INIT"/>
+                <Transition Event="timer[1]" Source="FLIP" Target="WAIT"/>
+                <Transition Event="reset[1]" Source="FLIP" Target="FLIP"/>
+                <Transition Event="timeout[1]" Source="FLIP" Target="FLIP"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="sensor_and_filter[1]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="new_value[1]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="new_value[1]" Source="s0" Target="s0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="timer[1]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="reset[1]"/>
+                <EventRef Name="timeout[1]"/>
+                <EventRef Name="timer[1]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="off">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="on"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="timer[1]" Source="off" Target="on"/>
+                <Transition Event="reset[1]" Source="on" Target="off"/>
+                <Transition Event="timeout[1]" Source="on" Target="off"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

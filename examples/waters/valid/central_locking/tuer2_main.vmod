@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="tuer2_main"
+        legacy="1"
+        arity="0"
+        generatorName="Dpr2Vmod"
+        generatorVersion="2.7b6"
+        version="1.0"
+        creationDate="2000-06-06 06:20:57 GMT"
+        modificationDate="2000-10-31 13:08:23 GMT">
+<interface/>
+<local>
+<event name="stop_VR"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="stop_VR.$_0" new="stop_VR[$_0]"/>
+</foreach-alias>
+<event name="MER_an"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="MER_an.$_0" new="MER_an[$_0]"/>
+</foreach-alias>
+<event name="soft_ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="stop_ZS"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="stop_ZS.$_0" new="stop_ZS[$_0]"/>
+</foreach-alias>
+<event name="time_ER"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="time_ER.$_0" new="time_ER[$_0]"/>
+</foreach-alias>
+<event name="tuer_auf"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="tuer_auf.$_0" new="tuer_auf[$_0]"/>
+</foreach-alias>
+<event name="start_ER"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="start_ER.$_0" new="start_ER[$_0]"/>
+</foreach-alias>
+<event name="reset"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="reset.$_0" new="reset[$_0]"/>
+</foreach-alias>
+<event name="MVR_aus"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="MVR_aus.$_0" new="MVR_aus[$_0]"/>
+</foreach-alias>
+<event name="done_ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="async"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="async.$_0" new="async[$_0]"/>
+</foreach-alias>
+<event name="sync"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="sync.$_0" new="sync[$_0]"/>
+</foreach-alias>
+<event name="time_VR"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="time_VR.$_0" new="time_VR[$_0]"/>
+</foreach-alias>
+<event name="MVR_an"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="MVR_an.$_0" new="MVR_an[$_0]"/>
+</foreach-alias>
+<event name="MZS_aus"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="MZS_aus.$_0" new="MZS_aus[$_0]"/>
+</foreach-alias>
+<event name="soft_SER"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{FT}">
+<alias old="soft_SER.$_0" new="soft_SER[$_0]"/>
+</foreach-alias>
+<event name="soft_CS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="time_ZS"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="time_ZS.$_0" new="time_ZS[$_0]"/>
+</foreach-alias>
+<event name="start_VR"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="start_VR.$_0" new="start_VR[$_0]"/>
+</foreach-alias>
+<event name="soft_ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="time_W"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="time_W.$_0" new="time_W[$_0]"/>
+</foreach-alias>
+<event name="done_VR"
+       controllable="1"
+       arity="0">
+</event>
+<event name="tuer_zu"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="tuer_zu.$_0" new="tuer_zu[$_0]"/>
+</foreach-alias>
+<event name="stop_ER"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="stop_ER.$_0" new="stop_ER[$_0]"/>
+</foreach-alias>
+<event name="start_ZS"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="start_ZS.$_0" new="start_ZS[$_0]"/>
+</foreach-alias>
+<event name="done_ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="MER_aus"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="MER_aus.$_0" new="MER_aus[$_0]"/>
+</foreach-alias>
+<event name="MZS_an"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="MZS_an.$_0" new="MZS_an[$_0]"/>
+</foreach-alias>
+<event name="timeout"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{TUER}">
+<alias old="timeout.$_0" new="timeout[$_0]"/>
+</foreach-alias>
+<event name="soft_VR"
+       controllable="1"
+       arity="0">
+</event>
+<event name="CS_ok"
+       controllable="1"
+       arity="0">
+</event>
+<event name="done_SER"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{FT}">
+<alias old="done_SER.$_0" new="done_SER[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<component graph="mer" kind="plant"/>
+<component graph="tuermodell" kind="plant"/>
+<component graph="nftuer" kind="spec"/>
+<component graph="ttimguard" kind="spec"/>
+<component graph="tklemme" kind="plant"/>
+<component graph="mvr" kind="plant"/>
+<component graph="mzs" kind="plant"/>
+<component graph="sync" kind="spec"/>
+<component graph="tmotor2" kind="spec"/>
+<component graph="ttimer" kind="plant"/>
+<component graph="mvrguard" kind="spec"/>
+<component graph="mzsguard" kind="spec"/>
+<component graph="merguard" kind="spec"/>
+</parts>
+</module>

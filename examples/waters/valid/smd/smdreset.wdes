@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="smdreset" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="CONTROLLABLE" Name="counter"/>
+        <Event Kind="UNCONTROLLABLE" Name="counter_equals_12"/>
+        <Event Kind="UNCONTROLLABLE" Name="counter_less_than_12"/>
+        <Event Kind="UNCONTROLLABLE" Name="done_recover"/>
+        <Event Kind="UNCONTROLLABLE" Name="done_scan"/>
+        <Event Kind="UNCONTROLLABLE" Name="done_turn"/>
+        <Event Kind="UNCONTROLLABLE" Name="done_vacuum"/>
+        <Event Kind="UNCONTROLLABLE" Name="error_scan"/>
+        <Event Kind="UNCONTROLLABLE" Name="error_turn"/>
+        <Event Kind="UNCONTROLLABLE" Name="error_vacuum"/>
+        <Event Kind="CONTROLLABLE" Name="operator_input"/>
+        <Event Kind="CONTROLLABLE" Name="recover"/>
+        <Event Kind="UNCONTROLLABLE" Name="repeat"/>
+        <Event Kind="CONTROLLABLE" Name="reset"/>
+        <Event Kind="CONTROLLABLE" Name="scan"/>
+        <Event Kind="UNCONTROLLABLE" Name="stop"/>
+        <Event Kind="CONTROLLABLE" Name="turn"/>
+        <Event Kind="CONTROLLABLE" Name="vacuum"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="PLANT" Name="counterobserver">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="counter"/>
+                <EventRef Name="counter_equals_12"/>
+                <EventRef Name="counter_less_than_12"/>
+                <EventRef Name="repeat"/>
+                <EventRef Name="reset"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+                <State Name="s2"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="counter_equals_12" Source="s1" Target="s0"/>
+                <Transition Event="counter_less_than_12" Source="s1" Target="s0"/>
+                <Transition Event="reset" Source="s2" Target="s0"/>
+                <Transition Event="counter" Source="s0" Target="s1"/>
+                <Transition Event="repeat" Source="s0" Target="s2"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="operatorobserver">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="operator_input"/>
+                <EventRef Name="repeat"/>
+                <EventRef Name="stop"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="operator_input" Source="s0" Target="s1"/>
+                <Transition Event="stop" Source="s1" Target="s0"/>
+                <Transition Event="repeat" Source="s1" Target="s0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="recoverysupervisor">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="counter"/>
+                <EventRef Name="done_recover"/>
+                <EventRef Name="done_scan"/>
+                <EventRef Name="done_turn"/>
+                <EventRef Name="done_vacuum"/>
+                <EventRef Name="error_scan"/>
+                <EventRef Name="error_turn"/>
+                <EventRef Name="error_vacuum"/>
+                <EventRef Name="operator_input"/>
+                <EventRef Name="recover"/>
+                <EventRef Name="repeat"/>
+                <EventRef Name="reset"/>
+                <EventRef Name="scan"/>
+                <EventRef Name="stop"/>
+                <EventRef Name="turn"/>
+                <EventRef Name="vacuum"/>
+            </EventRefList>
+            <StateList>
+                <State Name="resetting"/>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+                <State Name="s2"/>
+                <State Name="s3"/>
+                <State Name="s4"/>
+                <State Name="s5">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="scan" Source="s1" Target="s1"/>
+                <Transition Event="vacuum" Source="s1" Target="s1"/>
+                <Transition Event="turn" Source="s1" Target="s1"/>
+                <Transition Event="reset" Source="s1" Target="s1"/>
+                <Transition Event="counter" Source="s1" Target="s1"/>
+                <Transition Event="done_scan" Source="s1" Target="s1"/>
+                <Transition Event="error_scan" Source="s1" Target="s1"/>
+                <Transition Event="done_vacuum" Source="s1" Target="s1"/>
+                <Transition Event="error_vacuum" Source="s1" Target="s1"/>
+                <Transition Event="done_turn" Source="s1" Target="s1"/>
+                <Transition Event="error_turn" Source="s1" Target="s1"/>
+                <Transition Event="recover" Source="s1" Target="s2"/>
+                <Transition Event="done_recover" Source="s2" Target="s3"/>
+                <Transition Event="operator_input" Source="s3" Target="s4"/>
+                <Transition Event="stop" Source="s4" Target="s5"/>
+                <Transition Event="repeat" Source="s4" Target="resetting"/>
+                <Transition Event="reset" Source="resetting" Target="s0"/>
+                <Transition Event="error_turn" Source="s0" Target="s1"/>
+                <Transition Event="error_vacuum" Source="s0" Target="s1"/>
+                <Transition Event="error_scan" Source="s0" Target="s1"/>
+                <Transition Event="scan" Source="s0" Target="s0"/>
+                <Transition Event="vacuum" Source="s0" Target="s0"/>
+                <Transition Event="turn" Source="s0" Target="s0"/>
+                <Transition Event="reset" Source="s0" Target="s0"/>
+                <Transition Event="counter" Source="s0" Target="s0"/>
+                <Transition Event="done_scan" Source="s0" Target="s0"/>
+                <Transition Event="done_vacuum" Source="s0" Target="s0"/>
+                <Transition Event="done_turn" Source="s0" Target="s0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="scanobserver">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="done_recover"/>
+                <EventRef Name="done_scan"/>
+                <EventRef Name="error_scan"/>
+                <EventRef Name="recover"/>
+                <EventRef Name="scan"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+                <State Name="s2"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="done_recover" Source="s2" Target="s0"/>
+                <Transition Event="done_scan" Source="s1" Target="s0"/>
+                <Transition Event="error_scan" Source="s1" Target="s0"/>
+                <Transition Event="recover" Source="s0" Target="s2"/>
+                <Transition Event="scan" Source="s0" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="scansupervisor">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="counter"/>
+                <EventRef Name="counter_equals_12"/>
+                <EventRef Name="counter_less_than_12"/>
+                <EventRef Name="done_recover"/>
+                <EventRef Name="done_scan"/>
+                <EventRef Name="done_turn"/>
+                <EventRef Name="error_scan"/>
+                <EventRef Name="error_turn"/>
+                <EventRef Name="operator_input"/>
+                <EventRef Name="recover"/>
+                <EventRef Name="repeat"/>
+                <EventRef Name="scan"/>
+                <EventRef Name="stop"/>
+                <EventRef Name="turn"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0"/>
+                <State Name="s1"/>
+                <State Name="s2"/>
+                <State Name="s3"/>
+                <State Name="s4"/>
+                <State Name="s5"/>
+                <State Name="s6">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="recover" Source="s6" Target="s6"/>
+                <Transition Event="operator_input" Source="s6" Target="s6"/>
+                <Transition Event="done_recover" Source="s6" Target="s6"/>
+                <Transition Event="stop" Source="s6" Target="s6"/>
+                <Transition Event="repeat" Source="s6" Target="s0"/>
+                <Transition Event="counter_equals_12" Source="s5" Target="s6"/>
+                <Transition Event="counter_less_than_12" Source="s5" Target="s0"/>
+                <Transition Event="turn" Source="s0" Target="s1"/>
+                <Transition Event="counter" Source="s4" Target="s5"/>
+                <Transition Event="scan" Source="s2" Target="s3"/>
+                <Transition Event="done_scan" Source="s3" Target="s4"/>
+                <Transition Event="error_scan" Source="s3" Target="s4"/>
+                <Transition Event="error_turn" Source="s1" Target="s6"/>
+                <Transition Event="done_turn" Source="s1" Target="s2"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="turnobserver">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="done_recover"/>
+                <EventRef Name="done_turn"/>
+                <EventRef Name="error_turn"/>
+                <EventRef Name="recover"/>
+                <EventRef Name="turn"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+                <State Name="s2"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="done_recover" Source="s2" Target="s0"/>
+                <Transition Event="recover" Source="s0" Target="s2"/>
+                <Transition Event="turn" Source="s0" Target="s1"/>
+                <Transition Event="done_turn" Source="s1" Target="s0"/>
+                <Transition Event="error_turn" Source="s1" Target="s0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="vacuumobserver">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="done_recover"/>
+                <EventRef Name="done_vacuum"/>
+                <EventRef Name="error_vacuum"/>
+                <EventRef Name="recover"/>
+                <EventRef Name="vacuum"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+                <State Name="s2"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="recover" Source="s0" Target="s2"/>
+                <Transition Event="vacuum" Source="s0" Target="s1"/>
+                <Transition Event="done_recover" Source="s2" Target="s0"/>
+                <Transition Event="done_vacuum" Source="s1" Target="s0"/>
+                <Transition Event="error_vacuum" Source="s1" Target="s0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="vacuumsupervisor">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="counter"/>
+                <EventRef Name="counter_equals_12"/>
+                <EventRef Name="counter_less_than_12"/>
+                <EventRef Name="done_recover"/>
+                <EventRef Name="done_turn"/>
+                <EventRef Name="done_vacuum"/>
+                <EventRef Name="error_turn"/>
+                <EventRef Name="error_vacuum"/>
+                <EventRef Name="operator_input"/>
+                <EventRef Name="recover"/>
+                <EventRef Name="repeat"/>
+                <EventRef Name="stop"/>
+                <EventRef Name="turn"/>
+                <EventRef Name="vacuum"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0"/>
+                <State Name="s1"/>
+                <State Name="s2"/>
+                <State Name="s3"/>
+                <State Name="s4"/>
+                <State Name="s5"/>
+                <State Name="s6">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="vacuum" Source="s2" Target="s3"/>
+                <Transition Event="done_turn" Source="s1" Target="s2"/>
+                <Transition Event="error_turn" Source="s1" Target="s6"/>
+                <Transition Event="counter" Source="s4" Target="s5"/>
+                <Transition Event="turn" Source="s0" Target="s1"/>
+                <Transition Event="counter_less_than_12" Source="s5" Target="s0"/>
+                <Transition Event="counter_equals_12" Source="s5" Target="s6"/>
+                <Transition Event="done_vacuum" Source="s3" Target="s4"/>
+                <Transition Event="error_vacuum" Source="s3" Target="s4"/>
+                <Transition Event="repeat" Source="s6" Target="s0"/>
+                <Transition Event="recover" Source="s6" Target="s6"/>
+                <Transition Event="operator_input" Source="s6" Target="s6"/>
+                <Transition Event="done_recover" Source="s6" Target="s6"/>
+                <Transition Event="stop" Source="s6" Target="s6"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="door_norock" version="1.0" valid="1"
+	hasGeometry="1" width="161" height="146"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-11-30 21:17:18 GMT" modificationDate="2004-11-30 21:18:12 GMT">
+	<events>
+		<event controllable="1" name="enter"/>
+		<event controllable="1" name="exit"/>
+		<event controllable="1" name="unlock"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="208" y="176"/></rendering>
+			<label name="hero">
+				<rendering><point x="-11" y="21"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="112" y="80"/></rendering>
+			<label name="door">
+				<rendering><point x="-13" y="-9"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="80"/></rendering>
+			<label name="free">
+				<rendering><point x="-11" y="-9"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="225" y="129"/></rendering>
+			<source name="hero"/>
+			<target name="free"/>
+			<labelGroup>
+				<rendering><point x="7" y="4"/></rendering>
+				<label name="exit"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="193" y="129"/></rendering>
+			<source name="free"/>
+			<target name="hero"/>
+			<labelGroup>
+				<rendering><point x="-38" y="4"/></rendering>
+				<label name="enter"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="door"/>
+			<target name="free"/>
+			<labelGroup>
+				<rendering><point x="-18" y="-5"/></rendering>
+				<label name="unlock"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

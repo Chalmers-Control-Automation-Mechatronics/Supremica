@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="operatorobserver" version="1.0" valid="1"
+	hasGeometry="1" width="165" height="108"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-05 08:22:43 GMT" modificationDate="2004-09-05 08:22:43 GMT">
+	<events>
+		<event controllable="1" name="operator_input"/>
+		<event controllable="0" name="repeat"/>
+		<event controllable="0" name="stop"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="32" y="80"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="80"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-39" y="-8"/></rendering>
+				<label name="operator_input"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="103" y="38"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-20"/></rendering>
+				<label name="stop"/>
+				<label name="repeat">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

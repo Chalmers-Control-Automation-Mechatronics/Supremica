@@ -1,0 +1,21 @@
+dgrf2.4.7
+//s 266 193
+6
+u CLOSE.DRD
+u CLOSE.PSD
+c fh_cond_door_open
+c fh_cond_doors_closed
+u OPEN.DRD
+u OPEN.PSD
+3
+224 48 8 1 1 13 3 doors_closed
+224 208 8 0 0 13 5 doors_open
+224 128 8 0 0 14 5 door_open
+7
+2 door_open 192 129 -118 3 1 2 0 0
+3 door_open doors_closed 209 88 -81 -1 2 1 0 0 0 0 13
+3 door_open doors_open 240 168 8 -3 2 5 0 0 4 0 13
+3 doors_closed door_open 240 88 7 -2 2 5 0 0 4 0 13
+2 doors_closed 192 48 -133 1 1 3 0 0
+3 doors_open door_open 209 168 -78 -2 2 1 0 0 0 0 13
+2 doors_open 192 209 -118 4 1 2 0 0

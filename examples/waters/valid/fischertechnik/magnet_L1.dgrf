@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="magnet_L1" version="1.0" valid="1"
+	hasGeometry="1" width="697" height="596"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:04:26 GMT+00:00" modificationDate="2000-10-10 08:04:26 GMT+00:00">
+	<events>
+		<event controllable="1" name="init_done"/>
+		<event controllable="0" name="L_at_X1.1"/>
+		<event controllable="0" name="L_at_X2.1"/>
+		<event controllable="0" name="L_at_X3.1"/>
+		<event controllable="0" name="L_at_X4.1"/>
+		<event controllable="0" name="L_at_X5.1"/>
+		<event controllable="0" name="L_at_X6.1"/>
+		<event controllable="0" name="L_at_X7.1"/>
+		<event controllable="1" name="L_mag_off.1"/>
+		<event controllable="1" name="L_mag_on.1"/>
+		<event controllable="0" name="TL_Y1.1"/>
+		<event controllable="0" name="TL_Y2.1"/>
+		<event controllable="0" name="TL_Y3.1"/>
+	</events>
+	<nodes>
+		<node marked="1">
+			<rendering><point x="592" y="160"/></rendering>
+			<label name="X6Y1">
+				<rendering><point x="13" y="16"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="592" y="272"/></rendering>
+			<label name="X6Y2">
+				<rendering><point x="12" y="27"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="592" y="384"/></rendering>
+			<label name="X6Y3">
+				<rendering><point x="-4" y="22"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="64" y="176"/></rendering>
+			<label name="L1_UK">
+				<rendering><point x="-36" y="22"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="144" y="160"/></rendering>
+			<label name="X1Y1">
+				<rendering><point x="10" y="24"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="144" y="272"/></rendering>
+			<label name="X1Y2">
+				<rendering><point x="10" y="23"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="144" y="384"/></rendering>
+			<label name="X1Y3">
+				<rendering><point x="4" y="23"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="320" y="160"/></rendering>
+			<label name="X3Y1">
+				<rendering><point x="7" y="18"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="320" y="272"/></rendering>
+			<label name="X3Y2">
+				<rendering><point x="9" y="19"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="320" y="384"/></rendering>
+			<label name="X3Y3">
+				<rendering><point x="14" y="3"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="64"/></rendering>
+			<label name="XY1">
+				<rendering><point x="-36" y="-4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="192"/></rendering>
+			<label name="XY2">
+				<rendering><point x="-33" y="-5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="496"/></rendering>
+			<label name="XY3">
+				<rendering><point x="16" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="459" y="37"/></rendering>
+			<source name="XY1"/>
+			<labelGroup>
+				<rendering><point x="9" y="-25"/></rendering>
+				<label name="L_at_X2.1"/>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X5.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_at_X7.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="TL_Y1.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="369" y="107"/></rendering>
+			<source name="XY1"/>
+			<target name="X3Y1"/>
+			<labelGroup>
+				<rendering><point x="-88" y="34"/></rendering>
+				<label name="L_at_X3.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="441" y="128"/></rendering>
+			<source name="XY1"/>
+			<target name="XY2"/>
+			<labelGroup>
+				<rendering><point x="-14" y="7"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="295" y="122"/></rendering>
+			<source name="XY1"/>
+			<target name="X1Y1"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-8"/></rendering>
+				<label name="L_at_X1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="503" y="118"/></rendering>
+			<source name="XY1"/>
+			<target name="X6Y1"/>
+			<labelGroup>
+				<rendering><point x="-49" y="-3"/></rendering>
+				<label name="L_at_X6.1"/>
+				<label name="L_mag_off.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="625" y="374"/></rendering>
+			<source name="X6Y3"/>
+			<labelGroup>
+				<rendering><point x="4" y="-4"/></rendering>
+				<label name="L_mag_off.1"/>
+				<label name="L_mag_on.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X6.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="TL_Y3.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="583" y="324"/></rendering>
+			<source name="X6Y3"/>
+			<target name="X6Y2"/>
+			<labelGroup>
+				<rendering><point x="-44" y="-24"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="501" y="434"/></rendering>
+			<source name="X6Y3"/>
+			<target name="XY3"/>
+			<labelGroup>
+				<rendering><point x="-18" y="-45"/></rendering>
+				<label name="L_at_X5.1"/>
+				<label name="L_at_X7.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="381" y="117"/></rendering>
+			<source name="X3Y1"/>
+			<target name="XY1"/>
+			<labelGroup>
+				<rendering><point x="-31" y="20"/></rendering>
+				<label name="L_at_X2.1"/>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="287" y="159"/></rendering>
+			<source name="X3Y1"/>
+			<labelGroup>
+				<rendering><point x="-75" y="6"/></rendering>
+				<label name="L_mag_off.1"/>
+				<label name="L_mag_on.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X3.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="TL_Y1.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="327" y="216"/></rendering>
+			<source name="X3Y1"/>
+			<target name="X3Y2"/>
+			<labelGroup>
+				<rendering><point x="0" y="-23"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="602" y="326"/></rendering>
+			<source name="X6Y2"/>
+			<target name="X6Y3"/>
+			<labelGroup>
+				<rendering><point x="2" y="-6"/></rendering>
+				<label name="TL_Y3.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="629" y="269"/></rendering>
+			<source name="X6Y2"/>
+			<labelGroup>
+				<rendering><point x="4" y="-2"/></rendering>
+				<label name="L_at_X6.1"/>
+				<label name="TL_Y2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="518" y="224"/></rendering>
+			<source name="X6Y2"/>
+			<target name="XY2"/>
+			<labelGroup>
+				<rendering><point x="-6" y="-1"/></rendering>
+				<label name="L_at_X5.1"/>
+				<label name="L_at_X7.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="578" y="215"/></rendering>
+			<source name="X6Y2"/>
+			<target name="X6Y1"/>
+			<labelGroup>
+				<rendering><point x="-44" y="-30"/></rendering>
+				<label name="TL_Y1.1"/>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="519" y="446"/></rendering>
+			<source name="XY3"/>
+			<target name="X6Y3"/>
+			<labelGroup>
+				<rendering><point x="-11" y="23"/></rendering>
+				<label name="L_at_X6.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="430" y="535"/></rendering>
+			<source name="XY3"/>
+			<labelGroup>
+				<rendering><point x="24" y="-16"/></rendering>
+				<label name="L_at_X2.1"/>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X5.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_at_X7.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="TL_Y3.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="421" y="342"/></rendering>
+			<source name="XY3"/>
+			<target name="XY2"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-4"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="292" y="435"/></rendering>
+			<source name="XY3"/>
+			<target name="X1Y3"/>
+			<labelGroup>
+				<rendering><point x="-50" y="-16"/></rendering>
+				<label name="L_at_X1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="377" y="432"/></rendering>
+			<source name="XY3"/>
+			<target name="X3Y3"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-24"/></rendering>
+				<label name="L_at_X3.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="423" y="127"/></rendering>
+			<source name="XY2"/>
+			<target name="XY1"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-7"/></rendering>
+				<label name="TL_Y1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="504" y="239"/></rendering>
+			<source name="XY2"/>
+			<target name="X6Y2"/>
+			<labelGroup>
+				<rendering><point x="-14" y="38"/></rendering>
+				<label name="L_at_X6.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="446" y="343"/></rendering>
+			<source name="XY2"/>
+			<target name="XY3"/>
+			<labelGroup>
+				<rendering><point x="1" y="16"/></rendering>
+				<label name="TL_Y3.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="459" y="165"/></rendering>
+			<source name="XY2"/>
+			<labelGroup>
+				<rendering><point x="8" y="-10"/></rendering>
+				<label name="L_at_X2.1"/>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X5.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_at_X7.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="TL_Y2.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="291" y="242"/></rendering>
+			<source name="XY2"/>
+			<target name="X1Y2"/>
+			<labelGroup>
+				<rendering><point x="-92" y="32"/></rendering>
+				<label name="L_at_X1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="366" y="229"/></rendering>
+			<source name="XY2"/>
+			<target name="X3Y2"/>
+			<labelGroup>
+				<rendering><point x="-35" y="12"/></rendering>
+				<label name="L_at_X3.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="280" y="99"/></rendering>
+			<source name="X1Y1"/>
+			<target name="XY1"/>
+			<labelGroup>
+				<rendering><point x="-105" y="14"/></rendering>
+				<label name="L_at_X2.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="133" y="129"/></rendering>
+			<source name="X1Y1"/>
+			<labelGroup>
+				<rendering><point x="-28" y="-18"/></rendering>
+				<label name="L_at_X1.1"/>
+				<label name="TL_Y1.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="158" y="215"/></rendering>
+			<source name="X1Y1"/>
+			<target name="X1Y2"/>
+			<labelGroup>
+				<rendering><point x="3" y="-4"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="522" y="106"/></rendering>
+			<source name="X6Y1"/>
+			<target name="XY1"/>
+			<labelGroup>
+				<rendering><point x="-13" y="-25"/></rendering>
+				<label name="L_at_X5.1"/>
+				<label name="L_at_X7.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="604" y="217"/></rendering>
+			<source name="X6Y1"/>
+			<target name="X6Y2"/>
+			<labelGroup>
+				<rendering><point x="2" y="-18"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="612" y="126"/></rendering>
+			<source name="X6Y1"/>
+			<labelGroup>
+				<rendering><point x="-11" y="-41"/></rendering>
+				<label name="L_mag_off.1"/>
+				<label name="L_mag_on.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X6.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="TL_Y1.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="287" y="455"/></rendering>
+			<source name="X1Y3"/>
+			<target name="XY3"/>
+			<labelGroup>
+				<rendering><point x="-42" y="18"/></rendering>
+				<label name="L_at_X2.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="111" y="398"/></rendering>
+			<source name="X1Y3"/>
+			<labelGroup>
+				<rendering><point x="-46" y="-25"/></rendering>
+				<label name="L_at_X1.1"/>
+				<label name="TL_Y3.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="129" y="327"/></rendering>
+			<source name="X1Y3"/>
+			<target name="X1Y2"/>
+			<labelGroup>
+				<rendering><point x="-48" y="-8"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="91" y="149"/></rendering>
+			<source name="L1_UK"/>
+			<labelGroup>
+				<rendering><point x="-80" y="-23"/></rendering>
+				<label name="L_mag_off.1"/>
+				<label name="TL_Y2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="TL_Y1.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="TL_Y3.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L1_UK"/>
+			<target name="X1Y2"/>
+			<labelGroup>
+				<rendering><point x="-77" y="-3"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="284" y="226"/></rendering>
+			<source name="X1Y2"/>
+			<target name="XY2"/>
+			<labelGroup>
+				<rendering><point x="-78" y="3"/></rendering>
+				<label name="L_at_X2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="128" y="215"/></rendering>
+			<source name="X1Y2"/>
+			<target name="X1Y1"/>
+			<labelGroup>
+				<rendering><point x="-43" y="-21"/></rendering>
+				<label name="TL_Y1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="158" y="328"/></rendering>
+			<source name="X1Y2"/>
+			<target name="X1Y3"/>
+			<labelGroup>
+				<rendering><point x="2" y="-8"/></rendering>
+				<label name="TL_Y3.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="106" y="276"/></rendering>
+			<source name="X1Y2"/>
+			<labelGroup>
+				<rendering><point x="-67" y="-24"/></rendering>
+				<label name="L_mag_on.1"/>
+				<label name="L_at_X1.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="TL_Y2.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="init_done">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="L_mag_off.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="310" y="209"/></rendering>
+			<source name="X3Y2"/>
+			<target name="X3Y1"/>
+			<labelGroup>
+				<rendering><point x="-50" y="-2"/></rendering>
+				<label name="TL_Y1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="382" y="240"/></rendering>
+			<source name="X3Y2"/>
+			<target name="XY2"/>
+			<labelGroup>
+				<rendering><point x="-31" y="20"/></rendering>
+				<label name="L_at_X2.1"/>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="280" y="276"/></rendering>
+			<source name="X3Y2"/>
+			<labelGroup>
+				<rendering><point x="-52" y="18"/></rendering>
+				<label name="L_at_X3.1"/>
+				<label name="TL_Y2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="327" y="325"/></rendering>
+			<source name="X3Y2"/>
+			<target name="X3Y3"/>
+			<labelGroup>
+				<rendering><point x="1" y="-11"/></rendering>
+				<label name="TL_Y3.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="365" y="453"/></rendering>
+			<source name="X3Y3"/>
+			<target name="XY3"/>
+			<labelGroup>
+				<rendering><point x="-62" y="-28"/></rendering>
+				<label name="L_at_X2.1"/>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="311" y="328"/></rendering>
+			<source name="X3Y3"/>
+			<target name="X3Y2"/>
+			<labelGroup>
+				<rendering><point x="-50" y="3"/></rendering>
+				<label name="TL_Y2.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="285" y="377"/></rendering>
+			<source name="X3Y3"/>
+			<labelGroup>
+				<rendering><point x="-63" y="-23"/></rendering>
+				<label name="L_mag_off.1"/>
+				<label name="L_mag_on.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X3.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="TL_Y3.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

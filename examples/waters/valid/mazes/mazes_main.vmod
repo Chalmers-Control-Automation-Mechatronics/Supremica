@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="mazes_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2004-12-01 09:09:01 GMT+12:00"
+        modificationDate="2004-12-01 09:25:16 GMT+12:00">
+<interface/>
+<local>
+<event name="enter"
+       controllable="1"
+       arity="0">
+</event>
+<event name="pickup"
+       controllable="1"
+       arity="0">
+</event>
+<event name="escape"
+       controllable="1"
+       arity="0">
+</event>
+<event name="crush"
+       controllable="1"
+       arity="0">
+</event>
+<event name="exit"
+       controllable="1"
+       arity="0">
+</event>
+<event name="clear"
+       controllable="1"
+       arity="0">
+</event>
+<event name="unlock"
+       controllable="1"
+       arity="0">
+</event>
+</local>
+<parts>
+<component graph="gate_norock" kind="plant"/>
+<component graph="key_rock" kind="plant"/>
+<component graph="key_norock" kind="plant"/>
+<component graph="exit_norock" kind="plant"/>
+<component graph="gate_rock" kind="plant"/>
+<component graph="exit_rock" kind="plant"/>
+<component graph="door_norock" kind="plant"/>
+<component graph="hero_norock" kind="plant"/>
+<component graph="free_norock" kind="plant"/>
+<component graph="door_rock" kind="plant"/>
+<component graph="rock" kind="plant"/>
+<component graph="hero_rock" kind="plant"/>
+<component graph="free_rock" kind="plant"/>
+</parts>
+</module>

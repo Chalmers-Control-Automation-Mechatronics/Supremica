@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="hero_norock" xmlns="http://waters.sourceforge.net/xsd/module">
+<ParameterList>
+<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="hero_norock"/>
+<Graph>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="hero">
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry>
+<Point X="8" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry>
+<Point X="-39" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="145" Y="137"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

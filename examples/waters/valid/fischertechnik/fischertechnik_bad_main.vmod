@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="fischertechnik_bad_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2000-06-05 07:20:15 GMT"
+        modificationDate="2004-09-06 21:53:13 GMT+12:00">
+<interface/>
+<definitions>
+<typeDefinition name="STATION" expression="{S1 S2 S3 S4}"/>
+</definitions>
+<local>
+<event name="L_at_X5"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_at_X5.$_0" new="L_at_X5[$_0]"/>
+</foreach-alias>
+<event name="L_at_X6"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_at_X6.$_0" new="L_at_X6[$_0]"/>
+</foreach-alias>
+<event name="L_at_X7"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_at_X7.$_0" new="L_at_X7[$_0]"/>
+</foreach-alias>
+<event name="L_at_X8"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{2..2}">
+<alias old="L_at_X8.$_0" new="L_at_X8[$_0]"/>
+</foreach-alias>
+<event name="L_drop_B2"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{2..2}">
+<alias old="L_drop_B2.$_0" new="L_drop_B2[$_0]"/>
+</foreach-alias>
+<event name="L_down"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_down.$_0" new="L_down[$_0]"/>
+</foreach-alias>
+<event name="L_up"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_up.$_0" new="L_up[$_0]"/>
+</foreach-alias>
+<event name="L_pickS"
+       controllable="1"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{1 2 3 4 S}">
+<foreach-alias dummy="_1" range="{1..2}">
+<alias old="L_pickS.$_0.$_1" new="L_pickS[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="T_X1"
+       controllable="0"
+       arity="0">
+</event>
+<event name="T_X2"
+       controllable="0"
+       arity="0">
+</event>
+<event name="T_X3"
+       controllable="0"
+       arity="0">
+</event>
+<event name="T_X4"
+       controllable="0"
+       arity="0">
+</event>
+<event name="T_X5"
+       controllable="0"
+       arity="0">
+</event>
+<event name="T_X6"
+       controllable="0"
+       arity="0">
+</event>
+<event name="T_X7"
+       controllable="0"
+       arity="0">
+</event>
+<event name="T_X8"
+       controllable="0"
+       arity="0">
+</event>
+<event name="L_mag_on"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mag_on.$_0" new="L_mag_on[$_0]"/>
+</foreach-alias>
+<event name="LED_on"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..4}">
+<alias old="LED_on.$_0" new="LED_on[$_0]"/>
+</foreach-alias>
+<event name="LS_off_B1"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{2..2}">
+<alias old="LS_off_B1.$_0" new="LS_off_B1[$_0]"/>
+</foreach-alias>
+<event name="L_back"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_back.$_0" new="L_back[$_0]"/>
+</foreach-alias>
+<event name="TL_X1"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="TL_X1.$_0" new="TL_X1[$_0]"/>
+</foreach-alias>
+<event name="TL_Y1"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="TL_Y1.$_0" new="TL_Y1[$_0]"/>
+</foreach-alias>
+<event name="TL_Y2"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="TL_Y2.$_0" new="TL_Y2[$_0]"/>
+</foreach-alias>
+<event name="TL_X8"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{2..2}">
+<alias old="TL_X8.$_0" new="TL_X8[$_0]"/>
+</foreach-alias>
+<event name="TL_Y3"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="TL_Y3.$_0" new="TL_Y3[$_0]"/>
+</foreach-alias>
+<event name="LS_on_B1"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="LS_on_B1.$_0" new="LS_on_B1[$_0]"/>
+</foreach-alias>
+<event name="LS_on_B2"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="LS_on_B2.$_0" new="LS_on_B2[$_0]"/>
+</foreach-alias>
+<event name="TL_Z1"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="TL_Z1.$_0" new="TL_Z1[$_0]"/>
+</foreach-alias>
+<event name="TL_Z2"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="TL_Z2.$_0" new="TL_Z2[$_0]"/>
+</foreach-alias>
+<event name="LS1_off_B2"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="LS1_off_B2.$_0" new="LS1_off_B2[$_0]"/>
+</foreach-alias>
+<event name="L_right"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_right.$_0" new="L_right[$_0]"/>
+</foreach-alias>
+<event name="init_done"
+       controllable="1"
+       arity="0">
+</event>
+<event name="B1_stop"
+       controllable="1"
+       arity="0">
+</event>
+<event name="L_mX1"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="L_mX1.$_0" new="L_mX1[$_0]"/>
+</foreach-alias>
+<event name="L_mag_off"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mag_off.$_0" new="L_mag_off[$_0]"/>
+</foreach-alias>
+<event name="L_mX2"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mX2.$_0" new="L_mX2[$_0]"/>
+</foreach-alias>
+<event name="L_mX3"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mX3.$_0" new="L_mX3[$_0]"/>
+</foreach-alias>
+<event name="L_dropS"
+       controllable="1"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{1 2 3 4 S}">
+<foreach-alias dummy="_1" range="{1..2}">
+<alias old="L_dropS.$_0.$_1" new="L_dropS[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="L_mX4"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mX4.$_0" new="L_mX4[$_0]"/>
+</foreach-alias>
+<event name="L_mX5"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mX5.$_0" new="L_mX5[$_0]"/>
+</foreach-alias>
+<event name="L_mX6"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mX6.$_0" new="L_mX6[$_0]"/>
+</foreach-alias>
+<event name="L_mY1"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mY1.$_0" new="L_mY1[$_0]"/>
+</foreach-alias>
+<event name="L_mX7"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mX7.$_0" new="L_mX7[$_0]"/>
+</foreach-alias>
+<event name="L_mY2"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mY2.$_0" new="L_mY2[$_0]"/>
+</foreach-alias>
+<event name="L_mX8"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{2..2}">
+<alias old="L_mX8.$_0" new="L_mX8[$_0]"/>
+</foreach-alias>
+<event name="L_mY3"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_mY3.$_0" new="L_mY3[$_0]"/>
+</foreach-alias>
+<event name="init"
+       controllable="1"
+       arity="0">
+</event>
+<event name="B1_start"
+       controllable="1"
+       arity="0">
+</event>
+<event name="L_forward"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_forward.$_0" new="L_forward[$_0]"/>
+</foreach-alias>
+<event name="LED_off"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..4}">
+<alias old="LED_off.$_0" new="LED_off[$_0]"/>
+</foreach-alias>
+<event name="L_left"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_left.$_0" new="L_left[$_0]"/>
+</foreach-alias>
+<event name="L_pick_B1"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="L_pick_B1.$_0" new="L_pick_B1[$_0]"/>
+</foreach-alias>
+<event name="LS_on"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..4}">
+<alias old="LS_on.$_0" new="LS_on[$_0]"/>
+</foreach-alias>
+<event name="L_at_X1"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="L_at_X1.$_0" new="L_at_X1[$_0]"/>
+</foreach-alias>
+<event name="L_at_X2"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_at_X2.$_0" new="L_at_X2[$_0]"/>
+</foreach-alias>
+<event name="LS_off"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..4}">
+<alias old="LS_off.$_0" new="LS_off[$_0]"/>
+</foreach-alias>
+<event name="L_at_X3"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_at_X3.$_0" new="L_at_X3[$_0]"/>
+</foreach-alias>
+<event name="L_at_X4"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="L_at_X4.$_0" new="L_at_X4[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<foreach-instance dummy="i" range="{1..2}">
+<instance name="init_LZ1[$i]" module="init_LZ1_spec">
+<nameParam name="init" value="init"/>
+<nameParam name="init_done" value="init_done"/>
+<nameParam name="L_up" value="L_up[$i]"/>
+<nameParam name="TL_Z1" value="TL_Z1[$i]"/>
+</instance>
+</foreach-instance>
+<component graph="init_L1X1" kind="spec"/>
+<foreach-instance dummy="i" range="{1..2}">
+<instance name="init_Y[$i]" module="init_Y_spec">
+<nameParam name="init" value="init"/>
+<nameParam name="init_done" value="init_done"/>
+<nameParam name="L_back" value="L_back[$i]"/>
+<nameParam name="L_forward" value="L_forward[$i]"/>
+<nameParam name="L_mY1" value="L_mY1[$i]"/>
+<nameParam name="L_mY3" value="L_mY3[$i]"/>
+<nameParam name="TL_Y1" value="TL_Y1[$i]"/>
+<nameParam name="TL_Y2" value="TL_Y2[$i]"/>
+<nameParam name="TL_Y3" value="TL_Y3[$i]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="ST" range="{1..4}">
+<instance name="drop_on_station[$ST]" module="drop_on_station_spec">
+<nameParam name="L_dropS_ST_1" value="L_dropS[$ST][1]"/>
+<nameParam name="L_dropS_ST_2" value="L_dropS[$ST][2]"/>
+<nameParam name="L_pickS_ST_1" value="L_pickS[$ST][1]"/>
+<nameParam name="L_pickS_ST_2" value="L_pickS[$ST][2]"/>
+<nameParam name="LS_off" value="LS_off[$ST]"/>
+<nameParam name="LS_on" value="LS_on[$ST]"/>
+</instance>
+</foreach-instance>
+<component graph="init_L2X8" kind="spec"/>
+<component graph="belt_drop" kind="spec"/>
+<foreach-instance dummy="i" range="{1..2}">
+<instance name="spec_move_Ly[$i]" module="spec_move_Ly_spec">
+<nameParam name="init" value="init"/>
+<nameParam name="init_done" value="init_done"/>
+<nameParam name="L_back" value="L_back[$i]"/>
+<nameParam name="L_forward" value="L_forward[$i]"/>
+<nameParam name="L_mY1" value="L_mY1[$i]"/>
+<nameParam name="L_mY2" value="L_mY2[$i]"/>
+<nameParam name="L_mY3" value="L_mY3[$i]"/>
+<nameParam name="TL_Y1" value="TL_Y1[$i]"/>
+<nameParam name="TL_Y2" value="TL_Y2[$i]"/>
+<nameParam name="TL_Y3" value="TL_Y3[$i]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="i" range="{1..2}">
+<instance name="spec_move_Lz[$i]" module="spec_move_Lz_spec">
+<nameParam name="init" value="init"/>
+<nameParam name="init_done" value="init_done"/>
+<nameParam name="L_back" value="L_back[$i]"/>
+<nameParam name="L_down" value="L_down[$i]"/>
+<nameParam name="L_drop_B2" value="L_drop_B2[2]"/>
+<nameParam name="L_dropS_S_1" value="L_dropS[S][1]"/>
+<nameParam name="L_dropS_S_2" value="L_dropS[S][2]"/>
+<nameParam name="L_forward" value="L_forward[$i]"/>
+<nameParam name="L_left" value="L_left[$i]"/>
+<nameParam name="L_mag_off" value="L_mag_off[$i]"/>
+<nameParam name="L_mag_on" value="L_mag_on[$i]"/>
+<nameParam name="L_mX1" value="L_mX1[1]"/>
+<nameParam name="L_mX2" value="L_mX2[$i]"/>
+<nameParam name="L_mX3" value="L_mX3[$i]"/>
+<nameParam name="L_mX4" value="L_mX4[$i]"/>
+<nameParam name="L_mX5" value="L_mX5[$i]"/>
+<nameParam name="L_mX6" value="L_mX6[$i]"/>
+<nameParam name="L_mX7" value="L_mX7[$i]"/>
+<nameParam name="L_mX8" value="L_mX8[2]"/>
+<nameParam name="L_mY1" value="L_mY1[$i]"/>
+<nameParam name="L_mY2" value="L_mY2[$i]"/>
+<nameParam name="L_mY3" value="L_mY3[$i]"/>
+<nameParam name="L_pick_B1" value="L_pick_B1[1]"/>
+<nameParam name="L_pickS_S_1" value="L_pickS[S][1]"/>
+<nameParam name="L_pickS_S_2" value="L_pickS[S][2]"/>
+<nameParam name="L_right" value="L_right[$i]"/>
+<nameParam name="L_up" value="L_up[$i]"/>
+<nameParam name="TL_Z1" value="TL_Z1[$i]"/>
+<nameParam name="TL_Z2" value="TL_Z2[$i]"/>
+</instance>
+</foreach-instance>
+<component graph="belt" kind="spec"/>
+<foreach-instance dummy="ST" range="{1..4}">
+<instance name="station[$ST]" module="station_spec">
+<nameParam name="init_done" value="init_done"/>
+<nameParam name="LED_off" value="LED_off[$ST]"/>
+<nameParam name="LED_on" value="LED_on[$ST]"/>
+<nameParam name="LS_off" value="LS_off[$ST]"/>
+<nameParam name="LS_on" value="LS_on[$ST]"/>
+</instance>
+</foreach-instance>
+<component graph="magnet_L1" kind="spec"/>
+<component graph="magnet_L2" kind="spec"/>
+<component graph="safety2L1" kind="spec"/>
+<component graph="safety2L2" kind="spec"/>
+<component graph="init" kind="spec"/>
+<foreach-instance dummy="i" range="{1..2}">
+<instance name="plant_move_Ly[$i]" module="plant_move_Ly_plant">
+<nameParam name="init" value="init"/>
+<nameParam name="L_back" value="L_back[$i]"/>
+<nameParam name="L_forward" value="L_forward[$i]"/>
+<nameParam name="TL_Y1" value="TL_Y1[$i]"/>
+<nameParam name="TL_Y2" value="TL_Y2[$i]"/>
+<nameParam name="TL_Y3" value="TL_Y3[$i]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="i" range="{1..2}">
+<instance name="plant_move_Lz[$i]" module="plant_move_Lz_plant">
+<nameParam name="init" value="init"/>
+<nameParam name="init_done" value="init_done"/>
+<nameParam name="L_down" value="L_down[$i]"/>
+<nameParam name="L_up" value="L_up[$i]"/>
+<nameParam name="TL_Z1" value="TL_Z1[$i]"/>
+<nameParam name="TL_Z2" value="TL_Z2[$i]"/>
+</instance>
+</foreach-instance>
+<component graph="plant_move_L1x" kind="plant"/>
+<component graph="plant_move_L2x" kind="plant"/>
+<foreach-instance dummy="i" range="{1..2}">
+<instance name="magnet[$i]" module="magnet_spec">
+<nameParam name="init_done" value="init_done"/>
+<nameParam name="L_mag_off" value="L_mag_off[$i]"/>
+<nameParam name="L_mag_on" value="L_mag_on[$i]"/>
+</instance>
+</foreach-instance>
+<component graph="belt_pick" kind="spec"/>
+<component graph="observer_L1x" kind="spec"/>
+<component graph="observer_L2x" kind="spec"/>
+</parts>
+</module>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="colours" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name="blue"/>
+<Event Kind="PROPOSITION" Name="cyan"/>
+<Event Kind="PROPOSITION" Name="default"/>
+<Event Kind="PROPOSITION" Name="green"/>
+<Event Kind="PROPOSITION" Name="red"/>
+<Event Kind="PROPOSITION" Name="yellow"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="colourful">
+<EventRefList>
+<EventRef Name="blue"/>
+<EventRef Name="cyan"/>
+<EventRef Name="default"/>
+<EventRef Name="green"/>
+<EventRef Name="red"/>
+<EventRef Name="yellow"/>
+</EventRefList>
+<StateList>
+<State Name="default">
+<EventRefList>
+<EventRef Name="default"/>
+</EventRefList>
+</State>
+<State Name="more_than_four">
+<EventRefList>
+<EventRef Name="blue"/>
+<EventRef Name="cyan"/>
+<EventRef Name="green"/>
+<EventRef Name="red"/>
+<EventRef Name="yellow"/>
+</EventRefList>
+</State>
+<State Name="red">
+<EventRefList>
+<EventRef Name="red"/>
+</EventRefList>
+</State>
+<State Name="red_green">
+<EventRefList>
+<EventRef Name="green"/>
+<EventRef Name="red"/>
+</EventRefList>
+</State>
+<State Name="red_green_blue">
+<EventRefList>
+<EventRef Name="blue"/>
+<EventRef Name="green"/>
+<EventRef Name="red"/>
+</EventRefList>
+</State>
+<State Name="red_green_blue_default">
+<EventRefList>
+<EventRef Name="blue"/>
+<EventRef Name="default"/>
+<EventRef Name="green"/>
+<EventRef Name="red"/>
+</EventRefList>
+</State>
+</StateList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

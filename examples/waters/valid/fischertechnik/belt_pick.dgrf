@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="belt_pick" version="1.0" valid="1"
+	hasGeometry="1" width="332" height="165"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:12:08 GMT+00:00" modificationDate="2000-10-10 08:12:08 GMT+00:00">
+	<events>
+		<event controllable="1" name="L_pick_B1.1"/>
+		<event controllable="0" name="LS_off_B1.2"/>
+		<event controllable="0" name="LS_on_B1.2"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="192" y="112"/></rendering>
+			<label name="start">
+				<rendering><point x="-11" y="-13"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="288" y="208"/></rendering>
+			<label name="B1end_occupied">
+				<rendering><point x="-11" y="23"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="96" y="208"/></rendering>
+			<label name="B1end_empty">
+				<rendering><point x="-48" y="23"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="71" y="182"/></rendering>
+			<source name="B1end_empty"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-8"/></rendering>
+				<label name="LS_off_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="197" y="226"/></rendering>
+			<source name="B1end_empty"/>
+			<target name="B1end_occupied"/>
+			<labelGroup>
+				<rendering><point x="-35" y="15"/></rendering>
+				<label name="LS_on_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="B1end_empty"/>
+			<labelGroup>
+				<rendering><point x="-57" y="-19"/></rendering>
+				<label name="LS_off_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="B1end_occupied"/>
+			<labelGroup>
+				<rendering><point x="-10" y="-20"/></rendering>
+				<label name="LS_on_B1.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="192" y="193"/></rendering>
+			<source name="B1end_occupied"/>
+			<target name="B1end_empty"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-19"/></rendering>
+				<label name="L_pick_B1.1"/>
+				<label name="LS_off_B1.2">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="315" y="181"/></rendering>
+			<source name="B1end_occupied"/>
+			<labelGroup>
+				<rendering><point x="-37" y="-9"/></rendering>
+				<label name="LS_on_B1.2"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="magnet" version="1.0" valid="1"
+	hasGeometry="1" width="405" height="96"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:04:40 GMT+00:00" modificationDate="2000-10-10 08:04:40 GMT+00:00">
+	<events>
+		<event controllable="1" name="init_done"/>
+		<event controllable="1" name="L_mag_off.i"/>
+		<event controllable="1" name="L_mag_on.i"/>
+	</events>
+	<nodes>
+		<node marked="1">
+			<rendering><point x="256" y="160"/></rendering>
+			<label name="mag_off">
+				<rendering><point x="-31" y="23"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="64" y="160"/></rendering>
+			<label name="start">
+				<rendering><point x="-29" y="22"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="160"/></rendering>
+			<label name="init">
+				<rendering><point x="-11" y="23"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="400" y="160"/></rendering>
+			<label name="mag_on">
+				<rendering><point x="-11" y="23"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="init"/>
+			<target name="mag_off"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-3"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="251" y="119"/></rendering>
+			<source name="mag_off"/>
+			<labelGroup>
+				<rendering><point x="-25" y="-4"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="325" y="150"/></rendering>
+			<source name="mag_off"/>
+			<target name="mag_on"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-3"/></rendering>
+				<label name="L_mag_on.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="init"/>
+			<labelGroup>
+				<rendering><point x="-32" y="-5"/></rendering>
+				<label name="L_mag_off.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="328" y="175"/></rendering>
+			<source name="mag_on"/>
+			<target name="mag_off"/>
+			<labelGroup>
+				<rendering><point x="-32" y="11"/></rendering>
+				<label name="L_mag_off.i"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

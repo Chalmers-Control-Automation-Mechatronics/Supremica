@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="smdreset_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2004-09-05 20:19:33 GMT+12:00"
+        modificationDate="2004-09-05 20:27:14 GMT+12:00">
+<interface/>
+<local>
+<event name="counter_less_than_12"
+       controllable="0"
+       arity="0">
+</event>
+<event name="repeat"
+       controllable="0"
+       arity="0">
+</event>
+<event name="stop"
+       controllable="0"
+       arity="0">
+</event>
+<event name="scan"
+       controllable="1"
+       arity="0">
+</event>
+<event name="error_turn"
+       controllable="0"
+       arity="0">
+</event>
+<event name="done_scan"
+       controllable="0"
+       arity="0">
+</event>
+<event name="operator_input"
+       controllable="1"
+       arity="0">
+</event>
+<event name="reset"
+       controllable="1"
+       arity="0">
+</event>
+<event name="done_vacuum"
+       controllable="0"
+       arity="0">
+</event>
+<event name="counter"
+       controllable="1"
+       arity="0">
+</event>
+<event name="counter_equals_12"
+       controllable="0"
+       arity="0">
+</event>
+<event name="error_scan"
+       controllable="0"
+       arity="0">
+</event>
+<event name="error_vacuum"
+       controllable="0"
+       arity="0">
+</event>
+<event name="vacuum"
+       controllable="1"
+       arity="0">
+</event>
+<event name="turn"
+       controllable="1"
+       arity="0">
+</event>
+<event name="recover"
+       controllable="1"
+       arity="0">
+</event>
+<event name="done_turn"
+       controllable="0"
+       arity="0">
+</event>
+<event name="done_recover"
+       controllable="0"
+       arity="0">
+</event>
+</local>
+<parts>
+<component graph="vacuumsupervisor" kind="spec"/>
+<component graph="scansupervisor" kind="spec"/>
+<component graph="recoverysupervisor" kind="spec"/>
+<component graph="operatorobserver" kind="plant"/>
+<component graph="scanobserver" kind="plant"/>
+<component graph="counterobserver" kind="plant"/>
+<component graph="turnobserver" kind="plant"/>
+<component graph="vacuumobserver" kind="plant"/>
+</parts>
+</module>

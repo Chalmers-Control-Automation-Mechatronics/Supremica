@@ -1,0 +1,937 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="plant_move_L1x" version="1.0" valid="1"
+	hasGeometry="1" width="782" height="776"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:12:02 GMT+00:00" modificationDate="2000-10-10 08:12:02 GMT+00:00">
+	<events>
+		<event controllable="1" name="init"/>
+		<event controllable="1" name="init_done"/>
+		<event controllable="0" name="L_at_X1.1"/>
+		<event controllable="0" name="L_at_X2.1"/>
+		<event controllable="0" name="L_at_X3.1"/>
+		<event controllable="0" name="L_at_X4.1"/>
+		<event controllable="0" name="L_at_X5.1"/>
+		<event controllable="0" name="L_at_X6.1"/>
+		<event controllable="0" name="L_at_X7.1"/>
+		<event controllable="1" name="L_left.1"/>
+		<event controllable="1" name="L_mX1.1"/>
+		<event controllable="1" name="L_mX2.1"/>
+		<event controllable="1" name="L_mX3.1"/>
+		<event controllable="1" name="L_mX4.1"/>
+		<event controllable="1" name="L_mX5.1"/>
+		<event controllable="1" name="L_mX6.1"/>
+		<event controllable="1" name="L_mX7.1"/>
+		<event controllable="1" name="L_right.1"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="720" y="576"/></rendering>
+			<label name="L_leave_Xi5f">
+				<rendering><point x="-35" y="-11"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="144" y="96"/></rendering>
+			<label name="L_Xi">
+				<rendering><point x="-29" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="288"/></rendering>
+			<label name="L_leave_Xi2t">
+				<rendering><point x="-51" y="23"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="576"/></rendering>
+			<label name="L_leave_Xi5t">
+				<rendering><point x="-76" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="384"/></rendering>
+			<label name="L_leave_Xi3f">
+				<rendering><point x="-7" y="-15"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="240" y="192"/></rendering>
+			<label name="L_Xi1">
+				<rendering><point x="-37" y="16"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="336" y="288"/></rendering>
+			<label name="L_Xi2">
+				<rendering><point x="4" y="20"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="144" y="144"/></rendering>
+			<label name="L_Xi1_Xi">
+				<rendering><point x="-66" y="6"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="432" y="384"/></rendering>
+			<label name="L_Xi3">
+				<rendering><point x="4" y="19"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="528" y="480"/></rendering>
+			<label name="L_Xi4">
+				<rendering><point x="6" y="20"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="624" y="576"/></rendering>
+			<label name="L_Xi5">
+				<rendering><point x="8" y="-8"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="720" y="672"/></rendering>
+			<label name="L_Xi6">
+				<rendering><point x="17" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="384"/></rendering>
+			<label name="L_leave_Xi3t">
+				<rendering><point x="-48" y="21"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="64" y="32"/></rendering>
+			<label name="start1">
+				<rendering><point x="-50" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="624" y="672"/></rendering>
+			<label name="L_leave_Xi6t">
+				<rendering><point x="-62" y="23"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="128" y="656"/></rendering>
+			<label name="s0">
+				<rendering><point x="-28" y="8"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="240"/></rendering>
+			<label name="L_Xi1_Xi2">
+				<rendering><point x="-72" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="192"/></rendering>
+			<label name="L_leave_Xi1f">
+				<rendering><point x="-11" y="-12"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="96"/></rendering>
+			<label name="L_leave_Xif">
+				<rendering><point x="-12" y="-14"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="240"/></rendering>
+			<label name="L_Xi2_Xi1">
+				<rendering><point x="-75" y="7"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="336"/></rendering>
+			<label name="L_Xi2_Xi3">
+				<rendering><point x="9" y="-6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="336"/></rendering>
+			<label name="L_Xi3_Xi2">
+				<rendering><point x="-76" y="10"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="624" y="480"/></rendering>
+			<label name="L_leave_Xi4f">
+				<rendering><point x="-6" y="-12"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="432"/></rendering>
+			<label name="L_Xi3_Xi4">
+				<rendering><point x="12" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="144" y="192"/></rendering>
+			<label name="L_leave_Xi1t">
+				<rendering><point x="-51" y="22"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="432"/></rendering>
+			<label name="L_Xi4_Xi3">
+				<rendering><point x="-74" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="624" y="528"/></rendering>
+			<label name="L_Xi4_Xi5">
+				<rendering><point x="14" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="528" y="528"/></rendering>
+			<label name="L_Xi5_Xi4">
+				<rendering><point x="-72" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="720" y="624"/></rendering>
+			<label name="L_Xi5_Xi6">
+				<rendering><point x="10" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="480"/></rendering>
+			<label name="L_leave_Xi4t">
+				<rendering><point x="-70" y="26"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="624" y="624"/></rendering>
+			<label name="L_Xi6_Xi5">
+				<rendering><point x="-71" y="10"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="144"/></rendering>
+			<label name="L_Xi_Xi1">
+				<rendering><point x="-57" y="-17"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="96" y="64"/></rendering>
+			<label name="initialized">
+				<rendering><point x="-77" y="11"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="432" y="288"/></rendering>
+			<label name="L_leave_Xi2f">
+				<rendering><point x="-6" y="-12"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="L_Xi3"/>
+			<target name="L_leave_Xi3t"/>
+			<labelGroup>
+				<rendering><point x="-9" y="-3"/></rendering>
+				<label name="L_mX1.1"/>
+				<label name="L_mX2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX3.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi3"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="39" y="-34"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="481" y="384"/></rendering>
+			<source name="L_Xi3"/>
+			<target name="L_leave_Xi3f"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-31"/></rendering>
+				<label name="L_mX5.1"/>
+				<label name="L_mX6.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX7.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi3t"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="45" y="-75"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi3t"/>
+			<target name="L_Xi3_Xi2"/>
+			<labelGroup>
+				<rendering><point x="-46" y="9"/></rendering>
+				<label name="L_left.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi3_Xi4"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="16" y="-2"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi3_Xi4"/>
+			<target name="L_Xi4"/>
+			<labelGroup>
+				<rendering><point x="-54" y="-9"/></rendering>
+				<label name="L_at_X5.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="142" y="688"/></rendering>
+			<source name="s0"/>
+			<labelGroup>
+				<rendering><point x="14" y="-16"/></rendering>
+				<label name="L_left.1"/>
+				<label name="L_at_X2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_at_X3.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_at_X4.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="L_at_X5.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="L_at_X6.1">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+				<label name="L_at_X7.1">
+					<rendering><point x="0" y="96"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="67" y="207"/></rendering>
+			<source name="s0"/>
+			<target name="L_Xi"/>
+			<labelGroup>
+				<rendering><point x="6" y="90"/></rendering>
+				<label name="L_at_X1.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="171" y="165"/></rendering>
+			<source name="L_leave_Xi1t"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-5"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi1t"/>
+			<target name="L_Xi1_Xi"/>
+			<labelGroup>
+				<rendering><point x="-45" y="9"/></rendering>
+				<label name="L_left.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi2t"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="40" y="-123"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi2t"/>
+			<target name="L_Xi2_Xi1"/>
+			<labelGroup>
+				<rendering><point x="-44" y="6"/></rendering>
+				<label name="L_left.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi6_Xi5"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="50" y="-6"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi6_Xi5"/>
+			<target name="L_Xi5"/>
+			<labelGroup>
+				<rendering><point x="4" y="11"/></rendering>
+				<label name="L_at_X6.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi1f"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-10" y="-11"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi1f"/>
+			<target name="L_Xi1_Xi2"/>
+			<labelGroup>
+				<rendering><point x="5" y="-1"/></rendering>
+				<label name="L_right.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi4_Xi5"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="16" y="-1"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi4_Xi5"/>
+			<target name="L_Xi5"/>
+			<labelGroup>
+				<rendering><point x="4" y="0"/></rendering>
+				<label name="L_at_X6.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi5"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="26" y="-4"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi5"/>
+			<target name="L_leave_Xi5t"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-28"/></rendering>
+				<label name="L_mX1.1"/>
+				<label name="L_mX2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX3.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_mX4.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="L_mX5.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="673" y="576"/></rendering>
+			<source name="L_Xi5"/>
+			<target name="L_leave_Xi5f"/>
+			<labelGroup>
+				<rendering><point x="-16" y="11"/></rendering>
+				<label name="L_mX7.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi5_Xi6"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="30" y="9"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi5_Xi6"/>
+			<target name="L_Xi6"/>
+			<labelGroup>
+				<rendering><point x="6" y="2"/></rendering>
+				<label name="L_at_X7.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="97" y="21"/></rendering>
+			<source name="start1"/>
+			<labelGroup>
+				<rendering><point x="7" y="2"/></rendering>
+				<label name="L_left.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start1"/>
+			<target name="initialized"/>
+			<labelGroup>
+				<rendering><point x="-68" y="7"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi2f"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="4" y="-6"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi2f"/>
+			<target name="L_Xi2_Xi3"/>
+			<labelGroup>
+				<rendering><point x="3" y="-3"/></rendering>
+				<label name="L_right.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi_Xi1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-26"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi_Xi1"/>
+			<target name="L_Xi1"/>
+			<labelGroup>
+				<rendering><point x="-53" y="0"/></rendering>
+				<label name="L_at_X2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi5t"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="97" y="-17"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi5t"/>
+			<target name="L_Xi5_Xi4"/>
+			<labelGroup>
+				<rendering><point x="-58" y="4"/></rendering>
+				<label name="L_left.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi1_Xi2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="16" y="-54"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi1_Xi2"/>
+			<target name="L_Xi2"/>
+			<labelGroup>
+				<rendering><point x="-52" y="4"/></rendering>
+				<label name="L_at_X3.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="160" y="68"/></rendering>
+			<source name="L_Xi"/>
+			<labelGroup>
+				<rendering><point x="-5" y="15"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="124" y="72"/></rendering>
+			<source name="L_Xi"/>
+			<target name="initialized"/>
+			<labelGroup>
+				<rendering><point x="-11" y="-6"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="195" y="89"/></rendering>
+			<source name="L_Xi"/>
+			<target name="L_leave_Xif"/>
+			<labelGroup>
+				<rendering><point x="-13" y="-72"/></rendering>
+				<label name="L_mX2.1"/>
+				<label name="L_mX3.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX4.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_mX5.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="L_mX6.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="L_mX7.1">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi3f"/>
+			<target name="L_Xi3_Xi4"/>
+			<labelGroup>
+				<rendering><point x="5" y="-2"/></rendering>
+				<label name="L_right.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi3f"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-18" y="9"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi6t"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="68" y="18"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi6t"/>
+			<target name="L_Xi6_Xi5"/>
+			<labelGroup>
+				<rendering><point x="-54" y="8"/></rendering>
+				<label name="L_left.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi6"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="58" y="0"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi6"/>
+			<target name="L_leave_Xi6t"/>
+			<labelGroup>
+				<rendering><point x="-7" y="-39"/></rendering>
+				<label name="L_mX1.1"/>
+				<label name="L_mX2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX3.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_mX4.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="L_mX5.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+				<label name="L_mX6.1">
+					<rendering><point x="0" y="80"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi3_Xi2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="39" y="-71"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi3_Xi2"/>
+			<target name="L_Xi2"/>
+			<labelGroup>
+				<rendering><point x="-52" y="10"/></rendering>
+				<label name="L_at_X3.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi4_Xi3"/>
+			<target name="L_Xi3"/>
+			<labelGroup>
+				<rendering><point x="4" y="10"/></rendering>
+				<label name="L_at_X4.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi4_Xi3"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="4" y="-11"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="114" y="83"/></rendering>
+			<source name="initialized"/>
+			<target name="L_Xi"/>
+			<labelGroup>
+				<rendering><point x="-59" y="7"/></rendering>
+				<label name="L_at_X1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi2_Xi3"/>
+			<target name="L_Xi3"/>
+			<labelGroup>
+				<rendering><point x="-53" y="5"/></rendering>
+				<label name="L_at_X4.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi2_Xi3"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="8" y="-8"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi4"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-12" y="3"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="573" y="480"/></rendering>
+			<source name="L_Xi4"/>
+			<target name="L_leave_Xi4f"/>
+			<labelGroup>
+				<rendering><point x="-11" y="-17"/></rendering>
+				<label name="L_mX6.1"/>
+				<label name="L_mX7.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi4"/>
+			<target name="L_leave_Xi4t"/>
+			<labelGroup>
+				<rendering><point x="-25" y="-15"/></rendering>
+				<label name="L_mX1.1"/>
+				<label name="L_mX2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX3.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_mX4.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi4f"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-60" y="21"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi4f"/>
+			<target name="L_Xi4_Xi5"/>
+			<labelGroup>
+				<rendering><point x="5" y="-7"/></rendering>
+				<label name="L_right.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="0" y="-73"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi1"/>
+			<target name="L_leave_Xi1t"/>
+			<labelGroup>
+				<rendering><point x="-12" y="-1"/></rendering>
+				<label name="L_mX1.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="289" y="192"/></rendering>
+			<source name="L_Xi1"/>
+			<target name="L_leave_Xi1f"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-56"/></rendering>
+				<label name="L_mX3.1"/>
+				<label name="L_mX4.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX5.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_mX6.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+				<label name="L_mX7.1">
+					<rendering><point x="0" y="64"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi2_Xi1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="24" y="-116"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi2_Xi1"/>
+			<target name="L_Xi1"/>
+			<labelGroup>
+				<rendering><point x="-51" y="8"/></rendering>
+				<label name="L_at_X2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi1_Xi"/>
+			<target name="L_Xi"/>
+			<labelGroup>
+				<rendering><point x="-62" y="14"/></rendering>
+				<label name="L_at_X1.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="171" y="117"/></rendering>
+			<source name="L_Xi1_Xi"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-4"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi5f"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="22" y="3"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi5f"/>
+			<target name="L_Xi5_Xi6"/>
+			<labelGroup>
+				<rendering><point x="4" y="-5"/></rendering>
+				<label name="L_right.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xif"/>
+			<target name="L_Xi_Xi1"/>
+			<labelGroup>
+				<rendering><point x="1" y="-3"/></rendering>
+				<label name="L_right.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="190" y="103"/></rendering>
+			<source name="L_leave_Xif"/>
+			<target name="L_Xi"/>
+			<labelGroup>
+				<rendering><point x="-7" y="-3"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="45" y="-91"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi2"/>
+			<target name="L_leave_Xi2t"/>
+			<labelGroup>
+				<rendering><point x="-12" y="-2"/></rendering>
+				<label name="L_mX1.1"/>
+				<label name="L_mX2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="384" y="288"/></rendering>
+			<source name="L_Xi2"/>
+			<target name="L_leave_Xi2f"/>
+			<labelGroup>
+				<rendering><point x="-10" y="-45"/></rendering>
+				<label name="L_mX4.1"/>
+				<label name="L_mX5.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="L_mX6.1">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+				<label name="L_mX7.1">
+					<rendering><point x="0" y="48"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi4t"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="59" y="-44"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Xi4t"/>
+			<target name="L_Xi4_Xi3"/>
+			<labelGroup>
+				<rendering><point x="-59" y="5"/></rendering>
+				<label name="L_left.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi5_Xi4"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="80" y="-23"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Xi5_Xi4"/>
+			<target name="L_Xi4"/>
+			<labelGroup>
+				<rendering><point x="3" y="10"/></rendering>
+				<label name="L_at_X5.1"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="falko2_main"
+        legacy="1"
+        arity="0"
+        generatorName="Dpr2Vmod"
+        generatorVersion="2.8"
+        version="1.0"
+        creationDate="2004-09-05 20:19:33 GMT+12:00"
+        modificationDate="2004-09-07 18:35:58 GMT+12:00">
+<interface/>
+<definitions>
+<typeDefinition name="modus" expression="{WH PH}"/>
+</definitions>
+<parts>
+<component graph="minAbgelaufen" kind="spec"/>
+<component graph="wendehalt" kind="plant"/>
+<component graph="abfahrBereitFrei" kind="spec"/>
+<component graph="andConditionAbfahrt" kind="spec"/>
+<foreach-instance dummy="i" range="$modus">
+<instance name="abfahrBereitAbort[$i]" module="abfahrBereitAbort_spec">
+</instance>
+</foreach-instance>
+<component graph="passagierhalt" kind="plant"/>
+<component graph="Eigenschaft2" kind="spec"/>
+<component graph="fastAbfahrt" kind="spec"/>
+<component graph="andConditionFrei" kind="spec"/>
+<component graph="bereitFahrtAbort" kind="spec"/>
+<component graph="planhalt" kind="plant"/>
+<component graph="einstiegBeendet" kind="spec"/>
+</parts>
+</module>

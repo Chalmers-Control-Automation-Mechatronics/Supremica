@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="ftuer" version="1.0" valid="1"
+	hasGeometry="1" width="517" height="515"
+	generatorName="DGE" generatorVersion="2.7.5"
+	creationDate="2000-10-05 08:19:52 GMT+00:00" modificationDate="2000-11-09 14:48:08 GMT+00:00">
+	<events>
+		<event controllable="1" name="async.TUER"/>
+		<event controllable="1" name="CS_ok"/>
+		<event controllable="1" name="done_ER"/>
+		<event controllable="1" name="done_SER.TUER"/>
+		<event controllable="1" name="done_VR"/>
+		<event controllable="1" name="done_ZS"/>
+		<event controllable="1" name="reset.TUER"/>
+		<event controllable="1" name="soft_CS"/>
+		<event controllable="1" name="soft_ER"/>
+		<event controllable="1" name="soft_SER.TUER"/>
+		<event controllable="1" name="soft_VR"/>
+		<event controllable="1" name="soft_ZS"/>
+		<event controllable="1" name="start_ER.TUER"/>
+		<event controllable="1" name="start_VR.TUER"/>
+		<event controllable="1" name="start_ZS.TUER"/>
+		<event controllable="1" name="stop_ER.TUER"/>
+		<event controllable="1" name="stop_VR.TUER"/>
+		<event controllable="1" name="stop_ZS.TUER"/>
+		<event controllable="1" name="sync.TUER"/>
+		<event controllable="1" name="time_W.TUER"/>
+		<event controllable="0" name="timeout.TUER"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="336" y="528"/></rendering>
+			<label name="cs3">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="528"/></rendering>
+			<label name="cs1">
+				<rendering><point x="-29" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="528"/></rendering>
+			<label name="cs2">
+				<rendering><point x="-12" y="22"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="448"/></rendering>
+			<label name="vr8">
+				<rendering><point x="-26" y="2"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="208" y="448"/></rendering>
+			<label name="VR">
+				<rendering><point x="5" y="20"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="400"/></rendering>
+			<label name="vr7">
+				<rendering><point x="10" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="352"/></rendering>
+			<label name="vr6">
+				<rendering><point x="10" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="304"/></rendering>
+			<label name="vr5">
+				<rendering><point x="-24" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="256"/></rendering>
+			<label name="vr4">
+				<rendering><point x="-27" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="208"/></rendering>
+			<label name="vr3">
+				<rendering><point x="-27" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="112"/></rendering>
+			<label name="vr1">
+				<rendering><point x="9" y="11"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="160"/></rendering>
+			<label name="vr2">
+				<rendering><point x="3" y="16"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="422" y="218"/></rendering>
+			<label name="zs9">
+				<rendering><point x="-30" y="6"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="336" y="80"/></rendering>
+			<label name="IN">
+				<rendering><point x="12" y="1"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="160"/></rendering>
+			<label name="er1">
+				<rendering><point x="11" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="208"/></rendering>
+			<label name="er2">
+				<rendering><point x="11" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="256"/></rendering>
+			<label name="er3">
+				<rendering><point x="11" y="3"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="336" y="304"/></rendering>
+			<label name="ER">
+				<rendering><point x="7" y="13"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="464" y="112"/></rendering>
+			<label name="zs1">
+				<rendering><point x="-27" y="8"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="464" y="160"/></rendering>
+			<label name="zs2">
+				<rendering><point x="-26" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="464" y="208"/></rendering>
+			<label name="zs3">
+				<rendering><point x="13" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="464" y="256"/></rendering>
+			<label name="zs4">
+				<rendering><point x="11" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="464" y="304"/></rendering>
+			<label name="zs5">
+				<rendering><point x="-26" y="14"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="464" y="352"/></rendering>
+			<label name="zs6">
+				<rendering><point x="-28" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="464" y="400"/></rendering>
+			<label name="zs7">
+				<rendering><point x="-26" y="0"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="464" y="448"/></rendering>
+			<label name="ZS">
+				<rendering><point x="-18" y="19"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="512" y="448"/></rendering>
+			<label name="zs8">
+				<rendering><point x="1" y="20"/></rendering>
+			</label>
+		</node>
+		<nodeGroup id="$0">
+			<rendering>
+				<boundary><rectangle x="80" y="64" width="512" height="416"/></boundary>
+			</rendering>
+			<nodeElement name="vr8"/>
+			<nodeElement name="VR"/>
+			<nodeElement name="vr7"/>
+			<nodeElement name="vr6"/>
+			<nodeElement name="vr5"/>
+			<nodeElement name="vr4"/>
+			<nodeElement name="vr3"/>
+			<nodeElement name="vr1"/>
+			<nodeElement name="vr2"/>
+			<nodeElement name="zs9"/>
+			<nodeElement name="IN"/>
+			<nodeElement name="er1"/>
+			<nodeElement name="er2"/>
+			<nodeElement name="er3"/>
+			<nodeElement name="ER"/>
+			<nodeElement name="zs1"/>
+			<nodeElement name="zs2"/>
+			<nodeElement name="zs3"/>
+			<nodeElement name="zs4"/>
+			<nodeElement name="zs5"/>
+			<nodeElement name="zs6"/>
+			<nodeElement name="zs7"/>
+			<nodeElement name="ZS"/>
+			<nodeElement name="zs8"/>
+		</nodeGroup>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="IN"/>
+			<target name="vr1"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-6"/></rendering>
+				<label name="soft_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="er1"/>
+			<labelGroup>
+				<rendering><point x="1" y="-6"/></rendering>
+				<label name="soft_ER"/>
+				<label name="soft_SER.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="zs1"/>
+			<labelGroup>
+				<rendering><point x="-10" y="-6"/></rendering>
+				<label name="soft_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="147" y="501"/></rendering>
+			<source name="$0"/>
+			<target name="cs1"/>
+			<labelGroup>
+				<rendering><point x="-47" y="0"/></rendering>
+				<label name="soft_CS">
+					<actualSource name="vr8"/>
+					<actualSource name="VR"/>
+					<actualSource name="vr7"/>
+					<actualSource name="vr6"/>
+					<actualSource name="vr5"/>
+					<actualSource name="vr4"/>
+					<actualSource name="vr3"/>
+					<actualSource name="vr1"/>
+					<actualSource name="vr2"/>
+					<actualSource name="zs9"/>
+					<actualSource name="IN"/>
+					<actualSource name="er1"/>
+					<actualSource name="er2"/>
+					<actualSource name="er3"/>
+					<actualSource name="ER"/>
+					<actualSource name="zs1"/>
+					<actualSource name="zs2"/>
+					<actualSource name="zs3"/>
+					<actualSource name="zs4"/>
+					<actualSource name="zs5"/>
+					<actualSource name="zs6"/>
+					<actualSource name="zs7"/>
+					<actualSource name="ZS"/>
+					<actualSource name="zs8"/>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="305" y="303"/></rendering>
+			<source name="ZS"/>
+			<target name="vr1"/>
+			<labelGroup>
+				<rendering><point x="68" y="113"/></rendering>
+				<label name="soft_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ZS"/>
+			<target name="zs8"/>
+			<labelGroup>
+				<rendering><point x="-19" y="13"/></rendering>
+				<label name="soft_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="384" y="323"/></rendering>
+			<source name="ZS"/>
+			<target name="er1"/>
+			<labelGroup>
+				<rendering><point x="-26" y="40"/></rendering>
+				<label name="soft_ER"/>
+				<label name="soft_SER.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="176" y="562"/></rendering>
+			<source name="cs1"/>
+			<labelGroup>
+				<rendering><point x="-46" y="-9"/></rendering>
+				<label name="reset.TUER"/>
+				<label name="timeout.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="cs1"/>
+			<target name="cs2"/>
+			<labelGroup>
+				<rendering><point x="-59" y="-8"/></rendering>
+				<label name="start_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="496" y="161"/></rendering>
+			<source name="zs2"/>
+			<labelGroup>
+				<rendering><point x="-18" y="-5"/></rendering>
+				<label name="reset.TUER"/>
+				<label name="timeout.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs2"/>
+			<target name="zs3"/>
+			<labelGroup>
+				<rendering><point x="3" y="6"/></rendering>
+				<label name="stop_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="vr1"/>
+			<target name="vr2"/>
+			<labelGroup>
+				<rendering><point x="-88" y="5"/></rendering>
+				<label name="start_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs7"/>
+			<target name="ZS"/>
+			<labelGroup>
+				<rendering><point x="-1" y="4"/></rendering>
+				<label name="done_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ER"/>
+			<target name="vr5"/>
+			<labelGroup>
+				<rendering><point x="-43" y="13"/></rendering>
+				<label name="soft_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="320" y="282"/></rendering>
+			<source name="ER"/>
+			<target name="er3"/>
+			<labelGroup>
+				<rendering><point x="-89" y="-5"/></rendering>
+				<label name="soft_ER"/>
+				<label name="soft_SER.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ER"/>
+			<target name="zs5"/>
+			<labelGroup>
+				<rendering><point x="-19" y="8"/></rendering>
+				<label name="soft_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="503" y="412"/></rendering>
+			<source name="zs8"/>
+			<target name="zs7"/>
+			<labelGroup>
+				<rendering><point x="-22" y="1"/></rendering>
+				<label name="sync.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="572" y="188"/></rendering>
+			<source name="zs8"/>
+			<target name="zs1"/>
+			<labelGroup>
+				<rendering><point x="-69" y="34"/></rendering>
+				<label name="async.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="er1"/>
+			<target name="er2"/>
+			<labelGroup>
+				<rendering><point x="-86" y="7"/></rendering>
+				<label name="start_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs4"/>
+			<target name="zs5"/>
+			<labelGroup>
+				<rendering><point x="3" y="5"/></rendering>
+				<label name="timeout.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="vr5"/>
+			<target name="vr6"/>
+			<labelGroup>
+				<rendering><point x="-88" y="1"/></rendering>
+				<label name="start_VR.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs6"/>
+			<target name="zs7"/>
+			<labelGroup>
+				<rendering><point x="4" y="7"/></rendering>
+				<label name="stop_ZS.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="497" y="353"/></rendering>
+			<source name="zs6"/>
+			<labelGroup>
+				<rendering><point x="-17" y="-2"/></rendering>
+				<label name="reset.TUER"/>
+				<label name="timeout.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="287" y="316"/></rendering>
+			<source name="VR"/>
+			<target name="er1"/>
+			<labelGroup>
+				<rendering><point x="-65" y="54"/></rendering>
+				<label name="soft_ER"/>
+				<label name="soft_SER.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="VR"/>
+			<target name="vr8"/>
+			<labelGroup>
+				<rendering><point x="-22" y="14"/></rendering>
+				<label name="soft_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="344" y="351"/></rendering>
+			<source name="VR"/>
+			<target name="zs9"/>
+			<labelGroup>
+				<rendering><point x="-107" y="81"/></rendering>
+				<label name="soft_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs3"/>
+			<target name="zs4"/>
+			<labelGroup>
+				<rendering><point x="0" y="3"/></rendering>
+				<label name="time_W.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="176" y="354"/></rendering>
+			<source name="vr6"/>
+			<labelGroup>
+				<rendering><point x="-50" y="-1"/></rendering>
+				<label name="reset.TUER"/>
+				<label name="timeout.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="vr6"/>
+			<target name="vr7"/>
+			<labelGroup>
+				<rendering><point x="-85" y="8"/></rendering>
+				<label name="stop_VR.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs1"/>
+			<target name="zs2"/>
+			<labelGroup>
+				<rendering><point x="3" y="3"/></rendering>
+				<label name="start_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="304" y="209"/></rendering>
+			<source name="er2"/>
+			<labelGroup>
+				<rendering><point x="-63" y="-2"/></rendering>
+				<label name="reset.TUER"/>
+				<label name="timeout.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="er2"/>
+			<target name="er3"/>
+			<labelGroup>
+				<rendering><point x="-84" y="8"/></rendering>
+				<label name="stop_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="100" y="188"/></rendering>
+			<source name="vr8"/>
+			<target name="vr1"/>
+			<labelGroup>
+				<rendering><point x="-10" y="26"/></rendering>
+				<label name="async.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="171" y="410"/></rendering>
+			<source name="vr8"/>
+			<target name="vr7"/>
+			<labelGroup>
+				<rendering><point x="-36" y="-1"/></rendering>
+				<label name="sync.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="vr4"/>
+			<target name="vr5"/>
+			<labelGroup>
+				<rendering><point x="-89" y="3"/></rendering>
+				<label name="timeout.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="er3"/>
+			<target name="ER"/>
+			<labelGroup>
+				<rendering><point x="3" y="-4"/></rendering>
+				<label name="done_ER"/>
+				<label name="done_SER.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="vr3"/>
+			<target name="vr4"/>
+			<labelGroup>
+				<rendering><point x="-84" y="3"/></rendering>
+				<label name="time_W.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="256" y="560"/></rendering>
+			<source name="cs2"/>
+			<labelGroup>
+				<rendering><point x="-38" y="0"/></rendering>
+				<label name="timeout.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="cs2"/>
+			<target name="cs3"/>
+			<labelGroup>
+				<rendering><point x="-45" y="-9"/></rendering>
+				<label name="stop_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="vr2"/>
+			<target name="vr3"/>
+			<labelGroup>
+				<rendering><point x="-88" y="7"/></rendering>
+				<label name="stop_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="176" y="160"/></rendering>
+			<source name="vr2"/>
+			<labelGroup>
+				<rendering><point x="-55" y="-3"/></rendering>
+				<label name="reset.TUER"/>
+				<label name="timeout.TUER">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="vr7"/>
+			<target name="VR"/>
+			<labelGroup>
+				<rendering><point x="-53" y="3"/></rendering>
+				<label name="done_VR"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="cs3"/>
+			<target name="ER"/>
+			<labelGroup>
+				<rendering><point x="4" y="81"/></rendering>
+				<label name="CS_ok"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs9"/>
+			<target name="zs1"/>
+			<labelGroup>
+				<rendering><point x="-50" y="19"/></rendering>
+				<label name="async.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs9"/>
+			<target name="zs5"/>
+			<labelGroup>
+				<rendering><point x="-51" y="-2"/></rendering>
+				<label name="sync.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="zs5"/>
+			<target name="zs6"/>
+			<labelGroup>
+				<rendering><point x="3" y="2"/></rendering>
+				<label name="start_ZS.TUER"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

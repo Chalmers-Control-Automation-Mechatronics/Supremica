@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="init" version="1.0" valid="1"
+	hasGeometry="1" width="297" height="204"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2000-10-10 08:04:40 GMT" modificationDate="2004-09-06 09:34:30 GMT">
+	<events>
+		<event controllable="1" name="init"/>
+		<event controllable="1" name="init_done"/>
+		<event controllable="1" name="L_drop_B2.2"/>
+		<event controllable="1" name="L_dropS.S.1"/>
+		<event controllable="1" name="L_dropS.S.2"/>
+		<event controllable="1" name="L_mX1.1"/>
+		<event controllable="1" name="L_mX2.1"/>
+		<event controllable="1" name="L_mX3.1"/>
+		<event controllable="1" name="L_mX4.1"/>
+		<event controllable="1" name="L_mX5.1"/>
+		<event controllable="1" name="L_mX6.1"/>
+		<event controllable="1" name="L_mX7.1"/>
+		<event controllable="1" name="L_pick_B1.1"/>
+		<event controllable="1" name="L_pickS.S.1"/>
+		<event controllable="1" name="L_pickS.S.2"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="352" y="160"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="160" y="160"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="257" y="147"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-28" y="-5"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="256" y="177"/></rendering>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-15" y="13"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="117" y="157"/></rendering>
+			<source name="s0"/>
+			<labelGroup>
+				<rendering><point x="-47" y="-41"/></rendering>
+				<label name="L_mX1.1"/>
+				<label name="L_mX2.1">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="L_mX3.1">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="L_mX4.1">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="L_mX5.1">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="L_mX6.1">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="L_mX7.1">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+				<label name="L_drop_B2.2">
+					<rendering><point x="0" y="105"/></rendering>
+				</label>
+				<label name="L_dropS.S.1">
+					<rendering><point x="0" y="120"/></rendering>
+				</label>
+				<label name="L_dropS.S.2">
+					<rendering><point x="0" y="135"/></rendering>
+				</label>
+				<label name="L_pickS.S.1">
+					<rendering><point x="0" y="150"/></rendering>
+				</label>
+				<label name="L_pickS.S.2">
+					<rendering><point x="0" y="165"/></rendering>
+				</label>
+				<label name="L_pick_B1.1">
+					<rendering><point x="0" y="180"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

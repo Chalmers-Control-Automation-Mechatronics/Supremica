@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="debounce_main"
+        legacy="1"
+        arity="0"
+        generatorName="Dpr2Vmod"
+        generatorVersion="2.7b4"
+        version="1.0"
+        creationDate="2000-06-06 07:20:37 GMT"
+        modificationDate="2000-10-05 08:27:48 GMT">
+<interface/>
+<definitions>
+<typeDefinition name="BITS" expression="{1..1}"/>
+</definitions>
+<local>
+<event name="chg_value"
+       controllable="1"
+       arity="1">
+<comment>
+This event is used to report a stable change of the input value
+to the outside world.
+</comment>
+<posParam pos="0" value="$BITS"/>
+</event>
+<foreach-alias dummy="_0" range="$BITS">
+<alias old="chg_value.$_0" new="chg_value[$_0]"/>
+</foreach-alias>
+<event name="reset"
+       controllable="1"
+       arity="1">
+<comment>
+This event is used by the controller to reset the timer,
+before a timeout occurs.
+</comment>
+<posParam pos="0" value="$BITS"/>
+</event>
+<foreach-alias dummy="_0" range="$BITS">
+<alias old="reset.$_0" new="reset[$_0]"/>
+</foreach-alias>
+<event name="timer"
+       controllable="1"
+       arity="1">
+<comment>
+This event is used by the controller in order to start a timer.
+The timer will run until it elapses, then it will signal an
+uncontrollable timeout event.
+</comment>
+<posParam pos="0" value="$BITS"/>
+</event>
+<foreach-alias dummy="_0" range="$BITS">
+<alias old="timer.$_0" new="timer[$_0]"/>
+</foreach-alias>
+<event name="timeout"
+       controllable="0"
+       arity="1">
+<comment>
+This input is signalled when the timer has elapsed.
+</comment>
+<posParam pos="0" value="$BITS"/>
+</event>
+<foreach-alias dummy="_0" range="$BITS">
+<alias old="timeout.$_0" new="timeout[$_0]"/>
+</foreach-alias>
+<event name="new_value"
+       controllable="0"
+       arity="1"
+       legacyCode="0">
+<comment>
+This input occurs whenever a change of the input value has been detected.
+</comment>
+<posParam pos="0" value="$BITS"/>
+</event>
+<foreach-alias dummy="_0" range="$BITS">
+<alias old="new_value.$_0" new="new_value[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<foreach-instance dummy="I" range="$BITS">
+<instance name="debouncing_ok[$I]" module="debouncing_ok_spec">
+<nameParam name="chg_value" value="chg_value[$I]"/>
+<nameParam name="reset" value="reset[$I]"/>
+<nameParam name="timer" value="timer[$I]"/>
+<nameParam name="new_value" value="new_value[$I]"/>
+<nameParam name="timeout" value="timeout[$I]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="I" range="$BITS">
+<instance name="sensor_and_filter[$I]" module="sensor_and_filter_plant">
+<nameParam name="new_value" value="new_value[$I]"/>
+</instance>
+</foreach-instance>
+<component graph="chg_value" kind="process"/>
+<foreach-instance dummy="I" range="$BITS">
+<instance name="timer[$I]" module="timer_plant">
+<nameParam name="reset" value="reset[$I]"/>
+<nameParam name="timer" value="timer[$I]"/>
+<nameParam name="timeout" value="timeout[$I]"/>
+</instance>
+</foreach-instance>
+</parts>
+</module>

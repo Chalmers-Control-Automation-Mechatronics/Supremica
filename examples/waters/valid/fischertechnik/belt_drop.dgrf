@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="belt_drop" version="1.0" valid="1"
+	hasGeometry="1" width="377" height="169"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:12:06 GMT+00:00" modificationDate="2000-10-10 08:12:06 GMT+00:00">
+	<events>
+		<event controllable="1" name="L_drop_B2.2"/>
+		<event controllable="0" name="LS1_off_B2.1"/>
+		<event controllable="0" name="LS_on_B2.1"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="240" y="96"/></rendering>
+			<label name="start">
+				<rendering><point x="-12" y="-16"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="112" y="192"/></rendering>
+			<label name="B2begin_empty">
+				<rendering><point x="-55" y="22"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="352" y="192"/></rendering>
+			<label name="B2begin_occupied">
+				<rendering><point x="-30" y="22"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="77" y="176"/></rendering>
+			<source name="B2begin_empty"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-13"/></rendering>
+				<label name="LS1_off_B2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="234" y="178"/></rendering>
+			<source name="B2begin_empty"/>
+			<target name="B2begin_occupied"/>
+			<labelGroup>
+				<rendering><point x="-29" y="-19"/></rendering>
+				<label name="L_drop_B2.2"/>
+				<label name="LS_on_B2.1">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="230" y="211"/></rendering>
+			<source name="B2begin_occupied"/>
+			<target name="B2begin_empty"/>
+			<labelGroup>
+				<rendering><point x="-28" y="15"/></rendering>
+				<label name="LS1_off_B2.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="379" y="165"/></rendering>
+			<source name="B2begin_occupied"/>
+			<labelGroup>
+				<rendering><point x="-32" y="-9"/></rendering>
+				<label name="LS_on_B2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="B2begin_empty"/>
+			<labelGroup>
+				<rendering><point x="-59" y="-13"/></rendering>
+				<label name="LS1_off_B2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="B2begin_occupied"/>
+			<labelGroup>
+				<rendering><point x="-5" y="-18"/></rendering>
+				<label name="LS_on_B2.1"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

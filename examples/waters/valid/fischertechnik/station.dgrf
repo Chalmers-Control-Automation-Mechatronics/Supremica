@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="station" version="1.0" valid="1"
+	hasGeometry="1" width="431" height="403"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2000-10-10 08:12:05 GMT" modificationDate="2004-09-06 09:40:33 GMT">
+	<events>
+		<event controllable="1" name="init_done"/>
+		<event controllable="1" name="LED_off.ST"/>
+		<event controllable="1" name="LED_on.ST"/>
+		<event controllable="0" name="LS_off.ST"/>
+		<event controllable="0" name="LS_on.ST"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="240" y="32"/></rendering>
+			<label name="S_start">
+				<rendering><point x="-55" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="352"/></rendering>
+			<label name="part_dropped">
+				<rendering><point x="-36" y="-20"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="80"/></rendering>
+			<label name="S_init">
+				<rendering><point x="-50" y="6"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="80" y="288"/></rendering>
+			<label name="S_empty">
+				<rendering><point x="-33" y="25"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="128"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="416" y="288"/></rendering>
+			<label name="S_occupied">
+				<rendering><point x="-13" y="22"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="224"/></rendering>
+			<label name="part_removed">
+				<rendering><point x="-43" y="34"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="443" y="261"/></rendering>
+			<source name="S_occupied"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-11"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="321" y="263"/></rendering>
+			<source name="S_occupied"/>
+			<target name="part_removed"/>
+			<labelGroup>
+				<rendering><point x="-20" y="22"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="S_occupied"/>
+			<target name="part_dropped"/>
+			<labelGroup>
+				<rendering><point x="5" y="14"/></rendering>
+				<label name="LED_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="326" y="244"/></rendering>
+			<source name="part_removed"/>
+			<target name="S_occupied"/>
+			<labelGroup>
+				<rendering><point x="-38" y="-15"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="241" y="187"/></rendering>
+			<source name="part_removed"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-3"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="S_empty"/>
+			<target name="part_removed"/>
+			<labelGroup>
+				<rendering><point x="-13" y="-18"/></rendering>
+				<label name="LED_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="64" y="256"/></rendering>
+			<source name="S_empty"/>
+			<labelGroup>
+				<rendering><point x="-14" y="-4"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="164" y="314"/></rendering>
+			<source name="S_empty"/>
+			<target name="part_dropped"/>
+			<labelGroup>
+				<rendering><point x="3" y="-7"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="279" y="29"/></rendering>
+			<source name="S_start"/>
+			<labelGroup>
+				<rendering><point x="4" y="-3"/></rendering>
+				<label name="LS_on.ST"/>
+				<label name="LS_off.ST">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="S_start"/>
+			<target name="S_init"/>
+			<labelGroup>
+				<rendering><point x="-58" y="1"/></rendering>
+				<label name="LED_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="279" y="80"/></rendering>
+			<source name="S_init"/>
+			<labelGroup>
+				<rendering><point x="5" y="-3"/></rendering>
+				<label name="LS_on.ST"/>
+				<label name="LS_off.ST">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="S_init"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-68" y="0"/></rendering>
+				<label name="init_done"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="155" y="330"/></rendering>
+			<source name="part_dropped"/>
+			<target name="S_empty"/>
+			<labelGroup>
+				<rendering><point x="-46" y="17"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="243" y="389"/></rendering>
+			<source name="part_dropped"/>
+			<labelGroup>
+				<rendering><point x="-23" y="16"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="S_occupied"/>
+			<labelGroup>
+				<rendering><point x="1" y="-6"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="S_empty"/>
+			<labelGroup>
+				<rendering><point x="-42" y="-8"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

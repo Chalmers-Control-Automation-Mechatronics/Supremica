@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="sync" version="1.0" valid="1"
+	hasGeometry="1" width="297" height="266"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:50:02 GMT" modificationDate="2004-09-07 08:50:02 GMT">
+	<events>
+		<event controllable="1" name="async.TUER"/>
+		<event controllable="1" name="start_VR.TUER"/>
+		<event controllable="1" name="start_ZS.TUER"/>
+		<event controllable="1" name="stop_ER.TUER"/>
+		<event controllable="1" name="sync.TUER"/>
+		<event controllable="0" name="tuer_auf.TUER"/>
+		<event controllable="0" name="tuer_zu.TUER"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="224" y="96"/></rendering>
+			<label name="AUF">
+				<rendering><point x="5" y="-6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="160"/></rendering>
+			<label name="AZU">
+				<rendering><point x="-23" y="19"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="224" y="224"/></rendering>
+			<label name="ZU">
+				<rendering><point x="5" y="18"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="96" y="96"/></rendering>
+			<label name="ASY">
+				<rendering><point x="-24" y="-6"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="96" y="224"/></rendering>
+			<label name="VR">
+				<rendering><point x="-22" y="15"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="251" y="69"/></rendering>
+			<source name="AUF"/>
+			<labelGroup>
+				<rendering><point x="-23" y="-16"/></rendering>
+				<label name="sync.TUER"/>
+				<label name="stop_ER.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="AUF"/>
+			<target name="ASY"/>
+			<labelGroup>
+				<rendering><point x="-38" y="-3"/></rendering>
+				<label name="start_VR.TUER"/>
+				<label name="start_ZS.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="AUF"/>
+			<target name="ZU"/>
+			<labelGroup>
+				<rendering><point x="1" y="-35"/></rendering>
+				<label name="tuer_zu.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="187" y="133"/></rendering>
+			<source name="AZU"/>
+			<labelGroup>
+				<rendering><point x="-14" y="10"/></rendering>
+				<label name="async.TUER"/>
+				<label name="start_VR.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="start_ZS.TUER">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="123" y="133"/></rendering>
+			<source name="AZU"/>
+			<target name="ASY"/>
+			<labelGroup>
+				<rendering><point x="-58" y="18"/></rendering>
+				<label name="tuer_auf.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="AZU"/>
+			<target name="ZU"/>
+			<labelGroup>
+				<rendering><point x="-58" y="5"/></rendering>
+				<label name="stop_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="160" y="77"/></rendering>
+			<source name="ASY"/>
+			<target name="AUF"/>
+			<labelGroup>
+				<rendering><point x="-29" y="-7"/></rendering>
+				<label name="stop_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="133" y="123"/></rendering>
+			<source name="ASY"/>
+			<target name="AZU"/>
+			<labelGroup>
+				<rendering><point x="-17" y="0"/></rendering>
+				<label name="tuer_zu.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="68" y="67"/></rendering>
+			<source name="ASY"/>
+			<labelGroup>
+				<rendering><point x="-26" y="-23"/></rendering>
+				<label name="start_VR.TUER"/>
+				<label name="start_ZS.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="async.TUER">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="VR"/>
+			<target name="ASY"/>
+			<labelGroup>
+				<rendering><point x="-48" y="24"/></rendering>
+				<label name="tuer_auf.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="64" y="251"/></rendering>
+			<source name="VR"/>
+			<labelGroup>
+				<rendering><point x="-27" y="5"/></rendering>
+				<label name="start_VR.TUER"/>
+				<label name="start_ZS.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="sync.TUER">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="160" y="243"/></rendering>
+			<source name="VR"/>
+			<target name="ZU"/>
+			<labelGroup>
+				<rendering><point x="-36" y="11"/></rendering>
+				<label name="stop_ER.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="243" y="160"/></rendering>
+			<source name="ZU"/>
+			<target name="AUF"/>
+			<labelGroup>
+				<rendering><point x="-4" y="38"/></rendering>
+				<label name="tuer_auf.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ZU"/>
+			<target name="VR"/>
+			<labelGroup>
+				<rendering><point x="-35" y="-4"/></rendering>
+				<label name="start_VR.TUER"/>
+				<label name="start_ZS.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="256" y="252"/></rendering>
+			<source name="ZU"/>
+			<labelGroup>
+				<rendering><point x="-40" y="3"/></rendering>
+				<label name="sync.TUER"/>
+				<label name="stop_ER.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

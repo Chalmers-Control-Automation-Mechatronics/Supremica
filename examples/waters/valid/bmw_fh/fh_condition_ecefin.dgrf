@@ -1,0 +1,36 @@
+dgrf2.0.2
+//s 494 358
+7
+u CLOSE.DRD
+u CLOSE.PSD
+c fh_cond_ecefin
+u KL_R_OFF
+u KL_R_ON
+u OPEN.DRD
+u OPEN.PSD
+7
+368 192 8 0 0 11 5 radio_door_open
+144 192 8 0 0 -132 5 no_radio_door_open
+256 288 8 0 0 -7 -12 ecefin
+368 352 8 0 0 13 4 radio_doors_closed
+368 64 8 0 0 11 3 radio_doors_open
+144 352 8 1 1 -146 4 no_radio_doors_closed
+144 64 8 0 0 -136 3 no_radio_doors_open
+17
+3 no_radio_door_open ecefin 205 229 10 6 2 0 0 0 1 0 16
+3 no_radio_door_open radio_door_open 257 174 -46 -4 1 4 0 0
+3 no_radio_door_open no_radio_doors_open 128 129 -74 -2 2 5 0 0 6 0 16
+3 no_radio_doors_closed no_radio_door_open 129 273 -75 -6 2 5 0 0 6 0 16
+3 no_radio_doors_closed radio_doors_closed 257 334 -46 12 1 4 0 0
+3 ecefin no_radio_door_open 189 257 -48 -4 2 5 0 0 6 0 16
+2 ecefin 228 303 -77 14 1 2 0 0
+1 ecefin radio_doors_closed -50 1 1 4 0 0
+3 radio_doors_open radio_door_open 384 129 7 -3 2 0 0 0 1 0 16
+3 radio_doors_open no_radio_doors_open 255 82 -48 -5 1 3 0 0
+3 radio_door_open no_radio_door_open 255 200 -45 -3 1 3 0 0
+3 radio_door_open radio_doors_open 352 129 -73 -4 2 5 0 0 6 0 16
+3 radio_door_open radio_doors_closed 383 272 11 -2 2 0 0 0 1 0 16
+3 no_radio_doors_open no_radio_door_open 161 128 4 -2 2 0 0 0 1 0 16
+3 no_radio_doors_open radio_doors_open 257 46 -50 -4 1 4 0 0
+3 radio_doors_closed no_radio_doors_closed 257 370 -45 10 1 3 0 0
+3 radio_doors_closed radio_door_open 349 273 -46 -16 2 5 0 0 6 0 16

@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="error1_small">
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="MACHS"/>
+<IntRangeExpression>
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</IntRangeExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Name="finish" Kind="UNCONTROLLABLE">
+<SimpleIdentifier Name="MACHS"/>
+<Comment>
+Machine finishes operation.
+</Comment>
+</EventDecl>
+<EventDecl Name="break" Kind="UNCONTROLLABLE">
+<SimpleIdentifier Name="MACHS"/>
+<Comment>
+Machine breaks down.
+</Comment>
+</EventDecl>
+<EventDecl Name="start" Kind="CONTROLLABLE">
+<SimpleIdentifier Name="MACHS"/>
+<Comment>
+Start a machine.
+This code fragment should start operation of the machine given as its
+parameter.
+</Comment>
+</EventDecl>
+<EventDecl Name="repair" Kind="CONTROLLABLE">
+<SimpleIdentifier Name="MACHS"/>
+<Comment>
+Repair a machine.
+This code fragment should initiate the repair of the machine given as
+its parameter.
+
+"Yeah, yeah, yeah &amp; yeah!"
+</Comment>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="MACH">
+<SimpleIdentifier Name="MACHS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="mach"/>
+<Graph>
+<EventList>
+<IndexedIdentifier Name="break">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="finish">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="repair">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+</EventList>
+<NodeList>
+<SimpleNode Name="working">
+<PointGeometry>
+<Point X="192" Y="224"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-29" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="idle" Initial="true">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="256" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="-11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="down">
+<PointGeometry>
+<Point X="320" Y="224"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="down" Target="idle">
+<LabelBlock>
+<IndexedIdentifier Name="repair">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="1" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="idle" Target="working">
+<LabelBlock>
+<IndexedIdentifier Name="start">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-30" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="210" Y="169"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="working" Target="down">
+<LabelBlock>
+<IndexedIdentifier Name="break">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-32" Y="14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="working" Target="idle">
+<LabelBlock>
+<IndexedIdentifier Name="finish">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-22" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="231" Y="186"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="buffer"/>
+<Graph>
+<EventList>
+<IndexedIdentifier Name="finish">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</EventList>
+<NodeList>
+<SimpleNode Name="full">
+<PointGeometry>
+<Point X="304" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="2" Y="23"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="empty" Initial="true">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-19" Y="31"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="full" Target="empty">
+<LabelBlock>
+<IndexedIdentifier Name="start">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-16" Y="12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="237" Y="192"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="empty" Target="full">
+<LabelBlock>
+<IndexedIdentifier Name="finish">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-16" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="238" Y="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="empty" Target="empty">
+<LabelBlock>
+<IndexedIdentifier Name="start">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-24" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="134" Y="176"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="repair"/>
+<Graph>
+<EventList>
+<IndexedIdentifier Name="break">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="repair">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="repair">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</EventList>
+<NodeList>
+<SimpleNode Name="m1" Initial="true">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-7" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="m2">
+<PointGeometry>
+<Point X="304" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-7" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="m1" Target="m1">
+<LabelBlock>
+<IndexedIdentifier Name="repair">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-45" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="134" Y="176"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="m1" Target="m2">
+<LabelBlock>
+<IndexedIdentifier Name="break">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-20" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="238" Y="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="m2" Target="m1">
+<LabelBlock>
+<IndexedIdentifier Name="repair">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry>
+<Point X="-19" Y="16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="237" Y="192"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="turnobserver" version="1.0" valid="1"
+	hasGeometry="1" width="173" height="189"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-05 08:22:44 GMT" modificationDate="2004-09-05 08:22:44 GMT">
+	<events>
+		<event controllable="0" name="done_recover"/>
+		<event controllable="0" name="done_turn"/>
+		<event controllable="0" name="error_turn"/>
+		<event controllable="1" name="recover"/>
+		<event controllable="1" name="turn"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="64" y="144"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="144"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="64" y="32"/></rendering>
+			<label name="s2">
+				<rendering><point x="-7" y="-12"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="98" y="88"/></rendering>
+			<source name="s2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-28" y="6"/></rendering>
+				<label name="done_recover"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s2"/>
+			<labelGroup>
+				<rendering><point x="-46" y="7"/></rendering>
+				<label name="recover"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-14" y="-7"/></rendering>
+				<label name="turn"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="120" y="178"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-6"/></rendering>
+				<label name="done_turn"/>
+				<label name="error_turn">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

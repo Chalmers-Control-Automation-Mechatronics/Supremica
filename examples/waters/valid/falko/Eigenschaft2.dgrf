@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="Eigenschaft2" version="1.0" valid="1"
+	hasGeometry="1" width="340" height="237"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 06:35:59 GMT" modificationDate="2004-09-07 06:35:59 GMT">
+	<events>
+		<event controllable="1" name="bereitFahrt"/>
+		<event controllable="0" name="wendeVollzogen"/>
+		<event controllable="0" name="zugAn.PH"/>
+		<event controllable="0" name="zugAn.WH"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="108" y="206"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="267" y="206"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="172" y="303"/></rendering>
+			<label name="s2">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="178" y="109"/></rendering>
+			<label name="s3">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-26" y="18"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="94" y="123"/></rendering>
+			<source name="s0"/>
+			<target name="s3"/>
+			<labelGroup>
+				<rendering><point x="-56" y="-11"/></rendering>
+				<label name="zugAn.PH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="268" y="289"/></rendering>
+			<source name="s1"/>
+			<target name="s2"/>
+			<labelGroup>
+				<rendering><point x="3" y="22"/></rendering>
+				<label name="wendeVollzogen"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s3"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-27" y="0"/></rendering>
+				<label name="bereitFahrt"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s3"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="4" y="-9"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-76" y="13"/></rendering>
+				<label name="bereitFahrt"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s2"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-35" y="17"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,11 @@
+dgrf2.0.2
+//s 170 79
+2
+u CHISL_TASTER_OFF
+u CHISL_TASTER_ON
+2
+64 96 8 1 1 -26 6 off
+176 96 8 0 0 18 5 on
+2
+1 off on -54 20 1 1 0 0
+3 on off 118 61 -50 -4 1 0 0 0

@@ -1,0 +1,28 @@
+dgrf2.4.7
+//s 288 335
+13
+u CLOSE.DRD
+u CLOSE.PSD
+c CMFT_BACK.CLOSE
+c CMFT_BACK.OPEN
+c cmft_cond_doors
+c CMFT_FRONT.CLOSE
+c CMFT_FRONT.OPEN
+c CMFT_ROOF.CLOSE
+c CMFT_ROOF.OPEN
+c cmft_start
+u OPEN.DRD
+u OPEN.PSD
+c timer
+3
+208 128 8 1 1 13 3 doors_closed
+208 320 8 0 0 21 9 doors_open
+208 224 8 0 0 17 4 door_open
+7
+2 door_open 173 222 -103 4 1 4 0 0
+3 door_open doors_closed 240 176 6 -8 2 0 0 0 1 0 13
+1 door_open doors_open -77 -2 2 10 0 0 11 0 13
+1 doors_closed door_open -75 -5 2 10 0 0 11 0 13
+2 doors_closed 174 104 -134 -71 8 9 0 0 3 0 13 8 0 26 6 0 39 2 0 52 7 0 65 5 0 78 12 0 91
+3 doors_open door_open 241 271 6 -3 2 0 0 0 1 0 13
+2 doors_open 182 346 -107 -4 1 4 0 0

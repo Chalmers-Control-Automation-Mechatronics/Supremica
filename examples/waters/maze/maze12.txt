@@ -1,0 +1,13 @@
+3/13 - exit. 
+3/12 - door(gold). 
+3/11. 4/11. 
+1/10 - key(silver). 2/10. 3/10 - rock. 4/10. 
+3/9. 4/9. 
+3/8 - door(diamond). 
+3/7 - hero. 4/7. 5/7. 6/7. 7/7. 
+3/6. 7/6. 
+3/5. 4/5. 5/5 - key(brass). 6/5 - rock. 7/5. 
+3/4 - door(iron). 
+1/3 - key(diamond). 2/3 - door(brass). 3/3. 4/3. 
+3/2. 4/2. 
+1/1 - key(iron). 2/1. 3/1 - rock. 4/1. 5/1 - door(silver). 6/1 - key(gold). 

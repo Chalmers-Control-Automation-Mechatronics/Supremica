@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="wsptime" version="1.0" valid="1"
+	hasGeometry="1" width="268" height="172"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:51:07 GMT" modificationDate="2004-09-07 08:51:07 GMT">
+	<events>
+		<event controllable="1" name="autom_VR"/>
+		<event controllable="1" name="ER"/>
+		<event controllable="1" name="reset_ctr.WSP"/>
+		<event controllable="1" name="SER"/>
+		<event controllable="1" name="SERFS"/>
+		<event controllable="1" name="TAST"/>
+		<event controllable="1" name="time.WSP"/>
+		<event controllable="0" name="timeout.WSP"/>
+		<event controllable="1" name="ZS"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="288" y="112"/></rendering>
+			<label name="RESET">
+				<rendering><point x="-21" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="128" y="112"/></rendering>
+			<label name="TIME">
+				<rendering><point x="-16" y="21"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="48" y="112"/></rendering>
+			<label name="IN">
+				<rendering><point x="-8" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="112"/></rendering>
+			<label name="RUN">
+				<rendering><point x="-13" y="21"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="172" y="148"/></rendering>
+			<source name="RESET"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-37" y="13"/></rendering>
+				<label name="reset_ctr.WSP"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="RUN"/>
+			<target name="RESET"/>
+			<labelGroup>
+				<rendering><point x="-34" y="-5"/></rendering>
+				<label name="timeout.WSP"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="207" y="72"/></rendering>
+			<source name="RUN"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-59"/></rendering>
+				<label name="ER"/>
+				<label name="SER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="SERFS">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="TAST">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="ZS">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="autom_VR">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="TIME"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-83"/></rendering>
+				<label name="ER"/>
+				<label name="SER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="SERFS">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="ZS">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="TAST">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="autom_VR">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="TIME"/>
+			<target name="RUN"/>
+			<labelGroup>
+				<rendering><point x="-28" y="-6"/></rendering>
+				<label name="time.WSP"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

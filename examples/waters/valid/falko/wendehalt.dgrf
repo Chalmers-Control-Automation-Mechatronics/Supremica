@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="wendehalt" version="1.0" valid="1"
+	hasGeometry="1" width="305" height="98"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 06:34:20 GMT" modificationDate="2004-09-07 06:34:20 GMT">
+	<events>
+		<event controllable="0" name="notAktiv.WH"/>
+		<event controllable="0" name="wendeVollzogen"/>
+		<event controllable="0" name="zugAn.WH"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="288" y="160"/></rendering>
+			<label name="wendehaltAktiv">
+				<rendering><point x="1" y="22"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="175" y="160"/></rendering>
+			<label name="notWendehaltAktiv">
+				<rendering><point x="-99" y="25"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="148" y="133"/></rendering>
+			<source name="notWendehaltAktiv"/>
+			<labelGroup>
+				<rendering><point x="-43" y="-9"/></rendering>
+				<label name="notAktiv.WH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="230" y="183"/></rendering>
+			<source name="notWendehaltAktiv"/>
+			<target name="wendehaltAktiv"/>
+			<labelGroup>
+				<rendering><point x="-31" y="15"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="228" y="138"/></rendering>
+			<source name="wendehaltAktiv"/>
+			<target name="notWendehaltAktiv"/>
+			<labelGroup>
+				<rendering><point x="-43" y="-8"/></rendering>
+				<label name="wendeVollzogen"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

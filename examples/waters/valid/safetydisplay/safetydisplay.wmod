@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="safetydisplay" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="displayon">
+<IntRangeExpression>
+<IntConstant Value="1"/>
+<IntConstant Value="3"/>
+</IntRangeExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="displayoff"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="switchoff">
+<IntRangeExpression>
+<IntConstant Value="1"/>
+<IntConstant Value="3"/>
+</IntRangeExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="switchon">
+<IntRangeExpression>
+<IntConstant Value="1"/>
+<IntConstant Value="3"/>
+</IntRangeExpression>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="display"/>
+<Graph>
+<EventList>
+<SimpleIdentifier Name="displayoff"/>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+</EventList>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="248" Y="126"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-14" Y="-13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="108" Y="126"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="248" Y="245"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="396" Y="126"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="displayoff"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="292" Y="181"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="displayoff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="179" Y="165"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s3" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="displayoff"/>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="320" Y="89"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s3">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="displaypriority"/>
+<Graph>
+<EventList>
+<SimpleIdentifier Name="displayoff"/>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+</EventList>
+<NodeList>
+<SimpleNode Initial="true" Name="on123">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="469" Y="427"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="3" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on1">
+<PointGeometry>
+<Point X="356" Y="98"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="38" Y="-2"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on2">
+<PointGeometry>
+<Point X="224" Y="190"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-33" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on3">
+<PointGeometry>
+<Point X="140" Y="329"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-51" Y="19"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on12">
+<PointGeometry>
+<Point X="469" Y="190"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="19" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on13">
+<PointGeometry>
+<Point X="356" Y="329"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-18" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="off">
+<PointGeometry>
+<Point X="140" Y="99"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-28" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on23">
+<PointGeometry>
+<Point X="224" Y="427"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-20" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="on23" Target="on23">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="251" Y="400"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on23" Target="on3">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on23" Target="on123">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="386" Y="463"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on23" Target="on2">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-51" Y="-34"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on13" Target="on13">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="383" Y="302"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on13" Target="on3">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="13" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on13" Target="on1">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-51" Y="40"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on13" Target="on123">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="343" Y="385"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on3" Target="on23">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="115" Y="388"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on3" Target="on13">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="67" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="218" Y="296"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on3" Target="on3">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="102" Y="309"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on3" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on12" Target="on12">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="12" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="496" Y="163"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on12" Target="on1">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on12" Target="on123">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="501" Y="307"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on12" Target="on2">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-62" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on1" Target="on13">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-2" Y="-52"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="388" Y="217"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on1" Target="on12">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="481" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on1" Target="on1">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="383" Y="71"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on1" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="9" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="off" Target="on3">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="174" Y="234"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="off" Target="on1">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="30" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="215" Y="70"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="off" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="109" Y="73"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="off" Target="on2">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="249" Y="135"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on123" Target="on23">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on123" Target="on13">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on123" Target="on12">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-55" Y="13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on123" Target="on123">
+<LabelBlock>
+<SimpleIdentifier Name="displayoff"/>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="496" Y="400"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on2" Target="on23">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="3"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-8" Y="-80"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="255" Y="312"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on2" Target="on12">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="28" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="383" Y="220"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on2" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="on2" Target="on2">
+<LabelBlock>
+<IndexedIdentifier Name="displayon">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="252" Y="160"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="i">
+<IntRangeExpression>
+<IntConstant Value="1"/>
+<IntConstant Value="3"/>
+</IntRangeExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="door">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<EventList>
+<IndexedIdentifier Name="switchoff">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="switchon">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</EventList>
+<NodeList>
+<SimpleNode Initial="true" Name="init">
+<PointGeometry>
+<Point X="246" Y="209"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="on">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="318" Y="118"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="15" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="off">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="118"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-30" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="on" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="246" Y="76"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="off" Target="on">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="248" Y="118"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="init" Target="on">
+<LabelBlock>
+<IndexedIdentifier Name="switchon">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="init" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="switchoff">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-53" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
+

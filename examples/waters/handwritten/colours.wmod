@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="colours" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Name="red">
+<ColorGeometry>
+<Color Red="255" Green="0" Blue="0"/>
+</ColorGeometry>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name="green">
+<ColorGeometry>
+<Color Red="0" Green="255" Blue="0"/>
+</ColorGeometry>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name="default"/>
+<EventDecl Kind="PROPOSITION" Name="blue">
+<ColorGeometry>
+<Color Red="0" Green="0" Blue="255"/>
+</ColorGeometry>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name="cyan">
+<ColorGeometry>
+<Color Red="0" Green="255" Blue="255"/>
+</ColorGeometry>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name="yellow">
+<ColorGeometry>
+<Color Red="255" Green="255" Blue="0"/>
+</ColorGeometry>
+</EventDecl>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="colourful"/>
+<Graph Deterministic="true">
+<NodeList>
+<SimpleNode Name="red">
+<EventList>
+<SimpleIdentifier Name="red"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="0" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="red_green">
+<EventList>
+<SimpleIdentifier Name="red"/>
+<SimpleIdentifier Name="green"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="0" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="red_green_blue">
+<EventList>
+<SimpleIdentifier Name="red"/>
+<SimpleIdentifier Name="green"/>
+<SimpleIdentifier Name="blue"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="0" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="red_green_blue_default">
+<EventList>
+<SimpleIdentifier Name="red"/>
+<SimpleIdentifier Name="green"/>
+<SimpleIdentifier Name="blue"/>
+<SimpleIdentifier Name="default"/>
+</EventList>
+<PointGeometry>
+<Point X="272" Y="64"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="0" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="default">
+<EventList>
+<SimpleIdentifier Name="default"/>
+</EventList>
+<PointGeometry>
+<Point X="272" Y="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="0" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="more_than_four">
+<EventList>
+<SimpleIdentifier Name="red"/>
+<SimpleIdentifier Name="green"/>
+<SimpleIdentifier Name="blue"/>
+<SimpleIdentifier Name="cyan"/>
+<SimpleIdentifier Name="yellow"/>
+</EventList>
+<PointGeometry>
+<Point X="272" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="0" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

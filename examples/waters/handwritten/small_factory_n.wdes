@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="small_factory_n" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name="@omega"/>
+        <Event Kind="UNCONTROLLABLE" Name="finish[1]"/>
+        <Event Kind="UNCONTROLLABLE" Name="finish[2]"/>
+        <Event Kind="UNCONTROLLABLE" Name="machine[1].break"/>
+        <Event Kind="CONTROLLABLE" Name="machine[1].repair"/>
+        <Event Kind="UNCONTROLLABLE" Name="machine[2].break"/>
+        <Event Kind="CONTROLLABLE" Name="machine[2].repair"/>
+        <Event Kind="CONTROLLABLE" Name="start[1]"/>
+        <Event Kind="CONTROLLABLE" Name="start[2]"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="SPEC" Name="buffer[1].buffer">
+            <EventRefList>
+                <EventRef Name="@omega"/>
+                <EventRef Name="finish[1]"/>
+                <EventRef Name="start[1]"/>
+                <EventRef Name="start[2]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="empty">
+                    <EventRefList>
+                        <EventRef Name="@omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="full"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="start[1]" Source="empty" Target="empty"/>
+                <Transition Event="finish[1]" Source="empty" Target="full"/>
+                <Transition Event="start[2]" Source="full" Target="empty"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="machine[1].machine">
+            <EventRefList>
+                <EventRef Name="@omega"/>
+                <EventRef Name="finish[1]"/>
+                <EventRef Name="machine[1].break"/>
+                <EventRef Name="machine[1].repair"/>
+                <EventRef Name="start[1]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="false" Name="down"/>
+                <State Initial="true" Name="idle">
+                    <EventRefList>
+                        <EventRef Name="@omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="working"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="start[1]" Source="idle" Target="working"/>
+                <Transition Event="finish[1]" Source="working" Target="idle"/>
+                <Transition Event="machine[1].break" Source="working" Target="down"/>
+                <Transition Event="machine[1].repair" Source="down" Target="idle"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="machine[2].machine">
+            <EventRefList>
+                <EventRef Name="@omega"/>
+                <EventRef Name="finish[2]"/>
+                <EventRef Name="machine[2].break"/>
+                <EventRef Name="machine[2].repair"/>
+                <EventRef Name="start[2]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="false" Name="down"/>
+                <State Initial="true" Name="idle">
+                    <EventRefList>
+                        <EventRef Name="@omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="working"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="start[2]" Source="idle" Target="working"/>
+                <Transition Event="finish[2]" Source="working" Target="idle"/>
+                <Transition Event="machine[2].break" Source="working" Target="down"/>
+                <Transition Event="machine[2].repair" Source="down" Target="idle"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

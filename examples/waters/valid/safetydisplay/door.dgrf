@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="door" version="1.0" valid="1"
+	hasGeometry="1" width="208" height="189"
+	generatorName="DGE" generatorVersion="2.7.9"
+	creationDate="2001-06-19 08:08:55 GMT" modificationDate="2001-06-19 08:08:55 GMT">
+	<events>
+		<event controllable="0" name="switchoff.i"/>
+		<event controllable="0" name="switchon.i"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="246" y="209"/></rendering>
+			<label name="init">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="318" y="118"/></rendering>
+			<label name="on">
+				<rendering><point x="15" y="4"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="176" y="118"/></rendering>
+			<label name="off">
+				<rendering><point x="-30" y="3"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="246" y="76"/></rendering>
+			<source name="on"/>
+			<target name="off"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-9"/></rendering>
+				<label name="switchoff.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="248" y="118"/></rendering>
+			<source name="off"/>
+			<target name="on"/>
+			<labelGroup>
+				<rendering><point x="-25" y="16"/></rendering>
+				<label name="switchon.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="init"/>
+			<target name="on"/>
+			<labelGroup>
+				<rendering><point x="6" y="16"/></rendering>
+				<label name="switchon.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="init"/>
+			<target name="off"/>
+			<labelGroup>
+				<rendering><point x="-53" y="17"/></rendering>
+				<label name="switchoff.i"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

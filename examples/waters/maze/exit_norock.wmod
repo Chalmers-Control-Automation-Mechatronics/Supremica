@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="exit_norock" xmlns="http://waters.sourceforge.net/xsd/module">
+<ParameterList>
+<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="escape"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="exit_norock"/>
+<Graph>
+<EventList>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+</EventList>
+<NodeList>
+<SimpleNode Initial="true" Name="exit">
+<PointGeometry>
+<Point X="112" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-33" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="gone">
+<PointGeometry>
+<Point X="208" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="exit" Target="gone">
+<LabelBlock>
+<SimpleIdentifier Name="escape"/>
+<LabelGeometry>
+<Point X="-20" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="subsystem" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="CONTROLLABLE" Name="load[1]"/>
+<Event Kind="CONTROLLABLE" Name="unload[1]"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name=":reduced">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="load[1]"/>
+<EventRef Name="unload[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="i0">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="i1:w0"/>
+<State Name="i2:w1"/>
+</StateList>
+<TransitionList>
+<Transition Event="unload[1]" Source="i0" Target="i1:w0"/>
+<Transition Event="load[1]" Source="i1:w0" Target="i0"/>
+<Transition Event="unload[1]" Source="i1:w0" Target="i2:w1"/>
+<Transition Event="load[1]" Source="i2:w1" Target="i1:w0"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="subsystem:put[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="load[1]"/>
+<EventRef Name="unload[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="i0">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="i1"/>
+<State Name="i2"/>
+<State Name="w0"/>
+<State Name="w1"/>
+</StateList>
+<TransitionList>
+<Transition Event="load[1]" Source="i1" Target="i0"/>
+<Transition Event="unload[1]" Source="i1" Target="w1"/>
+<Transition Event="unload[1]" Source="w0" Target="w1"/>
+<Transition Event="load[1]" Source="i2" Target="i1"/>
+<Transition Event="load[1]" Source="w1" Target="i1"/>
+<Transition Event="unload[1]" Source="i0" Target="w0"/>
+<Transition Event="load[1]" Source="w0" Target="i0"/>
+<Transition Event="unload[1]" Source="i1" Target="i2"/>
+<Transition Event="load[1]" Source="w1" Target="w0"/>
+<Transition Event="unload[1]" Source="i0" Target="i1"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

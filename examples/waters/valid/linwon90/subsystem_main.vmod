@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="subsystem_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2004-12-22 13:35:35 GMT+12:00"
+        modificationDate="2004-12-22 13:36:04 GMT+12:00">
+<interface/>
+<local>
+<event name="unload"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="unload.$_0" new="unload[$_0]"/>
+</foreach-alias>
+<event name="put"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="put.$_0" new="put[$_0]"/>
+</foreach-alias>
+<event name="load"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..1}">
+<alias old="load.$_0" new="load[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<component graph="subsystem" kind="spec"/>
+</parts>
+</module>

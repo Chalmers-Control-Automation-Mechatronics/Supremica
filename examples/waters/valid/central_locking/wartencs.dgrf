@@ -1,0 +1,30 @@
+dgrf1.9.1
+//s 432 514
+16
+c soft_SER.FT
+c done_ER
+c SER
+c autom_VR
+c done_ZS
+c TAST
+c SERFS
+c soft_ER
+c done_SER.FT
+c ER
+c CS_ok
+c soft_CS
+c soft_ZS
+c ZS
+c done_VR
+c soft_VR
+3
+329 480 8 0 0 -8 24 CS
+126 76 8 1 1 -8 24 IDLE
+534 76 8 0 0 -8 24 RUN
+6
+2 IDLE 153 49 10 -10 6 9 0 0 2 0 13 6 0 26 13 0 39 5 0 52 3 0 65
+1 IDLE CS 10 -10 1 11 0 0
+3 IDLE RUN 330 15 10 -10 4 7 0 0 0 0 13 15 0 26 12 0 39
+3 CS IDLE 167 308 10 -10 1 10 0 0
+3 RUN IDLE 330 137 10 -10 4 1 0 0 8 0 13 14 0 26 4 0 39
+3 RUN CS 492 309 10 -10 1 11 0 0

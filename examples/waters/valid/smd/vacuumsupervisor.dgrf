@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="vacuumsupervisor" version="1.0" valid="1"
+	hasGeometry="1" width="239" height="473"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-05 08:22:46 GMT" modificationDate="2004-09-05 08:22:46 GMT">
+	<events>
+		<event controllable="1" name="counter"/>
+		<event controllable="0" name="counter_equals_12"/>
+		<event controllable="0" name="counter_less_than_12"/>
+		<event controllable="0" name="done_recover"/>
+		<event controllable="0" name="done_turn"/>
+		<event controllable="0" name="done_vacuum"/>
+		<event controllable="0" name="error_turn"/>
+		<event controllable="0" name="error_vacuum"/>
+		<event controllable="1" name="operator_input"/>
+		<event controllable="1" name="recover"/>
+		<event controllable="0" name="repeat"/>
+		<event controllable="0" name="stop"/>
+		<event controllable="1" name="turn"/>
+		<event controllable="1" name="vacuum"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="176" y="16"/></rendering>
+			<label name="s0">
+				<rendering><point x="12" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="80"/></rendering>
+			<label name="s1">
+				<rendering><point x="12" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="144"/></rendering>
+			<label name="s2">
+				<rendering><point x="12" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="208"/></rendering>
+			<label name="s3">
+				<rendering><point x="12" y="8"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="272"/></rendering>
+			<label name="s4">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="176" y="336"/></rendering>
+			<label name="s5">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="176" y="400"/></rendering>
+			<label name="s6">
+				<rendering><point x="14" y="8"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="s2"/>
+			<target name="s3"/>
+			<labelGroup>
+				<rendering><point x="5" y="2"/></rendering>
+				<label name="vacuum"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s1"/>
+			<target name="s2"/>
+			<labelGroup>
+				<rendering><point x="-30" y="7"/></rendering>
+				<label name="done_turn"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="244" y="235"/></rendering>
+			<source name="s1"/>
+			<target name="s6"/>
+			<labelGroup>
+				<rendering><point x="-33" y="-33"/></rendering>
+				<label name="error_turn"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s4"/>
+			<target name="s5"/>
+			<labelGroup>
+				<rendering><point x="4" y="0"/></rendering>
+				<label name="counter"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="5" y="-1"/></rendering>
+				<label name="turn"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="87" y="234"/></rendering>
+			<source name="s5"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-44" y="77"/></rendering>
+				<label name="counter_less_than_12"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s5"/>
+			<target name="s6"/>
+			<labelGroup>
+				<rendering><point x="-42" y="-4"/></rendering>
+				<label name="counter_equals_12"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s3"/>
+			<target name="s4"/>
+			<labelGroup>
+				<rendering><point x="-32" y="-6"/></rendering>
+				<label name="done_vacuum"/>
+				<label name="error_vacuum">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="58" y="294"/></rendering>
+			<source name="s6"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="25" y="83"/></rendering>
+				<label name="repeat"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="177" y="442"/></rendering>
+			<source name="s6"/>
+			<labelGroup>
+				<rendering><point x="-49" y="-16"/></rendering>
+				<label name="recover"/>
+				<label name="operator_input">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="done_recover">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="stop">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

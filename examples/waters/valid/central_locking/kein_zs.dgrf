@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="kein_zs" version="1.0" valid="1"
+	hasGeometry="1" width="185" height="64"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:48:57 GMT" modificationDate="2004-09-07 08:48:57 GMT">
+	<events>
+		<event controllable="1" name="kein_ZS"/>
+		<event controllable="0" name="tuer_auf.FT"/>
+		<event controllable="0" name="tuer_zu.FT"/>
+		<event controllable="1" name="ZS"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="48" y="48"/></rendering>
+			<label name="AUF">
+				<rendering><point x="-12" y="20"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="144" y="48"/></rendering>
+			<label name="ZU">
+				<rendering><point x="-8" y="20"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="12" y="43"/></rendering>
+			<source name="AUF"/>
+			<labelGroup>
+				<rendering><point x="-6" y="-13"/></rendering>
+				<label name="kein_ZS"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="96" y="58"/></rendering>
+			<source name="AUF"/>
+			<target name="ZU"/>
+			<labelGroup>
+				<rendering><point x="-32" y="11"/></rendering>
+				<label name="tuer_zu.FT"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="96" y="38"/></rendering>
+			<source name="ZU"/>
+			<target name="AUF"/>
+			<labelGroup>
+				<rendering><point x="-29" y="-4"/></rendering>
+				<label name="tuer_auf.FT"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="183" y="47"/></rendering>
+			<source name="ZU"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-18"/></rendering>
+				<label name="ZS"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

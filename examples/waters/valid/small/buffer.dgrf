@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="buffer" version="1.0" valid="1"
+	hasGeometry="1" width="219" height="75"
+	generatorName="DGE" generatorVersion="2.7.3"
+	creationDate="2000-10-10 12:20:21 GMT+00:00" modificationDate="2000-10-10 12:20:21 GMT+00:00">
+	<events>
+		<event controllable="0" name="finish.1"/>
+		<event controllable="1" name="start.1"/>
+		<event controllable="1" name="start.2"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="304" y="176"/></rendering>
+			<label name="full">
+				<rendering><point x="2" y="23"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="176" y="176"/></rendering>
+			<label name="empty">
+				<rendering><point x="-19" y="31"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="237" y="192"/></rendering>
+			<source name="full"/>
+			<target name="empty"/>
+			<labelGroup>
+				<rendering><point x="-16" y="12"/></rendering>
+				<label name="start.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="238" y="160"/></rendering>
+			<source name="empty"/>
+			<target name="full"/>
+			<labelGroup>
+				<rendering><point x="-16" y="-5"/></rendering>
+				<label name="finish.1"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="134" y="176"/></rendering>
+			<source name="empty"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-12"/></rendering>
+				<label name="start.1"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

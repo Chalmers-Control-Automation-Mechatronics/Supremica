@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="chg_value" version="1.0" valid="1"
+	hasGeometry="1" width="117" height="65"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-05 08:28:06 GMT+00:00" modificationDate="2000-10-05 08:28:06 GMT+00:00">
+	<events>
+		<event controllable="1" name="chg_value.1"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="112"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="139" y="85"/></rendering>
+			<source name="s0"/>
+			<labelGroup>
+				<rendering><point x="9" y="12"/></rendering>
+				<label name="chg_value.1"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

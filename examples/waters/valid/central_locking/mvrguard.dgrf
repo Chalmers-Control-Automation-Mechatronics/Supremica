@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="mvrguard" version="1.0" valid="1"
+	hasGeometry="1" width="213" height="99"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:49:31 GMT" modificationDate="2004-09-07 08:49:31 GMT">
+	<events>
+		<event controllable="1" name="MVR_an.TUER"/>
+		<event controllable="1" name="MVR_aus.TUER"/>
+		<event controllable="1" name="start_ER.TUER"/>
+		<event controllable="1" name="start_VR.TUER"/>
+		<event controllable="1" name="start_ZS.TUER"/>
+		<event controllable="1" name="stop_ER.TUER"/>
+		<event controllable="1" name="stop_VR.TUER"/>
+		<event controllable="1" name="stop_ZS.TUER"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="64"/></rendering>
+			<label name="IDLE">
+				<rendering><point x="13" y="6"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="64"/></rendering>
+			<label name="RUN">
+				<rendering><point x="-40" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="160" y="50"/></rendering>
+			<source name="RUN"/>
+			<target name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-2"/></rendering>
+				<label name="MVR_aus.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="159" y="78"/></rendering>
+			<source name="IDLE"/>
+			<target name="RUN"/>
+			<labelGroup>
+				<rendering><point x="-26" y="11"/></rendering>
+				<label name="MVR_an.TUER"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="74" y="63"/></rendering>
+			<source name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="-58" y="-33"/></rendering>
+				<label name="start_ER.TUER"/>
+				<label name="stop_ER.TUER">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="start_VR.TUER">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="stop_VR.TUER">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="start_ZS.TUER">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="stop_ZS.TUER">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

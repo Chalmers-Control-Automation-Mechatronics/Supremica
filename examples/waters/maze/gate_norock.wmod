@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="gate_norock" xmlns="http://waters.sourceforge.net/xsd/module">
+<ParameterList>
+<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="unlock"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="gate_norock"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="gate">
+<PointGeometry>
+<Point X="128" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-35" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="208" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="unlocked">
+<PointGeometry>
+<Point X="208" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry>
+<Point X="-35" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="90"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="gate" Target="unlocked">
+<LabelBlock>
+<SimpleIdentifier Name="unlock"/>
+<LabelGeometry>
+<Point X="-21" Y="13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="unlocked" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry>
+<Point X="5" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry>
+<Point X="5" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="223" Y="87"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

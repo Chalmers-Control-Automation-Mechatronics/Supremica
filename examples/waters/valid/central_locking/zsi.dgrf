@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="zsi" version="1.0" valid="1"
+	hasGeometry="1" width="372" height="248"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 08:51:14 GMT" modificationDate="2004-09-07 08:51:14 GMT">
+	<events>
+		<event controllable="0" name="tuer_auf.BT"/>
+		<event controllable="0" name="tuer_auf.FT"/>
+		<event controllable="0" name="tuer_zu.BT"/>
+		<event controllable="0" name="tuer_zu.FT"/>
+		<event controllable="1" name="ZSA"/>
+		<event controllable="1" name="ZSI"/>
+		<event controllable="0" name="zuendung_an"/>
+		<event controllable="0" name="zuendung_aus"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="192" y="224"/></rendering>
+			<label name="ZU">
+				<rendering><point x="-14" y="20"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="96" y="80"/></rendering>
+			<label name="AUS2">
+				<rendering><point x="-13" y="-12"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="96" y="176"/></rendering>
+			<label name="AUS1">
+				<rendering><point x="9" y="-6"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="96" y="272"/></rendering>
+			<label name="AUS0">
+				<rendering><point x="0" y="17"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="80"/></rendering>
+			<label name="AN2">
+				<rendering><point x="9" y="2"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="176"/></rendering>
+			<label name="AN1">
+				<rendering><point x="11" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="304" y="272"/></rendering>
+			<label name="AN0">
+				<rendering><point x="8" y="3"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="56" y="268"/></rendering>
+			<source name="AUS0"/>
+			<labelGroup>
+				<rendering><point x="-24" y="6"/></rendering>
+				<label name="ZSA"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="AUS0"/>
+			<target name="AN0"/>
+			<labelGroup>
+				<rendering><point x="-40" y="13"/></rendering>
+				<label name="zuendung_an"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="86" y="224"/></rendering>
+			<source name="AUS0"/>
+			<target name="AUS1"/>
+			<labelGroup>
+				<rendering><point x="-63" y="-7"/></rendering>
+				<label name="tuer_auf.FT"/>
+				<label name="tuer_auf.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="342" y="268"/></rendering>
+			<source name="AN0"/>
+			<labelGroup>
+				<rendering><point x="1" y="7"/></rendering>
+				<label name="ZSI"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="250" y="242"/></rendering>
+			<source name="AN0"/>
+			<target name="ZU"/>
+			<labelGroup>
+				<rendering><point x="-38" y="-2"/></rendering>
+				<label name="zuendung_aus"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="294" y="224"/></rendering>
+			<source name="AN0"/>
+			<target name="AN1"/>
+			<labelGroup>
+				<rendering><point x="-46" y="-16"/></rendering>
+				<label name="tuer_auf.FT"/>
+				<label name="tuer_auf.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="246" y="254"/></rendering>
+			<source name="ZU"/>
+			<target name="AN0"/>
+			<labelGroup>
+				<rendering><point x="-56" y="8"/></rendering>
+				<label name="zuendung_an"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="218" y="204"/></rendering>
+			<source name="ZU"/>
+			<labelGroup>
+				<rendering><point x="3" y="13"/></rendering>
+				<label name="ZSI"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ZU"/>
+			<target name="AUS1"/>
+			<labelGroup>
+				<rendering><point x="-25" y="-1"/></rendering>
+				<label name="tuer_auf.FT"/>
+				<label name="tuer_auf.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="106" y="224"/></rendering>
+			<source name="AUS1"/>
+			<target name="AUS0"/>
+			<labelGroup>
+				<rendering><point x="-3" y="9"/></rendering>
+				<label name="tuer_zu.FT"/>
+				<label name="tuer_zu.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="55" y="175"/></rendering>
+			<source name="AUS1"/>
+			<labelGroup>
+				<rendering><point x="-24" y="6"/></rendering>
+				<label name="ZSA"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="200" y="161"/></rendering>
+			<source name="AUS1"/>
+			<target name="AN1"/>
+			<labelGroup>
+				<rendering><point x="-34" y="-2"/></rendering>
+				<label name="zuendung_an"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="86" y="128"/></rendering>
+			<source name="AUS1"/>
+			<target name="AUS2"/>
+			<labelGroup>
+				<rendering><point x="-65" y="-5"/></rendering>
+				<label name="tuer_auf.FT"/>
+				<label name="tuer_auf.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="314" y="224"/></rendering>
+			<source name="AN1"/>
+			<target name="AN0"/>
+			<labelGroup>
+				<rendering><point x="0" y="3"/></rendering>
+				<label name="tuer_zu.FT"/>
+				<label name="tuer_zu.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="200" y="191"/></rendering>
+			<source name="AN1"/>
+			<target name="AUS1"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-7"/></rendering>
+				<label name="zuendung_aus"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="342" y="173"/></rendering>
+			<source name="AN1"/>
+			<labelGroup>
+				<rendering><point x="2" y="3"/></rendering>
+				<label name="ZSI"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="294" y="128"/></rendering>
+			<source name="AN1"/>
+			<target name="AN2"/>
+			<labelGroup>
+				<rendering><point x="-65" y="-11"/></rendering>
+				<label name="tuer_auf.FT"/>
+				<label name="tuer_auf.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="314" y="128"/></rendering>
+			<source name="AN2"/>
+			<target name="AN1"/>
+			<labelGroup>
+				<rendering><point x="4" y="-7"/></rendering>
+				<label name="tuer_zu.FT"/>
+				<label name="tuer_zu.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="342" y="77"/></rendering>
+			<source name="AN2"/>
+			<labelGroup>
+				<rendering><point x="1" y="4"/></rendering>
+				<label name="ZSI"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="200" y="95"/></rendering>
+			<source name="AN2"/>
+			<target name="AUS2"/>
+			<labelGroup>
+				<rendering><point x="-39" y="-3"/></rendering>
+				<label name="zuendung_aus"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="106" y="128"/></rendering>
+			<source name="AUS2"/>
+			<target name="AUS1"/>
+			<labelGroup>
+				<rendering><point x="-1" y="-5"/></rendering>
+				<label name="tuer_zu.FT"/>
+				<label name="tuer_zu.BT">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="200" y="65"/></rendering>
+			<source name="AUS2"/>
+			<target name="AN2"/>
+			<labelGroup>
+				<rendering><point x="-37" y="-2"/></rendering>
+				<label name="zuendung_an"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="58" y="78"/></rendering>
+			<source name="AUS2"/>
+			<labelGroup>
+				<rendering><point x="-24" y="5"/></rendering>
+				<label name="ZSA"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="dreitueren_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.7b5"
+        version="1.0"
+        creationDate="2000-07-06 07:20:50 GMT"
+        modificationDate="2000-10-11 07:52:37 GMT">
+<interface/>
+<definitions>
+<typeDefinition name="HeckTueren" expression="{HT}"/>
+<typeDefinition name="Timers" expression="{FT BT HT}"/>
+<typeDefinition name="NichtFahrerTueren" expression="{BT HT}"/>
+<typeDefinition name="FahrerTueren" expression="{FT}"/>
+<typeDefinition name="VorderTueren" expression="{FT BT}"/>
+<typeDefinition name="Tueren" expression="{FT BT HT}"/>
+</definitions>
+<local>
+<event name="stop_VR"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="stop_VR.$_0" new="stop_VR[$_0]"/>
+</foreach-alias>
+<event name="MER_an"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="MER_an.$_0" new="MER_an[$_0]"/>
+</foreach-alias>
+<event name="soft_ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="stop_ZS"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="stop_ZS.$_0" new="stop_ZS[$_0]"/>
+</foreach-alias>
+<event name="time_ER"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="time_ER.$_0" new="time_ER[$_0]"/>
+</foreach-alias>
+<event name="tuer_auf"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="tuer_auf.$_0" new="tuer_auf[$_0]"/>
+</foreach-alias>
+<event name="start_ER"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="start_ER.$_0" new="start_ER[$_0]"/>
+</foreach-alias>
+<event name="reset"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Timers"/>
+</event>
+<foreach-alias dummy="_0" range="$Timers">
+<alias old="reset.$_0" new="reset[$_0]"/>
+</foreach-alias>
+<event name="MVR_aus"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="MVR_aus.$_0" new="MVR_aus[$_0]"/>
+</foreach-alias>
+<event name="done_ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="async"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="async.$_0" new="async[$_0]"/>
+</foreach-alias>
+<event name="sync"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="sync.$_0" new="sync[$_0]"/>
+</foreach-alias>
+<event name="time_VR"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="time_VR.$_0" new="time_VR[$_0]"/>
+</foreach-alias>
+<event name="MVR_an"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="MVR_an.$_0" new="MVR_an[$_0]"/>
+</foreach-alias>
+<event name="MZS_aus"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="MZS_aus.$_0" new="MZS_aus[$_0]"/>
+</foreach-alias>
+<event name="soft_SER"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="soft_SER.$_0" new="soft_SER[$_0]"/>
+</foreach-alias>
+<event name="soft_CS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="time_ZS"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="time_ZS.$_0" new="time_ZS[$_0]"/>
+</foreach-alias>
+<event name="start_VR"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="start_VR.$_0" new="start_VR[$_0]"/>
+</foreach-alias>
+<event name="soft_ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="done_VR"
+       controllable="1"
+       arity="0">
+</event>
+<event name="time_W"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="time_W.$_0" new="time_W[$_0]"/>
+</foreach-alias>
+<event name="tuer_zu"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="tuer_zu.$_0" new="tuer_zu[$_0]"/>
+</foreach-alias>
+<event name="stop_ER"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="stop_ER.$_0" new="stop_ER[$_0]"/>
+</foreach-alias>
+<event name="start_ZS"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="start_ZS.$_0" new="start_ZS[$_0]"/>
+</foreach-alias>
+<event name="done_ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="MER_aus"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="MER_aus.$_0" new="MER_aus[$_0]"/>
+</foreach-alias>
+<event name="MZS_an"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="MZS_an.$_0" new="MZS_an[$_0]"/>
+</foreach-alias>
+<event name="STZV"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="STZV.$_0" new="STZV[$_0]"/>
+</foreach-alias>
+<event name="timeout"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Timers"/>
+</event>
+<foreach-alias dummy="_0" range="$Timers">
+<alias old="timeout.$_0" new="timeout[$_0]"/>
+</foreach-alias>
+<event name="soft_VR"
+       controllable="1"
+       arity="0">
+</event>
+<event name="CS_ok"
+       controllable="1"
+       arity="0">
+</event>
+<event name="done_SER"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="done_SER.$_0" new="done_SER[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="mer[$TUER]" module="mer_plant">
+<nameParam name="MER_an" value="MER_an[$TUER]"/>
+<nameParam name="MER_aus" value="MER_aus[$TUER]"/>
+</instance>
+</foreach-instance>
+<component graph="tuermodell" kind="plant"/>
+<foreach-instance dummy="TUER" range="$NichtFahrerTueren">
+<instance name="nftuer[$TUER]" module="nftuer_spec">
+<nameParam name="async" value="async[$TUER]"/>
+<nameParam name="CS_ok" value="CS_ok"/>
+<nameParam name="done_ER" value="done_ER"/>
+<nameParam name="done_SER" value="done_SER[FT]"/>
+<nameParam name="done_VR" value="done_VR"/>
+<nameParam name="done_ZS" value="done_ZS"/>
+<nameParam name="reset" value="reset[$TUER]"/>
+<nameParam name="soft_CS" value="soft_CS"/>
+<nameParam name="soft_ER" value="soft_ER"/>
+<nameParam name="soft_SER" value="soft_SER[FT]"/>
+<nameParam name="soft_VR" value="soft_VR"/>
+<nameParam name="soft_ZS" value="soft_ZS"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+<nameParam name="sync" value="sync[$TUER]"/>
+<nameParam name="time_W" value="time_W[$TUER]"/>
+<nameParam name="timeout" value="timeout[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="ttimguard[$TUER]" module="ttimguard_spec">
+<nameParam name="reset" value="reset[$TUER]"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+<nameParam name="time_ER" value="time_ER[$TUER]"/>
+<nameParam name="time_VR" value="time_VR[$TUER]"/>
+<nameParam name="time_W" value="time_W[$TUER]"/>
+<nameParam name="time_ZS" value="time_ZS[$TUER]"/>
+<nameParam name="timeout" value="timeout[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="tklemme[$TUER]" module="tklemme_plant">
+<nameParam name="tuer_auf" value="tuer_auf[$TUER]"/>
+<nameParam name="tuer_zu" value="tuer_zu[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$HeckTueren">
+<instance name="mvr[$TUER]" module="mvr_plant">
+<nameParam name="MVR_an" value="MVR_an[$TUER]"/>
+<nameParam name="MVR_aus" value="MVR_aus[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$HeckTueren">
+<instance name="mzs[$TUER]" module="mzs_plant">
+<nameParam name="MZS_an" value="MZS_an[$TUER]"/>
+<nameParam name="MZS_aus" value="MZS_aus[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="sync[$TUER]" module="sync_spec">
+<nameParam name="async" value="async[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="sync" value="sync[$TUER]"/>
+<nameParam name="tuer_auf" value="tuer_auf[$TUER]"/>
+<nameParam name="tuer_zu" value="tuer_zu[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$FahrerTueren">
+<instance name="ftuer[$TUER]" module="ftuer_spec">
+<nameParam name="async" value="async[$TUER]"/>
+<nameParam name="CS_ok" value="CS_ok"/>
+<nameParam name="done_ER" value="done_ER"/>
+<nameParam name="done_SER" value="done_SER[$TUER]"/>
+<nameParam name="done_VR" value="done_VR"/>
+<nameParam name="done_ZS" value="done_ZS"/>
+<nameParam name="reset" value="reset[$TUER]"/>
+<nameParam name="soft_CS" value="soft_CS"/>
+<nameParam name="soft_ER" value="soft_ER"/>
+<nameParam name="soft_SER" value="soft_SER[$TUER]"/>
+<nameParam name="soft_VR" value="soft_VR"/>
+<nameParam name="soft_ZS" value="soft_ZS"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+<nameParam name="sync" value="sync[$TUER]"/>
+<nameParam name="time_W" value="time_W[$TUER]"/>
+<nameParam name="timeout" value="timeout[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$VorderTueren">
+<instance name="tmotor1[$TUER]" module="tmotor1_spec">
+<nameParam name="MER_an" value="MER_an[$TUER]"/>
+<nameParam name="MER_aus" value="MER_aus[$TUER]"/>
+<nameParam name="MVR_an" value="MVR_an[$TUER]"/>
+<nameParam name="MVR_aus" value="MVR_aus[$TUER]"/>
+<nameParam name="reset" value="reset[$TUER]"/>
+<nameParam name="soft_CS" value="soft_CS"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+<nameParam name="time_ER" value="time_ER[$TUER]"/>
+<nameParam name="time_VR" value="time_VR[$TUER]"/>
+<nameParam name="time_ZS" value="time_ZS[$TUER]"/>
+<nameParam name="STZV" value="STZV[$TUER]"/>
+<nameParam name="timeout" value="timeout[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$HeckTueren">
+<instance name="tmotor2[$TUER]" module="tmotor2_spec">
+<nameParam name="MER_an" value="MER_an[$TUER]"/>
+<nameParam name="MER_aus" value="MER_aus[$TUER]"/>
+<nameParam name="MVR_an" value="MVR_an[$TUER]"/>
+<nameParam name="MVR_aus" value="MVR_aus[$TUER]"/>
+<nameParam name="MZS_an" value="MZS_an[$TUER]"/>
+<nameParam name="MZS_aus" value="MZS_aus[$TUER]"/>
+<nameParam name="reset" value="reset[$TUER]"/>
+<nameParam name="soft_CS" value="soft_CS"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+<nameParam name="time_ER" value="time_ER[$TUER]"/>
+<nameParam name="time_VR" value="time_VR[$TUER]"/>
+<nameParam name="time_ZS" value="time_ZS[$TUER]"/>
+<nameParam name="timeout" value="timeout[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="ttimer[$TUER]" module="ttimer_plant">
+<nameParam name="reset" value="reset[$TUER]"/>
+<nameParam name="time_ER" value="time_ER[$TUER]"/>
+<nameParam name="time_VR" value="time_VR[$TUER]"/>
+<nameParam name="time_W" value="time_W[$TUER]"/>
+<nameParam name="time_ZS" value="time_ZS[$TUER]"/>
+<nameParam name="timeout" value="timeout[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="mvrguard[$TUER]" module="mvrguard_spec">
+<nameParam name="MVR_an" value="MVR_an[$TUER]"/>
+<nameParam name="MVR_aus" value="MVR_aus[$TUER]"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$VorderTueren">
+<instance name="mvrstzv[$TUER]" module="mvrstzv_plant">
+<nameParam name="MVR_an" value="MVR_an[$TUER]"/>
+<nameParam name="MVR_aus" value="MVR_aus[$TUER]"/>
+<nameParam name="STZV" value="STZV[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$HeckTueren">
+<instance name="mzsguard[$TUER]" module="mzsguard_spec">
+<nameParam name="MZS_an" value="MZS_an[$TUER]"/>
+<nameParam name="MZS_aus" value="MZS_aus[$TUER]"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="merguard[$TUER]" module="merguard_spec">
+<nameParam name="MER_an" value="MER_an[$TUER]"/>
+<nameParam name="MER_aus" value="MER_aus[$TUER]"/>
+<nameParam name="start_ER" value="start_ER[$TUER]"/>
+<nameParam name="start_VR" value="start_VR[$TUER]"/>
+<nameParam name="start_ZS" value="start_ZS[$TUER]"/>
+<nameParam name="stop_ER" value="stop_ER[$TUER]"/>
+<nameParam name="stop_VR" value="stop_VR[$TUER]"/>
+<nameParam name="stop_ZS" value="stop_ZS[$TUER]"/>
+</instance>
+</foreach-instance>
+</parts>
+</module>

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="falko" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="CONTROLLABLE" Name="abfahrBereit"/>
+        <Event Kind="UNCONTROLLABLE" Name="abfahrt"/>
+        <Event Kind="UNCONTROLLABLE" Name="ausstiegBeendet"/>
+        <Event Kind="CONTROLLABLE" Name="bereitFahrt"/>
+        <Event Kind="UNCONTROLLABLE" Name="einstiegBeendet"/>
+        <Event Kind="UNCONTROLLABLE" Name="fastAbfahrt"/>
+        <Event Kind="UNCONTROLLABLE" Name="frei"/>
+        <Event Kind="UNCONTROLLABLE" Name="minAbgelaufen"/>
+        <Event Kind="UNCONTROLLABLE" Name="notAktiv[PH]"/>
+        <Event Kind="UNCONTROLLABLE" Name="notAktiv[WH]"/>
+        <Event Kind="UNCONTROLLABLE" Name="tuerenGeoeffnet"/>
+        <Event Kind="UNCONTROLLABLE" Name="tuerenGeschlossen"/>
+        <Event Kind="UNCONTROLLABLE" Name="wendeVollzogen"/>
+        <Event Kind="UNCONTROLLABLE" Name="zugAn[PH]"/>
+        <Event Kind="UNCONTROLLABLE" Name="zugAn[WH]"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="SPEC" Name="abfahrBereitAbort[PH]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="bereitFahrt"/>
+                <EventRef Name="notAktiv[PH]"/>
+                <EventRef Name="zugAn[PH]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="zugAn[PH]" Source="s0" Target="s0"/>
+                <Transition Event="notAktiv[PH]" Source="s0" Target="s1"/>
+                <Transition Event="zugAn[PH]" Source="s1" Target="s0"/>
+                <Transition Event="bereitFahrt" Source="s1" Target="s0"/>
+                <Transition Event="notAktiv[PH]" Source="s1" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="abfahrBereitAbort[WH]">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="bereitFahrt"/>
+                <EventRef Name="notAktiv[WH]"/>
+                <EventRef Name="zugAn[WH]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="zugAn[WH]" Source="s0" Target="s0"/>
+                <Transition Event="notAktiv[WH]" Source="s0" Target="s1"/>
+                <Transition Event="zugAn[WH]" Source="s1" Target="s0"/>
+                <Transition Event="bereitFahrt" Source="s1" Target="s0"/>
+                <Transition Event="notAktiv[WH]" Source="s1" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="abfahrBereitFrei">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="abfahrBereit"/>
+                <EventRef Name="frei"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="frei" Source="s1" Target="s1"/>
+                <Transition Event="abfahrBereit" Source="s1" Target="s0"/>
+                <Transition Event="frei" Source="s0" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="andConditionAbfahrt">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="abfahrt"/>
+                <EventRef Name="bereitFahrt"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="abfahrt" Source="s0" Target="s1"/>
+                <Transition Event="bereitFahrt" Source="s1" Target="s0"/>
+                <Transition Event="abfahrt" Source="s1" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="andConditionFrei">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="bereitFahrt"/>
+                <EventRef Name="frei"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="frei" Source="s0" Target="s1"/>
+                <Transition Event="bereitFahrt" Source="s1" Target="s0"/>
+                <Transition Event="frei" Source="s1" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="bereitFahrtAbort">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="abfahrBereit"/>
+                <EventRef Name="notAktiv[WH]"/>
+                <EventRef Name="zugAn[WH]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="notAktiv[WH]" Source="s1" Target="s1"/>
+                <Transition Event="zugAn[WH]" Source="s1" Target="s0"/>
+                <Transition Event="abfahrBereit" Source="s1" Target="s0"/>
+                <Transition Event="notAktiv[WH]" Source="s0" Target="s1"/>
+                <Transition Event="zugAn[WH]" Source="s0" Target="s0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="einstiegBeendet">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="abfahrBereit"/>
+                <EventRef Name="einstiegBeendet"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="einstiegBeendet" Source="s1" Target="s1"/>
+                <Transition Event="abfahrBereit" Source="s1" Target="s0"/>
+                <Transition Event="einstiegBeendet" Source="s0" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="fastAbfahrt">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="abfahrBereit"/>
+                <EventRef Name="fastAbfahrt"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="fastAbfahrt" Source="s0" Target="s1"/>
+                <Transition Event="abfahrBereit" Source="s1" Target="s0"/>
+                <Transition Event="fastAbfahrt" Source="s1" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="SPEC" Name="minAbgelaufen">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="abfahrBereit"/>
+                <EventRef Name="minAbgelaufen"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="s0">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="s1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="minAbgelaufen" Source="s0" Target="s1"/>
+                <Transition Event="abfahrBereit" Source="s1" Target="s0"/>
+                <Transition Event="minAbgelaufen" Source="s1" Target="s1"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="passagierhalt">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="abfahrBereit"/>
+                <EventRef Name="ausstiegBeendet"/>
+                <EventRef Name="notAktiv[PH]"/>
+                <EventRef Name="tuerenGeoeffnet"/>
+                <EventRef Name="tuerenGeschlossen"/>
+                <EventRef Name="zugAn[PH]"/>
+            </EventRefList>
+            <StateList>
+                <State Name="ausstieg">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="einstieg">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="true" Name="inaktiv">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="oeffnen">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="schliessen"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="ausstiegBeendet" Source="ausstieg" Target="einstieg"/>
+                <Transition Event="tuerenGeoeffnet" Source="oeffnen" Target="ausstieg"/>
+                <Transition Event="abfahrBereit" Source="einstieg" Target="schliessen"/>
+                <Transition Event="zugAn[PH]" Source="inaktiv" Target="oeffnen"/>
+                <Transition Event="notAktiv[PH]" Source="inaktiv" Target="inaktiv"/>
+                <Transition Event="tuerenGeschlossen" Source="schliessen" Target="inaktiv"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="planhalt">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="bereitFahrt"/>
+                <EventRef Name="zugAn[PH]"/>
+                <EventRef Name="zugAn[WH]"/>
+            </EventRefList>
+            <StateList>
+                <State Name="inPlanhalt">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="true" Name="notInPlanhalt">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+            </StateList>
+            <TransitionList>
+                <Transition Event="zugAn[PH]" Source="notInPlanhalt" Target="inPlanhalt"/>
+                <Transition Event="zugAn[WH]" Source="notInPlanhalt" Target="inPlanhalt"/>
+                <Transition Event="bereitFahrt" Source="inPlanhalt" Target="notInPlanhalt"/>
+                <Transition Event="zugAn[WH]" Source="inPlanhalt" Target="inPlanhalt"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="wendehalt">
+            <EventRefList>
+                <EventRef Name=":omega"/>
+                <EventRef Name="notAktiv[WH]"/>
+                <EventRef Name="wendeVollzogen"/>
+                <EventRef Name="zugAn[WH]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="notWendehaltAktiv">
+                    <EventRefList>
+                        <EventRef Name=":omega"/>
+                    </EventRefList>
+                </State>
+                <State Name="wendehaltAktiv"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="notAktiv[WH]" Source="notWendehaltAktiv" Target="notWendehaltAktiv"/>
+                <Transition Event="zugAn[WH]" Source="notWendehaltAktiv" Target="wendehaltAktiv"/>
+                <Transition Event="wendeVollzogen" Source="wendehaltAktiv" Target="notWendehaltAktiv"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="Eigenschaft1" version="1.0" valid="1"
+	hasGeometry="1" width="438" height="255"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-09-07 06:35:28 GMT" modificationDate="2004-09-07 06:35:28 GMT">
+	<events>
+		<event controllable="1" name="bereitFahrt"/>
+		<event controllable="0" name="tuerenGeschlossen"/>
+		<event controllable="0" name="zugAn.PH"/>
+		<event controllable="0" name="zugAn.WH"/>
+	</events>
+	<nodes>
+		<node initial="1">
+			<rendering><point x="145" y="227"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="359" y="227"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="237" y="89"/></rendering>
+			<label name="s2">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="404" y="226"/></rendering>
+			<source name="s1"/>
+			<labelGroup>
+				<rendering><point x="1" y="-18"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="244" y="277"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-51" y="16"/></rendering>
+				<label name="tuerenGeschlossen"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-32" y="16"/></rendering>
+				<label name="zugAn.PH"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="79" y="242"/></rendering>
+			<source name="s0"/>
+			<labelGroup>
+				<rendering><point x="-40" y="-43"/></rendering>
+				<label name="bereitFahrt"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="s2"/>
+			<labelGroup>
+				<rendering><point x="1" y="14"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s2"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="5" y="-11"/></rendering>
+				<label name="zugAn.PH"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="149" y="133"/></rendering>
+			<source name="s2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-37" y="-33"/></rendering>
+				<label name="bereitFahrt"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="264" y="62"/></rendering>
+			<source name="s2"/>
+			<labelGroup>
+				<rendering><point x="10" y="0"/></rendering>
+				<label name="zugAn.WH"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

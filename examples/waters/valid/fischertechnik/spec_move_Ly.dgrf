@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="spec_move_Ly" version="1.0" valid="1"
+	hasGeometry="1" width="646" height="259"
+	generatorName="DGE" generatorVersion="2.7.2"
+	creationDate="2000-10-10 08:12:07 GMT+00:00" modificationDate="2000-10-10 08:12:07 GMT+00:00">
+	<events>
+		<event controllable="1" name="init"/>
+		<event controllable="1" name="init_done"/>
+		<event controllable="1" name="L_back.i"/>
+		<event controllable="1" name="L_forward.i"/>
+		<event controllable="1" name="L_mY1.i"/>
+		<event controllable="1" name="L_mY2.i"/>
+		<event controllable="1" name="L_mY3.i"/>
+		<event controllable="0" name="TL_Y1.i"/>
+		<event controllable="0" name="TL_Y2.i"/>
+		<event controllable="0" name="TL_Y3.i"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="256" y="272"/></rendering>
+			<label name="L_leave_Y2h">
+				<rendering><point x="-52" y="46"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="320" y="96"/></rendering>
+			<label name="start">
+				<rendering><point x="-13" y="-15"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="400" y="272"/></rendering>
+			<label name="L_leave_Y2v">
+				<rendering><point x="-40" y="47"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="272"/></rendering>
+			<label name="L_Y2_Y1">
+				<rendering><point x="-31" y="45"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="480" y="272"/></rendering>
+			<label name="L_Y2_Y3">
+				<rendering><point x="-18" y="44"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="480" y="176"/></rendering>
+			<label name="L_leave_Y3h">
+				<rendering><point x="-9" y="-26"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="208" y="224"/></rendering>
+			<label name="s0">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="448" y="224"/></rendering>
+			<label name="s1">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="176"/></rendering>
+			<label name="L_Y1_Y2">
+				<rendering><point x="-25" y="-21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="176"/></rendering>
+			<label name="L_leave_Y1v">
+				<rendering><point x="-76" y="-22"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="400" y="176"/></rendering>
+			<label name="L_Y3_Y2">
+				<rendering><point x="-29" y="-21"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="96" y="224"/></rendering>
+			<label name="L_Y1">
+				<rendering><point x="-21" y="28"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="320" y="224"/></rendering>
+			<label name="L_Y2">
+				<rendering><point x="15" y="6"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="560" y="224"/></rendering>
+			<label name="L_Y3">
+				<rendering><point x="-6" y="23"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="58" y="223"/></rendering>
+			<source name="L_Y1"/>
+			<labelGroup>
+				<rendering><point x="-45" y="-1"/></rendering>
+				<label name="TL_Y1.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="131" y="198"/></rendering>
+			<source name="L_Y1"/>
+			<target name="L_leave_Y1v"/>
+			<labelGroup>
+				<rendering><point x="-37" y="-25"/></rendering>
+				<label name="L_mY2.i"/>
+				<label name="L_mY3.i">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="init">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s1"/>
+			<target name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="10" y="14"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s1"/>
+			<target name="L_leave_Y3h"/>
+			<labelGroup>
+				<rendering><point x="-7" y="22"/></rendering>
+				<label name="TL_Y3.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y2_Y3"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-18" y="13"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="495" y="300"/></rendering>
+			<source name="L_Y2_Y3"/>
+			<labelGroup>
+				<rendering><point x="16" y="-5"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y2_Y3"/>
+			<target name="L_Y3"/>
+			<labelGroup>
+				<rendering><point x="-11" y="23"/></rendering>
+				<label name="TL_Y3.i"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="318" y="263"/></rendering>
+			<source name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="-19" y="12"/></rendering>
+				<label name="TL_Y2.i"/>
+				<label name="init_done">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="init">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="353" y="255"/></rendering>
+			<source name="L_Y2"/>
+			<target name="L_leave_Y2v"/>
+			<labelGroup>
+				<rendering><point x="-12" y="18"/></rendering>
+				<label name="L_mY3.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="293" y="253"/></rendering>
+			<source name="L_Y2"/>
+			<target name="L_leave_Y2h"/>
+			<labelGroup>
+				<rendering><point x="-24" y="14"/></rendering>
+				<label name="L_mY1.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Y2v"/>
+			<target name="L_Y2_Y3"/>
+			<labelGroup>
+				<rendering><point x="-31" y="14"/></rendering>
+				<label name="L_forward.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="364" y="243"/></rendering>
+			<source name="L_leave_Y2v"/>
+			<target name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="3" y="0"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="383" y="299"/></rendering>
+			<source name="L_leave_Y2v"/>
+			<labelGroup>
+				<rendering><point x="-40" y="5"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y3_Y2"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="1" y="0"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y3_Y2"/>
+			<target name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="-28" y="-14"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="400" y="208"/></rendering>
+			<source name="L_Y3_Y2"/>
+			<labelGroup>
+				<rendering><point x="-22" y="9"/></rendering>
+				<label name="TL_Y3.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="-41" y="-19"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="198" y="114"/></rendering>
+			<source name="start"/>
+			<target name="L_leave_Y1v"/>
+			<labelGroup>
+				<rendering><point x="9" y="-18"/></rendering>
+				<label name="TL_Y1.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="432" y="111"/></rendering>
+			<source name="start"/>
+			<target name="L_leave_Y3h"/>
+			<labelGroup>
+				<rendering><point x="-30" y="-14"/></rendering>
+				<label name="TL_Y3.i"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="161" y="209"/></rendering>
+			<source name="L_leave_Y1v"/>
+			<labelGroup>
+				<rendering><point x="-33" y="2"/></rendering>
+				<label name="init"/>
+				<label name="TL_Y1.i">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Y1v"/>
+			<target name="L_Y1_Y2"/>
+			<labelGroup>
+				<rendering><point x="-29" y="-4"/></rendering>
+				<label name="L_forward.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y2_Y1"/>
+			<target name="L_Y1"/>
+			<labelGroup>
+				<rendering><point x="-28" y="20"/></rendering>
+				<label name="TL_Y1.i"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="134" y="290"/></rendering>
+			<source name="L_Y2_Y1"/>
+			<labelGroup>
+				<rendering><point x="-45" y="11"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y2_Y1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-30" y="8"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Y3h"/>
+			<target name="L_Y3_Y2"/>
+			<labelGroup>
+				<rendering><point x="-15" y="-3"/></rendering>
+				<label name="L_back.i"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="485" y="208"/></rendering>
+			<source name="L_leave_Y3h"/>
+			<labelGroup>
+				<rendering><point x="13" y="3"/></rendering>
+				<label name="init"/>
+				<label name="TL_Y3.i">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="287" y="243"/></rendering>
+			<source name="L_leave_Y2h"/>
+			<target name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="-17" y="-5"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_leave_Y2h"/>
+			<target name="L_Y2_Y1"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-5"/></rendering>
+				<label name="L_back.i"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="239" y="299"/></rendering>
+			<source name="L_leave_Y2h"/>
+			<labelGroup>
+				<rendering><point x="-45" y="0"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="522" y="202"/></rendering>
+			<source name="L_Y3"/>
+			<target name="L_leave_Y3h"/>
+			<labelGroup>
+				<rendering><point x="1" y="-32"/></rendering>
+				<label name="L_mY1.i"/>
+				<label name="L_mY2.i">
+					<rendering><point x="0" y="16"/></rendering>
+				</label>
+				<label name="init">
+					<rendering><point x="0" y="32"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="596" y="218"/></rendering>
+			<source name="L_Y3"/>
+			<labelGroup>
+				<rendering><point x="9" y="12"/></rendering>
+				<label name="TL_Y3.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="-39" y="15"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="s0"/>
+			<target name="L_leave_Y1v"/>
+			<labelGroup>
+				<rendering><point x="-10" y="16"/></rendering>
+				<label name="TL_Y1.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y1_Y2"/>
+			<target name="L_Y2"/>
+			<labelGroup>
+				<rendering><point x="-11" y="-12"/></rendering>
+				<label name="TL_Y2.i"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="L_Y1_Y2"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-9" y="16"/></rendering>
+				<label name="init"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="248" y="207"/></rendering>
+			<source name="L_Y1_Y2"/>
+			<labelGroup>
+				<rendering><point x="-49" y="-15"/></rendering>
+				<label name="TL_Y1.i"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

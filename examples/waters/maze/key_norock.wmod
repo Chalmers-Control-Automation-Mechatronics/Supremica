@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="key_norock" xmlns="http://waters.sourceforge.net/xsd/module">
+<ParameterList>
+<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="pickup"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="key_norock"/>
+<Graph>
+<NodeList>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="key">
+<PointGeometry>
+<Point X="160" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="15" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="key" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="pickup"/>
+<LabelGeometry>
+<Point X="3" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry>
+<Point X="-35" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="145" Y="137"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry>
+<Point X="6" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="177" Y="135"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

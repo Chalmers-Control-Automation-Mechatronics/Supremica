@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="koordwsp_main"
+        legacy="1"
+        arity="0"
+        generatorName="Dpr2Vmod"
+        generatorVersion="2.7b6"
+        version="1.0"
+        creationDate="2000-06-06 06:20:52 GMT"
+        modificationDate="2000-10-31 13:08:08 GMT">
+<interface/>
+<definitions>
+<typeDefinition name="Timers" expression="{FS WSP}"/>
+<typeDefinition name="Counters" expression="{WSP}"/>
+<typeDefinition name="Tueren" expression="{FT BT HT}"/>
+</definitions>
+<local>
+<event name="cod_er"
+       controllable="0"
+       arity="0">
+</event>
+<event name="SERFS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="soft_ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="kein_ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="zuendung_an"
+       controllable="0"
+       arity="0">
+</event>
+<event name="zuendung_aus"
+       controllable="0"
+       arity="0">
+</event>
+<event name="tuer_auf"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="tuer_auf.$_0" new="tuer_auf[$_0]"/>
+</foreach-alias>
+<event name="reset"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Timers"/>
+</event>
+<foreach-alias dummy="_0" range="$Timers">
+<alias old="reset.$_0" new="reset[$_0]"/>
+</foreach-alias>
+<event name="done_ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="TAST"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ctr_lt_max"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Counters"/>
+</event>
+<foreach-alias dummy="_0" range="$Counters">
+<alias old="ctr_lt_max.$_0" new="ctr_lt_max[$_0]"/>
+</foreach-alias>
+<event name="ER_BT"
+       controllable="0"
+       arity="0">
+</event>
+<event name="time"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Timers"/>
+</event>
+<foreach-alias dummy="_0" range="$Timers">
+<alias old="time.$_0" new="time[$_0]"/>
+</foreach-alias>
+<event name="WSP"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ER_FS"
+       controllable="0"
+       arity="0">
+</event>
+<event name="ER_FT"
+       controllable="0"
+       arity="0">
+</event>
+<event name="ER_HK"
+       controllable="0"
+       arity="0">
+</event>
+<event name="soft_SER"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="soft_SER.$_0" new="soft_SER[$_0]"/>
+</foreach-alias>
+<event name="soft_CS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="soft_ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="CS"
+       controllable="0"
+       arity="0">
+</event>
+<event name="cod_ser"
+       controllable="0"
+       arity="0">
+</event>
+<event name="done_VR"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ZSA"
+       controllable="1"
+       arity="0">
+</event>
+<event name="tuer_zu"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="tuer_zu.$_0" new="tuer_zu[$_0]"/>
+</foreach-alias>
+<event name="ER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="autom_VR"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ctr_ge_max"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Counters"/>
+</event>
+<foreach-alias dummy="_0" range="$Counters">
+<alias old="ctr_ge_max.$_0" new="ctr_ge_max[$_0]"/>
+</foreach-alias>
+<event name="ZSI"
+       controllable="1"
+       arity="0">
+</event>
+<event name="done_ZS"
+       controllable="1"
+       arity="0">
+</event>
+<event name="SER"
+       controllable="1"
+       arity="0">
+</event>
+<event name="TASTVR"
+       controllable="0"
+       arity="0">
+</event>
+<event name="timeout"
+       controllable="0"
+       arity="1">
+<posParam pos="0" value="$Timers"/>
+</event>
+<foreach-alias dummy="_0" range="$Timers">
+<alias old="timeout.$_0" new="timeout[$_0]"/>
+</foreach-alias>
+<event name="is_cod_ser"
+       controllable="1"
+       arity="0">
+</event>
+<event name="is_cod_er"
+       controllable="1"
+       arity="0">
+</event>
+<event name="reset_ctr"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Counters"/>
+</event>
+<foreach-alias dummy="_0" range="$Counters">
+<alias old="reset_ctr.$_0" new="reset_ctr[$_0]"/>
+</foreach-alias>
+<event name="VR_BT"
+       controllable="0"
+       arity="0">
+</event>
+<event name="inc_ctr"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Counters"/>
+</event>
+<foreach-alias dummy="_0" range="$Counters">
+<alias old="inc_ctr.$_0" new="inc_ctr[$_0]"/>
+</foreach-alias>
+<event name="soft_VR"
+       controllable="1"
+       arity="0">
+</event>
+<event name="CS_ok"
+       controllable="1"
+       arity="0">
+</event>
+<event name="VR_FS"
+       controllable="0"
+       arity="0">
+</event>
+<event name="VR_FT"
+       controllable="0"
+       arity="0">
+</event>
+<event name="VR_HK"
+       controllable="0"
+       arity="0">
+</event>
+<event name="done_SER"
+       controllable="1"
+       arity="1">
+<posParam pos="0" value="$Tueren"/>
+</event>
+<foreach-alias dummy="_0" range="$Tueren">
+<alias old="done_SER.$_0" new="done_SER[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<component graph="wspcount" kind="spec"/>
+<foreach-instance dummy="NAME" range="{WSP}">
+<instance name="noreset[$NAME]" module="noreset_spec">
+<nameParam name="reset" value="reset[$NAME]"/>
+</instance>
+</foreach-instance>
+<component graph="tuermodell" kind="spec"/>
+<foreach-instance dummy="NAME" range="{WSP}">
+<instance name="ircount[$NAME]" module="ircount_plant">
+<nameParam name="inc_ctr" value="inc_ctr[$NAME]"/>
+<nameParam name="reset_ctr" value="reset_ctr[$NAME]"/>
+<nameParam name="ctr_ge_max" value="ctr_ge_max[$NAME]"/>
+<nameParam name="ctr_lt_max" value="ctr_lt_max[$NAME]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="TUER" range="$Tueren">
+<instance name="tklemme[$TUER]" module="tklemme_plant">
+<nameParam name="tuer_auf" value="tuer_auf[$TUER]"/>
+<nameParam name="tuer_zu" value="tuer_zu[$TUER]"/>
+</instance>
+</foreach-instance>
+<component graph="automvr" kind="spec"/>
+<component graph="eingabe_er" kind="spec"/>
+<component graph="eingabe_fs" kind="spec"/>
+<component graph="crash" kind="spec"/>
+<component graph="decoder" kind="spec"/>
+<foreach-instance dummy="NAME" range="$Timers">
+<instance name="timer[$NAME]" module="timer_plant">
+<nameParam name="reset" value="reset[$NAME]"/>
+<nameParam name="time" value="time[$NAME]"/>
+<nameParam name="timeout" value="timeout[$NAME]"/>
+</instance>
+</foreach-instance>
+<component graph="keine_wsp" kind="spec"/>
+<component graph="zsi" kind="spec"/>
+<component graph="cod_ser" kind="plant"/>
+<component graph="eingabe_ser" kind="spec"/>
+<component graph="eingabe_vr" kind="spec"/>
+<component graph="check_cod_ser" kind="spec"/>
+<component graph="zuendung" kind="plant"/>
+<component graph="kein_zs" kind="spec"/>
+<component graph="wsptime" kind="spec"/>
+<component graph="warten" kind="spec"/>
+<component graph="eingabe_zs" kind="spec"/>
+</parts>
+</module>

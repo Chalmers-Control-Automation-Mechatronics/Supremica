@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+
+<graph name="subsystem"
+       version="1.0"
+       valid="1"
+       hasGeometry="1"
+       width="311"
+       height="163"
+       generatorName="DGE"
+       generatorVersion="2.9b2"
+       creationDate="2004-12-22 01:01:42 GMT"
+       modificationDate="2004-12-22 01:35:57 GMT">
+	<events>
+		<event controllable="1" name="load.1"></event>
+		<event controllable="0" name="put.1"></event>
+		<event controllable="1" name="unload.1"></event>
+	</events>
+	<nodes>
+		<node initial="0" marked="0">
+			<rendering><point x="416" y="240"></point></rendering>
+			<label name="w1">
+				<rendering><point x="11" y="-5"></point></rendering>
+			</label>
+		</node>
+		<node initial="0" marked="0">
+			<rendering><point x="416" y="112"></point></rendering>
+			<label name="i2">
+				<rendering><point x="10" y="-8"></point></rendering>
+			</label>
+		</node>
+		<node initial="0" marked="0">
+			<rendering><point x="256" y="112"></point></rendering>
+			<label name="i1">
+				<rendering><point x="5" y="-10"></point></rendering>
+			</label>
+		</node>
+		<node initial="0" marked="0">
+			<rendering><point x="256" y="240"></point></rendering>
+			<label name="w0">
+				<rendering><point x="10" y="-8"></point></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="160" y="160"></point></rendering>
+			<label name="i0">
+				<rendering><point x="16" y="6"></point></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="0">
+			<rendering><point x="256" y="172"></point></rendering>
+			<source name="w0"></source>
+			<target name="i1"></target>
+			<labelGroup>
+				<rendering><point x="5" y="12"></point></rendering>
+				<label name="put.1"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="210" y="203"></point></rendering>
+			<source name="i0"></source>
+			<target name="w0"></target>
+			<labelGroup>
+				<rendering><point x="-44" y="17"></point></rendering>
+				<label name="unload.1"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="334" y="112"></point></rendering>
+			<source name="i2"></source>
+			<target name="i1"></target>
+			<labelGroup>
+				<rendering><point x="-22" y="-8"></point></rendering>
+				<label name="load.1"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="215" y="131"></point></rendering>
+			<source name="i1"></source>
+			<target name="i0"></target>
+			<labelGroup>
+				<rendering><point x="-28" y="-7"></point></rendering>
+				<label name="load.1"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="333" y="173"></point></rendering>
+			<source name="i1"></source>
+			<target name="w1"></target>
+			<labelGroup>
+				<rendering><point x="1" y="-17"></point></rendering>
+				<label name="unload.1"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="336" y="240"></point></rendering>
+			<source name="w1"></source>
+			<target name="w0"></target>
+			<labelGroup>
+				<rendering><point x="-20" y="-7"></point></rendering>
+				<label name="load.1"></label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="0">
+			<rendering><point x="416" y="170"></point></rendering>
+			<source name="w1"></source>
+			<target name="i2"></target>
+			<labelGroup>
+				<rendering><point x="5" y="9"></point></rendering>
+				<label name="put.1"></label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

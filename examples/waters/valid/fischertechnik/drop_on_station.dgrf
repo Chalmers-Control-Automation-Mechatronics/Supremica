@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="drop_on_station" version="1.0" valid="1"
+	hasGeometry="1" width="470" height="276"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2000-10-10 08:12:04 GMT" modificationDate="2004-09-06 09:39:56 GMT">
+	<events>
+		<event controllable="1" name="L_dropS.ST.1"/>
+		<event controllable="1" name="L_dropS.ST.2"/>
+		<event controllable="1" name="L_pickS.ST.1"/>
+		<event controllable="1" name="L_pickS.ST.2"/>
+		<event controllable="0" name="LS_off.ST"/>
+		<event controllable="0" name="LS_on.ST"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="256" y="192"/></rendering>
+			<label name="part_dropped">
+				<rendering><point x="-43" y="24"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="112" y="224"/></rendering>
+			<label name="station_empty">
+				<rendering><point x="-76" y="23"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="400" y="224"/></rendering>
+			<label name="station_occupied">
+				<rendering><point x="-10" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="256" y="272"/></rendering>
+			<label name="part_pickedup">
+				<rendering><point x="-47" y="-15"/></rendering>
+			</label>
+		</node>
+		<node initial="1">
+			<rendering><point x="256" y="80"/></rendering>
+			<label name="start">
+				<rendering><point x="-14" y="-12"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="start"/>
+			<target name="station_empty"/>
+			<labelGroup>
+				<rendering><point x="-50" y="-6"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="start"/>
+			<target name="station_occupied"/>
+			<labelGroup>
+				<rendering><point x="-2" y="-13"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="85" y="194"/></rendering>
+			<source name="station_empty"/>
+			<labelGroup>
+				<rendering><point x="-56" y="17"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="station_empty"/>
+			<target name="part_dropped"/>
+			<labelGroup>
+				<rendering><point x="-16" y="-22"/></rendering>
+				<label name="L_dropS.ST.1"/>
+				<label name="L_dropS.ST.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="191" y="244"/></rendering>
+			<source name="station_empty"/>
+			<target name="part_pickedup"/>
+			<labelGroup>
+				<rendering><point x="-27" y="-12"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="255" y="155"/></rendering>
+			<source name="part_dropped"/>
+			<labelGroup>
+				<rendering><point x="-23" y="-6"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="331" y="199"/></rendering>
+			<source name="part_dropped"/>
+			<target name="station_occupied"/>
+			<labelGroup>
+				<rendering><point x="-25" y="-8"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="322" y="215"/></rendering>
+			<source name="station_occupied"/>
+			<target name="part_dropped"/>
+			<labelGroup>
+				<rendering><point x="-18" y="16"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="427" y="197"/></rendering>
+			<source name="station_occupied"/>
+			<labelGroup>
+				<rendering><point x="9" y="9"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="station_occupied"/>
+			<target name="part_pickedup"/>
+			<labelGroup>
+				<rendering><point x="-9" y="16"/></rendering>
+				<label name="L_pickS.ST.1"/>
+				<label name="L_pickS.ST.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="178" y="263"/></rendering>
+			<source name="part_pickedup"/>
+			<target name="station_empty"/>
+			<labelGroup>
+				<rendering><point x="-27" y="19"/></rendering>
+				<label name="LS_off.ST"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="255" y="308"/></rendering>
+			<source name="part_pickedup"/>
+			<labelGroup>
+				<rendering><point x="-25" y="14"/></rendering>
+				<label name="LS_on.ST"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

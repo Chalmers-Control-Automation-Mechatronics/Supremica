@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="buffer_sf1" xmlns="http://waters.sourceforge.net/xsd/des">
+    <EventList>
+        <Event Kind="PROPOSITION" Name="@omega"/>
+        <Event Kind="UNCONTROLLABLE" Name="finish_before"/>
+        <Event Kind="CONTROLLABLE" Name="start_after"/>
+        <Event Kind="CONTROLLABLE" Name="start_before"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="SPEC" Name="buffer">
+            <EventRefList>
+                <EventRef Name="@omega"/>
+                <EventRef Name="finish_before"/>
+                <EventRef Name="start_after"/>
+                <EventRef Name="start_before"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="empty">
+                    <EventRefList>
+                        <EventRef Name="@omega"/>
+                    </EventRefList>
+                </State>
+                <State Initial="false" Name="full"/>
+            </StateList>
+            <TransitionList>
+              <Transition Event="start_before" Source="empty" Target="empty"/>
+              <Transition Event="finish_before" Source="empty" Target="full"/>
+              <Transition Event="start_after" Source="full" Target="empty"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>
+

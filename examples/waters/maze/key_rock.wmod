@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="key_rock" xmlns="http://waters.sourceforge.net/xsd/module">
+<ParameterList>
+<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="pickup"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="crush"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
+<EventParameter Kind="UNCONTROLLABLE" Name="clear"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="key_rock"/>
+<Graph>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="key">
+<PointGeometry>
+<Point X="160" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-9" Y="23"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-40" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="key" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="pickup"/>
+<LabelGeometry>
+<Point X="3" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="key" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry>
+<Point X="-34" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry>
+<Point X="7" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry>
+<Point X="-22" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry>
+<Point X="-31" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry>
+<Point X="-15" Y="11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
