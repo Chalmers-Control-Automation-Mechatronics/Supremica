@@ -131,7 +131,7 @@ public class ConfigConverter
 
 		if(st.compareTo("typeA")==0)
 		{
-			stationVisit[20]=true;
+			//stationVisit[20]=true;
 		}
 		else if(st.compareTo("typeB")==0)
 		{
