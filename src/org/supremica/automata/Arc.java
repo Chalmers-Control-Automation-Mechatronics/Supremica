@@ -71,7 +71,16 @@ public class Arc
 	private int endY = -1;
 
 	public Arc(State from, State to, String eventId)
+		throws IllegalArgumentException
 	{
+		if (from == null)
+		{
+			throw new IllegalArgumentException("State from must be non null");
+		}
+		if (to == null)
+		{
+			throw new IllegalArgumentException("State to must be non null");
+		}
 		fromState = from;
 		toState = to;
 		this.eventId = eventId;

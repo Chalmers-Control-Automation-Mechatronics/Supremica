@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata>
+ <Automaton name="com_spec">
+  <Events>
+   <Event id="passtohost" label="passtohost" controllable="true" prioritized="true" />
+   <Event id="getframe" label="getframe" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q_0" initial="true" accepting="true" />
+   <State id="q_1" />
+  </States>
+  <Transitions>
+   <Transition event="passtohost" source="q_1" dest="q_0" />
+   <Transition event="getframe" source="q_0" dest="q_1" />
+  </Transitions>
+ </Automaton>
+</Automata>

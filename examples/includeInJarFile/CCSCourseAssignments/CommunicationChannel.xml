@@ -35,7 +35,7 @@
 		<Transition source="s7" dest="s0" event="rcvack"/>
 	</Transitions>
 </Automaton>
-<Automaton name="channel" type="Specification">
+<Automaton name="channel" type="Plant">
 	<Events>
 		<Event id="cksumerr" label="cksumerr" controllable="false"/>
 		<Event id="cksumerrack" label="cksumerrack" controllable="false"/>
