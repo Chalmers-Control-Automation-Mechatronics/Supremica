@@ -18,9 +18,9 @@ public class EditorAddNodeGroupAction
 	{
 		this.ide = ide;
 
-		putValue(Action.NAME, "Add Group State");
-		putValue(Action.SHORT_DESCRIPTION, "Add Group State");
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/nodegroup.gif")));
+		putValue(Action.NAME, "Add Node Group");
+		putValue(Action.SHORT_DESCRIPTION, "Add Node Group");
+		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/nodegroup16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -30,6 +30,6 @@ public class EditorAddNodeGroupAction
 
 	public void doAction()
 	{
-		System.err.println("Add Group State is not implemented yet!");
+		System.err.println("Add Node Group is not implemented yet!");
 	}
 }

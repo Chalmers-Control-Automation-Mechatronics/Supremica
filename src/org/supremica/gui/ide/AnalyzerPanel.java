@@ -44,6 +44,5 @@ public class AnalyzerPanel
 
 	public void addToolBarEntries(JToolBar toolBar)
 	{
-		toolBar.addSeparator();
 	}
 }

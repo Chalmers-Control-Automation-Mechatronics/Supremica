@@ -20,7 +20,7 @@ public class EditorSelectAction
 
 		putValue(Action.NAME, "Select");
 		putValue(Action.SHORT_DESCRIPTION, "Select");
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/select.gif")));
+		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/select16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)

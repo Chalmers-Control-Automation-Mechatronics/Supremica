@@ -67,7 +67,6 @@ public class EditorPanel
 		toolBar.add(getActions().editorAddNodeGroupAction);
 		toolBar.add(getActions().editorAddEdgeAction);
 		toolBar.add(getActions().editorAddEventAction);
-		toolBar.addSeparator();
 	}
 
 }
