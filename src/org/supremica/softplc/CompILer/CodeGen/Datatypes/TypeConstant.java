@@ -53,9 +53,5 @@ public final class TypeConstant
 	T_WSTRING = new TypeConstant("WSTRING"),
 
 	// Derived datatypes
-	T_DERIVED = new TypeConstant("DERIVED"),
-	/* Things that are not part of the IEC type tree, but similar */
-
-	// Function Block
-	T_FUNCTION_BLOCK = new TypeConstant("FUNCTION_BLOCK");
+		T_DERIVED = new TypeConstant("DERIVED");
 }

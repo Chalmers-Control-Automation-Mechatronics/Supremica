@@ -617,10 +617,7 @@ public abstract class ProgramAndFBBuilder
 	    {
 		emitSTN(arg);
 	    }
-	else if (op == IlSimpleOperator.NOT )
-	    {
-		emitNOT();
-	    }
+	// else if (op == IlSimpleOperator.NOT )
 	else if (op == IlSimpleOperator.S)
 	    {
 		emitS(arg);
@@ -650,7 +647,10 @@ public abstract class ProgramAndFBBuilder
 	    {
 		emitANDN(arg);
 	    }
-	//XXX else if (op == IlSimpleOperator.ORN )
+	else if (op == IlSimpleOperator.ORN )
+		{
+			emitORN(arg);
+		}
 	//XXX else if (op == IlSimpleOperator.XORN)
 	else if (op == IlSimpleOperator.ADD)
 	    {
@@ -1021,7 +1021,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 		if ((var instanceof IECSymbolicVariable) &&
-		    (t == TypeConstant.T_FUNCTION_BLOCK))
+		    (t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1076,7 +1077,8 @@ public abstract class ProgramAndFBBuilder
 		TypeConstant t = var.getType();
 
 		if ((var instanceof IECSymbolicVariable) &&
-		    (t == TypeConstant.T_FUNCTION_BLOCK))
+		    (t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1108,7 +1110,7 @@ public abstract class ProgramAndFBBuilder
     }
 
     /**
-     * emitAND makes a logical AND between TOS value and the inverted argument.
+     * emitANDN makes a logical AND between TOS value and the inverted argument.
      * @param arg an IL BOOL-variable
      */
     private void emitANDN(Object arg)
@@ -1138,7 +1140,8 @@ public abstract class ProgramAndFBBuilder
 		TypeConstant t = var.getType();
 
 		if ((var instanceof IECSymbolicVariable) &&
-		    (t == TypeConstant.T_FUNCTION_BLOCK))
+		    (t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1172,7 +1175,7 @@ public abstract class ProgramAndFBBuilder
 
 
     /**
-     * emitOR makes a logical OR between TOS value and the inverted argument.
+     * emitOR makes a logical OR between TOS value and the argument.
      * @param arg an IL BOOL
      */
     private void emitOR(Object arg)
@@ -1201,7 +1204,9 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && 
+			(t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1220,6 +1225,68 @@ public abstract class ProgramAndFBBuilder
 			end_or = ilRun.append(InstructionConstants.NOP);
 
 			ifeq.setTarget(end_or);
+		    }
+		else
+		    {
+			error("Illegal type or not yet " + "implemented (emitOR)");
+		    }
+	    }
+	else
+	    {
+		error("Not yet implemented");
+	    }
+    }
+
+    /**
+     * emitORN makes a logical ORN between TOS value and the inverted argument.
+     * @param arg an IL BOOL
+     */
+    private void emitORN(Object arg)
+    {
+	if (arg instanceof IECConstant)
+	    {
+		TypeConstant t = ((IECConstant) arg).getType();
+
+		if (t == TypeConstant.T_BOOL)
+		    {
+			if (!((TypeBOOL) arg).getValue())
+			    {    // result ORN FALSE -> TRUE
+				ilRun.append(InstructionConstants.POP);
+				ilRun.append(InstructionConstants.ICONST_1);
+			    }
+
+			// else  result register value, result ORN TRUE -> RESULT
+		    }
+		else
+		    {
+			error("Illegal type or not yet " + "implemented (emitORN)");
+		    }
+	    }
+	else if (arg instanceof IECVariable)
+	    {
+		IECVariable var = (IECVariable) arg;
+		TypeConstant t = var.getType();
+
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && 
+			((IECSymbolicVariable)var).getFieldSelectorType() != null)
+		    {
+				t = ((IECSymbolicVariable) var).getFieldSelectorType();
+		    }
+
+		if (t == TypeConstant.T_BOOL)
+		    {
+			ilRun.append(emitLoadVariable(var));
+
+			InstructionHandle end_orn;
+			BranchInstruction ifne = new IFNE(null);
+
+			ilRun.append(ifne);    // stack = true
+			ilRun.append(InstructionConstants.POP);
+			ilRun.append(new PUSH(constPoolGen, true));
+
+			end_orn = ilRun.append(InstructionConstants.NOP);
+
+			ifne.setTarget(end_orn);
 		    }
 		else
 		    {
@@ -1261,7 +1328,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1316,7 +1384,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+						(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1372,7 +1441,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1452,7 +1522,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+						(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1551,7 +1622,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+						(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1649,7 +1721,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+						(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1748,7 +1821,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+						(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1848,7 +1922,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+						(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -1948,7 +2023,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+			(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }
@@ -2046,7 +2122,8 @@ public abstract class ProgramAndFBBuilder
 		IECVariable var = (IECVariable) arg;
 		TypeConstant t = var.getType();
 
-		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_FUNCTION_BLOCK))
+		if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) &&
+						(((IECSymbolicVariable)var).getFieldSelectorType() != null))
 		    {
 			t = ((IECSymbolicVariable) var).getFieldSelectorType();
 		    }

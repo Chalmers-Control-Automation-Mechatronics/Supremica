@@ -22,7 +22,7 @@ för datatyperna:
     REAL
     BOOL
     WSTRING
-    FB
+    DERIVED (FB)
 
 LDST testat: konstant  variabel
  BOOL        X	       X
@@ -31,14 +31,15 @@ LDST testat: konstant  variabel
  WSTRING     ¤ fungerar ej
 
 
-Filer:
+Filer: variabeltest.il
 ------------------------------
 Test av JMP (JMPC, JMPCN)
+ JMP   X
+ JMPC  X
+ JMPCN X
 
 
-
-
-
+Filer: jmptest.il
 ---------------------------------
 Test av EQ (för att kunna använda i övriga test)
 

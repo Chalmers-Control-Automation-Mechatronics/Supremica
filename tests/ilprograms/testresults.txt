@@ -1,17 +1,18 @@
 Xinitaler = klarade test   (ex. Xar för Anders)
 Vdag.månad = klarade inte test
+?? = inte färdigt
 
 Simple operators:
 -----------------
 Testad för:
-        BOOL DINT REAL WSTRING iFB       avFB
-LD      Xar  Xar  Xar  Xar     Xar       ej imp 25.4
-LDN     Xar  -    -    -       ??
-ST      Xar  Xar  Xar  Xar     Xar
-STN     Xar  -    -    -       ??
-NOT 
-S
-R
+		    BOOL DINT REAL WSTRING iFB       avFB
+LD		    Xar  Xar  Xar  Xar     Xar       ej imp 25.4
+LDN			Xar  -    -    -       ??
+ST			Xar  Xar  Xar  Xar     Xar
+STN			Xar  -    -    -       ??
+NOT			
+S			Xar
+R			Xar
 // S1  
 // R1  
 // CLK 
@@ -20,10 +21,10 @@ R
 // PV  
 // IN  
 // PT  
-AND
-OR
+AND			Xar
+OR			Xar
 //XXX XOR 
-ANDN
+ANDN		Xar
 //XXX ORN 
 //XXX XORN
 ADD
