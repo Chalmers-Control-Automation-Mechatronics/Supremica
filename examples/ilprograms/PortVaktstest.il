@@ -1,19 +1,21 @@
-(*
-FUNCTION_BLOCK Delayer_KK
+FUNCTION_BLOCK Delayer
 	VAR_IN_OUT
 		LOOPS : DINT;
 		L : DINT;
 	END_VAR
-	LD DINT#0
-	ST L
-LOOP :  LD L
-	EQ LOOPS
-	JMPC ENDING
-	CAL PRINT("HEJ")
-	JMP LOOP
+		LD DINT#0
+		ST L
+	LOOP :  LD L
+		EQ LOOPS
+		CAL PRINT("L",L)
+		JMPC ENDING
+		CAL PRINT("HEJ")
+		LD DINT#1
+		ADD L
+		ST L
+		JMP LOOP
 ENDING:
 END_FUNCTION_BLOCK	
-*)
 PROGRAM PortVaktstest
 	VAR
 		(*Insignaler*)
@@ -30,11 +32,9 @@ PROGRAM PortVaktstest
 		Lcnt : DINT;
 		tmp  : BOOL;
 	END_VAR
-(*
 	VAR
 		delay : Delayer;
 	END_VAR
-*)
 
 (*Print start*)
 CAL PRINTLN("Start =", Start)
@@ -103,29 +103,29 @@ END4 :
 	if (KulaMätlyft && MätlyftNere)
 
 *)
-(*	LD DINT#600
-	ST delay.LOOPS
-*)
 
 	LD KulaMatlyft
 	AND MatlyftNere
 	JMPCN END5
 
+	LD DINT#20000
+	ST delay.LOOPS
 
+(*
 		LD DINT#0
 		ST Lcnt
 	LOOP :  LD Lcnt
-		EQ DINT#400
+		EQ DINT#4000
 		JMPC ENDING
-		CAL PRINT("HEJ")
 		LD DINT#1
 		ADD Lcnt
 		ST Lcnt
 		JMP LOOP
 	ENDING:
-
-		LD TRUE
-		ST Matlyft
+*)
+	CAL delay	
+	LD TRUE
+	ST Matlyft
 END5:
 
 END_PROGRAM

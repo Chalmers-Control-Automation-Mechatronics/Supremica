@@ -367,7 +367,7 @@ public class JavaBytecodeGenerator
 
 		// errorsPresentInPOU
 		builder.dumpCode();
-		temp = builder.getTempFile();
+		//temp = builder.getTempFile();
 
 		return null;
 	}
@@ -850,7 +850,7 @@ public class JavaBytecodeGenerator
 		return null;
 	}
 
-        public File getTempFile() {
-	        return temp;
-	}
+    public File getTempFile() {
+    	        return temp;
+    }
 }

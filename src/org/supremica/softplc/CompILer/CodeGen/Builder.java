@@ -17,7 +17,7 @@ public interface Builder
 
 	void dumpCode();
 
-        public File getTempFile();
+    //public File getTempFile();
 
 	void emitVarField(String varName, Object type, boolean global, boolean inputOutputVar);
 

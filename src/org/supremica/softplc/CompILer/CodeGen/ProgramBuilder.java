@@ -26,12 +26,12 @@ public class ProgramBuilder
 	implementedInterfaces = programInterfaces;
 	className = programName;
 
-	try {
-	    temp = File.createTempFile("ilc", ".class");
-	    classFileName = temp.getCanonicalPath();
+	//	try {
+	    //temp = File.createTempFile("ilc", ".class");
+	    classFileName = programName.concat(".class"); //temp.getCanonicalPath();
 	    //temp.deleteOnExit();
-	}
-	catch (Exception e) { System.err.println(e); }
+	    //}
+	    //catch (Exception e) { System.err.println(e); }
 
 	// create the new program class
 	classGen = new ClassGen(className, "java.lang.Object", "<generated>", 
@@ -80,7 +80,7 @@ public class ProgramBuilder
     }
 
     public File getTempFile() {
-	return temp;
+    	return temp;
     }
 
     public void emitDirectInit(IECDirectVariable v, TypeBOOL i)

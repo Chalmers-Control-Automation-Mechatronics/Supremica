@@ -6,7 +6,7 @@ import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
-import java.io.File;
+//import java.io.File;
 
 /**The class ProgramAndFBBuilder handles all common parts of code generation
  * for its sub classes.
