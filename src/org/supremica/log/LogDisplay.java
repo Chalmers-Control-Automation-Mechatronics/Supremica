@@ -70,8 +70,8 @@ public class LogDisplay
 	extends AppenderSkeleton
 	implements Runnable
 {
-	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private static LogDisplay theLogDisplay = null;
+	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private JScrollPane theTextPaneScrollPane;
 	private JTextPane textpane;
 	private StyledDocument doc;

@@ -65,6 +65,7 @@ public class State
 
 	// name is the external identifier, i.e. the string appearing in Supremica
 	private String name = "";
+	
 	private boolean initial = false;
 	private boolean accepting = false;
 	private boolean mutuallyAccepting = false;
@@ -72,15 +73,16 @@ public class State
 	private boolean active = false;
 	private boolean first = false;
 	private boolean last = false;
-	private int cost = UNDEF_COST;
 	private boolean visited = false;
+	private boolean selected = false;
+	
+	private int cost = UNDEF_COST;
 	private State assocState = null;
 	// private Object equivClass = null;
 	private StateSet stateClass = null;	//
 	private int x = UNDEF_POS;
 	private int y = UNDEF_POS;
 	private int radius = 9;
-	private boolean selected = false;
 
 	/** ARASH: this is used to speed up set operations in the AutomatonSynthesizerSingleFixpoint algorithm */
 	public int sethelper;

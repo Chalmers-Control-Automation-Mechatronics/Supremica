@@ -1965,14 +1965,9 @@ public class ActionMan
 
 			if (maxNbrOfStates < currAutomaton.nbrOfStates())
 			{
-				/*
-				StringBuffer msg = new StringBuffer();
 
-				msg.append(currAutomaton + " has " + currAutomaton.nbrOfStates() + " states. ");
-				msg.append("It is not recommended to display an automaton with more than ");
-				msg.append(maxNbrOfStates + " states.\n" + "Do you want to abort viewing?");
-				*/
-
+				// Why isn't this in AutomatonViewer??
+				// Every user of AutomatonViewer has to manage this for himself!?
 				String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() +
 					" states. It is not recommended to display an automaton with more than " +
 					maxNbrOfStates + " states. Do you want to abort viewing?";

@@ -148,7 +148,7 @@ public class AutomatonSynthesizer
 		return didSomething;
 	}
 
-	protected void initializeAcceptingStates()
+	public void initializeAcceptingStates()
 	{
 		Iterator stateIt = theAutomaton.stateIterator();
 
@@ -357,7 +357,7 @@ public class AutomatonSynthesizer
 		return didSomething;
 	}
 
-	protected LinkedList doCoreachable()
+	public LinkedList doCoreachable()
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::doCoreachable");
@@ -385,7 +385,7 @@ public class AutomatonSynthesizer
 				LabeledEvent currEvent = currArc.getEvent(); // theAutomaton.getEvent(currArc.getEventId());
 				State fromState = currArc.getFromState();
 
-				if ((fromState.getCost() != State.MAX_COST) &&!fromState.isVisited())
+				if ((fromState.getCost() != State.MAX_COST) && !fromState.isVisited())
 				{
 					fromState.setVisited(true);
 					stateStack.addLast(fromState);
@@ -428,6 +428,7 @@ public class AutomatonSynthesizer
 		while (stateStack.size() > 0)
 		{
 			State currState = (State) stateStack.removeLast();
+/*
 			Iterator arcIt = currState.incomingArcsIterator();
 
 			while (arcIt.hasNext())
@@ -446,7 +447,7 @@ public class AutomatonSynthesizer
 						newUnsafeStates = true;
 
 						fromState.setCost(State.MAX_COST);
-						stateStack.addLast(fromState);
+						stateStack.addLast(fromState);	// this makes it a fix-point calculation
 
 						if (fromState.isAccepting())
 						{
@@ -455,6 +456,14 @@ public class AutomatonSynthesizer
 					}
 				}
 			}
+*/
+			LinkedList newXstates = doControllable(currState);
+			if(newXstates.size() != 0)
+			{
+				newUnsafeStates = true;
+				nbrOfNewUnsafeStates += newXstates.size();
+				stateStack.addAll(newXstates);	// could be optimized here - adding one linked list to another
+			}
 		}
 
 		logger.debug("found " + nbrOfNewUnsafeStates + " new uncontrollable states");
@@ -462,13 +471,43 @@ public class AutomatonSynthesizer
 		return newUnsafeStates;
 	}
 
-	protected void doReachable()
+	// This one does for one state
+	public LinkedList doControllable(State currState)
+	{
+		LinkedList stateStack = new LinkedList();
+		
+		Iterator arcIt = currState.incomingArcsIterator();
+		while (arcIt.hasNext())
+		{
+			Arc currArc = (Arc) arcIt.next();
+			LabeledEvent currEvent = currArc.getEvent(); // theAutomaton.getEvent(currArc.getEventId());
+
+			if (!currEvent.isControllable())
+			{
+				State fromState = currArc.getFromState();	// backwards over this uc-event
+
+				if (fromState.getCost() != State.MAX_COST)	// if not already forbidden, forbid it
+				{
+					fromState.setCost(State.MAX_COST);
+					stateStack.addLast(fromState);
+
+					if(fromState.isAccepting())
+					{
+						acceptingStates.remove(fromState);
+					}
+				}
+			}
+		}
+		return stateStack;		
+	}
+	
+	public void doReachable()
 	{
 		logger.debug("AutomatonSynthesizer::doReachable");
 
 		theAutomaton.clearVisitedStates();
 
-		// Push all marked states on the stack
+		// Push the initial state on the stack
 		// Mark the state as visited
 		State initialState = theAutomaton.getInitialState();
 		LinkedList stateStack = new LinkedList();
@@ -516,7 +555,6 @@ public class AutomatonSynthesizer
 				currState.setCost(State.MAX_COST);
 			}
 		}
-
 	}
 
 	/**
@@ -562,7 +600,7 @@ public class AutomatonSynthesizer
 		}
 	}
 
-	protected void purge()
+	public void purge()
 	{
 		List stateList = new LinkedList();
 

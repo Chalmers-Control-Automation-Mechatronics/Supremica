@@ -673,6 +673,7 @@ public class Automaton
 		return theStates;
 	}
 
+	// Note, searches on id - only call this with states in this automaton
 	public State getState(State state)
 		throws IllegalArgumentException
 	{
@@ -1265,7 +1266,16 @@ public class Automaton
 			currState.setVisited(false);
 		}
 	}
+	public void clearSelectedStates()
+	{
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
 
+			currState.setSelected(false);
+		}
+	}
+	
 	private void removeAssociatedStateFromUnvisitedStates()
 	{
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )

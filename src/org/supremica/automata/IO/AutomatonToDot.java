@@ -95,19 +95,19 @@ public class AutomatonToDot
 		this.useColors = useColors;
 	}
 
-	private String getColor(State s)
+	protected String getColor(State s)
 	{
 		if (!useColors)
 		{
 			return "";
 		}
 
-		if (s.isAccepting() &&!s.isForbidden())
+		if (s.isAccepting() && !s.isForbidden())
 		{
 			return ", color = green";
 		}
 
-		if (s.isMutuallyAccepting() &&!s.isForbidden())
+		if (s.isMutuallyAccepting() && !s.isForbidden())
 		{
 			return ", color = yellow";
 		}

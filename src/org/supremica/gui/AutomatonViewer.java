@@ -113,4 +113,9 @@ public class AutomatonViewer
 
 		return serializer;
 	}
+	
+	public Automaton getAutomaton()
+	{
+		return theAutomaton;
+	}
 }

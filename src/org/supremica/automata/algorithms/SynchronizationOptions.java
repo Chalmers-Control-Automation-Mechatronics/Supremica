@@ -54,19 +54,19 @@ import org.supremica.properties.SupremicaProperties;
 public final class SynchronizationOptions
 {
 	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
-	private SynchronizationType syncType;
-	private boolean forbidUnconStates;
-	private boolean expandForbiddenStates;
+	private SynchronizationType syncType;	// Prioritized, Full, Broadcast, Unknown
+	private boolean forbidUnconStates;		// mark uc-states as uncontrollable
+	private boolean expandForbiddenStates;	// expand beyond an uc-state
 	private int initialHashtableSize;
 	private boolean expandHashtable;
 	private int nbrOfExecuters;
-	private boolean terminateIfUnconStates;
-	private boolean buildAutomaton;
-	private boolean expandEventsUsingPriority;
-	private boolean verboseMode;
-	private boolean requireConsistentControllability;
-	private boolean requireConsistentImmediate;
-	private boolean rememberDisabledEvents;
+	private boolean terminateIfUnconStates;	// don't stop just because an uc-state found
+	private boolean buildAutomaton;			// add also the arcs
+	private boolean expandEventsUsingPriority;	// ??
+	private boolean verboseMode;				// write stuff on debug window
+	private boolean requireConsistentControllability;	// check that common events have same controllability
+	private boolean requireConsistentImmediate;			// check that common evenst have same immediaticity
+	private boolean rememberDisabledEvents;		// redirect disabled transitions to forbidden dump-state
 	private boolean dialogOK = false;
 
 	public SynchronizationOptions()
@@ -83,11 +83,50 @@ public final class SynchronizationOptions
 			true, 	// buildAutomaton
 			SupremicaProperties.verboseMode(),
 			true, 	// requireConsistentControllability
-			true,
-			false);	// requireConsistentImmediate
+			true,	// requireConsistentImmediate
+			false);	// rememberDisabledEvents
 	}
 
-	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
+	// This one's so we only have to care about "relevant" options
+	public SynchronizationOptions(SynchronizationType syncType,
+								  boolean forbidUnconStates, 
+								  boolean expandForbiddenStates, 
+								  boolean terminateIfUnconState, 
+								  boolean expandEventsUsingPriority, 
+								  boolean buildAutomaton, 
+								  boolean verboseMode, 
+								  boolean requireConsistentControllability, 
+								  boolean requireConsistentImmediate, 
+								  boolean rememberDisabledEvents)
+	{
+		this(SupremicaProperties.syncNbrOfExecuters(),
+			syncType,
+			SupremicaProperties.syncInitialHashtableSize(),
+			SupremicaProperties.syncExpandHashtable(),
+			forbidUnconStates,
+			expandForbiddenStates, 
+			terminateIfUnconState, 
+			expandEventsUsingPriority, 
+			buildAutomaton, 
+			verboseMode, 
+			requireConsistentControllability, 
+			requireConsistentImmediate, 
+			rememberDisabledEvents);
+	}
+	
+	public SynchronizationOptions(int nbrOfExecuters, 
+								  SynchronizationType syncType, 
+								  int initialHashtableSize, 
+								  boolean expandHashtable, 
+								  boolean forbidUnconStates, 
+								  boolean expandForbiddenStates, 
+								  boolean terminateIfUnconState, 
+								  boolean expandEventsUsingPriority, 
+								  boolean buildAutomaton, 
+								  boolean verboseMode, 
+								  boolean requireConsistentControllability, 
+								  boolean requireConsistentImmediate, 
+								  boolean rememberDisabledEvents)
 		throws IllegalArgumentException
 	{
 		if (syncType == null)

@@ -70,6 +70,11 @@ class MainPopupMenu
 		menuHandler.add(synthesizeItem, 1);
 
 		menuHandler.addSeparator();
+		
+		JMenuItem workbench = new SupremicaMenuItem(new WorkbenchAction());
+		menuHandler.add(workbench, 1);
+
+		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
 		menuHandler.add(purgeItem, 1);

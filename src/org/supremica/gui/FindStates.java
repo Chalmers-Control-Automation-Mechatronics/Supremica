@@ -1055,6 +1055,7 @@ public class FindStates
 		putValue(SHORT_DESCRIPTION, "Specify and search for significant states");
 	}
 
+	// Note, we avoid (short-circut) the ActionMan here... should we?
 	public void actionPerformed(ActionEvent e)
 	{
 		VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();

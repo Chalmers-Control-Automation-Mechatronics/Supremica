@@ -1,5 +1,5 @@
 
-// ** MF ********************* Utility.java *******************//
+// ** MF ********************* CenteredFrame.java *******************//
 // ** license, blah blah blah **//
 // Heap of useful classes we should all use
 package org.supremica.gui;

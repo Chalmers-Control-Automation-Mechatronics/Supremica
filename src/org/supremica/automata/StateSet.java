@@ -82,6 +82,11 @@ public class StateSet
 		return theSet.add(state);
 	}
 
+	public boolean add(Collection collection)
+	{
+		return theSet.addAll(collection);
+	}
+	
 	public void clear()
 	{
 		theSet.clear();
