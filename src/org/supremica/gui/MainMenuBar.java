@@ -336,6 +336,21 @@ public class MainMenuBar
 						ActionMan.fileImportRobotCoordination(ActionMan.getGui());
 					}
 				});
+
+				// Domenico
+				JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem();
+
+				menuFileImportRobotCoordinationABB.setText("From Robot Coordinator ABB...");
+				menuFileImport.add(menuFileImportRobotCoordinationABB);
+				menuFileImportRobotCoordinationABB.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileImportRobotCoordinationABB(ActionMan.getGui());
+					}
+				});
+				// Domenico
+
 			}
 
 			separatorNeeded = true;

@@ -53,9 +53,13 @@ package org.supremica.automata.algorithms;
   java -classpath .;c:\programs\supremica\build;c:\programs\supremica\lib/unjared RobotStudioLink
 */
 
-import org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.*;
-import org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.enum.RsKinematicRole;
-import org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.enum.RsSimulationState;
+// Domenico
+import org.supremica.external.robotCoordinationABB.CreateXml;
+// Domenico
+
+import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.*;
+import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsKinematicRole;
+import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsSimulationState;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 import java.util.*;
@@ -91,6 +95,10 @@ public class RobotStudioLink
 	private static String stationName;
 	/** The Supremica gui. */
 	private static Gui gui;
+
+	// Domenico
+	private static int nbrOfTimesCollision = 0;
+	// Domenico
 
 	// Constants
 	/** The name of the IPart containing the mutex zones. */
@@ -199,7 +207,7 @@ End Sub
 		}
 		catch (Exception ex)
 		{
-			logger.error("Test crasched." + ex);
+			logger.error("Test crashed." + ex);
 		}
 	}
 
@@ -229,7 +237,7 @@ End Sub
 		}
 		catch (Exception ex)
 		{
-			logger.error("Test crasched." + ex);
+			logger.error("Test crashed." + ex);
 		}
 	}
 
@@ -244,7 +252,7 @@ End Sub
 			return;
 
 		// Create mutex zones
-		NEWcreateMutexZones();
+		createMutexZones();
 
 		// Wait for user
 		int n = JOptionPane.showConfirmDialog(gui.getComponent(), "Extract automata?", "Extract automata", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -338,7 +346,8 @@ End Sub
 				logger.info("Starting the Virtual Controller...");
 				IABBS4Controller controller = robot.startABBS4Controller(true);
 				// Wait for controller start
-				mechanismListener.waitForControllerStart();
+				//mechanismListener.waitForControllerStart();
+				//D: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
 				mechanismListener.setController(controller);
 				// Add SimulationListener
 				ISimulation simulation = activeStation.getSimulations().item(var(1));
@@ -346,7 +355,11 @@ End Sub
 				SimulationListener simulationListener = new SimulationListener();
 				sim.addDSimulationEventsListener(simulationListener);
 				// Start a thread running the simulation in RobotStudio
+				// Domenico
+				nbrOfTimesCollision = 1;
+				// Domenico
 				simulation.start();
+
 				// Wait for the simulation to stop
 				simulationListener.waitForSimulationStop();
 
@@ -357,7 +370,7 @@ End Sub
 				gui.addAutomaton(robotAutomaton);
 
 				// Adjust mutex automata
-				//for (Iterator autIt = mutexAutomata.iterator(); autIt.hasNext();)
+				// for (Iterator autIt = mutexAutomata.iterator(); autIt.hasNext();)
 				for (int j=0; j<mutexAutomata.size(); j++)
 				{
 					//Automaton mutexAutomaton = (Automaton) autIt.next();
@@ -391,6 +404,8 @@ End Sub
 		return;
 	}
 
+
+	//D: so far the following method is never used
 	public static void NEWextractAutomata()
 	{
 		try
@@ -428,7 +443,8 @@ End Sub
 				logger.info("Starting the Virtual Controller...");
 				IABBS4Controller controller = robot.startABBS4Controller(true);
 				// Wait for controller start
-				mechanismListener.waitForControllerStart();
+				// mechanismListener.waitForControllerStart();
+				//D H: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
 				mechanismListener.setController(controller);
 
 				// Simulate program path by path
@@ -631,7 +647,7 @@ End Sub
 
 	/**
 	 * Creates mutex zones that supposedly guarantees no collisions between
-	 * robots.
+	 * robots. Generates span for each robot and then calculates the intersection.
      */
 	public static void NEWcreateMutexZones()
 	{
@@ -676,7 +692,7 @@ End Sub
 			}
 
 			// Create automata for each entity in the IPart called mutexPartName
-			createMutexAutomata();
+			//createMutexAutomata();    // domenico
 		}
 		catch (Exception ex)
 		{
@@ -711,6 +727,17 @@ End Sub
 			{
 				activeStation = app.getActiveStation();
 				activeStation.getParts().item(var(mutexPartName));
+
+				// Domenico
+				try
+				{
+				CreateXml.createXmlStation(activeStation);
+				}
+				catch (Exception u)
+				{
+					logger.error("Error with xmlst");
+				}
+				// Domenico
 			}
 			catch (ComJniException ex)
 			{
@@ -726,9 +753,9 @@ End Sub
 
 			// CRASHES HERE IF ZONES ALREADY CREATED! FIXA!
 			// Create three boxes (IEntity:s), members of the IPart mutexPartName
-			createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneA");
-			createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneB");
-			createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");
+			// createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneA");
+			// createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneB");
+			// createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");
 			// 3 equal boxes
 			//createBox(-0.1875, 0.1875, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneA");
 			//createBox(-0.1875, -0.5625, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneB");
@@ -769,7 +796,7 @@ End Sub
 			*/
 
 			// Create automata for each entity in the IPart called mutexPartName
-			createMutexAutomata();
+			//createMutexAutomata();                                     //Domenico
 		}
 		catch (Exception ex)
 		{
@@ -824,7 +851,7 @@ End Sub
 		transform.setRz(rz);
 		IEntity newBox = mutexPart.createSolidBox(transform,wx,wy,wz);
 
-		// Kraftblå but relatively transparent and with a catchy name
+		// Very blue but relatively transparent and with a catchy name
 		newBox.setVisible(false);
 		newBox.setRelativeTransparency((float) 0.75);
 		//newBox.setRelativeTransparency((float) 0.9);
@@ -836,7 +863,7 @@ End Sub
 	/**
 	 * Generates a 3D object (IEntity) representing the span of robot.
 	 */
-	private static void generateSpan(IMechanism robot)
+	public static void generateSpan(IMechanism robot)
 		throws Exception
 	{
 		IABBS4Controller controller = startController(robot);
@@ -985,7 +1012,6 @@ End Sub
 		throws Exception
 	{
 		IABBS4Controller controller;
-
 		try
 		{
 			controller = robot.getController();
@@ -1004,8 +1030,11 @@ End Sub
 		// Start virtual controller
 		activeStation.setActiveMechanism((IMechanism2) robot);
 		controller = robot.startABBS4Controller(true);
+
 		// Wait for controller start
-		mechanismListener.waitForControllerStart();
+		//mechanismListener.waitForControllerStart();
+		//D H: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
+
 		mech.remove_MechanismEventsListener(mechanismListener);
 
 		return controller;
@@ -1094,17 +1123,17 @@ End Sub
 		//logger.info("Station being opened...");
     	return 0;
   	}
-  	public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.Station Station)
+  	public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.Station Station)
   	{
 		logger.info("Station opened.");
     	return 0;
   	}
-  	public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.Station Station,boolean[] Cancel)
+  	public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.Station Station,boolean[] Cancel)
   	{
 		//logger.info("Station being saved...");
     	return 0;
   	}
-  	public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.Station Station)
+  	public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.Station Station)
   	{
 		logger.info("Station saved...");
     	return 0;
@@ -1114,17 +1143,17 @@ End Sub
 		//logger.info("Library being opened...");
     	return 0;
   	}
-	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject)
+	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject RsObject)
   	{
 		//logger.info("Library opened.");
     	return 0;
   	}
-  	public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject,boolean[] Cancel)
+  	public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject RsObject,boolean[] Cancel)
   	{
 		//logger.info("Library being saved...");
     	return 0;
   	}
-  	public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject)
+  	public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject RsObject)
   	{
 		//logger.info("Library saved.");
     	return 0;
@@ -1410,6 +1439,16 @@ End Sub
 			}
 			return 0;
 		}
+		public int selected()
+		{
+			logger.fatal("Selected");
+			return 0;
+		}
+		public int unSelected()
+		{
+			logger.fatal("Unselected");
+			return 0;
+		}
 		public int tick(float systemTime)
 		{
 			// This is fatal, cause this has never ever happened
@@ -1441,7 +1480,11 @@ End Sub
 					data.setStartTime(controller.getMotionTime());
 					logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
 					//createTargetAtTCP(controller.getMechanism().getName() + "Enter" + objectName);
-					createTargetAtTCP("In" + objectName);
+
+					// Domenico
+					createTargetAtTCP("In" + /*objectName + */ "_" + nbrOfTimesCollision);
+					// Domenico
+
 				}
 				data.setCount(data.getCount()+1);
 			}
@@ -1450,7 +1493,7 @@ End Sub
 			}
 			return 0;
 		}
-		public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject collidingObject)
+		public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject collidingObject)
 		{
 			try
 			{
@@ -1471,9 +1514,13 @@ End Sub
 				if (data.getCount() == 0)
 				{
 					data.setEndTime(controller.getMotionTime());
-					logger.info("End of collision with " + objectName+ " at time " + (float) data.endTime);
+					logger.info("End of collision with " + objectName + " at time " + (float) data.endTime);
 					//createTargetAtTCP(controller.getMechanism().getName() + "Exit" + objectName);
-					createTargetAtTCP("Out" + objectName);
+
+					// Domenico
+					createTargetAtTCP("Out" + /*objectName + */ "_" + nbrOfTimesCollision);
+					nbrOfTimesCollision++;
+					// Domenico
 				}
 			}
 			catch (Exception whatever)
@@ -1481,14 +1528,19 @@ End Sub
 			}
 			return 0;
 		}
-		public synchronized int afterControllerStarted()
+		/*public int beforeControllerStarted()
+		{
+			logger.info("BeforeControllerStarted.");
+			return 0;
+		}*/
+		public int afterControllerStarted()
 		{
 			controllerStarted = true;
 			logger.info("Virtual Controller started.");
 			notify();
 			return 0;
 		}
-		public synchronized int afterControllerShutdown()
+		public int afterControllerShutdown()
 		{
 			controllerStarted = false;
 			logger.info("Virtual Controller shut down.");
@@ -1531,7 +1583,6 @@ End Sub
 				{
 					wait();
 				}
-
 				// Make sure the controller is really started before we return
 				Thread.sleep(3000);
 			}
@@ -1725,7 +1776,7 @@ End Sub
 			if (ruu == null)
 				ruu = new RsUnitsUtility();
 			spanPart = activeStation.getParts().add();
-			spanPart.setVisible(false);
+			spanPart.setVisible(true);
 			spanPart.setName(robot.getName() + "_Span");
 			tool0 = robot.getToolFrames().item(var("tool0"));
 			//robot.setActiveToolFrame(tool0);

@@ -104,7 +104,7 @@
 	<unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>	
-	
+	<unjar src="${lib}/interfaceRobotStudio2_1.jar" dest="${lib}/${unjared}"/>	
 
 	<mkdir dir="${lib}/licensed"/>
 	<touch file="${lib}/licensed/JGo.jar"/>	

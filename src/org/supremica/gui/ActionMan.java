@@ -84,6 +84,8 @@ import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 
+import org.supremica.external.robotCoordinationABB.*;
+
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
 abstract class FileImporter
@@ -1939,7 +1941,18 @@ public class ActionMan
 		};
 	}
 
-
+    // Domenico
+    public static void fileImportRobotCoordinationABB(Gui gui)
+		{
+			new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
+			{
+				void openFile(Gui g, File f)
+				{
+					importRobotCoordinationFileABB(g, f);
+				}
+			};
+	}
+    // Domenico
 
 	// Aldebaran format, a simple format for specifying des
 	public static void fileImportAut(Gui gui)
@@ -2226,6 +2239,26 @@ public class ActionMan
 			return;
 		}
 	}
+
+	// Domenico
+	public static void importRobotCoordinationFileABB(Gui gui, File file)
+		{
+
+			// logger.info("Importing " + file.getAbsolutePath() + " ...");
+			gui.info("Importing " + file.getAbsolutePath() + " ...");
+
+			try
+			{
+				ConvertToAutomata.conversionToAutomata(file);
+			}
+			catch (Exception ex)
+			{
+				logger.error("Error while importing " + file.getAbsolutePath(), ex);
+				logger.debug(ex.getStackTrace());
+				return;
+			}
+	}
+	// Domenico
 
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
