@@ -86,6 +86,8 @@ public class AutomatonViewer
 	private static Logger logger = LoggerFactory.createLogger(AutomatonViewer.class);
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5, MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
+	private Process dotProcess;
+	private Builder builder;
 
 	public AutomatonViewer(Automaton theAutomaton)
 		throws Exception
@@ -116,11 +118,13 @@ public class AutomatonViewer
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
+				terminateProcesses();
 				dispose();
 			}
 		});
@@ -294,6 +298,7 @@ public class AutomatonViewer
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
+				terminateProcesses();
 				dispose();
 			}
 		});
@@ -450,7 +455,7 @@ public class AutomatonViewer
 	public void build()
 		throws Exception
 	{
-		Builder builder = new Builder(this);
+		builder = new Builder(this);
 
 		builder.start();
 	}
@@ -510,6 +515,7 @@ public class AutomatonViewer
 			fromDotStream.close();
 		}
 
+
 		try
 		{
 			theGraph = parser.getGraph();
@@ -519,6 +525,23 @@ public class AutomatonViewer
 			logger.error("Exception while getting dot graph", ex);
 
 			throw ex;
+		}
+	}
+
+	public void stopProcess()
+	{
+		if (dotProcess != null)
+		{
+			dotProcess.destroy();
+			updateNeeded = true;
+		}
+	}
+
+	public void terminateProcesses()
+	{
+		if (builder != null)
+		{
+			builder.stopProcess();
 		}
 	}
 
@@ -553,10 +576,6 @@ public class AutomatonViewer
 	private void initializeStreams(String arguments)
 		throws Exception
 	{
-
-		// Create the dot process
-		Process dotProcess;
-
 		try
 		{
 			dotProcess = Runtime.getRuntime().exec(SupremicaProperties.getDotExecuteCommand() + " " + arguments);
@@ -736,6 +755,7 @@ class Builder
 	public Builder(AutomatonViewer theViewer)
 	{
 		this.theViewer = theViewer;
+		setPriority(Thread.MIN_PRIORITY);
 	}
 
 	public void run()
@@ -760,6 +780,14 @@ class Builder
 		else if (mode == DRAW)
 		{
 			theViewer.draw();
+		}
+	}
+
+	public void stopProcess()
+	{
+		if (theViewer != null)
+		{
+			theViewer.stopProcess();
 		}
 	}
 }
