@@ -1,5 +1,5 @@
 
-/************************** Users.java ************************/
+/** Users.java *********************** */
 package org.supremica.testcases;
 
 import org.supremica.automata.AutomatonType;
@@ -7,8 +7,8 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
-import org.supremica.automata.Event;
 import org.supremica.automata.Arc;
+import org.supremica.automata.EventLabel;
 
 class User
 	extends Automaton
@@ -20,10 +20,9 @@ class User
 
 		setType(AutomatonType.Plant);
 
-		// add events
-		Event ai = new Event("a" + id);
-		Event bi = new Event("b" + id);
-		Event ci = new Event("c" + id);
+		EventLabel ai = new EventLabel("a" + id);
+		EventLabel bi = new EventLabel("b" + id);
+		EventLabel ci = new EventLabel("c" + id);
 
 		ai.setControllable(a);
 		bi.setControllable(b);
@@ -62,11 +61,10 @@ class Fifo
 
 		setType(AutomatonType.Specification);
 
-		// add events
-		Event a1 = new Event("a" + id1);
-		Event a2 = new Event("a" + id2);
-		Event b1 = new Event("b" + id1);
-		Event b2 = new Event("b" + id2);
+		EventLabel a1 = new EventLabel("a" + id1);
+		EventLabel a2 = new EventLabel("a" + id2);
+		EventLabel b1 = new EventLabel("b" + id1);
+		EventLabel b2 = new EventLabel("b" + id2);
 
 		a1.setControllable(a);
 		a2.setControllable(a);
@@ -114,11 +112,10 @@ class Mutex
 
 		setType(AutomatonType.Specification);
 
-		// add events
-		Event b1 = new Event("b" + id1);
-		Event b2 = new Event("b" + id2);
-		Event c1 = new Event("c" + id1);
-		Event c2 = new Event("c" + id2);
+		EventLabel b1 = new EventLabel("b" + id1);
+		EventLabel b2 = new EventLabel("b" + id2);
+		EventLabel c1 = new EventLabel("c" + id1);
+		EventLabel c2 = new EventLabel("c" + id2);
 
 		b1.setControllable(b);
 		b2.setControllable(b);

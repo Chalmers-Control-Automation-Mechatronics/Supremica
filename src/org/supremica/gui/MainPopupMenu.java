@@ -1,30 +1,21 @@
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.*;
-import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 
-
 class MainPopupMenu
 	extends JPopupMenu
 {
-
 	private MenuHandler menuHandler = null;
 
 	// local utilities
@@ -36,7 +27,6 @@ class MainPopupMenu
 	// except for access, these are copied straight from gui.Supremica
 	private void initPopups()
 	{
-
 		JMenuItem selectAllItem = new JMenuItem("Select all");
 
 		menuHandler.add(selectAllItem, 0);
@@ -61,7 +51,6 @@ class MainPopupMenu
 			menuHandler.add(viewItem, 1);
 			viewItem.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.automatonView_actionPerformed(getGui());
@@ -126,7 +115,6 @@ class MainPopupMenu
 			menuHandler.addSeparator();
 			extendItem.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.automataExtend_actionPerformed(getGui());
@@ -135,7 +123,6 @@ class MainPopupMenu
 			});
 			removePassItem.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.automataRemovePass_actionPerformed(getGui());
@@ -144,7 +131,6 @@ class MainPopupMenu
 			});
 			addSelfLoopArcsItem.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.automataAddSelfLoopArcs_actionPerformed(getGui());
@@ -153,7 +139,6 @@ class MainPopupMenu
 			});
 			removeSelfLoopArcsItem.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.automataRemoveSelfLoopArcs_actionPerformed(getGui());
@@ -162,7 +147,6 @@ class MainPopupMenu
 			});
 			normalizeAlphabetItem.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.normalizeAlphabet_actionPerformed(getGui());
@@ -176,7 +160,6 @@ class MainPopupMenu
 		menuHandler.add(alphabetAnalyzerItem, 2);
 		alphabetAnalyzerItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.alphabetAnalyzer_actionPerformed(getGui());
@@ -189,16 +172,18 @@ class MainPopupMenu
 
 		menuHandler.add(findStatesItem, 1);
 		findStatesItem.addActionListener(new ActionListener()
-		{		// anonymous class (is this a good thing?)
+		{
 
+			// anonymous class (is this a good thing?)
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.findStates_action(getGui());
 				getGui().repaint();
 			}
 		});
-		menuHandler.addSeparator();		// ----------------------------------------------
+		menuHandler.addSeparator();
 
+		// ----------------------------------------------
 		JMenuItem copyItem = new JMenuItem("Copy");
 
 		menuHandler.add(copyItem, 1);
@@ -225,7 +210,6 @@ class MainPopupMenu
 			menuHandler.add(exportItem, 1);
 			exportItem.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.automataExport(getGui());
@@ -236,7 +220,6 @@ class MainPopupMenu
 
 		selectAllItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.selectAll_actionPerformed(getGui());
@@ -244,7 +227,6 @@ class MainPopupMenu
 		});
 		statusItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automatonStatus_actionPerformed(getGui());
@@ -252,7 +234,6 @@ class MainPopupMenu
 		});
 		exploreItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automatonExplore_actionPerformed(getGui());
@@ -261,7 +242,6 @@ class MainPopupMenu
 		});
 		alphabetItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automatonAlphabet_actionPerformed(getGui());
@@ -270,7 +250,6 @@ class MainPopupMenu
 		});
 		synchronizeItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataSynchronize_actionPerformed(getGui());
@@ -279,7 +258,6 @@ class MainPopupMenu
 		});
 		verifyItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataVerify_actionPerformed(getGui());
@@ -288,7 +266,6 @@ class MainPopupMenu
 		});
 		synthesizeItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataSynthesize_actionPerformed(getGui());
@@ -297,7 +274,6 @@ class MainPopupMenu
 		});
 		purgeItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataPurge_actionPerformed(getGui());
@@ -306,7 +282,6 @@ class MainPopupMenu
 		});
 		allAcceptingItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataAllAccepting_actionPerformed(getGui());
@@ -315,7 +290,6 @@ class MainPopupMenu
 		});
 		complementItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataComplement_actionPerformed(getGui());
@@ -324,7 +298,6 @@ class MainPopupMenu
 		});
 		minimizeItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automatonMinimize_actionPerformed(getGui());
@@ -333,7 +306,6 @@ class MainPopupMenu
 		});
 		copyItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataCopy_actionPerformed(getGui());
@@ -342,7 +314,6 @@ class MainPopupMenu
 		});
 		deleteItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataDelete_actionPerformed(getGui());
@@ -351,7 +322,6 @@ class MainPopupMenu
 		});
 		deleteAllItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataDeleteAll_actionPerformed(getGui());
@@ -360,7 +330,6 @@ class MainPopupMenu
 		});
 		renameItem.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataRename_actionPerformed(getGui());
@@ -371,49 +340,10 @@ class MainPopupMenu
 		// Here is revelaed that this one knows that the interface is built around a table. Not good!
 		// It should popup when ordered so by the gui, not de ide for itself when to
 		// It should have no notion of rows/cols, these thinsg it should get from the gui
-
-		/***
-																		theAutomatonTable.addMouseListener(new MouseAdapter()
-																										{
-																																		public void mousePressed(MouseEvent e)
-																																		{
-																																										// This is needed for the Linux platform
-																																										// where isPopupTrigger is true only on mousePressed.
-																																										maybeShowPopup(e);
-																																		}
-
-																																		public void mouseReleased(MouseEvent e)
-																																		{
-																																										// This is for triggering the popup on Windows platforms
-																																										maybeShowPopup(e);
-																																		}
-
-																																		private void maybeShowPopup(MouseEvent e)
-																																		{
-																																										if (e.isPopupTrigger())
-																																										{
-																																																		int currRow = theAutomatonTable.rowAtPoint(new Point(e.getX(), e.getY()));
-																																																		if (currRow < 0)
-																																																		{
-																																																										return;
-																																																		}
-																																																		if (!theAutomatonTable.isRowSelected(currRow))
-																																																		{
-																																																										theAutomatonTable.clearSelection();
-																																																										theAutomatonTable.setRowSelectionInterval(currRow, currRow);
-																																																		}
-																																																		JPopupMenu regionPopup = menuHandler.getDisabledPopupMenu(theAutomatonTable);
-																																																		regionPopup.show(e.getComponent(),
-																																																																																		 e.getX(), e.getY());
-																																										}
-																																		}
-																										});
-										**********/
 	}
 
 	public void show(int num_selected, Component c, int x, int y)
 	{
-
 		JPopupMenu regionPopup = menuHandler.getDisabledPopupMenu(num_selected);
 
 		regionPopup.show(c, x, y);
@@ -421,7 +351,6 @@ class MainPopupMenu
 
 	public MainPopupMenu(Gui gui)
 	{
-
 		setInvoker(gui.getFrame());
 
 		menuHandler = new MenuHandler();

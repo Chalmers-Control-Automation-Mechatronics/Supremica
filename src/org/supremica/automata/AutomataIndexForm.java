@@ -1,51 +1,51 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata;
 
@@ -55,25 +55,54 @@ import org.apache.log4j.*;
 
 public final class AutomataIndexForm
 {
-	private boolean[][] alphabetEventsTable;    // <automaton,event> -> <true|false>
-	private boolean[][] prioritizedEventsTable;    // <automaton,event> -> <true|false>
-	private int[][][] outgoingEventsTable;    // <automaton,state> -> <event[]>
-	private int[][][] incomingEventsTable;    // <automaton,state> -> <event[]>
-	private int[][][] nextStateTable;             // <automaton,state,event> -> <state>
-	private int[][][][] prevStatesTable;    // <automaton, state, event> -> <state[]>
-	private State[][] stateTable;                 // <automaton,state> -> <State>
-	private int[][] stateStatusTable;             // <automaton,state> -> <status>
-	private boolean[] controllableEventsTable;    // <event> -> <true|false>
-	private boolean[] immediateEventsTable;       // <event> -> <true|false>
-	private boolean[] typeIsPlantTable;           // <automaton> -> <isPlant>
-	private int[] eventPriority;                  // <event> -> <priority>
-	private int[] automataSize;                   // <automaton> -> <nbr_of_states>
-	private int[][][] enableEventsTable;          // <automaton, event> -> <state[]>
+	private boolean[][] alphabetEventsTable;
+
+	// <automaton,event> -> <true|false>
+	private boolean[][] prioritizedEventsTable;
+
+	// <automaton,event> -> <true|false>
+	private int[][][] outgoingEventsTable;
+
+	// <automaton,state> -> <event[]>
+	private int[][][] incomingEventsTable;
+
+	// <automaton,state> -> <event[]>
+	private int[][][] nextStateTable;
+
+	// <automaton,state,event> -> <state>
+	private int[][][][] prevStatesTable;
+
+	// <automaton, state, event> -> <state[]>
+	private State[][] stateTable;
+
+	// <automaton,state> -> <State>
+	private int[][] stateStatusTable;
+
+	// <automaton,state> -> <status>
+	private boolean[] controllableEventsTable;
+
+	// <event> -> <true|false>
+	private boolean[] immediateEventsTable;
+
+	// <event> -> <true|false>
+	private boolean[] typeIsPlantTable;
+
+	// <automaton> -> <isPlant>
+	private int[] eventPriority;
+
+	// <event> -> <priority>
+	private int[] automataSize;
+
+	// <automaton> -> <nbr_of_states>
+	private int[][][] enableEventsTable;
+
+	// <automaton, event> -> <state[]>
 	private static Category thisCategory = LogDisplay.createCategory(AutomataIndexForm.class.getName());
 
 	/**
-	 * @param theAutomata The automata to be synchronized.
-	 * @param theAutomaton The synchronized automaton.
+	 *@param  theAutomata The automata to be synchronized.
+	 *@param  theAutomaton The synchronized automaton.
+	 *@exception  Exception Description of the Exception
 	 */
 	public AutomataIndexForm(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
@@ -137,8 +166,9 @@ public final class AutomataIndexForm
 	}
 
 	public void generateAutomataIndices(Automata theAutomata)
-	{    // Give each automaton a unique index
+	{
 
+		// Give each automaton a unique index
 		// Remember that this index must be consistent with
 		// getAutomatonAt(int) in Automata
 		typeIsPlantTable = new boolean[theAutomata.size()];
@@ -177,7 +207,7 @@ public final class AutomataIndexForm
 		{
 			eventPriority[i] = 1;
 
-			((Event) (eventCollectionIt.next())).setSynchIndex(i++);
+			((EventLabel) (eventCollectionIt.next())).setSynchIndex(i++);
 		}
 
 		// Put the synchIndex into all the automata.
@@ -193,9 +223,9 @@ public final class AutomataIndexForm
 
 			while (eventIt.hasNext())
 			{
-				Event currEvent = (Event) eventIt.next();
+				EventLabel currEvent = (EventLabel) eventIt.next();
 				String label = currEvent.getLabel();
-				Event newEvent = theAlphabet.getEventWithLabel(label);
+				EventLabel newEvent = theAlphabet.getEventWithLabel(label);
 
 				currEvent.setSynchIndex(newEvent.getSynchIndex());
 			}
@@ -212,7 +242,7 @@ public final class AutomataIndexForm
 
 		while (theAlphabetIt.hasNext())
 		{
-			Event currEvent = (Event) theAlphabetIt.next();
+			EventLabel currEvent = (EventLabel) theAlphabetIt.next();
 			String currLabel = currEvent.getLabel();
 			int currEventSynchIndex = currEvent.getSynchIndex();
 
@@ -224,7 +254,7 @@ public final class AutomataIndexForm
 				{
 					alphabetEventsTable[i][currEventSynchIndex] = true;
 
-					Event currAutEvent = currAutAlphabet.getEventWithLabel(currLabel);
+					EventLabel currAutEvent = currAutAlphabet.getEventWithLabel(currLabel);
 
 					prioritizedEventsTable[i][currEventSynchIndex] = currAutEvent.isPrioritized();
 				}
@@ -242,6 +272,8 @@ public final class AutomataIndexForm
 	 * unique for the automaton to which the state belongs.
 	 * Also builds a state table that connects the state index to
 	 * the physical state.
+	 *
+	 *@param  theAutomata Description of the Parameter
 	 */
 	void generateStateIndices(Automata theAutomata)
 	{
@@ -284,10 +316,16 @@ public final class AutomataIndexForm
 	 * done in the states, since they do not know about the alphabet.
 	 *
 	 * Insert into enableEventsTable all states that enables a specific event.
+	 *
+	 *@param  theAutomata Description of the Parameter
+	 *@param  theAutomaton Description of the Parameter
+	 *@exception  Exception Description of the Exception
 	 */
 	void generateNextStateTransitionIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
-	{    // Compute the nextStateTable and outgoingEventsTable
+	{
+
+		// Compute the nextStateTable and outgoingEventsTable
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		int nbrOfAutomata = theAutomata.size();
 		int nbrOfEvents = theAlphabet.size();
@@ -345,11 +383,8 @@ public final class AutomataIndexForm
 
 					// Get the event from the automaton
 					String eventId = currArc.getEventId();
-					Event currEvent = currAlphabet.getEventWithId(eventId);
-
-					// Find the event with the same label in the new alphabet
-					// and insert its synchIndex.
-					Event theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
+					EventLabel currEvent = currAlphabet.getEventWithId(eventId);
+					EventLabel theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
 					sortedArcs.add(new Integer(currEventIndex));
@@ -399,10 +434,15 @@ public final class AutomataIndexForm
 	 * Integer.MAX_VALUE. Note that this computation can not be
 	 * done in the states, since they do not know about the alphabet.
 	 *
+	 *@param  theAutomata Description of the Parameter
+	 *@param  theAutomaton Description of the Parameter
+	 *@exception  Exception Description of the Exception
 	 */
 	void generatePrevStatesTransitionIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
-	{    // Compute the prevStateTable and outgoingEventsTable
+	{
+
+		// Compute the prevStateTable and outgoingEventsTable
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		int nbrOfAutomata = theAutomata.size();
 		int nbrOfEvents = theAlphabet.size();
@@ -449,11 +489,8 @@ public final class AutomataIndexForm
 
 					// Get the event from the automaton
 					String eventId = currArc.getEventId();
-					Event currEvent = currAlphabet.getEventWithId(eventId);
-
-					// Find the event with the same label in the new alphabet
-					// and insert its synchIndex.
-					Event theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
+					EventLabel currEvent = currAlphabet.getEventWithId(eventId);
+					EventLabel theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
 					sortedArcs.add(new Integer(currEventIndex));
@@ -465,7 +502,9 @@ public final class AutomataIndexForm
 					int nbrOfIncomingArcs = currState.nbrOfIncomingArcs();
 
 					if (currPreviousStates == null)
-					{    // Allocate memory and initialize, last element contains the number of valid elements
+					{
+
+						// Allocate memory and initialize, last element contains the number of valid elements
 						currPreviousStates = new int[nbrOfIncomingArcs + 1];
 						currPreviousStates[nbrOfIncomingArcs] = 0;
 					}
@@ -501,7 +540,7 @@ public final class AutomataIndexForm
 
 		for (int i = 0; i < theAlphabet.size(); i++)
 		{
-			Event currEvent = theAlphabet.getEventWithIndex(i);
+			EventLabel currEvent = theAlphabet.getEventWithIndex(i);
 
 			controllableEventsTable[i] = currEvent.isControllable();
 			immediateEventsTable[i] = currEvent.isImmediate();
@@ -644,7 +683,9 @@ public final class AutomataIndexForm
 				for (int k = 0; k < oldArray[i][j].length; k++)
 				{
 					if (oldArray[i][j][k] != null)
-					{    // This can be null, see prevStateTable
+					{
+
+						// This can be null, see prevStateTable
 						newArray[i][j][k] = new int[oldArray[i][j][k].length];
 
 						System.arraycopy(oldArray[i][j][k], 0, newArray[i][j][k], 0, oldArray[i][j][k].length);

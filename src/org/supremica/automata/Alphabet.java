@@ -1,51 +1,51 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata;
 
@@ -59,8 +59,10 @@ import java.util.*;
  * an Events object, then rehash must be called otherwise
  * the strange errors will arise.
  *
- * @see org.supremica.automata.Events
- * @see org.supremica.automata.AlphabetHelpers
+ *@author  ka
+ *@created  November 28, 2001
+ *@see  org.supremica.automata.Events
+ *@see  org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet
 	extends Events
@@ -88,6 +90,9 @@ public class Alphabet
 
 	/**
 	 * Returns a new unique (for this object) id.
+	 *
+	 *@param  prefix Description of the Parameter
+	 *@return  The uniqueId value
 	 */
 	public String getUniqueId(String prefix)
 	{
@@ -96,6 +101,9 @@ public class Alphabet
 
 	/**
 	 * True, if an event with this id, is already in the alphabet, false otherwise.
+	 *
+	 *@param  id Description of the Parameter
+	 *@return  Description of the Return Value
 	 */
 	public boolean containsEventWithId(String id)
 	{
@@ -105,13 +113,17 @@ public class Alphabet
 	/**
 	 * Returns an event with a given id. An exception is thrown if the event
 	 * does not exists.
+	 *
+	 *@param  id Description of the Parameter
+	 *@return  The eventWithId value
+	 *@exception  Exception Description of the Exception
 	 */
-	public Event getEventWithId(String id)
+	public EventLabel getEventWithId(String id)
 		throws Exception
 	{
 		if (containsEventWithId(id))
 		{
-			return (Event) idMap.get(id);
+			return (EventLabel) idMap.get(id);
 		}
 		else
 		{
@@ -123,8 +135,11 @@ public class Alphabet
 	 * Add an event to the alphabet. Check with containsEventWithId to make
 	 * sure that an event with the id already exists.
 	 * If trying to add an event with an id that already exists, an exception is thrown.
+	 *
+	 *@param  event The feature to be added to the Event attribute
+	 *@exception  Exception Description of the Exception
 	 */
-	public void addEvent(Event event)
+	public void addEvent(EventLabel event)
 		throws Exception
 	{
 		if (!containsEventWithId(event.getId()))
@@ -140,8 +155,10 @@ public class Alphabet
 
 	/**
 	 * Remove event from alphabet.
+	 *
+	 *@param  event Description of the Parameter
 	 */
-	public void removeEvent(Event event)
+	public void removeEvent(EventLabel event)
 	{
 		idMap.remove(event.getId());
 		super.removeEvent(event);
@@ -149,6 +166,8 @@ public class Alphabet
 
 	/**
 	 * Do not use this, use iterator instead.
+	 *
+	 *@return  Description of the Return Value
 	 */
 	public Iterator eventIterator()
 	{
@@ -157,6 +176,8 @@ public class Alphabet
 
 	/**
 	 * Produce a string suitable for debugging
+	 *
+	 *@return  Description of the Return Value
 	 */
 	public String toString()
 	{
@@ -185,21 +206,19 @@ public class Alphabet
 		}
 	}
 
-	/**
-	 * Must be called after an event label or id is modified.
-	 */
+	/** Must be called after an event label or id is modified. */
 	public void rehash()
 	{
 		super.rehash();
 
-		Event event;
+		EventLabel event;
 		Iterator eventIt = iterator();
 
 		idMap.clear();
 
 		while (eventIt.hasNext())
 		{
-			event = (Event) eventIt.next();
+			event = (EventLabel) eventIt.next();
 
 			idMap.put(event.getId(), event);
 		}

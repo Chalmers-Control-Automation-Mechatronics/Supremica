@@ -1,61 +1,69 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.*;
 import org.supremica.gui.*;
 import org.apache.log4j.*;
 import java.util.ArrayList;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.AutomataIndexForm;
+import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.State;
+import org.supremica.automata.EventLabel;
 
 /**
- * @deprecated DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
+ *@author  ka
+ *@created  November 28, 2001
+ *@deprecated  DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
  */
 public final class AutomataFastControllabilityCheckExecuter
 	extends Thread
@@ -134,9 +142,12 @@ public final class AutomataFastControllabilityCheckExecuter
 	{
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
-		nextState = new int[nbrOfAutomata + 1];    // +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1];    // Always end with Integer.MAX_VALUE
+		nextState = new int[nbrOfAutomata + 1];
 
+		// +1 status field
+		currEnabledEvents = new int[nbrOfEvents + 1];
+
+		// Always end with Integer.MAX_VALUE
 		// currPlantEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
 	}
 
@@ -203,7 +214,9 @@ public final class AutomataFastControllabilityCheckExecuter
 				currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
 
 				if (prioritizedEventsTable[currAutIndex][currEventIndex])
-				{    // The event is prioritized in currAutomaton
+				{
+
+					// The event is prioritized in currAutomaton
 					if (!(currEventIndex == currAutEventIndex))
 					{
 
@@ -237,7 +250,9 @@ public final class AutomataFastControllabilityCheckExecuter
 				// find the next event for this automaton and state
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
-				{    // Point to the next index;
+				{
+
+					// Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
 
 					currOutgoingEventsIndex[currAutIndex] = ++tmpIndex;
@@ -437,7 +452,7 @@ public final class AutomataFastControllabilityCheckExecuter
 						if (nextIndex >= 0)
 						{
 							State nextState = theAutomaton.getStateWithIndex(nextIndex);
-							Event theEvent = theAlphabet.getEventWithIndex(currEventIndex);
+							EventLabel theEvent = theAlphabet.getEventWithIndex(currEventIndex);
 							Arc newArc = new Arc(thisState, nextState, theEvent.getId());
 
 							theAutomaton.addArc(newArc);
@@ -477,80 +492,74 @@ public final class AutomataFastControllabilityCheckExecuter
 	}
 
 	/*
-	 * public int[][] previousStates(int[] state, int currEventIndex)
-	 * {
-	 * int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
-	 * int[] nbrOfPrevStates = int[nbrOfAutomata];
-	 * int[] currIndexOfPrevStates = int[nbrOfAutomata];
-	 * int[] currPrevState = int[nbrOfAutomata + 1];
+	 *  public int[][] previousStates(int[] state, int currEventIndex)
+	 *  {
+	 *  int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
+	 *  int[] nbrOfPrevStates = int[nbrOfAutomata];
+	 *  int[] currIndexOfPrevStates = int[nbrOfAutomata];
+	 *  int[] currPrevState = int[nbrOfAutomata + 1];
 	 *
-	 * // First compute the maximum nbr of previous states
-	 * int maxNbrOfPreviousStates = 1;
-	 * for (int i = 1; i < state.length - 1; i++)
-	 * {
-	 * // ToDo Check if this automaton is among the selected
+	 *  // First compute the maximum nbr of previous states
+	 *  int maxNbrOfPreviousStates = 1;
+	 *  for (int i = 1; i < state.length - 1; i++)
+	 *  {
+	 *  // ToDo Check if this automaton is among the selected
 	 *
-	 * int currAutomatonIndex = i;
-	 * int currStateIndex = state[currAutomatonIndex];
-	 * int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
-	 * if (prevStates != null)
-	 * {
-	 * int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
-	 * nbrOfPrevStates[i] = currNbrOfPreviousStates;
-	 * if (currNbrOfPreviousStates > 0)
-	 * {
-	 * currIndexOfPrevStates
-	 * }
-	 * else
-	 * {
-	 * currIndexOfPreviousState[i] = 0;
-	 * }
-	 * maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
-	 * }
-	 * }
+	 *  int currAutomatonIndex = i;
+	 *  int currStateIndex = state[currAutomatonIndex];
+	 *  int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
+	 *  if (prevStates != null)
+	 *  {
+	 *  int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
+	 *  nbrOfPrevStates[i] = currNbrOfPreviousStates;
+	 *  if (currNbrOfPreviousStates > 0)
+	 *  {
+	 *  currIndexOfPrevStates
+	 *  }
+	 *  else
+	 *  {
+	 *  currIndexOfPreviousState[i] = 0;
+	 *  }
+	 *  maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
+	 *  }
+	 *  }
 	 *
-	 * int[][] previousStates = new int[maxNbrOfPreviousState][];
-	 * for (int i = 1; i < state.length - 2; i++)
-	 * {
-	 * for(int j = i + 1; j < )
+	 *  int[][] previousStates = new int[maxNbrOfPreviousState][];
+	 *  for (int i = 1; i < state.length - 2; i++)
+	 *  {
+	 *  for(int j = i + 1; j < )
 	 *
-	 * }
+	 *  }
 	 *
-	 * // Check if this event is included
-	 * int[] existingPrevState = theStates.get(currPrevState);
-	 * if (existingPrevState != null)
-	 * {
-	 * // Check if the event is really possible
-	 * if (isValidTransition(existingPrevState, state, currEventIndex))
-	 * {
-	 * previousStates[xx] = existingPrevState;
-	 * }
-	 * }
+	 *  // Check if this event is included
+	 *  int[] existingPrevState = theStates.get(currPrevState);
+	 *  if (existingPrevState != null)
+	 *  {
+	 *  // Check if the event is really possible
+	 *  if (isValidTransition(existingPrevState, state, currEventIndex))
+	 *  {
+	 *  previousStates[xx] = existingPrevState;
+	 *  }
+	 *  }
 	 *
-	 * }
-	 */
-
-	/**
-	 * Check if the event is possible between fromState and toState.
-	 * For perfomance reasons we assume that event is possible in
-	 * at least one of the original automata.
+	 *  }
 	 */
 
 	/*
-	 *    public boolean isValidTransition(int[] fromState, int[] toState, int event)
-	 *     {
-	 *     if (prioritizedEventInResultAutomaton[event])
-	 *     { // Check that event is possible from all automata that have
-	 *     // this event as prioritized.
+	 *  public boolean isValidTransition(int[] fromState, int[] toState, int event)
+	 *  {
+	 *  if (prioritizedEventInResultAutomaton[event])
+	 *  { // Check that event is possible from all automata that have
+	 *  // this event as prioritized.
 	 *
-	 *     // To do
-	 *     }
-	 *     else
-	 *     { // We assume that the event is possible in at least one of the
-	 *     // original automata.
-	 *     return true;
-	 *     }
-	 *     }
+	 *  // To do
+	 *  }
+	 *  else
+	 *  { // We assume that the event is possible in at least one of the
+	 *  // original automata.
+	 *  return true;
+	 *  }
+	 *  }
 	 */
 
 	// */

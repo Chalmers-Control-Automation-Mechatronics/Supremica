@@ -103,11 +103,11 @@ public class StateHolder
 	/** MF ** trivial optimization
 	public boolean equals(Object other)
 	{
-																																	int[] otherState = ((StateHolder)other).getArray();
-																																	for (int i = 0; i < theState.length; i++)
-																																																																	if (theState[i] != otherState[i])
-																																																																																																	return false;
-																																	return true;
+																																																																	int[] otherState = ((StateHolder)other).getArray();
+																																																																	for (int i = 0; i < theState.length; i++)
+																																																																																																																																	if (theState[i] != otherState[i])
+																																																																																																																																																																																																	return false;
+																																																																	return true;
 	}
 	*/
 

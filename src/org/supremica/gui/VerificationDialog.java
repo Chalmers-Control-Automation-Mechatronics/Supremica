@@ -221,10 +221,10 @@ public class VerificationDialog
 		/*** advancedPanel
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText =
-																		new JLabel("Initial state limit for state exclusion");
+																																		new JLabel("Initial state limit for state exclusion");
 		exclusionStateLimit = new JTextField();
 		JLabel reachabilityStateLimitText =
-																		new JLabel("Initial state limit for reachability verification");
+																																		new JLabel("Initial state limit for reachability verification");
 		reachabilityStateLimit = new JTextField();
 		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
 		skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");

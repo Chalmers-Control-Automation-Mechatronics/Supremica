@@ -1,62 +1,72 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.*;
 import org.supremica.util.*;
 import org.supremica.gui.*;
 import org.apache.log4j.*;
 import java.util.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexForm;
+import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.State;
+import org.supremica.automata.EventLabel;
 
 /**
  * Contains information that is common to all synchronization threads.
+ *
+ *@author  ka
+ *@created  November 28, 2001
  */
 public final class AutomataSynchronizerHelper
 {
@@ -142,7 +152,10 @@ public final class AutomataSynchronizerHelper
 
 	/**
 	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and Automaton-Objects.
-	 * @see AutomataVerificationOptions#findUncontrollableStates(int[])
+	 *
+	 *@param  orgHelper Description of the Parameter
+	 *@exception  Exception Description of the Exception
+	 *@see  AutomataVerificationOptions#findUncontrollableStates(int[])
 	 */
 	public AutomataSynchronizerHelper(AutomataSynchronizerHelper orgHelper)
 		throws Exception
@@ -169,8 +182,9 @@ public final class AutomataSynchronizerHelper
 		rememberTrace = false;
 		exhaustiveSearch = false;
 		rememberUncontrollable = false;
-		expandEventsUsingPriority = false;    // Should be an external option?!? FIXA!
+		expandEventsUsingPriority = false;
 
+		// Should be an external option?!? FIXA!
 		// Is there anything else that needs to be cleared?...
 	}
 
@@ -202,6 +216,8 @@ public final class AutomataSynchronizerHelper
 	/**
 	 * Add a state to the queue of states waiting for being processed.
 	 * This is only called by the addInitialState and addState methods.
+	 *
+	 *@param  state The feature to be added to the StateToProcess attribute
 	 */
 	public void addStateToProcess(int[] state)
 	{
@@ -214,7 +230,7 @@ public final class AutomataSynchronizerHelper
 	}
 
 	/**
-	 * @return a state if there are more states to process, null otherwise.
+	 *@return  a state if there are more states to process, null otherwise.
 	 */
 	public int[] getStateToProcess()
 	{
@@ -261,11 +277,15 @@ public final class AutomataSynchronizerHelper
 			else
 			{
 				if (coExecute)
-				{    // Depth first search
+				{
+
+					// Depth first search
 					return statesToProcess.removeLast();
 				}
 				else
-				{    // Width first search
+				{
+
+					// Width first search
 					return statesToProcess.removeFirst();
 				}
 			}
@@ -281,7 +301,9 @@ public final class AutomataSynchronizerHelper
 		if (newState != null)
 		{
 			if (rememberTrace && (stateTrace.size() == 0))
-			{    // Add initial state
+			{
+
+				// Add initial state
 				stateTrace.add(newState);
 			}
 
@@ -292,8 +314,8 @@ public final class AutomataSynchronizerHelper
 			helperData.nbrOfAddedStates++;
 
 			/*
-			 * if (verboseMode && helperData.getNbrOfAddedStates() % 10000 == 0)
-			 *               thisCategory.debug(nbrOfAddedStates + " new states found so far.");
+			 *  if (verboseMode && helperData.getNbrOfAddedStates() % 10000 == 0)
+			 *  thisCategory.debug(nbrOfAddedStates + " new states found so far.");
 			 */
 		}
 		else
@@ -318,8 +340,8 @@ public final class AutomataSynchronizerHelper
 			}
 
 			/*
-			 * if (verboseMode && helperData.getNbrOfCheckedStates() % 10000 == 0)
-			 *               thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
+			 *  if (verboseMode && helperData.getNbrOfCheckedStates() % 10000 == 0)
+			 *  thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
 			 */
 		}
 	}
@@ -339,6 +361,11 @@ public final class AutomataSynchronizerHelper
 	 * and add it to the set of states and to the set of states waiting for processing.
 	 * If it exists then find it.
 	 * Insert the arc.
+	 *
+	 *@param  fromState The feature to be added to the State attribute
+	 *@param  toState The feature to be added to the State attribute
+	 *@param  eventIndex The feature to be added to the State attribute
+	 *@exception  Exception Description of the Exception
 	 */
 	public void addState(int[] fromState, int[] toState, int eventIndex)
 		throws Exception
@@ -363,7 +390,9 @@ public final class AutomataSynchronizerHelper
 			if ((activeAutomata == null) || (activeAutomata[i] == true))
 			{
 				currStatus = stateStatusTable[i][state[i]];
-				tmpStatus &= currStatus;    // works for everything except forbidden
+				tmpStatus &= currStatus;
+
+				// works for everything except forbidden
 				forbidden |= AutomataIndexFormHelper.isForbidden(currStatus);
 			}
 		}
@@ -419,7 +448,9 @@ public final class AutomataSynchronizerHelper
 
 	/**
 	 * Used for getting the synchronization result to the worker-class.
-	 * @see AutomataSynchronizerExecuter
+	 *
+	 *@param  isControllable The new automataIsControllable value
+	 *@see  AutomataSynchronizerExecuter
 	 */
 	public void setAutomataIsControllable(boolean isControllable)
 	{
@@ -480,17 +511,19 @@ public final class AutomataSynchronizerHelper
 
 		for (Iterator eventIterator = unionAlphabet.iterator(); eventIterator.hasNext(); )
 		{
-			Event currEvent = (Event) eventIterator.next();
+			EventLabel currEvent = (EventLabel) eventIterator.next();
 
 			if (currEvent.getExpansionPriority() < 0)
-			{    // The events are already ordered after synchIndex!
+			{
 
+				// The events are already ordered after synchIndex!
 				// eventPriority[currEvent.getSynchIndex()] = 10;
 				eventPriority[index++] = 10;
 			}
 			else
-			{    // The events are already ordered after synchIndex!
+			{
 
+				// The events are already ordered after synchIndex!
 				// eventPriority[currEvent.getSynchIndex()] = currEvent.getExpansionPriority();
 				eventPriority[index++] = currEvent.getExpansionPriority();
 			}
@@ -504,9 +537,7 @@ public final class AutomataSynchronizerHelper
 		this.rememberTrace = rememberTrace;
 	}
 
-	/**
-	 * Displats the amount of states examined during the execution.
-	 */
+	/** Displats the amount of states examined during the execution. */
 	public void displayInfo()
 	{
 
@@ -518,6 +549,8 @@ public final class AutomataSynchronizerHelper
 
 	/**
 	 * Displats the event-trace leading to the uncontrollable state.
+	 *
+	 *@exception  Exception Description of the Exception
 	 */
 	public void displayTrace()
 		throws Exception
@@ -551,50 +584,50 @@ public final class AutomataSynchronizerHelper
 		}
 
 		/*
-		 * // This tries to find shortcuts in the trace by looking one-step ahead
-		 * StringBuffer trace = new StringBuffer();
-		 * int[] fromState;
-		 * for (int i = 0; i < stateTrace.size() - 1; i++)
-		 * {
-		 *       int[] fromState = (int[]) stateTrace.get(i);
-		 *       executer.setCurrState(fromState);
-		 *       for (int j = stateTrace.size() - 1; j > i; j--)
-		 *       {
-		 *               int index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
-		 *               if (index >= 0)
-		 *               { // thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
-		 *                       trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
-		 *                       if (j != stateTrace.size() - 1)
-		 *                       {
-		 *                               trace.append(",");
-		 *                       }
-		 *                       if (j > i+1)
-		 *                       {
-		 *                               thisCategory.debug("Shortcut found from state number " + i + " to state number " + j + ".");
-		 *                       }
-		 *                       i = j-1;
-		 *                       break;
-		 *               }
-		 *               if (i == j-1)
-		 *               {
-		 *                       throw new Exception("Error in AutomataSynchronizerHelper.displayTrace(). Impossible transition found.");
-		 *               }
-		 *       }
-		 * }
+		 *  // This tries to find shortcuts in the trace by looking one-step ahead
+		 *  StringBuffer trace = new StringBuffer();
+		 *  int[] fromState;
+		 *  for (int i = 0; i < stateTrace.size() - 1; i++)
+		 *  {
+		 *  int[] fromState = (int[]) stateTrace.get(i);
+		 *  executer.setCurrState(fromState);
+		 *  for (int j = stateTrace.size() - 1; j > i; j--)
+		 *  {
+		 *  int index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
+		 *  if (index >= 0)
+		 *  { // thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
+		 *  trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
+		 *  if (j != stateTrace.size() - 1)
+		 *  {
+		 *  trace.append(",");
+		 *  }
+		 *  if (j > i+1)
+		 *  {
+		 *  thisCategory.debug("Shortcut found from state number " + i + " to state number " + j + ".");
+		 *  }
+		 *  i = j-1;
+		 *  break;
+		 *  }
+		 *  if (i == j-1)
+		 *  {
+		 *  throw new Exception("Error in AutomataSynchronizerHelper.displayTrace(). Impossible transition found.");
+		 *  }
+		 *  }
+		 *  }
 		 */
 		thisCategory.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
 
 		/*
-		 * thisCategory.error("And again...");
+		 *  thisCategory.error("And again...");
 		 *
-		 * while (stateTrace.size() > 1)
-		 * {
-		 *       index = executer.findTransition((int[]) stateTrace.removeFirst(), (int[]) stateTrace.getFirst());
-		 *       if (index >= 0)
-		 *               thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
-		 *       else
-		 *               thisCategory.error("Possible error?");
-		 * }
+		 *  while (stateTrace.size() > 1)
+		 *  {
+		 *  index = executer.findTransition((int[]) stateTrace.removeFirst(), (int[]) stateTrace.getFirst());
+		 *  if (index >= 0)
+		 *  thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
+		 *  else
+		 *  thisCategory.error("Possible error?");
+		 *  }
 		 */
 	}
 
@@ -745,33 +778,33 @@ public final class AutomataSynchronizerHelper
 	}
 
 	/*
-	 * public void newAutomaton(ArrayList selectedAutomata)
-	 *       throws Exception
-	 * {   // Used by automataaSynthesizer (essential when building more than one automata)
-	 *       theAutomaton = new Automaton();
+	 *  public void newAutomaton(ArrayList selectedAutomata)
+	 *  throws Exception
+	 *  {   // Used by automataaSynthesizer (essential when building more than one automata)
+	 *  theAutomaton = new Automaton();
 	 *
-	 *       // Compute the new alphabet
-	 *       EventsSet theAlphabets = new EventsSet();
-	 *       Iterator autIt = selectedAutomata.iterator();
-	 *       while (autIt.hasNext())
-	 *       {
-	 *               Automaton currAutomaton = (Automaton)autIt.next();
-	 *               Alphabet currAlphabet = currAutomaton.getAlphabet();
-	 *               theAlphabets.add(currAlphabet);
-	 *       }
+	 *  // Compute the new alphabet
+	 *  EventsSet theAlphabets = new EventsSet();
+	 *  Iterator autIt = selectedAutomata.iterator();
+	 *  while (autIt.hasNext())
+	 *  {
+	 *  Automaton currAutomaton = (Automaton)autIt.next();
+	 *  Alphabet currAlphabet = currAutomaton.getAlphabet();
+	 *  theAlphabets.add(currAlphabet);
+	 *  }
 	 *
-	 *       try
-	 *       {
-	 *               Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
-	 *               theAutomaton.setAlphabet(theAlphabet);
-	 *       }
-	 *       catch (Exception e)
-	 * {
-	 *               System.err.println("Error while generating union alphabet: " + e);
-	 *               thisCategory.error("Error while generating union alphabet: " + e);
-	 *       throw e;
-	 * }
-	 * }
+	 *  try
+	 *  {
+	 *  Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
+	 *  theAutomaton.setAlphabet(theAlphabet);
+	 *  }
+	 *  catch (Exception e)
+	 *  {
+	 *  System.err.println("Error while generating union alphabet: " + e);
+	 *  thisCategory.error("Error while generating union alphabet: " + e);
+	 *  throw e;
+	 *  }
+	 *  }
 	 */
 	public void stopExecutionAfter(int stopExecutionLimit)
 	{

@@ -1,51 +1,51 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 
 // This is the guy that ties together the Gui and the menus
@@ -60,14 +60,13 @@ import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
 import org.supremica.*;
-import org.supremica.automata.*;
 import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
-import org.supremica.gui.Gui;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
-import org.supremica.gui.TestCasesDialog;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 
 public class ActionMan
 {
@@ -358,11 +357,11 @@ public class ActionMan
 		}
 
 		/*
-		 * And this "closes" the project, should it, really?
-		 * if (theAutomatonContainer.getSize() == 0)
-		 * {
-		 *       theAutomatonContainer.setProjectFile(null);
-		 * }
+		 *  And this "closes" the project, should it, really?
+		 *  if (theAutomatonContainer.getSize() == 0)
+		 *  {
+		 *  theAutomatonContainer.setProjectFile(null);
+		 *  }
 		 */
 
 		// and we should have no notion of a "table" here
@@ -729,8 +728,10 @@ public class ActionMan
 
 			try
 			{
-				syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), true,    // WorkbenchProperties.syncForbidUncontrollableStates(),
-														 WorkbenchProperties.syncExpandForbiddenStates(), false, false, true, WorkbenchProperties.verboseMode());
+				syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), true,
+
+				// WorkbenchProperties.syncForbidUncontrollableStates(),
+				WorkbenchProperties.syncExpandForbiddenStates(), false, false, true, WorkbenchProperties.verboseMode());
 			}
 			catch (Exception ex)
 			{
@@ -911,29 +912,31 @@ public class ActionMan
 		Iterator autIt = selectedAutomata.iterator();
 
 		/*
-		 * while (autIt.hasNext())
-		 * {
-		 *       Automaton currAutomaton = (Automaton)autIt.next();
-		 *       String currAutomatonName = currAutomaton.getName();
-		 *       if (currAutomaton.getInitialState() == null)
-		 *       {
-		 *               JOptionPane.showMessageDialog(this, "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-		 *       }
-		 *       else
-		 *       {
-		 *               try
-		 *               {
-		 *                       AutomatonExplorer explorer = getAutomatonContainer.getAutomatonExplorer(currAutomatonName);
-		 *               }
-		 *               catch (Exception ex)
-		 *               {
-		 *                       thisCategory.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
-		 *               }
-		 *       }
-		 * }
+		 *  while (autIt.hasNext())
+		 *  {
+		 *  Automaton currAutomaton = (Automaton)autIt.next();
+		 *  String currAutomatonName = currAutomaton.getName();
+		 *  if (currAutomaton.getInitialState() == null)
+		 *  {
+		 *  JOptionPane.showMessageDialog(this, "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+		 *  }
+		 *  else
+		 *  {
+		 *  try
+		 *  {
+		 *  AutomatonExplorer explorer = getAutomatonContainer.getAutomatonExplorer(currAutomatonName);
+		 *  }
+		 *  catch (Exception ex)
+		 *  {
+		 *  thisCategory.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
+		 *  }
+		 *  }
+		 *  }
 		 */
 		if (selectedAutomata.size() == 1)
-		{    // One automata selected
+		{
+
+			// One automata selected
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
 
@@ -954,7 +957,9 @@ public class ActionMan
 			}
 		}
 		else
-		{    // Many automata selected
+		{
+
+			// Many automata selected
 			Automata currAutomata = new Automata();
 
 			while (autIt.hasNext())
@@ -1117,7 +1122,9 @@ public class ActionMan
 				int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 
 				if (res == 0)
-				{    // Abort - YES
+				{
+
+					// Abort - YES
 					return;
 				}
 			}
@@ -1217,23 +1224,23 @@ public class ActionMan
 	{
 
 		/*
-		 * JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
-		 * if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
-		 * {
-		 *       File[] currFiles = fileOpener.getSelectedFiles();
-		 *       if (currFiles != null)
-		 *       {
-		 *               for (int i = 0; i < currFiles.length; i++)
-		 *               {
-		 *                       if (currFiles[i].isFile())
-		 *                       {
-		 *                               importDescoFile(currFiles[i]);
-		 *                       }
-		 *               }
-		 *       }
-		 *       repaint();
-		 *       theAutomatonTable.repaint();
-		 * }
+		 *  JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
+		 *  if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+		 *  {
+		 *  File[] currFiles = fileOpener.getSelectedFiles();
+		 *  if (currFiles != null)
+		 *  {
+		 *  for (int i = 0; i < currFiles.length; i++)
+		 *  {
+		 *  if (currFiles[i].isFile())
+		 *  {
+		 *  importDescoFile(currFiles[i]);
+		 *  }
+		 *  }
+		 *  }
+		 *  repaint();
+		 *  theAutomatonTable.repaint();
+		 *  }
 		 */
 	}
 
@@ -1304,8 +1311,10 @@ public class ActionMan
 		{
 			currAutomata = AutomataBuildFromXml.build(file);
 		}
-		catch (Exception e)    // this exception is caught while opening
+		catch (Exception e)
 		{
+
+			// this exception is caught while opening
 			gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
 
 			return;
@@ -1363,95 +1372,6 @@ public class ActionMan
 		{
 			gui.getAutomatonContainer().setProjectFile(file);
 		}
-
-		/*********
-																																		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
-
-																																		gui.info("Opening " + file.getAbsolutePath() + " ...");
-																																		int nbrOfAddedAutomata = 0;
-																																		try
-																																		{
-																																																		Automata currAutomata = AutomataBuildFromXml.build(file);
-
-																																																		if (nbrOfAutomataBeforeOpening == 0)
-																																																		{
-																																																																		String projectName = currAutomata.getName();
-																																																																		if (projectName != null)
-																																																																		{
-																																																																																		gui.getAutomatonContainer().setProjectName(projectName);
-																																																																																		gui.info("Project name changed to \"" + projectName + "\"");
-																																																																																		gui.getAutomatonContainer().updateFrameTitles();
-																																																																		}
-																																																		}
-
-																																																		Iterator autIt = currAutomata.iterator();
-																																																		while (autIt.hasNext())
-																																																		{
-																																																																		Automaton currAutomaton = (Automaton)autIt.next();
-																																																																		boolean add = true;
-
-																																																																		// Force the user to enter a new name if the name is ""
-																																																																		// Note that a null name is not allowed by AutomataBuildFromXml
-																																																																		if (currAutomaton.getName().equals(""))
-																																																																		{
-																																																																																		String autName = gui.getNewAutomatonName("Enter a new name", "");
-																																																																																		if (autName == null)
-																																																																																		{
-																																																																																																		add = false;
-																																																																																																		return; // It's not ok to cancel!
-																																																																																		}
-																																																																																		else
-																																																																																		{
-																																																																																																		currAutomaton.setName(autName);
-																																																																																		}
-																																																																		}
-
-																																																																		if (gui.getAutomatonContainer().containsAutomaton(currAutomaton.getName()))
-																																																																		{
-																																																																																		String autName = currAutomaton.getName();
-
-																																																																																		JOptionPane.showMessageDialog(gui.getFrame(), autName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
-
-																																																																																		autName = gui.getNewAutomatonName("Enter a new name", autName + "(2)");
-																																																																																		if (autName == null)
-																																																																																		{
-																																																																																																		add = false;
-																																																																																																		return; // It's not ok to cancel!
-																																																																																		}
-																																																																																		else
-																																																																																		{
-																																																																																																		currAutomaton.setName(autName);
-																																																																																		}
-																																																																		}
-																																																																		if (add)
-																																																																		{
-																																																																																		nbrOfAddedAutomata++;
-																																																																																		gui.getAutomatonContainer().add(currAutomaton);
-																																																																		}
-																																																		}
-																																		}
-																																		catch (Exception e)
-																																		{
-																																																		// thisCategory.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
-																																																		gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
-																																																		return;
-																																		}
-																																		// thisCategory.info("Successfully opened " + nbrOfAddedAutomata + " automata.");
-																																		gui.info("Successfully opened " + nbrOfAddedAutomata + " automata.");
-
-																																		if (nbrOfAutomataBeforeOpening > 0)
-																																		{
-																																																		File projectFile = gui.getAutomatonContainer().getProjectFile();
-																																																		if (projectFile != null)
-																																																		{
-																																																																		gui.getAutomatonContainer().setProjectFile(null);
-																																																		}
-																																		}
-																																		else
-																																		{
-																																																		gui.getAutomatonContainer().setProjectFile(file);
-																																		}
-		**************/
 	}
 
 	// File.Save action performed
@@ -1559,63 +1479,6 @@ public class ActionMan
 
 			return;
 		}
-
-		/***
-																																		try
-																																		{
-																																																		Automata currAutomata = AutomataBuildFromVALID.build(file);
-																																																		Iterator autIt = currAutomata.iterator();
-																																																		while (autIt.hasNext())
-																																																		{
-																																																																		Automaton currAutomaton = (Automaton)autIt.next();
-																																																																		boolean add = true;
-																																																																		if (currAutomaton.getName().equals(""))
-																																																																		{
-																																																																																		String autName = gui.getNewAutomatonName("Enter a new name", "");
-																																																																																		if (autName == null)
-																																																																																		{
-																																																																																																		add = false;
-																																																																																																		return; // It's not ok to cancel!
-																																																																																		}
-																																																																																		else
-																																																																																		{
-																																																																																																		currAutomaton.setName(autName);
-																																																																																		}
-																																																																		}
-
-																																																																		if (gui.getAutomatonContainer().containsAutomaton(currAutomaton.getName()))
-																																																																		{
-																																																																																		String autName = currAutomaton.getName();
-
-																																																																																		JOptionPane.showMessageDialog(gui.getFrame(), autName + " already exists", "Alert",
-																																																																																																																																																																																																		  JOptionPane.ERROR_MESSAGE);
-
-																																																																																		autName = gui.getNewAutomatonName("Enter a new name", autName + "(2)");
-																																																																																		if (autName == null)
-																																																																																		{
-																																																																																																		add = false; // It's not ok to cancel!
-																																																																																		}
-																																																																																		else
-																																																																																		{
-																																																																																																		currAutomaton.setName(autName);
-																																																																																		}
-																																																																		}
-																																																																		if (add)
-																																																																		{
-																																																																																		nbrOfAddedAutomata++;
-																																																																																		gui.getAutomatonContainer().add(currAutomaton);
-																																																																		}
-																																																		}
-																																		}
-																																		catch (Exception e)
-																																		{
-																																																		// thisCategory.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
-																																																		gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
-																																																		return;
-																																		}
-																																		// thisCategory.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
-																																		gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
-		***/
 	}
 
 	// Automata.AlphabetNormalize action performed
@@ -1762,5 +1625,6 @@ public class ActionMan
 			}
 		}
 	}
-}    // ActionMan
+}
 
+// ActionMan

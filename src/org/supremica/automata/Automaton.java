@@ -1,51 +1,51 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata;
 
@@ -108,7 +108,9 @@ public class Automaton
 		}
 
 		try
-		{    // Create all transitions
+		{
+
+			// Create all transitions
 			states = orgAut.stateIterator();
 
 			while (states.hasNext())
@@ -121,7 +123,7 @@ public class Automaton
 				{
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
-					Event currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					EventLabel currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 					State newDestState = getStateWithId(orgDestState.getId());
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 
@@ -253,14 +255,14 @@ public class Automaton
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
 
-	public Event getEvent(String eventId)
+	public EventLabel getEvent(String eventId)
 		throws Exception
 	{
 		return alphabet.getEventWithId(eventId);
 	}
 
 	// FIXA: används inte?
-	public Event getEventWithLabel(String eventLabel)
+	public EventLabel getEventWithLabel(String eventLabel)
 		throws Exception
 	{
 		return alphabet.getEventWithId(eventLabel);
@@ -356,8 +358,8 @@ public class Automaton
 	}
 
 	/**
-	 *
-	 **/
+	 *@return  Description of the Return Value
+	 */
 	public Iterator groupedArcIterator()
 	{
 		return null;
@@ -463,7 +465,9 @@ public class Automaton
 	}
 
 	public long checksum()
-	{    // Ad-hoc checksum algorithm
+	{
+
+		// Ad-hoc checksum algorithm
 		long checksum = 0;
 
 		for (Iterator sIt = stateIterator(); sIt.hasNext(); )

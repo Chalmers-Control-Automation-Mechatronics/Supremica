@@ -1,83 +1,89 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.*;
 import java.util.*;
 import java.io.*;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import org.xml.sax.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.State;
+import org.supremica.automata.EventLabel;
 
 public class AutomataBuildFromXml
 	extends HandlerBase
 {
-	private static final String automataStr = "Automata";
-	private static final String automatonStr = "Automaton";
-	private static final String eventsStr = "Events";
-	private static final String eventStr = "Event";
-	private static final String statesStr = "States";
-	private static final String stateStr = "State";
-	private static final String transitionsStr = "Transitions";
-	private static final String transitionStr = "Transition";
-	private static final String idStr = "id";
-	private static final String nameStr = "name";
-	private static final String initialStr = "initial";
-	private static final String acceptingStr = "accepting";
-	private static final String forbiddenStr = "forbidden";
-	private static final String labelStr = "label";
-	private static final String controllableStr = "controllable";
-	private static final String prioritizedStr = "prioritized";
-	private static final String immediateStr = "immediate";
-	private static final String owner = "owner";
-	private static final String hash = "hash";
+	private final static String automataStr = "Automata";
+	private final static String automatonStr = "Automaton";
+	private final static String eventsStr = "Events";
+	private final static String eventStr = "Event";
+	private final static String statesStr = "States";
+	private final static String stateStr = "State";
+	private final static String transitionsStr = "Transitions";
+	private final static String transitionStr = "Transition";
+	private final static String idStr = "id";
+	private final static String nameStr = "name";
+	private final static String initialStr = "initial";
+	private final static String acceptingStr = "accepting";
+	private final static String forbiddenStr = "forbidden";
+	private final static String labelStr = "label";
+	private final static String controllableStr = "controllable";
+	private final static String prioritizedStr = "prioritized";
+	private final static String immediateStr = "immediate";
+	private final static String owner = "owner";
+	private final static String hash = "hash";
 	private static AutomataBuildFromXml builder = null;
 	private Automata currAutomata = null;
 	private Automaton currAutomaton = null;
@@ -359,7 +365,7 @@ public class AutomataBuildFromXml
 			}
 		}
 
-		Event currEvent = new Event();
+		EventLabel currEvent = new EventLabel();
 
 		if (id == null)
 		{

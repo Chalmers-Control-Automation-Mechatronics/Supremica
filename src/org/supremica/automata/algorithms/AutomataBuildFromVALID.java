@@ -1,55 +1,54 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.*;
 import java.util.*;
 import java.io.*;
 import org.jdom.*;
@@ -57,6 +56,13 @@ import org.jdom.input.*;
 import org.jdom.output.*;
 import org.apache.log4j.*;
 import org.supremica.gui.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.State;
+import org.supremica.automata.EventLabel;
 
 public class AutomataBuildFromVALID
 {
@@ -99,15 +105,21 @@ public class AutomataBuildFromVALID
 			Element root = doc.getRootElement();
 
 			if (root.getName() == "graph")
-			{    // DGRF-file
+			{
+
+				// DGRF-file
 				automatonFromDGRF(root, "", "Undefined");
 			}
 			else if (root.getName() == "module")
-			{    // VMOD-file
+			{
+
+				// VMOD-file
 				automataFromVMOD(root, "");
 			}
 			else if (root.getName() == "project")
-			{    // VPRJ-file
+			{
+
+				// VPRJ-file
 				automataFromVPRJ(root);
 			}
 			else
@@ -139,7 +151,9 @@ public class AutomataBuildFromVALID
 		throws Exception
 	{
 		HashMap definitionHash = new HashMap();
-		Element element;    // Note! This variable is used many times in different situations
+		Element element;
+
+		// Note! This variable is used many times in different situations
 		Iterator i;
 
 		// Read "typeDefinition"s and store in HashMap as lists of strings
@@ -183,9 +197,13 @@ public class AutomataBuildFromVALID
 		// LOOP over VMOD-files ("instance"s)
 		List instanceList = root.getChild("parts").getChildren("foreach-instance");
 		Document subDoc;
-		Element subRoot;    // Here we need to examine two files at the same time (for renaming events)
+		Element subRoot;
+
+		// Here we need to examine two files at the same time (for renaming events)
 		List modificationList;
-		StringTokenizer st;    // Used on several occasions
+		StringTokenizer st;
+
+		// Used on several occasions
 		String oldAutomatonName;
 		String newAutomatonName;
 		String oldEventName;
@@ -292,7 +310,7 @@ public class AutomataBuildFromVALID
 						// Change name on the label in the automaton
 						// currAutomata.getAutomaton(newAutomatonName).getEventWithLabel(oldEventName).setLabel(new String(newEventName));
 						Automaton currAutomaton = currAutomata.getAutomaton(newAutomatonName);
-						Event currEvent = currAutomaton.getEventWithLabel(oldEventName);
+						EventLabel currEvent = currAutomaton.getEventWithLabel(oldEventName);
 						Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 						currAlphabet.removeEvent(currEvent);
@@ -345,7 +363,7 @@ public class AutomataBuildFromVALID
 
 		while (i.hasNext())
 		{
-			Event currEvent = new Event();
+			EventLabel currEvent = new EventLabel();
 
 			element = (Element) i.next();
 

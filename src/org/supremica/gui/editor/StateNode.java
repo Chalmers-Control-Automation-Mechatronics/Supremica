@@ -1,57 +1,57 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.gui.editor;
 
 import com.nwoods.jgo.*;
 import java.awt.*;
-import org.supremica.automata.*;
+import org.supremica.automata.State;
 
 public class StateNode
 	extends JGoArea
@@ -65,9 +65,11 @@ public class StateNode
 	protected State theState = null;
 
 	/**
-	* A newly constructed StateNode is not usable until you've
-	* called initialize().
-	*/
+	 * A newly constructed StateNode is not usable until you've
+	 * called initialize().
+	 *
+	 *@param  theState Description of the Parameter
+	 */
 	public StateNode(State theState)
 	{
 		super();
@@ -131,14 +133,14 @@ public class StateNode
 	}
 
 	/**
-	* Keep the parts of a StateNode positioned relative to each other
-	* by setting their locations using some of the standard spots of
-	* a JGoObject.
-	* <p>
-	* By default the label will be positioned at the bottom of the node,
-	* above the ellipse.  To change this to be below the ellipse, at
-	* the bottom of the node, change the myLabel.setSpotLocation() call.
-	*/
+	 * Keep the parts of a StateNode positioned relative to each other
+	 * by setting their locations using some of the standard spots of
+	 * a JGoObject.
+	 * <p>
+	 * By default the label will be positioned at the bottom of the node,
+	 * above the ellipse.  To change this to be below the ellipse, at
+	 * the bottom of the node, change the myLabel.setSpotLocation() call.
+	 */
 	public void layoutChildren()
 	{
 		if (myEllipse == null)
@@ -206,14 +208,14 @@ public class StateNode
 		}
 
 		/*
-		 *               if (labeltext != null)
-		 *               {
-		 *                       myLabel = new JGoText(labeltext);
-		 *                       myLabel.setSelectable(false);
-		 *                       myLabel.setDraggable(false);
-		 *                       myLabel.setAlignment(JGoText.ALIGN_CENTER);
-		 *                       myLabel.setTransparent(true);
-		 *               }
+		 *  if (labeltext != null)
+		 *  {
+		 *  myLabel = new JGoText(labeltext);
+		 *  myLabel.setSelectable(false);
+		 *  myLabel.setDraggable(false);
+		 *  myLabel.setAlignment(JGoText.ALIGN_CENTER);
+		 *  myLabel.setTransparent(true);
+		 *  }
 		 */
 
 		// create a Port, which knows how to make sure
@@ -296,22 +298,22 @@ public class StateNode
 	}
 
 	/*
-	 *       public void colorChange()
-	 *       {
-	 *               Color c = getColor();
-	 *               if (c == Color.red)
-	 *               {
-	 *                       setColor(Color.green);
-	 *               }
-	 *               else if (c == Color.green)
-	 *               {
-	 *                       setColor(Color.blue);
-	 *               }
-	 *               else if (c == Color.blue)
-	 *               {
-	 *                       setColor(Color.red);
-	 *               }
-	 *       }
+	 *  public void colorChange()
+	 *  {
+	 *  Color c = getColor();
+	 *  if (c == Color.red)
+	 *  {
+	 *  setColor(Color.green);
+	 *  }
+	 *  else if (c == Color.green)
+	 *  {
+	 *  setColor(Color.blue);
+	 *  }
+	 *  else if (c == Color.blue)
+	 *  {
+	 *  setColor(Color.red);
+	 *  }
+	 *  }
 	 */
 	public JGoPort getPort()
 	{

@@ -1,66 +1,76 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.*;
 import java.util.*;
 import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
 import org.apache.log4j.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.EventsSet;
+import org.supremica.automata.State;
+import org.supremica.automata.EventLabel;
 
 /**
  * For performing controllability verification. Uses AutomataSynchronizerExecuter for the actual verification work.
- * @deprecated use AutomataVerifier instead.
- * @see AutomataVerifier
- * @see AutomataSynchronizerExecuter
+ *
+ *@author  ka
+ *@created  November 28, 2001
+ *@deprecated  use AutomataVerifier instead.
+ *@see  AutomataVerifier
+ *@see  AutomataSynchronizerExecuter
  */
 public class AutomataFastControllabilityCheck
 {
@@ -68,8 +78,11 @@ public class AutomataFastControllabilityCheck
 	private Automata theAutomata;
 	private int nbrOfExecuters;
 
-	/** Map from an uncontrollable Event-object to the Set of plant-type Automaton-objects that contains this event.
-	 * @see AlphabetAnalyzer */
+	/**
+	 * Map from an uncontrollable Event-object to the Set of plant-type Automaton-objects that contains this event.
+	 *
+	 *@see  AlphabetAnalyzer
+	 */
 	private HashMap uncontrollableEventToPlantMap = new HashMap();
 	private AutomataSynchronizerHelper synchHelper;
 	private ArrayList synchronizationExecuters;
@@ -82,8 +95,11 @@ public class AutomataFastControllabilityCheck
 	private int stateAmount = 1;
 	private int stateAmountLimit = 1000;
 
-	/** Determines if more detailed information on the progress of things should be displayed.
-	 * @see SynchronizationOptions */
+	/**
+	 * Determines if more detailed information on the progress of things should be displayed.
+	 *
+	 *@see  SynchronizationOptions
+	 */
 	private boolean verboseMode;
 
 	public AutomataFastControllabilityCheck(Automata theAutomata, SynchronizationOptions syncOptions)
@@ -115,8 +131,9 @@ public class AutomataFastControllabilityCheck
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
 		// Build the initial state
-		initialState = new int[theAutomata.size() + 1];    // + 1 status field
+		initialState = new int[theAutomata.size() + 1];
 
+		// + 1 status field
 		Iterator autIt = theAutomata.iterator();
 
 		while (autIt.hasNext())
@@ -129,13 +146,15 @@ public class AutomataFastControllabilityCheck
 
 	/**
 	 * Performs verification using the AutomataSynchronizerExecuter.
-	 * @return true if controllable, false if not or false if don't know.
-	 * @see AutomataSynchronizerExecuter
+	 *
+	 *@return  true if controllable, false if not or false if don't know.
+	 *@exception  Exception Description of the Exception
+	 *@see  AutomataSynchronizerExecuter
 	 */
 	public boolean execute()
 		throws Exception
 	{
-		Event currEvent;
+		EventLabel currEvent;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
 		ArrayList selectedAutomata = new ArrayList();
@@ -145,18 +164,22 @@ public class AutomataFastControllabilityCheck
 		Iterator supervisorIterator = theAutomata.iterator();
 
 		while (supervisorIterator.hasNext())
-		{                        // Iterate over supervisors/specifications
+		{
+
+			// Iterate over supervisors/specifications
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
 
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
-			{    // Examine uncontrollable events in currSupervisorAutomaton and select plants containing these events
+			{
+
+				// Examine uncontrollable events in currSupervisorAutomaton and select plants containing these events
 				selectedAutomata.add(currSupervisorAutomaton);
 
 				eventIterator = currSupervisorAutomaton.eventIterator();
 
 				while (eventIterator.hasNext())
 				{
-					currEvent = (Event) eventIterator.next();
+					currEvent = (EventLabel) eventIterator.next();
 
 					if (!currEvent.isControllable())
 					{
@@ -178,7 +201,9 @@ public class AutomataFastControllabilityCheck
 				}
 
 				if (selectedAutomata.size() > 1)
-				{    // Clear the hash-table and set some variables in the synchronization helper
+				{
+
+					// Clear the hash-table and set some variables in the synchronization helper
 					synchHelper.clear();
 					synchHelper.setRememberUncontrollable(true);
 					synchHelper.addState(initialState);
@@ -208,8 +233,9 @@ public class AutomataFastControllabilityCheck
 					String automataNames = "";
 
 					if (verboseMode)
-					{    // For printing the names of the automata in selectedAutomata
+					{
 
+						// For printing the names of the automata in selectedAutomata
 						// Object[] automatonArray = selectedAutomata.toArray();
 						Iterator autIt = selectedAutomata.iterator();
 
@@ -224,15 +250,18 @@ public class AutomataFastControllabilityCheck
 					}
 
 					if (synchHelper.getAutomataIsControllable())
-					{            // Very nice
+					{
+
+						// Very nice
 						if (verboseMode)
 						{
 							thisCategory.info(automataNames + "is controllable.");
 						}
 					}
 					else
-					{            // Try to add some more automata
+					{
 
+						// Try to add some more automata
 						// Make array with indices of selected automata to remember which were originally selected
 						int[] automataIndices = new int[selectedAutomata.size()];
 
@@ -265,8 +294,9 @@ public class AutomataFastControllabilityCheck
 							}
 
 							if (similarAutomata != null)
-							{    // Add the similar automata  in hope of removing uncontrollable
+							{
 
+								// Add the similar automata  in hope of removing uncontrollable
 								// states from potentiallyUncontrollableStates...
 								excludeUncontrollableStates(similarAutomata, selectedAutomata, automataIndices);
 							}
@@ -282,7 +312,9 @@ public class AutomataFastControllabilityCheck
 								if (findUncontrollableStates(automataIndices))
 								{
 									if (verboseMode)
-									{    // Print the uncontrollable state(s)...
+									{
+
+										// Print the uncontrollable state(s)...
 										synchHelper.printUncontrollableStates();
 
 										// Print event trace reaching uncontrollable state
@@ -296,8 +328,9 @@ public class AutomataFastControllabilityCheck
 								}
 							}
 							else
-							{    // All uncontrollable states were removed!
+							{
 
+								// All uncontrollable states were removed!
 								// thisCategory.info("The supervisor " + ((Automaton) selectedAutomata.get(0)).getName() + " was found to be controllable afterall!");
 								break;
 							}
@@ -339,10 +372,13 @@ public class AutomataFastControllabilityCheck
 
 	/**
 	 * Finds similar automata and sorts the automata in a smart way...
-	 * @param selectedAutomata the collection automata in the current "composition".
-	 * @param theAutomata reference to the global variable with the same name... eh...
-	 * @see #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
-	 * @see #excludeUncontrollableStates(int[], java.util.ArrayList, int[])
+	 *
+	 *@param  selectedAutomata the collection automata in the current "composition".
+	 *@param  theAutomata reference to the global variable with the same name... eh...
+	 *@return  Description of the Return Value
+	 *@exception  Exception Description of the Exception
+	 *@see  #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
+	 *@see  #excludeUncontrollableStates(int[], java.util.ArrayList, int[])
 	 */
 	private int[] findSimilarAutomata(Automata theAutomata, ArrayList selectedAutomata)
 		throws Exception
@@ -448,20 +484,21 @@ public class AutomataFastControllabilityCheck
 	/**
 	 * Compares two alphabets for determining how similar they are, in some sense. All events in rightAlphabet are
 	 * examined if they are unique to rightAlphabet or appear in leftAlphabet too.
-	 * @return double representing how similar the two alphabets are. Returns quota between common events in the alphabets and unique events in rightAlphabet.
-	 * @param leftAlphabet the alphabet to compare.
-	 * @param rightAlphabet the alphabet to compare to.
+	 *
+	 *@param  leftAlphabet the alphabet to compare.
+	 *@param  rightAlphabet the alphabet to compare to.
+	 *@return  double representing how similar the two alphabets are. Returns quota between common events in the alphabets and unique events in rightAlphabet.
 	 */
 	private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
 	{
 		int amountOfCommon = 0;
 		int amountOfUnique = 0;
 		Iterator eventIterator = rightAlphabet.iterator();
-		Event currEvent;
+		EventLabel currEvent;
 
 		while (eventIterator.hasNext())
 		{
-			currEvent = (Event) eventIterator.next();
+			currEvent = (EventLabel) eventIterator.next();
 
 			if (leftAlphabet.containsEventWithLabel(currEvent.getLabel()))
 			{
@@ -473,8 +510,10 @@ public class AutomataFastControllabilityCheck
 			}
 		}
 
-		if (amountOfCommon < 1)    // Perhaps <= 1? Only one event won't do much good?
+		if (amountOfCommon < 1)
 		{
+
+			// Perhaps <= 1? Only one event won't do much good?
 			return 0;
 		}
 
@@ -491,10 +530,12 @@ public class AutomataFastControllabilityCheck
 	/**
 	 * Excudes potentially uncontrollable states from potentiallyUncontrollableStates by synchronizing the
 	 * automata in the current composition with automata with similar alphabets.
-	 * @param similarAutomata integer array with indices of automata with similar alphabets (from similarAutomata()).
-	 * @param selectedAutomata ArrayList of the Automaton-objects currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier rins of this method).
-	 * @param automataIndices integer array with indices of automata in the current "composition".
-	 * @see #findSimilarAutomata(org.supremica.automata.Automata, java.util.ArrayList)
+	 *
+	 *@param  similarAutomata integer array with indices of automata with similar alphabets (from similarAutomata()).
+	 *@param  selectedAutomata ArrayList of the Automaton-objects currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier rins of this method).
+	 *@param  automataIndices integer array with indices of automata in the current "composition".
+	 *@exception  Exception Description of the Exception
+	 *@see  #findSimilarAutomata(org.supremica.automata.Automata, java.util.ArrayList)
 	 */
 	private void excludeUncontrollableStates(int[] similarAutomata, ArrayList selectedAutomata, int[] automataIndices)
 		throws Exception
@@ -503,7 +544,9 @@ public class AutomataFastControllabilityCheck
 		int start = selectedAutomata.size() - automataIndices.length;
 
 		if (start == similarAutomata.length)
-		{    // Already added all similar automata
+		{
+
+			// Already added all similar automata
 			if (verboseMode)
 			{
 				thisCategory.info("All similar automata are already added, there is no hope for prooving controllability...");
@@ -512,7 +555,9 @@ public class AutomataFastControllabilityCheck
 			return;
 		}
 		else if (start > 0)
-		{    // Been here before, already added some automata
+		{
+
+			// Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 			{
 				addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]).getName();
@@ -522,7 +567,9 @@ public class AutomataFastControllabilityCheck
 			stateAmountLimit = stateAmountLimit * 5;
 		}
 		else
-		{    // First attempt
+		{
+
+			// First attempt
 			for (int i = 0; i < automataIndices.length; i++)
 			{
 				stateAmount = stateAmount * theAutomata.getAutomatonAt(automataIndices[i]).nbrOfStates();
@@ -543,8 +590,9 @@ public class AutomataFastControllabilityCheck
 			stateAmount = stateAmount * theAutomata.getAutomatonAt(similarAutomata[i]).nbrOfStates();
 
 			if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
-			{        // Synchronize...
+			{
 
+				// Synchronize...
 				// synchHelper.clear(); // This is done while analyzing the result se *** below
 				synchHelper.addState(initialState);
 
@@ -565,8 +613,9 @@ public class AutomataFastControllabilityCheck
 					{
 						potentiallyUncontrollableStates.find(automataIndices, currStateTable[j]);
 
-						currStateTable[j] = null;    // Instead of using clear()... se *** above
+						currStateTable[j] = null;
 
+						// Instead of using clear()... se *** above
 						stateCount++;
 					}
 				}
@@ -611,7 +660,9 @@ public class AutomataFastControllabilityCheck
 				}
 
 				if (stateAmount > stateAmountLimit)
-				{    // Limit reached!!
+				{
+
+					// Limit reached!!
 					break;
 				}
 			}
@@ -619,69 +670,69 @@ public class AutomataFastControllabilityCheck
 	}
 
 	/*
-	 * private boolean oldFindUncontrollableStates(int[] automataIndices, int[] similarAutomata)
-	 *       throws Exception
-	 * {
-	 *       synchHelper.clear();
-	 *       // synchHelper.setRememberUncontrollable(false);
-	 *       synchHelper.setExpandEventsUsingPriority(true);
-	 *       synchHelper.setRememberTrace(true);
-	 *       synchHelper.addState(initialState);
+	 *  private boolean oldFindUncontrollableStates(int[] automataIndices, int[] similarAutomata)
+	 *  throws Exception
+	 *  {
+	 *  synchHelper.clear();
+	 *  // synchHelper.setRememberUncontrollable(false);
+	 *  synchHelper.setExpandEventsUsingPriority(true);
+	 *  synchHelper.setRememberTrace(true);
+	 *  synchHelper.addState(initialState);
 	 *
-	 *       thisCategory.debug("Searching for uncontrollable states...");
+	 *  thisCategory.debug("Searching for uncontrollable states...");
 	 *
-	 *       // Set expansion priority
-	 *       Iterator eventIterator;
-	 *       Automaton currAutomaton;
-	 *       Alphabet currAlphabet;
-	 *       Alphabet unionAlphabet = synchHelper.getAutomaton().getAlphabet();
-	 *       Event currEvent;
-	 *       for (int i = 0; i < similarAutomata.length; i++)
-	 *       {
-	 *               currAlphabet = theAutomata.getAutomatonAt(similarAutomata[i]).getAlphabet();
-	 *               eventIterator = currAlphabet.iterator();
-	 *               while (eventIterator.hasNext())
-	 *               {
-	 *                       currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
-	 *                       currEvent.setExpansionPriority(2);
-	 *                       // thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
-	 *               }
-	 *       }
-	 *       for (int i = 0; i < automataIndices.length; i++)
-	 *       {
-	 *               currAlphabet = theAutomata.getAutomatonAt(automataIndices[i]).getAlphabet();
-	 *               eventIterator = currAlphabet.iterator();
-	 *               while (eventIterator.hasNext())
-	 *               {
-	 *                       currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
-	 *                       currEvent.setExpansionPriority(1);
-	 *                       // thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
-	 *               }
-	 *       }
+	 *  // Set expansion priority
+	 *  Iterator eventIterator;
+	 *  Automaton currAutomaton;
+	 *  Alphabet currAlphabet;
+	 *  Alphabet unionAlphabet = synchHelper.getAutomaton().getAlphabet();
+	 *  Event currEvent;
+	 *  for (int i = 0; i < similarAutomata.length; i++)
+	 *  {
+	 *  currAlphabet = theAutomata.getAutomatonAt(similarAutomata[i]).getAlphabet();
+	 *  eventIterator = currAlphabet.iterator();
+	 *  while (eventIterator.hasNext())
+	 *  {
+	 *  currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
+	 *  currEvent.setExpansionPriority(2);
+	 *  // thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
+	 *  }
+	 *  }
+	 *  for (int i = 0; i < automataIndices.length; i++)
+	 *  {
+	 *  currAlphabet = theAutomata.getAutomatonAt(automataIndices[i]).getAlphabet();
+	 *  eventIterator = currAlphabet.iterator();
+	 *  while (eventIterator.hasNext())
+	 *  {
+	 *  currEvent = unionAlphabet.getEventWithLabel(((Event) eventIterator.next()).getLabel());
+	 *  currEvent.setExpansionPriority(1);
+	 *  // thisCategory.debug("Titta: " + currEvent.getLabel() + " " + currEvent.getExpansionPriority());
+	 *  }
+	 *  }
 	 *
-	 *       // Allocate and initialize the synchronizationExecuters
-	 *       ArrayList synchronizationExecuters = new ArrayList(nbrOfExecuters);
-	 *       for (int i = 0; i < nbrOfExecuters; i++)
-	 *       {
-	 *               AutomataSynchronizerExecuter currSynchronizationExecuter =
-	 *                       new AutomataSynchronizerExecuter(synchHelper);
-	 *               synchronizationExecuters.add(currSynchronizationExecuter);
-	 *       }
+	 *  // Allocate and initialize the synchronizationExecuters
+	 *  ArrayList synchronizationExecuters = new ArrayList(nbrOfExecuters);
+	 *  for (int i = 0; i < nbrOfExecuters; i++)
+	 *  {
+	 *  AutomataSynchronizerExecuter currSynchronizationExecuter =
+	 *  new AutomataSynchronizerExecuter(synchHelper);
+	 *  synchronizationExecuters.add(currSynchronizationExecuter);
+	 *  }
 	 *
-	 *       // Start all the synchronization executers and wait for completion
-	 *       // For the moment we assume that we only have one thread
-	 *       for (int i = 0; i < synchronizationExecuters.size(); i++)
-	 *       {
-	 *               AutomataSynchronizerExecuter currExec =
-	 *                       (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-	 *               currExec.selectAllAutomata();
-	 *               currExec.start();
-	 *       }
-	 *       ((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
-	 *       // synchHelper.setExpandEventsUsingPriority(false);
-	 *       // synchHelper.setRememberTrace(false);
-	 *       return !synchHelper.getAutomataIsControllable();
-	 * }
+	 *  // Start all the synchronization executers and wait for completion
+	 *  // For the moment we assume that we only have one thread
+	 *  for (int i = 0; i < synchronizationExecuters.size(); i++)
+	 *  {
+	 *  AutomataSynchronizerExecuter currExec =
+	 *  (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+	 *  currExec.selectAllAutomata();
+	 *  currExec.start();
+	 *  }
+	 *  ((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+	 *  // synchHelper.setExpandEventsUsingPriority(false);
+	 *  // synchHelper.setRememberTrace(false);
+	 *  return !synchHelper.getAutomataIsControllable();
+	 *  }
 	 */
 
 	/**
@@ -689,7 +740,9 @@ public class AutomataFastControllabilityCheck
 	 * This is done without doing a full synchronization but a full synchronization limited by
 	 * in the gratest extent possible following the enabled transitions in the current "composition".
 	 *
-	 * @param automataIndices integer array with indices of automata in the current "composition".
+	 *@param  automataIndices integer array with indices of automata in the current "composition".
+	 *@return  Description of the Return Value
+	 *@exception  Exception Description of the Exception
 	 */
 	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception

@@ -2,13 +2,13 @@
 // ***************** SearchStates.java *********************//
 
 /*
- * Given an Automata object and a Matcher object, online
- * synch the automata and save the matching states
+ *  Given an Automata object and a Matcher object, online
+ *  synch the automata and save the matching states
  *
- * Is it useful to first search each automaton for states
- * matching that automatons pattern? At least, if some
- * automaton has no states matching its pattern, then no
- * global match exists.
+ *  Is it useful to first search each automaton for states
+ *  matching that automatons pattern? At least, if some
+ *  automaton has no states matching its pattern, then no
+ *  global match exists.
  */
 package org.supremica.automata.algorithms;
 
@@ -16,10 +16,9 @@ import java.lang.Exception;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.apache.oro.text.regex.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
-import org.supremica.automata.algorithms.Matcher;
+import org.supremica.automata.Automata;
+import org.supremica.automata.State;
 
 // 
 public class SearchStates
@@ -57,16 +56,16 @@ public class SearchStates
 	}
 
 	/*
-	 *       // Search based on a pattern for each automaton
-	 *       public void search(PatternMatcher pm, Pattern[] ps) throws Exception
-	 *       {
-	 *               search(new FixedformMatcher(pm, ps));
-	 *       }
-	 *       // Search based on a freeform pattern for the global states
-	 *       public void search(PatternMatcher pm, Pattern p) throws Exception
-	 *       {
-	 *               search(new FreeformMatcher(pm, p));
-	 *       }
+	 *  // Search based on a pattern for each automaton
+	 *  public void search(PatternMatcher pm, Pattern[] ps) throws Exception
+	 *  {
+	 *  search(new FixedformMatcher(pm, ps));
+	 *  }
+	 *  // Search based on a freeform pattern for the global states
+	 *  public void search(PatternMatcher pm, Pattern p) throws Exception
+	 *  {
+	 *  search(new FreeformMatcher(pm, p));
+	 *  }
 	 */
 	public int numberFound()
 	{
@@ -84,8 +83,9 @@ public class SearchStates
 	{
 		private State[][] states;
 		private int[] composite;
-		int index;    // holds the automaton index
+		int index;
 
+		// holds the automaton index
 		// ** Note, ctor should be private, but jikes 1.15 emits faulty bytecode then
 		// ** javac and jikes 1.14 ok for private.
 		// ** Do not instantiate, create only through getStateIterator()
@@ -98,16 +98,22 @@ public class SearchStates
 
 		public boolean hasNext()
 		{
-			return index < composite.length - 1;    // the last element of composite is not used
+			return index < composite.length - 1;
+
+			// the last element of composite is not used
 		}
 
-		public State getState()    // get the current state of the current automaton
+		public State getState()
 		{
+
+			// get the current state of the current automaton
 			return states[index][composite[index]];
 		}
 
-		public void inc()    // move to the next automaton
+		public void inc()
 		{
+
+			// move to the next automaton
 			++index;
 		}
 	}

@@ -11,15 +11,15 @@ import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.log4j.*;
 import org.apache.oro.text.regex.*;
-import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
+import org.supremica.automata.Automata;
 
 // ----------------------------------------------------------------------------------
 // compiler type should be adjustable, but as for now, we only support a single type
 class CompilerFactory
 {
-	static public PatternCompiler getCompiler()
+	public static PatternCompiler getCompiler()
 	{
 		return new Perl5Compiler();
 	}
@@ -35,9 +35,9 @@ class FindStatesTableModel
 	private PatternCompiler comp = null;
 	private String[] columnNames = { "Automaton", "Type", "Regular Expression" };
 	private Object[][] cells = null;
-	private static final int AUTOMATON_COL = 0;
-	private static final int TYPE_COL = AUTOMATON_COL + 1;
-	private static final int REGEXP_COL = TYPE_COL + 1;
+	private final static int AUTOMATON_COL = 0;
+	private final static int TYPE_COL = AUTOMATON_COL + 1;
+	private final static int REGEXP_COL = TYPE_COL + 1;
 
 	public FindStatesTableModel(Automata a, PatternCompiler c)
 	{
@@ -55,8 +55,10 @@ class FindStatesTableModel
 		comp = c;
 		patterns = new Pattern[size];
 
-		try    // I know compile _cannot_ throw here, but Java requires me to catch this exception
+		try
 		{
+
+			// I know compile _cannot_ throw here, but Java requires me to catch this exception
 			Pattern any_string = comp.compile(".*");
 
 			for (int i = 0; i < patterns.length; ++i)
@@ -115,7 +117,9 @@ class FindStatesTableModel
 
 	public boolean isCellEditable(int row, int col)
 	{
-		return col == REGEXP_COL;    // the one and only editable column
+		return col == REGEXP_COL;
+
+		// the one and only editable column
 	}
 
 	public boolean isRegexpColumn(int col)
@@ -172,7 +176,9 @@ class FindStatesTable
 			JMenuItem edit_item = add("Edit");
 
 			edit_item.addActionListener(new ActionListener()
-			{                       // anonymous class
+			{
+
+				// anonymous class
 				public void actionPerformed(ActionEvent e)
 				{
 					String str = (String) getModel().getValueAt(row, col);
@@ -183,7 +189,9 @@ class FindStatesTable
 						getModel().setValueAt(regexp_dialog.getText(), row, col);
 					}
 
-					doRepaint();    // for resolving ambiguity
+					doRepaint();
+
+					// for resolving ambiguity
 				}
 			});
 		}
@@ -252,9 +260,10 @@ class FindStatesTable
 
 						regexp_popup.show(e.getComponent(), e.getX(), e.getY());
 					}
-					else    // in table but not in the regexp column - show main menu
+					else
 					{
 
+						// in table but not in the regexp column - show main menu
 						// Supremica.menuHandler.getDisabledPopupMenu(getThisTable()).show(e.getComponent(), e.getX(), e.getY());
 						// getMainPopupMenu().show(getThisTable().getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
 					}
@@ -282,7 +291,7 @@ abstract class FindStatesPanel
 		this.tip = tip;
 	}
 
-	abstract public Matcher getMatcher();
+	public abstract Matcher getMatcher();
 }
 
 class FreeFormPanel
@@ -407,8 +416,12 @@ class FixedFormPanel
 
 // -----------------------------------------
 class FindStatesFrame
-	extends JFrame    /* CenteredFrame */
+	extends JFrame
 {
+
+	/*
+	 *  CenteredFrame
+	 */
 	private FindStatesTable table = null;
 	private Automata automata = null;
 
@@ -523,71 +536,68 @@ class FindStatesFrame
 	}
 
 	/**
-																	class FreeFormButton extends JButton
-																	{
-																																	private PatternCompiler comp = null;
-																																	private Pattern pattern = null;
-
-																																	public FreeFormButton(PatternCompiler c)
-																																	{
-																																																	super("FreeForm");
-																																																	setToolTipText("Search with a free form regexp");
-																																																	addActionListener(
-																																																																	new ActionListener()
-																																																																	{
-																																																																																	public void actionPerformed(ActionEvent e)
-																																																																																	{
-																																																																																																	action(e);
-																																																																																	}
-																																																																	});
-
-																																																	comp = c;
-																																																	try
-																																																	{
-																																																																	pattern = comp.compile(".*");
-																																																	}
-																																																	catch(MalformedPatternException excp)
-																																																	{
-																																																																	System.err.println("FreeFormButton::impossible exception");
-																																																	}
-																																	}
-
-																																	void action(ActionEvent evt)
-																																	{
-																																																	RegexpDialog regexp_dlg = new RegexpDialog(null, pattern.getPattern());
-
-																																																	if(regexp_dlg.isOk())
-																																																	{
-																																																																	try
-																																																																	{
-																																																																																	pattern = comp.compile(regexp_dlg.getText());
-																																																																	}
-																																																																	catch(MalformedPatternException excp)
-																																																																	{
-																																																																																	debug("FindStatesTable::Incorrect pattern \"" + regexp_dlg.getText() +"\"");
-																																																																																	JOptionPane.showMessageDialog(null, "Incorrect pattern: " + regexp_dlg.getText(), "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
-																																																																																	return;
-																																																																	}
-																																																	}
-																																																	else
-																																																																	return;
-
-																																																	doRepaint();
-																																																	try
-																																																	{
-																																																																	SearchStates ss = new SearchStates(getAutomata());
-																																																																	ss.search(new Perl5Matcher(), pattern);
-																																																																	showCompositeStates(ss);
-																																																	}
-																																																	catch(Exception excp)
-																																																	{
-																																																																	// Let it silently die, how the f*** do get these excp specs to work?
-																																																																	debug("FindButton - " + excp);
-																																																																	excp.printStackTrace();
-																																																	}
-																																	}
-																	}
-	***/
+	 *class FreeFormButton extends JButton
+	 *{
+	 *private PatternCompiler comp = null;
+	 *private Pattern pattern = null;
+	 *public FreeFormButton(PatternCompiler c)
+	 *{
+	 *super("FreeForm");
+	 *setToolTipText("Search with a free form regexp");
+	 *addActionListener(
+	 *new ActionListener()
+	 *{
+	 *public void actionPerformed(ActionEvent e)
+	 *{
+	 *action(e);
+	 *}
+	 *});
+	 *comp = c;
+	 *try
+	 *{
+	 *pattern = comp.compile(".*");
+	 *}
+	 *catch(MalformedPatternException excp)
+	 *{
+	 *System.err.println("FreeFormButton::impossible exception");
+	 *}
+	 *}
+	 *void action(ActionEvent evt)
+	 *{
+	 *RegexpDialog regexp_dlg = new RegexpDialog(null, pattern.getPattern());
+	 *if(regexp_dlg.isOk())
+	 *{
+	 *try
+	 *{
+	 *pattern = comp.compile(regexp_dlg.getText());
+	 *}
+	 *catch(MalformedPatternException excp)
+	 *{
+	 *debug("FindStatesTable::Incorrect pattern \"" + regexp_dlg.getText() +"\"");
+	 *JOptionPane.showMessageDialog(null, "Incorrect pattern: " + regexp_dlg.getText(), "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
+	 *return;
+	 *}
+	 *}
+	 *else
+	 *return;
+	 *doRepaint();
+	 *try
+	 *{
+	 *SearchStates ss = new SearchStates(getAutomata());
+	 *ss.search(new Perl5Matcher(), pattern);
+	 *showCompositeStates(ss);
+	 *}
+	 *catch(Exception excp)
+	 *{
+	 * // Let it silently die, how the f*** do get these excp specs to work?
+	 *debug("FindButton - " + excp);
+	 *excp.printStackTrace();
+	 *}
+	 *}
+	 *}
+	 *
+	 * @param  a Description of the Parameter
+	 */
 	public FindStatesFrame(Automata a)
 	{
 

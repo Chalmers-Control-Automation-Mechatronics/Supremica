@@ -10,11 +10,13 @@ import java.io.*;
 import org.apache.log4j.*;
 import javax.help.*;
 import org.supremica.*;
-import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonContainer;
+import org.supremica.automata.AutomatonType;
 
 class TypeCellEditor
 	implements CellEditorListener

@@ -1,5 +1,5 @@
 
-/********************* BricksGame.java *********************/
+/** BricksGame.java ******************** */
 package org.supremica.testcases;
 
 import org.supremica.automata.AutomatonType;
@@ -7,8 +7,8 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
-import org.supremica.automata.Event;
 import org.supremica.automata.Arc;
+import org.supremica.automata.EventLabel;
 
 class BrickBuilder
 {
@@ -16,19 +16,20 @@ class BrickBuilder
 	private final int rows;
 	private final int cols;
 	private Automaton automaton = null;
-	private int number;    // this bricks number
+	private int number;
 
+	// this bricks number
 	private void addRight(int r, int c, int num, boolean reverse)
 		throws Exception
 	{
 		State source = automaton.getState(shared_states[r][c]);
-		State dest = automaton.getState(shared_states[r][c + 1]);    // to the right
-		Event src_dst = reverse
-						? new Event(dest.getId() + source.getId() + num)
-						: new Event(source.getId() + dest.getId() + num);
-		Event dst_src = reverse
-						? new Event(source.getId() + dest.getId() + num)
-						: new Event(dest.getId() + source.getId() + num);
+		State dest = automaton.getState(shared_states[r][c + 1]);
+		EventLabel src_dst = reverse
+							 ? new EventLabel(dest.getId() + source.getId() + num)
+							 : new EventLabel(source.getId() + dest.getId() + num);
+		EventLabel dst_src = reverse
+							 ? new EventLabel(source.getId() + dest.getId() + num)
+							 : new EventLabel(dest.getId() + source.getId() + num);
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);
@@ -40,13 +41,13 @@ class BrickBuilder
 		throws Exception
 	{
 		State source = automaton.getState(shared_states[r][c]);
-		State dest = automaton.getState(shared_states[r + 1][c]);    // downwards
-		Event src_dst = reverse
-						? new Event(dest.getId() + source.getId() + num)
-						: new Event(source.getId() + dest.getId() + num);
-		Event dst_src = reverse
-						? new Event(source.getId() + dest.getId() + num)
-						: new Event(dest.getId() + source.getId() + num);
+		State dest = automaton.getState(shared_states[r + 1][c]);
+		EventLabel src_dst = reverse
+							 ? new EventLabel(dest.getId() + source.getId() + num)
+							 : new EventLabel(source.getId() + dest.getId() + num);
+		EventLabel dst_src = reverse
+							 ? new EventLabel(source.getId() + dest.getId() + num)
+							 : new EventLabel(dest.getId() + source.getId() + num);
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);
@@ -59,8 +60,9 @@ class BrickBuilder
 	{
 		rows = r;
 		cols = c;
-		shared_states = new State[rows + 1][cols + 1];    // the +1 is a quick fixx to set boundaries
+		shared_states = new State[rows + 1][cols + 1];
 
+		// the +1 is a quick fixx to set boundaries
 		// Create the shared states - all states are named the same between automata (even the zero one)
 		// Create them just once, then share them (will this work in practice?)
 		for (int i = 1; i <= rows; ++i)
@@ -79,14 +81,17 @@ class BrickBuilder
 		automaton = new Automaton("Brick" + number);
 
 		automaton.setType(AutomatonType.Plant);
-		shared_states[r][c].setInitial(true);    // the initial state for this automaton
+		shared_states[r][c].setInitial(true);
 
+		// the initial state for this automaton
 		// Now add these states to this automaton
 		for (int i = 1; i <= rows; ++i)
 		{
 			for (int j = 1; j <= cols; ++j)
 			{
-				automaton.addState(new State(shared_states[i][j]));    // we must copy, mustn't we
+				automaton.addState(new State(shared_states[i][j]));
+
+				// we must copy, mustn't we
 			}
 		}
 
@@ -94,8 +99,10 @@ class BrickBuilder
 		// Since each transition has a unique event, there's a 1-2-1 mapping
 		for (int i = 1; i < rows; ++i)
 		{
-			for (int j = 1; j < cols; ++j)    // goes only to cols-1
+			for (int j = 1; j < cols; ++j)
 			{
+
+				// goes only to cols-1
 				addRight(i, j, number, false);
 				addDown(i, j, number, false);
 			}
@@ -122,14 +129,17 @@ class BrickBuilder
 		automaton = new Automaton("Brick0");
 
 		automaton.setType(AutomatonType.Plant);
-		shared_states[rows][cols].setInitial(true);    // the initial state for this automaton
+		shared_states[rows][cols].setInitial(true);
 
+		// the initial state for this automaton
 		// Now add these states to this automaton
 		for (int i = 1; i <= rows; ++i)
 		{
 			for (int j = 1; j <= cols; ++j)
 			{
-				automaton.addState(new State(shared_states[i][j]));    // we must copy, mustn't we
+				automaton.addState(new State(shared_states[i][j]));
+
+				// we must copy, mustn't we
 			}
 		}
 
@@ -137,8 +147,10 @@ class BrickBuilder
 		// Since each transition has a unique event, there's a 1-2-1 mapping
 		for (int i = 1; i < rows; ++i)
 		{
-			for (int j = 1; j < cols; ++j)    // goes only to cols-1
+			for (int j = 1; j < cols; ++j)
 			{
+
+				// goes only to cols-1
 				for (int k = 1; k < rows * cols; ++k)
 				{
 					addRight(i, j, k, true);

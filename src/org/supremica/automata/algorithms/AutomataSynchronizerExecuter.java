@@ -1,68 +1,77 @@
 
 /*
- * Supremica Software License Agreement
+ *  Supremica Software License Agreement
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Haradsgatan 26A
- * 431 42 Molndal
- * SWEDEN
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
  *
- * to discuss license terms. No cost evaluation licenses are
- * available.
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
  *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
  *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.*;
 import org.supremica.gui.*;
 import org.apache.log4j.*;
 import java.util.Arrays;
 
 // For the automata selection methods
 import java.util.ArrayList;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.AutomataIndexForm;
+import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.State;
+import org.supremica.automata.EventLabel;
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
  *
- * @see AutomataSynchronizer
- * @see AutomataFastControllabilityCheck
- * @see AutomataSynthesizer
+ *@author  ka
+ *@created  November 28, 2001
+ *@see  AutomataSynchronizer
+ *@see  AutomataFastControllabilityCheck
+ *@see  AutomataSynthesizer
  */
 public final class AutomataSynchronizerExecuter
 	extends Thread
@@ -85,28 +94,39 @@ public final class AutomataSynchronizerExecuter
 	private int[] nextState;
 	private int[] currEnabledEvents;
 	private boolean controllableState;
-	private static final int IMMEDIATE_NOT_AVAILABLE = -1;
+	private final static int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
 
-	/** Options determining how the synchronization should be performed.
-	 */
+	/** Options determining how the synchronization should be performed. */
 	private final SynchronizationOptions syncOptions;
 
-	/** Determines if uncontrollable states should be marked as forbidden.
-	 * @see SynchronizationOptions */
+	/**
+	 * Determines if uncontrollable states should be marked as forbidden.
+	 *
+	 *@see  SynchronizationOptions
+	 */
 	private boolean forbidUncontrollableStates;
 
-	/** Determines if uncontrollable states should be expanded in the synchronization.
-	 * @see SynchronizationOptions */
+	/**
+	 * Determines if uncontrollable states should be expanded in the synchronization.
+	 *
+	 *@see  SynchronizationOptions
+	 */
 	private boolean expandForbiddenStates;
 
-	/** Determines if more detailed information on the progress of things should be displayed.
-	 * @see SynchronizationOptions */
+	/**
+	 * Determines if more detailed information on the progress of things should be displayed.
+	 *
+	 *@see  SynchronizationOptions
+	 */
 	private boolean verboseMode;
 
-	/** Determines synchronization type.
-	 * @see SynchronizationType
-	 * @see SynchronizationOptions */
+	/**
+	 * Determines synchronization type.
+	 *
+	 *@see  SynchronizationType
+	 *@see  SynchronizationOptions
+	 */
 	private final SynchronizationType syncType;
 
 	// For AutomataFastControllabilityCheck...
@@ -127,7 +147,7 @@ public final class AutomataSynchronizerExecuter
 	private boolean stopRequested = false;
 
 	/**
-	 * @param synchronizerHelper helper for multithread execution.
+	 *@param  synchronizerHelper helper for multithread execution.
 	 */
 	public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
 	{
@@ -168,7 +188,10 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * @deprecated Used by deprecated method AutomataPairWiseCheck.
+	 *@param  plantIndex Description of the Parameter
+	 *@param  supervisorIndex Description of the Parameter
+	 *@exception  Exception Description of the Exception
+	 *@deprecated  Used by deprecated method AutomataPairWiseCheck.
 	 */
 
 	// Only used by AutomataPairWiseCheck (removable)
@@ -188,6 +211,9 @@ public final class AutomataSynchronizerExecuter
 
 	/**
 	 * Selects the automata in the ArrayList for synchronization.
+	 *
+	 *@param  automataToBeSelected Description of the Parameter
+	 *@exception  Exception Description of the Exception
 	 */
 	public void selectAutomata(ArrayList automataToBeSelected)
 		throws Exception
@@ -199,8 +225,9 @@ public final class AutomataSynchronizerExecuter
 			automataIndices[i] = ((Automaton) automataToBeSelected.get(i)).getIndex();
 		}
 
-		helper.selectAutomata(automataIndices);    // FIXA!
+		helper.selectAutomata(automataIndices);
 
+		// FIXA!
 		if (exhaustiveSearch)
 		{
 			throw new Exception("Exhaustive search used wrong way!");
@@ -209,6 +236,9 @@ public final class AutomataSynchronizerExecuter
 
 	/**
 	 * Selects the automata with the indices in automataIndices for synchronization
+	 *
+	 *@param  automataIndices Description of the Parameter
+	 *@exception  Exception Description of the Exception
 	 */
 	public void selectAutomata(int[] automataIndices)
 		throws Exception
@@ -221,9 +251,7 @@ public final class AutomataSynchronizerExecuter
 		}
 	}
 
-	/**
-	 * Selects all automata for synchronization.
-	 */
+	/** Selects all automata for synchronization. */
 	public void selectAllAutomata()
 	{
 		automataIndices = new int[nbrOfAutomata];
@@ -234,9 +262,7 @@ public final class AutomataSynchronizerExecuter
 		}
 	}
 
-	/**
-	 * Initializes variables vital for the synchronization.
-	 */
+	/** Initializes variables vital for the synchronization. */
 	public final void initialize()
 	{
 		currOutgoingEvents = new int[nbrOfAutomata][];
@@ -247,15 +273,19 @@ public final class AutomataSynchronizerExecuter
 			selectAllAutomata();
 		}
 
-		nextState = new int[nbrOfAutomata + 1];    // +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1];    // Always end with Integer.MAX_VALUE
+		nextState = new int[nbrOfAutomata + 1];
+
+		// +1 status field
+		currEnabledEvents = new int[nbrOfEvents + 1];
+
+		// Always end with Integer.MAX_VALUE
 	}
 
 	/**
 	 * Calculates what events are enabled from the state <tt>currState</tt>, if the state turns out
 	 * uncontrollable the boolean controllableState is set false.
 	 *
-	 * @param currState the (full) state to be examined.
+	 *@param  currState the (full) state to be examined.
 	 */
 	private final void enabledEvents(int[] currState)
 	{
@@ -321,7 +351,9 @@ public final class AutomataSynchronizerExecuter
 				if (syncType == SynchronizationType.Prioritized)
 				{
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])
-					{        // The event is prioritized in currAutomaton
+					{
+
+						// The event is prioritized in currAutomaton
 						if (!(currEventIndex == currAutEventIndex))
 						{
 
@@ -378,13 +410,16 @@ public final class AutomataSynchronizerExecuter
 				if (!canExecuteInPlant && typeIsPlantTable[currAutIndex])
 				{
 					if (currEventIndex == currAutEventIndex)
-					{        // Then currIndex (the event) must also be the
+					{
 
+						// Then currIndex (the event) must also be the
 						// current event in this automaton
 						canExecuteInPlant = true;
 
 						if (rememberUncontrollable)
-						{    // Remember uncontrollable states
+						{
+
+							// Remember uncontrollable states
 							problemEvent = currEventIndex;
 							problemPlant = currAutIndex;
 						}
@@ -395,7 +430,9 @@ public final class AutomataSynchronizerExecuter
 				// find the next event for this automaton and state
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
-				{            // Point to the next index;
+				{
+
+					// Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
 
 					currOutgoingEventsIndex[currAutIndex] = ++tmpIndex;
@@ -412,8 +449,9 @@ public final class AutomataSynchronizerExecuter
 			if (thisEventOk)
 			{
 				if (immediateEventsTable[currEventIndex])
-				{    // Clear out everything else and abort the search for enabled events
+				{
 
+					// Clear out everything else and abort the search for enabled events
 					// If several events that are immediate are found
 					// Then the one with smallest index are chosen.
 					immediateEvent = currEventIndex;
@@ -428,13 +466,17 @@ public final class AutomataSynchronizerExecuter
 			}
 
 			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk &&!controllableEventsTable[currEventIndex])
-			{                // Uncontrollable state found
+			{
+
+				// Uncontrollable state found
 				controllableState = false;
 
 				helper.setAutomataIsControllable(false);
 
 				if (exhaustiveSearch)
-				{            // Stop when uncontrollable state found
+				{
+
+					// Stop when uncontrollable state found
 					if (verboseMode)
 					{
 						thisCategory.info("Uncontrollable state found.");
@@ -449,7 +491,9 @@ public final class AutomataSynchronizerExecuter
 		currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
 
 		if (expandEventsUsingPriority)
-		{    // Choose outgoing events among the possibilities, choose after priority...
+		{
+
+			// Choose outgoing events among the possibilities, choose after priority...
 			int insertionIndex = 0;
 			int i = 0;
 			int minPrio = 2;
@@ -484,8 +528,9 @@ public final class AutomataSynchronizerExecuter
 		}
 
 		if (coExecute)
-		{    // In co-execution mode, an enabledEvents-method in another executer
+		{
 
+			// In co-execution mode, an enabledEvents-method in another executer
 			// follows the automaton we're suspecting has uncontrollable states.
 			int insertionIndex = 0;
 			int i = 0;
@@ -502,8 +547,9 @@ public final class AutomataSynchronizerExecuter
 			}
 
 			if (insertionIndex == 0)
-			{    // Found no corresponding transitions in the suspect automaton...
+			{
 
+				// Found no corresponding transitions in the suspect automaton...
 				// /*
 				if (verboseMode)
 				{
@@ -516,8 +562,9 @@ public final class AutomataSynchronizerExecuter
 				insertionIndex = currEnabledEvents.length - 1;
 			}
 			else
-			{    // There are transitions in the suspect automaton...
+			{
 
+				// There are transitions in the suspect automaton...
 				// /*
 				if (verboseMode)
 				{
@@ -531,9 +578,7 @@ public final class AutomataSynchronizerExecuter
 		}
 	}
 
-	/**
-	 * Performs the synchronization.
-	 */
+	/** Performs the synchronization. */
 	public void run()
 	{
 		initialize();
@@ -552,8 +597,9 @@ public final class AutomataSynchronizerExecuter
 			enabledEvents(currState);
 
 			if (!controllableState)
-			{    // We'd like to remember this state and later on try to show that
+			{
 
+				// We'd like to remember this state and later on try to show that
 				// it will be excluded in the total synchronization...  or not.
 				if (rememberUncontrollable)
 				{
@@ -577,13 +623,17 @@ public final class AutomataSynchronizerExecuter
 			}
 
 			if (controllableState || expandForbiddenStates)
-			{    // Expand state
+			{
+
+				// Expand state
 				int i = 0;
 				int currEventIndex = currEnabledEvents[i];
 
 				// Handle all events
 				while (currEventIndex != Integer.MAX_VALUE)
-				{    // Generate an array that contains the indicies of each state
+				{
+
+					// Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
 
 					// Iterate over all automata to construct the new state
@@ -627,8 +677,8 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * A call to this method stops the execution of the run-method or the buildAutomaton-method as soon as possible.
 	 *
-	 * @see AutomataSynchronizer
-	 * @see AutomataVerifier
+	 *@see  AutomataSynchronizer
+	 *@see  AutomataVerifier
 	 */
 	public void requestStop()
 	{
@@ -640,7 +690,8 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * Builds automaton using concatenated state names as new state names.
 	 *
-	 * @return true if build successful, false if build is stopped with requestStop().
+	 *@return  true if build successful, false if build is stopped with requestStop().
+	 *@exception  Exception Description of the Exception
 	 */
 	public boolean buildAutomaton()
 		throws Exception
@@ -651,8 +702,9 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * Builds automaton using either concatenated state names or new, short, unique names as new state names.
 	 *
-	 * @param longformId true for concateated state names, false for new names.
-	 * @return true if build successful, false if build is stopped with requestStop().
+	 *@param  longformId true for concateated state names, false for new names.
+	 *@return  true if build successful, false if build is stopped with requestStop().
+	 *@exception  Exception Description of the Exception
 	 */
 	public boolean buildAutomaton(boolean longformId)
 		throws Exception
@@ -791,7 +843,7 @@ public final class AutomataSynchronizerExecuter
 							if (nextIndex >= 0)
 							{
 								State nextState = theAutomaton.getStateWithIndex(nextIndex);
-								Event theEvent = theAlphabet.getEventWithIndex(currEventIndex);
+								EventLabel theEvent = theAlphabet.getEventWithIndex(currEventIndex);
 								Arc newArc = new Arc(thisState, nextState, theEvent.getId());
 
 								theAutomaton.addArc(newArc);
@@ -855,89 +907,93 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/*
-	 *   public int[][] previousStates(int[] state, int currEventIndex)
-	 *   {
-	 *               int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
-	 *               int[] nbrOfPrevStates = int[nbrOfAutomata];
-	 *               int[] currIndexOfPrevStates = int[nbrOfAutomata];
-	 *               int[] currPrevState = int[nbrOfAutomata + 1];
+	 *  public int[][] previousStates(int[] state, int currEventIndex)
+	 *  {
+	 *  int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
+	 *  int[] nbrOfPrevStates = int[nbrOfAutomata];
+	 *  int[] currIndexOfPrevStates = int[nbrOfAutomata];
+	 *  int[] currPrevState = int[nbrOfAutomata + 1];
 	 *
-	 *               // First compute the maximum nbr of previous states
-	 *       int maxNbrOfPreviousStates = 1;
-	 *       for (int i = 1; i < state.length - 1; i++)
-	 *       {
-	 *               // ToDo Check if this automaton is among the selected
+	 *  // First compute the maximum nbr of previous states
+	 *  int maxNbrOfPreviousStates = 1;
+	 *  for (int i = 1; i < state.length - 1; i++)
+	 *  {
+	 *  // ToDo Check if this automaton is among the selected
 	 *
-	 *               int currAutomatonIndex = i;
-	 *               int currStateIndex = state[currAutomatonIndex];
-	 *               int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
-	 *               if (prevStates != null)
-	 *               {
-	 *                       int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
-	 *                       nbrOfPrevStates[i] = currNbrOfPreviousStates;
-	 *                       if (currNbrOfPreviousStates > 0)
-	 *                       {
-	 *                               currIndexOfPrevStates
-	 *                       }
-	 *                       else
-	 *                       {
-	 *                               currIndexOfPreviousState[i] = 0;
-	 *                       }
-	 *                       maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
-	 *               }
-	 *       }
+	 *  int currAutomatonIndex = i;
+	 *  int currStateIndex = state[currAutomatonIndex];
+	 *  int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
+	 *  if (prevStates != null)
+	 *  {
+	 *  int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
+	 *  nbrOfPrevStates[i] = currNbrOfPreviousStates;
+	 *  if (currNbrOfPreviousStates > 0)
+	 *  {
+	 *  currIndexOfPrevStates
+	 *  }
+	 *  else
+	 *  {
+	 *  currIndexOfPreviousState[i] = 0;
+	 *  }
+	 *  maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
+	 *  }
+	 *  }
 	 *
-	 *       int[][] previousStates = new int[maxNbrOfPreviousState][];
-	 *               for (int i = 1; i < state.length - 2; i++)
-	 *               {
-	 *                       for(int j = i + 1; j < )
+	 *  int[][] previousStates = new int[maxNbrOfPreviousState][];
+	 *  for (int i = 1; i < state.length - 2; i++)
+	 *  {
+	 *  for(int j = i + 1; j < )
 	 *
-	 *               }
+	 *  }
 	 *
-	 *               // Check if this event is included
-	 *               int[] existingPrevState = theStates.get(currPrevState);
-	 *               if (existingPrevState != null)
-	 *               {
-	 *                       // Check if the event is really possible
-	 *                       if (isValidTransition(existingPrevState, state, currEventIndex))
-	 *                       {
-	 *                               previousStates[xx] = existingPrevState;
-	 *                       }
-	 *               }
+	 *  // Check if this event is included
+	 *  int[] existingPrevState = theStates.get(currPrevState);
+	 *  if (existingPrevState != null)
+	 *  {
+	 *  // Check if the event is really possible
+	 *  if (isValidTransition(existingPrevState, state, currEventIndex))
+	 *  {
+	 *  previousStates[xx] = existingPrevState;
+	 *  }
+	 *  }
 	 *
-	 *   }
+	 *  }
 	 */
 
 	/**
 	 * Check if the event is possible between fromState and toState.
 	 * For perfomance reasons we assume that event is possible in
 	 * at least one of the original automata.
+	 *
+	 *@param  fromState Description of the Parameter
+	 *@param  toState Description of the Parameter
+	 *@return  Description of the Return Value
 	 */
 
 	/*
-	 *    public boolean isValidTransition(int[] fromState, int[] toState, int event)
-	 *   {
-	 *       if (prioritizedEventInResultAutomaton[event])
-	 *       { // Check that event is possible from all automata that have
-	 *         // this event as prioritized.
+	 *  public boolean isValidTransition(int[] fromState, int[] toState, int event)
+	 *  {
+	 *  if (prioritizedEventInResultAutomaton[event])
+	 *  { // Check that event is possible from all automata that have
+	 *  // this event as prioritized.
 	 *
-	 *               // To do
-	 *       }
-	 *       else
-	 *       { // We assume that the event is possible in at least one of the
-	 *         // original automata.
-	 *               return true;
-	 *       }
-	 *   }
+	 *  // To do
+	 *  }
+	 *  else
+	 *  { // We assume that the event is possible in at least one of the
+	 *  // original automata.
+	 *  return true;
+	 *  }
+	 *  }
 	 */
 
 	/**
 	 * Method for finding transitions between states. Used by displayTrace() in AutomataSynchronizerHelper.
 	 *
-	 * @param fromState state to find transition from.
-	 * @param toState state to find transition to.
-	 * @see AutomataSynchronizerHelper#displayTrace()
-	 * @return index of one (of perhaps many) transitions between fromState and toState or -1 if none exists.
+	 *@param  fromState state to find transition from.
+	 *@param  toState state to find transition to.
+	 *@return  index of one (of perhaps many) transitions between fromState and toState or -1 if none exists.
+	 *@see  AutomataSynchronizerHelper#displayTrace()
 	 */
 	public int findTransition(int[] fromState, int[] toState)
 	{
@@ -948,7 +1004,9 @@ public final class AutomataSynchronizerExecuter
 
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
-		{    // Generate an array that contains the indicies of each state
+		{
+
+			// Generate an array that contains the indicies of each state
 			System.arraycopy(fromState, 0, nextState, 0, fromState.length);
 
 			// Iterate over all automata to construct the new state
@@ -977,10 +1035,15 @@ public final class AutomataSynchronizerExecuter
 
 	/**
 	 * Compares two arrays, except for the last element (the status field)
-	 * @return true if equal, false otherwise.
+	 *
+	 *@param  firstArray Description of the Parameter
+	 *@param  secondArray Description of the Parameter
+	 *@return  true if equal, false otherwise.
 	 */
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
-	{    // Assume that the last element is a status field
+	{
+
+		// Assume that the last element is a status field
 		for (int i = 0; i < firstArray.length - 1; i++)
 		{
 			if (firstArray[i] != secondArray[i])
@@ -994,9 +1057,10 @@ public final class AutomataSynchronizerExecuter
 
 	/**
 	 * Select uncontrollable event (for "one event at a time"-execution).
-	 * @param event the current uncontrollable event the synchronization should focus on.
+	 *
+	 *@param  event the current uncontrollable event the synchronization should focus on.
 	 */
-	public void setCurrUncontrollableEvent(Event event)
+	public void setCurrUncontrollableEvent(EventLabel event)
 	{
 		currUncontrollableEvent = event.getSynchIndex();
 	}
