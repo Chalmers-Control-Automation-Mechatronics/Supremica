@@ -12,6 +12,7 @@ import org.supremica.automata.*;
 public class FactoryExecutorDEMO
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	public static int threadSleepInterval = 200;
 	boolean type;
 	static PlantDEMO shoePlant;

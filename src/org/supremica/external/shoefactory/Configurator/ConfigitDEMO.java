@@ -64,6 +64,7 @@ public class ConfigitDEMO
 	extends JFrame
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(Configit.class);
 	CS_CtrlMngr ctrl_mngr = null;
 	Container c;
