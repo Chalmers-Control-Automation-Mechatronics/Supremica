@@ -196,12 +196,23 @@ public class DotViewer
 		menuEdit.setMnemonic(KeyEvent.VK_E);
 		menuBar.add(menuEdit);
 
-		// Edit
-		JMenuItem menuEditCopy = new JMenuItem();
+		if (SupremicaProperties.isWindows())
+		{
+			// Edit
+			JMenuItem menuEditCopy = new JMenuItem();
 
-		menuEditCopy.setText("Copy");
-		menuEditCopy.setMnemonic(KeyEvent.VK_C);
-		menuEdit.add(menuEditCopy);
+			menuEditCopy.setText("Copy");
+			menuEditCopy.setMnemonic(KeyEvent.VK_C);
+			menuEdit.add(menuEditCopy);
+
+			menuEditCopy.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					copyWMF();
+				}
+			});
+		}
 
 		// Layout
 		JMenu menuLayout = new JMenu();
@@ -284,13 +295,6 @@ public class DotViewer
 			}
 		});
 
-		menuEditCopy.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				copyWMF();
-			}
-		});
 
 
 		leftToRightCheckBox.addActionListener(new ActionListener()

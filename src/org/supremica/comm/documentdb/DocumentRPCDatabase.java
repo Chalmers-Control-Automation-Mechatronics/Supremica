@@ -27,7 +27,7 @@ public class DocumentRPCDatabase
 			SupremicaProperties.setDocDBPort(cdd.getPort());
 			SupremicaProperties.setDocDBUsername(cdd.getUsername());
 			SupremicaProperties.setDocDBDocument(cdd.getDocument());
-			SupremicaProperties.savePropperties();
+			SupremicaProperties.saveProperties();
 
 			RPCDocClient client = new RPCDocClient(cdd);
 			ClientFrame cf = new SupremicaRPCClientFrame(client, cdd.getDocument(), supremica);

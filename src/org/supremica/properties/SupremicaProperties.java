@@ -421,12 +421,12 @@ public final class SupremicaProperties
 	 *
 	 * @param name is the name of the config file
 	 */
-	public static final void savePropperties(String name)
+	public static final void saveProperties(String name)
 		throws IOException
 	{
 		updateBDDOptions(true);    // first sync from BDD options
 
-		// CODE STOLEN FROM THE OTIGINAL Properties.java FILE FROM JDK :(
+		// CODE STOLEN FROM THE ORIGINAL Properties.java FILE FROM JDK :(
 		OutputStream os = new FileOutputStream(name);
 		BufferedWriter awriter = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
 
@@ -456,17 +456,22 @@ public final class SupremicaProperties
 		os.close();
 	}
 
-	public static final void savePropperties()
+	public static final void saveProperties()
 		throws IOException
 	{
 		if (lastPropertyFile != null)
 		{
-			savePropperties(lastPropertyFile);
+			saveProperties(lastPropertyFile);
 		}
 		else
 		{
 			System.err.println("Could not write to configuration file, unknown file name.");
 		}
+	}
+
+	public static final boolean isWindows()
+	{
+            return System.getProperty("os.name").toLowerCase().indexOf("windows") != -1;
 	}
 
 	public static final void setProperties(File aFile)

@@ -173,7 +173,7 @@ public class PreferencesDialog
 		{
 			try
 			{
-				SupremicaProperties.savePropperties();    // write back the changes to the config file too!!
+				SupremicaProperties.saveProperties();    // write back the changes to the config file too!!
 			}
 			catch (IOException exx)
 			{
