@@ -165,9 +165,9 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 	public void showUnion()
 	{
 		// for all the (immediate) children of the root, make them visible
-		for (Enumeration enum = root.children(); enum.hasMoreElements(); )
+		for (Enumeration e = root.children(); e.hasMoreElements(); )
 		{
-			EventSubTree node = (EventSubTree)enum.nextElement();
+			EventSubTree node = (EventSubTree)e.nextElement();
 			node.setEnabled(true);
         }
         repaint();
@@ -177,9 +177,9 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 	public void showIntersection()
 	{
 		// for all the (immediate) children of the root, make them visible
-		for (Enumeration enum = root.children(); enum.hasMoreElements(); )
+		for (Enumeration e = root.children(); e.hasMoreElements(); )
 		{
-			EventSubTree node = (EventSubTree)enum.nextElement();
+			EventSubTree node = (EventSubTree)e.nextElement();
 
 			// If the number of children is not the same as the number of automata plus the number in EventSubTree
 			// Then it has to be disabled/hidden/unselectable

@@ -4,8 +4,8 @@
 
 /*===========================================================================
  $Workfile:   VerticalFlowLayout.java  $
- $Revision: 1.2 $
- $Date: 2004-03-31 12:20:52 $
+ $Revision: 1.3 $
+ $Date: 2004-05-03 08:10:39 $
 
  (C) Unpublished Copyright of Novell, Inc.  All Rights Reserved.
 
@@ -228,14 +228,14 @@ public class VerticalFlowLayout implements LayoutManager2, java.io.Serializable
    {
       if (comp != null)
       {
-         Enumeration enum = m_components.elements();
+         Enumeration e = m_components.elements();
 
-         if(enum != null)
+         if(e != null)
          {
-            while (enum.hasMoreElements())
+            while (e.hasMoreElements())
             {
                // Get the component/alignment pair
-               AlignedComponent alcomp = (AlignedComponent)enum.nextElement();
+               AlignedComponent alcomp = (AlignedComponent)e.nextElement();
 
                // Pull just the component out and see if there's a match
                Component currComp = alcomp.getComponent();
@@ -316,13 +316,13 @@ public class VerticalFlowLayout implements LayoutManager2, java.io.Serializable
          //D.out("Parent container insets: "+insets.toString());
 
          // Go through all of the components and add things up
-         Enumeration enum = m_components.elements();
-         if (enum != null)
+         Enumeration e = m_components.elements();
+         if (e != null)
          {
-            while (enum.hasMoreElements())
+            while (e.hasMoreElements())
             {
                // Get component/alignment pair
-               AlignedComponent alcomp =(AlignedComponent)enum.nextElement();
+               AlignedComponent alcomp =(AlignedComponent)e.nextElement();
 
                // Pull just the component out
                Dimension compSize = alcomp.getComponent().getPreferredSize();
@@ -414,12 +414,12 @@ public class VerticalFlowLayout implements LayoutManager2, java.io.Serializable
       }
 
       // Go through all of the components and place them vertically.
-      Enumeration enum = m_components.elements();
-      if(enum != null)
+      Enumeration e = m_components.elements();
+      if(e != null)
       {
-         while (enum.hasMoreElements())
+         while (e.hasMoreElements())
          {
-            AlignedComponent alcomp = (AlignedComponent)enum.nextElement();
+            AlignedComponent alcomp = (AlignedComponent)e.nextElement();
             Component comp = alcomp.getComponent();
             String alignment = alcomp.getAlignment();
 
