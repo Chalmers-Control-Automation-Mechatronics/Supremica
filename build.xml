@@ -583,6 +583,8 @@
 </target>
 
 <target name="startfiles_supremica" depends="startfiles_local_supremica,startfiles_supremica_student,startfiles_supremica_teacher">
+	<copy file="${templates}/IDE.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/IDE.cmd" perm="644"/>
 	<copy file="${templates}/Waters.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Waters.cmd" perm="644"/>
 	<copy file="${templates}/Waters" todir="${dist}"/>	
