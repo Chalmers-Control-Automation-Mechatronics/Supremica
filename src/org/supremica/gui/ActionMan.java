@@ -2077,6 +2077,17 @@ public class ActionMan
 			return;
 		}
 
+		FileSecurity fileSecurity = gui.getFileSecurity();
+		if (SupremicaProperties.generalUseSecurity())
+		{
+			if (!fileSecurity.allowOpening(currProject))
+			{
+				JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to open this file", "alert", JOptionPane.ERROR_MESSAGE);
+
+				return;
+			}
+		}
+			
 		if (!currProject.isDeterministic())
 		{
 			// JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
@@ -2098,18 +2109,6 @@ public class ActionMan
 			}
 			else // NO_OPTION
 			{
-				return;
-			}
-		}
-
-		FileSecurity fileSecurity = gui.getFileSecurity();
-
-		if (SupremicaProperties.generalUseSecurity())
-		{
-			if (!fileSecurity.allowOpening(currProject))
-			{
-				JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to open this file", "alert", JOptionPane.ERROR_MESSAGE);
-
 				return;
 			}
 		}
@@ -2138,6 +2137,7 @@ public class ActionMan
 			return;
 		}
 
+		/*
 		if (nbrOfAutomataBeforeOpening == 0)
 		{
 			String projectName = currProject.getName();
@@ -2149,6 +2149,7 @@ public class ActionMan
 				gui.getVisualProjectContainer().getActiveProject().updateFrameTitles();
 			}
 		}
+		*/
 
 		if (nbrOfAutomataBeforeOpening > 0)
 		{

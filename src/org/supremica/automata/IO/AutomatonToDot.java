@@ -235,6 +235,12 @@ public class AutomatonToDot
 						pw.print("#");
 					}
 
+					if (thisEvent.isEpsilon())
+					{
+						pw.print("@");
+						// pw.print("\356" + "");  // ascii-epsilon
+					}
+
 					pw.print(EncodingHelper.normalize(thisEvent.getLabel()));
 
 					if (arcIt.hasNext())

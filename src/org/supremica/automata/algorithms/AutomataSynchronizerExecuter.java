@@ -405,7 +405,6 @@ public final class AutomataSynchronizerExecuter
 				{
 					if (currEventIndex == currAutEventIndex)
 					{
-
 						// Then currIndex (the event) must also be the
 						// current event in this automaton
 						canExecuteInPlant = true;
@@ -424,7 +423,6 @@ public final class AutomataSynchronizerExecuter
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
 				{
-
 					// Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
 
@@ -443,7 +441,6 @@ public final class AutomataSynchronizerExecuter
 			{
 				if (immediateEventsTable[currEventIndex])
 				{
-
 					// Clear out everything else and abort the search for enabled events
 					// If several events that are immediate are found
 					// Then the one with smallest index are chosen.
@@ -483,7 +480,6 @@ public final class AutomataSynchronizerExecuter
 
 		if (expandEventsUsingPriority)
 		{
-
 			// Choose outgoing events among the possibilities, choose after priority...
 			int insertionIndex = 0;
 			int i = 0;
@@ -559,7 +555,7 @@ public final class AutomataSynchronizerExecuter
 				// /*
 				if (verboseMode)
 				{
-					logger.debug("Following transitions in the suspect automaton, there are " + insertionIndex + " such transitions...");
+					logger.debug("Following transitions in the suspect automaton. There are " + insertionIndex + " such transitions...");
 				}
 
 				// */
@@ -582,6 +578,7 @@ public final class AutomataSynchronizerExecuter
 		{
 			if (coExecute)
 			{
+				// Set current state in coExecuter and update enabledEvents there
 				coExecuter.setCurrState(currState);
 			}
 
@@ -628,6 +625,9 @@ public final class AutomataSynchronizerExecuter
 				{
 					// Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
+
+					// This is where we should add some stuff to take care of 
+					// any non-determinism.
 
 					// Iterate over all automata to construct the new state
 					for (int j = 0; j < automataIndices.length; j++)

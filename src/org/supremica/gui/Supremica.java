@@ -609,6 +609,17 @@ public class Supremica
 		}
 	}
 
+	public void commentProject()
+	{
+		String newComment = getNewProjectComment();
+
+		if (newComment != null)
+		{
+			getActiveProject().setComment(newComment);
+			getActiveProject().setProjectFile(null);
+		}
+	}
+
 	// Help.About action performed
 	public void helpAbout()
 	{
@@ -637,11 +648,12 @@ public class Supremica
 	{
 		String msg = "Enter new project name";
 		boolean finished = false;
+		String oldName = getActiveProject().getName();
 		String newName = "";
 
 		while (!finished)
 		{
-			newName = JOptionPane.showInputDialog(this, msg);
+			newName = JOptionPane.showInputDialog(this, msg, oldName);
 
 			if (newName == null)
 			{
@@ -658,6 +670,30 @@ public class Supremica
 		}
 
 		return newName;
+	}
+
+	public String getNewProjectComment()
+	{
+		String msg = "Enter new project comment";
+		boolean finished = false;
+		String oldComment = getActiveProject().getComment();
+		String newComment = "";
+
+		while (!finished)
+		{
+			newComment = JOptionPane.showInputDialog(this, msg, oldComment);
+
+			if (newComment == null)
+			{
+				return null;
+			}
+			else
+			{
+				finished = true;
+			}
+		}
+
+		return newComment;
 	}
 
 	public String getNewAutomatonName(String msg, String nameSuggestion)
@@ -863,6 +899,8 @@ public class Supremica
 	public int addProject(Project theProject)
 		throws Exception
 	{
+		int nbrOfAutomataBeforeOpening = getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
+		
 		int nbrOfAddedAutomata = addAutomata(theProject);
 		if (theProject != null)
 		{
@@ -876,6 +914,25 @@ public class Supremica
 			{
 				setAnimationPath(animPath);
 			}*/
+		}
+
+		if (theProject.getComment() != "")
+		{
+			logger.info(theProject.getComment());
+		}
+
+		if (nbrOfAutomataBeforeOpening == 0)
+		{
+			String projectName = theProject.getName();
+			String projectComment = theProject.getComment();
+
+			if (projectName != null)
+			{
+				getVisualProjectContainer().getActiveProject().setName(projectName);
+				getVisualProjectContainer().getActiveProject().setComment(projectComment);
+				//gui.info("Project name changed to \"" + projectName + "\"");
+				getVisualProjectContainer().getActiveProject().updateFrameTitles();
+			}
 		}
 
 		return nbrOfAddedAutomata;

@@ -65,6 +65,7 @@ public class Automata
 	private ArrayList theAutomata;
 	private HashMap nameMap;
 	private String name = null;
+	private String comment = null;
 	private AutomataListeners listeners = null;
 	private String owner = null;
 	private String hash = null;
@@ -699,6 +700,11 @@ public class Automata
 		return true;
 	}
 
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
 	public String getName()
 	{
 		if (name == null)
@@ -708,9 +714,18 @@ public class Automata
 		return name;
 	}
 
-	public void setName(String name)
+	public void setComment(String comment)
 	{
-		this.name = name;
+		this.comment = comment;
+	}
+
+	public String getComment()
+	{
+		if (comment == null)
+		{
+			return "";
+		}
+		return comment;
 	}
 
 	public void clear()

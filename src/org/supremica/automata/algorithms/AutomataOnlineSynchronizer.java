@@ -62,7 +62,8 @@ import org.supremica.automata.LabeledEvent;
 /**
  * Used in the "Automata Explorer" (an early version that is on ice since way 
  * back and therefore not completed).
- * Also used in AutomataVerifier.findUncontrollableStates.
+ * Also used in AutomataVerifier.findUncontrollableStates and in the 
+ * uncontrollability verification.
  *
  *@author  ka
  *@created  November 28, 2001
@@ -538,9 +539,6 @@ public final class AutomataOnlineSynchronizer
 	// To synchronize the two executers...
 	public void setCurrState(int[] state)
 	{
-
-		// for (int i=0; i<nbrOfSelectedAutomata; i++)
-		// currState[automataIndices[i]] = state[automataIndices[i]];
 		currState = state;
 
 		enabledEvents(currState);

@@ -144,17 +144,14 @@ public class MainMenuBar
 
 		boolean separatorNeeded = false;
 
-
 		// File
 		JMenu menuFile = new JMenu();
-
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		add(menuFile);
 
 		// File.New
 		JMenuItem menuFileNew = new JMenuItem();
-
 		menuFileNew.setText("New...");
 		menuFileNew.setEnabled(false);
 		menuFile.add(menuFileNew);
@@ -168,7 +165,6 @@ public class MainMenuBar
 
 		// File.NewFromTemplate
 		JMenu menuFileNewFromTemplate = new JMenu();
-
 		menuFileNewFromTemplate.setText("New From Template");
 		menuFile.add(menuFileNewFromTemplate);
 
@@ -195,7 +191,6 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowOpen())
 		{
-
 			// File.Open
 			/* JMenuItem menuFileOpen = new JMenuItem();
 
@@ -216,10 +211,8 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowSave())
 		{
-
 			// File.Save
 			JMenuItem menuFileSave = new JMenuItem();
-
 			menuFileSave.setText("Save");
 			menuFileSave.setMnemonic(KeyEvent.VK_S);
 			menuFile.add(menuFileSave);
@@ -233,7 +226,6 @@ public class MainMenuBar
 
 			// File.SaveAs
 			JMenuItem menuFileSaveAs = new JMenuItem();
-
 			menuFileSaveAs.setText("Save As...");
 			menuFile.add(menuFileSaveAs);
 			menuFileSaveAs.addActionListener(new ActionListener()
@@ -257,16 +249,15 @@ public class MainMenuBar
 		{
 			// File.Import
 			JMenu menuFileImport = new JMenu();
-
 			menuFileImport.setText("Import");
 			menuFile.add(menuFileImport);
 
 			// File.Import.Desco
 			JMenuItem menuFileImportDesco = new JMenuItem();
 			menuFileImportDesco.setEnabled(false);
-
 			menuFileImportDesco.setText("From Desco...");
 			menuFileImport.add(menuFileImportDesco);
+			//menuFileImportDesco.setEnabled(false);
 			menuFileImportDesco.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -278,10 +269,9 @@ public class MainMenuBar
 			// File.Import.TCT
 			JMenuItem menuFileImportTCT = new JMenuItem();
 			menuFileImportTCT.setEnabled(false);
-
 			menuFileImportTCT.setText("From TCT...");
 			menuFileImport.add(menuFileImportTCT);
-			menuFileImportTCT.setEnabled(false);
+			//menuFileImportTCT.setEnabled(false);
 			menuFileImportTCT.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -293,11 +283,10 @@ public class MainMenuBar
 
 			// File.Import.UMDES
 			JMenuItem menuFileImportUMDES = new JMenuItem();
-			menuFileImportDesco.setEnabled(false);
-
+			menuFileImportUMDES.setEnabled(false);
 			menuFileImportUMDES.setText("From UMDES...");
 			menuFileImport.add(menuFileImportUMDES);
-			menuFileImportUMDES.setEnabled(false);
+			//menuFileImportUMDES.setEnabled(false);
 			menuFileImportUMDES.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -309,7 +298,6 @@ public class MainMenuBar
 
 			// File.Import.Valid
 			JMenuItem menuFileImportValid = new JMenuItem();
-
 			menuFileImportValid.setText("From Valid...");
 			menuFileImport.add(menuFileImportValid);
 			menuFileImportValid.addActionListener(new ActionListener()
@@ -326,7 +314,6 @@ public class MainMenuBar
 			{
 				// File.Import.RobotCoordination
 				JMenuItem menuFileImportRobotCoordination = new JMenuItem();
-
 				menuFileImportRobotCoordination.setText("From Robot Coordinator...");
 				menuFileImport.add(menuFileImportRobotCoordination);
 				menuFileImportRobotCoordination.addActionListener(new ActionListener()
@@ -342,7 +329,6 @@ public class MainMenuBar
 			{
 				// File.Import.RobotCoordinationABB
 				JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem();
-
 				menuFileImportRobotCoordinationABB.setText("From Robot Coordinator ABB...");
 				menuFileImport.add(menuFileImportRobotCoordinationABB);
 				menuFileImportRobotCoordinationABB.addActionListener(new ActionListener()
@@ -361,13 +347,11 @@ public class MainMenuBar
 		{
 			// File.Export
 			JMenu menuFileExport = new JMenu();
-
 			menuFileExport.setText("Export");
 			menuFile.add(menuFileExport);
 
 			// File.Export.Html
 			JMenuItem menuFileExportHtml = new JMenuItem();
-
 			menuFileExportHtml.setText("To Html...");
 			menuFileExport.add(menuFileExportHtml);
 			menuFileExportHtml.addActionListener(new ActionListener()
@@ -381,7 +365,6 @@ public class MainMenuBar
 
 			// File.Export.Desco
 			JMenuItem menuFileExportDesco = new JMenuItem();
-
 			menuFileExportDesco.setText("To Desco...");
 			menuFileExport.add(menuFileExportDesco);
 			menuFileExportDesco.addActionListener(new ActionListener()
@@ -395,10 +378,9 @@ public class MainMenuBar
 			// File.Export.TCT
 			JMenuItem menuFileExportTCT = new JMenuItem();
 			menuFileExportTCT.setEnabled(false);
-
 			menuFileExportTCT.setText("To TCT...");
 			menuFileExport.add(menuFileExportTCT);
-			menuFileExportTCT.setEnabled(false);
+			//menuFileExportTCT.setEnabled(false);
 			menuFileExportTCT.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -411,10 +393,9 @@ public class MainMenuBar
 			// File.Export.UMDES
 			JMenuItem menuFileExportUMDES = new JMenuItem();
 			menuFileExportUMDES.setEnabled(false);
-
 			menuFileExportUMDES.setText("To UMDES...");
 			menuFileExport.add(menuFileExportUMDES);
-			menuFileExportUMDES.setEnabled(false);
+			//menuFileExportUMDES.setEnabled(false);
 			menuFileExportUMDES.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -427,10 +408,9 @@ public class MainMenuBar
 			// File.Export.Valid
 			JMenuItem menuFileExportValid = new JMenuItem();
 			menuFileExportValid.setEnabled(false);
-
 			menuFileExportValid.setText("To Valid...");
 			menuFileExport.add(menuFileExportValid);
-			menuFileExportUMDES.setEnabled(false);
+			//menuFileExportUMDES.setEnabled(false);
 			menuFileExportValid.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -444,7 +424,6 @@ public class MainMenuBar
 			if (SupremicaProperties.generalUseRCP())
 			{
 				JMenuItem menuFileExportRCP = new JMenuItem();
-
 				menuFileExportRCP.setText("To RCP...");
 				menuFileExport.add(menuFileExportRCP);
 				menuFileExportRCP.addActionListener(new ActionListener()
@@ -470,7 +449,6 @@ public class MainMenuBar
 		{
 			// File.Login
 			JMenuItem menuFileLogin = new JMenuItem();
-
 			menuFileLogin.setText("Login");
 			menuFile.add(menuFileLogin);
 			menuFileLogin.addActionListener(new ActionListener()
@@ -495,7 +473,6 @@ public class MainMenuBar
 		{
 			// File.Exit
 			JMenuItem menuFileExit = new JMenuItem();
-
 			menuFileExit.setText("Exit");
 			menuFile.add(menuFileExit);
 			menuFileExit.addActionListener(new ActionListener()
@@ -510,7 +487,6 @@ public class MainMenuBar
 		{
 			// File.Close
 			JMenuItem menuFileExit = new JMenuItem();
-
 			menuFileExit.setText("Close");
 			menuFile.add(menuFileExit);
 			menuFileExit.addActionListener(new ActionListener()
@@ -524,14 +500,12 @@ public class MainMenuBar
 
 		// Project
 		JMenu menuProject = new JMenu();
-
 		menuProject.setText("Project");
 		menuProject.setMnemonic(KeyEvent.VK_P);
 		add(menuProject);
 
 		// Project.Rename
 		JMenuItem menuProjectRename = new JMenuItem();
-
 		menuProjectRename.setText("Rename...");
 		menuProject.add(menuProjectRename);
 		menuProjectRename.addActionListener(new ActionListener()
@@ -542,11 +516,22 @@ public class MainMenuBar
 			}
 		});
 
+		// Project.Comment
+		JMenuItem menuProjectComment = new JMenuItem();
+		menuProjectComment.setText("Comment...");
+		menuProject.add(menuProjectComment);
+		menuProjectComment.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				supremica.commentProject();
+			}
+		});
+
 		menuProject.addSeparator();
 
 		// Project.ActionAndControlViewer
 		JMenuItem menuProjectActionAndControlViewer = new JMenuItem();
-
 		menuProjectActionAndControlViewer.setText("Execution Parameters...");
 		menuProject.add(menuProjectActionAndControlViewer);
 		menuProjectActionAndControlViewer.addActionListener(new ActionListener()
@@ -561,7 +546,6 @@ public class MainMenuBar
 		{
 			// Project.Animator
 			JMenuItem menuProjectAnimator = new JMenuItem();
-
 			menuProjectAnimator.setText("Animator...");
 			menuProject.add(menuProjectAnimator);
 			menuProjectAnimator.addActionListener(new ActionListener()
@@ -574,7 +558,6 @@ public class MainMenuBar
 
 			// Project.Simulator
 			JMenuItem menuProjectSimulator = new JMenuItem();
-
 			menuProjectSimulator.setText("Simulator...");
 			menuProject.add(menuProjectSimulator);
 			menuProjectSimulator.addActionListener(new ActionListener()
@@ -587,7 +570,6 @@ public class MainMenuBar
 
 			// Project.Clear
 			JMenuItem menuProjectSimulatorClear = new JMenuItem();
-
 			menuProjectSimulatorClear.setText("Clear Simulation Data");
 			menuProject.add(menuProjectSimulatorClear);
 			menuProjectSimulatorClear.addActionListener(new ActionListener()
@@ -601,14 +583,12 @@ public class MainMenuBar
 
 		// Tools
 		JMenu menuTools = new JMenu();
-
 		menuTools.setText("Tools");
 		menuTools.setMnemonic(KeyEvent.VK_T);
 		add(menuTools);
 
 		// Tools.TestCases
 		JMenuItem test_cases = new JMenuItem();
-
 		test_cases.setText("Test Cases...");
 		menuTools.add(test_cases);
 		test_cases.addActionListener(new ActionListener()
@@ -630,7 +610,6 @@ public class MainMenuBar
 		if (SupremicaProperties.includeAnimator())
 		{
 			JMenu menuToolsAnimations = new JMenu();
-
 			menuToolsAnimations.setText("Animations");
 			menuTools.add(menuToolsAnimations);
 
@@ -640,7 +619,6 @@ public class MainMenuBar
 			{
 				AnimationGroup currGroup = (AnimationGroup) groupIt.next();
 				JMenu menuToolsAnimationGroup = new JMenu();
-
 				menuToolsAnimationGroup.setText(currGroup.getDescription());
 				menuToolsAnimations.add(menuToolsAnimationGroup);
 
@@ -648,7 +626,6 @@ public class MainMenuBar
 				{
 					AnimationItem currItem = (AnimationItem) itemIt.next();
 					JMenuItem menuItem = new JMenuItem();
-
 					menuItem.setText(currItem.getDescription());
 					menuToolsAnimationGroup.add(menuItem);
 					menuItem.addActionListener(new ToolsAnimationHandler(currItem));
@@ -662,7 +639,6 @@ public class MainMenuBar
 			menuTools.add(new JSeparator());
 
 			JMenuItem menuToolsAutomataEditor = new JMenuItem();
-
 			menuToolsAutomataEditor.setText("Editor...");
 			menuTools.add(menuToolsAutomataEditor);
 			menuToolsAutomataEditor.addActionListener(new ActionListener()
@@ -680,7 +656,6 @@ public class MainMenuBar
 			menuTools.add(new JSeparator());
 
 			JMenu menuToolsShoeFactory = new JMenu();
-
 			menuToolsShoeFactory.setText("Shoe Factory...");
 			menuTools.add(menuToolsShoeFactory);
 
@@ -1173,6 +1148,7 @@ public class MainMenuBar
 
 			JMenu menuEvoComp = new JMenu();
 			menuEvoComp.setText("Evolution");
+			menuEvoComp.setEnabled(false);
 			menuTools.add(menuEvoComp);
 
 			// EvoComp.CalculateSynchTable

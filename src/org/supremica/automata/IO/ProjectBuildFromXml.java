@@ -83,6 +83,7 @@ public class ProjectBuildFromXml
 	private final static String controllableStr = "controllable";
 	private final static String prioritizedStr = "prioritized";
 	private final static String immediateStr = "immediate";
+	private final static String epsilonStr = "epsilon";
 	private final static String owner = "owner";
 	private final static String hash = "hash";
 	private final static String projectStr = "SupremicaProject";
@@ -270,7 +271,6 @@ public class ProjectBuildFromXml
 	public void startElement(String uri, String localName, String name, Attributes attributes)
 		throws SAXException
 	{
-
 		// in order of frequency
 		if (transitionStr.equals(name))
 		{
@@ -413,6 +413,7 @@ public class ProjectBuildFromXml
 		boolean controllable = true;
 		boolean prioritized = true;
 		boolean immediate = false;
+		boolean epsilon = false;
 		int length = attributes.getLength();
 		String currName;
 
@@ -440,8 +441,11 @@ public class ProjectBuildFromXml
 			{
 				immediate = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
 			}
+			else if (epsilonStr.equals(currName))
+			{
+				epsilon = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
+			}
 		}
-
 
 		if (id == null)
 		{
@@ -459,6 +463,7 @@ public class ProjectBuildFromXml
 		currEvent.setControllable(controllable);
 		currEvent.setPrioritized(prioritized);
 		currEvent.setImmediate(immediate);
+		currEvent.setEpsilon(epsilon);
 
 		// Associate the id with the event
 		idEventMap.put(id, currEvent);
@@ -614,53 +619,51 @@ public class ProjectBuildFromXml
 		currProject = theProjectFactory.getProject();
 
 		String name = attributes.getValue("name");
-
 		if (name != null)
 		{
 			currProject.setName(name);
 		}
 
 		String owner = attributes.getValue("owner");
-
 		if (name != null)
 		{
 			currProject.setOwner(owner);
 		}
 
 		String hash = attributes.getValue("hash");
-
 		if (hash != null)
 		{
 			currProject.setHash(hash);
 		}
 
+		String comment = attributes.getValue("comment");
+		if (comment != null)
+		{
+			currProject.setComment(comment);
+		}
+
 		int majorVersion = 0;
 		String majorStringVersion = attributes.getValue("major");
-
 		if (majorStringVersion != null)
 		{
 			majorVersion = Integer.parseInt(majorStringVersion);
 		}
-
-		int minorVersion = 0;
-		String minorStringVersion = attributes.getValue("minor");
-
-		if (minorStringVersion != null)
-		{
-			minorVersion = Integer.parseInt(minorStringVersion);
-		}
-
 		if (majorVersion > 0)
 		{
 			throw new SAXException("Unsupported file format.");
 		}
 
+		int minorVersion = 0;
+		String minorStringVersion = attributes.getValue("minor");
+		if (minorStringVersion != null)
+		{
+			minorVersion = Integer.parseInt(minorStringVersion);
+		}
 		if (minorVersion > 10)
 		{
 			throw new SAXException("Unsupported file format.");
 		}
 	}
-
 
 	public final void doLayout(Attributes attributes)
 		throws SAXException

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -98,16 +97,21 @@ public class AutomataToXml
 
 		if (automata.getName() != null)
 		{
-			pw.print(" name=\"" + EncodingHelper.normalize(automata.getName()) + "\" ");
+			pw.print(" name=\"" + EncodingHelper.normalize(automata.getName()) + "\"");
 		}
 
-		pw.print(" major=\"" + majorFileVersion + "\" ");
-		pw.print(" minor=\"" + minorFileVersion + "\" ");
+		pw.print(" major=\"" + majorFileVersion + "\"");
+		pw.print(" minor=\"" + minorFileVersion + "\"");
 
 		if (SupremicaProperties.generalUseSecurity())
 		{
 			pw.print(" owner=\"" + automata.getOwner() + "\"");
 			pw.print(" hash=\"" + automata.getHash() + "\"");
+		}
+
+		if (automata.getComment() != null)
+		{
+			pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment()) + "\"");
 		}
 
 		pw.println(">");
@@ -148,6 +152,11 @@ public class AutomataToXml
 				if (event.isImmediate())
 				{
 					pw.print(" immediate=\"true\"");
+				}
+
+				if (event.isEpsilon())
+				{
+					pw.print(" epsilon=\"true\"");
 				}
 
 				if (debugMode)
