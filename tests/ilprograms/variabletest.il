@@ -520,6 +520,10 @@ PROGRAM LDSTfbtest
 		DPrintln  : PrintlnDINT;
 		RPrintln  : PrintlnREAL;
 		BPrintln  : PrintlnBOOL;
+		WPrint   : PrintWSTRING;
+		DPrint    : PrintDINT;
+		RPrint    : PrintREAL;
+		BPrint    : PrintBOOL;
 	END_VAR
    VAR
 	BB1, BB2 : BOOL;
@@ -558,21 +562,47 @@ CAL WPrintln("Testing LD & ST of BOOL,DINT,REAL,WSTRING to/from FBs")
    LD FB1.WW2
    ST WW2
 
-   CAL WPrint("?? ",BB1," == ",BB2)
+   	CAL WPrint("?? ")
+	CAL BPrint(BB1)
+	CAL WPrint(" == ")
+	CAL BPrintln(BB2)
    
-   CAL WPrint("?? ",DD1," == ",DD2)
+   	CAL WPrint("?? ")
+	CAL DPrint(DD1)
+	CAL WPrint(" == ")
+	CAL DPrintln(DD2)
    
-   CAL WPrint("?? ",RR1," == ",RR2)
+   	CAL WPrint("?? ")
+	CAL RPrint(RR1)
+	CAL WPrint(" == ")
+	CAL RPrintln(RR2)
    
-   CAL WPrint("?? ",WW1," == ",WW2)
+  	CAL WPrint("?? ")
+	CAL WPrint(WW1)
+	CAL WPrint(" == ")
+	CAL WPrintln(WW2)
    
 (* Thomas titta på detta*)
 
 
-   LD FB2
-   ST FB1.FF
-   LD FB1.FF
-   ST FB2
+
+	LD FB2
+   	ST FB1.FF
+   	LD FB1.FF
+   	ST FB2
 
 END_PROGRAM
+
+
+
+
+
+
+
+
+
+
+
+
+
 
