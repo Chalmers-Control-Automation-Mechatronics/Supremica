@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="233" height="174">
+	<events>
+		<event controllable="1">autom_VR</event>
+		<event controllable="1">CS_ok</event>
+		<event controllable="1">done_ER</event>
+		<event controllable="1">done_SER.FT</event>
+		<event controllable="1">done_VR</event>
+		<event controllable="1">done_ZS</event>
+		<event controllable="1">ER</event>
+		<event controllable="1">SER</event>
+		<event controllable="1">SERFS</event>
+		<event controllable="1">soft_CS</event>
+		<event controllable="1">soft_ER</event>
+		<event controllable="1">soft_SER.FT</event>
+		<event controllable="1">soft_VR</event>
+		<event controllable="1">soft_ZS</event>
+		<event controllable="1">TAST</event>
+		<event controllable="1">ZS</event>
+	</events>
+	<nodes>
+		<node x="192" y="80" size="8">
+			<label dx="-8" dy="24">RUN</label>
+		</node>
+		<node x="64" y="80" size="8" initial="1" marked="1">
+			<label dx="-5" dy="-11">IDLE</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="26" y="77">
+			<source>IDLE</source>
+			<labelGroup dx="-15" dy="-34">
+				<label dx="0" dy="0">ER</label>
+				<label dx="0" dy="16">SER</label>
+				<label dx="0" dy="32">SERFS</label>
+				<label dx="0" dy="48">ZS</label>
+				<label dx="0" dy="64">TAST</label>
+				<label dx="0" dy="80">autom_VR</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="128" y="61">
+			<source>IDLE</source>
+			<target>RUN</target>
+			<labelGroup dx="-26" dy="-50">
+				<label dx="0" dy="0">soft_ER</label>
+				<label dx="0" dy="16">soft_SER.FT</label>
+				<label dx="0" dy="32">soft_VR</label>
+				<label dx="0" dy="48">soft_ZS</label>
+				<label dx="0" dy="64">soft_CS</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="128" y="99">
+			<source>RUN</source>
+			<target>IDLE</target>
+			<labelGroup dx="-31" dy="-3">
+				<label dx="0" dy="0">done_ER</label>
+				<label dx="0" dy="16">done_SER.FT</label>
+				<label dx="0" dy="32">done_VR</label>
+				<label dx="0" dy="48">done_ZS</label>
+				<label dx="0" dy="64">CS_ok</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="228" y="77">
+			<source>RUN</source>
+			<labelGroup dx="-37" dy="-13">
+				<label dx="0" dy="0">soft_CS</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

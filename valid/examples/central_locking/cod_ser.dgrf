@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.5" width="122" height="66">
+	<events>
+		<event controllable="0">cod_er</event>
+		<event controllable="0">cod_ser</event>
+	</events>
+	<nodes>
+		<node x="32" y="64" size="8" initial="1" marked="1">
+			<label dx="-8" dy="21">ER</label>
+		</node>
+		<node x="128" y="64" size="8">
+			<label dx="-12" dy="21">SER</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="80" y="74">
+			<source>ER</source>
+			<target>SER</target>
+			<labelGroup dx="-27" dy="14">
+				<label dx="0" dy="0">cod_ser</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="80" y="54">
+			<source>SER</source>
+			<target>ER</target>
+			<labelGroup dx="-24" dy="-7">
+				<label dx="0" dy="0">cod_er</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

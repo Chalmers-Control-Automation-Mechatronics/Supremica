@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="368" height="249">
+	<events>
+		<event controllable="0">tuer_auf.BT</event>
+		<event controllable="0">tuer_auf.FT</event>
+		<event controllable="0">tuer_zu.BT</event>
+		<event controllable="0">tuer_zu.FT</event>
+		<event controllable="1">ZSA</event>
+		<event controllable="1">ZSI</event>
+		<event controllable="0">zuendung_an</event>
+		<event controllable="0">zuendung_aus</event>
+	</events>
+	<nodes>
+		<node x="304" y="272" size="8">
+			<label dx="8" dy="3">AN0</label>
+		</node>
+		<node x="304" y="176" size="8">
+			<label dx="11" dy="4">AN1</label>
+		</node>
+		<node x="304" y="80" size="8">
+			<label dx="9" dy="2">AN2</label>
+		</node>
+		<node x="96" y="272" size="8" marked="1">
+			<label dx="0" dy="17">AUS0</label>
+		</node>
+		<node x="96" y="176" size="8">
+			<label dx="9" dy="-6">AUS1</label>
+		</node>
+		<node x="96" y="80" size="8" initial="1">
+			<label dx="-13" dy="-12">AUS2</label>
+		</node>
+		<node x="192" y="224" size="8">
+			<label dx="-14" dy="20">ZU</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="218" y="204">
+			<source>ZU</source>
+			<labelGroup dx="3" dy="13">
+				<label dx="0" dy="0">ZSI</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="246" y="254">
+			<source>ZU</source>
+			<target>AN0</target>
+			<labelGroup dx="-56" dy="8">
+				<label dx="0" dy="0">zuendung_an</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>ZU</source>
+			<target>AUS1</target>
+			<labelGroup dx="-25" dy="-1">
+				<label dx="0" dy="0">tuer_auf.FT</label>
+				<label dx="0" dy="16">tuer_auf.BT</label>
+			</labelGroup>
+		</line>
+		<quadratic x="250" y="242">
+			<source>AN0</source>
+			<target>ZU</target>
+			<labelGroup dx="-38" dy="-2">
+				<label dx="0" dy="0">zuendung_aus</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="342" y="268">
+			<source>AN0</source>
+			<labelGroup dx="1" dy="7">
+				<label dx="0" dy="0">ZSI</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="294" y="224">
+			<source>AN0</source>
+			<target>AN1</target>
+			<labelGroup dx="-46" dy="-16">
+				<label dx="0" dy="0">tuer_auf.FT</label>
+				<label dx="0" dy="16">tuer_auf.BT</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="314" y="224">
+			<source>AN1</source>
+			<target>AN0</target>
+			<labelGroup dx="0" dy="3">
+				<label dx="0" dy="0">tuer_zu.FT</label>
+				<label dx="0" dy="16">tuer_zu.BT</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="342" y="173">
+			<source>AN1</source>
+			<labelGroup dx="2" dy="3">
+				<label dx="0" dy="0">ZSI</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="200" y="191">
+			<source>AN1</source>
+			<target>AUS1</target>
+			<labelGroup dx="-30" dy="-7">
+				<label dx="0" dy="0">zuendung_aus</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="294" y="128">
+			<source>AN1</source>
+			<target>AN2</target>
+			<labelGroup dx="-65" dy="-11">
+				<label dx="0" dy="0">tuer_auf.FT</label>
+				<label dx="0" dy="16">tuer_auf.BT</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="58" y="78">
+			<source>AUS2</source>
+			<labelGroup dx="-24" dy="5">
+				<label dx="0" dy="0">ZSA</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="106" y="128">
+			<source>AUS2</source>
+			<target>AUS1</target>
+			<labelGroup dx="-1" dy="-5">
+				<label dx="0" dy="0">tuer_zu.FT</label>
+				<label dx="0" dy="16">tuer_zu.BT</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="200" y="65">
+			<source>AUS2</source>
+			<target>AN2</target>
+			<labelGroup dx="-37" dy="-2">
+				<label dx="0" dy="0">zuendung_an</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="200" y="161">
+			<source>AUS1</source>
+			<target>AN1</target>
+			<labelGroup dx="-34" dy="-2">
+				<label dx="0" dy="0">zuendung_an</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="86" y="128">
+			<source>AUS1</source>
+			<target>AUS2</target>
+			<labelGroup dx="-65" dy="-5">
+				<label dx="0" dy="0">tuer_auf.FT</label>
+				<label dx="0" dy="16">tuer_auf.BT</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="55" y="175">
+			<source>AUS1</source>
+			<labelGroup dx="-24" dy="6">
+				<label dx="0" dy="0">ZSA</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="106" y="224">
+			<source>AUS1</source>
+			<target>AUS0</target>
+			<labelGroup dx="-3" dy="9">
+				<label dx="0" dy="0">tuer_zu.FT</label>
+				<label dx="0" dy="16">tuer_zu.BT</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>AUS0</source>
+			<target>AN0</target>
+			<labelGroup dx="-40" dy="13">
+				<label dx="0" dy="0">zuendung_an</label>
+			</labelGroup>
+		</line>
+		<quadratic x="86" y="224">
+			<source>AUS0</source>
+			<target>AUS1</target>
+			<labelGroup dx="-63" dy="-7">
+				<label dx="0" dy="0">tuer_auf.FT</label>
+				<label dx="0" dy="16">tuer_auf.BT</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="56" y="268">
+			<source>AUS0</source>
+			<labelGroup dx="-24" dy="6">
+				<label dx="0" dy="0">ZSA</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="314" y="128">
+			<source>AN2</source>
+			<target>AN1</target>
+			<labelGroup dx="4" dy="-7">
+				<label dx="0" dy="0">tuer_zu.FT</label>
+				<label dx="0" dy="16">tuer_zu.BT</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="200" y="95">
+			<source>AN2</source>
+			<target>AUS2</target>
+			<labelGroup dx="-39" dy="-3">
+				<label dx="0" dy="0">zuendung_aus</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="342" y="77">
+			<source>AN2</source>
+			<labelGroup dx="1" dy="4">
+				<label dx="0" dy="0">ZSI</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

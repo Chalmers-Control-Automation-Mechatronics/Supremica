@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.11" width="249" height="347">
+	<events>
+		<event controllable="1">counter</event>
+		<event controllable="0">counterequals12</event>
+		<event controllable="0">counterlessthan12</event>
+		<event controllable="0">donerecover</event>
+		<event controllable="0">donescan</event>
+		<event controllable="0">doneturn</event>
+		<event controllable="0">errorscan</event>
+		<event controllable="0">errorturn</event>
+		<event controllable="1">operatorinput</event>
+		<event controllable="1">recover</event>
+		<event controllable="0">repeat</event>
+		<event controllable="1">scan</event>
+		<event controllable="0">stop</event>
+		<event controllable="1">turn</event>
+	</events>
+	<nodes>
+		<node x="288" y="48" size="8" initial="1">
+			<label dx="-24" dy="3">s0</label>
+		</node>
+		<node x="288" y="96" size="8">
+			<label dx="-22" dy="4">s1</label>
+		</node>
+		<node x="288" y="144" size="8">
+			<label dx="-23" dy="4">s2</label>
+		</node>
+		<node x="288" y="192" size="8">
+			<label dx="-25" dy="4">s3</label>
+		</node>
+		<node x="288" y="240" size="8">
+			<label dx="-23" dy="4">s4</label>
+		</node>
+		<node x="288" y="288" size="8">
+			<label dx="10" dy="3">s5</label>
+		</node>
+		<node x="288" y="336" size="8" marked="1">
+			<label dx="10" dy="12">s6</label>
+		</node>
+	</nodes>
+	<edges>
+		<line>
+			<source>s5</source>
+			<target>s6</target>
+			<labelGroup dx="-93" dy="-2">
+				<label dx="0" dy="0">counterequals12</label>
+			</labelGroup>
+		</line>
+		<quadratic x="206" y="169">
+			<source>s5</source>
+			<target>s0</target>
+			<labelGroup dx="-62" dy="-9">
+				<label dx="0" dy="0">counterlessthan12</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="256" y="336">
+			<source>s6</source>
+			<labelGroup dx="-76" dy="-9">
+				<label dx="0" dy="0">stop</label>
+				<label dx="0" dy="16">operatorinput</label>
+				<label dx="0" dy="32">donerecover</label>
+				<label dx="0" dy="48">recover</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="383" y="193">
+			<source>s6</source>
+			<target>s0</target>
+			<labelGroup dx="-38" dy="1">
+				<label dx="0" dy="0">repeat</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s2</source>
+			<target>s3</target>
+			<labelGroup dx="-29" dy="2">
+				<label dx="0" dy="0">scan</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s4</source>
+			<target>s5</target>
+			<labelGroup dx="-19" dy="0">
+				<label dx="0" dy="0">counter</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s3</source>
+			<target>s4</target>
+			<labelGroup dx="-57" dy="-6">
+				<label dx="0" dy="0">donescan</label>
+				<label dx="0" dy="16">errorscan</label>
+			</labelGroup>
+		</line>
+		<quadratic x="337" y="217">
+			<source>s1</source>
+			<target>s6</target>
+			<labelGroup dx="-27" dy="5">
+				<label dx="0" dy="0">errorturn</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s1</source>
+			<target>s2</target>
+			<labelGroup dx="-51" dy="3">
+				<label dx="0" dy="0">doneturn</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s0</source>
+			<target>s1</target>
+			<labelGroup dx="4" dy="7">
+				<label dx="0" dy="0">turn</label>
+			</labelGroup>
+		</line>
+	</edges>
+</graph>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.15" width="240" height="181">
+	<events>
+		<event controllable="0">User1Done</event>
+		<event controllable="1">User1TakesA</event>
+		<event controllable="1">User1TakesB</event>
+	</events>
+	<nodes>
+		<node x="160" y="176" size="8" initial="1" marked="1">
+			<label dx="-25" dy="4">s0</label>
+		</node>
+		<node x="320" y="176" size="8">
+			<label dx="12" dy="4">s2</label>
+		</node>
+		<node x="240" y="96" size="8">
+			<label dx="-8" dy="21">s1</label>
+		</node>
+		<node x="240" y="256" size="8">
+			<label dx="-6" dy="-12">s3</label>
+		</node>
+	</nodes>
+	<edges>
+		<line>
+			<source>s0</source>
+			<target>s3</target>
+			<labelGroup dx="-75" dy="12">
+				<label dx="0" dy="0">User1TakesB</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s0</source>
+			<target>s1</target>
+			<labelGroup dx="-71" dy="-5">
+				<label dx="0" dy="0">User1TakesA</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s3</source>
+			<target>s2</target>
+			<labelGroup dx="1" dy="10">
+				<label dx="0" dy="0">User1TakesA</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s2</source>
+			<target>s0</target>
+			<labelGroup dx="-32" dy="-3">
+				<label dx="0" dy="0">User1Done</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s1</source>
+			<target>s2</target>
+			<labelGroup dx="-3" dy="-7">
+				<label dx="0" dy="0">User1TakesB</label>
+			</labelGroup>
+		</line>
+	</edges>
+</graph>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="194" height="76">
+	<events>
+		<event controllable="1">MVR_an.TUER</event>
+		<event controllable="1">MVR_aus.TUER</event>
+		<event controllable="0">STZV.TUER</event>
+	</events>
+	<nodes>
+		<node x="160" y="80" size="8">
+			<label dx="-40" dy="6">RUN</label>
+		</node>
+		<node x="48" y="80" size="8" initial="1" marked="1">
+			<label dx="11" dy="7">IDLE</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="199" y="80">
+			<source>RUN</source>
+			<labelGroup dx="-41" dy="-16">
+				<label dx="0" dy="0">STZV.TUER</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="104" y="63">
+			<source>RUN</source>
+			<target>IDLE</target>
+			<labelGroup dx="-44" dy="-3">
+				<label dx="0" dy="0">MVR_aus.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="100" y="98">
+			<source>IDLE</source>
+			<target>RUN</target>
+			<labelGroup dx="-42" dy="13">
+				<label dx="0" dy="0">MVR_an.TUER</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

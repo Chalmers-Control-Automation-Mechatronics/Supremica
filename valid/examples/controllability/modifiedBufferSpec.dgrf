@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.15" width="142" height="104">
+	<events>
+		<event controllable="0">Finish1</event>
+		<event controllable="1">Start1</event>
+		<event controllable="1">Start2</event>
+	</events>
+	<nodes>
+		<node x="272" y="192" size="8">
+			<label dx="-6" dy="-12">Full</label>
+		</node>
+		<node x="176" y="192" size="8" initial="1" marked="1">
+			<label dx="-27" dy="-12">Empty</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="176" y="225">
+			<source>Empty</source>
+			<labelGroup dx="-16" dy="12">
+				<label dx="0" dy="0">Start1</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>Empty</source>
+			<target>Full</target>
+			<labelGroup dx="-25" dy="14">
+				<label dx="0" dy="0">Finish1</label>
+			</labelGroup>
+		</line>
+		<quadratic x="224" y="160">
+			<source>Full</source>
+			<target>Empty</target>
+			<labelGroup dx="-18" dy="-2">
+				<label dx="0" dy="0">Start2</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.15" width="144" height="104">
+	<events>
+		<event controllable="0">donevacuum</event>
+		<event controllable="0">errorvacuum</event>
+		<event controllable="1">recovervacuum</event>
+		<event controllable="1">vacuum</event>
+	</events>
+	<nodes>
+		<node x="256" y="176" size="8">
+			<label dx="-7" dy="21">s1</label>
+		</node>
+		<node x="144" y="176" size="8" initial="1" marked="1">
+			<label dx="-7" dy="22">s0</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="199" y="209">
+			<source>s1</source>
+			<target>s0</target>
+			<labelGroup dx="-36" dy="-3">
+				<label dx="0" dy="0">donevacuum</label>
+				<label dx="0" dy="16">errorvacuum</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s0</source>
+			<target>s1</target>
+			<labelGroup dx="-25" dy="-2">
+				<label dx="0" dy="0">vacuum</label>
+			</labelGroup>
+		</line>
+		<loop x="144" y="144">
+			<source>s0</source>
+			<labelGroup dx="-17" dy="-1">
+				<label dx="0" dy="0">recovervacuum</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

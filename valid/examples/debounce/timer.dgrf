@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.9" width="152" height="93">
+	<events>
+		<event controllable="1">reset.I</event>
+		<event controllable="0">timeout.I</event>
+		<event controllable="1">timer.I</event>
+	</events>
+	<nodes>
+		<node x="144" y="48" size="8">
+			<label dx="12" dy="5">on</label>
+		</node>
+		<node x="48" y="48" size="8" initial="1" marked="1">
+			<label dx="-25" dy="5">off</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="97" y="65">
+			<source>off</source>
+			<target>on</target>
+			<labelGroup dx="-16" dy="16">
+				<label dx="0" dy="0">timer.I</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="96" y="32">
+			<source>on</source>
+			<target>off</target>
+			<labelGroup dx="-21" dy="-19">
+				<label dx="0" dy="0">reset.I</label>
+				<label dx="0" dy="16">timeout.I</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

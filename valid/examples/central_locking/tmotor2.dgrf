@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.5" width="517" height="550">
+	<events>
+		<event controllable="1">MER_an.TUER</event>
+		<event controllable="1">MER_aus.TUER</event>
+		<event controllable="1">MVR_an.TUER</event>
+		<event controllable="1">MVR_aus.TUER</event>
+		<event controllable="1">MZS_an.TUER</event>
+		<event controllable="1">MZS_aus.TUER</event>
+		<event controllable="1">reset.TUER</event>
+		<event controllable="1">soft_CS</event>
+		<event controllable="1">start_ER.TUER</event>
+		<event controllable="1">start_VR.TUER</event>
+		<event controllable="1">start_ZS.TUER</event>
+		<event controllable="1">stop_ER.TUER</event>
+		<event controllable="1">stop_VR.TUER</event>
+		<event controllable="1">stop_ZS.TUER</event>
+		<event controllable="1">time_ER.TUER</event>
+		<event controllable="1">time_VR.TUER</event>
+		<event controllable="1">time_ZS.TUER</event>
+		<event controllable="0">timeout.TUER</event>
+	</events>
+	<nodes>
+		<node x="400" y="352" size="8">
+			<label dx="11" dy="-6">zs3a</label>
+		</node>
+		<node x="464" y="352" size="8">
+			<label dx="-34" dy="8">zs3b</label>
+		</node>
+		<node x="112" y="192" size="8">
+			<label dx="11" dy="3">er1</label>
+		</node>
+		<node x="112" y="272" size="8">
+			<label dx="10" dy="7">er2</label>
+		</node>
+		<node x="432" y="192" size="8">
+			<label dx="-27" dy="14">zs1</label>
+		</node>
+		<node x="112" y="352" size="8">
+			<label dx="13" dy="3">er3</label>
+		</node>
+		<node x="432" y="272" size="8">
+			<label dx="-28" dy="7">zs2</label>
+		</node>
+		<node x="112" y="432" size="8">
+			<label dx="11" dy="2">er4</label>
+		</node>
+		<node x="432" y="432" size="8">
+			<label dx="-27" dy="6">zs4</label>
+		</node>
+		<node x="432" y="512" size="8">
+			<label dx="-31" dy="6">zs5</label>
+		</node>
+		<node x="272" y="112" size="8" initial="1" marked="1">
+			<label dx="11" dy="0">IN</label>
+		</node>
+		<node x="272" y="192" size="8">
+			<label dx="-25" dy="5">vr1</label>
+		</node>
+		<node x="272" y="272" size="8">
+			<label dx="-28" dy="7">vr2</label>
+		</node>
+		<node x="272" y="352" size="8">
+			<label dx="-27" dy="8">vr3</label>
+		</node>
+		<node x="272" y="432" size="8">
+			<label dx="-27" dy="6">vr4</label>
+		</node>
+		<nodeGroup id="$0">
+			<box>
+				<point x="32" y="16"/>
+				<point x="544" y="16"/>
+				<point x="544" y="560"/>
+				<point x="32" y="560"/>
+			</box>
+			<nodeElement>zs3a</nodeElement>
+			<nodeElement>zs3b</nodeElement>
+			<nodeElement>er1</nodeElement>
+			<nodeElement>er2</nodeElement>
+			<nodeElement>zs1</nodeElement>
+			<nodeElement>er3</nodeElement>
+			<nodeElement>zs2</nodeElement>
+			<nodeElement>er4</nodeElement>
+			<nodeElement>zs4</nodeElement>
+			<nodeElement>zs5</nodeElement>
+			<nodeElement>IN</nodeElement>
+			<nodeElement>vr1</nodeElement>
+			<nodeElement>vr2</nodeElement>
+			<nodeElement>vr3</nodeElement>
+			<nodeElement>vr4</nodeElement>
+		</nodeGroup>
+	</nodes>
+	<edges>
+		<line>
+			<source>er1</source>
+			<target>er2</target>
+			<labelGroup dx="-51" dy="2">
+				<label dx="0" dy="0">time_ER.TUER</label>
+			</labelGroup>
+		</line>
+		<loop x="273" y="475">
+			<source>vr4</source>
+			<labelGroup dx="-43" dy="-4">
+				<label dx="0" dy="0">MVR_aus.TUER</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="304" y="283">
+			<source>vr4</source>
+			<target>IN</target>
+			<labelGroup dx="-17" dy="74">
+				<label dx="0" dy="0">stop_VR.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>zs3a</source>
+			<target>zs4</target>
+			<labelGroup dx="-44" dy="-13">
+				<label dx="0" dy="0">MVR_an.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="384" y="438">
+			<source>zs3a</source>
+			<target>zs5</target>
+			<labelGroup dx="-19" dy="20">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="236" y="352">
+			<source>vr2</source>
+			<target>vr4</target>
+			<labelGroup dx="-51" dy="-11">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>vr2</source>
+			<target>vr3</target>
+			<labelGroup dx="-49" dy="2">
+				<label dx="0" dy="0">MVR_an.TUER</label>
+			</labelGroup>
+		</line>
+		<loop x="112" y="474">
+			<source>er4</source>
+			<labelGroup dx="-41" dy="-1">
+				<label dx="0" dy="0">MER_aus.TUER</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="189" y="311">
+			<source>er4</source>
+			<target>IN</target>
+			<labelGroup dx="-33" dy="-34">
+				<label dx="0" dy="0">stop_ER.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>IN</source>
+			<target>er1</target>
+			<labelGroup dx="-59" dy="-7">
+				<label dx="0" dy="0">start_ER.TUER</label>
+			</labelGroup>
+		</line>
+		<loop x="272" y="72">
+			<source>IN</source>
+			<labelGroup dx="-40" dy="-42">
+				<label dx="0" dy="0">MER_aus.TUER</label>
+				<label dx="0" dy="16">MVR_aus.TUER</label>
+				<label dx="0" dy="32">MZS_aus.TUER</label>
+				<label dx="0" dy="48">reset.TUER</label>
+				<label dx="0" dy="64">timeout.TUER</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>IN</source>
+			<target>vr1</target>
+			<labelGroup dx="-64" dy="11">
+				<label dx="0" dy="0">start_VR.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="357" y="153">
+			<source>IN</source>
+			<target>zs1</target>
+			<labelGroup dx="-24" dy="-9">
+				<label dx="0" dy="0">start_ZS.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>zs4</source>
+			<target>zs5</target>
+			<labelGroup dx="-41" dy="12">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="174" y="69">
+			<source>$0</source>
+			<target>IN</target>
+			<labelGroup dx="-48" dy="4">
+				<label dx="0" dy="0">soft_CS</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>vr3</source>
+			<target>vr4</target>
+			<labelGroup dx="-43" dy="0">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>er3</source>
+			<target>er4</target>
+			<labelGroup dx="-42" dy="-10">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="76" y="352">
+			<source>er2</source>
+			<target>er4</target>
+			<labelGroup dx="-40" dy="-17">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>er2</source>
+			<target>er3</target>
+			<labelGroup dx="-48" dy="-6">
+				<label dx="0" dy="0">MER_an.TUER</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>zs2</source>
+			<target>zs3a</target>
+			<labelGroup dx="-43" dy="-2">
+				<label dx="0" dy="0">MZS_an.TUER</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>zs2</source>
+			<target>zs3b</target>
+			<labelGroup dx="-40" dy="18">
+				<label dx="0" dy="0">MVR_an.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="511" y="401">
+			<source>zs2</source>
+			<target>zs5</target>
+			<labelGroup dx="-50" dy="44">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>zs3b</source>
+			<target>zs4</target>
+			<labelGroup dx="-39" dy="7">
+				<label dx="0" dy="0">MZS_an.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="480" y="438">
+			<source>zs3b</source>
+			<target>zs5</target>
+			<labelGroup dx="-51" dy="33">
+				<label dx="0" dy="0">timeout.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>vr1</source>
+			<target>vr2</target>
+			<labelGroup dx="-50" dy="6">
+				<label dx="0" dy="0">time_VR.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="374" y="431">
+			<source>zs5</source>
+			<target>IN</target>
+			<labelGroup dx="-80" dy="-14">
+				<label dx="0" dy="0">stop_ZS.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="434" y="553">
+			<source>zs5</source>
+			<labelGroup dx="-42" dy="-15">
+				<label dx="0" dy="0">MVR_aus.TUER</label>
+				<label dx="0" dy="16">MZS_aus.TUER</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>zs1</source>
+			<target>zs2</target>
+			<labelGroup dx="-49" dy="4">
+				<label dx="0" dy="0">time_ZS.TUER</label>
+			</labelGroup>
+		</line>
+	</edges>
+</graph>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="179" height="68">
+	<events>
+		<event controllable="1">MVR_an.TUER</event>
+		<event controllable="1">MVR_aus.TUER</event>
+	</events>
+	<nodes>
+		<node x="160" y="48" size="8">
+			<label dx="12" dy="7">RUN</label>
+		</node>
+		<node x="64" y="48" size="8" initial="1" marked="1">
+			<label dx="-39" dy="5">IDLE</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="110" y="62">
+			<source>IDLE</source>
+			<target>RUN</target>
+			<labelGroup dx="-39" dy="11">
+				<label dx="0" dy="0">MVR_an.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="112" y="34">
+			<source>RUN</source>
+			<target>IDLE</target>
+			<labelGroup dx="-41" dy="-4">
+				<label dx="0" dy="0">MVR_aus.TUER</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

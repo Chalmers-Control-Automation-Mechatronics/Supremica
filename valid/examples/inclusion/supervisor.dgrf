@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.15" width="438" height="367">
+	<events>
+		<event controllable="0">Break1</event>
+		<event controllable="0">Break2</event>
+		<event controllable="0">Finish1</event>
+		<event controllable="0">Finish2</event>
+		<event controllable="1">Repair1</event>
+		<event controllable="1">Repair2</event>
+		<event controllable="1">Start1</event>
+		<event controllable="1">Start2</event>
+	</events>
+	<nodes>
+		<node x="464" y="80" size="8">
+			<label dx="10" dy="6">s11</label>
+		</node>
+		<node x="464" y="272" size="8">
+			<label dx="11" dy="5">s10</label>
+		</node>
+		<node x="464" y="176" size="8">
+			<label dx="11" dy="5">s9</label>
+		</node>
+		<node x="336" y="272" size="8">
+			<label dx="6" dy="17">s5</label>
+		</node>
+		<node x="336" y="368" size="8">
+			<label dx="-7" dy="20">s6</label>
+		</node>
+		<node x="240" y="368" size="8">
+			<label dx="-6" dy="20">s7</label>
+		</node>
+		<node x="336" y="80" size="8">
+			<label dx="12" dy="-1">s4</label>
+		</node>
+		<node x="336" y="176" size="8">
+			<label dx="4" dy="22">s3</label>
+		</node>
+		<node x="240" y="176" size="8">
+			<label dx="-31" dy="13">s2</label>
+		</node>
+		<node x="144" y="368" size="8">
+			<label dx="-8" dy="19">s8</label>
+		</node>
+		<node x="144" y="176" size="8">
+			<label dx="-23" dy="5">s1</label>
+		</node>
+		<node x="144" y="80" size="8" initial="1" marked="1">
+			<label dx="-24" dy="5">s0</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="272" y="116">
+			<source>s1</source>
+			<target>s11</target>
+			<labelGroup dx="121" dy="-15">
+				<label dx="0" dy="0">Break1</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s1</source>
+			<target>s2</target>
+			<labelGroup dx="-20" dy="-9">
+				<label dx="0" dy="0">Finish1</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s7</source>
+			<target>s2</target>
+			<labelGroup dx="-44" dy="20">
+				<label dx="0" dy="0">Repair2</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s0</source>
+			<target>s1</target>
+			<labelGroup dx="-34" dy="2">
+				<label dx="0" dy="0">Start1</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s6</source>
+			<target>s7</target>
+			<labelGroup dx="-19" dy="13">
+				<label dx="0" dy="0">Break2</label>
+			</labelGroup>
+		</line>
+		<quadratic x="299" y="262">
+			<source>s6</source>
+			<target>s2</target>
+			<labelGroup dx="-41" dy="12">
+				<label dx="0" dy="0">Finish2</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s3</source>
+			<target>s0</target>
+			<labelGroup dx="-13" dy="28">
+				<label dx="0" dy="0">Finish2</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s3</source>
+			<target>s4</target>
+			<labelGroup dx="0" dy="9">
+				<label dx="0" dy="0">Break2</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s3</source>
+			<target>s5</target>
+			<labelGroup dx="-33" dy="3">
+				<label dx="0" dy="0">Start1</label>
+			</labelGroup>
+		</line>
+		<quadratic x="144" y="272">
+			<source>s8</source>
+			<target>s1</target>
+			<labelGroup dx="-48" dy="5">
+				<label dx="0" dy="0">Repair2</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s8</source>
+			<target>s7</target>
+			<labelGroup dx="-21" dy="13">
+				<label dx="0" dy="0">Finish1</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s8</source>
+			<target>s10</target>
+			<labelGroup dx="91" dy="-15">
+				<label dx="0" dy="0">Break1</label>
+			</labelGroup>
+		</line>
+		<quadratic x="305" y="49">
+			<source>s11</source>
+			<target>s0</target>
+			<labelGroup dx="-23" dy="-5">
+				<label dx="0" dy="0">Repair1</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s2</source>
+			<target>s3</target>
+			<labelGroup dx="-7" dy="13">
+				<label dx="0" dy="0">Start2</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s4</source>
+			<target>s0</target>
+			<labelGroup dx="-23" dy="14">
+				<label dx="0" dy="0">Repair2</label>
+			</labelGroup>
+		</line>
+		<quadratic x="214" y="231">
+			<source>s4</source>
+			<target>s8</target>
+			<labelGroup dx="-49" dy="31">
+				<label dx="0" dy="0">Start1</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="401" y="176">
+			<source>s9</source>
+			<target>s3</target>
+			<labelGroup dx="-19" dy="-3">
+				<label dx="0" dy="0">Repair1</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s9</source>
+			<target>s11</target>
+			<labelGroup dx="-44" dy="8">
+				<label dx="0" dy="0">Finish2</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s9</source>
+			<target>s10</target>
+			<labelGroup dx="-42" dy="9">
+				<label dx="0" dy="0">Break2</label>
+			</labelGroup>
+		</line>
+		<quadratic x="497" y="177">
+			<source>s10</source>
+			<target>s11</target>
+			<labelGroup dx="-16" dy="-23">
+				<label dx="0" dy="0">Repair2</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s5</source>
+			<target>s1</target>
+			<labelGroup dx="-79" dy="-8">
+				<label dx="0" dy="0">Finish2</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s5</source>
+			<target>s6</target>
+			<labelGroup dx="0" dy="20">
+				<label dx="0" dy="0">Finish1</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s5</source>
+			<target>s8</target>
+			<labelGroup dx="-60" dy="11">
+				<label dx="0" dy="0">Break2</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>s5</source>
+			<target>s9</target>
+			<labelGroup dx="-39" dy="0">
+				<label dx="0" dy="0">Break1</label>
+			</labelGroup>
+		</line>
+	</edges>
+</graph>

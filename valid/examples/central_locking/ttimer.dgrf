@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="149" height="123">
+	<events>
+		<event controllable="1">reset.TUER</event>
+		<event controllable="1">time_ER.TUER</event>
+		<event controllable="1">time_VR.TUER</event>
+		<event controllable="1">time_W.TUER</event>
+		<event controllable="1">time_ZS.TUER</event>
+		<event controllable="0">timeout.TUER</event>
+	</events>
+	<nodes>
+		<node x="160" y="64" size="8">
+			<label dx="-13" dy="23">RUN</label>
+		</node>
+		<node x="48" y="64" size="8" initial="1" marked="1">
+			<label dx="-18" dy="22">IDLE</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="104" y="44">
+			<source>RUN</source>
+			<target>IDLE</target>
+			<labelGroup dx="-36" dy="-5">
+				<label dx="0" dy="0">reset.TUER</label>
+				<label dx="0" dy="16">timeout.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="101" y="79">
+			<source>IDLE</source>
+			<target>RUN</target>
+			<labelGroup dx="-37" dy="10">
+				<label dx="0" dy="0">time_W.TUER</label>
+				<label dx="0" dy="16">time_ER.TUER</label>
+				<label dx="0" dy="32">time_VR.TUER</label>
+				<label dx="0" dy="48">time_ZS.TUER</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

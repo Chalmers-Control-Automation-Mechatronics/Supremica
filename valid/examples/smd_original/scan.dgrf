@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.15" width="124" height="101">
+	<events>
+		<event controllable="0">donescan</event>
+		<event controllable="0">errorscan</event>
+		<event controllable="1">recoverscan</event>
+		<event controllable="1">scan</event>
+	</events>
+	<nodes>
+		<node x="240" y="176" size="8">
+			<label dx="-7" dy="23">s1</label>
+		</node>
+		<node x="144" y="176" size="8" initial="1" marked="1">
+			<label dx="-9" dy="22">s0</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="191" y="204">
+			<source>s1</source>
+			<target>s0</target>
+			<labelGroup dx="-29" dy="-2">
+				<label dx="0" dy="0">donescan</label>
+				<label dx="0" dy="16">errorscan</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>s0</source>
+			<target>s1</target>
+			<labelGroup dx="-15" dy="-2">
+				<label dx="0" dy="0">scan</label>
+			</labelGroup>
+		</line>
+		<loop x="144" y="144">
+			<source>s0</source>
+			<labelGroup dx="-13" dy="-2">
+				<label dx="0" dy="0">recoverscan</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

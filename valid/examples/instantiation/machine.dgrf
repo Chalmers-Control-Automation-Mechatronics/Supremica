@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.15" width="250" height="116">
+	<events>
+		<event controllable="0">Break.mach_num</event>
+		<event controllable="0">Finish.mach_num</event>
+		<event controllable="1">Repair.mach_num</event>
+		<event controllable="1">Start.mach_num</event>
+	</events>
+	<nodes>
+		<node x="288" y="192" size="8">
+			<label dx="12" dy="4">Down</label>
+		</node>
+		<node x="192" y="192" size="8">
+			<label dx="-57" dy="3">Working</label>
+		</node>
+		<node x="240" y="112" size="8" initial="1" marked="1">
+			<label dx="13" dy="4">Idle</label>
+		</node>
+	</nodes>
+	<edges>
+		<line>
+			<source>Down</source>
+			<target>Idle</target>
+			<labelGroup dx="-4" dy="-11">
+				<label dx="0" dy="0">Repair.mach_num</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>Working</source>
+			<target>Down</target>
+			<labelGroup dx="-38" dy="17">
+				<label dx="0" dy="0">Break.mach_num</label>
+			</labelGroup>
+		</line>
+		<quadratic x="187" y="134">
+			<source>Working</source>
+			<target>Idle</target>
+			<labelGroup dx="-65" dy="-6">
+				<label dx="0" dy="0">Finish.mach_num</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>Idle</source>
+			<target>Working</target>
+			<labelGroup dx="-60" dy="10">
+				<label dx="0" dy="0">Start.mach_num</label>
+			</labelGroup>
+		</line>
+	</edges>
+</graph>

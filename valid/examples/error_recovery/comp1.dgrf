@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.15" width="184" height="73">
+	<events>
+		<event controllable="0">Finish1</event>
+		<event controllable="1">Repair1</event>
+		<event controllable="1">RepairInit</event>
+		<event controllable="1">Start1</event>
+	</events>
+	<nodes>
+		<node x="80" y="48" size="8" initial="1" marked="1">
+			<label dx="-11" dy="-12">Idle1</label>
+		</node>
+		<node x="176" y="48" size="8">
+			<label dx="-24" dy="-12">Working1</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="209" y="48">
+			<source>Working1</source>
+			<labelGroup dx="-40" dy="27">
+				<label dx="0" dy="0">Repair1</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="128" y="65">
+			<source>Working1</source>
+			<target>Idle1</target>
+			<labelGroup dx="-19" dy="12">
+				<label dx="0" dy="0">Finish1</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="126" y="31">
+			<source>Idle1</source>
+			<target>Working1</target>
+			<labelGroup dx="-16" dy="-2">
+				<label dx="0" dy="0">Start1</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="47" y="50">
+			<source>Idle1</source>
+			<labelGroup dx="-9" dy="25">
+				<label dx="0" dy="0">RepairInit</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

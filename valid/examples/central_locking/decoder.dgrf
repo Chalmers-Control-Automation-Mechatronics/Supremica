@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.5" width="485" height="421">
+	<events>
+		<event controllable="1">autom_VR</event>
+		<event controllable="1">ER</event>
+		<event controllable="1">is_cod_er</event>
+		<event controllable="1">is_cod_ser</event>
+		<event controllable="1">SER</event>
+		<event controllable="1">SERFS</event>
+		<event controllable="1">soft_CS</event>
+		<event controllable="1">soft_ER</event>
+		<event controllable="1">soft_SER.FT</event>
+		<event controllable="1">soft_VR</event>
+		<event controllable="1">soft_ZS</event>
+		<event controllable="1">TAST</event>
+		<event controllable="1">ZS</event>
+		<event controllable="1">ZSA</event>
+		<event controllable="1">ZSI</event>
+	</events>
+	<nodes>
+		<node x="544" y="144" size="8">
+			<label dx="-11" dy="-10">RQZS</label>
+		</node>
+		<node x="160" y="144" size="8">
+			<label dx="-17" dy="-11">RQSER</label>
+		</node>
+		<node x="544" y="400" size="8" marked="1">
+			<label dx="-2" dy="18">ZS</label>
+		</node>
+		<node x="224" y="272" size="8">
+			<label dx="-20" dy="20">COD</label>
+		</node>
+		<node x="416" y="144" size="8">
+			<label dx="1" dy="-9">RQVR</label>
+		</node>
+		<node x="416" y="400" size="8" marked="1">
+			<label dx="6" dy="16">VR</label>
+		</node>
+		<node x="480" y="272" size="8">
+			<label dx="-2" dy="18">TSTZS</label>
+		</node>
+		<node x="288" y="144" size="8">
+			<label dx="-28" dy="-9">RQER</label>
+		</node>
+		<node x="160" y="400" size="8" marked="1">
+			<label dx="-11" dy="18">SER</label>
+		</node>
+		<node x="288" y="400" size="8" marked="1">
+			<label dx="7" dy="18">ER</label>
+		</node>
+		<node x="352" y="48" size="8" initial="1">
+			<label dx="-4" dy="-11">IN</label>
+		</node>
+		<nodeGroup id="$1">
+			<box>
+				<point x="112" y="16"/>
+				<point x="592" y="16"/>
+				<point x="592" y="432"/>
+				<point x="112" y="432"/>
+			</box>
+			<nodeElement>RQZS</nodeElement>
+			<nodeElement>RQSER</nodeElement>
+			<nodeElement>ZS</nodeElement>
+			<nodeElement>COD</nodeElement>
+			<nodeElement>RQVR</nodeElement>
+			<nodeElement>VR</nodeElement>
+			<nodeElement>TSTZS</nodeElement>
+			<nodeElement>RQER</nodeElement>
+			<nodeElement>SER</nodeElement>
+			<nodeElement>ER</nodeElement>
+			<nodeElement>IN</nodeElement>
+		</nodeGroup>
+	</nodes>
+	<edges>
+		<line>
+			<source>TSTZS</source>
+			<target>RQVR</target>
+			<labelGroup dx="-4" dy="-15">
+				<label dx="0" dy="0">ZSI</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>TSTZS</source>
+			<target>RQZS</target>
+			<labelGroup dx="-17" dy="-15">
+				<label dx="0" dy="0">ZSA</label>
+			</labelGroup>
+		</line>
+		<quadratic x="296" y="272">
+			<source>RQER</source>
+			<target>ER</target>
+			<labelGroup dx="-16" dy="-50">
+				<label dx="0" dy="0">soft_ER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>SER</source>
+			<target>TSTZS</target>
+			<labelGroup dx="11" dy="-12">
+				<label dx="0" dy="0">ZS</label>
+			</labelGroup>
+		</line>
+		<quadratic x="192" y="256">
+			<source>SER</source>
+			<target>RQER</target>
+			<labelGroup dx="-39" dy="14">
+				<label dx="0" dy="0">ER</label>
+				<label dx="0" dy="16">SER</label>
+				<label dx="0" dy="32">SERFS</label>
+				<label dx="0" dy="48">TAST</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>SER</source>
+			<target>RQVR</target>
+			<labelGroup dx="-105" dy="82">
+				<label dx="0" dy="0">autom_VR</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>ER</source>
+			<target>TSTZS</target>
+			<labelGroup dx="9" dy="7">
+				<label dx="0" dy="0">ZS</label>
+			</labelGroup>
+		</line>
+		<quadratic x="278" y="272">
+			<source>ER</source>
+			<target>RQER</target>
+			<labelGroup dx="-11" dy="2">
+				<label dx="0" dy="0">ER</label>
+				<label dx="0" dy="16">SER</label>
+				<label dx="0" dy="32">SERFS</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>ER</source>
+			<target>RQVR</target>
+			<labelGroup dx="-19" dy="-25">
+				<label dx="0" dy="0">TAST</label>
+				<label dx="0" dy="16">autom_VR</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>COD</source>
+			<target>RQER</target>
+			<labelGroup dx="-24" dy="1">
+				<label dx="0" dy="0">is_cod_er</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>COD</source>
+			<target>RQSER</target>
+			<labelGroup dx="-35" dy="-12">
+				<label dx="0" dy="0">is_cod_ser</label>
+			</labelGroup>
+		</line>
+		<quadratic x="416" y="273">
+			<source>ZS</source>
+			<target>RQER</target>
+			<labelGroup dx="-26" dy="0">
+				<label dx="0" dy="0">ER</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="374" y="362">
+			<source>ZS</source>
+			<target>COD</target>
+			<labelGroup dx="98" dy="29">
+				<label dx="0" dy="0">SER</label>
+				<label dx="0" dy="16">SERFS</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="524" y="273">
+			<source>ZS</source>
+			<target>RQZS</target>
+			<labelGroup dx="-17" dy="46">
+				<label dx="0" dy="0">ZS</label>
+				<label dx="0" dy="16">TAST</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="449" y="104">
+			<source>IN</source>
+			<target>TSTZS</target>
+			<labelGroup dx="-9" dy="-17">
+				<label dx="0" dy="0">ZS</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>IN</source>
+			<target>RQER</target>
+			<labelGroup dx="-12" dy="1">
+				<label dx="0" dy="0">ER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="252" y="104">
+			<source>IN</source>
+			<target>COD</target>
+			<labelGroup dx="-13" dy="-23">
+				<label dx="0" dy="0">SER</label>
+				<label dx="0" dy="16">SERFS</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>IN</source>
+			<target>RQVR</target>
+			<labelGroup dx="-15" dy="-2">
+				<label dx="0" dy="0">TAST</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>$1</source>
+			<target>ER</target>
+			<labelGroup dx="-52" dy="5">
+				<label dx="0" dy="0">soft_CS</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>RQVR</source>
+			<target>VR</target>
+			<labelGroup dx="-23" dy="-34">
+				<label dx="0" dy="0">soft_VR</label>
+			</labelGroup>
+		</line>
+		<quadratic x="141" y="272">
+			<source>RQSER</source>
+			<target>SER</target>
+			<labelGroup dx="-24" dy="-28">
+				<label dx="0" dy="0">soft_SER.FT</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>VR</source>
+			<target>TSTZS</target>
+			<labelGroup dx="-4" dy="16">
+				<label dx="0" dy="0">ZS</label>
+			</labelGroup>
+		</line>
+		<quadratic x="339" y="278">
+			<source>VR</source>
+			<target>RQER</target>
+			<labelGroup dx="16" dy="27">
+				<label dx="0" dy="0">ER</label>
+				<label dx="0" dy="16">TAST</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="314" y="346">
+			<source>VR</source>
+			<target>COD</target>
+			<labelGroup dx="-70" dy="-29">
+				<label dx="0" dy="0">SER</label>
+				<label dx="0" dy="16">SERFS</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="551" y="274">
+			<source>RQZS</source>
+			<target>ZS</target>
+			<labelGroup dx="-12" dy="-7">
+				<label dx="0" dy="0">soft_ZS</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

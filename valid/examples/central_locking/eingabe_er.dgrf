@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="327" height="359">
+	<events>
+		<event controllable="1">CS_ok</event>
+		<event controllable="1">ER</event>
+		<event controllable="0">ER_BT</event>
+		<event controllable="0">ER_FS</event>
+		<event controllable="0">ER_FT</event>
+		<event controllable="0">ER_HK</event>
+		<event controllable="1">soft_CS</event>
+		<event controllable="0">TASTVR</event>
+		<event controllable="0">VR_BT</event>
+		<event controllable="0">VR_FS</event>
+		<event controllable="0">VR_FT</event>
+		<event controllable="0">VR_HK</event>
+		<event controllable="1">WSP</event>
+	</events>
+	<nodes>
+		<node x="272" y="320" size="8">
+			<label dx="7" dy="16">C1</label>
+		</node>
+		<node x="112" y="320" size="8">
+			<label dx="-22" dy="14">C2</label>
+		</node>
+		<node x="272" y="160" size="8">
+			<label dx="6" dy="-8">ER</label>
+		</node>
+		<node x="112" y="160" size="8" initial="1" marked="1">
+			<label dx="-21" dy="-6">IN</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="76" y="347">
+			<source>C2</source>
+			<labelGroup dx="-43" dy="-111">
+				<label dx="0" dy="0">ER_FT</label>
+				<label dx="0" dy="16">ER_BT</label>
+				<label dx="0" dy="32">ER_HK</label>
+				<label dx="0" dy="48">ER_FS</label>
+				<label dx="0" dy="64">VR_FT</label>
+				<label dx="0" dy="80">VR_BT</label>
+				<label dx="0" dy="96">VR_HK</label>
+				<label dx="0" dy="112">VR_FS</label>
+				<label dx="0" dy="128">TASTVR</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>C2</source>
+			<target>IN</target>
+			<labelGroup dx="2" dy="2">
+				<label dx="0" dy="0">CS_ok</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>C1</source>
+			<target>C2</target>
+			<labelGroup dx="-15" dy="-2">
+				<label dx="0" dy="0">ER_FT</label>
+				<label dx="0" dy="16">ER_BT</label>
+				<label dx="0" dy="32">ER_HK</label>
+			</labelGroup>
+		</line>
+		<loop x="307" y="351">
+			<source>C1</source>
+			<labelGroup dx="-5" dy="-72">
+				<label dx="0" dy="0">ER_FS</label>
+				<label dx="0" dy="16">VR_FT</label>
+				<label dx="0" dy="32">VR_BT</label>
+				<label dx="0" dy="48">VR_HK</label>
+				<label dx="0" dy="64">VR_FS</label>
+				<label dx="0" dy="80">TASTVR</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>IN</source>
+			<target>C1</target>
+			<labelGroup dx="1" dy="-3">
+				<label dx="0" dy="0">soft_CS</label>
+			</labelGroup>
+		</line>
+		<loop x="75" y="135">
+			<source>IN</source>
+			<labelGroup dx="-42" dy="-40">
+				<label dx="0" dy="0">WSP</label>
+				<label dx="0" dy="16">ER_FT</label>
+				<label dx="0" dy="32">ER_FS</label>
+				<label dx="0" dy="48">VR_FT</label>
+				<label dx="0" dy="64">VR_BT</label>
+				<label dx="0" dy="80">VR_HK</label>
+				<label dx="0" dy="96">VR_FS</label>
+				<label dx="0" dy="112">TASTVR</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>IN</source>
+			<target>ER</target>
+			<labelGroup dx="5" dy="-1">
+				<label dx="0" dy="0">ER_BT</label>
+				<label dx="0" dy="16">ER_HK</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>ER</source>
+			<target>C1</target>
+			<labelGroup dx="4" dy="3">
+				<label dx="0" dy="0">soft_CS</label>
+			</labelGroup>
+		</line>
+		<quadratic x="192" y="136">
+			<source>ER</source>
+			<target>IN</target>
+			<labelGroup dx="-30" dy="-106">
+				<label dx="0" dy="0">ER_FT</label>
+				<label dx="0" dy="16">ER_FS</label>
+				<label dx="0" dy="32">VR_FT</label>
+				<label dx="0" dy="48">VR_BT</label>
+				<label dx="0" dy="64">VR_HK</label>
+				<label dx="0" dy="80">VR_FS</label>
+				<label dx="0" dy="96">TASTVR</label>
+				<label dx="0" dy="112">ER</label>
+				<label dx="0" dy="128">WSP</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="299" y="133">
+			<source>ER</source>
+			<labelGroup dx="2" dy="-7">
+				<label dx="0" dy="0">ER_BT</label>
+				<label dx="0" dy="16">ER_HK</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

@@ -1,0 +1,90 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (WinNT; U) [Netscape]">
+   <title>VALID Example: instantiation</title>
+</head>
+<body bgcolor="#FFFFFF" link="#0000FF" vlink="#800080">
+&nbsp;
+<table BORDER CELLPADDING=3 WIDTH="100%" >
+<tr>
+<td COLSPAN="2" BGCOLOR="#FFFF99"><b><font size=+2>instantiation</font></b></td>
+</tr>
+
+<tr VALIGN=TOP>
+<th ALIGN=LEFT>Description</th>
+
+<td>A small workcell consisting of two simple machines connected by a buffer
+of capacity 1, also known as "small factory".</td>
+</tr>
+
+<tr VALIGN=TOP>
+<th ALIGN=LEFT>Features
+<br>Demonstrated</th>
+
+<td>Templates and instantiation</td>
+</tr>
+
+<tr VALIGN=TOP>
+<th ALIGN=LEFT>Projects</th>
+
+<td>
+<dl>
+<dt>
+<b><tt>TwoMachinesOneBuffer</tt></b></dt>
+
+<dd>
+The small factory model, consisting of two machines and a buffer supervsior.</dd>
+</dl>
+</td>
+</tr>
+
+<tr VALIGN=TOP>
+<th ALIGN=LEFT>How to Use</th>
+
+<td>Open project <tt>TwoMachinesOneBuffer</tt>, and open the template
+<tt>machine</tt>
+by clicking on the triangle icon in front of it. The project contains two
+plants <tt>machine.1</tt> and <tt>machine.2</tt>, representing the two
+machines of the workcell. Since these two automata have very similar structure,
+they have been derived from a common
+<i>template</i> called <tt>machine</tt>,
+by substituting the indexes 1 and 2 for the parameter <tt>mach_num</tt>.
+Furthermore, a named
+<i>range</i> called <tt>MACHINES</tt> has been introduced
+to represent the range (1..2) of instantiation. A named range can be reused
+in other instantiations, so that a single change of the range can affect
+many instantiations simultaneously.</td>
+</tr>
+
+<tr VALIGN=TOP>
+<th ALIGN=LEFT>See Also</th>
+
+<td><a href="../controllability/index.html">controllability</a>,
+<a href="../inclusion/index.html">inclusion</a></td>
+</tr>
+
+<tr VALIGN=TOP>
+<th ALIGN=LEFT>Notes</th>
+
+<td>&nbsp;</td>
+</tr>
+
+<tr VALIGN=TOP>
+<th ALIGN=LEFT>History</th>
+
+<td>Original example by Ramadge and Wonham, 1987.
+<br>First release in VALID DESign 2.0.
+<br>Range introduced into example in VALID DESign 2.6.</td>
+</tr>
+</table>
+
+<p>
+<hr>
+<center><a href="../inclusion/index.html"><img SRC="../left.gif" ALT="Back" height=40 width=40></a><a href="../index.html"><img SRC="../up.gif" ALT="Up" height=40 width=40></a><a href="../smd_original/index.html"><img SRC="../right.gif" ALT="Forward" height=40 width=40></a></center>
+
+<br><font size=-1>&copy; 1998-2000, VALID Technologies.<!-- hhmts start -->Last
+Modification Date: 2000-06-19</font><!-- hhmts end -->
+</body>
+</html>

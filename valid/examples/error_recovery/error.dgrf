@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.9" width="83" height="65">
+	<events>
+		<event controllable="0">error</event>
+	</events>
+	<nodes>
+		<node x="192" y="128" size="8" initial="1" marked="1">
+			<label dx="-8" dy="24">s0</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="219" y="101">
+			<source>s0</source>
+			<labelGroup dx="11" dy="18">
+				<label dx="0" dy="0">error</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

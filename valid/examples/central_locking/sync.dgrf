@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="296" height="269">
+	<events>
+		<event controllable="1">async.TUER</event>
+		<event controllable="1">start_VR.TUER</event>
+		<event controllable="1">start_ZS.TUER</event>
+		<event controllable="1">stop_ER.TUER</event>
+		<event controllable="1">sync.TUER</event>
+		<event controllable="0">tuer_auf.TUER</event>
+		<event controllable="0">tuer_zu.TUER</event>
+	</events>
+	<nodes>
+		<node x="96" y="224" size="8" marked="1">
+			<label dx="-22" dy="15">VR</label>
+		</node>
+		<node x="96" y="96" size="8" initial="1">
+			<label dx="-24" dy="-6">ASY</label>
+		</node>
+		<node x="224" y="224" size="8" marked="1">
+			<label dx="5" dy="18">ZU</label>
+		</node>
+		<node x="160" y="160" size="8">
+			<label dx="-23" dy="19">AZU</label>
+		</node>
+		<node x="224" y="96" size="8">
+			<label dx="5" dy="-6">AUF</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="256" y="252">
+			<source>ZU</source>
+			<labelGroup dx="-40" dy="3">
+				<label dx="0" dy="0">sync.TUER</label>
+				<label dx="0" dy="16">stop_ER.TUER</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="243" y="160">
+			<source>ZU</source>
+			<target>AUF</target>
+			<labelGroup dx="-4" dy="38">
+				<label dx="0" dy="0">tuer_auf.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>ZU</source>
+			<target>VR</target>
+			<labelGroup dx="-35" dy="-4">
+				<label dx="0" dy="0">start_VR.TUER</label>
+				<label dx="0" dy="16">start_ZS.TUER</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>AZU</source>
+			<target>ZU</target>
+			<labelGroup dx="-58" dy="5">
+				<label dx="0" dy="0">stop_ER.TUER</label>
+			</labelGroup>
+		</line>
+		<loop x="187" y="133">
+			<source>AZU</source>
+			<labelGroup dx="-14" dy="10">
+				<label dx="0" dy="0">async.TUER</label>
+				<label dx="0" dy="16">start_VR.TUER</label>
+				<label dx="0" dy="32">start_ZS.TUER</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="123" y="133">
+			<source>AZU</source>
+			<target>ASY</target>
+			<labelGroup dx="-58" dy="18">
+				<label dx="0" dy="0">tuer_auf.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>AUF</source>
+			<target>ZU</target>
+			<labelGroup dx="1" dy="-35">
+				<label dx="0" dy="0">tuer_zu.TUER</label>
+			</labelGroup>
+		</line>
+		<loop x="251" y="69">
+			<source>AUF</source>
+			<labelGroup dx="-23" dy="-16">
+				<label dx="0" dy="0">sync.TUER</label>
+				<label dx="0" dy="16">stop_ER.TUER</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>AUF</source>
+			<target>ASY</target>
+			<labelGroup dx="-38" dy="-3">
+				<label dx="0" dy="0">start_VR.TUER</label>
+				<label dx="0" dy="16">start_ZS.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="160" y="243">
+			<source>VR</source>
+			<target>ZU</target>
+			<labelGroup dx="-36" dy="11">
+				<label dx="0" dy="0">stop_ER.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="64" y="251">
+			<source>VR</source>
+			<labelGroup dx="-27" dy="5">
+				<label dx="0" dy="0">start_VR.TUER</label>
+				<label dx="0" dy="16">start_ZS.TUER</label>
+				<label dx="0" dy="32">sync.TUER</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>VR</source>
+			<target>ASY</target>
+			<labelGroup dx="-48" dy="24">
+				<label dx="0" dy="0">tuer_auf.TUER</label>
+			</labelGroup>
+		</line>
+		<quadratic x="133" y="123">
+			<source>ASY</source>
+			<target>AZU</target>
+			<labelGroup dx="-17" dy="0">
+				<label dx="0" dy="0">tuer_zu.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="160" y="77">
+			<source>ASY</source>
+			<target>AUF</target>
+			<labelGroup dx="-29" dy="-7">
+				<label dx="0" dy="0">stop_ER.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="68" y="67">
+			<source>ASY</source>
+			<labelGroup dx="-26" dy="-23">
+				<label dx="0" dy="0">start_VR.TUER</label>
+				<label dx="0" dy="16">start_ZS.TUER</label>
+				<label dx="0" dy="32">async.TUER</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

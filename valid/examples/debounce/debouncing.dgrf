@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.9" width="200" height="277">
+	<events>
+		<event controllable="1">chg_value.I</event>
+		<event controllable="0">new_value.I</event>
+		<event controllable="1">reset.I</event>
+		<event controllable="0">timeout.I</event>
+		<event controllable="1">timer.I</event>
+	</events>
+	<nodes>
+		<node x="112" y="176" size="8">
+			<label dx="11" dy="6">WAIT</label>
+		</node>
+		<node x="112" y="256" size="8">
+			<label dx="12" dy="7">CHG</label>
+		</node>
+		<node x="112" y="16" size="8" initial="1" marked="1">
+			<label dx="11" dy="6">INIT</label>
+		</node>
+		<node x="112" y="96" size="8">
+			<label dx="11" dy="7">FLIP</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="152" y="16">
+			<source>INIT</source>
+			<labelGroup dx="5" dy="-7">
+				<label dx="0" dy="0">reset.I</label>
+				<label dx="0" dy="16">timeout.I</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>INIT</source>
+			<target>FLIP</target>
+			<labelGroup dx="4" dy="3">
+				<label dx="0" dy="0">new_value.I</label>
+			</labelGroup>
+		</line>
+		<quadratic x="79" y="57">
+			<source>FLIP</source>
+			<target>INIT</target>
+			<labelGroup dx="-48" dy="31">
+				<label dx="0" dy="0">new_value.I</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="152" y="97">
+			<source>FLIP</source>
+			<labelGroup dx="3" dy="-5">
+				<label dx="0" dy="0">reset.I</label>
+				<label dx="0" dy="16">timeout.I</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="112" y="136">
+			<source>FLIP</source>
+			<target>WAIT</target>
+			<labelGroup dx="6" dy="4">
+				<label dx="0" dy="0">timer.I</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="15" y="137">
+			<source>CHG</source>
+			<target>INIT</target>
+			<labelGroup dx="11" dy="79">
+				<label dx="0" dy="0">new_value.I</label>
+				<label dx="0" dy="16">chg_value.I</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="47" y="97">
+			<source>WAIT</source>
+			<target>INIT</target>
+			<labelGroup dx="-19" dy="40">
+				<label dx="0" dy="0">new_value.I</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>WAIT</source>
+			<target>CHG</target>
+			<labelGroup dx="5" dy="4">
+				<label dx="0" dy="0">timeout.I</label>
+			</labelGroup>
+		</line>
+	</edges>
+</graph>

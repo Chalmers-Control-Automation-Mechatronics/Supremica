@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.5" width="341" height="520">
+	<events>
+		<event controllable="1">autom_VR</event>
+		<event controllable="1">ER</event>
+		<event controllable="1">reset.FS</event>
+		<event controllable="1">SER</event>
+		<event controllable="1">SERFS</event>
+		<event controllable="1">soft_CS</event>
+		<event controllable="1">soft_ER</event>
+		<event controllable="1">soft_SER.FT</event>
+		<event controllable="1">soft_VR</event>
+		<event controllable="1">soft_ZS</event>
+		<event controllable="1">TAST</event>
+		<event controllable="1">time.FS</event>
+		<event controllable="0">timeout.FS</event>
+		<event controllable="0">tuer_auf.BT</event>
+		<event controllable="0">tuer_auf.FT</event>
+		<event controllable="0">tuer_auf.HT</event>
+		<event controllable="1">WSP</event>
+		<event controllable="1">ZS</event>
+	</events>
+	<nodes>
+		<node x="192" y="368" size="8">
+			<label dx="10" dy="14">AU2</label>
+		</node>
+		<node x="192" y="448" size="8">
+			<label dx="-9" dy="23">AU3</label>
+		</node>
+		<node x="192" y="288" size="8">
+			<label dx="8" dy="14">AU1</label>
+		</node>
+		<node x="192" y="208" size="8">
+			<label dx="8" dy="15">FS</label>
+		</node>
+		<node x="128" y="128" size="8" initial="1" marked="1">
+			<label dx="-21" dy="-5">VR</label>
+		</node>
+		<node x="256" y="128" size="8" marked="1">
+			<label dx="6" dy="-6">ER</label>
+		</node>
+		<nodeGroup id="$0">
+			<box>
+				<point x="112" y="256"/>
+				<point x="256" y="256"/>
+				<point x="256" y="496"/>
+				<point x="112" y="496"/>
+			</box>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU2</nodeElement>
+		</nodeGroup>
+		<nodeGroup id="$1">
+			<box>
+				<point x="32" y="64"/>
+				<point x="368" y="64"/>
+				<point x="368" y="512"/>
+				<point x="32" y="512"/>
+			</box>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>AU2</nodeElement>
+			<nodeElement>AU3</nodeElement>
+			<nodeElement>AU1</nodeElement>
+			<nodeElement>FS</nodeElement>
+			<nodeElement>VR</nodeElement>
+			<nodeElement>ER</nodeElement>
+			<nodeElement isLeaf="0">$0</nodeElement>
+		</nodeGroup>
+	</nodes>
+	<edges>
+		<loop x="152" y="286">
+			<source>AU1</source>
+			<labelGroup dx="-36" dy="-6">
+				<label dx="0" dy="0">SERFS</label>
+				<label dx="0" dy="16">reset.FS</label>
+				<label dx="0" dy="32">timeout.FS</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>AU1</source>
+			<target>AU2</target>
+			<labelGroup dx="-25" dy="8">
+				<label dx="0" dy="0">time.FS</label>
+			</labelGroup>
+		</line>
+		<quadratic x="256" y="29">
+			<source>$1</source>
+			<target>ER</target>
+			<labelGroup dx="-65" dy="-17">
+				<label dx="0" dy="0">soft_CS</label>
+				<label dx="0" dy="16">tuer_auf.BT</label>
+				<label dx="0" dy="32">tuer_auf.FT</label>
+				<label dx="0" dy="48">tuer_auf.HT</label>
+			</labelGroup>
+		</quadratic>
+		<line>
+			<source>FS</source>
+			<target>AU1</target>
+			<labelGroup dx="-43" dy="-13">
+				<label dx="0" dy="0">soft_ER</label>
+				<label dx="0" dy="16">soft_SER.FT</label>
+			</labelGroup>
+		</line>
+		<loop x="222" y="182">
+			<source>FS</source>
+			<labelGroup dx="-23" dy="-4">
+				<label dx="0" dy="0">reset.FS</label>
+				<label dx="0" dy="16">timeout.FS</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="144" y="181">
+			<source>FS</source>
+			<target>VR</target>
+			<labelGroup dx="-29" dy="-25">
+				<label dx="0" dy="0">WSP</label>
+				<label dx="0" dy="16">ER</label>
+				<label dx="0" dy="32">SER</label>
+				<label dx="0" dy="48">ZS</label>
+				<label dx="0" dy="64">TAST</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="153" y="367">
+			<source>AU2</source>
+			<labelGroup dx="-18" dy="5">
+				<label dx="0" dy="0">SERFS</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>AU2</source>
+			<target>AU3</target>
+			<labelGroup dx="-25" dy="6">
+				<label dx="0" dy="0">timeout.FS</label>
+			</labelGroup>
+		</line>
+		<quadratic x="165" y="163">
+			<source>VR</source>
+			<target>FS</target>
+			<labelGroup dx="-9" dy="5">
+				<label dx="0" dy="0">SERFS</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="92" y="103">
+			<source>VR</source>
+			<labelGroup dx="-46" dy="-72">
+				<label dx="0" dy="0">ER</label>
+				<label dx="0" dy="16">SER</label>
+				<label dx="0" dy="32">ZS</label>
+				<label dx="0" dy="48">TAST</label>
+				<label dx="0" dy="64">WSP</label>
+				<label dx="0" dy="80">soft_VR</label>
+				<label dx="0" dy="96">soft_ZS</label>
+				<label dx="0" dy="112">reset.FS</label>
+				<label dx="0" dy="128">timeout.FS</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="194" y="104">
+			<source>VR</source>
+			<target>ER</target>
+			<labelGroup dx="-32" dy="-19">
+				<label dx="0" dy="0">soft_ER</label>
+				<label dx="0" dy="16">soft_SER.FT</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="64" y="307">
+			<source>AU3</source>
+			<target>VR</target>
+			<labelGroup dx="-23" dy="1">
+				<label dx="0" dy="0">autom_VR</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="193" y="490">
+			<source>AU3</source>
+			<labelGroup dx="-42" dy="-4">
+				<label dx="0" dy="0">SERFS</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="193" y="141">
+			<source>ER</source>
+			<target>VR</target>
+			<labelGroup dx="-24" dy="-16">
+				<label dx="0" dy="0">soft_VR</label>
+				<label dx="0" dy="16">soft_ZS</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="283" y="101">
+			<source>ER</source>
+			<labelGroup dx="6" dy="-88">
+				<label dx="0" dy="0">ER</label>
+				<label dx="0" dy="16">SER</label>
+				<label dx="0" dy="32">ZS</label>
+				<label dx="0" dy="48">TAST</label>
+				<label dx="0" dy="64">WSP</label>
+				<label dx="0" dy="80">soft_ER</label>
+				<label dx="0" dy="96">soft_SER.FT</label>
+				<label dx="0" dy="112">reset.FS</label>
+				<label dx="0" dy="128">timeout.FS</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="258" y="211">
+			<source>$0</source>
+			<target>ER</target>
+			<labelGroup dx="8" dy="-42">
+				<label dx="0" dy="0">ER</label>
+				<label dx="0" dy="16">SER</label>
+				<label dx="0" dy="32">ZS</label>
+				<label dx="0" dy="48">TAST</label>
+			</labelGroup>
+		</quadratic>
+	</edges>
+</graph>

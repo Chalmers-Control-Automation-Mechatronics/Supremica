@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="211" height="224">
+	<events>
+		<event controllable="1">CS_ok</event>
+		<event controllable="0">ER_BT</event>
+		<event controllable="0">ER_FS</event>
+		<event controllable="0">ER_FT</event>
+		<event controllable="0">ER_HK</event>
+		<event controllable="1">kein_ZS</event>
+		<event controllable="1">soft_CS</event>
+		<event controllable="0">TASTVR</event>
+		<event controllable="0">VR_BT</event>
+		<event controllable="0">VR_FS</event>
+		<event controllable="0">VR_FT</event>
+		<event controllable="0">VR_HK</event>
+		<event controllable="1">WSP</event>
+		<event controllable="1">ZS</event>
+	</events>
+	<nodes>
+		<node x="176" y="144" size="8">
+			<label dx="-8" dy="24">VR</label>
+		</node>
+		<node x="64" y="144" size="8" initial="1" marked="1">
+			<label dx="-8" dy="24">IN</label>
+		</node>
+	</nodes>
+	<edges>
+		<loop x="212" y="144">
+			<source>VR</source>
+			<labelGroup dx="-39" dy="-59">
+				<label dx="0" dy="0">VR_FT</label>
+				<label dx="0" dy="16">VR_BT</label>
+				<label dx="0" dy="32">VR_HK</label>
+				<label dx="0" dy="48">VR_FS</label>
+			</labelGroup>
+		</loop>
+		<quadratic x="120" y="124">
+			<source>VR</source>
+			<target>IN</target>
+			<labelGroup dx="-2" dy="-114">
+				<label dx="0" dy="0">ZS</label>
+				<label dx="0" dy="16">WSP</label>
+				<label dx="0" dy="32">kein_ZS</label>
+				<label dx="0" dy="48">soft_CS</label>
+				<label dx="0" dy="64">CS_ok</label>
+				<label dx="0" dy="80">ER_FT</label>
+				<label dx="0" dy="96">ER_BT</label>
+				<label dx="0" dy="112">ER_HK</label>
+				<label dx="0" dy="128">ER_FS</label>
+				<label dx="0" dy="144">TASTVR</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="120" y="161">
+			<source>IN</source>
+			<target>VR</target>
+			<labelGroup dx="-35" dy="0">
+				<label dx="0" dy="0">VR_FT</label>
+				<label dx="0" dy="16">VR_BT</label>
+				<label dx="0" dy="32">VR_HK</label>
+				<label dx="0" dy="48">VR_FS</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="27" y="142">
+			<source>IN</source>
+			<labelGroup dx="-12" dy="-52">
+				<label dx="0" dy="0">WSP</label>
+				<label dx="0" dy="16">soft_CS</label>
+				<label dx="0" dy="32">CS_ok</label>
+				<label dx="0" dy="48">ER_FT</label>
+				<label dx="0" dy="64">ER_BT</label>
+				<label dx="0" dy="80">ER_HK</label>
+				<label dx="0" dy="96">ER_FS</label>
+				<label dx="0" dy="112">TASTVR</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

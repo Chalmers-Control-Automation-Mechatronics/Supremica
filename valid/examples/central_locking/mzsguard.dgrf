@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.7" width="209" height="105">
+	<events>
+		<event controllable="1">MZS_an.TUER</event>
+		<event controllable="1">MZS_aus.TUER</event>
+		<event controllable="1">start_ER.TUER</event>
+		<event controllable="1">start_VR.TUER</event>
+		<event controllable="1">start_ZS.TUER</event>
+		<event controllable="1">stop_ER.TUER</event>
+		<event controllable="1">stop_VR.TUER</event>
+		<event controllable="1">stop_ZS.TUER</event>
+	</events>
+	<nodes>
+		<node x="224" y="160" size="8">
+			<label dx="-40" dy="6">RUN</label>
+		</node>
+		<node x="128" y="160" size="8" initial="1" marked="1">
+			<label dx="12" dy="6">IDLE</label>
+		</node>
+	</nodes>
+	<edges>
+		<quadratic x="176" y="146">
+			<source>RUN</source>
+			<target>IDLE</target>
+			<labelGroup dx="-42" dy="-3">
+				<label dx="0" dy="0">MZS_aus.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<quadratic x="176" y="175">
+			<source>IDLE</source>
+			<target>RUN</target>
+			<labelGroup dx="-41" dy="11">
+				<label dx="0" dy="0">MZS_an.TUER</label>
+			</labelGroup>
+		</quadratic>
+		<loop x="89" y="158">
+			<source>IDLE</source>
+			<labelGroup dx="-59" dy="-34">
+				<label dx="0" dy="0">start_ER.TUER</label>
+				<label dx="0" dy="16">stop_ER.TUER</label>
+				<label dx="0" dy="32">start_VR.TUER</label>
+				<label dx="0" dy="48">stop_VR.TUER</label>
+				<label dx="0" dy="64">start_ZS.TUER</label>
+				<label dx="0" dy="80">stop_ZS.TUER</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>

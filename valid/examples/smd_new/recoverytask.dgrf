@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "graph" "graph.dtd">
+<graph version="2.5.13" width="367" height="364">
+	<events>
+		<event controllable="1">counter</event>
+		<event controllable="0">donerecover</event>
+		<event controllable="0">donescan</event>
+		<event controllable="0">doneturn</event>
+		<event controllable="0">donevacuum</event>
+		<event controllable="0">errorscan</event>
+		<event controllable="0">errorturn</event>
+		<event controllable="0">errorvacuum</event>
+		<event controllable="1">operatorinput</event>
+		<event controllable="1">recover</event>
+		<event controllable="0">repeat</event>
+		<event controllable="1">reset</event>
+		<event controllable="1">scan</event>
+		<event controllable="0">stop</event>
+		<event controllable="1">turn</event>
+		<event controllable="1">vacuum</event>
+	</events>
+	<nodes>
+		<node x="224" y="336" size="8" marked="1">
+			<label dx="-15" dy="19">abort</label>
+		</node>
+		<node x="352" y="272" size="8">
+			<label dx="-11" dy="22">idle</label>
+		</node>
+		<node x="224" y="272" size="8">
+			<label dx="-53" dy="18">operator</label>
+		</node>
+		<node x="352" y="192" size="8">
+			<label dx="-4" dy="-11">recovery</label>
+		</node>
+		<node x="224" y="192" size="8">
+			<label dx="-39" dy="19">errordetected</label>
+		</node>
+		<node x="96" y="272" size="8">
+			<label dx="-24" dy="20">startover</label>
+		</node>
+		<node x="96" y="192" size="8" initial="1" marked="1">
+			<label dx="-27" dy="17">init</label>
+		</node>
+	</nodes>
+	<edges>
+		<line>
+			<source>idle</source>
+			<target>operator</target>
+			<labelGroup dx="-37" dy="-5">
+				<label dx="0" dy="0">operatorinput</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>operator</source>
+			<target>startover</target>
+			<labelGroup dx="-10" dy="-10">
+				<label dx="0" dy="0">repeat</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>operator</source>
+			<target>abort</target>
+			<labelGroup dx="8" dy="0">
+				<label dx="0" dy="0">stop</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>recovery</source>
+			<target>idle</target>
+			<labelGroup dx="5" dy="1">
+				<label dx="0" dy="0">donerecover</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>startover</source>
+			<target>init</target>
+			<labelGroup dx="6" dy="5">
+				<label dx="0" dy="0">reset</label>
+			</labelGroup>
+		</line>
+		<line>
+			<source>errordetected</source>
+			<target>recovery</target>
+			<labelGroup dx="-20" dy="-2">
+				<label dx="0" dy="0">recover</label>
+			</labelGroup>
+		</line>
+		<loop x="224" y="160">
+			<source>errordetected</source>
+			<labelGroup dx="-26" dy="-146">
+				<label dx="0" dy="0">turn</label>
+				<label dx="0" dy="16">doneturn</label>
+				<label dx="0" dy="32">errorturn</label>
+				<label dx="0" dy="48">vacuum</label>
+				<label dx="0" dy="64">donevacuum</label>
+				<label dx="0" dy="80">errorvacuum</label>
+				<label dx="0" dy="96">scan</label>
+				<label dx="0" dy="112">errorscan</label>
+				<label dx="0" dy="128">donescan</label>
+				<label dx="0" dy="144">counter</label>
+			</labelGroup>
+		</loop>
+		<line>
+			<source>init</source>
+			<target>errordetected</target>
+			<labelGroup dx="-34" dy="-34">
+				<label dx="0" dy="0">errorturn</label>
+				<label dx="0" dy="16">errorscan</label>
+				<label dx="0" dy="32">errorvacuum</label>
+			</labelGroup>
+		</line>
+		<loop x="96" y="156">
+			<source>init</source>
+			<labelGroup dx="-23" dy="-97">
+				<label dx="0" dy="0">turn</label>
+				<label dx="0" dy="16">doneturn</label>
+				<label dx="0" dy="32">vacuum</label>
+				<label dx="0" dy="48">donevacuum</label>
+				<label dx="0" dy="64">scan</label>
+				<label dx="0" dy="80">donescan</label>
+				<label dx="0" dy="96">counter</label>
+			</labelGroup>
+		</loop>
+	</edges>
+</graph>
