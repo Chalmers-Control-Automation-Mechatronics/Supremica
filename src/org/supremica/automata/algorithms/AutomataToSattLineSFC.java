@@ -65,13 +65,6 @@ public class AutomataToSattLineSFC
 	extends AutomataToControlBuilderSFC
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToSattLineSFC.class);
-	/*protected String coord = getCoord();
-	protected String transitionConditionPrefix = getTransitionConditionPrefix();
-	protected String transitionConditionSuffix = getTransitionConditionSuffix();
-	protected String actionP1Prefix = getActionP1Prefix();
-	protected String actionP1Suffix = getActionP1Suffix();
-	protected String actionP0Prefix = getActionP0Prefix();
-	protected String actionP0Suffix = getActionP0Suffix();*/
 
 	public AutomataToSattLineSFC(Automata automata)
 	{
