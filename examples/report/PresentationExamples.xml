@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Untitled">
+<Automaton name="Maskin A" type="Plant">
+	<Events>
+		<Event id="a" label="A Start"/>
+		<Event id="b" label="A Klar" controllable="false"/>
+	</Events>
+	<States>
+		<State id="Ledig" initial="true" accepting="true"/>
+		<State id="Arbetande" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="Ledig" dest="Arbetande" event="a"/>
+		<Transition source="Arbetande" dest="Ledig" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Buffert" type="Supervisor">
+	<Events>
+		<Event id="b" label="A Klar" controllable="false"/>
+		<Event id="c" label="B Start"/>
+	</Events>
+	<States>
+		<State id="Tom" initial="true" accepting="true"/>
+		<State id="Full" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="Tom" dest="Full" event="b"/>
+		<Transition source="Full" dest="Tom" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="BuffertOK" type="Supervisor">
+	<Events>
+		<Event id="a" label="A Start"/>
+		<Event id="b" label="A Klar" controllable="false"/>
+		<Event id="c" label="B Start"/>
+	</Events>
+	<States>
+		<State id="Tom" initial="true" accepting="true"/>
+		<State id="Full" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="Tom" dest="Full" event="b"/>
+		<Transition source="Tom" dest="Tom" event="a"/>
+		<Transition source="Full" dest="Tom" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Maskin B" type="Plant">
+	<Events>
+		<Event id="a" label="B Start"/>
+		<Event id="b" label="B Klar" controllable="false"/>
+	</Events>
+	<States>
+		<State id="Ledig" initial="true" accepting="true"/>
+		<State id="Arbetande" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="Ledig" dest="Arbetande" event="a"/>
+		<Transition source="Arbetande" dest="Ledig" event="b"/>
+	</Transitions>
+</Automaton>
+</Automata>

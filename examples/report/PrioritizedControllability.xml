@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Untitled">
+<Automaton name="S" type="Supervisor">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b" prioritized="false"/>
+		<Event id="c" label="c" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s1" initial="true" accepting="true" cost="0"/>
+		<State id="s2" accepting="true" cost="0"/>
+		<State id="s3" accepting="true" cost="0"/>
+		<State id="s4" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="s1" dest="s2" event="a"/>
+		<Transition source="s2" dest="s3" event="b"/>
+		<Transition source="s3" dest="s4" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="P" type="Plant">
+	<Events>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c" controllable="false" prioritized="false"/>
+	</Events>
+	<States>
+		<State id="p1" initial="true" accepting="true" cost="0"/>
+		<State id="p2" accepting="true" cost="0"/>
+		<State id="p3" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="p1" dest="p2" event="b"/>
+		<Transition source="p2" dest="p3" event="c"/>
+	</Transitions>
+</Automaton>
+</Automata>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Untitled">
+<Automaton name="S" type="Supervisor">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c" controllable="false" prioritized="false"/>
+	</Events>
+	<States>
+		<State id="s1" initial="true" accepting="true" cost="0"/>
+		<State id="s2" accepting="true" cost="0"/>
+		<State id="s3" accepting="true" cost="0"/>
+		<State id="s4" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="s1" dest="s2" event="a"/>
+		<Transition source="s1" dest="s3" event="b"/>
+		<Transition source="s2" dest="s4" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="S||P" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c" controllable="false" prioritized="false"/>
+	</Events>
+	<States>
+		<State id="s1p1" initial="true" accepting="true" cost="0"/>
+		<State id="s2p2" accepting="true" cost="0"/>
+		<State id="s3p3" forbidden="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="s1p1" dest="s2p2" event="a"/>
+		<Transition source="s1p1" dest="s3p3" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="S|||P" type="Undefined">
+	<Events>
+		<Event id="a0" label="a"/>
+		<Event id="a1" label="b"/>
+		<Event id="a2" label="c" controllable="false" prioritized="false"/>
+	</Events>
+	<States>
+		<State id="s2p2" accepting="true" cost="0"/>
+		<State id="s3p3" accepting="true" cost="0"/>
+		<State id="s3p4" accepting="true" cost="0"/>
+		<State id="s4p2" accepting="true" cost="0"/>
+		<State id="s1p1" initial="true" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="s2p2" dest="s4p2" event="a2"/>
+		<Transition source="s3p3" dest="s3p4" event="a2"/>
+		<Transition source="s1p1" dest="s2p2" event="a0"/>
+		<Transition source="s1p1" dest="s3p3" event="a1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="P" type="Plant">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+		<Event id="c" label="c" controllable="false" prioritized="false"/>
+	</Events>
+	<States>
+		<State id="p1" initial="true" accepting="true" cost="0"/>
+		<State id="p2" accepting="true" cost="0"/>
+		<State id="p3" accepting="true" cost="0"/>
+		<State id="p4" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="p1" dest="p2" event="a"/>
+		<Transition source="p1" dest="p3" event="b"/>
+		<Transition source="p3" dest="p4" event="c"/>
+	</Transitions>
+</Automaton>
+</Automata>

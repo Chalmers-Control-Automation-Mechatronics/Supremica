@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Untitled">
+<Automaton name="B_c" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="b1" initial="true" cost="0"/>
+		<State id="b2" cost="0"/>
+		<State id="qc" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="b1" dest="b2" event="a"/>
+		<Transition source="b1" dest="qc" event="b"/>
+		<Transition source="b2" dest="b1" event="b"/>
+		<Transition source="b2" dest="qc" event="a"/>
+		<Transition source="qc" dest="qc" event="a"/>
+		<Transition source="qc" dest="qc" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B_c_c" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="b1" initial="true" accepting="true" cost="0"/>
+		<State id="b2" accepting="true" cost="0"/>
+		<State id="qc"/>
+	</States>
+	<Transitions>
+		<Transition source="b1" dest="b2" event="a"/>
+		<Transition source="b1" dest="qc" event="b"/>
+		<Transition source="b2" dest="b1" event="b"/>
+		<Transition source="b2" dest="qc" event="a"/>
+		<Transition source="qc" dest="qc" event="a"/>
+		<Transition source="qc" dest="qc" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B" type="Undefined">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="b1" initial="true" accepting="true" cost="0"/>
+		<State id="b2" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="b1" dest="b2" event="a"/>
+		<Transition source="b2" dest="b1" event="b"/>
+	</Transitions>
+</Automaton>
+</Automata>
