@@ -4,8 +4,10 @@
 
 <property name="src" value="src"/>
 <property name="testssrc" value="tests/src"/>
+<property name="runtimesoftplcsrc" value="runtime/softplc/src"/>
 <property name="build" value="build"/>
 <property name="testsbuild" value="tests/build"/>
+<property name="runtimesoftplcbuild" value="runtime/softplc/build"/>
 <property name="dist"  value="dist"/>
 <property name="doc" value="doc"/>
 <property name="examples" value="examples"/>
@@ -243,6 +245,23 @@
 	/>
 
 </target>
+
+<!-- Compile Runtime
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile_runtime_softplc">
+	<javac
+		srcdir="${runtimesoftplcsrc}"
+		destdir="${runtimesoftplcbuild}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false" >
+	</javac>
+
+</target>
+
+
 
 <!-- Build:
 *	A standard compilation followed by packaging
