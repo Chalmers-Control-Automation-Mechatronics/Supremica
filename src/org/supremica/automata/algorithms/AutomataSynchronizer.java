@@ -110,7 +110,6 @@ public class AutomataSynchronizer
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-			currExec.setPriority(Thread.MIN_PRIORITY);
 
 			currExec.start();
 		}
@@ -123,7 +122,7 @@ public class AutomataSynchronizer
 	{
 		synchHelper.displayInfo();
 	}
-	
+
 	//-- MF -- Added to allow users easy access to the number of synch'ed states
 	public int getNumberOfStates()
 	{

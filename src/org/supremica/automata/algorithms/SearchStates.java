@@ -20,7 +20,7 @@ import org.supremica.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 import org.supremica.gui.MonitorableThread;
-// 
+//
 public class SearchStates
 	extends MonitorableThread
 	// implements Monitorable    // Stoppable
@@ -32,7 +32,17 @@ public class SearchStates
 	protected /* volatile */ boolean stopRequested = false;
 	protected boolean mode = false;    // false means sychronization mode, true is matching mode
 	protected int progress = 1;
-	
+
+	public SearchStates(Automata automata, Matcher m)
+		throws Exception
+	{
+		setPriority(Thread.MIN_PRIORITY);
+		// !!Throws exception if automata is empty or has only one automaton!!
+		this.syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
+		this.matcher = m;
+		this.list = new IntArrayList();    // Must create the list, in case the thread is stopped
+	}
+
 	protected void synchronize()
 	{
 		try
@@ -45,14 +55,14 @@ public class SearchStates
 			return;
 		}
 	}
-	
+
 	protected void match()
 	{
 		if(!stopRequested)
 		{
 			int num_total = syncher.getNumberOfStates();
 			int num_processed = 0;
-			
+
 			// Note the difference between the two getStateIterator.
 			// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
 			for (Iterator it = syncher.getHelper().getStateIterator(); it.hasNext() && (!stopRequested); )
@@ -73,15 +83,15 @@ public class SearchStates
 			}
 		}
 	}
-	
+
 	public void run()    // throws Exception
 	{
 		mode = false; // start with synching mode - initializer above does not do the trick?
-		
+
 		synchronize();
-		
+
 		mode = true; // matching mode
-		
+
 		match();
 	}
 
@@ -115,15 +125,6 @@ public class SearchStates
 	public boolean wasStopped()
 	{
 		return stopRequested;
-	}
-
-	public SearchStates(Automata automata, Matcher m)
-		throws Exception
-	{
-		// !!Throws exception if automata is empty or has only one automaton!!
-		this.syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
-		this.matcher = m;
-		this.list = new IntArrayList();    // Must create the list, in case the thread is stopped
 	}
 
 	public int numberFound()
@@ -180,10 +181,10 @@ public class SearchStates
 	public StateIterator getStateIterator(int[] composite_state)
 	{
 
-		// 
+		//
 		State[][] states = syncher.getHelper().getIndexFormStateTable();
 
-		// 
+		//
 		return new StateIterator(states, composite_state);
 	}
 

@@ -65,12 +65,9 @@ public class AutomataSynchronizerWorker
 	implements Stoppable
 {
 
-	// -- MF --      private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerWorker.class);
-	// -- MF --      private Supremica workbench = null;
 	private Gui workbench = null;
 	private Automata theAutomata = null;
 
-	// -- MF --      private AutomatonContainer container = null;
 	private String newAutomatonName = null;
 	private final static int MODE_SYNC = 1;
 	private final static int MODE_UPDATE = 2;
@@ -79,16 +76,13 @@ public class AutomataSynchronizerWorker
 	private SynchronizationOptions syncOptions;
 	private boolean stopRequested = false;
 
-	// -- MF -- Changed stuff here to route output through the Gui
 	public AutomataSynchronizerWorker(Gui workbench,
 
-	// -- MF -- Supremica workbench,
 	Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
 
-		// -- MF --              container = workbench.getAutomatonContainer();
 		this.newAutomatonName = newAutomatonName;
 		this.syncOptions = syncOptions;
 
