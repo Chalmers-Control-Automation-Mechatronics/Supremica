@@ -54,30 +54,25 @@ package org.supremica.functionblocks.model;
 
 import java.util.*;
 
-public class ECState
+public class ECState extends NamedObject
 {
-    private String name;
-    private List ecActions = new ArrayList();
-    private List ecTransitions = new ArrayList();
-    
-    public ECState(String name)
-    {
-	this.name = name;
-    }
-    
-    public String getName()
-    {
-	return name;
-    }
-    
-    public Iterator actionIterator()
-    {
-	return ecActions.iterator();
-    }
 
-    public Iterator transitionIterator()
-    {
-	return ecTransitions.iterator();
-    }
+	private List ecActions = new LinkedList();
+    
+	ECState(String name)
+	{
+		this.name = name;
+	}
+    
+
+	void addECAction(ECAction action)
+	{
+		ecActions.add(action);
+	}
+
+	Iterator actionIterator()
+	{
+		return ecActions.iterator();
+	}
 
 }

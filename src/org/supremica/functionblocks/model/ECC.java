@@ -44,21 +44,46 @@ import java.util.*;
 
 public class ECC
 {
-	List ecStates = new LinkedList();
-	List ecTransitions = new LinkedList();
-	public ECC()
+	
+
+	private List ecStates = new LinkedList();
+	private List ecTransitions = new LinkedList();
+
+	private ECState initialState = null;
+
+	ECC()
 	{
+		System.out.println("ECC(): Creating new empty ECC");
 	}
 
-	public void addECState(ECState state)
+	void addInitialState(ECState initial)
+	{
+		addECState(initial);
+		initialState = initial;
+	}
+	
+	ECState getInitialState()
+	{
+		return initialState;
+	}
+
+
+	void addECState(ECState state)
 	{
 		ecStates.add(state);
 	}
 
-	public ECState execute(ECState currentECState, Variables vars)
+	void addECTransition(ECTransition trans)
 	{
-		System.out.println("ECC.execute()");
+		ecTransitions.add(trans);
+	}
 
+	ECState execute(ECState currentECState, Variables vars)
+	{
+		
+		System.out.println("ECC.execute()");
+		
+		// return the new state
 		return null;
 	}
 }

@@ -53,12 +53,36 @@ import java.util.*;
 
 public class ECTransition
 {
-    private ECState destination;
-    private ECCondition condition;
+	
+	private ECState source;
+	private ECState destination;
+	private ECCondition condition;
+
     
-    public ECTransition(ECState destination, ECCondition condition)
-    {
-	this.destination = destination;
-	this.condition = condition;
-    }   
+	ECTransition(ECState source, ECState destination, ECCondition condition)
+	{
+		this.source = source;
+		this.destination = destination;
+		this.condition = condition;
+	}   
+
+	ECState getSource()
+	{
+		return source;
+	}
+
+	ECState getDestination()
+	{
+		return destination;
+	}
+
+	ECCondition getCondition() 
+	{
+		return condition;
+	}
+
+	void setCondition(ECCondition cond) 
+	{
+		this.condition = cond;
+	}
 }

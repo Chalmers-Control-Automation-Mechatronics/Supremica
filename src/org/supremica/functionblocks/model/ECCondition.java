@@ -54,21 +54,23 @@ package org.supremica.functionblocks.model;
 
 public class ECCondition
 {
-    private String condition = null;
+	private String condition = null;
 
-    public ECCondition(String cond)
-    {
-	condition = cond;
-    }
+	public ECCondition(String cond)
+	{
+		condition = cond;
+	}
 
-    public void setCondition(String cond)
-    {
-	condition = cond;
-    }
+	public void setCondition(String cond)
+	{
+		condition = cond;
+	}
 
-    public boolean evaluateCondition(Variables vars)
-    {
-	return false;
-    }
+	public boolean evaluateCondition(Variables vars)
+	{
+		// interpret the condition string and evaluate
+		// for now all conditions are true, ie labeled by '1'
+		return true;
+	}
 
 }
