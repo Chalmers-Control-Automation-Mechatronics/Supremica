@@ -1,4 +1,9 @@
-#/bin/sh
+#!/bin/sh
 
-env LD_LIBRARY_PATH=. java -cp Supremica.jar:SupremicaLib.jar -enableassertions net.sourceforge.waters.gui.ModuleWindow
+DIR=`pwd`
+
+export LD_LIBRARY_PATH=$DIR
+
+cd ../examples/waters
+java -cp "$DIR/Supremica.jar:$DIR/SupremicaLib.jar" -enableassertions net.sourceforge.waters.gui.ModuleWindow $*
 
