@@ -10,9 +10,13 @@ public class SaveAction
 {
 	public SaveAction()
 	{
-		super("Save...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
+		super();
 
+		putValue(NAME, "Save...");
 		putValue(SHORT_DESCRIPTION, "Save this project");
+		putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
+		putValue(SMALL_ICON, 
+				 new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)

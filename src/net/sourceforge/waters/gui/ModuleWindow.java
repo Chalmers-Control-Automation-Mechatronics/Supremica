@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.4 2005-02-17 19:59:55 robi Exp $
+//# $Id: ModuleWindow.java,v 1.5 2005-02-17 21:46:17 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -29,14 +29,18 @@ import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
 
-/** <p>The primary module-loading window.</p>
+/** 
+ * <p>The primary module-loading window.</p>
  *
  * <p>This is the main window of Waters, from which module files can be loaded
  * and with which components can be added/removed from modules.</p>
  *
  * @author Gian Perrone
  */
-public class ModuleWindow extends JFrame implements ActionListener, FocusListener {
+public class ModuleWindow 
+	extends JFrame
+	implements ActionListener, FocusListener 
+{
     private ModuleProxy module = null;
 	private JFileChooser fileChooser = new JFileChooser(".");
     private JFileChooser fileSaveChooser = new JFileChooser(".");
@@ -70,7 +74,8 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
     private DefaultListModel paramData = null;
 	private org.supremica.gui.Supremica supremica = null;
 
-    public ModuleWindow(String title) {
+    public ModuleWindow(String title) 
+	{
         this.setTitle(title);
         JFrame.setDefaultLookAndFeelDecorated(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,44 +90,51 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
 		setLocationRelativeTo(null);
 		setVisible(true);
     }
-
+	
     /** Load a Waters module into the module viewer.
      * @param wmodf The file to load the module from
      */
-    public void loadWmodFile( File wmodf ) {
-	logEntry("Attempting to load: " + wmodf);
-        try {
-            final ProxyMarshaller marshaller =  new ModuleMarshaller();
-            module = (ModuleProxy) marshaller.unmarshal(wmodf);
-        } catch (final JAXBException exception) {
-            // Something bad happened
-            JOptionPane.showMessageDialog(this,
-                                          "Error loading module file! (JAXBException)");
-	    logEntry("JAXBException - Failed to load: " + wmodf);
-	    //exception.printStackTrace(System.err);
-        } catch (final ModelException exception) {
-            JOptionPane.showMessageDialog(this,
-                                          "Error loading module file! (ModelException)");
-	    logEntry("ModelException - Failed to load: " + wmodf);
-        }
+    public void loadWmodFile( File wmodf ) 
+	{
+		logEntry("Attempting to load: " + wmodf);
+		try 
+		{
+			final ProxyMarshaller marshaller =  new ModuleMarshaller();
+			module = (ModuleProxy) marshaller.unmarshal(wmodf);
+		} 
+		catch (final JAXBException exception) 
+		{
+			// Something bad happened
+			JOptionPane.showMessageDialog(this,
+										  "Error loading module file! (JAXBException)");
+			logEntry("JAXBException - Failed to load: " + wmodf);
+			//exception.printStackTrace(System.err);
+		} 
+		catch (final ModelException exception) 
+		{
+			JOptionPane.showMessageDialog(this,
+										  "Error loading module file! (ModelException)");
+			logEntry("ModelException - Failed to load: " + wmodf);
+		}
     }
-
-    public void saveWmodFile( File wmodf ) {
-	logEntry("Saving module to: " + wmodf);
+	
+    public void saveWmodFile( File wmodf ) 
+	{
+		logEntry("Saving module to: " + wmodf);
         try {
             final ProxyMarshaller marshaller =  new ModuleMarshaller();
-	    module.setLocation(wmodf);
+			module.setLocation(wmodf);
             marshaller.marshal(module,wmodf);
         } catch (final JAXBException exception) {
             // Something bad happened
             JOptionPane.showMessageDialog(this,
                                           "Error saving module file! (JAXBException)");
-	    logEntry("JAXBException - Failed to save: " + wmodf);
+			logEntry("JAXBException - Failed to save: " + wmodf);
         } catch (final java.io.IOException exception) {
-	    JOptionPane.showMessageDialog(this,
+			JOptionPane.showMessageDialog(this,
                                           "Error saving module file! (IOException)");
-	    logEntry("IOException - Failed to save: " + wmodf);
-	}
+			logEntry("IOException - Failed to save: " + wmodf);
+		}
     }
 
 	public void exportToSupremica()
@@ -360,30 +372,37 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
 	//renderer.setClosedIcon(null);
 	//ModuleSelectTree.setCellRenderer(renderer);
 
-	MouseListener ml = new MouseAdapter() {
+	MouseListener ml = new MouseAdapter() 
+	{
 		EditorWindow ed = null;
-
-		public void mousePressed(MouseEvent e) {
-		    int selRow = ModuleSelectTree.getRowForLocation(e.getX(), e.getY());
+		
+		public void mousePressed(MouseEvent e) 
+		{
+			int selRow = ModuleSelectTree.getRowForLocation(e.getX(), e.getY());
 		    TreePath selPath = ModuleSelectTree.getPathForLocation(e.getX(), e.getY());
 		    if(selRow != -1) {
-			if(e.getClickCount() == 2) {
-			    DefaultMutableTreeNode node =
-				(DefaultMutableTreeNode)ModuleSelectTree.getLastSelectedPathComponent();
-			    if (node == null) return;
-
-			    Object nodeInfo = node.getUserObject();
-			    if (node.isLeaf()) {
-				SimpleComponentProxy scp = (SimpleComponentProxy)(((ComponentInfo)nodeInfo).getComponent());
-				ed = new EditorWindow(scp.getName() +
-						      " - Waters Editor",
-						      module,
-						      scp);
-			    }
-			}
+				if(e.getClickCount() == 2) 
+				{
+					DefaultMutableTreeNode node =
+						(DefaultMutableTreeNode)ModuleSelectTree.getLastSelectedPathComponent();
+					if (node == null) return;
+					
+					Object nodeInfo = node.getUserObject();
+					if (node.isLeaf()) 
+					{
+						SimpleComponentProxy scp = (SimpleComponentProxy)(((ComponentInfo)nodeInfo).getComponent());
+						if (scp != null)
+						{
+							ed = new EditorWindow(scp.getName() +
+												  " - Waters Editor",
+												  module,
+												  scp);
+						}
+					}
+				}
 		    }
 		}
-	    };
+	};
 	ModuleSelectTree.addMouseListener(ml);
 
 	JButton NewSimpleButton = new JButton("New Simple Component");
@@ -458,16 +477,22 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
 		
 		menuItem = new JMenuItem(WLang.FileSaveAsMenu,
 								 KeyEvent.VK_A);
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
         menu.add(menuItem);
 		
         menu.addSeparator();
 		
         menuItem = new JMenuItem(WLang.FilePageSetupMenu,
 								 KeyEvent.VK_G);
+		menuItem.setEnabled(false); 
+		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		
         menuItem = new JMenuItem(WLang.FilePrintMenu,
 								 KeyEvent.VK_P);
+		menuItem.setEnabled(false); 
+		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		
         menu.addSeparator();
@@ -611,27 +636,36 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
 			}
 		}
 		
-		if(e.getSource() == FileNewMenu) {
+		if(e.getSource() == FileNewMenu) 
+		{
 			String modName = JOptionPane.showInputDialog(this, "Module Name?");
-			try {
-				final ExpressionParser parser = new ExpressionParser();
-				ExpressionProxy ep = parser.parse(modName);
-				if(ep instanceof SimpleIdentifierProxy) {
-					module = new ModuleProxy(modName,null);
-					constructWindow();
-					logEntry("New module created: " + modName);
+			if (modName != null)
+			{
+				try 
+				{
+					final ExpressionParser parser = new ExpressionParser();
+					ExpressionProxy ep = parser.parse(modName);
+					if(ep instanceof SimpleIdentifierProxy) 
+					{
+						module = new ModuleProxy(modName,null);
+						constructWindow();
+						logEntry("New module created: " + modName);
+					}
+					else 
+					{
+						logEntry("Invalid module identifier: " + modName);
+						JOptionPane.showMessageDialog(this,
+													  "Invalid module identifier");
+					}
+				} 
+				catch(final ParseException exception) 
+				{
+					ErrorWindow ew = new ErrorWindow("Parse error in identifier: " + exception.getMessage(),
+													 modName,
+													 exception.getPosition());
+					//constructWindow();
+					ModuleWindow w = new ModuleWindow("Waters");
 				}
-				else {
-					logEntry("Invalid module identifier: " + modName);
-					JOptionPane.showMessageDialog(this,
-												  "Invalid module identifier");
-				}
-			} catch(final ParseException exception) {
-				ErrorWindow ew = new ErrorWindow("Parse error in identifier: " + exception.getMessage(),
-												 modName,
-												 exception.getPosition());
-				//constructWindow();
-				ModuleWindow w = new ModuleWindow("Waters");
 			}
 		}
 		
@@ -649,15 +683,19 @@ public class ModuleWindow extends JFrame implements ActionListener, FocusListene
             }
 		}
 		
-		if(e.getSource() == FileSaveMenu) {
+		if(e.getSource() == FileSaveMenu) 
+		{
             int returnVal = fileSaveChooser.showSaveDialog(this);
 			
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
+            if (returnVal == JFileChooser.APPROVE_OPTION) 
+			{
             	File file = fileSaveChooser.getSelectedFile();
                 saveWmodFile(file);
 				modified = false;
 				logEntry("File saved: " + file);
-			} else {
+			} 
+			else 
+			{
 				// Open cancelled...  do nothing
 			}
 		}

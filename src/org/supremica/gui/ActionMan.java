@@ -119,6 +119,8 @@ public class ActionMan
 	public static final StateEnumerator stateEnumerator = new StateEnumerator();
 	public static final HelpAction helpAction = new HelpAction();
 	public static final OpenAction openAction = new OpenAction();    // defined in MainToolBar (just for fun :-)
+	public static final SaveAction saveAction = new SaveAction(); 
+	public static final SaveAsAction saveAsAction = new SaveAsAction(); 
 	public static final SynthesizeAction synthesizeAction = new SynthesizeAction();
 	public static final OpenJGrafchartAction openJGrafchartAction = new OpenJGrafchartAction();
 	public static final UpdateFromJGrafchartAction updateFromJGrafchartAction = new UpdateFromJGrafchartAction();

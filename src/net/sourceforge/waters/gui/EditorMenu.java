@@ -3,7 +3,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EditorMenu.java,v 1.2 2005-02-17 21:46:17 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -30,57 +30,65 @@ public class EditorMenu extends JMenuBar implements ActionListener {
     ControlledSurface C;
     JFileChooser fileChooser;
 
-    public EditorMenu(ControlledSurface c, EditorWindow r) {
-	root = r;
+    public EditorMenu(ControlledSurface c, EditorWindow r) 
+	{
+		root = r;
         C = c;
-
-	JMenu menu = new JMenu("File");
 		
-	menu.setMnemonic(KeyEvent.VK_F);
-	menu.getAccessibleContext().setAccessibleDescription(
-                                                             "The File menu");
-	this.add(menu);
-
-	JMenuItem menuItem = new JMenuItem("Clear all",
-                                           KeyEvent.VK_O);
+		JMenu menu = new JMenu("File");
+		
+		menu.setMnemonic(KeyEvent.VK_F);
+		menu.getAccessibleContext().setAccessibleDescription("The File menu");
+		this.add(menu);
+		
+		JMenuItem menuItem = new JMenuItem("Clear all", KeyEvent.VK_O);
         menuItem.addActionListener(this);
         FileNewMenu = menuItem;
-	menu.add(menuItem);
-
-
+		menu.add(menuItem);	
+		
         menu.addSeparator();
-
-        menuItem = new JMenuItem("Page Setup...",
-	KeyEvent.VK_G);
-	menu.add(menuItem);
-
-        menuItem = new JMenuItem("Print...",
-	KeyEvent.VK_P);
-	menu.add(menuItem);
-
+		
+        menuItem = new JMenuItem("Page Setup...", KeyEvent.VK_G);
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
+		menu.add(menuItem);
+		
+		menuItem = new JMenuItem("Print...", KeyEvent.VK_P);
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
+		menu.add(menuItem);
+		
         menu.addSeparator();
-
-	menuItem = new JMenuItem("Close Window",
-	KeyEvent.VK_X);
-	menu.add(menuItem);
+		
+		menuItem = new JMenuItem("Close Window",
+								 KeyEvent.VK_X);
+		menu.add(menuItem);
         menuItem.addActionListener(this);
-
+		
         FileExitMenu = menuItem;
-
+		
         menu = new JMenu("Edit");
         this.add(menu);
-
+		
         menuItem = new JMenuItem("Undo");
-        menu.add(menuItem);
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
+        menu.add(menuItem);		
         menu.addSeparator();
         
         menuItem = new JMenuItem("Copy");
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
         menu.add(menuItem);
 
         menuItem = new JMenuItem("Cut");
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
         menu.add(menuItem);
 
         menuItem = new JMenuItem("Paste");
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
         menu.add(menuItem);
         menu.addSeparator();
 

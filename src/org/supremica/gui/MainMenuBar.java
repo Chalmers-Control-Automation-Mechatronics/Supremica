@@ -195,22 +195,8 @@ public class MainMenuBar
 
 	if (SupremicaProperties.fileAllowOpen())
 	{
-
 	    // File.Open
-
-	    /* JMenuItem menuFileOpen = new JMenuItem();
-
-	    menuFileOpen.setText("Open...");
-	    menuFile.add(menuFileOpen);
-	    menuFileOpen.addActionListener(new ActionListener()
-	    {
-	    public void actionPerformed(ActionEvent e)
-	    {
-	    ActionMan.fileOpen(ActionMan.getGui());
-	    }
-	    });*/
 	    JMenuItem menuFileOpen = new SupremicaMenuItem(ActionMan.openAction);
-
 	    menuFile.add(menuFileOpen);
 
 	    separatorNeeded = true;
@@ -218,33 +204,13 @@ public class MainMenuBar
 
 	if (SupremicaProperties.fileAllowSave())
 	{
-
 	    // File.Save
-	    JMenuItem menuFileSave = new JMenuItem();
-
-	    menuFileSave.setText("Save");
-	    menuFileSave.setMnemonic(KeyEvent.VK_S);
+	    JMenuItem menuFileSave = new SupremicaMenuItem(ActionMan.saveAction);
 	    menuFile.add(menuFileSave);
-	    menuFileSave.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.fileSave(ActionMan.getGui());
-		    }
-		});
 
 	    // File.SaveAs
-	    JMenuItem menuFileSaveAs = new JMenuItem();
-
-	    menuFileSaveAs.setText("Save As...");
+	    JMenuItem menuFileSaveAs = new SupremicaMenuItem(ActionMan.saveAsAction); 
 	    menuFile.add(menuFileSaveAs);
-	    menuFileSaveAs.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-			ActionMan.fileSaveAs(ActionMan.getGui());
-		    }
-		});
 
 	    separatorNeeded = true;
 	}
@@ -258,15 +224,14 @@ public class MainMenuBar
 
 	if (SupremicaProperties.fileAllowImport())
 	{
-
 	    // File.Import
-	    JMenu menuFileImport = new JMenu();
-	    menuFileImport.setText("Import");
+	    JMenu menuFileImport = new JMenu("Import");
+		menuFileImport.setMnemonic(KeyEvent.VK_I);
+		menuFileImport.setToolTipText("Import file");
 	    menuFile.add(menuFileImport);
 
 	    // File.Import.UMDES
-	    JMenuItem menuFileImportUMDES = new JMenuItem();
-	    menuFileImportUMDES.setText("From UMDES...");
+	    JMenuItem menuFileImportUMDES = new JMenuItem("From UMDES...");
 	    menuFileImport.add(menuFileImportUMDES);
 	    menuFileImportUMDES.addActionListener(new ActionListener()
 		{
@@ -277,8 +242,7 @@ public class MainMenuBar
 		});
 
 	    // File.Import.Valid
-	    JMenuItem menuFileImportValid = new JMenuItem();
-	    menuFileImportValid.setText("From VALID...");
+	    JMenuItem menuFileImportValid = new JMenuItem("From VALID...");
 	    menuFileImport.add(menuFileImportValid);
 	    menuFileImportValid.addActionListener(new ActionListener()
 		{
@@ -290,8 +254,7 @@ public class MainMenuBar
 
 		/*
 	    // File.Import.HYB
-	    JMenuItem menuFileImportHYB = new JMenuItem();
-	    menuFileImportHYB.setText("From HYB...");
+	    JMenuItem menuFileImportHYB = new JMenuItem("From HYB...");
 	    menuFileImport.add(menuFileImportHYB);
 	    menuFileImportHYB.addActionListener(new ActionListener()
 		{
@@ -306,9 +269,7 @@ public class MainMenuBar
 	    if (SupremicaProperties.generalUseRobotCoordination() || true)
 	    {
 		//File.Import.RobotCoordination
-		JMenuItem menuFileImportRobotCoordination = new JMenuItem();
-
-		menuFileImportRobotCoordination.setText("From Robot Coordinator...");
+		JMenuItem menuFileImportRobotCoordination = new JMenuItem("From Robot Coordinator...");
 		menuFileImport.add(menuFileImportRobotCoordination);
 		menuFileImportRobotCoordination.addActionListener(new ActionListener()
 		    {
@@ -323,9 +284,7 @@ public class MainMenuBar
 	    if (SupremicaProperties.generalUseRobotCoordination())
 	    {
 		// File.Import.RobotCoordinationABB
-		JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem();
-
-		menuFileImportRobotCoordinationABB.setText("From Robot Coordinator ABB...");
+		JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem("From Robot Coordinator ABB...");
 		menuFileImport.add(menuFileImportRobotCoordinationABB);
 		menuFileImportRobotCoordinationABB.addActionListener(new ActionListener()
 		    {
@@ -344,15 +303,11 @@ public class MainMenuBar
 	{
 
 	    // File.Export
-	    JMenu menuFileExport = new JMenu();
-
-	    menuFileExport.setText("Export");
+	    JMenu menuFileExport = new JMenu("Export");
 	    menuFile.add(menuFileExport);
 
 	    // File.Export.Html
-	    JMenuItem menuFileExportHtml = new JMenuItem();
-
-	    menuFileExportHtml.setText("To Html...");
+	    JMenuItem menuFileExportHtml = new JMenuItem("To Html...");
 	    menuFileExport.add(menuFileExportHtml);
 	    menuFileExportHtml.addActionListener(new ActionListener()
 		{
@@ -363,9 +318,7 @@ public class MainMenuBar
 		});
 
 	    // File.Export.Desco
-	    JMenuItem menuFileExportDesco = new JMenuItem();
-
-	    menuFileExportDesco.setText("To Desco...");
+	    JMenuItem menuFileExportDesco = new JMenuItem("To Desco...");
 	    menuFileExport.add(menuFileExportDesco);
 	    menuFileExportDesco.addActionListener(new ActionListener()
 		{
@@ -376,9 +329,7 @@ public class MainMenuBar
 		});
 
 	    // File.Export.UMDES
-	    JMenuItem menuFileExportUMDES = new JMenuItem();
-
-	    menuFileExportUMDES.setText("To UMDES...");
+	    JMenuItem menuFileExportUMDES = new JMenuItem("To UMDES...");
 	    menuFileExport.add(menuFileExportUMDES);
 	    menuFileExportUMDES.addActionListener(new ActionListener()
 		{
@@ -398,11 +349,8 @@ public class MainMenuBar
 
 	if (SupremicaProperties.generalUseSecurity())
 	{
-
 	    // File.Login
-	    JMenuItem menuFileLogin = new JMenuItem();
-
-	    menuFileLogin.setText("Login");
+	    JMenuItem menuFileLogin = new JMenuItem("Login");
 	    menuFile.add(menuFileLogin);
 	    menuFileLogin.addActionListener(new ActionListener()
 		{
