@@ -188,6 +188,19 @@ public class Automata
 		notifyListeners();
 	}
 
+	// Moves automaton to arbitrary destination
+	public void moveAutomaton(Automaton aut, int destinationIndex)
+	{
+		int originIndex = theAutomata.indexOf(aut);
+		
+		if (originIndex > destinationIndex)
+			for (int i = originIndex; i > destinationIndex; i--)
+				moveAutomaton(aut, true);
+		else if (originIndex < destinationIndex)
+			for (int i = originIndex; i < destinationIndex; i++)
+				moveAutomaton(aut, false);
+	}
+
 	public void renameAutomaton(Automaton aut, String newName)
 	{
 		aut.setName(newName);
@@ -236,7 +249,7 @@ public class Automata
 	 *
 	 *@see ActionMan
 	 */
-	public Iterator backwardsIterator()
+	public AutomatonIterator backwardsIterator()
 	{
 		ArrayList backwardList = new ArrayList();
 		Iterator forwardIterator = iterator();
@@ -244,12 +257,12 @@ public class Automata
 		{
 			backwardList.add(0, forwardIterator.next());
 		}
-		return backwardList.iterator();
+		return new AutomatonIterator(backwardList.iterator());
 	}
 
-	public Iterator plantIterator()
+	public AutomatonIterator plantIterator()
 	{
-		return new AutomatonTypeIterator(AutomatonType.Plant);
+		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Plant));
 	}
 
 	/**
@@ -268,9 +281,9 @@ public class Automata
 		return newAutomata;
 	}
 
-	public Iterator specificationIterator()
+	public AutomatonIterator specificationIterator()
 	{
-		return new AutomatonTypeIterator(AutomatonType.Specification);
+		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Specification));
 	}
 
 	/**
@@ -289,9 +302,9 @@ public class Automata
 		return newAutomata;
 	}
 
-	public Iterator supervisorIterator()
+	public AutomatonIterator supervisorIterator()
 	{
-		return new AutomatonTypeIterator(AutomatonType.Supervisor);
+		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Supervisor));
 	}
 
 	/**
@@ -331,9 +344,9 @@ public class Automata
 		return newAutomata;
 	}
 
-	public Iterator interfaceIterator()
+	public AutomatonIterator interfaceIterator()
 	{
-		return new AutomatonTypeIterator(AutomatonType.Interface);
+		return new AutomatonIterator(new AutomatonTypeIterator(AutomatonType.Interface));
 	}
 
 	/**

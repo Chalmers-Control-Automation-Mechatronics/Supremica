@@ -69,9 +69,6 @@ public class MutuallyNonblockingVerifier
 	private AutomataVerifier theVerifier = null;	
 	private boolean stopRequested = false;
 
-	// The resulting synchs
-	private Automata resultAutomata = new Automata();
-
 	// Array with results
 	private final int MUTUALLY_NONBLOCKING_YES = 0;
 	private final int MUTUALLY_NONBLOCKING_MAYBE = 1;
@@ -81,8 +78,9 @@ public class MutuallyNonblockingVerifier
 	// Largest amount of synchronized automata during execution
 	private int maxSynchronized = 0;
 
-	// General count variable
+	// General count variables
 	private int count = 0;
+	private int index = 0;
 
 	public MutuallyNonblockingVerifier(Automata theAutomata)
 	{
@@ -278,27 +276,23 @@ public class MutuallyNonblockingVerifier
 		second: for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
+			// Adjust the state names so that we can keep track of them easier
 			adjustStateNames(currAutomaton);
-			//Automaton currAutomatonCopy = new Automaton(currAutomaton);
-			//adjustStateNames(currAutomatonCopy);
-			//Automaton currSynchAutomaton = new Automaton(currAutomatonCopy);
-			//Automata currSynchAutomata = new Automata(currAutomatonCopy);
 			Automaton currSynchAutomaton = new Automaton(currAutomaton);
-			currSynchAutomaton.setAllMutuallyAcceptingStatesAsAccepting();
 			Automata currSynchAutomata = new Automata(currSynchAutomaton);
 			Events currSafeEvents = new Events(safeEventsMap.getEvents(currAutomaton));
 
 			// What's the current mutually nonblocking status?
 			currSynchAutomaton.extendMutuallyAccepting(currSafeEvents);
 			boolean ok = currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates();
-			if (!ok)
-			{
-				logger.info("Second run: Examining automaton " + currAutomaton + " closer.");
-			}
-			else
+			if (ok)
 			{
 				logger.info("Second run: Automaton " + currAutomaton + 
 							" is mutually accepting from the first run.");
+			}
+			else
+			{
+				logger.info("Second run: Examining automaton " + currAutomaton + " closer.");
 			}
 
 			// As long as we haven't established mutual nonblocking, we loop...			
@@ -322,11 +316,12 @@ public class MutuallyNonblockingVerifier
 					{
 						// We should try to find another automaton and try to prove that the blocking
 						// states are unreachable... or give up.
-						logger.error("I give up! This is a good time for synthesis! " + currSynchAutomata.size());
+						logger.error("I give up! This is a good time for synthesis, though! " 
+									 + currSynchAutomata.size());
 					}
 					break;
 				}
-
+				
 				// The automaton should be marked in all states
 				if (interestingAutomaton.nbrOfAcceptingStates() != interestingAutomaton.nbrOfStates())
 				{
@@ -345,7 +340,11 @@ public class MutuallyNonblockingVerifier
 					
 					// Synchronize!
 					// currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomata);
-					currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomaton, interestingAutomaton);
+					// Make sure the accepting status propagates
+					currSynchAutomaton.setAllMutuallyAcceptingStatesAsAccepting();
+					currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomaton, 
+																				  interestingAutomaton);
+					currSynchAutomaton.setName(currSynchAutomaton.getComment());
 				}
 				catch (Exception ex)
 				{
@@ -373,14 +372,40 @@ public class MutuallyNonblockingVerifier
 
 				// How many unique events are there in currSynchAutomata?
 				Alphabet uniqueEvents = findUniqueEvents(currSynchAutomata, theAutomata);
+				logger.info("Events unique to this subsystem are: " + uniqueEvents + ".");
 				
 				// Remove as many transitions of uniqueEvents as you dare...
-				count = count + removeUniqueEventTransitions(currSynchAutomaton, uniqueEvents);
+				if (uniqueEvents != null && uniqueEvents.size() > 0)
+					count = count + removeUniqueEventTransitions(currSynchAutomaton, uniqueEvents);
+
+				// Show automaton with only unique events!
+				if (uniqueEvents.size() > 0)
+				{
+					Automaton copy = new Automaton(currSynchAutomaton);
+					// Remove all arcs wich are not safe events
+					for (ArcIterator arcIt = copy.safeArcIterator(); arcIt.hasNext();)
+					{
+						Arc currArc = arcIt.nextArc();
+						if (!uniqueEvents.contains(currArc.getEvent()))
+						{
+							copy.removeArc(currArc);
+						}
+					}
+					
+					/*
+					// Add automaton to gui
+					// Ignore enormous automata...
+					if (currSynchAutomaton.nbrOfStates() < 400)
+					{
+						Gui gui = ActionMan.getGui();
+						gui.getVisualProjectContainer().getActiveProject().addAutomaton(copy);
+					}
+					*/
+				}
 
 				/*
 				// Add automaton to gui
  				Gui gui = ActionMan.getGui();
-				currSynchAutomaton.setName(currSynchAutomaton.getComment());
 				gui.getVisualProjectContainer().getActiveProject().addAutomaton(currSynchAutomaton);
 				*/
 
@@ -401,7 +426,6 @@ public class MutuallyNonblockingVerifier
 
 					// Restart loop with (refined) original automaton
 					currSynchAutomaton = new Automaton(currAutomaton);
-					currSynchAutomaton.setAllMutuallyAcceptingStatesAsAccepting();
 					currSynchAutomata = new Automata(currSynchAutomaton);
 					currSafeEvents = new Events(safeEventsMap.getEvents(currAutomaton));
 				}
@@ -421,7 +445,7 @@ public class MutuallyNonblockingVerifier
 					maxSynchronized = currSynchAutomata.size();
 				}
 
-				// Have we had enough of this madness?
+				// Have we had enough of this mma..mmammm..mmmammmm...mmmadness?
 				if (currSynchAutomaton.nbrOfStates() > 2500)
 				{
 					logger.error("Gave up because of state explosion!");
@@ -432,10 +456,12 @@ public class MutuallyNonblockingVerifier
 			// It went ok?
 			if (ok)
 			{
+				// This is already done above...
 				// It worked! Set all states as mutually accepting in currAutomaton
 				//AutomatonAllMutuallyAccepting allAccepting = new AutomatonAllMutuallyAccepting(currAutomaton);
 				//allAccepting.execute();
 
+				// Remember that it went well for this automaton
 				int index = theAutomata.getAutomatonIndex(currAutomaton);
 				automatonIsMutuallyNonblocking[index] = MUTUALLY_NONBLOCKING_YES;
 			}  
@@ -476,8 +502,8 @@ public class MutuallyNonblockingVerifier
 		int bestValue = Integer.MAX_VALUE;
 		for (int i = 0; i < interestingEvents.size(); i++)
 		{
-			// int index = i;
-			int index = (int) Math.floor(Math.random() * interestingEvents.size());
+			int index = i;
+			// int index = (int) Math.floor(Math.random() * interestingEvents.size());
 
 			LabeledEvent currEvent = (LabeledEvent) interestingEvents.elementAt(index);
 			
@@ -605,7 +631,7 @@ public class MutuallyNonblockingVerifier
 		Automaton automatonCopy = new Automaton(automaton);
 		
 		// Remove all arcs wich are not safe events
-		for (ArcIterator arcIt = automaton.arcIterator(); arcIt.hasNext();)
+		for (ArcIterator arcIt = automatonCopy.safeArcIterator(); arcIt.hasNext();)
 		{
 			Arc currArc = arcIt.nextArc();
 			if (!safeEvents.containsEventWithLabel(currArc.getEvent()))
@@ -613,6 +639,7 @@ public class MutuallyNonblockingVerifier
 				automatonCopy.removeArc(currArc);
 			}
 		}
+		// logger.info("Nbroftransitions then: " + automaton.nbrOfTransitions() + ", now: " + automatonCopy.nbrOfTransitions());
 
 		// The unmarked states should be blocking in the input of this method!
 		automatonCopy.invertMarking();
@@ -636,6 +663,11 @@ public class MutuallyNonblockingVerifier
 
 						if (trace != null)
 						{
+							if (trace.size()==0)
+							{
+								logger.info("The initial state is blocking.");
+								break;
+							}
 							logger.info("Trace to blocking state: " + trace);
 							break;
 						}
@@ -660,40 +692,98 @@ public class MutuallyNonblockingVerifier
 	private int removeUniqueEventTransitions(Automaton automaton, Alphabet alpha)
 	{
 		int nbrOfRemoved = 0;
+		int amount = 0;
 
+		// Find percentage unique/total transitions
+		int nbrOfUnique = 0;
+		for (ArcIterator arcIt = automaton.arcIterator(); arcIt.hasNext();)
+		{
+			if (alpha.contains(arcIt.nextArc().getEvent()))
+				nbrOfUnique++;
+		}
+		java.text.DecimalFormat df = new java.text.DecimalFormat();
+		logger.warn("Percentage unique: " + df.format(((double) 100*nbrOfUnique)/automaton.nbrOfTransitions()) + " u: " + nbrOfUnique + " t: " + automaton.nbrOfTransitions());
+		//logger.warn("Percentage unique: " + ((double) 100*nbrOfUnique)/automaton.nbrOfTransitions());
+		
 		// Loop over states
-		for (StateIterator stateIt = automaton.stateIterator(); stateIt.hasNext();)
+		for (StateIterator stateIt = automaton.safeStateIterator(); stateIt.hasNext();)
 		{
 			State currState = stateIt.nextState();
-			ArcSet removeArcs = new ArcSet();
 			
 			// Loop over outgoing arcs
-			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext();)
+			StateSet states = new StateSet();
+			for (ArcIterator arcIt = currState.safeOutgoingArcsIterator(); arcIt.hasNext();)
 			{
 				Arc currArc = arcIt.nextArc();
 				
-				// Selfloops can always be removed!
-				if (alpha.contains(currArc.getEvent()) && currArc.isSelfLoop())
+				// Is this a transition with a unique event?
+				if (alpha.contains(currArc.getEvent()))
 				{
-					removeArcs.addArc(currArc);
+					// Unique event selfloops can always be removed!
+					if (currArc.isSelfLoop())
+					{
+						// removeArcs.addArc(currArc);
+						automaton.removeArc(currArc);
+						nbrOfRemoved++;
+						continue;
+					}
+					
+					// Only one unique transition to each state is necessary
+					if (states.contains(currArc.getToState()))
+					{
+						// removeArcs.addArc(currArc);
+						automaton.removeArc(currArc);
+						nbrOfRemoved++;
+						continue;
+					}
+					else
+					{
+						states.add(currArc.getToState());
+					}
 				}
 			}
 			
-			// Remove arcs
-			for (int i=0; i<removeArcs.size(); i++)
-				//for (ArcIterator arcIt = removeArcs.iterator(); arcIt.hasNext();)
+			// Is there only one outgoing arc left and is it with an unique event?
+			if (currState.nbrOfOutgoingArcs() == 1)
 			{
-				//automaton.removeArc(arcIt.nextArc());
-				automaton.removeArc(removeArcs.removeArc());
-				nbrOfRemoved++;
+				Arc currArc = currState.outgoingArcsIterator().nextArc();
+
+				// Is that transition a unique event?
+				if (alpha.contains(currArc.getEvent()))
+				{
+					amount++;
+
+					// Merge the states!
+					// All incoming should go to currArc.getToState() instead
+					// logger.info("Merging states " + currArc.getFromState() + " and " + currArc.getToState());
+					State toState = currArc.getToState();
+					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext();)
+					{
+						Arc arc = arcIt.nextArc();
+						automaton.addArc(new Arc(arc.getFromState(), toState, arc.getEvent()));
+						// arcIt.nextArc().setToState(toState);
+					}
+
+					// Don't leave the automaton without initial state!
+					if (currState.isInitial())
+					{
+						automaton.setInitialState(toState);
+					}
+
+					// Safely remove the old state
+					automaton.removeState(currState);
+					nbrOfRemoved++;
+				}
 			}
 		}
 		
+		logger.warn("Removed: " + nbrOfRemoved + ", amount of sole and unique transitions " + amount);
 		return nbrOfRemoved;
 	}		
 
 	/**
-	 * Examines how many unique events there are in automataA compared to automataB
+	 * Examines how many unique events there are in automataA compared to automataB. If automataB contains
+	 * automata from automataA, these are ignored so the method is really "\Sigma_A - \Sigma_(B-A)".
 	 */
 	private Alphabet findUniqueEvents(Automata automataA, Automata automataB)
 	{
@@ -701,26 +791,30 @@ public class MutuallyNonblockingVerifier
 
 		// Make sure automataA is not included in automataB (which would make the test really stupid)
 		Automata automataBminusA = new Automata(automataB);
-		for(AutomatonIterator autIt = automataA.iterator(); autIt.hasNext();)
+		for (AutomatonIterator autIt = automataA.iterator(); autIt.hasNext();)
 		{
 			automataBminusA.removeAutomaton(autIt.nextAutomaton().getName());
+		}
+
+		// Nothing left?
+		if (automataBminusA.size() == 0)
+		{
+			return null;
 		}
 		
 		try
 		{
 			Alphabet alphabetA = AlphabetHelpers.getUnionAlphabet(automataA);
 			Alphabet alphabetB = AlphabetHelpers.getUnionAlphabet(automataBminusA);
-		
+			
 			alphabetA.minus(alphabetB);
 			result = alphabetA;
-			
-			 logger.info(alphabetA);
 		}
 		catch (Exception oj)
 		{
 			logger.error(oj);
 		}
-
+		
 		return result;
 	}
 
@@ -814,7 +908,7 @@ public class MutuallyNonblockingVerifier
 	}
 
 	/**
-	 * Add safe events to theSafeEvents according to the safeness of the events in theAutomaton.
+	 * Add safe events to theSafeEvents according to the safeness of the events in selectedAutomata.
 	 */
 	private void addSafeEvents(Events theSafeEvents, Alphabet theAlphabet, 
 							   Automata selectedAutomata, Automata theAutomataCopy)
@@ -827,14 +921,13 @@ public class MutuallyNonblockingVerifier
 				return;
 
 			LabeledEvent currEvent = (LabeledEvent)evIt.next();
-			logger.debug("Event: " + currEvent + " (" + 
-						(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
+			//logger.debug("Event: " + currEvent + " (" + 
+			//			(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
 			
 			// Perhaps we have already added this event?
-			//if (safeEventsMap.containsEvent(theAutomaton, currEvent))
 			if (theSafeEvents.containsEventWithLabel(currEvent))
 			{
-				logger.debug("Already established to be safe!");
+				//logger.debug("Already established to be safe!");
 				continue;
 			}
 			
@@ -855,7 +948,7 @@ public class MutuallyNonblockingVerifier
 			boolean isSafe = checkSafeness(theAutomataCopy, selectedAutomata, currEvent);
 			if (isSafe)
 			{
-				logger.debug("The event is safe.");
+				logger.debug("The event " + currEvent + " is safe.");
 				
 				try
 				{
@@ -869,7 +962,7 @@ public class MutuallyNonblockingVerifier
 			}
 			else
 			{
-				logger.debug("The event is unsafe.");
+				logger.debug("The event " + currEvent + " is unsafe.");
 			}
 			
 			if (stopRequested)

@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -119,5 +118,4 @@ public class AutomatonType
 		}
 		return ident.toLowerCase().equals(type.toString().toLowerCase());
 	}
-
 }

@@ -111,6 +111,7 @@ public class Automaton
 		type = orgAut.type;
 
 		setName(orgAut.getName());
+		setComment(orgAut.getComment());
 
 		// Create all states
 		for(StateIterator states = orgAut.stateIterator(); states.hasNext();)
@@ -1008,14 +1009,16 @@ public class Automaton
 				return Integer.MAX_VALUE;
 			}
 			if (stateDepth>depth)
+			{
 				depth = stateDepth;
+			}
 		}
 
 		return depth;
 	}
 
 	/**
-	 * Returns mean depth of transitions of events in anAlphabet.
+	 * Returns sum of depths of transitions of events in anAlphabet.
 	 */
 	public int depthSum(Alphabet anAlphabet)
 	{
@@ -1066,7 +1069,7 @@ public class Automaton
 		return theArcs.iterator();
 	}
 
-	public Iterator safeArcIterator()
+	public ArcIterator safeArcIterator()
 	{
 		return (new ArcSet(theArcs)).iterator();
 	}
@@ -1321,7 +1324,8 @@ public class Automaton
 			LabeledEvent currEvent = getLabeledEvent(prevState, thisState);
 			if (currEvent == null)
 			{
-				throw new Exception("Could not find an arc from " + prevState.getName() + " to " + thisState.getName());
+				throw new Exception("Could not find an arc from " + prevState.getName() + 
+									" to " + thisState.getName());
 			}
 			theTrace.addFirst(currEvent.getLabel());
 			thisState = prevState;

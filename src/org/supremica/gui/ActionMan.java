@@ -564,8 +564,9 @@ public class ActionMan
 	 * Moves selected automata one step up or down in the list
 	 *
 	 * @param directionIsUp Boolean deciding the direction of the move, true->up false->down.
+	 * @param allTheWay Boolean deciding is the move is all the way to the top or bottom.
 	 */
-	public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp)
+	public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp, boolean allTheWay)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 		if (!selectedAutomata.sanityCheck(gui, 1))
@@ -581,43 +582,69 @@ public class ActionMan
 			return;
 		}
 
+		// selectionIndices are the indices of the automata that should be selected after the move!
 		int[] selectionIndices = new int[selectedAutomata.size()];
 		int index = 0;
 
-		// Avoid automata that can't move any further
-		Iterator autIt;
-		if (directionIsUp)
+		if (allTheWay)
 		{
-			autIt = selectedAutomata.iterator();
-
-			// Avoid the automata already at the top!
-			int i = 0;
-			while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+			// Move all the way...
+			if (directionIsUp)
 			{
-				autIt.next();
-				selectionIndices[index++] = i++;
+				int i = 0;
+				for (AutomatonIterator autIt = selectedAutomata.iterator(); autIt.hasNext();)
+				{
+					theProject.moveAutomaton(autIt.nextAutomaton(), i);
+					selectionIndices[index++] = i++;
+				}
+			}
+			else
+			{
+				int i = theProject.size() - 1;
+				for (AutomatonIterator autIt = selectedAutomata.backwardsIterator(); autIt.hasNext();)
+				{
+					theProject.moveAutomaton(autIt.nextAutomaton(), i);
+					selectionIndices[index++] = i--;
+				}
 			}
 		}
 		else
 		{
-			autIt = selectedAutomata.backwardsIterator();
-
-			// Avoid the automata already at the bottom!
-			int i = theProject.size() - 1;
-			while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+			// Avoid automata that can't move any further
+			Iterator autIt;
+			if (directionIsUp)
 			{
-				autIt.next();
-				selectionIndices[index++] = i--;
-			}
-		}
+				autIt = selectedAutomata.iterator();
 
-		// Move automata that can move!
-		Automaton currAutomaton;
-		while (autIt.hasNext())
-		{
-			currAutomaton = (Automaton) autIt.next();
-			theProject.moveAutomaton(currAutomaton, directionIsUp);
-			selectionIndices[index++] = theProject.getAutomatonIndex(currAutomaton);
+				// Avoid the automata already at the top!
+				int i = 0;
+				while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+				{
+					autIt.next();
+					selectionIndices[index++] = i++;
+				}
+			}
+			else
+			{
+				autIt = selectedAutomata.backwardsIterator();
+
+				// Avoid the automata already at the bottom!
+				int i = theProject.size() - 1;
+				while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+				{
+					autIt.next();
+					selectionIndices[index++] = i--;
+				}
+			}
+
+			// Move automata that can move! The thing is that we're using the same iterator here and above!!!!!!!!!!
+			Automaton currAutomaton;
+			while (autIt.hasNext())
+			{
+				currAutomaton = (Automaton) autIt.next();
+				theProject.moveAutomaton(currAutomaton, directionIsUp);
+				selectionIndices[index++] = theProject.getAutomatonIndex(currAutomaton);
+			}
 		}
 
 		// Update the selection
@@ -636,7 +663,6 @@ public class ActionMan
 
 		FORMAT_PCG = 13, FORMAT_PCG_DEBUG = 14, // ARASH: process communication graphs
 		FORMAT_SSPC = 15; // ARASH: Sanchez SSPC tool
-
 
 
 	// This class should really act as a factory for exporter objects, but that
@@ -770,7 +796,6 @@ public class ActionMan
 				return FORMAT_UNKNOWN;
 			}
 		}
-
 	}
 
 	// ** Export - shouldn't there be an exporter object?
@@ -811,7 +836,7 @@ public class ActionMan
 		}
 
 		if (exportMode == FORMAT_FSM_DEBUG || exportMode == FORMAT_FSM)
-		{ // UMDES cannot deal with forbidden states
+		{   // UMDES cannot deal with forbidden states
 			if (selectedAutomata.hasForbiddenState())
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "UMDES cannot handle forbidden states", "Alert", JOptionPane.ERROR_MESSAGE);

@@ -483,6 +483,9 @@ public class State
 		return outgoingArcSets.iterator();
 	}
 
+	/**
+	 * Use this iterator when you're planning to fiddle with the arcs.
+	 */
 	public ArcIterator safeOutgoingArcsIterator()
 	{
 		return new ArcIterator(((LinkedList) outgoingArcs.clone()).iterator());
