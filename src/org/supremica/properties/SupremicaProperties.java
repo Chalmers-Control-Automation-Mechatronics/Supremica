@@ -124,9 +124,13 @@ public final class SupremicaProperties
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
 
-        // SoftPLC Options
-       	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
-        private static Vector softplcInterfaces = new Vector();
+	// SoftPLC Options
+	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
+	private static Vector softplcInterfaces = new Vector();
+
+	// Special Menu Options
+	private static final String SHOW_GENETIC_ALGORITHMS = "showGeneticAlgorithms";
+	private static final String SHOW_ROBOTSTUDIO_LINK = "showRobotstudioLink";
 
 	private Set forbidExternalModification = new HashSet();
 
@@ -184,6 +188,8 @@ public final class SupremicaProperties
 		//setProperty(ANIMATOR_IN_USE, "false", true);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
+		setProperty(SHOW_GENETIC_ALGORITHMS, "false", true);
+		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
 
                 softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 
@@ -735,6 +741,16 @@ public final class SupremicaProperties
 	public static void setSoftplcInterfaces(Vector interfaces)
 	{
 		softplcInterfaces = interfaces;
+	}
+
+	public static boolean showGeneticAlgorithms()
+	{
+		return toBoolean(wp.getProperty(SHOW_GENETIC_ALGORITHMS));
+	}
+
+	public static boolean showRobotstudioLink()
+	{
+		return toBoolean(wp.getProperty(SHOW_ROBOTSTUDIO_LINK));
 	}
 
 	private static String toString(boolean b)

@@ -303,7 +303,7 @@ public class Alphabet
 					result.addEvent(newEvent, false);
 				}
 				catch (Exception ex)
-				{    // This should be impossible
+				{   // This should be impossible
 					logger.error("Alphabet.intersect. Trying to add an existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}

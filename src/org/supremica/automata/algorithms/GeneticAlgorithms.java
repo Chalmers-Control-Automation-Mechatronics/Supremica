@@ -231,21 +231,33 @@ public class GeneticAlgorithms
 	/**
 	 * This is an manually generated class
 	 */
+	/* Planned to make my own predictionFunction, based on intuition...
 	private static class ManualPredictionFunction 
 	{
-
+		private static double[] r = new double[GA_DATA_SIZE];
+		
+		public static double f(double[] in)
+		{	// Worst case
+			double worstCase = in[0]*in[1];
+			
+			if (in[2] == 0 && in[3] == 0)
+			{
+				return worstCase;
+			}
+		}
 	}
+	*/
 
 	/**
 	 * This is an automatically generated class
 	 */
 	private static class PredictionFunction 
 	{
-		private static double[] r = new double[8];
+		private static double[] r = new double[GA_DATA_SIZE];
 		
 		public static double f(double[] in)
 		{
-			for(int i=0; i<8; i++)
+			for(int i=0; i<r.length; i++)
 				r[i] = in[i];
 			
 			r[2] = 0.544921875;
