@@ -2626,7 +2626,7 @@ public class ActionMan
 			return;
 		}
 
-			JFileChooser outputDir = new JFileChooser();
+		JFileChooser outputDir = new JFileChooser();
 		outputDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
 		if (outputDir.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)

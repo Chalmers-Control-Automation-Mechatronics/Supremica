@@ -568,12 +568,12 @@ class SoftPLCPanel
         private JList ioInterfaceList = new JList();
         private Vector ioInterface = new Vector();
 
-    JPanel contentPane = new JPanel();
-    GridBagLayout gridBagLayout1 = new GridBagLayout();
-    JLabel jLabel1 = new JLabel();
-    JLabel jLabel2 = new JLabel();
-    JButton jButton1 = new JButton();
-    JToggleButton jToggleButton1 = new JToggleButton();
+        JPanel contentPane = new JPanel();
+        GridBagLayout gridBagLayout1 = new GridBagLayout();
+        JLabel jLabel1 = new JLabel();
+        JLabel jLabel2 = new JLabel();
+        JButton removeButton = new JButton();
+        JButton addButton    = new JButton();
 
 	public SoftPLCPanel(PreferencesDialog theDialog)
 	{
@@ -584,49 +584,67 @@ class SoftPLCPanel
 
 		//
 
-        contentPane.setLayout(gridBagLayout1);
-        ioInterfaceList.setVisibleRowCount(2);
+                contentPane.setLayout(gridBagLayout1);
+                ioInterfaceList.setVisibleRowCount(2);
 
-        jLabel1.setText("Default cycle time (ms)");
-        jLabel2.setText("Available IO-interfaces");
-        jButton1.setText("Remove");
-        jToggleButton1.setText("Add");
-        ioInterface.add("BTSim");
-        ioInterface.add("ProjectSoftPLC");
+                jLabel1.setText("Default cycle time (ms)");
+                jLabel2.setText("Available IO-interfaces");
+                removeButton.setText("Remove");
+                addButton.setText("Add");
+                ioInterface.add("BTSim");
+                ioInterface.add("ProjectSoftPLC");
 
-        ioInterfaceList.setListData(ioInterface);
-        contentPane.add(ioInterfaceList,                              new GridBagConstraints(0, 3, 1, 2, 1.0, 1.0
-            ,GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 80, 60, 20), 60, 0));
-        contentPane.add(jLabel1,               new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0
-            ,GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 81, 3, 40), 199, 0));
-        contentPane.add(cycleTime,                                       new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0
-            ,GridBagConstraints.SOUTHWEST, GridBagConstraints.NONE, new Insets(8, 82, 23, 0), 181, 0));
-        contentPane.add(jButton1,                                     new GridBagConstraints(1, 4, 1, 1, 0.4, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 0, 74, 8), 5, 0));
-        contentPane.add(jToggleButton1,                          new GridBagConstraints(1, 3, 1, 1, 0.4, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(3, 0, 7, 40), 0, 0));
-        contentPane.add(jLabel2,              new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 81, 9, 10), 0, 0));
+                addButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                                addButton_actionPerformed(e);
+                        }
+                });
 
-	add(contentPane, BorderLayout.CENTER);
+                removeButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                                removeButton_actionPerformed(e);
+                        }
+                });
 
+                ioInterfaceList.setListData(ioInterface);
+                contentPane.add(ioInterfaceList,                              new GridBagConstraints(0, 3, 1, 2, 1.0, 1.0
+                    ,GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 80, 60, 20), 60, 0));
+                contentPane.add(jLabel1,               new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0
+                    ,GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 81, 3, 40), 199, 0));
+                contentPane.add(cycleTime,                                       new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0
+                    ,GridBagConstraints.SOUTHWEST, GridBagConstraints.NONE, new Insets(8, 82, 23, 0), 181, 0));
+                contentPane.add(removeButton,                                     new GridBagConstraints(1, 4, 1, 1, 0.4, 0.0
+                    ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 0, 74, 8), 5, 0));
+                contentPane.add(addButton,                          new GridBagConstraints(1, 3, 1, 1, 0.4, 0.0
+                    ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(3, 0, 7, 40), 0, 0));
+                contentPane.add(jLabel2,              new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0
+                    ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 81, 9, 10), 0, 0));
 
-		//
-
-
-// 		Jlabel cycleTimeLabel = new JLabel("Default cycle time (ms)");
-// 		propertiesBox.add(cycleTimeLabel);
-
-// 		cycleTime = new JTextField();
-// 		propertiesBox.add(cycleTime);
-		
-// 		ioInterface.add("BTSim");
-// 		ioInterface.add("AdlinkPCI7432");
-
-// 		ioInterfaceList.setListData(ioInterface);
-// 		propertiesBox.add(ioInterfaceList);
+                add(contentPane, BorderLayout.CENTER);
 
 	}
+
+         void addButton_actionPerformed(ActionEvent e) {
+		JFileChooser outputDir = new JFileChooser();
+
+		if (outputDir.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = outputDir.getSelectedFile();
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+                                        ioInterface.add(currFile.getName());
+                                        ioInterfaceList.updateUI();
+				}
+			}
+                }
+         }
+
+         void removeButton_actionPerformed(ActionEvent e) {
+                 ioInterface.remove(ioInterfaceList.getSelectedIndex());
+                 ioInterfaceList.updateUI();
+         }
 
 	public boolean doApply()
 	{
