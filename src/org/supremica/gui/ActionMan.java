@@ -2139,7 +2139,6 @@ public class ActionMan
 		};
 	}
 
-	/*
 	public static void fileImportHYB(Gui gui)
 	{
 		new FileImporter(FileDialogs.getHYBFileImporter(), gui)    // anonymous class
@@ -2150,7 +2149,6 @@ public class ActionMan
 			}
 		};
 	}
-	*/
 
 	public static void fileImportUMDES(Gui gui)
 	{

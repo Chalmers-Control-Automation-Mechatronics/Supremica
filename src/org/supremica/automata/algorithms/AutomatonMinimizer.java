@@ -320,10 +320,6 @@ public class AutomatonMinimizer
 				rulesTimer.stop();	
 				logger.fatal("Rules A, B, C and F: " + rulesTimer);
 				Thread.sleep(0);
-			}
-			
-			if (debug)
-			{
 				partitioningTimer.start();
 			}
 			

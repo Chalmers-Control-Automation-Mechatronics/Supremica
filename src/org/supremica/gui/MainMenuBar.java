@@ -288,6 +288,7 @@ public class MainMenuBar
 		    }
 		});
 
+		/*
 	    // File.Import.HYB
 	    JMenuItem menuFileImportHYB = new JMenuItem();
 	    menuFileImportHYB.setText("From HYB...");
@@ -299,6 +300,7 @@ public class MainMenuBar
 			ActionMan.fileImportHYB(ActionMan.getGui());
 		    }
 		});
+		*/
 
 	    // /* WHAT'S THE DIFFERENCE BETWEEN THESE TWO? THERE IS NO DOCUMENTATION!!! AAAAARGH!!
 	    if (SupremicaProperties.generalUseRobotCoordination() || true)
