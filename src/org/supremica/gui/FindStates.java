@@ -669,7 +669,16 @@ class FindStatesFrame
 			if (matcher != null)
 			{
 
-				SearchStates ss = new SearchStates(getAutomata(), matcher);
+				SearchStates ss;
+				try
+				{
+					ss = new SearchStates(getAutomata(), matcher);
+				}
+				catch (Exception e)
+				{
+					logger.error("Exception while constructing SearchState. Operation aborted. " + e.getMessage());
+					return;
+				}
 				ss.start();    // Start the synchronization thread
 
 				Monitor monitor = new Monitor("Finding states...", "", ss);

@@ -53,7 +53,14 @@ import java.util.*;
 
 public class AlphabetHelpers
 {
+
 	public static Alphabet getUnionAlphabet(Automata theAutomata)
+		throws Exception
+	{
+		return getUnionAlphabet(theAutomata, true, true);
+	}
+
+	public static Alphabet getUnionAlphabet(Automata theAutomata, boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws Exception
 	{
 		EventsSet eventsSet = new EventsSet();
@@ -66,8 +73,15 @@ public class AlphabetHelpers
 			eventsSet.add(currAlphabet);
 		}
 
-		return getUnionAlphabet(eventsSet, "a");
+		return getUnionAlphabet(eventsSet, "a", requireConsistentControllability, requireConsistentImmediate);
 	}
+
+	public static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
+		throws IllegalArgumentException, Exception
+	{
+		return getUnionAlphabet(alphabets, idPrefix, true, true);
+	}
+
 
 	/**
 	 * Compute a new alphabet as the union of a set of alphabets.
@@ -79,7 +93,7 @@ public class AlphabetHelpers
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	public static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
+	public static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix, boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws IllegalArgumentException, Exception
 	{
 		if (alphabets.size() < 1)
@@ -114,7 +128,7 @@ public class AlphabetHelpers
 				}
 			}
 
-			LabeledEvent newEvent = EventHelpers.createEvent(eventSet, idPrefix);
+			LabeledEvent newEvent = EventHelpers.createEvent(eventSet, idPrefix, requireConsistentControllability, requireConsistentImmediate);
 
 			newEvent.setId(newAlphabet.getUniqueId(idPrefix));
 			newAlphabet.addEvent(newEvent);

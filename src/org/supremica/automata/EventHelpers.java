@@ -76,6 +76,22 @@ public class EventHelpers
 	public static LabeledEvent createEvent(EventsSet eventSet, String prefix)
 		throws IllegalArgumentException, Exception
 	{
+		return createEvent(eventSet, prefix, true, true);
+	}
+
+
+	/**
+	 * Creates a new event from a set of events
+	 *
+	 *@param  eventSet Description of the Parameter
+	 *@param  prefix Description of the Parameter
+	 *@return  Description of the Return Value
+	 *@exception  IllegalArgumentException Description of the Exception
+	 *@exception  Exception Description of the Exception
+	 */
+	public static LabeledEvent createEvent(EventsSet eventSet, String prefix, boolean requireConsistentControllability, boolean requireConsistentImmediate)
+		throws IllegalArgumentException, Exception
+	{
 		if (eventSet.size() <= 0)
 		{
 			throw new IllegalArgumentException("At least one event in the set is necessary");
@@ -104,14 +120,14 @@ public class EventHelpers
 				throw new Exception("All events must have the same label");
 			}
 
-			if (controllable != tmpEvent.isControllable())
+			if (requireConsistentControllability && controllable != tmpEvent.isControllable())
 			{
 				String errorMsg = "Controllability of an event must be the same in all automata. Controllability of " + label + " is not consistent.";
 
 				throw new Exception(errorMsg);
 			}
 
-			if (immediate != tmpEvent.isImmediate())
+			if (requireConsistentImmediate && immediate != tmpEvent.isImmediate())
 			{
 				String errorMsg = "Immediate of an event must be the same in all automata. Immediate of " + label + " is not consistent.";
 

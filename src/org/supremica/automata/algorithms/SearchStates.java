@@ -47,7 +47,9 @@ public class SearchStates
 		setPriority(Thread.MIN_PRIORITY);
 
 		// !!Throws exception if automata is empty or has only one automaton!!
-		this.syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
+		SynchronizationOptions syncOptions = new SynchronizationOptions();
+		syncOptions.setRequireConsistentControllability(false);
+		this.syncher = new AutomataSynchronizer(automata, syncOptions);
 		this.matcher = m;
 		this.container = makeContainer();    // Must create the container, in case the thread is stopped
 	}

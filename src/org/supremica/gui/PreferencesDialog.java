@@ -363,7 +363,7 @@ class LayoutPanel
 
 		propertiesBox.add(dotCommandLabel);
 
-		dotCommand = new JTextField();
+		dotCommand = new JTextField(20);
 
 		propertiesBox.add(dotCommand);
 
@@ -371,7 +371,7 @@ class LayoutPanel
 
 		propertiesBox.add(dotMaxNbrOfStatesLabel);
 
-		dotMaxNbrOfStates = new JTextField();
+		dotMaxNbrOfStates = new JTextField(20);
 
 		propertiesBox.add(dotMaxNbrOfStates);
 	}

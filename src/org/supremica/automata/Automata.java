@@ -190,7 +190,13 @@ public class Automata
 	public Alphabet getUnionAlphabet()
 		throws Exception
 	{
-		return AlphabetHelpers.getUnionAlphabet(this);
+		return getUnionAlphabet(true, true);
+	}
+
+	public Alphabet getUnionAlphabet(boolean requireConsistentControllability, boolean requireConsistentImmediate)
+		throws Exception
+	{
+		return AlphabetHelpers.getUnionAlphabet(this, requireConsistentControllability, requireConsistentImmediate);
 	}
 
 	public Iterator iterator()

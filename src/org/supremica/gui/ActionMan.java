@@ -870,7 +870,7 @@ public class ActionMan
 				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), true,
 
 				// SupremicaProperties.syncForbidUncontrollableStates(),
-				SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode());
+				SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode(), true, true);
 			}
 			catch (Exception ex)
 			{

@@ -137,7 +137,9 @@ public final class AutomataSynchronizerHelper
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
 
-		Alphabet theAlphabet = theAutomata.getUnionAlphabet();
+		//System.err.println(syncOptions.requireConsistentControllability());
+		//System.err.println(syncOptions.requireConsistentImmediate());
+		Alphabet theAlphabet = theAutomata.getUnionAlphabet(syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
 
 		theAutomaton.setAlphabet(theAlphabet);
 

@@ -66,15 +66,17 @@ public final class SynchronizationOptions
 	private boolean buildAutomaton;
 	private boolean expandEventsUsingPriority;
 	private boolean verboseMode;
+	private boolean requireConsistentControllability;
+	private boolean requireConsistentImmediate;
 	private boolean dialogOK = false;
 
 	public SynchronizationOptions()
 		throws Exception
 	{
-		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode());
+		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode(), true, true);
 	}
 
-	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode)
+	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws Exception
 	{
 		if (syncType == null)
@@ -102,6 +104,8 @@ public final class SynchronizationOptions
 		this.expandEventsUsingPriority = expandEventsUsingPriority;
 		this.buildAutomaton = buildAutomaton;
 		this.verboseMode = verboseMode;
+		this.requireConsistentControllability = requireConsistentControllability;
+		this.requireConsistentImmediate = requireConsistentImmediate;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -177,6 +181,26 @@ public final class SynchronizationOptions
 	public boolean verboseMode()
 	{
 		return verboseMode;
+	}
+
+	public boolean requireConsistentControllability()
+	{
+		return requireConsistentControllability;
+	}
+
+	public void setRequireConsistentControllability(boolean require)
+	{
+		requireConsistentControllability = require;
+	}
+
+	public boolean requireConsistentImmediate()
+	{
+		return requireConsistentImmediate;
+	}
+
+	public void setRequireConsistentImmediate(boolean require)
+	{
+		requireConsistentImmediate = require;
 	}
 
 	/**
