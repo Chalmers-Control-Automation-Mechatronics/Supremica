@@ -251,7 +251,7 @@ public class ActionMan
 		}
 
 		gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
-	
+
 		/*
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
@@ -337,7 +337,7 @@ public class ActionMan
 		{
 			return;
 		}
-		
+
 		/*
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
@@ -1818,7 +1818,7 @@ public class ActionMan
 		try
 		{
 			AutomataHierarchyViewer viewer = new AutomataHierarchyViewer(selectedAutomata);
-			
+
 			viewer.setVisible(true);
 			//viewer.setState(Frame.NORMAL);
 		}
@@ -1826,11 +1826,11 @@ public class ActionMan
 		{
 			logger.error("Exception in AutomataHierarchyViewer.", ex);
 			logger.debug(ex.getStackTrace());
-			
+
 			return;
 		}
 	}
-	
+
 	// Automaton.View action performed
 	public static void automatonView_actionPerformed(Gui gui)
 	{
@@ -2714,7 +2714,15 @@ public class ActionMan
 
 			return;
 		}
-		CreateXml.executeScheduledAutomaton(selectedAutomata.getAutomatonAt(0));
+		final Automaton a = new Automaton(selectedAutomata.getAutomatonAt(0));
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				CreateXml.executeScheduledAutomaton(a);
+			}
+		});
+		thread.start();
 	}
 
 	public static void demonstrate(Gui gui)
@@ -3495,7 +3503,7 @@ public class ActionMan
 	 * @param mustHaveType Test requires that the automata are not of undefined type.
 	 */
 	/* This method now resides in automata.Automata
-	private static boolean sanityCheck(Automata theAutomata, int minSize, boolean mustHaveInitial, 
+	private static boolean sanityCheck(Automata theAutomata, int minSize, boolean mustHaveInitial,
 											   boolean mustHaveType)
 	{
 		if (mustHaveInitial)
@@ -3511,13 +3519,13 @@ public class ActionMan
 				// Does this automaton have an initial state?
 				if (!currAutomaton.hasInitialState())
 				{
-					String message = "The automaton \"" + currAutomaton.getName() + 
+					String message = "The automaton \"" + currAutomaton.getName() +
 						"\" does not have an initial state.\n" +
 						"Skip this automaton or Cancel the whole operation?";
 					Object[] options = { "Skip", "Cancel" };
-					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
-															JOptionPane.OK_CANCEL_OPTION, 
-															JOptionPane.WARNING_MESSAGE, null, 
+					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+															JOptionPane.OK_CANCEL_OPTION,
+															JOptionPane.WARNING_MESSAGE, null,
 															options, options[1]);
 
 					if(cont == JOptionPane.OK_OPTION)
@@ -3551,9 +3559,9 @@ public class ActionMan
 						"\" is of type \"Undefined\".\n" +
 						"Skip this automaton or Cancel the whole operation?";
 					Object[] options = { "Skip", "Cancel" };
-					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
-															JOptionPane.OK_CANCEL_OPTION, 
-															JOptionPane.WARNING_MESSAGE, null, 
+					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+															JOptionPane.OK_CANCEL_OPTION,
+															JOptionPane.WARNING_MESSAGE, null,
 															options, options[1]);
 
 					if(cont == JOptionPane.OK_OPTION)
