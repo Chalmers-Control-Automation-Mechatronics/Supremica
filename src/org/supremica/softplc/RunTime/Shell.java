@@ -7,8 +7,6 @@ import java.util.*;
 import java.lang.reflect.*;
 import java.text.*;
 
-//import org.supremica.softplc.Simulator.ThirdTest.*;
-
 /**
  * Schedule a task that executes once every 100ms.
  */
@@ -23,14 +21,15 @@ public class Shell
     public static short nr_Of_Signals_In;
     public static short nr_Of_Signals_Out;
     public static DigitalIODriver driver;
-    public long last_invocation = 0;
 
-    // execute once every 100ms
-    public int interval = 10;//100;
+    /** execute once every [interval] ms */
+    public static short interval = 30;
+
     Class[] constructorArgumentTypes = { boolean[].class, boolean[].class };
     Constructor classConstructor;
     Object[] constructorArgs = { inSignals, outSignals };
     Class ILClass;
+
     public boolean isInitialized = false;
 
     public Shell(String io, String il)
