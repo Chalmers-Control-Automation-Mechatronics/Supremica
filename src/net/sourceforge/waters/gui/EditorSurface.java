@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.13 2005-03-03 23:29:33 flordal Exp $
+//# $Id: EditorSurface.java,v 1.14 2005-03-04 03:52:47 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -1332,7 +1332,7 @@ public class EditorSurface
 				line.setLine (pageFormat.getImageableWidth(), 0, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 				g2d.draw (line);
 				
-				//--- Print the horizontal lines
+				// Print the horizontal lines
 				line.setLine (0, 0, pageFormat.getImageableWidth(), 0);
 				g2d.draw (line);
 				line.setLine (0, pageFormat.getImageableHeight(), pageFormat.getImageableWidth(), pageFormat.getImageableHeight());

@@ -239,7 +239,7 @@ public class EditorNode
 			// There is no marking!
 			// Draw the background white!
 			g2d.setColor(Color.WHITE);
-			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH+1, WIDTH+1);
+			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 		}
 		else if (colours.size() <= 4)
 		{
@@ -250,7 +250,7 @@ public class EditorNode
 			{
 				// There are markings but they are fewer than 5! 
 				// Draw nice colored pies!!
-				a.setArcByCenter(getX(), getY(), RADIUS+1, startAngle, deltaAngle, Arc2D.PIE);
+				a.setArcByCenter(getX(), getY(), RADIUS, startAngle, deltaAngle, Arc2D.PIE);
 				startAngle += deltaAngle;
 				
 				g2d.setColor((Color) i.next());
@@ -262,7 +262,7 @@ public class EditorNode
 		{
 			// More than four markings! Use the default marking color and draw a cross on top!
 			g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
-			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH+1, WIDTH+1);
+			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 			
 			//g2d.setColor(EditorColor.DEFAULTCOLOR);
 			g2d.setColor(Color.WHITE);
@@ -272,12 +272,11 @@ public class EditorNode
 
 		// Draw the border of the node
 		g2d.setColor(getColor());
-		g2d.drawOval(getX() - RADIUS - 1, getY() - RADIUS - 1, WIDTH + 2, WIDTH + 2);
+		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 		if (isInitial())
 		{
 			// Draw it thicker!
-			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
-			//g2d.drawOval(getX() - RADIUS + 1, getY() - RADIUS + 1, WIDTH - 2, WIDTH - 2);			
+			g2d.drawOval(getX() - RADIUS + 1, getY() - RADIUS + 1, WIDTH - 2, WIDTH - 2);			
 		}
 	}
 }

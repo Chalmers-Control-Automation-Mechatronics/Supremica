@@ -585,7 +585,7 @@ public class ControlledSurface
 					else if ((object.getType() == EditorObject.EDGE) && (!controlPointsMove || !(nodeIsSelected() || nodeGroupIsSelected())))
 					{
 						EditorEdge edge = (EditorEdge) object;
-						edge.setTPoint(edge.getTPointX() + dx, edge.getTPointY() + dy);
+  						edge.setTPoint(edge.getTPointX() + dx, edge.getTPointY() + dy);
 					}
 
 					// DONT MOVE LABELS IN MULTI MODE, (WITH THE OFFSETS IT'S NO FUN TO TRY TO GET IT RIGHT...)
@@ -889,7 +889,7 @@ public class ControlledSurface
 					edge.setDragT(false);
 					edge.setDragS(false);
 					edge.setDragC(false);
-					edge.setTPoint(edge.getTPointX(), edge.getTPointY());
+					//edge.setTPoint(edge.getTPointX(), edge.getTPointY());
 				}
 			}
 
@@ -1045,7 +1045,7 @@ public class ControlledSurface
 				}
 
 				unsetAllInitial();
-				n.setInitial(true);
+ 				n.setInitial(true);
 				repaint();
 			}
 

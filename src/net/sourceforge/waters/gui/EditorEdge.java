@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.11 2005-03-03 23:29:33 flordal Exp $
+//# $Id: EditorEdge.java,v 1.12 2005-03-04 03:52:47 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -33,8 +33,11 @@ public class EditorEdge
 	extends EditorObject
 {
 	private int angle;
-	EditorObject startNode;
-	EditorNode endNode;
+	/** The start can be either a node or a nodegroup. */
+	private EditorObject startNode; 
+	/** The end is a node. */
+	private EditorNode endNode;
+
 	private Point2D.Double tPoint;
 
 	/** Boolean keeping track of whether the edge is a straight line or not. */
@@ -133,13 +136,14 @@ public class EditorEdge
 		}
 
 		// Initialize the edge
-		updateControlPoint(getCPointX(), getCPointY(), false);
+		//updateControlPoint(getCPointX(), getCPointY(), false);
 
 		type = EDGE;
 	}
 
 	public double getCPointX()
 	{
+		double result;
 		if (proxy.getSource() == proxy.getTarget())
 		{
 			return tPoint.getX();
@@ -160,42 +164,22 @@ public class EditorEdge
 
 	public Point2D.Double getCPoint()
 	{
-		if (proxy.getSource() == proxy.getTarget())
-		{
-			return (new Point2D.Double(tPoint.getX(), tPoint.getY()));
-		}
-
-		return (new Point2D.Double((2 * tPoint.getX() - (start.getX() + endNode.getX()) / 2), (2 * tPoint.getY() - (start.getY() + endNode.getY()) / 2)));
+		return (new Point2D.Double(getCPointX(), getCPointY()));
 	}
 
 	public void setCPointX(double x)
 	{
-		if (proxy.getSource() == proxy.getTarget())
-		{
-			setTPoint(x, tPoint.getY());
-		}
-
-		setTPoint(.25 * (start.getX() + 2 * x + endNode.getX()), tPoint.getY());
+		setCPoint(x, tPoint.getY());
 	}
 
 	public void setCPointY(double y)
 	{
-		if (proxy.getSource() == proxy.getTarget())
-		{
-			setTPoint(tPoint.getX(), y);
-		}
-
-		setTPoint(tPoint.getX(), .25 * (start.getY() + 2 * y + endNode.getY()));
+		setCPoint(tPoint.getX(), y);
 	}
 
 	public void setCPoint(Point2D.Double p)
 	{
-		if (proxy.getSource() == proxy.getTarget())
-		{
-			setTPoint(p.getX(), p.getY());
-		}
-
-		setTPoint(.25 * (start.getX() + 2 * p.getX() + endNode.getX()), .25 * (start.getY() + 2 * p.getY() + endNode.getY()));
+		setCPoint(p.getX(), p.getY());
 	}
 
 	public void setCPoint(double x, double y)
@@ -204,7 +188,7 @@ public class EditorEdge
 		{
 			setTPoint(x, y);
 		}
-
+		
 		setTPoint(.25 * (start.getX() + 2 * x + endNode.getX()), .25 * (start.getY() + 2 * y + endNode.getY()));
 	}
 
@@ -453,7 +437,7 @@ public class EditorEdge
 		if (startNode == endNode)
 		{
 			straight = false;
-
+			
 			tPoint.setLocation(x, y);
 		}
 		else
@@ -461,13 +445,13 @@ public class EditorEdge
 			if (onLine(x, y))
 			{
 				straight = true;
-
+				
 				tPoint.setLocation((double) ((start.getX() + endNode.getX()) / 2), (double) ((start.getY() + endNode.getY()) / 2));
 			}
 			else
 			{
 				straight = false;
-
+				
 				tPoint.setLocation(x, y);
 			}
 		}
@@ -524,7 +508,10 @@ public class EditorEdge
 			Newy = endNode.getY() - start.getY();
 		}
 
+		// If ox and oy are 0, this becomes 0...
 		double divide = Math.pow(ox, 2) + Math.pow(oy, 2);
+
+		// ... which is not good here!
 		double a1 = (Newx * ox + oy * Newy) / divide;
 		double a2 = ((oy * Newx) - (ox * Newy)) / divide;
 		double a3 = -a2;
@@ -546,6 +533,7 @@ public class EditorEdge
 			Cy += start.getY();
 		}
 
+		// This is where it sometimes goes wrong... Cx and Cy sometimes becomes NaN...
 		setTPoint(Cx, Cy);
 	}
 
@@ -785,8 +773,8 @@ public class EditorEdge
 		if (source.isEmpty() && (dragT || dragS))
 		{
 			int x1 = (int) source.getCenterX();
-			int x2 = (int) target.getCenterX();
 			int y1 = (int) source.getCenterY();
+			int x2 = (int) target.getCenterX();
 			int y2 = (int) target.getCenterY();
 			
 			g2d.drawLine(x1, y1, x2, y2);
@@ -799,25 +787,44 @@ public class EditorEdge
 			g2d.draw((Arc2D.Double) a.get(0));
 			g2d.draw((Line2D.Double) a.get(1));
 			g2d.draw((Line2D.Double) a.get(2));
-			drawArrow(getCPointX(), getCPointY(), start.getX(), start.getY(), (int) getTPointX(), (int) getTPointY(), true, g2d);
+			drawArrow(getCPointX(), getCPointY(), 
+					  start.getX(), start.getY(), 
+					  (int) getTPointX(), (int) getTPointY(), 
+					  true, g2d);
 		}
 		else
 		{
 			//controlPointX = ((start.getX() + endNode.getX())/2);
 			//controlPointY = ((start.getY() + endNode.getY())/2);
-			g2d.draw(new QuadCurve2D.Double(start.getX(), start.getY(), getCPointX(), getCPointY(), endNode.getX(), endNode.getY()));
-			
+			/*
+			System.err.println("---------------");
+			System.err.println("" + start.getX());
+			System.err.println("" + start.getY());
+			System.err.println("" + getCPointX());
+			System.err.println("" + getCPointY());
+			System.err.println("" + endNode.getX());
+			System.err.println("" + endNode.getY());
+			*/
+			g2d.draw(new QuadCurve2D.Double(start.getX(), start.getY(), 
+											getCPointX(), getCPointY(), 
+											endNode.getX(), endNode.getY()));
+
 			if (startNode.getType() == NODE)
 			{
-				findIntersection(source, new Point2D.Double(start.getX(), start.getY()), new Point2D.Double((double) getCPointX(), (double) getCPointY()));
+				findIntersection(source, new Point2D.Double(start.getX(), start.getY()), 
+								 new Point2D.Double((double) getCPointX(), (double) getCPointY()));
 			}
 			else
 			{
-				source.setFrameFromCenter(start.getX(), start.getY(), start.getX() + WIDTHD, start.getY() + WIDTHD);
+				source.setFrameFromCenter(start.getX(), start.getY(), 
+										  start.getX() + WIDTHD, start.getY() + WIDTHD);
 			}
 			
-			findIntersection(target, new Point2D.Double(endNode.getX(), endNode.getY()), new Point2D.Double((double) getCPointX(), (double) getCPointY()));
-			drawArrow(start.getX(), start.getY(), endNode.getX(), endNode.getY(), (int) getTPointX(), (int) getTPointY(), false, g2d);
+			findIntersection(target, new Point2D.Double(endNode.getX(), endNode.getY()), 
+							 new Point2D.Double((double) getCPointX(), (double) getCPointY()));
+			drawArrow(start.getX(), start.getY(), 
+					  endNode.getX(), endNode.getY(), 
+					  (int) getTPointX(), (int) getTPointY(), false, g2d);
 		}
 		
 		if (isSelected())
