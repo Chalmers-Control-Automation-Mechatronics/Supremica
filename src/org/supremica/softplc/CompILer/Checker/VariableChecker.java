@@ -113,7 +113,8 @@ public class VariableChecker implements SimpleNodeVisitor {
     }
 
 
-    public Object visitJAVA_BLOCK_DECLARATION(             
+
+    public Object visitJAVA_BLOCK_DECLARATION(
 								ASTjava_block_declaration n,
 								Object o){
 
@@ -259,8 +260,6 @@ public class VariableChecker implements SimpleNodeVisitor {
 	public Object visitVARIABLE(ASTvariable n, Object o) throws Exception{
 		String typeName = null;
 
-
-
 		if (!n.isDirectVariable()) {
 
 			/*
@@ -285,6 +284,10 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 					typeName = (String)fbVariables.get(n.getName());
 
+				}
+			else
+				{
+					System.out.println("*** Fel i visitVariable");
 				}
 
 			n.setTypeName(typeName);
@@ -332,13 +335,24 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 
     public Object visitFB_NAME(ASTfb_name n, Object o){
-		if (symbolicVariables.containsKey(n.getName())) {
+		String typeName = null;
 
-			n.setTypeName((String)symbolicVariables.get(n.getName()));
-		}
-
-			return null;
-		}
+		if (((VCinfo)o).blockType == "functionBlock") {
+			Hashtable fbVariables = (Hashtable)functionBlocks.get(((VCinfo)o).functionBlockName);
+			if (!fbVariables.containsKey(n.getName())) {
+				System.out.println("*** Undeclared variable: " + n.getName());
+			} else {
+				typeName = (String)fbVariables.get(n.getName());
+				n.setTypeName(typeName);
+			}
+		} else
+			{
+				if (symbolicVariables.containsKey(n.getName())) {
+					n.setTypeName((String)symbolicVariables.get(n.getName()));
+				}
+			}
+		return null;
+	}
 
 
 
@@ -350,6 +364,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 				for (int i=0; i < children.length; i++) {
 					SimpleNode c = (SimpleNode)children[i];
 					if (c != null) {
+						((VCinfo)o).childIndex = i;
 						c.visit(this, o);
 					}
 				}
@@ -673,12 +688,20 @@ public class VariableChecker implements SimpleNodeVisitor {
 	public Object visitIL_FB_CALL(ASTil_fb_call n, Object o) {
         Node[] children = n.getChildren();
 		if (children != null) {
+			int childNum = children.length + 1;
+
 			for (int i=0; i < children.length; i++) {
 				SimpleNode c = (SimpleNode)children[i];
 				if (c != null) {
 					c.visit(this, o);
 				}
 			}
+
+			/*
+			if (childNum > 2) {
+
+			}
+			*/
 		}
         return null;
 
@@ -867,6 +890,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 		public String  blockType;
 		public String  functionBlockName;
 		public int     pass;
+		public int     childIndex;
 
 		public VCinfo() {
 			pass = 1;

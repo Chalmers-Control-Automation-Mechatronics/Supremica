@@ -31,4 +31,6 @@ public interface Node
 
 	/** Return the number of children the node has. */
 	int jjtGetNumChildren();
+
+	void jjtInsertChild(Node n, int i);
 }

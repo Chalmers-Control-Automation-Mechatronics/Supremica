@@ -55,6 +55,24 @@ public class SimpleNode
 		children[i] = n;
 	}
 
+
+	public void jjtInsertChild(Node n, int i){
+		{
+			Node c[] = new Node[children.length];
+
+			if (i == 0) {
+				System.arraycopy(children, 0, c, 1, children.length);
+			} else {
+				System.arraycopy(children, 0, c, 0, i);
+				System.arraycopy(children, i, c, i+1, children.length-i);
+			}
+
+			children = c;
+		}
+		children[i] = n;
+	};
+
+
 	public Node jjtGetChild(int i)
 	{
 		return children[i];
@@ -72,7 +90,7 @@ public class SimpleNode
 	 *  customize the way the node appears when the tree is dumped.  If
 	 *  your output uses more than one line you should override
 	 *  toString(String), otherwise overriding toString() is probably all
-	 *  you need to do. 
+	 *  you need to do.
 	 */
 	public String toString()
 	{
@@ -86,7 +104,7 @@ public class SimpleNode
 
 	/*
 	 * Override this method if you want to customize how the node dumps
-	 *  out its children. 
+	 *  out its children.
 	 */
 	public void dump(String prefix)
 	{

@@ -1750,7 +1750,7 @@ void instance_specific_init() :
 void instruction_list() #void :
 {}
 {
-	(il_instruction())+
+	(il_instruction())*
 }
 
 

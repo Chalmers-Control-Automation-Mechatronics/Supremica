@@ -6280,7 +6280,6 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
   static final public void instruction_list() throws ParseException {
     label_36:
     while (true) {
-      il_instruction();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case il_call_op:
       case il_call_java_op:
@@ -6295,6 +6294,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
         jj_la1[142] = jj_gen;
         break label_36;
       }
+      il_instruction();
     }
   }
 
@@ -9834,7 +9834,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
 
   static private boolean jj_initialized_once = false;
   static public parserTokenManager token_source;
-  static SimpleCharStream jj_input_stream;
+  static ASCII_CharStream jj_input_stream;
   static public Token token, jj_nt;
   static private int jj_ntk;
   static private Token jj_scanpos, jj_lastpos;
@@ -9859,7 +9859,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
       throw new Error();
     }
     jj_initialized_once = true;
-    jj_input_stream = new SimpleCharStream(stream, 1, 1);
+    jj_input_stream = new ASCII_CharStream(stream, 1, 1);
     token_source = new parserTokenManager(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
@@ -9887,7 +9887,7 @@ public class parser/*@bgen(jjtree)*/implements parserTreeConstants, parserConsta
       throw new Error();
     }
     jj_initialized_once = true;
-    jj_input_stream = new SimpleCharStream(stream, 1, 1);
+    jj_input_stream = new ASCII_CharStream(stream, 1, 1);
     token_source = new parserTokenManager(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
