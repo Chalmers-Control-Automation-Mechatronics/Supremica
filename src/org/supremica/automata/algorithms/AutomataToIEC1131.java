@@ -334,18 +334,17 @@ public class AutomataToIEC1131
 
 	}
 */
-	public void serialize_StructuredText(PrintWriter pw)
+	public void serializeStructuredText(PrintWriter pw)
 		throws Exception
 	{
 		initialize();
 		printComputeEnabledEventsAsST(pw);
 	}
-/*
-	public void serialize_InstructionList(PrintWriter pw)
+
+	public void serializeInstructionList(PrintWriter pw)
 		throws Exception
 	{
 		initialize();
-		printComputeEnabledEventsInstructionList(pw);
+	//	printComputeEnabledEventsInstructionList(pw);
 	}
-*/
 }

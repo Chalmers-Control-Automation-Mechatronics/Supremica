@@ -1842,12 +1842,11 @@ public class ActionMan
 			return;
 		}
 
-		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
+		JFileChooser fileExporter = FileDialogs.getSTFileExporter();
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = fileExporter.getSelectedFile();
-			//File currFile = Utility.getFile(fileExporter);
 
 			if (currFile != null)
 			{
@@ -1857,39 +1856,68 @@ public class ActionMan
 
 					try
 					{
-						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedAutomata);
-						String pathName = currFile.getAbsolutePath();
 
-						if (pathName.endsWith(".prj"))
-						{
-							prefixName = pathName.substring(0, pathName.length() - 4);
-						}
-						else
-						{
-							prefixName = pathName;
-						}
+						SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata, synchronizationOptions);
 
-						File appFile = new File(prefixName + ".app");
-						//PrintWriter pw_app = new PrintWriter(new FileWriter(prefixName + ".app"));
-						PrintWriter pw_prj = new PrintWriter(new FileWriter(prefixName + ".prj"));
-						// These are not necessary?
-						//PrintWriter pw_prc = new PrintWriter(new FileWriter(prefixName + ".prc"));
-						//PrintWriter pw_wsp = new PrintWriter(new FileWriter(prefixName + ".wsp"));
+						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
-						exporter.serialize_app(appFile);
-						//exporter.serialize_app(pw_app);
-						exporter.serialize_prj(pw_prj);
-						//exporter.serialize_prc(pw_prc);
-						//exporter.serialize_wsp(pw_wsp);
-						//pw_app.close();
-						pw_prj.close();
-						//pw_prc.close();
-						//pw_wsp.close();
+						exporter.serializeStructuredText(theWriter);
+
+						theWriter.close();
+
 					}
 					catch (Exception ex)
 					{
 						ex.printStackTrace();
-						gui.error("Exception while generating ControlBuilder code to files " + prefixName + "{\".prj\", \".app\"}");
+						gui.error("Exception while generating 1131 Structured text code to file " + currFile.getAbsolutePath());
+					}
+				}
+			}
+		}
+	}
+
+	// Generate 1131 Instruction List
+	public static void AutomataTo1131IL(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getILFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String prefixName = null;
+
+					try
+					{
+
+						SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata, synchronizationOptions);
+
+						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
+
+						exporter.serializeInstructionList(theWriter);
+
+						theWriter.close();
+
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						gui.error("Exception while generating 1131 Instruction list code to file " + currFile.getAbsolutePath());
 					}
 				}
 			}
