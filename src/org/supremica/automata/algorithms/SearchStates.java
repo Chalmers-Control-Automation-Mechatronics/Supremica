@@ -77,8 +77,8 @@ public class SearchStates
 	{
 		if (!stopRequested)
 		{
-			int num_total = syncher.getNumberOfStates();
-			int num_processed = 0;
+			long num_total = syncher.getNumberOfStates();
+			long num_processed = 0;
 
 			// Note the difference between the two getStateIterator.
 			// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...

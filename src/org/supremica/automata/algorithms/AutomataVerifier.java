@@ -1218,8 +1218,9 @@ public class AutomataVerifier
 	throws Exception 
     {
 	Automata unselected = ActionMan.getGui().getUnselectedAutomata();
-	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, unselected);
+	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, unselected, synchHelper.getHelperData() );
 	boolean ret = abf.passLanguageInclusion();
+
 	abf.cleanup();
 	return ret;
 
@@ -1234,7 +1235,7 @@ public class AutomataVerifier
     private boolean BDDControllabilityVerification()
 	throws Exception 
     {
-	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
+	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
 	boolean ret = abf.isControllable();
 	abf.cleanup();
 	return ret;
@@ -1249,7 +1250,7 @@ public class AutomataVerifier
     private boolean BDDNonBlockingVerification()
 	throws Exception
     {
-	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
+	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
 	boolean ret = abf.isNonBlocking();
 	abf.cleanup();
 	return ret;

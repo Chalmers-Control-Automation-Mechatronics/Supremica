@@ -392,7 +392,7 @@ public final class AutomataSynchronizerHelper
 
 		if ((executionDialog != null) && (helperData.nbrOfCheckedStates % 2000 == 0))
 		{
-			executionDialog.setValue(helperData.nbrOfCheckedStates);
+			executionDialog.setValue((int)helperData.nbrOfCheckedStates);
 		}
 	}
 
@@ -489,7 +489,7 @@ public final class AutomataSynchronizerHelper
 		return theStates.iterator();
 	}
 
-	public int getNumberOfAddedStates()
+	public long getNumberOfAddedStates()
 	{
 		return helperData.nbrOfAddedStates;
 	}
@@ -901,31 +901,51 @@ public final class AutomataSynchronizerHelper
 	
 	public class HelperData
 	{
-		public int nbrOfAddedStates = 0;
-		public int nbrOfCheckedStates = 0;
-		public int nbrOfForbiddenStates = 0;
-		public int nbrOfDeadlockedStates = 0;
+		public long nbrOfAddedStates = 0;
+		public long nbrOfCheckedStates = 0;
+		public long nbrOfForbiddenStates = 0;
+		public long nbrOfDeadlockedStates = 0;
 
 		public HelperData() {}
 
-		public int getNumberOfReachableStates()
+		public long getNumberOfReachableStates()
 		{
 			return nbrOfAddedStates;
 		}
 
-		public int getNumberOfCheckedStates()
+		public long getNumberOfCheckedStates()
 		{
 			return nbrOfCheckedStates;
 		}
 
-		public int getNumberOfForbiddenStates()
+		public long getNumberOfForbiddenStates()
 		{
 			return nbrOfForbiddenStates;
 		}
 
-		public int getNumberOfDeadlockedStates()
+		public long getNumberOfDeadlockedStates()
 		{
 			return nbrOfDeadlockedStates;
+		}
+
+	    	public void setNumberOfReachableStates(long n)
+		{
+		    nbrOfAddedStates = n;
+		}
+
+		public void setNumberOfCheckedStates(long n)
+		{
+		    nbrOfCheckedStates = n;
+		}
+
+		public void setNumberOfForbiddenStates(long n)
+		{
+		    nbrOfForbiddenStates = n;
+		}
+
+		public void setNumberOfDeadlockedStates(long n)
+		{
+		    nbrOfDeadlockedStates = n;
 		}
 	}
 }

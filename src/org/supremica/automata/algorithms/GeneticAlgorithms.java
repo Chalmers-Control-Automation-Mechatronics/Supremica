@@ -184,7 +184,7 @@ public class GeneticAlgorithms
 		}
 
 		// The correct value, the number of states in the synchronization
-		return theSynchronizer.getNumberOfStates();
+		return (int) theSynchronizer.getNumberOfStates();
 	}
 
 	/**

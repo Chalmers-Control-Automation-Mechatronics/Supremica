@@ -13,6 +13,7 @@ import java.util.*;
  */
 
 public class AutomataBDDVerifier {
+    private AutomataSynchronizerHelper.HelperData hd;
     private  org.supremica.automata.Automata theAutomata;
     private BDDAutomata ba = null;
     private Supervisor sup = null;
@@ -23,10 +24,12 @@ public class AutomataBDDVerifier {
      * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
      * @see cleanup()
      */
-    public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata) 
+    public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata, 
+			        AutomataSynchronizerHelper.HelperData hd) 
 	throws Exception
     {
 	this.theAutomata = theAutomata;
+	this.hd          = hd;
 
 	try {
 	    Builder bu = new Builder(theAutomata);
@@ -47,9 +50,11 @@ public class AutomataBDDVerifier {
      * @see cleanup()
      */
     public AutomataBDDVerifier(org.supremica.automata.Automata selected,
-			       org.supremica.automata.Automata unselected) 
+			       org.supremica.automata.Automata unselected,
+			       AutomataSynchronizerHelper.HelperData hd) 
 	throws Exception
     {
+	this.hd     = hd;
 	theAutomata = new org.supremica.automata.Automata();
 	theAutomata.addAutomata(selected);
 	theAutomata.addAutomata(unselected);
@@ -62,7 +67,7 @@ public class AutomataBDDVerifier {
 	    Group g2 = new Group(ba, all, new AutomatonMembership(selected), "Selected");
 	    Group g1 = new Group(ba, all, new AutomatonMembership(unselected), "Unselected");
 
-	    sup = SupervisorFactory.createSupervisor(ba, g1, g2);
+	    sup = SupervisorFactory.createSupervisor(ba, g1, g2);	    
 	} catch(Exception pass) {
 	    cleanup();
 	    throw pass;
@@ -81,6 +86,8 @@ public class AutomataBDDVerifier {
     }
 
 
+
+
     /**
      *  BDD liveness check
      *
@@ -88,14 +95,18 @@ public class AutomataBDDVerifier {
      */
     public boolean isNonBlocking() {
 	boolean is_nonblocking = true;
+
 	int r = sup.getReachables();  
+	hd.setNumberOfReachableStates(ba.count_states(r));
+
 	int c = sup.getCoReachables();
 
 	int not_c = ba.not(c);
 	int intersection = ba.and(r, not_c);
 
+	hd.setNumberOfDeadlockedStates(ba.count_states(not_c));
+	hd. setNumberOfCheckedStates(ba.count_states(intersection));
 
-	
 	// DEBUG
 	// System.out.println("Reachables:" );
 	// ba.show_states(r);
@@ -111,8 +122,10 @@ public class AutomataBDDVerifier {
 	    }
 	}
 
+
 	ba.recursiveDeref(intersection);
 	ba.recursiveDeref(not_c);
+
 	return is_nonblocking;
     }
 
@@ -123,11 +136,20 @@ public class AutomataBDDVerifier {
      */
     public boolean isControllable() {
 	int Q_u = sup.getReachableUncontrollables();
-	Q_u = ba.removeDontCareS(Q_u);
-	boolean is_controllable = ba.getZero() == Q_u;
-	if(!is_controllable) {	  
-	    
+	// Q_u = ba.removeDontCareS(Q_u);
 
+
+
+	// get statistics
+	int Q_c = sup.getUncontrollableStates();
+	int Q_r = sup.getReachables();
+
+	hd.setNumberOfForbiddenStates(ba.count_states(Q_u));
+	hd.setNumberOfCheckedStates(ba.count_states(Q_c));
+	hd.setNumberOfReachableStates(ba.count_states(Q_r));
+
+	boolean is_controllable = ba.getZero() == Q_u;
+	if(!is_controllable) {	  	    
 	    if(Options.trace_on) {
 		// show all uncontrollable states...
 		// System.out.println("Uncontrollable states");
@@ -136,8 +158,10 @@ public class AutomataBDDVerifier {
 		sup.trace_set("uncontrollable", Q_u, 1);
 	    }
 	}
+
 	
 
+	
 	return is_controllable;
 
     }
@@ -152,10 +176,20 @@ public class AutomataBDDVerifier {
 	int states = sup.computeReachableLanguageDifference();
 	boolean ret = (states == ba.getZero());
 
+
+
+	// get statistics
+
+	int Q_r = sup.getReachables();
+	hd.setNumberOfCheckedStates(ba.count_states(states));
+	hd.setNumberOfReachableStates(ba.count_states(Q_r));
+
 	if(!ret && Options.trace_on) 
 	    sup.trace_set("Language Inclusion counterexample", states, 1);            
-	
+
+
 	ba.recursiveDeref(states);
+
 	return ret;
 
     }
