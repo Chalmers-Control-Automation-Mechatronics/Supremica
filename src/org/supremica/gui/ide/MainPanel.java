@@ -6,6 +6,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import java.awt.Dimension;
 import java.awt.Component;
+import javax.swing.JComponent;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import org.supremica.gui.WhiteScrollPane;
@@ -64,9 +65,9 @@ class MainPanel
 		return; //Default is to do nothing
 	}
 
-	public void setRightComponent(Component newComponent)
+	public void setRightComponent(JComponent newComponent)
 	{
-		Component oldComponent = getRightComponent();
+		JComponent oldComponent = getRightComponent();
 		if (oldComponent != newComponent)
 		{
 			JScrollPane emptyRightPanel = getEmptyRightPanel();
@@ -94,9 +95,9 @@ class MainPanel
 		validate();
 	}
 
-	public Component getRightComponent()
+	public JComponent getRightComponent()
 	{
-		return splitPanelHorizontal.getRightComponent();
+		return (JComponent)splitPanelHorizontal.getRightComponent();
 	}
 
 	public JScrollPane getEmptyRightPanel()
