@@ -2,22 +2,62 @@
 
 <animation width="395" height="714">
 
+	<behaviour id="input1.go" algorithm="Track" event="input1.end">
+		<param name="pointCount" value="5" />
+
+		<param name="point" index="0" value="(80,41)" />
+		<param name="duration" index="0" value="1" />
+		<param name="event" index="0" value="input1.end" />
+
+		<param name="point" index="1" value="(46,48)" />
+		<param name="duration" index="1" value="1" />
+		
+		<param name="point" index="2" value="(46,22)" />
+		<param name="duration" index="2" value="1" />
+		
+		<param name="point" index="3" value="(80,22)" />
+		<param name="duration" index="3" value="1" />		
+		<param name="event" index="3" value="input1.end" />
+		
+		<param name="point" index="4" value="(80,41)" />	
+	</behaviour>
+
+	<behaviour id="input3.go" algorithm="Track" event="input3.end">
+		<param name="pointCount" value="5" />
+
+		<param name="point" index="0" value="(46,166)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(46,142)" />
+		<param name="duration" index="1" value="1" />
+		
+		<param name="point" index="2" value="(81,142)" />
+		<param name="duration" index="2" value="1" />
+		<param name="event" index="2" value="input3.end" />
+		
+		<param name="point" index="3" value="(81,160)" />
+		<param name="duration" index="3" value="1" />		
+		<param name="event" index="3" value="input3.end" />
+		
+		<param name="point" index="4" value="(46,166)" />	
+	</behaviour>
+	
 	<behaviour id="agv1.go" algorithm="Track" event="agv1.end">
 		<param name="pointCount" value="11" />
 
 		<param name="point" index="0" value="(101,41)" />
-		<param name="duration" index="0" value="1" />
+		<param name="duration" index="0" value="0.5" />
 
 		<param name="point" index="1" value="(101,84)" />
-		<param name="duration" index="1" value="1" />
+		<param name="duration" index="1" value="0.5" />
 		<param name="event" index="1" value="agv1.end" />
 		
-		<param name="point" index="2" value="(107,84)" />
+		<param name="point" index="2" value="(126,84)" />
 		<param name="duration" index="2" value="1" />
 		<param name="event" index="2" value="agv1.end" />
 		
 		<param name="point" index="3" value="(169,84)" />
-		<param name="duration" index="3" value="1" />		
+		<param name="duration" index="3" value="3" />		
 
 		<param name="point" index="4" value="(327,84)" />
 		<param name="duration" index="4" value="1" />
@@ -27,7 +67,7 @@
 		<param name="duration" index="5" value="1" />
 
 		<param name="point" index="6" value="(327,24)" />
-		<param name="duration" index="6" value="1" />
+		<param name="duration" index="6" value="3" />
 		<param name="event" index="6" value="agv1.end" />
 
 		<param name="point" index="7" value="(169,24)" />		
@@ -35,10 +75,10 @@
 		<param name="event" index="7" value="agv1.end" />
 
 		<param name="point" index="8" value="(126,24)" />
-		<param name="duration" index="8" value="1" />
+		<param name="duration" index="8" value="0.5" />
 
 		<param name="point" index="9" value="(101,24)" />
-		<param name="duration" index="9" value="1" />
+		<param name="duration" index="9" value="0.5" />
 		<param name="event" index="9" value="agv1.end" />
 		
 		<param name="point" index="10" value="(101,41)" />		
@@ -304,12 +344,30 @@
 		<param name="point" index="16" value="(272,640)" />	
 	</behaviour>
 
+	<define id="input1_primitive">
+		<compose id ="input1_primitive_switch" type = "switch">
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part1.gif"/>
+				<param name =  "hotspot" value = "(13,4)"/>
+			</primitive>
+			<primitive type="null"/>
+		</compose>
+	</define>
+	<define id="input3_primitive">
+		<compose id ="input3_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(13,4)"/>
+			</primitive>
+		</compose>
+	</define>
 	<define id="agv1_primitive">
 		<primitive type = "sprite">
 			<param name = "src" value = "image/agv_red.gif"/>
 			<param name = "hotspot" value = "(18,10)"/>
 		</primitive>
-	</define>
+	</define>	
 	<define id="agv2_primitive">
 		<primitive type = "sprite">
 			<param name = "src" value = "image/agv_yellow.gif"/>
@@ -333,16 +391,116 @@
 			<param name = "src" value = "image/agv_green.gif"/>
 			<param name = "hotspot" value = "(18,10)"/>
 		</primitive>
-	</define>	
-	
+	</define>		
 	<define id="background_primitive">
 		<primitive type = "sprite">
 			<param name = "src" value ="image/agv_plant.gif"/>
 			<param name="hotspot" value="(0,0)"/>
 		</primitive>
 	</define>
-
+	<define id="agv1_part1_primitive">
+		<compose id ="agv1_part1_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part1.gif"/>
+				<param name =  "hotspot" value = "(11,12)"/>
+			</primitive>
+		</compose>
+	</define>	
+	<define id="agv2_part1_primitive">
+		<compose id ="agv2_part1_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part1.gif"/>
+				<param name =  "hotspot" value = "(11,12)"/>
+			</primitive>
+		</compose>
+	</define>
+	<define id="agv3_part2_primitive">
+		<compose id ="agv3_part2_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(11,12)"/>
+			</primitive>
+		</compose>
+	</define>
+	<define id="agv4_part2_primitive">
+		<compose id ="agv4_part2_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(11,12)"/>
+			</primitive>
+		</compose>
+	</define>
+	<define id="agv5_part2_primitive">
+		<compose id ="agv5_part2_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(11,16)"/>
+			</primitive>
+		</compose>
+	</define>
+	<define id="agv5_part1_primitive">
+		<compose id ="agv5_part1_primitive_switch" type = "switch">
+			<primitive type="null"/>
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part1.gif"/>
+				<param name =  "hotspot" value = "(11,12)"/>
+			</primitive>
+		</compose>
+	</define>	
 	<draw>
+		<transform type = "translate">
+			<param name ="x" value ="80"/>
+			<param name ="y" value ="41"/>
+			<animate param = "translation" behaviour = "input1.go"/>
+			<paste object = "input1_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="46"/>
+			<param name ="y" value ="166"/>
+			<animate param = "translation" behaviour = "input3.go"/>
+			<paste object = "input3_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="101"/>
+			<param name ="y" value ="41"/>
+			<animate param = "translation" behaviour = "agv1.go"/>
+			<paste object = "agv1_part1_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="272"/>
+			<param name ="y" value ="328"/>
+			<animate param = "translation" behaviour = "agv2.go"/>
+			<paste object = "agv2_part1_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="272"/>
+			<param name ="y" value ="406"/>
+			<animate param = "translation" behaviour = "agv3.go"/>
+			<paste object = "agv3_part2_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="153"/>
+			<param name ="y" value ="478"/>
+			<animate param = "translation" behaviour = "agv4.go"/>
+			<paste object = "agv4_part2_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="272"/>
+			<param name ="y" value ="640"/>
+			<animate param = "translation" behaviour = "agv5.go"/>
+			<paste object = "agv5_part1_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="272"/>
+			<param name ="y" value ="640"/>
+			<animate param = "translation" behaviour = "agv5.go"/>
+			<paste object = "agv5_part2_primitive" /> 
+		</transform>
 		<transform type = "translate">
 			<param name ="x" value ="101"/>
 			<param name ="y" value ="41"/>
@@ -378,17 +536,56 @@
 
 	<!-- The commands -->
 
+	<!-- Input 1 Commands -->
+	<command name="input1.addpart">
+		<announce event = "~input1.end"/>
+		<set object="input1_primitive_switch" param="current" value="0" />
+		<start behaviour="input1.go"/>
+	</command>
+	<command name="input1.removepart">
+		<announce event = "~input1.end"/>
+		<set object="input1_primitive_switch" param="current" value="1" />
+		<reset behaviour="input1.go"/>
+		<start behaviour="input1.go"/>
+	</command>	
+	<event object="input1.go" event="input1.end">
+		<announce event="input1.end"/>
+		<stop behaviour = "input1.go"/>
+	</event>
+
+	<!-- Input 3 Commands -->
+	<command name="input3.addpart">
+		<announce event = "~input3.end"/>
+		<set object="input3_primitive_switch" param="current" value="1" />
+		<start behaviour="input3.go"/>
+	</command>
+	<command name="input3.removepart">
+		<announce event = "~input3.end"/>
+		<set object="input3_primitive_switch" param="current" value="0" />
+		<reset behaviour="input3.go"/>
+		<start behaviour="input3.go"/>
+	</command>	
+	<event object="input3.go" event="input3.end">
+		<announce event="input3.end"/>
+		<stop behaviour = "input3.go"/>
+	</event>
 
 	<!-- AGV 1 Commands -->
-	<command name="agv1.reset">
-		<announce event = "~agv1.end"/>
-		<reset behaviour="agv1.go"/>
-		<start behaviour="agv1.go"/>
-	</command>
 	<command name="agv1.go">
 		<announce event = "~agv1.end"/>
 		<start behaviour="agv1.go"/>
 	</command>
+	<command name="agv1.reset">
+		<announce event = "~agv1.end"/>
+		<set object="agv1_part1_primitive_switch" param="current" value="1" />
+		<reset behaviour="agv1.go"/>
+		<start behaviour="agv1.go"/>
+	</command>
+	<command name="agv1.removepart">
+		<announce event = "~agv1.end"/>
+		<set object="agv1_part1_primitive_switch" param="current" value="0" />
+		<start behaviour="agv1.go"/>
+	</command>	
 	<event object="agv1.go" event="agv1.end">
 		<announce event="agv1.end"/>
 		<stop behaviour = "agv1.go"/>
@@ -402,6 +599,16 @@
 	</command>
 	<command name="agv2.go">
 		<announce event = "~agv2.end"/>
+		<start behaviour="agv2.go"/>
+	</command>
+	<command name="agv2.addpart">
+		<announce event = "~agv2.end"/>
+		<set object="agv2_part1_primitive_switch" param="current" value="1" />
+		<start behaviour="agv2.go"/>
+	</command>
+	<command name="agv2.removepart">
+		<announce event = "~agv2.end"/>
+		<set object="agv2_part1_primitive_switch" param="current" value="0" />
 		<start behaviour="agv2.go"/>
 	</command>
 	<event object="agv2.go" event="agv2.end">
@@ -419,6 +626,16 @@
 		<announce event = "~agv3.end"/>
 		<start behaviour="agv3.go"/>
 	</command>
+	<command name="agv3.addpart">
+		<announce event = "~agv3.end"/>
+		<set object="agv3_part2_primitive_switch" param="current" value="1" />
+		<start behaviour="agv3.go"/>
+	</command>
+	<command name="agv3.removepart">
+		<announce event = "~agv3.end"/>
+		<set object="agv3_part2_primitive_switch" param="current" value="0" />
+		<start behaviour="agv3.go"/>
+	</command>
 	<event object="agv3.go" event="agv3.end">
 		<announce event="agv3.end"/>
 		<stop behaviour = "agv3.go"/>
@@ -434,6 +651,16 @@
 		<announce event = "~agv4.end"/>
 		<start behaviour="agv4.go"/>
 	</command>
+	<command name="agv4.addpart">
+		<announce event = "~agv4.end"/>
+		<set object="agv4_part2_primitive_switch" param="current" value="1" />
+		<start behaviour="agv4.go"/>
+	</command>
+	<command name="agv4.removepart">
+		<announce event = "~agv4.end"/>
+		<set object="agv4_part2_primitive_switch" param="current" value="0" />
+		<start behaviour="agv4.go"/>
+	</command>
 	<event object="agv4.go" event="agv4.end">
 		<announce event="agv4.end"/>
 		<stop behaviour = "agv4.go"/>
@@ -447,6 +674,18 @@
 	</command>
 	<command name="agv5.go">
 		<announce event = "~agv5.end"/>
+		<start behaviour="agv5.go"/>
+	</command>
+	<command name="agv5.addpart">
+		<announce event = "~agv5.end"/>
+		<set object="agv5_part1_primitive_switch" param="current" value="1" />
+		<set object="agv5_part2_primitive_switch" param="current" value="1" />		
+		<start behaviour="agv5.go"/>
+	</command>
+	<command name="agv5.removepart">
+		<announce event = "~agv5.end"/>
+		<set object="agv5_part1_primitive_switch" param="current" value="0" />
+		<set object="agv5_part2_primitive_switch" param="current" value="0" />		
 		<start behaviour="agv5.go"/>
 	</command>
 	<event object="agv5.go" event="agv5.end">

@@ -24,8 +24,8 @@
 		<Event id="e31" label="e31" controllable="false"/>
 	</Events>
 	<States>
-		<State id="q0" initial="true" accepting="true"/>
-		<State id="q1" accepting="true"/>
+		<State id="q0" accepting="true"/>
+		<State id="q1" initial="true" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q1" event="e30"/>
@@ -442,12 +442,23 @@
 <Execution>
 	<Actions>
 
+		<!-- Input 1 -->
+		<Action label="e11">
+			<Command command="input1.addpart"/>
+		</Action>
+
+		<!-- Input 3 -->
+		<Action label="e31">
+			<Command command="input3.addpart"/>
+		</Action>
+		
 		<!-- AGV 1 -->
 		<Action label="u11">
 			<Command command="agv1.go"/>
 		</Action>
 		<Action label="e10">
 			<Command command="agv1.reset"/>
+			<Command command="input1.removepart"/>			
 		</Action>
 		<Action label="c1">
 			<Command command="agv1.go"/>
@@ -456,7 +467,8 @@
 			<Command command="agv1.go"/>
 		</Action>
 		<Action label="w23">
-			<Command command="agv1.go"/>
+			<Command command="agv1.removepart"/>
+			<Command command="ws2.addpart"/>			
 		</Action>	
 		<Action label="c2">
 			<Command command="agv1.go"/>
@@ -467,7 +479,8 @@
 			<Command command="agv2.reset"/>
 		</Action>
 		<Action label="w22">
-			<Command command="agv2.go"/>
+			<Command command="agv2.addpart"/>
+			<Command command="ws2.removepart"/>
 		</Action>
 		<Action label="c6">
 			<Command command="agv2.go"/>
@@ -476,7 +489,8 @@
 			<Command command="agv2.go"/>
 		</Action>
 		<Action label="w14">
-			<Command command="agv2.go"/>
+			<Command command="agv2.removepart"/>
+			<Command command="ws1.addpart1"/>
 		</Action>	
 		<Action label="c5">
 			<Command command="agv2.go"/>
@@ -502,7 +516,8 @@
 			<Command command="agv3.go"/>
 		</Action>
 		<Action label="e30">
-			<Command command="agv3.go"/>
+			<Command command="agv3.addpart"/>
+			<Command command="input3.removepart"/>						
 		</Action>
 		<Action label="c3">
 			<Command command="agv3.go"/>
@@ -523,7 +538,8 @@
 			<Command command="agv3.go"/>
 		</Action>
 		<Action label="w32">
-			<Command command="agv3.go"/>
+			<Command command="agv3.removepart"/>
+			<Command command="ws3.addpart"/>
 		</Action>
 		
 		<!-- AGV 4 -->
@@ -540,7 +556,8 @@
 			<Command command="agv4.go"/>
 		</Action>
 		<Action label="w37">
-			<Command command="agv4.go"/>
+			<Command command="agv4.addpart"/>
+			<Command command="ws3.removepart"/>
 		</Action>	
 		<Action label="c8">
 			<Command command="agv4.go"/>
@@ -555,7 +572,8 @@
 			<Command command="agv4.go"/>
 		</Action>
 		<Action label="w15">
-			<Command command="agv4.go"/>
+			<Command command="agv4.removepart"/>
+			<Command command="ws1.addpart2"/>			
 		</Action>	
 		
 		<!-- AGV 5 -->
@@ -569,7 +587,9 @@
 			<Command command="agv5.go"/>
 		</Action>
 		<Action label="w13">
-			<Command command="agv5.go"/>
+			<Command command="agv5.addpart"/>
+			<Command command="ws1.removepart1"/>			
+			<Command command="ws1.removepart2"/>	
 		</Action>
 		<Action label="c9">
 			<Command command="agv5.go"/>
@@ -581,18 +601,29 @@
 			<Command command="agv5.go"/>
 		</Action>
 		<Action label="e20">
-			<Command command="agv5.go"/>
+			<Command command="agv5.removepart"/>
+			<Command command="output.addpart"/>
 		</Action>
 	</Actions>
 	<Controls>
 
+		<!-- Input 1 -->
+		<Control label="e11">
+			<Condition condition="input1.end"/>			
+		</Control>
 
+		<!-- Input 3 -->
+		<Control label="e31">
+			<Condition condition="input3.end"/>			
+		</Control>
+		
 		<!-- AGV 1 -->
 		<Control label="u11">
 			<Condition condition="agv1.end"/>
 		</Control>
 		<Control label="e10">
 			<Condition condition="agv1.end"/>
+			<Condition condition="input1.end"/>			
 		</Control>
 		<Control label="c1">
 			<Condition condition="agv1.end"/>
