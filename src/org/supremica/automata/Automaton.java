@@ -880,7 +880,7 @@ public class Automaton
 		}
 	}
 
-	public void setIndex(int index)
+	void setIndex(int index)
 	{
 		this.index = index;
 	}

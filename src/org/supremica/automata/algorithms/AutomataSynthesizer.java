@@ -464,16 +464,19 @@ public class AutomataSynthesizer
 		currAutomata.addAutomata(theAutomata);
 		currAutomata.addAutomata(tempAutomata);
 
-		AutomataFastControllabilityCheck theFastControllabilityCheck;
+		// AutomataFastControllabilityCheck theFastControllabilityCheck;
+		AutomataVerifier theVerifier;
+		VerificationOptions theVerificationOptions = new VerificationOptions();
+		theVerificationOptions.setVerificationType(VerificationType.Controllability);
 		for (int i = tempAutomata.size() - 1; i >= 0; i--)
 		{
 			currAutomata.removeAutomaton(tempAutomata.getAutomatonAt(i));
 
 			try
 			{
-				theFastControllabilityCheck = new AutomataFastControllabilityCheck(currAutomata, syncOptions);
+				theVerifier = new AutomataVerifier(currAutomata, syncOptions, theVerificationOptions);
 
-				if (theFastControllabilityCheck.execute())
+				if (theVerifier.modularControllabilityVerification())
 				{
 					// This supervisor has no impact, remove it
 					newAutomata.removeAutomaton(newAutomata.getAutomatonAt(i));
