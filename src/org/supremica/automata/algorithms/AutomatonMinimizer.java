@@ -131,11 +131,10 @@ public class AutomatonMinimizer
 		ActionTimer removeTransitionsTimer = new ActionTimer();
 		ActionTimer automataBuildTimer = new ActionTimer();
 
-		/*
 		// Make reachable
         SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
-		synth.doReachable();
+		synth.doReachable(true);
 		LinkedList toBeRemoved = new LinkedList();
 		for (StateIterator it = theAutomaton.stateIterator(); it.hasNext(); )
 		{
@@ -155,7 +154,6 @@ public class AutomatonMinimizer
 		{
 			theAutomaton.removeState((State) toBeRemoved.remove(0));
 		}
-		*/
 
 		if (debug)
 		{

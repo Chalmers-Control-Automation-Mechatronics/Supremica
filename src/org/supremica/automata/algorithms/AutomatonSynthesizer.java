@@ -532,7 +532,19 @@ public class AutomatonSynthesizer
 		return stateStack;
 	}
 
+	/**
+	 * Sets the cost of all non reachable states to State.MAX_COST. Forbidden states 
+	 * stop reachability "synthesis style".
+	 */
 	public void doReachable()
+	{
+		doReachable(false);
+	}
+	/**
+	 * Sets the cost of all non reachable states to State.MAX_COST. The treatment of
+	 * forbidden states as stops for reachability is selectable through the argument.
+	 */
+	public void doReachable(boolean expandForbidden)
 	{
 		logger.debug("AutomatonSynthesizer::doReachable");
 		theAutomaton.clearVisitedStates();
@@ -572,7 +584,7 @@ public class AutomatonSynthesizer
 				State toState = currArc.getToState();
 
 				//if (!toState.isVisited())
-				if ((toState.getCost() != State.MAX_COST) && !toState.isVisited())
+				if (((toState.getCost() != State.MAX_COST) || expandForbidden) && !toState.isVisited())
 				{
 					toState.setVisited(true);
 					stateStack.addLast(toState);
