@@ -261,11 +261,16 @@ public class Automaton
 		return alphabet.getEventWithId(eventId);
 	}
 
-	// FIXA: används inte?
+	public boolean containsEventWithLabel(String eventLabel)
+	{
+		return alphabet.containsEventWithLabel(eventLabel);
+	}
+
+	// FIXA: används inte? Ovanstående är käckt i alla fall.
 	public EventLabel getEventWithLabel(String eventLabel)
 		throws Exception
 	{
-		return alphabet.getEventWithId(eventLabel);
+		return alphabet.getEventWithLabel(eventLabel);
 	}
 
 	public int nbrOfStates()

@@ -1434,6 +1434,7 @@ public class ActionMan
 			{
 				openAutomataXMLFile(g, f);
 			}
+
 		};
 	}
 
@@ -1785,6 +1786,7 @@ public class ActionMan
 					}
 					catch (Exception ex)
 					{
+						ex.printStackTrace();
 						gui.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 					}
 				}
