@@ -84,7 +84,7 @@ public class Specification
 	State E1,E2,E3,E4,E5,E6,E7,E8,E9,E10,E11,E12,E13,E14,E15,E16,E17,E18,E19,E20,E21,E22,E23,E24;
 	Arc EA1,EA2,EA3,EA4,EA5,EA6,EA7,EA8,EA9,EA10,EA11,EA12,EA13,EA14,EA15,EA16,EA17,EA18,EA19,EA20,EA21,EA22,EA23,fr6;
 	State Er2;
-	boolean allowerror =true;   //allow error event or not
+	boolean allowerror = false;   //allow error event or not
 
 	LabeledEvent Error;
 
