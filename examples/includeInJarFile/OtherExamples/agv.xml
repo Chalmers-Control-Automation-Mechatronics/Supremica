@@ -2,7 +2,7 @@
 <!-- Example from Moody/Antsaklis "Superviory Control of 
 	Discrete Event Systems Using Petri Nets", p.120
 -->
-<Automata name="Single Visual Project"  major="0"  minor="9" >
+<SupremicaProject name="AGV"  major="0"  minor="9" >
 <!-- Input stations -->
 <Automaton name="Input1" type="Plant">
 	<Events>
@@ -438,4 +438,297 @@
    <Transition event="c3" source="q2" dest="q0" />
   </Transitions>
  </Automaton>
-</Automata>
+
+<Execution>
+	<Actions>
+
+		<!-- AGV 1 -->
+		<Action label="u11">
+			<Command command="agv1.reset"/>
+		</Action>
+		<Action label="e10">
+			<Command command="agv1.go"/>
+		</Action>
+		<Action label="c1">
+			<Command command="agv1.go"/>
+		</Action>
+		<Action label="u10">
+			<Command command="agv1.go"/>
+		</Action>
+		<Action label="w23">
+			<Command command="agv1.go"/>
+		</Action>	
+		<Action label="c2">
+			<Command command="agv1.go"/>
+		</Action>
+		
+		<!-- AGV 2 -->
+		<Action label="u30">
+			<Command command="agv2.reset"/>
+		</Action>
+		<Action label="w22">
+			<Command command="agv2.go"/>
+		</Action>
+		<Action label="c6">
+			<Command command="agv2.go"/>
+		</Action>
+		<Action label="u31">
+			<Command command="agv2.go"/>
+		</Action>
+		<Action label="w14">
+			<Command command="agv2.go"/>
+		</Action>	
+		<Action label="c5">
+			<Command command="agv2.go"/>
+		</Action>
+
+		<!-- AGV 3 -->
+		<Action label="c4">
+			<Command command="agv3.reset"/>
+		</Action>
+		<Action label="u20">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u21">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u22">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u23">
+			<Command command="agv3.go"/>
+		</Action>	
+		<Action label="u24">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="e30">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="c3">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u25">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u26">
+			<Command command="agv3.go"/>
+		</Action>	
+		<Action label="u27">
+			<Command command="agv3.go"/>
+		</Action>	
+		<Action label="u28">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u29">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="w32">
+			<Command command="agv3.go"/>
+		</Action>
+		
+		<!-- AGV 4 -->
+		<Action label="c9">
+			<Command command="agv4.reset"/>
+		</Action>
+		<Action label="u40">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u41">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u42">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="w37">
+			<Command command="agv4.go"/>
+		</Action>	
+		<Action label="c8">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u43">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u44">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u45">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="w15">
+			<Command command="agv4.go"/>
+		</Action>	
+		
+		<!-- AGV 5 -->
+		<Action label="c10">
+			<Command command="agv5.reset"/>
+		</Action>
+		<Action label="u50">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="u51">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="w13">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="c9">
+			<Command command="agv5.go"/>
+		</Action>	
+		<Action label="u52">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="u53">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="e20">
+			<Command command="agv5.go"/>
+		</Action>
+	</Actions>
+	<Controls>
+
+
+		<!-- AGV 1 -->
+		<Control label="u11">
+			<Condition condition="agv1.end"/>
+		</Control>
+		<Control label="e10">
+			<Condition condition="agv1.end"/>
+		</Control>
+		<Control label="c1">
+			<Condition condition="agv1.end"/>
+		</Control>
+		<Control label="u10">
+			<Condition condition="agv1.end"/>
+		</Control>
+		<Control label="w23">
+			<Condition condition="agv1.end"/>
+		</Control>	
+		<Control label="c2">
+			<Condition condition="agv1.end"/>
+		</Control>
+		
+		<!-- AGV 2 -->
+		<Control label="u30">
+			<Condition condition="agv2.end"/>
+		</Control>
+		<Control label="w22">
+			<Condition condition="agv2.end"/>
+		</Control>
+		<Control label="c6">
+			<Condition condition="agv2.end"/>
+		</Control>
+		<Control label="u31">
+			<Condition condition="agv2.end"/>
+		</Control>
+		<Control label="w14">
+			<Condition condition="agv2.end"/>
+		</Control>	
+		<Control label="c5">
+			<Condition condition="agv2.end"/>
+		</Control>
+
+		<!-- AGV 3 -->
+		<Control label="c4">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u20">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u21">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u22">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u23">
+			<Condition condition="agv3.end"/>
+		</Control>	
+		<Control label="u24">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="e30">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="c3">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u25">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u26">
+			<Condition condition="agv3.end"/>
+		</Control>	
+		<Control label="u27">
+			<Condition condition="agv3.end"/>
+		</Control>	
+		<Control label="u28">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u29">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="w32">
+			<Condition condition="agv3.end"/>
+		</Control>
+		
+		<!-- AGV 4 -->
+		<Control label="c9">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u40">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u41">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u42">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="w37">
+			<Condition condition="agv4.end"/>
+		</Control>	
+		<Control label="c8">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u43">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u44">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u45">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="w15">
+			<Condition condition="agv4.end"/>
+		</Control>	
+		
+		<!-- AGV 5 -->
+		<Control label="c10">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="u50">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="u51">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="w13">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="c9">
+			<Condition condition="agv5.end"/>
+		</Control>	
+		<Control label="u52">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="u53">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="e20">
+			<Condition condition="agv5.end"/>
+		</Control>
+	</Controls>
+	<Animation path="/scenebeans/agv/agv.xml"/>
+</Execution>
+</SupremicaProject>

@@ -1,0 +1,456 @@
+<?xml version="1.0"?>
+
+<animation width="395" height="714">
+
+	<behaviour id="agv1.go" algorithm="Track" event="agv1.end">
+		<param name="pointCount" value="11" />
+		
+		<param name="point" index="0" value="(126,24)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(101,24)" />
+		<param name="duration" index="1" value="1" />
+		<param name="event" index="1" value="agv1.end" />
+
+		<param name="point" index="2" value="(101,41)" />
+		<param name="duration" index="2" value="1" />
+
+		<param name="point" index="3" value="(101,84)" />
+		<param name="duration" index="3" value="1" />
+		<param name="event" index="3" value="agv1.end" />
+		
+		<param name="point" index="4" value="(107,84)" />
+		<param name="duration" index="4" value="1" />
+		<param name="event" index="4" value="agv1.end" />
+		
+		<param name="point" index="5" value="(169,84)" />
+		<param name="duration" index="5" value="1" />		
+
+		<param name="point" index="6" value="(327,84)" />
+		<param name="duration" index="6" value="1" />
+		<param name="event" index="6" value="agv1.end" />
+
+		<param name="point" index="7" value="(327,69)" />
+		<param name="duration" index="7" value="1" />
+
+		<param name="point" index="8" value="(327,24)" />
+		<param name="duration" index="8" value="1" />
+		<param name="event" index="8" value="agv1.end" />
+
+		<param name="point" index="9" value="(195,24)" />		
+		<param name="duration" index="9" value="1" />
+		<param name="event" index="9" value="agv1.end" />
+
+		<param name="point" index="10" value="(126,24)" />		
+	</behaviour>
+
+	<behaviour id="agv2.go" algorithm="Track" event="agv2.end">
+		<param name="pointCount" value="11" />
+		
+		<param name="point" index="0" value="(272,328)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(327,328)" />
+		<param name="duration" index="1" value="1" />
+		<param name="event" index="1" value="agv2.end" />
+
+		<param name="point" index="2" value="(327,314)" />
+		<param name="duration" index="2" value="1" />
+		
+		<param name="point" index="3" value="(327,268)" />
+		<param name="duration" index="3" value="1" />
+		<param name="event" index="3" value="agv2.end" />
+		
+		<param name="point" index="4" value="(273,268)" />
+		<param name="duration" index="4" value="1" />		
+		<param name="event" index="4" value="agv2.end" />
+
+		<param name="point" index="5" value="(167,268)" />
+		<param name="duration" index="5" value="1" />
+
+		<param name="point" index="6" value="(62,268)" />
+		<param name="duration" index="6" value="1" />
+		<param name="event" index="6" value="agv2.end" />
+
+		<param name="point" index="7" value="(62,284)" />
+		<param name="duration" index="7" value="1" />
+
+		<param name="point" index="8" value="(62,328)" />		
+		<param name="duration" index="8" value="1" />
+		<param name="event" index="8" value="agv2.end" />
+
+		<param name="point" index="9" value="(167,328)" />
+		<param name="duration" index="9" value="1" />
+		<param name="event" index="9" value="agv2.end" />
+
+		<param name="point" index="10" value="(272,328)" />		
+	</behaviour>
+
+	<behaviour id="agv3.go" algorithm="Track" event="agv3.end">
+		<param name="pointCount" value="23" />
+		
+		<param name="point" index="0" value="(272,406)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(253,406)" />
+		<param name="duration" index="1" value="1" />
+		<param name="event" index="1" value="agv3.end" />
+
+		<param name="point" index="2" value="(253,386)" />
+		<param name="duration" index="2" value="1" />
+		<param name="event" index="2" value="agv3.end" />
+		
+		<param name="point" index="3" value="(253,344)" />
+		<param name="duration" index="3" value="1" />
+		<param name="event" index="3" value="agv3.end" />
+		
+		<param name="point" index="4" value="(253,253)" />
+		<param name="duration" index="4" value="1" />
+		
+		<param name="point" index="5" value="(253,148)" />
+		<param name="duration" index="5" value="1" />		
+		<param name="event" index="5" value="agv3.end" />
+
+		<param name="point" index="6" value="(173,148)" />
+		<param name="duration" index="6" value="1" />
+		<param name="event" index="6" value="agv3.end" />
+
+		<param name="point" index="7" value="(126,148)" />
+		<param name="duration" index="7" value="1" />
+
+		<param name="point" index="8" value="(101,148)" />
+		<param name="duration" index="8" value="1" />
+		<param name="event" index="8" value="agv3.end" />
+
+		<param name="point" index="9" value="(101,160)" />		
+		<param name="duration" index="9" value="1" />
+
+		<param name="point" index="10" value="(101,208)" />		
+		<param name="duration" index="10" value="1" />
+		<param name="event" index="10" value="agv3.end" />
+
+		<param name="point" index="11" value="(126,208)" />
+		<param name="duration" index="11" value="1" />
+		<param name="event" index="11" value="agv3.end" />
+
+		<param name="point" index="12" value="(173,208)" />
+		<param name="duration" index="12" value="1" />
+
+		<param name="point" index="13" value="(190,208)" />
+		<param name="duration" index="13" value="1" />
+		<param name="event" index="13" value="agv3.end" />
+		
+		<param name="point" index="14" value="(190,253)" />
+		<param name="duration" index="14" value="1" />
+		<param name="event" index="14" value="agv3.end" />
+		
+		<param name="point" index="15" value="(190,344)" />
+		<param name="duration" index="15" value="1" />
+		<param name="event" index="15" value="agv3.end" />
+		
+		<param name="point" index="16" value="(190,386)" />
+		<param name="duration" index="16" value="1" />		
+
+		<param name="point" index="17" value="(190,466)" />
+		<param name="duration" index="17" value="1" />
+		<param name="event" index="17" value="agv3.end" />
+
+		<param name="point" index="18" value="(272,466)" />
+		<param name="duration" index="18" value="1" />
+
+		<param name="point" index="19" value="(327,466)" />
+		<param name="duration" index="19" value="1" />
+		<param name="event" index="19" value="agv3.end" />
+
+		<param name="point" index="20" value="(327,459)" />		
+		<param name="duration" index="20" value="1" />
+
+		<param name="point" index="21" value="(327,406)" />
+		<param name="duration" index="21" value="1" />
+		<param name="event" index="21" value="agv3.end" />
+
+		<param name="point" index="22" value="(272,406)" />				
+	</behaviour>
+
+	<behaviour id="agv4.go" algorithm="Track" event="agv4.end">
+		<param name="pointCount" value="19" />
+		
+		<param name="point" index="0" value="(153,478)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(177,478)" />
+		<param name="duration" index="1" value="1" />
+		<param name="event" index="1" value="agv4.end" />
+
+		<param name="point" index="2" value="(177,489)" />
+		<param name="duration" index="2" value="1" />
+		<param name="event" index="2" value="agv4.end" />
+		
+		<param name="point" index="3" value="(177,501)" />
+		<param name="duration" index="3" value="1" />
+		
+		<param name="point" index="4" value="(177,574)" />
+		<param name="duration" index="4" value="1" />
+		<param name="event" index="4" value="agv4.end" />
+		
+		<param name="point" index="5" value="(273,574)" />
+		<param name="duration" index="5" value="1" />		
+
+		<param name="point" index="6" value="(327,574)" />
+		<param name="duration" index="6" value="1" />
+		<param name="event" index="6" value="agv4.end" />
+
+		<param name="point" index="7" value="(327,557)" />
+		<param name="duration" index="7" value="1" />
+
+		<param name="point" index="8" value="(327,514)" />
+		<param name="duration" index="8" value="1" />
+		<param name="event" index="8" value="agv4.end" />
+
+		<param name="point" index="9" value="(273,514)" />		
+		<param name="duration" index="9" value="1" />
+
+		<param name="point" index="10" value="(241,514)" />		
+		<param name="duration" index="10" value="1" />
+		<param name="event" index="10" value="agv4.end" />
+
+		<param name="point" index="11" value="(241,502)" />
+		<param name="duration" index="11" value="1" />
+		<param name="event" index="11" value="agv4.end" />
+
+		<param name="point" index="12" value="(241,488)" />
+		<param name="duration" index="12" value="1" />
+
+		<param name="point" index="13" value="(241,418)" />
+		<param name="duration" index="13" value="1" />
+		<param name="event" index="13" value="agv4.end" />
+		
+		<param name="point" index="14" value="(152,418)" />
+		<param name="duration" index="14" value="1" />
+		
+		<param name="point" index="15" value="(101,418)" />
+		<param name="duration" index="15" value="1" />
+		<param name="event" index="15" value="agv4.end" />
+		
+		<param name="point" index="16" value="(101,432)" />
+		<param name="duration" index="16" value="1" />		
+
+		<param name="point" index="17" value="(101,478)" />
+		<param name="duration" index="17" value="1" />
+		<param name="event" index="17" value="agv4.end" />
+
+		<param name="point" index="18" value="(153,478)" />		
+	</behaviour>
+
+	<behaviour id="agv5.go" algorithm="Track" event="agv5.end">
+		<param name="pointCount" value="17" />
+		
+		<param name="point" index="0" value="(272,640)" />
+		<param name="duration" index="0" value="1" />
+
+		<param name="point" index="1" value="(253,640)" />
+		<param name="duration" index="1" value="1" />
+		<param name="event" index="1" value="agv5.end" />
+
+		<param name="point" index="2" value="(253,602)" />
+		<param name="duration" index="2" value="1" />
+		
+		<param name="point" index="3" value="(253,547)" />
+		<param name="duration" index="3" value="1" />
+		<param name="event" index="3" value="agv5.end" />
+		
+		<param name="point" index="4" value="(152,547)" />
+		<param name="duration" index="4" value="1" />
+		<param name="event" index="4" value="agv5.end" />
+		
+		<param name="point" index="5" value="(63,547)" />
+		<param name="duration" index="5" value="1" />		
+
+		<param name="point" index="6" value="(48,547)" />
+		<param name="duration" index="6" value="1" />
+
+		<param name="point" index="7" value="(48,586)" />
+		<param name="duration" index="7" value="1" />
+		<param name="event" index="7" value="agv5.end" />
+
+		<param name="point" index="8" value="(152,586)" />
+		<param name="duration" index="8" value="1" />
+
+		<param name="point" index="9" value="(189,586)" />		
+		<param name="duration" index="9" value="1" />
+		<param name="event" index="9" value="agv5.end" />
+
+		<param name="point" index="10" value="(189,602)" />		
+		<param name="duration" index="10" value="1" />
+
+		<param name="point" index="11" value="(189,700)" />
+		<param name="duration" index="11" value="1" />
+		<param name="event" index="11" value="agv5.end" />
+
+		<param name="point" index="12" value="(272,700)" />
+		<param name="duration" index="12" value="1" />
+
+		<param name="point" index="13" value="(327,700)" />
+		<param name="duration" index="13" value="1" />
+		<param name="event" index="13" value="agv5.end" />
+		
+		<param name="point" index="14" value="(327,683)" />
+		<param name="duration" index="14" value="1" />
+		
+		<param name="point" index="15" value="(327,640)" />
+		<param name="duration" index="15" value="1" />
+		<param name="event" index="15" value="agv5.end" />
+		
+		<param name="point" index="16" value="(272,640)" />	
+	</behaviour>
+
+	<define id="agv1_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/agv_red.gif"/>
+			<param name = "hotspot" value = "(18,10)"/>
+		</primitive>
+	</define>
+	<define id="agv2_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/agv_yellow.gif"/>
+			<param name = "hotspot" value = "(18,10)"/>
+		</primitive>
+	</define>
+	<define id="agv3_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/agv_blue.gif"/>
+			<param name = "hotspot" value = "(18,10)"/>
+		</primitive>
+	</define>
+	<define id="agv4_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/agv_brown.gif"/>
+			<param name = "hotspot" value = "(18,10)"/>
+		</primitive>
+	</define>
+	<define id="agv5_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/agv_green.gif"/>
+			<param name = "hotspot" value = "(18,10)"/>
+		</primitive>
+	</define>	
+	
+	<define id="background_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value ="image/agv_plant.gif"/>
+			<param name="hotspot" value="(0,0)"/>
+		</primitive>
+	</define>
+
+	<draw>
+		<transform type = "translate">
+			<param name ="x" value ="126"/>
+			<param name ="y" value ="24"/>
+			<animate param = "translation" behaviour = "agv1.go"/>
+			<paste object = "agv1_primitive" /> 
+		</transform>	
+		<transform type = "translate">
+			<param name ="x" value ="272"/>
+			<param name ="y" value ="328"/>
+			<animate param = "translation" behaviour = "agv2.go"/>
+			<paste object = "agv2_primitive" /> 
+		</transform>	
+		<transform type = "translate">
+			<param name ="x" value ="296"/>
+			<param name ="y" value ="406"/>
+			<animate param = "translation" behaviour = "agv3.go"/>
+			<paste object = "agv3_primitive" /> 
+		</transform>	
+		<transform type = "translate">
+			<param name ="x" value ="153"/>
+			<param name ="y" value ="478"/>
+			<animate param = "translation" behaviour = "agv4.go"/>
+			<paste object = "agv4_primitive" /> 
+		</transform>	
+		<transform type = "translate">
+			<param name ="x" value ="272"/>
+			<param name ="y" value ="640"/>
+			<animate param = "translation" behaviour = "agv5.go"/>
+			<paste object = "agv5_primitive" /> 
+		</transform>	
+		<paste object="background_primitive"/>
+	</draw>
+
+	<!-- The commands -->
+
+
+	<!-- AGV 1 Commands -->
+	<command name="agv1.reset">
+		<announce event = "~agv1.end"/>
+		<reset behaviour="agv1.go"/>
+		<start behaviour="agv1.go"/>
+	</command>
+	<command name="agv1.go">
+		<announce event = "~agv1.end"/>
+		<start behaviour="agv1.go"/>
+	</command>
+	<event object="agv1.go" event="agv1.end">
+		<announce event="agv1.end"/>
+		<stop behaviour = "agv1.go"/>
+	</event>
+
+	<!-- AGV 2 Commands -->
+	<command name="agv2.reset">
+		<announce event = "~agv2.end"/>
+		<reset behaviour="agv2.go"/>
+		<start behaviour="agv2.go"/>
+	</command>
+	<command name="agv2.go">
+		<announce event = "~agv2.end"/>
+		<start behaviour="agv2.go"/>
+	</command>
+	<event object="agv2.go" event="agv2.end">
+		<announce event="agv2.end"/>
+		<stop behaviour = "agv2.go"/>
+	</event>
+
+	<!-- AGV 3 Commands -->
+	<command name="agv3.reset">
+		<announce event = "~agv3.end"/>
+		<reset behaviour="agv3.go"/>
+		<start behaviour="agv3.go"/>
+	</command>
+	<command name="agv3.go">
+		<announce event = "~agv3.end"/>
+		<start behaviour="agv3.go"/>
+	</command>
+	<event object="agv3.go" event="agv3.end">
+		<announce event="agv3.end"/>
+		<stop behaviour = "agv3.go"/>
+	</event>
+
+	<!-- AGV 4 Commands -->
+	<command name="agv4.reset">
+		<announce event = "~agv4.end"/>
+		<reset behaviour="agv4.go"/>
+		<start behaviour="agv4.go"/>
+	</command>
+	<command name="agv4.go">
+		<announce event = "~agv4.end"/>
+		<start behaviour="agv4.go"/>
+	</command>
+	<event object="agv4.go" event="agv4.end">
+		<announce event="agv4.end"/>
+		<stop behaviour = "agv4.go"/>
+	</event>
+
+	<!-- AGV 5 Commands -->
+	<command name="agv5.reset">
+		<announce event = "~agv5.end"/>
+		<reset behaviour="agv5.go"/>
+		<start behaviour="agv5.go"/>
+	</command>
+	<command name="agv5.go">
+		<announce event = "~agv5.end"/>
+		<start behaviour="agv5.go"/>
+	</command>
+	<event object="agv5.go" event="agv5.end">
+		<announce event="agv5.end"/>
+		<stop behaviour = "agv5.go"/>
+	</event>
+</animation>
