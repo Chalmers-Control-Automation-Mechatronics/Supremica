@@ -1,0 +1,29 @@
+/******************* PropertiesAction.java *********************/
+package org.supremica.gui.useractions;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.*;
+import javax.help.*;
+import java.net.URL;
+
+import org.supremica.gui.Supremica;
+import org.supremica.gui.ActionMan;
+
+public class PreferencesAction
+	extends AbstractAction
+{
+	public PreferencesAction()
+	{
+		super("Preferences...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Preferences16.gif")));
+		putValue(SHORT_DESCRIPTION, "Edit Supremica preferences");
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		ActionMan.configurePreferences_actionPerformed(ActionMan.getGui());
+	}
+
+}
+	
