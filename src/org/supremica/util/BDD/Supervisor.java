@@ -1,7 +1,11 @@
 package org.supremica.util.BDD;
 
-// NEW CUDD: fixed
+
 import java.util.*;
+
+// XXX: sythesis code NOT tested after we added these variables:
+//        s_cube, sp_cube, e_cube, perm_s2sp, perm_sp2s;
+
 
 public class Supervisor
 {
@@ -15,6 +19,9 @@ public class Supervisor
 	    bdd_reachable_uncontrollables, bdd_coreachables;
 
 
+	/** just declare these once for all subclasses ... */
+	protected int s_cube, sp_cube, e_cube;
+	protected int perm_s2sp, perm_sp2s;
 
 	public Supervisor(BDDAutomata manager, Group plant, Group spec)
 	{
@@ -57,6 +64,13 @@ public class Supervisor
 		}
 
 		has_uncontrollables = has_reachables = has_reachable_uncontrollables = has_coreachables = false;
+
+
+		e_cube = manager.getEventCube();
+		s_cube = manager.getStateCube();
+		sp_cube = manager.getStatepCube();
+		perm_s2sp = manager.getPermuteS2Sp();
+		perm_sp2s = manager.getPermuteSp2S();
 
 	}
 
@@ -190,7 +204,7 @@ public class Supervisor
 	int t_p = plant.getT();
 	int cubep_sp = spec.getCubep();
 	int cubep_p = plant.getCubep();
-	int sigma_cube = manager.getEventCube();
+
 
 
 
@@ -210,7 +224,7 @@ public class Supervisor
 
 	int tmp4;
 	if(remove_events) {
-		int cube2 = manager.and(sigma_cube, cubep_p);
+		int cube2 = manager.and(e_cube, cubep_p);
 		tmp4 = manager.relProd(t_p, tmp2, cubep_p);
 		manager.deref(cube2);
 	} else {
@@ -297,7 +311,7 @@ public class Supervisor
 	 * start from the given (set of) initial state(s)
 	 */
 	public int getReachables(int initial_states) {
-		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
 		int x = internal_computeReachables(t_all, initial_states);
 		manager.deref(t_all);
 		return x;
@@ -321,7 +335,7 @@ public class Supervisor
 	public int getReachables(boolean [] events, int intial_states) {
 		int event_mask = manager.getAlphabetSubsetAsBDD(events);
 		int tmp = manager.and(plant.getT(), event_mask);
-		int t_all = manager.relProd(tmp, spec.getT(), manager.getEventCube());
+		int t_all = manager.relProd(tmp, spec.getT(), e_cube);
 		manager.deref(tmp);
 		manager.deref(event_mask);
 		int x = internal_computeReachables(t_all, intial_states);
@@ -345,7 +359,7 @@ public class Supervisor
 
 	protected void computeReachables()
 	{
-		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
 		int i_all = manager.and(plant.getI(), spec.getI());
 		bdd_reachables = internal_computeReachables(t_all, i_all);
 		has_reachables = true;
@@ -366,8 +380,6 @@ public class Supervisor
 		timer.reset();
 		SizeWatch.setOwner("Supervisor.computeReachables");
 
-		int cube = manager.getStateCube();
-		int permute = manager.getPermuteSp2S();
 
 		// int i_all = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
@@ -381,8 +393,8 @@ public class Supervisor
 		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(t_all, r_all, cube);
-			int tmp2 = manager.replace(tmp, permute);
+			int tmp = manager.relProd(t_all, r_all, s_cube);
+			int tmp2 = manager.replace(tmp, perm_sp2s);
 			manager.deref(tmp);
 
 
@@ -489,10 +501,7 @@ public class Supervisor
 
 		timer.reset();
 
-		int cube = manager.getStatepCube();
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
 		int m_all = GroupHelper.getM(manager,spec, plant);
 
 
@@ -501,7 +510,7 @@ public class Supervisor
 		SizeWatch.report(m_all, "Qm");
 
 		// gets derefed in first orTo ??
-		int r_all_p, r_all = manager.replace(m_all, permute1);
+		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
 
 
 		// manager.ref(r_all);
@@ -509,8 +518,8 @@ public class Supervisor
 		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(t_all, r_all, cube);
-			int tmp2 = manager.replace(tmp, permute1);
+			int tmp = manager.relProd(t_all, r_all, sp_cube);
+			int tmp2 = manager.replace(tmp, perm_s2sp);
 
 			manager.deref(tmp);
 
@@ -528,9 +537,8 @@ public class Supervisor
 		manager.deref(t_all);
 		manager.deref(m_all);
 
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 		manager.deref(r_all);
-
 
 		has_coreachables = true;
 		bdd_coreachables = ret;
@@ -566,9 +574,8 @@ public class Supervisor
 
 	timer.reset();
 
-	int cube = manager.getStateCube();
-	int permute = manager.getPermuteSp2S();
-	int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+
+	int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
 	int i_all = manager.and(plant.getI(), spec.getI());
 	int r_all_p, r_all = i_all;
 
@@ -583,8 +590,8 @@ public class Supervisor
 	do {
 	    r_all_p = r_all;
 
-	    int tmp = manager.relProd(t_all, r_all, cube);
-	    int tmp2 = manager.replace(tmp, permute);
+	    int tmp = manager.relProd(t_all, r_all, s_cube);
+	    int tmp2 = manager.replace(tmp, perm_sp2s);
 	    manager.deref(tmp);
 
 
@@ -685,14 +692,9 @@ public class Supervisor
 		{
 			String[] states = new String[manager.getSize()];
 			int trace_len = frontiers.size();
-			int ecube = manager.getEventCube();
-			int cube = manager.getStatepCube();
-			int permute1 = manager.getPermuteS2Sp();
-			int permute2 = manager.getPermuteSp2S();
 
-			// int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
 			int t_all = manager.and(plant.getT(), spec.getT());
-			int here = manager.replace(to, permute1);
+			int here = manager.replace(to, perm_s2sp);
 
 			Options.out.println("\n*** " + what + " (backward trace)");
 			manager.printAutomatonVector();
@@ -715,7 +717,7 @@ public class Supervisor
 
 				manager.deref(next_all);
 
-				int tran1 = manager.relProd(tran0, t_all, cube);
+				int tran1 = manager.relProd(tran0, t_all, sp_cube);
 
 				manager.deref(tran0);
 
@@ -724,7 +726,7 @@ public class Supervisor
 				manager.deref(tran1);
 				enames.add(ename[0]);
 
-				int noe = manager.exists(e, ecube);
+				int noe = manager.exists(e, e_cube);
 
 				manager.deref(e);
 
@@ -734,7 +736,7 @@ public class Supervisor
 				manager.printStateVector(states, "" + i);
 				manager.deref(here);
 
-				here = manager.replace(s, permute1);
+				here = manager.replace(s, perm_s2sp);
 
 				manager.deref(s);
 			}
@@ -783,9 +785,7 @@ public class Supervisor
 
 	private boolean trace_hlp(int from, int to, Vector v)
 	{
-		int cube = manager.getStateCube();
-		int permute = manager.getPermuteSp2S();
-		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
 		int r_all_p, r_all = from;
 		int zero = manager.getZero();
 
@@ -799,8 +799,8 @@ public class Supervisor
 		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(t_all, r_all, cube);
-			int front = manager.replace(tmp, permute);
+			int tmp = manager.relProd(t_all, r_all, s_cube);
+			int front = manager.replace(tmp, perm_sp2s);
 
 			manager.deref(tmp);
 
@@ -836,23 +836,20 @@ public class Supervisor
 
 		// note: dont use timer here (get reseted in getSafeStates)
 		int good = manager.not(forbidden);
-		int cube = manager.getStatepCube();
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
 
 		// again, we remove events as soon as possible
-		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
-		int r_all_p, r_all = manager.replace(marked, permute1);
+		int t_all = manager.relProd(plant.getT(), spec.getT(), e_cube);
+		int r_all_p, r_all = manager.replace(marked, perm_s2sp);
 
 		do
 		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(t_all, r_all, cube);
+			int tmp = manager.relProd(t_all, r_all, sp_cube);
 
 			tmp = manager.andTo(tmp, good);    // remove bad stuffs
 
-			int tmp2 = manager.replace(tmp, permute1);
+			int tmp2 = manager.replace(tmp, perm_s2sp);
 
 			manager.deref(tmp);
 
@@ -865,7 +862,7 @@ public class Supervisor
 		manager.deref(t_all);
 		manager.deref(good);
 
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 
 		manager.deref(r_all);
 
@@ -878,36 +875,30 @@ public class Supervisor
 	{
 
 		// note: dont use timer here (get reseted in getSafeStates)
-		int sigma_2 = manager.getEventCube();
-		int state_2 = manager.getStatepCube();
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
+
+
 		int t_all = manager.and(plant.getTu(), spec.getTu());
 		int i_all = manager.and(plant.getI(), spec.getI());
-		int cube = manager.and(state_2, sigma_2);
-		int r_all_p, r_all = manager.replace(forbidden, permute1);
+		int cube = manager.and(sp_cube, e_cube);
+		int r_all_p, r_all = manager.replace(forbidden, perm_s2sp);
 
 		do
 		{
 			r_all_p = r_all;
 
 			int tmp = manager.relProd(t_all, r_all, cube);
-			int tmp2 = manager.replace(tmp, permute1);
-
+			int tmp2 = manager.replace(tmp, perm_s2sp);
 			manager.deref(tmp);
 
 			r_all = manager.orTo(r_all, tmp2);
-
 			manager.deref(tmp2);
-
-			// Options.out.print("2"); Options.out.flush();
 		}
 		while (r_all_p != r_all);
 
 		manager.deref(t_all);
 		manager.deref(cube);
 
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 
 		manager.deref(r_all);
 
@@ -925,12 +916,7 @@ public class Supervisor
 		int good_states = getSafeStates();
 
 		int bad_states = manager.not(good_states);
-		int s2sp = manager.getPermuteS2Sp();
-		int bad_statesp = manager.replace(bad_states, s2sp);
-
-		// DEBUG:
-		// Options.out.println("BAD states are: "); manager.show_states(bad_states);
-		// Options.out.println("GOOD states are: "); manager.show_states(good_states);
+		int bad_statesp = manager.replace(bad_states, perm_s2sp);
 
 		manager.deref(bad_states);
 
@@ -953,7 +939,6 @@ public class Supervisor
 	public Vector getUnsafeTransitionList()
 	{
 		int unsafe = getUnsafeTransitions();
-		int events_cube = manager.getEventCube();
 		Event[] events = manager.getEvents();
 		int events_size = events.length;
 
@@ -961,7 +946,7 @@ public class Supervisor
 		Vector results = new Vector();
 		for(int i = 0; i < events_size; i++)
 		{
-			int states_event = manager.relProd( unsafe, events[i].bdd, events_cube);
+			int states_event = manager.relProd( unsafe, events[i].bdd, e_cube);
 			IncompleteStateList isl = manager.getIncompleteStateList(states_event, events[i]);
 			DisablingPoint dp = new DisablingPoint(isl, events[i]);
 			results.add(dp);
@@ -974,7 +959,7 @@ public class Supervisor
 	{
 		// TODO: do we need to remove E x Q' with relProd, or can we remove Q' before the loop??
 		int unsafe = getUnsafeTransitions();
-		int cube = manager.and(manager.getEventCube(), manager.getStatepCube() );
+		int cube = manager.and(e_cube, sp_cube );
 		Event[] events = manager.getEvents();
 		int events_size = events.length;
 
@@ -1010,25 +995,15 @@ public class Supervisor
 
 		manager.ref(x);
 
-		// Options.out.println("marked = "); manager.show_states(marked); // DEBUG
 		do
 		{
 			xp = x;
 
-			// Options.out.println("x = "); manager.show_states(x); // DEBUG
-
 			int qp_k = getBR1(marked, x);
 			int not_qp_k = manager.not(qp_k);
-
-			// Options.out.println("qp_k = "); manager.show_states(qp_k); // DEBUG
-
 			manager.deref(qp_k);
 
-
-
 			int qpp_k = getBR2(not_qp_k);
-
-			//Options.out.println("qpp_k = "); manager.show_states(qpp_k); // DEBUG
 
 			x = manager.orTo(x, qpp_k);
 
@@ -1067,7 +1042,7 @@ public class Supervisor
 		int t_all = manager.and(plant.getT(), spec.getT());
 		int cube = manager.and(spec.getCubep(), plant.getCubep());
 
-		cube = manager.andTo(cube, manager.getEventCube());
+		cube = manager.andTo(cube, e_cube);
 
 		int t_noloops = manager.removeSelfLoops(t_all);
 

@@ -202,10 +202,6 @@ public class PetriNetSupervisor
 		GrowFrame gf = BDDGrow.getGrowFrame(manager,
 			"[PetriNetSupervisor] forward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
 
-
-		 int cube_s = manager.getStateCube();
-		int sp2s = manager.getPermuteSp2S();
-
 		int r_all_p, r_all = i_all;
 		manager.ref(r_all);
 
@@ -215,7 +211,7 @@ public class PetriNetSupervisor
 			int i = pick_one_event(true /* forward direction */);
 			if(i == -1) break;
 
-			int tmp3 = pet[i].forward(r_all, cube_s, sp2s);
+			int tmp3 = pet[i].forward(r_all, s_cube, perm_sp2s);
 			r_all = manager.orTo(r_all, tmp3);
 			manager.deref(tmp3);
 
@@ -253,13 +249,7 @@ public class PetriNetSupervisor
 		GrowFrame gf = BDDGrow.getGrowFrame(manager,
 			"[PetriNetSupervisor] backward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
 
-
-		int cube_sp = manager.getStatepCube();
-
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-
-		int r_all_p, r_all = manager.replace(q_m, permute1);
+		int r_all_p, r_all = manager.replace(q_m, perm_s2sp);
 		manager.ref(r_all);
 
 		for(;;) {
@@ -268,7 +258,7 @@ public class PetriNetSupervisor
 			int i = pick_one_event(false /* backward direction */);
 			if(i == -1) break;
 
-			int tmp3 = pet[i].backward(r_all, cube_sp, permute1);
+			int tmp3 = pet[i].backward(r_all, sp_cube, perm_s2sp);
 			r_all = manager.orTo(r_all, tmp3);
 			manager.deref(tmp3);
 
@@ -280,7 +270,7 @@ public class PetriNetSupervisor
 			if(gf != null) gf.add( r_all );
 		}
 
-		int ret = manager.replace(r_all,permute2);
+		int ret = manager.replace(r_all,perm_sp2s);
 		manager.deref(r_all);
 
 		if(gf != null) gf.stopTimer();

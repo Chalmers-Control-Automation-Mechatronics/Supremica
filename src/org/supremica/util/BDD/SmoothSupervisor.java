@@ -15,6 +15,22 @@ import java.util.*;
  * cases (shoefactory comes to my mind...).
  */
 
+// XXX: when choosing new automaton to be added:
+// changing the order makes things much 'smoother' for serial stuff such as
+// the wonhams production lines, BUT it uses gargabe-collection much more often.
+// dont know why this happen yet...
+//
+// Compare results for 20 cell FSM:
+//
+// type        max-size     step-count   time (not on the same machine, forward ~ 2x faster)
+// forward:
+// revese:     1873           9190        177s
+//              (reverse order is not affected is saturation is enabled ??)
+//
+// Note: seems like GrowFrame was guilty to a noticable part of the running-time :(
+//
+
+
 public class SmoothSupervisor extends DisjSupervisor {
 
     public SmoothSupervisor(BDDAutomata manager, Group p, Group sp) {
@@ -26,16 +42,44 @@ public class SmoothSupervisor extends DisjSupervisor {
     }
 
 
+	/**
+	 * just return my names, make it easy for the subclasses
+	 * to reuse my GUI related code that puts my/our name in the title..
+	 */
+	public String toString() { return "smoothed"; }
+
+
+	/**
+	 * function called after a new automata is added to the monotonic set
+	 * during a FORWARD serach.
+	 * r is the current set of reachable states and the function should return
+	 * a possibly modified 'r', due to some algorithm or just 'r' if no
+	 * such algorithm is used
+	 */
+	protected int delay_forward(GrowFrame gf, Cluster c, int r) {
+		return r;
+	}
+
+	/**
+	 * function called after a new automata is added to the monotonic set
+	 * during a BACKWARD serach.
+	 * same as delay_forward() but this time r is the current set of reachable
+	 * states in S' (NOT IN S)
+	 */
+
+	protected int delay_backward(GrowFrame gf, Cluster c, int r) {
+		return r;
+	}
+
     // ------------------------------------------------------------------------
     protected void computeReachables() {
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability ("+ toString() + ")");
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 
 		SizeWatch.setOwner("SmoothSupervisor.computeReachables");
-		int cube    = manager.getStateCube();
 		int i_all = manager.and(plant.getI(), spec.getI());
 
 		/*
@@ -72,21 +116,6 @@ public class SmoothSupervisor extends DisjSupervisor {
 			remaining[i] = true;
 
 
-		// XXX: changing the order makes things much 'smoother' for serial stuff such as
-		// the wonhams production lines, BUT it uses gargabe-collection much more often.
-		// dont know why this happen yet...
-		//
-		// Compare results for 20 cell FSM:
-		//
-		// type        max-size     step-count   time (not on the same machine, forward ~ 2x faster)
-		// forward:
-		// revese:     1873           9190        177s
-		//              (reverse order is not affected is saturation is enabled ??)
-		//
-		// Note: seems like GrowFrame was guilty to a noticable part of the running-time :(
-		//
-
-
 
 		// for(int a = 0; a < size; a++) {
 		for(int a = size-1; a >= 0; a--) {
@@ -94,8 +123,10 @@ public class SmoothSupervisor extends DisjSupervisor {
 				remaining[a] = false;
 				dp.add(clusters[a].twave);
 				if(gf != null) gf.mark( clusters[a].toString() );
-				// Options.out.println("Forward-Adding: " + clusters[a].toString() ); // DEBUG
+
+				r_all = delay_forward(gf, clusters[a], r_all); // do the 'delay' thing...
 			}
+
 			int r_all_pp, front_s, front_sp;
 
 			do {
@@ -119,28 +150,24 @@ public class SmoothSupervisor extends DisjSupervisor {
 		SizeWatch.report(r_all, "Qr");
 		dp.cleanup();
 		if(gf != null) gf.stopTimer();
-		timer.report("Forward reachables found (smoothed)");
+		timer.report("Forward reachables found ("+ toString() + ")");
 		// SizeWatch.report(r_all, "R");
     }
     // -------------------------------------------------------------------------------
 
     protected void computeCoReachables() {
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability ("+ toString() +")");
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 
 		SizeWatch.setOwner("SmoothSupervisor.computeCoReachables");
 
-		int cube    = manager.getStatepCube();
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-
 
 		int m_all = GroupHelper.getM(manager, spec, plant);
 
 		// gets derefed in first orTo ??
-		int r_all_p, r_all = manager.replace(m_all, permute1);
+		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
 		manager.deref(m_all);
 
 
@@ -165,7 +192,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 				remaining[a] = false;
 				dp.add(clusters[a].twave);
 				if(gf != null) gf.mark( clusters[a].toString() );
-				// Options.out.println("Backward-Adding: " + clusters[a].toString() ); // DEBUG
+				r_all = delay_backward(gf, clusters[a], r_all); // do the 'delay' thing...
 			}
 			int r_all_pp, front_s, front_sp;
 
@@ -180,7 +207,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 		}
 
 
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 
 		// cleanup:
 		manager.deref(r_all);
@@ -191,7 +218,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_coreachables, "Qco");
-		timer.report("Co-reachables found (smoothed)");
+		timer.report("Co-reachables found ("+ toString() +")");
 
 		dp.cleanup();
 		// SizeWatch.report(bdd_coreachables,"Coreachables");

@@ -25,7 +25,6 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 
 
     protected void computeReachables() {
-
 		// statistic stuffs
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (keep smoothed)");
 		timer.reset();
@@ -69,12 +68,9 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("KeepSmoothSupervisor.computeCoReachables");
 		KeepSmoothPartition psp = new KeepSmoothPartition(manager, dop.getClusters(), dop.getSize());
 
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-
 		int m_all = GroupHelper.getM(manager, spec, plant);
 		int r_all_p, r_all;
-		r_all = manager.replace(m_all, permute1);
+		r_all = manager.replace(m_all, perm_s2sp);
 		manager.deref(m_all);
 
 		SizeWatch.report(r_all, "Qm");
@@ -91,7 +87,7 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 		} while(psp.step());
 
 		has_coreachables = true;
-		bdd_coreachables = manager.replace(r_all, permute2);
+		bdd_coreachables = manager.replace(r_all, perm_sp2s);
 
 		// cleanup:
 		psp.cleanup();
@@ -101,8 +97,6 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_coreachables, "Qco");
 		timer.report("Co-reachables found (keep smoothed)");
-
-
     }
 
 

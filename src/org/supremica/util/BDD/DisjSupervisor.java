@@ -103,13 +103,10 @@ public class DisjSupervisor extends ConjSupervisor {
 		DisjPartition dp = getDisjPartition();
 		SizeWatch.setOwner("DisjSupervisor.computecoReachables");
 
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-
 		int m_all = GroupHelper.getM(manager, spec, plant);
 
 		// gets derefed in first orTo, but replace addes its own ref
-		int r_all_p, r_all = manager.replace(m_all, permute1);
+		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
 		int front = r_all;
 
 		manager.deref(m_all); // we dont need m_all anymore
@@ -129,7 +126,7 @@ public class DisjSupervisor extends ConjSupervisor {
 		} while(r_all != r_all_p);
 
 		// move the result from S' to S:
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 
 		// cleanup:
 		manager.deref(front);

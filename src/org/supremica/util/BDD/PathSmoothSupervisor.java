@@ -72,12 +72,9 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("PathSmoothSupervisor.computeCoReachables");
 		PathSmoothPartition psp = new PathSmoothPartition(manager, dop.getClusters(), dop.getSize(), false);
 
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-
 		int m_all = GroupHelper.getM(manager, spec, plant);
 		int r_all_p, r_all;
-		r_all = manager.replace(m_all, permute1);
+		r_all = manager.replace(m_all, perm_s2sp);
 		manager.deref(m_all);
 
 
@@ -96,7 +93,7 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		} while(psp.step());
 
 		has_coreachables = true;
-		bdd_coreachables = manager.replace(r_all, permute2);
+		bdd_coreachables = manager.replace(r_all, perm_sp2s);
 
 		// cleanup:
 		psp.cleanup();

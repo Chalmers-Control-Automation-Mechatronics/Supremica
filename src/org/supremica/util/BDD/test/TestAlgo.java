@@ -165,6 +165,8 @@ public class TestAlgo {
 	public void runTests() throws Exception {
 		fail  = pass = 0;
 		int len = TEST_FILES.length;
+
+		System.out.println("Using serach algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 		for(int i = 0; i < len; i++) {
 			announce(TEST_FILES[i]);
 

@@ -32,13 +32,10 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		timer.reset();
 		SizeWatch.setOwner("PartitionSmoothSupervisor.computeReachables");
 
-		int sp2s = manager.getPermuteSp2S();
-
 		// DisjPartition dp = getDisjPartition();
 		Cluster [] clusters = dop.getClusters();
 		int i,j, size = dop.getSize();
 
-		int cube = manager.getStateCube();
 		int i_all   = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
 		manager.ref(r_all); //gets derefed by orTo and finally a deref
@@ -50,8 +47,8 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 			// Util.notify("i = " + i + ", j = " + j + ", n = " + size);
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(clusters[j].getTwave(), r_all, cube);
-			int front= manager.replace( tmp, sp2s);
+			int tmp = manager.relProd(clusters[j].getTwave(), r_all, s_cube);
+			int front= manager.replace( tmp, perm_sp2s);
 			r_all = manager.orTo(r_all, front);
 			manager.deref(front);
 			manager.deref(tmp);
@@ -84,15 +81,10 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 
 		Cluster [] clusters = dop.getClusters();
 		int i,j, size = dop.getSize();
-
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-
-		int cube = manager.getStatepCube();
 		int m_all = GroupHelper.getM(manager, spec, plant);
 
 		// gets derefed in first orTo, but replace addes its own ref
-		int r_all_p, r_all = manager.replace(m_all, permute1);
+		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
 
 		// manager.ref(r_all); // gets derefed soon
 		manager.deref(m_all); // we dont need m_all anymore
@@ -105,8 +97,8 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		do {
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(clusters[j].getTwave(), r_all, cube);
-			int tmp2= manager.replace( tmp, permute1);
+			int tmp = manager.relProd(clusters[j].getTwave(), r_all, sp_cube);
+			int tmp2= manager.replace( tmp, perm_s2sp);
 			r_all = manager.orTo(r_all, tmp2);
 			manager.deref(tmp2);
 			manager.deref(tmp);
@@ -121,7 +113,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		} while( i < size);
 
 		// move the result from S' to S:
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 
 		// cleanup:
 		manager.deref(r_all);

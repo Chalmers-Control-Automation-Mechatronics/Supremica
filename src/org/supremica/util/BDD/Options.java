@@ -14,7 +14,16 @@ public class Options
 		MAX_MONOLITHIC_TOTAL_SIZE = 6
 		;
 
-    /** search algorithm */
+
+	/** REACHABILITY search algorithms */
+	public static final String [] REACH_ALGO_NAMES =  {
+		"monotonic", "Conjunctive", "LatticeWalk", "Disjunctive",
+		"Smoothed: Workset",  "Smoothed: Monotonic", "Smoothed: Delayed Monotonic",
+		"Smoothed: Delayed* Monotonic","Smoothed: Monotonic/Workset",
+		"Smoothed: Path (V1)", "Smoothed: Keep (V2)", "Smoothed: Partitioned (P1)",
+		"PetriNet-style"
+	};
+    /** constants for the above*/
     public static final int
 	ALGO_MONOLITHIC = 0,
 	ALGO_CONJUNCTIVE = 1,
@@ -22,12 +31,15 @@ public class Options
 	ALGO_DISJUNCTIVE = 3,
 	ALGO_DISJUNCTIVE_WORKSET = 4,
 	ALGO_SMOOTHED_MONO = 5,
-	ALGO_SMOOTHED_MONO_WORKSET = 6,
-	ALGO_SMOOTHED_PATH = 7,
-	ALGO_SMOOTHED_KEEP = 8,
-	ALGO_SMOOTHED_PART = 9,
-	ALGO_PETRINET = 10
+	ALGO_SMOOTHED_DELAYED_MONO = 6,
+	ALGO_SMOOTHED_DELAYED_STAR_MONO = 7,
+	ALGO_SMOOTHED_MONO_WORKSET = 8,
+	ALGO_SMOOTHED_PATH = 9,
+	ALGO_SMOOTHED_KEEP = 10,
+	ALGO_SMOOTHED_PART = 11,
+	ALGO_PETRINET = 12
 	;
+
 
 	/** language controllability/inclusion algorithms */
 	public static final int
@@ -51,7 +63,14 @@ public class Options
 	ORDERING_ALGO_NEW_TSP = 2;
 
 
-	/** Automaton selection heuristics */
+
+	/** Automaton selection heuristics  */
+	public static final String [] AS_HEURISTIC_NAMES =  {
+		"Random", "BDD/Stack", "BDD/FIFO", "BDD/distance",
+		"Most common uc-events",	"Most common uc-arcs",
+		"Most common events",	"Most common arcs",
+		"Most local events",	"Hybrid"
+	};
 	public static final int
 		AS_HEURISTIC_RANDOM = 0,
 		AS_HEURISTIC_STACK = 1,

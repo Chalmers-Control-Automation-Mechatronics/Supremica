@@ -31,14 +31,13 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 
 		// statistic stuffs
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (smoothed+workset)/" + workset.getHeuristicName());
-
+		SizeWatch.setOwner("SmoothWorksetSupervisor.computeReachables");
 		timer.reset();
+
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 
-		SizeWatch.setOwner("SmoothWorksetSupervisor.computeReachables");
-		int cube    = manager.getStateCube();
-		int i_all = manager.and(plant.getI(), spec.getI());
 
+		int i_all = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
 		manager.ref(i_all); //gets derefed by orTo and finally a deref
 
@@ -88,21 +87,14 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 		Workset workset = getWorkset(true);
 
 	GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (smoothed+workset)/" + workset.getHeuristicName());
-
-	timer.reset();
-	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
-
 	SizeWatch.setOwner("SmoothWorksetSupervisor.computeCoReachables");
+	timer.reset();
 
-	int cube    = manager.getStatepCube();
-	int permute1 = manager.getPermuteS2Sp();
-	int permute2 = manager.getPermuteSp2S();
+	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 
 
 	int m_all = GroupHelper.getM(manager, spec, plant);
-
-	// gets derefed in first orTo ??
-	int r_all_p, r_all = manager.replace(m_all, permute1);
+	int r_all_p, r_all = manager.replace(m_all, perm_s2sp); // gets derefed in first orTo ??
 	manager.deref(m_all);
 
 
@@ -137,7 +129,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 	    workset.advance(p, true);
 	}
 
-	int ret = manager.replace(r_all, permute2);
+	int ret = manager.replace(r_all, perm_sp2s);
 
 	// cleanup:
 	manager.deref(r_all);

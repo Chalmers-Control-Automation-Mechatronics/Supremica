@@ -694,11 +694,17 @@ class BDDPanel
 		this.theDialog = theDialog;
 		JLabel tmp;
 
+	JPanel pLeft  = new JPanel( new BorderLayout() );
+	add(pLeft, BorderLayout.WEST);
 
-	JPanel pWest  = new JPanel( new GridLayout(11,1));
-	add(pWest, BorderLayout.WEST);
+
+	// pLeft.add(tmp = new JLabel("Please don't touch anything", SwingConstants.CENTER), BorderLayout.NORTH);
+	// tmp.setForeground(Color.red);
 
 
+
+	JPanel pWest  = new JPanel( new GridLayout(10,1));
+	pLeft.add(pWest, BorderLayout.CENTER);
 
 	pWest.add( tmp = new JLabel("User interaction and reports:", SwingConstants.LEFT));
 	tmp.setForeground(Color.blue);
@@ -712,30 +718,39 @@ class BDDPanel
 	pWest.add( sizeWatch = new JCheckBox("report nodcount", Options.size_watch) );
 
 
-	pWest.add( new JSeparator() );
+	// pWest.add( new JSeparator() );
 
 	pWest.add( tmp = new JLabel("Computation options:"));
 	tmp.setForeground(Color.blue);
 
 
-	JPanel pPartitionSize = new JPanel(new FlowLayout(FlowLayout.LEFT) );
-	pWest.add(pPartitionSize);
-	pPartitionSize.add( new JLabel("Max BDD nodes/cluster"));
-	pPartitionSize.add( maxPartitionSize = new JTextField("" + Options.max_partition_size, 10));
-
-
-	pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
-
 	// pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
 	// pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
 
+	pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
+	localSaturation.setEnabled(false);
+
 	pWest.add( encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars) );
-
-		localSaturation.setEnabled(false);
-		encodingFill.setEnabled(false);
+	encodingFill.setEnabled(false);
 
 
+	// ----------------------------------------------------
+	JPanel pSouth = new JPanel( new GridLayout(2,1) );
+	pLeft.add(pSouth, BorderLayout.SOUTH);
 
+	JPanel pPartitionSize = new JPanel(new FlowLayout(FlowLayout.LEFT) );
+	pPartitionSize.add( new JLabel("Max BDD nodes/cluster"));
+	pPartitionSize.add( maxPartitionSize = new JTextField("" + Options.max_partition_size, 5));
+	pSouth.add(pPartitionSize);
+
+
+	JPanel pProof = new JPanel(new FlowLayout(FlowLayout.LEFT) );
+	pProof.add( bProofFile = new JButton("Set proof file") );
+	pProof.add( new JLabel(" (verbose and slow!)"));
+	bProofFile.addActionListener( this);
+	pSouth.add(pProof);
+
+	// -------------------------------------------------------
 	Box p = new Box(BoxLayout.Y_AXIS);
 	add(p, BorderLayout.EAST);
 
@@ -775,17 +790,8 @@ class BDDPanel
 	pFamily.add( new JLabel("Favour reachability algorithm"));
 	pFamily.add( algorithmFamily = new JComboBox());
 
-	algorithmFamily.addItem("Monolithic");
-	algorithmFamily.addItem("Conjunctive");
-	algorithmFamily.addItem("Conjunctive: LatticeWalk");
-	algorithmFamily.addItem("Disjunctive: Simple");
-	algorithmFamily.addItem("Disjunctive: Workset");
-	algorithmFamily.addItem("Smoothed: Monotonic");
-	algorithmFamily.addItem("Smoothed: Monotonic+Workset");
-	algorithmFamily.addItem("Smoothed: Path          (V1)");
-	algorithmFamily.addItem("Smoothed: Keep          (V2)");
-	algorithmFamily.addItem("Smoothed: Partitioned   (P1)");
-	algorithmFamily.addItem("PerEvent: Petri Net");
+	for(int i = 0; i < Options.REACH_ALGO_NAMES.length; i++)
+			algorithmFamily.addItem(Options.REACH_ALGO_NAMES[i]);
 	algorithmFamily.setSelectedIndex(Options.algo_family);
 
 
@@ -794,16 +800,10 @@ class BDDPanel
 	pHeuristics.add( new JLabel("Automaton selection heuristic"));
 	pHeuristics.add( asHeuristics = new JComboBox());
 
-	asHeuristics.addItem("Random");
-	asHeuristics.addItem("BDD/Stack");
-	asHeuristics.addItem("BDD/FIFO");
-	asHeuristics.addItem("BDD/distance");
-	asHeuristics.addItem("Most common uc-events");
-	asHeuristics.addItem("Most common uc-arcs");
-	asHeuristics.addItem("Most common events");
-	asHeuristics.addItem("Most common arcs");
-	asHeuristics.addItem("Most local events");
-	asHeuristics.addItem("Hybrid");
+	for(int i = 0; i < Options.AS_HEURISTIC_NAMES.length; i++)
+		asHeuristics.addItem(Options.AS_HEURISTIC_NAMES[i]);
+
+
 	asHeuristics.setSelectedIndex(Options.as_heuristics);
 
 
@@ -818,14 +818,7 @@ class BDDPanel
 
 	esHeuristics.setSelectedIndex(Options.es_heuristics);
 
-
-
-	// show all choices
-	orderingAlgorithm.setMaximumRowCount(20);
-	inclusionAlgorithm.setMaximumRowCount(20);
-	algorithmFamily.setMaximumRowCount(20);
-	asHeuristics.setMaximumRowCount(20);
-	esHeuristics.setMaximumRowCount(20);
+	// --------------------------------------------------------
 
 	p.add( new JSeparator() );
 
@@ -860,12 +853,16 @@ class BDDPanel
 	countAlgorithm.addItem("Exact");
 	countAlgorithm.setSelectedIndex(Options.count_algo);
 
-	JPanel pProof = new JPanel(new FlowLayout(FlowLayout.LEFT) );
-	p.add(pProof);
 
-	pProof.add( bProofFile = new JButton("Set proof file") );
-	pProof.add( new JLabel(" (verbose and slow!)"));
-	bProofFile.addActionListener( this);
+	// ----------------------------------------------------
+
+	// show all choices
+	orderingAlgorithm.setMaximumRowCount(20);
+	inclusionAlgorithm.setMaximumRowCount(20);
+	algorithmFamily.setMaximumRowCount(20);
+	asHeuristics.setMaximumRowCount(20);
+	esHeuristics.setMaximumRowCount(20);
+	showGrow.setMaximumRowCount(20);
 
     }
 

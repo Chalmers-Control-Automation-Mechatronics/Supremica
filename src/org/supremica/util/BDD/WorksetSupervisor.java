@@ -136,21 +136,16 @@ public class WorksetSupervisor extends DisjSupervisor
 
 		Workset workset = getWorkset(false);
 
-
-		int cube = manager.getStateCube();
-		int permute = manager.getPermuteSp2S();
-
 		int r_all_p, r_all = bdd_i;
 		manager.ref(r_all);
 
 		while(!workset.empty()) {
 			int p = workset.pickOne();
 			int r_all_org = r_all;
-			// Options.out.println("-->" + p);
 			do {
 				r_all_p = r_all;
-				int tmp = manager.relProd(clusters[p].getTwave() , r_all, cube);
-				int tmp2 = manager.replace(tmp, permute);
+				int tmp = manager.relProd(clusters[p].getTwave() , r_all, s_cube);
+				int tmp2 = manager.replace(tmp, perm_sp2s);
 				manager.deref(tmp);
 				r_all = manager.orTo(r_all, tmp2);
 				manager.deref(tmp2);
@@ -182,11 +177,8 @@ public class WorksetSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
 		Workset workset = getWorkset(false);
 
-		int cube = manager.getStatepCube();
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
 		int m_all = GroupHelper.getM(manager,spec, plant);
-		int r_all_p, r_all = manager.replace(m_all, permute1);
+		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
 		manager.deref(m_all);
 
 
@@ -197,8 +189,8 @@ public class WorksetSupervisor extends DisjSupervisor
 			int r_all_org = r_all;
 			do {
 				r_all_p = r_all;
-				int tmp = manager.relProd(clusters[p].getTwave(), r_all, cube);
-				int tmp2 = manager.replace(tmp, permute1);
+				int tmp = manager.relProd(clusters[p].getTwave(), r_all, sp_cube);
+				int tmp2 = manager.replace(tmp, perm_s2sp);
 				manager.deref(tmp);
 				r_all = manager.orTo(r_all, tmp2);
 				manager.deref(tmp2);
@@ -211,7 +203,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		}
 
 
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 		manager.deref(r_all);
 
 		has_coreachables = true;

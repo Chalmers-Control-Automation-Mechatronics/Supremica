@@ -75,7 +75,6 @@ public class ConjSupervisor
     {
 		int cubep_sp = spec.getCubep();
 		int cubep_p = plant.getCubep();
-		int sigma_cube = manager.getEventCube();
 		int tmp;
 
 		SizeWatch.setOwner("ConjSupervisor.computeLanguageDifference");
@@ -170,7 +169,7 @@ public class ConjSupervisor
 
 
 		if(remove_events) {
-			tmp = manager.exists(work, sigma_cube);
+			tmp = manager.exists(work, e_cube);
 			manager.deref(work);
 			work = tmp;
 		}
@@ -281,12 +280,8 @@ public class ConjSupervisor
 		ConjPartition cp = getConjPartition();
 		SizeWatch.setOwner("ConjSupervisor.computeReachables");
 
-
-		int permute1 = manager.getPermuteS2Sp();
-		int permute2 = manager.getPermuteSp2S();
-
 		int m_all = GroupHelper.getM(manager, spec, plant);
-		int r_all_p, r_all = manager.replace(m_all, permute1);  // r_all refed
+		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);  // r_all refed
 		int front = r_all;
 		manager.ref(front); // gets derefed
 		manager.deref(m_all);
@@ -313,7 +308,7 @@ public class ConjSupervisor
 
 		manager.deref(front);
 
-		int ret = manager.replace(r_all, permute2);
+		int ret = manager.replace(r_all, perm_sp2s);
 		manager.deref(r_all);
 
 		has_coreachables = true;
