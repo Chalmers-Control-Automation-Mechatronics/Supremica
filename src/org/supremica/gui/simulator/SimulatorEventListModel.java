@@ -70,6 +70,7 @@ import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.execution.Controls;
 import org.supremica.automata.execution.Control;
+import org.supremica.automata.execution.Condition;
 
 public class SimulatorEventListModel
 	extends AbstractListModel
@@ -141,8 +142,8 @@ public class SimulatorEventListModel
 					boolean conditionsFulfilled = true;
 					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext();)
 					{
-						String condition = (String)condIt.next();
-						conditionsFulfilled = conditionsFulfilled && theSignals.isTrue(condition);
+						Condition condition = (Condition)condIt.next();
+						conditionsFulfilled = conditionsFulfilled && theSignals.isTrue(condition.getLabel());
 					}
 					if (conditionsFulfilled)
 					{
