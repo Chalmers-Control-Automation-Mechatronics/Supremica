@@ -923,7 +923,7 @@ public final class AutomataSynchronizerExecuter
 					// Expand state? Otherwise the transitions will not be shown.
 					if (thisState.isForbidden() && !expandForbiddenStates)
 					{
-						break;
+						continue;
 					}
 
 					enabledEvents(currState);
