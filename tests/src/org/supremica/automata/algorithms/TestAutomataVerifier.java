@@ -102,7 +102,7 @@ public class TestAutomataVerifier
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.Controllability);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
-			assertTrue(theVerifier.modularControllabilityVerification());
+			assertTrue(theVerifier.verify());
 		}
 		catch (Exception ex)
 		{
@@ -121,7 +121,7 @@ public class TestAutomataVerifier
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.Controllability);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
-			assertTrue(!theVerifier.modularControllabilityVerification());
+			assertTrue(!theVerifier.verify());
 		}
 		catch (Exception ex)
 		{

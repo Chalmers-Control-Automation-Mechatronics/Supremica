@@ -97,12 +97,7 @@ public class AutomataVerificationWorker
 	private static final int MONOLITHIC = 0;
 	private static final int IDD = 2;
 
-	public AutomataVerificationWorker(
-
-	/*
-	 *  Supremica workbench,
-	 */
-	Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
+	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
@@ -182,12 +177,12 @@ public class AutomataVerificationWorker
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 					// Modular...
-					isControllable = automataVerifier.modularControllabilityVerification();
+					isControllable = automataVerifier.verify();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
 					// Monolithic...
-					isControllable = automataVerifier.monolithicControllabilityVerification();
+					isControllable = automataVerifier.verify();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
@@ -286,7 +281,7 @@ public class AutomataVerificationWorker
 				{
 
 					// Monolithic...
-					isNonBlocking = automataVerifier.monolithicNonBlockingVerification();
+					isNonBlocking = automataVerifier.verify();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
@@ -489,12 +484,12 @@ public class AutomataVerificationWorker
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 					// Modular...
-					isIncluded = automataVerifier.modularControllabilityVerification();
+					isIncluded = automataVerifier.verify();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
 					// Monolithic...
-					isIncluded = automataVerifier.monolithicControllabilityVerification();
+					isIncluded = automataVerifier.verify();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{

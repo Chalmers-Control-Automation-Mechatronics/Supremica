@@ -476,7 +476,7 @@ public class AutomataSynthesizer
 			{
 				theVerifier = new AutomataVerifier(currAutomata, syncOptions, theVerificationOptions);
 
-				if (theVerifier.modularControllabilityVerification())
+				if (theVerifier.verify())
 				{
 					// This supervisor has no impact, remove it
 					newAutomata.removeAutomaton(newAutomata.getAutomatonAt(i));

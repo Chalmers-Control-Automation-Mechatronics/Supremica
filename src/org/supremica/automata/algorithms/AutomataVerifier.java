@@ -146,6 +146,47 @@ public class AutomataVerifier
 		}
 	}
 
+
+	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
+	{
+
+		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
+		{
+			return "The IDD Algorithm is not fully implemented yet";
+		}
+
+		// Check Controllability
+		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
+		{
+			if (theAutomata.size() < 2)
+			{
+				return "At least two automata must be selected";
+			}
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			{
+				if (!theAutomata.isAllEventsPrioritized())
+				{
+					return "All event must be prioritized in the modular algorithm";
+				}
+			}
+		}
+
+		// Check Nonblocking
+		if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
+		{
+			if (theAutomata.size() < 1)
+			{
+				return "At least one automaton must be selected!";
+			}
+
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			{
+				return "Modular nonblocking option not yet implemented.";
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Method called from external class stopping AutomataVerifier as soon as possible.
 	 *
@@ -164,13 +205,61 @@ public class AutomataVerifier
 	}
 
 	/**
+	 * This is an attempt to clean up this interface.
+	 */
+	public boolean verify()
+		throws UnsupportedOperationException
+	{
+		try
+		{
+			if (verificationOptions.getVerificationType() == VerificationType.Controllability)
+			{
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+				{
+					return monolithicControllabilityVerification();
+				}
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				{
+					return modularControllabilityVerification();
+				}
+				else
+				{
+					throw new UnsupportedOperationException("The selected algorithm is not implemented");
+				}
+
+			}
+			else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
+			{
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+				{
+					return monolithicNonblockingVerification();
+				}
+				else
+				{
+					throw new UnsupportedOperationException("The selected algorithm is not implemented");
+				}
+			}
+			else
+			{
+				throw new UnsupportedOperationException("The selected type of verification is not implemented");
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Exception in AutomataVerifier: " + e);
+			throw new RuntimeException(e); // Try change this later
+		}
+	}
+
+
+	/**
 	 * Performs modular controllablity verification on theAutomata..
 	 *
 	 *@return  true if controllable, false if not or false if don't know.
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataVerificationWorker
 	 */
-	public boolean modularControllabilityVerification()
+	private boolean modularControllabilityVerification()
 		throws Exception
 	{
 		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
@@ -963,7 +1052,7 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 */
-	public boolean monolithicControllabilityVerification()
+	private boolean monolithicControllabilityVerification()
 		throws Exception
 	{
 		synchHelper.addState(initialState);
@@ -1004,7 +1093,7 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 */
-	public boolean monolithicNonBlockingVerification()
+	private boolean monolithicNonblockingVerification()
 		throws Exception
 	{
 		synchHelper.addState(initialState);
