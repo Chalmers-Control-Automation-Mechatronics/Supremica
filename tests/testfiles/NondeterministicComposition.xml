@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Nondeterministic">
+<Automaton name="A" type="Plant">
+	<Events>
+		<Event id="a"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="a"/>
+		<Transition source="0" dest="3" event="a"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B" type="Plant">
+	<Events>
+		<Event id="a"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+		<State id="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="a"/>
+	</Transitions>
+</Automaton>
+<Automaton name="A2" type="Plant">
+	<Events>
+		<Event id="a" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="1" event="a"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B2" type="Plant">
+	<Events>
+		<Event id="a" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="true"/>
+		<State id="1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+	</Transitions>
+</Automaton>
+</Automata>
