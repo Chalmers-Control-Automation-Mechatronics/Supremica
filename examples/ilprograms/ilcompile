@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 if [ -n "$SUPREMICADEV_PATH" ]
 then
