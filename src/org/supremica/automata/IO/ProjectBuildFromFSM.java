@@ -114,6 +114,7 @@ public class ProjectBuildFromFSM
 
 	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
+	private TransitionMap transitionMap = new TransitionMap();
 
 	private static int STATE_READ_NUMBER_OF_STATES = 1;
 	private static int STATE_READ_STATE = 2;
@@ -142,6 +143,12 @@ public class ProjectBuildFromFSM
 			thisFile = new File(fileName);
 			automatonName = thisFile.getName();
 
+			int lastdot = automatonName.lastIndexOf(".");
+			if (lastdot > 0)
+			{
+				automatonName = automatonName.substring(0, lastdot);
+			}
+
 		}
 		else if (protocol.equals("jar"))
 		{
@@ -166,11 +173,15 @@ public class ProjectBuildFromFSM
 		Project currProject = theProjectFactory.getProject();
 
 		Automaton currAutomaton = new Automaton(automatonName);
+		currAlphabet = currAutomaton.getAlphabet();
 		currProject.addAutomaton(currAutomaton);
 
-		int currState = STATE_READ_NUMBER_OF_STATES;
+		int currParserState = STATE_READ_NUMBER_OF_STATES;
 		int numberOfRemainingStates = 0;
 		int numberOfRemainingTransitions = 0;
+
+		State currState = null;
+		boolean initialState = true;
 
 
 		String currLine = reader.readLine();
@@ -181,9 +192,9 @@ public class ProjectBuildFromFSM
 			while (tokenizer.hasMoreTokens())
 			{
 				String currToken = tokenizer.nextToken();
-				System.err.println("umdes: \"" + currToken + "\"");
+				// System.err.println("umdes: \"" + currToken + "\"");
 
-				if (currState == STATE_READ_NUMBER_OF_STATES)
+				if (currParserState == STATE_READ_NUMBER_OF_STATES)
 				{
 					try
 					{
@@ -194,9 +205,14 @@ public class ProjectBuildFromFSM
 						logger.error("Expected the number of states. Read: " + currToken);
 						throw ex;
 					}
-					currState = STATE_READ_STATE;
+
+					if (numberOfRemainingStates < 1)
+					{
+						logger.error("The automaton must have at least one state (the initial state)");
+					}
+					 currParserState = STATE_READ_STATE;
 				}
-				else if (currState == STATE_READ_STATE)
+				else if ( currParserState == STATE_READ_STATE)
 				{
 					String stateName = currToken;
 					String markedString = tokenizer.nextToken();
@@ -224,6 +240,11 @@ public class ProjectBuildFromFSM
 						logger.error("Expected the marking of the state");
 					}
 
+					if (marked < 0 || marked > 1)
+					{
+						logger.error("Marked must be 0 (unmarked) or 1 (marked)");
+					}
+
 					try
 					{
 						numberOfRemainingTransitions = Integer.parseInt(nbrOfTransitionsString);
@@ -232,37 +253,247 @@ public class ProjectBuildFromFSM
 					{
 						logger.error("Expected the number of transitions");
 					}
-					currState = STATE_READ_TRANSITION;
+
+					if (numberOfRemainingTransitions < 0)
+					{
+						logger.error("The automaton must have a non negative number of transitions");
+					}
+
+					// Create and add the state
+					currState = currAutomaton.createUniqueState(stateName);
+					if (initialState)
+					{
+						currState.setInitial(true);
+						initialState = false;
+					}
+					if (marked == 1)
+					{
+						currState.setAccepting(true);
+						currState.setForbidden(false);
+					}
+					else
+					{
+						currState.setAccepting(false);
+						currState.setForbidden(false);
+					}
+					currAutomaton.addState(currState);
+
+					numberOfRemainingStates--;
+
+					if (numberOfRemainingTransitions > 0)
+					{
+						 currParserState = STATE_READ_TRANSITION;
+					}
+					else
+					{
+						if (numberOfRemainingStates > 0)
+						{
+							currParserState = STATE_READ_STATE;
+						}
+						else
+						{
+							currParserState = STATE_READ_ADDITIONAL_EVENTS;
+						}
+					}
 
 				}
-				else if (currState == STATE_READ_TRANSITION)
+				else if (currParserState == STATE_READ_TRANSITION)
 				{
-					//currState = STATE_READ_STATE;
+					String currEvent = currToken;
+					String destStateName = tokenizer.nextToken();
+					if (currEvent == null)
+					{
+						logger.error("Expected an event");
+					}
+					if (destStateName == null)
+					{
+						logger.error("Expected a destination state");
+					}
 
+					boolean currEventControllable = true;
+					boolean currEventObservable = true;
+
+					while (tokenizer.hasMoreTokens())
+					{
+						String optionalParameter = tokenizer.nextToken();
+						if (optionalParameter.equalsIgnoreCase("c"))
+						{
+							currEventControllable = true;
+						}
+						else if (optionalParameter.equalsIgnoreCase("uc"))
+						{
+							currEventControllable = false;
+						}
+						else if (optionalParameter.equalsIgnoreCase("o"))
+						{
+							currEventObservable = true;
+						}
+						else if (optionalParameter.equalsIgnoreCase("uo"))
+						{
+							currEventObservable = false;
+						}
+						else
+						{
+							logger.warn("Unknown event attribute: " + optionalParameter);
+						}
+					}
+
+					LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
+					currLabeledEvent.setControllable(currEventControllable);
+					currLabeledEvent.setObservable(currEventObservable);
+					currLabeledEvent.setPrioritized(true);
+					transitionMap.addArc(currState.getName(), destStateName, currLabeledEvent);
+
+					numberOfRemainingTransitions--;
+
+					if (numberOfRemainingTransitions > 0)
+					{
+						 currParserState = STATE_READ_TRANSITION;
+					}
+					else
+					{
+						if (numberOfRemainingStates > 0)
+						{
+							currParserState = STATE_READ_STATE;
+						}
+						else
+						{
+							currParserState = STATE_READ_ADDITIONAL_EVENTS;
+						}
+					}
 
 				}
-				else if (currState == STATE_READ_ADDITIONAL_EVENTS)
+				else if (currParserState == STATE_READ_ADDITIONAL_EVENTS)
 				{
+					if (currToken.equalsIgnoreCase("EVENTS"))
+					{ // Do nothing
 
+					}
+					else
+					{
+						String currEvent = currToken;
+						if (currAlphabet.containsEventWithLabel(currEvent))
+						{
+							logger.warn(currEvent + " is already defined");
+						}
+						LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
+						currAlphabet.addEvent(currLabeledEvent);
+					}
 				}
-				//println(tokenizer.nextToken());
 			}
 
 
 			currLine = reader.readLine();
 		}
+
+		// Add all transitions and events
+		for (Iterator labelIt = transitionMap.labelIterator(); labelIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent)labelIt.next();
+			List currList = transitionMap.getTransitions(currEvent);
+
+			// Add the event
+			if (currAlphabet.contains(currEvent))
+			{
+				logger.warn(currEvent.getLabel() + " is already defined");
+			}
+			currAlphabet.addEvent(currEvent);
+
+			// Add the transition
+			for (Iterator transIt = currList.iterator(); transIt.hasNext(); )
+			{
+				TransitionMap.Transition currTransition = (TransitionMap.Transition)transIt.next();
+				String sourceStateName = currTransition.getSourceStateName();
+				String destStateName = currTransition.getDestStateName();
+				State currSourceState = currAutomaton.getStateWithName(sourceStateName);
+				State currDestState = currAutomaton.getStateWithName(destStateName);
+
+
+				// Create and add the arc
+				Arc currArc = new Arc(currSourceState, currDestState, currEvent);
+				currAutomaton.addArc(currArc);
+			}
+
+
+		}
+
+
 		return currProject;
 	}
 
-	protected void readState()
+}
+
+class TransitionMap
+{
+	private HashMap theMap = new HashMap();
+
+	public TransitionMap()
 	{
 
 	}
 
-	protected void readTransition()
+	public void addArc(String sourceState, String destState, LabeledEvent event)
 	{
+		Transition newTransition = new Transition(sourceState, destState);
 
+		List transitions;
+		if (theMap.containsKey(event))
+		{
+			transitions = (List)theMap.get(event);
+		}
+		else
+		{
+			transitions = new LinkedList();
+			theMap.put(event, transitions);
+		}
+		transitions.add(newTransition);
 	}
 
+	public Iterator labelIterator()
+	{
+		Set currSet = theMap.keySet();
+		return currSet.iterator();
+	}
 
+	public List getTransitions(LabeledEvent event)
+	{
+		if (theMap.containsKey(event))
+		{
+			return (List)theMap.get(event);
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+/*
+	public boolean containsEvent(String label)
+	{
+		LabeledEvent tmpEvent = new LabeledEvent(label);
+		return theMap.containsKey(tmpEvent);
+	}
+*/
+
+	class Transition
+	{
+		private String sourceState = null;
+		private String destState = null;
+
+		public Transition(String sourceState, String destState)
+		{
+			this.sourceState = sourceState;
+			this.destState = destState;
+		}
+
+		public String getSourceStateName()
+		{
+			return sourceState;
+		}
+
+		public String getDestStateName()
+		{
+			return destState;
+		}
+	}
 }

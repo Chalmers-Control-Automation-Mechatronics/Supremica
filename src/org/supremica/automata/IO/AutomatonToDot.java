@@ -256,7 +256,11 @@ public class AutomatonToDot
 					if (thisEvent.isEpsilon())
 					{
 						pw.print("@");
-						// pw.print("\356" + "");  // ascii-epsilon
+					}
+
+					if (!thisEvent.isObservable())
+					{
+						pw.print("§");
 					}
 
 					pw.print(EncodingHelper.normalize(thisEvent.getLabel()));

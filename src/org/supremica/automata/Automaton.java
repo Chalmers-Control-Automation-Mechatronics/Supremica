@@ -522,7 +522,7 @@ public class Automaton
 		return (State) idStateMap.get(state.getId());
 	}
 
-	// Given thsi state, which belongs to this stateset, return a unique id-string
+	// Given this state, which belongs to this stateset, return a unique id-string
 	public String getUniqueStateId(State state)
 	{
 		// prereq: state is in theStates:
