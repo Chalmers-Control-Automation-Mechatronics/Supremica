@@ -148,6 +148,40 @@ class AutomataSelector
 		return partialSet; // empty, only when we're done. For a spec with no matching plants, this spec will be included
 	}
 
+	// To your current selection of spec and plants, add all plants that have this event
+	// Note -- except for the closedSet stuff, this code is identical to the inner loop above. Merge?
+	public Automata addPlant(LabeledEvent currEvent)
+	{
+		if (eventToAutomataMap.get(currEvent) != null)
+		{
+			Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
+
+			while (plantIterator.hasNext())
+			{
+				Automaton currPlantAutomaton = (Automaton) plantIterator.next();
+
+				// This check is performed in eventToAutomataMap
+				// if (currPlantAutomaton.getType() == AutomatonType.Plant)
+				if (!partialSet.containsAutomaton(currPlantAutomaton))
+				{
+					partialSet.addAutomaton(currPlantAutomaton);
+					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
+
+				}
+			}
+		}
+		return partialSet; // return the updated set
+	}
+
+	public Automata addPlants(Alphabet events)
+	{
+		for(Iterator it = events.iterator(); it.hasNext(); )
+		{
+			addPlant((LabeledEvent)it.next());
+		}
+		return partialSet;
+	}
+
 	// Return wether we've seen a spec/sup or not
 	boolean hadSpec()
 	{
@@ -159,7 +193,7 @@ class MonolithicReturnValue
 {
 	public Automaton automaton;
 	public boolean didSomething;
-	public Alphabet disabledEvents;
+	public Alphabet disabledEvents;	// see AutomatonSynthesizer
 }
 
 public class AutomataSynthesizer
@@ -293,7 +327,8 @@ public class AutomataSynthesizer
 		{
 			Automata modSupervisors = new Automata(); // collects the calculated supervisors
 
-			AutomataSelector selector = new AutomataSelector(theAutomata, synthesizerOptions.getMaximallyPermissive());
+//			AutomataSelector selector = new AutomataSelector(theAutomata, synthesizerOptions.getMaximallyPermissive());
+			AutomataSelector selector = new AutomataSelector(theAutomata, false);	// always start with non-max perm
 			for(Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
 			{
 				if(automata.size() > 1) // no need to do anything for a singleton spec
@@ -301,67 +336,35 @@ public class AutomataSynthesizer
 					MonolithicReturnValue retval = doMonolithic(automata);
 					if(retval.didSomething)
 					{
-						modSupervisors.addAutomaton(retval.automaton);
-						Alphabet disabledEvents = retval.disabledEvents;
-						if (disabledEvents != null)
-						{
-							for (Iterator autIt = automata.iterator(); autIt.hasNext();)
-							{
-								Automaton currAutomaton = (Automaton) autIt.next();
-								if (currAutomaton.isSupervisor() || currAutomaton.isSpecification())
-								{
-									Alphabet currAlphabet = currAutomaton.getAlphabet();
-									disabledEvents.minus(currAlphabet);
-								}
-							}
-							// Remove those disabled events that is not included in another plant
-							LinkedList eventsToBeRemoved = new LinkedList();
+						retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 
-							for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
-							{
-								LabeledEvent currEvent = (LabeledEvent)evIt.next();
-								Set currAutomata = (Set) eventToAutomataMap.get(currEvent);
-								boolean removeEvent = true;
-								// currAutomata contains those plant automata that contains this event.
-								for (Iterator autIt = currAutomata.iterator(); autIt.hasNext();)
-								{
-									Automaton currAutomaton = (Automaton) autIt.next();
-									if (currAutomaton.isPlant())
-									{
-										// Check if there is a plant not included in this
-										// modular supervisor. If no such plant exists then remove this
-										// event from the set of disabled events.
-										if (!automata.containsAutomaton(currAutomaton.getName()))
-										{
-											removeEvent = false;
-										}
-									}
-								}
-								if (removeEvent)
-								{
-									eventsToBeRemoved.add(currEvent);
-								}
-							}
-
-							for (Iterator evIt = eventsToBeRemoved.iterator(); evIt.hasNext();)
-							{
-								LabeledEvent currEvent = (LabeledEvent)evIt.next();
-								disabledEvents.removeEvent(currEvent);
-							}
-						}
-						if (disabledEvents.size() > 0)
+						Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
+						if (disabledEvents.size() > 0) // it's not (guaranteed to be) maximally permissive...
 						{
-							logger.info("The synthesized supervisor might not be maximally permissive due to:");
-							for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
+							if(synthesizerOptions.getMaximallyPermissive()) // ...but we should care
 							{
-								LabeledEvent currEvent = (LabeledEvent)evIt.next();
-								logger.info(currEvent.getLabel() + " is included in the plant but not in the supervisor");
+								// This would be all there is to it!
+								automata = selector.addPlants(disabledEvents);
+								retval = doMonolithic(automata); // now we're *guaranteed* max perm
+								retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+							}
+							else
+							{
+								logger.info("The synthesized supervisor " + retval.automaton.getComment() + " might not be maximally permissive due to:");
+								for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
+								{
+									LabeledEvent currEvent = (LabeledEvent)evIt.next();
+									logger.info(currEvent.getLabel() + " is included in the plant but not in the supervisor");
+
+								}
 							}
 						}
 						else
 						{
-							logger.info("The synthesized supervisor is maximally permissive.");
+							logger.info("The synthesized supervisor " + retval.automaton.getComment() + " is maximally permissive.");
 						}
+
+						modSupervisors.addAutomaton(retval.automaton);
 					}
 				}
 			}
@@ -396,6 +399,60 @@ public class AutomataSynthesizer
 		{
 			logger.error("Unknown synthesis algorithm");
 		}
+	}
+
+	// Removes from disabledEvents those events that are "insignificant"
+	// Returns the result, which is an altered disabledEvents
+	private Alphabet checkMaximallyPermissive(Automata automata, Alphabet disabledEvents)
+	{
+		if (disabledEvents != null)
+		{
+			for (Iterator autIt = automata.iterator(); autIt.hasNext();)
+			{
+				// disregard the uc-events of this spec/supervisor
+				Automaton currAutomaton = (Automaton) autIt.next();
+				if (currAutomaton.isSupervisor() || currAutomaton.isSpecification())
+				{
+					Alphabet currAlphabet = currAutomaton.getAlphabet();
+					disabledEvents.minus(currAlphabet);
+				}
+			}
+			// Remove those disabled events that are not included in another plant
+			LinkedList eventsToBeRemoved = new LinkedList();
+
+			for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext(); )
+			{
+				LabeledEvent currEvent = (LabeledEvent)evIt.next();
+				Set currAutomata = (Set) eventToAutomataMap.get(currEvent);
+				boolean removeEvent = true;
+				// currAutomata contains those plant automata that contain this event.
+				for (Iterator autIt = currAutomata.iterator(); autIt.hasNext();)
+				{
+					Automaton currAutomaton = (Automaton) autIt.next();
+					if (currAutomaton.isPlant())
+					{
+						// Check if there is a plant not included in this
+						// modular supervisor. If no such plant exists then remove this
+						// event from the set of disabled events.
+						if (!automata.containsAutomaton(currAutomaton.getName()))
+						{
+							removeEvent = false;
+						}
+					}
+				}
+				if (removeEvent)
+				{
+					eventsToBeRemoved.add(currEvent);
+				}
+			}
+
+			for (Iterator evIt = eventsToBeRemoved.iterator(); evIt.hasNext();)
+			{
+				LabeledEvent currEvent = (LabeledEvent)evIt.next();
+				disabledEvents.removeEvent(currEvent);
+			}
+		}
+		return disabledEvents;
 	}
 
 	// This is the engine, synchronizes the given automata, and calcs the forbidden states
