@@ -51,5 +51,5 @@ package org.supremica.util;
 
 public interface PriorityQueueObject
 {
-	public int value();
+	int value();
 }

@@ -51,29 +51,29 @@ package org.supremica.log;
 
 public interface Logger
 {
-	public void debug(Object message);
+	void debug(Object message);
 
-	public void debug(StackTraceElement[] stackTrace);
-	
-	public void debug(Object message, Throwable t);
+	void debug(StackTraceElement[] stackTrace);
 
-	public void error(Object message);
+	void debug(Object message, Throwable t);
 
-	public void error(Object message, Throwable t);
+	void error(Object message);
 
-	public void fatal(Object message);
+	void error(Object message, Throwable t);
 
-	public void fatal(Object message, Throwable t);
+	void fatal(Object message);
 
-	public void warn(Object message);
+	void fatal(Object message, Throwable t);
 
-	public void warn(Object message, Throwable t);
+	void warn(Object message);
 
-	public void info(Object message);
+	void warn(Object message, Throwable t);
 
-	public void info(Object message, Throwable t);
+	void info(Object message);
 
-	public boolean isDebugEnabled();
-	
-	public void setLogToConsole(boolean log);
+	void info(Object message, Throwable t);
+
+	boolean isDebugEnabled();
+
+	void setLogToConsole(boolean log);
 }

@@ -121,7 +121,7 @@ class SetOfStateSets
 // Depending on the way we want to interpret epsilon, instantiate diferent objects
 interface EpsilonTester
 {
-	public boolean isThisEpsilon(LabeledEvent event);
+	boolean isThisEpsilon(LabeledEvent event);
 }
 //
 class DefaultEpsilonTester

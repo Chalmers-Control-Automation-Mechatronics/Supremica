@@ -15,6 +15,6 @@ public interface AuthenticatedXmlRpcHandler
 	/**
 	 * Return the result, or throw an Exception if something went wrong.
 	 */
-	public Object execute(String method, Vector params, String user, String password)
+	Object execute(String method, Vector params, String user, String password)
 		throws Exception;
 }

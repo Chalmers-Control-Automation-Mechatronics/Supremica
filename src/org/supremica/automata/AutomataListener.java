@@ -52,11 +52,11 @@ package org.supremica.automata;
 public interface AutomataListener
 	extends Listener
 {
-	public void automatonAdded(Automata automata, Automaton automaton);
+	void automatonAdded(Automata automata, Automaton automaton);
 
-	public void automatonRemoved(Automata automata, Automaton automaton);
+	void automatonRemoved(Automata automata, Automaton automaton);
 
-	public void automatonRenamed(Automata automata, Automaton automaton);
+	void automatonRenamed(Automata automata, Automaton automaton);
 
-	public void actionsOrControlsChanged(Automata automata);
+	void actionsOrControlsChanged(Automata automata);
 }

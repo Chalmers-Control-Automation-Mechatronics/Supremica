@@ -51,5 +51,5 @@ package org.supremica.automata;
 
 public interface ProjectFactory
 {
-	public Project getProject();
+	Project getProject();
 }

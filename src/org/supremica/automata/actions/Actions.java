@@ -51,13 +51,13 @@ package org.supremica.automata.actions;
 
 public interface Actions
 {
-	public String getType();
+	String getType();
 
-	public String getDescription();
+	String getDescription();
 
-	public boolean isValid();
+	boolean isValid();
 
-	public String getErrorMessage();
+	String getErrorMessage();
 
-	public String serialize();
+	String serialize();
 }

@@ -9,11 +9,11 @@ import org.supremica.gui.ExecutionDialogMode;
 
 public interface Monitorable
 {
-	public int getProgress();
+	int getProgress();
 
-	public String getActivity();
+	String getActivity();
 
-	public void stopTask();
+	void stopTask();
 
-	public boolean wasStopped();
+	boolean wasStopped();
 }

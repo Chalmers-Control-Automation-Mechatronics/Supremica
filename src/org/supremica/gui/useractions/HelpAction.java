@@ -15,12 +15,12 @@ public class HelpAction
 {
  	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
-	
+
 	public HelpAction()
 	{
 		super("Supervisory Control", new ImageIcon(HelpAction.class.getResource("/toolbarButtonGraphics/general/Help16.gif")));
 		putValue(SHORT_DESCRIPTION, "Provides help on supervisory control theory");
-		
+
 		this.help = new ContentHelp();
 		this.helpDisplayer = new CSH.DisplayHelpFromSource(help.getStandardHelpBroker());
 	}

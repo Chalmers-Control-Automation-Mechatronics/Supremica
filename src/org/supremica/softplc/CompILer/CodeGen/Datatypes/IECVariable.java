@@ -11,7 +11,8 @@ public interface IECVariable
 {
 
 	/** getType returns the corresponding type constant of an elementary type
- * @see TypeConstant
-	 * @return the type constant*/
-	public TypeConstant getType();
+	 * @see TypeConstant
+	 * @return the type constant
+	 */
+	TypeConstant getType();
 }

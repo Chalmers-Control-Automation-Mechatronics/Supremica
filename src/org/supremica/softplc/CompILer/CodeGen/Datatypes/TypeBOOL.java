@@ -30,7 +30,6 @@ public class TypeBOOL
 	{
 		return value;
 	}
-	;
 
 	public String toString()
 	{

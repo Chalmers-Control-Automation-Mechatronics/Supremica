@@ -35,7 +35,7 @@ class IntegerField
 
 interface TestCase
 {
-	public Project doIt()
+	Project doIt()
 		throws Exception;
 }
 

@@ -58,7 +58,6 @@ public class VisualProjectFactory
 	private static Logger logger = LoggerFactory.createLogger(VisualProjectFactory.class);
 
 	public VisualProjectFactory() {}
-	;
 
 	public Project getProject()
 	{

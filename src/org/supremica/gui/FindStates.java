@@ -720,11 +720,11 @@ class FindStatesTable
 
 interface FindStatesTab
 {
-	public String getTitle();
+	String getTitle();
 
-	public String getTip();
+	String getTip();
 
-	public StateMatcher getMatcher();
+	StateMatcher getMatcher();
 }
 
 
@@ -1063,13 +1063,13 @@ public class FindStates
 		super("Find States...");
 		putValue(SHORT_DESCRIPTION, "Specify and search for significant states");
 	}
-	
+
 	public FindStates(VisualProject theProject, Automata theAutomata)
 		throws Exception
 	{
 		new FindStatesFrame(theProject, theAutomata);
 	}
-	
+
 	public void actionPerformed(ActionEvent e)
 	// Find States... action selected
 	// public static void findStates_action(Gui gui)

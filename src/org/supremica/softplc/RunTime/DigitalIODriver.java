@@ -21,7 +21,7 @@ public interface DigitalIODriver
 	/** setSignalArray sets all output signals on the I/O-card
 	 *  @param values new values for outputs
 	 */
-	public void setSignalArray(boolean[] values)
+	void setSignalArray(boolean[] values)
 		throws Exception;
 
 	/** get a specific signal
@@ -34,18 +34,18 @@ public interface DigitalIODriver
 	/** getSignal gets the values of all input signals
 	 *  @param values for the input signals
 	 */
-	public void getSignalArray(boolean[] values)
+	void getSignalArray(boolean[] values)
 		throws Exception;
 
-	public short getNrOfSignalsIn();
+	short getNrOfSignalsIn();
 
-	public short getNrOfSignalsOut();
+	short getNrOfSignalsOut();
 
-	public boolean hasInputDescriptions();
+	boolean hasInputDescriptions();
 
-	public boolean hasOutputDescriptions();
+	boolean hasOutputDescriptions();
 
-	public String[] getInputDescriptions();
+	String[] getInputDescriptions();
 
-	public String[] getOutputDescriptions();
+	String[] getOutputDescriptions();
 }

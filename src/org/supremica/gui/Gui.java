@@ -21,55 +21,55 @@ import org.supremica.gui.VisualProjectContainer;
 
 public interface Gui
 {
-	public void error(String msg);
+	void error(String msg);
 
 	// outputs an error message
-	public void error(String msg, Throwable t);
+	void error(String msg, Throwable t);
 
-	public void info(String msg);
+	void info(String msg);
 
-	public void debug(String msg);
+	void debug(String msg);
 
-	public void repaint();
+	void repaint();
 
-	public String getNewAutomatonName(String str, String def);
+	String getNewAutomatonName(String str, String def);
 
 	// who uses this one?
-	public void clearSelection();
+	void clearSelection();
 
-	public void selectAll();
+	void selectAll();
 
-	public void close();
+	void close();
 
-	public int addAutomata(Automata a)
+	int addAutomata(Automata a)
 		throws Exception;
 
 	// returns number added
-	public int addProject(Project p)
+	int addProject(Project p)
 		throws Exception;
 
 	// returns true if added
-	public boolean addAutomaton(Automaton a);
+	boolean addAutomaton(Automaton a);
 
-	public Component getComponent();
+	Component getComponent();
 
-	public void addAttributes(Project otherProject);
+	void addAttributes(Project otherProject);
 
 	//public void addActions(Actions theActions);
 
 	//public void addControls(Controls theControls);
 
 	// Do we need this one?
-	public JFrame getFrame();
+	JFrame getFrame();
 
 	// this should be the main frame
-	public VisualProjectContainer getVisualProjectContainer();
+	VisualProjectContainer getVisualProjectContainer();
 
-	public Collection getSelectedAutomataAsCollection();
+	Collection getSelectedAutomataAsCollection();
 
-	public Automata getSelectedAutomata();
+	Automata getSelectedAutomata();
 
-	public Project getSelectedProject();
+	Project getSelectedProject();
 
-	public FileSecurity getFileSecurity();
+	FileSecurity getFileSecurity();
 }

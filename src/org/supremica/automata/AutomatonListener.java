@@ -52,15 +52,15 @@ package org.supremica.automata;
 public interface AutomatonListener
 	extends Listener
 {
-	public void stateAdded(Automaton aut, State q);
+	void stateAdded(Automaton aut, State q);
 
-	public void stateRemoved(Automaton aut, State q);
+	void stateRemoved(Automaton aut, State q);
 
-	public void arcAdded(Automaton aut, Arc a);
+	void arcAdded(Automaton aut, Arc a);
 
-	public void arcRemoved(Automaton aut, Arc a);
+	void arcRemoved(Automaton aut, Arc a);
 
-	public void attributeChanged(Automaton aut);
+	void attributeChanged(Automaton aut);
 
-	public void automatonRenamed(Automaton aut, String oldName);
+	void automatonRenamed(Automaton aut, String oldName);
 }

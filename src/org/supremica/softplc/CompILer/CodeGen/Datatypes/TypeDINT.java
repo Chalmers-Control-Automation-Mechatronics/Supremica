@@ -30,7 +30,6 @@ public class TypeDINT
 	{
 		return value;
 	}
-	;
 
 	public String toString()
 	{

@@ -13,5 +13,5 @@ public interface IECConstant
 	 * @see TypeConstant
 	 * @return the type
 	 */
-	public TypeConstant getType();
+	TypeConstant getType();
 }

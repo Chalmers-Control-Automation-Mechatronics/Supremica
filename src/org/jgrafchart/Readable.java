@@ -3,15 +3,15 @@ package org.jgrafchart;
 public interface Readable
 	extends Referencable
 {
-	public boolean getBoolVal();
+	boolean getBoolVal();
 
-	public boolean getOldBoolVal();
+	boolean getOldBoolVal();
 
-	public int getIntVal();
+	int getIntVal();
 
-	public int getOldIntVal();
+	int getOldIntVal();
 
-	public String getStringVal();
+	String getStringVal();
 
-	public String getOldStringVal();
+	String getOldStringVal();
 }

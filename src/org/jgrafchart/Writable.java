@@ -3,15 +3,15 @@ package org.jgrafchart;
 public interface Writable
 	extends Referencable
 {
-	public boolean isBoolean();
+	boolean isBoolean();
 
-	public boolean isInteger();
+	boolean isInteger();
 
-	public boolean isString();
+	boolean isString();
 
-	public void setStoredBoolAction(boolean b);
+	void setStoredBoolAction(boolean b);
 
-	public void setStoredIntAction(int i);
+	void setStoredIntAction(int i);
 
-	public void setStoredStringAction(String s);
+	void setStoredStringAction(String s);
 }

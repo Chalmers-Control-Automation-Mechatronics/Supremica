@@ -30,7 +30,6 @@ public class TypeREAL
 	{
 		return value;
 	}
-	;
 
 	public String toString()
 	{

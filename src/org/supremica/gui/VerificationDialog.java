@@ -58,9 +58,9 @@ import javax.swing.*;
 
 interface VerificationPanel
 {
-	public void update(VerificationOptions v);
+	void update(VerificationOptions v);
 
-	public void regain(VerificationOptions v);
+	void regain(VerificationOptions v);
 }
 
 

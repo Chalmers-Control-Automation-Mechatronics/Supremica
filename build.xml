@@ -35,6 +35,15 @@
 *	just change "jikes" to "classic" on the next line.
 -->
 <property name="build.compiler" value="jikes"/>
+<!-- Enables emacs warning warning and error mesages. This is equals to calling jikes +E -->
+<!-- Put this in TextPad to get clickable error messages
+	Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
+	File Register = 1
+	Line Register = 2
+	Column Register = 3
+-->
+<property name="build.compiler.emacs" value="true"/>
+<property name="build.compiler.pedantic" value="true"/>
 
 <!-- 
 *	Run this script after checking out the sources for the

@@ -4,5 +4,5 @@ package org.jgrafchart.io;
 
 public interface DigitalOutput
 {
-	public void set(boolean value);
+	void set(boolean value);
 }

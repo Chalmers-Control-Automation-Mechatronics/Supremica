@@ -49,7 +49,6 @@ public class IECDirectVariable
 	{
 		return number;
 	}
-	;
 
 	public boolean isInput()
 	{

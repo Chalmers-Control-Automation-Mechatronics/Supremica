@@ -53,7 +53,7 @@ import org.supremica.automata.algorithms.SearchStates;
 
 public interface StateMatcher
 {
-	public boolean matches(SearchStates.StateIterator it);
+	boolean matches(SearchStates.StateIterator it);
 }
 
 //

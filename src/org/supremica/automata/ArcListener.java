@@ -52,7 +52,7 @@ package org.supremica.automata;
 public interface ArcListener
 	extends Listener
 {
-	public void arcAdded(Arc arc);
+	void arcAdded(Arc arc);
 
-	public void arcRemoved(Arc arc);
+	void arcRemoved(Arc arc);
 }

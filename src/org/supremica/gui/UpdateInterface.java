@@ -301,9 +301,9 @@ class UpdateInterfaceTable
 
 interface UpdateInterfaceTab
 {
-	public String getTitle();
+	String getTitle();
 
-	public String getTip();
+	String getTip();
 }
 
 

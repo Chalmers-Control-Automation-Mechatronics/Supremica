@@ -30,7 +30,6 @@ public class TypeFUNCTION_BLOCK
 	{
 		return name;
 	}
-	;
 
 	public String toString()
 	{

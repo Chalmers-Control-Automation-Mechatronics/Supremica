@@ -3,33 +3,33 @@ package org.jgrafchart.Actions;
 
 public interface ActionParserTreeConstants
 {
-	public int JJTPROCPARAM = 0;
-	public int JJTVOID = 1;
-	public int JJTCALLBYVALUENODE = 2;
-	public int JJTCALLBYREFERENCENODE = 3;
-	public int JJTPROCCALL = 4;
-	public int JJTSTATEMENT = 5;
-	public int JJTNORMALNODE = 6;
-	public int JJTPERIODICNODE = 7;
-	public int JJTSTOREDNODE = 8;
-	public int JJTEXITNODE = 9;
-	public int JJTANDNODE = 10;
-	public int JJTORNODE = 11;
-	public int JJTEQNODE = 12;
-	public int JJTNEQNODE = 13;
-	public int JJTLTNODE = 14;
-	public int JJTGTNODE = 15;
-	public int JJTLENODE = 16;
-	public int JJTGENODE = 17;
-	public int JJTPLUSNODE = 18;
-	public int JJTMINUSNODE = 19;
-	public int JJTMULTNODE = 20;
-	public int JJTDIVNODE = 21;
-	public int JJTNOTNODE = 22;
-	public int JJTINTEGER = 23;
-	public int JJTVARIABLE = 24;
-	public int JJTSTRING = 25;
-	public String[] jjtNodeName = { "ProcParam", "void", "CallByValueNode",
+	int JJTPROCPARAM = 0;
+	int JJTVOID = 1;
+	int JJTCALLBYVALUENODE = 2;
+	int JJTCALLBYREFERENCENODE = 3;
+	int JJTPROCCALL = 4;
+	int JJTSTATEMENT = 5;
+	int JJTNORMALNODE = 6;
+	int JJTPERIODICNODE = 7;
+	int JJTSTOREDNODE = 8;
+	int JJTEXITNODE = 9;
+	int JJTANDNODE = 10;
+	int JJTORNODE = 11;
+	int JJTEQNODE = 12;
+	int JJTNEQNODE = 13;
+	int JJTLTNODE = 14;
+	int JJTGTNODE = 15;
+	int JJTLENODE = 16;
+	int JJTGENODE = 17;
+	int JJTPLUSNODE = 18;
+	int JJTMINUSNODE = 19;
+	int JJTMULTNODE = 20;
+	int JJTDIVNODE = 21;
+	int JJTNOTNODE = 22;
+	int JJTINTEGER = 23;
+	int JJTVARIABLE = 24;
+	int JJTSTRING = 25;
+	String[] jjtNodeName = { "ProcParam", "void", "CallByValueNode",
 									"CallByReferenceNode", "ProcCall",
 									"Statement", "NormalNode", "PeriodicNode",
 									"StoredNode", "ExitNode", "AndNode",

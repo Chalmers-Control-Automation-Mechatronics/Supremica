@@ -54,9 +54,9 @@ import org.supremica.automata.*;
 public interface VisualProjectContainerListener
 	extends Listener
 {
-	public void projectAdded(VisualProjectContainer container, Project theProject);
+	void projectAdded(VisualProjectContainer container, Project theProject);
 
-	public void projectRemoved(VisualProjectContainer container, Project theProject);
+	void projectRemoved(VisualProjectContainer container, Project theProject);
 
-	public void projectRenamed(VisualProjectContainer container, Project theProject);
+	void projectRenamed(VisualProjectContainer container, Project theProject);
 }

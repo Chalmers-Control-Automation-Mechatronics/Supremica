@@ -3,22 +3,22 @@ package org.jgrafchart.Transitions;
 
 public interface TransitionParserTreeConstants
 {
-	public int JJTSTART = 0;
-	public int JJTVOID = 1;
-	public int JJTANDNODE = 2;
-	public int JJTORNODE = 3;
-	public int JJTEQNODE = 4;
-	public int JJTNEQNODE = 5;
-	public int JJTLTNODE = 6;
-	public int JJTGTNODE = 7;
-	public int JJTLENODE = 8;
-	public int JJTGENODE = 9;
-	public int JJTNOTNODE = 10;
-	public int JJTINTEGER = 11;
-	public int JJTVAR = 12;
-	public int JJTEVUVAR = 13;
-	public int JJTEVDVAR = 14;
-	public String[] jjtNodeName = { "Start", "void", "AndNode", "OrNode",
+	int JJTSTART = 0;
+	int JJTVOID = 1;
+	int JJTANDNODE = 2;
+	int JJTORNODE = 3;
+	int JJTEQNODE = 4;
+	int JJTNEQNODE = 5;
+	int JJTLTNODE = 6;
+	int JJTGTNODE = 7;
+	int JJTLENODE = 8;
+	int JJTGENODE = 9;
+	int JJTNOTNODE = 10;
+	int JJTINTEGER = 11;
+	int JJTVAR = 12;
+	int JJTEVUVAR = 13;
+	int JJTEVDVAR = 14;
+	String[] jjtNodeName = { "Start", "void", "AndNode", "OrNode",
 									"EQNode", "NEQNode", "LTNode", "GTNode",
 									"LENode", "GENode", "NotNode", "Integer",
 									"Var", "Evuvar", "Evdvar", };

@@ -63,8 +63,8 @@ class PresentStatesTableModel
 
 interface SelectionListener // should this be a utility class?
 {
-	public void emptySelection();
-	public void nonEmptySelection();
+	void emptySelection();
+	void nonEmptySelection();
 }
 
 class PresentStatesTable

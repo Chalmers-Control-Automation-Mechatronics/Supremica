@@ -30,7 +30,6 @@ public class TypeWSTRING
 	{
 		return value;
 	}
-	;
 
 	public String toString()
 	{
