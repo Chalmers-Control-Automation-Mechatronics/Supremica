@@ -52,14 +52,85 @@ package org.supremica.tools.updater;
 import java.io.*;
 import java.util.*;
 import java.net.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-
 
 public class Updater
-	extends JFrame
 {
+	public InputStream getRemoteFile(String url)
+		throws Exception
+	{
+		URL theUrl = new URL(url);
+		HttpURLConnection httpConnection;
+		httpConnection = (HttpURLConnection)theUrl.openConnection();
+		httpConnection.connect();
+		InputStream iStream = httpConnection.getInputStream();
+		return iStream;
+	}
+
+	public InputStream getLocalFile(String fileName)
+		throws Exception
+	{
+		File theFile = new File(fileName);
+		FileInputStream iStream = new FileInputStream(theFile);
+		BufferedInputStream bIStream = new BufferedInputStream(iStream);
+		return bIStream;
+	}
+
+	// E.g. http://www.s2.chalmers.se/%7Eka/Supremica/updates/noarch/SupremicaVersion.txt
+	public String getLatestVersion(String url)
+	{
+		InputStream remoteSupremicaVersionStream;
+		try
+		{
+			remoteSupremicaVersionStream = getRemoteFile(url);
+		}
+		catch (Exception e)
+		{
+			System.err.println("Error downloading: " + url + ". Update check aborted.");
+			return null;
+		}
+		Properties remoteProperties = new Properties();
+		try
+		{
+			remoteProperties.load(remoteSupremicaVersionStream);
+		}
+		catch (IOException e)
+		{
+			System.err.println("Error finding new version information.");
+			return null;
+		}
+		return remoteProperties.getProperty("SupremicaVersion");
+	}
+
+	public void writeLocalFile(InputStream iStream, File outFile)
+		throws Exception
+	{
+		try
+		{
+			FileOutputStream outStream = new FileOutputStream(outFile);
+			BufferedInputStream bIStream = new BufferedInputStream(iStream);
+
+			byte[] buffer = new byte[1024];
+			int offset = 0;
+			int nbrOfReadBytes = 0;
+			do
+			{
+				nbrOfReadBytes = bIStream.read(buffer, offset, buffer.length);
+				if (nbrOfReadBytes >= 0)
+				{
+					System.out.print(".");
+					outStream.write(buffer, offset, nbrOfReadBytes);
+				}
+			}
+			while (nbrOfReadBytes >= 0);
+			outStream.flush();
+			outStream.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+			e.printStackTrace();
+		}
+	}
 /*
 	private String host = null;
 	private Properties localProperties = null;

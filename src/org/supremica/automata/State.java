@@ -51,7 +51,6 @@ package org.supremica.automata;
 
 import java.util.*;
 
-// import org.supremica.gui.editor.*; //** MF ** The model should know _zilch_ about the view/UI
 import java.awt.Point;
 
 public class State
@@ -75,6 +74,7 @@ public class State
 	private boolean last = false;
 	private int cost = UNDEF_COST;
 	private boolean visited = false;
+	private State prevState = null;
 	private Object equivClass = null;
 	private int x = UNDEF_POS;
 	private int y = UNDEF_POS;
@@ -245,6 +245,25 @@ public class State
 	public boolean isActive()
 	{
 		return active;
+	}
+
+	/**
+	 * This is only valid after setPreviousState
+	 * has been called.
+	 */
+	public State getPreviousState()
+	{
+		return prevState;
+	}
+
+	/**
+	 * Set a state as the previous state.
+	 * This is used when computing the shortest
+	 * trace to a state.
+	 */
+	public void setPreviousState(State prevState)
+	{
+		this.prevState = prevState;
 	}
 
 	public void setSelected(boolean selected)

@@ -155,6 +155,7 @@ class MonolithicReturnValue
 public class AutomataSynthesizer
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
+
 	private Automata theAutomata;
 	private int nbrOfExecuters;
 	private HashMap eventToAutomataMap = new HashMap();

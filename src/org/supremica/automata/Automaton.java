@@ -319,7 +319,6 @@ public class Automaton
 		return alphabet.containsEventWithLabel(eventLabel);
 	}
 
-	// FIXA: används inte? Ovanstående är käckt i alla fall.
 	public LabeledEvent getEventWithLabel(String eventLabel)
 		throws Exception
 	{
@@ -400,6 +399,10 @@ public class Automaton
 		return theStates.iterator();
 	}
 
+	/**
+	 * Use this iterator instead of stateIterator when you will add or
+	 * remove states in this automaton.
+	 */
 	public Iterator safeStateIterator()
 	{
 		return (new LinkedList(theStates)).iterator();
@@ -525,6 +528,101 @@ public class Automaton
 
 			currState.setVisited(false);
 		}
+	}
+
+	/**
+	 * Returns the shortest trace from the initial state to toState.
+	 */
+	public LabelTrace getTrace(State toState)
+		throws Exception
+	{
+		return getTrace(getInitialState(), toState);
+	}
+
+	/**
+	 * Returns the shortest trace from fromState to toState,
+	 */
+	public LabelTrace getTrace(State fromState, State toState)
+		throws Exception
+	{
+		if (fromState == null)
+		{
+			throw new Exception("Automaton.getTrace: fromState is null");
+		}
+		if (toState == null)
+		{
+			throw new Exception("Automaton.getTrace: toState is null");
+		}
+
+		computeShortestPath(fromState);
+
+		LabelTrace theTrace = new LabelTrace();
+
+		State thisState = toState;
+		State prevState = thisState.getPreviousState();
+		while (prevState != null)
+		{
+			LabeledEvent currEvent = getLabeledEvent(prevState, thisState);
+			if (currEvent == null)
+			{
+				throw new Exception("Could not find an arc from " + prevState.getName() + " to " + thisState.getName());
+			}
+			theTrace.addFirst(currEvent.getLabel());
+			thisState = prevState;
+			prevState = prevState.getPreviousState();
+		}
+		return theTrace;
+	}
+
+	private void computeShortestPath(State fromState)
+		throws Exception
+	{
+		if (fromState == null)
+		{
+			throw new Exception("Automaton.getTrace: fromState is null");
+		}
+
+		clearVisitedStates();
+
+		// This implements a breath first search
+		LinkedList openStates = new LinkedList();
+		fromState.setPreviousState(null);
+		openStates.addLast(fromState);
+		fromState.setVisited(true);
+		while (openStates.size() > 0)
+		{
+			State currState = (State)openStates.removeFirst();
+			for (Iterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext();)
+			{
+				Arc currArc = (Arc)arcIt.next();
+				State currToState = currArc.getToState();
+				if (!currToState.isVisited())
+				{
+					currToState.setPreviousState(currState);
+					currToState.setVisited(true);
+					openStates.addLast(currToState);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns a event on a arc that starts in fromState and ens in toState.
+	 * If no such event exists, then null is returned.
+	 */
+	public LabeledEvent getLabeledEvent(State fromState, State toState)
+		throws Exception
+	{
+		for (Iterator arcIt = fromState.outgoingArcsIterator(); arcIt.hasNext();)
+		{
+			Arc currArc = (Arc)arcIt.next();
+			State currToState = currArc.getToState();
+			if (currToState == toState)
+			{
+				return getEvent(currArc.getEventId());
+			}
+		}
+		return null;
 	}
 
 	public void removeAllStates()
