@@ -396,6 +396,8 @@
 	<chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
 	<copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>	
+	<copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaProperties.cfg" perm="644"/>	
 </target>
 
 <target name="startfiles_supremica_student">

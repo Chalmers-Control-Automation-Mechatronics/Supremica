@@ -1,1 +1,1 @@
-@java -cp Supremica.jar org.supremica.apps.Supremica %1 %2 %3 %4 %5 %6 %7 %8 %9
+@java -cp Supremica.jar org.supremica.apps.Supremica -p SupremicaProperties.cfg %1 %2 %3 %4 %5 %6 %7 %8 %9
