@@ -4,7 +4,8 @@ package org.jgrafchart;
 import com.nwoods.jgo.*;
 import java.awt.*;
 import java.util.*;
-import se.lth.control.realtime.*;
+//import se.lth.control.realtime.*;
+import org.jgrafchart.io.*;
 
 /**
  * A DigitalIn is an Area containing a JGoStroke and two text labels
@@ -28,7 +29,7 @@ public class DigitalIn extends JGoArea implements Readable {
   static JGoPen redPen = new JGoPen(JGoPen.SOLID,2,red);
   static JGoPen greenPen = new JGoPen(JGoPen.SOLID,2,green);
   static JGoPen standardPen = new JGoPen(JGoPen.SOLID,2,new Color(0.0F,0.0F,0.0F));
-  public se.lth.control.realtime.DigitalIn digIn = null;
+  public DigitalInput digIn = null;
 
   public DigitalIn() {
     super();
@@ -97,10 +98,10 @@ public class DigitalIn extends JGoArea implements Readable {
 
   public JGoObject copyObject(JGoCopyEnvironment env)
   {
-    DigitalIn newobj = (DigitalIn)super.copyObject(env); 
+    DigitalIn newobj = (DigitalIn)super.copyObject(env);
     return newobj;
   }
-   
+
   public void copyChildren(JGoArea newarea,JGoCopyEnvironment env) {
 
     DigitalIn newobj = (DigitalIn)newarea;
@@ -136,7 +137,7 @@ public class DigitalIn extends JGoArea implements Readable {
 
   public void setLocation(int x, int y) {
 
-     myBorder.setSpotLocation(Center, x, y); 
+     myBorder.setSpotLocation(Center, x, y);
      layoutChildren();
   }
 
@@ -163,7 +164,7 @@ public class DigitalIn extends JGoArea implements Readable {
         (prevRect.height == getHeight())) {
       // let the default JGoArea implementation do the work
       super.geometryChange(prevRect);
-    } 
+    }
     layoutChildren();
   }
 
@@ -173,7 +174,7 @@ public class DigitalIn extends JGoArea implements Readable {
       if ((channel != newChan) || (digIn == null)) {
 	channel = newChan;
 	try {
-	  digIn = new se.lth.control.realtime.DigitalIn(channel);
+	  digIn = DigitalIOFactory.getDigitialIO().getInput(channel);
 	} catch (Exception x) {
 	  System.out.println(x.getMessage());
 	  x.printStackTrace();}
