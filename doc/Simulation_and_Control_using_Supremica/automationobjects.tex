@@ -5,12 +5,12 @@
 With the function blocks the main technological problem of
 distributed automation has been solved. A general framework
 for development and deployment of distributed automation
-system has been developed and established. What is still
-needed is a way of encapsulating function blocks together
-with the data about their properties and, more importantly,
-their functionality in a way that will enable diminishing of
-the time to market and facilitate effective rapid object
-oriented development of automation systems.
+systems has been developed. What is still needed is a way of
+encapsulating function blocks together with the data about
+their properties and, more importantly, their functionality
+in a way that will enable diminishing the time to market
+and facilitate effective rapid object oriented development
+of automation systems.
 
 \section{Background}
 %% Background. Why automation objects? What do we want to do?
@@ -20,14 +20,9 @@ afore mentioned goal.
 
 %%     effective reuse of software
 Object oriented system development as presented in the
-IEC~61499 standard is ideal for the purpose that is is
-designed for but not enough for achieving {\it effective
+IEC~61499 standard is ideal for the purpose that it is
+designed for but not enough for achieving \emph{effective
   software reuse} in automation systems development.
-
-% grouping software objects in functional units (encapsulation)
-% abstraction of functionality (views)
-% properties of the functional unit (attributes)
-
 
 %%     effective decentralization of software development 
 Effective software reuse facilitates \textit{effective
@@ -44,8 +39,8 @@ Leveraging effective software reuse and decentralized
 software development \textit{makes integration and
   deployment much easier}. System integrator's task is
 hereby reduced to picking the right software objects from
-the library and connecting them in correct patterns for the
-specific application.
+the library and connecting them for the specific
+application.
 
 %%     development of libraries
 Using the encapsulation of software objects with well
@@ -58,74 +53,73 @@ are distributed in binary only format and the interface
 documentation has to be downloaded or reviewed on-line prior
 to usage.
 
-%%     all of these result in rapid development of automation systems
+%%     all of these result in rapid development of
+%%     automation systems
 The arguments presented are enough to support the idea that
 the software objects encapsulated with the information about
 their usage will increase the speed of the development of
 the automation systems.
 
-After a formal definition of the encapsulation the benefits
-beyond the ones discussed above will be presented followed
-by the presentation about the implementation issues and the
-support in Supremica that is planned for such data objects.
+%After a specification and a formal definition of the
+%encapsulation the benefits beyond the ones discussed above
+%will be presented followed by the presentation about the
+%implementation issues and the support in Supremica that is
+%planned for such data objects.
 
 
 
+\section{Specification}
+To realize all of the above mentioned arguments a new kind
+of software objects are needed, preliminary called
+\emph{automation objects}. Even though this kind of objects
+are still very much a research subject the following is the
+specification of the objects so far.
 
+%Automation Object:
+%* consists of models, controllers, views and
+%  configuration registry
+Automation objects consists of models, views, controllers
+and configuration registry implemented using IEC-61499
+function blocks and their inteerfaces. Models are
+interchangable simulation models with varaying level of
+abstraction. One model might be used for the simulation on a
+high level of abstraction, typicaly behavioural model, and
+another for the simulation on a lower level. This is then
+used to implement dynamic zooming during the simulation. One
+of the models will implement the communication with the
+controlled equpiment thus allowing effortless switching
+between simulation and acutal control. This will enable
+gradual verification and on-line tuning of the big
+automation systems by allowing the simulation of the system
+components that are being configured or tuned while running
+the components that are already configured.
 
-\section{Specification and Definition}
-%% Specification
+Controllers are function blocks that control the model. The
+best examples of controllers are regulators as PI- or
+PID-regulator. On the higher level of the automation system
+these can be configurable implementations of different
+automation algorithms. This allows interchange of different
+controlling strategies for easy verification with simulation
+and the equipment.
 
-% Automation Object:
-%    * consists of model, views, contorllers and configuration of those
-%        * views and controllers operate on model 
-%        * model has several interchangable implementations
-%    * is extensible with user defined services
-%    * supports replacement of services defined within the
-%      object by user defind services
-%    * supports extension of services
-%    * supports distribution of services and model among
-%      different computing resources
-%    * has a single topology involving model and services
-%    * has a access protection mechanism
+Views are the function blocks allowing user interaction with
+the automation object. These implement all the alowable ways
+of interaction with the automation object. At the lower
+levels of the automation system they will typically provide
+different event and data interfaces depending on the user's
+needs while at the higher leve they will implement full
+graphical user interfaces for the operators.
 
-
-%% Definition. 
-%%     multi view objects
-An \textbf{automation object} is defined as \textit{a set of
-  software objects} encapsulated with a declaration of
-\textit{services}, \textit{attributes} and \textit{views} of
-the set.
-
-The \textbf{set} specifies the applications, subapplications
-and function blocks, as defined in \cite{iec:614991:2000},
-contained within the automation object. Only one set per
-automation object is defined and it contains \textit{all} of
-the software objects required for the functionality of the
-automation object.
-% less dependency problems at the cost of storage, more on
-% this after the definition
-
-An \textbf{attribute} is a user defined and specified data that
-describes some significant property of the automation
-object. 
-
-A \textbf{view} is an interface to the object. Every
-interface has at least one implementation.
-
-
-A \textbf{service} 
-
-
-
-%% How this definition supports the arguments above
-
-%% Further benefits of the the automation objects that could
-%% not be described prior to definition
-%%     views facilitate several different implementations of
-%%     the same functionality for different hardware and it
-%%     is the hardware vendors that should supply these
-
+%* service is a set of views that support some relevant task
+%  for the connected controller  
+%* is extensible with user defined services
+%* supports replacement of services defined within the
+%  object by user defined services
+%* supports extension of services
+%* supports distribution of services and model among
+%  different computing resources
+%* has a single topology involving model and services
+%* has an access protection mechanism
 
 
 
@@ -133,17 +127,15 @@ A \textbf{service}
 % Support in Supremica
 
 %% implementation of automation objects
-%%     archive of XML files
-%%     attribute and view declarations in MetaInformation.xml 
+%%   archive of XML files
+%%   models, views, controllers and registry are declared in
+%%   some kind of MetaInformation.xml 
 
 %% libraries 
-%%     non-hierarchical pool of automation objects
-%%     libraries  may be Internet repositories
-%%     searching and sorting by multiple attributes
-%%     searching and sorting by multiple views
-
-
-
+%%   non-hierarchical pool of automation objects
+%%   libraries  may be Internet repositories
+%%   searching and sorting by multiple attributes/keys
+%%   searching and sorting by services
 
 % Example of usage in Supremica. Three scenarios with the
 % lab equipment (kulbanan).
@@ -151,6 +143,3 @@ A \textbf{service}
 % 2. Library is provided and the logic is done by the student.
 % 3. Library is proviede and the logic is synthesised by the
 %    Supremica.
-
-
-
