@@ -2597,7 +2597,39 @@ public class ActionMan
 			}
 		}
 	}
-}
 
+        // Run simulation
+        public static void RunSimulation(Gui gui)
+	{
+	    Automata selectedAutomata = gui.getSelectedAutomata();
+	    
+	    if (selectedAutomata.size() < 1)
+		{
+		    JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+		    
+		    return;
+		}
+	    
+	    try
+		{
+		    File tmpFile  = File.createTempFile("softplc", ".il");
+		    tmpFile.deleteOnExit();
+		    AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
+		    PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
+		    
+		    exporter.serializeInstructionList(theWriter);
+		    theWriter.close();
+		    
+		    new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), "/tmp");
+		}
+	    catch (Exception ex)
+		{
+		    logger.error("Exception while generating Java Bytecode to file");
+		    logger.debug(ex.getStackTrace());
+		    return;
+		}
+	    logger.info("Java Bytecode file successfully generated");
+	}
+}
 
 // ActionMan

@@ -704,6 +704,20 @@ public class MainMenuBar
 		});
 
 
+		// Tools.RunSimulation
+		JMenuItem run_simulation = new JMenuItem();
+
+		run_simulation.setText("Run simulation...");
+		menuTools.add(run_simulation);
+		run_simulation.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+			        ActionMan.RunSimulation(ActionMan.getGui());
+			}
+		});
+
+
 		// Configure
 		JMenu menuConfigure = new JMenu();
 
