@@ -114,7 +114,8 @@ public class DigitalIODisplayView
 		signalPanelIn.setLayout(new BoxLayout(signalPanelIn, BoxLayout.Y_AXIS));
 		signalPanelOut.setLayout(new BoxLayout(signalPanelOut, BoxLayout.Y_AXIS));
 		signalPanel.setLayout(new BoxLayout(signalPanel, BoxLayout.X_AXIS));
-		descriptions.setLayout(new BoxLayout(descriptions, BoxLayout.X_AXIS));
+		//descriptions.setLayout(new BoxLayout(descriptions, BoxLayout.X_AXIS));
+		descriptions.setLayout(new BorderLayout());
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 		signalPanelIn.setBackground(Color.white);
 		signalPanelOut.setBackground(Color.white);
@@ -146,12 +147,12 @@ public class DigitalIODisplayView
 		signalPanel.add(signalPanelIn);
 		signalPanel.add(signalPanelOut);
 		signalPanelScroller.setAlignmentX(LEFT_ALIGNMENT);
-		descriptions.setAlignmentX(LEFT_ALIGNMENT);
+		//descriptions.setAlignmentX(LEFT_ALIGNMENT);
 		descIn.setFont(new Font("Arial", Font.PLAIN, 18));
-		descIn.setSize(160,20);
+		//descIn.setSize(160,20);
 		descUt.setFont(new Font("Arial", Font.PLAIN, 18));
-		descriptions.add(descIn);
-		descriptions.add(descUt);
+		descriptions.add(descIn,BorderLayout.WEST);
+		descriptions.add(descUt,BorderLayout.EAST);
 		contentPane.add(updateButton);
 		contentPane.add(descriptions);
 		contentPane.add(signalPanelScroller);
