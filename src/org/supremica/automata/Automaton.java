@@ -247,6 +247,12 @@ public class Automaton
 		return initialState;
 	}
 
+
+	/**
+	 * When adding an arc, both the two states associated with the
+	 * arc _must_ already be contained in the automaton, otherwise the
+	 * behavior is undefined.
+	 */
 	public void addArc(Arc arc)
 	{
 		arc.getListeners().addListener(this);
