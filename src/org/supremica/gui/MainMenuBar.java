@@ -550,7 +550,7 @@ public class MainMenuBar
 		});
 
 		// Tools.Animations
-		if (SupremicaProperties.generalIncludeAnimations())
+		if (SupremicaProperties.animatorInUse())
 		{
 			JMenu menuToolsAnimations = new JMenu();
 
