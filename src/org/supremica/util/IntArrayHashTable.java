@@ -376,6 +376,25 @@ public final class IntArrayHashTable
 			}
 		}
 
+		/**
+		 * Use this if you do not want
+		 * to make a cast.
+		 */
+		public int[] nextIntArray()
+		{
+			if (hasNext())
+			{
+				int[] currObject = theTable[nextIndex];
+				currIndex = nextIndex;
+				nextIndex = -1;
+				return currObject;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+
 		public void remove()
 		{
 			throw new UnsupportedOperationException();
