@@ -89,7 +89,7 @@ public class RobotStudioLink
 	private static Application app = null;
 	private static Gui gui;
 	private static IStation activeStation;
-	private String stationName;
+	private static String stationName;
 
 	// Generated automata
 	private static Automata robotAutomata;
@@ -108,6 +108,84 @@ public class RobotStudioLink
 		rsl.test(null);
 	}
 	*/
+
+	public static void test(Gui gui)
+	{
+		String stationName = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
+		RobotStudioLink rsl = new RobotStudioLink(gui, stationName);
+		rsl.init();
+
+		//programStructureTest();
+
+		//rsl.mechanismFromPathTest();
+
+		//pathSplittingTest();
+	}
+
+	public static void pathSplittingTest()
+	{
+		//IPath path = activeStation.getPaths().item(var("I1A1"));
+
+
+
+	}
+
+	/**
+	 * This test is supposed to show wether a path contains information
+	 * on what mechanism it controls... so to speak.
+	 */
+	public static void mechanismFromPathTest()
+	{
+		try
+		{	// Loop through all paths
+			IPaths paths = activeStation.getPaths();
+			for (int i=1; i<=paths.getCount(); i++)
+			{
+				IPath currPath = paths.item(var(i));
+				logger.info(currPath.getName());
+				logger.info("Parent: " + currPath.getParent().getName());
+				logger.info("Parent type: " + currPath.getParent().getObjectType());
+				logger.info("Parentparent: " + currPath.getParent().getParent().getName());
+				logger.info("Parentparent type: " + currPath.getParent().getParent().getObjectType());
+				IMechanism robot = getMechanismFromPath(currPath);
+				logger.info("Mechanism: " + robot.getName());
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Test crasched." + ex);
+		}
+	}
+
+	/**
+	 * This test showed that the program browser does not contain information
+	 * of any code above the paths...
+	 */
+	public static void programStructureTest()
+	{
+		try
+		{	// Get active mechanism
+			IMechanism mechanism = activeStation.getActiveMechanism();
+
+			// Print current program
+			// Find program structure (find the main procedure)
+			IABBS4Procedure main = getMainProcedure(mechanism);
+			if (main == null || main.getProcedureCalls().getCount() == 0)
+				throw new Exception("No main procedure in program.");
+
+			// Loop through the subprodecures of the main procedure in the ABBS4Controller program
+			IABBS4ProcedureCalls calls = main.getProcedureCalls();
+			for (int i=1;i<=calls.getCount();i++)
+			{
+				String procedureName = calls.item(var(i)).getProcedure().getName();
+				logger.info(procedureName);
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Test crasched." + ex);
+		}
+	}
 
 	public void run()
 	{
@@ -162,8 +240,7 @@ public class RobotStudioLink
 	public void extractAutomata()
 	{
 		try
-		{
-			// Examine mechanisms
+		{	// Examine mechanisms
 			boolean ok = false;
 			while (!ok) // Ugly fix to make sure everything is stable
 			{
@@ -173,20 +250,21 @@ public class RobotStudioLink
 					ok = true;
 				}
 				catch (Exception ex)
-				{
+				{	// Wait for a while and try again
 					Thread.sleep(1000);
 				}
 			}
 			LinkedList robots = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleRobot);
-			LinkedList devices = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleDevice);
-			LinkedList tools = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleTool);
-			LinkedList externalAxes = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleExternalAxes);
+			//LinkedList devices = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleDevice);
+			//LinkedList tools = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleTool);
+			//LinkedList externalAxes = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleExternalAxes);
 
 			// Build automata from the robots
 			//for (int i=0;i<1;i++)
 			for (int i=0;i<robots.size();i++)
 			{
 				IMechanism robot = (IMechanism) robots.get(i);
+
 				//robot.examine();
 				//robot.unexamine();
 
@@ -205,21 +283,22 @@ public class RobotStudioLink
 				// Clear all selections
 				activeStation.getSelections().removeAll();
 
-				// Start virtual controller
-				activeStation.setActiveMechanism((IMechanism2) robot);
-				logger.info("Starting Virtual Controller...");
 				//IABBS4Controller controller = robot.getController();
-				IABBS4Controller controller = robot.startABBS4Controller(true);
-				logger.info("Sleeping...");
-				Thread.sleep(5000);
-				logger.info("Virtual Controller started.");
+				//IABBS4Controller controller = robot.startABBS4Controller(true);
 
 				// Run simulation and gather transition times
+
 				// Add MechanismListener
 				Mechanism mech = Mechanism.getMechanismFromUnknown(robot);
 				MechanismListener mechanismListener = new MechanismListener();
-				mechanismListener.setController(controller);
 				mech.add_MechanismEventsListener(mechanismListener);
+				// Start virtual controller
+				activeStation.setActiveMechanism((IMechanism2) robot);
+				logger.info("Starting the Virtual Controller...");
+				IABBS4Controller controller = robot.startABBS4Controller(true);
+				// Wait for controller start
+				mechanismListener.waitForControllerStart();
+				mechanismListener.setController(controller);
 				// Add SimulationListener
 				ISimulation simulation = activeStation.getSimulations().item(var(1));
 				Simulation sim = Simulation.getSimulationFromUnknown(simulation);
@@ -254,10 +333,9 @@ public class RobotStudioLink
 				}
 
 				// Shut down the controller
+				logger.info("Shutting down the Virtual Controller...");
 				controller.shutDown();
-				logger.info("Sleeping...");
-				Thread.sleep(5000);
-				logger.info("Controller shut down");
+				mechanismListener.waitForControllerShutDown();
 
 				// Stop listening!
 				mech.remove_MechanismEventsListener(mechanismListener);
@@ -577,11 +655,59 @@ public class RobotStudioLink
 
 	}
 
-	public static void moveRobotAlongPath(IMechanism robot, String pathName)
+	/**
+	 * Starts thread that moves robot along path. The controller must be
+	 * started for the (active) mechanism robot.
+	 */
+	public static void moveRobotAlongPath(IMechanism robot, IPath path)
 		throws Exception
 	{
-		RobotMoverThread thread = new RobotMoverThread(robot, robot.getPaths().item(var(pathName)));
+		RobotMoverThread thread = new RobotMoverThread(robot, path);
 		thread.start();
+	}
+
+	/**
+	 * Moves robot along path, both the robot and the path are extracted from
+	 * the name of the event.
+	 *
+	 * @param eventName Name of the event, must be on the format "<path>_start".
+	 */
+	public static void executeEvent(String eventName)
+		throws Exception
+	{
+		// Test if this is a (controllable) "path-starting" event
+		if (!eventName.endsWith("_start"))
+			throw new Exception("Could not execute event. Event not controllable?");
+
+		// Find path name and the IPath
+		String pathName = eventName.substring(0,eventName.length()-6); // 6 is the length of "_start"
+		IPath path = activeStation.getPaths().item(var(pathName));
+		IMechanism robot = getMechanismFromPath(path);
+
+		// Move robot along path
+		moveRobotAlongPath(robot, path);
+	}
+
+	/**
+	 * Returns interface to the mechanism that corresponds to a given path.
+	 * This method is cheating, it aquires the correct mechanism by analysing
+	 * strings. I couldn't find any other way...
+	 *
+	 * @param path The path of interest
+	 */
+	private static IMechanism getMechanismFromPath(IPath path)
+		throws Exception
+	{
+		// Get parent name and test if it's correctly formatted
+		String frameName = path.getParent().getName();
+		if (!frameName.endsWith(">Elements"))
+			throw new Exception("Path member of illegal frame, \"" + frameName +"\".");
+
+		// Get the name of the mechanism
+		String mechName = frameName.substring(1,frameName.length()-9); // 9 is the length of ">Elements"
+
+		// Return corresponding mechanism
+		return activeStation.getMechanisms().item(var(mechName));
 	}
 
 	/**
@@ -647,7 +773,9 @@ public class RobotStudioLink
   	}
   	public void quit()
   	{
-		logger.info("RobotStudio is shutting down.");
+		// This is fatal, cause this has never ever happened
+		// and I'd like to know if it ever does!
+		logger.fatal("RobotStudio is shutting down.");
 		clean();
   	}
   	public int stationBeforeOpen(String Path,boolean[] Cancel)
@@ -672,7 +800,7 @@ public class RobotStudioLink
 		logger.info("Library opened.");
     	return 0;
   	}
- 		public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject)
+	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_0.RobotStudio.RsObject RsObject)
   	{
     	return 0;
   	}
@@ -756,7 +884,7 @@ public class RobotStudioLink
 				String pathName = state.getName();
 				try
 				{
-					moveRobotAlongPath(robot, pathName);
+					moveRobotAlongPath(robot, robot.getPaths().item(var(pathName)));
 				}
 				catch (Exception whatever)
 				{
@@ -830,9 +958,10 @@ class MechanismListener extends _MechanismEventsAdapter
 	private static Logger logger = LoggerFactory.createLogger(MechanismListener.class);
 
 	private IABBS4Controller controller = null;
-	private LinkedList targetTimes = new LinkedList();
-	private LinkedList collisions = new LinkedList();
-	private boolean leavingTarget = true;
+	private LinkedList targetTimes = new LinkedList(); // Doubles of targetReached-times
+	private LinkedList collisions = new LinkedList();  // CollisionDatas of collisionStart/End-times
+	private boolean leavingTarget = true;       // targetReached is invoked twice for every Target!
+	private boolean controllerStarted = false;  // Used in the wait-methods
 
 	// Events generated by RobotStudio.Mechanism
  	public int targetReached()
@@ -915,6 +1044,20 @@ class MechanismListener extends _MechanismEventsAdapter
 		}
   	  	return 0;
   	}
+	public synchronized int afterControllerStarted()
+	{
+		controllerStarted = true;
+		logger.info("Virtual Controller started.");
+		notify();
+		return 0;
+	}
+	public synchronized int afterControllerShutdown()
+	{
+		controllerStarted = false;
+		logger.info("Virtual Controller shut down.");
+		notify();
+		return 0;
+	}
 
 	// Junk constructed by me
 	public void setController(IABBS4Controller controller)
@@ -932,6 +1075,44 @@ class MechanismListener extends _MechanismEventsAdapter
 	{
 		CollisionData data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(mutexZone)));
 		return data.getTimes();
+	}
+	public synchronized void waitForControllerStart()
+	{
+		try
+		{
+			while (!controllerStarted)
+			{
+				wait();
+			}
+
+			// Make sure the controller is really started before we return
+			Thread.sleep(2500);
+		}
+		catch (Exception ex)
+		{
+			//System.out.println("Interrupted! " + ex);
+			logger.error("Interrupted! " + ex);
+		}
+		return;
+	}
+	public synchronized void waitForControllerShutDown()
+	{
+		try
+		{
+			while (controllerStarted)
+			{
+				wait();
+			}
+
+			// Make sure the controller is really shut down before we return
+			Thread.sleep(2500);
+		}
+		catch (Exception ex)
+		{
+			//System.out.println("Interrupted! " + ex);
+			logger.error("Interrupted! " + ex);
+		}
+		return;
 	}
 
 	/**
@@ -1009,7 +1190,6 @@ class SimulationListener extends DSimulationEventsAdapter
   	public synchronized void stop()
   	{
 		simulationRunning = false;
-		//System.out.println("Simulation stopped!");
 		logger.info("Simulation finished.");
 		notify();
   	}
@@ -1023,6 +1203,7 @@ class SimulationListener extends DSimulationEventsAdapter
   	{
 		try
 		{
+			simulationRunning = true;
 			while (simulationRunning)
 			{
 				wait();

@@ -2404,7 +2404,7 @@ public class ActionMan
 		}
 	}
 
-	public static void robotStudioTest(Gui gui)
+	public static void robotStudioLink(Gui gui)
 	{
 		new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
 		{
@@ -2449,6 +2449,11 @@ public class ActionMan
 	public static void robotStudioKill()
 	{
 		RobotStudioLink.kill();
+	}
+
+	public static void robotStudioTest(Gui gui)
+	{
+		RobotStudioLink.test(gui);
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata

@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -876,7 +875,7 @@ public class MainMenuBar
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						ActionMan.robotStudioTest(ActionMan.getGui());
+						ActionMan.robotStudioLink(ActionMan.getGui());
 					}
 				});
 /*
@@ -923,6 +922,17 @@ public class MainMenuBar
 					public void actionPerformed(ActionEvent e)
 					{
 						ActionMan.robotStudioKill();
+					}
+				});
+			// RobotStudioTest
+			JMenuItem robTest = new JMenuItem();
+			robTest.setText("Run Some Tests");
+			menuRobotStudioLink.add(robTest);
+			robTest.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioTest(ActionMan.getGui());
 					}
 				});
 		}
