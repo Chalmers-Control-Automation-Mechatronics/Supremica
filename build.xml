@@ -76,11 +76,6 @@
 		<fileset dir="${dist}" />
 	</delete>
 
- 	<mkdir dir="${doc}"/>
-	<delete includeEmptyDirs="true" >
-		<fileset dir="${doc}" />
-	</delete>
-
 	<mkdir dir="${lib}/${unjared}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${lib}/${unjared}" />
@@ -144,10 +139,8 @@
 		</fileset>
 	</delete>		
 
-	<mkdir dir="${doc}"/>
-	<delete dir="${doc}"/>
-	<mkdir dir="${doc}"/>
 	<mkdir dir="${doc}/api"/>	
+	<delete dir="${doc}/api"/>
 </target>
 
 <target name="build_jni">
