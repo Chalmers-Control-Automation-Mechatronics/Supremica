@@ -445,6 +445,7 @@ public final class AutomataSynchronizerExecuter
 				}
 				currEvent = currEnabledEvents[i++];
 			}
+
 			if (insertionIndex == 0)
 			{   // Found no corresponding transitions in the suspect automaton...
 				// /*
@@ -462,6 +463,7 @@ public final class AutomataSynchronizerExecuter
 					thisCategory.debug("Following transitions in the suspect automaton, there are " + insertionIndex + " such transitions...");
 				// */
 			}
+
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;
 		}
 	}

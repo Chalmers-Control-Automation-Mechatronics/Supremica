@@ -314,7 +314,8 @@ public class AutomataVerifier
 			// Object[] automatonArray = selectedAutomata.toArray();
 			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext();) 
 			{
-				automataNames = automataNames.append(((Automaton) autIt.next()).getName() + " ");
+				automataNames = automataNames.append(((Automaton) autIt.next()).getName());
+				automataNames = automataNames.append(" ");
 			}
 		}
 		

@@ -491,30 +491,21 @@ public final class AutomataSynchronizerHelper
 	{
 		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 
-		System.out.println("Krasch?");
-
 		// We have to have an executer for finding the transitions
 		clear();
 		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
 		executer.initialize();
 
-		System.out.println("Krasch?");
-
 		// This version does not remove shortcuts, add this later
 		StringBuffer trace = new StringBuffer();
 		int[] prevState = null;
-
-		System.out.println("Krasch!");
-
 		for (Iterator traceIt = stateTrace.iterator(); traceIt.hasNext();)
 		{
-			System.out.println("Tjoho?");
 			int[] nextState = (int[]) traceIt.next();
-			System.out.println("Tjoho!");
 			if (prevState != null)
 			{
 				int currEventIndex = executer.findTransition(prevState, nextState);
-				System.out.println("currEventIndex: " + currEventIndex);
+				trace.append(" ");
 				trace.append(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
 			}
 

@@ -139,7 +139,7 @@ public final class AutomataOnlineSynchronizer
 		}
     }
 
-	// ÄNdrad till public istället för private... för att kunna köra findTransistion
+	// ÄNdrad till public istället för private... för att kunna köra findTransition
 	public final void initialize()
 	{
 		currOutgoingEvents = new int[nbrOfAutomata][];
@@ -400,11 +400,18 @@ public final class AutomataOnlineSynchronizer
 		}
 	}
 
-	// Returns index of one (there may be more) transition between fromState and toState or -1 if none exists.
+	/**
+	 * Searches for transtition in automata.
+	 * @param fromState the state from which we want to know if there is a transition
+	 * @param toState the state t0 which we want to know if there is a transition
+	 * @return index of one (there may be more) transition between fromState and toState or -1 if none exists.
+	 */
 	public int findTransition(int[] fromState, int[] toState)
 	{
 		if (nextState == null)
 			nextState = new int[nbrOfAutomata + 1]; // +1 status field
+
+		setCurrState(fromState);
 
 		int i = 0;
 		int currEventIndex = currEnabledEvents[i];
@@ -425,10 +432,14 @@ public final class AutomataOnlineSynchronizer
 					nextState[currAutomatonIndex] = currSingleNextState;
 				}
 			}
+
 			if (equalsIntArray(nextState, toState))
+			{
 				return currEventIndex;
+			}
 			currEventIndex = currEnabledEvents[++i];
 		}
+
 		return -1;
 	}
 
