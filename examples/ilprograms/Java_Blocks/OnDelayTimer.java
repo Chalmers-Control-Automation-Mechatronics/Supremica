@@ -2,7 +2,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class OnDelayTimer{
+public class OnDelayTimer implements org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_FunctionBlock {
 	Timer timer = new Timer();
 	private long zeroTime;
 	private boolean prevIN;
