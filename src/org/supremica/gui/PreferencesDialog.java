@@ -108,8 +108,11 @@ public class PreferencesDialog
 
 		theControllerPanel = new PreferencesControllerPanel(this);
 
-		contentPane.add(theControllerPanel, BorderLayout.SOUTH);
-		setSize(400, 350);
+		contentPane.add(theControllerPanel, BorderLayout.SOUTH);		
+		// setSize(400, 350);
+		pack();
+		
+
 
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -126,6 +129,8 @@ public class PreferencesDialog
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+		
+
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -133,6 +138,7 @@ public class PreferencesDialog
 				doCancel();
 			}
 		});
+
 	}
 
 	public void doCancel()
@@ -654,7 +660,7 @@ class BDDPanel
 {
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn;
-    private Choice algorithmFamily;
+    private JComboBox algorithmFamily, countAlgorithm;
     
     public BDDPanel(PreferencesDialog theDialog)
     {
@@ -665,6 +671,7 @@ class BDDPanel
 	Box p = new Box(BoxLayout.Y_AXIS);
 	add(p, BorderLayout.CENTER);
 
+
 	this.theDialog = theDialog;
 
 	p.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
@@ -672,28 +679,41 @@ class BDDPanel
 	p.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	p.add( debugOn = new JCheckBox("Debug mode", Options.debug_on) );
 	
-	Panel pFamily = new Panel(new FlowLayout());
+	JPanel pFamily = new JPanel( /* new FlowLayout(FlowLayout.CENTER) */);
 	p.add(pFamily);
 	
-	pFamily.add( new Label("Favour algorithm family"));
-	pFamily.add( algorithmFamily = new Choice());
+	pFamily.add( new JLabel("Favour algorithm family"));
+	pFamily.add( algorithmFamily = new JComboBox());
 
-	algorithmFamily.add("Monolithic");
-	algorithmFamily.add("Conjunctive");
-	algorithmFamily.add("Disjunctive");
-	algorithmFamily.add("Smoothed");
-	algorithmFamily.select(Options.algo_family);
+	algorithmFamily.addItem("Monolithic");
+	algorithmFamily.addItem("Conjunctive");
+	algorithmFamily.addItem("Disjunctive");
+	algorithmFamily.addItem("Smoothed");
+	algorithmFamily.setSelectedIndex(Options.algo_family);
 
+
+	JPanel pCount = new JPanel( /* new FlowLayout(FlowLayout.CENTER) */);
+	p.add(pCount);
 	
+	pCount.add( new JLabel("State-counting algorithm"));
+	pCount.add(countAlgorithm = new JComboBox());
+
+	countAlgorithm.addItem("No counting");
+	countAlgorithm.addItem("Tree SAT");
+	countAlgorithm.addItem("Exact");
+	
+	countAlgorithm.setSelectedIndex( Options.count_algo);
     }
     
     public boolean doApply()
     {
-	Options.algo_family = algorithmFamily.getSelectedIndex();
-	Options.show_grow   = showGrow.isSelected();
-	Options.user_alters_PCG    = alterPCG.isSelected();
-	Options.trace_on    = traceOn.isSelected();
-	Options.debug_on    = debugOn.isSelected();
+	Options.algo_family     = algorithmFamily.getSelectedIndex();
+	Options.count_algo      = countAlgorithm.getSelectedIndex();
+	Options.show_grow       = showGrow.isSelected();
+	Options.user_alters_PCG = alterPCG.isSelected();
+	Options.trace_on        = traceOn.isSelected();
+	Options.debug_on        = debugOn.isSelected();
+	
 
 	SupremicaProperties.updateBDDOptions(true);		
 	return true;
