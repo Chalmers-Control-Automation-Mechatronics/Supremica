@@ -2380,16 +2380,7 @@ public class ActionMan
 			// logger.info("Importing " + file.getAbsolutePath() + " ...");
 			gui.info("Importing " + file.getAbsolutePath() + " ...");
 
-			try
-			{
-				ConvertToAutomata.conversionToAutomata(file);
-			}
-			catch (Exception ex)
-			{
-				logger.error("Error while importing " + file.getAbsolutePath(), ex);
-				logger.debug(ex.getStackTrace());
-				return;
-			}
+			ConvertToAutomata.conversionToAutomata(file);
 	}
 
 	// Automata.AlphabetNormalize action performed
