@@ -131,5 +131,53 @@ public class TestAutomataSynthesizer
 		}
 	}
 
+	public void testAGV()
+	{
+		try
+		{
+
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.AGV));
+			assertTrue(theProject.nbrOfAutomata() == 17);
+			SynthesizerOptions syntOptions = new SynthesizerOptions();
+			syntOptions.setSynthesisType(SynthesisType.Controllable);
+			syntOptions.setSynthesisAlgorithm(SynthesisAlgorithm.Modular);
+			syntOptions.setPurge(true);
+			syntOptions.setMaximallyPermissive(true);
+
+			SynchronizationOptions syncOptions = new SynchronizationOptions();
+
+			// Test Prioritized synchronization, although all events are prioritized in this example
+			{
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(theProject, syncOptions, syntOptions);
+				Automata supAutomata = synthesizer.execute();
+
+/*
+				assertTrue(synchronizer.getNumberOfStates() == 8);
+				//Automaton theAutomaton = synchronizer.getAutomaton();
+				Alphabet theAlphabet = theAutomaton.getAlphabet();
+				assertTrue(theAutomaton.getType() == AutomatonType.Specification);
+				assertTrue(theAutomaton.nbrOfStates() == 8);
+				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
+				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
+				assertTrue(theAutomaton.nbrOfTransitions() == 11);
+				assertTrue(theAutomaton.isAllEventsPrioritized());
+				assertTrue(theAutomaton.hasInitialState());
+				assertTrue(!theAutomaton.isNullAutomaton());
+				assertTrue(theAlphabet.nbrOfEvents() == 5);
+				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
+				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
+				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
+				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+*/
+			}
+
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
 }
 

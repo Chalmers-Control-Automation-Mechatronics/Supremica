@@ -50,6 +50,7 @@
 package org.supremica.automata;
 
 import java.util.*;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class AutomatonType
 {
@@ -58,7 +59,10 @@ public class AutomatonType
 	public static final AutomatonType Plant = new AutomatonType("Plant", true);
 	public static final AutomatonType Specification = new AutomatonType("Specification", true);
 	public static final AutomatonType Supervisor = new AutomatonType("Supervisor", true);
+	public static final AutomatonType Property = new AutomatonType("Property", true);
 	public static final AutomatonType Interface = new AutomatonType("Interface", false);
+
+
 	private String identifier;
 
 	private AutomatonType(String identifier, boolean add)
@@ -105,6 +109,27 @@ public class AutomatonType
 
 		return Undefined;
 	}
+
+	public static AutomatonType toType(ComponentKind type)
+	{
+		if (type == ComponentKind.PLANT)
+		{
+			return Plant;
+		}
+
+		if (type == ComponentKind.SPEC)
+		{
+			return Specification;
+		}
+
+		if (type == ComponentKind.PROPERTY)
+		{
+			return Property;
+		}
+
+		return Undefined;
+	}
+
 
 	public static Object[] toArray()
 	{

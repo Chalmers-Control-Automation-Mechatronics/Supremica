@@ -2,6 +2,8 @@
 
 <project name="Supremica" default="rebuild" basedir=".">
 
+<property file="build.properties"/>    
+
 <property name="src" value="src"/>
 <property name="testssrc" value="tests/src"/>
 <property name="runtimesoftplcsrc" value="runtime/softplc/src"/>
@@ -37,6 +39,10 @@
 <property name="installer.dir" value="C:\Supremica Installer"/>
 <property name="javalibs.dir" value="lib/unjared"/>
 
+<!-- Waters -->
+<property name="xml" location="xml"/>
+<property name="xsd" location="${xml}/xsd"/>
+<property name="xsl" location="${xml}/xsl"/>
 
 <!--
 *	If you for some reason prefer javac instead of jikes,
@@ -70,6 +76,20 @@
 		<fileset dir="${eclipselib}" />
 	</delete>
 </target>
+
+<target name="generate_JAXB" depends="init" description="Generate JAXB classes.">
+	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+		<classpath>
+			<pathelement path="${jwsdp.classpath}"/>
+		</classpath>
+	</taskdef>
+	<xjc target="${src}" extension="true" removeOldOutput="yes">
+		<schema dir="${xsd}" includes="waters-des.xsd waters-module.xsd"/>
+		<produces dir="${src}/net/sourceforge/waters/xsd/"
+			includes="base/* base/impl/* des/* des/impl/* module/* module/impl/*"/>
+	</xjc>
+</target>
+
 
 <target name="initialize" depends="clean">
  	<mkdir dir="${build}"/>
@@ -130,7 +150,14 @@
 	<unjar src="${lib}/interfaceRobotStudio3_1.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jaxb-api.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jaxb-impl.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jaxb-libs.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jax-qname.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/namespace.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/relaxngDatatype.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/xsdlib.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
 
 	
@@ -147,6 +174,18 @@
 	<delete includeEmptyDirs="true">
 		<fileset dir="${lib}/${unjared}/META-INF"/>
 	</delete>
+
+
+	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+		<classpath>
+			<pathelement path="${jwsdp.classpath}"/>
+		</classpath>
+	</taskdef>
+	<xjc target="${src}" extension="true" removeOldOutput="yes">
+		<schema dir="${xsd}" includes="waters-des.xsd waters-module.xsd"/>
+		<produces dir="${src}/net/sourceforge/waters/xsd/"
+			includes="base/* base/impl/* des/* des/impl/* module/* module/impl/*"/>
+	</xjc>
 
 </target>
 
@@ -246,7 +285,8 @@
 			${jgrafchart_basedir}/**,
 			${supremica_basedir}/external/comInterfaces/**,
 			${supremica_basedir}/sattline/**,
-			${supremica_basedir}/supervisor/**"	
+			${supremica_basedir}/supervisor/**,	
+			${supremica_basedir}/util/compactStateSet/**"	
 		source="1.4"
 	/>
 </target>
@@ -417,6 +457,11 @@
 		<fileset dir="${animations}"/>		
 		<fileset dir="${userinterfaces}"/>	
 		<fileset dir="${runtimesoftplcbuild}"/>	
+		<fileset dir="${src}">
+			<include name="**/*.properties"/>
+			<include name="**/*.ser"/>
+		</fileset>
+		
 	</jar>
 </target>
 
@@ -481,7 +526,10 @@
 		<fileset dir="${animations}"/>			
 		<fileset dir="${userinterfaces}"/>
 		<fileset dir="${runtimesoftplcbuild}"/>	
-
+		<fileset dir="${src}">
+			<include name="**/*.properties"/>
+			<include name="**/*.ser"/>
+		</fileset>
 	</jar>
 </target>
 
@@ -503,6 +551,8 @@
 </target>
 
 <target name="startfiles_supremica" depends="startfiles_local_supremica,startfiles_supremica_student,startfiles_supremica_teacher">
+	<copy file="${templates}/Waters.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/Waters.cmd" perm="644"/>
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	

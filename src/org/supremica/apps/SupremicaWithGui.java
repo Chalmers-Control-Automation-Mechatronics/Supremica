@@ -68,12 +68,12 @@ public class SupremicaWithGui
 
 	private SupremicaWithGui() {}
 
-	public static void startSupremica()
+	public static org.supremica.gui.Supremica startSupremica()
 	{
-		startSupremica(null);
+		return startSupremica(null);
 	}
 
-	public static void startSupremica(String[] args)
+	public static org.supremica.gui.Supremica startSupremica(String[] args)
 	{
 		SplashWindow splash = new SplashWindow();
 
@@ -130,5 +130,7 @@ public class SupremicaWithGui
 		workbench.setVisible(true);
 
 		PreLoader preLoader = PreLoader.getPreLoader();
+
+		return workbench;
 	}
 }

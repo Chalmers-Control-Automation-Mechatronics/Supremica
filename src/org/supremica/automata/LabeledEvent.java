@@ -49,6 +49,9 @@
  */
 package org.supremica.automata;
 
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.des.EventProxy;
+
 public class LabeledEvent
 	implements Comparable
 {
@@ -62,6 +65,7 @@ public class LabeledEvent
 	private boolean operatorReset = false;
 	private boolean immediate = false;
 	private boolean epsilon = false;
+	private boolean proposition = false;
 	private int expansionPriority = -1;
 	private int synchIndex = -1;
 
@@ -82,7 +86,27 @@ public class LabeledEvent
 		operatorReset = e.operatorReset;
 		immediate = e.immediate;
 		epsilon = e.epsilon;
+		proposition = e.proposition;
 		synchIndex = e.synchIndex;
+	}
+
+	public LabeledEvent(EventProxy e)
+	{
+		label = e.getName();
+		EventKind watersKind = e.getKind();
+		if (watersKind == EventKind.CONTROLLABLE)
+		{
+			controllable = true;
+		}
+		if (watersKind == EventKind.UNCONTROLLABLE)
+		{
+			controllable = false;
+		}
+		if (watersKind == EventKind.PROPOSITION)
+		{
+			proposition = true;
+		}
+
 	}
 
 	public String toString()
@@ -168,6 +192,16 @@ public class LabeledEvent
 	public void setEpsilon(boolean epsilon)
 	{
 		this.epsilon = epsilon;
+	}
+
+	public boolean isProposition()
+	{
+		return proposition;
+	}
+
+	public void setProposition(boolean proposition)
+	{
+		this.proposition = proposition;
 	}
 
 	public void setExpansionPriority(int expansionPriority)

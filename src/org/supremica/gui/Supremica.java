@@ -962,7 +962,7 @@ public class Supremica
 	}
 
 	public int addProject(Project theProject)
-		throws Exception
+//		throws Exception
 	{
 		int nbrOfAutomataBeforeOpening = getVisualProjectContainer().getActiveProject().nbrOfAutomata();
 		int nbrOfAddedAutomata = addAutomata(theProject);

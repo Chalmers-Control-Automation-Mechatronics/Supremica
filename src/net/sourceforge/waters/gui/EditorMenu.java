@@ -1,0 +1,151 @@
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: waters.gui
+//# CLASS:   EditorMenu
+//###########################################################################
+//# $Id: EditorMenu.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//###########################################################################
+
+package net.sourceforge.waters.gui;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+
+/** <p>The EditorWindow menu.</p>
+ *
+ * <p>Creates a menu bar for use with the editor.</p>
+ *
+ * @author Gian Perrone
+ */
+public class EditorMenu extends JMenuBar implements ActionListener {
+    public final JMenuItem FileNewMenu;
+    public final JMenuItem FileExitMenu;
+    public final JMenuItem ToolsCreateShadeMenu;
+    public final JMenuItem ToolsOptionsMenu;
+    public final JMenuItem editDeleteMenu;
+
+    EditorWindow root;
+    ControlledSurface C;
+    JFileChooser fileChooser;
+
+    public EditorMenu(ControlledSurface c, EditorWindow r) {
+	root = r;
+        C = c;
+
+	JMenu menu = new JMenu("File");
+		
+	menu.setMnemonic(KeyEvent.VK_F);
+	menu.getAccessibleContext().setAccessibleDescription(
+                                                             "The File menu");
+	this.add(menu);
+
+	JMenuItem menuItem = new JMenuItem("Clear all",
+                                           KeyEvent.VK_O);
+        menuItem.addActionListener(this);
+        FileNewMenu = menuItem;
+	menu.add(menuItem);
+
+
+        menu.addSeparator();
+
+        menuItem = new JMenuItem("Page Setup...",
+	KeyEvent.VK_G);
+	menu.add(menuItem);
+
+        menuItem = new JMenuItem("Print...",
+	KeyEvent.VK_P);
+	menu.add(menuItem);
+
+        menu.addSeparator();
+
+	menuItem = new JMenuItem("Close Window",
+	KeyEvent.VK_X);
+	menu.add(menuItem);
+        menuItem.addActionListener(this);
+
+        FileExitMenu = menuItem;
+
+        menu = new JMenu("Edit");
+        this.add(menu);
+
+        menuItem = new JMenuItem("Undo");
+        menu.add(menuItem);
+        menu.addSeparator();
+        
+        menuItem = new JMenuItem("Copy");
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Cut");
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Paste");
+        menu.add(menuItem);
+        menu.addSeparator();
+
+        menuItem = new JMenuItem("Delete");
+        menu.add(menuItem);
+	menuItem.addActionListener(this);
+	editDeleteMenu = menuItem;
+
+        menu = new JMenu("Tools");
+        this.add(menu);
+
+        menuItem = new JMenuItem("Select Tool");
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Node Tool");
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Edge Tool");
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem("Initial Node Tool");
+        menu.add(menuItem);
+
+        menu.addSeparator();
+        menuItem = new JMenuItem("Color selector");
+	ToolsCreateShadeMenu = menuItem;
+        menu.add(menuItem);
+        menuItem.addActionListener(this);
+
+        menu.addSeparator();
+        
+        menuItem = new JMenuItem("Options...");
+        menu.add(menuItem);
+        ToolsOptionsMenu = menuItem;
+        menuItem.addActionListener(this);
+        
+
+        menu = new JMenu("Help");
+        this.add(menu);
+
+        menuItem = new JMenuItem("About...");
+        menu.add(menuItem);
+
+        fileChooser = new JFileChooser();
+        fileChooser.addChoosableFileFilter(new WmodFileFilter());
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == FileNewMenu) {
+            C.clearAll();
+        }
+
+        if (e.getSource() == FileExitMenu) {
+	    root.dispose();
+   	}
+
+	if (e.getSource() == editDeleteMenu) {
+	    root.getControlledSurface().deleteSelected();
+	}
+
+	if (e.getSource() == ToolsCreateShadeMenu){
+            ShadeDialog dialog = new ShadeDialog(root);
+        }
+        if (e.getSource() == ToolsOptionsMenu) {
+            root.getControlledSurface().setOptionsVisible(true);
+        }
+    }
+}

@@ -418,7 +418,7 @@
 		<Transition source="q4" dest="q0" event="u52"/>
 	</Transitions>
 </Automaton>
-<!-- Only one AGV at the input statiosn at a time -->
+<!-- Only one AGV at the input station at a time -->
 <Automaton name="ZonX" type="Specification">
   <Events>
    <Event id="u11" label="u11" controllable="false" prioritized="true" />

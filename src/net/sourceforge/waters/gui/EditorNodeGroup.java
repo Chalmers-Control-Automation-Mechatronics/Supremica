@@ -1,0 +1,261 @@
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: waters.gui
+//# CLASS:   EditorNodeGroup
+//###########################################################################
+//# $Id: EditorNodeGroup.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//###########################################################################
+
+package net.sourceforge.waters.gui;
+
+import java.awt.*;
+import java.awt.geom.*;
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.model.base.*;
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.expr.*;
+import net.sourceforge.waters.xsd.module.AnchorPosition;
+import java.util.ArrayList;
+
+public class EditorNodeGroup extends EditorObject
+{
+    private boolean resizing;
+    private Point2D.Double resizingFrom;
+    private Rectangle2D.Double bounds;
+    private Rectangle[] corners = new Rectangle[4];
+    private ArrayList points = new ArrayList();
+    private ArrayList ratios = new ArrayList();
+    private ArrayList edges = new ArrayList();
+    private ArrayList immediateChildren = new ArrayList();
+    private GroupNodeProxy proxy;
+    private static int UPPERLEFT = 0;
+    private static int UPPERRIGHT = 1;
+    private static int LOWERRIGHT = 2;
+    private static int LOWERLEFT = 3;
+    private static int WIDTHD = 2;
+    private static int WIDTHS = 5;
+
+    public EditorNodeGroup(GroupNodeProxy gn) {
+	proxy = gn;
+	if (gn.getGeometry() == null){
+	    gn.setGeometry(new BoxGeometryProxy(1000,1000,10,10));
+	}
+
+	bounds = new Rectangle2D.Double();
+	bounds.setRect(gn.getGeometry().getRectangle());
+	gn.getGeometry().setRectangle(bounds);
+	resizing = bounds.isEmpty();
+	resizingFrom = new Point2D.Double(bounds.getMinX(), bounds.getMinY());
+	selected = false;
+	for (int i = 0; i < 4; i++){
+	    corners[i] = new Rectangle();
+	}
+	setCorners();
+	type = NODEGROUP;
+	setHash(gn.hashCode());
+    }
+
+    private void setCorners() {
+	corners[UPPERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMinY(),
+					      bounds.getMinX() + WIDTHS, bounds.getMinY() + WIDTHS);
+	corners[UPPERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMinY(),
+					       bounds.getMaxX() + WIDTHS, bounds.getMinY() + WIDTHS);
+	corners[LOWERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMaxY(),
+					      bounds.getMinX() + WIDTHS, bounds.getMaxY() + WIDTHS);
+	corners[LOWERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMaxY(),
+					       bounds.getMaxX() + WIDTHS, bounds.getMaxY() + WIDTHS);
+    }
+
+    public boolean getResizing(){
+	return resizing;
+    }
+  
+    public void setResizingFalse(){
+	resizing = false;
+    }
+	
+    public void resize(int x, int y){
+	bounds.setFrameFromDiagonal(resizingFrom.getX(), resizingFrom.getY(), x, y);
+	for (int i = 0; i < points.size(); i++){
+	    Point2D.Double p = (Point2D.Double)points.get(i);
+	    Point2D.Double r = (Point2D.Double)ratios.get(i);
+	    double ox = p.getX();
+	    double oy = p.getY();
+	    p.setLocation(bounds.getMinX() + r.getX()*bounds.getWidth(), bounds.getMinY() + r.getY()*bounds.getHeight());
+	    ((EditorEdge)edges.get(i)).updateControlPoint(ox, oy, true);
+	}
+	setCorners();
+    }
+
+    public void moveGroup(int x, int y)
+    {
+	int dx = x - (int)bounds.getMinX();
+	int dy = y - (int)bounds.getMinY();
+	for (int i = 0; i < points.size(); i++){
+	    Point2D.Double p = (Point2D.Double)points.get(i);
+	    p.setLocation(p.getX() + dx, p.getY() + dy);
+	    ((EditorEdge)edges.get(i)).updateControlPoint(p.getX() - dx, p.getY() - dy, true);
+	}
+	bounds.setRect(x, y, bounds.getWidth(), bounds.getHeight());
+	setCorners();
+    }
+
+    public int getX()
+    {
+	return (int)corners[UPPERLEFT].getCenterX();
+    }
+
+    public int getY()
+    {
+	return (int)corners[UPPERLEFT].getCenterY();
+    }
+
+    public Point2D.Double setOnBounds(int x, int y)
+    {
+	Line2D.Double closest = new Line2D.Double(corners[0].getCenterX(), corners[0].getCenterY(),
+						  corners[3].getCenterX(), corners[3].getCenterY());
+	for (int i = 1; i < 4; i++){
+	    Line2D.Double l = new Line2D.Double(corners[i].getCenterX(), corners[i].getCenterY(),
+						corners[i-1].getCenterX(), corners[i-1].getCenterY());
+	    if (closest.ptLineDist(x,y) > l.ptLineDist(x,y)){
+		closest = l;
+	    }
+	}
+	if (closest.getX1() == closest.getX2()){
+	    x = (int)closest.getX1();
+	    if (closest.ptLineDist(x,y) > .2){
+		if (Math.abs(closest.getY1() - y) < (closest.getY2() - y)){
+		    y = (int)closest.getY1();
+		}else{
+		    y = (int)closest.getY2();
+		}
+	    }
+	}else{
+	    y = (int)closest.getY1();
+	    if (closest.ptLineDist(x,y) > .2){
+		if (Math.abs(closest.getX1() - x) < (closest.getX2() - x)){
+		    x =(int)closest.getX1();
+		}else{
+		    x =(int)closest.getX2();
+		}
+	    }
+	}
+	return (new Point2D.Double(x, y));
+    }
+
+    public Point2D.Double getPosition(int x, int y, EditorEdge e)
+    {
+	Point2D.Double p = setOnBounds(x,y);
+	Point2D.Double r = new Point2D.Double((double)((p.getX()-bounds.getMinX())/bounds.getWidth()), 
+					      (double)((p.getY()-bounds.getMinY())/bounds.getHeight()));
+	points.add(p);
+	ratios.add(r);
+	edges.add(e);
+	return p;
+    }
+
+    public void removePosition(Point2D.Double p){
+	int i = points.indexOf(p);
+	points.remove(i);
+	ratios.remove(i);
+	edges.remove(i);
+    }
+
+    public boolean wasClicked(int cX, int cY)
+    {
+	resizing = false;
+	for (int i = 0; i < 4; i++) {
+	    if (corners[i].contains(cX, cY)){
+		resizing = true;
+		int h = i - 2;
+		if (h < 0)
+		    h += 4;
+		resizingFrom.setLocation(corners[h].getCenterX(), corners[h].getCenterY());
+		break;
+	    }
+	}
+       	return (bounds.intersects(cX-2,cY-2, 4, 4) && !bounds.contains(cX-2, cY-2, 4, 4));
+    }
+
+    public Rectangle2D.Double getBounds() {
+	return bounds;
+    }
+
+    public void setBounds(Rectangle2D.Double b) {
+	bounds.setRect(b);
+	for (int i = 0; i < points.size(); i++){
+	    Point2D.Double p = (Point2D.Double)points.get(i);
+	    Point2D.Double r = (Point2D.Double)ratios.get(i);
+	    double ox = p.getX();
+	    double oy = p.getY();
+	    p.setLocation(bounds.getMinX() + r.getX()*bounds.getWidth(), bounds.getMinY() + r.getY()*bounds.getHeight());
+	    ((EditorEdge)edges.get(i)).updateControlPoint(ox, oy, true);
+	}
+	setCorners();
+    }
+
+    public boolean isEmpty() {
+	return bounds.isEmpty();
+    }
+
+    public void setProxy(GroupNodeProxy gn){
+	proxy = gn;
+    }
+    
+    public GroupNodeProxy getProxy(){
+	return proxy;
+    }
+
+    public void setChildNodes(ArrayList children, JComponent c){
+	boolean fail = false;
+	ArrayList a = new ArrayList(children.size());
+	for (int i = 0; i < children.size(); i++){
+	    if (children.get(i) instanceof EditorNode){
+		a.add(((EditorNode)children.get(i)).getProxy());
+	    } else if (children.get(i) instanceof EditorNodeGroup){
+		a.add(((EditorNodeGroup)children.get(i)).getProxy());
+	    }
+	}
+	try{proxy.setImmediateChildNodes(a);}
+	catch(final CyclicGroupNodeException e){
+	    JOptionPane.showMessageDialog(c, e.getMessage());
+	    fail = true;
+	}
+	catch(final DuplicateNameException e){
+	    JOptionPane.showMessageDialog(c, e.getMessage());
+	    fail = true;
+	}
+	if (fail){
+	    return;
+	}
+	immediateChildren = children;	
+    }
+
+    public void setSelected(boolean s) {
+        selected = s;
+	if (s == true){
+	    for (int i = 0; i < immediateChildren.size(); i++){
+		((EditorObject)immediateChildren.get(i)).setSelected();
+	    }
+	}
+    }
+
+    public void drawObject(Graphics g)
+    {
+	Graphics2D g2d = (Graphics2D)g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if(selected) {
+       	    g2d.setColor(Color.BLUE);
+	    for (int i = 0; i < 4; i++){
+		g2d.fillRect((int)corners[i].getCenterX() - WIDTHD, (int)corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
+	    }	  
+        }
+       	else {
+            g2d.setColor(Color.BLACK);
+       	}
+	g2d.draw(bounds);
+    }
+}

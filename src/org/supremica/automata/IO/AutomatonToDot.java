@@ -138,10 +138,16 @@ public class AutomatonToDot
 		return "";
 	}
 
-	protected String getArcColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs)
+	protected String getArcColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs, boolean is_prop)
 	{
 		if (useArcColors)
 		{
+/*
+			if (is_prop)
+			{
+				return ", color = blue";
+			}
+*/
 			if (is_ctrl)
 			{
 				return ", color = green3";
@@ -271,6 +277,7 @@ public class AutomatonToDot
 				boolean is_imm = false;
 				boolean is_eps = false;
 				boolean is_obs = false;
+				boolean is_prop = false;
 				ArcSet currArcSet = (ArcSet) arcSets.next();
 				State fromState = currArcSet.getFromState();
 				State toState = currArcSet.getToState();
@@ -309,9 +316,16 @@ public class AutomatonToDot
 
 						if (thisEvent.isEpsilon())
 						{
-							pw.print("@");
+							pw.print("&");
 
 							is_eps = true;
+						}
+
+						if (thisEvent.isProposition())
+						{
+							pw.print("@");
+
+							is_prop = true;
 						}
 
 						if (!thisEvent.isObservable())
@@ -330,7 +344,7 @@ public class AutomatonToDot
 					}
 				}
 
-				pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs) + "];");
+				pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + "];");
 			}
 		}
 
