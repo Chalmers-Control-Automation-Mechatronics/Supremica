@@ -57,6 +57,7 @@ public class EventTimer
 	private String timeoutEvent = null;
 	private String name = null;
 	private int delay = -1;
+	private int synchIndex = -1;
 
 	public EventTimer(String name, String startEvent, String timeoutEvent, int delay)
 		throws IllegalArgumentException
@@ -161,5 +162,16 @@ public class EventTimer
 			throw new IllegalArgumentException("Delay must be non negative");
 		}
 		this.delay = delay;
+	}
+
+
+	public int getSynchIndex()
+	{
+		return synchIndex;
+	}
+
+	void setSynchIndex(int synchIndex)
+	{
+		this.synchIndex = synchIndex;
 	}
 }

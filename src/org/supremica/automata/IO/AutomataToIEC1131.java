@@ -160,19 +160,10 @@ public class AutomataToIEC1131
 
 	void printTimerVariables(PrintWriter pw)
 	{
-		for (Iterator theIt = theProject.timersIterator(); theIt.hasNext();)
+		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext();)
 		{
 			EventTimer currTimer = (EventTimer)theIt.next();
-			String startEvent = currTimer.getStartEvent();
-
-			if (!allEvents.containsEventWithLabel(startEvent))
-			{
-				throw new IllegalStateException("Could not find event: " + startEvent);
-			}
-			LabeledEvent startLabeledEvent = allEvents.getEventWithLabel(startEvent);
-			int currIndex = startLabeledEvent.getSynchIndex();
-
-			theHelper.printTimerVariableDeclaration(pw, "timer_" + currIndex, currTimer.getName());
+			theHelper.printTimerVariableDeclaration(pw, "timer_" + currTimer.getSynchIndex(), currTimer.getName());
 		}
 	}
 
@@ -286,9 +277,18 @@ public class AutomataToIEC1131
 			int currStateIndex = initialState.getSynchIndex();
 			theHelper.printILCommand(pw, "S", "q_" + currAutomatonIndex + "_" + currStateIndex);
 		}
+		// Initialize timer delays
+		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)theIt.next();
+			theHelper.printILCommand(pw, "LD", "DINT#" + currTimer.getDelay());
+			theHelper.printILCommand(pw, "ST", "timer_" + currTimer.getSynchIndex() + ".tonPT");
+		}
+
 		theHelper.printILCommand(pw, "S", "initialized");
 		theHelper.printILLabel(pw, "after_initialization");
 	}
+
 
 	/**
 	 * Compute which events that are enabled
@@ -505,6 +505,76 @@ public class AutomataToIEC1131
 			theHelper.printILCommand(pw, "JMP", "check_e_" + currEventIndex);
 			theHelper.printILLabel(pw, "after_check_e_" + currEventIndex);
 		}
+
+		theHelper.printILComment(pw, "Check if the events are enabled by timers");
+		// Iterate over all events and compute which events that are enabled by the timer
+		for (Iterator timerIt = theProject.timerIterator(); timerIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)timerIt.next();
+
+			int currTimerIndex = currTimer.getSynchIndex();
+			//theHelper.printILLabel(pw, "check_timer_" + currTimerIndex);
+			theHelper.printILComment(pw, "Condition for timer " + currTimer.getName());
+
+			String currTimeoutLabel = currTimer.getTimeoutEvent();
+			if (!allEvents.containsEventWithLabel(currTimeoutLabel))
+			{
+				throw new IllegalStateException("Could not find event: " + currTimeoutLabel);
+			}
+			LabeledEvent currEvent = allEvents.getEventWithLabel(currTimeoutLabel);
+			int currEventIndex = currEvent.getSynchIndex();
+
+			theHelper.printILComment(pw, "Timeout event is \"" + currEvent.getLabel() + "\"");
+			theHelper.printILCommand(pw, "LD",  "e_" + currEventIndex);
+			theHelper.printILCommand(pw, "JMPCN",  "after_check_timer_" + currTimerIndex);
+			// Here we know that the event is enabled in the automaton and by the conditions
+			theHelper.printILCommand(pw, "CAL",  "timer_" + currTimerIndex);
+			theHelper.printILCommand(pw, "LD",  "timer_" + currTimerIndex + ".tonQ");
+			theHelper.printILCommand(pw, "JMPC",  "after_check_timer_" + currTimerIndex);
+			// Here we know that the timeout event is not enabled
+			theHelper.printILCommand(pw, "LD",  "FALSE");
+			theHelper.printILCommand(pw, "ST",  "e_" + currEventIndex);
+			theHelper.printILLabel(pw, "after_check_timer_" + currTimerIndex);
+		}
+	}
+
+
+	void printStartTimersAsIL(PrintWriter pw)
+		throws Exception
+	{
+
+		theHelper.printILComment(pw, "Start timers");
+		for (Iterator timerIt = theProject.timerIterator(); timerIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)timerIt.next();
+
+			int currTimerIndex = currTimer.getSynchIndex();
+			//theHelper.printILLabel(pw, "check_timer_" + currTimerIndex);
+			theHelper.printILComment(pw, "Start timer " + currTimer.getName());
+
+			String currTimeoutLabel = currTimer.getStartEvent();
+			if (!allEvents.containsEventWithLabel(currTimeoutLabel))
+			{
+				throw new IllegalStateException("Could not find event: " + currTimeoutLabel);
+			}
+			LabeledEvent currEvent = allEvents.getEventWithLabel(currTimeoutLabel);
+			int currEventIndex = currEvent.getSynchIndex();
+
+			theHelper.printILComment(pw, "Start event is \"" + currEvent.getLabel() + "\"");
+			theHelper.printILCommand(pw, "LD",  "e_" + currEventIndex);
+			theHelper.printILCommand(pw, "JMPCN",  "after_start_timer_" + currTimerIndex);
+			// Here we know that the event is enabled in the automaton and by the conditions
+			// First we reset the timer, in case it already was enabled
+			theHelper.printILCommand(pw, "LD",  "FALSE");
+			theHelper.printILCommand(pw, "ST",  "timer_" + currTimerIndex + ".tonIN");
+			theHelper.printILCommand(pw, "CAL",  "timer_" + currTimerIndex);
+			// Now we start the timer
+			theHelper.printILCommand(pw, "LD",  "TRUE");
+			theHelper.printILCommand(pw, "ST",  "timer_" + currTimerIndex + ".tonIN");
+			theHelper.printILCommand(pw, "CAL",  "timer_" + currTimerIndex);
+			theHelper.printILLabel(pw, "after_start_timer_" + currTimerIndex);
+		}
+		theHelper.printILCommand(pw, "JMP", "end");
 	}
 
 	/**
@@ -748,7 +818,6 @@ public class AutomataToIEC1131
 				theHelper.printILLabel(pw, "trans_after_e_" + currEventIndex);
 			}
 		}
-		theHelper.printILCommand(pw, "JMP", "end");
 	}
 
 	void printComputeSingleEnabledEventAsIL(PrintWriter pw)
@@ -904,6 +973,41 @@ public class AutomataToIEC1131
 	}
 
 /*
+	void printCheckTimersAsIL(PrintWriter pw)
+	{
+		theHelper.printILComment(pw, "Check the timers");
+		// Iterate over all events and compute which events that are enabled by the timer
+		for (Iterator timerIt = theProject.timerIterator(); timerIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)timerIt.next();
+
+			int currTimerIndex = currTimer.getSynchIndex();
+			theHelper.printILLabel(pw, "check_timer_" + currTimerIndex);
+			theHelper.printILComment(pw, "Condition for timer " + currTimer.getName());
+
+			String currTimeoutLabel = currTimer.getTimeoutEvent();
+			if (!theEvents.containsEventWithLabel(currTimeoutLabel))
+			{
+				throw new IllegalStateException("Could not find event: " + currTimeoutLabel);
+			}
+			LabeledEvent currEvent = theEvents.getEventWithLabel(currTimeoutLabel);
+
+			theHelper.printILComment(pw, "Timeout event is " + currEvent.getLabel());
+			int currEventIndex = currEvent.getSynchIndex();
+
+			theHelper.printILCommand(pw, "LD",  "e_" + currEventIndex);
+			theHelper.printILCommand(pw, "JMPCN",  "after_check_timer_" + currTimerIndex);
+			// Here we know that the event is enabled in the automaton and by the conditions
+			theHelper.printILCommand(pw, "LD",  "timer_" + currTimerIndex + ".tonQ");
+			theHelper.printILCommand(pw, "JMPC",  "after_check_timer_" + currTimerIndex);
+			// Here we know that the timeout event is not enabled
+			theHelper.printILCommand(pw, "LD",  "FALSE");
+			theHelper.printILCommand(pw, "ST",  "e_" + currEventIndex);
+			theHelper.printILCommand(pw, "JMP",  "after_check_timer_" + currTimerIndex);
+		}
+	}
+*/
+/*
 
 	void printComputeExternalEnabledEventsAsIL(PrintWriter pw)
 		throws Exception
@@ -971,7 +1075,7 @@ public class AutomataToIEC1131
 		throws Exception
 	{
 		initialize();
-		initialize();
+		theHelper.printILTimerFunctions(pw);
 		printBeginProgram(pw);
 		printBeginVariables(pw);
 		printSignalVariables(pw);
@@ -979,6 +1083,7 @@ public class AutomataToIEC1131
 		printBeginVariables(pw);
 		printEventVariables(pw);
 		printStateVariables(pw);
+		printTimerVariables(pw);
 		printEndVariables(pw);
 		printILBegin(pw);
 		printInitializationStructureAsIL(pw);
@@ -986,6 +1091,7 @@ public class AutomataToIEC1131
 		printCheckEnabledEventsAsIL(pw);
 		printComputeSingleEnabledEventAsIL(pw);
 		printChangeStateTransitionsAsIL(pw);
+		printStartTimersAsIL(pw);
 		printCheckConditionsAsIL(pw);
 		printDoActionsAsIL(pw);
 		printILEnd(pw);

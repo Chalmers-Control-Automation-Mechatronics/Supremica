@@ -132,7 +132,7 @@ public class Project
 		return theTimers;
 	}
 
-	public Iterator timersIterator()
+	public Iterator timerIterator()
 	{
 		return theTimers.iterator();
 	}
@@ -270,6 +270,16 @@ public class Project
 		theActions.clear();
 		theControls.clear();
 		theTimers.clear();
+	}
+
+	/**
+	 * Set the synchronization indicies. The returned alphabet is the union alphabet
+	 * and contains the synchronization index of all the events in this automata.
+	 */
+	public Alphabet setIndicies()
+	{
+		theTimers.setIndicies();
+		return super.setIndicies();
 	}
 
 	public void clear()

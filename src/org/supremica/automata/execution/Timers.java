@@ -133,4 +133,15 @@ public class Timers
 		theTimers.clear();
 		labelToTimerMap.clear();
 	}
+
+	public void setIndicies()
+	{
+		int i = 0;
+		for (Iterator theIt = iterator(); theIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)theIt.next();
+			currTimer.setSynchIndex(i++);
+		}
+	}
+
 }

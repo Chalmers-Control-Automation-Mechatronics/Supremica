@@ -375,7 +375,6 @@ public class Automata
 			currAutomaton.setIndicies(i++, theAlphabet);
 		}
 		return theAlphabet;
-
 	}
 
 	public Automaton getAutomaton(String name)

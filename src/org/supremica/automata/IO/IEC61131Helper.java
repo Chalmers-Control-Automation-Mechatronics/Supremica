@@ -203,10 +203,41 @@ public class IEC61131Helper
 		printILStatement(pw, null, command, operand, null);
 	}
 
+	public void printILTimerFunctions(PrintWriter pw)
+	{
+		pw.println("JAVA_BLOCK OnDelayTimer");
+		pw.println("\tVAR_IN_OUT");
+		pw.println("\t\ttonIN : BOOL;");
+		pw.println("\t\ttonPT : DINT;");
+		pw.println("\t\ttonET : DINT;");
+		pw.println("\t\ttonQ  : BOOL;");
+		pw.println("\tEND_VAR");
+		pw.println("END_JAVA_BLOCK");
+		pw.println("FUNCTION_BLOCK TON");
+		pw.println("\tVAR_IN_OUT");
+		pw.println("\t\ttonIN : BOOL;");
+		pw.println("\t\ttonPT : DINT;");
+		pw.println("\t\ttonET : DINT;");
+		pw.println("\t\ttonQ  : BOOL;");
+		pw.println("\tEND_VAR");
+		pw.println("\tVAR");
+		pw.println("\t\todt : OnDelayTimer;");
+		pw.println("\tEND_VAR");
+		pw.println("\tLD  tonIN");
+		pw.println("\tST  odt.tonIN");
+		pw.println("\tLD  tonPT");
+		pw.println("\tST  odt.tonPT");
+		pw.println("\tCAL odt");
+		pw.println("\tLD  odt.tonET");
+		pw.println("\tST  tonET");
+		pw.println("\tLD  odt.tonQ");
+		pw.println("\tST  tonQ");
+		pw.println("END_FUNCTION_BLOCK");
+	}
 	public void printILPrintFunctions(PrintWriter pw)
 	{
-		pw.println("(* JAVA_BLOCKS for printing (no newline)* )");
-		pw.println("(*=====================================*)");
+		pw.println("(* JAVA_BLOCKS for printing (no newline) *)");
+		pw.println("(*=======================================*)");
 		pw.println("");
 		pw.println("JAVA_BLOCK JPrintWSTRING");
 		pw.println("\tVAR_IN_OUT");
@@ -276,7 +307,7 @@ public class IEC61131Helper
 		pw.println("END_FUNCTION_BLOCK");
 		pw.println("");
 		pw.println("(* JAVA_BLOCKS for printing (newline) *)");
-		pw.println("(*=====================================*)");
+		pw.println("(*====================================*)");
 		pw.println("");
 		pw.println("JAVA_BLOCK JPrintlnWSTRING");
 		pw.println("\tVAR_IN_OUT");

@@ -167,7 +167,7 @@ public class ActionAndControlViewerPanel
 			}
 		}
 
-		for (Iterator theIt = theProject.timersIterator(); theIt.hasNext();)
+		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext();)
 		{
 			EventTimer currTimer = (EventTimer)theIt.next();
 			DefaultMutableTreeNode currTimerNode = new DefaultMutableTreeNode(currTimer.getName());
