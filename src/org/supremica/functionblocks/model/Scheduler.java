@@ -136,19 +136,17 @@ public class Scheduler
 		while (true)
 		{
 			BasicFBInstance selectedFBInstance = (BasicFBInstance) selectFBInstanceToHandleEvent();
-			if(selectedFBInstance == null)
+			if(selectedFBInstance != null)
+			{
+				selectedFBInstance.handleEvent();
+			}
+			else
 			{
 				//System.out.println("Scheduler.runEvents(): no instances to shedule");
 				//try{ Thread.sleep(1); } catch(Exception e) {}
 			}
-			else
-			{
-				selectedFBInstance.handleEvent();
-			}
 			notifyFinished();
 			//resource.handleConfigurationRequests();
-
-
 		}
 	}
     

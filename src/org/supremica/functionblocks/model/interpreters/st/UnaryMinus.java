@@ -56,10 +56,10 @@ package org.supremica.functionblocks.model.interpreters.st;
 public class UnaryMinus extends UnaryExpression
 {
 
-	public PrimaryExpression a;
+	public UnaryExpression a;
 
 	private UnaryMinus() {}
 	
-	public UnaryMinus(PrimaryExpression aa) {a=aa;}
+	public UnaryMinus(UnaryExpression aa) {a=aa;}
 
 }

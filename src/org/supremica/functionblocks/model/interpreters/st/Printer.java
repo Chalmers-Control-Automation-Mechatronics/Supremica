@@ -101,6 +101,8 @@ public class Printer {
 		if (e instanceof BinaryOrExpression) 
 		{
 			prOrExpression(((BinaryOrExpression) e).a, d+2);
+			indent(d+2);
+			sayln("OR");
 			prOrExpression(((BinaryOrExpression) e).b, d+2);
 		}
 		else if (e instanceof UnaryOrExpression)
@@ -224,6 +226,8 @@ public class Printer {
 			//indent(d+2);
 			//sayln("Plus(");
 			prAddExpression(((Plus) e).a, d+4);
+			indent(d+2);
+			sayln("+");
 			prAddExpression(((Plus) e).b, d+4); 
 			//indent(d+2);
 			//sayln(")");			
@@ -233,6 +237,8 @@ public class Printer {
 			//indent(d+2);
 			//sayln("Minus(");
 			prAddExpression(((Minus) e).a, d+4);
+			indent(d+2);
+			sayln("-");
 			prAddExpression(((Minus) e).b, d+4); 
 			//indent(d+2);
 			//sayln(")");			
@@ -341,7 +347,7 @@ public class Printer {
 		{ 
 			//indent(d+2);
 			//sayln("UnaryMinus(");
-			prPrimaryExpression(((UnaryMinus) e).a, d+4);
+			prUnaryExpression(((UnaryMinus) e).a, d+4);
 			//indent(d+2);
 			//sayln(")");			
 		}
@@ -349,7 +355,7 @@ public class Printer {
 		{ 
 			//indent(d+2);
 			//sayln("UnaryNot(");
-			prPrimaryExpression(((UnaryNot) e).a, d+4);
+			prUnaryExpression(((UnaryNot) e).a, d+4);
 			//indent(d+2);
 			//sayln(")");			
 		}

@@ -51,17 +51,23 @@ package org.supremica.functionblocks.model;
 
 //import java.util.*;
 
-public abstract class Variable
+public class Variable
 {
+	
 	// The types are: "EventInput", "EventOutput", "DataInput", "DataOutput", "Local"
-	private String type;
-
-	public void setType(String t)
+	String type;
+	
+	Variable(String t)
 	{
 		type = t;
 	}
 
-	public String getType()
+	void setType(String t)
+	{
+		type = t;
+	}
+
+	String getType()
 	{
 		return type;
 	}

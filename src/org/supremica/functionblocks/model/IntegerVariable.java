@@ -54,7 +54,13 @@ import java.lang.Integer;
 public class IntegerVariable extends Variable
 {
 	
-	private Integer value;
+	private Integer value = new Integer(0);
+
+	public IntegerVariable(String type, int i)
+	{
+		super(type);
+		value = new Integer(i);
+	}
 
 	public void setValue(Integer i)
 	{

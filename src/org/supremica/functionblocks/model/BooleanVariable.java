@@ -54,7 +54,13 @@ import java.lang.Boolean;
 public class BooleanVariable extends Variable
 {
 	
-	private Boolean value;
+	private Boolean value = new Boolean(false);
+
+	public BooleanVariable(String type, boolean b)
+	{
+		super(type);
+		value = new Boolean(b);
+	}
 
 	public void setValue(Boolean v)
 	{

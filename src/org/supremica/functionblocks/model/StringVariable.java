@@ -54,7 +54,13 @@ import java.lang.String;
 public class StringVariable extends Variable
 {
 	
-	private String value;
+	private String value = "";
+
+	public StringVariable(String type, String s)
+	{
+		super(type);
+		value=s;
+	}
 
 	public void setValue(String v)
 	{

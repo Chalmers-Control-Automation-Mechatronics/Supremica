@@ -70,7 +70,7 @@ public class ECCondition
 	public ECCondition(String condition)
 	{
 		
-		System.out.println("ECCondition: Making new instance with condition: " + condition);
+		System.out.println("ECCondition: New instance: " + condition);
 		setCondition(condition);
 	}
 
@@ -92,8 +92,6 @@ public class ECCondition
 		{
 			
 		}
-
-		//new Printer(System.out).prExpression(abstractSyntax,0);
 
 	}
 

@@ -724,7 +724,7 @@ public class Evaluator {
 		}
 		else if (e instanceof UnaryMinus)
 		{ 
-			Object a = evalPrimaryExpression(((UnaryMinus) e).a);
+			Object a = evalUnaryExpression(((UnaryMinus) e).a);
 			if (a instanceof Integer)
 			{
 				return new Integer(-((Integer) a).intValue());
@@ -742,7 +742,7 @@ public class Evaluator {
 		}
 		else if (e instanceof UnaryNot)
 		{ 
-			Object a = evalPrimaryExpression(((UnaryNot) e).a);
+			Object a = evalUnaryExpression(((UnaryNot) e).a);
 			if (a instanceof Boolean)
 			{
 				return new Boolean( ! ((Boolean) a).booleanValue());

@@ -33,44 +33,44 @@ IDENT = {ALPHA} ( {ALPHA} | {DIGIT} | _ )*
 
 <YYINITIAL> {
 
-  "OR"			{ System.out.println("OR"); return new Symbol(Symbols.OR); }
-  "XOR"			{ System.out.println("XOR");return new Symbol(Symbols.XOR); }
-  "&"			{ System.out.println("AND");return new Symbol(Symbols.AND); }
-  "AND"			{ System.out.println("AND");return new Symbol(Symbols.AND); }	
+  "OR"			{ /*System.out.println("OR");*/ return new Symbol(Symbols.OR); }
+  "XOR"			{ /*System.out.println("XOR");*/ return new Symbol(Symbols.XOR); }
+  "&"			{ /*System.out.println("AND");*/ return new Symbol(Symbols.AND); }
+  "AND"			{ /*System.out.println("AND");*/ return new Symbol(Symbols.AND); }	
 
-  "=" 			{ System.out.println("EQ");return new Symbol(Symbols.EQ); }
-  "<>" 			{ System.out.println("NEQ");return new Symbol(Symbols.NEQ); }
+  "=" 			{ /*System.out.println("EQ");*/ return new Symbol(Symbols.EQ); }
+  "<>" 			{ /*System.out.println("NEQ");*/ return new Symbol(Symbols.NEQ); }
 
-  "<"  			{ System.out.println("LESS");return new Symbol(Symbols.LESS); }
-  "<=" 			{ System.out.println("LESSEQ");return new Symbol(Symbols.LESSEQ); }
-  ">"  			{ System.out.println("MORE");return new Symbol(Symbols.MORE); }
-  ">=" 			{ System.out.println("MOREEQ");return new Symbol(Symbols.MOREEQ); }
+  "<"  			{ /*System.out.println("LESS");*/ return new Symbol(Symbols.LESS); }
+  "<=" 			{ /*System.out.println("LESSEQ");*/ return new Symbol(Symbols.LESSEQ); }
+  ">"  			{ /*System.out.println("MORE");*/ return new Symbol(Symbols.MORE); }
+  ">=" 			{ /*System.out.println("MOREEQ");*/ return new Symbol(Symbols.MOREEQ); }
 
-  "+" 			{ System.out.println("PLUS");return new Symbol(Symbols.PLUS); }
-  "-" 			{ System.out.println("MINUS");return new Symbol(Symbols.MINUS); }
+  "+" 			{ /*System.out.println("PLUS");*/ return new Symbol(Symbols.PLUS); }
+  "-" 			{ /*System.out.println("MINUS");*/ return new Symbol(Symbols.MINUS); }
 
-  "*" 			{ System.out.println("TIMES");return new Symbol(Symbols.TIMES); }
-  "/" 			{ System.out.println("DIV");return new Symbol(Symbols.DIV); }
-  "MOD"			{ System.out.println("MOD");return new Symbol(Symbols.MOD); }
+  "*" 			{ /*System.out.println("TIMES");*/ return new Symbol(Symbols.TIMES); }
+  "/" 			{ /*System.out.println("DIV");*/ return new Symbol(Symbols.DIV); }
+  "MOD"			{ /*System.out.println("MOD");*/ return new Symbol(Symbols.MOD); }
 
-  "NOT"			{ System.out.println("NOT");return new Symbol(Symbols.NOT); }
+  "NOT"			{ /*System.out.println("NOT");*/ return new Symbol(Symbols.NOT); }
 
-  "(" 			{ System.out.println("LPAREN");return new Symbol(Symbols.LPAREN); }
-  ")" 			{ System.out.println("RPAREN");return new Symbol(Symbols.RPAREN); }
+  "(" 			{ /*System.out.println("LPAREN");*/ return new Symbol(Symbols.LPAREN); }
+  ")" 			{ /*System.out.println("RPAREN");*/ return new Symbol(Symbols.RPAREN); }
 
-  \"{STRING_TEXT}\" 	{ System.out.println("STRING:" + yytext());return new Symbol(Symbols.STRING,yytext()); } 
-  {DIGIT}+ 		{ System.out.println("INT:" + yytext());return new Symbol(Symbols.INT , new Integer(yytext())); }  
-  {DIGIT}+"."{DIGIT}+	{ System.out.println("FLOAT:" + yytext());return new Symbol(Symbols.FLOAT , new Float(yytext())); }
-  "TRUE"		{ System.out.println("TRUE");return new Symbol(Symbols.BOOL,new Boolean(true)); }
-  "FALSE"		{ System.out.println("FALSE");return new Symbol(Symbols.BOOL,new Boolean(false)); }
+  \"{STRING_TEXT}\" 	{ /*System.out.println("STRING:" + yytext());*/ return new Symbol(Symbols.STRING,yytext()); } 
+  {DIGIT}+ 		{ /*System.out.println("INT:" + yytext());*/ return new Symbol(Symbols.INT , new Integer(yytext())); }  
+  {DIGIT}+"."{DIGIT}+	{ /*System.out.println("FLOAT:" + yytext());*/ return new Symbol(Symbols.FLOAT , new Float(yytext())); }
+  "TRUE"		{ /*System.out.println("TRUE");*/ return new Symbol(Symbols.BOOL,new Boolean(true)); }
+  "FALSE"		{ /*System.out.println("FALSE");*/ return new Symbol(Symbols.BOOL,new Boolean(false)); }
 
-  {IDENT} 		{ System.out.println("IDENT:" + yytext());return new Symbol(Symbols.IDENT,yytext()); }  
+  {IDENT} 		{ /*System.out.println("IDENT:" + yytext());*/ return new Symbol(Symbols.IDENT,yytext()); }  
 
   {NEWLINE} 		{ }
 
   {NONNEWLINE_WHITE_SPACE_CHAR}+ { }
 
-  . 			{ System.out.println("Illegal character: <" + yytext() + ">");}
+  . 			{ System.out.println("Illegal character: <" + yytext() + ">"); }
 
 }
 

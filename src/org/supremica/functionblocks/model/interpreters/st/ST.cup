@@ -80,11 +80,10 @@ term ::= term:a TIMES term:b 					{: RESULT = new Times(a,b); :}
 power_expression ::= power_expression:a POWER power_expression:b {: RESULT = new BinaryPowerExpression(a,b); :}
 		   | unary_expression:a				{: RESULT = new  UnaryPowerExpression(a); :};
 
-unary_expression ::= primary_expression:a			{: RESULT = new UnaryPrimaryExpression(a); :}
-		   | LPAREN expression:a RPAREN			{: RESULT = new UnaryExpressionExpression(a); :}
-		   | MINUS primary_expression:a			{: RESULT = new UnaryMinus(a); :} %prec UMINUS
-		   | NOT   primary_expression:a			{: RESULT = new UnaryNot(a); :} %prec NOT;
-
+unary_expression ::= LPAREN expression:a RPAREN			{: RESULT = new UnaryExpressionExpression(a); :}
+		   | MINUS unary_expression:a			{: RESULT = new UnaryMinus(a); :} %prec UMINUS
+		   | NOT   unary_expression:a			{: RESULT = new UnaryNot(a); :} %prec NOT
+		   | primary_expression:a			{: RESULT = new UnaryPrimaryExpression(a); :};
 
 primary_expression ::= IDENT:a					{: RESULT = new PrimaryIdent(a); :}
 		     | STRING:a 				{: RESULT = new PrimaryString(a); :}

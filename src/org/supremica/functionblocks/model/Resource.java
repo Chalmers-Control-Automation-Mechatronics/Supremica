@@ -73,15 +73,20 @@ public class Resource
         this.name = name;
 	scheduler = new Scheduler(this);
 
-	// create a dummy FB type and instance
+	// creat the application from the Sync paper for testing
 	fbType = new BasicFBType("DummyFBType", this);
 	fbType.addAlgorithm(new TestAlgorithm("DummyAlgorithm"));
 	fbInstance = fbType.createInstance("DummyFBInstance");
 	fbInstance.addEventInputQueue(new EventQueue());
 	fbInstance.queueEvent("DummyEventInput");
 	Variables testVars = new Variables();
-	ECCondition testCond = new ECCondition("FALSE OR FALSE OR TRUE AND 8=5+3 OR (7.12 <> 7.0 + 0.2)"); 
-	System.out.println("Resource: test evaluation result:" + testCond.evaluate(testVars));
+	testVars.addVariable("bvar", new BooleanVariable("Local", true));
+	testVars.addVariable("ivar", new IntegerVariable("Local", 10));
+	testVars.addVariable("fvar", new FloatVariable("Local", 3.14));
+	testVars.addVariable("svar", new StringVariable("Local", "TestString"));
+	ECCondition testCond = new ECCondition("NOT (FALSE OR FALSE OR TRUE AND 8<>5+3 " + 
+					       "OR 7.12 = 7.0 + 0.2 OR 8>=5+3 OR 8<=5+3 OR 8<5+3 )"); 
+	System.out.println("Resource: test evaluation result: " + testCond.evaluate(testVars));
 	
     }
 

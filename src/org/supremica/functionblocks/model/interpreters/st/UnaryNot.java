@@ -56,10 +56,10 @@ package org.supremica.functionblocks.model.interpreters.st;
 public class UnaryNot extends UnaryExpression
 {
 
-	public PrimaryExpression a;
+	public UnaryExpression a;
 
 	private UnaryNot() {}
 	
-	public UnaryNot(PrimaryExpression aa) {a=aa;}
+	public UnaryNot(UnaryExpression aa) {a=aa;}
 
 }
