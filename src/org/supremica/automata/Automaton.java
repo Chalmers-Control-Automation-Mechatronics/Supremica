@@ -320,7 +320,7 @@ public class Automaton
 
 	// Quick and ugly fixx, see bug report
 	// When working with the state-indices, sometimes, somehow the indices in
-	// indexStateMap become different from the indices stored in the States
+	// indexStateMap become different from the indices stored in the State:s
 	// This func iterates over the states and rebuilds the map
 	// Used by ModifiedAstar
 	//  When is the slow and beautiful fixx due?
@@ -572,9 +572,27 @@ public class Automaton
 
 		theStates.remove(state);
 		state.removeArcs();
-		idStateMap.remove(state.getId());
-		indexStateMap.remove(new Integer(state.getIndex()));
+		String id = state.getId();
+		idStateMap.remove(id);
+		int index = state.getIndex();
+		indexStateMap.remove(new Integer(index));
 		notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
+
+		/* Äh! Funkar ju inte?
+		// Replace the index of the State with the highest index with the removed State's index
+		int lastIndex = indexStateMap.size()-1;
+		if (index != lastIndex)
+		{
+			logger.info("--------" + lastIndex + "---------");
+			logger.info("" + ((State) indexStateMap.get(new Integer(lastIndex-1)) != null));
+			logger.info("" + ((State) indexStateMap.get(new Integer(lastIndex)) != null));
+			logger.info("" + ((State) indexStateMap.get(new Integer(lastIndex+1)) != null));
+			State lastState = (State) indexStateMap.get(new Integer(lastIndex));
+			lastState.setIndex(index);
+			indexStateMap.remove(new Integer(lastIndex));
+			indexStateMap.put(new Integer(index), state);
+		}
+		*/
 	}
 
 	public boolean hasInitialState()
@@ -909,11 +927,6 @@ public class Automaton
 	public State getStateWithIndex(int index)
 	{
 		return (State) indexStateMap.get(new Integer(index));
-	}
-
-	public String getStateNameWithIndex(int index)
-	{
-		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
 
 	// end index stuff
@@ -1912,7 +1925,7 @@ public class Automaton
 			newState.setIndex(two.getIndex());
 		}
 		*/
-
+		
 		// Return the new state
 		return newState;
 	}

@@ -317,7 +317,7 @@ public class AutomataMinimizer
 		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata);
 		aut.hide(hideThese);
 
-		if (AutomatonMinimizer.debug)
+ 		if (AutomatonMinimizer.debug)
 		{
 			synchTimer.stop();
 			logger.fatal("Synchronization: " + synchTimer);

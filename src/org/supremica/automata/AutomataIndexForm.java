@@ -597,7 +597,6 @@ public final class AutomataIndexForm
 
 					if (currPreviousStates == null)
 					{
-
 						// Allocate memory and initialize, last element contains the number of valid elements
 						currPreviousStates = new int[nbrOfIncomingArcs + 1];
 						currPreviousStates[nbrOfIncomingArcs] = 0;

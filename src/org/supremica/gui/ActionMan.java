@@ -1849,7 +1849,8 @@ public class ActionMan
 	// Automaton.Status action performed
 	public static void automatonStatus_actionPerformed(Gui gui)
 	{
-		gui.info("Number of automata: " + gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata());
+		int nbrOfAutomata = gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
+		//gui.info("Number of automata: " + nbrOfAutomata);
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
 		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true, true))
@@ -1857,7 +1858,7 @@ public class ActionMan
 			return;
 		}
 
-		gui.info("Number of selected automata: " + selectedAutomata.size());
+		gui.info("Number of selected automata: " + selectedAutomata.size() + " (" + nbrOfAutomata + ")");
 		gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
 		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -1867,9 +1868,9 @@ public class ActionMan
 
 			statusStr.append("Status for automaton: " + currAutomaton.getName());
 
-			if ((currAutomaton.getComment() != null) &&!currAutomaton.getComment().equals(""))
+			if ((currAutomaton.getComment() != null) && !currAutomaton.getComment().equals(""))
 			{
-				statusStr.append("\nComment: \"" + currAutomaton.getComment() + "\"");
+				statusStr.append("\n\tComment: \"" + currAutomaton.getComment() + "\"");
 			}
 
 			statusStr.append("\n\tis deterministic: " + currAutomaton.isDeterministic());

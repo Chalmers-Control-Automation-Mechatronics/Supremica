@@ -144,7 +144,7 @@ public class TestAutomataVerifier
 		catch (Exception ex)
 		{
 			ex.printStackTrace();
-			assertTrue(false);			
+			assertTrue(false);
 		}
 	}
 

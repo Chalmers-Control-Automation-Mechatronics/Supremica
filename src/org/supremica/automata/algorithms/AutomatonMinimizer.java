@@ -136,8 +136,9 @@ public class AutomatonMinimizer
 		
 		if (options.getMinimizationType() == EquivalenceRelation.ApEquivalence)
 		{
-			//ruleB(theAutomaton);
+			ruleB(theAutomaton);
 
+			/*
 			State s140 = theAutomaton.getStateWithName("s140");
 			State s105 = theAutomaton.getStateWithName("s105");
 			State merge = theAutomaton.mergeStates(s140, s105);
@@ -152,6 +153,8 @@ public class AutomatonMinimizer
 			merge = theAutomaton.mergeStates(merge, s107);
 
 			theAutomaton.setName("apa(" + theAutomaton.getName() + ")");
+			*/
+			
 			return theAutomaton;
 		}
 
@@ -365,6 +368,8 @@ public class AutomatonMinimizer
 				int countB = ruleB(newAutomaton);
 				int countC = ruleC(newAutomaton);
 
+				//checkStateIndices(newAutomaton);
+
 				if (debug)
 					logger.warn("Rule A: " + countA + ", rule B: " + countB + ", rule C: " + countC);
 				count = countA+countB+countC;
@@ -373,7 +378,6 @@ public class AutomatonMinimizer
 					logger.verbose("Removed " + count + " states based on conflict equivalence " +
 								   "after running partitioning.");
 				}
-				count = 0;
 			}
 		}
 
@@ -413,6 +417,21 @@ public class AutomatonMinimizer
 		
 		// Return the result of the minimization!
 		return newAutomaton;
+	}
+
+	private void checkStateIndices(Automaton aut)
+	{
+		TreeSet sort = new TreeSet();
+
+		for (StateIterator it = aut.stateIterator(); it.hasNext(); )
+		{
+			sort.add(new Integer(it.nextState().getIndex()));
+		}
+
+		for (Iterator it = sort.iterator(); it.hasNext(); )
+		{
+			logger.error(it.next().toString());
+		}
 	}
 
 	/**
@@ -535,13 +554,13 @@ public class AutomatonMinimizer
 			// from the EquivalenceClass (from one state only). This is OK, though, since 
 			// all states in the equivalence class should have the same outgoing transitions 
 			// (with respect to equivalence classes), otherwise they are not really equivalent! 
-			//Iterator outgoingArcsIt = currEquivClass.get().outgoingArcsIterator();
+			//ArcIterator outgoingArcsIt = currEquivClass.get().outgoingArcsIterator();
 
 			// Since the automaton isn't saturated, we have to loop through all arcs!
-			Iterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
+			ArcIterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
 			while (outgoingArcsIt.hasNext())
 			{
-				Arc currArc = (Arc) outgoingArcsIt.next();
+				Arc currArc = outgoingArcsIt.nextArc();
 				LabeledEvent currEvent = currArc.getEvent();
 				State oldToState = currArc.getToState();
 
@@ -1563,11 +1582,6 @@ public class AutomatonMinimizer
 		toBeRemoved.clear();
 		loop: for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
 		{
-			if (stopRequested)
-			{
-				return -1;
-			}
-
 			Arc arc = arcIt.nextArc();
 
 			// Using Elorantas notation... (s1, s2 and (later) s3)
@@ -1587,6 +1601,11 @@ public class AutomatonMinimizer
 
 					for (ArcIterator inIt = s2.incomingArcsIterator(); inIt.hasNext(); )
 					{
+						if (stopRequested)
+						{
+							return -1;
+						}
+						
 						Arc secondArc = inIt.nextArc();
 						if (s3.equals(secondArc.getFromState()))
 						{
