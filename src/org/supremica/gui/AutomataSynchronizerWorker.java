@@ -78,6 +78,8 @@ public class AutomataSynchronizerWorker
 
 	private boolean stopRequested = false;
 
+	private EventQueue eventQueue = new EventQueue();
+
 	public AutomataSynchronizerWorker(Supremica workbench,
 		Automata theAutomata,
 		String newAutomatonName,
@@ -113,7 +115,7 @@ public class AutomataSynchronizerWorker
 			ArrayList threadsToStop = new ArrayList();
 			threadsToStop.add(theSynchronizer);
 			threadsToStop.add(this);
-			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop);
+			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop, eventQueue);
 			theSynchronizer.getHelper().setCancelDialog(cancelDialog);
 			cancelDialog.updateHeader("Synchronizing...");
 

@@ -91,7 +91,8 @@ public class CancelDialog
 	}
 
 	/**
-	 * Creates (modal?) dialog box for canceling the threads in the supplied ArrayList
+	 * Creates dialog box for canceling the Stoppable classes in the supplied ArrayList.
+	 * @see Stoppable
 	 */
 	public CancelDialog(Supremica workbench, ArrayList executers, EventQueue eventQueue)
 	{
