@@ -101,7 +101,10 @@
 	<unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
-    <unjar src="${lib}/concurrent.jar" dest="${lib}/${unjared}"/>
+    	<unjar src="${lib}/concurrent.jar" dest="${lib}/${unjared}"/>
+
+	<!-- jintegra -->
+    	<unjar src="${lib}/jintegra_reduced_logging.jar" dest="${lib}/${unjared}"/>
 
  	<mkdir dir="${lib}/licensed"/>
  	<touch file="${lib}/licensed/JGo.jar"/>	

@@ -53,13 +53,13 @@ import org.supremica.automata.*;
 import org.supremica.log.*;
 
 /**
- * This class is a result of a project in the course Evolutionary Computation, 
- * FFR105 (2002) at Chalmers University of Technology. 
+ * This class is a result of a project in the course Evolutionary Computation,
+ * FFR105 (2002) at Chalmers University of Technology.
  *
  * @author Hugo Flordal and Arash Vahidi
  */
 public class GeneticAlgorithms
-{	
+{
 	private static Logger logger = LoggerFactory.createLogger(GeneticAlgorithms.class);
 
 	private static final int GA_DATA_SIZE = 8;
@@ -68,30 +68,30 @@ public class GeneticAlgorithms
 	public static double[] extractData(Automaton autA, Automaton autB)
 	{
 		double[] data = new double[GA_DATA_SIZE];
-		
-		/* // OLD ATTEMPT... NO GOOD... DON USE THIS AGAIN!
+
+		/* // OLD ATTEMPT... NO GOOD... DON'T USE THIS AGAIN!
 		  // Amount of states in autA
 		  data[0] = autA.nbrOfStates();
 		  // Amount of events in autA
 		  data[1] = autA.nbrOfEvents();
 		  // Amount of transitions in autA
 		  data[2] = autA.nbrOfTransitions();
-		  
+
 		  // Amount of states in autB
 		  data[3] = autB.nbrOfStates();
 		  // Amount of events in autB
 		  data[4] = autB.nbrOfEvents();
 		  // Amount of transitions in autB
 		  data[5] = autB.nbrOfTransitions();
-		  
+
 		  // Amount of common events between the automata
 		  Alphabet alphabetIntersection = Alphabet.intersection(autA.getAlphabet(), autB.getAlphabet);
 		  data[6] = alphabetIntersection.size();
-		  
+
 		  // Worst case synchronization size
 		  data[7] = data[0] * data[3];
 		*/
-		
+
 		// Amount of states in autA
 		data[0] = autA.nbrOfStates(); // DON'T TOUCH!!! THIS MUST BE DATA[0]!!!
 		// Amount of states in autB
@@ -107,7 +107,7 @@ public class GeneticAlgorithms
 		data[4] = autA.nbrOfTransitions();
 		// Amount of transitions in autB
 		data[5] = autB.nbrOfTransitions();
-		
+
 		// Percentage of transitions with common events in autA
 		ArcIterator arcIterator = autA.arcIterator();
 		int commonTransitions = 0;
@@ -128,7 +128,7 @@ public class GeneticAlgorithms
 		data[3] = Math.round(100000*data[3])/100000.0;
 		data[6] = Math.round(100000*data[6])/100000.0;
 		data[7] = Math.round(100000*data[7])/100000.0;
-		
+
 		// CONCEIVABLE DATA THAT MIGHT BE OF INTEREST
 		// * Amount of states
 		// * Amount of events (percentage common events)
@@ -138,7 +138,7 @@ public class GeneticAlgorithms
 		// * Amount of prioritized events (overkill)
 		// * AutomatonType
 		// * Maximum depth of automata
-		
+
 		return data;
 	}
 
@@ -177,7 +177,7 @@ public class GeneticAlgorithms
 				logger.error("Error in GeneticAlgorithms.java: " + e);
 			}
 		}
-		
+
 		AutomataSynchronizer theSynchronizer = null;
 		try
 		{
@@ -188,13 +188,13 @@ public class GeneticAlgorithms
 		{
 			logger.error("Error in GeneticAlgorithms.java: " + e);
 		}
-		
+
 		// The correct value, the number of states in the synchronization
 		return theSynchronizer.getNumberOfStates();
 	}
 
 	/**
-	 * This is not finished... the idéa is to predict what happens when we 
+	 * This is not finished... the idéa is to predict what happens when we
 	 * synchronize several automata together, adding one at a time.
 	 *
 	 * First we need to predict all the data in the synchronizaed automaton
@@ -213,7 +213,7 @@ public class GeneticAlgorithms
 			return predictSynchronizationSize(automata.getAutomatonAt(0), automata.getAutomatonAt(0));
 		}
 		else
-		{			
+		{
 			logger.error("Only the size of two synchronized automata can be predicted!");
 			return 0.0;
 		}
@@ -232,14 +232,14 @@ public class GeneticAlgorithms
 	 * This is an manually generated class
 	 */
 	/* Planned to make my own predictionFunction, based on intuition...
-	private static class ManualPredictionFunction 
+	private static class ManualPredictionFunction
 	{
 		private static double[] r = new double[GA_DATA_SIZE];
-		
+
 		public static double f(double[] in)
 		{	// Worst case
 			double worstCase = in[0]*in[1];
-			
+
 			if (in[2] == 0 && in[3] == 0)
 			{
 				return worstCase;
@@ -251,15 +251,14 @@ public class GeneticAlgorithms
 	/**
 	 * This is an automatically generated class
 	 */
-	private static class PredictionFunction 
+	private static class PredictionFunction
 	{
 		private static double[] r = new double[GA_DATA_SIZE];
-		
 		public static double f(double[] in)
 		{
 			for(int i=0; i<r.length; i++)
 				r[i] = in[i];
-			
+
 			r[2] = 0.544921875;
 			r[1] = -0.900390625;
 			r[2] = r[2] + in[1];
@@ -355,7 +354,7 @@ public class GeneticAlgorithms
 			r[0] = r[0] + in[3];
 			r[0] = r[0] * r[7];
 			r[0] = r[0] + r[0];
-			
+
 			return r[0];
         } // 95 instructions, fitness: 4.731034756672716
 	}

@@ -71,6 +71,7 @@ import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
+import org.supremica.external.SuprRobLink;
 
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
@@ -489,17 +490,17 @@ public class ActionMan
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-			
+
 			return;
 		}
 
 		if (selectedAutomata.size() == theProject.size())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "No point in moving all automata, right?", "Alert", JOptionPane.ERROR_MESSAGE);
-			
+
 			return;
 		}
-		
+
 		Iterator autIt;
 		if (directionIsUp)
 		{
@@ -509,7 +510,7 @@ public class ActionMan
 			int i = 0;
 			while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
 			{
-				autIt.next();				
+				autIt.next();
 				selectionIndices[index++] = i++;
 			}
 		}
@@ -521,7 +522,7 @@ public class ActionMan
 			int i = theProject.size() - 1;
 			while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
 			{
-				autIt.next();				
+				autIt.next();
 				selectionIndices[index++] = i--;
 			}
 		}
@@ -533,11 +534,11 @@ public class ActionMan
 			theProject.moveAutomaton(currAutomaton, directionIsUp);
 			selectionIndices[index++] = theProject.getAutomatonIndex(currAutomaton);
 		}
-		
+
 		gui.clearSelection();
 		gui.selectAutomata(selectionIndices);
 	}
-	
+
 	// This is baaad!
 	private static final int    // instead of using constants later below :)
 		FORMAT_UNKNOWN = -1,
@@ -1376,7 +1377,7 @@ public class ActionMan
 		   if (selectedAutomata.size() < 1)  // This can't happen.
 		   {
 		       JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-		   
+
 		       return;
 		   }
 		*/
@@ -1414,16 +1415,16 @@ public class ActionMan
 
 		try
 		{
-			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), 
+			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
 													 SynchronizationType.Prioritized,
 													 SupremicaProperties.syncInitialHashtableSize(),
 													 SupremicaProperties.syncExpandHashtable(),
-													 SupremicaProperties.syncForbidUncontrollableStates(), 
-													 SupremicaProperties.syncExpandForbiddenStates(), 
+													 SupremicaProperties.syncForbidUncontrollableStates(),
+													 SupremicaProperties.syncExpandForbiddenStates(),
 													 false,
 													 false,
 													 false, // This is the only difference from default!
-													 SupremicaProperties.verboseMode(), 
+													 SupremicaProperties.verboseMode(),
 													 true,
 													 true);
 		}
@@ -1954,16 +1955,16 @@ public class ActionMan
 			// JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
 			// return;
 			Object[] options = { "Continue", "Abort" };
-			
-			int conf = JOptionPane.showOptionDialog(gui.getComponent(), 
-													"All automata are not determinstic. Abort?", 
-													"Non-determinism Found", 
-													JOptionPane.YES_NO_OPTION, 
+
+			int conf = JOptionPane.showOptionDialog(gui.getComponent(),
+													"All automata are not determinstic. Abort?",
+													"Non-determinism Found",
+													JOptionPane.YES_NO_OPTION,
 													JOptionPane.WARNING_MESSAGE,
 													null,
 													options,
 													options[1]);
-						
+
 			if(conf == 0)
 			{
 				logger.warn("Non-deterministic automaton loaded. You're on your own");
@@ -2286,8 +2287,8 @@ public class ActionMan
 
 	/**
 	 * Calculates table with information for use with an (external) genetic programming system.
-	 * This is a part of a project in a course in Evolutionary Computation, FFR105 (2002) at 
-	 * Chalmers University of Technology. 
+	 * This is a part of a project in a course in Evolutionary Computation, FFR105 (2002) at
+	 * Chalmers University of Technology.
 	 *
 	 * To use this you have to set a boolean in GeneticAlgorithms.java.
 	 *
@@ -2298,7 +2299,7 @@ public class ActionMan
 	public static void evoCompSynchTable(Gui gui, boolean append)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		
+
 		Automaton automatonA;
 		Automaton automatonB;
 		FileWriter outFile = null;
@@ -2310,7 +2311,7 @@ public class ActionMan
 
 		try
 		{
-			// Synchronize the automata using default options (this will 
+			// Synchronize the automata using default options (this will
 			// probably be a problem if there are non-prioritized events)
 			syncOptions = new SynchronizationOptions();
 			outFile = new FileWriter("SynchTable.txt", append);
@@ -2345,8 +2346,8 @@ public class ActionMan
 					outFile.write(automatonA.getName() + " " + automatonB.getName() + "\n");
 					outFile.flush();
 				}
-			}							
-			outFile.close();			
+			}
+			outFile.close();
 		}
 		catch (Exception ex)
 		{
@@ -2360,7 +2361,7 @@ public class ActionMan
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		double predictedSize = GeneticAlgorithms.predictSynchronizationSize(selectedAutomata);
-		
+
 		if (predictedSize > 0.0)
 		{
 			double[] data;
@@ -2372,8 +2373,8 @@ public class ActionMan
 				return;
 			int realSize = GeneticAlgorithms.calculateSynchronizationSize(selectedAutomata);
 			int worstSize = (int) (data[0]*data[1]);
-			JOptionPane.showMessageDialog(gui.getComponent(), "The synchronization is predicted to have " 
-										  + (float) predictedSize + " states. \nSynchronization actually " + 
+			JOptionPane.showMessageDialog(gui.getComponent(), "The synchronization is predicted to have "
+										  + (float) predictedSize + " states. \nSynchronization actually " +
 										  "gives exactly " + realSize + " states (worst case " + worstSize +
 										  ").", "Prediction", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -2382,6 +2383,23 @@ public class ActionMan
 			JOptionPane.showMessageDialog(gui.getComponent(), "The prediction failed. (Predicted size: " + predictedSize + ")", "Prediction",
 										  JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	/**
+	 * Calculates table with information for use with an (external) genetic programming system.
+	 * This is a part of a project in a course in Evolutionary Computation, FFR105 (2002) at
+	 * Chalmers University of Technology.
+	 *
+	 * To use this you have to set a boolean in GeneticAlgorithms.java.
+	 *
+	 * Writes 8 columns of data and a correct value on each line of an output file
+	 *
+	 * @author Hugo Flordal, hugo@s2.chalmers.se
+	 */
+	public static void robotStudioTest(Gui gui)
+	{
+		RobotStudioLink robotStudioLink = new RobotStudioLink();
+		robotStudioLink.test();
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata

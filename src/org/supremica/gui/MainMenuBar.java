@@ -91,6 +91,7 @@ import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
 import org.supremica.util.SupremicaMenuItem;
 import org.supremica.automata.algorithms.GeneticAlgorithms;
+import org.supremica.external.SuprRobLink;
 
 public class MainMenuBar
 	extends JMenuBar
@@ -571,10 +572,10 @@ public class MainMenuBar
 		}
 
 		// Evolution
-		if (GeneticAlgorithms.useGeneticAlgorithms())
+		if (SupremicaProperties.showGeneticAlgorithms())
 		{
 			JMenu menuEvoComp = new JMenu();
-			
+
 			menuEvoComp.setText("EvoComp");
 			menuEvoComp.setMnemonic(KeyEvent.VK_E);
 			add(menuEvoComp);
@@ -587,17 +588,10 @@ public class MainMenuBar
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						try
-						{
-							ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
-						}
-						catch (Exception excp)
-						{
-							// what the f*** do we do?
-						}
+						ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
 					}
 				});
-			
+
 			// EvoComp.PredictSize
 			JMenuItem predictSize = new JMenuItem();
 			predictSize.setText("Predict Synchronization Size");
@@ -606,14 +600,29 @@ public class MainMenuBar
 				{
 					public void actionPerformed(ActionEvent e)
 					{
-						try
-						{
-							ActionMan.evoCompPredictSize(ActionMan.getGui());
-						}
-						catch (Exception excp)
-						{
-							// what the f*** do we do?
-						}
+						ActionMan.evoCompPredictSize(ActionMan.getGui());
+					}
+				});
+		}
+
+		// Supremica - Robotstudio link
+		if (SupremicaProperties.showRobotstudioLink())
+		{
+			JMenu menuRobotStudioLink = new JMenu();
+
+			menuRobotStudioLink.setText("RobotStudio");
+			menuRobotStudioLink.setMnemonic(KeyEvent.VK_R);
+			add(menuRobotStudioLink);
+
+			// EvoComp.CalculateSynchTable
+			JMenuItem robLink= new JMenuItem();
+			robLink.setText("RobotStudio test");
+			menuRobotStudioLink.add(robLink);
+			robLink.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.robotStudioTest(ActionMan.getGui());
 					}
 				});
 		}
