@@ -1,4 +1,5 @@
 /************************ AlphabetSubTree.java *****************/
+
 package org.supremica.gui.treeview;
 
 import java.awt.*;
@@ -6,11 +7,12 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.util.*;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 
-class AlphabetSubTree
+public class AlphabetSubTree
 	extends SupremicaTreeNode
 {
 	public AlphabetSubTree(Alphabet alpha)

@@ -231,19 +231,28 @@ class RestrictEventsViewerPanel
 {
 	private JTree tree = null;
 	private JScrollPane scrollpane = null;
-	private AutomatonSubTree root = null;
-	boolean erase = true;
-	private Automaton automaton = new Automaton("Erase These Events");
+	// private AutomatonSubTree root = null;
+	private SupremicaTreeNode root = null;
+	boolean erase = true;	
+
+	// private Automaton automaton = new Automaton("Erase These Events");
+	private Alphabet alpha = new Alphabet();
 	
 	public RestrictEventsViewerPanel()
 	{
-		this.root = new AutomatonSubTree(automaton, true, false);
+		// this.root = new AutomatonSubTree(automaton, true, false);
+		// this.root = new SupremicaTreeNode("Erase These Events");
+		this.root = new AlphabetSubTree(alpha);
+		this.root.setUserObject("Erase These Events");
 		this.tree = new JTree(root);
+		//root.add(new AutomatonSubTree(new Automaton(), true, false));
+		// root.add(new AlphabetSubTree(alpha));
 		this.scrollpane = new JScrollPane(tree);
 
 		setLayout(new BorderLayout());
 		setPreferredSize(new Dimension(200, 400));
 		add(scrollpane, BorderLayout.CENTER);		
+		tree.setCellRenderer(new SupremicaTreeCellRenderer());
 	}
 
 	// add this event to the first and only! automaton
@@ -251,7 +260,7 @@ class RestrictEventsViewerPanel
 	{
 		try
 		{
-			Alphabet alpha = automaton.getAlphabet();
+			// Alphabet alpha = automaton.getAlphabet();
 			if(!alpha.containsEventWithLabel(event.getLabel()))
 			{
 				alpha.addEvent(event);
@@ -262,12 +271,12 @@ class RestrictEventsViewerPanel
 			excp.printStackTrace();
 		}
 	}
-	// 
+
 	public void remove(LabeledEvent event)
 	{
 		try
 		{
-			Alphabet alpha = automaton.getAlphabet();
+			// Alphabet alpha = automaton.getAlphabet();
 			alpha.removeEvent(event);
 		}
 		catch(Exception excp)
@@ -280,14 +289,18 @@ class RestrictEventsViewerPanel
 	// If the alphabet has changed, you have to rebuild
 	public void rebuild()
 	{
-		this.root = new AutomatonSubTree(automaton, true, false);
+		//this.root = new AutomatonSubTree(automaton, true, false);
+		SupremicaTreeNode newRoot = new AlphabetSubTree(alpha);
+		newRoot.setUserObject(root.getUserObject());
+		this.root = newRoot;
+		
 		((DefaultTreeModel)tree.getModel()).setRoot(root);
 		revalidate();
 	}
 
 	public void eraseThese()
 	{
-		automaton.setName("Erase These Events");
+		// automaton.setName("Erase These Events");
 		root.setUserObject("Erase These Events");
 		erase = true;
 		tree.repaint();
@@ -295,7 +308,7 @@ class RestrictEventsViewerPanel
 	
 	public void keepThese()
 	{
-		automaton.setName("Keep These Events");
+		// automaton.setName("Keep These Events");
 		root.setUserObject("Keep These Events");
 		erase = false;
 		tree.repaint();
@@ -313,7 +326,8 @@ class RestrictEventsViewerPanel
 	
 	public Alphabet getAlphabet()
 	{
-		return automaton.getAlphabet();
+		// return automaton.getAlphabet();
+		return alpha;
 	}
 }
 
