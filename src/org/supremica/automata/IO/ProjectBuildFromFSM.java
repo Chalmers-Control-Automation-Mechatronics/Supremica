@@ -190,7 +190,7 @@ public class ProjectBuildFromFSM
 			while (tokenizer.hasMoreTokens())
 			{
 				String currToken = tokenizer.nextToken();
-				// System.err.println("umdes: \"" + currToken + "\"");
+				System.err.println("umdes: \"" + currToken + "\"");
 
 				if (currParserState == STATE_READ_NUMBER_OF_STATES)
 				{
