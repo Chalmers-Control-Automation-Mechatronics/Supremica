@@ -2,7 +2,7 @@
 /**
  * TransferLine.java
  *
- * "industiral" productions systems transfer line.
+ * "industrial" productions systems transfer line.
  * See Wonhams lecture notes, Sec 4.6
  *
  *   /Arash
