@@ -92,7 +92,8 @@ public class GrowFrame
 		end_time = System.currentTimeMillis();
 		stopped = true;
 		bAbort.setVisible(false);
-		flush();
+		// flush();
+		repaint();
 	}
 
 	public void add(int value)
@@ -119,7 +120,15 @@ public class GrowFrame
 		update_screen();
 	}
 	private void update_screen() {
-		status.setText("Time " + (end_time - start_time) + " [ms]");
+		long t = (end_time - start_time);
+		if(t > 30 * 60 * 1000) {
+			status.setText("Time " + (t + 500 * 60) / (1000 * 60) + " [min]");
+		} else if(t > 30 * 1000) {
+			status.setText("Time " + (t + 500) / 1000 + " [s]");
+		} else {
+			status.setText("Time " + t + " [ms]");
+		}
+
 		canvas.force_repaint();
 	}
 

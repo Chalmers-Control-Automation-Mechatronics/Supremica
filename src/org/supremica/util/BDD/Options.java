@@ -150,7 +150,7 @@ public class Options
 
 
 
-	/** Event (Transition) selection heuristics, see petrinet related stuff */
+	/** H1: Event (Transition) selection heuristics, see petrinet related stuff */
 	public static final String [] ES_HEURISTIC_NAMES =  {
 		"Interactive", "Any",
 		"Topological order",
@@ -205,7 +205,7 @@ public class Options
 	public static int dssi_heuristics = DSSI_STACK;
 
 
-	/** Non-deteministic Automata Selection: how to use between equally expensive automata ? (see for example Workset.java) */
+	/** H2: Non-deteministic Automata Selection: how to use between equally expensive automata ? (see for example Workset.java) */
 	public static final String [] NDAS_HEURISTIC_NAMES =
 		{ "Random          ", "Topologically first", "Topologically last", "Ring",
 		"Reinforcement learning", "Reinforcement learning (taboo)" };

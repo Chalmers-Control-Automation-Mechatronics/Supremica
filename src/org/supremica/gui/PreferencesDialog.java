@@ -838,13 +838,13 @@ class BDDPanel1
 
 		pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pHeuristics);
-		pHeuristics.add( new JLabel("PN-event and workset-automaton selection"));
+		pHeuristics.add( new JLabel("H1: PN-event and workset-automaton selection"));
 		pHeuristics.add( esHeuristics = new JComboBox());
 		insert(esHeuristics, Options.ES_HEURISTIC_NAMES, Options.es_heuristics);
 
 		JPanel pNdas = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pNdas);
-		pNdas.add( new JLabel("Non-deteministic selection of equals"));
+		pNdas.add( new JLabel("H2: Non-deteministic selection of equals"));
 		pNdas.add( ndasHeuristics = new JComboBox());
 		insert(ndasHeuristics, Options.NDAS_HEURISTIC_NAMES, Options.ndas_heuristics);
 
