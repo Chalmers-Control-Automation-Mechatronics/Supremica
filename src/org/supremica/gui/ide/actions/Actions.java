@@ -12,7 +12,7 @@ public class Actions
 	public CloseAction closeAction;
 	public SaveAction saveAction;
 	public ExitAction exitAction;
-
+	public NewEventAction newEventAction;
 
 	public Actions(IDE ide)
 	{
@@ -23,6 +23,8 @@ public class Actions
 		closeAction = new CloseAction(ide);
 		saveAction = new SaveAction(ide);
 		exitAction = new ExitAction(ide);
+
+		newEventAction = new NewEventAction(ide);
 
 	}
 }
