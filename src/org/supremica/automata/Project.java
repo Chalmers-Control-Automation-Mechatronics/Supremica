@@ -102,9 +102,19 @@ public class Project
 		return theActions;
 	}
 
+	public Iterator actionIterator()
+	{
+		return theActions.iterator();
+	}
+
 	public Controls getControls()
 	{
 		return theControls;
+	}
+
+	public Iterator controlIterator()
+	{
+		return theControls.iterator();
 	}
 
 	public Signals getInputSignals()
@@ -270,6 +280,78 @@ public class Project
 		theActions.clear();
 		theControls.clear();
 		theTimers.clear();
+	}
+
+	public boolean validExecutionParameters()
+	{
+
+		Alphabet theAlphabet;
+		try
+		{
+			theAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
+		}
+		catch (Exception ex)
+		{
+			throw new RuntimeException(ex);
+		}
+		boolean valid = true;
+		for (Iterator theIt = actionIterator(); theIt.hasNext(); )
+		{
+			Action currAction = (Action)theIt.next();
+			String currLabel = currAction.getLabel();
+			if (!theAlphabet.containsEventWithLabel(currLabel))
+			{
+				valid = false;
+				logger.error("The action " + currLabel + " is not a valid event");
+			}
+			for (Iterator theCmdIt = currAction.commandIterator(); theCmdIt.hasNext();)
+			{
+				Command currCommand = (Command)theCmdIt.next();
+				String currCommandLabel = currCommand.getLabel();
+				if (!theOutputSignals.hasSignal(currCommandLabel))
+				{
+					valid = false;
+					logger.error("The command " + currCommandLabel + " is not a valid output signal");
+				}
+			}
+		}
+		for (Iterator theIt = controlIterator(); theIt.hasNext(); )
+		{
+			Control currControl = (Control)theIt.next();
+			String currLabel = currControl.getLabel();
+			if (!theAlphabet.containsEventWithLabel(currLabel))
+			{
+				valid = false;
+				logger.error("The control " + currLabel + " is not a valid event");
+			}
+			for (Iterator theCondIt = currControl.conditionIterator(); theCondIt.hasNext();)
+			{
+				Condition currCondition = (Condition)theCondIt.next();
+				String currConditionLabel = currCondition.getLabel();
+				if (!theInputSignals.hasSignal(currConditionLabel))
+				{
+					valid = false;
+					logger.error("The condition " + currConditionLabel + " is not a valid output signal");
+				}
+			}
+		}
+		for (Iterator theIt = timerIterator(); theIt.hasNext(); )
+		{
+			EventTimer currTimer = (EventTimer)theIt.next();
+			String currStartEvent = currTimer.getStartEvent();
+			if (!theAlphabet.containsEventWithLabel(currStartEvent))
+			{
+				valid = false;
+				logger.error("The start event, " + currStartEvent + ", in timer " + currTimer.getName() + " is not a valid event");
+			}
+			String currTimeoutEvent = currTimer.getTimeoutEvent();
+			if (!theAlphabet.containsEventWithLabel(currTimeoutEvent))
+			{
+				valid = false;
+				logger.error("The timeout event, " + currStartEvent + ", in timer " + currTimer.getName() + " is not a valid event");
+			}
+		}
+		return valid;
 	}
 
 	/**

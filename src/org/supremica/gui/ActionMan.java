@@ -112,14 +112,14 @@ public class ActionMan
 	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
 	// gui here is filled in by (who?)
 	public static Gui gui = null;
-	
+
 	public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
 	public static final FindStates findStates = new FindStates();
 	public static final StateEnumerator stateEnumerator = new StateEnumerator();
 	public static final HelpAction helpAction = new HelpAction();
 	public static final OpenAction openAction = new OpenAction(); // defined in MainToolBar (just for fun :-)
 	public static final SynthesizeAction synthesizeAction = new SynthesizeAction();
-	
+
 	public static Gui getGui()
 	{
 		return gui;
@@ -2567,6 +2567,13 @@ public class ActionMan
 		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		if (!selectedProject.validExecutionParameters())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "The project has illegal execution parameters", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}

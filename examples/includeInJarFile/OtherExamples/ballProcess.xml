@@ -113,6 +113,7 @@
 			<Transition event="manual_button_released" source="q_2" dest="q_0" />
 		</Transitions>
 	</Automaton>
+<!--
 	<Automaton name="automatic_button" type="Plant">
 		<Events>
 			<Event id="automatic_button_pressed" label="automatic_button_pressed" controllable="false" prioritized="true" />
@@ -129,7 +130,7 @@
 			<Transition event="start_automatic_mode" source="q_1" dest="q_2" />
 			<Transition event="automatic_button_released" source="q_2" dest="q_0" />
 		</Transitions>
-	</Automaton>	
+	</Automaton>		
 	<Automaton name="spec_mode" type="Specification">
 		<Events>
 			<Event id="start_automatic_mode" label="start_automatic_mode" controllable="true" prioritized="true" />
@@ -158,6 +159,21 @@
 			<Transition event="gk.release_ball" source="q_7" dest="q_0" />
 		</Transitions>
 	</Automaton>	
+-->
+	<Automaton name="spec_mode_simple" type="Specification">
+		<Events>
+			<Event id="start_manual_mode" label="start_manual_mode" controllable="true" prioritized="true" />
+			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+		</States>
+		<Transitions>
+			<Transition event="start_manual_mode" source="q_0" dest="q_1" />
+			<Transition event="gk.release_ball" source="q_1" dest="q_0" />
+		</Transitions>
+	</Automaton>
 	<Automaton name="variable_ball_size" type="Specification">
 		<Events>
 			<Event id="em.small_ball" label="em.small_ball" controllable="false" prioritized="true" />
@@ -270,6 +286,7 @@
 		</States>
 		<Transitions>
 			<Transition event="em.timer.before_up.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.before_up.start" source="q_1" dest="q_1" />
 			<Transition event="em.timer.before_up.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
@@ -284,6 +301,7 @@
 		</States>
 		<Transitions>
 			<Transition event="em.timer.before_measure.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.before_measure.start" source="q_1" dest="q_1" />			
 			<Transition event="em.timer.before_measure.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
@@ -298,6 +316,7 @@
 		</States>
 		<Transitions>
 			<Transition event="em.timer.measure.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.measure.start" source="q_1" dest="q_1" />
 			<Transition event="em.timer.measure.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
@@ -312,6 +331,7 @@
 		</States>
 		<Transitions>
 			<Transition event="em.timer.before_put.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.before_put.start" source="q_1" dest="q_1" />
 			<Transition event="em.timer.before_put.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
@@ -326,6 +346,7 @@
 		</States>
 		<Transitions>
 			<Transition event="es.timer.before_up.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_up.start" source="q_1" dest="q_1" />
 			<Transition event="es.timer.before_up.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
@@ -340,6 +361,7 @@
 		</States>
 		<Transitions>
 			<Transition event="es.timer.before_put.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_put.start" source="q_1" dest="q_1" />
 			<Transition event="es.timer.before_put.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
@@ -354,6 +376,7 @@
 		</States>
 		<Transitions>
 			<Transition event="es.timer.before_deput.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_deput.start" source="q_1" dest="q_1" />
 			<Transition event="es.timer.before_deput.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
@@ -368,6 +391,7 @@
 		</States>
 		<Transitions>
 			<Transition event="p.timer.before_turnleft.start" source="q_0" dest="q_1" />
+			<Transition event="p.timer.before_turnleft.start" source="q_1" dest="q_1" />
 			<Transition event="p.timer.before_turnleft.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>	
@@ -437,6 +461,24 @@
 		<Action label="gk.ball_out_of_gatekeeper">
 			<Command command="UrPortvakt" value="false"/>
 		</Action>
+		<Action label="em.go_up">
+			<Command command="UppMatlyft" value="true"/>
+		</Action>
+		<Action label="em.go_down">
+			<Command command="UppMatlyft" value="false"/>
+		</Action>
+		<Action label="em.start_measure">
+			<Command command="Mat" value="true"/>
+		</Action>	
+		<Action label="em.measure_finished">
+			<Command command="Mat" value="false"/>
+		</Action>	
+		<Action label="em.release_ball">
+			<Command command="UrMatning" value="true"/>
+		</Action>	
+		<Action label="em.ball_out_of_measure_station">
+			<Command command="UrMatning" value="false"/>
+		</Action>	
 	</Actions>
 	<Controls>
 		<Control label="manual_button_pressed">
@@ -453,6 +495,24 @@
 		</Control>
 		<Control label="gk.ball_in_gatekeeper">
 			<Condition condition="KulaPortvakt"/>
+		</Control>
+		<Control label="em.is_down">
+			<Condition condition="MatlyftNere"/>			
+		</Control>
+		<Control label="em.is_not_down">
+			<Condition condition="MatlyftNere" invert="true"/>			
+		</Control>
+		<Control label="em.got_ball">
+			<Condition condition="KulaMatlyft"/>			
+		</Control>
+		<Control label="em.is_up">
+			<Condition condition="MatlyftUppe"/>			
+		</Control>
+		<Control label="em.ball_measure_station">
+			<Condition condition="KulaMatstation" invert="false"/>			
+		</Control>
+		<Control label="em.no_ball_measure_station">
+			<Condition condition="KulaMatstation" invert="true"/>			
 		</Control>
 	</Controls>
 </Execution>
