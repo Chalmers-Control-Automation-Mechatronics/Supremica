@@ -1949,8 +1949,27 @@ public class ActionMan
 
 		if (!currProject.isDeterministic())
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
-			return;
+			// JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
+			// return;
+			Object[] options = { "Continue", "Abort" };
+			
+			int conf = JOptionPane.showOptionDialog(gui.getComponent(), 
+													"All automata are not determinstic. Abort?", 
+													"Non-determinism Found", 
+													JOptionPane.YES_NO_OPTION, 
+													JOptionPane.WARNING_MESSAGE,
+													null,
+													options,
+													options[1]);
+						
+			if(conf == 0)
+			{
+				logger.warn("Non-deterministic automaton loaded. You're on your own");
+			}
+			else
+			{
+				return;
+			}
 		}
 
 		FileSecurity fileSecurity = gui.getFileSecurity();

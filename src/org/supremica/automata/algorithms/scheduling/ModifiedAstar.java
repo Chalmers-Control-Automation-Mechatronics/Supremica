@@ -56,19 +56,19 @@ class Element
 		return sbuf.toString();
 	}
 	
-	public int compareTo(final Element cs)
+	public int compareTo(final Element elem)
 		throws ClassCastException
 	{
-		if(cs.getArray().length != state.length)
+		if(elem.getArray().length != state.length)
 		{
 			throw new ClassCastException("Non-equal lengths");
 		}
 		
 		for(int i = 0; i < state.length; ++i)
 		{
-			if(cs.getArray()[i] != state[i])
+			if(elem.getArray()[i] != state[i])
 			{
-				return cs.getArray()[i] - state[i];
+				return elem.getArray()[i] - state[i];
 			}
 		}
 		return 0;
@@ -133,30 +133,6 @@ class ElementUpdater
 	*/
 // }
 
-class ElementComparator
-	implements Comparator
-{
-	private boolean areEqual(Element e1, Element e2) // see page 65
-	{
-		return	e1.state == e2.state // equal logical state
-				&&
-				e1.g == e2.g		// equal cost to here
-				&&
-				e1.Tv == e2.Tv;		// equal remain processing time for each product
-	}
-	
-	protected int compare(Element e1, Element e2) // see page 65
-	{
-		if(e1.g != e2.g) return e1.g - e2.g;	// should be e1.f == e2.f? (see Main.cpp (130))
-		else return 0;
-		
-	}
-	
-	public int compare(Object obj1, Object obj2)
-	{
-		return compare((Element)obj1, (Element)obj2);
-	}
-}
 
 class Estimator
 {

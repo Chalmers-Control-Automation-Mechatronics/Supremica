@@ -18,6 +18,7 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
+import org.supremica.gui.useractions.*;
 import org.supremica.util.VPopupMenu;
 import org.supremica.util.SupremicaMenuItem;
 
@@ -114,6 +115,13 @@ class MainPopupMenu
 			}
 		});*/
 		
+		// Strictly EXPERIMENTAL
+		JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
+		menuHandler.add(automatonDiminisher, 1);
+		JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
+		menuHandler.add(automatonDeterminizer, 1);
+		
+
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 		//menuHandler.add(interfaceItem, 1);
 
