@@ -32,10 +32,10 @@ SUB
 MUL
 DIV
 MOD
-GT
-GE
-EQ
-LT
-LE
-NE
+GT		    	 Xah  Xah
+GE		    	 Xah  Xah
+EQ		    Xah	 Xah  Xah
+LT		    	 Xah  Xah
+LE		    	 Xah  Xah
+NE		    Xah	 Xah  Xah
 
