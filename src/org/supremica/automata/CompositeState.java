@@ -51,16 +51,16 @@ package org.supremica.automata;
 
 import java.util.*;
 
-public class MultipleState
+public class CompositeState
 {
 	private ArrayList theStates;
 
-	public MultipleState(int capacity)
+	public CompositeState(int capacity)
 	{
 		theStates = new ArrayList(capacity);
 	}
 
-	public MultipleState(MultipleState state)
+	public CompositeState(CompositeState state)
 	{
 
 		// Todo
@@ -78,7 +78,7 @@ public class MultipleState
 
 	public boolean equals(Object state)
 	{
-		return theStates.equals(((MultipleState) state).theStates);
+		return theStates.equals(((CompositeState) state).theStates);
 	}
 
 	public int hashCode()
