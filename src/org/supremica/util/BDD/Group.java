@@ -67,11 +67,11 @@ public class Group
 	{
 		reset();
 
-		manager.recursiveDeref(bdd_i);
-		manager.recursiveDeref(bdd_cube);
-		manager.recursiveDeref(bdd_cubep);
-		manager.recursiveDeref(bdd_sigma_u);
-		manager.recursiveDeref(bdd_sigma);
+		manager.deref(bdd_i);
+		manager.deref(bdd_cube);
+		manager.deref(bdd_cubep);
+		manager.deref(bdd_sigma_u);
+		manager.deref(bdd_sigma);
 	}
 
 	public void add(BDDAutomaton a)
@@ -97,19 +97,19 @@ public class Group
 		// something changed, pre-calculations are not valid anymore
 		if (has_t)
 		{
-			manager.recursiveDeref(bdd_t);
+			manager.deref(bdd_t);
 			has_t = false;
 		}
 
 		if (has_tu)
 		{
-			manager.recursiveDeref(bdd_tu);
+			manager.deref(bdd_tu);
 			has_tu = false;
 		}
 
 		if(has_m) 
 		    {
-			manager.recursiveDeref(bdd_m);
+			manager.deref(bdd_m);
 			has_m = false;
 		    }
 	}
@@ -199,7 +199,7 @@ public class Group
 		// System.out.print("tmp = "); manager.printSet(tmp);
 		// bdd_tu = manager.exists( tmp, manager.getEventCube());
 		// System.out.print("bd_tu = "); manager.printSet(bdd_tu);
-		// manager.recursiveDeref(tmp);
+		// manager.deref(tmp);
 		has_tu = true;
 	}
 
@@ -274,7 +274,7 @@ public class Group
 			int tmp1 = manager.relProd(t, r, cube);
 			int tmp2 = manager.replace(tmp1, permute);
 
-			manager.recursiveDeref(tmp1);
+			manager.deref(tmp1);
 
 			r = manager.orTo(r, tmp2);
 		}
@@ -283,7 +283,7 @@ public class Group
 		timer.report("Reachables states in group found");
 
 		// cleanup:
-		manager.recursiveDeref(cube);
+		manager.deref(cube);
 
 		return r;
 	}
@@ -365,7 +365,7 @@ public class Group
 				show_states_rec(saved, tmp, level + 1);
 			}
 
-			manager.recursiveDeref(tmp);
+			manager.deref(tmp);
 		}
 	}
 }

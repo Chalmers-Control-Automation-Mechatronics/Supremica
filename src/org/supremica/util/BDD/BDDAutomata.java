@@ -319,7 +319,7 @@ public class BDDAutomata
 					show_states_rec(saved, cares, tmp, level + 1);
 				}
 
-				recursiveDeref(tmp);
+				deref(tmp);
 			}
 		}
 	}
@@ -407,12 +407,12 @@ public class BDDAutomata
 					names[level] = states[i].name;
 				}
 
-				recursiveDeref(tmp);
+				deref(tmp);
 
 				return ret;
 			}
 
-			recursiveDeref(tmp);
+			deref(tmp);
 		}
 
 		return zero;
@@ -437,7 +437,7 @@ public class BDDAutomata
 		double states = satCount(new_bdd);
 		if(states != -1)
 		    states /= Math.pow(2, size_states + size_events);
-		recursiveDeref(new_bdd);		
+		deref(new_bdd);		
 		return (long) states;
 	    case Options.COUNT_EXACT:
 		// the hard/boring/slow way :(
@@ -474,7 +474,7 @@ public class BDDAutomata
 				count_transitions_rec0(c, tmp, level + 1);
 			}
 
-			recursiveDeref(tmp);
+			deref(tmp);
 		}
 	}
 
@@ -494,7 +494,7 @@ public class BDDAutomata
 				System.out.print(original_events[i].label + " ");
 			}
 
-			recursiveDeref(tmp);
+			deref(tmp);
 		}
 
 		System.out.println("};");
@@ -525,7 +525,7 @@ public class BDDAutomata
 				return tmp;
 			}
 
-			recursiveDeref(tmp);
+			deref(tmp);
 		}
 
 		return zero;    /* UNREACHABLE ? */
@@ -569,7 +569,7 @@ public class BDDAutomata
 				show_transitions_rec0(names, tmp, level + 1);
 			}
 
-			recursiveDeref(tmp);
+			deref(tmp);
 		}
 	}
 
@@ -596,7 +596,7 @@ public class BDDAutomata
 				show_transitions_rec1(names, tmp, level + 1);
 			}
 
-			recursiveDeref(tmp);
+			deref(tmp);
 		}
 	}
 
@@ -616,7 +616,7 @@ public class BDDAutomata
 				show_transitions_print(names);
 			}
 
-			recursiveDeref(tmp);
+			deref(tmp);
 		}
 	}
 
@@ -712,11 +712,11 @@ public class BDDAutomata
 
 		int dont_keep = not(all_loop);
 
-		recursiveDeref(all_loop);
+		deref(all_loop);
 
 		bdd = andTo(bdd, dont_keep);
 
-		recursiveDeref(dont_keep);
+		deref(dont_keep);
 
 		return bdd;
 	}
@@ -843,7 +843,7 @@ public class BDDAutomata
 			last = cubes[i];
 		}
 
-		recursiveDeref(getOne());    // 'last' is changed to something else now;)
+		deref(getOne());    // 'last' is changed to something else now;)
 
 		int front = r;
 
@@ -858,22 +858,22 @@ public class BDDAutomata
 				BDDAutomaton a = automata[i];
 				int tmp2 = relProd(a.getTpri(), front, cubes[i] /* WAS a.getCube() */);
 
-				recursiveDeref(front);
+				deref(front);
 
 				front = tmp2;
 			}
 
 			int tmp2 = exists(front, bdd_events_cube);
 
-			recursiveDeref(front);
+			deref(front);
 
 			front = replace(tmp2, permute_sp2s);
 
-			recursiveDeref(tmp2);
+			deref(tmp2);
 
 			r = orTo(r, front);
 
-			recursiveDeref(r);    // what is this ????
+			deref(r);    // what is this ????
 		}
 		while (rp != r);
 

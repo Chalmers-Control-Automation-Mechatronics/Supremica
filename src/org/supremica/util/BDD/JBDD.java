@@ -1,216 +1,543 @@
 package org.supremica.util.BDD;
 
-// Java Native Interface for BuDDy BDD package
-// Arash Vahidi, Chalmers/Sweden - 2001-2002
+
+
+/**
+	<pre>
+	Java Native Interface for BuDDy BDD package
+
+	Binary Decision Diagrams [BDDs] are used for efficient
+	computation of many common problems. This is done by giving
+	a compact representation and a set efficient operations on
+	boolean functions f: {0,1}^n --> {0,1}.
+
+	It turns out that this representation is good enough to solve a huge
+	amount of problems in Artificial Intelligence. For more information
+	about application areas of BDDs, check out the lecture notes of
+	Alan Mishchenko "BDDs and their application" which is found on the
+	net.
+
+
+	This is a BDD Java interface for the two popular BDD
+	packages BuDDy and CUDD. This allows you to combain the
+	programmer-friend programming language of Java with the
+	efficient BDD packages writen in highly optimized C.
+
+
+	You can choose between BuDDy and CUDD at runtime.
+	for BuDDy use
+	<i>	static {  System.loadLibrary("buddy");   }</i>
+	for CUDD, use this instead
+	<i>	static {  System.loadLibrary("cudd");   }</i>
+
+	Assuming that the dynamic loadable library for that packages
+	is in your PATH (windows)  or LD_LIBRARY_PATH (UNIX)
+
+
+
+	happy hacking
+
+	   Arash Vahidi, November 2002, Chalmers/Sweden
+
+	</pre>
+
+	@author Arash Vahidi
+*/
+
+
+
+
 // package se.chalmers.s2.jbuddy;
-class JBDD
-{
-	static
-	{
-		if (Options.use_cudd)
-		{
-			System.loadLibrary("cudd");
-		}
-		else
-		{
-			System.loadLibrary("buddy");
-		}
-	}
 
-	private static final int DEFAULT_VAR_COUNT = 64, DEFAULT_NODE_COUNT = 2;    // in million nodes
-	public int one, zero;
 
-	public JBDD()
-	{
-		this(DEFAULT_VAR_COUNT, DEFAULT_NODE_COUNT);
-	}
+class JBDD {
+    static
+    {
+        if (Options.use_cudd)
+            {
+                System.loadLibrary("cudd");
+            }
+	else
+	    {
+		System.loadLibrary("buddy");
+	    }
+    }
 
-	public JBDD(int vars)
-	{
-		this(vars, DEFAULT_NODE_COUNT);
-	}
 
-	public JBDD(int vars, int nodes)
-	{
-		init(vars, nodes);
 
-		one = getOne();
-		zero = getZero();
-	}
+	/** Default value used in the constructors
+		*/
+    private static final int
+	DEFAULT_VAR_COUNT = 64,
+	DEFAULT_NODE_COUNT = 10000; //
 
-	// basic BDD creation
-	public native int getOne();
+	/** Supported dyanmic reorering method */
+	public static final int
+		REORDER_NONE = 0, REORDER_WIN2 = 1, REORDER_WIN3 = 2,
+		REORDER_SIFT = 3, REORDER_RANDOM = 4;
 
-	public native int getZero();
 
-	public native int createBDD();
 
-	public native int getVarCount();
+		/** BDD trees for constant one and constant zero */
+    public int one, zero;
 
-	public native int getBDD(int index);
+	/** Create the BDD object using the default number
+		if variables and node-count	*/
+	  public JBDD() { this(DEFAULT_VAR_COUNT, DEFAULT_NODE_COUNT); }
 
-	// init/kill (init called by the constructer)
-	private native void init(int vars, int million_nodes);
 
-	public native void kill();
+			/** Create the BDD object using the default node count and the given number of variables
+			@param vars maximum number of BDD variables to be used */
+    public JBDD(int vars) { this(vars, DEFAULT_NODE_COUNT); }
 
-	// ref counting
-	public native void ref(int bdd);
 
-	public native void deref(int bdd);
+    	/** Create the BDD object using the given number of variables and node count
+					@param vars maximum number of BDD variables to be used
+					@param nodes the initial number of BDD nodes
+					The BuDDy manual suggest the follwoing values for inital node count:
+					<pre>
+					small test examples      1000 nodes
+					small examples           10000
+					medium sized examples    100000
+					large examples           1000000
+					</pre>
 
-	public native void recursiveDeref(int bdd);
+					*/
 
-	// BDD operations:
-	public native int and(int bdd1, int bdd2);
+    public JBDD(int vars, int nodes) {
+	init(vars, nodes);
+	one = getOne();
+	zero = getZero();
+    }
 
-	public native int or(int bdd1, int bdd2);
 
-	// bdd &= and;   plus referensing (old bdd -1, new bdd +1)
-	public native int andTo(int bdd, int and);
 
-	public native int orTo(int bdd, int or);
 
+    /** get the BDD constant 1
+    	@return BDD for constant 1*/
+    public native int getOne();
+
+
+		/** get the BDD constant 0
+    	@return BDD for constant 0 */
+    public native int getZero();
+
+
+
+		/** create a new BDD variable
+    	@return new BDD variable
+    	*/
+    public native int createBDD();
+
+
+
+		/** get number of BDD variables currently in the system
+    	@return number of existing BDD variables
+    	*/
+    public native int getVarCount();
+
+
+    /** get the BDD at the given index (ranked after call the crateBDD)
+		    	@return BDD_index
+    	*/
+    public native int getBDD(int index);
+
+    /** internal init. should not be called from userspace */
+    private native void init(int vars, int million_nodes);
+
+
+    /** close the BDD package and cleanup.<b>Must</b> be called
+      beforenew JBDD objects can be created (the JBDD is a singleton)
+      */
+    public native void kill();
+
+
+
+
+    /** increase the reference count of a BDD
+    	@param bdd The BDD node to be referenced
+    	@return The same BDD node, after it has been refrensed
+    	*/
+    public native int ref(int bdd);
+
+			/** decrease the reference count of a BDD.<br>
+			Note: this corresponds to the BuDDy call <i>bdd_delref</i>
+			and CUDD call <i>Cudd_recursiveDeref</i>.
+				@param bdd The BDD node to be de-referenced
+			*/
+    public native void deref(int bdd);
+
+
+
+		/** decrease the reference count of a BDD.
+		This is guaranteed to only change the reference count of the top node of the
+		BDD and no recursive calls are done.<br>
+			Note: this corresponds to the BuDDy call <i>bdd_delref</i>
+			and CUDD call <i>Cudd_deref</i>.
+			@param bdd The BDD node to be de-referenced
+			*/
+    public native void localDeref(int bdd);
+
+
+
+    /**
+    BDD AND operation.<br>Note: the returned result is already referenced.
+    @param bdd1 first operand
+    @param bdd2 second operand
+    @return bdd1 AND bdd2
+    */
+    public native int and(int bdd1, int bdd2);
+
+
+
+    /**
+    BDD OR operation.<br>Note: the returned result is already referenced.
+    @param bdd1 first operand
+    @param bdd2 second operand
+    @return bdd1 OR bdd2
+    */
+    public native int or(int bdd1, int bdd2);
+
+
+
+    /**
+    Cumulative BDD AND operation.<br>
+    Note: the returned result is already referenced. Furthermore, bdd is
+    <b>de-refrenced</b> once. Compare to bdd &= and;
+    @param bdd first operand
+    @param and second operand
+    @return bdd AND and
+    */
+    public native int andTo(int bdd, int and);
+
+    /**
+    Cumulative BDD OR operation.<br>
+    Note: the returned result is already referenced. Furthermore, bdd is
+    <b>de-refrenced</b> once. Compare to bdd |= or;
+    @param bdd first operand
+    @param or second operand
+    @return bdd OR or
+    */
+    public native int orTo(int bdd, int or);
+
+
+    /**
+    BDD NOT AND operation.<br>Note: the returned result is already referenced.
+    @param bdd1 first operand
+    @param bdd2 second operand
+    @return NOT (bdd1 AND bdd2)
+    */
 	public native int nand(int bdd1, int bdd2);
 
-	public native int nor(int bdd1, int bdd2);
 
-	public native int xor(int bdd1, int bdd2);
+    /**
+    BDD NOT OR operation.<br>Note: the returned result is already referenced.
+    @param bdd1 first operand
+    @param bdd2 second operand
+    @return NOT (bdd1 OR bdd2)
+    */
+    public native int nor(int bdd1, int bdd2);
 
-	// (if & then) or (not if & else)
-	public native int ite(int bdd_if, int bdd_then, int bdd_else);
 
-	public native int imp(int bdd1, int bdd2);    // bdd1 -> bdd2
+    /**
+    BDD EXCLUSIVE OR operation.<br>Note: the returned result is already referenced.
+    @param bdd1 first operand
+    @param bdd2 second operand
+    @return bdd1 XOR bdd2
+    */
+    public native int xor(int bdd1, int bdd2);
 
-	public native int biimp(int bdd1, int bdd2);    // bdd1 <-> bdd2
 
-	public native int not(int bdd);
 
-	// other BDD operations
-	public native int exists(int bdd, int quant_cube);
+		/**
+		BDD If-Then-Elseoperation.<br>Note: the returned result is already referenced.
+		@return efficently computes (bdd_if AND bdd_then) OR (NOT bdd_if and bdd_else)
+    */
+    public native int ite(int bdd_if, int bdd_then, int bdd_else);
 
-	public native int forall(int bdd, int quant_cube);
+    /**
+			BDD IMPLICATION operation.<br>Note: the returned result is already referenced.
+			@param bdd1 first operand
+			@param bdd2 second operand
+			@return bdd1 -> bdd2  (which equals (NOT bdd1) OR bdd2)
+    */
+    public native int imp(int bdd1, int bdd2);
 
-	public native int relProd(int bdd_left, int bdd_right, int quant_cube);    // see Clarke
 
-	public native int restrict(int r, int var);    // the restrict operation
+    /**
+			BDD BI-IMPLICATION operation.<br>Note: the returned result is already referenced.
+			@param bdd1 first operand
+			@param bdd2 second operand
+			@return bdd1 == bdd2  (which equals NOT(bdd1 XOR bdd2))
+    */
 
-	public native int constrain(int f, int c);    // general cofactorr of f with respect to c
+    public native int biimp(int bdd1, int bdd2); //  bdd1 <-> bdd2
 
-	// public native int simplify(int f, int d);  // simplify f restricting it to domain d
-	// note: in opposite to BuDDy, we use REAL variables here (in BuDDy, vars
-	// contains index of the variables!)
-	public native int makeSet(int[] vars, int size, int offset);    // conjuction (cube)
 
-	public native int makeSet(int[] vars, int size);    // conjuction (cube)
+    /**
+			BDD unary negation operation.<br>Note: the returned result is already referenced.<br>
+			This is an O(c) operation in CUDD due to its complemented edges!
+			@param bdd BDD to negate
+			@return NOT bdd
+    */
 
-	// replace operations
-	public native int createPair(int[] vars_old, int[] vars_new);
+    public native int not(int bdd);
 
-	public native void deletePair(int pair);
 
-	public native int replace(int bdd, int pair);
+		/**
+			BDD existential quantification. You first need to create a <i>cube</i>
+			of variables to be quantified which is basically the all-true minterm. for example
+			cube of {v1,v2,v3} is v1 & v2 & v3.
+			Note: the returned result is already referenced.<br>
+			@param quant_cube a cube of the variables to be quantified.
+			@param bdd BDD to be quantified
+			@return E quant_cube. bdd(quant_cube)
+    */
+    public native int exists(int bdd, int quant_cube);
 
-	public native void showPair(int pair);
+		/**
+		BDD universal quantification. You first need to create a <i>cube</i>
+		of variables to be quantified which is basically the all-true minterm. for example
+		cube of {v1,v2,v3} is v1 & v2 & v3.
+		Note: the returned result is already referenced.<br>
+		@param quant_cube a cube of the variables to be quantified.
+		@param bdd BDD to be quantified
+		@return A quant_cube. bdd(quant_cube)
+		*/
+    public native int forall(int bdd, int quant_cube);
 
-	public native int support(int bdd);    // BDD support set as a cube (BDD conjuction)
 
-	public native int nodeCount(int bdd);    // # of nodes in this bdd tree
+		/**
+		BDD relation-product: quantification and product computation in one pass.
+		This is a very efficient way of doing a common operation.
+		See Clarke papper "10^20and beyond..." for more info.
+		Note: the returned result is already referenced.<br>
+		@param bdd_left a BDD
+		@param bdd_rght a BDD
+		@param quant_cube the variables to be quantified.
+		@return E quant_cube. bdd_left AND bdd_right
+		*/
+    public native int relProd(int bdd_left, int bdd_right, int quant_cube); // see Clarke
 
-	public native int satOne(int bdd);    // get 1 SAT unless bdd == bdd_false
 
-	public native double satCount(int bdd);    // SAT count :)
 
-	public native double satCount(int bdd, int num_vars);    // return Math.pow(2,num_vars) * satCount(bdd);
+		/**
+		restrict a set of variables to constant values.
+		The var is a single minterm of a set of variables with either negative
+		or positive polarity (e.g. v1 & v2 & not v3). For each BDD variable <i>v</i> in
+		if the polarity of positive, then r is restricted to <i>v</i> otherwise to
+		</i>NOT v</i>. See Coudert and Madres paper "A Unified Framework for..." for more info.<br>
+		Note: the returned result is already referenced.<br>
+		@param r BDD to be restricted
+		@param var the minterm BDD
+		*/
+	public native int restrict(int r, int var);
 
-	// garbage collections
-	public native void gc();
 
-	// print and debugging
-	public native void printDot(int bdd);
+		/**
+		compute the <i>generalized cofactor</i> of <i>f</i> with respect to <i>c</i>.<br>
+		See Coudert and Madres paper "A Unified Framework for..." for more info.<br>
+		Note: the returned result is already referenced.<br>
+		@param r BDD to be restricted
+		@param c the minterm BDD
+		@param quant_cube the variables to be quantified.
+		*/
+    public native int constrain(int f, int c);
+    //public native int simplify(int f, int d);  // simplify f restricting it to domain d
 
-	public native void printDot(int bdd, String file);
 
-	public native void printSet(int bdd);    // truth assigments
 
-	public native void print(int bdd);
+		/** create a positive cube of the variables in vars.
+			@param vars list of considered BDD variables
+			@param size the size of the list
+			@param offset where to start in the list
+			@return vars[offset] & vars[offset+1] & ... & vars[offset+size]
+			*/
+    public native int makeSet(int [] vars, int size, int offset);   // conjuction (cube)
 
-	// Debugging BDD package itself
-	public native void printStats();    // package stats
+		/** create a positive cube of the variables in vars.
+			@param vars list of considered BDD variables
+			@param size the size of the list
+			@return vars[o] & vars[1] & ... & vars[offset+size]
+			*/
+    public native int makeSet(int [] vars, int size); // conjuction (cube)
 
-	public native boolean checkPackage();    // returns false if something is wrong
 
-	public native void debugPackage();    // debug the BDD Packages
 
-	public native boolean debugBDD(int bdd);    // debug cudd
 
-	// low-level and internal stuffs
-	public native int internal_index(int bdd);
+	/** creates a pair for permutation given to DISJOINT list of variables.<br>
+	creates a function
+	<pre>f: BDD variable -> BDD variable</pre>
+	such that
+	<pre>f(vars_old[i]) = vars_new[i].</pre>
+	@param vars_old list of variables to be replaced
+	@param vars_new list of variables to be replaced with
+	@return the pair, which is the function f discoursed above.
+	*/
+    public native int createPair(int []vars_old, int []vars_new);
 
-	public native int internal_refcount(int bdd);
+  /** remove and free the memory occupied  by this permutation pair
+  @param pair a permuation pair created with createPair
+  */
+    public native void deletePair(int pair);
 
-	public native boolean internal_isconst(int bdd);
+    /** replace/permute the variables in a BDD a
+    according to the given pair. The results is, as always, already referenced
+    @param bdd the BDD to be changed
+    @param pair the variable-pair created with createPair.
+    @return bdd [x/f(x)] where f(x) is the permutation function given by pair
+    */
+    public native int replace(int bdd, int pair);
 
-	public native boolean internal_constvalue(int bdd);
+    /** prints a <i>pair</i> created with createPair */
+    public native void showPair(int pair);
 
-	public native boolean internal_iscomplemented(int bdd);
 
-	public native int internal_then(int bdd);
+	/** BDD support set as a cube (BDD conjuction) */
+	public native int support(int bdd);
 
-	public native int internal_else(int bdd);
+	/** number of nodes in this bdd tree */
+	public native int nodeCount(int bdd);
+
+	/** get one minterm [satisfying variable assignment]  unless bdd equals 0*/
+	public native int satOne(int bdd);
+
+	/** get the number of minterms.<br>Note: this function is still under development*/
+	public native double satCount(int bdd);
+
+	/**
+		get the number of minterms.<br>Note: this function is still under development
+		@return Math.pow(2,num_vars) * satCount(bdd) */
+	public native double satCount(int bdd, int num_vars);
+
+
+
+
+
+
+
+
+ 	/** invoke garbage collection */
+    public native void gc();
+
+    /** print the BDD as a Graphviz DOT model to stdout */
+    public native void printDot(int bdd);
+
+    /** print the BDD as a Graphviz DOT model to the given file */
+    public native void printDot(int bdd, String file);
+
+    /** print the BDD minterms to stdout */
+    public native void printSet(int bdd);
+
+    /** print the BDD in the native package representation to stdout */
+    public native void print(int bdd);
+
+
+
+
+
+
+
+    /** INTERNAL: print  package statistics to stdout */
+    public native void printStats();
+
+    /** INTERNAL: returns false if something is wrong */
+    public native boolean checkPackage();
+
+    /** INTERNAL: debug the BDD package */
+    public native void debugPackage();
+
+    /** INTERNAL: debug the bdd in the BDD package */
+    public native boolean debugBDD(int bdd);
+
+
+    /** INTERNAL: get the <i>index</i> of a bdd [variable] */
+    public native int internal_index(int bdd);
+
+    /** INTERNAL: get the number of <i>refrences</i> to a bdd variable */
+    public native int internal_refcount(int bdd);
+
+    /** INTERNAL: returns true if the BDD is either 0 or 1 */
+    public native boolean internal_isconst(int bdd);
+
+    /** INTERNAL: if BDD is either 0 or 1, it returns that value */
+    public native boolean internal_constvalue(int bdd);
+
+    /** INTERNAL: returns true if the BDD is complemented */
+    public native boolean internal_iscomplemented(int bdd);
+
+    /** INTERNAL: get the THEN-node of a BDD*/
+    public native int internal_then(int bdd);
+
+    /** INTERNAL: get the ELSE-node of a BDD*/
+    public native int internal_else(int bdd);
+
+
+
+		/** set dynamic reordering heuristic
+			* @param method the heuristic, see the REORDER_* constants */
+		public native void reorder_setMethod(int method);
+
+		/** start dyanamic reordering */
+		public native void reorder_now();
+
+		/** enable/disable automatic dyanamic reordering */
+		public native void reorder_enableDyanamic(boolean enable);
+
+		/** create a variable block, between the first and last variable (USE INDEX)
+		 * @param fix_group decides whether to allow reordering inside group or fix to curren ordering */
+		public native void reorder_createVariableGroup(int first, int last, boolean fix_group);
 
 	// TEST BED
-	public static void main(String[] args)
-	{
-		JBDD jbdd = new JBDD(10, 1);
+	public static void main( String [] args) {
+		JBDD jbdd = new JBDD(10,1);
+
 		int v1 = jbdd.createBDD();
 		int v2 = jbdd.createBDD();
 		int v3 = jbdd.createBDD();
 		int v4 = jbdd.createBDD();
 
-		System.out.print("v1 = ");
-		jbdd.printSet(v1);
-		System.out.print("v2 = ");
-		jbdd.printSet(v2);
-		System.out.print("v3 = ");
-		jbdd.printSet(v3);
-		System.out.print("v4 = ");
-		jbdd.printSet(v4);
 
-		int v1andv2 = jbdd.and(v1, v2);
-		int v1orv2 = jbdd.or(v1, v2);
+		System.out.println("v1.refs = " + jbdd.internal_refcount(v1));
+		jbdd.ref(v1);
+		System.out.println("v1.refs = " + jbdd.internal_refcount(v1));
+		jbdd.deref(v1);
+		System.out.println("v1.refs = " + jbdd.internal_refcount(v1));
 
-		System.out.print("v1 & v2 = ");
-		jbdd.printSet(v1andv2);
-		System.out.print("v1 | v2 = ");
-		jbdd.printSet(v1orv2);
 
-		int f = jbdd.exists(v1andv2, v1);
-		int g = jbdd.forall(v1andv2, v2);
+		System.out.print("v1 = ");	jbdd.printSet(v1);
+		System.out.print("v2 = ");	jbdd.printSet(v2);
+		System.out.print("v3 = ");	jbdd.printSet(v3);
+		System.out.print("v4 = ");	jbdd.printSet(v4);
 
-		System.out.print("E v1. v1 & v2 = ");
-		jbdd.printSet(f);
-		System.out.print("A v2. v1 & v2 = ");
-		jbdd.printSet(g);
-		jbdd.debugBDD(v1);
-		jbdd.debugBDD(v2);
-		jbdd.debugBDD(f);
+		jbdd.gc();
+		jbdd.checkPackage();
 
-		// test replace
-		int[] s = new int[2];
-		int[] sp = new int[2];
+		int v1andv2 = jbdd.and(v1,v2);
+		int v1orv2 = jbdd.or(v1,v2);
+		System.out.print("v1 & v2 = ");	jbdd.printSet(v1andv2);
+		System.out.print("v1 | v2 = ");	jbdd.printSet(v1orv2);
 
-		s[0] = v1;
-		s[1] = v2;
-		sp[0] = v3;
-		sp[1] = v4;
+		jbdd.gc();
+		jbdd.checkPackage();
 
-		int s2sp = jbdd.createPair(s, sp);
-		int rep = jbdd.replace(v1andv2, s2sp);
+		int [] set = new int[2];
+		set[0] = v1;
+		set[1] = 1;
+		int x = jbdd.makeSet(set,2);
 
-		System.out.print("S -> S' : v1 & v2 = ");
-		jbdd.printSet(rep);
-		jbdd.deletePair(s2sp);
+		System.out.print("X = ");
+		jbdd.printSet(x);
+		jbdd.debugBDD(x);
+		jbdd.debugBDD(0);
+		jbdd.debugBDD(1);
+
+		// jbdd.ref(x);
+
+		jbdd.gc();
+
+		jbdd.checkPackage();
+
 		jbdd.kill();
 	}
 }

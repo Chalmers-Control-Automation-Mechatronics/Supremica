@@ -61,9 +61,9 @@ public class BDDTest
 		BDDAssert.bddAssert(tmp > 0, "default refcount for False not greater than zero");
 		ref(zero);
 		BDDAssert.bddAssert(tmp == internal_refcount(zero), "Ref not disabled for zero");
-		deref(zero);
+		localDeref(zero);
 		BDDAssert.bddAssert(tmp == internal_refcount(zero), "Deef not disabled for zero");
-		recursiveDeref(zero);
+		deref(zero);
 		BDDAssert.bddAssert(tmp == internal_refcount(zero), "RecursiveDeref not disabled for zero");
 		internal_refcount(one);
 		BDDAssert.bddAssert(tmp > 0, "default refcount for False not greater than one");
@@ -71,7 +71,7 @@ public class BDDTest
 		BDDAssert.bddAssert(tmp == internal_refcount(one), "Ref not disabled for one");
 		deref(one);
 		BDDAssert.bddAssert(tmp == internal_refcount(one), "Deef not disabled for one");
-		recursiveDeref(one);
+		deref(one);
 		BDDAssert.bddAssert(tmp == internal_refcount(one), "RecursiveDeref not disabled for one");
 
 		int v1 = createBDD();
@@ -87,7 +87,7 @@ public class BDDTest
 		BDDAssert.bddAssert(internal_refcount(v1andv2) == 0, "default refcount for AND not zero");
 		ref(v1andv2);
 		BDDAssert.bddAssert(internal_refcount(v1andv2) == 1, "refcount of refed AND not one");
-		recursiveDeref(v1andv2);
+		deref(v1andv2);
 		BDDAssert.bddAssert(internal_refcount(v1andv2) == 0, "refcount of refed/derefed AND not zero");
 		BDDAssert.bddAssert(internal_refcount(v1) == 1, "v1 refcount changed after and/ref/recursiveDeref");
 		BDDAssert.bddAssert(internal_refcount(v2) == 1, "v2 refcount changed after and/ref/recursiveDeref");
@@ -123,8 +123,8 @@ public class BDDTest
 
 		ref(answer);
 		BDDAssert.bddAssert(answer == p, "replace() returns wrong answer!");
-		recursiveDeref(answer);
-		recursiveDeref(p);
+		deref(answer);
+		deref(p);
 		deletePair(pair);
 
 		int[] bdds = new int[4];
@@ -141,7 +141,7 @@ public class BDDTest
 		int big = and(tmp, v4);
 
 		ref(big);
-		recursiveDeref(tmp);
+		deref(tmp);
 		save_refs(bdds, save);
 
 		// testing exists:
@@ -156,7 +156,7 @@ public class BDDTest
 			System.out.println("" + ch + " refs changed after Exist");
 		}
 
-		recursiveDeref(e1);
+		deref(e1);
 		save_refs(bdds, save);
 
 		int not1 = not(big);
@@ -170,9 +170,9 @@ public class BDDTest
 			System.out.println("" + ch + " refs changed after not");
 		}
 
-		recursiveDeref(not1);
+		deref(not1);
 		save_refs(bdds, save);
-		recursiveDeref(big);
+		deref(big);
 		gc();
 		checkPackage();
 		gc();

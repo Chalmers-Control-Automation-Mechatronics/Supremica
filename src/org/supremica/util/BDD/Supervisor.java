@@ -66,28 +66,28 @@ public class Supervisor
 		{
 			has_reachable_uncontrollables = false;
 
-			manager.recursiveDeref(bdd_reachable_uncontrollables);
+			manager.deref(bdd_reachable_uncontrollables);
 		}
 
 		if (has_uncontrollables)
 		{
 			has_uncontrollables = false;
 
-			manager.recursiveDeref(bdd_uncontrollables);
+			manager.deref(bdd_uncontrollables);
 		}
 
 		if (has_reachables)
 		{
 			has_reachables = false;
 
-			manager.recursiveDeref(bdd_reachables);
+			manager.deref(bdd_reachables);
 		}
 
 		if (has_coreachables)
 		{
 			has_coreachables = false;
 
-			manager.recursiveDeref(bdd_coreachables);
+			manager.deref(bdd_coreachables);
 		}
 
 		plant.cleanup();
@@ -130,7 +130,7 @@ public class Supervisor
 		bdd_uncontrollables = computeLanguageDifference(sigma_u);
 		has_uncontrollables = true;
 
-		manager.recursiveDeref(sigma_u);
+		manager.deref(sigma_u);
 
 		timer.report("Uncontrollable states found");
 	}
@@ -146,15 +146,15 @@ public class Supervisor
 	int tmp10 = manager.exists(t_sp, cubep_sp);
 	int tmp1 = manager.not(tmp10);
 	
-	manager.recursiveDeref(tmp10);
+	manager.deref(tmp10);
 	
 	int tmp2 = manager.and(tmp1, considred_events);	
-	manager.recursiveDeref(tmp1);
+	manager.deref(tmp1);
 	int cube2 = manager.and(sigma_cube, cubep_p);
 	int tmp4 = manager.relProd(t_p, tmp2, cube2);
 	
-	manager.recursiveDeref(tmp2);
-	manager.recursiveDeref(cube2);	
+	manager.deref(tmp2);
+	manager.deref(cube2);	
 	return tmp4;
 	
     }
@@ -189,7 +189,7 @@ public class Supervisor
 	
 	int r = getReachables();
 	int intersection = manager.and(ld,r);
-	manager.recursiveDeref(ld);
+	manager.deref(ld);
 	return intersection;
     }
 
@@ -209,13 +209,13 @@ public class Supervisor
 	 *       r_all_p = r_all;
 	 *       int tmp = manager.relProd(t_all, r_all, cube);
 	 *       int tmp2 = manager.replace( tmp, permute);
-	 *       manager.recursiveDeref(tmp);
+	 *       manager.deref(tmp);
 	 *       r_all = manager.orTo(r_all, tmp2);
-	 *       manager.recursiveDeref(tmp2);
+	 *       manager.deref(tmp2);
 	 *       if(gf != null)      gf.add( manager.nodeCount( r_all));
 	 *   } while(r_all_p != r_all);
 	 *
-	 *   manager.recursiveDeref(t_all);
+	 *   manager.deref(t_all);
 	 *   return r_all;
 	 * }
 	 */
@@ -256,11 +256,11 @@ public class Supervisor
 
 			int tmp = manager.relProd(t_all, r_all, cube);
 			int tmp2 = manager.replace(tmp, permute);
-			manager.recursiveDeref(tmp);
+			manager.deref(tmp);
 
 
 			r_all = manager.orTo(r_all, tmp2);
-			manager.recursiveDeref(tmp2);
+			manager.deref(tmp2);
 
 			if (gf != null)
 			{
@@ -269,8 +269,8 @@ public class Supervisor
 		}
 		while (r_all_p != r_all);
 
-		manager.recursiveDeref(i_all);
-		manager.recursiveDeref(t_all);
+		manager.deref(i_all);
+		manager.deref(t_all);
 
 
 
@@ -288,7 +288,7 @@ public class Supervisor
 		 *
 		 * bdd_reachables = getReachables(i_all, gf);
 		 * has_reachables = true;
-		 * manager.recursiveDeref(i_all);
+		 * manager.deref(i_all);
 		 * timer.report("Forward reachables found");
 		 */
 	}
@@ -384,11 +384,11 @@ public class Supervisor
 			int tmp = manager.relProd(t_all, r_all, cube);
 			int tmp2 = manager.replace(tmp, permute1);
 
-			manager.recursiveDeref(tmp);
+			manager.deref(tmp);
 
 			r_all = manager.orTo(r_all, tmp2);
 
-			manager.recursiveDeref(tmp2);
+			manager.deref(tmp2);
 
 			if (gf != null)
 			{
@@ -397,11 +397,11 @@ public class Supervisor
 		}
 		while (r_all_p != r_all);
 
-		manager.recursiveDeref(t_all);
-		manager.recursiveDeref(m_all);
+		manager.deref(t_all);
+		manager.deref(m_all);
 
 		int ret = manager.replace(r_all, permute2);
-		manager.recursiveDeref(r_all);
+		manager.deref(r_all);
 
 		
 		has_coreachables = true;
@@ -437,14 +437,14 @@ public class Supervisor
 			int not_next = manager.not(next);
 			int new_bdd = manager.and(bdd, not_next);
 
-			manager.recursiveDeref(bdd);
-			manager.recursiveDeref(next);
-			manager.recursiveDeref(not_next);
+			manager.deref(bdd);
+			manager.deref(next);
+			manager.deref(not_next);
 
 			bdd = new_bdd;
 		}
 
-		manager.recursiveDeref(bdd);
+		manager.deref(bdd);
 	}
 
 	// --------------------------------------------------------------
@@ -453,7 +453,7 @@ public class Supervisor
 		int i_all = manager.and(plant.getI(), spec.getI());
 
 		trace(what, i_all, to);
-		manager.recursiveDeref(i_all);
+		manager.deref(i_all);
 	}
 
 	public void trace(String what, int from, int to)
@@ -479,7 +479,7 @@ public class Supervisor
 			// show the last state:
 			int dumb = manager.pickOneState(states, to);
 
-			manager.recursiveDeref(dumb);
+			manager.deref(dumb);
 			manager.printStateVector(states, "" + trace_len);
 
 			Vector enames = new Vector(trace_len);
@@ -492,34 +492,34 @@ public class Supervisor
 				int next_all = ((Integer) fronts[i]).intValue();
 				int tran0 = manager.and(next_all, here);
 
-				manager.recursiveDeref(next_all);
+				manager.deref(next_all);
 
 				int tran1 = manager.relProd(tran0, t_all, cube);
 
-				manager.recursiveDeref(tran0);
+				manager.deref(tran0);
 
 				int e = manager.pickOneEvent(ename, tran1);
 
-				manager.recursiveDeref(tran1);
+				manager.deref(tran1);
 				enames.add(ename[0]);
 
 				int noe = manager.exists(e, ecube);
 
-				manager.recursiveDeref(e);
+				manager.deref(e);
 
 				int s = manager.pickOneState(states, noe);
 
-				manager.recursiveDeref(noe);
+				manager.deref(noe);
 				manager.printStateVector(states, "" + i);
-				manager.recursiveDeref(here);
+				manager.deref(here);
 
 				here = manager.replace(s, permute1);
 
-				manager.recursiveDeref(s);
+				manager.deref(s);
 			}
 
-			manager.recursiveDeref(here);
-			manager.recursiveDeref(t_all);
+			manager.deref(here);
+			manager.deref(t_all);
 
 			// ------------------- Show event trace
 			System.out.println("\n*** Events leading to " + what + ":");
@@ -581,20 +581,20 @@ public class Supervisor
 			int tmp = manager.relProd(t_all, r_all, cube);
 			int front = manager.replace(tmp, permute);
 
-			manager.recursiveDeref(tmp);
+			manager.deref(tmp);
 
 			// check to see if we have found "to"
 			int in = manager.and(front, to);
 
 			if (in != zero)
 			{
-				manager.recursiveDeref(in);
-				manager.recursiveDeref(t_all);
+				manager.deref(in);
+				manager.deref(t_all);
 
 				return true;
 			}
 
-			manager.recursiveDeref(in);
+			manager.deref(in);
 
 			// save the state for further use
 			v.add(new Integer(front));
@@ -603,7 +603,7 @@ public class Supervisor
 		}
 		while (r_all_p != r_all);
 
-		manager.recursiveDeref(t_all);
+		manager.deref(t_all);
 
 		return false;    // to not found
 	}
@@ -633,20 +633,20 @@ public class Supervisor
 
 			int tmp2 = manager.replace(tmp, permute1);
 
-			manager.recursiveDeref(tmp);
+			manager.deref(tmp);
 
 			r_all = manager.orTo(r_all, tmp2);
 
-			manager.recursiveDeref(tmp2);
+			manager.deref(tmp2);
 		}
 		while (r_all_p != r_all);
 
-		manager.recursiveDeref(t_all);
-		manager.recursiveDeref(good);
+		manager.deref(t_all);
+		manager.deref(good);
 
 		int ret = manager.replace(r_all, permute2);
 
-		manager.recursiveDeref(r_all);
+		manager.deref(r_all);
 
 		return ret;
 	}
@@ -673,22 +673,22 @@ public class Supervisor
 			int tmp = manager.relProd(t_all, r_all, cube);
 			int tmp2 = manager.replace(tmp, permute1);
 
-			manager.recursiveDeref(tmp);
+			manager.deref(tmp);
 
 			r_all = manager.orTo(r_all, tmp2);
 
-			manager.recursiveDeref(tmp2);
+			manager.deref(tmp2);
 
 			// System.out.print("2"); System.out.flush();
 		}
 		while (r_all_p != r_all);
 
-		manager.recursiveDeref(t_all);
-		manager.recursiveDeref(cube);
+		manager.deref(t_all);
+		manager.deref(cube);
 
 		int ret = manager.replace(r_all, permute2);
 
-		manager.recursiveDeref(r_all);
+		manager.deref(r_all);
 
 		return ret;
 	}
@@ -717,13 +717,13 @@ public class Supervisor
 			int qp_k = getBR1(marked, x);
 			int not_qp_k = manager.not(qp_k);
 
-			manager.recursiveDeref(qp_k);
+			manager.deref(qp_k);
 
 			int qpp_k = getBR2(not_qp_k);
 
 			x = manager.orTo(x, qpp_k);
 
-			manager.recursiveDeref(qpp_k);
+			manager.deref(qpp_k);
 
 			if (gf != null)
 			{
@@ -734,13 +734,13 @@ public class Supervisor
 
 		int not_x = manager.not(x);
 
-		manager.recursiveDeref(x);
+		manager.deref(x);
 
 		// return not_x;
 		// note: the only reason we get the reachable portion of it is to count it correctly!
 		int not_x_reachable = manager.and(not_x, getReachables());
 
-		manager.recursiveDeref(not_x);
+		manager.deref(not_x);
 
 		if (gf != null)
 		{
@@ -762,20 +762,20 @@ public class Supervisor
 
 		int t_noloops = manager.removeSelfLoops(t_all);
 
-		manager.recursiveDeref(t_all);
+		manager.deref(t_all);
 
 		int t = manager.removeDontCareSp(t_noloops);
 
-		manager.recursiveDeref(t_noloops);
+		manager.deref(t_noloops);
 
 		int s_go = manager.exists(t, cube);
 
-		manager.recursiveDeref(t);
-		manager.recursiveDeref(cube);
+		manager.deref(t);
+		manager.deref(cube);
 
 		int not_s_go = manager.not(s_go);
 
-		manager.recursiveDeref(s_go);
+		manager.deref(s_go);
 		timer.report("Deadlock states found");
 
 		int r = getReachables();
@@ -784,7 +784,7 @@ public class Supervisor
 
 		int r_not_s_go = manager.and(not_s_go, r);
 
-		manager.recursiveDeref(not_s_go);
+		manager.deref(not_s_go);
 		timer.report("Reachable deadlocks found");
 
 		return r_not_s_go;

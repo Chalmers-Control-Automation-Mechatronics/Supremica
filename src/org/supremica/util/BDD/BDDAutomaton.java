@@ -352,7 +352,7 @@ public class BDDAutomaton
 				bdd_tu = manager.orTo(bdd_tu, this_t);
 			}
 
-			manager.recursiveDeref(this_t);
+			manager.deref(this_t);
 		}
 
 		// ------------------------------------------------------------------------------------
@@ -365,17 +365,17 @@ public class BDDAutomaton
 
 		int tmp = manager.not(bdd_t_top);
 
-		manager.recursiveDeref(bdd_t_top);
+		manager.deref(bdd_t_top);
 
 		bdd_t_top = tmp;
 		tmp = manager.and(bdd_t_top, bdd_keep);
 
-		manager.recursiveDeref(bdd_t_top);
+		manager.deref(bdd_t_top);
 
 		bdd_t_top = tmp;
 		tmp = manager.or(bdd_t, bdd_t_top);
 
-		manager.recursiveDeref(bdd_t_top);
+		manager.deref(bdd_t_top);
 
 		bdd_t_top = tmp;
 
@@ -386,17 +386,17 @@ public class BDDAutomaton
 
 		tmp = manager.or(bdd_t, not_sigma_p);
 
-		manager.recursiveDeref(not_sigma_p);
+		manager.deref(not_sigma_p);
 
 		bdd_t_pri = tmp;
 		tmp = manager.exists(bdd_t_pri, cube_sp);
 
-		manager.recursiveDeref(bdd_t_pri);
+		manager.deref(bdd_t_pri);
 
 		bdd_t_pri = tmp;
 		tmp = manager.and(bdd_t_top, bdd_t_pri);
 
-		manager.recursiveDeref(bdd_t_pri);
+		manager.deref(bdd_t_pri);
 
 		bdd_t_pri = tmp;
 

@@ -123,8 +123,8 @@ public class AutomataBDDVerifier {
 	}
 
 
-	ba.recursiveDeref(intersection);
-	ba.recursiveDeref(not_c);
+	ba.deref(intersection);
+	ba.deref(not_c);
 
 	return is_nonblocking;
     }
@@ -188,7 +188,7 @@ public class AutomataBDDVerifier {
 	    sup.trace_set("Language Inclusion counterexample", states, 1);            
 
 
-	ba.recursiveDeref(states);
+	ba.deref(states);
 
 	return ret;
 

@@ -52,9 +52,9 @@ public class ConjSupervisor
 	    int tmp2 = manager.and(tmp, considred_events);
 	    int tmp3 = manager.forall(tmp2, Sp[j].getCubep());
 	    x1 = manager.andTo(x1,tmp3);
-	    manager.recursiveDeref(tmp3);
-	    manager.recursiveDeref(tmp2);
-	    manager.recursiveDeref(tmp);
+	    manager.deref(tmp3);
+	    manager.deref(tmp2);
+	    manager.deref(tmp);
 	}
 
 	int x2 = manager.getOne();
@@ -62,12 +62,12 @@ public class ConjSupervisor
 	for(int j = 0; j < P_size; j++) {
 	    int tmp = manager.exists(P[j].getTpri(), P[j].getCubep());
 	    x2 = manager.andTo(x2, tmp);
-	    manager.recursiveDeref(tmp);
+	    manager.deref(tmp);
 	}
 
 	int ret = manager.relProd(x1,x2, sigma_cube);
-	manager.recursiveDeref(x1);
-	manager.recursiveDeref(x2);
+	manager.deref(x1);
+	manager.deref(x2);
 
 	return ret;
     }
@@ -116,11 +116,11 @@ public class ConjSupervisor
 		front = manager.andTo( front, tpri[i]);
 
 	    int tmp = manager.exists(front, cube);
-	    manager.recursiveDeref(front);
+	    manager.deref(front);
 
 
 	    int tmp2 = manager.replace(tmp, permute);
-	    manager.recursiveDeref(tmp);
+	    manager.deref(tmp);
 
 
 	    r_all = manager.orTo(r_all, tmp2);
@@ -130,9 +130,9 @@ public class ConjSupervisor
 		gf.add(manager.nodeCount(r_all));
 	} while (r_all_p != r_all);
 	
-	manager.recursiveDeref(cube);
-	manager.recursiveDeref(i_all);
-	manager.recursiveDeref(front);
+	manager.deref(cube);
+	manager.deref(i_all);
+	manager.deref(front);
 	
 	has_reachables = true;
 	bdd_reachables = r_all;
@@ -181,10 +181,10 @@ public class ConjSupervisor
 			    front = manager.andTo( front, tpri[i]);
 			
 			int tmp = manager.exists(front, cube);
-			manager.recursiveDeref(front);
+			manager.deref(front);
 
 			int tmp2 = manager.replace(tmp, permute1);
-			manager.recursiveDeref(tmp);
+			manager.deref(tmp);
 			
 			r_all = manager.orTo(r_all, tmp2);
 			front = tmp2;
@@ -197,12 +197,12 @@ public class ConjSupervisor
 		}
 		while (r_all_p != r_all);
 
-		manager.recursiveDeref(m_all);
-		manager.recursiveDeref(cube);
+		manager.deref(m_all);
+		manager.deref(cube);
 
 		int ret = manager.replace(r_all, permute2);
 
-		manager.recursiveDeref(r_all);
+		manager.deref(r_all);
 
 		
 		has_coreachables = true;
