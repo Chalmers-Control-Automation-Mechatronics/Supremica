@@ -82,7 +82,8 @@ public class StateHolder
 	{
 		return problemEvent;
 	}
-
+	
+	//** MF ** Why isn't this code trivially optimised?
 	public boolean equals(Object other)
 	{
 		boolean equal = true;
@@ -92,6 +93,16 @@ public class StateHolder
 				equal = false;
 		return equal;
 	}
+	/** MF ** trivial optimization
+	public boolean equals(Object other)
+	{
+		int[] otherState = ((StateHolder)other).getArray();
+		for (int i = 0; i < theState.length; i++)
+			if (theState[i] != otherState[i])
+				return false;
+		return true;
+	}
+	*///** MF **
 
 	// Stolen and modified version of the hashCodeIntArray method in IntArrayHashTable
 	public int hashCode()

@@ -57,7 +57,7 @@ import javax.swing.table.*;
 
 import java.util.*;
 import java.io.*;
-import toolbarButtonGraphics.*;
+// import toolbarButtonGraphics.*;
 
 import org.apache.log4j.*;
 import javax.help.*;
@@ -762,7 +762,19 @@ public class Supremica
 				}
 			});
 
-		menuHandler.addSeparator();
+	//** MF Find States **
+		JMenuItem findStatesItem = new JMenuItem("Find States...");
+		menuHandler.add(findStatesItem, 1);
+		findStatesItem.addActionListener(new ActionListener()
+		{	// anonymous class (is this a good thing?)
+			public void actionPerformed(ActionEvent e)
+			{
+				findStates_action(e);
+				repaint();
+			}
+		});
+		
+		menuHandler.addSeparator(); //----------------------------------------------
 
 
 		JMenuItem copyItem = new JMenuItem("Copy");
@@ -1198,7 +1210,7 @@ public class Supremica
 		Collection selectedAutomata = getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -2198,6 +2210,21 @@ public class Supremica
 	}
 
 
+	//** MF ** why should it be public?
+	private void findStates_action(ActionEvent e)
+	{
+		FindStates find_states = new FindStates(getSelectedAutomata());
+		try
+		{
+			find_states.execute();
+		}
+		catch(Exception excp)
+		{
+			thisCategory.error(excp.toString());
+		}
+			
+	}
+	
 	// Automaton.Copy action performed
 	public void automataCopy_actionPerformed(ActionEvent e)
 	{
