@@ -1,7 +1,5 @@
 package org.supremica.external.robotCoordination;
 
-import java.util.*;
-
 public interface Position
 {
 	/**
