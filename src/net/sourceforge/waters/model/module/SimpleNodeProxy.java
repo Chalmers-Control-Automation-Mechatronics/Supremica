@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   SimpleNodeProxy
 //###########################################################################
-//# $Id: SimpleNodeProxy.java,v 1.3 2005-02-28 19:16:18 robi Exp $
+//# $Id: SimpleNodeProxy.java,v 1.4 2005-03-07 20:17:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -183,7 +183,7 @@ public class SimpleNodeProxy extends NodeProxy {
 
   /**
    * Sets the geometric position of this node's label.
-   * @return geo         A {@link PointGeometryProxy} identifying the position
+   * @param  geo         A {@link PointGeometryProxy} identifying the position
    *                     of the label's anchor point relative to the center of
    *                     the circle representing the node.
    */
