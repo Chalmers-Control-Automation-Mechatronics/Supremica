@@ -76,7 +76,7 @@ public final class AutomataSynchronizerHelper
 	private IntArrayHashTable theStates;
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
-
+	
 //      private int totalNbrOfStates = 0;
 //      private int nbrOfUncontrollableStates = 0;
 //      private int nbrOfDeadlockedStates = 0;

@@ -852,7 +852,6 @@ public class Automata
 	{
 		// Get the union alphabet
 		Alphabet theAlphabet;
-
 		try
 		{
 			// Why "this, false, false"?!? Shouldn't it be "this, true, true"?  /hugo
@@ -863,11 +862,11 @@ public class Automata
 			throw new RuntimeException(ex);
 		}
 
-		// Adjust the indices
+		// Adjust the indices of the alphabet
 		theAlphabet.setIndicies();
 
+		// Adjust the indices of the automata
 		int i = 0;
-
 		for (Iterator autIt = iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();

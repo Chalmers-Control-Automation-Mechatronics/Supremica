@@ -78,7 +78,6 @@ public class AutomataVerifier
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataVerifier.class);
 	private Automata theAutomata;
-	private int nbrOfExecuters;
 
 	// MF Started puting in all these timer.start/stop but...
 	// private ActionTimer timer = new ActionTimer();
@@ -116,28 +115,20 @@ public class AutomataVerifier
 	private boolean stopRequested = false;
 	private Stoppable threadToStop = null;
 
-	/** For verifying supervisors by one uncontrollable event at a time. */
-	private boolean oneEventAtATime;
-
 	/** For error message when Supremica can't be certain on the answer. */
 	private boolean failure = false;
 
 	public AutomataVerifier(Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 		throws IllegalArgumentException, Exception
 	{
-		/// logger.debug("DEBUG.......... " + theAutomata.size() ); // ARASH: DEBUG
 		Automaton currAutomaton;
-		State currInitialState;
 
 		this.theAutomata = theAutomata;
 		this.verificationOptions = verificationOptions;
 		this.synchronizationOptions = synchronizationOptions;
 
-		// We don't need to do this here (not at all, actually!). It's ugly.
-		nbrOfExecuters = synchronizationOptions.getNbrOfExecuters();
-		oneEventAtATime = verificationOptions.getOneEventAtATime();
-
 		// We're gonna do some serious synchronization! Initialize a synchronization helper!
+		// Can't this be done later?
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 		// Build the initial state  (including 2 status fields)
@@ -147,7 +138,7 @@ public class AutomataVerifier
 		while (autIt.hasNext())
 		{
 			currAutomaton = (Automaton) autIt.next();
-			currInitialState = currAutomaton.getInitialState();
+			State currInitialState = currAutomaton.getInitialState();
 			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
 		}
 	}
@@ -155,7 +146,8 @@ public class AutomataVerifier
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
 		// Modular algorithms demand system with more than one module...
-		if ((theAutomata.size() <= 1) && (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular))
+		if ((theAutomata.size() <= 1) && 
+			(verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular))
 		{
 			logger.warn("Using monolithic algorithm instead, since the system is not modular.");
 			verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
@@ -509,7 +501,7 @@ public class AutomataVerifier
 								}
 							}
 
-							if (oneEventAtATime)
+							if (verificationOptions.getOneEventAtATime())
 							{
 								if (stopRequested)
 								{
@@ -538,7 +530,7 @@ public class AutomataVerifier
 					}
 				}
 
-				if (!oneEventAtATime)
+				if (!verificationOptions.getOneEventAtATime())
 				{
 					if (stopRequested)
 					{
@@ -606,7 +598,7 @@ public class AutomataVerifier
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();
 
-		for (int i = 0; i < nbrOfExecuters; i++)
+		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = 
 				new AutomataSynchronizerExecuter(synchHelper);
@@ -1022,7 +1014,6 @@ public class AutomataVerifier
 		// Add some of the similar automata, but make sure the stateAmount doesn't explode!
 		for (int i = start; i < similarAutomata.length; i++)
 		{
-
 			// Add automaton
 			selectedAutomata.addAutomaton(theAutomata.getAutomatonAt(similarAutomata[i]));
 
@@ -1031,7 +1022,6 @@ public class AutomataVerifier
 
 			if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
 			{
-
 				// Synchronize...
 				// synchHelper.clear(); // This is done while analyzing the result se *** below
 				synchHelper.addState(initialState);
@@ -1044,7 +1034,7 @@ public class AutomataVerifier
 				// Initialize the synchronizationExecuters
 				synchronizationExecuters.clear();
 
-				for (int j = 0; j < nbrOfExecuters; j++)
+				for (int j = 0; j < synchronizationOptions.getNbrOfExecuters(); j++)
 				{
 					AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
 
@@ -1157,12 +1147,10 @@ public class AutomataVerifier
 	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
-
 		// WOHOOPS! Eventuellt är det listigt att göra ny onlinesynchronizer,
 		// med den nya automataIndices varje gång... tänk på det. FIXA!
 		if (uncontrollabilityCheckHelper == null)
 		{
-
 			//AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
 			AutomataSynchronizerExecuter onlineSynchronizer = new AutomataSynchronizerExecuter(synchHelper);
 
@@ -1190,7 +1178,7 @@ public class AutomataVerifier
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();
 
-		for (int i = 0; i < nbrOfExecuters; i++)
+		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(uncontrollabilityCheckHelper);
 
@@ -1198,7 +1186,7 @@ public class AutomataVerifier
 		}
 
 		// Start all the synchronization executers and wait for completion
-		for (int i = 0; i < nbrOfExecuters; i++)
+		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
 
@@ -1229,7 +1217,7 @@ public class AutomataVerifier
 		 *
 		 * // Initialize the synchronizationExecuters
 		 * synchronizationExecuters.clear();
-		 * for (int i = 0; i < nbrOfExecuters; i++)
+		 * for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		 * {
 		 * AutomataSynchronizerExecuter currSynchronizationExecuter =
 		 * new AutomataSynchronizerExecuter(synchHelper);
@@ -1237,7 +1225,7 @@ public class AutomataVerifier
 		 * }
 		 *
 		 * // Start all the synchronization executers and wait for completion
-		 * for (int i = 0; i < nbrOfExecuters; i++)
+		 * for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		 * {
 		 * AutomataSynchronizerExecuter currExec =
 		 * (AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
@@ -1411,7 +1399,7 @@ public class AutomataVerifier
 		synchHelper.setExhaustiveSearch(true);
 
 		// Initialize the synchronizationExecuters
-		for (int i = 0; i < nbrOfExecuters; i++)
+		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
 
@@ -1419,7 +1407,7 @@ public class AutomataVerifier
 		}
 
 		// Start all the synchronization executers and wait for completion
-		for (int i = 0; i < nbrOfExecuters; i++)
+		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
 
@@ -1460,7 +1448,7 @@ public class AutomataVerifier
 		synchHelper.setExhaustiveSearch(false);
 
 		// Initialize the synchronizationExecuters
-		for (int i = 0; i < nbrOfExecuters; i++)
+		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
 
@@ -1468,21 +1456,19 @@ public class AutomataVerifier
 		}
 
 		// Start all the synchronization executers and wait for completion
-		for (int i = 0; i < nbrOfExecuters; i++)
+		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
 
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 
 		// Get the synchronized automaton
 		Automaton theAutomaton;
-
 		try
 		{
 			if (currExec.buildAutomaton())
@@ -1491,7 +1477,7 @@ public class AutomataVerifier
 			}
 			else
 			{
-				// Execution stopped?
+				requestStop();
 				theAutomaton = null;
 
 				return false;
@@ -1505,9 +1491,15 @@ public class AutomataVerifier
 			throw ex;
 		}
 
+		// Now its just a matter of examining the states (and we can do that destructively!)
 		return moduleIsNonblocking(theAutomaton, true);
 	}
 
+	/**
+	 * Examines each automaton individually for nonblocking.
+	 *
+	 * Does not use the synchHelper!
+	 */
 	private boolean isIndividuallyNonblocking()
 		throws Exception
 	{
@@ -1543,6 +1535,8 @@ public class AutomataVerifier
 
 	/**
 	 * Examines nonblocking modularily... not fully implemented yet!
+	 *
+	 * Does not use the synchHelper!
 	 */
 	private boolean modularNonblockingVerification()
 		throws Exception
@@ -1611,6 +1605,8 @@ public class AutomataVerifier
 
 	/**
 	 * Examines nonblocking modularily... not fully implemented yet!
+	 *
+	 * Does not use the synchHelper.
 	 */
 	private boolean modularNonblockingVerification2()
 		throws Exception
@@ -1772,6 +1768,8 @@ public class AutomataVerifier
 
 	/**
 	 * Incrementally composes and minimizes the automata and examines the end result...
+	 *
+	 * Does not use the synchHelper.
 	 */
 	private boolean compositionalNonblockingVerification()
 		throws Exception
@@ -1785,7 +1783,6 @@ public class AutomataVerifier
 		{
 			public void run()
 			{
-				ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
 				if (executionDialog != null)
 				{
 					executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
@@ -1799,7 +1796,6 @@ public class AutomataVerifier
 			// Minimizer
 		 	AutomataMinimizer minimizer= new AutomataMinimizer(theAutomata);
 			threadToStop = minimizer;
-			ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
 			if (executionDialog != null)
 			{
 				minimizer.setExecutionDialog(executionDialog);
@@ -2063,7 +2059,7 @@ public class AutomataVerifier
 			// Initialize the synchronizationExecuters
 			synchronizationExecuters.clear();
 
-			for (int i = 0; i < nbrOfExecuters; i++)
+			for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 			{
 					AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
 					synchronizationExecuters.add(currSynchronizationExecuter);

@@ -155,8 +155,8 @@ public class AutomataVerificationWorker
 		else
 		{    // Error... this can't happen!
 			requestStop();
-			logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... this can't happen.\n" +
-						 "Please send bug report to bugs@supremica.org.");
+			logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... " + 
+						 "this can't happen.\nPlease send bug report to bugs@supremica.org.");
 
 			return;
 		}
