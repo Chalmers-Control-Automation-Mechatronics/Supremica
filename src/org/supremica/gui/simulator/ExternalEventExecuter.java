@@ -41,20 +41,11 @@ class ExternalEventExecuter extends EventExecuter
 	{
 		super(theExecuter, eventModel);
 
-		// TEMP: slow down things
-		// sleepTime = 5000;
-
 		logger.info("Using external exectuer");
 
 		theAutomata = eventModel.getAutomata();
 		theAlphabet = eventModel.getAlphabet();
-		/*
-		try {
-			theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, false, false);
-		} catch(Exception i_dont_know_what_to_do_with_this) {
-			i_dont_know_what_to_do_with_this.printStackTrace();
-		}
-		*/
+
 
 
 
@@ -99,10 +90,15 @@ class ExternalEventExecuter extends EventExecuter
 			{
 
 			}
-			logger.debug("---- IN");
+
+			// get enabled events
 			eventModel.update();
+
+			// update the list of pending events:
+			native_check_external_events();
+
+			// do some event messageing...
 			update_event_queue();
-			logger.debug("---- OUT");
 		}
 
 
@@ -142,8 +138,6 @@ class ExternalEventExecuter extends EventExecuter
 	{
 
 
-
-		logger.debug("1----------------------------");
 		// first, try to execute the pending events:
 		synchronized(pending_events) {
 			if(!pending_events.empty()) {
@@ -168,28 +162,12 @@ class ExternalEventExecuter extends EventExecuter
 		eventModel.enterLock();
 		int nbrOfEvents = eventModel.getSize();
 
-		logger.debug("2.a ----------------------------");
-
-		StringBuffer dum = new StringBuffer();
-		dum.append("Enabled events are: " );
-		for (int i = 0; i < nbrOfEvents; i++) dum.append(" " + eventModel.getEventAt(i).getLabel());
-		logger.debug(dum.toString() );
-
-
-		logger.debug("2.b----------------------------");
-
-
 		for (int i = 0; i < nbrOfEvents; i++)
 		{
 			LabeledEvent currEvent = eventModel.getEventAt(i);
 			EventWrapper ew = (EventWrapper) events_map.get(currEvent);
 			if (ew !=  null)
 			{
-				// _WEIRD_ á la Knut bug:
-				// The objects are not the same a(altough its the same event), which makes
-				// the simulator to _fail_ on executing this event, here is a _dirty_ hack to fix it
-				// ew.event = currEvent;
-
 				if(!ew.external) {
 					execute_event(ew);
 					eventModel.exitLock();
@@ -205,7 +183,6 @@ class ExternalEventExecuter extends EventExecuter
 
 		eventModel.exitLock();
 
-		logger.debug("3----------------------------");
 
 	}
 
