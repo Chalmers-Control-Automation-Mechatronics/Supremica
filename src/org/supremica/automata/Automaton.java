@@ -69,7 +69,7 @@ public class Automaton
 	private ArcSet theArcs;
 	private State initialState;
 	private boolean isDisabled = false;
-	private AutomatonType type = AutomatonType.Undefined;
+	private AutomatonType type = AutomatonType.Specification;
 	private int uniqueStateIndex = 0;
 
 	// Graphical stuff
@@ -1222,7 +1222,7 @@ public class Automaton
 	/*
 	public void setMutuallyAcceptingStatus(boolean status)
 	{
-		
+
 	}
 	*/
 
@@ -1240,7 +1240,7 @@ public class Automaton
 			for (Iterator stateIt = stateIterator(); stateIt.hasNext();)
 			{
 				State currState = (State) stateIt.next();
-				
+
 				// This state must be mutually accepting and not forbidden?
 				if (currState.isMutuallyAccepting() && !currState.isForbidden())
 				{

@@ -112,7 +112,7 @@ public class TestAutomataSynthesizer
 				assertTrue(synchronizer.getNumberOfStates() == 8);
 				Automaton theAutomaton = synchronizer.getAutomaton();
 				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Undefined);
+				assertTrue(theAutomaton.getType() == AutomatonType.Specification);
 				assertTrue(theAutomaton.nbrOfStates() == 8);
 				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
 				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);

@@ -279,8 +279,8 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Calculates what events are enabled from the state <tt>currState</tt>, 
-	 * if the state turns out uncontrollable, the boolean controllableState 
+	 * Calculates what events are enabled from the state <tt>currState</tt>,
+	 * if the state turns out uncontrollable, the boolean controllableState
 	 * is set false.
 	 *
 	 * The enabled events can then be found in currEnabledEvents[].
@@ -357,7 +357,7 @@ public final class AutomataSynchronizerExecuter
 						{
 							//... this event should not be executed
 							thisEventOk = false;
-							
+
 							// For controllability we need to know whether the event was disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
 							{
@@ -521,7 +521,7 @@ public final class AutomataSynchronizerExecuter
 			int i = 0;
 			int currEvent = currEnabledEvents[i++];
 
-			// If an event is enabled in the coexecuter, put it first in the 
+			// If an event is enabled in the coexecuter, put it first in the
 			// currEnabledEvents array!
 			while (currEvent != Integer.MAX_VALUE)
 			{
@@ -543,7 +543,7 @@ public final class AutomataSynchronizerExecuter
 				}
 
 				// */
-				// Here, the insertionIndex sets the maximium amount of states 
+				// Here, the insertionIndex sets the maximium amount of states
 				// that are examined...
 				// insertionIndex = 2;
 				insertionIndex = currEnabledEvents.length - 1;
@@ -564,8 +564,8 @@ public final class AutomataSynchronizerExecuter
 		}
 	}
 
-	/** 
-	 * Performs the synchronization. 
+	/**
+	 * Performs the synchronization.
 	 */
 	public void run()
 	{
@@ -627,7 +627,7 @@ public final class AutomataSynchronizerExecuter
 					// Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
 
-					// This is where we should add some stuff to take care of 
+					// This is where we should add some stuff to take care of
 					// any non-determinism.
 
 					// Iterate over all automata to construct the new state
@@ -642,7 +642,7 @@ public final class AutomataSynchronizerExecuter
 							nextState[currAutomatonIndex] = currSingleNextState;
 						}
 					}
-					
+
 					// Add this state to the automaton
 					// and include it in the queue of states waiting for
 					// processing if it has not been processed before
@@ -709,7 +709,7 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * A call to this method stops the execution of the run-method or 
+	 * A call to this method stops the execution of the run-method or
 	 * the buildAutomaton-method as soon as possible.
 	 *
 	 *@see  AutomataSynchronizer
@@ -912,7 +912,9 @@ public final class AutomataSynchronizerExecuter
 			}
 			else
 			{
-				theAutomaton.setType(AutomatonType.Undefined);
+				// theAutomaton.setType(AutomatonType.Undefined);
+				// Changed the default type to specification
+				theAutomaton.setType(AutomatonType.Specification);
 			}
 
 			return true;
@@ -1107,7 +1109,7 @@ public final class AutomataSynchronizerExecuter
 	// ****************************************************** //
 	public boolean isEnabled(LabeledEvent theEvent)
 	{
-		return isEnabled(theEvent.getSynchIndex());	
+		return isEnabled(theEvent.getSynchIndex());
 	}
 
 	public boolean isEnabled(int eventIndex)
@@ -1137,17 +1139,17 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Changes state along transition of theEvent. 
-	 * IT IS ASSUMED THAT theEvent IS ENABLED!! 
+	 * Changes state along transition of theEvent.
+	 * IT IS ASSUMED THAT theEvent IS ENABLED!!
 	 */
 	public int[] doTransition(int[] currState, LabeledEvent theEvent)
 	{
-		return doTransition(currState, theEvent.getSynchIndex());	
+		return doTransition(currState, theEvent.getSynchIndex());
 	}
 
 	/**
-	 * Changes state along transition of the event with index eventIndex. 
-	 * IT IS ASSUMED THAT THE EVENT WITH INDEX eventIndex IS ENABLED!! 
+	 * Changes state along transition of the event with index eventIndex.
+	 * IT IS ASSUMED THAT THE EVENT WITH INDEX eventIndex IS ENABLED!!
 	 */
 	public int[] doTransition(int[] currState, int eventIndex)
 	{
@@ -1156,30 +1158,30 @@ public final class AutomataSynchronizerExecuter
 		// Construct new state
 		int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
 		//int[] nextState = new int[currState.length];
-		
+
 		//System.arraycopy(currState, 0, nextState, 0, currState.length);
-		
+
 		//System.err.println("doTransition: nbrOfSelectedAutomata " + nbrOfSelectedAutomata);
-		
+
 		// Iterate over all automata to construct the new state
 		//for (int j = 0; j < nbrOfSelectedAutomata; j++)
 		for (int j = 0; j < automataIndices.length; j++)
 		{
 			int currAutomatonIndex = automataIndices[j];
 			int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][eventIndex];
-			
+
 			// Jump in all automata that have this event active.
 			if (currSingleNextState != Integer.MAX_VALUE)
-			{				
+			{
 				// currState[currAutomatonIndex] = currSingleNextState;
 				nextState[currAutomatonIndex] = currSingleNextState;
 			}
 		}
-		
+
 		// enabledEvents(nextState);
 		// System.arraycopy(nextState, 0, currState, 0, currState.length);
 		currState = nextState;
-		
+
 		// return currState;
 		return nextState;
 	}

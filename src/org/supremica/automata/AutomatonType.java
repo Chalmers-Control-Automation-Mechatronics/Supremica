@@ -54,7 +54,7 @@ import java.util.*;
 public class AutomatonType
 {
 	private static List collection = new LinkedList();
-	public static final AutomatonType Undefined = new AutomatonType("Undefined", true);
+	public static final AutomatonType Undefined = new AutomatonType("Undefined", false);
 	public static final AutomatonType Plant = new AutomatonType("Plant", true);
 	public static final AutomatonType Specification = new AutomatonType("Specification", true);
 	public static final AutomatonType Supervisor = new AutomatonType("Supervisor", true);

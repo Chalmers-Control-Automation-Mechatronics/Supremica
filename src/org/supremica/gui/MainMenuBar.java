@@ -150,6 +150,7 @@ public class MainMenuBar
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		add(menuFile);
 
+/*
 		// File.New
 		JMenuItem menuFileNew = new JMenuItem();
 		menuFileNew.setText("New...");
@@ -162,6 +163,7 @@ public class MainMenuBar
 				ActionMan.fileNew(ActionMan.getGui());
 			}
 		});
+*/
 
 		// File.NewFromTemplate
 		JMenu menuFileNewFromTemplate = new JMenu();
@@ -254,15 +256,13 @@ public class MainMenuBar
 
 			// File.Import.UMDES
 			JMenuItem menuFileImportUMDES = new JMenuItem();
-			menuFileImportUMDES.setEnabled(false);
 			menuFileImportUMDES.setText("From UMDES...");
 			menuFileImport.add(menuFileImportUMDES);
 			menuFileImportUMDES.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-
-					// ActionMan.fileImportUMDES(this);
+					ActionMan.fileImportUMDES(ActionMan.getGui());
 				}
 			});
 

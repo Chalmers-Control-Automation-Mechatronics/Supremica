@@ -166,8 +166,12 @@ public class ProjectBuildFromFSM
 		Project currProject = theProjectFactory.getProject();
 
 		Automaton currAutomaton = new Automaton(automatonName);
+		currProject.addAutomaton(currAutomaton);
 
 		int currState = STATE_READ_NUMBER_OF_STATES;
+		int numberOfRemainingStates = 0;
+		int numberOfRemainingTransitions = 0;
+
 
 		String currLine = reader.readLine();
 		while (currLine != null)
@@ -177,8 +181,70 @@ public class ProjectBuildFromFSM
 			while (tokenizer.hasMoreTokens())
 			{
 				String currToken = tokenizer.nextToken();
+				System.err.println("umdes: \"" + currToken + "\"");
+
+				if (currState == STATE_READ_NUMBER_OF_STATES)
+				{
+					try
+					{
+						numberOfRemainingStates = Integer.parseInt(currToken);
+					}
+					catch (NumberFormatException ex)
+					{
+						logger.error("Expected the number of states. Read: " + currToken);
+						throw ex;
+					}
+					currState = STATE_READ_STATE;
+				}
+				else if (currState == STATE_READ_STATE)
+				{
+					String stateName = currToken;
+					String markedString = tokenizer.nextToken();
+					String nbrOfTransitionsString = tokenizer.nextToken();
+					if (stateName == null)
+					{
+						logger.error("Expected a state name");
+					}
+					if (markedString == null)
+					{
+						logger.error("Expected the marking of the state: 0 or 1");
+					}
+					if (nbrOfTransitionsString == null)
+					{
+						logger.error("Expected the number of transitions");
+					}
+
+					int marked = -1;
+					try
+					{
+						marked = Integer.parseInt(markedString);
+					}
+					catch (NumberFormatException ex)
+					{
+						logger.error("Expected the marking of the state");
+					}
+
+					try
+					{
+						numberOfRemainingTransitions = Integer.parseInt(nbrOfTransitionsString);
+					}
+					catch (NumberFormatException ex)
+					{
+						logger.error("Expected the number of transitions");
+					}
+					currState = STATE_READ_TRANSITION;
+
+				}
+				else if (currState == STATE_READ_TRANSITION)
+				{
+					//currState = STATE_READ_STATE;
 
 
+				}
+				else if (currState == STATE_READ_ADDITIONAL_EVENTS)
+				{
+
+				}
 				//println(tokenizer.nextToken());
 			}
 

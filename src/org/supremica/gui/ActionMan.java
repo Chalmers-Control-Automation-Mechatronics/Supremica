@@ -2057,6 +2057,17 @@ public class ActionMan
 		};
 	}
 
+	public static void fileImportUMDES(Gui gui)
+	{
+		new FileImporter(FileDialogs.getImportFileChooser(FileFormats.FSM), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importUMDESFile(g, f);
+			}
+		};
+	}
+
 	public static void fileImportRobotCoordination(Gui gui)
 	{
 		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
@@ -2333,6 +2344,26 @@ public class ActionMan
 		{
 			AutomataBuildFromVALID builder = new AutomataBuildFromVALID(new VisualProjectFactory());
 			Automata currAutomata = builder.build(file);
+			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+
+			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error while importing " + file.getAbsolutePath(), ex);
+			logger.debug(ex.getStackTrace());
+			return;
+		}
+	}
+
+	public static void importUMDESFile(Gui gui, File file)
+	{
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+
+		try
+		{
+			ProjectBuildFromFSM builder = new ProjectBuildFromFSM(new VisualProjectFactory());
+			Automata currAutomata = builder.build(file.toURL());
 			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
 			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");

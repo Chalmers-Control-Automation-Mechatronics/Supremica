@@ -389,7 +389,8 @@ public class ProjectBuildFromXml
 		currAutomaton.setName(name);
 		String type = attributes.getValue("type");
 
-		AutomatonType currType = AutomatonType.Undefined;
+		// AutomatonType currType = AutomatonType.Undefined; // Changed to specification
+		AutomatonType currType = AutomatonType.Specification;
 		if (type != null)
 		{
 			currType = AutomatonType.toType(type);
