@@ -65,8 +65,8 @@ public class VerificationDialog
 	private VerificationOptions verificationOptions;
 	private JComboBox verificationTypeBox;
 	private JComboBox algorithmTypeBox;
-	// private JCheckBox purgeBox;
-	// private JCheckBox optimizeBox;
+	private JTextField stateLimit;
+	private JCheckBox oneEventAtATimeBox;
 	private JDialog dialog;
 
 	/**
@@ -93,36 +93,61 @@ public class VerificationDialog
                           "Advanced options");
 		
 		// standardPanel
-		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		Box standardBox = Box.createVerticalBox();
+		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		String[] verificationData = {"controllability", "non-blocking", "language inclusion"};
 		verificationTypeBox = new JComboBox(verificationData);
 		String[] algorithmData = {"modular", "monolithic", "IDD"};
 		algorithmTypeBox = new JComboBox(algorithmData);
-		// purgeBox = new JCheckBox("Purge result", true);
-		// optimizeBox = new JCheckBox("Optimize result", true);
-		leftPanel.add(verificationTypeBox);
-		leftPanel.add(algorithmTypeBox);
-		// rightPanel.add(purgeBox);
-		// rightPanel.add(optimizeBox);
+		// leftPanel.add(verificationTypeBox);
+		// leftPanel.add(algorithmTypeBox);
+		// standardPanel.setLayout(new GridLayout(1,2));
+		// standardPanel.add(leftPanel);
+		// standardPanel.add(rightPanel);
+		
+		standardBox.add(verificationTypeBox);
+		standardBox.add(algorithmTypeBox);
 
-		standardPanel.setLayout(new GridLayout(1,2));
-		standardPanel.add(leftPanel);
-		standardPanel.add(rightPanel);
+		standardPanel.add(standardBox);
 		
 		// advancedPanel
-		// null...
+		Box advancedBox = Box.createVerticalBox();
+		JLabel stateLimitText =
+			new JLabel("Initial state limit for uncontrollability check");
+		stateLimit = new JTextField();
+		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
+		
+		advancedBox.add(stateLimitText);
+		advancedBox.add(stateLimit);
+		advancedBox.add(oneEventAtATimeBox);
 
+		advancedPanel.add(advancedBox, BorderLayout.CENTER);
+
+		// buttonPanel;
 		JPanel buttonPanel = new JPanel();
 		okButton = addButton(buttonPanel, "OK");
 		cancelButton = addButton(buttonPanel, "Cancel");
 
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
-		// pack();
+
+		update();
+	}
+
+	/**
+	 * Updates the information in the dialog from what is recorded in VerificationOptions.
+	 * @see VerificationOptions
+	 */
+	public void update()
+	{
+		verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
+		algorithmTypeBox.setSelectedIndex(verificationOptions.getAlgorithmType());
+		stateLimit.setText(Integer.toString(verificationOptions.getStateLimit()));
+		oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
 	}
 	
-   	JButton addButton(Container container, String name)
+   	private JButton addButton(Container container, String name)
 	{
 		JButton button = new JButton(name);
 		button.addActionListener(this);
@@ -141,16 +166,18 @@ public class VerificationDialog
 		if (source == okButton)
 		{
 			verificationOptions.setDialogOK(true);
-			// verificationOptions.setPurge(purgeBox.isSelected());
-			// verificationOptions.setOptimize(optimizeBox.isSelected());
 			verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
 			verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+			verificationOptions.setStateLimit(PreferencesDialog.getInt("State limit", stateLimit.getText(), 10));
+			verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
 			dialog.setVisible(false);
+			dialog.dispose();
 		}
 		else if (source == cancelButton)
 		{
 			verificationOptions.setDialogOK(false); // Already done...
 			dialog.setVisible(false);
+			dialog.dispose();
 		}
 	}
 }

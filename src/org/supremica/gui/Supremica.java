@@ -1458,26 +1458,15 @@ public class Supremica
 		SynchronizationOptions syncOptions;
 		try
 		{
-			syncOptions = new SynchronizationOptions(
-				WorkbenchProperties.syncNbrOfExecuters(),
-				SynchronizationType.Prioritized,
-				WorkbenchProperties.syncInitialHashtableSize(),
-				WorkbenchProperties.syncExpandHashtable(),
-				WorkbenchProperties.syncForbidUncontrollableStates(),
-				WorkbenchProperties.syncExpandForbiddenStates(),
-				false,
-				false,
-				true,
-				WorkbenchProperties.verboseMode()
-			);
+			syncOptions = new SynchronizationOptions();
 		}
 		catch (Exception ex)
 		{
-				JOptionPane.showMessageDialog(this,
-					"Invalid synchronizationOptions",
-					"Alert",
-					JOptionPane.ERROR_MESSAGE);
-				return;
+			JOptionPane.showMessageDialog(this,
+										  "Invalid synchronizationOptions",
+										  "Alert",
+										  JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 
 		AutomataVerificationWorker worker = new AutomataVerificationWorker(this, currAutomata, syncOptions, verificationOptions);

@@ -70,12 +70,23 @@ public final class WorkbenchProperties
 	private static final String DOT_AUTOMATIC_UPDATE = "dotAutomaticUpdate";
 	private static final String INCLUDE_EDITOR = "includeEditor";
 	private static final String INCLUDE_BOUNDED_UNCON_TOOLS = "includeBoundedUnconTools";
+	private static final String VERBOSE_MODE = "verboseMode";
+	// SynchronizationOptions
 	private static final String SYNC_FORBID_UNCON_STATES = "syncForbidUncontrollableStates";
 	private static final String SYNC_EXPAND_FORBIDDEN_STATES = "syncExpandUncontrollableStates";
 	private static final String SYNC_INITIAL_HASHTABLE_SIZE = "syncInitialHashtableSize";
 	private static final String SYNC_EXPAND_HASHTABLE = "syncExpandHashtable";
-	private static final String VERBOSE_MODE = "verboseMode";
 	private static final String SYNC_NBR_OF_EXECUTERS = "synchNbrOfExecuters";
+	// VerificationOptions
+	private static final String VERIFY_VERIFICATION_TYPE = "verifyVerificationType";
+	private static final String VERIFY_ALGORITHM_TYPE = "verifyAlgorithmType";
+	private static final String VERIFY_STATE_LIMIT = "verifyStateLimit";
+	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
+	// SynthesizerOptions
+	private static final String SYNTHESIS_SYNTHESIS_TYPE = "synthesisSynthesisType";
+	private static final String SYNTHESIS_ALGORITHM_TYPE = "synthesisAlgorithmType";
+	private static final String SYNTHESIS_PURGE = "synthesisPurge";
+	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
 
 	private static final WorkbenchProperties wp = new WorkbenchProperties();
 
@@ -96,12 +107,20 @@ public final class WorkbenchProperties
 		setProperty(DOT_AUTOMATIC_UPDATE, "true");
 		setProperty(INCLUDE_EDITOR, "true");
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false");
+		setProperty(VERBOSE_MODE, "false");
 		setProperty(SYNC_FORBID_UNCON_STATES, "true");
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true");
 		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1));
 		setProperty(SYNC_EXPAND_HASHTABLE, "true");
-		setProperty(VERBOSE_MODE, "false");
 		setProperty(SYNC_NBR_OF_EXECUTERS, "1");
+		setProperty(VERIFY_VERIFICATION_TYPE, "0");
+		setProperty(VERIFY_ALGORITHM_TYPE, "0");
+		setProperty(VERIFY_STATE_LIMIT, "1000");
+		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false");
+		setProperty(SYNTHESIS_SYNTHESIS_TYPE, "0");
+		setProperty(SYNTHESIS_ALGORITHM_TYPE, "0");
+		setProperty(SYNTHESIS_PURGE, "true");
+		setProperty(SYNTHESIS_OPTIMIZE, "true");
 	}
 
 	public static void load(String fileName)
@@ -253,6 +272,17 @@ public final class WorkbenchProperties
 		return toBoolean(wp.getProperty(INCLUDE_BOUNDED_UNCON_TOOLS));
 	}
 
+	public static boolean verboseMode()
+	{
+		return toBoolean(wp.getProperty(VERBOSE_MODE));
+	}
+
+	public static void setVerboseMode(boolean mode)
+	{
+		wp.setProperty(VERBOSE_MODE, toString(mode));
+	}
+
+	// Synchronization...
 	public static boolean syncForbidUncontrollableStates()
 	{
 		return toBoolean(wp.getProperty(SYNC_FORBID_UNCON_STATES));
@@ -293,16 +323,6 @@ public final class WorkbenchProperties
 		wp.setProperty(SYNC_EXPAND_HASHTABLE, toString(expand));
 	}
 
-	public static boolean verboseMode()
-	{
-		return toBoolean(wp.getProperty(VERBOSE_MODE));
-	}
-
-	public static void setVerboseMode(boolean mode)
-	{
-		wp.setProperty(VERBOSE_MODE, toString(mode));
-	}
-
 	public static int syncNbrOfExecuters()
 	{
 		return toInt(wp.getProperty(SYNC_NBR_OF_EXECUTERS));
@@ -311,6 +331,88 @@ public final class WorkbenchProperties
 	public static void setSyncNbrOfExecuters(int nbrOfExecuters)
 	{
 		wp.setProperty(SYNC_NBR_OF_EXECUTERS, toString(nbrOfExecuters));
+	}
+
+	// Verification...
+	public static int verifyVerificationType()
+	{
+		return toInt(wp.getProperty(VERIFY_VERIFICATION_TYPE));
+	}
+
+	public static void setVerifyVerificationType(int type)
+	{
+		wp.setProperty(VERIFY_VERIFICATION_TYPE, toString(type));
+	}
+
+	public static int verifyAlgorithmType()
+	{
+		return toInt(wp.getProperty(VERIFY_ALGORITHM_TYPE));
+	}
+
+	public static void setVerifyAlgorithmType(int type)
+	{
+		wp.setProperty(VERIFY_ALGORITHM_TYPE, toString(type));
+	}
+
+	public static int verifyStateLimit()
+	{
+		return toInt(wp.getProperty(VERIFY_STATE_LIMIT));
+	}
+
+	public static void setVerifyStateLimit(int limit)
+	{
+		wp.setProperty(VERIFY_STATE_LIMIT, toString(limit));
+	}
+
+	public static boolean verifyOneEventAtATime()
+	{
+		return toBoolean(wp.getProperty(VERIFY_ONE_EVENT_AT_A_TIME));
+	}
+
+	public static void setVerifyOneEventAtATime(boolean bool)
+	{
+		wp.setProperty(VERIFY_ONE_EVENT_AT_A_TIME, toString(bool));
+	}
+
+	// Synthesis...
+	public static int synthesisSynthesisType()
+	{
+		return toInt(wp.getProperty(SYNTHESIS_SYNTHESIS_TYPE));
+	}
+
+	public static void setSynthesisSynthesisType(int type)
+	{
+		wp.setProperty(SYNTHESIS_SYNTHESIS_TYPE, toString(type));
+	}
+
+	public static int synthesisAlgorithmType()
+	{
+		return toInt(wp.getProperty(SYNTHESIS_ALGORITHM_TYPE));
+	}
+
+	public static void setSynthesisAlgorithmType(int type)
+	{
+		wp.setProperty(SYNTHESIS_ALGORITHM_TYPE, toString(type));
+	}
+
+	public static boolean synthesisPurge()
+	{
+		return toBoolean(wp.getProperty(SYNTHESIS_PURGE));
+	}
+
+	public static void setSynthesisPurge(boolean purge)
+	{
+		wp.setProperty(SYNTHESIS_PURGE, toString(purge));
+	}
+
+	public static boolean synthesisOptimize()
+	{
+		return toBoolean(wp.getProperty(SYNTHESIS_OPTIMIZE));
+	}
+
+	public static void setSynthesisOptimize(boolean optimize)
+	{
+		wp.setProperty(SYNTHESIS_OPTIMIZE, toString(optimize));
 	}
 
 	private static String toString(boolean b)

@@ -49,16 +49,30 @@
 
 package org.supremica.automata.algorithms;
 
-public class SynthesizerOptions 
+import org.supremica.gui.WorkbenchProperties;
+
+public final class SynthesizerOptions 
 {
 	private boolean dialogOK = false;
-	private int synthesisType = -1;
-	private int algorithmType = -1;
-	private boolean purge = false;
-	private boolean optimize = false;
+	private int synthesisType;
+	private int algorithmType;
+	private boolean purge;
+	private boolean optimize;
 
 	public SynthesizerOptions()
 	{
+		this(WorkbenchProperties.synthesisSynthesisType(), 
+			 WorkbenchProperties.synthesisAlgorithmType(),
+			 WorkbenchProperties.synthesisPurge(), 
+			 WorkbenchProperties.synthesisOptimize());
+	}
+
+	public SynthesizerOptions(int synthesisType, int algorithmType, boolean purge, boolean optimize)
+	{
+		this.synthesisType = synthesisType;
+		this.algorithmType = algorithmType; 
+		this.purge = purge;
+		this.optimize = optimize;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -74,6 +88,7 @@ public class SynthesizerOptions
 	public void setPurge(boolean bool)
 	{
 	    purge = bool;
+		WorkbenchProperties.setSynthesisPurge(bool);
 	}
 
 	public boolean getPurge()
@@ -84,6 +99,7 @@ public class SynthesizerOptions
 	public void setOptimize(boolean bool)
 	{
 	    optimize = bool;
+		WorkbenchProperties.setSynthesisOptimize(bool);
 	}
 
 	public boolean getOptimize()
@@ -94,6 +110,7 @@ public class SynthesizerOptions
 	public void setSynthesisType(int index)
 	{
 	    synthesisType = index;
+		WorkbenchProperties.setSynthesisSynthesisType(index);
 	}
 
 	public int getSynthesisType()
@@ -104,6 +121,7 @@ public class SynthesizerOptions
 	public void setAlgorithmType(int index)
 	{
 	    algorithmType = index;
+		WorkbenchProperties.setSynthesisAlgorithmType(index);
 	}
 
 	public int getAlgorithmType()

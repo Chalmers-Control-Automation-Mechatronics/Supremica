@@ -102,12 +102,17 @@ public class AutomataVerificationWorker
 		final AutomataVerifier automataVerifier;
 
 		// Cancel dialog initialization...
-		ArrayList threadsToStop = new ArrayList();
+		final ArrayList threadsToStop = new ArrayList();
 		threadsToStop.add(this);
-
-		cancelDialog = new CancelDialog(workbench, threadsToStop, eventQueue);
-		cancelDialog.updateHeader("Verifying...");
-
+		
+		eventQueue.invokeLater(new Runnable()
+			{   public void run()
+				{ 
+					cancelDialog = new CancelDialog(workbench, threadsToStop, eventQueue);
+					cancelDialog.updateHeader("Verifying...");
+				}
+			});
+		
 		if (verificationOptions.getVerificationType() == 0)
 		{   // Controllability verification...
 			boolean isControllable;
@@ -383,13 +388,13 @@ public class AutomataVerificationWorker
 
 	public void requestStop()
 	{
-		if (cancelDialog != null)
-			eventQueue.invokeLater(new Runnable()
-				{   public void run()
-					{ cancelDialog.destroy();
-					}
-				});
-		// cancelDialog.destroy();
+		eventQueue.invokeLater(new Runnable()
+			{   public void run()
+				{ 	
+					if (cancelDialog != null)
+						cancelDialog.destroy();
+				}
+			});
 		stopRequested = true;
 	}
 }

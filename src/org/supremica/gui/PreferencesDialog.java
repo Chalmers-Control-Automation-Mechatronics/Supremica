@@ -167,12 +167,12 @@ public class PreferencesDialog
 		return true;
 	}
 
-	int getInt(String label, String theIntStr)
+	public static int getInt(String label, String theIntStr)
 	{
 		return getInt(label, theIntStr, Integer.MIN_VALUE);
 	}
 
-	int getInt(String label, String theIntStr, int minValue)
+	public static int getInt(String label, String theIntStr, int minValue)
 	{
 		int theInt = Integer.MIN_VALUE;
 		try
@@ -181,12 +181,14 @@ public class PreferencesDialog
 		}
 		catch (NumberFormatException ex)
 		{
-			JOptionPane.showMessageDialog(this, label + " must be a number.", "Illegal format", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, label + " must be a number.", "Illegal format", JOptionPane.ERROR_MESSAGE);
+			// JOptionPane.showMessageDialog(this, label + " must be a number.", "Illegal format", JOptionPane.ERROR_MESSAGE);
 			return Integer.MIN_VALUE;
 		}
 		if (theInt < minValue)
 		{
-			JOptionPane.showMessageDialog(this, label + " must be at least " + minValue + ".", "Illegal format", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, label + " must be at least " + minValue + ".", "Illegal format", JOptionPane.ERROR_MESSAGE);
+			// JOptionPane.showMessageDialog(this, label + " must be at least " + minValue + ".", "Illegal format", JOptionPane.ERROR_MESSAGE);
 			return Integer.MIN_VALUE;
 		}
 		return theInt;

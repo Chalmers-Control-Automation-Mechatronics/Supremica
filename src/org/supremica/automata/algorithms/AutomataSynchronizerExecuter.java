@@ -447,16 +447,20 @@ public final class AutomataSynchronizerExecuter
 			}
 			if (insertionIndex == 0)
 			{   // Found no corresponding transitions in the suspect automaton...
+				/*
 				if (verboseMode)				
 					thisCategory.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
+				*/
 				// Here, the insertionIndex sets the maximium amount of states that are examined from such states...
 				// insertionIndex = 2;
 				insertionIndex = 20;
 			}
 			else
 			{   // There are transitions in the suspect automaton...
+				/*
 				if (verboseMode)
 					thisCategory.debug("Following transitions in the suspect automaton, there are " + insertionIndex + " such transitions...");
+				*/
 			}
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;
 		}
@@ -467,7 +471,7 @@ public final class AutomataSynchronizerExecuter
 	 */
     public void run()
     {
-		try
+		//try
 		{
     	initialize();
 
@@ -540,9 +544,9 @@ public final class AutomataSynchronizerExecuter
       		currState = helper.getStateToProcess();
         }
 		}
-		catch (Exception ex)
+		// catch (Exception ex)
 		{
-			System.out.println("Error: " + ex);
+			// System.out.println("Error!!: " + ex);
 		}
    }
 

@@ -93,36 +93,57 @@ public class SynthesizerDialog
                           "Advanced options");
 		
 		// standardPanel
-		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		Box standardBox = Box.createVerticalBox();
+		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		String[] synthesisData = {"controllable", "non-blocking", "both"};
 		synthesisTypeBox = new JComboBox(synthesisData);
 		String[] algorithmData = {"modular", "monolithic", "IDD"};
 		algorithmTypeBox = new JComboBox(algorithmData);
-		purgeBox = new JCheckBox("Purge result", true);
-		optimizeBox = new JCheckBox("Optimize result", true);
-		leftPanel.add(synthesisTypeBox);
-		leftPanel.add(algorithmTypeBox);
-		rightPanel.add(purgeBox);
-		rightPanel.add(optimizeBox);
+		purgeBox = new JCheckBox("Purge result");
+		optimizeBox = new JCheckBox("Optimize result");
+		// leftPanel.add(synthesisTypeBox);
+		// leftPanel.add(algorithmTypeBox);
+		// rightPanel.add(purgeBox);
+		// rightPanel.add(optimizeBox);
+		// standardPanel.setLayout(new GridLayout(1,2));
+		// standardPanel.add("Center", leftPanel);
+		// standardPanel.add("Center", rightPanel);
 
-		standardPanel.setLayout(new GridLayout(1,2));
-		standardPanel.add("Center", leftPanel);
-		standardPanel.add("Center", rightPanel);
+		standardBox.add(synthesisTypeBox);
+		standardBox.add(algorithmTypeBox);
+		standardBox.add(purgeBox);
+		standardBox.add(optimizeBox);
+		
+		standardPanel.add(standardBox);
 		
 		// advancedPanel
 		// null...
 
+		// buttonPanel
 		JPanel buttonPanel = new JPanel();
 		okButton = addButton(buttonPanel, "OK");
 		cancelButton = addButton(buttonPanel, "Cancel");
 
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
-		// pack();
+
+		update();
 	}
-	
-   	JButton addButton(Container container, String name)
+
+	/**
+	 * Updates the information in the dialog from what is recorded in SynthesizerOptions.
+	 * @see SynchesizerOptions
+	 */
+	public void update()
+	{
+		synthesisTypeBox.setSelectedIndex(synthesizerOptions.getSynthesisType());
+		algorithmTypeBox.setSelectedIndex(synthesizerOptions.getAlgorithmType());
+		purgeBox.setSelected(synthesizerOptions.getPurge());
+		optimizeBox.setSelected(synthesizerOptions.getOptimize());
+	}	
+
+   	private JButton addButton(Container container, String name)
 	{
 		JButton button = new JButton(name);
 		button.addActionListener(this);
@@ -146,11 +167,13 @@ public class SynthesizerDialog
 			synthesizerOptions.setSynthesisType(synthesisTypeBox.getSelectedIndex());
 			synthesizerOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
 			dialog.setVisible(false);
+			dialog.dispose();
 		}
 		else if (source == cancelButton)
 		{
 			synthesizerOptions.setDialogOK(false); // Already done...
 			dialog.setVisible(false);
+			dialog.dispose();
 		}
 	}
 }

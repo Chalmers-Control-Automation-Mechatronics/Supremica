@@ -49,16 +49,30 @@
 
 package org.supremica.automata.algorithms;
 
-public class VerificationOptions 
+import org.supremica.gui.WorkbenchProperties;
+
+public final class VerificationOptions 
 {
 	private boolean dialogOK = false;
-	private int verificationType = -1;
-	private int algorithmType = -1;
-	// private boolean purge = false;
-	// private boolean optimize = false;
+	private int verificationType;
+	private int algorithmType;
+	private int stateLimit;
+	private boolean oneEventAtATime;
 
 	public VerificationOptions()
 	{
+		this(WorkbenchProperties.verifyVerificationType(), 
+			 WorkbenchProperties.verifyAlgorithmType(),
+			 WorkbenchProperties.verifyStateLimit(),
+			 WorkbenchProperties.verifyOneEventAtATime());
+	}
+
+	public VerificationOptions(int verificationType, int algorithmType, int stateLimit, boolean oneEventAtATime)
+	{
+		this.verificationType = verificationType;
+		this.algorithmType = algorithmType; 
+		this.stateLimit = stateLimit;
+		this.oneEventAtATime = oneEventAtATime;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -71,31 +85,10 @@ public class VerificationOptions
 		return dialogOK;
 	}
 
-	/*
-	public void setPurge(boolean bool)
-	{
-	    purge = bool;
-	}
-
-	public boolean getPurge()
-	{
-		return purge;
-	}
-
-	public void setOptimize(boolean bool)
-	{
-	    optimize = bool;
-	}
-
-	public boolean getOptimize()
-	{
-		return optimize;
-	}
-	*/
-
 	public void setVerificationType(int index)
 	{
 	    verificationType = index;
+		WorkbenchProperties.setVerifyVerificationType(index);
 	}
 
 	public int getVerificationType()
@@ -106,10 +99,33 @@ public class VerificationOptions
 	public void setAlgorithmType(int index)
 	{
 	    algorithmType = index;
+		WorkbenchProperties.setVerifyAlgorithmType(index);
 	}
 
 	public int getAlgorithmType()
 	{
 		return algorithmType;
+	}
+
+	public void setStateLimit(int limit)
+	{
+	    stateLimit = limit;
+		WorkbenchProperties.setVerifyStateLimit(limit);
+	}
+
+	public int getStateLimit()
+	{
+		return stateLimit;
+	}
+
+	public void setOneEventAtATime(boolean bool)
+	{
+		oneEventAtATime = bool;
+		WorkbenchProperties.setVerifyOneEventAtATime(bool);
+	}
+
+	public boolean getOneEventAtATime()
+	{
+		return oneEventAtATime;
 	}
 }

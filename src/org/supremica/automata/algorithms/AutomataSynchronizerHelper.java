@@ -273,9 +273,11 @@ public final class AutomataSynchronizerHelper
 			}
             addStatus(newState);
         	addStateToProcess(newState);
+			/*
 			if (verboseMode)
 				if (++nbrOfAddedStates % 10000 == 0)
 					thisCategory.debug(nbrOfAddedStates + " new states found so far.");
+			*/
         }
 		else
 		{
@@ -284,15 +286,17 @@ public final class AutomataSynchronizerHelper
 				fromStateList.removeLast();
 			}
 		}
-  		if (++nbrOfCheckedStates % 1000 == 0)
+
+  		if (++nbrOfCheckedStates % 2000 == 0)
 		{
-			if ((nbrOfCheckedStates >= 10000) && cancelDialog != null)
-			{
+			if (cancelDialog != null)
 				cancelDialog.updateCounter(nbrOfCheckedStates);
-			}
+			
+			/*
 			if (verboseMode)
 				if (nbrOfCheckedStates % 10000 == 0)
 					thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
+			*/
 		}
     }
 
