@@ -65,12 +65,16 @@ public class Project
 	private static Logger logger = LoggerFactory.createLogger(Project.class);
 	private Actions theActions = null;
 	private Controls theControls = null;
+	private Signals theInputSignals = null;
+	private Signals theOutputSignals = null;
 	private URL animationURL = null;
 
 	public Project()
 	{
 		theActions = new Actions();
 		theControls = new Controls();
+		theInputSignals = new Signals();
+		theOutputSignals = new Signals();
 	}
 
 	public Project(String name)
@@ -85,7 +89,8 @@ public class Project
 
 		theActions = new Actions(otherProject.theActions);
 		theControls = new Controls(otherProject.theControls);
-
+		theInputSignals = new Signals(otherProject.theInputSignals);
+		theOutputSignals = new Signals(otherProject.theOutputSignals);
 		setName(otherProject.getName());
 	}
 
@@ -97,6 +102,16 @@ public class Project
 	public Controls getControls()
 	{
 		return theControls;
+	}
+
+	public Signals getInputSignals()
+	{
+		return theInputSignals;
+	}
+
+	public Signals getOutputSignals()
+	{
+		return theOutputSignals;
 	}
 
 	public boolean hasAnimation()

@@ -89,6 +89,9 @@ public class ProjectBuildFromXml
 	private final static String stateLayoutStr = "StateLayout";
 	private final static String supremicaLayoutStr = "SupremicaLayout";
 	private final static String executionStr = "Execution";
+	private final static String inputSignalsStr = "InputSignals";
+	private final static String outputSignalsStr = "OutputSignals";
+	private final static String signalStr = "Signal";
 	private final static String actionsStr = "Actions";
 	private final static String actionStr = "Action";
 	private final static String controlsStr = "Controls";
@@ -293,6 +296,20 @@ public class ProjectBuildFromXml
 		{
 			doExecution(attributes);
 		}
+/*
+		else if (inputSignalsStr.equals(name))
+		{
+			doInputSignals(attributes);
+		}
+		else if (outputSignalsStr.equals(name))
+		{
+			doOutputSignals(attributes);
+		}
+		else if (signalStr.equals(name))
+		{
+			doSignal(attributes);
+		}
+*/
 		else if (actionsStr.equals(name))
 		{
 			doActions(attributes);
