@@ -77,6 +77,9 @@ public class MutuallyNonblockingVerifier
 	private final int MUTUALLY_NONBLOCKING_MAYBE = 1;
 	private final int MUTUALLY_NONBLOCKING_NO = 2;
 	private int[] automatonIsMutuallyNonblocking;
+
+	// Largest amount of synchronized automata during execution
+	private int maxSynchronized = 0;
 	
 	public MutuallyNonblockingVerifier(Automata theAutomata)
 	{
@@ -131,6 +134,8 @@ public class MutuallyNonblockingVerifier
 		// Analyze and present result
 		boolean allMutuallyNonblocking = true;
 		int nbrMutuallyNonblocking = 0;
+		int nbrMaybeMutuallyNonblocking = 0;
+		int nbrBlocking = 0;
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
@@ -143,18 +148,34 @@ public class MutuallyNonblockingVerifier
 			}
 			else if (automatonIsMutuallyNonblocking[index] == MUTUALLY_NONBLOCKING_NO)
 			{
-				logger.error("Automaton " + currAutomaton + " is mutually blocking!");				
+				logger.error("Automaton " + currAutomaton + " is blocking!");				
+				nbrBlocking++;
 				allMutuallyNonblocking = false;
 			}
 			else
 			{
 				logger.warn("Automaton " + currAutomaton + " might cause blocks.");
+				nbrMaybeMutuallyNonblocking++;
 				allMutuallyNonblocking = false;
 			}
 			// logger.info("Safe events: " + safeEventsMap.getEvents(currAutomaton));
 		}
-		logger.info("At least " + nbrMutuallyNonblocking + " out of the total " + 
-					theAutomata.size() + " automata are mutually nonblocking.");
+		if (nbrBlocking > 0)
+		{
+			logger.info("The system is blocking. There are " + nbrBlocking + " blocking automata and " + 
+						nbrMutuallyNonblocking + " mutually nonblocking automata.");			
+		}
+		else if(nbrMutuallyNonblocking == theAutomata.size())
+		{
+			logger.info("The system is mutually nonblocking!");
+		}
+		else
+		{
+			logger.info("At least " + nbrMutuallyNonblocking + " out of the total " + 
+						theAutomata.size() + " automata are mutually nonblocking.");
+		}
+
+		logger.info("During verification, at most " + maxSynchronized + " automata were synchronized.");
 		return allMutuallyNonblocking;
 	}
 
@@ -242,6 +263,10 @@ public class MutuallyNonblockingVerifier
 			{
 				logger.info("Second run: Examining automaton " + currAutomaton + " closer.");
 			}
+			else
+			{
+				logger.info("Second run: Automaton " + currAutomaton + " is mutually accepting from the first run.");
+			}
 			while (!ok)
 			{
 				if (stopRequested)
@@ -290,10 +315,17 @@ public class MutuallyNonblockingVerifier
 				gui.getVisualProjectContainer().getActiveProject().addAutomaton(currSynchAutomaton);
 				*/
 
-				// ok = (currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates());
+				ok = (currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates());
 				// Assuming the system is controllable, we can ignore all uncontrollable (forbidden) states!!
-				ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
+				//ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
+
 				logger.fatal("states: " + currSynchAutomaton.nbrOfStates() + " forb: " + currSynchAutomaton.nbrOfForbiddenStates() + " mutnotforb: " + currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates() + " mut: " + currSynchAutomaton.nbrOfMutuallyAcceptingStates());
+
+				// How many automata did we synchronize? Did we break the record?
+				if (currSynchAutomata.size() > maxSynchronized)
+				{
+					maxSynchronized = currSynchAutomata.size();
+				}
 			}
 
 			// It went ok?
@@ -335,7 +367,7 @@ public class MutuallyNonblockingVerifier
 		Automaton bestAutomaton = null;
 		LabeledEvent bestEvent = null;
 		boolean safeInBest = false;
-		int nbrNewEvents = Integer.MAX_VALUE;
+		int bestValue = Integer.MAX_VALUE;
 		for (int i = 0; i < interestingEvents.size(); i++)
 		{
 			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
@@ -359,12 +391,14 @@ public class MutuallyNonblockingVerifier
 				// The most interesting event is safe in the automaton?
 				if (safeEventsMap.getEvents(currAutomaton).containsEventWithLabel(currEvent))
 				{
-					// Is this the first automaton where the event is safe? Then we override the earlier results.
+					// Is this the first automaton where the event is safe? 
+					// Then we override the earlier results.
 					if (safeInBest == false)
 					{
 						bestAutomaton = currAutomaton;
 						bestEvent = currEvent;
-						nbrNewEvents = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
+						bestValue = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
+						//bestValue = currAutomaton.nbrOfStates();
 						safeInBest = true;
 						continue;
 					}
@@ -377,14 +411,18 @@ public class MutuallyNonblockingVerifier
 						continue;
 					}
 				}
-
+				
 				// We now know this automaton is quite interesting, but we want as few new events as possible!
-				int newEvents = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
-				if (newEvents < nbrNewEvents)
+				
+				// This value is the number of new events in the automaton
+				int value = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
+				// This value is the number of states in the automaton
+				//int value = currAutomaton.nbrOfStates();
+				if (value < bestValue)
 				{
 					bestAutomaton = currAutomaton;
 					bestEvent = currEvent;
-					nbrNewEvents = newEvents;
+					bestValue = value;
 				}
 			}
 		}
@@ -403,77 +441,16 @@ public class MutuallyNonblockingVerifier
 			return allAcceptingAutomaton;
 		}
 		
+		// If we haven't found any automaton... then there can be no interesting events, right?
+		// Yes there can! But then the system must be blocking and the interestin events go
+		// from a mutually accepting state to a ordinary state!
+		/*
 		if (interestingEvents.size() > 0)
 		{
 			logger.fatal("This can't happen, right?");
 		}
-		return null;
-
-		/*
-		// Get the most interesting events
-		Vector interestingEvents = interestingEvents(synchAutomaton);
-		
-		Alphabet synchAlphabet = synchAutomaton.getAlphabet();
-		Automaton bestMatch = null;
-		int bestNewEvents = Integer.MAX_VALUE;
-		for (int i = 0; i < interestingEvents.size(); i++)
-		//for (int i = interestingEvents.size()-1; i < interestingEvents.size(); i++)
-		{
-			if (i == 1)
-				logger.fatal("MutuallyNonblockingVerifier: This can't happen, right?");
-			
-			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				Alphabet currAlphabet = currAutomaton.getAlphabet();
-
-				// Already in the synch?
-				if (synchAutomata.containsAutomaton(currAutomaton.getName()))
-				{
-					continue;
-				}
-				
-				// Does not contain the most interesting event?
-				if (!currAlphabet.containsEventWithLabel((LabeledEvent) interestingEvents.elementAt(i)))
-				{
-					continue;
-				}
-
-				// The most interesting event is safe in the automaton?
-				if (safeEventsMap.getEvents(currAutomaton).containsEventWithLabel((LabeledEvent) interestingEvents.elementAt(i)))
-				{
-					bestMatch = currAutomaton;
-					break; // Terminate immediately
-				}
-
-				// We want as few new events as possible!
-				int newEvents = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
-				if (newEvents < bestNewEvents)
-				{
-					bestMatch = currAutomaton;
-					bestNewEvents = newEvents;
-				}
-			}
-		
-			// Have we a winner?
-			if (bestMatch != null)
-			{
-				logger.info("Adding " + bestMatch + ", most important event: " + interestingEvents.elementAt(i) + ".");
-				
-				// The automaton we add should be accepting in all states!
-				Automaton allAcceptingAutomaton = new Automaton(bestMatch);
-				AutomatonAllAccepting allAccepting = new AutomatonAllAccepting(allAcceptingAutomaton);
-				allAccepting.execute();
-				
-				//return bestMatch;
-				return allAcceptingAutomaton;
-			}
-		}
-
-		logger.error("It didn't work. I'm giving up... but there may still be hope!");
-
-		return null;
 		*/
+		return null;
 	}
 
 	private void synchTest()
@@ -898,8 +875,10 @@ public class MutuallyNonblockingVerifier
 		if (noValue)
 		{
 			// It seems blocking! Use blockValue instead!
-			logger.info("The systems appears blocking, but we will se...");
+			logger.error("The systems appears blocking, but we will se...");
 			value = blockValue;
+
+			//We can merge all states that are not accepting!
 		}
 
 		// Sort the result

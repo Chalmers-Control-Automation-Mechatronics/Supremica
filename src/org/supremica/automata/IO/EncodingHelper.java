@@ -81,8 +81,11 @@ public class EncodingHelper
 
 		while (len - lastBreak > lineWidth)
 		{
-			lastBreak = s.lastIndexOf(' ', lastBreak + lineWidth);
-			s = s.substring(0,lastBreak) + "\n" + s.substring(lastBreak+1,len);
+			int nextBreak = s.lastIndexOf(' ', lastBreak + lineWidth);
+			if (nextBreak == -1)
+				nextBreak = lastBreak + lineWidth;
+			s = s.substring(0, nextBreak) + "\n" + s.substring(nextBreak+1,len);
+			lastBreak = nextBreak;
 		}
 
 		return s;

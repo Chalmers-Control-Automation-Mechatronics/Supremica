@@ -375,7 +375,7 @@
 		<Event id="part_ent-1" controllable="true"/>
 		<Event id="part_arr1-1" controllable="false"/>
 		<Event id="start_pol-1" controllable="true"/>
-		<Event id="compl_pol-1" controllable="true"/>
+		<Event id="compl_pol-1" controllable="false"/>
 		<Event id="part_lv1-1" controllable="true"/>
         <!-- Leduc is confusing here, it's probably controllable, though -->
 		<Event id="part_lvExit-1" controllable="true"/>
@@ -679,7 +679,7 @@
 		<Event id="part_ent-2" controllable="true"/>
 		<Event id="part_arr1-2" controllable="false"/>
 		<Event id="start_pol-2" controllable="true"/>
-		<Event id="compl_pol-2" controllable="true"/>
+		<Event id="compl_pol-2" controllable="false"/>
 		<Event id="part_lv1-2" controllable="true"/>
         <!-- Leduc is confusing here, it's probably controllable, though -->
 		<Event id="part_lvExit-2" controllable="true"/>
@@ -983,7 +983,7 @@
 		<Event id="part_ent-3" controllable="true"/>
 		<Event id="part_arr1-3" controllable="false"/>
 		<Event id="start_pol-3" controllable="true"/>
-		<Event id="compl_pol-3" controllable="true"/>
+		<Event id="compl_pol-3" controllable="false"/>
 		<Event id="part_lv1-3" controllable="true"/>
         <!-- Leduc is confusing here, it's probably controllable, though -->
 		<Event id="part_lvExit-3" controllable="true"/>

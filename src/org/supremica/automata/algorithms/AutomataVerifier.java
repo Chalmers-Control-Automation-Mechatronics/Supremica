@@ -370,6 +370,12 @@ public class AutomataVerifier
 	private boolean modularMutuallyNonblockingVerification()
 		throws Exception
 	{
+		// Ensure individual nonblocking
+		if (!isIndividuallyNonBlocking())
+		{
+			return false;
+		}
+
 		//MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata);
 		MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata, synchHelper);
 
@@ -1369,6 +1375,33 @@ public class AutomataVerifier
 		return moduleIsNonblocking(theAutomaton);
 	}
 
+	private boolean isIndividuallyNonBlocking()
+		throws Exception
+	{
+		boolean allIndividuallyNonblocking = true;
+		Iterator autIt = theAutomata.iterator();
+		Automaton currAutomaton;
+		while (autIt.hasNext())
+		{
+			currAutomaton = new Automaton((Automaton) autIt.next());
+			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
+			if (stopRequested)
+			{
+				return false;
+			}
+
+			if (!allIndividuallyNonblocking)
+			{
+				logger.error("The automaton " + currAutomaton + " is individually blocking!");
+				// logger.error("Aborting verification...");
+				requestStop();
+				return false;
+			}
+		}
+
+		logger.info("All automata are individually nonblocking.");
+		return true;
+	}
 
 	/**
 	 * Examines non-blocking modularily... not fully implemented yet!
@@ -1384,29 +1417,9 @@ public class AutomataVerifier
 		}
 
 		// Ensure individual nonblocking
-		boolean allIndividuallyNonblocking = true;
-		Iterator autIt = theAutomata.iterator();
-		Automaton currAutomaton;
-		while (autIt.hasNext())
+		if (!isIndividuallyNonBlocking())
 		{
-			currAutomaton = new Automaton((Automaton) autIt.next());
-			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
-			if (stopRequested)
-			{
-				return false;
-			}
-
-			if (!allIndividuallyNonblocking)
-			{
-				logger.error("The automaton " + currAutomaton.toString() + " is individually blocking!");
-				logger.error("Aborting verification...");
-				requestStop();
-				return false;
-			}
-		}
-		if (allIndividuallyNonblocking)
-		{
-			logger.info("This system has no individually blocking automata!");
+			return false;
 		}
 
 		// Do some tests...
