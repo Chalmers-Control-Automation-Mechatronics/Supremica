@@ -2143,7 +2143,7 @@ public class ActionMan
 	public static void automataCrop_actionPerformed(Gui gui)
 	{
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-		
+
 		if (selectedAutomata.size() == 0)
 		{
 			// Use DeleteAll instead
@@ -2166,9 +2166,9 @@ public class ActionMan
 				logger.debug(ex.getStackTrace());
 				return;
 			}
-			
+
 			currAutomatonName = currAutomaton.getName();
-			
+
 			if (!selectedAutomata.contains(currAutomaton))
 			{
 				try
@@ -2553,6 +2553,52 @@ public class ActionMan
 						return;
 					}
 					logger.info("Mindstorm NQC file successfully generated at " + currFile.getAbsolutePath());
+				}
+			}
+		}
+	}
+
+	// Generate SMV (Symbolic Model Verifier)
+	public static void AutomataToSMV(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.SMV);
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					try
+					{
+
+						AutomataToSMV exporter = new AutomataToSMV(selectedAutomata);
+
+						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
+
+						exporter.serializeSMV(theWriter);
+
+						theWriter.close();
+
+					}
+					catch (Exception ex)
+					{
+						logger.error("Exception while generating SMV text code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getStackTrace());
+						return;
+					}
+					logger.info("SMVfile successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
 		}

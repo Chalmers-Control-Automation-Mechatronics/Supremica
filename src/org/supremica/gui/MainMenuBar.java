@@ -767,6 +767,18 @@ public class MainMenuBar
 			}
 		});
 
+		JMenuItem menuToolsCodeGenerationSMV = new JMenuItem();
+
+		menuToolsCodeGenerationSMV.setText("NuSMV...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationSMV);
+		menuToolsCodeGenerationSMV.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				ActionMan.AutomataToSMV(ActionMan.getGui());
+			}
+		});
 
 		// Tools.RunSimulation
 		JMenuItem run_simulation = new JMenuItem();
