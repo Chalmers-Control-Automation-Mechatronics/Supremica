@@ -64,12 +64,14 @@ public class Controls
 
 	public Controls(Controls otherControls)
 	{
-		theControls = new HashSet((int)(otherControls.size()*1.5));
-		labelToControlMap = new HashMap((int)(otherControls.size()*1.5));
-		for (Iterator conIt = otherControls.iterator(); conIt.hasNext();)
+		theControls = new HashSet((int) (otherControls.size() * 1.5));
+		labelToControlMap = new HashMap((int) (otherControls.size() * 1.5));
+
+		for (Iterator conIt = otherControls.iterator(); conIt.hasNext(); )
 		{
-			Control currControl = (Control)conIt.next();
+			Control currControl = (Control) conIt.next();
 			Control newControl = new Control(currControl);
+
 			addControl(newControl);
 		}
 	}

@@ -52,9 +52,7 @@ package org.supremica.automata;
 public class DefaultProjectFactory
 	implements ProjectFactory
 {
-	public DefaultProjectFactory()
-	{
-	}
+	public DefaultProjectFactory() {}
 
 	public Project getProject()
 	{

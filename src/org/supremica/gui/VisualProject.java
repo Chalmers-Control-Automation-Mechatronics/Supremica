@@ -55,7 +55,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import javax.swing.table.*;
-
 import org.supremica.automata.*;
 import org.supremica.log.*;
 import org.supremica.gui.editor.*;
@@ -64,37 +63,27 @@ import org.supremica.gui.editor.*;
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
  * that are associated with a project.
  */
-
 public class VisualProject
 	extends Project
 {
 	private static Logger logger = LoggerFactory.createLogger(VisualProject.class);
-
 	private Automata selectedAutomata = null;
-	private AutomataEditor theAutomataEditor = null; // Lazy construction
-
+	private AutomataEditor theAutomataEditor = null;    // Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
 	private HashMap theAutomatonDocumentContainer = new HashMap();
 	private HashMap theAlphabetViewerContainer = new HashMap();
-
 	private LightTableModel lightTableModel = new LightTableModel();
 	private FullTableModel fullTableModel = new FullTableModel();
-
 	private File projectFile = null;
 
-
-	public VisualProject()
-	{
-	}
-
+	public VisualProject() {}
 
 	public VisualProject(String name)
 	{
 		super(name);
 	}
-
 
 	public void setSelectedAutomata(Automata theAutomata)
 	{
@@ -172,7 +161,6 @@ public class VisualProject
 					AutomatonViewer viewer = new AutomatonViewer(currAutomaton);
 
 					theAutomatonViewerContainer.put(automatonName, viewer);
-
 					viewer.setVisible(true);
 
 					return viewer;
@@ -223,7 +211,6 @@ public class VisualProject
 		}
 	}
 
-
 	public AutomatonDocument getAutomatonDocument(String automatonName)
 		throws Exception
 	{
@@ -233,35 +220,36 @@ public class VisualProject
 
 			return document;
 		}
+
 		return null;
-/*
-		else
-		{
-			Automaton currAutomaton = getAutomaton(automatonName);
 
-			if (currAutomaton != null)
-			{
-				try
-				{
-					AutomatonDocument document = new AutomatonDocument(this, currAutomaton);
+		/*
+						else
+						{
+								Automaton currAutomaton = getAutomaton(automatonName);
 
-					theAutomatonDocumentContainer.put(automaton, document);
+								if (currAutomaton != null)
+								{
+										try
+										{
+												AutomatonDocument document = new AutomatonDocument(this, currAutomaton);
 
-					return document;
-				}
-				catch (Exception ex)
-				{
-					throw new Exception("Error while viewing: " + automaton);
-				}
-			}
-			else
-			{
-				throw new Exception(automaton + " does not exist in VisualProjectContainer");
-			}
-		}
-*/
+												theAutomatonDocumentContainer.put(automaton, document);
+
+												return document;
+										}
+										catch (Exception ex)
+										{
+												throw new Exception("Error while viewing: " + automaton);
+										}
+								}
+								else
+								{
+										throw new Exception(automaton + " does not exist in VisualProjectContainer");
+								}
+						}
+		*/
 	}
-
 
 	public AutomatonExplorer getAutomatonExplorer(String automaton)
 		throws Exception
@@ -285,7 +273,6 @@ public class VisualProject
 					AutomatonExplorer explorer = new AutomatonExplorer(currAutomaton);
 
 					theAutomatonExplorerContainer.put(automaton, explorer);
-
 					explorer.setVisible(true);
 					explorer.initialize();
 
@@ -325,7 +312,6 @@ public class VisualProject
 					AlphabetViewer viewer = new AlphabetViewer(currAutomaton);
 
 					theAlphabetViewerContainer.put(automaton, viewer);
-
 					viewer.setVisible(true);
 					viewer.initialize();
 
@@ -342,7 +328,6 @@ public class VisualProject
 			}
 		}
 	}
-
 
 	public int getSize()
 	{
@@ -575,5 +560,4 @@ public class VisualProject
 			}
 		}
 	}
-
 }

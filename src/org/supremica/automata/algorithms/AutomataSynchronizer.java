@@ -123,7 +123,7 @@ public class AutomataSynchronizer
 		synchHelper.displayInfo();
 	}
 
-	//-- MF -- Added to allow users easy access to the number of synch'ed states
+	// -- MF -- Added to allow users easy access to the number of synch'ed states
 	public int getNumberOfStates()
 	{
 		return synchHelper.getNumberOfAddedStates();

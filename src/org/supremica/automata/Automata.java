@@ -89,6 +89,7 @@ public class Automata
 		theAutomata.add(aut);
 		nameMap.put(aut.getName(), aut);
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
+		logger.debug("Automata.addAutomaton: " + aut.getName());
 	}
 
 	public void addAutomata(Automata automata)
@@ -111,6 +112,7 @@ public class Automata
 	public void removeAutomaton(String name)
 	{
 		Automaton currAutomaton = getAutomaton(name);
+
 		if (currAutomaton != null)
 		{
 			removeAutomaton(currAutomaton);

@@ -1294,10 +1294,7 @@ public class ActionMan
 		automataExport(gui);
 	}
 
-	public static void fileImportDesco(Gui gui)
-	{
-
-	}
+	public static void fileImportDesco(Gui gui) {}
 
 	public static void fileImportValid(Gui gui)
 	{
@@ -1591,7 +1588,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	//
+	// 
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);

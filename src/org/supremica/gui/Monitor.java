@@ -1,3 +1,4 @@
+
 /********************** Monitor.java ************************/
 
 // Class for doing usable progress monitoring
@@ -33,19 +34,22 @@ public class Monitor
 		pm.setMillisToDecideToPopup(millisToDecideToPopup);
 
 		timer = new Timer(millisBetweenTimerFire, this);
+
 		timer.start();
 	}
 
 	// called each time the Timer fires
-	public void actionPerformed (ActionEvent event)
+	public void actionPerformed(ActionEvent event)
 	{
-		if(/* task.wasStopped() */ !task.isAlive() || pm.isCanceled())
+		if ( /* task.wasStopped() */!task.isAlive() || pm.isCanceled())
 		{
 			pm.close();
 			timer.stop();
-			if(/* !task.wasStopped() */ task.isAlive())
+
+			if ( /* !task.wasStopped() */task.isAlive())
 			{
-				task.stopTask(); // interrupt
+				task.stopTask();    // interrupt
+
 				// task.join(); // ??
 			}
 		}

@@ -25,11 +25,11 @@ class BrickBuilder
 		State source = automaton.getState(shared_states[r][c]);
 		State dest = automaton.getState(shared_states[r][c + 1]);
 		LabeledEvent src_dst = reverse
-							 ? new LabeledEvent(dest.getId() + source.getId() + num)
-							 : new LabeledEvent(source.getId() + dest.getId() + num);
+							   ? new LabeledEvent(dest.getId() + source.getId() + num)
+							   : new LabeledEvent(source.getId() + dest.getId() + num);
 		LabeledEvent dst_src = reverse
-							 ? new LabeledEvent(source.getId() + dest.getId() + num)
-							 : new LabeledEvent(dest.getId() + source.getId() + num);
+							   ? new LabeledEvent(source.getId() + dest.getId() + num)
+							   : new LabeledEvent(dest.getId() + source.getId() + num);
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);
@@ -43,11 +43,11 @@ class BrickBuilder
 		State source = automaton.getState(shared_states[r][c]);
 		State dest = automaton.getState(shared_states[r + 1][c]);
 		LabeledEvent src_dst = reverse
-							 ? new LabeledEvent(dest.getId() + source.getId() + num)
-							 : new LabeledEvent(source.getId() + dest.getId() + num);
+							   ? new LabeledEvent(dest.getId() + source.getId() + num)
+							   : new LabeledEvent(source.getId() + dest.getId() + num);
 		LabeledEvent dst_src = reverse
-							 ? new LabeledEvent(source.getId() + dest.getId() + num)
-							 : new LabeledEvent(dest.getId() + source.getId() + num);
+							   ? new LabeledEvent(source.getId() + dest.getId() + num)
+							   : new LabeledEvent(dest.getId() + source.getId() + num);
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);

@@ -64,12 +64,14 @@ public class Actions
 
 	public Actions(Actions otherActions)
 	{
-		theActions = new HashSet((int)(otherActions.size()*1.5));
-		labelToActionMap = new HashMap((int)(otherActions.size()*1.5));
-		for (Iterator actIt = otherActions.iterator(); actIt.hasNext();)
+		theActions = new HashSet((int) (otherActions.size() * 1.5));
+		labelToActionMap = new HashMap((int) (otherActions.size() * 1.5));
+
+		for (Iterator actIt = otherActions.iterator(); actIt.hasNext(); )
 		{
-			Action currAction = (Action)actIt.next();
+			Action currAction = (Action) actIt.next();
 			Action newAction = new Action(currAction);
+
 			addAction(newAction);
 		}
 	}

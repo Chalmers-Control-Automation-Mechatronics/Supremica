@@ -550,6 +550,7 @@ public class Automaton
 	public void addListener(AutomatonListener listener)
 	{
 		Listeners currListeners = getListeners();
+
 		currListeners.addListener(listener);
 	}
 

@@ -96,6 +96,7 @@ public final class AutomataFastControllabilityCheckExecuter
 	public AutomataFastControllabilityCheckExecuter(AutomataSynchronizerHelper synchronizerHelper)
 	{
 		setPriority(Thread.MIN_PRIORITY);
+
 		helper = synchronizerHelper;
 		indexForm = helper.getAutomataIndexForm();
 		nbrOfAutomata = helper.getAutomata().size();

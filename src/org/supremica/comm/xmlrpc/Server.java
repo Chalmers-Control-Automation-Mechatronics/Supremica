@@ -58,126 +58,125 @@ import org.supremica.automata.*;
 
 public class Server
 {
-//	private VisualProjectContainer container;
-//	private WebServer theServer;
 
+	// private VisualProjectContainer container;
+	// private WebServer theServer;
 	public Server(VisualProjectContainer container, int port)
 		throws Exception
 	{
-//		this.container = container;
-//		theServer = new WebServer(port);
 
-//		theServer.addHandler("$default", this);
-	}
-/*
-	public Vector getAutomataIdentities()
-	{
-		Vector theIdentities = new Vector();
-		Iterator autIt = container.getActiveProject().iterator();
-
-		while (autIt.hasNext())
-		{
-			String currName = (String) autIt.next();
-
-			theIdentities.add(currName);
-		}
-
-		return theIdentities;
+		// this.container = container;
+		// theServer = new WebServer(port);
+		// theServer.addHandler("$default", this);
 	}
 
-	public String getAutomata(Vector automataIdentities)
-		throws XmlRpcException
-	{
-
-		// Construct an automata object
-		Automata theAutomata = new Automata();
-
-		for (int i = 0; i < automataIdentities.size(); i++)
-		{
-			String currName = (String) automataIdentities.get(i);
-			Automaton currAutomaton;
-
-			try
+	/*
+			public Vector getAutomataIdentities()
 			{
-				currAutomaton = container.getActiveProject().getAutomaton(currName);
-			}
-			catch (Exception e)
-			{
-				throw new XmlRpcException(0, currName + " does not exist.");
+					Vector theIdentities = new Vector();
+					Iterator autIt = container.getActiveProject().iterator();
+
+					while (autIt.hasNext())
+					{
+							String currName = (String) autIt.next();
+
+							theIdentities.add(currName);
+					}
+
+					return theIdentities;
 			}
 
-			theAutomata.addAutomaton(currAutomaton);
-		}
-
-		AutomataToXml exporter = new AutomataToXml(theAutomata);
-		StringWriter response = new StringWriter();
-		PrintWriter pw = new PrintWriter(response);
-
-		exporter.serialize(pw);
-
-		return response.toString();
-	}
-
-	public void addAutomata(String automataXmlEncoding)
-		throws XmlRpcException
-	{
-		StringReader reader = new StringReader(automataXmlEncoding);
-		Automata theAutomata;
-
-		try
-		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml(new ProjectProjectFactory());
-
-			theAutomata = builder.build(reader);
-		}
-		catch (Exception e)
-		{
-			throw new XmlRpcException(0, "Error while parsing automataXmlEncoding.");
-		}
-
-		Iterator autIt = theAutomata.iterator();
-
-		while (autIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-
-			try
+			public String getAutomata(Vector automataIdentities)
+					throws XmlRpcException
 			{
-				container.add(currAutomaton);
+
+					// Construct an automata object
+					Automata theAutomata = new Automata();
+
+					for (int i = 0; i < automataIdentities.size(); i++)
+					{
+							String currName = (String) automataIdentities.get(i);
+							Automaton currAutomaton;
+
+							try
+							{
+									currAutomaton = container.getActiveProject().getAutomaton(currName);
+							}
+							catch (Exception e)
+							{
+									throw new XmlRpcException(0, currName + " does not exist.");
+							}
+
+							theAutomata.addAutomaton(currAutomaton);
+					}
+
+					AutomataToXml exporter = new AutomataToXml(theAutomata);
+					StringWriter response = new StringWriter();
+					PrintWriter pw = new PrintWriter(response);
+
+					exporter.serialize(pw);
+
+					return response.toString();
 			}
-			catch (Exception e)
+
+			public void addAutomata(String automataXmlEncoding)
+					throws XmlRpcException
 			{
-				throw new XmlRpcException(0, currAutomaton.getName() + " does already exist.");
+					StringReader reader = new StringReader(automataXmlEncoding);
+					Automata theAutomata;
+
+					try
+					{
+							AutomataBuildFromXml builder = new AutomataBuildFromXml(new ProjectProjectFactory());
+
+							theAutomata = builder.build(reader);
+					}
+					catch (Exception e)
+					{
+							throw new XmlRpcException(0, "Error while parsing automataXmlEncoding.");
+					}
+
+					Iterator autIt = theAutomata.iterator();
+
+					while (autIt.hasNext())
+					{
+							Automaton currAutomaton = (Automaton) autIt.next();
+
+							try
+							{
+									container.add(currAutomaton);
+							}
+							catch (Exception e)
+							{
+									throw new XmlRpcException(0, currAutomaton.getName() + " does already exist.");
+							}
+					}
 			}
-		}
-	}
 
-	public void removeAutomata(Vector automataIdentities)
-		throws XmlRpcException
-	{
-		for (int i = 0; i < automataIdentities.size(); i++)
-		{
-			String currName = (String) automataIdentities.get(i);
-
-			try
+			public void removeAutomata(Vector automataIdentities)
+					throws XmlRpcException
 			{
-				container.remove(currName);
+					for (int i = 0; i < automataIdentities.size(); i++)
+					{
+							String currName = (String) automataIdentities.get(i);
+
+							try
+							{
+									container.remove(currName);
+							}
+							catch (Exception e)
+							{
+									throw new XmlRpcException(0, currName + " does not exist.");
+							}
+					}
 			}
-			catch (Exception e)
-			{
-				throw new XmlRpcException(0, currName + " does not exist.");
-			}
-		}
-	}
 
-	public void synchronizeAutomata(Vector automataIdentitites, String newautomatonIdentitity)
-		throws XmlRpcException {}
+			public void synchronizeAutomata(Vector automataIdentitites, String newautomatonIdentitity)
+					throws XmlRpcException {}
 
-	public void minimizeAutomaton(String automatonIdentity, String newIdentity)
-		throws XmlRpcException {}
+			public void minimizeAutomaton(String automatonIdentity, String newIdentity)
+					throws XmlRpcException {}
 
 
-*/
+	*/
 }
-
-

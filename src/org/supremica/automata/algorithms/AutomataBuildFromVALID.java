@@ -61,9 +61,7 @@ public class AutomataBuildFromVALID
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataBuildFromVALID.class);
 	private ProjectFactory theProjectFactory;
-
 	private Project currAutomata = null;
-
 	private SAXBuilder docBuilder;
 	private String filePath;
 

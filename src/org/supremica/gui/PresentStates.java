@@ -11,7 +11,6 @@ import javax.swing.table.*;
 import org.supremica.log.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.SearchStates;
-
 import org.supremica.gui.Presenter;
 
 class PresentStatesTableModel
@@ -161,17 +160,18 @@ class UserInterruptFrame
 }
 
 // 
-public class PresentStates extends Presenter
+public class PresentStates
+	extends Presenter
 {
 	private JFrame frame = null;
-	private SearchStates searchs = null; 
+	private SearchStates searchs = null;
 	private Automata automata = null;
 	private boolean dispose_frame = false;
 
 	public PresentStates(JFrame frame, SearchStates ss, Automata a)
 	{
 		super(ss);
-		
+
 		this.frame = frame;
 		this.searchs = ss;
 		this.automata = a;
@@ -183,21 +183,22 @@ public class PresentStates extends Presenter
 		{
 			frame = new PresentStatesFrame(searchs, automata);
 		}
-		else // it was not stopped but none found
+		else    // it was not stopped but none found
 		{
 			frame = new NoStatesFoundFrame();
 			dispose_frame = true;    // for some reason the frame cannot dispose of itself
 		}
+
 		execute();
 	}
-	
+
 	public void taskStopped()
 	{
 		frame = new UserInterruptFrame();
 		dispose_frame = true;
+
 		execute();
 	}
-	
 
 	public void execute()
 	{
@@ -208,7 +209,7 @@ public class PresentStates extends Presenter
 			frame.dispose();
 		}
 	}
-	
+
 	// Debugging only
 	private void conOut()
 	{

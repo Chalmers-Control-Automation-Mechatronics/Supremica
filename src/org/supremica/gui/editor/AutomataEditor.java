@@ -62,7 +62,6 @@ import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 
-
 public class AutomataEditor
 	extends JFrame
 	implements TableModelListener
@@ -79,7 +78,6 @@ public class AutomataEditor
 	public AutomataEditor(VisualProject theVisualProject)
 	{
 		this.theVisualProject = theVisualProject;
-
 		theActions = new EditorActions(this);
 
 		initMenus();
@@ -1108,18 +1106,19 @@ public class AutomataEditor
 	public void fileOpen()
 	{
 
-		//ActionMan.fileOpen(workbench);
+		// ActionMan.fileOpen(workbench);
 	}
 
 	public void fileSave()
 	{
-		//ActionMan.fileSave(workbench);
+
+		// ActionMan.fileSave(workbench);
 	}
 
 	public void fileSaveAs()
 	{
 
-		//ActionMan.fileSaveAs(workbench);
+		// ActionMan.fileSaveAs(workbench);
 	}
 
 	public void filePrint()

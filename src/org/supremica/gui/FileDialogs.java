@@ -317,7 +317,6 @@ public class FileDialogs
 		return spFilter;
 	}
 
-
 	private FileFilter getVPRJFilter()
 	{
 		if (vprjFilter == null)

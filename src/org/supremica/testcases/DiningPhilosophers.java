@@ -142,9 +142,9 @@ class Chopstick
 {
 	static State[] states = { new State("0"), new State("1") };
 	static LabeledEvent[] events = { new LabeledEvent("L_up"),
-								   new LabeledEvent("R_up"),
-								   new LabeledEvent("L_dn"),
-								   new LabeledEvent("R_dn") };
+									 new LabeledEvent("R_up"),
+									 new LabeledEvent("L_dn"),
+									 new LabeledEvent("R_dn") };
 	final static int L_TAKE = 0;
 	final static int R_TAKE = 1;
 	final static int L_PUT = 2;

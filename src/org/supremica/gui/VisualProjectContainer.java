@@ -143,6 +143,7 @@ public class VisualProjectContainer
 	public void addListener(VisualProjectContainerListener listener)
 	{
 		Listeners currListeners = getListeners();
+
 		currListeners.addListener(listener);
 	}
 

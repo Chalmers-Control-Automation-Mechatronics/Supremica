@@ -65,6 +65,7 @@ public class Action
 	public Action(String label, String command)
 	{
 		this(label);
+
 		addCommand(command);
 	}
 
@@ -73,7 +74,6 @@ public class Action
 		this.label = otherAction.label;
 		commands = new LinkedList(commands);
 	}
-
 
 	public String getLabel()
 	{
@@ -87,7 +87,8 @@ public class Action
 
 	public void removeCommand(String command)
 	{
-		commands.remove(command);;
+		commands.remove(command);
+		;
 	}
 
 	public Iterator commandIterator()

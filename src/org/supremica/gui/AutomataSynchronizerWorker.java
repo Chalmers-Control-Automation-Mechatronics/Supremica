@@ -64,10 +64,8 @@ public class AutomataSynchronizerWorker
 	extends Thread
 	implements Stoppable
 {
-
 	private Gui workbench = null;
 	private Automata theAutomata = null;
-
 	private String newAutomatonName = null;
 	private final static int MODE_SYNC = 1;
 	private final static int MODE_UPDATE = 2;
@@ -76,13 +74,10 @@ public class AutomataSynchronizerWorker
 	private SynchronizationOptions syncOptions;
 	private boolean stopRequested = false;
 
-	public AutomataSynchronizerWorker(Gui workbench,
-
-	Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
+	public AutomataSynchronizerWorker(Gui workbench, Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
-
 		this.newAutomatonName = newAutomatonName;
 		this.syncOptions = syncOptions;
 

@@ -65,22 +65,23 @@ public class Project
 	private Actions theActions = null;
 	private Controls theControls = null;
 
-	public Project()
-	{
-	}
+	public Project() {}
 
 	public Project(String name)
 	{
 		theActions = new Actions();
 		theControls = new Controls();
+
 		setName(name);
 	}
 
 	public Project(Project otherProject)
 	{
 		super(otherProject);
+
 		theActions = new Actions(otherProject.theActions);
 		theControls = new Controls(otherProject.theControls);
+
 		setName(otherProject.getName());
 	}
 
@@ -100,5 +101,4 @@ public class Project
 		theActions.clear();
 		theControls.clear();
 	}
-
 }

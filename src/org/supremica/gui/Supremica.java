@@ -75,6 +75,8 @@ public class Supremica
 	implements TableModelListener, Gui, VisualProjectContainerListener
 {
 	private final static InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
+	private static Logger logger = LoggerFactory.createLogger(Supremica.class);
+	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private JToolBar toolBar = new JToolBar();
@@ -88,8 +90,6 @@ public class Supremica
 	private TableModel fullTableModel;
 	private JScrollPane theAutomatonTableScrollPane;
 	private MenuHandler menuHandler;
-	private static Logger logger = LoggerFactory.createLogger(Supremica.class);
-	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JSplitPane splitPaneVertical;
 	private Server xmlRpcServer = null;
 	private ContentHelp help = null;
@@ -108,14 +108,16 @@ public class Supremica
 	public Supremica()
 	{
 		theVisualProjectContainer = new VisualProjectContainer();
+
 		theVisualProjectContainer.addListener(this);
+
 		VisualProject theVisualProject = new VisualProject("Single Visual Project");
+
 		theVisualProjectContainer.addProject(theVisualProject);
-		theVisualProjectContainer.setActiveProject(theVisualProject);
+		setActiveProject(theVisualProject);
 
-		//theVisualProjectContainer = currProject.getVisualProjectContainer();
-		//theVisualProjectContainer.addListener(this);
-
+		// theVisualProjectContainer = currProject.getVisualProjectContainer();
+		// theVisualProjectContainer.addListener(this);
 		logger.info("Supremica version: " + (new Version()).toString());
 
 		if (SupremicaProperties.isXmlRpcActive())
@@ -233,9 +235,31 @@ public class Supremica
 		return this;
 	}
 
+	public void setActiveProject(VisualProject activeProject)
+	{
+		theVisualProjectContainer.setActiveProject(activeProject);
+		updateTitle();
+	}
+
 	public VisualProject getActiveProject()
 	{
 		return theVisualProjectContainer.getActiveProject();
+	}
+
+	public void updateTitle()
+	{
+		Project currProject = getActiveProject();
+
+		if (currProject != null)
+		{
+			String projectName = currProject.getName();
+
+			setTitle("Supremica - " + projectName);
+		}
+		else
+		{
+			setTitle("Supremica");
+		}
 	}
 
 	private JFrame getCurrentFrame()
@@ -258,6 +282,7 @@ public class Supremica
 		contentPane.setOpaque(true);
 		contentPane.setBackground(Color.white);
 		setSize(new Dimension(800, 600));
+
 		// theVisualProjectContainer.updateFrameTitles();
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		contentPane.add(splitPaneVertical, BorderLayout.CENTER);
@@ -1230,27 +1255,6 @@ public class Supremica
 		}
 	}
 
-	public void importValidFile(File file)
-	{
-		logger.info("Importing " + file.getAbsolutePath() + " ...");
-
-		// int nbrOfAddedAutomata = 0;
-		try
-		{
-			AutomataBuildFromVALID builder = new AutomataBuildFromVALID(new VisualProjectFactory());
-			Automata currAutomata = builder.build(file);
-			int nbrOfAddedAutomata = addAutomata(currAutomata);
-
-			logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
-		}
-		catch (Exception e)
-		{
-			logger.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
-
-			return;
-		}
-	}
-
 	public VisualProjectContainer getVisualProjectContainer()
 	{
 		return theVisualProjectContainer;
@@ -1312,32 +1316,12 @@ public class Supremica
 			String newName = getActiveProject().getUniqueAutomatonName(autName);
 
 			currAutomaton.setName(newName);
-
-			Gui gui = getGui();
-
-			gui.info("Name conflict - " + autName + " does already exist. Changed name of new " + autName + " to " + newName + ".");
-
-			/*
-			 *  JOptionPane.showMessageDialog(this, autName + " already exists", "Alert",
-			 *  JOptionPane.ERROR_MESSAGE);
-			 *
-			 *  autName = getNewAutomatonName("Enter a new name", autName + "(2)");
-			 *  if (autName == null)
-			 *  {
-			 *  return false; // It's not ok to cancel!
-			 *  }
-			 *  else
-			 *  {
-			 *  currAutomaton.setName(autName);
-			 *  }
-			 */
+			logger.info("Name conflict - " + autName + " does already exist. Changed name of new " + autName + " to " + newName + ".");
 		}
 
 		try
-		{
+		{    // throws Exception if the automaton already exists
 			getActiveProject().addAutomaton(currAutomaton);
-
-			// throws Exception if the automaton already exists
 		}
 		catch (Exception excp)
 		{
@@ -1375,8 +1359,5 @@ public class Supremica
 		logger.info("Project renamed: " + theProject.getName());
 	}
 
-	public void updated(Object theObject)
-	{
-
-	}
+	public void updated(Object theObject) {}
 }

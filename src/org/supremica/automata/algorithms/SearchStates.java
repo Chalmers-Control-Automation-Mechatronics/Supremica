@@ -20,15 +20,16 @@ import org.supremica.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 import org.supremica.gui.MonitorableThread;
-//
+
+// 
 public class SearchStates
 	extends MonitorableThread
-	// implements Monitorable    // Stoppable
+
+// implements Monitorable    // Stoppable
 {
 	private AutomataSynchronizer syncher = null;
 	private IntArrayList list = null;
 	private Matcher matcher = null;
-
 	protected /* volatile */ boolean stopRequested = false;
 	protected boolean mode = false;    // false means sychronization mode, true is matching mode
 	protected int progress = 1;
@@ -37,6 +38,7 @@ public class SearchStates
 		throws Exception
 	{
 		setPriority(Thread.MIN_PRIORITY);
+
 		// !!Throws exception if automata is empty or has only one automaton!!
 		this.syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
 		this.matcher = m;
@@ -51,6 +53,7 @@ public class SearchStates
 		}
 		catch (Exception excp)
 		{
+
 			// How to work this (exception in a worker thread)??
 			return;
 		}
@@ -58,7 +61,7 @@ public class SearchStates
 
 	protected void match()
 	{
-		if(!stopRequested)
+		if (!stopRequested)
 		{
 			int num_total = syncher.getNumberOfStates();
 			int num_processed = 0;
@@ -74,10 +77,11 @@ public class SearchStates
 				{
 					list.add(composite_state);
 				}
+
 				progress = (int) ((++num_processed * 100) / num_total);
 			}
 
-			if(stopRequested)
+			if (stopRequested)
 			{
 				list = new IntArrayList();    // thread stopped - clear the list
 			}
@@ -86,11 +90,11 @@ public class SearchStates
 
 	public void run()    // throws Exception
 	{
-		mode = false; // start with synching mode - initializer above does not do the trick?
+		mode = false;    // start with synching mode - initializer above does not do the trick?
 
 		synchronize();
 
-		mode = true; // matching mode
+		mode = true;    // matching mode
 
 		match();
 	}
@@ -103,11 +107,11 @@ public class SearchStates
 
 	public String getActivity()
 	{
-		if(!mode) // synching mode
+		if (!mode)    // synching mode
 		{
 			return "Synching: " + syncher.getNumberOfStates() + " states checked";
 		}
-		else	// matching mode
+		else          // matching mode
 		{
 			return "Matching: " + progress + "% done";
 		}
@@ -115,8 +119,8 @@ public class SearchStates
 
 	public void stopTask()
 	{
-		// System.out.println("Stop requested");
 
+		// System.out.println("Stop requested");
 		stopRequested = true;
 
 		syncher.requestStop();
@@ -181,10 +185,10 @@ public class SearchStates
 	public StateIterator getStateIterator(int[] composite_state)
 	{
 
-		//
+		// 
 		State[][] states = syncher.getHelper().getIndexFormStateTable();
 
-		//
+		// 
 		return new StateIterator(states, composite_state);
 	}
 

@@ -104,7 +104,7 @@ public class ProjectToSP
 
 		pw.println(">");
 
-		for (Iterator projectIt = project.iterator(); projectIt.hasNext();)
+		for (Iterator projectIt = project.iterator(); projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
@@ -113,7 +113,7 @@ public class ProjectToSP
 			// Print all events
 			pw.println("\t<Events>");
 
-			for (	Iterator eventIt = aut.eventIterator(); eventIt.hasNext(); )
+			for (Iterator eventIt = aut.eventIterator(); eventIt.hasNext(); )
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
 
@@ -214,10 +214,10 @@ public class ProjectToSP
 			pw.println("\t</Transitions>");
 
 			// Print layout
-
 			if (includeLayout)
 			{
 				pw.println("\t<Layout>");
+
 				// Print State Layout
 				pw.println("\t\t<StatesLayout>");
 
@@ -226,10 +226,8 @@ public class ProjectToSP
 					State state = (State) stateIt.next();
 
 					pw.print("\t\t\t<StateLayout id=\"" + normalize(state.getId()) + "\"");
-
 					pw.print(" x=\"" + state.getX() + "\"");
 					pw.print(" y=\"" + state.getY() + "\"");
-
 					pw.println("/>");
 				}
 
@@ -237,39 +235,42 @@ public class ProjectToSP
 
 				// Print Transition Layout
 				pw.println("\t\t<TransitionsLayout>");
+
 				for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 				{
 					State sourceState = (State) stateIt.next();
-/*
-					for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
-					{
-						ArcSet currArcSet = (ArcSet) arcSets.next();
-						State fromState = currArcSet.getFromState();
-						State toState = currArcSet.getToState();
-						pw.println("\t\t\t<ArcSet from=\"" + fromState.getId() + "\" to=\"" + toState.getId() + "\">");
 
-						for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
-						{
-							Arc currArc = (Arc) arcIt.next();
-							LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
+					/*
+															for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
+															{
+																	ArcSet currArcSet = (ArcSet) arcSets.next();
+																	State fromState = currArcSet.getFromState();
+																	State toState = currArcSet.getToState();
+																	pw.println("\t\t\t<ArcSet from=\"" + fromState.getId() + "\" to=\"" + toState.getId() + "\">");
 
-							pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
-						}
+																	for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
+																	{
+																			Arc currArc = (Arc) arcIt.next();
+																			LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
 
-						pw.println("\t\t\t</ArcSet>");
-					}
-*/
+																			pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
+																	}
+
+																	pw.println("\t\t\t</ArcSet>");
+															}
+					*/
 					pw.println("\t\t</TransitionsLayout>");
 				}
 
 				pw.println("\t</Layout>");
 			}
+
 			pw.println("</Automaton>");
 		}
 
 		if (includeExecution)
 		{
-			for (Iterator projectIt = project.iterator(); projectIt.hasNext();)
+			for (Iterator projectIt = project.iterator(); projectIt.hasNext(); )
 			{
 				Automaton aut = (Automaton) projectIt.next();
 
@@ -277,35 +278,43 @@ public class ProjectToSP
 				pw.println("\t<Actions>");
 
 				Actions theActions = project.getActions();
+
 				if (theActions != null)
 				{
 					for (Iterator actionIt = theActions.iterator(); actionIt.hasNext(); )
 					{
-						Action currAction = (Action)actionIt.next();
+						Action currAction = (Action) actionIt.next();
+
 						pw.println("\t\t<Action label=\"" + normalize(currAction.getLabel()) + "\">");
+
 						for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
 						{
-							String currCommand = (String)cmdIt.next();
+							String currCommand = (String) cmdIt.next();
+
 							pw.println("\t\t\t<Command>" + normalize(currCommand) + "</Command>");
 						}
 
 						pw.println("\t\t</Action>");
 					}
 				}
+
 				pw.println("\t</Actions>");
 				pw.println("\t<Controls>");
 
 				Controls theControls = project.getControls();
+
 				if (theControls != null)
 				{
 					for (Iterator controlIt = theControls.iterator(); controlIt.hasNext(); )
 					{
-						Control currControl = (Control)controlIt.next();
+						Control currControl = (Control) controlIt.next();
+
 						pw.println("\t\t<Control label=\"" + normalize(currControl.getLabel()) + "\">");
 						pw.println("\t\t\t<Condition>" + normalize(currControl.getCondition()) + "</Condition>");
 						pw.println("\t\t</Action>");
 					}
 				}
+
 				pw.println("\t</Controls>");
 				pw.println("</Execution>");
 			}
