@@ -31,8 +31,8 @@ public class TestAlgo {
 		"../examples/c3.xml"
 
 		};
-	private final long reachables[] = { 25731072, 18, 199, 2274519862886400L, 10000000, -1, -1};
-	private final long coreachables[] = { 343692864, 20, 432, 2274519862886400L, 10000000, -1, -1};
+	private final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, -1, -1};
+	private final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1, -1};
 	private final boolean controllable[] = { false, false, false, true, true, true, true};
 	private final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */, true /* dont know */};
 
@@ -76,13 +76,13 @@ public class TestAlgo {
 	}
 
 
-	private void testR(long states_r) {
+	private void testR(double states_r) {
 		if(states_r < 0) return;
 
 		System.out.print("R ");
 
 		int bdd_r = supervisor.getReachables();
-		long got = automata2.count_states(bdd_r);
+		double got = automata2.count_states(bdd_r);
 		if(got != states_r) {
 			System.err.println("ERROR: [reachability] " + got + " states reachable, expected " + states_r);
 			fail ++;
@@ -91,13 +91,13 @@ public class TestAlgo {
 		pass++;
 	}
 
-	private void testCR(long states_cr) {
+	private void testCR(double states_cr) {
 		if(states_cr < 0) return;
 
 		System.out.print("coR ");
 
 		int bdd_r = supervisor.getCoReachables();
-		long got = automata2.count_states(bdd_r);
+		double got = automata2.count_states(bdd_r);
 		if(got != states_cr) {
 			System.err.println("ERROR: [co-reachability] " + got + " states reachable, expected " + states_cr);
 			fail ++;
@@ -106,7 +106,7 @@ public class TestAlgo {
 		pass++;
 	}
 
-	private void testNB(long states_r, long states_cr, boolean result) {
+	private void testNB(double states_r, double states_cr, boolean result) {
 		if(states_r < 0 || states_cr < 0) return;
 
 		System.out.print("NB ");

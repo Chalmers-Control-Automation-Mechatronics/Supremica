@@ -534,7 +534,7 @@ public class BDDAutomata
 	Options.out.println(name + " " + count_states(bdd));
     }
 
-    public long count_states(int bdd)
+    public double count_states(int bdd)
 	{
 
 	    switch(Options.count_algo) {
@@ -548,7 +548,7 @@ public class BDDAutomata
 		if(states != -1)
 		    states /= Math.pow(2, 2 * size_states + size_events);
 		deref(new_bdd);
-		return (long) states;
+		return states;
 	    case Options.COUNT_EXACT:
 		// the hard/boring/slow way :(
 		Counter c = new Counter();

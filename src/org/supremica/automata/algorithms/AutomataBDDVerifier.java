@@ -103,7 +103,7 @@ public class AutomataBDDVerifier {
 		int r = sup.getReachables();
 		if(hd != null)
 		{
-			hd.setNumberOfReachableStates(ba.count_states(r));
+			hd.setNumberOfReachableStates((long)ba.count_states(r));
 		}
 
 		int c = sup.getCoReachables();
@@ -113,8 +113,8 @@ public class AutomataBDDVerifier {
 
 		if(hd != null)
 		{
-			hd.setNumberOfDeadlockedStates(ba.count_states(not_c));
-			hd. setNumberOfCheckedStates(ba.count_states(intersection));
+			hd.setNumberOfDeadlockedStates((long)ba.count_states(not_c));
+			hd. setNumberOfCheckedStates((long)ba.count_states(intersection));
 		}
 
 		if(intersection != ba.getZero()) {
@@ -174,8 +174,8 @@ public class AutomataBDDVerifier {
 		int Q_r = sup.getReachables();
 		if(hd != null)
 		{
-			hd.setNumberOfCheckedStates(ba.count_states(states));
-			hd.setNumberOfReachableStates(ba.count_states(Q_r));
+			hd.setNumberOfCheckedStates((long)ba.count_states(states));
+			hd.setNumberOfReachableStates((long)ba.count_states(Q_r));
 		}
 
 		if(!ret && Options.trace_on)
