@@ -53,12 +53,12 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 
-public class StateIterator
+public class ArcIterator
 	implements Iterator
 {
 	private final Iterator theIterator;
 
-	public StateIterator(Iterator theIterator)
+	public ArcIterator(Iterator theIterator)
 	{
 		this.theIterator = theIterator;
 	}
@@ -74,10 +74,16 @@ public class StateIterator
 		return theIterator.next();
 	}
 
-	public State nextState()
+	public Arc nextArc()
 		throws NoSuchElementException
 	{
-		return (State)next();
+		return (Arc)next();
+	}
+
+	public LabeledEvent nextEvent()
+		throws NoSuchElementException
+	{
+		return (LabeledEvent)nextArc().getEvent();
 	}
 
 	public void remove()

@@ -107,9 +107,9 @@ public class ArcSet
 		return theArcs.size();
 	}
 
-	public Iterator iterator()
+	public ArcIterator iterator()
 	{
-		return theArcs.iterator();
+		return new ArcIterator(theArcs.iterator());
 	}
 
 	/*

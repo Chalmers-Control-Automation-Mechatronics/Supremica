@@ -393,9 +393,9 @@ public class State
 		return null;
 	}
 
-	public Iterator outgoingArcsIterator()
+	public ArcIterator outgoingArcsIterator()
 	{
-		return outgoingArcs.iterator();
+		return new ArcIterator(outgoingArcs.iterator());
 	}
 
 	public Iterator outgoingArcSetIterator()
@@ -403,14 +403,14 @@ public class State
 		return outgoingArcSets.iterator();
 	}
 
-	public Iterator safeOutgoingArcsIterator()
+	public ArcIterator safeOutgoingArcsIterator()
 	{
-		return ((LinkedList) outgoingArcs.clone()).iterator();
+		return new ArcIterator(((LinkedList) outgoingArcs.clone()).iterator());
 	}
 
-	public Iterator incomingArcsIterator()
+	public ArcIterator incomingArcsIterator()
 	{
-		return incomingArcs.iterator();
+		return new ArcIterator(incomingArcs.iterator());
 	}
 
 	public int nbrOfIncomingArcs()

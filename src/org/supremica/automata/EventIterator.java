@@ -83,7 +83,7 @@ public class EventIterator
 	public void remove()
 		throws UnsupportedOperationException, IllegalStateException
 	{
-		theIterator.remove();
+		throw new UnsupportedOperationException();
 	}
 
 }

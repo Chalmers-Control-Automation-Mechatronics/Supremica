@@ -131,9 +131,9 @@ public class Automaton
 				State orgSourceState = (State) states.next();
 				State newSourceState = getStateWithId(orgSourceState.getId());
 
-				for (Iterator outgoingArcs = orgSourceState.outgoingArcsIterator(); outgoingArcs.hasNext(); )
+				for (ArcIterator outgoingArcs = orgSourceState.outgoingArcsIterator(); outgoingArcs.hasNext(); )
 				{
-					Arc orgArc = (Arc) outgoingArcs.next();
+					Arc orgArc = outgoingArcs.nextArc();
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
 
@@ -399,9 +399,9 @@ public class Automaton
 
 	public boolean hasSelfLoop()
 	{
-		for(Iterator arcIt = theArcs.iterator(); arcIt.hasNext();)
+		for(ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext();)
 		{
-			Arc currArc = (Arc)arcIt.next();
+			Arc currArc = arcIt.nextArc();
 			if (currArc.isSelfLoop())
 			{
 				return false;
@@ -418,9 +418,9 @@ public class Automaton
 		{
 			State currState = stateIt.nextState();
 			foundEvents.clear();
-			for (Iterator evIt = outgoingEventsIterator(currState); evIt.hasNext(); )
+			for (EventIterator evIt = outgoingEventsIterator(currState); evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = (LabeledEvent)evIt.next();
+				LabeledEvent currEvent = evIt.nextEvent();
 				boolean newElement = foundEvents.add(currEvent.getLabel());
 				if (!newElement)
 				{
@@ -985,13 +985,13 @@ public class Automaton
 	public LabeledEvent getLabeledEvent(State fromState, State toState)
 		throws Exception
 	{
-		for (Iterator arcIt = fromState.outgoingArcsIterator(); arcIt.hasNext();)
+		for (ArcIterator arcIt = fromState.outgoingArcsIterator(); arcIt.hasNext();)
 		{
-			Arc currArc = (Arc)arcIt.next();
+			Arc currArc = arcIt.nextArc();
 			State currToState = currArc.getToState();
 			if (currToState == toState)
 			{
-				return currArc.getEvent(); // getEvent(currArc.getEventId());
+				return currArc.getEvent();
 			}
 		}
 		return null;
