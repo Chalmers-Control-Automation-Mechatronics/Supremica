@@ -582,7 +582,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 	}
 
 
-	public Object visitVARIABLE(ASTvariable n, Object o) throws Exception{
+	public Object visitVARIABLE(ASTvariable n, Object o) {
 		String typeName = null;
 
 		if (!n.isDirectVariable()) {
@@ -599,7 +599,6 @@ public class VariableChecker implements SimpleNodeVisitor {
 					    )) {
 						success = false;
 						System.err.println("Error: Undeclared variable: " + n.getName());
-						throw new Exception("Undeclared variable: " + n.getName());
 					}
 				}
 			else if (((VCinfo)o).blockType == "functionBlock")
@@ -608,7 +607,6 @@ public class VariableChecker implements SimpleNodeVisitor {
 					if (!fbVariables.containsKey(n.getName())) {
 						success = false;
 						System.err.println("Error: Undeclared variable: " + n.getName());
-						throw new Exception("Undeclared variable: " + n.getName());
 					}
 
 					typeName = (String)fbVariables.get(n.getName());

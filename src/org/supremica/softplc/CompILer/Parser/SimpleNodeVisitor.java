@@ -93,8 +93,7 @@ public interface SimpleNodeVisitor
 
 	Object visitVAR1_LIST(ASTvar1_list n, Object o);
 
-	Object visitVARIABLE(ASTvariable n, Object o)
-		throws Exception;
+	Object visitVARIABLE(ASTvariable n, Object o);
 
 	Object visitVARIABLE_NAME(ASTvariable_name n, Object o);
 }
