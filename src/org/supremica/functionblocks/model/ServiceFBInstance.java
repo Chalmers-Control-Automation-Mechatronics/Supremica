@@ -55,17 +55,9 @@ package org.supremica.functionblocks.model;
 /**
  * @author cengic
  */
-public class ServiceFBInstance extends FBInstance
+public class ServiceFBInstance // extends FBInstance
 {
-	
-	public void handleEvent()
-	{
 
-	}
-	
-	public void queueEvent(String inputEvent)
-	{
-		
-	}
-	
+
+
 }

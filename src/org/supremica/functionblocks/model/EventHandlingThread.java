@@ -73,10 +73,6 @@ class EventHandlingThread extends Thread
     {
 	while (true)
 	{
-	    FBInstance selectedFB = scheduler.selectFBInstanceToHandleEvent();
-	    selectedFB.handleEvent();
-	    scheduler.notifyFinished();
-	    //resource.handleConfigurationRequests();
 	}
     }   
 }

@@ -55,17 +55,7 @@ package org.supremica.functionblocks.model;
 /**
  * @author cengic
  */
-public class CompositeFBInstace extends FBInstance
+public class CompositeFBInstace //extends FBInstance
 {
-	
-	public void handleEvent() 
-	{
-
-	}
-
-	public void queueEvent(String inputEvent)
-	{
-		
-	}
 
 }

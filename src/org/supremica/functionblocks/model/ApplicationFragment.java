@@ -46,16 +46,44 @@
  *
  * Supremica is owned and represented by KA.
  */
-
+/**
+ * @author cengic
+ */
 /*
  * Created on Dec 16, 2004
  */
 package org.supremica.functionblocks.model;
 
-/**
- * @author cengic
- */
+import java.util.Map;
+import java.util.HashMap;
 public class ApplicationFragment
 {
+
+	private Resource resource;
+	// instances
+	private Map fbInstances = new HashMap();
+
+	private ApplicationFragment() {}
+	
+	public ApplicationFragment(Resource res)
+	{
+		resource = res;
+	}
+
+	public void addFBInstance(String name,String fbType)
+	{
+		fbInstances.put(name,resource.getFBType(fbType).createInstance(name));
+	}
+
+	public FBInstance getFBInstance(String name)
+	{
+		return (FBInstance) fbInstances.get(name);
+	}
+
+	public void addFBConnection(String fromInstance,String fromOutput, String toInstance, String toInput)
+	{
+		Connection newConn = new Connection(getFBInstance(toInstance), toInput);
+		getFBInstance(fromInstance).addEventOutputConnection(fromOutput, newConn);
+	}
 
 }

@@ -53,32 +53,33 @@ import java.util.*;
 /**
  * @author Cengic
  */
-public class Resource
+public class Resource extends NamedObject
 {
 	
-	private String name;
 	private Scheduler scheduler;
-	private List applicationFragments = new ArrayList();
-	
-	BasicFBInstance fbInstance;
-	
+	private Map fbTypes = new HashMap();
+	private Map appFragments = new HashMap();
+
 	private Resource() {}
 	
 	public Resource(String name)
 	{
 		System.out.println("Resource(" + name + ")");
 
-		this.name = name;
+		setName(name);
 		scheduler = new Scheduler(this);
 
 		// creat the test application
 	
 		// FB types
-		BasicFBType fbType = new BasicFBType("P1", this);
+		addBasicFBType("P1");
+		BasicFBType fbType = (BasicFBType) getFBType("P1");
+
 		// only one event input and output for now
 		fbType.addVariable("OCCURRED", new BooleanVariable("EventInput",false));
 		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
 		fbType.addVariable("invoked", new IntegerVariable("Local",0));
+
 		// Build ECC 
 		fbType.getECC().addInitialState("INIT");
 		fbType.getECC().addState("STATE");
@@ -86,13 +87,20 @@ public class Resource
 		fbType.getECC().addTransition("STATE", "INIT", "TRUE");
 		fbType.getECC().getState("STATE").addAction(new TestAlgorithm(), "DONE");
 
-		// FB instances
-		fbInstance = fbType.createInstance("P1inst");
+		// FB application fragment
+		addApplicationFragment("AppFrag");
+		ApplicationFragment appFrag =  getApplicationFragment("AppFrag");
+ 
+		// add FB instances to app frag
+		appFrag.addFBInstance("inst1","P1");
+		appFrag.addFBInstance("inst2","P1");
 
 		// connections
-		fbInstance.addEventOutputConnection("DONE", new Connection(fbInstance,"OCCURRED"));
+		appFrag.addFBConnection("inst1","DONE","inst2","OCCURRED");
+		appFrag.addFBConnection("inst2","DONE","inst1","OCCURRED");
 
-		fbInstance.queueEvent("OCCURRED");
+		// kick off 
+		appFrag.getFBInstance("inst1").queueEvent("OCCURRED");
 	
 		//Interpreter tester
 		//new Tester();
@@ -120,4 +128,25 @@ public class Resource
 	{
 		return scheduler;
 	}
+	
+	public void addApplicationFragment(String name)
+	{
+		appFragments.put(name, new ApplicationFragment(this));
+	}
+
+	public ApplicationFragment getApplicationFragment(String name)
+	{
+		return (ApplicationFragment) appFragments.get(name);
+	}
+
+	public void addBasicFBType(String name)
+	{
+		fbTypes.put(name,new BasicFBType(name,this));
+	}
+
+	public FBType getFBType(String name)
+	{
+		return (FBType) fbTypes.get(name);
+	}
+
 }

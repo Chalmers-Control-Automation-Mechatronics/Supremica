@@ -57,28 +57,29 @@ package org.supremica.functionblocks.model;
 
 class AlgorithmExecutingThread extends Thread
 {
-
-    private Scheduler scheduler = null;
-    
-    private AlgorithmExecutingThread() {}
-    
-    public AlgorithmExecutingThread(Scheduler s)
-    {
-        scheduler = s;
-	setName("AlgorithmExecuting");
-	start();
-    }
-    
-    public void run()
-    {
-    	while (true) 
+	
+	private Scheduler scheduler = null;
+	
+	private AlgorithmExecutingThread() {}
+	
+	public AlgorithmExecutingThread(Scheduler s)
 	{
-	    if (scheduler.getNumberOfScheduledJobs() > 0)
-	    {
-		Job currentJob = scheduler.getNextScheduledJob();
-		currentJob.getAlgorithm().execute(currentJob.getVariables());
-		scheduler.addFinishedJob(currentJob);
-	    }
-	}	
-    }   
+		scheduler = s;
+		setName("AlgorithmExecuting");
+		start();
+	}
+	
+	public void run()
+	{
+		while (true) 
+		{
+			if (scheduler.getNumberOfScheduledJobs() > 0)
+			{
+				Job currentJob = scheduler.getNextScheduledJob();
+				System.out.println("AlgorithmExecutingThread: executing " +currentJob.getInstance().getName() + " algorithm");
+				currentJob.getAlgorithm().execute(currentJob.getVariables());
+				currentJob.getInstance().finishedJob(currentJob);
+			}
+		}	
+	}   
 }

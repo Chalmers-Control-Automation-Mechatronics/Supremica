@@ -46,11 +46,9 @@ import java.util.*;
 
 public abstract class FBType extends NamedObject
 {
-
-    Resource resource;
-    String comment;
-    List versionInfo = new LinkedList();
-    
-    //public abstract FBInstance createInstance(String name);
-
+	
+	Resource resource;
+	
+	public abstract FBInstance createInstance(String name);
+	
 }

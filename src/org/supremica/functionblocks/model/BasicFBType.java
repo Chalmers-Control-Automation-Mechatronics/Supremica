@@ -70,7 +70,7 @@ public class BasicFBType extends FBType
 	// Constructors
 	private BasicFBType() {}
 
-	public BasicFBType(String name, Resource r)
+	public BasicFBType(String name,Resource r)
 	{
 		System.out.println("BasicFBType(" + name + "," + r.getName()  + ")");
 		this.name = name;
@@ -80,7 +80,7 @@ public class BasicFBType extends FBType
 
 
 	// Methods 
-	public BasicFBInstance createInstance(String name)
+	public FBInstance createInstance(String name)
 	{
 		System.out.println("BasicFBType.createInstace(" + name + ")");
 		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
@@ -89,16 +89,6 @@ public class BasicFBType extends FBType
 
 		//System.out.println("BasicFBType.createInstace(" + name + "): cloning variables");
 		newInstance.setVariables((Variables) variables.clone());
-		//    for all InputEvents make queueus
-		for(Iterator iter = variables.iterator();iter.hasNext();)
-		{
-			String curName = (String) iter.next();
-			Variable curVar = variables.getVariable(curName);
-			if (curVar.getType().equals("EventInput"))
-			{
-				newInstance.addEventInputQueue(curName);
-			}
-		}
 
 		return newInstance;
 	}

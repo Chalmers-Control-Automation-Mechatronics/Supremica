@@ -61,10 +61,10 @@ public class Scheduler
 {
 	private Resource resource;
 	
+	private List scheduledFBInstances = new LinkedList();
 	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
-	private List finishedJobs = Collections.synchronizedList(new LinkedList());
+	//private List finishedJobs = Collections.synchronizedList(new LinkedList());
 	
-	//private EventHandlingThread eventThread = null; // maybe not needed
 	private AlgorithmExecutingThread algorithmThread = null;
 	
 	
@@ -90,7 +90,7 @@ public class Scheduler
 		return (Job) scheduledJobs.remove(0);
 	}
 	
-	
+	/*
 	public void addFinishedJob(Job j)
 	{
 		synchronized(finishedJobs)
@@ -98,23 +98,25 @@ public class Scheduler
 			finishedJobs.add(j);
 		}
 	}
+	*/
 	
-	
-	public FBInstance selectFBInstanceToHandleEvent()
+	public synchronized FBInstance getNextScheduledFBInstance()
 	{
-		//System.out.print("Scheduler.selectFBInstanceToHandleEvent(): ");
-		// TODO: implement selection algorithm
-		if(resource.fbInstance.isHandlingEvent())
-		{
-			
-			//System.out.println("all FB instances are busy handling an event!");
-			return null;
-		} 
-		//System.out.println("Scheduler.selectFBInstanceToHandleEvent(): found idle FB instance!");
-		return resource.fbInstance;
+		while(scheduledFBInstances.size() == 0)
+		{			
+			try
+			{
+				wait();
+			}
+			catch(InterruptedException e)
+			{
+				System.err.println("Scheduler: InterruptedException");
+			}
+		}
+		return (FBInstance) scheduledFBInstances.remove(0);
 	}
 	
-	
+	/*
 	public void notifyFinished()
 	{
 		
@@ -130,24 +132,18 @@ public class Scheduler
 			}
 		}
 	}
-	
+	*/
 	
 	public void runEvents()
 	{
 		System.out.println("Scheduler.runEvents()");
 		while (true)
 		{
-			BasicFBInstance selectedFBInstance = (BasicFBInstance) selectFBInstanceToHandleEvent();
+			FBInstance selectedFBInstance = getNextScheduledFBInstance();
 			if(selectedFBInstance != null)
 			{
 				selectedFBInstance.handleEvent();
 			}
-			else
-			{
-				//System.out.println("Scheduler.runEvents(): no instances to shedule");
-				//try{ Thread.sleep(1); } catch(Exception e) {}
-			}
-			notifyFinished();
 			//resource.handleConfigurationRequests();
 		}
 	}
@@ -157,5 +153,11 @@ public class Scheduler
 		//System.out.println("Scheduler.scheduleJob()");
 		scheduledJobs.add(j);
 	}
-    
+
+	public synchronized void scheduleFBInstance(FBInstance fbInst)
+	{
+		scheduledFBInstances.add(fbInst);
+		notify();
+	}
+   
 }

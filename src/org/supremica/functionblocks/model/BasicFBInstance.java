@@ -51,7 +51,7 @@ public class BasicFBInstance extends FBInstance
 	private Resource resource;
 	private BasicFBType fbType;
 
-	private Map eventInputQueues = new HashMap();
+	private EventQueue eventInputQueue = new EventQueue();
 
 	private Map eventOutputConnections = new HashMap();
 	private Map dataInputConnections = new HashMap();
@@ -85,11 +85,6 @@ public class BasicFBInstance extends FBInstance
 		variables.addVariable(name,var);
 	}
 	
-	public void addEventInputQueue(String event)
-	{
-		eventInputQueues.put(event,new EventQueue());
-	}
-
 	public void addEventOutputConnection(String output, Connection cnt)
 	{
 		eventOutputConnections.put(output,cnt);
@@ -108,13 +103,19 @@ public class BasicFBInstance extends FBInstance
 	public void queueEvent(String eventInput)
 	{
 		//System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
-		EventQueue tempQueue = (EventQueue) eventInputQueues.get(eventInput);
-		if(tempQueue != null)
-		{
-			tempQueue.add(new Event(eventInput));
-		}
+		if(variables.getVariable(eventInput) != null)
+			if(variables.getVariable(eventInput).getType().equals("EventInput"))
+			{
+				eventInputQueue.add(new Event(eventInput));
+				resource.getScheduler().scheduleFBInstance(this);
+			}
+			else
+			{
+				System.out.println("BasicFBInstance: No event input " + eventInput);
+				System.exit(0);
+			}
 		else
-		{
+ 		{
 			System.out.println("BasicFBInstance: No event input " + eventInput);
 			System.exit(0);
 		}
@@ -123,8 +124,13 @@ public class BasicFBInstance extends FBInstance
 	public void handleEvent()
 	{
 		//System.out.println("BasicFBInstance.handleEvent()");
-		
-		currentEvent = selectEventToHandle();
+		if(handlingEvent)
+		{
+			resource.getScheduler().scheduleFBInstance(this);
+			return;			
+		}
+
+		currentEvent = getNextEvent();
 		if(currentEvent != null)
 		{
 			handlingEvent = true;
@@ -150,16 +156,9 @@ public class BasicFBInstance extends FBInstance
 		handleState();
 	}
 
-	private Event selectEventToHandle()
+	private Event getNextEvent()
 	{
-		//System.out.println("BasicFBInstace.selectEventToHandle()");
-		// TODO: Implement better event selection
-		// For the skeleton the first event of the first queue will do
-		if( ((EventQueue) eventInputQueues.get("OCCURRED")).size() > 0 )
-		{
-			return  ((EventQueue) eventInputQueues.get("OCCURRED")).remove();
-		}
-		return null;
+		return  (Event) eventInputQueue.remove();
 	}
 	
 	private void getDataVariables(Event event)
