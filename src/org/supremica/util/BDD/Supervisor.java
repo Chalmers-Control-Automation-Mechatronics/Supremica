@@ -1009,13 +1009,16 @@ public class Supervisor
 		x = manager.orTo(x, implicitly_forbidden);
 		manager.deref(implicitly_forbidden);
 
-
 		int itr = 0;
 		do
 		{
 			xp = x;
 			itr++;
 
+			// NOTE: we have two ways of doing the inner-loop
+
+			/*
+			// METHOD ONE: straightforward implementation
 			int qp_k = restrictedBackward(marked, x);
 			int not_qp_k = manager.not(qp_k);
 			manager.deref(qp_k);
@@ -1023,6 +1026,27 @@ public class Supervisor
 			int qpp_k = uncontrollableBackward(not_qp_k);
 			x = manager.orTo(x, qpp_k);
 			manager.deref(qpp_k);
+			*/
+
+			// METHOD TWO: get out of the loop as soon as you can
+			int qp_k = uncontrollableBackward(x);
+
+			if(itr > 1 &&  (qp_k == x))
+			{
+				if(Options.debug_on)
+				{
+					Options.out.println("[Supervisor] exiting supNBC loop, restrictedBackward() cannot change the results");
+				}
+				manager.deref(qp_k);
+				break;
+			}
+
+			int qpp_k = restrictedBackward(marked, qp_k);
+			manager.deref(qp_k);
+
+			x = manager.not(qpp_k);
+			manager.deref(qpp_k);
+
 
 			if (gf != null)
 			{
