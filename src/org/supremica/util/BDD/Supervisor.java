@@ -287,6 +287,34 @@ public class Supervisor
 		return bdd_coreachables;
 	}
 
+    /*
+      // DONT KNOW IF THESE ARE NEEDED
+    protected int getTotalT() {
+	int ret = 0;
+	if(plant.isEmpty()) {
+	    ret = spec.getT();
+	    manager.ref(ret);
+	} else if(spec.isEmpty()) {
+	    ret = plant.getT();
+	    manager.ref(ret);
+	} else {
+	    ret = manager.and(spec.getT(), plant.getT());
+	}
+	return ret;
+    }
+
+    protected int getTotalTNoEvents() {
+	int ret = 0;
+	if(plant.isEmpty()) 
+	    ret = manager.exists(spec.getT(),  manager.getEventCube());
+	else if(spec.isEmpty()) 
+	    ret = manager.exists(plant.getT(),  manager.getEventCube());
+	else 
+	    ret = manager.relProd(spec.getT(), plant.getT(), manager.getEventCube() );
+
+	return ret;
+    }
+    */
 	private void computeCoReachables()
 	{
 		GrowFrame gf = null;;
@@ -302,8 +330,16 @@ public class Supervisor
 		int permute1 = manager.getPermuteS2Sp();
 		int permute2 = manager.getPermuteSp2S();
 		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
-		int m_all = spec.getM();    // assume all states in Plant are marked
-		int r_all_p, r_all = manager.replace(m_all, permute1);    // gets derefed in first orTo ??
+
+		// This one is tricky:
+		// if spec is empty, then we cant assume that all events in P are marked
+		// because then everything is marked (there is no spec, remember?)
+		int m_all = spec.isEmpty() ? plant.getM() : spec.getM();
+
+
+		// gets derefed in first orTo ??
+		int r_all_p, r_all = manager.replace(m_all, permute1);    
+
 
 		// manager.ref(r_all);
 		do
