@@ -216,10 +216,16 @@ public class BDDAutomaton
 	}
 
 	// ------------------------------------------------------------------
-    public DependencySet getDependencySet() {
-	if(dependency == null) dependency = new DependencySet(manager,this);
-	return dependency;
+    public DependencySet getDependencySet()
+    {
+		if(dependency == null) dependency = new DependencySet(manager,this);
+		return dependency;
     }
+
+	public boolean eventUsed(Event e)
+	{
+		return automaton.eventUsed(e);
+	}
 
 	public int[] getVar()
 	{

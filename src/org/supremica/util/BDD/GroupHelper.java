@@ -23,69 +23,69 @@ public class GroupHelper {
 
     public GroupHelper(Group g1, Group g2) {
 
-	// We actually need a priority vector, but who cares (N is small anyway) :)
-	all = new Vector(g1.getSize() + g2.getSize());
+		// We actually need a priority vector, but who cares (N is small anyway) :)
+		all = new Vector(g1.getSize() + g2.getSize());
 
-	BDDAutomaton [] tmp = g1.getMembers();
-	for(int i = 0; i < g1.getSize(); i++) all.addElement( tmp[i]);
+		BDDAutomaton [] tmp = g1.getMembers();
+		for(int i = 0; i < g1.getSize(); i++) all.addElement( tmp[i]);
 
-	tmp = g2.getMembers();
-	for(int i = 0; i < g2.getSize(); i++) all.addElement( tmp[i]);
+		tmp = g2.getMembers();
+		for(int i = 0; i < g2.getSize(); i++) all.addElement( tmp[i]);
 
-	sort();
+		sort();
     }
 
     public GroupHelper(BDDAutomaton [] a) {
 
-	// We actually need a priority vector, but who cares (N is small anyway) :)
-	all = new Vector(a.length);
-	for(int i = 0; i < a.length; i++) all.addElement( a[i]);
+		// We actually need a priority vector, but who cares (N is small anyway) :)
+		all = new Vector(a.length);
+		for(int i = 0; i < a.length; i++) all.addElement( a[i]);
 
-	sort();
+		sort();
     }
 
     private void sort() {
-	size  = all.size();
-	tpri  = new int[size];
-	cube  = new int[size];
-	cubep = new int[size];
+		size  = all.size();
+		tpri  = new int[size];
+		cube  = new int[size];
+		cubep = new int[size];
 
-	sorted_list = new BDDAutomaton[size];
+		sorted_list = new BDDAutomaton[size];
 
-	for(int i = 0; i < size; i++) {
-	    BDDAutomaton a = popLargest();
-	    sorted_list[i] = a;
-	    tpri[i]  = a.getTpri();
-	    cube[i]  = a.getCube();
-	    cubep[i] = a.getCubep();
-	}
+		for(int i = 0; i < size; i++) {
+			BDDAutomaton a = popLargest();
+			sorted_list[i] = a;
+			tpri[i]  = a.getTpri();
+			cube[i]  = a.getCube();
+			cubep[i] = a.getCubep();
+		}
 
-	twave = null; // NOT computed unless needed!
+		twave = null; // NOT computed unless needed!
     }
 
     // --------------------------------------------------------------------------
     public int getSize()
     {
-	return size;
+		return size;
     }
     public int [] getTpri()
     {
-	return tpri;
+		return tpri;
     }
 
     public int [] getCube()
     {
-	return cube;
+		return cube;
     }
 
     public int [] getCubep()
     {
-	return cubep;
+		return cubep;
     }
 
 
     public BDDAutomaton [] getSortedList() {
-	return sorted_list;
+		return sorted_list;
     }
 
     /** get ~T (disjunctive T). <br>
@@ -93,27 +93,27 @@ public class GroupHelper {
      * (internal: you dont need to cleanup after this function, its done elsewhere)
      */
     public int [] getTwave() {
-	if(twave == null) {
-	    twave = new int[size];
-	    for(int i = 0; i < size; i++)
-		twave[i] = sorted_list[i].getDependencySet().getTwave();
-	}
-	return twave;
+		if(twave == null) {
+			twave = new int[size];
+			for(int i = 0; i < size; i++)
+			twave[i] = sorted_list[i].getDependencySet().getTwave();
+		}
+		return twave;
     }
     // ---------------------------------------------------------------------------
     // a PriorityQueue, my kingdom for a PriorityQueue...
     private BDDAutomaton popLargest() {
-	Enumeration e = all.elements();
-	BDDAutomaton s = (BDDAutomaton) e.nextElement();
+		Enumeration e = all.elements();
+		BDDAutomaton s = (BDDAutomaton) e.nextElement();
 
-	while(e.hasMoreElements()) {
-	    BDDAutomaton c = (BDDAutomaton) e.nextElement();
-	    if(c.getIndex() > s.getIndex())
-		s = c;
-	}
+		while(e.hasMoreElements()) {
+			BDDAutomaton c = (BDDAutomaton) e.nextElement();
+			if(c.getIndex() > s.getIndex())
+			s = c;
+		}
 
-	all.removeElement(s);
-	return s;
+		all.removeElement(s);
+		return s;
     }
 
 
@@ -121,11 +121,11 @@ public class GroupHelper {
      * this is to allow different models of marked state to be controlled from the same place
      */
     public static int getM(JBDD m, Group spec, Group plant) {
-	// This one is tricky:
-	// if spec is empty, then we cant assume that all events in P are marked
-	// because then everything is marked (there is no spec, remember?)
-	int m_all = spec.isEmpty() ? plant.getM() : spec.getM();
-	m.ref(m_all);
-	return m_all;
+		// This one is tricky:
+		// if spec is empty, then we cant assume that all events in P are marked
+		// because then everything is marked (there is no spec, remember?)
+		int m_all = spec.isEmpty() ? plant.getM() : spec.getM();
+		m.ref(m_all);
+		return m_all;
     }
 }

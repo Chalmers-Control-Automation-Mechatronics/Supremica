@@ -224,6 +224,19 @@ public class AutomataSynthesizer
 	public AutomataSynthesizer(Gui gui, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws Exception, IllegalArgumentException
 	{
+
+
+		// initialization stuff that need no computation
+		this.theAutomata = theAutomata;
+		this.synchronizationOptions = synchronizationOptions;
+		this.synthesizerOptions = synthesizerOptions;
+		this.gui = gui;
+		this.nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
+		this.theVisualProjectContainer = gui.getVisualProjectContainer();
+		this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
+
+
+
 		if (!theAutomata.isEventControllabilityConsistent())
 		{
 			throw new IllegalArgumentException("The automata are not consistent in the controllbility of an event.");
@@ -233,24 +246,35 @@ public class AutomataSynthesizer
 			throw new IllegalArgumentException("The automata are not consistent in the controllbility of an event.");
 		}
 
+		// evil BDD code inserted here by Arash
+		if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
+		{
+
+			if(synthesizerOptions.getSynthesisType() !=  SynthesisType.Both)
+			{
+				throw new IllegalArgumentException("BDD algorithms currently only support sup NBC symthesis.");
+			}
+			// now, Do BDD Specific initialization here and skip the other stuff
+			return;
+		}
+
+
+
+
+		// initialization stuff that do need extra computation and thus ignored when
+		// doing BDD conputation...
+
 		Automaton currAutomaton;
 		State currInitialState;
 
-		// Fix this later
-		synthesizerOptions.setRememberDisabledEvents(true);
-
-		this.theAutomata = theAutomata;
-		this.synchronizationOptions = synchronizationOptions;
-		this.synthesizerOptions = synthesizerOptions;
-		initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
-
-		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
-		this.gui = gui;
-		theVisualProjectContainer = gui.getVisualProjectContainer();
-		maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
-
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
 		SynthesisAlgorithm synthesisAlgorithm = synthesizerOptions.getSynthesisAlgorithm();
+
+		// Fix this later
+		synthesizerOptions.setRememberDisabledEvents(true);
+		initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
+
+
 
 		//-- MF -- Should this be tested here? There should be no possibility selecting invalid combinations!
 		if (!AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm))
@@ -299,12 +323,20 @@ public class AutomataSynthesizer
 		{
 			return false; // Not implemented (yet)
 		}
+
+		else if (algorithm == SynthesisAlgorithm.BDD)
+		{
+			return true;
+		}
+
 		else if (algorithm == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
 			return true;
 		}
 
-		else if (algorithm == SynthesisAlgorithm.Monolithic)
+		else if (algorithm == SynthesisAlgorithm.Modular)
+		// Was this really correct ? :
+		// else if (algorithm == SynthesisAlgorithm.Monolithic)
 		{
 			// same as monolithic. in fact, anything but the NBC uses the monolithic code :)
 			return true;
@@ -440,6 +472,15 @@ public class AutomataSynthesizer
 			{
 				logger.info("NOTE! Currently global nonblocking is NOT guaranteed. The only guarantee is that each supervisor is individually nonblocking with respect to the plants it controls");
 			}
+		}
+		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) // more BDD Stuff
+		{
+			theTimer.start();
+			AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata);
+			bddSynthesizer.execute();
+			bddSynthesizer.cleanup();
+
+			theTimer.stop();
 		}
 		else
 		{
@@ -617,4 +658,5 @@ public class AutomataSynthesizer
 			}
 		}
 	}
+
 }

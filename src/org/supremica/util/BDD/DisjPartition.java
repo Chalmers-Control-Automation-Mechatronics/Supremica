@@ -26,7 +26,6 @@ public class DisjPartition {
 
 
 		/* compute the clusters */
-
 		Vector cv= new Vector();
 		Cluster [] old = dop.getClusters();
 		if(max_size > 0) {
@@ -51,10 +50,15 @@ public class DisjPartition {
 
 
     public void cleanup() {
-
 		for(int i = 0; i < curr; i++) clusters[i].cleanup();
 		curr = 0;
     }
+
+	/** DEBUG
+    public void check(String place){
+		for(int i = 0; i < curr; i++) clusters[i].check(place);
+	}
+	*/
     // --------------------------------------------------
 
     public int getNumberOfClusters() { return curr; }

@@ -16,44 +16,77 @@ public class DisjOptimizer {
     private int [] twave, twave2;
 	private Cluster [] clusters;
 
+	// DEBUG public BDDRefCheck refcheck;
+
     public DisjOptimizer(BDDAutomata manager, GroupHelper gh) {
-	this.gh = gh;
-	this.manager = manager;
+		this.gh = gh;
+		this.manager = manager;
 
-	max_size = size = gh.getSize();
+		max_size = size = gh.getSize();
 
-	twave = new int[size];
-	twave2 = new int[size];
-	clusters = new Cluster[size];
+		twave = new int[size];
+		twave2 = new int[size];
+		clusters = new Cluster[size];
 
-	int [] tmp = gh.getTwave();
-	int [] cube = gh.getCube();
-	int [] cubep = gh.getCubep();
-	BDDAutomaton [] automata = gh.getSortedList();
+		int [] tmp = gh.getTwave();
+		int [] cube = gh.getCube();
+		int [] cubep = gh.getCubep();
+		BDDAutomaton [] automata = gh.getSortedList();
 
-	for(int i = 0; i < size; i++) {
-		clusters[i] = new Cluster(manager, twave[i] = tmp[i], cube[i], cubep[i]);
-		clusters[i].members.addElement( automata[i] );
-	    manager.ref(twave[i]);
-	}
+ 		// DEBUG refcheck = new BDDRefCheck(manager, "DisjOptimizer");
 
-	optimize();
+		for(int i = 0; i < size; i++) {
+			// make this copy our own
+			twave[i] = tmp[i];
+			manager.ref(twave[i]);
+
+			// THIS solves many problmes (why?)
+			// manager.ref( cube[i] );
+
+			clusters[i] = new Cluster(manager, twave[i], cube[i], cubep[i]);
+			clusters[i].members.addElement( automata[i] );
+
+			// DEBUG:
+			// refcheck.add( twave[i]);
+			// refcheck.add( cube[i]);
+			// refcheck.add( cubep[i]);
+
+		}
+
+		optimize();
+		// DEBUG check("After optimize");
+
     }
+
 
     public void cleanup() {
-	for(int i = 0; i < size; i++) {
-	    manager.deref(twave[i]);
-	    clusters[i].cleanup();
-	}
+		// DEBUG check("cleanup()");
+		for(int i = 0; i < size; i++) {
+			manager.deref(twave[i]);
+			clusters[i].cleanup();
+		}
     }
+
+	// ----------------------------------------------------
+
+	/** DEBUG
+	public void check(String place){
+		refcheck.check(place);
+		for(int i = 0; i < size; i++) clusters[i].check(place);
+	}
+	*/
+
+	// ----------------------------------------------------
 
     public int getSize()
     {
+		// DEBUG check("getSize()");
 		return size;
     }
 
     public Cluster [] getClusters()
     {
+		// DEBUG check("getClusters()");
 		return clusters;
 	}
     // ----------------------------------------------------

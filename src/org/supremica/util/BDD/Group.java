@@ -11,12 +11,12 @@ public class Group
 	private boolean has_t, has_tu, has_m;
 
 
-    public Group(BDDAutomata manager, BDDAutomaton [] automata, String name) 
+    public Group(BDDAutomata manager, BDDAutomaton [] automata, String name)
     {
 	this(manager, automata, null, name);
-	
+
     }
-    public Group(BDDAutomata manager, BDDAutomaton [] automata, GroupMembership member, String name) 
+    public Group(BDDAutomata manager, BDDAutomaton [] automata, GroupMembership member, String name)
     {
 	this(manager, automata.length, name);
 	init();
@@ -56,12 +56,13 @@ public class Group
 	}
 
 
-    private void init() {	
+    private void init() {
     	// no pre-calculations are valid
-	has_t = false;
-	has_tu = false;
-	has_m = false;
+		has_t = false;
+		has_tu = false;
+		has_m = false;
     }
+
 	// Note: strange things will happen if you try to use this object _after_ calling cleanup :)
 	public void cleanup()
 	{
@@ -82,7 +83,7 @@ public class Group
 
 		size++;
 
-		bdd_i = manager.andTo(bdd_i, a.getI());	
+		bdd_i = manager.andTo(bdd_i, a.getI());
 		bdd_cube = manager.andTo(bdd_cube, a.getCube());
 		bdd_cubep = manager.andTo(bdd_cubep, a.getCubep());
 		bdd_sigma   = manager.orTo(bdd_sigma, a.getSigma());
@@ -107,17 +108,18 @@ public class Group
 			has_tu = false;
 		}
 
-		if(has_m) 
-		    {
+		if(has_m)
+		{
 			manager.deref(bdd_m);
 			has_m = false;
-		    }
+		}
 	}
 
-    public boolean isEmpty() 
+    public boolean isEmpty()
     {
-	return size == 0;
+		return size == 0;
     }
+
 	public int getSize()
 	{
 		return size;
@@ -137,7 +139,6 @@ public class Group
 	{
 		return bdd_i;
 	}
-
 
 
 	public int getSigma()
@@ -167,17 +168,18 @@ public class Group
 		{
 		    computeM();
 		}
-	    
+
 		return bdd_m;
 	}
+
     private void computeM() {
-	bdd_m = manager.getOne();
+		bdd_m = manager.getOne();
 
-	for (int i = size - 1; i >= 0; --i)
-	    bdd_m = manager.andTo(bdd_m, members[i].getM());
+		for (int i = size - 1; i >= 0; --i)
+			bdd_m = manager.andTo(bdd_m, members[i].getM());
 
-	has_m = true;
-    }
+		has_m = true;
+	}
 	// -------------------------------------------------------------------
 	public int getTu()
 	{

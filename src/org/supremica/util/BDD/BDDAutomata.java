@@ -240,6 +240,7 @@ public class BDDAutomata
 
 	public void cleanup()
 	{
+
 		for (int i = 0; i < components; i++)
 		{
 			automata[i].cleanup();
@@ -533,6 +534,89 @@ public class BDDAutomata
 		}
 
 		return zero;    /* UNREACHABLE ? */
+	}
+
+
+	// --------------------------------------------------------
+	// This is used by the state extraction routins, so we dont
+	// push to much stuff on the stack during recusrive calls
+	private class StateListRecusionData {
+		int current, max;
+		String [] names;
+		BDDAutomaton [] automata;
+		IncompleteStateList result;
+		int bdd;
+	};
+
+	// -------------------------------------------------------- build incomplete state list for this event
+	IncompleteStateList getIncompleteStateList(int bdd, Event event)
+	{
+
+
+		BDDAutomaton [] involved = new BDDAutomaton[components];
+		int count = 0;
+		for(int i = 0; i < components; i++)
+		{
+			/* NOT working, we must have the aother automata too!
+			if(automata[i].eventUsed(event))
+			{
+				involved[count++] = automata[i];
+			}
+			*/
+			involved[count++] = automata[i];
+		}
+
+
+		IncompleteStateList ret = new IncompleteStateList(involved, count);
+
+		int tmpbdd = relProd( bdd, event.bdd, bdd_events_cube);
+		if(tmpbdd != getZero() && count > 0)
+		{
+			StateListRecusionData slrd = new StateListRecusionData();
+			slrd.names = new String[count];
+			slrd.automata = involved;
+			slrd.bdd = tmpbdd;
+			slrd.result = ret;
+			slrd.current = 0;
+			slrd.max = count;
+			extract_states_rec(slrd);
+
+		}
+		deref(tmpbdd);
+
+		return ret;
+	}
+
+	/**
+	 * Arash says:
+	 *
+	 * THIS ALGORITHM IS HORREIBLY INEFFICIENT !!!
+	 * its BAD, BAD, BAD. If it could get any worse, it would use hungerian notation!
+	 *
+     */
+	private void extract_states_rec(StateListRecusionData slrd)
+		// int bdd, int count, String [] names, IncompleteStateList result)
+	{
+		if(slrd.current >= slrd.max)
+		{
+			slrd.result.insert(slrd.names);
+		} else {
+			State[] states = slrd.automata[slrd.current].getStates();
+			for (int i = 0; i < states.length; i++)
+			{
+				int tmp = and(slrd.bdd, states[i].bdd_s);
+
+				if (tmp != zero)
+				{
+					slrd.names[slrd.current] = states[i].name;
+					int old = slrd.bdd; slrd.bdd = tmp; slrd.current++;
+					extract_states_rec(slrd);
+					slrd.bdd = old; slrd.current--;
+				}
+
+				deref(tmp);
+			}
+		}
 	}
 
 	// -------------------------------------------------------- show_transitions

@@ -10,8 +10,12 @@ public class Cluster {
 	public int twave, cube, cubep;
 	private BDDAutomata manager;
 
+	// DEBUG private BDDRefCheck refcheck;
+
 	public Cluster(BDDAutomata manager, int t, int c, int cp) {
+
 		this.manager = manager;
+
 		members = new Vector();
 
 		this.twave = t;
@@ -21,9 +25,22 @@ public class Cluster {
 		manager.ref(this.twave);
 		manager.ref(this.cube);
 		manager.ref(this.cubep);
+
+
+		// DEBUG:
+		// refcheck = new BDDRefCheck(manager, "A Cluster");
+		// refcheck.add(this.twave);
+		// refcheck.add(this.cube);
+		// refcheck.add(this.cubep);
 	}
 
+
 	public void cleanup() {
+
+		// DEBUG
+		// check("cleanup");
+
+
 		manager.deref(twave);
 		manager.deref(cube);
 		manager.deref(cubep);
@@ -40,6 +57,8 @@ public class Cluster {
 
 	/* !!!! NOTE: this function is compleletly UNTESTED :(  !!!!*/
 	public void join(Cluster with) {
+		// System.err.println("UNTESTED joining of " +toString() + " AND " + with.toString() );
+
 		Util.append( members, with.members);
 		cube  = manager.andTo(cube,  with.cube);
 		cubep = manager.andTo(cubep, with.cubep);
@@ -61,6 +80,15 @@ public class Cluster {
 	}
 
 
+	// ------------------------------------------------
+	/** DEBUG
+	public void check(String place)
+	{
+		refcheck.check(place);
+	}
+	*/
+	// ------------------------------------------------
+
 	public int getTwave()
 	{
 		return twave;
@@ -76,6 +104,7 @@ public class Cluster {
 		return cubep;
 	}
 
+	// ------------------------------------------------
 
 	public String toString()
 	{
@@ -90,6 +119,4 @@ public class Cluster {
 		buf.append(")");
 		return buf.toString();
 	}
-
-
 };

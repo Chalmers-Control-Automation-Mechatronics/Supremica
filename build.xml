@@ -47,6 +47,7 @@
 	Line Register = 2
 	Column Register = 3
 -->
+<property name="build.compiler.emacs" value="true"/>
 <!--
 <property name="build.compiler.emacs" value="true"/>
 <property name="build.compiler.pedantic" value="false"/>

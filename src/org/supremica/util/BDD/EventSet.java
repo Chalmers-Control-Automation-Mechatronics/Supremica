@@ -103,13 +103,20 @@ public class EventSet
 		return events[index];
 	}
 
-    public boolean overlap(EventSet es) {
-	for(int t = 0; t < total; t++)
-	    if(events[t] != null && es.events[t] != null)
-		return true;
+    public boolean overlap(EventSet es)
+    {
+		for(int t = 0; t < total; t++)
+		    if(events[t] != null && es.events[t] != null)
+			return true;
 
-	return false;
+		return false;
     }
+
+    public boolean overlap(Event e)
+    {
+		return events[e.id] != null;
+    }
+
  	// -------------------------------------------------------
 
 	void close(EventManager alphabet)

@@ -47,96 +47,97 @@ public class DisjSupervisor extends ConjSupervisor {
 
     // --------------------------------------------------------
     protected void computeReachables() {
-	// statistic stuffs
-	GrowFrame gf = null;
-	if(Options.show_grow)
-	    gf = new GrowFrame("Forward reachability (disjunctive)");
-
-	timer.reset();
-	DisjPartition dp = getDisjPartition();
-	SizeWatch.setOwner("DisjSupervisor.computeReachables");
 
 
-	int i_all   = manager.and(plant.getI(), spec.getI());
+		// statistic stuffs
+		GrowFrame gf = null;
+		if(Options.show_grow)
+			gf = new GrowFrame("Forward reachability (disjunctive)");
 
-	int r_all_p, r_all = i_all, front = i_all;
-	manager.ref(i_all); //gets derefed by orTo and finally a deref
-	manager.ref(front); // get derefed
-
-
-	do {
-	    r_all_p = r_all;
-
-	    int new_front = dp.image(front);
-	    r_all = manager.orTo(r_all, new_front);
-	    manager.deref(front);
-	    front = new_front;
-
-	    if(gf != null)    gf.add( manager.nodeCount( r_all));
-	} while(r_all_p != r_all);
+		timer.reset();
+		DisjPartition dp = getDisjPartition();
+		SizeWatch.setOwner("DisjSupervisor.computeReachables");
 
 
-	manager.deref(front);
-	manager.deref(i_all);
+		int i_all   = manager.and(plant.getI(), spec.getI());
 
-	has_reachables = true;
-	bdd_reachables = r_all;
+		int r_all_p, r_all = i_all, front = i_all;
+		manager.ref(i_all); //gets derefed by orTo and finally a deref
+		manager.ref(front); // get derefed
 
-	SizeWatch.report(bdd_reachables, "Qr");
-	timer.report("Forward reachables found (disjunctive)");
-	// SizeWatch.report(r_all, "R");
 
+		do {
+			r_all_p = r_all;
+
+			int new_front = dp.image(front);
+			r_all = manager.orTo(r_all, new_front);
+			manager.deref(front);
+			front = new_front;
+
+			if(gf != null)    gf.add( manager.nodeCount( r_all));
+		} while(r_all_p != r_all);
+
+
+		manager.deref(front);
+		manager.deref(i_all);
+
+		has_reachables = true;
+		bdd_reachables = r_all;
+
+		SizeWatch.report(bdd_reachables, "Qr");
+		timer.report("Forward reachables found (disjunctive)");
+		// SizeWatch.report(r_all, "R");
     }
 
     protected void computeCoReachables() {
-	GrowFrame gf = null;;
-	if(Options.show_grow) gf = new GrowFrame("backward reachability (disjuncted)");
 
-	timer.reset();
-	DisjPartition dp = getDisjPartition();
-	SizeWatch.setOwner("DisjSupervisor.computecoReachables");
+		GrowFrame gf = null;
+		if(Options.show_grow) gf = new GrowFrame("backward reachability (disjuncted)");
 
-	int permute1 = manager.getPermuteS2Sp();
-	int permute2 = manager.getPermuteSp2S();
+		timer.reset();
+		DisjPartition dp = getDisjPartition();
+		SizeWatch.setOwner("DisjSupervisor.computecoReachables");
 
-	int m_all = GroupHelper.getM(manager, spec, plant);
+		int permute1 = manager.getPermuteS2Sp();
+		int permute2 = manager.getPermuteSp2S();
 
-	// gets derefed in first orTo, but replace addes its own ref
-	int r_all_p, r_all = manager.replace(m_all, permute1);
-	int front = r_all;
+		int m_all = GroupHelper.getM(manager, spec, plant);
 
-	manager.deref(m_all); // we dont need m_all anymore
-	manager.ref(front); // gets derefed sson
+		// gets derefed in first orTo, but replace addes its own ref
+		int r_all_p, r_all = manager.replace(m_all, permute1);
+		int front = r_all;
 
-	SizeWatch.report(r_all, "Qm");
+		manager.deref(m_all); // we dont need m_all anymore
+		manager.ref(front); // gets derefed sson
+
+		SizeWatch.report(r_all, "Qm");
 
 
-	do {
+		do {
 
-	    r_all_p = r_all;
-	    int new_front = dp.preImage(front);
-	    r_all = manager.orTo(r_all, new_front);
-	    manager.deref(front);
-	    front = new_front;
-	    if(gf != null)    gf.add( manager.nodeCount( r_all));
-	} while(r_all != r_all_p);
+			r_all_p = r_all;
+			int new_front = dp.preImage(front);
+			r_all = manager.orTo(r_all, new_front);
+			manager.deref(front);
+			front = new_front;
+			if(gf != null)    gf.add( manager.nodeCount( r_all));
+		} while(r_all != r_all_p);
 
-	// move the result from S' to S:
-	int ret = manager.replace(r_all, permute2);
+		// move the result from S' to S:
+		int ret = manager.replace(r_all, permute2);
 
-	// cleanup:
-	manager.deref(front);
-	manager.deref(r_all);
+		// cleanup:
+		manager.deref(front);
+		manager.deref(r_all);
 
-	has_coreachables = true;
-	bdd_coreachables = ret;
+		has_coreachables = true;
+		bdd_coreachables = ret;
 
-	SizeWatch.report(bdd_reachables, "Qco");
-	timer.report("Co-reachables found (disjuncted)");
+		SizeWatch.report(bdd_reachables, "Qco");
+		timer.report("Co-reachables found (disjuncted)");
 
-	if(gf != null) gf.stopTimer();
-	// SizeWatch.report(bdd_coreachables,"Coreachables");
-    }
-
+		if(gf != null) gf.stopTimer();
+		// SizeWatch.report(bdd_coreachables,"Coreachables");
+	}
 
 }

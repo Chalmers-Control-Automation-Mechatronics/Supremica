@@ -8,9 +8,9 @@ import java.util.*;
 /**
  * Disjunctive transition relation
  * NO CLUSTRING exists yet, so these algorithms may be SLOWER than the
- * monolitich versions!
+ * monolithic versions!
  */
-public class ConjSupervisor 
+public class ConjSupervisor
     extends Supervisor
 {
 
@@ -22,47 +22,47 @@ public class ConjSupervisor
 
     /** Constructor, passes to the base-class */
     public ConjSupervisor(BDDAutomata manager, Group plant, Group spec) {
-	super(manager, plant, spec);
-	init_conj();
+		super(manager, plant, spec);
+		init_conj();
     }
     /** Constructor, passes to the base-class */
     public ConjSupervisor(BDDAutomata manager, BDDAutomaton[] automata) {
-	super(manager, automata);
-	init_conj();
+		super(manager, automata);
+		init_conj();
     }
 
     // -----------------------------------------------------------------
     private void init_conj() {
-	conj_partition = null; // not needed yet
-	// get the ordred automata list!
-	gh = new GroupHelper(plant, spec);
-	tpri = gh.getTpri();
-	conj_size = gh.getSize();
+		conj_partition = null; // not needed yet
+		// get the ordred automata list!
+		gh = new GroupHelper(plant, spec);
+		tpri = gh.getTpri();
+		conj_size = gh.getSize();
     }
 
     // -----------------------------------------------------------------
     public void cleanup() {
-	if(conj_partition != null) {
-	    conj_partition.cleanup();
-	    conj_partition = null;
-	}
-	super.cleanup();
+		if(conj_partition != null) {
+			conj_partition.cleanup();
+			conj_partition = null;
+		}
+		super.cleanup();
     }
     protected ConjPartition getConjPartition() {
-	if(conj_partition == null) computeConjPartition();
-	return conj_partition;
+		if(conj_partition == null) computeConjPartition();
+		return conj_partition;
     }
-    
+
     private void computeConjPartition() {
-	conj_partition = new ConjPartition(manager, conj_size);
-	for(int i = 0; i < conj_size; i++) 
-	    conj_partition.add ( tpri[i]);
-	conj_partition.report(); // show some states
+		conj_partition = new ConjPartition(manager, conj_size);
+		for(int i = 0; i < conj_size; i++)
+		    conj_partition.add ( tpri[i]);
+		conj_partition.report(); // show some states
     }
     // -----------------------------------------------------------------
     // TODO
 
-    // protected int computeLanguageDifference(int considred_events) 
+    // protected int computeLanguageDifference(int considred_events)
     //	public int getBR1(int marked, int forbidden)
     // public int getBR2(int forbidden)
     // public int getDeadlocks()
@@ -71,8 +71,8 @@ public class ConjSupervisor
 
 
     /** compute language difference without building the total T (or the two T:s in our case)*/
-    /* NOT WORKING 
-    protected int computeLanguageDifference(int considred_events) 
+    /* NOT WORKING
+    protected int computeLanguageDifference(int considred_events)
     {
 	BDDAutomaton [] Sp = spec.getMembers();
 	BDDAutomaton [] P  = plant.getMembers();
@@ -112,49 +112,49 @@ public class ConjSupervisor
 
     protected void computeReachables()
     {
-	
-	// Note: we remove events from t_all, it is needed for forward reachability
-	GrowFrame gf = null;
-	
-	if (Options.show_grow)
-	    gf = new GrowFrame("Conjunctive forward reachability");
-	
-	
-	timer.reset();
-	ConjPartition cp = getConjPartition();		
-	SizeWatch.setOwner("ConjSupervisor.computeReachables");
 
-	int i_all = manager.and(plant.getI(), spec.getI());
-	int r_all_p, r_all = i_all, front = i_all;
-	manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
-	manager.ref(front); // gets derefed 
+		// Note: we remove events from t_all, it is needed for forward reachability
+		GrowFrame gf = null;
 
-	do {
-	    r_all_p = r_all;
-	    
-	    int tmp2 = cp.image(front);
-	    r_all = manager.orTo(r_all, tmp2);
-	    manager.deref(front);
-	    front = tmp2; 
-	    
-	    if (gf != null)
-		gf.add(manager.nodeCount(r_all));
-	} while (r_all_p != r_all);
-	
+		if (Options.show_grow)
+			gf = new GrowFrame("Conjunctive forward reachability");
 
-	manager.deref(i_all);
-	manager.deref(front);
-	
-	has_reachables = true;
-	bdd_reachables = r_all;
-	
-	SizeWatch.report(bdd_reachables, "Qr");
-	timer.report("[Conjunctive] forward reachables found");
+
+		timer.reset();
+		ConjPartition cp = getConjPartition();
+		SizeWatch.setOwner("ConjSupervisor.computeReachables");
+
+		int i_all = manager.and(plant.getI(), spec.getI());
+		int r_all_p, r_all = i_all, front = i_all;
+		manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
+		manager.ref(front); // gets derefed
+
+		do {
+			r_all_p = r_all;
+
+			int tmp2 = cp.image(front);
+			r_all = manager.orTo(r_all, tmp2);
+			manager.deref(front);
+			front = tmp2;
+
+			if (gf != null)
+			gf.add(manager.nodeCount(r_all));
+		} while (r_all_p != r_all);
+
+
+		manager.deref(i_all);
+		manager.deref(front);
+
+		has_reachables = true;
+		bdd_reachables = r_all;
+
+		SizeWatch.report(bdd_reachables, "Qr");
+		timer.report("[Conjunctive] forward reachables found");
     }
 
 
 
-    	protected void computeCoReachables()
+    protected void computeCoReachables()
 	{
 		GrowFrame gf = null;;
 
@@ -170,7 +170,7 @@ public class ConjSupervisor
 
 		int permute1 = manager.getPermuteS2Sp();
 		int permute2 = manager.getPermuteSp2S();
-	      
+
 		int m_all = GroupHelper.getM(manager, spec, plant);
 		int r_all_p, r_all = manager.replace(m_all, permute1);  // r_all refed
 		int front = r_all;
@@ -183,7 +183,7 @@ public class ConjSupervisor
 		do
 		{
 			r_all_p = r_all;
-			
+
 			int tmp = cp.preImage(front);
 			r_all = manager.orTo(r_all, tmp);
 			manager.deref(front);
@@ -201,7 +201,7 @@ public class ConjSupervisor
 
 		int ret = manager.replace(r_all, permute2);
 		manager.deref(r_all);
-		
+
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
@@ -215,4 +215,4 @@ public class ConjSupervisor
 	}
 
 }
-                   
+

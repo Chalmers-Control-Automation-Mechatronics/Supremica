@@ -120,7 +120,7 @@ public class Supervisor
 
 		return bdd_uncontrollables;
 	}
-    
+
 	protected void computeUncontrollables()
 	{
 		timer.reset();
@@ -140,7 +140,7 @@ public class Supervisor
 	}
 
 
-    protected int computeLanguageDifference(int considred_events) 
+    protected int computeLanguageDifference(int considred_events)
     {
 	int t_sp = spec.getT();
 	int t_p = plant.getT();
@@ -149,41 +149,41 @@ public class Supervisor
 	int sigma_cube = manager.getEventCube();
 
 
-	
+
 	SizeWatch.setOwner("Supervisor.computeLanguageDifference");
 	SizeWatch.report(t_sp, "Tsp");
 	SizeWatch.report(t_p, "Tp");
 
 	int tmp10 = manager.exists(t_sp, cubep_sp);
-	int tmp1 = manager.not(tmp10);	
+	int tmp1 = manager.not(tmp10);
 	manager.deref(tmp10);
 	SizeWatch.report(tmp1, "~Eq'sp. Tsp");
 
-	int tmp2 = manager.and(tmp1, considred_events);	
+	int tmp2 = manager.and(tmp1, considred_events);
 	manager.deref(tmp1);
 
 	SizeWatch.report(tmp2, "~Eq'sp. Tsp ^ (sigma in some Sigma)");
 
 	int cube2 = manager.and(sigma_cube, cubep_p);
 	int tmp4 = manager.relProd(t_p, tmp2, cube2);
-	
+
 	manager.deref(tmp2);
-	manager.deref(cube2);	
+	manager.deref(cube2);
 
 	SizeWatch.report(tmp4, "(Language diff)");
 
 	return tmp4;
-	
+
     }
 
     /**
      * We use the same base as our controllability routine to check if Plant includes Spec
      * <b>important note</b>: the plant and spec need not to be the actual plant and spec!
      * we only use this conevntion to reuse the controllability code!!
-     */ 
-    private int getLanguageDifference() 
+     */
+    private int getLanguageDifference()
     {
-	timer.reset();		
+	timer.reset();
 	int ret = computeLanguageDifference(plant.getSigma());
 	timer.report("Uncontrollable states found");
 	return ret;
@@ -199,11 +199,11 @@ public class Supervisor
     public int computeReachableLanguageDifference() {
 	int ld = getLanguageDifference();
 	if(ld == manager.getZero()) {
-	    // nothing there, so we dont need the intersection with reachables 
+	    // nothing there, so we dont need the intersection with reachables
 	    // to get the reachable difference
 	    return ld;
 	}
-	
+
 	int r = getReachables();
 	int intersection = manager.and(ld,r);
 	manager.deref(ld);
@@ -306,10 +306,10 @@ public class Supervisor
 
     // ----------------------------------------------------
 
-    /** 
+    /**
      * Used for verification: returns unknown amount of unreachables that are controllable
      * returns 0 only if there are no such states.
-     * Use this function to VERIFY, not SYNTHESIS anything that has to do 
+     * Use this function to VERIFY, not SYNTHESIS anything that has to do
      * with uncontrollable states
      * NOTE: returned value must be de-refed by user
      */
@@ -322,7 +322,7 @@ public class Supervisor
 		return bdd_reachable_uncontrollables;
 	    }
 
-	// If we are optimistic (we dont expect any reachable uncontrollables, its 
+	// If we are optimistic (we dont expect any reachable uncontrollables, its
 	// probably better to go for the complete search (which gurantees controllablilty)
 	// then do iterative tests
 
@@ -335,7 +335,7 @@ public class Supervisor
 	    int u_some = getUncontrollableStates();
 	    return getReachableSubset(u_some); // need no extra ref (not shared)
 	}
-	
+
     }
 
     // -----------------------------------------------------------
@@ -359,7 +359,7 @@ public class Supervisor
 		// note: dont use timer here (get reseted in two places below)
 		int r_all = getReachables();
 		int u_all = getUncontrollableStates();
-	
+
 
 		bdd_reachable_uncontrollables = manager.and(r_all, u_all);
 
@@ -403,9 +403,9 @@ public class Supervisor
 		SizeWatch.setOwner("Supervisor.computeCoReachables");
 		SizeWatch.report(t_all, "T");
 		SizeWatch.report(m_all, "Qm");
-	
+
 		// gets derefed in first orTo ??
-		int r_all_p, r_all = manager.replace(m_all, permute1);    
+		int r_all_p, r_all = manager.replace(m_all, permute1);
 
 
 		// manager.ref(r_all);
@@ -435,7 +435,7 @@ public class Supervisor
 		int ret = manager.replace(r_all, permute2);
 		manager.deref(r_all);
 
-		
+
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
@@ -453,7 +453,7 @@ public class Supervisor
     /**
      * having a set x, subset of Q, we compute x intersection Q_reachable.
      * If Q_reachable is not chaced, we compute reachability in out own way
-     */ 
+     */
     public int getReachableSubset(int set)
     {    // if already caches, use it
 	if (has_reachables)
@@ -463,23 +463,23 @@ public class Supervisor
 
 	return computeReachableSubset(set);
     }
-    
+
     protected int computeReachableSubset(int set) {
 	GrowFrame gf = null;
-	
+
 	if (Options.show_grow)
 	    {
 		gf = new GrowFrame("Forward reachability with constriant");
 	    }
-	
+
 	timer.reset();
-	
+
 	int cube = manager.getStateCube();
 	int permute = manager.getPermuteSp2S();
 	int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
 	int i_all = manager.and(plant.getI(), spec.getI());
 	int r_all_p, r_all = i_all;
-	
+
 	manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
 
 
@@ -487,15 +487,15 @@ public class Supervisor
 	SizeWatch.report(t_all, "T");
 	SizeWatch.report(set, "set");
 
-	
+
 	do {
 	    r_all_p = r_all;
-	    
+
 	    int tmp = manager.relProd(t_all, r_all, cube);
 	    int tmp2 = manager.replace(tmp, permute);
 	    manager.deref(tmp);
-	    
-	    
+
+
 	    int intersection = manager.and(set, tmp2);
 	    if(intersection != manager.getZero()) {
 
@@ -512,7 +512,7 @@ public class Supervisor
 
 	    r_all = manager.orTo(r_all, tmp2);
 	    manager.deref(tmp2);
-	    
+
 	    if (gf != null)
 		{
 		    gf.add(manager.nodeCount(r_all));
@@ -526,7 +526,7 @@ public class Supervisor
 	manager.deref(i_all);
 	manager.deref(t_all);
 
-	// since we got reachables anyway, lets save it		
+	// since we got reachables anyway, lets save it
 	has_reachables = true;
 	bdd_reachables = r_all;
 
@@ -819,32 +819,124 @@ public class Supervisor
 	}
 
 	// --------------------------------------------------------------------------------
+	// this is used to generate the supervisor??
+	public int getUnsafeTransitions()
+	{
+
+		// unsafe_transitions = { (q,sigma,q') |
+		//            \delta(q,sigma) = ´q´ \land q \in good_states \land q' \in bad_states }
+
+		int good_states = getSafeStates();
+
+		int bad_states = manager.not(good_states);
+		int s2sp = manager.getPermuteS2Sp();
+		int bad_statesp = manager.replace(bad_states, s2sp);
+
+		// DEBUG:
+		// System.out.println("BAD states are: "); manager.show_states(bad_states);
+		// System.out.println("GOOD states are: "); manager.show_states(good_states);
+
+		manager.deref(bad_states);
+
+		int t_all = manager.and(plant.getT(), spec.getT());
+
+		int tmp = manager.and(t_all, good_states);
+		tmp = manager.andTo(tmp, bad_statesp);
+		manager.deref(t_all);
+		manager.deref(good_states);
+		manager.deref(bad_statesp);
+
+		// tmp: Q x E -> Q, but we only need the first part, ie: tmp2: Q x E ??
+		// (note: this doesnt seem to work :(
+
+		return tmp;
+
+	}
+
+	/** get the list of unsafe transitions */
+	public Vector getUnsafeTransitionList()
+	{
+		int unsafe = getUnsafeTransitions();
+		int events_cube = manager.getEventCube();
+		Event[] events = manager.getEvents();
+		int events_size = events.length;
+
+
+		Vector results = new Vector();
+		for(int i = 0; i < events_size; i++)
+		{
+			int states_event = manager.relProd( unsafe, events[i].bdd, events_cube);
+			IncompleteStateList isl = manager.getIncompleteStateList(states_event, events[i]);
+			DisablingPoint dp = new DisablingPoint(isl, events[i]);
+			results.add(dp);
+			manager.deref(states_event);
+		}
+		return results;
+	}
+	/** get the _tree_ of unsafe states */
+	public Vector getUnsafeTransitionTree()
+	{
+		// TODO: do we need to remove E x Q' with relProd, or can we remove Q' before the loop??
+		int unsafe = getUnsafeTransitions();
+		int cube = manager.and(manager.getEventCube(), manager.getStatepCube() );
+		Event[] events = manager.getEvents();
+		int events_size = events.length;
+
+
+
+		Vector results = new Vector();
+		for(int i = 0; i < events_size; i++)
+		{
+			int states_event = manager.relProd( unsafe, events[i].bdd, cube);
+
+			BDDStateTreeExplorer ste = new BDDStateTreeExplorer(manager);
+			IncompleteStateTree ist = ste.getCompleteStateTree(states_event);
+			DisablingPoint dp = new DisablingPoint(ist, events[i]);
+			results.add(dp);
+			manager.deref(states_event);
+		}
+
+		manager.deref(cube);
+
+		return results;
+	}
+	// --------------------------------------------------------------------------------
 	public int getSafeStates()
 	{
 
 		// note: dont use timer here (get reseted by getReachable)
 		GrowFrame gf = null;
 
+/* TEMPORARY OFF:
 		if (Options.show_grow)
 		{
 			gf = new GrowFrame("Safe states: nodeCount(X)");
 		}
-
+*/
 		int xp, x = getReachableUncontrollables();
-		int marked = spec.getM();    // we assume all states in P are marked
+		int marked = GroupHelper.getM(manager,spec, plant);
 
 		manager.ref(x);
 
+		// System.out.println("marked = "); manager.show_states(marked); // DEBUG
 		do
 		{
 			xp = x;
 
+			// System.out.println("x = "); manager.show_states(x); // DEBUG
+
 			int qp_k = getBR1(marked, x);
 			int not_qp_k = manager.not(qp_k);
 
+			// System.out.println("qp_k = "); manager.show_states(qp_k); // DEBUG
+
 			manager.deref(qp_k);
 
+
+
 			int qpp_k = getBR2(not_qp_k);
+
+			//System.out.println("qpp_k = "); manager.show_states(qpp_k); // DEBUG
 
 			x = manager.orTo(x, qpp_k);
 

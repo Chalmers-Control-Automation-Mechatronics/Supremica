@@ -196,6 +196,10 @@ public class Automaton
 		return Util.log2ceil(getStatesSize());
 	}
 
+	public boolean eventUsed(Event e)
+	{
+		return eventSet.overlap(e);
+	}
 	// -----------------------------------------------------------
 	public void dump(PrintStream ps)
 	{
