@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.7 2005-02-22 03:05:08 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.8 2005-02-22 04:12:36 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -117,8 +117,8 @@ public class ControlledSurface
 		if (!selectedObjects.contains(o))
 		{
 			selectedObjects.add(o);
-			o.setSelected(true); 
-			selectAllWithParent(o); 
+			o.setSelected(true);
+			selectAllWithParent(o);
 		}
 	}
 
@@ -146,8 +146,8 @@ public class ControlledSurface
 		if (selectedObjects.contains(o))
 		{
 			selectedObjects.remove(o);
-			o.setSelected(false); 
-			//deselectAllWithParent(o); 
+			o.setSelected(false);
+			//deselectAllWithParent(o);
 		}
 	}
 
@@ -240,7 +240,7 @@ public class ControlledSurface
 		{
 			lastX = e.getX();
 			lastY = e.getY();
-			
+
 			EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 			if (o == null)
 			{
@@ -280,7 +280,7 @@ public class ControlledSurface
 			}
 			else
 			{
-				// Clicking on something! 
+				// Clicking on something!
 
 				if (!selectedObjects.contains(o))
 				{
@@ -293,7 +293,7 @@ public class ControlledSurface
 
 				// Select stuff!
 				selectChange(o);
-				
+
 				// If dragging, we should select anyway!
 				selectOnDrag = true;
 			}
@@ -338,21 +338,21 @@ public class ControlledSurface
 				if (o.getType() == EditorObject.NODE)
 				{
 					EditorNode object = (EditorNode) o;
-					
+
 					EditorNodePopupMenu popup = new EditorNodePopupMenu(this, object);
 					popup.show(this, e.getX(), e.getY());
 				}
 				if (o.getType() == EditorObject.NODEGROUP)
 				{
 					EditorNodeGroup object = (EditorNodeGroup) o;
-					
+
 					EditorNodeGroupPopupMenu popup = new EditorNodeGroupPopupMenu(this, object);
 					popup.show(this, e.getX(), e.getY());
 				}
 				if (o.getType() == EditorObject.EDGE)
 				{
 					EditorEdge object = (EditorEdge) o;
-					
+
 					EditorEdgePopupMenu popup = new EditorEdgePopupMenu(this, object);
 					popup.show(this, e.getX(), e.getY());
 				}
@@ -374,9 +374,9 @@ public class ControlledSurface
 			hasDragged = true;
 
 			// If we're not in a nice mode, let's end it right here and right now
-			if ((T.getPlace() != EditorToolbar.SELECT) && 
-				(T.getPlace() != EditorToolbar.NODE) && 
-				(T.getPlace() != EditorToolbar.EDGE) && 
+			if ((T.getPlace() != EditorToolbar.SELECT) &&
+				(T.getPlace() != EditorToolbar.NODE) &&
+				(T.getPlace() != EditorToolbar.EDGE) &&
 				(T.getPlace() != EditorToolbar.NODEGROUP))
 			{
 				return;
@@ -401,7 +401,7 @@ public class ControlledSurface
 			if (T.getPlace() == EditorToolbar.SELECT)
 			{
 				// Drag all selected objects
-				
+
 				// Select on drag?
 				if (selectOnDrag)
 				{
@@ -411,41 +411,41 @@ public class ControlledSurface
 					{
 						select(o);
 					}
-						
+
 					selectOnDrag = false;
 				}
-					
+
 				// The distances that we should move everything...
 				int dx = 0;
 				int dy = 0;
-					
+
 				// Are we using snap?
 				if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap)
 					//if (nodesSnap)
 				{
 					lastX = (lastX/gridSize) * gridSize;
 					lastY = (lastY/gridSize) * gridSize;
-						
+
 					while (dx + gridSize < e.getX())
 					{
 						dx += gridSize;
 					}
-						
+
 					if (e.getX() - dx > (dx + gridSize) - e.getX())
 					{
 						dx += gridSize;
 					}
-						
+
 					while (dy + gridSize < e.getY())
 					{
 						dy += gridSize;
 					}
-						
+
 					if (e.getY() - dy > (dy + gridSize) - e.getY())
 					{
 						dy += gridSize;
 					}
-						
+
 					// So the real delta values are...
 					dx -= lastX;
 					dy -= lastY;
@@ -465,7 +465,7 @@ public class ControlledSurface
 				{
 					return;
 				}
-			
+
 				/*
 				  for (int i = 0; i < nodes.size(); i++)
 				  {
@@ -488,7 +488,7 @@ public class ControlledSurface
 				for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
 				{
 					EditorObject object = (EditorObject) it.next();
-					
+
 					// Is it a node?
 					if (object.getType() == EditorObject.NODE)
 					{
@@ -497,23 +497,23 @@ public class ControlledSurface
 						// Where did it use to be?
 						int oldx = node.getX();
 						int oldy = node.getY();
-						
+
 						// Move
 						node.setX(oldx + dx);
 						node.setY(oldy + dy);
-						
+
 						// Update edges
 						if (controlPointsMove)
 						{
 							for (int i = 0; i < edges.size(); i++)
 							{
 								EditorEdge f = (EditorEdge) edges.get(i);
-								
+
 								if (f.getStartNode() == node)
 								{
 									f.updateControlPoint(oldx, oldy, true);
 								}
-								
+
 								if (f.getEndNode() == node)
 								{
 									f.updateControlPoint(oldx, oldy, false);
@@ -524,12 +524,13 @@ public class ControlledSurface
 					// Is it a nodegroup?
 					else if (object.getType() == EditorObject.NODEGROUP)
 					{
+
 						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
-						
+
 						Rectangle2D.Double b = new Rectangle2D.Double();
-						
+
 						b.setRect(nodeGroup.getBounds());
-						
+
 						if (nodeGroup.getResizing() && (selectedObjects.size() == 1))
 						{
 							if (nodesSnap)
@@ -552,7 +553,7 @@ public class ControlledSurface
 								nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 							}
 						}
-						
+
 						if (intersectsRectangle(nodeGroup.getBounds()))
 						{
 							nodeGroup.setBounds(b);
@@ -586,26 +587,26 @@ public class ControlledSurface
 						else if (object.getType() == EditorObject.LABELGROUP) // Don't move
 						{
 							EditorLabelGroup labelGroup = (EditorLabelGroup) object;
-							
+
 							//labelGroup.moveTo(labelGroup.getX() + dx, labelGroup.getY() + dy);
 							//labelGroup.setX(labelGroup.getX() + dx);
 							//labelGroup.setY(labelGroup.getY() + dy);
 							labelGroup.setOffset(labelGroup.getOffsetX() + dx, labelGroup.getOffsetY() + dy);
 						}
 					}
-				}					
+				}
 			}
 			else
 			{
 				// Single selection!
-				
+
 				/*
 				  if (T.getPlace() == EditorToolbar.EDGE)
 				  {
 				  if ((o != null) && (o.getType() == EditorObject.EDGE))
 				  {
 				  EditorEdge edge = (EditorEdge) o;
-					
+
 				  if (edge.getDragC())
 				  {
 				  edge.setTPoint(e.getX(), e.getY());
@@ -619,9 +620,9 @@ public class ControlledSurface
 				  System.out.println("DragS :" + edge.getDragS());
 				  edge.setSource(e.getX(), e.getY());
 				  }
-					
+
 				  repaint();
-					
+
 				  return;
 				  }
 				  }
@@ -641,7 +642,7 @@ public class ControlledSurface
 								EditorNode node = (EditorNode) object;
 
 								int[] dat = {node.getX(), node.getY(), e.getX(), e.getY()};
-							
+
 								// Draw line!
 								if ((lines != null) && (lines.size() > 0))
 								{
@@ -659,7 +660,7 @@ public class ControlledSurface
 								// Find point on the border of the group from where the line is drawn...
 								Point2D.Double p = nodeGroup.setOnBounds(nodeGroup.getX() + xoff, nodeGroup.getY() + yoff);
 								int[] dat = { (int) p.getX(), (int) p.getY(), e.getX(), e.getY() };
-							
+
 								// Draw line!
 								if ((lines != null) && (lines.size() > 0))
 								{
@@ -669,20 +670,20 @@ public class ControlledSurface
 								{
 									lines.add(dat);
 								}
-							}			
+							}
 						}
-					}				
+					}
 				}
-				
+
 				// Are we resizing a nodegroup?
 				if (nodeGroupIsSelected() && ((T.getPlace() == EditorToolbar.NODEGROUP) || (T.getPlace() == EditorToolbar.SELECT)))
 				{
 					EditorNodeGroup nodeGroup = (EditorNodeGroup) selectedObjects.get(0);
 
 					Rectangle2D.Double b = new Rectangle2D.Double();
-				
+
 					b.setRect(nodeGroup.getBounds());
-				
+
 					if (nodeGroup.getResizing())
 					{
 						if (nodesSnap)
@@ -705,7 +706,7 @@ public class ControlledSurface
 							nodeGroup.moveGroup(e.getX() - xoff, e.getY() - yoff);
 						}
 					}
-				
+
 					if (intersectsRectangle(nodeGroup.getBounds()))
 					{
 						nodeGroup.setBounds(b);
@@ -713,7 +714,7 @@ public class ControlledSurface
 				}
 			}
 		}
-		
+
 		repaint();
 	}
 
@@ -750,7 +751,7 @@ public class ControlledSurface
 
 				root.setBuffer(null);
 			}
-			
+
 			// Draw an edge if EditorToolbar.EDGE is selected
 			if (hasDragged && ((nodeIsSelected() || nodeGroupIsSelected()) && (T.getPlace() == EditorToolbar.EDGE)))
 			{
@@ -759,7 +760,7 @@ public class ControlledSurface
 					// This is thus the startingpoint
 					EditorObject n1 = (EditorObject) selectedObjects.remove(0);
 					deselect(n1);
-					
+
 					// This is the targetpoint
 					EditorNode n2 = (EditorNode) getObjectAtPosition(e.getX(), e.getY());
 					if (n2 != null)
@@ -799,12 +800,12 @@ public class ControlledSurface
 			}
 			*/
 
-			// Stop resizing nodegroup 
+			// Stop resizing nodegroup
 			if (nodeGroupIsSelected() && (selectedObjects.size() == 1))
 			{
 				EditorNodeGroup ng = (EditorNodeGroup) selectedObjects.remove(0);
 				ng.setResizingFalse();
-				
+
 				if (ng.isEmpty())
 				{
 					delNodeGroup(ng);
@@ -816,11 +817,11 @@ public class ControlledSurface
 			if (edgeIsSelected() && (selectedObjects.size() == 1))
 			{
 				EditorEdge edge = (EditorEdge) selectedObjects.remove(0);
-				
+
 				if ((T.getPlace() == EditorToolbar.EDGE) || (T.getPlace() == EditorToolbar.SELECT))
 				{
 					EditorObject n = getObjectAtPosition(e.getX(), e.getY());
-					
+
 					if (n != null)
 					{
 						if (n.getType() == EditorObject.NODE)
@@ -1078,7 +1079,7 @@ public class ControlledSurface
 		}
 	}
 
-	public void createOptions(EditorWindow root)
+	public void createOptions(EditorWindowInterface root)
 	{
 		Options = new EditorOptions(root);
 	}
@@ -1106,7 +1107,7 @@ public class ControlledSurface
 	}
 	*/
 
-	public ControlledSurface(EditorToolbar et, EditorWindow r)
+	public ControlledSurface(EditorToolbar et, EditorWindowInterface r)
 	{
 		S = this;
 		T = et;

@@ -1,12 +1,4 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
-//###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: waters.gui
-//# CLASS:   EditorWindow
-//###########################################################################
-//# $Id: EditorWindow.java,v 1.7 2005-02-22 04:12:36 knut Exp $
-//###########################################################################
-package net.sourceforge.waters.gui;
+package org.supremica.gui.ide;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,11 +14,19 @@ import java.util.ArrayList;
 import net.sourceforge.waters.model.expr.IdentifierProxy;
 import org.supremica.gui.GraphicsToClipboard;
 import java.awt.geom.Rectangle2D;
+import net.sourceforge.waters.gui.EditorToolbar;
+import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.EditorMenu;
+import net.sourceforge.waters.gui.EditorEvents;
+import net.sourceforge.waters.gui.EditorWindowInterface;
 
-public class EditorWindow
-	extends JFrame
+
+
+public class ComponentEditorPanel
+	extends JPanel
 	implements EditorWindowInterface
 {
+	private ModuleContainer moduleContainer;
 	private EditorToolbar toolbar;
 	private ControlledSurface surface;
 	private EditorEvents events;
@@ -36,10 +36,12 @@ public class EditorWindow
 	private boolean isSaved = false;
 	private GraphicsToClipboard toClipboard = null;
 
-	public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element)
+	public ComponentEditorPanel(ModuleContainer moduleContainer, SimpleComponentProxy element)
 	{
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle(title);
+		//setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		//setTitle(title);
+		this.moduleContainer = moduleContainer;
+		this.module = moduleContainer.getModuleProxy();
 
 		toolbar = new EditorToolbar();
 		surface = new ControlledSurface(toolbar, this);
@@ -50,7 +52,7 @@ public class EditorWindow
 		events = new EditorEvents(module, element, this);
 		menu = new EditorMenu(surface, this);
 
-		final Container panel = getContentPane();
+		// final Container panel = getContentPane();
 		final GridBagLayout gridbag = new GridBagLayout();
 		final GridBagConstraints constraints = new GridBagConstraints();
 
@@ -58,9 +60,9 @@ public class EditorWindow
 		constraints.weighty = 1.0;
 		constraints.anchor = GridBagConstraints.NORTH;
 
-		panel.setLayout(gridbag);
+		setLayout(gridbag);
 		gridbag.setConstraints(toolbar, constraints);
-		panel.add(toolbar);
+		add(toolbar);
 
 		final JScrollPane scrollsurface = new JScrollPane(surface);
 		final JScrollPane scrollevents = new JScrollPane(events);
@@ -75,12 +77,11 @@ public class EditorWindow
 		constraints.fill = GridBagConstraints.BOTH;
 
 		gridbag.setConstraints(split, constraints);
-		panel.add(split);
-		setJMenuBar(menu);
-		pack();
+		add(split);
+		//setJMenuBar(menu);
+//		pack();
 		setVisible(true);
 
-		this.module = module;
 		this.element = element;
 
 		if ((element != null) && (module != null))
@@ -118,7 +119,7 @@ public class EditorWindow
 
 	public JFrame getFrame()
 	{
-		return (JFrame) this;
+		return moduleContainer.getFrame();
 	}
 
 	public ControlledSurface getControlledSurface()

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorOptions
 //###########################################################################
-//# $Id: EditorOptions.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorOptions.java,v 1.3 2005-02-22 04:12:36 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -29,12 +29,12 @@ public class EditorOptions
 	final private ButtonGroup nodesSnap = new ButtonGroup();
 	final private String On = "On";
 	final private String Off = "Off";
-	final private EditorWindow r;
+	final private EditorWindowInterface r;
 	final private JFormattedTextField textField;
 
-	public EditorOptions(EditorWindow root)
+	public EditorOptions(EditorWindowInterface root)
 	{
-		super(root);
+		super(root.getFrame());
 
 		r = root;
 

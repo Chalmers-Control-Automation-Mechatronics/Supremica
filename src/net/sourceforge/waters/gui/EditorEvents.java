@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.5 2005-02-20 23:32:54 robi Exp $
+//# $Id: EditorEvents.java,v 1.6 2005-02-22 04:12:36 knut Exp $
 //###########################################################################
 
 
@@ -46,22 +46,22 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
  * @author Gian Perrone, Robi Malik
  */
 
-class EditorEvents
+public class EditorEvents
 	extends JTable
 {
 
 	//#######################################################################
 	//# Constructors
-	EditorEvents(final ModuleProxy module,
+	public EditorEvents(final ModuleProxy module,
 				 final SimpleComponentProxy comp,
-				 final EditorWindow root)
+				 final EditorWindowInterface root)
 	{
 		this(module, comp.getGraph(), root);
 	}
 
-	EditorEvents(final ModuleProxy module,
+	public EditorEvents(final ModuleProxy module,
 				 final GraphProxy graph,
-				 final EditorWindow root)
+				 final EditorWindowInterface root)
 	{
 		mRoot = root;
 		mModel = new EventTableModel(graph, module);
@@ -179,13 +179,13 @@ class EditorEvents
 	}
 
 
-	void setBuffer(final IdentifierProxy ident)
+	public void setBuffer(final IdentifierProxy ident)
 	{
 		mBuffer = ident;
 	}
 
 
-	IdentifierProxy getBuffer()
+	public IdentifierProxy getBuffer()
 	{
 		return mBuffer;
 	}
@@ -284,7 +284,7 @@ class EditorEvents
 		//# Constructors
 		private IdentifierEditor()
 		{
-			super(new SimpleExpressionCell(mRoot,
+			super(new SimpleExpressionCell(mRoot.getFrame(),
 										   SimpleExpressionProxy.TYPE_NAME));
 		}
 
@@ -364,7 +364,7 @@ class EditorEvents
 
 	//#######################################################################
 	//# Data Members
-	private final EditorWindow mRoot;
+	private final EditorWindowInterface mRoot;
 	private final EventTableModel mModel;
 	private final Dimension mPreferredSize;
 

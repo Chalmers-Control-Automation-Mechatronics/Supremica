@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.6 2005-02-22 00:35:13 flordal Exp $
+//# $Id: EditorSurface.java,v 1.7 2005-02-22 04:12:36 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
-/** 
+/**
  * <p>A component which allows for the display of module data.</p>
  *
  * <p>The EditorSurface is a viewer-only component.  It can load components from {@link ModuleProxy} objects
@@ -38,7 +38,7 @@ public class EditorSurface
 	extends JComponent
 {
 	protected boolean showGrid = true;
-	protected EditorWindow root;
+	protected EditorWindowInterface root;
 	protected int gridSize = 16;
 	protected Color backgroundColor = new Color(1.0f, 1.0f, 1.0f);
 	protected Color gridColor = new Color(0.0f, 0.0f, 0.0f);
@@ -420,13 +420,13 @@ public class EditorSurface
 
 		return null;
 	}
-	
+
 	public EditorLabel getLabel(EditorNode n)
 	{
 		for (int i = 0; i < labels.size(); i++)
 		{
 			EditorLabel e = (EditorLabel) labels.get(i);
-			
+
 			if (e.getParent() == (EditorObject) n)
 			{
 				return e;
@@ -877,7 +877,7 @@ public class EditorSurface
 		shades = s;
 	}
 
-	/** 
+	/**
 	 * This should reduce the size of the controlled surface to the minimum required
 	 */
 	public void minimizeSize()

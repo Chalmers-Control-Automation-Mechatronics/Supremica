@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.5 2005-02-20 23:32:54 robi Exp $
+//# $Id: EditorMenu.java,v 1.6 2005-02-22 04:12:36 knut Exp $
 //###########################################################################
 
 
@@ -33,11 +33,11 @@ public class EditorMenu
 	public final JMenuItem ToolsOptionsMenu;
 	public final JMenuItem editDeleteMenu;
 	public final JMenuItem editCopyAsWMFMenu;
-	EditorWindow root;
+	EditorWindowInterface root;
 	ControlledSurface C;
 	JFileChooser fileChooser;
 
-	public EditorMenu(ControlledSurface c, EditorWindow r)
+	public EditorMenu(ControlledSurface c, EditorWindowInterface r)
 	{
 		root = r;
 		C = c;
@@ -86,10 +86,11 @@ public class EditorMenu
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
+/*
 		menuItem = new JMenuItem("Copy as WMF");
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
-
+*/
 		editCopyAsWMFMenu = menuItem;
 
 		menuItem = new JMenuItem("Cut");
@@ -162,7 +163,7 @@ public class EditorMenu
 
 		if (e.getSource() == FileExitMenu)
 		{
-			root.dispose();
+//			root.dispose();
 		}
 
 		if (e.getSource() == editDeleteMenu)
@@ -179,10 +180,11 @@ public class EditorMenu
 		{
 			root.getControlledSurface().setOptionsVisible(true);
 		}
-
+/*
 		if (e.getSource() == editCopyAsWMFMenu)
 		{
 			root.copyAsWMFToClipboard();
 		}
+*/
 	}
 }

@@ -2,6 +2,7 @@ package org.supremica.gui.ide;
 
 import java.util.*;
 import java.awt.Component;
+import javax.swing.JFrame;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 public class ModuleContainer
@@ -67,6 +68,13 @@ public class ModuleContainer
 	{
 		return selectedComponent;
 	}
+
+	public JFrame getFrame()
+	{
+		return ide.getFrame();
+	}
+
+
 
 
 }

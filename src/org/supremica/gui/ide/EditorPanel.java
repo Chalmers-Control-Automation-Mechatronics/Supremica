@@ -14,20 +14,24 @@ class EditorPanel
 	private String name;
 	private JTabbedPane tabPanel;
 	private JPanel componentEditorPanel;
+	private JPanel emptyComponentEditorPanel;
+
 	private EditorParametersPanel parametersPanel;
 	private EditorEventsPanel eventsPanel;
 	private EditorAliasesPanel aliasesPanel;
 	private EditorComponentsPanel componentsPanel;
 	private JSplitPane splitPanelHorizontal;
+	private Dimension panelPreferredSize;
+	private Dimension panelMinimumSize;
+	private int preferredHeight = 400;
 
 	EditorPanel(ModuleContainer moduleContainer, String name)
 	{
 		this.moduleContainer = moduleContainer;
 		this.name = name;
 
-		int preferredHeight = 400;
-		Dimension panelPreferredSize = new Dimension(250, preferredHeight);
-		Dimension panelMinimumSize = new Dimension(100, 100);
+		panelPreferredSize = new Dimension(250, preferredHeight);
+		panelMinimumSize = new Dimension(100, 100);
 		setPreferredSize(panelPreferredSize);
 		setMinimumSize(panelMinimumSize);
 
@@ -57,9 +61,8 @@ class EditorPanel
 
 		tabPanel.setSelectedComponent(componentsPanel);
 
-		componentEditorPanel = new JPanel();
-		componentEditorPanel.setPreferredSize(new Dimension(600, preferredHeight));
-		componentEditorPanel.setMinimumSize(panelMinimumSize);
+		emptyComponentEditorPanel = new EmptyComponentEditorPanel();
+		componentEditorPanel = emptyComponentEditorPanel;
 
 		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, componentEditorPanel);
 		splitPanelHorizontal.setContinuousLayout(false);
@@ -93,4 +96,27 @@ class EditorPanel
 		return name;
 	}
 
+
+	public void setComponentEditorPanel(JPanel currPanel)
+	{
+		if (currPanel == null)
+		{
+			splitPanelHorizontal.setRightComponent(emptyComponentEditorPanel);
+		}
+		else
+		{
+			splitPanelHorizontal.setRightComponent(currPanel);
+		}
+
+	}
+
+ 	class EmptyComponentEditorPanel
+ 		extends JPanel
+ 	{
+		public EmptyComponentEditorPanel()
+		{
+			setPreferredSize(new Dimension(600, preferredHeight));
+			setMinimumSize(panelMinimumSize);
+		}
+	}
 }
