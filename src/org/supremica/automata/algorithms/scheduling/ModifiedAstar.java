@@ -48,13 +48,32 @@ public class ModifiedAstar
 	private Automata specAutomata = null;
 	private Expander expander = null;
 
-	private int debugNum = 0;
+	private int debugNum = 0;	// keeps track of the num of iterations until open is empty (is this the same as the number of states?)
 	private ActionTimer timer = new ActionTimer();
 
 	// This is only needed for init() and walk1()
 	private AutomataOnlineSynchronizer onlineSynchronizer = null;
 	private int[] indexmap;
 
+	public static class Info
+	{
+		private Element elem;
+		private int dbgNum;
+		private long time;
+		
+		Info(Element elem, int dbgnum, long time)
+		{
+			this.elem = elem;
+			this.dbgNum = dbgnum;
+			this.time = time;
+		}
+		
+		public String toString()
+		{
+			return new String(elem.toString() + "States searched: " + dbgNum + " in time: " + time);
+		}
+	}
+	
 	public ModifiedAstar(Automata theAutomata, Calculator calculator, Manipulator manipulator, Expander expander, Reopener reopener)
 		throws Exception
 	{
@@ -157,7 +176,6 @@ public class ModifiedAstar
 			}
 		}
 
-		logger.debug(state.toString() + " is marked.");
 		return true;
 	}
 
@@ -172,7 +190,7 @@ public class ModifiedAstar
 	//	end foreach
 
 	// Potentially, there can be a lot of locally enabled events that are not globally enabled.
-	public Element walk1()
+	private Element walk1()
 		throws Exception
 	{
 		// When we get here, initx() has already run, we need to undo what's been done, that is, clear open
@@ -193,6 +211,7 @@ public class ModifiedAstar
 			if(isMarked(state))
 			{
 				timer.stop();
+				logger.debug(state.toString() + " is marked. Number of states searched: " + debugNum + " Elapsed time: " + getElapsedTime());
 				return state; // we've reached the goal, are done
 			}
 
@@ -202,6 +221,8 @@ public class ModifiedAstar
 			{
 				onlineSynchronizer.setCurrState(state.getStateArray());	// we operate from this state
 				Automaton currAutomaton = (Automaton) autIt.next();
+				logger.debug("Expanding automaton: " + currAutomaton.getName());
+
 				// We only look through specAutomata
 				// if(currAutomaton.isSpecification())	// only do this for specs, plants/resources are not "directions"
 				{
@@ -283,7 +304,7 @@ public class ModifiedAstar
 	//			end if
 	//		end foreach
 	//	end foreach
-	public void walk2()
+	private void walk2()
 	{
 		int debugNum = 1;
 
@@ -303,6 +324,30 @@ public class ModifiedAstar
 	}
 
 	// Here's the one that uses the expander element, just to see how it works out
+	// This is the way it should work (isnt it?)
+	// 
+	// 	while open is not empty
+	//	{
+	//		intelligently pick an element e from open
+	//		expand e
+	//
+	//		for each element x in the expansion of e
+	//		{
+	//			if we've not already seen x (same logical state on either open or closed)
+	//			{
+	//				calc the bound of x
+	//				add x to open
+	//			}
+	//			else we've already seen x (is either on open or closed)
+	//			{
+	//				direct x's ptr along lowest g(n) path
+	//				if x was on closed
+	//					reopen x
+	//			}
+	//		}
+	//		remove e from open
+	//		put e on closed
+	//	}
 	public Element walk3()
 	{
 		timer.start();
@@ -317,6 +362,7 @@ public class ModifiedAstar
 			if(isMarked(state))
 			{
 				timer.stop();
+				logger.debug(state.toString() + " is marked. Number of states searched: " + debugNum + " Elapsed time: " + getElapsedTime());
 				return state; // we've reached the goal, are done
 			}
 
@@ -329,6 +375,11 @@ public class ModifiedAstar
 				// If we've not already seen it (same logical state)...
 				boolean onopen = open.contains(nextState);
 				boolean onclosed = closed.contains(nextState);
+				
+				/* begin debug */
+				logger.debug(nextState.toString() + " is " + (onopen ? "already" : "not") + " on open, and is " + (onclosed ? "already" : "not") + " on closed");
+				/* end debug */
+				
 				if(!onopen && !onclosed)
 				{
 					// ...calc the estimate
@@ -360,6 +411,7 @@ public class ModifiedAstar
 			// If you add before removing the iterators wont be pointing right
 
 		}
+		logger.debug("opne list is empty");
 		timer.stop();
 		return null;	// never reached a (globally) marked state!!
 	}
@@ -387,7 +439,7 @@ public class ModifiedAstar
 	}
 	// Generate the trace for this element
 	// Note, it's written backwards (should we bother?)
-	public String trace(Element elem)
+	private String trace(Element elem)
 	{
 		StringBuffer sbuf = new StringBuffer(debugNum + " nodes searched in " + timer.toString() + ".\n");
 
@@ -446,8 +498,8 @@ public class ModifiedAstar
 	}
 	public Automaton getAutomaton(Element elem)
 	{
-		String theTrace = trace(elem);
-		logger.info(theTrace);
+		// String theTrace = trace(elem);
+		// logger.info(theTrace);
 
 		Automaton automaton = new Automaton();
 		automaton.setComment("Schedule");
@@ -483,6 +535,12 @@ public class ModifiedAstar
 	{
 		return timer.elapsedTime();
 	}
+	
+	public Info getInfo(Element elem)
+	{
+		return new Info(elem, debugNum, getElapsedTime());
+	}
+	
 	// Read in problems of the format
 	//	<num machines>
 	//	<num products>

@@ -202,7 +202,8 @@ public class ScheduleDialog
 	private Estimates estimates;
 	// private AlgorithmsPanel algorithms;
 	private WeightsPanel weights;
-	private JCheckBox invertPlantSpec = new JCheckBox("Treat plants as spec and vice versa");
+	// private JCheckBox invertPlantSpec = new JCheckBox("Treat plants as spec and vice versa");
+	private JCheckBox getTimeFromPlants = new JCheckBox("Get times from plants");
 	private OkButton okButton;
 	private CancelButton cancelButton;
 	private ProgressPanel progress;
@@ -229,7 +230,8 @@ public class ScheduleDialog
 		buttonpanel.add(cancelButton);
 
 		getContentPane().add(estimates);
-		getContentPane().add(invertPlantSpec);
+		// getContentPane().add(invertPlantSpec);
+		getContentPane().add(getTimeFromPlants);
 		// getContentPane().add(algorithms);
 		getContentPane().add(weights);
 		getContentPane().add(buttonpanel);
@@ -244,10 +246,10 @@ public class ScheduleDialog
 		// Disable all but the cancel button and the progressbar
 		estimates.setEnabled(false);
 		okButton.setEnabled(false);
-		invertPlantSpec.setEnabled(false);
+		getTimeFromPlants.setEnabled(false);
 
 		Automata automata = ActionMan.getGui().getSelectedAutomata();
-		if(invertPlantSpec.isSelected())
+		if(getTimeFromPlants.isSelected())
 		{
 			// temporarily set all plants as specs and all specs as plants - reset below
 			invertTypes(automata);
@@ -256,7 +258,6 @@ public class ScheduleDialog
 		try
 		{
 			ModifiedAstar mastar = new ModifiedAstar(automata, weights.getCalculator(estimates.getEstimator(automata)));
-			// Element elem = algorithms.getAlgorithm() == 3 ? mastar.walk3() : mastar.walk1();
 			Element elem = mastar.walk3();
 			if(elem == null)
 			{
@@ -264,6 +265,7 @@ public class ScheduleDialog
 			}
 
 			// logger.info(mastar.trace(elem));
+			logger.info(mastar.getInfo(elem).toString());
 			Automaton automaton = mastar.getAutomaton(elem);
 			ActionMan.getGui().addAutomaton(automaton);
 		}
@@ -276,11 +278,12 @@ public class ScheduleDialog
 		// Enable what was previously disabled
 		estimates.setEnabled(true);
 		okButton.setEnabled(true);
-		invertPlantSpec.setEnabled(true);
+		getTimeFromPlants.setEnabled(true);
+
 
 		cancelButton.setText("Close");
 
-		if(invertPlantSpec.isSelected())
+		if(getTimeFromPlants.isSelected())
 		{
 			// reset the automaton types
 			invertTypes(automata);
