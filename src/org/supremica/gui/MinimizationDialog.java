@@ -80,12 +80,14 @@ class MinimizationDialogStandardPanel
 		alsoTransitions = new JCheckBox("Also minimize number of transitions");
 		keepOriginal = new JCheckBox("Keep original");
 		ignoreMarking = new JCheckBox("Ignore marking of states");
-		
+
 		note = new JTextArea("Note:\n" + "I have nothing to say.");
 		note.setBackground(this.getBackground());
-		
-		Box standardBox = Box.createVerticalBox();
+
+		Box standardBox = Box.createHorizontalBox();
+		standardBox.add(new Label("     ")); // Ugly fix to get stuff centered
 		standardBox.add(minimizationTypeBox);
+		standardBox.add(new Label("     ")); // Ugly fix to get stuff centered
 		Box anotherBox = Box.createVerticalBox();
 		anotherBox.add(alsoTransitions);
 		anotherBox.add(keepOriginal);
@@ -128,24 +130,24 @@ class MinimizationDialogStandardPanel
 		// Should we display a note?
 		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.ObservationEquivalence)
 		{
-			note.setText("Note:\n" + "This minimization algorithm is experimental, the\n" + 
-						 "result may not be minimal but should at least be\n" + 
+			note.setText("Note:\n" + "This minimization algorithm is experimental, the\n" +
+						 "result may not be minimal but should at least be\n" +
 						 "observation equivalent to the input.");
 			note.setVisible(true);
 		}
 		else if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
 		{
-			note.setText("Note:\n" + "Returns an automaton representing the same language\n" + 
-						 "using a minimal number of states and transitions.\n" + 
-						 "  If the automaton is nondeterministic, it is first made\n" + 
-						 "deterministic.");			
+			note.setText("Note:\n" + "Returns an automaton representing the same language\n" +
+						 "using a minimal number of states and transitions.\n" +
+						 "  If the automaton is nondeterministic, it is first\n" +
+						 "made deterministic.");
 			note.setVisible(true);
 		}
 		else
 		{
 			note.setVisible(false);
 		}
-		
+
 		// Not else if!
 		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
 		{
@@ -194,7 +196,7 @@ public class MinimizationDialog
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.options = options;
-		
+
 		dialog.setTitle("Minimization options");
 		dialog.setSize(new Dimension(400, 300));
 
@@ -255,7 +257,7 @@ public class MinimizationDialog
 		Object source = event.getSource();
 
 		if (source == okButton)
-		{    
+		{
 			// Remember the selections
 			standardPanel.regain(options);
 			advancedPanel.regain(options);

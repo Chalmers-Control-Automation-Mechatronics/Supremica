@@ -58,7 +58,7 @@ import java.awt.GridLayout;
 import java.awt.BorderLayout;
 import javax.swing.*;
 
-public class ExecutionDialog
+public final class ExecutionDialog
 	extends JDialog
 	implements ActionListener, Runnable
 {
@@ -150,9 +150,7 @@ public class ExecutionDialog
 
 		// And there are some buttons (one)
 		JPanel buttonPanel = new JPanel();
-
 		stopButton = new JButton("Abort");
-
 		stopButton.addActionListener(this);
 		buttonPanel.add(stopButton);
 		contentPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -259,7 +257,6 @@ public class ExecutionDialog
 	 */
 	public void initProgressBar(int min, int max)
 	{
-
 		// progressMin = min;
 		// progressMax = max;
 		progressBar.setMinimum(min);

@@ -54,7 +54,6 @@ import org.supremica.log.*;
 
 public final class AutomataIndexForm
 {
-
 	// <automaton, event> -> <true|false>
 	private boolean[][] alphabetEventsTable;
 
@@ -141,11 +140,11 @@ public final class AutomataIndexForm
 		}
 
 		generateStateIndices(theAutomata);
-		
-		// Här blir det fel! 
+
+		// Här blir det fel!
 		//  Bra kommentar, killar. Jättebra. /hguo
-		//   Men nu har jag också råkat ut för det. Plötsligt får man ArrayIndexOutOfBoundsException i 
-		//   metoden nedanför... Undrar varför... det verkar inte vara helt lätt att reproducera, 
+		//   Men nu har jag också råkat ut för det. Plötsligt får man ArrayIndexOutOfBoundsException i
+		//   metoden nedanför... Undrar varför... det verkar inte vara helt lätt att reproducera,
 		//   heller. Min gissning är att det är State.index som blir fel t.ex. om man gör merge. /hguo igen
 		generateNextStateTransitionIndices(theAutomata, theAutomaton);
 		generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
@@ -383,31 +382,30 @@ public final class AutomataIndexForm
 			Automaton currAutomaton = (Automaton) autIt.next();
 			int currAutomatonIndex = currAutomaton.getIndex();
 			int currAutomatonNbrOfStates = currAutomaton.nbrOfStates();
-			
+
 			nextStateTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][];
 			nextStatesTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][][];
 			outgoingEventsTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][];
 
 			// The "worst" case is that all states enables each event
 			enableEventsTable[currAutomatonIndex] = new int[alphabetSize][];
-
 			for (int i = 0; i < alphabetSize; i++)
 			{
 				enableEventsTable[currAutomatonIndex][i] = new int[currAutomatonNbrOfStates + 1];
 				enableEventsTable[currAutomatonIndex][i][0] = Integer.MAX_VALUE;
 			}
-			
+
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 			Iterator stateIt = currAutomaton.stateIterator();
-			
+
 			while (stateIt.hasNext())
 			{
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getIndex();
-				
+
 				nextStateTable[currAutomatonIndex][currStateIndex] = new int[nbrOfEvents];
 				nextStatesTable[currAutomatonIndex][currStateIndex] = new int[nbrOfEvents][];
-				
+
 				// Insert all event indices in a tree (sorted), here it is cleared, below it is filed
 				sortedEventIndices.clear();
 
@@ -420,7 +418,7 @@ public final class AutomataIndexForm
 					nextStateTable[currAutomatonIndex][currStateIndex][i] = Integer.MAX_VALUE;
 					sortedArcs[i] = new LinkedList();
 				}
-				
+
 				// Iterate over outgoing arcs
 				Iterator outgoingArcsIt = currState.outgoingArcsIterator();
 				while (outgoingArcsIt.hasNext())
@@ -435,12 +433,13 @@ public final class AutomataIndexForm
 					// Sort
 					sortedEventIndices.add(new Integer(currEventIndex));
 					sortedArcs[currEventIndex].add(currArc);
-					
+
 					// Now insert the nextState index into the table
 					State currNextState = currArc.getToState();
 					int currNextStateIndex = currNextState.getIndex();
 					nextStateTable[currAutomatonIndex][currStateIndex][currEventIndex] = currNextStateIndex;
 
+					/*
 					// Insert all states that enables the current event into
 					// enableEventsTable. This could easily be optimized to avoid the search.
 					int i = 0;
@@ -451,12 +450,17 @@ public final class AutomataIndexForm
 					enableEventsTable[currAutomatonIndex][currEventIndex][i] = currStateIndex;
 					try
 					{
+						// Här är felet! För icke deterministiska system förekommer
+						// FLERA övergångar med samma händelse utifrån ett tillstånd.
+						// Därför måste man se till att enableEventsTable inte innehåller samma
+						// tillstånd flera gånger!
 						enableEventsTable[currAutomatonIndex][currEventIndex][i + 1] = Integer.MAX_VALUE;
 					}
 					catch (Exception ex)
 					{
 						logger.error("Error in AutomataIndexForm.generateNextStateTransitionIndices. " + ex);
 					}
+					*/
 				}
 
 				// Allocate array for outgoingEventsTable
@@ -464,14 +468,30 @@ public final class AutomataIndexForm
 
 				// Now copy all indices to an int array
 				Iterator sortedEventIndicesIt = sortedEventIndices.iterator();
-
-				// Insert indices
 				int i = 0;
 				while (sortedEventIndicesIt.hasNext())
 				{
+					// Generate outgoingEventsTable
 					int thisIndex = ((Integer) sortedEventIndicesIt.next()).intValue();
-
 					outgoingEventsTable[currAutomatonIndex][currStateIndex][i++] = thisIndex;
+
+					// Generate enableEventsTable
+					// Insert all states that enables the current event into
+					// enableEventsTable. This could easily be optimized to avoid the search.
+					int j = 0;
+					while (enableEventsTable[currAutomatonIndex][thisIndex][j] != Integer.MAX_VALUE)
+					{
+						j++;
+					}
+					enableEventsTable[currAutomatonIndex][thisIndex][j] = currStateIndex;
+					try
+					{
+						enableEventsTable[currAutomatonIndex][thisIndex][j + 1] = Integer.MAX_VALUE;
+					}
+					catch (Exception ex)
+					{
+						logger.error("Error in AutomataIndexForm.generateNextStateTransitionIndices. " + ex);
+					}
 				}
 				outgoingEventsTable[currAutomatonIndex][currStateIndex][i] = Integer.MAX_VALUE;
 
@@ -490,7 +510,7 @@ public final class AutomataIndexForm
 						Arc arc = (Arc) arcIt.next();
 						State currNextState = arc.getToState();
 						int currNextStateIndex = currNextState.getIndex();
-						
+
 						nextStatesTable[currAutomatonIndex][currStateIndex][i][j++] = currNextStateIndex;
 					}
 					nextStatesTable[currAutomatonIndex][currStateIndex][i][j] = Integer.MAX_VALUE;

@@ -139,6 +139,7 @@ public class AutomataVerifier
 		// The helper must be initialized here (this early) only because of the
 		// executionDialog, I think...
 		// BUT THE EXECUTIONDIALOG IS NOT USED UNTIL MUCH LATER?!!!
+		//  That's right.
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 		// Build the initial state  (including 2 status fields)
@@ -286,7 +287,7 @@ public class AutomataVerifier
 
 					// This algorithm is under implementation!!
 					return modularNonblockingVerification();
-					//return compositionalNonblockingVerification();
+
 					// This algorithm only verifies pairwise nonblocking!!!
 					// return pairwiseNonblockingVerification();
 				}
@@ -302,6 +303,7 @@ public class AutomataVerifier
 
 					// This algorithm is under implementation!!
 					return modularMutuallyNonblockingVerification();
+					//return compositionalNonblockingVerification();
 
 					// This algorithm only verifies pairwise nonblocking!!!
 					// return pairwiseNonblockingVerification();
@@ -448,7 +450,6 @@ public class AutomataVerifier
 			// if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
 			if (typeIsSupSpecTable[currSupervisorAutomaton.getIndex()])
 			{
-
 				// This is a relevant automaton!
 				selectedAutomata.addAutomaton(currSupervisorAutomaton);
 
@@ -490,7 +491,6 @@ public class AutomataVerifier
 
 								if (selectedAutomata.size() > 1)
 								{
-
 									// Check module
 									allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
 
@@ -569,7 +569,6 @@ public class AutomataVerifier
 	private boolean moduleIsControllable(Automata selectedAutomata)
 		throws Exception
 	{
-
 		// Clear the hash-table and set some variables in the synchronization helper
 		synchHelper.clear();
 		synchHelper.setRememberUncontrollable(true);
@@ -1661,7 +1660,7 @@ public class AutomataVerifier
 
 		/*
 		// Preparations for the global nonblocking verification...
-	ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
+		ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
 		if (executionDialog != null) // The executionDialog might not have been initialized yet! FIXA!
 		{
 				executionDialog.initProgressBar(0, theAutomata.size());
@@ -1671,7 +1670,7 @@ public class AutomataVerifier
 		// effort of changing all events to uncontrollable over and over and lets us use the
 		// same helper all the time, EXCEPT for AutomataIndexForm.typeIsPlantTable which we
 		// have to reinitialize between the language inclusion checks!!
-	theAutomata = new Automata(theAutomata, false);
+		theAutomata = new Automata(theAutomata, false);
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 		// Make all events in all automata in theAutomata as uncontrollable! (All
 		// events in plants should be uncontrollable and the controllability of
@@ -1723,7 +1722,6 @@ public class AutomataVerifier
 
 			if (stopRequested)
 			{
-
 				// timer.stop();
 				return false;
 			}
@@ -1780,31 +1778,52 @@ public class AutomataVerifier
 	private boolean compositionalNonblockingVerification()
 	{
 		// Make a copy that we can fiddle with
-		//Automata theAutomata = new Automata(theAutomata); 
+		//Automata theAutomata = new Automata(theAutomata);
+		int nbrOfAutomata = theAutomata.size();
 
-		while (theAutomata.size() >= 2)
+		// Initialize execution dialog
+		java.awt.EventQueue.invokeLater(new Runnable()
 		{
+			public void run()
+			{
+				ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
+				executionDialog.initProgressBar(0, theAutomata.size()-1);
+				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+			}
+		});
+
+		// Verify...
+		while (theAutomata.size() >= 2)
+		// There will be theAutomata.size()-1 pairs to examine!
+		//for (int n=1; n<theAutomata.size(); n++)
+		{
+			if (stopRequested)
+			{
+				return false;
+			}
+
 			// Get any automaton
 			Automaton autA = theAutomata.getFirstAutomaton();
 			Alphabet alphaA = autA.getAlphabet();
-			
-			// Find the pair (in which autA is a part) with the highest 
+
+			// Find the pair (in which autA is a part) with the highest
 			// "unique to total" (number of events) ratio
-			double bestRatio = 0;
+			double bestUniqueRatio = 0;
+			double bestCommonRatio = 0;
 			Automaton bestAutB = null;
 			Alphabet hideThese = null;
 			for (int i=1; i<theAutomata.size(); i++)
 			{
 				Automaton autB = theAutomata.getAutomatonAt(i);
 				Alphabet alphaB = autB.getAlphabet();
-				
+
 				// If there is no common events, try next automaton
 				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
 				if (nbrOfCommonEvents == 0)
 				{
 					continue;
 				}
-				
+
 				// Calculate the alphabet of unique events
 				Alphabet uniqueEvents = Alphabet.union(alphaA, alphaB);
 				for (int j=1; j<theAutomata.size(); j++)
@@ -1814,59 +1833,76 @@ public class AutomataVerifier
 					{
 						continue;
 					}
-					
+
 					// Remove the events that are present in C, they are not unique to A and B.
 					Automaton autC = theAutomata.getAutomatonAt(j);
 					Alphabet alphaC = autC.getAlphabet();
 					uniqueEvents.minus(alphaC);
-					
+
 					// Early termination
 					if (uniqueEvents.size() == 0)
 					{
 						break;
 					}
 				}
-				
-				// Find ratio
+
+				// Find ratioa
 				int nbrOfUniqueEvents = uniqueEvents.size();
 				int unionAlphabetSize = alphaA.size() + alphaB.size() - nbrOfCommonEvents;
-				double thisRatio = nbrOfUniqueEvents/unionAlphabetSize;
-				
+				double thisUniqueRatio = ((double) nbrOfUniqueEvents)/((double) unionAlphabetSize);
+				//double thisUniqueRatio = (double) nbrOfUniqueEvents;
+				double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+
 				// Improvement?
-				if (thisRatio > bestRatio)
+				if (thisUniqueRatio > bestUniqueRatio)
 				{
 					bestAutB = autB;
-					bestRatio = thisRatio;
+					bestUniqueRatio = thisUniqueRatio;
 					hideThese = uniqueEvents;
 				}
+				else if ((bestUniqueRatio == 0) && (thisCommonRatio > bestCommonRatio))
+				{
+					bestAutB = autB;
+					bestCommonRatio = thisCommonRatio;
+					hideThese = new Alphabet();
+				}
 			}
-			
-			if (bestRatio > 0)
+
+			if ((bestUniqueRatio > 0) || (bestCommonRatio > 0))
 			{
 				Automata automata = new Automata();
 				automata.addAutomaton(autA);
 				automata.addAutomaton(bestAutB);
-				
+
 				Automaton min = composeAndMinimize(automata, hideThese);
+				min.remapStateIndices();
 				theAutomata.removeAutomata(automata);
+				ActionMan.getGui().getVisualProjectContainer().getActiveProject().removeAutomata(automata);
 				theAutomata.addAutomaton(min);
+				ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(min);
 			}
 			else
 			{
-				logger.info("No pair found based on " + autA + ". Need to try triples?");
-				break;
+				logger.error("Disjoint system?");
+				return false;
 			}
 
 			try
 			{
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			}
 			catch (Exception apa)
 			{
 
 			}
+
+			// Update execution dialog
+			if (synchHelper.getExecutionDialog() != null)
+			{
+				synchHelper.getExecutionDialog().setProgress(nbrOfAutomata-1-theAutomata.size());
+			}
 		}
-		
+
 		// How did it go?
 		if (theAutomata.size() == 1)
 		{
@@ -1878,7 +1914,12 @@ public class AutomataVerifier
 		}
 	}
 
-	private Automaton composeAndMinimize(Automata automata, Alphabet hideThese)
+	/**
+ 	 * Composes automata and minimizes the result with respect to
+ 	 * observation equivalence, with hideThese considered as epsilon
+ 	 * events.
+	 */
+	private static Automaton composeAndMinimize(Automata automata, Alphabet hideThese)
 	{
 		Automaton aut;
 
@@ -1891,6 +1932,7 @@ public class AutomataVerifier
 			options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
 			options.setAlsoTransitions(true);
 			options.setKeepOriginal(false);
+			//options.setIgnoreMarking(true);
 			aut = minimizer.getMinimizedAutomaton(options);
 		}
 		catch (Exception ex)

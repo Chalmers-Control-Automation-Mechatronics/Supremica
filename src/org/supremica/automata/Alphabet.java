@@ -875,14 +875,14 @@ public class Alphabet
 	public int nbrOfCommonEvents(Alphabet otherAlphabet)
 	{
 		int nbrOfCommon = 0;
-		EventIterator eventIterator = iterator();
-		LabeledEvent currEvent;
 
+		EventIterator eventIterator = iterator();
 		while (eventIterator.hasNext())
 		{
+			LabeledEvent currEvent;
 			currEvent = eventIterator.nextEvent();
 
-			if (otherAlphabet.contains(currEvent.getLabel()))
+			if (otherAlphabet.contains(currEvent))
 			{
 				nbrOfCommon++;
 			}
@@ -920,9 +920,9 @@ public class Alphabet
 				// Compare names ignoring case
 				if (eventA.getLabel().equalsIgnoreCase(eventB.getLabel()))
 				{
-					logger.warn("The events " + eventA + " and " + eventB + " have very " + 
+					logger.warn("The events " + eventA + " and " + eventB + " have very " +
 								"similar names but will be treated as different events!");
-					
+
 					found = true;
 				}
 			}

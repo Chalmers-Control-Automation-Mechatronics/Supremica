@@ -302,6 +302,7 @@ public class Automaton
 	// indexStateMap become different from the indices stored in the States
 	// This func iterates over the states and rebuilds the map
 	// Used by ModifiedAstar
+	//  When is the slow and beautiful fixx due?
 	public void remapStateIndices()
 	{
 		indexStateMap.clear();
@@ -754,7 +755,7 @@ public class Automaton
 		theArcs.removeArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
-	
+
 	/*
 	public void removeArcs(ArcSet arcSet)
 	{
@@ -1719,8 +1720,8 @@ public class Automaton
 	}
 
 	/**
-	 * Merges two states, giving the new state the union of incoming and outgoing transitions, 
-	 * if at least one state was accepting, the result is accepting, and similarily for 
+	 * Merges two states, giving the new state the union of incoming and outgoing transitions,
+	 * if at least one state was accepting, the result is accepting, and similarily for
 	 * initial and forbidden states
 	 */
 	public State mergeStates(State one, State two)
@@ -1758,7 +1759,7 @@ public class Automaton
 			{
 				toState = newState;
 			}
-			
+
 			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
 		}
 		for (ArcIterator arcIt = two.outgoingArcsIterator(); arcIt.hasNext(); )
@@ -1769,7 +1770,7 @@ public class Automaton
 			{
 				toState = newState;
 			}
-			
+
 			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
 		}
 		for (ArcIterator arcIt = one.incomingArcsIterator(); arcIt.hasNext(); )
@@ -1780,7 +1781,7 @@ public class Automaton
 			{
 				fromState = newState;
 			}
-			
+
 			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
 		}
 		for (ArcIterator arcIt = two.incomingArcsIterator(); arcIt.hasNext(); )
@@ -1791,7 +1792,7 @@ public class Automaton
 			{
 				fromState = newState;
 			}
-			
+
 			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
 		}
 		// Add the new arcs!
@@ -1801,7 +1802,7 @@ public class Automaton
 			Arc arc = (Arc) toBeAdded.remove(0);
 			if (!arc.getFromState().containsOutgoingArc(arc))
 			{
-				addArc(arc);				
+				addArc(arc);
 			}
 		}
 
@@ -1809,6 +1810,7 @@ public class Automaton
 		removeState(one);
 		removeState(two);
 
+		/*
 		// Adjust the index of the new state (see the "Här blir det fel" discussion in AutomataIndexForm)
 		if (one.getIndex() < two.getIndex())
 		{
@@ -1820,10 +1822,11 @@ public class Automaton
 			// Take over the index of state two
 			newState.setIndex(two.getIndex());
 		}
+		*/
 
 		// Return the new state
 		return newState;
-	}	
+	}
 
 	public void removeAllStates()
 	{
@@ -1980,7 +1983,7 @@ public class Automaton
 
 			return false;
 		}
-		
+
 		// The following stuff seems useful to consider
 		if (hasAcceptingState() != other.hasAcceptingState())
 		{

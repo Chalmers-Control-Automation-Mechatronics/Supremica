@@ -144,7 +144,7 @@ public class State
 		y = otherState.y;
 		radius = otherState.radius;
 
-// Här är skurken..... 
+// Här är skurken.....
 // Vilken jäv**a skurk? Skriv ordentliga kommentarer!!!
 //              outgoingArcs = otherState.outgoingArcs;
 	}
@@ -469,7 +469,7 @@ public class State
 	public void removeOutgoingArc(Arc theArc)
 	{
 		outgoingArcs.remove(theArc);
-		
+
 		// Also empty the arcset
 		ArcSet theArcSet = getArcSet(theArc);
 		theArcSet.removeArc(theArc);
@@ -731,7 +731,7 @@ public class State
 	}
 
 	/**
-	 * Returns true if label is enabled by the supervisor.
+	 * Returns true if an event with the label label is enabled by the supervisor.
 	 */
 	public boolean isEnabled(String label)
 	{

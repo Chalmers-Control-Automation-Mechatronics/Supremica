@@ -63,6 +63,7 @@ public class ExecutionDialogMode
 	public static ExecutionDialogMode verifyingNonblocking = new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
 	public static ExecutionDialogMode verifyingMutualNonblockingFirstRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
 	public static ExecutionDialogMode verifyingMutualNonblockingSecondRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);
+	public static ExecutionDialogMode minimizing = new ExecutionDialogMode("Minimizing...", "", false, true);
 	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "", false, false);
 	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "", false, false);
 	private final String id;

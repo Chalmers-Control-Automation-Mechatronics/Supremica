@@ -122,21 +122,18 @@ public class AutomataVerificationWorker
 		// Perform verification according to the VerificationType.
 		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
 		{
-
 			// Controllability verification...
 			successMessage = "The system is controllable!";
 			failureMessage = "The system is NOT controllable!";
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
 		{
-
 			// Non-blocking verification...
 			successMessage = "The system is non-blocking!";
 			failureMessage = "The system is blocking!";
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
 		{
-
 			// Mutual non-blocking verification...
 			successMessage = "The system is mutually non-blocking!";
 
@@ -145,7 +142,6 @@ public class AutomataVerificationWorker
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
-
 			// Language inclusion verification...
 			successMessage = "The language of the unselected automata is \n" + "included in the language of the selected automata.";
 			failureMessage = "The language of the unselected automata is NOT\n" + "included in the language of the selected automata.";
@@ -186,7 +182,6 @@ public class AutomataVerificationWorker
 		// This can't be done earlier, since the helper must be initialized! Ugly.
 		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
-
 			// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
 			automataVerifier.prepareForLanguageInclusion(workbench.getUnselectedAutomata());
 		}
