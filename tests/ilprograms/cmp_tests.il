@@ -238,10 +238,10 @@ PROGRAM CMPtests
 	ST BB2
 	CAL PRINT_S(output:="?? true == ")
 	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - -2147483648*)
-	LD DINT#-2147483648
+(*-2147483647 - -2147483647*)
+	LD DINT#-2147483647
 	ST DD1
-	LD DINT#-2147483648
+	LD DINT#-2147483647
 	EQ DD1
 	ST BB2
 	CAL PRINT_S(output:="?? true == ")
@@ -254,18 +254,18 @@ PROGRAM CMPtests
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*0 - -2147483648*)
-	LD DINT#-2147483648
+(*0 - -2147483647*)
+	LD DINT#-2147483647
 	ST DD1
 	LD DINT#0
 	EQ DD1
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - 0*)
+(*-2147483647 - 0*)
 	LD DINT#0
 	ST DD1
-	LD DINT#-2147483648
+	LD DINT#-2147483647
 	EQ DD1
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
@@ -292,27 +292,27 @@ PROGRAM CMPtests
 	ST BB2
 	CAL PRINT_S(output:="?? true == ")
 	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - -2147483648*)
-	LD DINT#-2147483648
-	EQ DINT#-2147483648
+(*-2147483647 - -2147483647*)
+	LD DINT#-2147483647
+	EQ DINT#-2147483647
 	ST BB2
 	CAL PRINT_S(output:="?? true == ")
 	CAL PRINTLN_B(output:=BB2)
-(*0 - -2147483648*)
+(*0 - -2147483647*)
 	LD DINT#2147483647
 	EQ DINT#0
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*0 - -2147483648*)
-	LD DINT#-2147483648
+(*0 - -2147483647*)
+	LD DINT#-2147483647
 	EQ DINT#0
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - 0*)
+(*-2147483647 - 0*)
 	LD DINT#0
-	EQ DINT#-2147483648
+	EQ DINT#-2147483647
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
@@ -449,45 +449,45 @@ PROGRAM CMPtests
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - -2147483648*)
-	LD DINT#-2147483648
+(*-2147483647 - -2147483647*)
+	LD DINT#-2147483647
 	ST DD1
-	LD DINT#-2147483648
+	LD DINT#-2147483647
+	GT DD1
+	ST BB2
+	CAL PRINT_S(output:="?? false == ")
+	CAL PRINTLN_B(output:=BB2)
+(*0 - 2147483647*)
+	LD DINT#2147483647
+	ST DD1
+	LD DINT#0
+	GT DD1
+	ST BB2
+	CAL PRINT_S(output:="?? false == ")
+	CAL PRINTLN_B(output:=BB2)
+(*0 - -2147483647*)
+	LD DINT#-2147483647
+	ST DD1
+	LD DINT#0
+	GT DD1
+	ST BB2
+	CAL PRINT_S(output:="?? true == ")
+	CAL PRINTLN_B(output:=BB2)
+(*-2147483647 - 0*)
+	LD DINT#0
+	ST DD1
+	LD DINT#-2147483647
 	GT DD1
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
 (*2147483647 - 0*)
+	LD DINT#0
+	ST DD1
 	LD DINT#2147483647
-	ST DD1
-	LD DINT#0
-	GT DD1
-	ST BB2
-	CAL PRINT_S(output:="?? false == ")
-	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - 0*)
-	LD DINT#-2147483648
-	ST DD1
-	LD DINT#0
-	GT DD1
-	ST BB2
-	CAL PRINT_S(output:="?? false == ")
-	CAL PRINTLN_B(output:=BB2)
-(*0 - -2147483648*)
-	LD DINT#0
-	ST DD1
-	LD DINT#-2147483648
 	GT DD1
 	ST BB2
 	CAL PRINT_S(output:="?? true == ")
-	CAL PRINTLN_B(output:=BB2)
-(*0 - 2147483647*)
-	LD DINT#0
-	ST DD1
-	LD DINT#2147483647
-	GT DD1
-	ST BB2
-	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
 
 	(*GT - DINT - jämför stack med konstant*)
@@ -503,9 +503,9 @@ PROGRAM CMPtests
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - -2147483648*)
-	LD DINT#-2147483648
-	GT DINT#-2147483648
+(*-2147483647 - -2147483647*)
+	LD DINT#-2147483647
+	GT DINT#-2147483647
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
@@ -515,15 +515,15 @@ PROGRAM CMPtests
 	ST BB2
 	CAL PRINT_S(output:="?? true == ")
 	CAL PRINTLN_B(output:=BB2)
-(*-2147483648 - 0*)
-	LD DINT#-2147483648
+(*-2147483647 - 0*)
+	LD DINT#-2147483647
 	GT DINT#0
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*0 - -2147483648*)
+(*0 - -2147483647*)
 	LD DINT#0
-	GT DINT#-2147483648
+	GT DINT#-2147483647
 	ST BB2
 	CAL PRINT_S(output:="?? true == ")
 	CAL PRINTLN_B(output:=BB2)
@@ -561,37 +561,37 @@ PROGRAM CMPtests
 	ST BB2
 	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
-(*3.4028235E38 - 0*)
+(*0 - 3.4028235E38*)
 	LD REAL#3.4028235E38
 	ST RR1
 	LD REAL#0.0
 	GT RR1
 	ST BB2
-	CAL PRINT_S(output:="?? true == ")
-	CAL PRINTLN_B(output:=BB2)
-(*1.4E-45 - 0*)
-	LD REAL#1.4E-45
-	ST RR1
-	LD REAL#0.0
-	GT RR1
-	ST BB2
-	CAL PRINT_S(output:="?? true == ")
+	CAL PRINT_S(output:="?? false == ")
 	CAL PRINTLN_B(output:=BB2)
 (*0 - 1.4E-45*)
+	LD REAL#1.4E-45
+	ST RR1
+	LD REAL#0.0
+	GT RR1
+	ST BB2
+	CAL PRINT_S(output:="?? false == ")
+	CAL PRINTLN_B(output:=BB2)
+(*1.4E-45 - 0*)
 	LD REAL#0.0
 	ST RR1
 	LD REAL#1.4E-45
 	GT RR1
 	ST BB2
-	CAL PRINT_S(output:="?? false == ")
+	CAL PRINT_S(output:="?? true == ")
 	CAL PRINTLN_B(output:=BB2)
-(*0 - 3.4028235E38*)
+(*3.4028235E38 - 0*)
 	LD REAL#0.0
 	ST RR1
 	LD REAL#3.4028235E38
 	GT RR1
 	ST BB2
-	CAL PRINT_S(output:="?? false == ")
+	CAL PRINT_S(output:="?? true == ")
 	CAL PRINTLN_B(output:=BB2)
 
 	(*GT - REAL - jämför stack med konstant*)
