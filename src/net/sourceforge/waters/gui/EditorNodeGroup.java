@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorNodeGroup.java,v 1.3 2005-02-21 10:22:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -36,8 +36,10 @@ public class EditorNodeGroup
 	private static int UPPERRIGHT = 1;
 	private static int LOWERRIGHT = 2;
 	private static int LOWERLEFT = 3;
-	private static int WIDTHD = 2;
-	private static int WIDTHS = 5;
+	private static int WIDTHD = 4; // Width of drawn corners
+	private static int WIDTHS = 5; // Don't know what this is...
+	private static int CORNERDIAMETER = 15;
+	private static int TOLERANCE = 8;
 
 	public EditorNodeGroup(GroupNodeProxy gn)
 	{
@@ -226,7 +228,9 @@ public class EditorNodeGroup
 			}
 		}
 
-		return (bounds.intersects(cX - 2, cY - 2, 4, 4) &&!bounds.contains(cX - 2, cY - 2, 4, 4));
+		Rectangle2D.Double innerBounds = new Rectangle2D.Double(bounds.getX() + TOLERANCE/2, bounds.getY() + TOLERANCE/2, bounds.getWidth() - TOLERANCE, bounds.getHeight() - TOLERANCE);
+
+		return (bounds.intersects(cX - TOLERANCE/2, cY - TOLERANCE/2, TOLERANCE, TOLERANCE) && !innerBounds.contains(cX, cY, 1, 1));
 	}
 
 	public Rectangle2D.Double getBounds()
@@ -313,6 +317,7 @@ public class EditorNodeGroup
 	{
 		selected = s;
 
+		/*
 		if (s == true)
 		{
 			for (int i = 0; i < immediateChildren.size(); i++)
@@ -320,6 +325,7 @@ public class EditorNodeGroup
 				((EditorObject) immediateChildren.get(i)).setSelected();
 			}
 		}
+		*/
 	}
 
 	public void drawObject(Graphics g)
@@ -334,14 +340,17 @@ public class EditorNodeGroup
 
 			for (int i = 0; i < 4; i++)
 			{
-				g2d.fillRect((int) corners[i].getCenterX() - WIDTHD, (int) corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
+				//g2d.fillRect((int) corners[i].getCenterX() - WIDTHD, (int) corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
+				g2d.drawOval((int) corners[i].getCenterX() - WIDTHD, (int) corners[i].getCenterY() - WIDTHD, 2 * WIDTHD, 2 * WIDTHD);
 			}
 		}
 		else
 		{
-			g2d.setColor(Color.BLACK);
+			g2d.setColor(Color.lightGray);
 		}
 
-		g2d.draw(bounds);
+		//g2d.draw(bounds);
+		g2d.drawRoundRect((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight(), CORNERDIAMETER, CORNERDIAMETER);
+		g2d.drawRoundRect((int) bounds.getX()-1, (int) bounds.getY()-1, (int) bounds.getWidth()+2, (int) bounds.getHeight()+2, CORNERDIAMETER+2, CORNERDIAMETER+2);
 	}
 }

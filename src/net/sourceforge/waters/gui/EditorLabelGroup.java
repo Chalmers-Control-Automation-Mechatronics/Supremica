@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorLabelGroup.java,v 1.3 2005-02-21 10:22:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -115,6 +115,16 @@ public class EditorLabelGroup
 	public void setOffset(int nxoff, int nyoff)
 	{
 		proxy.getGeometry().setOffset(new Point2D.Double(nxoff, nyoff));
+	}
+
+	public int getOffsetX()
+	{
+		return (int) proxy.getGeometry().getOffset().getX();
+	}
+
+	public int getOffsetY()
+	{
+		return (int) proxy.getGeometry().getOffset().getY();
 	}
 
 	public void moveTo(int x, int y)

@@ -1,0 +1,56 @@
+
+package net.sourceforge.waters.gui;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import org.supremica.util.VPopupMenu;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
+/**
+ * Popup for editing attributes of a node.
+ */
+class EditorNodeGroupPopupMenu
+	extends VPopupMenu
+	implements ActionListener
+{
+	private EditorNodeGroup nodegroup;
+	private EditorSurface parent;
+
+	private JMenuItem renameItem;
+	private JMenuItem deleteItem;
+	//private JCheckBox initialBox;
+	private JMenuItem initialItem;	
+
+	public EditorNodeGroupPopupMenu(EditorSurface parent, EditorNodeGroup nodegroup)
+	{
+		this.parent = parent;
+		this.nodegroup = nodegroup;
+
+		init();
+	}
+
+	/**
+	 * Initialize the menu.
+	 */
+	private void init()
+	{
+		JMenuItem item;
+
+		item = new JMenuItem("Delete nodegroup");
+		item.addActionListener(this);
+		this.add(item);
+		deleteItem = item;
+	}
+
+	public void actionPerformed(ActionEvent e) 
+	{
+		if (e.getSource() == deleteItem)
+		{
+			parent.delNodeGroup(nodegroup);
+			this.hide();
+		}
+
+		parent.repaint();
+	}
+}

@@ -10,7 +10,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 /**
  * Popup for editing attributes of a node.
  */
-class NodePopupMenu
+class EditorNodePopupMenu
 	extends VPopupMenu
 	implements ActionListener
 {
@@ -22,7 +22,7 @@ class NodePopupMenu
 	//private JCheckBox initialBox;
 	private JMenuItem initialItem;	
 
-	public NodePopupMenu(EditorSurface parent, EditorNode node)
+	public EditorNodePopupMenu(EditorSurface parent, EditorNode node)
 	{
 		this.parent = parent;
 		this.node = node;

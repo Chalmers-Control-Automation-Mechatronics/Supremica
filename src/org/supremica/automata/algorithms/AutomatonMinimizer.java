@@ -393,7 +393,7 @@ public class AutomatonMinimizer
 		int transitionCount = 0;
 		if (options.getAlsoTransitions())
 		{
-			// doTransitiveClosure(newAutomaton);
+			doTransitiveClosure(newAutomaton);
 			transitionCount = newAutomaton.nbrOfTransitions();
 			int countArcs = removeRedundantTransitions(newAutomaton);
 			totalArcs += countArcs;

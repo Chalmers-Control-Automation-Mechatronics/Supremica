@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.3 2005-02-19 03:26:56 flordal Exp $
+//# $Id: EditorToolbar.java,v 1.4 2005-02-21 10:22:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -26,7 +26,8 @@ public class EditorToolbar
 	//# Data Members
 	private final ButtonGroup mGroup = new ButtonGroup();
 	private ToolButtonListener mLastSelected;
-	private static final Color SELECTIONCOLOR = new Color(255, 200, 240);
+	//private static final Color SELECTIONCOLOR = new Color(255, 200, 240);
+	private static final Color SELECTIONCOLOR = new Color(255, 0, 240);
 
 	public static final String SELECT = "select";
 	public static final String NODE = "node";
@@ -94,7 +95,7 @@ public class EditorToolbar
 			final Border border = BorderFactory.createLoweredBevelBorder();
 
 			panel.setBorder(border);
-			button.setBackground(SELECTIONCOLOR);
+			//button.setBackground(SELECTIONCOLOR);
 		}
 		else
 		{
@@ -112,7 +113,6 @@ public class EditorToolbar
 	private class ToolButtonListener
 		implements ActionListener
 	{
-
 		//#######################################################################
 		//# Data Members
 		private final JPanel mPanel;

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.4 2005-02-20 23:32:54 robi Exp $
+//# $Id: EditorSurface.java,v 1.5 2005-02-21 10:22:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -268,7 +268,7 @@ public class EditorSurface
 		repaint();
 	}
 
-	public void addNodeGroup(int x, int y, int w, int h)
+	public EditorNodeGroup addNodeGroup(int x, int y, int w, int h)
 	{
 		GroupNodeProxy n = new GroupNodeProxy("NodeGroup" + nodeGroups.size());
 
@@ -279,6 +279,8 @@ public class EditorSurface
 		nodeGroups.add(g);
 		graph.getNodes().add(n);
 		repaint();
+
+		return g;
 	}
 
 	public void addNodeGroup(GroupNodeProxy n)
@@ -537,25 +539,6 @@ public class EditorSurface
 
 		g2d.setColor(new Color(0.0f, 1.0f, 0.0f, 1.0f));
 		g2d.fill(new Rectangle(m_xoffset, m_yoffset, event_x - m_xoffset, event_y - m_yoffset));
-	}
-
-	public void selectAllWithParent(EditorObject o)
-	{
-		for (int i = 0; i < labels.size(); i++)
-		{
-			if (((EditorLabel) labels.get(i)).getParent() == o)
-			{
-				((EditorLabel) labels.get(i)).setSelected(true);
-			}
-		}
-
-		for (int i = 0; i < events.size(); i++)
-		{
-			if (((EditorLabelGroup) events.get(i)).getParent() == o)
-			{
-				((EditorLabelGroup) events.get(i)).setSelected(true);
-			}
-		}
 	}
 
 	public EditorObject getObjectAtPosition(int ex, int ey)

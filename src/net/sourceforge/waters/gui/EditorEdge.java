@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorEdge.java,v 1.3 2005-02-21 10:22:09 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -445,10 +445,12 @@ public class EditorEdge
 		center.setFrameFromCenter(tPoint.getX(), tPoint.getY(), tPoint.getX() + WIDTHD, tPoint.getY() + WIDTHD);
 	}
 
-	/** Set the edge control point (rather than the turning point)
+	/**
+	 * Set the edge control point (rather than the turning point)
 	 */
 
-	/** Recaculate the position of the control point, based on the turning point
+	/** 
+	 * Recaculate the position of the control point, based on the turning point
 	 * @param ox The old X coordinate of the control point
 	 * @param oy The old Y position of the control point
 	 * @param startN True if the node being moved is the source node.
@@ -471,7 +473,6 @@ public class EditorEdge
 
 		if (startN)
 		{
-
 			//          Cx = (.25 * (double)(ox + 2*getCPointX() + (double)endNode.getX())) - (double)endNode.getX();
 			//  Cy = (.25 * (double)(oy + 2*getCPointY() + (double)endNode.getY())) - (double)endNode.getY();
 			Cx -= endNode.getX();
@@ -483,7 +484,6 @@ public class EditorEdge
 		}
 		else
 		{
-
 			//Cx = (.25 * (double)(ox + 2*getCPointX() + (double)start.getX())) - (double)start.getX();
 			//Cy = (.25 * (double)(oy + 2*getCPointY() + (double)start.getY())) - (double)start.getY();
 			Cx -= start.getX();
@@ -606,7 +606,8 @@ public class EditorEdge
 		return ((arc.intersects(r) &&!arc.contains(r) &&!r2.contains(x, y)) || (l1.intersects(r)) || (l2.intersects(r)));
 	}
 
-	/** Used to determine whether the object in question would be selected by given mouse click
+	/** 
+	 * Used to determine whether the object in question would be selected by given mouse click
 	 * @param Cxposition The click X position
 	 * @param Cyposition The click Y position
 	 */
@@ -781,7 +782,6 @@ public class EditorEdge
 		}
 		else
 		{
-
 			//controlPointX = ((start.getX() + endNode.getX())/2);
 			//controlPointY = ((start.getY() + endNode.getY())/2);
 			g2d.draw(new QuadCurve2D.Double(start.getX(), start.getY(), getCPointX(), getCPointY(), endNode.getX(), endNode.getY()));
