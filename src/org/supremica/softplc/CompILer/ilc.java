@@ -50,7 +50,6 @@ public class ilc
 		
 		if (v.check()) {
 		    JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
-		    //XXXnew JavaBytecodeGenerator(n, null/*output directory*/, logger);
 		    File temp = jb.getTempFile();
 		} else {
 		    System.err.println("VariableChecker failed");

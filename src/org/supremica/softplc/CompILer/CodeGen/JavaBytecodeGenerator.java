@@ -69,10 +69,7 @@ public class JavaBytecodeGenerator
 	this.logger = logger;
 	this.debug = debug;
 	outDir = outputDir;
-	System.out.println(abstractSyntaxTreeRoot.toString());
-	    
 	Node[] children = abstractSyntaxTreeRoot.getChildren();
-	    
 	visitChildren(0, children);
     }
 

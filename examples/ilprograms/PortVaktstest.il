@@ -16,15 +16,15 @@ FUNCTION_BLOCK TON
         VAR
                 odt : OnDelayTimer;
         END_VAR
-        LD tonIN
-        ST odt.tonIN
-        LD tonPT
-        ST odt.tonPT
-        CAL_JAVA odt
-        LD odt.tonET
-        ST tonET
-        LD odt.tonQ
-        ST tonQ
+        LD  tonIN
+        ST  odt.tonIN
+        LD  tonPT
+        ST  odt.tonPT
+        CAL odt
+        LD  odt.tonET
+        ST  tonET
+        LD  odt.tonQ
+        ST  tonQ
 END_FUNCTION_BLOCK
 
 PROGRAM PortVaktstest
@@ -61,10 +61,13 @@ PROGRAM PortVaktstest
 	END_VAR
 	VAR
 		IsStorKula  : BOOL;
-		MatningKlar, UrMatningKlar : BOOL := FALSE;
-		PaborjaMatning : BOOL := FALSE;
-		NyMatningSkallUtforas : BOOL;
+		Matn1, Matn2,Matn3,Matn4,Matn5 : BOOL := FALSE;
 
+
+(*		MatningKlar, UrMatningKlar : BOOL := FALSE;
+		PaborjaMatning : BOOL := FALSE;
+		MatningGjord : BOOL;
+*)
 		delay2, delay4, delay5, delay6,delay66: TON;
 		delay8, delay88,delay10 : TON;
 		tmpb   : BOOL;
@@ -85,6 +88,7 @@ PROGRAM PortVaktstest
 		ST delay5.tonPT
 		ST delay6.tonPT
 		ST delay66.tonPT (*PaborjaMatn-fördröjning*)
+		LD DINT#2000
 		ST delay10.tonPT (*Hiss*)
 		LD FALSE
 		ST Init
@@ -174,23 +178,24 @@ END4 :
 	ANDN UppMatlyft
 	JMPCN END5
 		LD TRUE
-		ST NyMatningSkallUtforas
 		ST delay5.tonIN
 		CAL delay5
 		LD delay5.tonQ
 		ST UppMatlyft
+		ST Matn1
 		STN delay5.tonIN
 		CAL delay5
 END5:
 
-(*	if (MätlyftUppe && KulaMatstation && HissNere && !MatningKlar)
+(*	if (MätlyftUppe && KulaMatstation && HissNere && Matn1 && !UrMatning)
 		Sätt Mät
 	fi
 *)
 	LD  MatlyftUppe
 	AND KulaMatstation
 	AND HissNere
-	ANDN MatningKlar
+	AND Matn1
+	ANDN UrMatning
 	JMPCN END6
 		(*Vänta tills bollen stabiliserats innan Mat sätts*)
 		LD TRUE   
@@ -202,11 +207,11 @@ END5:
 		ST delay66.tonIN
 		CAL delay66
 		LD delay66.tonQ
-		ST PaborjaMatning
-			
+		ST Matn2
+		STN Matn1
 END6:
 
-(*	if (MätlyftUppe && KulaMatstation && HissNere && Mat && !MatningKlar
+(*	if (MätlyftUppe && KulaMatstation && HissNere && Mat && Matn2
 		&& !KulaHiss)
 		Läs av mätare
 		Stäng av Mät
@@ -216,34 +221,37 @@ END6:
 	LD  MatlyftUppe
 	AND KulaMatstation
 	AND HissNere
-	ANDN MatningKlar
-	AND Mat	
-	AND PaborjaMatning
+	AND Mat
+	AND Matn2
 	ANDN KulaHiss
 	JMPCN END7
 		LD StorKula
+		OR LitenKula
+		JMPCN noMat
 		CAL PRINT("Läser av=", StorKula)
 		CAL PRINTLN("")
+		LD StorKula
 		ST IsStorKula
-		
 		(*lägg till lite bättre logik*)
-		LD FALSE
+	noMat:	LD FALSE
 		ST Mat (*släpp upp mätaren*)
-		ST PaborjaMatning
-		ST delay6.tonIN (*återställ delayen när Mat satts till true*)
+		ST delay6.tonIN (*återställ delayen*)
 		ST delay66.tonIN (*återställ delayen*)			
-		ST NyMatningSkallUtforas
+		CAL delay6
+		CAL delay66
+		ST Matn2
 		LD TRUE
-		ST MatningKlar
+		ST Matn3
 END7:
 
-(* 	if (MatningKlar && HissNere && !KulaHiss)
+(* 	if (Matn3 && HissNere && !KulaHiss)
 		Vänta lite
 		Sätt UrMätning
 		Vänta lite till
-		Sätt MatningKlar = false
+		Matn3 = F
+		Matn4 = T
 *)
-	LD MatningKlar
+	LD Matn3
 	AND HissNere
 	ANDN KulaHiss
 	JMPCN END8
@@ -255,27 +263,27 @@ END7:
 		ST delay88.tonIN
 		CAL delay88
 		LD delay88.tonQ
-		STN MatningKlar
+		ST Matn4
+		STN Matn3
 END8:
 (*	if (MatlyftUppe && !KulaMatstation &&
-		!NyMatningSkallUtforas)
+		Matn4)
 		dra tillbaka UrMätlyft
 		skicka ner matlyften
 *)
 
 	LD MatlyftUppe
 	ANDN KulaMatstation
-	ANDN NyMatningSkallUtforas
+	AND Matn4
 	JMPCN END9
 		LD FALSE
-		ST NyMatningSkallUtforas
 		ST UrMatning
 		ST UppMatlyft
-		(*ST UrMatningKlar*)
 		ST delay8.tonIN
 		ST delay88.tonIN
 		CAL delay8
 		CAL delay88
+		ST Matn4
 END9:
 
 (*	if (HissNere && KulaHiss && !UtVan1 && !UtVan2)
@@ -290,19 +298,18 @@ END9:
 		LD TRUE
 		ST delay10.tonIN
 		CAL delay10
-		LD delay10
+		LD delay10.tonQ
 		JMPCN END10 (*Vänta innan hissen körs upp*)
 		ST UppHissVan1
 		LD IsStorKula
-		JMPCN litenH
-			(*Stor kula*)		
+		JMPCN litenK	
 			LD TRUE
 			ST UppHissVan2
-			JMP END10
-	litenH:
+
+	litenK:
 		LD FALSE
 		ST delay10.tonIN
-		CAL delay10
+		CAL delay10  
 END10:
 
 (*	if (IsStorKula && HissVan2 && !KulaVan2)
@@ -315,6 +322,8 @@ END10:
 		LD FALSE
 		ST UppHissVan1
 		ST UppHissVan2
+		ST delay10.tonIN (*nollställ upphissningsfördröjningen*)
+		CAL delay10 
 END11:
 (*	if (!IsStorKula && HissVan1 && !KulaVan1)
 		Skicka ner hiss
@@ -326,9 +335,12 @@ END11:
 		LD FALSE
 		ST UppHissVan1
 		ST UppHissVan2
+		ST delay10.tonIN (*nollställ upphissningsfördröjningen*)
+		CAL delay10 
 END12:
 
-
+CAL PRINTLN("IsStorKula= ",IsStorKula)
+CAL PRINTLN("")
 
 END_PROGRAM
 
