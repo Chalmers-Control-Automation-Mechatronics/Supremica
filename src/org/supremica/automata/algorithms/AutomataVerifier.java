@@ -1856,7 +1856,6 @@ public class AutomataVerifier
 	 *@see AutomataSynchronizerExecuter
 	 */
 	private static boolean moduleIsNonblocking(Automaton theAutomaton)
-		throws Exception
 	{
 		Automaton theAutomatonCopy = new Automaton(theAutomaton);
 
@@ -1875,9 +1874,9 @@ public class AutomataVerifier
 			}
 		}
 
+		// Examine all guaranteed nonblocking states for incoming arcs
 		State examinedState;
 		Iterator incomingArcIterator;
-
 		while (statesToExamine.size() > 0)
 		{
 			examinedState = (State) statesToExamine.removeFirst();    // OBS. removeFirst!
@@ -1934,7 +1933,6 @@ public class AutomataVerifier
 	 * Standard method for monolithic nonblocking verification on theAutomaton.
 	 */
 	public static boolean verifyNonblocking(Automaton theAutomaton)
-		throws Exception
 	{
 		return moduleIsNonblocking(theAutomaton);
 	}
@@ -1961,7 +1959,7 @@ public class AutomataVerifier
 	 *
 	 * @param automataA the automata that should be included.
 	 * @param automataB the automata that should include
-	 * @return true if automataA is included in "L^-1(automataB)".
+	 * @return true if "L(automataA)" is included in "L^-1(automataB)".
 	 */
 	public static boolean verifyInclusion(Automata automataA, Automata automataB)
 		throws Exception

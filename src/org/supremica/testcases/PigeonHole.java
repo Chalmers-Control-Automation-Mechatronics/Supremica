@@ -5,8 +5,6 @@ package org.supremica.testcases;
 
 import org.supremica.automata.*;
 
-
-
 public class PigeonHole extends Automata {
 	private Project project;
 	private int pigeons, holes;
@@ -20,8 +18,8 @@ public class PigeonHole extends Automata {
 		this.pigeons = pigeons;
 		this.holes = holes;
 
-		project =  new Project();
-
+		project = new Project();
+		project.setComment("Model of pigeons and pigeonholes. From 'The Intractability of Resolution' by A. Haken. The goal is to prove that it is possible to get all pigeons inside the pigeonholes but no more than one pigeon in each hole. A (global) nonblocking problem.");
 
 		// create events:
 		iEvents = new LabeledEvent[ pigeons * holes ];
@@ -46,13 +44,13 @@ public class PigeonHole extends Automata {
 			}
 
 
-			State si = new State("P:" + (i + 1) + ":fly");
+			State si = new State("P" + (i + 1) + ":fly");
 			si.setInitial(true);
 			p.addState(si);
 
 			for(int j = 0; j < holes; j++)
 			{
-				State s = new State("P:" + (i + 1) + ":" + (j + 1));
+				State s = new State("P" + (i + 1) + ":" + (j + 1));
 				s.setAccepting(true);
 				p.addState( s);
 				p.addArc(new Arc(s, si, leaveEvent(i, j)));
@@ -62,11 +60,10 @@ public class PigeonHole extends Automata {
 			project.addAutomaton(p);
 		}
 
-
 		// add holes:
 		for (int i = 0; i < holes; i++)
 		{
-			Automaton h = new Automaton("H:" + (i + 1));
+			Automaton h = new Automaton("H" + (i + 1));
 			State last = null;
 
 			for(int k = 0; k < pigeons; k++) {
@@ -76,7 +73,7 @@ public class PigeonHole extends Automata {
 
 			for (int j = 0; j <= pigeons; j++)
 			{
-				State next = new State("H:" + (i + 1)+ ":" + ( j + 1) );
+				State next = new State("H" + (i + 1)+ ":" + (j) );
 				next.setAccepting(j == 0 || j == 1);
 				next.setInitial(j == 0);
 
@@ -95,7 +92,6 @@ public class PigeonHole extends Automata {
 			project.addAutomaton(h);
 		}
 	}
-
 
 	public Project getProject()
 	{

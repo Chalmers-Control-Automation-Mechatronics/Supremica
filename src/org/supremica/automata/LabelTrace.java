@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -123,7 +122,7 @@ public class LabelTrace
 		for (Iterator eIt = iterator(); eIt.hasNext();)
 		{
 			String currLabel = (String) eIt.next();
-			traceDesc.append("\"" + currLabel + "\"");
+			traceDesc.append("'" + currLabel + "'");
 			if (eIt.hasNext())
 			{
 				traceDesc.append("->");
@@ -131,5 +130,4 @@ public class LabelTrace
 		}
 		return traceDesc.toString();
 	}
-
 }

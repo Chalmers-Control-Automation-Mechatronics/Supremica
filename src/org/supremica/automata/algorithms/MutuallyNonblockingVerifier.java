@@ -80,7 +80,10 @@ public class MutuallyNonblockingVerifier
 
 	// Largest amount of synchronized automata during execution
 	private int maxSynchronized = 0;
-	
+
+	// General count variable
+	private int count = 0;
+
 	public MutuallyNonblockingVerifier(Automata theAutomata)
 	{
 		this.theAutomata = theAutomata;
@@ -182,6 +185,8 @@ public class MutuallyNonblockingVerifier
 		}
 
 		logger.info("During verification, at most " + maxSynchronized + " automata were synchronized.");
+		logger.info("Count: " + count + ".");
+
 		return allMutuallyNonblocking;
 	}
 
@@ -269,7 +274,7 @@ public class MutuallyNonblockingVerifier
 			});
 
 		// Second run, for each automaton, try and prove mutual nonblocking by adding automata if necessary
-		int count = 0;
+		int progress = 0;
 		second: for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
@@ -327,7 +332,7 @@ public class MutuallyNonblockingVerifier
 					}
 					*/
 
-					if (verifyBlocking(currSynchAutomaton, currSafeEvents))
+					if (verifyBlockingBySafeEvents(currSynchAutomaton, currSafeEvents))
 					{
 						logger.error("The automaton " + currAutomaton + " definitely has blocking states!");
 						int index = theAutomata.getAutomatonIndex(currAutomaton);
@@ -338,7 +343,7 @@ public class MutuallyNonblockingVerifier
 					{
 						// We should try to find another automaton and try to prove that the blocking
 						// states are unreachable... or give up.
-						logger.error("I give up! This is a good time for some synthesis! " + currSynchAutomata.size());
+						logger.error("I give up! This is a good time for synthesis! " + currSynchAutomata.size());
 					}
 					break;
 				}
@@ -376,6 +381,14 @@ public class MutuallyNonblockingVerifier
 				logger.info("Checking " + currSynchAutomata + ". \nSafe events: " + currSafeEvents + ".");
 				currSynchAutomaton.extendMutuallyAccepting(currSafeEvents);
 
+				// Are there apparent blocks in currSynchAutomaton? Maybe we can prove they're unreachable?
+				//languageInclusionTest(currSynchAutomaton);
+				if (!AutomataVerifier.verifyNonblocking(currSynchAutomaton))
+				{
+					logger.fatal("There are apparent blocks!! This is a good time for language inclusion tests!");
+					count++;
+				}
+				
 				/*
 				// Add automaton to gui
  				Gui gui = ActionMan.getGui();
@@ -442,7 +455,7 @@ public class MutuallyNonblockingVerifier
 			if (executionDialog != null)
 			{
 				//executionDialog.setProgress(currAutomaton.getIndex());
-				executionDialog.setProgress(++count);
+				executionDialog.setProgress(++progress);
 			}
 		}
 
@@ -598,17 +611,95 @@ public class MutuallyNonblockingVerifier
 	 *
 	 * It's important that automaton is marked in all states that are not blocking!!
 	 */
-	private boolean verifyBlocking(Automaton automaton, Events safeEvents)
+	private boolean verifyBlockingBySafeEvents(Automaton automaton, Events safeEvents)
 	{
 		Automaton automatonCopy = new Automaton(automaton);
 		
+		// Remove all arcs wich are not safe events
+		for (ArcIterator arcIt = automaton.arcIterator(); arcIt.hasNext();)
+		{
+			Arc currArc = arcIt.nextArc();
+			if (!safeEvents.containsEventWithLabel(currArc.getEvent()))
+			{
+				automatonCopy.removeArc(currArc);
+			}
+		}
+
 		// The unmarked states should be blocking in the input of this method!
 		automatonCopy.invertMarking();
 		automatonCopy.extendMutuallyAccepting(safeEvents);
 
 		// If the initial state is mutually accepting, then the blocking states are 
 		// guaranteed to be reachable!
-		return (automatonCopy.getInitialState().isMutuallyAccepting());
+		boolean result = automatonCopy.getInitialState().isMutuallyAccepting();
+		
+		// If we have blocks, display a (maybe local...) trace that leads to a block!
+		if (result == true)
+		{
+			for (StateIterator stateIt = automatonCopy.stateIterator(); stateIt.hasNext();)
+			{
+				State currState = stateIt.nextState();
+				if (currState.isAccepting())
+				{
+					try
+					{
+						LabelTrace trace = automatonCopy.getTrace(currState);
+
+						if (trace != null)
+						{
+							logger.info("Trace to blocking state: " + trace);
+							break;
+						}
+					}
+					catch (Exception ex)
+					{
+						logger.error(ex);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Examines if the blocking states in theAutomaton are reachable by making a language
+	 * inclusion test.
+	 */
+	private void languageInclusionTest(Automaton theAutomaton)
+	{
+		Automaton automatonCopy = new Automaton (theAutomaton);
+		automatonCopy.extendMutuallyAccepting(theAutomaton.getAlphabet());
+		
+		// Remove blocking states from automatonCopy...
+		boolean statesRemoved = false;
+		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext();)
+		{
+			State currState = automatonCopy.getState(stateIt.nextState());
+			
+			if (!currState.isMutuallyAccepting())
+			{
+				statesRemoved = true;
+				automatonCopy.removeState(currState);
+			}
+		}
+
+		if (!statesRemoved) 
+			return;
+
+		try
+		{
+			if (AutomataVerifier.verifyInclusion(theAutomata, new Automata(automatonCopy)))
+			{
+				logger.warn("WOHOHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!");
+			}
+		}
+		catch (Exception oj)
+		{
+			logger.error(oj);
+		}
+
+		return;
 	}
 
 	/**
@@ -843,7 +934,6 @@ public class MutuallyNonblockingVerifier
 			//if (currArc.getToState().isMutuallyAccepting() && !currArc.getToState().isForbidden() && !currArc.getFromState().isMutuallyAccepting())
 			if (currArc.getToState().isMutuallyAccepting() && !currArc.getFromState().isMutuallyAccepting())
 			{
-				// logger.info("Found event: " + currArc.getEvent() + " from " + currArc.getFromState() + " to " + currArc.getToState());
 				noValue = false;
 				value[index]++;
 			}

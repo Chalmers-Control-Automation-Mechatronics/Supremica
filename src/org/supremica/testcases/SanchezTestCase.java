@@ -17,14 +17,30 @@ public class SanchezTestCase extends Automata {
 
 		project =  new Project();
 
-		if(type == 0) {
+		if(type == 0) 
+		{
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + 
+							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + 
+							   "for asynchronous product.");
 			for (int i = 0; i < blocks; i++) createAsyncProduct(i);
-		} else if(type == 1) {
+		} 
+		else if(type == 1) 
+		{
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + 
+							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + 
+							   "for synchronous product.");
 			for (int i = 0; i < blocks; i++) createExactSyncProduct(i);
-		} else if(type == 2) {
+		} 
+		else if(type == 2) 
+		{
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + 
+							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + 
+							   "for supremal controllable sublanguage.");
 			TransferLine tl = new TransferLine(blocks, 1,1, true);
 			project = tl.getProject();
-		} else {
+		} 
+		else 
+		{
 			System.err.println("Unknown benchmark!");
 		}
 	}

@@ -558,6 +558,7 @@ public class Automaton
 		addState(newstate);
 		return newstate;
 	}
+
 	/**
 	 * Returns true if it finds one accepting state, else returns false
 	 * Iterates over all states _only_if_ no accepting states exist (or only
@@ -728,7 +729,6 @@ public class Automaton
 		return idStateMap.containsKey(id);
 	}
 
-
 	private State getStateWithId(String id)
 	{
 		return (State) idStateMap.get(id);
@@ -747,7 +747,7 @@ public class Automaton
 	}
 
 	/**
-	 * This is an ugly method that only are needed when dealing
+	 * This is an ugly method that only is needed when dealing
 	 * with automataIndexForm. All methods that works with index
 	 * needs special initialisation that is not automatically done.
 	 * This method is not recommended for general use.
@@ -1398,7 +1398,7 @@ public class Automaton
 	/*
 	public void setMutuallyAcceptingStatus(boolean status)
 	{
-
+	
 	}
 	*/
 

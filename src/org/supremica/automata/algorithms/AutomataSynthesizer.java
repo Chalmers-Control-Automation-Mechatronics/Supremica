@@ -67,7 +67,7 @@ import org.supremica.automata.EventIterator;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.algorithms.SynthesisType;
 
-// AutomatSelector a set of specs/sups/plants,
+// AutomataSelector a set of specs/sups/plants,
 // For each spec/sup it returns that automaton together with the plants with which it shares uc-events
 // If closedSet == true the returned set is closed in that all plants that share uc-events with any plant in the set is also included
 class AutomataSelector
@@ -210,7 +210,6 @@ public class AutomataSynthesizer
 	private ArrayList synchronizationExecuters;
 	private SynchronizationOptions synchronizationOptions;
 	private SynthesizerOptions synthesizerOptions;
-	private int[] initialState;
 	private VisualProjectContainer theVisualProjectContainer;
 	private ActionTimer theTimer = new ActionTimer();
 	private Gui gui;
@@ -233,11 +232,12 @@ public class AutomataSynthesizer
 
 		if (!theAutomata.isEventControllabilityConsistent())
 		{
-			throw new IllegalArgumentException("The automata are not consistent in the controllbility of an event.");
+			throw new IllegalArgumentException("The automata are not consistent in the controllability " + 
+											   "of an event.");
 		}
 		if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) && !theAutomata.isAllEventsPrioritized())
 		{
-			throw new IllegalArgumentException("The automata are not consistent in the controllbility of an event.");
+			throw new IllegalArgumentException("All events are not prioritized!");
 		}
 
 		// evil BDD code inserted here by Arash
@@ -253,16 +253,11 @@ public class AutomataSynthesizer
 		// initialization stuff that do need extra computation and thus ignored when
 		// doing BDD computation...
 
-
-		Automaton currAutomaton;
-		State currInitialState;
-
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
 		SynthesisAlgorithm synthesisAlgorithm = synthesizerOptions.getSynthesisAlgorithm();
 
 		// Fix this later
 		synthesizerOptions.setRememberDisabledEvents(true);
-		initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
 
 		//-- MF -- Should this be tested here? There should be no possibility selecting invalid combinations!
 		if (!AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm))
@@ -277,8 +272,9 @@ public class AutomataSynthesizer
 			AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
 			eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
+			/*
 			// Build the initial state
-			// Shouldn't this be done in Automata.java? It initialState used at all here?` /hugo
+			// Shouldn't this be done in Automata.java? Is initialState used at all here? Nope? /hugo
 			Iterator autIt = theAutomata.iterator();
 			while (autIt.hasNext())
 			{
@@ -286,6 +282,7 @@ public class AutomataSynthesizer
 				currInitialState = currAutomaton.getInitialState();
 				initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
 			}
+			*/
 		}
 		catch (Exception e)
 		{
@@ -308,19 +305,16 @@ public class AutomataSynthesizer
 		}
 		else if (algorithm == SynthesisAlgorithm.IDD)
 		{
-			return false; // Not implemented (yet)
+			return false; // Not implemented
 		}
-
 		else if (algorithm == SynthesisAlgorithm.BDD)
 		{
 			return true;
 		}
-
 		else if (algorithm == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
 			return true;
 		}
-
 		else if (algorithm == SynthesisAlgorithm.Modular)
 		// Was this really correct ? :
 		// else if (algorithm == SynthesisAlgorithm.Monolithic)
@@ -346,6 +340,7 @@ public class AutomataSynthesizer
 	{
 		return theTimer.elapsedTime();
 	}
+
 	// instead return the timer and let it do the time-to-string formatting
 	public ActionTimer getTimer()
 	{
@@ -356,112 +351,28 @@ public class AutomataSynthesizer
 	public void execute()
 		throws Exception
 	{
-		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
+		if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
 			theTimer.start();
 			MonolithicReturnValue retval = doMonolithic(theAutomata, true);
 			theTimer.stop();
 			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
-			gui.addAutomaton(retval.automaton); // let the user choose the name
+			gui.addAutomaton(retval.automaton); // let the user choose the name later
 		}
-		else if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
+		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
 			theTimer.start();
 			// monolithic case, just whack the entire stuff into the monolithic algo
-			//Boolean didSomething = new Boolean(false);
-			MonolithicReturnValue retval = doMonolithic(theAutomata, false); // we always do something, at least we synch
-			// if purge, that's already been done
+			MonolithicReturnValue retval = doMonolithic(theAutomata, false); 
 			theTimer.stop();
-
 			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
-			gui.addAutomaton(retval.automaton); // let the user choose the name
+			gui.addAutomaton(retval.automaton); // let the user choose the name later
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) // modular case
 		{
 			theTimer.start();
-
-			Automata modSupervisors = new Automata(); // collects the calculated supervisors
-
-			AutomataSelector selector = new AutomataSelector(theAutomata);	// always start with non-max perm
-			for(Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
-			{
-				if(automata.size() > 1) // no need to do anything for a singleton spec
-				{
-					MonolithicReturnValue retval = doMonolithic(automata);
-					if (retval.didSomething)
-					{
-						retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
-
-						Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
-						if(synthesizerOptions.getMaximallyPermissive()) // If we should care about max perm...
-						{
-							while(disabledEvents.size() > 0) // ...then do so until we're known to be maximally permissive...
-							{
-								automata = selector.addPlants(disabledEvents);
-								retval = doMonolithic(automata); // now we're *guaranteed* max perm
-								retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
-								disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
-							}
-						}
-						else	// we should not care about max perm, but should notify
-						{
-							if (disabledEvents.size() > 0)	// not guranteed to be max perm
-							{
-								logger.info("The synthesized supervisor " + retval.automaton.getComment() +
-											" might not be maximally permissive due to:");
-								for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
-								{
-									LabeledEvent currEvent = (LabeledEvent)evIt.next();
-									logger.info(currEvent.getLabel() + " is included in the plant but not " +
-												"in the supervisor");
-								}
-							}
-							else	// it's max perm in any case
-							{
-								logger.info("The synthesized supervisor " + retval.automaton.getComment() +
-											" is maximally permissive.");
-							}
-						}
-
-						modSupervisors.addAutomaton(retval.automaton);
-					}
-				}
-			}
-
-			// If no spec/sup is in the selected automata, only nonblocking requires work
-			if(selector.hadSpec() == false) // if we've not seen any spec, do monolithic synthesis on the entire set
-			{
-				logger.debug("No spec/sup seen, doing monolithic synthesis on the entire set");
-				MonolithicReturnValue retval = doMonolithic(theAutomata);
-				if(retval.didSomething)
-				{
-					modSupervisors.addAutomaton(retval.automaton);
-				}
-			}
-
-			if(synthesizerOptions.getOptimize())
-			{
-				optimize(theAutomata, modSupervisors);
-			}
-
+			doModular(theAutomata);
 			theTimer.stop();
-
-			if(modSupervisors.size() > 0)
-			{
-				gui.addAutomata(modSupervisors);
-			}
-			else
-			{
-				logger.info("No problems found, the specifications can be used as supervisors, as is.");
-			}
-
-			if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking ||
-			   synthesizerOptions.getSynthesisType() == SynthesisType.Both)
-			{
-				logger.info("NOTE! Currently global nonblocking is NOT guaranteed. The only guarantee " +
-							"is that each supervisor is individually nonblocking with respect to the " +
-							"plants it controls");
-			}
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) // more BDD Stuff
 		{
@@ -535,8 +446,96 @@ public class AutomataSynthesizer
 		return disabledEvents;
 	}
 
-
-	// se the real impelemntation below
+	/**
+	 * Does modular synthesis...
+	 */
+	private void doModular(Automata theAutomata)
+		throws Exception
+	{
+		Automata modSupervisors = new Automata(); // collects the calculated supervisors
+		
+		AutomataSelector selector = new AutomataSelector(theAutomata);	// always start with non-max perm
+		for (Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
+		{
+			if (automata.size() > 1) // no need to do anything for a singleton spec
+			{
+				MonolithicReturnValue retval = doMonolithic(automata);
+				if (retval.didSomething)
+				{
+					retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+					
+					Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
+					if(synthesizerOptions.getMaximallyPermissive()) // If we should care about max perm...
+					{
+						while(disabledEvents.size() > 0) // ...then do so until we're known to be maximally permissive...
+						{
+							automata = selector.addPlants(disabledEvents);
+							retval = doMonolithic(automata); // now we're *guaranteed* max perm
+							retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+							disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
+						}
+					}
+					else	// we should not care about max perm, but should notify
+					{
+						if (disabledEvents.size() > 0)	// not guranteed to be max perm
+						{
+							logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
+										"' might not be maximally permissive since:");
+							for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
+							{
+								LabeledEvent currEvent = (LabeledEvent)evIt.next();
+								logger.info(currEvent + " is included in the plant but not " +
+											"in the supervisor.");
+							}
+						}
+						else	// it's max perm in any case
+						{
+							logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
+										"' is maximally permissive.");
+						}
+					}
+					
+					modSupervisors.addAutomaton(retval.automaton);
+				}
+			}
+		}
+		
+		// If no spec/sup is in the selected automata, only nonblocking requires work
+		if(selector.hadSpec() == false) // if we've not seen any spec, do monolithic synthesis on the entire set
+		{
+			logger.debug("No spec/sup seen, doing monolithic synthesis on the entire set.");
+			MonolithicReturnValue retval = doMonolithic(theAutomata);
+			if (retval.didSomething)
+			{
+				modSupervisors.addAutomaton(retval.automaton);
+			}
+		}
+		
+		// Should we optimize the result (throw unnecessary supervisors away)
+		if (synthesizerOptions.getOptimize())
+		{
+			optimize(theAutomata, modSupervisors);
+		}
+		
+		if (modSupervisors.size() > 0)
+		{
+			gui.addAutomata(modSupervisors);
+		}
+		else
+		{
+			logger.info("No problems found, the specifications can be used as supervisors, as is.");
+		}
+		
+		if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking ||
+		   synthesizerOptions.getSynthesisType() == SynthesisType.Both)
+		{
+			logger.info("NOTE! Currently global nonblocking is NOT guaranteed. The only guarantee " +
+						"is that each supervisor is individually nonblocking with respect to the " +
+						"plants it controls");
+		}
+	}
+	
+	// se the real implementation below
 	private MonolithicReturnValue doMonolithic(Automata automata)
 		throws Exception
 	{
@@ -544,8 +543,6 @@ public class AutomataSynthesizer
 	}
 
 	// This is the engine, synchronizes the given automata, and calcs the forbidden states
-	// Returns true if states have been forbidden
-	// anAutomaton is an out-parameter, the synched result
 	private MonolithicReturnValue doMonolithic(Automata automata, boolean singleFixpoint)
 		throws Exception // simply throws everything upwards
 	{
@@ -604,7 +601,7 @@ public class AutomataSynthesizer
 				for (EventIterator evIt = problemEvents.iterator(); evIt.hasNext(); )
 				{
 					LabeledEvent currEvent = evIt.nextEvent();
-					sb.append(currEvent.getLabel() + " ");
+					sb.append(currEvent + " ");
 				}
 				logger.warn(sb.toString() + "are controllable but not observable. This imply that a supremal supervisor may not exist. To guarantee existence of such a supervisor the events will be treated us uncontrollable from the supervisors point of view. However the supervisor does not have to be maximally permissive.");
 
@@ -634,7 +631,6 @@ public class AutomataSynthesizer
 
 		// We need to synthesize even if the result above is controllable
 		// Nonblocking may ruin controllability
-
 
 		// ARASH: choose between tripple and the single fixpoint algorithms:
 		AutomatonSynthesizer synthesizer = singleFixpoint ?
@@ -683,7 +679,6 @@ public class AutomataSynthesizer
 			while (autIt.hasNext())
 			{
 				AutomatonPurge automatonPurge = new AutomatonPurge((Automaton) autIt.next());
-
 				automatonPurge.execute();
 			}
 		}

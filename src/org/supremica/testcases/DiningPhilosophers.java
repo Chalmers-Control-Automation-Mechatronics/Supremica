@@ -23,6 +23,7 @@ class Philosopher
 		new State("ld"),	// left fork put down
 		new State("rd")	// right fork put down
 	};
+
 	final static int INIT = 0;
 	final static int L_UP = 1;
 	final static int R_UP = 2;
@@ -37,6 +38,7 @@ class Philosopher
 		new LabeledEvent("L_put"),	// put down left
 		new LabeledEvent("R_put"),	// put down right
 	};
+
 	final static int L_TAKE = 0;
 	final static int R_TAKE = 1;
 	final static int L_PUT = 2;
@@ -132,20 +134,19 @@ class Philosopher
 		alpha.getEvent(events[L_PUT]).setLabel("put" + id + LABEL_SEP + l_fork);
 		alpha.getEvent(events[R_PUT]).setLabel("put" + id + LABEL_SEP + r_fork);
 
-		// must rehash since we've changed the label (that's the way it works)
+		// must rehash since we've changed the label (that's the way it works (unfortunately))
 		alpha.rehash();
 
 		return sm;
 	}
 }
 
-
 // Builds a Philo automaton
 class EatingPhilosopher
 {
 	static State[] states =
 	{
-		new State("s0"),
+		new State("think"),
 		new State("lu"),	// left fork picked up
 		new State("ru"),	// right fork picked up
 		new State("eat"),
@@ -456,11 +457,12 @@ public class DiningPhilosophers
 	public DiningPhilosophers(int num, boolean l_take, boolean r_take, boolean l_put, boolean r_put, boolean animation)
 		throws Exception
 	{
-
+		// Add comment
+		project.setComment("The classical dining philosophers problem.");
+		
 		// First the philosphers
 		// Philosopher philo = new Philosopher(l_take, r_take, l_put, r_put);
 		EatingPhilosopher philo = new EatingPhilosopher(l_take, r_take, l_put, r_put);
-
 
 		for (int i = 0; i < num; ++i)
 		{
@@ -472,7 +474,6 @@ public class DiningPhilosophers
 			project.addAutomaton(currPhil);
 
 			// To his right a philo has fork #id, and to his left is fork #id-1
-
 
 			if (animation)
 			{

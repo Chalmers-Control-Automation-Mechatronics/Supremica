@@ -402,12 +402,6 @@ class RandomPanel
 	}
 }
 
-
-
-
-
-
-
 class TransferLinePanel
 	extends JPanel
 	implements TestCase
@@ -461,7 +455,6 @@ class PigeonHolePanel
 
 	public PigeonHolePanel()
 	{
-
 		JPanel panel  = new JPanel( new GridLayout(3,2));
 		add(panel, BorderLayout.NORTH);
 
@@ -473,7 +466,6 @@ class PigeonHolePanel
 
 		panel.add(new JLabel("Number of holes: "));
 		panel.add(int_holes = new IntegerField("6", 3));
-
 	}
 
 	public Project doIt()
@@ -496,10 +488,9 @@ class SanchezPanel
 {
 	IntegerField int_blocks = null;
 	JComboBox choice = null;
-	final String [] choice_items =  {"#1: Async prod",  "#2: synch prod", "#3: supC"};
+	final String [] choice_items =  {"#1: Async prod",  "#2: Synch prod", "#3: SupC"};
 	public SanchezPanel()
 	{
-
 		JPanel panel  = new JPanel( new GridLayout(3,2));
 		add(panel, BorderLayout.NORTH);
 
@@ -510,7 +501,6 @@ class SanchezPanel
 		panel.add(int_blocks = new IntegerField("5", 3));
 		panel.add(new JLabel("Benchmark: "));
 		panel.add(choice = new JComboBox(choice_items));
-
 	}
 
 	public Project doIt()
@@ -634,6 +624,7 @@ public class TestCasesDialog
 		// We know that this is actually also a TestCase (right?)
 		TestCase tc = (TestCase) comp;
 
+		hide();
 		project = tc.doIt();    // Should return a Project (named)
 		gui.addProject(project);
 		dispose();
