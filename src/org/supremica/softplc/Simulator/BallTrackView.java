@@ -309,6 +309,13 @@ public class BallTrackView
 	System.exit(0);
     }
 
+    /**getBgImageStatus returns the status for the bgImage
+     */
+    public boolean getBgImageStatus()
+    {
+	return (bgImage != null);
+    }
+
 
     /**collisionAvoidanceHandle makes sure that no ball run over another
      */
@@ -353,45 +360,43 @@ public class BallTrackView
      */
     public void paint(Graphics gr)
     {
-	Image im = createImage(500, 458);
-	Graphics g = im.getGraphics();
-	
-	// get the balls to be painted
-	balls = rController.getAllBalls();
-
-	// make sure no balls collide
-	collisionAvoidanceHandle();
-	
-	// paint background image
-	g.drawImage(bgImage, 0, 0, this);
-	
-	// paint the animated lifts
-	g.setColor(Color.gray);
-	paintPortVakt(g);
-	paintMatLyft(g);
-	paintUrMatning(g);
-	paintHiss(g);
-	paintUrVan1(g);
-	paintUrVan2(g);
-	paintLyftVan1(g);
-	paintLyftVan2(g);
-	paintArm(g);
-
-	// paint the balls
-	for (Iterator i = balls.iterator(); i.hasNext(); )
-	{
-	    Ball b = (Ball) i.next();
-		
-	    b.paint(g);
-	}
-
-	//paint the simulator buffer to the canvas
-	Graphics gN = canvas.getGraphics();
-	gN.drawImage(im, 0, 0, this);
-	
-	//paint the buttons and the background of the buttons
-	south.repaint();
-
+	    Image im = createImage(500, 458);
+	    Graphics g = im.getGraphics();
+	    
+	    // get the balls to be painted
+	    balls = rController.getAllBalls();
+	    
+	    // make sure no balls collide
+	    collisionAvoidanceHandle();
+	    
+	    // paint background image
+	    g.drawImage(bgImage, 0, 0, this);
+	    
+	    // paint the animated lifts
+	    g.setColor(Color.gray);
+	    paintPortVakt(g);
+	    paintMatLyft(g);
+	    paintUrMatning(g);
+	    paintHiss(g);
+	    paintUrVan1(g);
+	    paintUrVan2(g);
+	    paintLyftVan1(g);
+	    paintLyftVan2(g);
+	    paintArm(g);
+	    
+	    // paint the balls
+	    for (Iterator i = balls.iterator(); i.hasNext(); )
+	    {
+		Ball b = (Ball) i.next();
+		b.paint(g);
+	    }
+	    
+	    //paint the simulator buffer to the canvas
+	    Graphics gN = canvas.getGraphics();
+	    gN.drawImage(im, 0, 0, this);
+	    
+	    //paint the buttons and the background of the buttons
+	    south.repaint();
     }
 
 

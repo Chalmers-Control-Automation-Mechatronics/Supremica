@@ -11,9 +11,9 @@ public class BTSim
 	private short nrOfSignalsOut = 32;
 
 	// inputs to simulator [18]
-	private boolean[] inSignals = { false, false, false, false, false, false,
-					false, false, false, false, false, false,
-					false, false, false, false, false, false};
+	private boolean[] inSignals = new boolean[]{ false, false, false, false, false, false,
+						    false, false, false, false, false, false,
+						    false, false, false, false, false, false};
 
 	// outputs from simulator [27]
     private boolean[] outSignals = { false, true, false, false, false, false, false,

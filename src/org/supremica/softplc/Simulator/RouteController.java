@@ -15,36 +15,36 @@ public class RouteController
 	private static final int nrOfLegs = 14;
 	public static final Movement[] movements =
 	{
-		/* movement[0]  = */
-		new Movement(new int[]{ 98, 314 }, new int[]{ 116, 316 }, 12),
-		/* movement[1]  = */
-		new Movement(new int[]{ 116, 316 }, new int[]{ 285, 329 }, 50),
-		/* movement[2]  = */
-		new Movement(new int[]{ 285, 328 }, new int[]{ 285, 251 }, 15),
-		/* movement[3]  = */
-		new Movement(new int[]{ 285, 251 }, new int[]{ 435, 266 }, 25),
-		/* movement[4]  = */
-		new Movement(new int[]{ 431, 266 }, new int[]{ 431, 124 }, 25),
-		/* movement[5]  = */
-		new Movement(new int[]{ 431, 124 }, new int[]{ 431, 62 }, 30),
-		/* movement[6]  = */
-		new Movement(new int[]{ 431, 127 }, new int[]{ 230, 149 }, 30),
-		/* movement[7]  = */
-		new Movement(new int[]{ 431, 62 }, new int[]{ 230, 78 }, 30),
-		/* movement[8]  = */
-		new Movement(new int[]{ 230, 149 }, new int[]{ 48, 149 }, 35),
-		/* movement[9]  = */
-		new Movement(new int[]{ 230, 78 }, new int[]{ 48, 78 }, 35),
-		/* movement[10] = */
-		new Movement(new int[]{ 48, 78 }, new int[]{ 48, 176 }, 35),
-		/* movement[11] = */
-		new Movement(new int[]{ 48, 150 }, new int[]{ 48, 176 }, 10),
-		/* movement[12] = */
-		new Movement(new int[]{ 48, 176 }, new int[]{ 48, 310 }, 15),
-		/* movement[13] = */
-		new Movement(new int[]{ 48, 310 }, new int[]{ 98, 314 }, 25)
-	};
-
+	    /* movement[0]  = */
+	    new Movement(new int[]{ 98, 314 }, new int[]{ 116, 316 }, 12),
+	    /* movement[1]  = */
+	    new Movement(new int[]{ 116, 316 }, new int[]{ 285, 329 }, 50),
+	    /* movement[2]  = */
+	    new Movement(new int[]{ 285, 328 }, new int[]{ 285, 251 }, 15),
+	    /* movement[3]  = */
+	    new Movement(new int[]{ 285, 251 }, new int[]{ 435, 266 }, 25),
+	    /* movement[4]  = */
+	    new Movement(new int[]{ 431, 266 }, new int[]{ 431, 124 }, 25),
+	    /* movement[5]  = */
+	    new Movement(new int[]{ 431, 124 }, new int[]{ 431, 62 }, 30),
+	    /* movement[6]  = */
+	    new Movement(new int[]{ 431, 127 }, new int[]{ 230, 149 }, 30),
+	    /* movement[7]  = */
+	    new Movement(new int[]{ 431, 62 }, new int[]{ 230, 78 }, 30),
+	    /* movement[8]  = */
+	    new Movement(new int[]{ 230, 149 }, new int[]{ 48, 149 }, 35),
+	    /* movement[9]  = */
+	    new Movement(new int[]{ 230, 78 }, new int[]{ 48, 78 }, 35),
+	    /* movement[10] = */
+	    new Movement(new int[]{ 48, 78 }, new int[]{ 48, 176 }, 35),
+	    /* movement[11] = */
+	    new Movement(new int[]{ 48, 150 }, new int[]{ 48, 176 }, 10),
+	    /* movement[12] = */
+	    new Movement(new int[]{ 48, 176 }, new int[]{ 48, 310 }, 15),
+	    /* movement[13] = */
+	    new Movement(new int[]{ 48, 310 }, new int[]{ 98, 314 }, 25)
+		};
+    
     public int getParts(int leg)
     {
 	return movements[leg].parts;
@@ -72,118 +72,140 @@ public class RouteController
 	outSignals[signal] = value;
     }
 
-	// keeps track of which balls are in each leg
-	private List[] legBallList = new List[nrOfLegs];
+    // keeps track of which balls are in each leg
+    private List[] legBallList = new List[nrOfLegs];
 
-	/**takes a step
-	 */
-
-	//parts is the vertical or horisontal differences
-	// range 0 - movement[2].parts
-	private int matlyftLevel = 0;
-	private int matlyftLength = -getVert(2);
-	// range 0 - (movement[4].parts + movement[5].parts)
-	private int hissLevel = 0;
-	private int hissLength = -(getVert(4) + getVert(5));
-	private int hissVan1Length = -getVert(4);
-	// range 0 - (movement[10].parts || movements[11].parts)
-	private int armLevel = 0;
-	private int armVertLength = getVert(10);
-	private int armVertVan1Length = getVert(11);
-	// range 0 - movement[8].parts (or movement[9].parts)
-	private int armAngle = 0;
-	private int armHoriLength = -getHori(9);
-
-	public int matlyftLevel()
+    /**takes a step
+     */
+    //parts is the vertical or horisontal differences
+    // range 0 - movement[2].parts
+    private int matlyftLevel = 0;
+    private int matlyftLength = -getVert(2);
+    // range 0 - (movement[4].parts + movement[5].parts)
+    private int hissLevel = 0;
+    private int hissLength = -(getVert(4) + getVert(5));
+    private int hissVan1Length = -getVert(4);
+    // range 0 - (movement[10].parts || movements[11].parts)
+    private int armLevel = 0;
+    private int armVertLength = getVert(10);
+    private int armVertVan1Length = getVert(11);
+    // range 0 - movement[8].parts (or movement[9].parts)
+    private int armAngle = 0;
+    private int armHoriLength = -getHori(9);
+    
+    public int matlyftLevel()
+    {
+	return matlyftLevel;
+    }
+    
+    public int hissLevel()
+    {
+	return hissLevel;
+    }
+    
+    public int armLevel()
+    {
+	return armLevel;
+    }
+    
+    public int armAngle()
+    {
+	return armAngle;
+    }
+    
+    private BTSim signals;
+    private static final int framesize = 500;
+    BallTrackView view = null; //new BallTrackView(framesize, this);
+    
+    public void addSmallBall()
+    {
+	Ball ball = new Ball(1);
+	
+	ball.moveInit(movements[12].startPos, movements[12].endPos, movements[12].move);
+	legBallList[12].add(ball);
+    }
+    
+    public void addLargeBall()
+    {
+	Ball ball = new Ball(2);
+	
+	ball.moveInit(movements[12].startPos, movements[12].endPos, movements[12].move);
+	legBallList[12].add(ball);
+    }
+    
+    public void delBall()
+    {
+	if (!legBallList[13].isEmpty())
 	{
-		return matlyftLevel;
+	    Ball ball = (Ball) legBallList[13].get(0);
+	    if (ball.finishedLeg())
+	    {
+		((LinkedList) legBallList[13]).removeFirst();
+	    }
 	}
-
-	public int hissLevel()
+    }
+    
+    public List getAllBalls()
+    {
+	LinkedList list = new LinkedList();
+	for (int j = 0; j < nrOfLegs; j++)
 	{
-		return hissLevel;
+	    for (Iterator i = legBallList[j].iterator(); i.hasNext(); )
+	    {
+		list.add(i.next());
+	    }
 	}
-
-	public int armLevel()
-	{
-		return armLevel;
+	return list;
     }
 
-	public int armAngle()
-	{
-		return armAngle;
+    /**getInSignal returns specified insignal
+     * from the array of all insignals
+     */
+    public boolean getInSignal(int sig)
+    {
+	inSignals = signals.getInSignals();
+	return inSignals[sig];
     }
+    
+    
+    /*    public boolean initialized()
+    {
+	if ( !(legBallList[0] == null) && !(signals == null) )
+	    return false;
+	else
+	    return true;
+	    }*/
 
-	private BTSim signals;
-	private static final int framesize = 500;
-	BallTrackView view = new BallTrackView(framesize, this);
+    /**Lite kommentar kanske ;)
+     *
+     */
+    public RouteController(boolean[] outs, BTSim sigs)
+    {
+	System.arraycopy(outs, 0, outSignals, 0, outSignals.length);
 
-	public void addSmallBall()
+	signals = sigs;
+
+	for (int i=0; i<legBallList.length; i++)
 	{
-		Ball ball = new Ball(1);
-
-		ball.moveInit(movements[12].startPos, movements[12].endPos, movements[12].move);
-		legBallList[12].add(ball);
+	    legBallList[i] = new LinkedList();
 	}
 
-	public void addLargeBall()
-	{
-		Ball ball = new Ball(2);
+	this.addLargeBall();
 
-		ball.moveInit(movements[12].startPos, movements[12].endPos, movements[12].move);
-		legBallList[12].add(ball);
-	}
-
-	public void delBall()
-	{
-		if (!legBallList[13].isEmpty())
-		{
-			Ball ball = (Ball) legBallList[13].get(0);
-
-			if (ball.finishedLeg())
-			{
-				((LinkedList) legBallList[13]).removeFirst();
-			}
-		}
-	}
-
-	public List getAllBalls()
-	{
-		LinkedList list = new LinkedList();
-
-		for (int j = 0; j < nrOfLegs; j++)
-		{
-			for (Iterator i = legBallList[j].iterator(); i.hasNext(); )
-			{
-				list.add(i.next());
-			}
-		}
-
-		return list;
-	}
-
-	/**Lite kommentar kanske ;)
- 	 *
- 	 */
-	public RouteController(boolean[] outs, BTSim sigs)
-	{
-		for (int i = 0; i < legBallList.length; i++)
-		{
-			legBallList[i] = new LinkedList();
-		}
-
-		System.arraycopy(outs, 0, outSignals, 0, outSignals.length);
-
-		signals = sigs;
-
-		this.addLargeBall();
-	}
-
+	view = new BallTrackView(framesize, this);
+    }
+    
 	/**run is the method run by the thread
 	 * It simply makes the simulator run
 	 */
     public void run()
     {
+	//	try
+	//  {
+	//Thread.sleep(1000);
+	//  }
+	//catch (InterruptedException eT) {}
+
 	while (true)
 	    {
 		try
@@ -203,15 +225,6 @@ public class RouteController
 	    }
     }
 
-    /**getInSignal returns specified insignal
-     * from the array of all insignals
-     */
-    public boolean getInSignal(int sig)
-    {
-	inSignals = signals.getInSignals();
-	return inSignals[sig];
-    }
-    
     private void step()
 	throws Exception
     {
@@ -569,7 +582,11 @@ public class RouteController
 	    }
 	}
 
-	view.repaint();
+	//System.out.println( "getBgStatus: " + view.getBgImageStatus() + "     Efter");
+	//System.out.println( "initialized: " + initialized() + "       Efter" );
+	if ( view.getBgImageStatus() )
+	    view.repaint();
+
 	setOutSignals();    // set all outsignals
 	signals.setOutSignals(outSignals);
     }
