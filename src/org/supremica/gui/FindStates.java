@@ -456,10 +456,7 @@ class FixedFormPanel
 class FindStatesFrame
 	extends JFrame
 {
-
-	/*
-	 *  CenteredFrame
-	 */
+	private Gui gui;	 
 	private FindStatesTable table = null;
 	private Automata automata = null;
 	private JTabbedPane tabbedPane = null;
@@ -569,14 +566,14 @@ class FindStatesFrame
 			if(matcher != null)
 			{
 				SearchStates ss = new SearchStates(getAutomata(), matcher);
-				setCursor(WAIT_CURSOR);
-				find_button.setEnabled(false);
-				//** HOWTO ** Lie here waiting for either QuitButton click or SearchStates thread finish?
-				//** HOWTO **
+				///setCursor(WAIT_CURSOR);
+				// find_button.setEnabled(false);
+				ExecutionDialog exedlg = new ExecutionDialog(this, "Finding States...", ss);
+				ss.setExecutionDialog(exedlg);
 				ss.run();	// Start the synchronization thread
-				ss.join(); // at the moment, simply wait fro ss to finish
-				find_button.setEnabled(true);
-				setCursor(DEFAULT_CURSOR);
+				// ss.join(); // at the moment, simply wait for ss to finish
+				// find_button.setEnabled(true);
+				///setCursor(DEFAULT_CURSOR);
 				showCompositeStates(ss);
 			}
 			// else do nothing
@@ -592,15 +589,16 @@ class FindStatesFrame
 	}
 
 
-	public FindStatesFrame(Automata a)
+	public FindStatesFrame(Gui gui)
 	{
 
 		// super(400, 300); // for CenteredFrame inheritance
 		Utility.setupFrame(this, 500, 300);
 		setTitle("Find States");
-
-		automata = a;
-		table = new FindStatesTable(a);
+		
+		this.gui = gui;
+		this.automata = gui.getSelectedAutomata();
+		this.table = new FindStatesTable(automata);
 
 		FixedFormPanel fixedformPanel = new FixedFormPanel(table);
 		FreeFormPanel freeformPanel = new FreeFormPanel();
@@ -625,9 +623,9 @@ public class FindStates
 {
 	private JFrame frame = null;
 
-	public FindStates(Automata a)
+	public FindStates(Gui gui)
 	{
-		frame = new FindStatesFrame(a);
+		frame = new FindStatesFrame(gui);
 	}
 
 	public void execute()

@@ -86,17 +86,8 @@ public class ExecutionDialog
 	private int nbrOfFoundStates = -1;
 	private boolean newMode = true;
 
-	/**
-	 * Creates dialog box for canceling the Stoppable classes in the supplied List.
-	 * @see Stoppable
-	 */
-	public ExecutionDialog( /* Supremica workbench */Gui workbench, String title, List executers)
+	private void Init(String title)
 	{
-		super(workbench.getFrame());
-
-		// this.workbench = workbench;
-		this.executers = executers;
-
 		setTitle(title);
 		setSize(new Dimension(240, 110));
 		setResizable(false);
@@ -152,7 +143,27 @@ public class ExecutionDialog
 		setMode(ExecutionDialogMode.uninitialized);
 		show();
 	}
+	/**
+	 * Creates dialog box for canceling the Stoppable classes in the supplied List.
+	 * @see Stoppable
+	 */
+	public ExecutionDialog(JFrame frame, String title, List executers)
+	{
+		super(frame);
 
+		// this.workbench = workbench;
+		this.executers = executers;
+		Init(title);
+	}
+	//-- MF -- Special case when you've got only one thread to watch
+	public ExecutionDialog(JFrame frame, String title, Stoppable thread)
+	{
+		super(frame);
+		this.executers = new ArrayList();
+		executers.add(thread);
+		Init(title);
+	}
+	
 	public void setMode(ExecutionDialogMode mode)
 	{
 		currentMode = mode;
@@ -244,12 +255,26 @@ public class ExecutionDialog
 
 				currCenterPanel = infoPanel;
 			}
+			else if(currentMode == ExecutionDialogMode.matchingStates)
+			{
+				operationLabel.setText(currentMode.getId());	// "Matching states...");
+				contentPanel.add(progressPanel, BorderLayout.CENTER);
+
+				currCenterPanel = infoPanel;
+			}
 			else if (currentMode == ExecutionDialogMode.hide)
 			{    
 				// Do nothing
 				//-- MF -- What happens if we do setText, add, etc, here?
 			}
+			/* This is what it should look like - let the mode keep track of itself
 
+			operationLabel.setText(currentMode.getId());	// "Matching states...");
+			contentPanel.add(progressPanel, BorderLayout.CENTER);
+
+			currCenterPanel = infoPanel;
+
+			*/
 			newMode = false;
 		}
 

@@ -123,7 +123,7 @@ public class AutomataSynchronizerWorker
 			threadsToStop.add(theSynchronizer);
 			threadsToStop.add(this);
 
-			ExecutionDialog executionDialog = new ExecutionDialog(workbench, "Synchronizing", threadsToStop);
+			ExecutionDialog executionDialog = new ExecutionDialog(workbench.getFrame(), "Synchronizing", threadsToStop);
 
 			theSynchronizer.getHelper().setExecutionDialog(executionDialog);
 			executionDialog.setMode(ExecutionDialogMode.synchronizing);

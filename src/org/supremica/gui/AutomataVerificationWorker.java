@@ -121,7 +121,7 @@ public class AutomataVerificationWorker
 		{
 			public void run()
 			{
-				executionDialog = new ExecutionDialog(workbench, "Verifying", threadsToStop);
+				executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
 
 				executionDialog.setMode(ExecutionDialogMode.verifying);
 			}
