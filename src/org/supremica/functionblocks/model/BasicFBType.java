@@ -60,14 +60,27 @@ public class BasicFBType extends FBType
 {
 
     private ECC theECC = new ECC();
+    // HashMap name,instance?
     private List instances = new ArrayList();
+    // HashMap name,algorithm
     private List algorithms = new ArrayList();
-       
+
+    private BasicFBType() {}
+
+    public BasicFBType(String name, Resource r)
+    {
+	System.out.println("BasicFBType(" + name + "," + r.getName()  + ")");
+	this.name = name;
+	resource = r;
+    }
+
+   
     public BasicFBInstance createInstance(String name)
     {
         System.out.println("BasicFBType.createInstace(" + name + ")");
-        BasicFBInstance newInstance = new BasicFBInstance(name,this);
+        BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
         // construct the newInstance
+	//instances.add(newInstance); // not yet
         return newInstance;
     }
 
@@ -76,5 +89,17 @@ public class BasicFBType extends FBType
         System.out.println("BasicFBType.getECC()");
         return theECC;
     }
-    
+
+    public void addAlgorithm(Algorithm a)
+    {
+	// this needs to be solved (look att design patterns for something suitable)
+	// the problem: name of the algorithm class i unknown before FB app is developed
+	algorithms.add(a);
+    }
+
+    public Algorithm getAlgorithm()
+    {
+	return (Algorithm) algorithms.get(0);
+    }
+
 }

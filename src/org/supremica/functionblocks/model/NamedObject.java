@@ -55,4 +55,6 @@ package org.supremica.functionblocks.model;
 public class NamedObject extends ManagedObject
 {
 
+    String name = "Unnamed";
+
 }

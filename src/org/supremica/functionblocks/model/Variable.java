@@ -54,17 +54,12 @@ package org.supremica.functionblocks.model;
 public abstract class Variable
 {
     private String name;
-    private VariableType valueHolder;
 
     public String getName()
     {
 	return name;
     }
 
-    public void setValue()
-    {
-	
-    }
     
        
 }

@@ -50,33 +50,14 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT Event (With*)>
-<!ATTLIST Event
- Name CDATA #REQUIRED
- Type CDATA #IMPLIED
- Comment CDATA #IMPLIED
->
-*/
 
 public class Event
 {
-	String name;
-	String type = null;
-	String comment = null;
-	List withs = new LinkedList(); // Put the variable name here
+    String type = null;
+    String comment = null;
 
-	private Event()
-	{
-	}
-
-	public Event(String name)
-	{
-		this.name = name;
-	}
-
-	public Iterator withIterator()
-	{
-		return withs.iterator();
-	}
+    
+    public Event()
+    {
+    }
 }

@@ -50,21 +50,16 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT Algorithm ((FBD | ST | LD | Other))>
-<!ATTLIST Algorithm
- Name CDATA #REQUIRED
- Comment CDATA #IMPLIED
->
 
-*/
-
-public abstract class Algorithm
+public class Algorithm
 {
-    private AlgorithmType algorithmType;
-    private String name;
+
+    String name;
     private String comment;
     
-    public abstract void execute(Variables variables);
+    public void execute(Variables variables)
+    {
+	
+    }
     
 }

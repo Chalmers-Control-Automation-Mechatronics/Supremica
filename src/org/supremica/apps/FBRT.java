@@ -58,8 +58,8 @@ public class FBRT
     
     public static void main(String[] args)
     {
-	Device theDevice = new Device(args[1]);
-	theDevice.run();
+	Device theDevice = new Device("FBRT Device");
+	theDevice.runDevice();
     }
 
 }

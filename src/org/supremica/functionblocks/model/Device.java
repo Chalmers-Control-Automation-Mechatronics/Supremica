@@ -61,18 +61,20 @@ public class Device
     private Resource managementResource;
     private List resources = new ArrayList();
 
+    private Device() {}
+
     public Device(String name)
     {
+	
+	System.out.println("Device(" + name + ")");
 	//as for now the test application is run in the managementResource
 	managementResource = new Resource("Management");
     }
 
-    public void run()
+    public void runDevice()
     {
-	while(true)
-	{
-	    
-	}
+	System.out.println("Device.runDevice()");
+	managementResource.runResource();
     }
 
 }

@@ -46,59 +46,22 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.functionblocks.model;
 
 import java.util.*;
 
-/**
- * @author Cengic
- */
-public class Resource
+public class TestAlgorithm extends Algorithm
 {
-
-    private String name;
-    private Scheduler scheduler;
-    private List applicationFragments = new ArrayList();
-
-    // attributes for the one instance prototype
-    BasicFBInstance fbInstance = null;
-    BasicFBType fbType = null;
-
-    private Resource() {}
-
-    public Resource(String name)
+    
+    public TestAlgorithm(String name)
     {
-	System.out.println("Resource(" + name + ")");
-
-        this.name = name;
-	scheduler = new Scheduler(this);
-
-	// create a dummy FB type and instance
-	fbType = new BasicFBType("DummyFBType", this);
-	fbType.addAlgorithm(new TestAlgorithm("DummyAlgorithm"));
-	fbInstance = fbType.createInstance("DummyFBInstance");
-	fbInstance.addEventInputQueue(new EventQueue());
-	fbInstance.queueEvent("DummyEventInput");
-    }
-
-    void handleConfigurationRequests()
-    {
-	System.out.println("Resource.handleConfigurationRequests()");
+	super();
+	this.name=name;
     }
     
-    void runResource()
+    public void execute(Variables variables)
     {
-	System.out.println("Resource.runResource()");	
-	scheduler.runEvents();
-    }
-
-    String getName()
-    {
-	return name;
-    }
-
-    Scheduler getScheduler()
-    {
-	return scheduler;
+	System.out.println("TestAlgorithm.execute()");
     }
 }

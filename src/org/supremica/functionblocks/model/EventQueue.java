@@ -59,16 +59,15 @@ import java.util.*;
 
 public class EventQueue
 {
-    private String eventName;
     private LinkedList queue = new LinkedList();
-    
-    public EventQueue(String name)
-    {
-        eventName = name;
-    }
     
     public Event remove()
     {
         return (Event) queue.removeFirst();
+    }
+
+    public void add(Event e)
+    {
+	queue.add(e);
     }
 }

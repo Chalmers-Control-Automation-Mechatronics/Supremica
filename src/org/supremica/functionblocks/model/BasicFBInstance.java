@@ -42,14 +42,18 @@
  */
 package org.supremica.functionblocks.model;
 
+
 import java.util.*;
 
 public class BasicFBInstance extends FBInstance
 {
     // attributes
+    private Resource resource;
     private BasicFBType fbType;
 
-    private List eventQueues = new ArrayList();
+    // change to HashMap for eventName to eventQueue mapping
+    private List eventInputQueues = new ArrayList();
+
 
     private ECState currentECState;
     private ECAction currentECAction;
@@ -58,20 +62,22 @@ public class BasicFBInstance extends FBInstance
     private Event currentEvent;
     private boolean handlingEvent = false;
 
-    //private Map eventOutputConnections = new ArrayList();
-    //private Map dataInputConnections = new ArrayList();
+    //private Map eventOutputConnections = new HashMap();
+    //private Map dataInputConnections = new HashMap();
 
 
     // contructor and methods for construction
-    public BasicFBInstance(String n, BasicFBType t)
+    public BasicFBInstance(String n, Resource r, BasicFBType t)
     {
         this.name = n;
 	fbType = t;
+	resource = r;
+	variables = new Variables();
     }
 
-    public void addEventQueue(EventQueue e)
+    public void addEventInputQueue(EventQueue e)
     {
-	eventQueues.add(e);
+	eventInputQueues.add(e);
     }
 
     public void addEventOutputConnection()
@@ -85,38 +91,58 @@ public class BasicFBInstance extends FBInstance
     }
 
     // methods
-    public Event getEventToHandle()
+    public Event selectEventToHandle()
     {
         System.out.println("BasicFBInstace.selectEventToHandle()");
         // TODO: Implement better event selection
-        // For the skeleton the first queue will do
-        return ((EventQueue) eventQueues.get(0)).remove();
+        // For the skeleton the first event of the first queue will do
+        return ((EventQueue) eventInputQueues.get(0)).remove();
     }
 
     public void handleEvent()
     {
         System.out.println("BasicFBInstance.handleEvent()");
 
-        currentEvent = getEventToHandle();
-	// update variables with the ones that come with the event
-	ECState newECState = fbType.getECC().execute(currentECState, variables);
-        if (newECState.getName() != currentECState.getName())
-        {
-            handlingEvent = true;
-            // TODO: get actions, make the jobs and schedule them
-	    // schedule jobs one at a time and wit for them to finish
-        }
+        currentEvent = selectEventToHandle();
+	// update variables with the ones that came with the event
+	// and execute the ecc
+	//ECState newECState = fbType.getECC().execute(currentECState, variables);
+        //if (newECState.getName() != currentECState.getName())
+        //{
+	// only set this if we find any algorithms
+	//handlingEvent = true;
+	// TODO: get actions, make the jobs and schedule them
+	// schedule jobs one at a time and wait for them to finish
+	//}
+
+	//=========================
+	//to test the threads
+	//for every event queue one algorithm
+	resource.getScheduler().scheduleJob(new Job(this, ((BasicFBType) fbType).getAlgorithm(), variables));
+	handlingEvent = true;	
     }
 
     public void finishedJob(Job theJob)
     {
         System.out.println("BasicFBInstance.finishedJob()");
 	handlingEvent = false;
+	
+	// for the dummy app make shure that the new event is queued 
+	// since there are no external sources
+	queueEvent("DummyEventInput");
+	
     }
 
     public void queueEvent(String eventInput)
     {
 	System.out.println("BasicFBInstace.queueEvent()");
-	
+	// get data, make the event object and then queue it
+	((EventQueue) eventInputQueues.get(0)).add(new Event());
     }
+    
+    boolean isHandlingEvent()
+    {
+	return handlingEvent;
+    }
+
 }

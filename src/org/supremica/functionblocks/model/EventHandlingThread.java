@@ -58,8 +58,25 @@ package org.supremica.functionblocks.model;
 class EventHandlingThread extends Thread
 {
 
-    public EventHandlingThread()
+    private Resource resource = null;
+    private Scheduler scheduler = null;
+
+    private EventHandlingThread() {}
+
+    public EventHandlingThread(Resource r,Scheduler s)
     {
-        
+        resource = r;
+	scheduler = s;
     }
+
+    public void run()
+    {
+	while (true)
+	{
+	    FBInstance selectedFB = scheduler.selectFBInstanceToHandleEvent();
+	    selectedFB.handleEvent();
+	    scheduler.notifyFinished();
+	    //resource.handleConfigurationRequests();
+	}
+    }   
 }
