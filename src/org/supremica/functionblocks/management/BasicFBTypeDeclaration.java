@@ -78,7 +78,7 @@ public class BasicFBTypeDeclaration
 		eccDeclaration = ecc;
 	}
 	
-	public void addAlgorithDeclaration(AlgorithmDeclaration algorithm)
+	public void addAlgorithmDeclaration(AlgorithmDeclaration algorithm)
 	{
 		algorithmDeclarations.add(algorithm);
 	}
