@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<Automata name="Cat and Mouse" comment="The cat and mouse problem with the specification expressed in two different ways. The cat and mouse must never be in the same room. This is specified locally, by the five specifications for the different rooms.">
+<!--
 <Automata name="Cat and Mouse" comment="The cat and mouse problem with the specification expressed in two different ways. The cat and mouse must never be in the same room. This is specified either locally, by the five specifications for the different rooms or globally, by the 'don't eat mouse' specification.">
+-->
 <Automaton name="cat" type="Plant">
 	<Events>
 		<Event id="c1" label="c1"/>
@@ -162,6 +165,7 @@
 		<Transition source="r5m" dest="r5e" event="m5"/>
 	</Transitions>
 </Automaton>
+<!--
 <Automaton name="don't eat mouse" type="Specification">
 	<Events>
 		<Event id="0" label="c1"/>
@@ -278,4 +282,5 @@
 		<Transition source="24" dest="23" event="11"/>
 	</Transitions>
 </Automaton>
+-->
 </Automata>
