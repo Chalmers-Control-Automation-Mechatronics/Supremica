@@ -1,0 +1,22 @@
+
+These models borrowed from Robi Malik from his time at Siemens.
+They are generated from UML descriptions, he has a paper about 
+this somewhere on his homepage...
+
+Note that we are not allowed to publish them or include them in 
+the Supremica executables
+
+
+FILES
+=====
+
+profisafe_i4			the original input and output models,
+profisafe_o4			note that these two are non-deterministic
+
+
+
+profisafe_large			deterministic variants of above.	
+profisafe_small			these contain less events in each automaton but more automata.
+
+/Arash
+
