@@ -101,9 +101,19 @@ public class IEC61131Helper
 		pw.println("\tVAR (* Internal variables *)");
 	}
 
-	public void printBooleanVariableDeclaration(PrintWriter pw, String variableName, String comment)
+	public static final void printTabs(PrintWriter pw, int tabs)
 	{
-		pw.print("\t\t" + variableName + " : BOOL; ");
+		for (int i = 0; i < tabs; i++) 
+		{
+			pw.print('\t');
+		}
+	}
+
+	public void printBooleanVariableDeclaration(PrintWriter pw, String variableName, String comment,int tabs)
+	{
+
+		printTabs(pw, tabs);
+		pw.print(variableName + " : BOOL; ");
 
 		if (comment != null)
 		{

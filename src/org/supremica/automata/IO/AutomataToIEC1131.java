@@ -81,6 +81,7 @@ public class AutomataToIEC1131
 	{
 		this.theProject = theProject;
 		this.theHelper = theHelper;
+		this.initialize();
 	}
 
 	private void initialize()
@@ -143,13 +144,13 @@ public class AutomataToIEC1131
 
 			theHelper.printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable()
 																										 ? " controllable"
-																										 : " uncontrollable"));
+																										 : " uncontrollable"),2);
 		}
 
-		theHelper.printBooleanVariableDeclaration(pw, "enabledEvent", "True if a event is enabled, false otherwise");
+		theHelper.printBooleanVariableDeclaration(pw, "enabledEvent", "True if an event is enabled, false otherwise",2);
 	}
 
-	void printStateVariables(PrintWriter pw)
+	void printStateVariables(PrintWriter pw,int tabs)
 	{
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
@@ -162,11 +163,11 @@ public class AutomataToIEC1131
 				State currState = (State) stateIt.next();
 				int currStateIndex = currState.getSynchIndex();
 
-				theHelper.printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName());
+				theHelper.printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),tabs);
 			}
 		}
 
-		theHelper.printBooleanVariableDeclaration(pw, "initialized", "Set the inital state the first scan cycle");
+		theHelper.printBooleanVariableDeclaration(pw, "initialized", "Set the inital state the first scan cycle",1);
 	}
 
 	void printTimerVariables(PrintWriter pw)
@@ -950,8 +951,8 @@ public class AutomataToIEC1131
 	void printComputeSingleEnabledEventAsST(PrintWriter pw)
 		throws Exception
 	{
-		pw.println("\n\t\t(* Make sure only one event is enabled *)");
-		pw.println("\t\t(* Priority is given to uncontrollable events *)");
+		pw.println("\n\t(* Make sure only one event is enabled *)");
+		pw.println("\t(* Priority is given to uncontrollable events *)");
 
 		// Iterate over all events and compute which events that are enabled
 		for (Iterator alphIt = allEvents.uncontrollableEventIterator();
@@ -1176,12 +1177,12 @@ public class AutomataToIEC1131
 	public void serializeStructuredText(PrintWriter pw)
 		throws Exception
 	{
-		initialize();
+		//initialize();
 		printBeginProgram(pw);
 		printBeginVariables(pw);
 		printSignalVariables(pw);
 		printEventVariables(pw);
-		printStateVariables(pw);
+		printStateVariables(pw,2);
 		printEndVariables(pw);
 		printSTBegin(pw);
 		printInitializationStructureAsST(pw);
@@ -1195,7 +1196,7 @@ public class AutomataToIEC1131
 	public void serializeInstructionList(PrintWriter pw)
 		throws Exception
 	{
-		initialize();
+		//initialize();
 		theHelper.printILTimerFunctions(pw);
 		printBeginProgram(pw);
 		printBeginVariables(pw);
@@ -1203,7 +1204,7 @@ public class AutomataToIEC1131
 		printEndVariables(pw);
 		printBeginVariables(pw);
 		printEventVariables(pw);
-		printStateVariables(pw);
+		printStateVariables(pw,2);
 		printTimerVariables(pw);
 		printEndVariables(pw);
 		printILBegin(pw);
