@@ -106,61 +106,52 @@ class FindStatesTableModel extends AbstractTableModel
 	public Pattern[] getRegexpPatterns()
 	{
 		return patterns;
-		/*
-		String[] strs = new String[getRowCount()];
-		for(int i = 0; i < strs.length; ++i)
-		{
-			strs[i] = (String)cells[i][REGEXP_COL];
-		}
-		return strs;
-		*/
 	}
-}
-//-----------------------------------
-class RegexpPopupMenu extends PopupMenu
-{
-	public RegexpPopupMenu()
-	{
-	}
-
 }
 //-----------------------------------
 class FindStatesTable extends JTable
 {
-
-	//** This class solves a problem with inner classes
-	//** Seems an innerclass can only access functions of its container
-	//** Thus, we cannot access the regexp_popupmenu unless it's inside
-	//** of here (or through a function call to the container)
-	//** This is also the reason for getTable(), is there a better way
-	//** to get a ref to the container?
-	class localMouseAdapter extends MouseAdapter
+	//** Inner class, needs access to teh model
+	class RegexpPopupMenu extends JPopupMenu
 	{
-		private RegexpPopupMenu regexp_popup;
-
-		public localMouseAdapter()
+		int row;
+		int col; 
+		
+		public RegexpPopupMenu(int r, int c)
 		{
-			regexp_popup = new RegexpPopupMenu();
+			super("RegexpPopup");
+			row = r;
+			col = c;
+			
+			JMenuItem edit_item = add("Edit");
+			edit_item.addActionListener(new ActionListener()
+			{	// anonymous class 
+				public void actionPerformed(ActionEvent e)
+				{
+					FindStatesTableModel table_model = getStatesTableModel();
+					String str = (String)table_model.getValueAt(row, col);
+					RegexpDialog regexp_dialog = new RegexpDialog(null, str);
+					if(regexp_dialog.isOk())
+					{
+						table_model.setValueAt(regexp_dialog.getText(), row, col);
+					}
+					doRepaint(); // for resolving ambiguity
+				}
+			});
 		}
-
-        public void mouseClicked(MouseEvent e)
-        {
-        	TableColumnModel columnModel = getColumnModel();
-    		int viewColumn = columnModel.getColumnIndexAtX(e.getX());
-	        int column = convertColumnIndexToModel(viewColumn);
-
-	        if( /* e.isPopupTrigger() && */ e.getClickCount() == 1 /**/ &&
-        		((FindStatesTableModel)((TableSorter)getModel()).getModel()).isRegexpColumn(column))
-        	{
-				boolean shiftPressed = ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0);
-				if(shiftPressed)
-					// Pop up a menu
-					regexp_popup.show(e.getComponent(), e.getX(), e.getY());
-
-        	}
-        }
+	
 	}
-
+	
+	void doRepaint()
+	{
+		repaint();
+	}
+	
+	FindStatesTableModel getStatesTableModel()
+	{
+		return (FindStatesTableModel)((TableSorter)getModel()).getModel();
+	}
+	
 	//** Wrap the FindStatesTableModel inside a sort filter
 	static TableSorter makeTableModel(Automata a)
 	{
@@ -177,6 +168,43 @@ class FindStatesTable extends JTable
 		((TableSorter)getModel()).addMouseListenerToHeaderInTable(this);
 
 		// addMouseListener(new localMouseAdapter());
+			
+		// Note! This code is duplicated (almost) from Supremica.java
+		addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				// This is needed for the Linux platform
+				// where isPopupTrigger is true only on mousePressed.
+				maybeShowPopup(e);
+			}
+
+			public void mouseReleased(MouseEvent e)
+			{
+				// This is for triggering the popup on Windows platforms
+				maybeShowPopup(e);
+			}
+
+			private void maybeShowPopup(MouseEvent e)
+			{
+				int col = columnAtPoint(new Point(e.getX(), e.getY()));
+				if(e.isPopupTrigger() && getStatesTableModel().isRegexpColumn(col))
+				{
+					int row = rowAtPoint(new Point(e.getX(), e.getY()));
+					if (row < 0)
+					{
+						return;
+					}
+					if (!isRowSelected(row))
+					{
+						clearSelection();
+						setRowSelectionInterval(row, row);
+					}
+					RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
+					regexp_popup.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 
 	}
 
@@ -187,7 +215,7 @@ class FindStatesTable extends JTable
 
 	public Pattern[] getRegexpPatterns()
 	{
-		return ((FindStatesTableModel)((TableSorter)getModel()).getModel()).getRegexpPatterns();
+		return getStatesTableModel().getRegexpPatterns();
 	}
 }
 //-----------------------------------------
@@ -195,11 +223,13 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 {
 	private FindStatesTable table = null;
 	private Automata automata = null;
+	
 	private static Category thisCategory = LogDisplay.createCategory(FindStatesFrame.class.getName());
-
-	Automata getAutomata() { return automata; }
-	Pattern[] getRegexpPatterns() { return table.getRegexpPatterns(); }
 	void Debug(String s) { thisCategory.debug(s); }
+
+	private Automata getAutomata() { return automata; }
+	private Pattern[] getRegexpPatterns() { return table.getRegexpPatterns(); }
+	private JRootPane getOurRootPane() { return getRootPane(); }
 
 	class FindButton extends JButton
 	{
@@ -208,6 +238,8 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 		{
 			super("Find");
 			setToolTipText("Go ahead and find");
+			getOurRootPane().setDefaultButton(this);
+
 			addActionListener(
 				new ActionListener()
 				{
@@ -220,24 +252,6 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 
 		void action(ActionEvent e)
 		{
-			/* build the pattern
-			String[] strs = getRegexpColumn();
-			Pattern[] patterns = new Pattern[strs.length];
-			PatternCompiler comp = new Perl5Compiler();
-			// Should test for malformed expression?? (no, should be done 'online')
-			try
-			{
-				for(int i = 0; i < patterns.length; ++i)
-				{
-					patterns[i] = comp.compile(strs[i]);
-				}
-			}
-			catch(MalformedPatternException excp)
-			{
-				System.err.println("Bad pattern.");
-        		System.err.println(excp.getMessage());
-			}
-			*/
 			// synchronize the automata but don't build the new automaton (throw away the edges)
 			// just save the states (efficiently) and mark those that match as matching
 			try
@@ -258,6 +272,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 		}
 		void showCompositeStates(SearchStates ss)
 		{
+			System.out.println("Number of states found: " + ss.numberFound());
 			for(Iterator it1 = ss.iterator(); it1.hasNext(); )
 			{
 				System.out.print("<");

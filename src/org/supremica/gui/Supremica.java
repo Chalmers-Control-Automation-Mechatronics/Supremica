@@ -78,7 +78,7 @@ public class Supremica
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private JToolBar toolBar = new JToolBar();
-	private JPopupMenu regionPopup;
+	// private JPopupMenu regionPopup;
 
 	private AutomatonContainer theAutomatonContainer;
 	private TypeCellEditor typeEditor;
@@ -1024,7 +1024,7 @@ public class Supremica
 							theAutomatonTable.clearSelection();
 							theAutomatonTable.setRowSelectionInterval(currRow, currRow);
 						}
-						regionPopup = menuHandler.getDisabledPopupMenu();
+						JPopupMenu regionPopup = menuHandler.getDisabledPopupMenu();
 						regionPopup.show(e.getComponent(),
 										 e.getX(), e.getY());
 					}

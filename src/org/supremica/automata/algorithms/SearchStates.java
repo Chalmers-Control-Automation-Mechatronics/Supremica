@@ -66,6 +66,12 @@ public class SearchStates
 			}
 		}
 	}
+	
+	public int numberFound()
+	{
+		return list.size();
+	}
+	
 	// To iterate over the matched states
 	public Iterator iterator()
 	{
