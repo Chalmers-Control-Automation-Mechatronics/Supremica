@@ -35,7 +35,7 @@ class EditorPanel
 		componentsPanel = new EditorComponentsPanel(ide, "Components");
 		tabPanel.add(componentsPanel.getTitle(), componentsPanel);
 
-		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, new WhiteScrollPane());
+		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, new JPanel());
 		splitPanelHorizontal.setContinuousLayout(false);
 		splitPanelHorizontal.setOneTouchExpandable(false);
 		splitPanelHorizontal.setDividerLocation(0.2);
