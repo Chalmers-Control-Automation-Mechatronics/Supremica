@@ -166,8 +166,8 @@ public final class SupremicaProperties
 		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000", true);
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false", true);
 		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false", true);
-		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Controllable.toString(), true);
-		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Modular.toString(), true);
+		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Both.toString(), true);
+		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Monolithic.toString(), true);
 		setProperty(SYNTHESIS_PURGE, "false", true);
 		setProperty(SYNTHESIS_OPTIMIZE, "false", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);

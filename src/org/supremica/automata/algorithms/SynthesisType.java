@@ -56,7 +56,7 @@ public class SynthesisType
 	private static Collection types = new LinkedList();
 	public static final SynthesisType Controllable = new SynthesisType("Controllable");
 	public static final SynthesisType Nonblocking = new SynthesisType("Nonblocking");
-	public static final SynthesisType Both = new SynthesisType("Both");
+	public static final SynthesisType Both = new SynthesisType("Nonblocking and controllable");
 	public static final SynthesisType Unknown = new SynthesisType("Unknown", false);
 	private String description = null;
 
