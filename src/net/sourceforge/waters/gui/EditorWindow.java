@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.11 2005-03-04 05:40:22 knut Exp $
+//# $Id: EditorWindow.java,v 1.12 2005-03-04 07:58:29 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -167,37 +167,26 @@ public class EditorWindow
 
 	public void createPDF(File file)
 	{
-		System.out.println("Hello World");
 
-		// step 1: creation of a document-object
 		int width = surface.getWidth();
 		int height = surface.getHeight();
 		Document document = new Document(new com.lowagie.text.Rectangle(width, height));
 
 		try
 		{
-			// step 2:
-			// we create a writer that listens to the document
-			// and directs a PDF-stream to a file
-			PdfWriter writer= PdfWriter.getInstance(document,
-					new FileOutputStream("c:/Temp/test.pdf"));
+			PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
 
 			document.addAuthor("Supremica");
-
-
-			// step 3: we open the document
 			document.open();
-			// step 4: we add a paragraph to the document
-			//document.add(new Paragraph("Hej Knut!"));
 
-            PdfContentByte cb = writer.getDirectContent();
-            PdfTemplate tp = cb.createTemplate(width, height);
-            Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
-            surface.print(g2);
-            //Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, width, height);
-            //chart.draw(g2, rectangle2D);
-            g2.dispose();
-            cb.addTemplate(tp, 0, 0);
+			PdfContentByte cb = writer.getDirectContent();
+			PdfTemplate tp = cb.createTemplate(width, height);
+			Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
+			surface.print(g2);
+			//Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, width, height);
+			//chart.draw(g2, rectangle2D);
+			g2.dispose();
+			cb.addTemplate(tp, 0, 0);
 
 		}
 		catch (DocumentException de)
@@ -209,20 +198,7 @@ public class EditorWindow
 			System.err.println(ioe.getMessage());
 		}
 
-		// step 5: we close the document
 		document.close();
-
-/*
-		if (toClipboard == null)
-		{
-			toClipboard = GraphicsToClipboard.getInstance();
-		}
-
-		Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
-
-		surface.print(theGraphics);
-		toClipboard.copyToClipboard();
-*/
 
 
 
