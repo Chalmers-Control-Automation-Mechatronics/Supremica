@@ -1,4 +1,4 @@
-package org.supremica.tools.operatorsupervisor.warehouse;
+package org.supremica.testcases;
 
 import java.util.*;
 import java.io.*;
@@ -7,18 +7,18 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.automata.IO.*;
 import org.supremica.automata.execution.*;
 
-class Resource
+class WarehouseResource
 {
 	private boolean exclusive;
 	private String identity;
 	private LinkedList u1NextResources = new LinkedList();
 	private LinkedList u2NextResources = new LinkedList();
-	private User u1;
-	private User u2;
+	private WarehouseUser u1;
+	private WarehouseUser u2;
 	private int x;
 	private int y;
 
-	public Resource(int x, int y, boolean exclusive, User u1, User u2)
+	public WarehouseResource(int x, int y, boolean exclusive, WarehouseUser u1, WarehouseUser u2)
 	{
 		this.x = x;
 		this.y = y;
@@ -290,22 +290,22 @@ class User
 }
 */
 
-class User
+class WarehouseUser
 {
 	private boolean controllable;
 	private String identity;
 	private LinkedList transitions = new LinkedList();
-	private Resource initial;
+	private WarehouseResource initial;
 	private Project theProject;
 
-	public User(String identity, boolean controllable, Project theProject)
+	public WarehouseUser(String identity, boolean controllable, Project theProject)
 	{
 		this.identity = identity;
 		this.controllable = controllable;
 		this.theProject = theProject;
 	}
 
-	public void addTransition(Resource fromResource, Resource[] toResources)
+	public void addTransition(WarehouseResource fromResource, WarehouseResource[] toResources)
 	{
 		ArrayList currTransition = new ArrayList(2);
 		currTransition.add(fromResource);
@@ -314,7 +314,7 @@ class User
 	}
 
 
-	public void setInitalResource(Resource initial)
+	public void setInitalResource(WarehouseResource initial)
 	{
 		this.initial = initial;
 	}
@@ -330,7 +330,7 @@ class User
 		for(Iterator transitionIt = transitions.iterator(); transitionIt.hasNext(); )
 		{
 			ArrayList currTransition = (ArrayList)transitionIt.next();
-			Resource resource = (Resource)currTransition.get(0);
+			WarehouseResource resource = (WarehouseResource)currTransition.get(0);
 			State resourceState = new State(resource.getIdentity());
 			//resourceState.setAccepting(true);
 			//resourceState.setId(resource.getIdentity());
@@ -357,7 +357,7 @@ class User
 		for(Iterator transitionIt = transitions.iterator(); transitionIt.hasNext(); )
 		{
 			ArrayList currTransition = (ArrayList)transitionIt.next();
-			Resource sourceResource = (Resource)currTransition.get(0);
+			WarehouseResource sourceResource = (WarehouseResource)currTransition.get(0);
 			State sourceState = (State)resourceMap.get(sourceResource);
 			// System.err.println(identity + sourceResource.getIdentity());
 			String label = identity + sourceResource.getIdentity();
@@ -386,12 +386,12 @@ class User
 		for(Iterator transitionIt = transitions.iterator(); transitionIt.hasNext(); )
 		{
 			ArrayList currTransition = (ArrayList)transitionIt.next();
-			Resource sourceResource = (Resource)currTransition.get(0);
-			Resource[] destResources = (Resource[])currTransition.get(1);
+			WarehouseResource sourceResource = (WarehouseResource)currTransition.get(0);
+			WarehouseResource[] destResources = (WarehouseResource[])currTransition.get(1);
 			State sourceState = (State)resourceMap.get(sourceResource);
 			for (int i = 0; i < destResources.length; i++)
 			{
-				Resource destResource = destResources[i];
+				WarehouseResource destResource = destResources[i];
 				State destState = (State)resourceMap.get(destResource);
 				LabeledEvent currEvent = theAlphabet.getEventWithLabel(identity + destResource.getIdentity());
 				if (currEvent == null)
@@ -422,7 +422,7 @@ class User
 }
 
 
-public class ExampleGenerator
+public class Warehouse
 {
 
 	public static void main(String args[])
@@ -431,88 +431,88 @@ public class ExampleGenerator
 
 		Project theAutomata = new Project();
 
-		User u1 = new User("agv", true, theAutomata);
-		User u2 = new User("truck", false, theAutomata);
+		WarehouseUser u1 = new WarehouseUser("agv", true, theAutomata);
+		WarehouseUser u2 = new WarehouseUser("truck", false, theAutomata);
 
-		Resource r11 = new Resource(1, 0, true, u1, u2);
-		Resource r12 = new Resource(2, 0, true, u1, u2);
-		Resource r13 = new Resource(3, 0, true, u1, u2);
-		Resource r14 = new Resource(1, 1, true, u1, u2);
-		Resource r15 = new Resource(2, 1, true, u1, u2);
-		Resource r16 = new Resource(3, 1, true, u1, u2);
-		Resource r17 = new Resource(1, 2, true, u1, u2);
-		Resource r18 = new Resource(2, 2, true, u1, u2);
-		Resource r19 = new Resource(3, 2, true, u1, u2);
+		WarehouseResource r11 = new WarehouseResource(1, 0, true, u1, u2);
+		WarehouseResource r12 = new WarehouseResource(2, 0, true, u1, u2);
+		WarehouseResource r13 = new WarehouseResource(3, 0, true, u1, u2);
+		WarehouseResource r14 = new WarehouseResource(1, 1, true, u1, u2);
+		WarehouseResource r15 = new WarehouseResource(2, 1, true, u1, u2);
+		WarehouseResource r16 = new WarehouseResource(3, 1, true, u1, u2);
+		WarehouseResource r17 = new WarehouseResource(1, 2, true, u1, u2);
+		WarehouseResource r18 = new WarehouseResource(2, 2, true, u1, u2);
+		WarehouseResource r19 = new WarehouseResource(3, 2, true, u1, u2);
 
-		Resource r21 = new Resource(1, 4, true, u1, u2);
-		Resource r22 = new Resource(2, 4, true, u1, u2);
-		Resource r23 = new Resource(3, 4, true, u1, u2);
-		Resource r24 = new Resource(1, 5, true, u1, u2);
-		Resource r25 = new Resource(2, 5, true, u1, u2);
-		Resource r26 = new Resource(3, 5, true, u1, u2);
-		Resource r27 = new Resource(1, 6, true, u1, u2);
-		Resource r28 = new Resource(2, 6, true, u1, u2);
-		Resource r29 = new Resource(3, 6, true, u1, u2);
+		WarehouseResource r21 = new WarehouseResource(1, 4, true, u1, u2);
+		WarehouseResource r22 = new WarehouseResource(2, 4, true, u1, u2);
+		WarehouseResource r23 = new WarehouseResource(3, 4, true, u1, u2);
+		WarehouseResource r24 = new WarehouseResource(1, 5, true, u1, u2);
+		WarehouseResource r25 = new WarehouseResource(2, 5, true, u1, u2);
+		WarehouseResource r26 = new WarehouseResource(3, 5, true, u1, u2);
+		WarehouseResource r27 = new WarehouseResource(1, 6, true, u1, u2);
+		WarehouseResource r28 = new WarehouseResource(2, 6, true, u1, u2);
+		WarehouseResource r29 = new WarehouseResource(3, 6, true, u1, u2);
 
-		Resource r31 = new Resource(0, 0, true, u1, u2);
-		Resource r32 = new Resource(0, 3, true, u1, u2);
-		Resource r33 = new Resource(0, 6, true, u1, u2);
+		WarehouseResource r31 = new WarehouseResource(0, 0, true, u1, u2);
+		WarehouseResource r32 = new WarehouseResource(0, 3, true, u1, u2);
+		WarehouseResource r33 = new WarehouseResource(0, 6, true, u1, u2);
 
-		Resource r41 = new Resource(4, 1, true, u1, u2);
-		Resource r42 = new Resource(4, 5, true, u1, u2);
+		WarehouseResource r41 = new WarehouseResource(4, 1, true, u1, u2);
+		WarehouseResource r42 = new WarehouseResource(4, 5, true, u1, u2);
 
 		// agv
-		u1.addTransition(r11, new Resource[]{r12, r14, r31});
-		u1.addTransition(r12, new Resource[]{r11, r13});
-		u1.addTransition(r13, new Resource[]{r12, r16});
-		u1.addTransition(r14, new Resource[]{r11, r15, r17});
-		u1.addTransition(r15, new Resource[]{r14, r18});
-		u1.addTransition(r16, new Resource[]{r13, r19, r41});
-		u1.addTransition(r17, new Resource[]{r14, r18});
-		u1.addTransition(r18, new Resource[]{r15, r17, r19});
-		u1.addTransition(r19, new Resource[]{r16, r18});
+		u1.addTransition(r11, new WarehouseResource[]{r12, r14, r31});
+		u1.addTransition(r12, new WarehouseResource[]{r11, r13});
+		u1.addTransition(r13, new WarehouseResource[]{r12, r16});
+		u1.addTransition(r14, new WarehouseResource[]{r11, r15, r17});
+		u1.addTransition(r15, new WarehouseResource[]{r14, r18});
+		u1.addTransition(r16, new WarehouseResource[]{r13, r19, r41});
+		u1.addTransition(r17, new WarehouseResource[]{r14, r18});
+		u1.addTransition(r18, new WarehouseResource[]{r15, r17, r19});
+		u1.addTransition(r19, new WarehouseResource[]{r16, r18});
 
-		u1.addTransition(r21, new Resource[]{r22, r24});
-		u1.addTransition(r22, new Resource[]{r21, r23, r25});
-		u1.addTransition(r23, new Resource[]{r22, r26});
-		u1.addTransition(r24, new Resource[]{r21, r25, r27});
-		u1.addTransition(r25, new Resource[]{r22, r24, r28});
-		u1.addTransition(r26, new Resource[]{r23, r29, r42});
-		u1.addTransition(r27, new Resource[]{r24, r28});
-		u1.addTransition(r28, new Resource[]{r25, r27, r29});
-		u1.addTransition(r29, new Resource[]{r26, r28});
+		u1.addTransition(r21, new WarehouseResource[]{r22, r24});
+		u1.addTransition(r22, new WarehouseResource[]{r21, r23, r25});
+		u1.addTransition(r23, new WarehouseResource[]{r22, r26});
+		u1.addTransition(r24, new WarehouseResource[]{r21, r25, r27});
+		u1.addTransition(r25, new WarehouseResource[]{r22, r24, r28});
+		u1.addTransition(r26, new WarehouseResource[]{r23, r29, r42});
+		u1.addTransition(r27, new WarehouseResource[]{r24, r28});
+		u1.addTransition(r28, new WarehouseResource[]{r25, r27, r29});
+		u1.addTransition(r29, new WarehouseResource[]{r26, r28});
 
-		u1.addTransition(r31, new Resource[]{r32});
-		u1.addTransition(r32, new Resource[]{r33});
-		u1.addTransition(r33, new Resource[]{r27});
+		u1.addTransition(r31, new WarehouseResource[]{r32});
+		u1.addTransition(r32, new WarehouseResource[]{r33});
+		u1.addTransition(r33, new WarehouseResource[]{r27});
 
-		u1.addTransition(r41, new Resource[]{r16, r42});
-		u1.addTransition(r42, new Resource[]{r26, r41});
+		u1.addTransition(r41, new WarehouseResource[]{r16, r42});
+		u1.addTransition(r42, new WarehouseResource[]{r26, r41});
 
 		// truck
-		u2.addTransition(r11, new Resource[]{r12, r14, r31});
-		u2.addTransition(r12, new Resource[]{r11, r13});
-		u2.addTransition(r13, new Resource[]{r12, r16});
-		u2.addTransition(r14, new Resource[]{r11, r15, r17});
-		u2.addTransition(r15, new Resource[]{r14, r18});
-		u2.addTransition(r16, new Resource[]{r13, r19});
-		u2.addTransition(r17, new Resource[]{r14, r18});
-		u2.addTransition(r18, new Resource[]{r15, r17, r19});
-		u2.addTransition(r19, new Resource[]{r16, r18});
+		u2.addTransition(r11, new WarehouseResource[]{r12, r14, r31});
+		u2.addTransition(r12, new WarehouseResource[]{r11, r13});
+		u2.addTransition(r13, new WarehouseResource[]{r12, r16});
+		u2.addTransition(r14, new WarehouseResource[]{r11, r15, r17});
+		u2.addTransition(r15, new WarehouseResource[]{r14, r18});
+		u2.addTransition(r16, new WarehouseResource[]{r13, r19});
+		u2.addTransition(r17, new WarehouseResource[]{r14, r18});
+		u2.addTransition(r18, new WarehouseResource[]{r15, r17, r19});
+		u2.addTransition(r19, new WarehouseResource[]{r16, r18});
 
-		u2.addTransition(r21, new Resource[]{r22, r24});
-		u2.addTransition(r22, new Resource[]{r21, r23, r25});
-		u2.addTransition(r23, new Resource[]{r22, r26});
-		u2.addTransition(r24, new Resource[]{r21, r25, r27});
-		u2.addTransition(r25, new Resource[]{r22, r24});
-		u2.addTransition(r26, new Resource[]{r23, r29});
-		u2.addTransition(r27, new Resource[]{r24, r33});
+		u2.addTransition(r21, new WarehouseResource[]{r22, r24});
+		u2.addTransition(r22, new WarehouseResource[]{r21, r23, r25});
+		u2.addTransition(r23, new WarehouseResource[]{r22, r26});
+		u2.addTransition(r24, new WarehouseResource[]{r21, r25, r27});
+		u2.addTransition(r25, new WarehouseResource[]{r22, r24});
+		u2.addTransition(r26, new WarehouseResource[]{r23, r29});
+		u2.addTransition(r27, new WarehouseResource[]{r24, r33});
 		// u2.addTransition(r28, new Resource[]{});
-		u2.addTransition(r29, new Resource[]{r26});
+		u2.addTransition(r29, new WarehouseResource[]{r26});
 
-		u2.addTransition(r31, new Resource[]{r32, r11});
-		u2.addTransition(r32, new Resource[]{r31, r33});
-		u2.addTransition(r33, new Resource[]{r32, r27});
+		u2.addTransition(r31, new WarehouseResource[]{r32, r11});
+		u2.addTransition(r32, new WarehouseResource[]{r31, r33});
+		u2.addTransition(r33, new WarehouseResource[]{r32, r27});
 
 		theAutomata.addAutomaton(u1.build());
 		theAutomata.addAutomaton(u2.build());

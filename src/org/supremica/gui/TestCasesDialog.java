@@ -177,6 +177,38 @@ class BricksPanel
 	}
 }
 
+class Warehouse
+	extends JPanel
+	implements TestCase
+{
+	IntegerField nbr_events_k = new IntegerField("4", 6);
+	IntegerField nbr_events_l = new IntegerField("4", 6);
+
+	Warehouse()
+	{
+
+
+		JPanel panel  = new JPanel( new GridLayout(2,2));
+		add(panel, BorderLayout.WEST);
+
+		panel.add(new JLabel("Number of operator events (k): "));
+		panel.add(nbr_events_k);
+
+		panel.add(new JLabel("Number of supervisor events (l): "));
+		panel.add(nbr_events_l);
+
+
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		BricksGame bg = new BricksGame(nbr_events_k.get(), nbr_events_l.get());
+
+		return bg.getProject();
+	}
+}
+
 class StickGamePanel
 	extends JPanel
 	implements TestCase
@@ -314,7 +346,7 @@ class RandomPanel
 		panel.add(new JLabel("Number of states: "));
 		panel.add(int_size = new IntegerField("8", 6));
 
-		panel.add(new JLabel("Number of Events: "));
+		panel.add(new JLabel("Number of events: "));
 		panel.add(int_events = new IntegerField("8", 3));
 
 		panel.add(new JLabel("Deterministic transition-density: "));
