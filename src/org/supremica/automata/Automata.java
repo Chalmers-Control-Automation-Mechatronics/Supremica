@@ -1297,9 +1297,8 @@ public class Automata
 		}
 
 		// Warns if there are events with equal (lowercase) names. 
-		//Always do this check
+		//Always do this check (irritating? well yes... but those are really bad names!)
 		isEventNamesSafe();
-
 
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)

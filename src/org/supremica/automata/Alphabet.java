@@ -912,7 +912,6 @@ public class Alphabet
 	 */
 	public boolean hasEqualEventNamesIgnoringCase()
 	{
-
 		// Make copy to make iterating easier...
 		Alphabet copy = new Alphabet(this);
 
@@ -927,7 +926,7 @@ public class Alphabet
 			// Another iterator
 			EventIterator eventIt = iterator();
 
-			// Make sure each pair is only examined once
+			// Make sure each pair is only examined once (assumes same order in both iterations!)
 			while (!eventA.equals(eventIt.nextEvent()));
 
 			while (eventIt.hasNext())
@@ -939,7 +938,7 @@ public class Alphabet
 				{
 					logger.warn("The events " + eventA + " and " + eventB + " have very " + 
 								"similar names but will be treated as different events!");
-
+					
 					found = true;
 				}
 			}

@@ -928,7 +928,6 @@ public class Supremica
 */
 	public int addAutomata(Automata currAutomata)
 	{
-
 		//-- MF -- debug stuff, is there no way to remove the if under no-debug-build?
 		if (currAutomata.size() == 0)
 		{
@@ -1017,7 +1016,7 @@ public class Supremica
 
 		// Force the user to enter a new name if it has no name
 		//if (currAutomaton.getName() == null || currAutomaton.getName().equals(""))
-		if (!currAutomaton.hasName())
+		if (!currAutomaton.hasName() || currAutomaton.getName().equals(""))
 		{
 			String autName = getNewAutomatonName("Enter a new name", currAutomaton.getComment());
 

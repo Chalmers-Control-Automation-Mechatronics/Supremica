@@ -127,8 +127,8 @@ class MinimizationDialogStandardPanel
 	{
 		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.ObservationEquivalence)
 		{
-			//note.setText("Note:\n" + "This minimization algorithm is experimental!");
-			note.setVisible(false);
+			note.setText("Note:\n" + "This minimization algorithm is experimental!");
+			note.setVisible(true);
 		}
 
 		// Not else if!
@@ -136,7 +136,7 @@ class MinimizationDialogStandardPanel
 		{
 			note.setText("Note:\n" + "Returns an automaton representing the same language\n" + 
 						 "using a minimal number of states and transitions.\n" + 
-						 "  If the automaton is nondeterministic, it is first made\n." + 
+						 "  If the automaton is nondeterministic, it is first made\n" + 
 						 "deterministic.");
 			
 			// This implies that the number of transitions are minimized

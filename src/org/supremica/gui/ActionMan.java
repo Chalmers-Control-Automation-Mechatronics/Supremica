@@ -2352,7 +2352,6 @@ public class ActionMan
 
 		if (!currProject.isDeterministic())
 		{
-
 			// JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
 			// return;
 			Object[] options = { "Continue", "Abort" };
@@ -2360,7 +2359,7 @@ public class ActionMan
 
 			if (conf == JOptionPane.YES_OPTION)
 			{
-				logger.warn("Non-deterministic automaton loaded. You're on your own.");
+				logger.warn("Non-deterministic automaton loaded. Some algorithms are not guaranteed to work. You're on your own.");
 			}
 			else    // NO_OPTION
 			{
@@ -2550,8 +2549,6 @@ public class ActionMan
 
 	public static void importValidFile(Gui gui, File file)
 	{
-
-		// logger.info("Importing " + file.getAbsolutePath() + " ...");
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
 
 		try
@@ -2649,14 +2646,12 @@ public class ActionMan
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-
 		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true, false))
 		{
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();

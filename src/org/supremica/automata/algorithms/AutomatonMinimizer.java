@@ -54,6 +54,7 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.SupremicaProperties;
+import java.awt.Toolkit;
 
 // Factory object for generating the correct class according to prefs
 class EqClassFactory
@@ -94,10 +95,10 @@ public class AutomatonMinimizer
 		throws Exception
 	{
 		this.options = options;
-		
+				
 		// We need a copy since we must make the system reachable (and maybe deterministic) first!
-		theAutomaton = new Automaton(theAutomaton);
-		
+		//theAutomaton = new Automaton(theAutomaton);
+
 		// Make reachable
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, SynthesizerOptions.getDefaultSynthesizerOptions());
 		synth.doReachable();
@@ -137,11 +138,11 @@ public class AutomatonMinimizer
 			}
 			else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
 			{
-				// We need a copy since we must do "saturation"
-				theAutomaton = new Automaton(theAutomaton);
-
-				// Make copy, we're going to modify things...
+				// Saturate
 				doTransitiveClosure(theAutomaton);
+
+				// Adjust marking to transitive closure
+				adjustMarking(theAutomaton);
 
 				// Find initial partitioning
 				equivClasses = findInitialPartitioning(theAutomaton);
@@ -178,7 +179,7 @@ public class AutomatonMinimizer
 	 * Find the initial partitioning of this automaton, based on the marking and forbidden
 	 * states (marking can be ignored using the minimization option ignoreMarking.
 	 */	
-	private EquivalenceClasses findInitialPartitioning(Automaton theAutomaton)
+	private EquivalenceClasses findInitialPartitioning(Automaton aut)
 	{
 		// Find the initial partitioning for the minimization
 		EquivalenceClasses equivClasses = new EquivalenceClasses();
@@ -189,7 +190,7 @@ public class AutomatonMinimizer
 		EquivalenceClass rejectingStates = EqClassFactory.getEqClass();
 		
 		// Examine each state for which class it fits into
-		StateIterator stateIt = theAutomaton.stateIterator();
+		StateIterator stateIt = aut.stateIterator();
 		while (stateIt.hasNext())
 		{
 			State currState = stateIt.nextState();
@@ -241,7 +242,7 @@ public class AutomatonMinimizer
 		Automaton newAutomaton = new Automaton();
 
 		newAutomaton.setType(theAutomaton.getType());
-		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... it works, of course, but why like this?
+		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... but it works. Why like this?
 
 		// Associate one state with each equivalence class
 		int currNbrOfStates = 0;
@@ -386,19 +387,33 @@ public class AutomatonMinimizer
 			StateSet closure = determinizer.epsilonClosure(currState);
 			currState.setStateSet(closure);
 		}
-
-		// From each state add transitions that are present in its closure
+		
+		// From each state add transitions that are present in its closure		
+		LinkedList toBeAdded = new LinkedList();
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
 			State currState = stateIt.nextState();
 			StateSet closure = currState.getStateSet();
-
+			
 			// Iterate over outgoing arcs in the closure
 			for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
 			{
-				for (ArcIterator arcIt = closureIt.nextState().safeOutgoingArcsIterator(); arcIt.hasNext(); )
+				for (ArcIterator arcIt = closureIt.nextState().outgoingArcsIterator(); arcIt.hasNext(); )
 				{
 					Arc arc = arcIt.nextArc();
+
+					// We can safely ignore the closure, we'll get there, don't worry
+					if (arc.getEvent().isEpsilon())						
+					{
+						// Don't add self-loops of epsilons (we will do that later in each state)
+						if (!currState.equals(arc.getToState()))
+						{
+							toBeAdded.add(new Arc(currState, arc.getToState(), arc.getEvent()));
+						}
+
+						// Ignore the below loop
+						continue;
+					}
 					
 					// Where may we end up if we move along this transition? 
 					// Anywhere in the epsilon closure of the toState...
@@ -406,17 +421,16 @@ public class AutomatonMinimizer
 					for (StateIterator toIt = toClosure.iterator(); toIt.hasNext(); )
 					{
 						State toState = toIt.nextState();
-					   
+						
 						// Don't add already existing transitions
 						if (!(currState.equals(arc.getFromState()) && toState.equals(arc.getToState())))
 						{
-							Arc newArc = new Arc(currState, toState, arc.getEvent());
-							aut.addArc(newArc);
+							toBeAdded.add(new Arc(currState, toState, arc.getEvent()));
 						}
 					}
 				}
 			}
-			
+
 			// Add silent self-loop
 			LabeledEvent tau = new LabeledEvent("tau");
 			tau.setEpsilon(true);
@@ -424,9 +438,56 @@ public class AutomatonMinimizer
 			{
 				aut.getAlphabet().addEvent(tau);
 			}
-			aut.addArc(new Arc(currState, currState, tau));
+			toBeAdded.add(new Arc(currState, currState, tau));
+		}
+		// Add the new arcs!
+		while (toBeAdded.size() != 0)
+		{
+			// Add if not already there
+			Arc arc = (Arc) toBeAdded.remove(0);
+			if (!aut.containsArc(arc))
+			{
+				aut.addArc(arc);
+			}
 		}
 	} 
+
+	/** 
+	 * All states could as well be marked in an epsilon-loop where at least one state is marked.
+	 * This method adjusts this.
+	 */
+	public void adjustMarking(Automaton aut)
+	{
+		LinkedList toBeMarked = new LinkedList();
+		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+		{
+			State markedState = stateIt.nextState();			
+			if (markedState.isAccepting())
+			{
+				// Is currState in the closure of a state in its closure? 
+				// Then that state should be marked.
+				StateSet closure = markedState.getStateSet();
+				for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
+				{
+					State otherState = closureIt.nextState();
+					if (!otherState.isAccepting())
+					{
+						StateSet otherClosure = otherState.getStateSet();
+						if (otherClosure.contains(markedState))
+						{
+							logger.info("Marking " + otherState);
+							toBeMarked.add(otherState);
+						}
+					}
+				}
+			}		
+		}	
+		// Adjust the marking!
+		while (toBeMarked.size() != 0)
+		{
+			((State) toBeMarked.remove(0)).setAccepting(true);
+		}		
+	}
 
 	/**
 	 * Algorithm inspired by "Minimizing the Number of Transitions with Respect to Observation Equivalence"
@@ -462,11 +523,11 @@ public class AutomatonMinimizer
 		{
 			Arc arc = arcIt.nextArc();
 			
-			// Using Elorantas notation... (s1, s2 and s3)
+			// Using Elorantas notation... (s1, s2 and (later) s3)
 			State s1 = arc.getFromState();
 			State s2 = arc.getToState();
 
-			// Is the criteria fulfilled? (does there exist a s3 such that either
+			// Is the criteria fulfilled? (I.e. does there exist a s3 such that either
 			// (s1 -a-> a3 and s3 -tau-> s2) or (s1 -tau-> s3 and s3 -a-> s2) holds?)
 			test: for (ArcIterator outIt = s1.outgoingArcsIterator(); outIt.hasNext(); )
 			{
@@ -498,6 +559,33 @@ public class AutomatonMinimizer
 		while (toBeRemoved.size() > 0)
 		{
 			aut.removeArc((Arc) toBeRemoved.remove(0));
+		}
+
+		// Remove epsilon transitions that are never used
+		Alphabet alpha = aut.getAlphabet();
+		toBeRemoved.clear();
+		loop: for (EventIterator evIt = alpha.iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent event = evIt.nextEvent();
+			
+			// Epsilon?
+			if (event.isEpsilon())
+			{
+				// Does there exist a transition like this?
+				for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				{
+					// Is this transition of the right event? If so continue the outer loop.
+					if (event.equals(arcIt.nextArc().getEvent()))
+					{
+						continue loop;
+					}
+				}
+				toBeRemoved.add(event);
+			}
+		}
+		while (toBeRemoved.size() > 0)
+		{
+			alpha.removeEvent((LabeledEvent) toBeRemoved.remove(0));
 		}
 	}
 
