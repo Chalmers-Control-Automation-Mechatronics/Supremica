@@ -69,6 +69,7 @@ public class AutomatonExplorer
 	extends JFrame
 	implements AutomatonListener
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
 	private Automaton theAutomaton;
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;
@@ -260,7 +261,12 @@ class StateViewer
 		setCurrState(newState, false);
 	}
 
-	private void setCurrState(State newState, boolean isUndo)
+	private void setCurrState(State newState, boolean isUndo) 
+	{
+		setCurrState(newState, isUndo, true); 	
+	}
+	
+	public void setCurrState(State newState, boolean isUndo, boolean forward)
 	{
 		if (!isUndo)
 		{
@@ -270,6 +276,9 @@ class StateViewer
 			}
 
 			nextStates.clear();
+	
+			if (forward) 
+				updateCosts(currState, newState);
 		}
 
 		currState = newState;
@@ -334,6 +343,23 @@ class StateViewer
 	public void setController(ExplorerController controller)
 	{
 		this.controller = controller;
+	}
+	
+	/**
+	 *	Performs any action only if the current automaton is composite (otherwise 
+	 *	it is not necessary). Updates the current costs (see also CompositeState) 
+	 *	if the current state is not initial. Otherwise, the method initializes the 
+	 *	current and accumulated costs. 
+	 */
+	public void updateCosts(State currState, State newState) 
+	{
+		if (currState instanceof CompositeState)
+		{
+			if (newState.isInitial())
+				((CompositeState) newState).initCosts();
+			else
+				((CompositeState) newState).updateCosts((CompositeState) currState);
+		}
 	}
 }
 
@@ -418,13 +444,14 @@ class EventList
 
 	private void updateStateViewer(State newState)
 	{
-		stateViewer.setCurrState(newState);
+		stateViewer.setCurrState(newState, false, forward);
 	}
 }
 
 class EventListModel
 	extends AbstractListModel
 {
+	private static Logger logger = LoggerFactory.createLogger(EventListModel.class);
 	private State currState;
 	private ArrayList currArcs = new ArrayList();
 	private boolean forward;
@@ -436,7 +463,7 @@ class EventListModel
 	{
 		this.forward = forward;
 		this.theAutomaton = theAutomaton;
-		this.theAlphabet = theAutomaton.getAlphabet();
+		this.theAlphabet = theAutomaton.getAlphabet();			
 	}
 
 	public void setCurrState(State currState)
@@ -591,10 +618,8 @@ class StateDisplayer
 	private JLabel stateCost = new JLabel();
 	private JLabel stateId = new JLabel();
 	private JLabel stateName = new JLabel();
-	private JLabel compositeCosts = new JLabel();
+	private JLabel currentCosts = new JLabel();
 	
-		private static Logger logger = LoggerFactory.createLogger(StateDisplayer.class);
-
 	private void changeStateAccepting(boolean b)
 	{
 		stateViewer.getCurrState().setAccepting(b);
@@ -661,7 +686,7 @@ class StateDisplayer
 		statusBox.add(stateCost);
 		statusBox.add(stateId);
 		statusBox.add(stateName);
-		statusBox.add(compositeCosts);
+		statusBox.add(currentCosts);
 
 		JScrollPane boxScroller = new JScrollPane(statusBox);
 
@@ -672,25 +697,33 @@ class StateDisplayer
 		vp.setBackground(Color.white);
 	}
 
+	/**
+	 *	This method sets the values of the graphical components building up the 
+	 *	stateDisplayer. 
+	 */
 	public void setCurrState(State currState)
 	{
 		isInitialBox.setSelected(currState.isInitial());
 		isAcceptingBox.setSelected(currState.isAccepting());
 		isMutuallyAcceptingBox.setSelected(currState.isMutuallyAccepting());
 		isForbiddenBox.setSelected(currState.isForbidden());
-		stateCost.setText("cost: " + currState.getCost());
-//		stateId.setText("id: " + currState.getId());
-		stateName.setText("name: " + currState.getName());
 	
 		if (currState instanceof CompositeState) 
 		{
 			StringBuffer str = new StringBuffer();
-			int[] costs = ((CompositeState) currState).getCompositeCosts();
+			int[] costs = ((CompositeState) currState).getCurrentCosts();
 			for (int i=0; i<costs.length-1; i++)
 				str.append(costs[i] + "  ");
 			str.append(costs[costs.length-1] + "");
-			compositeCosts.setText("composite costs = [" + str + "]");
+			currentCosts.setText("composite costs: [" + str + "]");
+			
+			stateCost.setText("accumulated cost: " + ((CompositeState) currState).getAccumulatedCost());
 		}
+		else
+			stateCost.setText("cost: " + currState.getCost());
+		
+		//		stateId.setText("id: " + currState.getId());
+		stateName.setText("name: " + currState.getName());
 	}
 }
 

@@ -1664,6 +1664,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, true, false, false))
 		{
 			return;
@@ -1696,11 +1697,11 @@ public class ActionMan
 
 			Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
 			String currAutomatonName = theAutomaton.getName();
-
+		
 			try
 			{
 				AutomatonExplorer explorer = gui.getVisualProjectContainer().
-					getActiveProject().getAutomatonExplorer(currAutomatonName);
+				getActiveProject().getAutomatonExplorer(currAutomatonName);
 			}
 			catch (Exception ex)
 			{

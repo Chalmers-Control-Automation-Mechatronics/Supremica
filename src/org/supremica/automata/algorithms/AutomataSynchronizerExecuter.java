@@ -869,9 +869,10 @@ public final class AutomataSynchronizerExecuter
 					newState.setForbidden(AutomataIndexFormHelper.isForbidden(currState));
 					newState.setFirst(AutomataIndexFormHelper.isFirst(currState));
 					newState.setLast(AutomataIndexFormHelper.isLast(currState));
+					newState.initCosts();
 					theAutomaton.addState(newState);
 				}
-			}
+			}		
 
 			if (executionDialog != null)
 			{

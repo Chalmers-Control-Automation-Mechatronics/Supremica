@@ -50,11 +50,14 @@
 package org.supremica.automata;
 
 import java.util.*;
+import org.supremica.log.*;
 
 public class CompositeState extends State
 {
 	//private ArrayList theStates;
 //	private int[] theStates;
+
+	private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
 	
 	/** The indices of the underlying states */
 	private int[] compositeIndices = null;
@@ -62,6 +65,19 @@ public class CompositeState extends State
 	/** The costs corresponding to the underlying states */
 	private int[] compositeCosts = null;
 
+	/** 
+	 * The current costs in this state (only important in a composite state). 
+	 * Depend on which automaton is to be fired as well as the path to this state. 
+	 * See for ex. T.Liljenvalls Lic. (currentCosts = T_v).
+	 */
+	private int[] currentCosts = null;
+	
+	/** 
+	 * Stores the cost accumulated from the initial state until this one.
+	 * The value depends normally (if synchronized automaton) on the path to this state.
+	 */
+	private int accumulatedCost = -1;
+	
 	// Behövs den??? )(och theStates också...)
 /*	public CompositeState(int capacity)
 	{
@@ -96,15 +112,37 @@ public class CompositeState extends State
 //		nextCosts = new int[indices.length-2];
 //		theStates = new int[indices.length-2];
 		compositeCosts = new int[indices.length-2];
+		currentCosts = new int[indices.length-2];
+		
+		setCompositeIndices(indices);
+		
+		for (int i=0; i<currentCosts.length; i++)
+			currentCosts[i] = -1;
 	}
-	
+
 	public void initialize(int[] indices, Automata theAutomata) 
 	{
 		initialize(indices);
 		
 		for (int i=0; i<compositeCosts.length; i++) 
+		{
 			compositeCosts[i] = theAutomata.getAutomatonAt(i).getStateWithIndex(indices[i]).getCost();
-			
+		}			
+	}
+	
+	/**
+	 *	This method should only be called if the current state is initial in the 
+	 *	composed automaton. The currentCosts are then set to composedCosts. 
+	 */
+	public void initCosts() 
+	{
+		if (isInitial()) 
+		{
+			for (int i=0; i<currentCosts.length; i++)
+				currentCosts[i] = compositeCosts[i];
+				
+			accumulatedCost = 0;
+		}
 	}
 
 /*	public State getStateAt(int index)
@@ -144,10 +182,107 @@ public class CompositeState extends State
 	 *	Returns the cost accumulated when this state is reached. Note that the 
 	 *	path to the state is of importance. 
 	 */
-/*	public int getAccumulatedCost() { return accumulatedCost; }
+	public int getAccumulatedCost() { return accumulatedCost; }
 	
-	public void setAccumulatedCost(int cost) {} 
+	/**
+	 *	Returns the current costs associated to this state (keeping in mind the 
+	 *	path to this state). 
+	 */
+	public int[] getCurrentCosts() { return currentCosts; }
+	
+	/**
+	 *	Calculates and updates the currentCosts-vector and the accumulated cost. 
+	 *	The costs in the previously visited state must be submitted as parameters. 
+	 *	If the current state does not have any underlying cost(s) associated, the 
+	 *	accumulatedCost of the previously visited state is kept. 
+	 */
+	public void updateCosts(int[] prevCurrentCosts, boolean[] firingAutomata, int prevAccumulatedCost) 
+	{
+		if (isTimed()) 
+		{			
+			int costAddition = 0;
+			
+			// The value of costAddition is set as the maximal cost for the firing/active automata
+			for (int i=0; i<firingAutomata.length; i++)
+			{
+				if ((firingAutomata[i] == true) && (prevCurrentCosts[i] > costAddition))
+					costAddition = prevCurrentCosts[i];	
+			}
+			
+			// The currentCosts-vector is updated
+			for (int i=0; i<firingAutomata.length; i++)
+			{
+				if (firingAutomata[i] == false) 
+					currentCosts[i] = Math.max(0, prevCurrentCosts[i] - costAddition);
+				else
+					currentCosts[i] = compositeCosts[i]; 	
+			}
+			
+			// The accumulatedCost is updated
+			accumulatedCost = prevAccumulatedCost + costAddition;
+		}
+		else
+			accumulatedCost = prevAccumulatedCost;
+	}
+	
+	/**
+	 *	Calculates the firing automata and other necessary parameters and calls 
+	 *	updateCosts(int[], boolean[], int);
+	 */
+	public void updateCosts(CompositeState prevState) 
+	{
+		if (prevState.isUpdatingCosts()) 
+		{
+			boolean[] firingAutomata = new boolean[compositeIndices.length];
+			int[] prevCompositeIndices = prevState.getCompositeIndices();
+			
+			for (int i=0; i<firingAutomata.length; i++) 
+			{
+				if (compositeIndices[i] == prevCompositeIndices[i])
+					firingAutomata[i] = false;
+				else
+					firingAutomata[i] = true;
+			}	
+			
+			updateCosts(prevState.getCurrentCosts(), firingAutomata, prevState.getAccumulatedCost());
+		}
+	}
+	
+	/**
+	 *	The cost cannot be updated if the path from the initial state to the current
+	 *	state is not remembered. Then the updating shoul be closed. 
+	 */
+/*	public void closeCostUpdating() 
+	{
+		accumulatedCost = null;	
+	}
 */	
+	/**
+	 *	This method checks if this state has underlying costs associated to it. 
+	 *	Otherwise the updating of costs would not make sense. 
+	 */
+	private boolean isTimed() 
+	{
+		boolean timed = false;
+		
+		for (int i=0; i<compositeCosts.length; i++)
+		{
+			if (compositeCosts[i] > -1)
+				timed = true;
+		}	
+		
+		return timed;
+	}
+	
+	/**
+	 *	Checks if the cost updating has not been closed, i.e. if the path to 
+	 *	this state is known. 
+	 */
+	private boolean isUpdatingCosts() 
+	{
+		return (accumulatedCost	> -1);
+	}
+	
 	/**
 	 *	Returns the cost vector representing the cost for choosing to move every 
 	 *	one of the composing automata. 

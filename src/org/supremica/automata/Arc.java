@@ -317,6 +317,14 @@ public class Arc
 
 	}
 	
+	/**
+	 *	Returns a boolean vector where true means that the corresponding automata
+	 *	is (one of the) "responsible(s)" for the transition.
+	 *
+	 *	@return firingAutomata
+	 */
+	 public boolean[] getFiringAutomata() { return firingAutomata; }
+	
 	// For debugging (etc)
 	public String toString()
 	{
