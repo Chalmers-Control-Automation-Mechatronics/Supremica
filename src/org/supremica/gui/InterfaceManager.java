@@ -50,7 +50,6 @@
 package org.supremica.gui;
 
 import javax.swing.*;
-import org.supremica.log.*;
 import org.supremica.properties.*;
 
 public class InterfaceManager

@@ -53,7 +53,6 @@ import org.supremica.log.*;
 import java.awt.*;
 import com.pietjonas.wmfwriter2d.*;
 import java.io.*;
-import javax.swing.*;
 
 public class GraphicsToClipboard
 {
