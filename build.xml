@@ -496,7 +496,7 @@
 	<copy file="${templates}/SupremicaPropertiesStandard.cfg" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaPropertiesStandard.cfg" perm="644"/>
 	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>	
-	<chmod file="${dist}/buddy.dll" perm="644"/>
+	<chmod file="${dist}/buddy.dll" perm="644"/> 
 	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>	
 	<chmod file="${dist}/izmjnicom.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${dist}"/>	
