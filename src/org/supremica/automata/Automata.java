@@ -704,6 +704,7 @@ public class Automata
 	 */
 	public boolean equalAutomata(Automata other)
 	{
+		//System.err.println("equalAutomata: " + getName() + " " + other.getName());
 		if (nbrOfAutomata() != other.nbrOfAutomata())
 		{
 			return false;

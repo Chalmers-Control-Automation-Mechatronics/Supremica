@@ -65,7 +65,7 @@ public class AutomatonToFSM
 	}
 
 	public void serialize(PrintWriter pw)
-		throws Exception
+		throws IOException
 	{
 		//System.err.println("Org Alph size: " + aut.getAlphabet().size());
 		//System.err.println("New Alph size: " + eventsNotOnTransitions.size());
@@ -147,8 +147,14 @@ public class AutomatonToFSM
 	}
 
 	public void serialize(String fileName)
-		throws Exception
+		throws IOException
 	{
 		serialize(new PrintWriter(new FileWriter(fileName)));
+	}
+
+	public void serialize(File theFile)
+		throws IOException
+	{
+		serialize(theFile.getAbsolutePath());
 	}
 }

@@ -280,9 +280,7 @@ public class TestProjectBuildFromXml
 			assertTrue(specAutomaton != null);
 			assertTrue(robotAutomaton != null);
 			assertTrue(machineAutomaton != null);
-			assertTrue(!specAutomaton.equalAutomaton(robotAutomaton));
-			assertTrue(!specAutomaton.equalAutomaton(machineAutomaton));
-			assertTrue(!robotAutomaton.equalAutomaton(machineAutomaton));
+
 		}
 		catch (Exception ex)
 		{

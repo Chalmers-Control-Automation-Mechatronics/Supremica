@@ -1398,71 +1398,105 @@ public class Automaton
 	/**
 	 * Returns true if there are no obvious differences between this
 	 * automaton and the other. Note, that this method only compares the
-	 * number of states and transitions, etc. This method does guarantee
+	 * number of states and transitions, etc. This method does not guarantee
 	 * that the two automata generates the same language.
 	 *
-	 * That should really be "does NOT guarantee", right?
 	 * Shouldn't there really be a CompareAutomata class?
 	 * This class should have methods like areIsomorphic() and languageEqual()
 	 */
 	public boolean equalAutomaton(Automaton other)
 	{
+		boolean debug = true;
 		// Should type, name, comment really be considered?
 		if (getType() != other.getType())
 		{
-			//System.err.println("equalAutomaton::non equal type");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal type");
+			}
 			return false;
 		}
 		if (!getName().equals(other.getName()))
 		{
-			//System.err.println("equalAutomaton::non equal name");
+			if (debug)
+			{
+				// System.err.println(getName() + " " + other.getName());
+				System.err.println("equalAutomaton::non equal name");
+			}
 			return false;
 		}
 		if (!getComment().equals(other.getComment()))
 		{
-			//System.err.println("equalAutomaton::non equal comment");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal comment");
+			}
 			return false;
 		}
 
 		// The following stuff seems useful to consider
 		if (hasAcceptingState() != other.hasAcceptingState())
 		{
-			//System.err.println("equalAutomaton::non equal accepting state");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal accepting state");
+			}
 			return false;
 		}
 		if (hasSelfLoop() != other.hasSelfLoop())
 		{
-			//System.err.println("equalAutomaton::non equal has self loop");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal has self loop");
+			}
 			return false;
 		}
 		if (isDeterministic() != other.isDeterministic())
 		{
-			//System.err.println("equalAutomaton::non equal is deterministic");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal is deterministic");
+			}
 			return false;
 		}
 		if (isAllEventsPrioritized() != other.isAllEventsPrioritized())
 		{
-			//System.err.println("equalAutomaton::non equal is all events prioritized");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal is all events prioritized");
+			}
 			return false;
 		}
 		if (nbrOfAcceptingStates() != other.nbrOfAcceptingStates())
 		{
-			//System.err.println("equalAutomaton::non equal name nbr of accepting states");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal name nbr of accepting states");
+			}
 			return false;
 		}
 		if (nbrOfForbiddenStates() != other.nbrOfForbiddenStates())
 		{
-			//System.err.println("equalAutomaton::non equal nbr of forbidden states");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal nbr of forbidden states");
+			}
 			return false;
 		}
 		if (nbrOfAcceptingAndForbiddenStates() != other.nbrOfAcceptingAndForbiddenStates())
 		{
-			//System.err.println("equalAutomaton::non equal name nbr of accepting and forbidden states");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal name nbr of accepting and forbidden states");
+			}
 			return false;
 		}
 		if (!alphabet.equalAlphabet(other.alphabet))
 		{
-			//System.err.println("equalAutomaton::non equal alphabet");
+			if (debug)
+			{
+				System.err.println("equalAutomaton::non equal alphabet");
+			}
 			return false;
 		}
 
