@@ -143,7 +143,7 @@ public class AutomatonToDot
 		else
 		{
 			standardShape = "plaintext";
-			acceptingShape = "circle";
+			acceptingShape = "ellipse";
 			forbiddenShape = "box";
 		}
 
