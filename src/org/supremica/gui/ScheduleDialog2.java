@@ -1,5 +1,5 @@
 
-/********************** ScheduleDialog.java *****************/
+/********************** ScheduleDialog3.java *****************/
 package org.supremica.gui;
 
 import javax.swing.*;
@@ -25,7 +25,7 @@ public class ScheduleDialog2
 
 	public ScheduleDialog2(JFrame frame)
 	{
-		super(frame, "Schedule Selected Automata", true);
+		super(frame, "Schedule Selected Automata (Sched 3)", true);
 
 		/******** Base components of the dialog ***********/
 		JButton okButton = new JButton("Ok");
@@ -91,25 +91,12 @@ public class ScheduleDialog2
 		{
 			if (optiMethodsBox.getSelectedItem().equals("Modified A*"))
 			{
-				Automaton theAutomaton = ActionMan.getGui().getSelectedAutomata().getFirstAutomaton();
-				ModifiedAstar2 mastar = new ModifiedAstar2(theAutomaton);
+				//Automaton theAutomaton = ActionMan.getGui().getSelectedAutomata().getFirstAutomaton();
+				ModifiedAstar2 mastar = new ModifiedAstar2(ActionMan.getGui().getSelectedAutomata());
 
-				/*                      ModifiedAstar mastar = new ModifiedAstar(automata, weights.getCalculator(estimates.getEstimator(automata)));
-										Element elem = mastar.walk();
-										if(elem == null)
-										{
-												throw new RuntimeException("no marked state found");
-										}
-
-										// logger.info(mastar.trace(elem));
-										logger.info(mastar.getInfo(elem).toString());
-										Automaton automaton = mastar.getAutomaton(elem);
-										ActionMan.getGui().addAutomaton(automaton);
-				*/
-
-//                              State acceptingState = mastar.walk();
+					
 				Node acceptingNode = mastar.walk();
-
+				
 				if (acceptingNode == null)
 				{
 					throw new RuntimeException("no marked state found");
@@ -117,7 +104,7 @@ public class ScheduleDialog2
 
 				Automaton schedule = mastar.buildScheduleAutomaton(acceptingNode);
 
-				ActionMan.getGui().addAutomaton(schedule);
+				ActionMan.getGui().addAutomaton(schedule);	
 			}
 		}
 		catch (Exception excp)

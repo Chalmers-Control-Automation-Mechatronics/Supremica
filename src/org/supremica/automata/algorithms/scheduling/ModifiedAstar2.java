@@ -35,14 +35,15 @@ public class ModifiedAstar2
 
 	/** Contains "opened" but not yet examined (i.e. not "closed") nodes. */
 	private ArrayList openList;
+	
 	/** Contains already examined (i.e. "closed") nodes. */
 	private ArrayList closedList;
 	
-	private TreeMap openMap, closedMap;
+	/** Hashtable containing the estimated cost for each robot, having states as keys. **/
+	private Hashtable[] oneProdRelax; 
 	
-	
-	/** Hashtable containing the estimated cost, having states as keys. **/
-	private Hashtable oneProdRelax; 
+	/** Hashtable containing the estimated cost for each combination of two robots **/
+	private Hashtable[] twoProdRelax;
 	
 	/** Needed for online expansion of the Nodes **/
 	private AutomataSynchronizerExecuter onlineSynchronizer;
@@ -71,9 +72,24 @@ public class ModifiedAstar2
 		timer = new ActionTimer();
 		openList = new ArrayList();
 		closedList = new ArrayList();
-		oneProdRelax = new Hashtable();
-		openMap = new TreeMap();
-		closedMap = new TreeMap();
+		
+		if (theAutomata == null)
+			oneProdRelax[0] = new Hashtable();
+		else {
+			initOnlineSynchronizer();
+			
+			int nrOfPlants = theAutomata.getPlantAutomata().size();
+			oneProdRelax = new Hashtable[nrOfPlants];
+			for (int i=0; i<nrOfPlants; i++)
+				oneProdRelax[i] = new Hashtable();	
+		
+			if (nrOfPlants > 2) {
+				twoProdRelax = new Hashtable[nrOfPlants * (nrOfPlants - 1) / 2];
+				for (int i=0; i<twoProdRelax.length; i++)
+					twoProdRelax[i] = new Hashtable();
+			}
+				
+		}
 	}
 
 	/**
@@ -122,47 +138,73 @@ public class ModifiedAstar2
 		// Om istället flera automater skall online-synkas-och-schemaläggas...
 		else {
 			timer.start();		
+			preprocess1();
+			logger.info("Time for 1st preprocessing: " + timer.elapsedTime() + " ms");
 			
-			preprocess();
-			initOnlineSynchronizer();
-			
-			logger.info("Time for preprocessing: " + timer.elapsedTime() + " ms");
-			timer.start();
-			
-			while (!openList.isEmpty()) {
-				Node currNode = (Node) openList.remove(0);				
-				closedList.add(currNode);
-				
-				if (currNode.isAccepting()) {
-					logger.info(currNode + ". States searched: " + closedList.size() + " in time: " + timer.elapsedTime() + " ms.");
-					return currNode;
-				}
-				
-				int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
-				for (int i=0; i<currNode.size(); i++) 
-					currStateIndex[i] = currNode.getState(i).getIndex();
-				
-				int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
-				for (int i=0; i<currOutgoingEvents.length; i++) {
-					if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
-						int[] nextState = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
-						State[] theStates = new State[theAutomata.size()];
-						
-						for (int j=0; j<theAutomata.size(); j++)
-							theStates[j] = autoIndexForm.getState(j, nextState[j]);
-						
-						Node childNode = new Node(theStates, currNode);
-						if (!isOnAList(childNode))
-							putOnOpenList(childNode);
-					}		
-				}				
+			if (theAutomata.getPlantAutomata().size() > 2) {
+				timer.start();
+				preprocess2();
+				logger.info("Time for 2nd preprocessing: " + timer.elapsedTime() + " ms");
 			}
-
-			logger.error("Inget markerat tillstånd kunde hittas............");
-			return null;
+			
+			timer.start();
+			return scheduleFrom(new Node(makeInitialState()));
 		}
 	}
 	
+	private Node scheduleFrom(Node initNode) {
+		openList.clear();
+		closedList.clear();
+		openList.add(initNode);
+		
+		int counter = 0;
+		
+		while (!openList.isEmpty()) {
+			counter++;
+			Node currNode = (Node) openList.remove(0);				
+			closedList.add(currNode);
+			
+			if (currNode.isAccepting()) {
+				logger.info(currNode + ". States searched: " + closedList.size() + " in time: " + timer.elapsedTime() + " ms.");
+				logger.info("A-stjärnat " + counter + " ggr");
+				return currNode;
+			}
+			
+			Iterator childIter = expandNode(currNode).iterator();
+			while (childIter.hasNext()) {
+				Node childNode = (Node)childIter.next();
+				if (!isOnAList(childNode))
+					putOnOpenList(childNode);
+			}				
+		}
+		
+		logger.error("Inget markerat tillstånd kunde hittas............");
+		return null;
+	}
+	
+	private ArrayList expandNode(Node node) {
+		ArrayList childNodes = new ArrayList();
+		
+		int[] currStateIndex = AutomataIndexFormHelper.createState(node.size());
+		for (int i=0; i<node.size(); i++) 
+			currStateIndex[i] = node.getState(i).getIndex();
+		
+		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
+		for (int i=0; i<currOutgoingEvents.length; i++) {
+			if (onlineSynchronizer.isEnabled(currOutgoingEvents[i])) {
+				int[] nextState = onlineSynchronizer.doTransition(currStateIndex, currOutgoingEvents[i]);
+				State[] theStates = new State[theAutomata.size()];
+				
+				for (int j=0; j<theAutomata.size(); j++)
+					theStates[j] = autoIndexForm.getState(j, nextState[j]);
+				
+				childNodes.add(new Node(theStates, node));
+			}
+		}
+		
+		return childNodes;
+	}
+
 	/**
 	 * 			Inserts the node into the openList according to the estimatedCost (ascending).
 	 * @param 	node
@@ -185,7 +227,9 @@ public class ModifiedAstar2
 	}
 
 	/**
-	 * 			Checks if some node is on the closedList.
+	 * 			Checks if some node is on the openList or closedList. If found, a comparison 
+	 * 			between the estimated costs is done to decide which node to keep as optimal. 
+	 *  
 	 * @param 	node
 	 * @return 	true if node is already on the closedList and has an estimated cost not lower than 
 	 * 		   	the guy on the closedList. 
@@ -244,22 +288,12 @@ public class ModifiedAstar2
 		//helper.setCoExecuter(onlineSynchronizer);	
 	}
 
-	private int[] makeInitialState() {
-		// Build the initial state
-		Automaton currAutomaton;
-		State currInitialState;
-		int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
+	private State[] makeInitialState() {
+		State[] initialState = new State[theAutomata.size()];
 
-		// + 1 status field
-		Iterator autIt = theAutomata.iterator();
+		for (int i=0; i<theAutomata.size(); i++)
+			initialState[i] = theAutomata.getAutomatonAt(i).getInitialState();
 		
-		while (autIt.hasNext())
-		{
-			currAutomaton = (Automaton) autIt.next();
-			currInitialState = currAutomaton.getInitialState();	
-			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-		}
-
 		return initialState;
 	}
 
@@ -272,80 +306,119 @@ public class ModifiedAstar2
 	 * 			an accepting state. 
 	 * @return 	true, otherwise
 	 */
-	private boolean preprocess() {	
-		int plantCounter = 0;
+	private boolean preprocess1() {		
+		Automata plantAutomata = theAutomata.getPlantAutomata();
 		
-		for (int i=0; i<theAutomata.size(); i++) {
-			if (theAutomata.getAutomatonAt(i).getInitialState().getCost() != -1) {
-				plantCounter++;
+		for (int i=0; i<plantAutomata.size(); i++) {			
+			Automaton theAuto = plantAutomata.getAutomatonAt(i);
+			State markedState = findAcceptingState(theAuto);
+			ArrayList estList = new ArrayList();
+			
+			if (markedState == null)
+				return false;
+			else {				
+				oneProdRelax[i].put(markedState, new Integer(0));
+				estList.add(markedState);
 				
-				Automaton theAuto = theAutomata.getAutomatonAt(i);
-				State markedState = findAcceptingState(theAuto);
-				ArrayList estList = new ArrayList();
-				
-				if (markedState == null)
-					return false;
-				else {
-					Hashtable subHashtable = new Hashtable();
+				while (!estList.isEmpty()) {
+					ArcIterator incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
 					
-					subHashtable.put(markedState, new Integer(0));
-					estList.add(markedState);
-					
-					while (!estList.isEmpty()) {
-						ArcIterator incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
+					while (incomingArcIterator.hasNext()) {
+						Arc currArc = incomingArcIterator.nextArc();
+						State currState = currArc.getFromState();
+						int remainingCost = ((Integer)(oneProdRelax[i].get(currArc.getToState()))).intValue();
 						
-						while (incomingArcIterator.hasNext()) {
-								Arc currArc = incomingArcIterator.nextArc();
-								State currState = currArc.getFromState();
-								int remainingCost = ((Integer)(subHashtable.get(currArc.getToState()))).intValue();
-								
-								if (subHashtable.get(currState) == null) {
-									subHashtable.put(currState, new Integer(remainingCost + currArc.getToState().getCost()));							
-									estList.add(currState);
-								}
-								else {
-									int currRemainingCost = ((Integer)(subHashtable.get(currState))).intValue();
-									int newRemainingCost = currArc.getToState().getCost() + remainingCost;
-									
-									if (newRemainingCost < currRemainingCost) {
-										subHashtable.remove(currState);
-										subHashtable.put(currState, new Integer(newRemainingCost));
-									}
-								}
-							
+						if (oneProdRelax[i].get(currState) == null) {
+							oneProdRelax[i].put(currState, new Integer(remainingCost + currArc.getToState().getCost()));							
+							estList.add(currState);
 						}
+						else {
+							int currRemainingCost = ((Integer)(oneProdRelax[i].get(currState))).intValue();
+							int newRemainingCost = currArc.getToState().getCost() + remainingCost;
+							
+							if (newRemainingCost < currRemainingCost) {
+								oneProdRelax[i].remove(currState);
+								oneProdRelax[i].put(currState, new Integer(newRemainingCost));
+							}
+						}					
 					}
-				
-					oneProdRelax.put(theAuto.getName(),subHashtable);
-				}				
+				}			
 			}	
 		}
-		
-		State[] theStates = new State[theAutomata.size()];
-		
-		for (int i=0; i<theStates.length; i++) 
-			theStates[i] = theAutomata.getAutomatonAt(i).getInitialState(); 
-		
-		Node initialNode = new Node(theStates);
-		openList.add(initialNode);
-		//openMap.put(makeMapKey(initialNode), initialNode);
 		
 		return true;
 	}
 	
+	/**
+	 * 			Calculates the costs for a two-product relaxation (i.e. as if there 
+	 * 			would only be two robots in the cell) and stores it in the hashtable
+	 * 			twoProdRelax.
+	 */
+	private void preprocess2() {
+		int hashtableCounter = -1;
+		Automata plantAutomata = theAutomata.getPlantAutomata();
+		for (int i=0; i<plantAutomata.size()-1; i++) {
+			for (int j=i+1; j<plantAutomata.size(); j++) {
+				hashtableCounter++;
+				
+				ArrayList tree = new ArrayList();
+				State[] theStates = new State[]{plantAutomata.getAutomatonAt(i).getInitialState(), 
+												plantAutomata.getAutomatonAt(j).getInitialState()};		
+				tree.add(new Node(theStates));
+				
+				while (!tree.isEmpty()) {
+					Node currNode = (Node)tree.remove(0);
+					tree.add(expandNode(currNode));
+					
+					Node accNode = scheduleFrom(currNode);
+					twoProdRelax[hashtableCounter].put(currNode, new Integer(accNode.getAccumulatedCost()));					
+				}
+			}
+		}
+	}
+	
 	private int calcEstimatedCost(Node theNode) {
-		return theNode.getAccumulatedCost() + getOneProdRelaxation(theNode);
+		int[] costs = theNode.getCurrentCosts();
+		int counter = 0;
+		
+		for (int i=0; i<costs.length; i++) {
+			if (costs[i] >= 0)
+				counter++;
+		}
+		
+		if (counter <= 2) 
+			return theNode.getAccumulatedCost() + getOneProdRelaxation(theNode);
+		else
+			return theNode.getAccumulatedCost() + getTwoProdRelaxation(theNode);
 	}
 	
 	private int getOneProdRelaxation(Node theNode) {
 		Automata plantAutomata = theAutomata.getPlantAutomata();
 		int estimate = 0;
 		
-		//fult...... Asfult............
 		for (int i=0; i<plantAutomata.size(); i++) {
-			int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)((Hashtable) oneProdRelax.get(plantAutomata.getAutomatonAt(i).getName())).get(theNode.getState(i))).intValue();
+			int altEstimate = theNode.getCurrentCosts()[i] + ((Integer)oneProdRelax[i].get(theNode.getState(i))).intValue();
+		
 			if (altEstimate > estimate)
 				estimate = altEstimate;	
+		}
+
+		return estimate;
+	}
+	
+	private int getTwoProdRelaxation(Node theNode) {
+		int plantAutomataSize = theAutomata.getPlantAutomata().size();
+		int estimate = 0;
+		int hashtableCounter = 0;
+		
+		for (int i=0; i<plantAutomataSize-1; i++) {
+			for (int j=i+1; j<plantAutomataSize; j++) {
+				State[] theStates = new State[]{theNode.getState(i), theNode.getState(j)};
+				int altEstimate = ((Integer)twoProdRelax[hashtableCounter].get(new Node(theStates))).intValue();
+				
+				if (altEstimate > estimate)
+					estimate = altEstimate;	
+			}		
 		}
 
 		return estimate;
@@ -354,6 +427,7 @@ public class ModifiedAstar2
 	// Borde kanske ligga i "Automaton.java" men det kanske inte är tillräckligt
 	// generellt för det. Om man inte har att göra med schemaläggning, kan det väl
 	// finnas flera markerade tillstånd. 
+	// Kan nog rensas bort snart. 
 	/**
 	 * Returns some accepting state if it finds one, else returns null.
 	 * Iterates over all states _only_if_ no accepting states exist (or only
