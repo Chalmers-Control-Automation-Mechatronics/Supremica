@@ -98,9 +98,9 @@ public final class SynchronizationOptions
 			throw new IllegalArgumentException("synchType must be non-null");
 		}
 
-		if (nbrOfExecuters < 1)
+		if (nbrOfExecuters < 1 || nbrOfExecuters > 1)
 		{
-			throw new IllegalArgumentException("nbrOfExcuters must be at least 1");
+			throw new IllegalArgumentException("nbrOfExcuters must be 1");
 		}
 
 		if (initialHashtableSize < 100)
@@ -221,7 +221,7 @@ public final class SynchronizationOptions
 	{
 		rememberDisabledEvents = remember;
 	}
-	
+
 	public boolean buildAutomaton()
 	{
 		return buildAutomaton;

@@ -61,7 +61,7 @@ import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
-import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
+//import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
 /**
  * Contains information that is common to all synchronization threads.
@@ -76,7 +76,7 @@ public final class AutomataSynchronizerHelper
 	private IntArrayHashTable theStates;
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
-	
+
 //      private int totalNbrOfStates = 0;
 //      private int nbrOfUncontrollableStates = 0;
 //      private int nbrOfDeadlockedStates = 0;
@@ -103,7 +103,7 @@ public final class AutomataSynchronizerHelper
 
 	//private AutomataOnlineSynchronizer coExecuter = null;
 	private AutomataSynchronizerExecuter coExecuter = null;
-	private Rendezvous executerRendezvous = null;
+//	private Rendezvous executerRendezvous = null;
 
 	/* Used by AutomataControllabillityCheck.
 	 * Causes the synchronization to stop as soon as an uncontrollable
@@ -141,7 +141,7 @@ public final class AutomataSynchronizerHelper
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(),
 										  syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
-		executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
+//		executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
 
 		// Calculate the automataIndexForm (a more efficient representation of an automata)
 		try
@@ -175,7 +175,7 @@ public final class AutomataSynchronizerHelper
 		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
-		executerRendezvous = orgHelper.getExecuterRendezvous();
+//		executerRendezvous = orgHelper.getExecuterRendezvous();
 	}
 
 	public void clear()
@@ -195,7 +195,7 @@ public final class AutomataSynchronizerHelper
 	}
 
 	/**
-	 * Initializes the helper for a new run. Generates a new initial state and adds it to the queue. 
+	 * Initializes the helper for a new run. Generates a new initial state and adds it to the queue.
 	 */
 	public void initialize()
 		throws Exception
@@ -230,12 +230,12 @@ public final class AutomataSynchronizerHelper
 	{
 		return theAutomaton;
 	}
-
+/*
 	public Rendezvous getExecuterRendezvous()
 	{
 		return executerRendezvous;
 	}
-
+*/
 	public Alphabet getUnionAlphabet()
 	{
 		return theAutomaton.getAlphabet();
@@ -642,8 +642,8 @@ public final class AutomataSynchronizerHelper
 		this.rememberTrace = rememberTrace;
 	}
 
-	/** 
-	 * Logs the amount of states examined during the execution and some other stuff. 
+	/**
+	 * Logs the amount of states examined during the execution and some other stuff.
 	 */
 	public void displayInfo()
 	{
@@ -847,7 +847,7 @@ public final class AutomataSynchronizerHelper
 			for (int i = 0; i < currState.length; i++)
 			{
 				// Only print states that are not initial if we are looking at a full state
-				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || 
+				if (!stateTable[automataIndices[i]][currState[i]].isInitial() ||
 					(automataIndices.length < theAutomata.size()))
 				{
 					if (firstEntry)
@@ -864,10 +864,10 @@ public final class AutomataSynchronizerHelper
 					state.append(stateTable[automataIndices[i]][currState[i]].getName());
 				}
 			}
-			
+
 			String reason = "the event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent) +
 				" is enabled in " + problemAutomaton;
-			
+
 			// Log the message
 			if (!state.toString().equals(""))
 			{

@@ -67,7 +67,7 @@ import org.supremica.automata.AutomatonType;
 import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.properties.SupremicaProperties;
-import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
+//import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -163,7 +163,7 @@ public final class AutomataSynchronizerExecuter
 	private boolean stopRequested = false;
 
 	// Synchonization of all executors
-	private Rendezvous executerRendezvous = null;
+//	private Rendezvous executerRendezvous = null;
 
 	/**
 	 *@param  synchronizerHelper helper for multithread execution.
@@ -182,7 +182,7 @@ public final class AutomataSynchronizerExecuter
 		expandEventsUsingPriority = helper.getExpandEventsUsingPriority();
 		coExecute = helper.getCoExecute();
 		coExecuter = helper.getCoExecuter();
-		executerRendezvous = helper.getExecuterRendezvous();
+//		executerRendezvous = helper.getExecuterRendezvous();
 
 		// Indexform parameters
 		indexForm = helper.getAutomataIndexForm();
@@ -730,6 +730,9 @@ public final class AutomataSynchronizerExecuter
 
 			if (currState == null)
 			{
+
+				//finished = false;
+/*
 				// This thread tells the other threads that it failed to get
 				// a new state, thus when all threads has entered this state
 				// all threads can stop executing. There is one exception
@@ -759,6 +762,7 @@ public final class AutomataSynchronizerExecuter
 						finished = true;
 					}
 				}
+*/
 			}
 		}
 	}
@@ -871,7 +875,7 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Builds automaton using either concatenated state names or new, 
+	 * Builds automaton using either concatenated state names or new,
 	 * short, unique names as new state names.
 	 *
 	 *@return  true if build successful, false if build is stopped with requestStop().
@@ -923,9 +927,9 @@ public final class AutomataSynchronizerExecuter
 				{
 					int[] currState = currStateTable[i];
 					CompositeState newState = null;
-					
+
 					// Should the state name be based on the names of the states that
-					// it is constructed from or not? 
+					// it is constructed from or not?
 					if (options.useShortStateNames())
 					{
 						// Make sure the initial state gets number 0
@@ -942,7 +946,7 @@ public final class AutomataSynchronizerExecuter
 					{
 						org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
 						StringBuffer sb = new StringBuffer();
-						
+
 						for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
 						{
 							// It should be name here, right? That's what the method description says...
@@ -950,10 +954,10 @@ public final class AutomataSynchronizerExecuter
 							sb.append(stateTable[j][currState[j]].getName());
 							sb.append(SEPARATOR_STRING);
 						}
-						
+
 						// Remove last separator string element
 						sb.setLength(sb.length() - SEPARATOR_LENGTH);
-						
+
 						// Create state
 						newState = new CompositeState(sb.toString(), currState, helper.getAutomata());
 					}
