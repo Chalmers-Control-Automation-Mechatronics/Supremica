@@ -520,30 +520,30 @@
 	</define>
 	<define id="ws2_primitive">
 		<compose id ="ws2_primitive_switch" type = "switch">
-			<primitive type="null"/>
 			<primitive type = "sprite">
 				<param name =  "src" value = "image/agv_part1.gif"/>
 				<param name =  "hotspot" value = "(13,4)"/>
 			</primitive>
+			<primitive type="null"/>
 		</compose>
 	</define>	
 	<define id="ws3_primitive">
 		<compose id ="ws3_primitive_switch" type = "switch">
-			<primitive type="null"/>
 			<primitive type = "sprite">
 				<param name =  "src" value = "image/agv_part2.gif"/>
 				<param name =  "hotspot" value = "(13,4)"/>
 			</primitive>
+			<primitive type="null"/>
 		</compose>
 	</define>
 	<define id="output_primitive">
 	<!-- Add part1 too -->
 		<compose id ="output_primitive_switch" type = "switch">
-			<primitive type="null"/>
 			<primitive type = "sprite">
 				<param name =  "src" value = "image/agv_part2.gif"/>
 				<param name =  "hotspot" value = "(13,4)"/>
 			</primitive>
+			<primitive type="null"/>
 		</compose>
 	</define>
 	<define id="agv1_primitive">
@@ -648,6 +648,36 @@
 			<param name ="y" value ="166"/>
 			<animate param = "translation" behaviour = "input3.go"/>
 			<paste object = "input3_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="379"/>
+			<param name ="y" value ="659"/>
+			<animate param = "translation" behaviour = "output.go"/>
+			<paste object = "output_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="44"/>
+			<param name ="y" value ="396"/>
+			<animate param = "translation" behaviour = "ws1_part1.go"/>
+			<paste object = "ws1_part1_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="67"/>
+			<param name ="y" value ="407"/>
+			<animate param = "translation" behaviour = "ws1_part2.go"/>
+			<paste object = "ws1_part2_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="379"/>
+			<param name ="y" value ="243"/>
+			<animate param = "translation" behaviour = "ws2.go"/>
+			<paste object = "ws2_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="345"/>
+			<param name ="y" value ="558"/>
+			<animate param = "translation" behaviour = "ws3.go"/>
+			<paste object = "ws3_primitive" /> 
 		</transform>
 		<transform type = "translate">
 			<param name ="x" value ="101"/>
@@ -789,12 +819,12 @@
 	<!-- WS 2 Commands -->
 	<command name="ws2.addpart">
 		<announce event = "~ws2.end"/>
-		<set object="ws2_primitive_switch" param="current" value="1" />
+		<set object="ws2_primitive_switch" param="current" value="0" />
 		<start behaviour="ws2.go"/>
 	</command>
 	<command name="ws2.removepart">
 		<announce event = "~ws2.end"/>
-		<set object="ws2_primitive_switch" param="current" value="0" />
+		<set object="ws2_primitive_switch" param="current" value="1" />
 		<reset behaviour="ws2.go"/>
 		<start behaviour="ws2.go"/>
 	</command>	
@@ -806,12 +836,12 @@
 	<!-- WS 3 Commands -->
 	<command name="ws3.addpart">
 		<announce event = "~ws3.end"/>
-		<set object="ws3_primitive_switch" param="current" value="1" />
+		<set object="ws3_primitive_switch" param="current" value="0" />
 		<start behaviour="ws3.go"/>
 	</command>
 	<command name="ws3.removepart">
 		<announce event = "~ws3.end"/>
-		<set object="ws3_primitive_switch" param="current" value="0" />
+		<set object="ws3_primitive_switch" param="current" value="1" />
 		<reset behaviour="ws3.go"/>
 		<start behaviour="ws3.go"/>
 	</command>	
@@ -823,12 +853,12 @@
 	<!-- Output Commands -->
 	<command name="output.addpart">
 		<announce event = "~output.end"/>
-		<set object="output_primitive_switch" param="current" value="1" />
+		<set object="output_primitive_switch" param="current" value="0" />
 		<start behaviour="output.go"/>
 	</command>
 	<command name="output.removepart">
 		<announce event = "~output.end"/>
-		<set object="output_primitive_switch" param="current" value="0" />
+		<set object="output_primitive_switch" param="current" value="1" />
 		<reset behaviour="output.go"/>
 		<start behaviour="output.go"/>
 	</command>	
