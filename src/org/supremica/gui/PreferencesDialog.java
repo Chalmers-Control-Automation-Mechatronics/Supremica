@@ -56,6 +56,8 @@ import javax.swing.*;
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
 
+import org.supremica.util.BDD.Options; // Arash
+
 public class PreferencesDialog
 	extends JDialog
 {
@@ -63,6 +65,7 @@ public class PreferencesDialog
 	private JTabbedPane theTabbedPanel = null;
 	private FilePanel theFilePanel = null;
 	private CommunicationPanel theCommunicationPanel = null;
+    private BDDPanel theBDDPanel = null;
 	private LayoutPanel theLayoutPanel = null;
 	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
 	private SoftPLCPanel theSoftPLCPanel = null;
@@ -92,6 +95,9 @@ public class PreferencesDialog
 		theSoftPLCPanel = new SoftPLCPanel(this);
 
 		theTabbedPanel.add("SoftPLC", theSoftPLCPanel);
+
+		theBDDPanel = new BDDPanel(this);
+		theTabbedPanel.add("BDD", theBDDPanel);
 
 		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
 		{
@@ -160,6 +166,7 @@ public class PreferencesDialog
 			theFilePanel.update();
 		}
 
+		theBDDPanel.update();
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
 		theSynchronizationPanel.update();
@@ -168,6 +175,15 @@ public class PreferencesDialog
 
 	private boolean setAttributes()
 	{
+
+	    	if (theBDDPanel != null)
+		{
+			if (!theBDDPanel.doApply())
+			{
+				return false;
+			}
+		}
+
 		if (theFilePanel != null)
 		{
 			if (!theFilePanel.doApply())
@@ -628,4 +644,64 @@ class SoftPLCPanel
 		cycleTime.setText(Integer.toString(SupremicaProperties.getSoftplcCycleTime()));
                 ioInterfaceList.updateUI();
 	}
+}
+
+
+
+
+class BDDPanel
+    extends JPanel
+{
+    private PreferencesDialog theDialog = null;
+    private JCheckBox showGrow, alterPCG, debugOn,  traceOn;
+    private Choice algorithmFamily;
+    
+    public BDDPanel(PreferencesDialog theDialog)
+    {
+	// super(new BorderLayout(20,20));
+	// Panel p = new Panel(new GridLayout(5,1));
+	// add(p, BorderLayout.SOUTH);
+	
+	Box p = new Box(BoxLayout.Y_AXIS);
+	add(p, BorderLayout.CENTER);
+
+	this.theDialog = theDialog;
+
+	p.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
+	p.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
+	p.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
+	p.add( debugOn = new JCheckBox("Debug mode", Options.debug_on) );
+	
+	Panel pFamily = new Panel(new FlowLayout());
+	p.add(pFamily);
+	
+	pFamily.add( new Label("Favour algorithm family"));
+	pFamily.add( algorithmFamily = new Choice());
+
+	algorithmFamily.add("Monolithic");
+	algorithmFamily.add("Conjunctive");
+	algorithmFamily.add("Disjunctive");
+	algorithmFamily.add("Smoothed");
+	algorithmFamily.select(Options.algo_family);
+
+	
+    }
+    
+    public boolean doApply()
+    {
+	Options.algo_family = algorithmFamily.getSelectedIndex();
+	Options.show_grow   = showGrow.isSelected();
+	Options.user_alters_PCG    = alterPCG.isSelected();
+	Options.trace_on    = traceOn.isSelected();
+	Options.debug_on    = debugOn.isSelected();
+
+	SupremicaProperties.updateBDDOptions(true);		
+	return true;
+	
+    }
+
+    public void update()
+    {
+	// fuck it
+    }
 }
