@@ -168,8 +168,8 @@ public final class SupremicaProperties
 		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false", true);
 		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Controllable.toString(), true);
 		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Modular.toString(), true);
-		setProperty(SYNTHESIS_PURGE, "true", true);
-		setProperty(SYNTHESIS_OPTIMIZE, "true", true);
+		setProperty(SYNTHESIS_PURGE, "false", true);
+		setProperty(SYNTHESIS_OPTIMIZE, "false", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 	}
