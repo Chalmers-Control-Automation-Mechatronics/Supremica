@@ -342,7 +342,7 @@ public class RouteController
 	//System.out.println("ArmLevel         : " + armLevel);
 	//System.out.println("ArmAngle         : " + armAngle);
 	//System.out.println("");
-	
+	System.out.println("Manuell Start: " + outSignals[24]);
 	
 	// leg 13
 	if (!legBallList[13].isEmpty())
@@ -855,7 +855,7 @@ public class RouteController
 	outSignals[21] = (armLevel == armVertLength) && (armAngle == armHoriLength);      // ArmVån2
 	outSignals[22] = inSignals[16] &&!(legBallList[9].isEmpty()); // KulaFast
 	outSignals[23] = true;                                       // AutoStart, inverterad
-	outSignals[24] = true;                                      // ManuellStart, inverterad
+	//outSignals[24] = true;                                      // ManuellStart, inverterad
 	outSignals[25] = false;                                    // NödStopp
 	outSignals[26] = false;                                   // LarmKvittering
     }
