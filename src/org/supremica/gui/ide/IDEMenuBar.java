@@ -27,5 +27,9 @@ public class IDEMenuBar
 		menuFile.add(new JMenuItem(ide.getActions().openAction));
 		menuFile.add(new JMenuItem(ide.getActions().saveAction));
 
+	    menuFile.addSeparator();
+
+		menuFile.add(new JMenuItem(ide.getActions().exitAction));
+
 	}
 }

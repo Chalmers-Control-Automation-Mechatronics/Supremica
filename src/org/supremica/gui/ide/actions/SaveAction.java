@@ -11,6 +11,7 @@ import org.supremica.gui.ide.IDE;
 
 public class SaveAction
 	extends AbstractAction
+	implements IDEAction
 {
 	private IDE ide;
 
@@ -21,11 +22,15 @@ public class SaveAction
 		putValue(Action.NAME, "Save...");
 		putValue(Action.SHORT_DESCRIPTION, "Save the project");
 		putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
-		putValue(Action.SMALL_ICON,
-				 new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
+		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)
+	{
+		doAction();
+	}
+
+	public void doAction()
 	{
 		System.err.println("Save Action selected - not implemented");
 	}

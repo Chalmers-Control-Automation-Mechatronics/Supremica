@@ -11,6 +11,7 @@ import org.supremica.gui.ide.IDE;
 
 public class OpenAction
 	extends AbstractAction
+	implements IDEAction
 {
 	private IDE ide;
 
@@ -26,6 +27,11 @@ public class OpenAction
 	}
 
 	public void actionPerformed(ActionEvent e)
+	{
+		doAction();
+	}
+
+	public void doAction()
 	{
 		System.err.println("Open Action selected - not implemented");
 	}

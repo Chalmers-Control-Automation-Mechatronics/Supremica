@@ -9,6 +9,8 @@ public class Actions
 
 	public OpenAction openAction;
 	public SaveAction saveAction;
+	public ExitAction exitAction;
+
 
 	public Actions(IDE ide)
 	{
@@ -16,6 +18,7 @@ public class Actions
 
 		openAction = new OpenAction(ide);
 		saveAction = new SaveAction(ide);
+		exitAction = new ExitAction(ide);
 
 	}
 }

@@ -3,12 +3,16 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
+import java.awt.event.WindowEvent;
 import org.supremica.gui.Utility;
+import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
 
 public class IDE
     extends JFrame
 {
+	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
+
 	private Actions theActions;
 
 	private JPanel contentPanel;
@@ -43,10 +47,10 @@ public class IDE
 		tabPanel = new JTabbedPane();
 
 		editorPanel = new EditorPanel(this, "Editor");
-		tabPanel.add(editorPanel);
+		tabPanel.add(editorPanel.getTitle(), editorPanel);
 
 		analyzerPanel = new AnalyzerPanel(this, "Analyzer");
-		tabPanel.add(analyzerPanel);
+		tabPanel.add(analyzerPanel.getTitle(), analyzerPanel);
 
 		logPanel = new LogPanel(this, "Logger");
 
@@ -63,6 +67,17 @@ public class IDE
 		return theActions;
 	}
 
+
+	// Overridden so we can exit when window is closed
+	protected void processWindowEvent(WindowEvent e)
+	{
+		super.processWindowEvent(e);
+
+		if (e.getID() == WindowEvent.WINDOW_CLOSING)
+		{
+			getActions().exitAction.doAction();
+		}
+	}
 
 	public static void main(String args[])
 	{
