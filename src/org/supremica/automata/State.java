@@ -133,7 +133,8 @@ public class State
 		radius = otherState.radius;
 	}
 
-	private String getId()
+	// These two should be, and will be, private
+	public String getId()
 	{
 		if (id == null)
 		{
@@ -142,7 +143,7 @@ public class State
 		return id;
 	}
 
-	private void setId(String id)
+	public void setId(String id)
 	{
 		this.id = id;
 	}

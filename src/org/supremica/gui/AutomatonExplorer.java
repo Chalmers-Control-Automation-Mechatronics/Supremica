@@ -656,7 +656,7 @@ class StateDisplayer
 		isAcceptingBox.setSelected(currState.isAccepting());
 		isForbiddenBox.setSelected(currState.isForbidden());
 		stateCost.setText("cost: " + currState.getCost());
-		stateId.setText("id: " + currState.getId());
+//		stateId.setText("id: " + currState.getId());
 		stateName.setText("name: " + currState.getName());
 	}
 }
@@ -773,7 +773,7 @@ class ExplorerController
 
 		try
 		{
-			new FindStates(theProject, theAutomata);
+			ActionMan.findStates.execute(theProject, theAutomata);
 		}
 		catch (Exception ex)
 		{
@@ -787,11 +787,12 @@ class ExplorerController
 		try
 		{
 			LabelTrace trace = theAutomaton.getTrace(stateViewer.getCurrState());
-			logger.info("Trace to state " + stateViewer.getCurrState().getId() + ": " + trace);
+//			logger.info("Trace to state " + stateViewer.getCurrState().getId() + ": " + trace);
+			logger.info("Trace to state " + stateViewer.getCurrState().getName() + ": " + trace);
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error when performing route: " + ex.getMessage());
+			logger.error("Error when performing route: ", ex);
 			logger.debug(ex.getStackTrace());
 		}
 		stateViewer.update();

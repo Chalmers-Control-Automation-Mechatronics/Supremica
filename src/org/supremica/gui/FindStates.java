@@ -1064,24 +1064,14 @@ public class FindStates
 		putValue(SHORT_DESCRIPTION, "Specify and search for significant states");
 	}
 
-	public FindStates(VisualProject theProject, Automata theAutomata)
-		throws Exception
-	{
-		new FindStatesFrame(theProject, theAutomata);
-	}
-
 	public void actionPerformed(ActionEvent e)
-	// Find States... action selected
-	// public static void findStates_action(Gui gui)
 	{
 		VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
 		Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
 
-		// FindStates find_states = new FindStates(theProject, selectedAutomata);
-
 		try
 		{
-			new FindStatesFrame(theProject, selectedAutomata).show();
+			execute(theProject, selectedAutomata);
 		}
 		catch (Exception ex)
 		{
@@ -1089,4 +1079,11 @@ public class FindStates
 			logger.debug(ex.getStackTrace());
 		}
 	}
+	
+	public void execute(VisualProject theProject, Automata theAutomata)
+		throws Exception
+	{
+			new FindStatesFrame(theProject, theAutomata).show();
+	}
+			
 }

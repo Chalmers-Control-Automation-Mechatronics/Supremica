@@ -248,7 +248,8 @@ public class ProjectToSP
 				{
 					State state = (State) stateIt.next();
 
-					pw.print("\t\t\t<StateLayout id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
+					// pw.print("\t\t\t<StateLayout id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
+					pw.print("\t\t\t<StateLayout id=\"" + stateIdMap.get(state) + "\"");
 					pw.print(" x=\"" + state.getX() + "\"");
 					pw.print(" y=\"" + state.getY() + "\"");
 					pw.println("/>");
