@@ -151,7 +151,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
-		setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
+		//setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
@@ -177,7 +177,7 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_OPTIMIZE, "false", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
-		setProperty(ANIMATOR_IN_USE, "false", true);
+		//setProperty(ANIMATOR_IN_USE, "false", true);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 	}
 
