@@ -175,7 +175,7 @@
 <target name="backup" depends="init,clean">
 	<tar tarfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar" 
 		basedir="../${project.name}"
-		excludes="rsync/**,put,get"/>
+		excludes="rsync/**,put,get,lib/unjared/**"/>
 	<gzip zipfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar.gz"
 		src="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
 	<delete file="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
