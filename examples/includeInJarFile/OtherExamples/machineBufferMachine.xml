@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Maching-Buffer-Machine" comment="Classical example of uncontrollable specfication. Neat example of where 'supervisor reduction' works perfectly.">
+<Automaton name="Machine 1" type="Plant">
+	<Events>
+		<Event id="l1" label="load1"/>
+		<Event id="u1" label="unload1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="m0" name="Idle1" initial="true" accepting="true"/>
+		<State id="m1" name="Working1"/>
+	</States>
+	<Transitions>
+		<Transition source="m0" dest="m1" event="l1"/>
+		<Transition source="m1" dest="m0" event="u1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Buffer" type="Specification">
+	<Events>
+		<Event id="u1" label="unload1" controllable="false"/>
+		<Event id="l2" label="load2"/>
+	</Events>
+	<States>
+		<State id="b0" name="Empty" initial="true" accepting="true"/>
+		<State id="b1" name="Full"/>
+	</States>
+	<Transitions>
+		<Transition source="b0" dest="b1" event="u1"/>
+		<Transition source="b1" dest="b0" event="l2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Machine 2" type="Plant">
+	<Events>
+		<Event id="l2" label="load2"/>
+		<Event id="u2" label="unload2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="m0" name="Idle2" initial="true" accepting="true"/>
+		<State id="m1" name="Working2"/>
+	</States>
+	<Transitions>
+		<Transition source="m0" dest="m1" event="l2"/>
+		<Transition source="m1" dest="m0" event="u2"/>
+	</Transitions>
+</Automaton>
+</Automata>
