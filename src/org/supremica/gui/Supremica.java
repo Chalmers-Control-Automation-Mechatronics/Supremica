@@ -284,6 +284,8 @@ public class Supremica
 		setSize(new Dimension(800, 600));
 
 		// theVisualProjectContainer.updateFrameTitles();
+		// Enables stylish rollover buttions - JDK 1.4 required
+		toolBar.setRollover(true);
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		contentPane.add(splitPaneVertical, BorderLayout.CENTER);
 		splitPaneVertical.setContinuousLayout(false);
