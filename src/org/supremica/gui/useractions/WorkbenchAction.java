@@ -17,6 +17,7 @@ public class WorkbenchAction
 	extends AbstractAction
 {
 	private static Logger logger = LoggerFactory.createLogger(WorkbenchAction.class);
+	private Workbench wb;
 
 	public WorkbenchAction()
 	{
@@ -50,6 +51,7 @@ public class WorkbenchAction
 			return;
 		}
 
-		new Workbench(theProject, theAutomata).show();
+		wb = new Workbench(theProject, theAutomata);
+		wb.show();
 	}
 }

@@ -49,6 +49,33 @@
    <Transition event="out" source="half" dest="empty" x="186" y="144" />
   </Transitions>
  </Automaton>
+ <Automaton name="FillDrain" type="Specification">
+  <Events>
+   <Event id="in" label="in" controllable="false" prioritized="true" />
+   <Event id="v10" label="v10" controllable="true" prioritized="true" />
+   <Event id="v21" label="v21" controllable="true" prioritized="true" />
+   <Event id="out" label="out" controllable="false" prioritized="true" />
+   <Event id="v20" label="v20" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="p0" initial="true" accepting="true" x="150" y="155" />
+   <State id="p1" x="278" y="155" />
+   <State id="p2" x="406" y="152" />
+   <State id="p3" x="534" y="155" />
+   <State id="p4" x="406" y="283" />
+   <State id="p5" x="278" y="411" />
+   <State id="p6" x="214" y="283" />
+  </States>
+  <Transitions>
+   <Transition event="in" source="p0" dest="p1" x="214" y="151" />
+   <Transition event="in" source="p1" dest="p2" x="347" y="156" />
+   <Transition event="v10" source="p2" dest="p3" x="475" y="156" />
+   <Transition event="v21" source="p3" dest="p4" x="475" y="222" />
+   <Transition event="out" source="p4" dest="p5" x="347" y="350" />
+   <Transition event="out" source="p5" dest="p6" x="251" y="350" />
+   <Transition event="v20" source="p6" dest="p0" x="187" y="222" />
+  </Transitions>
+ </Automaton>
  <Automaton name="E" type="Plant">
   <Events>
    <Event id="e1" label="e1" controllable="true" prioritized="true" />
@@ -79,33 +106,6 @@
   <Transitions>
    <Transition event="t1" source="lo" dest="hi" x="226" y="93" />
    <Transition event="t0" source="hi" dest="lo" x="219" y="241" />
-  </Transitions>
- </Automaton>
- <Automaton name="FillDrain" type="Specification">
-  <Events>
-   <Event id="in" label="in" controllable="false" prioritized="true" />
-   <Event id="v10" label="v10" controllable="true" prioritized="true" />
-   <Event id="v21" label="v21" controllable="true" prioritized="true" />
-   <Event id="out" label="out" controllable="false" prioritized="true" />
-   <Event id="v20" label="v20" controllable="true" prioritized="true" />
-  </Events>
-  <States>
-   <State id="p0" initial="true" accepting="true" x="150" y="155" />
-   <State id="p1" x="278" y="155" />
-   <State id="p2" x="406" y="152" />
-   <State id="p3" x="534" y="155" />
-   <State id="p4" x="406" y="283" />
-   <State id="p5" x="278" y="411" />
-   <State id="p6" x="214" y="283" />
-  </States>
-  <Transitions>
-   <Transition event="in" source="p0" dest="p1" x="214" y="151" />
-   <Transition event="in" source="p1" dest="p2" x="347" y="156" />
-   <Transition event="v10" source="p2" dest="p3" x="475" y="156" />
-   <Transition event="v21" source="p3" dest="p4" x="475" y="222" />
-   <Transition event="out" source="p4" dest="p5" x="347" y="350" />
-   <Transition event="out" source="p5" dest="p6" x="251" y="350" />
-   <Transition event="v20" source="p6" dest="p0" x="187" y="222" />
   </Transitions>
  </Automaton>
  <Automaton name="Heat" type="Specification">
