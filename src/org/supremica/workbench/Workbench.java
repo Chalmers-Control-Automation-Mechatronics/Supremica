@@ -634,7 +634,7 @@ public class Workbench
 	public Workbench(VisualProject project, Automata automata)
 		throws Exception
 	{
-		super(228, 416);
+		super(228, 432);
 
 		setTitle("Supervisor Workbench");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
