@@ -141,6 +141,13 @@ public class EventManager
 		return ret;
 	}
 
+	/** gives the number automata that "use" each event */
+	public void getUsageCount(int [] answer) {
+		BDDAssert.internalCheck(closed, "[EventManager.copyEvents] BAD function call");
+		for (int i = 0; i < size; i++)
+			answer[i] = events[i].owners;
+	}
+
 	// --------------------------------------------------------------------
 	/** prints only a subset of the events. given by 'subset'
 	 */

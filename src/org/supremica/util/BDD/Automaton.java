@@ -40,9 +40,12 @@ public class Automaton
 	private ArcSet arcSet = new ArcSet();
 	private EventManager alphabet;
 	private int [][] eventFlowMatrix = null;
-	private boolean [] care_set, care_set_uc; // Events that we have in our alphabeth, and are uncontrollaböe
+	private boolean [] care_set, care_set_uc; // Events that we have in our alphabeth, and are uncontrollabe
 	private int [] event_usage; // how many times each event was used
 
+
+
+	// ------------------------------------------------------------------------------------------
 
 	public Automaton(String name, EventManager alphabet)
 	{
@@ -51,6 +54,9 @@ public class Automaton
 		type = TYPE_UNKNOWN;
 		closed = false;
 	}
+
+
+	// ------------------------------------------------------------
 
 	// From PCGNode:
 	public int getSize()
@@ -95,6 +101,7 @@ public class Automaton
 		}
 	}
 
+	// ------------------------------------------------------------
 
 	private void saturate(Vector v)
 	{
@@ -116,6 +123,7 @@ public class Automaton
 	}
 
 
+	// ------------------------------------------------------------
 	public void close()
 	    throws BDDException
 	{
@@ -289,14 +297,8 @@ public class Automaton
 	{
 		return eventSet.overlap(e);
 	}
+
 	// -----------------------------------------------------------
-	public void dump(PrintStream ps)
-	{
-		ps.println("--- Automaton " + name + "  (" + getType(type) + ")");
-		stateSet.dump(ps);
-		eventSet.dump(ps);
-		arcSet.dump(ps);
-	}
 
 	// _estimaed_ communication between two automata.
 	// current estimation is the avreage number of common events
@@ -323,6 +325,30 @@ public class Automaton
 		return ret / 2;    // to get the average
 	}
 
+
+
+
+
+	/**
+	 * See Group.removeEventUsage() for more info :(
+	 *
+	 */
+	public void removeEventUsage(int [] count) {
+		int len = count.length;
+		for(int i = 0; i <  len; i++)
+			if(care_set[i]) count[i] --;
+	}
+
+	/**
+	 * See Group.addEventUsage() for more info :(
+	 *
+	 */
+	public void addEventUsage(int [] count) {
+		int len = count.length;
+		for(int i = 0; i <  len; i++)
+			if(care_set[i]) count[i] ++;
+
+	}
 
 	//  ---------[ these are here to be used in a eventfolw/workset supervisor some day :)  ]---
 	/**
@@ -375,5 +401,14 @@ public class Automaton
 			ret[i] = tmp > 0;
 		}
 		return ret;
+	}
+
+	// -----------------------------------------------------------
+	public void dump(PrintStream ps)
+	{
+		ps.println("--- Automaton " + name + "  (" + getType(type) + ")");
+		stateSet.dump(ps);
+		eventSet.dump(ps);
+		arcSet.dump(ps);
 	}
 }

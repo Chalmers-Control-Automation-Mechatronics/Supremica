@@ -301,6 +301,34 @@ public class Group
 		has_t = true;
 	}
 
+
+	// --[ event analysis stuff ]-----------------------------------------------------
+
+	/**
+	 * subtracts the number of automata using each event from the original number
+	 * found in the vector.
+	 *
+	 * This is used to find local events:
+	 *   1. find the number of automata using each event, put them in 'count'
+	 *   2. removeEventUsage() for some group G
+	 *   3. if some position in count[] equals zero then that event is not used outside G.
+	 *      3.b)  if that event is used at all, then it must be local to group G!
+	 */
+	public void removeEventUsage(int [] count) {
+		for (int i = 0; i < size; i++)
+			members[i].removeEventUsage(count);
+	}
+
+	/**
+	 * Not used anywhere yet.
+	 * its here just to complete removeEventUsage() above ...
+	 *
+	 * [no kidding]
+	 */
+	public void addEventUsage(int [] count) {
+		for (int i = 0; i < size; i++)
+			members[i].addEventUsage(count);
+	}
 	// --------------------------------------------------------------------------------
 
 	public int forward_reachables()
@@ -418,11 +446,10 @@ public class Group
 
 	// ---------------------------------------------------------------------------
 
-
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("{ ");
+		sb.append("{");
 		for (int i = 0; i < size; i++) {
 			if(i != 0) sb.append(", ");
 			sb.append( members[i].getName() );

@@ -17,7 +17,7 @@ import java.util.*;
 
 public class AutomataConfiguration {
 	private boolean [] selection, type; /** type: true if member of G1 */
-	private boolean [] workset_events, current_events; // original Sigma' events and the extended events
+	private boolean [] workset_events, current_events, tmp_events; // original Sigma' events and the extended events
 	private boolean include_both; /* both g1 and g2 are choosen */
 	private int size1, size2, size_all, selected;
 	private int [] local_index; /* index for the automata in G1 or G2, whereever it belongs */
@@ -111,7 +111,10 @@ public class AutomataConfiguration {
 
 
 		// alloc on demand...
-		if(current_events == null)	current_events = new boolean[event_care.length];
+		if(current_events == null) {
+			current_events = new boolean[event_care.length];
+			tmp_events = new boolean[event_care.length];
+		}
 
 
 		// make selection[] valid...
@@ -135,7 +138,7 @@ public class AutomataConfiguration {
 			return false;
 		}
 
-		addIfInteractWith(current_events);
+		addIfInteractWithMe(current_events);
 		return true;
 	}
 
@@ -154,7 +157,7 @@ public class AutomataConfiguration {
 		emptyQueue();
 
 		// and put those that are syill relevant back again
-		addIfInteractWith(current_events);
+		addIfInteractWithMe(current_events);
 	}
 
 
@@ -168,6 +171,7 @@ public class AutomataConfiguration {
 		{
 			if(!override || addIfInteractWithMe(current_events) == 0)
 			{
+				Options.out.println("No more automata to add");
 				return null;
 			}
 		}
@@ -175,7 +179,7 @@ public class AutomataConfiguration {
 		int pop = deleteMin();
 
 		if(Options.debug_on)
-			Options.out.println("    -- Adding " + all[pop].getName() + "..." );
+			Options.out.println("   -- Adding automaton " + all[pop].getName() + " (taken from the queue)..." );
 
 		// check if it was from g1 or g2
 		if(type[pop])	l1.add( all[pop]);
@@ -219,16 +223,30 @@ public class AutomataConfiguration {
 	 */
 	private  int addIfInteractWithMe(boolean [] event_careset)
 	{
+
 		// get new care set:
 		for(int i = 0; i < size_all; i++)
+		{
 			if(selection[i])
-				all[i].addEventCareSet(event_careset, true /* all events*/ );
+			{
+				// NOT WORKING (same results but more computation)
+				// IndexedSet.copy(event_careset, tmp_events); // we do this copying to avoid adding recursive dependencies
+				// all[i].addEventCareSet(tmp_events, false /* all events*/ );
+				// IndexedSet.add(event_careset, tmp_events);
+
+				all[i].addEventCareSet(event_careset, false /* all events*/ );
+			}
+		}
+
 
 		int count = 0;
 		for(int i = 0; i < size_all; i++)
 		{
 			if(!selection[i] && i != my_index && all[i].interact(event_careset))
 			{
+				if(Options.debug_on)
+					Options.out.println("   ++ Putting automaton " + all[i].getName() + " on the queue (directly dependent)");
+
 				addSelection(i);
 				count ++;
 			}

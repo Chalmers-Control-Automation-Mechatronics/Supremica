@@ -70,4 +70,12 @@ public class IndexedSet {
 		for(int i = 0; i < len; i++) dst[i] = src[i];
 	}
 
+
+	/** compute set diff, left += right, return cardinality */
+	public static void add(boolean [] left, boolean [] right) {
+		int len = left.length;
+		for(int i = 0; i < len; i++)
+			left[i] |= right[i];
+	}
+
 }

@@ -111,6 +111,43 @@ public class Supervisor
 	}
 
 	// ------------------------------------------------------------------------------
+
+	/**
+	 * this functions retuns the events that are "local" for the current Plant and Spec.
+	 * this means that they are not used outside this set of automata (if there are any
+	 * others in the BDDAutomata).
+	 *
+	 * @param tmp_v temporary int vector (size of the events)
+	 * @param are_local true if that event is local
+	 * @returns the number of local events
+	 */
+	public int getLocalEvents(int [] tmp_v, boolean [] are_local) {
+		int count = 0;
+		int len = tmp_v.length;
+
+		manager.getEventManager().getUsageCount(tmp_v);
+
+		// this trick will exluce those that are never used anywhere!
+		for(int i = 0; i < len; i++)
+			if(tmp_v[i] == 0) count--;
+
+		plant.removeEventUsage(tmp_v);
+		spec.removeEventUsage(tmp_v);
+
+		for(int i = 0; i < len; i++) {
+			if(tmp_v[i] < 1) {
+				count++;
+				are_local[i] = true;
+			} else {
+				are_local[i] = false;
+			}
+		}
+
+
+		return count;
+	}
+
+	// ------------------------------------------------------------------------------
 	public int getUncontrollableStates()
 	{
 		if (!has_uncontrollables)
@@ -214,28 +251,19 @@ public class Supervisor
 
 	// --------------------------------------------------------------------------------------------
 
-	/*
-	 * public int getReachables(int from, GrowFrame gf) {
-	 *   int cube    = manager.getStateCube();
-	 *   int permute = manager.getPermuteSp2S();
-	 *   int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
-	 *   int r_all_p, r_all = from;
-	 *   manager.ref(r_all); // gets derefed by orTo and finally a recursiveDeref
-	 *
-	 *   do {
-	 *       r_all_p = r_all;
-	 *       int tmp = manager.relProd(t_all, r_all, cube);
-	 *       int tmp2 = manager.replace( tmp, permute);
-	 *       manager.deref(tmp);
-	 *       r_all = manager.orTo(r_all, tmp2);
-	 *       manager.deref(tmp2);
-	 *       if(gf != null)      gf.add( manager.nodeCount( r_all));
-	 *   } while(r_all_p != r_all);
-	 *
-	 *   manager.deref(t_all);
-	 *   return r_all;
-	 * }
-	 */
+	/** do a reachability search, use only these events; */
+	public int getReachables(boolean [] events) {
+		int event_mask = manager.getAlphabetSubsetAsBDD(events);
+		int tmp = manager.and(plant.getT(), event_mask);
+		int t_all = manager.relProd(tmp, spec.getT(), manager.getEventCube());
+		manager.deref(tmp);
+		manager.deref(event_mask);
+		int x = internal_computeReachables(t_all);
+		manager.deref(t_all);
+		return x;
+	}
+
+	/** do a reachability search, use all events ; */
 	public int getReachables()
 	{    // get reachables from I
 		if (!has_reachables)
@@ -248,8 +276,15 @@ public class Supervisor
 
 	protected void computeReachables()
 	{
+		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+		bdd_reachables = internal_computeReachables(t_all);
+		has_reachables = true;
+		manager.deref(t_all);
+	}
 
-		// Note: we remove events from t_all, it is needed for forward reachability
+	/** do a reachability search, using the given transition relation */
+	protected int internal_computeReachables(int t_all) {
+	// Note: we remove events from t_all, it is needed for forward reachability
 		GrowFrame gf = null;
 
 		if (Options.show_grow)
@@ -262,7 +297,7 @@ public class Supervisor
 
 		int cube = manager.getStateCube();
 		int permute = manager.getPermuteSp2S();
-		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+
 		int i_all = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
 
@@ -291,19 +326,11 @@ public class Supervisor
 		while (r_all_p != r_all);
 
 		manager.deref(i_all);
-		manager.deref(t_all);
-
-
-
-
-		has_reachables = true;
-		bdd_reachables = r_all;
 
 		SizeWatch.report(r_all, "R");
 		if(gf != null) gf.stopTimer();
 		timer.report("Forward reachables found");
-
-
+		return r_all;
 	}
 
     // ----------------------------------------------------
@@ -1012,4 +1039,5 @@ public class Supervisor
 
 		return r_not_s_go;
 	}
+
 }

@@ -47,7 +47,8 @@ public class Options
     // options
     public static final boolean use_cudd = false;
     public static boolean fill_statevars = false;
-    public static boolean debug_on = false; // proof generating and misc profiling stuff
+    public static boolean profile_on = false; // misc profiling stuff
+    public static boolean debug_on = true; // proof generating and general debug
     public static boolean size_watch = false; // BDD sizewatch
     public static boolean sanity_check_on = false;
     public static boolean user_alters_PCG = false;

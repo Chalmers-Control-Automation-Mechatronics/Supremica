@@ -680,7 +680,7 @@ class BDDPanel
 {
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
-    private JCheckBox localSaturation, encodingFill, sizeWatch;
+    private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
     private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm;
 	private JButton bProofFile;
 
@@ -691,7 +691,7 @@ class BDDPanel
 		JLabel tmp;
 
 
-	JPanel pWest  = new JPanel( new GridLayout(10,1));
+	JPanel pWest  = new JPanel( new GridLayout(12,1));
 	add(pWest, BorderLayout.WEST);
 
 
@@ -705,6 +705,8 @@ class BDDPanel
 	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
 	pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
+	pWest.add( profileOn = new JCheckBox("Profile", Options.profile_on) );
+
 	pWest.add( sizeWatch = new JCheckBox("report nodcount", Options.size_watch) );
 
 
@@ -816,6 +818,7 @@ class BDDPanel
 	// Options.uc_optimistic    = ucOptimistic.isSelected();
 	// Options.nb_optimistic    = nbOptimistic.isSelected();
 	Options.trace_on         = traceOn.isSelected();
+	Options.profile_on         = profileOn.isSelected();
 	Options.debug_on         = debugOn.isSelected();
 	Options.size_watch       = sizeWatch.isSelected();
 	Options.local_saturation = localSaturation.isSelected();

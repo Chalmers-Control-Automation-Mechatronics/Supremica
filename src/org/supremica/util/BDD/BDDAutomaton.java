@@ -419,6 +419,22 @@ public class BDDAutomaton
 		return automaton.getEventFlow(forward);
 	}
 
+	/**
+	 * See Group.removeEventUsage() for more info :(
+	 *
+	 */
+	public void removeEventUsage(int [] count) {
+		automaton.removeEventUsage(count);
+	}
+
+	/**
+	 * See Group.addEventUsage() for more info :(
+	 *
+	 */
+	public void addEventUsage(int [] count) {
+		automaton.addEventUsage(count);
+	}
+
 
 	// ------------------------------------------------------------------
 

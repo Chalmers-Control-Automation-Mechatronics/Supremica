@@ -38,7 +38,7 @@ public class Timer
 
 	public void report(String str, boolean must_report)
 	{
-		if (!Options.debug_on)
+		if (!Options.profile_on)
 		{
 			return;    // No output anyway, forget it
 		}
