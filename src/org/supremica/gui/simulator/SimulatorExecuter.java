@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -68,12 +67,13 @@ import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.animators.scenebeans.Animator;
+import org.supremica.automata.execution.*;
 import uk.ac.ic.doc.scenebeans.event.AnimationListener;
 import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
 import uk.ac.ic.doc.scenebeans.animation.Animation;
 import uk.ac.ic.doc.scenebeans.animation.CommandException;
 import uk.ac.ic.doc.scenebeans.animation.ResetActivityCommand;
-import org.supremica.automata.execution.*;
+
 
 
 public class SimulatorExecuter

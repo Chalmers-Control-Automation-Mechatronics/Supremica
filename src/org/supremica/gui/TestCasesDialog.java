@@ -10,6 +10,7 @@ import org.supremica.automata.algorithms.AutomatonToDsx;
 import org.supremica.automata.algorithms.AutomataToXml;
 import org.supremica.automata.Project;
 import org.supremica.properties.*;
+import org.supremica.log.*;
 import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;
 import org.supremica.testcases.DiningPhilosophers;
@@ -260,6 +261,8 @@ class ExampleTab
 public class TestCasesDialog
 	extends JDialog
 {
+	private static Logger logger = LoggerFactory.createLogger(TestCasesDialog.class);
+
 	private ExampleTab extab = new ExampleTab();
 	private Project project = null;
 
@@ -283,7 +286,8 @@ public class TestCasesDialog
 					}
 					catch (Exception excp)
 					{
-
+						excp.printStackTrace();
+						logger.error("Exception while constructing test case: " + excp);
 						// what are we supposed to do?
 					}
 				}

@@ -477,6 +477,7 @@ public class VisualProject
 
 	public void clearSimulationData()
 	{
+		/*
 		Actions theActions = getActions();
 		if (theActions != null)
 		{
@@ -486,7 +487,7 @@ public class VisualProject
 		if (theControls != null)
 		{
 			theControls.clear();
-		}
+		}*/
 
 		if (theActionAndControlViewer != null)
 		{

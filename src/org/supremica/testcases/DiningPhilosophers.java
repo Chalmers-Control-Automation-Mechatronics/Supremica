@@ -268,11 +268,12 @@ public class DiningPhilosophers
 		{
 			int id = i + 1;
 
-			Automaton currPhil = philo.build(id, id, prevId(id, num));
+			//Automaton currPhil = philo.build(id, id, prevId(id, num));
+			Automaton currPhil = philo.build(id, id, nextId(id, num));
 			// id's are from 1...n
 			project.addAutomaton(currPhil);
 
-			// To his left a philo has fork #id, and to his right is fork #id-1
+			// To his right a philo has fork #id, and to his left is fork #id-1
 
 
 			if (animation)
@@ -294,7 +295,7 @@ public class DiningPhilosophers
 
 				Action rTakeAction = new Action(rTake.getLabel());
 				currActions.addAction(rTakeAction);
-				rTakeAction.addCommand("fork." + prevId(id, num) + ".get");
+				rTakeAction.addCommand("fork." + nextId(id, num) + ".get");
 				rTakeAction.addCommand("phil." + id + ".rightfork");
 
 				Action lPutAction = new Action(lPut.getLabel());
@@ -304,7 +305,7 @@ public class DiningPhilosophers
 
 				Action rPutAction = new Action(rPut.getLabel());
 				currActions.addAction(rPutAction);
-				rPutAction.addCommand("fork." + prevId(id, num) + ".put");
+				rPutAction.addCommand("fork." + nextId(id, num) + ".put");
 				rPutAction.addCommand("phil." + id + ".thinking.begin");
 
 			}
@@ -319,9 +320,9 @@ public class DiningPhilosophers
 			int id = i + 1;
 
 			// id's are from 1...n
-			project.addAutomaton(fork.build(id, nextId(id, num), id));
+			project.addAutomaton(fork.build(id, prevId(id, num), id));
 
-			// To its left a fork has philo #id+1, and to its right philo #id
+			// To its right a fork has philo #id, and to its left philo #id-1
 		}
 
 		if (animation)
