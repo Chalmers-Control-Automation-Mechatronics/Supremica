@@ -785,11 +785,22 @@ public class ProjectBuildFromXml
 			throwException("label attribute is missing");
 		}
 
+		boolean invert = false;
+		String invertStr = attributes.getValue("invert");
+
+		if (invertStr != null)
+		{
+			if (invertStr.equalsIgnoreCase("true"))
+			{
+				invert = true;
+			}
+		}
+
 		if (currControls.hasControl(label))
 		{
 			throwException("Multiple controls of " + label);
 		}
-		currControl = new Control(label);
+		currControl = new Control(label, invert);
 
 		currControls.addControl(currControl);
 	}

@@ -141,6 +141,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml"));
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicle", prefix + "agv.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
+		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
 	}
 
 	private void initializeAIPExamples()

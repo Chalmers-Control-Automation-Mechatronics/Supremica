@@ -56,23 +56,30 @@ public class Control
 	private String label = null;
 	private List conditions = null;
 	private Expression expr = null;
+	private boolean invert = false;
 
 	public Control(String label)
 	{
+		this(label, false);
+	}
+
+	public Control(String label, boolean invert)
+	{
 		this.label = label;
+		this.invert = invert;
 		conditions = new LinkedList();
 		expr = new ConstVariable(false);
 	}
 
-	public Control(String label, String condition)
+	public Control(String label, boolean invert, String condition)
 	{
-		this(label);
+		this(label, invert);
 		addCondition(condition);
 	}
 
 	public Control(Control otherControl)
 	{
-		this(otherControl.label);
+		this(otherControl.label, otherControl.invert);
 		conditions = new LinkedList(otherControl.conditions);
 		expr = new ConstVariable(true);
 	}
@@ -95,6 +102,18 @@ public class Control
 	public Iterator conditionIterator()
 	{
 		return conditions.iterator();
+	}
+
+	/** This should be in conditions instead, Remove this later **/
+	public boolean doInvert()
+	{
+		return invert;
+	}
+
+	/** This should be in conditions instead, Remove this later **/
+	public void setInvert(boolean invert)
+	{
+		this.invert = invert;
 	}
 
 	public boolean equals(Object other)

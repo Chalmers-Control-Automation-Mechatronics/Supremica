@@ -187,6 +187,9 @@ public class AutomataToNQC
 	void printComputeEnabledEvents(PrintWriter pw)
 		throws Exception
 	{
+		pw.println("\n\t\tenabledEvent = false;");
+
+
 		pw.println("\n\t\t// Compute the enabled events");
 		// Iterate over all events and compute which events that are enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)

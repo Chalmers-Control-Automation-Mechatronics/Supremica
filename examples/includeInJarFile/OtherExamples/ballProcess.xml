@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata>
+ <Automaton name="gantry" type="Plant">
+  <Events>
+   <Event id="p1.gantry_go_drill_2" label="p1.gantry_go_drill_2" controllable="true" prioritized="true" />
+   <Event id="p1.b_oven" label="p1.b_oven" controllable="true" prioritized="true" />
+   <Event id="p1.gantry_go_seg3" label="p1.gantry_go_seg3" controllable="true" prioritized="true" />
+   <Event id="p1.b_drill" label="p1.b_drill" controllable="true" prioritized="true" />
+   <Event id="p1.gantry_go_oven_2" label="p1.gantry_go_oven_2" controllable="true" prioritized="true" />
+   <Event id="p1.b_seg4" label="p1.b_seg4" controllable="true" prioritized="true" />
+   <Event id="p2.gantry_go_drill_2" label="p2.gantry_go_drill_2" controllable="true" prioritized="true" />
+   <Event id="p2.b_seg4" label="p2.b_seg4" controllable="true" prioritized="true" />
+   <Event id="p2.gantry_go_oven_2" label="p2.gantry_go_oven_2" controllable="true" prioritized="true" />
+   <Event id="p2.b_drill" label="p2.b_drill" controllable="true" prioritized="true" />
+   <Event id="p2.gantry_go_seg3" label="p2.gantry_go_seg3" controllable="true" prioritized="true" />
+   <Event id="p2.b_oven" label="p2.b_oven" controllable="true" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q_0" initial="true" accepting="true" />
+   <State id="q_1" />
+   <State id="q_2" />
+   <State id="q_3" />
+   <State id="q_4" />
+   <State id="q_5" />
+   <State id="q_6" />
+  </States>
+  <Transitions>
+   <Transition event="p1.gantry_go_drill_2" source="q_0" dest="q_2" />
+   <Transition event="p1.b_oven" source="q_2" dest="q_0" />
+   <Transition event="p1.gantry_go_seg3" source="q_0" dest="q_1" />
+   <Transition event="p1.b_drill" source="q_1" dest="q_0" />
+   <Transition event="p1.gantry_go_oven_2" source="q_0" dest="q_3" />
+   <Transition event="p1.b_seg4" source="q_3" dest="q_0" />
+   <Transition event="p2.gantry_go_drill_2" source="q_0" dest="q_6" />
+   <Transition event="p2.b_seg4" source="q_6" dest="q_0" />
+   <Transition event="p2.gantry_go_oven_2" source="q_0" dest="q_5" />
+   <Transition event="p2.b_drill" source="q_5" dest="q_0" />
+   <Transition event="p2.gantry_go_seg3" source="q_0" dest="q_4" />
+   <Transition event="p2.b_oven" source="q_4" dest="q_0" />
+  </Transitions>
+ </Automaton>
+<Execution>
+	<InputSignals>
+		<Signal label="KulaPortvakt" port="0"/>
+		<Signal label="MatlyftNere" port="1"/>
+		<Signal label="KulaMatlyft" port="2"/>
+		<Signal label="MatlyftUppe" port="3"/>
+		<Signal label="KulaMatstation" port="4"/>
+		<Signal label="StorKula" port="5"/>
+		<Signal label="LitenKula" port="6"/>
+		<Signal label="HissNere" port="7"/>
+		<Signal label="KulaHiss" port="10"/>
+		<Signal label="HissVan1" port="11"/>
+		<Signal label="KulaVan1" port="12"/>
+		<Signal label="PlockaVan1" port="13"/>
+		<Signal label="HissVan2" port="14"/>
+		<Signal label="KulaVan2" port="15"/>
+		<Signal label="PlockaVan2" port="16"/>
+		<Signal label="ArmHemma" port="17"/>
+		<Signal label="ArmVan1" port="20"/>
+		<Signal label="ArmVan2" port="21"/>
+		<Signal label="KulaFast" port="22"/>
+		<Signal label="Autostart" port="23"/>
+		<Signal label="ManuellStart" port="24"/>
+		<Signal label="NodStopp" port="25"/>
+		<Signal label="LarmKvittering" port="26"/>
+	</InputSignals>
+	<OutputSignals>
+		<Signal label="InPortvakt" port="0"/>
+		<Signal label="UrPortvakt" port="1"/>	
+		<Signal label="UppMatlyft" port="2"/>	
+		<Signal label="UrMatning" port="3"/>	
+		<Signal label="Mat" port="4"/>	
+		<Signal label="UppHissVan1" port="5"/>	
+		<Signal label="UppHissVan2" port="6"/>	
+		<Signal label="UtVan1" port="7"/>	
+		<Signal label="LyftVan1" port="10"/>	
+		<Signal label="UtVan2" port="11"/>	
+		<Signal label="LyftVan2" port="12"/>			
+		<Signal label="UppArmVan1" port="13"/>	
+		<Signal label="UppArmVan2" port="14"/>	
+		<Signal label="VridArmHoger" port="15"/>	
+		<Signal label="Sug" port="16"/>			
+	</OutputSignals>
+	<Actions>
+		<Action label="p1.b_seg1">
+			<Command command="seg.1.a.begin"/>
+		</Action>
+		<Action label="p1.b_seg2">
+			<Command command="seg.2.a.begin"/>
+		</Action>
+	</Actions>
+	<Controls>
+		<Control label="p1.gantry_seg3_get">
+			<Condition condition="seg.3.end"/>
+			<Condition condition="gantry.end"/>
+			<Condition condition="head.end"/>			
+		</Control>
+		<Control label="p1.gantry_drill_get">
+			<Condition condition="drill.end"/>
+			<Condition condition="gantry.end"/>
+			<Condition condition="head.end"/>
+		</Control>
+	</Controls>
+</Execution>
+</Automata>
