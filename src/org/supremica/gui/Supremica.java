@@ -1483,7 +1483,7 @@ public class Supremica
 		}
 
 		Date endDate = new Date();
-		thisCategory.info("Execution took " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+		thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 
 		if (isControllable)
 		{
@@ -1539,7 +1539,7 @@ public class Supremica
 		}
 
 		Date endDate = new Date();
-		thisCategory.info("Execution took " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+		thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 
 		if (isControllable)
 		{
@@ -1674,7 +1674,7 @@ public class Supremica
 		}
 
 		Date endDate = new Date();
-		thisCategory.info("Execution took " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+		thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 
 		if (isIncluded)
 		{
@@ -1785,7 +1785,7 @@ public class Supremica
 			}
 		}
 		Date endDate = new Date();
-		thisCategory.info("Execution took " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+		thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 	}
 
 	// Automaton.Purge action performed

@@ -110,15 +110,11 @@ public class AutomataSynchronizerWorker
 			threadsToStop.add(theSynchronizer);
 			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop);
 			theSynchronizer.getHelper().setCancelDialog(cancelDialog);
+			cancelDialog.updateHeader("Synchronizing...");
 
-			// cancelDialog.makeProgressBar(0,97000);
-			// cancelDialog.makeCounter();
-			
 			try
 			{
-				cancelDialog.updateHeader("Synchronizing...");
 				theSynchronizer.execute();
-				System.out.println("Synchronization complete...");
 			}
 			catch (Exception ex)
 			{
@@ -127,9 +123,7 @@ public class AutomataSynchronizerWorker
 			}
 			try
 			{
-				cancelDialog.updateHeader("Building automaton...");
 				theAutomaton = theSynchronizer.getAutomaton();
-				System.out.println("Automaton build complete...");
 			}
 			catch (Exception ex)
 			{
@@ -137,7 +131,6 @@ public class AutomataSynchronizerWorker
 				return;
 			}
 
-			// if (!theAutomaton.isDisabled())
 			if (theAutomaton != null)
 			{
 				theAutomaton.setName(newAutomatonName);

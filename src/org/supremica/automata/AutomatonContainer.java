@@ -512,6 +512,7 @@ public class AutomatonContainer
     	{
 			theAutomatonNames.remove(automatonName);
 		}
+
 		theAutomatonContainer.remove(automatonName);
 
 		//theAutomatonListeners.remove(automaton);
