@@ -390,6 +390,7 @@ public class AutomataVerifier
 					if (verboseMode)
 						thisCategory.info("Couldn't proove controllability, trying to proove uncontrollability...");
 					
+					/*
 					// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
 					if (findUncontrollableStates(automataIndices))
 					{   // Uncontrollable state found! 
@@ -403,6 +404,7 @@ public class AutomataVerifier
 						}
 						return false;
 					}
+					*/
 				}
 				else
 				{   // All uncontrollable states were removed!
