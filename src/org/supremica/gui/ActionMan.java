@@ -68,6 +68,32 @@ import org.supremica.gui.help.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
+//-- MF -- Abstract class to sav eon duplicate code
+//-- From this class is instantiated anonymous classes that implement the openFile properly
+abstract class FileImporter
+{
+	FileImporter(JFileChooser fileOpener, Gui gui)
+	{
+		if(fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
+		{
+			File[] currFiles = fileOpener.getSelectedFiles();
+			if (currFiles != null)
+			{
+				for (int i = 0; i < currFiles.length; i++)
+				{
+					if (currFiles[i].isFile())
+					{
+						openFile(gui, currFiles[i]);
+					}
+				}
+			}
+			gui.getFrame().repaint();
+		}
+	}
+	
+	abstract void openFile(Gui gui, File file);
+}
+//--------------------
 public class ActionMan
 {
 	private static int getIntegerInDialogWindow(String text, Component parent)
@@ -1222,30 +1248,37 @@ public class ActionMan
 
 	public static void fileImportDesco(Gui gui)
 	{
-
 		/*
-		 *  JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
-		 *  if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
-		 *  {
-		 *  File[] currFiles = fileOpener.getSelectedFiles();
-		 *  if (currFiles != null)
-		 *  {
-		 *  for (int i = 0; i < currFiles.length; i++)
-		 *  {
-		 *  if (currFiles[i].isFile())
-		 *  {
-		 *  importDescoFile(currFiles[i]);
-		 *  }
-		 *  }
-		 *  }
-		 *  repaint();
-		 *  theAutomatonTable.repaint();
-		 *  }
-		 */
-	}
+		JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
+		if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+		{
+			File[] currFiles = fileOpener.getSelectedFiles();
+			if (currFiles != null)
+			{
+				for (int i = 0; i < currFiles.length; i++)
+				{
+					if (currFiles[i].isFile())
+					{
+						importDescoFile(gui, currFiles[i]);
+					}
+				}
+			}
+			repaint();
+			theAutomatonTable.repaint();
+       	}
+       	*//* Not implemented yet
+       	new FileImporter(FileDialogs.getDescoFileImporter(), gui)
+       	{
+       		void openFile(Gui g, File f)
+       		{
+       			importDescoFile(g, f);
+       		}
+       	};*/
+    }
 
 	public static void fileImportValid(Gui gui)
 	{
+		/*
 		JFileChooser fileOpener = FileDialogs.getVALIDFileImporter();
 
 		if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
@@ -1266,12 +1299,31 @@ public class ActionMan
 			gui.repaint();
 
 			// theAutomatonTable.repaint(); // shoudl this really be necessary??
-		}
+       	}*/
+       	new FileImporter(FileDialogs.getVALIDFileImporter(), gui)	// anonymous class
+       	{
+       		void openFile(Gui g, File f)
+       		{
+       			importValidFile(g, f);
+       		}
+       	};
+    }
+	//-- MF -- Aldebaran format, a simple format for specifying des
+	public static void fileImportAut(Gui gui)
+	{
+		new FileImporter(FileDialogs.getAutFileImporter(), gui) // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importAutFile(g, f);	
+			}
+		};
 	}
 
 	// File.Open action performed
 	public static void fileOpen(Gui gui)
 	{
+		/*
 		JFileChooser fileOpener = FileDialogs.getXMLFileImporter();
 
 		if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
@@ -1292,8 +1344,16 @@ public class ActionMan
 			gui.getFrame().repaint();
 
 			// theAutomatonTable.repaint(); // necessary?
-		}
-	}
+       	}
+       	*/
+       	new FileImporter(FileDialogs.getXMLFileImporter(), gui) // anonymous class
+       	{
+       		void openFile(Gui g, File f)
+       		{
+       			openAutomataXMLFile(g, f); 
+       		}
+       	};
+    }
 
 	// Why this indirection?
 	public static void openFile(Gui gui, File file)
@@ -1459,7 +1519,23 @@ public class ActionMan
 			}
 		}
 	}
-
+	
+	public static void importAutFile(Gui gui, File file)
+	{
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+		try
+		{
+  			Automata currAutomata = null ; // AutomataBuildFromAut.build(file);
+  			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+		}
+		catch (Exception e)
+		{
+			gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
+			return;
+		}
+	}
+	
 	public static void importValidFile(Gui gui, File file)
 	{
 

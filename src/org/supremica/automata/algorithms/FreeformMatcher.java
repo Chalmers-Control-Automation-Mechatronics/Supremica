@@ -11,12 +11,13 @@ public class FreeformMatcher
 {
 	private PatternMatcher matcher;
 	private Pattern pattern;
-
-	public FreeformMatcher(PatternMatcher m, Pattern p)
+	private String state_sep;
+	
+	public FreeformMatcher(PatternMatcher m, Pattern p, String s)
 	{
 		matcher = m;
 		pattern = p;
-
+		state_sep = s;
 		// dbg: System.err.println("FreeformMatcher::constructing");
 	}
 
@@ -31,9 +32,9 @@ public class FreeformMatcher
 			state_name.append(it.getState().getName());
 			it.inc();
 
-			if (it.hasNext())    // should the user have control over how this string is built?
+			if(it.hasNext())	// the user now has control over how this string is built
 			{
-				state_name.append(',');
+				state_name.append(state_sep); 
 			}
 		}
 

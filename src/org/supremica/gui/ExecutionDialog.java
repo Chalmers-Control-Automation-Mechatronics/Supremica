@@ -208,44 +208,46 @@ public class ExecutionDialog
 
 			if (currentMode == ExecutionDialogMode.synchronizing)
 			{
-				operationLabel.setText("Synchronizing...");
-				infoHeader.setText("Number of states:");
+				operationLabel.setText(currentMode.getId());	// "Synchronizing...");
+				infoHeader.setText(currentMode.getText());	// "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifying)
 			{
-				operationLabel.setText("Verifying...");
-				infoHeader.setText("Number of states:");
+				operationLabel.setText(currentMode.getId());	// "Verifying...");
+				infoHeader.setText(currentMode.getText());	// "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.synthesizing)
 			{
-				operationLabel.setText("Synthesizing...");
-				infoHeader.setText("Number of states:");
+				operationLabel.setText(currentMode.getId());	// "Synthesizing...");
+				infoHeader.setText(currentMode.getText());	// "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.buildingStates)
 			{
-				operationLabel.setText("Building states...");
+				operationLabel.setText(currentMode.getId());	// "Building states...");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.buildingTransitions)
 			{
-				operationLabel.setText("Building transitions...");
+				operationLabel.setText(currentMode.getId());	// "Building transitions...");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.hide)
-			{    // Do nothing
+			{    
+				// Do nothing
+				//-- MF -- What happens if we do setText, add, etc, here?
 			}
 
 			newMode = false;

@@ -51,22 +51,36 @@ package org.supremica.gui;
 
 public class ExecutionDialogMode
 {
-	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing");
-	public static ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying");
-	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing");
-	public static ExecutionDialogMode buildingStates = new ExecutionDialogMode("BuildingStates");
-	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("BuildingTransitions");
-	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide");
-	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized");
-	private final String id;
+	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing...", "Number of states:");
+	public static ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying...", "Number of states:");
+	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "Number of states:");
+	public static ExecutionDialogMode buildingStates = new ExecutionDialogMode("Building states...", "");
+	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("Building transitions...", "");
+	public static ExecutionDialogMode matchingStates = new ExecutionDialogMode("Matching States...", "");
+	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "");
+	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "");
 
-	private ExecutionDialogMode(String id)
+	private final String id;
+	private final String text;
+	
+	private ExecutionDialogMode(String id, String txt)
 	{
 		this.id = id;
+		this.text = txt;
 	}
-
+/*
 	public String toString()
 	{
 		return id;
+	}
+*/
+	public String getId()
+	{
+		return id;
+	}
+	
+	public String getText()
+	{
+		return text;
 	}
 }

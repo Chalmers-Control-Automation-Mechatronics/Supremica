@@ -67,6 +67,8 @@ public class FileDialogs
 	private FileFilter gifFilter = null;
 	private FileFilter mifFilter = null;
 	private FileFilter sFilter = null;
+	private FileFilter autFilter = null;
+
 	private static FileDialogs fd = new FileDialogs();
 
 	private FileDialogs() {}
@@ -173,6 +175,14 @@ public class FileDialogs
 		return fileExporter;
 	}
 
+	public static JFileChooser getAutFileImporter()
+	{
+		JFileChooser autFileImporter = fd.getFileImporter();
+		autFileImporter.resetChoosableFileFilters();
+		autFileImporter.setFileFilter(fd.getAutFilter());
+		return autFileImporter;
+	}
+
 	private JFileChooser getFileImporter()
 	{
 		if (fileImporter == null)
@@ -215,12 +225,31 @@ public class FileDialogs
 		return fileSaveAs;
 	}
 
-	private FileFilter getXMLFilter()
+	// all of the below look exactly the same - this FileFilter derivative generalizes it all 
+	// Note, could not have variable referred to in anonymous class
+	private FileFilter makeFileFilter(final String ext, final String description)
 	{
-		if (xmlFilter == null)
-		{
+		return new FileFilter()
+		{ 
+			public boolean accept(java.io.File f)
+			{
+				return f.getName().toLowerCase().endsWith(ext) || f.isDirectory();
+			}
+
+			public String getDescription()
+			{
+				return description;
+			}
+		};
+	}
+	
+ 	private FileFilter getXMLFilter()
+ 	{
+ 		if (xmlFilter == null)
+ 		{
+ 			/*
 			xmlFilter = new FileFilter()
-			{    // Anonymous class
+			{ // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".xml") || f.isDirectory();
@@ -230,81 +259,84 @@ public class FileDialogs
 				{
 					return "XML files (*.xml)";
 				}
-			};
+			};*/
+			xmlFilter = makeFileFilter(".xml", "XML files (*.xml)");
 		}
-
 		return xmlFilter;
-	}
+ 	}
 
 	private FileFilter getVPRJFilter()
-	{
-		if (vprjFilter == null)
-		{
+ 	{
+ 		if (vprjFilter == null)
+ 		{	/*
 			vprjFilter = new FileFilter()
-			{    // Anonymous class
-				public boolean accept(java.io.File f)
-				{
-					return f.getName().toLowerCase().endsWith(".vprj") || f.isDirectory();
-				}
+				{ // Anonymous class
+					public boolean accept(java.io.File f)
+					{
+						return f.getName().toLowerCase().endsWith(".vprj") ||  f.isDirectory();
+					}
 
-				public String getDescription()
-				{
-					return "VPRJ files (*.vprj)";
-				}
-			};
+					public String getDescription()
+					{
+						return "VPRJ files (*.vprj)";
+					}
+				};*/
+			vprjFilter = makeFileFilter(".vprj", "Valid Project files (*.vprj)");			
 		}
-
 		return vprjFilter;
 	}
 
 	private FileFilter getVMODFilter()
-	{
-		if (vmodFilter == null)
-		{
+ 	{
+ 		if (vmodFilter == null)
+ 		{
+ 			/*
 			vmodFilter = new FileFilter()
-			{    // Anonymous class
-				public boolean accept(java.io.File f)
-				{
-					return f.getName().toLowerCase().endsWith(".vmod") || f.isDirectory();
-				}
+				{ // Anonymous class
+					public boolean accept(java.io.File f)
+					{
+						return f.getName().toLowerCase().endsWith(".vmod") ||  f.isDirectory();
+					}
 
-				public String getDescription()
-				{
-					return "VMOD files (*.vmod)";
-				}
-			};
+					public String getDescription()
+					{
+						return "VMOD files (*.vmod)";
+					}
+				};*/
+			vmodFilter = makeFileFilter(".vmod", "Valid Module files (*.vmod)");
 		}
-
 		return vmodFilter;
 	}
 
 	private FileFilter getDGRFFilter()
-	{
-		if (dgrfFilter == null)
-		{
+ 	{
+ 		if (dgrfFilter == null)
+ 		{
+ 			/*
 			dgrfFilter = new FileFilter()
-			{    // Anonymous class
-				public boolean accept(java.io.File f)
-				{
-					return f.getName().toLowerCase().endsWith(".dgrf") || f.isDirectory();
-				}
+				{ // Anonymous class
+					public boolean accept(java.io.File f)
+					{
+						return f.getName().toLowerCase().endsWith(".dgrf") ||  f.isDirectory();
+					}
 
-				public String getDescription()
-				{
-					return "DGRF files (*.dgrf)";
-				}
-			};
+					public String getDescription()
+					{
+						return "DGRF files (*.dgrf)";
+					}
+				};*/
+			dgrfFilter = makeFileFilter(".dgrf", "Valid Graph files (*.dgrf)");
 		}
-
 		return dgrfFilter;
 	}
 
-	private FileFilter getDSXFilter()
-	{
-		if (dsxFilter == null)
-		{
+ 	private FileFilter getDSXFilter()
+ 	{
+ 		if (dsxFilter == null)
+ 		{
+ 			/*
 			dsxFilter = new FileFilter()
-			{    // Anonymous class
+			{ // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".dsx") || f.isDirectory();
@@ -314,18 +346,19 @@ public class FileDialogs
 				{
 					return "DSX files (*.dsx)";
 				}
-			};
+			};*/
+			dsxFilter = makeFileFilter(".dsx", "Desco files (*.dsx)");
 		}
-
 		return dsxFilter;
-	}
+ 	}
 
-	private FileFilter getDOTFilter()
-	{
-		if (dotFilter == null)
-		{
+ 	private FileFilter getDOTFilter()
+ 	{
+ 		if (dotFilter == null)
+ 		{
+ 			/*
 			dotFilter = new FileFilter()
-			{    // Anonymous class
+			{ // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".dot") || f.isDirectory();
@@ -335,18 +368,19 @@ public class FileDialogs
 				{
 					return "DOT files (*.dot)";
 				}
-			};
+			};*/
+			dotFilter = makeFileFilter(".dot", "Graphviz files (*.dot)");
 		}
-
 		return dotFilter;
-	}
+ 	}
 
-	private FileFilter getEPSFilter()
-	{
-		if (epsFilter == null)
-		{
+ 	private FileFilter getEPSFilter()
+ 	{
+ 		if (epsFilter == null)
+ 		{
+ 			/*
 			epsFilter = new FileFilter()
-			{    // Anonymous class
+			{ // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".eps") || f.isDirectory();
@@ -357,17 +391,19 @@ public class FileDialogs
 					return "EPS files (*.eps)";
 				}
 			};
+			*/ 
+			epsFilter = makeFileFilter(".eps", "Encapsulated Postscript (*.eps)");
 		}
-
 		return epsFilter;
-	}
+ 	}
 
-	private FileFilter getGIFFilter()
-	{
-		if (gifFilter == null)
-		{
+ 	private FileFilter getGIFFilter()
+ 	{
+ 		if (gifFilter == null)
+ 		{
+ 			/*
 			gifFilter = new FileFilter()
-			{    // Anonymous class
+			{ // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".gif") || f.isDirectory();
@@ -378,17 +414,19 @@ public class FileDialogs
 					return "GIF files (*.gif)";
 				}
 			};
+			*/
+			gifFilter = makeFileFilter(".gif", "GIF files (*.gif)");
 		}
-
 		return gifFilter;
-	}
+ 	}
 
-	private FileFilter getMIFFilter()
-	{
-		if (mifFilter == null)
-		{
+ 	private FileFilter getMIFFilter()
+ 	{
+ 		if (mifFilter == null)
+ 		{
+ 			/*
 			mifFilter = new FileFilter()
-			{    // Anonymous class
+			{ // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".mif") || f.isDirectory();
@@ -399,15 +437,26 @@ public class FileDialogs
 					return "MIF files (*.mif)";
 				}
 			};
+			*/
+			mifFilter = makeFileFilter(".mif", "MIF files (*.mif)");
 		}
-
 		return mifFilter;
-	}
+ 	}
+ 	
+ 	private FileFilter getAutFilter()
+ 	{
+ 		if(autFilter == null)
+ 		{
+ 			autFilter = makeFileFilter(".aut", "Aldebaran files (*.aut)");
+ 		}
+ 		return autFilter;
+ 	}
 
 	private FileFilter getSFilter()
 	{
 		if (sFilter == null)
 		{
+			/*
 			sFilter = new FileFilter()
 			{    // Anonymous class
 				public boolean accept(java.io.File f)
@@ -419,7 +468,8 @@ public class FileDialogs
 				{
 					return "SattLine files (*.s)";
 				}
-			};
+			};*/
+			sFilter = makeFileFilter(".s", "SattLine files (*.s)");
 		}
 
 		return sFilter;

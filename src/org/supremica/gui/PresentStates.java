@@ -1,4 +1,3 @@
-
 // ****************** PresentStates.java ***********************//
 // * (Various ways of?) Presents the found states for the user
 package org.supremica.gui;
@@ -127,7 +126,7 @@ class PresentStatesFrame
 
 		Container contentPane = getContentPane();
 
-		contentPane.add(new WhitePane(table), "Center");
+		contentPane.add(new WhiteScrollPane(table), "Center");
 		contentPane.add(panel, "South");
 	}
 }
@@ -146,8 +145,17 @@ class NoStatesFoundFrame
 		// dispose();
 	}
 }
+//
+class UserInterruptFrame extends JFrame
+{
+	public UserInterruptFrame()
+	{
+		Utility.setupFrame(this, 0, 0);
+		JOptionPane.showMessageDialog(this, "Search interruped by user", "User INterrupt", JOptionPane.INFORMATION_MESSAGE);
+	}
+}
+//
 
-// 
 public class PresentStates
 {
 	private JFrame frame = null;
@@ -165,11 +173,17 @@ public class PresentStates
 		{
 			frame = new PresentStatesFrame(ss, a);
 		}
-		else
-		{
+		else if(!ss.wasStopped())
+		{		
 			frame = new NoStatesFoundFrame();
 			dispose_frame = true;    // for some reason the frame cannot dispose of itself
 		}
+		else
+		{
+			frame = new UserInterruptFrame();
+			dispose_frame = true;
+		}
+		
 	}
 
 	private void conOut()

@@ -21,52 +21,65 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 
 // 
-public class SearchStates
+public class SearchStates extends Thread implements Stoppable
 {
 	private AutomataSynchronizer syncher = null;
 	private IntArrayList list = null;
-
-	public void search(Matcher matcher)
-		throws Exception
+	private Matcher matcher = null;
+	private /* volatile */ boolean stopRequested = false;
+	
+	public void run() // throws Exception
 	{
-		syncher.execute();
-
-		list = new IntArrayList();
-
-		// Note the difference between the two getStateIterator.
-		// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
-		for (Iterator it = syncher.getHelper().getStateIterator(); it.hasNext(); )
+		try
 		{
-			int[] composite_state = (int[]) it.next();
-
-			// and this is SearchStates::getStateIterator, returns SearchStates::StateIterator
-			if (matcher.matches(getStateIterator(composite_state)))
+			syncher.execute(); // Starts teh synch thread and waits for it to stop
+		}
+		catch(Exception excp)
+		{
+			// How to work this (exception in a worker thread)??
+			return;
+		}
+		
+		if(!stopRequested)
+		{
+			// Note the difference between the two getStateIterator. 
+			// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
+			for(Iterator it = syncher.getHelper().getStateIterator(); it.hasNext() && !stopRequested; )
 			{
-				list.add(composite_state);
+				int[] composite_state = (int[])it.next();
+				// and this is SearchStates::getStateIterator, returns SearchStates::StateIterator
+				if(matcher.matches(getStateIterator(composite_state)))
+				{
+					list.add(composite_state);
+				}
+			}
+			if(stopRequested)
+			{
+				list = new IntArrayList(); // thread stopped - clear the list
 			}
 		}
 	}
 
-	public SearchStates(Automata automata)
-		throws Exception
+	public void requestStop()
 	{
-
-		// !!Throws exception if automata is empty or has only one automaton!!
+		stopRequested = true;
+		syncher.requestStop();
+	}
+	
+	public boolean wasStopped()
+	{
+		return stopRequested;
+	}
+	
+	public SearchStates(Automata automata, Matcher m) throws Exception
+	{
+		//!!Throws exception if automata is empty or has only one automaton!!
 		syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
+		matcher = m;
+		list = new IntArrayList(); // Must create the list, in case the therad is stopped
+
 	}
 
-	/*
-	 *  // Search based on a pattern for each automaton
-	 *  public void search(PatternMatcher pm, Pattern[] ps) throws Exception
-	 *  {
-	 *  search(new FixedformMatcher(pm, ps));
-	 *  }
-	 *  // Search based on a freeform pattern for the global states
-	 *  public void search(PatternMatcher pm, Pattern p) throws Exception
-	 *  {
-	 *  search(new FreeformMatcher(pm, p));
-	 *  }
-	 */
 	public int numberFound()
 	{
 		return list.size();
