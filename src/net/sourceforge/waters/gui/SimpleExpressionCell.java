@@ -4,23 +4,28 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventListCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.4 2005-02-20 23:32:54 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.5 2005-02-21 19:18:35 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.KeyStroke;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.Keymap;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ExpressionScanner;
@@ -31,7 +36,6 @@ import net.sourceforge.waters.model.expr.ParseException;
 
 public class SimpleExpressionCell
 	extends JFormattedTextField
-	implements KeyListener
 {
 
 	//#######################################################################
@@ -65,14 +69,20 @@ public class SimpleExpressionCell
 		mFilter = new SimpleExpressionFilter();
 		mVerifier = new SimpleExpressionVerifier();
 
-		final DefaultFormatter formatter = new SimpleExpressionFormatter(false);
-		final DefaultFormatter nullformatter = new SimpleExpressionFormatter(true);
+		final DefaultFormatter formatter =
+			new SimpleExpressionFormatter(false);
+		final DefaultFormatter nullformatter =
+			new SimpleExpressionFormatter(true);
 		final DefaultFormatterFactory factory =
-			new DefaultFormatterFactory(formatter, formatter, formatter, nullformatter);
-
+			new DefaultFormatterFactory(formatter, formatter,
+										formatter, nullformatter);
 		setFormatterFactory(factory);
 		setInputVerifier(mVerifier);
-		addKeyListener(this);
+
+		final Action action = new EnterAction();
+		final Action[] actions = {action};
+		final Keymap keymap = getKeymap();
+		JTextComponent.loadKeymap(keymap, BINDINGS, actions);
 
 		if (expr != null)
 		{
@@ -92,32 +102,8 @@ public class SimpleExpressionCell
 
 	public void revert()
 	{
-		final Object value = getValue();
-		final String goodtext = value.toString();
-		setText(goodtext);
-	}
-
-
-
-	//#######################################################################
-	//# Interface java.awt.event.KeyListener
-	public void keyPressed(final KeyEvent event) 
-	{
-		if (event.getKeyCode() == KeyEvent.VK_ENTER) {
-			// For some reason, input is not checked automatically when
-			// <enter> is pressed with invalid input. So we do it manually ...
-			if (!verify()) {
-				event.consume();
-			}
-		}
-	}
-
-	public void keyReleased(final KeyEvent event) 
-	{
-	}
-
-	public void keyTyped(final KeyEvent event) 
-	{
+		final Object oldvalue = getValue();
+		setValue(oldvalue);
 	}
 
 
@@ -296,6 +282,41 @@ public class SimpleExpressionCell
 	}
 
 
+
+	//#######################################################################
+	//# Local Class EnterAction
+	/**
+	 * This handles the <CODE>&lt;ENTER&gt;</CODE> key.
+	 * When pressed, we need to verify the input and, if successful,
+	 * fire an {@link ActionEvent} to notify any registered listeners.
+	 * Other keys such as <CODE>&lt;TAB&gt;</CODE> are handled automatically
+	 * as focus changes. 
+	 */
+	private class EnterAction extends AbstractAction
+	{
+
+		//###################################################################
+		//# Constructors
+		private EnterAction()
+		{
+			super(ACTNAME_ENTER);
+		}
+
+
+
+		//###################################################################
+		//# Interface java.awt.event.ActionListener
+		public void actionPerformed(final ActionEvent event)
+		{
+			if (verify()) {
+				fireActionPerformed();
+			}
+		}
+
+	}
+
+
+
 	//#######################################################################
 	//# Data Members
 	private final Frame mRoot;
@@ -303,5 +324,19 @@ public class SimpleExpressionCell
 	private final ExpressionParser mParser;
 	private final DocumentFilter mFilter;
 	private final InputVerifier mVerifier;
+
+
+
+	//#######################################################################
+	//# Class Constants
+	private static final String ACTNAME_ENTER = "SimpleExpressionCell.ENTER";
+	private static final KeyStroke STROKE_ENTER =
+		KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+	private static final JTextComponent.KeyBinding BINDING_ENTER =
+		new JTextComponent.KeyBinding(STROKE_ENTER, ACTNAME_ENTER);
+
+	private static final JTextComponent.KeyBinding[] BINDINGS = {
+		BINDING_ENTER
+	};
 
 }
