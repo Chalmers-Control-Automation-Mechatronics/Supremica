@@ -219,8 +219,8 @@ public class DigitalIODisplayView
 
 	void updateButton_mouseClicked(MouseEvent e)
     {
-	boolean[] signalsIn = new boolean[nr_Of_Signals_Out];
-	boolean[] signalsOut = new boolean[nr_Of_Signals_In];
+	boolean[] signalsIn = new boolean[nr_Of_Signals_In];
+	boolean[] signalsOut = new boolean[nr_Of_Signals_Out];
 	int i;
 
 	// set signals
