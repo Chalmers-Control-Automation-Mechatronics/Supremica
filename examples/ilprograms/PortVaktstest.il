@@ -105,6 +105,16 @@ PROGRAM PortVaktstest
 		ST Init
 end_init:
 
+CAL WPrint("Manuel Start = ")
+LD %IX24
+ST tmpb
+CAL BPrintln(tmpb)
+
+CAL WPrint("KulaPortVakt = ")
+LD KulaPortvakt
+ST tmpb
+CAL BPrintln(tmpb)
+
 (*start*)
 (*	if !(Start || (KulaPortvakt || UrPortvakt))
 		Släpp in kula
@@ -134,8 +144,8 @@ END1 :
 			CAL delay2
 			LD  delay2.tonQ
 			STN InPortvakt
-			STN tmpb
-			CAL BPrintln(tmpb)
+			(*STN tmpb
+			CAL BPrintln(tmpb)*)
 			JMPCN e2
 				LD FALSE
 				ST delay2.tonIN
@@ -143,6 +153,10 @@ END1 :
 			e2:
 
 END2 :
+
+CAL WPrint("delay2.ET = ")
+CAL DPrintln(delay2.tonET)
+
 
 (*
 	if (KulaPortvakt && !InPortvakt && MätlyftNere && !KulaMätlyft)
