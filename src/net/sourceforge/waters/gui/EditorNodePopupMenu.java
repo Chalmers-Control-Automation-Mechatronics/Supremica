@@ -49,12 +49,6 @@ class EditorNodePopupMenu
 		this.add(item);
 		deleteItem = item;
 
-		/*
-		initialBox = new JCheckBox("Initial", node.isInitial());
-		initialBox.addActionListener(this);
-		this.add(initialBox);
-		*/
-
 		item = new JMenuItem("Make initial");
 		item.addActionListener(this);
 		this.add(item);
@@ -72,7 +66,7 @@ class EditorNodePopupMenu
 		this.add(item);
 		recallItem = item;
 
-		// Disable "recall" if label is in right position
+		// Disable "recall" if label is in right position (or maybe instead if it is close enough?)
 		if ((parent.getLabel(node).getOffsetX() == EditorLabel.DEFAULTOFFSETX) && (parent.getLabel(node).getOffsetY() == EditorLabel.DEFAULTOFFSETY))
 		{
 			recallItem.setEnabled(false);
@@ -93,14 +87,6 @@ class EditorNodePopupMenu
 			parent.delNode(node);
 			this.hide();
 		}
-
-		/*
-		if (e.getSource() == initialBox)
-		{
-			parent.unsetAllInitial();
-			node.getProxy().setInitial(initialBox.isSelected());
-		}
-		*/
 
 		if (e.getSource() == initialItem)
 		{
