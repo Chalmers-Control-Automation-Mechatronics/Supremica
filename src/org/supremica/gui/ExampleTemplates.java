@@ -119,6 +119,8 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Flexible manufacturing system", prefix + "flexibleManufacturingSystem.xml"));
 		thisGroup.addItem(new TemplateItem("Robot assembly cell", prefix + "robotAssemblyCell.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacuring cell", prefix + "flexibleManufacturingCell.xml"));
+		thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml"));
+		thisGroup.addItem(new TemplateItem("Automated Guided Vehicle", prefix + "agv.xml"));
 
 	}
 
