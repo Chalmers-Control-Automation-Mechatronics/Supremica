@@ -46,11 +46,11 @@ public class BDDAutomata
 		ref_count++;
 
 
-		if(Options.developer_mode) {
+		// if(Options.developer_mode) {
 			Thread t = Thread.currentThread() ;
 			saved_priority = t.getPriority();
 			t.setPriority(Thread.MIN_PRIORITY);
-		}
+		// }
 
 		SizeWatch.setManager(this);
 
@@ -375,10 +375,10 @@ public class BDDAutomata
 
 
 		// restore our priority
-		if(Options.developer_mode) {
+		// if(Options.developer_mode) {
 			Thread t = Thread.currentThread() ;
 			t.setPriority(saved_priority );
-		}
+		// }
 	}
 
 	public void dump(PrintStream ps)

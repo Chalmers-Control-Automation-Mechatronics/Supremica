@@ -332,8 +332,8 @@ public class WebServer implements Runnable
         // webserver.acceptClient ("192.168.*.*");
         addHandler("string", "Welcome to XML-RPC!");
         addHandler("math", Math.class);
-        addHandler("auth", new AuthDemo());
-        addHandler("$default", new Echo());
+        // addHandler("auth", new AuthDemo());
+        // addHandler("$default", new Echo());
         // XmlRpcClients can be used as Proxies in XmlRpcServers which is a
         // cool feature for applets.
         String url = "http://www.mailtothefuture.com:80/RPC2";

@@ -1222,9 +1222,14 @@ public final class SupremicaProperties
 
 	/**
 	 * Looks for "-p propertyFile", and loads it if it exists.
+	 * Looks also for developer/user tags
 	 */
 	public static void loadProperties(String[] args)
 	{
+
+		// do we  want developer stuff by default
+		boolean enabled_developer_mode = true;
+
 		for (int i = 0; i < args.length; i++)
 		{
 			if (args[i].equals("-p") || args[i].equals("--properties"))
@@ -1243,6 +1248,18 @@ public final class SupremicaProperties
 					}
 				}
 			}
+			else if (args[i].equals("--developer"))
+			{
+				enabled_developer_mode = true;
+			}
+			else if (args[i].equals("--user"))
+			{
+				enabled_developer_mode = false;
+			}
 		}
+
+
+		wp.setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, enabled_developer_mode ? "true" : "false", true);
 	}
+
 }

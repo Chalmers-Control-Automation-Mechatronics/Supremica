@@ -240,7 +240,7 @@ public class Options
 
 
     // --- [ options ] -------------------------------------------------
-	public static boolean developer_mode = true;
+	// public static boolean developer_mode = true;
     public static final boolean use_cudd = false;
     public static boolean fill_statevars = false;
     public static boolean profile_on = false; // misc profiling stuff

@@ -66,5 +66,6 @@ public class Supremica
 		SupremicaProperties.loadProperties(args);
 		//SupremicaWithGui.startSupremica(args);
 		SupremicaWithGui.startSupremica();
+
 	}
 }

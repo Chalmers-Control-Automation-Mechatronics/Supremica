@@ -1697,7 +1697,7 @@ public class ActionMan
 
 			Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
 			String currAutomatonName = theAutomaton.getName();
-		
+
 			try
 			{
 				AutomatonExplorer explorer = gui.getVisualProjectContainer().
@@ -3800,9 +3800,7 @@ public class ActionMan
 	public static void DoBDDCoReachability() {
 		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
 	}
-	public static void DoBDDDeadlock() {
-		org.supremica.util.BDD.test.DeveloperTest.DoDeadlock(gui.getSelectedAutomata());
-	}
+
 }
 
 // ActionMan

@@ -32,6 +32,7 @@ class MainPopupMenu
 
 		menuHandler.addSeparator();
 
+
 		JMenuItem statusItem = new JMenuItem("Status");
 		menuHandler.add(statusItem, 0);
 
@@ -114,45 +115,6 @@ class MainPopupMenu
 			}
 		});*/
 
-		// Strictly EXPERIMENTAL
-		if (true || SupremicaProperties.includeExperimentalAlgorithms())
-		{
-			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
-			menuHandler.add(automatonDiminisher, 1);
-		}
-
-		if (true || SupremicaProperties.includeExperimentalAlgorithms())
-		{
-			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
-			menuHandler.add(automatonDeterminizer, 1);
-		}
-
-		if (true || SupremicaProperties.includeExperimentalAlgorithms())
-		{
-			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
-			menuHandler.add(automatonBuildObserver, 1);
-		}
-
-		if (true || SupremicaProperties.includeExperimentalAlgorithms())
-		{
-			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());
-			menuHandler.add(automatonSplit, 1);
-		}
-
-		// De följande två Schedule-knapparna borde bli till ett inom en viss (snar?) framtid
-		menuHandler.addSeparator();
-		
-		if (SupremicaProperties.includeExperimentalAlgorithms())
-		{
-			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
-			menuHandler.add(automataScheduler, 1);
-		}
-		
-		if (SupremicaProperties.includeExperimentalAlgorithms())
-		{
-			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction2());
-			menuHandler.add(automataScheduler, 1);
-		}
 
 
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
@@ -160,18 +122,6 @@ class MainPopupMenu
 
 		menuHandler.addSeparator();
 
-
-		if(org.supremica.util.BDD.Options.developer_mode) {
-			JMenuItem miR, miCR, miD;
-			menuHandler.add(miR = new JMenuItem("BDD/Reachability"), 1);
-			menuHandler.add(miCR = new JMenuItem("BDD/CoReachability"), 1);
-			menuHandler.add(miD = new JMenuItem("BDD/Deadlock"), 1);
-			menuHandler.addSeparator();
-
-			miR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDReachability(); } } );
-			miCR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDCoReachability(); } } );
-			miD.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDDeadlock(); } } );
-		}
 
 		if (SupremicaProperties.includeBoundedUnconTools())
 		{
@@ -317,6 +267,57 @@ class MainPopupMenu
 				}
 			});
 		}
+
+
+
+		// --------------------------------------------------------------
+
+		// ***************** UNDER DEVELOPMENT MENUES ARE ADDED HERE:
+		if(SupremicaProperties.includeExperimentalAlgorithms() ) {
+			JMenu expMenu = new JMenu("Experimental algorithms");
+			menuHandler.add(expMenu, 1);
+
+
+			// Strictly EXPERIMENTAL
+
+			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
+			expMenu.add(automatonDiminisher);
+
+			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
+			expMenu.add(automatonDeterminizer);
+
+			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
+			expMenu.add(automatonBuildObserver);
+
+			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());
+			expMenu.add(automatonSplit);
+
+			// De följande två Schedule-knapparna borde bli till ett inom en viss (snar?) framtid
+			expMenu.addSeparator();
+
+
+			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
+			expMenu.add(automataScheduler);
+
+			JMenuItem automataScheduler2 = new SupremicaMenuItem(new ScheduleAction2());
+			expMenu.add(automataScheduler2);
+
+
+
+
+
+			// BDD crap, sorry for the compressed lines... /Arash
+			JMenuItem miR, miCR;
+			expMenu.addSeparator();
+			expMenu.add(miR = new JMenuItem("BDD/Reachability"));
+			expMenu.add(miCR = new JMenuItem("BDD/CoReachability"));
+			expMenu.addSeparator();
+			miR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDReachability(); } } );
+			miCR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDCoReachability(); } } );
+
+
+		}
+		// ------------------------------------------------------------------
 
 		selectAllItem.addActionListener(new ActionListener()
 		{

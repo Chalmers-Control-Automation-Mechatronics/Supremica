@@ -108,6 +108,31 @@ public class MenuHandler
 		 */
 	}
 
+
+	/**
+	 * Add a sub-menu
+	 *
+	 */
+	public void addSubMenu(JMenu theMenu, int minNbrOfAutomata)
+	{
+		if (minNbrOfAutomata == 0)
+		{
+			zeroAutomataItems.add(theMenu);
+		}
+		else if (minNbrOfAutomata == 1)
+		{
+			oneAutomataItems.add(theMenu);
+		}
+		else if (minNbrOfAutomata == 2)
+		{
+			twoAutomataItems.add(theMenu);
+		}
+		twoAutomataMenu.add(theMenu);
+		twoAutomataMenuLastSep = false;
+	}
+
+
+
 	public void addSeparator()
 	{
 		if (!oneAutomataMenuLastSep)
