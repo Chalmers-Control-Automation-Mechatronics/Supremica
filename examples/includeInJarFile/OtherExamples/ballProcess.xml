@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata>
+<Automata name="Ball Process" comment="There is an error in this model. All events in these automata are not controllability consistent!">
 
 	<!-- -->
 	<!-- Progress specs -->

@@ -643,7 +643,7 @@ public class AutomataVerifier
 					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 					if (moreSimilarAutomata == null)
 					{
-						// There were no more automata to add!
+						// There were no more automata to add this is monolithically uncontrollable!
 						return false;
 					}
 					int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
@@ -1855,14 +1855,14 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see AutomataSynchronizerExecuter
 	 */
-	private boolean moduleIsNonblocking(Automaton theAutomaton)
+	private static boolean moduleIsNonblocking(Automaton theAutomaton)
 		throws Exception
 	{
-	    // Automaton theAutomatonCopy = new Automaton(theAutomaton);
+		Automaton theAutomatonCopy = new Automaton(theAutomaton);
 
 		// Examine all states, starting from the marked ones and moving backwards...
 		LinkedList statesToExamine = new LinkedList();
-		Iterator stateIterator = theAutomaton.stateIterator();
+		Iterator stateIterator = theAutomatonCopy.stateIterator();
 		State currState;
 
 		// Add all marked states
@@ -1893,10 +1893,10 @@ public class AutomataVerifier
 				}
 			}
 
-			theAutomaton.removeState(examinedState);
+			theAutomatonCopy.removeState(examinedState);
 		}
 
-		stateIterator = theAutomaton.stateIterator();
+		stateIterator = theAutomatonCopy.stateIterator();
 
 		while (stateIterator.hasNext())
 		{
@@ -1906,7 +1906,7 @@ public class AutomataVerifier
 			// logger.info("Trace to blocking state: " + (theAutomatonCopy.getTrace(currState)).toString());
 		}
 
-		return theAutomaton.nbrOfStates() == 0;
+		return theAutomatonCopy.nbrOfStates() == 0;
 	}
 
 	/**
@@ -1928,6 +1928,15 @@ public class AutomataVerifier
 		{
 			threadToStop.requestStop();
 		}
+	}
+
+	/**
+	 * Standard method for monolithic nonblocking verification on theAutomaton.
+	 */
+	public static boolean verifyNonblocking(Automaton theAutomaton)
+		throws Exception
+	{
+		return moduleIsNonblocking(theAutomaton);
 	}
 
 	/**

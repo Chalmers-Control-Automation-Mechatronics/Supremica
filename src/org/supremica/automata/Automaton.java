@@ -1419,7 +1419,10 @@ public class Automaton
 				State currState = (State) stateIt.next();
 
 				// This state must be mutually accepting and not forbidden?
-				if (currState.isMutuallyAccepting() && !currState.isForbidden())
+				//if (currState.isMutuallyAccepting() && !currState.isForbidden())
+
+				// We don't care about forbidden states... 
+				if (currState.isMutuallyAccepting())
 				{
 					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext();)
 					{

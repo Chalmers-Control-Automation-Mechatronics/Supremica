@@ -169,6 +169,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
 		thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
 		thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml"));
+		thisGroup.addItem(new TemplateItem("Telecommunications Network", prefix + "telecommunicationsNetwork.xml"));
 	}
 
 	private void initializeAIPExamples()
