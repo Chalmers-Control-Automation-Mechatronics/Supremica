@@ -726,9 +726,6 @@ public class VariableChecker implements SimpleNodeVisitor {
 				{
 					n.setIsFunctionBlock(true);
 
-					System.out.println("### n.getName() = " + n.getName());
-					System.out.println("### typeName    = " + typeName);
-
 					Hashtable fbVariables = (Hashtable)functionBlocks.get(typeName);
 					
 					/* kolla att det finns en field_selector */
