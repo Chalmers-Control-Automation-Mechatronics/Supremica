@@ -67,7 +67,6 @@ class WhiteScrollPane
 	private void setWhite()
 	{
 		Utility.setupPane(this);
-		;
 	}
 
 	public WhiteScrollPane()
