@@ -46,7 +46,24 @@ public class DisjSupervisor extends ConjSupervisor {
     }
 
 
+		// -----------------------------------------------
+		/** return the some of disjunctive T sizes */
+		public double sumOfTSize() {
+			double ret = 0;
 
+			Cluster [] cs = disj_partition.getClusters();
+			int size = disj_partition.getNumberOfClusters(); // NOT cs.length !!
+			for(int i = 0; i < size; i++)
+				ret += manager.nodeCount ( cs[i].twave);
+			return ret;
+		}
+
+		/** get number of disjunctive partitions */
+		public int getNumOfPartitions() {
+			return disj_partition.getNumberOfClusters();
+		}
+
+		// ----------------------------------------------
 
     protected int internal_computeReachablesDisj(int i_all) {
 		// statistic stuffs

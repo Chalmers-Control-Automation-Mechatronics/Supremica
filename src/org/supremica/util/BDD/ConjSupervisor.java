@@ -53,6 +53,20 @@ public class ConjSupervisor
 		return conj_partition;
     }
 
+    /** return the some of conjunctive T sizes */
+    public double sumOfTSize() {
+			double ret = 0;
+			for(int i = 0; i < conj_size; i++)
+		    ret += manager.nodeCount ( tpri[i]);
+
+			return ret;
+		}
+
+		/** get number of conjunctive partitions */
+		public int getNumOfPartitions() {
+			return conj_size;
+		}
+
     private void computeConjPartition() {
 		conj_partition = new ConjPartition(manager, conj_size);
 		for(int i = 0; i < conj_size; i++)
