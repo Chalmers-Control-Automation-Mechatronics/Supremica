@@ -201,7 +201,7 @@ class EditorComponentsPanel
 		JTree moduleSelectTree;
 		ModuleProxy module;
 
-		ComponentEditorPanel ed = null;
+//		ComponentEditorPanel ed = null;
 
 		public TreeMouseAdapter(ModuleProxy module, JTree moduleSelectTree)
 		{
@@ -233,12 +233,12 @@ class EditorComponentsPanel
 
 						if (scp != null)
 						{
-							if (ed == null)
-							{
-								ed = new ComponentEditorPanel(moduleContainer, scp);
-							}
+//							if (ed == null)
+//							{
+//								ed = new ComponentEditorPanel(moduleContainer, scp);
+//							}
 							EditorPanel editorPanel = moduleContainer.getEditorPanel();
-							editorPanel.setComponentEditorPanel(ed);
+							editorPanel.setActiveComponentEditorPanel(moduleContainer.getComponentEditorPanel(scp));
 //							ed = new EditorWindow(scp.getName(), module, scp);
 						}
 					}

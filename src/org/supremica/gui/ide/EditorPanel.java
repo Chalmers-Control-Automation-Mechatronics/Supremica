@@ -1,6 +1,7 @@
 package org.supremica.gui.ide;
 
 import javax.swing.*;
+import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -97,16 +98,32 @@ class EditorPanel
 	}
 
 
-	public void setComponentEditorPanel(JPanel currPanel)
+	public void setActiveComponentEditorPanel(JPanel currPanel)
 	{
-		if (currPanel == null)
+		System.err.println("setActiveComponentEditorPanel");
+
+		Component oldPanel = splitPanelHorizontal.getRightComponent();
+		if (oldPanel != currPanel)
 		{
-			splitPanelHorizontal.setRightComponent(emptyComponentEditorPanel);
+			System.err.println("Switching panel");
+
+			if (oldPanel != null)
+			{
+				splitPanelHorizontal.remove(oldPanel);
+			}
+
+			if (currPanel == null)
+			{
+				splitPanelHorizontal.setRightComponent(emptyComponentEditorPanel);
+			}
+			else
+			{
+				splitPanelHorizontal.setRightComponent(currPanel);
+				System.err.println("setRightPanel");
+			}
 		}
-		else
-		{
-			splitPanelHorizontal.setRightComponent(currPanel);
-		}
+
+		validate();
 
 	}
 

@@ -4,6 +4,8 @@ import java.util.*;
 import java.awt.Component;
 import javax.swing.JFrame;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+
 
 public class ModuleContainer
 {
@@ -14,6 +16,7 @@ public class ModuleContainer
 	private AnalyzerPanel analyzerPanel = null;
 	private SimulatorPanel simulatorPanel = null;
 	private Component selectedComponent = null;
+	private Map componentToPanelMap = new HashMap();
 
 	public ModuleContainer(IDE ide, ModuleProxy module)
 	{
@@ -57,6 +60,20 @@ public class ModuleContainer
 			simulatorPanel = new SimulatorPanel(this, "Simulator");
 		}
 		return simulatorPanel;
+	}
+
+	public ComponentEditorPanel getComponentEditorPanel(SimpleComponentProxy scp)
+	{
+		if (scp == null)
+		{
+			return null;
+		}
+		if (!componentToPanelMap.containsKey(scp))
+		{
+			ComponentEditorPanel newPanel = new ComponentEditorPanel(this, scp);
+			componentToPanelMap.put(scp, newPanel);
+		}
+		return (ComponentEditorPanel)componentToPanelMap.get(scp);
 	}
 
 	public void setSelectedComponent(Component selectedComponent)
