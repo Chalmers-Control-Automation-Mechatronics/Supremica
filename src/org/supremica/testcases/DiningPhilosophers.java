@@ -139,6 +139,142 @@ class Philosopher
 	}
 }
 
+
+// Builds a Philo automaton
+class EatingPhilosopher
+{
+	static State[] states =
+	{
+		new State("s0"), new State("lu"),
+
+		// left fork picked up
+		new State("ru"),
+
+		// right fork picked up
+		new State("eat"), new State("ld"),
+
+		// left fork put down
+		new State("rd"),
+
+		// right fork put down
+		new State("eat2")
+	};
+	final static int INIT = 0;
+	final static int L_UP = 1;
+	final static int R_UP = 2;
+	final static int EAT = 3;
+	final static int L_DN = 4;
+	final static int R_DN = 5;
+	final static int EAT2 = 6;
+	static LabeledEvent[] events =
+	{
+		new LabeledEvent("L_take"),
+
+		// pick up left
+		new LabeledEvent("R_take"),
+
+		// pick up right
+		new LabeledEvent("L_put"),
+
+		// put down left
+		new LabeledEvent("R_put"),
+
+		// put down right
+		new LabeledEvent("Start_eating"),
+	};
+	final static int L_TAKE = 0;
+	final static int R_TAKE = 1;
+	final static int L_PUT = 2;
+	final static int R_PUT = 3;
+	final static int START_EATING = 4;
+	final static String LABEL_SEP = ".";
+
+	// note, must be the same in both Philosopher and Fork
+	final static String NAME_SEP = ":";
+
+	// Need note be the same everywhere
+	static Automaton philo = null;
+	static boolean inited = false;
+
+	public EatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
+		throws Exception
+	{
+		if (inited)
+		{
+			return;
+		}
+
+		// Here we create the "template" automaton, philo
+		philo = new Automaton("Philo template");
+
+		philo.setType(AutomatonType.Plant);
+
+		// These are fivestate project
+		states[0].setInitial(true);
+		states[0].setAccepting(true);
+
+		for (int i = 0; i < states.length; ++i)
+		{
+			philo.addState(states[i]);
+		}
+
+		// Now the events, these should be (re)named uniquely for each philosopher
+		// (each fork-pair, actually)
+		events[L_TAKE].setControllable(l_take);
+		events[R_TAKE].setControllable(r_take);
+		events[L_PUT].setControllable(l_put);
+		events[R_PUT].setControllable(r_put);
+		events[START_EATING].setControllable(true);
+
+		for (int i = 0; i < events.length; ++i)
+		{
+			philo.getAlphabet().addEvent(events[i]);
+		}
+
+		// And finally the arcs - first the left side (where the left is picked up
+		// and put down first)
+		philo.addArc(new Arc(states[INIT], states[L_UP], events[L_TAKE].getId()));
+		philo.addArc(new Arc(states[L_UP], states[EAT], events[R_TAKE].getId()));
+		philo.addArc(new Arc(states[EAT], states[EAT2], events[START_EATING].getId()));
+		philo.addArc(new Arc(states[EAT2], states[L_DN], events[L_PUT].getId()));
+		philo.addArc(new Arc(states[L_DN], states[INIT], events[R_PUT].getId()));
+
+		// And then the right side (where th eright fork is picked up and put down first)
+		philo.addArc(new Arc(states[INIT], states[R_UP], events[R_TAKE].getId()));
+		philo.addArc(new Arc(states[R_UP], states[EAT], events[L_TAKE].getId()));
+		philo.addArc(new Arc(states[EAT2], states[R_DN], events[R_PUT].getId()));
+		philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT].getId()));
+
+		inited = true;
+	}
+
+	public Automaton build(int id, int l_fork, int r_fork)
+		throws Exception
+	{
+		Automaton sm = new Automaton(philo);
+
+		// deep copy, I hope
+		sm.setName("Philo" + NAME_SEP + id);
+
+		// adjust the event names according to l_fork and r_fork
+		// L_take becomes take<id>.<l_fork>
+		// R_take becomes take<id>.<r_fork>
+		// L_put becomes put<id>.<l_fork>
+		// R_put becomes put<id>.<r_fork>
+		Alphabet alpha = sm.getAlphabet();
+
+		alpha.getEventWithId("L_take").setLabel("take" + id + LABEL_SEP + l_fork);
+		alpha.getEventWithId("R_take").setLabel("take" + id + LABEL_SEP + r_fork);
+		alpha.getEventWithId("L_put").setLabel("put" + id + LABEL_SEP + l_fork);
+		alpha.getEventWithId("R_put").setLabel("put" + id + LABEL_SEP + r_fork);
+		alpha.getEventWithId("Start_eating").setLabel("startEating" + id);
+		alpha.rehash();
+
+		// must rehash since we've changed the label (that's the way it works)
+		return sm;
+	}
+}
+
 // Builds a chopstick automaton
 class Chopstick
 {
@@ -262,7 +398,9 @@ public class DiningPhilosophers
 	{
 
 		// First the philosphers
-		Philosopher philo = new Philosopher(l_take, r_take, l_put, r_put);
+		// Philosopher philo = new Philosopher(l_take, r_take, l_put, r_put);
+		EatingPhilosopher philo = new EatingPhilosopher(l_take, r_take, l_put, r_put);
+
 
 		for (int i = 0; i < num; ++i)
 		{
@@ -284,8 +422,10 @@ public class DiningPhilosophers
 				LabeledEvent rTake = alpha.getEventWithId("R_take");
 				LabeledEvent lPut = alpha.getEventWithId("L_put");
 				LabeledEvent rPut = alpha.getEventWithId("R_put");
+				LabeledEvent startEating = alpha.getEventWithId("Start_eating");
 
 				Actions currActions = project.getActions();
+				Controls currControls = project.getControls();
 				// The forks in the animation are numbered 0 to nbr of forks - 1
 
 				Action lTakeAction = new Action(lTake.getLabel());
@@ -303,10 +443,22 @@ public class DiningPhilosophers
 				lPutAction.addCommand("fork." + id  + ".put");
 				lPutAction.addCommand("phil." + id  + ".thinking.begin");
 
+				Control lPutControl = new Control(lPut.getLabel());
+				currControls.addControl(lPutControl);
+				lPutControl.setCondition("phil." + id + ".eating.end");
+
 				Action rPutAction = new Action(rPut.getLabel());
 				currActions.addAction(rPutAction);
 				rPutAction.addCommand("fork." + nextId(id, num) + ".put");
 				rPutAction.addCommand("phil." + id + ".thinking.begin");
+
+				Control rPutControl = new Control(rPut.getLabel());
+				currControls.addControl(rPutControl);
+				rPutControl.setCondition("phil." + id + ".eating.end");
+
+				Action startEatingAction = new Action(startEating.getLabel());
+				currActions.addAction(startEatingAction);
+				startEatingAction.addCommand("phil." + id + ".eating.begin");
 
 			}
 

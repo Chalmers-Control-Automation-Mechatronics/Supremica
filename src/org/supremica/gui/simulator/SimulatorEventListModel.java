@@ -96,6 +96,7 @@ public class SimulatorEventListModel
 		this.theAlphabet = helper.getAutomaton().getAlphabet();
 		this.showDisabledEvents = showDisabledEvents;
 		this.theSignals = theSignals;
+		events = new int[helper.getNbrOfEvents() + 1];
 	}
 
 	public void setCurrState(int[] currState)
@@ -112,17 +113,15 @@ public class SimulatorEventListModel
 
 	public void update()
 	{
+		//logger.info("SimulatorEventListModel.update");
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-		if (showDisabledEvents)
+		int[] extEvents = onlineSynchronizer.getOutgoingEvents(currState);
+		System.arraycopy(extEvents, 0, events, 0, events.length);
+		if (!showDisabledEvents)
 		{
-			events = onlineSynchronizer.getOutgoingEvents(currState);
-		}
-		else
-		{
-			events = onlineSynchronizer.getOutgoingEvents(currState);
 			int currEventIndex = 0;
 			int nbrOfEvents = 0;
-			while (events[currEventIndex] != Integer.MAX_VALUE)
+			while (extEvents[currEventIndex] != Integer.MAX_VALUE)
 			{
 				LabeledEvent currEvent;
 				try
@@ -131,11 +130,12 @@ public class SimulatorEventListModel
 				}
 				catch (Exception ex)
 				{
-					logger.error("Exception in SimulatorEventListModel.update");
+					//logger.error("Exception in SimulatorEventListModel.update");
 					return;
 				}
 				if (theControls.hasControl(currEvent.getLabel()))
 				{
+					//logger.info("hasControl: " + currEvent.getLabel());
 					Control currControl = theControls.getControl(currEvent.getLabel());
 					String condition = currControl.getCondition();
 					if (theSignals.isTrue(condition))
@@ -143,11 +143,15 @@ public class SimulatorEventListModel
 						events[nbrOfEvents] = events[currEventIndex];
 						nbrOfEvents++;
 					}
+					else
+					{
+						//logger.info("hasControl, event disabled: " + events[currEventIndex] + " " + currEvent.getLabel());
+					}
 				}
 				else
 				{
 					events[nbrOfEvents] = events[currEventIndex];
-					nbrOfEvents++;	
+					nbrOfEvents++;
 				}
 				currEventIndex++;
 			}

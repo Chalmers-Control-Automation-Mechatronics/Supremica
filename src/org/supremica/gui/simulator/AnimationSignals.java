@@ -35,15 +35,20 @@ class AnimationSignals
 
 	public void animationEvent(AnimationEvent ev)
 	{
+		logger.info("AnimationEvent: " + ev.getName());
 		String currEvent = ev.getName();
 		if (currEvent.charAt(0) == '~')
 		{
-			theSignals.put(currEvent.substring(1, currEvent.length()), Boolean.FALSE);
+			String currSignal = currEvent.substring(1, currEvent.length());
+			logger.info("Setting " + currSignal + " to FALSE");
+			theSignals.put(currSignal, Boolean.FALSE);
 		}
 		else
 		{
+			logger.info("Setting " + currEvent + " to TRUE");
 			theSignals.put(currEvent, Boolean.TRUE);
 		}
+		notifyObservers();
 
 	}
 
@@ -68,4 +73,3 @@ class AnimationSignals
 		return currValue == Boolean.TRUE;
 	}
 }
-	

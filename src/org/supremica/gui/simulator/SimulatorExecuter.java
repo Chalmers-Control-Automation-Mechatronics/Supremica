@@ -262,7 +262,7 @@ public class SimulatorExecuter
 
 	public void animationEvent(AnimationEvent ev)
 	{
-		logger.info("AnimationEvent: " + ev.getName());
+		//logger.info("AnimationEvent: " + ev.getName());
 	}
 
 	public void executeEvent(LabeledEvent event)
@@ -303,7 +303,7 @@ public class SimulatorExecuter
 
 	public Project getProject()
 	{
-		return theProject;	
+		return theProject;
 	}
 
 }

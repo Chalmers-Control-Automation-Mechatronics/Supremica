@@ -1141,7 +1141,13 @@ public class ActionMan
 	{
 		try
 		{
-			Animator animator = gui.getVisualProjectContainer().getActiveProject().getAnimator();
+			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+			if (!currProject.hasAnimation())
+			{
+				logger.info("No animation present");
+				return;
+			}
+			Animator animator = currProject.getAnimator();
 		}
 		catch (Exception ex)
 		{
@@ -1230,6 +1236,11 @@ public class ActionMan
 		try
 		{
 			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+			if (!currProject.hasAnimation())
+			{
+				logger.info("No simulation present");
+				return;
+			}
 			SimulatorExecuter simulator = currProject.getSimulator();
 			if (simulator != null)
 			{

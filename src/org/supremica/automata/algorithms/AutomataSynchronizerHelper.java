@@ -208,6 +208,11 @@ public final class AutomataSynchronizerHelper
 		return theAutomaton.getAlphabet();
 	}
 
+	public int getNbrOfEvents()
+	{
+		return getUnionAlphabet().size();
+	}
+
 	public Automata getAutomata()
 	{
 		return theAutomata;
