@@ -1,3 +1,5 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# $Id: FileDialogs.java,v 1.26 2005-02-24 09:04:13 robi Exp $
 
 /*
  * Supremica Software License Agreement
@@ -56,14 +58,28 @@ import javax.swing.*;
 
 public class FileDialogs
 {
+
+	//#######################################################################
+	//# Class Constants (for File Extensions)
+	public static final String MAINVMOD_EXT = "_main.vmod";
+	public static final String VPRJ_EXT = ".vprj";
+	public static final String VMOD_EXT = ".vmod";
+	public static final String WMOD_EXT = ".wmod";
+
+
+
+	//#######################################################################
+	//# Data Members
 	private JFileChooser fileImporter = null;
 	private JFileChooser fileExporter = null;
 	private JFileChooser fileSaveAs = null;
+
 	private FileFilter rcpFilter = null;
 	private FileFilter xmlFilter = null;
 	private FileFilter spFilter = null;
 	private FileFilter vprjFilter = null;
 	private FileFilter vmodFilter = null;
+	private FileFilter mainvmodFilter = null;
 	private FileFilter wmodFilter = null;
 	private FileFilter dgrfFilter = null;
 	private FileFilter hybFilter = null;
@@ -81,6 +97,8 @@ public class FileDialogs
 	private FileFilter ilFilter = null;
 	private FileFilter nqcFilter = null;
 	private FileFilter stnFilter = null;
+
+
 	private static FileDialogs fd = new FileDialogs();
 
 	private FileDialogs() {}
@@ -103,6 +121,33 @@ public class FileDialogs
 		fileExport.setFileFilter(fd.getFilter(fileType));
 
 		return fileExport;
+	}
+
+	public static JFileChooser getWatersImportFileChooser()
+	{
+		final JFileChooser fileImport = fd.getFileImporter();
+		final FileFilter last = fileImport.getFileFilter();
+		final FileFilter wmod = fd.getWMODFilter();
+		final FileFilter vprj = fd.getVPRJFilter();
+		final FileFilter vmod = fd.getMainVMODFilter();
+		final FileFilter[] filters = {wmod, vprj, vmod};
+
+		// If the dialog has been used before with the same filters,
+		// try to set the filter to what is was last.
+		boolean found = false;
+		fileImport.resetChoosableFileFilters();
+		for (int i = 0; i < filters.length; i++) {
+			fileImport.addChoosableFileFilter(filters[i]);
+			if (last == filters[i]) {
+				found = true;
+			}
+		}
+		if (found) {
+			fileImport.setFileFilter(last);
+		} else {
+			fileImport.setFileFilter(wmod);
+		}
+		return fileImport;
 	}
 
 	public static JFileChooser getImportFileChooser(FileFormats fileType)
@@ -446,7 +491,8 @@ public class FileDialogs
 	{
 		if (vprjFilter == null)
 		{
-			vprjFilter = makeFileFilter(".vprj", "VALID Project files (*.vprj)");
+			vprjFilter =
+				makeFileFilter(VPRJ_EXT, "VALID Project files (*.vprj)");
 		}
 
 		return vprjFilter;
@@ -456,23 +502,35 @@ public class FileDialogs
 	{
 		if (vmodFilter == null)
 		{
-			vmodFilter = makeFileFilter(".vmod", "VALID Module files (*.vmod)");
+			vmodFilter =
+				makeFileFilter(VMOD_EXT, "VALID Module files (*.vmod)");
 		}
 
 		return vmodFilter;
 	}
 
-/*
+	private FileFilter getMainVMODFilter()
+	{
+		if (mainvmodFilter == null)
+		{
+			mainvmodFilter = makeFileFilter
+				(MAINVMOD_EXT, "VALID Main Module files (*_main.vmod)");
+		}
+
+		return mainvmodFilter;
+	}
+
 	private FileFilter getWMODFilter()
 	{
 		if (wmodFilter == null)
 		{
-			wmodFilter = makeFileFilter(".wmod", "Waters Module files (*.wmod)");
+			wmodFilter =
+				makeFileFilter(WMOD_EXT, "Waters Module files (*.wmod)");
 		}
 
 		return wmodFilter;
 	}
-*/
+
 	private FileFilter getDGRFFilter()
 	{
 		if (dgrfFilter == null)

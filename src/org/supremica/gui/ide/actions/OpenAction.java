@@ -1,23 +1,37 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   OpenAction
+//###########################################################################
+//# $Id: OpenAction.java,v 1.5 2005-02-24 09:04:13 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide.actions;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import javax.xml.bind.JAXBException;
+import javax.xml.transform.TransformerConfigurationException;
+
 import net.sourceforge.waters.model.module.ModuleMarshaller;
 import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
+import net.sourceforge.waters.valid.ValidUnmarshaller;
 
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import org.supremica.automata.IO.FileFormats;
 import org.supremica.gui.FileDialogs;
-import org.supremica.gui.ide.*;
-
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
+
+
 
 public class OpenAction
 	extends AbstractAction
@@ -43,38 +57,135 @@ public class OpenAction
 
 	public void doAction()
 	{
+		final FileImporter importer = new WatersFileImporter();
+	}
 
-		new FileImporter(FileDialogs.getImportFileChooser(FileFormats.WMOD), ide)    // anonymous class
+
+
+	//#######################################################################
+	//# Local Class WatersFileImporter
+	private class WatersFileImporter extends FileImporter
+	{
+
+		//###################################################################
+		//# Constructors
+		private WatersFileImporter()
 		{
-			void openFile(IDE ide, File f)
-			{
-				ModuleProxy module = null;
-				try
-				{
-					final ProxyMarshaller marshaller = new ModuleMarshaller();
+			super(FileDialogs.getWatersImportFileChooser(), ide);
+		}
 
-					module = (ModuleProxy) marshaller.unmarshal(f);
-				}
-				catch (final JAXBException exception)
-				{
 
-					// Something bad happened
-					JOptionPane.showMessageDialog(ide, "Error loading module file! (JAXBException)");
-					// logEntry("JAXBException - Failed to load: " + wmodf);
 
-					//exception.printStackTrace(System.err);
-				}
-				catch (final ModelException exception)
-				{
-					JOptionPane.showMessageDialog(ide, "Error loading module file! (ModelException)");
-					// logEntry("ModelException - Failed to load: " + wmodf);
-				}
-
-				ModuleContainer moduleContainer = new ModuleContainer(ide, module);
-				ide.add(moduleContainer);
-				ide.setActive(moduleContainer);
+		//###################################################################
+		//# Overrides for Base Class org.supremica.gui.ide.actions.FileImporter
+		void openFile(final File file)
+		{
+			final String filename = file.getName();
+			final String lowername = filename.toLowerCase();
+			if (lowername.endsWith(FileDialogs.WMOD_EXT)) {
+				openFileWmod(file);
+			} else if (lowername.endsWith(FileDialogs.MAINVMOD_EXT)) { 
+				openFileVmod(file);
+			} else if (filename.endsWith(FileDialogs.VPRJ_EXT)) { 
+				openFileVprj(file);
 			}
-		};
+		}
+
+
+
+		//###################################################################
+		//# Type Specific Opening Methods
+		private void openFileWmod(final File file)
+		{
+			try	{
+				final ProxyMarshaller marshaller = new ModuleMarshaller();
+				final ModuleProxy module =
+					(ModuleProxy) marshaller.unmarshal(file);
+				installContainer(module);
+			} catch (final JAXBException exception) {
+				showParseError("Could not parse module file", file, exception);
+			} catch (final ModelException exception) {
+				showParseError("Could not parse module file", file, exception);
+			}
+		}
+
+
+
+		private void openFileVprj(final File vprjfile)
+		{
+			final String vprjname = vprjfile.getName();
+			final StringBuffer buffer = new StringBuffer(vprjname);
+			final int len = buffer.length();
+			final int start = len - FileDialogs.VPRJ_EXT.length();
+			buffer.delete(start, len);
+			buffer.append(FileDialogs.MAINVMOD_EXT);
+			final String vmodname = buffer.toString();
+			final File dir = vprjfile.getParentFile();
+			final File vmodfile = new File(dir, vmodname);
+			if (vmodfile.exists()) {
+				openFileVmod(vmodfile);
+			} else {
+				buffer.delete(0, buffer.length());
+				buffer.append
+					("Can't import VALID project: main module file '");
+				buffer.append(vmodfile.toString());
+				buffer.append("' not found!");
+				final String shown = buffer.toString();
+				JOptionPane.showMessageDialog(ide, shown);
+			}
+		}
+
+
+
+		private void openFileVmod(final File file)
+		{
+			try {
+				final ValidUnmarshaller unmarshaller = new ValidUnmarshaller();
+				final ModuleProxy module = unmarshaller.unmarshal(file);
+				installContainer(module);
+			} catch (final IOException exception) {
+				showParseError
+					("Error importing from VALID module", file, exception);
+			} catch (final JAXBException exception) {
+				showParseError
+					("Error importing from VALID module", file, exception);
+			} catch (final ModelException exception) {
+				showParseError
+					("Error importing from VALID module", file, exception);
+			} catch (final TransformerConfigurationException exception) {
+				showParseError
+					("Error importing from VALID module", file, exception);
+			}
+		}
+
+
+
+		//###################################################################
+		//# Auxiliary Methods
+		private void installContainer(final ModuleProxy module)
+		{
+			ModuleContainer moduleContainer = new ModuleContainer(ide, module);
+			ide.add(moduleContainer);
+			ide.setActive(moduleContainer);
+		}
+
+
+
+		//###################################################################
+		//# Error Handling
+		private void showParseError(final String msg,
+									final File file,
+									final Exception exception)
+		{
+			final StringBuffer buffer = new StringBuffer(msg);
+			buffer.append(" '");
+			buffer.append(file.toString());
+			buffer.append("' - ");
+			buffer.append(exception.getMessage());
+			final String shown = buffer.toString();
+			JOptionPane.showMessageDialog(ide, shown);
+		}
 
 	}
+
 }

@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   OpenAction
+//###########################################################################
+//# $Id: FileImporter.java,v 1.2 2005-02-24 09:04:13 robi Exp $
+//###########################################################################
+
 
 package org.supremica.gui.ide.actions;
 
@@ -19,7 +28,7 @@ abstract class FileImporter
 				{
 					if (currFiles[i].isFile())
 					{
-						openFile(ide, currFiles[i]);
+						openFile(currFiles[i]);
 					}
 				}
 			}
@@ -28,5 +37,5 @@ abstract class FileImporter
 		}
 	}
 
-	abstract void openFile(IDE ide, File file);
+	abstract void openFile(File file);
 }
