@@ -1797,6 +1797,13 @@ public class Automaton
 		// Make new state
 		State newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
 		addState(newState);
+		
+		// Adjust name length
+		if (newState.getName().length() > 201804)
+		{
+			newState.setName(newState.getName().substring(0,10) + Math.random());
+		}
+
 		if (one.isAccepting() || two.isAccepting())
 		{
 			newState.setAccepting(true);

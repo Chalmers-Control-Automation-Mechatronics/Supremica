@@ -181,16 +181,20 @@ public class AutomataMinimizationWorker
 				{
 					result.addAutomaton(newAutomaton);
 				}
+				/*
 				else
 				{
 					requestStop();
+					return;
 				}
+				*/
 			}
 			catch (Exception ex)
 			{
 				logger.error("Exception in AutomatonMinimizer when compositionally minimizing " +
 							 theAutomata + " " + ex);
 				logger.debug(ex.getStackTrace());
+				requestStop();
 			}
 
 			if (!options.getKeepOriginal())

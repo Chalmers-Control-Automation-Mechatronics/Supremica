@@ -82,7 +82,8 @@ public class ActionTimer
 	/**
 	 * Returns the elapsed time in milliseconds between last start and last stop call.
 	 * If stop is not called before this method then the time since last call
-	 * to start is returned */
+	 * to start is returned 
+	 */
 	public long elapsedTime()
 		throws IllegalStateException
 	{
@@ -119,11 +120,13 @@ public class ActionTimer
 
 		if (hrs != 0)
 		{
-			sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
+			//sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
+			sbuf.append(hrs + hours + mins + minutes);
 		}
 		else if (mins != 0)
 		{
-			sbuf.append(mins + minutes + secs + seconds + millis + milliseconds);
+			//sbuf.append(mins + minutes + secs + seconds + millis + milliseconds);
+			sbuf.append(mins + minutes + secs + seconds);
 		}
 		else if (secs != 0)
 		{

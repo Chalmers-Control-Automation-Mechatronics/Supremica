@@ -56,6 +56,7 @@ import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.ActionMan;
 import java.awt.Toolkit;
+import org.supremica.util.ActionTimer;
 
 // Factory object for generating the correct class according to prefs
 /*
@@ -87,8 +88,8 @@ public class AutomatonMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
-	// Private debug flag...
-	private static boolean debug = false;
+	// Debug flag...
+	public static final boolean debug = false;
 
 	/**
 	 * Basic constructor.
@@ -119,8 +120,23 @@ public class AutomatonMinimizer
 			theAutomaton = new Automaton(theAutomaton);
 		}
 		
+		ActionTimer reachabilityTimer = new ActionTimer();
+		ActionTimer preMinimizationTimer = new ActionTimer();
+		ActionTimer saturationTimer = new ActionTimer();
+		ActionTimer adjustMarkingTimer = new ActionTimer();
+		ActionTimer postMinimizationTimer = new ActionTimer();
+		ActionTimer partitioningTimer = new ActionTimer();
+		ActionTimer removeTransitionsTimer = new ActionTimer();
+		ActionTimer automataBuildTimer = new ActionTimer();
+
+		if (debug)
+		{
+			reachabilityTimer.start();
+		}
+
 		// Make reachable
-		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, SynthesizerOptions.getDefaultSynthesizerOptions());
+        SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
+		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
 		synth.doReachable();
 		LinkedList toBeRemoved = new LinkedList();
 		for (StateIterator it = theAutomaton.stateIterator(); it.hasNext(); )
@@ -143,7 +159,11 @@ public class AutomatonMinimizer
 		}
 
 		if (debug)
-			logger.info("A");
+		{
+			reachabilityTimer.stop();
+			logger.fatal("Reachability: " + reachabilityTimer);
+			preMinimizationTimer.start();
+		}
 
 		// Find out what to do
 		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
@@ -158,12 +178,18 @@ public class AutomatonMinimizer
 				theAutomaton = determinizer.getNewAutomaton();
 			}
 
+			if (debug)
+			{
+				preMinimizationTimer.stop();
+				logger.fatal("Determinization: " + preMinimizationTimer);
+			}
+
 			// Now we're ready for minimization!
 		}
 		else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
 		{
-			// Merge silent loops and other obvious OE stuff (to save computation later)
-			// (Almost like cheating.)
+			// Merge silent loops and other obvious OE stuff (to save computation later)...
+			// This is actually NOT entirely OE!! 
 			int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
 			if (count > 0)
 			{
@@ -171,46 +197,63 @@ public class AutomatonMinimizer
 							 "before running the minimization.");
 			}
 
-			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
-			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
+			if (debug)
+			{
+				preMinimizationTimer.stop();
+				logger.fatal("Pre minimization: " + preMinimizationTimer);
+				saturationTimer.start();
+			}
 
 			// Saturate
-			doTransitiveClosure(theAutomaton);
+			int transitions = doTransitiveClosure(theAutomaton);
 
-			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
-			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
-
+			if (debug)
+			{
+				saturationTimer.stop();	
+				logger.fatal("Saturation: " + saturationTimer + 
+							 " (added " + transitions + " new transitions)");
+			}
+			
 			// Now we're ready for minimization!
 		}
 		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 		{
-			if (debug)
-				logger.info("B");
-
 			// Merge silent loops and other obvious OE stuff (to save computation later)
-			// (Almost like cheating.)
+			// This is actually NOT entirely OE!!
 			int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
 			if (count > 0)
 			{
 				logger.debug("Removed " + count + " observation equivalent states " +
 							 "before running minimization.");
 			}
-			
+				
 			if (debug)
-				logger.info("C");
+			{
+				preMinimizationTimer.stop();
+				logger.fatal("Pre minimization: " + preMinimizationTimer);
+				saturationTimer.start();
+			}
 		
-			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
-			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
-
 			// Saturate
-			doTransitiveClosure(theAutomaton);
+			int transitions = doTransitiveClosure(theAutomaton);
 
 			if (debug)
-				logger.info("D");
-
-			// Adjust marking based on epsilon transitions (it IS ok (actually necessary)
+			{
+				saturationTimer.stop();	
+				logger.fatal("Saturation: " + saturationTimer + 
+							 " (added " + transitions + " new transitions)");
+				adjustMarkingTimer.start();
+			}
+			
+			// Adjust marking based on epsilon transitions (it IS ok and actually necessary
 			// to do this AFTER doTransitiveClosure). This is not an expensive computation.
 			adjustMarking(theAutomaton); // Not OE
+
+			if (debug)
+			{
+				adjustMarkingTimer.stop();	
+				logger.fatal("Adjust markings: " + adjustMarkingTimer);
+			}
 
 			// Now we're ready for minimization!
 		}
@@ -222,6 +265,11 @@ public class AutomatonMinimizer
 		if (stopRequested)
 		{
 			return null;
+		}
+
+		if (debug)
+		{
+			partitioningTimer.start();
 		}
 
 		// After the above preparations, we can do the minimization in the same way for all cases!
@@ -237,9 +285,6 @@ public class AutomatonMinimizer
 				return null;
 			}
 
-			if (debug)
-				logger.info("E");
-
 			// Minimize
 			findCoarsestPartitioning(equivClasses);
 		}
@@ -252,7 +297,11 @@ public class AutomatonMinimizer
 		}
 
 		if (debug)
-			logger.info("F");
+		{
+			partitioningTimer.stop();	
+			logger.fatal("Partitioning: " + partitioningTimer);
+			automataBuildTimer.start();
+		}
 
 		// Build the minimized automaton
 		Automaton newAutomaton = buildAutomaton(equivClasses);
@@ -263,7 +312,11 @@ public class AutomatonMinimizer
 		}
 
 		if (debug)
-			logger.info("G");
+		{
+			automataBuildTimer.stop();
+			logger.fatal("Automaton build: " + automataBuildTimer);
+			removeTransitionsTimer.start();
+		}
 
 		// Should we remove redundant transitions to minimize also with respect to transitions?
 		if (options.getAlsoTransitions())
@@ -271,8 +324,12 @@ public class AutomatonMinimizer
 			removeRedundantTransitions(newAutomaton);
 		}
 
-		if (debug)
-			logger.info("H");
+   		if (debug)
+		{
+			removeTransitionsTimer.stop();
+			logger.fatal("Remove transitions: " + removeTransitionsTimer);
+			postMinimizationTimer.start();
+		}
 
 		// Post minimization adjustments
 		if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
@@ -303,7 +360,10 @@ public class AutomatonMinimizer
 		removeUnusedEpsilonEvents(newAutomaton);
 
 		if (debug)
-			logger.info("I");
+		{
+			postMinimizationTimer.stop();
+			logger.fatal("Post minimization: " + postMinimizationTimer);
+		}
 
 		// Return the result of the minimization!
 		return newAutomaton;
@@ -557,8 +617,8 @@ public class AutomatonMinimizer
 					State currState = statesToModify.get();
 					statesToModify.remove(currState);
 
-					// Accepting states that by epsilons may reach a block are modified to be nonaccepting
-					// an exception is made if this is the initial state!
+					// Accepting states that by epsilons may reach a block are modified to be 
+					// nonaccepting an exception is made if this is the initial state!
 					if (currState.isAccepting())
 					{
 						if (currState.isInitial())
@@ -685,6 +745,7 @@ public class AutomatonMinimizer
 		{
 			if (stopRequested)
 			{
+				aut = null;
 				return 0;
 			}
 
@@ -792,11 +853,11 @@ public class AutomatonMinimizer
 	 * time there is a transition "p =a=> q", after completing the transitive closure (or
 	 * "saturation"), there is also a transition "p -a-> q".
 	 */
-	public void doTransitiveClosure(Automaton aut)
+	public int doTransitiveClosure(Automaton aut)
 	{
 		if (aut == null)
 		{
-			return;
+			return -1;
 		}
 
 		// Find epsilon-closure for each state, put this info in each state
@@ -804,7 +865,8 @@ public class AutomatonMinimizer
 		{
 			if (stopRequested)
 			{
-				return;
+				aut = null;
+				return -1;
 			}
 
 			State currState = stateIt.nextState();
@@ -820,7 +882,8 @@ public class AutomatonMinimizer
 		{
 			if (stopRequested)
 			{
-				return;
+				aut = null;
+				return -1;
 			}
 
 			State currState = stateIt.nextState();
@@ -871,9 +934,12 @@ public class AutomatonMinimizer
 			}
 			toBeAdded.add(new Arc(currState, currState, tau));
 		}
-		// Add the new
-		logger.debug("Added " + toBeAdded.size() + " transitions to " + aut + ".");
-		while (toBeAdded.size() != 0)
+
+		// Add the new arcs
+		int amount = toBeAdded.size();
+		int added = 0;
+		//logger.debug("Added " + toBeAdded.size() + " transitions to " + aut + ".");
+		while (added != amount)
 		{
 			// Add if not already there
 			Arc arc = (Arc) toBeAdded.remove(0);
@@ -881,7 +947,17 @@ public class AutomatonMinimizer
 			{
 				aut.addArc(arc);
 			}
+
+			added++;
 		}
+
+		if (stopRequested)
+		{
+			aut = null;
+			return -1;
+		}
+
+		return amount;
 	}
 
 	/**
@@ -961,15 +1037,22 @@ public class AutomatonMinimizer
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
 			State currState = stateIt.nextState();
-			if (!currState.isAccepting() && !currState.isInitial())
+			//if (!currState.isAccepting() && !currState.isInitial())
+			if (!currState.isAccepting())
 			{
 				StateSet closure = currState.getStateSet();
+				if (closure == null)
+				{
+					aut = null;
+					return;
+				}
 				for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
 				{
 					State otherState = closureIt.nextState();
 					if (otherState.isAccepting())
 					{
 						toBeMarked.add(currState);
+						break;
 					}
 				}
 			}
@@ -992,8 +1075,8 @@ public class AutomatonMinimizer
 		// Note! This is not Jaana Elorantas definition of redundant transitions!
 		// Her "redundant transitions" are removed below (which requires that all
 		// silent self-loops have already been removed).
-		boolean hasSilentSelfloop = false;
-		// Put them in a list, remove afterwards
+
+		// Put silent self-loops in a list, remove afterwards
 		LinkedList toBeRemoved = new LinkedList();
 		for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
 		{
@@ -1020,7 +1103,7 @@ public class AutomatonMinimizer
 			State s2 = arc.getToState();
 
 			// Is the criteria fulfilled? (I.e. does there exist a s3 such that either
-			// (s1 -a-> a3 and s3 -tau-> s2) or (s1 -tau-> s3 and s3 -a-> s2) holds?)
+			// (s1 -a-> s3 and s3 -tau-> s2) or (s1 -tau-> s3 and s3 -a-> s2) holds?)
 			test: for (ArcIterator outIt = s1.outgoingArcsIterator(); outIt.hasNext(); )
 			{
 				Arc firstArc = outIt.nextArc();
@@ -1037,7 +1120,9 @@ public class AutomatonMinimizer
 						{
 							LabeledEvent secondEvent = secondArc.getEvent();
 							// The order (wrt ||) in this if-clause is important!!
-							if ((secondEvent.isEpsilon() && (!firstEvent.isEpsilon() || arc.getEvent().isEpsilon())) || (secondEvent.equals(arc.getEvent()) && !firstEvent.equals(secondEvent)))
+							if ((secondEvent.isEpsilon() && 
+								 (!firstEvent.isEpsilon() || arc.getEvent().isEpsilon())) || 
+								(secondEvent.equals(arc.getEvent()) && !firstEvent.equals(secondEvent)))
 							{
 								// Redundant!!!!
 								toBeRemoved.add(arc);

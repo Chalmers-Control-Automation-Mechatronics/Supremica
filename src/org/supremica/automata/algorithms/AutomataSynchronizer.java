@@ -147,7 +147,6 @@ public class AutomataSynchronizer
 		{
 			if (currExec.buildAutomaton())
 			{
-				// logger.debug(synchHelper.getAutomaton() == null);
 				return synchHelper.getAutomaton();
 			}
 			else
@@ -169,19 +168,22 @@ public class AutomataSynchronizer
 		return synchHelper;
 	}
 
-	/* GAAAH! The garbage collection is too slow... and this won't make it faster... /Hugo.
+	/**
+	 * Help the garbage collector by clearing variables.
+	 */
 	public void clear()
 	{
-			synchHelper = null;
-			for (int i = 0; i < synchronizationExecuters.size(); i++)
-			{
-					AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-
-					currExec = null;
-			}
-			synchronizationExecuters = null;
+		theAutomata = null;
+		synchHelper = null;		
+		for (int i = 0; i < synchronizationExecuters.size(); i++)
+		{
+			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+			currExec = null;
+		}
+		syncOptions = null;
+		synchronizationExecuters = null;
 	}
-	*/
+
 	public void requestStop()
 	{
 		stopRequested = true;
@@ -217,7 +219,9 @@ public class AutomataSynchronizer
 		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 		AutomataSynchronizer synchronizer = new AutomataSynchronizer(theAutomata, syncOptions);
 		synchronizer.execute();
-
-		return synchronizer.getAutomaton();
+		Automaton result = synchronizer.getAutomaton();
+		synchronizer.clear();
+		
+		return result;
 	}
 }

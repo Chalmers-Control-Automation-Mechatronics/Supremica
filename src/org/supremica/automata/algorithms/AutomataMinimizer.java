@@ -54,6 +54,7 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
+import org.supremica.util.ActionTimer;
 
 public class AutomataMinimizer
 	implements Stoppable
@@ -71,7 +72,7 @@ public class AutomataMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
-	/* Largest single automaton considered */
+	/** Largest single automaton considered */
 	int largestAutomatonSize = 0;
 
 	/**
@@ -234,6 +235,10 @@ public class AutomataMinimizer
 			//min.remapStateIndices(); // Why did I do that?
 			theAutomata.removeAutomata(automata);
 			theAutomata.addAutomaton(min);
+
+			// Dispose of originals
+			automata.clear();
+		
 			
 			/*
 			// Update gui
@@ -281,9 +286,18 @@ public class AutomataMinimizer
 	private Automaton monolithicMinimization(Automata automata, Alphabet hideThese)
 		throws Exception
 	{
+		ActionTimer synchTimer = new ActionTimer();
+		synchTimer.start();
+
 		// Synch and hide
 		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata);
 		aut.hide(hideThese);
+
+		synchTimer.stop();
+		if (AutomatonMinimizer.debug)
+		{
+			logger.fatal("Synchronization: " + synchTimer);
+		}
 
 		// Examine for largest automaton size
 		if (aut.nbrOfStates() > largestAutomatonSize)
@@ -318,7 +332,7 @@ public class AutomataMinimizer
 						   " states after the minimization. Reduction: " + 
 						   ((double) (before-after))*100/before + "%.");
 		}
-		
+
 		return aut;
 	}
 

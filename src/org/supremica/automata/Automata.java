@@ -1008,6 +1008,7 @@ public class Automata
 
 	public void clear()
 	{
+		/*
 		ArrayList theAutomataCopy = new ArrayList(theAutomata);
 
 		for (Iterator autIt = theAutomataCopy.iterator(); autIt.hasNext(); )
@@ -1015,6 +1016,12 @@ public class Automata
 			Automaton currAutomaton = (Automaton) autIt.next();
 
 			removeAutomaton(currAutomaton.getName());
+		}
+		*/
+
+		while (size() != 0)
+		{
+			removeAutomaton(getFirstAutomaton());
 		}
 
 		theAutomata.clear();

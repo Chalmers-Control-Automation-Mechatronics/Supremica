@@ -1819,6 +1819,7 @@ public class AutomataVerifier
 			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
 			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
 			options.setAlsoTransitions(true);
+			//options.setAlsoTransitions(false);
 			options.setKeepOriginal(false);
 			options.setCompositionalMinimization(true);
 			options.setTargetAlphabet(new Alphabet()); // Empty alphabet!
