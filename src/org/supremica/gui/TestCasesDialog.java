@@ -16,6 +16,9 @@ import org.supremica.testcases.BricksGame;
 import org.supremica.testcases.DiningPhilosophers;
 import org.supremica.testcases.StickPickingGame;
 import org.supremica.testcases.AllocationBatch;
+import org.supremica.testcases.Counters;
+import org.supremica.testcases.RandomAutomata;
+
 
 // should perform integer validation - see Horstmann
 class IntegerField
@@ -29,6 +32,20 @@ class IntegerField
 	int get()
 	{
 		return Integer.parseInt(getText());
+	}
+}
+
+class DoubleField
+	extends JTextField
+{
+	public DoubleField(String init, int cols)
+	{
+		super(init, cols);
+	}
+
+	double get()
+	{
+		return Double.parseDouble(getText());
 	}
 }
 
@@ -141,16 +158,18 @@ class BricksPanel
 
 	BricksPanel()
 	{
-		JPanel rows = new JPanel();
-		rows.add(new JLabel("Number of rows: "));
-		rows.add(num_rows);
 
-		JPanel cols = new JPanel();
-		cols.add(new JLabel("Number of cols: "));
-		cols.add(num_cols);
 
-		add(BorderLayout.NORTH, rows);
-		add(BorderLayout.SOUTH, cols);
+		JPanel panel  = new JPanel( new GridLayout(2,2));
+		add(panel, BorderLayout.WEST);
+
+		panel.add(new JLabel("Number of rows: "));
+		panel.add(num_rows);
+
+		panel.add(new JLabel("Number of cols: "));
+		panel.add(num_cols);
+
+
 	}
 
 	public Project doIt()
@@ -171,16 +190,15 @@ class StickGamePanel
 
 	StickGamePanel()
 	{
-		JPanel players = new JPanel();
-		players.add(new JLabel("Number of players: "));
-		players.add(num_players);
+		JPanel panel  = new JPanel( new GridLayout(2,2));
+		add(panel, BorderLayout.WEST);
 
-		JPanel sticks = new JPanel();
-		sticks.add(new JLabel("Number of sticks: "));
-		sticks.add(num_sticks);
+		panel.add(new JLabel("Number of players: "));
+		panel.add(num_players);
 
-		add(players, BorderLayout.NORTH);
-		add(sticks, BorderLayout.SOUTH);
+		panel.add(new JLabel("Number of sticks: "));
+		panel.add(num_sticks);
+
 
 	}
 	public Project doIt()
@@ -203,7 +221,8 @@ class AllocationBatchPanel
 	{
 		super(new BorderLayout(10, 10));
 
-		JPanel pCenter = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel pCenter  = new JPanel( new GridLayout(4,2));
+		add(pCenter, BorderLayout.WEST);
 
 		pCenter.add(new JLabel("batch file:  "));
 		pCenter.add(filename = new JTextField(20));
@@ -248,6 +267,73 @@ class AllocationBatchPanel
 	}
 }
 
+
+
+class CountersPanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField int_num = null;
+	IntegerField int_size = null;
+
+	public CountersPanel()
+	{
+		JPanel panel  = new JPanel( new GridLayout(2,2));
+		add(panel, BorderLayout.CENTER);
+
+		panel.add(new JLabel("Number of counters: "));
+		panel.add(int_num = new IntegerField("3", 6));
+
+		panel.add(new JLabel("Counter states: "));
+		panel.add(int_size = new IntegerField("8", 6));
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		Counters counters = new Counters(int_num.get(), int_size.get());
+		return counters.getProject();
+	}
+}
+
+
+
+class RandomPanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField int_num = null;
+	IntegerField int_size = null;
+	IntegerField int_events = null;
+	DoubleField dbl_dens = null;
+
+	public RandomPanel()
+	{
+		JPanel panel  = new JPanel( new GridLayout(4,2));
+		add(panel, BorderLayout.WEST);
+
+		panel.add(new JLabel("Number of automata: "));
+		panel.add(int_num = new IntegerField("3", 6));
+
+		panel.add(new JLabel("Number of states: "));
+		panel.add(int_size = new IntegerField("8", 6));
+
+		panel.add(new JLabel("Number of Events: "));
+		panel.add(int_events = new IntegerField("8", 3));
+
+		panel.add(new JLabel("Transition density: "));
+		panel.add(dbl_dens = new DoubleField("0.3", 6));
+
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		RandomAutomata ra = new RandomAutomata(int_num.get(), int_size.get(), int_events.get(), dbl_dens.get());
+		return ra.getProject();
+	}
+}
+
 class ExampleTab
 	extends JTabbedPane
 {
@@ -257,6 +343,8 @@ class ExampleTab
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
 		addTab("Sticks Game", null, new StickGamePanel(), "Stick picking game");
+		addTab("Counters", null, new CountersPanel(), "Independent Counters");
+		addTab("Random automata", null, new RandomPanel(), "Random automata");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
 }

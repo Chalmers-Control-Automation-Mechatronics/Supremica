@@ -31,6 +31,10 @@ public class ArcSet
 	public void add(String event, String s1, String s2)
 	    throws BDDException
 	{
+		/* if you see this assert in Supremica, then the automata is probably non-deterministic and
+		 * some unknown bug sends us here somehow ...
+		 */
+
 		BDDAssert.internalCheck(!closed, "[ArcSet.add]BAD FUNCTION CALL!");
 		BDDAssert.bddAssert(!in(event, s1, s2), "Duplicate arc: " + s1 + " -" + event + "-> " + s2);
 
