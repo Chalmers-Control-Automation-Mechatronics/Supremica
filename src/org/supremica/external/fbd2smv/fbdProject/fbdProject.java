@@ -62,7 +62,7 @@ public class fbdProject
 	return programs;
     }
 
-
+    /*
     public boolean isOutputVariable(String name)
     {
 	Program program;
@@ -73,7 +73,7 @@ public class fbdProject
 	    {
 		program = (Program)programs.get(i);
 		arcs = program.getArcs();
-		variables = program.getVariables();
+		variables = program.getVariablesByName();
 		VAR variable = (VAR)variables.get(name);
 		
 		if (variable != null) {
@@ -92,9 +92,66 @@ public class fbdProject
 	    }
 	
 	return false;
+    }
+    */
+
+    public boolean isOutputVariable(String index)
+    {
+	Program program;
+	LinkedList arcs;    
+	HashMap variables;
+
+	for (int i=0; i<programs.size(); i++)
+	    {
+		program = (Program)programs.get(i);
+		arcs = program.getArcs();
+		String S = null;
+
+		for (int j=0; j<arcs.size(); j++ )
+		{
+		    ARC currARC = (ARC)arcs.get(j);
+		    if (index.equals(S.valueOf(currARC.getTargetIndex()))) 
+			{
+			    return true;
+			}
+		    }
+	    }
+
+	return false;
 	
     }
 
+
+    /*
+    public boolean isOutputVariable(int ix)
+    {
+	Program program;
+	LinkedList arcs;    
+	HashMap variables;
+	String S = null;
+	String index;
+	
+	index = S.valueOf(ix);
+
+	for (int i=0; i<programs.size(); i++)
+	    {
+		program = (Program)programs.get(i);
+		arcs = program.getArcs();
+
+		for (int j=0; j<arcs.size(); j++ )
+		{
+		    ARC currARC = (ARC)arcs.get(j);
+		    if (index.equals(S.valueOf(currARC.getTargetIndex()))) 
+			{
+			    return true;
+			}
+		    }
+	    }
+
+	return false;
+	
+    }
+    */
 
 }
 

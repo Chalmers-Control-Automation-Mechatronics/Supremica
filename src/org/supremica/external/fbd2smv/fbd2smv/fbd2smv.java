@@ -195,7 +195,6 @@ public class fbd2smv
 	
     }
 
-
     void printMainModule(PrintWriter pw, LinkedList programs, LinkedList varBooleans, LinkedList varIntegers)
     {
 	String str = "";
@@ -309,7 +308,7 @@ public class fbd2smv
 	for(int i=0; i<programs.size(); i++)
 	    {
 		program   = (Program)programs.get(i);
-		variables = program.getVariables();
+		variables = program.getVariablesByIndex();
 		LinkedList outputVariables = new LinkedList();
 		LinkedList arcs      = program.getArcs();		
 		HashMap    boxes     = program.getBoxes();
@@ -319,7 +318,7 @@ public class fbd2smv
 		    {
 			VAR currVAR = (VAR)variables.get(varIt.next());
 
-			if (fbdProj.isOutputVariable(currVAR.getName()) && !outputVariables.contains(currVAR))
+			if (fbdProj.isOutputVariable(currVAR.getIndex()) && !outputVariables.contains(currVAR))
 			    {
 				outputVariables.add(currVAR);
 				LinkedList inputElementIndices  = inputElementIndices(currVAR.getIndex(), arcs);
@@ -433,8 +432,8 @@ public class fbd2smv
 	String     boxDeclaration = null;
 	FBDElement theFBDElement  = null;
 		
-	HashMap variables = program.getVariables();
-	HashMap boxes     = program.getBoxes();
+	//	HashMap variables    = program.getVariables();
+	HashMap boxes        = program.getBoxes();
 	LinkedList arcs      = program.getArcs();
 
 	LinkedList inputElementIndices  = inputElementIndices(box.getIndex(), arcs);
@@ -659,7 +658,7 @@ public class fbd2smv
 
     public FBDElement getElementByIndex(Program program, String index)
     {
-	HashMap variables        = program.getVariables();
+	HashMap variables        = program.getVariablesByIndex();
 	HashMap boxes            = program.getBoxes();
 	FBDElement theFBDElement = null;
 

@@ -6,9 +6,10 @@ import org.supremica.external.fbd2smv.isagrafReader.*;
 
 public class LSFReader
 {
-    private HashMap variables = new HashMap();
-    private HashMap boxes     = new HashMap();
-    private LinkedList arcs   = new LinkedList();
+    private HashMap variablesByName  = new HashMap();
+    private HashMap variablesByIndex = new HashMap();
+    private HashMap boxes            = new HashMap();
+    private LinkedList arcs          = new LinkedList();
 
     public LSFReader(FileReader fr) throws IOException
     {
@@ -16,9 +17,15 @@ public class LSFReader
 	parse(br);
     }
 
-    public HashMap getVariables()
+    public HashMap getVariablesByName()
     {
-	return variables;
+	return variablesByName;
+    }
+
+
+    public HashMap getVariablesByIndex()
+    {
+	return variablesByIndex;
     }
 
     
@@ -164,11 +171,8 @@ public class LSFReader
 
 	VAR newVAR = new VAR(indexString, varName);
 
-	/*  Put the variable twice in the Hashmap in order
-	 *  to allow retrieval by index and by name
-	 */
-	variables.put(newVAR.getIndex(), newVAR);
-	variables.put(newVAR.getName(), newVAR);
+	variablesByIndex.put(newVAR.getIndex(), newVAR);
+	variablesByName.put(newVAR.getName(), newVAR);
 		
     }
 

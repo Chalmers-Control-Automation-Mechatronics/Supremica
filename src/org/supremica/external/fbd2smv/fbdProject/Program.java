@@ -5,7 +5,8 @@ import org.supremica.external.fbd2smv.isagrafReader.*;
 
 public class Program
 {
-    private HashMap    variables;
+    private HashMap    variablesByIndex;
+    private HashMap    variablesByName;
     private HashMap    boxes;
     private LinkedList boxesList  = new LinkedList();
     private LinkedList boxesWithoutCornersList  = new LinkedList();
@@ -14,10 +15,11 @@ public class Program
     private String     name;
 	
 
-    public Program(String name, HashMap variables, HashMap boxes, LinkedList arcs)
+    public Program(String name, HashMap variablesByIndex, HashMap variablesByName, HashMap boxes, LinkedList arcs)
     {
 	this.name = name;
-	this.variables = variables;
+	this.variablesByIndex = variablesByIndex;
+	this.variablesByName = variablesByName;
 	this.boxes = boxes;
 	this.arcs = arcs;
 
@@ -46,9 +48,15 @@ public class Program
     }
 
 
-    public HashMap getVariables()
+    public HashMap getVariablesByIndex()
     {
-	return variables;
+	return variablesByIndex;
+    }
+
+
+    public HashMap getVariablesByName()
+    {
+	return variablesByName;
     }
 
     
