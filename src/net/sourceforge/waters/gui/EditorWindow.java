@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.8 2005-02-22 18:28:46 robi Exp $
+//# $Id: EditorWindow.java,v 1.9 2005-02-22 21:24:31 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -69,7 +69,6 @@ public class EditorWindow
 			(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
 		viewevents.setBackground(Color.WHITE);
 		split.setResizeWeight(1.0);
-		split.setDividerLocation(500);
 
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.BOTH;
@@ -78,6 +77,21 @@ public class EditorWindow
 		panel.add(split);
 		setJMenuBar(menu);
 		pack();
+
+		// Try to set the divider location so the event panel is displayed
+		// at its preferred size.
+		final int splitwidth = split.getSize().width;
+		final int surfacewidth = surface.getSize().width;
+		final int eventswidth = events.getSize().width;
+		final int separatorwidth = splitwidth - surfacewidth - eventswidth;
+		final int halfwidth = (splitwidth - separatorwidth) >> 1;
+		if (halfwidth > 0) {
+			final int prefeventswidth = events.getPreferredSize().width;
+			final int setwidth = Math.min(prefeventswidth, halfwidth);
+			final int divider = splitwidth - setwidth - separatorwidth;
+			split.setDividerLocation(divider);
+		}
+
 		setVisible(true);
 
 		this.module = module;

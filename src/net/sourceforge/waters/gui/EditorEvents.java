@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.7 2005-02-22 18:28:46 robi Exp $
+//# $Id: EditorEvents.java,v 1.8 2005-02-22 21:24:31 robi Exp $
 //###########################################################################
 
 
@@ -70,36 +70,22 @@ public class EditorEvents
 		setRowHeight(22);
 		setShowGrid(false);
 		setIntercellSpacing(ispacing);
-		setAutoResizeMode(AUTO_RESIZE_OFF);
-
-		final TableColumn column0 = getColumnModel().getColumn(0);
-		column0.setMinWidth(20);
-		column0.setPreferredWidth(COLUMNWIDTH0);
-		column0.setMaxWidth(COLUMNWIDTH0);
-		column0.setResizable(false);
-
+		setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);
+		
 		final TableCellRenderer iconrenderer0 =
 			getDefaultRenderer(ImageIcon.class);
 		final TableCellRenderer iconrenderer1 =
 			new RendererNoFocus(iconrenderer0, false);
-
 		setDefaultRenderer(ImageIcon.class, iconrenderer1);
-
 		final TableCellRenderer textrenderer0 =
 			getDefaultRenderer(Object.class);
 		final TableCellRenderer textrenderer1 =
 			new RendererNoFocus(textrenderer0, true);
-
 		setDefaultRenderer(Object.class, textrenderer1);
-
 		final TableCellEditor editor = new IdentifierEditor();
 		setDefaultEditor(Object.class, editor);
 
-		mPreferredSize = new Dimension();
-		calculateHeight();
-		calculateWidth();
-		setPreferredSize(mPreferredSize);
-		setPreferredScrollableViewportSize(mPreferredSize);
+		setPreferredSizes();
 
 		final ListSelectionModel selmodel = getSelectionModel();
 		final ListSelectionListener listener = new SelectionListener();
@@ -108,8 +94,6 @@ public class EditorEvents
 
 
 
-	//#######################################################################
-	//# Overrides for Base Class javax.swing.JTable
 	public void tableChanged(final TableModelEvent event)
 	{
 		super.tableChanged(event);
@@ -119,29 +103,12 @@ public class EditorEvents
 		if (row0 >= 0 && row1 >= 0) {
 			switch (event.getType()) {
 			case TableModelEvent.INSERT :
-				calculateHeight();
-				setPreferredSize(mPreferredSize);
-				revalidate();
-				break;
 			case TableModelEvent.DELETE :
-				calculateHeight();
-				if (row0 <= mLargestRow && mLargestRow <= row1) {
-					calculateWidth();
-				}
-				setPreferredSize(mPreferredSize);
+				final Dimension prefsize = getPreferredSize();
+				prefsize.height = calculateHeight();
+				setPreferredSize(prefsize);
+				setPreferredScrollableViewportSize(prefsize);
 				revalidate();
-				break;
-			case TableModelEvent.UPDATE :
-				final int oldwidth = mLargestRowWidth;
-				if (row0 <= mLargestRow && mLargestRow <= row1) {
-					calculateWidth();
-				} else {
-					calculateWidth(row0, row1);
-				}
-				if (oldwidth != mLargestRowWidth) {
-					setPreferredSize(mPreferredSize);
-					revalidate();
-				}
 				break;
 			default :
 				break;
@@ -172,6 +139,7 @@ public class EditorEvents
 			final Component comp = getEditorComponent();
 			final Rectangle bounds = comp.getBounds();
 			scrollRectToVisible(bounds);
+			comp.requestFocus();
 		}
 	}
 
@@ -191,41 +159,58 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Calculating Column Widths
-	private void calculateHeight()
+	/**
+	 * Set the table's preferred and minimum size by checking the space
+	 * needed for its contents.
+	 */
+	private void setPreferredSizes()
 	{
-		mPreferredSize.height = getRowCount() * getRowHeight();
+		final int height = calculateHeight();
+		final int width1 = calculateWidth1();
+
+		final TableColumn column0 = getColumnModel().getColumn(0);
+		column0.setMinWidth(MINCOLUMNWIDTH0);
+		column0.setPreferredWidth(COLUMNWIDTH0);
+		column0.setMaxWidth(COLUMNWIDTH0);
+		column0.setResizable(false);
+
+		final TableColumn column1 = getColumnModel().getColumn(1);
+		column1.setMinWidth(MINCOLUMNWIDTH1);
+		column1.setPreferredWidth(width1);
+
+		final int totalwidth = COLUMNWIDTH0 + width1;
+		final int minwidth = MINCOLUMNWIDTH0 + MINCOLUMNWIDTH1;
+		final Dimension prefsize = new Dimension(totalwidth, height);
+		final Dimension minsize = new Dimension(minwidth, 3 * getRowHeight());
+		setPreferredSize(prefsize);
+		setPreferredScrollableViewportSize(prefsize);
+		setMinimumSize(minsize);
 	}
 
 
-	private void calculateWidth()
+	private int calculateHeight()
 	{
-		final int rows = getRowCount();
-		mLargestRow = -1;
-		mLargestRowWidth = COLUMNWIDTH1;
-		calculateWidth(0, rows - 1);
+		return getRowCount() * getRowHeight();
 	}
 
 
-	private void calculateWidth(final int row0, final int row1)
+	private int calculateWidth1()
 	{
 		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
-		for (int row = row0; row <= row1; row++) {
+		final int rows = getRowCount();
+		int maxwidth = COLUMNWIDTH1;
+		for (int row = 0; row < rows; row++) {
 			final Object value = mModel.getValueAt(row, 1);
 			final Component comp =
 				renderer.getTableCellRendererComponent
-				    (this, value, false, false, row, 1);
+				(this, value, false, false, row, 1);
 			final Dimension size = comp.getPreferredSize();
 			final int width = size.width;
-			if (width > mLargestRowWidth) {
-				mLargestRow = row;
-				mLargestRowWidth = width;
+			if (width > maxwidth) {
+				maxwidth = width;
 			}
 		}
-
-		final TableColumn column1 = getColumnModel().getColumn(1);
-		column1.setPreferredWidth(mLargestRowWidth);
-		column1.setMaxWidth(mLargestRowWidth);
-		mPreferredSize.width = COLUMNWIDTH0 + mLargestRowWidth;
+		return maxwidth;
 	}
 
 
@@ -361,10 +346,7 @@ public class EditorEvents
 	//#######################################################################
 	//# Data Members
 	private final EventTableModel mModel;
-	private final Dimension mPreferredSize;
 
-	private int mLargestRow;
-	private int mLargestRowWidth;
 	private IdentifierProxy mBuffer;
 
 
@@ -372,6 +354,8 @@ public class EditorEvents
 	//#######################################################################
 	//# Class Constants
 	private static final int COLUMNWIDTH0 = 24;
+	private static final int MINCOLUMNWIDTH0 = 20;
 	private static final int COLUMNWIDTH1 = 96;
+	private static final int MINCOLUMNWIDTH1 = 24;
 
 }
