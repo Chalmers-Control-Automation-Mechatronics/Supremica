@@ -62,6 +62,7 @@ public final class ExecutionDialog
 	extends JDialog
 	implements ActionListener, Runnable
 {
+	private static final long serialVersionUID = 1L;
 	private List threadsToStop;
 	private JPanel contentPanel = null;
 	private JLabel operationLabel = null;

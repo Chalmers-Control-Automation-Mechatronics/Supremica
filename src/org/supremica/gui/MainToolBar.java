@@ -14,6 +14,7 @@ import org.supremica.gui.useractions.*;
 public class MainToolBar
 	extends JToolBar
 {
+	private static final long serialVersionUID = 1L;
 	private static Supremica supremica;
 	private static final OpenAction openAction = new OpenAction();
 	private static final SaveAction saveAction = new SaveAction();

@@ -1487,6 +1487,8 @@ class EqClass
 class EquivalenceClassHolder
 	extends HashMap
 {
+	private static final long serialVersionUID = 1L;
+
 	public void addState(State state, EquivalenceClass nextClass)
 	{
 		// If the next equivalence class does not exist create it

@@ -10,6 +10,7 @@ import rpcdocdb.client.*;
 public class SupremicaRPCClientFrame
 	extends ClientFrame
 {
+	private static final long serialVersionUID = 1L;
 	private Supremica supremica;
 
 	public SupremicaRPCClientFrame(RPCDocClient client, String document, Supremica supremica)

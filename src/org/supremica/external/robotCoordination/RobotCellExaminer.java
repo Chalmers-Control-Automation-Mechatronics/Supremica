@@ -13,6 +13,7 @@ import org.supremica.external.robotCoordination.RobotStudioInterface;
 public class RobotCellExaminer
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(RobotCellExaminer.class);
 	private Frame owner = null;
 	private JPanel contentPane = null;

@@ -66,6 +66,7 @@ class SynthesizerDialogStandardPanel
 	extends SynthesizerPanel
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	private SynthesisSelector synthesisTypeBox;
 	private AlgorithmSelector algorithmTypeBox;
 	private JCheckBox purgeBox;
@@ -75,6 +76,8 @@ class SynthesizerDialogStandardPanel
 	static class AlgorithmSelector
 		extends JComboBox
 	{
+		private static final long serialVersionUID = 1L;
+
 		private AlgorithmSelector(Object[] array)
 		{
 			super(array);
@@ -113,6 +116,8 @@ class SynthesizerDialogStandardPanel
 	static class SynthesisSelector
 		extends JComboBox
 	{
+		private static final long serialVersionUID = 1L;
+
 		private SynthesisSelector()
 		{
 			super(SynthesisType.toArray());
@@ -137,6 +142,7 @@ class SynthesizerDialogStandardPanel
 	class NonblockNote
 		extends JTextArea
 	{
+		private static final long serialVersionUID = 1L;
 		private static final int transparent = 0;
 
 		public NonblockNote()
@@ -234,6 +240,7 @@ class SynthesizerDialogAdvancedPanel
 	extends SynthesizerPanel
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	private JCheckBox reduceSupervisorsBox;
 	private JCheckBox maximallyPermissiveBox;
 	private JCheckBox maximallyPermissiveIncrementalBox;

@@ -17,6 +17,7 @@ import org.supremica.util.SupremicaMenuItem;
 class MainPopupMenu
 	extends VPopupMenu
 {
+	private static final long serialVersionUID = 1L;
 	private MenuHandler menuHandler = null;
 
 	// local utilities
