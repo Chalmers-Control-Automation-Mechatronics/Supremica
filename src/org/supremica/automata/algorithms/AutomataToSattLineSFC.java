@@ -63,6 +63,8 @@ public class AutomataToSattLineSFC
 	private Automata automata;
 	private Automaton automaton;
 	private boolean debugMode = false;
+	private int transitionCounter = 0;
+	private int level = 0;
 
 
 	public AutomataToSattLineSFC(Automata automata)
@@ -165,111 +167,18 @@ public class AutomataToSattLineSFC
 
 
 			Automaton aut = (Automaton)automataIt.next();
+			aut.clearVisitedStates();
+			transitionCounter = 1;
 
 			// If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
 			// Won't check that for now ...
 			// Might want to parameterise COORD so that sequences are not drawn on top of each other.
 			pw.println("SEQUENCE " + aut.getName() + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
 
-
 			State initState = aut.getInitialState();
+			level = 0;
 			straightSequenceOutput(aut, initState, pw);
 
-/*			State destState = null;
-			State currState = initState;
-			int level = 0;
-			pw.println("SEQINITSTEP " + aut.getName() + "_" + initState.getName());
-			while (destState != initState && level == 0)
-			{
-				if (currState.nbrOfOutgoingArcs() > 1)
-				{
-					pw.println("ALTERNATIVESEQ");
-					level = level + 1;
-				}
-
-				boolean firstArc = true;
-
-				for (Iterator outgoingArcsIt = currState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
-				{
-					if (firstArc)
-					{
-						firstArc = false;
-					}
-					else
-					{
-						pw.println("ALTERNATIVEBRANCH");
-					}
-
-					Arc arc = (Arc)outgoingArcsIt.next();
-					Alphabet alpha = aut.getAlphabet();
-					try
-					{
-						Event event = alpha.getEventWithId(arc.getEventId());
-						pw.println("SEQTRANSITION " + aut.getName() + "_" + arc.getEventId() + " WAIT_FOR " + event.getLabel());
-					}
-					catch (Exception ex)
-					{
-						thisCategory.error("Failed getting event label. Code generation aborted.");
-						return;
-					}
-					// Depth first, should get next state here?
-					destState = arc.getToState();
-					if (destState != initState)
-					{
-						pw.println("SEQSTEP " + aut.getName() + "_" + destState.getName());
-					}
-				}
-				// temporary workaround
-				if (currState.nbrOfOutgoingArcs() > 1)
-				{
-					pw.println("ENDALTERNATIVE");
-					level = level - 1;
-				}
-
-			}
-*/
-/*			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
-			{
-				State sourceState = (State)stateIt.next();
-				if (sourceState.isInitial())
-				{
-					pw.println("SEQINITSTEP " + aut.getName() + "_" + sourceState.getName());
-				}
-				else
-				{
-					pw.println("SEQSTEP " + aut.getName() + "_" + sourceState.getName());
-				}
-
-				for (Iterator outgoingArcsIt = sourceState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
-				{
-					Arc arc = (Arc)outgoingArcsIt.next();
-					if (sourceState.nbrOfOutgoingArcs() == 1)
-					{
-						Alphabet alpha = aut.getAlphabet();
-						try
-						{
-							Event event = alpha.getEventWithId(arc.getEventId());
-							pw.println("SEQTRANSITION " + aut.getName() + "_" + arc.getEventId() + " WAIT_FOR " + event.getLabel());
-						}
-						catch (Exception ex)
-						{
-							return;
-						}
-
-					}
-					else
-					{
-						// It is easy to know when ALT.. starts, but not when it ends.
-						// Easy way out is to fork. Ugly as hell, but will probably work.
-						/*
-						pw.println("ALTERNATIVESEQ");
-						pw.println("ENDALTERNATIVE");
-						State destState = arc.getToState();
-
-					}
-				}
-			}
-*/
 			pw.println("ENDSEQUENCE\n\n");
 		}
 
@@ -307,16 +216,20 @@ public class AutomataToSattLineSFC
 	{
 
 		printStep(theAutomaton, theState, pw);
-
+		theState.setVisited(true);
+		int endAlternativeLevel = 0;
+		boolean alternativeEnded = false;
 		if (theState.nbrOfOutgoingArcs() > 1)
 		{
 			pw.println("ALTERNATIVESEQ");
-			//level = level + 1;
+			level = level + 1;
+			endAlternativeLevel = theState.nbrOfOutgoingArcs();
 		}
 
 		boolean firstArc = true;
 		for (Iterator outgoingArcsIt = theState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
 		{
+
 			if (firstArc)
 			{
 				firstArc = false;
@@ -324,21 +237,32 @@ public class AutomataToSattLineSFC
 			else
 			{
 				pw.println("ALTERNATIVEBRANCH");
+				endAlternativeLevel = endAlternativeLevel - 1;
+				thisCategory.info("endAlternativeLevel = " + endAlternativeLevel);
 			}
 
 			Arc arc = (Arc)outgoingArcsIt.next();
 			printTransition(theAutomaton, arc, pw);
 
+			// Forking logic should be placed here.
+
 			State nextState = arc.getToState();
-			// only straight sequences allowed as yet
-			if (!nextState.isInitial())
+			// only non-forking sequences allowed as yet
+			if (!nextState.isVisited())
 			{
 				straightSequenceOutput(theAutomaton, nextState, pw);
 			}
-			else
+			else if (endAlternativeLevel == 1)
 			{
-				// End of this subsequence
+				//pw.println("ENDALTERNATIVE"); // End of this subsequence
+				//alternativeEnded = true;
+				//thisCategory.info("EndAlternative");
 			}
+		}
+		if (endAlternativeLevel == 1 /* && !alternativeEnded */)
+		{
+			pw.println("ENDALTERNATIVE"); // End of this subsequence
+			thisCategory.info("EndAlternative");
 		}
 	}
 
@@ -346,11 +270,11 @@ public class AutomataToSattLineSFC
 	{
 		if (theState.isInitial())
 		{
-			pw.println("SEQINITSTEP " + theAutomaton.getName() + "_" + theState.getName());
+			pw.println("SEQINITSTEP " + theAutomaton.getName() + "_" + theState.getId());
 		}
 		else
 		{
-			pw.println("SEQSTEP " + theAutomaton.getName() + "_" + theState.getName());
+			pw.println("SEQSTEP " + theAutomaton.getName() + "_" + theState.getId());
 		}
 	}
 
@@ -360,7 +284,8 @@ public class AutomataToSattLineSFC
 		try
 		{
 			Event event = alpha.getEventWithId(theArc.getEventId());
-			pw.println("SEQTRANSITION " + theAutomaton.getName() + "_" + theArc.getEventId() + " WAIT_FOR " + event.getLabel());
+			pw.println("SEQTRANSITION " + theAutomaton.getName() + "_Tr" + transitionCounter + " WAIT_FOR " + event.getLabel());
+			transitionCounter = transitionCounter + 1;
 		}
 		catch (Exception ex)
 		{
