@@ -1231,22 +1231,6 @@ public class AutomataVerifier
 			throw ex;	
 		}
 		
-		/* VILL VETA HUR AUTOMATEN SER UT!!!
-		  //AutomataSynk.setName("SYNK" + AutomatonA.getName() + AutomatonB.getName());
-		  //theAutomata.addAutomaton(AutomataSynk);
-		  
-		  try
-		  {
-		  AutomatonViewer automataSynkView = new AutomatonViewer(AutomataSynk);			
-		  automataSynkView.run();
-		  //AutomatonExplorer automataSynkView = new AutomatonExplorer(null, AutomataSynk);			
-		  }
-		  catch (Exception ex)
-		  {
-		  logger.error("Tjoho, för fan. " + ex);
-		  }
-		*/
-		
 		return moduleIsNonblocking(AutomataSynk);
 	}
 
@@ -1278,11 +1262,15 @@ public class AutomataVerifier
 		State localInitialState;
 		Automaton currAutomaton;
 
+		int index=0;
 		while (autIt.hasNext())
 		{
 			currAutomaton = (Automaton) autIt.next();
 			localInitialState = currAutomaton.getInitialState();
-			initialState[currAutomaton.getIndex()] = localInitialState.getIndex();
+			// The automata have indexes corresponding to theAutomata, we ignore
+			// this by using the variable "index".
+			//currInitialState[currAutomaton.getIndex()] = localInitialState.getIndex();
+			currInitialState[index++] = localInitialState.getIndex();
 		}
 
 		// Initialize new synchHelper and move the excecutionDialog to the new helper...
@@ -1346,7 +1334,6 @@ public class AutomataVerifier
 		return AutomataSynk;
 	}
 
-
 	/**
 	 * Examines non-blocking monolithically, by examining all reachable states.
 	 * Lots and lots of work for big systems.
@@ -1366,7 +1353,6 @@ public class AutomataVerifier
 		while (stateIterator.hasNext())
 		{
 			currState = (State) stateIterator.next();
-
 			if (currState.isAccepting())
 			{
 				statesToExamine.add(currState);
@@ -1393,7 +1379,7 @@ public class AutomataVerifier
 
 			theAutomaton.removeState(examinedState);
 		}
-
+		
 		stateIterator = theAutomaton.stateIterator();
 
 		while (stateIterator.hasNext())

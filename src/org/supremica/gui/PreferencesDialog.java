@@ -163,7 +163,7 @@ public class PreferencesDialog
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
 		theSynchronizationPanel.update();
-                theSoftPLCPanel.update();
+		theSoftPLCPanel.update();
 	}
 
 	private boolean setAttributes()
@@ -244,23 +244,18 @@ class FilePanel
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
-
 		add(propertiesBox, BorderLayout.CENTER);
 
 		JLabel fileOpenPathLabel = new JLabel("File open path");
-
 		propertiesBox.add(fileOpenPathLabel);
 
 		fileOpenPath = new JTextField();
-
 		propertiesBox.add(fileOpenPath);
 
 		JLabel fileSavePathLabel = new JLabel("File save path");
-
 		propertiesBox.add(fileSavePathLabel);
 
 		fileSavePath = new JTextField();
-
 		propertiesBox.add(fileSavePath);
 	}
 
@@ -291,19 +286,15 @@ class CommunicationPanel
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
-
 		add(propertiesBox, BorderLayout.CENTER);
 
 		useXmlRpc = new JCheckBox("Run XML-RPC server");
-
 		propertiesBox.add(useXmlRpc);
 
 		JLabel xmlRpcPortLabel = new JLabel("Use port number");
-
 		propertiesBox.add(xmlRpcPortLabel);
 
 		xmlRpcPort = new JTextField();
-
 		propertiesBox.add(xmlRpcPort);
 	}
 
@@ -347,43 +338,33 @@ class LayoutPanel
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
-
 		add(propertiesBox, BorderLayout.CENTER);
 
 		dotLeftToRight = new JCheckBox("Layout from left to right");
-
 		propertiesBox.add(dotLeftToRight);
 
 		dotWithStateLabels = new JCheckBox("Draw state labels");
-
 		propertiesBox.add(dotWithStateLabels);
 
 		dotWithCircles = new JCheckBox("Draw states as circles");
-
 		propertiesBox.add(dotWithCircles);
 
 		dotUseColors = new JCheckBox("Draw with colors");
-
 		propertiesBox.add(dotUseColors);
 
 		dotUseMultipleLabels = new JCheckBox("Draw multiple labels");
-
 		propertiesBox.add(dotUseMultipleLabels);
 
 		JLabel dotCommandLabel = new JLabel("Dot command");
-
 		propertiesBox.add(dotCommandLabel);
 
-		dotCommand = new JTextField(20);
-
+		dotCommand = new JTextField();
 		propertiesBox.add(dotCommand);
 
 		JLabel dotMaxNbrOfStatesLabel = new JLabel("Maximum number of states without warning");
-
 		propertiesBox.add(dotMaxNbrOfStatesLabel);
 
-		dotMaxNbrOfStates = new JTextField(20);
-
+		dotMaxNbrOfStates = new JTextField();
 		propertiesBox.add(dotMaxNbrOfStates);
 	}
 
@@ -395,7 +376,7 @@ class LayoutPanel
 		SupremicaProperties.setDotUseColors(dotUseColors.isSelected());
 		SupremicaProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
 		SupremicaProperties.setDotExecuteCommand(dotCommand.getText());
-
+		
 		int maxNbrOfStates = theDialog.getInt("Max number of states without warning", dotMaxNbrOfStates.getText(), 0);
 
 		if (maxNbrOfStates == Integer.MIN_VALUE)
@@ -436,39 +417,30 @@ class SynchronizationPropertiesPanel
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
-
 		add(propertiesBox, BorderLayout.CENTER);
 
 		forbidUncontrollableStates = new JCheckBox("Forbid uncontrollable states");
-
 		propertiesBox.add(forbidUncontrollableStates);
 
 		expandForbiddenStates = new JCheckBox("Expand forbidden states");
-
 		propertiesBox.add(expandForbiddenStates);
 
 		expandHashtable = new JCheckBox("Expand hashtable");
-
 		propertiesBox.add(expandHashtable);
 
 		verboseMode = new JCheckBox("Verbose mode");
-
 		propertiesBox.add(verboseMode);
 
 		JLabel hashtableSizeLabel = new JLabel("Initial size of the hashtable");
-
 		propertiesBox.add(hashtableSizeLabel);
 
 		hashtableSize = new JTextField();
-
 		propertiesBox.add(hashtableSize);
 
 		JLabel nbrOfExecutersLabel = new JLabel("Nbr of threads");
-
 		propertiesBox.add(nbrOfExecutersLabel);
 
 		nbrOfExecuters = new JTextField();
-
 		propertiesBox.add(nbrOfExecuters);
 	}
 

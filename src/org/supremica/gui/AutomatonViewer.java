@@ -700,6 +700,9 @@ public class AutomatonViewer
 			return;
 		}
 
+		// Suggest a reasonable filename based on the name of the automaton...
+		fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" +  theAutomaton.getName() + "." + selectedValue));
+
 		if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = fileExporter.getSelectedFile();

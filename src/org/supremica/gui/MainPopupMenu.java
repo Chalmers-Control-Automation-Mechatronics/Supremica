@@ -378,6 +378,7 @@ class MainPopupMenu
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataCrop_actionPerformed(getGui());
+				ActionMan.selectAll_actionPerformed(getGui());
 				getGui().repaint();
 			}
 		});
