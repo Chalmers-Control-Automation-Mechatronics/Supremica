@@ -13,7 +13,7 @@ public class AutomataSimplifier
 
 	/**
 	 * transform an automata to something with equal behaviour, but simpler structure
-	 * @retruns a modified automata that behaves like the input.
+	 * @return a modified automata that behaves like the input.
 	 */
 	public static Automata simplify(Automata org)
 		throws Exception

@@ -209,7 +209,7 @@ public class Supervisor
 	 *
 	 * @param tmp_v temporary int vector (size of the events)
 	 * @param are_local true if that event is local
-	 * @returns the number of local events
+	 * @return the number of local events
 	 */
 	public int getLocalEvents(int[] tmp_v, boolean[] are_local)
 	{
@@ -341,7 +341,7 @@ public class Supervisor
 	/**
 	 * <b>Reachable</b> counterexamples to the language inclusions check
 	 * <br>
-	 * @retruns a BDD for states that fail the test (see also below)
+	 * @return a BDD for states that fail the test (see also below)
 	 */
 	public int computeReachableLanguageDifference()
 	{

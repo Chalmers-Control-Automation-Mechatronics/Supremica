@@ -16,7 +16,7 @@ public class AutomataBDDVerifier
 	 * creates a verification object
 	 * depeding one the type of algorithm used, this call might take a while
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
-	 * @see cleanup()
+	 * @see #cleanup()
 	 */
 	public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata)
 		throws Exception
@@ -44,7 +44,7 @@ public class AutomataBDDVerifier
 	 * depeding one the family of the reachability algorithm used, this call might take a while
 	 *
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
-	 * @see cleanup()
+	 * @see #cleanup()
 	 */
 	public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata, org.supremica.automata.Alphabet alphabet)
 		throws Exception
@@ -70,7 +70,7 @@ public class AutomataBDDVerifier
 	 * creates a verification object for LANGUAGE INCLUSION test.
 	 * depeding one the type of algorithm used, this call might take a while
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
-	 * @see cleanup()
+	 * @see #cleanup()
 	 */
 	public AutomataBDDVerifier(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected)
 		throws Exception

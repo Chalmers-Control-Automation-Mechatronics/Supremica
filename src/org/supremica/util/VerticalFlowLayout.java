@@ -4,8 +4,8 @@
 
 /*===========================================================================
  $Workfile:   VerticalFlowLayout.java  $
- $Revision: 1.4 $
- $Date: 2004-06-11 21:12:52 $
+ $Revision: 1.5 $
+ $Date: 2005-02-10 04:35:58 $
 
  (C) Unpublished Copyright of Novell, Inc.  All Rights Reserved.
 
@@ -666,7 +666,7 @@ public class VerticalFlowLayout
 	 * Set the left external horizontal padding.  This is the space
 	 * between the widest component in the column and the edge.
 	 *
-	 * @param Left external horizontal padding.
+	 * @param padding Left external horizontal padding.
 	 */
 	public void setExternalPadLeft(int padding)
 	{
@@ -677,7 +677,7 @@ public class VerticalFlowLayout
 	 * Set the right external horizontal padding.  This is the space
 	 * between the widest component in the column and the edge.
 	 *
-	 * @param Right external horizontal padding.
+	 * @param padding Right external horizontal padding.
 	 */
 	public void setExternalPadRight(int padding)
 	{
@@ -688,7 +688,7 @@ public class VerticalFlowLayout
 	 * Set the top external vertical padding.  This is the space
 	 * between the top and the top edge.
 	 *
-	 * @param Top external vertical padding.
+	 * @param padding Top external vertical padding.
 	 */
 	public void setExternalPadTop(int padding)
 	{
@@ -699,7 +699,7 @@ public class VerticalFlowLayout
 	 * Set the bottom external vertical padding.  This is the space
 	 * between the bottom and the bottom edge.
 	 *
-	 * @param Bottom external vertical padding.
+	 * @param padding Bottom external vertical padding.
 	 */
 	public void setExternalPadBottom(int padding)
 	{

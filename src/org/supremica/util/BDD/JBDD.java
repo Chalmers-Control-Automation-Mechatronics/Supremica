@@ -95,8 +95,10 @@ class JBDD
 		this(DEFAULT_VAR_COUNT, DEFAULT_NODE_COUNT);
 	}
 
-	/** Create the BDD object using the default node count and the given number of variables
-		@param vars maximum number of BDD variables to be used */
+	/** 
+	 * Create the BDD object using the default node count and the given number of variables
+	 * @param vars maximum number of BDD variables to be used 
+	 */
 	public JBDD(int vars)
 	{
 		this(vars, DEFAULT_NODE_COUNT);
@@ -127,12 +129,13 @@ class JBDD
 	public native int getOne();
 
 	/** get the BDD constant 0
-@return BDD for constant 0 */
+		@return BDD for constant 0 */
 	public native int getZero();
 
-	/** create a new BDD variable
-@return new BDD variable
-*/
+	/** 
+	 * create a new BDD variable
+	 * @return new BDD variable
+	 */
 	public native int createBDD();
 
 	/** get number of BDD variables currently in the system
@@ -315,9 +318,8 @@ class JBDD
 	compute the <i>generalized cofactor</i> of <i>f</i> with respect to <i>c</i>.<br>
 	See Coudert and Madres paper "A Unified Framework for..." for more info.<br>
 	Note: the returned result is already referenced.<br>
-	@param r BDD to be restricted
+	@param f BDD to be restricted
 	@param c the minterm BDD
-	@param quant_cube the variables to be quantified.
 	*/
 	public native int constrain(int f, int c);
 

@@ -71,7 +71,6 @@ public class BallProcessHelper
 	/**
 	 * Helper functions for producing SattLine Code for the Ball Process
 	 *
-	 * @returns Nothing
 	 * @param pw does this and that
 	 * @see org.supremica.gui.Supremica
 	 */

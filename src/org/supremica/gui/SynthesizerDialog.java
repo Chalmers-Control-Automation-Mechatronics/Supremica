@@ -350,7 +350,7 @@ public class SynthesizerDialog
 
 	/**
 	 * Updates the information in the dialog from what is recorded in SynthesizerOptions.
-	 * @see SynchesizerOptions
+	 * @see SynthesizerOptions
 	 */
 	public void update()
 	{

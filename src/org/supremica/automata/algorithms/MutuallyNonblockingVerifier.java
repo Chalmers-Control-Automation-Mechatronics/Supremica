@@ -758,7 +758,7 @@ public class MutuallyNonblockingVerifier
 	 * Removes as many as possible of the transitions with uniqueEvents, but avoids nondeterminism and
 	 * destroying the local stateset of the "first automaton"...
 	 *
-	 * @returns Amount of removed transitions
+	 * @return Amount of removed transitions
 	 */
 	private int removeUniqueEventTransitions(Automaton automaton, Alphabet alpha)
 	{
@@ -989,7 +989,7 @@ public class MutuallyNonblockingVerifier
 	 * theAutomata that this method will fiddle with a lot, you should NOT pass
 	 * theAutomata as an argument instead of theAutomataCopy (a deep copy of theAutomata).
 	 *
-	 * @see buildSafeEvents()
+	 * @see #buildSafeEvents()
 	 */
 	private void buildSafeEvents(Automaton currAutomaton, Automata theAutomataCopy)
 	{

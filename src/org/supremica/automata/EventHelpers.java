@@ -57,8 +57,8 @@ import org.supremica.log.*;
  * A collection of useful methods for manipulating Event.
  *
  *@author  ka
- *@created  November 28, 2001
- *@see  org.supremica.automata.Event
+ *@since  November 28, 2001
+ *@see  org.supremica.automata.LabeledEvent
  */
 public class EventHelpers
 {
@@ -67,16 +67,15 @@ public class EventHelpers
 	/**
 	 * Creates a new event from a set of events
 	 *
-	 *@param  eventSet Description of the Parameter
-	 *@param  prefix ??? Never used, what was it good for ???
-	 *@return  Description of the Return Value
-	 *@exception  IllegalArgumentException Description of the Exception
-	 *@exception  Exception Description of the Exception
+	 * @param  eventSet Description of the Parameter
+	 * @return  Description of the Return Value
+	 * @exception  IllegalArgumentException Description of the Exception
+	 * @exception  Exception Description of the Exception
 	 */
-	private static LabeledEvent createEvent(EventsSet eventSet)    // , String prefix)
+	private static LabeledEvent createEvent(EventsSet eventSet)
 		throws IllegalArgumentException, Exception
 	{
-		return createEvent(eventSet, /* prefix,*/ true, true);
+		return createEvent(eventSet, true, true);
 	}
 
 	/**

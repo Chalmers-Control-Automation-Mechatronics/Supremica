@@ -70,7 +70,7 @@ public class RobotStudioInterface
     public static class RSRobotCell
 		implements RobotCell, DAppEvents
     {
-		/** The active RopbotStudio station. */
+		/** The active RobotStudio station. */
 		private static Station station = null;
 		private Part zones;
 
@@ -153,7 +153,7 @@ public class RobotStudioInterface
 		 * Returns true if an application is already running, false otherwise.
 		 * if quit() worked as it should, we could simply check if (app == null).
 		 *
-		 * @see quit()
+		 * @see #quit()
 		 */
 		private boolean applicationIsRunning()
 		{
@@ -1117,7 +1117,7 @@ public class RobotStudioInterface
 			/**
 			 * Function used to check if the robot collides with some object
 			 * (before the simulation starts).
-			 *@returns true if robot and object are intersecting at their current
+			 * @return true if robot and object are intersecting at their current
 			 * position, false otherwise
 			 */
 			private boolean entityCollidesWith(IMechanism robot, IEntity object)

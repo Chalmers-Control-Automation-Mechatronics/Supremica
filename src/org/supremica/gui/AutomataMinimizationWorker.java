@@ -62,8 +62,8 @@ import org.supremica.util.ActionTimer;
 /**
  * Thread dealing with minimization.
  *
- *@author  hugo
- *@created  November 11, 2004
+ *@author hugo
+ *@since November 11, 2004
  */
 public class AutomataMinimizationWorker
 	extends Thread

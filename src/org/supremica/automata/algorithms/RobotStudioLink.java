@@ -575,7 +575,7 @@ End Sub
 	 * This automata will be a simple linear loop... alternatives
 	 * are not an option in RobotStudio... for the moment
 	 *
-	 * @returns Automaton describing the mechanism movement
+	 * @return Automaton describing the mechanism movement
 	 */
 	private static Automaton buildAutomaton(IMechanism mechanism)
 		throws Exception
@@ -904,7 +904,7 @@ End Sub
 	/**
 	 * Creates transparent box (intended to be a mutual exclusion volume).
 	 *
-	 * @par name The name the mutexbox
+	 * @param name The name the mutexbox
 	 */
 	private static void createBox(double tx, double ty, double tz, double rx, double ry, double rz, double wx, double wy, double wz, String name)
 		throws Exception

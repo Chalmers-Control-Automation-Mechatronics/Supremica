@@ -371,7 +371,7 @@ public class ConjSupervisor
 	 * it has to do with the dont-cares. This operators usually returns significantly smaller BDDs [implicit care-set optimization ??]
 	 *
 	 *
-	 * @see Supervisor.possibleLanguageContainmentCounterexample
+	 * @see Supervisor#possibleLanguageContainmentCounterexample(int, boolean)
 	 */
 	protected int possibleLanguageContainmentCounterexample(int considred_events, boolean remove_events)
 	{

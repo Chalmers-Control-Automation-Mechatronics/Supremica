@@ -52,7 +52,7 @@ public class BaseLI
 	 * creates a verification object for LANGUAGE INCLUSION test.
 	 * depeding one the type of algorithm used, this call might take a while
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
-	 * @see cleanup()
+	 * @see #cleanup()
  */
 	public BaseLI(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected)
 		throws Exception
@@ -98,7 +98,7 @@ public class BaseLI
 	 * creates a verification object for CONTROLLABILITY test.
 	 * depeding one the type of algorithm used, this call might take a while
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
-	 * @see cleanup()
+	 * @see #cleanup()
 	 */
 	public BaseLI(org.supremica.automata.Automata theAutomata)
 		throws Exception

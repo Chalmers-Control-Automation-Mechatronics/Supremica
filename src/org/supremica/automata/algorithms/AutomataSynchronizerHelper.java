@@ -67,7 +67,7 @@ import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
  * Contains information that is common to all synchronization threads.
  *
  *@author  ka
- *@created  November 28, 2001
+ *@since  November 28, 2001
  */
 public final class AutomataSynchronizerHelper
 {
@@ -162,7 +162,6 @@ public final class AutomataSynchronizerHelper
 	 * Automaton-Objects.
 	 *
 	 *@param  orgHelper The old helper to collect information from
-	 *@see  AutomataVerificationOptions#findUncontrollableStates(int[])
 	 */
 	public AutomataSynchronizerHelper(AutomataSynchronizerHelper orgHelper)
 		throws Exception
@@ -351,10 +350,9 @@ public final class AutomataSynchronizerHelper
 	 * If it exists then find it.
 	 * Insert the arc.
 	 *
-	 *@param fromState The feature to be added to the State attribute
-	 *@param toState The feature to be added to the State attribute
-	 *@param eventIndex The feature to be added to the State attribute
-	 *@exception  Exception Description of the Exception
+	 * @param fromState The feature to be added to the State attribute
+	 * @param toState The feature to be added to the State attribute
+	 * @exception  Exception Description of the Exception
 	 */
 	public void addState(int[] fromState, int[] toState)
 		throws Exception

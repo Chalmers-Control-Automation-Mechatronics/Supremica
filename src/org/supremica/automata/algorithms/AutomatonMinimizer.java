@@ -969,7 +969,7 @@ public class AutomatonMinimizer
 				int countA = 0;
 				if (options.getUseRuleA())
 				{
-					countA = ruleA(aut);
+					countA = ruleAA(aut);
 					totalA += countA;
 				}
 				if (countA > 0)
@@ -2309,8 +2309,8 @@ class EqClass
 /**
  * Temporary help object for storing new equivalence classes.
  *
- *@author  ka
- *@created  November 28, 2001
+ * @author  ka
+ * @since  November 28, 2001
  */
 class EquivalenceClassHolder
 	extends HashMap

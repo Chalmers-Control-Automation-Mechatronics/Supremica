@@ -117,7 +117,6 @@ public class Timers
 	 * it's timeout event. An event can not
 	 * be a timeout event to more than one timer.
 	 * @param event The timeout event
-	 * @return
 	 */
 	public EventTimer getTimerWithTimeoutEvent(LabeledEvent event)
 	{
@@ -146,7 +145,6 @@ public class Timers
 	 * this event as start event. An event can be
 	 * startevent to more than one timer.
 	 * @param theEvent
-	 * @return
 	 */
 	public Iterator iteratorWithStartEvent(LabeledEvent theEvent)
 	{

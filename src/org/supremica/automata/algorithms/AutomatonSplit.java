@@ -133,7 +133,7 @@ public class AutomatonSplit
 	 *
 	 * @param supervisor The supervisor to be reduced.
 	 * @param parents The automata that were used to generate the supervisor.
-	 * @returns The reduced supervisor.
+	 * @return The reduced supervisor.
 	 */
 	public static Automaton reduceAutomaton(Automaton supervisor, Automata parents)
 	{

@@ -52,7 +52,7 @@ public class AutomataCommunicationHelper
 	 * that is, retrun all the automata that interact with selected (including itself) and
 	 * leave the rest.
 	 *
-	 * @retruns Vector of Automaton which is v, such that selected SUBSET-EQUAL v SUBSET-EQUAL all.
+	 * @return Vector of Automaton which is v, such that selected SUBSET-EQUAL v SUBSET-EQUAL all.
 	 */
 	public static Collection getMaximalComponent(Automata selected, Automata all)
 		throws Exception
@@ -106,7 +106,7 @@ public class AutomataCommunicationHelper
 	/**
 	 * splits the graph in the largest interacting components.
 	 *
-	 * @returns Vector of Automata whose alphabet share no common events
+	 * @return Vector of Automata whose alphabet share no common events
 	 */
 	public static Collection split(Automata all)
 		throws Exception

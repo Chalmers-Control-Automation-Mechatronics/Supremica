@@ -73,9 +73,8 @@ import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
  *
  *@author  ka
- *@created  November 28, 2001
+ *@since  November 28, 2001
  *@see  AutomataSynchronizer
- *@see  AutomataFastControllabilityCheck
  *@see  AutomataSynthesizer
  */
 public final class AutomataSynchronizerExecuter

@@ -64,8 +64,6 @@ public class NailNode
 	/**
 	 * A newly constructed StateNode is not usable until you've
 	 * called initialize().
-	 *
-	 *@param  theState Description of the Parameter
 	 */
 	public NailNode()
 	{

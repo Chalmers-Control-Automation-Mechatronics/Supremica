@@ -58,8 +58,8 @@ public class CompositeState
 	private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
 
 	/** The indices of the underlying states */
-
-//private int[] compositeIndices = null;
+	
+	//private int[] compositeIndices = null;
 
 	/** The costs corresponding to the underlying states */
 	private int[] compositeCosts = null;
@@ -91,7 +91,7 @@ public class CompositeState
 	{
 		this(id);
 
-//setOwnerAutomaton(ownerAutomaton);
+		//setOwnerAutomaton(ownerAutomaton);
 		initialize(indices, compositeAutomata);
 	}
 
@@ -112,7 +112,7 @@ public class CompositeState
 	}
 
 	/**
-	 *      Stores the underlying (non-composite) states.
+	 * Stores the underlying (non-composite) states.
 	 */
 	private void initComposingStates(State currState)
 	{
@@ -127,8 +127,8 @@ public class CompositeState
 	}
 
 	/**
-	 *      This method should only be called if the current state is initial in the
-	 *      composed automaton. The currentCosts are then set to composedCosts.
+	 * This method should only be called if the current state is initial in the
+	 * composed automaton. The currentCosts are then set to composedCosts.
 	 */
 	public void initCosts()
 	{
@@ -262,9 +262,9 @@ public class CompositeState
 	}
 
 	/**
-	 *      Calculates the automaton/a that fired the transition from to this state.
+	 * Calculates the automaton/a that fired the transition from to this state.
 	 *
-	 *      @param  CompositeState prevState - previously visited state
+	 * @param prevState CompositeState prevState - previously visited state
 	 */
 	public boolean[] getFiringAutomata(CompositeState prevState)
 	{

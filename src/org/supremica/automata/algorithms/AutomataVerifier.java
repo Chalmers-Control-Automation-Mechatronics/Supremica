@@ -71,9 +71,9 @@ import org.supremica.properties.SupremicaProperties;
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
  *
- *@author  ka
- *@created  November 28, 2001
- *@see  AutomataSynchronizerExecuter
+ * @author  ka
+ * @since  November 28, 2001
+ * @see  AutomataSynchronizerExecuter
  */
 public class AutomataVerifier
 	implements Stoppable
@@ -827,11 +827,11 @@ public class AutomataVerifier
 	/**
 	 * Finds similar automata and sorts these automata in a smart way...
 	 *
-	 *@param  selectedAutomata the selected automata in the current "composition".
-	 *@param  theAuomata reference to the global variable with the same name... eh...
+	 *@param selectedAutomata the selected automata in the current "composition".
+	 *@param theAutomata reference to the global variable with the same name... eh...
 	 *@return an int array with indexes of interesting automata in order of interesting interest.
-	 *@see  #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
-	 *@see  #excludeUncontrollableStates(int[], java.util.ArrayList, int[])
+	 *@see #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
+	 *@see #excludeUncontrollableStates(int[], org.supremica.automata.Automata, int[])
 	 */
 	private int[] findSimilarAutomata(Automata theAutomata, Automata selectedAutomata)
 		throws Exception
@@ -981,7 +981,7 @@ public class AutomataVerifier
 	 *@param  similarAutomata integer array with indices of automata with similar alphabets (from similarAutomata()).
 	 *@param  selectedAutomata The automata currently selected (the ones in the current "composition" plus perhaps some of the similar automata from earlier runs of this method).
 	 *@param  automataIndices integer array with indices of automata in the current "composition".
-	 *@see  #findSimilarAutomata(org.supremica.automata.Automata, java.util.ArrayList)
+	 *@see  #findSimilarAutomata(org.supremica.automata.Automata, org.supremica.automata.Automata)
 	 */
 	private void excludeUncontrollableStates(int[] similarAutomata, Automata selectedAutomata, int[] automataIndices)
 		throws Exception
@@ -1257,7 +1257,8 @@ public class AutomataVerifier
 	/**
 	 * Answers YES/NO to the language inclusion problem
 	 *
-	 *@see  BDDAutomata, AutomataBDDVerifier
+	 * @see org.supremica.util.BDD.BDDAutomata
+	 * @see AutomataBDDVerifier
 	 */
 	private boolean BDDLanguageInclusionVerification()
 		throws Exception
@@ -1321,8 +1322,9 @@ public class AutomataVerifier
 	/**
 	 * Answers YES/NO to the controllability problem
 	 *
-	 *@return  true if the system is controllable
-	 *@see  BDDAutomata, AutomataBDDVerifier
+	 * @return  true if the system is controllable
+	 * @see org.supremica.util.BDD.BDDAutomata
+	 * @see AutomataBDDVerifier
 	 */
 	private boolean BDDControllabilityVerification(Automata theAutomata)
 		throws Exception
@@ -1382,7 +1384,8 @@ public class AutomataVerifier
 	 * Answers YES/NO to the NONBLOCKING problem
 	 *
 	 *@return  true if the system is nonblocking
-	 *@see  BDDAutomata, AutomataBDDVerifier
+	 *@see org.supremica.util.BDD.BDDAutomata
+	 *@see AutomataBDDVerifier
 	 */
 	private boolean BDDNonblockingVerification()
 		throws Exception

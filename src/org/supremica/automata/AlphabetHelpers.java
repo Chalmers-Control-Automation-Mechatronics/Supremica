@@ -92,12 +92,11 @@ public class AlphabetHelpers
 	 * Adjust the Event attributes properly.
 	 *
 	 *@param  alphabets Description of the Parameter
-	 *@param  idPrefix Description of the Parameter
 	 *@return  The unionAlphabet value
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	private static Alphabet getUnionAlphabet(EventsSet alphabets, /* String idPrefix, */ boolean requireConsistentControllability, boolean requireConsistentImmediate)
+	private static Alphabet getUnionAlphabet(EventsSet alphabets, boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws IllegalArgumentException, Exception
 	{
 		if (alphabets.size() < 1)

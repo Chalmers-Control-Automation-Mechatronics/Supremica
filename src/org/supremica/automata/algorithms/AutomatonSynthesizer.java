@@ -59,7 +59,7 @@ import org.supremica.automata.algorithms.standard.ObserverBuilder;
  * A monolithic synthesizer that can handle non-blocking and controllability problems.
  *
  *@author  ka
- *@created  November 28, 2000
+ *@since  November 28, 2000
  */
 public class AutomatonSynthesizer
 	implements Stoppable
@@ -687,7 +687,7 @@ public class AutomatonSynthesizer
 	/**
 	 * Method that stops the synthesizer as soon as possible.
 	 *
-	 * @see  ExecutionDialog
+	 * @see org.supremica.gui.ExecutionDialog
 	 */
 	public void requestStop()
 	{

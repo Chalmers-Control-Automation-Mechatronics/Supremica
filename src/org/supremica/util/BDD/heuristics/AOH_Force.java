@@ -188,12 +188,9 @@ public class AOH_Force
 	 * one round of FORCE inner-loops
 	 *
 	 * assumes: card_e and card_Ev are computed, lv is the current order
-	 *
-	 * @returns the "cost" for the computed ordering
 	 */
-	private void force() {
-
-
+	private void force() 
+	{
 		// 1. compute COG in extra4
 		for(int i = 0; i < size; i++) {
 			Node n1 = nodes[i];

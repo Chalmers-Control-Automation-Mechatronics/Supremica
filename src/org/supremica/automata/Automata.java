@@ -292,7 +292,7 @@ public class Automata
 	 * in the automataMove_actionPerformed in ActionMan when
 	 * moving down
 	 *
-	 *@see ActionMan
+	 *@see org.supremica.gui.ActionMan
 	 */
 	public AutomatonIterator backwardsIterator()
 	{
@@ -1349,12 +1349,10 @@ public class Automata
 	 * @param gui If gui != null, a JOptionPane shows the results and guides the user.
 	 * @param minSize Minimum size of the automata.
 	 * @param mustHaveInitial Test requires automata to have initial states.
-	 * @param mustHaveType Test requires that the automata are not of undefined type.
+	 * @param mustHaveValidType Test requires that the automata are not of undefined type.
 	 * @param mustBeControllabilityConsistent Test requires that an event has the same
 	 * controllability status in all automata.
 	 * @param examineStructure Test examines whether there are disjoint parts in the system.
-	 * @param explicitly Examines and warns if there are disjoint sets of automata
-	 * (considering shared events)
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */

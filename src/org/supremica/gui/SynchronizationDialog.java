@@ -246,8 +246,8 @@ public class SynchronizationDialog
 	}
 
 	/**
-	 * Updates the information in the dialog from what is recorded in SynthesizerOptions.
-	 * @see SynchesizerOptions
+	 * Updates the information in the dialog from what is recorded in synchronizationOptions.
+	 * @see SynchronizationOptions
 	 */
 	public void update()
 	{

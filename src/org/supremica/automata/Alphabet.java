@@ -61,7 +61,7 @@ import org.supremica.log.*;
  * strange errors will arise.
  *
  *@author  ka
- *@created  November 28, 2001
+ *@since  November 28, 2001
  *@see  org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet

@@ -63,7 +63,7 @@ import org.supremica.util.ActionTimer;
  * Thread dealing with synthesis.
  *
  *@author  hugo
- *@created  November 18, 2004
+ *@since November 18, 2004
  */
 public class AutomataSynthesisWorker
 	extends Thread

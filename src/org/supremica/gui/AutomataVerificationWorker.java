@@ -61,8 +61,8 @@ import org.supremica.util.ActionTimer;
 /**
  * Thread dealing with verification.
  *
- *@author  ka
- *@created  November 28, 2001
+ * @author  ka
+ * @since November 28, 2001
  */
 public class AutomataVerificationWorker
 	extends Thread
