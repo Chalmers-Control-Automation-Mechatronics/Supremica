@@ -337,8 +337,9 @@ class CommunicationPanel
 {
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null;
-	private JTextField xmlRpcPort = null;
-	private JTextField xmlRpcFilter = null;
+	private JTextField xmlRpcPort, xmlRpcFilter;
+	private JTextField docdbHost, docdbPort, docdbUser, docdbDoc;
+
 
 	public CommunicationPanel(PreferencesDialog theDialog)
 	{
@@ -352,47 +353,69 @@ class CommunicationPanel
 		JPanel panel  = new JPanel( new GridLayout(5,1) );
 		add(panel, BorderLayout.WEST);
 
-
 		panel.add( tmp = new JLabel("XML-RPC", SwingConstants.LEFT)  );
 		tmp.setForeground(Color.blue);
 
-
 		panel.add( tmp = new JLabel("(must restart to take effect)", SwingConstants.CENTER)  );
-
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
 		add(propertiesBox, BorderLayout.CENTER);
 
-
 		panel.add(useXmlRpc = new JCheckBox("Run XML-RPC server") );
+		xmlRpcPort = add(panel, "Use port number ", 10);
+		xmlRpcFilter = add(panel, "Server IP filter ", 10);
 
 
-		panel.add( ptmp = new JPanel(new FlowLayout( FlowLayout.RIGHT) ) );
-		ptmp.add( new JLabel("Use port number ") );
-		ptmp.add( xmlRpcPort = new JTextField(10) );
+		panel  = new JPanel( new GridLayout(5,1) );
+		add(panel, BorderLayout.EAST);
 
+		panel.add( tmp = new JLabel("Document Database", SwingConstants.LEFT)  );
+		tmp.setForeground(Color.blue);
 
-
-		panel.add( ptmp = new JPanel(new FlowLayout( FlowLayout.RIGHT) ) );
-		ptmp.add( new JLabel("Server IP filter ") );
-		ptmp.add( xmlRpcFilter = new JTextField(10) );
+		docdbHost = add(panel, "Sever address", 10);
+		docdbPort = add(panel, "Server port ", 10);
+		docdbUser = add(panel, "Username", 10);
+		docdbDoc  = add(panel, "Default document", 10);
 	}
 
+	// ----------------------- helper funcs
+	private JTextField add(JPanel panel, String txt, int width)
+	{
+		JPanel ptmp = new JPanel(new FlowLayout( FlowLayout.RIGHT) ) ;
+		panel.add( ptmp );
+
+		ptmp.add( new JLabel(txt) );
+
+		JTextField tmp = new JTextField(10) ;
+		ptmp.add( tmp );
+
+		return tmp;
+	}
+
+	// -----------------------
 	public boolean doApply()
 	{
 
 		int port = PreferencesDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
+		int port2 = PreferencesDialog.getInt("Remote document server port", docdbPort.getText(), 1);
 
-		if (port == Integer.MIN_VALUE)
+		if (port == Integer.MIN_VALUE || port2 == Integer.MIN_VALUE )
 		{
 			return false;
 		}
 
+
+
 		SupremicaProperties.setXmlRpcPort(port);
-
 		SupremicaProperties.setXmlRpcFilter(xmlRpcFilter.getText());
-
 		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
+
+
+		SupremicaProperties.setDocDBHost(docdbHost.getText());
+		SupremicaProperties.setDocDBPort(port2);
+		SupremicaProperties.setDocDBUsername(docdbUser.getText());
+		SupremicaProperties.setDocDBDocument(docdbDoc.getText());
+
 
 		return true;
 	}
@@ -402,6 +425,11 @@ class CommunicationPanel
 		useXmlRpc.setSelected(SupremicaProperties.isXmlRpcActive());
 		xmlRpcPort.setText(Integer.toString(SupremicaProperties.getXmlRpcPort()));
 		xmlRpcFilter.setText(SupremicaProperties.getXmlRpcFilter() );
+
+		docdbPort.setText("" + SupremicaProperties.getDocDBPort() );
+		docdbHost.setText(SupremicaProperties.getDocDBHost() );
+		docdbUser.setText(SupremicaProperties.getDocDBUsername() );
+		docdbDoc.setText(SupremicaProperties.getDocDBDocument() );
 	}
 }
 
@@ -892,7 +920,7 @@ class BDDPanel2
 
 		JLabel tmp;
 
-		pTopLeft.add( tmp = new JLabel("Automata --> BDD conversion", SwingConstants.LEFT)  );
+		pTopLeft.add( tmp = new JLabel("Automata to BDD conversion", SwingConstants.LEFT)  );
 		tmp.setForeground(Color.blue);
 
 		JPanel pOrdering = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
