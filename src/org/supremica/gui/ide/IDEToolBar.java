@@ -17,6 +17,7 @@ public class IDEToolBar
 		setRollover(true);
 		setFloatable(false);
 
+		add(ide.getActions().newAction);
 		add(ide.getActions().openAction);
 		add(ide.getActions().saveAction);
 

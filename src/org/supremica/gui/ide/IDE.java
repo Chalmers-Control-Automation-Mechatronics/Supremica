@@ -32,12 +32,13 @@ public class IDE
 
 	private LinkedList modules = new LinkedList();
 
+	private final String ideName = "Supremica with Waters";
 	private int newModuleCounter = 1;
 
     public IDE()
     {
 		Utility.setupFrame(this, 900, 700);
-		setTitle("Supremica with Waters");
+		setTitle(ideName);
 
 		contentPanel = (JPanel)getContentPane();
 		contentLayout = new BorderLayout();
@@ -118,6 +119,7 @@ public class IDE
 	public void add(ModuleProxy module)
 	{
 		modules.addFirst(module);
+		setActiveModule(module);
 	}
 
 	public void remove(ModuleProxy module)
@@ -127,8 +129,12 @@ public class IDE
 
 	public void setActiveModule(ModuleProxy module)
 	{
-		remove(module);
-		add(module);
+		if (getActiveModule() != module)
+		{
+			remove(module);
+			add(module);
+		}
+		setTitle(ideName + " [" + module.getName() + "]");
 	}
 
 	public ModuleProxy getActiveModule()

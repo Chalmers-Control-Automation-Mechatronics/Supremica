@@ -7,6 +7,7 @@ public class Actions
 {
 	private IDE ide;
 
+	public NewAction newAction;
 	public OpenAction openAction;
 	public SaveAction saveAction;
 	public ExitAction exitAction;
@@ -16,6 +17,7 @@ public class Actions
 	{
 		this.ide = ide;
 
+		newAction = new NewAction(ide);
 		openAction = new OpenAction(ide);
 		saveAction = new SaveAction(ide);
 		exitAction = new ExitAction(ide);

@@ -29,6 +29,7 @@ public class IDEMenuBar
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		add(menuFile);
 
+		menuFile.add(new JMenuItem(ide.getActions().newAction));
 		menuFile.add(new JMenuItem(ide.getActions().openAction));
 		menuFile.add(new JMenuItem(ide.getActions().saveAction));
 
