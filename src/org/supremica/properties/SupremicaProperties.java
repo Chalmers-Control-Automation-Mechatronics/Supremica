@@ -113,52 +113,98 @@ public final class SupremicaProperties
 	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
+
+	private Set forbidExternalModification = new HashSet();
+
 	private static final SupremicaProperties wp = new SupremicaProperties();
 
 	private SupremicaProperties()
 	{
-		setProperty(FILE_OPEN_PATH, "../examples/");
-		setProperty(FILE_SAVE_PATH, ".");
-		setProperty(FILE_ALLOW_OPEN, "true");
-		setProperty(FILE_ALLOW_SAVE, "true");
-		setProperty(FILE_ALLOW_IMPORT, "true");
-		setProperty(FILE_ALLOW_EXPORT, "true");
-		setProperty(FILE_ALLOW_QUIT, "true");
-		setProperty(XML_RPC_ACTIVE, "false");
-		setProperty(XML_RPC_PORT, "9112");
-		setProperty(DOT_USE, "true");
-		setProperty(DOT_EXECUTE_COMMAND, "dot");
-		setProperty(DOT_MAX_NBR_OF_STATES, "40");
-		setProperty(DOT_LEFT_TO_RIGHT, "false");
-		setProperty(DOT_WITH_STATE_LABELS, "true");
-		setProperty(DOT_WITH_CIRCLES, "false");
-		setProperty(DOT_USE_COLORS, "true");
-		setProperty(DOT_USE_MULTI_LABELS, "true");
-		setProperty(DOT_AUTOMATIC_UPDATE, "true");
-		setProperty(INCLUDE_EDITOR, "true");
-		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false");
-		setProperty(VERBOSE_MODE, "false");
-		setProperty(SUPERUSER_IDENTITY, "ESS030");
-		setProperty(LOG_TO_CONSOLE, "false");
-		setProperty(LOG_TO_GUI, "false");
-		setProperty(ALLOW_SUPERUSER_LOGIN, "true");
-		setProperty(SYNC_FORBID_UNCON_STATES, "true");
-		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true");
-		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1));
-		setProperty(SYNC_EXPAND_HASHTABLE, "true");
-		setProperty(SYNC_NBR_OF_EXECUTERS, "1");
-		setProperty(VERIFY_VERIFICATION_TYPE, "0");
-		setProperty(VERIFY_ALGORITHM_TYPE, "0");
-		setProperty(VERIFY_EXCLUSION_STATE_LIMIT, "1000");
-		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000");
-		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false");
-		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false");
-		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Controllable.toString());
-		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Modular.toString());
-		setProperty(SYNTHESIS_PURGE, "true");
-		setProperty(SYNTHESIS_OPTIMIZE, "true");
-		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true");
-		setProperty(GENERAL_USE_SECURITY, "false");
+		setProperty(FILE_OPEN_PATH, "../examples/", true);
+		setProperty(FILE_SAVE_PATH, ".", true);
+		setProperty(FILE_ALLOW_OPEN, "true", true);
+		setProperty(FILE_ALLOW_SAVE, "true", true);
+		setProperty(FILE_ALLOW_IMPORT, "true", true);
+		setProperty(FILE_ALLOW_EXPORT, "true", true);
+		setProperty(FILE_ALLOW_QUIT, "true", true);
+		setProperty(XML_RPC_ACTIVE, "false", true);
+		setProperty(XML_RPC_PORT, "9112", true);
+		setProperty(DOT_USE, "true", true);
+		setProperty(DOT_EXECUTE_COMMAND, "dot", true);
+		setProperty(DOT_MAX_NBR_OF_STATES, "40", true);
+		setProperty(DOT_LEFT_TO_RIGHT, "false", true);
+		setProperty(DOT_WITH_STATE_LABELS, "true", true);
+		setProperty(DOT_WITH_CIRCLES, "false", true);
+		setProperty(DOT_USE_COLORS, "true", true);
+		setProperty(DOT_USE_MULTI_LABELS, "true", true);
+		setProperty(DOT_AUTOMATIC_UPDATE, "true", true);
+		setProperty(INCLUDE_EDITOR, "true", true);
+		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
+		setProperty(VERBOSE_MODE, "false", true);
+		setProperty(SUPERUSER_IDENTITY, "ESS030", false);
+		setProperty(LOG_TO_CONSOLE, "false", true);
+		setProperty(LOG_TO_GUI, "false", true);
+		setProperty(ALLOW_SUPERUSER_LOGIN, "true", false);
+		setProperty(SYNC_FORBID_UNCON_STATES, "true", true);
+		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true", true);
+		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1), true);
+		setProperty(SYNC_EXPAND_HASHTABLE, "true", true);
+		setProperty(SYNC_NBR_OF_EXECUTERS, "1", true);
+		setProperty(VERIFY_VERIFICATION_TYPE, "0", true);
+		setProperty(VERIFY_ALGORITHM_TYPE, "0", true);
+		setProperty(VERIFY_EXCLUSION_STATE_LIMIT, "1000", true);
+		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000", true);
+		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false", true);
+		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false", true);
+		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Controllable.toString(), true);
+		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Modular.toString(), true);
+		setProperty(SYNTHESIS_PURGE, "true", true);
+		setProperty(SYNTHESIS_OPTIMIZE, "true", true);
+		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
+		setProperty(GENERAL_USE_SECURITY, "false", false);
+	}
+
+
+	public static final void setProperties(File aFile)
+		throws Exception
+	{
+		FileInputStream fStream = new FileInputStream(aFile);
+		BufferedInputStream bStream = new BufferedInputStream(fStream);
+		setProperties(bStream);
+	}
+
+	public static final void setProperties(InputStream iStream)
+		throws Exception
+	{
+		Properties newProperties = new Properties();
+		newProperties.load(iStream);
+		setProperties(newProperties);
+	}
+
+	public static final void setProperties(Properties otherProperties)
+	{
+		for (Enumeration propEnum = otherProperties.propertyNames(); propEnum.hasMoreElements();)
+		{
+			String currKey = (String)propEnum.nextElement();
+			if (wp.allowExternalModification(currKey))
+			{
+				wp.setProperty(currKey, otherProperties.getProperty(currKey));
+			}
+		}
+	}
+
+	public boolean allowExternalModification(String key)
+	{
+		return !forbidExternalModification.contains(key.toLowerCase());
+	}
+
+	public void setProperty(String key, String value, boolean allowExternalModification)
+	{
+		setProperty(key, value);
+		if (!allowExternalModification)
+		{
+			forbidExternalModification.add(key.toLowerCase());
+		}
 	}
 
 	public static void load(String fileName)

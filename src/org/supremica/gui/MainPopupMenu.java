@@ -90,6 +90,11 @@ class MainPopupMenu
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
 
 		menuHandler.add(complementItem, 1);
+
+		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
+
+		menuHandler.add(interfaceItem, 1);
+
 		menuHandler.addSeparator();
 
 		if (SupremicaProperties.includeBoundedUnconTools())
@@ -302,6 +307,14 @@ class MainPopupMenu
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automatonMinimize_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
+		interfaceItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automatonUpdateInterface_actionPerformed(getGui());
 				getGui().repaint();
 			}
 		});

@@ -230,6 +230,50 @@ public class ActionMan
 		}
 	}
 
+	// Automaton.UpdateInterface action performed
+	public static void automatonUpdateInterface_actionPerformed(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+		if (selectedAutomata.size() > 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At most one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		Automaton theInterface = selectedAutomata.getAutomatonAt(0);
+		if (theInterface == null)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Could not find the interface!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
+		VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
+
+		UpdateInterface updateInterface = new UpdateInterface(gui.getFrame(), theProject, theInterface);
+
+		try
+		{
+			updateInterface.execute();
+		}
+		catch (Exception ex)
+		{
+
+			// logger.error(excp.toString());
+			gui.error(ex.toString());
+		}
+
+	}
+
 	// Automata.AddSelfLoopArcs action performed
 	public static void automataAddSelfLoopArcs_actionPerformed(Gui gui)
 	{

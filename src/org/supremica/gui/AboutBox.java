@@ -77,11 +77,10 @@ public class AboutBox
 	FlowLayout flowLayout2 = new FlowLayout();
 	GridLayout gridLayout1 = new GridLayout();
 	String product = "Supremica";
-	String version = new Version().toString();
-	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, Arash Vahidi 1999-2001";
+	String version = Version.version();
+	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, Arash Vahidi 1999-2002";
 	String comments = "";
 
-	// "Chalmers University of Technology, Sweden\nUniversity of Illinois at Urbana-Champaign, USA";
 	public AboutBox(Frame parent)
 	{
 		super(parent);

@@ -68,6 +68,11 @@ public class Automaton
 	private boolean hasLayout = false;
 	private int width = -1;
 	private int height = -1;
+
+	// master and slave automata are only valid if this automaton is an interface
+	private Automata masterAutomata = null;
+	private Automata slaveAutomata = null;
+
 	private AutomatonListeners listeners = null;
 
 	public Automaton()
@@ -77,6 +82,8 @@ public class Automaton
 		indexStateMap = new HashMap();
 		theStates = new LinkedList();
 		theArcs = new ArcSet();
+		masterAutomata = new Automata();
+		slaveAutomata = new Automata();
 	}
 
 	public Automaton(String name)
@@ -148,6 +155,26 @@ public class Automaton
 	public AutomatonType getType()
 	{
 		return type;
+	}
+
+	public boolean isSupervisor()
+	{
+		return type == AutomatonType.Supervisor;
+	}
+
+	public boolean isSpecification()
+	{
+		return type == AutomatonType.Specification;
+	}
+
+	public boolean isPlant()
+	{
+		return type == AutomatonType.Plant;
+	}
+
+	public boolean isInterface()
+	{
+		return type == AutomatonType.Interface;
 	}
 
 	public void setName(String name)
@@ -366,6 +393,45 @@ public class Automaton
 	public Iterator safeArcIterator()
 	{
 		return (new ArcSet(theArcs)).iterator();
+	}
+
+	/**
+	 * These are only valid if the automatonType is interface.
+	 */
+	public Automata getMasterAutomata()
+	{
+		return masterAutomata;
+	}
+
+	public Automata getSlaveAutomata()
+	{
+		return slaveAutomata;
+	}
+
+	public void purgeInterfaceAutomata(Automata validAutomata)
+	{
+		purgeInterfaceAutomata(masterAutomata, validAutomata);
+		purgeInterfaceAutomata(slaveAutomata, validAutomata);
+	}
+
+	private void purgeInterfaceAutomata(Automata currDependencies, Automata validAutomata)
+	{
+		List toBeRemoved = new ArrayList();
+
+		for (Iterator autIt = currDependencies.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			if (!validAutomata.containsAutomaton(currAutomaton))
+			{
+				toBeRemoved.add(currAutomaton);
+			}
+		}
+
+		for (Iterator autIt = toBeRemoved.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			currDependencies.removeAutomaton(currAutomaton);
+		}
 	}
 
 	/**

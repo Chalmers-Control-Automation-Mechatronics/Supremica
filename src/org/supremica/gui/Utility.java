@@ -36,10 +36,23 @@ public class Utility
 	{
 		pane.getViewport().setBackground(Color.white);
 	}
-	
+
+	static void setupDialog(JDialog dialog, int width, int height)
+	{
+		dialog.setSize(width, height);                 // from Component
+		dialog.setLocation(getPosForCenter(new Dimension(width, height)));    // from Component
+		// dialog.setIconImage(Supremica.cornerImage);    // from Frame
+	}
+
 	static JButton setDefaultButton(JFrame frame, JButton b)
 	{
 		frame.getRootPane().setDefaultButton(b);
+		return b;
+	}
+
+	static JButton setDefaultButton(JDialog dialog, JButton b)
+	{
+		dialog.getRootPane().setDefaultButton(b);
 		return b;
 	}
 }

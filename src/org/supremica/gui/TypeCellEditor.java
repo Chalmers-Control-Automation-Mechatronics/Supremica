@@ -94,7 +94,7 @@ class TypeCellEditor
 		TableColumn typeColumn = columnModel.getColumn(Supremica.TABLE_TYPE_COLUMN);
 		DefaultCellEditor cellEditor = new DefaultCellEditor(automatonTypeCombo);
 
-		cellEditor.setClickCountToStart(2);
+		cellEditor.setClickCountToStart(1);
 		typeColumn.setCellEditor(cellEditor);
 		cellEditor.addCellEditorListener(this);
 	}

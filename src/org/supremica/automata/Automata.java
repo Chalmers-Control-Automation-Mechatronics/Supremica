@@ -72,13 +72,45 @@ public class Automata
 		nameMap = new HashMap();
 	}
 
+	/**
+	 * Copy constructor that also makes a copy of all the automata
+	 * contained in oldAutomata. Calling this is equal to calling
+	 * Automata(oldAutomata, false)
+	 **/
 	public Automata(Automata oldAutomata)
 	{
-		this();
+		this(oldAutomata, false);
+	}
 
+	/**
+	 * Does not make a new copy of the contained automata.
+	 **/
+	public Automata(Automata oldAutomata, boolean shallowCopy)
+	{
+		this();
+		if (shallowCopy)
+		{
+			shallowAutomataCopy(oldAutomata);
+		}
+		else
+		{
+			deepAutomataCopy(oldAutomata);
+		}
+	}
+
+	private void deepAutomataCopy(Automata oldAutomata)
+	{
 		for (Iterator automataIterator = oldAutomata.iterator(); automataIterator.hasNext(); )
 		{
 			addAutomaton(new Automaton((Automaton) automataIterator.next()));
+		}
+	}
+
+	private void shallowAutomataCopy(Automata oldAutomata)
+	{
+		for (Iterator automataIterator = oldAutomata.iterator(); automataIterator.hasNext(); )
+		{
+			addAutomaton((Automaton) automataIterator.next());
 		}
 	}
 
@@ -181,6 +213,17 @@ public class Automata
 		return nameMap.containsKey(name);
 	}
 
+	public boolean containsAutomaton(Automaton otherAutomaton)
+	{
+		Automaton thisAutomaton = (Automaton)nameMap.get(otherAutomaton.getName());
+		if (thisAutomaton == null)
+		{
+			return false;
+		}
+		return thisAutomaton == otherAutomaton;
+	}
+
+
 	public Automaton getAutomaton(String name)
 	{
 		return (Automaton) nameMap.get(name);
@@ -189,6 +232,19 @@ public class Automata
 	public Automaton getAutomatonAt(int i)
 	{
 		return (Automaton) theAutomata.get(i);
+	}
+
+	public int getAutomatonIndex(Automaton theAutomaton)
+	{
+		for (int i = 0; i < theAutomata.size(); i++)
+		{
+			Automaton currAutomaton = getAutomatonAt(i);
+			if (currAutomaton == theAutomaton)
+			{
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	public String getName()
