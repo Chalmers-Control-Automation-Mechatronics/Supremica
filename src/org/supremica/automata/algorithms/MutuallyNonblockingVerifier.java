@@ -448,7 +448,7 @@ public class MutuallyNonblockingVerifier
 				// Have we had enough of this mma..mmammm..mmmammmm...mmmadness?
 				if (currSynchAutomaton.nbrOfStates() > 2500)
 				{
-					logger.error("Gave up because of state explosion!");
+ 					logger.error("Gave up because of state explosion!");
 					break;
 				}
 			}

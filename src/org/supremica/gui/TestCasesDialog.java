@@ -17,6 +17,7 @@ import org.supremica.testcases.RandomAutomata;
 import org.supremica.testcases.TransferLine;
 import org.supremica.testcases.PigeonHole;
 import org.supremica.testcases.SanchezTestCase;
+import org.supremica.testcases.RoundRobin;
 import org.supremica.testcases.warehouse.Warehouse;
 import org.supremica.testcases.warehouse.SelectEventsWindow;
 
@@ -49,13 +50,11 @@ class DoubleField
 	}
 }
 
-
 interface TestCase
 {
 	Project doIt()
 		throws Exception;
 }
-
 
 class UsersPanel
 	extends JPanel
@@ -143,7 +142,8 @@ class PhilosPanel
 	public Project doIt()
 		throws Exception
 	{
-		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected());
+		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), 
+													   l_put.isSelected(), r_put.isSelected(), animation.isSelected());
 
 		return dp.getProject();
 	}
@@ -160,7 +160,7 @@ class BricksPanel
 	{
 
 
-		JPanel panel  = new JPanel( new GridLayout(2,2));
+		JPanel panel  = new JPanel(new GridLayout(2,2));
 		add(panel, BorderLayout.WEST);
 
 		panel.add(new JLabel("Number of rows: "));
@@ -193,7 +193,7 @@ class WarehousePanel
 
 	WarehousePanel()
 	{
-		JPanel panel  = new JPanel( new GridLayout(3,2));
+		JPanel panel  = new JPanel(new GridLayout(3,2));
 		add(panel, BorderLayout.WEST);
 
 		panel.add(new JLabel("Number of operator events (k): "));
@@ -209,7 +209,9 @@ class WarehousePanel
 			{
 				if (selectOperatorEventsWindow == null)
 				{
-					selectOperatorEventsWindow = new SelectEventsWindow(warehouse.getTruckAlphabet(), "Select operator events", "Select operator events", true);
+					selectOperatorEventsWindow = new SelectEventsWindow(warehouse.getTruckAlphabet(), 
+																		"Select operator events", 
+																		"Select operator events", true);
 				}
 				selectOperatorEventsWindow.actionPerformed(e);
 				// ActionMan.fileOpen(ActionMan.getGui());
@@ -229,7 +231,9 @@ class WarehousePanel
 			{
 				if (selectUnobservableEventsWindow == null)
 				{
-					selectUnobservableEventsWindow = new SelectEventsWindow(warehouse.getTruckAlphabet(), "Select unobservable events", "Select unobservable events", false);
+					selectUnobservableEventsWindow = new SelectEventsWindow(warehouse.getTruckAlphabet(), 
+																			"Select unobservable events", 
+																			"Select unobservable events", false);
 				}
 				selectUnobservableEventsWindow.actionPerformed(e);
 				// ActionMan.fileOpen(ActionMan.getGui());
@@ -258,7 +262,7 @@ class StickGamePanel
 
 	StickGamePanel()
 	{
-		JPanel panel  = new JPanel( new GridLayout(2,2));
+		JPanel panel  = new JPanel(new GridLayout(2,2));
 		add(panel, BorderLayout.WEST);
 
 		panel.add(new JLabel("Number of players: "));
@@ -289,7 +293,7 @@ class AllocationBatchPanel
 	{
 		super(new BorderLayout(10, 10));
 
-		JPanel pCenter  = new JPanel( new GridLayout(4,2));
+		JPanel pCenter  = new JPanel(new GridLayout(4,2));
 		add(pCenter, BorderLayout.WEST);
 
 		pCenter.add(new JLabel("batch file:  "));
@@ -335,8 +339,6 @@ class AllocationBatchPanel
 	}
 }
 
-
-
 class CountersPanel
 	extends JPanel
 	implements TestCase
@@ -346,7 +348,7 @@ class CountersPanel
 
 	public CountersPanel()
 	{
-		JPanel panel  = new JPanel( new GridLayout(2,2));
+		JPanel panel  = new JPanel(new GridLayout(2,2));
 		add(panel, BorderLayout.CENTER);
 
 		panel.add(new JLabel("Number of counters: "));
@@ -364,8 +366,6 @@ class CountersPanel
 	}
 }
 
-
-
 class RandomPanel
 	extends JPanel
 	implements TestCase
@@ -377,7 +377,7 @@ class RandomPanel
 
 	public RandomPanel()
 	{
-		JPanel panel  = new JPanel( new GridLayout(4,2));
+		JPanel panel  = new JPanel(new GridLayout(4,2));
 		add(panel, BorderLayout.WEST);
 
 		panel.add(new JLabel("Number of automata: "));
@@ -413,13 +413,11 @@ class TransferLinePanel
 
 	public TransferLinePanel()
 	{
-
-		JPanel panel  = new JPanel( new GridLayout(4,2));
+		JPanel panel  = new JPanel(new GridLayout(4,2));
 		add(panel, BorderLayout.CENTER);
 
-
-		panel.add(new JLabel("Ref: \"Notes on Control of Discrete",  SwingConstants.RIGHT) );
-		panel.add(new JLabel("-Event Systems\", W.M. Wonham", SwingConstants.LEFT ));
+		panel.add(new JLabel("Ref: 'Notes on Control of Discrete",  SwingConstants.RIGHT) );
+		panel.add(new JLabel("-Event Systems', W.M. Wonham", SwingConstants.LEFT ));
 
 		panel.add(new JLabel("Number of cells: "));
 		panel.add(int_cells = new IntegerField("3", 5));
@@ -429,8 +427,6 @@ class TransferLinePanel
 
 		panel.add(new JLabel("Buffer 2 capacity: "));
 		panel.add(int_cap2 = new IntegerField("3", 5));
-
-
 	}
 
 	public Project doIt()
@@ -445,7 +441,6 @@ class TransferLinePanel
 	}
 }
 
-
 class PigeonHolePanel
 	extends JPanel
 	implements TestCase
@@ -455,11 +450,11 @@ class PigeonHolePanel
 
 	public PigeonHolePanel()
 	{
-		JPanel panel  = new JPanel( new GridLayout(3,2));
+		JPanel panel  = new JPanel(new GridLayout(3,2));
 		add(panel, BorderLayout.NORTH);
 
-		panel.add(new JLabel("Ref: \"The Intractability",  SwingConstants.RIGHT) );
-		panel.add(new JLabel(" of Resolution\", Armin Haken", SwingConstants.LEFT ));
+		panel.add(new JLabel("Ref: 'The Intractability",  SwingConstants.RIGHT) );
+		panel.add(new JLabel(" of Resolution', Armin Haken", SwingConstants.LEFT ));
 
 		panel.add(new JLabel("Number of pigeons: "));
 		panel.add(int_pigeons = new IntegerField("5", 3));
@@ -480,8 +475,6 @@ class PigeonHolePanel
 	}
 }
 
-
-
 class SanchezPanel
 	extends JPanel
 	implements TestCase
@@ -491,11 +484,11 @@ class SanchezPanel
 	final String [] choice_items =  {"#1: Async prod",  "#2: Synch prod", "#3: SupC"};
 	public SanchezPanel()
 	{
-		JPanel panel  = new JPanel( new GridLayout(3,2));
+		JPanel panel  = new JPanel(new GridLayout(3,2));
 		add(panel, BorderLayout.NORTH);
 
-		panel.add(new JLabel("Ref: \"A Comparision of Synthesis",  SwingConstants.RIGHT) );
-		panel.add(new JLabel(" Tools For...\", A. Sanchez et. al.", SwingConstants.LEFT ));
+		panel.add(new JLabel("Ref: 'A Comparision of Synthesis",  SwingConstants.RIGHT) );
+		panel.add(new JLabel(" Tools For...', A. Sanchez et. al.", SwingConstants.LEFT ));
 
 		panel.add(new JLabel("Number of blocks: "));
 		panel.add(int_blocks = new IntegerField("5", 3));
@@ -514,6 +507,32 @@ class SanchezPanel
 	}
 }
 
+class RoundRobinPanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField num_proc = new IntegerField("4", 2);
+
+	public RoundRobinPanel()
+	{
+		JPanel panel  = new JPanel(new GridLayout(2,2));
+		panel.add(new JLabel("Ref: 'Compositional Minimization of ",  SwingConstants.RIGHT) );
+		panel.add(new JLabel("Finite State Systems', S. Graf et. al.", SwingConstants.LEFT ));
+
+		panel.add(new JLabel("Number of processes: "));
+		panel.add(num_proc);
+
+		add(panel);
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		RoundRobin rr = new RoundRobin(num_proc.get());
+
+		return rr.getProject();
+	}
+}
 
 class ExampleTab
 	extends JTabbedPane
@@ -529,8 +548,8 @@ class ExampleTab
 		addTab("Random automata", null, new RandomPanel(), "Random automata");
 		addTab("Pigeon-Hole", null, new PigeonHolePanel(), "Pigeon-Hole");
 		addTab("Sanchez-BM", null, new SanchezPanel(), "Sanchez-BM");
-
 		addTab("Warehouse", null, new WarehousePanel(), "Warehouse");
+		addTab("Round robin", null, new RoundRobinPanel(), "Round robin access");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
 }
