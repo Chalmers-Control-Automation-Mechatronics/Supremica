@@ -141,11 +141,12 @@ public class AutomataMinimizer
 				Automaton autB = theAutomata.getAutomatonAt(i);
 				Alphabet alphaB = autB.getAlphabet();
 
-				// If there is no common events, try next automaton
+				// If there are no common events, try next automaton
 				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
 				if (nbrOfCommonEvents == 0)
 				{
-					if ((bestUniqueRatio == 0) && (bestCommonRatio == 0) && (autB.nbrOfStates() < bestSize))
+					if ((bestUniqueRatio == 0) && (bestCommonRatio == 0) && 
+						(autB.nbrOfStates() < bestSize))
 					{
 						bestAutB = autB;
 						bestSize = autB.nbrOfStates();
@@ -156,9 +157,12 @@ public class AutomataMinimizer
 
 				// Calculate the alphabet of unique events
 				Alphabet uniqueEvents = Alphabet.union(alphaA, alphaB);
+				// The targetAlphabet should not be removed (although they may be "unique")!
+				uniqueEvents.minus(options.getTargetAlphabet());
+				// Remove events that are present in other automata
 				for (int j=1; j<theAutomata.size(); j++)
 				{
-					// Skip self
+					// Skip autB (and autA since we iterate from 1 instead of 0)
 					if (i == j)
 					{
 						continue;
@@ -168,9 +172,6 @@ public class AutomataMinimizer
 					Automaton autC = theAutomata.getAutomatonAt(j);
 					Alphabet alphaC = autC.getAlphabet();
 					uniqueEvents.minus(alphaC);
-
-					// The targetAlphabet should not be removed (although they may be "unique")!
-					uniqueEvents.minus(options.getTargetAlphabet());
 
 					// Early termination
 					if (uniqueEvents.size() == 0)
@@ -218,15 +219,17 @@ public class AutomataMinimizer
 							"be treated separately if possible.");
 			}
 
-			/* Already taken care of above
+			/* Already taken care of above?
 			// Minimize this part, but always spare events from targetAlphabet!
 			if (hideThese != null)
 			{
 				hideThese.minus(options.getTargetAlphabet());
 			}
-			*/
+			// */
 			
 			// Compose and minimize!
+			//logger.info("Hiding " + hideThese);
+			//logger.info("Target " + options.getTargetAlphabet());
 			Automaton min = monolithicMinimization(automata, hideThese);
 			if (stopRequested)
 			{
@@ -238,7 +241,6 @@ public class AutomataMinimizer
 
 			// Dispose of originals
 			automata.clear();
-		
 			
 			/*
 			// Update gui
