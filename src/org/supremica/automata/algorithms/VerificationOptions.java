@@ -59,13 +59,14 @@ public final class VerificationOptions
 	private int reachabilityStateLimit;
 	private boolean oneEventAtATime;
 	private boolean skipUncontrollabilityCheck;
+	private int nbrOfAttempts;
 
 	public VerificationOptions()
 	{
-		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck());
+		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck(), SupremicaProperties.verifyNbrOfAttempts());
 	}
 
-	public VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
+	public VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts)
 	{
 		this.verificationType = verificationType;
 		this.algorithmType = algorithmType;
@@ -73,6 +74,7 @@ public final class VerificationOptions
 		this.reachabilityStateLimit = reachabilityStateLimit;
 		this.oneEventAtATime = oneEventAtATime;
 		this.skipUncontrollabilityCheck = skipUncontrollabilityCheck;
+		this.nbrOfAttempts = nbrOfAttempts;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -157,6 +159,18 @@ public final class VerificationOptions
 		return skipUncontrollabilityCheck;
 	}
 
+	public void setNbrOfAttempts(int nbr)
+	{
+		nbrOfAttempts = nbr;
+
+		SupremicaProperties.setVerifyNbrOfAttempts(nbr);
+	}
+
+	public int getNbrOfAttempts()
+	{
+		return nbrOfAttempts;
+	}
+
 	/**
 	 * Returns the default options for verification. This is the same as 
 	 * in the default constructor in this class.
@@ -176,7 +190,8 @@ public final class VerificationOptions
 									   SupremicaProperties.verifyExclusionStateLimit(), 
 									   SupremicaProperties.verifyReachabilityStateLimit(), 
 									   SupremicaProperties.verifyOneEventAtATime(), 
-									   SupremicaProperties.verifySkipUncontrollabilityCheck());
+									   SupremicaProperties.verifySkipUncontrollabilityCheck(),
+									   SupremicaProperties.verifyNbrOfAttempts());
 	}
 
 	/**
@@ -189,6 +204,7 @@ public final class VerificationOptions
 									   SupremicaProperties.verifyExclusionStateLimit(),
 									   SupremicaProperties.verifyReachabilityStateLimit(),
 									   SupremicaProperties.verifyOneEventAtATime(),
-									   SupremicaProperties.verifySkipUncontrollabilityCheck());
+									   SupremicaProperties.verifySkipUncontrollabilityCheck(),
+									   SupremicaProperties.verifyNbrOfAttempts());
 	}
 }

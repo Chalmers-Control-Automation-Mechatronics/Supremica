@@ -14,7 +14,8 @@ class DefaultExpander
 {
 	private Automata system;
 	private Automata specs;
-	private AutomataOnlineSynchronizer onlineSynchronizer;
+	//private AutomataOnlineSynchronizer onlineSynchronizer;
+	private AutomataSynchronizerExecuter onlineSynchronizer;
 	private int[] initialState;
 	// indexmap maps automaton.getIndex() to a "linear" index used for...?
 	private int[] indexmap;
@@ -58,8 +59,8 @@ class DefaultExpander
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true);
 		AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(system, syncOptions);
-		this.onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
-
+		//this.onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+		this.onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
 		this.onlineSynchronizer.initialize();
 		this.onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);
@@ -91,7 +92,8 @@ class DefaultExpander
 				EventIterator evit = currAutomaton.outgoingEventsIterator(s);
 				while(evit.hasNext())
 				{
-					onlineSynchronizer.setCurrState(elem.getStateArray());	// we operate from this state
+					int[] currState = elem.getStateArray();
+					onlineSynchronizer.setCurrState(currState);	// we operate from this state
 					LabeledEvent event = evit.nextEvent();
 					
 					logger.debug("Event: " + currAutomaton.getName() + "::" + event.toString());
@@ -101,7 +103,7 @@ class DefaultExpander
 						logger.debug(" is globally enabled");
 						
 						// Move in direction Ai
-						Element nextState = new ElementObject(onlineSynchronizer.doTransition(event), specs.size());
+						Element nextState = new ElementObject(onlineSynchronizer.doTransition(currState, event), specs.size());
 						nextState.setDepth(depth);
 						move(elem, nextState, currAutomaton);
 						

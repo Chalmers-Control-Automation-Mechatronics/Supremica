@@ -61,7 +61,6 @@ interface VerificationPanel
 	void regain(VerificationOptions v);
 }
 
-
 class VerificationDialogStandardPanel
 	extends JPanel
 	implements VerificationPanel, ActionListener
@@ -191,19 +190,22 @@ class VerificationDialogAdvancedPanel
 	private JTextField reachabilityStateLimit;
 	private JCheckBox oneEventAtATimeBox;
 	private JCheckBox skipUncontrollabilityBox;
+	private JTextField nbrOfAttempts;
 
 	public VerificationDialogAdvancedPanel()
 	{
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
-
 		exclusionStateLimit = new JTextField();
 
 		JLabel reachabilityStateLimitText = new JLabel("Initial state limit for reachability verification");
-
 		reachabilityStateLimit = new JTextField();
+
 		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
 		skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
+
+		JLabel nbrOfAttemptsText = new JLabel("Number of verification attempts");
+		nbrOfAttempts = new JTextField();
 
 		advancedBox.add(exclusionStateLimitText);
 		advancedBox.add(exclusionStateLimit);
@@ -211,6 +213,8 @@ class VerificationDialogAdvancedPanel
 		advancedBox.add(reachabilityStateLimit);
 		advancedBox.add(oneEventAtATimeBox);
 		advancedBox.add(skipUncontrollabilityBox);
+		advancedBox.add(nbrOfAttemptsText);
+		advancedBox.add(nbrOfAttempts);
 		this.add(advancedBox, BorderLayout.CENTER);
 	}
 
@@ -220,14 +224,16 @@ class VerificationDialogAdvancedPanel
 		reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
 		oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
 		skipUncontrollabilityBox.setSelected(verificationOptions.getSkipUncontrollabilityCheck());
+		nbrOfAttempts.setText(Integer.toString(verificationOptions.getNbrOfAttempts()));
 	}
 
 	public void regain(VerificationOptions verificationOptions)
 	{
-		verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("State limit", exclusionStateLimit.getText(), 10));
-		verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("State limit", reachabilityStateLimit.getText(), 10));
+		verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("Exclusion state limit", exclusionStateLimit.getText(), 10));
+		verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("Reachability state limit", reachabilityStateLimit.getText(), 10));
 		verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
 		verificationOptions.setSkipUncontrollabilityCheck(skipUncontrollabilityBox.isSelected());
+		verificationOptions.setNbrOfAttempts(PreferencesDialog.getInt("Nbr of attempts limit", nbrOfAttempts.getText(), 1));
 	}
 }
 
@@ -242,7 +248,7 @@ public class VerificationDialog
 	private JDialog dialog;
 
 	/**
-	 * Creates modal dialog box for input of synthesizer options.
+	 * Creates modal dialog box for input of verification options.
 	 */
 	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions)
 	{

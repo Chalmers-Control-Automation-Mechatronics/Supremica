@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -58,6 +57,36 @@ public class EncodingHelper
 
 	private EncodingHelper()
 	{
+	}
+
+	/**
+	 * Places line breaks '\n' at as even distances as possible.
+	 * There ought to be a method like this in the JDK somewhere?
+	 */
+	public static String linebreakAdjust(String input)
+	{
+		return linebreakAdjust(input, 50);
+	}
+
+	public static String linebreakAdjust(String input, int lineWidth)
+	{
+		if (input == null)
+			return "";
+
+		// Normalize string
+		String s = input.replaceAll("[\n\r]", " ");
+		s = s.replaceAll(" +", " ");
+
+		int len = s.length();
+		int lastBreak = 0;
+
+		while (len - lastBreak > lineWidth)
+		{
+			lastBreak = s.lastIndexOf(' ', lastBreak + lineWidth);
+			s = s.substring(0,lastBreak) + "\n" + s.substring(lastBreak+1,len);
+		}
+
+		return s;
 	}
 
 	public static String normalize(String input)

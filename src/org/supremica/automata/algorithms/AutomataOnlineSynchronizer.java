@@ -1,3 +1,10 @@
+
+
+      ////////////////
+      // DEPRECATED //
+      ////////////////
+
+
 /*
  *  Supremica Software License Agreement
  *
@@ -62,11 +69,7 @@ import org.supremica.automata.LabeledEvent;
 /**
  * Used in the "Automata Explorer" (an early version that is on ice since way 
  * back and therefore not completed).
- * Also used in AutomataVerifier.findUncontrollableStates and in the 
- * uncontrollability verification.
- *
- *@author  ka
- *@created  November 28, 2001
+ * Also used in the uncontrollability verification.
  */
 public final class AutomataOnlineSynchronizer
 //	extends Thread
@@ -113,6 +116,7 @@ public final class AutomataOnlineSynchronizer
 
 	public AutomataOnlineSynchronizer(AutomataSynchronizerHelper synchronizerHelper)
 	{
+		System.err.println("The class AutomataOnlineSynchronizer is deprecated!");
 		//setPriority(Thread.MIN_PRIORITY);
 
 		helper = synchronizerHelper;
@@ -163,21 +167,6 @@ public final class AutomataOnlineSynchronizer
 
 		// System.arraycopy(initialState, 0, currState, 0, currState.length);
 		// enabledEvents(currState);
-	}
-
-	// Only used by PairWiseControllabilityCheck (removable)
-	// Select two automata
-	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
-		throws Exception
-	{
-		automataIndices = new int[2];
-		automataIndices[0] = plantIndex;
-		automataIndices[1] = supervisorIndex;
-
-		if (exhaustiveSearch)
-		{
-			throw new Exception("Exhaustive search used wrong way!");
-		}
 	}
 
 	// Select some automata
@@ -456,6 +445,7 @@ public final class AutomataOnlineSynchronizer
 	 *@param  toState the state to which we want to know if there is a transition
 	 *@return  index of one (there may be more) transition between fromState and toState or -1 if none exists.
 	 */
+	/*
 	public int findTransition(int[] fromState, int[] toState)
 	{
 		if (nextState == null)
@@ -497,6 +487,7 @@ public final class AutomataOnlineSynchronizer
 
 		return -1;
 	}
+	*/
 
 	// Compares int arrays, except for the last elements (the status field)
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
@@ -563,7 +554,6 @@ public final class AutomataOnlineSynchronizer
 
 	public int[] doTransition(int eventIndex)
 	{
-
 		//System.err.println("doTransition: eventIndex " + eventIndex);
 		// Counting on correct input here... only enabled events, please...
 		// Construct new state
@@ -606,7 +596,6 @@ public final class AutomataOnlineSynchronizer
 
 	public int[] getIncomingEvents(int[] state)
 	{
-
 		// Not finished... FIXA!
 		return (new int[]{ 0, 1, Integer.MAX_VALUE });
 	}

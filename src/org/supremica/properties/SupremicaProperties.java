@@ -115,6 +115,7 @@ public final class SupremicaProperties
 	private static final String VERIFY_REACHABILITY_STATE_LIMIT = "verifyReachabilityStateLimit";
 	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
 	private static final String VERIFY_SKIP_UNCONTROLLABILITY_CHECK = "skipUncontrollabilityCheck";
+	private static final String VERIFY_NBR_OF_ATTEMPTS = "nbrOfAttempts";
 
 	// Synthesizer Options
 	private static final String SYNTHESIS_SYNTHESIS_TYPE = "synthesisSynthesisType";
@@ -221,6 +222,7 @@ public final class SupremicaProperties
 		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000", true);
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false", true);
 		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false", true);
+		setProperty(VERIFY_NBR_OF_ATTEMPTS, "5", true);
 		setProperty(SYNTHESIS_SYNTHESIS_TYPE, SynthesisType.Both.toString(), true);
 		setProperty(SYNTHESIS_ALGORITHM_TYPE, SynthesisAlgorithm.Monolithic.toString(), true);
 		setProperty(SYNTHESIS_PURGE, "false", true);
@@ -741,6 +743,16 @@ public final class SupremicaProperties
 	public static void setVerifySkipUncontrollabilityCheck(boolean bool)
 	{
 		wp.setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, toString(bool));
+	}
+
+	public static int verifyNbrOfAttempts()
+	{
+		return toInt(wp.getProperty(VERIFY_NBR_OF_ATTEMPTS));
+	}
+
+	public static void setVerifyNbrOfAttempts(int nbr)
+	{
+		wp.setProperty(VERIFY_NBR_OF_ATTEMPTS, toString(nbr));
 	}
 
 	// Synthesis...

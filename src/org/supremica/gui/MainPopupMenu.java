@@ -37,30 +37,25 @@ class MainPopupMenu
 	private void initPopups()
 	{
 		JMenuItem selectAllItem = new JMenuItem("Select all");
-
 		menuHandler.add(selectAllItem, 0);
+
 		menuHandler.addSeparator();
 
 		JMenuItem statusItem = new JMenuItem("Status");
-
 		menuHandler.add(statusItem, 0);
 
 		JMenuItem exploreItem = new JMenuItem("Explore states");
-
 		menuHandler.add(exploreItem, 1);
 
 		JMenuItem hierarchyItem = new JMenuItem("View hierarchy");
-
 		menuHandler.add(hierarchyItem, 1);
 
 		JMenuItem alphabetItem = new JMenuItem("View alphabet");
-
 		menuHandler.add(alphabetItem, 1);
 
 		if (SupremicaProperties.useDot())
 		{
 			JMenuItem viewItem = new JMenuItem("View automaton");
-
 			menuHandler.add(viewItem, 1);
 			viewItem.addActionListener(new ActionListener()
 			{
@@ -137,23 +132,18 @@ class MainPopupMenu
 		if (SupremicaProperties.includeBoundedUnconTools())
 		{
 			JMenuItem extendItem = new JMenuItem("Extend");
-
 			menuHandler.add(extendItem, 1);
 
 			JMenuItem removePassItem = new JMenuItem("Remove pass events");
-
 			menuHandler.add(removePassItem, 1);
 
 			JMenuItem addSelfLoopArcsItem = new JMenuItem("Add self-loop arcs");
-
 			menuHandler.add(addSelfLoopArcsItem, 1);
 
 			JMenuItem removeSelfLoopArcsItem = new JMenuItem("Remove self-loop arcs");
-
 			menuHandler.add(removeSelfLoopArcsItem, 1);
 
 			JMenuItem normalizeAlphabetItem = new JMenuItem("Normalize alphabet");
-
 			menuHandler.add(normalizeAlphabetItem, 1);
 			menuHandler.addSeparator();
 			extendItem.addActionListener(new ActionListener()
@@ -239,7 +229,8 @@ class MainPopupMenu
 
 		menuHandler.add(deleteAllItem, 0);
 
-		JMenuItem cropItem = new JMenuItem("Crop to selection");
+		//JMenuItem cropItem = new JMenuItem("Crop to selection");
+		JMenuItem cropItem = new JMenuItem("Delete unselected");
 
 		menuHandler.add(cropItem, 0);
 

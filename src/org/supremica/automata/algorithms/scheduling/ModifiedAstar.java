@@ -52,7 +52,8 @@ public class ModifiedAstar
 	private ActionTimer timer = new ActionTimer();
 
 	// This is only needed for init() and walk1()
-	private AutomataOnlineSynchronizer onlineSynchronizer = null;
+	//private AutomataOnlineSynchronizer onlineSynchronizer = null;
+	private AutomataSynchronizerExecuter onlineSynchronizer = null;
 	private int[] indexmap;
 
 	public static class Info
@@ -137,7 +138,8 @@ public class ModifiedAstar
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true);
 		AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, syncOptions);
-		this.onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+		//this.onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+		this.onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
 
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
@@ -219,7 +221,8 @@ public class ModifiedAstar
 			// First we need to find the events enabled in automaton i
 			for(Iterator autIt = specAutomata.iterator(); autIt.hasNext(); )
 			{
-				onlineSynchronizer.setCurrState(state.getStateArray());	// we operate from this state
+				int[] currState = state.getStateArray();
+				onlineSynchronizer.setCurrState(currState);	// we operate from this state
 				Automaton currAutomaton = (Automaton) autIt.next();
 				logger.debug("Expanding automaton: " + currAutomaton.getName());
 
@@ -245,7 +248,7 @@ public class ModifiedAstar
 							/* System.out.println(" is globally enabled"); */
 
 							// Move in direction Ai
-							Element nextState = new ElementObject(onlineSynchronizer.doTransition(event), specAutomata.size());
+							Element nextState = new ElementObject(onlineSynchronizer.doTransition(currState, event), specAutomata.size());
 							move(state, nextState, currAutomaton);
 
 							// attach ptr back to n

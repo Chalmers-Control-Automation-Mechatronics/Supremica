@@ -37,7 +37,8 @@ public class EventSubTree
 	}
 	
 	// Change this to reflect the correct number of children/properties/leaves
-	// Could this be calculated from sizeof(LabeledEvent)? It should not. This depends only on the above construction
+	// Could this be calculated from sizeof(LabeledEvent)? It should not. 
+	// This depends only on the above construction
 	public int numDirectLeafs()
 	{
 		return 3;

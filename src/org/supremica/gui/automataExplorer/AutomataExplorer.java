@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -77,7 +76,8 @@ public class AutomataExplorer
 	private AutomataStateViewer stateViewer;
 	private AutomataExplorerController controller;
 	private AutomataSynchronizerHelper helper;
-	private AutomataOnlineSynchronizer onlineSynchronizer;
+	//private AutomataOnlineSynchronizer onlineSynchronizer;
+	private AutomataSynchronizerExecuter onlineSynchronizer;
 
 	public AutomataExplorer(Automata theAutomata)
 		throws Exception
@@ -105,8 +105,8 @@ public class AutomataExplorer
 
 		AutomataExplorerHelper.setInitialState(initialState);
 
-		onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
-
+		//onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+		onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);

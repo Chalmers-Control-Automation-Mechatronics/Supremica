@@ -88,7 +88,8 @@ public class SimulatorExecuter
 	private SimulatorStateViewer stateViewer;
 	private SimulatorExecuterController controller;
 	private AutomataSynchronizerHelper helper;
-	private AutomataOnlineSynchronizer onlineSynchronizer;
+	//private AutomataOnlineSynchronizer onlineSynchronizer;
+	private AutomataSynchronizerExecuter onlineSynchronizer;
 	private Actions theActions;
 	private Controls theControls;
 	private VisualProject theProject;
@@ -139,10 +140,11 @@ public class SimulatorExecuter
 
 		SimulatorExecuterHelper.setInitialState(initialState);
 
-		onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
-
+		//onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+		onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
+
 		currState = initialState;
 		helper.setCoExecuter(onlineSynchronizer);
 		//theProject.getListeners().addListener(this);
@@ -185,11 +187,11 @@ public class SimulatorExecuter
 
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
-		// / controller = new ExplorerController(stateViewer, theAutomaton);
+		//controller = new ExplorerController(stateViewer, theAutomaton);
 		controller = new SimulatorExecuterController(stateViewer, useExternalExecuter);
 		contentPane.add(controller, BorderLayout.SOUTH);
 		stateViewer.setController(controller);
-//		stateViewer.goToInitialState();
+		//stateViewer.goToInitialState();
 		update();
 	}
 
@@ -299,12 +301,10 @@ public class SimulatorExecuter
 */
 	public boolean executeEvent(LabeledEvent event)
 	{
-
 		String label = event.getLabel();
 
 		if (theControls != null)
 		{
-
 		}
 
 		if (theActions != null)
@@ -321,7 +321,8 @@ public class SimulatorExecuter
 					}
 					catch (CommandException ex)
 					{
-						logger.error("Exception while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
+						logger.error("Exception while executing command: " + 
+									 currCommand + "\nMessage: " + ex.getMessage());
 						logger.debug(ex.getStackTrace());
 					}
 				}
@@ -332,8 +333,8 @@ public class SimulatorExecuter
 		onlineSynchronizer.setCurrState(currState);
 		if (onlineSynchronizer.isEnabled(event))
 		{
-			currState = onlineSynchronizer.doTransition(event);
-//		return onlineSynchronizer.doTransition(events[index]);
+			currState = onlineSynchronizer.doTransition(currState, event);
+			// return onlineSynchronizer.doTransition(events[index]);
 			update();
 		}
 		else
@@ -356,7 +357,7 @@ public class SimulatorExecuter
 
 	public void update()
 	{
-//		theAnimationSignals.notifyObservers();
+		//theAnimationSignals.notifyObservers();
 	}
 }
 

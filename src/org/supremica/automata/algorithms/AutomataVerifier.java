@@ -108,7 +108,7 @@ public class AutomataVerifier
 	/**
 	 * Determines if more detailed information on the progress of things should be displayed.
 	 *
-	 *@see  SynchronizationOptions
+	 *@see SynchronizationOptions
 	 */
 	private boolean verboseMode;
 	private VerificationOptions verificationOptions;
@@ -170,6 +170,7 @@ public class AutomataVerifier
 			{
 				return "At least two automata must be selected";
 			}
+
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
@@ -187,6 +188,11 @@ public class AutomataVerifier
 				return "At least one automaton must be selected!";
 			}
 
+			if (!theAutomata.hasAcceptingState())
+			{
+				return "Some automaton has no marked states!";
+			}
+
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				return "The modular nonblocking algorithm \n" + "is not fully implemented!";
@@ -199,6 +205,11 @@ public class AutomataVerifier
 			if (theAutomata.size() < 1)
 			{
 				return "At least one automaton must be selected!";
+			}
+
+			if (!theAutomata.hasAcceptingState())
+			{
+				return "Some automaton has no marked states!";
 			}
 
 			if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.Modular)
@@ -214,10 +225,12 @@ public class AutomataVerifier
 			{
 				return "At least one automaton must be selected";
 			}
+
 			if (ActionMan.getGui().getUnselectedAutomata().size() < 1)
 			{
 				return "At least one automaton must be unselected";
 			}
+
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
@@ -594,10 +607,11 @@ public class AutomataVerifier
 		// loop finished.
 		if (failure)
 		{
-			logger.error("Supremica's modular verification algorithm can't solve this\n" +
+			logger.warn("Supremica's modular verification algorithm can't solve this\n" +
 						 "problem. Try the monolithic algorithm instead. There are " +
 						 potentiallyUncontrollableStates.size() + "\n" +
 						 "states that perhaps makes this system uncontrollable.");
+			return false;
 		}
 
 		return allModulesControllable;
@@ -706,7 +720,8 @@ public class AutomataVerifier
 
 			// Make nbrOfAttempts attempts on prooving controllability and
 			// uncontrollability alternatingly and then give up
-			int nbrOfAttempts = 5;
+			// int nbrOfAttempts = 5;
+			int nbrOfAttempts = verificationOptions.getNbrOfAttempts();
 
 			stateAmount = 1;
 			for (attempt = 1; attempt <= nbrOfAttempts; attempt++)
@@ -1159,12 +1174,12 @@ public class AutomataVerifier
 	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
-
 		// WOHOOPS! Eventuellt är det listigt att göra ny onlinesynchronizer,
 		// med den nya automataIndices varje gång... tänk på det. FIXA!
 		if (uncontrollabilityCheckHelper == null)
 		{
-			AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
+			//AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
+			AutomataSynchronizerExecuter onlineSynchronizer = new AutomataSynchronizerExecuter(synchHelper);
 			onlineSynchronizer.selectAutomata(automataIndices);
 			onlineSynchronizer.initialize();
 
@@ -2033,7 +2048,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Standard method for performing languageInclusion verification on automataA
+	 * Standard method for performing modular languageInclusion verification on automataA
 	 * and automataB.
 	 *
 	 * @param automataA the automata that should be included.

@@ -100,7 +100,8 @@ public final class AutomataSynchronizerHelper
 	private IntArrayList stateTrace = new IntArrayList();
 	private boolean rememberTrace = false;
 	private boolean coExecute = false;
-	private AutomataOnlineSynchronizer coExecuter = null;
+	//private AutomataOnlineSynchronizer coExecuter = null;
+	private AutomataSynchronizerExecuter coExecuter = null;
 
 	private Rendezvous executerRendezvous = null;
 
@@ -460,7 +461,8 @@ public final class AutomataSynchronizerHelper
 	{
 		if (logger.isDebugEnabled())
 		{
-			logger.debug("Deadlocked state:\n" + AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
+			logger.debug("Deadlocked state:\n" + 
+						 AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
 			logger.debug(displayTrace(state));
 		}
 
@@ -520,7 +522,7 @@ public final class AutomataSynchronizerHelper
 		automataIsControllable = isControllable;
 	}
 
-	// automataIsControllable is set to false by AutomataSynchronizerhelper, AutomataOnlineSynchronizer
+	// automataIsControllable is set to false by AutomataSynchronizerhelper, AutomataSynchronizerExecuter
 	// when an uncontrollable state is found.
 	public boolean getAutomataIsControllable()
 	{
@@ -609,8 +611,6 @@ public final class AutomataSynchronizerHelper
 
 	/**
 	 * Displays the event-trace leading to the uncontrollable state.
-	 *
-	 *@exception  Exception Description of the Exception
 	 */
 	public void displayTrace()
 		throws Exception
@@ -619,7 +619,8 @@ public final class AutomataSynchronizerHelper
 
 		// We have to have an executer for finding the transitions
 		clear();
-		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
+		//AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
+		AutomataSynchronizerExecuter executer = new AutomataSynchronizerExecuter(this);
 		executer.initialize();
 
 		// This version does not remove shortcuts, add this later. FIXA!
@@ -745,12 +746,14 @@ public final class AutomataSynchronizerHelper
 		return coExecute;
 	}
 
-	public void setCoExecuter(AutomataOnlineSynchronizer coExecuter)
+	//public void setCoExecuter(AutomataOnlineSynchronizer coExecuter)
+	public void setCoExecuter(AutomataSynchronizerExecuter coExecuter)
 	{
 		this.coExecuter = coExecuter;
 	}
 
-	public AutomataOnlineSynchronizer getCoExecuter()
+	//public AutomataOnlineSynchronizer getCoExecuter()
+	public AutomataSynchronizerExecuter getCoExecuter()
 	{
 		return coExecuter;
 	}
@@ -808,8 +811,9 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 
-			String reason = "the uncontrollable event \"" + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + "\" is enabled in the plant \"" + problemAutomaton.getName() + "\"";
-
+			String reason = "the uncontrollable event \"" + 
+				theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + 
+				"\" is enabled in the plant \"" + problemAutomaton.getName() + "\"";
 			logger.info("The state \"" + state.toString() + "\" is uncontrollable since " + reason + ".");
 		}
 	}

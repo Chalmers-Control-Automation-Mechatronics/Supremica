@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -103,7 +102,8 @@ public class AutomataEventListModel
 
 	public void update()
 	{
-		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+		//AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+		AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
 
 		if (forward)
 		{
@@ -190,11 +190,12 @@ public class AutomataEventListModel
 		return responseString.toString();
 	}
 
-	public int[] getStateAt(int index)
+	public int[] getStateAt(int[] currState, int index)
 	{
-		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+		//AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+		AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
 
-		return onlineSynchronizer.doTransition(events[index]);
+		return onlineSynchronizer.doTransition(currState, events[index]);
 
 		/*
 		 *  Arc currArc = (Arc)currArcs.get(index);

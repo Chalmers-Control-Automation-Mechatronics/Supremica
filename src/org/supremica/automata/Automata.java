@@ -373,7 +373,8 @@ public class Automata
 
 	/**
 	 * Returns true if each automaton has at least one accepting state
-	 * Note, this is no guarantee that the composition will have an accepting state.
+	 * Of course, this is no guarantee that the composition will have 
+	 * an accepting state.
 	 */
 	public boolean hasAcceptingState()
 	{
@@ -388,6 +389,27 @@ public class Automata
 		}
 		return true;
 	}
+
+	
+	/**
+	 * Returns name of first automaton found that has no accepting states. Returns null
+	 * if all automata have at least one accepting state.
+	 */
+	/*
+	public String hasAcceptingState()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+
+			if(!automaton.hasAcceptingState())
+			{
+				return automaton.getName();
+			}
+		}
+		return null;
+	}
+	*/
 
 	/**
 	 * Returns true if all automata have all events prioritized

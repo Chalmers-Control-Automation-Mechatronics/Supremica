@@ -92,6 +92,7 @@ public class LabeledEvent
 		controllable = e.controllable;
 		prioritized = e.prioritized;
 		immediate = e.immediate;
+		epsilon = e.epsilon;
 		synchIndex = e.synchIndex;
 	}
 
@@ -164,6 +165,16 @@ public class LabeledEvent
 		this.prioritized = prioritized;
 	}
 
+	public boolean isEpsilon()
+	{
+		return epsilon;
+	}
+
+	public void setEpsilon(boolean b)
+	{
+		epsilon = b;
+	}
+
 	public void setExpansionPriority(int expansionPriority)
 	{
 		this.expansionPriority = expansionPriority;
@@ -201,16 +212,6 @@ public class LabeledEvent
 	public boolean isEqual(LabeledEvent ev)
 	{
 		return this.label.equals(ev.label); // should also check priority & controllability?
-	}
-
-	public boolean isEpsilon()
-	{
-		return epsilon;
-	}
-
-	public void setEpsilon(boolean b)
-	{
-		epsilon = b;
 	}
 
 	private boolean equalId(Object obj)

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -123,7 +122,8 @@ public class SimulatorEventListModel
 		enterLock();
 
 		//logger.info("SimulatorEventListModel.update");
-		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+		//AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+		AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
 		int[] extEvents = onlineSynchronizer.getOutgoingEvents(theExecuter.getCurrentState());
 		System.arraycopy(extEvents, 0, events, 0, events.length);
 		if (!showDisabledEvents)

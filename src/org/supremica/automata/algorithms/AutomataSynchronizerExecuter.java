@@ -146,7 +146,8 @@ public final class AutomataSynchronizerExecuter
 	private boolean expandEventsUsingPriority;
 	private boolean exhaustiveSearch = false;
 	private boolean coExecute = false;
-	private AutomataOnlineSynchronizer coExecuter = null;
+	//private AutomataOnlineSynchronizer coExecuter = null;
+	private AutomataSynchronizerExecuter coExecuter = null;
 
 	/** For "one event at a time"-execution. */
 	private int currUncontrollableEvent = -1;
@@ -273,10 +274,8 @@ public final class AutomataSynchronizerExecuter
 
 		nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
 
-		// +1 status field
+		// +1 status field (always end with Integer.MAX_VALUE)
 		currEnabledEvents = new int[nbrOfEvents + 1];
-
-		// Always end with Integer.MAX_VALUE
 	}
 
 	/**
@@ -565,7 +564,9 @@ public final class AutomataSynchronizerExecuter
 		}
 	}
 
-	/** Performs the synchronization. */
+	/** 
+	 * Performs the synchronization. 
+	 */
 	public void run()
 	{
 		initialize();
@@ -601,16 +602,16 @@ public final class AutomataSynchronizerExecuter
 					}
 				}
 
-				// We now know that there is an uncontrollable state
-				if (exhaustiveSearch)
-				{
-					return;
-				}
-
 				// Forbid uncontrollable state?
 				if (forbidUncontrollableStates)
 				{
 					helper.setForbidden(currState, true);
+				}
+
+				// We now know that there is an uncontrollable state
+				if (exhaustiveSearch)
+				{
+					return;
 				}
 			}
 
@@ -708,15 +709,15 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * A call to this method stops the execution of the run-method or the buildAutomaton-method as soon as possible.
+	 * A call to this method stops the execution of the run-method or 
+	 * the buildAutomaton-method as soon as possible.
 	 *
 	 *@see  AutomataSynchronizer
 	 *@see  AutomataVerifier
 	 */
 	public void requestStop()
 	{
-
-		// System.out.println("Executer requested to stop.");
+		// logger.debug("Executer requested to stop.");
 		stopRequested = true;
 	}
 
@@ -1007,7 +1008,6 @@ public final class AutomataSynchronizerExecuter
 	 *@param  toState Description of the Parameter
 	 *@return  Description of the Return Value
 	 */
-
 	/*
 	 *  public boolean isValidTransition(int[] fromState, int[] toState, int event)
 	 *  {
@@ -1080,7 +1080,6 @@ public final class AutomataSynchronizerExecuter
 	 */
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
 	{
-
 		// Assume that the last element is a status field
 		for (int i = 0; i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
@@ -1101,5 +1100,106 @@ public final class AutomataSynchronizerExecuter
 	public void setCurrUncontrollableEvent(LabeledEvent event)
 	{
 		currUncontrollableEvent = event.getSynchIndex();
+	}
+
+	// ****************************************************** //
+	//  Methods from AutomataOnlineSynchronizer (which is to  //
+	//  become deprecated real soon, I hope).                 //
+	// ****************************************************** //
+	public boolean isEnabled(LabeledEvent theEvent)
+	{
+		return isEnabled(theEvent.getSynchIndex());	
+	}
+
+	public boolean isEnabled(int eventIndex)
+	{
+		int i = 0;
+		int currEventIndex = currEnabledEvents[i];
+
+		while (currEventIndex != Integer.MAX_VALUE)
+		{
+			if (currEventIndex == eventIndex)
+			{
+				return true;
+			}
+
+			currEventIndex = currEnabledEvents[++i];
+		}
+
+		return false;
+	}
+
+	// To synchronize the two executers...
+	public void setCurrState(int[] state)
+	{
+		//currState = state;
+		//enabledEvents(currState);
+		enabledEvents(state);
+	}
+
+	/**
+	 * Changes state along transition of theEvent. 
+	 * IT IS ASSUMED THAT theEvent IS ENABLED!! 
+	 */
+	public int[] doTransition(int[] currState, LabeledEvent theEvent)
+	{
+		return doTransition(currState, theEvent.getSynchIndex());	
+	}
+
+	/**
+	 * Changes state along transition of the event with index eventIndex. 
+	 * IT IS ASSUMED THAT THE EVENT WITH INDEX eventIndex IS ENABLED!! 
+	 */
+	public int[] doTransition(int[] currState, int eventIndex)
+	{
+		//System.err.println("doTransition: eventIndex " + eventIndex);
+		// Counting on correct input here... only enabled events, please...
+		// Construct new state
+		int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
+		//int[] nextState = new int[currState.length];
+		
+		//System.arraycopy(currState, 0, nextState, 0, currState.length);
+		
+		//System.err.println("doTransition: nbrOfSelectedAutomata " + nbrOfSelectedAutomata);
+		
+		// Iterate over all automata to construct the new state
+		//for (int j = 0; j < nbrOfSelectedAutomata; j++)
+		for (int j = 0; j < automataIndices.length; j++)
+		{
+			int currAutomatonIndex = automataIndices[j];
+			int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][eventIndex];
+			
+			// Jump in all automata that have this event active.
+			if (currSingleNextState != Integer.MAX_VALUE)
+			{				
+				// currState[currAutomatonIndex] = currSingleNextState;
+				nextState[currAutomatonIndex] = currSingleNextState;
+			}
+		}
+		
+		// enabledEvents(nextState);
+		// System.arraycopy(nextState, 0, currState, 0, currState.length);
+		currState = nextState;
+		
+		// return currState;
+		return nextState;
+	}
+
+	public int[] getOutgoingEvents(int[] state)
+	{
+		enabledEvents(state);
+
+		return currEnabledEvents;
+	}
+
+	public int[] getIncomingEvents(int[] state)
+	{
+		// Not finished... FIXA!
+		return (new int[]{ 0, 1, Integer.MAX_VALUE });
+	}
+
+	public boolean isControllable()
+	{
+		return controllableState;
 	}
 }

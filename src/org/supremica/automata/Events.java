@@ -308,7 +308,8 @@ public class Events
 
 	public String toString()
 	{
-		StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
+		//StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
+		StringBuffer tmpBuf = new StringBuffer(theEvents.toString());
 
 		return tmpBuf.toString();
 	}

@@ -86,7 +86,6 @@ public class MutuallyNonblockingVerifier
 			{
 				synchronizedEvents++;
 			}
-
 		}
 
 		logger.info(unsynchronizedEvents + " unsynchronized events.");
@@ -99,25 +98,38 @@ public class MutuallyNonblockingVerifier
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			Events currEvents = safeEventsMap.getEvents(currAutomaton);
+			// System.out.println("Automaton: " + currAutomaton.getName() + "\nEvents: " + currEvents + "\n");
 			currAutomaton.extendMutuallyAccepting(currEvents);
 		}
 
+		boolean allMutuallyNonblocking = true;
+		int nbrMutuallyNonblocking = 0;
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			if (currAutomaton.nbrOfStates() != currAutomaton.nbrOfMutuallyAcceptingStates())
 			{
-				return false;
+				logger.warn("Automaton " + currAutomaton.getName() + " might cause blocks.");
+				allMutuallyNonblocking = false;
+				// return false;
+			}
+			else
+			{
+				logger.info("Automaton " + currAutomaton.getName() + " is mutually nonblocking!");
+				nbrMutuallyNonblocking++;
 			}
 		}
-		return true;
+		logger.info("At least " + nbrMutuallyNonblocking + " out of the total " + theAutomata.size() + " automata were mutually nonblocking.");
+		return allMutuallyNonblocking;
 	}
 
 	/**
 	 * Find all events in all automata that can be executed as soon as
 	 * they are enabled in the current automaton.
-	 * An obvious example of this is all events that are only
+	 *   An obvious example of this is all events that are only
 	 * present in one automation.
+	 *   A less obvious example is events that are never disabled by the
+	 * system if it is enabled in the current automaton. See checkSafeness().
 	 */
 	protected void buildSafeEvents()
 	{
@@ -126,10 +138,12 @@ public class MutuallyNonblockingVerifier
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
+			logger.info("Building safe events for automaton '" + currAutomaton.getName() + "'...");
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 			for (Iterator evIt = currAlphabet.iterator(); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = (LabeledEvent)evIt.next();
+				logger.info("Event: '" + currEvent.getLabel() + "'...");
 
 				boolean isSafe = checkSafeness(newAutomata, currAutomaton, currEvent);
 				if (isSafe)
@@ -137,16 +151,19 @@ public class MutuallyNonblockingVerifier
 					safeEventsMap.addEvent(currAutomaton, currEvent);
 				}
 			}
-
 		}
 	}
 
+	/**
+	 * Sets the AutomatonType of the automata and the controllability of the events to 
+	 * make way for the controllability check in checkSafeness().
+	 */
 	private void setAttributes(Automata totalSystem, Automaton thePlantAutomaton, LabeledEvent unconEvent)
 	{
 		for (Iterator autIt = totalSystem.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			if (currAutomaton == thePlantAutomaton)
+			if (currAutomaton.getName() == thePlantAutomaton.getName()) // Equal name? Is this enough?
 			{
 				currAutomaton.setType(AutomatonType.Plant);
 			}
@@ -154,20 +171,36 @@ public class MutuallyNonblockingVerifier
 			{
 				currAutomaton.setType(AutomatonType.Specification);
 			}
+
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 			for (Iterator eventIt = currAlphabet.iterator(); eventIt.hasNext();)
 			{
+				// Make all events controllable except for the chosen one (unconEvent)
 				LabeledEvent currEvent = (LabeledEvent)eventIt.next();
 				currEvent.setControllable(!currEvent.getLabel().equals(unconEvent.getLabel()));
 			}
 		}
 	}
 
+	/**
+	 * Examines if the event currEvent is always enabled in totalSystem if
+	 * it is enabled in thePlantAutomaton (it is never disabled by totalSystem).
+	 */
 	private boolean checkSafeness(Automata totalSystem, Automaton thePlantAutomaton, LabeledEvent currEvent)
 	{
 		setAttributes(totalSystem, thePlantAutomaton, currEvent);
 		SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-		VerificationOptions verificationOptions = new VerificationOptions(VerificationType.Controllability, VerificationAlgorithm.Modular, SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), false, SupremicaProperties.verifySkipUncontrollabilityCheck());
+		VerificationOptions verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
+		/*
+		VerificationOptions verificationOptions;
+		verificationOptions = new VerificationOptions(VerificationType.Controllability, 
+													  VerificationAlgorithm.Modular, 
+													  SupremicaProperties.verifyExclusionStateLimit(), 
+													  SupremicaProperties.verifyReachabilityStateLimit(), 
+													  false, // Why false? /hugo
+													  SupremicaProperties.verifySkipUncontrollabilityCheck(),
+													  SupremicaProperties.verifyNbrOfAttempts());
+		*/		
 
 		AutomataVerifier theVerifier = null;
 		boolean isSafe = false;
@@ -177,17 +210,14 @@ public class MutuallyNonblockingVerifier
 			theVerifier = new AutomataVerifier(totalSystem, synchronizationOptions, verificationOptions);
 			isSafe = theVerifier.verify();
 			logger.debug(new Boolean(isSafe));
-
 		}
 		catch (Exception ex)
 		{
 			logger.error(ex);
-			logger.debug(ex);
+			// logger.debug(ex);
 		}
 		return isSafe;
-
 	}
-
 }
 
 class AutomataToEventMap

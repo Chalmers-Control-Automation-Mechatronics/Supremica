@@ -1,5 +1,3 @@
-
-
 /*
  *  Supremica Software License Agreement
  *
@@ -119,7 +117,7 @@ public class AutomataEventList
 
 					if (index >= 0)
 					{
-						int[] newState = eventsList.getStateAt(index);
+						int[] newState = eventsList.getStateAt(currState, index);
 
 						updateStateViewer(newState);
 					}

@@ -661,7 +661,7 @@ public class Supremica
 			}
 			else if (newName.equals(""))
 			{
-				JOptionPane.showMessageDialog(this, "An empty name is not allowed", "alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "An empty name is not allowed", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else
 			{
@@ -918,7 +918,9 @@ public class Supremica
 
 		if (theProject.getComment() != "")
 		{
-			logger.info(theProject.getComment());
+			// logger.info(theProject.getComment());
+			JOptionPane.showMessageDialog(this, EncodingHelper.linebreakAdjust(theProject.getComment()), 
+										  "Info", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 		if (nbrOfAutomataBeforeOpening == 0)
