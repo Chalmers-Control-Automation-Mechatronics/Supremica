@@ -642,9 +642,21 @@ public class RobotStudioInterface
 				}
 				*/
 
-				// If no collisions, return!
+				// If no collisions, not much needs to be done...
 				if (richPath.size() == 2)
 				{
+					// MODIFY ROBOT TARGET AUTOMATON
+					if (!to.getName().equals(robot.getHomePosition().getName()))
+					{
+						Automaton target = robotAutomata.getAutomaton(robot.getName() + UNDERSCORE + to.getName());
+						Position fromPos = (Position) richPath.get(0);
+						Position toPos = (Position) richPath.get(1);
+						LabeledEvent event = new LabeledEvent(fromPos.getName() + toPos.getName());
+						Arc arc = new Arc(target.getStateWithName("0"), target.getStateWithName("1"), event);
+						target.getAlphabet().addEvent(event);
+						target.addArc(arc);
+					}
+					
 					return;
 				}
 
