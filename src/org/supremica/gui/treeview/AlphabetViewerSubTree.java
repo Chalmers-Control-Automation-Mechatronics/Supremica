@@ -16,6 +16,9 @@ import org.supremica.automata.LabeledEvent;
 public class AlphabetViewerSubTree	
 	extends SupremicaTreeNode
 {
+	/**
+	 * DEPRECATED! Use AlphabetSubTree instead!!
+	 */
 	private AlphabetViewerSubTree(Automaton automaton)
 	{
 		super(automaton.getName());

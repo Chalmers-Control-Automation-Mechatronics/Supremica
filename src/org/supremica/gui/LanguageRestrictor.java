@@ -88,6 +88,7 @@ class EventsViewerPanel	// compare AlphabetsViewerPanel
 		setPreferredSize(new Dimension(200, 400));
 		add(scrollPanel, BorderLayout.CENTER);		
 	}
+
 	// In this panel, the EventSubTrees are at level 1 (root is at 0) with the AlphabetViewerSubTrees at level 2
 	// The AlphabetViewerSubTrees are only there to show what automata the event belongs to
 	// Shold make an effort to cache the AlphabetViewerSubTrees and not calc and store the same subtree several times

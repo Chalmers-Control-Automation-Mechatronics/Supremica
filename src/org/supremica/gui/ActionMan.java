@@ -1645,7 +1645,8 @@ public class ActionMan
 		}
 		catch(Exception ex)
 		{
-			logger.error("Exception in AlphabetViewer", ex);
+			// logger.error("Exception in AlphabetViewer", ex);
+			logger.error("Exception in AutomataViewer: " + ex);
 			logger.debug(ex.getStackTrace());
 			return;
 		}

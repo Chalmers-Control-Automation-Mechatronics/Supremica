@@ -41,7 +41,7 @@ public class SupremicaTreeNode
 		return null;
 	}
 	public Icon getLeafIcon()
-	{
+	{ 
 		return null;
 	}
 	public Icon getClosedIcon()

@@ -18,10 +18,16 @@ import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.log.*;
+import org.supremica.gui.Supremica;
 
 public class EventSubTree
 	extends SupremicaTreeNode
 {
+	private ImageIcon controllableIcon = 
+		new ImageIcon(Supremica.class.getResource("/icons/ControllableEvent16.gif"));
+	private ImageIcon uncontrollableIcon = 
+		new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));
+
 	public EventSubTree(LabeledEvent event)
 	{
 		super(event);	// Note that this also caches the event for quick access
@@ -45,10 +51,35 @@ public class EventSubTree
 	// Change this to reflect the correct number of children/properties/leaves
 	// Could this be calculated from sizeof(LabeledEvent)? It should not.
 	// This depends only on the above construction
+	//
+	// UM... this method is never used, right? What is this?   /hguo
 	public int numDirectLeafs()
 	{
-		return 4;
+		return 5;
 	}
 
+	public Icon getOpenIcon()
+	{		
+		//return null;
+		if (((LabeledEvent) userObject).isControllable())
+		{
+			return controllableIcon;
+		}
+		else
+		{
+			return uncontrollableIcon;
+		}
+	}
+
+	public Icon getClosedIcon()
+	{
+		//return null;
+		return getOpenIcon();
+	}
+
+	public String toString()
+	{
+		return ((LabeledEvent) userObject).getLabel();
+	}
 }
 

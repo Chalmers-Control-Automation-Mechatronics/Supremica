@@ -13,13 +13,22 @@ import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.gui.Supremica;
 
 public class AutomatonSubTree	
 	extends SupremicaTreeNode
 {
+	private ImageIcon plantIcon = 
+		new ImageIcon(Supremica.class.getResource("/icons/Plant16.gif"));
+	private ImageIcon specificationIcon = 
+		new ImageIcon(Supremica.class.getResource("/icons/Specification16.gif"));
+	private ImageIcon interfaceIcon = 
+		new ImageIcon(Supremica.class.getResource("/icons/Interface16.gif"));
+
 	public AutomatonSubTree(Automaton automaton, boolean includeAlphabet, boolean includeStates)
 	{
-		super(automaton.getName());
+		//super(automaton.getName());
+		super(automaton);
 
 		// If we are to show either, but not both, the "Alphabet" and/or "State" nodes are unnecessary
 		if(includeAlphabet && includeStates)
@@ -27,17 +36,46 @@ public class AutomatonSubTree
 			add(new AlphabetSubTree(automaton.getAlphabet()));
 			add(new StateSetSubTree(automaton.getStateSet()));
 		}
-		else // now we know that both are not valid
-		if(includeAlphabet)
+		else if(includeAlphabet)
 		{
 			AlphabetSubTree.buildSubTree(automaton.getAlphabet(), this);
 		}
-		else
-		if(includeStates)
+		else if(includeStates)
 		{
 			StateSetSubTree.buildSubTree(automaton.getStateSet(), this);
 		}
-		// else // none
+	}
+
+	public Icon getOpenIcon()
+	{		
+		//return null;
+		Automaton aut = (Automaton) userObject;
+
+		if (aut.isPlant())
+		{
+			return plantIcon;
+		}
+		else if (aut.isSupervisor() || aut.isSpecification())
+		{
+			return specificationIcon;
+		}
+		else if (aut.isInterface())
+		{
+			return interfaceIcon;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	public Icon getClosedIcon()
+	{
+		//return null;
+		return getOpenIcon();
+	}
+
+	public String toString()
+	{
+		return ((Automaton) userObject).getName();
 	}
 }
-	

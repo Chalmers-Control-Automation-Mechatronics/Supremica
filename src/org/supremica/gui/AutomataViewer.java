@@ -30,6 +30,7 @@ class AutomataViewerPanel
 
 		add(scrollPanel, BorderLayout.CENTER);
 		build(showalpha, showstates);
+		theTree.setCellRenderer(new SupremicaTreeCellRenderer()); // EventNodeRenderer());
 	}
 
 	private AutomataViewerPanel(Automata automata)
