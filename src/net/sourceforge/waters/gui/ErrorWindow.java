@@ -1,101 +1,248 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ErrorWindow
 //###########################################################################
-//# $Id: ErrorWindow.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: ErrorWindow.java,v 1.3 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import java.awt.GridLayout;
-import javax.swing.event.*;
-import java.awt.event.*;
-import java.awt.Font;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
-/** <p>Provides an easy interface for viewing errors which occur.</p>
+import net.sourceforge.waters.model.expr.ParseException;
+
+
+/**
+ * <p>Provides an easy interface for viewing errors which occur.</p>
  *
  * <p>Features a descriptive message and an output text area.</p>
  *
  * @author Gian Perrone
  */
+
 public class ErrorWindow
 	extends JDialog
-	implements ActionListener
 {
-	private JPanel contentPane;
 
-	/** Displays an error message, with reference to pos in buf as the location of the error
-	 * @param message The error mesage
-	 * @param buf The input which caused the error
-	 * @param pos The offset within the input which caused the error.  -1 if not applicable */
-	public ErrorWindow(String message, String buf, int pos)
+	//#######################################################################
+	//# Modal Invocation
+	/**
+	 * Pops up an error dialog window.
+	 * This method shows a dialog describing a parse error message
+	 * and its position, and asks the user whether they want to
+	 * continue their editing, or stop and revert to the last correct
+	 * value of their input.
+	 * @param  exception  The parse exception that caused the error.
+	 * @param  input      The input which caused the error.
+	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
+	 *         <CODE>false</CODE> otherwise.
+	 */
+	public static boolean askRevert(final ParseException exception,
+									final String input)
 	{
-		setTitle("Waters - Error!");
+		return askRevert(null, exception, input);
+	}
 
-		//TODO: Use JEditorPane instead, and <pre> tags to make it do fixed-width font rendering
-		// Center this element on the screen
-		setModal(true);
-		setLocationRelativeTo(null);
 
-		contentPane = new JPanel();
+	/**
+	 * Pops up an error dialog window.
+	 * This method shows a dialog describing a parse error message
+	 * and its position, and asks the user whether they want to
+	 * continue their editing, or stop and revert to the last correct
+	 * value of their input.
+	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  exception  The parse exception that caused the error.
+	 * @param  input      The input which caused the error.
+	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
+	 *         <CODE>false</CODE> otherwise.
+	 */
+	public static boolean askRevert(final Frame owner,
+									final ParseException exception,
+									final String input)
+	{
+		final String message = exception.getMessage();
+		final int pos = exception.getErrorOffset();
+		return askRevert(owner, message, input, pos);
+	}
 
-		JFrame.setDefaultLookAndFeelDecorated(true);
 
-		Box b = new Box(BoxLayout.PAGE_AXIS);
+	/**
+	 * Pops up an error dialog window.
+	 * This method shows a dialog describing a parse error message
+	 * and its position, and asks the user whether they want to
+	 * continue their editing, or stop and revert to the last correct
+	 * value of their input.
+	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  exception  The parse exception that caused the error.
+	 * @param  input      The input which caused the error.
+	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
+	 *         <CODE>false</CODE> otherwise.
+	 */
+	public static boolean askRevert(final Frame owner,
+									final java.text.ParseException exception,
+									final String input)
+	{
+		final String message = exception.getMessage();
+		final int pos = exception.getErrorOffset();
+		return askRevert(owner, message, input, pos);
+	}
+
+
+	/**
+	 * Pops up an error dialog window.
+	 * This method shows a dialog describing a parse error message
+	 * and its position, and asks the user whether they want to
+	 * continue their editing, or stop and revert to the last correct
+	 * value of their input.
+	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  message    The error message to be shown.
+	 * @param  input      The input which caused the error.
+	 * @param  pos        The offset within the input where the error
+	 *                    occurred, -1 if not applicable.
+	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
+	 *         <CODE>false</CODE> otherwise.
+	 */
+	public static boolean askRevert(final Frame owner,
+									final String message,
+									final String input,
+									final int pos)
+	{
+		final ErrorWindow window = new ErrorWindow(owner, message, input, pos);
+		return window.isCancelled();
+	}
+
+
+	//#######################################################################
+	//# Constructors
+	/**
+	 * Creates an error dialog window.
+	 * This method creates a dialog describing a parse error message
+	 * and its position, and asking the user whether they want to
+	 * continue their editing, or stop and revert to the last correct
+	 * value of their input.
+	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  message    The error message to be shown.
+	 * @param  input      The input which caused the error.
+	 * @param  pos        The offset within the input where the error
+	 *                    occurred, -1 if not applicable.
+	 */
+	public ErrorWindow(final Frame owner,
+					   final String message,
+					   final String input,
+					   final int pos)
+	{
+		super(owner, "Waters - Error!", true);
+		setLocationRelativeTo(owner);
+
+		final JPanel contentPane = new JPanel();
+		final Box b = new Box(BoxLayout.PAGE_AXIS);
 
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 
 		JPanel messagePanel = new JPanel();
 
-		messagePanel.add(new JLabel("<html><b>Error:</b> " + message + "</html>"));
+		messagePanel.add
+			(new JLabel("<html><b>Error:</b> " + message + "</html>"));
 		contentPane.add(messagePanel);
 
-		JPanel buttonPanel = new JPanel();
-		JButton okButton = new JButton("OK");
-
-		okButton.addActionListener(this);
-		okButton.setActionCommand("ok");
+		final JPanel buttonPanel = new JPanel();
+		final JButton okButton = new JButton("OK");
+		final ActionListener okListener = new ButtonListener(false);
+		okButton.addActionListener(okListener);
 		buttonPanel.add(okButton);
+		final JButton cancelButton = new JButton("Cancel");
+		final ActionListener cancelListener = new ButtonListener(true);
+		cancelButton.addActionListener(cancelListener);
+		buttonPanel.add(cancelButton);
 
-		JEditorPane outArea = new JEditorPane("text/html", "");
-
-		outArea.setEditable(false);
-
-		//outArea.setFont(new Font("system", Font.PLAIN, 12));
-		String text = "<html>";
-
-		if (pos == -1)
-		{
-			text += "<b>Error:</b>\n" + buf;
-		}
-		else
-		{
-			text += "<b>Error at position " + (pos + 1) + " in:</b><br>\n";
-			text += "<pre>" + buf + "\n";
-
-			for (int i = 0; i < pos; i++)
-			{
-				text += "-";
+		final JEditorPane outArea = new JEditorPane("text/html", "");
+		final StringBuffer buffer = new StringBuffer("<html>");
+		if (pos < 0) {
+			buffer.append("<b>Error:</b>\n");
+			buffer.append(input);
+		} else {
+			buffer.append("<b>Error at position ");
+			buffer.append(pos + 1);
+			buffer.append(" in:</b><br><pre>");
+			buffer.append(input);
+			buffer.append('\n');
+			for (int i = 0; i < pos; i++) {
+				buffer.append('-');
 			}
-
-			text += "^</pre></html>\n";
+			buffer.append("^</pre></html>");
 		}
-
+		final String text = buffer.toString();
 		outArea.setText(text);
+		outArea.setEditable(false);
 		contentPane.add(new JScrollPane(outArea));
 		contentPane.add(buttonPanel);
 		setContentPane(contentPane);
 		pack();
-		show();
+		setVisible(true);
+		okButton.requestFocus();
 	}
 
-	public void actionPerformed(ActionEvent e)
+
+
+	//#######################################################################
+	//# Get the Answer
+	/**
+	 * Checks whether the user decided to cancel editing.
+	 * @return <CODE>true</CODE> if the user chose to cancel their edit,
+	 *         <CODE>false</CODE> otherwise.
+	 */
+	public boolean isCancelled()
 	{
-		if (e.getActionCommand().equals("ok"))
+		return mIsCancelled;
+	}
+
+
+
+	//#######################################################################
+	//# Local Class ButtonListener
+	private class ButtonListener implements ActionListener
+	{
+
+		//###################################################################
+		//# Constructors
+		private ButtonListener(final boolean cancel)
 		{
+			mCancel = cancel;
+		}
+
+
+		//###################################################################
+		//# Interface java.awt.event.ActionListener
+		public void actionPerformed(final ActionEvent event)
+		{
+			mIsCancelled = mCancel;
 			dispose();
 		}
+
+
+		//###################################################################
+		//# Data Members
+		private final boolean mCancel;
+
 	}
+
+
+
+	//#######################################################################
+	//# Data Members
+	private boolean mIsCancelled;
+
 }

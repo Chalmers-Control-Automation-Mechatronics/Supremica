@@ -1,10 +1,10 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorNewDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -54,7 +54,6 @@ public class EditorNewDialog
 		// Center this element on the screen
 		setModal(true);
 		setLocationRelativeTo(null);
-		JFrame.setDefaultLookAndFeelDecorated(true);
 
 		Box b = new Box(BoxLayout.PAGE_AXIS);
 		JPanel r1 = new JPanel();
@@ -141,10 +140,8 @@ public class EditorNewDialog
 			}
 			catch (final ParseException exception)
 			{
-
 				// an error has occurred ...
-				ErrorWindow ew = new ErrorWindow("Parse error in identifier: " + exception.getMessage(), name.getText(), exception.getPosition());
-
+				ErrorWindow.askRevert(exception,  name.getText());
 				return;
 			}
 

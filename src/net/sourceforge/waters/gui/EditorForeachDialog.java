@@ -1,10 +1,10 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorForeachDialog
 //###########################################################################
-//# $Id: EditorForeachDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorForeachDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -44,7 +44,6 @@ public class EditorForeachDialog
 		this.root = root;
 
 		this.setTitle("Foreach Component Editor");
-		JFrame.setDefaultLookAndFeelDecorated(true);
 
 		Box b = new Box(BoxLayout.PAGE_AXIS);
 		JPanel r1 = new JPanel();
@@ -125,9 +124,7 @@ public class EditorForeachDialog
 
 				// an error has occurred ...
 				JOptionPane.showMessageDialog(this, "Invalid Name for Component");
-
-				ErrorWindow ew = new ErrorWindow("Parse error in identifier: " + exception.getMessage(), name.getText(), exception.getPosition());
-
+				ErrorWindow.askRevert(exception,  name.getText());
 				return;
 			}
 
@@ -160,8 +157,7 @@ public class EditorForeachDialog
 			}
 			catch (final ParseException exception)
 			{
-				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), body, exception.getPosition());
-
+				ErrorWindow.askRevert(exception,  body);
 				root.logEntry("ParseException: " + exception.getMessage());
 
 				return;

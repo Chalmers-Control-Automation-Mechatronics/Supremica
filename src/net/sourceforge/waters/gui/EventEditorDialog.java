@@ -1,10 +1,10 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EventEditorDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -170,8 +170,7 @@ public class EventEditorDialog
 			}
 			catch (final ParseException exception)
 			{
-				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), name.getText(), exception.getPosition());
-
+				ErrorWindow.askRevert(exception,  name.getText());
 				root.logEntry("ParseException in event name: " + exception.getMessage());
 
 				return;
@@ -191,8 +190,7 @@ public class EventEditorDialog
 				}
 				catch (final ParseException exception)
 				{
-					ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), (String) data.get(i), exception.getPosition());
-
+					ErrorWindow.askRevert(exception,  (String) data.get(i));
 					root.logEntry("ParseException in event range: " + exception.getMessage());
 
 					return;
@@ -250,8 +248,7 @@ public class EventEditorDialog
 			}
 			catch (final ParseException exception)
 			{
-				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), range, exception.getPosition());
-
+				ErrorWindow.askRevert(exception, range);
 				root.logEntry("ParseException in event range: " + exception.getMessage());
 
 				return;

@@ -1,10 +1,10 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.6 2005-02-18 03:09:06 knut Exp $
+//# $Id: ModuleWindow.java,v 1.7 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -76,9 +76,8 @@ public class ModuleWindow
 
 	public ModuleWindow(String title)
 	{
-		this.setTitle(title);
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle(title);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		module = new ModuleProxy("Unnamed Module", null);
 		debugPane = createDebugPane();
@@ -728,8 +727,7 @@ public class ModuleWindow
 				}
 				catch (final ParseException exception)
 				{
-					ErrorWindow ew = new ErrorWindow("Parse error in identifier: " + exception.getMessage(), modName, exception.getPosition());
-
+					ErrorWindow.askRevert(exception,  modName);
 					//constructWindow();
 					ModuleWindow w = new ModuleWindow("Waters");
 				}
@@ -895,7 +893,8 @@ public class ModuleWindow
 
 		LanguagesEN.createLanguage(WLang);
 
-		//TODO: Put this inside a thread
 		ModuleWindow editor = new ModuleWindow("Waters");
+
 	}
+
 }

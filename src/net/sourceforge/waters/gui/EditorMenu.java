@@ -1,11 +1,13 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.4 2005-02-19 03:26:56 flordal Exp $
+//# $Id: EditorMenu.java,v 1.5 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -13,19 +15,21 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
-/** <p>The EditorWindow menu.</p>
+/**
+ * <p>The EditorWindow menu.</p>
  *
  * <p>Creates a menu bar for use with the editor.</p>
  *
  * @author Gian Perrone
  */
+
 public class EditorMenu
 	extends JMenuBar
 	implements ActionListener
 {
 	public final JMenuItem FileNewMenu;
 	public final JMenuItem FileExitMenu;
-	public final JMenuItem ToolsCreateShadeMenu;
+	public final JMenuItem mToolsCreateEvent;
 	public final JMenuItem ToolsOptionsMenu;
 	public final JMenuItem editDeleteMenu;
 	public final JMenuItem editCopyAsWMFMenu;
@@ -123,9 +127,8 @@ public class EditorMenu
 
 		menu.addSeparator();
 
-		menuItem = new JMenuItem("Color selector");
-		ToolsCreateShadeMenu = menuItem;
-
+		menuItem = new JMenuItem("Create Event");
+		mToolsCreateEvent = menuItem;
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
 		menu.addSeparator();
@@ -167,9 +170,9 @@ public class EditorMenu
 			root.getControlledSurface().deleteSelected();
 		}
 
-		if (e.getSource() == ToolsCreateShadeMenu)
+		if (e.getSource() == mToolsCreateEvent)
 		{
-			ShadeDialog dialog = new ShadeDialog(root);
+			root.getEventPane().createEvent();
 		}
 
 		if (e.getSource() == ToolsOptionsMenu)

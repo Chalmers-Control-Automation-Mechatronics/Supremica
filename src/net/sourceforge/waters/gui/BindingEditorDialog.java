@@ -1,10 +1,10 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   BindingEditorDialog
 //###########################################################################
-//# $Id: BindingEditorDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: BindingEditorDialog.java,v 1.3 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -114,8 +114,7 @@ public class BindingEditorDialog
 			}
 			catch (final ParseException exception)
 			{
-				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), expr.getText(), exception.getPosition());
-
+				ErrorWindow.askRevert(exception,  expr.getText());
 				root.logEntry("ParseException in binding: " + exception.getMessage());
 
 				return;

@@ -1,10 +1,10 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.4 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorWindow.java,v 1.5 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -37,7 +37,6 @@ class EditorWindow
 
 	public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element)
 	{
-		JFrame.setDefaultLookAndFeelDecorated(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle(title);
 
@@ -64,9 +63,12 @@ class EditorWindow
 
 		final JScrollPane scrollsurface = new JScrollPane(surface);
 		final JScrollPane scrollevents = new JScrollPane(events);
-		final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
-
+		final JViewport viewevents = scrollevents.getViewport();
+		final JSplitPane split = new JSplitPane
+			(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
+		viewevents.setBackground(Color.WHITE);
 		split.setResizeWeight(1.0);
+		split.setDividerLocation(500);
 
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.BOTH;
@@ -121,6 +123,11 @@ class EditorWindow
 	public ControlledSurface getControlledSurface()
 	{
 		return surface;
+	}
+
+	public EditorEvents getEventPane()
+	{
+		return events;
 	}
 
 	void copyAsWMFToClipboard()

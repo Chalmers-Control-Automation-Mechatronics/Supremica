@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.3 2005-02-19 03:26:56 flordal Exp $
+//# $Id: EditorSurface.java,v 1.4 2005-02-20 23:32:54 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -291,8 +291,6 @@ public class EditorSurface
 
 	public EditorNodeGroup getLastNodeGroup()
 	{
-		System.out.println("" + nodeGroups.size() + ":NodeGroups");
-
 		if (!nodeGroups.isEmpty())
 		{
 			return (EditorNodeGroup) nodeGroups.get(nodeGroups.size() - 1);
@@ -452,8 +450,6 @@ public class EditorSurface
 
 	public void delNodeGroup(EditorNodeGroup n)
 	{
-		System.out.println("deleting NodeGroup");
-
 		for (int i = 0; i < edges.size(); i++)
 		{
 			EditorEdge e = (EditorEdge) edges.get(i);
@@ -698,7 +694,6 @@ public class EditorSurface
 					else
 					{
 						addNode(np);
-						System.out.println("Node: " + np.getName());
 					}
 				}
 				else if (temp instanceof GroupNodeProxy)
@@ -831,7 +826,7 @@ public class EditorSurface
 				else
 				{
 					//TODO: Do something here!
-					System.out.println("SOURCE OR TARGET IS NULL!");
+					System.err.println("SOURCE OR TARGET IS NULL!");
 				}
 			}
 		}
