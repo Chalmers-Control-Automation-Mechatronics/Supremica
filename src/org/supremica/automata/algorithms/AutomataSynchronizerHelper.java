@@ -170,14 +170,14 @@ public final class AutomataSynchronizerHelper
 
 	public void clear()
 	{
-		automataIsControllable = true;
 		theStates.clear();
+		automataIsControllable = true;
 		coExecute = false;
 		coExecuter = null;
 		rememberTrace = false;
 		exhaustiveSearch = false;
 		rememberUncontrollable = false;
-		expandEventsUsingPriority = false;
+		expandEventsUsingPriority = false; // Should be an external option?!? FIXA!
 		// Is there anything else that needs to be cleared?...
 	}
 

@@ -476,7 +476,7 @@ public final class AutomataSynchronizerExecuter
 
  		// main loop
      	while (currState != null && !stopRequested)
-     	{
+     	{			
 			if (coExecute)
 				coExecuter.setCurrState(currState);
 

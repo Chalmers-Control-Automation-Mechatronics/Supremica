@@ -226,6 +226,9 @@ public class AutomataVerifier
 						synchronizationExecuters.add(currSynchronizationExecuter);
 					}
 
+					if (stopRequested)
+						return false;
+
 					// Start all the synchronization executers and wait for completion
 					// For the moment we assume that we only have one thread
 					for (int i = 0; i < synchronizationExecuters.size(); i++)
@@ -237,6 +240,9 @@ public class AutomataVerifier
 					}
 					((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
 
+					if (stopRequested)
+						return false;
+					
 					String automataNames = "";
 					if (verboseMode)
 					{	// For printing the names of the automata in selectedAutomata
@@ -281,6 +287,8 @@ public class AutomataVerifier
 							{	// Add the similar automata  in hope of removing uncontrollable
 								// states from potentiallyUncontrollableStates...
 								excludeUncontrollableStates(similarAutomata, selectedAutomata, automataIndices);
+								if (stopRequested)
+									return false;
 							}
 
 							if (potentiallyUncontrollableStates.size(automataIndices) > 0)
@@ -492,11 +500,38 @@ public class AutomataVerifier
 			{   // Synchronize...
 				// synchHelper.clear(); // This is done while analyzing the result se *** below
 				synchHelper.addState(initialState);
+				
+				/*
 				AutomataSynchronizerExecuter currExecuter =
 					new AutomataSynchronizerExecuter(synchHelper);
 				currExecuter.selectAutomata(selectedAutomata);
 				currExecuter.start();
 				currExecuter.join();
+				*/
+
+				// Initialize the synchronizationExecuters
+				synchronizationExecuters.clear();
+				for (int j = 0; j < nbrOfExecuters; j++)
+				{
+					AutomataSynchronizerExecuter currSynchronizationExecuter =
+						new AutomataSynchronizerExecuter(synchHelper);
+					synchronizationExecuters.add(currSynchronizationExecuter);
+				}
+				
+				// Start all the synchronization executers and wait for completion
+				// For the moment we assume that we only have one thread
+				for (int j = 0; j < synchronizationExecuters.size(); j++)
+				{
+					AutomataSynchronizerExecuter currExec =
+						(AutomataSynchronizerExecuter) synchronizationExecuters.get(j);
+					currExec.selectAutomata(selectedAutomata);
+					currExec.start();
+				}
+				((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+
+				if (stopRequested)
+					return;
+
 				// Examine if there are states in potentiallyUncontrollableStates
 				// that are not represented in the new synchronization
 				int[][] currStateTable = synchHelper.getStateTable();

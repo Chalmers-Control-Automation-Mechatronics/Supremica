@@ -103,7 +103,7 @@ public class CancelDialog
 		this.eventQueue = eventQueue;
 
 		setTitle("Stop execution");
-		setSize(new Dimension(250, 120));
+		setSize(new Dimension(240, 110));
 		// dialog.setLocation(200,100);
 		setResizable(false);
 
@@ -196,7 +196,9 @@ public class CancelDialog
 				{
 					counterLabel = null;
 					progressBar = new JProgressBar(min, max);
+					progressBar.setStringPainted(true);
 					counterPanel.removeAll();
+					counterPanel.repaint();
 					counterPanel.add(progressBar);
 				}
 			});
@@ -210,40 +212,41 @@ public class CancelDialog
 
 	public void updateCounter(int value)
 	{
+		final int counterValue = value;
+		eventQueue.invokeLater(new Runnable()
+					{   public void run()
+						{   
+							if (progressBar == null)
+								counterLabel.setText(String.valueOf(counterValue));
+							else if (counterLabel == null)
+								progressBar.setValue(counterValue);
+						}
+			});
+		
+		/*
 		if (progressBar == null)
 		{
-			// try
+			try
 			{
-				final int counterValue = value;
-				eventQueue.invokeLater(new Runnable()
-					{   public void run()
-						{   counterLabel.setText(String.valueOf(counterValue));
-						}
-					});
-				//counterLabel.setText(String.valueOf(value));
+				counterLabel.setText(String.valueOf(value));
 			}
-			// catch (Exception e)
+			catch (Exception e)
 			{
-				// System.out.println("Error when updating counter.");
+				System.out.println("Error when updating counter.");
 			}
 		}
 		else if (counterLabel == null)
 		{
-			// try
+			try
 			{
-				final int counterValue = value;
-				eventQueue.invokeLater(new Runnable()
-					{   public void run()
-						{   progressBar.setValue(counterValue);
-						}
-					});
-				// progressBar.setValue(value);
+				progressBar.setValue(value);
 			}
-			// catch (Exception e)
+			catch (Exception e)
 			{
-				// System.out.println("Error when updating progress bar.");
+				System.out.println("Error when updating progress bar.");
 			}
 		}
+		*/
 	}
 
 	public void updateHeader(String headerMessage)

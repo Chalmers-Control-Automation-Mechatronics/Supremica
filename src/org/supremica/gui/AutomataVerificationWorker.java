@@ -114,8 +114,8 @@ public class AutomataVerificationWorker
 
 			if (theAutomata.size() < 2)
 			{
-				requestStop();
 				JOptionPane.showMessageDialog(workbench, "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				requestStop();
 				return;
 			}
 
@@ -231,8 +231,8 @@ public class AutomataVerificationWorker
 			
 			if (automataA.size() < 1 || automataB.size() < 1)
 			{
-				requestStop();
 				thisCategory.error("At least one automaton must be unselected.");
+				requestStop();
 				return;
 			}
 

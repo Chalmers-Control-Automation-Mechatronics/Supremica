@@ -651,9 +651,11 @@ public class Supremica
 		menuHandler.add(controllabilityCheckItem, 2);
 		*/		
 
+		/*
 		JMenuItem fastControllabilityCheckItem = new JMenuItem("Fast controllability check");
 		menuHandler.add(fastControllabilityCheckItem, 2);
-		
+		*/		
+
 		/*
 		JMenuItem pairwiseCheckItem = new JMenuItem("Pairwise controllability check");
 		menuHandler.add(pairwiseCheckItem, 2);
@@ -848,6 +850,7 @@ public class Supremica
 			});
 		*/
 
+		/*
 		fastControllabilityCheckItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -856,7 +859,8 @@ public class Supremica
 					repaint();
 				}
 			});
-		
+		*/
+
 		/*
 		pairwiseCheckItem.addActionListener(new ActionListener()
 			{
@@ -1334,7 +1338,7 @@ public class Supremica
 			return;
 		}
 
-		String newAutomatonName = getNewAutomatonName("Please enter a new name");
+		String newAutomatonName = getNewAutomatonName("Please enter a new name", "");
 
 		if (newAutomatonName == null)
 		{
@@ -1584,6 +1588,7 @@ public class Supremica
 		}
 	 }
 	
+	
 	/**
 	 * @deprecated use AutomataVerifier instead.
 	 */
@@ -1641,7 +1646,7 @@ public class Supremica
 		{
 			JOptionPane.showMessageDialog(this, "The automata is NOT controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 		}
-	 }
+	}
 
 	/*
 	// Automaton.PairwiseCheck action performed
@@ -1949,7 +1954,7 @@ public class Supremica
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			String newAutomatonName = getNewAutomatonName("Please enter a new name");
+			String newAutomatonName = getNewAutomatonName("Please enter a new name", currAutomaton.getName() + "_c");
 
 			if (newAutomatonName == null)
 			{
@@ -1984,7 +1989,7 @@ public class Supremica
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			String newAutomatonName = getNewAutomatonName("Please enter a new name");
+			String newAutomatonName = getNewAutomatonName("Please enter a new name", "");
 
 			if (newAutomatonName == null)
 			{
@@ -2125,7 +2130,7 @@ public class Supremica
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			String newAutomatonName = getNewAutomatonName("Please enter a new name");
+			String newAutomatonName = getNewAutomatonName("Please enter a new name", "");
 
 			if (newAutomatonName == null)
 			{
@@ -2192,7 +2197,7 @@ public class Supremica
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
-			String newAutomatonName = getNewAutomatonName("Please enter a new name");
+			String newAutomatonName = getNewAutomatonName("Please enter a new name", currAutomaton.getName() + "(2)");
 			if (newAutomatonName == null)
 				return;
 			try
@@ -2265,7 +2270,7 @@ public class Supremica
 			String currAutomatonName = currAutomaton.getName();
 			try
 			{
-				String newName = getNewAutomatonName("Enter a new name for " + currAutomatonName);
+				String newName = getNewAutomatonName("Enter a new name for " + currAutomatonName, currAutomatonName);
 				if (newName != null)
 				{
 					theAutomatonContainer.rename(currAutomaton, newName);
@@ -2518,25 +2523,27 @@ public class Supremica
 		return newName;
 	}
 
-	public String getNewAutomatonName(String msg)
+	public String getNewAutomatonName(String msg, String nameSuggestion)
 	{
 		boolean finished = false;
 		String newName = "";
 
 		while (!finished)
 		{
-			newName = JOptionPane.showInputDialog(this, msg);
+			newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name", 
+														   JOptionPane.QUESTION_MESSAGE,
+														   null, null, nameSuggestion);
 			if (newName == null)
 			{
 				return null;
 			}
 			else if (newName.equals(""))
 			{
-				JOptionPane.showMessageDialog(this, "An empty name is not allowed", "alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "An empty name is not allowed", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else if (theAutomatonContainer.containsAutomaton(newName))
 			{
-				JOptionPane.showMessageDialog(this, newName + " already exists", "alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, newName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else
 			{
@@ -2562,7 +2569,7 @@ public class Supremica
 			}
 			catch (Exception e)
 			{
-				JOptionPane.showMessageDialog(this, "Not a valid integer", "alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Not a valid integer", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		return theIntValue;
@@ -2616,10 +2623,11 @@ public class Supremica
 				// Note that a null name is not allowed by AutomataBuildFromXml
 				if (currAutomaton.getName().equals(""))
 				{
-					String autName = getNewAutomatonName("Enter a new name");
+					String autName = getNewAutomatonName("Enter a new name", "");
 					if (autName == null)
 					{
 						add = false;
+						return; // It's not ok to cancel!
 					}
 					else
 					{
@@ -2631,12 +2639,13 @@ public class Supremica
 				{
 					String autName = currAutomaton.getName();
 
-					JOptionPane.showMessageDialog(this, autName + " already exists", "alert", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this, autName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
 
-					autName = getNewAutomatonName("Enter a new name");
+					autName = getNewAutomatonName("Enter a new name", autName + "(2)");
 					if (autName == null)
 					{
 						add = false;
+						return; // It's not ok to cancel!
 					}
 					else
 					{
@@ -2684,17 +2693,31 @@ public class Supremica
 			{
 				Automaton currAutomaton = (Automaton)autIt.next();
 				boolean add = true;
+				if (currAutomaton.getName().equals(""))
+				{
+					String autName = getNewAutomatonName("Enter a new name", "");
+					if (autName == null)
+					{
+						add = false;
+						return; // It's not ok to cancel!
+					}
+					else
+					{
+						currAutomaton.setName(autName);
+					}
+				}
+
 				if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
 				{
 					String autName = currAutomaton.getName();
 
-					JOptionPane.showMessageDialog(this, autName + " already exists", "alert",
+					JOptionPane.showMessageDialog(this, autName + " already exists", "Alert",
 												  JOptionPane.ERROR_MESSAGE);
 
-					autName = getNewAutomatonName("Enter a new name");
+					autName = getNewAutomatonName("Enter a new name", autName + "(2)");
 					if (autName == null)
 					{
-						add = false;
+						add = false; // It's not ok to cancel!
 					}
 					else
 					{
