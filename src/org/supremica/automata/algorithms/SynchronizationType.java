@@ -56,7 +56,7 @@ public class SynchronizationType
 	private static Collection types = new LinkedList();
 	public static final SynchronizationType Prioritized = new SynchronizationType("Prioritized Synchronization");
 	public static final SynchronizationType Full = new SynchronizationType("Full Synchronization");
-	public static final SynchronizationType Broadcast = new SynchronizationType("Broadcast Synchronization", false);
+	public static final SynchronizationType Broadcast = new SynchronizationType("Broadcast Synchronization");
 	public static final SynchronizationType Unknown = new SynchronizationType("Unknown", false);
 	private String description = null;
 
