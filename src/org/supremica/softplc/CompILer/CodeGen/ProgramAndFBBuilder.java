@@ -1522,8 +1522,7 @@ public abstract class ProgramAndFBBuilder
 			else
 			    {
 				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
-				ilRun.append(InstructionConstants.FSUB);
-				ilRun.append(InstructionConstants.F2I);
+				ilRun.append(InstructionConstants.FCMPL);
 			    }			    
 			InstructionHandle if_true;
 			BranchInstruction ifeq = new IFEQ(null);
@@ -1564,8 +1563,7 @@ public abstract class ProgramAndFBBuilder
 			ilRun.append(InstructionConstants.ISUB);
 		    }
 		    else {
-			ilRun.append(InstructionConstants.FSUB);
-			ilRun.append(InstructionConstants.F2I);
+			ilRun.append(InstructionConstants.FCMPL);
 		    }			    
 
 		    InstructionHandle if_true;
@@ -1622,8 +1620,7 @@ public abstract class ProgramAndFBBuilder
 			else
 			    {
 				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
-				ilRun.append(InstructionConstants.FSUB);
-				ilRun.append(InstructionConstants.F2I);
+				ilRun.append(InstructionConstants.FCMPL);
 			    }
 			InstructionHandle if_true;
 			BranchInstruction ifgt = new IFGT(null);
@@ -1664,8 +1661,7 @@ public abstract class ProgramAndFBBuilder
 			ilRun.append(InstructionConstants.ISUB);
 		    }
 		    else {
-			ilRun.append(InstructionConstants.FSUB);
-			ilRun.append(InstructionConstants.F2I);
+			ilRun.append(InstructionConstants.FCMPL);
 		    }
 		    
 		    InstructionHandle if_true;
@@ -1721,8 +1717,7 @@ public abstract class ProgramAndFBBuilder
 			else
 			    {
 				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
-				ilRun.append(InstructionConstants.FSUB);
-				ilRun.append(InstructionConstants.F2I);
+				ilRun.append(InstructionConstants.FCMPL);
 			    }
 			
 			// subtracting values on the stack
@@ -1765,8 +1760,7 @@ public abstract class ProgramAndFBBuilder
 			ilRun.append(InstructionConstants.ISUB);
 		    }
 		    else {
-			ilRun.append(InstructionConstants.FSUB);
-			ilRun.append(InstructionConstants.F2I);
+			ilRun.append(InstructionConstants.FCMPL);
 		    }
 		    
 		    InstructionHandle if_true;
@@ -1823,8 +1817,7 @@ public abstract class ProgramAndFBBuilder
 			else
 			    {
 				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
-				ilRun.append(InstructionConstants.FSUB);
-				ilRun.append(InstructionConstants.F2I);
+				ilRun.append(InstructionConstants.FCMPG);
 			    }
 
 			// subtracting values on the stack
@@ -1867,8 +1860,7 @@ public abstract class ProgramAndFBBuilder
 			ilRun.append(InstructionConstants.ISUB);
 		    }
 		    else {
-			ilRun.append(InstructionConstants.FSUB);
-			ilRun.append(InstructionConstants.F2I);
+			ilRun.append(InstructionConstants.FCMPG);
 		    }
 			
 		    InstructionHandle if_true;
@@ -1925,8 +1917,7 @@ public abstract class ProgramAndFBBuilder
 			else
 			    {
 				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
-				ilRun.append(InstructionConstants.FSUB);
-				ilRun.append(InstructionConstants.F2I);
+				ilRun.append(InstructionConstants.FCMPG);
 			    }
 
 			// subtracting values on the stack
@@ -1969,8 +1960,7 @@ public abstract class ProgramAndFBBuilder
 			ilRun.append(InstructionConstants.ISUB);
 		    }
 		    else {
-			ilRun.append(InstructionConstants.FSUB);
-			ilRun.append(InstructionConstants.F2I);
+			ilRun.append(InstructionConstants.FCMPG);
 		    }
 
 		    InstructionHandle if_true;
@@ -2026,8 +2016,7 @@ public abstract class ProgramAndFBBuilder
 			else
 			    {
 				ilRun.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
-				ilRun.append(InstructionConstants.FSUB);
-				ilRun.append(InstructionConstants.F2I);
+				ilRun.append(InstructionConstants.FCMPL);
 			    }
 
 			InstructionHandle if_true;
@@ -2069,8 +2058,7 @@ public abstract class ProgramAndFBBuilder
 			ilRun.append(InstructionConstants.ISUB);
 		    }
 		    else {
-			ilRun.append(InstructionConstants.FSUB);
-			ilRun.append(InstructionConstants.F2I);
+			ilRun.append(InstructionConstants.FCMPL);
 		    }
 			
 		    InstructionHandle if_true;
