@@ -129,7 +129,7 @@ public final class WorkbenchProperties
 		setProperty(FILE_ALLOW_EXPORT, "true");
 		setProperty(FILE_ALLOW_QUIT, "true");
 
-		setProperty(XML_RPC_ACTIVE, "true");
+		setProperty(XML_RPC_ACTIVE, "false");
 		setProperty(XML_RPC_PORT, "9112");
 		setProperty(DOT_USE, "true");
 		setProperty(DOT_EXECUTE_COMMAND, "dot");
