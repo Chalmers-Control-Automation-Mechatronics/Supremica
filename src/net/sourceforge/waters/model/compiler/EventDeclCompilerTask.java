@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   EventDeclCompilerTask
 //###########################################################################
-//# $Id: EventDeclCompilerTask.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EventDeclCompilerTask.java,v 1.2 2005-02-21 19:19:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -16,9 +17,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -54,9 +53,6 @@ class EventDeclCompilerTask extends CompilerTask
     throws EvalException
   {
     final CompilerContext context = getContext();
-    final String name = decl.getName();
-    final EventKind kind = decl.getKind();
-    final ColorGeometryProxy geo = decl.getColorGeometry();
     final List expressions = decl.getRanges();
     final List ranges = new ArrayList(expressions.size());
     final Iterator iter = expressions.iterator();
@@ -65,9 +61,10 @@ class EventDeclCompilerTask extends CompilerTask
       final RangeValue range = expr.evalToRange(context);
       ranges.add(range);
     }
+    final String name = decl.getName();
     final String fullname = context.getPrefixedName(name);
     final CompiledEventDecl entry =
-      new CompiledEventDecl(fullname, kind, ranges, geo, mEnvironment);
+      new CompiledEventDecl(fullname, decl, ranges, mEnvironment);
     final EventValue value = entry.getValue();
     context.set(name, value);
   }

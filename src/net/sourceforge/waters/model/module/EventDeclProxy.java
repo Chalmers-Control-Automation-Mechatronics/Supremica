@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.model.decl
+//# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EventDeclProxy.java,v 1.2 2005-02-21 19:19:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -48,14 +49,19 @@ import net.sourceforge.waters.xsd.module.IdentifierType;
  * <DD>A string defining the name of the event. It is unique within an
  * a module and must obey syntactic restrictions for identifiers.</DD>
  * <DT><STRONG>Kind.</STRONG></DT>
- * <DD>The type of the event. This can be <I>controllable</I>,
- * <I>uncontrollable</I>, or <I>proposition</I>.</DD>
+ * <DD>The type of the events obtained from the declaration.
+ * This can be <I>controllable</I>, <I>uncontrollable</I>,
+ * or <I>proposition</I>.</DD>
+ * <DT><STRONG>Observability.</STRONG></DT>
+ * <DD>A boolean flag, indicating whether the events obtained from the
+ * declaration are considered <I>observable</I>.</DD>
  * <DT><STRONG>Indexes.</STRONG></DT>
  * <DD>Event arrays are declared by specifying a list of index ranges,
  * each defining the possible range of indexes at one index position.</DD>
  * <DT><STRONG>Color Geometry.</STRONG></DT>
- * <DD>Events of kind <I>proposition</I> may have a color associated to them,
- * which then defines how nodes marked with the proposition are rendered.</DD>
+ * <DD>Events of kind <I>proposition</I> may have a color associated to
+ * them, which then defines how nodes marked with the proposition are
+ * rendered.</DD>
  * </DL>
  *
  * @author Robi Malik
@@ -67,13 +73,29 @@ public class EventDeclProxy extends UniqueElementProxy {
   //# Constructors
   /**
    * Creates a simple event declaration.
-   * @param  name        The name of the new event.
-   * @param  kind        The kind of the new event.
+   * This constructor creates an observable event declaration.
+   * @param  name        The name of the new event declaration.
+   * @param  kind        The kind of the new event declaration.
    */
   public EventDeclProxy(final String name, final EventKind kind)
   {
+    this(name, kind, true);
+  }
+
+  /**
+   * Creates a simple event declaration.
+   * @param  name        The name of the new event declaration.
+   * @param  kind        The kind of the new event declaration.
+   * @param  observable  <CODE>true</CODE> if the event declaration is to
+   *                     be observable, <CODE>false</CODE> otherwise.
+   */
+  public EventDeclProxy(final String name,
+			final EventKind kind,
+			final boolean observable)
+  {
     super(name);
     mKind = kind;
+    mIsObservable = observable;
     mRangeListProxy = new RangeListProxy();
     mColorGeometry = null;
   }
@@ -90,6 +112,7 @@ public class EventDeclProxy extends UniqueElementProxy {
   {
     super(decl);
     mKind = decl.getKind();
+    mIsObservable = decl.isObservable();
     mRangeListProxy = new RangeListProxy(decl);
     final ColorGeometryType geo = decl.getColorGeometry();
     if (geo != null) {
@@ -101,7 +124,7 @@ public class EventDeclProxy extends UniqueElementProxy {
   //#########################################################################
   //# Getters and Setters
   /**
-   * Gets the kind of this event.
+   * Gets the kind of this event declaration.
    * @return One of {@link EventKind#CONTROLLABLE},
    *         {@link EventKind#UNCONTROLLABLE}, or
    *         {@link EventKind#PROPOSITION}.
@@ -112,7 +135,7 @@ public class EventDeclProxy extends UniqueElementProxy {
   }
 
   /**
-   * Sets the kind of this event.
+   * Sets the kind of this event declaration.
    * @param  kind        The new event kind, one of
    *                     {@link EventKind#CONTROLLABLE},
    *                     {@link EventKind#UNCONTROLLABLE}, or
@@ -121,6 +144,26 @@ public class EventDeclProxy extends UniqueElementProxy {
   public void setKind(final EventKind kind)
   {
     mKind = kind;
+  }
+
+  /**
+   * Gets the observability status of this event declaration.
+   * @return <CODE>true</CODE> if the event declaration is observable,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isObservable()
+  {
+    return mIsObservable;
+  }
+
+  /**
+   * Sets the observability status of this event declaration.
+   * @param  observable  <CODE>true</CODE> if the event declaration is to
+   *                     be observable, <CODE>false</CODE> otherwise.
+   */
+  public void setObservable(final boolean observable)
+  {
+    mIsObservable = observable;
   }
 
   /**
@@ -180,7 +223,8 @@ public class EventDeclProxy extends UniqueElementProxy {
 	super.equals(partner)) {
       final EventDeclProxy decl = (EventDeclProxy) partner;
       return
-	getKind().equals(decl.getKind()) &&
+	mKind.equals(decl.mKind) &&
+	(mIsObservable == decl.mIsObservable) &&
 	getRanges().equals(decl.getRanges());
     } else {
       return false;
@@ -236,6 +280,9 @@ public class EventDeclProxy extends UniqueElementProxy {
       final String kindname = kind.toString();
       final String lowername = kindname.toLowerCase();
       printer.print(lowername);
+      if (!isObservable()) {
+	printer.print("unobservable ");
+      }
       printer.print(' ');
     }
     printer.print(getName());
@@ -257,6 +304,7 @@ public class EventDeclProxy extends UniqueElementProxy {
     super.toJAXBElement(element);
     final EventBaseType decl = (EventBaseType) element;
     decl.setKind(getKind());
+    decl.setObservable(isObservable());
     final ElementFactory factory = new RangeElementFactory(decl);
     mRangeListProxy.toJAXB(factory);
     if (mColorGeometry != null) {
@@ -386,6 +434,7 @@ public class EventDeclProxy extends UniqueElementProxy {
   //#########################################################################
   //# Data Members
   private EventKind mKind;
+  private boolean mIsObservable;
   private ColorGeometryProxy mColorGeometry;
   private final ListProxy mRangeListProxy;
 

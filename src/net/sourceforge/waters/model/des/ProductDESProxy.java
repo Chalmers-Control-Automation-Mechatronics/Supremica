@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.model.des
 //# CLASS:   ProductDESProxy
 //###########################################################################
-//# $Id: ProductDESProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ProductDESProxy.java,v 1.2 2005-02-21 19:19:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -217,7 +218,7 @@ public class ProductDESProxy
   //# Equals and Hashcode
   public boolean equals(final Object partner)
   {
-    if (getClass() == partner.getClass() && super.equals(partner)) {
+    if (super.equals(partner)) {
       final ProductDESProxy des = (ProductDESProxy) partner;
       return
 	mEventSetProxy.equals(des.mEventSetProxy) &&

@@ -46,6 +46,7 @@
     <xs:enumeration value="PLANT"/>
     <xs:enumeration value="SPEC"/>
     <xs:enumeration value="PROPERTY"/>
+    <xs:enumeration value="SUPERVISOR"/>
   </xs:restriction>
 </xs:simpleType>
 

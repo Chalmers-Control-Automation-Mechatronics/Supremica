@@ -228,6 +228,7 @@
         <xs:element ref="M:ColorGeometry" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="Kind" type="B:EventKind" use="required"/>
+      <xs:attribute name="Observable" type="xs:boolean" default="true"/>
     </xs:extension>
   </xs:complexContent>
 </xs:complexType>

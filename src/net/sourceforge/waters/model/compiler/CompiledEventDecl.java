@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledEventDecl
 //###########################################################################
-//# $Id: CompiledEventDecl.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: CompiledEventDecl.java,v 1.2 2005-02-21 19:19:51 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -19,6 +20,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -37,15 +39,15 @@ class CompiledEventDecl
   //#########################################################################
   //# Constructors
   CompiledEventDecl(final String name,
-		    final EventKind kind,
+		    final EventDeclProxy decl,
 		    final List ranges,
-		    final ColorGeometryProxy geo,
 		    final ModuleCompiler environment)
   {
     mName = name;
-    mKind = kind;
+    mKind = decl.getKind();
+    mIsObservable = decl.isObservable();
     mRanges = Collections.unmodifiableList(ranges);
-    mGeometry = geo;
+    mGeometry = decl.getColorGeometry();
     mIndexValueMap = new HashMap();
     mEnvironment = environment;
   }
@@ -106,7 +108,7 @@ class CompiledEventDecl
   EventProxy getEvent(final List indexes)
   {
     final String name = getIndexedName(indexes);
-    final EventProxy template = new EventProxy(name, mKind);
+    final EventProxy template = new EventProxy(name, mKind, mIsObservable);
     return mEnvironment.getEvent(template);
   }
 
@@ -131,6 +133,7 @@ class CompiledEventDecl
   //# Data Members
   private final String mName;
   private final EventKind mKind;
+  private final boolean mIsObservable;
   private final List mRanges;
   private final ColorGeometryProxy mGeometry;
   private final Map mIndexValueMap;
