@@ -1,7 +1,7 @@
 package org.supremica.gui;
 
 import java.awt.*;
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 public class SplashWindow
         extends java.awt.Window
@@ -45,6 +45,6 @@ public class SplashWindow
                 BorderLayout layout = new BorderLayout();
                 this.setLayout(layout);
                 ImageIcon imageIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"));
-                layout.add(new Label(imageIcon), BorderLayout.CENTER);
+                layout.add(new JLabel(imageIcon), BorderLayout.CENTER);
         }
 }
