@@ -101,7 +101,7 @@ public class AOH_Force
 
 		if(Options.profile_on)
 		{
-			Options.out.println("--> [AOH_Force] best lowest total span = " + best_span);
+			Options.out.println("--> [AOH_Force] lowest total span = " + best_span);
 		}
 
 

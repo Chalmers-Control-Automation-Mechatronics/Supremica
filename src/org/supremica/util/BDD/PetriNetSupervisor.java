@@ -1,4 +1,9 @@
+
 package org.supremica.util.BDD;
+
+
+import org.supremica.util.BDD.heuristics.*;
+
 
 /**
  * Petri net supervisor does reachability somehow like Petri Nets (surrprise!).
@@ -37,6 +42,9 @@ public class PetriNetSupervisor
 	/** one 'transition' system per event, see comments on the top */
 	private int[] workset, queue;
 
+	/** this is our H2 heuristc */
+	private NDAS_Choice ndas;
+
 	/** workset as above, queue is the set of suggested events, see algo again */
 	private InteractiveChoice ic = null;
 
@@ -73,6 +81,7 @@ public class PetriNetSupervisor
 
 		workset = new int[size];
 		queue = new int[size];    // use by the heuristics
+		ndas = new NDAS_Choice(size); // use by the heuristics
 		heuristic = Options.es_heuristics;
 
 		if (heuristic == Options.ES_HEURISTIC_INTERACTIVE)
@@ -322,11 +331,61 @@ public class PetriNetSupervisor
 			break;
 		}
 
-		return (queue_size > 0)
-			   ? queue[(int) (Math.random() * queue_size)]
-			   : -1;
+
+		return nd_pick(queue_size);
 	}
 
+
+
+	//---------------------------------------------------------------------------
+	/* same as NDAS-choice or H2 in automata heuristics */
+	private int nd_pick(int queue_size)
+	{
+		if(queue_size < 1) return -1;
+
+
+		// return queue[(int) (Math.random() * queue_size)];
+		return ndas.choose(queue, queue_size);
+	}
+
+	/* register changes in the same way as workset/H2 do */
+	private void register_change(int trans, boolean changed, boolean forward)
+	{
+
+
+		if (changed)
+		{
+			// something changed, update the workset
+			int [] next = forward ? pet[trans].getNextEventCount() : pet[trans].getPrevEventCount();
+			for (int j = 0; j < size; j++)
+			{
+				workset[j] += next[j];
+			}
+		}
+		workset[trans] = 0;    // we are done with ourselves
+
+		// for heuristics, update score
+		ndas.advance(trans, changed);
+	}
+	//---------------------------------------------------------------------------
+	private void init_search()
+	{
+
+		// start with all enevts (transitions?) enabled
+		for (int i = 0; i < size; i++)
+		{
+			workset[i] = 1;
+		}
+
+		// reset H2 heuristics
+		ndas.reset();
+
+	}
+	private void stop_search()
+	{
+		// just report the NDAS statistics
+		ndas.done();
+	}
 	//---------------------------------------------------------------------------
 
 	/** forward reachability stub functions */
@@ -344,17 +403,13 @@ public class PetriNetSupervisor
 	private int internal_computeReachablesPN(int i_all)
 	{
 
-		// start with all events
-		for (int i = 0; i < size; i++)
-		{
-			workset[i] = 1;
-		}
-
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 		int r_all_p, r_all = i_all;
 
 		manager.ref(r_all);
 		limit.reset();
+
+		init_search();
 
 		while (!limit.stopped())
 		{
@@ -368,22 +423,10 @@ public class PetriNetSupervisor
 			}
 
 			int tmp3 = pet[i].forward(r_all, s_cube, perm_sp2s);
-
 			r_all = manager.orTo(r_all, tmp3);
-
 			manager.deref(tmp3);
 
-			if (r_all != r_all_p)
-			{
-				int[] next = pet[i].getNextEventCount();
-
-				for (int j = 0; j < size; j++)
-				{
-					workset[j] += next[j];
-				}
-			}
-
-			workset[i] = 0;    // we are done with ourselfs
+			register_change(i, r_all != r_all_p, true);
 
 			if (gf != null)
 			{
@@ -395,6 +438,8 @@ public class PetriNetSupervisor
 		{
 			gf.stopTimer();
 		}
+
+		stop_search();
 
 		return r_all;
 	}
@@ -415,10 +460,6 @@ public class PetriNetSupervisor
 	/** implementation of the backward reachability */
 	private int internal_computeCoReachablesPN(int q_m)
 	{
-		for (int i = 0; i < size; i++)
-		{
-			workset[i] = 1;    // start with all events
-		}
 
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
 		int r_all_p, r_all = manager.replace(q_m, perm_s2sp);
@@ -426,6 +467,7 @@ public class PetriNetSupervisor
 		manager.ref(r_all);
 		limit.reset();
 
+		init_search();
 		while (!limit.stopped())
 		{
 			r_all_p = r_all;
@@ -438,22 +480,11 @@ public class PetriNetSupervisor
 			}
 
 			int tmp3 = pet[i].backward(r_all, sp_cube, perm_s2sp);
-
 			r_all = manager.orTo(r_all, tmp3);
-
 			manager.deref(tmp3);
 
-			if (r_all != r_all_p)
-			{    // something changed, update the workset
-				int[] next = pet[i].getPrevEventCount();
 
-				for (int j = 0; j < size; j++)
-				{
-					workset[j] += next[j];
-				}
-			}
-
-			workset[i] = 0;    // we are done with ourselves
+			register_change(i, r_all != r_all_p, false);
 
 			if (gf != null)
 			{
@@ -469,6 +500,8 @@ public class PetriNetSupervisor
 		{
 			gf.stopTimer();
 		}
+
+		stop_search();
 
 		return ret;
 	}
