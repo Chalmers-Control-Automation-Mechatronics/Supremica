@@ -128,10 +128,13 @@ public class AutomataVerifier
 		nbrOfExecuters = synchronizationOptions.getNbrOfExecuters();
 		verboseMode = synchronizationOptions.verboseMode();
 		oneEventAtATime = verificationOptions.getOneEventAtATime();
+
+		// The helper must be initialized here only because of the executionDialog, I think...
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 		// Allocate the synchronizationExecuters
 		// synchronizationExecuters = new ArrayList(nbrOfExecuters);
+
 		// Build the initial state
 		initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
@@ -337,7 +340,6 @@ public class AutomataVerifier
 
 								if (selectedAutomata.size() > 1)
 								{
-
 									// Check module
 									allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
 
@@ -422,7 +424,6 @@ public class AutomataVerifier
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 
@@ -501,7 +502,6 @@ public class AutomataVerifier
 
 			for (attempt = 1; attempt <= 5; attempt++)
 			{
-
 				// Make five attempts on prooving controllability and uncontrollability
 				if (verboseMode)
 				{
@@ -510,7 +510,6 @@ public class AutomataVerifier
 
 				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
 				{
-
 					// Already added all similar automata, try to find more similarities
 					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 					int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
@@ -559,7 +558,7 @@ public class AutomataVerifier
 				{
 					if (verboseMode)
 					{
-						logger.info("Couldn't proove controllability, trying to proove uncontrollability...");
+						logger.info("Couldn't prove controllability, trying to prove uncontrollability...");
 					}
 
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
@@ -596,9 +595,7 @@ public class AutomataVerifier
 				}
 				else
 				{
-
 					// All uncontrollable states were removed!
-					// logger.info("The supervisor " + ((Automaton) selectedAutomata.get(0)).getName() + " was found to be controllable afterall!");
 					break;
 				}
 			}
@@ -632,7 +629,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Finds similar automata and sorts the automata in a smart way...
+	 * Finds similar automata and sorts these automata in a smart way...
 	 *
 	 *@param  selectedAutomata the collection automata in the current "composition".
 	 *@param  theAutomata reference to the global variable with the same name... eh...
@@ -743,7 +740,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Compares two alphabets for determining how similar they are, in some sense. All events in rightAlphabet are
+	 * Compares two alphabets for determining how similar they are in some sense. All events in rightAlphabet are
 	 * examined if they are unique to rightAlphabet or appear in leftAlphabet too.
 	 *
 	 *@param  leftAlphabet the alphabet to compare.
@@ -961,8 +958,8 @@ public class AutomataVerifier
 
 	/**
 	 * Makes attempt on finding states in the total synchronization that REALLY are uncontrollable.
-	 * This is done without doing a full synchronization but a full synchronization limited by
-	 * in the gratest extent possible following the enabled transitions in the current "composition".
+	 * This is done by making not a full synchronization but a full synchronization limited by
+	 * in the greatest extent possible following the enabled transitions in the current "composition".
 	 *
 	 *@param  automataIndices integer array with indices of automata in the current "composition".
 	 *@return  Description of the Return Value
@@ -971,7 +968,6 @@ public class AutomataVerifier
 	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
-
 		// WOHOOPS! Eventuellt är det listigt att göra ny onlinesynchronizer,
 		// med den nya automataIndices varje gång... tänk på det. FIXA!
 		if (uncontrollabilityCheckHelper == null)
@@ -985,11 +981,9 @@ public class AutomataVerifier
 
 			if (verboseMode)
 			{
-
 				// It's important that setRememberTrace occurs before addState!
 				uncontrollabilityCheckHelper.setRememberTrace(true);
 			}
-
 			uncontrollabilityCheckHelper.addState(initialState);
 			uncontrollabilityCheckHelper.setCoExecute(true);
 			uncontrollabilityCheckHelper.setCoExecuter(onlineSynchronizer);
@@ -1173,9 +1167,14 @@ public class AutomataVerifier
 	private boolean pairwiseNonblockingVerification()
 		throws Exception
 	{
+		if (theAutomata.size() == 1)
+		{   // This is a monolithic system!
+			return monolithicNonblockingVerification();
+		}
+
 		// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
-		logger.error("Modular non-blocking verification is not implemented! This algorithm " +
-					 "examines pairwise non-blocking between all automata! DOES NOT WORK!!");
+		logger.error("NOTE! Modular non-blocking verification is not implemented! This algorithm examines " +
+					 "pairwise non-blocking between all automata! THIS DOES NOT PROVE NONBLOCKING!!");
 		
 		boolean allPairsNonblocking = true;
 		
@@ -1212,7 +1211,7 @@ public class AutomataVerifier
 	private boolean automatonPairIsNonblocking(Automaton AutomatonA, Automaton AutomatonB)
 		throws Exception
 	{
-		logger.info("Synchronizing " + AutomatonA.getName() + " and " + AutomatonB.getName());
+		logger.info("Synchronizing " + AutomatonA.getName() + " and " + AutomatonB.getName() + "...");
 
 		// Synchronize the two automata and verify nonblocking on the result
 		Automaton AutomataSynk;
@@ -1227,11 +1226,27 @@ public class AutomataVerifier
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error when synchronizing automata: " + ex.toString());
+			logger.error("Error in AutomataVerifier when synchronizing automata: " + ex.toString());
 			logger.debug(ex.getStackTrace());
 			throw ex;	
 		}
-	
+		
+		/* VILL VETA HUR AUTOMATEN SER UT!!!
+		  //AutomataSynk.setName("SYNK" + AutomatonA.getName() + AutomatonB.getName());
+		  //theAutomata.addAutomaton(AutomataSynk);
+		  
+		  try
+		  {
+		  AutomatonViewer automataSynkView = new AutomatonViewer(AutomataSynk);			
+		  automataSynkView.run();
+		  //AutomatonExplorer automataSynkView = new AutomatonExplorer(null, AutomataSynk);			
+		  }
+		  catch (Exception ex)
+		  {
+		  logger.error("Tjoho, för fan. " + ex);
+		  }
+		*/
+		
 		return moduleIsNonblocking(AutomataSynk);
 	}
 
@@ -1240,17 +1255,45 @@ public class AutomataVerifier
 	 *
 	 * @param selectedAutomata The Automata to be synchronized
 	 * @return The automaton that constitutes the synchronization of the automata 
-	 * represented by the ArrayList.
+	 * represented by selectedAutomata.
 	 */
 	private Automaton synchronizeAutomata(ArrayList selectedAutomata)
 		throws Exception
 	{
 		Automaton AutomataSynk;
 
+		// BUILD A NEW SYNCHHELPER! The status of the states must not be affected by the 
+		// automata we're not looking at for the moment... 
+		Automata currAutomata = new Automata();
+		while (selectedAutomata.size() != 0)
+		{
+			currAutomata.addAutomaton((Automaton) selectedAutomata.remove(0));			
+		}
+		
+		// Build the initial state
+		int[] currInitialState = AutomataIndexFormHelper.createState(currAutomata.size());
+
+		// + 1 status field
+		Iterator autIt = currAutomata.iterator();
+		State localInitialState;
+		Automaton currAutomaton;
+
+		while (autIt.hasNext())
+		{
+			currAutomaton = (Automaton) autIt.next();
+			localInitialState = currAutomaton.getInitialState();
+			initialState[currAutomaton.getIndex()] = localInitialState.getIndex();
+		}
+
+		// Initialize new synchHelper and move the excecutionDialog to the new helper...
+		ExecutionDialog excutionDialog = synchHelper.getExecutionDialog();
+		synchHelper = new AutomataSynchronizerHelper(currAutomata, synchronizationOptions);
+		synchHelper.setExecutionDialog(excutionDialog);
+
 		// Clear the hash-table in the helper and set some variables in the synchronization helper
-		synchHelper.clear();
+		// synchHelper.clear();
 		// synchHelper.setRememberUncontrollable(true);
-		synchHelper.addState(initialState);
+		synchHelper.addState(currInitialState);
 		
 		if (stopRequested)
 		{
@@ -1273,7 +1316,7 @@ public class AutomataVerifier
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
 			
-			currExec.selectAutomata(selectedAutomata);
+			currExec.selectAllAutomata();
 			currExec.start();
 		}
 		
@@ -1281,6 +1324,7 @@ public class AutomataVerifier
 		
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 		
+		// Build automaton
 		try
 		{
 			if (currExec.buildAutomaton())

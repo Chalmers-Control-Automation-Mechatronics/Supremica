@@ -102,7 +102,10 @@ public final class AutomataSynchronizerHelper
 	private boolean coExecute = false;
 	private AutomataOnlineSynchronizer coExecuter = null;
 
-	// Used by AutomataControllabillityCheck
+	/* Used by AutomataControllabillityCheck.
+	 * Causes the synchronization to stop as soon as an uncontrollable
+	 * state is found.
+	 */
 	private boolean exhaustiveSearch = false;
 
 	// For synchronizing without recalculating the AutomataIndexForm
@@ -159,8 +162,7 @@ public final class AutomataSynchronizerHelper
 	/**
 	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and Automaton-Objects.
 	 *
-	 *@param  orgHelper Description of the Parameter
-	 *@exception  Exception Description of the Exception
+	 *@param  orgHelper The old helper to collect information from
 	 *@see  AutomataVerificationOptions#findUncontrollableStates(int[])
 	 */
 	public AutomataSynchronizerHelper(AutomataSynchronizerHelper orgHelper)
@@ -322,7 +324,6 @@ public final class AutomataSynchronizerHelper
 		{
 			if (rememberTrace && (stateTrace.size() == 0))
 			{
-
 				// Add initial state
 				stateTrace.add(newState);
 			}
@@ -356,6 +357,7 @@ public final class AutomataSynchronizerHelper
 	{
 		theAutomaton.setComment(comment);
 	}
+
 	public void setExecutionDialog(ExecutionDialog executionDialog)
 	{
 		this.executionDialog = executionDialog;
@@ -811,7 +813,7 @@ public final class AutomataSynchronizerHelper
 			if (currAutomaton.getType() != AutomatonType.Plant)
 			{
 				return false;
-			}
+		}
 		}
 
 		return true;

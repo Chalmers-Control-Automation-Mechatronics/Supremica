@@ -272,6 +272,7 @@ public class AutomataVerificationWorker
 					// logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead!");
 					// return;				
 					
+					JOptionPane.showMessageDialog(workbench.getFrame(), "This algorithm is intentionally designed \n not to give you the answer you want.", "Mind you!", JOptionPane.INFORMATION_MESSAGE);
 					isNonBlocking = automataVerifier.verify();					
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)

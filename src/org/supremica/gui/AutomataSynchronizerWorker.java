@@ -97,7 +97,6 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception e)
 			{
-
 				// -- MF -- should really put up a message box here? Why not let the Gui manage that?
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 

@@ -295,7 +295,7 @@ public final class AutomataSynchronizerExecuter
 
 			currOutgoingEvents[currAutIndex] = outgoingEventsTable[currAutIndex][currSingleStateIndex];
 			currOutgoingEventsIndex[currAutIndex] = 0;
-
+			
 			// Find the event with the smallest index.
 			// The last element currOutgoingEvents[currAutIndex]
 			// is always Integer.MAX_VALUE
@@ -401,7 +401,6 @@ public final class AutomataSynchronizerExecuter
 
 						if (rememberUncontrollable)
 						{
-
 							// Remember uncontrollable states
 							problemEvent = currEventIndex;
 							problemPlant = currAutIndex;
@@ -458,7 +457,6 @@ public final class AutomataSynchronizerExecuter
 
 				if (exhaustiveSearch)
 				{
-
 					// Stop when uncontrollable state found
 					if (verboseMode)
 					{
@@ -586,7 +584,6 @@ public final class AutomataSynchronizerExecuter
 
 			if (!controllableState)
 			{
-
 				// We'd like to remember this state and later on try to show that
 				// it will be excluded in the total synchronization...  or not.
 				if (rememberUncontrollable)
@@ -613,7 +610,6 @@ public final class AutomataSynchronizerExecuter
 
 			if (controllableState || expandForbiddenStates)
 			{
-
 				// Expand state
 				int i = 0;
 				int currEventIndex = currEnabledEvents[i];
@@ -712,7 +708,7 @@ public final class AutomataSynchronizerExecuter
 			Automaton theAutomaton = helper.getAutomaton();
 
 			// theAutomaton.setName("regaut");
-
+			
 			Alphabet theAlphabet = theAutomaton.getAlphabet();
 			int[][] currStateTable = helper.getStateTable();
 			int stateNumber = 0;

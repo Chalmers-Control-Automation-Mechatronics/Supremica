@@ -34,7 +34,8 @@ public interface Gui
 
 	String getNewAutomatonName(String str, String def);
 
-	// who uses this one?
+	// who uses this one? 
+	// ActionMan does!!
 	void clearSelection();
 
 	void selectAll();

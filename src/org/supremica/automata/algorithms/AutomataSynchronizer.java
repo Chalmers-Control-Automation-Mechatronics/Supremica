@@ -82,7 +82,7 @@ public class AutomataSynchronizer
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-
+			
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 	}
