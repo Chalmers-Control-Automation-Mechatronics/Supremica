@@ -2610,6 +2610,9 @@ public abstract class ProgramAndFBBuilder
 	ilRun.append(fac.createInvoke(fbTypeName, "run", Type.VOID, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
     }
 
+
+
+
     /**
      * hack för att få print att fungera på ett enkelt sätt
      * This method is deprecated
