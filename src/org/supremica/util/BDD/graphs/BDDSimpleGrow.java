@@ -65,7 +65,7 @@ public class BDDSimpleGrow
 	// ---- [ inner class : SimpleStatCanvas ] ---------------------------------------------------------
 	private class SimpleStatCanvas extends Canvas {
 		public SimpleStatCanvas() {
-			setSize(300, 150);
+			setSize(300, 130);
 			setBackground(Color.lightGray);
 			setFont( new Font("Courier", Font.PLAIN, 18) );
 		}
