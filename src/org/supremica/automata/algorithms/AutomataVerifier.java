@@ -226,9 +226,9 @@ public class AutomataVerifier
 				{
 					return modularControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MonolithicBDD) 
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD) 
 				    {
-					return monolithicBDDControllabilityVerification();
+					return BDDControllabilityVerification();
 				    }
 				else
 				{
@@ -242,9 +242,9 @@ public class AutomataVerifier
 				{
 					return monolithicNonblockingVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MonolithicBDD) 
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD) 
 				    {
-					return monolithicBDDNonBlockingVerification();
+					return BDDNonBlockingVerification();
 				    }
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
@@ -1208,7 +1208,7 @@ public class AutomataVerifier
 	 *@return  true if the system is controllable
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
-    private boolean monolithicBDDControllabilityVerification()
+    private boolean BDDControllabilityVerification()
     {
 	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
 	boolean ret = abf.isControllable();
@@ -1222,7 +1222,7 @@ public class AutomataVerifier
 	 *@return  true if the system is non-blocking
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
-    private boolean monolithicBDDNonBlockingVerification()
+    private boolean BDDNonBlockingVerification()
     {
 	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
 	boolean ret = abf.isNonBlocking();

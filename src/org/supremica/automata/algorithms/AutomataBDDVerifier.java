@@ -26,7 +26,7 @@ public class AutomataBDDVerifier {
 
 	Builder bu = new Builder(theAutomata);
 	ba = bu.getBDDAutomata();
-	sup = new Supervisor(ba,	ba.getAutomataVector());
+	sup = new Supervisor(ba, ba.getAutomataVector());
 	
     }
 
@@ -64,9 +64,10 @@ public class AutomataBDDVerifier {
 
 	if(intersection != ba.getZero()) {
 	    is_nonblocking = false;
-	    // DEBUG:
+	    if(Options.trace_on) {
 	    // show one trace to a blocking state
-	    // sup.trace_set("non-blocking",intersection, 1);
+		sup.trace_set("non-blocking",intersection, 1);
+	    }
 	}
 
 	ba.recursiveDeref(intersection);
@@ -84,12 +85,15 @@ public class AutomataBDDVerifier {
 	Q_u = ba.removeDontCareS(Q_u);
 	boolean is_controllable = ba.getZero() == Q_u;
 	if(!is_controllable) {	  
-	    // DEBUG
-	    // show all uncontrollable states...
-	    // System.out.println("Uncontrollable states");
-	    // ba.show_states(Q_u);
-	    // ... and show how to get to one such state
-	    // sup.trace_set("uncontrollable", Q_u, 1)
+	    
+
+	    if(Options.trace_on) {
+		// show all uncontrollable states...
+		// System.out.println("Uncontrollable states");
+		// ba.show_states(Q_u);
+		// ... and show how to get to one such state
+		sup.trace_set("uncontrollable", Q_u, 1);
+	    }
 	}
 	
 
