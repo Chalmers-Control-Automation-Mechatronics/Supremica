@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name=""  major="0"  minor="9" >
+<Automaton name="counter" type="Undefined">
+	<Events>
+		<Event id="0" label="counter"/>
+		<Event id="1" label="counterequals12" controllable="false"/>
+		<Event id="2" label="counterlessthan12" controllable="false"/>
+		<Event id="3" label="recoverscan"/>
+		<Event id="4" label="recoverturn"/>
+		<Event id="5" label="reset"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="errorscan" type="Undefined">
+	<Events>
+		<Event id="0" label="errorscan" controllable="false"/>
+		<Event id="1" label="recoverscan"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="scan" type="Undefined">
+	<Events>
+		<Event id="0" label="donescan" controllable="false"/>
+		<Event id="1" label="errorscan" controllable="false"/>
+		<Event id="2" label="recoverscan"/>
+		<Event id="3" label="scan"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="scantask" type="Undefined">
+	<Events>
+		<Event id="0" label="counter"/>
+		<Event id="1" label="counterequals12" controllable="false"/>
+		<Event id="2" label="counterlessthan12" controllable="false"/>
+		<Event id="3" label="donescan" controllable="false"/>
+		<Event id="4" label="doneturn" controllable="false"/>
+		<Event id="5" label="errorscan" controllable="false"/>
+		<Event id="6" label="errorturn" controllable="false"/>
+		<Event id="7" label="recoverscan"/>
+		<Event id="8" label="recoverturn"/>
+		<Event id="9" label="scan"/>
+		<Event id="10" label="turn"/>
+	</Events>
+	<States>
+		<State id="0" name="s10"/>
+		<State id="1" name="s11"/>
+		<State id="2" name="s16"/>
+		<State id="3" name="s17" accepting="true"/>
+		<State id="4" name="s6" initial="true"/>
+		<State id="5" name="s7"/>
+		<State id="6" name="s8"/>
+		<State id="7" name="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="3" event="1"/>
+		<Transition source="1" dest="4" event="2"/>
+		<Transition source="2" dest="3" event="8"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="4" dest="5" event="10"/>
+		<Transition source="5" dest="2" event="6"/>
+		<Transition source="5" dest="6" event="4"/>
+		<Transition source="6" dest="7" event="9"/>
+		<Transition source="7" dest="0" event="3"/>
+		<Transition source="7" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="turn" type="Undefined">
+	<Events>
+		<Event id="0" label="doneturn" controllable="false"/>
+		<Event id="1" label="errorturn" controllable="false"/>
+		<Event id="2" label="recoverturn"/>
+		<Event id="3" label="turn"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="vacuum" type="Undefined">
+	<Events>
+		<Event id="0" label="donevacuum" controllable="false"/>
+		<Event id="1" label="errorvacuum" controllable="false"/>
+		<Event id="2" label="recovervacuum"/>
+		<Event id="3" label="vacuum"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="vacuumtask" type="Undefined">
+	<Events>
+		<Event id="0" label="counter"/>
+		<Event id="1" label="counterequals12" controllable="false"/>
+		<Event id="2" label="counterlessthan12" controllable="false"/>
+		<Event id="3" label="doneturn" controllable="false"/>
+		<Event id="4" label="donevacuum" controllable="false"/>
+		<Event id="5" label="errorturn" controllable="false"/>
+		<Event id="6" label="errorvacuum" controllable="false"/>
+		<Event id="7" label="recoverturn"/>
+		<Event id="8" label="recovervacuum"/>
+		<Event id="9" label="turn"/>
+		<Event id="10" label="vacuum"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s12"/>
+		<State id="3" name="s13"/>
+		<State id="4" name="s2"/>
+		<State id="5" name="s3"/>
+		<State id="6" name="s4"/>
+		<State id="7" name="s5"/>
+		<State id="8" name="s6" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="1" dest="4" event="3"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="2" dest="8" event="7"/>
+		<Transition source="3" dest="0" event="8"/>
+		<Transition source="4" dest="5" event="10"/>
+		<Transition source="5" dest="6" event="4"/>
+		<Transition source="5" dest="3" event="6"/>
+		<Transition source="6" dest="7" event="0"/>
+		<Transition source="7" dest="8" event="1"/>
+		<Transition source="7" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+</Automata>
