@@ -2754,6 +2754,8 @@ public class ActionMan
 	public static void shoeFactoryConfigurator()
 	{
 		Configit con = new Configit();
+		con.setLocationRelativeTo(null);
+		con.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		try
 		{
 			con.show();
@@ -2768,7 +2770,8 @@ public class ActionMan
 	public static void shoeFactoryAnimator(Gui gui)
 	{
 		JFrame frame = new Factory();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			try
 			{
 				frame.show();

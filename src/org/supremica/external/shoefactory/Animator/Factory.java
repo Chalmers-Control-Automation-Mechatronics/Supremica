@@ -87,13 +87,6 @@ public class Factory extends JFrame implements ActionListener{
    	{
     	setSize(1024, 740);
       	setTitle("Shoefactory");
-      	addWindowListener(new WindowAdapter()
-      	{
-			public void windowClosing(WindowEvent e)
-			{
-    	    	System.exit(0);
-	    	}
-	   	});
       	Container contentPane = getContentPane();
       	canvas = new FactoryCanvas(nrOfaTables+nrOfbTables+nrOfcTables, maxNrOfShoes);
       	JPanel buttonPanel = new JPanel();

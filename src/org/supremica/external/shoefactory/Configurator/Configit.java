@@ -54,6 +54,11 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.ImageIcon.*;
 import java.net.URL;
+import java.net.MalformedURLException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.SAXParser;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 import java.io.*;
 import com.configit_software.ctrlmngr.*;
 import java.io.BufferedReader;
@@ -62,14 +67,30 @@ import org.supremica.gui.*;
 import org.supremica.log.*;
 
 public class Configit extends JFrame
-	implements ItemListener, ActionListener
+	implements ActionListener
 {
 	private static Logger logger = LoggerFactory.createLogger(Configit.class);
 
 	CS_CtrlMngr ctrl_mngr = null;
 	Container c;
-	boolean resetok = true;
-	JPanel space = new JPanel();
+	private boolean resetok = true;
+	private double Solutions;
+
+    private String [] Gender = {"Male" ,"Female"};
+	private String [] GeneralType = {"Children", "Adult" };
+   	private String [] Size;
+	private String [] Color;
+  	private String [] Sole;
+  	private String [] ShoeType;
+
+	int[] Allowed_Gender = {0,0};
+	int[] Allowed_GT = {0,0};
+	int[] Allowed_Colors;
+	int[] Allowed_Size;
+	int[] Allowed_Sole;
+ 	int[] Allowed_ShoeType;
+
+ 	JPanel space = new JPanel();
 	JPanel buttonPanel = new JPanel();
 	JPanel infoSpace = new JPanel();
    	JPanel kommArea = new JPanel();
@@ -78,42 +99,28 @@ public class Configit extends JFrame
 	JPanel additionalChoices = new JPanel();
 	JPanel scrollPanel = new JPanel();
 	JPanel scrollPanelTitles = new JPanel();
-   	JButton JB = new JButton ("Quit");
+   	JButton JB = new JButton ("Cancel");
 	JButton JR = new JButton ("Reset");
 	JButton JC = new JButton ("Order");
-    private boolean isdone =false;
-    private String [] Gender = {"Male" ,"Female"};
-	private String [] GeneralType = {"Children", "Adult" };
-   	private String [] Size = new String [ctrl_mngr.getDomainSize(1)];
-	private String [] Color = new String [ctrl_mngr.getDomainSize(3)];
-  	private String [] Sole = new String [ctrl_mngr.getDomainSize(4)];
-  	private String [] ShoeType = new String [ctrl_mngr.getDomainSize(5)];
 
-	int[] Allowed_Gender = {0,0};
-	int[] Allowed_GT = {0,0};
-	int[] Allowed_Colors = new int[ctrl_mngr.getDomainSize(3)];
-	int[] Allowed_Size = new int[ctrl_mngr.getDomainSize(1)];
-	int[] Allowed_Sole = new int[ctrl_mngr.getDomainSize(4)];
- 	int[] Allowed_ShoeType = new int[ctrl_mngr.getDomainSize(5)];
+	ButtonGroup lGend = new ButtonGroup();
+	ButtonGroup lGT = new ButtonGroup();
+	JRadioButton lGend1 = new JRadioButton("Male");
+	JRadioButton lGend2 = new JRadioButton("Female");
+	JRadioButton lGT1 = new JRadioButton("Children");
+	JRadioButton lGT2 = new JRadioButton("Adult");
 
-	Choice lCol = new Choice();
-	CheckboxGroup lGend = new CheckboxGroup();
-	CheckboxGroup lGT = new CheckboxGroup();
-	Checkbox lGend1 = new Checkbox("Male",false,lGend);
-	Checkbox lGend2 = new Checkbox("Female",false,lGend);
-	Checkbox lGT1 = new Checkbox("Children",false,lGT);
-	Checkbox lGT2 = new Checkbox("Adult",false,lGT);
+	JComboBox lCol = new JComboBox();
+	JComboBox lSole = new JComboBox();
+	JComboBox lSize = new JComboBox();
+	JComboBox lShoeType = new JComboBox();
 
-	Choice lSole = new Choice();
-	Choice lSize = new Choice();
-	Choice lShoeType = new Choice();
-
-	JLabel JL = new JLabel("You have not selected anything yet. Available combinations: "+ctrl_mngr.getSolutionCount());
+	JLabel JL;
 	JLabel mainTitle = new JLabel("Select your shoe!");
-	JLabel selectColor = new JLabel("Select color");
-	JLabel selectSole = new JLabel("Select sole");
-	JLabel selectModel = new JLabel("Select model");
-	JLabel selectSize = new JLabel("Select size");
+	JLabel selectColor = new JLabel("Color");
+	JLabel selectSole = new JLabel("Sole");
+	JLabel selectModel = new JLabel("Model");
+	JLabel selectSize = new JLabel("Size");
 
 	Border panelBorder = BorderFactory.createRaisedBevelBorder();
 	Border choicesBorder = BorderFactory.createTitledBorder(panelBorder,"Additional choices");
@@ -124,7 +131,6 @@ public class Configit extends JFrame
 	public Configit ()
 	{
 		URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.vt");
-
 		InputStream vtStream = null;
 		try
 		{
@@ -136,46 +142,52 @@ public class Configit extends JFrame
 			return;
 		}
 		ctrl_mngr = new CS_CtrlMngr(vtStream, CS_CtrlMngr.CONFIG_STATIC);
+		//ctrl_mngr = new CS_CtrlMngr("../src/org/supremica/external/shoefactory/Configurator/ShoeFactory.vt", CS_CtrlMngr.CONFIG_STATIC);
+
+   		Size = new String [ctrl_mngr.getDomainSize(1)];
+		Color = new String [ctrl_mngr.getDomainSize(3)];
+  		Sole = new String [ctrl_mngr.getDomainSize(4)];
+  		ShoeType = new String [ctrl_mngr.getDomainSize(5)];
+
+		Allowed_Colors = new int[ctrl_mngr.getDomainSize(3)];
+		Allowed_Size = new int[ctrl_mngr.getDomainSize(1)];
+		Allowed_Sole = new int[ctrl_mngr.getDomainSize(4)];
+ 		Allowed_ShoeType = new int[ctrl_mngr.getDomainSize(5)];
+
+ 		JL = new JLabel("You have not selected anything yet. Available combinations: "+ctrl_mngr.getSolutionCount());
 
 	    setTitle("Configit");
-    	addWindowListener(new WindowAdapter()
-    	{
-			public void windowClosing(WindowEvent e)
-			{
-         		System.exit(0);
-    		}
-   		});
    		Res_Sellist();
 
 		for(int val = 0; val < ctrl_mngr.getDomainSize(1); val++)
 		{
 			Size[val] = ctrl_mngr.getValueName(1, val);
-			lSize.add(Size[val]);
+			lSize.addItem(Size[val]);
 		}
 
 		for(int val = 0; val < ctrl_mngr.getDomainSize(3); val++)
 		{
 			Color[val] = ctrl_mngr.getValueName(3, val);
-			lCol.add(Color[val]);
+			lCol.addItem(Color[val]);
 		}
 		for(int val = 0; val < ctrl_mngr.getDomainSize(4); val++)
 		{
 			Sole[val] = ctrl_mngr.getValueName(4, val);
-			lSole.add(Sole[val]);
+			lSole.addItem(Sole[val]);
 		}
 		for(int val = 0; val < ctrl_mngr.getDomainSize(5); val++)
 		{
 			ShoeType[val]= ctrl_mngr.getValueName(5, val);
-			lShoeType.add(ShoeType[val]);
+			lShoeType.addItem(ShoeType[val]);
 		}
-   		lSize.add("");
-   		lCol.add("");
-   		lSole.add("");
-   		lShoeType.add("");
-		lSize.select("");
-		lCol.select("");
-		lSole.select("");
-		lShoeType.select("");
+   		lSize.addItem("");
+   		lCol.addItem("");
+   		lSole.addItem("");
+   		lShoeType.addItem("");
+   		lSize.setSelectedItem("");
+   		lCol.setSelectedItem("");
+   		lSole.setSelectedItem("");
+   		lShoeType.setSelectedItem("");
 
 		c = getContentPane();
 		c.setLayout(new BorderLayout());
@@ -200,6 +212,11 @@ public class Configit extends JFrame
 		kommArea1.add(lGend2);
 		kommArea2.add(lGT1);
 		kommArea2.add(lGT2);
+
+		lGend.add(lGend1);
+		lGend.add(lGend2);
+		lGT.add(lGT1);
+		lGT.add(lGT2);
 
 		additionalChoices.setLayout(new BorderLayout());
 		additionalChoices.setBorder(choicesBorder);
@@ -235,15 +252,14 @@ public class Configit extends JFrame
 		buttonPanel.add(JB, FlowLayout.CENTER);
 		buttonPanel.add(JC, FlowLayout.RIGHT);
 
-		lCol.addItemListener(this);
-		lGend1.addItemListener(this);
-		lGend2.addItemListener(this);
-		lGT1.addItemListener(this);
-		lGT2.addItemListener(this);
-		lSole.addItemListener(this);
-		lShoeType.addItemListener(this);
-		lSize.addItemListener(this);
-		lSole.addItemListener(this);
+		lGend1.addActionListener(this);
+		lGend2.addActionListener(this);
+		lGT1.addActionListener(this);
+		lGT2.addActionListener(this);
+		lCol.addActionListener(this);
+		lSole.addActionListener(this);
+		lShoeType.addActionListener(this);
+		lSize.addActionListener(this);
 
 		JB.addActionListener(this);
 		JR.addActionListener(this);
@@ -303,73 +319,110 @@ public class Configit extends JFrame
 	{
 		if(resetok)
 		{
-			lCol.removeItemListener(this);
-			lGend1.removeItemListener(this);
-			lGend2.removeItemListener(this);
-			lGT1.removeItemListener(this);
-			lGT2.removeItemListener(this);
-			lSole.removeItemListener(this);
-			lShoeType.removeItemListener(this);
-			lSize.removeItemListener(this);
-			lSole.removeItemListener(this);
-
-			kommArea1.removeAll();
-			kommArea2.removeAll();
-			scrollPanel.removeAll();
+			lGend.remove(lGend1);
+			lGend.remove(lGend2);
+			lGT.remove(lGT1);
+			lGT.remove(lGT2);
 
 			if (Allowed_GT[0] == 0)
-				lGT1 = new Checkbox("Children",false, lGT);
+			{
+				lGT1.setText("Children");
+				lGT1.setSelected(false);
+			}
 			else if (Allowed_GT[0] == 1)
-				lGT1 = new Checkbox("(Children)",false, lGT);
+			{
+				lGT1.setText("(Children)");
+				lGT1.setSelected(false);
+			}
 			else if (Allowed_GT[0] == 2)
-				lGT1 = new Checkbox("Children",true, lGT);
+			{
+				lGT1.setText("Children");
+				lGT1.setSelected(true);
+			}
 
 			if (Allowed_GT[1] == 0)
-				lGT2 = new Checkbox("Adult",false, lGT);
-			else if (Allowed_GT [1] ==1)
-				lGT2 = new Checkbox("(Adult)",false, lGT);
+			{
+				lGT2.setText("Adult");
+				lGT2.setSelected(false);
+			}
+			else if (Allowed_GT [1] == 1)
+			{
+				lGT2.setText("(Adult)");
+				lGT2.setSelected(false);
+			}
 			else if (Allowed_GT[1] == 2)
-				lGT2 = new Checkbox("Adult",true, lGT);
+			{
+				lGT2.setText("Adult");
+				lGT2.setSelected(true);
+			}
 
 			if (Allowed_Gender[0] == 0)
-				lGend1 = new Checkbox("Male",false,lGend);
+			{
+				lGend1.setText("Male");
+				lGend1.setSelected(false);
+			}
 			else if (Allowed_Gender [0] ==1)
-				lGend1 = new Checkbox("(Male)",false,lGend);
+			{
+				lGend1.setText("(Male)");
+				lGend1.setSelected(false);
+			}
 			else if (Allowed_Gender [0] ==2)
-				lGend1 = new Checkbox("Male",true, lGend);
+			{
+				lGend1.setText("Male");
+				lGend1.setSelected(true);
+			}
 
 			if (Allowed_Gender[1] == 0)
-				lGend2 = new Checkbox("Female",false,lGend);
+			{
+				lGend2.setText("Female");
+				lGend2.setSelected(false);
+			}
 			else if (Allowed_Gender [1] ==1)
-				lGend2 = new Checkbox("(Female)",false,lGend);
+			{
+				lGend2.setText("(Female)");
+				lGend2.setSelected(false);
+			}
 			else if (Allowed_Gender [1] ==2)
-				lGend2 = new Checkbox("Female",true, lGend);
+			{
+				lGend2.setText("Female");
+				lGend2.setSelected(true);
+			}
 
-			lCol = new Choice();
-			lSole = new Choice();
-			lSize = new Choice();
-			lShoeType = new Choice();
+			lGend.add(lGend1);
+			lGend.add(lGend2);
+			lGT.add(lGT1);
+			lGT.add(lGT2);
+
+			lCol.removeActionListener(this);
+			lSole.removeActionListener(this);
+			lShoeType.removeActionListener(this);
+			lSize.removeActionListener(this);
+
+			lCol.removeAllItems();
+			lSole.removeAllItems();
+			lSize.removeAllItems();
+			lShoeType.removeAllItems();
 
 			boolean ifSelected = false;
 			for(int i=0; i<ctrl_mngr.getDomainSize(3);i++)
 			{
 				if(Allowed_Colors[i] ==1)
 				{
-					lCol.add(UnStr(Color[i]));
+					lCol.addItem(UnStr(Color[i]));
 				}
 				if(Allowed_Colors[i] ==2)
 				{
 					ifSelected = true;
-					lCol.add(Color[i]);
-					lCol.select(i);
+					lCol.addItem(Color[i]);
+					lCol.setSelectedIndex(i);
 				}
 				else if(Allowed_Colors[i] ==0)
-					lCol.add(Color[i]);
+					lCol.addItem(Color[i]);
 			}
 			if(!ifSelected)
 			{
-				lCol.add("");
-				lCol.select("");
+				lCol.addItem("");
+				lCol.setSelectedItem("");
 			}
 
 			ifSelected = false;
@@ -377,21 +430,21 @@ public class Configit extends JFrame
 			{
 				if(Allowed_Sole[i]==1)
 				{
-					lSole.add(UnStr(Sole[i]));
+					lSole.addItem(UnStr(Sole[i]));
 				}
 				if(Allowed_Sole[i]==2)
 				{
 					ifSelected = true;
-					lSole.add(Sole[i]);
-					lSole.select(i);
+					lSole.addItem(Sole[i]);
+					lSole.setSelectedIndex(i);
 				}
 				else if (Allowed_Sole[i]==0)
-					lSole.add(Sole[i]);
+					lSole.addItem(Sole[i]);
 			}
 			if(!ifSelected)
 			{
-				lSole.add("");
-				lSole.select("");
+				lSole.addItem("");
+				lSole.setSelectedItem("");
 			}
 
 			ifSelected = false;
@@ -399,21 +452,21 @@ public class Configit extends JFrame
 			{
 				if(Allowed_Size[i]==1)
 				{
-					lSize.add(UnStr(Size[i]));
+					lSize.addItem(UnStr(Size[i]));
 				}
 				if(Allowed_Size[i] ==2)
 				{
 					ifSelected = true;
-					lSize.add(Size[i]);
-					lSize.select(i);
+					lSize.addItem(Size[i]);
+					lSize.setSelectedIndex(i);
 				}
 				else if (Allowed_Size[i]==0)
-					lSize.add(Size[i]);
+					lSize.addItem(Size[i]);
 			}
 			if(!ifSelected)
 			{
-				lSize.add("");
-				lSize.select("");
+				lSize.addItem("");
+				lSize.setSelectedItem("");
 			}
 
 			ifSelected = false;
@@ -421,56 +474,36 @@ public class Configit extends JFrame
 			{
 				if(Allowed_ShoeType[i]==1)
 				{
-					lShoeType.add(UnStr(ShoeType[i]));
+					lShoeType.addItem(UnStr(ShoeType[i]));
 				}
 				if(Allowed_ShoeType[i]==2)
 				{
 					ifSelected = true;
-					lShoeType.add(ShoeType[i]);
-					lShoeType.select(i);
+					lShoeType.addItem(ShoeType[i]);
+					lShoeType.setSelectedIndex(i);
 				}
 				else if(Allowed_ShoeType[i]==0)
-					lShoeType.add(ShoeType[i]);
+					lShoeType.addItem(ShoeType[i]);
 			}
 			if(!ifSelected)
 			{
-				lShoeType.add("");
-				lShoeType.select("");
+				lShoeType.addItem("");
+				lShoeType.setSelectedItem("");
 			}
 
-			kommArea1.setLayout(new FlowLayout(FlowLayout.CENTER));
-			kommArea2.setLayout(new FlowLayout(FlowLayout.CENTER));
-			kommArea1.add(lGend1);
-			kommArea1.add(lGend2);
-			kommArea2.add(lGT1);
-			kommArea2.add(lGT2);
-
-			scrollPanel.setLayout(new GridLayout(1,4,20,0));
-			scrollPanel.add(lCol);
-			scrollPanel.add(lSole);
-			scrollPanel.add(lSize);
-			scrollPanel.add(lShoeType);
-
-			lCol.addItemListener(this);
-			lGend1.addItemListener(this);
-			lGend2.addItemListener(this);
-			lGT1.addItemListener(this);
-			lGT2.addItemListener(this);
-			lSole.addItemListener(this);
-			lShoeType.addItemListener(this);
-			lSize.addItemListener(this);
-			lSole.addItemListener(this);
-
-			pack();
+			lCol.addActionListener(this);
+			lSole.addActionListener(this);
+			lShoeType.addActionListener(this);
+			lSize.addActionListener(this);
 		}
 	}
 
 	public void update()
 	{
    		String S;
-        for(int var = 0; var < ctrl_mngr.getVarCount(); var++ )
+        for(int var = 0; var < ctrl_mngr.getVarCount(); var++)
         {
-			for(int val = 0; val < ctrl_mngr.getDomainSize(var); val++ )
+			for(int val = 0; val < ctrl_mngr.getDomainSize(var); val++)
 			{
     			S = printValueState(ctrl_mngr, var, val);
 
@@ -528,8 +561,7 @@ public class Configit extends JFrame
 	public void actionPerformed(ActionEvent e)
 	{
       	if(e.getSource() == JB){
-			this.setVisible(false);
-        	//System.exit(0);
+			dispose();
 		}
 		if(e.getSource() == JR)
 		{
@@ -556,7 +588,6 @@ public class Configit extends JFrame
 				if(selection == JOptionPane.OK_OPTION)
 				{
 					ctrl_mngr.completeConf();
-					isdone =true;
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();
@@ -565,16 +596,42 @@ public class Configit extends JFrame
 				}
 			}
 		}
-		isdone =false;
-	}
 
-	public void itemStateChanged(ItemEvent e)
-	{
-		resetok=true;
-		double Solutions;
+		if(e.getSource() == lGend1)
+		{
+			assign(0,0);
+			Solutions=ctrl_mngr.getSolutionCount();
+			JL.setText("Available combinations: " +Solutions);
+			resetok=true;
+		}
+
+		if(e.getSource() == lGend2)
+		{
+			assign(0,1);
+			Solutions=ctrl_mngr.getSolutionCount();
+			JL.setText("Available combinations: " +Solutions);
+			resetok=true;
+		}
+
+		if(e.getSource() == lGT1)
+		{
+   			assign(2,0);
+			Solutions=ctrl_mngr.getSolutionCount();
+			JL.setText("Available combinations: " +Solutions);
+			resetok=true;
+		}
+
+		if(e.getSource() == lGT2)
+		{
+   			assign(2,1);
+			Solutions=ctrl_mngr.getSolutionCount();
+			JL.setText("Available combinations: " +Solutions);
+			resetok=true;
+		}
 
 		if(e.getSource() ==lCol)
 		{
+			resetok=true;
 			for(int i=0;i< ctrl_mngr.getDomainSize(3);i++)
 			{
 				if(lCol.getSelectedIndex()==i )
@@ -586,36 +643,9 @@ public class Configit extends JFrame
 			}
 		}
 
-		if(e.getSource() == lGend1)
-		{
-			assign(0,0);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
-		}
-
-		if(e.getSource() == lGend2)
-		{
-			assign(0,1);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
-		}
-
-		if(e.getSource() == lGT1)
-		{
-   			assign(2,0);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
-		}
-
-		if(e.getSource() == lGT2)
-		{
-   			assign(2,1);
-			Solutions=ctrl_mngr.getSolutionCount();
-			JL.setText("Available combinations: " +Solutions);
-		}
-
 		if(e.getSource() == lSole)
 		{
+			resetok=true;
 			for(int i=0;i<ctrl_mngr.getDomainSize(4);i++)
 			{
 				if(lSole.getSelectedIndex()==i)
@@ -629,6 +659,7 @@ public class Configit extends JFrame
 
 		if(e.getSource () == lSize)
 		{
+			resetok=true;
 			for(int i=0;i< ctrl_mngr.getDomainSize(1);i++)
 			{
 				if(lSize.getSelectedIndex()==i )
@@ -642,6 +673,7 @@ public class Configit extends JFrame
 
 		if(e.getSource () == lShoeType)
 		{
+			resetok=true;
 			for(int i=0;i< ctrl_mngr.getDomainSize(5);i++)
 			{
 				if(lShoeType.getSelectedIndex()==i)
@@ -674,10 +706,4 @@ public class Configit extends JFrame
 			ctrl_mngr.assignValue(var, val, false);
 		}
 	}
-
-	public boolean finished ()
-	{
-		return isdone;
-	}
-
 }
