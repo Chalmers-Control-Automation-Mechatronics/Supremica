@@ -53,6 +53,7 @@ public class SearchStates
 		// !!Throws exception if automata is empty or has only one automaton!!
 		SynchronizationOptions syncOptions = new SynchronizationOptions();
 		syncOptions.setRequireConsistentControllability(false);
+		syncOptions.setBuildAutomaton(false); // don't build teh automaton until absolutely necessary
 		this.syncher = new AutomataSynchronizer(automata, syncOptions);
 		this.matcher = m;
 		this.container = makeContainer();    // Must create the container, in case the thread is stopped
@@ -173,7 +174,8 @@ public class SearchStates
 		// ** Note, ctor should be private, but jikes 1.15 emits faulty bytecode then
 		// ** javac and jikes 1.14 ok for private.
 		// ** Do not instantiate, create only through getStateIterator()
-		public StateIterator(State[][] s, int[] c)
+		// Seems to be fixed in jikes 1.16
+		private StateIterator(State[][] s, int[] c)
 		{
 			states = s;
 			composite = c;
@@ -233,7 +235,7 @@ public class SearchStates
 		return new String(str);
 	}
 
-	public Automaton buildAutomaton() // once the states have been created, we could build an entire automaton
+	private Automaton buildAutomaton() // once the states have been created, we could build an entire automaton
 		throws Exception
 	{
 		return syncher.getAutomaton();

@@ -64,6 +64,8 @@ public class AutomataBuildFromVALID
 	private Project currAutomata = null;
 	private SAXBuilder docBuilder;
 	private String filePath;
+	
+	private int autonum = 0;
 
 	// mappings between id and state/event
 	private Map idStateMap = new HashMap();
@@ -121,7 +123,8 @@ public class AutomataBuildFromVALID
 		}
 		catch (Exception ex)
 		{
-			throw new Exception(ex.getMessage()); // why not simply throw ex;?
+			// throw new Exception(ex.getMessage()); // why not simply throw ex;?
+			throw ex;
 		}
 
 		return currAutomata;
@@ -322,12 +325,18 @@ public class AutomataBuildFromVALID
 		Alphabet currAlphabet = new Alphabet();
 		Element element;
 
-		// Name automaton and set type
+		/* Name automaton and set type
 		if (name.equals(""))
 		{
-			currAutomaton.setName(root.getAttributeValue("name"));
+			// Fix here to handle no-named graphs
+			name = root.getAttributeValue("name");
+			if(name == null || name.equals(""))
+			{
+				name = "Automaton " + ++autonum;
+			}
+			//currAutomaton.setName();
 		}
-		else
+		else*/
 		{
 			currAutomaton.setName(name);
 		}
@@ -417,7 +426,7 @@ public class AutomataBuildFromVALID
 			}
 
 			// Self loops
-			if (element.getAttributeValue("isLoop").equals("1"))
+			if((element.getAttributeValue("isLoop") != null) && (element.getAttributeValue("isLoop").equals("1")))
 			{
 				destState = (State)idStateMap.get(element.getChild("source").getAttributeValue("name"));
 				// destState = currAutomaton.getStateWithId(element.getChild("source").getAttributeValue("name"));

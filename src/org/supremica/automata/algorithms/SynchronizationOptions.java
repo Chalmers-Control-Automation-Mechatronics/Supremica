@@ -73,7 +73,18 @@ public final class SynchronizationOptions
 	public SynchronizationOptions()
 		throws Exception
 	{
-		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode(), true, true);
+		this(SupremicaProperties.syncNbrOfExecuters(), 
+			SynchronizationType.Prioritized, 
+			SupremicaProperties.syncInitialHashtableSize(), 
+			SupremicaProperties.syncExpandHashtable(), 
+			SupremicaProperties.syncForbidUncontrollableStates(), 
+			SupremicaProperties.syncExpandForbiddenStates(), 
+			false, 	// terminate if uncontrollable state found
+			false, 	// expandEventsUsingPriority
+			true, 	// buildAutomaton
+			SupremicaProperties.verboseMode(), 
+			true, 	// requireConsistentControllability
+			true);	// requireConsistentImmediate
 	}
 
 	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate)

@@ -31,13 +31,16 @@ public class EventSubTree
 
 		SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
 		add(currPrioritizedNode);
+		
+		SupremicaTreeNode isEpsilonNode = new SupremicaTreeNode("epsilon: " + event.isEpsilon());
+		add(isEpsilonNode);
 	}
 	
 	// Change this to reflect the correct number of children/properties/leaves
-	// Could this be calculated from sizeof(LabeledEvent)?
+	// Could this be calculated from sizeof(LabeledEvent)? It should not. This depends only on the above construction
 	public int numDirectLeafs()
 	{
-		return 2;
+		return 3;
 	}
 	
 }
