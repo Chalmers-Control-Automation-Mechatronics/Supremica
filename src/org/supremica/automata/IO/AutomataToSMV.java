@@ -338,7 +338,8 @@ public class AutomataToSMV
 					String enableConditionPlant = getEnableCondition(currEvent, true, true);
 					if (enableConditionPlant.equals(""))
 					{
-						enableConditionPlant = "FALSE";
+						pw.print("TRUE)");
+						continue;
 					}
 					pw.print(enableConditionPlant);
 					// First find conditions for when this event is enabled in the plant
