@@ -472,33 +472,33 @@ Editing the execution control chart{\protect ~\cite{FBEditor}}}
 %\doublespace
 %
 
-\section{EMBench and Function Blocks}
+%\section{EMBench and Function Blocks}
 
-Since the FBEditor provided the aforementioned functionality, it
-was decided that the EMBench should leverage it. In particular,
-the bench relies on the editor for two basic features.
-\begin{enumerate}
-\item To generate the Java files from the IEC 61499 source files.
-\item To manage the Java thread that initializes the blocks during
-simulation.
-\end{enumerate}
+%Since the FBEditor provided the aforementioned functionality, it
+%was decided that the EMBench should leverage it. In particular,
+%the bench relies on the editor for two basic features.
+%\begin{enumerate}
+%\item To generate the Java files from the IEC 61499 source files.
+%\item To manage the Java thread that initializes the blocks during
+%simulation.
+%\end{enumerate}
 
-It has been visualized that the bench will eventually have the
-editor as one of its components. The bench explicitly manages the
-design activities of the user and generates the function block
-definitions for the user design. It then requests the FBEditor
-component to load the specified source files, generate the Java
-classes and run the simulation. In addition, the user may make
-behavioral changes to the blocks by editing the events, if he/she
-so desires. The editor conforms to the published service
-specifications of the bench as explained in chapter \ref{chap3}
-and hence would present the same interface to the client.
+%It has been visualized that the bench will eventually have the
+%editor as one of its components. The bench explicitly manages the
+%design activities of the user and generates the function block
+%definitions for the user design. It then requests the FBEditor
+%component to load the specified source files, generate the Java
+%classes and run the simulation. In addition, the user may make
+%behavioral changes to the blocks by editing the events, if he/she
+%so desires. The editor conforms to the published service
+%specifications of the bench as explained in chapter \ref{chap3}
+%and hence would present the same interface to the client.
 
-Currently, however, the FBEditor is not a part of the bench
-because it does not expose an API. Since it is external to the
-bench, the bench has to circumvent this problem by allowing the
-editor to be executed as a separate application and delegating the
-simulation task completely to the editor. The data exchange
-necessary between the two applications is handled via network
-communication. This issue is explained in a greater detail in
-chapter~\ref{chap4} and chapter~\ref{chap5}.
+%Currently, however, the FBEditor is not a part of the bench
+%because it does not expose an API. Since it is external to the
+%bench, the bench has to circumvent this problem by allowing the
+%editor to be executed as a separate application and delegating the
+%simulation task completely to the editor. The data exchange
+%necessary between the two applications is handled via network
+%communication. This issue is explained in a greater detail in
+%chapter~\ref{chap4} and chapter~\ref{chap5}.
