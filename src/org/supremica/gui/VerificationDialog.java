@@ -70,9 +70,9 @@ class VerificationDialogStandardPanel
 	private AlgorithmSelector algorithmSelector;
 	private JTextArea nbNote;
 
-	final String[] verificationData = { "controllability",	// keep them in this order, for God's sake!
-										"non-blocking",
-										"language inclusion" };
+	final String[] verificationData = { "Controllability",	// keep them in this order, for God's sake!
+										"Non-blocking",
+										"Language inclusion" };
 
 
 	static class AlgorithmSelector
@@ -80,8 +80,8 @@ class VerificationDialogStandardPanel
 	{
 		final static int MONOLITHIC = 0;
 		final static int MODULAR = 1;
-		final static int IDD = 2;
-		final static String[] algorithmData = { "monolithic",  "modular"/*, "IDD" */ };
+		//final static int IDD = 2;
+		final static String[] algorithmData = { "Monolithic",  "Modular"};
 
 		public AlgorithmSelector()
 		{
