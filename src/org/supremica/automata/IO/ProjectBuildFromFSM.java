@@ -316,6 +316,7 @@ public class ProjectBuildFromFSM
 					while (tokenizer.hasMoreTokens())
 					{
 						String optionalParameter = tokenizer.nextToken();
+						System.err.println(currEvent + " " + destStateName + " " + optionalParameter);
 						if (optionalParameter.equalsIgnoreCase("c"))
 						{
 							currEventControllable = true;
@@ -407,7 +408,6 @@ public class ProjectBuildFromFSM
 				String destStateName = currTransition.getDestStateName();
 				State currSourceState = currAutomaton.getStateWithName(sourceStateName);
 				State currDestState = currAutomaton.getStateWithName(destStateName);
-
 
 				// Create and add the arc
 				Arc currArc = new Arc(currSourceState, currDestState, currEvent);

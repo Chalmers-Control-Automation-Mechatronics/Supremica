@@ -503,7 +503,6 @@ public class Alphabet
 		}
 		if (nbrOfObservableEvents() != other.nbrOfObservableEvents())
 		{
-			//System.err.println("equalAlphabet::non equal nbr of prioritized events");
 			return false;
 		}
 		if (nbrOfImmediateEvents() != other.nbrOfImmediateEvents())
