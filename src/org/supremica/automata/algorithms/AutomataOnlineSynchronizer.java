@@ -58,6 +58,10 @@ import java.util.Arrays;
 // For the automata selection methods
 import java.util.ArrayList;
 
+/**
+ * Used in the "Automata Explorer" (an early version that is on ice since way back and therefore not completed).
+ * Also used in AutomataVerifier.findUncontrollableStates.
+ */
 public final class AutomataOnlineSynchronizer
 	extends Thread
 {

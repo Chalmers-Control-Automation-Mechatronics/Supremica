@@ -401,7 +401,7 @@ public final class AutomataSynchronizerExecuter
 
 		// Always add Integer.MAX_VALUE as the last element
 		currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
-
+		
 		if (expandEventsUsingPriority)
 		{   // Choose outgoing events among the possibilities, choose after priority...
 			int insertionIndex = 0;
@@ -430,7 +430,7 @@ public final class AutomataSynchronizerExecuter
 			}
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;
 		}
-
+		
 		if (coExecute)
 		{   // In co-execution mode, a enabledEvents-method in another executer 
 			// follows the automaton we're suspecting has uncontrollable states.
@@ -451,7 +451,7 @@ public final class AutomataSynchronizerExecuter
  				if (verboseMode)				
 				 	thisCategory.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
 				//  */
-				// Here, the insertionIndex sets the maximium amount of states that are examined from such states...
+				// Here, the insertionIndex sets the maximium amount of states that are examined...
 				// insertionIndex = 2;
 				insertionIndex = 20;
 			}
@@ -536,6 +536,7 @@ public final class AutomataSynchronizerExecuter
 						thisCategory.error("Error in SynchronizerExecuter");
 						return;
 					}
+
 					currEventIndex = currEnabledEvents[++i];
 				}
 			}

@@ -90,7 +90,7 @@ public final class IntArrayList
 	 */
 	public void add(int[] theArray)
 	{
-		addFirst(theArray);
+		addLast(theArray);
 	}
 
 	/**

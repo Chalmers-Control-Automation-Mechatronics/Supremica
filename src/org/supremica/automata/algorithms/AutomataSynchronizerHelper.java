@@ -216,11 +216,11 @@ public final class AutomataSynchronizerHelper
     }
 
     /**
-     * @return A state if there is more states to process, null otherwise.
+     * @return A state if there are more states to process, null otherwise.
      */
     public int[] getStateToProcess()
     {
-        synchronized (gettingFromStatesToProcessLock)
+		synchronized (gettingFromStatesToProcessLock)
         {
 	        if (nbrOfStatesToProcess == 0)
 			{
@@ -230,7 +230,7 @@ public final class AutomataSynchronizerHelper
 			if (rememberTrace)
 			{
 				if (fromStateList.size() > 0)
-				{
+				{   // 
 					while (!(Arrays.equals(fromStateList.getLast(), stateTrace.getLast())))
 					{
 						stateTrace.removeLast();
@@ -255,13 +255,11 @@ public final class AutomataSynchronizerHelper
 			else
 			{
 				if (coExecute)
-				{
-					// Depth first search
+				{	// Depth first search
 					return statesToProcess.removeLast();
 				}
 				else
-				{
-					// Breath first search
+				{	// Width first search
 					return statesToProcess.removeFirst();
 				}
 			}
@@ -284,8 +282,7 @@ public final class AutomataSynchronizerHelper
 			++nbrOfAddedStates;
 
 			/*
-			if (verboseMode)
-			    if (nbrOfAddedStates % 10000 == 0)
+			if (verboseMode && nbrOfAddedStates % 10000 == 0)
 					thisCategory.debug(nbrOfAddedStates + " new states found so far.");
 			*/
         }
@@ -305,22 +302,11 @@ public final class AutomataSynchronizerHelper
 			}
 
 			/*
-			if (verboseMode)
-				if (nbrOfCheckedStates % 10000 == 0)
+			if (verboseMode && nbrOfCheckedStates % 10000 == 0)
 					thisCategory.debug(nbrOfCheckedStates + " states checked so far.");
 			*/
 		}
     }
-
-   	public void setCancelDialog(CancelDialog cancelDialog)
-	{
-		this.cancelDialog = cancelDialog;
-	}
-
-	public CancelDialog getCancelDialog()
-	{
-		return cancelDialog;
-	}
 
     /**
      * If the toState does not exist then make a copy of this state
@@ -337,6 +323,16 @@ public final class AutomataSynchronizerHelper
 		}
 		addState(toState);
     }
+
+   	public void setCancelDialog(CancelDialog cancelDialog)
+	{
+		this.cancelDialog = cancelDialog;
+	}
+
+	public CancelDialog getCancelDialog()
+	{
+		return cancelDialog;
+	}
 
     public void addStatus(int[] state)
     {
@@ -494,36 +490,47 @@ public final class AutomataSynchronizerHelper
 	{
 		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 
+		System.out.println("Krasch?");
+
 		// We have to have an executer for finding the transitions
 		clear();
 		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
 		executer.initialize();
 
+		System.out.println("Krasch?");
+
 		// This version does not remove shortcuts, add this later
 		StringBuffer trace = new StringBuffer();
 		int[] prevState = null;
+
+		System.out.println("Krasch!");
+
 		for (Iterator traceIt = stateTrace.iterator(); traceIt.hasNext();)
 		{
+			System.out.println("Tjoho?");
 			int[] nextState = (int[]) traceIt.next();
+			System.out.println("Tjoho!");
 			if (prevState != null)
 			{
 				int currEventIndex = executer.findTransition(prevState, nextState);
+				System.out.println("currEventIndex: " + currEventIndex);
 				trace.append(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
 			}
 
 			prevState = nextState;
 		}
 
-/*
+		/*
 		// This tries to find shortcuts in the trace by looking one-step ahead
+		StringBuffer trace = new StringBuffer();
 		int[] fromState;
 		for (int i = 0; i < stateTrace.size() - 1; i++)
-		{
+		{ 
 			int[] fromState = (int[]) stateTrace.get(i);
 			executer.setCurrState(fromState);
 			for (int j = stateTrace.size() - 1; j > i; j--)
 			{
-				index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
+				int index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
 				if (index >= 0)
 				{ // thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
 					trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
@@ -544,7 +551,8 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 		}
-*/
+		*/
+		 
 		thisCategory.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
 
 		/*
@@ -614,10 +622,13 @@ public final class AutomataSynchronizerHelper
 				// Only print states that are not initial if we are looking at a full state
 				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || automataIndices.length < theAutomata.size())
 				{
-					if (!firstEntry)
+					if (firstEntry)
 					{
-						state.append(",");
 						firstEntry = false;
+					}
+					else
+					{
+						state.append(", ");
 					}
 					state.append(theAutomata.getAutomatonAt(automataIndices[i]).getName());
 					state.append(": ");
@@ -625,7 +636,7 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 			String reason = "the uncontrollable event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + " in the plant " + problemAutomaton.getName() + " is enabled.";
-			thisCategory.error("The state" + state.toString() + " is uncontrollable since " + reason);
+			thisCategory.error("The state: " + state.toString() + " is uncontrollable since " + reason);
 		}
 	}
 

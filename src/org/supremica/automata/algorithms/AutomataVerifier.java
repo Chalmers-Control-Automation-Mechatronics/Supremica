@@ -225,8 +225,11 @@ public class AutomataVerifier
 									
 									// Stop if uncontrollable
 									if (!allModulesControllable)
+									{
+										System.out.println("Uncontrollable state found.");
 										break loop;
-									
+									}									
+
 									// Clean selectedAutomata	
 									while(selectedAutomata.size() > 1) 
 										selectedAutomata.remove(1);							
@@ -245,9 +248,11 @@ public class AutomataVerifier
 					{	// Check module
 						allModulesControllable = allModulesControllable && checkModule(selectedAutomata);
 	
-						// Stop if uncontrollable						
+						// Stop if uncontrollable
 						if (!allModulesControllable)
+						{
 							break loop;
+						}									
 					}
 				}
 								
@@ -303,16 +308,14 @@ public class AutomataVerifier
 		if (stopRequested)
 			return false;
 
-		String automataNames = "";
+		StringBuffer automataNames = new StringBuffer();
 		if (verboseMode)
 		{	// For printing the names of the automata in selectedAutomata
 			// Object[] automatonArray = selectedAutomata.toArray();
-			Iterator autIt = selectedAutomata.iterator();
-			automataNames = "";
-			// for (int i = 0; i < automatonArray.length; i++)
-			//automataNames = automataNames + ((Automaton) automatonArray[i]).getName() + " ";
-			while (autIt.hasNext())
-				automataNames = automataNames + ((Automaton) autIt.next()).getName() + " ";
+			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext();) 
+			{
+				automataNames = automataNames.append(((Automaton) autIt.next()).getName() + " ");
+			}
 		}
 		
 		if (!synchHelper.getAutomataIsControllable())
@@ -324,9 +327,12 @@ public class AutomataVerifier
 			{
 				automataIndices[i] = ((Automaton) selectedAutomata.get(i)).getIndex();
 			}
-			if (verboseMode)
-				thisCategory.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
 			
+			if (verboseMode)
+			{
+				thisCategory.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
+			}			
+
 			// Sort automata in order of similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 			if (similarAutomata == null)
@@ -357,7 +363,10 @@ public class AutomataVerifier
 					if (moreSimilarAutomata != null)
 					{
 						if (verboseMode)
+						{
 							thisCategory.info("All similar automata are already added, trying to add some more...");
+						}
+						
 						System.arraycopy(similarAutomata, 0, newSimilarAutomata, 0, similarAutomata.length);
 						System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata, similarAutomata.length, moreSimilarAutomata.length);
 						similarAutomata = newSimilarAutomata;
@@ -374,11 +383,12 @@ public class AutomataVerifier
 							// Print info on amount of states examined
 							// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
 						}
+
 						return false;
 					}
 				}
 				
-				// Add the similar automata  in hope of removing uncontrollable
+				// Add the similar automata in hope of removing uncontrollable
 				// states from potentiallyUncontrollableStates...
 				excludeUncontrollableStates(similarAutomata, selectedAutomata, automataIndices);
 				
@@ -576,7 +586,7 @@ public class AutomataVerifier
 
 		if (verboseMode)
 			thisCategory.info("stateAmountLimit: " + stateAmountLimit + ".");
-
+		
 		synchHelper.clear();
 
 		for (int i = start; i < similarAutomata.length; i++)
@@ -682,7 +692,7 @@ public class AutomataVerifier
 		onlineSynchronizer.selectAutomata(automataIndices);
 		onlineSynchronizer.initialize();
 
-		// The order of the two first synchHelper-commands here is important...
+		// It's important that setRememberTrace occurs before addState...
 		if (verboseMode)
 			synchHelper.setRememberTrace(true);
 		synchHelper.addState(initialState);
