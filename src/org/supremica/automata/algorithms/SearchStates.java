@@ -36,13 +36,13 @@ public class SearchStates
 	public void run()    // throws Exception
 	{		
 		exedlg.setMode(ExecutionDialogMode.synchronizing);
-		java.awt.EventQueue.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					syncher.getHelper().setExecutionDialog(exedlg);
-				}
-			});
+		// java.awt.EventQueue.invokeLater(new Runnable()
+		//	{
+		//		public void run()
+		//		{
+		syncher.getHelper().setExecutionDialog(exedlg);
+		//		}
+		//	});
 		
 		try
 		{

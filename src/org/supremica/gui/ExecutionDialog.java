@@ -75,8 +75,8 @@ public class ExecutionDialog
 	private JProgressBar progressBar = null;
 	private JPanel currCenterPanel = null;
 	private JButton stopButton = null;
-	private int progressMin = -1;
-	private int progressMax = -1;
+	// private int progressMin = -1;
+	// private int progressMax = -1;
 	private int progressValue = -1;
 	private int value = -1;
 
@@ -181,8 +181,13 @@ public class ExecutionDialog
 	 */
 	public void initProgressBar(int min, int max)
 	{
-		progressMin = min;
-		progressMax = max;
+		// progressMin = min;
+		// progressMax = max;
+		progressBar.setMinimum(min);
+		progressBar.setMaximum(max);
+		this.progressValue = 0;
+
+		update();
 	}
 
 	public void setProgress(int progressValue)

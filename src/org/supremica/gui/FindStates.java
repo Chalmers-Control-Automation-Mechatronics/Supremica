@@ -598,7 +598,6 @@ class FindStatesFrame
 
 				ss.setExecutionDialog(exedlg);
 				ss.run();    // Start the synchronization thread
-
 				// ss.join(); // at the moment, simply wait for ss to finish
 				// find_button.setEnabled(true);
 				// /setCursor(DEFAULT_CURSOR);
