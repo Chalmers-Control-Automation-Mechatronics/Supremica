@@ -76,6 +76,7 @@ public class AutomataBuildFromXml
 	private static final String labelStr = "label";
 	private static final String controllableStr = "controllable";
 	private static final String prioritizedStr = "prioritized";
+	private static final String immediateStr = "immediate";
 
 	private static AutomataBuildFromXml builder = null;
 	private Automata currAutomata = null;
@@ -243,12 +244,12 @@ public class AutomataBuildFromXml
 		}
 
 		int minorVersion = 0;
-		String minorStringVersion = attributes.getValue("minor");		
+		String minorStringVersion = attributes.getValue("minor");
 		if (minorStringVersion != null)
 		{
 			minorVersion = Integer.parseInt(minorStringVersion);
 		}
-		
+
 		if (majorVersion > 0)
 		{
 			throw new SAXException("Unsupported file format.");
@@ -307,6 +308,7 @@ public class AutomataBuildFromXml
 		String label = null;
 		boolean controllable = true;
 		boolean prioritized = true;
+		boolean immediate = false;
 
 		int length = attributes.getLength();
 		String currName;
@@ -329,6 +331,10 @@ public class AutomataBuildFromXml
 			{
 				prioritized = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
 			}
+			else if (immediateStr.equals(currName))
+			{
+				immediate = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
+			}
 		}
 
 		Event currEvent = new Event();
@@ -347,6 +353,7 @@ public class AutomataBuildFromXml
 		currEvent.setLabel(label);
 		currEvent.setControllable(controllable);
 		currEvent.setPrioritized(prioritized);
+		currEvent.setImmediate(immediate);
 
 		try
 		{

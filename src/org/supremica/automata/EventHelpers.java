@@ -78,6 +78,7 @@ public class EventHelpers
 		String label = tmpEvent.getLabel();
 		boolean controllable = tmpEvent.isControllable();
 		boolean prioritized = tmpEvent.isPrioritized();
+		boolean immediate = tmpEvent.isImmediate();
 
 		while (eventIt.hasNext())
 		{
@@ -89,6 +90,11 @@ public class EventHelpers
 				String errorMsg = "Controllability of an event must be the same in all automata. Controllability of " + label + " is not consistent.";
 				throw new Exception(errorMsg);
 			}
+			if (immediate != tmpEvent.isImmediate())
+			{
+				String errorMsg = "Immediate of an event must be the same in all automata. Immediate of " + label + " is not consistent.";
+				throw new Exception(errorMsg);
+			}
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 
@@ -97,6 +103,7 @@ public class EventHelpers
 		theEvent.setId(id); // Do I need to tweak the id???
 		theEvent.setControllable(controllable);
 		theEvent.setPrioritized(prioritized);
+		theEvent.setImmediate(immediate);
 
 		return theEvent;
 	}

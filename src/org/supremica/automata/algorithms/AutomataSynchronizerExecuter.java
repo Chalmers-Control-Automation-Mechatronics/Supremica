@@ -81,6 +81,7 @@ public final class AutomataSynchronizerExecuter
 	private final boolean[][] prioritizedEventsTable;
 	private final boolean[] typeIsPlantTable;
 	private final boolean[] controllableEventsTable;
+	private final boolean[] immediateEventsTable;
 
 	private int[][] currOutgoingEvents;
 	private int[] currOutgoingEventsIndex;
@@ -89,6 +90,10 @@ public final class AutomataSynchronizerExecuter
 	private int[] nextState;
 	private int[] currEnabledEvents;
 	private boolean controllableState;
+
+	private static final int IMMEDIATE_NOT_AVAILABLE = -1;
+	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
+
 
 	/** Options determining how the synchronization should be performed.
 	 */
@@ -139,12 +144,14 @@ public final class AutomataSynchronizerExecuter
 		prioritizedEventsTable = indexForm.getPrioritizedEventsTable();
 		typeIsPlantTable = indexForm.getTypeIsPlantTable();
 		controllableEventsTable = indexForm.getControllableEventsTable();
+		immediateEventsTable = indexForm.getImmediateEventsTable();
 		potentiallyUncontrollableStates = helper.getStateMemorizer();
 		exhaustiveSearch = helper.getExhaustiveSearch();
 		rememberUncontrollable = helper.getRememberUncontrollable();
 		expandEventsUsingPriority = helper.getExpandEventsUsingPriority();
 		coExecute = helper.getCoExecute();
 		coExecuter = helper.getCoExecuter();
+
 		if (expandEventsUsingPriority)
 		{
 			eventPriority = helper.getEventPriority();
@@ -275,6 +282,8 @@ public final class AutomataSynchronizerExecuter
 		boolean thisPlantEventOk;
 		boolean canExecuteInPlant;
 		controllableState = true;
+		immediateEvent = IMMEDIATE_NOT_AVAILABLE;
+
 		while (currMinEventIndex < Integer.MAX_VALUE)
 		{
 			int currEventIndex = currMinEventIndex;
@@ -382,7 +391,19 @@ public final class AutomataSynchronizerExecuter
 
 			if (thisEventOk)
 			{
-				currEnabledEvents[nbrOfEnabledEvents++] = currEventIndex;
+				if (immediateEventsTable[currEventIndex])
+				{ // Clear out everything else and abort the search for enabled events
+				  // If several events that are immediate are found
+				  // Then the one with smallest index are chosen.
+					immediateEvent = currEventIndex;
+					nbrOfEnabledEvents = 0;
+					currEnabledEvents[nbrOfEnabledEvents++] = immediateEvent;
+					currMinEventIndex = Integer.MAX_VALUE;
+				}
+				else
+				{
+					currEnabledEvents[nbrOfEnabledEvents++] = currEventIndex;
+				}
 			}
 
 			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk && !controllableEventsTable[currEventIndex])
@@ -401,7 +422,7 @@ public final class AutomataSynchronizerExecuter
 
 		// Always add Integer.MAX_VALUE as the last element
 		currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
-		
+
 		if (expandEventsUsingPriority)
 		{   // Choose outgoing events among the possibilities, choose after priority...
 			int insertionIndex = 0;
@@ -430,7 +451,7 @@ public final class AutomataSynchronizerExecuter
 			}
 			currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;
 		}
-		
+
 		if (coExecute)
 		{   // In co-execution mode, an enabledEvents-method in another executer
 			// follows the automaton we're suspecting has uncontrollable states.
@@ -473,8 +494,8 @@ public final class AutomataSynchronizerExecuter
 	 */
     public void run()
     {
-	
-	
+
+
 		initialize();
 
 		// Get the first state to process
@@ -545,7 +566,7 @@ public final class AutomataSynchronizerExecuter
 			}
       		currState = helper.getStateToProcess();
         }
-		
+
 	}
 
 	/**
@@ -580,10 +601,10 @@ public final class AutomataSynchronizerExecuter
 	public boolean buildAutomaton(boolean longformId)
 		throws Exception
     {
-	
+
 		try
 		{
-	
+
         Automaton theAutomaton = helper.getAutomaton();
         theAutomaton.setName("regaut");
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
@@ -742,7 +763,7 @@ public final class AutomataSynchronizerExecuter
 		}
 
 		return true;
-		
+
 		}
 		catch (OutOfMemoryError ex)
 		{

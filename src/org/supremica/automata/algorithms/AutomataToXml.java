@@ -61,7 +61,7 @@ public class AutomataToXml
 	private Automaton automaton;
 	private boolean canonical;
 	private boolean debugMode = false;
-	
+
 	private static final int majorFileVersion = 0;
 	private static final int minorFileVersion = 9;
 
@@ -89,7 +89,7 @@ public class AutomataToXml
 
 		pw.print(" major=\"" + majorFileVersion + "\" ");
 		pw.print(" minor=\"" + minorFileVersion + "\" ");
-		
+
 		pw.println(">");
 
 		Iterator automataIt = automata.iterator();
@@ -109,6 +109,8 @@ public class AutomataToXml
 					pw.print(" controllable=\"false\"");
 				if (!event.isPrioritized())
 					pw.print(" prioritized=\"false\"");
+				if (event.isImmediate())
+					pw.print(" immediate=\"true\"");
 				if (debugMode)
 					pw.print(" synchIndex=" + event.getSynchIndex());
 				pw.println("/>");

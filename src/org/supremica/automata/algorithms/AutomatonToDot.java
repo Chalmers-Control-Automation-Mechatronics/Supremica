@@ -225,6 +225,8 @@ public class AutomatonToDot
 							pw.print("!");
 						if (!thisEvent.isPrioritized())
 							pw.print("?");
+						if (thisEvent.isImmediate())
+							pw.print("#");
 						pw.print(thisEvent.getLabel());
 
 						if (arcIt.hasNext())
@@ -250,6 +252,8 @@ public class AutomatonToDot
 						pw.print("!");
 					if (!thisEvent.isPrioritized())
 						pw.print("?");
+					if (thisEvent.isImmediate())
+						pw.print("#");
 					pw.println(thisEvent.getLabel() + "\" ];");
 				}
 			}

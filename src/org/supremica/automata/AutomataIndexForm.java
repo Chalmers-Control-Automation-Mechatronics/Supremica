@@ -64,6 +64,7 @@ public final class AutomataIndexForm
 	private State[][] stateTable; // <automaton,state> -> <State>
  	private int[][] stateStatusTable; // <automaton,state> -> <status>
 	private boolean[] controllableEventsTable; // <event> -> <true|false>
+	private boolean[] immediateEventsTable; // <event> -> <true|false>
 	private boolean[] typeIsPlantTable; // <automaton> -> <isPlant>
 	private int[] eventPriority; // <event> -> <priority>
 	private int[] automataSize; // <automaton> -> <nbr_of_states>
@@ -112,6 +113,7 @@ public final class AutomataIndexForm
 			stateStatusTable = generateCopy2DIntArray(indexForm.stateStatusTable);
 			typeIsPlantTable = generateCopy1DBooleanArray(indexForm.typeIsPlantTable);
 			controllableEventsTable = generateCopy1DBooleanArray(indexForm.controllableEventsTable);
+			immediateEventsTable = generateCopy1DBooleanArray(indexForm.immediateEventsTable);
 			automataSize = generateCopy1DIntArray(indexForm.automataSize);
 			enableEventsTable = generateCopy3DIntArray(indexForm.enableEventsTable);
 		}
@@ -126,6 +128,7 @@ public final class AutomataIndexForm
 			stateStatusTable = indexForm.stateStatusTable;
 			typeIsPlantTable = indexForm.typeIsPlantTable;
 			controllableEventsTable = indexForm.controllableEventsTable;
+			immediateEventsTable = indexForm.immediateEventsTable;
 			automataSize = indexForm.automataSize;
 			enableEventsTable = indexForm.enableEventsTable;
 		}
@@ -456,10 +459,12 @@ public final class AutomataIndexForm
     {
         Alphabet theAlphabet = theAutomaton.getAlphabet();
 		controllableEventsTable = new boolean[theAlphabet.size()];
+		immediateEventsTable = new boolean[theAlphabet.size()];
 	    for (int i = 0; i < theAlphabet.size(); i++)
         {
 			Event currEvent = theAlphabet.getEventWithIndex(i);
 			controllableEventsTable[i] = currEvent.isControllable();
+			immediateEventsTable[i] = currEvent.isImmediate();
 		}
 	}
 
@@ -516,6 +521,11 @@ public final class AutomataIndexForm
     public boolean[] getControllableEventsTable()
     {
     	return controllableEventsTable;
+    }
+
+    public boolean[] getImmediateEventsTable()
+    {
+    	return immediateEventsTable;
     }
 
     public int[] getAutomataSize()

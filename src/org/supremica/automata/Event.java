@@ -58,6 +58,7 @@ public class Event
 	private String label = "";
 	private boolean controllable = true;
 	private boolean prioritized = true;
+	private boolean immediate = false;
 	private int expansionPriority = -1;
 	private int synchIndex = -1;
 //	private Action theAction = null;
@@ -85,6 +86,7 @@ public class Event
 		label = e.label;
 		controllable = e.controllable;
 		prioritized = e.prioritized;
+		immediate = e.immediate;
 	}
 
 	public String toString()
@@ -131,6 +133,17 @@ public class Event
 	{
 		this.controllable = controllable;
 	}
+
+	public boolean isImmediate()
+	{
+		return immediate;
+	}
+
+	public void setImmediate(boolean immediate)
+	{
+		this.immediate = immediate;
+	}
+
 
 	public boolean isPrioritized()
 	{
