@@ -1094,6 +1094,17 @@ public class Automata
 					{
 						String message = "The automaton " + currAutomaton +
 							" does not have an initial state.\n" +
+							"Please specify an initial state.";
+
+						Object[] options = { "Cancel" };
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																JOptionPane.OK_OPTION,
+																JOptionPane.WARNING_MESSAGE, null,
+																options, options[0]);
+
+						/*
+						String message = "The automaton " + currAutomaton +
+							" does not have an initial state.\n" +
 							"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
 						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
@@ -1113,14 +1124,15 @@ public class Automata
 							// This is iNsanE!
 							return false;
 						}
+						*/
 					}
 					else
 					{
 						logger.error("The automaton " + currAutomaton + " has no initial state.");
-
-						// This is iNsaNe!
-						return false;
 					}
+
+					// This is iNsaNe!
+					return false;
 				}
 			}
 		}
