@@ -135,7 +135,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Flexible manufacuring cell", prefix + "flexibleManufacturingCell.xml"));
 		thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml"));
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicle", prefix + "agv.xml"));
-
+		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
 	}
 
 	private void initializeStandardComponents()
