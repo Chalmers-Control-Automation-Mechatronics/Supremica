@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.4 2005-02-22 22:38:42 robi Exp $
+//# $Id: EventTableModel.java,v 1.5 2005-03-06 22:42:49 robi Exp $
 //###########################################################################
 
 
@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.expr.IdentifierProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventParameterProxy;
+import net.sourceforge.waters.model.module.ForeachEventProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -194,14 +195,14 @@ class EventTableModel
 	{
 		final Collection collected = new TreeSet();
 		final Collection blocked = mGraph.getBlockedEvents();
-		collected.addAll(blocked);
+		collectEvents(collected, blocked);
 
 		final Collection nodes = mGraph.getNodes();
 		final Iterator nodeiter = nodes.iterator();
 		while (nodeiter.hasNext()) {
 			final NodeProxy node = (NodeProxy) nodeiter.next();
-			final Collection props = node.getPropositions();
-			collected.addAll(props);
+			final List props = node.getPropositions();
+			collectEvents(collected, props);
 		}
 
 		final Collection edges = mGraph.getEdges();
@@ -209,7 +210,7 @@ class EventTableModel
 		while (edgeiter.hasNext()) {
 			final EdgeProxy edge = (EdgeProxy) edgeiter.next();
 			final Collection labels = edge.getLabelBlock();
-			collected.addAll(labels);
+			collectEvents(collected, labels);
 		}
 
 		final List result = new ArrayList(collected.size());
@@ -220,6 +221,24 @@ class EventTableModel
 			result.add(entry);
 		}
 		return result;
+	}
+
+
+
+	private void collectEvents(final Collection dest, final Collection source)
+	{
+		final Iterator iter = source.iterator();
+		while (iter.hasNext()) {
+			final Object entry = iter.next();
+			if (entry instanceof ForeachEventProxy) {
+				final ForeachEventProxy foreach = (ForeachEventProxy) entry;
+				final List body = foreach.getBody();
+				collectEvents(dest, body);
+			} else {
+				final IdentifierProxy ident = (IdentifierProxy) entry;
+				dest.add(ident);
+			}
+		}
 	}
 
 
