@@ -658,9 +658,7 @@ public class MutuallyNonblockingVerifier
 				Automaton otherAutomaton = (Automaton) autItTwo.next();
 				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
 
-				Alphabet.intersect(currAlphabet, otherAlphabet);
-
-				if (Alphabet.intersect(currAlphabet, otherAlphabet).size() != 0)
+				if (AlphabetHelpers.intersect(currAlphabet, otherAlphabet).size() != 0)
 				{
 					synchAutomata.addAutomaton(otherAutomaton);
 				}

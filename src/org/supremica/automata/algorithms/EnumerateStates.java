@@ -13,8 +13,6 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
 public class EnumerateStates
-
-//      extends InterruptableAlgorithm
 {
 	Automata automata = null;
 	StringBuffer prefix = null;
@@ -53,7 +51,6 @@ public class EnumerateStates
 
 		int num = 1;
 		Iterator stateit = automaton.stateIterator();
-
 		while (stateit.hasNext())
 		{
 			State state = (State) stateit.next();

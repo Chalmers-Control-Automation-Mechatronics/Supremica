@@ -22,6 +22,7 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.ArcIterator;
 import org.supremica.automata.Arc;
@@ -85,15 +86,15 @@ class EventHiderDialog
 			// Find out which events should be hidden
 			if (!restrictEvents.toErase())
 			{
-				alpha = Alphabet.minus(automaton.getAlphabet(), alpha);
+				alpha = AlphabetHelpers.minus(automaton.getAlphabet(), alpha);
 			}
 
 			// Do the hiding
 			newAutomaton.hide(alpha);
 
 			// Set appropriate comment
-			newAutomaton.setComment(automaton.getName() + "/" +
-									Alphabet.intersect(automaton.getAlphabet(), alpha));
+			newAutomaton.setComment(automaton.getName() + "//" +
+									AlphabetHelpers.intersect(automaton.getAlphabet(), alpha));
 
 			// Add automaton
 			newAutomata.addAutomaton(newAutomaton);

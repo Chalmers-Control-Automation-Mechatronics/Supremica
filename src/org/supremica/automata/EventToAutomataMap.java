@@ -1,0 +1,131 @@
+
+/*
+ *  Supremica Software License Agreement
+ *
+ *  The Supremica software is not in the public domain
+ *  However, it is freely available without fee for education,
+ *  research, and non-profit purposes.  By obtaining copies of
+ *  this and other files that comprise the Supremica software,
+ *  you, the Licensee, agree to abide by the following
+ *  conditions and understandings with respect to the
+ *  copyrighted software:
+ *
+ *  The software is copyrighted in the name of Supremica,
+ *  and ownership of the software remains with Supremica.
+ *
+ *  Permission to use, copy, and modify this software and its
+ *  documentation for education, research, and non-profit
+ *  purposes is hereby granted to Licensee, provided that the
+ *  copyright notice, the original author's names and unit
+ *  identification, and this permission notice appear on all
+ *  such copies, and that no charge be made for such copies.
+ *  Any entity desiring permission to incorporate this software
+ *  into commercial products or to use it for commercial
+ *  purposes should contact:
+ *
+ *  Knut Akesson (KA), knut@supremica.org
+ *  Supremica,
+ *  Haradsgatan 26A
+ *  431 42 Molndal
+ *  SWEDEN
+ *
+ *  to discuss license terms. No cost evaluation licenses are
+ *  available.
+ *
+ *  Licensee may not use the name, logo, or any other symbol
+ *  of Supremica nor the names of any of its employees nor
+ *  any adaptation thereof in advertising or publicity
+ *  pertaining to the software without specific prior written
+ *  approval of the Supremica.
+ *
+ *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ *  Supremica or KA shall not be liable for any damages
+ *  suffered by Licensee from the use of this software.
+ *
+ *  Supremica is owned and represented by KA.
+ */
+package org.supremica.automata;
+
+import java.util.*;
+
+/**
+ * Map for mapping LabeledEvent:s to Automata-objects.
+ */
+public class EventToAutomataMap
+	extends HashMap
+{
+	/*
+	public void insert(LabeledEvent ev, Automaton aut)
+	{
+		Automata automata = (Automata) get(ev);
+		
+		if (automata == null)
+		{   
+			// There were no automata in the map for this event,
+			automata = new Automata();
+			put(ev, automata);
+		}
+		
+		automata.add(aut);			
+	}
+	*/
+
+	/**
+	 * Get the Automata that the LabeledEvent ev is associated with.
+	 */
+	public Automata get(LabeledEvent ev)
+	{
+		return (Automata) super.get(ev);
+	}
+
+	/**
+	 * Override of the original method.
+	 */
+	public Object put(Object key, Object val)
+	{
+		return put((LabeledEvent) key, (Automaton) val);
+	}
+
+	/**
+	 * Put Automaton aut in the Automata that is found using the LabeledEvent ev as a key in the map.
+	 */
+	public Automata put(LabeledEvent ev, Automaton aut)
+	{
+		Automata automata = get(ev);
+		if (automata == null)
+		{   
+			// There were no automata in the map for this event,
+			automata = new Automata();
+			super.put(ev, automata);
+
+			// Add and return
+			automata.addAutomaton(aut);			
+			return null;
+		}
+		else
+		{
+			// There was one already, add and return
+			automata.addAutomaton(aut);			
+			return automata;
+		}
+	}
+
+	/**
+	 * Iterate over the events, that is the keys in this map.
+	 */
+    public EventIterator eventIterator()
+    {
+        return new EventIterator(keySet().iterator());
+    }
+
+	/**
+	 * Iterate over the events, that is the keys in this map.
+	 */
+    public EventIterator iterator()
+    {
+        return eventIterator();
+    }
+}

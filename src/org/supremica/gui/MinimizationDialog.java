@@ -229,6 +229,7 @@ class MinimizationDialogAdvancedPanel
 		}
 		targetAlphabetSelector = new JList(list);
 		targetAlphabetSelector.setVisibleRowCount(10);
+		targetAlphabetSelector.setPrototypeCellValue("AT LEAST THIS WIDE");
 		JScrollPane scrollPane = new JScrollPane(targetAlphabetSelector);
 
 		//note = new JTextArea("Note:\n" + "I have nothing to say.");

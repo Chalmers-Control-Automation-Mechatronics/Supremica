@@ -185,7 +185,7 @@ public class Automata
 		{
 			Automaton a = (Automaton) automataIterator.next();
 
-			removeAutomaton((Automaton) a);
+			removeAutomaton(a.getName());
 		}
 	}
 
@@ -924,6 +924,11 @@ public class Automata
 	 */
 	public Alphabet getUnionAlphabet()
 	{
+		if (size() == 0)
+		{
+			return new Alphabet();
+		}
+		
 		try
 		{
 			// If consistency is important, that has to be said explicitly
@@ -1364,7 +1369,7 @@ public class Automata
 
 		// Warns if there are events with equal (lowercase) names.
 		// Always do this check (irritating? well yes... but those are really bad names!)
-		if (isEventNamesSafe())
+		if (!isEventNamesSafe())
 		{
 			// Warning has been written in log window by isEventNamesSafe.
 		}
@@ -1382,8 +1387,7 @@ public class Automata
 				return false;
 			}
 		}
-
-		/*
+		
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
 		if (examineStructure)
@@ -1393,7 +1397,6 @@ public class Automata
 				// Warning has been written in the log window by isSeveralSystems.
 			}
 		}
-		*/
 
 		// Examines each automaton for an initial state
 		if (mustHaveInitial)

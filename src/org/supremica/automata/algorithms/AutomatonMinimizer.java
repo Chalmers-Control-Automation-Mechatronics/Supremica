@@ -90,8 +90,15 @@ public class AutomatonMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
-	// Local debug flag... 
+	// Local debug stuff... to be erased when things are stable!
 	public static final boolean debug = false;
+	private static int totalA = 0;
+	private static int totalB = 0;
+	private static int totalC = 0;
+	private static int totalD = 0;
+	private static int totalF = 0;
+	private static int totalOE = 0;
+	private static int totalArcs = 0;
 
 	// Use short names
 	private boolean useShortNames = false;
@@ -124,14 +131,6 @@ public class AutomatonMinimizer
 		if (!options.isValid())
 		{
 			return null;
-		}
-
-		// Do we have to care about the original?
-		if (options.getKeepOriginal())
-		{
-			// We need a copy since we must make the system reachable 
-			// (and maybe deterministic) first!
-			theAutomaton = new Automaton(theAutomaton);
 		}
 		
 		// Just to run quick tests
@@ -266,7 +265,7 @@ public class AutomatonMinimizer
 								   "before running the partitioning.");
 				}
 			}
-			else if (theAutomaton.nbrOfEpsilonEvents() == 1)
+			else if ((theAutomaton.nbrOfEpsilonEvents() == 1) && useShortNames)
 			{
 				// The conflict equivalent automaton is just one state, the initial state. 
 				// Marked if the automaton is nonblocking, nonmarked otherwise.
@@ -294,7 +293,8 @@ public class AutomatonMinimizer
 			////////////
 			
 			// Adjust marking based on epsilon transitions 
-			ruleD(theAutomaton); // Not OE
+			int countD = ruleD(theAutomaton); // Not OE
+			totalD += countD;
 			
 			if (debug)
 			{
@@ -373,6 +373,7 @@ public class AutomatonMinimizer
 		// Build the minimized automaton based on the partitioning in equivClasses
 		Automaton newAutomaton = buildAutomaton(equivClasses);
 		int diffSize = theAutomaton.nbrOfStates() - newAutomaton.nbrOfStates();
+		totalOE += diffSize;
 		if (diffSize > 0)
 		{
 			logger.verbose("Removed " + diffSize + " states based on partitioning with " + 
@@ -421,7 +422,8 @@ public class AutomatonMinimizer
 		{
 			// doTransitiveClosure(newAutomaton);
 			transitionCount = newAutomaton.nbrOfTransitions();
-			removeRedundantTransitions(newAutomaton);
+			int countArcs = removeRedundantTransitions(newAutomaton);
+			totalArcs += countArcs;
 		}
 
    		if (debug)
@@ -962,9 +964,10 @@ public class AutomatonMinimizer
 				// Remove redundant transitions
 				int countArcs = 0;
 				countArcs = removeRedundantTransitions(aut);
-				if (debug)
+				totalArcs += countArcs;
+				if (debug && countArcs > 0)
 				{
-					logger.verbose("Removed: " + countArcs + " redundant transitions.");
+					logger.verbose("Removed " + countArcs + " redundant transitions.");
 				}
 				
 				// Merge conflict equivalent states and stuff...
@@ -972,6 +975,11 @@ public class AutomatonMinimizer
 				int countB = ruleB(aut);
 				int countC = ruleC(aut);
 				int countF = ruleF(aut);
+
+				totalA += countA;
+				totalB += countB;
+				totalC += countC;
+				totalF += countF;
 
 				//ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(new Automaton(aut));
 				
@@ -1438,22 +1446,33 @@ public class AutomatonMinimizer
 			}
 			
 			State state = statesToExamine.remove();
-			
+			//logger.info(state);
+			//logger.info(statesToExamine);
+	
 			// Don't remove the initial state!
 			if (state.isInitial())
 			{
 				continue loop;
 			}
 
-			// All outgoing (at least one!) must be epsilon			
+			// If this state is marked, we need to make sure that at least one of the
+			// following states is marked!
+			boolean isMarked = state.isAccepting();
+			boolean hasMarkedDecessor = false;
+			 
+			// All outgoing (at least one!) must be epsilon (and maybe have a marked toState)
 			for (ArcIterator outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
 			{
-				if (!outIt.nextEvent().isEpsilon())
+				Arc arc = outIt.nextArc();
+				if (!arc.getEvent().isEpsilon())
 				{
 					continue loop;
 				}
+				hasMarkedDecessor |= arc.getToState().isAccepting();
 			}
-			if ((state.outgoingArcsIterator().hasNext()))
+
+			// So, at least one outgoing and if "state" is marked, there must be a marked decessor
+			if ((state.outgoingArcsIterator().hasNext()) && (!isMarked || hasMarkedDecessor))
 			{
 				int arcCount = 0;
 				for (ArcIterator outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
@@ -1464,12 +1483,17 @@ public class AutomatonMinimizer
 					{
 						Arc inArc = inIt.nextArc();
 						Arc newArc = new Arc(inArc.getFromState(), outArc.getToState(), inArc.getEvent());
-
+						
 						aut.addArc(newArc);
 						arcCount++;
 					}
-
-					if (!useShortNames)
+					
+					// BUG! There is a problem here, since when using the State.setName method, all
+					// StateSet:s that the state is involved in would need to be rebuilt since the 
+					// hashCode of the state is changed... not gooooood...
+					//   On the other hand... maybe we shouldn't give the state a new name at all? 
+					// After all, we don't merge states, we just remove a state.
+					if (!useShortNames && false)
 					{
 						State toState = outArc.getToState();
 						toState.setName(state.getName() + SupremicaProperties.getStateSeparator() + 
@@ -1481,7 +1505,7 @@ public class AutomatonMinimizer
 				//logger.error("Removed state " + state + ", added " + arcCount + " arcs.");
 				countF++;
 			}
-
+			
 			/*
 			// All outgoing (at least one!) must be epsilon, i.e. there should be no events in the alphabet
 			// of enabled events if we don't consider the epsilon closure...
@@ -1507,6 +1531,21 @@ public class AutomatonMinimizer
 		}
 
 		return countF;
+	}
+
+	public static void printTotal()
+	{
+		logger.warn("Totally: A: " + totalA + ", B: " + totalB + ", C: " + totalC + ", D: " + totalD + ", F: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+	}
+	public static void resetTotal()
+	{
+		totalA = 0;
+		totalB = 0;
+		totalC = 0;
+		totalD = 0;
+		totalF = 0;
+		totalOE = 0;
+		totalArcs = 0;
 	}
 
 	/**

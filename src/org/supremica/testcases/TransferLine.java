@@ -17,19 +17,14 @@ public class TransferLine
 	private Project project;
 	private LabeledEvent[] events_vector;
 	private boolean sanchez_models;
-	private static boolean first = true;
 
 	public TransferLine(int cells, int cap1, int cap2, boolean sanchez_models)
 	{
 		this.sanchez_models = sanchez_models;
 		project = new Project();
-
-		if (first)
-		{
-			project.setComment("This testcase is [more or less] equal to the Transfer Line " + "example from Wonham's Lecture Notes.");
-		}
-
-		first = false;
+		project.setComment("This testcase has some resemblance to the Transfer Line " + 
+						   "example from Wonham's Lecture Notes, the main difference " + 
+						   "being that here, the different cells are not connected.");
 
 		// create those shared events between the cells:
 		if (!sanchez_models)

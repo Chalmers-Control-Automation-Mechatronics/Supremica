@@ -179,7 +179,7 @@ public class State
 	/**
 	 * Do not use this method.
 	 * This is temporary method for letting AutomataSynchronizerExecutor set the index.
-	 * This method will be remomoved ASAP.
+	 * This method will be remomoved ASAP. Oh yea?
 	 */
 	public void setAutomataSynchronizerExecutorIndex(int index)
 	{
@@ -232,6 +232,9 @@ public class State
 		return name;
 	}
 
+	/**
+	 * This method should be used with care! If the name is changed, 
+	 */
 	public void setName(String name)
 	{
 		this.name = name;
@@ -381,7 +384,13 @@ public class State
 
 	public boolean equals(Object state)
 	{
-		return id.equals(((State) state).id);
+		//return id.equals(((State) state).id);
+		boolean result = id.equals(((State) state).id);
+		if (result)
+		{
+			assert(this.hashCode() == state.hashCode());
+		}
+		return result;
 	}
 
 	/**

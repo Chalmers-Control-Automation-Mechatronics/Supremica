@@ -22,6 +22,7 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.gui.treeview.*;
@@ -675,12 +676,12 @@ class LanguageRestrictorDialog
 			if (restrictEvents.toErase())
 			{
 				newautomaton.setComment(automaton.getName() + "\\" + 
-										Alphabet.intersect(alpha, automaton.getAlphabet()));
+										AlphabetHelpers.intersect(alpha, automaton.getAlphabet()));
 			}
 			else
 			{
 				newautomaton.setComment(automaton.getName() + "\\" + 
-										Alphabet.minus(automaton.getAlphabet(), alpha));
+										AlphabetHelpers.minus(automaton.getAlphabet(), alpha));
 			}
 
 			newautomata.addAutomaton(newautomaton);

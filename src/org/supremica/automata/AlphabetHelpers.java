@@ -182,4 +182,101 @@ public class AlphabetHelpers
 		// at least 1 (not two ::MF) arguments are necessary
 		throw new IllegalArgumentException("Not enough elements of events");
 	}
+
+	/** 
+	 * Builds an returns a map mapping events to sets of automata.
+	 * (LabeledEvent) -> (Set of Automaton-objects).
+	 */
+	public static EventToAutomataMap buildEventToAutomataMap(Automata anAutomata)
+	{
+		//HashMap map = new HashMap();
+		EventToAutomataMap map = new EventToAutomataMap();
+
+		// Loop over automata
+		for (Iterator automataIt = anAutomata.iterator(); automataIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) automataIt.next();
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
+
+			// Loop over alphabet
+			for (EventIterator eventIt = currAlphabet.iterator(); eventIt.hasNext(); )
+			{ 
+				// Insert in map
+				//insertEvent(map, eventIt.nextEvent(), currAutomaton);
+				map.put(eventIt.nextEvent(), currAutomaton);
+			}
+		}
+
+		return map;
+	}
+
+	/** 
+	 * Builds an returns a map mapping uncontrollable events to sets of plant automata.
+	 * (uncontrollable LabeledEvent) -> (Set of AutomatonType.Plant Automaton-objects).
+	 */
+	public static EventToAutomataMap buildUncontrollableEventToPlantsMap(Automata anAutomata)
+	{
+		//HashMap map = new HashMap();
+		EventToAutomataMap map = new EventToAutomataMap();
+
+		// Loop over automata
+		for (Iterator automataIt = anAutomata.iterator(); automataIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) automataIt.next();
+
+			if (currAutomaton.getType() == AutomatonType.Plant)
+			{
+				Alphabet currAlphabet = (Alphabet) currAutomaton.getAlphabet();
+
+				Iterator eventIt = currAlphabet.iterator();
+				while (eventIt.hasNext())
+				{
+					LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+					if (!currEvent.isControllable())
+					{
+						//insertEvent(map, currEvent, currAutomaton);
+						map.put(currEvent, currAutomaton);
+					}
+				}
+			}
+		}
+
+		return map;
+	}
+
+	/**
+	 * Computes and returns "a1 minus a2"
+	 */
+	public static Alphabet minus(Alphabet a1, Alphabet a2)
+	{
+		Alphabet result = new Alphabet(a1);
+
+		result.minus(a2);
+
+		return result;
+	}
+
+	/**
+	 * Computes and returns "a1 intersection a2"
+	 */
+	public static Alphabet intersect(Alphabet a1, Alphabet a2)
+	{
+		Alphabet result = new Alphabet(a1);
+
+		result.intersect(a2);
+
+		return result;
+	}
+
+	/**
+	 * Computes and returns "a1 union a2"
+	 */
+	static public Alphabet union(Alphabet a1, Alphabet a2)
+	{
+		Alphabet result = new Alphabet(a1);
+
+		result.union(a2);
+
+		return result;
+	}
 }

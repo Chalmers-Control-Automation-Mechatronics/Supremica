@@ -61,7 +61,7 @@ public class AlphabetAnalyzer
 	/**
 	 * Map from an Event-object to the Set of Automaton-objects that contains this event.
 	 */
-	private HashMap eventToAutomataMap = new HashMap();
+	private EventToAutomataMap eventToAutomataMap;
 	private Collection eventCollection;
 
 	public AlphabetAnalyzer(Automata theAutomata)
@@ -69,6 +69,9 @@ public class AlphabetAnalyzer
 		this.theAutomata = theAutomata;
 	}
 
+	/**
+	 * Builds map and logs info about the different alphabets relationships.
+	 */
 	public void execute()
 	{
 		buildEventToAutomataMap();
@@ -79,112 +82,33 @@ public class AlphabetAnalyzer
 
 	private void buildEventToAutomataMap()
 	{
-		buildEventToAutomataMap(theAutomata);
+		eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
 	}
 
-	private void buildEventToAutomataMap(Automata anAutomata)
+	public void printUnsynchronizedEvents()
 	{
+		//Set eventSet = eventToAutomataMap.keySet();
+		//Iterator eventIt = eventSet.iterator();
 
-		// Loop over automata
-		for (Iterator automataIt = anAutomata.iterator();
-				automataIt.hasNext(); )
+		EventIterator eventIt = eventToAutomataMap.eventIterator();
+		while (eventIt.hasNext())
 		{
-			Automaton currAutomaton = (Automaton) automataIt.next();
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
+			//LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+			LabeledEvent currEvent = eventIt.nextEvent();
 
-			// Loop over alphabet
-			for (EventIterator eventIt = currAlphabet.iterator();
-					eventIt.hasNext(); )
-			{    // Insert in map
-				insertEvent(eventIt.nextEvent(), currAutomaton);
-			}
-		}
-	}
-
-	/**
-	 * Builds the eventToAutomataMap to map the events in anAutomata to the automata in anAutomata
-	 *
-	 *@return HashMap mapping Event-object to Set of Automaton-objects.
-	 */
-	public HashMap getEventToAutomataMap(Automata anAutomata)
-	{
-		buildEventToAutomataMap(anAutomata);
-
-		return eventToAutomataMap;
-	}
-
-	/**
-	 * Builds the eventToAutomataMap to map uncontrollable events to plants.
-	 *
-	 *@return HashMap mapping uncontrollable Event-object to Set of plant-type Automaton-objects.
-	 */
-	public HashMap getUncontrollableEventToPlantMap()
-		throws Exception
-	{
-
-		///* There will be no exceptions
-		try
-		{
-			buildUncontrollableEventToPlantMap();
-		}
-		catch (Exception e)
-		{
-			logger.error("Error in AlphabetAnalyzer. " + e);
-			logger.debug(e.getStackTrace());
-
-			throw e;
-		}
-
-		//*/
-		//buildUncontrollableEventToPlantMap();
-		return eventToAutomataMap;
-	}
-
-	private void buildUncontrollableEventToPlantMap()
-	{
-		Iterator automataIt = theAutomata.iterator();
-
-		while (automataIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton) automataIt.next();
-
-			if (currAutomaton.getType() == AutomatonType.Plant)
+			if (isUnsynchronizedEvent(currEvent))
 			{
-				Alphabet currAlphabet = (Alphabet) currAutomaton.getAlphabet();
-				Iterator eventIt = currAlphabet.iterator();
-
-				while (eventIt.hasNext())
-				{
-					LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-
-					if (!currEvent.isControllable())
-					{
-						insertEvent(currEvent, currAutomaton);
-					}
-				}
+				logger.info("UnsynchronizedEvent: " + currEvent.getLabel());
 			}
 		}
-	}
-
-	private void insertEvent(LabeledEvent ev, Automaton aut)
-	{
-		HashSet automatonSet = (HashSet) eventToAutomataMap.get(ev);
-
-		if (automatonSet == null)
-		{    // There were no automata in the map for this event,
-			automatonSet = new HashSet();
-
-			eventToAutomataMap.put(ev, automatonSet);
-		}
-
-		automatonSet.add(aut);
 	}
 
 	/**
 	 * Determines if an event is not synchronized, that is, present in less than two automata.
 	 *
-	 *@param  ev the event that should be examined.
-	 *@return  true if the given event is present in zero or one automata, and false if it is present on more than one automata.
+	 * @param  ev the event that should be examined.
+	 * @return  true if the given event is present in zero or one automata, and false if it 
+	 * is present on more than one automata.
 	 */
 	public boolean isUnsynchronizedEvent(LabeledEvent ev)
 	{
@@ -196,27 +120,6 @@ public class AlphabetAnalyzer
 		}
 
 		return automatonSet.size() <= 1;
-	}
-
-	public Iterator eventIterator()
-	{
-		return eventToAutomataMap.keySet().iterator();
-	}
-
-	public void printUnsynchronizedEvents()
-	{
-		Set eventSet = eventToAutomataMap.keySet();
-		Iterator eventIt = eventSet.iterator();
-
-		while (eventIt.hasNext())
-		{
-			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-
-			if (isUnsynchronizedEvent(currEvent))
-			{
-				logger.info("UnsynchronizedEvent: " + currEvent.getLabel());
-			}
-		}
 	}
 
 	private void checkAllPairs()
@@ -287,18 +190,21 @@ public class AlphabetAnalyzer
 
 		if ((nbrOnlyLeft == 0) && (nbrOnlyRight == 0))
 		{
-			logger.info("Alphabet: " + leftAut.getName() + " == " + rightAut.getName() + " new unsych: " + newUnique);
+			logger.info("Alphabet: " + leftAut.getName() + " == " + rightAut.getName() + 
+						" new unsych: " + newUnique);
 		}
 		else
 		{
 			if (nbrOnlyLeft == 0)
 			{
-				logger.info("Alphabet: " + leftAut.getName() + " <= " + rightAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + leftAut.getName() + " <= " + rightAut.getName() + 
+							" new unsych: " + newUnique);
 			}
 
 			if (nbrOnlyRight == 0)
 			{
-				logger.info("Alphabet: " + rightAut.getName() + " <= " + leftAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + rightAut.getName() + " <= " + leftAut.getName() + 
+							" new unsych: " + newUnique);
 			}
 		}
 

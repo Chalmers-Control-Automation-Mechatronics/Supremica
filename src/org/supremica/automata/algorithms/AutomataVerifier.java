@@ -54,9 +54,11 @@ import java.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.EventIterator;
+import org.supremica.automata.EventToAutomataMap;
 import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
@@ -87,7 +89,7 @@ public class AutomataVerifier
 	 *
 	 *@see  AlphabetAnalyzer
 	 */
-	private HashMap uncontrollableEventToPlantMap = null;
+	private EventToAutomataMap uncontrollableEventToPlantsMap = null;
 	private AutomataSynchronizerHelper synchHelper;
 	private ArrayList synchronizationExecuters = new ArrayList();
 	private StateMemorizer potentiallyUncontrollableStates;
@@ -361,8 +363,7 @@ public class AutomataVerifier
 
 		// Redefined plant status
 		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(specifications);
-		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(specifications);
+		uncontrollableEventToPlantsMap = AlphabetHelpers.buildEventToAutomataMap(specifications);
 
 		// Invert controllability status in helper
 		synchHelper.invertControllability();
@@ -406,8 +407,7 @@ public class AutomataVerifier
 		// After these preparations, controllability verification verifies language inclusion
 		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
 
-		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);
+		uncontrollableEventToPlantsMap = AlphabetHelpers.buildEventToAutomataMap(inclusionAutomata);
 
 		// This last one is not really good... we'd like to do this only once! Perhaps
 		// a switch in the synchronizeroptions or verificationoptions instead? FIXA!!
@@ -449,11 +449,9 @@ public class AutomataVerifier
 	private boolean modularControllabilityVerification()
 		throws Exception
 	{
-		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-
-		if (uncontrollableEventToPlantMap == null)
+		if (uncontrollableEventToPlantsMap == null)
 		{
-			uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
+			uncontrollableEventToPlantsMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(theAutomata);
 		}
 
 		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
@@ -491,12 +489,12 @@ public class AutomataVerifier
 					{
 
 						// Note that in the language inclusion case, the
-						// uncontrollableEventToPlantMap has been adjusted...
-						if (uncontrollableEventToPlantMap.get(currEvent) != null)
+						// uncontrollableEventToPlantsMap has been adjusted...
+						if (uncontrollableEventToPlantsMap.get(currEvent) != null)
 						{
-
 							// Iterate over the plants and add them to selectedAutomata
-							for (Iterator plantIt = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
+							//for (Iterator plantIt = ((Set) uncontrollableEventToPlantsMap.get(currEvent)).iterator();
+							for (Iterator plantIt = uncontrollableEventToPlantsMap.get(currEvent).iterator();
 									plantIt.hasNext(); )
 							{
 								Automaton currPlantAutomaton = (Automaton) plantIt.next();
@@ -1788,9 +1786,8 @@ public class AutomataVerifier
 		throws Exception
 	{
 		// Make a copy that we can fiddle with
-		//Automata theAutomata = new Automata(theAutomata); // Don't need to fiddle
-		//int nbrOfAutomata = theAutomata.size();
-
+		Automata theAutomata = new Automata(this.theAutomata); 
+			
 		// Initialize execution dialog
 		java.awt.EventQueue.invokeLater(new Runnable()
 		{
@@ -1975,7 +1972,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Assigns the verifier an execution dialog.
+	 * Assigns the verifier an ExecutionDialog.
 	 */
 	public void setExecutionDialog(ExecutionDialog executionDialog)
 	{

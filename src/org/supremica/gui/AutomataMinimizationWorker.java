@@ -135,6 +135,13 @@ public class AutomataMinimizationWorker
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 
+				// Do we have to care about the original?
+				if (options.getKeepOriginal())
+				{
+					// We need a copy since we might need to fiddle with the original
+					currAutomaton = new Automaton(currAutomaton);
+				}
+
 				// Minimize this one
 				try
 				{

@@ -115,119 +115,20 @@ public class AutomataMinimizer
 			executionDialog.initProgressBar(0, theAutomata.size()-1);
 		}
 
-		// While there are more than two automata, compose and minimize!
+		// As long as there are at least two automata, compose and minimize!
 		while (theAutomata.size() >= 2)
 		{
-			if (stopRequested)
-			{
-				return null;
-			}
-
-			// Get any automaton
-			Automaton autA = theAutomata.getFirstAutomaton();
-			Alphabet alphaA = autA.getAlphabet();
-
-			// Find the pair (in which autA is a part) with the highest
-			// "unique to total" (number of events) ratio
-			double bestUniqueRatio = 0;
-			double bestCommonRatio = 0;
-			int bestSize = Integer.MAX_VALUE;
-			Automaton bestAutB = null;
-			Alphabet hideThese = null;
-			for (int i=1; i<theAutomata.size(); i++)
-			{
-				Automaton autB = theAutomata.getAutomatonAt(i);
-				Alphabet alphaB = autB.getAlphabet();
-
-				// If there are no common events, try next automaton
-				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
-				if (nbrOfCommonEvents == 0)
-				{
-					if ((bestUniqueRatio == 0) && (bestCommonRatio == 0) && 
-						(autB.nbrOfStates() < bestSize))
-					{
-						bestAutB = autB;
-						bestSize = autB.nbrOfStates();
-						hideThese = null;
-					}
-					continue;
-				}
-
-				// Calculate the alphabet of unique events
-				Alphabet uniqueEvents = Alphabet.union(alphaA, alphaB);
-				// The targetAlphabet should not be removed (although they may be "unique")!
-				uniqueEvents.minus(options.getTargetAlphabet());
-				// Remove events that are present in other automata
-				for (int j=1; j<theAutomata.size(); j++)
-				{
-					// Skip autB (and autA since we iterate from 1 instead of 0)
-					if (i == j)
-					{
-						continue;
-					}
-
-					// Remove the events that are present in C, they are not unique to A and B.
-					Automaton autC = theAutomata.getAutomatonAt(j);
-					Alphabet alphaC = autC.getAlphabet();
-					uniqueEvents.minus(alphaC);
-
-					// Early termination
-					if (uniqueEvents.size() == 0)
-					{
-						break;
-					}
-				}
-
-				// Find ratios
-				int nbrOfUniqueEvents = uniqueEvents.size();
-				int unionAlphabetSize = alphaA.size() + alphaB.size() - nbrOfCommonEvents;
-				double thisUniqueRatio = ((double) nbrOfUniqueEvents)/((double) unionAlphabetSize);
-				//double thisUniqueRatio = (double) nbrOfUniqueEvents;
-				double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
-
-				// Improvement?
-				if (thisUniqueRatio > bestUniqueRatio)
-				{
-					bestAutB = autB;
-					bestUniqueRatio = thisUniqueRatio;
-					hideThese = uniqueEvents;
-				}
-				else if ((bestUniqueRatio == 0) && (thisCommonRatio > bestCommonRatio))
-				{
-					bestAutB = autB;
-					bestCommonRatio = thisCommonRatio;
-					hideThese = null;
-				}
-			}
+			// Get next automata to minimize
+			MinimizationTask task = getNextMinimizationTask();
 
 			if (stopRequested)
 			{
 				return null;
 			}
 
-			// Generate automata to minimize
-			Automata automata = new Automata();
-			automata.addAutomaton(autA);
-			automata.addAutomaton(bestAutB);
+			Automata automata = task.getAutomata();
+			Alphabet hideThese = task.getEventsToHide();
 			
-			// Was the system disjoint?
-			if (!((bestUniqueRatio > 0) || (bestCommonRatio > 0)))
-			{
-				logger.warn("The system has disjoint parts. Preferrably, they should " + 
-							"be treated separately if possible.");
-			}
-
-			/* Already taken care of above?
-			// Minimize this part, but always spare events from targetAlphabet!
-			if (hideThese != null)
-			{
-				hideThese.minus(options.getTargetAlphabet());
-			}
-			// */
-			
-			//logger.info("Hiding " + hideThese);
-			//logger.info("Target " + options.getTargetAlphabet());
-
 			// Perform the minimization, unless of course this is the last step 
 			// and it should be skipped...
 			Automaton min;
@@ -236,6 +137,13 @@ public class AutomataMinimizer
 				// Just synch and hide
 				min = AutomataSynchronizer.synchronizeAutomata(automata);
 				min.hide(hideThese);
+				
+				if (AutomatonMinimizer.debug)
+				{
+					// Print total reduction statistics
+					AutomatonMinimizer.printTotal();
+					AutomatonMinimizer.resetTotal();
+				}
 			}
 			else
 			{
@@ -247,37 +155,24 @@ public class AutomataMinimizer
 			{
 				return null;
 			}
+
 			//min.remapStateIndices(); // Why did I do that?
 			theAutomata.removeAutomata(automata);
 			theAutomata.addAutomaton(min);
 
 			// Dispose of originals
 			automata.clear();
-			
-			/*
-			// Update gui
-			ActionMan.getGui().getVisualProjectContainer().getActiveProject().removeAutomata(automata);
-			ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(min);
-			try
-			{
-			    Thread.sleep(1000); // Doesn't help much, but removes some of the error messages...
-			}
-			catch (Exception apa)
-			{
-			
-			}
-			*/
-			
+
 			if (AutomatonMinimizer.debug)
 			{
 				logger.error("---------------------------------------------------------------------");
-				logger.fatal("Progress: " + (nbrOfAutomata-1-theAutomata.size())*100/(nbrOfAutomata-1) + "%");
+				logger.fatal("Progress: " + (nbrOfAutomata-theAutomata.size())*100/(nbrOfAutomata-1) + "%");
 			}
 			
 			// Update execution dialog
 			if (executionDialog != null)
 			{
-				executionDialog.setProgress(nbrOfAutomata-1-theAutomata.size());
+				executionDialog.setProgress(nbrOfAutomata-theAutomata.size());
 			}
 		}
 
@@ -300,6 +195,237 @@ public class AutomataMinimizer
 	}
 
 	/**
+	 * Class holding info about what should be done in the next minimization. Which automata and
+	 * which events that can be abstracted to epsilons.
+	 */
+	private class MinimizationTask
+	{
+		private Automata automata;
+		private Alphabet eventsToHide;
+
+		public MinimizationTask(Automata automata, Alphabet eventsToHide)
+		{
+			this.automata = automata;
+			this.eventsToHide = eventsToHide;
+		}
+
+		public Automata getAutomata()
+		{
+			return automata;
+		}
+
+		public Alphabet getEventsToHide()
+		{
+			return eventsToHide;
+		}
+	}
+
+	/**
+	 * Returns the next Automata that is predicted to be the best one to do minimization on next.
+	 */
+	private MinimizationTask getNextMinimizationTask()
+	{
+		Automata result;
+		Alphabet hideThese;
+
+		// Which strategy should be used to select the next task?
+		//MinimizationStrategy strategy = options.getMinimizationSelectionStrategy();
+		//MinimizationStrategy strategy = MinimizationStrategy.AtLeastOneUnique;
+		MinimizationStrategy strategy = MinimizationStrategy.BestPair;
+		if (strategy == MinimizationStrategy.BestPair)
+		{
+			result = new Automata();
+
+			// Get any automaton
+			Automaton autA = theAutomata.getFirstAutomaton();
+			Alphabet alphaA = autA.getAlphabet();
+			
+			// Find the pair (in which autA is a part) with the highest
+			// "unique to total" (number of events) ratio
+			double bestUniqueRatio = 0;
+			double bestCommonRatio = 0;
+			int bestSize = Integer.MAX_VALUE;
+			Automaton bestAutB = null;
+			hideThese = null;
+			for (int i=1; i<theAutomata.size(); i++)
+			{
+				Automaton autB = theAutomata.getAutomatonAt(i);
+				Alphabet alphaB = autB.getAlphabet();
+				
+				// If there are no common events, try next automaton
+				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
+				if (nbrOfCommonEvents == 0)
+				{
+					if ((bestUniqueRatio == 0) && (bestCommonRatio == 0) && 
+						(autB.nbrOfStates() < bestSize))
+					{
+						bestAutB = autB;
+						bestSize = autB.nbrOfStates();
+						hideThese = null;
+					}
+					continue;
+				}
+				
+				// Calculate the alphabet of unique events
+				Alphabet uniqueEvents = AlphabetHelpers.union(alphaA, alphaB);
+				// The targetAlphabet should not be removed (although those events may be "unique")!
+				uniqueEvents.minus(options.getTargetAlphabet());
+				// Remove events that are present in other automata
+				for (int j=1; j<theAutomata.size(); j++)
+				{
+					// Skip autB (and autA since we iterate from 1 instead of 0)
+					if (i == j)
+					{
+						continue;
+					}
+					
+					// Remove the events that are present in C, they are not unique to A and B.
+					Automaton autC = theAutomata.getAutomatonAt(j);
+					Alphabet alphaC = autC.getAlphabet();
+					uniqueEvents.minus(alphaC);
+					
+					// Early termination
+					if (uniqueEvents.size() == 0)
+					{
+						break;
+					}
+				}
+				
+				// Find ratios
+				int nbrOfUniqueEvents = uniqueEvents.size();
+				int unionAlphabetSize = alphaA.size() + alphaB.size() - nbrOfCommonEvents;
+				double thisUniqueRatio = ((double) nbrOfUniqueEvents)/((double) unionAlphabetSize);
+				//double thisUniqueRatio = (double) nbrOfUniqueEvents;
+				double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+				
+				// Improvement?
+				if (thisUniqueRatio > bestUniqueRatio)
+				{
+					bestAutB = autB;
+					bestUniqueRatio = thisUniqueRatio;
+					hideThese = uniqueEvents;
+				}
+				else if ((bestUniqueRatio == 0) && (thisCommonRatio > bestCommonRatio))
+				{
+					bestAutB = autB;
+					bestCommonRatio = thisCommonRatio;
+					hideThese = null;
+				}
+			}
+			
+			if (stopRequested)
+			{
+				return null;
+			}
+			
+			// Generate result
+			result.addAutomaton(autA);
+			result.addAutomaton(bestAutB);
+			if (hideThese == null)
+			{
+				hideThese = new Alphabet();
+			}
+
+			// Was the system disjoint?
+			if (!((bestUniqueRatio > 0) || (bestCommonRatio > 0)))
+			{
+				logger.warn("The system has disjoint parts. Preferrably, they should " + 
+							"be treated separately if possible.");
+			}
+		}	
+		else if (strategy == MinimizationStrategy.AtLeastOneUnique)
+		{
+			// For each event, fint the automata that has this event in its alphabet
+			EventToAutomataMap eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
+
+			// Target alphabet
+			Alphabet targetAlphabet = options.getTargetAlphabet();
+
+			// The result so far
+			result = null;
+
+			// Look through the map and find the smallest set of automata
+			EventIterator evIt = eventToAutomataMap.iterator();
+			while (evIt.hasNext())
+			{
+				LabeledEvent event = evIt.nextEvent();
+
+				if (stopRequested)
+				{
+					return null;
+				}
+
+				// Skip the events in targetAlphabet and epsilon events!
+				if (targetAlphabet.contains(event) || event.isEpsilon())
+				{
+					continue;
+				}
+
+				// Get the automata that have this event in their alphabet
+				Automata automata = eventToAutomataMap.get(event);
+
+				// Take as few automata as possible as the next task
+				if ((result == null) || (automata.size() < result.size()))
+				{
+					result = automata;
+					if (result.size() == 1)
+					{
+						break;
+					}
+				}
+			}
+
+			// Did we find an apropriate result?
+			if (result != null)
+			{
+				// Which events should be hidden?
+				hideThese = getUniqueEvents(result, theAutomata);
+				
+				//logger.info(result);
+				//logger.info(hideThese);
+			}
+			else
+			{
+				// This must mean that there were only targetAlphabet events left? We should not
+				// take all of them at once (they may be many!) but I'll do that for now...
+				result = theAutomata;
+
+				// Just in case... but it should be empty?
+				hideThese = theAutomata.getUnionAlphabet();
+				hideThese.minus(targetAlphabet);
+				assert(hideThese.size() == 0);
+			}
+		}
+		else
+		{
+			logger.error("Error in AutomataMinimizer, undefined MinimizationStrategy.");
+			requestStop();
+			return null;
+		}
+
+		// Remember that we should never hide the events in options.getTargetAlphabet()!!!
+		assert(AlphabetHelpers.intersect(hideThese, options.getTargetAlphabet()).size() == 0);
+
+		// Return result
+		return new MinimizationTask(result, hideThese);
+	}
+
+	/**
+	 * This method examines how many unique events there are in autA with respect to autB.
+	 * If automata from autA are included in autB, they are ignored.
+	 */
+	private Alphabet getUniqueEvents(Automata autA, Automata autB)
+	{
+		Automata autNotA = new Automata(autB);
+		autNotA.removeAutomata(autA);
+
+		Alphabet alphaA = autA.getUnionAlphabet();
+		Alphabet alphaNotA = autNotA.getUnionAlphabet();
+		
+		return AlphabetHelpers.minus(alphaA, alphaNotA);
+	}
+
+	/**
  	 * Composes automata and minimizes the result with hideThese considered as epsilon
  	 * events.
 	 */
@@ -313,12 +439,37 @@ public class AutomataMinimizer
 			synchTimer.start();
 		}
 
+		// We don't really care about the state names, keep them short!
 		boolean useShortStateNames = true;
 
-		// Synch and hide
-		SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-		synchOptions.setUseShortStateNames(useShortStateNames);
-		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
+		// Synchronize, or if there's just one automaton, just find it
+		Automaton aut;
+		if (automata.size() > 1)
+		{
+			// Synch
+			SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			synchOptions.setUseShortStateNames(useShortStateNames);
+			aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
+		}
+		else
+		{
+			/*
+			if (useShortStateNames)
+			{
+				EnumerateStates en = new EnumerateStates(automata, "q");				
+				en.execute();
+			}
+			*/
+			aut = automata.getFirstAutomaton();
+
+			// This is probably one of the originals, so we might need to make a copy!
+			if (options.getKeepOriginal())
+			{
+				aut = new Automaton(aut);
+			}
+		}
+
+		// Hide the events!
 		aut.hide(hideThese);
 
  		if (AutomatonMinimizer.debug)
@@ -334,7 +485,7 @@ public class AutomataMinimizer
 		}
 
 		// Is it at all possible to minimize? (It may actually be possible even
-		// if there are no epsilons.)
+		// if there are no epsilons... but I don't care...)
 		if (aut.nbrOfEpsilonTransitions() > 0)
 		{
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);

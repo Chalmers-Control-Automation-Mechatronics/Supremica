@@ -64,7 +64,7 @@ class AutomataSelector
 	private Automata globalSet;
 	private Automata partialSet = new Automata();
 	private Iterator specIterator;
-	private HashMap eventToAutomataMap = new HashMap();
+	private EventToAutomataMap eventToAutomataMap;
 	private int progress = 0;
 	private boolean seenSpec = false;    // keep track of wether no spec exists, may need to do some job anyway
 
@@ -74,12 +74,12 @@ class AutomataSelector
 		this.globalSet = globalSet;
 		this.specIterator = globalSet.iterator();
 
-		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(globalSet);
-
-		eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
+		eventToAutomataMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(globalSet);
 	}
 
-	// Loop over supervisors/specifications and find plants containing equal uncontrollable events
+	/**
+	 * Returns a spec/supervisor together with the plants sharing uncontrollable events
+	 */
 	public Automata next()
 	{
 		partialSet.clear();
@@ -108,33 +108,6 @@ class AutomataSelector
 					if (!currEvent.isControllable())
 					{
 						addPlants(currEvent);
-
-						/*
-						if (eventToAutomataMap.get(currEvent) != null)
-						{
-								Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
-
-								while (plantIterator.hasNext())
-								{
-										Automaton currPlantAutomaton = (Automaton) plantIterator.next();
-
-										// This check is performed in eventToAutomataMap
-										// if (currPlantAutomaton.getType() == AutomatonType.Plant)
-										if (!partialSet.containsAutomaton(currPlantAutomaton))
-										{
-												partialSet.addAutomaton(currPlantAutomaton);
-												logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
-
-												// If we want a closed set, we need to add plants with
-												// uncontrollable events common to the already added plants too...
-												if (closedSet)
-												{
-														eventList.addAll(currPlantAutomaton.eventCollection());
-												}
-										}
-								}
-						}
-						*/
 					}
 				}
 
@@ -163,6 +136,9 @@ class AutomataSelector
 	{
 		if (eventToAutomataMap.get(currEvent) != null)
 		{
+			partialSet.addAutomata(eventToAutomataMap.get(currEvent));
+
+			/*
 			Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
 
 			while (plantIterator.hasNext())
@@ -179,6 +155,7 @@ class AutomataSelector
 					// closedSet stuff removed
 				}
 			}
+			*/
 		}
 
 		return partialSet;    // return the updated set
@@ -197,7 +174,9 @@ class AutomataSelector
 		return partialSet;
 	}
 
-	// Return wether we've seen a spec/sup or not
+	/**
+	 * Return wether we've seen a spec/sup or not
+	 */
 	boolean hadSpec()
 	{
 		return seenSpec;

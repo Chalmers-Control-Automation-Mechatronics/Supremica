@@ -555,23 +555,25 @@ public class Alphabet
 				try
 				{
 					removeEvent(currEvent.getLabel());
+
+					//  Quick check if this alphabet is almost empty
+					if ((this.size() == 1) && !other.contains(this.iterator().nextEvent()))
+					{
+						return;
+					}
+					else if (this.size() == 0)
+					{
+						return;
+					}
 				}
 				catch (Exception ex)
-				{    // This should be impossible
+				{   
+					// This should be impossible
 					logger.error("Alphabet.minus. Trying to remove a non-existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
-	}
-
-	static public Alphabet minus(Alphabet op1, Alphabet op2)
-	{
-		Alphabet result = new Alphabet(op1);
-
-		result.minus(op2);
-
-		return result;
 	}
 
 	/**
@@ -623,18 +625,6 @@ public class Alphabet
 	}
 
 	/**
-	 * Computes and returns "A intersection B"
-	 */
-	public static Alphabet intersect(Alphabet a1, Alphabet a2)
-	{
-		Alphabet result = new Alphabet(a1);
-
-		result.intersect(a2);
-
-		return result;
-	}
-
-	/**
 	 * Computes A union B, where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
@@ -661,15 +651,6 @@ public class Alphabet
 				}
 			}
 		}
-	}
-
-	static public Alphabet union(Alphabet op1, Alphabet op2)
-	{
-		Alphabet result = new Alphabet(op1);
-
-		result.union(op2);
-
-		return result;
 	}
 
 	/**

@@ -53,12 +53,12 @@ import java.util.*;
 
 public class VerificationAlgorithm
 {
-	private static Collection types = new LinkedList();
+	private static Collection collection = new LinkedList();
 	public static final VerificationAlgorithm Monolithic = new VerificationAlgorithm("Monolithic");
 	public static final VerificationAlgorithm Modular = new VerificationAlgorithm("Modular");
 	public static final VerificationAlgorithm BDD = new VerificationAlgorithm("BDD");
 	public static final VerificationAlgorithm IDD = new VerificationAlgorithm("IDD", false);
-	public static final VerificationAlgorithm Unknown = new VerificationAlgorithm("Unknown", false);
+	public static final VerificationAlgorithm Undefined = new VerificationAlgorithm("Undefined", false);
 	private String description = null;
 
 	private VerificationAlgorithm(String description)
@@ -70,7 +70,7 @@ public class VerificationAlgorithm
 	{
 		if (selectable)
 		{
-			types.add(this);
+			collection.add(this);
 		}
 
 		this.description = description;
@@ -78,7 +78,7 @@ public class VerificationAlgorithm
 
 	public static Iterator iterator()
 	{
-		return types.iterator();
+		return collection.iterator();
 	}
 
 	public String toString()
@@ -86,28 +86,22 @@ public class VerificationAlgorithm
 		return description;
 	}
 
-	public static VerificationAlgorithm toAlgorithm(String algorithm)
+	public static VerificationAlgorithm toAlgorithm(String string)
 	{
-		if (algorithm.equals(Monolithic.toString()))
+		for (Iterator it = collection.iterator(); it.hasNext(); )
 		{
-			return Monolithic;
+			VerificationAlgorithm thisOne = (VerificationAlgorithm) it.next();
+			if (string.equals(thisOne.toString()))
+			{
+				return thisOne;
+			}
 		}
-
-		if (algorithm.equals(Modular.toString()))
-		{
-			return Modular;
-		}
-
-		if (algorithm.equals(IDD.toString()))
-		{
-			return IDD;
-		}
-
-		return Unknown;
+		
+		return Undefined;
 	}
 
 	public static Object[] toArray()
 	{
-		return types.toArray();
+		return collection.toArray();
 	}
 }

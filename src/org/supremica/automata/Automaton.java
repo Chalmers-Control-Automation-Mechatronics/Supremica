@@ -125,18 +125,11 @@ public class Automaton
 	{
 		this();
 
-		Alphabet orgAlphabet = orgAut.getAlphabet();
-
-		alphabet.union(orgAlphabet);
+		alphabet.union(orgAut.getAlphabet());
 
 		type = orgAut.type;
-
-		if (orgAut.hasName())
-		{
-			setName(orgAut.getName());
-		}
-
-		setComment(orgAut.getComment());
+		name = orgAut.name;
+		comment = orgAut.comment;
 
 		// Create all states
 		for (StateIterator states = orgAut.stateIterator(); states.hasNext(); )
@@ -534,8 +527,10 @@ public class Automaton
 		return controlInconsistentEvents;
 	}
 
-	// If a state with this id (and/or name?) already exists, return the existing state
-	// Else, add this state and return it
+	/**
+	 * If a state with this id (and/or name?) already exists, return the existing state
+	 * Else, add this state and return it
+	 */
 	public State addStateChecked(State state)
 		throws IllegalArgumentException
 	{

@@ -51,31 +51,30 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class EquivalenceRelation
+public class MinimizationStrategy
 {
-	private static List collection = new LinkedList();
-	public static final EquivalenceRelation LanguageEquivalence = 
-		new EquivalenceRelation("Language equivalence", true);
-	public static final EquivalenceRelation ObservationEquivalence = 
-		new EquivalenceRelation("Observation equivalence", true);
-	public static final EquivalenceRelation ConflictEquivalence = 
-		new EquivalenceRelation("Conflict equivalence", true);
-	public static final EquivalenceRelation ConflictEquivalenceMinimizationRules = 
-		new EquivalenceRelation("Conflict equivalence minimization rules", AutomatonMinimizer.debug);
-	public static final EquivalenceRelation FailureEquivalence = 
-		new EquivalenceRelation("Failure equivalence", false);
-	public static final EquivalenceRelation Undefined = 
-		new EquivalenceRelation("Undefined", false);
-	private String identifier;
+	private static Collection collection = new LinkedList();
+	public static final MinimizationStrategy BestPair = 
+		new MinimizationStrategy("Best unique-to-total-ratio pair", true);
+	public static final MinimizationStrategy AtLeastOneUnique = 
+		new MinimizationStrategy("At least one unique in set", true);
+	public static final MinimizationStrategy Undefined = 
+		new MinimizationStrategy("Undefined", false);
+	private String description = null;
 
-	private EquivalenceRelation(String identifier, boolean add)
+	private MinimizationStrategy(String description)
 	{
-		if (add)
+		this(description, true);
+	}
+
+	private MinimizationStrategy(String description, boolean selectable)
+	{
+		if (selectable)
 		{
 			collection.add(this);
 		}
 
-		this.identifier = identifier;
+		this.description = description;
 	}
 
 	public static Iterator iterator()
@@ -85,14 +84,14 @@ public class EquivalenceRelation
 
 	public String toString()
 	{
-		return identifier;
+		return description;
 	}
 
-	public static EquivalenceRelation toType(String string)
+	public static MinimizationStrategy toStrategy(String string)
 	{
 		for (Iterator it = collection.iterator(); it.hasNext(); )
 		{
-			EquivalenceRelation thisOne = (EquivalenceRelation) it.next();
+			MinimizationStrategy thisOne = (MinimizationStrategy) it.next();
 			if (string.equals(thisOne.toString()))
 			{
 				return thisOne;

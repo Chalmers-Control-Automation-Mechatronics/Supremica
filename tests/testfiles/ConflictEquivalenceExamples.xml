@@ -259,4 +259,100 @@
 		<Transition source="0" dest="2" event="tau"/>
 	</Transitions>
 </Automaton>
+<Automaton name="F2" type="Plant">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="b"/>
+		<Event id="2" label="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3" accepting="true"/>
+		<State id="4"/>
+		<State id="5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="4" event="2"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="minimal(F2)" type="Specification">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true"/>
+		<State id="1" name="1.2"/>
+		<State id="2" name="1.4"/>
+		<State id="3" accepting="true"/>
+		<State id="5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="2" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="2" dest="5" event="1"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="F2" type="Plant">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="b"/>
+		<Event id="2" label="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3" accepting="true"/>
+		<State id="4"/>
+		<State id="5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="4" event="2"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="4" dest="5" event="1"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="minimal(F2)" type="Specification">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="b"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true"/>
+		<State id="1" name="1.2"/>
+		<State id="2" name="1.4"/>
+		<State id="3" accepting="true"/>
+		<State id="5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="2" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="2" dest="5" event="1"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="5" dest="5" event="1"/>
+	</Transitions>
+</Automaton>
 </Automata>

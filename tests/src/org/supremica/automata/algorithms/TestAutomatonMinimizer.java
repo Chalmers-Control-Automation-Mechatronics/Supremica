@@ -121,7 +121,7 @@ public class TestAutomatonMinimizer
 			hide.addEvent(alpha.getEvent("Start2"));
 			hide.addEvent(alpha.getEvent("End1"));
 			hide.addEvent(alpha.getEvent("End2"));
-			hide = Alphabet.minus(alpha, hide);
+			hide = AlphabetHelpers.minus(alpha, hide);
 			synch.hide(hide);
 					
 			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();

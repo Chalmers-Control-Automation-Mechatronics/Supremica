@@ -195,10 +195,10 @@ public class AutomataSynchronizer
 	}
 
 	/**
-	 * Method for synchronizing automata with default options.
+	 * Method for synchronizing Automata with default options.
 	 *
-	 * @param theAutomata the automata to be synchronized.
-	 * @return automaton representing the synchronous composition.
+	 * @param theAutomata the Automata to be synchronized.
+	 * @return Automaton representing the synchronous composition.
 	 */
 	public static Automaton synchronizeAutomata(Automata theAutomata)
 		throws Exception
@@ -209,11 +209,11 @@ public class AutomataSynchronizer
 	}
 
 	/**
-	 * Method for synchronizing automata with supplied options.
+	 * Method for synchronizing Automata with supplied options.
 	 *
-	 * @param theAutomata the automata to be synchronized.
+	 * @param theAutomata the Automata to be synchronized.
 	 * @param options the SynchronizationOptions that should be used.
-	 * @return automaton representing the synchronous composition.
+	 * @return Automaton representing the synchronous composition.
 	 */
 	public static Automaton synchronizeAutomata(Automata theAutomata, SynchronizationOptions options)
 		throws Exception

@@ -101,7 +101,7 @@ public class GeneticAlgorithms
 		// Amount of states in autB
 		data[1] = autB.nbrOfStates();    // DON'T TOUCH!!! THIS MUST BE DATA[1]!!!
 
-		Alphabet alphabetIntersection = Alphabet.intersect(autA.getAlphabet(), autB.getAlphabet());
+		Alphabet alphabetIntersection = AlphabetHelpers.intersect(autA.getAlphabet(), autB.getAlphabet());
 
 		// Percentage of common events in autA
 		data[2] = ((double) alphabetIntersection.size()) / ((double) autA.nbrOfEvents());

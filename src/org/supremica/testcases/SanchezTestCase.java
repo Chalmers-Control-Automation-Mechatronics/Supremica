@@ -7,9 +7,6 @@ public class SanchezTestCase
 {
 	private Project project;
 	private int blocks;
-	private static boolean first0 = true;
-	private static boolean first1 = true;
-	private static boolean first2 = true;
 
 	public SanchezTestCase(int blocks, int type)
 	{
@@ -18,12 +15,7 @@ public class SanchezTestCase
 
 		if (type == 0)
 		{
-			if (first0)
-			{
-				project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for asynchronous product.");
-			}
-
-			first0 = false;
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for asynchronous product.");
 
 			for (int i = 0; i < blocks; i++)
 			{
@@ -32,12 +24,7 @@ public class SanchezTestCase
 		}
 		else if (type == 1)
 		{
-			if (first1)
-			{
-				project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for synchronous product.");
-			}
-
-			first1 = false;
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for synchronous product.");
 
 			for (int i = 0; i < blocks; i++)
 			{
@@ -46,12 +33,7 @@ public class SanchezTestCase
 		}
 		else if (type == 2)
 		{
-			if (first2)
-			{
-				project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for supremal controllable sublanguage.");
-			}
-
-			first2 = false;
+			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + "for supremal controllable sublanguage.");
 
 			TransferLine tl = new TransferLine(blocks, 1, 1, true);
 

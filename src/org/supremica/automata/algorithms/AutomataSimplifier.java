@@ -21,7 +21,8 @@ public class AutomataSimplifier
 		Automata ret = new Automata();
 
 		/**
-		 * Minimize with respect to language equivalence (is this really clever?)
+		 * Minimize with respect to language equivalence. 
+		 * (Is this really clever? Nope. Use AutomatonMinimizer!)
 		 */
 		for (AutomatonIterator it = org.iterator(); it.hasNext(); )
 		{
@@ -29,7 +30,7 @@ public class AutomataSimplifier
 			AutomatonMinimizer am = new AutomatonMinimizer(a);
 			Automaton mm = am.getMinimizedAutomaton(MinimizationOptions.getDefaultMinimizationOptions());
 
-			mm.setName("SIMP:" + a.getName());
+			mm.setName("simp(" + a.getName() + ")");
 			ret.addAutomaton(mm);
 		}
 
@@ -46,7 +47,6 @@ public class AutomataSimplifier
 
 			if (ss.isEmpty())
 			{
-
 				// XXX: maybe we sould remove everything??? or at least every automata that shares its events?
 				toRemove.add(a);
 				logger.info("Removing NULL automaton " + a);
