@@ -34,30 +34,31 @@ class MainPopupMenu
 		menuHandler.addSeparator();
 
 		JMenuItem statusItem = new JMenuItem("Status");
-
+		statusItem.setToolTipText("Displays some statistics of the selected automata");
 		menuHandler.add(statusItem, 0);
 
 		JMenuItem exploreItem = new JMenuItem("Explore states");
-
+		exploreItem.setToolTipText("Explore states one by one interactively");
 		menuHandler.add(exploreItem, 1);
 
 		JMenuItem hierarchyItem = new JMenuItem("View modular structure");
-
+		hierarchyItem.setToolTipText("Display graphically the connections between different modules");
 		menuHandler.add(hierarchyItem, 1);
 
 		JMenuItem alphabetItem = new JMenuItem("View alphabet");
-
+		alphabetItem.setToolTipText("Display information about the alphabets of the selected automata");
 		menuHandler.add(alphabetItem, 1);
 
 		JMenuItem statesItem = new JMenuItem("View states");
-
+		statesItem.setToolTipText("Display information about the states of the selected automata");
 		menuHandler.add(statesItem, 1);
 
 		if (SupremicaProperties.useDot())
 		{
 			JMenuItem viewItem = new JMenuItem("View automaton");
-
+			viewItem.setToolTipText("Display graphical representation of the selected automata");
 			menuHandler.add(viewItem, 1);
+
 			viewItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -71,15 +72,14 @@ class MainPopupMenu
 		menuHandler.addSeparator();
 
 		JMenuItem synchronizeItem = new JMenuItem("Synchronize...");
-
+		synchronizeItem.setToolTipText("Calculate the synchronous composition of the selected automata");
 		menuHandler.add(synchronizeItem, 2);
 
 		JMenuItem verifyItem = new JMenuItem("Verify...");
-
+		verifyItem.setToolTipText("Verify different properties");
 		menuHandler.add(verifyItem, 1);
 
 		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
-
 		menuHandler.add(synthesizeItem, 1);
 		menuHandler.addSeparator();
 
@@ -90,6 +90,7 @@ class MainPopupMenu
 		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
+		purgeItem.setToolTipText("Remove all states marked as forbidden");
 		menuHandler.add(purgeItem, 1);
 
 		// These are the "standard" algorithms
@@ -98,9 +99,11 @@ class MainPopupMenu
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
 		JMenuItem minimizeItem = new JMenuItem("Minimize");
+		minimizeItem.setToolTipText("Minimize with respect to language equivalence");
 		menuHandler.add(minimizeItem, 1);
 
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");
+		allAcceptingItem.setToolTipText("Make all states accepting (marked)");
 		menuHandler.add(allAcceptingItem, 1);
 
 		JMenuItem stateEnumerator = new JMenuItem(ActionMan.stateEnumerator);
@@ -112,7 +115,6 @@ class MainPopupMenu
 
 		// Do this...
 		JMenuItem languageRestrictor = new SupremicaMenuItem(ActionMan.languageRestrictor);
-
 		menuHandler.add(languageRestrictor, 1);
 
 		/* ...and you can forget about this
@@ -293,30 +295,24 @@ class MainPopupMenu
 
 			// Strictly EXPERIMENTAL
 			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
-
 			expMenu.add(automatonDiminisher);
 
 			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
-
 			expMenu.add(automatonDeterminizer);
 
 			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
-
 			expMenu.add(automatonBuildObserver);
 
-			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());
-
+			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());			
 			expMenu.add(automatonSplit);
 
 			// De följande två Schedule-knapparna borde bli till ett inom en viss (snar?) framtid
 			expMenu.addSeparator();
 
 			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
-
 			expMenu.add(automataScheduler);
 
 			JMenuItem automataScheduler2 = new SupremicaMenuItem(new ScheduleAction2());
-
 			expMenu.add(automataScheduler2);
 
 			JMenuItem mMd, mMmc, mSp;
