@@ -58,6 +58,7 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Project;
@@ -67,23 +68,34 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.execution.Controls;
+import org.supremica.automata.execution.Control;
 
 public class SimulatorEventListModel
 	extends AbstractListModel
 {
+	private static Logger logger = LoggerFactory.createLogger(SimulatorEventListModel.class);
 	private int[] currState;
 	private int[] events;
 	private int eventAmount = 0;
 	private Automata theAutomata;
+	private Project theProject;
+	private Controls theControls;
 	private Alphabet theAlphabet;
 	private boolean showState = false;
+	private boolean showDisabledEvents = true;
 	private AutomataSynchronizerHelper helper;
+	private AnimationSignals theSignals;
 
-	public SimulatorEventListModel(AutomataSynchronizerHelper helper)
+	public SimulatorEventListModel(AutomataSynchronizerHelper helper, Project theProject, AnimationSignals theSignals, boolean showDisabledEvents)
 	{
 		this.helper = helper;
 		this.theAutomata = helper.getAutomata();
+		this.theProject = theProject;
+		this.theControls = theProject.getControls();
 		this.theAlphabet = helper.getAutomaton().getAlphabet();
+		this.showDisabledEvents = showDisabledEvents;
+		this.theSignals = theSignals;
 	}
 
 	public void setCurrState(int[] currState)
@@ -101,7 +113,47 @@ public class SimulatorEventListModel
 	public void update()
 	{
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-		events = onlineSynchronizer.getOutgoingEvents(currState);
+		if (showDisabledEvents)
+		{
+			events = onlineSynchronizer.getOutgoingEvents(currState);
+		}
+		else
+		{
+			events = onlineSynchronizer.getOutgoingEvents(currState);
+			int currEventIndex = 0;
+			int nbrOfEvents = 0;
+			while (events[currEventIndex] != Integer.MAX_VALUE)
+			{
+				LabeledEvent currEvent;
+				try
+				{
+					currEvent = theAlphabet.getEventWithIndex(events[currEventIndex]);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Exception in SimulatorEventListModel.update");
+					return;
+				}
+				if (theControls.hasControl(currEvent.getLabel()))
+				{
+					Control currControl = theControls.getControl(currEvent.getLabel());
+					String condition = currControl.getCondition();
+					if (theSignals.isTrue(condition))
+					{
+						events[nbrOfEvents] = events[currEventIndex];
+						nbrOfEvents++;
+					}
+				}
+				else
+				{
+					events[nbrOfEvents] = events[currEventIndex];
+					nbrOfEvents++;	
+				}
+				currEventIndex++;
+			}
+			events[nbrOfEvents] = Integer.MAX_VALUE;
+
+		}
 
 		eventAmount = 0;
 

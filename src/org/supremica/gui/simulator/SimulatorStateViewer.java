@@ -70,9 +70,10 @@ import org.supremica.automata.LabeledEvent;
 
 public class SimulatorStateViewer
 	extends JPanel
+	implements SignalObserver
 {
 	private Automata theAutomata;
-	private VisualProject theProject;
+	private Project theProject;
 	private AutomataSynchronizerHelper helper;
 	private int[] currState;
 	private SimulatorEventList forwardEvents;
@@ -85,22 +86,24 @@ public class SimulatorStateViewer
 	private LinkedList nextStates = new LinkedList();
 	private SimulatorExecuter simulator;
 
-	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper)
+	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper, AnimationSignals theAnimationSignals)
 	{
 		setLayout(new BorderLayout());
 
 		this.simulator = simulator;
+		theProject = simulator.getProject();
 
 		theAutomata = helper.getAutomata();
 		this.helper = helper;
-		forwardEvents = new SimulatorEventList(this, helper);
-		backwardEvents = new SimulatorEventList(this, helper);
+		forwardEvents = new SimulatorEventList(this, helper, theProject, theAnimationSignals, false);
+		backwardEvents = new SimulatorEventList(this, helper, theProject, theAnimationSignals, true);
 
 		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
 		stateDisplayer = new SimulatorStateDisplayer(this, helper);
 		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
 
 		add(stateEventSplitter, BorderLayout.CENTER);
+		theAnimationSignals.registerInterest(this);
 	}
 
 	public void initialize()
@@ -183,6 +186,11 @@ public class SimulatorStateViewer
 		stateDisplayer.setCurrState(currState);
 		controller.update();
 	}
+	
+	public void signalUpdated()
+	{
+		update();	
+	}
 
 	public void executeEvent(LabeledEvent event)
 	{
@@ -193,4 +201,6 @@ public class SimulatorStateViewer
 	{
 		this.controller = controller;
 	}
+	
+
 }

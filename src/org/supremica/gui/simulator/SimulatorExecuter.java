@@ -94,6 +94,7 @@ public class SimulatorExecuter
 	private VisualProject theProject;
 	private Animator theAnimator;
 	private Animation theAnimation;
+	private AnimationSignals theAnimationSignals;
 
 
 	public SimulatorExecuter(VisualProject theProject)
@@ -113,6 +114,8 @@ public class SimulatorExecuter
 
 		theAnimation = theAnimator.getAnimation();
 		theAnimation.addAnimationListener(this);
+
+		theAnimationSignals = new AnimationSignals(theAnimation);
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true);
 
@@ -177,7 +180,7 @@ public class SimulatorExecuter
 		});
 		initMenubar();
 
-		stateViewer = new SimulatorStateViewer(this, helper);
+		stateViewer = new SimulatorStateViewer(this, helper, theAnimationSignals);
 
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
@@ -297,6 +300,14 @@ public class SimulatorExecuter
 		//logger.info("Reset animation");
 		//theAnimator.reset();
 	}
+
+	public Project getProject()
+	{
+		return theProject;	
+	}
+
 }
+
+
 
 

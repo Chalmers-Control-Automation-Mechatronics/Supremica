@@ -76,45 +76,62 @@ public class SimulatorEventList
 	private SimulatorStateViewer stateViewer;
 	private SimulatorEventListModel eventsList;
 	private JList theList;
+	private boolean allowEventSelection = false;
 
-	public SimulatorEventList(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper helper)
+	public SimulatorEventList(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper helper, Project theProject, AnimationSignals theSignals, boolean showDisabledEvents)
 	{
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
 		this.theAutomata = helper.getAutomata();
-		eventsList = new SimulatorEventListModel(helper);
+		eventsList = new SimulatorEventListModel(helper, theProject, theSignals, showDisabledEvents);
+		allowEventSelection = !showDisabledEvents;
 		theList = new JList(eventsList);
 
 		JScrollPane scrollPanel = new JScrollPane(theList);
 
 		theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		JLabel jLabel = new JLabel("Outgoing events");
+		JLabel jLabel = null;
+		
+		if (showDisabledEvents)
+		{
+			jLabel = new JLabel("Outgoing events");
+		}
+		else
+		{
+			jLabel = new JLabel("Enabled events");			
+		}
 
-		// jLabel.setOpaque(true);
-		// jLabel.setBackground(Color.yellow);
 		add(jLabel, BorderLayout.NORTH);
 		add(scrollPanel, BorderLayout.CENTER);
 		theList.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent e)
 			{
-				if (e.getClickCount() == 2)
+				if (clickable())
 				{
-					int index = theList.locationToIndex(e.getPoint());
-
-					if (index >= 0)
+					if (e.getClickCount() == 2)
 					{
-						LabeledEvent currEvent = eventsList.getEventAt(index);
-						executeEvent(currEvent);
-						int[] newState = eventsList.getStateAt(index);
-
-						updateStateViewer(newState);
+						int index = theList.locationToIndex(e.getPoint());
+	
+						if (index >= 0)
+						{
+							LabeledEvent currEvent = eventsList.getEventAt(index);
+							executeEvent(currEvent);
+							int[] newState = eventsList.getStateAt(index);
+	
+							updateStateViewer(newState);
+						}
 					}
 				}
 			}
 		});
+	}
+
+	public boolean clickable()
+	{
+		return allowEventSelection;	
 	}
 
 	public void setShowStateId(boolean showStateId)
