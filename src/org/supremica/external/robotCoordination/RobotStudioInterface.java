@@ -9,6 +9,7 @@ import com.inzoom.comjni.enum.HResult;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import java.util.*;
+import java.io.*;
 import org.supremica.external.robotCoordinationABB.*;
 
 /**
@@ -59,12 +60,12 @@ public class RobotStudioInterface
 		private static Station station = null;
 		private Part zones;
 
-		public RSRobotCell(String stationName)
+		public RSRobotCell(File file)
 		{
 			try
 			{
 				init();
-				openStation(stationName);
+				openStation(file);
 				station.setBackgroundColor(RS_WHITE);
 				station.setFloorVisible(false);
 
@@ -125,11 +126,11 @@ public class RobotStudioInterface
 		}
 
 		// RobotCell interface methods
-		public void openStation(String stationName)
+		public void openStation(File file)
 			throws Exception
 		{
+			String stationName = file.getAbsolutePath();
 			IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
-			
 			station = Station.getStationFromUnknown(iStation);
 		}
 

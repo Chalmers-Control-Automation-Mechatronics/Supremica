@@ -5,7 +5,6 @@ import org.supremica.automata.*;
 
 public interface RobotCell
 {
-
 	/**
 	 * Initializes simulation environment.
 	 */

@@ -46,12 +46,12 @@ public class RobotCellExaminer
 
 				if (fileOpener.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 				{
-					File f = fileOpener.getSelectedFile();
-					String cellName = f.getAbsolutePath();
+					File file = fileOpener.getSelectedFile();
+					String cellName = file.getAbsolutePath();
 
 					if (cellName.endsWith(".stn"))
 					{
-						openCell(cellName, RobotSimulatorType.RobotStudio);
+						openCell(file, RobotSimulatorType.RobotStudio);
 					}
 					else
 					{						
@@ -102,13 +102,23 @@ public class RobotCellExaminer
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
 				//openCell("C:/temp/RobSuprTestStation/RobSuprTest.stn", RobotSimulatorType.RobotStudio);
-				openCell("C:/temp/DomStations/DemoSafe.stn", RobotSimulatorType.RobotStudio);
-				generateSpans();
-				intersectSpans();
-				generateAutomata();
-				examineCollisions();
+				// Open file if it exists...
+				//File file = new File("C:/temp/RobSuprTestStation/RobSuprTest.stn");
+				File file = new File("C:/temp/DomStations/DemoSafe.stn");
+				if (file.exists())
+				{
+					//openCell("C:/temp/DomStations/DemoSafe.stn", RobotSimulatorType.RobotStudio);
+					openCell(file, RobotSimulatorType.RobotStudio);
+					generateSpans();
+					intersectSpans();
+					generateAutomata();
+					examineCollisions();
+				}
+				else 
+				{
+					logger.error("File " + file + " does not exist.");
+				}
 			}
 		});
 		contentPane.add(demoButton);
@@ -121,7 +131,6 @@ public class RobotCellExaminer
 	 */
 	private void init()
 	{
-
 		//zoneAutomata = new Automata();
 		//robotAutomata = new Automata();
 	}
@@ -131,18 +140,18 @@ public class RobotCellExaminer
 	/**
 	 * Initiates simulation environment and opens cell with certain name.
 	 */
-	private void openCell(String name, RobotSimulatorType simType)
+	private void openCell(File file, RobotSimulatorType simType)
 	{
 		// Which simulation software is used?
 		// This is the only "application specific" part of this class!
 		if (simType == RobotSimulatorType.RobotStudio)
-			{
-				// Here, it would be a good thing to examine if RobotStudio is
-				// properly installed...
-
-				// Open cell
-				cell = new RobotStudioInterface.RSRobotCell(name);
-			}
+		{
+			// Here, it would be a good thing to examine if RobotStudio is
+			// properly installed...
+			
+			// Open cell
+			cell = new RobotStudioInterface.RSRobotCell(file);
+		}
 		else
 		{
 			logger.error("Unknown robot simulation environment specified.");
