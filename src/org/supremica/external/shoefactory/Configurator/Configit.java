@@ -65,7 +65,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.supremica.gui.*;
 import org.supremica.log.*;
-// import org.supremica.external.shoefactory.Executor.*;
+import org.supremica.external.shoefactory.Executor.*;
 
 public class Configit extends JFrame
 	implements ActionListener
@@ -74,8 +74,9 @@ public class Configit extends JFrame
 
 	CS_CtrlMngr ctrl_mngr = null;
 	Container c;
+	Gui gui;
 	private boolean resetok = true;
-
+		
     private String [] Gender = {"Male" ,"Female"};
 	private String [] GeneralType = {"Children", "Adult" };
    	private String [] Size;
@@ -128,8 +129,9 @@ public class Configit extends JFrame
    	ImageIcon icon1 = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));
    	ImageIcon icon2 = new ImageIcon(Supremica.class.getResource("/shoefactory/pnkshoe.gif"));
 
-	public Configit ()
+	public Configit (Gui g)
 	{
+		gui = g;
 		URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.vt");
 		InputStream vtStream = null;
 		try
@@ -467,7 +469,7 @@ public class Configit extends JFrame
 				lSize.addItem("");
 				lSize.setSelectedItem("");
 			}
-
+			
 			ifSelected = false;
 			for(int i=0; i<ctrl_mngr.getDomainSize(5); i++)
 			{
@@ -573,7 +575,7 @@ public class Configit extends JFrame
 
 		if(e.getSource() == JC)
 		{
-			if(ctrl_mngr.getSelectedValue(3)==-1 || ctrl_mngr.getSelectedValue(1)==-1 || ctrl_mngr.getSelectedValue(4)==-1 || ctrl_mngr.getSelectedValue(5)==-1)
+			if(ctrl_mngr.getSelectedValue(3)==-1 || ctrl_mngr.getSelectedValue(2)==-1 || ctrl_mngr.getSelectedValue(1)==-1 || ctrl_mngr.getSelectedValue(4)==-1 || ctrl_mngr.getSelectedValue(5)==-1)
 				JOptionPane.showMessageDialog(this, "You have not completed the form", "Please check your order", JOptionPane.ERROR_MESSAGE);
 			else
 			{
@@ -588,12 +590,11 @@ public class Configit extends JFrame
 				{
 					ctrl_mngr.completeConf();
 					ConfigConverter cc = new ConfigConverter(ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)),
-											ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(2)), ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(2)),
+											ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(1)), ctrl_mngr.getValueName(2, ctrl_mngr.getSelectedValue(2)),
 											ctrl_mngr.getValueName(0, ctrl_mngr.getSelectedValue(0)), ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)),
 											ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)));
-					//FactoryExecutor fe = new FactoryExecutor(cc.stationVisit);
-					//fe.setPriority(Thread.NORM_PRIORITY);
-					//fe.start();
+
+					FactoryExecutor fe = new FactoryExecutor(cc.getConfig(), gui);
 					ctrl_mngr.resetConf();
 					Res_Sellist();
 					reset();

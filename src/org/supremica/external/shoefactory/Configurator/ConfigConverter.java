@@ -2,7 +2,7 @@ package org.supremica.external.shoefactory.Configurator;
 
 public class ConfigConverter
 {
-	public boolean[] stationVisit = new boolean[24];
+	private boolean[] stationVisit = new boolean[24];
 
 	public ConfigConverter(String c, String s, String gt, String g, String st, String m)
 	{
@@ -125,5 +125,10 @@ public class ConfigConverter
 		}
 
 		stationVisit[23]=true;
+	}
+
+	public boolean[] getConfig()
+	{
+		return stationVisit;
 	}
 }
