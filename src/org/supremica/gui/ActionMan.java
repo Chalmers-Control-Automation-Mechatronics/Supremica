@@ -448,7 +448,6 @@ public class ActionMan
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -478,6 +477,66 @@ public class ActionMan
 		gui.clearSelection();
 	}
 
+	// Moves selected automata one step up in the list
+	public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		int[] selectionIndices = new int[selectedAutomata.size()];
+		int index = 0;
+		Project theProject = gui.getVisualProjectContainer().getActiveProject();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			
+			return;
+		}
+
+		if (selectedAutomata.size() == theProject.size())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "No point in moving all automata, right?", "Alert", JOptionPane.ERROR_MESSAGE);
+			
+			return;
+		}
+		
+		Iterator autIt;
+		if (directionIsUp)
+		{
+			autIt = selectedAutomata.iterator();
+
+			// Avoid the automata already at the top!
+			int i = 0;
+			while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+			{
+				autIt.next();				
+				selectionIndices[index++] = i++;
+			}
+		}
+		else
+		{
+			autIt = selectedAutomata.backwardsIterator();
+
+			// Avoid the automata already at the bottom!
+			int i = theProject.size() - 1;
+			while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+			{
+				autIt.next();				
+				selectionIndices[index++] = i--;
+			}
+		}
+
+		Automaton currAutomaton;
+		while (autIt.hasNext())
+		{
+			currAutomaton = (Automaton) autIt.next();
+			theProject.moveAutomaton(currAutomaton, directionIsUp);
+			selectionIndices[index++] = theProject.getAutomatonIndex(currAutomaton);
+		}
+		
+		gui.clearSelection();
+		gui.selectAutomata(selectionIndices);
+	}
+	
 	// This is baaad!
 	private static final int    // instead of using constants later below :)
 		FORMAT_UNKNOWN = -1,
@@ -2119,7 +2178,6 @@ public class ActionMan
 	// selectAll action performed
 	public static void selectAll_actionPerformed(Gui gui)
 	{
-
 		// theAutomatonTable.selectAll();
 		gui.selectAll();
 	}
@@ -2204,52 +2262,6 @@ public class ActionMan
 	public static void automataInvert_actionPerformed(Gui gui)
 	{
 		gui.invertSelection();
-		
-		/*
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() == 0)
-		{
-			// Use SelectAll instead
-			automataSelectAll_actionPerformed(gui);
-			return;
-		}
-
-		Automaton currAutomaton;
-		String currAutomatonName;
-
-		for (int i = 0; i < gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata(); i++)
-		{
-			try
-			{
-				currAutomaton = gui.getVisualProjectContainer().getActiveProject().getAutomatonAt(i);
-			}
-			catch (Exception ex)
-			{
-				logger.error("Exception in VisualProjectContainer. " + ex);
-				logger.debug(ex.getStackTrace());
-				return;
-			}
-
-			currAutomatonName = currAutomaton.getName();
-
-			if (!selectedAutomata.contains(currAutomaton))
-			{
-				try
-				{
-					gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomatonName);
-				}
-				catch (Exception ex)
-				{
-					logger.error("Exception while removing " + currAutomatonName, ex);
-					logger.debug(ex.getStackTrace());
-					return;
-				}
-				i--; // Step back! One automaton has been removed!
-			}
-		}
-		gui.clearSelection();		
-		*/
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata

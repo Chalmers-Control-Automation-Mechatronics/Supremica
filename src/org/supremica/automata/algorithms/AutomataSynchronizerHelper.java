@@ -785,7 +785,7 @@ public final class AutomataSynchronizerHelper
 		Automaton problemAutomaton;
 		int[] currState = new int[automataIndices.length];
 		State[][] stateTable = getIndexFormStateTable();
-
+		
 		for (Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices); stateHolderIterator.hasNext(); )
 		{
 			StateHolder stateHolder = (StateHolder) stateHolderIterator.next();

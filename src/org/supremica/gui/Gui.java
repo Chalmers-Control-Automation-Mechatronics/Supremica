@@ -42,6 +42,8 @@ public interface Gui
 
 	void selectAll();
 
+	void selectAutomata(int[] a);
+
 	void close();
 
 	int addAutomata(Automata a)
@@ -71,6 +73,7 @@ public interface Gui
 	Collection getSelectedAutomataAsCollection();
 
 	Automata getSelectedAutomata();
+	Automata getUnSelectedAutomata();
 
 	Project getSelectedProject();
 

@@ -182,7 +182,7 @@ public class AutomataVerifier
 
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
-				return "The modular nonblocking algorithm \n" + "is not fully implemented!";
+				// return "The modular nonblocking algorithm \n" + "is not fully implemented!";
 			}
 		}
 
@@ -1185,7 +1185,7 @@ public class AutomataVerifier
 	
 		// Preparations for the global nonblocking verification...
 	    ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
-		if (executionDialog != null) // The executionDialog might not have been initilized yet! FIXA!
+		if (executionDialog != null) // The executionDialog might not have been initialized yet! FIXA!
 		{
 			executionDialog.initProgressBar(0, theAutomata.size());
 			executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
@@ -1196,15 +1196,15 @@ public class AutomataVerifier
 		// have to reinitialize between the language inclusion checks!!
 	    theAutomata = new Automata(theAutomata, false); 
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-		// Make all events in all automata in theAutomata uncontrollable! (All 
-		// events in plants skould be uncontrollable and the controllability of 
+		// Make all events in all automata in theAutomata as uncontrollable! (All 
+		// events in plants should be uncontrollable and the controllability of 
 		// the events in the supervisors doesn't matter!)
 		Iterator eventIterator;
 		Iterator automatonIterator = theAutomata.iterator();
 		while (automatonIterator.hasNext())
 		{
 			currAutomaton = (Automaton) automatonIterator.next();
-			currAutomaton.setType(AutomatonType.Plant);
+			// currAutomaton.setType(AutomatonType.Plant);
 			eventIterator = currAutomaton.eventIterator();
 			while (eventIterator.hasNext())
 			{
@@ -1225,9 +1225,9 @@ public class AutomataVerifier
 				executionDialog.setProgress(theAutomata.getAutomatonIndex(currAutomaton));
 			}
 		    currAutomata.addAutomaton(currAutomaton);
+			
 			// Perform the behavioural inclusion check!
 			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
-			
 			automatonIsIncluded = behaviouralInclusionVerification(currAutomata, theAutomata);
 			allIncluded = allIncluded && automatonIsIncluded;
 			currAutomata.removeAutomaton(currAutomaton); // Examine one automaton at a time...
@@ -1235,10 +1235,10 @@ public class AutomataVerifier
 			{
 				logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
 			}
-		}		
+		}
 		return allIncluded && allIndividuallyNonblocking;
 	}
-
+	
 	/**
 	 * Verifies behavioural inclusion of the language of automataA in automataB. 
 	 * I.e. "Is the behaviour of automataA included in automataB?"
@@ -1271,7 +1271,7 @@ public class AutomataVerifier
 		// Update the typeIsPlantTable in the AutomataIndexForm in the synchHelper!
 		synchHelper.getAutomataIndexForm().generateAutomataIndices(theAutomata);
 		
-		// After the above preparations, the language inclusion check
+		// After the above preparations, the behavioural inclusion check
 		// can be performed as a controllability check...
 		return modularControllabilityVerification();
 	}

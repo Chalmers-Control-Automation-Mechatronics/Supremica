@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -151,6 +150,23 @@ public class Automata
 		}
 	}
 
+	// Moves automaton one step up or down in the ArrayList
+	public void moveAutomaton(Automaton aut, boolean directionIsUp)
+	{
+		int firstAutomatonIndex = theAutomata.indexOf(aut);
+		int secondAutomatonIndex;
+		if (directionIsUp)
+			secondAutomatonIndex = firstAutomatonIndex - 1;
+		else
+			secondAutomatonIndex = firstAutomatonIndex + 1;
+		
+		Automaton firstAutomaton = aut;
+		Automaton secondAutomaton = (Automaton) theAutomata.get(secondAutomatonIndex); 
+		theAutomata.set(firstAutomatonIndex, secondAutomaton);
+		theAutomata.set(secondAutomatonIndex, firstAutomaton);
+		notifyListeners();
+	}
+
 	public void renameAutomaton(Automaton aut, String newName)
 	{
 		aut.setName(newName);
@@ -193,6 +209,16 @@ public class Automata
 		return theAutomata.iterator();
 	}
 
+	public Iterator backwardsIterator()
+	{
+		ArrayList backwardList = new ArrayList();
+		Iterator forwardIterator = iterator();
+		while (forwardIterator.hasNext())
+		{
+			backwardList.add(0, forwardIterator.next());
+		}
+		return backwardList.iterator();
+	}
 
 	public Iterator plantIterator()
 	{
@@ -664,7 +690,6 @@ public class Automata
 
 	void notifyListeners(int mode, Automaton a)
 	{
-
 		// logger.debug("Automata.notifyListeners Start");
 		if (listeners != null)
 		{

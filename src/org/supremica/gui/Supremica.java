@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -405,12 +404,29 @@ public class Supremica
 		theAutomatonTable.clearSelection();
 	}
 
+	/** 
+	 * Selects the automata indicated by selectionIndices
+	 */
+ 	public void selectAutomata(int[] selectionIndices)
+	{		
+		// We must set the autoscrolls property false for esthetical reasons 
+		// but keep it unchanged after the operation for consistency
+		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
+		theAutomatonTable.setAutoscrolls(false);
+		for (int i=0; i<selectionIndices.length; i++)
+		{
+			theAutomatonTable.changeSelection(selectionIndices[i], 0, true, false);
+		}
+		theAutomatonTable.setAutoscrolls(autoscrolls);
+	}
+
 	/**
 	  Inverts the selection in theAutomatonTable.
 	 */
 	public void invertSelection()
 	{
-		// We must set the autoscrolls property false but keep it unchanged after the operation for safety
+		// We must set the autoscrolls property false for esthetical reasons 
+		// but keep it unchanged after the operation for consistency
 		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
 		theAutomatonTable.setAutoscrolls(false);
 		for (int i=0; i<theAutomatonTable.getRowCount(); i++)
@@ -422,6 +438,8 @@ public class Supremica
 	{
 		theAutomatonTable.selectAll();
 	}
+
+
 
 	public Component getComponent()
 	{
@@ -488,6 +506,14 @@ public class Supremica
 		}
 
 		return selectedAutomata;
+	}
+
+	public Automata getUnSelectedAutomata()
+	{
+		invertSelection();
+		Automata unSelectedAutomata = getSelectedAutomata();
+		invertSelection();
+		return unSelectedAutomata;
 	}
 
 	// Same as getSelected automata but include execution information
@@ -845,8 +871,7 @@ public class Supremica
 		}
 
 		try
-		{    // throws Exception if the automaton already exists
-
+		{   // throws Exception if the automaton already exists
 			// logger.debug("Supremica.addAutomaton");
 			getActiveProject().addAutomaton(currAutomaton);
 		}

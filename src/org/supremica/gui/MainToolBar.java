@@ -23,6 +23,9 @@ public class MainToolBar
 	private static final OpenAction openAction = new OpenAction();
 	private static final SaveAction saveAction = new SaveAction();
 	private static final SaveAsAction saveAsAction = new SaveAsAction();
+	private static final PreferencesAction preferencesAction = new PreferencesAction();
+	private static final MoveAutomataUpAction moveAutomataUpAction = new MoveAutomataUpAction();
+	private static final MoveAutomataDownAction moveAutomataDownAction = new MoveAutomataDownAction();
 	private static final EditAction editAction = new EditAction(supremica);
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
 
@@ -48,6 +51,13 @@ public class MainToolBar
 			add(saveAsAction);
 			addSeparator();
 		}
+
+		add(moveAutomataUpAction);
+		add(moveAutomataDownAction);
+		addSeparator();
+
+		add(preferencesAction);
+		addSeparator();
 
 		// Tools.AutomataEditor
 		if (SupremicaProperties.includeEditor())
