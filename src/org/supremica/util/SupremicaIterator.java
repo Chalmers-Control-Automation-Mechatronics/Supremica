@@ -47,35 +47,51 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.util;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-public class TestPackageAlgorithms
-	extends TestCase
+
+public class SupremicaIterator
 {
+	private final Iterator theIterator;
+	private Object currObject = null;
+	private boolean isValid = false;
 
-	public TestPackageAlgorithms(String name)
+	public SupremicaIterator(Iterator theIterator)
 	{
-		super(name);
+		this.theIterator = theIterator;
+		increase();
 	}
 
-	/**
-	 * Assembles and returns a test suite
-	 * containing all known tests.
-	 */
-	public static Test suite()
+	public boolean isValid()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestProjectBuildFromXml.suite());
-		suite.addTest(TestAutomataSynchronizer.suite());
-		suite.addTest(TestAutomatonSynthesizer.suite());
-		suite.addTest(TestAutomataSynthesizer.suite());
-		suite.addTest(TestAutomataVerifier.suite());
-		suite.addTest(TestAutomataToXml.suite());
-		suite.addTest(TestProjectToSP.suite());
-		return suite;
+		return isValid;
 	}
+
+	public void increase()
+	{
+		if (theIterator.hasNext())
+		{
+			currObject = theIterator.next();
+			isValid = true;
+		}
+		else
+		{
+			currObject = null;
+			isValid = false;
+		}
+	}
+
+	public Object get()
+	{
+		if (isValid)
+		{
+			return currObject;
+		}
+		throw new NoSuchElementException();
+	}
+
 }
+

@@ -51,6 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.log.*;
+import org.supremica.util.SupremicaIterator;
 
 public class Automaton
 	implements ArcListener
@@ -422,9 +423,9 @@ public class Automaton
 	{
 		HashSet foundEvents = new HashSet();
 
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (SupremicaIterator stateIt = new SupremicaIterator(stateIterator()); stateIt.isValid(); stateIt.increase())
 		{
-			State currState = stateIt.nextState();
+			State currState = (State)stateIt.get();
 			foundEvents.clear();
 			for (EventIterator evIt = outgoingEventsIterator(currState); evIt.hasNext(); )
 			{

@@ -49,33 +49,83 @@
  */
 package org.supremica.automata.algorithms;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import java.io.*;
+import org.supremica.log.*;
 
-public class TestPackageAlgorithms
-	extends TestCase
+public class EncodingHelper
 {
+	private static Logger logger = LoggerFactory.createLogger(EncodingHelper.class);
 
-	public TestPackageAlgorithms(String name)
+	private EncodingHelper()
 	{
-		super(name);
 	}
 
-	/**
-	 * Assembles and returns a test suite
-	 * containing all known tests.
-	 */
-	public static Test suite()
+	public static String normalize(String input)
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestProjectBuildFromXml.suite());
-		suite.addTest(TestAutomataSynchronizer.suite());
-		suite.addTest(TestAutomatonSynthesizer.suite());
-		suite.addTest(TestAutomataSynthesizer.suite());
-		suite.addTest(TestAutomataVerifier.suite());
-		suite.addTest(TestAutomataToXml.suite());
-		suite.addTest(TestProjectToSP.suite());
-		return suite;
+		String s = input;
+		/*
+		try
+		{
+			s = new String(input.getBytes(), "UTF-8");
+			logger.info("org: " + input + " new: " + s);
+		}
+		catch (UnsupportedEncodingException ex)
+		{
+			logger.error("UTF-8 is an unsupported encoding");
+			throw new RuntimeException("UTF-8 is an unsupported encoding");
+		}
+		return s.toString();
+		*/
+
+		StringBuffer str = new StringBuffer();
+		int len = (s != null)
+				  ? s.length()
+				  : 0;
+
+		for (int i = 0; i < len; i++)
+		{
+			char ch = s.charAt(i);
+
+			switch (ch)
+			{
+
+			case '<' :
+			{
+				str.append("&lt;");
+
+				break;
+			}
+			case '>' :
+			{
+				str.append("&gt;");
+
+				break;
+			}
+			case '&' :
+			{
+				str.append("&amp;");
+
+				break;
+			}
+			case '"' :
+			{
+				str.append("&quot;");
+
+				break;
+			}
+			case '\r' :
+			case '\n' :
+			{
+				// else, default append char
+			}
+			default :
+			{
+				str.append(ch);
+			}
+			}
+		}
+
+		return str.toString();
+
 	}
 }

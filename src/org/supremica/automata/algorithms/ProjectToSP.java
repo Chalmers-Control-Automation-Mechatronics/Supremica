@@ -93,7 +93,7 @@ public class ProjectToSP
 
 		if (project.getName() != null)
 		{
-			pw.print(" name=\"" + normalize(project.getName()) + "\" ");
+			pw.print(" name=\"" + EncodingHelper.normalize(project.getName()) + "\" ");
 		}
 
 		pw.print(" major=\"" + majorFileVersion + "\" ");
@@ -122,10 +122,10 @@ public class ProjectToSP
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
 				eventIdMap.put(event, new Integer(eventId));
-				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
 				eventId++;
 				//--
-				// pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				// pw.print("\t\t<Event id=\"" + EncodingHelper.normalize(event.getId()) + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
 				//--
 				if (!event.isControllable())
 				{
@@ -156,7 +156,7 @@ public class ProjectToSP
 			pw.println("\t<States>");
 
 			int stateId = 0; // we need to make up ids
-			
+
 			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 			{
 				State state = (State) stateIt.next();
@@ -164,13 +164,13 @@ public class ProjectToSP
 				pw.print("\t\t<State id=\"" + stateId + "\""); // no longer need to normalize
 				stateId++;
 				//--
-				// pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
+				// pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
 				//--
-				pw.print(" name=\"" + normalize(state.getName()) + "\""); // always print the name
+				pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\""); // always print the name
 				//--
 				// if (!state.getId().equals(state.getName()))
 				// {
-				// 	pw.print(" name=\"" + normalize(state.getName()) + "\"");
+				// 	pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
 				// }
 				//--
 				if (state.isInitial())
@@ -227,9 +227,9 @@ public class ProjectToSP
 					pw.print("\" dest=\"" + destId);
 					pw.println("\" event=\"" + eventID + "\"/>");
 					//--
-					// pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-					// pw.print("\" dest=\"" + normalize(destState.getId()));
-					// pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+					// pw.print("\t\t<Transition source=\"" + EncodingHelper.normalize(sourceState.getId()));
+					// pw.print("\" dest=\"" + EncodingHelper.normalize(destState.getId()));
+					// pw.println("\" event=\"" + EncodingHelper.normalize(arc.getEventId()) + "\"/>");
 					//--
 				}
 			}
@@ -248,7 +248,7 @@ public class ProjectToSP
 				{
 					State state = (State) stateIt.next();
 
-					pw.print("\t\t\t<StateLayout id=\"" + normalize(state.getId()) + "\"");
+					pw.print("\t\t\t<StateLayout id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
 					pw.print(" x=\"" + state.getX() + "\"");
 					pw.print(" y=\"" + state.getY() + "\"");
 					pw.println("/>");
@@ -304,13 +304,13 @@ public class ProjectToSP
 				{
 					Action currAction = (Action) actionIt.next();
 
-					pw.println("\t\t<Action label=\"" + normalize(currAction.getLabel()) + "\">");
+					pw.println("\t\t<Action label=\"" + EncodingHelper.normalize(currAction.getLabel()) + "\">");
 
 					for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
 					{
 						String currCommand = (String) cmdIt.next();
 
-						pw.println("\t\t\t<Command command=\"" + normalize(currCommand) + "\"/>");
+						pw.println("\t\t\t<Command command=\"" + EncodingHelper.normalize(currCommand) + "\"/>");
 					}
 
 					pw.println("\t\t</Action>");
@@ -328,18 +328,18 @@ public class ProjectToSP
 				{
 					Control currControl = (Control) controlIt.next();
 
-					pw.println("\t\t<Control label=\"" + normalize(currControl.getLabel()) + "\">");
+					pw.println("\t\t<Control label=\"" + EncodingHelper.normalize(currControl.getLabel()) + "\">");
 
 					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext(); )
 					{
 						String currCondition = (String) condIt.next();
 
-						pw.println("\t\t\t<Condition condition=\"" + normalize(currCondition) + "\"/>");
+						pw.println("\t\t\t<Condition condition=\"" + EncodingHelper.normalize(currCondition) + "\"/>");
 					}
 					/*
 					if (currControl.getCondition() != null && !currControl.getCondition().equals(""))
 					{
-						pw.println("\t\t\t<Condition condition=\"" + normalize(currControl.getCondition()) + "\"/>");
+						pw.println("\t\t\t<Condition condition=\"" + EncodingHelper.normalize(currControl.getCondition()) + "\"/>");
 					}
 					*/
 					pw.println("\t\t</Control>");
@@ -350,7 +350,7 @@ public class ProjectToSP
 
 			if (project.hasAnimation())
 			{
-				pw.println("\t<Animation path=\"" + normalize(project.getAnimationURL().toString()) + "\"/>");
+				pw.println("\t<Animation path=\"" + EncodingHelper.normalize(project.getAnimationURL().toString()) + "\"/>");
 			}
 
 			pw.println("</Execution>");
@@ -370,68 +370,6 @@ public class ProjectToSP
 		throws IOException
 	{
 		serialize(new PrintWriter(new FileWriter(fileName)));
-	}
-
-	private String normalize(String s)
-	{
-		StringBuffer str = new StringBuffer();
-		int len = (s != null)
-				  ? s.length()
-				  : 0;
-
-		for (int i = 0; i < len; i++)
-		{
-			char ch = s.charAt(i);
-
-			switch (ch)
-			{
-
-			case '<' :
-			{
-				str.append("&lt;");
-
-				break;
-			}
-			case '>' :
-			{
-				str.append("&gt;");
-
-				break;
-			}
-			case '&' :
-			{
-				str.append("&amp;");
-
-				break;
-			}
-			case '"' :
-			{
-				str.append("&quot;");
-
-				break;
-			}
-			case '\r' :
-			case '\n' :
-			{
-				if (canonical)
-				{
-					str.append("&#");
-					str.append(Integer.toString(ch));
-					str.append(';');
-
-					break;
-				}
-
-				// else, default append char
-			}
-			default :
-			{
-				str.append(ch);
-			}
-			}
-		}
-
-		return str.toString();
 	}
 
 	void printIntArray(PrintWriter pw, int[] theArray)

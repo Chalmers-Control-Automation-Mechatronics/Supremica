@@ -1270,7 +1270,7 @@ public class ActionMan
 
 				try
 				{
-					synthesizer = new AutomatonSynthesizer(gui, currAutomaton, synthesizerOptions);
+					synthesizer = new AutomatonSynthesizer(currAutomaton, synthesizerOptions);
 				}
 				catch (Exception ex)
 				{

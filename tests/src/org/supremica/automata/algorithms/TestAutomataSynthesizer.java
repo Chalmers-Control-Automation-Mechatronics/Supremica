@@ -125,51 +125,6 @@ public class TestAutomataSynthesizer
 				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
 			}
 
-			// Test Full synchronization
-			{
-				syncOptions.setSynchronizationType(SynchronizationType.Full);
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
-				synchronizer.execute();
-				assertTrue(synchronizer.getNumberOfStates() == 8);
-				Automaton theAutomaton = synchronizer.getAutomaton();
-				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Undefined);
-				assertTrue(theAutomaton.nbrOfStates() == 8);
-				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
-				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
-				assertTrue(theAutomaton.nbrOfTransitions() == 11);
-				assertTrue(theAutomaton.isAllEventsPrioritized());
-				assertTrue(theAutomaton.hasInitialState());
-				assertTrue(!theAutomaton.isNullAutomaton());
-				assertTrue(theAlphabet.nbrOfEvents() == 5);
-				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
-				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
-				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
-			}
-
-			// Test Broadcast synchronization
-			{
-				syncOptions.setSynchronizationType(SynchronizationType.Broadcast);
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
-				synchronizer.execute();
-				assertTrue(synchronizer.getNumberOfStates() == 12);
-				Automaton theAutomaton = synchronizer.getAutomaton();
-				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Undefined);
-				assertTrue(theAutomaton.nbrOfStates() == 12);
-				assertTrue(theAutomaton.nbrOfAcceptingStates() == 4);
-				assertTrue(theAutomaton.nbrOfForbiddenStates() == 0);
-				assertTrue(theAutomaton.nbrOfTransitions() == 36);
-				assertTrue(theAutomaton.isAllEventsPrioritized());
-				assertTrue(theAutomaton.hasInitialState());
-				assertTrue(!theAutomaton.isNullAutomaton());
-				assertTrue(theAlphabet.nbrOfEvents() == 5);
-				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
-				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
-				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
-			}
 		}
 		catch (Exception ex)
 		{

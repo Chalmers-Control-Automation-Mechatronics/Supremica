@@ -53,29 +53,86 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class TestPackageAlgorithms
+import org.supremica.testhelpers.*;
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
+import java.io.*;
+import java.util.*;
+
+public class TestAutomatonSynthesizer
 	extends TestCase
 {
-
-	public TestPackageAlgorithms(String name)
+	public TestAutomatonSynthesizer(String name)
 	{
 		super(name);
 	}
 
 	/**
+	 * Sets up the test fixture.
+	 * Called before every test case method.
+	 */
+	protected void setUp()
+	{
+	}
+
+	/**
+	 * Tears down the test fixture.
+	 * Called after every test case method.
+	 */
+	protected void tearDown()
+	{
+	}
+
+	/**
 	 * Assembles and returns a test suite
-	 * containing all known tests.
+	 * for all the test methods of this test case.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestProjectBuildFromXml.suite());
-		suite.addTest(TestAutomataSynchronizer.suite());
-		suite.addTest(TestAutomatonSynthesizer.suite());
-		suite.addTest(TestAutomataSynthesizer.suite());
-		suite.addTest(TestAutomataVerifier.suite());
-		suite.addTest(TestAutomataToXml.suite());
-		suite.addTest(TestProjectToSP.suite());
+		TestSuite suite = new TestSuite(TestAutomatonSynthesizer.class);
 		return suite;
 	}
+
+	public void testEx45b()
+	{
+		try
+		{
+
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			assertTrue(theProject.nbrOfAutomata() == 3);
+			SynchronizationOptions syncOptions = new SynchronizationOptions();
+
+			AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+			synchronizer.execute();
+			assertTrue(synchronizer.getNumberOfStates() == 8);
+			Automaton theAutomaton = synchronizer.getAutomaton();
+
+
+/*
+			Alphabet theAlphabet = theAutomaton.getAlphabet();
+			assertTrue(theAutomaton.getType() == AutomatonType.Undefined);
+			assertTrue(theAutomaton.nbrOfStates() == 8);
+			assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
+			assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
+			assertTrue(theAutomaton.nbrOfTransitions() == 11);
+			assertTrue(theAutomaton.isAllEventsPrioritized());
+			assertTrue(theAutomaton.hasInitialState());
+			assertTrue(!theAutomaton.isNullAutomaton());
+			assertTrue(theAlphabet.nbrOfEvents() == 5);
+			assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
+			assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
+			assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
+			assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+*/
+
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
 }
+

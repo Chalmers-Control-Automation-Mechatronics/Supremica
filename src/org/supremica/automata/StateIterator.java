@@ -71,7 +71,7 @@ public class StateIterator
 	public Object next()
 		throws NoSuchElementException
 	{
-		return theIterator.next();
+		return (State)theIterator.next();
 	}
 
 	public State nextState()
@@ -87,3 +87,4 @@ public class StateIterator
 	}
 
 }
+

@@ -198,7 +198,7 @@ public class AutomatonToDot
 
 			if (withLabel)
 			{
-				pw.print(sourceState.getName());
+				pw.print(EncodingHelper.normalize(sourceState.getName()));
 			}
 
 			pw.println("\"" + getColor(sourceState) + "]; ");
@@ -232,7 +232,7 @@ public class AutomatonToDot
 						pw.print("#");
 					}
 
-					pw.print(thisEvent.getLabel());
+					pw.print(EncodingHelper.normalize(thisEvent.getLabel()));
 
 					if (arcIt.hasNext())
 					{

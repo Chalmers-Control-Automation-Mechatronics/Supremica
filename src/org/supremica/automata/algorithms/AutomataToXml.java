@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms;
 
 import java.io.*;
 import java.util.*;
+import org.supremica.log.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
@@ -61,6 +62,8 @@ import org.supremica.automata.LabeledEvent;
 public class AutomataToXml
 	implements AutomataSerializer
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomataToXml.class);
+
 	private Automata automata;
 	private Automaton automaton;
 	private boolean canonical;
@@ -95,7 +98,7 @@ public class AutomataToXml
 
 		if (automata.getName() != null)
 		{
-			pw.print(" name=\"" + normalize(automata.getName()) + "\" ");
+			pw.print(" name=\"" + EncodingHelper.normalize(automata.getName()) + "\" ");
 		}
 
 		pw.print(" major=\"" + majorFileVersion + "\" ");
@@ -121,16 +124,16 @@ public class AutomataToXml
 			pw.println("\t<Events>");
 
 			int eventId = 0;
-			
+
 			Iterator eventIt = aut.eventIterator();
 			while (eventIt.hasNext())
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
 				eventIdMap.put(event, new Integer(eventId));
-				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
 				eventId++;
 				//--
-				// pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
+				// pw.print("\t\t<Event id=\"" + EncodingHelper.normalize(event.getId()) + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
 				//--
 				if (!event.isControllable())
 				{
@@ -161,7 +164,7 @@ public class AutomataToXml
 			pw.println("\t<States>");
 
 			int stateId = 0; // we need to make up ids
-			
+
 			Iterator stateIt = aut.stateIterator();
 			while (stateIt.hasNext())
 			{
@@ -170,13 +173,13 @@ public class AutomataToXml
 				pw.print("\t\t<State id=\"" + stateId + "\""); // no longer need to normalize
 				stateId++;
 				//--
-				// pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
+				// pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
 				//--
-				pw.print(" name=\"" + normalize(state.getName()) + "\""); // always print the name
+				pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\""); // always print the name
 				//--
 				// if (!state.getId().equals(state.getName()))
 				// {
-				// 	pw.print(" name=\"" + normalize(state.getName()) + "\"");
+				// 	pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
 				// }
 				//--
 				if (state.isInitial())
@@ -224,7 +227,7 @@ public class AutomataToXml
 			{
 				State sourceState = (State) stateIt.next();
 				Object sourceId = stateIdMap.get(sourceState);
-				
+
 				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
 				while (outgoingArcsIt.hasNext())
 				{
@@ -237,9 +240,9 @@ public class AutomataToXml
 					pw.print("\" dest=\"" + destId);
 					pw.println("\" event=\"" + eventID + "\"/>");
 					//--
-					// pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-					// pw.print("\" dest=\"" + normalize(destState.getId()));
-					// pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+					// pw.print("\t\t<Transition source=\"" + EncodingHelper.normalize(sourceState.getId()));
+					// pw.print("\" dest=\"" + EncodingHelper.normalize(destState.getId()));
+					// pw.println("\" event=\"" + EncodingHelper.normalize(arc.getEventId()) + "\"/>");
 					//--
 				}
 			}
@@ -263,69 +266,6 @@ public class AutomataToXml
 		throws IOException
 	{
 		serialize(theFile.getAbsolutePath());
-	}
-
-
-	private String normalize(String s)
-	{
-		StringBuffer str = new StringBuffer();
-		int len = (s != null)
-				  ? s.length()
-				  : 0;
-
-		for (int i = 0; i < len; i++)
-		{
-			char ch = s.charAt(i);
-
-			switch (ch)
-			{
-
-			case '<' :
-			{
-				str.append("&lt;");
-
-				break;
-			}
-			case '>' :
-			{
-				str.append("&gt;");
-
-				break;
-			}
-			case '&' :
-			{
-				str.append("&amp;");
-
-				break;
-			}
-			case '"' :
-			{
-				str.append("&quot;");
-
-				break;
-			}
-			case '\r' :
-			case '\n' :
-			{
-				if (canonical)
-				{
-					str.append("&#");
-					str.append(Integer.toString(ch));
-					str.append(';');
-
-					break;
-				}
-
-				// else, default append char
-			}
-			default :
-			{
-				str.append(ch);
-			}
-			}
-		}
-
-		return str.toString();
 	}
 
 	void printIntArray(PrintWriter pw, int[] theArray)

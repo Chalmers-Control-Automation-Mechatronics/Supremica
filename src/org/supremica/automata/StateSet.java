@@ -29,7 +29,6 @@ class StateComparator
 }
 
 public class StateSet
-//	extends AbstractSet
 {
 	private TreeSet theSet = null;
 
@@ -122,10 +121,8 @@ public class StateSet
 	{
 		if(this == s2)	// avoid testing for self comparison
 		{
-			// System.out.println("Self comparison " + toString());
 			return true;
 		}
-		// System.out.println(toString() + " equals " + s2.toString() + " == " + (theSet.equals(s2.theSet) ? "true" : "false"));
 		return theSet.equals(s2.theSet);
 	}
 

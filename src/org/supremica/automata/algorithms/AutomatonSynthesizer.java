@@ -50,13 +50,13 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.log.*;
-import org.supremica.gui.*;
 import java.util.*;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
+import org.supremica.automata.StateIterator;
 import org.supremica.automata.LabeledEvent;
 
 /**
@@ -71,13 +71,12 @@ public class AutomatonSynthesizer
 
 	private Automaton theAutomaton;
 	private LinkedList acceptingStates = new LinkedList();
-	private Gui workbench;
 	private SynthesizerOptions synthesizerOptions;
 	private boolean rememberDisabledEvents = false;
 	private Alphabet disabledEvents;
 	private final static boolean debugMode = false;
 
-	public AutomatonSynthesizer(Gui workbench, Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
+	public AutomatonSynthesizer(Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
 		throws Exception
 	{
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.Unknown)
@@ -85,7 +84,6 @@ public class AutomatonSynthesizer
 			throw new Exception("Invalid synthesis type: " + SynthesisType.Unknown.toString());
 		}
 
-		this.workbench = workbench;
 		this.theAutomaton = theAutomaton;
 		this.synthesizerOptions = synthesizerOptions;
 	}
@@ -245,19 +243,6 @@ public class AutomatonSynthesizer
 
 		// Do fixed point iteration
 		doControllable(stateList);
-
-		/*
-		 *  do
-		 *  {
-		 *  stateList = doCoreachable();
-		 *  newUnsafeStates = stateList.size() > 0;
-		 *  if (newUnsafeStates)
-		 *  {
-		 *  newUnsafeStates = doControllable(stateList);
-		 *  }
-		 *  } while (newUnsafeStates);
-		 *
-		 */
 		doReachable();
 
 		// Set MIN_COST to all safe states
@@ -536,11 +521,11 @@ public class AutomatonSynthesizer
 	private void purge()
 	{
 		LinkedList stateList = new LinkedList();
-		Iterator stateIt = theAutomaton.stateIterator();
 
-		while (stateIt.hasNext())
+
+		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.nextState();
 
 			if (currState.getCost() == State.MAX_COST)
 			{
@@ -549,11 +534,9 @@ public class AutomatonSynthesizer
 
 		}
 
-		stateIt = stateList.iterator();
-
-		while (stateIt.hasNext())
+		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.nextState();
 
 			theAutomaton.removeState(currState);
 		}

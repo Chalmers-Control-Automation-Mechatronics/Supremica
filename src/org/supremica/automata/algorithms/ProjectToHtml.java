@@ -108,13 +108,13 @@ public class ProjectToHtml
 	{
 		PrintWriter pw = getPrintWriter("index.html");
 		printHtmlBegin(pw, "Supremica Project: " + project.getName());
-		pw.println("<h1>Project: " + normalize(project.getName()) + "</h1>");
+		pw.println("<h1>Project: " + EncodingHelper.normalize(project.getName()) + "</h1>");
 		pw.println("<h2>Plants:</h2>");
 		pw.println("<ul>");
 		for (Iterator projectIt = project.plantIterator(); projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 
 		}
 		pw.println("</ul>");
@@ -124,7 +124,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 
 		}
 		pw.println("</ul>");
@@ -134,7 +134,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 
 		}
 		pw.println("</ul>");
@@ -144,7 +144,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 
 		}
 		pw.println("</ul>");
@@ -156,14 +156,14 @@ public class ProjectToHtml
 	{
 		PrintWriter pw = getPrintWriter("automaton" + theAutomaton.getSynchIndex() + ".html");
 		printHtmlBegin(pw, "Supremica Automaton: " + theAutomaton.getName());
-		pw.println("<h1>Automaton: " + normalize(theAutomaton.getName()) + "</h1>");
+		pw.println("<h1>Automaton: " + EncodingHelper.normalize(theAutomaton.getName()) + "</h1>");
 		pw.println("<h2>Type: " + theAutomaton.getType() + "</h2>");
 		pw.println("<h2>Alphabet:</h2>");
 		pw.println("<ul>");
 		for (Iterator eventIt = theAutomaton.eventIterator(); eventIt.hasNext(); )
 		{
 			LabeledEvent event = (LabeledEvent) eventIt.next();
-			pw.println("<li> <a href=\"event" + event.getSynchIndex() + ".html\">" + normalize(event.getLabel()) + "</a></li>");
+			pw.println("<li> <a href=\"event" + event.getSynchIndex() + ".html\">" + EncodingHelper.normalize(event.getLabel()) + "</a></li>");
 		}
 		pw.println("</ul>");
 		boolean pngCreated = createPngFile(theAutomaton);
@@ -182,7 +182,7 @@ public class ProjectToHtml
 		PrintWriter pw = getPrintWriter("event" + theEvent.getSynchIndex() + ".html");
 		printHtmlBegin(pw, "Supremica Event: " + theEvent.getLabel());
 
-		pw.println("<h1>Event: " + normalize(theEvent.getLabel()) + "</h1>");
+		pw.println("<h1>Event: " + EncodingHelper.normalize(theEvent.getLabel()) + "</h1>");
 		pw.println("<ul>");
 		pw.println("<li>" + "Controllable: " + theEvent.isControllable() + "</li>");
 		pw.println("<li>" + "Immediate: " + theEvent.isImmediate() + "</li>");
@@ -198,7 +198,7 @@ public class ProjectToHtml
 		pw.println("<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML//EN\">");
 		pw.println("<html>");
 		pw.println("<head>");
-		pw.println("<title>" + normalize(title) + "</title>");
+		pw.println("<title>" + EncodingHelper.normalize(title) + "</title>");
 		pw.println("</head>");
 		pw.println("<body bgcolor=\"#FFFFFF\">");
 	}
@@ -298,295 +298,4 @@ public class ProjectToHtml
 		return new PrintWriter(new FileWriter(getFile(name)));
 	}
 
-/*
-	public void serialize(PrintWriter pw)
-	{
-		pw.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-		pw.print("<SupremicaProject");
-
-		if (project.getName() != null)
-		{
-			pw.print(" name=\"" + normalize(project.getName()) + "\" ");
-		}
-
-		if (SupremicaProperties.generalUseSecurity())
-		{
-			pw.print(" owner=\"" + project.getOwner() + "\"");
-			pw.print(" hash=\"" + project.getHash() + "\"");
-		}
-
-		pw.println(">");
-
-		for (Iterator projectIt = project.iterator(); projectIt.hasNext(); )
-		{
-			Automaton aut = (Automaton) projectIt.next();
-
-			pw.println("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\">");
-
-			// Print all events
-			pw.println("\t<Events>");
-
-			for (Iterator eventIt = aut.eventIterator(); eventIt.hasNext(); )
-			{
-				LabeledEvent event = (LabeledEvent) eventIt.next();
-
-				pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
-
-				if (!event.isControllable())
-				{
-					pw.print(" controllable=\"false\"");
-				}
-
-				if (!event.isPrioritized())
-				{
-					pw.print(" prioritized=\"false\"");
-				}
-
-				if (event.isImmediate())
-				{
-					pw.print(" immediate=\"true\"");
-				}
-
-				if (debugMode)
-				{
-					pw.print(" synchIndex=" + event.getSynchIndex());
-				}
-
-				pw.println("/>");
-			}
-
-			pw.println("\t</Events>");
-
-			// Print all states
-			pw.println("\t<States>");
-
-			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
-			{
-				State state = (State) stateIt.next();
-
-				pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
-
-				if (!state.getId().equals(state.getName()))
-				{
-					pw.print(" name=\"" + normalize(state.getName()) + "\"");
-				}
-
-				if (state.isInitial())
-				{
-					pw.print(" initial=\"true\"");
-				}
-
-				if (state.isAccepting())
-				{
-					pw.print(" accepting=\"true\"");
-				}
-
-				if (state.isForbidden())
-				{
-					pw.print(" forbidden=\"true\"");
-				}
-
-				if (includeCost)
-				{
-					int value = state.getCost();
-
-					if (value != State.UNDEF_COST)
-					{
-						pw.print(" cost=\"" + value + "\"");
-					}
-				}
-
-				if (debugMode)
-				{
-					pw.print(" synchIndex=" + state.getIndex());
-				}
-
-				pw.println("/>");
-			}
-
-			pw.println("\t</States>");
-
-			// Print all transitions
-			pw.println("\t<Transitions>");
-
-			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
-			{
-				State sourceState = (State) stateIt.next();
-
-				for (Iterator outgoingArcsIt = sourceState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
-				{
-					Arc arc = (Arc) outgoingArcsIt.next();
-					State destState = arc.getToState();
-
-					pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-					pw.print("\" dest=\"" + normalize(destState.getId()));
-					pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
-				}
-			}
-
-			pw.println("\t</Transitions>");
-
-			// Print layout
-			if (includeLayout && aut.hasLayout())
-			{
-				pw.println("\t<Layout>");
-
-				// Print State Layout
-				pw.println("\t\t<StatesLayout>");
-
-				for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
-				{
-					State state = (State) stateIt.next();
-
-					pw.print("\t\t\t<StateLayout id=\"" + normalize(state.getId()) + "\"");
-					pw.print(" x=\"" + state.getX() + "\"");
-					pw.print(" y=\"" + state.getY() + "\"");
-					pw.println("/>");
-				}
-
-				pw.println("\t\t</StatesLayout>");
-
-				// Print Transition Layout
-				pw.println("\t\t<TransitionsLayout>");
-
-				for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
-				{
-					State sourceState = (State) stateIt.next();
-
-					pw.println("\t\t</TransitionsLayout>");
-				}
-
-				pw.println("\t</Layout>");
-			}
-
-			pw.println("</Automaton>");
-		}
-
-		if (includeExecution)
-		{
-			pw.println("<Execution>");
-			pw.println("\t<Actions>");
-
-			Actions theActions = project.getActions();
-
-			if (theActions != null)
-			{
-				for (Iterator actionIt = theActions.iterator(); actionIt.hasNext(); )
-				{
-					Action currAction = (Action) actionIt.next();
-
-					pw.println("\t\t<Action label=\"" + normalize(currAction.getLabel()) + "\">");
-
-					for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
-					{
-						String currCommand = (String) cmdIt.next();
-
-						pw.println("\t\t\t<Command command=\"" + normalize(currCommand) + "\"/>");
-					}
-
-					pw.println("\t\t</Action>");
-				}
-			}
-
-			pw.println("\t</Actions>");
-			pw.println("\t<Controls>");
-
-			Controls theControls = project.getControls();
-
-			if (theControls != null)
-			{
-				for (Iterator controlIt = theControls.iterator(); controlIt.hasNext(); )
-				{
-					Control currControl = (Control) controlIt.next();
-
-					pw.println("\t\t<Control label=\"" + normalize(currControl.getLabel()) + "\">");
-
-					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext(); )
-					{
-						String currCondition = (String) condIt.next();
-
-						pw.println("\t\t\t<Condition condition=\"" + normalize(currCondition) + "\"/>");
-					}
-					pw.println("\t\t</Control>");
-				}
-			}
-
-			pw.println("\t</Controls>");
-
-			if (project.hasAnimation())
-			{
-				pw.println("\t<Animation path=\"" + normalize(project.getAnimationURL().toString()) + "\"/>");
-			}
-
-			pw.println("</Execution>");
-		}
-
-		pw.println("</SupremicaProject>");
-		pw.flush();
-	}
-
-	public void serialize(File theFile)
-		throws IOException
-	{
-		serialize(theFile.getAbsolutePath());
-	}
-
-	public void serialize(String fileName)
-		throws IOException
-	{
-		serialize(new PrintWriter(new FileWriter(fileName)));
-	}
-*/
-	private String normalize(String s)
-	{
-		StringBuffer str = new StringBuffer();
-		int len = (s != null)
-				  ? s.length()
-				  : 0;
-
-		for (int i = 0; i < len; i++)
-		{
-			char ch = s.charAt(i);
-
-			switch (ch)
-			{
-
-			case '<' :
-			{
-				str.append("&lt;");
-
-				break;
-			}
-			case '>' :
-			{
-				str.append("&gt;");
-
-				break;
-			}
-			case '&' :
-			{
-				str.append("&amp;");
-
-				break;
-			}
-			case '"' :
-			{
-				str.append("&quot;");
-
-				break;
-			}
-			case '\r' :
-			case '\n' :
-			{
-				// default append char
-			}
-			default :
-			{
-				str.append(ch);
-			}
-			}
-		}
-
-		return str.toString();
-	}
 }
