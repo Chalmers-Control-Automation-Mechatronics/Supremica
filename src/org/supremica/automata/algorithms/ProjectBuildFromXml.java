@@ -607,14 +607,6 @@ public class ProjectBuildFromXml
 	public final void doExecution(Attributes attributes)
 		throws SAXException
 	{
-		if (currProject == null)
-		{
-			currActions = null;
-			currControls = null;
-			return;
-		}
-		currActions = currProject.getActions();
-		currControls = currProject.getControls();
 	}
 
 	public final void doActions(Attributes attributes)
@@ -656,8 +648,7 @@ public class ProjectBuildFromXml
 	{
 		if (currProject == null)
 		{
-			currControls = null;
-			return;
+			throwException("Project section is missing");
 		}
 		currControls = currProject.getControls();
 	}

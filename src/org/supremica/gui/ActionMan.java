@@ -367,7 +367,8 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				gui.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName());
+				ex.printStackTrace();
+				gui.error("Exception in AutomatonComplement. Automaton: " + currAutomaton.getName() + " Message: " + ex);
 			}
 		}
 	}

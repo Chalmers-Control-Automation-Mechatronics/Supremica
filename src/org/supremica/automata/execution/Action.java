@@ -109,6 +109,6 @@ public class Action
 
 	public int hashCode()
 	{
-		return label.hashCode() + commands.hashCode();
+		return label.hashCode();
 	}
 }

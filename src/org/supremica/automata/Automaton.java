@@ -259,7 +259,7 @@ public class Automaton
 	 * Add it to the state set
 	 * Passing null or empty prefix sets prefix to 'q'
 	 */
-	public State createUniqueState(String prefix)
+	public State createAndAddUniqueState(String prefix)
 	{
 		StringBuffer name = null;
 		if(prefix == null || prefix.equals(""))

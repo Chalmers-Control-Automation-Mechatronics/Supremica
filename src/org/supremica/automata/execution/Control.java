@@ -99,6 +99,6 @@ public class Control
 
 	public int hashCode()
 	{
-		return label.hashCode() + condition.hashCode();
+		return label.hashCode();
 	}
 }

@@ -68,9 +68,9 @@ public class AutomatonComplement
 	public Automaton execute()
 	{
 		Alphabet alphabet = theAutomaton.getAlphabet();
-		State newState = theAutomaton.createUniqueState("dump"); // was null, see below;
+		State newState = null;
 		boolean complemented = false;
-		Iterator stateIterator = theAutomaton.stateIterator();
+		Iterator stateIterator = theAutomaton.safeStateIterator();
 
 		while (stateIterator.hasNext())
 		{
@@ -108,6 +108,10 @@ public class AutomatonComplement
 				if (!found)
 				{
 					complemented = true;
+					if (newState == null)
+					{
+						newState = theAutomaton.createAndAddUniqueState("dump");
+					}
 					theAutomaton.addArc(new Arc(currState, newState, currEvent.getId()));
 				}
 			}

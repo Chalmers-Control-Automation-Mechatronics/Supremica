@@ -65,13 +65,15 @@ public class Project
 	private Actions theActions = null;
 	private Controls theControls = null;
 
-	public Project() {}
-
-	public Project(String name)
+	public Project()
 	{
 		theActions = new Actions();
 		theControls = new Controls();
+	}
 
+	public Project(String name)
+	{
+		this();
 		setName(name);
 	}
 

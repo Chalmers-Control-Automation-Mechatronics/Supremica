@@ -78,7 +78,7 @@ public class Actions
 
 	public void addAction(Action theAction)
 	{
-		theActions.add(theActions);
+		theActions.add(theAction);
 		labelToActionMap.put(theAction.getLabel(), theAction);
 	}
 
