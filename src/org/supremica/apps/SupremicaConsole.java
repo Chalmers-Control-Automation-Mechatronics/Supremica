@@ -4,13 +4,13 @@
 package org.supremica.apps;
 
 import org.supremica.gui.Gui;
-import org.supremica.tty.*;
+import org.supremica.console.*;
 
-public class Console
+public class SupremicaConsole
 {
 	private static ConsoleUI gui = null;
 
-	private Console() {}
+	private SupremicaConsole() {}
 
 	private static void doSplash()
 	{
