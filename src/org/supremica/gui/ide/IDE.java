@@ -91,9 +91,6 @@ public class IDE
 
 		logPanel = new LogPanel(this, "Logger");
 
-//		splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, theLogDisplay.getComponent());
-//		theLogDisplay.getComponent().updateUI();
-
 		splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
 		splitPanelVertical.setContinuousLayout(false);
 		splitPanelVertical.setOneTouchExpandable(false);
