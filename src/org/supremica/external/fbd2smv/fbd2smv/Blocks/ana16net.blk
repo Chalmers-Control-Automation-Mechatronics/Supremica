@@ -1,0 +1,14 @@
+module ana16net(In1, Out1, compute)
+{
+	input compute: boolean;
+	input In1: -32..32;
+	output Out1: -32..32;
+
+	init(Out1) := 0;
+	next(Out1) := 
+		case {
+			compute : In1;
+			1    : Out1;
+		};
+
+}

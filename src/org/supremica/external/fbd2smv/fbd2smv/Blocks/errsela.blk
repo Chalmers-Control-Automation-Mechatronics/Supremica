@@ -1,0 +1,14 @@
+module errsela(In1, AltIn, ErrSe, compute)
+{
+	input In1, AltIn : -32..32;
+	input compute: boolean;
+	output ErrSe: -32..32;
+
+	init(ErrSe) := 0;
+	next(ErrSe) := 
+		case {
+			compute : In1;
+			1    : ErrSe;
+		};
+
+}

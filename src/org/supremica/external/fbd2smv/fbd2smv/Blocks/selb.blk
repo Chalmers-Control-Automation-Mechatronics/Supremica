@@ -1,0 +1,13 @@
+module selb(sel_i, In1, In2, Out1, compute)
+{
+	input sel_i, In1, In2, compute: boolean;
+	output Out1: boolean;
+
+	init(Out1) := 0;
+	next(Out1) := 
+		case {
+			compute : sel_i ? In1 : In2;
+			1    : Out1;
+		};
+
+}

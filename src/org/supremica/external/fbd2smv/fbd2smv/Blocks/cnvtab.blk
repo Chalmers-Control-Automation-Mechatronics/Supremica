@@ -1,0 +1,14 @@
+module cnvtab(In1, Tab, Out1, compute)
+{
+	input In1, Tab : -32..32;
+	input compute: boolean;
+	output Out1: -32..32;
+
+	init(Out1) := 0;
+	next(Out1) := 
+		case {
+			compute : In1;
+			1    : ErrSe;
+		};
+
+}

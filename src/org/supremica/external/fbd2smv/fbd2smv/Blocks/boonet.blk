@@ -1,0 +1,13 @@
+module boonet(In1, Out1, compute)
+{
+	input In1, compute: boolean;
+	output Out1: boolean;
+
+	init(Out1) := 0;
+	next(Out1) := 
+		case {
+			compute : In1;
+			1    : Out1;
+		};
+
+}

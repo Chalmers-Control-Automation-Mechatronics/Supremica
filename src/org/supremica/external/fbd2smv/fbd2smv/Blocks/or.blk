@@ -1,0 +1,13 @@
+module or(x, y, z, compute)
+{
+	input x, y, compute: boolean;
+	output z: boolean;
+
+	init(z) := 0;
+	next(z) := 
+		case {
+			compute : x | y;
+			1    : z;
+		};
+
+}

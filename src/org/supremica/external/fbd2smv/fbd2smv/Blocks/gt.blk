@@ -1,0 +1,15 @@
+-- gt: Greater Than (>)
+module gt(In1, In2, Q, compute)
+{
+	input In1, In2: {-32..32}; 
+	input compute: boolean;
+	output Q: boolean;
+
+	init(Q) := 0;
+	next(Q) := 
+		case {
+			compute : In1 > In2;
+			1    : Q;
+		};
+
+}

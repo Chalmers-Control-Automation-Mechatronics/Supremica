@@ -1,0 +1,14 @@
+module add(In1, In2, Out1, compute)
+{
+	input compute: boolean;	
+	input In1, In2: -32..32;
+	output Out1: -32..32;
+
+	init(Out1) := 0;
+	next(Out1) := 
+		case {
+			compute : In1 + In2;
+			1    : Out1;
+		};
+
+}

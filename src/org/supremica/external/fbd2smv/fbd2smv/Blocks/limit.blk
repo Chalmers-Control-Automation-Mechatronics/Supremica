@@ -1,0 +1,16 @@
+module limit(Min, In1, Max, Out1, compute)
+{
+	input compute: boolean;	
+	input Min, In1, Max: -32..32;
+	output Out1: -32..32;
+
+	init(Out1) := 0;
+	next(Out1) := 
+		case {
+			compute & In1 < Min: Min;
+			compute & In1 > Max: Max;
+			compute: In1;
+			1    : Out1;
+		};
+
+}

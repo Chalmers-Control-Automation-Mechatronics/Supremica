@@ -1,0 +1,13 @@
+module errselb(In1, AltIn, ErrSe, compute)
+{
+	input In1, AltIn, compute: boolean;
+	output ErrSe: boolean;
+
+	init(ErrSe) := 0;
+	next(ErrSe) := 
+		case {
+			compute : In1;
+			1    : ErrSe;
+		};
+
+}
