@@ -681,14 +681,12 @@ public class MainMenuBar
 		JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
 
 		menuToolsCodeGenerationBC.setText("Java Bytecode...");
-		menuToolsCodeGenerationBC.setEnabled(false);
 		menuToolsCodeGeneration.add(menuToolsCodeGenerationBC);
 		menuToolsCodeGenerationBC.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
-				//ActionMan.AutomataToJavaBytecode(ActionMan.getGui());
+				ActionMan.AutomataToJavaBytecode(ActionMan.getGui());
 			}
 		});
 

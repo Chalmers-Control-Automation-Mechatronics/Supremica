@@ -3,7 +3,6 @@ package org.supremica.softplc.CompILer.CodeGen;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import de.fub.bytecode.generic.*;
-import java.io.File;
 
 public interface Builder
 {
@@ -16,8 +15,6 @@ public interface Builder
 	void emitLoad(Object arg);
 
 	void dumpCode();
-
-    //public File getTempFile();
 
 	void emitVarField(String varName, Object type, boolean global, boolean inputOutputVar);
 

@@ -2549,6 +2549,54 @@ public class ActionMan
 			}
 		}
 	}
+
+	// Generate Java Bytecode
+	public static void AutomataToJavaBytecode(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getBytecodeFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String prefixName = null;
+
+					try
+					{
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
+
+						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
+
+						exporter.serializeInstructionList(theWriter);
+
+						theWriter.close();
+
+					}
+					catch (Exception ex)
+					{
+						logger.error("Exception while generating Java Bytecode to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getStackTrace());
+						return;
+					}
+					logger.info("Java Bytecode file successfully generated at " + currFile.getAbsolutePath());
+				}
+			}
+		}
+	}
 }
+
 
 // ActionMan
