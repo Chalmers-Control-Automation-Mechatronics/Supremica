@@ -1621,6 +1621,7 @@ public class ActionMan
 			statusStr.append("\n\tis deterministic: " + currAutomaton.isDeterministic());
 			statusStr.append("\n\tNumber of states: " + currAutomaton.nbrOfStates());
 			statusStr.append("\n\tNumber of events: " + currAutomaton.nbrOfEvents());
+			statusStr.append("\n\tNumber of transitions: " + currAutomaton.nbrOfTransitions());
 			statusStr.append("\n\tNumber of accepting states: " + currAutomaton.nbrOfAcceptingStates());
 			statusStr.append("\n\tNumber of forbidden states: " + currAutomaton.nbrOfForbiddenStates());
 

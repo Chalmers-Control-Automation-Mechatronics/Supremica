@@ -70,6 +70,7 @@ public class TestPackageAlgorithms
 	{
 		TestSuite suite = new TestSuite();
 		suite.addTest(TestProjectBuildFromXml.suite());
+		suite.addTest(TestAutomataSynchronizer.suite());
 		suite.addTest(TestAutomataVerifier.suite());
 		suite.addTest(TestAutomataToXml.suite());
 		suite.addTest(TestProjectToSP.suite());
