@@ -38,6 +38,9 @@ public class SmoothSupervisor extends DisjSupervisor {
 	int cube    = manager.getStateCube();	
 	int i_all = manager.and(plant.getI(), spec.getI());
 
+	/*
+	  // for some ODD reason, this makes things go SLOWER
+	  // and the rachability requires MORE stpes ???
 	if(Options.local_saturation) {
 	    // compute saturated I
 	    int i_first = i_all;
@@ -54,8 +57,8 @@ public class SmoothSupervisor extends DisjSupervisor {
 	    }
 	    manager.deref(i_first);
 	} // End of computing saturated I
+	*/
 	
-
 	int r_all_p, r_all = i_all;
 	manager.ref(i_all); //gets derefed by orTo and finally a deref
 

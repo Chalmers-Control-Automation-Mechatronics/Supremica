@@ -10,8 +10,9 @@ public class GrowFrame
 	private IntArray vars;
 	private GrowCanvas canvas;
 	private long start_time, end_time;
-	private Button bQuit;
+	private Button bQuit, bDump, bReturn;
 	private Label status;
+	private TextArea ta;
 
 	public GrowFrame(String txt)
 	{
@@ -24,11 +25,25 @@ public class GrowFrame
 		add(pNorth, BorderLayout.NORTH);
 		pNorth.add(bQuit = new Button("Close"));
 		bQuit.addActionListener(this);
+
+		pNorth.add(bDump = new Button("Values"));
+		bDump.addActionListener(this);
+
+		pNorth.add(bReturn = new Button("Graph"));
+		bReturn.addActionListener(this);
+		bReturn.setVisible(false);
+
+
+
 		add(status = new Label(), BorderLayout.SOUTH);
+
 
 		canvas = new GrowCanvas();
 
 		add(canvas, BorderLayout.CENTER);
+
+		add( ta = new TextArea(20,80), BorderLayout.WEST);
+		ta.setVisible(false);
 
 		start_time = -1;
 
@@ -61,6 +76,44 @@ public class GrowFrame
 		canvas.repaint();
 	}
 
+	private void onDump()
+	{
+
+		int size_x = vars.getSize();
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("x=[0:" + size_x + "];\n");
+		sb.append("\n");
+		sb.append("y=[");
+
+		for (int i = 0; i < size_x; i++)
+		{
+			if(i != 0) sb.append("; ");
+			if( (i % 20) == 0) sb.append("\n");
+			sb.append(vars.get(i));
+		}
+		sb.append("];\n");
+
+		ta.setText( sb.toString());
+
+		canvas.setVisible(false);
+		ta.setVisible(true);
+
+		bDump.setVisible(false);
+		bReturn.setVisible(true);
+		pack();
+	}
+
+	private void onReturn()
+	{
+		ta.setVisible(false);
+		canvas.setVisible(true);
+		bReturn.setVisible(false);
+		bDump.setVisible(true);
+		bReturn.setVisible(false);
+		pack();
+	}
+
 	public void actionPerformed(ActionEvent e)
 	{
 		Object src = e.getSource();
@@ -69,7 +122,16 @@ public class GrowFrame
 		{
 			dispose();
 		}
+		else if (src == bDump)
+		{
+			onDump();
+		}
+		else if (src == bReturn)
+		{
+			onReturn();
+		}
 	}
+
 
 	private class GrowCanvas
 		extends Canvas
