@@ -723,6 +723,30 @@ public class MainMenuBar
 			menuToolsShoeFactory.add(menuBuildAnimator);
 		}
 
+
+		// Tools.JGrafchart
+		if (SupremicaProperties.includeJGrafchart())
+		{
+			menuTools.add(new JSeparator());
+
+			JMenu menuToolsJGrafchart = new JMenu();
+
+			menuToolsJGrafchart.setText("JGrafchart...");
+			menuTools.add(menuToolsJGrafchart);
+
+			JMenuItem menuOpenEditor= new JMenuItem("Open Editor");
+
+			menuOpenEditor.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.openJGrafchartEditor(ActionMan.getGui());
+				}
+			});
+
+			menuToolsJGrafchart.add(menuOpenEditor);
+		}
+
 		menuTools.add(new JSeparator());
 
 		JMenuItem menuToolsCellEditor = new JMenuItem();

@@ -23,6 +23,8 @@
 <property name="xmlrpc_basepackage" value="helma"/>
 <property name="xmlrpc_basedir" value="helma"/>
 
+<property name="resources" value="resources"/>
+
 <property name="supremica_basepackage" value="org.supremica"/>
 <property name="supremica_basedir" value="org/supremica"/>
 
@@ -81,6 +83,11 @@
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${lib}/${unjared}" />
 	</delete>
+
+	<mkdir dir="${resources}"/>
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${resources}" />
+	</delete>
  
 	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
@@ -114,6 +121,8 @@
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
 	
 	<unjar src="${lib}/interfaceRobotStudio2_1.jar" dest="${lib}/${unjared}"/>	
+
+	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
 
 	<mkdir dir="${lib}/licensed"/>
 	<touch file="${lib}/licensed/JGo.jar"/>	
@@ -427,6 +436,8 @@
 </target>
 
 <target name="startfiles_local_supremica">
+	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	
@@ -512,7 +523,7 @@
 		overview="${templates}/Overview.html"
 		doctitle="Supremica"
 		
-		bottom="Copyright &#169; 2001 Supremica and Knut Akesson. All Rights Reserved.">
+		bottom="Copyright &#169; 2001, 2002, 2003 Supremica and Knut Akesson. All Rights Reserved.">
 	</javadoc>
 </target>
 

@@ -151,6 +151,9 @@ public final class SupremicaProperties
 	// ShoeFactory Options
 	private static final String INCLUDE_SHOE_FACTORY = "includeShoeFactory";
 
+	// JGrafchart Options
+	private static final String INCLUDE_JGRAFCHART = "includeJGrafchart";
+
 	// SoftPLC Options
 	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
 	private static Vector softplcInterfaces = new Vector();
@@ -206,6 +209,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, "true", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
+		setProperty(INCLUDE_JGRAFCHART, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
 		setProperty(SUPERUSER_IDENTITY, "ESS030", false);
@@ -229,7 +233,6 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_OPTIMIZE, "false", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
-		//setProperty(ANIMATOR_IN_USE, "false", true);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
 		setProperty(SHOW_GENETIC_ALGORITHMS, "true", false);
@@ -574,6 +577,11 @@ public final class SupremicaProperties
 	public static boolean includeShoeFactory()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_SHOE_FACTORY));
+	}
+
+	public static boolean includeJGrafchart()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_JGRAFCHART));
 	}
 
 	public static boolean includeBoundedUnconTools()

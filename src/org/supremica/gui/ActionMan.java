@@ -85,6 +85,7 @@ import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 
+import grafchart.sfc.*;
 
 
 // -- MF -- Abstract class to save on duplicate code
@@ -2814,6 +2815,45 @@ public class ActionMan
 			}
 		}
 	}
+
+
+	//shoeFactory - animate
+	public static void openJGrafchartEditor(Gui gui)
+	{
+		String[] args = new String[1];
+		EditorAPI e = new EditorAPI(args);
+		Editor.singleton = e;
+		e.removePaletteAction();
+		// Create Top-level Workspace
+		GCDocument top = e.newWorkspace();
+		top.setWorkspaceName("Nisse");
+		top.setFrameRectangle(new Rectangle(300,500,400,400));
+		// Create WorkspaceObject
+		WorkspaceObject wo = top.createWorkspaceObject(300,50,"Vars");
+		GCDocument vars = wo.getSubWorkspace();
+		// Create variables inside workspace object
+		IntegerVariable iv = vars.createIntegerVariable(50,50,"Int1","99");
+		BooleanVariable bv = vars.createBooleanVariable(50,120,"Bool1","1");
+		StringVariable sv = vars.createStringVariable(50,190,"String1","Hello");
+		// Create Grafcet
+		GCStepInitial initialStep = top.createInitialStep(100,50,"",";");
+		initialStep.setActionText("S println(\"Hej\");");
+		GCTransition tr1 = top.createTransition(100,130,"1");
+		GCStep s1 = top.createStep(100,180,"myStep","S Vars.Int1 = Vars.Int1 + 1;");
+		GCTransition tr2 = top.createTransition(100,260,"myStep.s > 4");
+		tr2.setConditionText("myStep.s > 5");
+		// Connect together
+		top.connect(initialStep,tr1);
+		top.connect(tr1,s1);
+		top.connect(s1,tr2);
+		top.connect(tr2,initialStep);
+		// Compile and run
+		boolean OK = e.compileWorkspace(top);
+		if (OK)
+		{
+			e.startWorkspace(top);
+		}
+    }
 
 	//shoeFactory - Config
 	public static void shoeFactoryConfigurator()
