@@ -123,6 +123,7 @@ public class GrowFrame
 	public int finalValue() { return last_value; }
 	public int iterations() { return vars.getSize(); }
 	public long totalTime() { return end_time - start_time; }
+	public IntArray data() { return vars; }
 
 
 	public void save(String filename) throws IOException {
