@@ -70,7 +70,6 @@ public class Alphabet
 	extends Events
 {
 	private static Category thisCategory = LogDisplay.createCategory(Alphabet.class.getName());
-
 	private HashMap idMap;
 	private int idIndex = 0;
 	private Listeners listeners = null;
@@ -101,10 +100,13 @@ public class Alphabet
 	public String getUniqueId(String prefix)
 	{
 		String newId = null;
+
 		do
 		{
 			newId = prefix + new Integer(idIndex++);
-		} while (containsEventWithId(newId));
+		}
+		while (containsEventWithId(newId));
+
 		return newId;
 	}
 
@@ -172,6 +174,7 @@ public class Alphabet
 		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
 		{
 			EventLabel currEvent = (EventLabel) alphIt.next();
+
 			if (containsEventWithLabel(currEvent.getLabel()))
 			{
 				try
@@ -179,7 +182,7 @@ public class Alphabet
 					removeEvent(currEvent.getLabel());
 				}
 				catch (Exception e)
-				{ // This should be impossible
+				{    // This should be impossible
 					thisCategory.error("Alphabet.minus. Trying to remove a non-existing event.");
 				}
 			}
@@ -196,22 +199,24 @@ public class Alphabet
 		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
 		{
 			EventLabel currEvent = (EventLabel) alphIt.next();
+
 			if (!containsEventWithLabel(currEvent.getLabel()))
 			{
 				EventLabel newEvent = new EventLabel(currEvent);
+
 				newEvent.setId(getUniqueId("e"));
+
 				try
 				{
 					addEvent(newEvent);
 				}
 				catch (Exception e)
-				{  // This should be impossible
+				{    // This should be impossible
 					thisCategory.error("Alphabet.plus. Trying to add an existing event.");
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * Remove event from alphabet.
@@ -234,10 +239,10 @@ public class Alphabet
 		throws Exception
 	{
 		EventLabel currEvent = getEventWithLabel(label);
+
 		idMap.remove(currEvent.getId());
 		super.removeEvent(label);
 	}
-
 
 	/**
 	 * Do not use this, use iterator instead.

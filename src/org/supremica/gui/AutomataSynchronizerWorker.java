@@ -91,7 +91,8 @@ public class AutomataSynchronizerWorker
 		// -- MF --              container = workbench.getAutomatonContainer();
 		this.newAutomatonName = newAutomatonName;
 		this.syncOptions = syncOptions;
-		this.start();	// Causes this thread to begin execution; the Jvm calls the run method of this thread.
+
+		this.start();    // Causes this thread to begin execution; the Jvm calls the run method of this thread.
 	}
 
 	public void run()

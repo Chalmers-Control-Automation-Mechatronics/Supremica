@@ -100,16 +100,17 @@ public class StateHolder
 		return equal;
 	}
 
-	/** MF ** trivial optimization
-	public boolean equals(Object other)
-	{
-																																																																	int[] otherState = ((StateHolder)other).getArray();
-																																																																	for (int i = 0; i < theState.length; i++)
-																																																																																																																																	if (theState[i] != otherState[i])
-																																																																																																																																																																																																	return false;
-																																																																	return true;
-	}
-	*/
+	/*
+	 * MF -- trivial optimization
+	 * public boolean equals(Object other)
+	 * {
+	 *       int[] otherState = ((StateHolder)other).getArray();
+	 *       for (int i = 0; i < theState.length; i++)
+	 *       if (theState[i] != otherState[i]
+	 *               return false;
+	 *       return true;
+	 * }
+	 */
 
 	// Stolen and modified version of the hashCodeIntArray method in IntArrayHashTable
 	public int hashCode()

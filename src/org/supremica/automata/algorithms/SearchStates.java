@@ -23,70 +23,81 @@ import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
 
 // 
-public class SearchStates extends Thread implements Stoppable
+public class SearchStates
+	extends Thread
+	implements Stoppable
 {
 	private AutomataSynchronizer syncher = null;
 	private IntArrayList list = null;
 	private Matcher matcher = null;
 	private ExecutionDialog exedlg = null;
 	private /* volatile */ boolean stopRequested = false;
-	
-	public void run() // throws Exception
+
+	public void run()    // throws Exception
 	{
 		syncher.getHelper().setExecutionDialog(exedlg);
 		exedlg.setMode(ExecutionDialogMode.synchronizing);
-		
+
 		try
-		{	
-			syncher.execute(); // Starts the synch thread and waits for it to stop
-		}
-		catch(Exception excp)
 		{
+			syncher.execute();    // Starts the synch thread and waits for it to stop
+		}
+		catch (Exception excp)
+		{
+
 			// How to work this (exception in a worker thread)??
 			return;
 		}
-		
-		if(!stopRequested)
+
+		if (!stopRequested)
 		{
 			exedlg.setMode(ExecutionDialogMode.matchingStates);
-			// Note the difference between the two getStateIterator. 
+
+			// Note the difference between the two getStateIterator.
 			// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
-			for(Iterator it = syncher.getHelper().getStateIterator(); it.hasNext() && !stopRequested; )
+			for (Iterator it = syncher.getHelper().getStateIterator(); it.hasNext() &&!stopRequested; )
 			{
-				int[] composite_state = (int[])it.next();
+				int[] composite_state = (int[]) it.next();
+
 				// and this is SearchStates::getStateIterator, returns SearchStates::StateIterator
-				if(matcher.matches(getStateIterator(composite_state)))
+				if (matcher.matches(getStateIterator(composite_state)))
 				{
 					list.add(composite_state);
 				}
 			}
-			if(stopRequested)
+
+			if (stopRequested)
 			{
-				list = new IntArrayList(); // thread stopped - clear the list
+				list = new IntArrayList();    // thread stopped - clear the list
 			}
 		}
+
 		exedlg.setMode(ExecutionDialogMode.hide);
 	}
 
 	public void requestStop()
 	{
 		stopRequested = true;
+
 		syncher.requestStop();
 	}
-	
+
 	public boolean wasStopped()
 	{
 		return stopRequested;
 	}
-	
-	public SearchStates(Automata automata, Matcher m) throws Exception
+
+	public SearchStates(Automata automata, Matcher m)
+		throws Exception
 	{
-		//!!Throws exception if automata is empty or has only one automaton!!
+
+		// !!Throws exception if automata is empty or has only one automaton!!
 		this.syncher = new AutomataSynchronizer(automata, new SynchronizationOptions());
 		this.matcher = m;
-		this.list = new IntArrayList(); // Must create the list, in case the thread is stopped
+		this.list = new IntArrayList();    // Must create the list, in case the thread is stopped
 	}
-	//-- MF -- Not ideal here but we have a circular ref otherwise
+
+	// -- MF -- Not ideal here but we have a circular ref otherwise
 	public void setExecutionDialog(ExecutionDialog exedlg)
 	{
 		this.exedlg = exedlg;

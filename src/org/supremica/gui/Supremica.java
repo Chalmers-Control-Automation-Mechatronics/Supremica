@@ -483,8 +483,7 @@ public class Supremica
 
 			menuFileExport.setText("Export");
 			menuFile.add(menuFileExport);
-		       
-			
+
 			// File.Export.Desco
 			JMenuItem menuFileExportDesco = new JMenuItem();
 
@@ -542,19 +541,21 @@ public class Supremica
 				}
 			});
 
-
 			// ++ ARASH:
 			// File.Export.RCP
 			JMenuItem menuFileExportRCP = new JMenuItem();
+
 			menuFileExportRCP.setText("To RCP...");
 			menuFileExport.add(menuFileExportRCP);
-			menuFileExportRCP.addActionListener( new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+			menuFileExportRCP.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
 					ActionMan.fileExportRCP(getGui());
 				}
 			});
-			// -- ARASH
 
+			// -- ARASH
 			separatorNeeded = true;
 		}
 

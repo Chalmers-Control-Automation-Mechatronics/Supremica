@@ -1,3 +1,4 @@
+
 // ** MF ************** FindStates.java *******************//
 // Implements the FindStates dialog with regexps
 package org.supremica.gui;
@@ -252,7 +253,7 @@ class FindStatesTable
 						setRowSelectionInterval(row, row);
 					}
 
-					//
+					// 
 					if (getStatesTableModel().isRegexpColumn(col))
 					{
 						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
@@ -277,34 +278,41 @@ class FindStatesTable
 	}
 }
 
+
 // ------------------------------------------
-/* abstract class FindStatesPanel
-	extends JPanel
-{
-	public String title;
-	public String tip;
 
-	FindStatesPanel(String title, String tip)
-	{
-		this.title = title;
-		this.tip = tip;
-	}
-
-	public abstract Matcher getMatcher();
-}*/
+/*
+ * abstract class FindStatesPanel
+ *       extends JPanel
+ * {
+ *       public String title;
+ *       public String tip;
+ *
+ *       FindStatesPanel(String title, String tip)
+ *       {
+ *               this.title = title;
+ *               this.tip = tip;
+ *       }
+ *
+ *       public abstract Matcher getMatcher();
+ * }
+ */
 interface FindStatesTab
 {
 	public String getTitle();
+
 	public String getTip();
+
 	public Matcher getMatcher();
 }
 
+
 class FreeFormPanel
-	extends JPanel /* FindStatesPanel */ implements FindStatesTab
+	extends JPanel    /* FindStatesPanel */
+	implements FindStatesTab
 {
 	private String title = "Free Form";
 	private String tip = "Search with a free form regexp";
-
 	private JTextField reg_exp;
 	private JTextField sep_str;
 	private boolean ok = false;
@@ -375,44 +383,54 @@ class FreeFormPanel
 		add(new RegexpMenuBar(), BorderLayout.NORTH);
 
 		JPanel p1 = new JPanel();
+
 		p1.add(new JLabel("Regexp:"));
 		p1.add(reg_exp = new JTextField(".*", 30));
 		p1.add(new JLabel("State Separator: "));
 		p1.add(sep_str = new JTextField(".", 20));
 		add("Center", p1);
-/*
-		JPanel p2 = new JPanel();
-		p2.add(new JLabel("State Separator: "));
-		p2.add(sep_str = new JTextField(".", 20));
-		add("South", p2);
-*/	}
+
+		/*
+		 *               JPanel p2 = new JPanel();
+		 *               p2.add(new JLabel("State Separator: "));
+		 *               p2.add(sep_str = new JTextField(".", 20));
+		 *               add("South", p2);
+		 */
+	}
 
 	public String getTitle()
 	{
 		return title;
 	}
+
 	public String getTip()
 	{
 		return tip;
 	}
+
 	public Matcher getMatcher()
 	{
 		try
 		{
 			Pattern pattern = CompilerFactory.getCompiler().compile(reg_exp.getText());
+
 			return new FreeformMatcher(new Perl5Matcher(), pattern, sep_str.getText());
 		}
-		catch(MalformedPatternException excp)
+		catch (MalformedPatternException excp)
 		{
+
 			// debug("FindStatesTable::Incorrect pattern \"" + reg_exp.getText() +"\"");
 			JOptionPane.showMessageDialog(null, "Incorrect pattern: " + reg_exp.getText(), "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
+
 			return null;
 		}
 	}
+
 	public void setVisible(boolean aFlag)
 	{
 		super.setVisible(aFlag);
-		if(aFlag)
+
+		if (aFlag)
 		{
 			reg_exp.requestFocus();
 			reg_exp.selectAll();
@@ -421,20 +439,22 @@ class FreeFormPanel
 }
 
 class FixedFormPanel
-	extends WhiteScrollPane implements FindStatesTab 
+	extends WhiteScrollPane
+	implements FindStatesTab
 {
 	private final String title = "Fixed Form";
 	private final String tip = "Search with state specific content";
-
 	FindStatesTable table = null;
 
 	FixedFormPanel(FindStatesTable t)
 	{
+
 		// this.table = table;
 		// JScrollPane scroll_pane = new WhitePane(table);
 		// scroll_pane.setPreferredSize(new Dimension(500, 300)); // does not help - still no scrolling
 		// add(scroll_pane, "Center");
 		super(t);
+
 		this.table = t;
 	}
 
@@ -442,10 +462,12 @@ class FixedFormPanel
 	{
 		return title;
 	}
+
 	public String getTip()
 	{
 		return tip;
 	}
+
 	public Matcher getMatcher()
 	{
 		return new FixedformMatcher(new Perl5Matcher(), table.getRegexpPatterns());
@@ -456,13 +478,12 @@ class FixedFormPanel
 class FindStatesFrame
 	extends JFrame
 {
-	private Gui gui;	 
+	private Gui gui;
 	private FindStatesTable table = null;
 	private Automata automata = null;
 	private JTabbedPane tabbedPane = null;
 	private JButton find_button = null;
 	private QuitButton quit_button = null;
-
 	private static Category thisCategory = LogDisplay.createCategory(FindStatesFrame.class.getName());
 
 	private static void debug(String s)
@@ -524,7 +545,6 @@ class FindStatesFrame
 		void action(ActionEvent e)
 		{
 			goAhead();
-
 		}
 	}
 
@@ -534,6 +554,7 @@ class FindStatesFrame
 		public QuitButton()
 		{
 			super("Quit");
+
 			setToolTipText("Enough of finding states");
 			addActionListener(new ActionListener()
 			{
@@ -554,40 +575,45 @@ class FindStatesFrame
 
 	private void goAhead()
 	{
+
 		// synchronize the automata but don't build the new automaton (throw away the edges)
 		// just save the states (efficiently) and mark those that match as matching
-		//** TODO ** Disable the Find button, enable the Break button, start a new thread for searching
-		//** TODO ** If the Quit or Break buttons are pressed, break the search thread
+		// ** TODO ** Disable the Find button, enable the Break button, start a new thread for searching
+		// ** TODO ** If the Quit or Break buttons are pressed, break the search thread
 		try
 		{
+
 			// Pattern[] patterns = getRegexpPatterns();
 			// ss.search(new Perl5Matcher(), patterns);
-			Matcher matcher = ((FindStatesTab)getSelectedComponent()).getMatcher();
-			if(matcher != null)
+			Matcher matcher = ((FindStatesTab) getSelectedComponent()).getMatcher();
+
+			if (matcher != null)
 			{
 				SearchStates ss = new SearchStates(getAutomata(), matcher);
-				///setCursor(WAIT_CURSOR);
+
+				// /setCursor(WAIT_CURSOR);
 				// find_button.setEnabled(false);
 				ExecutionDialog exedlg = new ExecutionDialog(this, "Finding States...", ss);
+
 				ss.setExecutionDialog(exedlg);
-				ss.run();	// Start the synchronization thread
+				ss.run();    // Start the synchronization thread
+
 				// ss.join(); // at the moment, simply wait for ss to finish
 				// find_button.setEnabled(true);
-				///setCursor(DEFAULT_CURSOR);
+				// /setCursor(DEFAULT_CURSOR);
 				showCompositeStates(ss);
 			}
-			// else do nothing
 
+			// else do nothing
 		}
-		catch(Exception excp)
+		catch (Exception excp)
 		{
+
 			// Let it silently die, how the f*** do get these excp specs to work?
 			debug("FindButton - " + excp);
 			excp.printStackTrace();
 		}
-
 	}
-
 
 	public FindStatesFrame(Gui gui)
 	{
@@ -595,7 +621,7 @@ class FindStatesFrame
 		// super(400, 300); // for CenteredFrame inheritance
 		Utility.setupFrame(this, 500, 300);
 		setTitle("Find States");
-		
+
 		this.gui = gui;
 		this.automata = gui.getSelectedAutomata();
 		this.table = new FindStatesTable(automata);
@@ -609,6 +635,7 @@ class FindStatesFrame
 		tabbedPane.addTab(freeformPanel.getTitle(), null, freeformPanel, freeformPanel.getTip());
 
 		JPanel buttonPanel = new JPanel();
+
 		buttonPanel.add(find_button = setDefaultButton(new FindButton()));
 		buttonPanel.add(quit_button = new QuitButton());
 

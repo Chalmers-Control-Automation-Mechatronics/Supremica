@@ -68,15 +68,16 @@ import org.supremica.gui.help.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
-//-- MF -- Abstract class to sav eon duplicate code
-//-- From this class is instantiated anonymous classes that implement the openFile properly
+// -- MF -- Abstract class to sav eon duplicate code
+// -- From this class is instantiated anonymous classes that implement the openFile properly
 abstract class FileImporter
 {
 	FileImporter(JFileChooser fileOpener, Gui gui)
 	{
-		if(fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
+		if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
 		{
 			File[] currFiles = fileOpener.getSelectedFiles();
+
 			if (currFiles != null)
 			{
 				for (int i = 0; i < currFiles.length; i++)
@@ -87,21 +88,19 @@ abstract class FileImporter
 					}
 				}
 			}
+
 			gui.getFrame().repaint();
 		}
 	}
-	
+
 	abstract void openFile(Gui gui, File file);
 }
-//--------------------
+
+// --------------------
 public class ActionMan
-{   
-    private static final int  // instead of using conststs later below :)
-	FORMAT_UNKNOWN = -1,
-	FORMAT_XML = 1,
-	FORMAT_DOT = 2,
-	FORMAT_DSX = 3,
-	FORMAT_RCP = 4;
+{
+	private static final int    // instead of using conststs later below :)
+		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4;
 
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
@@ -403,34 +402,30 @@ public class ActionMan
 	}
 
 	// ** Export - shouldn't there be an exporter object?
-	    // it is now (ARASH)
-	    public static void automataExport(Gui gui)
-    {
-	    
+	// it is now (ARASH)
+	public static void automataExport(Gui gui)
+	{
 
-	// this one comes back in the next function. we need to have duplicates otherwise we would
-	       // ask for the type and first then complain if nonthing is selected
+		// this one comes back in the next function. we need to have duplicates otherwise we would
+		// ask for the type and first then complain if nonthing is selected
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
-			}
-	    
-
+		}
 
 		String xmlString = "xml";
 		String dotString = "dot";
 		String dsxString = "dsx";
-		String rcpString = "rcp"; // ++ ARASH
-
-		Object[] possibleValues = { xmlString, dotString, dsxString, rcpString /* <-- ARASH */ };
-		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Input", 
-								   JOptionPane.INFORMATION_MESSAGE, null, 
-								   possibleValues, possibleValues[0]);
-
-
+		String rcpString = "rcp";                         // ++ ARASH
+		Object[] possibleValues =
+		{
+			xmlString, dotString, dsxString, rcpString    /* <-- ARASH */
+		};
+		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Input", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 
 		if (selectedValue == null)
 		{
@@ -451,7 +446,7 @@ public class ActionMan
 		{
 			exportMode = FORMAT_DSX;
 		}
-		else if(selectedValue == rcpString) 
+		else if (selectedValue == rcpString)
 		{
 			exportMode = FORMAT_RCP;
 		}
@@ -459,29 +454,30 @@ public class ActionMan
 		{
 			return;
 		}
+
 		automataExport(gui, exportMode);
 	}
-	
-    // Exporter when the type is already known
-	// Add new export functions here and to the function above
-       
-    public static void automataExport(Gui gui, int exportMode)
-    {
-	
 
-	Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-	    
-	    if (selectedAutomata.size() < 1)   {
-		JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-		return;
-	    }
-	    Iterator autIt = selectedAutomata.iterator();
-		
+	// Exporter when the type is already known
+	// Add new export functions here and to the function above
+	public static void automataExport(Gui gui, int exportMode)
+	{
+		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
-		    {
+		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			JFileChooser fileExporter = null;
-			
+
 			if (exportMode == FORMAT_XML)
 			{
 				fileExporter = FileDialogs.getXMLFileExporter();
@@ -494,21 +490,21 @@ public class ActionMan
 			{
 				fileExporter = FileDialogs.getDSXFileExporter();
 			}
+
 			// ++ ARASH
-			else if(exportMode == FORMAT_RCP) 
+			else if (exportMode == FORMAT_RCP)
 			{
-				 fileExporter = FileDialogs.getRCPFileExporter();
+				fileExporter = FileDialogs.getRCPFileExporter();
 			}
+
 			// -- ARASH
 			else
 			{
 				return;
 			}
 
-			
 			// ARASH: ain't it good to see what we're doin' ??
 			fileExporter.setDialogTitle("Save " + currAutomaton.getName() + " as ...");
-
 
 			if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 			{
@@ -542,19 +538,20 @@ public class ActionMan
 
 								exporter.serialize(currFile.getAbsolutePath());
 							}
+
 							// ++ ARASH
-							else if(exportMode == FORMAT_RCP) 
+							else if (exportMode == FORMAT_RCP)
 							{
-							    AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
-							    exporter.serialize(currFile.getAbsolutePath() );
+								AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
+
+								exporter.serialize(currFile.getAbsolutePath());
 							}
+
 							// -- ARASH
 						}
 						catch (Exception ex)
 						{
-							gui.error("Exception while exporting " + currFile.getAbsolutePath() 
-								  + " : " + ex.toString() );
-							
+							gui.error("Exception while exporting " + currFile.getAbsolutePath() + " : " + ex.toString());
 						}
 					}
 				}
@@ -1274,16 +1271,16 @@ public class ActionMan
 		}
 	}
 
-
 	// ++ ARASH:
-	public static void fileExportRCP(Gui gui) {
+	public static void fileExportRCP(Gui gui)
+	{
 		automataExport(gui, FORMAT_RCP);
 	}
+
 	public static void fileExportDesco(Gui gui)
 	{
 		automataExport(gui, FORMAT_DSX);
 	}
-
 
 	public static void fileExportDot(Gui gui)
 	{
@@ -1294,10 +1291,8 @@ public class ActionMan
 	{
 		automataExport(gui, FORMAT_XML);
 	}
-			 
 
-       // -------------- TODO: ADD EXPORTES FOR THESE TOO ------------------------------------
-
+	// -------------- TODO: ADD EXPORTES FOR THESE TOO ------------------------------------
 	public static void fileExportTCT(Gui gui)
 	{
 		automataExport(gui);
@@ -1315,74 +1310,82 @@ public class ActionMan
 
 	public static void fileImportDesco(Gui gui)
 	{
+
 		/*
-		JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
-		if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
-		{
-			File[] currFiles = fileOpener.getSelectedFiles();
-			if (currFiles != null)
-			{
-				for (int i = 0; i < currFiles.length; i++)
-				{
-					if (currFiles[i].isFile())
-					{
-						importDescoFile(gui, currFiles[i]);
-					}
-				}
-			}
-			repaint();
-			theAutomatonTable.repaint();
-       	}
-       	*//* Not implemented yet
-       	new FileImporter(FileDialogs.getDescoFileImporter(), gui)
-       	{
-       		void openFile(Gui g, File f)
-       		{
-       			importDescoFile(g, f);
-       		}
-       	};*/
-    }
+		 * JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
+		 * if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
+		 * {
+		 *       File[] currFiles = fileOpener.getSelectedFiles();
+		 *       if (currFiles != null)
+		 *       {
+		 *               for (int i = 0; i < currFiles.length; i++)
+		 *               {
+		 *                       if (currFiles[i].isFile())
+		 *                       {
+		 *                               importDescoFile(gui, currFiles[i]);
+		 *                       }
+		 *               }
+		 *       }
+		 *       repaint();
+		 *       theAutomatonTable.repaint();
+		 * }
+		 */
+
+		/*
+		 * Not implemented yet
+		 * new FileImporter(FileDialogs.getDescoFileImporter(), gui)
+		 * {
+		 *     void openFile(Gui g, File f)
+		 *     {
+		 *             importDescoFile(g, f);
+		 *     }
+		 * };
+		 */
+	}
 
 	public static void fileImportValid(Gui gui)
 	{
+
 		/*
-		JFileChooser fileOpener = FileDialogs.getVALIDFileImporter();
-
-		if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
-		{
-			File[] currFiles = fileOpener.getSelectedFiles();
-
-			if (currFiles != null)
-			{
-				for (int i = 0; i < currFiles.length; i++)
-				{
-					if (currFiles[i].isFile())
-					{
-						importValidFile(gui, currFiles[i]);
-					}
-				}
-			}
-
-			gui.repaint();
-
-			// theAutomatonTable.repaint(); // shoudl this really be necessary??
-       	}*/
-       	new FileImporter(FileDialogs.getVALIDFileImporter(), gui)	// anonymous class
-       	{
-       		void openFile(Gui g, File f)
-       		{
-       			importValidFile(g, f);
-       		}
-       	};
-    }
-	//-- MF -- Aldebaran format, a simple format for specifying des
-	public static void fileImportAut(Gui gui)
-	{
-		new FileImporter(FileDialogs.getAutFileImporter(), gui) // anonymous class
+		 * JFileChooser fileOpener = FileDialogs.getVALIDFileImporter();
+		 *
+		 * if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
+		 * {
+		 *       File[] currFiles = fileOpener.getSelectedFiles();
+		 *
+		 *       if (currFiles != null)
+		 *       {
+		 *               for (int i = 0; i < currFiles.length; i++)
+		 *               {
+		 *                       if (currFiles[i].isFile())
+		 *                       {
+		 *                               importValidFile(gui, currFiles[i]);
+		 *                       }
+		 *               }
+		 *       }
+		 *
+		 *       gui.repaint();
+		 *
+		 *       // theAutomatonTable.repaint(); // shoudl this really be necessary??
+		 * }
+		 */
+		new FileImporter(FileDialogs.getVALIDFileImporter(), gui)    // anonymous class
 		{
 			void openFile(Gui g, File f)
 			{
-				importAutFile(g, f);	
+				importValidFile(g, f);
+			}
+		};
+	}
+
+	// -- MF -- Aldebaran format, a simple format for specifying des
+	public static void fileImportAut(Gui gui)
+	{
+		new FileImporter(FileDialogs.getAutFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importAutFile(g, f);
 			}
 		};
 	}
@@ -1390,37 +1393,38 @@ public class ActionMan
 	// File.Open action performed
 	public static void fileOpen(Gui gui)
 	{
+
 		/*
-		JFileChooser fileOpener = FileDialogs.getXMLFileImporter();
-
-		if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
+		 * JFileChooser fileOpener = FileDialogs.getXMLFileImporter();
+		 *
+		 * if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
+		 * {
+		 *       File[] currFiles = fileOpener.getSelectedFiles();
+		 *
+		 *       if (currFiles != null)
+		 *       {
+		 *               for (int i = 0; i < currFiles.length; i++)
+		 *               {
+		 *                       if (currFiles[i].isFile())
+		 *                       {
+		 *                               openFile(gui, currFiles[i]);
+		 *                       }
+		 *               }
+		 *       }
+		 *
+		 *       gui.getFrame().repaint();
+		 *
+		 *       // theAutomatonTable.repaint(); // necessary?
+		 * }
+		 */
+		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
 		{
-			File[] currFiles = fileOpener.getSelectedFiles();
-
-			if (currFiles != null)
+			void openFile(Gui g, File f)
 			{
-				for (int i = 0; i < currFiles.length; i++)
-				{
-					if (currFiles[i].isFile())
-					{
-						openFile(gui, currFiles[i]);
-					}
-				}
+				openAutomataXMLFile(g, f);
 			}
-
-			gui.getFrame().repaint();
-
-			// theAutomatonTable.repaint(); // necessary?
-       	}
-       	*/
-       	new FileImporter(FileDialogs.getXMLFileImporter(), gui) // anonymous class
-       	{
-       		void openFile(Gui g, File f)
-       		{
-       			openAutomataXMLFile(g, f); 
-       		}
-       	};
-    }
+		};
+	}
 
 	// Why this indirection?
 	public static void openFile(Gui gui, File file)
@@ -1586,23 +1590,26 @@ public class ActionMan
 			}
 		}
 	}
-	
+
 	public static void importAutFile(Gui gui, File file)
 	{
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
+
 		try
 		{
-  			Automata currAutomata = null ; // AutomataBuildFromAut.build(file);
-  			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+			Automata currAutomata = null;    // AutomataBuildFromAut.build(file);
+			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+
 			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		}
 		catch (Exception e)
 		{
 			gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
+
 			return;
 		}
 	}
-	
+
 	public static void importValidFile(Gui gui, File file)
 	{
 

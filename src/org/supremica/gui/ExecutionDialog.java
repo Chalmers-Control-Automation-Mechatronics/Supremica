@@ -143,6 +143,7 @@ public class ExecutionDialog
 		setMode(ExecutionDialogMode.uninitialized);
 		show();
 	}
+
 	/**
 	 * Creates dialog box for canceling the Stoppable classes in the supplied List.
 	 * @see Stoppable
@@ -153,17 +154,21 @@ public class ExecutionDialog
 
 		// this.workbench = workbench;
 		this.executers = executers;
+
 		Init(title);
 	}
-	//-- MF -- Special case when you've got only one thread to watch
+
+	// -- MF -- Special case when you've got only one thread to watch
 	public ExecutionDialog(JFrame frame, String title, Stoppable thread)
 	{
 		super(frame);
+
 		this.executers = new ArrayList();
+
 		executers.add(thread);
 		Init(title);
 	}
-	
+
 	public void setMode(ExecutionDialogMode mode)
 	{
 		currentMode = mode;
@@ -219,62 +224,65 @@ public class ExecutionDialog
 
 			if (currentMode == ExecutionDialogMode.synchronizing)
 			{
-				operationLabel.setText(currentMode.getId());	// "Synchronizing...");
-				infoHeader.setText(currentMode.getText());	// "Number of states:");
+				operationLabel.setText(currentMode.getId());    // "Synchronizing...");
+				infoHeader.setText(currentMode.getText());    // "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifying)
 			{
-				operationLabel.setText(currentMode.getId());	// "Verifying...");
-				infoHeader.setText(currentMode.getText());	// "Number of states:");
+				operationLabel.setText(currentMode.getId());    // "Verifying...");
+				infoHeader.setText(currentMode.getText());    // "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.synthesizing)
 			{
-				operationLabel.setText(currentMode.getId());	// "Synthesizing...");
-				infoHeader.setText(currentMode.getText());	// "Number of states:");
+				operationLabel.setText(currentMode.getId());    // "Synthesizing...");
+				infoHeader.setText(currentMode.getText());    // "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.buildingStates)
 			{
-				operationLabel.setText(currentMode.getId());	// "Building states...");
+				operationLabel.setText(currentMode.getId());    // "Building states...");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.buildingTransitions)
 			{
-				operationLabel.setText(currentMode.getId());	// "Building transitions...");
+				operationLabel.setText(currentMode.getId());    // "Building transitions...");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
-			else if(currentMode == ExecutionDialogMode.matchingStates)
+			else if (currentMode == ExecutionDialogMode.matchingStates)
 			{
-				operationLabel.setText(currentMode.getId());	// "Matching states...");
+				operationLabel.setText(currentMode.getId());    // "Matching states...");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.hide)
-			{    
+			{
+
 				// Do nothing
-				//-- MF -- What happens if we do setText, add, etc, here?
+				// -- MF -- What happens if we do setText, add, etc, here?
 			}
-			/* This is what it should look like - let the mode keep track of itself
 
-			operationLabel.setText(currentMode.getId());	// "Matching states...");
-			contentPanel.add(progressPanel, BorderLayout.CENTER);
-
-			currCenterPanel = infoPanel;
-
-			*/
+			/*
+			 * This is what it should look like - let the mode keep track of itself
+			 *
+			 * operationLabel.setText(currentMode.getId());    // "Matching states...");
+			 * contentPanel.add(progressPanel, BorderLayout.CENTER);
+			 *
+			 * currCenterPanel = infoPanel;
+			 *
+			 */
 			newMode = false;
 		}
 

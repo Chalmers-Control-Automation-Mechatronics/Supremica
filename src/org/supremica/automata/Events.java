@@ -207,7 +207,6 @@ public class Events
 		return theEvents.containsValue(theEvent);
 	}
 
-
 	public String toString()
 	{
 		StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
