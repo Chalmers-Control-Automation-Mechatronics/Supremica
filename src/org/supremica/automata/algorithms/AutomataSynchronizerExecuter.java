@@ -63,6 +63,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -147,12 +148,16 @@ public final class AutomataSynchronizerExecuter
 	private boolean exhaustiveSearch = false;
 	private boolean coExecute = false;
 	private AutomataOnlineSynchronizer coExecuter = null;
-	
+
 	/** For "one event at a time"-execution. */
 	private int currUncontrollableEvent = -1;
 
 	/** For stopping of thread. */
 	private boolean stopRequested = false;
+
+
+	// Synchonization of all executors
+	private Rendezvous executerRendezvous = null;
 
 	/**
 	 *@param  synchronizerHelper helper for multithread execution.
@@ -196,6 +201,9 @@ public final class AutomataSynchronizerExecuter
 		{
 			expandForbiddenStates = false;
 		}
+
+		executerRendezvous = synchronizerHelper.getExecuterRendezvous();
+
 	}
 
 	/**
@@ -295,7 +303,7 @@ public final class AutomataSynchronizerExecuter
 
 			currOutgoingEvents[currAutIndex] = outgoingEventsTable[currAutIndex][currSingleStateIndex];
 			currOutgoingEventsIndex[currAutIndex] = 0;
-			
+
 			// Find the event with the smallest index.
 			// The last element currOutgoingEvents[currAutIndex]
 			// is always Integer.MAX_VALUE
@@ -665,6 +673,37 @@ public final class AutomataSynchronizerExecuter
 			}
 
 			currState = helper.getStateToProcess();
+
+			if (currState == null)
+			{
+				// This thread tells the other threads that it failed to get
+				// a new state, thus when all threads has enter this state
+				// all threads can stop executing. There is one exception
+				// and this is the possibility for this thread to experience
+				// a temporary shortage of states and at this position
+				// other threads might notice this thread that new
+				// states to process now exist.
+				boolean finished = false;
+				while (!finished && currState == null && !stopRequested)
+				{
+					try
+					{
+						if ((Boolean)executerRendezvous.rendezvous(Boolean.TRUE) == Boolean.TRUE)
+						{
+							finished = true;
+						}
+						else
+						{
+							currState = helper.getStateToProcess();
+						}
+					}
+					catch (InterruptedException ex)
+					{
+						logger.error("InterruptedException in AutomataSynchronizerExecuter");
+						finished = true;
+					}
+				}
+			}
 		}
 	}
 
@@ -708,7 +747,7 @@ public final class AutomataSynchronizerExecuter
 			Automaton theAutomaton = helper.getAutomaton();
 
 			// theAutomaton.setName("regaut");
-			
+
 			Alphabet theAlphabet = theAutomaton.getAlphabet();
 			int[][] currStateTable = helper.getStateTable();
 			int stateNumber = 0;

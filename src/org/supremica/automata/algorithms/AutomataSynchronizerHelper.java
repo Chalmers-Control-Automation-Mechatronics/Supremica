@@ -62,6 +62,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
 /**
  * Contains information that is common to all synchronization threads.
@@ -102,6 +103,8 @@ public final class AutomataSynchronizerHelper
 	private boolean coExecute = false;
 	private AutomataOnlineSynchronizer coExecuter = null;
 
+	private Rendezvous executerRendezvous = null;
+
 	/* Used by AutomataControllabillityCheck.
 	 * Causes the synchronization to stop as soon as an uncontrollable
 	 * state is found.
@@ -141,6 +144,8 @@ public final class AutomataSynchronizerHelper
 		nbrOfStatesToProcess = 0;
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
+
+		executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
 
 		// Alphabet theAlphabet = theAutomata.getUnionAlphabet(syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
 		//Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
@@ -204,6 +209,11 @@ public final class AutomataSynchronizerHelper
 	public Automaton getAutomaton()
 	{
 		return theAutomaton;
+	}
+
+	public Rendezvous getExecuterRendezvous()
+	{
+		return executerRendezvous;
 	}
 
 	public Alphabet getUnionAlphabet()
