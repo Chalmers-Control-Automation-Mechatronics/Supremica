@@ -281,10 +281,10 @@ public class SimulatorExecuter
 				org.supremica.automata.execution.Action currAction = theActions.getAction(label);
 				for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
 				{
-					String currCommand = (String)cmdIt.next();
+					Command currCommand = (Command)cmdIt.next();
 					try
 					{
-						theAnimation.invokeCommand(currCommand);
+						theAnimation.invokeCommand(currCommand.getLabel());
 					}
 					catch (CommandException ex)
 					{
