@@ -57,7 +57,7 @@
   control theory with distributed control application
   development since synchronous composition of discrete
   event models is used to model interaction between systems
-  in supervisory control theory. Method is demonstrated
+  in supervisory control theory. The method is demonstrated
   using a simple example before the formulation for the
   general case is presented. A new structure of control
   applications suitable for application of supervisory
@@ -93,7 +93,7 @@ to update the control system application to reflect the
 changes. The same problem applies to both system types
 mentioned above and it becomes even larger in mission
 critical control applications since the strict requirement
-of guaranteeing the correct operation is imposed. Thus,
+of guaranteeing, the correct operation is imposed. Thus,
 there is a need to introduce algorithms and tools to make it
 simple and as safe as possible to modify the control system.
 The supervisory control theory,\cite{rw:con:1989}, is a
@@ -230,7 +230,7 @@ have that event enabled in its current state, than the event
 is not allowed to occur in any of the other automatons in
 the group. That is, one automaton is able to prevent all the
 others from executing an event if it does not enable it at
-the same time as all the other automatons. This property of
+the same time as all the other automata. This property of
 the definition is used to construct a supervisor which
 prevents events from occurring. The concept of supervisor is
 explained further in the next section which introduces the
@@ -287,10 +287,10 @@ specification, the synchronous composition of the plant and
 supervisor models has to be implemented in the control
 software. Using the conventional implementation methods,
 i.e. implementing the synchronization using PLC programming
-techniques, the solution becomes complex which makes it
+techniques, the solution becomes complex, which makes it
 difficult to distribute across multiple control computers.
 Next section presents an example illustrating how the
-synchronous composition can be implemented using the new
+synchronous composition might be implemented using the new
 standard.
 
 \section{Synchronization: An Example}
@@ -386,8 +386,7 @@ data input represents and the event output \texttt{DONE} is
 generated. It signals that the model has updated its state
 and that the data outputs are ready. The data outputs are
 boolean variables representing the enabled events after the
-model has updated its state, i.e. the events labeling the
-transitions that are possible from the new state.
+model has updated its state, i.e. the events that are possible from the new state.
 
 The function block type that is generated according to the
 new method presented is shown in Fig.~\ref{fig:syncFB} and
@@ -485,8 +484,8 @@ general method is presented in the next section.
 
 \section{Synchronization: General Approach}
 The method for implementation of the full synchronous
-composition for the general system containing any number of
-discrete event models is made up of two major steps. The
+composition for the general system, containing any number of
+discrete event models, is made up of two major steps. The
 first step is creation of the function block types that
 generate the behavior of the discrete event models. The
 interface that these blocks have to adhere to is shown in
@@ -667,7 +666,9 @@ tested using the Function Block Development Kit (FBDK),
 \cite{c:fun:2002}. For further information about IEC 61499
 function blocks see \cite{c:ope:2002}.
 
+
 \bibliography{/home/cengic/research/Bibliographies/desbib.bib}
+
 
 \end{document}
 
