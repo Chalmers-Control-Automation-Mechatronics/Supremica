@@ -383,10 +383,9 @@ public class JavaBytecodeGenerator
 	    }
 	else if (n.getType() == TypeConstant.T_DERIVED)
 	    {
-	        if (n.getFieldSelector() != null) {
+			if (n.getFieldSelector() != null) {
 				/*n is referring to a field in a derived variable*/
-		    return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
-						   n.getFieldSelector(), n.getFieldSelectorType(), n.getFieldSelectorTypeName());
+				return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), n.getFieldSelector(), n.getFieldSelectorType(), n.getFieldSelectorTypeName());
 			}
 			else {
 				/*n is referring to the derived variable itself*/
