@@ -22,6 +22,7 @@ public class IDE
 	private IDEToolBar toolBar;
 	private EditorPanel editorPanel;
 	private AnalyzerPanel analyzerPanel;
+	private SimulatorPanel simulatorPanel;
 	private LogPanel logPanel;
 
 	private JTabbedPane tabPanel;
@@ -52,12 +53,14 @@ public class IDE
 		analyzerPanel = new AnalyzerPanel(this, "Analyzer");
 		tabPanel.add(analyzerPanel.getTitle(), analyzerPanel);
 
+		simulatorPanel = new SimulatorPanel(this, "Simulator");
+		tabPanel.add(simulatorPanel.getTitle(), simulatorPanel);
+
 		logPanel = new LogPanel(this, "Logger");
 
 		splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
 		splitPanelVertical.setContinuousLayout(false);
 		splitPanelVertical.setOneTouchExpandable(false);
-		setVisible(true);
 		splitPanelVertical.setDividerLocation(0.8);
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
