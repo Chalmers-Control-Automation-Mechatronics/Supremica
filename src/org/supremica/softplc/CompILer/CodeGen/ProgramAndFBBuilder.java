@@ -8,43 +8,75 @@ import org.supremica.log.Logger;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
 
-/**The class ProgramAndFBBuilder handles all common parts of code generation
- * for its sub classes.
+/**
+ * This class handles java bytecode generation. It handles all parts common
+ * to IL programs (@see ProgramBuilder) and function blocks 
+ * (@see FunctionBlockBuilder). 
+ * @author Anders Röding
+ * @author Andreas Herner
  */
 public abstract class ProgramAndFBBuilder
     implements Builder
 {
+    /** 
+     * Name of the class that is to be generated
+     */
     String className;
+    /** 
+     * File name of the class that is to be generated
+     */
     String classFileName;
     String[] implementedInterfaces;
 
-    /* name of owner field for use with external variables */
-
-    // XXX Vad skall man ha denna till undrar Anders, som inte vet
-    // XXX varför han har skapat den.
-    // XXX String owner = "owner";
-
-    /* jumpController keeps track of all jumps contained in a POU */
+    /** jumpController keeps track of all jumps contained in a POU */
     JumpController jumpController = new JumpController();
+
+
     /* BCEL objects used to create bytecode */
+    /** the class generator */
     ClassGen classGen;
+    /** constant pool generator */
     ConstantPoolGen constPoolGen;
-    MethodGen mgRun;    /* methodGen for creating the run() method */
-    MethodGen mgInit;    /* methodGen for creating the <init> method */
+    /** 
+     * method generator for creating the run() method that 
+     * should exist in both IL programs and function blocks. */
+    MethodGen mgRun;
+    /** 
+     * method generator for creating the <init> method of
+     * IL programs and function blocks
+     */
+    MethodGen mgInit;
+    /**
+     * instructions in the run method's (bytecode) instruction list.
+     */
     InstructionList ilRun = new InstructionList();
+    /**
+     * instructions in the init method's (bytecode) instruction list.
+     */
     InstructionList ilInit = new InstructionList();
+    /**
+     * bytecode instruction factory
+     */
     InstructionFactory fac;
     
-        /**
+    /**
      * Logger prints nice error, info and debug messages in the Supremica console
      */
     Logger logger;
-    boolean debug; //only used when not started withing Supremica
-    /* if errorsPresent is set to true no bytecode will be dumped */
+    /**
+     * decides whether debug messages should appear when not using 
+     * any Logger.
+     */
+    boolean debug; //only used when not started within Supremica
+ 
+   /* if errorsPresent is set to true no bytecode will be dumped */
     boolean errorsPresent = false;
 
 
-    //XXX
+    /**
+     * takes care of debug messages.
+     * @param message a message to be displayed.
+     */
     void debug (Object message) {
 	if (logger != null)
 	    logger.debug(message);
@@ -52,7 +84,11 @@ public abstract class ProgramAndFBBuilder
 	    System.out.println("Debug: " + message);
 	}
     }
-    //XXX
+    /**
+     * takes care of error messages.
+     * After calling this method calls to dumpCode() has no effect.
+     * @param message a message to be displayed.
+     */
     void error (Object message) {
 	if (logger != null)
 	    logger.error(message);
@@ -60,13 +96,20 @@ public abstract class ProgramAndFBBuilder
 	    System.err.println("Error: " + message);
 	errorsPresent = true;
     }
-    //XXX
+    /**
+     * takes care of info messages.
+     * @param message a message to be displayed.
+     */
     void info (Object message) {
 	if (logger != null)
 	    logger.info(message);
 	else
 	    System.out.println(message);
     }
+    /**
+     * takes care of warning messages.
+     * @param message a message to be displayed.
+     */
     //XXX fråga knut hur denna fungerar
     void warn (Object message) {
 	if (logger != null)
@@ -189,7 +232,9 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitVarField generates a bytecode field representing a specific variable
+    /**
+     * emitVarField generates a bytecode field representing a specific variable.
+     * Parameter type does also have a value that the field is initialised to.
      * @param varName the name of the variable
      * @param type the CompILer type of the variable
      * @param global decide whether this variable should be globally declared
@@ -220,7 +265,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitVarField generates a bytecode field representing a specific variable
+    /**
+     * emitVarField generates a bytecode field representing a specific variable
      * @param varName the name of the variable
      * @param type the CompILer type of the variable
      * @param global decide whether this variable should be globally declared
@@ -253,13 +299,15 @@ public abstract class ProgramAndFBBuilder
 					    Constants.PUTFIELD));
     }
 
-    /**emitDirectInit is used to set init values to direct output variables
+    /**
+     * emitDirectInit is used to set init values to direct output variables
      * @param v the direct variable
      * @param i the value the variable should be set to
      */
     abstract public void emitDirectInit(IECDirectVariable v, TypeBOOL i);
 
-    /**emitLoadVariable pushes the value of a specified variable
+    /**
+     * emitLoadVariable pushes the value of a specified variable
      * on the stack without manipulating
      * previous stack values
      * @param var variable to load
@@ -276,7 +324,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitLoadVariable pushes the value of a specified variable
+    /**
+     * emitLoadVariable pushes the value of a specified variable
      * on the stack without manipulating
      * previous stack values
      * @param var symbolic variable to load
@@ -311,10 +360,10 @@ public abstract class ProgramAndFBBuilder
 		il.append(fac.createFieldAccess(className, varName, Type.STRING,
 						Constants.GETFIELD));
 	    }
-	else if (type == TypeConstant.T_DERIVED /*including function blocks */)
+	else if (type == TypeConstant.T_DERIVED /*including function blocks*/)
 	    {
 		if (var.getFieldSelector() != null)
-		    {    /* we have got a variable in a derived variable */
+		    {   /* we have got a variable in a derived variable */
 
 			/* first get reference to the derived variable object*/
 			il.append(InstructionConstants.THIS);
@@ -325,7 +374,6 @@ public abstract class ProgramAndFBBuilder
 			/* then load value */
 			type = var.getFieldSelectorType();
 
-			// int och real och string måste vara med
 			if (type == TypeConstant.T_BOOL)
 			    {
 				il.append(fac.createFieldAccess
@@ -374,10 +422,8 @@ public abstract class ProgramAndFBBuilder
 							new ObjectType(var.getTypeName()),
 							Constants.GETFIELD));
 
-			// XXX should implement this
-			warn("Not tested properly sofar. Only loading of elements in " +
-			      "derived variables are implemented " +
-			      "so far. Not load of derived itself"); //XXX
+			// XXX don't forget to test this
+			warn("Not properly tested so far. Loading of derived variables."); //XXX
 		    }
 	    }
 	else
@@ -387,16 +433,18 @@ public abstract class ProgramAndFBBuilder
 	return il;
     }
 
-    /**emitLoadVariable pushes the value of a specified variable
+    /**
+     * emitLoadVariable pushes the value of a specified variable
      * on the stack without manipulating
      * previous stack values
-     * This method also applies to AT-defined variables since these
+     * This method also applies to AT-defined (IEC 6-1131) variables since these
      * already should have been changed into DirectVariables by a Checker.
      * @param var direct variable to load
      */
     abstract InstructionList emitLoadVariable(IECDirectVariable var);
 
-    /**emitStoreVariable takes the top of stack value and stores it in
+    /**
+     * emitStoreVariable takes the top of stack value and stores it in
      * the specified variable
      * @param var variable to store TOS value in
      */
@@ -412,7 +460,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitStoreVariable takes the top of stack value and stores it in
+    /**
+     * emitStoreVariable takes the top of stack value and stores it in
      * the specified variable
      * @param var variable to store TOS value in
      */
@@ -495,14 +544,14 @@ public abstract class ProgramAndFBBuilder
 					   var.getFieldSelector(), Type.STRING,
 					   Constants.PUTFIELD));
 			    }
-			else if (type == TypeConstant.T_DERIVED) //XXX funkar inte detta utan att ha typnamnet för derived var så
-			                                         //XXX struntar vi i det.
+			else if (type == TypeConstant.T_DERIVED)
 			    {
 				il.append(InstructionConstants.SWAP);
 				il.append(fac.createFieldAccess
 					  (/*fb type name*/var.getTypeName(),
 					   var.getFieldSelector(), new ObjectType(var.getFieldSelectorTypeName()),
 					   Constants.PUTFIELD));
+				warn("Not tested. Stording derived type into another derived type"); //XXX stämmer det
 			    }
 			else
 			    {
@@ -512,15 +561,12 @@ public abstract class ProgramAndFBBuilder
 		    }
 		else
 		    {    /* the derived variable itself */
-			// XXX should implement this
 			il.append(InstructionConstants.THIS);
 			il.append(InstructionConstants.SWAP);
 			il.append(fac.createFieldAccess(className, varName,
 							new ObjectType(var.getTypeName()),
 							Constants.PUTFIELD));
-			warn("Not properly tested. Only storing of elements in " +
-			      "derived variables are implemented " +
-			      "so far. Not store of derived itself."); //XXX
+			warn("Not properly tested. Store of derived type variables."); //XXX
 		    }
 	    }
 	else
@@ -530,7 +576,8 @@ public abstract class ProgramAndFBBuilder
 	return il;
     }
 
-    /**emitStoreVariable takes the top of stack value and stores it in
+    /**
+     * emitStoreVariable takes the top of stack value and stores it in
      * the specified variable
      * This method also applies to AT-defined variables since these
      * already should have been changed into DirectVariables by a Checker.
@@ -538,7 +585,8 @@ public abstract class ProgramAndFBBuilder
      */
     abstract InstructionList emitStoreVariable(IECDirectVariable var);
 
-    /**emitIL_SIMPLE_OPERATION choose operator function
+    /**
+     * emitIL_SIMPLE_OPERATION choose operator function
      * @param oparator operator to choose
      * @param arg operator argument
      */
@@ -569,7 +617,10 @@ public abstract class ProgramAndFBBuilder
 	    {
 		emitSTN(arg);
 	    }
-	//XXX	else if (op == IlSimpleOperator.NOT )
+	else if (op == IlSimpleOperator.NOT )
+	    {
+		emitNOT();
+	    }
 	else if (op == IlSimpleOperator.S)
 	    {
 		emitS(arg);
@@ -647,7 +698,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitStackSpace is used when opening a new scope in IL
+    /**
+     * emitStackSpace is used when opening a new scope in IL
      * @param size nr of spaces on JVM-stack to reserve
      */
     public void emitStackSpace(int size)
@@ -664,11 +716,12 @@ public abstract class ProgramAndFBBuilder
 	else
 	    {
 		error("param size (emitStackSpace) must be 1 or 2." + 
-		      " Probably you have used unimplemented IL constructs.");
+		      " Probably you have used nonsupported IL constructs.");
 	    }
     }
 
-    /**emitLoadG pushes a value on the stack without manipulating
+    /**
+     * emitLoadG pushes a value on the stack without manipulating
      * previous values
      * @param arg the value to push
      * @return BCEL instructions for loading
@@ -716,8 +769,9 @@ public abstract class ProgramAndFBBuilder
 	return il;
     }
 
-    /**emitLoad pushes a value on the stack without manipulating
-     * previous values
+    /**
+     * emitLoad pushes a value on the stack without manipulating
+     * previous values (inserts instructions into the run method)
      * @param arg the value to push
      */
     public void emitLoad(Object arg)
@@ -725,7 +779,8 @@ public abstract class ProgramAndFBBuilder
 	ilRun.append(emitLoadG(arg));
     }
 
-    /**emitLD replaces the top of stack value (simulating IL's LD-instruction
+    /**
+     * emitLD replaces the top of stack value (simulating IL's LD-instruction
      * behaviour)
      * @param arg the value to push
      */
@@ -735,7 +790,8 @@ public abstract class ProgramAndFBBuilder
 	emitLoad(arg);
     }
 
-    /**emitLDN replaces the top of stack value (simulating IL's LDN-instruction
+    /**
+     * emitLDN replaces the top of stack value (simulating IL's LDN-instruction
      * behaviour)
      * @param arg the value to push
      */
@@ -748,7 +804,7 @@ public abstract class ProgramAndFBBuilder
 	    {
 		ilRun.append(InstructionConstants.POP);
 		emitLoad(arg);
-		/* negate value */
+		/* invert value */
 		emitNOT();
 	    }
 	else
@@ -759,7 +815,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitST stores the negated top of stack value (IL's result register) in a
+    /**
+     * emitSTN stores the inverted top of stack value (IL's result register) in a
      * specified variable
      * @param arg where the value is to be stored (must be of type BOOL)
      */
@@ -795,10 +852,11 @@ public abstract class ProgramAndFBBuilder
 	    }
 	else
 	    {
-		error("Can't store in anything else than a variable");
+		error("Can't store in anything else than a variable: " + arg);
 	    }
     }
-    /**emitST stores the top of stack value (IL's result register) in a
+    /**
+     * emitST stores the top of stack value (IL's result register) in a
      * specified variable
      * @param arg where the value is to be stored
      */
@@ -807,7 +865,7 @@ public abstract class ProgramAndFBBuilder
 	if (arg instanceof IECConstant)
 	    {
 		System.err.println("Fatal error: Operator ST cannot " +
-				   "store in constant");
+				   "store in constant: " + arg);
 	    }
 	else if (arg instanceof IECVariable)
 	    {
@@ -833,11 +891,13 @@ public abstract class ProgramAndFBBuilder
 	    }
 	else
 	    {
-		error("Can't store in anything else than a variable");
+		error("Can't store in anything else than a variable: " + arg);
 	    }
     }
 
-    /**emitNOT negates the boolean value on the stack
+    /**
+     * emitNOT inverts the boolean value on the stack.
+     * TOS value must be a boolean.
      */
     private void emitNOT() {
 	InstructionHandle end_ldn, iffalse;
@@ -851,7 +911,8 @@ public abstract class ProgramAndFBBuilder
 	ifeq.setTarget(iffalse);
 	jmp.setTarget(end_ldn);
     }
-    /**emitS set the argument (a variable) to true if the TOS value is true
+    /**
+     * emitS set the argument (a variable) to true if the TOS value is true
      * @param arg an IL BOOL-variable
      */
     private void emitS(Object arg)
@@ -889,7 +950,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitR set the argument (a variable) to false if the TOS value is true
+    /**
+     * emitR set the argument (a variable) to false if the TOS value is true
      * @param arg an IL BOOL-variable
      */
     private void emitR(Object arg)
@@ -927,7 +989,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitADD add the argument with stack value and put the result
+    /**
+     * emitADD add the argument with stack value and put the result
      * on the stack
      * @param arg an IL BOOL-variable
      */
@@ -983,6 +1046,10 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
+    /**
+     * emitAND does a logical and between TOS value and the argument.
+     * @param arg an IL BOOL-variable
+     */
     private void emitAND(Object arg)
     {
 	if (arg instanceof IECConstant)
@@ -1040,6 +1107,10 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
+    /**
+     * emitAND makes a logical AND between TOS value and the inverted argument.
+     * @param arg an IL BOOL-variable
+     */
     private void emitANDN(Object arg)
     {
 	if (arg instanceof IECConstant)
@@ -1099,8 +1170,11 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    //XXX Hit har Anders gått igenom formatering + lite kommentarer 2002-04-12
 
+    /**
+     * emitOR makes a logical OR between TOS value and the inverted argument.
+     * @param arg an IL BOOL
+     */
     private void emitOR(Object arg)
     {
 	if (arg instanceof IECConstant)
@@ -1159,7 +1233,7 @@ public abstract class ProgramAndFBBuilder
     }
 
     /**emitSUB sub stack value with argument and put the result on the stack
-     * @param arg an IL BOOL-variable
+     * @param arg an IL DINT or REAL
      */
     private void emitSUB(Object arg)
     {
@@ -1214,7 +1288,7 @@ public abstract class ProgramAndFBBuilder
     }
 
     /**emitMUL multiplicates the argument with stack value and put the result on the stack
-     * @param arg an IL BOOL-variable
+     * @param arg an IL DINT or REAL
      */
     private void emitMUL(Object arg)
     {
@@ -1270,7 +1344,7 @@ public abstract class ProgramAndFBBuilder
 
     /**emitDIV divides stack value by argument value and put the
      * result on the stack
-     * @param arg an IL BOOL-variable
+     * @param arg an IL DINT or REAL
      */
     private void emitDIV(Object arg)
     {
@@ -1331,7 +1405,7 @@ public abstract class ProgramAndFBBuilder
      * is negative and positive only if value1' / value2' is positive, and whose magnitude is as large
      * as possible without exceeding the magnitude of the true mathematical quotient of
      * value1' and value2'.
-     * @param arg an IL BOOL-variable
+     * @param arg 
      */
     private void emitMOD(Object arg)
     {
@@ -1423,10 +1497,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    //XXX Testa EQ för alla olika typer
-
     /**emitEQ test for equality and put the result on the stack
-     * @param arg an IL BOOL-variable
+     * @param arg argument to compare to TOS
      */
     private void emitEQ(Object arg)
     {
@@ -1524,6 +1596,10 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
+
+    /** emitGT does the test TOS > arg and puts the result in TOS.
+     * @param arg argument to compare to TOS
+     */
     private void emitGT(Object arg)
     {
 	if (arg instanceof IECConstant)
@@ -1620,8 +1696,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitGE test two intergers  >=  and put the result on the stack
-     * @param arg an IL BOOL-variable
+    /**emitGE does the test >= and put the result on the stack
+     * @param arg argument to compare to TOS
      */
     private void emitGE(Object arg)
     {
@@ -1721,8 +1797,9 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitLT test two intergers  <  and put the result on the stack
-     * @param arg an IL BOOL-variable
+    /**
+     * emitLT does the test  <  and put the result on the stack
+     * @param arg argument to compare to TOS
      */
     private void emitLT(Object arg)
     {
@@ -1822,8 +1899,9 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitLE test two intergers  <= and put the result on the stack
-     * @param arg an IL BOOL-variable
+    /**
+     * emitLE does the test  <= and put the result on the stack
+     * @param arg argument to compare to TOS
      */
     private void emitLE(Object arg)
     {
@@ -1923,8 +2001,8 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitNE test two intergers for not equality and put the result on the stack
-     * @param arg an IL BOOL-variable
+    /**emitNE tests two values for difference and put the result on the stack
+     * @param arg argument to compare to TOS
      */
     private void emitNE(Object arg)
     {
@@ -2023,15 +2101,14 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
-    /**emitIL_EXPRESSION writes an il_expr_operator to the bytecode
+    /**
+     * emitIL_EXPRESSION writes an il_expr_operator to the bytecode
      * @param operator a string defining the operator, e.g. "ADD("
      * @param t what datatype is the operator to work on
      * @param arg for future use, i.e. for derived types
      */
     public void emitIL_EXPRESSION(String operator, TypeConstant t, Object arg)
     {
-
-	// throws IllegalOperatorException{
 	IlExprOperator op = IlExprOperator.ADD;
 
 	try
@@ -2091,6 +2168,11 @@ public abstract class ProgramAndFBBuilder
     }
 
     // private void emitExprAdd(TypeConstant t, Object arg){
+    /**
+     * emitExprAND does a logical AND between TOS value and the 
+     * next to TOS value
+     * @param arg type constant
+     */
     private void emitExprAND(TypeConstant t, Object arg)
     {
 	if (t == TypeConstant.T_BOOL)
@@ -2115,6 +2197,11 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
+    /**
+     * emitExprANDN does a logical AND between inverted TOS value and the 
+     * next to TOS value
+     * @param arg type constant
+     */
     private void emitExprANDN(TypeConstant t, Object arg)
     {
 	if (t == TypeConstant.T_BOOL)
@@ -2139,6 +2226,11 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
+    /**
+     * emitExprOR does a logical OR between TOS value and the 
+     * next to TOS value
+     * @param arg type constant
+     */
     private void emitExprOR(TypeConstant t, Object arg)
     {
 	if (t == TypeConstant.T_BOOL)
@@ -2162,18 +2254,10 @@ public abstract class ProgramAndFBBuilder
 
     // private void emitExprXOR(TypeConstant t, Object arg){
 
-    /*
-     *    private void emitExprANDN(TypeConstant t, Object arg){
-     * if (t == TypeConstant.T_BOOL) {
-     *               InstructionHandle end_andn;
-     *               BranchInstruction ifeq = new IFEQ(null);
-     *               ilRun.append(ifeq);  // stack = false
-     *               ilRun.append(InstructionConstants.POP);
-     *               ilRun.append(new PUSH(constPoolGen,false));
-     *               end_andn = ilRun.append(InstructionConstants.NOP);
-     *       }
-     * else {error("ANDN not implemented for type: " + t);}
-     * }
+    /**
+     * emitExprORN does a logical OR between inverted TOS value and the 
+     * next to TOS value
+     * @param arg type constant
      */
     private void emitExprORN(TypeConstant t, Object arg)
     {
@@ -2207,7 +2291,8 @@ public abstract class ProgramAndFBBuilder
     // private void emitExprLE(TypeConstant t, Object arg){
     // private void emitExprNE(TypeConstant t, Object arg){
 
-    /**emitLabel stores the position of a label so that jumps can
+    /**
+     * emitLabel stores the position of a label so that jumps can
      * be pointed to it.
      * @param label the name of the label
      */
@@ -2218,7 +2303,8 @@ public abstract class ProgramAndFBBuilder
 	jumpController.addTarget(label, ih);
     }
 
-    /**emitLabel takes care of IL's jump commands (JMP, JMPC, JMPCN).
+    /**
+     * emitIL_JUMP_OPERATION takes care of IL's jump commands (JMP, JMPC, JMPCN).
      * @param op the jump operator
      * @param targetLabel the label (position) to which the jump should point
      */
@@ -2263,6 +2349,11 @@ public abstract class ProgramAndFBBuilder
     }
 
     /* Function block call handling */
+    /**
+     * emitIL_FB_CALL_Start handles the first part of a function block call:
+     * it takes care of checks associated to conditional calls
+     * @param op IL call operator
+     */
     public BranchInstruction emitIL_FB_CALL_Start(IlCallOperator op)
     {
 	/* check conditions */
@@ -2270,12 +2361,10 @@ public abstract class ProgramAndFBBuilder
 
 	if (op == IlCallOperator.CAL)
 	    {
-
 		// do nothing
 	    }
 	else if (op == IlCallOperator.CALC)
 	    {
-
 		// if result reg == true -> make call
 		ilRun.append(InstructionConstants.DUP);
 
@@ -2293,25 +2382,32 @@ public abstract class ProgramAndFBBuilder
 
 		ilRun.append(callCondition);
 	    }
-
 	return callCondition;
     }
 
-    /** set conditional target */
+    /** 
+     * emitIL_FB_CALL_End sets the jump target for conditional calls
+     * @param callCondition the branch instruction returned by 
+     *                      emitIL_FB_CALL_Start
+     */
     public void emitIL_FB_CALL_End(BranchInstruction callCondition)
     {
 	if (callCondition != null    /*
 				      * call operator != CAL,
-				      *                             see emitIL_FB_CALL_start
+				      * see emitIL_FB_CALL_start
 				      */
 	    )
 	    {
 		InstructionHandle end_call = ilRun.append(InstructionConstants.NOP);
-
 		callCondition.setTarget(end_call);
 	    }
     }
 
+    /**
+     * emitIL_FB_CALL_Run calls the run method in a function block
+     * @param fbName name of the function block to be called
+     * @param fbTypeName the type (class name) of the FB to be called
+     */
     public void emitIL_FB_CALL_Run(String fbName, String fbTypeName)
     {
 	ObjectType fbType = new ObjectType(fbTypeName);
@@ -2321,11 +2417,17 @@ public abstract class ProgramAndFBBuilder
 	ilRun.append(fac.createInvoke(fbTypeName, "run", Type.VOID, Type.NO_ARGS, Constants.INVOKEVIRTUAL));
     }
 
-    public void emitIL_FB_CALL_SetInputs() {}
+    /*
+      Intended to handle fb calls with parameters, but it was decided that the checker should handle this.
+      public void emitIL_FB_CALL_SetInputs() {}
 
-    public void emitIL_FB_CALL_SetOutputs() {}
+      public void emitIL_FB_CALL_SetOutputs() {}
+    */
 
-    /* hack för att få print att fungera på ett enkelt sätt */
+    /**
+     * hack för att få print att fungera på ett enkelt sätt
+     * This method is deprecated
+     */ 
     public void emitIL_FB_CALL(IlCallOperator op, String fb_name, Object[] args)
     {
 	fb_name = fb_name.toLowerCase();

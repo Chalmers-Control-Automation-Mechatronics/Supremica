@@ -26,11 +26,11 @@ public interface Builder
 
 	void emitIL_FB_CALL_Run(String fbName, String fbTypeName);
     
-	void emitIL_FB_CALL_SetInputs();
+    //XXXvoid emitIL_FB_CALL_SetInputs();
 
-	void emitIL_FB_CALL_SetOutputs();
+    //XXXvoid emitIL_FB_CALL_SetOutputs();
 
-	// il_fb_call är en hackfunktion
+	//XXX il_fb_call är en hackfunktion
 	void emitIL_FB_CALL(IlCallOperator op, String fb_name, Object[] args);
 
 	void emitLABEL(String label);

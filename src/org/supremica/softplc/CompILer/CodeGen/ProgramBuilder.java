@@ -9,18 +9,33 @@ import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
 import java.io.File;
 
+/**
+ * handles java bytecode generation for IL programs. Especially 
+ * parts that differs from function blocks (common parts are handled
+ * by @see ProgramAndFunctionBlockBuilder)
+ * @author Anders Röding
+ */
+
 public class ProgramBuilder
     extends ProgramAndFBBuilder
 {
-    private String[] programInterfaces = { "org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_Program" };
+    /**
+     * array of interfaces that IL programs should implement
+     */
+    private static String[] programInterfaces = { "org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_Program" };
     /* references to the direct variable fields */
     String directOutput = "directOutput";
     String directInput = "directInput";
     private File temp;
 
-    /**Constructor ProgramBuilder constructs a new frame for
+    /**
+     * Constructor ProgramBuilder constructs a new frame for
      * IL program generation
-     *@param programName name of IL program be generated (i.e. classfile name)
+     * @param programName name of IL program be generated (i.e. classfile name)
+     * @param dumpClassDir directory for output files
+     * @param logger a logger object for messages
+     * @param debug set whether debug messages should appear at standard output.
+     *              Only used if there is no logger provided
      */
     public ProgramBuilder(String programName, String dumpClassDir, Logger logger, boolean debug)
     {
@@ -76,7 +91,12 @@ public class ProgramBuilder
 					    new ArrayType(Type.BOOLEAN, 1), 
 					    Constants.PUTFIELD));
     }
-
+    
+    /**
+     * emitDirectInit is used to set init values to direct output variables
+     * @param v the direct variable
+     * @param i the value the variable should be set to
+     */
     public void emitDirectInit(IECDirectVariable v, TypeBOOL i)
     {
 	if (v.isInput())
@@ -96,6 +116,7 @@ public class ProgramBuilder
      * This method also applies to AT-defined variables since these
      * already should have been changed into DirectVariables by a Checker.
      * @param var direct variable to load
+     * @return instruction list with bytecode for loading var
      */
     InstructionList emitLoadVariable(IECDirectVariable var)
     {
@@ -129,6 +150,7 @@ public class ProgramBuilder
      * This method also applies to AT-defined symbolic variables since these
      * already should have been changed into DirectVariables by a Checker.
      * @param var variable to store TOS value in
+     * @return instruction list with bytecode for storing TOS in var.
      */
     InstructionList emitStoreVariable(IECDirectVariable var)
     {

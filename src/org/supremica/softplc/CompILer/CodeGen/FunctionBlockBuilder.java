@@ -8,36 +8,44 @@ import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
 import java.io.File;
 
-/** The class FunctionBlockBuilder is used to generate code parts that
- *  are specific to Function Blocks and not common with Programs. The
- *  common parts of code are instead generated in @see ProgramAndFBBuilder.
+/**
+ * The class FunctionBlockBuilder is used to generate code parts that
+ * are specific to Function Blocks and not common with Programs. The
+ * common parts of code are instead generated in @see ProgramAndFBBuilder.
+ * @author Anders Röding
  */
 public class FunctionBlockBuilder
     extends ProgramAndFBBuilder
 {
-    private String[] programInterfaces = {"org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_FunctionBlock" };
+    /**
+     * array of interfaces that IL function blocks should implement
+     */
+    private static String[] interfaces = {"org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces.IEC_FunctionBlock" };
 
     /*
      * BCEL objects used to create bytecode for the runArgs method
      *     that only function blocks has
      */
-    InstructionList ilRunArgs = new InstructionList();
-    MethodGen mgRunArgs;
+    //XXX InstructionList ilRunArgs = new InstructionList();
+    //XXXMethodGen mgRunArgs;
 
     public File getTempFile() {return null;};
 
     /**Constructor ProgramBuilder constructs a new frame for
      * IL program generation
-     *@param functionBlockName name of IL function block be
+     * @param functionBlockName name of IL function block be
      *                         generated (i.e. classfile name)
-     * XXX mer parametrar
+     * @param outDir output directory for class files
+     * @param logger a logger object for messages
+     * @param debug set whether debug messages should appear at standard output.
+     *              Only used if there is no logger provided
      */
     public FunctionBlockBuilder(String functionBlockName, String outDir, Logger logger, 
 				boolean debug)
     {
 	this.logger = logger;
 	this.debug = debug;
-	implementedInterfaces = programInterfaces;
+	implementedInterfaces = interfaces;
 	className = functionBlockName;
 	classFileName = outDir + "/" + className.concat(".class");
 
@@ -50,9 +58,10 @@ public class FunctionBlockBuilder
 	mgRun = new MethodGen(Constants.ACC_PUBLIC, Type.VOID, Type.NO_ARGS,
 			      null, "run", className, ilRun, constPoolGen);
 	/* create the runArgs method of the IL program */
-	mgRunArgs = new MethodGen(Constants.ACC_PUBLIC, Type.VOID,
+	/* XXXmgRunArgs = new MethodGen(Constants.ACC_PUBLIC, Type.VOID,
 				  Type.NO_ARGS, null, "runArgs", className,
 				  ilRunArgs, constPoolGen);
+	*/
 	/* create MethodGen for constructor method */
 	mgInit = new MethodGen(Constants.ACC_PUBLIC, Type.VOID,
 			       Type.NO_ARGS, new String[]{}, "<init>",
@@ -63,25 +72,17 @@ public class FunctionBlockBuilder
 	ilInit.append(fac.createInvoke("java.lang.Object", "<init>",
 				       Type.VOID, Type.NO_ARGS,
 				       Constants.INVOKESPECIAL));
-	/* XXX initialize owner field */
-
-	// XXX varför behöver man owner???? Anders undrar vad han tänkt på:(
-	// behövs det så skall det troligen ha typen IECProgram eller IECFunctionBlock eller IECProgramOrganisationUnit
-	// ilInit.append(InstructionConstants.THIS); //this
-	// ilInit.append(InstructionConstants.ALOAD_1);
-	// ilInit.append(fac.createFieldAccess(className,owner,
-	// Type.OBJECT,
-	// Constants.PUTFIELD));
     }
 
-    /**should be called when the IL function block generation is finished.
+    /**
+     * should be called when the IL function block generation is finished.
      * This method will then dump the generated code to a class file.
      */
     public void dumpCode()
     {
-	ilRunArgs.append(InstructionConstants.RETURN);
-	mgRunArgs.setMaxStack();
-	classGen.addMethod(mgRunArgs.getMethod());
+	//XXXilRunArgs.append(InstructionConstants.RETURN);
+	//XXXmgRunArgs.setMaxStack();
+	//XXXclassGen.addMethod(mgRunArgs.getMethod());
 	super.dumpCode();
     }
 
@@ -99,12 +100,6 @@ public class FunctionBlockBuilder
     public void emitVarField(String varName, Object type, boolean global,
 			     boolean inputOutputVar)
     {
-
-	/*
-	 * XXX Det mesta av koden här bör kanske läggas i en egen class
-	 * för field-generering(global variables are only allowed at
-	 *               configuration, resource or program level)
-	 */
 	if (global)
 	    {
 		error("Global variables not allowed in function blocks");
@@ -115,7 +110,8 @@ public class FunctionBlockBuilder
 	    }
     }
 
-    /**emitDirectInit is used to set init values to direct output variables,
+    /**
+     * emitDirectInit is used to set init values to direct output variables,
      * but in the case of function blocks direct variables are not allowed
      * and errors will be generated.
      * @param v the direct variable
@@ -124,10 +120,11 @@ public class FunctionBlockBuilder
     public void emitDirectInit(IECDirectVariable v, TypeBOOL i)
     {
 	error("Direct variables are not allowed in function and therefore " + 
-	      "you can't initialise such vars.");
+	      "you can't initialise such vars." + v);
     }
 
-    /**emitLoadVariable pushes the value of a specified variable
+    /**
+     * emitLoadVariable pushes the value of a specified variable
      * on the stack without manipulating
      * previous stack values
      * This method also applies to AT-defined variables since these
@@ -136,17 +133,18 @@ public class FunctionBlockBuilder
      */
     InstructionList emitLoadVariable(IECDirectVariable var)
     {
-	error("Reference to direct variable not allowed in function blocks");
+	error("Reference to direct variable not allowed in function blocks"+var);
 	return new InstructionList();
     }
 
-    /**emitStoreVariable takes the top of stack value and stores it in
+    /**
+     * emitStoreVariable takes the top of stack value and stores it in
      * the specified variable
      * @param var variable to store TOS value in
      */
     InstructionList emitStoreVariable(IECDirectVariable var)
     {
-	error("Reference to direct variable not allowed in function blocks");
+	error("Reference to direct variable not allowed in function blocks"+var);
 	return new InstructionList();
     }
 }
