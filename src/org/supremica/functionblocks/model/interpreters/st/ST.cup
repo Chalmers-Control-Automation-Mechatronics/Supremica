@@ -1,0 +1,97 @@
+// CUP specification for ST expressions
+
+package org.supremica.functionblocks.model.interpreters.st;
+
+import java_cup.runtime.*;
+
+/* Preliminaries to set up and use the scanner.  
+init with {: scanner.init();              :};
+scan with {: return scanner.next_token(); :};*/
+
+/* Terminals (tokens returned by the scanner). */
+terminal            OR,XOR,AND;
+terminal	    EQ,NEQ;
+terminal            LESS,LESSEQ,MORE,MOREEQ;
+terminal            PLUS,MINUS;
+terminal	    TIMES,DIV,MOD;
+terminal	    POWER;
+terminal            NOT; 
+terminal            LPAREN, RPAREN;
+terminal 	    STRING;
+terminal 	    NUMBER;
+terminal	    BOOL;
+terminal            IDENT;
+
+/* Non terminals */
+non terminal     expression, expressionp;
+non terminal     xor_expression, xor_expressionp;
+non terminal     and_expression, and_expressionp;
+non terminal     comparison, comparisonp;
+non terminal     equ_expression, equ_expressionp;
+non terminal     add_expression, add_expressionp;
+non terminal     term, termp;
+non terminal     power_expression, power_expressionp;
+non terminal     unary_expression;
+non terminal     primary_expression;
+non terminal     constant, variable;
+non terminal     empty;
+
+/* Precedences */
+//precedence left PLUS, MINUS;
+//precedence left TIMES, DIVIDE, MOD;
+//precedence left UMINUS;
+
+
+/* The grammar */
+
+start with expression;
+
+expression ::= xor_expression expressionp;
+expressionp ::= OR xor_expression expressionp | empty;
+
+xor_expression ::= and_expression xor_expressionp;
+xor_expressionp ::= XOR and_expression xor_expressionp | empty;
+
+and_expression ::= comparison and_expressionp;
+and_expressionp ::= AND comparison and_expressionp | empty;
+
+comparison ::= equ_expression comparisonp;
+comparisonp ::= EQ equ_expression comparisonp 
+	      | NEQ equ_expression comparisonp	
+	      | empty;
+
+equ_expression ::= add_expression equ_expressionp;
+equ_expressionp ::=  LESS   add_expression equ_expressionp 
+		  |  LESSEQ add_expression equ_expressionp 
+		  |  MORE   add_expression equ_expressionp 
+		  |  MOREEQ add_expression equ_expressionp 
+	          |  empty;
+
+add_expression ::= term add_expressionp;
+add_expressionp ::= PLUS term add_expressionp
+ 		  | MINUS term add_expressionp 
+	      	  | empty;
+
+term ::= power_expression termp;
+termp ::= TIMES power_expression termp 
+	| DIV power_expression termp
+	| MOD power_expression termp  
+	| empty;
+
+power_expression ::= unary_expression power_expressionp;
+power_expressionp ::= POWER unary_expression power_expressionp 
+	            | empty;
+
+unary_expression ::= primary_expression
+		   | MINUS primary_expression
+		   | NOT primary_expression;
+
+primary_expression ::= constant 
+                     | variable 
+		     | LPAREN expression RPAREN;
+
+constant ::= STRING | NUMBER | BOOL;
+
+variable ::= IDENT;
+
+empty ::=;
