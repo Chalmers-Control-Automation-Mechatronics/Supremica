@@ -748,7 +748,7 @@ public final class AutomataSynchronizerExecuter
 						State[][] stateTable = indexForm.getStateTable();
 						StringBuffer sb = new StringBuffer();
 
-						for (int j = 0; j < currState.length - 1; j++)
+						for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
 						{
 							sb.append(stateTable[j][currState[j]].getId());
 						}
@@ -1043,7 +1043,7 @@ public final class AutomataSynchronizerExecuter
 	{
 
 		// Assume that the last element is a status field
-		for (int i = 0; i < firstArray.length - 1; i++)
+		for (int i = 0; i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
 			if (firstArray[i] != secondArray[i])
 			{

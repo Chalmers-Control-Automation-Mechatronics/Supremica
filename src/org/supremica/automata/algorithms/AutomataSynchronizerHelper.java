@@ -395,7 +395,7 @@ public final class AutomataSynchronizerHelper
 		boolean forbidden = AutomataIndexFormHelper.isForbidden(tmpStatus);
 		int currStatus;
 
-		for (int i = 1; i < state.length - 1; i++)
+		for (int i = 1; i < state.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
 			if ((activeAutomata == null) || (activeAutomata[i] == true))
 			{
@@ -412,12 +412,12 @@ public final class AutomataSynchronizerHelper
 			tmpStatus |= (1 << 2);
 		}
 
-		state[state.length - 1] = tmpStatus;
+		state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END] = tmpStatus;
 	}
 
 	public void setForbidden(int[] state, boolean forbidden)
 	{
-		int currStatus = state[state.length - 1];
+		int currStatus = state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END];
 
 		if (forbidden)
 		{
@@ -428,14 +428,14 @@ public final class AutomataSynchronizerHelper
 			currStatus &= ~(1 << 2);
 		}
 
-		state[state.length - 1] = currStatus;
+		state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END] = currStatus;
 		helperData.nbrOfForbiddenStates++;
 	}
 
 	public void setDeadlocked(int[] state, boolean deadlocked)
 	{
 		logger.debug(AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
-		int currStatus = state[state.length - 1];
+		int currStatus = state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END];
 
 		if (deadlocked)
 		{
@@ -447,7 +447,7 @@ public final class AutomataSynchronizerHelper
 			currStatus &= ~(1 << 6);
 		}
 
-		state[state.length - 1] = currStatus;
+		state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END] = currStatus;
 	}
 
 	public int[][] getStateTable()

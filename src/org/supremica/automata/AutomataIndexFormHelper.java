@@ -53,9 +53,13 @@ import java.util.StringTokenizer;
 
 public final class AutomataIndexFormHelper
 {
+	public static final int STATE_EXTRA_DATA = 2;
+	public static final int STATE_STATUS_FROM_END = 1;
+	public static final int STATE_PREVSTATE_FROM_END = 2;
+
 	public static int[] createState(int nbrOfAutomata)
 	{
-		return new int[nbrOfAutomata + 1];
+		return new int[nbrOfAutomata + STATE_EXTRA_DATA];
 	}
 
 	public static int[] createCopyOfState(int[] state)
@@ -141,32 +145,32 @@ public final class AutomataIndexFormHelper
 
 	public static boolean isInitial(int[] state)
 	{
-		return isInitial(state[state.length - 1]);
+		return isInitial(state[state.length - STATE_STATUS_FROM_END]);
 	}
 
 	public static boolean isAccepting(int[] state)
 	{
-		return isAccepting(state[state.length - 1]);
+		return isAccepting(state[state.length - STATE_STATUS_FROM_END]);
 	}
 
 	public static boolean isForbidden(int[] state)
 	{
-		return isForbidden(state[state.length - 1]);
+		return isForbidden(state[state.length - STATE_STATUS_FROM_END]);
 	}
 
 	public static boolean isFirst(int[] state)
 	{
-		return isFirst(state[state.length - 1]);
+		return isFirst(state[state.length - STATE_STATUS_FROM_END]);
 	}
 
 	public static boolean isLast(int[] state)
 	{
-		return isLast(state[state.length - 1]);
+		return isLast(state[state.length - STATE_STATUS_FROM_END]);
 	}
 
 	public static boolean isDeadlocked(int[] state)
 	{
-		return isDeadlocked(state[state.length - 1]);
+		return isDeadlocked(state[state.length - STATE_STATUS_FROM_END]);
 	}
 
 	/**
@@ -262,7 +266,7 @@ public final class AutomataIndexFormHelper
 
 		State[][] stateTable = theForm.getStateTable();
 
-		for (int i = 0; i < state.length - 1; i++)
+		for (int i = 0; i < state.length - STATE_EXTRA_DATA; i++)
 		{
 			Automaton currAutomaton = theForm.getAutomaton(i);
 			State currState = theForm.getState(i, state[i]);
@@ -270,7 +274,7 @@ public final class AutomataIndexFormHelper
 			sb.append("Automaton index:" + i + " name: \"" + currAutomaton.getName() + "\", State: index:" + state[i] + " name:\"" + currState.getName() + "\"\n");
 		}
 
-		sb.append("Status: " + state[state.length - 1] + "\n");
+		sb.append("Status: " + state[state.length - STATE_STATUS_FROM_END] + "\n");
 
 		sb.append("]");
 

@@ -53,7 +53,7 @@ import org.supremica.automata.AutomataIndexFormHelper;
 import java.util.*;
 
 /**
- * Insert <int_1, int_2, int_3, ..., int_n, int_status>
+ * Insert <int_1, int_2, int_3, ..., int_n, prev_state, int_status>
  */
 public final class IntArrayHashTable
 {
@@ -252,7 +252,7 @@ public final class IntArrayHashTable
 	{    // Assume that the last element is a status field
 		int hashCode = 1;
 
-		for (int i = 0; i < theArray.length - 1; i++)
+		for (int i = 0; i < theArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
 			hashCode = 127 * hashCode + 7 * theArray[i];
 		}
@@ -262,7 +262,7 @@ public final class IntArrayHashTable
 
 	public static boolean equalsIntArray(int[] firstArray, int[] secondArray)
 	{    // Assume that the last element is a status field
-		for (int i = 0; i < firstArray.length - 1; i++)
+		for (int i = 0; i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
 			if (firstArray[i] != secondArray[i])
 			{
