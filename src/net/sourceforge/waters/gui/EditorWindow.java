@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.5 2005-02-20 23:32:54 robi Exp $
+//# $Id: EditorWindow.java,v 1.6 2005-02-22 02:14:15 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.expr.IdentifierProxy;
 import org.supremica.gui.GraphicsToClipboard;
 import java.awt.geom.Rectangle2D;
 
-class EditorWindow
+public class EditorWindow
 	extends JFrame
 {
 	private EditorToolbar toolbar;

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleTreeRenderer
 //###########################################################################
-//# $Id: ModuleTreeRenderer.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: ModuleTreeRenderer.java,v 1.3 2005-02-22 02:14:15 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-class ModuleTreeRenderer
+public class ModuleTreeRenderer
 	extends DefaultTreeCellRenderer
 {
 	Icon plantIcon;
