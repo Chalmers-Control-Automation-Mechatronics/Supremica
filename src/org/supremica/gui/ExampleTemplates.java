@@ -216,8 +216,8 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Uncontrollable", prefix + "centralLock/verriegel3_uncontrollable.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Inclusion", prefix + "centralLock/verriegel3_language_inclusion.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Exclusion", prefix + "centralLock/verriegel3_language_exclusion.xml"));
-		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants", prefix + "centralLock/verriegel3_joint.xml"));
-		thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants Uncontrollable", prefix + "centralLock/verriegel3_joint_uncontrollable.xml"));
+		//thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants", prefix + "centralLock/verriegel3_joint.xml"));
+		//thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants Uncontrollable", prefix + "centralLock/verriegel3_joint_uncontrollable.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors", prefix + "centralLock/verriegel4.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Inclusion", prefix + "centralLock/verriegel4_language_inclusion.xml"));
 		thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "centralLock/verriegel4_language_exclusion.xml"));
