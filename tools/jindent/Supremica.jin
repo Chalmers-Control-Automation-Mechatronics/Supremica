@@ -1,8 +1,6 @@
 ###
-### Converted from "Supremica.jin", please enter own header here...
+### Jindent 3.51 property file -- http://www.jindent.com
 ###
-
-
 
 
 
@@ -226,10 +224,10 @@ deleteSingleLineComments                  = false
 deleteTrailingComments                    = false
 deleteEndOfLineComments                   = false
 
-formatBlockComments                       = true
-formatSingleLineComments                  = true
-formatTrailingComments                    = true
-formatEndOfLineComments                   = true
+formatBlockComments                       = false
+formatSingleLineComments                  = false
+formatTrailingComments                    = false
+formatEndOfLineComments                   = false
 
 
 ### Comments -- Exceptions
@@ -326,6 +324,9 @@ spaceAfterTilde                           = false
 
 spaceBeforeCaseColon                      = true
 
+spaceBeforeAssertColon                    = true
+spaceAfterAssertColon                     = true
+
 
 ### Whitespaces -- Space After
 
@@ -371,6 +372,3 @@ alwaysWrapImplements                      = true
 indentWrappedThrows                       = 4
 indentWrappedExtends                      = 4
 indentWrappedImplements                   = 4
-
-spaceBeforeAssertColon                    = true
-spaceAfterAssertColon                     = true

@@ -1,5 +1,3 @@
-
-
 package org.supremica.util.BDD;
 
 /**
@@ -15,60 +13,73 @@ package org.supremica.util.BDD;
  * TODO: add constraint and restrict/simplify optimization soon
  *
  */
-
-public class FrontierSetOptimizer {
+public class FrontierSetOptimizer
+{
 	private BDDAutomata manager;
 
-	public FrontierSetOptimizer(BDDAutomata manager) {
+	public FrontierSetOptimizer(BDDAutomata manager)
+	{
 		this.manager = manager;
 	}
 
+	public void cleanup()
+	{
 
-	public void cleanup() {
 		// nothing yet...
 	}
-
 
 	/**
 	 * choose something between front and r,
 	 * TAKES CARE OF DE-REFING front!!
 	 *
 	 */
-	public int choose(int r, int front) {
-
-
+	public int choose(int r, int front)
+	{
 		boolean choose_r = true;
 
-		switch(Options.frontier_strategy) {
-			case Options.FRONTIER_STRATEGY_RANDOM:
-				choose_r  = (Math.random() >= 0.5);
-				break;
+		switch (Options.frontier_strategy)
+		{
 
-			case Options.FRONTIER_STRATEGY_R:
-				choose_r  = true;
-				break;
+		case Options.FRONTIER_STRATEGY_RANDOM :
+			choose_r = (Math.random() >= 0.5);
+			break;
 
-			case Options.FRONTIER_STRATEGY_FRONT:
-				choose_r  = false;
-				break;
+		case Options.FRONTIER_STRATEGY_R :
+			choose_r = true;
+			break;
 
-			case Options.FRONTIER_STRATEGY_FRONT_MINUS_R:
-				if(r == front) break; // we dont optimize if they are equal (maybe the first round!)
-				int x = manager.ite(r, manager.getZero(), front); // x = front - r
-				manager.deref(front);
-				return x;
+		case Options.FRONTIER_STRATEGY_FRONT :
+			choose_r = false;
+			break;
 
-			case Options.FRONTIER_STRATEGY_MIN:
-				int s1 = manager.nodeCount(r);
-				int s2 = manager.nodeCount(front);
-				choose_r = (s1 < s2);
-				break;
+		case Options.FRONTIER_STRATEGY_FRONT_MINUS_R :
+			if (r == front)
+			{
+				break;    // we dont optimize if they are equal (maybe the first round!)
+			}
+
+			int x = manager.ite(r, manager.getZero(), front);    // x = front - r
+
+			manager.deref(front);
+
+			return x;
+
+		case Options.FRONTIER_STRATEGY_MIN :
+			int s1 = manager.nodeCount(r);
+			int s2 = manager.nodeCount(front);
+
+			choose_r = (s1 < s2);
+			break;
 		}
 
-		if(choose_r) {
+		if (choose_r)
+		{
 			manager.deref(front);
+
 			return manager.ref(r);
-		} else {
+		}
+		else
+		{
 			return front;
 		}
 	}

@@ -9,21 +9,22 @@ class XMLReader
 	extends DefaultHandler
 {
 	private static final String TYPE_AUTOMATA = "Automata",
-						 TYPE_AUTOMATON = "Automaton", TYPE_EVENT = "Event",
-						 TYPE_STATE = "State", TYPE_ARC = "Transition",
-						 VALUE_NAME = "name", VALUE_ID = "id",
-						 VALUE_LABEL = "label", VALUE_TYPE = "type",
-						 VALUE_INITIAL = "initial",
-						 VALUE_MARKED = "accepting",
-						 VALUE_FORBIDDEN = "forbidden",
-						 VALUE_CONTROLLABLE = "controllable",
-						 VALUE_PRIORITIZED = "prioritized",
-						 VALUE_EVENT = "event", VALUE_FROM = "source", VALUE_TO = "dest"
+								TYPE_AUTOMATON = "Automaton",
+								TYPE_EVENT = "Event", TYPE_STATE = "State",
+								TYPE_ARC = "Transition", VALUE_NAME = "name",
+								VALUE_ID = "id", VALUE_LABEL = "label",
+								VALUE_TYPE = "type",
+								VALUE_INITIAL = "initial",
+								VALUE_MARKED = "accepting",
+								VALUE_FORBIDDEN = "forbidden",
+								VALUE_CONTROLLABLE = "controllable",
+								VALUE_PRIORITIZED = "prioritized",
+								VALUE_EVENT = "event", VALUE_FROM = "source", VALUE_TO = "dest"
 	;
 	private Automata automata;
 
 	XMLReader(Automata automata, String filename)
-	    throws IOException, ParserConfigurationException, SAXException
+		throws IOException, ParserConfigurationException, SAXException
 	{
 		this.automata = automata;
 
@@ -81,85 +82,90 @@ class XMLReader
 	}
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes)
-	    throws SAXException
+		throws SAXException
 	{
-	    try {
-		if (qName.equals(TYPE_AUTOMATON))
+		try
 		{
-			String name = attributes.getValue(VALUE_NAME);
-			int type = getType(attributes.getValue(VALUE_TYPE));
-
-			automata.createAutomaton(name, null);
-			automata.getCurrent().setType(type);
-		}
-		else if (qName.equals(TYPE_STATE))
-		{
-			Automaton c = automata.getCurrent();
-			String name = attributes.getValue(VALUE_NAME);
-			String name_id = attributes.getValue(VALUE_ID);
-
-			if (name == null)
+			if (qName.equals(TYPE_AUTOMATON))
 			{
-				name = name_id;
+				String name = attributes.getValue(VALUE_NAME);
+				int type = getType(attributes.getValue(VALUE_TYPE));
+
+				automata.createAutomaton(name, null);
+				automata.getCurrent().setType(type);
 			}
-			else if (name_id == null)
+			else if (qName.equals(TYPE_STATE))
 			{
-				name_id = name;    // just for fun :)
+				Automaton c = automata.getCurrent();
+				String name = attributes.getValue(VALUE_NAME);
+				String name_id = attributes.getValue(VALUE_ID);
+
+				if (name == null)
+				{
+					name = name_id;
+				}
+				else if (name_id == null)
+				{
+					name_id = name;    // just for fun :)
+				}
+
+				boolean initial = getBooleanValue(attributes, VALUE_INITIAL, false);
+				boolean marked = getBooleanValue(attributes, VALUE_MARKED, false);
+				boolean forbidden = getBooleanValue(attributes, VALUE_FORBIDDEN, false);
+
+				c.addState(name, name_id, initial, marked, forbidden);
 			}
-
-			boolean initial = getBooleanValue(attributes, VALUE_INITIAL, false);
-			boolean marked = getBooleanValue(attributes, VALUE_MARKED, false);
-			boolean forbidden = getBooleanValue(attributes, VALUE_FORBIDDEN, false);
-
-			c.addState(name, name_id, initial, marked, forbidden);
-		}
-		else if (qName.equals(TYPE_EVENT))
-		{
-			Automaton c = automata.getCurrent();
-			String id = attributes.getValue(VALUE_ID);
-			String label = attributes.getValue(VALUE_LABEL);
-
-			if (label == null)
+			else if (qName.equals(TYPE_EVENT))
 			{
-				label = id;
+				Automaton c = automata.getCurrent();
+				String id = attributes.getValue(VALUE_ID);
+				String label = attributes.getValue(VALUE_LABEL);
+
+				if (label == null)
+				{
+					label = id;
+				}
+
+				boolean co = getBooleanValue(attributes, VALUE_CONTROLLABLE, true);
+				boolean p = getBooleanValue(attributes, VALUE_PRIORITIZED, true);
+
+				c.addEvent(label, id, co, p);
 			}
+			else if (qName.equals(TYPE_ARC))
+			{
+				Automaton c = automata.getCurrent();
+				String name = attributes.getValue(VALUE_EVENT);
+				String from = attributes.getValue(VALUE_FROM);
+				String to = attributes.getValue(VALUE_TO);
 
-			boolean co = getBooleanValue(attributes, VALUE_CONTROLLABLE, true);
-			boolean p = getBooleanValue(attributes, VALUE_PRIORITIZED, true);
-
-			c.addEvent(label, id, co, p);
+				c.addArc(name, from, to);
+			}
 		}
-		else if (qName.equals(TYPE_ARC))
+		catch (BDDException e)
 		{
-			Automaton c = automata.getCurrent();
-			String name = attributes.getValue(VALUE_EVENT);
-			String from = attributes.getValue(VALUE_FROM);
-			String to = attributes.getValue(VALUE_TO);
-
-			c.addArc(name, from, to);
+			throw new SAXException(e.toString());
 		}
-	    } catch(BDDException e) {
-		throw new SAXException(e.toString());
-	    }
 	}
 
 	public void endElement(String uri, String localName, String qName)
-	    throws SAXException
-
+		throws SAXException
 	{
-	    try {
-		if (qName.equals(TYPE_AUTOMATON))
+		try
 		{
-			automata.getCurrent().close();
+			if (qName.equals(TYPE_AUTOMATON))
+			{
+				automata.getCurrent().close();
 
-			// Options.out.println("read automaton " + automata.getCurrent().getName() );
+				// Options.out.println("read automaton " + automata.getCurrent().getName() );
+			}
+			else if (qName.equals(TYPE_AUTOMATA))
+			{
+				automata.close();
+			}
 		}
-		else if (qName.equals(TYPE_AUTOMATA))
+		catch (BDDException e)
 		{
-			automata.close();
+			throw new SAXException(e.toString());
 		}
-	    } catch(BDDException e) {
-		throw new SAXException(e.toString());
-	    }
 	}
 }

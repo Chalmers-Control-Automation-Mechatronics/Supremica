@@ -19,6 +19,7 @@ public class EventManager
 	private Event addEvent(Event e)
 	{
 		e.id = size++;
+
 		eventv.addElement(e);
 
 		return e;
@@ -40,7 +41,7 @@ public class EventManager
 	}
 
 	public int registerEvent(Event e)
-	    throws BDDException
+		throws BDDException
 	{
 		BDDAssert.internalCheck(!closed, "[EventManager.registerEvent] BAD function call");
 
@@ -58,7 +59,8 @@ public class EventManager
 		}
 
 		e.id = old.id;    // copy the id (possibly just created)
-		old.owners++; // mark that this event has been used once
+
+		old.owners++;    // mark that this event has been used once
 
 		return old.id;
 	}
@@ -66,20 +68,24 @@ public class EventManager
 	// -----------------------------------------------------
 	public Vector getLocalEvents(Automaton owner)
 	{
-	    Vector ret = new Vector();
-	    BDDAssert.internalCheck(closed, "[EventManager.registerEvent] BAD function call");
+		Vector ret = new Vector();
 
-	    for (int i = 0; i < size; i++) {
-		if(events[i].owners == 1 && events[i].automaton == owner) ret.add(events[i]);
-	    }
-	    return ret;
+		BDDAssert.internalCheck(closed, "[EventManager.registerEvent] BAD function call");
 
+		for (int i = 0; i < size; i++)
+		{
+			if ((events[i].owners == 1) && (events[i].automaton == owner))
+			{
+				ret.add(events[i]);
+			}
+		}
+
+		return ret;
 	}
-
 
 	// -----------------------------------------------------
 	public void close()
-	    throws BDDException
+		throws BDDException
 	{
 		BDDAssert.internalCheck(!closed, "[EventManager.registerEvent] BAD function call");
 
@@ -142,34 +148,54 @@ public class EventManager
 	}
 
 	/** gives the number automata that "use" each event */
-	public void getUsageCount(int [] answer) {
+	public void getUsageCount(int[] answer)
+	{
 		BDDAssert.internalCheck(closed, "[EventManager.copyEvents] BAD function call");
+
 		for (int i = 0; i < size; i++)
+		{
 			answer[i] = events[i].owners;
+		}
 	}
 
 	// --------------------------------------------------------------------
+
 	/** prints only a subset of the events. given by 'subset'
 	 */
-	public void dumpSubset(String what, boolean [] subset)
+	public void dumpSubset(String what, boolean[] subset)
 	{
 		int count = 0;
+
 		Options.out.print(what + " {");
-		for(int i = 0; i < size; i++)
-			if(subset[i]) {
-				if(count > 0) Options.out.print(", ");
+
+		for (int i = 0; i < size; i++)
+		{
+			if (subset[i])
+			{
+				if (count > 0)
+				{
+					Options.out.print(", ");
+				}
+
 				Options.out.print(events[i].getName());
+
 				count++;
 			}
+		}
 
 		Options.out.println("};");
 	}
-	public void showEncoding(BDDAutomata ba) {
+
+	public void showEncoding(BDDAutomata ba)
+	{
 		Options.out.println("\n ---------------- Alphabet encoding:");
-		for(int i = 0; i < size; i++) {
-			Options.out.println(events[i].getName() );
-			ba.printSet(events[i].getBDD() );
+
+		for (int i = 0; i < size; i++)
+		{
+			Options.out.println(events[i].getName());
+			ba.printSet(events[i].getBDD());
 		}
+
 		Options.out.println();
 	}
 }

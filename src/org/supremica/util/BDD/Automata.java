@@ -1,7 +1,6 @@
 package org.supremica.util.BDD;
 
 import org.supremica.util.BDD.heuristics.*;
-
 import java.util.*;
 import java.io.*;
 
@@ -27,7 +26,7 @@ public class Automata
 	}
 
 	public Automaton createAutomaton(Object org, String name)
-	    throws BDDException
+		throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[Automata.createAutomaton] BAD function call");
 
@@ -63,69 +62,81 @@ public class Automata
 		return variable_count;
 	}
 
-	public long getReorderingTime() {
+	public long getReorderingTime()
+	{
 		return reordering_time;
 	}
 
-  public int [][]getCommunicationMatrix()
+	public int[][] getCommunicationMatrix()
 		throws BDDException
 	{
-	    int components = automata.size();
-	    int [][]ret = new int[components][components];
+		int components = automata.size();
+		int[][] ret = new int[components][components];
 
-	    for(int i = 0; i < components; i++) {
+		for (int i = 0; i < components; i++)
+		{
 			Automaton a1 = (Automaton) automata.elementAt(i);
-			ret[i][i] = a1.getCommunicationComplexity(a1); // not actually needed :)
-			for (int j = 0; j < i; j++) {
+
+			ret[i][i] = a1.getCommunicationComplexity(a1);    // not actually needed :)
+
+			for (int j = 0; j < i; j++)
+			{
 				Automaton a2 = (Automaton) automata.elementAt(j);
 				int cc = a1.getCommunicationComplexity(a2);
+
 				ret[i][j] = ret[j][i] = cc;
 			}
-	    }
-	    return ret;
+		}
+
+		return ret;
 	}
+
 	public void close()
-	    throws BDDException
+		throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[Automata.close] BAD function call");
 		alphabet.close();
 
 		int components;
 
-		for(Enumeration e = automata.elements(); e.hasMoreElements();)
+		for (Enumeration e = automata.elements(); e.hasMoreElements(); )
 		{
 			Automaton a = (Automaton) e.nextElement();
 
 			a.close2();
 		}
 
-
 		// --[ Automata ordering which affects the BDD variable ordering starts HERE ] --
-		Timer timer = new Timer(); // This times the ordering procedure
+		Timer timer = new Timer();    // This times the ordering procedure
 		AutomataOrderingHeuristic aoh = AutomataOrderingHeuristicFactory.createInstance(this);
+
 		grupp_ordering = aoh.ordering();
-		timer.report("Automata reordering '" +  AutomataOrderingHeuristicFactory.getName() + "' done");
+
+		timer.report("Automata reordering '" + AutomataOrderingHeuristicFactory.getName() + "' done");
+
 		reordering_time = timer.getElapsed();
 
-
 		// maybe the user needs to change something ?
-		if (Options.user_alters_PCG) {
-		    PCGFrame frame = new PCGFrame(grupp_ordering, automata);
-		    frame.getUserPermutation();
+		if (Options.user_alters_PCG)
+		{
+			PCGFrame frame = new PCGFrame(grupp_ordering, automata);
+
+			frame.getUserPermutation();
 		}
 
 		// now, use the new ordering to re-order the list:
 		components = automata.size();
+
 		Vector tmp = new Vector();
+
 		for (int i = 0; i < components; i++)
 		{
 			tmp.addElement(automata.elementAt(grupp_ordering[i]));
 		}
 
 		automata.removeAllElements();    // just for fun
+
 		automata = tmp;
-
-
 
 		// compute upper-bound and allocated states size
 		total_size = 1;
@@ -146,9 +157,10 @@ public class Automata
 		total_size_allocated = Math.pow(2, variable_count);
 		variable_count = variable_count * 3 + Util.log2ceil(alphabet.getSize());
 
-		if(Options.debug_on || Options.profile_on) {
-			Options.out.println("The theoretical number of states is " + Util.showHugeNumber( total_size));
-			Options.out.println("Universe size is " + Util.showHugeNumber( total_size_allocated));
+		if (Options.debug_on || Options.profile_on)
+		{
+			Options.out.println("The theoretical number of states is " + Util.showHugeNumber(total_size));
+			Options.out.println("Universe size is " + Util.showHugeNumber(total_size_allocated));
 		}
 
 		// .... and, we are done

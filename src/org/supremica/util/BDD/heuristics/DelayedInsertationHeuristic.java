@@ -1,5 +1,3 @@
-
-
 package org.supremica.util.BDD.heuristics;
 
 import org.supremica.util.BDD.*;
@@ -11,30 +9,39 @@ import org.supremica.util.BDD.*;
  * Note that the first automata (last in the queue) MUST be inserted firs!
  *
  */
-
-public abstract class DelayedInsertationHeuristic {
-
-	protected Cluster [] cluster_stack;
-	protected int [] order;
+public abstract class DelayedInsertationHeuristic
+{
+	protected Cluster[] cluster_stack;
+	protected int[] order;
 	protected int curr;
 
-	public DelayedInsertationHeuristic (Cluster [] stack, int size) {
+	public DelayedInsertationHeuristic(Cluster[] stack, int size)
+	{
 		cluster_stack = stack;
 		order = new int[size];
 		curr = 0;
 	}
 
-
-	public void init(int size) {
+	public void init(int size)
+	{
 		curr = size;
+
 		do_order();
 	}
 
+	public boolean empty()
+	{
+		return curr == 0;
+	}
 
-	public boolean empty() { return curr == 0;  }
-	public Cluster next()  {
-		if(curr == 0) return null;
-		return cluster_stack [ order[ --curr ] ];
+	public Cluster next()
+	{
+		if (curr == 0)
+		{
+			return null;
+		}
+
+		return cluster_stack[order[--curr]];
 	}
 
 	/**
@@ -46,8 +53,4 @@ public abstract class DelayedInsertationHeuristic {
 	 * at exit, order[0..curr-1] states the STACK-order decided by the heuristics
 	 */
 	protected abstract void do_order();
-
-
-
-
 }

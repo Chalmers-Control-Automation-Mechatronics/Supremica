@@ -38,7 +38,6 @@ public class IntArray
 		return size;
 	}
 
-
 	public int get(int index)
 	{
 		return ((index >= 0) && (index < size))
@@ -46,7 +45,7 @@ public class IntArray
 			   : 0;
 	}
 
-	public int [] getAll()
+	public int[] getAll()
 	{
 		return array;
 	}
@@ -65,12 +64,18 @@ public class IntArray
 	{
 		size = 0;
 	}
-	/** make a copy of exactly the right size */
-	public int [] copy() {
-		int [] c = new int[size];
-		for(int i = 0; i < size; i++) c[i] = array[i];
-		return c;
 
+	/** make a copy of exactly the right size */
+	public int[] copy()
+	{
+		int[] c = new int[size];
+
+		for (int i = 0; i < size; i++)
+		{
+			c[i] = array[i];
+		}
+
+		return c;
 	}
 
 	private void resize()
@@ -86,7 +91,7 @@ public class IntArray
 
 			int[] tmp = new int[capacity];
 
-			if(size > 200)	// native method call is to slow for small values due to call overhead!
+			if (size > 200)    // native method call is to slow for small values due to call overhead!
 			{
 				System.arraycopy(array, 0, tmp, 0, size);
 			}

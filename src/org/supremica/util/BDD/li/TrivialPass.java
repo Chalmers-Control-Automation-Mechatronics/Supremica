@@ -1,4 +1,3 @@
-
 package org.supremica.util.BDD.li;
 
 /**
@@ -6,10 +5,10 @@ package org.supremica.util.BDD.li;
  * crap to just follow the algorithm story-line, we throw in one of these
  *
  */
-
-public class TrivialPass extends Exception
+public class TrivialPass
+	extends Exception
 {
-	public TrivialPass (String pass_what)
+	public TrivialPass(String pass_what)
 	{
 		super(pass_what);
 	}

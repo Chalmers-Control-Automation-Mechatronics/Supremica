@@ -21,19 +21,25 @@ public class ASTil_param_list
 	private LinkedList in = new LinkedList();
 	private LinkedList out = new LinkedList();
 
-	public void addParameter(Param p) {
-		if (p.type == "in") {
+	public void addParameter(Param p)
+	{
+		if (p.type == "in")
+		{
 			in.add(p);
-		} else {
+		}
+		else
+		{
 			out.add(p);
 		}
 	}
 
-	public LinkedList getInParameters() {
+	public LinkedList getInParameters()
+	{
 		return in;
 	}
 
-	public LinkedList getOutParameters() {
+	public LinkedList getOutParameters()
+	{
 		return out;
 	}
 
@@ -41,6 +47,4 @@ public class ASTil_param_list
 	{
 		return v.visitIL_PARAM_LIST(this, o);
 	}
-
-
 }

@@ -217,12 +217,11 @@ public final class IntArrayHashTable
 	}
 
 /*
-	private static int getIndex(int[][] theTable, int[] theArray)
-	{
-		return theTable.getIndex(theArray);
-	}
+		private static int getIndex(int[][] theTable, int[] theArray)
+		{
+				return theTable.getIndex(theArray);
+		}
 */
-
 	private int getTableIndex(int hash)
 	{
 		return (hash & 0x7FFFFFFF) % theTable.length;
@@ -271,10 +270,12 @@ public final class IntArrayHashTable
 			{
 				int[] currState = oldTable[i];
 				int prevStateIndex = currState[currState.length - AutomataIndexFormHelper.STATE_PREVSTATE_FROM_END];
+
 				if (prevStateIndex != AutomataIndexFormHelper.STATE_NO_PREVSTATE)
 				{
 					int[] prevState = oldTable[prevStateIndex];
 					int newPrevStateIndex = getIndex(prevState);
+
 					AutomataIndexFormHelper.setPrevStateIndex(currState, newPrevStateIndex);
 				}
 			}
@@ -285,7 +286,9 @@ public final class IntArrayHashTable
 	{    // The two last elements are special!
 		int hashCode = 1;
 
-		for (int i = 0; i < theArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
+		for (int i = 0;
+				i < theArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA;
+				i++)
 		{
 			hashCode = 127 * hashCode + 7 * theArray[i];
 		}
@@ -295,7 +298,9 @@ public final class IntArrayHashTable
 
 	public static boolean equalsIntArray(int[] firstArray, int[] secondArray)
 	{    // The two last elements are not to be compared!
-		for (int i = 0; i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
+		for (int i = 0;
+				i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA;
+				i++)
 		{
 			if (firstArray[i] != secondArray[i])
 			{

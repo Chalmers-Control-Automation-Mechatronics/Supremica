@@ -7,28 +7,34 @@ public class Group
 	private BDDAutomaton[] members;
 	private BDDAutomata manager;
 	private String name;
-	private int bdd_i, bdd_cube, bdd_cubep, bdd_sigma, bdd_sigma_u, bdd_t, bdd_m, bdd_tu;
+	private int bdd_i, bdd_cube, bdd_cubep, bdd_sigma, bdd_sigma_u, bdd_t,
+				bdd_m, bdd_tu;
 	private boolean has_t, has_tu, has_m;
+
 	/* if this flags is set, the Supervisor derivats should not attempt to cleanup this group after they are done,
 	 * since it is probably owned by an incremental algorithm that will _reuse_ this group in the next run and
 	 * hopefully :) clean it up when the algorithm terminates ...*/
 	private boolean cleanup_flag = true;
 
-
-    public Group(BDDAutomata manager, BDDAutomaton [] automata, String name)
-    {
+	public Group(BDDAutomata manager, BDDAutomaton[] automata, String name)
+	{
 		this(manager, automata, null, name);
-    }
-    public Group(BDDAutomata manager, BDDAutomaton [] automata, GroupMembership member, String name)
-    {
+	}
+
+	public Group(BDDAutomata manager, BDDAutomaton[] automata, GroupMembership member, String name)
+	{
 		this(manager, automata.length, name);
+
 		init();
-		for(int i = 0; i < automata.length; i++)
-		    if(member == null || member.shouldInclude(automata[i]))
-		    {
+
+		for (int i = 0; i < automata.length; i++)
+		{
+			if ((member == null) || member.shouldInclude(automata[i]))
+			{
 				add(automata[i]);
 			}
-    }
+		}
+	}
 
 	public Group(BDDAutomata manager, int max_capacity, String name)
 	{
@@ -37,54 +43,56 @@ public class Group
 		capacity = max_capacity;
 		size = 0;
 		members = new BDDAutomaton[capacity];
-		init();
 
+		init();
 	}
 
-
-
 	/* ------------------------------------------------------------------ */
+
 	/** empty the group and start from the beginning */
-	public void empty() {
+	public void empty()
+	{
 		cleanup();
 		init();
+
 		size = 0;
 	}
 
-    private void init() {
+	private void init()
+	{
 
-    	// no pre-calculations are valid
+		// no pre-calculations are valid
 		has_t = false;
 		has_tu = false;
 		has_m = false;
-
 		bdd_i = manager.getOne();
+
 		manager.ref(bdd_i);
 
 		bdd_cube = manager.getOne();
+
 		manager.ref(bdd_cube);
 
 		bdd_cubep = manager.getOne();
+
 		manager.ref(bdd_cubep);
 
 		bdd_sigma_u = manager.getZero();
+
 		manager.ref(bdd_sigma_u);
 
 		bdd_sigma = manager.getZero();
+
 		manager.ref(bdd_sigma);
-
-
-
-    }
+	}
 
 	/**
 	 * standard cleanup code
 	 * Note: strange things will happen if you try to use this object _after_ calling cleanup :)
-   	 */
+	 */
 	public void cleanup()
 	{
 		reset();
-
 		manager.deref(bdd_i);
 		manager.deref(bdd_cube);
 		manager.deref(bdd_cubep);
@@ -99,24 +107,26 @@ public class Group
 		if (has_t)
 		{
 			manager.deref(bdd_t);
+
 			has_t = false;
 		}
 
 		if (has_tu)
 		{
 			manager.deref(bdd_tu);
+
 			has_tu = false;
 		}
 
-		if(has_m)
+		if (has_m)
 		{
 			manager.deref(bdd_m);
+
 			has_m = false;
 		}
 	}
 
 	/** ---------------------------------------------------------------- */
-
 	public void add(BDDAutomaton a)
 	{
 		BDDAssert.internalCheck(size < capacity, "[Group.add] Group size exceeded");
@@ -128,44 +138,52 @@ public class Group
 		bdd_i = manager.andTo(bdd_i, a.getI());
 		bdd_cube = manager.andTo(bdd_cube, a.getCube());
 		bdd_cubep = manager.andTo(bdd_cubep, a.getCubep());
-		bdd_sigma   = manager.orTo(bdd_sigma, a.getSigma());
+		bdd_sigma = manager.orTo(bdd_sigma, a.getSigma());
 		bdd_sigma_u = manager.orTo(bdd_sigma_u, a.getSigmaU());
 
 		// new optimization: dont recompute everything when we add a new automaya!
 		// try to modify the previous answer instead!
-
 		// WAS: reset();
-
-		if(has_t) {
+		if (has_t)
+		{
 			bdd_t = manager.andTo(bdd_t, a.getTpri());
 		}
 
-		if(has_m) {
+		if (has_m)
+		{
 			bdd_m = manager.andTo(bdd_m, a.getM());
 		}
 
-		if(has_tu) {
+		if (has_tu)
+		{
+
 			// not this one! it cant be computed incrementally!:
 			// int t = getT();
 			// bdd_tu = manager.and(t, bdd_sigma_u);
 			manager.deref(bdd_tu);
+
 			has_tu = false;
 		}
 	}
 
 	/** ---------------------------------------------------------------- */
-	public boolean isMember(BDDAutomaton a) {
+	public boolean isMember(BDDAutomaton a)
+	{
 		for (int i = 0; i < size; i++)
-			if(members[i] == a)
+		{
+			if (members[i] == a)
+			{
 				return true;
+			}
+		}
 
 		return false;
 	}
 
-    public boolean isEmpty()
-    {
+	public boolean isEmpty()
+	{
 		return size == 0;
-    }
+	}
 
 	public int getSize()
 	{
@@ -187,7 +205,6 @@ public class Group
 		return bdd_i;
 	}
 
-
 	public int getSigma()
 	{
 		return bdd_sigma;
@@ -208,39 +225,48 @@ public class Group
 		return bdd_cubep;
 	}
 
-
 	/** careSet[i] is true if the Event is used by any automata in this group */
-	public boolean [] getEventCareSet(boolean uncontrollable_events_only)
+	public boolean[] getEventCareSet(boolean uncontrollable_events_only)
 	{
 		int es = manager.getEvents().length;
-		boolean [] ret = new boolean [es] ;
-		for(int i = 0; i < es; i++) ret[i] = false;
+		boolean[] ret = new boolean[es];
+
+		for (int i = 0; i < es; i++)
+		{
+			ret[i] = false;
+		}
 
 		for (int i = 0; i < size; i++)
+		{
 			members[i].addEventCareSet(ret, ret, uncontrollable_events_only);
+		}
 
 		return ret;
 	}
 
-    // --------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	public int getM()
 	{
-	    if(!has_m)
+		if (!has_m)
 		{
-		    computeM();
+			computeM();
 		}
 
 		return bdd_m;
 	}
 
-    private void computeM() {
+	private void computeM()
+	{
 		bdd_m = manager.getOne();
 
 		for (int i = size - 1; i >= 0; --i)
+		{
 			bdd_m = manager.andTo(bdd_m, members[i].getM());
+		}
 
 		has_m = true;
 	}
+
 	// -------------------------------------------------------------------
 	public int getTu()
 	{
@@ -267,16 +293,20 @@ public class Group
 	}
 
 	// ---------------------------------------------------------------------
-	/** to signal Supervisor etc if it should cleanup the Group when it terminates */
-	public void setCleanup(boolean cu) { cleanup_flag  = cu; }
 
 	/** to signal Supervisor etc if it should cleanup the Group when it terminates */
-	public boolean getCleanup() { return cleanup_flag ; }
+	public void setCleanup(boolean cu)
+	{
+		cleanup_flag = cu;
+	}
 
+	/** to signal Supervisor etc if it should cleanup the Group when it terminates */
+	public boolean getCleanup()
+	{
+		return cleanup_flag;
+	}
 
 	// ---------------------------------------------------------------------
-
-
 	public int getT()
 	{
 		if (has_t)
@@ -302,12 +332,13 @@ public class Group
 
 			manager.ref(bdd_t);
 		}
+
 		/*
 		else if (size == 1)
 		{
-			bdd_t = members[0].getT();
+				bdd_t = members[0].getT();
 
-			manager.ref(bdd_t);    // because we will deref it later here (see reset)
+				manager.ref(bdd_t);    // because we will deref it later here (see reset)
 		}
 		*/
 		else
@@ -329,7 +360,6 @@ public class Group
 		has_t = true;
 	}
 
-
 	// --[ event analysis stuff ]-----------------------------------------------------
 
 	/**
@@ -342,9 +372,12 @@ public class Group
 	 *   3. if some position in count[] equals zero then that event is not used outside G.
 	 *      3.b)  if that event is used at all, then it must be local to group G!
 	 */
-	public void removeEventUsage(int [] count) {
+	public void removeEventUsage(int[] count)
+	{
 		for (int i = 0; i < size; i++)
+		{
 			members[i].removeEventUsage(count);
+		}
 	}
 
 	/**
@@ -353,12 +386,15 @@ public class Group
 	 *
 	 * [no kidding]
 	 */
-	public void addEventUsage(int [] count) {
+	public void addEventUsage(int[] count)
+	{
 		for (int i = 0; i < size; i++)
+		{
 			members[i].addEventUsage(count);
+		}
 	}
-	// --------------------------------------------------------------------------------
 
+	// --------------------------------------------------------------------------------
 	public int forward_reachables()
 	{
 		int permute = manager.getPermuteSp2S();
@@ -473,16 +509,24 @@ public class Group
 	}
 
 	// ---------------------------------------------------------------------------
-
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
+
 		sb.append("{");
-		for (int i = 0; i < size; i++) {
-			if(i != 0) sb.append(", ");
-			sb.append( members[i].getName() );
+
+		for (int i = 0; i < size; i++)
+		{
+			if (i != 0)
+			{
+				sb.append(", ");
+			}
+
+			sb.append(members[i].getName());
 		}
+
 		sb.append("}");
+
 		return sb.toString();
 	}
 }

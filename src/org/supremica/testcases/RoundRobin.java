@@ -1,5 +1,7 @@
+
 /** RoundRobin.java ******************** */
 package org.supremica.testcases;
+
 import org.supremica.automata.*;
 
 /**
@@ -8,11 +10,12 @@ import org.supremica.automata.*;
 public class RoundRobin
 {
 	private Project project;
-	
+
 	public RoundRobin(final int processes)
 		throws Exception
 	{
 		project = new Project("Round robin access");
+
 		project.setComment("Adapted from 'Compositional Minimization of Finite State Systems' by S. Graf and B. Steffen. Round robin access by token passing, the token starts at Process 1. The system is mutually but not globally nonblocking and the behaviour of the plants does not violate the specification (language inclusion).");
 
 		Automaton resource = buildResource(processes);
@@ -30,19 +33,21 @@ public class RoundRobin
 	{
 		Automaton resource = new Automaton("Resource");
 		Alphabet alpha = resource.getAlphabet();
-
 		State initialState = new State("Free");
+
 		initialState.setAccepting(true);
 		resource.addState(initialState);
 		resource.setInitialState(initialState);
 
-		for (int i=1; i<=processes; i++)
+		for (int i = 1; i <= processes; i++)
 		{
 			State state = new State("" + i);
+
 			resource.addState(state);
-			
+
 			LabeledEvent ps = new LabeledEvent("ps" + i);
 			LabeledEvent sb = new LabeledEvent("sb" + i);
+
 			alpha.addEvent(ps);
 			alpha.addEvent(sb);
 			resource.addArc(new Arc(initialState, state, ps));
@@ -50,6 +55,7 @@ public class RoundRobin
 		}
 
 		resource.setType(AutomatonType.Plant);
+
 		return resource;
 	}
 
@@ -57,26 +63,27 @@ public class RoundRobin
 	{
 		Automata buffers = new Automata();
 
-		for (int i=1; i<=processes; i++)
+		for (int i = 1; i <= processes; i++)
 		{
 			Automaton buffer = new Automaton("Buffer " + i);
 			Alphabet alpha = buffer.getAlphabet();
-
 			State initialState = new State("0");
+
 			initialState.setAccepting(true);
 			buffer.addState(initialState);
 			buffer.setInitialState(initialState);
 
 			State otherState = new State("1");
+
 			buffer.addState(otherState);
 
 			LabeledEvent sb = new LabeledEvent("sb" + i);
 			LabeledEvent bp = new LabeledEvent("bp" + i);
+
 			alpha.addEvent(sb);
 			alpha.addEvent(bp);
 			buffer.addArc(new Arc(initialState, otherState, sb));
 			buffer.addArc(new Arc(otherState, initialState, bp));
-
 			buffer.setType(AutomatonType.Plant);
 			buffers.addAutomaton(buffer);
 		}
@@ -88,17 +95,19 @@ public class RoundRobin
 	{
 		Automata procs = new Automata();
 
-		for (int i=1; i<=processes; i++)
+		for (int i = 1; i <= processes; i++)
 		{
 			Automaton proc = new Automaton("Process " + i);
 			Alphabet alpha = proc.getAlphabet();
-
 			State initialState = new State("Idle");
+
 			initialState.setAccepting(true);
+
 			State state1 = new State("1");
 			State state2 = new State("2");
 			State state3 = new State("3");
 			State state4 = new State("4");
+
 			proc.addState(initialState);
 			proc.addState(state1);
 			proc.addState(state2);
@@ -106,18 +115,29 @@ public class RoundRobin
 			proc.addState(state4);
 
 			if (i != 1)
+			{
 				proc.setInitialState(initialState);
+			}
 			else
+			{
 				proc.setInitialState(state1);
+			}
 
 			LabeledEvent tk = new LabeledEvent("tk" + i);
 			LabeledEvent tkNext;
+
 			if (i < processes)
-				tkNext = new LabeledEvent("tk" + (i+1));
+			{
+				tkNext = new LabeledEvent("tk" + (i + 1));
+			}
 			else
+			{
 				tkNext = new LabeledEvent("tk" + 1);
+			}
+
 			LabeledEvent ps = new LabeledEvent("ps" + i);
 			LabeledEvent bp = new LabeledEvent("bp" + i);
+
 			alpha.addEvent(tk);
 			alpha.addEvent(tkNext);
 			alpha.addEvent(ps);
@@ -128,7 +148,6 @@ public class RoundRobin
 			proc.addArc(new Arc(state2, state4, bp));
 			proc.addArc(new Arc(state3, initialState, bp));
 			proc.addArc(new Arc(state4, initialState, tkNext));
-
 			proc.setType(AutomatonType.Plant);
 			procs.addAutomaton(proc);
 		}
@@ -140,29 +159,34 @@ public class RoundRobin
 	{
 		Automaton spec = new Automaton("Token passing");
 		Alphabet alpha = spec.getAlphabet();
-		
 		State initialState = new State("P1");
+
 		initialState.setAccepting(true);
 		spec.addState(initialState);
 		spec.setInitialState(initialState);
-		
+
 		State lastState = initialState;
-		for (int i=2; i<=processes; i++)
+
+		for (int i = 2; i <= processes; i++)
 		{
 			State newState = new State("P" + i);
+
 			spec.addState(newState);
-			
+
 			LabeledEvent tk = new LabeledEvent("tk" + i);
+
 			alpha.addEvent(tk);
 			spec.addArc(new Arc(lastState, newState, tk));
 
 			lastState = newState;
 		}
+
 		LabeledEvent tk = new LabeledEvent("tk" + 1);
+
 		alpha.addEvent(tk);
 		spec.addArc(new Arc(lastState, initialState, tk));
-		
 		spec.setType(AutomatonType.Specification);
+
 		return spec;
 	}
 

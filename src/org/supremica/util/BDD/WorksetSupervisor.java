@@ -1,6 +1,5 @@
 package org.supremica.util.BDD;
 
-
 /**
  *
  * This is an optimization of the simple disjunctive algorithm when we choose a
@@ -15,7 +14,7 @@ package org.supremica.util.BDD;
  *     R´:= R;
  *     R := Forward(R, \wave{\delta}^i);
  *     if (R \neq R') {
- *	      \Delta := \Delta \cup "affect"(i);
+ *            \Delta := \Delta \cup "affect"(i);
  *     }
  * }
  *
@@ -27,54 +26,64 @@ package org.supremica.util.BDD;
  * For better performance, we use the disjunctive clusters instead of the automata itself here
  *
  */
-
-public class WorksetSupervisor extends DisjSupervisor
+public class WorksetSupervisor
+	extends DisjSupervisor
 {
 
 	/**
 	 * dependency matrix:  n = dependent[automata][0] is the number of dependent automata.
-     * dependent[automata][1] .. dependent[automata][n] are the dependent automata.
+ * dependent[automata][1] .. dependent[automata][n] are the dependent automata.
 	 */
-	protected int [][] dependent ;
+	protected int[][] dependent;
 	protected int size;
-	protected BDDAutomaton [] bas;
-	protected Cluster [] clusters;
+	protected BDDAutomaton[] bas;
+	protected Cluster[] clusters;
 	protected Workset workset;
 
-    /** Constructor, passes to the base-class */
-    public WorksetSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
-		super(manager,as);
+	/** Constructor, passes to the base-class */
+	public WorksetSupervisor(BDDAutomata manager, BDDAutomaton[] as)
+	{
+		super(manager, as);
+
 		init_worksets();
-    }
+	}
 
-
-    /** Constructor, passes to the base-class */
-    public WorksetSupervisor(BDDAutomata manager, Group plant, Group spec) {
+	/** Constructor, passes to the base-class */
+	public WorksetSupervisor(BDDAutomata manager, Group plant, Group spec)
+	{
 		super(manager, plant, spec);
+
 		init_worksets();
-    }
+	}
 
-    /** C++-style Destructor to cleanup unused BDD trees*/
-    public void cleanup() {
+	/** C++-style Destructor to cleanup unused BDD trees*/
+	public void cleanup()
+	{
 		super.cleanup();
-    }
-
+	}
 
 	/** this build ups the dependency matrix, once for all */
-	private void init_worksets() {
-		workset = null; // not created yet
-
+	private void init_worksets()
+	{
+		workset = null;    // not created yet
 		size = dop.getSize();
 		clusters = dop.getClusters();
+
 		int count;
 
-		dependent = new int[size][size+1];
+		dependent = new int[size][size + 1];
 
-		for(int i = 0; i < size; i++) dependent[i][0] = 0;
+		for (int i = 0; i < size; i++)
+		{
+			dependent[i][0] = 0;
+		}
 
-		for(int i = 0; i < size; i++) {
-			for(int j = i+1; j < size; j++) {
-				if(clusters[i].interact(clusters[j])) {
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = i + 1; j < size; j++)
+			{
+				if (clusters[i].interact(clusters[j]))
+				{
 					dependent[i][1 + dependent[i][0]++] = j;
 					dependent[j][1 + dependent[j][0]++] = i;
 				}
@@ -82,48 +91,49 @@ public class WorksetSupervisor extends DisjSupervisor
 		}
 	}
 
-
 	/** workset to start from: all automata are enabled */
 	protected Workset getWorkset(boolean monotonic)
 	{
-		if(workset == null) workset = new Workset(clusters, size, dependent);
+		if (workset == null)
+		{
+			workset = new Workset(clusters, size, dependent);
+		}
+
 		workset.init_workset(monotonic);
+
 		return workset;
 	}
 
-
 	// ------------------------------------------------------------------------------------------------------
-
-
-
-
-
 	// TODO: creating these two would require major changes to the workset algorithm :(
 	// public int getReachables(boolean [] events)
 	// public int getReachables(boolean [] events, int intial_states)
-
 
 	/**
 	 * do a FORWARD reachability search.
 	 * start from the given (set of) initial state(s)
 	 */
-	public int getReachables(int initial_states) {
+	public int getReachables(int initial_states)
+	{
 		return internal_computeReachablesWorkset(initial_states);
 	}
 
 	/**
 	 * do a FORWARD reachability search fro mthe initial state
 	 */
-    protected void computeReachables()
-    {
+	protected void computeReachables()
+	{
 		int i_all = manager.and(plant.getI(), spec.getI());
 		int ret = internal_computeReachablesWorkset(i_all);
+
 		manager.deref(i_all);
+
 		has_reachables = true;
 		bdd_reachables = ret;
 	}
 
-	protected int internal_computeReachablesWorkset(int bdd_i) {
+	protected int internal_computeReachablesWorkset(int bdd_i)
+	{
 
 		// statistic stuffs
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
@@ -132,126 +142,179 @@ public class WorksetSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
 
 		Workset workset = getWorkset(false);
-
 		int r_all_p, r_all = manager.ref(bdd_i);
 
-
 		// initial burst mode
-		if(Options.burst_mode) {
-			for(int i = 0; i < clusters.length; i++) {
-				do{
+		if (Options.burst_mode)
+		{
+			for (int i = 0; i < clusters.length; i++)
+			{
+				do
+				{
 					r_all_p = r_all;
-					int tmp = manager.relProd(clusters[i].getTwave() , bdd_i, s_cube);
+
+					int tmp = manager.relProd(clusters[i].getTwave(), bdd_i, s_cube);
 					int tmp2 = manager.replace(tmp, perm_sp2s);
+
 					manager.deref(tmp);
 
 					r_all = manager.orTo(r_all, tmp2);
+
 					manager.deref(tmp2);
 
-					if (gf != null)	gf.add( r_all );
-				} while(r_all_p != r_all);
+					if (gf != null)
+					{
+						gf.add(r_all);
+					}
+				}
+				while (r_all_p != r_all);
 			}
-			if (gf != null)	gf.mark("Burst done");
+
+			if (gf != null)
+			{
+				gf.mark("Burst done");
+			}
 		}
 
-
 		limit.reset();
-		while(!workset.empty() && !limit.stopped()) {
+
+		while (!workset.empty() &&!limit.stopped())
+		{
 			int p = workset.pickOne();
 			int r_all_org = r_all;
 
-			do {
+			do
+			{
 				r_all_p = r_all;
-				int tmp = manager.relProd(clusters[p].getTwave() , r_all, s_cube);
+
+				int tmp = manager.relProd(clusters[p].getTwave(), r_all, s_cube);
 				int tmp2 = manager.replace(tmp, perm_sp2s);
+
 				manager.deref(tmp);
 
 				r_all = manager.orTo(r_all, tmp2);
+
 				manager.deref(tmp2);
 
-				if (gf != null)	gf.add( r_all );
-			} while(r_all_p != r_all);
+				if (gf != null)
+				{
+					gf.add(r_all);
+				}
+			}
+			while (r_all_p != r_all);
 
 			workset.advance(p, r_all != r_all_org);
 		}
 
-
-		if(gf != null) gf.stopTimer();
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
 
 		timer.report("Forward reachables found (workset)");
 		workset.done();
 
 		return r_all;
-
 	}
 
 	// ---------------------------------------------------------------------------------------
+	protected void computeCoReachables()
+	{
+		int m_all = GroupHelper.getM(manager, spec, plant);
 
-   protected void computeCoReachables() {
-	   int m_all = GroupHelper.getM(manager,spec, plant);
-	   bdd_coreachables = internal_computeCoReachablesWorkset(m_all);
-	   has_coreachables = true;
-	   manager.deref(m_all);
-   }
+		bdd_coreachables = internal_computeCoReachablesWorkset(m_all);
+		has_coreachables = true;
 
-   protected int internal_computeCoReachablesWorkset(int m_all)
-   {
+		manager.deref(m_all);
+	}
+
+	protected int internal_computeCoReachablesWorkset(int m_all)
+	{
 
 		// statistic stuffs
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
 
 		timer.reset();
-
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
-		Workset workset = getWorkset(false);
 
+		Workset workset = getWorkset(false);
 		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
 
-
 		// initial burst mode:
-			if(Options.burst_mode) {
-				for(int i = 0; i < clusters.length; i++) {
-					do{
-						r_all_p = r_all;
-						int tmp = manager.relProd(clusters[i].getTwave(), m_all, sp_cube);
-						int tmp2 = manager.replace(tmp, perm_s2sp);
-						manager.deref(tmp);
-						r_all = manager.orTo(r_all, tmp2);
-						manager.deref(tmp2);
+		if (Options.burst_mode)
+		{
+			for (int i = 0; i < clusters.length; i++)
+			{
+				do
+				{
+					r_all_p = r_all;
 
-						if (gf != null)	gf.add( r_all );
-					} while(r_all_p != r_all);
+					int tmp = manager.relProd(clusters[i].getTwave(), m_all, sp_cube);
+					int tmp2 = manager.replace(tmp, perm_s2sp);
+
+					manager.deref(tmp);
+
+					r_all = manager.orTo(r_all, tmp2);
+
+					manager.deref(tmp2);
+
+					if (gf != null)
+					{
+						gf.add(r_all);
+					}
 				}
-				if (gf != null)	gf.mark("Burst done");
+				while (r_all_p != r_all);
 			}
 
+			if (gf != null)
+			{
+				gf.mark("Burst done");
+			}
+		}
 
 		limit.reset();
-		while(!workset.empty() && !limit.stopped()) {
+
+		while (!workset.empty() &&!limit.stopped())
+		{
 			int p = workset.pickOne();
 			int r_all_org = r_all;
-			do {
+
+			do
+			{
 				r_all_p = r_all;
+
 				int tmp = manager.relProd(clusters[p].getTwave(), r_all, sp_cube);
 				int tmp2 = manager.replace(tmp, perm_s2sp);
+
 				manager.deref(tmp);
+
 				r_all = manager.orTo(r_all, tmp2);
+
 				manager.deref(tmp2);
 
-				if (gf != null)	gf.add( r_all );
-			} while(r_all_p != r_all);
+				if (gf != null)
+				{
+					gf.add(r_all);
+				}
+			}
+			while (r_all_p != r_all);
 
 			workset.advance(p, r_all != r_all_org);
 		}
 
-
 		int ret = manager.replace(r_all, perm_sp2s);
+
 		manager.deref(r_all);
 
-		if(gf != null) gf.stopTimer();
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Backward reachables found (workset)");
 		workset.done();
+
 		return ret;
 	}
 }

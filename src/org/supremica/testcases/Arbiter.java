@@ -1,5 +1,7 @@
+
 /** Arbiter.java ******************** */
 package org.supremica.testcases;
+
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.AutomataSynchronizer;
 
@@ -13,7 +15,6 @@ public class Arbiter
 	private int userCount = 0;
 	private String rootName = "s";
 	private boolean synchronize;
-
 	Automaton server = new Automaton();
 	Automata arbiters = new Automata();
 	Automata users = new Automata();
@@ -22,23 +23,23 @@ public class Arbiter
 		throws Exception
 	{
 		project = new Project("Arbiter tree structure");
+
 		project.setComment("Tree arbiter cell structure adapted from 'Compositional Model Checking' by E.M. Clarke et. al. Each arbiter cell has three communication channels, two users and one server. The cell gets requests from its two users and as a response, initiates requests events to the server. Each user/server initates two requests before returning to its initial state. The system is nonblocking for any number of users.");
 
 		// Synchronize arbiter?
 		this.synchronize = synchronize;
-	
+
 		// Start the recursion with the root node, the server
 		String serverName = buildServer();
 		String arbiterName = "a" + arbiterCount++;
 
 		// Split the users between the two branches!
-		int half = nbrOfUsers/2;
-		int rest = nbrOfUsers-half;
+		int half = nbrOfUsers / 2;
+		int rest = nbrOfUsers - half;
 		String user0 = buildArbiter(half, arbiterName);
 		String user1 = buildArbiter(rest, arbiterName);
 
 		buildArbiter(user0, user1, arbiterName, serverName);
-
 		project.addAutomaton(server);
 		project.addAutomata(arbiters);
 		project.addAutomata(users);
@@ -48,16 +49,17 @@ public class Arbiter
 	{
 		if (nbrOfUsers == 1)
 		{
+
 			// This is a leaf, a user!
 			return buildUser();
 		}
-		
+
 		// This is an arbiter cell with two users (possibly arbiters)! 
 		String name = "a" + arbiterCount++;
 
 		// Split the users between the two branches!
-		int half = nbrOfUsers/2;
-		int rest = nbrOfUsers-half;
+		int half = nbrOfUsers / 2;
+		int rest = nbrOfUsers - half;
 		String user0 = buildArbiter(half, name);
 		String user1 = buildArbiter(rest, name);
 
@@ -66,6 +68,7 @@ public class Arbiter
 
 	private String buildArbiter(String user0, String user1, String arbiterName, String serverName)
 	{
+
 		// Arbiter alphabet
 		LabeledEvent r0 = new LabeledEvent("r" + user0);
 		LabeledEvent t0 = new LabeledEvent("t" + user0);
@@ -75,6 +78,7 @@ public class Arbiter
 		LabeledEvent a1 = new LabeledEvent("a" + user1);
 		LabeledEvent rs;
 		LabeledEvent as;
+
 		// If the server is the root, the server events are labeled differently...
 		if (serverName.equals(rootName))
 		{
@@ -89,32 +93,23 @@ public class Arbiter
 
 		// Arbiter automaton
 		Automaton arbiter = new Automaton("Arbiter " + arbiterName);
+
 		{
 			Alphabet alpha = arbiter.getAlphabet();
-			
-			State[] states =
-			{
-				new State("0"),
-				new State("1"),
-				new State("2"),
-				new State("3"),
-				new State("4"),
-				new State("5"),
-				new State("6"),
-				new State("7"),
-				new State("8"),
-				new State("9"),
-				new State("10")
-			};
+			State[] states = { new State("0"), new State("1"), new State("2"),
+							   new State("3"), new State("4"), new State("5"),
+							   new State("6"), new State("7"), new State("8"),
+							   new State("9"), new State("10") };
+
 			for (int i = 0; i < states.length; ++i)
 			{
 				arbiter.addState(states[i]);
 			}
-			
+
 			State initialState = states[0];
+
 			initialState.setAccepting(true);
 			arbiter.setInitialState(initialState);
-			
 			alpha.addEvent(r0);
 			alpha.addEvent(r1);
 			alpha.addEvent(rs);
@@ -142,27 +137,22 @@ public class Arbiter
 
 		// Communication channel C0
 		Automaton arb0 = new Automaton("Com " + arbiterName + " - " + user0);
-		{		
+
+		{
 			Alphabet alpha = arb0.getAlphabet();
-			
-			State[] states =
-			{
-				new State("0"),
-				new State("1"),
-				new State("2"),
-				new State("3"),
-				new State("4"),
-				new State("5")
-			};
+			State[] states = { new State("0"), new State("1"), new State("2"),
+							   new State("3"), new State("4"),
+							   new State("5") };
+
 			for (int i = 0; i < states.length; ++i)
 			{
 				arb0.addState(states[i]);
 			}
-			
+
 			State initialState = states[0];
+
 			initialState.setAccepting(true);
 			arb0.setInitialState(initialState);
-			
 			alpha.addEvent(r0);
 			alpha.addEvent(t0);
 			alpha.addEvent(a0);
@@ -177,27 +167,22 @@ public class Arbiter
 
 		// Communication channel C1
 		Automaton arb1 = new Automaton("Com " + arbiterName + " - " + user1);
+
 		{
 			Alphabet alpha = arb1.getAlphabet();
-			
-			State[] states =
-			{
-				new State("0"),
-				new State("1"),
-				new State("2"),
-				new State("3"),
-				new State("4"),
-				new State("5")
-			};
+			State[] states = { new State("0"), new State("1"), new State("2"),
+							   new State("3"), new State("4"),
+							   new State("5") };
+
 			for (int i = 0; i < states.length; ++i)
 			{
 				arb1.addState(states[i]);
 			}
-			
+
 			State initialState = states[0];
+
 			initialState.setAccepting(true);
 			arb1.setInitialState(initialState);
-			
 			alpha.addEvent(r1);
 			alpha.addEvent(t1);
 			alpha.addEvent(a1);
@@ -212,30 +197,23 @@ public class Arbiter
 
 		// Communication channel Cp
 		Automaton arbs = new Automaton("Com " + arbiterName + " - " + serverName);
+
 		{
 			Alphabet alpha = arbs.getAlphabet();
-			
-			State[] states =
-			{
-				new State("0"),
-				new State("1"),
-				new State("2"),
-				new State("3"),
-				new State("4"),
-				new State("5"),
-				new State("6"),
-				new State("7"),
-				new State("8")
-			};
+			State[] states = { new State("0"), new State("1"), new State("2"),
+							   new State("3"), new State("4"), new State("5"),
+							   new State("6"), new State("7"),
+							   new State("8") };
+
 			for (int i = 0; i < states.length; ++i)
 			{
 				arbs.addState(states[i]);
 			}
-			
+
 			State initialState = states[0];
+
 			initialState.setAccepting(true);
 			arbs.setInitialState(initialState);
-			
 			alpha.addEvent(t0);
 			alpha.addEvent(t1);
 			alpha.addEvent(rs);
@@ -252,19 +230,22 @@ public class Arbiter
 			arbs.addArc(new Arc(states[8], states[0], t1));
 			arbs.setType(AutomatonType.Specification);
 		}
-		
 
 		if (synchronize)
 		{
+
 			// Synchronize the arbiter and the communication channels!
 			Automata synchAutomata = new Automata();
+
 			synchAutomata.addAutomaton(arbiter);
 			synchAutomata.addAutomaton(arb0);
 			synchAutomata.addAutomaton(arb1);
 			synchAutomata.addAutomaton(arbs);
+
 			try
 			{
 				Automaton synch = AutomataSynchronizer.synchronizeAutomata(synchAutomata);
+
 				synch.setName("Arbiter cell " + arbiterName);
 				arbiters.addAutomaton(synch);
 			}
@@ -275,40 +256,40 @@ public class Arbiter
 		}
 		else
 		{
+
 			// Add the arbiter and communication channels separately   
 			arbiters.addAutomaton(arbiter);
 			arbiters.addAutomaton(arb0);
 			arbiters.addAutomaton(arb1);
 			arbiters.addAutomaton(arbs);
 		}
-		
+
 		return arbiterName;
 	}
 
 	private String buildServer()
 	{
 		String name = rootName;
-		server.setName("Server");
-		Alphabet alpha = server.getAlphabet();
 
-		State[] states =
-		{
-			new State("0"),
-			new State("1"),
-			new State("2"),
-			new State("3")
-		};
+		server.setName("Server");
+
+		Alphabet alpha = server.getAlphabet();
+		State[] states = { new State("0"), new State("1"), new State("2"),
+						   new State("3") };
+
 		for (int i = 0; i < states.length; ++i)
 		{
 			server.addState(states[i]);
 		}
 
 		State initialState = states[0];
+
 		initialState.setAccepting(true);
 		server.setInitialState(initialState);
-		
+
 		LabeledEvent r = new LabeledEvent("r" + name);
 		LabeledEvent a = new LabeledEvent("a" + name);
+
 		alpha.addEvent(r);
 		alpha.addEvent(a);
 		server.addArc(new Arc(states[0], states[1], r));
@@ -325,25 +306,22 @@ public class Arbiter
 		String name = "u" + userCount++;
 		Automaton user = new Automaton("User " + name);
 		Alphabet alpha = user.getAlphabet();
+		State[] states = { new State("0"), new State("1"), new State("2"),
+						   new State("3") };
 
-		State[] states =
-		{
-			new State("0"),
-			new State("1"),
-			new State("2"),
-			new State("3")
-		};
 		for (int i = 0; i < states.length; ++i)
 		{
 			user.addState(states[i]);
 		}
 
 		State initialState = states[0];
+
 		initialState.setAccepting(true);
 		user.setInitialState(initialState);
-		
+
 		LabeledEvent r = new LabeledEvent("r" + name);
 		LabeledEvent a = new LabeledEvent("a" + name);
+
 		alpha.addEvent(r);
 		alpha.addEvent(a);
 		user.addArc(new Arc(states[0], states[1], r));
@@ -351,8 +329,8 @@ public class Arbiter
 		user.addArc(new Arc(states[2], states[3], r));
 		user.addArc(new Arc(states[3], states[0], a));
 		user.setType(AutomatonType.Plant);
-
 		users.addAutomaton(user);
+
 		return name;
 	}
 

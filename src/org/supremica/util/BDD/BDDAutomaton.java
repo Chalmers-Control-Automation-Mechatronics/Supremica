@@ -8,9 +8,12 @@ public class BDDAutomaton
 {
 	private BDDAutomata manager;
 	private Automaton automaton;
-    private DependencySet dependency = null;
-    /* package */ int index;
-	private int num_bits, num_states, num_arcs, membership; /** membership is used to modify plant/spec time */
+	private DependencySet dependency = null;
+	/* package */
+	int index;
+	private int num_bits, num_states, num_arcs, membership;
+
+	/** membership is used to modify plant/spec time */
 	private State[] states;
 	private Arc[] arcs;
 	private Event[] events;
@@ -27,13 +30,15 @@ public class BDDAutomaton
 	private int bdd_care_s, bdd_dontcare_s;
 	private int bdd_care_sp, bdd_dontcare_sp;
 	private int index_first_bdd, index_last_bdd;
-	public int extra1, extra2; /** used by other algos */
+	public int extra1, extra2;
+
+	/** used by other algos */
 
 	public BDDAutomaton(BDDAutomata manager, Automaton a, int index)
 	{
-		this.manager   = manager;
+		this.manager = manager;
 		this.automaton = a;
-		this.index     = index;
+		this.index = index;
 		states = automaton.getStates().getStateVector();
 		arcs = automaton.getArcs().getArcVector();
 		num_arcs = a.getArcsSize();
@@ -57,8 +62,8 @@ public class BDDAutomaton
 			bdd_keep = manager.andTo(bdd_keep, equal);
 		}
 
-		index_first_bdd = manager.internal_index( var_s[0] );
-		index_last_bdd  = manager.internal_index( var_spp[ num_bits - 1] );
+		index_first_bdd = manager.internal_index(var_s[0]);
+		index_last_bdd = manager.internal_index(var_spp[num_bits - 1]);
 	}
 
 	/**
@@ -66,7 +71,6 @@ public class BDDAutomaton
 	 * now, we also have the global alphabet since all automata has been read */
 	public void init()
 	{
-
 		events = manager.getEvents();
 		cube_s = manager.makeSet(var_s, num_bits);
 		cube_sp = manager.makeSet(var_sp, num_bits);
@@ -74,15 +78,19 @@ public class BDDAutomaton
 
 		// precalculate STATE -> BDD map
 		bdd_m = manager.getZero();
+
 		manager.ref(bdd_m);
 
 		bdd_f = manager.getZero();
+
 		manager.ref(bdd_f);
 
 		bdd_care_s = manager.getZero();
+
 		manager.ref(bdd_care_s);
 
 		bdd_care_sp = manager.getZero();
+
 		manager.ref(bdd_care_sp);
 
 		// interleaved simple state encoding.
@@ -110,52 +118,54 @@ public class BDDAutomaton
 			}
 
 			/* to count states correctly, we use only one encoding state -> the care set != entire S */
+
 			// if(!Options.fill_statevars) {
-				bdd_care_s = manager.orTo(bdd_care_s, states[i].bdd_s);
-				bdd_care_sp = manager.orTo(bdd_care_sp, states[i].bdd_sp);
+			bdd_care_s = manager.orTo(bdd_care_s, states[i].bdd_s);
+			bdd_care_sp = manager.orTo(bdd_care_sp, states[i].bdd_sp);
+
 			//}
 		}
 
-
 		/* use the entire encoding space by having duplicate encodings per state*/
-		if(Options.fill_statevars)
+		if (Options.fill_statevars)
 		{
 			int capacity = 1 << num_bits;
 			int unused = capacity - num_states;
-
 			/* find out which encodings are free */
+			boolean[] code_used = new boolean[capacity];
 
-			boolean [] code_used= new boolean[capacity];
-
-			for(int i = 0; i < capacity; i++)
+			for (int i = 0; i < capacity; i++)
+			{
 				code_used[i] = false;
+			}
 
 			for (int i = 0; i < num_states; i++)
+			{
 				code_used[states[i].code] = true;
-
+			}
 
 			/* append the unused encoding to some states, untill every code is used */
-			for(int i = 0; i < unused; i++)
+			for (int i = 0; i < unused; i++)
 			{
-
-				int state = i; /* the state to which we add an encoding */
-
+				int state = i;    /* the state to which we add an encoding */
 				/* find the next unused code */
 				int j = 0;
-				for(; code_used[j]; j++) ;
+
+				for (; code_used[j]; j++);
+
 				int code = j;
+
 				code_used[j] = true;
 
 				/* get the BDD for it */
-				int bdd_more_s  = Util.getNumber(manager, var_s, code);
+				int bdd_more_s = Util.getNumber(manager, var_s, code);
 				int bdd_more_sp = Util.getNumber(manager, var_sp, code);
 
 				/* append it to some state */
-				states[state].bdd_s  = manager.orTo(states[state].bdd_s , bdd_more_s );
+				states[state].bdd_s = manager.orTo(states[state].bdd_s, bdd_more_s);
 				states[state].bdd_sp = manager.orTo(states[state].bdd_sp, bdd_more_sp);
 			}
 		}
-
 
 		// get dont-care states, i.e. states allocated but not used in this state-vector
 		bdd_dontcare_s = manager.not(bdd_care_s);
@@ -214,24 +224,30 @@ public class BDDAutomaton
 
 	public void cleanup()
 	{
-		// check("Cleanup");
 
+		// check("Cleanup");
 		manager.deref(cube_s);
 		manager.deref(cube_sp);
 		manager.deref(cube_spp);
 
-		if(dependency != null) {
-		    dependency.cleanup();
-		    dependency = null;
+		if (dependency != null)
+		{
+			dependency.cleanup();
+
+			dependency = null;
 		}
 	}
 
 	// ------------------------------------------------------------------
-    public DependencySet getDependencySet()
-    {
-		if(dependency == null) dependency = new DependencySet(manager,this);
+	public DependencySet getDependencySet()
+	{
+		if (dependency == null)
+		{
+			dependency = new DependencySet(manager, this);
+		}
+
 		return dependency;
-    }
+	}
 
 	public boolean eventUsed(Event e)
 	{
@@ -262,6 +278,7 @@ public class BDDAutomaton
 	{
 		return cube_spp;
 	}
+
 	public int getI()
 	{
 		return bdd_i;
@@ -346,10 +363,11 @@ public class BDDAutomaton
 	{
 		return automaton.getName();
 	}
-    public int getIndex()
-    {
+
+	public int getIndex()
+	{
 		return index;
-    }
+	}
 
 	public Automaton getModel()
 	{
@@ -371,67 +389,76 @@ public class BDDAutomaton
 		return num_bits;
 	}
 
-	public int getNumArcs() {
+	public int getNumArcs()
+	{
 		return num_arcs;
 	}
 
-	public int getMembership() {
+	public int getMembership()
+	{
 		return membership;
 	}
 
-	public void setMembership(int m) {
+	public void setMembership(int m)
+	{
 		membership = m;
 	}
 
 	/** get the first bdd variable [for default order], i.e. the one with lowest index */
-	public int getTopBDD() {
+	public int getTopBDD()
+	{
 		return index_first_bdd;
 	}
+
 	/** get the last bdd variable [for default order] i.e. the one with highest index */
-	public int getBottomBDD() {
+	public int getBottomBDD()
+	{
 		return index_last_bdd;
 	}
+
 	// --------------------------------------------------------
-
-    public boolean interact(BDDAutomaton ba) {
+	public boolean interact(BDDAutomaton ba)
+	{
 		return automaton.interact(ba.automaton);
-    }
+	}
 
-    public boolean interact(BDDAutomaton ba, boolean [] careSet) {
+	public boolean interact(BDDAutomaton ba, boolean[] careSet)
+	{
 		return automaton.interact(ba.automaton, careSet);
-    }
+	}
 
-    public boolean interact(boolean [] careSet) {
+	public boolean interact(boolean[] careSet)
+	{
 		return automaton.interact(careSet);
-    }
-
-
+	}
 
 	/** returns the number of events that overlapp */
-	public int eventOverlapCount(boolean [] events) {
+	public int eventOverlapCount(boolean[] events)
+	{
 		return automaton.eventOverlapCount(events);
 	}
 
 	/** returns the number of events that overlapp in ARCS */
-	public int arcOverlapCount(boolean [] events) {
+	public int arcOverlapCount(boolean[] events)
+	{
 		return automaton.arcOverlapCount(events);
 	}
-
 
 	/**
 	 * maps event -> number of times that event was used in a transition
 	 * good for heuristics...
-     */
-	public int [] getEventUsageCount() {
+ */
+	public int[] getEventUsageCount()
+	{
 		return automaton.getEventUsageCount();
 	}
 
-	public void addEventCareSet(boolean [] events, boolean [] result, boolean uncontrollable_events_only)
+	public void addEventCareSet(boolean[] events, boolean[] result, boolean uncontrollable_events_only)
 	{
 		automaton.addEventCareSet(events, result, uncontrollable_events_only);
 	}
 
-	public boolean [] getEventCareSet(boolean uncontrollable_events_only)
+	public boolean[] getEventCareSet(boolean uncontrollable_events_only)
 	{
 		return automaton.getEventCareSet(uncontrollable_events_only);
 	}
@@ -441,7 +468,8 @@ public class BDDAutomaton
 	 * After which events just fired, we may do a transition
 	 *
 	 */
-    public boolean [] getEventFlow(boolean forward) {
+	public boolean[] getEventFlow(boolean forward)
+	{
 		return automaton.getEventFlow(forward);
 	}
 
@@ -449,7 +477,8 @@ public class BDDAutomaton
 	 * See Group.removeEventUsage() for more info :(
 	 *
 	 */
-	public void removeEventUsage(int [] count) {
+	public void removeEventUsage(int[] count)
+	{
 		automaton.removeEventUsage(count);
 	}
 
@@ -457,15 +486,12 @@ public class BDDAutomaton
 	 * See Group.addEventUsage() for more info :(
 	 *
 	 */
-	public void addEventUsage(int [] count) {
+	public void addEventUsage(int[] count)
+	{
 		automaton.addEventUsage(count);
 	}
 
-
-
 	// ------------------------------------------------------------------
-
-
 	private void createI()
 	{
 		bdd_i = manager.getOne();
@@ -616,25 +642,35 @@ public class BDDAutomaton
 
 		if (errors > 0)
 		{
-		    System.err.println("TEST '" + name + "' --> BDD structure integrity check failed for: " + automaton.getName());
-		    System.exit(20);
+			System.err.println("TEST '" + name + "' --> BDD structure integrity check failed for: " + automaton.getName());
+			System.exit(20);
 		}
 
 		BDDAssert.internalCheck(manager.checkPackage(), name + ": checkPackage() failed");
 	}
 
-
-	public void showEncoding(BDDAutomata ba) {
+	public void showEncoding(BDDAutomata ba)
+	{
 		BDDAssert.internalCheck(manager == ba, "[INTERNAL ERROR] in BDDAutomaton.showEncoding() ");
-
 		Options.out.println("\n ---------------- BDD encoding of " + getName());
-		for(int i = 0; i < states.length; i++) {
-			Options.out.println(states[i].name_id );
-			ba.printSet(states[i].bdd_s );
+
+		for (int i = 0; i < states.length; i++)
+		{
+			Options.out.println(states[i].name_id);
+			ba.printSet(states[i].bdd_s);
 		}
+
 		Options.out.println();
 	}
+
 	// ---[ WeightedObject stuff ]-----------------------------------------------------
-	public Object object() { return this; }
-	public double weight() { return getIndex(); }
+	public Object object()
+	{
+		return this;
+	}
+
+	public double weight()
+	{
+		return getIndex();
+	}
 }

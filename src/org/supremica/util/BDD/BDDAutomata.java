@@ -1,6 +1,5 @@
 package org.supremica.util.BDD;
 
-
 import org.supremica.util.BDD.encoding.*;
 
 // NEW CUDD: FIXED
@@ -10,8 +9,7 @@ import java.util.*;
 public class BDDAutomata
 	extends JBDD
 {
-    private static int ref_count = 0;
-
+	private static int ref_count = 0;
 	private boolean has_events = false;
 	private Automata original_automata;
 	private int components;    // number of automata
@@ -22,7 +20,8 @@ public class BDDAutomata
 	// the global alphabet
 	private Event[] original_events;
 	private int events_size;
-	private int bdd_total_initial, bdd_total_cube, bdd_total_cubep, bdd_total_cubepp;
+	private int bdd_total_initial, bdd_total_cube, bdd_total_cubep,
+				bdd_total_cubepp;
 
 	// vector sizes
 	private int size_states, size_events, size_all;
@@ -39,57 +38,67 @@ public class BDDAutomata
 	/** this is used in recursive show_transition calls, dont touch */
 	private boolean show_transition_is_half;
 
-
 	public BDDAutomata(Automata a)
 	{
 		super(a.getVariableCount(), Util.suggest_nodecount(a));
+
 		ref_count++;
 
-
 		// if(Options.developer_mode) {
-			Thread t = Thread.currentThread() ;
-			saved_priority = t.getPriority();
-			t.setPriority(Thread.MIN_PRIORITY);
-		// }
+		Thread t = Thread.currentThread();
 
+		saved_priority = t.getPriority();
+
+		t.setPriority(Thread.MIN_PRIORITY);
+
+		// }
 		SizeWatch.setManager(this);
 
 		// some funny thing with CUDD ...
 		int check0 = not(getZero());
 		int check1 = not(getOne());
-		BDDAssert.internalCheck((check0 == getOne()) && (check1 == getZero()),
-					"[INTERNAL] either  ~1 != 0  or  ~0 != 1");
+
+		BDDAssert.internalCheck((check0 == getOne()) && (check1 == getZero()), "[INTERNAL] either  ~1 != 0  or  ~0 != 1");
 		deref(check0);
 		deref(check1);
 
 		Timer timer = new Timer();
+
 		this.original_automata = a;
+
 		Vector v = a.getAutomata();
 
 		this.components = v.size();
 		this.automata = new BDDAutomaton[components];
 
 		// Dynamic reordering stuff:
-		reorder_setMethod( Options.reorder_algo);
-		if(Options.reorder_dyanmic) reorder_enableDyanamic(true);
+		reorder_setMethod(Options.reorder_algo);
 
-
+		if (Options.reorder_dyanmic)
+		{
+			reorder_enableDyanamic(true);
+		}
 
 		// lets change the state encoding now:
 		Encoding enc = EncodingFactory.getEncoder();
-		for(Enumeration e = v.elements(); e.hasMoreElements(); )
+
+		for (Enumeration e = v.elements(); e.hasMoreElements(); )
 		{
-			Automaton automaton  = (Automaton) e.nextElement();
+			Automaton automaton = (Automaton) e.nextElement();
+
 			enc.encode(automaton);
 		}
 
 		// first we create all automata  ...
 		int i = 0;
+
 		size_states = 0;
-		for(Enumeration e = v.elements(); e.hasMoreElements(); )
+
+		for (Enumeration e = v.elements(); e.hasMoreElements(); )
 		{
 			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);
 			size_states += automata[i].getNumStateBits();
+
 			i++;
 
 			// BDDAssert.debug(automata[i-1].getName() + " created");
@@ -108,16 +117,21 @@ public class BDDAutomata
 		ref(keep);
 
 		bdd_total_initial = getOne();
+
 		ref(bdd_total_initial);
 
 		bdd_total_cube = getOne();
+
 		ref(bdd_total_cube);
 
 		bdd_total_cubep = getOne();
+
 		ref(bdd_total_cubep);
 
 		bdd_total_cubepp = getOne();
+
 		ref(bdd_total_cubepp);
+
 		for (i = components - 1; i >= 0; --i)
 		{
 			automata[i].init();
@@ -129,16 +143,15 @@ public class BDDAutomata
 			bdd_total_cubepp = andTo(bdd_total_cubepp, automata[i].getCubepp());
 
 			// check("Createdautomaton " + automata[i].getName() );
-			if(Options.reorderEnabled() && Options.reorder_with_groups) {
-				reorder_createVariableGroup(automata[i].getTopBDD(), automata[i].getBottomBDD(),
-					Options.reorder_within_group);
+			if (Options.reorderEnabled() && Options.reorder_with_groups)
+			{
+				reorder_createVariableGroup(automata[i].getTopBDD(), automata[i].getBottomBDD(), Options.reorder_within_group);
 			}
 		}
 
-
-
 		// see if we must reorder after build:
-		if(Options.reorderEnabled() && Options.reorder_after_build) {
+		if (Options.reorderEnabled() && Options.reorder_after_build)
+		{
 			reorder_now();
 		}
 
@@ -147,14 +160,15 @@ public class BDDAutomata
 
 		// gc();
 		// Options.out.println("CheckPackage returned " + checkPackage());
-
-		if(Options.show_encoding) {
+		if (Options.show_encoding)
+		{
 			for (i = 0; i < components; i++)
+			{
 				automata[i].showEncoding(this);
+			}
 
 			original_automata.getAlphabeth().showEncoding(this);
 		}
-
 	}
 
 	private void createEvents()
@@ -176,11 +190,12 @@ public class BDDAutomata
 			events[i] = createBDD();
 		}
 
-
 		// if we have dynamic reordering:
-		if(Options.reorderEnabled() && Options.reorder_with_groups) {
-			int index1 = internal_index( events[0] );
-			int index2 = internal_index( events[size_events-1] );
+		if (Options.reorderEnabled() && Options.reorder_with_groups)
+		{
+			int index1 = internal_index(events[0]);
+			int index2 = internal_index(events[size_events - 1]);
+
 			reorder_createVariableGroup(index1, index2, Options.reorder_within_group);
 		}
 
@@ -216,7 +231,6 @@ public class BDDAutomata
 		}
 
 		bdd_events = or(bdd_events_c, bdd_events_u);
-
 		has_events = true;
 
 		// ---------------------------------------- create global S->S' and S'->S permutations
@@ -226,37 +240,35 @@ public class BDDAutomata
 
 		for (int i = 0; i < size_states; i++)
 		{
-			tmp1[i] = getBDD(i * 3);    	// S[i]
+			tmp1[i] = getBDD(i * 3);    // S[i]
 			tmp2[i] = getBDD(i * 3 + 1);    // S´[i]
 			tmp3[i] = getBDD(i * 3 + 2);    // S´'[i]
 		}
 
-		permute_s2sp   = createPair(tmp1, tmp2);
-		permute_sp2s   = createPair(tmp2, tmp1);
+		permute_s2sp = createPair(tmp1, tmp2);
+		permute_sp2s = createPair(tmp2, tmp1);
 		permute_spp2sp = createPair(tmp3, tmp2);
 		permute_sp2spp = createPair(tmp2, tmp3);
-
 
 		// Options.out.println("cube_s   -> " + internal_refcount(cube_s));
 		// Options.out.println("cube_s'  -> " + internal_refcount(cube_sp));
 		// Options.out.println("cube_s'' -> " + internal_refcount(cube_spp));
-
 		size_all = 3 * size_states + size_events;
 	}
 
-
 	// -------------------------------------------------------------------------------------
-
-    public BDDAutomaton [] getAutomataVector()
-    {
+	public BDDAutomaton[] getAutomataVector()
+	{
 		return automata;
-    }
+	}
+
 	public int getSize()
 	{
 		return components;
 	}
 
-	public long getReorderingTime() {
+	public long getReorderingTime()
+	{
 		return original_automata.getReorderingTime();
 	}
 
@@ -306,6 +318,7 @@ public class BDDAutomata
 	{
 		return keep;
 	}
+
 	public int getPermuteS2Sp()
 	{
 		return permute_s2sp;
@@ -339,31 +352,33 @@ public class BDDAutomata
 	}
 
 	/** get a BDD for a subset of alphabet */
-	public int getAlphabetSubsetAsBDD(boolean [] subset)
+	public int getAlphabetSubsetAsBDD(boolean[] subset)
 	{
-		int bdd_subset = ref( getZero() );
+		int bdd_subset = ref(getZero());
 
-		for(int i = 0; i < subset.length; i++)
+		for (int i = 0; i < subset.length; i++)
 		{
-			if(subset[i])
-			bdd_subset = orTo(bdd_subset ,	original_events[i].bdd);
+			if (subset[i])
+			{
+				bdd_subset = orTo(bdd_subset, original_events[i].bdd);
+			}
 		}
-		return bdd_subset;
 
+		return bdd_subset;
 	}
 
 	// -------------------------------------------------------------------------
-
 	public void cleanup()
 	{
-
 		check("cleanup");
+
 		for (int i = 0; i < components; i++)
 		{
 			automata[i].cleanup();
 		}
 
-		if(has_events) {
+		if (has_events)
+		{
 			deref(bdd_events_u);
 			deref(bdd_events_c);
 			deref(bdd_events);
@@ -376,13 +391,15 @@ public class BDDAutomata
 
 		// printStats();
 		kill();
-		ref_count--;
 
+		ref_count--;
 
 		// restore our priority
 		// if(Options.developer_mode) {
-			Thread t = Thread.currentThread() ;
-			t.setPriority(saved_priority );
+		Thread t = Thread.currentThread();
+
+		t.setPriority(saved_priority);
+
 		// }
 	}
 
@@ -398,12 +415,12 @@ public class BDDAutomata
 		ps.println("BDD Sigma_u: " + nodeCount(bdd_events_u) + " nodes, SAT-count = " + satCount(bdd_events_u, size_events));
 	}
 
+	// ------------------------------------------------------------------------------
+	public static boolean BDDPackageIsBusy()
+	{
+		return ref_count > 0;
+	}
 
-
-    // ------------------------------------------------------------------------------
-    public static boolean BDDPackageIsBusy() {
-	return ref_count > 0;
-    }
 	// ------------------------ some debugging functions ----------------------------------
 	// --------------------------------------------------------- show_states (note: O(n!) complexity)
 	public void show_states(int bdd)
@@ -422,8 +439,9 @@ public class BDDAutomata
 
 	private void show_states_rec(String[] saved, boolean[] cares, int bdd, int level)
 	{
+
 		// no need to continue if there is nothing there anyway...
-		if(bdd == getZero())
+		if (bdd == getZero())
 		{
 			return;
 		}
@@ -454,9 +472,12 @@ public class BDDAutomata
 		}
 		else
 		{
-			if(dont_care(bdd, automata[level].getCareS(), automata[level].getCube()) ) {
+			if (dont_care(bdd, automata[level].getCareS(), automata[level].getCube()))
+			{
 				saved[level] = "-";
+
 				show_states_rec(saved, cares, bdd, level + 1);
+
 				return;
 			}
 
@@ -519,8 +540,8 @@ public class BDDAutomata
 			}
 
 			Options.out.print((states[i] == null)
-							 ? "-"
-							 : states[i]);
+							  ? "-"
+							  : states[i]);
 		}
 
 		Options.out.println(">");
@@ -575,33 +596,45 @@ public class BDDAutomata
 
 	// ------------------------------------------------------------------------------
 	public void count_states(String name, int bdd)
-    {
-	Options.out.println(name + " " + count_states(bdd));
-    }
-
-    public double count_states(int bdd)
 	{
+		Options.out.println(name + " " + count_states(bdd));
+	}
 
-	    switch(Options.count_algo) {
-	    case Options.COUNT_NONE:
-		return 0;
+	public double count_states(int bdd)
+	{
+		switch (Options.count_algo)
+		{
 
-	    case Options.COUNT_TREE:
-		// the easy way
-		int new_bdd = removeDontCareS(bdd);
-		double states = satCount(new_bdd);
-		// System.out.println("states= " + states + ", div = 2^" + (2 * size_states + size_events));
-		if(states != -1)
-		    states /= Math.pow(2, 2 * size_states + size_events);
-		deref(new_bdd);
-		return states;
-	    case Options.COUNT_EXACT:
-		// the hard/boring/slow way :(
-		Counter c = new Counter();
-		count_transitions_rec0(c, bdd, 0);
-		return c.get();
-	    }
-	    return 0; // just in case :)
+		case Options.COUNT_NONE :
+			return 0;
+
+		case Options.COUNT_TREE :
+
+			// the easy way
+			int new_bdd = removeDontCareS(bdd);
+			double states = satCount(new_bdd);
+
+			// System.out.println("states= " + states + ", div = 2^" + (2 * size_states + size_events));
+			if (states != -1)
+			{
+				states /= Math.pow(2, 2 * size_states + size_events);
+			}
+
+			deref(new_bdd);
+
+			return states;
+
+		case Options.COUNT_EXACT :
+
+			// the hard/boring/slow way :(
+			Counter c = new Counter();
+
+			count_transitions_rec0(c, bdd, 0);
+
+			return c.get();
+		}
+
+		return 0;    // just in case :)
 	}
 
 	private void count_transitions_rec0(Counter c, int bdd, int level)
@@ -685,52 +718,54 @@ public class BDDAutomata
 		return zero;    /* UNREACHABLE ? */
 	}
 
-
 	// --------------------------------------------------------
 	// This is used by the state extraction routins, so we dont
 	// push to much stuff on the stack during recusrive calls
-	private class StateListRecusionData {
+	private class StateListRecusionData
+	{
 		int current, max;
-		String [] names;
-		BDDAutomaton [] automata;
+		String[] names;
+		BDDAutomaton[] automata;
 		IncompleteStateList result;
 		int bdd;
-	};
+	}
+	;
 
 	// -------------------------------------------------------- build incomplete state list for this event
 	IncompleteStateList getIncompleteStateList(int bdd, Event event)
 	{
-
-
-		BDDAutomaton [] involved = new BDDAutomaton[components];
+		BDDAutomaton[] involved = new BDDAutomaton[components];
 		int count = 0;
-		for(int i = 0; i < components; i++)
+
+		for (int i = 0; i < components; i++)
 		{
+
 			/* NOT working, we must have the aother automata too!
 			if(automata[i].eventUsed(event))
 			{
-				involved[count++] = automata[i];
+					involved[count++] = automata[i];
 			}
 			*/
 			involved[count++] = automata[i];
 		}
 
-
 		IncompleteStateList ret = new IncompleteStateList(involved, count);
+		int tmpbdd = relProd(bdd, event.bdd, bdd_events_cube);
 
-		int tmpbdd = relProd( bdd, event.bdd, bdd_events_cube);
-		if(tmpbdd != getZero() && count > 0)
+		if ((tmpbdd != getZero()) && (count > 0))
 		{
 			StateListRecusionData slrd = new StateListRecusionData();
+
 			slrd.names = new String[count];
 			slrd.automata = involved;
 			slrd.bdd = tmpbdd;
 			slrd.result = ret;
 			slrd.current = 0;
 			slrd.max = count;
-			extract_states_rec(slrd);
 
+			extract_states_rec(slrd);
 		}
+
 		deref(tmpbdd);
 
 		return ret;
@@ -742,15 +777,19 @@ public class BDDAutomata
 	 * THIS ALGORITHM IS HORREIBLY INEFFICIENT !!!
 	 * its BAD, BAD, BAD. If it could get any worse, it would use hungerian notation!
 	 *
-     */
+ */
 	private void extract_states_rec(StateListRecusionData slrd)
-		// int bdd, int count, String [] names, IncompleteStateList result)
+
+	// int bdd, int count, String [] names, IncompleteStateList result)
 	{
-		if(slrd.current >= slrd.max)
+		if (slrd.current >= slrd.max)
 		{
 			slrd.result.insert(slrd.names);
-		} else {
+		}
+		else
+		{
 			State[] states = slrd.automata[slrd.current].getStates();
+
 			for (int i = 0; i < states.length; i++)
 			{
 				int tmp = and(slrd.bdd, states[i].bdd_s);
@@ -758,9 +797,18 @@ public class BDDAutomata
 				if (tmp != zero)
 				{
 					slrd.names[slrd.current] = states[i].name;
-					int old = slrd.bdd; slrd.bdd = tmp; slrd.current++;
+
+					int old = slrd.bdd;
+
+					slrd.bdd = tmp;
+
+					slrd.current++;
+
 					extract_states_rec(slrd);
-					slrd.bdd = old; slrd.current--;
+
+					slrd.bdd = old;
+
+					slrd.current--;
 				}
 
 				deref(tmp);
@@ -774,8 +822,10 @@ public class BDDAutomata
 	 * for a transition T: Q x E --> Q, the half-transition is T': subset Q x E
 	 *
 	 */
-	public void show_half_transitions(int bdd) {
+	public void show_half_transitions(int bdd)
+	{
 		show_transition_is_half = true;
+
 		show_transitions_internal(bdd);
 	}
 
@@ -786,12 +836,12 @@ public class BDDAutomata
 	public void show_transitions(int bdd)
 	{
 		show_transition_is_half = false;
+
 		show_transitions_internal(bdd);
 	}
 
 	private void show_transitions_internal(int bdd)
 	{
-
 		String[] names = new String[components * 2 + 1];    // the last one for events
 
 		for (int i = 0; i < names.length; i++)
@@ -799,7 +849,9 @@ public class BDDAutomata
 			names[i] = null;
 		}
 
-		Options.out.println(show_transition_is_half ? "T-half = {" : "T = {");
+		Options.out.println(show_transition_is_half
+							? "T-half = {"
+							: "T = {");
 		show_transitions_rec0(names, bdd, 0);
 		Options.out.println("};");
 	}
@@ -807,17 +859,15 @@ public class BDDAutomata
 	/** show the first part (State from) of a transition */
 	private void show_transitions_rec0(String[] names, int bdd, int level)
 	{
-
-		if(bdd == getZero() )
+		if (bdd == getZero())
 		{
 			return;
 		}
 
-
 		// for S
 		if (level >= components)
 		{
-			if(show_transition_is_half)
+			if (show_transition_is_half)
 			{
 				show_transitions_rec2(names, bdd);
 			}
@@ -825,16 +875,19 @@ public class BDDAutomata
 			{
 				show_transitions_rec1(names, bdd, 0);
 			}
+
 			return;
 		}
 
 		// see if it is dont care!
-		if(dont_care(bdd, automata[level].getCareS(), automata[level].getCube()) ) {
+		if (dont_care(bdd, automata[level].getCareS(), automata[level].getCube()))
+		{
 			names[level] = "-";
+
 			show_transitions_rec0(names, bdd, level + 1);
+
 			return;
 		}
-
 
 		// show exactly what it was:
 		State[] states = automata[level].getStates();
@@ -855,11 +908,10 @@ public class BDDAutomata
 		}
 	}
 
-
 	/** show the second part (State to) of a transition */
 	private void show_transitions_rec1(String[] names, int bdd, int level)
 	{
-		if(bdd == getZero())
+		if (bdd == getZero())
 		{
 			return;
 		}
@@ -872,16 +924,15 @@ public class BDDAutomata
 			return;
 		}
 
-
-
 		// see if it doesnt matter
-		if(dont_care(bdd, automata[level].getCareSp(), automata[level].getCubep()) ) {
+		if (dont_care(bdd, automata[level].getCareSp(), automata[level].getCubep()))
+		{
 			names[components + level] = "-";
+
 			show_transitions_rec1(names, bdd, level + 1);
+
 			return;
 		}
-
-
 
 		State[] states = automata[level].getStates();
 		int zero = getZero();
@@ -901,22 +952,24 @@ public class BDDAutomata
 		}
 	}
 
-
 	/** show the event part of a transition */
 	private void show_transitions_rec2(String[] names, int bdd)
 	{    // and for Sigma
 		final int pos = components * 2;
 		int zero = getZero();
 
-		if(bdd == zero)
+		if (bdd == zero)
 		{
 			return;
 		}
 
 		// see if it is a dont care!
-		if(dont_care(bdd, bdd_events, bdd_events_cube) ){
+		if (dont_care(bdd, bdd_events, bdd_events_cube))
+		{
 			names[pos] = "-";
+
 			show_transitions_print(names);
+
 			return;
 		}
 
@@ -963,8 +1016,10 @@ public class BDDAutomata
 			event = "??";
 		}
 
-		if(show_transition_is_half) {
+		if (show_transition_is_half)
+		{
 			Options.out.println(event + "  ]");
+
 			return;
 		}
 
@@ -991,9 +1046,10 @@ public class BDDAutomata
 	{
 		if (Options.sanity_check_on)
 		{
-		    // DEBUG: in case checkPackage crashes before it exists and prints 'name'
-		    Options.out.println("Checking : " + name);
-		    BDDAssert.internalCheck(super.checkPackage(), name + ": checkPackage() failed");
+
+			// DEBUG: in case checkPackage crashes before it exists and prints 'name'
+			Options.out.println("Checking : " + name);
+			BDDAssert.internalCheck(super.checkPackage(), name + ": checkPackage() failed");
 		}
 	}
 
@@ -1010,7 +1066,7 @@ public class BDDAutomata
 		 * }
 		 */
 
-		 // Note to myself: who the f**k is Theo??? can t remember why i wrote this...
+		// Note to myself: who the f**k is Theo??? can t remember why i wrote this...
 		double theo_states = Math.pow(2, size_states);
 		double efficiency = (100 * states) / theo_states;
 
@@ -1076,28 +1132,24 @@ public class BDDAutomata
 	 *
 	 * NOTE: THIS FUNCTION IS NOT VERY EFFICIENT!!!
 	 */
-	private boolean dont_care(int bdd, int values, int cube) {
-
-		if(bdd == getOne())
+	private boolean dont_care(int bdd, int values, int cube)
+	{
+		if (bdd == getOne())
 		{
 			return true;
 		}
-
-
-
 
 		int tmp = relProd(bdd, values, cube);
 
-		if(tmp == bdd)
+		if (tmp == bdd)
 		{
 			deref(tmp);
+
 			return true;
 		}
-
 
 		deref(tmp);
 
 		return false;
-
 	}
 }

@@ -14,24 +14,34 @@ public class PCGFrame
 	private Button bUp, bDown, bDone, bDump;
 	private java.awt.List order;
 
-    public PCGFrame(int [] perm, Vector all) {
+	public PCGFrame(int[] perm, Vector all)
+	{
 		super(new Frame(), "[PCGFrame]", true);
-		PCGNode [] nods = new PCGNode[perm.length];
-		for(int i = 0; i < perm.length; i++) nods[i] = (PCGNode) all.elementAt( i);
+
+		PCGNode[] nods = new PCGNode[perm.length];
+
+		for (int i = 0; i < perm.length; i++)
+		{
+			nods[i] = (PCGNode) all.elementAt(i);
+		}
+
 		init(perm, nods);
-    }
-    public PCGFrame(int[] perm, PCGNode[] nodes) {
+	}
+
+	public PCGFrame(int[] perm, PCGNode[] nodes)
+	{
 		super(new Frame(), "[PCGFrame]", true);
+
 		init(perm, nodes);
-    }
+	}
 
-    private void init(int [] perm, PCGNode [] nodes) {
-
+	private void init(int[] perm, PCGNode[] nodes)
+	{
 		this.perm = perm;
 		this.nodes = nodes;
 		this.size = perm.length;
 
-		Panel pNorth = new Panel(new FlowLayout( FlowLayout.LEFT) );
+		Panel pNorth = new Panel(new FlowLayout(FlowLayout.LEFT));
 
 		add(pNorth, BorderLayout.NORTH);
 		pNorth.add(bDone = new Button("Done"));
@@ -48,23 +58,18 @@ public class PCGFrame
 		pEast.add(new Label());
 		add(order = new java.awt.List(25, false));
 		build_list();
-
 		bUp.addActionListener(this);
 		bDown.addActionListener(this);
 		bDone.addActionListener(this);
 		bDump.addActionListener(this);
-
 		add(new Label("reorder PCG, then press done"), BorderLayout.SOUTH);
 		pack();
-    }
-
+	}
 
 	public void getUserPermutation()
 	{
-
 		show();
 	}
-
 
 	public void actionPerformed(ActionEvent e)
 	{
@@ -82,7 +87,7 @@ public class PCGFrame
 		{
 			onDone();
 		}
-		else if(src == bDump)
+		else if (src == bDump)
 		{
 			onDump();
 		}
@@ -123,22 +128,28 @@ public class PCGFrame
 	private void onDone()
 	{
 		dispose();
-
 	}
 
 	private void onDump()
 	{
 		Options.out.println("Automata order in the BDDs:");
+
 		int len = order.getItemCount();
-		for(int i = 0; i < len; i++) {
-			if(i != 0) Options.out.print(" < ");
+
+		for (int i = 0; i < len; i++)
+		{
+			if (i != 0)
+			{
+				Options.out.print(" < ");
+			}
+
 			Options.out.print(order.getItem(i));
 		}
+
 		Options.out.println();
 	}
 
 	// --------------------------------------
-
 	private void build_list()
 	{
 		order.removeAll();

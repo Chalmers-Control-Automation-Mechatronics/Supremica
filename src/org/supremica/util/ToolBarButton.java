@@ -56,40 +56,44 @@ public class ToolBarButton
 	extends JButton
 {
 	private static Insets tmpInsets = new Insets(0, 0, 0, 0);
-	
+
 	public ToolBarButton()
 	{
 		super();
+
 		initialize();
 	}
-	
+
 	public ToolBarButton(Action a)
 	{
 		super(a);
+
 		initialize();
 	}
-	
+
 	public ToolBarButton(Icon icon)
 	{
 		super(icon);
+
 		initialize();
 	}
 
 	public ToolBarButton(String text)
 	{
 		super(text);
-		initialize();		
+
+		initialize();
 	}
-	
+
 	public ToolBarButton(String text, Icon icon)
 	{
 		super(text, icon);
-		initialize();		
-	}	
-	
+
+		initialize();
+	}
+
 	private void initialize()
 	{
 		setMargin(tmpInsets);
 	}
-
 }

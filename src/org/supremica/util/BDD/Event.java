@@ -12,13 +12,26 @@ public class Event
 	int id, code, use, owners;
 	int bdd;
 	boolean c, p;
-    Automaton automaton;
+	Automaton automaton;
 
+	// for the rest of us:
+	public String getName()
+	{
+		return name_id;
+	}
 
-    // for the rest of us:
-    public String getName() { return name_id; }
-    public boolean isControllable() { return c; }
-    public boolean isPrioritized() { return p; }
+	public boolean isControllable()
+	{
+		return c;
+	}
 
-    public int getBDD() { return bdd; }
+	public boolean isPrioritized()
+	{
+		return p;
+	}
+
+	public int getBDD()
+	{
+		return bdd;
+	}
 }

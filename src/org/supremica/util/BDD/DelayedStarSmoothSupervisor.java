@@ -2,7 +2,6 @@ package org.supremica.util.BDD;
 
 import org.supremica.util.BDD.heuristics.*;
 
-
 // XXX: we should check if the first insertion (the new cluster!) does anything good
 //      and if not. abort the whole series to save time!
 
@@ -17,73 +16,95 @@ import org.supremica.util.BDD.heuristics.*;
  * current implementation uses a stack to do this, which is not a very good approximation.
  * we need heuristics like those in ES_* and AS_* for better reults
  */
-
-public class  DelayedStarSmoothSupervisor extends DelayedSmoothSupervisor {
-
-	Cluster [] cluster_stack;
-	int cluster_tos; // top of stach
-
+public class DelayedStarSmoothSupervisor
+	extends DelayedSmoothSupervisor
+{
+	Cluster[] cluster_stack;
+	int cluster_tos;    // top of stach
 	DelayedInsertationHeuristic dih;
 
-    public DelayedStarSmoothSupervisor(BDDAutomata manager, Group p, Group sp) {
-		super(manager,p,sp);
-		delaystar_init();
-    }
+	public DelayedStarSmoothSupervisor(BDDAutomata manager, Group p, Group sp)
+	{
+		super(manager, p, sp);
 
-    public DelayedStarSmoothSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
-		super(manager,as);
 		delaystar_init();
-    }
+	}
 
-	private void delaystar_init() {
+	public DelayedStarSmoothSupervisor(BDDAutomata manager, BDDAutomaton[] as)
+	{
+		super(manager, as);
+
+		delaystar_init();
+	}
+
+	private void delaystar_init()
+	{
 		cluster_stack = new Cluster[disj_size];
 		dih = DelayedInsertationHeuristicFactory.create(cluster_stack, disj_size);
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		return "delayed* smothing/" + Options.DSSI_HEURISTIC_NAMES[Options.dssi_heuristics];
 	}
 
-
 	// ---------------------------------------------------------------------------
-	protected void init_delay() {
+	protected void init_delay()
+	{
 		cluster_tos = 0;
 	}
-	protected void cleanup_delay() {
-	}
+
+	protected void cleanup_delay() {}
+
 	// ---------------------------------------------------------------------------
-
-
 	// compute the forward image
-	protected int delay_forward(GrowFrame gf, Cluster c, int r) {
+	protected int delay_forward(GrowFrame gf, Cluster c, int r)
+	{
+		MonotonicPartition delay_partition = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 
-		MonotonicPartition delay_partition= new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+		cluster_stack[cluster_tos++] = c;
 
-		cluster_stack[ cluster_tos++] = c;
 		dih.init(cluster_tos);
 
-		for(int i = 0; i < cluster_tos; i++) {
-			delay_partition.add( dih.next().twave );
+		for (int i = 0; i < cluster_tos; i++)
+		{
+			delay_partition.add(dih.next().twave);
+
 			r = delay_partition.forward(gf, limit, r);
 		}
 
-		if(gf != null)    gf.mark("Released* " + c.toString());
+		if (gf != null)
+		{
+			gf.mark("Released* " + c.toString());
+		}
+
 		delay_partition.cleanup();
+
 		return r;
 	}
 
-	protected int delay_backward(GrowFrame gf, Cluster c, int r) {
-		MonotonicPartition delay_partition= new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+	protected int delay_backward(GrowFrame gf, Cluster c, int r)
+	{
+		MonotonicPartition delay_partition = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 
-		cluster_stack[ cluster_tos++] = c;
+		cluster_stack[cluster_tos++] = c;
+
 		dih.init(cluster_tos);
 
-		for(int i = 0; i < cluster_tos; i++) {
-			delay_partition.add( dih.next().twave );
+		for (int i = 0; i < cluster_tos; i++)
+		{
+			delay_partition.add(dih.next().twave);
+
 			r = delay_partition.backward(gf, limit, r);
 		}
-		if(gf != null)    gf.mark("Released* " + c.toString());
+
+		if (gf != null)
+		{
+			gf.mark("Released* " + c.toString());
+		}
+
 		delay_partition.cleanup();
+
 		return r;
 	}
 }

@@ -1,5 +1,3 @@
-
-
 package org.supremica.util.BDD;
 
 /**
@@ -7,31 +5,38 @@ package org.supremica.util.BDD;
  * heuristics
  *
  */
-
-public class PartitionSmoothSupervisor extends DisjSupervisor {
+public class PartitionSmoothSupervisor
+	extends DisjSupervisor
+{
 	private boolean p1;
-    /** Constructor, passes to the base-class */
-    public PartitionSmoothSupervisor(BDDAutomata manager, BDDAutomaton [] as, boolean p1) {
-	super(manager,as);
-	this.p1 = p1;
 
-    }
+	/** Constructor, passes to the base-class */
+	public PartitionSmoothSupervisor(BDDAutomata manager, BDDAutomaton[] as, boolean p1)
+	{
+		super(manager, as);
 
+		this.p1 = p1;
+	}
 
-    /** Constructor, passes to the base-class */
-    public PartitionSmoothSupervisor(BDDAutomata manager, Group plant, Group spec, boolean p1) {
-	super(manager, plant, spec);
-	this.p1 = p1;
-    }
+	/** Constructor, passes to the base-class */
+	public PartitionSmoothSupervisor(BDDAutomata manager, Group plant, Group spec, boolean p1)
+	{
+		super(manager, plant, spec);
 
-    /** C++-style Destructor to cleanup unused BDD trees*/
-    public void cleanup() {
-	super.cleanup();
-    }
-    // --------------------------------------------------------
+		this.p1 = p1;
+	}
 
-    // --------------------------------------------------------
-    protected void computeReachables() {
+	/** C++-style Destructor to cleanup unused BDD trees*/
+	public void cleanup()
+	{
+		super.cleanup();
+	}
+
+	// --------------------------------------------------------
+	// --------------------------------------------------------
+	protected void computeReachables()
+	{
+
 		// statistic stuffs
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 
@@ -39,98 +44,136 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		SizeWatch.setOwner("PartitionSmoothSupervisor.computeReachables");
 
 		// DisjPartition dp = getDisjPartition();
-		Cluster [] clusters = dop.getClusters();
-		int i,j, size = dop.getSize();
-
-		int i_all   = manager.and(plant.getI(), spec.getI());
+		Cluster[] clusters = dop.getClusters();
+		int i, j, size = dop.getSize();
+		int i_all = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
-		manager.ref(r_all); //gets derefed by orTo and finally a deref
 
+		manager.ref(r_all);    //gets derefed by orTo and finally a deref
 
-		int num_access = 0, num_advance = 0; // statistics
-
+		int num_access = 0, num_advance = 0;    // statistics
 
 		i = j = 0;
+
 		limit.reset();
-		do {
+
+		do
+		{
+
 			// Util.notify("i = " + i + ", j = " + j + ", n = " + size);
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(clusters[p1 ? j : i ].getTwave(), r_all, s_cube);
-			int front= manager.replace( tmp, perm_sp2s);
+			int tmp = manager.relProd(clusters[p1
+											   ? j
+											   : i].getTwave(), r_all, s_cube);
+			int front = manager.replace(tmp, perm_sp2s);
+
 			r_all = manager.orTo(r_all, front);
+
 			manager.deref(front);
 			manager.deref(tmp);
 
-
-			if(r_all_p == r_all) {
+			if (r_all_p == r_all)
+			{
 				num_access++;
-				if(i > 0) num_advance++;
 
-				i =  i + 1;
-				j = (j + 1) % size; // only for P1
-			} else i = 0;
+				if (i > 0)
+				{
+					num_advance++;
+				}
 
-			if(gf != null)    gf.add( r_all );
+				i = i + 1;
+				j = (j + 1) % size;    // only for P1
+			}
+			else
+			{
+				i = 0;
+			}
 
-		} while( i < size && !limit.stopped());
-
+			if (gf != null)
+			{
+				gf.add(r_all);
+			}
+		}
+		while ((i < size) &&!limit.stopped());
 
 		has_reachables = true;
 		bdd_reachables = r_all;
 
-		if(gf != null) gf.stopTimer();
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
 		SizeWatch.report(bdd_reachables, "Qr");
 		timer.report("Forward reachables found (PartitionSmooth)");
 
-		if(Options.profile_on && num_access != 0) {
-			Options.out.println("Pn advances: " + ( (100 * num_advance) / num_access) + "%");
+		if (Options.profile_on && (num_access != 0))
+		{
+			Options.out.println("Pn advances: " + ((100 * num_advance) / num_access) + "%");
 		}
-    }
+	}
 
-
-    protected void computeCoReachables() {
+	protected void computeCoReachables()
+	{
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability" + type());
-		int num_access = 0, num_advance = 0; // statistics
+		int num_access = 0, num_advance = 0;    // statistics
+
 		timer.reset();
 		SizeWatch.setOwner("PartitionSmoothSupervisor.computecoReachables");
 
-		Cluster [] clusters = dop.getClusters();
-		int i,j, size = dop.getSize();
+		Cluster[] clusters = dop.getClusters();
+		int i, j, size = dop.getSize();
 		int m_all = GroupHelper.getM(manager, spec, plant);
 
 		// gets derefed in first orTo, but replace addes its own ref
 		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
 
 		// manager.ref(r_all); // gets derefed soon
-		manager.deref(m_all); // we dont need m_all anymore
-
-
+		manager.deref(m_all);    // we dont need m_all anymore
 		SizeWatch.report(r_all, "Qm");
 
-
 		i = j = 0;
+
 		limit.reset();
-		do {
+
+		do
+		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(clusters[p1 ? j : i].getTwave(), r_all, sp_cube);
-			int tmp2= manager.replace( tmp, perm_s2sp);
+			int tmp = manager.relProd(clusters[p1
+											   ? j
+											   : i].getTwave(), r_all, sp_cube);
+			int tmp2 = manager.replace(tmp, perm_s2sp);
+
 			r_all = manager.orTo(r_all, tmp2);
+
 			manager.deref(tmp2);
 			manager.deref(tmp);
 
-			if(r_all_p == r_all) {
+			if (r_all_p == r_all)
+			{
 				num_access++;
-				if(i > 0) num_advance++;
 
-				i =  i + 1;
+				if (i > 0)
+				{
+					num_advance++;
+				}
+
+				i = i + 1;
 				j = (j + 1) % size;
-			} else i = 0;
+			}
+			else
+			{
+				i = 0;
+			}
 
-			if(gf != null)    gf.add( r_all );
-
-		} while( i < size && !limit.stopped());
+			if (gf != null)
+			{
+				gf.add(r_all);
+			}
+		}
+		while ((i < size) &&!limit.stopped());
 
 		// move the result from S' to S:
 		int ret = manager.replace(r_all, perm_sp2s);
@@ -141,11 +184,17 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
-		if(gf != null) gf.stopTimer();
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+
 		SizeWatch.report(bdd_reachables, "Qco");
 		timer.report("Co-reachables found (PartitionSmooth)");
-		if(Options.profile_on && num_access != 0) {
-			Options.out.println("Pn advances: " + ( (100 * num_advance) / num_access) + "%");
+
+		if (Options.profile_on && (num_access != 0))
+		{
+			Options.out.println("Pn advances: " + ((100 * num_advance) / num_access) + "%");
 		}
-    }
+	}
 }

@@ -52,7 +52,6 @@ package org.supremica.util;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-
 /**
  * This is an experimental class, Please do not use it.
  */
@@ -65,6 +64,7 @@ public class SupremicaIterator
 	public SupremicaIterator(Iterator theIterator)
 	{
 		this.theIterator = theIterator;
+
 		increase();
 	}
 
@@ -93,8 +93,7 @@ public class SupremicaIterator
 		{
 			return currObject;
 		}
+
 		throw new NoSuchElementException();
 	}
-
 }
-

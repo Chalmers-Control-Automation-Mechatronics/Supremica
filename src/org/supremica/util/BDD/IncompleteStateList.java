@@ -1,5 +1,3 @@
-
-
 package org.supremica.util.BDD;
 
 import java.util.*;
@@ -7,14 +5,15 @@ import java.util.*;
 public class IncompleteStateList
 {
 	private int count;
-	private String [] automata_names;
+	private String[] automata_names;
 	private Vector list;
 
-	public IncompleteStateList(BDDAutomaton [] as, int size)
+	public IncompleteStateList(BDDAutomaton[] as, int size)
 	{
 		count = size;
 		automata_names = new String[count];
-		for(int i = 0; i < count; i++)
+
+		for (int i = 0; i < count; i++)
 		{
 			automata_names[i] = as[i].getName();
 		}
@@ -22,10 +21,13 @@ public class IncompleteStateList
 		list = new Vector();
 	}
 
-	public void insert(String [] list_) {
+	public void insert(String[] list_)
+	{
+
 		// make a copy
-		String [] new_list = new String[count];
-		for(int i = 0; i < count; i++)
+		String[] new_list = new String[count];
+
+		for (int i = 0; i < count; i++)
 		{
 			new_list[i] = list_[i];
 		}
@@ -38,7 +40,7 @@ public class IncompleteStateList
 		return count;
 	}
 
-	public String []getAutomatonNames()
+	public String[] getAutomatonNames()
 	{
 		return automata_names;
 	}

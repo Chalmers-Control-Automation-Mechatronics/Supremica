@@ -20,7 +20,7 @@ class JJTparserState
 	/*
 	 * Determines whether the current node was actually closed and
 	 *  pushed.  This should only be called in the final user action of a
-	 *  node scope.  
+	 *  node scope.
 	 */
 	boolean nodeCreated()
 	{
@@ -29,7 +29,7 @@ class JJTparserState
 
 	/*
 	 * Call this to reinitialize the node stack.  It is called
-	 *  automatically by the parser's ReInit() method. 
+	 *  automatically by the parser's ReInit() method.
 	 */
 	void reset()
 	{
@@ -42,7 +42,7 @@ class JJTparserState
 
 	/*
 	 * Returns the root node of the AST.  It only makes sense to call
-	 *  this after a successful parse. 
+	 *  this after a successful parse.
 	 */
 	Node rootNode()
 	{
@@ -59,7 +59,7 @@ class JJTparserState
 
 	/*
 	 * Returns the node on the top of the stack, and remove it from the
-	 *  stack.  
+	 *  stack.
 	 */
 	Node popNode()
 	{
@@ -79,7 +79,7 @@ class JJTparserState
 
 	/*
 	 * Returns the number of children on the stack in the current node
-	 *  scope. 
+	 *  scope.
 	 */
 	int nodeArity()
 	{
@@ -109,7 +109,7 @@ class JJTparserState
 	 * A definite node is constructed from a specified number of
 	 *  children.  That number of nodes are popped from the stack and
 	 *  made the children of the definite node.  Then the definite node
-	 *  is pushed on to the stack. 
+	 *  is pushed on to the stack.
 	 */
 	void closeNodeScope(Node n, int num)
 	{
@@ -134,7 +134,7 @@ class JJTparserState
 	 *  the nodes that have been pushed since the node was opened are
 	 *  made children of the the conditional node, which is then pushed
 	 *  on to the stack.  If the condition is false the node is not
-	 *  constructed and they are left on the stack. 
+	 *  constructed and they are left on the stack.
 	 */
 	void closeNodeScope(Node n, boolean condition)
 	{

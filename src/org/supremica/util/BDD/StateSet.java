@@ -27,56 +27,76 @@ public class StateSet
 		return false;
 	}
 
-
 	public State getByName(String name)
-	    throws BDDException
+		throws BDDException
 	{
 		State by_name = null;
 
-		if(closed) {
-			for(int i = 0; i < states.length; i++) {
-				if(states[i].name_id.equals(name))	return states[i];
-				if(states[i].name.equals(name)) by_name = states[i];
-			}
-		} else {
+		if (closed)
+		{
+			for (int i = 0; i < states.length; i++)
+			{
+				if (states[i].name_id.equals(name))
+				{
+					return states[i];
+				}
 
-			for (Enumeration e = elements(); e.hasMoreElements(); ) {
+				if (states[i].name.equals(name))
+				{
+					by_name = states[i];
+				}
+			}
+		}
+		else
+		{
+			for (Enumeration e = elements(); e.hasMoreElements(); )
+			{
 				State s = (State) e.nextElement();
-				if (s.name_id.equals(name))		return s;
-				if(s.name.equals(name))			by_name = s;
+
+				if (s.name_id.equals(name))
+				{
+					return s;
+				}
+
+				if (s.name.equals(name))
+				{
+					by_name = s;
+				}
 			}
 		}
 
-
-
-		if(by_name != null)
+		if (by_name != null)
 		{
 			System.err.println("[StateSet.getByName] BAD MODEL, uses name " + by_name.name + " instead of ID " + by_name.name_id);
+
 			return by_name;
 		}
 
-
 		// DEBUG:
 		System.out.println("Failed to find " + name + " dumping complete state set for this automaton:");
-		for (Enumeration e = elements(); e.hasMoreElements(); ) {
+
+		for (Enumeration e = elements(); e.hasMoreElements(); )
+		{
 			State s = (State) e.nextElement();
+
 			System.out.println("State " + s.name + ", id = " + s.name_id + ", id = " + s.id + ", code = " + s.code);
 		}
 
 		return null;
 	}
 
-
 	public int getIdByName(String name)
-	    throws BDDException
+		throws BDDException
 	{
 		State s = getByName(name);
-		return ( s  != null) ? s.id : Automaton.FAILED;
+
+		return (s != null)
+			   ? s.id
+			   : Automaton.FAILED;
 	}
 
-
 	public void add(String name, String id, boolean i, boolean m, boolean x)
-	    throws BDDException
+		throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[StateSet.add] BAD FUNCTION CALL!");
 
@@ -136,7 +156,7 @@ public class StateSet
 	}
 
 	void close()
-	    throws BDDException
+		throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[StateSet.close] BAD FUNCTION CALL!");
 

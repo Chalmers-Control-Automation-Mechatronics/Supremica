@@ -8,8 +8,9 @@ public class GrowFrame
 	extends Frame
 	implements ActionListener
 {
-	private final static long SHOW_THRESHOLD = 1000; /** how long to wait before next graph is drawn */
+	private final static long SHOW_THRESHOLD = 1000;
 
+	/** how long to wait before next graph is drawn */
 	protected IntArray vars;
 	private GrowCanvas canvas;
 	private long start_time, end_time, last_time;
@@ -22,12 +23,11 @@ public class GrowFrame
 	protected String title;
 	protected int min_value, max_value, last_value;
 
-
 	protected GrowFrame(String txt)
 	{
 		super(txt);
-		title = txt;
 
+		title = txt;
 		this.showGraph = true;
 		this.vars = new IntArray();
 
@@ -36,17 +36,11 @@ public class GrowFrame
 		add(pNorth, BorderLayout.NORTH);
 		pNorth.add(bQuit = new Button("Close"));
 		bQuit.addActionListener(this);
-
-
 		pNorth.add(bAbort = new Button("Abort"));
 		bAbort.addActionListener(this);
 		bAbort.setBackground(Color.red);
-
-
 		pNorth.add(bDump = new Button("Values"));
 		bDump.addActionListener(this);
-
-
 		pNorth.add(bReturn = new Button("Graph"));
 		bReturn.addActionListener(this);
 		bReturn.setVisible(false);
@@ -55,16 +49,12 @@ public class GrowFrame
 		this.min_value = Integer.MAX_VALUE;
 		this.last_value = 0;
 
-
-
 		add(status = new Label(), BorderLayout.SOUTH);
-
 
 		canvas = new GrowCanvas();
 
 		add(canvas, BorderLayout.CENTER);
-
-		add( ta = new TextArea(20,60), BorderLayout.WEST);
+		add(ta = new TextArea(20, 60), BorderLayout.WEST);
 		ta.setVisible(false);
 
 		start_time = last_time = -1;
@@ -91,7 +81,9 @@ public class GrowFrame
 	{
 		end_time = System.currentTimeMillis();
 		stopped = true;
+
 		bAbort.setVisible(false);
+
 		// flush();
 		repaint();
 	}
@@ -99,75 +91,112 @@ public class GrowFrame
 	public void add(int value)
 	{
 		end_time = System.currentTimeMillis();
+
 		vars.add(last_value = value);
 
-		if(last_value > max_value) max_value = last_value ;
-		if(last_value < min_value) min_value = last_value ;
+		if (last_value > max_value)
+		{
+			max_value = last_value;
+		}
 
+		if (last_value < min_value)
+		{
+			min_value = last_value;
+		}
 
 		// dont update toooooo often
-		if(end_time < last_time + SHOW_THRESHOLD)
+		if (end_time < last_time + SHOW_THRESHOLD)
+		{
 			return;
+		}
 
 		last_time = end_time;
 
-
-
 		update_screen();
 	}
 
-	public void flush() {
+	public void flush()
+	{
 		update_screen();
 	}
-	private void update_screen() {
+
+	private void update_screen()
+	{
 		long t = (end_time - start_time);
-		if(t > 30 * 60 * 1000) {
+
+		if (t > 30 * 60 * 1000)
+		{
 			status.setText("Time " + (t + 500 * 60) / (1000 * 60) + " [min]");
-		} else if(t > 30 * 1000) {
+		}
+		else if (t > 30 * 1000)
+		{
 			status.setText("Time " + (t + 500) / 1000 + " [s]");
-		} else {
+		}
+		else
+		{
 			status.setText("Time " + t + " [ms]");
 		}
 
 		canvas.force_repaint();
 	}
 
-
 	// -------------------------------------------------------------
+	public int minValue()
+	{
+		return min_value;
+	}
 
-	public int minValue() { return min_value; }
-	public int maxValue() { return max_value; }
-	public int finalValue() { return last_value; }
-	public int iterations() { return vars.getSize(); }
-	public long totalTime() { return end_time - start_time; }
-	public IntArray data() { return vars; }
+	public int maxValue()
+	{
+		return max_value;
+	}
 
+	public int finalValue()
+	{
+		return last_value;
+	}
 
-	public void save(String filename) throws IOException {
+	public int iterations()
+	{
+		return vars.getSize();
+	}
+
+	public long totalTime()
+	{
+		return end_time - start_time;
+	}
+
+	public IntArray data()
+	{
+		return vars;
+	}
+
+	public void save(String filename)
+		throws IOException
+	{
 		FileWriter fw = new FileWriter(filename);
 		String text = getText();
+
 		fw.write(text);
 		fw.flush();
 		fw.close();
 	}
 
 	// -------------------------------------------------------------
-
 	private void onDump()
 	{
 		String text = getText();
 
 		ta.setText(text);
-
 		canvas.setVisible(false);
 		ta.setVisible(true);
-
 		bDump.setVisible(false);
 		bReturn.setVisible(true);
 		pack();
 	}
 
-	private String getText() {
+	private String getText()
+	{
 		int size_x = vars.getSize();
 		StringBuffer sb = new StringBuffer();
 
@@ -183,22 +212,35 @@ public class GrowFrame
 
 		for (int i = 0; i < size_x; i++)
 		{
-			if(i != 0) sb.append("; ");
-			if( (i % 20) == 0) sb.append("\n");
+			if (i != 0)
+			{
+				sb.append("; ");
+			}
+
+			if ((i % 20) == 0)
+			{
+				sb.append("\n");
+			}
+
 			sb.append(vars.get(i));
 		}
+
 		sb.append("];\n");
 
 		// get markes (if any)
-		if(marker_root != null) {
+		if (marker_root != null)
+		{
 			Marker current = marker_root;
+
 			sb.append("\n\n% the markers are:\n");
-			while(current != null) {
+
+			while (current != null)
+			{
 				sb.append("% at step " + current.position + ": " + current.text + "\n");
+
 				current = current.next;
 			}
 		}
-
 
 		return sb.toString();
 	}
@@ -224,13 +266,16 @@ public class GrowFrame
 		else if (src == bDump)
 		{
 			showGraph = false;
+
 			onDump();
 		}
 		else if (src == bReturn)
 		{
 			showGraph = true;
+
 			onReturn();
-		} else if(src == bAbort)
+		}
+		else if (src == bAbort)
 		{
 			Limiter.stopAll();
 			bAbort.setVisible(false);
@@ -238,22 +283,35 @@ public class GrowFrame
 	}
 
 	// -[ marker stuff ]-------------------------------------------------------
+
 	/** inster a marker at the current position */
-	public void mark(String txt) {
+	public void mark(String txt)
+	{
 		Marker m = new Marker(txt);
 
-		if(marker_root == null) {
+		if (marker_root == null)
+		{
 			marker_root = marker_last = m;
-		} else {
+		}
+		else
+		{
 			marker_last.next = m;
 			marker_last = m;
 		}
 	}
-	private class Marker {
+
+	private class Marker
+	{
 		public int position;
 		public String text;
 		public Marker next;
-		public Marker(String txt) { text = txt; next = null; position = vars.getSize(); }
+
+		public Marker(String txt)
+		{
+			text = txt;
+			next = null;
+			position = vars.getSize();
+		}
 	}
 
 	// -[ grow canwas ]-------------------------------------------------------
@@ -265,24 +323,29 @@ public class GrowFrame
 			this.setSize(400, 300);
 		}
 
-
 		/** this is to force repainting right away even if the AWT thread is busy */
-		public void force_repaint() {
-			if(!showGraph) return;
-
+		public void force_repaint()
+		{
+			if (!showGraph)
+			{
+				return;
+			}
 
 			Graphics g = GrowCanvas.this.getGraphics();
 
-			if(g!= null)
+			if (g != null)
 			{
-				g.clearRect(0,0, GrowCanvas.this.getWidth(), GrowCanvas.this.getHeight() );
+				g.clearRect(0, 0, GrowCanvas.this.getWidth(), GrowCanvas.this.getHeight());
 				paint(g);
 			}
-
 		}
+
 		public void paint(Graphics g)
 		{
-			if(!showGraph) return;
+			if (!showGraph)
+			{
+				return;
+			}
 
 			int min = min_value;
 			int max = max_value;
@@ -292,13 +355,15 @@ public class GrowFrame
 				min = 0;
 			}
 
-
 			Dimension dims = this.getSize();
 			int size_x = vars.getSize();
 			int size_y = (max - min);
 			int marg_y = (dims.height * 1) / 10;
 
-			if(size_y < 1) size_y = 1; // avoid DIV BY ZERO
+			if (size_y < 1)
+			{
+				size_y = 1;    // avoid DIV BY ZERO
+			}
 
 			dims.height -= 2 * marg_y;
 
@@ -309,8 +374,9 @@ public class GrowFrame
 				return;    // no values yet
 			}
 
+			if (stopped)
+			{
 
-			if(stopped) {
 				// we have stoped, and afford to draw a better cuve
 				g.setColor(Color.black);
 
@@ -318,17 +384,23 @@ public class GrowFrame
 				{
 					int x = (i * dims.width) / size_x;
 					int y = dims.height + marg_y - (vars.get(i) * dims.height) / size_y;
-					if(i != 0)
+
+					if (i != 0)
+					{
 						g.drawLine(old_x, old_y, x, y);
+					}
 
 					old_x = x;
 					old_y = y;
 				}
-				g.setColor(Color.red); // for the upcoming drawString
-			} else {
+
+				g.setColor(Color.red);    // for the upcoming drawString
+			}
+			else
+			{
+
 				// this one is "a-bit" faster (could be much faster using _skips_)
 				// good if size becomes huge, ~ 10 000 is not very unusuall)
-
 				// get first one:
 				old_x = (0 * dims.width) / size_x;
 				old_y = dims.height + marg_y - (vars.get(0) * dims.height) / size_y;
@@ -337,11 +409,17 @@ public class GrowFrame
 				{
 					int x = (i * dims.width) / size_x;
 
-					if(x == old_x) {
+					if (x == old_x)
+					{
+
 						// dont draw
-					} else {
+					}
+					else
+					{
 						int y = dims.height + marg_y - (vars.get(i) * dims.height) / size_y;
+
 						g.drawLine(old_x, old_y, x, y);
+
 						old_x = x;
 						old_y = y;
 					}
@@ -351,32 +429,45 @@ public class GrowFrame
 			g.drawString("" + size_x + " points, max " + max + ", last:" + vars.get(size_x - 1), 10, 10);
 
 			// now draw the markers, if any:
-			if(marker_root != null) {
-				g.setColor( Color.blue);
+			if (marker_root != null)
+			{
+				g.setColor(Color.blue);
+
 				Marker current = marker_root;
 				int mark_y = 20;
 				int mark_delta = Math.max(dims.height / 6, 40);
-
 				int halve = dims.width / 2;
 				FontMetrics fm = g.getFontMetrics();
-				while(current != null) {
+
+				while (current != null)
+				{
 					int x = (current.position * dims.width) / size_x;
-					int y = dims.height + marg_y - (vars.get(current.position)  * dims.height) / size_y;
-
-
+					int y = dims.height + marg_y - (vars.get(current.position) * dims.height) / size_y;
 
 					// render string, but make sure the text is visible
 					int w = fm.stringWidth(current.text);
 					int x2 = x;
-					if(x2  + w > dims.width) x2 -= w;
-					if(x2 < 0) x2 = 0;
+
+					if (x2 + w > dims.width)
+					{
+						x2 -= w;
+					}
+
+					if (x2 < 0)
+					{
+						x2 = 0;
+					}
+
 					g.drawString(current.text, x2 + 4, mark_y);
-
-					g.drawLine(x2, mark_y, x , y);
-
+					g.drawLine(x2, mark_y, x, y);
 
 					mark_y += mark_delta;
-					if(mark_y > dims.height) mark_y = 20;
+
+					if (mark_y > dims.height)
+					{
+						mark_y = 20;
+					}
+
 					current = current.next;
 				}
 			}

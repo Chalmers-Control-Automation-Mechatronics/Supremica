@@ -3,139 +3,159 @@ package org.supremica.util.BDD;
 import java.util.*;
 import org.supremica.automata.*;
 
-public class Builder {
-    private org.supremica.automata.Automata s_automata;
-    private Automata automata;
-    private BDDAutomata bddautomata = null;
+public class Builder
+{
+	private org.supremica.automata.Automata s_automata;
+	private Automata automata;
+	private BDDAutomata bddautomata = null;
 
-    private int convertType(AutomatonType t) {
-	String name = t.toString().toLowerCase();
+	private int convertType(AutomatonType t)
+	{
+		String name = t.toString().toLowerCase();
 
-	if (name == null) {
-	    return Automaton.TYPE_UNKNOWN;
+		if (name == null)
+		{
+			return Automaton.TYPE_UNKNOWN;
+		}
+
+		if (name.equals("plant"))
+		{
+			return Automaton.TYPE_PLANT;
+		}
+
+		if (name.equals("specification"))
+		{
+			return Automaton.TYPE_SPEC;
+		}
+
+		if (name.equals("supervisor"))
+		{
+			return Automaton.TYPE_SUPERVISOR;
+		}
+
+		// XXX: this is really playing with fire. we dont know if interface is a plant or spec
+		if (name.equals("interface"))
+		{
+
+			// return Automaton.TYPE_SUPERVISOR;
+			return Automaton.TYPE_PLANT;
+		}
+
+		return Automaton.TYPE_UNKNOWN;
 	}
 
-	if (name.equals("plant"))
-	    {
-		return Automaton.TYPE_PLANT;
-	    }
-
-
-	if (name.equals("specification"))
-	    {
-		return Automaton.TYPE_SPEC;
-	    }
-
-	if (name.equals("supervisor"))
-	    {
-		return Automaton.TYPE_SUPERVISOR;
-	    }
-
-
-	// XXX: this is really playing with fire. we dont know if interface is a plant or spec
-	if (name.equals("interface"))
-	    {
-		// return Automaton.TYPE_SUPERVISOR;
-		return Automaton.TYPE_PLANT;
-	    }
-
-	return Automaton.TYPE_UNKNOWN;
-    }
-
-    public Builder(org.supremica.automata.Automata s_automata)
-	throws BDDException
-    {
+	public Builder(org.supremica.automata.Automata s_automata)
+		throws BDDException
+	{
 		this(s_automata, null);
 	}
 
 	public Builder(org.supremica.automata.Automata s_automata, org.supremica.automata.Alphabet alphabet)
 		throws BDDException
-    {
-	this.s_automata = s_automata;
-	automata = new Automata();
+	{
+		this.s_automata = s_automata;
+		automata = new Automata();
 
-	// build the automata
-	for (Iterator it = s_automata.iterator(); it.hasNext(); )
-	    {
-		org.supremica.automata.Automaton s_a = (org.supremica.automata.Automaton) it.next();
+		// build the automata
+		for (Iterator it = s_automata.iterator(); it.hasNext(); )
+		{
+			org.supremica.automata.Automaton s_a = (org.supremica.automata.Automaton) it.next();
 
-		automata.createAutomaton(s_a, s_a.getName());
+			automata.createAutomaton(s_a, s_a.getName());
 
-		Automaton a = automata.getCurrent();
+			Automaton a = automata.getCurrent();
 
-		a.setType(convertType(s_a.getType()));
+			a.setType(convertType(s_a.getType()));
 
-		// insert events
-		for(EventIterator ei = s_a.eventIterator(); ei.hasNext(); ) {
-		    LabeledEvent le = (LabeledEvent) ei.next();
-		    if(alphabet != null && !alphabet.contains(le)) continue;
+			// insert events
+			for (EventIterator ei = s_a.eventIterator(); ei.hasNext(); )
+			{
+				LabeledEvent le = (LabeledEvent) ei.next();
 
-		    String id = le.getLabel(); // le.getId() has DEFAULT ACCESS, why??
-		    String label = le.getLabel();
-		    if(label == null) label = id;
-		    boolean co = le.isControllable();
-		    boolean p  = le.isPrioritized();
-		    a.addEvent(label, id, co, p);
+				if ((alphabet != null) &&!alphabet.contains(le))
+				{
+					continue;
+				}
+
+				String id = le.getLabel();    // le.getId() has DEFAULT ACCESS, why??
+				String label = le.getLabel();
+
+				if (label == null)
+				{
+					label = id;
+				}
+
+				boolean co = le.isControllable();
+				boolean p = le.isPrioritized();
+
+				a.addEvent(label, id, co, p);
+			}
+
+			// Insert states:
+			for (StateIterator sit = s_a.stateIterator(); sit.hasNext(); )
+			{
+				org.supremica.automata.State s_st = (org.supremica.automata.State) sit.next();
+				String name = s_st.getName();
+				String name_id = s_st.getId();
+
+				if ((name == null) || (name.length() == 0))
+				{
+					name = name_id;
+				}
+				else if ((name_id == null) || (name_id.length() == 0))
+				{
+					name_id = name;    // just for fun :)
+				}
+
+				boolean initial = s_st.isInitial();
+				boolean marked = s_st.isAccepting();
+				boolean forbidden = s_st.isForbidden();
+
+				a.addState(name, name_id, initial, marked, forbidden);
+
+				// Insert ARCS
+				for (EventIterator eit = s_a.outgoingEventsIterator(s_st);
+						eit.hasNext(); )
+				{
+					LabeledEvent le = (LabeledEvent) eit.next();
+
+					if ((alphabet != null) &&!alphabet.contains(le))
+					{
+						continue;
+					}
+
+					org.supremica.automata.State s_to = s_st.nextState(le);
+					String e_name = le.getLabel();    // or getID() ???
+					String to_name = s_to.getName();
+
+					a.addArc(e_name, name, to_name);
+				}
+			}
+
+			// Close automaton:
+			a.close();
 		}
 
-		// Insert states:
-		for (StateIterator sit = s_a.stateIterator(); sit.hasNext(); )
-		    {
-			org.supremica.automata.State s_st = (org.supremica.automata.State) sit.next();
-			String name = s_st.getName();
-			String name_id = s_st.getId();
+		// close automata
+		automata.close();
 
-			if ((name == null) || (name.length() == 0))
-			    {
-				name = name_id;
-			    }
-			else if ((name_id == null) || (name_id.length() == 0))
-			    {
-				name_id = name;    // just for fun :)
-			    }
-
-			boolean initial = s_st.isInitial();
-			boolean marked = s_st.isAccepting();
-			boolean forbidden = s_st.isForbidden();
-
-			a.addState(name, name_id, initial, marked, forbidden);
-
-			// Insert ARCS
-			for (EventIterator eit = s_a.outgoingEventsIterator(s_st);
-			     eit.hasNext(); )
-			    {
-				LabeledEvent le = (LabeledEvent) eit.next();
-				if(alphabet != null && !alphabet.contains(le)) continue;
-
-				org.supremica.automata.State s_to = s_st.nextState(le);
-				String e_name = le.getLabel();    // or getID() ???
-				String to_name = s_to.getName();
-
-				a.addArc(e_name, name, to_name);
-			    }
-		    }
-
-		// Close automaton:
-		a.close();
-	    }
-
-	// close automata
-	automata.close();
-
-	// DEBUG:
-	// automata.dump(Options.out);
-    }
-
-    public BDDAutomata getBDDAutomata()
-	throws BDDException
-    {
-	if (bddautomata == null) {
-	    if(BDDAutomata.BDDPackageIsBusy())
-		throw new BDDException("The BDD packages is used by another task!");
-
-	    bddautomata = new BDDAutomata(automata);
+		// DEBUG:
+		// automata.dump(Options.out);
 	}
 
-	return bddautomata;
-    }
+	public BDDAutomata getBDDAutomata()
+		throws BDDException
+	{
+		if (bddautomata == null)
+		{
+			if (BDDAutomata.BDDPackageIsBusy())
+			{
+				throw new BDDException("The BDD packages is used by another task!");
+			}
+
+			bddautomata = new BDDAutomata(automata);
+		}
+
+		return bddautomata;
+	}
 }

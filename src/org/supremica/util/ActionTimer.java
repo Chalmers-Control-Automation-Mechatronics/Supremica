@@ -57,12 +57,10 @@ public class ActionTimer
 	private final static String minutes = " minutes ";
 	private final static String seconds = " seconds ";
 	private final static String milliseconds = " milliseconds";
-
 	private Date startDate = null;
 	private Date stopDate = null;
 
-	public ActionTimer()
-	{	}
+	public ActionTimer() {}
 
 	/**
 	 * Starts the timer.
@@ -72,7 +70,6 @@ public class ActionTimer
 		stopDate = null;
 		startDate = new Date();
 	}
-
 
 	/**
 	 * Stops the timer.
@@ -93,35 +90,42 @@ public class ActionTimer
 		{
 			throw new IllegalStateException("startDate is negative");
 		}
+
 		if (stopDate == null)
 		{
 			return (new Date()).getTime() - startDate.getTime();
 		}
+
 		return stopDate.getTime() - startDate.getTime();
 	}
 
 	public String toString()
 	{
-		long time = elapsedTime();	// time is in millisecs
+		long time = elapsedTime();    // time is in millisecs
+		int hrs = (int) (time / (60 * 60 * 1000.0));
 
-		int hrs = (int)(time / (60 * 60 * 1000.0));
 		time = time - hrs * (60 * 60 * 1000);
-		int mins = (int)(time / (60 * 1000.0));
-		time = time - mins * (60 * 1000);
-		int secs = (int)(time / (1000.0));
-		time = time - secs * 1000;
-		int millis = (int)time;
 
+		int mins = (int) (time / (60 * 1000.0));
+
+		time = time - mins * (60 * 1000);
+
+		int secs = (int) (time / (1000.0));
+
+		time = time - secs * 1000;
+
+		int millis = (int) time;
 		StringBuffer sbuf = new StringBuffer();
-		if(hrs != 0)
+
+		if (hrs != 0)
 		{
 			sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
 		}
-		else if(mins != 0)
+		else if (mins != 0)
 		{
 			sbuf.append(mins + minutes + secs + seconds + millis + milliseconds);
 		}
-		else if(secs != 0)
+		else if (secs != 0)
 		{
 			sbuf.append(secs + seconds + millis + milliseconds);
 		}
@@ -129,6 +133,7 @@ public class ActionTimer
 		{
 			sbuf.append(millis + milliseconds);
 		}
+
 		return sbuf.toString();
 	}
 

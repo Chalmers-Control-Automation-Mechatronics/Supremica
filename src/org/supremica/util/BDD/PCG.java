@@ -64,7 +64,7 @@ public class PCG
 	}
 
 	public void connect(Object obj1, Object obj2, int weight)
-	    throws BDDException
+		throws BDDException
 	{
 		Node node1 = (Node) map.get(obj1);
 		Node node2 = (Node) map.get(obj2);
@@ -87,7 +87,7 @@ public class PCG
 	}
 
 	private int getSmallest(boolean[] free)
-	    throws BDDException
+		throws BDDException
 	{
 		int smallest = 0, index = 0;
 		boolean first = true;
@@ -114,7 +114,7 @@ public class PCG
 
 	// ------------------------------------------------------------
 	public int[] getShortestPath()
-	    throws BDDException
+		throws BDDException
 	{
 		int[] perm = null;
 
@@ -131,9 +131,8 @@ public class PCG
 		}
 
 		perm = getShortestPath_greedy2();
+
 		// perm = getShortestPath_complete();
-
-
 		if (Options.debug_on)
 		{
 			Options.out.print("PCG group ordering: ");
@@ -147,8 +146,12 @@ public class PCG
 		}
 
 		// we dont want the last element (score) any more
-		int [] ret = new int[size];
-		for(int i = 0; i < size; i++) ret[i] = perm[i];
+		int[] ret = new int[size];
+
+		for (int i = 0; i < size; i++)
+		{
+			ret[i] = perm[i];
+		}
 
 		return ret;
 	}
@@ -226,7 +229,7 @@ public class PCG
 
 	// ----------------------------------- greedy, 2-step lookahead
 	private int[] getShortestPath_greedy2()
-	    throws BDDException
+		throws BDDException
 	{
 
 		// the last one, perm[size], is reserved for the total cost
@@ -272,7 +275,7 @@ public class PCG
 	}
 
 	private void getShortest_greedy2(int me, int left, boolean[] free, int[] result)
-	    throws BDDException
+		throws BDDException
 	{
 
 		// Options.out.println("Im " + me + " size " + size + "  left " + left);
@@ -327,7 +330,7 @@ public class PCG
 
 	// ------------------------------------------------------------------------------
 	private int[] getShortestPath_greedy()
-	    throws BDDException
+		throws BDDException
 	{
 		int[] perm = new int[size + 1];
 		boolean[] free = new boolean[size];
@@ -363,7 +366,7 @@ public class PCG
 	}
 
 	private int getNext_greedy1(int me_, boolean[] free, int level)
-	    throws BDDException
+		throws BDDException
 	{
 		boolean first = true;
 		int index = -1, max = -1;
@@ -399,22 +402,23 @@ public class PCG
 		return index;
 	}
 
-    // --------------------------------------------------------------
-    // Nearest insertation TSP heruistic.
-    // see Disrcrete Optimization lecture notes , chap 4: PH-2
-    //
-    // 1. chose a cycle C of length 3
-    // 2. if V=V(C) then stop (C is a tour)
-    // 3. Find a city p \in V - V(C) such there there exists a q \in V(C) satisfying
-    //             c_pq   = min { min { c_ij | j \in V(C)} | i \in V - V(C)
-    // 4. Determine an edge uv \in C such that
-    //             c_up + c_pv - c_uv = {main c_ip + c_pj-c_ij| ic \in C }
-    // 5. set C := ( C \ {uv}} \cup {up,pv} and goto 2
-    public int [] getShortestPath_NearesInsertation() {
-	// TODO
-	return null;
-    }
+	// --------------------------------------------------------------
+	// Nearest insertation TSP heruistic.
+	// see Disrcrete Optimization lecture notes , chap 4: PH-2
+	//
+	// 1. chose a cycle C of length 3
+	// 2. if V=V(C) then stop (C is a tour)
+	// 3. Find a city p \in V - V(C) such there there exists a q \in V(C) satisfying
+	//             c_pq   = min { min { c_ij | j \in V(C)} | i \in V - V(C)
+	// 4. Determine an edge uv \in C such that
+	//             c_up + c_pv - c_uv = {main c_ip + c_pj-c_ij| ic \in C }
+	// 5. set C := ( C \ {uv}} \cup {up,pv} and goto 2
+	public int[] getShortestPath_NearesInsertation()
+	{
 
+		// TODO
+		return null;
+	}
 
 	// -----------------------------------------------------------------------------
 	public void dump()
@@ -427,8 +431,7 @@ public class PCG
 			{
 				if (nodes[i].weights[j] != NOT_CONNECTED)
 				{
-					Options.out.println("\t --> " + j + "    (weight = " +
-							   nodes[i].weights[j] + ")");
+					Options.out.println("\t --> " + j + "    (weight = " + nodes[i].weights[j] + ")");
 				}
 			}
 		}

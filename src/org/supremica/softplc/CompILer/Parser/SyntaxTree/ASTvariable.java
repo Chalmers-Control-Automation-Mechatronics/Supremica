@@ -40,13 +40,13 @@ public class ASTvariable
 
 	public TypeConstant getType()
 	{
-	    if (isFunctionBlock || HelpMethods.parseTypeConstants(typeName) == null)
+		if (isFunctionBlock || (HelpMethods.parseTypeConstants(typeName) == null))
 		{
-		    return TypeConstant.T_DERIVED;
+			return TypeConstant.T_DERIVED;
 		}
-	    else
+		else
 		{
-		    return HelpMethods.parseTypeConstants(typeName);
+			return HelpMethods.parseTypeConstants(typeName);
 		}
 	}
 
@@ -62,13 +62,13 @@ public class ASTvariable
 
 	public TypeConstant getFieldSelectorType()
 	{
-	    if (HelpMethods.parseTypeConstants(fieldSelectorTypeName) == null)
-		{ /*the fieldselector itself is probably a functionblock/other derived variable*/
-		    return TypeConstant.T_DERIVED;
+		if (HelpMethods.parseTypeConstants(fieldSelectorTypeName) == null)
+		{    /*the fieldselector itself is probably a functionblock/other derived variable*/
+			return TypeConstant.T_DERIVED;
 		}
-	    else
+		else
 		{
-		    return HelpMethods.parseTypeConstants(fieldSelectorTypeName);
+			return HelpMethods.parseTypeConstants(fieldSelectorTypeName);
 		}
 	}
 
@@ -133,14 +133,16 @@ public class ASTvariable
 
 	public Object visit(SimpleNodeVisitor v, Object o)
 	{
-	    //	try
-	    //	{
-			return v.visitVARIABLE(this, o);
-			//	}
-			//		catch (Exception e)
-			//	{
-			//		System.err.println("Caught Exception: " + e.getMessage());
-			//return null;
-			//	}
+
+		//  try
+		//  {
+		return v.visitVARIABLE(this, o);
+
+		//      }
+		//              catch (Exception e)
+		//      {
+		//              System.err.println("Caught Exception: " + e.getMessage());
+		//return null;
+		//      }
 	}
 }

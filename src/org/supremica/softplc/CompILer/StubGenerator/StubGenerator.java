@@ -3,18 +3,13 @@ package org.supremica.softplc.CompILer.StubGenerator;
 import java.lang.reflect.*;
 import java.io.*;
 
-
 /**
  * Given a Class a IEC 61131 function block with the corresponding attributes
  * will be generated.
  */
 public class StubGenerator
 {
-
-	public StubGenerator()
-	{
-
-	}
+	public StubGenerator() {}
 
 	/**
 	 * Create an IEC 61131 Function block declaration.
@@ -22,18 +17,21 @@ public class StubGenerator
 	public void generate(Class theClass, PrintWriter pw)
 	{
 		pw.print("FUNCTION_BLOCK ");
+
 		String className = theClass.getName();
 		String mangledClassName = className.replace('.', '_');
+
 		pw.println(mangledClassName);
-
 		pw.println("(* Original class name: " + className + " *)");
-
 		pw.println("\tVAR_IN_OUT");
+
 		Field[] theFields = theClass.getFields();
+
 		for (int i = 0; i < theFields.length; i++)
 		{
 			Field currField = theFields[i];
 			int modifiers = currField.getModifiers();
+
 			if (Modifier.isPublic(modifiers))
 			{
 				Class currFieldType = currField.getType();
@@ -55,17 +53,16 @@ public class StubGenerator
 					}
 				}
 				else
-				{ // Do nothing
-
+				{    // Do nothing
 				}
 			}
 		}
+
 		pw.println("\tEND_VAR");
+
 		//pw.println("END:");
 		pw.println("END_FUNCTION_BLOCK");
 	}
-
-
 
 	public static void main(String[] args)
 	{
@@ -74,4 +71,3 @@ public class StubGenerator
 		generator.generate(java.lang.Integer.class, new PrintWriter(System.out, true));
 	}
 }
-

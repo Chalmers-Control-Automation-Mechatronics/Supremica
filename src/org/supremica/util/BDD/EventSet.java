@@ -33,7 +33,7 @@ public class EventSet
 		{
 			Event ev = (Event) e.nextElement();
 
-			if (/* ev.name_id.equals(name) */ ev.label.equals(name))
+			if ( /* ev.name_id.equals(name) */ev.label.equals(name))
 			{
 				return ev;
 			}
@@ -60,7 +60,7 @@ public class EventSet
 	}
 
 	public void add(EventManager alphabet, String label, String id, boolean c, boolean p, Automaton owner)
-	    throws BDDException
+		throws BDDException
 	{
 		BDDAssert.internalCheck(!closed, "[EventSet.add] BAD FUNCTION CALL!");
 		BDDAssert.bddAssert(!in(label), "Duplicate event: " + label);
@@ -84,6 +84,7 @@ public class EventSet
 	public int getSize()
 	{
 		BDDAssert.internalCheck(closed, "[EventSet.getSize] BAD FUNCTION CALL!");
+
 		return total;
 	}
 
@@ -103,65 +104,65 @@ public class EventSet
 	}
 
 /*
-    public boolean overlap(EventSet es)
-    {
-		BDDAssert.internalCheck(closed, "[EventSet.overlap] BAD FUNCTION CALL!");
-
-		for(int t = 0; t < total; t++)
-		    if(events[t] != null && es.events[t] != null)
-			return true;
-
-		return false;
-    }
-
-    public boolean overlap(EventSet es, boolean [] careSet)
-    {
-		BDDAssert.internalCheck(closed, "[EventSet.overlap] BAD FUNCTION CALL!");
-
-		for(int t = 0; t < total; t++)
-		    if(careSet[t] && events[t] != null && es.events[t] != null)
-			return true;
-
-		return false;
-    }
-
-
-    public boolean overlap(boolean [] careSet)
-    {
-		BDDAssert.internalCheck(closed, "[EventSet.overlap] BAD FUNCTION CALL!");
-		for(int t = 0; t < total; t++)
-		    if(careSet[t] && events[t] != null)
-			return true;
-		return false;
-    }
-
-	public void addEventCareSet(boolean [] es, boolean uncontrollable_events_only)
+	public boolean overlap(EventSet es)
 	{
-		for(int t = 0; t < total; t++) {
-		    if(events[t] != null && (!uncontrollable_events_only || events[t].c ) )
-		    	es[t] = true;
-		}
+				BDDAssert.internalCheck(closed, "[EventSet.overlap] BAD FUNCTION CALL!");
+
+				for(int t = 0; t < total; t++)
+					if(events[t] != null && es.events[t] != null)
+						return true;
+
+				return false;
 	}
 
-	*/
-
-	public boolean [] getEventCareSet(boolean uncontrollable_events_only)
+	public boolean overlap(EventSet es, boolean [] careSet)
 	{
-		boolean [] es = new boolean[total];
-		for(int t = 0; t < total; t++) {
-		    es[t] = (events[t] != null && !(uncontrollable_events_only && events[t].c));
+				BDDAssert.internalCheck(closed, "[EventSet.overlap] BAD FUNCTION CALL!");
+
+				for(int t = 0; t < total; t++)
+					if(careSet[t] && events[t] != null && es.events[t] != null)
+						return true;
+
+				return false;
+	}
+
+
+	public boolean overlap(boolean [] careSet)
+	{
+				BDDAssert.internalCheck(closed, "[EventSet.overlap] BAD FUNCTION CALL!");
+				for(int t = 0; t < total; t++)
+					if(careSet[t] && events[t] != null)
+						return true;
+				return false;
+	}
+
+		public void addEventCareSet(boolean [] es, boolean uncontrollable_events_only)
+		{
+				for(int t = 0; t < total; t++) {
+					if(events[t] != null && (!uncontrollable_events_only || events[t].c ) )
+						es[t] = true;
+				}
 		}
+
+		*/
+	public boolean[] getEventCareSet(boolean uncontrollable_events_only)
+	{
+		boolean[] es = new boolean[total];
+
+		for (int t = 0; t < total; t++)
+		{
+			es[t] = ((events[t] != null) &&!(uncontrollable_events_only && events[t].c));
+		}
+
 		return es;
 	}
 
-    public boolean overlap(Event e)
-    {
+	public boolean overlap(Event e)
+	{
 		return events[e.id] != null;
-    }
+	}
 
-
- 	// -------------------------------------------------------
-
+	// -------------------------------------------------------
 	void close(EventManager alphabet)
 	{
 		BDDAssert.internalCheck(!closed, "[EventSet.close] BAD FUNCTION CALL!");
@@ -212,8 +213,15 @@ public class EventSet
 				ps.print(events[i].label);
 
 				// DEBUG
-				if(!events[i].c) ps.print(":u");
-				if(!events[i].p) ps.print(":p");
+				if (!events[i].c)
+				{
+					ps.print(":u");
+				}
+
+				if (!events[i].p)
+				{
+					ps.print(":p");
+				}
 
 				if (!events[i].c)
 				{

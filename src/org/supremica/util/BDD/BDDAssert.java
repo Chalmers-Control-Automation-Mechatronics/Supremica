@@ -5,9 +5,13 @@ public class BDDAssert
 	public static void fatal(String s)
 	{
 		System.err.println("FATAL ERROR: " + s);
-		try {
-		    Thread.sleep(5000);
-		} catch(Exception exx) { }
+
+		try
+		{
+			Thread.sleep(5000);
+		}
+		catch (Exception exx) {}
+
 		System.exit(20);
 	}
 
@@ -25,7 +29,7 @@ public class BDDAssert
 	}
 
 	public static void bddAssert(boolean condition, String msg)
-	    throws BDDException
+		throws BDDException
 	{
 		if (!condition)
 		{
@@ -33,17 +37,15 @@ public class BDDAssert
 		}
 	}
 
-
-    /**
-     * This is similar to bddAssert, but it does not throw an exception 
-     * but calls fatal()
-     */
-    	public static void internalCheck(boolean condition, String msg)
+	/**
+	 * This is similar to bddAssert, but it does not throw an exception
+	 * but calls fatal()
+	 */
+	public static void internalCheck(boolean condition, String msg)
 	{
 		if (!condition)
 		{
-		    fatal(msg);
+			fatal(msg);
 		}
 	}
-
 }

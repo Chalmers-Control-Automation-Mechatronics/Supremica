@@ -12,11 +12,11 @@ public class Ball
 {
 	public static final int SMALL_BALL = 5;    // allowed sizes of balls
 	public static final int BIG_BALL = 8;
-	int radius;                                // ball's radius
-	float tolerance;                           // tolerance at endpos
-	float[] lower = new float[2];              // coordinates for lower part of ball
-	float[] stopPos = new float[2];            // where the ball should stop moving
-	float[] sp = new float[2];                 // how the ball moves when calling move()
+	int radius;    // ball's radius
+	float tolerance;    // tolerance at endpos
+	float[] lower = new float[2];    // coordinates for lower part of ball
+	float[] stopPos = new float[2];    // where the ball should stop moving
+	float[] sp = new float[2];    // how the ball moves when calling move()
 	boolean atEndPos = false;
 	boolean ballVisible = true;
 	public boolean allowMove = true;
@@ -29,14 +29,17 @@ public class Ball
 	{
 		switch (size)
 		{
+
 		case 1 :
 		{
 			radius = SMALL_BALL;
+
 			break;
 		}
 		case 2 :
 		{
 			radius = BIG_BALL;
+
 			break;
 		}
 		default :

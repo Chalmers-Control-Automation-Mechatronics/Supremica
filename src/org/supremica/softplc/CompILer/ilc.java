@@ -1,3 +1,4 @@
+
 /** ilc is a compiler for parts of the IEC Instruction List language.
  * @author Anders Röding
  */
@@ -12,68 +13,87 @@ import java.io.*;
 public class ilc
 {
 	private static parser p;
-    public static void main(String[] args) {
-	if (args.length != 2)
-	    {
-		System.err.println("Usage: ilcompiler file.il outputDir");
-		return;
-	    }
-	new ilc(args[0], args[1]);
-    }
 
-    public ilc(String ilFile, String outDir) {
-	this(ilFile, outDir, null, false);
-    }
-
-    public ilc(String ilFile, String outDir, Logger logger, boolean debug) {
-	try {
-	    BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
-
-	    if (logger != null)
-		logger.info("Compiling " + ilFile + "...");
-	    else
-		System.out.println("Compiling " + ilFile + "...");
-	    if (p == null)
-	    {
-	    	p = new parser(ilReader);
-		}
-		else
+	public static void main(String[] args)
+	{
+		if (args.length != 2)
 		{
-			parser.ReInit(ilReader);
+			System.err.println("Usage: ilcompiler file.il outputDir");
+
+			return;
 		}
 
-	    try {
-		SimpleNode n = parser.Start();
+		new ilc(args[0], args[1]);
+	}
 
-		VariableChecker v = new VariableChecker(n);
+	public ilc(String ilFile, String outDir)
+	{
+		this(ilFile, outDir, null, false);
+	}
 
-		//XXX new VaribleChecker(n,logger);
-		if (v.check()) {
-		    JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
-		} else {
-		    System.err.println("VariableChecker failed");
+	public ilc(String ilFile, String outDir, Logger logger, boolean debug)
+	{
+		try
+		{
+			BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
+
+			if (logger != null)
+			{
+				logger.info("Compiling " + ilFile + "...");
+			}
+			else
+			{
+				System.out.println("Compiling " + ilFile + "...");
+			}
+
+			if (p == null)
+			{
+				p = new parser(ilReader);
+			}
+			else
+			{
+				parser.ReInit(ilReader);
+			}
+
+			try
+			{
+				SimpleNode n = parser.Start();
+				VariableChecker v = new VariableChecker(n);
+
+				//XXX new VaribleChecker(n,logger);
+				if (v.check())
+				{
+					JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
+				}
+				else
+				{
+					System.err.println("VariableChecker failed");
+				}
+			}
+			catch (Exception e)
+			{
+				if (logger != null)
+				{
+					logger.error(e.getMessage());
+				}
+				else
+				{
+					System.out.println(e.getMessage());
+				}
+
+				e.printStackTrace();
+			}
 		}
-	    }
-	    catch (Exception e)
+		catch (Throwable e)
 		{
 			if (logger != null)
-				logger.error(e.getMessage());
+			{
+				logger.error("Unable to parse input " + e);
+			}
 			else
-				System.out.println(e.getMessage());
-		    e.printStackTrace();
+			{
+				System.out.println("Unable to parse input " + e);
+			}
 		}
 	}
-	catch (Throwable e)
-	    {
-			if (logger != null)
-				logger.error("Unable to parse input " + e);
-			else
-				System.out.println("Unable to parse input " + e);
-	    }
-    }
 }
-
-
-
-
-
