@@ -207,7 +207,7 @@ public class Events
 	}
 
 	public LabeledEvent getEventWithIndex(int index)
-		throws Exception
+		throws IllegalArgumentException
 	{
 		Iterator eventIt = iterator();
 
@@ -221,7 +221,7 @@ public class Events
 			}
 		}
 
-		throw new Exception("No event with index '" + index + "' exists");
+		throw new IllegalArgumentException("No event with index '" + index + "' exists");
 	}
 
 	public int nbrOfEvents()

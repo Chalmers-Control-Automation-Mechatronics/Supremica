@@ -156,7 +156,9 @@ public final class IntArrayHashTable
 		size = 0;
 	}
 
-	// Returns an int[] if it exists otherwise null
+	/**
+	 * Returns an int[] if it exists otherwise null
+	 */
 	public int[] get(int[] theArray)
 	{
 		int table[][] = theTable;
@@ -179,6 +181,14 @@ public final class IntArrayHashTable
 				return null;
 			}
 		}
+	}
+
+	/**
+	 * Return the element at index
+	 */
+	public int[] get(int index)
+	{
+		return theTable[index];
 	}
 
 	// Returns the index of theArray if it exists otherwise -1

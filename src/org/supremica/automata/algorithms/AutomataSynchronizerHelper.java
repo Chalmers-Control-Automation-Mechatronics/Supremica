@@ -385,6 +385,19 @@ public final class AutomataSynchronizerHelper
 			fromStateList.addLast(fromState);
 		}
 
+		if (true)
+		{
+			int prevStateIndex = theStates.getIndex(fromState);
+			if (prevStateIndex >= 0)
+			{
+				AutomataIndexFormHelper.setPrevStateIndex(toState, prevStateIndex);
+			}
+			else
+			{
+				AutomataIndexFormHelper.setPrevStateIndex(toState, AutomataIndexFormHelper.STATE_NO_PREVSTATE);
+			}
+		}
+
 		addState(toState);
 	}
 
@@ -435,6 +448,7 @@ public final class AutomataSynchronizerHelper
 	public void setDeadlocked(int[] state, boolean deadlocked)
 	{
 		logger.debug(AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
+		displayTrace(state);
 		int currStatus = state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END];
 
 		if (deadlocked)
@@ -614,53 +628,34 @@ public final class AutomataSynchronizerHelper
 			prevState = nextState;
 		}
 
-		/*
-		 *  // This tries to find shortcuts in the trace by looking one-step ahead
-		 *  StringBuffer trace = new StringBuffer();
-		 *  int[] fromState;
-		 *  for (int i = 0; i < stateTrace.size() - 1; i++)
-		 *  {
-		 *  int[] fromState = (int[]) stateTrace.get(i);
-		 *  executer.setCurrState(fromState);
-		 *  for (int j = stateTrace.size() - 1; j > i; j--)
-		 *  {
-		 *  int index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
-		 *  if (index >= 0)
-		 *  { // logger.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
-		 *  trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
-		 *  if (j != stateTrace.size() - 1)
-		 *  {
-		 *  trace.append(",");
-		 *  }
-		 *  if (j > i+1)
-		 *  {
-		 *  logger.debug("Shortcut found from state number " + i + " to state number " + j + ".");
-		 *  }
-		 *  i = j-1;
-		 *  break;
-		 *  }
-		 *  if (i == j-1)
-		 *  {
-		 *  throw new Exception("Error in AutomataSynchronizerHelper.displayTrace(). Impossible transition found.");
-		 *  }
-		 *  }
-		 *  }
-		 */
 		logger.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
 
-		/*
-		 *  logger.error("And again...");
-		 *
-		 *  while (stateTrace.size() > 1)
-		 *  {
-		 *  index = executer.findTransition((int[]) stateTrace.removeFirst(), (int[]) stateTrace.getFirst());
-		 *  if (index >= 0)
-		 *  logger.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
-		 *  else
-		 *  logger.error("Possible error?");
-		 *  }
-		 */
 	}
+
+	public void displayTrace(int[] currState)
+	{
+/*
+		Alphabet unionAlphabet = theAutomaton.getAlphabet();
+
+		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
+
+		executer.initialize();
+
+		int prevStateIndex = AutomataIndexFormHelper.getPrevStateIndex(currState);
+		if (prevStateIndex != AutomataIndexFormHelper.STATE_NO_PREVSTATE)
+		{
+			int[] prevState = theStates.get(prevStateIndex);
+			if (prevState != null)
+			{
+				displayTrace(prevState);
+				int currEventIndex = executer.findTransition(prevState, currState);
+
+				logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
+			}
+		}
+*/
+	}
+
 
 	public void setCoExecute(boolean coExecute)
 	{

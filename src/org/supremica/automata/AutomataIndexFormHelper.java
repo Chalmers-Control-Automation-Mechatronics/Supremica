@@ -64,7 +64,7 @@ public final class AutomataIndexFormHelper
 	public static int[] createState(int nbrOfAutomata)
 	{
 		int[] newState = new int[nbrOfAutomata + STATE_EXTRA_DATA];
-		newState[STATE_PREVSTATE_FROM_END] = STATE_NO_PREVSTATE;
+		newState[nbrOfAutomata + STATE_EXTRA_DATA - STATE_PREVSTATE_FROM_END] = STATE_NO_PREVSTATE;
 		return newState;
 	}
 
@@ -306,6 +306,7 @@ public final class AutomataIndexFormHelper
 
 		return sb.toString();
 	}
+
 
 	public static void main(String[] args)
 	{

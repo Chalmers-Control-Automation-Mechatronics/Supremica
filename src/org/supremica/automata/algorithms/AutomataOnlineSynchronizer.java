@@ -462,8 +462,6 @@ public final class AutomataOnlineSynchronizer
 		if (nextState == null)
 		{
 			nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
-
-			// +1 status field
 		}
 
 		setCurrState(fromState);
@@ -507,7 +505,7 @@ public final class AutomataOnlineSynchronizer
 	{
 
 		// Assume that the last element is a status field
-		for (int i = 0; i < firstArray.length - 1; i++)
+		for (int i = 0; i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
 			if (firstArray[i] != secondArray[i])
 			{
