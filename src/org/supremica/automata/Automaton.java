@@ -56,7 +56,7 @@ public class Automaton
 {
 	private Alphabet alphabet;
 	private String name;
-	private String comment; //-- MF -- To be shown as tooltip, should also be editable
+	private String comment;
 	private List theStates;
 	private int index = -1;
 	private Map idStateMap;
@@ -530,6 +530,20 @@ public class Automaton
 		}
 	}
 
+	private void removeAssociatedStateFromUnvisitedStates()
+	{
+		Iterator stateIt = stateIterator();
+
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+			if (!currState.isVisited())
+			{
+				currState.setAssociatedState(null);
+			}
+		}
+	}
+
 	/**
 	 * Returns the shortest trace from the initial state to toState.
 	 */
@@ -559,7 +573,8 @@ public class Automaton
 		LabelTrace theTrace = new LabelTrace();
 
 		State thisState = toState;
-		State prevState = thisState.getPreviousState();
+		thisState.setVisited(true);
+		State prevState = thisState.getAssociatedState();
 		while (prevState != null)
 		{
 			LabeledEvent currEvent = getLabeledEvent(prevState, thisState);
@@ -569,8 +584,11 @@ public class Automaton
 			}
 			theTrace.addFirst(currEvent.getLabel());
 			thisState = prevState;
-			prevState = prevState.getPreviousState();
+			prevState = prevState.getAssociatedState();
 		}
+
+		reverseAssociatedState(toState);
+
 		return theTrace;
 	}
 
@@ -586,7 +604,7 @@ public class Automaton
 
 		// This implements a breath first search
 		LinkedList openStates = new LinkedList();
-		fromState.setPreviousState(null);
+		fromState.setAssociatedState(null);
 		openStates.addLast(fromState);
 		fromState.setVisited(true);
 		while (openStates.size() > 0)
@@ -598,12 +616,34 @@ public class Automaton
 				State currToState = currArc.getToState();
 				if (!currToState.isVisited())
 				{
-					currToState.setPreviousState(currState);
+					currToState.setAssociatedState(currState);
 					currToState.setVisited(true);
 					openStates.addLast(currToState);
 				}
 			}
 		}
+	}
+
+	private void reverseAssociatedState(State toState)
+	{
+		clearVisitedStates();
+		reverseAssociatedState(toState, null);
+		removeAssociatedStateFromUnvisitedStates();
+	}
+
+	private void reverseAssociatedState(State currState, State nextState)
+	{
+		if (currState != null)
+		{
+			currState.setVisited(true);
+		}
+		if (currState.getAssociatedState() == null)
+		{
+			currState.setAssociatedState(nextState);
+			return;
+		}
+		reverseAssociatedState(currState.getAssociatedState(), currState);
+		currState.setAssociatedState(nextState);
 	}
 
 	/**
@@ -844,15 +884,15 @@ public class Automaton
 
 	public static void main(String[] args)
 	{
-				Automaton theAutomaton = new Automaton();
+		Automaton theAutomaton = new Automaton();
 
-                State stateZero = new State("zero");
-                theAutomaton.addState(stateZero);
+		State stateZero = new State("zero");
+		theAutomaton.addState(stateZero);
 
-                State st = theAutomaton.getStateWithIndex(0); // should be stateZero (not?)
-                if(st == null)
-                        System.err.println("st == null");
-                else
-                        System.err.println("st != null");
+		State st = theAutomaton.getStateWithIndex(0); // should be stateZero (not?)
+		if(st == null)
+				System.err.println("st == null");
+		else
+				System.err.println("st != null");
 	}
 }

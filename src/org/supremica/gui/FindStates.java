@@ -71,6 +71,8 @@ import org.supremica.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
+import org.supremica.gui.VisualProject;
+
 // ----------------------------------------------------------------------------------
 // compiler type should be adjustable, but as for now, we only support a single type
 /*
@@ -496,11 +498,24 @@ class FreeFormPanel
 		add(new RegexpMenuBar(), BorderLayout.NORTH);
 
 		JPanel p1 = new JPanel();
+		p1.setLayout(new BorderLayout());
 
-		p1.add(new JLabel("Regexp:"));
-		p1.add(reg_exp = new JTextField(".*", 30));
-		p1.add(new JLabel("State Separator: "));
-		p1.add(sep_str = new JTextField(".", 20));
+		Box yBox = new Box(BoxLayout.Y_AXIS);
+
+		Box x1Box = new Box(BoxLayout.X_AXIS);
+		x1Box.add(new JLabel("Regexp:"));
+		reg_exp = new JTextField(".*", 30);
+		x1Box.add(reg_exp);
+		Box x2Box = new Box(BoxLayout.X_AXIS);
+		x2Box.add(new JLabel("State Separator: "));
+		sep_str = new JTextField(".", 30);
+		x2Box.add(sep_str);
+		yBox.add(Box.createVerticalGlue());
+		yBox.add(x1Box);
+		yBox.add(Box.createVerticalGlue());
+		yBox.add(x2Box);
+		yBox.add(Box.createVerticalGlue());
+		p1.add(yBox, BorderLayout.NORTH);
 		add("Center", p1);
 	}
 
@@ -579,17 +594,45 @@ class FixedFormPanel
 class FindStatesFrame
 	extends JFrame
 {
-	private Gui gui;
+	private static Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
 	private FindStatesTable table = null;
 	private Automata automata = null;
 	private JTabbedPane tabbedPane = null;
 	private JButton find_button = null;
 	private CancelButton quit_button = null;
-	private static Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
+	private VisualProject theVisualProject = null;
 
 	private static void debug(String s)
 	{
 		logger.debug(s);
+	}
+
+	public FindStatesFrame(VisualProject theVisualProject, Automata selectedAutomata)
+	{
+		Utility.setupFrame(this, 500, 300);
+		setTitle("Find States");
+
+		this.theVisualProject = theVisualProject;
+		this.automata = selectedAutomata;
+		this.table = new FindStatesTable(automata, this);
+
+		FixedFormPanel fixedformPanel = new FixedFormPanel(table);
+		FreeFormPanel freeformPanel = new FreeFormPanel();
+
+		tabbedPane = new JTabbedPane();
+
+		tabbedPane.addTab(fixedformPanel.getTitle(), null, fixedformPanel, fixedformPanel.getTip());
+		tabbedPane.addTab(freeformPanel.getTitle(), null, freeformPanel, freeformPanel.getTip());
+
+		JPanel buttonPanel = new JPanel();
+
+		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
+		buttonPanel.add(quit_button = new CancelButton());
+
+		Container contentPane = getContentPane();
+
+		contentPane.add(tabbedPane, BorderLayout.CENTER);
+		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 	}
 
 	private Automata getAutomata()
@@ -684,7 +727,7 @@ class FindStatesFrame
 				Monitor monitor = new Monitor("Finding states...", "", ss);
 				monitor.startMonitor(this, 0, 1000);
 
-				PresentStates present_states = new PresentStates(this, ss, getAutomata());
+				PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject);
 				present_states.start();
 
 			}
@@ -700,42 +743,15 @@ class FindStatesFrame
 		}
 	}
 
-	public FindStatesFrame(Gui gui)
-	{
-		Utility.setupFrame(this, 500, 300);
-		setTitle("Find States");
-
-		this.gui = gui;
-		this.automata = gui.getSelectedAutomata();
-		this.table = new FindStatesTable(automata, this);
-
-		FixedFormPanel fixedformPanel = new FixedFormPanel(table);
-		FreeFormPanel freeformPanel = new FreeFormPanel();
-
-		tabbedPane = new JTabbedPane();
-
-		tabbedPane.addTab(fixedformPanel.getTitle(), null, fixedformPanel, fixedformPanel.getTip());
-		tabbedPane.addTab(freeformPanel.getTitle(), null, freeformPanel, freeformPanel.getTip());
-
-		JPanel buttonPanel = new JPanel();
-
-		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
-		buttonPanel.add(quit_button = new CancelButton());
-
-		Container contentPane = getContentPane();
-
-		contentPane.add(tabbedPane, BorderLayout.CENTER);
-		contentPane.add(buttonPanel, BorderLayout.SOUTH);
-	}
 }
 
 public class FindStates
 {
 	private JFrame frame = null;
 
-	public FindStates(Gui gui)
+	public FindStates(VisualProject theVisualProject, Automata selectedAutomata)
 	{
-		frame = new FindStatesFrame(gui);
+		frame = new FindStatesFrame(theVisualProject, selectedAutomata);
 	}
 
 	public void execute()

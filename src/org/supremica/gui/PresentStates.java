@@ -13,10 +13,12 @@ import javax.swing.table.*;
 import org.supremica.log.*;
 import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
+import org.supremica.automata.State;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.automata.algorithms.Router;
 import org.supremica.gui.Presenter;
+import org.supremica.gui.VisualProject;
 
 //-- owner: MF
 
@@ -27,11 +29,11 @@ class PresentStatesTableModel
 	private SearchStates ss;
 	private final int rows;
 	private final int cols;
-	
+
 	private static Vector formColumnNameVector(Automata a)
 	{
 		Vector v = new Vector();
-		
+
 		for (int i = 0; i < a.size(); ++i)
 		{
 			v.add( a.getAutomatonAt(i).getName());
@@ -41,8 +43,8 @@ class PresentStatesTableModel
 	public PresentStatesTableModel(SearchStates ss, Automata a)
 	{
 		super(formColumnNameVector(a), ss.numberFound());
-		
-		this.ss = ss;		
+
+		this.ss = ss;
 		this.rows = ss.numberFound();
 		this.cols = a.size();
 	}
@@ -52,8 +54,8 @@ class PresentStatesTableModel
 	{
 		return ss.getState(col, row).getName();
 	}
-	// None of the cells are editable (DefaultTableMode return true! AbstractTableModel does not!!) 
-	public boolean isCellEditable(int rowIndex, int columnIndex) 
+	// None of the cells are editable (DefaultTableMode return true! AbstractTableModel does not!!)
+	public boolean isCellEditable(int rowIndex, int columnIndex)
 	{
 		return false;
 	}
@@ -68,18 +70,25 @@ interface SelectionListener // should this be a utility class?
 class PresentStatesTable
 	extends JTable
 {
+	private static Logger logger = LoggerFactory.createLogger(PresentStatesTable.class);
 	private SelectionListener listener;
-	
-	public PresentStatesTable(SearchStates ss, Automata a)
+	private VisualProject theVisualProject;
+	private SearchStates searchStates;
+	private Automata theAutomata;
+
+	public PresentStatesTable(SearchStates ss, Automata a, VisualProject theVisualProject)
 	{
 		super(new PresentStatesTableModel(ss, a));
-	
+		this.theVisualProject = theVisualProject;
+		this.searchStates = ss;
+		this.theAutomata = a;
+
 		// This code handles a flaw in the selection model
 		// By default, once a row is selected it cannot be unseleced unless a new row is selected
 		// This is changed so that a selected row is unselected by clicking it again
 		//-- Note, this works only for right-click selection (and it shouldn't really...)
-		//-- For left click teh selection has appearently already been effected, so we always deselect
-		/*
+		//-- For left click the selection has appearently already been effected, so we always deselect
+
 		addMouseListener(new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
@@ -89,7 +98,7 @@ class PresentStatesTable
 				{
 					return;
 				}
-	
+
 				if (isRowSelected(currRow)) // then unselect it
 				{
 					removeRowSelectionInterval(currRow, currRow);
@@ -98,16 +107,44 @@ class PresentStatesTable
 				{
 					addRowSelectionInterval(currRow, currRow);
 				}
+				if (e.getClickCount() == 2)
+				{
+					if (theAutomata.size() == 1)
+					{
+						viewInAutomatonExplorer(currRow);
+					}
+				}
 			}
-		});*/
-		setToolTipText("Click to select for routing");
+		});
+		if (theAutomata.size() == 1)
+		{
+			setToolTipText("Doubleclick to view in explorer");
+		}
 	}
-	
+
+	/**
+	 * This is only valid to call when exactly one state in one automaton is selected.
+	 */
+	private void viewInAutomatonExplorer(int index)
+	{
+		Automaton currAutomaton = theAutomata.getFirstAutomaton();
+		State currState = searchStates.getState(0, index);
+		try
+		{
+			AutomatonExplorer theExplorer = theVisualProject.getAutomatonExplorer(currAutomaton.getName());
+			theExplorer.setState(currState);
+		}
+		catch (Exception ex)
+		{
+			logger.error("Could not create AutomatonExplorer.");
+		}
+	}
+
 	public void setSelectionListener(SelectionListener listener)
 	{
 		this.listener = listener;
 	}
-	
+
 	public void valueChanged(ListSelectionEvent e)
 	{
 		super.valueChanged(e);
@@ -122,13 +159,14 @@ class PresentStatesTable
 }
 
 class PresentStatesFrame
-	extends JFrame 
+	extends JFrame
 	implements SelectionListener // listens to selection events, en/disables the RouteButton
 {
 	private static Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
-	private RouteButton route_button;
+//	private RouteButton route_button;
 	private SearchStates search_states;
-	
+	private VisualProject theVisualProject;
+
 	private static void debug(String s)
 	{
 		logger.debug(s);
@@ -141,7 +179,7 @@ class PresentStatesFrame
 		{
 			super("Close");
 
-			setToolTipText("I'm fine, thanks");
+			setToolTipText("Close this window");
 			addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -158,13 +196,14 @@ class PresentStatesFrame
 			dispose();
 		}
 	}
+/*
 	private class RouteButton
 		extends JButton
 	{
 		public RouteButton()
 		{
 			super("Route");
-			
+
 			setToolTipText("Find traces to selected states");
 			addActionListener(new ActionListener()
 			{
@@ -174,43 +213,44 @@ class PresentStatesFrame
 			});
 		}
 	}
-	
-	public PresentStatesFrame(SearchStates ss, Automata a)
+*/
+	public PresentStatesFrame(SearchStates ss, Automata a, VisualProject theVisualProject)
 	{
 		this.search_states = ss;
-		
+		this.theVisualProject = theVisualProject;
+
 		Utility.setupFrame(this, 400, 300);
 		setTitle("Found States - " + ss.numberFound());
-		route_button = new RouteButton();
-		route_button.setEnabled(false);
-	
-		PresentStatesTable table = new PresentStatesTable(ss, a);
+//		route_button = new RouteButton();
+//		route_button.setEnabled(false);
+
+		PresentStatesTable table = new PresentStatesTable(ss, a, theVisualProject);
 		table.setSelectionListener(this);
-		
+
 		JPanel panel = new JPanel();
 		// panel.add(new JLabel(ss.numberFound() + " states found"));
 		panel.add(Utility.setDefaultButton(this, new FineButton()));
-		panel.add(route_button);
+//		panel.add(route_button);
 
 		Container contentPane = getContentPane();
 
 		contentPane.add(new WhiteScrollPane(table), BorderLayout.CENTER);
 		contentPane.add(panel, BorderLayout.SOUTH);
 	}
-	
+
 	// SelectionListener interface implementation
 	public void emptySelection()
 	{
-		route_button.setEnabled(false);
+//		route_button.setEnabled(false);
 	}
 	public void nonEmptySelection()
 	{
 		// Utility.setDefaultButton(this, route_button);
-		route_button.setEnabled(false);	// enable when implemented
+//		route_button.setEnabled(false);	// enable when implemented
 	}
 }
 
-// 
+//
 class NoStatesFoundFrame
 	extends JFrame
 {
@@ -225,7 +265,7 @@ class NoStatesFoundFrame
 	}
 }
 
-// 
+//
 class UserInterruptFrame
 	extends JFrame
 {
@@ -236,7 +276,7 @@ class UserInterruptFrame
 	}
 }
 
-// 
+//
 public class PresentStates
 	extends Presenter
 {
@@ -244,21 +284,23 @@ public class PresentStates
 	private SearchStates searchs = null;
 	private Automata automata = null;
 	private boolean dispose_frame = false;
+	private VisualProject theVisualProject;
 
-	public PresentStates(JFrame frame, SearchStates ss, Automata a)
+	public PresentStates(JFrame frame, SearchStates ss, Automata a, VisualProject theVisualProject)
 	{
 		super(ss);
 
 		this.frame = frame;
 		this.searchs = ss;
 		this.automata = a;
+		this.theVisualProject = theVisualProject;
 	}
 
 	public void taskFinished()
 	{
 		if (searchs.numberFound() > 0)
 		{
-			frame = new PresentStatesFrame(searchs, automata);
+			frame = new PresentStatesFrame(searchs, automata, theVisualProject);
 		}
 		else    // it was not stopped but none found
 		{

@@ -153,7 +153,7 @@ public class SearchStates
 	// Given index for an automaton and a composite state, return that state
 	public State getState(int automaton, int index)
 	{
-		State[][] states = syncher.getHelper().getIndexFormStateTable(); // shoudl be cached?
+		State[][] states = syncher.getHelper().getIndexFormStateTable(); // should be cached?
 		int[] composite = container.getElement(index);
 		return states[automaton][composite[automaton]];
 	}

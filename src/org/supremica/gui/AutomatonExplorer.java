@@ -58,9 +58,12 @@ import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.Automata;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.LabelTrace;
+import org.supremica.log.*;
 
 public class AutomatonExplorer
 	extends JFrame
@@ -72,10 +75,12 @@ public class AutomatonExplorer
 	private JMenuBar menuBar = new JMenuBar();
 	private StateViewer stateViewer;
 	private ExplorerController controller;
+	private VisualProject theProject;
 
-	public AutomatonExplorer(Automaton theAutomaton)
+	public AutomatonExplorer(VisualProject theProject, Automaton theAutomaton)
 		throws Exception
 	{
+		this.theProject = theProject;
 		this.theAutomaton = theAutomaton;
 
 		theAutomaton.getListeners().addListener(this);
@@ -125,7 +130,7 @@ public class AutomatonExplorer
 
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
-		controller = new ExplorerController(stateViewer, theAutomaton);
+		controller = new ExplorerController(theProject, stateViewer, theAutomaton);
 
 		contentPane.add(controller, BorderLayout.SOUTH);
 		stateViewer.setController(controller);
@@ -162,6 +167,11 @@ public class AutomatonExplorer
 				dispose();
 			}
 		});
+	}
+
+	public void setState(State theState)
+	{
+		stateViewer.setCurrState(theState);
 	}
 
 	public void updated(Object o)
@@ -485,6 +495,14 @@ class EventListModel
 
 		StringBuffer responseString = new StringBuffer();
 
+		boolean terminateFont = false;
+		if (nextStateAssociated(currArc))
+		{
+			responseString.append("<html><font color=RED>");
+			terminateFont = true;
+		}
+
+
 		if (!currEvent.isControllable())
 		{
 			responseString.append("!");
@@ -507,8 +525,34 @@ class EventListModel
 
 			responseString.append(" [state name: " + currState.getName() + "]");
 		}
-
+		if (terminateFont)
+		{
+			responseString.append("</font></html>");
+		}
 		return responseString.toString();
+	}
+
+	private boolean nextStateAssociated(Arc currArc)
+	{
+		if (forward)
+		{
+			if (currState.getAssociatedState() == null)
+			{
+				return false;
+			}
+			State nextState = currArc.getToState();
+			return nextState == currState.getAssociatedState();
+		}
+		else
+		{
+			State nextState = currArc.getFromState();
+			if (nextState == null || nextState.getAssociatedState() == null)
+			{
+				return false;
+			}
+			return nextState.getAssociatedState() == currState;
+		}
+
 	}
 
 	public State getStateAt(int index)
@@ -616,15 +660,18 @@ class StateDisplayer
 class ExplorerController
 	extends JPanel
 {
+	private static Logger logger = LoggerFactory.createLogger(ExplorerController.class);
 	private StateViewer stateViewer;
 	private Automaton theAutomaton;
 	private JButton undoButton;
 	private JButton redoButton;
+	private VisualProject theProject;
 
-	public ExplorerController(StateViewer stateViewer, Automaton theAutomaton)
+	public ExplorerController(VisualProject theProject, StateViewer stateViewer, Automaton theAutomaton)
 	{
 		setLayout(new BorderLayout());
 
+		this.theProject = theProject;
 		this.stateViewer = stateViewer;
 		this.theAutomaton = theAutomaton;
 
@@ -633,6 +680,8 @@ class ExplorerController
 		ImageIcon forwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
 		ImageIcon backwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
 		ImageIcon homeImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
+		ImageIcon findImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/general/Find24.gif"));
+		ImageIcon routeImg = new ImageIcon(ExplorerController.class.getResource("/icons/Route24.gif"));
 
 		undoButton = new JButton(backwardImg);
 		undoButton.setToolTipText("Back");
@@ -640,6 +689,10 @@ class ExplorerController
 		redoButton.setToolTipText("Forward");
 		JButton resetButton = new JButton(homeImg);
 		resetButton.setToolTipText("Go to the initial state");
+		JButton findButton = new JButton(findImg);
+		findButton.setToolTipText("Search for a state");
+		JButton routeButton = new JButton(routeImg);
+		routeButton.setToolTipText("Find shortest path from the initial state to this state and mark the corresponding events in red.");
 
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(Box.createHorizontalGlue());
@@ -648,6 +701,10 @@ class ExplorerController
 		redoBox.add(redoButton);
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(resetButton);
+		redoBox.add(Box.createHorizontalGlue());
+		redoBox.add(findButton);
+		redoBox.add(Box.createHorizontalGlue());
+		redoBox.add(routeButton);
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(Box.createHorizontalGlue());
 
@@ -674,13 +731,25 @@ class ExplorerController
 				reset_actionPerformed(e);
 			}
 		});
+		findButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				find_actionPerformed(e);
+			}
+		});
+		routeButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				route_actionPerformed(e);
+			}
+		});
 	}
 
 	public void reset_actionPerformed(ActionEvent e)
 	{
 		stateViewer.goToInitialState();
-
-		// stateViewer.initialize();
 	}
 
 	public void undo_actionPerformed(ActionEvent e)
@@ -691,6 +760,37 @@ class ExplorerController
 	public void redo_actionPerformed(ActionEvent e)
 	{
 		stateViewer.redoState();
+	}
+
+	public void find_actionPerformed(ActionEvent e)
+	{
+		Automata theAutomata = new Automata();
+		theAutomata.addAutomaton(theAutomaton);
+		FindStates find_states = new FindStates(theProject, theAutomata);
+
+		try
+		{
+			find_states.execute();
+		}
+		catch (Exception ex)
+		{
+
+			logger.error(ex.toString());
+		}
+	}
+
+	public void route_actionPerformed(ActionEvent e)
+	{
+		try
+		{
+			LabelTrace trace = theAutomaton.getTrace(stateViewer.getCurrState());
+			logger.info("Trace to state " + stateViewer.getCurrState().getId() + ": " + trace);
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error when performing route: " + ex.getMessage());
+		}
+		stateViewer.update();
 	}
 
 	public void update()

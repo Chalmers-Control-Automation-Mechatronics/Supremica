@@ -86,7 +86,6 @@ public class VisualProject
 	public VisualProject(String name)
 	{
 		super(name);
-
 		initialize();
 	}
 
@@ -333,7 +332,7 @@ public class VisualProject
 			{
 				try
 				{
-					AutomatonExplorer explorer = new AutomatonExplorer(currAutomaton);
+					AutomatonExplorer explorer = new AutomatonExplorer(this, currAutomaton);
 
 					theAutomatonExplorerContainer.put(automaton, explorer);
 					explorer.setVisible(true);

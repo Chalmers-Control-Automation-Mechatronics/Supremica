@@ -123,4 +123,19 @@ public class LabelTrace
 		return theTrace.iterator();
 	}
 
+	public String toString()
+	{
+		StringBuffer traceDesc = new StringBuffer();
+		for (Iterator eIt = iterator(); eIt.hasNext();)
+		{
+			String currLabel = (String) eIt.next();
+			traceDesc.append("\"" + currLabel + "\"");
+			if (eIt.hasNext())
+			{
+				traceDesc.append("->");
+			}
+		}
+		return traceDesc.toString();
+	}
+
 }

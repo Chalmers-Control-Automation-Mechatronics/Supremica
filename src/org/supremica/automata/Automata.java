@@ -240,6 +240,11 @@ public class Automata
 		return (Automaton) theAutomata.get(i);
 	}
 
+	public Automaton getFirstAutomaton()
+	{
+		return getAutomatonAt(0);
+	}
+
 	public int getAutomatonIndex(Automaton theAutomaton)
 	{
 		for (int i = 0; i < theAutomata.size(); i++)

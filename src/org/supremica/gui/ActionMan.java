@@ -1645,7 +1645,10 @@ public class ActionMan
 	// Find States... action selected
 	public static void findStates_action(Gui gui)
 	{
-		FindStates find_states = new FindStates(gui);
+		VisualProject theProject = gui.getVisualProjectContainer().getActiveProject();
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		gui.info("Nbr of selected automata: " + selectedAutomata.size());
+		FindStates find_states = new FindStates(theProject, selectedAutomata);
 
 		try
 		{

@@ -74,7 +74,7 @@ public class State
 	private boolean last = false;
 	private int cost = UNDEF_COST;
 	private boolean visited = false;
-	private State prevState = null;
+	private State assocState = null;
 	private Object equivClass = null;
 	private int x = UNDEF_POS;
 	private int y = UNDEF_POS;
@@ -248,22 +248,22 @@ public class State
 	}
 
 	/**
-	 * This is only valid after setPreviousState
+	 * This is only valid after setAssociatedState
 	 * has been called.
 	 */
-	public State getPreviousState()
+	public State getAssociatedState()
 	{
-		return prevState;
+		return assocState;
 	}
 
 	/**
-	 * Set a state as the previous state.
+	 * Set a state as the associated state.
 	 * This is used when computing the shortest
 	 * trace to a state.
 	 */
-	public void setPreviousState(State prevState)
+	public void setAssociatedState(State assocState)
 	{
-		this.prevState = prevState;
+		this.assocState = assocState;
 	}
 
 	public void setSelected(boolean selected)
