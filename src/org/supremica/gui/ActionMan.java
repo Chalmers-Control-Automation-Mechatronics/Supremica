@@ -804,6 +804,9 @@ public class ActionMan
 			return;
 		}
 
+		//-- MF - Isn't this "wrong". An automaton can exist without a name.
+		//-- MF - The name is a gui-thing, and should be handled there
+		//-- MF - When an unnamed automatan is added, the gui should ask for a name
 		String newAutomatonName = "Dummy";
 
 		if (synchronizationOptions.buildAutomaton())

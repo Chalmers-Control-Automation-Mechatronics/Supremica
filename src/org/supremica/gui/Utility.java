@@ -1,7 +1,7 @@
 
 // ** MF ********************* Utility.java *******************//
 // ** license, blah blah blah **//
-// Heap of useful classes we should all use
+// Heap of useful stuff we should all use
 package org.supremica.gui;
 
 import java.awt.*;
@@ -24,9 +24,6 @@ public class Utility
 
 	static void setupFrame(JFrame frame, int width, int height)
 	{
-
-		// Toolkit tool_kit = Toolkit.getDefaultToolkit();
-		// Dimension d = tool_kit.getScreenSize();
 		frame.setSize(width, height);                 // from Component
 		frame.setLocation(getPosForCenter(new Dimension(width, height)));    // from Component
 		frame.setIconImage(Supremica.cornerImage);    // from Frame
@@ -53,6 +50,12 @@ public class Utility
 	static JButton setDefaultButton(JDialog dialog, JButton b)
 	{
 		dialog.getRootPane().setDefaultButton(b);
+		return b;
+	}
+
+	static JButton setDisabledButton(JFrame frame, JButton b)
+	{
+		b.setEnabled(false);
 		return b;
 	}
 }

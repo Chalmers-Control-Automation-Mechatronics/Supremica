@@ -1,7 +1,6 @@
 
-// ***************** SearchStates.java *********************//
-
-/*
+/* ***************** SearchStates.java *********************
+ *
  *  Given an Automata object and a Matcher object, online
  *  synch the automata and save the matching states
  *
@@ -10,6 +9,9 @@
  *  automaton has no states matching its pattern, then no
  *  global match exists.
  */
+
+//-- owner: MF
+
 package org.supremica.automata.algorithms;
 
 import java.lang.Exception;
@@ -20,14 +22,12 @@ import java.util.regex.*;
 import org.supremica.util.IntArrayList;
 import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.gui.MonitorableThread;
 
-//
 public class SearchStates
 	extends MonitorableThread
-
-// implements Monitorable    // Stoppable
 {
 	private AutomataSynchronizer syncher = null;
 	private IntArrayVector container = null;
@@ -199,10 +199,8 @@ public class SearchStates
 
 	public StateIterator getStateIterator(int[] composite_state)
 	{
-
 		//
 		State[][] states = syncher.getHelper().getIndexFormStateTable();
-
 		//
 		return new StateIterator(states, composite_state);
 	}
@@ -219,5 +217,11 @@ public class SearchStates
 		}
 
 		return new String(str);
+	}
+
+	public Automaton buildAutomaton() // once the states have been created, we could build an entire automaton
+		throws Exception
+	{
+		return syncher.getAutomaton();
 	}
 }
