@@ -12,7 +12,7 @@ conio.o: conio.c
 	gcc -c $(CFLAGS) conio.c
 
 AdlinkPCI7432: AdlinkPCI7432.c 
-	gcc $(CFLAGS) -c AdlinkPCI7432.c -I/usr/java/jdk1.3/include/ -I/usr/java/jdk1.3/include/linux
+	gcc $(CFLAGS) -c AdlinkPCI7432.c -I/usr/java/jdk1.4/include/ -I/usr/java/jdk1.4/include/linux
 	gcc -shared $(CFLAGS) -o libAdlinkPCI7432.so -fPIC AdlinkPCI7432.o
 
 clean:

@@ -7,7 +7,7 @@ package org.supremica.softplc.Drivers;
  *  @author Knut Åkesson
  *  @version 1.0
  */
-class AdlinkPCI7432
+public class AdlinkPCI7432
 	implements org.supremica.softplc.RunTime.DigitalIODriver
 {
 	private static final short PCI_7432 = 16;

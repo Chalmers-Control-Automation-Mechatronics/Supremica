@@ -1,7 +1,8 @@
 #include <dlfcn.h>   
-
 #include "AdlinkPCI7432.h"
 #include "dask.h"
+
+
 
 void* lib_handle;
 const char* error_msg;
@@ -17,14 +18,14 @@ I16 (*dl_DO_WritePort)(U16 CardNumber, U16 Port, U32 Value);
  * Method:    RegisterCard
  * Signature: (SS)S
  */
-JNIEXPORT jshort JNICALL Java_AdlinkPCI7432_RegisterCard
+JNIEXPORT jshort JNICALL Java_org_supremica_softplc_Drivers_AdlinkPCI7432_RegisterCard
   (JNIEnv *env, jclass cls, jshort cardid, jshort cardnr)
 {
   lib_handle = dlopen("/usr/lib/libpci_dask.so", RTLD_LAZY);  
   if (!lib_handle)
   {
     fprintf(stderr, "Error during dlopen(): %s\n", dlerror());
-    exit(1);
+    // exit(1);
   }
   
   dl_Register_Card = dlsym(lib_handle, "Register_Card");
@@ -32,7 +33,7 @@ JNIEXPORT jshort JNICALL Java_AdlinkPCI7432_RegisterCard
   if (error_msg)
   {
     fprintf(stderr, "Error locating 'Register_Card' - %s\n", error_msg);
-    exit(1);
+    // exit(1);
   }
 
   dl_Release_Card = dlsym(lib_handle, "Release_Card");
@@ -40,7 +41,7 @@ JNIEXPORT jshort JNICALL Java_AdlinkPCI7432_RegisterCard
   if (error_msg)
   {
     fprintf(stderr, "Error locating 'Release_Card' - %s\n", error_msg);
-    exit(1);
+    // exit(1);
   }
 
   dl_DI_ReadPort = dlsym(lib_handle, "DI_ReadPort");
@@ -48,7 +49,7 @@ JNIEXPORT jshort JNICALL Java_AdlinkPCI7432_RegisterCard
   if (error_msg)
   {
     fprintf(stderr, "Error locating 'DI_ReadPort' - %s\n", error_msg);
-    exit(1);
+    //exit(1);
   }
   
   dl_DO_WritePort = dlsym(lib_handle, "DO_WritePort");
@@ -56,7 +57,7 @@ JNIEXPORT jshort JNICALL Java_AdlinkPCI7432_RegisterCard
   if (error_msg)
   {
     fprintf(stderr, "Error locating 'Release_Card' - %s\n", error_msg);
-    exit(1);
+    //exit(1);
   }
   
   
@@ -68,7 +69,7 @@ JNIEXPORT jshort JNICALL Java_AdlinkPCI7432_RegisterCard
  * Method:    ReleaseCard
  * Signature: (S)V
  */
-JNIEXPORT void JNICALL Java_AdlinkPCI7432_ReleaseCard
+JNIEXPORT void JNICALL Java_org_supremica_softplc_Drivers_AdlinkPCI7432_ReleaseCard
   (JNIEnv *env, jclass cls, jshort card)
 {
   (*dl_Release_Card)(card);
@@ -84,7 +85,7 @@ JNIEXPORT void JNICALL Java_AdlinkPCI7432_ReleaseCard
  * Method:    WritePort
  * Signature: (SSI)V
  */
-JNIEXPORT void JNICALL Java_AdlinkPCI7432_WritePort
+JNIEXPORT void JNICALL Java_org_supremica_softplc_Drivers_AdlinkPCI7432_WritePort
   (JNIEnv *env, jclass cls, jshort card, jshort channel, jint value)
 {
   (*dl_DO_WritePort)(card, channel, value);
@@ -95,7 +96,7 @@ JNIEXPORT void JNICALL Java_AdlinkPCI7432_WritePort
  * Method:    ReadPort
  * Signature: (SS)I
  */
-JNIEXPORT jint JNICALL Java_AdlinkPCI7432_ReadPort
+JNIEXPORT jint JNICALL Java_org_supremica_softplc_Drivers_AdlinkPCI7432_ReadPort
   (JNIEnv *env, jclass cls, jshort card, jshort channel)
 {
   U32 value;
