@@ -138,6 +138,9 @@
 	<delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
 	<copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>	
 	<replace file="${src}/${supremica_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
+	<delete quiet="true" file="${dist}/SupremicaVersion.cfg"/>
+	<copy file="${templates}/SupremicaVersion.cfg" tofile="${dist}/SupremicaVersion.cfg"/>	
+	<replace file="${dist}/SupremicaVersion.cfg" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
 </target>
 
 <!-- Compile:

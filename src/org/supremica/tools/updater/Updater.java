@@ -1,16 +1,68 @@
+
+/*
+ * Supremica Software License Agreement
+ *
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
+ *
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
+ *
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
+ *
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
+ *
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
+ *
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
+ *
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
+ *
+ * Supremica is owned and represented by KA.
+ */
+package org.supremica.tools.updater;
+
 import java.io.*;
+import java.util.*;
+import java.net.*;
 
-
-public class SupremicaUpdater
+public class Updater
 {
 	private String host = null;
 	private Properties localProperties = null;
 	private Properties remoteProperties = null;
 
-	private static final SupremicaFilename = "Supremica.jar";
-	private static final SupremicaVersionFilename = "SupremicaVersion.cfg";
+	private static final String SupremicaFilename = "Supremica.jar";
+	private static final String SupremicaVersionFilename = "SupremicaVersion.cfg";
 
-	public SupremicaUpdater(String host)
+	public Updater(String host)
 	{
 		this.host = host;
 	}
@@ -28,7 +80,7 @@ public class SupremicaUpdater
 		remoteStream.close();
 	}
 
-	public void updateNeeded()
+	public boolean updateNeeded()
 		throws Exception
 	{
 		loadProperties();
@@ -52,16 +104,17 @@ public class SupremicaUpdater
 		BufferedInputStream bIStream = new BufferedInputStream(iStream);
 		byte[] buffer = new byte[1024];
 		int offset = 0;
+		int nbrOfReadBytes = 0;
 		do
 		{
-			int nbrOfReadBytes = bIStream.read(buffer, offset, buffer.length);
+			nbrOfReadBytes = bIStream.read(buffer, offset, buffer.length);
 			if (nbrOfReadBytes >= 0)
 			{
 				outStream.write(buffer, offset, nbrOfReadBytes);
 				offset = offset + nbrOfReadBytes;
 			}
 		}
-		while (nbrOfReadBytes >= 0)
+		while (nbrOfReadBytes >= 0);
 		outStream.flush();
 		outStream.close();
 	}
@@ -93,7 +146,7 @@ public class SupremicaUpdater
 			return;
 		}
 		File newSupremicaVersionFile = new File("tmp_ " + SupremicaVersionFilename);
-		File newSupremicaFile = new File("tmp_" + SupremicaFilename)
+		File newSupremicaFile = new File("tmp_" + SupremicaFilename);
 		writeLocalFile(getRemoteFile(SupremicaVersionFilename), newSupremicaVersionFile);
 		writeLocalFile(getRemoteFile(SupremicaFilename), newSupremicaFile);
 		File orgSupremicaVersionFile = new File(SupremicaVersionFilename);
@@ -107,6 +160,8 @@ public class SupremicaUpdater
 
 	public static void main(String[] args)
 	{
+
+		Updater updater = new Updater("http://www.s2.chalmers,se/~ka/Supremica/");
 
 	}
 }
