@@ -276,6 +276,153 @@ public class fbd2smv
 
 
 
+
+	
+
+	// Utskrift av variabler
+	HashMap variablesHashMap = new HashMap();
+
+	LinkedList fbdElements = fbdProj.getFBDElements();
+	
+	for (int i=0; i<fbdElements.size(); i++)
+	{
+	    org.supremica.external.fbd2smv.isagrafReader.FBDElement fbdElement = ( org.supremica.external.fbd2smv.isagrafReader.FBDElement)fbdElements.get(i);
+
+	    if (fbdElement.getElementType().equals("variable"))
+		{
+		    if (variablesHashMap.containsKey(fbdElement.getElementName()))
+			{
+			    LinkedList variableList = (LinkedList)variablesHashMap.get(fbdElement.getElementName());
+			    variableList.add(fbdElement);
+			} 
+		    else
+			{
+			    LinkedList variableList  = new LinkedList();
+			    variableList.add(fbdElement);
+			    variablesHashMap.put(fbdElement.getElementName(), variableList);
+			}
+		}
+	}
+
+	for (Iterator fbdIt = variablesHashMap.keySet().iterator(); fbdIt.hasNext();)
+	    {
+		String varName = (String)fbdIt.next();
+		LinkedList curVariable = (LinkedList)variablesHashMap.get(varName);
+
+
+		pw.println("");
+		pw.println("\tnext(" + varName + ") := case");
+		pw.println("\t{");
+		pw.println("\t\tctrl.state = read_input : {0, 1};");
+
+		for (int i=0;i<curVariable.size();i++)
+		    {
+			org.supremica.external.fbd2smv.isagrafReader.FBDElement curVariableElement = ( org.supremica.external.fbd2smv.isagrafReader.FBDElement)curVariable.get(i);		
+
+			String S = null;
+			Program prog  = (Program)programs.get(curVariableElement.getProgramIndex());
+			LinkedList arcs      = prog.getArcs();		
+			HashMap    boxes     = prog.getBoxes();
+			String outputVariableDeclaration = "\t\t\t";
+
+			LinkedList inputs = inputElementIndices(S.valueOf(curVariableElement.getElementIndex()), arcs);
+
+			if (inputs.size() > 0)
+			    {
+
+				String  sourceIndex = S.valueOf(((Tuple4)inputs.get(0)).x);
+				int     sourceOutputNumber = ((Tuple4)inputs.get(0)).y;
+				boolean invert = ((Tuple4)inputs.get(0)).invert;
+
+				FBDElement theFBDElement = getElementByIndex(prog, sourceIndex);
+
+				if (theFBDElement.getType().equals("variable") ) 
+				    {
+				    }
+				else if (theFBDElement.getType().equals("box") ) 
+				    {
+
+					/*
+					 * Ta reda på vilken av input-boxens utsignaler
+					 * som ska kopplas till den aktuella boxens insignal
+					 * 
+					 */
+
+					BOX box2 = ((BOX)theFBDElement.getElement());
+					if ((box2.getName().equals("{\\div}")))
+					    {
+						System.out.println("*** 3 ***");
+
+						LinkedList divInputIndices = new LinkedList();
+						boolean moreDivs = true;
+						FBDElement theFBDElement2 = null;
+						String sourceIndex2 = null;
+						while (moreDivs)
+						    {
+							moreDivs = false;
+							divInputIndices = inputElementIndices(box2.getIndex(), arcs);
+							    
+							sourceIndex2 = S.valueOf(((Tuple4)divInputIndices.get(0)).x);
+
+							theFBDElement2 = getElementByIndex(prog, sourceIndex2);
+							if (theFBDElement2.getType().equals("box"))
+							    {
+								box2 = (BOX)boxes.get(sourceIndex2);
+								moreDivs = box2.getName().equals("{\\div}");
+							    }
+						    }
+
+						theFBDElement = theFBDElement2;
+						sourceIndex = sourceIndex2;
+					    }
+					    
+
+
+					if (invert)
+					    {
+						 outputVariableDeclaration =  outputVariableDeclaration + "!";
+					    }
+
+					if (theFBDElement.getType().equals("variable") ) 
+					    {
+						//boxDeclaration =  outputVariableDeclaration + ((VAR)theFBDElement.getElement()).getName() + ", ";
+					    } 
+				
+					else
+					    {
+
+						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
+						 outputVariableDeclaration =  outputVariableDeclaration + prog.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + "; ";
+			
+					    }
+
+					pw.println(outputVariableDeclaration);
+				    }
+			    }
+
+		    		
+		    
+
+
+
+			System.out.println("\t\t\t inputs.size()=" + inputs.size());
+
+			pw.println("\t\t" + i + "_" + curVariableElement.getElementIndex() + "                       : " +  "att fixa" + ";");
+
+
+			System.out.println("\t\t" + curVariableElement.getProgramName() + ": " + curVariableElement.getElementName() + ": (" + curVariableElement.getX() + ", " + curVariableElement.getY() + ")");
+		    }
+		
+		pw.println("\t\t1                       : " +  varName + ";");
+		pw.println("\t};");
+
+
+		System.out.println("%%%%% " + curVariable.size());
+	    }
+
+
+
+
 	for (int i = 0; i<varBooleans.size(); i++) 
 	    {
 		String varName = (String)varBooleans.get(i);
@@ -332,6 +479,8 @@ public class fbd2smv
                 }
             }
 
+
+
  
 
 
@@ -354,7 +503,7 @@ public class fbd2smv
 				outputVariables.add(currVAR);
 				LinkedList inputElementIndices  = inputElementIndices(currVAR.getIndex(), arcs);
 
-				System.out.println("currVAR.index='" + currVAR.getIndex() + "'");
+				System.out.println("currVAR.index='" + currVAR.getIndex() + "' currVAR.name=" + currVAR.getName());
 
 				System.out.println("OUTPUT VARIABLE: " + currVAR.getName());
 

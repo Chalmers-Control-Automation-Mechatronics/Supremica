@@ -191,7 +191,7 @@ public class LSFReader
 
 	variablesByIndex.put(newVAR.getIndex(), newVAR);
 	variablesByName.put(newVAR.getName(), newVAR);
-	fbdElements.add(new FBDElement(programName, programIndex, (String)newVAR.getName(), "variable", x, y));
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newVAR.getName(), "variable", I.valueOf(indexString).intValue(), x, y));
 		
     }
 
@@ -275,7 +275,7 @@ public class LSFReader
 
 	BOX newBOX = new BOX(indexString, boxName, x, y);
 	boxes.put(newBOX.getIndex(), newBOX);
-	fbdElements.add(new FBDElement(programName, programIndex, (String)newBOX.getName(), "box", I.valueOf(x).intValue(), I.valueOf(y).intValue()));
+	fbdElements.add(new FBDElement(programName, programIndex, (String)newBOX.getName(), "box", I.valueOf(indexString).intValue(), I.valueOf(x).intValue(), I.valueOf(y).intValue()));
     }
 
 

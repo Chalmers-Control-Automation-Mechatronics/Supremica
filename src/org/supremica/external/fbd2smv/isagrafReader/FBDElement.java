@@ -9,14 +9,16 @@ public class FBDElement implements java.lang.Comparable
     String elementName;
     String elementType;
     int programIndex;
+    int elementIndex;
     int x;
     int y;
 
-    public FBDElement(String programName, int programIndex, String elementName, String elementType, int x, int y)
+    public FBDElement(String programName, int programIndex, String elementName, String elementType, int elementIndex, int x, int y)
     {
-	this.programName = programName;
-	this.elementName = elementName;
-	this.elementType = elementType;
+	this.programName  = programName;
+	this.elementName  = elementName;
+	this.elementType  = elementType;
+	this.elementIndex = elementIndex;
 	this.programIndex = programIndex;
 	this.x = x;
 	this.y = y;
@@ -24,7 +26,7 @@ public class FBDElement implements java.lang.Comparable
 
     public String getProgramName()
     {
-	return programName;
+	return programName; 
     }
 
     public String getElementName()
@@ -40,6 +42,11 @@ public class FBDElement implements java.lang.Comparable
     public int getProgramIndex()
     {
 	return programIndex;
+    }
+
+    public int getElementIndex()
+    {
+	return elementIndex;
     }
 
     public int getX()
