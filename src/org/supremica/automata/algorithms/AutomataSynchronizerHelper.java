@@ -466,7 +466,7 @@ public final class AutomataSynchronizerHelper
 	{
 		automataIsControllable = isControllable;
 	}
-	// automataIsControllable is set to false by AutomataSynchronizerhelper, AutomataOnlineSynchronizer, AutomataFastControllabilityCheckExecuter
+	// automataIsControllable is set to false by AutomataSynchronizerhelper, AutomataOnlineSynchronizer
 	// when an uncontrollable state is found.
 	public boolean getAutomataIsControllable()
 	{
