@@ -51,6 +51,9 @@
  */
 package org.supremica.functionblocks.model;
 
+import org.supremica.functionblocks.model.interpreters.st.Lexer;
+import org.supremica.functionblocks.model.interpreters.st.Parser;
+
 
 public class ECCondition
 {
@@ -64,6 +67,7 @@ public class ECCondition
 	public void setCondition(String cond)
 	{
 		condition = cond;
+		// parse condition
 	}
 
 	public boolean evaluateCondition(Variables vars)
