@@ -38,13 +38,15 @@ public class FactoryExecutor
 				JgrafSupervisor js = new JgrafSupervisor(jgSupervisor,shoeNr);
 
 				shoePlant = new Plant();
-				Specification shoeSpec = new Specification(shoeNr,sv);
 				gui.addProject(shoePlant.getPlant());
+				
+				Specification shoeSpec = new Specification(shoeNr,sv);
+				gui.addProject(shoeSpec.getSpec());
 
-				int[] syncAutomata = {0,1,2,3};
+				int[] syncAutomata = {45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
 				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant(), syncAutomata);
 				syncPlant.synthesizePlants("theSupervisor");
-				gui.addProject(shoeSpec.getSpec());
+				
 
 				GCDocument newShoe = e.newWorkspace();
 				Shoe s = new Shoe(newShoe, stationV, shoeNr);
