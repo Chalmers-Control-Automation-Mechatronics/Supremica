@@ -23,11 +23,11 @@ public class BTSim
 
     public BTSim()
     {
-	
+
 	// Start a RouteController thread
 	RouteController p = new RouteController(outSignals, this);
 	Thread pThread = new Thread(p);
-	
+
 	pThread.start();
     }
 
@@ -39,7 +39,7 @@ public class BTSim
     {
 	System.arraycopy(values, 0, inSignals, 0, inSignals.length);
     }
-    
+
     /** getSignalArray gets all signals
      *  @return all the values for the signals
 	 */
@@ -48,11 +48,11 @@ public class BTSim
     {
 	System.arraycopy(outSignals, 0, values, 0, outSignals.length);
     }
-    
+
     /*
      * Methods used internally by the simulator
      */
-    
+
     /**setOutSignals is used by RouteController
      * @param values the output signals to be set
      */
@@ -60,34 +60,34 @@ public class BTSim
     {
 	System.arraycopy(values, 0, outSignals, 0, outSignals.length);
     }
-    
+
     /**getInSignals is used by RouteController
      * @return the signals set by....*/
     public boolean[] getInSignals()
     {
 	return inSignals;
     }
-    
+
     public short getNrOfSignalsIn()
     {
 	return nrOfSignalsIn;
     }
-    
+
     public short getNrOfSignalsOut()
     {
 	return nrOfSignalsOut;
     }
-    
+
     public boolean hasInputDescriptions()
     {
 	return true;
     }
-    
+
     public boolean hasOutputDescriptions()
     {
 	return true;
     }
-    
+
     public String[] getInputDescriptions()
     {
 	String[] temp = new String[nrOfSignalsIn];
@@ -119,7 +119,7 @@ public class BTSim
 	temp[24] = new String("24 - ManuellStart");
 	temp[25] = new String("25 - Nödstopp");
 	temp[26] = new String("26 - LarmKvittering");
-	
+
 	//There are some signals not being used
 	for (int i = 27; i < nrOfSignalsOut; i++)
 	    {
@@ -127,7 +127,7 @@ public class BTSim
 	    }
 		return temp;
     }
-    
+
     public String[] getOutputDescriptions()
     {
 	String[] temp = new String[nrOfSignalsOut];
@@ -151,8 +151,8 @@ public class BTSim
 	temp[16] = new String("16 - Sug");
 	temp[17] = new String("17 - TändLampa");
 
-	//There is some signals not being used	
-	for (int i = 18; i < nrOfSignalsOut; i++) 
+	//There is some signals not being used
+	for (int i = 18; i < nrOfSignalsOut; i++)
 	    {
 		temp[i] = new String("Not in Use");
 	    }
