@@ -157,19 +157,19 @@ public class Options
 														"Min pending req.",
 														"Max follow",
 														"Min follow",
-														"Largest cover",
-														"Smallest cover" };
+														"Smallest additional alphabet",
+														"Larggest shared alphabet",
+														};
 	public static final int ES_HEURISTIC_INTERACTIVE = 0,
 							ES_HEURISTIC_ANY = 1, ES_HEURISTIC_TOPDOWN = 2,
 							ES_HEURISTIC_BOTTOMUP = 3,
 							ES_HEURISTIC_MOST_PENDING = 4,
 							ES_HEURISTIC_LEAST_PENDING = 5,
-							ES_HEURISTIC_MOST_FOLLOWERS = 6,
-							ES_HEURISTIC_LEAST_FOLLOWERS = 7,
-							ES_HEURISTIC_MOST_MEMBERS = 8,
-							ES_HEURISTIC_LEAST_MEMBERS = 9;
-	;
-	public static int es_heuristics = ES_HEURISTIC_MOST_FOLLOWERS;
+							ES_HEURISTIC_MOST_MEMBERS = 6,
+							ES_HEURISTIC_LEAST_MEMBERS = 7,
+							ES_LEAST_ADDITIONAL_EVENTS = 8,
+							ES_MOST_SHARED_EVENTS = 9;
+	public static int es_heuristics = ES_HEURISTIC_MOST_MEMBERS;
 
 	/** BDD grow graph */
 	public static final String SHOW_GROW_NAMES[] = { "None", "Node count",

@@ -15,6 +15,7 @@ public class Workset
 	private boolean[] remaining;    // this is for the exclusive stuff
 	private int size, heuristic;
 	private int workset_count;    // sum of workset_i
+	private int last_choice; // the last cluster that was chosen
 	private Cluster[] clusters;
 	private InteractiveChoice ic = null;
 	private NDAS_Choice ndas = null;
@@ -39,8 +40,9 @@ public class Workset
 	public void init_workset(boolean exclusive)
 	{
 
-		// all automata are enabled from start
-		workset_count = size;
+
+		workset_count = size;	// all automata are enabled from start
+		last_choice = -1; // invalid, yet
 
 		for (int i = 0; i < size; i++)
 		{
@@ -90,147 +92,211 @@ public class Workset
 		return queue[ic.getSelected()];
 	}
 
-	/**
-	 * choose the next automaton
-	 *
-	 * This is a rip-off from the PetriNetSupervisor :)
-	 */
-	public int pickOne()
+
+	// ----[ The H1 heuristics are all here ] -------------------------------------
+	/** let the user choose one */
+	private int h1_interactive(boolean exclusive)
 	{
-		int best, queue_size = 0;
+		queue[0] = pickOneInteractive(exclusive);
+		return 1;
+	}
 
-		switch (heuristic)
+	/** pass ALL enabled clusters */
+	private int h1_all(boolean exclusive)
+	{
+		int queue_size = 0;
+		for (int i = 0; i < size; i++)
 		{
-
-		case Options.ES_HEURISTIC_INTERACTIVE :
-			return pickOneInteractive(false);
-
-		case Options.ES_HEURISTIC_ANY :
-			for (int i = 0; i < size; i++)    // anything is ok
+			if (workset[i] > 0 && (!exclusive || remaining[i]) )
 			{
-				if (workset[i] > 0)
+				queue[queue_size++] = i;
+			}
+		}
+		return queue_size;
+	}
+
+
+	/**
+	 * choose the ones that share most number of events in their alphabet, compared
+	 * to the last one
+	 */
+
+	private int h1_most_shared_events(boolean exclusive)
+	{
+		if(last_choice == -1)
+		{
+			return h1_all(exclusive);
+		}
+
+		int queue_size = 0;
+		int best = 0;
+		Cluster last = clusters[last_choice];
+
+		for (int i = 0; i < size; i++)
+		{
+			if (workset[i] > 0 && (!exclusive || remaining[i]))
+			{
+				int added = last.sharedEvents(clusters[i]);
+				if (best < added )
+				{
+					best = added;
+					queue_size = 0;
+				}
+
+				if (added == best)
 				{
 					queue[queue_size++] = i;
 				}
 			}
-			break;
+		}
+		return queue_size;
 
-		case Options.ES_HEURISTIC_TOPDOWN :
-			for (int i = 0; i < size; i++)
-			{
-				if (workset[i] > 0)
-				{
-					return i;
-				}
-			}
-			break;
+	}
 
-		case Options.ES_HEURISTIC_BOTTOMUP :
-			for (int i = size - 1; i >= 0; i--)
-			{
-				if (workset[i] > 0)
-				{
-					return i;
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_MOST_PENDING :
-
-			// one of the largest one (most affected so far)
-			best = 0;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (workset[i] > 0)
-				{
-					if (best < workset[i])
-					{
-						best = workset[i];
-						queue_size = 0;
-					}
-
-					if (best == workset[i])
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_LEAST_PENDING :
-
-			// one of the smallest one (least affected so far)
-			best = Integer.MAX_VALUE;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (workset[i] > 0)
-				{
-					if (best > workset[i])
-					{
-						best = workset[i];
-						queue_size = 0;
-					}
-
-					if (best == workset[i])
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_MOST_MEMBERS :
-		case Options.ES_HEURISTIC_MOST_FOLLOWERS :
-			best = 0;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (workset[i] > 0)
-				{
-					int c = dependent[i][0];
-
-					if (best < c)
-					{
-						best = c;
-						queue_size = 0;
-					}
-
-					if (best == c)
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_LEAST_MEMBERS :
-		case Options.ES_HEURISTIC_LEAST_FOLLOWERS :
-			best = Integer.MAX_VALUE;;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (workset[i] > 0)
-				{
-					int c = dependent[i][0];
-
-					if (best > c)
-					{
-						best = c;
-						queue_size = 0;
-					}
-
-					if (best == c)
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
+	/**
+	 * choose the ones that have least number of "new" events in their alphabet, compared
+	 * to the last one
+	 */
+	private int h1_least_additional_events(boolean exclusive) {
+		if(last_choice == -1)
+		{
+			return h1_all(exclusive);
 		}
 
-		return ndas.choose(queue, queue_size);
+		int queue_size = 0;
+		int best = Integer.MAX_VALUE;
+		Cluster last = clusters[last_choice];
+
+		for (int i = 0; i < size; i++)
+		{
+			if (workset[i] > 0 && (!exclusive || remaining[i]) )
+			{
+				int added = last.additionalEvents(clusters[i]);
+				if (best > added )
+				{
+					best = added;
+					queue_size = 0;
+				}
+
+				if (added == best)
+				{
+					queue[queue_size++] = i;
+				}
+			}
+		}
+		return queue_size;
+	}
+
+	/** return the first cluster in the given order */
+	private int h1_topdown(boolean reverse, boolean exclusive)
+	{
+		for (int i = 0; i < size; i++)
+		{
+			int index = reverse ? (size - i -1) : i;
+			if (workset[index] > 0 && (!exclusive || remaining[index]) )
+			{
+				queue[0] = index;
+				return 1;
+			}
+		}
+		return 0; // will not happen
+	}
+
+
+	/** one of the largest requested (most affected so far) */
+	private int h1_most_pending(boolean reverse, boolean exclusive)
+	{
+		int best = reverse ? Integer.MAX_VALUE : 0;
+		int queue_size = 0;
+
+		for (int i = 0; i < size; i++)
+		{
+			if (workset[i] > 0  && (!exclusive || remaining[i]) )
+			{
+				if ( (!reverse && (best < workset[i])) ||  (reverse && (best > workset[i])) )
+				{
+					best = workset[i];
+					queue_size = 0;
+				}
+
+				if (best == workset[i])
+				{
+					queue[queue_size++] = i;
+				}
+			}
+		}
+		return queue_size;
+	}
+
+
+	/** the one with the largest automata dependent on */
+	private int h1_most_followers(boolean reverse, boolean exclusive)
+	{
+		int queue_size = 0;
+		int best = reverse ? Integer.MAX_VALUE : 0;
+
+		for (int i = 0; i < size; i++)
+		{
+			if (workset[i] > 0 && (!exclusive || remaining[i]) )
+			{
+				int c = dependent[i][0];
+
+				if ( (!reverse && (best < c)) || (reverse && (best > c)) )
+				{
+					best = c;
+					queue_size = 0;
+				}
+
+				if (best == c)
+				{
+					queue[queue_size++] = i;
+				}
+			}
+		}
+		return queue_size;
+	}
+
+	/** and here is where they are called from: */
+
+	private int h1_heuristic(int h1, boolean exclusive)
+	{
+			switch (h1)
+			{
+			case Options.ES_HEURISTIC_INTERACTIVE :
+				return h1_interactive(exclusive);
+			case Options.ES_HEURISTIC_ANY:
+				return h1_all(exclusive);
+			case Options.ES_MOST_SHARED_EVENTS:
+				return h1_most_shared_events(exclusive);
+			case Options.ES_LEAST_ADDITIONAL_EVENTS:
+				return h1_least_additional_events(exclusive);
+			case Options.ES_HEURISTIC_TOPDOWN :
+				return h1_topdown(false, exclusive);
+			case Options.ES_HEURISTIC_BOTTOMUP :
+				return h1_topdown(true, exclusive);
+			case Options.ES_HEURISTIC_MOST_PENDING :
+				return h1_most_pending(false, exclusive);
+			case Options.ES_HEURISTIC_LEAST_PENDING :
+				return h1_most_pending(true, exclusive);
+			case Options.ES_HEURISTIC_MOST_MEMBERS :
+				return h1_most_followers(false, exclusive);
+			case Options.ES_HEURISTIC_LEAST_MEMBERS :
+				return h1_most_followers(true, exclusive);
+			default:
+				System.err.println("unknown h1 heuristic: " + h1);
+				return 0; // ERROR
+			}
+	}
+	// ----------------------------------------------------
+	/**
+	 * choose the next automaton
+	 */
+	public int pickOne()
+	{
+		int queue_size = h1_heuristic(heuristic, false);
+		Options.out.println("DEBUG: took " + queue_size + " out of " + workset_count);
+		last_choice = ndas.choose(queue, queue_size);
+		return last_choice;
 	}
 
 	/**
@@ -243,148 +309,11 @@ public class Workset
 	 */
 	public int pickOneExcelsuive()
 	{
-		int best, queue_size = 0;
+		int queue_size = h1_heuristic(heuristic, true);
+		last_choice = ndas.choose(queue, queue_size);
+		remaining[last_choice] = false;
 
-		switch (heuristic)
-		{
-
-		case Options.ES_HEURISTIC_INTERACTIVE :
-			return pickOneInteractive(true);
-
-		case Options.ES_HEURISTIC_ANY :
-			for (int i = 0; i < size; i++)    // anything is ok
-			{
-				if (remaining[i] && (workset[i] > 0))
-				{
-					queue[queue_size++] = i;
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_TOPDOWN :
-			for (int i = 0; i < size; i++)
-			{
-				if (remaining[i] && (workset[i] > 0))
-				{
-					queue[queue_size++] = i;    // only ine
-
-					break;
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_BOTTOMUP :
-			for (int i = size - 1; i >= 0; i--)
-			{
-				if (remaining[i] && (workset[i] > 0))
-				{
-					queue[queue_size++] = i;    // only ine
-
-					break;
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_MOST_PENDING :
-
-			// one of the largest one (most affected so far)
-			best = 0;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (remaining[i] && (workset[i] > 0))
-				{
-					if (best < workset[i])
-					{
-						best = workset[i];
-						queue_size = 0;
-					}
-
-					if (best == workset[i])
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_MOST_MEMBERS :
-		case Options.ES_HEURISTIC_MOST_FOLLOWERS :
-			best = 0;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (remaining[i] && (workset[i] > 0))
-				{
-					int c = dependent[i][0];
-
-					if (best < c)
-					{
-						best = c;
-						queue_size = 0;
-					}
-
-					if (best == c)
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-
-		// -------------------------------------------------------------
-		case Options.ES_HEURISTIC_LEAST_PENDING :
-
-			// one of the smallest one (least affected so far)
-			best = Integer.MAX_VALUE;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (remaining[i] && (workset[i] > 0))
-				{
-					if (best > workset[i])
-					{
-						best = workset[i];
-						queue_size = 0;
-					}
-
-					if (best == workset[i])
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-
-		case Options.ES_HEURISTIC_LEAST_MEMBERS :
-		case Options.ES_HEURISTIC_LEAST_FOLLOWERS :
-			best = Integer.MAX_VALUE;;
-
-			for (int i = 0; i < size; i++)
-			{
-				if (remaining[i] && (workset[i] > 0))
-				{
-					int c = dependent[i][0];
-
-					if (best > c)
-					{
-						best = c;
-						queue_size = 0;
-					}
-
-					if (best == c)
-					{
-						queue[queue_size++] = i;
-					}
-				}
-			}
-			break;
-		}
-
-		best = ndas.choose(queue, queue_size);
-		remaining[best] = false;
-
-		return best;
+		return last_choice;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -450,12 +379,5 @@ public class Workset
 	public boolean empty()
 	{
 		return workset_count <= 0;
-
-		/*
-		for(int i = 0; i < size; i++) {
-			if(workset[i] > 0) return false;
-		}
-		return true;
-		*/
 	}
 }
