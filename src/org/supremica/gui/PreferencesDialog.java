@@ -60,6 +60,7 @@ import org.supremica.util.BDD.Options;    // Arash
 public class PreferencesDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane = null;
 	private JTabbedPane theTabbedPanel = null;
 	private FilePanel theFilePanel = null;
@@ -325,6 +326,7 @@ public class PreferencesDialog
 class FilePanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JTextField fileOpenPath = null;
 	private JTextField fileSavePath = null;
@@ -372,6 +374,7 @@ class FilePanel
 class CommunicationPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null, debugXmlRpc = null;;
 	private JTextField xmlRpcPort, xmlRpcFilter;
@@ -472,6 +475,7 @@ class CommunicationPanel
 class LayoutPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JCheckBox dotLeftToRight = null;
 	private JCheckBox dotWithStateLabels = null;
@@ -569,6 +573,7 @@ class LayoutPanel
 class GeneralPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JTextField nbrOfExecuters = null;
 	private JTextField stateSeparator = null;
@@ -625,6 +630,7 @@ class GeneralPanel
 class SynchronizationPropertiesPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JCheckBox forbidUncontrollableStates = null;
 	private JCheckBox expandForbiddenStates = null;
@@ -632,6 +638,7 @@ class SynchronizationPropertiesPanel
 	//private JCheckBox verboseMode = null;
 	private JTextField hashtableSize = null;
 	//private JTextField nbrOfExecuters = null;
+	private JTextField automatonNameSeparator = null;
 
 	public SynchronizationPropertiesPanel(PreferencesDialog theDialog)
 	{
@@ -673,6 +680,10 @@ class SynchronizationPropertiesPanel
 		nbrOfExecuters = new JTextField();
 		propertiesBox.add(nbrOfExecuters);
 		*/
+		propertiesBox.add(new JLabel("Automaton name separator"));
+		automatonNameSeparator = new JTextField();
+		automatonNameSeparator.setToolTipText("The name of the synchronized automaton is by default a concatenation of the names of the automata, separated by this string.");
+		propertiesBox.add(automatonNameSeparator);
 	}
 
 	public boolean doApply()
@@ -681,6 +692,7 @@ class SynchronizationPropertiesPanel
 		SupremicaProperties.setSyncExpandForbiddenStates(expandForbiddenStates.isSelected());
 		SupremicaProperties.setSyncExpandHashtable(expandHashtable.isSelected());
 		//SupremicaProperties.setVerboseMode(verboseMode.isSelected());
+		SupremicaProperties.setSyncAutomatonNameSeparator(automatonNameSeparator.getText());
 
 		int size = PreferencesDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
 		if (size == Integer.MIN_VALUE)
@@ -709,12 +721,14 @@ class SynchronizationPropertiesPanel
 		//verboseMode.setSelected(SupremicaProperties.verboseMode());
 		hashtableSize.setText(Integer.toString(SupremicaProperties.syncInitialHashtableSize()));
 		//nbrOfExecuters.setText(Integer.toString(SupremicaProperties.syncNbrOfExecuters()));
+		automatonNameSeparator.setText(SupremicaProperties.syncAutomatonNameSeparator());
 	}
 }
 
 class PreferencesControllerPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JButton applyButton = null;
 	private JButton cancelButton = null;
@@ -769,6 +783,7 @@ class PreferencesControllerPanel
 class SoftPLCPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null;
 	private JTextField cycleTime = new JTextField();
@@ -863,6 +878,7 @@ class BDDPanel1
 	extends JPanel
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JCheckBox alterPCG, traceOn, ucOptimistic, nbOptimistic;
 	/* package access */
@@ -974,7 +990,7 @@ class BDDPanel1
 		// AWT is much better than Swing
 		FileDialog fd = new FileDialog(theDialog.getOwnerFrame(), "Choose a proof file", FileDialog.SAVE);
 
-		fd.show();
+		fd.setVisible(true);
 
 		if (fd.getFile() != null)
 		{
@@ -1046,6 +1062,7 @@ class BDDPanel1
 class BDDPanel2
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JComboBox cbReordering, countAlgorithm,
 					  orderingAlgorithm, encodingAlgorithm, forceCostFunction;
@@ -1164,6 +1181,7 @@ class BDDPanel2
 class BDDPanel3
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JComboBox cbDisjOpt, cbTransitionOpt;
 	private JTextField maxPartitionSize;
@@ -1221,6 +1239,7 @@ class BDDPanel3
 class SimulationPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useExternal;
 	private JTextField cycleTime;
@@ -1271,6 +1290,7 @@ class SimulationPanel
 class RobotCoordinationPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private PreferencesDialog theDialog = null;
 	private JCheckBox showRobotCoordination;
 	private JTextField cycleTime;
