@@ -260,8 +260,12 @@ public class AutomataToSattLineSFCForBallProcess
 		 the step timer variable retains its value until the step
 		 is reactivated. Maybe we should just ignore it. */
 
-		StringBuffer theCondition = new StringBuffer();
-		boolean firstUcEvent = true;
+		StringBuffer theCondition = new StringBuffer("");
+
+		/* QUICK AND DIRTY HACK preventing locking behaviour: !event AND NOT !event.
+		   This is safe assuming that the event monitors remain last in execution order. */
+
+		/*boolean firstUcEvent = true;
 		theCondition.append("NOT (");
 		int lineLength = 36; // 31 + 5
 
@@ -292,7 +296,7 @@ public class AutomataToSattLineSFCForBallProcess
 				lineLength = 0;
 			}
 		}
-		theCondition.append(") AND ");
+		theCondition.append(") AND ");*/
 		return theCondition.toString();
 	}
 
