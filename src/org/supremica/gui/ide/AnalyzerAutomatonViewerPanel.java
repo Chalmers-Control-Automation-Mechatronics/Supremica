@@ -24,6 +24,8 @@ class AnalyzerAutomatonViewerPanel
 		this.moduleContainer = moduleContainer;
 		this.name = name;
 		this.theAutomaton = theAutomaton;
+		setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
+		setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
 		build();
 	}
 

@@ -14,6 +14,7 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.automata.IO.FileFormats;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.log.*;
+import org.supremica.Version;
 
 public class IDE
     extends JFrame
@@ -30,6 +31,7 @@ public class IDE
 	}
 	private static Logger logger = LoggerFactory.createLogger(IDE.class);
 	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
+//	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 
 	private Actions theActions;
 
@@ -89,6 +91,9 @@ public class IDE
 
 		logPanel = new LogPanel(this, "Logger");
 
+//		splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, theLogDisplay.getComponent());
+//		theLogDisplay.getComponent().updateUI();
+
 		splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
 		splitPanelVertical.setContinuousLayout(false);
 		splitPanelVertical.setOneTouchExpandable(false);
@@ -100,6 +105,7 @@ public class IDE
 		pack();
 		validate();
 
+		logger.info("Supremica version: " + (new Version()).toString());
     }
 
 	public Actions getActions()

@@ -5,13 +5,15 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-
 import org.supremica.gui.ide.IDE;
+import org.supremica.log.*;
+
 
 public class SaveAction
 	extends IDEAction
 {
+	private static Logger logger = LoggerFactory.createLogger(SaveAction.class);
+
 	private IDE ide;
 
 	public SaveAction(IDE ide)
@@ -31,6 +33,6 @@ public class SaveAction
 
 	public void doAction()
 	{
-		System.err.println("Save Action selected - not implemented");
+		logger.error("Save Action selected - not implemented");
 	}
 }

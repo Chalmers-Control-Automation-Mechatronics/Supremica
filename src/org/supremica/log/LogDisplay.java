@@ -333,6 +333,11 @@ public class LogDisplay
 		return theTextPaneScrollPane;
 	}
 
+	public JComponent getComponentWithoutScrollPane()
+	{
+		return textpane;
+	}
+
 	public String getLabel()
 	{
 		return label;

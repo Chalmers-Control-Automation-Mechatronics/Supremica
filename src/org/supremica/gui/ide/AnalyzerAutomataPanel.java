@@ -47,10 +47,8 @@ class AnalyzerAutomataPanel
 		this.analyzerPanel = analyzerPanel;
 		this.moduleContainer = moduleContainer;
 		this.name = name;
-		Dimension panelPreferredSize = new Dimension(500, 400);
-		Dimension panelMinimumSize = new Dimension(100, 100);
-		setPreferredSize(panelPreferredSize);
-		setMinimumSize(panelMinimumSize);
+		setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
+		setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
 		initialize();
 	}
 

@@ -31,8 +31,8 @@ class MainPanel
 		this.moduleContainer = moduleContainer;
 		this.name = name;
 
-		setPreferredSize(IDEDimensions.mainWindowPreferredSize);
-		setMinimumSize(IDEDimensions.mainWindowMinimumSize);
+		setPreferredSize(IDEDimensions.mainPanelPreferredSize);
+		setMinimumSize(IDEDimensions.mainPanelMinimumSize);
 
 		GridBagLayout gridbag = new GridBagLayout();
 		setLayout(gridbag);

@@ -28,6 +28,8 @@ class EditorComponentsPanel
 
 		createContentPane();
 
+		setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+		setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 	}
 
 	public String getName()

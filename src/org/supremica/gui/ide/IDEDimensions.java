@@ -11,6 +11,9 @@ public class IDEDimensions
 	public static Dimension loggerPreferredSize = new Dimension(1000, 100);
 	public static Dimension loggerMinimumSize = new Dimension(100, 10);
 
+	public static Dimension mainPanelPreferredSize = new Dimension(1000, 650);
+	public static Dimension mainPanelMinimumSize = new Dimension(100, 50);
+
 	public static Dimension leftEditorPreferredSize = new Dimension(300, 650);
 	public static Dimension leftEditorMinimumSize = new Dimension(50, 50);
 
