@@ -80,7 +80,7 @@ public class NDAS_Choice {
 		num_access++;
 		if(changed) num_advance++;
 
-		if(ndas == Options.NDAS_RL_TABU) {
+		if(ndas == Options.NDAS_RL) {
 			if(punish_inactive) {
 				// reward and punish
 				activity[automaton] += (changed) ? ADD_REWARD : ADD_PUNISH;

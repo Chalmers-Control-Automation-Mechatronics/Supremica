@@ -206,7 +206,7 @@ public class Options
 	/** Non-deteministic Automata Selection: how to use between equally expensive automata ? (see for example Workset.java) */
 	public static final String [] NDAS_HEURISTIC_NAMES =
 		{ "Random          ", "Topologically first", "Topologically last", "Ring",
-		"Reinforcement learning", "Reinforcement learning (tabu)" };
+		"Reinforcement learning", "Reinforcement learning (taboo)" };
 	public static final int
 		NDAS_RANDOM = 0,
 		NDAS_FIRST = 1,
