@@ -254,7 +254,7 @@ class StickGamePanel
 	implements TestCase
 {
 	IntegerField num_players = new IntegerField("2", 6);
-	IntegerField num_sticks = new IntegerField("5", 6);
+	IntegerField num_sticks = new IntegerField("7", 6);
 
 	StickGamePanel()
 	{
