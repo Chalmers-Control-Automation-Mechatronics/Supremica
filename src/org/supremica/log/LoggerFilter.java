@@ -56,7 +56,6 @@ import org.supremica.properties.*;
 
 public class LoggerFilter
 	extends Filter
-
 {
 	private boolean allowInfos = true;
 	private boolean allowWarns = true;
@@ -67,7 +66,7 @@ public class LoggerFilter
 	public LoggerFilter() {}
 
 	public void setOption(String option, String value)
-	{ // Not implemented
+	{    // Not implemented
 	}
 
 	public String[] getOptionStrings()
@@ -78,46 +77,57 @@ public class LoggerFilter
 	public int decide(LoggingEvent event)
 	{
 		Priority prio = event.priority;
+
 		if (prio == Priority.DEBUG)
 		{
 			if (allowDebugs)
 			{
 				return Filter.ACCEPT;
 			}
+
 			return Filter.DENY;
 		}
+
 		if (prio == Priority.INFO)
 		{
 			if (allowInfos)
 			{
 				return Filter.ACCEPT;
 			}
+
 			return Filter.DENY;
 		}
+
 		if (prio == Priority.WARN)
 		{
 			if (allowWarns)
 			{
 				return Filter.ACCEPT;
 			}
+
 			return Filter.DENY;
 		}
+
 		if (prio == Priority.ERROR)
 		{
 			if (allowErrors)
 			{
 				return Filter.ACCEPT;
 			}
+
 			return Filter.DENY;
 		}
+
 		if (prio == Priority.FATAL)
 		{
 			if (allowFatals)
 			{
 				return Filter.ACCEPT;
 			}
+
 			return Filter.DENY;
 		}
+
 		return Filter.NEUTRAL;
 	}
 

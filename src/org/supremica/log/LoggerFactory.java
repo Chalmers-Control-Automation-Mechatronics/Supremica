@@ -82,6 +82,7 @@ public class LoggerFactory
 			if (consoleAppender == null)
 			{
 				consoleAppender = new ConsoleAppender(layout);
+
 				consoleAppender.addFilter(filter);
 			}
 

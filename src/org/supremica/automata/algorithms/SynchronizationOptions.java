@@ -156,7 +156,7 @@ public final class SynchronizationOptions
 
 	public void setExpandForbiddenStates(boolean set)
 	{
-		 expandForbiddenStates = set;
+		expandForbiddenStates = set;
 	}
 
 	public boolean terminateIfUncontrollableState()
@@ -166,7 +166,7 @@ public final class SynchronizationOptions
 
 	public void setTerminateIfUncontrollableState(boolean set)
 	{
-		 terminateIfUnconStates = set;
+		terminateIfUnconStates = set;
 	}
 
 	public boolean expandEventsUsingPriority()
@@ -189,7 +189,7 @@ public final class SynchronizationOptions
 
 	public void setBuildAutomaton(boolean set)
 	{
-		 buildAutomaton = set;
+		buildAutomaton = set;
 	}
 
 	public boolean isValid()
@@ -208,6 +208,7 @@ public final class SynchronizationOptions
 		{
 			return false;
 		}
+
 		return true;
 	}
 }

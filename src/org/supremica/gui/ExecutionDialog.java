@@ -75,6 +75,7 @@ public class ExecutionDialog
 	private JProgressBar progressBar = null;
 	private JPanel currCenterPanel = null;
 	private JButton stopButton = null;
+
 	// private int progressMin = -1;
 	// private int progressMax = -1;
 	private int progressValue = -1;
@@ -181,10 +182,12 @@ public class ExecutionDialog
 	 */
 	public void initProgressBar(int min, int max)
 	{
+
 		// progressMin = min;
 		// progressMax = max;
 		progressBar.setMinimum(min);
 		progressBar.setMaximum(max);
+
 		this.progressValue = 0;
 
 		update();
@@ -293,10 +296,11 @@ public class ExecutionDialog
 
 		// Update labels
 		boolean showValues = currentMode.showValue();
+
 		// = ((currentMode == ExecutionDialogMode.synchronizing) || (currentMode == ExecutionDialogMode.verifying) || (currentMode == ExecutionDialogMode.synthesizing));
 		boolean showProgress = currentMode.showProgress();
-		// = ((currentMode == ExecutionDialogMode.buildingStates) || (currentMode == ExecutionDialogMode.buildingTransitions));
 
+		// = ((currentMode == ExecutionDialogMode.buildingStates) || (currentMode == ExecutionDialogMode.buildingTransitions));
 		if (showValues)
 		{
 			infoValue.setText(String.valueOf(value));

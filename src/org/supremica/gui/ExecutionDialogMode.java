@@ -59,12 +59,11 @@ public class ExecutionDialogMode
 	public static ExecutionDialogMode matchingStates = new ExecutionDialogMode("Matching States...", "", false, true);
 	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "", false, false);
 	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "", false, false);
-
 	private final String id;
 	private final String text;
 	private boolean show_value;
 	private boolean show_progress;
-	
+
 	private ExecutionDialogMode(String id, String txt, boolean value, boolean progress)
 	{
 		this.id = id;
@@ -77,14 +76,17 @@ public class ExecutionDialogMode
 	{
 		return id;
 	}
+
 	public String getText()
 	{
 		return text;
 	}
+
 	public boolean showValue()
 	{
 		return show_value;
 	}
+
 	public boolean showProgress()
 	{
 		return show_progress;

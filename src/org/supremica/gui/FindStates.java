@@ -254,7 +254,7 @@ class FindStatesTable
 						setRowSelectionInterval(row, row);
 					}
 
-					//
+					// 
 					if (getStatesTableModel().isRegexpColumn(col))
 					{
 						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
@@ -573,60 +573,78 @@ class FindStatesFrame
 			dispose();
 		}
 	}
-// ****************** Testing only ********** copied straight (almost) from the Monitor project
-class Task extends Thread implements Monitorable
-{
-	private int p;
-	private int i = 0;
-	private boolean mode = false; // false is "no progressbar"
-	private /* volatile */ boolean requestStop = false;
-	public void run()
+
+	// ****************** Testing only ********** copied straight (almost) from the Monitor project
+	class Task
+		extends Thread
+		implements Monitorable
 	{
-		try
+		private int p;
+		private int i = 0;
+		private boolean mode = false;    // false is "no progressbar"
+		private /* volatile */ boolean requestStop = false;
+
+		public void run()
 		{
-			while(i < 100 && !requestStop)
+			try
 			{
-				sleep(750);
-				i += (int)(Math.random()*20);
+				while ((i < 100) &&!requestStop)
+				{
+					sleep(750);
+
+					i += (int) (Math.random() * 20);
+				}
+
+				mode = !mode;
+
+				while ((p < 100) &&!requestStop)
+				{
+					p += (int) (Math.random() * 20);
+
+					sleep(500);
+				}
 			}
-			mode = !mode;
-			while(p < 100 && !requestStop)
+			catch (InterruptedException iexcp)
 			{
-				p += (int)(Math.random()*20);
-				sleep(500);
+				return;
 			}
 		}
-		catch(InterruptedException iexcp)
+
+		public int getProgress()
 		{
-			return;
+			if (mode)
+			{
+				return p;
+			}
+			else
+			{
+				return 1;    // no progress
+			}
 		}
-	}
-	
-	public int getProgress()
-	{
-		if(mode)
-			return p;
-		else
+
+		public String getActivity()
 		{
-			return 1; // no progress
+			if (mode)
+			{
+				return ("Building transitions: " + p + "% complete");
+			}
+			else
+			{
+				return ("Synchronizing: " + i + " number of states");
+			}
 		}
-	}
-	public String getActivity()
-	{
-		if(mode)
-			return ("Building transitions: " + p + "% complete");
-		else
-			return ("Synchronizing: " + i + " number of states");
-	}
-	public void stopTask() 
-	{ 
-		requestStop = true;
-	}
-	public ExecutionDialogMode getMode() // ** Changed but not used **
-	{
-		return null;
-	}
-}// ****************************************************
+
+		public void stopTask()
+		{
+			requestStop = true;
+		}
+
+		public ExecutionDialogMode getMode()    // ** Changed but not used **
+		{
+			return null;
+		}
+	}    // ****************************************************
+
 	private void goAhead()
 	{
 		try
@@ -635,19 +653,23 @@ class Task extends Thread implements Monitorable
 
 			if (matcher != null)
 			{
+
 				// SearchStates ss = new SearchStates(getAutomata(), matcher);
 				Task ss = new Task();
-				ss.start();	// Start the synchronization thread
+
+				ss.start();    // Start the synchronization thread
 
 				// /setCursor(WAIT_CURSOR);
 				// ExecutionDialog exedlg = new ExecutionDialog(this, "Finding States...", ss);
 				Monitor monitor = new Monitor("Finding states...", "", ss);
-				monitor.spawn(this); // spawn the monitor with this as parent
+
+				monitor.spawn(this);    // spawn the monitor with this as parent
+
 				// ss.setExecutionDialog(exedlg);
-				ss.join(); // wait for ss to finish
+				ss.join();     // wait for ss to finish
+
 				// /setCursor(DEFAULT_CURSOR);
-				
-				//showCompositeStates(ss);
+				// showCompositeStates(ss);
 			}
 
 			// else do nothing

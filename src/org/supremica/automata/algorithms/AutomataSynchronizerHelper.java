@@ -75,7 +75,6 @@ public final class AutomataSynchronizerHelper
 	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerHelper.class);
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
-
 	private int totalNbrOfStates = 0;
 	private int nbrOfUncontrollableStates = 0;
 	private int nbrOfDeadlockedStates = 0;
@@ -191,7 +190,6 @@ public final class AutomataSynchronizerHelper
 		// Should be an external option?!? FIXA!
 		// Is there anything else that needs to be cleared?...
 	}
-
 
 	public SynchronizationOptions getSynchronizationOptions()
 	{
@@ -317,7 +315,6 @@ public final class AutomataSynchronizerHelper
 
 			// helperData.incrNbrOfAddedStates();
 			helperData.nbrOfAddedStates++;
-
 		}
 		else
 		{
@@ -333,7 +330,6 @@ public final class AutomataSynchronizerHelper
 		{
 			if (executionDialog != null)
 			{
-
 				executionDialog.setValue(helperData.nbrOfCheckedStates);
 			}
 		}
@@ -423,6 +419,7 @@ public final class AutomataSynchronizerHelper
 	{
 		return theStates.iterator();
 	}
+
 	public int getNumberOfStates()
 	{
 		return helperData.nbrOfCheckedStates;
@@ -806,7 +803,6 @@ public final class AutomataSynchronizerHelper
 
 	public class HelperData
 	{
-
 		public int nbrOfAddedStates = 0;
 		public int nbrOfCheckedStates = 0;
 		public int nbrOfUncontrollableStates = 0;

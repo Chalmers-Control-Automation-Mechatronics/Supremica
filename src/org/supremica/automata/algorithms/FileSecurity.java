@@ -124,6 +124,7 @@ public class FileSecurity
 		{
 			return true;
 		}
+
 		return false;
 	}
 

@@ -129,6 +129,7 @@ public class AutomataVerificationWorker
 
 		if (verificationOptions.getVerificationType() == 0)
 		{
+
 			// Controllability verification...
 			boolean isControllable;
 
@@ -172,16 +173,19 @@ public class AutomataVerificationWorker
 			{
 				if (verificationOptions.getAlgorithmType() == 0)
 				{
+
 					// Modular...
 					isControllable = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 1)
 				{
+
 					// Monolithic...
 					isControllable = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 2)
 				{
+
 					// IDD...
 					requestStop();
 
@@ -192,6 +196,7 @@ public class AutomataVerificationWorker
 				}
 				else
 				{
+
 					// Error...
 					requestStop();
 
@@ -228,18 +233,19 @@ public class AutomataVerificationWorker
 		}
 		else if (verificationOptions.getVerificationType() == 1)
 		{
+
 			// Non-blocking verification...
-			// requestStop();		
+			// requestStop();
 			// logger.error("Option not implemented...");
 			// workbench.error("Option not implemented...");
 			// return;
 			boolean isNonBlocking;
-			
+
 			if (theAutomata.size() < 1)
 			{
 				JOptionPane.showMessageDialog(workbench.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 				requestStop();
-				
+
 				return;
 			}
 
@@ -275,6 +281,7 @@ public class AutomataVerificationWorker
 			{
 				if (verificationOptions.getAlgorithmType() == 0)
 				{
+
 					// Modular...
 					requestStop();
 
@@ -285,11 +292,13 @@ public class AutomataVerificationWorker
 				}
 				else if (verificationOptions.getAlgorithmType() == 1)
 				{
+
 					// Monolithic...
 					isNonBlocking = automataVerifier.monolithicNonBlockingVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 2)
 				{
+
 					// IDD...
 					requestStop();
 
@@ -300,6 +309,7 @@ public class AutomataVerificationWorker
 				}
 				else
 				{
+
 					// Error...
 					requestStop();
 
@@ -320,7 +330,7 @@ public class AutomataVerificationWorker
 			}
 
 			endDate = new Date();
-			
+
 			// Present result...
 			if (!stopRequested)
 			{
@@ -332,10 +342,11 @@ public class AutomataVerificationWorker
 				{
 					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is blocking!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 				}
-			}		
+			}
 		}
 		else if (verificationOptions.getVerificationType() == 2)
 		{
+
 			// Language inclusion
 			boolean isIncluded;
 			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();

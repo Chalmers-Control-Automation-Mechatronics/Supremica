@@ -113,8 +113,8 @@ class SynchronizationDialogAdvancedPanel
 		Box advancedBox = Box.createVerticalBox();
 
 		synchronizationTypeBox = new JComboBox(SynchronizationType.toArray());
-		advancedBox.add(synchronizationTypeBox);
 
+		advancedBox.add(synchronizationTypeBox);
 		this.add(advancedBox);
 	}
 
@@ -123,7 +123,7 @@ class SynchronizationDialogAdvancedPanel
 		synchronizationTypeBox.setSelectedItem(synchronizationOptions.getSynchronizationType());
 	}
 
-	public void regain(SynchronizationOptions  synchronizationOptions)
+	public void regain(SynchronizationOptions synchronizationOptions)
 	{
 		synchronizationOptions.setSynchronizationType((SynchronizationType) synchronizationTypeBox.getSelectedItem());
 	}
@@ -232,4 +232,3 @@ public class SynchronizationDialog
 		}
 	}
 }
-

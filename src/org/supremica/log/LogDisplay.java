@@ -56,11 +56,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-
 import javax.swing.*;
-
 import javax.swing.text.*;
-
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.Loader;
@@ -117,7 +114,6 @@ public class LogDisplay
 		// this.tp = new TracerPrintWriter(qw);
 		this.fancy = true;
 
-
 		// This code used to be in the popup menu -------------
 		textpane.addMouseListener(new MouseAdapter()
 		{
@@ -153,12 +149,12 @@ public class LogDisplay
 		if (theLogDisplay == null)
 		{
 			theLogDisplay = new LogDisplay();
+
 			theLogDisplay.addFilter(LoggerFactory.getLoggerFilter());
 		}
 
 		return theLogDisplay;
 	}
-
 
 	private void createAttributes()
 	{
@@ -186,7 +182,6 @@ public class LogDisplay
 	{
 		textpane.setText("");
 	}
-
 
 	public void cut()
 	{
@@ -420,13 +415,10 @@ public class LogDisplay
 		return true;
 	}
 
-
-
 	class LoggerPopupMenu
 		extends JPopupMenu
 	{
 		private LoggerFilter filter = null;
-
 		private JCheckBoxMenuItem fatalItem = null;
 		private JCheckBoxMenuItem errorItem = null;
 		private JCheckBoxMenuItem debugItem = null;
@@ -437,6 +429,7 @@ public class LogDisplay
 		private void initPopups()
 		{
 			JMenuItem cutItem = new JMenuItem("Cut");
+
 			cutItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -447,6 +440,7 @@ public class LogDisplay
 			add(cutItem);
 
 			JMenuItem copyItem = new JMenuItem("Copy");
+
 			copyItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -455,10 +449,10 @@ public class LogDisplay
 				}
 			});
 			add(copyItem);
-
 			addSeparator();
 
 			JMenuItem clearItem = new JMenuItem("Clear");
+
 			clearItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -467,74 +461,88 @@ public class LogDisplay
 				}
 			});
 			add(clearItem);
-
 			addSeparator();
 
 			JMenu logProperties = new JMenu("Log Properties");
+
 			add(logProperties);
 
 			// FATAL, ERROR, WARN, INFO and DEBUG.
-
 			fatalItem = new JCheckBoxMenuItem("Log Fatal");
+
 			fatalItem.setSelected(filter.allowFatal());
 			fatalItem.addItemListener(new ItemListener()
 			{
 				public void itemStateChanged(ItemEvent e)
 				{
-					setAllowFatal(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+					setAllowFatal((e.getStateChange() == ItemEvent.SELECTED)
+								  ? true
+								  : false);
 				}
 			});
 			logProperties.add(fatalItem);
 
 			errorItem = new JCheckBoxMenuItem("Log Error");
+
 			errorItem.setSelected(filter.allowError());
 			errorItem.addItemListener(new ItemListener()
 			{
 				public void itemStateChanged(ItemEvent e)
 				{
-					setAllowError(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+					setAllowError((e.getStateChange() == ItemEvent.SELECTED)
+								  ? true
+								  : false);
 				}
 			});
 			logProperties.add(errorItem);
 
 			warnItem = new JCheckBoxMenuItem("Log Warning");
+
 			warnItem.setSelected(filter.allowWarn());
 			warnItem.addItemListener(new ItemListener()
 			{
 				public void itemStateChanged(ItemEvent e)
 				{
-					setAllowWarn(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+					setAllowWarn((e.getStateChange() == ItemEvent.SELECTED)
+								 ? true
+								 : false);
 				}
 			});
 			logProperties.add(warnItem);
 
 			infoItem = new JCheckBoxMenuItem("Log Info");
+
 			infoItem.setSelected(filter.allowInfo());
 			infoItem.addItemListener(new ItemListener()
 			{
 				public void itemStateChanged(ItemEvent e)
 				{
-					setAllowInfo(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+					setAllowInfo((e.getStateChange() == ItemEvent.SELECTED)
+								 ? true
+								 : false);
 				}
 			});
 			logProperties.add(infoItem);
 
 			debugItem = new JCheckBoxMenuItem("Log Debug");
+
 			debugItem.setSelected(filter.allowDebug());
 			debugItem.addItemListener(new ItemListener()
 			{
 				public void itemStateChanged(ItemEvent e)
 				{
-					setAllowDebug(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+					setAllowDebug((e.getStateChange() == ItemEvent.SELECTED)
+								  ? true
+								  : false);
 				}
 			});
 			logProperties.add(debugItem);
-
 		}
 
 		public LoggerPopupMenu(LoggerFilter filter)
 		{
 			this.filter = filter;
+
 			initPopups();
 		}
 

@@ -741,6 +741,7 @@ public class ActionMan
 		}
 
 		SynchronizationOptions synchronizationOptions = null;
+
 		try
 		{
 			synchronizationOptions = new SynchronizationOptions();
@@ -748,8 +749,10 @@ public class ActionMan
 		catch (Exception ex)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Error constructing synchronizationOptions: " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
+
 		SynchronizationDialog synchronizationDialog = new SynchronizationDialog(gui.getFrame(), synchronizationOptions);
 
 		synchronizationDialog.show();
@@ -760,6 +763,7 @@ public class ActionMan
 		}
 
 		String newAutomatonName = "Dummy";
+
 		if (synchronizationOptions.buildAutomaton())
 		{
 			newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
@@ -769,6 +773,7 @@ public class ActionMan
 				return;
 			}
 		}
+
 		Automata currAutomata = new Automata();
 		Iterator autIt = selectedAutomata.iterator();
 
@@ -1434,7 +1439,6 @@ public class ActionMan
 			{
 				openAutomataXMLFile(g, f);
 			}
-
 		};
 	}
 
@@ -1464,6 +1468,7 @@ public class ActionMan
 		}
 
 		FileSecurity fileSecurity = gui.getFileSecurity();
+
 		if (SupremicaProperties.generalUseSecurity())
 		{
 			if (!fileSecurity.allowOpening(currAutomata))
@@ -1475,7 +1480,7 @@ public class ActionMan
 		}
 
 		// We should always check owner and hash when it is present
-		if (!(currAutomata.getOwner() == null && currAutomata.getHash() == null) && !fileSecurity.hasCorrectHash(currAutomata))
+		if (!((currAutomata.getOwner() == null) && (currAutomata.getHash() == null)) &&!fileSecurity.hasCorrectHash(currAutomata))
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "The automata has an invalid hash", "alert", JOptionPane.WARNING_MESSAGE);
 		}
@@ -1691,7 +1696,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	//
+	// 
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);

@@ -183,8 +183,8 @@ public class AutomataSynchronizerWorker
 				// logger.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
 				workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
 			}
-			theSynchronizer.displayInfo();
 
+			theSynchronizer.displayInfo();
 			executionDialog.setMode(ExecutionDialogMode.hide);
 		}
 		else if (mode == MODE_UPDATE)

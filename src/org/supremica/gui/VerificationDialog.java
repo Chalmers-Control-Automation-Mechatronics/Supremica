@@ -54,8 +54,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-// import javax.swing.event.*;
-// import javax.swing.table.*;
 interface VerificationPanel
 {
 	public void update(VerificationOptions v);
@@ -74,9 +72,6 @@ class VD_StandardPanel
 	public VD_StandardPanel()
 	{
 		Box standardBox = Box.createVerticalBox();
-
-		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		String[] verificationData = { "controllability", "non-blocking",
 									  "language inclusion" };
 
@@ -86,11 +81,6 @@ class VD_StandardPanel
 
 		algorithmTypeBox = new JComboBox(algorithmData);
 
-		// leftPanel.add(verificationTypeBox);
-		// leftPanel.add(algorithmTypeBox);
-		// standardPanel.setLayout(new GridLayout(1,2));
-		// standardPanel.add(leftPanel);
-		// standardPanel.add(rightPanel);
 		standardBox.add(verificationTypeBox);
 		standardBox.add(algorithmTypeBox);
 		this.add(standardBox);
@@ -163,17 +153,7 @@ public class VerificationDialog
 	private JButton okButton;
 	private JButton cancelButton;
 	private VerificationOptions verificationOptions;
-
-	// -- standard panel stuff
-	// private JComboBox verificationTypeBox;
-	// private JComboBox algorithmTypeBox;
 	private VD_StandardPanel standardPanel;
-
-	// -- advanced panel stuff
-	// private JTextField exclusionStateLimit;
-	// private JTextField reachabilityStateLimit;
-	// private JCheckBox oneEventAtATimeBox;
-	// private JCheckBox skipUncontrollabilityBox;
 	private VD_AdvancedPanel advancedPanel;
 	private JDialog dialog;
 
@@ -199,45 +179,6 @@ public class VerificationDialog
 		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
 		tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
 
-		/*** standardPanel
-		Box standardBox = Box.createVerticalBox();
-		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		String[] verificationData = {"controllability", "non-blocking", "language inclusion"};
-		verificationTypeBox = new JComboBox(verificationData);
-		String[] algorithmData = {"modular", "monolithic", "IDD"};
-		algorithmTypeBox = new JComboBox(algorithmData);
-		// leftPanel.add(verificationTypeBox);
-		// leftPanel.add(algorithmTypeBox);
-		// standardPanel.setLayout(new GridLayout(1,2));
-		// standardPanel.add(leftPanel);
-		// standardPanel.add(rightPanel);
-
-		standardBox.add(verificationTypeBox);
-		standardBox.add(algorithmTypeBox);
-
-		standardPanel.add(standardBox); ***/
-
-		/*** advancedPanel
-		Box advancedBox = Box.createVerticalBox();
-		JLabel exclusionStateLimitText =
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		new JLabel("Initial state limit for state exclusion");
-		exclusionStateLimit = new JTextField();
-		JLabel reachabilityStateLimitText =
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		new JLabel("Initial state limit for reachability verification");
-		reachabilityStateLimit = new JTextField();
-		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
-		skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
-
-		advancedBox.add(exclusionStateLimitText);
-		advancedBox.add(exclusionStateLimit);
-		advancedBox.add(reachabilityStateLimitText);
-		advancedBox.add(reachabilityStateLimit);
-		advancedBox.add(oneEventAtATimeBox);
-		advancedBox.add(skipUncontrollabilityBox);
-
-		advancedPanel.add(advancedBox, BorderLayout.CENTER); ***/
-
 		// buttonPanel;
 		JPanel buttonPanel = new JPanel();
 
@@ -262,15 +203,7 @@ public class VerificationDialog
 	public void update()
 	{
 		standardPanel.update(verificationOptions);
-
-		// verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
-		// algorithmTypeBox.setSelectedIndex(verificationOptions.getAlgorithmType());
 		advancedPanel.update(verificationOptions);
-
-		// exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
-		// reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
-		// oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
-		// skipUncontrollabilityBox.setSelected(verificationOptions.getSkipUncontrollabilityCheck());
 	}
 
 	private JButton addButton(Container container, String name)
@@ -293,17 +226,9 @@ public class VerificationDialog
 		Object source = event.getSource();
 
 		if (source == okButton)
-		{                                              // Remember the selections
+		{ // Remember the selections
 			verificationOptions.setDialogOK(true);
-
-			// verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
-			// verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
 			standardPanel.regain(verificationOptions);
-
-			// verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("State limit", exclusionStateLimit.getText(), 10));
-			// verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("State limit", reachabilityStateLimit.getText(), 10));
-			// verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
-			// verificationOptions.setSkipUncontrollabilityCheck(skipUncontrollabilityBox.isSelected());
 			advancedPanel.regain(verificationOptions);
 			dialog.setVisible(false);
 			dialog.dispose();

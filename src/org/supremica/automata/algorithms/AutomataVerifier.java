@@ -154,40 +154,41 @@ public class AutomataVerifier
 	 *@deprecated  this is done in AutomataVerificationWorker.
 	 *@see  AutomataSynchronizerExecuter
 	 */
+
 	/*
-	public boolean execute()
-		throws Exception
-	{
-		if (verificationOptions.getAlgorithmType() == 0)
-		{
-
-			// Modular...
-			return modularControllabilityVerification();
-		}
-		else if (verificationOptions.getAlgorithmType() == 1)
-		{
-
-			// Monolithic...
-			return monolithicControllabilityVerification();
-		}
-		else if (verificationOptions.getAlgorithmType() == 2)
-		{
-
-			// IDD...
-			logger.error("Option not implemented...");
-
-			return false;
-		}
-		else
-		{
-
-			// Error...
-			logger.error("Unavailable option chosen.");
-
-			return false;
-		}
-	}
-	*/
+	 * public boolean execute()
+	 *       throws Exception
+	 * {
+	 *       if (verificationOptions.getAlgorithmType() == 0)
+	 *       {
+	 *
+	 *               // Modular...
+	 *               return modularControllabilityVerification();
+	 *       }
+	 *       else if (verificationOptions.getAlgorithmType() == 1)
+	 *       {
+	 *
+	 *               // Monolithic...
+	 *               return monolithicControllabilityVerification();
+	 *       }
+	 *       else if (verificationOptions.getAlgorithmType() == 2)
+	 *       {
+	 *
+	 *               // IDD...
+	 *               logger.error("Option not implemented...");
+	 *
+	 *               return false;
+	 *       }
+	 *       else
+	 *       {
+	 *
+	 *               // Error...
+	 *               logger.error("Unavailable option chosen.");
+	 *
+	 *               return false;
+	 *       }
+	 * }
+	 */
 
 	/**
 	 * Method called from external class stopping AutomataVerifier as soon as possible.
@@ -1047,7 +1048,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines non-blocking monolithically, by examining all reachable states. 
+	 * Examines non-blocking monolithically, by examining all reachable states.
 	 * Lots and lots of work for big systems.
 	 *
 	 *@return True if non-blocking, false if blocking
@@ -1059,28 +1060,27 @@ public class AutomataVerifier
 	{
 		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(false);
-		
+
 		// Initialize the synchronizationExecuters
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-			
+
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
-		
+
 		// Start all the synchronization executers and wait for completion
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-			
+
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-		
-		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
-		
-		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 
+		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+
+		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 		Automaton theAutomaton;
 
 		try
@@ -1097,6 +1097,7 @@ public class AutomataVerifier
 		catch (Exception ex)
 		{
 			logger.error("Error when building automaton: " + ex.toString());
+
 			throw ex;
 		}
 
@@ -1104,7 +1105,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines non-blocking monolithically, by examining all reachable states. 
+	 * Examines non-blocking monolithically, by examining all reachable states.
 	 * Lots and lots of work for big systems.
 	 *
 	 *@return True if non-blocking, false if blocking
@@ -1113,43 +1114,51 @@ public class AutomataVerifier
 	 */
 	private boolean moduleIsNonBlocking(Automaton theAutomaton)
 	{
+
 		// Examine all states, starting from the marked ones and moving backwards...
 		LinkedList statesToExamine = new LinkedList();
 		Iterator stateIterator = theAutomaton.stateIterator();
 		State currState;
+
 		// Add all marked states
 		while (stateIterator.hasNext())
 		{
 			currState = (State) stateIterator.next();
+
 			if (currState.isAccepting())
 			{
 				statesToExamine.add(currState);
 			}
 		}
-		
+
 		State examinedState;
 		Iterator incomingArcIterator;
+
 		while (statesToExamine.size() > 0)
 		{
-			examinedState = (State) statesToExamine.removeFirst(); // OBS. removeFirst!
+			examinedState = (State) statesToExamine.removeFirst();    // OBS. removeFirst!
 			incomingArcIterator = examinedState.incomingArcsIterator();
+
 			while (incomingArcIterator.hasNext())
 			{
-				currState = ((Arc) incomingArcIterator.next()).getFromState(); 
-				if (!currState.equals(examinedState)) // Self-loops...
+				currState = ((Arc) incomingArcIterator.next()).getFromState();
+
+				if (!currState.equals(examinedState))    // Self-loops...
 				{
 					statesToExamine.add(currState);
 				}
 			}
+
 			theAutomaton.removeState(examinedState);
 		}
 
 		stateIterator = theAutomaton.stateIterator();
-			while (stateIterator.hasNext())
+
+		while (stateIterator.hasNext())
 		{
 			System.out.println("Blocking state: " + ((State) stateIterator.next()).getName());
 		}
 
-		return theAutomaton.nbrOfStates()==0;
+		return theAutomaton.nbrOfStates() == 0;
 	}
 }

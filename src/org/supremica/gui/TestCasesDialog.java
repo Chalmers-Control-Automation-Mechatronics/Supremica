@@ -135,53 +135,67 @@ class BricksPanel
 		throws Exception
 	{
 		BricksGame bg = new BricksGame(num_rows.get(), num_cols.get());
-		
+
 		return bg.getAutomata();
 	}
 }
 
 // ++ ARASH
 class AllocationBatchPanel
-    extends JPanel
-    implements TestCase, ActionListener
+	extends JPanel
+	implements TestCase, ActionListener
 {
-    JTextField filename;
-    JButton browse;
-    AllocationBatchPanel() {
-	JPanel pCenter = new JPanel(new FlowLayout(FlowLayout.LEFT));       
-	pCenter.add( new JLabel("batch file:  ") );
-	pCenter.add( filename = new JTextField(20));
-	pCenter.add( browse   = new JButton("..."));
-	browse.addActionListener(this);
+	JTextField filename;
+	JButton browse;
 
-	add(pCenter, BorderLayout.CENTER);
-	add(new JLabel("Exprimental serialized allocation batch"), BorderLayout.NORTH);
-	
-    }
-    public Automata doIt() 
-	throws Exception 
-    {
-	String file = filename.getText();
-	if(file.length() > 0 ) {
-	    AllocationBatch ab = new AllocationBatch(file); 						 
-	    return ab.getAutomata();	
-	}  // else...
-	throw new Exception("you must choose a filename");	
-    }
-    public void actionPerformed(ActionEvent e) {
-	Object src = e.getSource();
-	if(src == browse) {
-	    JFileChooser chooser = new JFileChooser();
-	    chooser.setDialogTitle("Please choose a batch file");
-	    int returnVal = chooser.showOpenDialog(this);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) 
-		filename.setText( chooser.getSelectedFile().getAbsolutePath());
+	AllocationBatchPanel()
+	{
+		JPanel pCenter = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+		pCenter.add(new JLabel("batch file:  "));
+		pCenter.add(filename = new JTextField(20));
+		pCenter.add(browse = new JButton("..."));
+		browse.addActionListener(this);
+		add(pCenter, BorderLayout.CENTER);
+		add(new JLabel("Exprimental serialized allocation batch"), BorderLayout.NORTH);
 	}
-    }
 
+	public Automata doIt()
+		throws Exception
+	{
+		String file = filename.getText();
+
+		if (file.length() > 0)
+		{
+			AllocationBatch ab = new AllocationBatch(file);
+
+			return ab.getAutomata();
+		}    // else...
+
+		throw new Exception("you must choose a filename");
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		Object src = e.getSource();
+
+		if (src == browse)
+		{
+			JFileChooser chooser = new JFileChooser();
+
+			chooser.setDialogTitle("Please choose a batch file");
+
+			int returnVal = chooser.showOpenDialog(this);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				filename.setText(chooser.getSelectedFile().getAbsolutePath());
+			}
+		}
+	}
 }
-// -- ARASH
 
+// -- ARASH
 class ExampleTab
 	extends JTabbedPane
 {
