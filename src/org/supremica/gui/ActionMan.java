@@ -1647,7 +1647,7 @@ public class ActionMan
 	{
 		VisualProject theProject = gui.getVisualProjectContainer().getActiveProject();
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		gui.info("Nbr of selected automata: " + selectedAutomata.size());
+		// gui.info("Nbr of selected automata: " + selectedAutomata.size());
 		FindStates find_states = new FindStates(theProject, selectedAutomata);
 
 		try
@@ -1656,7 +1656,6 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-
 			// logger.error(excp.toString());
 			gui.error(ex.toString());
 		}
