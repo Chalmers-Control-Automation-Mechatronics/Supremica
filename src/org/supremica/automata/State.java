@@ -296,7 +296,7 @@ public class State
 		}
 		theArcSet.addArc(theArc);
 
-	
+
 	}
 
 	public void removeIncomingArc(Arc theArc)
@@ -357,6 +357,11 @@ public class State
 	public int nbrOfOutgoingArcs()
 	{
 		return outgoingArcs.size();
+	}
+
+	public int nbrOfOutgoingArcSets()
+	{
+		return outgoingArcSets.size();
 	}
 
 	public void setCost(int cost)
