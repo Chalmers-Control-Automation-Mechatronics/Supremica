@@ -43,7 +43,7 @@
 	Column Register = 3
 -->
 <property name="build.compiler.emacs" value="true"/>
-<property name="build.compiler.pedantic" value="true"/>
+<property name="build.compiler.pedantic" value="false"/>
 
 <!-- 
 *	Run this script after checking out the sources for the
