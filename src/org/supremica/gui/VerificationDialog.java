@@ -226,7 +226,7 @@ public class VerificationDialog
 		Object source = event.getSource();
 
 		if (source == okButton)
-		{ // Remember the selections
+		{                                              // Remember the selections
 			verificationOptions.setDialogOK(true);
 			standardPanel.regain(verificationOptions);
 			advancedPanel.regain(verificationOptions);

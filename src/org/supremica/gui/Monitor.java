@@ -13,10 +13,10 @@ import org.supremica.gui.Monitorable;
 /************************************************
 class Task extends Thread implements Measurable
 {
-								private int p;
-								private int i = 0;
-								private boolean mode = false; // false is "no progressbar"
-								private /* volatile */
+																private int p;
+																private int i = 0;
+																private boolean mode = false; // false is "no progressbar"
+																private /* volatile */
 
 /*
  * boolean requestStop = false;
@@ -133,26 +133,26 @@ public class Monitor
 	}
 
 	/***
-									public static void main (String[] args) // demo
-									{
-																	JFrame frame = new JFrame ("Monitor Demo");
-																	frame.setSize(200, 200);
-																	frame.setVisible (true);
+																	public static void main (String[] args) // demo
+																	{
+																																	JFrame frame = new JFrame ("Monitor Demo");
+																																	frame.setSize(200, 200);
+																																	frame.setVisible (true);
 
-																	Task task = new Task();
-																	task.start();
-																	Monitor monitor = new Monitor (task);
-																	// task.start();
-																	monitor.spawn (frame);
-																	// task.start();
-																	frame.setTitle ("Back in main thread");
-																	try
-																	{
-																									task.join();
-																	}
-																	catch(InterruptedException iexcp)
-																	{
-																	}
-																	System.exit(0); }
+																																	Task task = new Task();
+																																	task.start();
+																																	Monitor monitor = new Monitor (task);
+																																	// task.start();
+																																	monitor.spawn (frame);
+																																	// task.start();
+																																	frame.setTitle ("Back in main thread");
+																																	try
+																																	{
+																																																	task.join();
+																																	}
+																																	catch(InterruptedException iexcp)
+																																	{
+																																	}
+																																	System.exit(0); }
 	***/
 }
