@@ -27,11 +27,9 @@ FUNCTION_BLOCK TON
         ST  tonQ
 END_FUNCTION_BLOCK
 
-
 PROGRAM PortVaktstest
 	VAR
 		(*Insignaler*)
-		Start 		 AT %IX24 : BOOL;
 		KulaPortvakt 	AT %IX0  : BOOL;
 		MatlyftNere  	AT %IX1  : BOOL;
 		KulaMatlyft  	AT %IX2  : BOOL;
@@ -47,6 +45,14 @@ PROGRAM PortVaktstest
 		HissVan2	AT %IX14 : BOOL;
 		KulaVan2	AT %IX15 : BOOL;
 		PlockaVan2	AT %IX16 : BOOL;
+		ArmHemma	AT %IX17 : BOOL;
+		ArmVan1		AT %IX20 : BOOL;
+		ArmVan2		AT %IX21 : BOOL;
+		KulaFast	AT %IX22 : BOOL;
+		Autostart   AT %IX23 : BOOL;
+		ManuellStart AT %IX24 : BOOL;
+		NodStopp	AT %IX25 : BOOL;
+		LarmKvittering AT %IX26 : BOOL;
 		(*Utsignaler*)
 		InPortvakt   	AT %QX0  : BOOL;
 		UrPortvakt   	AT %QX1  : BOOL;
@@ -59,18 +65,23 @@ PROGRAM PortVaktstest
 		LyftVan1	AT %QX10 : BOOL;
 		UtVan2		AT %QX11 : BOOL;
 		LyftVan2	AT %QX12 : BOOL;
+		UppArmVan1	AT %QX13 : BOOL;
+		UppArmVan2	AT %QX14 : BOOL;
+		VridArmHoger AT %QX15 : BOOL;
+		Sug			AT %QX16 : BOOL;
 	END_VAR
 	VAR
 		IsStorKula  : BOOL;
 		Matn1, Matn2,Matn3,Matn4,Matn5 : BOOL := FALSE;
-
+		ArmSteg1, ArmSteg2, AutomatiskStart : BOOL := FALSE;
+		StartAllowed : BOOL := TRUE;
 
 (*		MatningKlar, UrMatningKlar : BOOL := FALSE;
 		PaborjaMatning : BOOL := FALSE;
 		MatningGjord : BOOL;
 *)
 		delay2, delay4, delay5, delay6,delay66: TON;
-		delay8, delay88,delay10 : TON;
+		delay8, delay88,delay10,delay20 : TON;
 		tmpb   : BOOL;
 		tmpd   : DINT;		
 		Init  : BOOL := TRUE;
@@ -99,13 +110,14 @@ PROGRAM PortVaktstest
 		ST delay5.tonPT
 		ST delay6.tonPT
 		ST delay66.tonPT (*PaborjaMatn-fördröjning*)
+		ST delay20.tonPT
 		LD DINT#2000
 		ST delay10.tonPT (*Hiss*)
 		LD FALSE
 		ST Init
 end_init:
 
-
+(*
 CAL WPrint("manuell start")
 CAL BPrintln(%IX24)
 
@@ -120,22 +132,54 @@ CAL WPrint("KulaPortVakt = ")
 LD KulaPortvakt
 ST tmpb
 CAL BPrintln(tmpb)
+*)
 
-
-(*start*)
-(*	if !(Start || (KulaPortvakt || UrPortvakt))
+(* autostart, special för simulator, funkar ej för riktig kulbana*)
+(*	if !(fsfsdfsd || (KulaPortvakt || UrPortvakt))
 		Släpp in kula
 	fi
 *)
-		LD Start
+		LDN AutomatiskStart
 		OR(KulaPortvakt
 		   OR UrPortvakt
+		   ORN StartAllowed
+		)
+		JMPC END1A
+			
+			LD TRUE
+			ST InPortvakt
+END1A :
+
+(* if (Autostart)
+		sätt AutomatiskStart
+*)
+		LDN Autostart
+		JMPCN ENDauto
+			LD TRUE
+			ST AutomatiskStart
+ENDauto:
+
+(* /autostart *)
+
+(* manuell start*)
+(*	if !(ManuellStart || (KulaPortvakt || UrPortvakt))
+		Släpp in kula
+	fi
+*)
+		LD ManuellStart
+		OR(KulaPortvakt
+		   OR UrPortvakt
+		   ORN StartAllowed
 		)
 		JMPC END1
 			
 			LD TRUE
 			ST InPortvakt
 END1 :
+
+
+
+
 
 (*
 	if (KulaPortvakt && InPortvakt)
@@ -151,8 +195,6 @@ END1 :
 			CAL delay2
 			LD  delay2.tonQ
 			STN InPortvakt
-			(*STN tmpb
-			CAL BPrintln(tmpb)*)
 			JMPCN e2
 				LD FALSE
 				ST delay2.tonIN
@@ -160,10 +202,6 @@ END1 :
 			e2:
 
 END2 :
-
-CAL WPrint("delay2.ET = ")
-CAL DPrintln(delay2.tonET)
-
 
 (*
 	if (KulaPortvakt && !InPortvakt && MätlyftNere && !KulaMätlyft)
@@ -177,6 +215,8 @@ CAL DPrintln(delay2.tonET)
 		JMPCN END3
 			LD TRUE
 			ST UrPortvakt
+			LD FALSE
+			ST StartAllowed
 END3 :
 
 (*
@@ -210,6 +250,7 @@ END4 :
 	ANDN UppMatlyft
 	JMPCN END5
 		LD TRUE
+		ST StartAllowed
 		ST delay5.tonIN
 		CAL delay5
 		LD delay5.tonQ
@@ -355,6 +396,7 @@ END10:
 		LD FALSE
 		ST UppHissVan1
 		ST UppHissVan2
+		ST UtVan2
 		ST delay10.tonIN (*nollställ upphissningsfördröjningen*)
 		CAL delay10 
 END11:
@@ -368,13 +410,163 @@ END11:
 		LD FALSE
 		ST UppHissVan1
 		ST UppHissVan2
+		ST UtVan1
 		ST delay10.tonIN (*nollställ upphissningsfördröjningen*)
 		CAL delay10 
 END12:
 
+(* =============================
+	Härifrån och tom END21 är ej testat på riktiga kulbanan.
+*)
+
+
+(* if (IsStorKula && HissVan2 && KulaVan2)
+	UtVan1
+*)
+	LD  IsStorKula
+	AND HissVan2
+	AND KulaVan2
+	JMPCN END13
+		LD TRUE
+		ST UtVan2		
+END13:	
+(* if (!IsStorKula && HissVan1 && KulaVan1)
+	UtVan1
+*)
+	LD  KulaVan1
+	AND HissVan1
+	ANDN IsStorKula
+	JMPCN END14
+		LD TRUE
+		ST UtVan1		
+END14:
+
+(* if (ArmHemma && !Sug)
+		Skicka upp arm om kula finns där uppe
+		if (PlockaVan1)
+			Arm1
+			UppArm1
+			VridArmHöger
+		fi
+		if (PlockaVan2)
+			Arm2
+			UppArm1
+			UppArm2
+			VridArmHöger
+		fi
+	fi
+*)
+
+	LD   ArmHemma
+	ANDN Sug
+	JMPCN END15
+		LD PlockaVan1
+		JMPCN ingenvan1
+			LD TRUE
+			ST ArmSteg1
+			ST UppArmVan1
+			ST VridArmHoger
+		ingenvan1:
+
+		LD PlockaVan2
+		JMPCN ingenvan2
+			LD TRUE
+			ST ArmSteg2
+			ST UppArmVan1
+			ST UppArmVan2
+			ST VridArmHoger
+		ingenvan2:
+END15:
+
+(*	if (ArmVan1 && PlockaVan1 && !KulaFast)
+		Sug
+		LyftVan1
+*)
+		LD ArmVan1
+		AND PlockaVan1
+		ANDN KulaFast
+		JMPCN END16
+			LD TRUE
+			ST Sug
+			ST LyftVan1
+END16:
+
+(*	if (ArmVan2 && PlockaVan2 && !KulaFast)
+		Sug
+		LyftVan2
+*)
+		LD ArmVan2
+		AND PlockaVan2
+		ANDN KulaFast
+		JMPCN END17
+			LD TRUE
+			ST Sug
+			ST LyftVan2
+END17:
+
+(*	if	(ArmVan1 && KulaFast)
+		LD FALSE
+		ST LyftVan1
+		ST delay20.tonIN
+*)
+		LD ArmVan1
+		AND KulaFast
+		JMPCN END18
+			LD FALSE
+			ST LyftVan1
+			ST delay20.tonIN
+			CAL delay20
+END18:
+(*	if	(ArmVan2 && KulaFast)
+		LD FALSE
+		ST LyftVan2
+		ST delay
+*)
+		LD ArmVan2
+		AND KulaFast
+		JMPCN END19
+			LD FALSE
+			ST LyftVan2
+			ST delay20.tonIN
+			CAL delay20
+END19:
+
+(*	if ((ArmVan1 || ArmVan2) && KulaFast && !LyftVan1 && !LyftVan2)
+		delay
+		ta ner kulan
+*)
+		LD ArmVan1
+		OR ArmVan2
+		AND KulaFast
+		ANDN LyftVan1
+		ANDN LyftVan2
+		JMPCN END20
+			CAL delay20(tonIN := TRUE)
+			JMPCN e20
+				LD FALSE
+				ST VridArmHoger
+				ST UppArmVan1
+				ST UppArmVan2
+		e20:
+END20:
+
+(*	if (KulaFast && ArmHemma)
+		Släpp kula
+*)
+		LD KulaFast
+		AND ArmHemma
+		JMPCN END21
+			LD FALSE
+			ST Sug
+END21:
+
+
+
+
+(*
 CAL WPrint("IsStorKula= ")
 CAL BPrintln(IsStorKula)
-
+*)
 END_PROGRAM
 
 
