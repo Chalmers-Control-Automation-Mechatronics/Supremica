@@ -67,21 +67,42 @@ class VerificationDialogStandardPanel
 	implements VerificationPanel, ActionListener
 {
 	private JComboBox verificationTypeBox;
-	private JComboBox algorithmTypeBox;
+	private AlgorithmSelector algorithmSelector;
 	private JTextArea nbNote;
 	
 	final String[] verificationData = { "controllability",	// keep them in this order, for God's sake!
 										"non-blocking",
 										"language inclusion" };
 	
-	final String[] algorithmData = { "modular", "monolithic" /*, "IDD" */ };
+	
+	static class AlgorithmSelector
+		extends JComboBox
+	{	
+		final static int MONOLITHIC = 0;
+		final static int MODULAR = 1;
+		final static int IDD = 2;
+		final static String[] algorithmData = { "monolithic",  "modular"/*, "IDD" */ };
+		
+		public AlgorithmSelector()
+		{
+			super(algorithmData);			
+		}
+		public void forceMonolithic()
+		{
+			removeItemAt(MODULAR);
+		}
+		public void allowAll()
+		{
+			addItem(algorithmData[MODULAR]);
+		}
+	}
 	
 	public VerificationDialogStandardPanel()
 	{
 		verificationTypeBox = new JComboBox(verificationData);
 		verificationTypeBox.addActionListener(this);
 		
-		algorithmTypeBox = new JComboBox(algorithmData);
+		algorithmSelector = new AlgorithmSelector();
 		
 		nbNote = new JTextArea("Note:\n" + 
 								"Currently, modular non-blocking\n" +
@@ -90,7 +111,7 @@ class VerificationDialogStandardPanel
 	
 		Box standardBox = Box.createVerticalBox();
 		standardBox.add(verificationTypeBox);
-		standardBox.add(algorithmTypeBox);
+		standardBox.add(algorithmSelector);
 		this.add(standardBox, BorderLayout.CENTER);
 		this.add(nbNote, BorderLayout.SOUTH);
 		
@@ -99,13 +120,13 @@ class VerificationDialogStandardPanel
 	public void update(VerificationOptions verificationOptions)
 	{
 		verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
-		algorithmTypeBox.setSelectedIndex(verificationOptions.getAlgorithmType());
+		algorithmSelector.setSelectedIndex(verificationOptions.getAlgorithmType());
 	}
 
 	public void regain(VerificationOptions verificationOptions)
 	{
 		verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
-		verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+		verificationOptions.setAlgorithmType(algorithmSelector.getSelectedIndex());
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -113,15 +134,12 @@ class VerificationDialogStandardPanel
 		if(((String)verificationTypeBox.getSelectedItem()) == verificationData[1]) // non-blocking
 		{
 			// force the monolithic algorithm
-			algorithmTypeBox.removeAllItems();
-			algorithmTypeBox.addItem(algorithmData[1]); // monolithic
+			algorithmSelector.forceMonolithic();
 			nbNote.setVisible(true);
 		}
 		else // either controllability or language inclusion selected
 		{
-			algorithmTypeBox.removeAllItems();
-			algorithmTypeBox.addItem(algorithmData[0]);
-			algorithmTypeBox.addItem(algorithmData[1]);
+			algorithmSelector.allowAll();
 			nbNote.setVisible(false);
 		}
 	}

@@ -89,6 +89,11 @@ public class AutomataVerificationWorker
 	private boolean stopRequested = false;
 	private EventQueue eventQueue = new EventQueue();
 
+	// Make sure these match what's defined in VerificationDialogStandardPanel
+	private static final int MODULAR = 1;
+	private static final int MONOLITHIC = 0;
+	private static final int IDD = 2;
+	
 	public AutomataVerificationWorker(
 
 	/*
@@ -171,19 +176,19 @@ public class AutomataVerificationWorker
 
 			try
 			{
-				if (verificationOptions.getAlgorithmType() == 0)
+				if (verificationOptions.getAlgorithmType() == MODULAR)
 				{
 
 					// Modular...
 					isControllable = automataVerifier.modularControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == 1)
+				else if (verificationOptions.getAlgorithmType() == MONOLITHIC)
 				{
 
 					// Monolithic...
 					isControllable = automataVerifier.monolithicControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == 2)
+				else if (verificationOptions.getAlgorithmType() == IDD)
 				{
 
 					// IDD...
@@ -279,7 +284,7 @@ public class AutomataVerificationWorker
 
 			try
 			{
-				if (verificationOptions.getAlgorithmType() == 0)
+				if (verificationOptions.getAlgorithmType() == MODULAR)
 				{
 
 					// Modular...
@@ -290,13 +295,13 @@ public class AutomataVerificationWorker
 
 					return;
 				}
-				else if (verificationOptions.getAlgorithmType() == 1)
+				else if (verificationOptions.getAlgorithmType() == MONOLITHIC)
 				{
 
 					// Monolithic...
 					isNonBlocking = automataVerifier.monolithicNonBlockingVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == 2)
+				else if (verificationOptions.getAlgorithmType() == IDD)
 				{
 
 					// IDD...
@@ -512,19 +517,19 @@ public class AutomataVerificationWorker
 
 			try
 			{
-				if (verificationOptions.getAlgorithmType() == 0)
+				if (verificationOptions.getAlgorithmType() == MODULAR)
 				{
 
 					// Modular...
 					isIncluded = automataVerifier.modularControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == 1)
+				else if (verificationOptions.getAlgorithmType() == MONOLITHIC)
 				{
 
 					// Monolithic...
 					isIncluded = automataVerifier.monolithicControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == 2)
+				else if (verificationOptions.getAlgorithmType() == IDD)
 				{
 
 					// IDD...

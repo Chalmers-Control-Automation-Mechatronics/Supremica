@@ -32,59 +32,43 @@ class PlayerEvents
 	}
 }
 
-class TestingXyz
-	extends Automaton
-{
-	public TestingXyz()		// This is just test ---
-		throws Exception
-	{
-		State stateZero = new State("zero");
-		addState(stateZero);
-		State from = getStateWithIndex(0); // should be stateZero (not?)
-		if(from == null)
-			System.err.println("from == null");
-		else
-			System.err.println("from != null");		
-		
-		LabeledEvent ev = new LabeledEvent("event");
-		getAlphabet().addEvent(ev);
-		
-		System.err.println("Adding arc...");
-		addArc(new Arc(null, null, ev.getId()));
-		throw new Exception("Arc added?");
-	}
-}
-
 class Sticks
 	extends Automaton
 {
+	State[] sticks; // we have to cache the states ourselves
+	
 	public Sticks(int num, int players)
+		throws Exception
 	{
 		super("Sticks:" + num);
 		setType(AutomatonType.Plant);
-	System.err.println("Sticks::construct");
 		
-		State firstState = new State(Integer.toString(num)); // first state is special
-		firstState.setInitial(true);
-		firstState.setAccepting(true);
-		addState(firstState);
+		sticks = new State[num+1];	// one more state than sticks
 		
-		for(int i = num-1; i <= 0; --i) // states are numbered from num to 0
+		sticks[0] = new State(Integer.toString(num)); // starting at "num" and counting down
+		sticks[0].setInitial(true); // first state is initial
+		addState(sticks[0]);
+		
+		for(int i = 1; i < num+1; ++i)
 		{
-			addState(new State(Integer.toString(i)));
-		}
-		
-		// Note, we assume _at_least_ 5 sticks here!
-		State s0 = getStateWithIndex(0);
-		State s1 = getStateWithIndex(0+1);
-		State s2 = getStateWithIndex(0+2);
-		State s3 = getStateWithIndex(0+3);
-		
-		int player = 0;
-		PlayerEvents pe = new PlayerEvents(player);
-		
-		for( ; player < players; ++player) 
+			sticks[i] = new State(Integer.toString(num-i));
+			addState(sticks[i]);
+		}		
+		sticks[num].setAccepting(true);	// last state is accepting
+
+		for(int player = 0; player < players; ++player) 
 		{
+			// Note, we assume _at_least_ 5 sticks here!
+			State s0 = sticks[0];
+			State s1 = sticks[0+1];
+			State s2 = sticks[0+2];
+			State s3 = sticks[0+3];
+			
+			PlayerEvents pe = new PlayerEvents(player);
+			getAlphabet().addEvent(pe.a1);
+			getAlphabet().addEvent(pe.a2);
+			getAlphabet().addEvent(pe.a3);
+			
 			addArc(new Arc(s0, s1, pe.a1.getId()));
 			addArc(new Arc(s0, s2, pe.a2.getId()));
 			addArc(new Arc(s0, s3, pe.a3.getId()));
@@ -94,83 +78,63 @@ class Sticks
 				s0 = s1;
 				s1 = s2;
 				s2 = s3;
-				s3 = getStateWithIndex(i+3);
+				s3 = sticks[i+3];
 				addArc(new Arc(s0, s1, pe.a1.getId()));
 				addArc(new Arc(s0, s2, pe.a2.getId()));
 				addArc(new Arc(s0, s3, pe.a3.getId()));
 			}
 			
-			pe = new PlayerEvents(player);
+			s0 = s1;
+			s1 = s2;
+			s2 = s3; // sticks[num-1];
+			addArc(new Arc(s0, s1, pe.a1.getId()));
+			addArc(new Arc(s0, s2, pe.a2.getId()));
+			
+			s0 = s1;
+			s1 = s2;
+			addArc(new Arc(s0, s1, pe.a1.getId()));
 		}
 
-		s0 = s1;
-		s1 = s2;
-		s2 = getStateWithIndex(num-2);
-		addArc(new Arc(s0, s1, pe.a1.getId()));
-		addArc(new Arc(s0, s2, pe.a2.getId()));
 		
-		s0 = s1;
-		s1 = getStateWithIndex(num-1);
-		addArc(new Arc(s0, s1, pe.a1.getId()));
-		
+		sticks = null; // done with the cache
 	}
 }
 
 class Players
 	extends Automaton
 {
+	private State[] players; // have to cache the states ourselves
+	
 	public Players(int num)
 		throws Exception
 	{
 		super("Players:" + num);
 		setType(AutomatonType.Plant);
-	System.err.println("Players::Players(" + num + ")");
-		State firstPlayer = new State("1");	// first player is special (initial and accepting)
-		firstPlayer.setInitial(true);
-		firstPlayer.setAccepting(true);
-		addState(firstPlayer);	// this is state[0]
-
-/** Something's fishy going on here, the second println statement is not printing!		
-		PlayerEvents pe = new PlayerEvents(0);	// first players events are special (controllable)
 		
-		Alphabet alpha = getAlphabet();
-		alpha.addEvent(pe.a1);
-		alpha.addEvent(pe.a2);
-		alpha.addEvent(pe.a3);
+		players = new State[num]; // one state for each player
 		
-		for(int i = 1; i < num; ++i)	// the rest of the players are boring
-		{
-			State to = new State(PlayerEvents.getPlayerId(i));
-			addState(to);
-			State from = getStateWithIndex(i-1);
-	System.err.println("from-state gotten");
-			addArc(new Arc(from, to, pe.a1.getId()));
-			addArc(new Arc(from, to, pe.a2.getId()));
-			addArc(new Arc(from, to, pe.a3.getId()));
-	System.err.println("Players::player events added for player: " + PlayerEvents.getPlayerId(i));
-			
-			pe = new PlayerEvents(i);
-		}
-**/
+		players[0] = new State(PlayerEvents.getPlayerId(0));	// first player is special (initial and accepting)
+		players[0].setInitial(true);
+		players[0].setAccepting(true);
+		addState(players[0]);
 
 		Alphabet alpha = getAlphabet();
-		for(int i = 0; i < num-1; ++i)
+		for(int i = 0; i < num-1; ++i) // for each player excpet the last one, add arcs to the next guy
 		{
 			PlayerEvents pe = new PlayerEvents(i);
 			alpha.addEvent(pe.a1);
 			alpha.addEvent(pe.a2);
 			alpha.addEvent(pe.a3);
 		
-			State to = new State(PlayerEvents.getPlayerId(i+1));
+			State from = players[i];	// from this guy...
+			players[i+1] = new State(PlayerEvents.getPlayerId(i+1));
+			State to = players[i+1];	// ...to this one
 			addState(to);
-			State from = getStateWithIndex(i);
-	System.err.println("from-state gotten");
 			
 			addArc(new Arc(from, to, pe.a1.getId()));
 			addArc(new Arc(from, to, pe.a2.getId()));
 			addArc(new Arc(from, to, pe.a3.getId()));
-	System.err.println("Players::player events added for player: " + PlayerEvents.getPlayerId(i));
-			
+		
 		}
 		
 		// finally, add the last to first player arcs	
@@ -179,14 +143,14 @@ class Players
 		alpha.addEvent(pe.a2);
 		alpha.addEvent(pe.a3);
 		
-		State to = getStateWithIndex(0);
-		State from = getStateWithIndex(num-1);
-	System.err.println("from-state gotten");
+		State from = players[num-1];	// from this guy...
+		State to = players[0];	// ...to this one
+		
 		addArc(new Arc(from, to, pe.a1.getId()));
 		addArc(new Arc(from, to, pe.a2.getId()));
 		addArc(new Arc(from, to, pe.a3.getId()));
-	System.err.println("Players::player events added for player: " + PlayerEvents.getPlayerId(num-1));
 
+		players = null; // done with the cache
 	}
 
 }	
@@ -198,15 +162,22 @@ public class StickPickingGame
 	public StickPickingGame(int players, int sticks)
 		throws Exception
 	{
-		automata.addAutomaton(new TestingXyz());
-		// System.err.println("StickPickingGame::construct");
-		// automata.addAutomaton(new Players(players));
-		// automata.addAutomaton(new Sticks(sticks, players)); 
+		try
+		{
+			System.err.println("StickPickingGame::construct");
+			automata.addAutomaton(new Players(players));
+			automata.addAutomaton(new Sticks(sticks, players)); 
+		}
+		catch(Exception excp)
+		{
+			excp.printStackTrace();
+			throw excp;
+		}
 	}
 	
 	public Automata getAutomata()
 	{
-		System.err.println("StickPickingGame::getAutomata()");
+		// System.err.println("StickPickingGame::getAutomata()");
 		return automata;
 	}
 
