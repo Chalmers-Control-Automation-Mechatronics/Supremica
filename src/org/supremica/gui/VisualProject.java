@@ -355,22 +355,11 @@ public class VisualProject
 		return fullTableModel;
 	}
 
-	private class LightTableModel
-		implements TableModel, AutomataListener
+	public class LightTableModel
+		extends AbstractTableModel
+		implements AutomataListener
 	{
-		private LinkedList listeners = new LinkedList();
-
 		public LightTableModel() {}
-
-		public void addTableModelListener(TableModelListener l)
-		{
-			listeners.addLast(l);
-		}
-
-		public void removeTableModelListener(TableModelListener l)
-		{
-			listeners.remove(l);
-		}
 
 		public int getColumnCount()
 		{
@@ -428,17 +417,7 @@ public class VisualProject
 
 		public void updateListeners()
 		{
-
-			// logger.debug("LightTableModel.updateListeners");
-			Iterator theIt = listeners.iterator();
-			TableModelEvent event = new TableModelEvent(this, 0, getNbrOfAutomata() - 1);
-
-			while (theIt.hasNext())
-			{
-				TableModelListener theListener = (TableModelListener) theIt.next();
-
-				theListener.tableChanged(event);
-			}
+			fireTableDataChanged();
 		}
 
 		public void automatonAdded(Automata automata, Automaton automaton)
@@ -462,22 +441,11 @@ public class VisualProject
 		}
 	}
 
-	private class FullTableModel
-		implements TableModel, AutomataListener
+	public class FullTableModel
+		extends AbstractTableModel
+		implements AutomataListener
 	{
-		private LinkedList listeners = new LinkedList();
-
 		public FullTableModel() {}
-
-		public void addTableModelListener(TableModelListener l)
-		{
-			listeners.addLast(l);
-		}
-
-		public void removeTableModelListener(TableModelListener l)
-		{
-			listeners.remove(l);
-		}
 
 		public int getColumnCount()
 		{
@@ -582,17 +550,7 @@ public class VisualProject
 
 		public void updateListeners()
 		{
-
-			// logger.debug("LightTableModel.updateListeners");
-			Iterator theIt = listeners.iterator();
-			TableModelEvent event = new TableModelEvent(this, 0, getNbrOfAutomata() - 1);
-
-			while (theIt.hasNext())
-			{
-				TableModelListener theListener = (TableModelListener) theIt.next();
-
-				theListener.tableChanged(event);
-			}
+			fireTableDataChanged();
 		}
 
 		public void automatonAdded(Automata automata, Automaton automaton)

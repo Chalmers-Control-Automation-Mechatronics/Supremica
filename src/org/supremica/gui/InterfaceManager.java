@@ -59,6 +59,7 @@ public class InterfaceManager
 
 	private InterfaceManager()
 	{
+		/*
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -67,7 +68,7 @@ public class InterfaceManager
 		{
 			logger.fatal("Error while setting LookAndFeel");
 			System.exit(0);
-		}
+		}*/
 	}
 
 	public static synchronized InterfaceManager getInstance()
