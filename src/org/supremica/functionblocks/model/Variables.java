@@ -59,7 +59,7 @@ public class Variables
 	private Map variables = new HashMap();
 
 
-	public Variable getVariable(String)
+	public Variable getVariable(String name)
 	{
 		return (Variable) variables.get(name);
 	}
