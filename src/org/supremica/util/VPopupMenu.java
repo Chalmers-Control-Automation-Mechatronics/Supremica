@@ -2,6 +2,7 @@ package org.supremica.util;
 
 import javax.swing.*;
 import java.awt.*;
+import org.supremica.gui.InterfaceManager;
 
 /**
 This component extends JPopupMenu and adds a method to display the menu inside the screen, even if the mouse pointer is near the edge of the screen.
@@ -13,6 +14,10 @@ Source at : http://www.egroups.com/list/advanced-java/md1875700976.html
 public class VPopupMenu
 	extends JPopupMenu
 {
+	public VPopupMenu()
+	{
+		InterfaceManager interfaceManager = InterfaceManager.getInstance();
+	}
 
 /**Displays the popUpMenu at a specified position*/
 	public void show(Component invoker, int x, int y)

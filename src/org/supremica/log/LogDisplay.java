@@ -74,7 +74,6 @@ public class LogDisplay
 	private StyledDocument doc;
 	private LoggerPopupMenu popup = new LoggerPopupMenu(LoggerFactory.getLoggerFilter());
 
-	// private TracerPrintWriter tp;
 	private StringWriter sw;
 	private QuietWriter qw;
 	private Hashtable attributes;
@@ -115,7 +114,6 @@ public class LogDisplay
 		this.sw = new StringWriter();
 		this.qw = new QuietWriter(sw, errorHandler);
 
-		// this.tp = new TracerPrintWriter(qw);
 		this.fancy = true;
 
 		// This code used to be in the popup menu -------------
@@ -158,14 +156,12 @@ public class LogDisplay
 			{
 				String text = "Couldn't redirect STDOUT to this console\n" + io.getMessage();
 
-				//doc.insertString(doc.getLength(), text);
 				System.err.println(text);
 			}
 			catch (SecurityException se)
 			{
 				String text = "Couldn't redirect STDOUT to this console\n" + se.getMessage();
 
-				//doc.insertString(doc.getLength(), text);
 				System.err.println(text);
 			}
 
@@ -209,6 +205,8 @@ public class LogDisplay
 
 	public synchronized static LogDisplay getInstance()
 	{
+		InterfaceManager interfaceManager = InterfaceManager.getInstance();
+
 		if (theLogDisplay == null)
 		{
 			theLogDisplay = new LogDisplay();
@@ -222,18 +220,8 @@ public class LogDisplay
 	private void createAttributes()
 	{
 
-//              Priority prio[] = Priority.getAllPossiblePriorities();
 		attributes = new Hashtable();
 
-/*
-				for (int i = 0; i < prio.length; i++)
-				{
-						MutableAttributeSet att = new SimpleAttributeSet();
-
-						attributes.put(prio[i], att);
-						StyleConstants.setFontSize(att, 14);
-				}
-*/
 		MutableAttributeSet attError = new SimpleAttributeSet();
 
 		attributes.put(Level.ERROR, attError);
@@ -296,9 +284,6 @@ public class LogDisplay
 
 	private ImageIcon getIcon(String file)
 	{
-
-		// What the f**k is this?
-		//URL url = Supremica.class.getResource("/icons/BlackFlag.gif");
 		URL url = Supremica.class.getResource(file);
 
 		return (url == null)
@@ -308,8 +293,6 @@ public class LogDisplay
 
 	private void createIcons()
 	{
-
-//              Priority prio[] = Priority.getAllPossiblePriorities();
 		icons = new Hashtable();
 
 		icons.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
@@ -320,37 +303,6 @@ public class LogDisplay
 		icons.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
 		icons.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
 
-/*
-				for (int i = 0; i < prio.length; i++)
-				{
-						if (prio[i].equals(Priority.FATAL))
-						{
-								//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-								icons.put(prio[i], getIcon("/icons/BlackFlag.gif") );
-						}
-
-						if (prio[i].equals(Priority.ERROR))
-						{
-								icons.put(prio[i], getIcon("/icons/RedFlag.gif") );
-						}
-
-						if (prio[i].equals(Priority.WARN))
-						{
-								//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-								icons.put(prio[i], getIcon("/icons/OrangeFlag.gif") );
-						}
-
-						if (prio[i].equals(Priority.INFO))
-						{
-								icons.put(prio[i], getIcon("/icons/GreenFlag.gif") );
-						}
-
-						if (prio[i].equals(Priority.DEBUG))
-						{
-								icons.put(prio[i], getIcon("/icons/BlueFlag.gif") );
-						}
-				}
-*/
 	}
 
 	public void append(LoggingEvent event)
@@ -358,25 +310,6 @@ public class LogDisplay
 		String text = this.layout.format(event);
 		String trace = "";
 
-		// Print Stacktrace
-		// Quick Hack maybe there is a better/faster way?
-
-		/*
-		 * This is not compiling anylonger - fix this  /Knut
-		 *       if (event.throwableInfo != null)
-		 *       {
-		 *               //event.throwable.printStackTrace(tp);
-		 *               for (int i=0; i< sw.getBuffer().length(); i++)
-		 *               {
-		 *                       if (sw.getBuffer().charAt(i)=='\t')
-		 *                       {
-		 *                               sw.getBuffer().replace(i,i+1,"        ");
-		 *                       }
-		 *               }
-		 *               trace = sw.toString();
-		 *               sw.getBuffer().delete(0,sw.getBuffer().length());
-		 *       }
-		 */
 		textpane.setCaretPosition(doc.getLength());
 
 		try
@@ -444,6 +377,7 @@ public class LogDisplay
 	private void setTextPane(JTextPane textpane)
 	{
 		this.textpane = textpane;
+		//this.textpane();
 
 		textpane.setEditable(false);
 		textpane.setBackground(Color.white);

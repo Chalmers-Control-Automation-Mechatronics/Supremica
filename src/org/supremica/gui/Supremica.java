@@ -159,6 +159,7 @@ public class Supremica
 		theAutomatonTable.setBackground(Color.white);
 
 		splitPaneVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, theAutomatonTableScrollPane, theLogDisplay.getComponent());
+		theLogDisplay.getComponent().updateUI();
 
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 

@@ -57,6 +57,7 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.SynchronizationType;
 import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 import org.supremica.automata.execution.*;
+import org.supremica.util.SupremicaException;
 
 /**
  * @author torda
@@ -66,7 +67,7 @@ import org.supremica.automata.execution.*;
 public class AutomataToJava
 {
 	public class GenerationException
-		extends Exception
+		extends SupremicaException
 	{
 		public GenerationException()
 		{
