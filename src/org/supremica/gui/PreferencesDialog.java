@@ -659,7 +659,7 @@ class BDDPanel
     extends JPanel
 {
     private PreferencesDialog theDialog = null;
-    private JCheckBox showGrow, alterPCG, debugOn,  traceOn;
+    private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
     private JComboBox algorithmFamily, countAlgorithm;
     
     public BDDPanel(PreferencesDialog theDialog)
@@ -678,6 +678,9 @@ class BDDPanel
 	p.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
 	p.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	p.add( debugOn = new JCheckBox("Debug mode", Options.debug_on) );
+	p.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
+	p.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
+
 	
 	JPanel pFamily = new JPanel( /* new FlowLayout(FlowLayout.CENTER) */);
 	p.add(pFamily);
@@ -711,6 +714,8 @@ class BDDPanel
 	Options.count_algo      = countAlgorithm.getSelectedIndex();
 	Options.show_grow       = showGrow.isSelected();
 	Options.user_alters_PCG = alterPCG.isSelected();
+	Options.uc_optimistic   = ucOptimistic.isSelected();
+	Options.nb_optimistic   = nbOptimistic.isSelected();
 	Options.trace_on        = traceOn.isSelected();
 	Options.debug_on        = debugOn.isSelected();
 	

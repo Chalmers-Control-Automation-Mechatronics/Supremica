@@ -130,6 +130,8 @@ public final class SupremicaProperties
     private static final String BDD_DEBUG_ON  = "bddDebugOn";
     private static final String BDD_ALGORITHM = "bddAlgorithm";
     private static final String BDD_COUNT_ALGO= "bddCountAlgorithm";
+    private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
+    private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
 
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
@@ -219,8 +221,10 @@ public final class SupremicaProperties
 		setProperty(BDD_ALTER_PCG , toString(Options.user_alters_PCG), true);
 		setProperty(BDD_TRACE_ON  , toString(Options.trace_on), true);
 		setProperty(BDD_DEBUG_ON  , toString(Options.debug_on), true);
+		setProperty(BDD_UC_OPTIMISTIC, toString(Options.uc_optimistic), true);
+		setProperty(BDD_NB_OPTIMISTIC, toString(Options.nb_optimistic), true);
 		setProperty(BDD_ALGORITHM , toString(Options.algo_family), true);
-		setProperty(BDD_COUNT_ALGO, toString(Options.count_algo), true);
+		setProperty(BDD_COUNT_ALGO, toString(Options.count_algo), true);		
 	}
 
 
@@ -794,6 +798,13 @@ public final class SupremicaProperties
 	public static boolean getBDDDebugOn(){  return toBoolean(wp.getProperty(BDD_DEBUG_ON));    }
     	public static void setBDDDebugOn(boolean a){  wp.setProperty(BDD_DEBUG_ON, toString(a));    }
 
+
+	public static boolean isBDDUCOptimistic(){  return toBoolean(wp.getProperty(BDD_UC_OPTIMISTIC));    }
+    	public static void setBDDUCOptimistic(boolean a){  wp.setProperty(BDD_UC_OPTIMISTIC, toString(a));    }
+
+	public static boolean isBDDNBOptimistic(){  return toBoolean(wp.getProperty(BDD_NB_OPTIMISTIC));    }
+    	public static void setBDDNBOptimistic(boolean a){  wp.setProperty(BDD_NB_OPTIMISTIC, toString(a));    }
+
     /*
      * The problem is that we got to copies of BDD Options.
      * This will make sure they are both updated
@@ -805,6 +816,8 @@ public final class SupremicaProperties
 	    setBDDShowGrow(Options.show_grow);
 	    setBDDAlterPCG(Options.user_alters_PCG);
 	    setBDDDebugOn(Options.debug_on);
+	    setBDDUCOptimistic(Options.uc_optimistic);
+	    setBDDNBOptimistic(Options.nb_optimistic);
 	    setBDDTraceOn(Options.trace_on);
 	    setBDDCountAlgorithm(Options.count_algo);
 	} else {
@@ -812,6 +825,8 @@ public final class SupremicaProperties
 	    Options.algo_family     = getBDDAlgorithm();
 	    Options.show_grow       = getBDDShowGrow();
 	    Options.user_alters_PCG = getBDDAlterPCG();
+	    Options.uc_optimistic   = isBDDUCOptimistic();
+	    Options.nb_optimistic   = isBDDNBOptimistic();
 	    Options.debug_on        = getBDDDebugOn();
 	    Options.trace_on        = getBDDTraceOn();
 	    Options.count_algo      = getBDDCountAlgorithm();

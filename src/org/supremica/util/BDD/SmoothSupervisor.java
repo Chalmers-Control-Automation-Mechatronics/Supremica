@@ -152,34 +152,4 @@ public class SmoothSupervisor extends DisjSupervisor {
 
     }
 
-
-
-    // -------------------------------------------------------------
-    protected void computeUncontrollables() {
-	timer.reset();
-
-	int t_sp = spec.getT();
-	int t_p  = plant.getT();
-	int cubep_sp = spec.getCubep();
-	int cubep_p = plant.getCubep();
-	int sigma_u = manager.getSigmaU();
-	int sigma_cube = manager.getEventCube();
-
-	int tmp10 = manager.relProd(t_sp, sigma_u, cubep_sp);
-	int tmp1  = manager.not(tmp10);
-	manager.deref(tmp10);
-
-	int tmp2  = manager.and(tmp1, sigma_u);
-	manager.deref(tmp1);
-
-	int cube2 = manager.and(sigma_cube, cubep_p);
-
-	int tmp4 = manager.relProd(t_p, tmp2, cube2);
-	manager.deref(tmp2); manager.deref(cube2);
-
-	has_uncontrollables = true;
-	bdd_uncontrollables = tmp4;
-	timer.report("Uncontrollable states found");
-
-    }
 }

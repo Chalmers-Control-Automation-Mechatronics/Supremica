@@ -279,20 +279,48 @@ public class Supervisor
 
 		timer.report("Forward reachables found");
 
-		/*
-		 * GrowFrame gf = null;
-		 * if(Options.show_grow) gf = new GrowFrame("Forward reachability");
-		 *
-		 * timer.reset();
-		 * int i_all = manager.and(plant.getI(), spec.getI());
-		 *
-		 * bdd_reachables = getReachables(i_all, gf);
-		 * has_reachables = true;
-		 * manager.deref(i_all);
-		 * timer.report("Forward reachables found");
-		 */
+
 	}
 
+    // ----------------------------------------------------
+
+    /** 
+     * Used for verification: returns unknown amount of unreachables that are controllable
+     * returns 0 only if there are no such states.
+     * Use this function to VERIFY, not SYNTHESIS anything that has to do 
+     * with uncontrollable states
+     * NOTE: returned value must be de-refed by user
+     */
+    public int getSomeReachableUncontrollables()
+    {
+	// since its pre-computed, lets use this one
+	if (has_reachable_uncontrollables)
+	    {
+		manager.ref(bdd_reachable_uncontrollables);
+		return bdd_reachable_uncontrollables;
+	    }
+
+	// If we are optimistic (we dont expect any reachable uncontrollables, its 
+	// probably better to go for the complete search (which gurantees controllablilty)
+	// then do iterative tests
+
+	if(Options.uc_optimistic) {
+	    int u_all = getReachableUncontrollables();
+	    manager.ref(u_all); // add extra ref, since user has to deref this later
+	    return u_all;
+	} else {
+	    // note: dont use timer here (get reseted in two places below)
+	    int u_some = getUncontrollableStates();
+	    return getReachableSubset(u_some); // need no extra ref (not shared)
+	}
+	
+    }
+
+    // -----------------------------------------------------------
+    /**
+     * Computes ALL uncotrollable states that are reachable.
+     * This implies finding all uncontrollable states and all reachables states (full FR).
+     */
 	public int getReachableUncontrollables()
 	{
 		if (!has_reachable_uncontrollables)
@@ -325,34 +353,6 @@ public class Supervisor
 		return bdd_coreachables;
 	}
 
-    /*
-      // DONT KNOW IF THESE ARE NEEDED
-    protected int getTotalT() {
-	int ret = 0;
-	if(plant.isEmpty()) {
-	    ret = spec.getT();
-	    manager.ref(ret);
-	} else if(spec.isEmpty()) {
-	    ret = plant.getT();
-	    manager.ref(ret);
-	} else {
-	    ret = manager.and(spec.getT(), plant.getT());
-	}
-	return ret;
-    }
-
-    protected int getTotalTNoEvents() {
-	int ret = 0;
-	if(plant.isEmpty()) 
-	    ret = manager.exists(spec.getT(),  manager.getEventCube());
-	else if(spec.isEmpty()) 
-	    ret = manager.exists(plant.getT(),  manager.getEventCube());
-	else 
-	    ret = manager.relProd(spec.getT(), plant.getT(), manager.getEventCube() );
-
-	return ret;
-    }
-    */
 	protected void computeCoReachables()
 	{
 		GrowFrame gf = null;;
@@ -415,6 +415,86 @@ public class Supervisor
 		}
 	}
 
+    // ------------------------------------------------------------------------
+    /**
+     * having a set x, subset of Q, we compute x intersection Q_reachable.
+     * If Q_reachable is not chaced, we compute reachability in out own way
+     */ 
+    public int getReachableSubset(int set)
+    {    // if already caches, use it
+	if (has_reachables)
+	    {
+		return manager.and(set, bdd_reachables);
+	    }
+
+	return computeReachableSubset(set);
+    }
+    
+    protected int computeReachableSubset(int set) {
+	GrowFrame gf = null;
+	
+	if (Options.show_grow)
+	    {
+		gf = new GrowFrame("Forward reachability with constriant");
+	    }
+	
+	timer.reset();
+	
+	int cube = manager.getStateCube();
+	int permute = manager.getPermuteSp2S();
+	int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+	int i_all = manager.and(plant.getI(), spec.getI());
+	int r_all_p, r_all = i_all;
+	
+	manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
+	
+	do {
+	    r_all_p = r_all;
+	    
+	    int tmp = manager.relProd(t_all, r_all, cube);
+	    int tmp2 = manager.replace(tmp, permute);
+	    manager.deref(tmp);
+	    
+	    
+	    int intersection = manager.and(set, tmp2);
+	    if(intersection != manager.getZero()) {
+
+		// clean up
+		manager.deref(r_all);
+		manager.deref(t_all);
+		manager.deref(i_all);
+		manager.deref(tmp2);
+		timer.report("Forward reachablility with constraint");
+		return intersection;
+	    }
+
+	    r_all = manager.orTo(r_all, tmp2);
+	    manager.deref(tmp2);
+	    
+	    if (gf != null)
+		{
+		    gf.add(manager.nodeCount(r_all));
+		}
+	}
+	while (r_all_p != r_all);
+
+	timer.report("Forward reachablility with constraint [none found]");
+
+	// clean up
+	manager.deref(i_all);
+	manager.deref(t_all);
+
+	// since we got reachables anyway, lets save it		
+	has_reachables = true;
+	bdd_reachables = r_all;
+
+	// nothing to report, return 0
+	int ret = manager.getZero();
+	manager.ref(ret);
+	return ret;
+    }
+
+    // -----------------------------------------------------------------------
 	public void trace_set(String what, int bdd, int max)
 	{
 		if (bdd == manager.getZero())

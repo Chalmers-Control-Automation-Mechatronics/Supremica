@@ -118,7 +118,7 @@ public class AutomataBDDVerifier {
 	    is_nonblocking = false;
 	    if(Options.trace_on) {
 	    // show one trace to a blocking state
-		sup.trace_set("non-blocking",intersection, 1);
+		sup.trace_set("blocking",intersection, 1);
 	    }
 	}
 
@@ -135,18 +135,9 @@ public class AutomataBDDVerifier {
      * @return TRUE if the system is controllable
      */
     public boolean isControllable() {
-	int Q_u = sup.getReachableUncontrollables();
-	// Q_u = ba.removeDontCareS(Q_u);
-
-
-
-	// get statistics
-	int Q_c = sup.getUncontrollableStates();
-	int Q_r = sup.getReachables();
-
-	hd.setNumberOfForbiddenStates(ba.count_states(Q_u));
-	hd.setNumberOfCheckedStates(ba.count_states(Q_c));
-	hd.setNumberOfReachableStates(ba.count_states(Q_r));
+	int Q_u = sup.getSomeReachableUncontrollables();
+	// int Q_u = sup.getReachableUncontrollables();
+	// hd.setNumberOfForbiddenStates(ba.count_states(Q_u));
 
 	boolean is_controllable = ba.getZero() == Q_u;
 	if(!is_controllable) {	  	    
@@ -159,9 +150,7 @@ public class AutomataBDDVerifier {
 	    }
 	}
 
-	
-
-	
+	ba.deref(Q_u); // we own this BDD
 	return is_controllable;
 
     }

@@ -23,6 +23,9 @@ public class Options
     public static boolean user_alters_PCG = false;
     public static boolean show_grow = false;
     public static boolean trace_on = false;
+    public static boolean uc_optimistic = true;
+    public static boolean nb_optimistic = true;
+
     public static int algo_family = ALGO_SMOOTHED;
     public static int count_algo  = COUNT_TREE;
 }
