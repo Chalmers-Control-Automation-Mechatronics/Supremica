@@ -94,25 +94,54 @@ public class WorksetSupervisor extends DisjSupervisor
 	}
 
 
-    protected void computeReachables() {
+	// ------------------------------------------------------------------------------------------------------
+
+
+
+
+
+	// TODO: creating these two would require major changes to the workset algorithm :(
+	// public int getReachables(boolean [] events)
+	// public int getReachables(boolean [] events, int intial_states)
+
+
+	/**
+	 * do a FORWARD reachability search.
+	 * start from the given (set of) initial state(s)
+	 */
+	public int getReachables(int initial_states) {
+		return internal_computeReachablesWorkset(initial_states);
+	}
+
+	/**
+	 * do a FORWARD reachability search fro mthe initial state
+	 */
+    protected void computeReachables()
+    {
+		int i_all = manager.and(plant.getI(), spec.getI());
+		int ret = internal_computeReachablesWorkset(i_all);
+		manager.deref(i_all);
+		has_reachables = true;
+		bdd_reachables = ret;
+	}
+
+	private int internal_computeReachablesWorkset(int bdd_i) {
 
 		// statistic stuffs
-		GrowFrame gf = null;
-		if(Options.show_grow) gf = new GrowFrame("Forward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+		GrowFrame gf = BDDGrow.getGrowFrame(manager,
+			"Forward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+
 		timer.reset();
-
-		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
-
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
-
 
 		Workset workset = getWorkset(false);
 
+
 		int cube = manager.getStateCube();
 		int permute = manager.getPermuteSp2S();
-		int i_all   = manager.and(plant.getI(), spec.getI());
-		int r_all_p, r_all = i_all;
 
+		int r_all_p, r_all = bdd_i;
+		manager.ref(r_all);
 
 		while(!workset.empty()) {
 			int p = workset.pickOne();
@@ -126,35 +155,31 @@ public class WorksetSupervisor extends DisjSupervisor
 				r_all = manager.orTo(r_all, tmp2);
 				manager.deref(tmp2);
 
-				if (gf != null)	gf.add(manager.nodeCount(r_all));
+				if (gf != null)	gf.add( r_all );
 			} while(r_all_p != r_all);
 
 			workset.advance(p, r_all != r_all_org);
 		}
 
-		manager.deref(i_all);
-		has_reachables = true;
-		bdd_reachables = r_all;
 
 		if(gf != null) gf.stopTimer();
-		SizeWatch.report(bdd_reachables, "Qr");
+
 		timer.report("Forward reachables found (workset)");
+
+		return r_all;
+
 	}
 
+	// ---------------------------------------------------------------------------------------
 
    protected void computeCoReachables() {
 
 		// statistic stuffs
-		GrowFrame gf = null;
-		if(Options.show_grow) gf = new GrowFrame("Backward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+		GrowFrame gf = BDDGrow.getGrowFrame(manager,
+			"Backward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
 		timer.reset();
 
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
-
-		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
-		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
-
-
 		Workset workset = getWorkset(false);
 
 		int cube = manager.getStatepCube();
@@ -178,7 +203,7 @@ public class WorksetSupervisor extends DisjSupervisor
 				r_all = manager.orTo(r_all, tmp2);
 				manager.deref(tmp2);
 
-				if (gf != null)	gf.add(manager.nodeCount(r_all));
+				if (gf != null)	gf.add( r_all );
 			} while(r_all_p != r_all);
 
 

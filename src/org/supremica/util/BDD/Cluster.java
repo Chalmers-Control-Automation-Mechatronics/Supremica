@@ -108,6 +108,12 @@ public class Cluster {
 
 	public String toString()
 	{
+		if(members.size() == 1) {
+			BDDAutomaton a = (BDDAutomaton) members.firstElement();
+			return a.getName();
+		}
+
+
 		StringBuffer buf = new StringBuffer();
 		buf.append("(");
 		for (Enumeration e = members.elements(); e.hasMoreElements(); )

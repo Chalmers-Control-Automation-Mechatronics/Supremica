@@ -10,8 +10,8 @@ public class Options
 	 * monolithic supervisor -- see SupervisorFactory.createNonDisjSupervisor()
 	 */
 	public static final int
-		MAX_MONOLITHIC_GROUP_SIZE = 12,
-		MAX_MONOLITHIC_TOTAL_SIZE = 18
+		MAX_MONOLITHIC_GROUP_SIZE = 4,
+		MAX_MONOLITHIC_TOTAL_SIZE = 6
 		;
 
     /** search algorithm */
@@ -61,7 +61,8 @@ public class Options
 		AS_HEURISTIC_MOST_COMMON_UC_ARCS = 5,
 		AS_HEURISTIC_MOST_COMMON_EVENTS = 6,
 		AS_HEURISTIC_MOST_COMMON_ARCS = 7,
-		AS_HEURISTIC_MOST_LOCAL = 8
+		AS_HEURISTIC_MOST_LOCAL = 8,
+		AS_HEURISTIC_HYBRID = 9
 		;
 
 
@@ -82,6 +83,18 @@ public class Options
 	;
 
 
+	/** BDD grow graf */
+	public static final int
+		SHOW_GROW_NONE = 0,
+
+		SHOW_GROW_NODES = 1,
+		SHOW_GROW_NODES_LOG = 2,
+		SHOW_GROW_NODES_DIFF = 3,
+
+		SHOW_GROW_SATCOUNT = 4,
+		SHOW_GROW_SATCOUNT_LOG = 5,
+		SHOW_GROW_SATCOUNT_DIFF = 6;
+
     // constants
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
     private static final int DEFAULT_MAX_PARTITION_SIZE = 3000; // max nodes/partition
@@ -89,7 +102,7 @@ public class Options
 
 
     // options
-	public static boolean developer_mode = false;
+	public static boolean developer_mode = true;
     public static final boolean use_cudd = false;
     public static boolean fill_statevars = false;
     public static boolean profile_on = false; // misc profiling stuff
@@ -97,13 +110,13 @@ public class Options
     public static boolean size_watch = false; // BDD sizewatch
     public static boolean sanity_check_on = false;
     public static boolean user_alters_PCG = false;
-    public static boolean show_grow = false;
     public static boolean show_encoding = false; // dump variable encoding, not workin very good :(
     public static boolean trace_on = false;
     public static boolean local_saturation = false;
     public static boolean uc_optimistic = true;
     public static boolean nb_optimistic = true;
 
+	public static int show_grow = SHOW_GROW_NONE; /** type of the BDD graph shown by GrowFrame */
 
 
     // algorithms
@@ -112,7 +125,7 @@ public class Options
     public static int count_algo  = COUNT_TREE; /** state counting, nothing important ... */
 
     // heurisitcs
-	public static int as_heuristics  = AS_HEURISTIC_MOST_LOCAL;
+	public static int as_heuristics  = AS_HEURISTIC_HYBRID;
 	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
 	public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
 

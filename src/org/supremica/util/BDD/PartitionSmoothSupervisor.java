@@ -27,9 +27,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
     // --------------------------------------------------------
     protected void computeReachables() {
 		// statistic stuffs
-		GrowFrame gf = null;
-		if(Options.show_grow)
-			gf = new GrowFrame("Forward reachability (PartitionSmooth)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (PartitionSmooth)");
 
 		timer.reset();
 		SizeWatch.setOwner("PartitionSmoothSupervisor.computeReachables");
@@ -63,7 +61,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 				j = (j + 1) % size;
 			} else i = 0;
 
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
+			if(gf != null)    gf.add( r_all );
 
 		} while( i < size);
 
@@ -79,8 +77,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 
 
     protected void computeCoReachables() {
-		GrowFrame gf = null;;
-		if(Options.show_grow) gf = new GrowFrame("backward reachability (PartitionSmooth)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (PartitionSmooth)");
 
 		timer.reset();
 		SizeWatch.setOwner("PartitionSmoothSupervisor.computecoReachables");
@@ -119,7 +116,7 @@ public class PartitionSmoothSupervisor extends DisjSupervisor {
 				j = (j + 1) % size;
 			} else i = 0;
 
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
+			if(gf != null)    gf.add( r_all );
 
 		} while( i < size);
 

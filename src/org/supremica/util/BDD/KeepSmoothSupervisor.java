@@ -27,8 +27,7 @@ public class KeepSmoothSupervisor extends DisjSupervisor
     protected void computeReachables() {
 
 		// statistic stuffs
-		GrowFrame gf = null;
-		if(Options.show_grow) gf = new GrowFrame("Forward reachability (keep smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (keep smoothed)");
 		timer.reset();
 		SizeWatch.setOwner("KeepSmoothSupervisor.computeReachables");
 
@@ -46,7 +45,7 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 				r_all = manager.orTo(r_all, tmp);
 				manager.deref(tmp);
 
-				if(gf != null)    gf.add( manager.nodeCount( r_all));
+				if(gf != null)    gf.add( r_all);
 			} while(r_all_p != r_all);
 		} while(psp.step());
 
@@ -64,8 +63,7 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 
 
 	protected void computeCoReachables() {
-		GrowFrame gf = null;
-		if(Options.show_grow) gf = new GrowFrame("backward reachability (keep smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (keep smoothed)");
 
 		timer.reset();
 		SizeWatch.setOwner("KeepSmoothSupervisor.computeCoReachables");
@@ -88,7 +86,7 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 				r_all = manager.orTo(r_all, tmp  );
 				manager.deref(tmp );
 
-				if(gf != null)    gf.add( manager.nodeCount( r_all));
+				if(gf != null)    gf.add( r_all);
 			} while(r_all_p != r_all);
 		} while(psp.step());
 

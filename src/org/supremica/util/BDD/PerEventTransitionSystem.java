@@ -60,7 +60,7 @@ public class PerEventTransitionSystem {
 			manager.deref(tmp2);
 			r_all = manager.orTo(r_all, front);
 
-			if(gf != null) gf.add(manager.nodeCount(r_all));
+			if(gf != null) gf.add( r_all);
 
 		} while (r_all_p != r_all);
 

@@ -888,8 +888,8 @@ public final class SupremicaProperties
     	public static int getBDDCountAlgorithm(){  return toInt(wp.getProperty(BDD_COUNT_ALGO));    }
     	public static void setBDDCountAlgorithm(int a){  wp.setProperty(BDD_COUNT_ALGO, toString(a));    }
 
-	public static boolean getBDDShowGrow(){  return toBoolean(wp.getProperty(BDD_SHOW_GROW));    }
-    	public static void setBDDShowGrow(boolean a){  wp.setProperty(BDD_SHOW_GROW, toString(a));    }
+	public static int getBDDShowGrow(){  return toInt(wp.getProperty(BDD_SHOW_GROW));    }
+    public static void setBDDShowGrow(int a){  wp.setProperty(BDD_SHOW_GROW, toString(a));    }
 
 	public static boolean getBDDAlterPCG(){  return toBoolean(wp.getProperty(BDD_ALTER_PCG));    }
     	public static void setBDDAlterPCG(boolean a){  wp.setProperty(BDD_ALTER_PCG, toString(a));    }

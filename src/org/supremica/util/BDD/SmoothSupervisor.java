@@ -29,9 +29,7 @@ public class SmoothSupervisor extends DisjSupervisor {
     // ------------------------------------------------------------------------
     protected void computeReachables() {
 		// statistic stuffs
-		GrowFrame gf = null;
-		if(Options.show_grow)
-			gf = new GrowFrame("Forward reachability (smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (smoothed)");
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -95,6 +93,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 			if(remaining[a]) {
 				remaining[a] = false;
 				dp.add(clusters[a].twave);
+				if(gf != null) gf.mark( clusters[a].toString() );
 				// Options.out.println("Forward-Adding: " + clusters[a].toString() ); // DEBUG
 			}
 			int r_all_pp, front_s, front_sp;
@@ -104,7 +103,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 			int front = dp.image(r_all);
 			r_all = manager.orTo(r_all, front);
 			manager.deref(front);
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
+			if(gf != null)    gf.add( r_all );
 
 			} while(r_all != r_all_pp);
 		}
@@ -126,8 +125,7 @@ public class SmoothSupervisor extends DisjSupervisor {
     // -------------------------------------------------------------------------------
 
     protected void computeCoReachables() {
-		GrowFrame gf = null;;
-		if(Options.show_grow) gf = new GrowFrame("backward reachability (smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (smoothed)");
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -166,6 +164,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 			if(remaining[a]) {
 				remaining[a] = false;
 				dp.add(clusters[a].twave);
+				if(gf != null) gf.mark( clusters[a].toString() );
 				// Options.out.println("Backward-Adding: " + clusters[a].toString() ); // DEBUG
 			}
 			int r_all_pp, front_s, front_sp;
@@ -175,7 +174,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 			int front = dp.preImage(r_all);
 			r_all = manager.orTo(r_all, front);
 			manager.deref(front);
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
+			if(gf != null)    gf.add(r_all);
 
 			} while(r_all != r_all_pp);
 		}

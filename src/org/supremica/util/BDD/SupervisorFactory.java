@@ -66,9 +66,10 @@ public class SupervisorFactory {
 
 
 	/**
-	 * get a non-disjunctive algorithm, choose one based on the size of the system
+	 * currently, the smoothing algorithm does not work:
+	 * choose another one based on the size of the system
 	 */
-   public static Supervisor createNonDisjSupervisor(BDDAutomata manager, Group plant, Group spec)
+   public static Supervisor suggestSupervisorForModularReachability(BDDAutomata manager, Group plant, Group spec)
    	throws Exception
    {
 		int s1 = plant.getSize();
@@ -77,7 +78,9 @@ public class SupervisorFactory {
 		if(s1 > Options.MAX_MONOLITHIC_GROUP_SIZE || s1 > Options.MAX_MONOLITHIC_GROUP_SIZE
 			|| (s1 + s2) > Options.MAX_MONOLITHIC_TOTAL_SIZE) {
 			// return new ConjSupervisor(manager,plant, spec);
-			return new PetriNetSupervisor(manager,plant, spec);
+			// return new PetriNetSupervisor(manager,plant, spec);
+			// System.out.println("\n\n\n----------------- SWITHICHNG\n\n\n\n");
+			return new WorksetSupervisor(manager,plant, spec);
 		} else {
 			return new Supervisor(manager, plant,spec);
 		}

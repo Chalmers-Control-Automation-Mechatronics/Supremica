@@ -199,11 +199,9 @@ public class PetriNetSupervisor
 		// start with all events
 		for(int i = 0; i < size; i++) workset[i] = 1;
 
-		GrowFrame gf = null;
-		if (Options.show_grow)
-		{
-			gf = new GrowFrame("[PetriNetSupervisor] forward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
-		}
+		GrowFrame gf = BDDGrow.getGrowFrame(manager,
+			"[PetriNetSupervisor] forward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+
 
 		 int cube_s = manager.getStateCube();
 		int sp2s = manager.getPermuteSp2S();
@@ -227,7 +225,7 @@ public class PetriNetSupervisor
 			}
 			workset[i] = 0; // we are done with ourselfs
 
-			if(gf != null) gf.add(manager.nodeCount(r_all));
+			if(gf != null) gf.add( r_all );
 		}
 
 
@@ -252,11 +250,9 @@ public class PetriNetSupervisor
 	{
 		for(int i = 0; i < size; i++) workset[i] = 1; 	// start with all events
 
-		GrowFrame gf = null;
-		if (Options.show_grow)
-		{
-			gf = new GrowFrame("[PetriNetSupervisor] backward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
-		}
+		GrowFrame gf = BDDGrow.getGrowFrame(manager,
+			"[PetriNetSupervisor] backward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+
 
 		int cube_sp = manager.getStatepCube();
 
@@ -281,7 +277,7 @@ public class PetriNetSupervisor
 				for(int j = 0; j < size; j++) workset[j] += next[j];
 			}
 			workset[i] = 0; // we are done with ourselves
-			if(gf != null) gf.add(manager.nodeCount(r_all));
+			if(gf != null) gf.add( r_all );
 		}
 
 		int ret = manager.replace(r_all,permute2);

@@ -45,6 +45,15 @@ public class Util
 		return ret;
 	}
 
+	/** shuffle/permutate a list of integers */
+	public static void permutate(int [] list, int size) {
+		for(int i = 0; i < size; i++) {
+			int next = (int)(Math.random() * size);
+			int tmp = list[i];
+			list[i] = list[next];
+			list[next] = tmp;
+		}
+	}
 
 	// -------------------------------------------------
 

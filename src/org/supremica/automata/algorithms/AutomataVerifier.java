@@ -262,7 +262,7 @@ public class AutomataVerifier
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 			    {
-					return BDDControllabilityVerification();
+					return BDDControllabilityVerification(theAutomata);
 			    }
 				else
 				{
@@ -966,7 +966,7 @@ public class AutomataVerifier
 	 *
 	 *@param  leftAlphabet the alphabet to compare.
 	 *@param  rightAlphabet the alphabet to compare to.
-	 *@return  double representing how similar the two alphabets are. Returns quota between common 
+	 *@return  double representing how similar the two alphabets are. Returns quota between common
 	 * events in the alphabets and unique events in rightAlphabet.
 	 */
 	private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
@@ -1332,7 +1332,7 @@ public class AutomataVerifier
 	 *@return  true if the system is controllable
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
-    private boolean BDDControllabilityVerification()
+    private boolean BDDControllabilityVerification(Automata theAutomata)
 		throws Exception
     {
 

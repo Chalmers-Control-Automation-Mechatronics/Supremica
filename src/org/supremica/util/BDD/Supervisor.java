@@ -181,6 +181,7 @@ public class Supervisor
 	 * compute language difference of plant and spec considreing only the given events.
 	 * returns a BDD as a counter example. retunrs < states> if remove_events is trues
 	 * otherwise returns <states, events> instead...
+	 *
 	 */
 
     protected int computeLanguageDifference(int considred_events, boolean remove_events)
@@ -206,12 +207,6 @@ public class Supervisor
 	manager.deref(tmp1);
 
 	SizeWatch.report(tmp2, "~Eq'sp. Tsp ^ (sigma in some Sigma)");
-
-
-
-	// this is a _DIRTY_ trick to remove added self-loops (false)contribution!
-	// this is needed when doing modular computation, i.e. when plant + spec < all automata
-	tmp2 = manager.andTo(tmp2, plant.getSigma());
 
 	int tmp4;
 	if(remove_events) {
@@ -284,6 +279,7 @@ public class Supervisor
 		if(ld == manager.getZero()) {
 			// nothing there, so we dont need the intersection with reachables
 			// to get the reachable difference
+			Options.out.println("Language diff is empty!");
 			return ld;
 		}
 
@@ -364,12 +360,8 @@ public class Supervisor
 	 */
 	protected int internal_computeReachables(int t_all, int i_all) {
 	// Note: we remove events from t_all, it is needed for forward reachability
-		GrowFrame gf = null;
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability");
 
-		if (Options.show_grow)
-		{
-			gf = new GrowFrame("Forward reachability");
-		}
 
 		timer.reset();
 		SizeWatch.setOwner("Supervisor.computeReachables");
@@ -399,7 +391,7 @@ public class Supervisor
 
 			if (gf != null)
 			{
-				gf.add(manager.nodeCount(r_all));
+				gf.add( r_all );
 			}
 		}
 		while (r_all_p != r_all);
@@ -492,12 +484,8 @@ public class Supervisor
 
 	protected void computeCoReachables()
 	{
-		GrowFrame gf = null;;
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability");
 
-		if (Options.show_grow)
-		{
-			gf = new GrowFrame("backward reachability");
-		}
 
 		timer.reset();
 
@@ -532,7 +520,7 @@ public class Supervisor
 
 			if (gf != null)
 			{
-				gf.add(manager.nodeCount(r_all));
+				gf.add( r_all );
 			}
 		}
 		while (r_all_p != r_all);
@@ -573,12 +561,8 @@ public class Supervisor
     }
 
     protected int computeReachableSubset(int set) {
-	GrowFrame gf = null;
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability with constriant");
 
-	if (Options.show_grow)
-	    {
-		gf = new GrowFrame("Forward reachability with constriant");
-	    }
 
 	timer.reset();
 
@@ -623,7 +607,7 @@ public class Supervisor
 
 	    if (gf != null)
 		{
-		    gf.add(manager.nodeCount(r_all));
+		    gf.add( r_all );
 		}
 	}
 	while (r_all_p != r_all);
@@ -1017,14 +1001,10 @@ public class Supervisor
 	{
 
 		// note: dont use timer here (get reseted by getReachable)
+		// TEMPORARY OFF:
+		// GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
 		GrowFrame gf = null;
 
-/* TEMPORARY OFF:
-		if (Options.show_grow)
-		{
-			gf = new GrowFrame("Safe states: nodeCount(X)");
-		}
-*/
 		int xp, x = getReachableUncontrollables();
 		int marked = GroupHelper.getM(manager,spec, plant);
 
@@ -1056,7 +1036,7 @@ public class Supervisor
 
 			if (gf != null)
 			{
-				gf.add(manager.nodeCount(x));
+				gf.add( x );
 			}
 		}
 		while (x != xp);

@@ -10,9 +10,10 @@ import org.supremica.util.BDD.*;
 
 public class AutomataBDDVerifier {
     private AutomataSynchronizerHelper.HelperData hd;
-    private  org.supremica.automata.Automata theAutomata;
+    private org.supremica.automata.Automata theAutomata;
     private BDDAutomata ba = null;
     private Supervisor sup = null;
+
 
     /**
      * creates a verification object
@@ -83,6 +84,13 @@ public class AutomataBDDVerifier {
     }
 
 
+	// ------------------------------------------------------------------------------------
+	/** allow access to some stuff we really shouldnt access :) */
+	public Supervisor  getSupervisor() { return sup; }
+	public BDDAutomata  getBDDAutomata() { return ba; }
+	public org.supremica.automata.Automata  getAutomata() { return theAutomata; }
+
+	// -------------------------------------------------------------------------------
 
     /**
      *  BDD liveness check
@@ -93,22 +101,21 @@ public class AutomataBDDVerifier {
 		boolean is_nonblocking = true;
 
 		int r = sup.getReachables();
-		hd.setNumberOfReachableStates(ba.count_states(r));
+		if(hd != null)
+		{
+			hd.setNumberOfReachableStates(ba.count_states(r));
+		}
 
 		int c = sup.getCoReachables();
 
 		int not_c = ba.not(c);
 		int intersection = ba.and(r, not_c);
 
-		hd.setNumberOfDeadlockedStates(ba.count_states(not_c));
-		hd. setNumberOfCheckedStates(ba.count_states(intersection));
-
-		// DEBUG
-		// System.out.println("Reachables:" );
-		// ba.show_states(r);
-
-		// System.out.println("Co-Reachables:");
-		// ba.show_states(c);
+		if(hd != null)
+		{
+			hd.setNumberOfDeadlockedStates(ba.count_states(not_c));
+			hd. setNumberOfCheckedStates(ba.count_states(intersection));
+		}
 
 		if(intersection != ba.getZero()) {
 			is_nonblocking = false;
@@ -165,8 +172,11 @@ public class AutomataBDDVerifier {
 		// get statistics
 
 		int Q_r = sup.getReachables();
-		hd.setNumberOfCheckedStates(ba.count_states(states));
-		hd.setNumberOfReachableStates(ba.count_states(Q_r));
+		if(hd != null)
+		{
+			hd.setNumberOfCheckedStates(ba.count_states(states));
+			hd.setNumberOfReachableStates(ba.count_states(Q_r));
+		}
 
 		if(!ret && Options.trace_on)
 			sup.trace_set("Language Inclusion counterexample", states, 1);
@@ -176,5 +186,8 @@ public class AutomataBDDVerifier {
 		return ret;
 
     }
+
+
+
 
 }

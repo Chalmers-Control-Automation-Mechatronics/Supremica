@@ -17,11 +17,13 @@ public class GrowFrame
 	private TextArea ta;
 	private boolean showGraph;
 	private boolean stopped;
+	private Marker marker_root, marker_last;
+	private String title;
 
-
-	public GrowFrame(String txt)
+	protected GrowFrame(String txt)
 	{
 		super(txt);
+		title = txt;
 
 		this.showGraph = true;
 		this.vars = new IntArray();
@@ -51,8 +53,8 @@ public class GrowFrame
 		add( ta = new TextArea(20,60), BorderLayout.WEST);
 		ta.setVisible(false);
 
-		start_time = -1;
-		last_time = -1;
+		start_time = last_time = -1;
+		marker_root = marker_last = null;
 
 		pack();
 		setVisible(true);
@@ -110,8 +112,14 @@ public class GrowFrame
 		int size_x = vars.getSize();
 		StringBuffer sb = new StringBuffer();
 
+		// get header:
+		sb.append("% " + title + "\n\n");
+
+		// get X
 		sb.append("x=[1:" + size_x + "];\n");
 		sb.append("\n");
+
+		// get Y
 		sb.append("y=[");
 
 		for (int i = 0; i < size_x; i++)
@@ -121,6 +129,17 @@ public class GrowFrame
 			sb.append(vars.get(i));
 		}
 		sb.append("];\n");
+
+		// get markes (if any)
+		if(marker_root != null) {
+			Marker current = marker_root;
+			sb.append("\n\n% the markers are:\n");
+			while(current != null) {
+				sb.append("% at step " + current.position + ": " + current.text + "\n");
+				current = current.next;
+			}
+		}
+
 
 		ta.setText( sb.toString());
 
@@ -162,7 +181,26 @@ public class GrowFrame
 		}
 	}
 
+	// -[ marker stuff ]-------------------------------------------------------
+	/** inster a marker at the current position */
+	public void mark(String txt) {
+		Marker m = new Marker(txt);
 
+		if(marker_root == null) {
+			marker_root = marker_last = m;
+		} else {
+			marker_last.next = m;
+			marker_last = m;
+		}
+	}
+	private class Marker {
+		public int position;
+		public String text;
+		public Marker next;
+		public Marker(String txt) { text = txt; next = null; position = vars.getSize(); }
+	}
+
+	// -[ grow canwas ]-------------------------------------------------------
 	private class GrowCanvas
 		extends Canvas
 	{
@@ -198,8 +236,6 @@ public class GrowFrame
 			{
 				return;    // no values yet
 			}
-
-
 
 
 			if(stopped) {
@@ -241,6 +277,37 @@ public class GrowFrame
 			}
 
 			g.drawString("" + size_x + " points, max " + max + ", last:" + vars.get(size_x - 1), 10, 10);
+
+			// now draw the markers, if any:
+			if(marker_root != null) {
+				g.setColor( Color.blue);
+				Marker current = marker_root;
+				int mark_y = 20;
+				int mark_delta = Math.max(dims.height / 6, 40);
+
+				int halve = dims.width / 2;
+				FontMetrics fm = g.getFontMetrics();
+				while(current != null) {
+					int x = (current.position * dims.width) / size_x;
+					int y = dims.height + marg_y - (vars.get(current.position)  * dims.height) / size_y;
+
+
+
+					// render string, but make sure the text is visible
+					int w = fm.stringWidth(current.text);
+					int x2 = x;
+					if(x2  + w > dims.width) x2 -= w;
+					if(x2 < 0) x2 = 0;
+					g.drawString(current.text, x2 + 4, mark_y);
+
+					g.drawLine(x2, mark_y, x , y);
+
+
+					mark_y += mark_delta;
+					if(mark_y > dims.height) mark_y = 20;
+					current = current.next;
+				}
+			}
 		}
 	}
 }

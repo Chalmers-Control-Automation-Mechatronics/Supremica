@@ -48,6 +48,7 @@ public abstract class BaseBDDLanguageInclusion {
 	protected int [] current_event_usage; 	/** temporary storage for local events */
 	protected int [] event_usage_count; /** number of automata that use each event */
 	protected int local_events_found = 0; /** how many local events we had last time. to detect if any new has been added */
+	protected int bdd_local_events; /** bd for the local events */
 
     /**
      * creates a verification object for LANGUAGE INCLUSION test.
@@ -126,6 +127,7 @@ public abstract class BaseBDDLanguageInclusion {
     public void cleanup() {
 		if(Options.profile_on)	showStatistics();
 
+		if(bdd_local_events != -1) ba.deref(bdd_local_events);
 		if(work1 != null) work1.cleanup();
 		if(work2 != null) work2.cleanup();
 		if(L1 != null) L1.cleanup();
@@ -136,6 +138,8 @@ public abstract class BaseBDDLanguageInclusion {
 	// ----------------------------------------------------------------------------------
 	/** constructors common init code */
 	protected void init() {
+
+		bdd_local_events = -1;
 
 		// get our working sets
 		work1 = new Group(ba, all.length, "work1");
@@ -158,7 +162,11 @@ public abstract class BaseBDDLanguageInclusion {
 		changes = new boolean[considred_events.length]; // and one for the changes
 		workset_events = new boolean[considred_events.length]; // and one the current spec
 
-		init_local_event_detection();
+
+		local_events = new boolean[considred_events.length];
+		current_event_usage = new int[considred_events.length];
+		event_usage_count = new int[considred_events.length];
+
 	}
 
 	// --------------------------------------------------------------------------------------
@@ -182,8 +190,8 @@ public abstract class BaseBDDLanguageInclusion {
 	public boolean passLanguageInclusion() {
 
 		// temporary disable some stuff...
-		boolean save_show_grow = Options.show_grow;
-		Options.show_grow = false;
+		int save_show_grow = Options.show_grow;
+		Options.show_grow = Options.SHOW_GROW_NONE;
 
 
 		BDDAutomaton[] l1 = L1.getMembers();
@@ -195,6 +203,8 @@ public abstract class BaseBDDLanguageInclusion {
 		// only if [Sigma' - (SigmaL1 \cap SigmaL2)] is not empty we need to add from L1 too
 		// this is not the case if we are doing a language inclusion test!
 		AutomataConfiguration ac = new AutomataConfiguration (L1, L2, controllaibilty_test);
+
+		init_local_event_detection();
 
 		for(int i = 0; i < count; i++)
 		{
@@ -217,7 +227,6 @@ public abstract class BaseBDDLanguageInclusion {
 		}
 
 
-
 		// change back what we disabled:
 		Options.show_grow = save_show_grow;
 
@@ -228,9 +237,11 @@ public abstract class BaseBDDLanguageInclusion {
 
 	/** intiailize event-counting related stuff for detecting local events */
 	private void init_local_event_detection() {
-		local_events = new boolean[considred_events.length];
-		current_event_usage = new int[considred_events.length];
-		event_usage_count = new int[considred_events.length];
+		if(bdd_local_events != -1) ba.deref(bdd_local_events); // clean up previous rounds shit
+
+		bdd_local_events = ba.getOne();
+		ba.ref(bdd_local_events);
+
 
 		ba.getEventManager().getUsageCount(event_usage_count);
 		if(!controllaibilty_test) {
@@ -242,8 +253,8 @@ public abstract class BaseBDDLanguageInclusion {
 		local_events_found = 0;
 		int len = event_usage_count.length;
 		for(int i = 0; i < len; i++) if(event_usage_count[i] == 0) local_events_found++;
-
 	}
+
 
 	/** initialize the local-event detection algorithm, must be called first! */
 	protected void initialize_event_usage(BDDAutomaton sp) {
@@ -287,6 +298,7 @@ public abstract class BaseBDDLanguageInclusion {
 	 * check that by adding another automaton 'at', at least state in bdd_uc
 	 * is reachable by local-events _only_.
 	 */
+
 	protected boolean try_local_reachability(Supervisor sup, BDDAutomaton at, int bdd_uc) {
 		int local_events_current = register_automaton_addition(at);
 
@@ -299,18 +311,25 @@ public abstract class BaseBDDLanguageInclusion {
 			}
 			local_events_found  = local_events_current;
 
+			// update its BDD:
+			ba.deref(bdd_local_events);
+			bdd_local_events = ba.getAlphabetSubsetAsBDD(local_events);
+
 			// now check if that state is still reachable given only those events:
 			int local_r = sup.getReachables(local_events);
-			int tmp_bdd = ba.and(bdd_uc, local_r);
-			boolean not_exist = (tmp_bdd == ba.getZero());
-
+			int tmp1 = ba.and(bdd_uc, local_r);
 			ba.deref(local_r);
+
+			int tmp2 = ba.and(tmp1, bdd_local_events);
+			ba.deref(tmp1);
+
+			boolean not_exist = (tmp2 == ba.getZero());
 
 			if(not_exist) {
 				// ok, nothing to worry about, we will carry one. just clean up the mess
 				if(Options.debug_on)
 					Options.out.println("Could not prove reachability using local events, continuing...");
-				ba.deref(tmp_bdd);
+				ba.deref(tmp2);
 				return false;
 			} else {
 				// we have proved that the a bad state was reachable using LOCAL EVENTS!
@@ -322,9 +341,9 @@ public abstract class BaseBDDLanguageInclusion {
 				// XXX: looks like this gives an error.
 				// this is since when tracing back, show_trace will try _any_ way back to
 				// the initial state which may look wierd since we said we only look at local states
-				if(Options.trace_on) show_trace(sup, tmp_bdd);
+				if(Options.trace_on) show_trace(sup, tmp2);
 
-				ba.deref(tmp_bdd);
+				ba.deref(tmp2);
 
 				return true;
 			}
@@ -347,19 +366,33 @@ public abstract class BaseBDDLanguageInclusion {
 
 		int local_events_current = register_automaton_addition(at);
 
-		if(local_events_current > local_events_found ) {
+
+		if(local_events_current > local_events_found ) {		// new local events found ?
+
+			// update its BDD:
+			ba.deref(bdd_local_events);
+			bdd_local_events = ba.getAlphabetSubsetAsBDD(local_events);
+
 
 			if(Options.debug_on) {
 				Options.out.println("   LL " + (local_events_current - local_events_found) +
 				" new local events found.");
 				ba.getEventManager().dumpSubset("   LL Local events", local_events);
 			}
+
 			local_events_found  = local_events_current;
+
+
+			// make sure the transition itself is always P-enabled.
+			// this is done by taking does who cannot be blocked anymore
+			// [all relevant automata alread added --> event is local]
+			int bdd_uc_local = ba.and(bdd_uc, bdd_local_events);
 
 			// now check if that state is still reachable given only those events:
 			int local_r = sup.getReachables(local_events);
-			int tmp_bdd = ba.and(bdd_uc, local_r);
+			int tmp_bdd = ba.and(bdd_uc_local, local_r);
 			boolean not_exist = (tmp_bdd == ba.getZero());
+			ba.deref(bdd_uc_local);
 
 
 

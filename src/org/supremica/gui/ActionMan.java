@@ -3633,13 +3633,13 @@ public class ActionMan
 	// BDD developer stuff:
 
 	public static void DoBDDReachability() {
-		org.supremica.util.BDD.DeveloperTest.DoReachability(gui.getSelectedAutomata());
+		org.supremica.util.BDD.test.DeveloperTest.DoReachability(gui.getSelectedAutomata());
 	}
 	public static void DoBDDCoReachability() {
-		org.supremica.util.BDD.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
+		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
 	}
 	public static void DoBDDDeadlock() {
-		org.supremica.util.BDD.DeveloperTest.DoDeadlock(gui.getSelectedAutomata());
+		org.supremica.util.BDD.test.DeveloperTest.DoDeadlock(gui.getSelectedAutomata());
 	}
 }
 

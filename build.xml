@@ -516,6 +516,18 @@
 	</java>
 </target>
 
+
+<target name="bdd_tests" depends="compile_supremica,startfiles_supremica">
+	<java dir="dist" fork="yes" classname="org.supremica.util.BDD.test.TestAlgo" taskname="bdd_tests" failonerror="true">		
+		<classpath>	
+			<pathelement location="${build}" />
+			<pathelement location="${testsbuild}" />
+			<pathelement path="${lib}/${unjared}" />
+			<pathelement path="${java.class.path}" />
+		</classpath>	
+	</java>
+</target>
+
 <target name="doc_supremica">
 	<javadoc
 		sourcepath="${src}"

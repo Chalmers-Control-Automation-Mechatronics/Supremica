@@ -28,9 +28,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
     // ------------------------------------------------------------------------
     protected void computeReachables() {
 		// statistic stuffs
-		GrowFrame gf = null;
-		if(Options.show_grow)
-			gf = new GrowFrame("Forward reachability (smoothed+workset)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (smoothed+workset)");
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -52,6 +50,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 		for(int a = 0; a < size; a++) {
 			int p = workset.pickOneExcelsuive();
 			dp.add(clusters[p].twave);
+			if(gf != null) gf.mark( clusters[p].toString() );
 
 			int  r_all_pp, front_s, front_sp;
 
@@ -61,7 +60,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 				int front = dp.image(r_all);
 				r_all = manager.orTo(r_all, front);
 				manager.deref(front);
-				if(gf != null)    gf.add( manager.nodeCount( r_all));
+				if(gf != null)    gf.add( r_all);
 			} while(r_all != r_all_pp);
 
 			workset.advance(p, true);
@@ -84,8 +83,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
     // -------------------------------------------------------------------------------
 
     protected void computeCoReachables() {
-	GrowFrame gf = null;;
-	if(Options.show_grow) gf = new GrowFrame("backward reachability (smoothed+workset)");
+	GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (smoothed+workset)");
 
 	timer.reset();
 	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -120,6 +118,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 	for(int a = 0; a < size; a++) {
 	    int p = workset.pickOneExcelsuive();
 	    dp.add(clusters[p].twave);
+	    if(gf != null) gf.mark( clusters[p].toString() );
 
 	    int r_all_org, r_all_pp, front_s, front_sp;
 
@@ -130,7 +129,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 			int front = dp.preImage(r_all);
 			r_all = manager.orTo(r_all, front);
 			manager.deref(front);
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
+			if(gf != null)    gf.add( r_all );
 	    } while(r_all != r_all_pp);
 
 	    workset.advance(p, true);

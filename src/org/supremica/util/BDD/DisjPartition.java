@@ -68,8 +68,9 @@ public class DisjPartition {
     public int getSp2s() { return sp2s; }
     // --------------------------------------------------
 
+	/** stupid greedy insertation algorithm */
     public void add(Vector v, Cluster c) {
-		/** stupid greedy insertation algorithm */
+
 		for (Enumeration e = v.elements(); e.hasMoreElements(); )
 		{
 			Cluster c2 = (Cluster) e.nextElement();

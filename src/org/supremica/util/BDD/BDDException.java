@@ -1,11 +1,11 @@
 
 package org.supremica.util.BDD;
 
-public class BDDException 
-    extends Exception 
+public class BDDException
+    extends Exception
 {
-    BDDException(String why) {
+    public BDDException(String why) {
 	super(why);
     }
-	
+
 }

@@ -50,9 +50,7 @@ public class DisjSupervisor extends ConjSupervisor {
 
     protected int internal_computeReachablesDisj(int i_all) {
 		// statistic stuffs
-		GrowFrame gf = null;
-		if(Options.show_grow)
-			gf = new GrowFrame("Forward reachability (disjunctive)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (disjunctive)");
 
 		timer.reset();
 		DisjPartition dp = getDisjPartition();
@@ -70,7 +68,7 @@ public class DisjSupervisor extends ConjSupervisor {
 			manager.deref(front);
 			front = new_front;
 
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
+			if(gf != null)    gf.add( r_all);
 		} while(r_all_p != r_all);
 
 
@@ -99,8 +97,7 @@ public class DisjSupervisor extends ConjSupervisor {
 	// -------------------------------
     protected void computeCoReachables() {
 
-		GrowFrame gf = null;
-		if(Options.show_grow) gf = new GrowFrame("backward reachability (disjuncted)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (disjuncted)");
 
 		timer.reset();
 		DisjPartition dp = getDisjPartition();
@@ -128,7 +125,7 @@ public class DisjSupervisor extends ConjSupervisor {
 			r_all = manager.orTo(r_all, new_front);
 			manager.deref(front);
 			front = new_front;
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
+			if(gf != null)    gf.add( r_all);
 		} while(r_all != r_all_p);
 
 		// move the result from S' to S:

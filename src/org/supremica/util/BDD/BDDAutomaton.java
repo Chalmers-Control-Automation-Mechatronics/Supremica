@@ -81,6 +81,7 @@ public class BDDAutomaton
 		bdd_care_sp = manager.getZero();
 		manager.ref(bdd_care_sp);
 
+		// interleaved simple state encoding.
 		for (int i = 0; i < num_states; i++)
 		{
 			int code = states[i].code;
@@ -89,21 +90,25 @@ public class BDDAutomaton
 
 			states[i].bdd_s = bdd_s;
 			states[i].bdd_sp = bdd_sp;
+		}
 
+		// Now, pre-build some important BDDs
+		for (int i = 0; i < num_states; i++)
+		{
 			if (states[i].m)
 			{
-				bdd_m = manager.orTo(bdd_m, bdd_s);
+				bdd_m = manager.orTo(bdd_m, states[i].bdd_s);
 			}
 
 			if (states[i].f)
 			{
-				bdd_f = manager.orTo(bdd_f, bdd_sp);
+				bdd_f = manager.orTo(bdd_f, states[i].bdd_sp);
 			}
 
 			/* to count states correctly, we use only one encoding state -> the care set != entire S */
 			// if(!Options.fill_statevars) {
-				bdd_care_s = manager.orTo(bdd_care_s, bdd_s);
-				bdd_care_sp = manager.orTo(bdd_care_sp, bdd_sp);
+				bdd_care_s = manager.orTo(bdd_care_s, states[i].bdd_s);
+				bdd_care_sp = manager.orTo(bdd_care_sp, states[i].bdd_sp);
 			//}
 		}
 

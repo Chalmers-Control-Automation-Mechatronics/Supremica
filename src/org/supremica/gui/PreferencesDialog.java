@@ -680,10 +680,10 @@ class BDDPanel
     implements ActionListener
 {
     private PreferencesDialog theDialog = null;
-    private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
+    private JCheckBox alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
-    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm;
-    private JComboBox  asHeuristics, esHeuristics;
+    private JComboBox showGrow, algorithmFamily, countAlgorithm, orderingAlgorithm;
+    private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics;
 	private JButton bProofFile;
 
     public BDDPanel(PreferencesDialog theDialog)
@@ -702,8 +702,6 @@ class BDDPanel
 	tmp.setForeground(Color.blue);
 
 
-
-	pWest.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
 	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
 	pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
@@ -762,8 +760,6 @@ class BDDPanel
 	inclusionAlgorithm.addItem("Incremental");
 	inclusionAlgorithm.setSelectedIndex( Options.inclsuion_algorithm);
 
-
-
 	JPanel pFamily = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 	p.add(pFamily);
 	pFamily.add( new JLabel("Favour reachability algorithm"));
@@ -797,6 +793,7 @@ class BDDPanel
 	asHeuristics.addItem("Most common events");
 	asHeuristics.addItem("Most common arcs");
 	asHeuristics.addItem("Most local events");
+	asHeuristics.addItem("Hybrid");
 	asHeuristics.setSelectedIndex(Options.as_heuristics);
 
 
@@ -808,7 +805,17 @@ class BDDPanel
 
 	for(int i = 0; i < Options.ES_HEURISTIC_NAMES.length; i++)
 		esHeuristics.addItem(Options.ES_HEURISTIC_NAMES[i]);
+
 	esHeuristics.setSelectedIndex(Options.es_heuristics);
+
+
+
+	// show all choices
+	orderingAlgorithm.setMaximumRowCount(20);
+	inclusionAlgorithm.setMaximumRowCount(20);
+	algorithmFamily.setMaximumRowCount(20);
+	asHeuristics.setMaximumRowCount(20);
+	esHeuristics.setMaximumRowCount(20);
 
 	p.add( new JSeparator() );
 
@@ -816,6 +823,20 @@ class BDDPanel
 	p.add( pLabel);
 	pLabel.add( tmp = new JLabel("Misc. options:"));
 	tmp.setForeground(Color.blue);
+
+
+	JPanel pGrow = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+	p.add(pGrow);
+	pGrow.add( new Label("BDD graphs"));
+	pGrow.add( showGrow = new JComboBox());
+	showGrow.addItem("None");
+	showGrow.addItem("Node count");
+	showGrow.addItem("Node count (log scale)      ");
+	showGrow.addItem("Node count delta");
+	showGrow.addItem("SAT count");
+	showGrow.addItem("SAT count (log scale)");
+	showGrow.addItem("SAT count delta");
+	showGrow.setSelectedIndex( Options.show_grow);
 
 	JPanel pCount = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 	p.add(pCount);
@@ -847,7 +868,7 @@ class BDDPanel
 	Options.as_heuristics = asHeuristics.getSelectedIndex();
 	Options.es_heuristics = esHeuristics.getSelectedIndex();
 
-	Options.show_grow        = showGrow.isSelected();
+	Options.show_grow        = showGrow.getSelectedIndex();
 	Options.user_alters_PCG  = alterPCG.isSelected();
 	// Options.uc_optimistic    = ucOptimistic.isSelected();
 	// Options.nb_optimistic    = nbOptimistic.isSelected();

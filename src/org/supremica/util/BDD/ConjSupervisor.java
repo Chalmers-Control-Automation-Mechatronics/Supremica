@@ -234,10 +234,7 @@ public class ConjSupervisor
 	{
 
 		// Note: we remove events from t_all, it is needed for forward reachability
-		GrowFrame gf = null;
-
-		if (Options.show_grow)
-			gf = new GrowFrame("Conjunctive forward reachability");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Conjunctive forward reachability");
 
 
 		timer.reset();
@@ -260,7 +257,7 @@ public class ConjSupervisor
 			front = tmp2;
 
 			if (gf != null)
-			gf.add(manager.nodeCount(r_all));
+			gf.add(r_all);
 		} while (r_all_p != r_all);
 
 		manager.deref(front);
@@ -277,12 +274,8 @@ public class ConjSupervisor
 	// -------------------------------------------------------------------------------------
     protected void computeCoReachables()
 	{
-		GrowFrame gf = null;;
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "[Conjunctive] backward reachability");
 
-		if (Options.show_grow)
-		{
-			gf = new GrowFrame("[Conjunctive] backward reachability");
-		}
 
 		timer.reset();
 		ConjPartition cp = getConjPartition();
@@ -313,7 +306,7 @@ public class ConjSupervisor
 
 			if (gf != null)
 			{
-				gf.add(manager.nodeCount(r_all));
+				gf.add(r_all);
 			}
 		}
 		while (r_all_p != r_all);

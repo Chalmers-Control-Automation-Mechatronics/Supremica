@@ -68,13 +68,9 @@ public class AutomataCoverManager {
 	}
 
 	public int forward_reachability(int initial) {
-		GrowFrame gf1 = null, gf2 = null;
+		GrowFrame gf1 = BDDGrow.getGrowFrame(manager, "AutomataCoverManager.forward_reachability [global]");
+		GrowFrame gf2 = BDDGrow.getGrowFrame(manager, "AutomataCoverManager.forward_reachability [local]");
 
-		if (Options.show_grow)
-		{
-			gf1 = new GrowFrame("AutomataCoverManager.forward_reachability [global]");
-			gf2 = new GrowFrame("AutomataCoverManager.forward_reachability [local]");
-		}
 
 		int ret = initial; manager.ref(ret);
 		int front, new_, old = ret;
@@ -94,7 +90,7 @@ public class AutomataCoverManager {
 
 				if (gf2 != null)
 				{
-					gf2.add(manager.nodeCount(front));
+					gf2.add(front);
 				}
 			}
 
@@ -110,7 +106,7 @@ public class AutomataCoverManager {
 
 			if (gf1 != null)
 			{
-				gf1.add(manager.nodeCount(ret));
+				gf1.add(ret);
 			}
 		} while(old != ret);
 

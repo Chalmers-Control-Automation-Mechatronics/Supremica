@@ -1,4 +1,7 @@
-package org.supremica.util.BDD;
+package org.supremica.util.BDD.test;
+
+
+import org.supremica.util.BDD.*;
 
 /**
  * This class is used for profiling reachability (at the moment) without
