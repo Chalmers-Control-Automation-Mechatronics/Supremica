@@ -57,6 +57,7 @@ public class ExecutionDialogMode
 	public static ExecutionDialogMode buildingStates = new ExecutionDialogMode("Building states...", "", false, true);
 	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("Building transitions...", "", false, true);
 	public static ExecutionDialogMode matchingStates = new ExecutionDialogMode("Matching States...", "", false, true);
+	public static ExecutionDialogMode verifyingNonblocking = new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
 	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "", false, false);
 	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "", false, false);
 	private final String id;

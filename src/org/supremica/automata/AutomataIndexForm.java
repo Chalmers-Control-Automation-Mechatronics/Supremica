@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -178,15 +177,11 @@ public final class AutomataIndexForm
 
 	public void generateAutomataIndices(Automata theAutomata)
 	{
-
 		// Give each automaton a unique index
 		// Remember that this index must be consistent with
 		// getAutomatonAt(int) in Automata
 		typeIsPlantTable = new boolean[theAutomata.size()];
 		automataSize = new int[theAutomata.size()];
-
-//		int i = 0;
-
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
@@ -196,8 +191,6 @@ public final class AutomataIndexForm
 
 			typeIsPlantTable[i] = currAutomaton.getType() == AutomatonType.Plant;
 			automataSize[i] = currAutomaton.nbrOfStates();
-
-			//i++;
 		}
 	}
 
@@ -295,14 +288,13 @@ public final class AutomataIndexForm
 	 *
 	 * Insert into enableEventsTable all states that enables a specific event.
 	 *
-	 *@param  theAutomata Description of the Parameter
-	 *@param  theAutomaton Description of the Parameter
-	 *@exception  Exception Description of the Exception
+	 * @param  theAutomata Description of the Parameter
+	 * @param  theAutomaton Description of the Parameter
+	 * @exception  Exception Description of the Exception
 	 */
 	void generateNextStateTransitionIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{
-
 		// Compute the nextStateTable and outgoingEventsTable
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		int nbrOfAutomata = theAutomata.size();

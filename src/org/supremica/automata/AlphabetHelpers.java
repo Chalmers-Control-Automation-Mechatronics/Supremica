@@ -53,7 +53,6 @@ import java.util.*;
 
 public class AlphabetHelpers
 {
-
 	public static Alphabet getUnionAlphabet(Automata theAutomata)
 		throws Exception
 	{

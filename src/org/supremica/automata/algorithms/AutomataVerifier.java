@@ -194,7 +194,7 @@ public class AutomataVerifier
 	/**
 	 * Method called from external class stopping AutomataVerifier as soon as possible.
 	 *
-	 *@see  ExecutionDialog
+	 * @see  ExecutionDialog
 	 */
 	public void requestStop()
 	{
@@ -310,11 +310,10 @@ public class AutomataVerifier
 
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			{
-				// Examine uncontrollable events in currSupervisorAutomaton and select plants containing these events
+				// Examine uncontrollable events in currSupervisorAutomaton 
+				// and select plants containing these events
 				selectedAutomata.add(currSupervisorAutomaton);
-
 				eventIterator = currSupervisorAutomaton.eventIterator();
-
 				while (eventIterator.hasNext())
 				{
 					currEvent = (LabeledEvent) eventIterator.next();
@@ -327,7 +326,6 @@ public class AutomataVerifier
 							while (plantIterator.hasNext())
 							{
 								currPlantAutomaton = (Automaton) plantIterator.next();
-
 								if (!selectedAutomata.contains(currPlantAutomaton))
 								{
 									selectedAutomata.add(currPlantAutomaton);
@@ -1167,21 +1165,117 @@ public class AutomataVerifier
 		// Ensure individual nonblocking
 		boolean allIndividuallyNonblocking = true;
 		Iterator autIt = theAutomata.iterator();
-		Automaton currAut;
+		Automaton currAutomaton;
 		while (autIt.hasNext())
 		{
-			currAut = new Automaton((Automaton) autIt.next());
-			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAut);
+			currAutomaton = new Automaton((Automaton) autIt.next());
+			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
 			if (!allIndividuallyNonblocking)
 			{
-				logger.error("The automaton " + currAut.getName() + " (among others?) is individually blocking!");
-				return false;
+				logger.error("The automaton " + currAutomaton.getName() + " is individually blocking!");
 			}
 		}		
-		logger.error("This system has no individually blocking automata! That's about everything I can tell at the moment, though...");
-		return false;
-		
+		if (allIndividuallyNonblocking)
+		{
+			logger.info("This system has no individually blocking automata!");
+		}
+	
+		// Preparations for the global nonblocking verification...
+		ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
+		executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+		executionDialog.initProgressBar(0,theAutomata.size());
+		// We use a copy of theAutomata instead from this point on. This is to spare us the 
+		// effort of changing all events to uncontrollable over and over and lets us use the 
+		// same helper all the time, EXCEPT for AutomataIndexForm.typeIsPlantTable which we 
+		// have to reinitialize between the language inclusion checks!!
+	    theAutomata = new Automata(theAutomata, false); 
+		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+		// Make all events in all automata in theAutomata uncontrollable!
+		Iterator eventIterator;
+		Iterator automatonIterator = theAutomata.iterator();
+		while (automatonIterator.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIterator.next();
+			currAutomaton.setType(AutomatonType.Plant);
+			eventIterator = currAutomaton.eventIterator();
+			while (eventIterator.hasNext())
+			{
+				((LabeledEvent) eventIterator.next()).setControllable(false);
+			}
+		}
+
 		// Ensure global nonblocking...
+		boolean allIncluded = true;
+		autIt = theAutomata.iterator();
+		Automata currAutomata = new Automata();
+		while (autIt.hasNext())
+		{
+			currAutomaton = new Automaton((Automaton) autIt.next());
+			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
+			executionDialog.setValue(theAutomata.getAutomatonIndex(currAutomaton));
+		    currAutomata.addAutomaton(currAutomaton);
+			// Perform the language inclusion check!
+			allIncluded = allIncluded && languageInclusionVerification(currAutomata, theAutomata);
+			currAutomata.removeAutomaton(currAutomaton); // Examine one automaton at a time...
+			if (!allIncluded)
+			{
+				logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
+			}
+		}		
+		return allIncluded && allIndividuallyNonblocking;
+	}
+
+	/**
+	 * Verifies language inclusion of the language of AutomataA in AutomataB. 
+	 * I.e. is AutomataA included in AutomataB?
+	 */
+	private boolean languageInclusionVerification(Automata automataA, Automata automataB)
+		throws Exception
+	{
+		// Compute the union alphabet of the events in automataA, mark all
+		// events in automataA as uncontrollable and the automata as plants
+		Alphabet unionAlphabet;
+		Iterator eventIterator;
+		Automaton currAutomaton;
+		Iterator automatonIterator = automataA.iterator();
+		while (automatonIterator.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIterator.next();
+			currAutomaton.setType(AutomatonType.Plant);
+			// eventIterator = currAutomaton.eventIterator();
+			// while (eventIterator.hasNext())
+			// {
+			// 	((LabeledEvent) eventIterator.next()).setControllable(false);
+			// }
+		}
+ 		unionAlphabet = AlphabetHelpers.getUnionAlphabet(automataA);
+
+		// Change events in the automata in automataB to uncontrollable if they
+		// are included in the union alphabet found above, mark the automata as
+		// specifications
+		LabeledEvent currEvent;
+		automatonIterator = automataB.iterator();
+		while (automatonIterator.hasNext())
+		{
+			currAutomaton = (Automaton) automatonIterator.next();
+			currAutomaton.setType(AutomatonType.Supervisor);
+			// eventIterator = currAutomaton.eventIterator();
+			// while (eventIterator.hasNext())
+			// {
+			// 	currEvent = (LabeledEvent) eventIteratorB.next();
+			//	if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
+			//		currEvent.setControllable(false);
+			//	else
+			//		currEvent.setControllable(true);
+			// }
+		}
+		
+		// And update the typeIsPlantTable in the AutomataIndexForm in the synchHelper!
+		synchHelper.getAutomataIndexForm().generateAutomataIndices(theAutomata);
+		
+		// After the above preparations, the language inclusion check
+		// can be performed as a controllability check...
+		return modularControllabilityVerification();
 	}
 
 	/**
@@ -1309,7 +1403,7 @@ public class AutomataVerifier
 			//currInitialState[currAutomaton.getIndex()] = localInitialState.getIndex();
 		}
 
-		// Initialize new synchHelper and move the excecutionDialog to the new helper...
+		// Initialize new synchHelper and move the executionDialog to the new helper...
 		ExecutionDialog excutionDialog = synchHelper.getExecutionDialog();
 		synchHelper = new AutomataSynchronizerHelper(currAutomata, synchronizationOptions);
 		synchHelper.setExecutionDialog(excutionDialog);
