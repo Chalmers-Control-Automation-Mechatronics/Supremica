@@ -198,7 +198,7 @@ public class Animator
 			{
 				_announced.add(ev.getName());
 				_announced.makeVisible(_announced.getItemCount() - 1);
-				Toolkit.getDefaultToolkit().beep();
+				//Toolkit.getDefaultToolkit().beep();
 			}
 		});
 		invalidate();
