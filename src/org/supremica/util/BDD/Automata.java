@@ -14,6 +14,7 @@ public class Automata
 	private int[] grupp_ordering = null;
 	private double total_size = 0, total_size_allocated = 0;
 	private int variable_count = 0;
+	private long reordering_time;
 
 	public Automata()
 	{
@@ -62,9 +63,12 @@ public class Automata
 		return variable_count;
 	}
 
+	public long getReorderingTime() {
+		return reordering_time;
+	}
 
-  	public int [][]getCommunicationMatrix()
-	    throws BDDException
+  public int [][]getCommunicationMatrix()
+		throws BDDException
 	{
 	    int components = automata.size();
 	    int [][]ret = new int[components][components];
@@ -101,6 +105,7 @@ public class Automata
 		AutomataOrderingHeuristic aoh = AutomataOrderingHeuristicFactory.createInstance(this);
 		grupp_ordering = aoh.ordering();
 		timer.report("Automata reordering '" +  AutomataOrderingHeuristicFactory.getName() + "' done");
+		reordering_time = timer.getElapsed();
 
 
 		// maybe the user needs to change something ?

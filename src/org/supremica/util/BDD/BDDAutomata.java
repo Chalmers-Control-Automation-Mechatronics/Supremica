@@ -255,6 +255,10 @@ public class BDDAutomata
 		return components;
 	}
 
+	public long getReorderingTime() {
+		return original_automata.getReorderingTime();
+	}
+
 	public int getEventCube()
 	{
 		return bdd_events_cube;
