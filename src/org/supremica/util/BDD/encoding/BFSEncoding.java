@@ -32,13 +32,15 @@ public class BFSEncoding implements Encoding {
 			// fill the initial round
 			if((from_i && states[i].isInitial()) || (!from_i && states[i].isMarked()) ){
 				queue.enqueue(i);
+				codes[i] = -2; // in the queue
 			}
 		}
 
 		while(! queue.empty() ) {
 			int curr = queue.dequeue();
 			State state = states[curr];
-			codes[state.extra1] = count++;
+			// codes[state.extra1] = count++;
+			codes[curr] = count++;
 
 			for(Enumeration e = from_i ? state.out() : state.in(); e.hasMoreElements(); ) {
 				Arc arc = (Arc)e.nextElement();
@@ -57,7 +59,5 @@ public class BFSEncoding implements Encoding {
 			states[i].setCode(codes[i]);
 		}
 	}
-
-
 
 }

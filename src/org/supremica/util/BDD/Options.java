@@ -229,7 +229,7 @@ public class Options
 		ENCODING_DFS_M = 3,
 		ENCODING_BFS_I = 4,
 		ENCODING_BFS_M = 5;
-	public static int encoding_algorithm = ENCODING_BFS_I;
+	public static int encoding_algorithm = ENCODING_BFS_M;
 
 
 

@@ -163,30 +163,82 @@ public class TestAlgo {
 
 	}
 
+	private void adjust(String s, int size) {
+		System.out.print(s);
+		int n = size - s.length();
+		while(n-- > 0) System.out.print(' ');
+		System.out.flush();
+	}
+
 	private void announce(String nam) {
 		int n = nam.lastIndexOf('/');
 		if(n > 0) nam = nam.substring(n+1);
-		System.out.print(nam);
-		System.out.print(':');
-		n = 40 - nam.length();
-		while(n-- > 0) System.out.print(' ');
-		System.out.flush();
-
-
-		if(Options.debug_on ) {
-			Options.out.println("\n\n\n\n\n\n\n\n\n\n\n");
-			Options.out.println("********************************************************************");
-			Options.out.println("Loaded " + nam);
-			Options.out.println("\n\n\n\n\n\n\n\n\n\n\n");
-		}
+		adjust(nam + ":", 40);
 	}
 	// ------------------------------------------------------------------------------------
 	public void runTests() throws Exception {
 		fail  = pass = 0;
 		int len = TEST_FILES.length;
 
-		System.out.println("Using serach algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 
+		System.out.println("NOTE: test target for the first phase is : " + TEST_FILES[0]);
+
+		// test different algos
+		System.out.println("\n***** Testing all search algorithms");
+		int save_algo_family = Options.algo_family; // save the default crap
+		load(TEST_FILES[0]);
+		for(int i = 0; i < Options.REACH_ALGO_NAMES.length; i++) {
+			Options.algo_family = i;
+			adjust(Options.REACH_ALGO_NAMES[Options.algo_family], 40);
+			testR(reachables[0]);
+			testCR(coreachables[0]);
+
+			if(i == save_algo_family) System.out.print("   (DEFAULT) ");
+			System.out.println();
+		}
+		verifier.cleanup();
+		Options.algo_family = save_algo_family;
+
+	// test different encodings
+		System.out.println("\n***** Testing all encoding functions");
+		int save_encoding = Options.encoding_algorithm;
+		for(int i = 0; i < Options.ENCODING_NAMES.length; i++) {
+			load(TEST_FILES[0]);
+			Options.encoding_algorithm = i;
+			adjust(Options.ENCODING_NAMES[Options.encoding_algorithm], 40);
+			testR(reachables[0]);
+			testCR(coreachables[0]);
+			verifier.cleanup();
+
+			if(i == save_encoding) System.out.print("   (DEFAULT) ");
+			System.out.println();
+		}
+		Options.encoding_algorithm = save_encoding;
+		System.out.println("NOTE: default algorithm is " + Options.ENCODING_NAMES[Options.encoding_algorithm]);
+
+
+// test different encodings
+		System.out.println("\n***** Testing all encoding functions");
+		int save_ordering = Options.ordering_algorithm;
+		for(int i = 0; i < Options.ORDERING_ALGORITHM_NAMES.length; i++) {
+			load(TEST_FILES[0]);
+			Options.ordering_algorithm = i;
+			adjust(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], 40);
+			testR(reachables[0]);
+			testCR(coreachables[0]);
+			verifier.cleanup();
+
+			if(i == save_ordering) System.out.print("   (DEFAULT) ");
+			System.out.println();
+		}
+		Options.ordering_algorithm = save_ordering;
+		System.out.println("NOTE: default algorithm is " + Options.ENCODING_NAMES[Options.ordering_algorithm]);
+
+
+
+
+
+		System.out.println("\n***** Testing DES/SCT algorithms");
 		for(int i = 0; i < len; i++) {
 			announce(TEST_FILES[i]);
 
@@ -250,5 +302,8 @@ public class TestAlgo {
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.8  2004/01/30 14:45:04  vahidi
+ testing log keywork, ignore this one
+
 
 */

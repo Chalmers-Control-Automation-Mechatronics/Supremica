@@ -3,13 +3,14 @@ package org.supremica.util.BDD;
 
 
 /**
- * A ring queue of integers
+ * A ring queue of integers. has limited capacity, and if exceeded, data will be overwritten
  *
  */
 public class IntQueue {
 	private int size, read, write;
 	private int []data;
 	public IntQueue(int size) {
+		size ++; // otherwise, a completely full queue would look empty!!
 		this.size = size;
 		this.read = 0;
 		this.write = 0;
@@ -29,9 +30,6 @@ public class IntQueue {
 
 	public boolean empty() { return (read == write); }
 	public void reset() { read = write = 0; }
-	public int size() { return write; }
-	public int [] getArray() { return data; }
-
 
 /*
 	public static void main(String [] args) {
