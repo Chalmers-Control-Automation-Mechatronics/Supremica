@@ -15,6 +15,19 @@ import java.util.*;
  *
  */
 
+
+ /**
+  *
+  * Important note about the local-event detection algorithm:
+  *
+  * if we are doing language inclusion, then we dont need to add additional Specs to the curent
+  * search. this means that we must _not_ considers these automata dyring local-event detection.
+  * for example if Sigma of p1,sp1,sp2 = {a}, {b}, {b} respectively. then the local events of
+  * p1 || sp is {a,b}. since sp2 is not going to get added anyway, we ignore the presence
+  * of event 'b' in it!
+  *
+  */
+
 public abstract class BaseBDDLanguageInclusion {
 	protected AutomataSynchronizerHelper.HelperData hd;
 	protected org.supremica.automata.Automata theAutomata;
@@ -31,6 +44,11 @@ public abstract class BaseBDDLanguageInclusion {
 
 
 
+	// local event stuff:
+	protected boolean [] local_events;	/** true if an event is local, valid only after a call to register_automaton_addition() */
+	private int [] current_event_usage; 	/** temporary storage for local events */
+	protected int [] event_usage_count; /** number of automata that use each event */
+	protected int local_events_found = 0; /** how many local events we had last time. to detect if any new has been added */
 
     /**
      * creates a verification object for LANGUAGE INCLUSION test.
@@ -139,10 +157,7 @@ public abstract class BaseBDDLanguageInclusion {
 		changes = new boolean[considred_events.length]; // and one for the changes
 		workset_events = new boolean[considred_events.length]; // and one the current spec
 
-		if(Options.debug_on) {
-			Options.out.println("*** Modular language containment test considreing " +
-				IndexedSet.cardinality(considred_events) + " events." );
-		}
+		init_local_event_detection();
 	}
 
 	// --------------------------------------------------------------------------------------
@@ -208,7 +223,74 @@ public abstract class BaseBDDLanguageInclusion {
 		return result;
 	}
 
+	// ------ [LOCAL event detection ] -------------------------------------------------------------
 
+	/** intiailize event-counting related stuff for detecting local events */
+	private void init_local_event_detection() {
+		local_events = new boolean[considred_events.length];
+		current_event_usage = new int[considred_events.length];
+		event_usage_count = new int[considred_events.length];
+
+		ba.getEventManager().getUsageCount(event_usage_count);
+		if(!controllaibilty_test) {
+			// include only plants, we dont need spec
+			L1.removeEventUsage(event_usage_count);
+		}
+
+		// initialize local_events_found!! some events might not have been used at all!
+		local_events_found = 0;
+		int len = event_usage_count.length;
+		for(int i = 0; i < len; i++) if(event_usage_count[i] == 0) local_events_found++;
+
+	}
+
+	/** initialize the local-event detection algorithm, must be called first! */
+	protected void initialize_event_usage(BDDAutomaton sp) {
+		int len = event_usage_count.length;
+		for(int i = 0; i < len; i++)
+			current_event_usage[i] = event_usage_count[i];
+
+
+		if(controllaibilty_test) {
+			// if language inclusion, we ignore Specs.
+			// see init_local_event_detection() and the comments at the top
+			sp.removeEventUsage(current_event_usage);
+		}
+	}
+
+	/**
+	 * a step in a local event computation algorithm.
+	 * returns the number of local events after 'at' being added.
+	 * also sets the 'local_events[]' member variable for further usage
+	 */
+	protected int register_automaton_addition(BDDAutomaton at) {
+		at.removeEventUsage(current_event_usage);
+
+		int len = current_event_usage.length;
+		int count = 0;
+		for(int i = 0; i < len; i++)
+		if(current_event_usage[i] < 1) {
+			count++;
+			local_events[i] = true;
+		} else {
+			local_events[i] = false;
+		}
+
+		return count;
+	}
+
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * show a trace to a reachable BDD.
+	 * XXX: this part is not modular yet. it is much slower than the verification itself!
+	 *      not very accurate either :(
+	 */
+	protected void show_trace(Supervisor sup, int bdd) {
+		int tmp2 = ba.exists(bdd, ba.getEventCube());
+		sup.trace("Trace", tmp2);
+		ba.deref(tmp2);
+	}
 	// --------------------------------------------------------------------------------
 	/**
 	 * given a S x Sigma BDD, check if (some of) events are included.
@@ -240,8 +322,59 @@ public abstract class BaseBDDLanguageInclusion {
 		ba.deref(bdd_es);
 		return count;
 	}
+	// ---------------------------------------------------------------------------------------
+
+	/**
+	 * check that by adding another automaton 'at', at least state in bdd_uc
+	 * is reachable by local-events _only_.
+	 */
+	protected boolean try_local_reachability(Supervisor sup, BDDAutomaton at, int bdd_uc) {
+		int local_events_current = register_automaton_addition(at);
+
+		if(local_events_current > local_events_found ) {
+
+			if(Options.debug_on) {
+				Options.out.println("   LL " + (local_events_current - local_events_found) +
+				" new local events found.");
+				ba.getEventManager().dumpSubset("   LL Local events", local_events);
+			}
+			local_events_found  = local_events_current;
+
+			// now check if that state is still reachable given only those events:
+			int local_r = sup.getReachables(local_events);
+			int tmp_bdd = ba.and(bdd_uc, local_r);
+			boolean not_exist = (tmp_bdd == ba.getZero());
 
 
+
+			ba.deref(local_r);
+
+			if(not_exist) {
+				// ok, nothing to worry about, we will carry one. just clean up the mess
+				if(Options.debug_on)
+					Options.out.println("Could not prove reachability using local events, continuing...");
+				ba.deref(tmp_bdd);
+				return false;
+			} else {
+				// we have proved that the a bad state was reachable using LOCAL EVENTS!
+				// no need to proceed, we now we are screwed ;(
+				if(Options.debug_on)
+					Options.out.println("A 'bad' state was proved to be reachable by _local events_. we are done!");
+
+				// XXX: looks like this gives an error.
+				// this is since when tracing back, show_trace will try _any_ way back to
+				// the initial state which may look wierd since we said we only look at local states
+				if(Options.trace_on) show_trace(sup, tmp_bdd);
+
+				ba.deref(tmp_bdd);
+
+				return true;
+			}
+		}
+		return false; // no new local events, no need to compute ??
+	}
+
+	// ---------------------------------------------------------------------------------------
 
 	/** this is where all the action will be... */
 	protected abstract boolean check(BDDAutomaton k, AutomataConfiguration ac);

@@ -164,7 +164,7 @@ public class Supervisor
 
 		int sigma_u = manager.and( plant.getSigmaU(), spec.getSigmaU()); // WAS manager.getSigmaU();
 
-		bdd_uncontrollables = computeLanguageDifference(sigma_u);
+		bdd_uncontrollables = computeLanguageDifference(sigma_u, true);
 		has_uncontrollables = true;
 
 		SizeWatch.setOwner("Supervisor.computeUncontrollables");
@@ -177,7 +177,13 @@ public class Supervisor
 	}
 
 
-    protected int computeLanguageDifference(int considred_events)
+	/**
+	 * compute language difference of plant and spec considreing only the given events.
+	 * returns a BDD as a counter example. retunrs < states> if remove_events is trues
+	 * otherwise returns <states, events> instead...
+	 */
+
+    protected int computeLanguageDifference(int considred_events, boolean remove_events)
     {
 	int t_sp = spec.getT();
 	int t_p = plant.getT();
@@ -201,11 +207,25 @@ public class Supervisor
 
 	SizeWatch.report(tmp2, "~Eq'sp. Tsp ^ (sigma in some Sigma)");
 
-	int cube2 = manager.and(sigma_cube, cubep_p);
-	int tmp4 = manager.relProd(t_p, tmp2, cube2);
+
+
+	// this is a _DIRTY_ trick to remove added self-loops (false)contribution!
+	// this is needed when doing modular computation, i.e. when plant + spec < all automata
+	tmp2 = manager.andTo(tmp2, plant.getSigma());
+
+	int tmp4;
+	if(remove_events) {
+		int cube2 = manager.and(sigma_cube, cubep_p);
+		tmp4 = manager.relProd(t_p, tmp2, cubep_p);
+		manager.deref(cube2);
+	} else {
+		tmp4 = manager.relProd(t_p, tmp2, cubep_p);
+	}
+
+	// DEBUG:
+	// manager.printSet(tmp4);
 
 	manager.deref(tmp2);
-	manager.deref(cube2);
 
 	SizeWatch.report(tmp4, "(Language diff)");
 
@@ -221,7 +241,7 @@ public class Supervisor
     private int getLanguageDifference()
     {
 	timer.reset();
-	int ret = computeLanguageDifference(plant.getSigma());
+	int ret = computeLanguageDifference(plant.getSigma(), true);
 	timer.report("Uncontrollable states found");
 	return ret;
     }
@@ -229,8 +249,8 @@ public class Supervisor
 
     /**
      * <b>Reachable</b> counterexamples to the language inclusions check
-     *
-     *
+     * <br>
+     * @retruns a BDD for states that fail the test (see also below)
      */
 
     public int computeReachableLanguageDifference() {
@@ -248,6 +268,31 @@ public class Supervisor
     }
 
 
+    /**
+     * <b>Reachable</b> counterexamples to the language inclusions check.
+     *
+     * only includes events in 'event_care'-
+     * NOTE:<br>
+     * the return value of this one is failed reachable states PLUS the
+     * corresponding event: ret = BDD<state, event>
+     */
+ 	public int computeReachableLanguageDifference(int event_care) {
+
+		int ld = computeLanguageDifference(event_care, false);
+
+
+		if(ld == manager.getZero()) {
+			// nothing there, so we dont need the intersection with reachables
+			// to get the reachable difference
+			return ld;
+		}
+
+
+		int r = getReachables();
+		int intersection = manager.and(ld,r);
+		manager.deref(ld);
+		return intersection;
+    }
 
 	// --------------------------------------------------------------------------------------------
 

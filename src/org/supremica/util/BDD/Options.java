@@ -48,11 +48,12 @@ public class Options
     public static final boolean use_cudd = false;
     public static boolean fill_statevars = false;
     public static boolean profile_on = false; // misc profiling stuff
-    public static boolean debug_on = true; // proof generating and general debug
+    public static boolean debug_on = false; // proof generating and general debug
     public static boolean size_watch = false; // BDD sizewatch
     public static boolean sanity_check_on = false;
     public static boolean user_alters_PCG = false;
-    public static boolean show_grow = true;
+    public static boolean show_grow = false;
+    public static boolean show_encoding = false; // dump variable encoding, not workin very good :(
     public static boolean trace_on = false;
     public static boolean local_saturation = false;
     public static boolean uc_optimistic = true;
@@ -63,7 +64,7 @@ public class Options
     public static int algo_family = ALGO_SMOOTHED_MONO;
     public static int count_algo  = COUNT_TREE;
     public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
-    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;
+    public static int inclsuion_algorithm = INCLUSION_ALGO_MODULAR;
 
     // out own out stream, might be changed to point to a file
     public static PrintStream out = System.out;

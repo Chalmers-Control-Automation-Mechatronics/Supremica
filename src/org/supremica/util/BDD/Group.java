@@ -74,6 +74,7 @@ public class Group
 		manager.ref(bdd_sigma);
 
 
+
     }
 
 	/**
@@ -130,7 +131,26 @@ public class Group
 		bdd_sigma   = manager.orTo(bdd_sigma, a.getSigma());
 		bdd_sigma_u = manager.orTo(bdd_sigma_u, a.getSigmaU());
 
-		reset();
+		// new optimization: dont recompute everything when we add a new automaya!
+		// try to modify the previous answer instead!
+
+		// WAS: reset();
+
+		if(has_t) {
+			bdd_t = manager.andTo(bdd_t, a.getTpri());
+		}
+
+		if(has_m) {
+			bdd_m = manager.andTo(bdd_m, a.getM());
+		}
+
+		if(has_tu) {
+			// not this one! it cant be computed incrementally!:
+			// int t = getT();
+			// bdd_tu = manager.and(t, bdd_sigma_u);
+			manager.deref(bdd_tu);
+			has_tu = false;
+		}
 	}
 
 	/** ---------------------------------------------------------------- */

@@ -104,9 +104,9 @@ class PhilosPanel
 	IntegerField int_num = new IntegerField("5", 6);
 	JCheckBox l_take = new JCheckBox("take left fork", true);
 	JCheckBox r_take = new JCheckBox("take right fork", true);
-	JCheckBox l_put = new JCheckBox("put left fork", true);
-	JCheckBox r_put = new JCheckBox("put right fork", true);
-	JCheckBox animation = new JCheckBox("Include animation (5 philos)", true);
+	JCheckBox l_put = new JCheckBox("put left fork", false);
+	JCheckBox r_put = new JCheckBox("put right fork", false);
+	JCheckBox animation = new JCheckBox("Include animation (5 philos)", false);
 
 	public PhilosPanel()
 	{

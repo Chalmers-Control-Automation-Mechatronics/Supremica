@@ -2,15 +2,9 @@
 package org.supremica.automata.algorithms;
 
 
-// TODO:
-// Language Inclusion early termination (see try_local_reachability) failes because we seem to
-// consider other Specs to, which makes us (almost) never find local events and have to compute
-// the whole chain before we can give a nagative answer.
-// fix this!!
-// (need to modify):
-// ba.getEventManager().getUsageCount(local_event_helper);
-// int local_events_current = sup.getLocalEvents(local_event_helper, local_events);
-// to only care abou the spec??
+// TODO: remove the early-termination test if no more automata exists to be added
+
+
 
 import org.supremica.automata.*;
 import org.supremica.util.BDD.*;
@@ -22,15 +16,16 @@ import java.util.*;
  *
  */
 
+
+
+
 public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
-	private boolean [] local_events;
-	private int [] local_event_helper;
+
 
 	// added some stuff that really should be local. but its good for the common code...
 	private int bdd_events = -1;
 	private int bdd_theta  = -1;
-	private int local_events_found = 0;
 	private Supervisor sup = null;
 
 
@@ -41,9 +36,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	throws Exception
     {
 		super(selected, unselected, hd);
-
-		local_events = new boolean[considred_events.length];
-		local_event_helper = new int[considred_events.length];
+		init2();
 	}
 
 
@@ -52,12 +45,17 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	throws Exception
     {
 		super(theAutomata, hd);
-
-		local_events = new boolean[considred_events.length];
-		local_event_helper = new int[considred_events.length];
+		init2();
 	}
 
+	private void init2() {
+		if(Options.debug_on) {
+			Options.out.println("*** Incremental language containment test considreing " +
+				IndexedSet.cardinality(considred_events) + " events." );
+		}
+	}
 
+	// ------------------------------------------------------------------------------------
 
 	protected boolean check(BDDAutomaton k, AutomataConfiguration ac)
 	{
@@ -95,6 +93,10 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		boolean sane = ac.reset(k, considred_events, workset_events);
 		if(!sane) return true; // nothing to check
 
+
+		// initialize the table of event usage
+		initialize_event_usage(k);
+
 		work1.empty(); // start with w1 = { k } ...
 		work1.add(k);
 		work2.empty(); // and w2 = \emptyset, that is L(w2) = \Sigma^* ??
@@ -113,7 +115,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		ba.deref(tmp);
 
 		sup = null;
-		local_events_found = 0; // this is needed for try_local_reachability() to work properly
+
 		for(;;) {
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null)
@@ -131,7 +133,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			try {
 				if(sup != null)  sup.cleanup(); // delete the last one
 
-				sup = SupervisorFactory.createSupervisor(ba, work1, work2);
+				sup = SupervisorFactory.createSupervisor(ba, work2, work1);
 				int r = sup.getReachables();
 
 				bdd_theta= ba.andTo(bdd_theta, r); // see how much of uc was reachable
@@ -150,7 +152,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 				// ok, we now it might exists. we can proov that it _does_ exists if
 				// we can show that is reachable using local events only!!
-				else if(try_local_reachability()) {
+				else if(try_local_reachability(sup, next, bdd_theta)) {
 					cleanup_bdds();
 					return false;
 				}
@@ -183,13 +185,14 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 		// show the shortest trace to the language collision, if the user has enabled it
 		if(Options.trace_on && sup != null)
-			show_trace(bdd_theta);
+			show_trace(sup, bdd_theta);
 
 
 
 		cleanup_bdds();
 
-		return false;
+		// if no L, then always  K \subseteq \Sigma^*
+		return work2.isEmpty();
 	}
 
 
@@ -209,6 +212,9 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		boolean sane = ac.reset(k, considred_events,  workset_events);
 		if(!sane) return true; // nothing to check
 
+		// initialize the table of event usage
+		initialize_event_usage(k);
+
 		work1.empty(); // start with w1 = { k } ...
 		work1.add(k);
 		work2.empty(); // and w2 = \emptyset, that is L(w2) = \Sigma^* ??
@@ -227,13 +233,10 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		ba.deref(tmp);
 
 		sup = null;
-		int num_plants = 0;
-		local_events_found = 0; // this is needed for try_local_reachability() to work properly
 
 		for(;;) {
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
-			if(next.getType() == org.supremica.util.BDD.Automaton.TYPE_PLANT) num_plants++;
 
 			if(Options.debug_on) {
 				Options.out.println("\n -----------------------------------------------------------\n");
@@ -252,7 +255,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				}
 
 
-				sup = SupervisorFactory.createSupervisor(ba, work1, work2);
+				sup = SupervisorFactory.createSupervisor(ba, work2, work1);
 				int r = sup.getReachables();
 
 				bdd_theta= ba.andTo(bdd_theta, r); // see how much of uc was reachable
@@ -269,7 +272,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				}
 				// ok, we now it might exists. we can proov that it _does_ exists if
 				// we can show that is reachable using local events only!!
-				else if(try_local_reachability()) {
+				else if(try_local_reachability(sup, next, bdd_theta)) {
 					cleanup_bdds();
 					return false;
 				}
@@ -299,15 +302,15 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 		// show the shortest trace to the language collision, if the user has enabled it
 		if(Options.trace_on && sup != null)
-			show_trace(bdd_theta);
+			show_trace(sup, bdd_theta);
 
 		// do the delayed cleanup!
 		cleanup_bdds();
 
-		// if we didnt check any plants, then we are done (spec does not share
-		// uncontrollable events with any plant)
-		return (num_plants == 0);
 
+
+		// if no L, then always  K \subseteq \Sigma^*
+		return work2.isEmpty();
 	}
 
 	// ----- [ all common code goes here ] -------------------------------------------------------
@@ -325,58 +328,6 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			sup = null;
 		}
 	}
-	private void show_trace(int bdd) {
-		int tmp2 = ba.exists(bdd, ba.getEventCube());
-		sup.trace("Trace", tmp2);
-		ba.deref(tmp2);
-	}
-
-
-
-	private boolean try_local_reachability() {
-		// lets prove that these events are really reachable by local events:
-		ba.getEventManager().getUsageCount(local_event_helper);
-		int local_events_current = sup.getLocalEvents(local_event_helper, local_events);
-		if(local_events_current > local_events_found ) {
-
-			if(Options.debug_on) {
-				Options.out.println("   LL " + (local_events_current - local_events_found) +
-				" new local events found.");
-				ba.getEventManager().dumpSubset("   LL Local events", local_events);
-			}
-			local_events_found  = local_events_current;
-
-			// now check if that state is still reachable given only those events:
-			int local_r = sup.getReachables(local_events);
-			int tmp_bdd = ba.and(bdd_theta, local_r);
-			boolean not_exist = (tmp_bdd == ba.getZero());
-			ba.deref(local_r);
-
-			if(not_exist) {
-				// ok, nothing to worry about, we will carry one. just clean up the mess
-				if(Options.debug_on)
-					Options.out.println("Could not prove reachability using local events, continuing...");
-				ba.deref(tmp_bdd);
-				return false;
-			} else {
-				// we have proved that the a bad state was reachable using LOCAL EVENTS!
-				// no need to proceed, we now we are screwed ;(
-
-				if(Options.debug_on)
-					Options.out.println("A 'bad' state was proved to be reachable by _local events_. we are done!");
-
-				// TODO: looks like this gives an error:
-				if(Options.trace_on) show_trace(tmp_bdd);
-
-				ba.deref(tmp_bdd);
-
-				return true;
-			}
-		}
-		return false; // no new local events, no need to compute ??
-	}
-
-
 }
 
 

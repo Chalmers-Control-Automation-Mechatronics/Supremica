@@ -164,4 +164,12 @@ public class EventManager
 
 		Options.out.println("};");
 	}
+	public void showEncoding(BDDAutomata ba) {
+		Options.out.println("\n ---------------- Alphabet encoding:");
+		for(int i = 0; i < size; i++) {
+			Options.out.println(events[i].getName() );
+			ba.printSet(events[i].getBDD() );
+		}
+		Options.out.println();
+	}
 }

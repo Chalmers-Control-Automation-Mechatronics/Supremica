@@ -108,6 +108,13 @@ public class BDDAutomata
 
 		// gc();
 		// Options.out.println("CheckPackage returned " + checkPackage());
+
+		if(Options.show_encoding) {
+			for (i = 0; i < components; i++)
+				automata[i].showEncoding(this);
+
+			original_automata.getAlphabeth().showEncoding(this);
+		}
 	}
 
 	private void createEvents()

@@ -12,7 +12,12 @@ import java.util.*;
  *
  */
 
+
 public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
+
+	private int bdd_events  = -1;
+	private int bdd_bad = -1;
+	private Supervisor sup = null;
 
 	// ---[ interface to the base class ]-----------------------------------------------
 
@@ -22,6 +27,7 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	throws Exception
     {
 		super(selected, unselected, hd);
+		init2();
     }
 
 
@@ -30,8 +36,15 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		throws Exception
 	{
 		super(theAutomata, hd);
+		init2();
 	}
 
+	private void init2() {
+		if(Options.debug_on) {
+			Options.out.println("*** Modular language containment test considreing " +
+				IndexedSet.cardinality(considred_events) + " events." );
+		}
+	}
 
 
 
@@ -43,75 +56,128 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	 */
     protected boolean check(BDDAutomaton k, AutomataConfiguration ac)
     {
-		/*
-		// after this, events will hold the events in k that are considred.
-		// ac should mark the plants/specs with connections to these events
+		// events that are intresting for this automata
 		boolean [] k_events = k.getEventCareSet(controllaibilty_test);
 		IndexedSet.intersection(k_events, considred_events, workset_events);
 
-		ac.reset(k, considred_events, events, workset_events);
-		if(Options.debug_on)	Options.out.println("Verifiying " + ac.toString() );
+		if(Options.debug_on) {
+			ba.getEventManager().dumpSubset(
+				"\n*** Verifiying " + k.getName()  + ", considering events", workset_events);
+			Options.out.println("\n");
+		}
+
+		// get events that are considred and in k
+		boolean sane = ac.reset(k, considred_events,  workset_events);
+		if(!sane) return true; // nothing to check
+
+		// initialize the table of event usage
+		initialize_event_usage(k);
+
 
 		// check if L(w1) \Sigma \cap L(w2) \subseteq L(w1)
-
-		// start with w1 = { k } ...
-		work1.empty();
+		work1.empty();	// start with w1 = { k } ...
 		work1.add(k);
+		work2.empty();	// and w2 = \emptyset, that is L(w2) = \Sigma^* ??
 
-		// and w2 = \emptyset, that is L(w2) = \Sigma^* ??
-		work2.empty();
 
-		Supervisor sup = null;
-		int states = -1;
-		while(ac.addone(events, work1, work2, true) != null) {
+		int bdd_cube_sp = ba.getStatepCube();
+		bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
+
+
+		sup = null; // you never know ...
+
+		for(;;) {
+			BDDAutomaton next = ac.addone(work1, work2, true);
+			if(next == null) break;
+
+			if(Options.debug_on) {
+				Options.out.println("\n -----------------------------------------------------------\n");
+				Options.out.println("Check C(" + work2.toString() + ", " + work1.toString()  + ") ?");
+			}
+
+
+
 			try {
 				if(	sup != null) {
 					sup.cleanup();
 					sup = null;
-					if(states != -1) ba.deref(states);
-					states = -1;
 				}
-				sup = SupervisorFactory.createSupervisor(ba, work1, work2);
+				sup = SupervisorFactory.createSupervisor(ba, work2, work1);
 
-				if(Options.debug_on)
-				{
-					Options.out.println("Checking if " + work2.toString() + " subseteq " + work1.toString() );
-				}
+				bdd_bad = sup.computeReachableLanguageDifference(bdd_events);
+				boolean ret = (bdd_bad == ba.getZero());
 
-				states = sup.computeReachableLanguageDifference();
-				boolean ret = (states == ba.getZero());
-
+				// proof non-reachability:
 				if(ret) {
-					sup.cleanup();
-					ba.deref(states);
+					cleanup_bdds();
 					return true;
 				}
+
+				// proof reachability by local events and thus reachability globally:
+				if(try_local_reachability(sup, next, bdd_bad)) {
+					cleanup_bdds();
+					return false;
+				}
+
+
+			// XXX: this messes up things. events that are not in P (yet) will be removed and declared
+			//      ok while they are not! this is due to or "dirty trick" in the function
+			// Supervisor.computeLanguageDifference(...) :
+			// tmp2 = manager.andTo(tmp2, plant.getSigma());
+
+			// anyway, it seems that we can do without it...
+
+/*
+
+				// *** see if some events are proved to be unrachable and can be removed
+				if(event_included(bdd_bad, workset_events, changes) > 0) {
+
+					if(Options.debug_on)
+						ba.getEventManager().dumpSubset("*** Removed events", changes);
+
+					// and remove the targets in the queue waiting to be added
+					ac.removeTargets(workset_events, changes);
+
+					ba.deref(bdd_events);
+					bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
+				}
+
+*/
+
 			} catch(Exception exx) {
 				exx.printStackTrace();
-				if(sup != null) sup.cleanup();
-				if(states != -1) ba.deref(states);
+				cleanup_bdds();
 				return false;
 			}
 
 		}
 
-		// dump trace ...
-		if(Options.trace_on && sup != null && states != -1)
-		{
-			sup.trace("Trace", states);
+
+
+		// show the shortest trace to the language collision, if the user has enabled it
+		if(Options.trace_on && sup != null) {
+			show_trace(sup, bdd_bad);
 		}
 
-		// cleanup
-		if(sup != null) sup.cleanup();
-		if(states != -1) ba.deref(states);
+		// do the delayed cleanup!
+		cleanup_bdds();
 
-
-
-		// if no plants existed, then we cant fail! [becasue then L(P) = \Sigma^* ]
-		return work2.isEmpty();
-		*/
-
-		return false; // TODO
+		return work2.isEmpty();		// if no L, then always  K \subseteq \Sigma^*
 	}
 
+
+	private void  cleanup_bdds() {
+		if(bdd_bad != -1) {
+			ba.deref(bdd_bad);
+			bdd_bad = -1;
+		}
+		if(bdd_events != -1) {
+			ba.deref(bdd_events);
+			bdd_events = -1;
+		}
+		if(sup != null) {
+			sup.cleanup();	// do the delayed cleanup!
+			sup = null;
+		}
+	}
 }

@@ -597,6 +597,16 @@ public class BDDAutomaton
 	}
 
 
+	public void showEncoding(BDDAutomata ba) {
+		BDDAssert.internalCheck(manager == ba, "[INTERNAL ERROR] in BDDAutomaton.showEncoding() ");
+
+		Options.out.println("\n ---------------- BDD encoding of " + getName());
+		for(int i = 0; i < states.length; i++) {
+			Options.out.println(states[i].name_id );
+			ba.printSet(states[i].bdd_s );
+		}
+		Options.out.println();
+	}
 	// ---[ WeightedObject stuff ]-----------------------------------------------------
 	public Object object() { return this; }
 	public double weight() { return getIndex(); }
