@@ -115,10 +115,9 @@ public class Automaton
 		setAlphabet(newAlphabet);
 
 		// Create all states
-		Iterator states = orgAut.stateIterator();
-		while (states.hasNext())
+		for(StateIterator states = orgAut.stateIterator(); states.hasNext();)
 		{
-			State orgState = (State) states.next();
+			State orgState = states.nextState();
 			State newState = new State(orgState);
 
 			addState(newState);
@@ -127,26 +126,20 @@ public class Automaton
 		try
 		{
 			// Create all transitions
-			states = orgAut.stateIterator();
-
-			while (states.hasNext())
+			for (StateIterator states = orgAut.stateIterator(); states.hasNext(); )
 			{
 				State orgSourceState = (State) states.next();
 				State newSourceState = getStateWithId(orgSourceState.getId());
-				Iterator outgoingArcs = orgSourceState.outgoingArcsIterator();
 
-				while (outgoingArcs.hasNext())
+				for (Iterator outgoingArcs = orgSourceState.outgoingArcsIterator(); outgoingArcs.hasNext(); )
 				{
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
-					
+
 					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent());
-					// LabeledEvent currEvent = newAlphabet.getEventWithId(orgArc.getEventId());
-					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
-					// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 
 					addArc(newArc);
 				}
@@ -156,17 +149,25 @@ public class Automaton
 		{
 			logger.error("Error while copying transitions", ex);
 			logger.debug(ex.getStackTrace());
-			System.exit(0);
 		}
 	}
 
 	public void setType(AutomatonType type)
+		throws IllegalArgumentException
 	{
+		if (type == null)
+		{
+			throw new IllegalArgumentException("Type must be non-null");
+		}
 		this.type = type;
 	}
 
 	public AutomatonType getType()
 	{
+		if (type == null)
+		{
+			return AutomatonType.Undefined;
+		}
 		return type;
 	}
 
@@ -191,7 +192,13 @@ public class Automaton
 	}
 
 	public void setName(String name)
+		throws IllegalArgumentException
 	{
+		if (name == null)
+		{
+			throw new IllegalArgumentException("Name must be non-null");
+		}
+
 		String oldName = this.name;
 
 		this.name = name;
@@ -207,6 +214,7 @@ public class Automaton
 		}
 		return name;
 	}
+
 	public String getComment()
 	{
 		if (comment == null)
@@ -215,10 +223,17 @@ public class Automaton
 		}
 		return comment;
 	}
+
 	public void setComment(String comment)
+		throws IllegalArgumentException
 	{
+		if (comment == null)
+		{
+			throw new IllegalArgumentException("Comment must be non-null");
+		}
 		this.comment = comment;
 	}
+
 	public void setDisabled(boolean isDisabled)
 	{
 		this.isDisabled = isDisabled;
@@ -230,7 +245,13 @@ public class Automaton
 	}
 
 	public void addState(State state)
+		throws IllegalArgumentException
 	{
+		if (state == null)
+		{
+			throw new IllegalArgumentException("State must be non-null");
+		}
+
 		theStates.add(state);
 		if (state.getIndex() == -1)
 		{
@@ -250,7 +271,12 @@ public class Automaton
 	// If a state with this id (and/or name?) already exists, return the existing state
 	// Else, add this state and return it
 	public State addStateChecked(State state)
+		throws IllegalArgumentException
 	{
+		if (state == null)
+		{
+			throw new IllegalArgumentException("State must be non-null");
+		}
 		State existing = (State)idStateMap.get(state.getId());
 		if(existing != null)
 		{
@@ -262,7 +288,13 @@ public class Automaton
 	}
 
 	public void removeState(State state)
+		throws IllegalArgumentException
 	{
+		if (state == null)
+		{
+			throw new IllegalArgumentException("State must be non-null");
+		}
+
 		if (state == initialState)
 		{
 			initialState = null;
@@ -287,7 +319,13 @@ public class Automaton
 
 	// This is a fixx, for now - see bug report
 	public void setInitialState(State state)
+		throws IllegalArgumentException
 	{
+		if (state == null)
+		{
+			throw new IllegalArgumentException("State must be non-null");
+		}
+
 		State oldinit = getInitialState();
 
 		State newinit = getState(state);
@@ -347,11 +385,9 @@ public class Automaton
 	 */
 	public boolean hasAcceptingState()
 	{
-		Iterator stateIt = stateIterator();
-
-		while (stateIt.hasNext())
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.nextState();
 
 			if (currState.isAccepting())
 			{
@@ -378,9 +414,9 @@ public class Automaton
 	{
 		HashSet foundEvents = new HashSet();
 
-		for (Iterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State)stateIt.next();
+			State currState = stateIt.nextState();
 			foundEvents.clear();
 			for (Iterator evIt = outgoingEventsIterator(currState); evIt.hasNext(); )
 			{
@@ -407,21 +443,36 @@ public class Automaton
 	 * behavior is undefined.
 	 */
 	public void addArc(Arc arc)
+		throws IllegalArgumentException
 	{
+		if (arc == null)
+		{
+			throw new IllegalArgumentException("Arc must be non-null");
+		}
 		arc.getListeners().addListener(this);
 		theArcs.addArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
 	}
 
 	public void removeArc(Arc arc)
+		throws IllegalArgumentException
 	{
+		if (arc == null)
+		{
+			throw new IllegalArgumentException("Arc must be non-null");
+		}
 		theArcs.removeArc(arc);
 		arc.clear();
 		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
 
 	public boolean containsState(State state)
+		throws IllegalArgumentException
 	{
+		if (state == null)
+		{
+			throw new IllegalArgumentException("State must be non-null");
+		}
 		return idStateMap.containsKey(state.getId());
 	}
 
@@ -432,7 +483,12 @@ public class Automaton
 	}
 
 	public State getState(State state)
+		throws IllegalArgumentException
 	{
+		if (state == null)
+		{
+			throw new IllegalArgumentException("State must be non-null");
+		}
 		return (State) idStateMap.get(state.getId());
 	}
 
@@ -476,7 +532,7 @@ public class Automaton
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
 	// end index stuff
-	
+
 	// What the f*** are these doing here?
 
 	private LabeledEvent getEvent(String eventId)
@@ -518,9 +574,15 @@ public class Automaton
 	 * Returns an iterator to all states in this automaton
 	 * that has an event with eventLabel as an outoing event.
 	 */
-	public Iterator statesThatEnableEventIterator(String eventLabel)
+	public StateIterator statesThatEnableEventIterator(String eventLabel)
+		throws IllegalStateException
 	{
-		StateIterator stateIt = new StateIterator(eventLabel, true);
+		if (eventLabel == null)
+		{
+			throw new IllegalArgumentException("EventLabel must be non-null");
+		}
+
+		StateIterator stateIt = new InternalStateIterator(eventLabel, true);
 		return stateIt;
 	}
 
@@ -530,7 +592,13 @@ public class Automaton
 	 * prioritized then it returns false.
 	 */
 	public boolean isEventPrioritized(String eventLabel)
+		throws IllegalArgumentException
 	{
+		if (eventLabel == null)
+		{
+			throw new IllegalArgumentException("EventLabel must be non-null");
+		}
+
 		if (!containsEventWithLabel(eventLabel))
 		{
 			return false;
@@ -625,19 +693,18 @@ public class Automaton
 		return nbrOfAcceptingAndForbiddenStates;
 	}
 
-	public Iterator stateIterator()	// Should be 'getStateIterator'?
+	public StateIterator stateIterator()
 	{
-		return theStates.iterator();
+		return new StateIterator(theStates.iterator());
 	}
 
 	/**
 	 * Use this iterator instead of stateIterator when you will add or
 	 * remove states in this automaton.
 	 */
-	public Iterator safeStateIterator()
+	public StateIterator safeStateIterator()
 	{
-		// return (new LinkedList(theStates)).iterator();
-		return (new StateSet(theStates)).iterator();
+		return new StateIterator((new StateSet(theStates)).iterator());
 	}
 
 	public Iterator arcIterator()
@@ -653,13 +720,13 @@ public class Automaton
 	public Iterator outgoingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.outgoingArcsIterator();
-		return new EventIterator(arcIt);
+		return new InternalEventIterator(arcIt);
 	}
 
 	public Iterator incomingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.incomingArcsIterator();
-		return new EventIterator(arcIt);
+		return new InternalEventIterator(arcIt);
 	}
 
 	/**
@@ -725,7 +792,12 @@ public class Automaton
 	}
 
 	public void setAlphabet(Alphabet alphabet)
+		throws IllegalArgumentException
 	{
+		if (alphabet == null)
+		{
+			throw new IllegalArgumentException("Alphabet must be non-null");
+		}
 		this.alphabet = alphabet;
 	}
 
@@ -771,11 +843,9 @@ public class Automaton
 
 	public void clearVisitedStates()
 	{
-		Iterator stateIt = stateIterator();
-
-		while (stateIt.hasNext())
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.nextState();
 
 			currState.setVisited(false);
 		}
@@ -783,11 +853,9 @@ public class Automaton
 
 	private void removeAssociatedStateFromUnvisitedStates()
 	{
-		Iterator stateIt = stateIterator();
-
-		while (stateIt.hasNext())
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State) stateIt.next();
+			State currState = stateIt.nextState();
 			if (!currState.isVisited())
 			{
 				currState.setAssociatedState(null);
@@ -799,8 +867,16 @@ public class Automaton
 	 * Returns the shortest trace from the initial state to toState.
 	 */
 	public LabelTrace getTrace(State toState)
-		throws Exception
+		throws Exception, IllegalArgumentException, IllegalStateException
 	{
+		if (toState == null)
+		{
+			throw new IllegalArgumentException("Automaton.getTrace: toState must be non-null");
+		}
+		if (!hasInitialState())
+		{
+			throw new IllegalStateException("There is no initial state");
+		}
 		return getTrace(getInitialState(), toState);
 	}
 
@@ -808,15 +884,15 @@ public class Automaton
 	 * Returns the shortest trace from fromState to toState,
 	 */
 	public LabelTrace getTrace(State fromState, State toState)
-		throws Exception
+		throws Exception, IllegalArgumentException
 	{
 		if (fromState == null)
 		{
-			throw new Exception("Automaton.getTrace: fromState is null");
+			throw new IllegalArgumentException("Automaton.getTrace: fromState must be non-null");
 		}
 		if (toState == null)
 		{
-			throw new Exception("Automaton.getTrace: toState is null");
+			throw new IllegalArgumentException("Automaton.getTrace: toState must be non-null");
 		}
 
 		computeShortestPath(fromState);
@@ -846,11 +922,11 @@ public class Automaton
 	}
 
 	private void computeShortestPath(State fromState)
-		throws Exception
+		throws IllegalArgumentException
 	{
 		if (fromState == null)
 		{
-			throw new Exception("Automaton.getTrace: fromState is null");
+			throw new IllegalArgumentException("Automaton.getTrace: fromState is null");
 		}
 
 		clearVisitedStates();
@@ -1241,12 +1317,12 @@ public class Automaton
 				System.err.println("st != null");
 	}
 
-	class EventIterator
+	class InternalEventIterator
 		implements Iterator
 	{
 		private Iterator arcIt;
 
-		public EventIterator(Iterator arcIt)
+		public InternalEventIterator(Iterator arcIt)
 		{
 			this.arcIt = arcIt;
 		}
@@ -1267,7 +1343,7 @@ public class Automaton
 			}
 			catch (Exception ex)
 			{
-				logger.error("Automaton::EventIterator.next: Error in getEvent", ex);
+				logger.error("Automaton::InternalEventIterator.next: Error in getEvent", ex);
 				logger.debug(ex.getStackTrace());
 			}
 			return nextEvent;
@@ -1279,16 +1355,17 @@ public class Automaton
 		}
 	}
 
-	class StateIterator
-		implements Iterator
+	class InternalStateIterator
+		extends StateIterator
 	{
 		private Iterator arcIt;
 		private State currState = null;
 		private String eventLabel;
 		private boolean outgoing;
 
-		public StateIterator(String eventLabel, boolean outgoing)
+		public InternalStateIterator(String eventLabel, boolean outgoing)
 		{
+			super(null);
 			this.eventLabel = eventLabel;
 			this.outgoing = outgoing;
 			this.arcIt = theArcs.iterator();
@@ -1325,7 +1402,7 @@ public class Automaton
 				}
 				catch (Exception ex)
 				{
-					logger.error("Automaton::StateIterator.findNext: Error in getLabel", ex);
+					logger.error("Automaton::InternalStateIterator.findNext: Error in getLabel", ex);
 					logger.debug(ex.getStackTrace());
 				}
 				if (eventLabel.equals(currLabel))
