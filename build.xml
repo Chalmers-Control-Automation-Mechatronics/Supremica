@@ -158,13 +158,13 @@
 		<fileset dir="${javalibs.dir}"/>
 	</jar>
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica" perm="555"/>	
+	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica.cmd" perm="444"/>
+	<chmod file="${dist}/Supremica.cmd" perm="644"/>
 	<copy file="${templates}/JGrafChart" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart" perm="555"/>	
+	<chmod file="${dist}/JGrafChart" perm="755"/>	
 	<copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart.cmd" perm="444"/>	
+	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>	
 </target>
 
 <!-- Rebuild:
@@ -179,13 +179,13 @@
 		<fileset dir="${javalibs.dir}"/>
 	</jar>
 	<copy file="${templates}/Supremica" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica" perm="555"/>	
+	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/Supremica.cmd" perm="444"/>	
+	<chmod file="${dist}/Supremica.cmd" perm="644"/>	
 	<copy file="${templates}/JGrafChart" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart" perm="555"/>	
+	<chmod file="${dist}/JGrafChart" perm="755"/>	
 	<copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/JGrafChart.cmd" perm="444"/>			
+	<chmod file="${dist}/JGrafChart.cmd" perm="644"/>			
 </target>
 
 <target name="doc">
