@@ -8,10 +8,10 @@
 		<Event id="c2" label="c2" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="q0" initial="true"/>
-		<State id="1" name="q1"/>
-		<State id="2" name="q2"/>
-		<State id="3" name="q3"/>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+		<State id="2" name="q2" accepting="true"/>
+		<State id="3" name="q3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="a1"/>
@@ -30,7 +30,7 @@
 		<Event id="c1" label="c1" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="p0" initial="true"/>
+		<State id="0" name="p0" initial="true" accepting="true"/>
 		<State id="1" name="p1"/>
 	</States>
 	<Transitions>
