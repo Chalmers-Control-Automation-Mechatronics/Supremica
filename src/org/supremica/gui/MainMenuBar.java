@@ -355,23 +355,6 @@ public class MainMenuBar
 				}
 			});
 
-			// ++ ARASH:
-			// File.Export.RCP
-			if (SupremicaProperties.generalUseRCP())
-			{
-				JMenuItem menuFileExportRCP = new JMenuItem();
-				menuFileExportRCP.setText("To RCP...");
-				menuFileExport.add(menuFileExportRCP);
-				menuFileExportRCP.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.fileExportRCP(ActionMan.getGui());
-					}
-				});
-
-				separatorNeeded = true;
-			}
 		}
 
 		if (separatorNeeded)

@@ -47,6 +47,27 @@
  *  Supremica is owned and represented by KA.
  */
 
+
+
+
+
+// **************************************************************************************************
+// I quote Martin on this:
+//     "It's not that simple. The code below defeats that purpose. Where are the exporter objects?
+//      OO was invented just to avoid the type of code below. It's a maintenance nightmare!!"
+//
+// Suggested reading material for the author of this file
+//   - Design Patterns										ISBN 0201633612
+//   - The Object-Oriented Thought Process					ISBN 0672318539
+//   - The Java(TM) Programming Language (3rd Edition)		ISBN 0201704331
+//
+//    /Arash :)
+// **************************************************************************************************
+
+
+
+
+
 // This is the guy that ties together the Gui and the menus
 // This is nothing but the Controller in the ModelViewController pattern
 package org.supremica.gui;
@@ -607,10 +628,14 @@ public class ActionMan
 	private static final int    // instead of using constants later below :)
 		FORMAT_UNKNOWN = -1,
 		FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3,
-		FORMAT_RCP = 4, FORMAT_SP = 5, FORMAT_HTML = 6,
-		FORMAT_XML_DEBUG = 7, FORMAT_DOT_DEBUG = 8, FORMAT_DSX_DEBUG = 9,
-		FORMAT_RCP_DEBUG = 10, FORMAT_SP_DEBUG = 11, FORMAT_HTML_DEBUG = 12,
-		FORMAT_FSM = 13, FORMAT_FSM_DEBUG = 14;
+		FORMAT_SP = 4, FORMAT_HTML = 5,
+		FORMAT_XML_DEBUG = 6, FORMAT_DOT_DEBUG = 7, FORMAT_DSX_DEBUG = 8,
+		FORMAT_SP_DEBUG = 9, FORMAT_HTML_DEBUG = 10,
+		FORMAT_FSM = 11, FORMAT_FSM_DEBUG = 12,
+
+		FORMAT_PCG = 13, FORMAT_PCG_DEBUG = 14; // ARASH
+
+
 
 	// This class should really act as a factory for exporter objects, but that
 	// would mean rewriting the entire export/saveAs functionality. Should I bother?
@@ -622,12 +647,12 @@ public class ActionMan
 		private final String dotString = "dot";
 		private final String dsxString = "dsx";
 		private final String htmlString ="html";
-		private final String rcpString = "rcp";                         // ++ ARASH
 		private final String fsmString = "fsm";
+		private final String pcgString = "pcg";
 
 		private final Object[] possibleValues =
 		{
-			xmlString, spString, dotString, dsxString, fsmString, htmlString, rcpString
+			xmlString, spString, dotString, dsxString, fsmString, htmlString, pcgString
 		};
 
 		private JOptionPane pane = null;
@@ -712,14 +737,6 @@ public class ActionMan
 				}
 				return FORMAT_FSM;	// Should return a FsmExporter object
 			}
-			else if (selectedValue == rcpString)
-			{
-				if(checkbox.isSelected())
-				{
-					return FORMAT_RCP_DEBUG;
-				}
-				return FORMAT_RCP;	// Should return an RcpExporter object
-			}
 			else if (selectedValue == spString)
 			{
 				if(checkbox.isSelected())
@@ -735,6 +752,10 @@ public class ActionMan
 					return FORMAT_HTML_DEBUG;
 				}
 				return FORMAT_HTML;	// Should return a HtmlExporter object
+			}
+			else if (selectedValue == pcgString)
+			{
+				return (checkbox.isSelected()) ? FORMAT_PCG_DEBUG: FORMAT_PCG;
 			}
 			else
 			{
@@ -871,20 +892,36 @@ public class ActionMan
 			}
 			return;
 		}
-		if(exportMode == FORMAT_RCP_DEBUG)
+		if(exportMode == FORMAT_PCG_DEBUG)
 		{
-			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph( selectedAutomata );
+
+			TextFrame textframe = new TextFrame("PCG debug output");
+			try
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
-				TextFrame textframe = new TextFrame("RCP debug output");
+				a2cg.serialize(textframe.getPrintWriter());
+			}
+			catch(Exception ex)
+			{
+				logger.debug(ex.getStackTrace());
+			}
+			return;
+		}
+		else if (exportMode == FORMAT_PCG)
+		{
+			JFileChooser  fileExporter = new JFileChooser();
+			fileExporter.setDialogTitle("Save as ...");
+			if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION) {
+				File currFile = fileExporter.getSelectedFile();
+				if(currFile == null) return;
 				try
 				{
-					exporter.serialize(textframe.getPrintWriter());
+					AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph( selectedAutomata );
+					a2cg.serialize(currFile.getAbsolutePath());
 				}
 				catch(Exception ex)
 				{
-					logger.debug(ex.getStackTrace());
+				logger.debug(ex.getStackTrace());
 				}
 			}
 			return;
@@ -908,7 +945,7 @@ public class ActionMan
 			return;
 		}
 */
-		if (exportMode == FORMAT_DOT || exportMode == FORMAT_DSX || exportMode == FORMAT_FSM || exportMode == FORMAT_RCP)
+		if (exportMode == FORMAT_DOT || exportMode == FORMAT_DSX || exportMode == FORMAT_FSM || exportMode == FORMAT_PCG)
 		{
 			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 			{
@@ -994,10 +1031,6 @@ public class ActionMan
 		{
 			fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
 		}
-		else if (exportMode == FORMAT_RCP)
-		{
-			fileExporter = FileDialogs.getExportFileChooser(FileFormats.RCP);
-		}
 		else if (exportMode == FORMAT_SP)
 		{
 			fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
@@ -1045,12 +1078,6 @@ public class ActionMan
 						else if (exportMode == FORMAT_FSM)
 						{
 							AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
-
-							exporter.serialize(currFile.getAbsolutePath());
-						}
-						else if (exportMode == FORMAT_RCP)
-						{
-							AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
 
 							exporter.serialize(currFile.getAbsolutePath());
 						}
@@ -1983,12 +2010,6 @@ public class ActionMan
 		{
 			gui.close();
 		}
-	}
-
-	// ++ ARASH:
-	public static void fileExportRCP(Gui gui)
-	{
-		automataExport(gui, FORMAT_RCP);
 	}
 
 	public static void fileExportDesco(Gui gui)
@@ -3639,8 +3660,7 @@ public class ActionMan
 	}
 	*/
 
-	// BDD developer stuff:
-
+	// BDD developer stuff: these are disabled if org.supremica.util.BDD.Options.dev_mode == false
 	public static void DoBDDReachability() {
 		org.supremica.util.BDD.test.DeveloperTest.DoReachability(gui.getSelectedAutomata());
 	}

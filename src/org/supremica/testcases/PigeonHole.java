@@ -66,7 +66,7 @@ public class PigeonHole extends Automata {
 		// add holes:
 		for (int i = 0; i < holes; i++)
 		{
-			Automaton h = new Automaton("H:" + (i + 1) + ":empty");
+			Automaton h = new Automaton("H:" + (i + 1));
 			State last = null;
 
 			for(int k = 0; k < pigeons; k++) {

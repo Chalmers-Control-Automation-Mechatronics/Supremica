@@ -46,7 +46,7 @@ public class StateSet
 
 			if(s.name.equals(name))
 			{
-				by_id = null;
+				by_id = s;
 			}
 		}
 
@@ -56,6 +56,14 @@ public class StateSet
 		{
 			System.err.println("[StateSet.getByName] BAD MODEL, uses name " + by_id.name + " instead of " + by_id.name_id);
 			return by_id;
+		}
+
+
+		// DEBUG:
+		System.out.println("Failed to find " + name + " dumping complete state set for this automaton:");
+		for (Enumeration e = elements(); e.hasMoreElements(); ) {
+			State s = (State) e.nextElement();
+			System.out.println("State " + s.name + ", id = " + s.name_id + ", id = " + s.id + ", code = " + s.code);
 		}
 
 		return null;
