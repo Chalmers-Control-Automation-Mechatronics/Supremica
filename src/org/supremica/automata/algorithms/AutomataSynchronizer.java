@@ -121,17 +121,26 @@ public class AutomataSynchronizer
 	}
 	
  	public Automaton getAutomaton()
+		throws Exception
   	{
 		AutomataSynchronizerExecuter currExec =
 			(AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
-		if (currExec.buildAutomaton())
+		try
 		{
-			// System.out.println(synchHelper.getAutomaton() == null);
-			return synchHelper.getAutomaton();
+			if (currExec.buildAutomaton())
+			{
+				// System.out.println(synchHelper.getAutomaton() == null);
+				return synchHelper.getAutomaton();
+			}
+			else
+			{
+				return null;
+			}
 		}
-		else
+		catch (Exception ex)
 		{
-			return null;
+			thisCategory.error(ex.toString());
+			throw ex;
 		}
 	}
 

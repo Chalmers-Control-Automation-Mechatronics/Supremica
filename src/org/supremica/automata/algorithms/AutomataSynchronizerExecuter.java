@@ -473,6 +473,8 @@ public final class AutomataSynchronizerExecuter
 	 */
     public void run()
     {
+	
+	
 		initialize();
 
 		// Get the first state to process
@@ -543,6 +545,7 @@ public final class AutomataSynchronizerExecuter
 			}
       		currState = helper.getStateToProcess();
         }
+		
 	}
 
 	/**
@@ -563,6 +566,7 @@ public final class AutomataSynchronizerExecuter
 	 * @return true if build successful, false if build is stopped with requestStop().
 	 */
 	public boolean buildAutomaton()
+		throws Exception
     {
 		return buildAutomaton(true);
 	}
@@ -574,7 +578,12 @@ public final class AutomataSynchronizerExecuter
 	 * @return true if build successful, false if build is stopped with requestStop().
 	 */
 	public boolean buildAutomaton(boolean longformId)
+		throws Exception
     {
+	
+		try
+		{
+	
         Automaton theAutomaton = helper.getAutomaton();
         theAutomaton.setName("regaut");
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
@@ -733,6 +742,12 @@ public final class AutomataSynchronizerExecuter
 		}
 
 		return true;
+		
+		}
+		catch (OutOfMemoryError ex)
+		{
+			throw new Exception("Out of memory. Try to increase the JVM heap.");
+		}
     }
 
    private String printTypeIsPlantTable()
