@@ -230,7 +230,7 @@ public class LogDisplay
 		}
 
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.ERROR), Color.red);
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.WARN), Color.red);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.WARN), new Color(255,127,0)); // Color.orange);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.INFO), new Color(0, 80, 0));
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Priority.DEBUG), Color.blue);
 	}
