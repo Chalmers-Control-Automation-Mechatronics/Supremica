@@ -2318,7 +2318,7 @@ public class ActionMan
 			return;
 		}
 
-		Automata currAutomata = gui.getVisualProjectContainer().getActiveProject();
+		Project currProject = gui.getVisualProjectContainer().getActiveProject();
 
 		if (currFile != null)
 		{
@@ -2326,6 +2326,14 @@ public class ActionMan
 			{
 				try
 				{
+					if (currProject.hasExecutionParameters())
+						if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(gui.getComponent(),
+								"The project contains an execution part which will be lost when saving. Do a backup copy of " + currFile.getPath() + " first. Continue saving (and erase execution part from file)?",
+								"Saving will erase execution part from file",
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.WARNING_MESSAGE))
+							return;
+						
 					FileSecurity fileSecurity = gui.getFileSecurity();
 
 					if (SupremicaProperties.generalUseSecurity())
@@ -2337,11 +2345,11 @@ public class ActionMan
 							return;
 						}
 
-						currAutomata.setOwner(fileSecurity.getCurrentUser());
-						currAutomata.setHash(currAutomata.computeHash());
+						currProject.setOwner(fileSecurity.getCurrentUser());
+						currProject.setHash(currProject.computeHash());
 					}
 
-					AutomataToXml exporter = new AutomataToXml(currAutomata);
+					AutomataToXml exporter = new AutomataToXml(currProject);
 
 					exporter.serialize(currFile.getAbsolutePath());
 				}
