@@ -39,9 +39,9 @@
 
 <!--
 *	If you for some reason prefer javac instead of jikes,
-*	just change "jikes" to "classic" on the next line.
+*	just change "jikes" to "modern" on the next line.
 -->
-<property name="build.compiler" value="jikes"/>
+<property name="build.compiler" value="modern"/>
 <!-- Enables emacs warning warning and error mesages. This is equals to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
 	Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
@@ -129,6 +129,7 @@
 	<unjar src="${lib}/interfaceRobotStudio3_0.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
 
 	
@@ -219,6 +220,7 @@
 		includeJavaRuntime="yes"
 		deprecation="false"
 		verbose="false"
+		nowarn="true"
 		includes="
 			${supremica_basedir}/external/**,
 			${jgrafchart_basedir}/external/**"
@@ -238,7 +240,7 @@
 		includeJavaRuntime="yes"
 		deprecation="false"
 		verbose="false"
-		nowarn="false"
+		nowarn="true"
 		excludes="
 			${jgrafchart_basedir}/**,
 			${supremica_basedir}/external/comInterfaces/**,
