@@ -1,0 +1,171 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE vt SYSTEM "vt.dtd">
+<vt version="1.0">
+    <variables count="6">
+        <var index="0" type="enum" domain_size="2"/>
+        <var index="1" type="enum" domain_size="12"/>
+        <var index="2" type="enum" domain_size="2"/>
+        <var index="3" type="enum" domain_size="6"/>
+        <var index="4" type="enum" domain_size="2"/>
+        <var index="5" type="enum" domain_size="4"/>
+    </variables>
+    <presentation>
+        <layer name="SystemVariables">
+            <entry>
+                <key>0</key>
+                <value>Gender</value>
+            </entry>
+            <entry>
+                <key>1</key>
+                <value>Size</value>
+            </entry>
+            <entry>
+                <key>2</key>
+                <value>GeneralType</value>
+            </entry>
+            <entry>
+                <key>3</key>
+                <value>Color</value>
+            </entry>
+            <entry>
+                <key>4</key>
+                <value>SoleType</value>
+            </entry>
+            <entry>
+                <key>5</key>
+                <value>ShoeType</value>
+            </entry>
+        </layer>
+        <layer name="SystemValues">
+            <entry>
+                <key>0</key>
+                <value>Male</value>
+            </entry>
+            <entry>
+                <key>1</key>
+                <value>Female</value>
+            </entry>
+            <entry>
+                <key>2</key>
+                <value>35</value>
+            </entry>
+            <entry>
+                <key>3</key>
+                <value>36</value>
+            </entry>
+            <entry>
+                <key>4</key>
+                <value>37</value>
+            </entry>
+            <entry>
+                <key>5</key>
+                <value>38</value>
+            </entry>
+            <entry>
+                <key>6</key>
+                <value>39</value>
+            </entry>
+            <entry>
+                <key>7</key>
+                <value>40</value>
+            </entry>
+            <entry>
+                <key>8</key>
+                <value>41</value>
+            </entry>
+            <entry>
+                <key>9</key>
+                <value>42</value>
+            </entry>
+            <entry>
+                <key>10</key>
+                <value>43</value>
+            </entry>
+            <entry>
+                <key>11</key>
+                <value>44</value>
+            </entry>
+            <entry>
+                <key>12</key>
+                <value>45</value>
+            </entry>
+            <entry>
+                <key>13</key>
+                <value>46</value>
+            </entry>
+            <entry>
+                <key>14</key>
+                <value>Children</value>
+            </entry>
+            <entry>
+                <key>15</key>
+                <value>Adult</value>
+            </entry>
+            <entry>
+                <key>16</key>
+                <value>red</value>
+            </entry>
+            <entry>
+                <key>17</key>
+                <value>black</value>
+            </entry>
+            <entry>
+                <key>18</key>
+                <value>white</value>
+            </entry>
+            <entry>
+                <key>19</key>
+                <value>brown</value>
+            </entry>
+            <entry>
+                <key>20</key>
+                <value>pink</value>
+            </entry>
+            <entry>
+                <key>21</key>
+                <value>green</value>
+            </entry>
+            <entry>
+                <key>22</key>
+                <value>typeA</value>
+            </entry>
+            <entry>
+                <key>23</key>
+                <value>typeB</value>
+            </entry>
+            <entry>
+                <key>24</key>
+                <value>Hiking</value>
+            </entry>
+            <entry>
+                <key>25</key>
+                <value>Indoors</value>
+            </entry>
+            <entry>
+                <key>26</key>
+                <value>Walking</value>
+            </entry>
+            <entry>
+                <key>27</key>
+                <value>Running</value>
+            </entry>
+        </layer>
+    </presentation>
+    <conf_static>
+        <data>
+            <![CDATA[v6 n12 e36 r2
+A-B,B-B,C-B,D-B,E-C,F-C,G-C,H-C,I-C,J-C,K-C,L-C
+A-C,B-D
+B-C
+A-C,B-D,C-C,D-D,E-C,F-C
+B-C,C-B,D-C
+A-C,B-D
+A-D,B-A
+C-A,D-A
+B-A,C-A,D-A
+A-A,C-A,D-A
+A,C,D,F,H,J
+]]>
+        </data>
+    </conf_static>
+</vt>
