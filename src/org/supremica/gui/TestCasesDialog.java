@@ -45,6 +45,7 @@ class UsersPanel
 	implements TestCase
 {
 	IntegerField int_num = null;
+	IntegerField int_rsc = null;
 	JCheckBox req = new JCheckBox("request (a)");
 	JCheckBox acc = new JCheckBox("access  (b)", true);
 	JCheckBox rel = new JCheckBox("release (c)");
@@ -62,6 +63,8 @@ class UsersPanel
 
 		JPanel num_users = new JPanel();
 
+		num_users.add(new JLabel("Number of resources: "));
+		num_users.add(int_rsc = new IntegerField("1", 6));
 		num_users.add(new JLabel("Number of users: "));
 		num_users.add(int_num = new IntegerField("3", 6));
 		add(BorderLayout.NORTH, cont);
@@ -71,7 +74,7 @@ class UsersPanel
 	public Project doIt()
 		throws Exception
 	{
-		Users users = new Users(int_num.get(), req.isSelected(), acc.isSelected(), rel.isSelected());
+		Users users = new Users(int_num.get(), int_rsc.get(), req.isSelected(), acc.isSelected(), rel.isSelected());
 
 		return users.getProject();
 	}
