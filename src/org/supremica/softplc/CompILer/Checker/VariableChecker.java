@@ -100,9 +100,14 @@ public class VariableChecker implements SimpleNodeVisitor {
 		outParameters = n.getOutParameters();
 
 		parent = n.jjtGetParent();
+
+		/* Skapa referens till function_block_body */
 		greatParent = parent.jjtGetParent();
+
 		fb_name = ((ASTfb_name)(((ASTil_fb_call)parent).getChildren())[1]).getName();
 
+		/* il_fb_call's index i function_block_body's barn
+           (il_fb_call är il_param_list's förälder)          */
 		pos = ((VCinfo)o).childIndex;
 
 		if (inParameters != null) {
@@ -118,6 +123,8 @@ public class VariableChecker implements SimpleNodeVisitor {
 					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
 					jjtn_simple_op.setName("LD");
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
+
+					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
 
 					if (p.parameterType == "numeric_literal") {
@@ -215,6 +222,8 @@ public class VariableChecker implements SimpleNodeVisitor {
 					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
 					jjtn_simple_op.setName("ST");
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
+
+					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
 
 					jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
@@ -231,7 +240,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 		}
 
 		parent.jjtDeleteChild(2);
-		pos = pos + 1;
+  		pos = pos + 1;
 
 		if (outParameters != null) {
 			for (i = 0; i < outParameters.size(); i++)
@@ -247,6 +256,8 @@ public class VariableChecker implements SimpleNodeVisitor {
 					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
 					jjtn_simple_op.setName("LD");
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
+
+					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
 
 
@@ -320,6 +331,8 @@ public class VariableChecker implements SimpleNodeVisitor {
 					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
 					jjtn_simple_op.setName("ST");
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
+
+					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
 
 
@@ -660,13 +673,15 @@ public class VariableChecker implements SimpleNodeVisitor {
 
     public Object visitFUNCTION_BLOCK_BODY(ASTfunction_block_body n, Object o){
 		if (((VCinfo)o).pass == 2) {
+			((VCinfo)o).childIndex = -1;
 
 			Node[] children = n.getChildren();
 			if (children != null) {
 				for (int i=0; i < children.length; i++) {
+					System.out.println("___ Child #" + i);
 					SimpleNode c = (SimpleNode)children[i];
 					if (c != null) {
-						((VCinfo)o).childIndex = i;
+						((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 						c.visit(this, o);
 					}
 				}

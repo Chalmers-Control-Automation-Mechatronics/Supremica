@@ -29,7 +29,7 @@ FUNCTION_BLOCK TON
 	ST tonQ
 (*
 	CAL PRINT("tid =", tonET)
-	CAL PRINTLN("") 
+	CAL PRINTLN("")
 *)
 END_FUNCTION_BLOCK
 PROGRAM TONtest
@@ -132,15 +132,15 @@ PROGRAM PRINTtest
 	LD  "HELLO"
 	ST  WSp.output
 	CAL WSp
-	
+
 	LD  DINT#5677
 	ST  Dp.output
 	CAL Dp
-	
+
 	LD  REAL#45.5667
 	ST  Rp.output
 	CAL Rp
-	
+
 	LD  TRUE
 	ST  Bp.output
 	CAL Bp
@@ -183,6 +183,7 @@ FUNCTION_BLOCK PrintlnDINT
 	ST jblock.output
 	CAL jblock
 END_FUNCTION_BLOCK
+
 JAVA_BLOCK JPrintlnREAL
 	VAR_IN_OUT
 		output:REAL;
@@ -229,15 +230,17 @@ PROGRAM PRINTLNtest
 	LD  "HELLO"
 	ST  WSpln.output
 	CAL WSpln
-	
+
+	CAL WSpln(output := "ddddddddddddddddddddddddddddd")
+
 	LD  DINT#5677
 	ST  Dpln.output
 	CAL Dpln
-	
+
 	LD  REAL#45.5667
 	ST  Rpln.output
 	CAL Rpln
-	
+
 	LD  TRUE
 	ST  Bpln.output
 	CAL Bpln
