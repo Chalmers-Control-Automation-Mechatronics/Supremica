@@ -55,7 +55,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomataExtender
 {
@@ -104,7 +104,7 @@ public class AutomataExtender
 
 		if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
 		{
-			EventLabel passEvent = new EventLabel("pass");
+			LabeledEvent passEvent = new LabeledEvent("pass");
 
 			passEvent.setControllable(true);
 			passEvent.setId(passEventId);
@@ -124,11 +124,11 @@ public class AutomataExtender
 
 			while (eventIt.hasNext())
 			{
-				EventLabel currEvent = (EventLabel) eventIt.next();
+				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 				if (!currEvent.isControllable())
 				{
-					EventLabel newEvent = new EventLabel(currEvent);
+					LabeledEvent newEvent = new LabeledEvent(currEvent);
 
 					newEvent.setControllable(true);
 					newEvent.setLabel(currEvent.getLabel());
@@ -141,7 +141,7 @@ public class AutomataExtender
 
 			while (eventIt.hasNext())
 			{
-				EventLabel currEvent = (EventLabel) eventIt.next();
+				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 				newAlphabet.addEvent(currEvent);
 			}
@@ -203,7 +203,7 @@ public class AutomataExtender
 				{
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
-					EventLabel currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 
 					if (i < k)
 					{

@@ -56,7 +56,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.ArcSet;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class Labels
 	extends JGoArea
@@ -90,7 +90,7 @@ public class Labels
 		{
 			Arc currArc = (Arc) arcIt.next();
 			String eventId = currArc.getEventId();
-			EventLabel currEvent = theAlphabet.getEventWithId(eventId);
+			LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
 			JGoText theText = new JGoText(currEvent.getLabel());
 
 			addObjectAtTail(theText);

@@ -62,7 +62,7 @@ import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
@@ -223,7 +223,7 @@ public class AutomataVerifier
 
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
-		EventLabel currEvent;
+		LabeledEvent currEvent;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
 		ArrayList selectedAutomata = new ArrayList();
@@ -249,7 +249,7 @@ public class AutomataVerifier
 
 				while (eventIterator.hasNext())
 				{
-					currEvent = (EventLabel) eventIterator.next();
+					currEvent = (LabeledEvent) eventIterator.next();
 
 					if (!currEvent.isControllable())
 					{
@@ -698,11 +698,11 @@ public class AutomataVerifier
 		int amountOfCommon = 0;
 		int amountOfUnique = 0;
 		Iterator eventIterator = rightAlphabet.iterator();
-		EventLabel currEvent;
+		LabeledEvent currEvent;
 
 		while (eventIterator.hasNext())
 		{
-			currEvent = (EventLabel) eventIterator.next();
+			currEvent = (LabeledEvent) eventIterator.next();
 
 			if (leftAlphabet.containsEventWithLabel(currEvent.getLabel()))
 			{

@@ -8,7 +8,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 class BrickBuilder
 {
@@ -24,12 +24,12 @@ class BrickBuilder
 	{
 		State source = automaton.getState(shared_states[r][c]);
 		State dest = automaton.getState(shared_states[r][c + 1]);
-		EventLabel src_dst = reverse
-							 ? new EventLabel(dest.getId() + source.getId() + num)
-							 : new EventLabel(source.getId() + dest.getId() + num);
-		EventLabel dst_src = reverse
-							 ? new EventLabel(source.getId() + dest.getId() + num)
-							 : new EventLabel(dest.getId() + source.getId() + num);
+		LabeledEvent src_dst = reverse
+							 ? new LabeledEvent(dest.getId() + source.getId() + num)
+							 : new LabeledEvent(source.getId() + dest.getId() + num);
+		LabeledEvent dst_src = reverse
+							 ? new LabeledEvent(source.getId() + dest.getId() + num)
+							 : new LabeledEvent(dest.getId() + source.getId() + num);
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);
@@ -42,12 +42,12 @@ class BrickBuilder
 	{
 		State source = automaton.getState(shared_states[r][c]);
 		State dest = automaton.getState(shared_states[r + 1][c]);
-		EventLabel src_dst = reverse
-							 ? new EventLabel(dest.getId() + source.getId() + num)
-							 : new EventLabel(source.getId() + dest.getId() + num);
-		EventLabel dst_src = reverse
-							 ? new EventLabel(source.getId() + dest.getId() + num)
-							 : new EventLabel(dest.getId() + source.getId() + num);
+		LabeledEvent src_dst = reverse
+							 ? new LabeledEvent(dest.getId() + source.getId() + num)
+							 : new LabeledEvent(source.getId() + dest.getId() + num);
+		LabeledEvent dst_src = reverse
+							 ? new LabeledEvent(source.getId() + dest.getId() + num)
+							 : new LabeledEvent(dest.getId() + source.getId() + num);
 
 		automaton.getAlphabet().addEvent(src_dst);
 		automaton.getAlphabet().addEvent(dst_src);

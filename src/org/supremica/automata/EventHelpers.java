@@ -73,7 +73,7 @@ public class EventHelpers
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	public static EventLabel createEvent(EventsSet eventSet, String prefix)
+	public static LabeledEvent createEvent(EventsSet eventSet, String prefix)
 		throws IllegalArgumentException, Exception
 	{
 		if (eventSet.size() <= 0)
@@ -86,7 +86,7 @@ public class EventHelpers
 		}
 
 		Iterator eventIt = eventSet.iterator();
-		EventLabel tmpEvent = (EventLabel) eventIt.next();
+		LabeledEvent tmpEvent = (LabeledEvent) eventIt.next();
 
 		// Some initializations
 		String id = tmpEvent.getId();
@@ -97,7 +97,7 @@ public class EventHelpers
 
 		while (eventIt.hasNext())
 		{
-			tmpEvent = (EventLabel) eventIt.next();
+			tmpEvent = (LabeledEvent) eventIt.next();
 
 			if (!label.equals(tmpEvent.getLabel()))
 			{
@@ -121,7 +121,7 @@ public class EventHelpers
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 
-		EventLabel theEvent = new EventLabel(label);
+		LabeledEvent theEvent = new LabeledEvent(label);
 
 		theEvent.setId(id);
 

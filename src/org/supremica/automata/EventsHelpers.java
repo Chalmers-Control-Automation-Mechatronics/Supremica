@@ -93,7 +93,7 @@ public class EventsHelpers
 
 			while (eventIt.hasNext())
 			{
-				theEvents.addEvent((EventLabel) eventIt.next());
+				theEvents.addEvent((LabeledEvent) eventIt.next());
 			}
 
 			return theEvents;

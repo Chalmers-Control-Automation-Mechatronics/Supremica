@@ -60,7 +60,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 /**
  *@author  ka
@@ -117,7 +117,7 @@ public class LanguageInclusionCheck
 
 			while (eventIteratorA.hasNext())
 			{
-				((EventLabel) eventIteratorA.next()).setControllable(false);
+				((LabeledEvent) eventIteratorA.next()).setControllable(false);
 			}
 		}
 
@@ -134,7 +134,7 @@ public class LanguageInclusionCheck
 		// are included in the union alphabet found above, mark the automata as
 		// specifications
 		Iterator automatonIteratorB = AutomataB.iterator();
-		EventLabel currEvent;
+		LabeledEvent currEvent;
 
 		while (automatonIteratorB.hasNext())
 		{
@@ -146,7 +146,7 @@ public class LanguageInclusionCheck
 
 			while (eventIteratorB.hasNext())
 			{
-				currEvent = (EventLabel) eventIteratorB.next();
+				currEvent = (LabeledEvent) eventIteratorB.next();
 
 				if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
 				{

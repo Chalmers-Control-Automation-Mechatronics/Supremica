@@ -56,7 +56,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.ArcSet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomatonToDot
 	implements AutomataSerializer
@@ -219,7 +219,7 @@ public class AutomatonToDot
 				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
 				{
 					Arc currArc = (Arc) arcIt.next();
-					EventLabel thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
+					LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
 
 					if (!thisEvent.isControllable())
 					{

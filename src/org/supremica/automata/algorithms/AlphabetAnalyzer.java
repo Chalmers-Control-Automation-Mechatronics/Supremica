@@ -56,7 +56,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AlphabetAnalyzer
 {
@@ -111,7 +111,7 @@ public class AlphabetAnalyzer
 
 			while (eventIt.hasNext())
 			{
-				EventLabel currEvent = (EventLabel) eventIt.next();
+				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 				insertEvent(currEvent, currAutomaton);
 			}
@@ -136,7 +136,7 @@ public class AlphabetAnalyzer
 
 				while (eventIt.hasNext())
 				{
-					EventLabel currEvent = (EventLabel) eventIt.next();
+					LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 					if (!currEvent.isControllable())
 					{
@@ -147,7 +147,7 @@ public class AlphabetAnalyzer
 		}
 	}
 
-	private void insertEvent(EventLabel ev, Automaton aut)
+	private void insertEvent(LabeledEvent ev, Automaton aut)
 	{
 		Set automatonSet = (Set) eventToAutomataMap.get(ev);
 
@@ -167,7 +167,7 @@ public class AlphabetAnalyzer
 	 *@param  ev the event that should be examined.
 	 *@return  true if the given event is present in zero or one automata, and false if it is present on more than one automata.
 	 */
-	public boolean isUnsynchronizedEvent(EventLabel ev)
+	public boolean isUnsynchronizedEvent(LabeledEvent ev)
 	{
 		Set automatonSet = (Set) eventToAutomataMap.get(ev);
 
@@ -186,7 +186,7 @@ public class AlphabetAnalyzer
 
 		while (eventIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) eventIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 			if (isUnsynchronizedEvent(currEvent))
 			{

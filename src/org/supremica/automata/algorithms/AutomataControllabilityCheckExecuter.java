@@ -58,7 +58,7 @@ import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 /**
  *@author  ka
@@ -444,7 +444,7 @@ public final class AutomataControllabilityCheckExecuter
 						if (nextIndex >= 0)
 						{
 							State nextState = theAutomaton.getStateWithIndex(nextIndex);
-							EventLabel theEvent = theAlphabet.getEventWithIndex(currEventIndex);
+							LabeledEvent theEvent = theAlphabet.getEventWithIndex(currEventIndex);
 							Arc newArc = new Arc(thisState, nextState, theEvent.getId());
 
 							theAutomaton.addArc(newArc);

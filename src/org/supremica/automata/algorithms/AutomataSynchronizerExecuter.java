@@ -62,7 +62,7 @@ import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -843,7 +843,7 @@ public final class AutomataSynchronizerExecuter
 							if (nextIndex >= 0)
 							{
 								State nextState = theAutomaton.getStateWithIndex(nextIndex);
-								EventLabel theEvent = theAlphabet.getEventWithIndex(currEventIndex);
+								LabeledEvent theEvent = theAlphabet.getEventWithIndex(currEventIndex);
 								Arc newArc = new Arc(thisState, nextState, theEvent.getId());
 
 								theAutomaton.addArc(newArc);
@@ -1060,7 +1060,7 @@ public final class AutomataSynchronizerExecuter
 	 *
 	 *@param  event the current uncontrollable event the synchronization should focus on.
 	 */
-	public void setCurrUncontrollableEvent(EventLabel event)
+	public void setCurrUncontrollableEvent(LabeledEvent event)
 	{
 		currUncontrollableEvent = event.getSynchIndex();
 	}

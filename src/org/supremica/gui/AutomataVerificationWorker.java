@@ -62,7 +62,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonContainer;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 /**
  * Thread dealing with verification.
@@ -424,7 +424,7 @@ public class AutomataVerificationWorker
 
 				while (eventIteratorA.hasNext())
 				{
-					((org.supremica.automata.EventLabel) eventIteratorA.next()).setControllable(false);
+					((org.supremica.automata.LabeledEvent) eventIteratorA.next()).setControllable(false);
 				}
 			}
 
@@ -453,7 +453,7 @@ public class AutomataVerificationWorker
 			// are included in the union alphabet found above, mark the automata as
 			// specifications
 			Iterator automatonIteratorB = automataB.iterator();
-			org.supremica.automata.EventLabel currEvent;
+			org.supremica.automata.LabeledEvent currEvent;
 
 			while (automatonIteratorB.hasNext())
 			{
@@ -465,7 +465,7 @@ public class AutomataVerificationWorker
 
 				while (eventIteratorB.hasNext())
 				{
-					currEvent = (org.supremica.automata.EventLabel) eventIteratorB.next();
+					currEvent = (org.supremica.automata.LabeledEvent) eventIteratorB.next();
 
 					if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
 					{

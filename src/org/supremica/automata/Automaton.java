@@ -123,7 +123,7 @@ public class Automaton
 				{
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
-					EventLabel currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 					State newDestState = getStateWithId(orgDestState.getId());
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 
@@ -259,7 +259,7 @@ public class Automaton
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
 
-	public EventLabel getEvent(String eventId)
+	public LabeledEvent getEvent(String eventId)
 		throws Exception
 	{
 		return alphabet.getEventWithId(eventId);
@@ -271,7 +271,7 @@ public class Automaton
 	}
 
 	// FIXA: används inte? Ovanstående är käckt i alla fall.
-	public EventLabel getEventWithLabel(String eventLabel)
+	public LabeledEvent getEventWithLabel(String eventLabel)
 		throws Exception
 	{
 		return alphabet.getEventWithLabel(eventLabel);

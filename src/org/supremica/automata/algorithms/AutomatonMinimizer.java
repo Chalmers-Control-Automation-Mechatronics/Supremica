@@ -54,7 +54,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomatonMinimizer
 {
@@ -257,7 +257,7 @@ public class AutomatonMinimizer
 
 		while (eventIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) eventIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 			refined = doMinimization(equivClasses, equivClass, currEvent) || refined;
 		}
@@ -265,7 +265,7 @@ public class AutomatonMinimizer
 		return refined;
 	}
 
-	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass, EventLabel e)
+	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass, LabeledEvent e)
 	{
 
 		// System.err.println("A iteration in doMinimization <classes, class, event>");
@@ -494,7 +494,7 @@ class EquivalenceClass
 	 *@param  e Description of the Parameter
 	 *@return  Description of the Return Value
 	 */
-	public EquivalenceClassHolder split(EventLabel e)
+	public EquivalenceClassHolder split(LabeledEvent e)
 	{
 
 		// System.err.println("Splitting " + e.getLabel());

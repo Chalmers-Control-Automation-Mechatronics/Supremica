@@ -60,7 +60,7 @@ import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 /**
  * Contains information that is common to all synchronization threads.
@@ -505,7 +505,7 @@ public final class AutomataSynchronizerHelper
 
 		for (Iterator eventIterator = unionAlphabet.iterator(); eventIterator.hasNext(); )
 		{
-			EventLabel currEvent = (EventLabel) eventIterator.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIterator.next();
 
 			if (currEvent.getExpansionPriority() < 0)
 			{

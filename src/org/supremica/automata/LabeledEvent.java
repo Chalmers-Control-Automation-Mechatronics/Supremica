@@ -51,7 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 
-public class EventLabel
+public class LabeledEvent
 	implements Comparable
 {
 	private String id = "";
@@ -63,9 +63,9 @@ public class EventLabel
 	private int synchIndex = -1;
 
 	// private Action theAction = null;
-	public EventLabel() {}
+	public LabeledEvent() {}
 
-	public EventLabel(String label)
+	public LabeledEvent(String label)
 	{
 		this.label = label;
 
@@ -74,13 +74,13 @@ public class EventLabel
 		this.id = label;
 	}
 
-	public EventLabel(String label, String id)
+	public LabeledEvent(String label, String id)
 	{
 		setLabel(label);
 		setId(id);
 	}
 
-	public EventLabel(EventLabel e)
+	public LabeledEvent(LabeledEvent e)
 	{
 		id = e.id;
 		label = e.label;
@@ -170,7 +170,7 @@ public class EventLabel
 	{
 
 		// System.err.println("equalsObject");
-		return this.label.equals(((EventLabel) obj).label);
+		return this.label.equals(((LabeledEvent) obj).label);
 	}
 
 	public boolean equals(String label)
@@ -182,7 +182,7 @@ public class EventLabel
 
 	public boolean equalId(Object obj)
 	{
-		return this.id.equals(((EventLabel) obj).id);
+		return this.id.equals(((LabeledEvent) obj).id);
 	}
 
 	public boolean equalId(String id)
@@ -209,7 +209,7 @@ public class EventLabel
 	{
 
 		// System.err.println("CompareTo");
-		return label.compareTo(((EventLabel) event).label);
+		return label.compareTo(((LabeledEvent) event).label);
 	}
 
 	/*

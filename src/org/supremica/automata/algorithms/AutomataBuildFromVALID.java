@@ -62,7 +62,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomataBuildFromVALID
 {
@@ -310,7 +310,7 @@ public class AutomataBuildFromVALID
 						// Change name on the label in the automaton
 						// currAutomata.getAutomaton(newAutomatonName).getEventWithLabel(oldEventName).setLabel(new String(newEventName));
 						Automaton currAutomaton = currAutomata.getAutomaton(newAutomatonName);
-						EventLabel currEvent = currAutomaton.getEventWithLabel(oldEventName);
+						LabeledEvent currEvent = currAutomaton.getEventWithLabel(oldEventName);
 						Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 						currAlphabet.removeEvent(currEvent);
@@ -363,7 +363,7 @@ public class AutomataBuildFromVALID
 
 		while (i.hasNext())
 		{
-			EventLabel currEvent = new EventLabel();
+			LabeledEvent currEvent = new LabeledEvent();
 
 			element = (Element) i.next();
 

@@ -64,7 +64,7 @@ import org.supremica.automata.AutomatonContainer;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomataSynthesizer
 {
@@ -174,7 +174,7 @@ public class AutomataSynthesizer
 	public void execute()
 		throws Exception
 	{
-		EventLabel currEvent;
+		LabeledEvent currEvent;
 		Automaton theAutomaton;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
@@ -204,7 +204,7 @@ public class AutomataSynthesizer
 				{
 
 					// currEvent = (Event) eventIterator.next();
-					currEvent = (EventLabel) eventList.remove(0);
+					currEvent = (LabeledEvent) eventList.remove(0);
 
 					if (!currEvent.isControllable())
 					{
@@ -361,11 +361,11 @@ public class AutomataSynthesizer
 		// Correct the id:s on the events...
 		Alphabet unionAlphabet = synchHelper.getAutomaton().getAlphabet();
 		Iterator eventIt = theAlphabet.iterator();
-		EventLabel currEvent;
+		LabeledEvent currEvent;
 
 		while (eventIt.hasNext())
 		{
-			currEvent = (EventLabel) eventIt.next();
+			currEvent = (LabeledEvent) eventIt.next();
 
 			currEvent.setId(unionAlphabet.getEventWithLabel(currEvent.getLabel()).getId());
 		}

@@ -54,7 +54,7 @@ import java.util.*;
 public class EventExecutionListeners
 	extends Listeners
 {
-	public EventExecutionListeners(EventLabel owner)
+	public EventExecutionListeners(LabeledEvent owner)
 	{
 		super(owner);
 	}

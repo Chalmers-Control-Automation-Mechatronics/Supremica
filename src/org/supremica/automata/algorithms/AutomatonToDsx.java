@@ -54,7 +54,7 @@ import java.io.*;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomatonToDsx
 	implements AutomataSerializer
@@ -97,7 +97,7 @@ public class AutomatonToDsx
 
 		while (events.hasNext())
 		{
-			EventLabel event = (EventLabel) events.next();
+			LabeledEvent event = (LabeledEvent) events.next();
 
 			if (!event.isControllable())
 			{

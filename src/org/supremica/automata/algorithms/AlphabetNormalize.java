@@ -53,7 +53,7 @@ import java.util.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AlphabetNormalize
 {
@@ -75,7 +75,7 @@ public class AlphabetNormalize
 
 		while (eventIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) eventIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 			LinkedList currList = (LinkedList) labelMap.get(currEvent.getLabel());
 
 			if (currList == null)
@@ -101,10 +101,10 @@ public class AlphabetNormalize
 		{
 			Arc currArc = (Arc) arcIt.next();
 			String eventId = currArc.getEventId();
-			EventLabel currEvent = theAlphabet.getEventWithId(eventId);
+			LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
 			String currLabel = currEvent.getLabel();
 			LinkedList currList = (LinkedList) labelMap.get(currLabel);
-			EventLabel firstEvent = (EventLabel) currList.getFirst();
+			LabeledEvent firstEvent = (LabeledEvent) currList.getFirst();
 
 			currArc.setEvent(firstEvent.getId());
 		}
@@ -130,7 +130,7 @@ public class AlphabetNormalize
 
 				while (eventIt.hasNext())
 				{
-					EventLabel currEvent = (EventLabel) eventIt.next();
+					LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 					if (currEvent.isControllable())
 					{
@@ -162,7 +162,7 @@ public class AlphabetNormalize
 
 			while (eventIt.hasNext())
 			{
-				EventLabel currEvent = (EventLabel) eventIt.next();
+				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 				System.err.println("   " + currEvent.getId() + "   " + (currEvent.isControllable()
 																		? ""

@@ -451,7 +451,7 @@ public class State
 	 *@param  e Description of the Parameter
 	 *@return  Description of the Return Value
 	 */
-	public State nextState(EventLabel e)
+	public State nextState(LabeledEvent e)
 	{
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
 		String eventId = e.getId();

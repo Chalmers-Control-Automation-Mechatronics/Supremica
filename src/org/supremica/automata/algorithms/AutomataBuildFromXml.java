@@ -60,7 +60,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomataBuildFromXml
 	extends HandlerBase
@@ -354,7 +354,7 @@ public class AutomataBuildFromXml
 			}
 		}
 
-		EventLabel currEvent = new EventLabel();
+		LabeledEvent currEvent = new LabeledEvent();
 
 		if (id == null)
 		{

@@ -60,7 +60,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomatonExplorer
 	extends JFrame
@@ -470,7 +470,7 @@ class EventListModel
 	{
 		Arc currArc = (Arc) currArcs.get(index);
 		String eventId = currArc.getEventId();
-		org.supremica.automata.EventLabel currEvent;
+		org.supremica.automata.LabeledEvent currEvent;
 
 		try
 		{

@@ -54,7 +54,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomatonComplement
 {
@@ -69,7 +69,7 @@ public class AutomatonComplement
 	{
 		Alphabet alphabet = theAutomaton.getAlphabet();
 		State newState = null;
-		EventLabel currEvent;
+		LabeledEvent currEvent;
 		State currState;
 		boolean found;
 		Iterator eventIterator;
@@ -96,7 +96,7 @@ public class AutomatonComplement
 			while (eventIterator.hasNext())
 			{
 				found = false;
-				currEvent = (EventLabel) eventIterator.next();
+				currEvent = (LabeledEvent) eventIterator.next();
 				outgoingArcsIterator = currState.outgoingArcsIterator();
 
 				while (outgoingArcsIterator.hasNext())
@@ -132,7 +132,7 @@ public class AutomatonComplement
 
 			while (eventIterator.hasNext())
 			{
-				theAutomaton.addArc(new Arc(newState, newState, ((EventLabel) eventIterator.next()).getId()));
+				theAutomaton.addArc(new Arc(newState, newState, ((LabeledEvent) eventIterator.next()).getId()));
 			}
 		}
 

@@ -55,7 +55,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AddSelfArcs
 {
@@ -76,7 +76,7 @@ public class AddSelfArcs
 		throws Exception
 	{
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
-		EventLabel passEvent = null;
+		LabeledEvent passEvent = null;
 		String passEventId = null;
 
 		if (expandedSystem)
@@ -158,7 +158,7 @@ public class AddSelfArcs
 
 			if ((passEventId == null) ||!passEventId.equals(currEventId))
 			{
-				EventLabel currEvent = currAlphabet.getEventWithId(currEventId);
+				LabeledEvent currEvent = currAlphabet.getEventWithId(currEventId);
 
 				currAlphabet.removeEvent(currEvent);
 			}
@@ -169,7 +169,7 @@ public class AddSelfArcs
 
 		while (eventIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) eventIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 			Arc currArc = new Arc(currState, currState, currEvent.getId());
 
 			theAutomaton.addArc(currArc);
@@ -191,7 +191,7 @@ public class AddSelfArcs
 
 			if ((passEventId == null) ||!passEventId.equals(currEventId))
 			{
-				EventLabel currEvent = currAlphabet.getEventWithId(currEventId);
+				LabeledEvent currEvent = currAlphabet.getEventWithId(currEventId);
 
 				if (currEvent.getLabel().equals("pass"))
 				{
@@ -202,7 +202,7 @@ public class AddSelfArcs
 					{
 						Arc currPassArc = (Arc) passArcIt.next();
 						String currPassEventId = currPassArc.getEventId();
-						EventLabel currPassEvent = currAlphabet.getEventWithId(currEventId);
+						LabeledEvent currPassEvent = currAlphabet.getEventWithId(currEventId);
 
 						currAlphabet.removeEvent(currPassEvent);
 					}
@@ -219,7 +219,7 @@ public class AddSelfArcs
 
 		while (eventIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) eventIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 			Arc currArc = new Arc(currState, currState, currEvent.getId());
 
 			theAutomaton.addArc(currArc);

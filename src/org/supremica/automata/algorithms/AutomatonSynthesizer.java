@@ -55,7 +55,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 /**
  * A monolithic synthesizer that can handle non-blocking and controllability problems.
@@ -307,7 +307,7 @@ public class AutomatonSynthesizer
 			while (arcIt.hasNext())
 			{
 				Arc currArc = (Arc) arcIt.next();
-				EventLabel currEvent = theAutomaton.getEvent(currArc.getEventId());
+				LabeledEvent currEvent = theAutomaton.getEvent(currArc.getEventId());
 				State fromState = currArc.getFromState();
 
 				if ((fromState.getCost() != State.MAX_COST) &&!fromState.isVisited())
@@ -364,7 +364,7 @@ public class AutomatonSynthesizer
 			while (arcIt.hasNext())
 			{
 				Arc currArc = (Arc) arcIt.next();
-				EventLabel currEvent = theAutomaton.getEvent(currArc.getEventId());
+				LabeledEvent currEvent = theAutomaton.getEvent(currArc.getEventId());
 
 				if (!currEvent.isControllable())
 				{

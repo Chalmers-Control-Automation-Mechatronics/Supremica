@@ -54,7 +54,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class RemovePassEvent
 {
@@ -85,7 +85,7 @@ public class RemovePassEvent
 			{
 				Arc currArc = (Arc) arcIt.next();
 				String currEventId = currArc.getEventId();
-				EventLabel currEvent = theAlphabet.getEventWithId(currEventId);
+				LabeledEvent currEvent = theAlphabet.getEventWithId(currEventId);
 
 				if (currEvent.getLabel().equals("pass"))
 				{
@@ -99,7 +99,7 @@ public class RemovePassEvent
 					{
 						Arc nextArc = (Arc) nextArcIt.next();
 						String nextEventId = nextArc.getEventId();
-						EventLabel nextEvent = theAlphabet.getEventWithId(nextEventId);
+						LabeledEvent nextEvent = theAlphabet.getEventWithId(nextEventId);
 
 						if (!nextEvent.isControllable())
 						{
@@ -118,7 +118,7 @@ public class RemovePassEvent
 
 		if (theAlphabet.containsEventWithLabel("pass"))
 		{
-			EventLabel passEvent = theAlphabet.getEventWithLabel("pass");
+			LabeledEvent passEvent = theAlphabet.getEventWithLabel("pass");
 
 			theAlphabet.removeEvent(passEvent);
 		}

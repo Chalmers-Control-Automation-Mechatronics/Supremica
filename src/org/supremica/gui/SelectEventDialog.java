@@ -56,12 +56,12 @@ import java.awt.*;
 import java.awt.event.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class SelectEventDialog
 	extends JDialog
 {
-	private org.supremica.automata.EventLabel selectedEvent = null;
+	private org.supremica.automata.LabeledEvent selectedEvent = null;
 	private JPanel contentPane = null;
 	private Alphabet theAlphabet = null;
 	private Automaton theAutomaton = null;
@@ -133,7 +133,7 @@ public class SelectEventDialog
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 	}
 
-	public org.supremica.automata.EventLabel getEvent()
+	public org.supremica.automata.LabeledEvent getEvent()
 	{
 		selectedEvent = null;
 
@@ -218,7 +218,7 @@ class CreateEventPanel
 				}
 				else
 				{
-					EventLabel newEvent = new EventLabel(currLabel);
+					LabeledEvent newEvent = new LabeledEvent(currLabel);
 
 					newEvent.setId(alph.getUniqueId("e"));
 

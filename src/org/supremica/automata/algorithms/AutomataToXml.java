@@ -56,7 +56,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomataToXml
 	implements AutomataSerializer
@@ -120,7 +120,7 @@ public class AutomataToXml
 
 			while (eventIt.hasNext())
 			{
-				EventLabel event = (EventLabel) eventIt.next();
+				LabeledEvent event = (LabeledEvent) eventIt.next();
 
 				pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
 

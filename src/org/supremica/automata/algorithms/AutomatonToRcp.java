@@ -13,7 +13,7 @@ import java.io.*;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AutomatonToRcp
 	implements AutomataSerializer
@@ -85,7 +85,7 @@ public class AutomatonToRcp
 
 		while (events.hasNext())
 		{
-			EventLabel event = (EventLabel) events.next();
+			LabeledEvent event = (LabeledEvent) events.next();
 			Allocation al = getAllocation(event.getLabel());
 
 			resSet.add(al.resource);

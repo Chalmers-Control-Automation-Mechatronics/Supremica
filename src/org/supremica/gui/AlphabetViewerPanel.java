@@ -60,7 +60,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 public class AlphabetViewerPanel
 	extends JPanel
@@ -159,7 +159,7 @@ public class AlphabetViewerPanel
 
 		while (eventIt.hasNext())
 		{
-			org.supremica.automata.EventLabel currEvent = (org.supremica.automata.EventLabel) eventIt.next();
+			org.supremica.automata.LabeledEvent currEvent = (org.supremica.automata.LabeledEvent) eventIt.next();
 			DefaultMutableTreeNode currEventNode = new DefaultMutableTreeNode(currEvent.getLabel());
 
 			root.add(currEventNode);

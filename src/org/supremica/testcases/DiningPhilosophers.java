@@ -8,7 +8,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 
 // Builds a Philo automaton
 class Philosopher
@@ -34,18 +34,18 @@ class Philosopher
 	final static int EAT = 3;
 	final static int L_DN = 4;
 	final static int R_DN = 5;
-	static EventLabel[] events =
+	static LabeledEvent[] events =
 	{
-		new EventLabel("L_take"),
+		new LabeledEvent("L_take"),
 
 		// pick up left
-		new EventLabel("R_take"),
+		new LabeledEvent("R_take"),
 
 		// pick up right
-		new EventLabel("L_put"),
+		new LabeledEvent("L_put"),
 
 		// put down left
-		new EventLabel("R_put"),
+		new LabeledEvent("R_put"),
 
 		// put down right
 	};
@@ -141,10 +141,10 @@ class Philosopher
 class Chopstick
 {
 	static State[] states = { new State("0"), new State("1") };
-	static EventLabel[] events = { new EventLabel("L_up"),
-								   new EventLabel("R_up"),
-								   new EventLabel("L_dn"),
-								   new EventLabel("R_dn") };
+	static LabeledEvent[] events = { new LabeledEvent("L_up"),
+								   new LabeledEvent("R_up"),
+								   new LabeledEvent("L_dn"),
+								   new LabeledEvent("R_dn") };
 	final static int L_TAKE = 0;
 	final static int R_TAKE = 1;
 	final static int L_PUT = 2;

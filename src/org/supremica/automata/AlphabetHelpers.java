@@ -96,7 +96,7 @@ public class AlphabetHelpers
 
 		while (eventsIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) eventsIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventsIt.next();
 
 			eventSet.clear();
 
@@ -114,7 +114,7 @@ public class AlphabetHelpers
 				}
 			}
 
-			EventLabel newEvent = EventHelpers.createEvent(eventSet, idPrefix);
+			LabeledEvent newEvent = EventHelpers.createEvent(eventSet, idPrefix);
 
 			newEvent.setId(newAlphabet.getUniqueId(idPrefix));
 			newAlphabet.addEvent(newEvent);

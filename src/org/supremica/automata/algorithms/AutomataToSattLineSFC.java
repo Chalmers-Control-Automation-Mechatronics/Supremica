@@ -57,7 +57,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.EventLabel;
+import org.supremica.automata.LabeledEvent;
 import java.io.*;
 import java.util.*;
 
@@ -139,7 +139,7 @@ public class AutomataToSattLineSFC
 
 		for (Iterator alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
 		{
-			EventLabel currEvent = (EventLabel) alphaIt.next();
+			LabeledEvent currEvent = (LabeledEvent) alphaIt.next();
 
 			if (currEvent.getLabel().length() > 20)
 			{
@@ -287,7 +287,7 @@ public class AutomataToSattLineSFC
 		// Step 2. Pick an event
 		for (Iterator alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
 		{
-			EventLabel theEvent = (EventLabel) alphaIt.next();
+			LabeledEvent theEvent = (LabeledEvent) alphaIt.next();
 
 			if (testAlphabet.containsEventWithLabel(theEvent.getLabel()))
 			{
@@ -306,7 +306,7 @@ public class AutomataToSattLineSFC
 		}    // Step 5. Terminate if event set exhausted
 	}
 
-	private Alphabet extendedConflict(Automata theAutomata, EventLabel theEvent, Alphabet iteratorAlphabet)
+	private Alphabet extendedConflict(Automata theAutomata, LabeledEvent theEvent, Alphabet iteratorAlphabet)
 	{
 
 		// Step 1. Initialise. C = {theEvent}, D = empty.
@@ -334,7 +334,7 @@ public class AutomataToSattLineSFC
 			// Step 2. Pick e in C \ D.
 			for (Iterator alphaIt = iteratorAlphabet.iterator(); alphaIt.hasNext(); )
 			{
-				EventLabel confEvent = (EventLabel) alphaIt.next();
+				LabeledEvent confEvent = (LabeledEvent) alphaIt.next();
 
 				if (theExtConfAlphabet.containsEventWithLabel(confEvent.getLabel()) &&!testAlphabet.containsEventWithLabel(confEvent.getLabel()))
 				{
@@ -371,7 +371,7 @@ public class AutomataToSattLineSFC
 		return theExtConfAlphabet;
 	}
 
-	private Alphabet computeConflict(Automata theAutomata, EventLabel theEvent)
+	private Alphabet computeConflict(Automata theAutomata, LabeledEvent theEvent)
 	{
 		Alphabet confAlphabet = new Alphabet();
 
@@ -408,7 +408,7 @@ public class AutomataToSattLineSFC
 
 					try
 					{
-						EventLabel arcEvent = (EventLabel) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -429,7 +429,7 @@ public class AutomataToSattLineSFC
 
 									try
 									{
-										EventLabel currArcEvent = (EventLabel) aut.getEvent(currArc.getEventId());
+										LabeledEvent currArcEvent = (LabeledEvent) aut.getEvent(currArc.getEventId());
 										Alphabet dummyAlphabet = new Alphabet();
 
 										try
@@ -495,7 +495,7 @@ public class AutomataToSattLineSFC
 
 		for (Iterator eventIt = theAlphabet.iterator(); eventIt.hasNext(); )
 		{
-			EventLabel currEvent = (EventLabel) eventIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 			if (firstEvent)
 			{
@@ -533,7 +533,7 @@ public class AutomataToSattLineSFC
 		logger.debug("Printing Event Monitor");
 	}
 
-	private String computeGenerationCondition(Automata theAutomata, EventLabel theEvent)
+	private String computeGenerationCondition(Automata theAutomata, LabeledEvent theEvent)
 	{
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstAutomaton = true;
@@ -558,7 +558,7 @@ public class AutomataToSattLineSFC
 
 					try
 					{
-						EventLabel arcEvent = (EventLabel) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -620,7 +620,7 @@ public class AutomataToSattLineSFC
 		return theCondition.toString();
 	}
 
-	private String computeCeaseCondition(Automata theAutomata, EventLabel theEvent)
+	private String computeCeaseCondition(Automata theAutomata, LabeledEvent theEvent)
 	{
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstAutomaton = true;
@@ -645,7 +645,7 @@ public class AutomataToSattLineSFC
 
 					try
 					{
-						EventLabel arcEvent = (EventLabel) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -791,7 +791,7 @@ public class AutomataToSattLineSFC
 	{
 		try
 		{
-			EventLabel event = theAutomaton.getEvent(theArc.getEventId());
+			LabeledEvent event = theAutomaton.getEvent(theArc.getEventId());
 
 			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter + " WAIT_FOR " + event.getLabel().replace('.', '_'));
 

@@ -207,7 +207,7 @@ public final class AutomataIndexForm
 		{
 			eventPriority[i] = 1;
 
-			((EventLabel) (eventCollectionIt.next())).setSynchIndex(i++);
+			((LabeledEvent) (eventCollectionIt.next())).setSynchIndex(i++);
 		}
 
 		// Put the synchIndex into all the automata.
@@ -223,9 +223,9 @@ public final class AutomataIndexForm
 
 			while (eventIt.hasNext())
 			{
-				EventLabel currEvent = (EventLabel) eventIt.next();
+				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 				String label = currEvent.getLabel();
-				EventLabel newEvent = theAlphabet.getEventWithLabel(label);
+				LabeledEvent newEvent = theAlphabet.getEventWithLabel(label);
 
 				currEvent.setSynchIndex(newEvent.getSynchIndex());
 			}
@@ -242,7 +242,7 @@ public final class AutomataIndexForm
 
 		while (theAlphabetIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) theAlphabetIt.next();
+			LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();
 			String currLabel = currEvent.getLabel();
 			int currEventSynchIndex = currEvent.getSynchIndex();
 
@@ -254,7 +254,7 @@ public final class AutomataIndexForm
 				{
 					alphabetEventsTable[i][currEventSynchIndex] = true;
 
-					EventLabel currAutEvent = currAutAlphabet.getEventWithLabel(currLabel);
+					LabeledEvent currAutEvent = currAutAlphabet.getEventWithLabel(currLabel);
 
 					prioritizedEventsTable[i][currEventSynchIndex] = currAutEvent.isPrioritized();
 				}
@@ -383,8 +383,8 @@ public final class AutomataIndexForm
 
 					// Get the event from the automaton
 					String eventId = currArc.getEventId();
-					EventLabel currEvent = currAlphabet.getEventWithId(eventId);
-					EventLabel theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
+					LabeledEvent currEvent = currAlphabet.getEventWithId(eventId);
+					LabeledEvent theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
 					sortedArcs.add(new Integer(currEventIndex));
@@ -489,8 +489,8 @@ public final class AutomataIndexForm
 
 					// Get the event from the automaton
 					String eventId = currArc.getEventId();
-					EventLabel currEvent = currAlphabet.getEventWithId(eventId);
-					EventLabel theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
+					LabeledEvent currEvent = currAlphabet.getEventWithId(eventId);
+					LabeledEvent theEvent = theAlphabet.getEventWithLabel(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
 					sortedArcs.add(new Integer(currEventIndex));
@@ -540,7 +540,7 @@ public final class AutomataIndexForm
 
 		for (int i = 0; i < theAlphabet.size(); i++)
 		{
-			EventLabel currEvent = theAlphabet.getEventWithIndex(i);
+			LabeledEvent currEvent = theAlphabet.getEventWithIndex(i);
 
 			controllableEventsTable[i] = currEvent.isControllable();
 			immediateEventsTable[i] = currEvent.isImmediate();

@@ -84,7 +84,7 @@ public class Events
 		// Deep copy
 		for (Iterator it = orgEvents.iterator(); it.hasNext(); )
 		{
-			EventLabel newEvent = new EventLabel((EventLabel) it.next());
+			LabeledEvent newEvent = new LabeledEvent((LabeledEvent) it.next());
 
 			theEvents.put(newEvent.getLabel(), newEvent);
 		}
@@ -126,13 +126,13 @@ public class Events
 	 *@param  ev The feature to be added to the Event attribute
 	 *@exception  Exception Description of the Exception
 	 */
-	public void addEvent(EventLabel ev)
+	public void addEvent(LabeledEvent ev)
 		throws Exception
 	{
 		theEvents.put(ev.getLabel(), ev);
 	}
 
-	public void removeEvent(EventLabel ev)
+	public void removeEvent(LabeledEvent ev)
 		throws Exception
 	{
 		removeEvent(ev.getLabel());
@@ -163,14 +163,14 @@ public class Events
 	 *@return  The eventWithLabel value
 	 *@exception  Exception Description of the Exception
 	 */
-	public EventLabel getEventWithLabel(String label)
+	public LabeledEvent getEventWithLabel(String label)
 		throws Exception
 	{
 
 		// System.err.println(label);
 		if (containsEventWithLabel(label))
 		{
-			return (EventLabel) theEvents.get(label);
+			return (LabeledEvent) theEvents.get(label);
 		}
 		else
 		{
@@ -178,14 +178,14 @@ public class Events
 		}
 	}
 
-	public EventLabel getEventWithIndex(int index)
+	public LabeledEvent getEventWithIndex(int index)
 		throws Exception
 	{
 		Iterator eventIt = iterator();
 
 		while (eventIt.hasNext())
 		{
-			EventLabel currEvent = (EventLabel) eventIt.next();
+			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
 			if (currEvent.getSynchIndex() == index)
 			{
@@ -202,7 +202,7 @@ public class Events
 	 *@param  theEvent Description of the Parameter
 	 *@return  Description of the Return Value
 	 */
-	public boolean includes(EventLabel theEvent)
+	public boolean includes(LabeledEvent theEvent)
 	{
 		return theEvents.containsValue(theEvent);
 	}
@@ -233,7 +233,7 @@ public class Events
 		// Deep copy
 		for (Iterator it = iterator(); it.hasNext(); )
 		{
-			EventLabel currEvent = (EventLabel) it.next();
+			LabeledEvent currEvent = (LabeledEvent) it.next();
 
 			newEvents.put(currEvent.getLabel(), currEvent);
 		}

@@ -129,12 +129,12 @@ public class Alphabet
 	 *@return  The eventWithId value
 	 *@exception  Exception Description of the Exception
 	 */
-	public EventLabel getEventWithId(String id)
+	public LabeledEvent getEventWithId(String id)
 		throws Exception
 	{
 		if (containsEventWithId(id))
 		{
-			return (EventLabel) idMap.get(id);
+			return (LabeledEvent) idMap.get(id);
 		}
 		else
 		{
@@ -150,7 +150,7 @@ public class Alphabet
 	 *@param  event The feature to be added to the Event attribute
 	 *@exception  Exception Description of the Exception
 	 */
-	public void addEvent(EventLabel event)
+	public void addEvent(LabeledEvent event)
 		throws Exception
 	{
 		if (!containsEventWithId(event.getId()))
@@ -173,7 +173,7 @@ public class Alphabet
 	{
 		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
 		{
-			EventLabel currEvent = (EventLabel) alphIt.next();
+			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
 			if (containsEventWithLabel(currEvent.getLabel()))
 			{
@@ -198,11 +198,11 @@ public class Alphabet
 	{
 		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
 		{
-			EventLabel currEvent = (EventLabel) alphIt.next();
+			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
 			if (!containsEventWithLabel(currEvent.getLabel()))
 			{
-				EventLabel newEvent = new EventLabel(currEvent);
+				LabeledEvent newEvent = new LabeledEvent(currEvent);
 
 				newEvent.setId(getUniqueId("e"));
 
@@ -223,7 +223,7 @@ public class Alphabet
 	 *
 	 *@param  event Description of the Parameter
 	 */
-	public void removeEvent(EventLabel event)
+	public void removeEvent(LabeledEvent event)
 		throws Exception
 	{
 		idMap.remove(event.getId());
@@ -238,7 +238,7 @@ public class Alphabet
 	public void removeEvent(String label)
 		throws Exception
 	{
-		EventLabel currEvent = getEventWithLabel(label);
+		LabeledEvent currEvent = getEventWithLabel(label);
 
 		idMap.remove(currEvent.getId());
 		super.removeEvent(label);
@@ -291,14 +291,14 @@ public class Alphabet
 	{
 		super.rehash();
 
-		EventLabel event;
+		LabeledEvent event;
 		Iterator eventIt = iterator();
 
 		idMap.clear();
 
 		while (eventIt.hasNext())
 		{
-			event = (EventLabel) eventIt.next();
+			event = (LabeledEvent) eventIt.next();
 
 			idMap.put(event.getId(), event);
 		}
