@@ -41,10 +41,12 @@ public class SFCStep
 	{
 		return id;
 	}
+
 	public boolean isInitialStep()
 	{
 		return initialStep;
 	}
+
 
 	/* for listing sfcAction objects based on makeActionsList procedure */
 	/*

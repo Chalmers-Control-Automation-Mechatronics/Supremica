@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <GCDocument name="J1" threadSpeed="40" simulationMode="1" tokenLuminance="0" dimTicks="25" boundsHeight="600.0" boundsWidth="843.0" scale="0.81" viewPositionX="0.0" viewPositionY="-15.0" color="-1" x="0.0" y="0.0" socketHost="" socketPort="-1" modifiable="1" horizontalScrollBar="1" verticalScrollBar="1">
-  <GCInitialStep id="S5" x="90.0" y="120.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText=";" actionBlockVisible="0" />
-  <GCTransition id="T5" x="75.0" y="200.0" height="25.0" width="30.0" actionText="in1" conditionVisible="1" />
-  <GCStep id="S6" x="90.0" y="240.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText="N M1;" actionBlockVisible="1" />
-  <GCTransition id="T6" x="75.0" y="310.0" height="25.0" width="30.0" actionText="!M2" conditionVisible="1" />
-  <GCInitialStep id="S7" x="370.0" y="120.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText=";" actionBlockVisible="0" />
-  <GCTransition id="T7" x="355.0" y="200.0" height="25.0" width="30.0" actionText="in2" conditionVisible="1" />
-  <GCStep id="S8" x="370.0" y="240.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText="N M2;" actionBlockVisible="1" />
-  <GCTransition id="T8" x="355.0" y="310.0" height="25.0" width="30.0" actionText="!M1" conditionVisible="1" />
+  <GCInitialStep id="S13" x="90.0" y="120.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText=";" actionBlockVisible="0" />
+  <GCTransition id="T13" x="75.0" y="200.0" height="25.0" width="30.0" actionText="in1 &amp; !M2" conditionVisible="1" />
+  <GCStep id="S14" x="90.0" y="240.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText="N M1;" actionBlockVisible="1" />
+  <GCTransition id="T14" x="75.0" y="310.0" height="25.0" width="30.0" actionText="!M2" conditionVisible="1" />
+  <GCInitialStep id="S15" x="370.0" y="120.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText=";" actionBlockVisible="0" />
+  <GCTransition id="T15" x="355.0" y="200.0" height="25.0" width="30.0" actionText="in2 &amp; !M1" conditionVisible="1" />
+  <GCStep id="S16" x="370.0" y="240.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText="N M2;" actionBlockVisible="1" />
+  <GCTransition id="T16" x="355.0" y="310.0" height="25.0" width="30.0" actionText="!M1" conditionVisible="1" />
   <BooleanVariable height="61.0" x="650.0" y="100.0" width="65.0" name="M1" value="0" initialValue="0" />
   <BooleanVariable height="61.0" x="650.0" y="180.0" width="65.0" name="M2" value="0" initialValue="0" />
   <BooleanVariable height="61.0" x="650.0" y="270.0" width="65.0" name="in1" value="0" initialValue="1" />
   <BooleanVariable height="61.0" x="650.0" y="360.0" width="65.0" name="in2" value="0" initialValue="1" />
-  <GCLink fromObject="T8" toObject="S7">
+  <GCLink fromObject="T16" toObject="S15">
     <Stroke x="370" y="335" />
     <Stroke x="370" y="345" />
     <Stroke x="542" y="345" />
@@ -21,7 +21,7 @@
     <Stroke x="370" y="105" />
     <Stroke x="370" y="115" />
   </GCLink>
-  <GCLink fromObject="S8" toObject="T8">
+  <GCLink fromObject="S16" toObject="T16">
     <Stroke x="370" y="305" />
     <Stroke x="370" y="315" />
     <Stroke x="370" y="315" />
@@ -29,7 +29,7 @@
     <Stroke x="370" y="300" />
     <Stroke x="370" y="310" />
   </GCLink>
-  <GCLink fromObject="T7" toObject="S8">
+  <GCLink fromObject="T15" toObject="S16">
     <Stroke x="370" y="225" />
     <Stroke x="370" y="235" />
     <Stroke x="370" y="235" />
@@ -37,7 +37,7 @@
     <Stroke x="370" y="225" />
     <Stroke x="370" y="235" />
   </GCLink>
-  <GCLink fromObject="S7" toObject="T7">
+  <GCLink fromObject="S15" toObject="T15">
     <Stroke x="370" y="185" />
     <Stroke x="370" y="195" />
     <Stroke x="370" y="195" />
@@ -45,7 +45,7 @@
     <Stroke x="370" y="190" />
     <Stroke x="370" y="200" />
   </GCLink>
-  <GCLink fromObject="T6" toObject="S5">
+  <GCLink fromObject="T14" toObject="S13">
     <Stroke x="90" y="335" />
     <Stroke x="90" y="345" />
     <Stroke x="262" y="345" />
@@ -53,7 +53,7 @@
     <Stroke x="90" y="105" />
     <Stroke x="90" y="115" />
   </GCLink>
-  <GCLink fromObject="S6" toObject="T6">
+  <GCLink fromObject="S14" toObject="T14">
     <Stroke x="90" y="305" />
     <Stroke x="90" y="315" />
     <Stroke x="90" y="315" />
@@ -61,7 +61,7 @@
     <Stroke x="90" y="300" />
     <Stroke x="90" y="310" />
   </GCLink>
-  <GCLink fromObject="T5" toObject="S6">
+  <GCLink fromObject="T13" toObject="S14">
     <Stroke x="90" y="225" />
     <Stroke x="90" y="235" />
     <Stroke x="90" y="235" />
@@ -69,7 +69,7 @@
     <Stroke x="90" y="225" />
     <Stroke x="90" y="235" />
   </GCLink>
-  <GCLink fromObject="S5" toObject="T5">
+  <GCLink fromObject="S13" toObject="T13">
     <Stroke x="90" y="185" />
     <Stroke x="90" y="195" />
     <Stroke x="90" y="195" />

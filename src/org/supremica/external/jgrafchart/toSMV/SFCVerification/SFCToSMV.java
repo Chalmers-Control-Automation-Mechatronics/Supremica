@@ -86,8 +86,32 @@ public class SFCToSMV
 			write("\t--**************** Input Phase ****************");
 			writeInputPhaseBlock("\t",numberOfSFCs);
 		}
+		writeSpecifications();
 		writeEndBracket();
 		closeFile();
+
+	}
+
+	private void writeSpecifications()
+	{
+		write("\t--**************** Specifications ****************");
+
+		write("\n \t--**************** Reachability of all steps ****************");
+
+		for (Iterator sfcIt = allSteps.iterator(); sfcIt.hasNext(); )
+		{
+			SFCStep currStep = (SFCStep) sfcIt.next();
+			// reach_S1 : assert ( F(S1) );
+			write("\treachable_" + currStep.getId() + ": assert ( F(" + currStep.getId() + ") );");
+		}
+
+		write("\n \t--**************** Deadlock check all steps ****************");
+		for (Iterator sfcIt = allSteps.iterator(); sfcIt.hasNext(); )
+		{
+			SFCStep currStep = (SFCStep) sfcIt.next();
+			// dead_S1 : assert G( S -> F(~S) );
+			write("\tdeadlockfree_" + currStep.getId() + ": assert G( " + currStep.getId() + " -> F(~" + currStep.getId() + ") );");
+		}
 
 	}
 
@@ -295,14 +319,15 @@ public class SFCToSMV
 				 }
 
 			}
+/*
 			if (initial)
 			{
 				if(condition.equals(""))
 					condition = condition.concat("start_"+sfcNumber);
 				else
 					condition = condition.concat(" | start_"+sfcNumber);
-
 			}
+*/
 
 			if(initial)
 				write("\t\tif( "+condition+" )");	//Completing the If part
@@ -399,6 +424,53 @@ public class SFCToSMV
 			write("\t\t}");
 
 		}//main while loop
+
+
+		for(Iterator stepIt = stepsInOneSFC.iterator(); stepIt.hasNext(); )
+		{
+			SFCStep currStep = (SFCStep) stepIt.next();
+			System.err.println("Debug: " + currStep.getId() + "isInitial: " + currStep.isInitialStep() );
+			if (currStep.isInitialStep())
+			{
+				List initialModList = new LinkedList();
+				List initialStepActions = new LinkedList();
+				write("\t\telse if (start_" + sfcNumber + ")");
+				write("\t\t{");
+				write("\t\t\tnext(start_" + sfcNumber + ") := 0;");
+				String stepId = currStep.getId();
+				initialModList.add(stepId);
+				write("\t\t\tnext(" + stepId + ") := 1;");
+				initialStepActions = currStep.getActionsList();
+				/************************************************************/
+				if(initialStepActions != null)
+				{
+
+					Iterator initStepActionsIt = initialStepActions.iterator();
+					while(initStepActionsIt.hasNext())
+					{
+						SFCAction anAction = (SFCAction) initStepActionsIt.next();
+
+						if(anAction.getActionType().equals("N"))
+						{
+							write("\t\t\t"+getNActionString(anAction.getLeftHandSide()));
+							//avoidDupActions.add(anAction.getLeftHandSide());
+							initialModList.add(anAction.getLeftHandSide());
+						}
+						else if(anAction.getActionType().equals("S"))
+						{
+
+							write("\t\t\t"+getSActionString(anAction));
+							//avoidDupActions.add(anAction.getLeftHandSide());
+							initialModList.add(anAction.getLeftHandSide());
+						}
+					}
+				}
+				writeRestOfSMVVars(initialModList,"\t\t\t");
+				write("\t\t\tnext(turn) := (turn mod "+(numberOfSFCs+1)+")+1;");
+				/************************************************************/
+				write("\t\t}");
+			}
+		}
 		writeFinalElseBlock("\t\t\t",numberOfSFCs);
 		if(numberOfSFCs > 1)
 			write("\t}");

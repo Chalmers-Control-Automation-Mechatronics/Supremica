@@ -19,7 +19,7 @@ public class ParseXML
 			Document SFCDoc = builder.build(new File(xmlFileName));
 			SFC sfc = new SFC(SFCDoc);
 			String smvFileName = xmlFileName.replaceFirst(".xml",".smv");
-			SFCToSMV smvGenerator = new SFCToSMV(sfc,"D:/MyWork/IO/"+smvFileName);
+			SFCToSMV smvGenerator = new SFCToSMV(sfc,smvFileName);
 
 			smvGenerator.writeCode();
 
