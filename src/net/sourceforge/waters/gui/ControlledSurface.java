@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.4 2005-02-21 10:22:09 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.5 2005-02-21 11:13:33 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -43,6 +43,7 @@ public class ControlledSurface
 	private boolean hasDragged = false;
 
 	private LinkedList selectedObjects = new LinkedList();
+	private EditorObject highlightedObject = null;
 
 	public void setOptionsVisible(boolean v)
 	{
@@ -212,6 +213,19 @@ public class ControlledSurface
 		for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
 		{
 			if (((EditorObject) it.next()).getType() == EditorObject.NODEGROUP)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean edgeIsSelected()
+	{
+		for (Iterator it = selectedObjects.iterator(); it.hasNext(); )
+		{
+			if (((EditorObject) it.next()).getType() == EditorObject.EDGE)
 			{
 				return true;
 			}
@@ -659,7 +673,8 @@ public class ControlledSurface
 						}
 					}				
 				}
-			
+				
+				// Are we resizing a nodegroup?
 				if (nodeGroupIsSelected() && ((T.getPlace() == EditorToolbar.NODEGROUP) || (T.getPlace() == EditorToolbar.SELECT)))
 				{
 					EditorNodeGroup nodeGroup = (EditorNodeGroup) selectedObjects.get(0);
@@ -695,8 +710,6 @@ public class ControlledSurface
 					{
 						nodeGroup.setBounds(b);
 					}
-				
-					repaint();
 				}
 			}
 		}
@@ -786,58 +799,57 @@ public class ControlledSurface
 			}
 			*/
 
-			// Stop resizing nodegroup
-			if (nodeGroupIsSelected() && (T.getPlace() == EditorToolbar.NODEGROUP))
+			// Stop resizing nodegroup 
+			if (nodeGroupIsSelected() && (selectedObjects.size() == 1))
 			{
 				EditorNodeGroup ng = (EditorNodeGroup) selectedObjects.remove(0);
 				ng.setResizingFalse();
-
+				
 				if (ng.isEmpty())
 				{
 					delNodeGroup(ng);
 				}
 			}
 
-			/*
-			if (selectedEdge != null)
+			// Redraw edge
+			if (edgeIsSelected() && (selectedObjects.size() == 1))
 			{
-				System.out.println("released DragS:" + selectedEdge.getDragS());
-
+				EditorEdge edge = (EditorEdge) selectedObjects.remove(0);
+				
 				if ((T.getPlace() == EditorToolbar.EDGE) || (T.getPlace() == EditorToolbar.SELECT))
 				{
 					EditorObject n = getObjectAtPosition(e.getX(), e.getY());
-
+					
 					if (n != null)
 					{
 						if (n.getType() == EditorObject.NODE)
 						{
-							if (selectedEdge.getDragT() && (n != selectedEdge.getEndNode()))
+							if (edge.getDragT() && (n != edge.getEndNode()))
 							{
-								selectedEdge.setEndNode((EditorNode) n);
+								edge.setEndNode((EditorNode) n);
 							}
-							else if (selectedEdge.getDragS() && (n != selectedEdge.getStartNode()))
+							else if (edge.getDragS() && (n != edge.getStartNode()))
 							{
-								selectedEdge.setStartNode(n, e.getX(), e.getY());
+								edge.setStartNode(n, e.getX(), e.getY());
 							}
 						}
 						else if (n.getType() == EditorObject.NODEGROUP)
 						{
-							System.out.println("is a nodeGroup when mouse released" + selectedEdge.getDragS());
+							System.out.println("is a nodeGroup when mouse released" + edge.getDragS());
 
-							if (selectedEdge.getDragS())
+							if (edge.getDragS())
 							{
-								selectedEdge.setStartNode(n, e.getX(), e.getY());
+								edge.setStartNode(n, e.getX(), e.getY());
 							}
 						}
 					}
 
-					selectedEdge.setDragT(false);
-					selectedEdge.setDragS(false);
-					selectedEdge.setDragC(false);
-					selectedEdge.setTPoint(selectedEdge.getTPointX(), selectedEdge.getTPointY());
+					edge.setDragT(false);
+					edge.setDragS(false);
+					edge.setDragC(false);
+					edge.setTPoint(edge.getTPointX(), edge.getTPointY());
 				}
 			}
-			*/
 
 			lines.clear();
 
@@ -851,7 +863,49 @@ public class ControlledSurface
 
 	public void mouseMoved(MouseEvent e)
 	{
-		;
+		// Highlight things that are moved over...
+		EditorObject o = getObjectAtPosition(e.getX(), e.getY());
+
+		if ((highlightedObject != null) && !highlightedObject.equals(o))
+		{
+			highlightedObject.setHighlighted(false);
+			highlightedAllWithParent(highlightedObject, false);
+			highlightedObject = null;
+		}
+
+		if (o != null)
+		{
+			o.setHighlighted(true);
+			highlightedObject = o;
+			highlightedAllWithParent(highlightedObject, true);
+		}
+
+		repaint();
+	}
+
+	/**
+	 * Changes the highlight status of all EditorObject:s with o as parent.
+	 *
+	 * @param o the parent of which all children should be highlighed.
+	 * @param highlight if true, makes highlighted, otherwise removes highlight
+	 */
+	private void highlightedAllWithParent(EditorObject o, boolean highlight)
+	{
+		for (int i = 0; i < labels.size(); i++)
+		{
+			if (((EditorLabel) labels.get(i)).getParent() == o)
+			{
+				((EditorLabel) labels.get(i)).setHighlighted(highlight);
+			}
+		}
+
+		for (int i = 0; i < events.size(); i++)
+		{
+			if (((EditorLabelGroup) events.get(i)).getParent() == o)
+			{
+				((EditorLabelGroup) events.get(i)).setHighlighted(highlight);
+			}
+		}
 	}
 
 	public void mouseEntered(MouseEvent e)

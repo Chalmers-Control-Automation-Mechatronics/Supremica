@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.3 2005-02-20 23:32:54 robi Exp $
+//# $Id: EditorObject.java,v 1.4 2005-02-21 11:13:33 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -20,6 +20,7 @@ public class EditorObject
 {
 	protected boolean visible;
 	protected boolean selected = false;
+	private boolean highlighted = false;
 	protected int type = 0;
 	private int hash = 0;
 	public static int EDGE = 1;
@@ -61,6 +62,16 @@ public class EditorObject
 	public boolean getSelected()
 	{
 		return selected;
+	}
+
+	public void setHighlighted(boolean s)
+	{
+		highlighted = s;
+	}
+
+	public boolean getHighlighted()
+	{
+		return highlighted;
 	}
 
 	public EditorObject()
