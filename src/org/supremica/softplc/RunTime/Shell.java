@@ -13,7 +13,7 @@ import java.text.*;
 public class Shell
 {
     public Timer timer;
-    public IEC_Program il_program;
+    //    public IEC_Program il_program;
     public static String ioclass = new String();
     public static String ilclass = new String();
     public boolean[] inSignals;
@@ -30,7 +30,7 @@ public class Shell
     Object[] constructorArgs = { inSignals, outSignals };
     Class ILClass;
 
-    public boolean isInitialized = false;
+    //    public boolean isInitialized = false;
 
     public Shell(String io, String il)
     {
@@ -87,13 +87,30 @@ public class Shell
 
 	timer = new Timer();
 
-	timer.schedule(new ILTask(), 0,    // initial delay
+	timer.schedule(new ILTask(inSignals, outSignals), 0,    // initial delay
 		       1 * interval);    // subsequent rate
     }
 
     class ILTask
 	extends TimerTask
     {
+	private IEC_Program il_program;
+
+	public ILTask(boolean[] inputSignals, boolean[] outputSignals)
+	{
+ 
+	    try
+		{
+		    il_program = (IEC_Program) classConstructor.newInstance(new Object[]{inputSignals, outputSignals});
+		}
+	    catch (Exception exc)
+		{
+		    exc.printStackTrace();
+		    System.err.println("2: " + exc);
+		    System.exit(-1);
+		}
+	}
+
 	public void run()
 	{
 	    if (System.currentTimeMillis() - scheduledExecutionTime() >= interval * 0.01)
@@ -101,22 +118,7 @@ public class Shell
 		    System.err.println("=============================");
 		    System.err.println("The time limit was exceeded!");
 		    System.err.println("=============================");
-		}
-
-	    if (!isInitialized)
-		{
-		    try
-			{
-			    il_program = (IEC_Program) classConstructor.newInstance(constructorArgs);
-			}
-		    catch (Exception exc)
-			{
-			    System.err.println("2: " + exc);
-			    System.exit(-1);
-			}
-
-		    isInitialized = true;
-		}
+		}	
 
 	    try
 		{
