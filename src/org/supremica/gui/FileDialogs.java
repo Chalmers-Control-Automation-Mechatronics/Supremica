@@ -57,6 +57,7 @@ public class FileDialogs
 	private JFileChooser fileImporter = null;
 	private JFileChooser fileExporter = null;
 	private JFileChooser fileSaveAs = null;
+    private FileFilter rcpFilter = null; // <-- ARASH
 	private FileFilter xmlFilter = null;
 	private FileFilter vprjFilter = null;
 	private FileFilter vmodFilter = null;
@@ -104,6 +105,19 @@ public class FileDialogs
 
 		return fileImporter;
 	}
+
+
+    // ++ ARASH
+    	public static JFileChooser getRCPFileExporter()
+    {
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getRCPFilter());
+
+		return fileExporter;
+	}
+    // -- ARASH
 
 	public static JFileChooser getXMLFileExporter()
 	{
@@ -242,7 +256,15 @@ public class FileDialogs
 			}
 		};
 	}
-	
+
+    // ++ ARASH
+    	private FileFilter getRCPFilter() {
+ 		if (rcpFilter == null) {
+			rcpFilter = makeFileFilter(".rcp", "RCP files (*.rcp)");
+		}
+		return rcpFilter;
+ 	}
+    // -- ARASH
  	private FileFilter getXMLFilter()
  	{
  		if (xmlFilter == null)

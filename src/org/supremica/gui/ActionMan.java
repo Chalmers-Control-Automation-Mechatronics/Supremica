@@ -410,8 +410,13 @@ public class ActionMan
 		String xmlString = "xml";
 		String dotString = "dot";
 		String dsxString = "dsx";
-		Object[] possibleValues = { xmlString, dotString, dsxString };
+		String rcpString = "rcp"; // ++ ARASH
+
+		Object[] possibleValues = { xmlString, dotString, dsxString, rcpString /* <-- ARASH */ };
 		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Input", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
+
+
+		// ARASH: Hmmmm.... den här koden kan nog förbättras :)
 
 		if (selectedValue == null)
 		{
@@ -431,6 +436,10 @@ public class ActionMan
 		else if (selectedValue == dsxString)
 		{
 			exportMode = 3;
+		}
+		else if(selectedValue == rcpString) 
+		{
+			exportMode = 4;
 		}
 		else
 		{
@@ -456,6 +465,12 @@ public class ActionMan
 			{
 				fileExporter = FileDialogs.getDSXFileExporter();
 			}
+			// ++ ARASH
+			else if(exportMode == 4) 
+			{
+				 fileExporter = FileDialogs.getRCPFileExporter();
+			}
+			// -- ARASH
 			else
 			{
 				return;
@@ -493,10 +508,19 @@ public class ActionMan
 
 								exporter.serialize(currFile.getAbsolutePath());
 							}
+							// ++ ARASH
+							else if(exportMode == 4) 
+							{
+							    AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
+							    exporter.serialize(currFile.getAbsolutePath() );
+							}
+							// -- ARASH
 						}
 						catch (Exception ex)
 						{
-							gui.error("Exception while exporting " + currFile.getAbsolutePath());
+							gui.error("Exception while exporting " + currFile.getAbsolutePath() 
+								  + " : " + ex.toString() );
+							
 						}
 					}
 				}
@@ -1216,10 +1240,16 @@ public class ActionMan
 		}
 	}
 
+
+	// ++ ARASH:
+	public static void fileExportRCP(Gui gui) {
+		automataExport(gui);
+	}
 	public static void fileExportDesco(Gui gui)
 	{
 		automataExport(gui);
 	}
+
 
 	public static void fileExportDot(Gui gui)
 	{

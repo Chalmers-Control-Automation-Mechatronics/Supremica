@@ -484,6 +484,19 @@ public class Supremica
 			menuFileExport.setText("Export");
 			menuFile.add(menuFileExport);
 
+			
+			// ++ ARASH:
+			// File.EXport.RCP
+			JMenuItem menuFileExportRCP = new JMenuItem();
+			menuFileExportRCP.setText("To RCP...");
+			menuFileExport.add(menuFileExportRCP);
+			menuFileExportRCP.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					ActionMan.fileExportRCP(getGui());
+				}
+			});
+			// -- ARASH
+			
 			// File.Export.Desco
 			JMenuItem menuFileExportDesco = new JMenuItem();
 
