@@ -142,6 +142,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicle", prefix + "agv.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
+		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
 	}
 
 	private void initializeAIPExamples()

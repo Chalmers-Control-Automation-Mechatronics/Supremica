@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata>
+	<Automaton name="Progress spec: Manual or automatic mode" type="Specification">
+		<Events>
+			<Event id="mode.automatic" label="mode.automatic" controllable="true" prioritized="true" />
+			<Event id="mode.manual" label="mode.manual" controllable="true" prioritized="true" />
+			<Event id="gk.enter_ball" label="gk.enter_ball" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+			<State id="q_3" />
+			<State id="q_4" />
+			<State id="q_5" />
+			<State id="q_6" />
+			<State id="q_7" />
+		</States>
+		<Transitions>
+			<Transition event="mode.automatic" source="q_0" dest="q_2" />
+			<Transition event="mode.manual" source="q_0" dest="q_1" />
+			<Transition event="gk.enter_ball" source="q_1" dest="q_0" />
+			<Transition event="gk.enter_ball" source="q_2" dest="q_3" />
+			<Transition event="gk.enter_ball" source="q_3" dest="q_4" />
+			<Transition event="gk.enter_ball" source="q_4" dest="q_5" />
+			<Transition event="gk.enter_ball" source="q_5" dest="q_6" />
+			<Transition event="gk.enter_ball" source="q_6" dest="q_7" />
+			<Transition event="gk.enter_ball" source="q_7" dest="q_0" />
+			<Transition event="mode.manual" source="q_1" dest="q_1" />
+			<Transition event="mode.automatic" source="q_1" dest="q_1" />
+			<Transition event="mode.manual" source="q_2" dest="q_2" />
+			<Transition event="mode.automatic" source="q_2" dest="q_2" />
+			<Transition event="mode.manual" source="q_3" dest="q_3" />
+			<Transition event="mode.automatic" source="q_3" dest="q_3" />
+			<Transition event="mode.manual" source="q_4" dest="q_4" />
+			<Transition event="mode.automatic" source="q_4" dest="q_4" />
+			<Transition event="mode.manual" source="q_5" dest="q_5" />
+			<Transition event="mode.automatic" source="q_5" dest="q_5" />
+			<Transition event="mode.manual" source="q_6" dest="q_6" />
+			<Transition event="mode.automatic" source="q_6" dest="q_6" />
+			<Transition event="mode.manual" source="q_7" dest="q_7" />
+			<Transition event="mode.automatic" source="q_7" dest="q_7" />
+		</Transitions>
+	</Automaton>	
+	<Automaton name="Progress spec: Gatekeeper (gk)" type="Specification">
+		<Events>
+			<Event id="gk.enter_ball" label="gk.enter_ball" controllable="true" prioritized="true" />		
+			<Event id="gk.in.go_out" label="gk.in.go_out" controllable="true" prioritized="true" />
+			<Event id="gk.in.go_in" label="gk.in.go_in" controllable="true" prioritized="true" />			
+			<Event id="gk.out.go_out" label="gk.out.go_out" controllable="true" prioritized="true" />
+			<Event id="gk.out.go_in" label="gk.out.go_in" controllable="true" prioritized="true" />	
+			<Event id="gk.has_ball" label="gk.has_ball" controllable="false" prioritized="true" />
+			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
+			<Event id="gk.ball_out_of_gatekeeper" label="gk.ball_out_of_gatekeeper" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1_1" />
+			<State id="q_1" />
+			<State id="q_2" />
+			<State id="q_3" />		
+			<State id="q_4" />
+			<State id="q_5" />
+			<State id="q_6" />	
+		</States>
+		<Transitions>
+			<Transition event="gk.enter_ball" source="q_0" dest="q_1_1" />
+			<Transition event="gk.in.go_out" source="q_1_1" dest="q_1" />
+			<Transition event="gk.has_ball" source="q_1" dest="q_2" />
+			<Transition event="gk.in.go_in" source="q_2" dest="q_3" />
+			<Transition event="gk.release_ball" source="q_3" dest="q_4" />
+			<Transition event="gk.out.go_out" source="q_4" dest="q_5" />			
+			<Transition event="gk.ball_out_of_gatekeeper" source="q_5" dest="q_6" />	
+			<Transition event="gk.out.go_in" source="q_6" dest="q_0" />						
+		</Transitions>
+	</Automaton>
+	<Automaton name="Plant: Manual button" type="Plant">
+		<Events>
+			<Event id="button.manual.pressed" label="button.manual.pressed" controllable="false" prioritized="true" />
+			<Event id="button.manual.released" label="button.manual.released" controllable="false" prioritized="true" />
+			<Event id="mode.manual" label="mode.manual" controllable="true" prioritized="true" />
+
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true" />
+			<State id="q_2" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="button.manual.pressed" source="q_0" dest="q_1" />
+			<Transition event="button.manual.released" source="q_1" dest="q_2" />
+			<Transition event="mode.manual" source="q_2" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="Plant: Automatic button" type="Plant">
+		<Events>
+			<Event id="button.automatic.pressed" label="button.automatic.pressed" controllable="false" prioritized="true" />
+			<Event id="button.automatic.released" label="button.automatic.released" controllable="false" prioritized="true" />
+			<Event id="mode.automatic" label="mode.automatic" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true" />
+			<State id="q_2" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="button.automatic.pressed" source="q_0" dest="q_1" />
+			<Transition event="button.automatic.released" source="q_1" dest="q_2" />
+			<Transition event="mode.automatic" source="q_2" dest="q_0" />
+		</Transitions>
+	</Automaton>	
+	<Automaton name="Plant: Gatekeeper - In" type="Plant">
+		<Events>
+			<Event id="go_in" label="gk.in.go_in" />
+			<Event id="go_out" label="gk.in.go_out" />
+			<Event id="is_out" label="gk.in.is_out" />
+			<Event id="is_in" label="gk.in.is_in" />
+		</Events>
+		<States>
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="Plant: Gatekeeper - Out" type="Plant">
+		<Events>
+			<Event id="go_in" label="gk.out.go_in" />
+			<Event id="go_out" label="gk.out.go_out" />
+			<Event id="is_out" label="gk.out.is_out" />
+			<Event id="is_in" label="gk.out.is_in" />
+		</Events>
+		<States>
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="Plant: Disable events" type="Plant">
+		<Events>
+			<Event id="e4" label="gk.in.is_in" />
+			<Event id="e5" label="gk.in.is_out" />
+			<Event id="e6" label="gk.out.is_in" />
+			<Event id="e7" label="gk.out.is_out" />
+			<!-- <Event id="e8" label="button.automatic.pressed" /> -->
+		</Events>
+		<States>
+			<State id="q_0" name="dummy" initial="true" accepting="true" />
+		</States>
+		<Transitions>
+		</Transitions>
+	</Automaton>
+<Execution>
+	<Timers>
+	</Timers>
+	<InputSignals>
+		<Signal label="KulaPortvakt" port="0"/>
+		<Signal label="MatlyftNere" port="1"/>
+		<Signal label="KulaMatlyft" port="2"/>
+		<Signal label="MatlyftUppe" port="3"/>
+		<Signal label="KulaMatstation" port="4"/>
+		<Signal label="StorKula" port="5"/>
+		<Signal label="LitenKula" port="6"/>
+		<Signal label="HissNere" port="7"/>
+		<Signal label="KulaHiss" port="10"/>
+		<Signal label="HissVan1" port="11"/>
+		<Signal label="KulaVan1" port="12"/>
+		<Signal label="PlockaVan1" port="13"/>
+		<Signal label="HissVan2" port="14"/>
+		<Signal label="KulaVan2" port="15"/>
+		<Signal label="PlockaVan2" port="16"/>
+		<Signal label="ArmHemma" port="17"/>
+		<Signal label="ArmVan1" port="20"/>
+		<Signal label="ArmVan2" port="21"/>
+		<Signal label="KulaFast" port="22"/>
+		<Signal label="Autostart" port="23"/>
+		<Signal label="ManuellStart" port="24"/>
+		<Signal label="NodStopp" port="25"/>
+		<Signal label="LarmKvittering" port="26"/>
+	</InputSignals>
+	<OutputSignals>
+		<Signal label="InPortvakt" port="0"/>
+		<Signal label="UrPortvakt" port="1"/>	
+		<Signal label="UppMatlyft" port="2"/>	
+		<Signal label="UrMatning" port="3"/>	
+		<Signal label="Mat" port="4"/>	
+		<Signal label="UppHissVan1" port="5"/>	
+		<Signal label="UppHissVan2" port="6"/>	
+		<Signal label="UtVan1" port="7"/>	
+		<Signal label="LyftVan1" port="10"/>	
+		<Signal label="UtVan2" port="11"/>	
+		<Signal label="LyftVan2" port="12"/>			
+		<Signal label="UppArmVan1" port="13"/>	
+		<Signal label="UppArmVan2" port="14"/>	
+		<Signal label="VridArmHoger" port="15"/>	
+		<Signal label="Sug" port="16"/>			
+	</OutputSignals>
+	<Actions>
+		<Action label="gk.in.go_out">
+			<Command command="InPortvakt" value="true"/>
+		</Action>
+		<Action label="gk.in.go_in">
+			<Command command="InPortvakt" value="false"/>
+		</Action>
+		<Action label="gk.out.go_out">
+			<Command command="UrPortvakt" value="true"/>
+		</Action>
+		<Action label="gk.out.go_in">
+			<Command command="UrPortvakt" value="false"/>
+		</Action>
+	</Actions>
+	<Controls>
+		<Control label="button.manual.pressed">
+			<Condition condition="ManuellStart" invert="true"/>			
+		</Control>
+		<Control label="button.manual.released">
+			<Condition condition="ManuellStart" invert="false"/>			
+		</Control>
+		<Control label="button.automatic.pressed">
+			<Condition condition="Autostart" invert="true"/>			
+		</Control>
+		<Control label="button.automatic.released">
+			<Condition condition="Autostart" invert="false"/>			
+		</Control>
+		<Control label="gk.has_ball">
+			<Condition condition="KulaPortvakt"/>
+		</Control>
+	</Controls>
+</Execution>
+</Automata>

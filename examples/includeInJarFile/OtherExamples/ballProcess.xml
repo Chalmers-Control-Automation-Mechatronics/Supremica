@@ -3,7 +3,7 @@
 	<Automaton name="Progress spec: Gatekeeper (gk)" type="Specification">
 		<Events>
 			<Event id="gk.enter_ball" label="gk.enter_ball" controllable="true" prioritized="true" />
-			<Event id="gk.ball_in_gatekeeper" label="gk.ball_in_gatekeeper" controllable="false" prioritized="true" />
+			<Event id="gk.has_ball" label="gk.has_ball" controllable="false" prioritized="true" />
 			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
 			<Event id="gk.ball_out_of_gatekeeper" label="gk.ball_out_of_gatekeeper" controllable="false" prioritized="true" />
 		</Events>
@@ -15,7 +15,7 @@
 		</States>
 		<Transitions>
 			<Transition event="gk.enter_ball" source="q_0" dest="q_1" />
-			<Transition event="gk.ball_in_gatekeeper" source="q_1" dest="q_2" />
+			<Transition event="gk.has_ball" source="q_1" dest="q_2" />
 			<Transition event="gk.release_ball" source="q_2" dest="q_3" />
 			<Transition event="gk.ball_out_of_gatekeeper" source="q_3" dest="q_0" />		
 		</Transitions>
