@@ -70,7 +70,7 @@ public class Scheduler
 	    {
 		FBInstance selectedFB = selectFBInstanceToHandleEvent();
 		selectedFB.handleEvent();
-		notifyFinished();
+		notifyFinished();		
 	    }
     }
     
