@@ -1172,9 +1172,4 @@ public class JavaBytecodeGenerator
 	debug(n.toString());
 	return null;
     }
-
-    //XXX används denna överhuvudtaget????
-    public File getTempFile() {
-	return temp;
-    }
 }

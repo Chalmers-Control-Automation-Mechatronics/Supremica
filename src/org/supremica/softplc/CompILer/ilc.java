@@ -49,14 +49,13 @@ public class ilc
 		if (v.check()) {
 		    //n.dump("");
 		    JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
-		    File temp = jb.getTempFile();
+		    //XXXFile temp = jb.getTempFile();
 		} else {
 		    System.err.println("VariableChecker failed");
 		}
 	    }
 	    catch (Exception e)
 		{
-		    System.out.println("Ooops");
 		    System.out.println(e.getMessage());
 		    e.printStackTrace();
 		}
