@@ -378,6 +378,7 @@ public final class SupremicaProperties
 
 	/**
 	 * Possible values
+	 * Metal : All platforms
 	 * javax.swing.plaf.metal.MetalLookAndFeel : All platforms
 	 * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
 	 * com.sun.java.swing.plaf.motif.MotifLookAndFeel : All platforms

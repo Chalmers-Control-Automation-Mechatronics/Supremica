@@ -67,6 +67,10 @@ public class InterfaceManager
 			{
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			}
+			else if ("Metal".equalsIgnoreCase(lookAndFeel))
+			{
+				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+			}
 			else
 			{
 				UIManager.setLookAndFeel(lookAndFeel);

@@ -63,6 +63,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.Loader;
 import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.helpers.OptionConverter;
+import org.supremica.util.VPopupMenu;
 import org.supremica.gui.*;
 import org.supremica.properties.*;
 
@@ -474,7 +475,7 @@ public class LogDisplay
 	}
 
 	class LoggerPopupMenu
-		extends JPopupMenu
+		extends VPopupMenu
 	{
 		private LoggerFilter filter = null;
 		private JCheckBoxMenuItem fatalItem = null;
