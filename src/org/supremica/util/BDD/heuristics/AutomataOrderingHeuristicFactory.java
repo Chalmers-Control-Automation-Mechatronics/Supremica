@@ -36,7 +36,11 @@ public class AutomataOrderingHeuristicFactory
 			break;
 
 		case Options.AO_HEURISTIC_FORCE :
-			aoh = new AOH_Force();
+			aoh = new AOH_Force(false);
+			break;
+
+		case Options.AO_HEURISTIC_FORCE_WIN4 :
+			aoh = new AOH_Force(true);
 			break;
 
 		default :
