@@ -432,8 +432,8 @@
 	<copy file="${dist}/SupremicaVersion.txt" todir="H:\public_html\Supremica\updates\noarch"/>
 	<copy file="${dist}/Supremica.jar" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
 	<copy file="${dist}/SupremicaVersion.txt" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
-	<exec executable="C:\Program Files\Inno Setup 2\iscc.exe">
-		<arg value=" U:\temp\SupremicaInstaller\SupremicaDist.iss"/>
+	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
+		<arg value="U:\temp\SupremicaInstaller\SupremicaDist.iss"/>
 	</exec>
 	<copy file="U:\temp\SupremicaInstaller\Output\setup.exe" todir="H:\public_html\Supremica\distributions\windows"/>	
 </target>
