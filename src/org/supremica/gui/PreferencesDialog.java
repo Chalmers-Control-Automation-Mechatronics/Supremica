@@ -451,7 +451,8 @@ class LayoutPanel
 	private JCheckBox dotLeftToRight = null;
 	private JCheckBox dotWithStateLabels = null;
 	private JCheckBox dotWithCircles = null;
-	private JCheckBox dotUseColors = null;
+	private JCheckBox dotUseStateColors = null;
+	private JCheckBox dotUseArcColors = null;
 	private JCheckBox dotUseMultipleLabels = null;
 	private JTextField dotCommand = null;
 	private JTextField dotMaxNbrOfStates = null;
@@ -476,9 +477,13 @@ class LayoutPanel
 
 		propertiesBox.add(dotWithCircles);
 
-		dotUseColors = new JCheckBox("Draw with colors");
+		dotUseStateColors = new JCheckBox("Draw with state colors");
 
-		propertiesBox.add(dotUseColors);
+		propertiesBox.add(dotUseStateColors);
+
+		dotUseArcColors = new JCheckBox("Draw with arc colors");
+
+		propertiesBox.add(dotUseArcColors);
 
 		dotUseMultipleLabels = new JCheckBox("Draw multiple labels");
 
@@ -506,7 +511,8 @@ class LayoutPanel
 		SupremicaProperties.setDotLeftToRight(dotLeftToRight.isSelected());
 		SupremicaProperties.setDotWithStateLabels(dotWithStateLabels.isSelected());
 		SupremicaProperties.setDotWithCircles(dotWithCircles.isSelected());
-		SupremicaProperties.setDotUseColors(dotUseColors.isSelected());
+		SupremicaProperties.setDotUseStateColors(dotUseStateColors.isSelected());
+		SupremicaProperties.setDotUseArcColors(dotUseArcColors.isSelected());
 		SupremicaProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
 		SupremicaProperties.setDotExecuteCommand(dotCommand.getText());
 
@@ -527,7 +533,8 @@ class LayoutPanel
 		dotLeftToRight.setSelected(SupremicaProperties.isDotLeftToRight());
 		dotWithStateLabels.setSelected(SupremicaProperties.isDotWithStateLabels());
 		dotWithCircles.setSelected(SupremicaProperties.isDotWithCircles());
-		dotUseColors.setSelected(SupremicaProperties.isDotUseColors());
+		dotUseStateColors.setSelected(SupremicaProperties.isDotUseStateColors());
+		dotUseArcColors.setSelected(SupremicaProperties.isDotUseArcColors());
 		dotUseMultipleLabels.setSelected(SupremicaProperties.isDotUseMultipleLabels());
 		dotCommand.setText(SupremicaProperties.getDotExecuteCommand());
 		dotMaxNbrOfStates.setText(Integer.toString(SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning()));

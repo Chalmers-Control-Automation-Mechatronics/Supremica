@@ -68,7 +68,8 @@ public class AutomatonToDot
 	private boolean leftToRight = false;
 	private boolean withLabel = true;
 	private boolean withCircles = false;
-	private boolean useColors = false;
+	private boolean useStateColors = false;
+	private boolean useArcColors = false;
 
 	public AutomatonToDot(Automaton aut)
 	{
@@ -95,14 +96,19 @@ public class AutomatonToDot
 		this.withCircles = withCircles;
 	}
 
-	public void setUseColors(boolean useColors)
+	public void setUseStateColors(boolean useStateColors)
 	{
-		this.useColors = useColors;
+		this.useStateColors = useStateColors;
 	}
 
-	protected String getColor(State s)
+	public void setUseArcColors(boolean useArcColors)
 	{
-		if (!useColors)
+		this.useArcColors = useArcColors;
+	}
+
+	protected String getStateColor(State s)
+	{
+		if (!useStateColors)
 		{
 			return "";
 		}
@@ -125,9 +131,9 @@ public class AutomatonToDot
 		return "";
 	}
 
-	protected String getColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs)
+	protected String getArcColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs)
 	{
-		if (useColors)
+		if (useArcColors)
 		{
 			if (is_ctrl)
 			{
@@ -181,7 +187,7 @@ public class AutomatonToDot
 		}
 
 		// The mutually accepting states are not shown if we aren't using colors...
-		if (!useColors)
+		if (!useStateColors)
 		{
 			mutuallyAcceptingShape = "plaintext";
 		}
@@ -247,7 +253,7 @@ public class AutomatonToDot
 				pw.print(EncodingHelper.normalize(sourceState.getName(), false));
 			}
 
-			pw.println("\"" + getColor(sourceState) + "]; ");
+			pw.println("\"" + getStateColor(sourceState) + "]; ");
 
 			for (Iterator arcSets = sourceState.outgoingArcSetIterator();
 					arcSets.hasNext(); )
@@ -312,7 +318,7 @@ public class AutomatonToDot
 					}
 				}
 
-				pw.println("\" " + getColor(is_ctrl, is_prio, is_imm, is_eps, is_obs) + "];");
+				pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs) + "];");
 			}
 		}
 

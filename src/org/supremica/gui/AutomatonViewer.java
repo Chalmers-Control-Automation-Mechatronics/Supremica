@@ -110,7 +110,8 @@ public class AutomatonViewer
 		serializer.setLeftToRight(leftToRightCheckBox.isSelected());
 		serializer.setWithLabels(withLabelsCheckBox.isSelected());
 		serializer.setWithCircles(withCirclesCheckBox.isSelected());
-		serializer.setUseColors(useColorsCheckBox.isSelected());
+		serializer.setUseStateColors(useStateColorsCheckBox.isSelected());
+		serializer.setUseArcColors(useArcColorsCheckBox.isSelected());
 
 		return serializer;
 	}

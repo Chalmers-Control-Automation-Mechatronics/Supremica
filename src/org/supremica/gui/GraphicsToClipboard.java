@@ -50,68 +50,111 @@
 package org.supremica.gui;
 
 import org.supremica.log.*;
-import org.supremica.automata.IO.*;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomataListener;
+import java.awt.*;
+import com.pietjonas.wmfwriter2d.*;
+import java.io.*;
+import javax.swing.*;
 
-public class AutomataHierarchyViewer
-	extends DotViewer
-	implements AutomataListener
+public class GraphicsToClipboard
 {
-	private static Logger logger = LoggerFactory.createLogger(AutomataHierarchyViewer.class);
-	private Automata theAutomata;
+	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
+	private static GraphicsToClipboard theInstance = null;
 
-	public AutomataHierarchyViewer(Automata theAutomata)
-		throws Exception
+	private ClipboardCopy clipboardCopy = null;
+
+	private int width = 0;
+	private int height = 0;
+	private WMF wmf = null;
+
+	private GraphicsToClipboard()
 	{
-		this.theAutomata = theAutomata;
-
-		//super.setObjectName("Hierarchy " + theAutomata);
-		super.setObjectName("Hierarchy");
-		theAutomata.getListeners().addListener(this);
-	}
-
-	// Implementation of AutomataListener interface
-	public void automatonAdded(Automata automata, Automaton automaton)
-	{
-		updated(automata, theAutomata);
-	}
-
-	public void automatonRemoved(Automata automata, Automaton automaton)
-	{
-		updated(automata, theAutomata);
-	}
-
-	public void automatonRenamed(Automata automata, Automaton automaton)
-	{
-		updated(automata, theAutomata);
-	}
-
-	public void actionsOrControlsChanged(Automata automata)
-	{
-		updated(automata, theAutomata);
-	}
-
-	// End of interface implementation
-	public AutomataSerializer getSerializer()
-	{
-		AutomataToHierarchyToDot serializer = new AutomataToHierarchyToDot(theAutomata);
-
-		serializer.setLeftToRight(leftToRightCheckBox.isSelected());
-		serializer.setWithLabels(withLabelsCheckBox.isSelected());
-		serializer.setWithCircles(withCirclesCheckBox.isSelected());
-		serializer.setUseColors(useStateColorsCheckBox.isSelected());
-
 		try
 		{
-			serializer.serialize("Output.txt");
+			clipboardCopy = new ClipboardCopy();
 		}
 		catch (Exception ex)
 		{
-			logger.error(ex.getMessage());
+			logger.error(ex);
+		}
+	}
+
+	public static GraphicsToClipboard getInstance()
+	{
+		if (theInstance == null)
+		{
+			theInstance = new GraphicsToClipboard();
+		}
+		return theInstance;
+	}
+
+
+	/** First call this to get a graphics object, then send the Graphics object
+	 * to paint to fill it in. After this call copyToClipboard.
+	 **/
+	public Graphics getGraphics(int width, int height)
+	{
+		wmf = new WMF();
+		WMFGraphics2D wmfg = new WMFGraphics2D(wmf, width, height);
+		return wmfg;
+	}
+
+	public void copyToClipboard()
+	{
+		File temp = null;
+		try
+		{
+			 temp = File.createTempFile("SupremicaWMF", ".wmf");
+		}
+		catch (IOException ex)
+		{
+			logger.error(ex);
+			return;
 		}
 
-		return serializer;
+		temp.deleteOnExit();
+
+		//save the WMF to an OutputStream with a placeable WMF header
+		FileOutputStream out = null;
+		try
+		{
+			out = new FileOutputStream(temp.getAbsolutePath());
+		}
+		catch (FileNotFoundException ex)
+		{
+			logger.error(ex);
+			return;
+		}
+
+		try
+		{
+			if (false)
+			{
+				wmf.writePlaceableWMF(out, 0, 0, width, height, Toolkit.getDefaultToolkit().getScreenResolution());
+			}
+			else
+			{
+				wmf.writeWMF(out);
+			}
+		}
+		catch (IOException ex)
+		{
+			logger.error(ex);
+			return;
+		}
+
+		try
+		{
+			out.close();
+		}
+		catch (IOException ex)
+		{
+			logger.error(ex);
+			return;
+		}
+
+		clipboardCopy.copyWithPixelSize(temp.getAbsolutePath(), width, height, false);
+		temp.delete();
 	}
+
+
 }

@@ -248,7 +248,8 @@ public class ProjectToHtml
 				{
 					AutomatonToDot exporter = new AutomatonToDot(theAutomaton);
 
-					exporter.setUseColors(true);
+					exporter.setUseStateColors(true);
+					exporter.setUseArcColors(true);
 
 					try
 					{

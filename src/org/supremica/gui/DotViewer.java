@@ -59,7 +59,6 @@ import att.grappa.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.IO.*;
 import org.supremica.gui.texteditor.TextFrame;
-import com.pietjonas.wmfwriter2d.*;
 import java.awt.geom.Rectangle2D;
 
 public class DotViewer
@@ -76,10 +75,11 @@ public class DotViewer
 	private JMenuBar menuBar = new JMenuBar();
 	private JToolBar toolBar = new JToolBar();
 	private boolean updateNeeded = false;
-	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout Left to right", SupremicaProperties.isDotLeftToRight());
+	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout left to right", SupremicaProperties.isDotLeftToRight());
 	protected JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", SupremicaProperties.isDotWithCircles());
 	protected JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", SupremicaProperties.isDotWithStateLabels());
-	protected JCheckBoxMenuItem useColorsCheckBox = new JCheckBoxMenuItem("Draw colors", SupremicaProperties.isDotUseColors());
+	protected JCheckBoxMenuItem useStateColorsCheckBox = new JCheckBoxMenuItem("Draw state colors", SupremicaProperties.isDotUseStateColors());
+	protected JCheckBoxMenuItem useArcColorsCheckBox = new JCheckBoxMenuItem("Draw arc colors", SupremicaProperties.isDotUseArcColors());
 	protected JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", SupremicaProperties.isDotAutomaticUpdate());
 	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5,
 								MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
@@ -87,10 +87,7 @@ public class DotViewer
 	private Process dotProcess;
 	private Builder builder;
 	private String objectName = "";
-	private ClipboardCopy clipboardCopy = null;
-
-	private int wmfWidth = 0;
-	private int wmfHeight = 0;
+	private GraphicsToClipboard toClipboard = null;
 
 	public DotViewer()
 		throws Exception
@@ -209,7 +206,7 @@ public class DotViewer
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					copyWMF();
+					copyToClipboard();
 				}
 			});
 		}
@@ -223,7 +220,8 @@ public class DotViewer
 		menuLayout.add(leftToRightCheckBox);
 		menuLayout.add(withLabelsCheckBox);
 		menuLayout.add(withCirclesCheckBox);
-		menuLayout.add(useColorsCheckBox);
+		menuLayout.add(useStateColorsCheckBox);
+		menuLayout.add(useArcColorsCheckBox);
 		menuLayout.addSeparator();
 
 		JMenuItem menuLayoutUpdate = new JMenuItem();
@@ -327,7 +325,17 @@ public class DotViewer
 				}
 			}
 		});
-		useColorsCheckBox.addActionListener(new ActionListener()
+		useStateColorsCheckBox.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (automaticUpdateCheckBox.isSelected())
+				{
+					update();
+				}
+			}
+		});
+		useArcColorsCheckBox.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -605,10 +613,13 @@ public class DotViewer
 		currScrollPanel = scrollPanel;
 	}
 
-
-	private void saveTo(String name, boolean withHeader)
-		throws FileNotFoundException, IOException
+	public void copyToClipboard()
 	{
+		if (toClipboard == null)
+		{
+			toClipboard = GraphicsToClipboard.getInstance();
+		}
+
 		Rectangle2D bb = theGraph.getBoundingBox();
 
 		double minX = bb.getMinX();
@@ -616,63 +627,18 @@ public class DotViewer
 		double minY = bb.getMinY();
 		double maxY = bb.getMaxY();
 
-		System.out.println("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
+		logger.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
 
 		//create a WMF object
-		wmfWidth = (int)(maxX - minX) + 1;
-		wmfHeight = (int)(maxY - minY) + 1;
-		WMF wmf = new WMF();
-		WMFGraphics2D wmfg = new WMFGraphics2D(wmf, wmfWidth, wmfHeight);
+		int width = (int)(maxX - minX) + 20;
+		int height = (int)(maxY - minY) + 20;
 
-		viewerPanel.paint(wmfg);
+		Graphics theGraphics = toClipboard.getGraphics(width, height);
+		viewerPanel.paint(theGraphics);
 
-		//save the WMF to an OutputStream with a placeable WMF header
-		FileOutputStream out = new FileOutputStream(name);
-		if (withHeader)
-		{
-			wmf.writePlaceableWMF(out, 0, 0, wmfWidth, wmfHeight, Toolkit.getDefaultToolkit().getScreenResolution());
-		}
-		else
-		{
-			wmf.writeWMF(out);
-		}
-		out.close();
+		toClipboard.copyToClipboard();
 	}
 
-
-	private void copyWMF()
-	{
-		if (clipboardCopy == null)
-		{
-			try
-			{
-				clipboardCopy = new ClipboardCopy();
-			}
-			catch (Exception e)
-			{
-				logger.error("Can't access clipboard: " + e);
-				return;
-			}
-		}
-		try
-		{
-			copyToClipboard();
-		}
-		catch (IOException e)
-		{
-			logger.error("IO Exception while saving WMF:" + e);
-		}
-	}
-
-	private void copyToClipboard()
-		throws FileNotFoundException, IOException
-	{
-		File temp = File.createTempFile("SupremicaWMF", ".wmf");
-		temp.deleteOnExit();
-		saveTo(temp.getAbsolutePath(), false);
-		clipboardCopy.copyWithPixelSize(temp.getAbsolutePath(), wmfWidth, wmfHeight, false);
-		temp.delete();
-	}
 	private void initializeStreams(String arguments)
 		throws Exception
 	{

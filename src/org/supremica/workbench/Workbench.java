@@ -33,14 +33,14 @@ class MyAutomatonToDot
 		super(automaton);
 	}
 
-	protected String getColor(State state)
+	protected String getStateColor(State state)
 	{
 		if (state.isForbidden() && state.isSelected())
 		{
 			return ", color = red, style=bold";
 		}
 
-		return super.getColor(state);
+		return super.getStateColor(state);
 	}
 }
 
@@ -62,7 +62,8 @@ class MyAutomatonViewer
 		serializer.setLeftToRight(leftToRightCheckBox.isSelected());
 		serializer.setWithLabels(withLabelsCheckBox.isSelected());
 		serializer.setWithCircles(withCirclesCheckBox.isSelected());
-		serializer.setUseColors(useColorsCheckBox.isSelected());
+		serializer.setUseStateColors(useStateColorsCheckBox.isSelected());
+		serializer.setUseArcColors(useArcColorsCheckBox.isSelected());
 
 		return serializer;
 	}

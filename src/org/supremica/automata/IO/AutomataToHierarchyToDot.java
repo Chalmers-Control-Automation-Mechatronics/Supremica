@@ -151,7 +151,7 @@ public class AutomataToHierarchyToDot
 			return ", shape = egg";
 		}
 
-		// What the f**k was that? 
+		// What the f**k was that?
 		return "";
 	}
 
@@ -185,7 +185,7 @@ public class AutomataToHierarchyToDot
 			pw.println("\tnode [style = filled];");
 		}
 
-		// The automata are nodes in the graph          
+		// The automata are nodes in the graph
 		//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		for (int i = 0; i < theAutomata.size(); i++)
 		{

@@ -128,7 +128,9 @@
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/interfaceRobotStudio3_0.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
+
 	
 	<!-- Ant 1.6.0 is not able to unjar empty jar files -->
 	<!--
