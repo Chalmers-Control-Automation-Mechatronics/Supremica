@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.10 2005-03-11 09:25:31 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.11 2005-03-16 08:15:25 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -37,7 +37,7 @@ public class EditorNodeGroup
 	private static int LOWERRIGHT = 2;
 	private static int LOWERLEFT = 3;
 	private static int CORNERDIAMETER = 15;
-	private static int TOLERANCE = 8;
+	private static int TOLERANCE = 4;
 	private static int HANDLEWIDTH = 4;
 
 	public EditorNodeGroup(GroupNodeProxy gn)
@@ -77,10 +77,10 @@ public class EditorNodeGroup
 
 	private void setCorners()
 	{
-		corners[UPPERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMinY(), bounds.getMinX() + TOLERANCE, bounds.getMinY() + TOLERANCE);
-		corners[UPPERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMinY(), bounds.getMaxX() + TOLERANCE, bounds.getMinY() + TOLERANCE);
-		corners[LOWERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMaxY(), bounds.getMinX() + TOLERANCE, bounds.getMaxY() + TOLERANCE);
-		corners[LOWERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMaxY(), bounds.getMaxX() + TOLERANCE, bounds.getMaxY() + TOLERANCE);
+		corners[UPPERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMinY(), bounds.getMinX() + 2*TOLERANCE, bounds.getMinY() + 2*TOLERANCE);
+		corners[UPPERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMinY(), bounds.getMaxX() + 2*TOLERANCE, bounds.getMinY() + 2*TOLERANCE);
+		corners[LOWERLEFT].setFrameFromCenter(bounds.getMinX(), bounds.getMaxY(), bounds.getMinX() + 2*TOLERANCE, bounds.getMaxY() + 2*TOLERANCE);
+		corners[LOWERRIGHT].setFrameFromCenter(bounds.getMaxX(), bounds.getMaxY(), bounds.getMaxX() + 2*TOLERANCE, bounds.getMaxY() + 2*TOLERANCE);
 	}
 
 	public boolean getResizing()
@@ -245,9 +245,9 @@ public class EditorNodeGroup
 			}
 		}
 
-		Rectangle2D.Double innerBounds = new Rectangle2D.Double(bounds.getX() + TOLERANCE/2, bounds.getY() + TOLERANCE/2, bounds.getWidth() - TOLERANCE, bounds.getHeight() - TOLERANCE);
+		Rectangle2D.Double innerBounds = new Rectangle2D.Double(bounds.getX() + TOLERANCE, bounds.getY() + TOLERANCE, bounds.getWidth() - 2*TOLERANCE, bounds.getHeight() - 2*TOLERANCE);
 
-		return (bounds.intersects(cX - TOLERANCE/2, cY - TOLERANCE/2, TOLERANCE, TOLERANCE) && !innerBounds.contains(cX, cY, 1, 1));
+		return (bounds.intersects(cX - TOLERANCE, cY - TOLERANCE, 2*TOLERANCE, 2*TOLERANCE) && !innerBounds.contains(cX, cY, 1, 1));
 	}
 
 	public Rectangle2D.Double getBounds()

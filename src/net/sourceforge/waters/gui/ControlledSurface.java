@@ -31,7 +31,6 @@ public class ControlledSurface
 	private boolean controlPointsMove = true;
 	private boolean nodesSnap = true;
 
-	private boolean selectOnDrag = false;
 	private boolean hasDragged = false;
 
 	private LinkedList selectedObjects = new LinkedList();
@@ -278,9 +277,6 @@ public class ControlledSurface
 				// Select stuff!
 				//selectChange(o);
 
-				// If dragging, we should select anyway!
-				//selectOnDrag = true;
-				
 				// Only if SELECT is chosen multiple selection is possible...
 				if (!(T.getPlace() == EditorToolbar.SELECT))
 				{
@@ -467,7 +463,6 @@ public class ControlledSurface
 			// DragSelect!
 			if (dragSelect)
 			{
-				/* Drag-select */
 				dragNowX = e.getX();
 				dragNowY = e.getY();
 
@@ -656,13 +651,10 @@ public class ControlledSurface
 			else
 			{
 				// Single selection! (Multiple selection is only allowed in SELECT-mode.)
-
+				
 				// Edge drawing...
 				if (T.getPlace() == EditorToolbar.EDGE )
 				{
-					// Update highlighting!
-					updateHighlighting(e);
-
 					// There should only be one object here, or maybe two, 
 					// a node and it's label or an edge and it's labelgroup...
 					// Let's make it an iterator anyway!
@@ -690,8 +682,11 @@ public class ControlledSurface
 							{
 								edge.setSource(e.getX(), e.getY());
 							}
+
+							break;
 						}
 						
+						// If clicking on a node or nodegroup, draw a new edge!
 						if (object.getType() == EditorObject.NODE)
 						{
 							assert(selectedObjects.size() <= 2);
@@ -709,6 +704,8 @@ public class ControlledSurface
 							{
 								lines.add(dat);
 							}
+		
+							break;
 						}
 						else if (object.getType() == EditorObject.NODEGROUP)
 						{
@@ -729,8 +726,13 @@ public class ControlledSurface
 							{
 								lines.add(dat);
 							}
+							
+							break;
 						}
 					}
+				
+					// Update highlighting!
+					updateHighlighting(e);
 				}
 
 				// Are we resizing a nodegroup?
@@ -942,7 +944,6 @@ public class ControlledSurface
 
 			dragSelect = false;
 			hasDragged = false;
-			selectOnDrag = false;
 		}
 
 		repaint();
@@ -963,6 +964,7 @@ public class ControlledSurface
 		// Highlight things that are moved over...
 		EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 
+		// Unhighlight highligted stuff not in focus
 		if ((highlightedObject != null) && !highlightedObject.equals(o))
 		{
 			highlightedObject.setHighlighted(false);
@@ -979,6 +981,7 @@ public class ControlledSurface
 			needRepaint = true;
 		}
 
+		// Highlight stuff in focus!
 		if (o != null)
 		{
 			o.setHighlighted(true);

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.19 2005-03-15 05:32:34 flordal Exp $
+//# $Id: EditorSurface.java,v 1.20 2005-03-16 08:15:25 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -269,11 +269,11 @@ public class EditorSurface
 
 			// Why is this done here? Why are labelgroups treated differently?
 			// Draw shadow
-			if (l.isHighlighted())
+			if (l.shadow && l.isHighlighted())
 			{
 				Rectangle bounds = l.getBounds();
 				g.setColor(l.getShadowColor());
-				int adjust = 2;
+				int adjust = 2; // The bounds are too tight!
 				g.fillRoundRect((int) bounds.getX()-adjust, (int) bounds.getY()-adjust, 
 								(int) bounds.getWidth()+2*adjust, (int) bounds.getHeight()+2*adjust, 
 								20, 20);
@@ -1478,7 +1478,7 @@ public class EditorSurface
 			}
 			if (scale < 1)
 			{
-				System.err.println("Rescaling figure to fit page. Scale: " + scale);
+				System.out.println("Rescaling figure to fit page. Scale: " + scale);
 				g2d.scale(scale, scale);
 			}   
 

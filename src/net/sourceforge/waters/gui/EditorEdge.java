@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.17 2005-03-11 09:25:31 flordal Exp $
+//# $Id: EditorEdge.java,v 1.18 2005-03-16 08:15:25 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -882,9 +882,9 @@ public class EditorEdge
 		
 		if (isSelected())
 		{
-			g2d.draw(source);
+			//g2d.draw(source);
 			g2d.fill(source);
-			g2d.draw(target);
+			//g2d.draw(target);
 			g2d.fill(target);
 		}
 	}
