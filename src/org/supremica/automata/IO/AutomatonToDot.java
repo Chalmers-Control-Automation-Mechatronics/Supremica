@@ -122,12 +122,29 @@ public class AutomatonToDot
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
 
+		String standardShape = null;
+		String acceptingShape = null;
+		String forbiddenShape = null;
+
 		pw.println("digraph state_automaton {");
 		pw.println("\tcenter = true;");
 
 		if (leftToRight)
 		{
 			pw.println("\trankdir = LR;");
+		}
+
+		if (withCircles)
+		{
+			standardShape = "circle";
+			acceptingShape = "doublecircle";
+			forbiddenShape = "box";
+		}
+		else
+		{
+			standardShape = "plaintext";
+			acceptingShape = "circle";
+			forbiddenShape = "box";
 		}
 
 		if (!aut.hasInitialState())
@@ -147,34 +164,21 @@ public class AutomatonToDot
 			if (state.isInitial())
 			{
 				initialStates.addElement(state);
-				pw.println("\tnode [shape = plaintext] \"" + initPrefix + state.getId() + "\";");
+				pw.println("\t{node [shape = plaintext] \"" + initPrefix + state.getId() + "\"};");
 			}
 
-			if (state.isAccepting() &&!state.isForbidden())
+			if (state.isAccepting() && !state.isForbidden())
 			{
-				if (withCircles)
-				{
-					pw.println("\tnode [shape = doublecircle] \"" + state.getId() + "\";");
-				}
-				else
-				{
-					pw.println("\tnode [shape = ellipse] \"" + state.getId() + "\";");
-				}
+				pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getId() + "\"};");
 			}
-
-			if (state.isForbidden())
+			else if (state.isForbidden())
 			{
-				pw.println("\tnode [shape = box] \"" + state.getId() + "\";");
+				pw.println("\t{node [shape = " + forbiddenShape + "] \"" + state.getId() + "\"};");
 			}
-		}
-
-		if (withCircles)
-		{
-			pw.println("\tnode [shape = circle];");
-		}
-		else
-		{
-			pw.println("\tnode [shape = plaintext];");
+			else
+			{
+				pw.println("\t{node [shape = " + standardShape + "] \"" + state.getId() + "\"};");
+			}
 		}
 
 		for (int i = 0; i < initialStates.size(); i++)
@@ -245,8 +249,8 @@ public class AutomatonToDot
 
 		// An attemp to always start at the initial state.
 		// The problem is that a rectangle is drawn around the initial state.
-		Iterator stateIt = initialStates.iterator();
-		while(stateIt.hasNext())
+		// Ok, new versions of dot seems to be able to deal with this.
+		for (Iterator stateIt = initialStates.iterator(); stateIt.hasNext(); )
 		{
 		 	State currState = (State)stateIt.next();
 		 	pw.println("\t{ rank = min ;");

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata>
 <Automaton name="Robot_all_con" type="Plant">
 	<Events>
@@ -6,7 +6,7 @@
 		<Event id="b" label="b" controllable="true" prioritized="true"/>
 	</Events>
 	<States>
-		<State id="r1" name="r1" initial="true" accepting="true"/>
+		<State id="r1" name="Åkesson" initial="true" accepting="true"/>
 		<State id="r2" accepting="true"/>
 	</States>
 	<Transitions>

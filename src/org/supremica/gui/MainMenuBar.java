@@ -658,6 +658,27 @@ public class MainMenuBar
 			});
 		}
 
+		// Tools.ShoeFactory
+		if (SupremicaProperties.includeShoeFactory())
+		{
+			menuTools.add(new JSeparator());
+
+			JMenu menuToolsShoeFactory = new JMenu();
+
+			menuToolsShoeFactory.setText("Shoe Factory...");
+			menuTools.add(menuToolsShoeFactory);
+
+			JMenuItem menuBuildPlant = new JMenuItem("Build Plant");
+			menuBuildPlant.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.shoeFactoryBuildPlant(ActionMan.getGui());
+				}
+			});
+			menuToolsShoeFactory.add(menuBuildPlant);
+		}
+
 		menuTools.add(new JSeparator());
 
 		JMenuItem menuToolsCellEditor = new JMenuItem();

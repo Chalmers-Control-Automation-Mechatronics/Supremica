@@ -63,11 +63,11 @@ public class EncodingHelper
 	public static String normalize(String input)
 	{
 		String s = input;
-		/*
+/*
 		try
 		{
-			s = new String(input.getBytes(), "UTF-8");
-			logger.info("org: " + input + " new: " + s);
+			s = new String(input.getBytes("UTF-8"), "ISO-8859-1");
+			//logger.info("org: " + input + " new: " + s);
 		}
 		catch (UnsupportedEncodingException ex)
 		{
@@ -75,8 +75,7 @@ public class EncodingHelper
 			throw new RuntimeException("UTF-8 is an unsupported encoding");
 		}
 		return s.toString();
-		*/
-
+*/
 		StringBuffer str = new StringBuffer();
 		int len = (s != null)
 				  ? s.length()
@@ -126,6 +125,7 @@ public class EncodingHelper
 		}
 
 		return str.toString();
+
 
 	}
 }

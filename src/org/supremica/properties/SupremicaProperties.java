@@ -146,6 +146,9 @@ public final class SupremicaProperties
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
 
+	// ShoeFactory Options
+	private static final String INCLUDE_SHOE_FACTORY = "includeShoeFactory";
+
 	// SoftPLC Options
 	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
 	private static Vector softplcInterfaces = new Vector();
@@ -196,6 +199,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
+		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
 		setProperty(SUPERUSER_IDENTITY, "ESS030", false);
@@ -548,6 +552,11 @@ public final class SupremicaProperties
 	public static boolean includeEditor()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_EDITOR));
+	}
+
+	public static boolean includeShoeFactory()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_SHOE_FACTORY));
 	}
 
 	public static boolean includeBoundedUnconTools()

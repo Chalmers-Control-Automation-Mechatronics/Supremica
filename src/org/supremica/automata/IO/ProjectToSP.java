@@ -88,7 +88,7 @@ public class ProjectToSP
 
 	public void serialize(PrintWriter pw)
 	{
-		pw.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		pw.println("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
 		pw.print("<SupremicaProject");
 
 		if (project.getName() != null)
