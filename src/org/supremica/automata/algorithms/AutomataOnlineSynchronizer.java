@@ -56,6 +56,7 @@ import java.util.Arrays;
 // For the automata selection methods
 import java.util.ArrayList;
 import org.supremica.automata.AutomataIndexForm;
+import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.Automaton;
 
 /**
@@ -150,7 +151,7 @@ public final class AutomataOnlineSynchronizer
 	{
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
-		currState = new int[nbrOfAutomata + 1];
+		currState = AutomataIndexFormHelper.createState(nbrOfAutomata);
 
 		// +1 status field
 		currEnabledEvents = new int[nbrOfEvents + 1];
@@ -460,7 +461,7 @@ public final class AutomataOnlineSynchronizer
 	{
 		if (nextState == null)
 		{
-			nextState = new int[nbrOfAutomata + 1];
+			nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
 
 			// +1 status field
 		}
@@ -563,9 +564,10 @@ public final class AutomataOnlineSynchronizer
 		//System.err.println("doTransition: eventIndex " + eventIndex);
 		// Counting on correct input here... only enabled events, please...
 		// Construct new state
-		int[] nextState = new int[currState.length];
+		int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
+		//int[] nextState = new int[currState.length];
 
-		System.arraycopy(currState, 0, nextState, 0, currState.length);
+		//System.arraycopy(currState, 0, nextState, 0, currState.length);
 
 		//System.err.println("doTransition: nbrOfSelectedAutomata " + nbrOfSelectedAutomata);
 

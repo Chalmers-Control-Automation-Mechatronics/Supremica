@@ -91,7 +91,7 @@ public class AutomataExplorer
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
-		int[] initialState = new int[this.theAutomata.size() + 1];
+		int[] initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
 
 		// + 1 status field
 		Iterator autIt = this.theAutomata.iterator();
@@ -140,7 +140,7 @@ public class AutomataExplorer
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		*/
 		Utility.setupFrame(this, 400, 500);
-		
+
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)

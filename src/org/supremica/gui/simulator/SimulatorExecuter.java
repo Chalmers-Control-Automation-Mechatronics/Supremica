@@ -124,7 +124,7 @@ public class SimulatorExecuter
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
-		int[] initialState = new int[this.theProject.size() + 1];
+		int[] initialState = AutomataIndexFormHelper.createState(this.theProject.size());
 
 		// + 1 status field
 		Iterator autIt = this.theProject.iterator();

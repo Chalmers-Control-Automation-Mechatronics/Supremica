@@ -53,6 +53,11 @@ import java.util.StringTokenizer;
 
 public final class AutomataIndexFormHelper
 {
+	public static int[] createState(int nbrOfAutomata)
+	{
+		return new int[nbrOfAutomata + 1];
+	}
+
 	public static int[] createCopyOfState(int[] state)
 	{
 		int[] newState = new int[state.length];

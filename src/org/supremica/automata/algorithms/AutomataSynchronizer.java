@@ -91,7 +91,7 @@ public class AutomataSynchronizer
 		throws Exception
 	{
 		State currInitialState;
-		int[] initialState = new int[theAutomata.size() + 1];    // +1 status field
+		int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
 		// Build the initial state - and the comment
 		Iterator autIt = theAutomata.iterator();

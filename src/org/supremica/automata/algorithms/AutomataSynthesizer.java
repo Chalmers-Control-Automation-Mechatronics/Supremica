@@ -67,6 +67,7 @@ import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.AutomataIndexFormHelper;
 
 // AutomatSelector a set of specs/sups/plants,
 // For each spec/sup it returns that automaton together with the plants with which it shares uc-events
@@ -167,7 +168,7 @@ class AutomataSelector
 				{
 					partialSet.addAutomaton(currPlantAutomaton);
 					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
-					
+
 					// closedSet stuff removed
 
 				}
@@ -175,7 +176,7 @@ class AutomataSelector
 		}
 		return partialSet; // return the updated set
 	}
-	
+
 	public Automata addPlants(Alphabet events)
 	{
 		for(Iterator it = events.iterator(); it.hasNext(); )
@@ -184,7 +185,7 @@ class AutomataSelector
 		}
 		return partialSet;
 	}
-	
+
 
 	// Return wether we've seen a spec/sup or not
 	boolean hadSpec()
@@ -241,9 +242,8 @@ public class AutomataSynthesizer
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
 		this.synthesizerOptions = synthesizerOptions;
-		initialState = new int[this.theAutomata.size() + 1];
+		initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
 
-		// + 1 status field
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
 		this.gui = gui;
 		theVisualProjectContainer = gui.getVisualProjectContainer();
@@ -384,7 +384,7 @@ public class AutomataSynthesizer
 								logger.info("The synthesized supervisor " + retval.automaton.getComment() + " is maximally permissive.");
 							}
 						}
-						
+
 						modSupervisors.addAutomaton(retval.automaton);
 					}
 				}

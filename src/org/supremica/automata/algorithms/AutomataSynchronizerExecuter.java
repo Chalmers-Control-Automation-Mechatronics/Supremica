@@ -258,7 +258,7 @@ public final class AutomataSynchronizerExecuter
 			selectAllAutomata();
 		}
 
-		nextState = new int[nbrOfAutomata + 1];
+		nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
 
 		// +1 status field
 		currEnabledEvents = new int[nbrOfEvents + 1];

@@ -63,6 +63,7 @@ import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.AutomataIndexFormHelper;
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
@@ -133,7 +134,7 @@ public class AutomataVerifier
 		// Allocate the synchronizationExecuters
 		// synchronizationExecuters = new ArrayList(nbrOfExecuters);
 		// Build the initial state
-		initialState = new int[theAutomata.size() + 1];
+		initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
 		// + 1 status field
 		Iterator autIt = theAutomata.iterator();
