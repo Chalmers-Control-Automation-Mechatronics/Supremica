@@ -1167,14 +1167,15 @@ public class AutomataVerifier
 	private boolean pairwiseNonblockingVerification()
 		throws Exception
 	{
-		if (theAutomata.size() == 1)
-		{   // This is a monolithic system!
+		if (theAutomata.size() <= 2)
+		{   // This is better verified as a monolithic system!
 			return monolithicNonblockingVerification();
 		}
 
 		// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
-		logger.error("NOTE! Modular non-blocking verification is not implemented! This algorithm examines " +
-					 "pairwise non-blocking between all automata! THIS DOES NOT PROVE NONBLOCKING!!");
+		logger.warn("NOTE! Modular non-blocking verification is not really implemented! " +
+					"This algorithm examines pairwise non-blocking between all automata, " +
+					"respectively! THIS DOES NOT PROVE GENERAL NONBLOCKING!!");
 		
 		boolean allPairsNonblocking = true;
 		
@@ -1199,6 +1200,12 @@ public class AutomataVerifier
 				}
 			}
 		}
+
+		// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
+		logger.warn("NOTE! Modular non-blocking verification is not really implemented! " +
+					"This algorithm examines pairwise non-blocking between all automata, " +
+					"respectively! THIS DOES NOT PROVE GENERAL NONBLOCKING!!");
+
 		return allPairsNonblocking;
 	}
 	
@@ -1262,15 +1269,15 @@ public class AutomataVerifier
 		State localInitialState;
 		Automaton currAutomaton;
 
+		// The automata have indexes corresponding to theAutomata, we ignore
+		// this by using the variable "index".
 		int index=0;
 		while (autIt.hasNext())
 		{
 			currAutomaton = (Automaton) autIt.next();
 			localInitialState = currAutomaton.getInitialState();
-			// The automata have indexes corresponding to theAutomata, we ignore
-			// this by using the variable "index".
-			//currInitialState[currAutomaton.getIndex()] = localInitialState.getIndex();
 			currInitialState[index++] = localInitialState.getIndex();
+			//currInitialState[currAutomaton.getIndex()] = localInitialState.getIndex();
 		}
 
 		// Initialize new synchHelper and move the excecutionDialog to the new helper...
@@ -1282,7 +1289,7 @@ public class AutomataVerifier
 		// synchHelper.clear();
 		// synchHelper.setRememberUncontrollable(true);
 		synchHelper.addState(currInitialState);
-		
+
 		if (stopRequested)
 		{
 			return null;

@@ -621,7 +621,7 @@ public class Automaton
 		return alphabet.containsEventWithLabel(eventLabel);
 	}
 */
-	// The above stuff should be removed -- use teh Alphabet and the Arc methods instead
+	// The above stuff should be removed -- use the Alphabet and the Arc methods instead
 
 	/**
 	 * Returns an iterator to all states in this automaton
@@ -1263,7 +1263,6 @@ public class Automaton
 
 	public long checksum()
 	{
-
 		// Ad-hoc checksum algorithm
 		long checksum = 0;
 
