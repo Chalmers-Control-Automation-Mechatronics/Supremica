@@ -575,19 +575,19 @@ public final class AutomataSynchronizerExecuter
         int[][] currStateTable = helper.getStateTable();
 		int stateNumber = 0;
 
-		// /*
+		/*
 		CancelDialog cancelDialog = helper.getCancelDialog();
 		cancelDialog.updateHeader("Building states...");
 		cancelDialog.makeProgressBar(0, currStateTable.length);		
-		// */
+		*/
 
         // Create all states
 		for (int i = 0; i < currStateTable.length; i++)
   		{
-			// /*
+			/*
 			if (i % 100 == 0) 
 				cancelDialog.updateCounter(i);
-			// */
+			*/
 
 			if (stopRequested)
 			{
@@ -630,17 +630,17 @@ public final class AutomataSynchronizerExecuter
 			}
         }
 
-		// /*
+		/*
 		cancelDialog.updateHeader("Building transitions...");
-		// */
+		*/
 
         // Create all transitions
  		for (int k = 0; k < currStateTable.length; k++)
   		{
-			// /*
+			/*
 			if (k % 100 == 0) 
 				cancelDialog.updateCounter(k);
-			// */
+			*/
 
 			if (stopRequested)
 			{

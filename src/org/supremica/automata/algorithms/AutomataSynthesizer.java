@@ -97,7 +97,7 @@ public class AutomataSynthesizer
 			synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 			AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-			eventToAutomataMap = alphabetAnalyzer.uncontrollableEventsExecute();
+			eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
 			// Build the initial state
 			Iterator autIt = theAutomata.iterator();
@@ -165,8 +165,7 @@ public class AutomataSynthesizer
 				}
 
 				if (selectedAutomata.size() > 1)
-				{
-					// Clear the hash-table and set some variables in the synchronization helper
+				{	// Clear the hash-table and set some variables in the synchronization helper
 					synchHelper.clear();
 					synchHelper.addState(initialState);
 					synchHelper.getAutomaton().removeAllStates(); // Essential when building more than one automaton
@@ -233,9 +232,8 @@ public class AutomataSynthesizer
 							thisCategory.error("Exception while adding the new automaton.");
 						}
 					}
-
-					selectedAutomata.clear();
 				}
+				selectedAutomata.clear();
 			}
 		}
 		if (synthesizerOptions.getOptimize())

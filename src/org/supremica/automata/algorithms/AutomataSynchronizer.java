@@ -96,7 +96,6 @@ public class AutomataSynchronizer
 	public void execute()
 		throws Exception
 	{
-		//Automaton currAutomaton;
   		State currInitialState;
   		int[] initialState = new int[theAutomata.size() + 1]; // +1 status field
 
@@ -118,15 +117,13 @@ public class AutomataSynchronizer
 				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
 			currExec.start();
 		}
-		// synchHelper.setCancelDialog(cancelDialog);
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
-		// cancelDialog.destroy();
 	}
 	
  	public Automaton getAutomaton()
   	{
 		AutomataSynchronizerExecuter currExec =
-			(AutomataSynchronizerExecuter)synchronizationExecuters.get(0);
+			(AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 		if (currExec.buildAutomaton())
 		{
 			// System.out.println(synchHelper.getAutomaton() == null);

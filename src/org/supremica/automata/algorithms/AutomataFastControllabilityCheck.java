@@ -67,19 +67,19 @@ public class AutomataFastControllabilityCheck
 	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheck.class.getName());
 
     private Automata theAutomata;
-    private Automaton theAutomaton;
 	private int nbrOfExecuters;
-	private HashMap eventToAutomataMap = new HashMap();
+
+	/** Map from an uncontrollable Event-object to the Set of plant-type Automaton-objects that contains this event. 
+	 * @see AlphabetAnalyzer */
+	private HashMap uncontrollableEventToPlantMap = new HashMap();
 
     private AutomataSynchronizerHelper synchHelper;
     private ArrayList synchronizationExecuters;
-    private SynchronizationOptions syncOptions;
 	private StateMemorizer potentiallyUncontrollableStates;
 	private int[] initialState;
 
 	private int nbrOfUncontrollableStates = 0;
 	private int nbrOfUncontrollableSpecifications = 0;
-	private Alphabet unionAlphabet;
 
 	// Used in excludeUncontrollableStates
 	private int stateAmount = 1;
@@ -95,42 +95,41 @@ public class AutomataFastControllabilityCheck
 		Automaton currAutomaton;
 		State currInitialState;
 
-		this.theAutomata = theAutomata; // Maybe should have used different names here...
-
-	    initialState = new int[theAutomata.size() + 1]; // + 1 status field
+		this.theAutomata = theAutomata;
 		nbrOfExecuters = syncOptions.getNbrOfExecuters();
 		verboseMode = syncOptions.verboseMode();
-		this.syncOptions = syncOptions;
 
 		try
 		{
 			synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
-
-			unionAlphabet = synchHelper.getAutomaton().getAlphabet();
-			potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
-			AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-			eventToAutomataMap = alphabetAnalyzer.uncontrollableEventsExecute();
-			
-			// Build the initial state
-			Iterator autIt = theAutomata.iterator();
-			while (autIt.hasNext())
-			{
-				currAutomaton = (Automaton) autIt.next();
-				currInitialState = currAutomaton.getInitialState();
-				initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-			}
 		}
 		catch (Exception e)
-	    {
-         	System.err.println("Error while initializing synchronization helper. " + e);
+		{
+			System.err.println("Error while initializing synchronization helper. " + e);
 			// e.printStackTrace();
           	System.exit(0);
 	    }
+		
+		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
+		
+		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
+		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
+		
+		// Build the initial state
+	    initialState = new int[theAutomata.size() + 1]; // + 1 status field
+		Iterator autIt = theAutomata.iterator();
+		while (autIt.hasNext())
+		{
+			currAutomaton = (Automaton) autIt.next();
+			currInitialState = currAutomaton.getInitialState();
+			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+		}
     }
-
+	
 	/**
-	 * Performs verification.
+	 * Performs verification using the AutomataSynchronizerExecuter.
 	 * @return true if controllable, false if not or false if don't know.
+	 * @see AutomataSynchronizerExecuter
 	 */
     public boolean execute()
 		throws Exception
@@ -146,12 +145,11 @@ public class AutomataFastControllabilityCheck
 		// Loop over supervisors/specifications and find plants containing equal uncontrollable events
 		Iterator supervisorIterator = theAutomata.iterator();
 		while (supervisorIterator.hasNext())
-		{
+		{   // Iterate over supervisors/specifications
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) ||
 				(currSupervisorAutomaton.getType() == AutomatonType.Specification))
-			{
-				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
+			{	// Examine uncontrollable events in currSupervisorAutomaton and select plants containing these events
 				selectedAutomata.add(currSupervisorAutomaton);
 				eventIterator = currSupervisorAutomaton.eventIterator();
 				while (eventIterator.hasNext())
@@ -159,17 +157,12 @@ public class AutomataFastControllabilityCheck
 					currEvent = (Event) eventIterator.next();
 					if (!currEvent.isControllable())
 					{
-						if (eventToAutomataMap.get(currEvent) != null)
+						plantIterator = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
+						while (plantIterator.hasNext())
 						{
-							plantIterator = ((Set)eventToAutomataMap.get(currEvent)).iterator();
-							while (plantIterator.hasNext())
-							{
-								currPlantAutomaton = (Automaton) plantIterator.next();
-								// This check is performed in eventToAutomataMap
-								// if (currPlantAutomaton.getType() == AutomatonType.Plant)
-								if (!selectedAutomata.contains(currPlantAutomaton))
-									selectedAutomata.add(currPlantAutomaton);
-							}
+							currPlantAutomaton = (Automaton) plantIterator.next();
+							if (!selectedAutomata.contains(currPlantAutomaton))
+								selectedAutomata.add(currPlantAutomaton);
 						}
 					}
 				}
@@ -220,7 +213,7 @@ public class AutomataFastControllabilityCheck
 					else
 					{   // Try to add some more automata
 
-						// Make array with indices of selected automata
+						// Make array with indices of selected automata to remember which were originally selected
 						int[] automataIndices = new int[selectedAutomata.size()];
 						for (int i = 0; i < selectedAutomata.size(); i++)
 						{
@@ -253,15 +246,15 @@ public class AutomataFastControllabilityCheck
 								
 								// Try to prove remaining states in the stateMemorizer as beeing uncontrollable	
 								if (findUncontrollableStates(automataIndices))
-								{   // Print the uncontrollable state(s)...
+								{
 									if (verboseMode)
+									{	// Print the uncontrollable state(s)...
 										synchHelper.printUncontrollableStates();
-									// Print event trace reaching uncontrollable state
-									if (verboseMode)
+										// Print event trace reaching uncontrollable state
 										synchHelper.displayTrace();
-									// Print info on amount of states examined
-									if (verboseMode)
+										// Print info on amount of states examined
 										synchHelper.displayInfo();
+									}
 									return false;
 								}
 							}
@@ -477,7 +470,7 @@ public class AutomataFastControllabilityCheck
 				stateAmount = stateCount;
 				// Remove states in the stateMemorizer that are not represented in the new
 				// automaton and therefore can't be reached in the total synchronization.
-				// Reachable states are marked with potentiallyUncontrollableStates.find above.
+				// Reachable states are marked with potentiallyUncontrollableStates.find() above.
 				potentiallyUncontrollableStates.clean(automataIndices);
 
 				// Print result
@@ -485,7 +478,7 @@ public class AutomataFastControllabilityCheck
 				if  (statesLeft == 0)
 				{
 					if (verboseMode)
-						thisCategory.info("No uncontrollable states left after adding" + addedAutomata + ".");
+						thisCategory.info("No uncontrollable states left after adding" + addedAutomata + ", the automata is controllable.");
 					return;
 				}
 				else

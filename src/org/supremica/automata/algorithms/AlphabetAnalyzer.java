@@ -61,8 +61,7 @@ public class AlphabetAnalyzer
 
    	private Automata theAutomata;
 
-	// For each event there is a set of automata
-	// that contains this event.
+	/** Map from an Event-object to the Set of Automaton-objects that contains this event. */
 	private HashMap eventToAutomataMap = new HashMap();
 
 	private Collection eventCollection;
@@ -77,7 +76,11 @@ public class AlphabetAnalyzer
 		buildEventToAutomataMap();
 	}
 
-	public HashMap uncontrollableEventsExecute()
+	/**
+	 * Builds the eventToAutomataMap to map uncontrollable events to plants.
+	 * @return HashMap mapping uncontrollable Event-object to Set of plant-type Automaton-objects.
+	 */
+	public HashMap getUncontrollableEventToPlantMap()
 	{
 		try
 		{
@@ -139,15 +142,13 @@ public class AlphabetAnalyzer
 			automatonSet = new HashSet();
 			eventToAutomataMap.put(ev, automatonSet);
 		}
-		// System.out.println("Krasch?" + (eventToAutomataMap == null) + (aut == null) + (automatonSet == null));
 		automatonSet.add(aut);
-		// System.out.println("Krasch?");
 	}
 
 	/**
-	 * Returns true if the given event is present in zero or
-	 * one automata, and false if it is present on more than two (ONE?)
-	 * automata.
+	 * Determines if an event is not synchronized, that is, present in ledd than two automata. 
+	 * @param ev the event that should be examined.
+	 * @return true if the given event is present in zero or one automata, and false if it is present on more than one automata.
 	 */
 	public boolean isUnsynchronizedEvent(Event ev)
 	{

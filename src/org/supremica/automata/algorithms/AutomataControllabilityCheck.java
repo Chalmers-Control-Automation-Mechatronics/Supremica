@@ -57,7 +57,6 @@ import java.io.PrintWriter;
 public class AutomataControllabilityCheck
 {
     private Automata theAutomata;
-    private Automaton theAutomaton;
 
     private AutomataSynchronizerHelper synchHelper;
     private ArrayList synchronizationExecuters;
@@ -70,8 +69,6 @@ public class AutomataControllabilityCheck
 		this.theAutomata = theAutomata;
 
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
-		theAutomaton = synchHelper.getAutomaton();
-
 
     	// Build the initial state
 		Automaton currAutomaton;
