@@ -78,8 +78,6 @@ public class AutomataSynchronizerWorker
 
 	private boolean stopRequested = false;
 
-	private EventQueue eventQueue = new EventQueue();
-
 	public AutomataSynchronizerWorker(Supremica workbench,
 		Automata theAutomata,
 		String newAutomatonName,
@@ -115,9 +113,9 @@ public class AutomataSynchronizerWorker
 			ArrayList threadsToStop = new ArrayList();
 			threadsToStop.add(theSynchronizer);
 			threadsToStop.add(this);
-			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop, eventQueue);
-			theSynchronizer.getHelper().setCancelDialog(cancelDialog);
-			cancelDialog.updateHeader("Synchronizing...");
+			ExecutionDialog executionDialog = new ExecutionDialog(workbench, "Synchronizing", threadsToStop);
+			theSynchronizer.getHelper().setExecutionDialog(executionDialog);
+			executionDialog.setMode(ExecutionDialogMode.synchronizing);
 
 			// Synchronize automaton
 			try
@@ -152,15 +150,15 @@ public class AutomataSynchronizerWorker
 				java.awt.EventQueue.invokeLater(this);
 
 				Date endDate = new Date();
-				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+				thisCategory.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
 			}
 			else
 			{
 				Date endDate = new Date();
-				thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds!");
+				thisCategory.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
 			}
 
-			cancelDialog.destroy();
+			executionDialog.setMode(ExecutionDialogMode.hide);
 		}
 		else if (mode == MODE_UPDATE)
 		{

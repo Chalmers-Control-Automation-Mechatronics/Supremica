@@ -76,7 +76,7 @@ public class AutomataVerificationWorker
 	// private Automaton theAutomaton = null;
 	private SynchronizationOptions synchronizationOptions;
 	private VerificationOptions verificationOptions;
-	private CancelDialog cancelDialog;
+	private ExecutionDialog executionDialog;
 	private boolean stopRequested = false;
 
 	private EventQueue eventQueue = new EventQueue();
@@ -104,15 +104,15 @@ public class AutomataVerificationWorker
 		// Cancel dialog initialization...
 		final ArrayList threadsToStop = new ArrayList();
 		threadsToStop.add(this);
-		
+
 		eventQueue.invokeLater(new Runnable()
 			{   public void run()
-				{ 
-					cancelDialog = new CancelDialog(workbench, threadsToStop, eventQueue);
-					cancelDialog.updateHeader("Verifying...");
+				{
+					executionDialog = new ExecutionDialog(workbench, "Verifying", threadsToStop);
+					executionDialog.setMode(ExecutionDialogMode.verifying);
 				}
 			});
-		
+
 		if (verificationOptions.getVerificationType() == 0)
 		{   // Controllability verification...
 			boolean isControllable;
@@ -130,10 +130,10 @@ public class AutomataVerificationWorker
  				eventQueue.invokeLater(new Runnable()
 					{   public void run()
 						{
-							automataVerifier.getHelper().setCancelDialog(cancelDialog);
+							automataVerifier.getHelper().setExecutionDialog(executionDialog);
 						}
 					});
-				// automataVerifier.getHelper().setCancelDialog(cancelDialog);
+				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
 			catch (Exception e)
@@ -305,10 +305,10 @@ public class AutomataVerificationWorker
 				automataVerifier = new AutomataVerifier(automataA, synchronizationOptions, verificationOptions);
 				eventQueue.invokeLater(new Runnable()
 					{   public void run()
-						{ automataVerifier.getHelper().setCancelDialog(cancelDialog);
+						{ automataVerifier.getHelper().setExecutionDialog(executionDialog);
 						}
 					});
-				// automataVerifier.getHelper().setCancelDialog(cancelDialog);
+				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
 			catch (Exception e)
@@ -388,13 +388,11 @@ public class AutomataVerificationWorker
 
 	public void requestStop()
 	{
-		eventQueue.invokeLater(new Runnable()
-			{   public void run()
-				{ 	
-					if (cancelDialog != null)
-						cancelDialog.destroy();
-				}
-			});
+		if (executionDialog != null)
+		{
+			executionDialog.setMode(ExecutionDialogMode.hide);
+		}
+
 		stopRequested = true;
 	}
 }

@@ -101,8 +101,8 @@ public final class AutomataSynchronizerHelper
 	// For synchronizing without recalculating the AutomataIndexForm
 	private boolean[] activeAutomata;
 
-	// For counting states in cancelDialog
-	private CancelDialog cancelDialog = null;
+	// For counting states in executionDialog
+	private ExecutionDialog executionDialog = null;
 
 	// Verbose mode
 	private boolean verboseMode;
@@ -230,7 +230,7 @@ public final class AutomataSynchronizerHelper
 			if (rememberTrace)
 			{
 				if (fromStateList.size() > 0)
-				{   // 
+				{   //
 					while (!(Arrays.equals(fromStateList.getLast(), stateTrace.getLast())))
 					{
 						stateTrace.removeLast();
@@ -296,9 +296,9 @@ public final class AutomataSynchronizerHelper
 
   		if (++nbrOfCheckedStates % 2000 == 0)
 		{
-			if (cancelDialog != null)
+			if (executionDialog != null)
 			{
-				cancelDialog.updateCounter(nbrOfCheckedStates);
+				executionDialog.setValue(nbrOfCheckedStates);
 			}
 
 			/*
@@ -307,6 +307,17 @@ public final class AutomataSynchronizerHelper
 			*/
 		}
     }
+
+   	public void setExecutionDialog(ExecutionDialog executionDialog)
+	{
+		this.executionDialog = executionDialog;
+	}
+
+	public ExecutionDialog getExecutionDialog()
+	{
+		return executionDialog;
+	}
+
 
     /**
      * If the toState does not exist then make a copy of this state
@@ -323,16 +334,6 @@ public final class AutomataSynchronizerHelper
 		}
 		addState(toState);
     }
-
-   	public void setCancelDialog(CancelDialog cancelDialog)
-	{
-		this.cancelDialog = cancelDialog;
-	}
-
-	public CancelDialog getCancelDialog()
-	{
-		return cancelDialog;
-	}
 
     public void addStatus(int[] state)
     {
@@ -525,7 +526,7 @@ public final class AutomataSynchronizerHelper
 		StringBuffer trace = new StringBuffer();
 		int[] fromState;
 		for (int i = 0; i < stateTrace.size() - 1; i++)
-		{ 
+		{
 			int[] fromState = (int[]) stateTrace.get(i);
 			executer.setCurrState(fromState);
 			for (int j = stateTrace.size() - 1; j > i; j--)
@@ -552,7 +553,7 @@ public final class AutomataSynchronizerHelper
 			}
 		}
 		*/
-		 
+
 		thisCategory.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
 
 		/*
