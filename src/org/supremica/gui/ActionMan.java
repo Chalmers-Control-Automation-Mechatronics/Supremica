@@ -1196,18 +1196,18 @@ public class ActionMan
 			// logger.info(statusStr.toString());
 			gui.info(statusStr.toString());
 		}
-		
+
 		if(selectedAutomata.size() > 1)
 		{
 			double potentialNumberOfStates = 1.0;
-	
+
 			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
-	
+
 				potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
 			}
-	
+
 			gui.info("\n\tNumber of potential states: " + new Double(potentialNumberOfStates).longValue());
 		}
 	}
@@ -1758,6 +1758,71 @@ public class ActionMan
 					{
 						ex.printStackTrace();
 						gui.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+					}
+				}
+			}
+		}
+	}
+
+	// Generate ABB Control Builder SFCs
+	public static void AutomataToControlBuilderSFC(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String prefixName = null;
+
+					try
+					{
+						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedAutomata);
+						String pathName = currFile.getAbsolutePath();
+
+						if (pathName.endsWith(".prj"))
+						{
+							prefixName = pathName.substring(0, pathName.length() - 4);
+						}
+						else
+						{
+							prefixName = pathName;
+						}
+
+						File appFile = new File(prefixName + ".app");
+						//PrintWriter pw_app = new PrintWriter(new FileWriter(prefixName + ".app"));
+						PrintWriter pw_prj = new PrintWriter(new FileWriter(prefixName + ".prj"));
+						// These are not necessary?
+						//PrintWriter pw_prc = new PrintWriter(new FileWriter(prefixName + ".prc"));
+						//PrintWriter pw_wsp = new PrintWriter(new FileWriter(prefixName + ".wsp"));
+
+						exporter.serialize_app(appFile);
+						//exporter.serialize_app(pw_app);
+						exporter.serialize_prj(pw_prj);
+						//exporter.serialize_prc(pw_prc);
+						//exporter.serialize_wsp(pw_wsp);
+						//pw_app.close();
+						pw_prj.close();
+						//pw_prc.close();
+						//pw_wsp.close();
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						gui.error("Exception while generating ControlBuilder code to files " + prefixName + "{\".prj\", \".app\"}");
 					}
 				}
 			}

@@ -70,6 +70,7 @@ public class FileDialogs
 	private FileFilter gifFilter = null;
 	private FileFilter mifFilter = null;
 	private FileFilter sFilter = null;
+	private FileFilter prjFilter = null;
 	private FileFilter autFilter = null;
 	private static FileDialogs fd = new FileDialogs();
 
@@ -213,6 +214,16 @@ public class FileDialogs
 
 		fileExporter.resetChoosableFileFilters();
 		fileExporter.setFileFilter(fd.getSFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getPRJFileExporter()
+	{
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getPRJFilter());
 
 		return fileExporter;
 	}
@@ -415,5 +426,15 @@ public class FileDialogs
 		}
 
 		return sFilter;
+	}
+
+	private FileFilter getPRJFilter()
+	{
+		if (prjFilter == null)
+		{
+			prjFilter = makeFileFilter(".prj", "Control Builder Project files (*.prj)");
+		}
+
+		return prjFilter;
 	}
 }

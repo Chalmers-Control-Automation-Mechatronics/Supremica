@@ -820,6 +820,18 @@ public class Supremica
 					ActionMan.AutomataToSattLineSFC(getGui());
 				}
 			});
+
+			JMenuItem menuToolsCodeGenerationControlBuilderSFC = new JMenuItem();
+
+			menuToolsCodeGenerationControlBuilderSFC.setText("ControlBuilder SFC...");
+			menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderSFC);
+			menuToolsCodeGenerationControlBuilderSFC.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.AutomataToControlBuilderSFC(getGui());
+				}
+			});
 		}
 
 		// Configure
@@ -1279,7 +1291,7 @@ public class Supremica
 			return 0; // "nothing to do, nowhere to go-o" [Ramones 1978]
 		}
 		//-- MF --
-		
+
 		int nbrOfAddedAutomata = 0;
 		Iterator autIt = currAutomata.iterator();
 
