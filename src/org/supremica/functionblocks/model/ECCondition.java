@@ -51,6 +51,11 @@
  */
 package org.supremica.functionblocks.model;
 
+import java.lang.Exception;
+import java.io.StringReader;
+import java.io.Reader;
+import java_cup.runtime.Scanner;
+import java_cup.runtime.Symbol;
 import org.supremica.functionblocks.model.interpreters.st.Lexer;
 import org.supremica.functionblocks.model.interpreters.st.Parser;
 
@@ -58,23 +63,39 @@ import org.supremica.functionblocks.model.interpreters.st.Parser;
 public class ECCondition
 {
 	private String condition = null;
+	private StringReader reader = null;
+	private Lexer lexer = null;
+	private Parser parser = null;
+	
+	private ECCondition(){}
 
 	public ECCondition(String cond)
 	{
-		condition = cond;
+		setCondition(cond);
 	}
 
 	public void setCondition(String cond)
 	{
 		condition = cond;
-		// parse condition
+
+		reader = new StringReader(condition);
+		
+		lexer = new Lexer((Reader) reader);
+
+		parser = new Parser((Scanner) lexer);
+
+
 	}
 
-	public boolean evaluateCondition(Variables vars)
+	public boolean evaluate(Variables vars)
 	{
-		// interpret the condition string and evaluate
-		// for now all conditions are true, ie labeled by '1'
+		
+		try{
+			System.out.println("ECCondition.evaluate(): parser returned symbol:" + parser.parse().toString());
+		} 
+		catch(Exception e)
+		{}
 		return true;
 	}
-
+	
 }

@@ -75,6 +75,7 @@ public class Resource
 
 	// create a dummy FB type and instance
 	fbType = new BasicFBType("DummyFBType", this);
+	fbType.getECC().
 	fbType.addAlgorithm(new TestAlgorithm("DummyAlgorithm"));
 	fbInstance = fbType.createInstance("DummyFBInstance");
 	fbInstance.addEventInputQueue(new EventQueue());

@@ -44,10 +44,9 @@ package org.supremica.functionblocks.model;
 
 import java.util.*;
 
-public abstract class FBType
+public abstract class FBType extends NamedObject
 {
 
-    String name;
     Resource resource;
     String comment;
     List versionInfo = new LinkedList();

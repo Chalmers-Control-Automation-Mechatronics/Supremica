@@ -51,6 +51,8 @@ public class ECC
 
 	private ECState initialState = null;
 
+	
+
 	ECC()
 	{
 		System.out.println("ECC(): Creating new empty ECC");
@@ -83,7 +85,49 @@ public class ECC
 		
 		System.out.println("ECC.execute()");
 		
-		// return the new state
-		return null;
-	}
+		// find all transitions that have currentECState in their source
+		List ecTransitionsWithSameSource = new LinkedList();
+
+		for(Iterator iter = ecTransitions.iterator();iter.hasNext();)
+		{
+			ECTransition temp = (ECTransition) iter.next();
+			if (temp.getSource() == currentECState)
+			{
+				ecTransitionsWithSameSource.add(temp);
+			}
+		}
+		
+		// evalute all of their conditions and remove the ones that can not be taken
+		if(ecTransitionsWithSameSource.size()>0)
+		{
+			for(Iterator iter = ecTransitionsWithSameSource.iterator();iter.hasNext();)
+			{
+				ECTransition temp = (ECTransition) iter.next();
+				if(!temp.getCondition().evaluate(vars)) iter.remove();
+			}
+		}
+		else
+		{
+			System.out.println("ECC.execute(): no possible transitions from state" + currentECState.getName());
+			System.out.println("\t Check your ECC for deadlocks!");
+		}
+		
+		// if more than one condition is true report it and don't do anything,
+		// otherwise take the transition
+		if(ecTransitionsWithSameSource.size()>0)
+		{
+			if(ecTransitionsWithSameSource.size()==1)
+			{
+				return ((ECTransition) ecTransitionsWithSameSource.get(0)).getDestination();
+			}
+			else
+			{
+				System.out.println("ECC.execute(): more than one possible transitions from state" + currentECState.getName());
+				System.out.println("\t Check your ECC for determinism!");
+			}		
+		}
+		
+		// didn't find any transitions that could be taken
+		return currentECState;
+	}	
 }
