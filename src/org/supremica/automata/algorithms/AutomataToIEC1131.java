@@ -119,7 +119,7 @@ public class AutomataToIEC1131
 
 	public void printILCommand(PrintWriter pw, String command, String operand)
 	{
-		printILStatement(pw, null, command, label, null);
+		printILStatement(pw, null, command, operand, null);
 	}
 
 	void printBeginProgram(PrintWriter pw)
