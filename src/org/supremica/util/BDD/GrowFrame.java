@@ -13,7 +13,7 @@ public class GrowFrame
 	protected IntArray vars;
 	private GrowCanvas canvas;
 	private long start_time, end_time, last_time;
-	private Button bQuit, bDump, bReturn;
+	private Button bQuit, bDump, bReturn, bAbort;
 	protected Label status;
 	private TextArea ta;
 	private boolean showGraph;
@@ -37,8 +37,15 @@ public class GrowFrame
 		pNorth.add(bQuit = new Button("Close"));
 		bQuit.addActionListener(this);
 
+
+		pNorth.add(bAbort = new Button("Abort"));
+		bAbort.addActionListener(this);
+		bAbort.setBackground(Color.red);
+
+
 		pNorth.add(bDump = new Button("Values"));
 		bDump.addActionListener(this);
+
 
 		pNorth.add(bReturn = new Button("Graph"));
 		bReturn.addActionListener(this);
@@ -84,6 +91,7 @@ public class GrowFrame
 	{
 		end_time = System.currentTimeMillis();
 		stopped = true;
+		bAbort.setVisible(false);
 		flush();
 	}
 
@@ -213,6 +221,10 @@ public class GrowFrame
 		{
 			showGraph = true;
 			onReturn();
+		} else if(src == bAbort)
+		{
+			Limiter.stopAll();
+			bAbort.setVisible(false);
 		}
 	}
 
