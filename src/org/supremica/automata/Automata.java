@@ -140,10 +140,30 @@ public class Automata
 	{
 		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
-			addAutomaton((Automaton) autIt.next());
+			Automaton currAutomaton = (Automaton)autIt.next();
+			if (containsAutomaton(currAutomaton.getName()))
+			{
+				removeAutomaton(currAutomaton.getName());
+			}
+			addAutomaton(currAutomaton);
 		}
 	}
 
+	/**
+	 * Iterates over all automata in automata. 
+	 * If an automaton with the same name is not in the cureent
+	 * automata then the automata is added. If there already is an automaton
+	 * then that automaton is replace with the new one. 
+	 * @param automata
+	 */
+	public void updateAutomata(Automata automata)
+	{
+		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
+		{
+			addAutomaton((Automaton) autIt.next());
+		}
+	}
+	
 	public void removeAutomaton(Automaton aut)
 	{
 		theAutomata.remove(aut);

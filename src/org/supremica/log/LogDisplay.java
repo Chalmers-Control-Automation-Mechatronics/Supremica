@@ -68,7 +68,6 @@ public class LogDisplay
 	implements Runnable
 {
 	private static LogDisplay theLogDisplay = null;
-	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private JScrollPane theTextPaneScrollPane;
 	private JTextPane textpane;
 	private StyledDocument doc;
@@ -84,7 +83,7 @@ public class LogDisplay
 	private Thread reader;
 	private Thread reader2;
 	private boolean quit;
-
+	
 	private final PipedInputStream pin=new PipedInputStream();
 	private final PipedInputStream pin2=new PipedInputStream();
 
@@ -102,6 +101,7 @@ public class LogDisplay
 	private LogDisplay()
 	{
 		super();
+
 
 		layout = new PatternLayout("%-5p %m%n");
 		name = "Debug";
