@@ -1740,9 +1740,15 @@ public class Automaton
 	 */
 	public void hide(Alphabet alpha)
 	{
+		// Don't hide nothing!
+		if (alpha.size() == 0)
+		{
+			return;
+		}
+
 		Automaton aut = this;
 
-		// Remove the hidden events
+		// Remove the hidden events from alphabet
 		aut.getAlphabet().minus(alpha);
 
 		// Get/create silent event tau

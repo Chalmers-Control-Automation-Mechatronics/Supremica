@@ -195,6 +195,17 @@ public final class VerificationOptions
 	}
 
 	/**
+	 * Returns the default options for nonblocking verification.
+	 */
+	public static VerificationOptions getDefaultNonblockingOptions()
+	{
+		VerificationOptions options = new VerificationOptions();
+		options.setVerificationType(VerificationType.Nonblocking);
+		options.setAlgorithmType(VerificationAlgorithm.Modular);
+		return options;
+	}
+
+	/**
 	 * Returns the default options for language inclusion verification.
 	 */
 	public static VerificationOptions getDefaultLanguageInclusionOptions()

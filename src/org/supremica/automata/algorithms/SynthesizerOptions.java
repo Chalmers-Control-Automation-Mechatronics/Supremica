@@ -224,6 +224,7 @@ public final class SynthesizerOptions
 		SupremicaProperties.setSynthesisPurge(purge);
 		SupremicaProperties.setSynthesisOptimize(optimize);
 		SupremicaProperties.setSynthesisMaximallyPermissive(maximallyPermissive);
+		SupremicaProperties.setSynthesisMaximallyPermissiveIncremental(maximallyPermissiveIncremental);
 	}
 
 	/**

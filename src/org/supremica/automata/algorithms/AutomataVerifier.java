@@ -64,6 +64,7 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.util.BDD.*;
+import org.supremica.properties.SupremicaProperties;
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
@@ -1466,7 +1467,6 @@ public class AutomataVerifier
 		// Maybe the system is monolithic already?
 		if (theAutomata.size() == 1)
 		{
-
 			// No need to synchronize!
 			return moduleIsNonblocking(theAutomata.getFirstAutomaton());
 		}
@@ -1790,6 +1790,7 @@ public class AutomataVerifier
 	 * Incrementally composes and minimizes the automata and examines the end result...
 	 */
 	private boolean compositionalNonblockingVerification()
+		throws Exception
 	{
 		// Make a copy that we can fiddle with
 		//Automata theAutomata = new Automata(theAutomata); // Don't need to fiddle
@@ -1801,7 +1802,10 @@ public class AutomataVerifier
 			public void run()
 			{
 				ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
-				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+				if (executionDialog != null)
+				{
+					executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+				}
 			}
 		});
 
@@ -1830,6 +1834,7 @@ public class AutomataVerifier
 		}
 		catch (Exception ex)
 		{
+			requestStop();
 			logger.error("Error in AutomataVerifier when verifying nonblocking compositionally. " + ex);
 			return false;
 		}
@@ -1840,7 +1845,6 @@ public class AutomataVerifier
 		}
 
 		// Present result!
-		logger.info("Automaton: " + result + " nbrOfStates " + result.nbrOfStates() + ".");
 		return verifyNonblocking(result);
 	}
 
@@ -2123,6 +2127,7 @@ public class AutomataVerifier
 	 *@see AutomataSynchronizerExecuter
 	 */
 	private static boolean moduleIsNonblocking(Automaton theAutomaton)
+		throws Exception
 	{
 		return moduleIsNonblocking(theAutomaton, false);
 	}
@@ -2135,18 +2140,24 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see AutomataSynchronizerExecuter
 	 */
-	private static boolean moduleIsNonblocking(Automaton theAutomaton, boolean destructive)
+	private static boolean moduleIsNonblocking(Automaton original, boolean destructive)
+		throws Exception
 	{
+		Automaton aut;
 
 		// Should we save the original by creating a copy that we can destroy?
-		if (!destructive)
+		if (destructive)
 		{
-			theAutomaton = new Automaton(theAutomaton);
+			aut = original;
+		}
+		else
+		{	
+			aut = new Automaton(original);
 		}
 
 		// Examine all states, starting from the marked ones and moving backwards...
 		LinkedList statesToExamine = new LinkedList();
-		Iterator stateIterator = theAutomaton.stateIterator();
+		Iterator stateIterator = aut.stateIterator();
 		State currState;
 
 		// Add all marked states
@@ -2163,7 +2174,6 @@ public class AutomataVerifier
 		// Examine all guaranteed nonblocking states for incoming arcs
 		State examinedState;
 		Iterator incomingArcIterator;
-
 		while (statesToExamine.size() > 0)
 		{
 			examinedState = (State) statesToExamine.removeFirst();    // OBS. removeFirst!
@@ -2179,22 +2189,36 @@ public class AutomataVerifier
 				}
 			}
 
-			theAutomaton.removeState(examinedState);
+			aut.removeState(examinedState);
 		}
 
-		stateIterator = theAutomaton.stateIterator();
-
-		while (stateIterator.hasNext())
+		// Present result (if in verbose mode)
+		if (SupremicaProperties.verboseMode())
 		{
-			currState = (State) stateIterator.next();
-
-			logger.info("Blocking state: " + currState.getName());
-
-			// If we did a copy of theAutomata before we destroyed it we could display the trace...
-			// logger.info("Trace to blocking state: " + (theAutomaton.getTrace(currState)).toString());
+			stateIterator = aut.stateIterator();
+			while (stateIterator.hasNext())
+			{
+				currState = (State) stateIterator.next();
+				
+				logger.info("Blocking state: " + currState.getName());
+				
+				// If we did a copy of theAutomata before we destroyed it we could display the trace...
+				if (!destructive)
+				{
+					String trace = (original.getTrace(original.getStateWithName(currState.getName()))).toString();
+					if (!trace.equals(""))
+					{
+						logger.info("Trace to blocking state: " + trace);
+					}
+					else
+					{
+						logger.info("The initial state is blocking!");
+				}
+				}
+			}
 		}
 
-		return theAutomaton.nbrOfStates() == 0;
+		return aut.nbrOfStates() == 0;
 	}
 
 	/**
@@ -2223,8 +2247,26 @@ public class AutomataVerifier
 	 * Standard method for monolithic nonblocking verification on theAutomaton.
 	 */
 	public static boolean verifyNonblocking(Automaton theAutomaton)
+		throws Exception
 	{
 		return moduleIsNonblocking(theAutomaton);
+	}
+
+	/**
+	 * Standard method for modular nonblocking verification on theAutomaton.
+	 */
+	public static boolean verifyModularNonblocking(Automata automata)
+		throws Exception
+	{
+		SynchronizationOptions synchronizationOptions;
+		VerificationOptions verificationOptions;
+
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
+
+		AutomataVerifier verifier = new AutomataVerifier(automata, synchronizationOptions, verificationOptions);
+		
+		return verifier.verify();
 	}
 
 	/**

@@ -108,7 +108,10 @@ public class AutomataMinimizer
 		{
 			public void run()
 			{
-				executionDialog.initProgressBar(0, theAutomata.size()-1);
+				if (executionDialog != null)
+				{
+					executionDialog.initProgressBar(0, theAutomata.size()-1);
+				}
 			}
 		});
 
@@ -157,6 +160,9 @@ public class AutomataMinimizer
 					Alphabet alphaC = autC.getAlphabet();
 					uniqueEvents.minus(alphaC);
 
+					// The targetAlphabet should not be removed (although they may be "unique")!
+					uniqueEvents.minus(options.getTargetAlphabet());
+
 					// Early termination
 					if (uniqueEvents.size() == 0)
 					{
@@ -199,6 +205,8 @@ public class AutomataMinimizer
 
 				// Minimize this part, but always spare events from targetAlphabet!
 				hideThese.minus(options.getTargetAlphabet());
+
+				// Compose and minimize!
 				Automaton min = monolithicMinimization(automata, hideThese);
 				if (stopRequested)
 				{
@@ -251,42 +259,56 @@ public class AutomataMinimizer
 	}
 
 	/**
- 	 * Composes automata and minimizes the result with respect to
- 	 * conflict equivalence, with hideThese considered as epsilon
+ 	 * Composes automata and minimizes the result with hideThese considered as epsilon
  	 * events.
 	 */
 	private Automaton monolithicMinimization(Automata automata, Alphabet hideThese)
+		throws Exception
 	{
-		Automaton aut;
-
-		try
+		AutomatonIterator autIt = automata.iterator();
+		for (Automaton currAut = autIt.nextAutomaton(); autIt.hasNext(); 
+			 currAut = autIt.nextAutomaton())
 		{
-			aut = AutomataSynchronizer.synchronizeAutomata(automata);
-			aut.hide(hideThese);
-
-			int before = aut.nbrOfStates();
-			int epsilons = aut.nbrOfEpsilonTransitions();
-			logger.info("Minimizing " + aut + " states: " + before +
-						" epsilons: " + epsilons);
-
-			// Is it at all possible to minimize?
-			if (epsilons > 0)
+			if (currAut.nbrOfForbiddenStates() != 0)
 			{
-				AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
-				threadToStop = minimizer;
-				aut = minimizer.getMinimizedAutomaton(options);
-				threadToStop = null;
-
-				int after = aut.nbrOfStates();
-				logger.info("Before: " + before + ". After: " + after + ". Reduction: " + ((double) before-after/(double) before));
+				logger.info("FORB! in " + currAut);
 			}
 		}
-		catch (Exception ex)
+		
+		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata);
+		
+		if (aut.nbrOfForbiddenStates() != 0)
 		{
-			logger.error(ex);
-			return null;
+			logger.info("FORB1!");
+			aut.setName("FORB! " + aut);
+			if (ActionMan.getGui() != null)
+				ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(new Automaton(aut));		
+			aut.setName(null);
 		}
-
+		
+		aut.hide(hideThese);
+		
+		int before = aut.nbrOfStates();
+		int epsilons = aut.nbrOfEpsilonTransitions();
+		int total = aut.nbrOfTransitions();
+		logger.debug("Minimizing " + aut + " with " + before +
+					" states and " + epsilons + " epsilon transitions (" + 
+					((double) epsilons)*100/total + "%).");
+		
+		// Is it at all possible to minimize?
+		if (epsilons > 0)
+		{
+			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
+			threadToStop = minimizer;
+			aut = minimizer.getMinimizedAutomaton(options);
+			threadToStop = null;
+			
+			int after = aut.nbrOfStates();
+			logger.debug("There were " + before + " states before and " + after + 
+						" states after the minimization. Reduction: " + 
+						((double) (before-after))*100/before + "%.");
+		}
+		
 		return aut;
 	}
 

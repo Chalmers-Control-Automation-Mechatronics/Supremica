@@ -78,7 +78,7 @@ public final class SynchronizationOptions
 		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(),
 			 false,                                   // expandEventsUsingPriority
 			 true,                                    // buildAutomaton
-			 SupremicaProperties.verboseMode(),       // Should always be decided by user! Doesn't belong here?
+			 SupremicaProperties.verboseMode(),       // Should always be decided by user! Doesn't belong here!?
 			 true,                                    // requireConsistentControllability
 			 true,                                    // requireConsistentImmediate
 			 false);                                  // rememberDisabledEvents
@@ -272,12 +272,12 @@ public final class SynchronizationOptions
 	public static SynchronizationOptions getDefaultSynchronizationOptions()
 	{
 		SynchronizationOptions options = new SynchronizationOptions();
-		options.setSynchronizationType(SynchronizationType.Prioritized);
-		//options.setForbidUncontrollableStates(true);  // This is controversial!
+		options.setSynchronizationType(SynchronizationType.Full);
+		// options.setForbidUncontrollableStates(true);  // This is controversial!
 		options.setForbidUncontrollableStates(false);   // So why was it like that?
 		options.setExpandForbiddenStates(true);
 		options.setExpandHashtable(true);
-		return new SynchronizationOptions();
+		return options;
 	}
 
 	/**

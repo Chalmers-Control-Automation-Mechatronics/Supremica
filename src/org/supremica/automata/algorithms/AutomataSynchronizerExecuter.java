@@ -897,7 +897,8 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Builds automaton using either concatenated state names or new, short, unique names as new state names.
+	 * Builds automaton using either concatenated state names or new, 
+	 * short, unique names as new state names.
 	 *
 	 *@param  longformId true for concateated state names, false for new names.
 	 *@return  true if build successful, false if build is stopped with requestStop().

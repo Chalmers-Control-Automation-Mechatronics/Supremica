@@ -75,6 +75,7 @@ public class TestFiles
 	public static final TestFiles Verriegel3LanguageInclusion = new TestFiles("verriegel3_language_inclusion.xml");
 	public static final TestFiles Verriegel3LanguageExclusion = new TestFiles("verriegel3_language_exclusion.xml");
 	public static final TestFiles Verriegel3Uncontrollable = new TestFiles("verriegel3_uncontrollable.xml");
+	public static final TestFiles AutomaticCarParkGate = new TestFiles("AutomaticCarParkGate.xml");
 	public static final TestFiles Ex4_5_a = new TestFiles("ex4_5_a.xml");
 	public static final TestFiles Ex4_5_b = new TestFiles("ex4_5_b.xml");
 	public static final TestFiles UMDES_1 = new TestFiles("umdes_test1.fsm");

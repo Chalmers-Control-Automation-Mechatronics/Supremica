@@ -87,6 +87,9 @@ public class AutomatonMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
+	// Private debug flag...
+	private static boolean debug = false;
+
 	/**
 	 * Basic constructor.
 	 */
@@ -115,7 +118,7 @@ public class AutomatonMinimizer
 			// We need a copy since we must make the system reachable (and maybe deterministic) first!
 			theAutomaton = new Automaton(theAutomaton);
 		}
-
+		
 		// Make reachable
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, SynthesizerOptions.getDefaultSynthesizerOptions());
 		synth.doReachable();
@@ -125,7 +128,13 @@ public class AutomatonMinimizer
 			State state = it.nextState();
 			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
 			{
+				logger.fatal("The state " + state + " is not reachable.");
 				toBeRemoved.add(state);
+			}
+
+			if (state.isForbidden())
+			{
+				logger.fatal("The state " + state + " is forbidden.");
 			}
 		}
 		while (toBeRemoved.size() != 0)
@@ -133,7 +142,8 @@ public class AutomatonMinimizer
 			theAutomaton.removeState((State) toBeRemoved.remove(0));
 		}
 
-		//logger.info("X");
+		if (debug)
+			logger.info("X");
 
 		// Find out what to do
 		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
@@ -174,7 +184,8 @@ public class AutomatonMinimizer
 		}
 		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 		{
-			//logger.info("Z");
+			if (debug)
+				logger.info("Z");
 
 			// Merge silent loops and other obvious OE stuff (to save computation later)
 			// (Almost like cheating.)
@@ -184,16 +195,18 @@ public class AutomatonMinimizer
 				logger.debug("Removed " + count + " observation equivalent states " +
 							 "before running minimization.");
 			}
-
-			//logger.info("A");
-
+			
+			if (debug)
+				logger.info("A");
+		
 			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
 			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
 
 			// Saturate
 			doTransitiveClosure(theAutomaton);
 
-			//logger.info("B");
+			if (debug)
+				logger.info("B");
 
 			// Adjust marking based on epsilon transitions (it IS ok (actually necessary)
 			// to do this AFTER doTransitiveClosure). This is not an expensive computation.
@@ -204,6 +217,11 @@ public class AutomatonMinimizer
 		else
 		{
 			throw new Exception("Unknown equivalence relation");
+		}
+
+		if (stopRequested)
+		{
+			return null;
 		}
 
 		// After the above preparations, we can do the minimization in the same way for all cases!
@@ -219,13 +237,15 @@ public class AutomatonMinimizer
 				return null;
 			}
 
-			//logger.info("C");
+			if (debug)
+				logger.info("C");
 
 			// Minimize
 			findCoarsestPartitioning(equivClasses);
 		}
 		catch (Exception ex)
 		{
+			requestStop();
 			logger.debug(ex.getStackTrace());
 
 			throw ex;
@@ -239,7 +259,8 @@ public class AutomatonMinimizer
 			return null;
 		}
 
-		//logger.info("D");
+		if (debug)
+			logger.info("D");
 
 		// Should we remove redundant transitions to minimize also with respect to transitions?
 		if (options.getAlsoTransitions())
@@ -247,7 +268,8 @@ public class AutomatonMinimizer
 			removeRedundantTransitions(newAutomaton);
 		}
 
-		//logger.info("E");
+		if (debug)
+			logger.info("E");
 
 		// Post minimization adjustments
 		if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
@@ -277,7 +299,8 @@ public class AutomatonMinimizer
 		// Remove from alphabet epsilon events that are never used
 		removeUnusedEpsilonEvents(newAutomaton);
 
-		//logger.info("F");
+		if (debug)
+			logger.info("F");
 
 		// Return the result of the minimization!
 		return newAutomaton;
@@ -512,7 +535,8 @@ public class AutomatonMinimizer
 				if (state.isAccepting())
 				{
 					// How did this happen!? An accepting state is always coreachable!?!?
-					logger.fatal("The state " + state + " forb: " + state.isForbidden() + " accept: " + state.isAccepting() + " init: " + state.isInitial());
+					logger.fatal("The state " + state + " forb: " + state.isForbidden() + 
+								 " accept: " + state.isAccepting() + " init: " + state.isInitial());
 					throw new Exception("Error in AutomatonMinimizer, coreachability failed!");
 				}
 
@@ -531,7 +555,8 @@ public class AutomatonMinimizer
 					{
 						if (currState.isInitial())
 						{
-							logger.info("The system was found to be blocking.");
+							if (debug)
+								logger.info("The system was found to be blocking.");
 							// Do nothing...
 							continue;
 						}
@@ -869,7 +894,8 @@ public class AutomatonMinimizer
 			{
 				Arc currArc = arcIt.nextArc();
 
-				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && !result.contains(currArc.getToState()))
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
+					!result.contains(currArc.getToState()))
 				{
 					statesToExamine.add(currArc.getToState());
 					result.add(currArc.getToState());

@@ -132,6 +132,22 @@ public class TestAutomataVerifier
 		}
 	}
 
+	public void testModularNonblocking()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
+
+			assertTrue(!AutomataVerifier.verifyModularNonblocking(theProject));
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);			
+		}
+	}
+
 	public void testModularLanguageInclusion()
 	{
 	 	try

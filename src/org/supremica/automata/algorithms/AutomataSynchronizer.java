@@ -147,7 +147,6 @@ public class AutomataSynchronizer
 		{
 			if (currExec.buildAutomaton())
 			{
-
 				// logger.debug(synchHelper.getAutomaton() == null);
 				return synchHelper.getAutomaton();
 			}

@@ -99,7 +99,11 @@ public class TestAutomataSynchronizer
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
-			SynchronizationOptions syncOptions = new SynchronizationOptions();
+
+			// Note that (strictly) it is NOT synchronization we're testing 
+			// here (since we forbid uncontrollable states)!
+			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			syncOptions.setForbidUncontrollableStates(true); 
 
 			// Test Prioritized synchronization, although all events are prioritized in this example
 			{
