@@ -67,7 +67,8 @@ public final class StateMemorizer
 		private Hashtable stateHash;
 		private int[] automataIndices;
 
-		private HashtableHolder(Hashtable stateHash, int[] automataIndices)
+		// Jikes 1.15 workaround
+		public HashtableHolder(Hashtable stateHash, int[] automataIndices)
 		{
 			this.stateHash = stateHash;
 			this.automataIndices = automataIndices;
