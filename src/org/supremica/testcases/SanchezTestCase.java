@@ -10,6 +10,9 @@ import org.supremica.automata.*;
 public class SanchezTestCase extends Automata {
 	private Project project;
 	private int blocks;
+	private static boolean first0 = true;
+	private static boolean first1 = true;
+	private static boolean first2 = true;
 
 	public SanchezTestCase(int blocks, int type)
 	{
@@ -17,29 +20,38 @@ public class SanchezTestCase extends Automata {
 
 		project =  new Project();
 
-		if(type == 0) 
+		if(type == 0)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + 
-							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + 
+			if(first0)
+				project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
+							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
 							   "for asynchronous product.");
+			first0 = false;
+
 			for (int i = 0; i < blocks; i++) createAsyncProduct(i);
-		} 
-		else if(type == 1) 
+		}
+		else if(type == 1)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + 
-							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + 
+			if(first1)
+				project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
+							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
 							   "for synchronous product.");
+			first1 = false;
+
 			for (int i = 0; i < blocks; i++) createExactSyncProduct(i);
-		} 
-		else if(type == 2) 
+		}
+		else if(type == 2)
 		{
-			project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " + 
-							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " + 
+			if(first2)
+				project.setComment("Benchmark example from 'A Comparision of Synthesis Tools " +
+							   "For Supervisory Controllers' by A. Sanchez et. al. Benchmark " +
 							   "for supremal controllable sublanguage.");
+			first2 = false;
+
 			TransferLine tl = new TransferLine(blocks, 1,1, true);
 			project = tl.getProject();
-		} 
-		else 
+		}
+		else
 		{
 			System.err.println("Unknown benchmark!");
 		}
@@ -84,6 +96,7 @@ public class SanchezTestCase extends Automata {
 		State s00 = new State("open");
 		State s01 = new State("closed");
 		s01.setInitial(true);
+		s01.setAccepting(true);
 		a1.addState(s00);
 		a1.addState(s01);
 		a1.addArc(new Arc(s00, s01, e12));
@@ -93,6 +106,7 @@ public class SanchezTestCase extends Automata {
 		State s10 = new State("on");
 		State s11 = new State("off");
 		s11.setInitial(true);
+		s11.setAccepting(true);
 		a2.addState(s11);
 		a2.addState(s10);
 		a2.addArc(new Arc(s11, s10, e21));
@@ -106,6 +120,8 @@ public class SanchezTestCase extends Automata {
 		State s22 = new State("high");
 
 		s20.setInitial(true);
+		s21.setAccepting(true);
+
 		a3.addState(s20);
 		a3.addState(s21);
 		a3.addState(s22);

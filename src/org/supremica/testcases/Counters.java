@@ -9,10 +9,18 @@ import org.supremica.automata.*;
 
 public class Counters extends Automata {
 	private Project project;
+	private static boolean first = true;
 
 	public Counters(int num, int states)
 	{
 		project =  new Project();
+
+		if(first) {
+			project.setComment("Independent counters. Used to produce huge state spaces with no interaction. " +
+				"For such models, BDDs are superior traditional methods. "+
+				"Note however that this behaviour is very uncommon in real-life models");
+			first = false;
+		}
 
 
 		for (int i = 0; i < num; ++i)

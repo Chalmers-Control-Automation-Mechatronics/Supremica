@@ -18,6 +18,7 @@ public class TransferLine extends Automata {
 	private Project project;
 	private LabeledEvent [] events_vector;
 	private boolean sanchez_models;
+	private static boolean first = true;
 
 	public TransferLine(int cells, int cap1, int cap2, boolean sanchez_models)
 	{
@@ -25,15 +26,24 @@ public class TransferLine extends Automata {
 
 		project =  new Project();
 
-		// create those shared events between the cells:
-		events_vector = new LabeledEvent[cells+1];
-		for(int i = 0; i <= cells; i++)
-		{
-			if(i == 0) events_vector[i] = new LabeledEvent("start");
-			else if(i == cells) events_vector[i] = new LabeledEvent("finish");
-			else events_vector[i] = new LabeledEvent("transfer_" + i);
+		if(first)
+			project.setComment("This testcase is [more or less] equal to the Transfer Line " +
+				"example from Wonham's Lecture Notes.");
 
-			if(i > 0) events_vector[i].setControllable(false);
+		first = false;
+
+		// create those shared events between the cells:
+
+		if(!sanchez_models) {
+			events_vector = new LabeledEvent[cells+1];
+			for(int i = 0; i <= cells; i++)
+			{
+				if(i == 0) events_vector[i] = new LabeledEvent("start");
+				else if(i == cells) events_vector[i] = new LabeledEvent("finish");
+				else events_vector[i] = new LabeledEvent("transfer_" + i);
+
+				if(i > 0) events_vector[i].setControllable(false);
+			}
 		}
 
 
@@ -57,14 +67,26 @@ public class TransferLine extends Automata {
 		Automaton m2 = new Automaton("M2_" + (i + 1));
 		Automaton tu = new Automaton("TU_" + (i + 1));
 
-		LabeledEvent e1 = events_vector[i];
+
 		LabeledEvent e2 = new LabeledEvent("M1_" + (i + 1) + "_finished");
 		LabeledEvent e3 = new LabeledEvent("M2_" + (i + 1) + "_started");
 		LabeledEvent e4 = new LabeledEvent("M2_" + (i + 1) + "_finished");
 		LabeledEvent e5 = new LabeledEvent("TU_" + (i + 1) + "_take");
-		LabeledEvent e6 = events_vector[i+1];
-		// LabeledEvent e7 = ???
-		LabeledEvent e8 = new LabeledEvent("TU_" + (i + 1) + "_reject");
+			LabeledEvent e8 = new LabeledEvent("TU_" + (i + 1) + "_reject");
+
+		LabeledEvent e1, e6;
+		if(sanchez_models) {
+			e1 = new LabeledEvent("start_" + (i+1));
+			e6 = new LabeledEvent("finish_" + (i+1));
+			e6.setControllable(false);
+		}
+		else
+		{
+			e1 = events_vector[i];
+			e6 = events_vector[i+1];
+		}
+
+
 
 
 

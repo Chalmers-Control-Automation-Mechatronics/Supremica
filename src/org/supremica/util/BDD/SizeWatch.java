@@ -75,34 +75,33 @@ public class SizeWatch
     }
 
     public static void setOwner(String owner) {
-	SizeWatch me = getInstance();
-	if(me != null) {
-	    me.owner = owner;
+		SizeWatch me = getInstance();
+		if(me != null) {
+			me.owner = owner;
 
-	    int add = (50 - owner.length()) / 2;
-	    if(add < 0) add = 0;
-	    StringBuffer dumb = new StringBuffer(add + 2);
-	    for(int i = 0; i < add; i++) dumb.append('-');
+			int add = (50 - owner.length()) / 2;
+			if(add < 0) add = 0;
+			StringBuffer dumb = new StringBuffer(add + 2);
+			for(int i = 0; i < add; i++) dumb.append('-');
 
-	    me.addString(dumb.toString()  + owner + dumb.toString() );
+			me.addString(dumb.toString()  + owner + dumb.toString() );
+		}
 	}
-    }
 
 
     public static void report(int bdd, String what) {
-	SizeWatch me = getInstance();
-	if(me != null) {
-	    long size = manager.nodeCount(bdd);
-	    StringBuffer buf = new StringBuffer(what);
-	    while(buf.length() < 40) buf.append(' ');
-	    buf.append(size);
-	    me.addString(buf.toString());
-	}
+		SizeWatch me = getInstance();
+		if(me != null) {
+			long size = manager.nodeCount(bdd);
+			StringBuffer buf = new StringBuffer(what);
+			while(buf.length() < 40) buf.append(' ');
+			buf.append(size);
+			me.addString(buf.toString());
+		}
     }
 
     private void addString(String str) {
-	// Options.out.println(str);
-	list.add(str);
+		list.add(str);
     }
 
 	private void onDump()

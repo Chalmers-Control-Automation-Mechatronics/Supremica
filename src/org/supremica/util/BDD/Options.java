@@ -90,11 +90,12 @@ public class Options
 
     /** Automaton ordering algorithm */
     public static final String [] ORDERING_ALGORITHM_NAMES = {
-		"Random (!) ", "PCG search",  "modified TSP" };
+		"Random (!)", "PCG search",  "modified TSP", "Topological sort (DFS)    " };
     public static final int
     	AO_HEURISTIC_RANDOM = 0,
     	AS_HEURISTIC_PCG = 1,
-    	AS_HEURISTIC_TSP = 2;
+    	AS_HEURISTIC_TSP = 2,
+    	AS_HEURISTIC_DFS = 3;
 	public static int ordering_algorithm = AS_HEURISTIC_TSP;
 
 

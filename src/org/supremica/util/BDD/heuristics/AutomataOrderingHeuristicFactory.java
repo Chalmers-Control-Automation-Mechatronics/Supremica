@@ -26,16 +26,20 @@ public class AutomataOrderingHeuristicFactory {
 				aoh = new AOH_Random();
 				break;
 
+			// all these use the same engine, the solver is different and the selection is handled internally...
 			case Options.AS_HEURISTIC_TSP:
-				aoh = new AOH_TSP();
+			case Options.AS_HEURISTIC_DFS:
+				aoh = new AOH_Solver();
 				break;
 		 	default:
 		 		System.err.println("[INTERNAL] BAD AutomatonSelectionHeuristic type...");
 		 		return null;
 		}
-
-
 		aoh.init(a);
 		return aoh;
+	}
+
+	public static String getName() {
+		return Options.ORDERING_ALGORITHM_NAMES[ Options.ordering_algorithm] ;
 	}
 }

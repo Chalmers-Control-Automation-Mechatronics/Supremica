@@ -120,4 +120,58 @@ public class QuickSort
 	}
 
 
+	// ----[ quicksort for Object-array types ]---------------------------------------------
+
+	private static Object [] oarray_;
+
+	/**
+	 * quicksor of arrays of Objects + costs
+	 * @param reverse reverse the sort
+	 */
+
+	public static void sort(Object [] array, double [] cost, int size, boolean reverse) {
+		oarray_ = array;
+		cost_  = cost;
+		oquicksort_(0, size-1);
+		if(reverse) {
+			Util.reverse(oarray_,size);
+			Util.reverse(cost_,size);
+
+		}
+	}
+
+
+	private static void oswap_(int a, int b) {
+		double tmp1;
+		Object tmp2;
+		tmp1 = cost_[a]; cost_[a] = cost_[b]; cost_[b] = tmp1;
+		tmp2 = oarray_[a]; oarray_[a] = oarray_[b]; oarray_[b] = tmp2;
+	}
+
+	/** helper function to quicksort (quicksort partition) */
+	private static int opartition_(int p, int r) {
+		double x = cost_[r];
+		int i = p - 1;
+
+		for(int j = p; j < r; j++) {
+			if(cost_[j] <= x) {
+				i++;
+				oswap_(i, j);
+			}
+		}
+
+		i++;
+		oswap_(i, r);
+		return i;
+	}
+
+	/** worker function for sort (quick sort function) */
+	private static void oquicksort_(int p, int r) {
+		if(p < r) {
+			int q = opartition_(p, r);
+			oquicksort_(p, q-1);
+			oquicksort_(q+1,r);
+
+		}
+	}
 }

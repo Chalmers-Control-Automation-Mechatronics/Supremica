@@ -70,13 +70,13 @@ public class Automata
 	    int [][]ret = new int[components][components];
 
 	    for(int i = 0; i < components; i++) {
-		Automaton a1 = (Automaton) automata.elementAt(i);
-		ret[i][i] = a1.getCommunicationComplexity(a1); // not actually needed :)
-		for (int j = 0; j < i; j++) {
-		    Automaton a2 = (Automaton) automata.elementAt(j);
-		    int cc = a1.getCommunicationComplexity(a2);
-		    ret[i][j] = ret[j][i] = cc;
-		}
+			Automaton a1 = (Automaton) automata.elementAt(i);
+			ret[i][i] = a1.getCommunicationComplexity(a1); // not actually needed :)
+			for (int j = 0; j < i; j++) {
+				Automaton a2 = (Automaton) automata.elementAt(j);
+				int cc = a1.getCommunicationComplexity(a2);
+				ret[i][j] = ret[j][i] = cc;
+			}
 	    }
 	    return ret;
 	}
@@ -98,9 +98,10 @@ public class Automata
 
 		// --[ Automata ordering which affects the BDD variable ordering starts HERE ] --
 		Timer timer = new Timer(); // This times the ordering procedure
-
 		AutomataOrderingHeuristic aoh = AutomataOrderingHeuristicFactory.createInstance(this);
 		grupp_ordering = aoh.ordering();
+		timer.report("Automata reordering '" +  AutomataOrderingHeuristicFactory.getName() + "' done");
+
 
 		// maybe the user needs to change something ?
 		if (Options.user_alters_PCG) {
@@ -119,7 +120,7 @@ public class Automata
 		automata.removeAllElements();    // just for fun
 		automata = tmp;
 
-		timer.report("PCG reodering done");
+
 
 		// compute upper-bound and allocated states size
 		total_size = 1;

@@ -3,14 +3,15 @@
 package org.supremica.util.BDD.heuristics;
 
 import org.supremica.util.BDD.*;
+import org.supremica.util.BDD.solvers.*;
 
 import java.util.*;
 
 /**
- * TSP mode ordering technique
+ * ordering, decided by a solver
  */
 
-public class AOH_TSP extends AutomataOrderingHeuristic  {
+public class AOH_Solver extends AutomataOrderingHeuristic  {
 	private int [] order;
 
 	public int [] ordering() { return order; }

@@ -9,6 +9,7 @@ public class PigeonHole extends Automata {
 	private Project project;
 	private int pigeons, holes;
 	private LabeledEvent [] iEvents, lEvents;
+	private static boolean first = true;
 
 	private final LabeledEvent invadeEvent(int p, int h) { return iEvents[ p + h * pigeons]; }
 	private final LabeledEvent leaveEvent(int p, int h) { return lEvents[ p + h * pigeons]; }
@@ -19,7 +20,18 @@ public class PigeonHole extends Automata {
 		this.holes = holes;
 
 		project = new Project();
-		project.setComment("Model of pigeons and pigeonholes. From 'The Intractability of Resolution' by A. Haken. The goal is to prove that it is possible to get all pigeons inside the pigeonholes but no more than one pigeon in each hole. A (global) nonblocking problem.");
+		if(first)
+			project.setComment("The Pigeon-Hole Principe (PHP): having n pigeons in m holes, if m < n, " +
+				"then there is at least one hole that contains more than one pigeon. " +
+				"Note that similar situations arise often in reality, for example in a batch system with large buffers... " +
+				"In this testcase model, the marked states represent states when each pigeons are in some hole, " +
+				"but there are no more than a pigeon in each hole. Clearly, if m < n, the system is blocking.... " +
+				"Here, we have choosen a model where each Pigeon and Hole have unique identies, which makes the problem very hard. "+
+				"An anonymous Petri-Net model on the other hand, would be extremly easy to traverse. " +
+				"To see why this problem is so hard, refer to 'The Intractability of Resolution' by A. Haken. "
+				);
+
+		first = false;
 
 		// create events:
 		iEvents = new LabeledEvent[ pigeons * holes ];

@@ -10,6 +10,8 @@ import org.supremica.automata.*;
 
 public class RandomAutomata extends Automata {
 	private Project project;
+	private static boolean first = true;
+
 	private class TransitionStruct {
 		int s0,s1,event;
 	};
@@ -19,6 +21,13 @@ public class RandomAutomata extends Automata {
 	{
 		project =  new Project();
 
+		if(first)
+			project.setComment("Composition of random automata tend to have very few states (often only one). "+
+				"This is very favourable for traditional algorithms in contrast to the symbolic ones (e.g. BDD-based). " +
+				"In this sense, the Random Automata testcase is the exact opposite to the Counter test case."
+				);
+
+		first = false;
 
 		if(dens > 1.0)
 		{
