@@ -1536,20 +1536,56 @@ public class ActionMan
 	// Generate SattLine SFCs
 	public static void AutomataToSattLineSFC(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
-		/*for (Iterator sfcIt = selectedAutomata.iterator(); sfcIt.hasNext(); )
+		JFileChooser fileExporter = FileDialogs.getSFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
-			Automaton currAutomaton = (Automaton)sfcIt.next();
-			JFileChooser fileExporter = null;
-				fileExporter = FileDialogs.getSFCFileExporter();
+			File currFile = fileExporter.getSelectedFile();
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String prefixName = null;
+					try
+					{
+						AutomataToSattLineSFC exporter = new AutomataToSattLineSFC(selectedAutomata);
+						String pathName = currFile.getAbsolutePath();
+						if (pathName.endsWith(".s"))
+						{
+							prefixName = pathName.substring(0, pathName.length() - 2);
+						}
+						else
+						{
+							prefixName = pathName;
+						}
+						PrintWriter pw_s = new PrintWriter(new FileWriter(prefixName + ".s"));
+						PrintWriter pw_g = new PrintWriter(new FileWriter(prefixName + ".g"));
+						PrintWriter pw_l = new PrintWriter(new FileWriter(prefixName + ".l"));
+						PrintWriter pw_p = new PrintWriter(new FileWriter(prefixName + ".p"));
+						exporter.serialize_s(pw_s);
+						exporter.serialize_g(pw_g);
+						exporter.serialize_l(pw_l);
+						exporter.serialize_p(pw_p);
+						pw_s.close();
+						pw_g.close();
+						pw_l.close();
+						pw_p.close();
+					}
+					catch (Exception ex)
+					{
+						gui.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+					}
+				}
+			}
 		}
-		AutomataToSattLineSFC exporter = new AutomataToSattLineSFC(currAutomata);*/
+
 	}
 
 } // ActionMan

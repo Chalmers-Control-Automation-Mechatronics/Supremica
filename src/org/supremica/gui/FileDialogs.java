@@ -67,6 +67,7 @@ public class FileDialogs
 	private FileFilter epsFilter = null;
 	private FileFilter gifFilter = null;
 	private FileFilter mifFilter = null;
+	private FileFilter sFilter = null;
 
 	private static FileDialogs fd = new FileDialogs();
 
@@ -145,6 +146,14 @@ public class FileDialogs
   		JFileChooser fileExporter = fd.getFileExporter();
  		fileExporter.resetChoosableFileFilters();
  		fileExporter.setFileFilter(fd.getGIFFilter());
+ 		return fileExporter;
+ 	}
+
+ 	public static JFileChooser getSFileExporter()
+ 	{
+  		JFileChooser fileExporter = fd.getFileExporter();
+ 		fileExporter.resetChoosableFileFilters();
+ 		fileExporter.setFileFilter(fd.getSFilter());
  		return fileExporter;
  	}
 
@@ -365,5 +374,25 @@ public class FileDialogs
 			};
 		}
 		return mifFilter;
+ 	}
+
+ 	private FileFilter getSFilter()
+ 	{
+ 		if (sFilter == null)
+ 		{
+			sFilter = new FileFilter()
+			{ // Anonymous class
+				public boolean accept(java.io.File f)
+				{
+					return f.getName().toLowerCase().endsWith(".s") || f.isDirectory();
+				}
+
+				public String getDescription()
+				{
+					return "SattLine files (*.s)";
+				}
+			};
+		}
+		return sFilter;
  	}
 }
