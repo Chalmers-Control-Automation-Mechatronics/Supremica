@@ -131,7 +131,7 @@ class SynchButton
 		synch_ops.setRequireConsistentControllability(true);
 		synch_ops.setRequireConsistentImmediate(false);
 		synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
-		
+
 		try
 		{    // wb.syncher *should* be null here - we assume this!
 			wb.syncher = new AutomataSynchronizer(wb.automata, synch_ops);
@@ -279,6 +279,8 @@ class CompareButton
 		{
 			wb.showGraph();
 			wb.listUcStates(wb.calcForbiddenStates() - num_x_states);
+			wb.automaton.invalidate();
+
 		}
 		catch (Exception excp)
 		{
@@ -344,6 +346,8 @@ class ContButton
 
 			wb.showGraph();
 			wb.listUcStates(wb.calcForbiddenStates() - num_x_states);
+			wb.automaton.invalidate();
+
 		}
 		catch (Exception excp)
 		{
@@ -400,6 +404,8 @@ class NonblockButton
 
 			wb.showGraph();
 			wb.listUcStates(wb.calcForbiddenStates() - num_x_states);
+			wb.automaton.invalidate();
+
 		}
 		catch (Exception excp)
 		{
@@ -456,6 +462,8 @@ class ReachButton
 
 			wb.showGraph();
 			wb.listUcStates(wb.calcForbiddenStates() - num_x_states);
+			wb.automaton.invalidate();
+
 		}
 		catch (Exception excp)
 		{
@@ -495,6 +503,8 @@ class PurgeButton
 
 			synth.purge();
 			wb.showGraph();
+			wb.automaton.invalidate();
+
 		}
 		catch (Exception excp)
 		{
@@ -568,6 +578,8 @@ class ParamPanel
 			if (show_graph.isSelected())
 			{
 				wb.showGraph();
+				wb.automaton.invalidate();
+
 			}
 			else    // show_graph is not selected
 			{
@@ -712,7 +724,7 @@ public class Workbench
 	void close()
 	{
 		hideGraph();
-		
+
 		if (toAddIt() == false)
 		{
 			project.removeAutomaton(automaton);
@@ -747,7 +759,7 @@ public class Workbench
 			{
 				System.out.println("Something bad occurred");
 			}
-		}	
+		}
 	}
 
 	void hideGraph()
