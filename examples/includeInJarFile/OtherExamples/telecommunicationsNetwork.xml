@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Telecommunications Network" comment="This is a model of a telecommunications network adapted from 'Supervisory Control od Distributed Systems Part I: Modelling, Specification and Synthesis' by J.G. Thistle, R.P. Malhame and H.-H. Hoang. These automata represents Figures 4-7 in the article.">
+<Automata name="Telecommunications Network" comment="This is a model of a telecommunications network adapted from 'Supervisory Control od Distributed Systems Part I: Modelling, Specification and Synthesis' by J.G. Thistle, R.P. Malhame and H.-H. Hoang. These automata represents Figures 4-7 in the article. This is not the complete model!">
 <!--
 <Automaton name="Old Subscriber i" type="Plant">
 	<Events>

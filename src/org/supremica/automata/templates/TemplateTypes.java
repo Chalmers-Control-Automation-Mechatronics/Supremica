@@ -63,8 +63,11 @@ public class TemplateTypes
 	public static final TemplateTypes AIPExample = new TemplateTypes("AIP Examples");
 	public static final TemplateTypes CentralLockExample = new TemplateTypes("Central Lock Examples");
 	public static final TemplateTypes OperatorSupervisorExample = new TemplateTypes("Hybrid Human-Computer Supervisors");
+	public static final TemplateTypes CommunicationSystemExamples = new TemplateTypes("Communication System Examples");
+	public static final TemplateTypes ManufacturingSystemExamples = new TemplateTypes("Manufacturing System Examples");
+	public static final TemplateTypes Games = new TemplateTypes("Games and Puzzles");
 
-//      public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
+	// public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
 	private String description;
 
 	private TemplateTypes(String description)

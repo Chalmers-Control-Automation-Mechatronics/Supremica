@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Bisimulation" comment="From an exercise by Milner in 'A Calculus of Communicating Systems' (LNCS 92, Springer 1980). Four of the pairs of processes are observation equivalent. The question is which...">
+<Automaton name="i.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="c"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="tau"/>
+		<Transition source="2" dest="3" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="i.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="c"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ii.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="c"/>
+		<Transition source="1" dest="2" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="ii.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="1" dest="3" event="c"/>
+	</Transitions>
+</Automaton><Automaton name="iii.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="c"/>
+		<Transition source="1" dest="2" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="iii.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="a"/>
+		<Transition source="1" dest="3" event="b"/>
+		<Transition source="1" dest="4" event="c"/>
+		<Transition source="2" dest="5" event="c"/>
+	</Transitions>
+</Automaton>
+<Automaton name="iv.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="b"/>
+		<Transition source="0" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="iv.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="tau"/>
+		<Transition source="2" dest="3" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="v.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="b"/>
+		<Transition source="0" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="v.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="vi.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="b"/>
+		<Transition source="1" dest="2" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="vi.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="vii.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="d"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+		<State id="6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="1" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="c"/>
+		<Transition source="3" dest="5" event="tau"/>
+		<Transition source="5" dest="6" event="d"/>
+	</Transitions>
+</Automaton>
+<Automaton name="vii.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="d"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+		<State id="6"/>
+		<State id="7"/>
+		<State id="8"/>
+		<State id="9"/>
+		<State id="10"/>
+		<State id="11"/>
+		<State id="12"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="a"/>
+		<Transition source="0" dest="3" event="a"/>
+		<Transition source="1" dest="4" event="b"/>
+		<Transition source="1" dest="5" event="tau"/>
+		<Transition source="2" dest="6" event="c"/>
+		<Transition source="2" dest="7" event="tau"/>
+		<Transition source="3" dest="8" event="d"/>
+		<Transition source="5" dest="9" event="c"/>
+		<Transition source="5" dest="10" event="tau"/>
+		<Transition source="7" dest="11" event="d"/>
+		<Transition source="10" dest="12" event="d"/>
+	</Transitions>
+</Automaton>
+<Automaton name="viii.a" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="d"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+		<State id="6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="1" dest="2" event="b"/>
+		<Transition source="1" dest="3" event="tau"/>
+		<Transition source="3" dest="4" event="c"/>
+		<Transition source="3" dest="5" event="tau"/>
+		<Transition source="5" dest="6" event="d"/>
+	</Transitions>
+</Automaton>
+<Automaton name="viii.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="d"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+		<State id="6"/>
+		<State id="7"/>
+		<State id="8"/>
+		<State id="9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="a"/>
+		<Transition source="0" dest="3" event="a"/>
+		<Transition source="1" dest="4" event="b"/>
+		<Transition source="1" dest="5" event="c"/>
+		<Transition source="1" dest="6" event="d"/>
+		<Transition source="2" dest="7" event="c"/>
+		<Transition source="2" dest="8" event="d"/>
+		<Transition source="3" dest="9" event="d"/>
+	</Transitions>
+</Automaton>
+</Automata>

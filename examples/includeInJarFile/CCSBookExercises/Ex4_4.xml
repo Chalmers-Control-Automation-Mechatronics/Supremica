@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Cat and Mouse" comment="The cat and mouse problem with the specification expressed in two different ways. The cat and mouse must never be in the same room. This is specified locally, by the five specifications for the different rooms.">
+<Automata name="Cat and Mouse" comment="The cat and mouse problem. The cat and mouse must never be in the same room. This is specified 'locally', by the five specifications for the different rooms. Since this is a static specification, this can also be expressed 'globally' as a set of forbidden states in the composed plant model, 'cat||mouse'.">
 <!--
 <Automata name="Cat and Mouse" comment="The cat and mouse problem with the specification expressed in two different ways. The cat and mouse must never be in the same room. This is specified either locally, by the five specifications for the different rooms or globally, by the 'don't eat mouse' specification.">
 -->

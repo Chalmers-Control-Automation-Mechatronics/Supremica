@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="ABP" comment="From 'Divergence and Fair Testing' by Natarjan and Cleaveland. There are two different mediums, Medium and Medium'. Medium may lose messages given to it at any point until the message is received whereas Medium' may only lose a message at the time it is given to it. With Medium, the system is nonblocking and with Medium', the system is blocking. Without fairness assumptions though, both systems are considered 'divergent' and one misses the 'fact' that Medium is 'strictly better' than Medium'. The paper so argues that fairness is a sound assumption for many real world systems and that it allows for some interesting properties to be tested.">
+<Automaton name="Sender" type="Plant">
+	<Events>
+		<Event id="send"/>
+		<Event id="s0"/>
+		<Event id="rack0"/>
+		<Event id="s1"/>
+		<Event id="rack1"/>
+		<Event id="timeout" label="sender_timeout" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s0'"/>
+		<State id="s0''"/>
+		<State id="s1" accepting="true"/>
+		<State id="s1'"/>
+		<State id="s1''"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s0'" event="send"/>
+		<Transition source="s0'" dest="s0''" event="s0"/>
+		<Transition source="s0''" dest="s1" event="rack0"/>
+		<Transition source="s0''" dest="s0'" event="rack1"/>
+		<Transition source="s0''" dest="s0'" event="timeout"/>
+		<Transition source="s1" dest="s1'" event="send"/>
+		<Transition source="s1'" dest="s1''" event="s1"/>
+		<Transition source="s1''" dest="s0" event="rack1"/>
+		<Transition source="s1''" dest="s1'" event="rack0"/>
+		<Transition source="s1''" dest="s1'" event="timeout"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Receiver" type="Plant">
+	<Events>
+		<Event id="receive"/>
+		<Event id="r0"/>
+		<Event id="sack0"/>
+		<Event id="r1"/>
+		<Event id="sack1"/>
+		<Event id="timeout" label="receiver_timeout" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="r0" initial="true" accepting="true"/>
+		<State id="r0'"/>
+		<State id="r0''"/>
+		<State id="r1" accepting="true"/>
+		<State id="r1'"/>
+		<State id="r1''"/>
+	</States>
+	<Transitions>
+		<Transition source="r0" dest="r0'" event="r0"/>
+		<Transition source="r0" dest="r0''" event="r1"/>
+		<Transition source="r0" dest="r0''" event="timeout"/>
+		<Transition source="r0''" dest="r0" event="sack1"/>
+		<Transition source="r0'" dest="r1''" event="receive"/>
+		<Transition source="r1" dest="r1'" event="r1"/>
+		<Transition source="r1" dest="r1''" event="r0"/>
+		<Transition source="r1" dest="r1''" event="timeout"/>
+		<Transition source="r1''" dest="r1" event="sack0"/>
+		<Transition source="r1'" dest="r0''" event="receive"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Medium" type="Plant">
+	<Events>
+		<Event id="s0"/>
+		<Event id="rack0"/>
+		<Event id="s1"/>
+		<Event id="rack1"/>
+		<Event id="r0"/>
+		<Event id="sack0"/>
+		<Event id="r1"/>
+		<Event id="sack1"/>
+		<Event id="tau" label="message_lost" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="m" initial="true" accepting="true"/>
+		<State id="ms0"/>
+		<State id="ms1"/>
+		<State id="msack0"/>
+		<State id="msack1"/>
+	</States>
+	<Transitions>
+		<Transition source="m" dest="ms0" event="s0"/>
+		<Transition source="ms0" dest="m" event="r0"/>
+		<Transition source="ms0" dest="m" event="tau"/>
+		<Transition source="m" dest="ms1" event="s1"/>
+		<Transition source="ms1" dest="m" event="r1"/>
+		<Transition source="ms1" dest="m" event="tau"/>
+		<Transition source="m" dest="msack0" event="sack0"/>
+		<Transition source="msack0" dest="m" event="rack0"/>
+		<Transition source="msack0" dest="m" event="tau"/>
+		<Transition source="m" dest="msack1" event="sack1"/>
+		<Transition source="msack1" dest="m" event="rack1"/>
+		<Transition source="msack1" dest="m" event="tau"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Medium'" type="Plant">
+	<Events>
+		<Event id="s0"/>
+		<Event id="rack0"/>
+		<Event id="s1"/>
+		<Event id="rack1"/>
+		<Event id="r0"/>
+		<Event id="sack0"/>
+		<Event id="r1"/>
+		<Event id="sack1"/>
+	</Events>
+	<States>
+		<State id="m" initial="true" accepting="true"/>
+		<State id="ms0"/>
+		<State id="ms1"/>
+		<State id="msack0"/>
+		<State id="msack1"/>
+	</States>
+	<Transitions>
+		<Transition source="m" dest="ms0" event="s0"/>
+		<Transition source="m" dest="m" event="s0"/>
+		<Transition source="ms0" dest="m" event="r0"/>
+		<Transition source="m" dest="ms1" event="s1"/>
+		<Transition source="m" dest="m" event="s1"/>
+		<Transition source="ms1" dest="m" event="r1"/>
+		<Transition source="m" dest="msack0" event="sack0"/>
+		<Transition source="m" dest="m" event="sack0"/>
+		<Transition source="msack0" dest="m" event="rack0"/>
+		<Transition source="m" dest="msack1" event="sack1"/>
+		<Transition source="m" dest="m" event="sack1"/>
+		<Transition source="msack1" dest="m" event="rack1"/>
+	</Transitions>
+</Automaton>
+</Automata>

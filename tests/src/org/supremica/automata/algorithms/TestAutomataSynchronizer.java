@@ -172,6 +172,24 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
 				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
 			}
+
+			// Test synchronization of nondeterministic automata
+			{
+				theProject = builder.build(TestFiles.getFile(TestFiles.NondeterministicComposition));
+				Automata aut = new Automata();
+				aut.addAutomaton(theProject.getAutomaton("A"));
+				aut.addAutomaton(theProject.getAutomaton("B"));
+				Automaton result = AutomataSynchronizer.synchronizeAutomata(aut);
+				assertTrue(result.nbrOfStates() == 7);
+				assertTrue(result.nbrOfTransitions() == 6);
+
+				aut = new Automata();
+				aut.addAutomaton(theProject.getAutomaton("A2"));
+				aut.addAutomaton(theProject.getAutomaton("B2"));
+				result = AutomataSynchronizer.synchronizeAutomata(aut);
+				assertTrue(result.nbrOfStates() == 4);
+				assertTrue(result.nbrOfTransitions() == 6);
+			}
 		}
 		catch (Exception ex)
 		{

@@ -737,6 +737,48 @@ public class Automata
 	/**
 	 * Returns true if the controllability is consistent through all the automata.
 	 */
+	public boolean isEventEpsilonConsistent()
+	{
+		// Get the union alphabet, ignoring consistency for now
+		Alphabet unionAlphabet = null;
+
+		try
+		{
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+
+		// Iterate over the alphabet and examine all automata
+		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+
+			// Examine each automata
+			for (AutomatonIterator autIt = iterator(); autIt.hasNext(); )
+			{
+				Alphabet currAlpha = autIt.nextAutomaton().getAlphabet();
+
+				if (currAlpha.contains(currEvent.getLabel()))
+				{
+					if (currEvent.isEpsilon() != currAlpha.getEvent(currEvent.getLabel()).isEpsilon())
+					{
+						logger.error("The event " + currEvent + " is not epsilon consistent.");
+
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns true if the controllability is consistent through all the automata.
+	 */
 	public boolean isEventControllabilityConsistent()
 	{
 		// Get the union alphabet, ignoring consistency for now
@@ -1330,6 +1372,11 @@ public class Automata
 		if (mustBeControllabilityConsistent)
 		{
 			if (!isEventControllabilityConsistent())
+			{
+				return false;
+			}
+
+			if (!isEventEpsilonConsistent())
 			{
 				return false;
 			}
