@@ -28,8 +28,9 @@ public class ArcSet
 	}
 
 	public void add(String event, String s1, String s2)
+	    throws BDDException
 	{
-		BDDAssert.bddAssert(!closed, "[ArcSet.add]BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(!closed, "[ArcSet.add]BAD FUNCTION CALL!");
 		BDDAssert.bddAssert(!in(event, s1, s2), "Duplicate arc: " + s1 + " -" + event + "-> " + s2);
 
 		Arc arc = new Arc();
@@ -53,22 +54,23 @@ public class ArcSet
 
 	public Arc[] getArcVector()
 	{
-		BDDAssert.bddAssert(closed, "[ArcSet.getArcVector] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(closed, "[ArcSet.getArcVector] BAD FUNCTION CALL!");
 
 		return arcs;
 	}
 
 	public Arc getArc(int index)
 	{
-		BDDAssert.bddAssert(closed, "[ArcSet.getArc]BAD FUNCTION CALL!");
-		BDDAssert.bddAssert((index >= 0) && (index < count), "BAD arc-index");
+		BDDAssert.internalCheck(closed, "[ArcSet.getArc]BAD FUNCTION CALL!");
+		BDDAssert.internalCheck((index >= 0) && (index < count), "BAD arc-index");
 
 		return arcs[index];
 	}
 
 	public void close(StateSet ss, EventSet es)
+	    throws BDDException
 	{
-		BDDAssert.bddAssert(!closed, "[ArcSet.close] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(!closed, "[ArcSet.close] BAD FUNCTION CALL!");
 
 		arcs = new Arc[count];
 

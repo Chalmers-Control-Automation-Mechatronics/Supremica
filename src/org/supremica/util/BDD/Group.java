@@ -68,7 +68,7 @@ public class Group
 
 	public void add(BDDAutomaton a)
 	{
-		BDDAssert.bddAssert(size < capacity, "[Group.add] Group size exceeded");
+		BDDAssert.internalCheck(size < capacity, "[Group.add] Group size exceeded");
 
 		members[size] = a;
 

@@ -22,10 +22,25 @@ public class BDDAssert
 	}
 
 	public static void bddAssert(boolean condition, String msg)
+	    throws BDDException
 	{
 		if (!condition)
 		{
-			fatal(msg);
+			throw new BDDException(msg);
 		}
 	}
+
+
+    /**
+     * This is similar to bddAssert, but it does not throw an exception 
+     * but calls fatal()
+     */
+    	public static void internalCheck(boolean condition, String msg)
+	{
+		if (!condition)
+		{
+		    fatal(msg);
+		}
+	}
+
 }

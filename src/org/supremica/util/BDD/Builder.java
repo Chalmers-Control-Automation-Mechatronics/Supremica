@@ -35,6 +35,7 @@ public class Builder {
     }
 
     public Builder(org.supremica.automata.Automata s_automata)
+	throws BDDException
     {
 	this.s_automata = s_automata;
 	automata = new Automata();
@@ -109,8 +110,13 @@ public class Builder {
 	// automata.dump(System.out);
     }
     
-    public BDDAutomata getBDDAutomata() {
+    public BDDAutomata getBDDAutomata() 
+	throws BDDException
+    {
 	if (bddautomata == null) {
+	    if(BDDAutomata.BDDPackageIsBusy()) 
+		throw new BDDException("The BDD packages is used by another task!");
+
 	    bddautomata = new BDDAutomata(automata);
 	}
 	

@@ -7,7 +7,7 @@ public class Automaton
 	implements PCGNode
 {
 	public static final int FAILED = -1,    // universal FAIL code
-							TYPE_UNKNOWN = 0, TYPE_PLANT = 1, TYPE_SPEC = 2, TYPE_SUPERVISOR = 3
+	    TYPE_UNKNOWN = 0, TYPE_PLANT = 1, TYPE_SPEC = 2, TYPE_SUPERVISOR = 3
 	;
 
 	public static String getType(int type)
@@ -65,6 +65,7 @@ public class Automaton
 	}
 
 	public void addState(String name, String id, boolean i, boolean m, boolean x)
+	    throws BDDException
 	{
 		if (!closed)
 		{
@@ -73,6 +74,7 @@ public class Automaton
 	}
 
 	public void addEvent(String label, String id, boolean c, boolean p)
+	    throws BDDException
 	{
 		if (!closed)
 		{
@@ -81,6 +83,7 @@ public class Automaton
 	}
 
 	public void addArc(String name, String from, String to)
+	    throws BDDException
 	{
 		if (!closed)
 		{
@@ -89,6 +92,7 @@ public class Automaton
 	}
 
 	public void close()
+	    throws BDDException
 	{
 
 		// TODO: this function seems to be extremly inefficient, more linear searchs??
@@ -102,6 +106,7 @@ public class Automaton
 	}
 
 	public void close2()
+	    throws BDDException
 	{
 
 		// EventManager.close() has been called and we can proceed
@@ -166,6 +171,7 @@ public class Automaton
 	// current estimation is the avreage number of common events
 	// used in transitions in each automaton
 	public int getCommunicationComplexity(Automaton other)
+	    throws BDDException
 	{
 		int ret = 0;
 		Event[] e1s = this.eventSet.getEventVector();

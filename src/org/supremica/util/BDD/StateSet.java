@@ -28,6 +28,7 @@ public class StateSet
 	}
 
 	public int getIdByName(String name)
+	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[StateSet.getIdByName]BAD FUNCTION CALL!");
 
@@ -45,6 +46,7 @@ public class StateSet
 	}
 
 	public void add(String name, String id, boolean i, boolean m, boolean x)
+	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[StateSet.add] BAD FUNCTION CALL!");
 
@@ -91,19 +93,20 @@ public class StateSet
 
 	public State[] getStateVector()
 	{
-		BDDAssert.bddAssert(closed, "[StateSet.getStateVector] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(closed, "[StateSet.getStateVector] BAD FUNCTION CALL!");
 
 		return states;
 	}
 
 	public State getState(int index)
 	{
-		BDDAssert.bddAssert((index >= 0) && (index < count), "BAD state-index");
+		BDDAssert.internalCheck((index >= 0) && (index < count), "BAD state-index");
 
 		return states[index];
 	}
 
 	void close()
+	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[StateSet.close] BAD FUNCTION CALL!");
 

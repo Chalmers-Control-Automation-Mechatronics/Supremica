@@ -46,6 +46,7 @@ public class BDDTest
 	}
 
 	public BDDTest()
+	    throws BDDException
 	{
 		int zero = getZero();
 		int one = getOne();
@@ -180,6 +181,10 @@ public class BDDTest
 
 	public static void main(String[] args)
 	{
+	    try {
 		new BDDTest();
+	    } catch(BDDException ex) {
+		ex.printStackTrace();
+	    }
 	}
 }

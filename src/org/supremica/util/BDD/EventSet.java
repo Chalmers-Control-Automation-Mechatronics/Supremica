@@ -27,7 +27,7 @@ public class EventSet
 
 	public Event getEventByName(String name)
 	{
-		BDDAssert.bddAssert(!closed, "[EventSet.getEventByName]BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(!closed, "[EventSet.getEventByName]BAD FUNCTION CALL!");
 
 		for (Enumeration e = elements(); e.hasMoreElements(); )
 		{
@@ -44,7 +44,7 @@ public class EventSet
 
 	public int getIdByName(String name)
 	{
-		BDDAssert.bddAssert(!closed, "[EventSet.getIdByName]BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(!closed, "[EventSet.getIdByName]BAD FUNCTION CALL!");
 
 		for (Enumeration e = elements(); e.hasMoreElements(); )
 		{
@@ -60,8 +60,9 @@ public class EventSet
 	}
 
 	public void add(EventManager alphabet, String label, String id, boolean c, boolean p)
+	    throws BDDException
 	{
-		BDDAssert.bddAssert(!closed, "[EventSet.add] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(!closed, "[EventSet.add] BAD FUNCTION CALL!");
 		BDDAssert.bddAssert(!in(label), "Duplicate event: " + label);
 
 		Event event = new Event();
@@ -81,29 +82,29 @@ public class EventSet
 
 	public int getSize()
 	{
-		BDDAssert.bddAssert(closed, "[EventSet.getSize] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(closed, "[EventSet.getSize] BAD FUNCTION CALL!");
 
 		return total;
 	}
 
 	public Event[] getEventVector()
 	{
-		BDDAssert.bddAssert(closed, "[EventSet.getEventVector] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(closed, "[EventSet.getEventVector] BAD FUNCTION CALL!");
 
 		return events;
 	}
 
 	public Event getEvent(int index)
 	{
-		BDDAssert.bddAssert(closed, "[EventSet.getEvent] BAD FUNCTION CALL!");
-		BDDAssert.bddAssert((index >= 0) && (index < total), "BAD event-index");
+		BDDAssert.internalCheck(closed, "[EventSet.getEvent] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck((index >= 0) && (index < total), "BAD event-index");
 
 		return events[index];
 	}
 
 	void close(EventManager alphabet)
 	{
-		BDDAssert.bddAssert(!closed, "[EventSet.close] BAD FUNCTION CALL!");
+		BDDAssert.internalCheck(!closed, "[EventSet.close] BAD FUNCTION CALL!");
 
 		total = alphabet.getSize();
 		events = new Event[total];

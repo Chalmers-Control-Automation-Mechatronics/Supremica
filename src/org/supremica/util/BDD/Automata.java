@@ -24,6 +24,7 @@ public class Automata
 	}
 
 	public Automaton createAutomaton(String name)
+	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[Automata.createAutomaton] BAD function call");
 
@@ -60,6 +61,7 @@ public class Automata
 	}
 
 	public void close()
+	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[Automata.close] BAD function call");
 		alphabet.close();

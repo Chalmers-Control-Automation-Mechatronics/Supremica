@@ -7,6 +7,8 @@ import java.util.*;
 public class BDDAutomata
 	extends JBDD
 {
+    private static int ref_count = 0;
+
 	private boolean has_events = false;
 	private Automata original_automata;
 	private int components;    // number of automata
@@ -31,9 +33,10 @@ public class BDDAutomata
 	public BDDAutomata(Automata a)
 	{
 		super(a.getVariableCount(), Util.suggest_nodecount(a));
+		ref_count++;
 
 		// some funny thing with CUDD ...
-		BDDAssert.bddAssert((not(getZero()) == getOne()) && (not(getOne()) == getZero()), "[INTERNAL] either  ~1 != 0  or  ~0 != 1");
+		BDDAssert.internalCheck((not(getZero()) == getOne()) && (not(getOne()) == getZero()), "[INTERNAL] either  ~1 != 0  or  ~0 != 1");
 
 		Timer timer = new Timer();
 
@@ -53,8 +56,9 @@ public class BDDAutomata
 
 		while (e.hasMoreElements())
 		{
-			automata[i++] = new BDDAutomaton(this, (Automaton) e.nextElement());
-			size_states += automata[i - 1].getNumStateBits();
+			automata[i] = new BDDAutomaton(this, (Automaton) e.nextElement(), i);			
+			size_states += automata[i].getNumStateBits();
+			i++;
 
 			// BDDAssert.debug(automata[i-1].getName() + " created");
 		}
@@ -104,7 +108,7 @@ public class BDDAutomata
 
 	private void createEvents()
 	{
-		BDDAssert.bddAssert(!has_events, "[BDDAutomata.createEvents] multiple calls" + " to createEvents!");
+		BDDAssert.internalCheck(!has_events, "[BDDAutomata.createEvents] multiple calls" + " to createEvents!");
 
 		EventManager em = original_automata.getAlphabeth();
 
@@ -225,7 +229,7 @@ public class BDDAutomata
 
 	public Event[] getEvents()
 	{
-		BDDAssert.bddAssert(has_events, "[BDDAutomata.getEvents] call createEvents firs!");
+		BDDAssert.internalCheck(has_events, "[BDDAutomata.getEvents] call createEvents firs!");
 
 		return original_events;
 	}
@@ -239,6 +243,7 @@ public class BDDAutomata
 
 		// printStats();
 		kill();
+		ref_count--;
 	}
 
 	public void dump(PrintStream ps)
@@ -253,6 +258,10 @@ public class BDDAutomata
 		ps.println("BDD Sigma_u: " + nodeCount(bdd_events_u) + " nodes, SAT-count = " + satCount(bdd_events_u, size_events));
 	}
 
+    // ------------------------------------------------------------------------------
+    public static boolean BDDPackageIsBusy() {
+	return ref_count > 0;
+    }
 	// ------------------------ some debugging functions ----------------------------------
 	// --------------------------------------------------------- show_states (note: O(n!) complexity)
 	public void show_states(int bdd)
@@ -651,14 +660,12 @@ public class BDDAutomata
 	// -----------------------------------------------------------------------------
 	public void check(String name)
 	{
-		if (!Options.sanity_check_on)
+		if (Options.sanity_check_on)
 		{
-			return;    // ignore function call
+		    // DEBUG: in case checkPackage crashes before it exists and prints 'name'
+		    System.out.println("Checking : " + name);
+		    BDDAssert.internalCheck(super.checkPackage(), name + ": checkPackage() failed");
 		}
-
-		// DEBUG: in case checkPackage crashes before it exists and prints 'name'
-		System.out.println("Checking : " + name);
-		BDDAssert.bddAssert(super.checkPackage(), name + ": checkPackage() failed");
 	}
 
 	public void stats(PrintStream ps)

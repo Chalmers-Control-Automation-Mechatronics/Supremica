@@ -41,8 +41,9 @@ public class EventManager
 	}
 
 	public int registerEvent(Event e)
+	    throws BDDException
 	{
-		BDDAssert.bddAssert(!closed, "[EventManager.registerEvent] BAD function call");
+		BDDAssert.internalCheck(!closed, "[EventManager.registerEvent] BAD function call");
 
 		Event old = getEvent(e);    // already registred ?
 
@@ -64,8 +65,9 @@ public class EventManager
 
 	// -----------------------------------------------------
 	public void close()
+	    throws BDDException
 	{
-		BDDAssert.bddAssert(!closed, "[EventManager.registerEvent] BAD function call");
+		BDDAssert.internalCheck(!closed, "[EventManager.registerEvent] BAD function call");
 
 		events = new Event[size];
 
@@ -98,22 +100,22 @@ public class EventManager
 
 	public Event[] getEventVector()
 	{
-		BDDAssert.bddAssert(closed, "[EventManager.getEventVector] BAD function call");
+		BDDAssert.internalCheck(closed, "[EventManager.getEventVector] BAD function call");
 
 		return events;
 	}
 
 	public Event getEvent(int index)
 	{
-		BDDAssert.bddAssert(closed, "[EventManager.getEvent] BAD function call");
-		BDDAssert.bddAssert((index >= 0) && (index < size), "BAD state-index");
+		BDDAssert.internalCheck(closed, "[EventManager.getEvent] BAD function call");
+		BDDAssert.internalCheck((index >= 0) && (index < size), "BAD state-index");
 
 		return events[index];
 	}
 
 	public Event[] copyEvents()
 	{
-		BDDAssert.bddAssert(closed, "[EventManager.copyEvents] BAD function call");
+		BDDAssert.internalCheck(closed, "[EventManager.copyEvents] BAD function call");
 
 		Event[] ret = new Event[size];
 

@@ -64,6 +64,7 @@ public class PCG
 	}
 
 	public void connect(Object obj1, Object obj2, int weight)
+	    throws BDDException
 	{
 		Node node1 = (Node) map.get(obj1);
 		Node node2 = (Node) map.get(obj2);
@@ -86,6 +87,7 @@ public class PCG
 	}
 
 	private int getSmallest(boolean[] free)
+	    throws BDDException
 	{
 		int smallest = 0, index = 0;
 		boolean first = true;
@@ -112,6 +114,7 @@ public class PCG
 
 	// ------------------------------------------------------------------------------
 	public int[] getShortestPath()
+	    throws BDDException
 	{
 		int[] perm = null;
 
@@ -246,6 +249,7 @@ public class PCG
 
 	// ----------------------------------- greedy, 2-step lookahead
 	private int[] getShortestPath_greedy2()
+	    throws BDDException
 	{
 
 		// the last one, perm[size], is reserved for the total cost
@@ -291,6 +295,7 @@ public class PCG
 	}
 
 	private void getShortest_greedy2(int me, int left, boolean[] free, int[] result)
+	    throws BDDException
 	{
 
 		// System.out.println("Im " + me + " size " + size + "  left " + left);
@@ -345,6 +350,7 @@ public class PCG
 
 	// ------------------------------------------------------------------------------
 	private int[] getShortestPath_greedy()
+	    throws BDDException
 	{
 		int[] perm = new int[size + 1];
 		boolean[] free = new boolean[size];
@@ -380,6 +386,7 @@ public class PCG
 	}
 
 	private int getNext_greedy1(int me_, boolean[] free, int level)
+	    throws BDDException
 	{
 		boolean first = true;
 		int index = -1, max = -1;

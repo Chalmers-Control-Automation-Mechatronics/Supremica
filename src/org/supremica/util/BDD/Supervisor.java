@@ -5,14 +5,14 @@ import java.util.*;
 
 public class Supervisor
 {
-	private Group plant;
-	private Group spec;
-	private BDDAutomata manager;
-	private Timer timer;
-	private boolean has_uncontrollables, has_reachables,
-					has_reachable_uncontrollables, has_coreachables;
-	private int bdd_uncontrollables, bdd_reachables,
-				bdd_reachable_uncontrollables, bdd_coreachables;
+	protected Group plant;
+	protected Group spec;
+	protected BDDAutomata manager;
+	protected Timer timer;
+	protected boolean has_uncontrollables, has_reachables,
+	    has_reachable_uncontrollables, has_coreachables;
+	protected int bdd_uncontrollables, bdd_reachables,
+	    bdd_reachable_uncontrollables, bdd_coreachables;
 
 	public Supervisor(BDDAutomata manager, Group plant, Group spec)
 	{
@@ -118,7 +118,7 @@ public class Supervisor
 		return bdd_uncontrollables;
 	}
     
-	private void computeUncontrollables()
+	protected void computeUncontrollables()
 	{
 		timer.reset();
 
@@ -226,7 +226,7 @@ public class Supervisor
 		return bdd_reachables;
 	}
 
-	private void computeReachables()
+	protected void computeReachables()
 	{
 
 		// Note: we remove events from t_all, it is needed for forward reachability
@@ -253,11 +253,10 @@ public class Supervisor
 
 			int tmp = manager.relProd(t_all, r_all, cube);
 			int tmp2 = manager.replace(tmp, permute);
-
 			manager.recursiveDeref(tmp);
 
-			r_all = manager.orTo(r_all, tmp2);
 
+			r_all = manager.orTo(r_all, tmp2);
 			manager.recursiveDeref(tmp2);
 
 			if (gf != null)
@@ -349,7 +348,7 @@ public class Supervisor
 	return ret;
     }
     */
-	private void computeCoReachables()
+	protected void computeCoReachables()
 	{
 		GrowFrame gf = null;;
 

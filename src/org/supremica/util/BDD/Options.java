@@ -9,12 +9,12 @@ public class Options
 	ALGO_SMOOTHED = 3
 	;
 
-	public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
-	public static final boolean use_cudd = false;
-	public static boolean debug_on = false;
-	public static boolean sanity_check_on = false;
-	public static boolean user_alters_PCG = false;
-	public static boolean show_grow = false;
+    public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
+    public static final boolean use_cudd = false;
+    public static boolean debug_on = false;
+    public static boolean sanity_check_on = false;
+    public static boolean user_alters_PCG = false;
+    public static boolean show_grow = true;
     public static boolean trace_on = false;
-    public static int algo_family = ALGO_MONOLITHIC;
+    public static int algo_family = ALGO_CONJUNCTIVE;
 }

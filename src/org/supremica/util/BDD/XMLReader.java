@@ -23,7 +23,7 @@ class XMLReader
 	private Automata automata;
 
 	XMLReader(Automata automata, String filename)
-		throws IOException, ParserConfigurationException, SAXException
+	    throws IOException, ParserConfigurationException, SAXException
 	{
 		this.automata = automata;
 
@@ -81,7 +81,9 @@ class XMLReader
 	}
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes)
+	    throws SAXException
 	{
+	    try {
 		if (qName.equals(TYPE_AUTOMATON))
 		{
 			String name = attributes.getValue(VALUE_NAME);
@@ -136,10 +138,16 @@ class XMLReader
 
 			c.addArc(name, from, to);
 		}
+	    } catch(BDDException e) {
+		throw new SAXException(e.toString());
+	    }
 	}
 
 	public void endElement(String uri, String localName, String qName)
+	    throws SAXException
+
 	{
+	    try {
 		if (qName.equals(TYPE_AUTOMATON))
 		{
 			automata.getCurrent().close();
@@ -149,6 +157,9 @@ class XMLReader
 		else if (qName.equals(TYPE_AUTOMATA))
 		{
 			automata.close();
-		}
+		}			
+	    } catch(BDDException e) {
+		throw new SAXException(e.toString());
+	    }
 	}
 }

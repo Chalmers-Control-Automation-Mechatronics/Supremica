@@ -8,6 +8,7 @@ public class BDDAutomaton
 {
 	private BDDAutomata manager;
 	private Automaton automaton;
+    private int index;
 	private int num_bits, num_states, num_arcs;
 	private State[] states;
 	private Arc[] arcs;
@@ -27,10 +28,11 @@ public class BDDAutomaton
 	// BDD misc
 	private int permute_s2sp, permute_sp2s;
 
-	public BDDAutomaton(BDDAutomata manager, Automaton a)
-	{
-		this.manager = manager;
+	public BDDAutomaton(BDDAutomata manager, Automaton a, int index)
+	{	    
+		this.manager   = manager;
 		this.automaton = a;
+		this.index     = index;
 		states = automaton.getStates().getStateVector();
 		arcs = automaton.getArcs().getArcVector();
 		num_arcs = a.getArcsSize();
@@ -281,7 +283,10 @@ public class BDDAutomaton
 	{
 		return automaton.getName();
 	}
-
+    public int getIndex() 
+    {
+	return index;
+    }
 	public Automaton getModel()
 	{
 		return automaton;
@@ -453,10 +458,10 @@ public class BDDAutomaton
 
 		if (errors > 0)
 		{
-			System.err.println("TEST '" + name + "' --> BDD structure integrity check failed for: " + automaton.getName());
-			System.exit(20);
+		    System.err.println("TEST '" + name + "' --> BDD structure integrity check failed for: " + automaton.getName());
+		    System.exit(20);
 		}
 
-		BDDAssert.bddAssert(manager.checkPackage(), name + ": checkPackage() failed");
+		BDDAssert.internalCheck(manager.checkPackage(), name + ": checkPackage() failed");
 	}
 }
