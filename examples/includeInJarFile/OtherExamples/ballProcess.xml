@@ -81,7 +81,7 @@
 	</Automaton>
 	<Automaton name="Progress spec: Elevate and measure (em)" type="Specification">
 		<Events>
-			<Event id="em.start" label="em.start" controllable="true" prioritized="true" />		
+			<Event id="em.enter_ball" label="em.enter_ball" controllable="true" prioritized="true" />		
 			<Event id="em.has_ball" label="em.has_ball" controllable="false" prioritized="true" />
 			<Event id="em.timer.before_up.start" label="em.timer.before_up.start" controllable="true" prioritized="true" />
 			<Event id="em.timer.before_up.timeout" label="em.timer.before_up.timeout" controllable="false" prioritized="true" />
@@ -118,7 +118,7 @@
 			<State id="q_13" />
 		</States>
 		<Transitions>
-			<Transition event="em.start" source="q_0" dest="q_0_1" />		
+			<Transition event="em.enter_ball" source="q_0" dest="q_0_1" />		
 			<Transition event="em.has_ball" source="q_0_1" dest="q_1" />
 			<Transition event="em.timer.before_up.start" source="q_1" dest="q_2" />
 			<Transition event="em.timer.before_up.timeout" source="q_2" dest="q_3_1" />
@@ -145,22 +145,31 @@
 	
 	<Automaton name="Interaction spec: GK and EM" type="Specification">
 		<Events>
+			<Event id="gk.has_ball" label="gk.has_ball" controllable="false" prioritized="true" />		
 			<Event id="em.is_down" label="em.is_down" controllable="false" prioritized="true" />
 			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
-			<Event id="em.start" label="em.start" controllable="true" prioritized="true" />			
+			<Event id="em.enter_ball" label="em.enter_ball" controllable="true" prioritized="true" />
+			<Event id="em.has_ball" label="em.has_ball" controllable="false" prioritized="true" />						
+			<Event id="gk.ball_out_of_gatekeeper" label="gk.ball_out_of_gatekeeper" controllable="false" prioritized="true" />
 			<Event id="em.is_up" label="em.is_up" controllable="false" prioritized="true" />
 		</Events>
 		<States>
 			<State id="q_0" initial="true" accepting="true" />
 			<State id="q_1" />
+			<State id="q_1_0" />			
 			<State id="q_2" />
 			<State id="q_3" />
+			<State id="q_4" />
+			<State id="q_5" />					
 		</States>
 		<Transitions>
-			<Transition event="em.is_down" source="q_0" dest="q_1" />
-			<Transition event="gk.release_ball" source="q_1" dest="q_2" />
-			<Transition event="em.start" source="q_2" dest="q_3" />
-			<Transition event="em.is_up" source="q_3" dest="q_0" />
+			<Transition event="gk.has_ball" source="q_0" dest="q_1_0" />
+			<Transition event="em.is_down" source="q_1_0" dest="q_1" />
+			<Transition event="em.enter_ball" source="q_1" dest="q_2" />
+			<Transition event="gk.release_ball" source="q_2" dest="q_3" />
+			<Transition event="em.has_ball" source="q_3" dest="q_4" />
+			<Transition event="gk.ball_out_of_gatekeeper" source="q_4" dest="q_5" />
+			<Transition event="em.is_up" source="q_5" dest="q_0" />
 		</Transitions>
 	</Automaton>	
 
