@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Ex2_1">
+<Automaton name="PIN Code Reader" type="Undefined">
+	<Events>
+		<Event id="0"/>
+		<Event id="1"/>
+		<Event id="2"/>
+		<Event id="3"/>
+		<Event id="4"/>
+		<Event id="5"/>
+		<Event id="6"/>
+		<Event id="7"/>
+		<Event id="8"/>
+		<Event id="9"/>
+	</Events>
+	<States>
+		<State id="0" initial="true" accepting="false"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="Unlock" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="8"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="2" dest="0" event="0"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="2" dest="1" event="5"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="2" dest="0" event="7"/>
+		<Transition source="2" dest="0" event="8"/>
+		<Transition source="2" dest="0" event="9"/>
+		<Transition source="3" dest="0" event="0"/>
+		<Transition source="3" dest="Unlock" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="1" event="5"/>
+		<Transition source="3" dest="0" event="6"/>
+		<Transition source="3" dest="0" event="7"/>
+		<Transition source="3" dest="0" event="8"/>
+		<Transition source="3" dest="0" event="9"/>
+		<Transition source="Unlock" dest="0" event="0"/>
+		<Transition source="Unlock" dest="0" event="1"/>
+		<Transition source="Unlock" dest="0" event="2"/>
+		<Transition source="Unlock" dest="0" event="3"/>
+		<Transition source="Unlock" dest="0" event="4"/>
+		<Transition source="Unlock" dest="1" event="5"/>
+		<Transition source="Unlock" dest="0" event="6"/>
+		<Transition source="Unlock" dest="0" event="7"/>
+		<Transition source="Unlock" dest="0" event="8"/>
+		<Transition source="Unlock" dest="0" event="9"/>
+	</Transitions>
+</Automaton>
+</Automata>
