@@ -37,6 +37,7 @@ public class ControlledSurface
 
 	private LinkedList selectedObjects = new LinkedList();
 	private LinkedList toBeSelected = new LinkedList();
+	private LinkedList toBeDeselected = new LinkedList();
 
 	private EditorObject highlightedObject = null;
 
@@ -118,7 +119,8 @@ public class ControlledSurface
 			LinkedList children = getChildren(o);
 			while (children.size() != 0)
 			{
-				((EditorObject) children.remove(0)).setSelected(true);
+				//((EditorObject) children.remove(0)).setSelected(true);
+				select((EditorObject) children.remove(0));
 			}
 		}
 	}
@@ -266,10 +268,26 @@ public class ControlledSurface
 				}
 
 				// Select stuff!
-				selectChange(o);
+				//selectChange(o);
 
 				// If dragging, we should select anyway!
-				selectOnDrag = true;
+				//selectOnDrag = true;
+				
+				// Only if SELECT is chosen multiple selection is possible...
+				if (!(T.getPlace() == EditorToolbar.SELECT))
+				{
+					deselectAll();
+				}
+				
+				// If object is selected prepare to unselect (don't unselect if dragging!)
+				if (selectedObjects.contains(o))
+				{
+					toBeDeselected.add(o);
+				}
+				else
+				{
+					select(o);
+				}	   
 			}
 
 			/*
@@ -461,10 +479,11 @@ public class ControlledSurface
 			{
 				// Drag all selected objects
 
+				/*
 				// Select on drag?
 				if (selectOnDrag)
 				{
-					// Where are we pointing right now?
+					// Where were we pointing just now?
 					EditorObject o = getObjectAtPosition(e.getX() - dx, e.getY() - dy);
 					if (o != null)
 					{
@@ -473,6 +492,10 @@ public class ControlledSurface
 
 					selectOnDrag = false;
 				}
+				*/
+				
+				// Don't unselect!
+				toBeDeselected.clear();
 
 				// No move?
 				if ((dx == 0) && (dy == 0))
@@ -750,6 +773,12 @@ public class ControlledSurface
 		while (toBeSelected.size() > 0)
 		{
 			select((EditorObject) toBeSelected.remove(0));
+		}
+
+		// Make the temporary selection definite
+		while (toBeDeselected.size() > 0)
+		{
+			deselect((EditorObject) toBeDeselected.remove(0));
 		}
 
 		if (e.getButton() == MouseEvent.BUTTON1)
