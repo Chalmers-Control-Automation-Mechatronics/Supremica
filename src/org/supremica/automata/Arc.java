@@ -265,4 +265,19 @@ public class Arc
 
 		return angle;
 	}
+	
+	// For debugging (etc)
+	public String toString()
+	{
+		StringBuffer sbuf = new StringBuffer();
+		
+		sbuf.append("<");
+		sbuf.append(getFromState().toString());
+		sbuf.append(", ");
+		sbuf.append(getEvent().toString());
+		sbuf.append(", ");
+		sbuf.append(getToState().toString());
+		sbuf.append(">");
+		return sbuf.toString();
+	}
 }

@@ -58,6 +58,7 @@ import javax.swing.*;
 import java.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.util.ActionTimer;
 
 public class AutomataSynchronizerWorker
 	extends Thread
@@ -87,7 +88,9 @@ public class AutomataSynchronizerWorker
 	{
 		if (mode == MODE_SYNC)
 		{
-			Date startDate = new Date();
+			// Date startDate = new Date();
+			ActionTimer timer = new ActionTimer();
+			timer.start();
 			AutomataSynchronizer theSynchronizer;
 
 			try
@@ -96,6 +99,7 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception e)
 			{
+				timer.stop();
 				// -- MF -- should really put up a message box here? Why not let the Gui manage that?
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
@@ -123,6 +127,7 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception ex)
 			{
+				timer.stop();
 				workbench.error("Exception while executing AutomataSynchronizer");
 
 				// logger.error("Exception while executing AutomataSynchronizer");
@@ -139,6 +144,7 @@ public class AutomataSynchronizerWorker
 				}
 				catch (Exception ex)
 				{
+					timer.stop();
 					// -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					workbench.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					ex.printStackTrace();
@@ -167,17 +173,21 @@ public class AutomataSynchronizerWorker
 
 				java.awt.EventQueue.invokeLater(this);
 
-				Date endDate = new Date();
+				// Date endDate = new Date();
+				timer.stop();
 
 				// logger.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
-				workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
+				// workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
+				workbench.info("Execution completed after " + timer.toString());
 			}
 			else
 			{
-				Date endDate = new Date();
+				// Date endDate = new Date();
+				timer.stop();
 
 				// logger.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
-				workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
+				// workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
+				workbench.info("Execution stopped after " + timer.toString());
 			}
 
 			theSynchronizer.displayInfo();

@@ -63,6 +63,7 @@ import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.util.ActionTimer;
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
@@ -78,12 +79,15 @@ public class AutomataVerifier
 	private Automata theAutomata;
 	private int nbrOfExecuters;
 
+	// MF Started puting in all these timer.start/stop but...
+	// private ActionTimer timer = new ActionTimer();
+
 	/**
 	 * Map from an uc LabeledEvent to the Set of plant Automaton-objects that contain this event
 	 *
 	 *@see  AlphabetAnalyzer
 	 */
-	private HashMap uncontrollableEventToPlantMap = null; 
+	private HashMap uncontrollableEventToPlantMap = null;
 	private AutomataSynchronizerHelper synchHelper;
 	private ArrayList synchronizationExecuters = new ArrayList();
 	private StateMemorizer potentiallyUncontrollableStates;
@@ -129,7 +133,7 @@ public class AutomataVerifier
 		verboseMode = synchronizationOptions.verboseMode();
 		oneEventAtATime = verificationOptions.getOneEventAtATime();
 
-		// The helper must be initialized here (this early) only because of the 
+		// The helper must be initialized here (this early) only because of the
 		// executionDialog, I think...
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
@@ -226,7 +230,7 @@ public class AutomataVerifier
 				{
 					return modularControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD) 
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				    {
 					return BDDControllabilityVerification();
 				    }
@@ -242,7 +246,7 @@ public class AutomataVerifier
 				{
 					return monolithicNonblockingVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD) 
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				    {
 					return BDDNonBlockingVerification();
 				    }
@@ -300,11 +304,11 @@ public class AutomataVerifier
 	 */
 	public void prepareForLanguageInclusion(Automata inclusionAutomata)
 	{
-		// After these preparations, the modular controllability 
+		// After these preparations, the modular controllability
 		// verification verifies language inclusion
 		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);				
+		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);
 
 		// This last one is not really good... we'd like to do this only once! Perhaps
 		// a switch in the synchronizeroptions or verificationsptions instead? FIXA!!
@@ -352,7 +356,7 @@ public class AutomataVerifier
 			if (typeIsSupSpecTable[currSupervisorAutomaton.getIndex()])
 			{
 				// logger.info("Supervisor: " + currSupervisorAutomaton.getName());
-				// Examine uncontrollable events in currSupervisorAutomaton 
+				// Examine uncontrollable events in currSupervisorAutomaton
 				// and select plants containing these events
 				selectedAutomata.add(currSupervisorAutomaton);
 				eventIterator = currSupervisorAutomaton.eventIterator();
@@ -366,7 +370,7 @@ public class AutomataVerifier
 					{
 						if (uncontrollableEventToPlantMap.get(currEvent) != null)
 						{
-							// Note that in the language inclusion case, the 
+							// Note that in the language inclusion case, the
 							// uncontrollableEventToPlantMap has been adjusted...
 							plantIterator = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
 							while (plantIterator.hasNext())
@@ -400,7 +404,7 @@ public class AutomataVerifier
 										}
 										break loop;
 									}
-									
+
 									// Clean selectedAutomata
 									while (selectedAutomata.size() > 1)
 									{
@@ -455,7 +459,7 @@ public class AutomataVerifier
 
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			{
-				// Examine uncontrollable events in currSupervisorAutomaton 
+				// Examine uncontrollable events in currSupervisorAutomaton
 				// and select plants containing these events
 				selectedAutomata.add(currSupervisorAutomaton);
 				eventIterator = currSupervisorAutomaton.eventIterator();
@@ -497,7 +501,7 @@ public class AutomataVerifier
 										}
 										break loop;
 									}
-									
+
 									// Clean selectedAutomata
 									while (selectedAutomata.size() > 1)
 									{
@@ -622,7 +626,7 @@ public class AutomataVerifier
 
 			// Sort automata in order of similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
-			
+
 			if (similarAutomata == null)
 			{
 				// There are no similar automata, this module must be uncontrollable
@@ -1208,14 +1212,14 @@ public class AutomataVerifier
 	}
 
 
-  
+
 	/**
 	 * Answers YES/NO to the language inclusion problem
 	 *
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
     private boolean BDDLanguageInclusionVerification()
-	throws Exception 
+	throws Exception
     {
 	Automata unselected = ActionMan.getGui().getUnselectedAutomata();
 	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, unselected, synchHelper.getHelperData() );
@@ -1225,7 +1229,7 @@ public class AutomataVerifier
 	return ret;
 
     }
-  
+
 	/**
 	 * Answers YES/NO to the controllability problem
 	 *
@@ -1233,12 +1237,14 @@ public class AutomataVerifier
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
     private boolean BDDControllabilityVerification()
-	throws Exception 
+		throws Exception
     {
-	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
-	boolean ret = abf.isControllable();
-	abf.cleanup();
-	return ret;
+    	// timer.start();
+		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
+		boolean ret = abf.isControllable();
+		abf.cleanup();
+		// timer.stop();
+		return ret;
 
     }
 	/**
@@ -1248,12 +1254,14 @@ public class AutomataVerifier
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
     private boolean BDDNonBlockingVerification()
-	throws Exception
+		throws Exception
     {
-	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
-	boolean ret = abf.isNonBlocking();
-	abf.cleanup();
-	return ret;
+    	// timer.start();
+		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
+		boolean ret = abf.isNonBlocking();
+		abf.cleanup();
+		// timer.stop();
+		return ret;
 
     }
 
@@ -1268,6 +1276,7 @@ public class AutomataVerifier
 	private boolean monolithicControllabilityVerification()
 		throws Exception
 	{
+		// timer.start();
 		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(true);
 
@@ -1289,6 +1298,7 @@ public class AutomataVerifier
 		}
 
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+		// timer.stop();
 
 		return synchHelper.getAutomataIsControllable();
 	}
@@ -1309,6 +1319,8 @@ public class AutomataVerifier
 	private boolean monolithicNonblockingVerification()
 		throws Exception
 	{
+		// timer.start();
+
 		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(false);
 
@@ -1344,11 +1356,14 @@ public class AutomataVerifier
 		}
 		catch (Exception ex)
 		{
+			// timer.stop(); // No, java has no destructors, have to do this manually!!
+
 			logger.error("Error when building automaton: " + ex.toString());
 			logger.debug(ex.getStackTrace());
 			throw ex;
 		}
 
+		// timer.stop();
 		return moduleIsNonblocking(theAutomaton);
 	}
 
@@ -1385,7 +1400,7 @@ public class AutomataVerifier
 				requestStop();
 				return false;
 			}
-		}		
+		}
 		if (allIndividuallyNonblocking)
 		{
 			logger.info("This system has no individually blocking automata!");
@@ -1393,20 +1408,20 @@ public class AutomataVerifier
 
 		/*
 		// Preparations for the global nonblocking verification...
-	    ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
+	    ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
 		if (executionDialog != null) // The executionDialog might not have been initialized yet! FIXA!
 		{
 			executionDialog.initProgressBar(0, theAutomata.size());
 			executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
 		}
-		// We use a copy of theAutomata instead from this point on. This is to spare us the 
-		// effort of changing all events to uncontrollable over and over and lets us use the 
-		// same helper all the time, EXCEPT for AutomataIndexForm.typeIsPlantTable which we 
-		// have to reinitialize between the language inclusion checks!! 
-	    theAutomata = new Automata(theAutomata, false); 
+		// We use a copy of theAutomata instead from this point on. This is to spare us the
+		// effort of changing all events to uncontrollable over and over and lets us use the
+		// same helper all the time, EXCEPT for AutomataIndexForm.typeIsPlantTable which we
+		// have to reinitialize between the language inclusion checks!!
+	    theAutomata = new Automata(theAutomata, false);
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-		// Make all events in all automata in theAutomata as uncontrollable! (All 
-		// events in plants should be uncontrollable and the controllability of 
+		// Make all events in all automata in theAutomata as uncontrollable! (All
+		// events in plants should be uncontrollable and the controllability of
 		// the events in the supervisors doesn't matter!)
 		Iterator eventIterator;
 		Iterator automatonIterator = theAutomata.iterator();
@@ -1427,7 +1442,7 @@ public class AutomataVerifier
 			{
 				public void run()
 				{
-					ExecutionDialog executionDialog = synchHelper.getExecutionDialog(); 
+					ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
 					executionDialog.initProgressBar(0, theAutomata.size());
 					executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
 				}
@@ -1448,19 +1463,21 @@ public class AutomataVerifier
 
 			if (stopRequested)
 			{
+				// timer.stop();
 				return false;
 			}
 			if (synchHelper.getExecutionDialog() != null)
 			{
 				synchHelper.getExecutionDialog().setProgress(theAutomata.getAutomatonIndex(currAutomaton));
-			}			
+			}
 			if (!automatonIsIncluded)
 			{
 				logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
 			}
 		}
-		return allIncluded && allIndividuallyNonblocking;			
-			
+		// timer.stop();
+		return allIncluded && allIndividuallyNonblocking;
+
 		/*
 		// Ensure global nonblocking...
 		boolean allIncluded = true;
@@ -1475,7 +1492,7 @@ public class AutomataVerifier
 				executionDialog.setProgress(theAutomata.getAutomatonIndex(currAutomaton));
 			}
 		    currAutomata.addAutomaton(currAutomaton);
-			
+
 			// Perform the behavioural inclusion check!
 			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
 			automatonIsIncluded = behaviouralInclusionVerification(currAutomata, theAutomata);
@@ -1495,7 +1512,7 @@ public class AutomataVerifier
 		return allIncluded && allIndividuallyNonblocking;
 		*/
 	}
-	
+
 	private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
 		throws Exception
 	{
@@ -1511,7 +1528,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Verifies behavioural inclusion of the language of automataA in automataB. 
+	 * Verifies behavioural inclusion of the language of automataA in automataB.
 	 * I.e. "Is the behaviour of automataA included in automataB?"
 	 * It IS ok for automataB to contain automata in automataA, but not the other
 	 * way around!... that is, automataA has priority over automataB... if you're
@@ -1539,10 +1556,10 @@ public class AutomataVerifier
 			currAutomaton = (Automaton) automatonIterator.next();
 			currAutomaton.setType(AutomatonType.Plant);
 		}
- 		
+
 		// Update the typeIsPlantTable in the AutomataIndexForm in the synchHelper!
 		synchHelper.getAutomataIndexForm().generateAutomataIndices(theAutomata);
-		
+
 		// After the above preparations, the behavioural inclusion check
 		// can be performed as a controllability check...
 		return modularControllabilityVerification();
@@ -1570,13 +1587,13 @@ public class AutomataVerifier
 		logger.warn("NOTE! Modular non-blocking verification is not really implemented! " +
 					"This algorithm examines pairwise non-blocking between all automata, " +
 					"respectively! THIS DOES NOT PROVE GENERAL NONBLOCKING!!");
-		
+
 		boolean allPairsNonblocking = true;
-		
+
 		Iterator automatonIterator = theAutomata.iterator();
 		Automaton currAutomaton;
 		Automaton currOtherAutomaton;
-		
+
 		while (automatonIterator.hasNext())
 		{
 			currAutomaton = (Automaton) automatonIterator.next();
@@ -1589,7 +1606,7 @@ public class AutomataVerifier
 				allPairsNonblocking = allPairsNonblocking && pairIsNonblocking;
 				if (!pairIsNonblocking)
 				{
-					logger.error("The automata " + currAutomaton.getName() + 
+					logger.error("The automata " + currAutomaton.getName() +
 								 " and " + currOtherAutomaton.getName() + " are blocking each other.");
 				}
 			}
@@ -1602,7 +1619,7 @@ public class AutomataVerifier
 
 		return allPairsNonblocking;
 	}
-	
+
 	/**
 	 * Examines non-blocking between a pair of automata
 	 *
@@ -1620,18 +1637,18 @@ public class AutomataVerifier
 
 		selectedAutomata.add(AutomatonA);
 		selectedAutomata.add(AutomatonB);
-	
+
 		try
-		{	
+		{
 			AutomataSynk = synchronizeAutomata(selectedAutomata);
 		}
 		catch (Exception ex)
 		{
 			logger.error("Error in AutomataVerifier when synchronizing automata: " + ex.toString());
 			logger.debug(ex.getStackTrace());
-			throw ex;	
+			throw ex;
 		}
-		
+
 		return moduleIsNonblocking(AutomataSynk);
 	}
 
@@ -1639,7 +1656,7 @@ public class AutomataVerifier
 	 * Performs synchronous composition on the automata represented by selectedAutomata
 	 *
 	 * @param selectedAutomata The Automata to be synchronized, ArrayList of Automaton objects
-	 * @return The automaton that constitutes the synchronization of the automata 
+	 * @return The automaton that constitutes the synchronization of the automata
 	 * represented by selectedAutomata.
 	 */
 	private Automaton synchronizeAutomata(ArrayList selectedAutomata)
@@ -1647,12 +1664,12 @@ public class AutomataVerifier
 	{
 		Automaton AutomataSynk;
 
-		// BUILD A NEW SYNCHHELPER! The status of the states must not be affected by the 
-		// automata we're not looking at for the moment... 
+		// BUILD A NEW SYNCHHELPER! The status of the states must not be affected by the
+		// automata we're not looking at for the moment...
 		Automata currAutomata = new Automata();
 		while (selectedAutomata.size() != 0)
 		{
-			currAutomata.addAutomaton((Automaton) selectedAutomata.remove(0));			
+			currAutomata.addAutomaton((Automaton) selectedAutomata.remove(0));
 		}
 
 		// Build the initial state  (including 2 status fields)
@@ -1686,16 +1703,16 @@ public class AutomataVerifier
 		{
 			return null;
 		}
-		
+
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();
-		
+
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
-		
+
 		// Start all the synchronization executers and wait for completion
 		// For the moment we assume that we only have one thread
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
@@ -1704,10 +1721,10 @@ public class AutomataVerifier
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-		
+
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
-		
+
 		// Build automaton
 		try
 		{
@@ -1778,7 +1795,7 @@ public class AutomataVerifier
 
 			theAutomaton.removeState(examinedState);
 		}
-		
+
 		stateIterator = theAutomaton.stateIterator();
 
 		while (stateIterator.hasNext())
@@ -1788,7 +1805,7 @@ public class AutomataVerifier
 			// If we did a copy of theAutomata before we destroyed it we could display the trace...
 			// logger.info("Trace to blocking state: " + (theAutomatonCopy.getTrace(currState)).toString());
 		}
-		
+
 		return theAutomaton.nbrOfStates() == 0;
 	}
 

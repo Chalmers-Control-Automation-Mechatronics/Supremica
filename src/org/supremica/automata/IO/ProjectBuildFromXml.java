@@ -80,6 +80,7 @@ public class ProjectBuildFromXml
 	private final static String initialStr = "initial";
 	private final static String acceptingStr = "accepting";
 	private final static String forbiddenStr = "forbidden";
+	private final static String costStr = "cost";
 	private final static String labelStr = "label";
 	private final static String controllableStr = "controllable";
 	private final static String prioritizedStr = "prioritized";
@@ -485,6 +486,7 @@ public class ProjectBuildFromXml
 		boolean initial = false;
 		boolean accepting = false;
 		boolean forbidden = false;
+		int cost = State.UNDEF_COST;
 		int length = attributes.getLength();
 		String currName;
 
@@ -512,6 +514,10 @@ public class ProjectBuildFromXml
 			{
 				forbidden = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
 			}
+			else if(costStr.equals(currName))
+			{
+				cost = Integer.valueOf(attributes.getValue(i)).intValue();
+			}
 		}
 
 		if (id == null)
@@ -530,7 +536,8 @@ public class ProjectBuildFromXml
 		currState.setInitial(initial);
 		currState.setAccepting(accepting);
 		currState.setForbidden(forbidden);
-
+		currState.setCost(cost);
+		
 		// Associate the id with the state
 		idStateMap.put(id, currState);
 

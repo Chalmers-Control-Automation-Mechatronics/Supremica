@@ -120,6 +120,8 @@ class MainPopupMenu
 		menuHandler.add(automatonDiminisher, 1);
 		JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
 		menuHandler.add(automatonDeterminizer, 1);
+		JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
+		menuHandler.add(automataScheduler, 1);
 		
 
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");

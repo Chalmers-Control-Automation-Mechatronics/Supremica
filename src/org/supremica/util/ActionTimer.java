@@ -53,6 +53,11 @@ import java.util.Date;
 
 public class ActionTimer
 {
+	private final static String hours = " hours ";
+	private final static String minutes = " minutes ";
+	private final static String seconds = " seconds ";
+	private final static String milliseconds = " milliseconds";
+
 	private Date startDate = null;
 	private Date stopDate = null;
 
@@ -93,6 +98,38 @@ public class ActionTimer
 			return (new Date()).getTime() - startDate.getTime();
 		}
 		return stopDate.getTime() - startDate.getTime();
+	}
+
+	public String toString()
+	{
+		long time = elapsedTime();	// time is in millisecs
+
+		int hrs = (int)(time / (60 * 60 * 1000.0));
+		time = time - hrs * (60 * 60 * 1000);
+		int mins = (int)(time / (60 * 1000.0));
+		time = time - mins * (60 * 1000);
+		int secs = (int)(time / (1000.0));
+		time = time - secs * 1000;
+		int millis = (int)time;
+
+		StringBuffer sbuf = new StringBuffer();
+		if(hrs != 0)
+		{
+			sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
+		}
+		else if(mins != 0)
+		{
+			sbuf.append(mins + minutes + secs + seconds + millis + milliseconds);
+		}
+		else if(secs != 0)
+		{
+			sbuf.append(secs + seconds + millis + milliseconds);
+		}
+		else
+		{
+			sbuf.append(millis + milliseconds);
+		}
+		return sbuf.toString();
 	}
 
 	public void clear()

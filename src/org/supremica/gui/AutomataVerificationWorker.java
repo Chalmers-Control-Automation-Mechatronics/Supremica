@@ -65,6 +65,7 @@ import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.util.ActionTimer;
 
 /**
  * Thread dealing with verification.
@@ -94,20 +95,20 @@ public class AutomataVerificationWorker
 	private static final int MONOLITHIC = 0;
 	private static final int MODULAR = 1;
 	private static final int IDD = 2;
-	
+
 	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
 		theVisualProjectContainer = workbench.getVisualProjectContainer();
-		
+
 		// this.newAutomatonName = newAutomatonName;
 		this.synchronizationOptions = synchronizationOptions;
 		this.verificationOptions = verificationOptions;
 
 		this.start();
 	}
-	
+
 	public void run()
 	{
 		final AutomataVerifier automataVerifier;
@@ -118,7 +119,7 @@ public class AutomataVerificationWorker
 		String successMessage;
 		String failureMessage;
 
-		// Initialize the ExecutionDialog 
+		// Initialize the ExecutionDialog
 		final ArrayList threadsToStop = new ArrayList();
 		threadsToStop.add(this);
 		eventQueue.invokeLater(new Runnable()
@@ -129,7 +130,7 @@ public class AutomataVerificationWorker
 				executionDialog.setMode(ExecutionDialogMode.hide);
 			}
 		});
-		
+
 		// Examine the validity of the chosen options
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
 		if (errorMessage != null)
@@ -138,7 +139,7 @@ public class AutomataVerificationWorker
 			requestStop();
 			return;
 		}
-		
+
 		// Perform verification according to the VerificationType.
 		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
 		{
@@ -159,16 +160,16 @@ public class AutomataVerificationWorker
 				             "included in the language of the selected automata.";
 			failureMessage = "The language of the unselected automata is \n" +
 				             "NOT included in the language of the selected automata.";
-			
+
 			// In language inclusion, not only the currently selected automata are used!
-			theAutomata = workbench.getVisualProjectContainer().getActiveProject();			
-			
+			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
+
 			// Reservation!!
-			JOptionPane.showMessageDialog(workbench.getFrame(), 
+			JOptionPane.showMessageDialog(workbench.getFrame(),
 										  "Note that the language inclusion check is guaranteed to \n" +
 										  "work only when the alphabets of the respective automata \n" +
 										  "sets are equal. Also know that this is prefix-closed \n" +
-										  "language verification only.", "Important information!", 
+										  "language verification only.", "Important information!",
 										  JOptionPane.INFORMATION_MESSAGE);
 		}
 		else
@@ -185,7 +186,7 @@ public class AutomataVerificationWorker
 		{
 			return;
 		}
-		
+
 		// Initialize the AutomataVerifier
 		try
 		{
@@ -200,7 +201,7 @@ public class AutomataVerificationWorker
 				});
 			threadsToStop.add(automataVerifier);
 		}
-		catch (Exception ex) 
+		catch (Exception ex)
 		{
 			requestStop();
 			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -217,9 +218,12 @@ public class AutomataVerificationWorker
 		}
 
 		// Solve the problem!
-		startDate = new Date();
-		verificationSuccess = automataVerifier.verify();		
-		endDate = new Date();
+		// startDate = new Date();
+		ActionTimer timer = new ActionTimer();
+		timer.start();
+		verificationSuccess = automataVerifier.verify();
+		// endDate = new Date();
+		timer.stop();
 
 		// Present the result
 		if (!stopRequested)
@@ -233,14 +237,16 @@ public class AutomataVerificationWorker
 				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.INFORMATION_MESSAGE);
 			}
 			automataVerifier.getHelper().displayInfo();
-			logger.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			// logger.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			logger.info("Execution completed after " + timer.toString());
 		}
 		else
 		{
 			automataVerifier.getHelper().displayInfo();
-			logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			// logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
+			logger.info("Execution stopped after " + timer.toString());
 		}
-		
+
 		// We're finished! Bail out! Make sure to kill the ExecutionDialog!
 		if (executionDialog != null)
 		{

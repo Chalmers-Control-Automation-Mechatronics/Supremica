@@ -221,16 +221,23 @@ public class AutomatonViewer
 
 		// File
 		JMenu menuFile = new JMenu();
-
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
+
 		menuBar.add(menuFile);
 
 		// File.Export
 		JMenuItem menuFileExport = new JMenuItem();
-
 		menuFileExport.setText("Export...");
+
 		menuFile.add(menuFileExport);
+
+		/* File.Import, see below
+		JMenuItem menuFileImport = new JMenuItem();
+		menuFileImport.setText("Import *.dot");
+
+		menuFile.add(menuFileImport);
+		*/
 		menuFile.addSeparator();
 
 		// File.Close
@@ -299,6 +306,15 @@ public class AutomatonViewer
 				fileExport_actionPerformed(e);
 			}
 		});
+		/* see below
+		menuFileImport.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				fileImport_actionPerformed(e);
+			}
+		});
+		*/
 		menuFileClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -504,8 +520,14 @@ public class AutomatonViewer
 			toDotWriter.close();
 		}
 
+		parseResponse(fromDotStream);
+	}
+
+	private void parseResponse(InputStream inputStream)
+		throws Exception
+	{
 		// Parse the response from dot
-		Parser parser = new Parser(fromDotStream);
+		Parser parser = new Parser(inputStream);
 
 		try
 		{
@@ -519,7 +541,7 @@ public class AutomatonViewer
 		}
 		finally
 		{
-			fromDotStream.close();
+			inputStream.close();
 		}
 
 
@@ -629,14 +651,14 @@ public class AutomatonViewer
 
 	public void fileExport_actionPerformed(ActionEvent e)
 	{
-		String epsString = "eps";
-		String mifString = "mif";
-		String dotString = "dot";
-		String pngString = "png";
-		String svgString = "svg";
+		final String epsString = "eps";
+		final String mifString = "mif";
+		final String dotString = "dot";
+		final String pngString = "png";
+		final String svgString = "svg";
+		// final String gifString = "gif";
 
 
-		// String gifString = "gif";
 		Object[] possibleValues = { epsString, mifString, pngString, svgString, dotString };
 		Object selectedValue = JOptionPane.showInputDialog(null, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 
@@ -645,6 +667,7 @@ public class AutomatonViewer
 			return;
 		}
 
+/* Who the f@¤! wrote this convoluted code???
 		int exportMode = -1;
 
 		if (selectedValue == epsString)
@@ -667,31 +690,31 @@ public class AutomatonViewer
 		{
 			exportMode = 5;
 		}
-
+*/
 		JFileChooser fileExporter = null;
 		String dotArgument = null;
 
-		if (exportMode == 1)
+		if(selectedValue == epsString) // (exportMode == 1)
 		{
 			fileExporter = FileDialogs.getEPSFileExporter();
 			dotArgument = "-Tps";
 		}
-		else if (exportMode == 2)
+		else if(selectedValue == mifString) // (exportMode == 2)
 		{
 			fileExporter = FileDialogs.getMIFFileExporter();
 			dotArgument = "-Tmif";
 		}
-		else if (exportMode == 3)
+		else if(selectedValue == dotString) // (exportMode == 3)
 		{
 			fileExporter = FileDialogs.getDOTFileExporter();
 			dotArgument = "";
 		}
-		else if (exportMode == 4)
+		else if(selectedValue == pngString) // (exportMode == 4)
 		{
 			fileExporter = FileDialogs.getPNGFileExporter();
 			dotArgument = "-Tpng";
 		}
-		else if (exportMode == 5)
+		else if(selectedValue == svgString) // (exportMode == 5)
 		{
 			fileExporter = FileDialogs.getSVGFileExporter();
 			dotArgument = "-Tsvg";
@@ -751,6 +774,28 @@ public class AutomatonViewer
 			}
 		}
 	}
+	/* I wanted a way to load manually altered dot-files and to then export them
+	 * This is not the way to do it.
+	public void fileImport_actionPerformed(ActionEvent e)
+	{
+		// Open an inputstream to the file and have it parsed as an ordinary dot response
+		try
+		{
+			FileInputStream fistream = new FileInputStream("D:\\Temp\\User1.dot");
+			parseResponse(fistream);
+		}
+		catch(FileNotFoundException excp)
+		{
+			logger.error("File not found");
+		}
+		catch(Exception excp)
+		{
+			logger.error("Exception parsing the file");
+			logger.debug(excp.getStackTrace());
+		}
+		draw();
+	}
+	*/
 }
 
 class Builder

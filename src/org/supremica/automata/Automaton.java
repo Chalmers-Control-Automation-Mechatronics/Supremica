@@ -1616,4 +1616,60 @@ public class Automaton
 			currState = null;
 		}
 	}
+	
+	// These are useful for debugging (etc)
+	public String toString()
+	{
+		StringBuffer sbuf = new StringBuffer();
+
+		sbuf.append(getName());
+		sbuf.append("::");
+		
+		for(Iterator it = arcIterator(); it.hasNext(); )
+		{
+			Arc arc = (Arc)it.next();
+			sbuf.append(arc.toString());
+		}
+		return sbuf.toString();
+	}
+	// toCode writes Java code - Note, the names are used as-is, which means there may be blanks in variabel names!
+	public String toCode()
+	{
+		StringBuffer sbuf = new StringBuffer();
+	
+		sbuf.append("Automaton " + getName() + " = new Automaton(\"" + getName() + "\");");
+		sbuf.append("\t\t{\t\t\t" + getName() + ".setType(AutomatonType." + getType().toString() + ");\n");
+		
+		for(StateIterator sit = stateIterator(); sit.hasNext(); )
+		{
+			State state = sit.nextState();
+			sbuf.append("State " + state.getName() + " = new State(\"" + state.getName() + "\");");
+			sbuf.append("\t" + state.getName() + ".setCost(" + state.getCost() + ");");
+			sbuf.append("\t" + getName() + ".addState(" + state.getName() + ");");
+			if(state.isInitial())
+			{
+				sbuf.append("\t" + getName() + ".setInitialState(" + state.getName() + ");");
+			}
+			if(state.isAccepting())
+			{
+				sbuf.append("\t" + state.getName() + ".setAccepting(true);");
+			}
+			sbuf.append("\n");
+		}
+		for(EventIterator eit = getAlphabet().eventIterator(); eit.hasNext(); )
+		{
+			LabeledEvent ev = eit.nextEvent();
+			sbuf.append("LabeledEvent " + ev.getLabel() + " = new LabeledEvent(\"" + ev.getLabel() + "\");");
+			sbuf.append("\t" + getName() + ".getAlphabet().addEvent(" + ev.getLabel() + ");\n");
+		}
+		
+		for(ArcIterator ait = arcIterator(); ait.hasNext(); )
+		{
+			Arc arc = ait.nextArc();
+			sbuf.append(getName() + ".addArc(new Arc(" + arc.getFromState().getName() + ", " + arc.getToState().getName() + ", " + arc.getEvent().getLabel() + "));\n");
+		}
+		sbuf.append("}\n");
+	
+		return sbuf.toString();
+	}
 }

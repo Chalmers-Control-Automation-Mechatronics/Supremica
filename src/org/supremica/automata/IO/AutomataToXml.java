@@ -282,4 +282,11 @@ public class AutomataToXml
 			}
 		}
 	}
+	
+	public boolean writeCost(boolean b)
+	{
+		boolean old = includeCost;
+		includeCost = b;
+		return old;
+	}
 }

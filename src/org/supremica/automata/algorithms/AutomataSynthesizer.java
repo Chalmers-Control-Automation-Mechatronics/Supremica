@@ -321,6 +321,11 @@ public class AutomataSynthesizer
 	{
 		return theTimer.elapsedTime();
 	}
+	// instead return the timer and let it do the time-to-string formatting
+	public ActionTimer getTimer()
+	{
+		return theTimer;
+	}
 
 	// Synthesizes supervisors
 	public void execute()

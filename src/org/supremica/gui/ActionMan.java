@@ -73,6 +73,7 @@ import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
+import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.RobotStudioLink;
 
 import org.supremica.gui.useractions.*;
@@ -1236,7 +1237,8 @@ public class ActionMan
 
 		synthesizerDialog.show();
 
-		long elapsedTime = -1;
+		// long elapsedTime = -1;
+		ActionTimer timer = null;
 
 		if (!synthesizerOptions.getDialogOK())
 		{
@@ -1322,7 +1324,8 @@ public class ActionMan
 
 				synthesizer.execute();
 
-				elapsedTime = synthesizer.elapsedTime();
+				// elapsedTime = synthesizer.elapsedTime();
+				timer = synthesizer.getTimer();
 			}
 			catch (Exception ex)
 			{
@@ -1353,7 +1356,7 @@ public class ActionMan
 				try
 				{
 					synthesizer.synthesize();
-					elapsedTime = synthesizer.elapsedTime();
+					// elapsedTime = synthesizer.elapsedTime();
 				}
 				catch (Exception ex)
 				{
@@ -1363,9 +1366,9 @@ public class ActionMan
 			}
 		}
 
-		if (elapsedTime >= 0)
+		if (timer != null)
 		{
-			logger.info("Execution completed after " + (elapsedTime) / 1000.0 + " seconds.");
+			logger.info("Execution completed after " + timer.toString());
 		}
 	}
 

@@ -819,4 +819,53 @@ public class Automata
 			theAutomaton = null;
 		}
 	}
+	// Useful for debugging (among other things)
+	public String toString()
+	{
+		StringBuffer sbuf = new StringBuffer();
+		
+		for(Iterator it = iterator(); it.hasNext(); )
+		{
+			Automaton automaton = (Automaton)it.next();
+			sbuf.append(automaton.toString());
+			sbuf.append("\n");
+		}
+		return sbuf.toString();
+	}
+	// Useful for debugging (among other things) - writes Java code
+	public String toCode()
+	{
+		StringBuffer sbuf = new StringBuffer();
+		for(Iterator it = iterator(); it.hasNext(); )
+		{
+			Automaton automaton = (Automaton)it.next();
+			sbuf.append(automaton.toCode());
+			sbuf.append("\n");
+		}
+		sbuf.append("Automata automata = new Automata();\n");
+		for(Iterator it = iterator(); it.hasNext(); )
+		{
+			Automaton automaton = (Automaton)it.next();
+			sbuf.append("automata.addAutomaton(" + automaton.getName() + ");");
+			sbuf.append("\n");
+		}
+		
+		return sbuf.toString();
+	}
+
+	public String stateToString(int[] arrstate)
+	{
+		StringBuffer sbuf = new StringBuffer();
+		int i = 0;
+		for(Iterator it = iterator(); it.hasNext(); )
+		{
+			Automaton automaton = (Automaton)it.next();
+			State state = automaton.getStateWithIndex(arrstate[i]);
+			sbuf.append(state.getName() + ".");
+			++i;
+		}
+		
+		return sbuf.toString();
+	}
+
 }
