@@ -110,7 +110,7 @@ public class AutomatonToDot
 
 		if (s.isAccepting() && !s.isForbidden())
 		{
-			return ", color = green";
+			return ", color = green3";
 		}
 
 		if (s.isMutuallyAccepting() && !s.isForbidden())
@@ -120,10 +120,26 @@ public class AutomatonToDot
 
 		if (s.isForbidden())
 		{
-			return ", color = red";
+			return ", color = red1";
 		}
 
 		return "";
+	}
+	protected String getColor(boolean is_ctrl, boolean is_prio,	boolean is_imm, boolean is_eps, boolean is_obs)
+	{
+		if(useColors)
+		{
+			if(is_ctrl)
+			{
+				return ", color = green3";
+			}
+			else
+			{
+				return ", color = red1";
+			}
+		}
+		return "";
+
 	}
 
 	public void serialize(PrintWriter pw)
@@ -237,6 +253,12 @@ public class AutomatonToDot
 
 			for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
 			{
+				boolean is_ctrl = true;
+				boolean is_prio = false;
+				boolean is_imm = false;
+				boolean is_eps = false;
+				boolean is_obs = false;
+
 				ArcSet currArcSet = (ArcSet) arcSets.next();
 				State fromState = currArcSet.getFromState();
 				State toState = currArcSet.getToState();
@@ -252,28 +274,33 @@ public class AutomatonToDot
 					if (!thisEvent.isControllable())
 					{
 						pw.print("!");
+						is_ctrl = false;
 					}
 
 					if (!thisEvent.isPrioritized())
 					{
 						pw.print("?");
+						is_prio = true;
 					}
 
 					if (thisEvent.isImmediate())
 					{
 						pw.print("#");
+						is_imm = true;
 					}
 
 					if (thisEvent.isEpsilon())
 					{
 						pw.print("@");
+						is_eps = true;
 					}
 
 					if (!thisEvent.isObservable())
 					{
 						pw.print("$");
-					}	
-					
+						is_obs = true;
+					}
+
 					pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
 
 					if (arcIt.hasNext())
@@ -282,7 +309,7 @@ public class AutomatonToDot
 					}
 				}
 
-				pw.println("\" ];");
+				pw.println("\" " + getColor(is_ctrl, is_prio, is_imm, is_eps, is_obs) + "];");
 			}
 		}
 

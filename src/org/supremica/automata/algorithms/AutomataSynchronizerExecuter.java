@@ -101,6 +101,9 @@ public final class AutomataSynchronizerExecuter
 	private final static int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
 
+	private final static String SEPARATOR_STRING = "."; // Should be user-definable!!
+	private final static int SEPARATOR_LENGTH = 1;	// for this particular case!
+	
 	private int numberOfAddedStates = 0;
 
 	/** Options determining how the synchronization should be performed. */
@@ -852,8 +855,12 @@ public final class AutomataSynchronizerExecuter
 							// It should be name here, right? That's what the method description says...
 							//sb.append(stateTable[j][currState[j]].getId());
 							sb.append(stateTable[j][currState[j]].getName());
+							sb.append(SEPARATOR_STRING);
 						}
-
+						
+						// Remove last separator string element
+						sb.setLength(sb.length() - SEPARATOR_LENGTH); // could use deleteCharAt(sb.length()) if we had single-char separators
+						
 						newState = new CompositeState(sb.toString(), currState, helper.getAutomata());
 					}
 					else
