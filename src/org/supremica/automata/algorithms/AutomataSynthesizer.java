@@ -82,12 +82,10 @@ public class AutomataSynthesizer
 	private boolean maximallyPermissive;
 
     public AutomataSynthesizer(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
-		throws IllegalArgumentException
+		throws Exception
 	{
 		Automaton currAutomaton;
 		State currInitialState;
-
-		workbench.error("AutomataSynthesizer");
 
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
@@ -98,6 +96,13 @@ public class AutomataSynthesizer
 		this.workbench = workbench;
 		theAutomatonContainer = workbench.getAutomatonContainer();
 		maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
+
+		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
+		SynthesisAlgorithm synthesisAlgorithm = synthesizerOptions.getSynthesisAlgorithm();
+		if (!AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm))
+		{
+			throw new Exception("Illegal combination of synthesis type and algorithm");
+		}
 
  		try
 		{
@@ -119,8 +124,34 @@ public class AutomataSynthesizer
 		{
 			//-- MF -- System.err.println("Error while initializing synchronization helper. " + e);
 			workbench.error("Error while initializing synchronization helper. " + e);
+			throw e;
 			// e.printStackTrace();
 		}
+	}
+
+	public static boolean validOptions(SynthesisType type, SynthesisAlgorithm algorithm)
+	{
+		if (type == SynthesisType.Unknown)
+		{
+			return false;
+		}
+		if (algorithm == SynthesisAlgorithm.Unknown)
+		{
+			return false;
+		}
+		if (algorithm == SynthesisAlgorithm.IDD)
+		{
+			return false;
+		}
+		if (algorithm == SynthesisAlgorithm.Modular)
+		{
+			if (type == SynthesisType.Controllable)
+			{
+				return true;
+			}
+			return false;
+		}
+		return true;
 	}
 
 	// Synthesizes controllable supervisors
@@ -229,34 +260,6 @@ public class AutomataSynthesizer
 							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(workbench, theAutomaton, synthesizerOptions);
 							synthesizer.synthesize();
 
-/*
-							if (synthesizerOptions.getSynthesisType() == SynthesisType.Controllable)
-							{
-								synthesizer.synthesizeControllable();
-							}
-							else if (synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking)
-							{
-								synthesizer.synthesizeNonblocking();
-								//-- MF -- thisCategory.error("Option not implemented...");
-								// workbench.error("Option not implemented...");
-							}
-							else if (synthesizerOptions.getSynthesisType() == SynthesisType.Both)
-							{
-								synthesizer.synthesize();
-								//-- MF -- thisCategory.error("Option not implemented...");
-								// workbench.error("Option not implemented...");
-							}
-							else
-							{
-								//-- MF -- thisCategory.error("Unavailable option chosen.");
-								workbench.error("Unavailable option chosen.");
-							}
-							if (synthesizerOptions.getPurge())
-							{
-								AutomatonPurge automatonPurge = new AutomatonPurge(theAutomaton);
-								automatonPurge.execute();
-							}
-*/
 							newAutomata.addAutomaton(theAutomaton);
 						}
 						catch (Exception ex)

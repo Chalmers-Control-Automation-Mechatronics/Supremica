@@ -88,14 +88,14 @@ class SD_StandardPanel extends SynthesizerPanel
 	public void update(SynthesizerOptions synthesizerOptions)
 	{
 		synthesisTypeBox.setSelectedItem(synthesizerOptions.getSynthesisType());
-		algorithmTypeBox.setSelectedItem(synthesizerOptions.getAlgorithmType());
+		algorithmTypeBox.setSelectedItem(synthesizerOptions.getSynthesisAlgorithm());
 		purgeBox.setSelected(synthesizerOptions.doPurge());
 		optimizeBox.setSelected(synthesizerOptions.getOptimize());
 	}
 	public void regain(SynthesizerOptions synthesizerOptions)
 	{
 		synthesizerOptions.setSynthesisType((SynthesisType)synthesisTypeBox.getSelectedItem());
-		synthesizerOptions.setAlgorithmType((SynthesisAlgorithm)algorithmTypeBox.getSelectedItem());
+		synthesizerOptions.setSynthesisAlgorithm((SynthesisAlgorithm)algorithmTypeBox.getSelectedItem());
 		synthesizerOptions.setPurge(purgeBox.isSelected());
 		synthesizerOptions.setOptimize(optimizeBox.isSelected());
 	}
@@ -137,12 +137,15 @@ public class SynthesizerDialog
 
 	private JDialog dialog;
 
+	private JFrame parentFrame;
+
 	/**
 	 * Creates modal dialog box for input of synthesizer options.
 	 */
 	public SynthesizerDialog(JFrame parentFrame, SynthesizerOptions synthesizerOptions)
 	{
 		dialog = new JDialog(parentFrame, true); //modal
+		this.parentFrame = parentFrame;
 		this.synthesizerOptions = synthesizerOptions;
 		dialog.setTitle("Synthesizer options");
 		dialog.setSize(new Dimension(400, 300));
@@ -240,8 +243,15 @@ public class SynthesizerDialog
 			synthesizerOptions.setDialogOK(true);
 			standardPanel.regain(synthesizerOptions);
 			advancedPanel.regain(synthesizerOptions);
-			dialog.setVisible(false);
-			dialog.dispose();
+			if (synthesizerOptions.isValid())
+			{
+				dialog.setVisible(false);
+				dialog.dispose();
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(parentFrame, "Invalid combination of type and algorithm", "Alert", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 		else if (source == cancelButton)
 		{

@@ -578,9 +578,9 @@ public class ActionMan
 				currAutomata.addAutomaton(currAutomaton);
 			}
 
-			AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, currAutomata, syncOptions, synthesizerOptions);
 			try
 			{
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, currAutomata, syncOptions, synthesizerOptions);
 				synthesizer.execute();
 			}
 			catch (Exception ex)

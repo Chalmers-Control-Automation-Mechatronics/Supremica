@@ -55,7 +55,7 @@ public final class SynthesizerOptions
 {
 	private boolean dialogOK = false;
 	private SynthesisType synthesisType;
-	private SynthesisAlgorithm algorithmType;
+	private SynthesisAlgorithm synthesisAlgorithm;
 	private boolean purge;
 	private boolean optimize;
 	private boolean maximallyPermissive;
@@ -70,13 +70,18 @@ public final class SynthesizerOptions
 			 WorkbenchProperties.synthesisMaximallyPermissive());
 	}
 
-	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm algorithmType, boolean purge, boolean optimize, boolean maximallyPermissive)
+	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive)
 	{
 		this.synthesisType = synthesisType;
-		this.algorithmType = algorithmType;
+		this.synthesisAlgorithm = synthesisAlgorithm;
 		this.purge = purge;
 		this.optimize = optimize;
 		this.maximallyPermissive = maximallyPermissive;
+	}
+
+	public boolean isValid()
+	{
+		return AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm);
 	}
 
 	public void setDialogOK(boolean bool)
@@ -100,15 +105,15 @@ public final class SynthesizerOptions
 		return synthesisType;
 	}
 
-	public void setAlgorithmType(SynthesisAlgorithm algorithm)
+	public void setSynthesisAlgorithm(SynthesisAlgorithm algorithm)
 	{
-	    algorithmType = algorithm;
+	    synthesisAlgorithm = algorithm;
 		WorkbenchProperties.setSynthesisAlgorithmType(algorithm);
 	}
 
-	public SynthesisAlgorithm getAlgorithmType()
+	public SynthesisAlgorithm getSynthesisAlgorithm()
 	{
-		return algorithmType;
+		return synthesisAlgorithm;
 	}
 
 	public void setPurge(boolean bool)
