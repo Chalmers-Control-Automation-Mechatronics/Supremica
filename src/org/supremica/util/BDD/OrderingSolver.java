@@ -193,7 +193,8 @@ public class OrderingSolver {
 	    for(int i = 0; i < size; i++) solved[i] = org[ tour[(i + start_index) % size]];
 
 	}
-
+	
+	// Currently, a 2-step look-ahead greedy max-weight TSP tour 
 	private int [] TSP_tour() {
 	    int size = org.length;
 	    

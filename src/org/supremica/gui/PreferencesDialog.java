@@ -665,9 +665,6 @@ class BDDPanel
     
     public BDDPanel(PreferencesDialog theDialog)
     {
-	// super(new BorderLayout(20,20));
-	// Panel p = new Panel(new GridLayout(5,1));
-	// add(p, BorderLayout.SOUTH);
 
 	this.theDialog = theDialog;
 
@@ -686,7 +683,8 @@ class BDDPanel
 
        
 	Box p = new Box(BoxLayout.Y_AXIS);
-	add(p, BorderLayout.CENTER);
+	add(p, BorderLayout.EAST);
+
 
 	JPanel pOrdering = new JPanel();
 	p.add(pOrdering);
