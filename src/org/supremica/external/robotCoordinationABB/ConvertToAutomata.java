@@ -133,8 +133,6 @@ public class ConvertToAutomata
 		if (nbrOfRobot==0)
 			logger.info("No robot present in " + fileName);
 
-		// there is a BUG for the scheduling algorithm in Supremica: the plant automata have to be first in order!!!!!!!!!!
-		// prova();
 	}
 
 	/**
@@ -432,7 +430,11 @@ public class ConvertToAutomata
 
 		if(typeGet(firstP).equals("wp"))
 		{
-			LabeledEvent event = new LabeledEvent(robotName + "_" + whichPath + "_weld");
+			LabeledEvent event;
+			if (!typeGet(secondP).equals("home"))
+				event = new LabeledEvent(robotName + "_" + whichPath + "_weld");    // comprehend going to the limit of the zone
+			else
+				event = new LabeledEvent(robotName + "_" + whichPath);
 			if (!alphabet.containsEqualEvent(event))
 				alphabet.addEvent(event);
 			State state = a.createAndAddUniqueState(null);
