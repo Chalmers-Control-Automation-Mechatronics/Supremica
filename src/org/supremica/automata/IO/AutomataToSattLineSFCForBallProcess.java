@@ -198,7 +198,7 @@ public class AutomataToSattLineSFCForBallProcess
 								nextAutomaton = false;
 
 								theCondition.append(" AND ");
-								lineLength = lineLength + 4;
+								lineLength = lineLength + 5;
 							}
 
 							if (firstState)
@@ -307,6 +307,10 @@ public class AutomataToSattLineSFCForBallProcess
 		boolean nextAutomaton = false;
 		int lineLength = 31;
 
+		/* This version takes care of line length limits and assumes that the
+		   ordering of the SFCs doesn't change. Then we can allow self loops.
+		   In general, that is not the case for IT/DA PLCs, such as Satt Line. */
+
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
@@ -337,35 +341,42 @@ public class AutomataToSattLineSFCForBallProcess
 
 							stateFound = true;
 
-							State sourceState = (State) anArc.getFromState();
+							// State sourceState = (State) anArc.getFromState(); Use postset instead.
+							State destinationState = (State) anArc.getToState();
 
 							if (firstAutomaton)
 							{
 								firstAutomaton = false;
 
-								theCondition.append("NOT (");
-								lineLength = lineLength + 5;
+								// theCondition.append("NOT ("); Not necessary since postset
+								// lineLength = lineLength + 5;
 							}
 							else if (nextAutomaton)
 							{
 								nextAutomaton = false;
 
-								theCondition.append(" OR ");
-								lineLength = lineLength + 4;
+								// theCondition.append(" OR ");
+								// lineLength = lineLength + 4;
+								theCondition.append(" AND ");
+								lineLength = lineLength + 5;
 							}
 
 							if (firstState)
 							{
 								firstState = false;
 
-								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
-								lineLength = lineLength + 5 + aut.getName().length() + sourceState.getId().length();
+								// theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								// lineLength = lineLength + 5 + aut.getName().length() + sourceState.getId().length();
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + destinationState.getId() + ".X");
+								lineLength = lineLength + 5 + aut.getName().length() + destinationState.getId().length();
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
-								theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
-								lineLength = lineLength + 9 + aut.getName().length() + sourceState.getId().length();
+								// theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								// lineLength = lineLength + 9 + aut.getName().length() + sourceState.getId().length();
+								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + destinationState.getId() + ".X");
+								lineLength = lineLength + 8 + aut.getName().length() + destinationState.getId().length();
 							}
 						}
 					}
@@ -398,7 +409,8 @@ public class AutomataToSattLineSFCForBallProcess
 			}
 		}
 
-		theCondition.append(")");
+		// theCondition.append(")");
+		theCondition.append("");
 
 		return theCondition.toString();
 	}

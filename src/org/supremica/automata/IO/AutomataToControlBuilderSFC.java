@@ -561,7 +561,8 @@ public class AutomataToControlBuilderSFC
 		boolean firstAutomaton = true;
 		boolean nextAutomaton = false;
 
-		/* We create the uncontrollable disablement condition first. */
+		/* We create the uncontrollable disablement condition first.
+		   Only the uc events in conflict with theEvent are relevant here. */
 		if (theExtConfAlphabet.nbrOfUncontrollableEvents() > 0)
 		{
 			String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
@@ -653,6 +654,12 @@ public class AutomataToControlBuilderSFC
 
 	protected String ucDisablementCondition(Alphabet theAlphabet)
 	{
+		/* We have to compute a conflict set first. Note that this is,
+		   in fact, a dynamic property. It may well be the case that
+		   statically the rising and falling edge of an input signal
+		   is in conflict with an output event. Note in particular that
+		   we cannot use all uncontrollable events in the extended conflict.
+		   Nevertheless, let's not bother about this now ... */
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstUcEvent = true;
 		theCondition.append("NOT (");
