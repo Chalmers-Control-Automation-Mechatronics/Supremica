@@ -49,19 +49,19 @@
 
 package org.supremica.functionblocks.model;
 
-import java.lang.Integer;
+import java.lang.Float;
 
-public class IntegerVariable extends Variable
+public class FloatVariable extends Variable
 {
 	
-	private Integer value;
+	private Float value;
 
-	public void setValue(Integer i)
+	public void setValue(Float i)
 	{
 		value = i;
 	}
 
-	public Integer getValue()
+	public Float getValue()
 	{
 		return value;
 	}

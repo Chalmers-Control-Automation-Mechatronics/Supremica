@@ -49,21 +49,19 @@
 
 package org.supremica.functionblocks.model;
 
-//import java.util.*;
+import java.lang.Boolean;
 
 public class BooleanVariable extends Variable
 {
 	
-	private boolean value;
+	private Boolean value;
 
-
-
-	public void setValue(boolean v)
+	public void setValue(Boolean v)
 	{
 		value = v;
 	}
 
-	public boolean getValue()
+	public Boolean getValue()
 	{
 		return value;
 		

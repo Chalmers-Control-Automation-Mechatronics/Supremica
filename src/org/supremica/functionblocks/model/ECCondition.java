@@ -96,7 +96,7 @@ public class ECCondition
 			
 		}
 		
-		new Print(System.out).prExpression(abstractSyntax,0);
+		new Printer(System.out).prExpression(abstractSyntax,0);
 
 	}
 

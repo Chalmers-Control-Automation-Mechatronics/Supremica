@@ -56,9 +56,6 @@ public abstract class Variable
 	// The types are: "EventInput", "EventOutput", "DataInput", "DataOutput", "Local"
 	private String type;
 
-	// The value types are: "Boolean", "Integer"
-	private String valueType;
-
 	public void setType(String t)
 	{
 		type = t;
@@ -68,16 +65,5 @@ public abstract class Variable
 	{
 		return type;
 	}
-
-	public void setValueType(String t)
-	{
-		valueType = t;
-	}
-
-	public String getValueType()
-	{
-		return valueType;
-	}
-
 
 }

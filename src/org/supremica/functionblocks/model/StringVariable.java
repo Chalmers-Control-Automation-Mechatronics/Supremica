@@ -49,21 +49,22 @@
 
 package org.supremica.functionblocks.model;
 
-import java.lang.Integer;
+import java.lang.String;
 
-public class IntegerVariable extends Variable
+public class StringVariable extends Variable
 {
 	
-	private Integer value;
+	private String value;
 
-	public void setValue(Integer i)
+	public void setValue(String v)
 	{
-		value = i;
+		value = v;
 	}
 
-	public Integer getValue()
+	public String getValue()
 	{
 		return value;
+		
 	}
     
 }
