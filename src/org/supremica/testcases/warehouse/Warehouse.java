@@ -10,6 +10,8 @@ import org.supremica.automata.execution.*;
 
 class Resource
 {
+	private static Logger logger = LoggerFactory.createLogger(Resource.class);
+
 	private boolean exclusive;
 	private String identity;
 	private LinkedList u1NextResources = new LinkedList();
@@ -18,8 +20,11 @@ class Resource
 	private User u2;
 	private int x;
 	private int y;
+	private Automaton theAutomaton = null;
+	private State orgInitialState;
+	private Warehouse warehouse;
 
-	public Resource(int x, int y, boolean exclusive, User u1, User u2)
+	public Resource(Warehouse warehouse, int x, int y, boolean exclusive, User u1, User u2)
 	{
 		this.x = x;
 		this.y = y;
@@ -27,6 +32,14 @@ class Resource
 		this.exclusive = exclusive;
 		this.u1 = u1;
 		this.u2 = u2;
+		theAutomaton = new Automaton("Zone_" + identity);
+		theAutomaton.setType(AutomatonType.Specification);
+		State initialState = theAutomaton.createUniqueState("idle");
+		initialState.setInitial(true);
+		initialState.setAccepting(true);
+		theAutomaton.addState(initialState);
+		orgInitialState = initialState;
+		this.warehouse = warehouse;
 	}
 
 	public String getIdentity()
@@ -53,6 +66,132 @@ class Resource
 	{
 		return y;
 	}
+	
+	public void addNextAGVResource(Resource currResource)
+	{
+		u1NextResources.add(currResource);
+	}
+
+	public void addNextTruckResource(Resource currResource)
+	{
+		u2NextResources.add(currResource);
+	}
+	
+	public Automaton getAutomaton()
+	{
+		buildTransitions();
+		return theAutomaton;	
+	}
+
+	private void buildTransitions()
+	{
+		State usedByAGV = theAutomaton.createUniqueState("qagv");
+		State usedByTruck = theAutomaton.createUniqueState("qtruck");
+
+		if (getIdentity().equals("16"))
+		{
+			usedByTruck.setInitial(true);
+			usedByTruck.setAccepting(true);
+			orgInitialState.setInitial(false);
+			orgInitialState.setAccepting(false);
+		}
+		else if (getIdentity().equals("41"))
+		{
+			usedByAGV.setInitial(true);
+			usedByAGV.setAccepting(true);
+			orgInitialState.setInitial(false);
+			orgInitialState.setAccepting(false);
+		}
+		theAutomaton.addState(usedByAGV);
+		theAutomaton.addState(usedByTruck);
+
+		Alphabet agvAlphabet = warehouse.getAGVAlphabet();
+		Alphabet truckAlphabet = warehouse.getTruckAlphabet();
+		Alphabet thisAlphabet = theAutomaton.getAlphabet();
+
+		{
+			// Add agv allocation event
+			LabeledEvent agvAllocationEvent = agvAlphabet.getEventWithLabel("agv" + getIdentity());
+			LabeledEvent thisAGVAllocationEvent = new LabeledEvent(agvAllocationEvent);
+			thisAlphabet.addEvent(thisAGVAllocationEvent);
+			Arc agvAllocationArc = new Arc(orgInitialState, usedByAGV, thisAGVAllocationEvent);
+			try
+			{
+				theAutomaton.addArc(agvAllocationArc);
+			}
+			catch (Exception ex)
+			{
+				logger.error("Could not add arc." +ex);	
+			}
+		}
+		{
+			// Add agv deallocation events
+			for (Iterator nextResIt = u1NextResources.iterator(); nextResIt.hasNext(); )
+			{
+				Resource nextResource = (Resource)nextResIt.next();
+				String nextIdentity = nextResource.getIdentity();
+				LabeledEvent agvDeallocationEvent = agvAlphabet.getEventWithLabel("agv" + nextIdentity);
+				LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
+				thisAGVDeallocationEvent.setPrioritized(false);
+				thisAlphabet.addEvent(thisAGVDeallocationEvent);
+				Arc agvDeallocationArc = new Arc(usedByAGV, orgInitialState, thisAGVDeallocationEvent);
+				try
+				{
+					theAutomaton.addArc(agvDeallocationArc);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Could not add arc." +ex);	
+				}
+			}
+		}
+
+		{	
+			// Add truck allocation event
+			String truckAllocationString = "truck" + getIdentity();
+			LabeledEvent truckAllocationEvent = truckAlphabet.getEventWithLabel(truckAllocationString);
+			if (truckAllocationEvent == null)
+			{
+				logger.debug("Could not find event " + truckAllocationString);
+			}
+			else
+			{
+				LabeledEvent thisTruckAllocationEvent = new LabeledEvent(truckAllocationEvent);
+				thisAlphabet.addEvent(thisTruckAllocationEvent);
+				Arc truckAllocationArc = new Arc(orgInitialState, usedByTruck, thisTruckAllocationEvent);
+				try
+				{
+					theAutomaton.addArc(truckAllocationArc);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Could not add arc." +ex);	
+				}
+			}
+		}
+		{
+			// Add truck deallocation events
+			for (Iterator nextResIt = u2NextResources.iterator(); nextResIt.hasNext(); )
+			{
+				Resource nextResource = (Resource)nextResIt.next();
+				String nextIdentity = nextResource.getIdentity();
+				LabeledEvent truckDeallocationEvent = truckAlphabet.getEventWithLabel("truck" + nextIdentity);
+				LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
+				thisTruckDeallocationEvent.setPrioritized(false);
+				thisAlphabet.addEvent(thisTruckDeallocationEvent);
+				Arc truckDeallocationArc = new Arc(usedByTruck, orgInitialState, thisTruckDeallocationEvent);
+				try
+				{
+					theAutomaton.addArc(truckDeallocationArc);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Could not add arc." +ex);	
+				}
+			}
+		}
+
+	}
 }
 
 
@@ -77,6 +216,26 @@ class User
 		currTransition.add(fromResource);
 		currTransition.add(toResources);
 		transitions.addLast(currTransition);
+		
+		if (identity.equalsIgnoreCase("agv"))
+		{
+			for (int i = 0; i < toResources.length; i++)
+			{
+				fromResource.addNextAGVResource((Resource)toResources[i]);
+			}
+		}
+		else if (identity.equalsIgnoreCase("truck"))
+		{
+			for (int i = 0; i < toResources.length; i++)
+			{
+				fromResource.addNextTruckResource((Resource)toResources[i]);
+			}
+		}
+		else
+		{
+			System.err.println("Unknown type");
+		}
+		
 	}
 
 
@@ -196,6 +355,32 @@ public class Warehouse
 	protected int l = 1;
 	protected Automaton agvAutomaton = null;
 	protected Automaton truckAutomaton = null;
+	Resource r11 = null;
+	Resource r12 = null;
+	Resource r13 = null;
+	Resource r14 = null;
+	Resource r15 = null;
+	Resource r16 = null;
+	Resource r17 = null;
+	Resource r18 = null;
+	Resource r19 = null;
+
+	Resource r21 = null;
+	Resource r22 = null;
+	Resource r23 = null;
+	Resource r24 = null;
+	Resource r25 = null;
+	Resource r26 = null;
+	Resource r27 = null;
+	Resource r28 = null;
+	Resource r29 = null;
+
+	Resource r31 = null;
+	Resource r32 = null;
+	Resource r33 = null;
+
+	Resource r41 = null;
+	Resource r42 = null;
 	
 	public Warehouse()
 	{
@@ -209,32 +394,32 @@ public class Warehouse
 		theProject = new Project("Warehouse");	
 		User u1 = new User("agv", true, theProject);
 		User u2 = new User("truck", false, theProject);
-		Resource r11 = new Resource(1, 0, true, u1, u2);
-		Resource r12 = new Resource(2, 0, true, u1, u2);
-		Resource r13 = new Resource(3, 0, true, u1, u2);
-		Resource r14 = new Resource(1, 1, true, u1, u2);
-		Resource r15 = new Resource(2, 1, true, u1, u2);
-		Resource r16 = new Resource(3, 1, true, u1, u2);
-		Resource r17 = new Resource(1, 2, true, u1, u2);
-		Resource r18 = new Resource(2, 2, true, u1, u2);
-		Resource r19 = new Resource(3, 2, true, u1, u2);
+		r11 = new Resource(this, 1, 0, true, u1, u2);
+		r12 = new Resource(this, 2, 0, true, u1, u2);
+		r13 = new Resource(this, 3, 0, true, u1, u2);
+		r14 = new Resource(this, 1, 1, true, u1, u2);
+		r15 = new Resource(this, 2, 1, true, u1, u2);
+		r16 = new Resource(this, 3, 1, true, u1, u2);
+		r17 = new Resource(this, 1, 2, true, u1, u2);
+		r18 = new Resource(this, 2, 2, true, u1, u2);
+		r19 = new Resource(this, 3, 2, true, u1, u2);
 
-		Resource r21 = new Resource(1, 4, true, u1, u2);
-		Resource r22 = new Resource(2, 4, true, u1, u2);
-		Resource r23 = new Resource(3, 4, true, u1, u2);
-		Resource r24 = new Resource(1, 5, true, u1, u2);
-		Resource r25 = new Resource(2, 5, true, u1, u2);
-		Resource r26 = new Resource(3, 5, true, u1, u2);
-		Resource r27 = new Resource(1, 6, true, u1, u2);
-		Resource r28 = new Resource(2, 6, true, u1, u2);
-		Resource r29 = new Resource(3, 6, true, u1, u2);
+		r21 = new Resource(this, 1, 4, true, u1, u2);
+		r22 = new Resource(this, 2, 4, true, u1, u2);
+		r23 = new Resource(this, 3, 4, true, u1, u2);
+		r24 = new Resource(this, 1, 5, true, u1, u2);
+		r25 = new Resource(this, 2, 5, true, u1, u2);
+		r26 = new Resource(this, 3, 5, true, u1, u2);
+		r27 = new Resource(this, 1, 6, true, u1, u2);
+		r28 = new Resource(this, 2, 6, true, u1, u2);
+		r29 = new Resource(this, 3, 6, true, u1, u2);
 
-		Resource r31 = new Resource(0, 0, true, u1, u2);
-		Resource r32 = new Resource(0, 3, true, u1, u2);
-		Resource r33 = new Resource(0, 6, true, u1, u2);
+		r31 = new Resource(this, 0, 0, true, u1, u2);
+		r32 = new Resource(this, 0, 3, true, u1, u2);
+		r33 = new Resource(this, 0, 6, true, u1, u2);
 
-		Resource r41 = new Resource(4, 1, true, u1, u2);
-		Resource r42 = new Resource(4, 5, true, u1, u2);
+		r41 = new Resource(this, 4, 1, true, u1, u2);
+		r42 = new Resource(this, 4, 5, true, u1, u2);
 
 		// agv
 		u1.addTransition(r11, new Resource[]{r12, r14, r31});
@@ -292,6 +477,7 @@ public class Warehouse
 		truckAutomaton = u2.build();
 		theProject.addAutomaton(agvAutomaton);
 		theProject.addAutomaton(truckAutomaton);
+
 	}
 	
 	public void setK(int k)
@@ -328,6 +514,33 @@ public class Warehouse
 	
 	protected void buildProject()
 	{
+		theProject.addAutomaton(r11.getAutomaton());
+		theProject.addAutomaton(r12.getAutomaton());
+		theProject.addAutomaton(r13.getAutomaton());
+		theProject.addAutomaton(r14.getAutomaton());
+		theProject.addAutomaton(r15.getAutomaton());
+		theProject.addAutomaton(r16.getAutomaton());
+		theProject.addAutomaton(r17.getAutomaton());
+		theProject.addAutomaton(r18.getAutomaton());
+		theProject.addAutomaton(r19.getAutomaton());
+
+		theProject.addAutomaton(r21.getAutomaton());
+		theProject.addAutomaton(r22.getAutomaton());
+		theProject.addAutomaton(r23.getAutomaton());
+		theProject.addAutomaton(r24.getAutomaton());
+		theProject.addAutomaton(r25.getAutomaton());
+		theProject.addAutomaton(r26.getAutomaton());
+		theProject.addAutomaton(r27.getAutomaton());
+		theProject.addAutomaton(r28.getAutomaton());
+		theProject.addAutomaton(r29.getAutomaton());
+
+		theProject.addAutomaton(r31.getAutomaton());
+		theProject.addAutomaton(r32.getAutomaton());
+		theProject.addAutomaton(r33.getAutomaton());
+		
+		theProject.addAutomaton(r41.getAutomaton());
+		theProject.addAutomaton(r42.getAutomaton());
+				
 		ComputerHumanExtender extender = new ComputerHumanExtender(theProject, k);
 
 		try
