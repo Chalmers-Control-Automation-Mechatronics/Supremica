@@ -144,9 +144,9 @@ public class State
 		y = otherState.y;
 		radius = otherState.radius;
 
-// Här är skurken.....
-// Vilken jäv**a skurk? Skriv ordentliga kommentarer!!!
-//              outgoingArcs = otherState.outgoingArcs;
+		// Här är skurken.....
+		// Vilken jäv**a skurk? Skriv ordentliga kommentarer, era skurkar!!!
+		//              outgoingArcs = otherState.outgoingArcs;
 	}
 
 	// These two should be, and will be, private

@@ -18,66 +18,66 @@ import org.supremica.external.robotCoordinationABB.*;
  */
 public class RobotStudioInterface
 {
-	private static Logger logger = LoggerFactory.createLogger(RobotStudioInterface.class);
-
-	// Initialize jacoZoom
-	static
-	{
-		com.inzoom.comjni.Dll.runRoyaltyFree(643622874);
-	}
-
-	// Constants
-
-	/** The name of the IPart containing the mutex zones. */
-	private final static String ZONEPART_NAME = "MutexZones";
-
-	private final static String ZONEENTITY_BASENAME = "MutexZone";
-	private final static String FREESTATE_NAME = "Free";
-	private final static String BOOKEDSTATE_NAME = "Booked";
-
-	/** The suffix of the Part containing the spans. */
-	private final static String SPAN_SUFFIX = "_Span";
-	private final static String SPANS_SUFFIX = SPAN_SUFFIX + "s";
-
-	/** The name of the module containing the paths */
-	private final static String PATHSMODULE_NAME = "Paths";
-
-	/** Automata constants */
-	private final static String STARTSTATE_NAME = "start";
-	private final static String FINISHSTATE_NAME = "finish";
-	private final static String FINISHEVENT_NAME = "fin";
-
-	/** Via point suffix */
-	private final static String VIAPOINT_SUFFIX = "vp";
-
-	/** Colours */
-	private static Variant RS_WHITE;
-	private static Variant RS_RED;
-	private static Variant RS_GREEN;
-	private static Variant RS_BLUE;
-
-	/** The RobotStudio application. */
-	private static Application app = null;
-
-	// Domenico stuff
-	private static int nbrOfTimesCollision = 1;
-	private static LinkedList[] robotCosts;
-
-	// Implementation of the RobotCell interface for use against RobotStudio.
-	public static class RSRobotCell
+    private static Logger logger = LoggerFactory.createLogger(RobotStudioInterface.class);
+    
+    // Initialize jacoZoom
+    static
+    {
+    	com.inzoom.comjni.Dll.runRoyaltyFree(643622874);
+    }
+    
+    // Constants
+    
+    /** The name of the IPart containing the mutex zones. */
+    private final static String ZONEPART_NAME = "MutexZones";
+    
+    private final static String ZONEENTITY_BASENAME = "MutexZone";
+    private final static String FREESTATE_NAME = "Free";
+    private final static String BOOKEDSTATE_NAME = "Booked";
+    
+    /** The suffix of the Part containing the spans. */
+    private final static String SPAN_SUFFIX = "_Span";
+    private final static String SPANS_SUFFIX = SPAN_SUFFIX + "s";
+    
+    /** The name of the module containing the paths */
+    private final static String PATHSMODULE_NAME = "Paths";
+    
+    /** Automata constants */
+    private final static String STARTSTATE_NAME = "start";
+    private final static String FINISHSTATE_NAME = "finish";
+    private final static String FINISHEVENT_NAME = "fin";
+    
+    /** Via point suffix */
+    private final static String VIAPOINT_SUFFIX = "vp";
+    
+    /** Colours */
+    private static Variant RS_WHITE;
+    private static Variant RS_RED;
+    private static Variant RS_GREEN;
+    private static Variant RS_BLUE;
+    
+    /** The RobotStudio application. */
+    private static Application app = null;
+    
+    // Domenico stuff
+    private static int nbrOfTimesCollision = 1;
+    private static LinkedList[] robotCosts;
+    
+    // Implementation of the RobotCell interface for use against RobotStudio.
+    public static class RSRobotCell
 		implements RobotCell, DAppEvents
-	{
+    {
 		/** The active RopbotStudio station. */
 		private static Station station = null;
 		private Part zones;
-
+		
 		/** Generated automata */
 		private Automata robotAutomata = new Automata();
 		private Automata zoneAutomata = new Automata();
-
+		
 		// Running number of added zones
 		private int zoneNbr = 1;
-
+		
 		public RSRobotCell(File file)
 		{
 			try
@@ -86,17 +86,17 @@ public class RobotStudioInterface
 				openStation(file);
 				station.setBackgroundColor(RS_WHITE);
 				station.setFloorVisible(false);
-
+				
 				// Array of LinkedLists, later containing PathWithCost objects
 				robotCosts = new LinkedList[getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size()];
-
+				
 				for (int i = 0;
-						i < getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size();
-						i++)
+					 i < getMechanismsWithRole(RsKinematicRole.rsKinematicRoleRobot).size();
+					 i++)
 				{
 					robotCosts[i] = new LinkedList();
 				}
-
+				
 				try
 				{
 					// Already got a zones part?
@@ -115,10 +115,10 @@ public class RobotStudioInterface
 				e.printStackTrace();
 			}
 		}
-
+		
 		/**
 		 * Initializes RobotStudio
- 		 */
+		 */
 		public void init()
 			throws Exception
 		{
@@ -131,21 +131,21 @@ public class RobotStudioInterface
 			else
 			{
 				logger.info("Starting RobotStudio...");
-
+				
 				app = new Application();
 				app.addDAppEventsListener(this);
 				app.setVisible(true);    // It's nice to see what is happening
-
+				
 				logger.info("RobotStudio started.");
 			}
-
+			
 			// Some declarations
 			RS_WHITE = new Variant(new SafeArray(new int[]{ 255, 255, 255 }), false);
 			RS_RED = new Variant(new SafeArray(new int[]{ 255, 0, 0 }), false);
 			RS_GREEN = new Variant(new SafeArray(new int[]{ 0, 255, 0 }), false);
 			RS_BLUE = new Variant(new SafeArray(new int[]{ 0, 0, 255 }), false);
 		}
-
+		
 		/**
 		 * Returns true if an application is already running, false otherwise.
 		 * if quit() worked as it should, we could simply check if (app == null).
@@ -169,29 +169,29 @@ public class RobotStudioInterface
 				return false;
 			}
 		}
-
-	    /////////////////////////////////
+		
+		/////////////////////////////////
 		// RobotCell INTERFACE METHODS //
 		/////////////////////////////////
-
+			
 		/**
 		 * Opens station in the RobotStudio environment
 		 */
-		public void openStation(File file)
-			throws Exception
+			public void openStation(File file)
+				throws Exception
 		{
 			String stationName = file.getAbsolutePath();
 			IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
 			station = Station.getStationFromUnknown(iStation);
-
+			
 			// Build robot automata
 			LinkedList robots = getRobots();
 			robotAutomata = buildRobotAutomata(robots);
 		}
-
+		
 		/**
 		 * Examine if there is an open station.
-	 	 */
+		 */
 		public boolean isOpen()
 		{
 			try
@@ -207,7 +207,7 @@ public class RobotStudioInterface
 				return false;
 			}
 		}
-
+		
 		/**
 		 * Returns a linked list of Robot objects.
 		 */
@@ -218,7 +218,7 @@ public class RobotStudioInterface
 
 			// Transform into a list of Robot objects instead
 			for (Iterator mechanismIt = list.iterator();
-					mechanismIt.hasNext(); )
+				 mechanismIt.hasNext(); )
 			{
 				IMechanism mech = (IMechanism) mechanismIt.next();
 				Mechanism mechanism = Mechanism.getMechanismFromUnknown(mech);
@@ -234,49 +234,49 @@ public class RobotStudioInterface
 			throws Exception
 		{
 			/*
-			Automata result = new Automata();
+			  Automata result = new Automata();
 
-			// Create new automata
-			for (int i = 1; i <= zones.getEntities().getCount(); i++)
-			{
-				// Create new automaton
-				String zoneName = zones.getEntities().item(var(i)).getName();
-				Automaton aut = new Automaton(zoneName);
+			  // Create new automata
+			  for (int i = 1; i <= zones.getEntities().getCount(); i++)
+			  {
+			  // Create new automaton
+			  String zoneName = zones.getEntities().item(var(i)).getName();
+			  Automaton aut = new Automaton(zoneName);
 
-				aut.setType(AutomatonType.Specification);
+			  aut.setType(AutomatonType.Specification);
 
-				// Add two states, Free and Booked
-				State state = aut.createAndAddUniqueState(null);
+			  // Add two states, Free and Booked
+			  State state = aut.createAndAddUniqueState(null);
 
-				state.setName(FREESTATE_NAME);
-				state.setAccepting(true);
-				aut.setInitialState(state);
+			  state.setName(FREESTATE_NAME);
+			  state.setAccepting(true);
+			  aut.setInitialState(state);
 
-				state = aut.createAndAddUniqueState(null);
+			  state = aut.createAndAddUniqueState(null);
 
-				state.setName(BOOKEDSTATE_NAME);
+			  state.setName(BOOKEDSTATE_NAME);
 
-				// Add automaton
-				result.addAutomaton(new Automaton(zoneName));
-			}
+			  // Add automaton
+			  result.addAutomaton(new Automaton(zoneName));
+			  }
 
-			/*
-			// Find the robot paths that determine booking and unbooking
-			LinkedList list = getRobots();
-			for (Iterator listIt = list.iterator(); listIt.hasNext(); )
-			{
-					Mechanism mech = ((RSRobot) listIt.next()).getRobotStudioMechanism();
-					IPaths paths = mech.getPaths();
+			  /*
+			  // Find the robot paths that determine booking and unbooking
+			  LinkedList list = getRobots();
+			  for (Iterator listIt = list.iterator(); listIt.hasNext(); )
+			  {
+			  Mechanism mech = ((RSRobot) listIt.next()).getRobotStudioMechanism();
+			  IPaths paths = mech.getPaths();
 
-					// Yada, yada...
-			}
-			return result;
+			  // Yada, yada...
+			  }
+			  return result;
 			*/
 			return zoneAutomata;
 		}
 
 		/**
-	 	 * Generates the structure of the robot automata models. Not the complete models!
+		 * Generates the structure of the robot automata models. Not the complete models!
 		 */
 		public Automata buildRobotAutomata(LinkedList robots)
 			throws Exception
@@ -295,9 +295,11 @@ public class RobotStudioInterface
 				State initial = new State(STARTSTATE_NAME);
 				initial.setInitial(true);
 				aut.addState(initial);
+				initial.setCost(0);
 				State marked = new State(FINISHSTATE_NAME);
 				marked.setAccepting(true);
 				aut.addState(marked);
+				marked.setCost(0);
 				LinkedList posList = robot.getPositions();
 				for (int i=0; i < posList.size(); i++)
 				{
@@ -308,6 +310,7 @@ public class RobotStudioInterface
 							State state = new State(((Position) posList.get(i)).getName() +
 													((Position) posList.get(j)).getName());
 							aut.addState(state);
+							state.setCost(0);
 						}
 					}
 				}
@@ -323,7 +326,7 @@ public class RobotStudioInterface
 						{
 							// Create new arc...
 							String name = ((Position) posList.get(0)).getName() +
-										  ((Position) posList.get(i)).getName();
+								((Position) posList.get(i)).getName();
 							State toState = aut.getStateWithName(name);
 							LabeledEvent event = new LabeledEvent(name);
 							if (!aut.getAlphabet().contains(event))
@@ -361,7 +364,7 @@ public class RobotStudioInterface
 									{
 										// Create new arc...
 										String name = ((Position) posList.get(i)).getName() +
-													  ((Position) posList.get(j)).getName();
+											((Position) posList.get(j)).getName();
 										State toState = aut.getStateWithName(name);
 
 										// Special treatment if were dealing with the home position
@@ -454,23 +457,23 @@ public class RobotStudioInterface
 			throws Exception
 		{
 			/*
-			Automata result = new Automata();
+			  Automata result = new Automata();
 
-			// Iterate over robots
-			LinkedList list = getRobots();
-			for (Iterator listIt = list.iterator(); listIt.hasNext(); )
-			{
-				// Create new automaton
-				Robot robot = (Robot) listIt.next();
-				Automaton aut = new Automaton(robot.getName());
+			  // Iterate over robots
+			  LinkedList list = getRobots();
+			  for (Iterator listIt = list.iterator(); listIt.hasNext(); )
+			  {
+			  // Create new automaton
+			  Robot robot = (Robot) listIt.next();
+			  Automaton aut = new Automaton(robot.getName());
 
-				aut.setType(AutomatonType.Plant);
+			  aut.setType(AutomatonType.Plant);
 
-				// Add automaton
-				result.addAutomaton(aut);
-			}
+			  // Add automaton
+			  result.addAutomaton(aut);
+			  }
 
-			return result;
+			  return result;
 			*/
 			return robotAutomata;
 		}
@@ -544,8 +547,8 @@ public class RobotStudioInterface
 				// Redefine robot program...
 				IABBS4Procedure mainProcedure = ((RSRobot) robot).getMainProcedure();
 				for (int k = 1;
-						k <= mainProcedure.getProcedureCalls().getCount();
-						k++)
+					 k <= mainProcedure.getProcedureCalls().getCount();
+					 k++)
 				{
 					mainProcedure.getProcedureCalls().item(var(k)).delete();
 				}
@@ -586,13 +589,24 @@ public class RobotStudioInterface
 				path.insert(toTarget);
 				path.getTargetRefs().item(var(path.getTargetRefs().getCount())).setMotionType(1);
 				// This is where it goes wrong...
-				((RichPosition) richPath.getFirst()).setPosition(fromTarget.getName());
-				((RichPosition) richPath.getLast()).setPosition(toTarget.getName());
+				String fromName = fromTarget.getName();
+				String toName = toTarget.getName();
+				fromName = fromName.substring(0,fromName.length()-2); // Last two are ":1"
+				toName = toName.substring(0,toName.length()-2);       // Last two are ":1"
+				((RichPosition) richPath.getFirst()).setName(fromName);
+				((RichPosition) richPath.getLast()).setName(toName);
 
 				// Print richPath
+				logger.info("The path from " + from + " to " + to + ".");
 				for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
 				{
 					logger.fatal((RichPosition) posIt.next());
+				}
+
+				// If no collisions, return!
+				if (richPath.size() == 2)
+				{
+					return;
 				}
 
 				// The richPath should be used to generate the automata!
@@ -608,9 +622,10 @@ public class RobotStudioInterface
 					// Detect error...
 					if (inZone != null && outZone != null)
 					{
-						logger.fatal("Exiting and entering zone at the same time detected? This is impossible, tell Hugo!");
+						logger.fatal("Exiting and entering zone at the same time detected? " + 
+									 "This is impossible, tell Hugo!");
 					}
-
+					
 					// Modify zone automaton
 					if (inZone != null || outZone != null)
 					{
@@ -618,22 +633,22 @@ public class RobotStudioInterface
 						String prevPos;
 						if (inZone != null)
 						{
-							nextPos = ((RichPosition) richPath.get(i+1)).getPosition();
-							prevPos = ((RichPosition) richPath.get(i-1)).getPosition();
+							nextPos = ((RichPosition) richPath.get(i+1)).getName();
+							prevPos = ((RichPosition) richPath.get(i-1)).getName();
 						}
 						else
 						{
 							// Other way around...
 							inZone = outZone;
-							nextPos = ((RichPosition) richPath.get(i-1)).getPosition();
-							prevPos = ((RichPosition) richPath.get(i+1)).getPosition();
+							nextPos = ((RichPosition) richPath.get(i-1)).getName();
+							prevPos = ((RichPosition) richPath.get(i+1)).getName();
 						}
 
 						Automaton zone = zoneAutomata.getAutomaton(inZone);
 						Alphabet zoneAlpha = zone.getAlphabet();
 
 						// Book event
-						LabeledEvent bookEvent = new LabeledEvent(currPos.getPosition() + nextPos);
+						LabeledEvent bookEvent = new LabeledEvent(currPos.getName() + nextPos);
 						zoneAlpha.addEvent(bookEvent);
 						Arc arc = new Arc(zone.getStateWithName(FREESTATE_NAME),
 										  zone.getStateWithName(BOOKEDSTATE_NAME),
@@ -641,20 +656,152 @@ public class RobotStudioInterface
 						zone.addArc(arc);
 
 						// Unbook event (other direction)
-						LabeledEvent unbookEvent = new LabeledEvent(currPos.getPosition() + prevPos);
+						LabeledEvent unbookEvent = new LabeledEvent(currPos.getName() + prevPos);
 						zoneAlpha.addEvent(unbookEvent);
 						arc = new Arc(zone.getStateWithName(BOOKEDSTATE_NAME),
-										  zone.getStateWithName(FREESTATE_NAME),
-										  unbookEvent);
+									  zone.getStateWithName(FREESTATE_NAME),
+									  unbookEvent);
 						zone.addArc(arc);
 					}
 				}
-
-				// Modify robot automata
-				for (int i=0; i< richPath.size(); i++)
+				
+				// Modify Robot Automaton
+				// Forward direction
 				{
-					RichPosition currPos = (RichPosition) richPath.get(i);
+					Automaton rob = robotAutomata.getAutomaton(robot.getName());
+					RichPosition firstPos = (RichPosition) richPath.get(0);				
+					Position secondPos = (Position) richPath.get(1);
+					Position secondLastPos = (Position) richPath.get(richPath.size()-2);
+					Position lastPos = (Position) richPath.get(richPath.size()-1);
+					assert(richPath.size() > 2);
+					assert(from.getName().equals(firstPos.getName()));
+					assert(to.getName().equals(lastPos.getName()));
+					//assert(firstPos.getName().startsWith(from.getName()));
+					//assert(lastPos.getName().startsWith(to.getName()));
+					State firstState = new State(firstPos.getName() + secondPos.getName());
+					rob.addState(firstState);
+					State lastState =  rob.getStateWithName(from.getName() + to.getName());
+					lastState.setName(secondLastPos.getName() + lastPos.getName());
 
+					// Set cost for first state, must be int, so it now is the number of milliseconds
+					firstState.setCost((int) (1000*firstPos.getTime()));
+
+					// Modify original arcs
+					LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+					rob.getAlphabet().addEvent(firstEvent);
+					logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+					//ArcIterator arcIt = lastState.incomingArcsIterator();
+					LinkedList toBeRemoved = new LinkedList();
+					//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
+					for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+					{
+						Arc currArc = arcIt.nextArc();
+						toBeRemoved.add(currArc);
+
+						Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
+						rob.addArc(newArc);
+					}
+					while (toBeRemoved.size() > 0)
+					{
+						rob.removeArc(((Arc) toBeRemoved.remove(0)));
+					}
+					LabeledEvent oldEvent = rob.getAlphabet().getEvent(from.getName() + to.getName());
+					rob.getAlphabet().removeEvent(oldEvent);
+				
+					// Add sequence
+					State currState = firstState;
+					for (int i=1; i<richPath.size()-1; i++)
+					{
+						RichPosition currPos = (RichPosition) richPath.get(i);
+						RichPosition nextPos = (RichPosition) richPath.get(i+1);
+					
+						// Add new arc and stuff
+						State nextState;
+						if (i == richPath.size()-2)
+						{
+							nextState = lastState;
+						}
+						else	
+						{
+							nextState = new State(currPos.getName() + nextPos.getName());
+							rob.addState(nextState);
+						}
+						LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+						rob.getAlphabet().addEvent(event);
+						Arc arc = new Arc(currState, nextState, event);
+						rob.addArc(arc);
+
+						// Set cost, must be int, so it now is the number of milliseconds
+						nextState.setCost((int) (1000*(nextPos.getTime() - currPos.getTime())));
+					
+						currState = nextState;
+					}
+				}
+				// Backwards direction (lines with // in the end have been changed)
+				{
+					Automaton rob = robotAutomata.getAutomaton(robot.getName());     
+					Position lastPos = (Position) richPath.get(0);				     //
+					Position secondLastPos = (Position) richPath.get(1);             //
+					RichPosition secondPos = (RichPosition) richPath.get(richPath.size()-2); //
+					RichPosition firstPos = (RichPosition) richPath.get(richPath.size()-1);  //
+					State firstState = new State(firstPos.getName() + secondPos.getName());
+					rob.addState(firstState);
+					State lastState =  rob.getStateWithName(to.getName() + from.getName());  //
+					lastState.setName(secondLastPos.getName() + lastPos.getName());
+
+					// Set cost for first state, must be int, so it now is the number of milliseconds
+					firstState.setCost((int) (1000*(firstPos.getTime() - secondPos.getTime()))); //
+
+					// Modify original arcs
+					LabeledEvent firstEvent = new LabeledEvent(firstPos.getName() + secondPos.getName());
+					rob.getAlphabet().addEvent(firstEvent);
+					logger.info("Nbr of incoming: " + lastState.nbrOfIncomingArcs());
+					//ArcIterator arcIt = lastState.incomingArcsIterator();
+					LinkedList toBeRemoved = new LinkedList();
+					//for (Arc currArc = arcIt.nextArc(); arcIt.hasNext(); currArc = arcIt.nextArc())
+					for (ArcIterator arcIt = lastState.incomingArcsIterator(); arcIt.hasNext(); )
+					{
+						Arc currArc = arcIt.nextArc();
+						toBeRemoved.add(currArc);
+
+						Arc newArc = new Arc(currArc.getFromState(), firstState, firstEvent);
+						rob.addArc(newArc);
+					}
+					while (toBeRemoved.size() > 0)
+					{
+						rob.removeArc(((Arc) toBeRemoved.remove(0)));
+					}
+					LabeledEvent oldEvent = rob.getAlphabet().getEvent(to.getName() + from.getName()); //
+					rob.getAlphabet().removeEvent(oldEvent);
+				
+					// Add sequence
+					State currState = firstState;
+					for (int i=richPath.size()-2; i>0; i--) //
+					{
+						RichPosition currPos = (RichPosition) richPath.get(i);
+						RichPosition nextPos = (RichPosition) richPath.get(i-1); //
+					
+						// Add new arc and stuff
+						State nextState;
+						if (i == 1) //
+						{
+							nextState = lastState;
+						}
+						else	
+						{
+							nextState = new State(currPos.getName() + nextPos.getName());
+							rob.addState(nextState);
+						}
+						LabeledEvent event = new LabeledEvent(currPos.getName() + nextPos.getName());
+						rob.getAlphabet().addEvent(event);
+						Arc arc = new Arc(currState, nextState, event);
+						rob.addArc(arc);
+
+						// Set cost, must be int, so it now is the number of milliseconds
+						nextState.setCost((int) (1000*(currPos.getTime() - nextPos.getTime()))); //
+					
+						currState = nextState;
+					}
 				}
 
 				// Clean up
@@ -833,8 +980,8 @@ public class RobotStudioInterface
 		}
 
 		/**
-	 	 * Listener for detecting when targets are reached and when collisions
-	 	 * begin and end.
+		 * Listener for detecting when targets are reached and when collisions
+		 * begin and end.
 		 */
 		private class MechanismListener
 			extends _MechanismEventsAdapter
@@ -886,7 +1033,6 @@ public class RobotStudioInterface
 				// ("already colliding with")
 				try
 				{
-					logger.info("Zones");
 					for (int j = 1; j <= zones.getEntities().getCount(); j++)
 					{
 						IEntity zone = zones.getEntities().item(var(j));
@@ -897,11 +1043,10 @@ public class RobotStudioInterface
 							objectsColliding.add(new Collider(zoneName));
 						}
 					}
-					logger.info("Zunes");
 
 					// Print the objects already colliding
 					for (ListIterator it = objectsColliding.listIterator();
-							it.hasNext(); )
+						 it.hasNext(); )
 					{
 						logger.debug(mechanism.getName() + " is already inside the zone " + ((Collider) it.next()).getName() + " at target " + path.getTargetRefs().item(var(1)).getName() + ".");
 					}
@@ -964,18 +1109,18 @@ public class RobotStudioInterface
 				try
 				{
 					double motionTime = controller.getMotionTime();
-
+				
 					if (!leavingTarget)
 					{
 						// Log
 						logger.debug("Target reached at time " + (float) motionTime + ".");
-
+					
 						// Set the cost
 						Double realCost = new Double((motionTime - previousTime) * 1000);    // [ms]
-
+					
 						pathcosts.insertCost(new Integer(realCost.intValue()));
 						robotCosts[getRobotIndex(mechanism.getName())].add(pathcosts);
-
+					
 						// Remember
 						posList.add(new RichPosition("FINISH", motionTime, null, null));
 					}
@@ -984,17 +1129,17 @@ public class RobotStudioInterface
 						// Remember
 						posList.add(new RichPosition("START", motionTime, null, null));
 					}
-
+				
 					leavingTarget = !leavingTarget;
 				}
 				catch (Exception ex)
 				{
 					logger.error("Error in event targetReached. " + ex);
 				}
-
+			
 				return 0;
 			}
-
+		
 			public synchronized int collisionStart(RsObject collidingObject)
 			{
 				try
@@ -1002,38 +1147,39 @@ public class RobotStudioInterface
 					// basic information
 					String objectName = collidingObject.getName();
 					double time = controller.getMotionTime();
-
+				
 					// Don't care about the spans!!
-
-					/* Nä... så är det ju inte, de slutar på "_X" också... där X är int
-					if (objectName.endsWith(SPAN_SUFFIX))
-					{
-							return 0;
-					}
+				
+					/*
+					   Nä... så här är det ju inte, de slutar på "_X" också... där X är int
+					   if (objectName.endsWith(SPAN_SUFFIX))
+					   {
+					       return 0;
+					   }
 					*/
-
+				
 					// Did this happen at a positive valued time?
 					if (time < 0)
 					{
 						logger.error("Collision at negative time detected with " + objectName + ".");
-
+					
 						return 0;
 					}
-
+				
 					// Wasn't this a zone?
 					int indexZone = getZoneIndex(objectName);
 					if (indexZone <= 0)
 					{
 						logger.warn("It appears that " + mechanism.getName() + " has collided with '" + objectName + "'.");
-
+					
 						return 0;
-
+					
 						//throw new SupremicaException("Collision with object in station detected!");
 					}
-
+				
 					// Have we collided with this fellow before?
 					Collider data = getColliderWithName(objectsColliding, objectName);
-
+				
 					// Only for new collisions
 					if (data == null)
 					{
@@ -1045,7 +1191,7 @@ public class RobotStudioInterface
 						Double realCost = new Double((time - previousTime) * 1000);
 						pathcosts.insertCost(new Integer(realCost.intValue()));
 						previousTime = time;
-
+					
 						// Create a target here!
 						//String viaPointName = "In" + indexZone + "_";
 						//viaPointName = viaPointName + path.getName() + nbrOfTimesCollision;
@@ -1054,17 +1200,17 @@ public class RobotStudioInterface
 						int robotIndex = getRobotIndex(mechanism.getName());
 						String viaPointName = mechanism.getName().substring(5) + VIAPOINT_SUFFIX + nbrOfTimesCollision;
 						ITarget viaTarget = createTargetAtTCP(viaPointName);
-
+					
 						// Insert the new target in the path
 						ITargetRef viaTargetRef = path.insert(viaTarget);
 						viaTargetRef.setMotionType(1);
-
+					
 						nbrOfTimesCollision++;
-
+					
 						// Remember
 						posList.add(new RichPosition(viaPointName, time, objectName, null));
 					}
-
+				
 					// Count the "ins"
 					data.setCount(data.getCount() + 1);
 				}
@@ -1073,10 +1219,10 @@ public class RobotStudioInterface
 					logger.error("Error in collisionStart. " + e);
 					e.printStackTrace(System.err);
 				}
-
+			
 				return 0;
 			}
-
+		
 			public synchronized int collisionEnd(RsObject collidingObject)
 			{
 				try
@@ -1084,21 +1230,21 @@ public class RobotStudioInterface
 					// basic information
 					String objectName = collidingObject.getName();
 					double time = controller.getMotionTime();
-
+				
 					// Wasn't this a zone?
 					int indexZone = getZoneIndex(objectName);
-
+				
 					if (indexZone <= 0)
 					{
 						return 0;
 					}
-
+				
 					Collider data = getColliderWithName(objectsColliding, objectName);
-
+				
 					if (data == null)
 					{
 						logger.error("Collision ended mysteriously (without starting).");
-
+					
 						return 0;
 					}
 
@@ -1296,7 +1442,7 @@ public class RobotStudioInterface
 				try
 				{
 					for (ListIterator it = collisions.listIterator();
-							it.hasNext(); )
+						 it.hasNext(); )
 					{
 						Collider collide = (Collider) it.next();
 
@@ -1316,9 +1462,10 @@ public class RobotStudioInterface
 		}
 
 		private class RichPosition
+			implements Position
 		{
 			/** The name of this position */
-			String pos;
+			String name;
 			/** The time it took to get here */
 			double timeToPos;
 			/** The name of eventual zone just about to be entered */
@@ -1326,9 +1473,9 @@ public class RobotStudioInterface
 			/** The name of eventual zone just left */
 			String leaveZone = null;
 
-			RichPosition(String pos, double timeToPos, String enterZone, String leaveZone)
+			RichPosition(String name, double timeToPos, String enterZone, String leaveZone)
 			{
-				this.pos = pos;
+				this.name = name;
 				this.timeToPos = timeToPos;
 				this.enterZone = enterZone;
 				this.leaveZone = leaveZone;
@@ -1336,17 +1483,17 @@ public class RobotStudioInterface
 
 			public String toString()
 			{
-				return pos + " at " + timeToPos + ", enter: " + enterZone + ", leave: " + leaveZone;
+				return name + " at " + timeToPos + ", enter: " + enterZone + ", leave: " + leaveZone;
 			}
 
-			public String getPosition()
+			public String getName()
 			{
-				return pos;
+				return name;
 			}
 
-			public void setPosition(String pos)
+			public void setName(String name)
 			{
-				this.pos = pos;
+				this.name = name;
 			}
 
 			public double getTime()
@@ -1364,12 +1511,12 @@ public class RobotStudioInterface
 				return leaveZone;
 			}
 		}
-	}
+    }
 
-	// Implementation of the Robot interface for use against RobotStudio.
-	private static class RSRobot
+    // Implementation of the Robot interface for use against RobotStudio.
+    private static class RSRobot
 		implements Robot
-	{
+    {
 		// Internal variables
 		private Mechanism mechanism;
 		private Station station;
@@ -1438,7 +1585,7 @@ public class RobotStudioInterface
 			IABBS4Procedure mainProcedure = getMainProcedure();
 
 			for (int k = 1; k <= mainProcedure.getProcedureCalls().getCount();
-					k++)
+				 k++)
 			{
 				mainProcedure.getProcedureCalls().item(var(k)).delete();
 			}
@@ -1945,7 +2092,7 @@ public class RobotStudioInterface
 					if (temp.getEntities().getCount() > 0)
 					{
 						logger.warn("RobotStudio struck problems when calculating the span for " +
-									 getName() + ". Do not trust the solution!");
+									getName() + ". Do not trust the solution!");
 					}
 					// temp.delete();
 				}
@@ -2007,14 +2154,14 @@ public class RobotStudioInterface
 				temp.createSolidBox(boxTransform, BOXSIZE + 2 * MARGIN, BOXSIZE + 2 * MARGIN, BOXSIZE + 2 * MARGIN);
 			}
 		}
-	}
+    }
 
-	/**
-	 * Implementation of the Position-interface for RobotStudio.
-	 */
-	private static class RSPosition
+    /**
+     * Implementation of the Position-interface for RobotStudio.
+     */
+    private static class RSPosition
 		implements Position
-	{
+    {
 		Target target;
 
 		public RSPosition(ITarget target)
@@ -2048,12 +2195,11 @@ public class RobotStudioInterface
 		////////////////////////////////
 		// Position interface methods //
 		////////////////////////////////
-
+	
 		public String getName()
 		{
 			try
-			{
-
+			{	
 				// Return the name (remove the last two characters ":1" since they are ugly)
 				return target.getName().substring(0, target.getName().length() - 2);
 			}
@@ -2061,39 +2207,39 @@ public class RobotStudioInterface
 			{
 				System.err.println("Robot has no name? " + ex);
 			}
-
+	    
 			return "";
 		}
-	}
-
-	/**
-	 * A listener for determining when a simulation is finished.
-	 */
-	private static class SimulationListener
+    }
+    
+    /**
+     * A listener for determining when a simulation is finished.
+     */
+    private static class SimulationListener
 		extends DSimulationEventsAdapter
-	{
+    {
 		// Boolean for keeping track on when a simulation is running... not 100%!
 		boolean simulationRunning = true;
-
+	
 		// Events generated by RobotStudio.ISimulation
 		public synchronized void stop()
 		{
 			simulationRunning = false;
-
+	    
 			logger.debug("Simulation finished.");
-
+	    
 			notify();
 		}
-
+	
 		public void tick(double time)
 		{
 			//System.out.println("Simtick: " + time);
 		}
-
+	
 		////////////////////////////
 		// Junk constructed by me //
 		////////////////////////////
-
+	
 		/**
 		 * This method is designed to return when the current simulation has stopped.
 		 */
@@ -2106,7 +2252,7 @@ public class RobotStudioInterface
 				{
 					wait();
 				}
-
+		
 				// Make sure the simulation is really over before we return
 				//Thread.sleep(2500);
 			}
@@ -2115,38 +2261,38 @@ public class RobotStudioInterface
 				//System.out.println("Interrupted! " + ex);
 				logger.error("Interrupted! " + ex);
 			}
-
+	    
 			return;
 		}
-	}
-
-	/**
-	 * Typecast i into Variant, for convenience! (Variant is something like
-	 * VB:s counterpart of java's Object.)
-	 */
-	private static Variant var(int i)
+    }
+    
+    /**
+     * Typecast i into Variant, for convenience! (Variant is something like
+     * VB:s counterpart of java's Object.)
+     */
+    private static Variant var(int i)
 		throws Exception
-	{
+    {
 		return new Variant(i);
-	}
-
-	/**
-	 * Typecast i into Variant, for convenience! (Variant is something like
-	 * VB:s counterpart of java's Object.)
-	 */
-	private static Variant var(boolean i)
+    }
+    
+    /**
+     * Typecast i into Variant, for convenience! (Variant is something like
+     * VB:s counterpart of java's Object.)
+     */
+    private static Variant var(boolean i)
 		throws Exception
-	{
+    {
 		return new Variant(i);
-	}
-
-	/**
-	 * Typecast i into Variant, for convenience! (Variant is something like
-	 * VB:s counterpart of java's Object.)
-	 */
-	private static Variant var(String i)
+    }
+    
+    /**
+     * Typecast i into Variant, for convenience! (Variant is something like
+     * VB:s counterpart of java's Object.)
+     */
+    private static Variant var(String i)
 		throws Exception
-	{
+    {
 		return new Variant(i);
-	}
+    }
 }

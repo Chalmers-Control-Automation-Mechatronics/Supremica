@@ -11,7 +11,7 @@ import org.supremica.automata.*;
 import org.supremica.external.robotCoordination.RobotStudioInterface;
 
 public class RobotCellExaminer
-	extends JDialog
+    extends JDialog
 {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(RobotCellExaminer.class);
@@ -164,6 +164,9 @@ public class RobotCellExaminer
 		{
 			logger.error("Unknown robot simulation environment specified.");
 		}
+
+		// Set the project name based on the file name...
+		ActionMan.getGui().getVisualProjectContainer().getActiveProject().setName(file.getName());
 
 		// Initialize
 		init();
