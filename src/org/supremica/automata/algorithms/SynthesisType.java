@@ -57,6 +57,7 @@ public class SynthesisType
 	public static final SynthesisType Controllable = new SynthesisType("Controllable");
 	public static final SynthesisType Nonblocking = new SynthesisType("Nonblocking");
 	public static final SynthesisType Both = new SynthesisType("Nonblocking and controllable");
+	public static final SynthesisType Observable = new SynthesisType("Nonblocking, controllable and observable");	
 	public static final SynthesisType Unknown = new SynthesisType("Unknown", false);
 	private String description = null;
 
@@ -100,6 +101,11 @@ public class SynthesisType
 		if (type.equals(Both.toString()))
 		{
 			return Both;
+		}
+
+		if (type.equals(Observable.toString()))
+		{
+			return Observable;
 		}
 
 		return Unknown;

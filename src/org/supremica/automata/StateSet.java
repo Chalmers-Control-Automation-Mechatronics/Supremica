@@ -13,6 +13,7 @@ package org.supremica.automata;
 import java.util.*;
 import org.supremica.automata.State;
 
+
 class StateComparator
 	implements Comparator
 {

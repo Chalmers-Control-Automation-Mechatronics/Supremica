@@ -15,6 +15,7 @@ import java.util.Iterator;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.StateSet;
+import org.supremica.automata.Events;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
 import org.supremica.automata.StateIterator;
@@ -117,66 +118,7 @@ class SetOfStateSets
 		return (StateSet)iterator().next();
 	}
 }
-// Here we determine whether the passed event is epsilon or not
-// Depending on the way we want to interpret epsilon, instantiate diferent objects
-interface EpsilonTester
-{
-	boolean isThisEpsilon(LabeledEvent event);
-	
-	// debug only
-	String showWhatYouGot();
-	// debug only
-}
-//
-class DefaultEpsilonTester
-	implements EpsilonTester
-{
-	public boolean isThisEpsilon(LabeledEvent event)
-	{
-		return event.isEpsilon();
-	}
-	
-	// debug only
-	public String showWhatYouGot()
-	{
-		return "removing epsilons";
-	}
-}
-//
-class AlphaEpsilonTester
-	implements EpsilonTester
-{
-	Alphabet events;
-	boolean notin;
 
-	public AlphaEpsilonTester(Alphabet events, boolean contains)
-	{
-		this.events = events;
-		this.notin = !contains;
-	}
-	public boolean isThisEpsilon(LabeledEvent event)
-	{
-		/*
-		if(notin)
-		{
-			return !events.contains(event);
-		}
-		else
-		{
-			return events.contains(event);
-		}
-		*/
-		return notin^events.containsEventWithLabel(event);
-	}
-	
-	public String showWhatYouGot()
-	{
-		if (notin)
-			return "keeping " + events.toString();
-		else
-			return "removing " + events.toString();
-	}
-}
 //
 public class Determinizer
 // extends InterruptableAlgorithm
@@ -192,28 +134,13 @@ public class Determinizer
 
 	private StateSet openStates = new StateSet();
 	private StateSet closedStates = new StateSet();
+	
+	private boolean checkControlInconsistencies = false;
+	private boolean resolveControlInconsistencies = false;
+	private boolean isControlInconsistent = false;
 
 	// Debug stuff
 	private int tabs = 0; // keeps track on num tabs to insert, for formatting output
-	private void printTabs()
-	{
-	//	for(int i = 0; i < tabs; ++i)
-	//		System.out.print("\t");
-	}
-	private void debugPrint(String str, boolean enter)
-	{
-	/*	if(enter)
-			++tabs;
-
-		printTabs();
-		System.out.println(str);
-
-		if(!enter)
-			--tabs;
-	*/
-		logger.debug(str);
-	}
-	// end debug stuff
 
 	// For this automaton, determinize with respect to the events marked as isEpsilon()
 	public Determinizer(Automaton automaton)
@@ -233,6 +160,36 @@ public class Determinizer
 		this.newAutomaton = createNewAutomaton();
 	}
 
+	public Determinizer(Automaton automaton, EpsilonTester epsilonTester)
+	{
+		this.automaton = automaton;
+		this.epsilonTester = epsilonTester;
+		this.newAutomaton = createNewAutomaton();
+	}
+	
+	public void checkControlInconsistencies(boolean checkControlInconsistencies)
+	{
+		this.checkControlInconsistencies = checkControlInconsistencies;
+	}
+
+	public void resolveControlInconsistencies(boolean resolveControlInconsistencies)
+	{
+		this.resolveControlInconsistencies = resolveControlInconsistencies;
+	}
+	
+	public boolean isControlInconsistent()
+		throws IllegalStateException
+	{
+		if (checkControlInconsistencies || resolveControlInconsistencies)	
+		{
+			return isControlInconsistent;
+		}
+		else
+		{
+			throw new IllegalStateException("Only allowed to be called when checkControlInconsistencies or resolvedControlInconsistencies are set to true");	
+		}
+	}
+	
 	public void execute()
 	{
 		// Clear the caches - is this necessary?
@@ -292,6 +249,24 @@ public class Determinizer
 					StateSet Q2c = epsilonClosure(Q2);
 					if(!Q2c.isEmpty())
 					{
+						if (checkControlInconsistencies)
+						{
+							Events inconsistentEvents = automaton.getControlInconsistentEvents(Q2c);
+							if (inconsistentEvents.size() > 0)
+							{
+								logger.debug("In states " + Q2c.toString() + " the following events are inconsistent " + inconsistentEvents.toString());
+								isControlInconsistent= true;
+							}
+						}
+						if (resolveControlInconsistencies)
+						{
+							Events inconsistentEvents = automaton.resolveControlInconsistencies(Q2c);
+							if (inconsistentEvents.size() > 0)
+							{
+								logger.debug("In states " + Q2c.toString() + " the following events are inconsistent (resolved) " + inconsistentEvents.toString());
+								isControlInconsistent = true;
+							}
+						}						
 						add(Q2c);
 						State U = newAutomaton.addStateChecked(Q2c.createNewState());
 						newAutomaton.addArc(new Arc(T, U, e));
@@ -598,4 +573,24 @@ public class Determinizer
 
 
 	}
+
+	private void printTabs()
+	{
+	//	for(int i = 0; i < tabs; ++i)
+	//		System.out.print("\t");
+	}
+	private void debugPrint(String str, boolean enter)
+	{
+	/*	if(enter)
+			++tabs;
+
+		printTabs();
+		System.out.println(str);
+
+		if(!enter)
+			--tabs;
+	*/
+		logger.debug(str);
+	}
+	// end debug stuff
 }

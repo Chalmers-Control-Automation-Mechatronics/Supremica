@@ -490,6 +490,17 @@ public class State
 	{
 		return new ArcIterator(incomingArcs.iterator());
 	}
+	
+	public StateIterator nextStateIterator()
+	{
+		StateSet nextStates = new StateSet();
+		for (Iterator arcSetIt = outgoingArcSetIterator(); arcSetIt.hasNext(); )
+		{
+			ArcSet currArcSet = (ArcSet)arcSetIt.next();
+			nextStates.add(currArcSet.getToState());
+		}
+		return nextStates.iterator();
+	}
 
 	public int nbrOfIncomingArcs()
 	{

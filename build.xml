@@ -63,6 +63,13 @@
 *
 -->
 
+<target name="eclipse_initialize">
+ 	<mkdir dir="${eclipselib}"/>
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${eclipselib}" />
+	</delete>
+</target>
+
 <target name="initialize" depends="clean">
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
@@ -100,7 +107,6 @@
 	<unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>	
-<!--	<unjar src="${lib}/log4j-core.jar" dest="${lib}/${unjared}"/> -->
 	<unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
@@ -119,11 +125,8 @@
 	<unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
-	
 	<unjar src="${lib}/interfaceRobotStudio2_1.jar" dest="${lib}/${unjared}"/>	
-
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
-
 	<mkdir dir="${lib}/licensed"/>
 	<touch file="${lib}/licensed/JGo.jar"/>	
 	<touch file="${lib}/licensed/JGoLayout.jar"/>

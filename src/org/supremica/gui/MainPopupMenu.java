@@ -107,16 +107,22 @@ class MainPopupMenu
 		});*/
 
 		// Strictly EXPERIMENTAL
-		if (SupremicaProperties.includeExperimentalAlgorithms())
+		if (true || SupremicaProperties.includeExperimentalAlgorithms())
 		{
 			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
 			menuHandler.add(automatonDiminisher, 1);
 		}
 
-		if (SupremicaProperties.includeExperimentalAlgorithms())
+		if (true || SupremicaProperties.includeExperimentalAlgorithms())
 		{
 			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
 			menuHandler.add(automatonDeterminizer, 1);
+		}
+
+		if (true || SupremicaProperties.includeExperimentalAlgorithms())
+		{
+			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
+			menuHandler.add(automatonBuildObserver, 1);
 		}
 
 		if (SupremicaProperties.includeExperimentalAlgorithms())

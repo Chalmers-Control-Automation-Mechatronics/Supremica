@@ -87,8 +87,8 @@ public class EncodingHelper
 
 		return s;
 	}
-
-	public static String normalize(String input)
+	
+	public static String normalize(String input, boolean replacedot)
 	{
 		String s = input;
 /*
@@ -115,6 +115,18 @@ public class EncodingHelper
 
 			switch (ch)
 			{
+			case '.' :
+			{
+				if (replacedot)
+				{
+					str.append("_");
+				}
+				else
+				{
+					str.append(".");
+				}
+				break;
+			}
 
 			case '<' :
 			{
@@ -153,7 +165,10 @@ public class EncodingHelper
 		}
 
 		return str.toString();
+	}
 
-
+	public static String normalize(String input)
+	{
+		return EncodingHelper.normalize(input, false);
 	}
 }

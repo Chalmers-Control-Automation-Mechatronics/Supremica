@@ -123,6 +123,8 @@ public class AutomatonToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
+		aut.normalizeStateIdentities();
+		
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
 
@@ -218,7 +220,7 @@ public class AutomatonToDot
 
 			if (withLabel)
 			{
-				pw.print(EncodingHelper.normalize(sourceState.getName()));
+				pw.print(EncodingHelper.normalize(sourceState.getName(), false));
 			}
 
 			pw.println("\"" + getColor(sourceState) + "]; ");
@@ -259,10 +261,10 @@ public class AutomatonToDot
 
 					if (!thisEvent.isObservable())
 					{
-						pw.print("§");
+						pw.print("$");
 					}
 
-					pw.print(EncodingHelper.normalize(thisEvent.getLabel()));
+					pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
 
 					if (arcIt.hasNext())
 					{

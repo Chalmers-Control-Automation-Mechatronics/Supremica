@@ -103,6 +103,16 @@ public class Arc
 		return toState;
 	}
 
+	public void setToState(State toState)
+	{
+		this.toState = toState;
+	}
+
+	public void setFromState(State fromState)
+	{
+		this.fromState = fromState;
+	}
+
 	public String getLabel()
 	{
 		return event.getLabel();

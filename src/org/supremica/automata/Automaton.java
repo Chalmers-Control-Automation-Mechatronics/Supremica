@@ -255,10 +255,12 @@ public class Automaton
 	public void remapStateIndices()
 	{
 		indexStateMap.clear();
+		idStateMap.clear();
 		for(StateIterator stit = stateIterator(); stit.hasNext(); )
 		{
 			State state = stit.nextState();
 			indexStateMap.put(new Integer(state.getIndex()), state);
+			idStateMap.put(state.getId(), state);
 		}
 	}
 
@@ -284,6 +286,157 @@ public class Automaton
 		}
 
 		notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
+	}
+	
+	/**
+	 * Returns a list of control inconsisten events among the 
+	 * given states are consistent.
+	 * We have an inconsistency if an event is explicitly
+	 * removed in one state and explicitly enabled in another.
+	 * To represent the explicitly removed events they must
+	 * exist from the state but they are assumed to end in
+	 * an forbidden state.
+	 * The states in stateset must be contained in the current automaton.
+	 */
+	public Events getControlInconsistentEvents(StateSet stateset)
+	{
+		Events explicitlyForbiddenEvents = new Events();
+
+		// We start by computing the set of explicitly 
+		// forbidden events
+		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+				State nextState = currArc.getToState();
+				if (nextState.isForbidden())
+				{
+					LabeledEvent currEvent = currArc.getEvent();
+					if (!explicitlyForbiddenEvents.includes(currEvent))
+					{
+						try
+						{
+							explicitlyForbiddenEvents.addEvent(currEvent);		
+						}
+						catch (Exception ex)
+						{
+							logger.error("Could not add event in getControlInconsistentStates", ex);
+						}
+
+					}
+				}
+			}
+		}
+
+		// We continuing by iterating over the
+		// all explicitly allowed events and check
+		// that those are not in the list of explicitly 
+		// forbidden events 
+		Events controlInconsistentEvents = new Events();
+		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+				State nextState = currArc.getToState();
+				if (!nextState.isForbidden())
+				{
+					LabeledEvent currEvent = currArc.getEvent();
+					if (explicitlyForbiddenEvents.includes(currEvent))
+					{
+						try
+						{
+							controlInconsistentEvents.addEvent(currEvent);		
+						}
+						catch (Exception ex)
+						{
+							logger.error("Could not add event in getControlInconsistentStates", ex);
+						}
+
+					}
+				}
+			}
+		}		
+
+		return controlInconsistentEvents;
+	}
+
+	/**
+	 * Sets an explicitly allowed arc (event) to point
+	 * to a forbidden state if that events is involved
+	 * in a control inconsistency. See getControlInconsistentEvents.
+	 */
+	public Events resolveControlInconsistencies(StateSet stateset)
+	{
+		Events explicitlyForbiddenEvents = new Events();
+		Map eventToStateMap = new HashMap();
+
+		// We start by computing the set of explicitly 
+		// forbidden events
+		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+				State nextState = currArc.getToState();
+				if (nextState.isForbidden())
+				{
+					LabeledEvent currEvent = currArc.getEvent();
+					if (!explicitlyForbiddenEvents.includes(currEvent))
+					{
+						try
+						{
+							explicitlyForbiddenEvents.addEvent(currEvent);		
+							eventToStateMap.put(currEvent, nextState);
+						}
+						catch (Exception ex)
+						{
+							logger.error("Could not add event in resolveControlInconsistencies", ex);
+						}
+
+					}
+				}
+			}
+		}
+
+		// We continuing by iterating over the
+		// all explicitly allowed events and check
+		// that those are not in the list of explicitly 
+		// forbidden events 
+		Events controlInconsistentEvents = new Events();
+		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+				State nextState = currArc.getToState();
+				if (!nextState.isForbidden())
+				{
+					LabeledEvent currEvent = currArc.getEvent();
+					if (explicitlyForbiddenEvents.includes(currEvent))
+					{
+						try
+						{
+							State forbiddenState = (State)eventToStateMap.get(currEvent);
+							currArc.setToState(forbiddenState);
+							controlInconsistentEvents.addEvent(currEvent);		
+						}
+						catch (Exception ex)
+						{
+							logger.error("Could not add event in getControlInconsistentStates", ex);
+						}
+
+					}
+				}
+			}
+		}		
+
+		return controlInconsistentEvents;
 	}
 
 	// If a state with this id (and/or name?) already exists, return the existing state
@@ -1013,6 +1166,22 @@ public class Automaton
 		this.alphabet = alphabet;
 	}
 */
+	/**
+	 * In some situation, for example in the dot output
+	 * not all state identities can be accepeted. For examepl
+	 * dot does not handle dots in the statename.
+	 * This method resets all state identities to valid names
+	 */
+	public void normalizeStateIdentities()
+	{
+		setStateIndicies();
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+			currState.setId("q_" + currState.getIndex());
+		}
+		remapStateIndices();
+	}
 
 	public void setIndicies()
 	{
