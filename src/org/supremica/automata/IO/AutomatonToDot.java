@@ -272,8 +272,8 @@ public class AutomatonToDot
 					if (!thisEvent.isObservable())
 					{
 						pw.print("$");
-					}
-
+					}	
+					
 					pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
 
 					if (arcIt.hasNext())
