@@ -64,9 +64,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 				}
 			}
 		}
-		//				return success;
-		return true;
-
+		return success;
 	}
 
 
@@ -139,18 +137,22 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 		v = getVariableInfo(variableName, blockName);
 
-		jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
-		jjtn_variable.setName(v.name);
-		jjtn_variable.setTypeName(v.typeName);
-		jjtn_variable.setIsDirectVariable(v.directVariable);
-		jjtn_variable.setFieldSelector(v.fieldSelector);
-		jjtn_variable.setFieldSelectorTypeName(v.fieldSelectorTypeName);
-		jjtn_variable.setIsFunctionBlock(v.isFunctionBlock);
+		if (v==null) {
+			return null;
+		} else {
 
-		jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
+			jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
+			jjtn_variable.setName(v.name);
+			jjtn_variable.setTypeName(v.typeName);
+			jjtn_variable.setIsDirectVariable(v.directVariable);
+			jjtn_variable.setFieldSelector(v.fieldSelector);
+			jjtn_variable.setFieldSelectorTypeName(v.fieldSelectorTypeName);
+			jjtn_variable.setIsFunctionBlock(v.isFunctionBlock);
+			
+			jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
 
-
-		return jjtn_simple_op;
+			return jjtn_simple_op;
+		}
 
 	}
 
@@ -182,6 +184,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 						 )) {
 					success = false;
 					System.err.println("Error: Undeclared variable: " + v.name);
+					return null;
 				}
 
 				v.typeName = (String)symbolicVariables.get(v.name);
@@ -194,6 +197,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 				if (!fbVariables.containsKey(v.name)) {
 					success = false;
 					System.err.println("Error: Undeclared variable: " + v.name);
+					return null;
 				}
 
 				v.typeName = (String)fbVariables.get(v.name);
@@ -229,7 +233,38 @@ public class VariableChecker implements SimpleNodeVisitor {
 	}
 
 
-	//	public String getFunctionBlockTypeName(String fbVariableName,
+   	public String getFunctionBlockTypeName(String fbVariableName, String blockName) {
+		Hashtable fbVariables;
+
+		/*
+         * Kolla att det anropade funktionsblocket är deklarerat och hämta typeName
+         */
+		if (blockName == null)
+			/* funktionsblocket finns i ett program */
+			{
+				if (!(   symbolicVariables.containsKey(fbVariableName)
+						 || locatedVariables.containsKey(fbVariableName)
+						 )) {
+					success = false;
+					System.err.println("Error: Undeclared function block: " + fbVariableName);
+				}
+
+				return (String)symbolicVariables.get(fbVariableName);
+			}
+		else
+			/* funktionsblocket finns i ett function block */
+			{
+				fbVariables = (Hashtable)functionBlocks.get(blockName);
+
+				if (!fbVariables.containsKey(fbVariableName)) {
+					success = false;
+					System.err.println("Error: Undeclared function block: " + fbVariableName);
+				}
+
+				return (String)fbVariables.get(fbVariableName);
+			}
+
+	}
 
 
 
@@ -281,7 +316,6 @@ public class VariableChecker implements SimpleNodeVisitor {
                      */
 					jjtn_simple_op = create_LD_Node(p.parameterType, p.value, functionBlockName);
 
-
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
 
 					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
@@ -295,11 +329,12 @@ public class VariableChecker implements SimpleNodeVisitor {
                      */
 					jjtn_simple_op = create_ST_Node(fb_name + "." + p.parameter, functionBlockName);
 
+					if (jjtn_simple_op != null) {
+						greatParent.jjtInsertChild(jjtn_simple_op, pos);
 
-					greatParent.jjtInsertChild(jjtn_simple_op, pos);
-
-					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
-					pos = pos + 1;
+						((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
+						pos = pos + 1;
+					}
 				}
 
 		}
@@ -999,17 +1034,6 @@ public class VariableChecker implements SimpleNodeVisitor {
 				}
 			}
 
-			/*
-			if (childNum > 2) {
-				if (((SimpleNode)children[2]).toString() == "il_param_list") {
-					params = ((SimpleNode)children[2]).getChildren();
-					for (i=0; i<params.length; i++) {
-						p2 = ((SimpleNode)params[i]).getChildren();
-						System.out.println("***IL_FB_CALL: " + ((SimpleNode)p2[0]).toString());
-					}
-				}
-			}
-			*/
 		}
         return null;
 
@@ -1078,81 +1102,55 @@ public class VariableChecker implements SimpleNodeVisitor {
 		fb_name = ((ASTfb_name)(((ASTil_fb_call)parent).getChildren())[1]).getName();
 
 
-		/*
-         * Kolla att det anropade funktionsblocket är deklarerat och hämta typeName
-         */
-		if (((VCinfo)o).blockType=="program")
-			/* variabeln finns i ett program */
-			{
-				if (!(   symbolicVariables.containsKey(fb_name)
-						 || locatedVariables.containsKey(fb_name)
-						 )) {
-					success = false;
-					System.err.println("Error: Undeclared function block: " + fb_name);
-				}
-
-				fb_type = (String)symbolicVariables.get(fb_name);
-			}
-		else
-			/* variabeln finns i ett function block */
-			{
-				fbVariables = (Hashtable)functionBlocks.get(((VCinfo)o).functionBlockName);
-
-				if (!fbVariables.containsKey(fb_name)) {
-					success = false;
-					System.err.println("Error: Undeclared function block: " + fb_name);
-				}
-
-				fb_type = (String)fbVariables.get(fb_name);
-			}
-
+		fb_type = getFunctionBlockTypeName(fb_name, functionBlockName);
 
 
 		/* il_fb_call's index i function_block_body's barn
            (il_fb_call är il_param_list's förälder)          */
 		pos = ((VCinfo)o).childIndex;
 
+		if (fb_type != null) {
+			fbVariables = (Hashtable)functionBlocks.get(fb_type);
 
-		fbVariables = (Hashtable)functionBlocks.get(fb_type);
+			for (i = 0; i < operands.size(); i++) {
+				operand = (Operand)operands.get(i);
 
-		for (i = 0; i < operands.size(); i++) {
-			operand = (Operand)operands.get(i);
+				/*
+				 * LD
+				 */
+				if (((VCinfo)o).blockType=="program") {
+					jjtn_simple_op = create_LD_Node(operand.type, operand.value, null);
+				} else {
+					jjtn_simple_op = create_LD_Node(operand.type, operand.value, ((VCinfo)o).functionBlockName);
+				}
 
-			/*
-			 * LD
-             */
-			if (((VCinfo)o).blockType=="program") {
-				jjtn_simple_op = create_LD_Node(operand.type, operand.value, null);
-			} else {
-				jjtn_simple_op = create_LD_Node(operand.type, operand.value, ((VCinfo)o).functionBlockName);
+				greatParent.jjtInsertChild(jjtn_simple_op, pos);
+
+				((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
+				pos = pos + 1;
+
+
+
+				/*
+				 * ST
+				 */
+				if (((VCinfo)o).blockType=="program") {
+					jjtn_simple_op = create_ST_Node(fb_name + "." + (String)fbVariables.get(""+i), null);
+				} else {
+					jjtn_simple_op = create_ST_Node(fb_name + "." + (String)fbVariables.get(""+i), ((VCinfo)o).functionBlockName);
+				}
+
+				greatParent.jjtInsertChild(jjtn_simple_op, pos);
+
+				((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
+				pos = pos + 1;
+
 			}
 
-			greatParent.jjtInsertChild(jjtn_simple_op, pos);
-
-			((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
-			pos = pos + 1;
-
-
-
-			/*
-             * ST
-             */
-			if (((VCinfo)o).blockType=="program") {
-				jjtn_simple_op = create_ST_Node(fb_name + "." + (String)fbVariables.get(""+i), null);
-			} else {
-				jjtn_simple_op = create_ST_Node(fb_name + "." + (String)fbVariables.get(""+i), ((VCinfo)o).functionBlockName);
-			}
-
-			greatParent.jjtInsertChild(jjtn_simple_op, pos);
-
-			((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
-			pos = pos + 1;
-
+			/* Ta bort noden il_operand_list
+			 */
+			parent.jjtDeleteChild(2);
 		}
-
-		/* Ta bort noden il_operand_list
-         */
-		parent.jjtDeleteChild(2);
 
         return o;
 
