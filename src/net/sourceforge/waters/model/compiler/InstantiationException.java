@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.model.base
 //# CLASS:   InstantiationException
 //###########################################################################
-//# $Id: InstantiationException.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: InstantiationException.java,v 1.2 2005-03-03 02:33:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -24,8 +25,26 @@ public class InstantiationException extends EvalException {
   public InstantiationException(final Exception cause,
 				final InstanceProxy inst)
   {
-    super("Can't load module '" + inst.getName() +
-	  "' for instantiation: " + cause.getMessage(), cause, inst);
+    super(createMessage(cause, inst), cause, inst);
+  }
+
+
+  //#########################################################################
+  //# Message Preparation
+  private static String createMessage(final Exception cause,
+				      final InstanceProxy inst)
+  {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append("Can't load module '");
+    buffer.append(inst.getName());
+    buffer.append("' for instantiation");
+    final String msg = cause.getMessage();
+    if (msg == null) {
+      buffer.append('!');
+    } else {
+      buffer.append(msg);
+    }
+    return buffer.toString();
   }
 
 }

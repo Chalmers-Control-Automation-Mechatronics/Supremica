@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.3 2005-03-03 02:16:50 robi Exp $
+//# $Id: CompilerTest.java,v 1.4 2005-03-03 02:33:40 robi Exp $
 //###########################################################################
 
 
@@ -17,12 +18,15 @@ import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.WatersException;
+import net.sourceforge.waters.model.compiler.InstantiationException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.NondeterminismException;
 import net.sourceforge.waters.model.des.ProductDESMarshaller;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.DuplicateIdentifierException;
+import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.expr.UndefinedIdentifierException;
+import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
@@ -33,7 +37,7 @@ public class CompilerTest
 
   //#########################################################################
   //# Test Cases
-  public void testCompile_empty()
+  public void testCompile_empty_1()
     throws JAXBException, WatersException, IOException
   {
     final String name = "empty";
@@ -45,6 +49,29 @@ public class CompilerTest
     assertTrue("Unexpected location!", des.getLocation() == null);
     assertTrue("Unexpected event!", des.getEvents().isEmpty());
     assertTrue("Unexpected automata!", des.getAutomata().isEmpty());
+  }
+
+  public void testCompile_empty_2()
+    throws JAXBException, WatersException, IOException
+  {
+    final String modname = "almost_empty";
+    final String instname = "instance";
+    try {
+      final ModuleProxy module = new ModuleProxy(modname);
+      final ModuleCompiler compiler =
+        new ModuleCompiler(module, mDocumentManager);
+      final SimpleIdentifierProxy ident = new SimpleIdentifierProxy(instname);
+      final InstanceProxy instance = new InstanceProxy(ident, instname);
+      module.getComponentList().add(instance);
+      final ProductDESProxy des = compiler.compile();
+      fail("Expected InstantiationException not caught!");
+    } catch (final InstantiationException exception) {
+      final String culprit = "'" + instname + "'";
+      final String msg = exception.getMessage();
+      assertTrue("InstantiationException <" + msg +
+                 "> does not mention culprit " + culprit + "!",
+                 msg.indexOf(culprit) >= 0);
+    }
   }
 
   public void testCompile_buffer_sf1()
@@ -86,11 +113,11 @@ public class CompilerTest
     } catch (final NondeterminismException exception) {
       final String msg = exception.getMessage();
       assertTrue("NondeterminismException <" + msg +
-		 "> does not mention culprit 'q0'!",
-		 msg.indexOf("'q0'") >= 0);
+                 "> does not mention culprit 'q0'!",
+                 msg.indexOf("'q0'") >= 0);
       assertTrue("NondeterminismException <" + msg +
-		 "> does not mention culprit 'e'!",
-		 msg.indexOf("'e'") >= 0);
+                 "> does not mention culprit 'e'!",
+                 msg.indexOf("'e'") >= 0);
     }
   }
 
@@ -128,8 +155,8 @@ public class CompilerTest
     } catch (final DuplicateIdentifierException exception) {
       final String msg = exception.getMessage();
       assertTrue("DuplicateIdentifierException <" + msg +
-		 "> does not mention culprit 'mach'!",
-		 msg.indexOf("'mach'") >= 0);
+                 "> does not mention culprit 'mach'!",
+                 msg.indexOf("'mach'") >= 0);
     }
   }
 
@@ -142,8 +169,8 @@ public class CompilerTest
     } catch (final UndefinedIdentifierException exception) {
       final String msg = exception.getMessage();
       assertTrue("UndefinedIdentifierException <" + msg +
-		 "> does not mention culprit 'break'!",
-		 msg.indexOf("required parameter 'break'") >= 0);
+                 "> does not mention culprit 'break'!",
+                 msg.indexOf("required parameter 'break'") >= 0);
     }
   }
 
