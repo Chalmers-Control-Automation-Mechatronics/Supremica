@@ -120,6 +120,8 @@ public class IDE
 		{
 			moduleContainers.setActive(moduleContainer);
 
+			oldModuleContainer.setSelectedComponent(tabPanel.getSelectedComponent());
+
 			tabPanel.remove(oldModuleContainer.getEditorPanel());
 			tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
 			tabPanel.remove(oldModuleContainer.getSimulatorPanel());
@@ -127,6 +129,8 @@ public class IDE
 			tabPanel.add(moduleContainer.getEditorPanel());
 			tabPanel.add(moduleContainer.getAnalyzerPanel());
 			tabPanel.add(moduleContainer.getSimulatorPanel());
+
+			tabPanel.setSelectedComponent(moduleContainer.getSelectedComponent());
 		}
 	}
 

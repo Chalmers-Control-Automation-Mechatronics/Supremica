@@ -319,7 +319,7 @@ public class AutomatonToDot
 
 						if (thisEvent.isEpsilon())
 						{
-							pw.print("&");
+							pw.print("%");
 
 							is_eps = true;
 						}

@@ -1,7 +1,7 @@
 package org.supremica.gui.ide;
 
 import java.util.*;
-import javax.swing.JComponent;
+import java.awt.Component;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 public class ModuleContainer
@@ -12,16 +12,13 @@ public class ModuleContainer
 	private EditorPanel editorPanel = null;
 	private AnalyzerPanel analyzerPanel = null;
 	private SimulatorPanel simulatorPanel = null;
-
-	private EditorEventsPanel editorEventsPanel = null;
-	private EditorComponentsPanel editorComponentsPanel = null;
-	private EditorAliasesPanel editorAliasesPanel = null;
-	private EditorParametersPanel editorParametersPanel = null;
+	private Component selectedComponent = null;
 
 	public ModuleContainer(IDE ide, ModuleProxy module)
 	{
 		this.ide = ide;
 		this.module = module;
+		setSelectedComponent(getEditorPanel());
 	}
 
 	public String getName()
@@ -60,5 +57,16 @@ public class ModuleContainer
 		}
 		return simulatorPanel;
 	}
+
+	public void setSelectedComponent(Component selectedComponent)
+	{
+		this.selectedComponent = selectedComponent;
+	}
+
+	public Component getSelectedComponent()
+	{
+		return selectedComponent;
+	}
+
 
 }
