@@ -35,6 +35,10 @@ public class AutomataOrderingHeuristicFactory
 			aoh = new AOH_Solver();
 			break;
 
+		case Options.AO_HEURISTIC_FORCE :
+			aoh = new AOH_Force();
+			break;
+
 		default :
 			System.err.println("[INTERNAL] BAD AutomatonSelectionHeuristic type...");
 
