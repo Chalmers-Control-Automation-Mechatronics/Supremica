@@ -56,6 +56,7 @@ import org.supremica.automata.ArcSet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.algorithms.EnumerateStates;
 
 public class AutomatonToDot
@@ -66,12 +67,13 @@ public class AutomatonToDot
 	private static final int DEFAULT_WIDTH = 7;
 	private static final int DEFAULT_HEIGHT = 11;
 	private Automaton aut;
-	private boolean leftToRight = false;
-	private boolean withLabel = true;
-	private boolean withCircles = false;
-	private boolean useStateColors = false;
-	private boolean useArcColors = false;
-	private boolean writeEventLabels = true;
+
+	private boolean leftToRight = SupremicaProperties.isDotLeftToRight();
+	private boolean withLabel = SupremicaProperties.isDotWithStateLabels();
+	private boolean withCircles = SupremicaProperties.isDotWithCircles();
+	private boolean useStateColors = SupremicaProperties.isDotUseStateColors();
+	private boolean useArcColors = SupremicaProperties.isDotUseArcColors();
+	private boolean writeEventLabels = SupremicaProperties.isDotWithEventLabels();
 
 	public AutomatonToDot(Automaton aut)
 	{
@@ -221,7 +223,7 @@ public class AutomatonToDot
 			if (state.isInitial())
 			{
 				initialStates.addElement(state);
-				pw.println("\t{node [shape = plaintext, style=invis] \"" + initPrefix + state.getName() + "\"};");
+				pw.println("\t{node [shape = plaintext, style=invis, label=\"\"] \"" + initPrefix + state.getName() + "\"};");
 			}
 
 			if (state.isAccepting() &&!state.isForbidden())

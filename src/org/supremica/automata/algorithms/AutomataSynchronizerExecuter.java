@@ -103,8 +103,6 @@ public final class AutomataSynchronizerExecuter
 	private boolean controllableState;
 	private final static int IMMEDIATE_NOT_AVAILABLE = -1;
 	private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
-	private final static String SEPARATOR_STRING = SupremicaProperties.getStateSeparator();
-	private final static int SEPARATOR_LENGTH = SEPARATOR_STRING.length();
 	private int numberOfAddedStates = 0;
 
 	/** Options determining how the synchronization should be performed. */
@@ -952,11 +950,11 @@ public final class AutomataSynchronizerExecuter
 							// It should be name here, right? That's what the method description says...
 							//sb.append(stateTable[j][currState[j]].getId());
 							sb.append(stateTable[j][currState[j]].getName());
-							sb.append(SEPARATOR_STRING);
+							sb.append(options.getStateNameSeparator());
 						}
 
 						// Remove last separator string element
-						sb.setLength(sb.length() - SEPARATOR_LENGTH);
+						sb.setLength(sb.length() - options.getStateNameSeparator().length());
 
 						// Create state
 						newState = new CompositeState(sb.toString(), currState, helper.getAutomata());
