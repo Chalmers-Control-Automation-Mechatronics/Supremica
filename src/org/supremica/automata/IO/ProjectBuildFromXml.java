@@ -211,8 +211,6 @@ public class ProjectBuildFromXml
 		return build(r, false);
 	}
 
-
-
 	private  Project build(Reader r, boolean validate)
 		throws Exception
 	{

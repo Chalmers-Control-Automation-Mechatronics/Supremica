@@ -607,7 +607,7 @@ public class Automata
 		return true;
 
 		/*
-		// ?(/¤#)=%&# WHAT THE ¤@@%& IS THIS! IT'S NOT DOING WHAT THE METHOD SAYS IT DOES!! %"#¤&#%/" /hugo
+		// ?(/¤#&# WHAT THE ¤@@%& IS THIS! IT'S NOT DOING WHAT THE DESCRIPTION SAYS IT DOES!! %"GRR#%/& /hugo
 		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
