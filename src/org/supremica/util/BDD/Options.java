@@ -115,7 +115,7 @@ public class Options
 		"Random", "BDD/Stack", "BDD/FIFO", "BDD/distance",
 		"Most common uc-events",	"Most common uc-arcs",
 		"Most common events",	"Most common arcs",
-		"Most local events",	"Hybrid"
+		"Most local events",	"Hybrid", "Interactive"
 	};
 	public static final int
 		AS_HEURISTIC_RANDOM = 0,
@@ -127,7 +127,8 @@ public class Options
 		AS_HEURISTIC_MOST_COMMON_EVENTS = 6,
 		AS_HEURISTIC_MOST_COMMON_ARCS = 7,
 		AS_HEURISTIC_MOST_LOCAL = 8,
-		AS_HEURISTIC_HYBRID = 9;
+		AS_HEURISTIC_HYBRID = 9,
+		AS_HEURISTIC_INTERACTIVE = 10;
 	public static int as_heuristics  = AS_HEURISTIC_HYBRID;
 
 

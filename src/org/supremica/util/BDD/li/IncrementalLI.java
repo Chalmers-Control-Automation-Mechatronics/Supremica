@@ -81,6 +81,8 @@ public class IncrementalLI extends BaseLI {
 
 		BDDAutomaton next;
 		while( (next = ac.next() ) != null) {
+			num_automata_added++;
+			num_syncs_done++;
 
 			if(Options.debug_on) Options.out.println("\t +++ Adding " + next.getName() + "\n");
 
@@ -102,7 +104,7 @@ public class IncrementalLI extends BaseLI {
 			// More verbose crap
 			if(Options.debug_on) ac.dump();
 
-			// test over-approximated reachability of badd states (as in theta)
+			// test over-approximated reachability of bad states (as in theta)
 			int Qr = sup.getReachables(bdd_initial);
 			bdd_theta = ba.andTo(bdd_theta, Qr);
 			boolean ret = (bdd_theta == ba.getZero());
@@ -112,6 +114,34 @@ public class IncrementalLI extends BaseLI {
 				if(Options.debug_on) ba.getEventManager().dumpSubset("*** Removed events (all)", workset_events);
 				return true;
 			}
+
+
+			// remove events not used anymore. NOTE: this snippet is not as inefficient as it looks :)
+			int theta_sigma = ba.exists(bdd_theta, ba.getStateCube() );
+			Event [] es =  ba.getEvents();
+			int changed = 0;
+			for(int i = 0; i < workset_events.length; i++) {
+				if(workset_events[i]) {
+					int tmp = ba.and( theta_sigma, es[i].getBDD() );
+					boolean empty = (tmp == ba.getZero() );
+					ba.deref(tmp);
+					if(empty) {
+						changed++;
+						workset_events[i] = false;
+					}
+				}
+			}
+			ba.deref( theta_sigma );
+			if(changed > 0) {
+				ba.deref(bdd_sigma_w );
+				bdd_sigma_w = ba.getAlphabetSubsetAsBDD(workset_events);
+				bdd_theta_i = ba.andTo(bdd_theta_i, bdd_sigma_w);
+				bdd_theta_j = ba.andTo(bdd_theta_j, bdd_sigma_w);
+				// bdd_theta alread updated.
+				if(Options.debug_on) Options.out.println("*** Removed " + changed + " events from workset-events.");
+			}
+
+
 
 
 

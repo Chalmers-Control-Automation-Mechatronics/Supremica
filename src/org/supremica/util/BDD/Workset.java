@@ -68,12 +68,12 @@ public class Workset
 
 
 	private int pickOneInteractive(boolean exclusive) {
-		ic.choice.removeAll();
+		ic.removeAll();
 
 		int queue_size = 0;
 		for(int i = 0; i < size; i++)
 			if(( !exclusive || remaining[i]) && workset[i] > 0 ) {
-				ic.choice.add( clusters[i].toString() );
+				ic.add( clusters[i].toString() );
 				queue[queue_size++] = i;
 			}
 

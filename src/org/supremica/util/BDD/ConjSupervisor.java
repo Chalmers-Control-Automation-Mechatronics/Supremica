@@ -84,45 +84,25 @@ public class ConjSupervisor
 
 		int work;
 
-		// if(plant.getSize() > spec.getSize()) {
-			int t_sp = spec.getT();
 
-			SizeWatch.report(t_sp, "Tsp");
+		int t_sp = spec.getT();
 
-			tmp = manager.exists(t_sp, cubep_sp);
-			work = manager.not(tmp);
+		SizeWatch.report(t_sp, "Tsp");
+
+		tmp = manager.exists(t_sp, cubep_sp);
+		work = manager.not(tmp);
+		manager.deref(tmp);
+		SizeWatch.report(work, "~Eq'sp. Tsp");
+
+
+		BDDAutomaton[] ps = plant.getMembers();
+		int psize = plant.getSize();
+		for(int i = 0; i < psize; i++) {
+			tmp = manager.exists(ps[i].getTpri(), cubep_p);
+			work = manager.andTo(work, tmp);
 			manager.deref(tmp);
-			SizeWatch.report(work, "~Eq'sp. Tsp");
-
-
-			BDDAutomaton[] ps = plant.getMembers();
-			int psize = plant.getSize();
-			for(int i = 0; i < psize; i++) {
-				tmp = manager.exists(ps[i].getTpri(), cubep_p);
-				work = manager.andTo(work, tmp);
-				manager.deref(tmp);
-			}
-
-
-
-	/*
-		} else {
-			// THIS WONT WORK! (why??)
-			int t_p = plant.getT();
-			SizeWatch.report(t_p, "Tp");
-			work = manager.exists(t_p, cubep_p);
-
-			BDDAutomaton[] sps = spec.getMembers();
-			int spsize = spec.getSize();
-			for(int i = 0; i < spsize; i++) {
-				int tmp = manager.exists(sps[i].getTpri(), cubep_sp);
-				int tmp2 = manager.not(tmp);
-				manager.deref(tmp);
-				work = manager.orTo(work, tmp2);
-				manager.deref(tmp2);
-			}
 		}
-	*/
+
 
 		/*
 		// THIS IS PROBABLY WORSE THAN THE MONOLITHIC VERSION (is it?)

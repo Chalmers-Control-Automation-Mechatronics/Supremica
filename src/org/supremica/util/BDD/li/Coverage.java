@@ -127,7 +127,10 @@ public class Coverage {
 			}
 		}
 
-		int picked =  work_queue[--queue_size];
+		int picked = heuristic.pick(queue_size--);
+
+
+
 		BDDAutomaton a = li.all[ picked ];
 
 		// how does this choice affect us?

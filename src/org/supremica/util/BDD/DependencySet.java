@@ -14,9 +14,20 @@ public class DependencySet {
 
 
     public DependencySet(BDDAutomata manager, BDDAutomaton me) {
+		this(manager, manager.getAutomataVector(), me, null);
+	}
+
+	public DependencySet(BDDAutomata manager, BDDAutomaton [] all, BDDAutomaton me) {
+		this(manager, all, me, null);
+	}
+
+	public DependencySet(BDDAutomata manager, BDDAutomaton [] all, BDDAutomaton me, boolean []event_care) {
 		this.manager = manager;
-		this.all = manager.getAutomataVector();
+		this.all = all;
 		this.me  = me;
+
+		// which events do we care about??
+		int event_mask = event_care == null ? manager.ref (manager.getOne()) : manager.getAlphabetSubsetAsBDD(event_care);
 
 		map_dependency = new boolean[all.length];
 		for(int i = 0; i < all.length; i++)
@@ -27,7 +38,8 @@ public class DependencySet {
 
 		// get dependet set, compute bdd_keep_others at the same time
 
-		Vector tmp = new Vector(all.length);
+		BDDAutomaton [] queue = new  BDDAutomaton [all.length];
+		int i, len = 0;
 
 		bdd_keep_others = manager.getOne();
 		manager.ref(bdd_keep_others);
@@ -37,10 +49,15 @@ public class DependencySet {
 
 		bdd_cube_others = manager.getOne();
 		manager.ref(bdd_cube_others);
-		for(int i = 0; i < all.length; i++) {
+		for(i = 0; i < all.length; i++) {
 			if(all[i] != me) {
-				if(me.interact(all[i])) {
-				   tmp.add( all[i]);
+
+				// ignore event-interaction if it is outside the event-care
+				boolean interact = (event_care == null ? me.interact(all[i]) : me.interact(all[i], event_care));
+
+				if(interact) {
+					queue[len++] = all[i];
+				   // tmp.add( all[i]);
 				   bdd_cube = manager.and(bdd_cube, all[i].getCube());
 				} else {
 					bdd_keep_others = manager.andTo(bdd_keep_others, all[i].getKeep());
@@ -52,20 +69,15 @@ public class DependencySet {
 
 		SizeWatch.report(bdd_keep_others, "keep_others");
 
-		// put it into an array
-		int len = tmp.size();
+		// get an array with correct size:
 		dependent = new BDDAutomaton[len];
-		int i = 0;
-		for(Enumeration it = tmp.elements(); it.hasMoreElements(); i++) {
-			BDDAutomaton ba = (BDDAutomaton) it.nextElement();
-			dependent[i] = ba;
-		}
+		for(i = 0; i < len; i++) dependent[i] = queue[i];
 
 
 
 		// calc Twave etc
-		int follow = manager.getOne(); manager.ref(follow);
-		bdd_i = me.getI(); manager.ref(bdd_i);
+		int follow = manager.ref( manager.getOne() );
+		bdd_i = manager.ref( me.getI() );
 
 
 		for(i = 0; i < len; i++) {
@@ -74,6 +86,7 @@ public class DependencySet {
 			// TWave
 			int common_events =  manager.and(a_i.getSigma(), me.getSigma());
 			int uncommon_events = manager.not(common_events);
+
 
 			int move = manager.and(a_i.getT(), common_events);
 			int keep = manager.and(a_i.getKeep(), uncommon_events);
@@ -93,19 +106,16 @@ public class DependencySet {
 			bdd_i = manager.andTo(bdd_i, a_i.getI());
 		}
 
-
-
-       int tmp3 = manager.and(me.getT(), follow);
+       	int tmp3 = manager.and(me.getT(), follow);
 		manager.deref(follow);
 
-
-		bdd_t_wave_isolated = manager.exists(tmp3,  manager.getEventCube());
-		tmp3 = manager.andTo(tmp3, bdd_keep_others);
-		bdd_t_wave = manager.exists(tmp3, manager.getEventCube() );
+		tmp3 = manager.andTo(tmp3, event_mask); // <-- must remove unused crap!
+		bdd_t_wave_isolated = manager.exists(tmp3, manager.getEventCube());	// XXX: why dones this one includes event-variables ??
+		bdd_t_wave  = manager.relProd(tmp3, bdd_keep_others, manager.getEventCube() );
 		manager.deref(tmp3);
 
-		// manager.printSet(bdd_t_wave);
 
+		manager.deref (event_mask);
 		SizeWatch.report(bdd_t_wave, "Twave");
     }
 

@@ -70,6 +70,9 @@ public class ModularLI extends BaseLI {
 
 		BDDAutomaton next;
 		while( (next = ac.next() ) != null) {
+			num_automata_added++;
+			num_syncs_done++;
+
 			if(Options.debug_on) Options.out.println("\t +++ Adding " + next.getName() + "\n");
 			if(ac.lastWasSpec() )	Ip.add(next);
 			else					Jp.add(next);

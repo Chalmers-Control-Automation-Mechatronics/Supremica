@@ -133,7 +133,7 @@ public class Supervisor
 	// ------------------------------------------------------------------------------
 	/**
 	 * returns an info string with the some relevant options highlighted
-	 *
+	 * XXX: what happens if the supervisor type does not rely on the values of Options.xyz ???
 	 */
 	public  String type() {
 		StringBuffer sb = new StringBuffer();

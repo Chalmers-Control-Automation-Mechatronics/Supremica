@@ -9,7 +9,7 @@ public class InteractiveChoice
 	implements ActionListener
 {
 	private Button bOK, bRandom;
-	/* package */ java.awt.List choice;
+	private java.awt.List choice;
 	private int selected_;
 	public InteractiveChoice(String title) {
 		super(new Frame(), title, true);
@@ -30,6 +30,8 @@ public class InteractiveChoice
 	}
 
 	public int getSelected() { return selected_; }
+	public void removeAll() { choice.removeAll(); }
+	public void add(String str) { choice.add(str); }
 
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
@@ -41,4 +43,6 @@ public class InteractiveChoice
 			hide(); // we are done
 		}
 	}
+
+
 }

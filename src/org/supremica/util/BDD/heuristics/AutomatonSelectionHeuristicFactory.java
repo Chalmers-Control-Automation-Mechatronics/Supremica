@@ -42,6 +42,9 @@ public class AutomatonSelectionHeuristicFactory {
 		 	case Options.AS_HEURISTIC_HYBRID:
 		 		ash = new ASH_Hybrid();
 		 		break;
+		 	case Options.AS_HEURISTIC_INTERACTIVE:
+		 		ash = new ASH_Interactive();
+		 		break;
 		 	default:
 		 		System.err.println("[INTERNAL] BAD AutomatonSelectionHeuristic type...");
 		 		return null;

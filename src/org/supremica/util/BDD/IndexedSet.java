@@ -75,6 +75,12 @@ public class IndexedSet {
 		for(int i = 0; i < len; i++) dst[i] = src[i];
 	}
 
+	public static boolean[] clone(boolean [] src)  {
+		boolean [] ret = new boolean[src.length];
+		copy(ret, src);
+		return ret;
+	}
+
 
 	/** left += right */
 	public static void add(boolean [] left, boolean [] right) {
