@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   GroupNodeProxy
 //###########################################################################
-//# $Id: GroupNodeProxy.java,v 1.2 2005-03-09 06:29:15 flordal Exp $
+//# $Id: GroupNodeProxy.java,v 1.3 2005-03-11 09:25:31 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -275,24 +275,26 @@ public class GroupNodeProxy extends NodeProxy {
     super.pprint(printer);
   }
 
-
-  //#########################################################################
-  //# Marshalling
-  public void toJAXBElement(final ElementType element)
-    throws JAXBException
-  {
-    super.toJAXBElement(element);
-    if (element instanceof GroupNodeType) {
-      final GroupNodeType state = (GroupNodeType) element;
-      final ElementFactory factory = new NodeRefElementFactory(state);
-      mNodes.toJAXB(factory);
-      if (mGeometry != null) {
-	final BoxGeometryType geo = mGeometry.toBoxGeometryType();
-	state.setBoxGeometry(geo);
-      }
-    }
-  }
-
+	
+	//#########################################################################
+	//# Marshalling
+	public void toJAXBElement(final ElementType element)
+		throws JAXBException
+	{
+		super.toJAXBElement(element);
+		if (element instanceof GroupNodeType) 
+		{
+			final GroupNodeType state = (GroupNodeType) element;
+			final ElementFactory factory = new NodeRefElementFactory(state);
+			mNodes.toJAXB(factory);
+			if (mGeometry != null) 
+			{
+				final BoxGeometryType geo = mGeometry.toBoxGeometryType();
+				state.setBoxGeometry(geo);
+			}
+		}
+	}
+	
 
   //#########################################################################
   //# Local Class ChildNodeIterator

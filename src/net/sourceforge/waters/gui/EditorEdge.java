@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.16 2005-03-09 06:29:15 flordal Exp $
+//# $Id: EditorEdge.java,v 1.17 2005-03-11 09:25:31 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -826,6 +826,19 @@ public class EditorEdge
 		{
 			ArrayList a = createTear();
 			
+			// Draw shadow
+			if (shadow && isHighlighted())
+			{
+				g2d.setStroke(SHADOWSTROKE);
+				g2d.setColor(getShadowColor());				
+				g2d.draw((Arc2D.Double) a.get(0));
+				g2d.draw((Line2D.Double) a.get(1));
+				g2d.draw((Line2D.Double) a.get(2));
+				g2d.setColor(getColor());
+				g2d.setStroke(BASICSTROKE);
+			}
+
+			// Draw curve
 			g2d.draw((Arc2D.Double) a.get(0));
 			g2d.draw((Line2D.Double) a.get(1));
 			g2d.draw((Line2D.Double) a.get(2));
@@ -836,9 +849,8 @@ public class EditorEdge
 		}
 		else
 		{
-			/*
 			// Draw shadow
-			if (isHighlighted())
+			if (shadow && isHighlighted())
 			{
 				g2d.setStroke(SHADOWSTROKE);
 				g2d.setColor(getShadowColor());				
@@ -846,7 +858,6 @@ public class EditorEdge
 				g2d.setColor(getColor());
 				g2d.setStroke(BASICSTROKE);
 			}
-			*/
 
 			// Draw curve
 			g2d.draw(getCurve());

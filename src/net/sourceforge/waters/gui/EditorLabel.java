@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.10 2005-03-04 11:52:45 flordal Exp $
+//# $Id: EditorLabel.java,v 1.11 2005-03-11 09:25:31 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -34,14 +34,16 @@ public class EditorLabel
 {
 	private JTextField text;
 	private JLabel label;
-	//private JLabel labelShadow;
+	///*
+	private JLabel labelShadow;
+	//*/
 	private String backup = "";
 	private Rectangle boundingRect = new Rectangle();
 	private boolean editing = false;
 	private EditorNode parent = null;
 	private LabelGeometryProxy geometry;
 
-	public static final int DEFAULTOFFSETX = 0;
+	public static final int DEFAULTOFFSETX = 5;
 	public static final int DEFAULTOFFSETY = 20;
 
 	/** 
@@ -55,7 +57,9 @@ public class EditorLabel
 	public void removeFromSurface(EditorSurface e)
 	{
 		e.remove(text);
-		//e.remove(labelShadow);
+		///*
+		e.remove(labelShadow);
+		//*/
 		e.remove(label);
 	}
 
@@ -86,7 +90,9 @@ public class EditorLabel
 
 		text.setVisible(edit);
 		label.setVisible(!edit);
-		//labelShadow.setVisible(!edit);
+		///*
+		labelShadow.setVisible(!edit);
+		//*/
 	}
 
 	public boolean getEditing()
@@ -136,16 +142,16 @@ public class EditorLabel
 		}
 
 		label.setForeground(getColor());
-		/*
-		if (isHighlighted())
+		///*
+		if (shadow && isHighlighted())
 		{
 			labelShadow.setForeground(getShadowColor());
 		}
 		else
 		{
-			labelShadow.setForeground(EditorColor.INVISIBLE);
+		    labelShadow.setForeground(EditorColor.INVISIBLE);
 		}
-		*/
+		//*/
 
 		int xposition = parent.getX() + (int) geometry.getOffset().getX();
 		int yposition = parent.getY() + (int) geometry.getOffset().getY();
@@ -155,23 +161,38 @@ public class EditorLabel
 		label.setText(text.getText());
 		label.setFont(text.getFont());
 		label.setSize(label.getPreferredSize());
-		/*
-		labelShadow.setLocation(label.getX(), label.getY());
+
+		///*
+		labelShadow.setLocation(label.getX()+2, label.getY()+2);
 		labelShadow.setText(text.getText());
-		labelShadow.setFont(text.getFont().deriveFont(Font.BOLD));
-		labelShadow.setSize(label.getPreferredSize());
-		*/
+		//labelShadow.setFont(text.getFont().deriveFont(Font.BOLD));
+		labelShadow.setSize(labelShadow.getPreferredSize());
+		//*/
 		boundingRect.setRect(xposition - 1, yposition - 14, text.getWidth(), text.getHeight());
 
 		/*
 		// Draw shadow?
-		if (isHighlighted())
+		if (shadow && isHighlighted())
 		{
 			Graphics2D g2d = (Graphics2D) g;
-			//g2d.setStroke(SHADOWSTROKE); 
+			g2d.setStroke(SHADOWSTROKE); 
 			g2d.setColor(getShadowColor());				
 			g2d.fillRect((int) boundingRect.getX(), (int) boundingRect.getY(), 
 						 (int) boundingRect.getWidth(), (int) boundingRect.getHeight());			
+			g2d.setColor(getColor());
+			g2d.setStroke(BASICSTROKE);
+		}
+		*/
+
+		/*
+		// Draw shadow?
+		if (shadow && isHighlighted())
+		{
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setStroke(SHADOWSTROKE); 
+			g2d.setColor(getShadowColor());				
+			g2d.drawLine((int) boundingRect.getX(), (int) (boundingRect.getY()+boundingRect.getHeight()), 
+						 (int) (boundingRect.getX()+boundingRect.getWidth()), (int) (boundingRect.getY()+boundingRect.getHeight()));			
 			g2d.setColor(getColor());
 			g2d.setStroke(BASICSTROKE);
 		}
@@ -239,19 +260,22 @@ public class EditorLabel
 		}
 
 		label = new JLabel(text.getText());
-		//labelShadow = new JLabel(text.getText());
-
+		
 		text.setOpaque(false);
 		label.setOpaque(false);
-		//labelShadow.setOpaque(false);
 		text.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
 		label.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
-		//labelShadow.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
 		text.setVisible(false);
 		text.setForeground(EditorColor.DEFAULTCOLOR);
 		e.add(text);
-		//e.add(labelShadow);
 		e.add(label);
+
+		///*
+		labelShadow = new JLabel(text.getText());
+		labelShadow.setOpaque(false);
+		labelShadow.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
+		e.add(labelShadow);
+		//*/
 
 		parent = par;
 		type = LABEL;

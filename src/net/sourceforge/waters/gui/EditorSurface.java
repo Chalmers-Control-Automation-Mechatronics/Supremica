@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.17 2005-03-09 06:29:15 flordal Exp $
+//# $Id: EditorSurface.java,v 1.18 2005-03-11 09:25:31 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -1492,5 +1492,11 @@ public class EditorSurface
 		{
 			return (NO_SUCH_PAGE);
 		}
+	}
+
+	public void repaint()
+	{
+		//System.err.println("Repaint!");
+		super.repaint();
 	}
 }

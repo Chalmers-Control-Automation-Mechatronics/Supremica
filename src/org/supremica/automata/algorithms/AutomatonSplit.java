@@ -60,9 +60,16 @@ public class AutomatonSplit
 
 	/**
 	 * Splits automaton in two (experimental).
+	 * @return an automata containing parts of the split or null if the operation failed.
 	 */
 	public static Automata split(Automaton original)
 	{
+		if (!original.isDeterministic())
+		{
+			logger.error("The \"Automaton split\" algorithm does not work for nondeterministic automata.");
+			return null;
+		}
+
 		Automata split = new Automata();
 		Automaton splitA = null;
 		Automaton splitB = null;
@@ -112,12 +119,14 @@ public class AutomatonSplit
 		catch (Exception ex)
 		{
 			logger.error("Error when splitting " + original);
+			return null;
 		}
 
 		// Fail?
 		if (split.size() == 0)
 		{
 			logger.info("Unable to split automaton " + original + ".");
+			return null;
 		}
 
 		// Return the results
@@ -133,10 +142,16 @@ public class AutomatonSplit
 	 *
 	 * @param supervisor The supervisor to be reduced.
 	 * @param parents The automata that were used to generate the supervisor.
-	 * @return The reduced supervisor.
+	 * @return The reduced supervisor or null if the operation failed.
 	 */
 	public static Automaton reduceAutomaton(Automaton supervisor, Automata parents)
 	{
+		if (!supervisor.isDeterministic())
+		{
+			logger.error("The \"Reduce automaton\" algorithm does not work for nondeterministic automata.");
+			return null;
+		}
+
 		if (supervisor.nbrOfStates() == 0)
 		{
 			return supervisor;
@@ -205,6 +220,7 @@ public class AutomatonSplit
 		catch (Exception ex)
 		{
 			logger.error("Error when reducing automaton " + supervisor + ", " + ex);
+			return null;
 		}
 
 		// Give the new automaton an appropriate comment

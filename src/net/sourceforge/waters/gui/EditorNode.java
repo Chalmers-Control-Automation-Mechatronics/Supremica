@@ -239,9 +239,8 @@ public class EditorNode
 			propGroup.setVisible(false);
 		}
 		
-		/*
 		// Draw shadow?
-		if (isHighlighted())
+		if (shadow && isHighlighted())
 		{
 			g2d.setStroke(SHADOWSTROKE); 
 			g2d.setColor(getShadowColor());				
@@ -249,7 +248,6 @@ public class EditorNode
 			g2d.setColor(getColor());
 			g2d.setStroke(BASICSTROKE);
 		}
-		*/
 
 		// Draw the inside of the node
 		if (colours.size() == 0)
@@ -292,10 +290,39 @@ public class EditorNode
 		g2d.setColor(getColor());
 		if (isInitial())
 		{
+			// Draw initial state arrow
+			drawInitialStateArrow(g2d);
+
 			// Draw it thicker!
 			g2d.setStroke(DOUBLESTROKE);
 		}
 		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
 		g2d.setStroke(BASICSTROKE);
+	}
+
+	private void drawInitialStateArrow(Graphics2D g2d)
+	{
+		double angle = 3*Math.PI/4; // 135 degrees
+		angle += Math.PI/2;
+		
+		// Draw line
+		int length = 15; // Line length
+		int borderX = getX() + (int) (RADIUS * Math.sin(angle));
+		int borderY = getY() + (int) (RADIUS * Math.cos(angle));
+		int endX = borderX + (int) (length * Math.sin(angle));
+		int endY = borderY + (int) (length * Math.cos(angle));
+		g2d.drawLine(borderX, borderY, endX, endY);
+		
+		// Draw triangle
+		int height = 8; // Triangle height
+		int[] xcoords = new int[3];
+		int[] ycoords = new int[3];
+		xcoords[0] = borderX;
+		ycoords[0] = borderY;
+		xcoords[1] = xcoords[0] + (int) (height * Math.sin(angle - Math.PI / 6));
+		ycoords[1] = ycoords[0] + (int) (height * Math.cos(angle - Math.PI / 6));
+		xcoords[2] = xcoords[0] + (int) (height * Math.cos(Math.PI / 2 - (angle + Math.PI / 6)));
+		ycoords[2] = ycoords[0] + (int) (height * Math.sin(Math.PI / 2 - (angle + Math.PI / 6)));
+		g2d.fillPolygon(xcoords, ycoords, 3);
 	}
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.8 2005-03-09 06:29:15 flordal Exp $
+//# $Id: ModuleWindow.java,v 1.9 2005-03-11 09:25:31 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -131,7 +131,6 @@ public class ModuleWindow
 		}
 		catch (final JAXBException exception)
 		{
-
 			// Something bad happened
 			JOptionPane.showMessageDialog(this, "Error saving module file! (JAXBException)");
 			logEntry("JAXBException - Failed to save: " + wmodf);

@@ -383,9 +383,6 @@ public class ControlledSurface
 
 	public void mouseDragged(MouseEvent e)
 	{
-		// A drag is a move
-		//mouseMoved(e); 
-
 		//if (e.getButton() == MouseEvent.BUTTON1) // Why not?
 		{
 			hasDragged = true;
@@ -663,6 +660,9 @@ public class ControlledSurface
 				// Edge drawing...
 				if (T.getPlace() == EditorToolbar.EDGE )
 				{
+					// Update highlighting!
+					updateHighlighting(e);
+
 					// There should only be one object here, or maybe two, 
 					// a node and it's label or an edge and it's labelgroup...
 					// Let's make it an iterator anyway!
@@ -950,6 +950,16 @@ public class ControlledSurface
 
 	public void mouseMoved(MouseEvent e)
 	{
+		updateHighlighting(e);
+	}
+	
+	/**
+	 * Updates highlighting based on the current location of the mouse pointer.
+	 */
+	private void updateHighlighting(MouseEvent e)
+	{
+		boolean needRepaint = false;
+
 		// Highlight things that are moved over...
 		EditorObject o = getObjectAtPosition(e.getX(), e.getY());
 
@@ -965,6 +975,8 @@ public class ControlledSurface
 			}
 
 			highlightedObject = null;
+
+			needRepaint = true;
 		}
 
 		if (o != null)
@@ -978,10 +990,16 @@ public class ControlledSurface
 			{
 				((EditorObject) children.remove(0)).setHighlighted(true);
 			}
+
+			needRepaint = true;
 		}
 
-		repaint();
-	}
+		// Need repaint?
+		if (needRepaint)
+		{
+			repaint();
+		}
+    }
 
 	public void mouseEntered(MouseEvent e)
 	{

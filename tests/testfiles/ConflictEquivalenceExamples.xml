@@ -259,7 +259,7 @@
 		<Transition source="0" dest="2" event="tau"/>
 	</Transitions>
 </Automaton>
-<Automaton name="F2" type="Plant">
+<Automaton name="F" type="Plant">
 	<Events>
 		<Event id="0" label="a"/>
 		<Event id="1" label="b"/>
@@ -284,7 +284,7 @@
 		<Transition source="5" dest="5" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="minimal(F2)" type="Specification">
+<Automaton name="minimal(F)" type="Specification">
 	<Events>
 		<Event id="0" label="a"/>
 		<Event id="1" label="b"/>

@@ -305,10 +305,10 @@ public class MinimizationDialog
 
 			minimizationStrategy = new JComboBox(MinimizationStrategy.toArray());
 			Box strategyBox = Box.createHorizontalBox();
-			strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
+			strategyBox.add(new JLabel("     ")); // Ugly fix to get stuff centered
 			strategyBox.add(new JLabel("Strategy: "));
 			strategyBox.add(minimizationStrategy);
-			strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
+			strategyBox.add(new JLabel("     ")); // Ugly fix to get stuff centered
 		
 			/*
 			  targetAlphabetSelector = new List(7, true);
