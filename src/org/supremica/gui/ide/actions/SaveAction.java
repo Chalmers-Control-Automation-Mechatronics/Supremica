@@ -14,11 +14,9 @@ public class SaveAction
 {
 	private static Logger logger = LoggerFactory.createLogger(SaveAction.class);
 
-	private IDE ide;
-
-	public SaveAction(IDE ide)
+	public SaveAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Save...");
 		putValue(Action.SHORT_DESCRIPTION, "Save the project");

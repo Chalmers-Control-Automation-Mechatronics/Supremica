@@ -11,11 +11,10 @@ import org.supremica.gui.ide.IDE;
 public class EditorSelectAction
 	extends IDEAction
 {
-	private IDE ide;
 
-	public EditorSelectAction(IDE ide)
+	public EditorSelectAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Select");
 		putValue(Action.SHORT_DESCRIPTION, "Select");

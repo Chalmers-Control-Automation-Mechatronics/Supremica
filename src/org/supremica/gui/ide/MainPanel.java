@@ -62,6 +62,10 @@ abstract class MainPanel
 
 	public abstract void addToolBarEntries(IDEToolBar toolbar);
 
+	public abstract void disablePanel();
+
+	public abstract void enablePanel();
+
 	public void setRightComponent(JComponent newComponent)
 	{
 		JComponent oldComponent = getRightComponent();
@@ -76,17 +80,19 @@ abstract class MainPanel
 				oldSize = oldComponent.getSize();
 			}
 
-			if (newComponent == null)
+			if (newComponent == null || newComponent == getEmptyRightPanel())
 			{
 //				emptyRightPanel.setPreferredScrollableViewportSize(oldSize);
 				emptyRightPanel.setPreferredSize(oldSize);
 				splitPanelHorizontal.setRightComponent(emptyRightPanel);
+				disablePanel();
 			}
 			else
 			{
 //				newComponent.setPreferredScrollableViewportSize(oldSize);
 				newComponent.setPreferredSize(oldSize);
 				splitPanelHorizontal.setRightComponent(newComponent);
+				enablePanel();
 			}
 		}
 		validate();

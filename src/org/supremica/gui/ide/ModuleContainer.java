@@ -116,9 +116,14 @@ public class ModuleContainer
 		return theVisualProject;
 	}
 
+/*
+	public EditorWindowInterface getEditorWindowInterface()
+	{
+		return null;
+	}
+*/
 	public void updateAutomata()
 	{
-		//System.err.println("updateAutomata");
 		ModuleProxy currModule = getModuleProxy();
 		ProjectBuildFromWaters builder = new ProjectBuildFromWaters();
 		Project supremicaProject = builder.build(currModule);

@@ -52,4 +52,12 @@ public class AnalyzerPanel
 	public void addToolBarEntries(IDEToolBar toolBar)
 	{
 	}
+
+	public void disablePanel()
+	{
+	}
+
+	public void enablePanel()
+	{
+	}
 }

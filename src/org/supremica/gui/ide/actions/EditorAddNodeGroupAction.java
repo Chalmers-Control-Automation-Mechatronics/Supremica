@@ -11,11 +11,10 @@ import org.supremica.gui.ide.IDE;
 public class EditorAddNodeGroupAction
 	extends IDEAction
 {
-	private IDE ide;
 
-	public EditorAddNodeGroupAction(IDE ide)
+	public EditorAddNodeGroupAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Add Node Group");
 		putValue(Action.SHORT_DESCRIPTION, "Add Node Group");

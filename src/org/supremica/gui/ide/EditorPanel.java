@@ -71,4 +71,29 @@ public class EditorPanel
 		toolBar.add(getActions().editorAddEventAction, editorButtonGroup);
 	}
 
+	public void disablePanel()
+	{
+		getActions().editorSelectAction.setEnabled(false);
+		getActions().editorAddNodeAction.setEnabled(false);
+		getActions().editorAddNodeGroupAction.setEnabled(false);
+		getActions().editorAddEdgeAction.setEnabled(false);
+		getActions().editorAddEventAction.setEnabled(false);
+	}
+
+	public void enablePanel()
+	{
+		getActions().editorSelectAction.setEnabled(true);
+		getActions().editorAddNodeAction.setEnabled(true);
+		getActions().editorAddNodeGroupAction.setEnabled(true);
+		getActions().editorAddEdgeAction.setEnabled(true);
+		getActions().editorAddEventAction.setEnabled(true);
+	}
+
+/*
+	public EditorWindowInterface getEditorWindowInterface()
+	{
+		return null;
+//		return getEditorWindowInterface();
+	}
+*/
 }

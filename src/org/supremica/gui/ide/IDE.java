@@ -2,6 +2,8 @@
 package org.supremica.gui.ide;
 
 import org.supremica.gui.ide.actions.IDEAction;
+import org.supremica.gui.ide.actions.IDEActionInterface;
+
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
@@ -19,7 +21,7 @@ import org.supremica.Version;
 
 public class IDE
     extends JFrame
-    implements ChangeListener
+    implements ChangeListener, IDEActionInterface
 {
 	static
 	{
@@ -182,6 +184,10 @@ public class IDE
 		return this;
 	}
 
+	public IDE getIDE()
+	{
+		return this;
+	}
 	private void setToolBar(JToolBar toolBar)
 	{
 		//System.err.println("setToolBar");
@@ -219,10 +225,14 @@ public class IDE
 		{
 			setToolBar(getActiveModuleContainer().getAnalyzerPanel().getToolBar(ideToolBar));
 			getActiveModuleContainer().updateAutomata();
+			getActiveModuleContainer().getEditorPanel().disablePanel();
+			getActiveModuleContainer().getAnalyzerPanel().enablePanel();
 		}
 		if (currTab == getActiveModuleContainer().getEditorPanel())
 		{
 			setToolBar(getActiveModuleContainer().getEditorPanel().getToolBar(ideToolBar));
+			getActiveModuleContainer().getEditorPanel().enablePanel();
+			getActiveModuleContainer().getAnalyzerPanel().disablePanel();
 		}
 		validate();
 		repaint();

@@ -12,11 +12,9 @@ import org.supremica.gui.ide.IDE;
 public class ExitAction
 	extends IDEAction
 {
-	private IDE ide;
-
-	public ExitAction(IDE ide)
+	public ExitAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Exit");
 		putValue(Action.SHORT_DESCRIPTION, "Exit");

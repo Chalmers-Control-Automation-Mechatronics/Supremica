@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.6 2005-03-02 11:39:21 knut Exp $
+//# $Id: OpenAction.java,v 1.7 2005-03-03 23:40:20 knut Exp $
 //###########################################################################
 
 
@@ -36,11 +36,9 @@ import org.supremica.gui.ide.ModuleContainer;
 public class OpenAction
 	extends IDEAction
 {
-	private IDE ide;
-
-	public OpenAction(IDE ide)
+	public OpenAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Open...");
 		putValue(Action.SHORT_DESCRIPTION, "Open a new project");
@@ -130,7 +128,7 @@ public class OpenAction
 				buffer.append(vmodfile.toString());
 				buffer.append("' not found!");
 				final String shown = buffer.toString();
-				JOptionPane.showMessageDialog(ide, shown);
+				JOptionPane.showMessageDialog(ide.getFrame(), shown);
 			}
 		}
 
@@ -163,7 +161,7 @@ public class OpenAction
 		//# Auxiliary Methods
 		private void installContainer(final ModuleProxy module)
 		{
-			ModuleContainer moduleContainer = new ModuleContainer(ide, module);
+			ModuleContainer moduleContainer = new ModuleContainer(ide.getIDE(), module);
 			ide.add(moduleContainer);
 			ide.setActive(moduleContainer);
 		}
@@ -182,7 +180,7 @@ public class OpenAction
 			buffer.append("' - ");
 			buffer.append(exception.getMessage());
 			final String shown = buffer.toString();
-			JOptionPane.showMessageDialog(ide, shown);
+			JOptionPane.showMessageDialog(ide.getFrame(), shown);
 		}
 
 	}

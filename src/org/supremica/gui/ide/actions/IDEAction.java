@@ -9,6 +9,12 @@ public abstract class IDEAction
 	extends AbstractAction
 {
 	private AbstractButton theButton = null;
+	protected IDEActionInterface ide;
+
+	public IDEAction(IDEActionInterface ide)
+	{
+		this.ide = ide;
+	}
 
 	public abstract void doAction();
 

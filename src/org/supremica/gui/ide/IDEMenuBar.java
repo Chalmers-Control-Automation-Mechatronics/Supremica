@@ -49,6 +49,15 @@ public class IDEMenuBar
 
 
 		//
+		// Configure
+		//
+
+		JMenu menuConfigure = new JMenu("Configure");
+		add(menuConfigure);
+
+		menuConfigure.add(new JMenuItem(ide.getActions().editorOptionsAction));
+
+		//
 		// Module
 		//
 

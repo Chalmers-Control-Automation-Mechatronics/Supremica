@@ -11,11 +11,10 @@ import org.supremica.gui.ide.IDE;
 public class EditorAddEventAction
 	extends IDEAction
 {
-	private IDE ide;
 
-	public EditorAddEventAction(IDE ide)
+	public EditorAddEventAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Add Event");
 		putValue(Action.SHORT_DESCRIPTION, "Add Event");

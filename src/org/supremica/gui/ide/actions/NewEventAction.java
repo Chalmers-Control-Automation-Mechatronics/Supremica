@@ -13,11 +13,9 @@ import org.supremica.gui.ide.EventEditorDialog;
 public class NewEventAction
 	extends IDEAction
 {
-	private IDE ide;
-
-	public NewEventAction(IDE ide)
+	public NewEventAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "New Event");
 		putValue(Action.SHORT_DESCRIPTION, "New event");
@@ -32,6 +30,6 @@ public class NewEventAction
 
 	public void doAction()
 	{
-		EventEditorDialog diag = new EventEditorDialog(ide);
+//		EventEditorDialog diag = new EventEditorDialog(ide);
 	}
 }

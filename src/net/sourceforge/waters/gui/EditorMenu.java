@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.9 2005-03-03 21:49:14 flordal Exp $
+//# $Id: EditorMenu.java,v 1.10 2005-03-03 23:40:20 knut Exp $
 //###########################################################################
 
 
@@ -86,14 +86,15 @@ public class EditorMenu
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		menu.addSeparator();
-		
+
+	/*
 		menuItem = new JMenuItem("Copy");
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
+	*/
 
-
-		menuItem = new JMenuItem("Copy as WMF");
+		menuItem = new JMenuItem("Copy");
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
 
@@ -176,6 +177,9 @@ public class EditorMenu
 		{
 			ControlledSurface surface = root.getControlledSurface();
 
+			// System.err.println(surface.getDrawnArea());
+
+
 			PrinterJob printJob = PrinterJob.getPrinterJob();
 			if (printJob.getPrintService() == null)
 			{
@@ -186,14 +190,14 @@ public class EditorMenu
 			printJob.setPrintable((EditorSurface) surface);
 
 			// Show printing dialog
-			if (printJob.printDialog()) 
+			if (printJob.printDialog())
 			{
-				try 
+				try
 				{
 					// Print!
 					printJob.print();
-				} 
-				catch (Exception ex) 
+				}
+				catch (Exception ex)
 				{
 					System.err.println(ex.getStackTrace());
 				}

@@ -11,11 +11,9 @@ import org.supremica.gui.ide.IDE;
 public class CloseAction
 	extends IDEAction
 {
-	private IDE ide;
-
-	public CloseAction(IDE ide)
+	public CloseAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Close");
 		putValue(Action.SHORT_DESCRIPTION, "Close module");

@@ -11,11 +11,9 @@ import org.supremica.gui.ide.IDE;
 public class NewAction
 	extends IDEAction
 {
-	private IDE ide;
-
-	public NewAction(IDE ide)
+	public NewAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "New");
 		putValue(Action.SHORT_DESCRIPTION, "New module");

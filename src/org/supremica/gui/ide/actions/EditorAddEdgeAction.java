@@ -11,11 +11,9 @@ import org.supremica.gui.ide.IDE;
 public class EditorAddEdgeAction
 	extends IDEAction
 {
-	private IDE ide;
-
-	public EditorAddEdgeAction(IDE ide)
+	public EditorAddEdgeAction(IDEActionInterface ide)
 	{
-		this.ide = ide;
+		super(ide);
 
 		putValue(Action.NAME, "Add Edge");
 		putValue(Action.SHORT_DESCRIPTION, "Add Edge");

@@ -5,7 +5,7 @@ import org.supremica.gui.ide.IDE;
 
 public class Actions
 {
-	private IDE ide;
+	private IDEActionInterface ide;
 
 	public NewAction newAction;
 	public OpenAction openAction;
@@ -20,7 +20,9 @@ public class Actions
 	public EditorAddEdgeAction editorAddEdgeAction;
 	public EditorAddEventAction editorAddEventAction;
 
-	public Actions(IDE ide)
+	public EditorOptionsAction editorOptionsAction;
+
+	public Actions(IDEActionInterface ide)
 	{
 		this.ide = ide;
 
@@ -36,5 +38,9 @@ public class Actions
 		editorAddNodeGroupAction = new EditorAddNodeGroupAction(ide);
 		editorAddEdgeAction = new EditorAddEdgeAction(ide);
 		editorAddEventAction = new EditorAddEventAction(ide);
+
+		editorOptionsAction = new EditorOptionsAction(ide);
+
 	}
+
 }

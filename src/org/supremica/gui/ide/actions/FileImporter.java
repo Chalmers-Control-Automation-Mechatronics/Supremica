@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: FileImporter.java,v 1.2 2005-02-24 09:04:13 robi Exp $
+//# $Id: FileImporter.java,v 1.3 2005-03-03 23:40:20 knut Exp $
 //###########################################################################
 
 
@@ -16,7 +16,7 @@ import java.io.File;
 
 abstract class FileImporter
 {
-	FileImporter(JFileChooser fileOpener, IDE ide)
+	FileImporter(JFileChooser fileOpener, IDEActionInterface ide)
 	{
 		if (fileOpener.showOpenDialog(ide.getFrame()) == JFileChooser.APPROVE_OPTION)
 		{
