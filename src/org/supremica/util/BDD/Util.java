@@ -89,12 +89,81 @@ public class Util
 
 
 
+
+
+
+
+	/** helper function to sort_variable_list (quicksort partition) */
+	private static int partition_bdd(JBDD manager, int [] list, int p, int r) {
+		int x = manager.internal_index(list[r]);
+		int i = p -1, tmp;
+
+		for(int j = p; j < r; j++) {
+			if(manager.internal_index(list[j])<= x) {
+				i++;
+				// SWAP I <-> J
+				// System.out.println("SWAP "+i+" <-> "+j);
+				tmp = list[i];
+				list[i] = list[j];
+				list[j] = tmp;
+			}
+		}
+
+		// SWAP I+1 <-> r
+		i++;
+		// System.out.println("SWAP2 "+i+" <-> "+r);
+		tmp = list[i];
+		list[i] = list[r];
+		list[r] = tmp;
+		return i;
+	}
+
+	/** helper function to sort_variable_list (quick sort function) */
+	private static void quicksort_bdd(JBDD manager, int [] list, int p, int r) {
+		if(p < r) {
+				int q = partition_bdd(manager, list, p, r);
+				quicksort_bdd(manager,list, p, q-1);
+				quicksort_bdd(manager,list, q+1,r);
+
+		}
+	}
+
+	/**
+	 * sort a list of BDD _variables_ (not trees) from top to bottom)
+	 * if reverse_ is not set, the highest BDD will be put first
+	 * if revesre_ is set, the lowest BDD (nearest to terminal 0/1) are put first in the list
+	 */
+	public static void sort_variable_list(JBDD manager, int [] variables, int size, boolean reverse_) {
+		quicksort_bdd(manager, variables, 0, size-1);
+		if(reverse_) reverse(variables,size);
+	}
+
+
+	/* reverse some list */
+	public static void reverse(Object [] variables, int size) {
+		for(int j = 0; j < size / 2; j++) {
+			int i = size - j -1;
+			Object tmp = variables[i];
+			variables[i] = variables[j];
+			variables[j] =  tmp;
+		}
+	}
+
+	/** reverse some array */
+	public static void reverse(int [] variables, int size) {
+		for(int j = 0; j < size / 2; j++) {
+			int i = size - j -1;
+			int tmp = variables[i];
+			variables[i] = variables[j];
+			variables[j] =  tmp;
+		}
+	}
+
+
 	/**
      * write to stderr and wait until user presses ENTER
      *
      */
-
-
 	public static void notify(String msg) {
 		System.err.println(msg);
 		System.err.flush();

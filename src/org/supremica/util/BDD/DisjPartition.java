@@ -96,16 +96,16 @@ public class DisjPartition {
     /** 1-step forward rechables */
 
     public int image(int q_k) {
-	int front = manager.getZero(); manager.ref(front);
-	for(int i = 0; i < curr; i++) {
-	    int tmp = manager.relProd(clusters[i].twave, q_k, cube);
-	    front = manager.orTo(front, tmp);
-	    manager.deref(tmp);
-	}
+		int front = manager.getZero(); manager.ref(front);
+		for(int i = 0; i < curr; i++) {
+			int tmp = manager.relProd(clusters[i].twave, q_k, cube);
+			front = manager.orTo(front, tmp);
+			manager.deref(tmp);
+		}
 
-	int front_s = manager.replace( front, sp2s);
-	manager.deref(front);
-	return front_s;
+		int front_s = manager.replace( front, sp2s);
+		manager.deref(front);
+		return front_s;
     }
 
 

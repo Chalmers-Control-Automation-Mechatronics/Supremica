@@ -709,7 +709,9 @@ class BDDPanel
 	algorithmFamily.addItem("Conjunctive");
 	algorithmFamily.addItem("Disjunctive");
 	algorithmFamily.addItem("Smoothed: Monotonic ");
-	algorithmFamily.addItem("Smoothed: Path");
+	algorithmFamily.addItem("Smoothed: Path          (V1)");
+	algorithmFamily.addItem("Smoothed: Keep          (V2)");
+	algorithmFamily.addItem("Smoothed: Partitioned   (P1)");
 	algorithmFamily.setSelectedIndex(Options.algo_family);
 
 

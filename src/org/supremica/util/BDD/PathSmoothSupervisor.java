@@ -35,24 +35,19 @@ public class PathSmoothSupervisor extends DisjSupervisor
 		timer.reset();
 		SizeWatch.setOwner("PathSmoothSupervisor.computeReachables");
 
-
-		DisjPartition dp = getDisjPartition();
-		PathSmoothPartition psp = new PathSmoothPartition(manager, dp.getClusters(), dp.getNumberOfClusters(), true);
+		PathSmoothPartition psp = new PathSmoothPartition(manager, dop.getClusters(), dop.getSize(), true);
 
 		int i_all   = manager.and(plant.getI(), spec.getI());
-		int r_all_p, r_all = i_all, front = i_all;
-		manager.ref(i_all); //gets derefed by orTo and finally a deref
-		manager.ref(front); // get derefed
+		int r_all_p, r_all = i_all;
 
 
 		do {
 			do {
 				r_all_p = r_all;
 
-				int new_front = dp.image(front);
-				r_all = manager.orTo(r_all, new_front);
-				manager.deref(front);
-				front = new_front;
+				int tmp = psp.image(r_all);
+				r_all = manager.orTo(r_all, tmp);
+				manager.deref( tmp );
 
 				if(gf != null)    gf.add( manager.nodeCount( r_all));
 			} while(r_all_p != r_all);
@@ -60,8 +55,6 @@ public class PathSmoothSupervisor extends DisjSupervisor
 
 
 		// cleanup
-		manager.deref(front);
-		manager.deref(i_all);
 		psp.cleanup();
 
 		has_reachables = true;
@@ -72,52 +65,46 @@ public class PathSmoothSupervisor extends DisjSupervisor
 	}
 
 
-  protected void computeCoReachables() {
-	GrowFrame gf = null;
-	if(Options.show_grow) gf = new GrowFrame("backward reachability (path smoothed)");
+	protected void computeCoReachables() {
+		GrowFrame gf = null;
+		if(Options.show_grow) gf = new GrowFrame("backward reachability (path smoothed)");
 
-	timer.reset();
-	SizeWatch.setOwner("PathSmoothSupervisor.computeCoReachables");
-	DisjPartition dp = getDisjPartition();
-	PathSmoothPartition psp = new PathSmoothPartition(manager, dp.getClusters(), dp.getNumberOfClusters(), false);
+		timer.reset();
+		SizeWatch.setOwner("PathSmoothSupervisor.computeCoReachables");
+		PathSmoothPartition psp = new PathSmoothPartition(manager, dop.getClusters(), dop.getSize(), false);
 
-	int permute1 = manager.getPermuteS2Sp();
-	int permute2 = manager.getPermuteSp2S();
+		int permute1 = manager.getPermuteS2Sp();
+		int permute2 = manager.getPermuteSp2S();
 
-	int m_all = GroupHelper.getM(manager, spec, plant);
-	int front, r_all_p, r_all;
-	front = r_all = manager.replace(m_all, permute1);
-	manager.deref(m_all);
-	manager.ref(r_all);
+		int m_all = GroupHelper.getM(manager, spec, plant);
+		int r_all_p, r_all;
+		r_all = manager.replace(m_all, permute1);
+		manager.deref(m_all);
 
 
-	SizeWatch.report(r_all, "Qm");
+		SizeWatch.report(r_all, "Qm");
 
 
-	do {
 		do {
-			r_all_p = r_all;
-			int new_front = dp.preImage(front);
-			r_all = manager.orTo(r_all, new_front);
-			manager.deref(front);
-			front = new_front;
+			do {
+				r_all_p = r_all;
+				int tmp = psp.preImage(r_all);
+				r_all = manager.orTo(r_all, tmp);
+				manager.deref(tmp);
 
-			if(gf != null)    gf.add( manager.nodeCount( r_all));
-		} while(r_all_p != r_all);
-	} while(psp.step());
+				if(gf != null)    gf.add( manager.nodeCount( r_all));
+			} while(r_all_p != r_all);
+		} while(psp.step());
 
-	has_coreachables = true;
-	bdd_coreachables = manager.replace(r_all, permute2);
+		has_coreachables = true;
+		bdd_coreachables = manager.replace(r_all, permute2);
 
-	// cleanup:
-	psp.cleanup();
-	manager.deref(r_all);
-	manager.deref(front);
+		// cleanup:
+		psp.cleanup();
 
+		SizeWatch.report(bdd_coreachables, "Qco");
+		timer.report("Co-reachables found (path smoothed)");
+		if(gf != null) gf.stopTimer();
 
-	SizeWatch.report(bdd_coreachables, "Qco");
-	timer.report("Co-reachables found (path smoothed)");
-	if(gf != null) gf.stopTimer();
-	dp.cleanup();
     }
 }

@@ -3,7 +3,6 @@ package org.supremica.util.BDD;
 import java.util.*;
 
 
-
 /**
  * Smoothing  based on locking some paths in partitions?
  *
@@ -36,7 +35,6 @@ public class PathSmoothPartition {
 		pathclusters = new PathCluster[size];
 		for(int i = 0; i < size; i++)
 			pathclusters[i] = new PathCluster(manager, clusters[i], forward );
-
 
 		step();
 	}
@@ -123,7 +121,6 @@ public class PathSmoothPartition {
 		private int [] v_cubep;
 		private int bdd_curr_i, bdd_curr_t;
 
-
 		public PathCluster(BDDAutomata manager, Cluster cluster, boolean forward) {
 			this.cluster = cluster;
 			this.manager = manager;
@@ -170,6 +167,9 @@ public class PathSmoothPartition {
 				for(int i = 0; i < size; i++) v_cubep[bits++] = vp[i];
 			}
 
+
+			// EXPRIMENTAL: sort the vars:
+			Util.sort_variable_list(manager, v_cubep, bits, false);
 
 			// initilaized, now step forward one initial step
 			step();

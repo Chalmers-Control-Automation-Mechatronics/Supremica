@@ -19,10 +19,12 @@ public class SupervisorFactory {
 	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,automata);
+	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,automata);
+	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,automata);
 	}
 
 	// the type is not supported:
-	throw new Exception("Current algorithm family not implemented");
+	throw new Exception("Current BDD algorithm family not implemented");
     }
 
     // ----------------------------------------------------------------------------------
@@ -35,9 +37,11 @@ public class SupervisorFactory {
  	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_MONO: return new SmoothSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,plant, spec);
+	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,plant, spec);
+	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,plant, spec);
 	}
 
 	// the type is not supported:
-	throw new Exception("Current algorithm family not implemented");
+	throw new Exception("Current BDD algorithm family not implemented");
     }
 }
