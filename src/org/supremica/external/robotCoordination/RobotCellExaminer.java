@@ -173,11 +173,11 @@ public class RobotCellExaminer
 				Robot robot = (Robot) robotIt.next();
 
 				// Initalize
+				logger.debug("Starting robot " + robot + ".");
 				robot.start();
 
 				// Generate span for each "path", i.e. unique pair of positions
 				LinkedList positions = robot.getPositions();
-
 				for (int i = 0; i < positions.size(); i++)
 				{
 					Position from = (Position) positions.get(i);
@@ -187,6 +187,7 @@ public class RobotCellExaminer
 						Position to = (Position) positions.get(j);
 
 						// Generate span!
+						logger.debug("Generating span from " + from + " to " + to + " for " + robot + ".");
 						robot.generateSpan(from, to);
 					}
 				}
@@ -244,8 +245,8 @@ public class RobotCellExaminer
 			zoneAutomata = cell.generateZoneAutomata();
 			robotAutomata = cell.generateRobotAutomata();
 
-			ActionMan.getGui().addAutomata(zoneAutomata);
 			ActionMan.getGui().addAutomata(robotAutomata);
+			ActionMan.getGui().addAutomata(zoneAutomata);
 		}
 		catch (Exception ex)
 		{
@@ -280,6 +281,7 @@ public class RobotCellExaminer
 						Position to = (Position) positions.get(j);
 
 						// Examine path for collisions
+						logger.debug("Examining collisions from " + from + " to " + to + " for " + robot + ".");
 						cell.examineCollisions(robot, from, to);
 					}
 				}

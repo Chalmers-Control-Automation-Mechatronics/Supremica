@@ -47,7 +47,7 @@ public class RobotStudioInterface
 	private final static String FINISHEVENT_NAME = "fin";
 
 	/** Via point suffix */
-	private final static String VIAPOINT_SUFFIX = "_vp";
+	private final static String VIAPOINT_SUFFIX = "vp";
 
 	/** Colours */
 	private static Variant RS_WHITE;
@@ -144,7 +144,11 @@ public class RobotStudioInterface
 			RS_BLUE = new Variant(new SafeArray(new int[]{ 0, 0, 255 }), false);
 		}
 
-		// RobotCell interface methods
+		// RobotCell INTERFACE METHODS //
+
+		/**
+		 * Opens station in the RobotStudio environment
+		 */
 		public void openStation(File file)
 			throws Exception
 		{
@@ -152,7 +156,7 @@ public class RobotStudioInterface
 			IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
 			station = Station.getStationFromUnknown(iStation);
 
-			// Add automata
+			// Build robot automata
 			LinkedList robots = getRobots();
 			robotAutomata = buildRobotAutomata(robots);
 		}
@@ -237,7 +241,7 @@ public class RobotStudioInterface
 			{
 				Robot robot = (Robot) robotIt.next();
 
-				// One aut for the robot itself
+				// ONE AUTOMATON FOR THE ROBOT ITSELF //
 				Automaton aut = new Automaton(robot.getName());
 				aut.setType(AutomatonType.Plant);
 				// Build the states...
@@ -286,7 +290,7 @@ public class RobotStudioInterface
 					}
 					else if (fromState.getName().equals(FINISHSTATE_NAME))
 					{
-						// Never mind
+						// No outgoing from final state...
 					}
 					else
 					{
@@ -331,7 +335,7 @@ public class RobotStudioInterface
 										Arc arc = new Arc(fromState, toState, event);
 										aut.addArc(arc);
 
-										// Only once if this was the home position
+										// Only once if this was the home position (ugly hack... whatever)
 										if (i==0)
 										{
 											break;
@@ -346,11 +350,12 @@ public class RobotStudioInterface
 				// Add automaton
 				robotAut.addAutomaton(aut);
 
-				// One aut per target
+				// ONE AUTOMATON PER TARGET //
 				LinkedList positions = robot.getPositions();
-				for (Iterator posIt = positions.iterator(); posIt.hasNext();)
+				// Skip home position (i=1...)
+				for (int i=1; i<positions.size(); i++)
 				{
-					Position pos = (Position) posIt.next();
+					Position pos = (Position) positions.get(i);
 
 					aut = new Automaton(robot.getName() + "_" + pos.getName());
 					State notVisited = new State("0");
@@ -360,15 +365,39 @@ public class RobotStudioInterface
 					aut.addState(notVisited);
 					aut.addState(visited);
 					aut.setType(AutomatonType.Plant);
+
+					// Add transitions
+					for (int j=0; j<positions.size(); j++)
+					{
+						if (i==j)
+						{
+							continue;
+						}
+
+						// Create event
+						String name = ((Position) positions.get(j)).getName() + pos.getName();
+						LabeledEvent event = new LabeledEvent(name);
+						if (!aut.getAlphabet().contains(event)) // Is always true?
+						{
+							aut.getAlphabet().addEvent(event);
+						}
+
+						// Add arc
+						Arc arc = new Arc(notVisited, visited, event);
+						aut.addArc(arc);
+					}
+
 					aut.setComment("This automaton is not ready generated!");
 					robotAut.addAutomaton(aut);
 				}
 
-				// One for the sequence length
+				/*
+				// ONE AUTOMATON FOR THE SEQUENCE LENGTH //
 				aut = new Automaton(robot.getName() + "_seq");
 				aut.setType(AutomatonType.Plant);
 				aut.setComment("This automaton is not ready generated!");
 				robotAut.addAutomaton(aut);
+				*/
 			}
 
 			return robotAut;
@@ -441,7 +470,7 @@ public class RobotStudioInterface
 
 		/**
 		 * For each path try to calculate the points in which each robot intersects a mutex zone
-		 * (that is an entity in the part named "MutexZones").
+		 * (that is an entity in the part named ZONEPART_NAME).
 		 * Each new point found is added to the corresponding path.
 		 */
 		public void examineCollisions(Robot robot, Position from, Position to)
@@ -509,6 +538,7 @@ public class RobotStudioInterface
 				path.getTargetRefs().item(var(2)).delete();
 				path.insert(toTarget);
 				path.getTargetRefs().item(var(path.getTargetRefs().getCount())).setMotionType(1);
+				// This is where it goes wrong...
 				((RichPosition) richPath.getFirst()).setPosition(fromTarget.getName());
 				((RichPosition) richPath.getLast()).setPosition(toTarget.getName());
 
@@ -639,7 +669,7 @@ public class RobotStudioInterface
 					try
 					{
 						// Note that the intersection between two objects can give
-						// more than one object!
+						// more than one object! The boolean is for keeping / not keeping original
 						IEntities intersections = spanA.intersect(spanB, true);
 						IPart parent = intersections.getParent();
 
@@ -668,6 +698,7 @@ public class RobotStudioInterface
 							zoneAutomata.addAutomaton(aut);
 						}
 
+						// Delete this span
 						parent.delete();
 					}
 					catch (Exception e)
@@ -805,6 +836,7 @@ public class RobotStudioInterface
 				// ("already colliding with")
 				try
 				{
+					logger.info("Zones");
 					for (int j = 1; j <= zones.getEntities().getCount(); j++)
 					{
 						IEntity zone = zones.getEntities().item(var(j));
@@ -815,6 +847,7 @@ public class RobotStudioInterface
 							objectsColliding.add(new Collider(zoneName));
 						}
 					}
+					logger.info("Zunes");
 
 					// Print the objects already colliding
 					for (ListIterator it = objectsColliding.listIterator();
@@ -968,7 +1001,8 @@ public class RobotStudioInterface
 						//viaPointName = viaPointName + path.getName() + nbrOfTimesCollision;
 						//String viaPointName = "In" + objectName + "_";
 						//viaPointName = viaPointName + nbrOfTimesCollision;
-						String viaPointName = mechanism.getName() + VIAPOINT_SUFFIX + nbrOfTimesCollision;
+						int robotIndex = getRobotIndex(mechanism.getName());
+						String viaPointName = mechanism.getName().substring(5) + VIAPOINT_SUFFIX + nbrOfTimesCollision;
 						ITarget viaTarget = createTargetAtTCP(viaPointName);
 
 						// Insert the new target in the path
@@ -1036,7 +1070,7 @@ public class RobotStudioInterface
 						//viaPointName = viaPointName + path.getName() + nbrOfTimesCollision;
 						//String viaPointName = "Out" + objectName + "_";
 						//viaPointName = viaPointName + nbrOfTimesCollision;
-						String viaPointName = mechanism.getName() + VIAPOINT_SUFFIX + nbrOfTimesCollision;
+						String viaPointName = mechanism.getName().substring(5) + VIAPOINT_SUFFIX + nbrOfTimesCollision;
 						ITarget viaTarget = createTargetAtTCP(viaPointName);
 
 						// Insert the new target in the path
@@ -1298,7 +1332,7 @@ public class RobotStudioInterface
 
 			try
 			{
-				spans = addPart(mechanism.getName() + SPANS_SUFFIX);
+				spans = addPart(getName() + SPANS_SUFFIX);
 			}
 			catch (Exception ex)
 			{
@@ -1477,7 +1511,7 @@ public class RobotStudioInterface
 			// We don't have to wait here! In RS2.0 it was necessary, but in RS3.0,
 			// the above call won't return until the controller has started!
 			// YES IT WILL! Better wait at least a second... ¤#&#@¤#%#!
-			Thread.sleep(1000);
+			Thread.sleep(1500);
 
 			// Return the controller
 			return controller;
@@ -1730,10 +1764,10 @@ public class RobotStudioInterface
 			private static final double BOXSIZE = 0.12;    // [m]
 			private static final double CYLINDERLENGTH = 1.1;    // [m]
 			private static final double CYLINDERRADIUS = 0.06;    // [m]
-			private static final double STEPSIZE = BOXSIZE * 3 / 5;    // [m]
+			private static final double STEPSIZE = BOXSIZE * 3 / 4;    // [m]
 
 			// The MARGIN that should be added to all sides
-			private static final double MARGIN = 0.06;    // [m]
+			private static final double MARGIN = 0.05;    // [m]
 			private Transform oldTransform;
 			private Part temp;
 
@@ -1790,11 +1824,9 @@ public class RobotStudioInterface
 			// Called when the simulation stops
 			public void stop()
 			{
-
 				// Generate the union of the spanEntities
 				try
 				{
-
 					// Create a final cover
 					// createSpanEntity(tool0.getTransform());
 					// IEntities spanEntities = spans.getEntities();
@@ -1803,8 +1835,8 @@ public class RobotStudioInterface
 					if (spanEntities.getCount() >= 2)
 					{    // At least two spanEntities
 						unionEntity = spanEntities.item(var(2));
-
 						IPart oldPart = null;
+						boolean shutup = false;
 
 						for (int i = spanEntities.getCount(); i > 1; i--)
 						{
@@ -1817,7 +1849,11 @@ public class RobotStudioInterface
 							}
 							catch (Exception ex)
 							{
-								logger.warn("Disjoint entities in span?");
+								if (!shutup)
+								{
+									logger.warn("Disjoint entities in span?");
+									shutup = true;
+								}
 
 								// logger.info("Problem when joining entities. Disjoint? " + ex);
 								continue;
@@ -1850,11 +1886,17 @@ public class RobotStudioInterface
 					spans.addEntity(unionEntity);
 					parent.delete();
 
-					//unionEntity.getParent().setName(mechanism.getName() + SPAN_SUFFIX);
 					// If there are elements left in temp, make them red!
 					temp.setColor(RS_RED);
 					temp.setRelativeTransparency((float) 0.9);
 					station.getSelections().removeAll();
+					// If temp is empty, delete it!
+					if (temp.getEntities().getCount() > 0)
+					{
+						logger.warn("RobotStudio struck problems when calculating the span for " +
+									 getName() + ". Do not trust the solution!");
+					}
+					// temp.delete();
 				}
 				catch (Exception ex)
 				{

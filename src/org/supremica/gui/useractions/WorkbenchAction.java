@@ -30,7 +30,7 @@ public class WorkbenchAction
 	public void actionPerformed(ActionEvent e)
 	{
 		// ActionMan.workbench_actionPerformed(ActionMan.getGui());
-		
+
 		VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
 		Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
 
@@ -48,7 +48,7 @@ public class WorkbenchAction
 	public void execute(VisualProject theProject, Automata theAutomata)
 		throws Exception
 	{
-		if (!theAutomata.sanityCheck(ActionMan.getGui(), 1, true, true, true))
+		if (!theAutomata.sanityCheck(ActionMan.getGui(), 1, true, true, true, true))
 		{
 			return;
 		}

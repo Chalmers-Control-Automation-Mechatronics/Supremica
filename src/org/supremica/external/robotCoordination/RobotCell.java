@@ -20,11 +20,8 @@ public interface RobotCell
 	/**
 	 * Finds the index of a robot.
 	 */
-
-	/*
-	public int getRobotIndex(Robot robot)
+	public int getRobotIndex(String robotName)
 			throws Exception;
-	*/
 
 	/**
 	 * Intersects spans of robots robotA and robotB, generating

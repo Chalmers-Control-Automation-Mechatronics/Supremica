@@ -4,7 +4,6 @@ import java.util.*;
 
 public interface Robot
 {
-
 	/**
 	 * Returns list of the positions for this robot.
 	 */
@@ -24,7 +23,7 @@ public interface Robot
 		throws Exception;
 
 	/**
-	 * Hides span in smulation envitronment (just for esthetics)
+	 * Hides span in smulation environment (just for esthetics)
 	 */
 	public void hideSpan()
 		throws Exception;
