@@ -395,6 +395,13 @@ public class ProjectBuildFromXml
 		{
 			currType = AutomatonType.toType(type);
 		}
+
+		// To deal with old files
+		if (currType == AutomatonType.Undefined)
+		{
+			currType = AutomatonType.Specification;
+		}
+
 		currAutomaton.setType(currType);
 
 		String comment = attributes.getValue("comment");
