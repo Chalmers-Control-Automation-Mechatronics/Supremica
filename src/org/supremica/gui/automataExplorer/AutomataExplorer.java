@@ -120,6 +120,7 @@ public class AutomataExplorer
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		// / setTitle(theAutomaton.getName());
 		setTitle("AutomataExplorer");
+		/*
 		setSize(400, 500);
 
 		// Center the window
@@ -137,6 +138,9 @@ public class AutomataExplorer
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+		*/
+		Utility.setupFrame(this, 400, 500);
+		
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)

@@ -13,14 +13,13 @@ import javax.swing.*;
 
 
 public class TextPanel
-	extends JPanel
+	extends JScrollPane
 {
 	JTextArea textarea = null;
 	
 	public TextPanel(int width, int height)
 	{
-		this.textarea = new JTextArea();
-		init(width, height);
+		this("", width, height);
 	}
 	
 	public TextPanel(String str, int width, int height)
@@ -36,10 +35,20 @@ public class TextPanel
 		textarea.setWrapStyleWord(true);
 		textarea.setTabSize(4);
 		textarea.setEditable(false);
+
+		// setBorder(BorderFactory.createEtchedBorder());		
+        // JScrollPane areaScrollPane = new JScrollPane(this);
+		getViewport().add(textarea);
 		
-        JScrollPane areaScrollPane = new JScrollPane(textarea);
-        areaScrollPane.setPreferredSize(new Dimension(width, height));
-		add(areaScrollPane);
+        // From the docs:
+        // If you put a text area in a scroll pane, be sure to
+     	// set the scroll pane's preferred size or use a text area constructor 
+     	// that sets the number of rows and columns for the text area. 
+        // areaScrollPane.setPreferredSize(new Dimension(width, height));
+       // areaScrollPane.setBorder(new Border
+		// add(areaScrollPane);
+		
+
 	}
 	
 	public void append(String str)
@@ -59,5 +68,8 @@ public class TextPanel
 		PrintWriter pw = textframe.getPrintWriter();
 		pw.println("Hello World!");
 	}
+
 }
+
+
 

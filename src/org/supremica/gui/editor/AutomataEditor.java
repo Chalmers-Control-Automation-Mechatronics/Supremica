@@ -733,24 +733,27 @@ public class AutomataEditor
 				 */
 			}
 		});
-		setSize(new Dimension(800, 600));
-		setIconImage(Supremica.cornerImage);
+//		setSize(new Dimension(800, 600));
+//		setIconImage(Supremica.cornerImage);
+//
+//		// Center the window
+//		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//		Dimension frameSize = getSize();
+//
+//		if (frameSize.height > screenSize.height)
+//		{
+//			frameSize.height = screenSize.height;
+//		}
+//
+//		if (frameSize.width > screenSize.width)
+//		{
+//			frameSize.width = screenSize.width;
+//		}
+//
+//		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
-		// Center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension frameSize = getSize();
+		Utility.setupFrame(this, 800, 600);
 
-		if (frameSize.height > screenSize.height)
-		{
-			frameSize.height = screenSize.height;
-		}
-
-		if (frameSize.width > screenSize.width)
-		{
-			frameSize.width = screenSize.width;
-		}
-
-		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		myDesktop.setBackground(new Color(132, 130, 130));
 		setVisible(true);
 		splitPaneHorizontal.setDividerLocation(0.2);

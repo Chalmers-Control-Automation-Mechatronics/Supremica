@@ -101,24 +101,27 @@ public class AutomatonViewer
 
 		contentPane.setLayout(layout);
 		setTitle(theAutomaton.getName());
-		setSize(400, 500);
+//		setSize(400, 500);
+//
+//		// Center the window
+//		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//		Dimension frameSize = getSize();
+//
+//		if (frameSize.height > screenSize.height)
+//		{
+//			frameSize.height = screenSize.height;
+//		}
+//
+//		if (frameSize.width > screenSize.width)
+//		{
+//			frameSize.width = screenSize.width;
+//		}
+//
+//		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+//		setIconImage(Supremica.cornerImage);
 
-		// Center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension frameSize = getSize();
-
-		if (frameSize.height > screenSize.height)
-		{
-			frameSize.height = screenSize.height;
-		}
-
-		if (frameSize.width > screenSize.width)
-		{
-			frameSize.width = screenSize.width;
-		}
-
-		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-
+		Utility.setupFrame(this, 400, 500);
+		
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -128,7 +131,6 @@ public class AutomatonViewer
 				//dispose();
 			}
 		});
-		setIconImage(Supremica.cornerImage);
 		initMenubar();
 		initToolbar();
 

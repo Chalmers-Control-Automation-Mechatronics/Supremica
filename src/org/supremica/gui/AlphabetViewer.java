@@ -91,7 +91,7 @@ public class AlphabetViewer
 		// contentPane.setLayout(new BorderLayout());
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		setTitle("Alphabet Viewer"); // : " + theAutomaton.getName());
-		setSize(200, 500);
+		// setSize(200, 500);
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -101,7 +101,7 @@ public class AlphabetViewer
 			}
 		});
 
-		// Center the window
+		/* Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = getSize();
 
@@ -116,7 +116,8 @@ public class AlphabetViewer
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-		setIconImage(Supremica.cornerImage);
+		setIconImage(Supremica.cornerImage);*/
+		Utility.setupFrame(this, 200, 500);
 		initMenubar();
 		contentPane.add(alphabetPanel, BorderLayout.CENTER);
 	}

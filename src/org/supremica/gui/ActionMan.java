@@ -652,7 +652,7 @@ public class ActionMan
 			xport.serialize(textframe.getPrintWriter());
 			return;		
 		}
-		if (exportMode == FORMAT_SP)
+		if (exportMode == FORMAT_SP_DEBUG)
 		{
 			ProjectToSP exporter = new ProjectToSP(gui.getSelectedProject());
 			TextFrame textframe = new TextFrame("SP debug output");
