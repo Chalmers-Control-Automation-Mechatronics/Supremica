@@ -723,7 +723,7 @@ public class AutomataVerifier
 		}
 		
 		// Stop after having found a suitable amount of new states
-		uncontrollabilityCheckHelper.stopExecutionAfter(250*attempt);
+		uncontrollabilityCheckHelper.stopExecutionAfter(100*attempt);
 
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();
