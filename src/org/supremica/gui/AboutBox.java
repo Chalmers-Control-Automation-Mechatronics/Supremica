@@ -80,7 +80,7 @@ public class AboutBox
 	String product = "Supremica";
 	String version = Version.version();
 	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, Arash Vahidi 1999-2002";
-	String comments = "Thanks to Northwoods Software - http://www.nwoods.com";
+	String comments = "Thanks to Northwoods Software - http://www.nwoods.com, and AT&T Research - http://www.graphviz.org.";
 	//String thanks = "";
 
 	public AboutBox(Frame parent)
