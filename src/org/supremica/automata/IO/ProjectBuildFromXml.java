@@ -565,6 +565,10 @@ public class ProjectBuildFromXml
 			throwException("event attribute is missing");
 		}
 		// Get the event corresponding to this id
+		if (!idEventMap.containsKey(eventId))
+		{
+			throwException("event id \"" + eventId + "\" is not a valid event id.");
+		}
 		LabeledEvent event = (LabeledEvent)idEventMap.get(eventId);
 		// Create and add the arc
 		Arc arc = new Arc(sourceState, destState, event);
