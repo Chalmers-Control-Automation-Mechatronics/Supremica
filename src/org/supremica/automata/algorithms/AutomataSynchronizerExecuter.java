@@ -933,8 +933,8 @@ public final class AutomataSynchronizerExecuter
 					theAutomaton = null;
 
 					// theAutomaton.setDisabled(true);
-					// System.out.println(theAutomaton == null);
-					// System.out.println(helper.getAutomaton() == null);
+					// logger.debug(theAutomaton == null);
+					// logger.debug(helper.getAutomaton() == null);
 					return false;
 				}
 

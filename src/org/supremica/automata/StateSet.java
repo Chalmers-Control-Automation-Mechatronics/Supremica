@@ -204,7 +204,7 @@ public class StateSet
 
 		buf.setLength(buf.length() - 1);    // truncate last '.'
 
-		// System.out.println("StateSet::createNewState -- " + buf.toString());
+		// logger.info("StateSet::createNewState -- " + buf.toString());
 		State newstate = new State(buf.toString());
 
 		// if(i) newstate.setInitial(true);

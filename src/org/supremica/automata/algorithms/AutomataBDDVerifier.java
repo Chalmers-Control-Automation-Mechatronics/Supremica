@@ -207,7 +207,7 @@ public class AutomataBDDVerifier
 			{
 
 				// show all uncontrollable states...
-				// System.out.println("Uncontrollable states");
+				// logger.debug("Uncontrollable states");
 				// ba.show_states(Q_u);
 				// ... and show how to get to one such state
 				sup.trace_set("uncontrollable", Q_u, 1);

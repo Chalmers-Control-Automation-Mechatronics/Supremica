@@ -306,12 +306,12 @@ public class AlphabetAnalyzer
 		 *  if (nbrOnlyLeft == 0)
 		 *  System.out.println("*** left <= right");
 		 *  if (nbrOnlyRight == 0)
-		 *  System.out.println("*** right <= left");
-		 *  System.out.println("left: " + leftAut.getName() + " right: " + rightAut.getName());
-		 *  System.out.println("#left: " + nbrOnlyLeft +
+		 *  logger.info("*** right <= left");
+		 *  logger.info("left: " + leftAut.getName() + " right: " + rightAut.getName());
+		 *  logger.info("#left: " + nbrOnlyLeft +
 		 *  " #right: " + nbrOnlyRight +
 		 *  " #common: " + nbrCommon);
-		 *  System.out.println("#uleft: " + nbrUniqueLeft +
+		 *  logger.info("#uleft: " + nbrUniqueLeft +
 		 *  " #uright: " + nbrUniqueRight +
 		 *  " #newUnique: " + newUnique);
 		 */

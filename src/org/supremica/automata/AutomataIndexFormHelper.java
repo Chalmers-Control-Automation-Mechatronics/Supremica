@@ -49,10 +49,13 @@
  */
 package org.supremica.automata;
 
+import org.supremica.log.*;
 import java.util.StringTokenizer;
 
 public final class AutomataIndexFormHelper
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomataIndexFormHelper.class);
+
 	public static final int STATE_EXTRA_DATA = 2;
 	public static final int STATE_STATUS_FROM_END = 1;
 	public static final int STATE_PREVSTATE_FROM_END = 2;
@@ -318,7 +321,7 @@ public final class AutomataIndexFormHelper
 			System.err.println("state == null");
 		}
 
-		System.out.println("org: " + orgString);
-		System.out.println("parsed: " + dumpState(state));
+		logger.info("org: " + orgString);
+		logger.info("parsed: " + dumpState(state));
 	}
 }

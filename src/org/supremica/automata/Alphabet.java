@@ -960,6 +960,6 @@ public class Alphabet
 		sigma2.addEvent(new LabeledEvent("e2"));
 		sigma2.addEvent(new LabeledEvent("e3"));
 		sigma1.union(sigma2);
-		System.out.println("sigma1 + sigma2 = " + sigma1.toString());
+		logger.info("sigma1 + sigma2 = " + sigma1.toString());
 	}
 }

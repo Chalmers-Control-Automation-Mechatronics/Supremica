@@ -124,7 +124,7 @@ public class AutomataVerifier
 		throws IllegalArgumentException, Exception
 	{
 
-		/// System.out.println("DEBUG.......... " + theAutomata.size() ); // ARASH: DEBUG
+		/// logger.debug("DEBUG.......... " + theAutomata.size() ); // ARASH: DEBUG
 		Automaton currAutomaton;
 		State currInitialState;
 
