@@ -141,6 +141,11 @@ public class VerificationDialog
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
 
+		//** MF ** Fix to get the frigging thing centered
+		Dimension dim = dialog.getMinimumSize();
+		dialog.setLocation(Utility.getPosForCenter(dim));
+		dialog.setResizable(false);
+
 		update();
 	}
 

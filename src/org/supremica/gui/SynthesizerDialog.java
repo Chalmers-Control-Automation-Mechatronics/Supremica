@@ -79,7 +79,7 @@ public class SynthesizerDialog
 		this.synthesizerOptions = synthesizerOptions;
 		dialog.setTitle("Synthesizer options");
 		dialog.setSize(new Dimension(400, 300));
-		// dialog.setResizable(false);
+
 		Container contentPane = dialog.getContentPane();
 
 		JPanel standardPanel = new JPanel();
@@ -134,6 +134,11 @@ public class SynthesizerDialog
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
 
+		//** MF ** Fix to get the frigging thing centered
+		Dimension dim = dialog.getMinimumSize();
+		dialog.setLocation(Utility.getPosForCenter(dim));
+		dialog.setResizable(false);
+		
 		update();
 	}
 

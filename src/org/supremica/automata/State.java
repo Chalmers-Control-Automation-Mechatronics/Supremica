@@ -100,7 +100,12 @@ public class State
 		//** MF ** at instantiation, and not the id.
 
 	}
-
+	public State(String id, String name)
+	{
+		this();
+		setId(id);
+		setId(name);
+	}
 	/**
 	 * This copy constructor does only copy the states attributes.
 	 * The incoming and outgoing arcs are not copied.

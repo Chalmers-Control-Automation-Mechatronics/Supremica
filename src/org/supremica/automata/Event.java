@@ -73,7 +73,12 @@ public class Event
 		//** MF ** adding this cannot break any code, cannit?
 		this.id = label;
 	}
-
+	public Event(String label, String id)
+	{
+		setLabel(label);
+		setId(id);
+	}
+	
 	public Event(Event e)
 	{
 		id = e.id;
