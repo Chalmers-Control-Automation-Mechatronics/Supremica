@@ -74,7 +74,7 @@ public class LoggerFactory
 
 	public synchronized static Logger createLogger(String name)
 	{
-		Category thisCategory = Category.getInstance(name);
+		Category thisCategory = Category.getInstance(name); // Deprecated
 
 		if (logToConsole)
 		{

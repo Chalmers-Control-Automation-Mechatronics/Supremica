@@ -189,6 +189,11 @@ public class Automaton
 		return type == AutomatonType.Interface;
 	}
 
+	public boolean isUndefined()
+	{
+		return type == AutomatonType.Undefined;
+	}
+
 	public void setName(String name)
 		throws IllegalArgumentException
 	{

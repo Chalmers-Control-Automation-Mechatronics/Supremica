@@ -619,7 +619,6 @@ public final class AutomataSynchronizerHelper
 
 		// We have to have an executer for finding the transitions
 		clear();
-
 		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
 		executer.initialize();
 
@@ -709,7 +708,8 @@ public final class AutomataSynchronizerHelper
 					}
 					else
 					{
-						return prevString + " -> \"" + unionAlphabet.getEventWithIndex(currEventIndex).getLabel() + "\"";
+						return prevString + " -> \"" + 
+							unionAlphabet.getEventWithIndex(currEventIndex).getLabel() + "\"";
 					}
 					// logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
 				}

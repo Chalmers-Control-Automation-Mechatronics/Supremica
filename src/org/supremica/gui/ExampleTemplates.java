@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -98,6 +97,7 @@ public class ExampleTemplates
 
 		String prefix = extraPrefix + "/CCSBookExercises/";
 
+		thisGroup.addItem(new TemplateItem("2.1 - PIN Code Reader", prefix + "Ex2_1.xml"));
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: All events controllable", prefix + "Ex4_5_all_con.xml"));
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: Put is uncontrollable", prefix + "Ex4_5_b_uncon.xml"));
 	}
@@ -146,7 +146,8 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
 		thisGroup.addItem(new TemplateItem("Rotation Table", prefix + "rotationTable.xml"));
 		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));
-
+		thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
+		thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
 	}
 
 	private void initializeAIPExamples()

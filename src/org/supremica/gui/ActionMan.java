@@ -1278,15 +1278,6 @@ public class ActionMan
 			return;
 		}
 
-		/*
-		if (selectedAutomata.size() < 1)
-		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-			return;
-		}
-		*/
-
 		// Get the default options and allow the user to change them...
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
 		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(),
@@ -1297,15 +1288,15 @@ public class ActionMan
 			return;
 		}
 
-		// long elapsedTime = -1;
 		ActionTimer timer = null;
 
 		if (selectedAutomata.size() > 1)
 		{
 			SynchronizationOptions syncOptions;
-			try
-			{
+			// try
+			// {
 				syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+
 				/*
 				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
 														 SynchronizationType.Prioritized,
@@ -1320,6 +1311,7 @@ public class ActionMan
 														 true,
 														 true);
 				*/
+			/*
 			}
 			catch (Exception ex)
 			{
@@ -1327,6 +1319,7 @@ public class ActionMan
 				logger.debug(ex.getStackTrace());
 				return;
 			}
+			*/
 
 			/*
 			Automata currAutomata = new Automata();
@@ -1398,7 +1391,6 @@ public class ActionMan
 
 			try
 			{
-
 				// ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
 				// (this is a dirty fix, should use a factory instead)
 				AutomatonSynthesizer synthesizer =
@@ -1818,7 +1810,7 @@ public class ActionMan
 	public static void hierarchyView_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 2, false, false))
 		{
 			return;
 		}

@@ -109,6 +109,11 @@ public class AutomataToHierarchyToDot
 			return ", color = yellow";
 		}
 
+		if (aut.isUndefined())
+		{
+			return ", color = pink";
+		}
+
 		if (aut.isPlant())
 		{
 			return ", color = red";
@@ -119,7 +124,39 @@ public class AutomataToHierarchyToDot
 			return ", color = green";
 		}
 
+		// What on G*d's green earth was that?
 		return ", color = white";
+	}
+
+	private String getShape(Automaton aut)
+	{
+		if (withCircles)
+		{
+			return "";
+		}
+
+		if (aut.isInterface())
+		{
+			return ", shape = diamond";
+		}
+
+		if (aut.isPlant())
+		{
+			return ", shape = box";
+		}
+
+		if (aut.isSupervisor() || aut.isSpecification())
+		{
+			return ", shape = ellipse";
+		}
+
+		if (aut.isUndefined())
+		{
+			return ", shape = egg";
+		}
+
+		// What the f**k was that? 
+		return "";
 	}
 
 	public void serialize(PrintWriter pw)
@@ -142,8 +179,9 @@ public class AutomataToHierarchyToDot
 		else
 		{
 			//pw.println("\tnode [shape = plaintext];");
-			pw.println("\tnode [shape = ellipse];");
+			//pw.println("\tnode [shape = ellipse];");
 		}
+
 		// Filled?
 		if (useColors)
 		{
@@ -154,22 +192,19 @@ public class AutomataToHierarchyToDot
 		//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		for (int i=0; i<theAutomata.size(); i++)
 		{
-			//Automaton currAutomaton = (Automaton) autIt.next();			
-			Automaton currAutomaton = theAutomata.getAutomatonAt(i);			
-			
+			Automaton currAutomaton = theAutomata.getAutomatonAt(i);						
 			pw.print("\t\"" + currAutomaton.getName() + "\" [label = \"");			
 			if (withLabel)
 			{
 				pw.print(EncodingHelper.normalize(currAutomaton.getName()));
 			}			
-			pw.println("\"" + getColor(currAutomaton) + "]; ");
+			pw.println("\"" + getColor(currAutomaton) + getShape(currAutomaton) + "]; ");
 
 			// The arcs in the graph represent common events in the respective alphabets
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 			//for (Iterator otherIt = theAutomata.iterator(); otherIt.hasNext(); )
 			for (int j=i+1; j<theAutomata.size(); j++)
 			{
-				//Automaton otherAutomaton = (Automaton) otherIt.next();
 				Automaton otherAutomaton = theAutomata.getAutomatonAt(j);
 				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
 				

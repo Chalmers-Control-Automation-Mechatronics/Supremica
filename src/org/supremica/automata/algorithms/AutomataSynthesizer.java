@@ -116,7 +116,8 @@ class AutomataSelector
 
 					if (!currEvent.isControllable())
 					{
-						addPlant(currEvent); /*
+						addPlant(currEvent); 
+						/*
 						if (eventToAutomataMap.get(currEvent) != null)
 						{
 							Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
@@ -169,7 +170,6 @@ class AutomataSelector
 					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
 
 					// closedSet stuff removed
-
 				}
 			}
 		}
@@ -184,8 +184,7 @@ class AutomataSelector
 		}
 		return partialSet;
 	}
-
-
+	
 	// Return wether we've seen a spec/sup or not
 	boolean hadSpec()
 	{
@@ -224,8 +223,6 @@ public class AutomataSynthesizer
 	public AutomataSynthesizer(Gui gui, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws Exception, IllegalArgumentException
 	{
-
-
 		// initialization stuff that need no computation
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
@@ -234,8 +231,6 @@ public class AutomataSynthesizer
 		this.nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
 		this.theVisualProjectContainer = gui.getVisualProjectContainer();
 		this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
-
-
 
 		if (!theAutomata.isEventControllabilityConsistent())
 		{
@@ -252,17 +247,14 @@ public class AutomataSynthesizer
 
 			if(synthesizerOptions.getSynthesisType() !=  SynthesisType.Both)
 			{
-				throw new IllegalArgumentException("BDD algorithms currently only support sup NBC symthesis.");
+				throw new IllegalArgumentException("BDD algorithms currently only support sup NBC synthesis.");
 			}
 			// now, Do BDD Specific initialization here and skip the other stuff
 			return;
 		}
 
-
-
-
 		// initialization stuff that do need extra computation and thus ignored when
-		// doing BDD conputation...
+		// doing BDD computation...
 
 		Automaton currAutomaton;
 		State currInitialState;
@@ -273,8 +265,6 @@ public class AutomataSynthesizer
 		// Fix this later
 		synthesizerOptions.setRememberDisabledEvents(true);
 		initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
-
-
 
 		//-- MF -- Should this be tested here? There should be no possibility selecting invalid combinations!
 		if (!AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm))
@@ -287,12 +277,11 @@ public class AutomataSynthesizer
 			synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 
 			AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-
 			eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
 			// Build the initial state
+			// Shouldn't this be done in Automata.java? It initialState used at all here?` /hugo
 			Iterator autIt = theAutomata.iterator();
-
 			while (autIt.hasNext())
 			{
 				currAutomaton = (Automaton) autIt.next();
@@ -369,9 +358,6 @@ public class AutomataSynthesizer
 	public void execute()
 		throws Exception
 	{
-		//Automata newAutomata = new Automata();
-
-
 		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
 			theTimer.start();
@@ -379,7 +365,6 @@ public class AutomataSynthesizer
 			theTimer.stop();
 			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 			gui.addAutomaton(retval.automaton); // let the user choose the name
-
 		}
 		else if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
@@ -392,7 +377,6 @@ public class AutomataSynthesizer
 
 			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 			gui.addAutomaton(retval.automaton); // let the user choose the name
-
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) // modular case
 		{
@@ -406,7 +390,7 @@ public class AutomataSynthesizer
 				if(automata.size() > 1) // no need to do anything for a singleton spec
 				{
 					MonolithicReturnValue retval = doMonolithic(automata);
-					if(retval.didSomething)
+					if (retval.didSomething)
 					{
 						retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 
@@ -423,19 +407,21 @@ public class AutomataSynthesizer
 						}
 						else	// we should not care about max perm, but should notify
 						{
-							if(disabledEvents.size() > 0)	// not guranteed to be max perm
+							if (disabledEvents.size() > 0)	// not guranteed to be max perm
 							{
-								logger.info("The synthesized supervisor " + retval.automaton.getComment() + " might not be maximally permissive due to:");
+								logger.info("The synthesized supervisor " + retval.automaton.getComment() + 
+											" might not be maximally permissive due to:");
 								for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
 								{
 									LabeledEvent currEvent = (LabeledEvent)evIt.next();
-									logger.info(currEvent.getLabel() + " is included in the plant but not in the supervisor");
-
+									logger.info(currEvent.getLabel() + " is included in the plant but not " + 
+												"in the supervisor");
 								}
 							}
 							else	// it's max perm in any case
 							{
-								logger.info("The synthesized supervisor " + retval.automaton.getComment() + " is maximally permissive.");
+								logger.info("The synthesized supervisor " + retval.automaton.getComment() + 
+											" is maximally permissive.");
 							}
 						}
 
@@ -443,6 +429,7 @@ public class AutomataSynthesizer
 					}
 				}
 			}
+
 			// If no spec/sup is in the selected automata, only nonblocking requires work
 			if(selector.hadSpec() == false) // if we've not seen any spec, do monolithic synthesis on the entire set
 			{
@@ -453,6 +440,7 @@ public class AutomataSynthesizer
 					modSupervisors.addAutomaton(retval.automaton);
 				}
 			}
+
 			if(synthesizerOptions.getOptimize())
 			{
 				optimize(theAutomata, modSupervisors);
@@ -468,9 +456,13 @@ public class AutomataSynthesizer
 			{
 				logger.info("No problems found, the specifications can be used as supervisors, as is.");
 			}
-			if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking || synthesizerOptions.getSynthesisType() == SynthesisType.Both)
+
+			if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking || 
+			   synthesizerOptions.getSynthesisType() == SynthesisType.Both)
 			{
-				logger.info("NOTE! Currently global nonblocking is NOT guaranteed. The only guarantee is that each supervisor is individually nonblocking with respect to the plants it controls");
+				logger.info("NOTE! Currently global nonblocking is NOT guaranteed. The only guarantee " + 
+							"is that each supervisor is individually nonblocking with respect to the " + 
+							"plants it controls");
 			}
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) // more BDD Stuff
@@ -479,7 +471,6 @@ public class AutomataSynthesizer
 			AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata);
 			bddSynthesizer.execute();
 			bddSynthesizer.cleanup();
-
 			theTimer.stop();
 		}
 		else
@@ -591,9 +582,12 @@ public class AutomataSynthesizer
 	private void optimize(Automata theAutomata, Automata newAutomata)
 	{
 		logger.debug("AutomataSynthesizer.optimize");
-		Automata tempAutomata = new Automata(newAutomata); // deep copy, so we can purge without affecting the originals
-		SynchronizationOptions syncOptions;
 
+		// Deep copy the new automata, so we can purge without affecting the originals
+		Automata tempAutomata = new Automata(newAutomata); 
+		
+		// Get the default synchronizationOptions
+		SynchronizationOptions syncOptions;
 		try
 		{
 			syncOptions = new SynchronizationOptions();
@@ -605,7 +599,8 @@ public class AutomataSynthesizer
 			return;
 		}
 
-		if (!synthesizerOptions.doPurge()) // The automata aren't purged but they must be for the optimization to work...
+		// Make sure the automata are purged - they must be for the optimization to work...
+		if (!synthesizerOptions.doPurge()) 
 		{
 			Iterator autIt = tempAutomata.iterator();
 
@@ -623,7 +618,8 @@ public class AutomataSynthesizer
 
 		AutomataVerifier theVerifier;
 		VerificationOptions theVerificationOptions = new VerificationOptions();
-		theVerificationOptions.setVerificationType(VerificationType.Controllability); // Is this the only necessary option?
+		// Is this the only necessary option?
+		theVerificationOptions.setVerificationType(VerificationType.Controllability); 
 
 		// Remove the new automata one by one and examine if it had impact on the result.
 		for (int i = tempAutomata.size() - 1; i >= 0; i--)
@@ -631,17 +627,14 @@ public class AutomataSynthesizer
 			currAutomata.removeAutomaton(tempAutomata.getAutomatonAt(i));
 
 			try
-			{
+			{   // Verify controllability with one automaton removed
 				theVerifier = new AutomataVerifier(currAutomata, syncOptions, theVerificationOptions);
-
 				if (theVerifier.verify())
-				{
-					// This supervisor has no impact, remove it
+				{	// This supervisor had no impact, throw it away!
 					newAutomata.removeAutomaton(newAutomata.getAutomatonAt(i));
 				}
 				else
-				{
-					// It has impact, add it back
+				{	// It had impact, put it back!
 					currAutomata.addAutomaton(tempAutomata.getAutomatonAt(i));
 				}
 			}

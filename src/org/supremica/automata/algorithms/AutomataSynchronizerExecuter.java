@@ -284,6 +284,8 @@ public final class AutomataSynchronizerExecuter
 	 * if the state turns out uncontrollable, the boolean controllableState 
 	 * is set false.
 	 *
+	 * The enabled events can then be found in currEnabledEvents[].
+	 *
 	 *@param  currState the (full) state to be examined.
 	 */
 	private final void enabledEvents(int[] currState)
@@ -298,7 +300,6 @@ public final class AutomataSynchronizerExecuter
 		// the current state.
 		for (int i = 0; i < nbrOfSelectedAutomata; i++)
 		{
-
 			// Initialization part
 			int currAutIndex = automataIndices[i];
 			int currSingleStateIndex = currState[currAutIndex];
@@ -1034,17 +1035,17 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public int findTransition(int[] fromState, int[] toState)
 	{
+		// Find the currently enabled events (and put these in currEnabledEvents).
 		enabledEvents(fromState);
-
 		int i = 0;
 		int currEventIndex = currEnabledEvents[i];
 
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
-		{
-
-			// Generate an array that contains the indicies of each state
-			System.arraycopy(fromState, 0, nextState, 0, fromState.length);
+		{	// Generate an array that contains the indicies of each state, nextstate, initialize
+			// it with the values of toState, to get the correct status values in the end!
+			System.arraycopy(toState, 0, nextState, 0, fromState.length);
+			// System.arraycopy(fromState, 0, nextState, 0, fromState.length);
 
 			// Iterate over all automata to construct the new state
 			for (int j = 0; j < nbrOfAutomata; j++)

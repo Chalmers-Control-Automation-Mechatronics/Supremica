@@ -679,7 +679,7 @@ public class AutomataVerifier
 				if (potentiallyUncontrollableStates.size(automataIndices) == 1)
 					states = "one state";
 				else
-					states = potentiallyUncontrollableStates.size(automataIndices) + "states";
+					states = potentiallyUncontrollableStates.size(automataIndices) + " states";
 
 				logger.info("\"" + automataNames + "\" has " + states + 
 							 " that might be uncontrollable...");
@@ -775,13 +775,12 @@ public class AutomataVerifier
 							logger.info("Couldn't prove controllability, trying to prove uncontrollability...");
 						}
 
-						// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
+						// Try to prove remaining states in the stateMemorizer as being uncontrollable
 						if (findUncontrollableStates(automataIndices))
 						{
 							// Uncontrollable state found!
 							if (verboseMode)
-							{
-								// Print the uncontrollable state(s)...
+							{	// Print the uncontrollable state(s)...
 								uncontrollabilityCheckHelper.printUncontrollableStates();
 
 								// Print event trace reaching uncontrollable state
@@ -826,7 +825,7 @@ public class AutomataVerifier
 		// Nothing bad has happened. Very nice!
 		if (verboseMode)
 		{
-			logger.info(automataNames + "is controllable.");
+			logger.info("\"" + automataNames + "\" is controllable.");
 		}
 
 		return true;
@@ -1021,7 +1020,7 @@ public class AutomataVerifier
 			// Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 			{
-				addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]).getName();
+				addedAutomata = addedAutomata + " \"" + theAutomata.getAutomatonAt(similarAutomata[i]).getName() + "\"";
 			}
 
 			// Increase the limit each time
@@ -1040,7 +1039,7 @@ public class AutomataVerifier
 			// Add automaton
 			selectedAutomata.add(theAutomata.getAutomatonAt(similarAutomata[i]));
 
-			addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]).getName();
+			addedAutomata = addedAutomata + " \"" + theAutomata.getAutomatonAt(similarAutomata[i]).getName() + "\"";
 			stateAmount = stateAmount * theAutomata.getAutomatonAt(similarAutomata[i]).nbrOfStates();
 
 			if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
@@ -1127,7 +1126,7 @@ public class AutomataVerifier
 					default:
 						message = "Still " + statesLeft + " states ";
 					}
-					logger.info(message + "left after adding" + addedAutomata + ", this subsystem is controllable.");
+					logger.info(message + "left after adding" + addedAutomata + ".");
 				}
 
 				if (statesLeft == 0)
@@ -1135,7 +1134,6 @@ public class AutomataVerifier
 
 				if (stateAmount > stateAmountLimit)
 				{
-
 					// Limit reached!!
 					break;
 				}
