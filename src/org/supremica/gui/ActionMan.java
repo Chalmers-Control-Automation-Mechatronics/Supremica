@@ -1803,21 +1803,12 @@ public class ActionMan
 						}
 
 						File appFile = new File(prefixName + ".app");
-						//PrintWriter pw_app = new PrintWriter(new FileWriter(prefixName + ".app"));
 						PrintWriter pw_prj = new PrintWriter(new FileWriter(prefixName + ".prj"));
-						// These are not necessary?
-						//PrintWriter pw_prc = new PrintWriter(new FileWriter(prefixName + ".prc"));
-						//PrintWriter pw_wsp = new PrintWriter(new FileWriter(prefixName + ".wsp"));
 
 						exporter.serialize_app(appFile);
-						//exporter.serialize_app(pw_app);
 						exporter.serialize_prj(pw_prj);
-						//exporter.serialize_prc(pw_prc);
-						//exporter.serialize_wsp(pw_wsp);
-						//pw_app.close();
+
 						pw_prj.close();
-						//pw_prc.close();
-						//pw_wsp.close();
 					}
 					catch (Exception ex)
 					{

@@ -212,7 +212,7 @@ public class Automata
 		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
-			
+
 			if(!automaton.hasInitialState())
 			{
 				return false;
@@ -230,7 +230,7 @@ public class Automata
 		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
-			
+
 			if(!automaton.hasAcceptingState())
 			{
 				return false;
@@ -238,7 +238,41 @@ public class Automata
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Returns true if all automata have all events prioritized
+	 */
+	public boolean isAllEventsPrioritized()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+
+			if(!automaton.isAllEventsPrioritized())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns true if any automaton has a self loop
+	 */
+	public boolean hasSelfLoop()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+
+			if(automaton.hasSelfLoop())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public int size()
 	{
 		return theAutomata.size();

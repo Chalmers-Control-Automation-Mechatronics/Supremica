@@ -109,6 +109,14 @@ public class Arc
 		return fromState;
 	}
 
+	/**
+	 * True if the from and the to state are the same, otherwise false.
+	 */
+	public boolean isSelfLoop()
+	{
+		return fromState == toState;
+	}
+
 	public void clear()
 	{
 		if (fromState != null)

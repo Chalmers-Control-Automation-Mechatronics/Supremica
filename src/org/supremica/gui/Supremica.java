@@ -797,7 +797,6 @@ public class Supremica
 		JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
 
 		menuToolsCodeGenerationIL.setText("IEC-1131 Instruction List...");
-		menuToolsCodeGenerationIL.setEnabled(false);
 		menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
 		menuToolsCodeGenerationIL.addActionListener(new ActionListener()
 		{
@@ -830,7 +829,7 @@ public class Supremica
 			public void actionPerformed(ActionEvent e)
 			{
 
-				// toolsAutomataEditor();
+				//ActionMan.AutomataToJavaBytecode(getGui());
 			}
 		});
 

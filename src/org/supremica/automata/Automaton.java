@@ -275,6 +275,24 @@ public class Automaton
 		return false;
 	}
 
+	public boolean hasSelfLoop()
+	{
+		for(Iterator arcIt = theArcs.iterator(); arcIt.hasNext();)
+		{
+			Arc currArc = (Arc)arcIt.next();
+			if (currArc.isSelfLoop())
+			{
+				return false;
+			}
+		}
+		return false;
+	}
+
+	public boolean isAllEventsPrioritized()
+	{
+		return alphabet.isAllEventsPrioritized();
+	}
+
 	/**
 	 * When adding an arc, both the two states associated with the
 	 * arc _must_ already be contained in the automaton, otherwise the
@@ -1099,12 +1117,12 @@ public class Automaton
 				{
 					if (outgoing)
 					{
-						currState = currArc.getToState();
+						currState = currArc.getFromState();
 						return;
 					}
 					else
 					{
-						currState = currArc.getFromState();
+						currState = currArc.getToState();
 						return;
 					}
 				}

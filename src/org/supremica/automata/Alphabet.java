@@ -218,6 +218,20 @@ public class Alphabet
 		}
 	}
 
+	public boolean isAllEventsPrioritized()
+	{
+		for (Iterator evIt = eventIterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent) evIt.next();
+
+			if (!currEvent.isPrioritized())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * Remove event from alphabet.
 	 *
