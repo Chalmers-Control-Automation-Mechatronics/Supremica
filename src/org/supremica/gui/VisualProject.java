@@ -113,6 +113,18 @@ public class VisualProject
 			theAutomataEditor.dispose();
 			theAutomataEditor = null;
 		}
+		if (theAnimator != null)
+		{
+			theAnimator.setVisible(false);
+			theAnimator.dispose();
+			theAnimator = null;
+		}
+		if (theActionAndControlViewer != null)
+		{
+			theActionAndControlViewer.setVisible(false);
+			theActionAndControlViewer.dispose();
+			theActionAndControlViewer = null;
+		}
 		projectFile = null;
 	}
 
