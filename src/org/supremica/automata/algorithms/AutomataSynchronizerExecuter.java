@@ -575,6 +575,11 @@ public final class AutomataSynchronizerExecuter
 
 			enabledEvents(currState);
 
+			if (currEnabledEvents[0] == Integer.MAX_VALUE)
+			{
+				helper.setDeadlocked(currState, true);
+			}
+
 			if (!controllableState)
 			{
 
@@ -598,6 +603,7 @@ public final class AutomataSynchronizerExecuter
 				if (forbidUncontrollableStates)
 				{
 					helper.setForbidden(currState, true);
+
 				}
 			}
 

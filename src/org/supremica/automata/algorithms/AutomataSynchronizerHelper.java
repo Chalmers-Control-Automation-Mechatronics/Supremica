@@ -76,9 +76,9 @@ public final class AutomataSynchronizerHelper
 	private IntArrayHashTable theStates;
 	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
-	private int totalNbrOfStates = 0;
-	private int nbrOfUncontrollableStates = 0;
-	private int nbrOfDeadlockedStates = 0;
+//	private int totalNbrOfStates = 0;
+//	private int nbrOfUncontrollableStates = 0;
+//	private int nbrOfDeadlockedStates = 0;
 
 	// Two locks are used to limit the access the statesToProcess
 	private final Object gettingFromStatesToProcessLock = new Object();
@@ -429,6 +429,25 @@ public final class AutomataSynchronizerHelper
 		}
 
 		state[state.length - 1] = currStatus;
+		helperData.nbrOfForbiddenStates++;
+	}
+
+	public void setDeadlocked(int[] state, boolean deadlocked)
+	{
+		AutomataIndexFormHelper.dumpState(state);
+		int currStatus = state[state.length - 1];
+
+		if (deadlocked)
+		{
+			currStatus |= (1 << 6);
+			helperData.nbrOfDeadlockedStates++;
+		}
+		else
+		{
+			currStatus &= ~(1 << 6);
+		}
+
+		state[state.length - 1] = currStatus;
 	}
 
 	public int[][] getStateTable()
@@ -556,7 +575,7 @@ public final class AutomataSynchronizerHelper
 	/** Displats the amount of states examined during the execution. */
 	public void displayInfo()
 	{
-		logger.info("During the execution, " + helperData.nbrOfCheckedStates + " states were examined. " + helperData.nbrOfAddedStates + " new states were found.");
+		logger.info("Synchronization statistics:\n\t" + helperData.getNumberOfCheckedStates() + " states were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
 	}
 
 	/**
@@ -828,24 +847,24 @@ public final class AutomataSynchronizerHelper
 	{
 		public int nbrOfAddedStates = 0;
 		public int nbrOfCheckedStates = 0;
-		public int nbrOfUncontrollableStates = 0;
+		public int nbrOfForbiddenStates = 0;
 		public int nbrOfDeadlockedStates = 0;
 
 		public HelperData() {}
 
-		public int getNumberOfStates()
+		public int getNumberOfReachableStates()
 		{
 			return nbrOfAddedStates;
 		}
 
-		public int getNbrOfCheckedStates()
+		public int getNumberOfCheckedStates()
 		{
 			return nbrOfCheckedStates;
 		}
 
-		public int getNumberOfUncontrollableStates()
+		public int getNumberOfForbiddenStates()
 		{
-			return nbrOfUncontrollableStates;
+			return nbrOfForbiddenStates;
 		}
 
 		public int getNumberOfDeadlockedStates()

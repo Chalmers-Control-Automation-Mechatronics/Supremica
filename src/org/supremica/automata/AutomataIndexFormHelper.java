@@ -70,6 +70,7 @@ public final class AutomataIndexFormHelper
 	 * 3: first
 	 * 4: last
 	 * 5: fastClearStatus
+	 * 6: deadlocked
 	 **/
 	public static int createStatus(State state)
 	{
@@ -128,6 +129,11 @@ public final class AutomataIndexFormHelper
 		return ((status >> 4) & 1) == 1;
 	}
 
+	public static boolean isDeadlocked(int status)
+	{
+		return ((status >> 6) & 1) == 1;
+	}
+
 	public static boolean isInitial(int[] state)
 	{
 		return isInitial(state[state.length - 1]);
@@ -151,6 +157,11 @@ public final class AutomataIndexFormHelper
 	public static boolean isLast(int[] state)
 	{
 		return isLast(state[state.length - 1]);
+	}
+
+	public static boolean isDeadlocked(int[] state)
+	{
+		return isDeadlocked(state[state.length - 1]);
 	}
 
 	/**
