@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   ModuleProxy
 //###########################################################################
-//# $Id: ModuleProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ModuleProxy.java,v 1.2 2005-02-17 19:30:44 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -252,7 +252,43 @@ public class ModuleProxy
 
 
   //#########################################################################
-  //# Accessing the Event Declaration List
+  //# Accessing the Event Declaration Lists
+  /**
+   * Finds an parameter with given name.
+   * @param  name        The name of the parameter to be found.
+   * @return The corresponding parameter object.
+   * @throws NameNotFoundException to indicate that the module does not
+   *                      contain any parameter with the given name.
+   */
+  public ParameterProxy findParameter(final String name)
+    throws NameNotFoundException
+  {
+    return (ParameterProxy) mParameterListProxy.find(name);
+  }
+
+  /**
+   * Tries to find an parameter with given name.
+   * @param  name        The name of the parameter to be found.
+   * @return The corresponding parameter object,
+   *         or <CODE>null</CODE> if none was found.
+   */
+  public ParameterProxy getParameter(final String name)
+  {
+    return (ParameterProxy) mParameterListProxy.get(name);
+  }  
+
+  /**
+   * Adds a new parameter.
+   * @param  param       The parameter to be added.
+   * @throws DuplicateNameException to indicate that the module already
+   *                     contains an parameter with the same name.
+   */
+  public void insertParameter(final ParameterProxy param)
+    throws DuplicateNameException
+  {
+    mParameterListProxy.insert(param);
+  }
+    
   /**
    * Finds an event declaration with given name.
    * @param  name        The name of the event declaration to be found.
@@ -365,7 +401,7 @@ public class ModuleProxy
 
   //#########################################################################
   //# Local Class ParameterListProxy
-  private static class ParameterListProxy extends TopLevelListProxy {
+  private static class ParameterListProxy extends IndexedArrayListProxy {
 
     //#######################################################################
     //# Constructors
@@ -531,7 +567,7 @@ public class ModuleProxy
   //# Data Members
   private File mLocation;
   private final ListProxy mConstantAliasListProxy;
-  private final ListProxy mParameterListProxy;
+  private final IndexedArrayListProxy mParameterListProxy;
   private final ListProxy mEventAliasListProxy;
   private final IndexedArrayListProxy mEventDeclListProxy;
   private final ListProxy mComponentListProxy;

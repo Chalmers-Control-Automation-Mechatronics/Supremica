@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   ParameterProxy
 //###########################################################################
-//# $Id: ParameterProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ParameterProxy.java,v 1.2 2005-02-17 19:30:44 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -14,9 +14,9 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.ModelPrinter;
-import net.sourceforge.waters.model.base.MutableNamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyFactory;
+import net.sourceforge.waters.model.base.UniqueElementProxy;
 import net.sourceforge.waters.xsd.module.EventParameterType;
 import net.sourceforge.waters.xsd.module.IntParameterType;
 import net.sourceforge.waters.xsd.base.ElementType;
@@ -42,7 +42,7 @@ import net.sourceforge.waters.xsd.module.RangeParameterType;
  * @author Robi Malik
  */
 
-public abstract class ParameterProxy extends MutableNamedProxy {
+public abstract class ParameterProxy extends UniqueElementProxy {
 
   //#########################################################################
   //# Constructors
