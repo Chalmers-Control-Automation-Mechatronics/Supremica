@@ -46,7 +46,7 @@ import java.util.*;
  * <!ELEMENT BasicFBInstance (InternalVars?,ECC?,Algorithm*)>
  */
 
-public class BasicFBInstance
+public class BasicFBInstance extends FBInstance
 {
     
     Variables internalVars;

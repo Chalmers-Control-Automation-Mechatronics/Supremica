@@ -54,7 +54,7 @@ package org.supremica.functionblocks.model;
  */
 public abstract class FBInstance extends NamedObject
 {
-    public FBInstance(String name)
+    public FBInstance()
     {
     }
 }
