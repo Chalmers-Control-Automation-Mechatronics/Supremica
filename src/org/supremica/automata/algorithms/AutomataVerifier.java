@@ -49,21 +49,17 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
-import org.supremica.util.IntArrayHashTable;
-import java.io.PrintWriter;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.AutomataIndexFormHelper;
-import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.standard.Determinizer;
 
 import org.supremica.util.BDD.*;

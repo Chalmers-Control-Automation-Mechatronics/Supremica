@@ -54,15 +54,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
-import java.util.*;
 import att.grappa.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.IO.*;
 import org.supremica.gui.texteditor.TextFrame;
-//import org.supremica.automata.Automaton;
-//import org.supremica.automata.AutomatonListener;
-//import org.supremica.automata.State;
-//import org.supremica.automata.Arc;
 
 public class DotViewer
 	extends JFrame
@@ -650,7 +645,7 @@ public class DotViewer
 			pane.setWantsInput(true);
 			pane.setSelectionValues(possibleValues);
 			pane.setInitialSelectionValue(possibleValues[0]);
-			pane.setComponentOrientation(((comp == null) ? pane.getRootFrame() : comp).getComponentOrientation());
+			pane.setComponentOrientation(((comp == null) ? JOptionPane.getRootFrame() : comp).getComponentOrientation());
 			pane.selectInitialValue();
 
 			this.checkbox = new JCheckBox("Export to debugview");

@@ -50,12 +50,6 @@
 package org.supremica.automata;
 
 import java.util.*;
-import java.io.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
 
 
 /**

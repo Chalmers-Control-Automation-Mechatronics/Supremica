@@ -49,18 +49,9 @@
  */
 package org.supremica.apps;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import java.util.*;
-import java.io.*;
 import org.supremica.log.*;
 import org.supremica.*;
-import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
-import org.supremica.gui.*;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.properties.SupremicaProperties;
 

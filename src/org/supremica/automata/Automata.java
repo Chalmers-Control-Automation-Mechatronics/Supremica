@@ -50,7 +50,6 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.log.*;
-import org.supremica.automata.algorithms.*;
 import org.supremica.gui.Gui;
 import javax.swing.JOptionPane;
 

@@ -56,9 +56,7 @@
 package org.supremica.gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.table.*;
 
 // ** This one sets its own background to white
 class WhiteScrollPane

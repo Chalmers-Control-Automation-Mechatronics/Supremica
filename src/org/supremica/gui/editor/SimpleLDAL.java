@@ -50,16 +50,10 @@
 package org.supremica.gui.editor;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.util.Iterator;
-import java.util.LinkedList;
 import com.nwoods.jgo.layout.JGoLayeredDigraphAutoLayout;
 import com.nwoods.jgo.layout.JGoNetwork;
 import com.nwoods.jgo.layout.JGoNetworkLink;
 import com.nwoods.jgo.layout.JGoNetworkNode;
-import com.nwoods.jgo.layout.JGoLayeredDigraphAutoLayoutLinkData;
-import com.nwoods.jgo.JGoPort;
-import com.nwoods.jgo.JGoLink;
 
 public class SimpleLDAL
 	extends JGoLayeredDigraphAutoLayout

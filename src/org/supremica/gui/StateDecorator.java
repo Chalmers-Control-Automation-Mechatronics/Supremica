@@ -49,12 +49,8 @@
  */
 package org.supremica.gui;
 
-import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.geom.*;
-import java.util.*;
 import org.supremica.automata.State;
 
 public class StateDecorator

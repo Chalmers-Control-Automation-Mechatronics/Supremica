@@ -50,7 +50,6 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
-import java.io.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;

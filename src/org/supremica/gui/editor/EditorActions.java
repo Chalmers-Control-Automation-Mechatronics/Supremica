@@ -49,12 +49,7 @@
  */
 package org.supremica.gui.editor;
 
-import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import com.nwoods.jgo.*;
-import com.nwoods.jgo.layout.JGoNetwork;
 
 public class EditorActions
 {

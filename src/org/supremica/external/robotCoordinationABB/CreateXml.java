@@ -51,25 +51,18 @@ package org.supremica.external.robotCoordinationABB;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.DataConversionException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.FileWriter;
 import java.util.*;
 
 import org.supremica.automata.*;
 import org.supremica.log.*;
-import org.supremica.gui.*;
 
 
 import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.*;
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsKinematicRole;
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsSimulationState;
 
 import com.inzoom.comjni.Variant;
 import com.inzoom.comjni.SafeArray;

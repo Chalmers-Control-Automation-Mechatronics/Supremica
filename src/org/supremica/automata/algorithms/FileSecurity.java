@@ -51,7 +51,6 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.gui.*;
 import org.supremica.automata.Automata;
 
 public class FileSecurity

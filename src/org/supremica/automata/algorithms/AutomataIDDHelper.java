@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.util.*;
-import org.supremica.gui.*;
 import org.supremica.util.IDD.*;
 import org.supremica.log.*;
 import java.util.*;

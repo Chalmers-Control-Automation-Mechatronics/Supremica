@@ -48,21 +48,11 @@
  * Supremica is owned and represented by KA.
  */
 package org.supremica.gui;
-
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.*;
-import java.io.*;
 import org.supremica.log.*;
-import javax.help.*;
-import org.supremica.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.comm.xmlrpc.*;
-import org.supremica.gui.editor.*;
-import org.supremica.gui.help.*;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;

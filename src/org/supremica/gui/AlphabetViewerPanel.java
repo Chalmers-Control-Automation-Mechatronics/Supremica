@@ -49,9 +49,7 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.*;
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.util.*;
@@ -59,12 +57,8 @@ import java.util.*;
 import org.supremica.log.*;
 
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonListener;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.treeview.*;
 
 // I changed AlphabetViewer to accept Automata objects and to show the alphabets 

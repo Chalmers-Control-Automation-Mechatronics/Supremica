@@ -48,8 +48,6 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
-
 public class Arc
 {
 	private LabeledEvent event;

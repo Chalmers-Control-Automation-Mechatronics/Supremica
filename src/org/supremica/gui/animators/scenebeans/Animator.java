@@ -2,20 +2,15 @@ package org.supremica.gui.animators.scenebeans;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 import javax.swing.*;
 import java.io.*;
 import java.util.Iterator;
 import java.util.TreeSet;
 import org.supremica.gui.*;
 import org.supremica.log.*;
-import uk.ac.ic.doc.scenebeans.*;
-import uk.ac.ic.doc.scenebeans.activity.*;
-import uk.ac.ic.doc.scenebeans.behaviour.*;
 import uk.ac.ic.doc.scenebeans.event.*;
 import uk.ac.ic.doc.scenebeans.animation.*;
 import uk.ac.ic.doc.scenebeans.animation.parse.*;
-import uk.ac.ic.doc.scenebeans.pick.*;
 import uk.ac.ic.doc.scenebeans.input.*;
 
 public class Animator

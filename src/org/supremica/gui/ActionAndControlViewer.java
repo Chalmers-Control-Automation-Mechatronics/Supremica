@@ -49,12 +49,9 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.tree.*;
-import java.util.*;
 import org.supremica.automata.*;
 
 public class ActionAndControlViewer

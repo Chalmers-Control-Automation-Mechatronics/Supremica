@@ -1,6 +1,5 @@
 package org.supremica.gui.cellEditor;
 
-import java.util.*;
 import javax.swing.*;
 import org.supremica.gui.VisualProject;
 

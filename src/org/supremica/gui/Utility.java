@@ -5,9 +5,7 @@
 package org.supremica.gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.table.*;
 
 // ** And the utility class that contains the functions that do the real job
 public class Utility

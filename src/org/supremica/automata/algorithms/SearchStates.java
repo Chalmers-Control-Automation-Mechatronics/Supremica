@@ -15,13 +15,10 @@
 package org.supremica.automata.algorithms;
 
 import java.lang.Exception;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.regex.*;
 
 import org.supremica.log.*;
 
-import org.supremica.util.IntArrayList;
 import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;

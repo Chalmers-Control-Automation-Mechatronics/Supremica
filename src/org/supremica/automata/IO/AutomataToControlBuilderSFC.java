@@ -49,7 +49,6 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;

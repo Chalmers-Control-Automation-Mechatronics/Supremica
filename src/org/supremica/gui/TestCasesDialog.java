@@ -2,14 +2,10 @@
 /********************** TestCasesDialog.java ************************/
 package org.supremica.gui;
 
-import java.io.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import org.supremica.automata.IO.AutomatonToDsx;
-import org.supremica.automata.IO.AutomataToXml;
 import org.supremica.automata.Project;
-import org.supremica.properties.*;
 import org.supremica.log.*;
 import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;

@@ -12,10 +12,8 @@ package org.supremica.automata.algorithms;
 // local-rechanles are not re-used in the LI test, only used for C test
 //    (doesn't really matter)
 
-import org.supremica.automata.*;
 import org.supremica.util.BDD.*;
 
-import java.util.*;
 
 /**
  * IncrementalBDDLanguageInclusion, for incremental modular verification with BDDs

@@ -49,7 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.gui.*;
 import org.supremica.log.*;
 
 public final class IDDOptions

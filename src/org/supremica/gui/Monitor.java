@@ -8,7 +8,6 @@ package org.supremica.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import org.supremica.gui.Monitorable;
 
 public class Monitor
 	implements ActionListener

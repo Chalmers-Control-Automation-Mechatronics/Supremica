@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.execution.expressions;
 
-import java.util.*;
-
 public abstract class Expression
 {
 	public abstract boolean isVariable();

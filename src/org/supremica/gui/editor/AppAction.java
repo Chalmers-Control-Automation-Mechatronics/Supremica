@@ -51,8 +51,7 @@ package org.supremica.gui.editor;
 
 import java.awt.Container;
 import javax.swing.AbstractAction;
-import javax.swing.Icon;
-import com.nwoods.jgo.*;
+import javax.swing.Icon; 
 import java.util.Vector;
 
 // Define an Action that knows about views and supports enabling/disabling

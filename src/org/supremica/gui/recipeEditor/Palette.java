@@ -13,10 +13,6 @@ package org.supremica.gui.recipeEditor;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
 import com.nwoods.jgo.*;
 
 /**

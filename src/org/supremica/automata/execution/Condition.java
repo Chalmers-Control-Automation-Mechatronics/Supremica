@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.execution;
 
-import java.util.*;
-
 public class Condition
 {
 	private String label = null;

@@ -49,9 +49,6 @@
  */
 package org.supremica.automata.execution.expressions;
 
-import java.util.*;
-
-
 public class AndExpression
 	extends Expression
 {

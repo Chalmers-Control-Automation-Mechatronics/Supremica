@@ -49,13 +49,8 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.*;
 import org.supremica.log.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
-import javax.swing.*;
-import java.util.*;
 import att.grappa.*;
 
 public class PreLoader

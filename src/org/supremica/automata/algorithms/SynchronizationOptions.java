@@ -48,7 +48,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.properties.SupremicaProperties;
 

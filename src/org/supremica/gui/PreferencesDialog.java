@@ -343,7 +343,7 @@ class CommunicationPanel
 	{
 		SupremicaProperties.setXmlRpcActive(useXmlRpc.isSelected());
 
-		int port = theDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
+		int port = PreferencesDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
 
 		if (port == Integer.MIN_VALUE)
 		{
@@ -418,7 +418,7 @@ class LayoutPanel
 		SupremicaProperties.setDotUseMultipleLabels(dotUseMultipleLabels.isSelected());
 		SupremicaProperties.setDotExecuteCommand(dotCommand.getText());
 
-		int maxNbrOfStates = theDialog.getInt("Max number of states without warning", dotMaxNbrOfStates.getText(), 0);
+		int maxNbrOfStates = PreferencesDialog.getInt("Max number of states without warning", dotMaxNbrOfStates.getText(), 0);
 
 		if (maxNbrOfStates == Integer.MIN_VALUE)
 		{
@@ -492,7 +492,7 @@ class SynchronizationPropertiesPanel
 		SupremicaProperties.setSyncExpandHashtable(expandHashtable.isSelected());
 		SupremicaProperties.setVerboseMode(verboseMode.isSelected());
 
-		int size = theDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
+		int size = PreferencesDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
 
 		if (size == Integer.MIN_VALUE)
 		{
@@ -501,7 +501,7 @@ class SynchronizationPropertiesPanel
 
 		SupremicaProperties.setSyncInitialHashtableSize(size);
 
-		int nbrOfThreads = theDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
+		int nbrOfThreads = PreferencesDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
 
 		if (nbrOfThreads == Integer.MIN_VALUE)
 		{
@@ -657,7 +657,7 @@ class SoftPLCPanel
 
 	public boolean doApply()
 	{
-		int cycleTimeInt = theDialog.getInt("Cycle time", cycleTime.getText());
+		int cycleTimeInt = PreferencesDialog.getInt("Cycle time", cycleTime.getText());
 		SupremicaProperties.setSoftplcCycleTime(cycleTimeInt);
                 SupremicaProperties.setSoftplcInterfaces(interfaces);
 
@@ -941,7 +941,7 @@ class SimulationPanel
     {
 
 		SupremicaProperties.setSimulationIsExternal(useExternal.isSelected());
-		int time = theDialog.getInt("Simulation cycle time", cycleTime.getText(), 0);
+		int time = PreferencesDialog.getInt("Simulation cycle time", cycleTime.getText(), 0);
 		if (time == Integer.MIN_VALUE)
 		{
 			return false;

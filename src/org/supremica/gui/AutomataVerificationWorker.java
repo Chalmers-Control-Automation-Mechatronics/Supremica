@@ -49,22 +49,14 @@
 package org.supremica.gui;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
 import javax.swing.*;
 import java.util.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
 
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
 import org.supremica.gui.VisualProjectContainer;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.EventsSet;
-import org.supremica.automata.LabeledEvent;
 import org.supremica.util.ActionTimer;
 
 /**
@@ -200,7 +192,7 @@ public class AutomataVerificationWorker
 		threadsToStop.add(this);
 		threadsToStop.add(automataVerifier);
 		
-		eventQueue.invokeLater(new Runnable()
+		EventQueue.invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -220,7 +212,7 @@ public class AutomataVerificationWorker
 		// Make sure(?) the ExecutionDialog is hidden!
 		// I thought this wouldn't work... but it seems
 		// it does!! /hguo
-		eventQueue.invokeLater(new Runnable()
+		EventQueue.invokeLater(new Runnable()
 			{
 				public void run()
 				{

@@ -16,7 +16,6 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.SearchStates;
-import org.supremica.automata.algorithms.Router;
 import org.supremica.gui.Presenter;
 import org.supremica.gui.VisualProject;
 

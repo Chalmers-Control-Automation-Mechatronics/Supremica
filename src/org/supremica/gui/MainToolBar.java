@@ -6,11 +6,7 @@
 package org.supremica.gui;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.util.*;
-import javax.help.*;
-import java.net.URL;
 
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.useractions.*;
@@ -40,7 +36,7 @@ public class MainToolBar
 
 	public MainToolBar(Supremica supremica)
 	{
-		this.supremica = supremica;
+		MainToolBar.supremica = supremica;
 
 		initToolBar();
 

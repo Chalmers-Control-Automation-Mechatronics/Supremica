@@ -5,9 +5,6 @@
 
 package org.supremica.automata.algorithms.scheduling;
 
-import java.io.*;
-import java.util.*;
-
 import com.objectspace.jgl.BinaryPredicate;
 import com.objectspace.jgl.Range;
 import com.objectspace.jgl.OrderedSetIterator;

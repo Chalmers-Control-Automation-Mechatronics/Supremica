@@ -49,10 +49,6 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
-import org.supremica.gui.editor.*;
-
 public class AutomatonToAutomatonDocument
 {
 

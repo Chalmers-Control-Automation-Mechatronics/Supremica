@@ -48,37 +48,7 @@
 */
 package org.supremica.external.shoefactory.plantBuilder;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import java.util.*;
-import java.io.*;
-import org.supremica.*;
-import org.supremica.properties.SupremicaProperties;
-import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.comm.xmlrpc.*;
-import org.supremica.gui.editor.*;
-import org.supremica.gui.help.*;
-import org.supremica.automata.*;
-import org.supremica.gui.animators.scenebeans.*;
-import org.supremica.gui.automataExplorer.AutomataExplorer;
-import org.supremica.gui.recipeEditor.RecipeEditor;
-import org.supremica.gui.cellEditor.CellEditor;
-import org.supremica.gui.simulator.SimulatorExecuter;
-import org.supremica.external.robotCoordination.AutomataBuilder;
-import org.supremica.external.shoefactory.plantBuilder.*;
-import org.supremica.external.shoefactory.Animator.*;
-
-import org.supremica.log.*;
-import org.supremica.automata.IO.*;
-import org.supremica.util.ActionTimer;
-import org.supremica.automata.algorithms.RobotStudioLink;
-
-import org.supremica.gui.useractions.*;
-import org.supremica.gui.texteditor.TextFrame;
 
 import org.supremica.automata.*;
 import org.supremica.gui.*;

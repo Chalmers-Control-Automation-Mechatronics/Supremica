@@ -55,8 +55,6 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.io.*;
-import java.net.URL;
-import java.beans.*;
 import javax.help.*;
 import org.supremica.log.*;
 import org.supremica.*;

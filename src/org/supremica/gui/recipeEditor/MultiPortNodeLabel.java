@@ -12,7 +12,6 @@
 package org.supremica.gui.recipeEditor;
 
 import com.nwoods.jgo.*;
-import java.awt.*;
 
 /**
  * MultiPortNodeLabel is just a JGoText that treats a single click as a command

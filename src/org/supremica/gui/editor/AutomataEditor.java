@@ -56,7 +56,6 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import java.util.HashMap;
 import com.nwoods.jgo.*;
-import com.nwoods.jgo.layout.JGoNetwork;
 import java.beans.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;

@@ -17,7 +17,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
-import javax.swing.event.*;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -25,7 +24,6 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.util.VPopupMenu;
 import org.supremica.automata.algorithms.standard.Determinizer;
 
 import org.supremica.gui.treeview.*;

@@ -50,20 +50,15 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
-import org.supremica.util.IntArrayHashTable;
 import org.supremica.util.ActionTimer;
-
-import java.io.PrintWriter;
 
 import org.supremica.log.*;
 import org.supremica.gui.Gui;
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.AutomataIndexFormHelper;

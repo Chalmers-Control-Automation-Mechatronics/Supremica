@@ -49,9 +49,7 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.*;
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;

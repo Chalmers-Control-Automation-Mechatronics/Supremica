@@ -53,7 +53,6 @@ import java.io.*;
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.*;
-import org.supremica.automata.execution.*;
 import org.supremica.log.*;
 
 public class ProjectToHtml

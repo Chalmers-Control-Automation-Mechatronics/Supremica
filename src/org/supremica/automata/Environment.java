@@ -49,8 +49,6 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
-
 public interface Environment
 {
 

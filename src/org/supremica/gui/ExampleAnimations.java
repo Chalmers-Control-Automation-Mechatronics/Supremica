@@ -50,8 +50,6 @@
 package org.supremica.gui;
 
 import java.util.*;
-import java.net.URL;
-import org.supremica.gui.animators.*;
 import org.supremica.gui.animators.scenebeans.*;
 
 public class ExampleAnimations

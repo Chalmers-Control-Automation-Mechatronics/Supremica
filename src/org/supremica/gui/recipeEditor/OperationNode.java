@@ -13,7 +13,6 @@ package org.supremica.gui.recipeEditor;
 
 import com.nwoods.jgo.*;
 import java.awt.*;
-import java.net.URL;
 
 //import com.nwoods.jgo.examples.*;
 // Activities are implemented as MultiPortNodes.

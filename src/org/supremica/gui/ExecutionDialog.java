@@ -48,9 +48,6 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.SynthesizerOptions;
-import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
-import org.supremica.automata.algorithms.AutomataSynchronizer;
 import org.supremica.automata.algorithms.Stoppable;
 import java.util.*;
 import java.awt.event.*;

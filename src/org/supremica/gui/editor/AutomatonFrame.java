@@ -49,12 +49,7 @@
  */
 package org.supremica.gui.editor;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import org.supremica.gui.*;
-import org.supremica.gui.VisualProjectContainer;
-import org.supremica.automata.Automaton;
 
 public class AutomatonFrame
 	extends JInternalFrame

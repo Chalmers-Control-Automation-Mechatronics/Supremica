@@ -50,7 +50,6 @@ package org.supremica.automata.IO;
 
 // package org.supremica;
 import java.io.PrintWriter;
-import java.io.IOException;
 
 public interface AutomataSerializer
 {

@@ -4,10 +4,6 @@ import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Animator.*;
 import org.supremica.gui.*;
 import grafchart.sfc.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -31,7 +27,7 @@ public class FactoryExecutorDEMO
 		{
 				e= new EditorAPI(args);
 				Editor.singleton = e;
-				e.removePaletteAction();
+				Editor.removePaletteAction();
 
 				URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.xml");
 				//GCDocument top = e.openWorkspace(url.getPath());

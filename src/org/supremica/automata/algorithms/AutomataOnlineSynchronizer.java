@@ -55,9 +55,7 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.gui.*;
 import org.supremica.log.*;
-import java.util.Arrays;
 
 // For the automata selection methods
 import java.util.ArrayList;

@@ -49,7 +49,6 @@
  */
 package org.supremica.apps;
 
-import java.io.*;
 import java.awt.*;
 import org.supremica.log.*;
 import org.supremica.properties.SupremicaProperties;

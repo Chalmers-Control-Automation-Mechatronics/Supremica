@@ -52,7 +52,6 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.log.*;
 import java.util.*;
-import java.io.PrintWriter;
 
 public class AutomataSynchronizer
 	implements Stoppable

@@ -51,9 +51,7 @@ package org.supremica.automata.IO;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
-import java.net.MalformedURLException;
 import org.supremica.automata.*;
-import org.supremica.automata.execution.*;
 import org.supremica.log.*;
 
 

@@ -19,9 +19,6 @@ import com.objectspace.jgl.OrderedSetIterator;
 // THis makes contains() a more costly operation
 // Thus, OrderedSet allows you to first find, then access
 import com.objectspace.jgl.BinaryPredicate;
-// Note another difference. OrderedSet by default sorts based on the hashcode
-// java.util.TreeSet orders on the "natural ordering", that is, compareTo
-import com.objectspace.jgl.Range;
 import com.objectspace.jgl.Tree;
 
 public class MultiSet

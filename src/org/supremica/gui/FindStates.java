@@ -66,7 +66,6 @@ import java.util.regex.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;

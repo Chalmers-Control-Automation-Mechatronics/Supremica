@@ -74,12 +74,10 @@
 */
 package org.supremica.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import javax.help.*;
-import java.net.URL;
 
 import org.supremica.gui.help.ContentHelp;
 import org.supremica.properties.SupremicaProperties;
@@ -89,7 +87,6 @@ import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
 import org.supremica.util.SupremicaMenuItem;
-import org.supremica.automata.algorithms.GeneticAlgorithms;
 import org.supremica.automata.algorithms.RobotStudioLink;
 
 public class MainMenuBar

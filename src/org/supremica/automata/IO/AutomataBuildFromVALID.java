@@ -53,7 +53,6 @@ import java.util.*;
 import java.io.*;
 import org.jdom.*;
 import org.jdom.input.*;
-import org.jdom.output.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 

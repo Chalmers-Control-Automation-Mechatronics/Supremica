@@ -1,11 +1,7 @@
 
 package org.supremica.automata.algorithms;
 
-
-import org.supremica.automata.*;
 import org.supremica.util.BDD.*;
-
-import java.util.*;
 
 /**
  * ModularBDDLanguageInclusion, for verification with BDDs

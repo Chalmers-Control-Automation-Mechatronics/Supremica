@@ -3,11 +3,8 @@
 
 package org.supremica.gui;
 
-import java.util.*;
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;

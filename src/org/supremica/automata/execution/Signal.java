@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.execution;
 
-import java.util.*;
-
 public class Signal
 {
 	private String label = null;

@@ -14,7 +14,6 @@ package org.supremica.gui.recipeEditor;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.*;
 
 public class OperationDialog
 	extends JDialog

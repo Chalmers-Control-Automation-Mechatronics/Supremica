@@ -50,8 +50,6 @@
 package org.supremica.gui;
 
 import javax.swing.filechooser.*;
-import javax.swing.*;
-import java.io.File;
 
 public class StandardExtensionFileFilter
 	extends FileFilter

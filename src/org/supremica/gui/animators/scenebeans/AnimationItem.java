@@ -49,23 +49,8 @@
  */
 package org.supremica.gui.animators.scenebeans;
 
-import java.util.*;
 import java.net.URL;
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import javax.swing.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.Automata;
-import uk.ac.ic.doc.scenebeans.*;
-import uk.ac.ic.doc.scenebeans.activity.*;
-import uk.ac.ic.doc.scenebeans.behaviour.*;
-import uk.ac.ic.doc.scenebeans.event.*;
-import uk.ac.ic.doc.scenebeans.animation.*;
 import uk.ac.ic.doc.scenebeans.animation.parse.*;
-import uk.ac.ic.doc.scenebeans.pick.*;
-import uk.ac.ic.doc.scenebeans.input.*;
 
 public class AnimationItem
 {

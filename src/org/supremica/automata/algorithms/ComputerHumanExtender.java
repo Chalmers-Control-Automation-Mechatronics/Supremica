@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.*;
-import java.io.*;
 import org.supremica.automata.*;
 
 public class ComputerHumanExtender

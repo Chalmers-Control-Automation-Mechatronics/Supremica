@@ -48,7 +48,6 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
 import org.supremica.log.*;
 
 public class EncodingHelper

@@ -58,12 +58,11 @@ import org.supremica.external.robotCoordinationABB.CreateXml;
 
 import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.*;
 import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsKinematicRole;
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsSimulationState;
+
 import org.supremica.automata.*;
 import org.supremica.log.*;
 import java.util.*;
 import javax.swing.JOptionPane;
-import javax.swing.JDialog;
 import org.supremica.gui.*;
 
 import com.inzoom.comjni.Variant;
@@ -108,8 +107,8 @@ public class RobotStudioLink
 
 	public RobotStudioLink(Gui gui, String stationName)
 	{
-		this.gui = gui;
-		this.stationName = stationName;
+		RobotStudioLink.gui = gui;
+		RobotStudioLink.stationName = stationName;
 	}
 
 	/*

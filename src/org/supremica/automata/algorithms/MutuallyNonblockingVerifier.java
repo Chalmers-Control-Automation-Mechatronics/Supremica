@@ -51,7 +51,6 @@ package org.supremica.automata.algorithms;
 import java.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
-import org.supremica.properties.*;
 import org.supremica.automata.*;
 
 public class MutuallyNonblockingVerifier

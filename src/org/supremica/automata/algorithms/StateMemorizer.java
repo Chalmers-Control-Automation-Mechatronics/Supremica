@@ -49,7 +49,6 @@
 package org.supremica.automata.algorithms;
 
 // Skräp
-import org.supremica.gui.*;
 import org.supremica.log.*;
 import java.util.Iterator;
 import java.util.LinkedList;

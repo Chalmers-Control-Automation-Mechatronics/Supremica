@@ -20,18 +20,9 @@ package org.supremica.automata.algorithms.scheduling;
 import java.io.*;
 import java.util.*;
 
-import com.objectspace.jgl.BinaryPredicate;
-import com.objectspace.jgl.Range;
-import com.objectspace.jgl.OrderedSetIterator;
-
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.IO.AutomataToXml;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.ActionTimer;
-
-import com.objectspace.jgl.MultiSet; // actually my own...
 
 public class ModifiedAstar
 {
@@ -211,7 +202,7 @@ public class ModifiedAstar
 
 						if(onclosed)	// reopen
 						{
-							reopener.reopen(nextState, open, closed);
+							Reopener.reopen(nextState, open, closed);
 						}
 					}
 				}

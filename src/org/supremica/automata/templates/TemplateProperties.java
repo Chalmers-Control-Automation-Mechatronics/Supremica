@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.templates;
 
-import java.util.*;
-
 public class TemplateProperties
 {
 	private String stateNamePrefix = null;

@@ -2,9 +2,6 @@
 // Interface for what populates the open and closed lists
 package org.supremica.automata.algorithms.scheduling;
 
-import java.io.*;
-import java.util.*;
-
 import com.objectspace.jgl.OrderedSetIterator;
 
 public interface Element

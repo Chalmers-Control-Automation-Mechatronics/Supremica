@@ -52,7 +52,6 @@ package org.supremica.gui.editor;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
-import com.nwoods.jgo.layout.JGoNetwork;
 
 public class ForceDialog
 	extends JDialog

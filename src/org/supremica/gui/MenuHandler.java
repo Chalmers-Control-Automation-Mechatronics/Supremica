@@ -50,8 +50,6 @@ package org.supremica.gui;
 
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
 import org.supremica.util.VPopupMenu;
 
 // MF -- Small changes here to make the main popup menu usefable from other tables
