@@ -48,7 +48,7 @@ public abstract class BaseBDDLanguageInclusion {
 
 	// local event stuff:
 	protected boolean [] local_events;	/** true if an event is local, valid only after a call to register_automaton_addition() */
-	private int [] current_event_usage; 	/** temporary storage for local events */
+	protected int [] current_event_usage; 	/** temporary storage for local events */
 	protected int [] event_usage_count; /** number of automata that use each event */
 	protected int local_events_found = 0; /** how many local events we had last time. to detect if any new has been added */
 
@@ -284,49 +284,7 @@ public abstract class BaseBDDLanguageInclusion {
 	}
 
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * show a trace to a reachable BDD.
-	 * XXX: this part is not modular yet. it is much slower than the verification itself!
-	 *      not very accurate either :(
-	 */
-	protected void show_trace(Supervisor sup, int bdd) {
-		int tmp2 = ba.exists(bdd, ba.getEventCube());
-		sup.trace("Trace", tmp2);
-		ba.deref(tmp2);
-	}
-	// --------------------------------------------------------------------------------
-	/**
-	 * given a S x Sigma BDD, check if (some of) events are included.
-	 * returns the number of changes
-	 */
-	protected int event_included(int bdd, boolean [] care, boolean [] removed) {
-
-		// XXX: this is _NOT_ efficient!!
-		int bdd_es = ba.exists(bdd, ba.getStateCube() );
-
-		int count = 0;
-		int len = care.length;
-		int zero = ba.getZero();
-		Event [] es = ba.getEvents();
-
-		for(int i = 0; i < len; i++) {
-			if(care[i]) {
-				// XXX: should we use and() or restrict()
-				int tmp = ba.and(bdd_es, es[i].getBDD() );
-				if( (removed[i] = (tmp == zero)))
-					count ++;
-				ba.deref(tmp);
-			} else {
-				removed[i] = false;
-			}
-		}
-
-
-		ba.deref(bdd_es);
-		return count;
-	}
-	// ---------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------
 
 	/**
 	 * check that by adding another automaton 'at', at least state in bdd_uc
@@ -432,6 +390,51 @@ public abstract class BaseBDDLanguageInclusion {
 
 
 	// ---------------------------------------------------------------------------------------
+
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * given a S x Sigma BDD, check if (some of) events are included.
+	 * returns the number of changes
+	 */
+	protected int event_included(int bdd, boolean [] care, boolean [] removed) {
+
+		// XXX: this is _NOT_ efficient!!
+		int bdd_es = ba.exists(bdd, ba.getStateCube() );
+
+		int count = 0;
+		int len = care.length;
+		int zero = ba.getZero();
+		Event [] es = ba.getEvents();
+
+		for(int i = 0; i < len; i++) {
+			if(care[i]) {
+				// XXX: should we use and() or restrict()
+				int tmp = ba.and(bdd_es, es[i].getBDD() );
+				if( (removed[i] = (tmp == zero)))
+					count ++;
+				ba.deref(tmp);
+			} else {
+				removed[i] = false;
+			}
+		}
+
+
+		ba.deref(bdd_es);
+		return count;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * show a trace to a reachable BDD.
+	 * XXX: this part is not modular yet. it is much slower than the verification itself!
+	 *      not very accurate either :(
+	 */
+	protected void show_trace(Supervisor sup, int bdd) {
+		int tmp2 = ba.exists(bdd, ba.getEventCube());
+		sup.trace("Trace", tmp2);
+		ba.deref(tmp2);
+	}
 
 	/** show some stats, make everyone happy etc... */
 	public void showStatistics() {

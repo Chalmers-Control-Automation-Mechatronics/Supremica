@@ -104,10 +104,11 @@ public class AutomataConfiguration {
 	 * @param automaton [in] the automaton that is the first element
 	 * @param event_care [in]events we are intrested in (only common events are of intrest)
 	 * @param workset_events [in] events we are intrested in (only common events are of intrest)
-	 * @param result [out] events that the algorithm should be intrested in
+	 * @param current_events_usage [in] number of times this events is still used in the "rest" partition
 	 * return TRUE if we should proceed, FALSE if there is no use since the workset is empty
 	 */
-	public boolean reset(BDDAutomaton automaton, boolean [] event_care,  boolean [] workset_events)
+	public boolean reset(BDDAutomaton automaton, boolean [] event_care,  boolean [] workset_events,
+						int [] current_events_usage)
 	{
 
 		selected = 1;
@@ -158,6 +159,8 @@ public class AutomataConfiguration {
 			workset_events_to_be_used_in_plant[i] = workset_events[i] ? 1 : 0;
 
 		addIfInteractWithMe(current_events);
+
+		heuristic.reset(automaton, current_events, workset_events, current_events_usage);
 		return true;
 	}
 
@@ -327,7 +330,7 @@ public class AutomataConfiguration {
 		resetQueue();
 	}
 
-	/** returtns the min member in the queue, assuming its  not empty (NOT CHECKED!) */
+	/** retruns the min member in the queue, assuming its  not empty (NOT CHECKED!) */
 	private int deleteMin() {
 		if(!queue_sorted) sort_queue();
 		queue_size--;
@@ -351,19 +354,7 @@ public class AutomataConfiguration {
 	// -- [ queue ordering heuristics ] ------------------------------------
 
 	private void sort_queue() {
-
-		heuristic.choose(queue_size, workset_events);
-
-
-
-/*
-		// DEBUG:
-		Options.out.println("***************** STUFF SORTED ********************");
-		for(int i = 0; i < queue_size; i++)
-			Options.out.println("--> " + queue_costs[i] + "   " + all[ work_queue[i] ].getName() );
-*/
-
-
+		heuristic.choose(queue_size /*  , workset_events */);
 		queue_sorted = true;
 	}
 

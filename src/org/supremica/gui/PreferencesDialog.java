@@ -788,8 +788,12 @@ class BDDPanel
 	asHeuristics.addItem("Random");
 	asHeuristics.addItem("BDD/Stack");
 	asHeuristics.addItem("BDD/FIFO");
+	asHeuristics.addItem("BDD/distance");
 	asHeuristics.addItem("Most common uc-events");
 	asHeuristics.addItem("Most common uc-arcs");
+	asHeuristics.addItem("Most common events");
+	asHeuristics.addItem("Most common arcs");
+	asHeuristics.addItem("Most local events");
 	asHeuristics.setSelectedIndex(Options.as_heuristics);
 
 

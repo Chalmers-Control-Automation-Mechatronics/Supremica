@@ -16,9 +16,9 @@ import org.supremica.util.BDD.*;
  */
 public class ASH_Random extends AutomatonSelectionHeuristic  {
 
-	public void choose(int queue_size, boolean [] workset_events) {
+	public void choose(int queue_size) {
 
-		// super-elajt randomization algorith ...
+		// super-elajt randomization algorithm ...
 
 		for(int i = 0; i < queue_size; i++)
 			queue_costs[i] = i;

@@ -14,7 +14,10 @@ import org.supremica.util.BDD.*;
 public abstract class AutomatonSelectionHeuristic {
 
 	protected BDDAutomaton [] list;
-	protected int [] queue;
+	protected BDDAutomaton first;
+
+	protected boolean [] partition_events, relevant_events;
+	protected int [] queue, event_usage;
 	protected double [] queue_costs;
 
 	public AutomatonSelectionHeuristic () {
@@ -29,5 +32,12 @@ public abstract class AutomatonSelectionHeuristic {
 		this.queue_costs = queue_costs;
 	}
 
-	public abstract void choose(int queue_size, boolean [] workset_events);
+	public void reset(BDDAutomaton first, boolean [] partition_events, boolean [] relevant_events, int [] usage) {
+		this.first = first;
+		this.partition_events = partition_events;
+		this.relevant_events = relevant_events;
+		this.event_usage = usage;
+	}
+
+	public abstract void choose(int queue_size);
 }

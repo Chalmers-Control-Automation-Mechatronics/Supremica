@@ -55,8 +55,13 @@ public class Options
 		AS_HEURISTIC_RANDOM = 0,
 		AS_HEURISTIC_STACK = 1,
 		AS_HEURISTIC_FIFO = 2,
-		AS_HEURISTIC_MOST_COMMON_UC_EVENTS = 3,
-		AS_HEURISTIC_MOST_COMMON_UC_ARCS = 4;
+		AS_HEURISTIC_DISTANCE = 3,
+		AS_HEURISTIC_MOST_COMMON_UC_EVENTS = 4,
+		AS_HEURISTIC_MOST_COMMON_UC_ARCS = 5,
+		AS_HEURISTIC_MOST_COMMON_EVENTS = 6,
+		AS_HEURISTIC_MOST_COMMON_ARCS = 7,
+		AS_HEURISTIC_MOST_LOCAL = 8
+		;
 
     // constants
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
@@ -83,7 +88,7 @@ public class Options
     public static int count_algo  = COUNT_TREE;
     public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
     public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;
-	public static int as_heuristics  = AS_HEURISTIC_MOST_COMMON_UC_ARCS;
+	public static int as_heuristics  = AS_HEURISTIC_MOST_LOCAL;
 
     // out own out stream, might be changed to point to a file
     public static PrintStream out = System.out;

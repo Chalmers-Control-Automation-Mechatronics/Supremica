@@ -68,7 +68,7 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		}
 
 		// get events that are considred and in k
-		boolean sane = ac.reset(k, considred_events,  workset_events);
+		boolean sane = ac.reset(k, considred_events,  workset_events, current_event_usage);
 		if(!sane) return true; // nothing to check
 
 		// initialize the table of event usage

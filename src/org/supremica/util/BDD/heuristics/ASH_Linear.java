@@ -15,7 +15,7 @@ public class ASH_Linear extends AutomatonSelectionHeuristic  {
 		this.reverse = reverse;
 	}
 
-	public void choose(int queue_size, boolean [] workset_events) {
+	public void choose(int queue_size) {
 
 		for(int i = 0; i < queue_size; i++)
 			queue_costs[i] = i;
