@@ -122,6 +122,10 @@ class SetOfStateSets
 interface EpsilonTester
 {
 	boolean isThisEpsilon(LabeledEvent event);
+	
+	// debug only
+	String showWhatYouGot();
+	// debug only
 }
 //
 class DefaultEpsilonTester
@@ -130,6 +134,12 @@ class DefaultEpsilonTester
 	public boolean isThisEpsilon(LabeledEvent event)
 	{
 		return event.isEpsilon();
+	}
+	
+	// debug only
+	public String showWhatYouGot()
+	{
+		return "removing epsilons";
 	}
 }
 //
@@ -157,6 +167,14 @@ class AlphaEpsilonTester
 		}
 		*/
 		return notin^events.contains(event);
+	}
+	
+	public String showWhatYouGot()
+	{
+		if(notin)
+			return "keeping " + events.toString();
+		else
+			return "removing " + events.toString();
 	}
 }
 //
@@ -217,7 +235,14 @@ public class Determinizer
 
 	public void execute()
 	{
-		logger.debug("Executing Determinizer(" + automaton.getName() + ")");
+		// Clear the caches - is this necessary?
+		for(Iterator state_it = automaton.stateIterator(); state_it.hasNext(); )
+		{
+			State state = (State)state_it.next();
+			state.setStateClass(null);
+		}
+			
+		logger.debug("Executing Determinizer(" + automaton.getName() + ") " + epsilonTester.showWhatYouGot());
 
 		/* This is how it goes - a variant of van Noords
 
@@ -245,7 +270,7 @@ public class Determinizer
 		and that's how it goes */
 
 		StateSet initset = epsilonClosure(automaton.getInitialState()); // This should be the one and only initial state!
-		add(initset);
+		add(initset);							// put it on openStateSets (if not already seen)
 		State init = initset.createNewState();
 		newAutomaton.addState(init);
 		newAutomaton.setInitialState(init);

@@ -179,24 +179,27 @@ public class SearchStates
 			composite = c;
 			index = 0;
 
-			//logger.debug("getState states: " + states);
-			//logger.debug("getState composite: " + states);
+			logger.debug("getState states[" + states.length + "][" + states[0].length + "]");
+			logger.debug("getState composite[" + composite.length + "]");
 		}
 
 		public boolean hasNext()
 		{
-			return index < composite.length - 1;
-
 			// the last element of composite is not used
+			// return index < composite.length - 1;
+
+			// did Knut change this to not use the las two elements??
+			return index < composite.length - 2;
+			// Yes! He f***ing did. Where else did this break code???
 		}
 
 		public State getState()
 		{
 
 			// get the current state of the current automaton
-			//logger.debug("getState index: " + index);
-			//logger.debug("getState states.length: " + statesInner.length);
-			//logger.debug("getState composite.length: " + composite.length);
+			logger.debug("getState index: " + index);
+			logger.debug("getState composite.length: " + composite.length);
+			logger.debug("getState composite[index]: " + composite[index]);
 			return states[index][composite[index]];
 		}
 
