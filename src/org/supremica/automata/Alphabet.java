@@ -208,7 +208,7 @@ public class Alphabet
 
 		if(doThrow == true)
 		{
-			throw new RuntimeException("Alphabet.addEvent: An event with id \"" + 
+			throw new RuntimeException("Alphabet.addEvent: An event with id \"" +
 									   event.getId() + "\" already exists");
 		}
 		else // doThrow == false => construct unique id, and add for real
@@ -393,7 +393,7 @@ public class Alphabet
 
 	public boolean isAllEventsPrioritized()
 	{
-		for (Iterator evIt = eventIterator(); evIt.hasNext(); )
+		for (Iterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) evIt.next();
 
@@ -407,7 +407,7 @@ public class Alphabet
 
 	public boolean isAllEventsObservable()
 	{
-		for (Iterator evIt = eventIterator(); evIt.hasNext(); )
+		for (Iterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) evIt.next();
 
@@ -494,10 +494,12 @@ public class Alphabet
 	 *
 	 *@return  Description of the Return Value
 	 */
+	 /*
 	public EventIterator eventIterator()
 	{
 		return new EventIterator(idMap.values().iterator());
 	}
+	*/
 
 	public boolean equalAlphabet(Alphabet other)
 	{
@@ -546,11 +548,11 @@ public class Alphabet
 	 */
 	public String toString()
 	{
-		/*	
+		/*
 		  StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
-		  
+
 		  tmpBuf.append(super.toString());
-		  
+
 		  return tmpBuf.toString();
 		*/
 		StringBuffer buf = new StringBuffer("{");
@@ -587,7 +589,7 @@ public class Alphabet
 	public int nbrOfCommonEvents(Alphabet otherAlphabet)
 	{
 		int nbrOfCommon = 0;
-		EventIterator eventIterator = this.eventIterator();
+		EventIterator eventIterator = iterator();
 		LabeledEvent currEvent;
 
 		while (eventIterator.hasNext())

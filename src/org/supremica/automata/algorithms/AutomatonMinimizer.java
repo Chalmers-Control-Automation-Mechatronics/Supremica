@@ -193,7 +193,6 @@ public class AutomatonMinimizer
 
 		newAutomaton.setType(theAutomaton.getType());
 		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet());
-		// newAutomaton.setName("min" + theAutomaton.getName());
 
 		// Associate one state with each equivalence class
 		int currNbrOfStates = 0;
@@ -229,6 +228,12 @@ public class AutomatonMinimizer
 			}
 		}
 
+		// Give the automaton an appropriate comment
+		if (theAutomaton.getName() != "")
+			newAutomaton.setComment("min(" + theAutomaton.getName() + ")");
+		else
+			newAutomaton.setComment("min(" + theAutomaton.getComment() + ")");
+
 		return newAutomaton;
 	}
 
@@ -255,9 +260,8 @@ public class AutomatonMinimizer
 	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
 	{
 		boolean refined = false;
-		Iterator eventIt = theAutomaton.getAlphabet().eventIterator();
 
-		while (eventIt.hasNext())
+		for (Iterator eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
@@ -421,7 +425,7 @@ class EquivalenceClasses
 // at the moment, this is only for being able to use get/setStateClaa
 // will StateSet do most of the job correctly?
 class EquivalenceClass
-	extends StateSet 	
+	extends StateSet
 {
 	// private LinkedList states = new LinkedList();
 	protected State newState = null;

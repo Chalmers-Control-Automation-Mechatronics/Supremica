@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="" major="0" minor="9">
+<Automaton name="q" type="Specification">
+	<Events>
+		<Event id="0" label="a"/>
+		<Event id="1" label="b"/>
+		<Event id="2" label="c"/>
+		<Event id="3" label="d"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="3" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="3" dest="1" event="3"/>
+	</Transitions>
+</Automaton>
+</Automata>

@@ -316,7 +316,7 @@ public class TableSorter
 	// This is a home-grown implementation which we have not had time
 	// to research - it may perform poorly in some circumstances. It
 	// requires twice the space of an in-place algorithm and makes
-	// NlogN assigments shuttling the values between the two
+	// NlogN assignments shuttling the values between the two
 	// arrays. The number of compares appears to vary between N-1 and
 	// NlogN depending on the initial order but the main reason for
 	// using it here is that, unlike qsort, it is stable.

@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -239,24 +238,29 @@ class SynthesizerDialogAdvancedPanel
 	extends SynthesizerPanel
 {
 	private JCheckBox maximallyPermissiveBox;
+	private JCheckBox reduceSupervisorsBox;
 
 	public SynthesizerDialogAdvancedPanel()
 	{
 		Box advancedBox = Box.createVerticalBox();
 
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
+		reduceSupervisorsBox = new JCheckBox("Reduce supervisors");
 		advancedBox.add(maximallyPermissiveBox);
+		advancedBox.add(reduceSupervisorsBox);
 		this.add(advancedBox);
 	}
 
 	public void update(SynthesizerOptions synthesizerOptions)
 	{
 		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
+		reduceSupervisorsBox.setSelected(synthesizerOptions.getReduceSupervisors());
 	}
 
 	public void regain(SynthesizerOptions synthesizerOptions)
 	{
 		synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
+		synthesizerOptions.setReduceSupervisors(reduceSupervisorsBox.isSelected());
 	}
 }
 

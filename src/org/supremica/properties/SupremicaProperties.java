@@ -125,6 +125,7 @@ public final class SupremicaProperties
 	private static final String SYNTHESIS_PURGE = "synthesisPurge";
 	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
+	private static final String SYNTHESIS_REDUCE_SUPERVISORS = "synthesisReduceSupervisors";
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
 
     // BDD Options
@@ -236,6 +237,7 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_PURGE, "false", true);
 		setProperty(SYNTHESIS_OPTIMIZE, "false", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
+		setProperty(SYNTHESIS_REDUCE_SUPERVISORS, "false", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
@@ -260,8 +262,6 @@ public final class SupremicaProperties
 		// Simulation stuff
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
-
-
 	}
 
 	public static final void setProperties(File aFile)
@@ -814,9 +814,9 @@ public final class SupremicaProperties
 		return toBoolean(wp.getProperty(SYNTHESIS_OPTIMIZE));
 	}
 
-	public static void setSynthesisOptimize(boolean maximallyPermissive)
+	public static void setSynthesisOptimize(boolean bool)
 	{
-		wp.setProperty(SYNTHESIS_OPTIMIZE, toString(maximallyPermissive));
+		wp.setProperty(SYNTHESIS_OPTIMIZE, toString(bool));
 	}
 
 	public static boolean synthesisMaximallyPermissive()
@@ -824,9 +824,19 @@ public final class SupremicaProperties
 		return toBoolean(wp.getProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE));
 	}
 
-	public static void setSynthesisMaximallyPermissive(boolean maximallyPermissive)
+	public static void setSynthesisMaximallyPermissive(boolean bool)
 	{
-		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, toString(maximallyPermissive));
+		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, toString(bool));
+	}
+
+	public static boolean synthesisReduceSupervisors()
+	{
+		return toBoolean(wp.getProperty(SYNTHESIS_REDUCE_SUPERVISORS));
+	}
+
+	public static void setSynthesisReduceSupervisors(boolean bool)
+	{
+		wp.setProperty(SYNTHESIS_REDUCE_SUPERVISORS, toString(bool));
 	}
 
 	public static boolean generalUseSecurity()

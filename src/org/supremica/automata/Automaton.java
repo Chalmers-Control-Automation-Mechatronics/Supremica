@@ -214,6 +214,12 @@ public class Automaton
 	{
 		if (name == null)
 		{
+			// This solved some ugly problems...
+			// but this isn't all that beautiful either... /hguo
+			if (comment != null)
+				return getComment();
+			else
+				logger.error("Error in Automata.java. Automaton with empty name and comment detected!");
 			return "";
 		}
 		return name;
@@ -766,44 +772,14 @@ public class Automaton
 	// end index stuff
 
 	// What the f*** are these doing here?
+	/*
 	private LabeledEvent getEvent(String eventId)
 		throws Exception
 	{
 		// return alphabet.getEventWithId(eventId);
 		return alphabet.getEvent(new LabeledEvent(eventId));
 	}
-
-/*
-	public LabeledEvent getEvent(Arc theArc)
-		throws Exception
-	{
-		// return getEvent(theArc.getEventId());
-		return theArc.getEvent();
-	}
-*/
-/*
-	public String getLabel(Arc theArc)
-		throws Exception
-	{
-		return theArc.getEvent().getLabel();
-	}
-*/
-	/** Room for improvement - our problem domain deals with states and events, not ids and labels!
-	 * Use isInAlphabet instead
-	 * @deprecated
-	 */
-/*
-	public boolean containsEventWithLabel(String eventLabel)
-	{
-		return hasEventInAlphabet(eventLabel);
-	}
-
-	public boolean hasEventInAlphabet(String eventLabel)
-	{
-		return alphabet.containsEventWithLabel(eventLabel);
-	}
-*/
-	// The above stuff should be removed -- use the Alphabet and the Arc methods instead
+	*/
 
 	/**
 	 * Returns an iterator to all states in this automaton
@@ -1275,7 +1251,7 @@ public class Automaton
 			currState.setSelected(false);
 		}
 	}
-	
+
 	private void removeAssociatedStateFromUnvisitedStates()
 	{
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
@@ -1334,7 +1310,7 @@ public class Automaton
 			LabeledEvent currEvent = getLabeledEvent(prevState, thisState);
 			if (currEvent == null)
 			{
-				throw new Exception("Could not find an arc from " + prevState.getName() + 
+				throw new Exception("Could not find an arc from " + prevState.getName() +
 									" to " + thisState.getName());
 			}
 			theTrace.addFirst(currEvent.getLabel());
@@ -1412,7 +1388,7 @@ public class Automaton
 	/*
 	public void setMutuallyAcceptingStatus(boolean status)
 	{
-	
+
 	}
 	*/
 
@@ -1435,7 +1411,7 @@ public class Automaton
 				// This state must be mutually accepting and not forbidden?
 				//if (currState.isMutuallyAccepting() && !currState.isForbidden())
 
-				// We don't care about forbidden states... 
+				// We don't care about forbidden states...
 				if (currState.isMutuallyAccepting())
 				{
 					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext();)
@@ -1906,7 +1882,14 @@ public class Automaton
 
 	public int hashCode()
 	{
-		return name.hashCode();
+		// Generate hascode from name, or if that's null, from the comment
+		if (name != null)
+			return name.hashCode();
+		else if (comment != null)
+			return comment.hashCode();
+
+		logger.error("Error in Automaton.java. Some automaton has both name and comment empty! This is NOT recommended!");
+		return 0;
 	}
 
 	public static void main(String[] args)
@@ -2066,7 +2049,7 @@ public class Automaton
 			}
 			sbuf.append("\n");
 		}
-		for(EventIterator eit = getAlphabet().eventIterator(); eit.hasNext(); )
+		for(EventIterator eit = getAlphabet().iterator(); eit.hasNext(); )
 		{
 			LabeledEvent ev = eit.nextEvent();
 			sbuf.append("LabeledEvent " + ev.getLabel() + " = new LabeledEvent(\"" + ev.getLabel() + "\");");

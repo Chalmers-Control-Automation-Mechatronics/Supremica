@@ -371,7 +371,7 @@ public class ExecutionDialog
 				operationLabel.setText(currentMode.getId());    // "Verifying nonblocking...");
 				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
-				
+
 				currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingFirstRun)
@@ -379,7 +379,7 @@ public class ExecutionDialog
 				operationLabel.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
 				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
-				
+
 				currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingSecondRun)
@@ -387,7 +387,7 @@ public class ExecutionDialog
 				operationLabel.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
 				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
-				
+
 				currCenterPanel = progressPanel;
 			}
 			*/
@@ -425,6 +425,14 @@ public class ExecutionDialog
 		}
 	}
 
+	public void stopAllThreads()
+	{
+		for (Iterator exIt = threadsToStop.iterator(); exIt.hasNext(); )
+		{
+			((Stoppable) exIt.next()).requestStop();
+		}
+	}
+
 	public void actionPerformed(ActionEvent event)
 	{
 		Object source = event.getSource();
@@ -433,11 +441,7 @@ public class ExecutionDialog
 		{
 			if (threadsToStop != null)
 			{
-				for (Iterator exIt = threadsToStop.iterator(); exIt.hasNext(); )
-				{
-					((Stoppable) exIt.next()).requestStop();
-				}
-
+				stopAllThreads();
 				threadsToStop = null;    // Helping the garbage collector...
 			}
 

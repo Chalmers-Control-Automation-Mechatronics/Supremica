@@ -50,11 +50,7 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 import org.supremica.log.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 
 public class AlphabetAnalyzer
 {
@@ -87,19 +83,16 @@ public class AlphabetAnalyzer
 
 	private void buildEventToAutomataMap(Automata anAutomata)
 	{
-		Iterator automataIt = anAutomata.iterator();
-
-		while (automataIt.hasNext())
+		// Loop over automata
+		for (Iterator automataIt = anAutomata.iterator(); automataIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton) automataIt.next();
-			Alphabet currAlphabet = (Alphabet) currAutomaton.getAlphabet();
-			Iterator eventIt = currAlphabet.iterator();
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
 
-			while (eventIt.hasNext())
-			{
-				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-
-				insertEvent(currEvent, currAutomaton);
+			// Loop over alphabet
+			for (EventIterator eventIt = currAlphabet.iterator(); eventIt.hasNext();)
+			{	// Insert in map
+				insertEvent(eventIt.nextEvent(), currAutomaton);
 			}
 		}
 	}
@@ -168,7 +161,7 @@ public class AlphabetAnalyzer
 
 	private void insertEvent(LabeledEvent ev, Automaton aut)
 	{
-		Set automatonSet = (Set) eventToAutomataMap.get(ev);
+		HashSet automatonSet = (HashSet) eventToAutomataMap.get(ev);
 
 		if (automatonSet == null)
 		{   // There were no automata in the map for this event,
@@ -286,20 +279,20 @@ public class AlphabetAnalyzer
 
 		if ((nbrOnlyLeft == 0) && (nbrOnlyRight == 0))
 		{
-			logger.info("Alphabet: " + leftAut.getName() + " == " + 
+			logger.info("Alphabet: " + leftAut.getName() + " == " +
 						rightAut.getName() + " new unsych: " + newUnique);
 		}
 		else
 		{
 			if (nbrOnlyLeft == 0)
 			{
-				logger.info("Alphabet: " + leftAut.getName() + " <= " + 
+				logger.info("Alphabet: " + leftAut.getName() + " <= " +
 							rightAut.getName() + " new unsych: " + newUnique);
 			}
 
 			if (nbrOnlyRight == 0)
 			{
-				logger.info("Alphabet: " + rightAut.getName() + " <= " + 
+				logger.info("Alphabet: " + rightAut.getName() + " <= " +
 							leftAut.getName() + " new unsych: " + newUnique);
 			}
 		}

@@ -63,17 +63,17 @@ class MainPopupMenu
 
 		menuHandler.addSeparator();
 
-		JMenuItem synchronizeItem = new JMenuItem("Synchronize");
+		JMenuItem synchronizeItem = new JMenuItem("Synchronize...");
 		menuHandler.add(synchronizeItem, 2);
 
-		JMenuItem verifyItem = new JMenuItem("Verify");
+		JMenuItem verifyItem = new JMenuItem("Verify...");
 		menuHandler.add(verifyItem, 1);
 
 		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
 		menuHandler.add(synthesizeItem, 1);
 
 		menuHandler.addSeparator();
-		
+
 		JMenuItem workbench = new SupremicaMenuItem(new WorkbenchAction());
 		menuHandler.add(workbench, 1);
 
@@ -131,6 +131,12 @@ class MainPopupMenu
 		{
 			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
 			menuHandler.add(automatonBuildObserver, 1);
+		}
+
+		if (true || SupremicaProperties.includeExperimentalAlgorithms())
+		{
+			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());
+			menuHandler.add(automatonSplit, 1);
 		}
 
 		if (SupremicaProperties.includeExperimentalAlgorithms())

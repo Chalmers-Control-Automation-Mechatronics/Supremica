@@ -209,7 +209,7 @@ public class Events
 	{
 		if (label == null)
 		{
-			throw new IllegalArgumentException("label must be non-null");
+			throw new IllegalArgumentException("Event label must be non-null");
 		}
 		return theEvents.containsKey(label);
 	}
@@ -227,7 +227,7 @@ public class Events
 	{
 		if (label == null)
 		{
-			throw new IllegalArgumentException("EventLabel must be non-null");
+			throw new IllegalArgumentException("Event label must be non-null");
 		}
 		return (LabeledEvent) theEvents.get(label);
 	}

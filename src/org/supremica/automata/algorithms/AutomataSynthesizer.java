@@ -53,143 +53,8 @@ import java.util.*;
 import org.supremica.util.ActionTimer;
 
 import org.supremica.log.*;
-import org.supremica.gui.Gui;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.AlphabetHelpers;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.gui.VisualProjectContainer;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.State;
-import org.supremica.automata.Events;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.EventIterator;
-import org.supremica.automata.AutomataIndexFormHelper;
-import org.supremica.automata.algorithms.SynthesisType;
-
-// AutomataSelector a set of specs/sups/plants,
-// For each spec/sup it returns that automaton together with the plants with which it shares uc-events
-// If closedSet == true the returned set is closed in that all plants that share uc-events with any plant in the set is also included
-class AutomataSelector
-{
-	private static Logger logger = LoggerFactory.createLogger(AutomataSelector.class);
-
-	private Automata globalSet;
-	private Automata partialSet = new Automata();
-	private Iterator specIterator;
-	private HashMap eventToAutomataMap = new HashMap();
-	private boolean seenSpec = false; // keep track of wether no spec exists, may need to do some job anyway
-
-	public AutomataSelector(Automata globalSet)
-		throws Exception
-	{
-		this.globalSet = globalSet;
-		this.specIterator = globalSet.iterator();
-
-		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(globalSet);
-		eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
-	}
-
-	// Loop over supervisors/specifications and find plants containing equal uncontrollable events
-	public Automata next()
-	{
-		partialSet.clear();
-
-		while (specIterator.hasNext())
-		{
-			Automaton currSupervisorAutomaton = (Automaton) specIterator.next();
-
-			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
-			{
-				seenSpec = true; // yes, we've found a spec/sup
-
-				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
-				partialSet.addAutomaton(currSupervisorAutomaton);
-				logger.debug("AutomataSelector::Added spec/sup " + currSupervisorAutomaton.getName());
-
-				ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
-
-				while (!eventList.isEmpty())
-				{
-					LabeledEvent currEvent = (LabeledEvent) eventList.remove(0);
-
-					if (!currEvent.isControllable())
-					{
-						addPlant(currEvent);
-						/*
-						if (eventToAutomataMap.get(currEvent) != null)
-						{
-							Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
-
-							while (plantIterator.hasNext())
-							{
-								Automaton currPlantAutomaton = (Automaton) plantIterator.next();
-
-								// This check is performed in eventToAutomataMap
-								// if (currPlantAutomaton.getType() == AutomatonType.Plant)
-								if (!partialSet.containsAutomaton(currPlantAutomaton))
-								{
-									partialSet.addAutomaton(currPlantAutomaton);
-									logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
-
-									// If we want a closed set, we need to add plants with
-									// uncontrollable events common to the already added plants too...
-									if (closedSet)
-									{
-										eventList.addAll(currPlantAutomaton.eventCollection());
-									}
-								}
-							}
-						}
-						*/
-					}
-				}
-				break; // Note, we break out of the while loop here
-			}
-		}
-		return partialSet; // empty, only when we're done. For a spec with no matching plants, this spec will be included
-	}
-
-	// To your current selection of spec and plants, add all plants that have this event
-	public Automata addPlant(LabeledEvent currEvent)
-	{
-		if (eventToAutomataMap.get(currEvent) != null)
-		{
-			Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
-
-			while (plantIterator.hasNext())
-			{
-				Automaton currPlantAutomaton = (Automaton) plantIterator.next();
-
-				// This check is performed in eventToAutomataMap
-				// if (currPlantAutomaton.getType() == AutomatonType.Plant)
-				if (!partialSet.containsAutomaton(currPlantAutomaton))
-				{
-					partialSet.addAutomaton(currPlantAutomaton);
-					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
-
-					// closedSet stuff removed
-				}
-			}
-		}
-		return partialSet; // return the updated set
-	}
-
-	public Automata addPlants(Alphabet events)
-	{
-		for(Iterator it = events.iterator(); it.hasNext(); )
-		{
-			addPlant((LabeledEvent)it.next());
-		}
-		return partialSet;
-	}
-
-	// Return wether we've seen a spec/sup or not
-	boolean hadSpec()
-	{
-		return seenSpec;
-	}
-}
+import org.supremica.gui.*;
+import org.supremica.automata.*;
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -199,6 +64,10 @@ class MonolithicReturnValue
 	public Alphabet disabledEvents;	// see AutomatonSynthesizer
 }
 
+/**
+ * Does synthesis in automata-scale, modularily,
+ * uses AutomatonSynthesizer for monolithic problems
+ */
 public class AutomataSynthesizer
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
@@ -232,8 +101,8 @@ public class AutomataSynthesizer
 
 		if (!theAutomata.isEventControllabilityConsistent())
 		{
-			throw new IllegalArgumentException("The automata are not consistent in the controllability " + 
-											   "of an event.");
+			throw new IllegalArgumentException("The automata are not consistent in the controllability " +
+											   "of some event.");
 		}
 		if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) && !theAutomata.isAllEventsPrioritized())
 		{
@@ -363,7 +232,7 @@ public class AutomataSynthesizer
 		{
 			theTimer.start();
 			// monolithic case, just whack the entire stuff into the monolithic algo
-			MonolithicReturnValue retval = doMonolithic(theAutomata, false); 
+			MonolithicReturnValue retval = doMonolithic(theAutomata, false);
 			theTimer.stop();
 			retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 			gui.addAutomaton(retval.automaton); // let the user choose the name later
@@ -454,53 +323,63 @@ public class AutomataSynthesizer
 		throws Exception
 	{
 		Automata modSupervisors = new Automata(); // collects the calculated supervisors
-		
+
 		AutomataSelector selector = new AutomataSelector(theAutomata);	// always start with non-max perm
+
+		// Loop over specs/sups AND their corresponding plants (dealt with by the selector)
 		for (Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
 		{
-			if (automata.size() > 1) // no need to do anything for a singleton spec
+			// Do monolithic synthesis on this subsystem
+			MonolithicReturnValue retval = doMonolithic(automata);
+			if (retval.didSomething)
 			{
-				MonolithicReturnValue retval = doMonolithic(automata);
-				if (retval.didSomething)
+				retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+
+				Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
+				if(synthesizerOptions.getMaximallyPermissive()) // If we should care about max perm...
 				{
-					retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
-					
-					Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
-					if(synthesizerOptions.getMaximallyPermissive()) // If we should care about max perm...
+					while(disabledEvents.size() > 0) // ...then do so until we're known to be maximally permissive...
 					{
-						while(disabledEvents.size() > 0) // ...then do so until we're known to be maximally permissive...
+						automata = selector.addPlants(disabledEvents);
+						retval = doMonolithic(automata); // now we're *guaranteed* max perm
+						retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
+						disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
+					}
+				}
+				else	// we should not care about max perm, but should notify
+				{
+					if (disabledEvents.size() > 0)	// not guranteed to be max perm
+					{
+						logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
+									"' might not be maximally permissive since:");
+						for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
 						{
-							automata = selector.addPlants(disabledEvents);
-							retval = doMonolithic(automata); // now we're *guaranteed* max perm
-							retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
-							disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
+							LabeledEvent currEvent = (LabeledEvent)evIt.next();
+							logger.info(currEvent + " is included in the plant but not " +
+										"in the supervisor.");
 						}
 					}
-					else	// we should not care about max perm, but should notify
+					else	// it's max perm in any case
 					{
-						if (disabledEvents.size() > 0)	// not guranteed to be max perm
-						{
-							logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
-										"' might not be maximally permissive since:");
-							for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
-							{
-								LabeledEvent currEvent = (LabeledEvent)evIt.next();
-								logger.info(currEvent + " is included in the plant but not " +
-											"in the supervisor.");
-							}
-						}
-						else	// it's max perm in any case
-						{
-							logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
-										"' is maximally permissive.");
-						}
+						logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
+									"' is maximally permissive.");
 					}
-					
+				}
+
+				// Should we reduce the supervisor?
+				if (synthesizerOptions.getReduceSupervisors())
+				{	// Add the reduced supervisor
+					Automaton supervisor = retval.automaton;
+					Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(supervisor, automata);
+					modSupervisors.addAutomaton(reducedSupervisor);
+				}
+				else
+				{	// Add the supervisor as is
 					modSupervisors.addAutomaton(retval.automaton);
 				}
 			}
 		}
-		
+
 		// If no spec/sup is in the selected automata, only nonblocking requires work
 		if(selector.hadSpec() == false) // if we've not seen any spec, do monolithic synthesis on the entire set
 		{
@@ -511,19 +390,21 @@ public class AutomataSynthesizer
 				modSupervisors.addAutomaton(retval.automaton);
 			}
 		}
-		
+
 		// Should we optimize the result (throw unnecessary supervisors away)
 		if (synthesizerOptions.getOptimize())
 		{
 			optimize(theAutomata, modSupervisors);
 		}
-		
+
+		// Did we do anything at all?
 		if (modSupervisors.size() == 0)
 		{
-			logger.info("No problems found, the current specifications and supervisors " + 
+			logger.info("No problems found, the current specifications and supervisors " +
 						"can be used to supervise the system.");
 		}
-		
+
+		// Nonblocking synthesis is not implemented...
 		if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking ||
 		   synthesizerOptions.getSynthesisType() == SynthesisType.Both)
 		{
@@ -532,9 +413,10 @@ public class AutomataSynthesizer
 						"plants it controls");
 		}
 
+		// Return the new supervisors
 		return modSupervisors;
 	}
-	
+
 	// se the real implementation below
 	private MonolithicReturnValue doMonolithic(Automata automata)
 		throws Exception
@@ -557,7 +439,7 @@ public class AutomataSynthesizer
 		// If this is not the case then we can treat all
 		// unobservable events as uncontrollable. This will
 		// guarantee the existence of a supremal supervisor.
-		// How ever this will not necessarily be the maximally
+		// However this will not necessarily be the maximally
 		// permissive supervisor. See Introduction to Discrete Event
 		// Systems, Cassandras, Lafortune for a discussion about this
 		// problem.
@@ -621,12 +503,12 @@ public class AutomataSynthesizer
 		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
 		syncher.execute(); // should be able to interrupt this one, just not now...
 		retval.automaton = syncher.getAutomaton();
-		retval.didSomething |= syncher.getHelper().getAutomataIsControllable();
+		retval.didSomething |= !syncher.getHelper().getAutomataIsControllable();
 
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
 		{
 			// Reset the synchronization type
-			synchronizationOptions.rememberDisabledEvents(true);
+			synchronizationOptions.rememberDisabledEvents(orgRememberDisabledEvents);
 		}
 
 		// We need to synthesize even if the result above is controllable

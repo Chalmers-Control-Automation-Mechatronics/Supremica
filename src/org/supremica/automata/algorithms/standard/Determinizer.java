@@ -135,7 +135,6 @@ public class Determinizer
 		newAutomaton.addState(init);
 		newAutomaton.setInitialState(init);
 
-
 		while(!openStateSets.isEmpty())
 		{
 			StateSet Q1 = openStateSets.get(); // This is vanNoords T
@@ -181,6 +180,12 @@ public class Determinizer
 			openStateSets.remove(Q1);
 			closedStateSets.add(Q1); // "mark" this set as done
 		}
+
+		// Give the new automaton an appropriate comment
+		if (automaton.getName() != "")
+			newAutomaton.setComment("detm(" + automaton.getName() + ")");
+		else
+			newAutomaton.setComment("detm(" + automaton.getComment() + ")");
 	}
 
 	public Automaton getNewAutomaton()

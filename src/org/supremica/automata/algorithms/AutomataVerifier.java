@@ -175,7 +175,7 @@ public class AutomataVerifier
 			{
 				if (!theAutomata.isAllEventsPrioritized())
 				{
-					return "All event must be prioritized in the modular algorithm";
+					return "All events must be prioritized in the modular algorithm";
 				}
 			}
 		}
@@ -350,6 +350,25 @@ public class AutomataVerifier
 	 */
 	public void prepareForLanguageInclusion(Automata inclusionAutomata)
 	{
+		/* WHY WON'T THIS WORK!?!? GRRR. /hugo
+		// Make sure the alphabets have the right relation
+		Automata exclusionAutomata = new Automata();
+		for (AutomatonIterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		{
+			Automaton currAut = autIt.nextAutomaton();
+			if (!inclusionAutomata.containsAutomaton(currAut))
+			{
+				exclusionAutomata.addAutomaton(currAut);
+			}
+
+			// The "exclusionAutomata"'s alphabet must be included in the "inclusionAutomata"
+			if (Alphabet.minus(exclusionAutomata.getUnionAlphabet(),inclusionAutomata.getUnionAlphabet()).size() > 0)
+			{
+				logger.warn("Warning, the alphabets are not well related for language inclusion.");
+			}
+		}
+		*/
+
 		// After these preparations, controllability verification verifies language inclusion
 		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
@@ -1999,7 +2018,7 @@ public class AutomataVerifier
 		Automata theAutomata = new Automata();
 		theAutomata.addAutomata(automataA);
 		theAutomata.addAutomata(automataB);
-		//theAutomata.setIndicies();
+		theAutomata.setIndicies();
 
 		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions,
 														 verificationOptions);

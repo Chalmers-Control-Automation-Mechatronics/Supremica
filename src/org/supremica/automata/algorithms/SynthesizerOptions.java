@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -59,20 +58,22 @@ public final class SynthesizerOptions
 	private boolean purge;
 	private boolean optimize;
 	private boolean maximallyPermissive;
+	private boolean reduceSupervisors;
 	private boolean rememberDisabledEvents;
 
 	public SynthesizerOptions()
 	{
-		this(SupremicaProperties.synthesisSynthesisType(), SupremicaProperties.synthesisAlgorithmType(), SupremicaProperties.synthesisPurge(), SupremicaProperties.synthesisOptimize(), SupremicaProperties.synthesisMaximallyPermissive());
+		this(SupremicaProperties.synthesisSynthesisType(), SupremicaProperties.synthesisAlgorithmType(), SupremicaProperties.synthesisPurge(), SupremicaProperties.synthesisOptimize(), SupremicaProperties.synthesisMaximallyPermissive(), SupremicaProperties.synthesisReduceSupervisors());
 	}
 
-	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive)
+	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean reduceSupervisors)
 	{
 		this.synthesisType = synthesisType;
 		this.synthesisAlgorithm = synthesisAlgorithm;
 		this.purge = purge;
 		this.optimize = optimize;
 		this.maximallyPermissive = maximallyPermissive;
+		this.reduceSupervisors = reduceSupervisors;
 	}
 
 	public boolean isValid()
@@ -158,5 +159,17 @@ public final class SynthesizerOptions
 	public boolean getMaximallyPermissive()
 	{
 		return maximallyPermissive;
+	}
+
+	public void setReduceSupervisors(boolean bool)
+	{
+		reduceSupervisors = bool;
+
+		SupremicaProperties.setSynthesisReduceSupervisors(bool);
+	}
+
+	public boolean getReduceSupervisors()
+	{
+		return reduceSupervisors;
 	}
 }

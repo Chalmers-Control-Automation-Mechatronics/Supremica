@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -74,6 +73,9 @@ public class AutomatonSynthesizer
 	protected final ActionTimer theTimer = new ActionTimer();
 	protected boolean forcedPurge = false;
 
+	/**
+	 * theAutomaton will be changed!
+	 */
 	public AutomatonSynthesizer(Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
 		throws Exception
 	{
@@ -85,6 +87,7 @@ public class AutomatonSynthesizer
 		this.theAutomaton = theAutomaton;
 		this.synthesizerOptions = synthesizerOptions;
 	}
+
 	/**
 	 * Return the time required to run this algorithm. It is only valid to
 	 * call this method after the return of the execute method.
@@ -93,7 +96,7 @@ public class AutomatonSynthesizer
 	{
 		return theTimer.elapsedTime();
 	}
-	
+
 	public Automaton getAutomaton()
 	{
 		return theAutomaton;
@@ -170,39 +173,39 @@ public class AutomatonSynthesizer
 		throws Exception
 	{
 		forcedPurge = true;
-		
+
 		boolean didSomething = false;
 		boolean observable = false;
 
-		int observerIteration = 1; 		
+		int observerIteration = 1;
 		while (!observable)
 		{
 			boolean changed = synthesizeControllableNonblocking();
 			didSomething = didSomething || changed;
-			ObserverBuilder observerBuilder = new ObserverBuilder(theAutomaton, true);							
+			ObserverBuilder observerBuilder = new ObserverBuilder(theAutomaton, true);
 			observerBuilder.execute();
 			observable = observerBuilder.isObservable();
 			Automaton currObserver = observerBuilder.getNewAutomaton();
 			currObserver.setAllStatesAsAccepting(true);
 			currObserver.setName("Observer");
-			
+
 			logger.info("Number of states in observer: " + currObserver.nbrOfStates() + " nbr forb states: " + currObserver.nbrOfForbiddenStates());
-			
+
 			Automata observerAndSupervisor = new Automata();
 			observerAndSupervisor.addAutomaton(currObserver);
 			observerAndSupervisor.addAutomaton(theAutomaton);
 			// observerAndSupervisor.setIndicies();
 			SynchronizationOptions observerSynchOptions = new SynchronizationOptions();
 			observerSynchOptions.setSynchronizationType(SynchronizationType.Full);
-			
+
 			AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions);
 			observerSynchronizer.execute();
 			Automaton newSystem = observerSynchronizer.getAutomaton();
 			logger.info("Number of states in observer||sup: " + newSystem.nbrOfStates() + " nbr forb states: " + newSystem.nbrOfForbiddenStates());
-			
-			
+
+
 			theAutomaton = newSystem;
-			 
+
 			logger.debug("Observer in iteration " + observerIteration + " is " + (observable ? "observable" : "unobservable"));
 			observerIteration++;
 		}
@@ -235,7 +238,6 @@ public class AutomatonSynthesizer
 
 		// Do fixed point iteration
 		doControllable(stateList);
-
 		boolean newUnsafeStates = false;
 		do
 		{
@@ -253,7 +255,7 @@ public class AutomatonSynthesizer
 
 		// Forbid the states with MAX_COST set
 		boolean didSomething = false;
-		
+
 		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
@@ -416,7 +418,8 @@ public class AutomatonSynthesizer
 		return stateStack; // return the set of non-coreachable states
 	}
 
-	protected boolean doControllable(LinkedList stateStack) // returns true if uncontrollable states found
+	// returns true if uncontrollable states found
+	protected boolean doControllable(LinkedList stateStack)
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::doControllable");
@@ -475,7 +478,7 @@ public class AutomatonSynthesizer
 	public LinkedList doControllable(State currState)
 	{
 		LinkedList stateStack = new LinkedList();
-		
+
 		Iterator arcIt = currState.incomingArcsIterator();
 		while (arcIt.hasNext())
 		{
@@ -498,9 +501,9 @@ public class AutomatonSynthesizer
 				}
 			}
 		}
-		return stateStack;		
+		return stateStack;
 	}
-	
+
 	public void doReachable()
 	{
 		logger.debug("AutomatonSynthesizer::doReachable");
@@ -558,7 +561,7 @@ public class AutomatonSynthesizer
 	}
 
 	/**
-	 * Returns the set of uncontrollable events that needed to be disabled in the synthesis.
+	 * Returns the set of UNCONTROLLABLE events that needed to be disabled in the synthesis.
 	 * If not rememberDisabledEvents are set to true then null is returned.
 	 * This method might only be called after synthesize has returned.
 	 */

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -74,6 +73,7 @@ public class TestPackageAlgorithms
 		suite.addTest(TestAutomatonSynthesizer.suite());
 		suite.addTest(TestAutomataSynthesizer.suite());
 		suite.addTest(TestAutomataVerifier.suite());
+		suite.addTest(TestAutomatonSplit.suite());
 		// suite.addTest(TestAutomataToXml.suite());
 		// suite.addTest(TestProjectToSP.suite());
 		return suite;

@@ -46,21 +46,23 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.algorithms;
+
+import java.io.*;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.automata.algorithms.*;
 import org.supremica.testhelpers.*;
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
+import org.supremica.automata.IO.*;
 
-
-public class TestAlphabet
+public class TestAutomatonSplit
 	extends TestCase
 {
-
-	public TestAlphabet(String name)
+	public TestAutomatonSplit(String name)
 	{
 		super(name);
 	}
@@ -87,88 +89,25 @@ public class TestAlphabet
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestAlphabet.class);
+		TestSuite suite = new TestSuite(TestAutomatonSplit.class);
 		return suite;
 	}
 
-
-	public void testSimpleOperations()
+	public void testAutomatonSplit()
 	{
-		Alphabet alph1 = new Alphabet();
-		assertTrue(alph1.size() == 0);
+		try
 		{
-			LabeledEvent e1 = new LabeledEvent("e1");
-			alph1.addEvent(e1);
-			assertTrue(alph1.size() == 1);
-			LabeledEvent e2 = new LabeledEvent("e2");
-			alph1.addEvent(e2);
-			assertTrue(alph1.size() == 2);
-			LabeledEvent e3 = new LabeledEvent("e3");
-			alph1.addEvent(e3);
-			assertTrue(alph1.size() == 3);
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Split));
+			Automaton q = theProject.getAutomaton("q");
+			Automata split = AutomatonSplit.split(q);
+			assertTrue(AutomataVerifier.verifyInclusion(new Automata(q), split));
+			assertTrue(AutomataVerifier.verifyInclusion(split, new Automata(q)));
 		}
-
-
-		Alphabet alph2 = new Alphabet();
-		assertTrue(alph2.size() == 0);
+		catch (Exception ex)
 		{
-			LabeledEvent e1 = new LabeledEvent("e1");
-			alph2.addEvent(e1);
-			assertTrue(alph2.size() == 1);
-			LabeledEvent e2 = new LabeledEvent("e2");
-			alph2.addEvent(e2);
-			assertTrue(alph2.size() == 2);
-			LabeledEvent e3 = new LabeledEvent("e3");
-			alph2.addEvent(e3);
-			assertTrue(alph2.size() == 3);
-		}
-
-		Alphabet alph3 = new Alphabet(alph1);
-		assertTrue(alph3.size() == 3);
-		alph3.union(alph2);
-		assertTrue(alph3.size() == 3);
-		alph3.intersect(alph2);
-		assertTrue(alph3.size() == 3);
-		alph3.minus(alph2);
-		assertTrue(alph3.size() == 0);
-
-		Alphabet alph4 = new Alphabet(alph1);
-		{
-			LabeledEvent e2 = alph4.getEventWithLabel("e2");
-			alph4.removeEvent(e2);
-			assertTrue(alph4.size() == 2);
-			alph2.minus(alph4);
-			assertTrue(alph2.size() == 1);
-			alph2.union(alph1);
-			assertTrue(alph2.size() == 3);
-		}
-
-		alph1.setIndicies();
-		int minIndex = 0;
-		int maxIndex = alph1.size() - 1;
-		for (EventIterator evIt = alph1.iterator(); evIt.hasNext(); )
-		{
-			LabeledEvent currEvent = evIt.nextEvent();
-			int currIndex = currEvent.getSynchIndex();
-			assertTrue(currIndex >= minIndex);
-			assertTrue(currIndex <= maxIndex);
+			ex.printStackTrace();
+			assertTrue(false);
 		}
 	}
-
-	public void testAddState()
-	{
-		Automaton theAutomaton = new Automaton();
-		assertTrue(theAutomaton.nbrOfStates() == 0);
-		assertTrue(theAutomaton.nbrOfTransitions() == 0);
-		assertTrue(theAutomaton.nbrOfEvents() == 0);
-		// assertTrue(theAutomaton.getName().equals(""));
-		State q1 = new State("q1");
-		State q2 = new State("q2");
-		assertTrue(theAutomaton.nbrOfStates() == 0);
-		theAutomaton.addState(q1);
-		assertTrue(theAutomaton.nbrOfStates() == 1);
-		theAutomaton.addState(q2);
-		assertTrue(theAutomaton.nbrOfStates() == 2);
-	}
-
 }

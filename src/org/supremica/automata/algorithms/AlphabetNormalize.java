@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -50,10 +49,7 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 
 public class AlphabetNormalize
 {
@@ -71,11 +67,10 @@ public class AlphabetNormalize
 		labelMap = new HashMap();
 
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
-		Iterator eventIt = theAlphabet.eventIterator();
 
-		while (eventIt.hasNext())
+		for (EventIterator eventIt = theAlphabet.iterator(); eventIt.hasNext();)
 		{
-			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+			LabeledEvent currEvent = eventIt.nextEvent();
 			LinkedList currList = (LinkedList) labelMap.get(currEvent.getLabel());
 
 			if (currList == null)
@@ -167,8 +162,8 @@ public class AlphabetNormalize
 			{
 				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
-				System.err.println("   " + currEvent.toString() // getId() 
-											+ "   " + (currEvent.isControllable() ? "" : "!") 
+				System.err.println("   " + currEvent.toString() // getId()
+											+ "   " + (currEvent.isControllable() ? "" : "!")
 											+ currEvent.getLabel());
 			}
 		}
