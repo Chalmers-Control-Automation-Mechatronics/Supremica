@@ -19,7 +19,7 @@ public class SplashWindow
 
                 BorderLayout layout = new BorderLayout();
                 this.setLayout(layout);
-                this.add(new JLabel(imageIcon), BorderLayout.CENTER);
+                this.add(new JLabel(splashIcon), BorderLayout.CENTER);
 
                 /*
                 * Center splash window on screen
