@@ -8,7 +8,6 @@ import java.util.*;
 import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
-import net.sourceforge.waters.model.module.ModuleProxy;
 
 public class IDE
     extends JFrame
@@ -22,23 +21,23 @@ public class IDE
 
 	private IDEMenuBar menuBar;
 	private IDEToolBar toolBar;
-	private EditorPanel editorPanel;
-	private AnalyzerPanel analyzerPanel;
-	private SimulatorPanel simulatorPanel;
+
+	private ModuleContainers moduleContainers;
+
 	private LogPanel logPanel;
 
 	private JTabbedPane tabPanel;
 	private JSplitPane splitPanelVertical;
 
-	private LinkedList modules = new LinkedList();
+	private boolean panelsInitialized = false;
 
 	private final String ideName = "Supremica with Waters";
-	private int newModuleCounter = 1;
 
     public IDE()
     {
 		Utility.setupFrame(this, 900, 700);
 		setTitle(ideName);
+		moduleContainers = new ModuleContainers(this);
 
 		contentPanel = (JPanel)getContentPane();
 		contentLayout = new BorderLayout();
@@ -53,15 +52,7 @@ public class IDE
     	contentPanel.add(toolBar, BorderLayout.NORTH);
 
 		tabPanel = new JTabbedPane();
-
-		editorPanel = new EditorPanel(this, "Editor");
-		tabPanel.add(editorPanel.getTitle(), editorPanel);
-
-		analyzerPanel = new AnalyzerPanel(this, "Analyzer");
-		tabPanel.add(analyzerPanel.getTitle(), analyzerPanel);
-
-		simulatorPanel = new SimulatorPanel(this, "Simulator");
-		tabPanel.add(simulatorPanel.getTitle(), simulatorPanel);
+		setActive(moduleContainers.getActiveModuleContainer());
 
 		logPanel = new LogPanel(this, "Logger");
 
@@ -74,7 +65,6 @@ public class IDE
 
 		pack();
 
-
     }
 
 	public Actions getActions()
@@ -82,6 +72,60 @@ public class IDE
 		return theActions;
 	}
 
+	public void add(ModuleContainer moduleContainer)
+	{
+		moduleContainers.add(moduleContainer);
+	}
+
+	public void remove(ModuleContainer moduleContainer)
+	{
+		if (moduleContainers.size() >= 2)
+		{
+			moduleContainers.remove(moduleContainer);
+		}
+	}
+
+	public ModuleContainer getActiveModuleContainer()
+	{
+		return moduleContainers.getActiveModuleContainer();
+	}
+
+	public void setActive(ModuleContainer moduleContainer)
+	{
+		ModuleContainer oldModuleContainer = getActiveModuleContainer();
+
+		if (!panelsInitialized || (moduleContainer != oldModuleContainer))
+		{
+			if (panelsInitialized)
+			{
+				EditorPanel currEditorPanel = oldModuleContainer.getEditorPanel();
+				tabPanel.remove(currEditorPanel);
+
+				AnalyzerPanel currAnalyzerPanel = oldModuleContainer.getAnalyzerPanel();
+				tabPanel.remove(currAnalyzerPanel);
+
+				SimulatorPanel currSimulatorPanel = oldModuleContainer.getSimulatorPanel();
+				tabPanel.remove(currSimulatorPanel);
+			}
+
+			moduleContainers.setActive(moduleContainer);
+			tabPanel.add(moduleContainer.getEditorPanel());
+			tabPanel.add(moduleContainer.getAnalyzerPanel());
+			tabPanel.add(moduleContainer.getSimulatorPanel());
+
+			panelsInitialized = true;
+		}
+	}
+
+	public String getIDEName()
+	{
+		return ideName;
+	}
+
+	public ModuleContainer createNewModuleContainer()
+	{
+		return moduleContainers.createNewModuleContainer();
+	}
 
 	// Overridden so we can exit when window is closed
 	protected void processWindowEvent(WindowEvent e)
@@ -94,60 +138,6 @@ public class IDE
 		}
 	}
 
-	public String getNewModuleName(String prefix)
-	{
-		String nameSuggestion = prefix + newModuleCounter++;
-		while (getModuleProxy(nameSuggestion) != null)
-		{
-			nameSuggestion = prefix + newModuleCounter++;
-		}
-		return nameSuggestion;
-
-	}
-
-	public ModuleProxy getModuleProxy(String name)
-	{
-		for(Iterator modIt = modules.iterator(); modIt.hasNext(); )
-		{
-			ModuleProxy currModule = (ModuleProxy)modIt.next();
-			if (name.equals(currModule.getName()))
-			{
-				return currModule;
-			}
-		}
-		return null;
-	}
-
-	public void add(ModuleProxy module)
-	{
-		modules.addFirst(module);
-		setActiveModule(module);
-	}
-
-	public void remove(ModuleProxy module)
-	{
-		modules.remove(module);
-	}
-
-	public void setActiveModule(ModuleProxy module)
-	{
-		if (getActiveModuleProxy() != module)
-		{
-			remove(module);
-			add(module);
-		}
-		setTitle(ideName + " [" + module.getName() + "]");
-	}
-
-	public ModuleProxy getActiveModuleProxy()
-	{
-		return (ModuleProxy)modules.getFirst();
-	}
-
-	public Iterator getModuleIterator()
-	{
-		return modules.iterator();
-	}
 
 	public static void main(String args[])
 	{

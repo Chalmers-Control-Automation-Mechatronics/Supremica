@@ -7,7 +7,7 @@ import org.supremica.gui.WhiteScrollPane;
 class EditorPanel
 	extends JPanel
 {
-	private IDE ide;
+	private ModuleContainer moduleContainer;
 	private String title;
 	private JTabbedPane tabPanel;
 	private EditorParametersPanel parametersPanel;
@@ -16,23 +16,23 @@ class EditorPanel
 	private EditorComponentsPanel componentsPanel;
 	private JSplitPane splitPanelHorizontal;
 
-	EditorPanel(IDE ide, String title)
+	EditorPanel(ModuleContainer moduleContainer, String title)
 	{
-		this.ide = ide;
+		this.moduleContainer = moduleContainer;
 		this.title = title;
 
 		tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
 
-		parametersPanel = new EditorParametersPanel(ide, "Parameters");
+		parametersPanel = new EditorParametersPanel(moduleContainer, "Parameters");
 		tabPanel.add(parametersPanel.getTitle(), parametersPanel);
 
-		eventsPanel = new EditorEventsPanel(ide, "Events");
+		eventsPanel = new EditorEventsPanel(moduleContainer, "Events");
 		tabPanel.add(eventsPanel.getTitle(), eventsPanel);
 
-		aliasesPanel = new EditorAliasesPanel(ide, "Aliases");
+		aliasesPanel = new EditorAliasesPanel(moduleContainer, "Events");
 		tabPanel.add(aliasesPanel.getTitle(), aliasesPanel);
 
-		componentsPanel = new EditorComponentsPanel(ide, "Components");
+		componentsPanel = new EditorComponentsPanel(moduleContainer, "Components");
 		tabPanel.add(componentsPanel.getTitle(), componentsPanel);
 
 		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, new JPanel());

@@ -6,12 +6,12 @@ import org.supremica.gui.WhiteScrollPane;
 class AnalyzerPanel
 	extends WhiteScrollPane
 {
-	private IDE ide;
+	private ModuleContainer moduleContainer;
 	private String title;
 
-	AnalyzerPanel(IDE ide, String title)
+	AnalyzerPanel(ModuleContainer moduleContainer, String title)
 	{
-		this.ide = ide;
+		this.moduleContainer = moduleContainer;
 		this.title = title;
 	}
 

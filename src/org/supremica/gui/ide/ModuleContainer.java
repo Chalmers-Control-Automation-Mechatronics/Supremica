@@ -8,12 +8,17 @@ class ModuleContainer
 {
 	private IDE ide;
 	private final ModuleProxy module;
+
+	private EditorPanel editorPanel = null;
+	private AnalyzerPanel analyzerPanel = null;
+	private SimulatorPanel simulatorPanel = null;
+
 	private EditorEventsPanel editorEventsPanel = null;
 	private EditorComponentsPanel editorComponentsPanel = null;
 	private EditorAliasesPanel editorAliasesPanel = null;
 	private EditorParametersPanel editorParametersPanel = null;
 
-	ModuleContainer(IDE ide, ModuleProxy module)
+	public ModuleContainer(IDE ide, ModuleProxy module)
 	{
 		this.ide = ide;
 		this.module = module;
@@ -29,39 +34,30 @@ class ModuleContainer
 		return module;
 	}
 
-	public JComponent getEventsPanel()
+	public EditorPanel getEditorPanel()
 	{
-		if (editorEventsPanel == null)
+		if (editorPanel == null)
 		{
-			editorEventsPanel = new EditorEventsPanel(ide, this, "Events");
+			editorPanel = new EditorPanel(this, "Editor");
 		}
-		return editorEventsPanel;
+		return editorPanel;
 	}
 
-	public JComponent getAliasesPanel()
+	public AnalyzerPanel getAnalyzerPanel()
 	{
-		if (editorAliasesPanel == null)
+		if (analyzerPanel == null)
 		{
-			editorAliasesPanel = new EditorAliasesPanel(ide, this, "Aliases");
+			analyzerPanel = new AnalyzerPanel(this, "Analyzer");
 		}
-		return editorAliasesPanel;
+		return analyzerPanel;
 	}
 
-	public JComponent getComponentsPanel()
+	public SimulatorPanel getSimulatorPanel()
 	{
-		if (editorComponentsPanel == null)
+		if (simulatorPanel == null)
 		{
-			editorComponentsPanel = new EditorComponentsPanel(ide, this, "Components");
+			simulatorPanel = new SimulatorPanel(this, "Simulator");
 		}
-		return editorComponentsPanel;
-	}
-
-	public JComponent getParametersPanel()
-	{
-		if (editorParametersPanel == null)
-		{
-			editorParametersPanel = new EditorParametersPanel(ide, this, "Parameters");
-		}
-		return editorParametersPanel;
+		return simulatorPanel;
 	}
 }

@@ -33,7 +33,6 @@ public class NewAction
 
 	public void doAction()
 	{
-		ModuleProxy newModule = new ModuleProxy(ide.getNewModuleName("Module"));
-		ide.add(newModule);
+		ide.add(ide.createNewModuleContainer());
 	}
 }
