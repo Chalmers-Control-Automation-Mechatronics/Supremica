@@ -3353,6 +3353,43 @@ public class ActionMan
 			}
 		}
 	}
+	// Generate Java-code
+	public static void AutomataToJava(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.JAVA);
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					try
+					{
+						//Assuming a filename in the form classname.java
+						String classname = currFile.getName().substring(0, currFile.getName().length() - 5);
+						AutomataToJava exporter = new AutomataToJava(selectedAutomata, classname);
+						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
+						exporter.serialize(theWriter);
+						theWriter.close();
+					}
+					catch (Exception ex)
+					{
+						logger.error("Exception while generating Java code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getStackTrace());
+						return;
+					}
+					logger.info("Java file successfully generated at " + currFile.getAbsolutePath());
+				}
+			}
+		}
+	}
 
 	// Generate Mindstorm NQC (Not Quite C)
 	public static void AutomataToMindstormNQC(Gui gui)

@@ -786,6 +786,18 @@ public class MainMenuBar
 				ActionMan.AutomataToJavaBytecode(ActionMan.getGui());
 			}
 		});
+		
+		JMenuItem menuToolsCodeGenerationJava = new JMenuItem();
+
+		menuToolsCodeGenerationJava.setText("Java...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationJava);
+		menuToolsCodeGenerationJava.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.AutomataToJava(ActionMan.getGui());
+			}
+		});
 
 		JMenuItem menuToolsCodeGenerationC = new JMenuItem();
 
