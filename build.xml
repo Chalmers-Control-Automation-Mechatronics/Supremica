@@ -32,6 +32,7 @@
 <property name="backup.dir" value="../backup"/>
 <property name="javalibs.dir" value="lib/unjared"/>
 
+
 <!--
 *	If you for some reason prefer javac instead of jikes,
 *	just change "jikes" to "classic" on the next line.
@@ -364,6 +365,7 @@
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>		
 		<fileset dir="${javalibs.dir}"/>		
+		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
 
@@ -383,6 +385,7 @@
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
 		<fileset dir="${javalibs.dir}"/>		
+		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
 
@@ -393,6 +396,7 @@
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
 		<fileset dir="${javalibs.dir}"/>		
+		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
 
@@ -403,6 +407,8 @@
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
 		<fileset dir="${javalibs.dir}"/>	
+		<fileset dir="${runtimesoftplcbuild}"/>	
+
 	</jar>
 </target>
 
