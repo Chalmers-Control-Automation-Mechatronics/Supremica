@@ -62,7 +62,7 @@ public class Action
 		commands = new LinkedList();
 	}
 
-	public Action(String label, String command)
+	public Action(String label, Command command)
 	{
 		this(label);
 
@@ -80,12 +80,12 @@ public class Action
 		return label;
 	}
 
-	public void addCommand(String command)
+	public void addCommand(Command command)
 	{
 		commands.add(command);
 	}
 
-	public void removeCommand(String command)
+	public void removeCommand(Command command)
 	{
 		commands.remove(command);
 	}

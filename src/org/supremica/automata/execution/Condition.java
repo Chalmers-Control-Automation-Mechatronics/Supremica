@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -49,39 +50,27 @@
 package org.supremica.automata.execution;
 
 import java.util.*;
-import org.supremica.automata.execution.expressions.*;
 
-public class Control
+public class Condition
 {
 	private String label = null;
-	private List conditions = null;
-	private Expression expr = null;
 	private boolean invert = false;
 
-	public Control(String label)
+	public Condition(String label)
 	{
 		this(label, false);
 	}
 
-	public Control(String label, boolean invert)
+	public Condition(String label, boolean invert)
 	{
 		this.label = label;
 		this.invert = invert;
-		conditions = new LinkedList();
-		expr = new ConstVariable(false);
 	}
 
-	public Control(String label, boolean invert, Condition condition)
+	public Condition(Condition otherCondition)
 	{
-		this(label, invert);
-		addCondition(condition);
-	}
-
-	public Control(Control otherControl)
-	{
-		this(otherControl.label, otherControl.invert);
-		conditions = new LinkedList(otherControl.conditions);
-		expr = new ConstVariable(true);
+		this.label = otherCondition.label;
+		this.invert = otherCondition.invert;
 	}
 
 	public String getLabel()
@@ -89,50 +78,30 @@ public class Control
 		return label;
 	}
 
-	public void addCondition(Condition condition)
-	{
-		conditions.add(condition);
-	}
-
-	public void removeCondition(Condition condition)
-	{
-		conditions.remove(condition);
-	}
-
-	public Iterator conditionIterator()
-	{
-		return conditions.iterator();
-	}
-
-	/** This should be in conditions instead, Remove this later **/
-/*
 	public boolean doInvert()
 	{
 		return invert;
 	}
-*/
-	/** This should be in conditions instead, Remove this later **/
-/*
-	public void setInvert(boolean invert)
-	{
-		this.invert = invert;
-	}
-*/
 
 	public boolean equals(Object other)
 	{
-		if (!(other instanceof Control))
+		if (!(other instanceof Condition))
 		{
 			return false;
 		}
 
-		Control otherControl = (Control) other;
+		Condition otherCondition = (Condition) other;
 
-		return label.equals(otherControl.label) && conditions.equals(otherControl.conditions);
+		return label.equals(otherCondition.label) && (invert == otherCondition.invert);
 	}
 
 	public int hashCode()
 	{
 		return label.hashCode();
+	}
+
+	public String toString()
+	{
+		return label;
 	}
 }

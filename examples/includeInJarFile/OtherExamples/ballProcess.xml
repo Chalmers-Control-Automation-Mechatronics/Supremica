@@ -1,44 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata>
- <Automaton name="gantry" type="Plant">
-  <Events>
-   <Event id="p1.gantry_go_drill_2" label="p1.gantry_go_drill_2" controllable="true" prioritized="true" />
-   <Event id="p1.b_oven" label="p1.b_oven" controllable="true" prioritized="true" />
-   <Event id="p1.gantry_go_seg3" label="p1.gantry_go_seg3" controllable="true" prioritized="true" />
-   <Event id="p1.b_drill" label="p1.b_drill" controllable="true" prioritized="true" />
-   <Event id="p1.gantry_go_oven_2" label="p1.gantry_go_oven_2" controllable="true" prioritized="true" />
-   <Event id="p1.b_seg4" label="p1.b_seg4" controllable="true" prioritized="true" />
-   <Event id="p2.gantry_go_drill_2" label="p2.gantry_go_drill_2" controllable="true" prioritized="true" />
-   <Event id="p2.b_seg4" label="p2.b_seg4" controllable="true" prioritized="true" />
-   <Event id="p2.gantry_go_oven_2" label="p2.gantry_go_oven_2" controllable="true" prioritized="true" />
-   <Event id="p2.b_drill" label="p2.b_drill" controllable="true" prioritized="true" />
-   <Event id="p2.gantry_go_seg3" label="p2.gantry_go_seg3" controllable="true" prioritized="true" />
-   <Event id="p2.b_oven" label="p2.b_oven" controllable="true" prioritized="true" />
-  </Events>
-  <States>
-   <State id="q_0" initial="true" accepting="true" />
-   <State id="q_1" />
-   <State id="q_2" />
-   <State id="q_3" />
-   <State id="q_4" />
-   <State id="q_5" />
-   <State id="q_6" />
-  </States>
-  <Transitions>
-   <Transition event="p1.gantry_go_drill_2" source="q_0" dest="q_2" />
-   <Transition event="p1.b_oven" source="q_2" dest="q_0" />
-   <Transition event="p1.gantry_go_seg3" source="q_0" dest="q_1" />
-   <Transition event="p1.b_drill" source="q_1" dest="q_0" />
-   <Transition event="p1.gantry_go_oven_2" source="q_0" dest="q_3" />
-   <Transition event="p1.b_seg4" source="q_3" dest="q_0" />
-   <Transition event="p2.gantry_go_drill_2" source="q_0" dest="q_6" />
-   <Transition event="p2.b_seg4" source="q_6" dest="q_0" />
-   <Transition event="p2.gantry_go_oven_2" source="q_0" dest="q_5" />
-   <Transition event="p2.b_drill" source="q_5" dest="q_0" />
-   <Transition event="p2.gantry_go_seg3" source="q_0" dest="q_4" />
-   <Transition event="p2.b_oven" source="q_4" dest="q_0" />
-  </Transitions>
- </Automaton>
+	<Automaton name="ballp" type="Plant">
+		<Events>
+			<Event id="enter_ball" label="enter_ball" controllable="true" prioritized="true" />
+			<Event id="ball_in" label="ball_in" controllable="false" prioritized="true" />
+			<Event id="exit_ball" label="exit_ball" controllable="true" prioritized="true" />
+			<Event id="ball_out" label="ball_out" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+			<State id="q_3" />
+		</States>
+		<Transitions>
+			<Transition event="enter_ball" source="q_0" dest="q_1" />
+			<Transition event="ball_in" source="q_1" dest="q_2" />
+			<Transition event="exit_ball" source="q_2" dest="q_3" />
+			<Transition event="ball_out" source="q_3" dest="q_0" />
+		</Transitions>
+	</Automaton>
 <Execution>
 	<InputSignals>
 		<Signal label="KulaPortvakt" port="0"/>
@@ -83,23 +64,32 @@
 		<Signal label="Sug" port="16"/>			
 	</OutputSignals>
 	<Actions>
-		<Action label="p1.b_seg1">
-			<Command command="seg.1.a.begin"/>
+		<Action label="enter_ball">
+			<Command command="InPortvakt" value="true"/>
 		</Action>
-		<Action label="p1.b_seg2">
-			<Command command="seg.2.a.begin"/>
+		<Action label="ball_in">
+			<Command command="InPortvakt" value="false"/>
+		</Action>
+		<Action label="exit_ball">
+			<Command command="UrPortvakt" value="true"/>
+		</Action>
+		<Action label="ball_out">
+			<Command command="UrPortvakt" value="false"/>
 		</Action>
 	</Actions>
 	<Controls>
-		<Control label="p1.gantry_seg3_get">
-			<Condition condition="seg.3.end"/>
-			<Condition condition="gantry.end"/>
-			<Condition condition="head.end"/>			
+		<Control label="enter_ball">
+			<Condition condition="ManuellStart" invert="true"/>			
+			<Condition condition="KulaPortVakt" invert="true"/>	
 		</Control>
-		<Control label="p1.gantry_drill_get">
-			<Condition condition="drill.end"/>
-			<Condition condition="gantry.end"/>
-			<Condition condition="head.end"/>
+		<Control label="ball_in">
+			<Condition condition="KulaPortvakt"/>
+		</Control>
+		<Control label="exit_ball">
+			<Condition condition="MatlyftNere"/>		
+		</Control>
+		<Control label="ball_out">
+			<Condition condition="KulaMatLyft"/>
 		</Control>
 	</Controls>
 </Execution>

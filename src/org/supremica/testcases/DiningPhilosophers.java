@@ -16,10 +16,10 @@ class Philosopher
 {
 	static State[] states =
 	{
-		new State("s0"), 
+		new State("s0"),
 		new State("lu"),	// left fork picked up
 		new State("ru"),	// right fork picked up
-		new State("eat"), 
+		new State("eat"),
 		new State("ld"),	// left fork put down
 		new State("rd")	// right fork put down
 	};
@@ -29,7 +29,7 @@ class Philosopher
 	final static int EAT = 3;
 	final static int L_DN = 4;
 	final static int R_DN = 5;
-	
+
 	static LabeledEvent[] events =
 	{
 		new LabeledEvent("L_take"),	// pick up left
@@ -131,7 +131,7 @@ class Philosopher
 		alpha.getEvent(events[R_TAKE]).setLabel("take" + id + LABEL_SEP + r_fork);
 		alpha.getEvent(events[L_PUT]).setLabel("put" + id + LABEL_SEP + l_fork);
 		alpha.getEvent(events[R_PUT]).setLabel("put" + id + LABEL_SEP + r_fork);
-		
+
 		// must rehash since we've changed the label (that's the way it works)
 		alpha.rehash();
 
@@ -145,10 +145,10 @@ class EatingPhilosopher
 {
 	static State[] states =
 	{
-		new State("s0"), 
+		new State("s0"),
 		new State("lu"),	// left fork picked up
 		new State("ru"),	// right fork picked up
-		new State("eat"), 
+		new State("eat"),
 		new State("ld"),	// left fork put down
 		new State("rd"),	// right fork put down
 		new State("eat2")
@@ -160,7 +160,7 @@ class EatingPhilosopher
 	final static int L_DN = 4;
 	final static int R_DN = 5;
 	final static int EAT2 = 6;
-	
+
 	static LabeledEvent[] events =
 	{
 		new LabeledEvent("L_take"),	// pick up left
@@ -272,10 +272,10 @@ class EatingPhilosopher
 
 		// must rehash since we've changed the label (that's the way it works)
 		alpha.rehash();
-		
+
 		return sm;
 	}
-	
+
 	static void fixAnimation(Automaton currPhil, int id, int nextId, Actions currActions, Controls currControls)
 		throws Exception
 	{
@@ -286,42 +286,42 @@ class EatingPhilosopher
 		LabeledEvent lPut = alpha.getEvent(events[L_PUT]);
 		LabeledEvent rPut = alpha.getEvent(events[R_PUT]);
 		LabeledEvent startEating = alpha.getEvent(events[START_EATING]);
-		
+
 //		Actions currActions = project.getActions();
 //		Controls currControls = project.getControls();
 		// The forks in the animation are numbered 0 to nbr of forks - 1
-		
+
 		Action lTakeAction = new Action(lTake.getLabel());
 		currActions.addAction(lTakeAction);
-		lTakeAction.addCommand("fork." + id  + ".get");
-		lTakeAction.addCommand("phil." + id  + ".leftfork");
-		
+		lTakeAction.addCommand(new Command("fork." + id  + ".get"));
+		lTakeAction.addCommand(new Command("phil." + id  + ".leftfork"));
+
 		Action rTakeAction = new Action(rTake.getLabel());
 		currActions.addAction(rTakeAction);
-		rTakeAction.addCommand("fork." + nextId + ".get");
-		rTakeAction.addCommand("phil." + id + ".rightfork");
-		
+		rTakeAction.addCommand(new Command("fork." + nextId + ".get"));
+		rTakeAction.addCommand(new Command("phil." + id + ".rightfork"));
+
 		Action lPutAction = new Action(lPut.getLabel());
 		currActions.addAction(lPutAction);
-		lPutAction.addCommand("fork." + id  + ".put");
-		lPutAction.addCommand("phil." + id  + ".thinking.begin");
-		
+		lPutAction.addCommand(new Command("fork." + id  + ".put"));
+		lPutAction.addCommand(new Command("phil." + id  + ".thinking.begin"));
+
 		Control lPutControl = new Control(lPut.getLabel());
 		currControls.addControl(lPutControl);
-		lPutControl.addCondition("phil." + id + ".eating.end");
-		
+		lPutControl.addCondition(new Condition("phil." + id + ".eating.end"));
+
 		Action rPutAction = new Action(rPut.getLabel());
 		currActions.addAction(rPutAction);
-		rPutAction.addCommand("fork." + nextId + ".put");
-		rPutAction.addCommand("phil." + id + ".thinking.begin");
-		
+		rPutAction.addCommand(new Command("fork." + nextId + ".put"));
+		rPutAction.addCommand(new Command("phil." + id + ".thinking.begin"));
+
 		Control rPutControl = new Control(rPut.getLabel());
 		currControls.addControl(rPutControl);
-		rPutControl.addCondition("phil." + id + ".eating.end");
-		
+		rPutControl.addCondition(new Condition("phil." + id + ".eating.end"));
+
 		Action startEatingAction = new Action(startEating.getLabel());
 		currActions.addAction(startEatingAction);
-		startEatingAction.addCommand("phil." + id + ".eating.begin");
+		startEatingAction.addCommand(new Command("phil." + id + ".eating.begin"));
 
 	}
 }
@@ -414,7 +414,7 @@ class Chopstick
 
 		// must rehash since we've changed the label (that's the way it works)
 		alpha.rehash();
-		
+
 		return sm;
 	}
 }
@@ -477,7 +477,7 @@ public class DiningPhilosophers
 			if (animation)
 			{
 				EatingPhilosopher.fixAnimation(currPhil, id, nextId(id, num), project.getActions(), project.getControls());
-			
+
 //				Alphabet alpha = currPhil.getAlphabet();
 
 //				LabeledEvent lTake = alpha.getEventWithId("L_take");

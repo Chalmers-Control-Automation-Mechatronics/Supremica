@@ -371,14 +371,14 @@ class User
 
 			// Add actions
 			Action theAction = new Action(label);
-			theAction.addCommand(identity + ".goX." + sourceResource.getX());
-			theAction.addCommand(identity + ".goY." + sourceResource.getY());
+			theAction.addCommand(new Command(identity + ".goX." + sourceResource.getX()));
+			theAction.addCommand(new Command(identity + ".goY." + sourceResource.getY()));
 			theActions.addAction(theAction);
 
 			// Add controls
 			Control theControl = new Control(label);
-			theControl.addCondition(identity + "X.end");
-			theControl.addCondition(identity + "Y.end");
+			theControl.addCondition(new Condition(identity + "X.end"));
+			theControl.addCondition(new Condition(identity + "Y.end"));
 			theControls.addControl(theControl);
 		}
 

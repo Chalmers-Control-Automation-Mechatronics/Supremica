@@ -819,7 +819,18 @@ public class ProjectBuildFromXml
 			throwException("command attribute is missing");
 		}
 
-		currAction.addCommand(command);
+		boolean value = true;
+		String valueStr = attributes.getValue("value");
+
+		if (valueStr != null)
+		{
+			if (valueStr.equalsIgnoreCase("false"))
+			{
+				value = false;
+			}
+		}
+
+		currAction.addCommand(new Command(command, value));
 	}
 
 	public final void doCondition(Attributes attributes)
@@ -836,7 +847,17 @@ public class ProjectBuildFromXml
 			throwException("condition attribute is missing");
 		}
 
-		currControl.addCondition(condition);
+		boolean invert = false;
+		String invertStr = attributes.getValue("invert");
+
+		if (invertStr != null)
+		{
+			if (invertStr.equalsIgnoreCase("true"))
+			{
+				invert = true;
+			}
+		}
+		currControl.addCondition(new Condition(condition, invert));
 	}
 
 	public final void doAnimation(Attributes attributes)
