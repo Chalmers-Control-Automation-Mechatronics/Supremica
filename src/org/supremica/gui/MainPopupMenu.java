@@ -224,6 +224,10 @@ class MainPopupMenu
 
 		menuHandler.add(deleteAllItem, 0);
 
+		JMenuItem cropItem = new JMenuItem("Crop to selection");
+
+		menuHandler.add(cropItem, 0);
+
 		JMenuItem renameItem = new JMenuItem("Rename");
 
 		menuHandler.add(renameItem, 1);
@@ -366,6 +370,14 @@ class MainPopupMenu
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataDeleteAll_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
+		cropItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automataCrop_actionPerformed(getGui());
 				getGui().repaint();
 			}
 		});

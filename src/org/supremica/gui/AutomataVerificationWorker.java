@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -269,9 +268,11 @@ public class AutomataVerificationWorker
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 					// Modular...
-					requestStop();
-					logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead!");
-					return;
+					// requestStop();
+					// logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead!");
+					// return;				
+					
+					isNonBlocking = automataVerifier.verify();					
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
