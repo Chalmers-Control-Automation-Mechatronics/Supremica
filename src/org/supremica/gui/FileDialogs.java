@@ -111,7 +111,7 @@ public class FileDialogs
     	public static JFileChooser getRCPFileExporter()
     {
 		JFileChooser fileExporter = fd.getFileExporter();
-
+	       
 		fileExporter.resetChoosableFileFilters();
 		fileExporter.setFileFilter(fd.getRCPFilter());
 

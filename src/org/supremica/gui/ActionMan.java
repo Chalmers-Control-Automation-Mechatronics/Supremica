@@ -95,7 +95,14 @@ abstract class FileImporter
 }
 //--------------------
 public class ActionMan
-{
+{   
+    private static final int  // instead of using conststs later below :)
+	FORMAT_UNKNOWN = -1,
+	FORMAT_XML = 1,
+	FORMAT_DOT = 2,
+	FORMAT_DSX = 3,
+	FORMAT_RCP = 4;
+
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
 		boolean finished = false;
@@ -396,16 +403,22 @@ public class ActionMan
 	}
 
 	// ** Export - shouldn't there be an exporter object?
-	public static void automataExport(Gui gui)
-	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+	    // it is now (ARASH)
+	    public static void automataExport(Gui gui)
+    {
+	    
 
+	// this one comes back in the next function. we need to have duplicates otherwise we would
+	       // ask for the type and first then complain if nonthing is selected
+		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
-		}
+			}
+	    
+
 
 		String xmlString = "xml";
 		String dotString = "dot";
@@ -413,60 +426,76 @@ public class ActionMan
 		String rcpString = "rcp"; // ++ ARASH
 
 		Object[] possibleValues = { xmlString, dotString, dsxString, rcpString /* <-- ARASH */ };
-		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Input", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
+		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Input", 
+								   JOptionPane.INFORMATION_MESSAGE, null, 
+								   possibleValues, possibleValues[0]);
 
 
-		// ARASH: Hmmmm.... den här koden kan nog förbättras :)
 
 		if (selectedValue == null)
 		{
 			return;
 		}
 
-		int exportMode = -1;
+		int exportMode = FORMAT_UNKNOWN;
 
 		if (selectedValue == xmlString)
 		{
-			exportMode = 1;
+			exportMode = FORMAT_XML;
 		}
 		else if (selectedValue == dotString)
 		{
-			exportMode = 2;
+			exportMode = FORMAT_DOT;
 		}
 		else if (selectedValue == dsxString)
 		{
-			exportMode = 3;
+			exportMode = FORMAT_DSX;
 		}
 		else if(selectedValue == rcpString) 
 		{
-			exportMode = 4;
+			exportMode = FORMAT_RCP;
 		}
 		else
 		{
 			return;
 		}
+		automataExport(gui, exportMode);
+	}
+	
+    // Exporter when the type is already known
+	// Add new export functions here and to the function above
+       
+    public static void automataExport(Gui gui, int exportMode)
+    {
+	
 
-		Iterator autIt = selectedAutomata.iterator();
-
+	Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+	    
+	    if (selectedAutomata.size() < 1)   {
+		JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+		return;
+	    }
+	    Iterator autIt = selectedAutomata.iterator();
+		
 		while (autIt.hasNext())
-		{
+		    {
 			Automaton currAutomaton = (Automaton) autIt.next();
 			JFileChooser fileExporter = null;
-
-			if (exportMode == 1)
+			
+			if (exportMode == FORMAT_XML)
 			{
 				fileExporter = FileDialogs.getXMLFileExporter();
 			}
-			else if (exportMode == 2)
+			else if (exportMode == FORMAT_DOT)
 			{
 				fileExporter = FileDialogs.getDOTFileExporter();
 			}
-			else if (exportMode == 3)
+			else if (exportMode == FORMAT_DSX)
 			{
 				fileExporter = FileDialogs.getDSXFileExporter();
 			}
 			// ++ ARASH
-			else if(exportMode == 4) 
+			else if(exportMode == FORMAT_RCP) 
 			{
 				 fileExporter = FileDialogs.getRCPFileExporter();
 			}
@@ -475,6 +504,11 @@ public class ActionMan
 			{
 				return;
 			}
+
+			
+			// ARASH: ain't it good to see what we're doin' ??
+			fileExporter.setDialogTitle("Save " + currAutomaton.getName() + " as ...");
+
 
 			if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 			{
@@ -486,7 +520,7 @@ public class ActionMan
 					{
 						try
 						{
-							if (exportMode == 1)
+							if (exportMode == FORMAT_XML)
 							{
 								Automata currAutomata = new Automata();
 
@@ -496,20 +530,20 @@ public class ActionMan
 
 								exporter.serialize(currFile.getAbsolutePath());
 							}
-							else if (exportMode == 2)
+							else if (exportMode == FORMAT_DOT)
 							{
 								AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
 
 								exporter.serialize(currFile.getAbsolutePath());
 							}
-							else if (exportMode == 3)
+							else if (exportMode == FORMAT_DSX)
 							{
 								AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
 
 								exporter.serialize(currFile.getAbsolutePath());
 							}
 							// ++ ARASH
-							else if(exportMode == 4) 
+							else if(exportMode == FORMAT_RCP) 
 							{
 							    AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
 							    exporter.serialize(currFile.getAbsolutePath() );
@@ -1243,23 +1277,26 @@ public class ActionMan
 
 	// ++ ARASH:
 	public static void fileExportRCP(Gui gui) {
-		automataExport(gui);
+		automataExport(gui, FORMAT_RCP);
 	}
 	public static void fileExportDesco(Gui gui)
 	{
-		automataExport(gui);
+		automataExport(gui, FORMAT_DSX);
 	}
 
 
 	public static void fileExportDot(Gui gui)
 	{
-		automataExport(gui);
+		automataExport(gui, FORMAT_DOT);
 	}
 
 	public static void fileExportSupremica(Gui gui)
 	{
-		automataExport(gui);
+		automataExport(gui, FORMAT_XML);
 	}
+			 
+
+       // -------------- TODO: ADD EXPORTES FOR THESE TOO ------------------------------------
 
 	public static void fileExportTCT(Gui gui)
 	{
