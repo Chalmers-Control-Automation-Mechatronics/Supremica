@@ -66,20 +66,15 @@ public class AutomatonComplement
 	}
 
 	public Automaton execute()
-		throws Exception
 	{
 		Alphabet alphabet = theAutomaton.getAlphabet();
-		State newState = null;
-		LabeledEvent currEvent;
-		State currState;
-		boolean found;
-		Iterator eventIterator;
-		Iterator outgoingArcsIterator;
+		State newState = theAutomaton.createUniqueState("dump"); // was null, see below;
+		boolean complemented = false;
 		Iterator stateIterator = theAutomaton.stateIterator();
 
 		while (stateIterator.hasNext())
 		{
-			currState = (State) stateIterator.next();
+			State currState = (State) stateIterator.next();
 
 			// Invert marking
 			if (currState.isAccepting())
@@ -92,13 +87,13 @@ public class AutomatonComplement
 			}
 
 			// Add arcs for all events that are not currently outgoing from the current state.
-			eventIterator = alphabet.iterator();
+			Iterator eventIterator = alphabet.iterator();
 
 			while (eventIterator.hasNext())
 			{
-				found = false;
-				currEvent = (LabeledEvent) eventIterator.next();
-				outgoingArcsIterator = currState.outgoingArcsIterator();
+				boolean found = false;
+				LabeledEvent currEvent = (LabeledEvent) eventIterator.next();
+				Iterator outgoingArcsIterator = currState.outgoingArcsIterator();
 
 				while (outgoingArcsIterator.hasNext())
 				{
@@ -112,24 +107,19 @@ public class AutomatonComplement
 
 				if (!found)
 				{
-					if (newState == null)
-					{
-						newState = new State("qc");
-					}
-
+					complemented = true;
 					theAutomaton.addArc(new Arc(currState, newState, currEvent.getId()));
 				}
 			}
 		}
 
-		// Add self loops to the extra state...
-		if (newState != null)
+		// If complementation has been done, add the state, mark it as accepting and add self loops to the dump state...
+		if(complemented)
 		{
 			theAutomaton.addState(newState);
-			newState.setName("qc");
 			newState.setAccepting(true);
 
-			eventIterator = alphabet.iterator();
+			Iterator eventIterator = alphabet.iterator();
 
 			while (eventIterator.hasNext())
 			{
