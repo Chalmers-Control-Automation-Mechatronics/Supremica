@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.3 2005-02-21 10:22:09 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.4 2005-02-21 21:33:30 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -336,7 +336,7 @@ public class EditorNodeGroup
 
 		if (selected)
 		{
-			g2d.setColor(Color.BLUE);
+			g2d.setColor(EditorColor.SELECTCOLOR);
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -346,7 +346,14 @@ public class EditorNodeGroup
 		}
 		else
 		{
-			g2d.setColor(Color.lightGray);
+			if (getHighlighted())
+			{
+				g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
+			}
+			else
+			{
+				g2d.setColor(EditorColor.NODEGROUPCOLOR);
+			}
 		}
 
 		//g2d.draw(bounds);

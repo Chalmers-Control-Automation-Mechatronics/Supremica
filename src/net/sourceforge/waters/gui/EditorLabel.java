@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.4 2005-02-21 11:13:33 flordal Exp $
+//# $Id: EditorLabel.java,v 1.5 2005-02-21 21:33:30 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -184,6 +184,12 @@ public class EditorLabel
 	public int getWidth()
 	{
 		return text.getWidth();
+	}
+
+	public void setHighlighted(boolean s)
+	{
+		super.setHighlighted(s);
+		parent.setHighlighted(s);
 	}
 
 	public EditorLabel(EditorNode par, String t, EditorSurface e)

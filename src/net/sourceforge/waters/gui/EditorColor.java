@@ -8,5 +8,7 @@ class EditorColor
 	public static Color SELECTCOLOR = Color.BLUE; 
 	public static Color DEFAULTCOLOR = Color.BLACK; 
 	public static Color DEFAULTMARKINGCOLOR = Color.GRAY; 
+	public static Color NODEGROUPCOLOR = Color.lightGray; 
 }
+
 

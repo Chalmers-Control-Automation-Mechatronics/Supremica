@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.3 2005-02-21 11:13:33 flordal Exp $
+//# $Id: EditorNode.java,v 1.4 2005-02-21 21:33:30 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -253,7 +253,14 @@ public class EditorNode
 		{
 			if (!selected)
 			{
-				g2d.setColor(EditorColor.DEFAULTCOLOR);
+				if (!getHighlighted())
+				{
+					g2d.setColor(EditorColor.DEFAULTCOLOR);
+				}
+				else
+				{
+					g2d.setColor(EditorColor.HIGHLIGHTCOLOR);
+				}
 			}
 
 			g2d.fillOval((int) position.getX() - (WIDTH / 2), (int) position.getY() - (WIDTH / 2), WIDTH + 1, WIDTH + 1);

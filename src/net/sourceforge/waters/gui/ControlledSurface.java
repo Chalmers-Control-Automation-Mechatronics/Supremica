@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.5 2005-02-21 11:13:33 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.6 2005-02-21 21:33:30 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -811,6 +811,7 @@ public class ControlledSurface
 				}
 			}
 
+			/*
 			// Redraw edge
 			if (edgeIsSelected() && (selectedObjects.size() == 1))
 			{
@@ -850,6 +851,7 @@ public class ControlledSurface
 					edge.setTPoint(edge.getTPointX(), edge.getTPointY());
 				}
 			}
+			*/
 
 			lines.clear();
 
