@@ -102,7 +102,7 @@ public class CancelDialog
 		this.executers = executers;
 		this.eventQueue = eventQueue;
 
-		setTitle("Stop execution");
+		setTitle("Verifying...");
 		setSize(new Dimension(240, 110));
 		// dialog.setLocation(200,100);
 		setResizable(false);
@@ -139,7 +139,7 @@ public class CancelDialog
 		messagePanel.add(headerPanel);
 		messagePanel.add(counterPanel);
 		JPanel buttonPanel = new JPanel();
-		stopButton = addButton(buttonPanel, "Stop execution");
+		stopButton = addButton(buttonPanel, "Abort");
 
 		headerLabel = new JLabel();
 		// headerLabel.setVerticalAlignment(SwingConstants.BOTTOM);
@@ -152,7 +152,7 @@ public class CancelDialog
 		counterPanel.add(stateLabel);
 		counterPanel.add(counterLabel);
 		//makeCounter();
-		
+
 		// counterLabel.setVerticalAlignment(SwingConstants.TOP);
 		// counterLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		headerPanel.add(headerLabel, "South");
@@ -215,14 +215,14 @@ public class CancelDialog
 		final int counterValue = value;
 		eventQueue.invokeLater(new Runnable()
 					{   public void run()
-						{   
+						{
 							if (progressBar == null)
 								counterLabel.setText(String.valueOf(counterValue));
 							else if (counterLabel == null)
 								progressBar.setValue(counterValue);
 						}
 			});
-		
+
 		/*
 		if (progressBar == null)
 		{

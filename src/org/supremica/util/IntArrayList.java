@@ -49,7 +49,7 @@
 
 package org.supremica.util;
 
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * An efficient implementation of a list of int[].
@@ -59,10 +59,11 @@ import java.util.LinkedList;
  */
 public final class IntArrayList
 {
-	private static final int blockSize = 10*1024;
+	private final int blockSize;
  	private int currMinBlockIndex = -1; // index of the first occupied entry
  	private int currMaxBlockIndex = -1; // index of the first free entry
  	private int size = -1;
+ 	private int maxSize = -1;
  	private int[][] firstBlock = null;
  	private int[][] lastBlock = null;
 
@@ -70,6 +71,12 @@ public final class IntArrayList
 
     public IntArrayList()
     {
+		this(10*1024);
+    }
+
+    public IntArrayList(int blockSize)
+    {
+		this.blockSize = blockSize;
 		firstBlock = new int[blockSize][];
 		lastBlock = firstBlock;
 		blocks.addFirst(firstBlock);
@@ -77,6 +84,14 @@ public final class IntArrayList
 		currMaxBlockIndex = 0;
 		size = 0;
     }
+
+	/**
+	 * @param theArray the int[] to insert
+	 */
+	public void add(int[] theArray)
+	{
+		addFirst(theArray);
+	}
 
 	/**
 	 * @param theArray the int[] to insert
@@ -92,6 +107,10 @@ public final class IntArrayList
 		}
 		firstBlock[--currMinBlockIndex] = theArray;
 		size++;
+		if (size > maxSize)
+		{
+			maxSize = size;
+		}
 	}
 
 	/**
@@ -108,12 +127,16 @@ public final class IntArrayList
 			currMaxBlockIndex = 0;
 		}
 		size++;
+		if (size > maxSize)
+		{
+			maxSize = size;
+		}
 	}
 
 	/**
 	 * This returns the first element if it exists, otherwise null
 	 * The returned element is not removed.
-	 * @returns theArray if it exists, null otherwise
+	 * @return theArray if it exists, null otherwise
 	 */
 	public int[] getFirst()
 	{
@@ -127,7 +150,7 @@ public final class IntArrayList
 	/**
 	 * This returns the last element if it exists, otherwise null
 	 * The returned element is not removed.
-	 * @returns theArray if it exists, null otherwise
+	 * @return theArray if it exists, null otherwise
 	 */
 	public int[] getLast()
 	{
@@ -151,7 +174,7 @@ public final class IntArrayList
 	/**
 	 * This returns the first element if it exists, otherwise null
 	 * The returned element is removed.
-	 * @returns theArray if it exists, null otherwise
+	 * @return theArray if it exists, null otherwise
 	 */
 	public int[] removeFirst()
 	{
@@ -172,7 +195,7 @@ public final class IntArrayList
 	/**
 	 * This returns the last element if it exists, otherwise null
 	 * The returned element is removed.
-	 * @returns theArray if it exists, null otherwise
+	 * @return theArray if it exists, null otherwise
 	 */
 	public int[] removeLast()
 	{
@@ -192,11 +215,86 @@ public final class IntArrayList
 
 
 	/**
-	 * @returns Number of elements in the list.
+	 * @return Number of elements in the list.
 	 */
 	public int size()
 	{
 		return size;
 	}
+
+	public int maxSize()
+	{
+		return maxSize;
+	}
+
+	public Iterator iterator()
+	{
+		return new IntArrayListIterator();
+	}
+
+	public String toString()
+	{
+		StringBuffer sb = new StringBuffer();
+		for (Iterator it = iterator(); it.hasNext();)
+		{
+			int[] currEntry = (int[]) it.next();
+			sb.append(currEntry);
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
+	private class IntArrayListIterator
+		implements Iterator
+	{
+		private int[][] currBlock = null;
+		private int currIndex = 0;
+		private Iterator blockIterator = null;
+
+		public IntArrayListIterator()
+		{
+			currBlock = firstBlock;
+			currIndex = currMinBlockIndex;
+			blockIterator = blocks.iterator();
+		}
+
+		public boolean hasNext()
+		{
+			if (currIndex < currMaxBlockIndex)
+			{
+				return true;
+			}
+			if (currBlock != lastBlock)
+			{
+				return true;
+			}
+			return false;
+		}
+
+		public Object next()
+		{
+			currIndex++;
+			if (currIndex >= blockSize)
+			{
+				currIndex = 0;
+				if (blockIterator.hasNext())
+				{
+					currBlock = (int[][])blockIterator.next();
+				}
+				else
+				{
+					throw new NoSuchElementException();
+				}
+			}
+			return (Object)currBlock[currIndex];
+		}
+
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
 
 }

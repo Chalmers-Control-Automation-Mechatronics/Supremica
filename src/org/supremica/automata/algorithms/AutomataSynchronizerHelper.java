@@ -89,8 +89,8 @@ public final class AutomataSynchronizerHelper
 	private StateMemorizer stateMemorizer = new StateMemorizer();
 	private boolean rememberUncontrollable = false;
 	private boolean expandEventsUsingPriority = false;
-	private LinkedList fromStateList = new LinkedList();
-	private LinkedList stateTrace = new LinkedList();
+	private IntArrayList fromStateList = new IntArrayList();
+	private IntArrayList stateTrace = new IntArrayList();
 	private boolean rememberTrace = false;
 	private boolean coExecute = false;
 	private AutomataOnlineSynchronizer coExecuter = null;
@@ -231,11 +231,15 @@ public final class AutomataSynchronizerHelper
 			{
 				if (fromStateList.size() > 0)
 				{
-					while (!(Arrays.equals((int[]) fromStateList.getLast(),(int[]) stateTrace.getLast())))
+					while (!(Arrays.equals(fromStateList.getLast(), stateTrace.getLast())))
+					{
 						stateTrace.removeLast();
+					}
 
 					if (stateTrace.size() == 0)
+					{
 						thisCategory.error("Error when recording trace.");
+					}
 
 					fromStateList.removeLast();
 					stateTrace.addLast(statesToProcess.getLast());
@@ -244,10 +248,12 @@ public final class AutomataSynchronizerHelper
 				{
 					stateTrace.addLast(statesToProcess.getLast());
 				}
+
 				// Depth first search
-				return (int[])statesToProcess.removeLast();
+				return statesToProcess.removeLast();
 			}
 			else
+			{
 				if (coExecute)
 				{
 					// Depth first search
@@ -258,6 +264,7 @@ public final class AutomataSynchronizerHelper
 					// Breath first search
 					return statesToProcess.removeFirst();
 				}
+			}
    		}
     }
 
@@ -293,7 +300,9 @@ public final class AutomataSynchronizerHelper
   		if (++nbrOfCheckedStates % 2000 == 0)
 		{
 			if (cancelDialog != null)
+			{
 				cancelDialog.updateCounter(nbrOfCheckedStates);
+			}
 
 			/*
 			if (verboseMode)
@@ -445,20 +454,20 @@ public final class AutomataSynchronizerHelper
 	{
 	    Alphabet unionAlphabet = theAutomaton.getAlphabet();
 		int[] eventPriority = new int[unionAlphabet.size()];
-		Iterator eventIterator = unionAlphabet.iterator();
-		Event currEvent;
 		int index = 0;
-		while (eventIterator.hasNext())
+		for (Iterator eventIterator = unionAlphabet.iterator(); eventIterator.hasNext();)
 		{
-			currEvent = (Event) eventIterator.next();
+			Event currEvent = (Event) eventIterator.next();
 			if (currEvent.getExpansionPriority() < 0)
-			    // The events are already ordered after synchIndex!
+			{   // The events are already ordered after synchIndex!
 			    // eventPriority[currEvent.getSynchIndex()] = 10;
 				eventPriority[index++] = 10;
+			}
 			else
-			    // The events are already ordered after synchIndex!
+			{   // The events are already ordered after synchIndex!
 				// eventPriority[currEvent.getSynchIndex()] = currEvent.getExpansionPriority();
 				eventPriority[index++] = currEvent.getExpansionPriority();
+			}
 		}
 		return eventPriority;
 	}
@@ -483,33 +492,49 @@ public final class AutomataSynchronizerHelper
 	public void displayTrace()
 		throws Exception
 	{
-		String trace = "";
-		int index;
 		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 
 		// We have to have an executer for finding the transitions
 		clear();
-		// AutomataSynchronizerExecuter executer =
-		//	new AutomataSynchronizerExecuter(this);
 		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
 		executer.initialize();
 
-		int[] fromState;
-		for (int i = 0; i < stateTrace.size()-1; i++)
+		// This version does not remove shortcuts, add this later
+		StringBuffer trace = new StringBuffer();
+		int[] prevState = null;
+		for (Iterator traceIt = stateTrace.iterator(); traceIt.hasNext();)
 		{
-			fromState = (int[]) stateTrace.get(i);
+			int[] nextState = (int[]) traceIt.next();
+			if (prevState != null)
+			{
+				int currEventIndex = executer.findTransition(prevState, nextState);
+				trace.append(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
+			}
+
+			prevState = nextState;
+		}
+
+/*
+		// This tries to find shortcuts in the trace by looking one-step ahead
+		int[] fromState;
+		for (int i = 0; i < stateTrace.size() - 1; i++)
+		{
+			int[] fromState = (int[]) stateTrace.get(i);
 			executer.setCurrState(fromState);
-			for (int j=stateTrace.size()-1; j>i; j--)
+			for (int j = stateTrace.size() - 1; j > i; j--)
 			{
 				index = executer.findTransition(fromState, (int[]) stateTrace.get(j));
 				if (index >= 0)
-				{
-					// thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
-					trace = trace + " " + unionAlphabet.getEventWithIndex(index).getLabel();
-					if (j != stateTrace.size()-1)
-						trace = trace + ",";
+				{ // thisCategory.debug("Event: " + unionAlphabet.getEventWithIndex(index).getLabel());
+					trace.append(unionAlphabet.getEventWithIndex(index).getLabel());
+					if (j != stateTrace.size() - 1)
+					{
+						trace.append(",");
+					}
 					if (j > i+1)
+					{
 						thisCategory.debug("Shortcut found from state number " + i + " to state number " + j + ".");
+					}
 					i = j-1;
 					break;
 				}
@@ -519,8 +544,8 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 		}
-
-		thisCategory.info("The trace leading to the uncontrollable state is:" + trace + ".");
+*/
+		thisCategory.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
 
 		/*
 		thisCategory.error("And again...");
@@ -560,8 +585,10 @@ public final class AutomataSynchronizerHelper
 		throws Exception
 	{
 		int[] automataIndices = new int[theAutomata.size()];
-		for(int i=0;i<theAutomata.size();i++)
+		for(int i = 0; i < theAutomata.size(); i++)
+		{
 			automataIndices[i] = i;
+		}
 		printUncontrollableStates(automataIndices);
 	}
 
@@ -573,36 +600,38 @@ public final class AutomataSynchronizerHelper
 		Automaton problemAutomaton;
 		int[] currState = new int[automataIndices.length];
 		State[][] stateTable = getIndexFormStateTable();
-		StateHolder stateHolder;
-		Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices);
-		while (stateHolderIterator.hasNext())
+		for (Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices); stateHolderIterator.hasNext();)
 		{
-			stateHolder = (StateHolder) stateHolderIterator.next();
+			StateHolder stateHolder = (StateHolder) stateHolderIterator.next();
 			currState = stateHolder.getArray();
 			problemPlant = stateHolder.getProblemPlant();
 			problemEvent = stateHolder.getProblemEvent();
 			problemAutomaton = theAutomata.getAutomatonAt(problemPlant);
-			String state = "";
+			StringBuffer state = new StringBuffer();
+			boolean firstEntry = true;
 			for (int i = 0; i < currState.length; i++)
 			{
 				// Only print states that are not initial if we are looking at a full state
 				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || automataIndices.length < theAutomata.size())
 				{
-					if (state != "")
-						state = state + ",";
-					state = state + " " + theAutomata.getAutomatonAt(automataIndices[i]).getName() + ": ";
-					state = state + stateTable[automataIndices[i]][currState[i]].getName();
+					if (!firstEntry)
+					{
+						state.append(",");
+						firstEntry = false;
+					}
+					state.append(theAutomata.getAutomatonAt(automataIndices[i]).getName());
+					state.append(": ");
+					state.append(stateTable[automataIndices[i]][currState[i]].getName());
 				}
 			}
 			String reason = "the uncontrollable event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + " in the plant " + problemAutomaton.getName() + " is enabled.";
-			thisCategory.error("The state" + state + " is uncontrollable since " + reason);
+			thisCategory.error("The state" + state.toString() + " is uncontrollable since " + reason);
 		}
 	}
 
 	public boolean isAllAutomataPlants()
 	{
-		Iterator autIt = theAutomata.iterator();
-		while (autIt.hasNext())
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			if (currAutomaton.getType() != AutomatonType.Plant)
@@ -616,8 +645,7 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataSupervisors()
 	{
-		Iterator autIt = theAutomata.iterator();
-		while (autIt.hasNext())
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			if (currAutomaton.getType() != AutomatonType.Supervisor)
@@ -631,8 +659,7 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataSpecifications()
 	{
-		Iterator autIt = theAutomata.iterator();
-		while (autIt.hasNext())
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			if (currAutomaton.getType() != AutomatonType.Specification)
@@ -647,12 +674,21 @@ public final class AutomataSynchronizerHelper
 	public void selectAutomata(int[] automataIndices)
 	{
 		if (activeAutomata == null)
+		{
 			activeAutomata = new boolean[theAutomata.size()];
+		}
 		else
+		{
 			for (int i = 0; i < activeAutomata.length; i++)
+			{
 				activeAutomata[i] = false;
+			}
+		}
+
 		for (int i = 0; i < automataIndices.length; i++)
+		{
 			activeAutomata[automataIndices[i]] = true;
+		}
 	}
 
 	/*
