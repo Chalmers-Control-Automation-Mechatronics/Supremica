@@ -77,7 +77,10 @@
 	</delete>
 </target>
 
-<target name="generate_JAXB" depends="init" description="Generate JAXB classes.">
+<target name="generate_JAXB" depends="clean,init,generate_JAXB_internal,rebuild,jar_jaxb" description="Generate JAXB classes.">
+</target>
+
+<target name="generate_JAXB_internal">
 	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
 		<classpath>
 			<pathelement path="${jwsdp.classpath}"/>
@@ -91,7 +94,7 @@
 </target>
 
 
-<target name="initialize" depends="clean,generate_JAXB">
+<target name="initialize" depends="clean">
  	<mkdir dir="${build}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${build}" />
@@ -158,6 +161,7 @@
 	<unjar src="${lib}/namespace.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/relaxngDatatype.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/xsdlib.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
 
 	
@@ -174,18 +178,6 @@
 	<delete includeEmptyDirs="true">
 		<fileset dir="${lib}/${unjared}/META-INF"/>
 	</delete>
-
-
-	<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-		<classpath>
-			<pathelement path="${jwsdp.classpath}"/>
-		</classpath>
-	</taskdef>
-	<xjc target="${src}" extension="true" removeOldOutput="yes">
-		<schema dir="${xsd}" includes="waters-des.xsd waters-module.xsd"/>
-		<produces dir="${src}/net/sourceforge/waters/xsd/"
-			includes="base/* base/impl/* des/* des/impl/* module/* module/impl/*"/>
-	</xjc>
 
 </target>
 
@@ -549,6 +541,24 @@
 			<include name="**/*.ser"/>
 		</fileset>
 	</jar>
+</target>
+
+<target name="jar_jaxb">
+	<jar jarfile="${lib}/waters_jaxb.jar"> 
+		<fileset dir="${build}/">
+			<include name="org/w3/**"/>
+			<include name="net/sourceforge/waters/xsd/**"/>
+		</fileset>
+	</jar>
+	<delete>
+		<fileset dir="${lib}">
+			<patternset id="cleanjaxdbunjaredclassfiles">
+				<include name="org/w3/**"/>
+				<include name="net/sourceforge/waters/xsd/**"/>
+			</patternset>
+		</fileset>
+	</delete>
+	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
 </target>
 
 <target name="startfiles_local_supremica">
