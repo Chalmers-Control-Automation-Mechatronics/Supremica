@@ -71,7 +71,9 @@ public final class SupremicaCategory
 		category.debug(message, t);
 	}
 
-	// Print the stack trace on the debug pane
+	/**
+	 * Print the stack trace to the registered listeners.
+	 */
 	public void debug(StackTraceElement[] trace)
 	{
 		for(int i = 0; i < trace.length; ++i)
@@ -79,7 +81,7 @@ public final class SupremicaCategory
 			category.debug(trace[i].toString());
 		}
 	}
-	
+
 	public void error(Object message)
 	{
 		category.error(message);
@@ -88,6 +90,18 @@ public final class SupremicaCategory
 	public void error(Object message, Throwable t)
 	{
 		category.error(message, t);
+		//category.error(t.getMessage());
+	}
+
+	/**
+	 * Print the stack trace to the registered listeners.
+	 */
+	public void error(StackTraceElement[] trace)
+	{
+		for(int i = 0; i < trace.length; ++i)
+		{
+			category.error(trace[i].toString());
+		}
 	}
 
 	public void fatal(Object message)
@@ -100,6 +114,17 @@ public final class SupremicaCategory
 		category.fatal(message, t);
 	}
 
+	/**
+	 * Print the stack trace to the registered listeners.
+	 */
+	public void fatal(StackTraceElement[] trace)
+	{
+		for(int i = 0; i < trace.length; ++i)
+		{
+			category.fatal(trace[i].toString());
+		}
+	}
+
 	public void warn(Object message)
 	{
 		category.warn(message);
@@ -108,6 +133,17 @@ public final class SupremicaCategory
 	public void warn(Object message, Throwable t)
 	{
 		category.warn(message, t);
+	}
+
+	/**
+	 * Print the stack trace to the registered listeners.
+	 */
+	public void warn(StackTraceElement[] trace)
+	{
+		for(int i = 0; i < trace.length; ++i)
+		{
+			category.warn(trace[i].toString());
+		}
 	}
 
 	public void info(Object message)
@@ -120,11 +156,22 @@ public final class SupremicaCategory
 		category.info(message, t);
 	}
 
+	/**
+	 * Print the stack trace to the registered listeners.
+	 */
+	public void info(StackTraceElement[] trace)
+	{
+		for(int i = 0; i < trace.length; ++i)
+		{
+			category.info(trace[i].toString());
+		}
+	}
+
 	public boolean isDebugEnabled()
 	{
 		return category.isDebugEnabled();
 	}
-	
+
 	public void setLogToConsole(boolean log)
 	{
 		if (log)

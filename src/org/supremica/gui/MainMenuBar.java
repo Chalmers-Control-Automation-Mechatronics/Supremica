@@ -469,7 +469,7 @@ public class MainMenuBar
 		// Project.ActionAndControlViewer
 		JMenuItem menuProjectActionAndControlViewer = new JMenuItem();
 
-		menuProjectActionAndControlViewer.setText("Action & Control Viewer...");
+		menuProjectActionAndControlViewer.setText("Execution Parameters...");
 		menuProject.add(menuProjectActionAndControlViewer);
 		menuProjectActionAndControlViewer.addActionListener(new ActionListener()
 		{
@@ -510,7 +510,7 @@ public class MainMenuBar
 			// Project.Clear
 			JMenuItem menuProjectSimulatorClear = new JMenuItem();
 
-			menuProjectSimulatorClear.setText("Clear simulation data");
+			menuProjectSimulatorClear.setText("Clear Simulation Data");
 			menuProject.add(menuProjectSimulatorClear);
 			menuProjectSimulatorClear.addActionListener(new ActionListener()
 			{

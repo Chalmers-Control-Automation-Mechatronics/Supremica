@@ -1300,7 +1300,7 @@ public class ActionMan
 
 		if (elapsedTime >= 0)
 		{
-			gui.info("Execution completed after " + (elapsedTime) / 1000.0 + " seconds.");
+			logger.info("Execution completed after " + (elapsedTime) / 1000.0 + " seconds.");
 		}
 	}
 
@@ -1421,7 +1421,9 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			gui.error("Exception in ActionAndControlViewer.");
+			logger.error("Exception in ActionAndControlViewer.", ex);
+			logger.debug(ex.getStackTrace());
+			return;
 		}
 	}
 

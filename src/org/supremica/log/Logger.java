@@ -59,17 +59,25 @@ public interface Logger
 
 	void error(Object message);
 
+	void error(StackTraceElement[] stackTrace);
+
 	void error(Object message, Throwable t);
 
 	void fatal(Object message);
+
+	void fatal(StackTraceElement[] stackTrace);
 
 	void fatal(Object message, Throwable t);
 
 	void warn(Object message);
 
+	void warn(StackTraceElement[] stackTrace);
+
 	void warn(Object message, Throwable t);
 
 	void info(Object message);
+
+	void info(StackTraceElement[] stackTrace);
 
 	void info(Object message, Throwable t);
 

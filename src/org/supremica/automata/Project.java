@@ -238,7 +238,7 @@ public class Project
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
 
-	public void clearActions()
+	private void clearActions()
 	{
 		if (theActions != null)
 		{
@@ -247,7 +247,7 @@ public class Project
 		}
 	}
 
-	public void clearControls()
+	private void clearControls()
 	{
 		if (theControls != null)
 		{
@@ -256,7 +256,7 @@ public class Project
 		}
 	}
 
-	public void clearTimers()
+	private void clearTimers()
 	{
 		if (theTimers != null)
 		{
@@ -265,12 +265,17 @@ public class Project
 		}
 	}
 
-	public void clear()
+	public void clearExecutionParameters()
 	{
-		super.clear();
 		theActions.clear();
 		theControls.clear();
 		theTimers.clear();
+	}
+
+	public void clear()
+	{
+		clearExecutionParameters();
+		super.clear();
 	}
 
 	public boolean equalProject(Project other)

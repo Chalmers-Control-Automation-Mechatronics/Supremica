@@ -74,7 +74,7 @@ public class ActionAndControlViewer
 
 		// contentPane.setLayout(new BorderLayout());
 		// contentPane.add(toolBar, BorderLayout.NORTH);
-		setTitle("Action and Control Viewer: " + theProject.getName());
+		setTitle("Execution parameters: " + theProject.getName());
 		setSize(200, 500);
 		addWindowListener(new WindowAdapter()
 		{
@@ -139,7 +139,7 @@ public class ActionAndControlViewer
 		// Edit.ClearActions
 		JMenuItem menuEditClearActions = new JMenuItem();
 
-		menuEditClearActions.setText("Clear actions and controls");
+		menuEditClearActions.setText("Clear execution parameters");
 		menuEdit.add(menuEditClearActions);
 		menuBar.add(menuEdit);
 		menuEdit.addActionListener(new ActionListener()
@@ -148,8 +148,7 @@ public class ActionAndControlViewer
 			{
 				if (theProject != null)
 				{
-					theProject.clearActions();
-					theProject.clearControls();
+					theProject.clearExecutionParameters();
 				}
 			}
 		});

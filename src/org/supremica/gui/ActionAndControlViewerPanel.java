@@ -107,14 +107,18 @@ public class ActionAndControlViewerPanel
 		DefaultMutableTreeNode controlsNode = new DefaultMutableTreeNode("Controls");
 		root.add(controlsNode);
 
+		DefaultMutableTreeNode timersNode = new DefaultMutableTreeNode("Timers");
+		root.add(timersNode);
 
 		for (Iterator theIt = theProject.inputSignalsIterator(); theIt.hasNext();)
 		{
 			Signal currSignal = (Signal)theIt.next();
 			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
 			inputSignalsNode.add(currSignalNode);
-			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
 			currSignalNode.add(currPortNode);
+			DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			currPortNode.add(currPortNodeAttribute);
 		}
 
 		for (Iterator theIt = theProject.outputSignalsIterator(); theIt.hasNext();)
@@ -122,8 +126,10 @@ public class ActionAndControlViewerPanel
 			Signal currSignal = (Signal)theIt.next();
 			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
 			outputSignalsNode.add(currSignalNode);
-			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
 			currSignalNode.add(currPortNode);
+			DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			currPortNode.add(currPortNodeAttribute);
 		}
 
 		Actions currActions = theProject.getActions();
@@ -136,7 +142,7 @@ public class ActionAndControlViewerPanel
 				actionsNode.add(currActionNode);
 				for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext();)
 				{
-					String currCommand = (String)cmdIt.next();
+					Command currCommand = (Command)cmdIt.next();
 					DefaultMutableTreeNode currCommandNode = new DefaultMutableTreeNode(currCommand);
 					currActionNode.add(currCommandNode);
 				}
@@ -154,13 +160,37 @@ public class ActionAndControlViewerPanel
 				controlsNode.add(currControlNode);
 				for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext();)
 				{
-					String currCondition = (String)condIt.next();
+					Condition currCondition = (Condition)condIt.next();
 					DefaultMutableTreeNode currConditionNode = new DefaultMutableTreeNode(currCondition);
 					currControlNode.add(currConditionNode);
 				}
 			}
 		}
 
+		for (Iterator theIt = theProject.timersIterator(); theIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)theIt.next();
+			DefaultMutableTreeNode currTimerNode = new DefaultMutableTreeNode(currTimer.getName());
+			timersNode.add(currTimerNode);
+
+			// Start event
+			DefaultMutableTreeNode currStartEventNode = new DefaultMutableTreeNode("Start event");
+			currTimerNode.add(currStartEventNode);
+			DefaultMutableTreeNode currStartEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getStartEvent());
+			currStartEventNode.add(currStartEventNodeAttribute);
+
+			// Timeout event
+			DefaultMutableTreeNode currTimeoutEventNode = new DefaultMutableTreeNode("Timeout event");
+			currTimerNode.add(currTimeoutEventNode);
+			DefaultMutableTreeNode currTimeoutEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getTimeoutEvent());
+			currTimeoutEventNode.add(currTimeoutEventNodeAttribute);
+
+			// delay
+			DefaultMutableTreeNode currDelayNode = new DefaultMutableTreeNode("Delay (ms)");
+			currTimerNode.add(currDelayNode);
+			DefaultMutableTreeNode currDelayNodeAttribute = new DefaultMutableTreeNode(new Integer(currTimer.getDelay()));
+			currDelayNode.add(currDelayNodeAttribute);
+		}
 
 		DefaultTreeModel treeModel = new DefaultTreeModel(root);
 

@@ -21,6 +21,10 @@
 		</Transitions>
 	</Automaton>
 <Execution>
+	<Timers>
+		<Timer name="timer1" startEvent="enter_ball" timeoutEvent="enter_ball_timeout" delay="500" />
+		<Timer name="timer2" startEvent="exit_ball" timeoutEvent="exit_ball_timeout" delay="700" />	
+	</Timers>
 	<InputSignals>
 		<Signal label="KulaPortvakt" port="0"/>
 		<Signal label="MatlyftNere" port="1"/>
