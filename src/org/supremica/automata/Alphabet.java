@@ -446,6 +446,7 @@ public class Alphabet
 		return new EventIterator(idMap.values().iterator());
 	}
 
+
 	public boolean equalAlphabet(Alphabet other)
 	{
 		if (nbrOfEvents() != other.nbrOfEvents())

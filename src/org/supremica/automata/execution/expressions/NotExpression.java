@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,71 +47,45 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.execution;
+package org.supremica.automata.execution.expressions;
 
 import java.util.*;
-import org.supremica.automata.execution.expressions.*;
 
-public class Control
+public class NotExpression
+	extends Expression
 {
-	private String label = null;
-	private List conditions = null;
-	private Expression expr = null;
+	private Expression theExpression = null;
 
-	public Control(String label)
+	public NotExpression()
 	{
-		this.label = label;
-		conditions = new LinkedList();
-		expr = new ConstVariable(false);
+		this(null);
 	}
 
-	public Control(String label, String condition)
+	public NotExpression(Expression theExpression)
 	{
-		this(label);
-		addCondition(condition);
+		this.theExpression = theExpression;
 	}
 
-	public Control(Control otherControl)
+	public void setExpression(Expression theExpression)
 	{
-		this(otherControl.label);
-		conditions = new LinkedList(otherControl.conditions);
-		expr = new ConstVariable(true);
+		this.theExpression = theExpression;
 	}
 
-	public String getLabel()
+	public Expression getExpression()
 	{
-		return label;
+		return theExpression;
 	}
 
-	public void addCondition(String condition)
+	public boolean isVariable()
 	{
-		conditions.add(condition);
+		return false;
 	}
 
-	public void removeCondition(String condition)
+	public boolean evaluate()
 	{
-		conditions.remove(condition);
-	}
-
-	public Iterator conditionIterator()
-	{
-		return conditions.iterator();
-	}
-
-	public boolean equals(Object other)
-	{
-		if (!(other instanceof Control))
-		{
-			return false;
-		}
-
-		Control otherControl = (Control) other;
-
-		return label.equals(otherControl.label) && conditions.equals(otherControl.conditions);
-	}
-
-	public int hashCode()
-	{
-		return label.hashCode();
+		return !theExpression.evaluate();
 	}
 }
+
+
+

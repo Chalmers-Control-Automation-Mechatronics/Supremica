@@ -106,13 +106,12 @@ public class AutomataToNQC
 		// Iterate over all events and compute which events that are enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
-			while (alphIt.hasNext())
-			{
-				LabeledEvent currEvent = (LabeledEvent)alphIt.next();
-				int currEventIndex = currEvent.getSynchIndex();
-				printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable() ? " controllable" : " uncontrollable"), "false");
-			}
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable() ? " controllable" : " uncontrollable"), "false");
 		}
+		printBooleanVariableDeclaration(pw, "enabledEvent", "True if a event is enabled, false otherwise", "false");
+
 	}
 
 	void printStateVariables(PrintWriter pw)
@@ -149,6 +148,7 @@ public class AutomataToNQC
 
 	void printBeginScanCycle(PrintWriter pw)
 	{
+		pw.println("\n\tinitialize(); // Initialize the supervisor");
 		pw.println("\n\t// Main scancycle");
 		pw.println("\twhile (true)");
 		pw.println("\t{");
@@ -191,69 +191,152 @@ public class AutomataToNQC
 		// Iterate over all events and compute which events that are enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
-			while (alphIt.hasNext())
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
+			boolean previousCondition = false;
+			pw.print("\t\te_" + currEventIndex + " = ");
+			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 			{
-				LabeledEvent currEvent = (LabeledEvent)alphIt.next();
-				int currEventIndex = currEvent.getSynchIndex();
-				pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
-				boolean previousCondition = false;
-				pw.print("\t\te_" + currEventIndex + " = ");
-				for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
-				{
-					Automaton currAutomaton = (Automaton)autIt.next();
-					Alphabet currAlphabet = currAutomaton.getAlphabet();
+				Automaton currAutomaton = (Automaton)autIt.next();
+				Alphabet currAlphabet = currAutomaton.getAlphabet();
 
-					int currAutomatonIndex = currAutomaton.getSynchIndex();
+				int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-					if (syncType == SynchronizationType.Prioritized)
-					{ // All automata that has this event as prioritized must be able to execute it
-						if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
-						{ // Find all states that enables this event
-						  // Use OR between states in the same automaton.
-						  // Use AND between states in different automata.
-							if (previousCondition)
+				if (syncType == SynchronizationType.Prioritized)
+				{ // All automata that has this event as prioritized must be able to execute it
+					if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
+					{ // Find all states that enables this event
+					  // Use OR between states in the same automaton.
+					  // Use AND between states in different automata.
+						if (previousCondition)
+						{
+							pw.print(" && ");
+						}
+						else
+						{
+							previousCondition = true;
+						}
+
+						boolean previousState = false;
+						pw.print("(");
+						for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
+						{
+							State currState = (State)stateIt.next();
+							int currStateIndex = currState.getSynchIndex();
+							if (previousState)
 							{
-								pw.print(" && ");
+								pw.print(" || ");
 							}
 							else
 							{
-								previousCondition = true;
+								previousState = true;
 							}
+							pw.print("(q_" + currAutomatonIndex + " == " + currStateIndex + ")");
 
-							boolean previousState = false;
-							pw.print("(");
-							for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
-							{
-								State currState = (State)stateIt.next();
-								int currStateIndex = currState.getSynchIndex();
-								if (previousState)
-								{
-									pw.print(" || ");
-								}
-								else
-								{
-									previousState = true;
-								}
-								pw.print("(q_" + currAutomatonIndex + " == " + currStateIndex + ")");
-
-							}
-							if (!previousState)
-							{
-								pw.print(" false ");
-							}
-							pw.print(")");
 						}
-					}
-					else
-					{
-						throw new Exception("Unsupported SynchronizationType");
+						if (!previousState)
+						{
+							pw.print(" false ");
+						}
+						pw.print(")");
 					}
 				}
-				pw.println(";");
+				else
+				{
+					throw new Exception("Unsupported SynchronizationType");
+				}
 			}
+			pw.println(";");
 		}
 	}
 
+
+	void printComputeExternalEnabledEvents(PrintWriter pw)
+		throws Exception
+	{
+		pw.println("\n\t\t// Compute the external enabled events");
+		// Iterate over all events and compute which events that are externally enabled
+		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		{
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
+			pw.println("\t\tenabled_" + currEvent.getLabel() + "(e_" + currEventIndex + ");");
+		}
+	}
+
+	void printInitializationFunction(PrintWriter pw)
+		throws Exception
+	{
+		pw.println("\n// Intitialization function");
+		pw.println("void initialize()");
+		pw.println("{");
+		pw.println("\t// Add initialization code here");
+		pw.println("}");
+	}
+
+	void printComputeExternalEnabledEventsFunctions(PrintWriter pw)
+		throws Exception
+	{
+		pw.println("\n// Functions for the external enabled events");
+		pw.println("// Note that all labels must valid identifiers in NQC");
+		// Iterate over all events and compute which events that are externally enabled
+		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		{
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.println("\n// External enable condition for event \"" + currEvent.getLabel() + "\"");
+			pw.println("void enabled_" + currEvent.getLabel() + "(int& e)");
+			pw.println("{");
+			pw.println("\t// Add a condition here, the default does not change anything. Example:");
+			pw.println("\t// e = e && (SensorValue(0) == 2);");
+			pw.println("}");
+		}
+	}
+
+	void printDoEnabledEventsFunctions(PrintWriter pw)
+		throws Exception
+	{
+		pw.println("\n// Functions for the external enabled events");
+		pw.println("// Note that all labels must valid identifiers in NQC");
+		// Iterate over all events and compute which events that are externally enabled
+		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
+		{
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.println("\n// Action for event \"" + currEvent.getLabel() + "\"");
+			pw.println("void do_" + currEvent.getLabel() + "()");
+			pw.println("{");
+			pw.println("\t// Add an action here, the default does not change anything. Example:");
+			pw.println("\t// SetGlobalOutput(OUT_A, OUT_ON); // enable output A;");
+			pw.println("}");
+		}
+	}
+
+	void printComputeSingleEnabledEvent(PrintWriter pw)
+		throws Exception
+	{
+		pw.println("\n\t\t// Make sure only one event is enabled");
+		pw.println("\t\t// Priority is given to uncontrollable events");
+		// Iterate over all events and compute which events that are enabled
+		for (Iterator alphIt = allEvents.uncontrollableEventIterator(); alphIt.hasNext();)
+		{
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
+			pw.println("\t\te_" + currEventIndex + " = " + "e_" + currEventIndex + " && !enabledEvent;");
+			pw.println("\t\tenabledEvent = " + "enabledEvent || " + "e_" + currEventIndex + ";");
+		}
+		for (Iterator alphIt = allEvents.controllableEventIterator(); alphIt.hasNext();)
+		{
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
+			pw.println("\t\te_" + currEventIndex + " = " + "e_" + currEventIndex + " && !enabledEvent;");
+			pw.println("\t\tenabledEvent = " + "enabledEvent || " + "e_" + currEventIndex + ";");
+		}
+	}
 
 	/**
 	 * If self loop then do not do anything, else update state
@@ -338,73 +421,72 @@ public class AutomataToNQC
 		// Iterate over all events and compute which events that are enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
-			while (alphIt.hasNext())
+
+			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
+			int currEventIndex = currEvent.getSynchIndex();
+			pw.println("\n\t\t// Transition for event \"" + currEvent.getLabel() + "\"");
+			boolean previousCondition = false;
+			pw.println("\t\tif (e_" + currEventIndex + ")");
+			pw.println("\t\t{");
+			pw.println("\t\t\tdo_" + currEvent.getLabel() + "();");
+			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 			{
-				LabeledEvent currEvent = (LabeledEvent)alphIt.next();
-				int currEventIndex = currEvent.getSynchIndex();
-				pw.println("\n\t\t// Transition for event \"" + currEvent.getLabel() + "\"");
-				boolean previousCondition = false;
-				pw.println("\t\tif (e_" + currEventIndex + ")");
-				pw.println("\t\t{");
-				for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+				Automaton currAutomaton = (Automaton)autIt.next();
+				Alphabet currAlphabet = currAutomaton.getAlphabet();
+				int currAutomatonIndex = currAutomaton.getSynchIndex();
+
+				if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
 				{
-					Automaton currAutomaton = (Automaton)autIt.next();
-					Alphabet currAlphabet = currAutomaton.getAlphabet();
-					int currAutomatonIndex = currAutomaton.getSynchIndex();
-
-					if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
+					LabeledEvent currAutomatonEvent = currAutomaton.getEventWithLabel(currEvent.getLabel());
+					if (currAutomatonEvent == null)
 					{
-						LabeledEvent currAutomatonEvent = currAutomaton.getEventWithLabel(currEvent.getLabel());
-						if (currAutomatonEvent == null)
+						throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+					}
+
+					pw.println("\n\t\t\t// Transitions in " + currAutomaton.getName());
+					boolean previousState = false;
+					for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
+					{
+						State currState = (State)stateIt.next();
+						int currStateIndex = currState.getSynchIndex();
+
+						State toState = currState.nextState(currAutomatonEvent);
+						if (toState == null)
 						{
-							throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+							throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 						}
-
-						pw.println("\n\t\t\t// Transitions in " + currAutomaton.getName());
-						boolean previousState = false;
-						for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
+						int toStateIndex = toState.getSynchIndex();
+						if (currState != toState)
 						{
-							State currState = (State)stateIt.next();
-							int currStateIndex = currState.getSynchIndex();
-
-							State toState = currState.nextState(currAutomatonEvent);
-							if (toState == null)
+							if (!previousState)
 							{
-								throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
-							}
-							int toStateIndex = toState.getSynchIndex();
-							if (currState != toState)
-							{
-								if (!previousState)
-								{
-									pw.print("\t\t\tif");
-									previousState = true;
-								}
-								else
-								{
-									pw.println("\t\t\t}");
-									pw.print("\t\t\telse if");
-								}
-								pw.println(" (q_" + currAutomatonIndex + " == " + currStateIndex + ")");
-								pw.println("\t\t\t{");
-								//pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + toStateIndex + " = true;");
-								//pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + currStateIndex + " = false;");
-								pw.println("\t\t\t\tq_" + currAutomatonIndex + " = " + toStateIndex + ";");
+								pw.print("\t\t\tif");
+								previousState = true;
 							}
 							else
 							{
-								pw.println("\t\t\t// q_" + currAutomatonIndex + "_" + currStateIndex + "  has e_" + currEventIndex + " as self loop, no transition");
+								pw.println("\t\t\t}");
+								pw.print("\t\t\telse if");
 							}
+							pw.println(" (q_" + currAutomatonIndex + " == " + currStateIndex + ")");
+							pw.println("\t\t\t{");
+							//pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + toStateIndex + " = true;");
+							//pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + currStateIndex + " = false;");
+							pw.println("\t\t\t\tq_" + currAutomatonIndex + " = " + toStateIndex + ";");
 						}
-						if (previousState)
+						else
 						{
-							pw.println("\t\t\t}");
+							pw.println("\t\t\t// q_" + currAutomatonIndex + "_" + currStateIndex + "  has e_" + currEventIndex + " as self loop, no transition");
 						}
 					}
-
+					if (previousState)
+					{
+						pw.println("\t\t\t}");
+					}
 				}
-				pw.println("\t\t}");
+
 			}
+			pw.println("\t\t}");
 		}
 	}
 
@@ -419,9 +501,14 @@ public class AutomataToNQC
 		printStateVariables(pw);
 		printBeginScanCycle(pw);
 		printComputeEnabledEvents(pw);
+		printComputeExternalEnabledEvents(pw);
+		printComputeSingleEnabledEvent(pw);
 		printChangeStateTransitions(pw);
 		printEndScanCycle(pw);
 		printEndProgram(pw);
+		printInitializationFunction(pw);
+		printComputeExternalEnabledEventsFunctions(pw);
+		printDoEnabledEventsFunctions(pw);
 	}
 
 }

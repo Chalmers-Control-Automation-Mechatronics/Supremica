@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,71 +47,22 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.execution;
+package org.supremica.automata.execution.expressions;
 
-import java.util.*;
-import org.supremica.automata.execution.expressions.*;
 
-public class Control
+public class ConstVariable
+	extends Variable
 {
-	private String label = null;
-	private List conditions = null;
-	private Expression expr = null;
 
-	public Control(String label)
+	public ConstVariable(boolean value)
 	{
-		this.label = label;
-		conditions = new LinkedList();
-		expr = new ConstVariable(false);
+		super(null);
+		this.value = value;
 	}
 
-	public Control(String label, String condition)
+	public boolean isConst()
 	{
-		this(label);
-		addCondition(condition);
+		return true;
 	}
 
-	public Control(Control otherControl)
-	{
-		this(otherControl.label);
-		conditions = new LinkedList(otherControl.conditions);
-		expr = new ConstVariable(true);
-	}
-
-	public String getLabel()
-	{
-		return label;
-	}
-
-	public void addCondition(String condition)
-	{
-		conditions.add(condition);
-	}
-
-	public void removeCondition(String condition)
-	{
-		conditions.remove(condition);
-	}
-
-	public Iterator conditionIterator()
-	{
-		return conditions.iterator();
-	}
-
-	public boolean equals(Object other)
-	{
-		if (!(other instanceof Control))
-		{
-			return false;
-		}
-
-		Control otherControl = (Control) other;
-
-		return label.equals(otherControl.label) && conditions.equals(otherControl.conditions);
-	}
-
-	public int hashCode()
-	{
-		return label.hashCode();
-	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,71 +47,57 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.execution;
+package org.supremica.automata.execution.expressions;
 
 import java.util.*;
-import org.supremica.automata.execution.expressions.*;
 
-public class Control
+
+public class AndExpression
+	extends Expression
 {
-	private String label = null;
-	private List conditions = null;
-	private Expression expr = null;
+	private Expression leftExpression = null;
+	private Expression rightExpression = null;
 
-	public Control(String label)
+	public AndExpression()
 	{
-		this.label = label;
-		conditions = new LinkedList();
-		expr = new ConstVariable(false);
+		this(null, null);
 	}
 
-	public Control(String label, String condition)
+	public AndExpression(Expression leftExpression, Expression rightExpression)
 	{
-		this(label);
-		addCondition(condition);
+		this.leftExpression = leftExpression;
+		this.rightExpression = rightExpression;
 	}
 
-	public Control(Control otherControl)
+	public void setLeftExpression(Expression leftExpression)
 	{
-		this(otherControl.label);
-		conditions = new LinkedList(otherControl.conditions);
-		expr = new ConstVariable(true);
+		this.leftExpression = leftExpression;
 	}
 
-	public String getLabel()
+	public void setRightExpression(Expression rightExpression)
 	{
-		return label;
+		this.rightExpression = rightExpression;
 	}
 
-	public void addCondition(String condition)
+	public Expression getLeftExpression()
 	{
-		conditions.add(condition);
+		return leftExpression;
 	}
 
-	public void removeCondition(String condition)
+	public Expression getRightExpression()
 	{
-		conditions.remove(condition);
+		return rightExpression;
 	}
 
-	public Iterator conditionIterator()
+	public boolean isVariable()
 	{
-		return conditions.iterator();
+		return false;
 	}
 
-	public boolean equals(Object other)
+	public boolean evaluate()
 	{
-		if (!(other instanceof Control))
-		{
-			return false;
-		}
-
-		Control otherControl = (Control) other;
-
-		return label.equals(otherControl.label) && conditions.equals(otherControl.conditions);
-	}
-
-	public int hashCode()
-	{
-		return label.hashCode();
+		return leftExpression.evaluate() && rightExpression.evaluate();
 	}
 }
+
+

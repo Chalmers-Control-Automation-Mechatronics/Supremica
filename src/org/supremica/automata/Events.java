@@ -113,11 +113,31 @@ public class Events
 	/**
 	 * Return an iterator to the events.
 	 *
-	 *@return  Description of the Return Value
+	 *@return  An iterator
 	 */
 	public EventIterator iterator()
 	{
 		return new EventIterator(theEvents.values().iterator());
+	}
+
+	/**
+	 * Return an iterator to the controllable events.
+	 *
+	 *@return  An iterator
+	 */
+	public EventIterator controllableEventIterator()
+	{
+		return new EventIterator(new ControllableEventIterator(theEvents.values().iterator(), true));
+	}
+
+	/**
+	 * Return an iterator to the uncontrollable events.
+	 *
+	 *@return  An iterator
+	 */
+	public EventIterator uncontrollableEventIterator()
+	{
+		return new EventIterator(new ControllableEventIterator(theEvents.values().iterator(), false));
 	}
 
 	/**
@@ -316,6 +336,62 @@ public class Events
 		theEvents.clear();
 
 		theEvents = newEvents;
+	}
+
+	class ControllableEventIterator
+		implements Iterator
+	{
+		private final Iterator theIterator;
+		private final boolean controllableEvents;
+		private Object nextEvent = null;
+
+
+		public ControllableEventIterator(Iterator theIterator, boolean controllableEvents)
+		{
+			this.theIterator = theIterator;
+			this.controllableEvents = controllableEvents;
+			findNextEvent();
+		}
+
+		public boolean hasNext()
+		{
+			return nextEvent != null;
+		}
+
+		public Object next()
+			throws NoSuchElementException
+		{
+			if (nextEvent != null)
+			{
+				Object oldEvent = nextEvent;
+				findNextEvent();
+				return oldEvent;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+
+		public void remove()
+			throws UnsupportedOperationException, IllegalStateException
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private void findNextEvent()
+		{
+			while (theIterator.hasNext())
+			{
+				LabeledEvent currEvent = (LabeledEvent)theIterator.next();
+				if (currEvent.isControllable() == controllableEvents)
+				{
+					nextEvent = currEvent;
+					return;
+				}
+			}
+			nextEvent = null;
+		}
 	}
 
 }
