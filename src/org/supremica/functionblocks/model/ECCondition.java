@@ -62,6 +62,8 @@ import org.supremica.functionblocks.model.interpreters.st.*;
 
 public class ECCondition
 {
+	
+	private String condition = "";
 
 	private Expression abstractSyntax = null;
 
@@ -71,12 +73,14 @@ public class ECCondition
 	{
 		
 		System.out.println("ECCondition: New instance: " + condition);
-		setCondition(condition);
+		set(condition);
 	}
 
-	public void setCondition(String condition)
+	public void set(String cond)
 	{
 	
+		condition = cond;
+		
 		StringReader stringReader = new StringReader(condition);
 		
 		Lexer lexer = new Lexer((Reader) stringReader);
@@ -86,7 +90,7 @@ public class ECCondition
 		try 
 		{
 			System.out.println("ECCondition: Parsing...");
-			abstractSyntax = (Expression) parser.parse().value; 
+			abstractSyntax = (Expression) parser.parse().value;
 		} 
 		catch(Exception e) 
 		{
@@ -95,13 +99,18 @@ public class ECCondition
 
 	}
 
-	public Boolean evaluate(Variables vars)
+	public String get()
+	{
+		return condition;
+	}
+
+	public Object evaluate(Variables vars)
 	{
 		
 		System.out.println("ECCondition: evaluate()");
 		try 
 		{ 
-			return new Evaluator(vars).evalExpression(abstractSyntax);
+			return (new Evaluator(vars)).evalExpression(abstractSyntax);
 		} 
 		catch(Exception e) 
 		{

@@ -79,14 +79,17 @@ public class Resource
 	fbInstance = fbType.createInstance("DummyFBInstance");
 	fbInstance.addEventInputQueue(new EventQueue());
 	fbInstance.queueEvent("DummyEventInput");
+	
+	// Test ST interpreter
 	Variables testVars = new Variables();
 	testVars.addVariable("bvar", new BooleanVariable("Local", true));
 	testVars.addVariable("ivar", new IntegerVariable("Local", 10));
 	testVars.addVariable("fvar", new FloatVariable("Local", 3.14));
 	testVars.addVariable("svar", new StringVariable("Local", "TestString"));
-	ECCondition testCond = new ECCondition("NOT (FALSE OR FALSE OR TRUE AND 8<>5+3 " + 
-					       "OR 7.12 = 7.0 + 0.2 OR 8>=5+3 OR 8<=5+3 OR 8<5+3 )"); 
-	System.out.println("Resource: test evaluation result: " + testCond.evaluate(testVars));
+
+	ECCondition testCond = new ECCondition("5+3"); 
+	System.out.println("Resource: evaluation result: " + testCond.evaluate(testVars));
+
 	
     }
 

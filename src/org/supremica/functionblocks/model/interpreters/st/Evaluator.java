@@ -68,12 +68,12 @@ public class Evaluator {
 		vars=v; 
 	}
 
-	public Boolean evalExpression(Expression e) throws Exception
+	public Object evalExpression(Expression e) throws Exception
 	{
 		return evalOrExpression(e.a);
 	}
 
-	public Boolean evalOrExpression(OrExpression e) throws Exception
+	public Object evalOrExpression(OrExpression e) throws Exception
 	{
 		if (e instanceof BinaryOrExpression) 
 		{
@@ -99,7 +99,7 @@ public class Evaluator {
 		throw new Exception();
 	}
 
-	public Boolean evalXorExpression(XorExpression e) throws Exception
+	public Object evalXorExpression(XorExpression e) throws Exception
 	{
 		if (e instanceof BinaryXorExpression) 
 		{
@@ -125,7 +125,7 @@ public class Evaluator {
 		throw new Exception();
 	}
 
-	public Boolean evalAndExpression(AndExpression e) throws Exception
+	public Object evalAndExpression(AndExpression e) throws Exception
 	{
 		if (e instanceof BinaryAndExpression) 
 		{
@@ -151,7 +151,7 @@ public class Evaluator {
 		throw new Exception();
 	}
 
-	public Boolean evalComparison(Comparison e) throws Exception
+	public Object evalComparison(Comparison e) throws Exception
 	{
 		if (e instanceof Eq)
 		{ 
@@ -459,17 +459,7 @@ public class Evaluator {
 		}
 		else if (e instanceof UnaryComparison)
 		{ 
-			Object a = evalAddExpression(((UnaryComparison) e).a);
-			if (a instanceof Boolean)
-			{
-				return (Boolean) a;
-			}
-			else
-			{
-				System.out.println("Eval: Incompatible type in :");
-				printer.prComparison(e,4);
-				throw new Exception();
-			}
+			return evalAddExpression(((UnaryComparison) e).a);
 		}
 		System.out.println("Eval: Can not determine the child type of Comparison: ");
 		printer.prComparison(e,4);
@@ -700,7 +690,7 @@ public class Evaluator {
 	{
 		if (e instanceof BinaryPowerExpression)
 		{
-			System.out.println("Eval: Power operation is not implemented!");
+			System.out.println("Eval: Power operation is not implemented yet!");
 			throw new Exception();	
 		}
 		else if (e instanceof UnaryPowerExpression)

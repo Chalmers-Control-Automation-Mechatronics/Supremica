@@ -102,8 +102,16 @@ public class ECC
 		{
 			for(Iterator iter = ecTransitionsWithSameSource.iterator();iter.hasNext();)
 			{
-				ECTransition temp = (ECTransition) iter.next();
-				if(! temp.getCondition().evaluate(vars).booleanValue()) iter.remove();
+				ECTransition tempTransition = (ECTransition) iter.next();
+				Object evaluationResult = tempTransition.getCondition().evaluate(vars);
+				if(evaluationResult instanceof Boolean)
+				{
+					if( ! ((Boolean) evaluationResult).booleanValue() ) iter.remove();
+				}
+				else
+				{
+					System.out.println("ECC.execute(): Non Boolean type returned from evaluation of " + tempTransition.getCondition().get());
+				}
 			}
 		}
 		else
