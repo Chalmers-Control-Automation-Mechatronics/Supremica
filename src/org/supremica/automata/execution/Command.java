@@ -54,11 +54,11 @@ import java.util.*;
 public class Command
 {
 	private String label = null;
-	private boolean value = false;
+	private boolean value = true;
 
 	public Command(String label)
 	{
-		this(label, false);
+		this(label, true);
 	}
 
 	public Command(String label, boolean value)

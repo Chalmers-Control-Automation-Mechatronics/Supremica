@@ -793,6 +793,9 @@ public class AutomataToIEC1131
 	void printDoActionsAsIL(PrintWriter pw)
 		throws Exception
 	{
+		Actions theActions = theProject.getActions();
+		Signals outputSignals = theProject.getOutputSignals();
+
 		theHelper.printILComment(pw, "The actions");
 		// Iterate over all events and compute which events that are externally enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
@@ -801,8 +804,29 @@ public class AutomataToIEC1131
 			int currEventIndex = currEvent.getSynchIndex();
 			theHelper.printILLabel(pw, "do_e_" + currEventIndex);
 			theHelper.printILComment(pw, "Action for event " + currEvent.getLabel());
-			//pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
-			//pw.println("\t\tenabled_" + currEvent.getLabel() + "(e_" + currEventIndex + ");");
+			if (theActions.hasAction(currEvent.getLabel()))
+			{
+				Action currAction = theActions.getAction(currEvent.getLabel());
+				for (Iterator it = currAction.commandIterator(); it.hasNext(); )
+				{
+					Command currCommand = (Command)it.next();
+					if (currCommand.getValue())
+					{
+						theHelper.printILCommand(pw, "LD",  "TRUE");
+					}
+					else
+					{
+						theHelper.printILCommand(pw, "LD",  "FALSE");
+					}
+					if (!outputSignals.hasSignal(currCommand.getLabel()))
+					{
+						throw new Exception("Could not find output signal " + currCommand.getLabel());
+					}
+					Signal currSignal = outputSignals.getSignal(currCommand.getLabel());
+					theHelper.printILCommand(pw, "ST",  "so_" + currSignal.getPort());
+				}
+			}
+
 			theHelper.printILCommand(pw, "JMP",  "after_do_e_" + currEventIndex);
 		}
 	}
@@ -810,6 +834,9 @@ public class AutomataToIEC1131
 	void printCheckConditionsAsIL(PrintWriter pw)
 		throws Exception
 	{
+		Controls theControls = theProject.getControls();
+		Signals inputSignals = theProject.getInputSignals();
+
 		theHelper.printILComment(pw, "The conditions");
 		// Iterate over all events and compute which events that are externally enabled
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
@@ -818,11 +845,42 @@ public class AutomataToIEC1131
 			int currEventIndex = currEvent.getSynchIndex();
 			theHelper.printILLabel(pw, "check_e_" + currEventIndex);
 			theHelper.printILComment(pw, "Condition for event " + currEvent.getLabel());
-			//pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
-			//pw.println("\t\tenabled_" + currEvent.getLabel() + "(e_" + currEventIndex + ");");
+
 			theHelper.printILCommand(pw, "LD",  "e_" + currEventIndex);
 			theHelper.printILCommand(pw, "JMPNC",  "after_check_e_" + currEventIndex);
-			theHelper.printILCommand(pw, "ST",  "e_" + currEventIndex);
+			if (theControls.hasControl(currEvent.getLabel()))
+			{
+				Control currControl = theControls.getControl(currEvent.getLabel());
+				int i = 0;
+				for (Iterator it = currControl.conditionIterator(); it.hasNext(); )
+				{
+					Condition currCondition = (Condition)it.next();
+					if (!inputSignals.hasSignal(currCondition.getLabel()))
+					{
+						throw new Exception("Could not find input signal " + currCondition.getLabel());
+					}
+					Signal currSignal = inputSignals.getSignal(currCondition.getLabel());
+
+					theHelper.printILCommand(pw, "LD",  "si_" + currSignal.getPort());
+					if (currCondition.doInvert())
+					{
+						theHelper.printILCommand(pw, "JMPNC",  "check_e_" + currEventIndex + "_" + i);
+						theHelper.printILCommand(pw, "LD",  "FALSE");
+						theHelper.printILCommand(pw, "ST",  "e_" + currEventIndex);
+						theHelper.printILCommand(pw, "JMP",  "after_check_e_" + currEventIndex);
+						theHelper.printILLabel(pw, "check_e_" + currEventIndex + "_" + i);
+					}
+					else
+					{
+						theHelper.printILCommand(pw, "JMPC",  "check_e_" + currEventIndex + "_" + i);
+						theHelper.printILCommand(pw, "LD",  "FALSE");
+						theHelper.printILCommand(pw, "ST",  "e_" + currEventIndex);
+						theHelper.printILCommand(pw, "JMP",  "after_check_e_" + currEventIndex);
+						theHelper.printILLabel(pw, "check_e_" + currEventIndex + "_" + i);
+					}
+					i++;
+				}
+			}
 			theHelper.printILCommand(pw, "JMP",  "after_check_e_" + currEventIndex);
 		}
 	}
