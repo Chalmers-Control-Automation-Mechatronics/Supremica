@@ -50,6 +50,7 @@
 package org.supremica.automata.execution;
 
 import java.util.*;
+import org.supremica.automata.LabeledEvent;
 
 public class Controls
 {
@@ -124,6 +125,11 @@ public class Controls
 		return theControls.iterator();
 	}
 
+	public Iterator iterator(LabeledEvent theEvent)
+	{
+		return new ControlIterator(iterator(), theEvent);
+	}
+
 	public int size()
 	{
 		return theControls.size();
@@ -133,5 +139,62 @@ public class Controls
 	{
 		theControls.clear();
 		labelToControlMap.clear();
+	}
+
+	class ControlIterator
+		implements Iterator
+	{
+		private final Iterator theIterator;
+		private LabeledEvent theEvent;
+		private String label;
+		private Object nextObject = null;
+
+		public ControlIterator(Iterator theIterator, LabeledEvent theEvent)
+		{
+			this.theIterator = theIterator;
+			this.theEvent = theEvent;
+			this.label = theEvent.getLabel();
+			findNextObject();
+		}
+
+		public boolean hasNext()
+		{
+			return nextObject != null;
+		}
+
+		public Object next()
+			throws NoSuchElementException
+		{
+			if (nextObject != null)
+			{
+				Object oldObject = nextObject;
+				findNextObject();
+				return oldObject;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+
+		public void remove()
+			throws UnsupportedOperationException, IllegalStateException
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private void findNextObject()
+		{
+			while (theIterator.hasNext())
+			{
+				Control currControl = (Control)theIterator.next();
+				if (label.equals(currControl.getLabel()))
+				{
+					nextObject = currControl;
+					return;
+				}
+			}
+			nextObject = null;
+		}
 	}
 }

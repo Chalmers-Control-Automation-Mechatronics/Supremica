@@ -50,6 +50,7 @@
 package org.supremica.automata.execution;
 
 import java.util.*;
+import org.supremica.automata.LabeledEvent;
 
 public class Timers
 {
@@ -123,6 +124,11 @@ public class Timers
 		return theTimers.iterator();
 	}
 
+	public Iterator iterator(LabeledEvent theEvent)
+	{
+		return new TimerIterator(iterator(), theEvent);
+	}
+
 	public int size()
 	{
 		return theTimers.size();
@@ -141,6 +147,63 @@ public class Timers
 		{
 			EventTimer currTimer = (EventTimer)theIt.next();
 			currTimer.setSynchIndex(i++);
+		}
+	}
+
+	class TimerIterator
+		implements Iterator
+	{
+		private final Iterator theIterator;
+		private LabeledEvent theEvent;
+		private String label;
+		private Object nextObject = null;
+
+		public TimerIterator(Iterator theIterator, LabeledEvent theEvent)
+		{
+			this.theIterator = theIterator;
+			this.theEvent = theEvent;
+			this.label = theEvent.getLabel();
+			findNextObject();
+		}
+
+		public boolean hasNext()
+		{
+			return nextObject != null;
+		}
+
+		public Object next()
+			throws NoSuchElementException
+		{
+			if (nextObject != null)
+			{
+				Object oldObject = nextObject;
+				findNextObject();
+				return oldObject;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+
+		public void remove()
+			throws UnsupportedOperationException, IllegalStateException
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private void findNextObject()
+		{
+			while (theIterator.hasNext())
+			{
+				EventTimer currTimer = (EventTimer)theIterator.next();
+				if (label.equals(currTimer.getStartEvent()) || label.equals(currTimer.getTimeoutEvent()))
+				{
+					nextObject = currTimer;
+					return;
+				}
+			}
+			nextObject = null;
 		}
 	}
 

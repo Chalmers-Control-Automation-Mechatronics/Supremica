@@ -50,6 +50,7 @@
 package org.supremica.automata.execution;
 
 import java.util.*;
+import org.supremica.automata.LabeledEvent;
 
 public class Actions
 {
@@ -123,6 +124,11 @@ public class Actions
 		return theActions.iterator();
 	}
 
+	public Iterator iterator(LabeledEvent theEvent)
+	{
+		return new ActionIterator(iterator(), theEvent);
+	}
+
 	public int size()
 	{
 		return theActions.size();
@@ -132,5 +138,62 @@ public class Actions
 	{
 		theActions.clear();
 		labelToActionMap.clear();
+	}
+
+	class ActionIterator
+		implements Iterator
+	{
+		private final Iterator theIterator;
+		private LabeledEvent theEvent;
+		private String label;
+		private Object nextObject = null;
+
+		public ActionIterator(Iterator theIterator, LabeledEvent theEvent)
+		{
+			this.theIterator = theIterator;
+			this.theEvent = theEvent;
+			this.label = theEvent.getLabel();
+			findNextObject();
+		}
+
+		public boolean hasNext()
+		{
+			return nextObject != null;
+		}
+
+		public Object next()
+			throws NoSuchElementException
+		{
+			if (nextObject != null)
+			{
+				Object oldObject = nextObject;
+				findNextObject();
+				return oldObject;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+
+		public void remove()
+			throws UnsupportedOperationException, IllegalStateException
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private void findNextObject()
+		{
+			while (theIterator.hasNext())
+			{
+				Action currAction = (Action)theIterator.next();
+				if (label.equals(currAction.getLabel()))
+				{
+					nextObject = currAction;
+					return;
+				}
+			}
+			nextObject = null;
+		}
 	}
 }
