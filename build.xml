@@ -449,5 +449,19 @@
 	<copy file="U:\temp\SupremicaInstallerX\Output\setup.exe" todir="H:\public_html\Supremica\distributions\windows9x"/>	
 </target>
 
+<target name="deploySecret" depends="deploySecretNT">
+</target>
+
+<target name="deploySecretNT">
+	<copy file="${dist}/Supremica.jar" todir="H:\public_html\Supremica\updates\noarch"/>	
+	<copy file="${dist}/SupremicaVersion.txt" todir="H:\public_html\Supremica\updates\noarch"/>
+	<copy file="${dist}/Supremica.jar" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
+	<copy file="${dist}/SupremicaVersion.txt" todir="U:\temp\SupremicaInstaller\SupremicaDist\Runtime\NoArch"/>	
+	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
+		<arg value="U:\temp\SupremicaInstaller\SupremicaDist.iss"/>
+	</exec>
+	<copy file="U:\temp\SupremicaInstaller\Output\setup.exe" tofile="H:\public_html\Supremica\distributions\windows\setupSecret.exe"/>	
+</target>
+
 </project>
        
