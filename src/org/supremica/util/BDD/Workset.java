@@ -104,6 +104,10 @@ public class Workset
 				for(int i = 0; i < size; i++)
 					if(workset[i] > 0)  return i;
 				break;
+			case Options.ES_HEURISTIC_BOTTOMUP:
+				for(int i = size-1; i >= 0; i--)
+					if(workset[i] > 0)  return i;
+				break;
 			case Options.ES_HEURISTIC_MOST_PENDING:
 				// one of the largest one (most affected so far)
 				best = 0;

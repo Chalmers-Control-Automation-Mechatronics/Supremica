@@ -150,19 +150,23 @@ public class Options
 
 	/** Event (Transition) selection heuristics, see petrinet related stuff */
 	public static final String [] ES_HEURISTIC_NAMES =  {
-		"Interactive", "Any", "Topological order", "Max pending req.","Min pending req.","Max follow","Min follow",
+		"Interactive", "Any",
+		"Topological order",
+		"Inverse T.O",
+		"Max pending req.","Min pending req.","Max follow","Min follow",
 		"Largest cover", "Smallest cover"
 	};
 	public static final int
 		ES_HEURISTIC_INTERACTIVE = 0,
 		ES_HEURISTIC_ANY = 1,
 		ES_HEURISTIC_TOPDOWN = 2,
-		ES_HEURISTIC_MOST_PENDING = 3,
-		ES_HEURISTIC_LEAST_PENDING = 4,
-		ES_HEURISTIC_MOST_FOLLOWERS = 5,
-		ES_HEURISTIC_LEAST_FOLLOWERS = 6,
-		ES_HEURISTIC_MOST_MEMBERS = 7,
-		ES_HEURISTIC_LEAST_MEMBERS = 8;
+		ES_HEURISTIC_BOTTOMUP = 3,
+		ES_HEURISTIC_MOST_PENDING = 4,
+		ES_HEURISTIC_LEAST_PENDING = 5,
+		ES_HEURISTIC_MOST_FOLLOWERS = 6,
+		ES_HEURISTIC_LEAST_FOLLOWERS = 7,
+		ES_HEURISTIC_MOST_MEMBERS = 8,
+		ES_HEURISTIC_LEAST_MEMBERS = 9;
 		;
 	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
 
