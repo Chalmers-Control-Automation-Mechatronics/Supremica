@@ -58,8 +58,19 @@ public class Automaton
 	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
 
 	private final Alphabet alphabet;
+
+	/**
+	 * The name of the automaton.
+	 */
 	private String name;
+
+	/**
+	 * A temporary name, used as a suggestion for a name to the gui when
+	 * adding a new automaton, so that the gui can avoid giving two automata
+	 * the same name. 
+	 */
 	private String comment;
+
 	// private List theStates = new LinkedList();
 	private final StateSet theStates = new StateSet();
 
@@ -617,6 +628,14 @@ public class Automaton
 			for (EventIterator evIt = outgoingEventsIterator(currState); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
+
+				// Epsilon event?
+				if (currEvent.isEpsilon())
+				{
+					return false;
+				}
+
+				// Has this event been seen in another transition from this state?
 				boolean newElement = foundEvents.add(currEvent.getLabel());
 				if (!newElement)
 				{
@@ -830,7 +849,6 @@ public class Automaton
 	{
 		return alphabet.getEventWithLabel(eventLabel);
 	}
-
 
 	public int nbrOfStates()
 	{

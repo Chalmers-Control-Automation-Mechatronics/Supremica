@@ -131,6 +131,9 @@ public class AutomatonSplit
 	 */
 	public static Automaton reduceAutomaton(Automaton supervisor, Automata parents)
 	{
+		if (supervisor.nbrOfStates() == 0)
+			return supervisor;
+
 		Automaton result = supervisor;
 		Automata automataB = new Automata(supervisor);
 
@@ -171,7 +174,10 @@ public class AutomatonSplit
 		// Set the right type
 		result.setType(supervisor.getType());  // should be a supervisor...
 
-		return result;
+		if (supervisor.nbrOfStates() < result.nbrOfStates())
+			return supervisor;
+		else
+			return result;
 	}
 
 	/**

@@ -529,11 +529,15 @@ public class AutomataSynthesizer
 		retval.automaton.setComment("sup(" + retval.automaton.getName() + ")");
 
 		// Shall we reduce the supervisor?
-		if (synthesizerOptions.getReduceSupervisors())
+		if (synthesizerOptions.getReduceSupervisors() && synthesizerOptions.doPurge())
 		{	// Add the reduced supervisor
 			Automaton supervisor = retval.automaton;
 			Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(supervisor, automata);
 			retval.automaton = reducedSupervisor;
+		}
+		else if (synthesizerOptions.getReduceSupervisors() && !synthesizerOptions.doPurge())
+		{
+			logger.warn("Supervisor reduction only works if the supervisor is purged.");
 		}
 
 		// Return the result
