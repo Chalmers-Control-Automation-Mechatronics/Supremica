@@ -43,6 +43,8 @@
 <property name="xml" location="xml"/>
 <property name="xsd" location="${xml}/xsd"/>
 <property name="xsl" location="${xml}/xsl"/>
+<property name="logs" location="logs"/>
+
 
 <!--
 *	If you for some reason prefer javac instead of jikes,
@@ -646,6 +648,39 @@
 	</java>
 </target>
 
+<target name="run_tests_waters" depends="compile_supremica,compile_tests_supremica">
+	<mkdir dir="${logs}/des"/>
+	<mkdir dir="${logs}/module"/>
+	<mkdir dir="${logs}/expression"/>
+	<mkdir dir="${logs}/compiler"/>
+	<mkdir dir="${logs}/algorithms"/>
+	<mkdir dir="${logs}/analysis"/>
+	<mkdir dir="${logs}/maze"/>
+	<mkdir dir="${logs}/valid"/>
+	<junit printsummary="on" fork="true">
+		<formatter type="brief" extension=".log"/>
+		<test name="net.sourceforge.waters.junit.ProductDESTest"
+			outfile="logs/des/testrun"/>
+		<test name="net.sourceforge.waters.junit.ModuleTest"
+			outfile="logs/module/testrun"/>
+		<test name="net.sourceforge.waters.junit.ExpressionTest"
+			outfile="logs/expression/testrun"/>
+		<test name="net.sourceforge.waters.junit.CompilerTest"
+			outfile="logs/compiler/testrun"/>
+		<test name="net.sourceforge.waters.junit.AnalysisTest"
+			outfile="logs/analysis/testrun"/>
+		<test name="net.sourceforge.waters.junit.AlgorithmsTest"
+			outfile="logs/algorithms/testrun"/>
+		<test name="net.sourceforge.waters.junit.MazeTest"
+			outfile="logs/maze/testrun"/>
+		<test name="net.sourceforge.waters.junit.ValidTest"
+			outfile="logs/valid/testrun"/>
+		<classpath>
+			<path refid="external-classpath"/>
+			<pathelement location="${jar.file}"/>
+		</classpath>
+	</junit>
+</target>
 
 <target name="bdd_tests" depends="compile_supremica,startfiles_supremica">
 	<!-- 
