@@ -54,8 +54,11 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.DataConversionException;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 
 import org.supremica.automata.*;
