@@ -661,8 +661,8 @@ public class MainMenuBar
 
 			JMenuItem menuBuildConfigit = new JMenuItem("Shoeconfigurator");
 			JMenuItem menuBuildPlant = new JMenuItem("Build Plant");
-			JMenuItem menuBuildSFC = new JMenuItem("Build SFC");
-			JMenuItem menuBuildAnimator = new JMenuItem("Animator");
+			JMenuItem menuBuildConfigitDEMO = new JMenuItem("ShoeconfiguratorDEMO");
+
 			menuBuildPlant.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -678,24 +678,17 @@ public class MainMenuBar
 					ActionMan.shoeFactoryConfigurator();
 				}
 			});
-			menuBuildSFC.addActionListener(new ActionListener()
+			menuBuildConfigitDEMO.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					ActionMan.shoeFactorySFC();
+					ActionMan.shoeFactoryConfiguratorDEMO();
 				}
 			});
-			menuBuildAnimator.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.shoeFactoryAnimator(ActionMan.getGui());
-				}
-			});
+
 			menuToolsShoeFactory.add(menuBuildConfigit);
+			menuToolsShoeFactory.add(menuBuildConfigitDEMO);
 			menuToolsShoeFactory.add(menuBuildPlant);
-			menuToolsShoeFactory.add(menuBuildSFC);
-			menuToolsShoeFactory.add(menuBuildAnimator);
 		}
 
 

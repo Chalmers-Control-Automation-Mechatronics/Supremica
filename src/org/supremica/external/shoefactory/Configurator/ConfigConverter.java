@@ -34,50 +34,76 @@ public class ConfigConverter
 		if(s.compareTo("35")==0)
 		{
 			stationVisit[0]=true;
+			stationVisit[5]=true;
+			stationVisit[9]=true;
+
 		}
 		else if(s.compareTo("36")==0)
 		{
 			stationVisit[1]=true;
+			stationVisit[6]=true;
+			stationVisit[10]=true;
 		}
 		else if(s.compareTo("37")==0)
 		{
 			stationVisit[2]=true;
+			stationVisit[7]=true;
+			stationVisit[11]=true;
 		}
 		else if(s.compareTo("38")==0)
 		{
 			stationVisit[3]=true;
+			stationVisit[8]=true;
+			stationVisit[9]=true;
 		}
         else if(s.compareTo("39")==0)
         {
 			stationVisit[4]=true;
+			stationVisit[5]=true;
+			stationVisit[11]=true;
 		}
 		else if(s.compareTo("40")==0)
 		{
-			stationVisit[5]=true;
+			stationVisit[0]=true;
+			stationVisit[6]=true;
+			stationVisit[9]=true;
 		}
 		else if(s.compareTo("41")==0)
 		{
-			stationVisit[6]=true;
+			stationVisit[1]=true;
+			stationVisit[7]=true;
+			stationVisit[10]=true;
+
 		}
 		else if(s.compareTo("42")==0)
 		{
-            stationVisit[7]=true;
+            stationVisit[2]=true;
+			stationVisit[8]=true;
+			stationVisit[11]=true;
 		}
 		else if(s.compareTo("43")==0)
 		{
-			stationVisit[8]=true;
+			stationVisit[3]=true;
+			stationVisit[5]=true;
+			stationVisit[9]=true;
 		}
 		else if(s.compareTo("44")==0)
 		{
-			stationVisit[9]=true;
+			stationVisit[4]=true;
+			stationVisit[6]=true;
+			stationVisit[10]=true;
 		}
 		else if(s.compareTo("45")==0)
 		{
-			stationVisit[10]=true;
+			stationVisit[0]=true;
+			stationVisit[7]=true;
+			stationVisit[11]=true;
 		}
 		else if(s.compareTo("46")==0)
 		{
-			stationVisit[11]=true;
+			stationVisit[1]=true;
+			stationVisit[8]=true;
+			stationVisit[9]=true;
 		}
 
         if(gt.compareTo("Adult")==0)

@@ -236,50 +236,50 @@ public class Plant
 
 		index++;
 
-					for(int i=1;i<6;i++){
+		for(int i=1;i<6;i++){
 
-				 		LabeledEvent putEvent1 = new LabeledEvent("Shoe_"+snmbr+"put_T"+i);
-				  		LabeledEvent putEvent2 = new LabeledEvent("Shoe_"+snmbr+"put_T"+(i+5));
-				  		LabeledEvent getEvent1 = new LabeledEvent("Shoe_"+snmbr+ "get_T"+(i-1));
-				  		LabeledEvent getEvent2 = new LabeledEvent("Shoe_"+snmbr+ "get_T"+(i+5));
+	 		LabeledEvent putEvent1 = new LabeledEvent("Shoe_"+snmbr+"put_T"+i);
+	  		LabeledEvent putEvent2 = new LabeledEvent("Shoe_"+snmbr+"put_T"+(i+5));
+	  		LabeledEvent getEvent1 = new LabeledEvent("Shoe_"+snmbr+ "get_T"+(i-1));
+	  		LabeledEvent getEvent2 = new LabeledEvent("Shoe_"+snmbr+ "get_T"+(i+5));
 
-						IOAlphabet[IOAlfindex].addEvent(putEvent1);
+			IOAlphabet[IOAlfindex].addEvent(putEvent1);
 
-						IOAlphabet[IOAlfindex].addEvent(putEvent2);
+			IOAlphabet[IOAlfindex].addEvent(putEvent2);
 
-						IOAlphabet[IOAlfindex].addEvent(getEvent1);
+			IOAlphabet[IOAlfindex].addEvent(getEvent1);
 
-						IOAlphabet[IOAlfindex].addEvent(getEvent2);
+			IOAlphabet[IOAlfindex].addEvent(getEvent2);
 
-						IOAlfindex++;
+			IOAlfindex++;
 
-						Arc putArc1 = new Arc(IOSTate[index+1] , IOSTate[index], putEvent1);
-						Arc putArc2 = new Arc(IOSTate[index+1] ,IOSTate[index], putEvent2);
-						Arc getArc1 = new Arc(IOSTate[index],IOSTate[index+1], getEvent1);
-      					Arc getArc2 = new Arc(IOSTate[index],IOSTate[index+1], getEvent2);
-						index+=2;
-						}
+			Arc putArc1 = new Arc(IOSTate[index+1] , IOSTate[index], putEvent1);
+			Arc putArc2 = new Arc(IOSTate[index+1] ,IOSTate[index], putEvent2);
+			Arc getArc1 = new Arc(IOSTate[index],IOSTate[index+1], getEvent1);
+			Arc getArc2 = new Arc(IOSTate[index],IOSTate[index+1], getEvent2);
+			index+=2;
+			}
 
-						LabeledEvent putEvent = new LabeledEvent("Shoe_"+snmbr+"put_T"+11);
-	    				LabeledEvent getEvent = new LabeledEvent("Shoe_"+snmbr+"get_T5");
+			LabeledEvent putEvent = new LabeledEvent("Shoe_"+snmbr+"put_T"+11);
+			LabeledEvent getEvent = new LabeledEvent("Shoe_"+snmbr+"get_T5");
 
-						IOAlphabet[IOAlfindex].addEvent(putEvent);
+			IOAlphabet[IOAlfindex].addEvent(putEvent);
 
-						IOAlphabet[IOAlfindex].addEvent(getEvent);
-						IOAlfindex++;
+			IOAlphabet[IOAlfindex].addEvent(getEvent);
+			IOAlfindex++;
 
-						Arc putArc = new Arc(IOSTate[12] , IOSTate[11], putEvent);
-						Arc getArc = new Arc(IOSTate[11], IOSTate[12], getEvent);
+			Arc putArc = new Arc(IOSTate[12] , IOSTate[11], putEvent);
+			Arc getArc = new Arc(IOSTate[11], IOSTate[12], getEvent);
 
-						LabeledEvent putEvent1 = new LabeledEvent("Shoe_"+snmbr+"put_T"+12);
-						LabeledEvent getEvent1 = new LabeledEvent("Shoe_"+snmbr+"get_T10");
+			LabeledEvent putEvent1 = new LabeledEvent("Shoe_"+snmbr+"put_T"+12);
+			LabeledEvent getEvent1 = new LabeledEvent("Shoe_"+snmbr+"get_T10");
 
-						IOAlphabet[IOAlfindex].addEvent(putEvent1);
+			IOAlphabet[IOAlfindex].addEvent(putEvent1);
 
-						IOAlphabet[IOAlfindex].addEvent(getEvent1);
+			IOAlphabet[IOAlfindex].addEvent(getEvent1);
 
-						Arc putArc1 = new Arc(IOSTate[14] , IOSTate[13], putEvent1);
-						Arc getArc1 = new Arc(IOSTate[13], IOSTate[14], getEvent1);
+			Arc putArc1 = new Arc(IOSTate[14] , IOSTate[13], putEvent1);
+			Arc getArc1 = new Arc(IOSTate[13], IOSTate[14], getEvent1);
 
 
 }

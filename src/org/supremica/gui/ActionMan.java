@@ -74,7 +74,7 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;
 import org.supremica.external.robotCoordinationABB.*;
 import org.supremica.external.shoefactory.plantBuilder.*;
-//import org.supremica.external.shoefactory.Animator.*;
+import org.supremica.external.shoefactory.Animator.*;
 import org.supremica.external.shoefactory.Configurator.*;
 
 import org.supremica.log.*;
@@ -2936,12 +2936,6 @@ public class ActionMan
 		}
 	}
 
-	//shoeFactory - animate
-	public static void shoeFactoryAnimator(Gui gui)
-	{
-
-	}
-
 	// shoeFactory - build plant
 	public static void shoeFactoryBuildPlant(Gui gui)
 	{
@@ -2964,9 +2958,19 @@ public class ActionMan
 	}
 
 	//shoeFactory - build SFC
-	public static void shoeFactorySFC()
+	public static void shoeFactoryConfiguratorDEMO()
 	{
-
+		ConfigitDEMO con = new ConfigitDEMO(gui);
+		con.setLocationRelativeTo(null);
+		con.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		try
+		{
+			con.show();
+		}
+		catch (Exception ex)
+		{
+			logger.error("shoeFactoryConfigurator: " + ex.getMessage());
+		}
 	}
 
 
