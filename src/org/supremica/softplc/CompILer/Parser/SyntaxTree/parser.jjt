@@ -87,6 +87,11 @@ void library_element_declaration() #void :
 	      function_block_declaration()
 		| program_declaration()
 	   //  | configuration_declaration()
+			  | java_block_declaration() /* Added in addition to the
+										  * normal grammar to handle
+										  * calls to function blocks
+										  * programmed in java.
+										  */
 }
 
 
@@ -1417,6 +1422,27 @@ void function_block_declaration() :
 	function_block_body() "END_FUNCTION_BLOCK"
 }
 
+/*
+ * Tillägg för JAVA_BLOCK 2002-04-15 av Anders
+ * java_block_declaration är endast till för att typdeklarara
+ * function blocks som är skrivna direkt i java ist. för i IL.
+ * Därför används exakt samma byggstenar i java_block_declaration
+ * som i
+ */
+void java_block_declaration() :
+{}
+{
+	"JAVA_BLOCK" derived_function_block_name()
+		io_var_declarations()
+	"END_JAVA_BLOCK"
+}
+
+/*
+ * Slut JAVA_BLOCK-tillägg
+ */
+
+
+
 void other_var_declarations() :
 {}
 {
@@ -1808,6 +1834,12 @@ void il_jump_operation() :
 void il_fb_call() :
 {}
 {
+/*
+ * il_call_java_operator added in addition to the
+ * normal grammar to handle calls to function blocks
+ * programmed in java.
+ */
+
     ( il_call_operator() | il_call_java_operator() )
         fb_name()
         ("("
@@ -1816,9 +1848,8 @@ void il_fb_call() :
 
 		  | il_operand_list())//?)
          ")")?
-
-
 }
+
 
 
 //void il_formal_funct_call() :
@@ -1939,6 +1970,9 @@ TOKEN:
 
 
 void il_call_java_operator() :
+/* Added in addition to the normal grammar to handle
+ * calls to function blocks programmed in java.
+ */
 {
 	Token t;
 }
@@ -1949,6 +1983,9 @@ void il_call_java_operator() :
 
 
 TOKEN:
+/* Added in addition to the normal grammar to handle
+ * calls to function blocks programmed in java.
+ */
 {
 	<il_call_java_op: "CAL_JAVA" >
 }

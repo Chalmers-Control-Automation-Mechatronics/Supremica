@@ -120,6 +120,11 @@ void library_element_declaration()       :
 	      function_block_declaration()
 		| program_declaration()
 	   //  | configuration_declaration()
+			  | java_block_declaration() /* Added in addition to the
+										  * normal grammar to handle
+										  * calls to function blocks
+										  * programmed in java.
+										  */
 }
 
 
@@ -4327,6 +4332,53 @@ void function_block_declaration() :
 /*@egen*/
 }
 
+/*
+ * Till\u00e4gg f\u00f6r JAVA_BLOCK 2002-04-15 av Anders
+ * java_block_declaration \u00e4r endast till f\u00f6r att typdeklarara
+ * function blocks som \u00e4r skrivna direkt i java ist. f\u00f6r i IL.
+ * D\u00e4rf\u00f6r anv\u00e4nds exakt samma byggstenar i java_block_declaration
+ * som i
+ */
+void java_block_declaration() :
+{/*@bgen(jjtree) java_block_declaration */
+  ASTjava_block_declaration jjtn000 = new ASTjava_block_declaration(JJTJAVA_BLOCK_DECLARATION);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) java_block_declaration */
+        try {
+/*@egen*/
+	"JAVA_BLOCK" derived_function_block_name()
+		io_var_declarations()
+	"END_JAVA_BLOCK"/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+/*
+ * Slut JAVA_BLOCK-till\u00e4gg
+ */
+
+
+
 void other_var_declarations() :
 {/*@bgen(jjtree) other_var_declarations */
   ASTother_var_declarations jjtn000 = new ASTother_var_declarations(JJTOTHER_VAR_DECLARATIONS);
@@ -5632,6 +5684,12 @@ void il_fb_call() :
 {/*@bgen(jjtree) il_fb_call */
     try {
 /*@egen*/
+/*
+ * il_call_java_operator added in addition to the
+ * normal grammar to handle calls to function blocks
+ * programmed in java.
+ */
+
     ( il_call_operator() | il_call_java_operator() )
         fb_name()
         ("("
@@ -5660,9 +5718,8 @@ void il_fb_call() :
       }
     }
 /*@egen*/
-
-
 }
+
 
 
 //void il_formal_funct_call() :
@@ -6060,6 +6117,9 @@ TOKEN:
 
 
 void il_call_java_operator() :
+/* Added in addition to the normal grammar to handle
+ * calls to function blocks programmed in java.
+ */
 {/*@bgen(jjtree) il_call_java_operator */
         ASTil_call_java_operator jjtn000 = new ASTil_call_java_operator(JJTIL_CALL_JAVA_OPERATOR);
         boolean jjtc000 = true;
@@ -6087,6 +6147,9 @@ void il_call_java_operator() :
 
 
 TOKEN:
+/* Added in addition to the normal grammar to handle
+ * calls to function blocks programmed in java.
+ */
 {
 	<il_call_java_op: "CAL_JAVA" >
 }

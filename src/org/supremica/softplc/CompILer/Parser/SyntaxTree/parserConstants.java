@@ -32,15 +32,15 @@ public interface parserConstants {
   int size_prefix = 67;
   int single_byte_string_spec = 82;
   int double_byte_string_spec = 83;
-  int il_call_op = 112;
-  int il_call_java_op = 113;
-  int il_return_op = 114;
-  int il_jump_op = 115;
-  int il_expr_operator = 116;
-  int il_simple_operator = 117;
-  int identifier = 118;
-  int digit = 119;
-  int letter = 120;
+  int il_call_op = 114;
+  int il_call_java_op = 115;
+  int il_return_op = 116;
+  int il_jump_op = 117;
+  int il_expr_operator = 118;
+  int il_simple_operator = 119;
+  int identifier = 120;
+  int digit = 121;
+  int letter = 122;
 
   int DEFAULT = 0;
   int WithinComment = 1;
@@ -139,6 +139,8 @@ public interface parserConstants {
     "\"END_FUNCTION\"",
     "\"FUNCTION_BLOCK\"",
     "\"END_FUNCTION_BLOCK\"",
+    "\"JAVA_BLOCK\"",
+    "\"END_JAVA_BLOCK\"",
     "\"VAR_TEMP\"",
     "\"PROGRAM\"",
     "\"END_PROGRAM\"",
