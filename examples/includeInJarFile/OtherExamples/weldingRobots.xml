@@ -9,11 +9,11 @@
   <Event id="4" label="robot_1_home" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="q_0" initial="true" accepting="true" /> 
-  <State id="1" name="q_1" /> 
-  <State id="2" name="q_2" /> 
-  <State id="3" name="q_3" /> 
-  <State id="4" name="q_4" /> 
+  <State id="0" name="q_0" cost="0" initial="true" /> 
+  <State id="1" name="q_1" cost="3" /> 
+  <State id="2" name="q_2" cost="2" /> 
+  <State id="3" name="q_3" cost="1" /> 
+  <State id="4" name="q_4" cost="0" accepting="true" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
@@ -35,14 +35,14 @@
   <Event id="7" label="robot_2_home" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="q_0" initial="true" accepting="true" /> 
-  <State id="1" name="q_1" /> 
-  <State id="2" name="q_2" /> 
-  <State id="3" name="q_3" /> 
-  <State id="4" name="q_4" /> 
-  <State id="5" name="q_5" /> 
-  <State id="6" name="q_6" /> 
-  <State id="7" name="q_7" /> 
+  <State id="0" name="q_0" cost="0" initial="true" /> 
+  <State id="1" name="q_1" cost="2" /> 
+  <State id="2" name="q_2" cost="2" /> 
+  <State id="3" name="q_3" cost="2" /> 
+  <State id="4" name="q_4" cost="5" /> 
+  <State id="5" name="q_5" cost="1" /> 
+  <State id="6" name="q_6" cost="3" /> 
+  <State id="7" name="q_7" cost="0" accepting="true" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
@@ -65,12 +65,12 @@
   <Event id="5" label="robot_3_home" controllable="false" /> 
   </Events>
  <States>
-  <State id="0" name="q_0" initial="true" accepting="true" /> 
-  <State id="1" name="q_1" /> 
-  <State id="2" name="q_2" /> 
-  <State id="3" name="q_3" /> 
-  <State id="4" name="q_4" /> 
-  <State id="5" name="q_5" /> 
+  <State id="0" name="q_0" cost="0" initial="true" /> 
+  <State id="1" name="q_1" cost="3" /> 
+  <State id="2" name="q_2" cost="7" /> 
+  <State id="3" name="q_3" cost="2" /> 
+  <State id="4" name="q_4" cost="2" /> 
+  <State id="5" name="q_5" cost="0" accepting="true" /> 
   </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
