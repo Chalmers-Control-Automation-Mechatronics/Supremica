@@ -46,35 +46,43 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 /*
- * Created on Dec 16, 2004
+ * Created on 2004-dec-21
  */
 /**
  * @author cengic
  */
 package org.supremica.functionblocks.model;
 
-import java.util.*;
 
-public class BasicFBType extends FBType
+public class Job
 {
 
-    private ECC theECC = new ECC();
-    private List instances = new ArrayList();
-    private List algorithms = new ArrayList();
-       
-    public BasicFBInstance createInstance(String name)
-    {
-        System.out.println("BasicFBType.createInstace(" + name + ")");
-        BasicFBInstance newInstance = new BasicFBInstance(name,this);
-        // construct the newInstance
-        return newInstance;
-    }
+    private BasicFBInstance fbInstance = null;
+    private Algorithm theAlgorithm = null;
+    private Variables theVariables = null;
 
-    public ECC getECC()
+    public Job(BasicFBInstance i, Algorithm a, Variables v)
     {
-        System.out.println("BasicFBType.getECC()");
-        return theECC;
+	fbInstance = i;
+	theAlgorithm = a;
+	theVariables = v;
     }
     
+    public BasicFBInstance getInstance()
+    {
+	return fbInstance;
+    }
+    
+    public Algorithm getAlgorithm()
+    {
+	return theAlgorithm;
+    }
+
+    public Variables getVariables()
+    {
+	return theVariables;
+    }
+
 }

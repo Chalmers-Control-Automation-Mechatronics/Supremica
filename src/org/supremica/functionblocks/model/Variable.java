@@ -51,22 +51,20 @@ package org.supremica.functionblocks.model;
 
 //import java.util.*;
 
-public class Variable
+public abstract class Variable
 {
-	String name;
-	String type;
-	int arraySize = 0;
-	Object initialValue = null;
-	String comment = null;
+    private String name;
+    private VariableType valueHolder;
 
-	private Variable()
-	{
-	}
+    public String getName()
+    {
+	return name;
+    }
 
-	public Variable(String name, String type)
-	{
-		this.name = name;
-		this.type = type;
-	}
-
+    public void setValue()
+    {
+	
+    }
+    
+       
 }

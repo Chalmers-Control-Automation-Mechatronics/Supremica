@@ -50,34 +50,15 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT ECTransition EMPTY>
-<!ATTLIST ECTransition
- Source CDATA #REQUIRED
- Destination CDATA #REQUIRED
- Condition CDATA #REQUIRED
- Comment CDATA #IMPLIED
- x CDATA #IMPLIED
- y CDATA #IMPLIED
->
-
-*/
 
 public class ECTransition
 {
-	ECState source;
-	ECState destination;
-	String condition;
-
-	String comment = null;
-	float x;
-	float y;
-
-	public ECTransition(ECState source, ECState destination, String condition)
-	{
-		this.source = source;
-		this.destination = destination;
-		this.condition = condition;
-	}
-
+    private ECState destination;
+    private ECCondition condition;
+    
+    public ECTransition(ECState destination, ECCondition condition)
+    {
+	this.destination = destination;
+	this.condition = condition;
+    }   
 }

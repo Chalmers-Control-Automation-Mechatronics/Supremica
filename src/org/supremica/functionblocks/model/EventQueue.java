@@ -46,37 +46,29 @@
  *
  * Supremica is owned and represented by KA.
  */
-
+/*
+ * Created on 2004-dec-21
+ */
+/**
+ * @author cengic
+ */
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT Event (With*)>
-<!ATTLIST Event
- Name CDATA #REQUIRED
- Type CDATA #IMPLIED
- Comment CDATA #IMPLIED
->
-*/
 
-public class IncomingEvent
+
+public class EventQueue
 {
-	String name;
-	String type = null;
-	String comment = null;
-	List withs = new LinkedList(); // Put the variable name here
-
-	private IncomingEvent()
-	{
-	}
-
-	public IncomingEvent(String name)
-	{
-		this.name = name;
-	}
-
-	public Iterator withIterator()
-	{
-		return withs.iterator();
-	}
+    private String eventName;
+    private LinkedList queue = new LinkedList();
+    
+    public EventQueue(String name)
+    {
+        eventName = name;
+    }
+    
+    public Event remove()
+    {
+        return (Event) queue.removeFirst();
+    }
 }

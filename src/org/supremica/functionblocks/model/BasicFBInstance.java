@@ -37,30 +37,86 @@
  * 
  * Supremica is owned and represented by KA.
  */
-
+/**
+ * @author Cengic
+ */
 package org.supremica.functionblocks.model;
 
 import java.util.*;
 
-/*
- * <!ELEMENT BasicFBInstance (InternalVars?,ECC?,Algorithm*)>
- */
-
 public class BasicFBInstance extends FBInstance
 {
-    
-    Variables internalVars;
+    // attributes
+    private BasicFBType fbType;
 
-    public BasicFBInstance(String name)
+    private List eventQueues = new ArrayList();
+
+    private ECState currentECState;
+    private ECAction currentECAction;
+    private Variables variables;
+
+    private Event currentEvent;
+    private boolean handlingEvent = false;
+
+    //private Map eventOutputConnections = new ArrayList();
+    //private Map dataInputConnections = new ArrayList();
+
+
+    // contructor and methods for construction
+    public BasicFBInstance(String n, BasicFBType t)
     {
+        this.name = n;
+	fbType = t;
     }
 
-    /* (non-Javadoc)
-     * @see org.supremica.functionblocks.model.FBInstance#handleEvent()
-     */
+    public void addEventQueue(EventQueue e)
+    {
+	eventQueues.add(e);
+    }
+
+    public void addEventOutputConnection()
+    {
+	
+    }
+    
+    public void addDataInputConnection()
+    {
+	
+    }
+
+    // methods
+    public Event getEventToHandle()
+    {
+        System.out.println("BasicFBInstace.selectEventToHandle()");
+        // TODO: Implement better event selection
+        // For the skeleton the first queue will do
+        return ((EventQueue) eventQueues.get(0)).remove();
+    }
+
     public void handleEvent()
     {
-        // TODO Auto-generated method stub
-        
+        System.out.println("BasicFBInstance.handleEvent()");
+
+        currentEvent = getEventToHandle();
+	// update variables with the ones that come with the event
+	ECState newECState = fbType.getECC().execute(currentECState, variables);
+        if (newECState.getName() != currentECState.getName())
+        {
+            handlingEvent = true;
+            // TODO: get actions, make the jobs and schedule them
+	    // schedule jobs one at a time and wit for them to finish
+        }
+    }
+
+    public void finishedJob(Job theJob)
+    {
+        System.out.println("BasicFBInstance.finishedJob()");
+	handlingEvent = false;
+    }
+
+    public void queueEvent(String eventInput)
+    {
+	System.out.println("BasicFBInstace.queueEvent()");
+	
     }
 }

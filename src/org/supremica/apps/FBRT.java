@@ -47,34 +47,19 @@
  * Supremica is owned and represented by KA.
  */
 /*
- * Created on Dec 16, 2004
- */
-/**
  * @author cengic
  */
-package org.supremica.functionblocks.model;
+package org.supremica.apps;
 
-import java.util.*;
+import org.supremica.functionblocks.model.*;
 
-public class BasicFBType extends FBType
+public class FBRT 
 {
-
-    private ECC theECC = new ECC();
-    private List instances = new ArrayList();
-    private List algorithms = new ArrayList();
-       
-    public BasicFBInstance createInstance(String name)
-    {
-        System.out.println("BasicFBType.createInstace(" + name + ")");
-        BasicFBInstance newInstance = new BasicFBInstance(name,this);
-        // construct the newInstance
-        return newInstance;
-    }
-
-    public ECC getECC()
-    {
-        System.out.println("BasicFBType.getECC()");
-        return theECC;
-    }
     
+    public static void main(String[] args)
+    {
+	Device theDevice = new Device(args[1]);
+	theDevice.run();
+    }
+
 }

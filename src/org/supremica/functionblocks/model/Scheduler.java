@@ -55,27 +55,58 @@
  */
 package org.supremica.functionblocks.model;
 
+import java.util.*;
+
 public class Scheduler
 {
+    private Resource resource;
+    
+    private List scheduledJobs = Collections.synchronizedList(new LinkedList());
+    private List finishedJobs = Collections.synchronizedList(new LinkedList());
 
     public void runEvents()
     {
         while (true)
-        {
-            FBInstance selectedFB = selectFBInstanceToHandleEvent();
-            selectedFB.handleEvent();
-            notifyFinished();
-        }
+	    {
+		FBInstance selectedFB = selectFBInstanceToHandleEvent();
+		selectedFB.handleEvent();
+		notifyFinished();
+	    }
     }
-
+    
     public FBInstance selectFBInstanceToHandleEvent()
     {
         System.out.println("Scheduler.selectFBInstanceToHandleEvent");
+        // TODO: implement selection algorithm
         return null;
     }
     
     public void notifyFinished()
     {
-        
+        for (Iterator iter = finishedJobs.iterator(); iter.hasNext();)
+	{
+	    Job finishedJob = (Job) iter.next();
+	    finishedJob.getInstance().finishedJob(finishedJob);
+	    iter.remove();
+	}
     }
+    
+    public void runAlgorithms()
+    {
+	while (true) 
+	{
+	    if (scheduledJobs.size() > 0)
+	    {
+		Job currentJob = (Job) scheduledJobs.remove(0);
+		currentJob.getAlgorithm().execute(currentJob.getVariables());
+		finishedJobs.add(currentJob);
+	    }
+	}	
+    }
+    
+    public void scheduleJob(Job j)
+    {
+	scheduledJobs.add(j);
+    }
+    
 }

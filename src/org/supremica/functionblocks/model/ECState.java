@@ -46,36 +46,38 @@
  *
  * Supremica is owned and represented by KA.
  */
+/*
+ * @author cengic
+ */
 
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT ECState (ECAction*)>
-<!ATTLIST ECState
- Name CDATA #REQUIRED
- Comment CDATA #IMPLIED
- x CDATA #IMPLIED
- y CDATA #IMPLIED
->
-*/
 
 public class ECState
 {
-	List ecActions = new LinkedList();
-	String name;
-	String comment = null;
-	float x;
-	float y;
+    private String name;
+    private List ecActions = new ArrayList();
+    private List ecTransitions = new ArrayList();
+    
+    public ECState(String name)
+    {
+	this.name = name;
+    }
+    
+    public String getName()
+    {
+	return name;
+    }
+    
+    public Iterator actionIterator()
+    {
+	return ecActions.iterator();
+    }
 
-	public ECState(String name)
-	{
-		this.name = name;
-	}
+    public Iterator transitionIterator()
+    {
+	return ecTransitions.iterator();
+    }
 
-
-	public Iterator actionIterator()
-	{
-		return ecActions.iterator();
-	}
 }

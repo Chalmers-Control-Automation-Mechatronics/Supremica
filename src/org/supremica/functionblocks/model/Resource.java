@@ -46,13 +46,23 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.functionblocks.model;
+
+import java.util.*;
 
 /**
  * @author Cengic
  */
 public class Resource
 {
+
+    private String name;
+    private Scheduler scheduler;
+    private List applicationFragments = new ArrayList();
+
+    public Resource(String name)
+    {
+	this.name = name;
+    }
 
 }

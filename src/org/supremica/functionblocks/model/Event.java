@@ -46,35 +46,37 @@
  *
  * Supremica is owned and represented by KA.
  */
-/*
- * Created on Dec 16, 2004
- */
-/**
- * @author cengic
- */
+
 package org.supremica.functionblocks.model;
 
 import java.util.*;
+/*
+<!ELEMENT Event (With*)>
+<!ATTLIST Event
+ Name CDATA #REQUIRED
+ Type CDATA #IMPLIED
+ Comment CDATA #IMPLIED
+>
+*/
 
-public class BasicFBType extends FBType
+public class Event
 {
+	String name;
+	String type = null;
+	String comment = null;
+	List withs = new LinkedList(); // Put the variable name here
 
-    private ECC theECC = new ECC();
-    private List instances = new ArrayList();
-    private List algorithms = new ArrayList();
-       
-    public BasicFBInstance createInstance(String name)
-    {
-        System.out.println("BasicFBType.createInstace(" + name + ")");
-        BasicFBInstance newInstance = new BasicFBInstance(name,this);
-        // construct the newInstance
-        return newInstance;
-    }
+	private Event()
+	{
+	}
 
-    public ECC getECC()
-    {
-        System.out.println("BasicFBType.getECC()");
-        return theECC;
-    }
-    
+	public Event(String name)
+	{
+		this.name = name;
+	}
+
+	public Iterator withIterator()
+	{
+		return withs.iterator();
+	}
 }

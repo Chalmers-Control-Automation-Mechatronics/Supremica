@@ -47,34 +47,28 @@
  * Supremica is owned and represented by KA.
  */
 /*
- * Created on Dec 16, 2004
- */
-/**
  * @author cengic
  */
 package org.supremica.functionblocks.model;
 
-import java.util.*;
 
-public class BasicFBType extends FBType
+public class ECCondition
 {
+    private String condition = null;
 
-    private ECC theECC = new ECC();
-    private List instances = new ArrayList();
-    private List algorithms = new ArrayList();
-       
-    public BasicFBInstance createInstance(String name)
+    public ECCondition(String cond)
     {
-        System.out.println("BasicFBType.createInstace(" + name + ")");
-        BasicFBInstance newInstance = new BasicFBInstance(name,this);
-        // construct the newInstance
-        return newInstance;
+	condition = cond;
     }
 
-    public ECC getECC()
+    public void setCondition(String cond)
     {
-        System.out.println("BasicFBType.getECC()");
-        return theECC;
+	condition = cond;
     }
-    
+
+    public boolean evaluateCondition(Variables vars)
+    {
+	return false;
+    }
+
 }

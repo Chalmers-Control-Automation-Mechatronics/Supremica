@@ -50,18 +50,8 @@ public abstract class FBType extends NamedObject
     private String comment;
     private List versionInfo = new LinkedList();
     
-    private Variables variables = new Variables(); 
-   
-    //public FBType()
-    //{
+    private Variables inputData;
+    private Variables outputData;
 
-    //}
-
-    //public FBType(String name)
-    //{
-    //    this.name = name;
-    //}
-
-    public abstract FBInstance createInstance();
     
 }

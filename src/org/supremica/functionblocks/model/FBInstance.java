@@ -46,17 +46,14 @@
  *
  * Supremica is owned and represented by KA.
  */
-
-package org.supremica.functionblocks.model;
-
 /**
  * @author Cengic
  */
+package org.supremica.functionblocks.model;
+
+
 public abstract class FBInstance extends NamedObject
 {
-    public FBInstance()
-    {
-    }
-    
-    public abstract void handleEvent();
+    String name;
+    public abstract void handleEvent();   
 }

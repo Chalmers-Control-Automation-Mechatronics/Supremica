@@ -59,16 +59,12 @@ import java.util.*;
 
 */
 
-public class Algorithm
+public abstract class Algorithm
 {
-	AlgorithmType algorithmType;
-	String name;
-	String comment;
-
-	public Algorithm(String name, AlgorithmType algorithmType)
-	{
-		this.name = name;
-		this.algorithmType = algorithmType;
-	}
-
+    private AlgorithmType algorithmType;
+    private String name;
+    private String comment;
+    
+    public abstract void execute(Variables variables);
+    
 }

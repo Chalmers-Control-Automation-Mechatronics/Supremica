@@ -46,13 +46,33 @@
  *
  * Supremica is owned and represented by KA.
  */
-
-package org.supremica.functionblocks.model;
-
 /**
  * @author Cengic
  */
+
+package org.supremica.functionblocks.model;
+
+import java.util.*;
+
 public class Device
 {
+
+    private String name;
+    private Resource managementResource;
+    private List resources = new ArrayList();
+
+    public Device(String name)
+    {
+	//as for now the test application is run in the managementResource
+	managementResource = new Resource("Management");
+    }
+
+    public void run()
+    {
+	while(true)
+	{
+	    
+	}
+    }
 
 }
