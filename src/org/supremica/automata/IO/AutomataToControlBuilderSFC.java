@@ -522,8 +522,7 @@ public class AutomataToControlBuilderSFC
 			 That is, a controllable event should not be generated when an uncontrollable
 			 event in extended conflict has occurred. */
 			String transitionCondition = computeGenerationCondition(theProject, theAlphabet, currEvent);
-
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + transitionCondition + theHelper.getTransitionConditionSuffix());
+			transitionCounter = printEventMonitorTransition(transitionCounter, eventMonitorCounter, transitionCondition, pw);
 
 			// (b) Create step with action e
 			pw.println("SEQSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
@@ -531,17 +530,22 @@ public class AutomataToControlBuilderSFC
 
 			// (c) Create transition t' with t'.C = not preset()
 			transitionCondition = computeCeaseCondition(theProject, currEvent);
-
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + transitionCondition + theHelper.getTransitionConditionSuffix());
+			transitionCounter = printEventMonitorTransition(transitionCounter, eventMonitorCounter, transitionCondition, pw);
 		}
 
-		if (theAlphabet.size() > 1)
+		if (theAlphabet.nbrOfControllableEvents() > 1)
 		{
 			pw.println("ENDALTERNATIVE");
 		}
 
 		pw.println("ENDSEQUENCE\n\n");
 		logger.debug("Printing Event Monitor");
+	}
+
+	protected int printEventMonitorTransition(int transitionCounter, int eventMonitorCounter, String transitionCondition, PrintWriter pw)
+	{
+		pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + transitionCondition + theHelper.getTransitionConditionSuffix());
+		return transitionCounter;
 	}
 
 	protected void printEventMonitorAction(LabeledEvent theEvent, PrintWriter pw)

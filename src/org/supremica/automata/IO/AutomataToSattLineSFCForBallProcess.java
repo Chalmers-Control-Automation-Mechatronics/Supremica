@@ -133,18 +133,137 @@ public class AutomataToSattLineSFCForBallProcess
 		pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel() +  theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
 	}
 
+	protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
+	{
+		StringBuffer theCondition = new StringBuffer();
+		boolean firstAutomaton = true;
+		boolean nextAutomaton = false;
+		int lineLength = 0;
+
+		/* We create the uncontrollable disablement condition first. */
+		if (theExtConfAlphabet.nbrOfUncontrollableEvents() > 0)
+		{
+			String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
+			theCondition.append(theUcCondition);
+		}
+
+		if (theCondition.lastIndexOf("\n") == -1)
+		{
+			lineLength = 31 + theCondition.length();
+		}
+		else
+		{
+			lineLength = theCondition.length() - theCondition.lastIndexOf("\n");
+		}
+
+		/* And then the actual generation condition. */
+		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		{
+			Automaton aut = (Automaton) autIt.next();
+			Alphabet theAlphabet = aut.getAlphabet();
+
+			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			{
+
+				// The event exists in this automaton
+				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName().replace('.', '_'));
+
+				boolean stateFound = false;
+				boolean firstState = true;
+
+				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				{
+					Arc anArc = (Arc) arcIt.next();
+
+					try
+					{
+						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
+
+						if (arcEvent.getLabel().equals(theEvent.getLabel()))
+						{
+
+							// The event labels this arc. Get preset (a singleton!).
+							logger.debug("The event labels arc");
+
+							stateFound = true;
+
+							State sourceState = (State) anArc.getFromState();
+
+							if (firstAutomaton)
+							{
+								firstAutomaton = false;
+							}
+							else if (nextAutomaton)
+							{
+								nextAutomaton = false;
+
+								theCondition.append(" AND ");
+								lineLength = lineLength + 4;
+							}
+
+							if (firstState)
+							{
+								firstState = false;
+
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								lineLength = lineLength + 5 + aut.getName().length() + sourceState.getId().length();
+								logger.debug("Current transition condition: " + theCondition);
+							}
+							else
+							{
+								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								lineLength = lineLength + 8 + aut.getName().length() + sourceState.getId().length();
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+
+						// This should not happen since the event exists in the automaton.
+						logger.error("Failed getting event label. Code generation erroneous. " + ex);
+						logger.debug(ex.getStackTrace());
+						return theCondition.toString();
+					}
+					if (lineLength > 100)
+					{
+						theCondition.append("\n");
+						lineLength = 0;
+					}
+				}
+
+				if (!stateFound)
+				{
+					return "False";
+				}
+				else
+				{
+					theCondition.append(")");
+					lineLength = lineLength + 1;
+				}
+
+				nextAutomaton = true;
+			}
+		}
+
+		return theCondition.toString();
+	}
+
 	protected String ucDisablementCondition(Alphabet theAlphabet)
 	{
-		/* See above, we should not replace '.' with '_'.
+		/* Must fix 140 character line length limit. There are at least 31
+		 characters before the transition condition. There are none after it.
+		 Let's make the transition condition limit 100 characters.
+		 We should furthermore not replace '.' with '_'.
 		 And we should preferably not include the timer event,
 		 but that's a tad bit more difficult since we don't have
 		 its precondition. Even so, it may not be useable since
 		 the step timer variable retains its value until the step
-		 is reactivated. Maye we should just ignore it. */
+		 is reactivated. Maybe we should just ignore it. */
 
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstUcEvent = true;
 		theCondition.append("NOT (");
+		int lineLength = 36; // 31 + 5
 
 		for (Iterator ucEventIt = theAlphabet.uncontrollableEventIterator(); ucEventIt.hasNext(); )
 		{
@@ -156,6 +275,7 @@ public class AutomataToSattLineSFCForBallProcess
 			else
 			{
 				theCondition.append(" OR ");
+				lineLength = lineLength + 4;
 			}
 			if (theUcEvent.getLabel().equalsIgnoreCase("timer"))
 			{
@@ -164,9 +284,118 @@ public class AutomataToSattLineSFCForBallProcess
 			else
 			{
 				theCondition.append(theUcEvent.getLabel());
+				lineLength = lineLength + theUcEvent.getLabel().length();
+			}
+			if (lineLength > 100)
+			{
+				theCondition.append("\n");
+				lineLength = 0;
 			}
 		}
 		theCondition.append(") AND ");
+		return theCondition.toString();
+	}
+
+	protected String computeCeaseCondition(Project theProject, LabeledEvent theEvent)
+	{
+		StringBuffer theCondition = new StringBuffer();
+		boolean firstAutomaton = true;
+		boolean nextAutomaton = false;
+		int lineLength = 31;
+
+		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
+		{
+			Automaton aut = (Automaton) autIt.next();
+			Alphabet theAlphabet = aut.getAlphabet();
+
+			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
+			{
+
+				// The event exists in this automaton
+				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName().replace('.', '_'));
+
+				boolean stateFound = false;
+				boolean firstState = true;
+
+				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				{
+					Arc anArc = (Arc) arcIt.next();
+
+					try
+					{
+						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
+
+						if (arcEvent.getLabel().equals(theEvent.getLabel()))
+						{
+
+							// The event labels this arc. Get preset (a singleton!).
+							logger.debug("The event labels arc");
+
+							stateFound = true;
+
+							State sourceState = (State) anArc.getFromState();
+
+							if (firstAutomaton)
+							{
+								firstAutomaton = false;
+
+								theCondition.append("NOT (");
+								lineLength = lineLength + 5;
+							}
+							else if (nextAutomaton)
+							{
+								nextAutomaton = false;
+
+								theCondition.append(" OR ");
+								lineLength = lineLength + 4;
+							}
+
+							if (firstState)
+							{
+								firstState = false;
+
+								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								lineLength = lineLength + 5 + aut.getName().length() + sourceState.getId().length();
+								logger.debug("Current transition condition: " + theCondition);
+							}
+							else
+							{
+								theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getId() + ".X");
+								lineLength = lineLength + 9 + aut.getName().length() + sourceState.getId().length();
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+
+						// This should not happen since the event exists in the automaton.
+						logger.error("Failed getting event label. Code generation erroneous. " + ex);
+						logger.debug(ex.getStackTrace());
+						return theCondition.toString();
+					}
+					if (lineLength > 100)
+					{
+						theCondition.append("\n");
+						lineLength = 0;
+					}
+				}
+
+				if (!stateFound)
+				{
+					return "False";
+				}
+				else
+				{
+					theCondition.append(")");
+					lineLength = lineLength + 1;
+				}
+
+				nextAutomaton = true;
+			}
+		}
+
+		theCondition.append(")");
+
 		return theCondition.toString();
 	}
 
@@ -181,10 +410,10 @@ public class AutomataToSattLineSFCForBallProcess
 			{
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + theAutomaton.getName().replace('.', '_') + "__" + theArc.getFromState().getId() + ".T > 1000" + theHelper.getTransitionConditionSuffix());
 			}
-			else if (event.getLabel().equalsIgnoreCase("IP.ManuellStart") || event.getLabel().equalsIgnoreCase("IP.AutoStart"))
+			/*else if (event.getLabel().equalsIgnoreCase("IP.ManuellStart") || event.getLabel().equalsIgnoreCase("IP.AutoStart"))
 			{
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + "NOT " + event.getLabel() + theHelper.getTransitionConditionSuffix());
-			}
+			}*/
 			else
 			{
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel() + theHelper.getTransitionConditionSuffix());
