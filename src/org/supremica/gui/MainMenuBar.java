@@ -1082,6 +1082,7 @@ public class MainMenuBar
 					public void actionPerformed(ActionEvent e)
 					{
 						ActionMan.robotStudioOpenStation(ActionMan.getGui());
+						RobotStudioLink.configureCreateXml();
 					}
 				});
 
@@ -1140,6 +1141,29 @@ public class MainMenuBar
 					ActionMan.buildXmlFile(ActionMan.getGui());
 				}
 			});
+			// ExecuteScheduledAutomaton
+			JMenuItem scheduledExecute = new JMenuItem();
+			scheduledExecute.setText("Execute Optimal Coordination");
+			menuCoordinationABB.add(scheduledExecute);
+			scheduledExecute.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.executeScheduledAutomaton(ActionMan.getGui());
+					}
+				});
+
+			JMenuItem demo = new JMenuItem();
+			demo.setText("Optimal coordination DEMO");
+			menuCoordinationABB.add(demo);
+			demo.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.demonstrate(ActionMan.getGui());
+					}
+				});
+
 		}
 
 

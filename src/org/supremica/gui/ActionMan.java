@@ -2658,14 +2658,13 @@ public class ActionMan
 		RobotStudioLink.test(gui);
 	}
 
-	// Coordination of robots in Robot Studio
+	// CoordinationABB of robots in Robot Studio
 	public static void createPathsInRS(Gui gui)
 	{
 		Thread thread = new Thread(new Runnable()
 		{
 			public void run()
 			{
-				RobotStudioLink.configureCreateXml();
 				CreateXml.createPathsInRS();
 			}
 		});
@@ -2678,7 +2677,6 @@ public class ActionMan
 		{
 			public void run()
 			{
-				RobotStudioLink.configureCreateXml();
 				CreateXml.createSpansInRS();
 			}
 		});
@@ -2691,7 +2689,6 @@ public class ActionMan
 		{
 			public void run()
 			{
-				RobotStudioLink.configureCreateXml();
 				CreateXml.createMutexZonesInRS();
 			}
 		});
@@ -2704,7 +2701,6 @@ public class ActionMan
 		{
 			public void run()
 			{
-				RobotStudioLink.configureCreateXml();
 				CreateXml.addViaPointsInRS();
 			}
 		});
@@ -2715,6 +2711,31 @@ public class ActionMan
 	{
 		CreateXml.buildXmlFile();
 	}
+
+	public static void executeScheduledAutomaton(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (selectedAutomata.size() != 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+		CreateXml.executeScheduledAutomaton(selectedAutomata.getAutomatonAt(0));
+	}
+
+	public static void demonstrate(Gui gui)
+	{
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				CreateXml.demoCoordination();
+			}
+		});
+		thread.start();
+	}
+
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata	public static void testCases(Gui gui)
 	public static void testCases(Gui gui)

@@ -496,10 +496,12 @@ public class CreateXml
 			IABBS4Module noModule = createIfNotExists(modules,"Program"); //BUG? why does not it work if Program is already present? delete it and then create again
 			noModule.delete();
 			IABBS4Module mainModule = modules.add(var("Program"),1);
+			Thread.sleep(1000);
 
 			Variant mainName = var("main");
 			//mainProcedure = module.getProcedures().add(mainName,true); // this way does not work!!!!
 			mainProcedure = mainModule.getProcedures().add(mainName);
+			Thread.sleep(2000);
 			logger.info("Main procedure added");
 		}
 
@@ -587,20 +589,11 @@ public class CreateXml
 		{
 			for(int i=1; i<=station.getMechanisms().getCount(); i++)
 			{
+				LinkedList spansCreated = new LinkedList();
 				IMechanism2 robot = station.getMechanisms().item(var(i));
 				station.setActiveMechanism(robot);
 
 				syncModulesAndPaths(robot);  // if we start when the zones are already created
-				// Trying to make faster simulations: it does not work properly
-				/*
-				IABBS4Controller controller = org.supremica.automata.algorithms.RobotStudioLink.startController(robot);
-				// in startController we sleep
-				logger.info("Controller for " + robot.getName() + " started");
-				// at this point pathsModule should be always present
-				IABBS4Modules modules = controller.getModules();
-				IABBS4Module module = createIfNotExists(modules, "pathsModule");
-				IABBS4Procedure mainProcedure = getMainProcedure(robot);
-				*/
 
 				IPart spansPart = station.getParts().add();
 				spansPart.setName(robot.getName() + "_Spans");
@@ -612,23 +605,13 @@ public class CreateXml
 				spansPart.getTransform().setRz(0);
 
 				int nbrOfPaths = robot.getPaths().getCount();
-				/*
-				for(int j=1; j<=nbrOfPaths; j++)
-				{
-					logger.info(module.getProcedures().item(var(j)).getName());
-					logger.info(robot.getPaths().item(var(j)).getName());
-					logger.info(" ");
-				}
-				*/
+
 				boolean goHome = false;
 				for(int j=1; j<=nbrOfPaths; j++)
 				{
-
 					IABBS4Controller controller = org.supremica.automata.algorithms.RobotStudioLink.startController(robot);
-					// in startController we sleep
 					logger.info("Controller for " + robot.getName() + " started");
-					// at this point pathsModule should be always present
-					//Thread.sleep(1500);  7 6
+					Thread.sleep(2500);  //june
 					IABBS4Modules modules = controller.getModules();
 					IABBS4Module module = createIfNotExists(modules,"Paths");
 					IABBS4Procedure mainProcedure = getMainProcedure(robot);
@@ -637,36 +620,43 @@ public class CreateXml
 					//IPath associatedPath = pathProcedure.getPath();
 					IPath associatedPath = robot.getPaths().item(var(pathProcedure.getName()));
 					ITarget startPoint = associatedPath.getTargetRefs().item(var(1)).getTarget();
-					//Thread.sleep(1000);
-					//logger.info(associatedPath.getName() + " and " + pathProcedure.getName());
-					logger.info("From " + startPoint.getName().substring(0,startPoint.getName().length()-2) + " to " + associatedPath.getTargetRefs().item(var(2)).getTarget().getName());
+					String startPointName = startPoint.getName();
+					String endPointName = associatedPath.getTargetRefs().item(var(2)).getTarget().getName();
 
-					// go to the start point for path j otherwise the simulation listens what should not listen
-					robot.jumpToTarget(startPoint);
-					//Thread.sleep(1000);   7 6
-					//robot.moveToTargetRef(associatedPath.getTargetRefs().item(var(1)));   // stuck!!!!!
+					// in this version assume the spans of two symmetric paths equal
+					if (alreadySwept(spansCreated,startPointName,endPointName))
+					{
+						controller.shutDown();
+						Thread.sleep(2500);
+						logger.info("Controller shut down");
+					}
+					else
+					{
+						spansCreated.add(associatedPath);
 
-					// see if the robot really reached the target!!!!!!!!!!!!!!!!!!!!!!!
+						//Thread.sleep(1000);
+						//logger.info(associatedPath.getName() + " and " + pathProcedure.getName());
+						logger.info("From " + startPointName.substring(0,startPointName.length()-2) + " to " + endPointName.substring(0,endPointName.length()-2));
 
-					// deleting all procedures in the main
-					for (int k=1; k<=mainProcedure.getProcedureCalls().getCount(); k++)
-						mainProcedure.getProcedureCalls().item(var(k)).delete();
+						// go to the start point for path j otherwise the simulation listens what should not listen
+						robot.jumpToTarget(startPoint);
+						// see if the robot really reached the target!!!!!!!!!!!!!!!!!!!!!!!
 
-					// add path procedure to the main
-					mainProcedure.getProcedureCalls().add(pathProcedure);
-					//Thread.sleep(2500);
-					if (j==nbrOfPaths)
-						goHome = true;
-					generateSpanD(controller,pathProcedure.getName(),spansPart,goHome);
+						//Thread.sleep(1000);   //june
+						//robot.moveToTargetRef(associatedPath.getTargetRefs().item(var(1)));   // stuck!!!!!
+
+						// deleting all procedures in the main
+						for (int k=1; k<=mainProcedure.getProcedureCalls().getCount(); k++)
+							mainProcedure.getProcedureCalls().item(var(k)).delete();
+
+						// add path procedure to the main
+						mainProcedure.getProcedureCalls().add(pathProcedure);
+						//Thread.sleep(2500);
+						if (j==nbrOfPaths)
+							goHome = true;
+						generateSpanD(controller,pathProcedure.getName(),spansPart,goHome);
+					}
 				}
-
-				// to be commented if we stop for each path's simulation
-				/*
-				robot.jumpToTarget(getHomePoint(robot));
-				controller.shutDown();
-				Thread.sleep(2500);
-				logger.info("Controller for " + robot.getName() + " shut down");
-				*/
 			}
 		}
 		catch (Exception e)
@@ -676,6 +666,20 @@ public class CreateXml
 		}
 
 		logger.info("Spans created successfully");
+	}
+
+	private static boolean alreadySwept(LinkedList spans, String a, String b)
+		throws Exception
+	{
+		for (ListIterator it = spans.listIterator(); it.hasNext();)
+		{
+			IPath p = (IPath) it.next();
+			String firstPoint =  p.getTargetRefs().item(var(1)).getTarget().getName();
+			String lastPoint = p.getTargetRefs().item(var(2)).getTarget().getName();
+			if(firstPoint.equals(b) && lastPoint.equals(a))
+				return true;
+		}
+		return false;
 	}
 
 	public static void createMutexZonesInRS()
@@ -691,21 +695,6 @@ public class CreateXml
 			return;
 		}
 
-
-			/*
-			IPart mutex = null;
-			for(int i=1; i<=station.getParts().getCount(); i++)
-				if(station.getParts().item(var(i)).getName().equals("MutexZones"))
-				{
-					mutex = station.getParts().item(var(i));
-					break;
-				}
-			if (mutex==null)
-			{
-				logger.error("MutexZones not found");
-				return;
-			}
-			*/
 		try
 		{
 			mutexZonesFromSpans(mutex);
@@ -738,9 +727,7 @@ public class CreateXml
 							for(int l=1; l<=toBeIntersected.getEntities().getCount(); l++)
 							{
 								IEntity temp1 = thisPart.getEntities().item(var(k));
-								//logger.info(temporary.getName());
 								IEntity temp2 = toBeIntersected.getEntities().item(var(l));
-								//logger.info(temp.getName());
 								boolean disjoint = false;
 								try
 								{
@@ -752,6 +739,7 @@ public class CreateXml
 								{
 									logger.info(temp1.getName() + " and " + temp2.getName() + " disjoint");
 									disjoint = true;
+									//break;   // 12 june
 								}
 								if (!disjoint)
 								{
@@ -761,10 +749,6 @@ public class CreateXml
 									for(int m=1; m<=intersections.getCount(); m++)
 									{
 										intersections.item(var(m)).setName(temp1.getName() + temp2.getName() + "_" + m);
-										//RsUnitsUtility rUU = new RsUnitsUtility();
-										//rUU.uCSToWCS(oldIntersectionPart.getTransform());
-										//rUU.uCSToWCS(intersections.item(var(m)).getTransform());
-										//rUU.uCSToWCS(intersections.item(var(m)).getTransform());
 										mutex.setTransform(oldIntersectionPart.getTransform());
 										mutex.addEntity(intersections.item(var(m)));
 									}
@@ -825,7 +809,7 @@ public class CreateXml
 				IMechanism robot = station.getMechanisms().item(var(i));
 				station.setActiveMechanism((IMechanism2) robot);
 				syncModulesAndPaths(robot);
-				// nbr of paths = nbr of procedures in "Paths"
+				// Nbr of paths = nbr of procedures in "Paths"
 				for (int j=1; j<=robot.getPaths().getCount(); j++)
 				{
 					logger.info("Starting the Virtual Controller...");
@@ -835,9 +819,7 @@ public class CreateXml
 
 					//IABBS4Module module = controller.getModules().item(var("Paths"));   // pathsModule is not allowed as a name
 					IABBS4Module module = controller.getModules().item(var("Paths"));
-					//logger.info(module.getName());
 					IABBS4Procedure mainProcedure = getMainProcedure(robot);
-					//logger.info(mainProcedure.getName());
 
 					// Delete everything in the main
 					for (int k=1; k<=mainProcedure.getProcedureCalls().getCount(); k++)
@@ -846,15 +828,14 @@ public class CreateXml
 					// Add path procedure to the main
 					IABBS4Procedure pathProcedure = module.getProcedures().item(var(j));
 					mainProcedure.getProcedureCalls().add(pathProcedure);
+					Thread.sleep(1000);
 
 					// Take the arrival point
 					//IPath path = pathProcedure.getPath();  problems!!!!
 					IPath path = robot.getPaths().item(var(pathProcedure.getName()));
-					ITargetRefs arrivalTargets = path.getTargetRefs();
-					ITargetRef arrivalTargetRef = arrivalTargets.item(var(2));
-					ITarget arrivalTarget = arrivalTargetRef.getTarget();
-					String arrivalTargetName = arrivalTarget.getName();
-					// delete it
+					ITarget arrivalTarget = path.getTargetRefs().item(var(2)).getTarget();
+
+					// Delete it
 					path.getTargetRefs().item(var(2)).delete();
 
 					// Take the starting point
@@ -1073,7 +1054,7 @@ public class CreateXml
 		return 0;
 	}
 
-//-------------- from robot studio link---------------------------------------------
+//-------------- from robotStudioLink with modification---------------------------------------------
 
 
 	private static class MechanismListener extends _MechanismEventsAdapter
@@ -1090,8 +1071,8 @@ public class CreateXml
 			private int pathIndex = 0;
 			private int robotIndex = 0;
 
-
 			private PathWithCosts pathcosts;
+			private LinkedList objectsCollidingAtStart = new LinkedList();
 
 			private double previousTime = 0;
 			private Double realCost;
@@ -1110,7 +1091,43 @@ public class CreateXml
 					logger.error("Error");
 					return;
 				}
+
 				pathcosts.insertCost(new Integer(0));
+
+				try
+				{
+					IPart mutex = station.getParts().item(var(mutexZonesName));
+					for (int j=1; j<=mutex.getEntities().getCount(); j++)
+					{
+						IEntity entity = mutex.getEntities().item(var(j));
+						if (entityCollidesWith(station.getMechanisms().item(var(i)), entity))
+							objectsCollidingAtStart.add(entity.getName());
+					}
+
+					/* Print the objects already colliding
+					for (ListIterator it = objectsCollidingAtStart.listIterator(); it.hasNext();)
+						logger.info((String) it.next());
+					*/
+
+					/*
+					// Try to get the event collisionStart once for the whole robot
+					ICollisionSets sets = station.getCollisionSets();
+					sets.setMode(1);
+
+					set = sets.add();
+					set.setName("CollisionsBeforeTheStart");
+					set.setActive(true);
+
+					ICollisionObjects rob = set.getObjectsA();
+					RsObject robObject = RsObject.getRsObjectFromUnknown(station.getMechanisms().item(var(i)));
+					rob.add(robObject);
+					*/
+				}
+				catch (Exception e)
+				{
+					logger.error("Error in finding the objects already colliding");
+					return;
+				}
 			}
 			// Events generated by RobotStudio.Mechanism
 			public int targetReached()
@@ -1123,12 +1140,13 @@ public class CreateXml
 					{
 						logger.info("Target reached at time " + (float) motionTime);
 
-						// set the cost
+						// Set the cost
 						Double realCost = new Double((motionTime - previousTime)*1000);   // [ms]
 
-						// a target is the end of a path (in this version of the code)
+						// A target is the end of a path (in this version of the code)
 						pathcosts.insertCost(new Integer(realCost.intValue()));
 						robotCosts[robotIndex].add(pathcosts);
+						//set.delete();
 					}
 					leavingTarget = !leavingTarget;
 				}
@@ -1137,28 +1155,16 @@ public class CreateXml
 				}
 				return 0;
 			}
-			public int selected()
-			{
-				logger.fatal("Selected");
-				return 0;
-			}
-			public int unSelected()
-			{
-				logger.fatal("Unselected");
-				return 0;
-			}
-			public int tick(float systemTime)
-			{
-				// This is fatal, cause this has never ever happened
-				// and I'd like to know if it ever does!
-				logger.fatal("Mechtick: " + systemTime + ", please tell Hugo if you get this message.");
-				return 0;
-			}
+
 			public synchronized int collisionStart(RsObject collidingObject)
 			{
+
 				try
 				{
+					if (controller.getMotionTime()>=0)
+					{
 					String objectName = collidingObject.getName();
+					logger.info("Collision with " + objectName + "   " + controller.getMotionTime());
 
 					CollisionData data;
 					if (!collisions.contains(new CollisionData(objectName)))
@@ -1174,50 +1180,57 @@ public class CreateXml
 					}
 
 					// Is this the start?
-					if (data.getCount() == 0)
+					if (data.getCount() == 0 && !objectsCollidingAtStart.contains(new String(objectName)))
 					{
-						if (controller.getMotionTime()>0)
-						{
-							data.setStartTime(controller.getMotionTime());
-							logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
+						data.setStartTime(controller.getMotionTime());
+						logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
 
-							// set the cost for the automata
-							realCost = new Double((data.startTime - previousTime)*1000);
-							pathcosts.insertCost(new Integer(realCost.intValue()));
-							previousTime = data.startTime;
+						// set the cost for the automata
+						realCost = new Double((data.startTime - previousTime)*1000);
+						pathcosts.insertCost(new Integer(realCost.intValue()));
+						previousTime = data.startTime;
 
-							// create a target with its own name (can be equal to a target's name for another robot)
-							int indexZone = takeIndexZone(objectName);
-							String stringName = "In_" + indexZone + "_";
-							stringName = stringName + pathIndex + nbrOfTimesCollision;
-							ITarget viaTarget = createTargetAtTCP(stringName);
+						// create a target with its own name (can be equal to a target's name for another robot)
+						int indexZone = takeIndexZone(objectName);
+						if (indexZone<=0)
+							throw new Exception();
+						String stringName = "In_" + indexZone + "_";
+						stringName = stringName + pathIndex + nbrOfTimesCollision;
+						ITarget viaTarget = createTargetAtTCP(stringName);
 
-							// insert the new target in the right position in the path
-							ITargetRef viaTargetRef = path.insert(viaTarget);
-							viaTargetRef.setMotionType(1);
-							nbrOfTimesCollision++;
-						}
-						else
-							data.setStartTime(0);
+						// insert the new target in the right position in the path
+						ITargetRef viaTargetRef = path.insert(viaTarget);
+						viaTargetRef.setMotionType(1);
+						nbrOfTimesCollision++;
 					}
-					data.setCount(data.getCount()+1);
+					//if (controller.getMotionTime()>0) // sometimes yes sometimes not
+						data.setCount(data.getCount()+1);
+					}
 				}
 				catch (Exception whatever)
 				{
+					logger.error("Error with event 'collisionStart'.");
 				}
 				return 0;
 			}
+
 			public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject collidingObject)
 			{
 				try
 				{
+					if (controller.getMotionTime()>=0)
+					{
 					String objectName = collidingObject.getName();
+					logger.info("Exiting from " + objectName + "   " + controller.getMotionTime());
+
 					CollisionData data;
+
 					if (!collisions.contains(new CollisionData(objectName)))
 					{
 						logger.error("Collision ended mysteriously.");
 						return 1;
 					}
+
 					else
 					{
 						data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
@@ -1245,22 +1258,25 @@ public class CreateXml
 						ITargetRef viaTargetRef = path.insert(viaTarget);
 						viaTargetRef.setMotionType(1);
 						nbrOfTimesCollision++;
+
+						// remove from the objects
+						if(objectsCollidingAtStart.contains(new String(objectName)))
+							objectsCollidingAtStart.remove(new String(objectName));
 					}
+				}
 				}
 				catch (Exception whatever)
 				{
+					logger.error("Error with the event collisionEnd" + whatever);
 				}
 				return 0;
 			}
-			/*public int beforeControllerStarted()
-			{
-				logger.info("BeforeControllerStarted.");
-				return 0;
-			}*/
+
 			public int afterControllerStarted()
 			{
 				controllerStarted = true;
 				logger.info("Virtual Controller started.");
+				logger.info("Hello");
 				notify();
 				return 0;
 			}
@@ -1297,24 +1313,6 @@ public class CreateXml
 					return null;
 				}
 			}
-			public synchronized void waitForControllerStart()
-			{
-				try
-				{
-					while (!controllerStarted)
-					{
-						wait();
-					}
-					// Make sure the controller is really started before we return
-					Thread.sleep(3000);
-				}
-				catch (Exception ex)
-				{
-					//System.out.println("Interrupted! " + ex);
-					logger.error("Interrupted! " + ex);
-				}
-				return;
-			}
 			public synchronized void waitForControllerShutDown()
 			{
 				try
@@ -1325,7 +1323,7 @@ public class CreateXml
 					}
 
 					// Make sure the controller is really shut down before we return
-					Thread.sleep(2500);
+					Thread.sleep(2000);
 				}
 				catch (Exception ex)
 				{
@@ -1433,7 +1431,376 @@ public class CreateXml
 					return times;
 				}
 			}
+
+			/**
+			 * Function used to check if the robot collides with some object before the simulation starts.
+			 */
+			private boolean entityCollidesWith(IMechanism robot, IEntity object)
+				throws Exception
+			{
+				ICollisionSets sets = station.getCollisionSets();
+				sets.setMode(1);
+
+				ICollisionSet set = sets.add();
+				set.setName("CollisionsBeforeTheStart");
+				set.setActive(true);
+
+				ICollisionObjects rob = set.getObjectsA();
+				RsObject robObject = RsObject.getRsObjectFromUnknown(robot);
+				rob.add(robObject);
+
+				ICollisionObjects objects = set.getObjectsB();
+				RsObject entObject = RsObject.getRsObjectFromUnknown(object);
+				objects.add(entObject);
+
+				sets.setHighlightCollisions(true);  // only to see what happens
+				boolean collide = sets.checkCollisions();
+				sets.setHighlightCollisions(false);
+
+				set.delete();
+
+				// the following statement allows the event collisionStart to happen for all the entities of the robot
+				sets.setMode(2);
+
+				//logger.info(robot.getName() + " " + object.getName() + " " + collide);
+				return collide;
+			}
+
+
+			/*  The intersection with an entity of the robot does not seem working. Is that a special Entity?!?
+
+				private boolean entityCollidesWith(IMechanism robot, IEntity object)
+				throws Exception
+				{
+					// Physical parts of the robot: links
+					ILinks links = robot.getLinks();
+
+					for (int i=1; i<=links.getCount(); i++)
+					{
+						ILink link = links.item(var(i));
+						IParts parts = link.getParts();
+						for (int j=1; j<=parts.getCount(); j++)
+						{
+							IPart part = parts.item(var(j));
+							IEntities entities = part.getEntities();
+							for (int k=1; k<=entities.getCount(); k++)
+							{
+								IEntity entity = entities.item(var(k));
+								boolean disjoint = false;
+								try
+								{
+									IEntities intersections = entity.intersect(object,true);
+									//intersections.getParent().delete();
+								}
+								catch (Exception e)
+								{
+									logger.info(part.getName() + " out of robot");
+									// entity and object are disjoint
+									disjoint = true;
+								}
+								if (!disjoint)
+								{
+									logger.info(object.getName() + " collides with " + entity.getName());
+									return true;
+								}
+							}
+						}
+					}
+					return false;
+				}
+			*/
 	}
+
+//--------------------------------------------------------------------------------------------------------
+	/*// june
+	private static class MechanismListener extends _MechanismEventsAdapter
+		{
+			private static Logger logger = LoggerFactory.createLogger(MechanismListener.class);
+
+			private IABBS4Controller controller = null;
+			private boolean leavingTarget = true;       // targetReached is invoked twice for every Target!
+			private boolean controllerStarted = false;  // Used in the wait-methods
+
+			private IPath path = null;
+			private int pathIndex = 0;
+			private int robotIndex = 0;
+
+			private PathWithCosts pathcosts;
+
+			private double previousTime = 0;
+			private Double realCost;
+			// set to detect collisions
+			private ICollisionSet set;
+			// objects that collide with the robot
+			private LinkedList objectsCollidingAtStart = new LinkedList();
+
+			public MechanismListener(IPath path, int pathIndex, int i)
+			{
+				this.path = path;
+				this.pathIndex = pathIndex;
+				robotIndex = i-1;
+				try
+				{
+					pathcosts = new PathWithCosts(path.getName());
+				}
+				catch (Exception e)
+				{
+					logger.error("Error");
+					return;
+				}
+				try
+				{
+					IPart mutex = station.getParts().item(var(mutexZonesName));
+					for (int j=1; j<=mutex.getEntities().getCount(); j++)
+					{
+						IEntity entity = mutex.getEntities().item(var(j));
+						if (entityCollidesWith(station.getMechanisms().item(var(i)), entity))
+							objectsCollidingAtStart.add(entity.getName());
+					}
+
+				}
+				catch (Exception e)
+				{
+					logger.error("Error in finding the objects already colliding" + e);
+					return;
+				}
+				try
+				{
+					// standard way to detect collisions during the simulation
+					ICollisionSets sets = station.getCollisionSets();
+					set = sets.add();
+					set.setActive(true);
+
+					ICollisionObjects rob = set.getObjectsA();
+					RsObject robObject = RsObject.getRsObjectFromUnknown(station.getMechanisms().item(var(i)));
+					rob.add(robObject);
+					sets.setHighlightCollisions(true);
+				}
+				catch (Exception e)
+				{
+					logger.error("Error" + e);
+					return;
+				}
+				pathcosts.insertCost(new Integer(0));
+			}
+			// Events generated by RobotStudio.Mechanism
+			public int targetReached()
+			{
+				try
+				{
+					if (!leavingTarget)
+					{
+						logger.info("Target reached at time " + (float) controller.getMotionTime());
+
+						// Set the cost
+						Double realCost = new Double((controller.getMotionTime() - previousTime)*1000);   // [ms]
+
+						// A target is the end of a path (in this version of the code)
+						pathcosts.insertCost(new Integer(realCost.intValue()));
+						robotCosts[robotIndex].add(pathcosts);
+						set.delete();
+					}
+					leavingTarget = !leavingTarget;
+				}
+				catch(Exception seeIfICare)
+				{
+				}
+				return 0;
+			}
+
+			public synchronized int collisionStart(RsObject collidingObject)
+			{
+				try
+				{
+					logger.info("collisionstart");
+					String objectName = collidingObject.getName();
+					double time = controller.getMotionTime();
+					//if(controllerStarted)
+					if(!objectsCollidingAtStart.contains(new String(objectName)))
+					{
+						logger.info("Start of collision with " + objectName + " at time " + (float) time);
+						objectsCollidingAtStart.add(new String(objectName));
+
+						// set the cost for the automata
+						realCost = new Double((time - previousTime)*1000);
+						pathcosts.insertCost(new Integer(realCost.intValue()));
+						previousTime = time;
+
+						// create a target with its own name (can be equal to a target's name for another robot)
+						int indexZone = takeIndexZone(objectName);
+						if (indexZone<=0)
+							throw new Exception();
+						String stringName = "In_" + indexZone + "_";
+						stringName = stringName + pathIndex + nbrOfTimesCollision;
+						ITarget viaTarget = createTargetAtTCP(stringName);
+
+						// insert the new target in the right position in the path
+						ITargetRef viaTargetRef = path.insert(viaTarget);
+						viaTargetRef.setMotionType(1);
+						nbrOfTimesCollision++;
+					}
+				}
+				catch (Exception whatever)
+				{
+					logger.error("Error with event 'collisionStart'" + whatever);
+				}
+				return 0;
+			}
+
+			public synchronized int collisionEnd(RsObject collidingObject)
+			{
+				try
+				{
+					logger.info("collisionend");
+					String objectName = collidingObject.getName();
+					double time = controller.getMotionTime();
+
+					IPart mutex = station.getParts().item(var(mutexZonesName));
+					IEntity entity = mutex.getEntities().item(var(objectName));
+					set.setActive(false);
+					if (!entityCollidesWith(station.getMechanisms().item(var(robotIndex+1)), entity))
+					{
+						logger.info("End of collision with " + objectName + " at time " + (float) controller.getMotionTime());
+
+						// set the cost
+						realCost = new Double((time - previousTime)*1000);
+						pathcosts.insertCost(new Integer(realCost.intValue()));
+						previousTime = time;
+
+						// create a target with its own name (can be equal to a target's name for another robot)
+						int indexZone = takeIndexZone(objectName);
+						String stringName = "Out_" + indexZone + "_";
+						stringName = stringName + pathIndex + nbrOfTimesCollision;
+						ITarget viaTarget = createTargetAtTCP(stringName);
+
+						// insert the new target in the right position in the path
+						ITargetRef viaTargetRef = path.insert(viaTarget);
+						viaTargetRef.setMotionType(1);
+						nbrOfTimesCollision++;
+
+						if(objectsCollidingAtStart.contains(new String(objectName)))
+							objectsCollidingAtStart.remove(new String(objectName));
+					}
+					set.setActive(true);
+				}
+				catch (Exception whatever)
+				{
+					logger.error("Error with the event 'collisionEnd'" + whatever);
+				}
+				return 0;
+			}
+
+			public int afterControllerStarted()
+			{
+				controllerStarted = true;
+				logger.info("Virtual Controller started.");
+				notify();
+				return 0;
+			}
+			public int afterControllerShutdown()
+			{
+				controllerStarted = false;
+				logger.info("Virtual Controller shut down.");
+				notify();
+				return 0;
+			}
+			public void setController(IABBS4Controller controller)
+			{
+				this.controller = controller;
+			}
+			public synchronized void waitForControllerShutDown()
+			{
+				try
+				{
+					while (controllerStarted)
+					{
+						wait();
+					}
+
+					// Make sure the controller is really shut down before we return
+					//Thread.sleep(3000);  // june
+				}
+				catch (Exception ex)
+				{
+					//System.out.println("Interrupted! " + ex);
+					logger.error("Interrupted! " + ex);
+					return;
+				}
+			}
+
+			private ITarget createTargetAtTCP(String targetName)
+				throws Exception
+			{
+				// Create a new target
+				IMechanism mechanism = controller.getMechanism();
+				ITarget newTarget = mechanism.getWorkObjects().item(var(1)).getTargets().add();
+				IToolFrame toolFrame = mechanism.getActiveToolFrame();
+				newTarget.setTransform(toolFrame.getTransform());
+				//newTarget.setName(targetName);
+
+				// Set a catchy name
+				boolean ok = false;
+				String suffix = ":1";
+				int nbr = 1;
+				while (!ok)
+				{
+					try
+					{
+						newTarget.setName(targetName + suffix);
+						ok = true;
+					}
+					catch (Exception e)
+					{
+						suffix = ":" + ++nbr;
+						if (nbr>=10)
+							ok = true;
+					}
+				}
+				return newTarget;
+			}
+
+			private boolean entityCollidesWith(IMechanism robot, IEntity object)
+				throws Exception
+			{
+				ICollisionSets sets = station.getCollisionSets();
+				sets.setMode(1);
+				logger.info("hello");
+
+				ICollisionSet set1 = sets.add();
+				logger.info("hello1");
+				set1.setActive(true);
+				logger.info("hello2");
+
+				ICollisionObjects rob = set1.getObjectsA();
+				logger.info("hello3");
+				RsObject robObject = RsObject.getRsObjectFromUnknown(robot);
+				logger.info("hello4");
+				rob.add(robObject);
+				logger.info("hello5");
+
+				ICollisionObjects objects = set1.getObjectsB();
+				logger.info("hello6");
+				RsObject entObject = RsObject.getRsObjectFromUnknown(object);
+				logger.info("hello7");
+				objects.add(entObject);
+				logger.info("hello8");
+
+				sets.setHighlightCollisions(true);  // only to see what happens
+				logger.info("hello9");
+				boolean collide = sets.checkCollisions();
+				logger.info("hello10");
+				sets.setHighlightCollisions(false);
+				logger.info("hello11");
+
+				set1.delete();
+				logger.info("hello12");
+
+				//logger.info(robot.getName() + " " + object.getName() + " " + collide);
+				return collide;
+			}
+	}
+*/
+//-------------------------------------------------------------------------------------------------
 
 	private static class SimulationListener extends DSimulationEventsAdapter
 	{
@@ -1464,7 +1831,7 @@ public class CreateXml
 					wait();
 				}
 				// Make sure the simulation is really over before we return
-				Thread.sleep(1500);
+				//Thread.sleep(2500); june
 			}
 			catch (Exception ex)
 			{
@@ -1495,9 +1862,8 @@ public class CreateXml
 
 			if (goHome)
 				robot.jumpToTarget(getHomePoint(robot));
-			// cut off to have faster simulations
 			controller.shutDown();
-			Thread.sleep(2500);
+			Thread.sleep(1500);
 			logger.info("Controller shut down");
 
 	}
@@ -1535,14 +1901,15 @@ public class CreateXml
 				if (ruu == null)
 					ruu = new RsUnitsUtility();
 				spanPart = station.getParts().add();
+				/*
 				spanPart.setVisible(true);
 				spanPart.setName(robot.getName() + "_Span");
+				*/
 				tool0 = robot.getToolFrames().item(var("tool0"));
 				//robot.setActiveToolFrame(tool0);
 				oldTransform = transformCopy(tool0.getTransform());
 				logger.info("Simulation for path " + procName + " started");
-				// sometimes it keeps the past span so I skip the first entity created. Ok also this does not work!!!
-				createSpanEntity(oldTransform);    //to be fixed when the controller is always on during simulations
+				createSpanEntity(oldTransform);
 			}
 
 			// Events generated by RobotStudio.ISimulation
@@ -1566,6 +1933,7 @@ public class CreateXml
 					logger.error("Error in RobotStudioLink.SpanGenerator.tick " + ex);
 				}
 			}
+			/* old version
 			public void stop()
 			{
 				// Generate the union of the spanEntities
@@ -1579,11 +1947,9 @@ public class CreateXml
 						IPart oldPart = null;
 						for (int i=spanEntities.getCount(); i>1; i--)
 						{
-
 							boolean disjoint = false;
 							try
 							{
-								//Thread.sleep(2000);
 								IEntity temp = unionEntity.join(spanEntities.item(var(1)), true);
 								temp.getParent().delete();
 							}
@@ -1617,7 +1983,7 @@ public class CreateXml
 					station.getSelections().removeAll();
 					IPart toBeDeleted = unionEntity.getParent();
 
-					//toBeDeleted.setTransform(ruu.uCSToWCS(toBeDeleted.getTransform()));
+				    //toBeDeleted.setTransform(ruu.uCSToWCS(toBeDeleted.getTransform()));
 					//ruu.uCSToWCS(unionEntity.getTransform());
 					//spansPart.setTransform(unionEntity.getParent().getTransform());
 					//spansPart.setTransform(toBeDeleted.getTransform());
@@ -1631,6 +1997,25 @@ public class CreateXml
 					return;
 				}
 
+				super.stop();
+			}
+			*/
+
+			public void stop()
+			{
+				try
+				{
+					IEntity unionEntity = spanPart.getEntities().item(var(1));
+					unionEntity.setName(robot.getName() + procName);
+					unionEntity.setRelativeTransparency((float) 0.7);
+					unionEntity.setTransform(ruu.uCSToWCS(unionEntity.getTransform()));
+					spansPart.addEntity(unionEntity);
+					spanPart.delete();
+				}
+				catch (Exception e)
+				{
+					logger.error("Error adding the span");
+				}
 				super.stop();
 			}
 
@@ -1666,11 +2051,52 @@ public class CreateXml
 				cylinderTransform.setRy(cylinderTransform.getRy()+Math.PI/2);
 				cylinderTransform = ruu.uCSToWCS(cylinderTransform);
 
+				/* Old version
 				// Create cylinder around the arm
 				spanPart.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+2*margin);
 
 				// Create box around the tooltip
 				spanPart.createSolidBox(boxTransform,boxSize+2*margin,boxSize+2*margin,boxSize+2*margin);
+				*/
+
+				IPart part = station.getParts().add();
+
+				// Create cylinder around the arm
+				IEntity cyl = part.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+2*margin);
+
+				// Create box around the tooltip
+				IEntity box = part.createSolidBox(boxTransform,boxSize+2*margin,boxSize+2*margin,boxSize+2*margin);
+
+				IEntity boxCyl = box.join(cyl,false);
+				IPart dd = boxCyl.getParent();
+
+				if (spanPart.getEntities().getCount()>0)
+				{
+
+					IEntity union = null;
+					try
+					{
+						union = spanPart.getEntities().item(var(1)).join(boxCyl,false);
+					}
+					catch (Exception e)
+					{
+						//logger.error("Error joining"); I do NOT KNOW WHY ?!?!
+						part.delete();
+						dd.delete();
+						return;
+					}
+					dd.delete();
+					IPart pp = union.getParent();
+					spanPart.delete();
+					spanPart = pp;
+				}
+				else
+				{
+					IPart pp = spanPart;
+					spanPart = boxCyl.getParent();
+					pp.delete();
+				}
+				part.delete();
 			}
 	}
 
@@ -1827,14 +2253,13 @@ public class CreateXml
 		for (int i=1;i<=modules.getCount();i++)
 		{
 			IABBS4Procedures procedures = modules.item(var(i)).getProcedures();
-			for (int j=1;j<=procedures.getCount();j++)
+			for (int j=1; j<=procedures.getCount(); j++)
 			{
 				IABBS4Procedure procedure = procedures.item(var(j));
 				if (procedure.getName().equals("main"))
 				{
 					if (procedure.getProcedureCalls().getCount() == 0)
 						logger.info("Main procedure empty");
-
 					return procedure;
 				}
 			}

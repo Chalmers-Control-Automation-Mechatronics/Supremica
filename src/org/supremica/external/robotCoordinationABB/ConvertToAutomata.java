@@ -431,10 +431,10 @@ public class ConvertToAutomata
 		if(typeGet(firstP).equals("wp"))
 		{
 			LabeledEvent event;
-			if (!typeGet(secondP).equals("home"))
+			//if (!typeGet(secondP).equals("home"))
 				event = new LabeledEvent(robotName + "_" + whichPath + "_weld");    // comprehend going to the limit of the zone
-			else
-				event = new LabeledEvent(robotName + "_" + whichPath);
+			// else
+			//	event = new LabeledEvent(robotName + "_" + whichPath);
 			if (!alphabet.containsEqualEvent(event))
 				alphabet.addEvent(event);
 			State state = a.createAndAddUniqueState(null);

@@ -722,7 +722,7 @@ End Sub
 				activeStation = app.getActiveStation();
 				activeStation.getParts().item(var(mutexPartName));
 
-				/* Domenico
+				/*
 				try
 				{
 					CreateXml.createXmlStation(activeStation);
@@ -731,7 +731,7 @@ End Sub
 				{
 					logger.error("Error building the xml file for the coordinated station");
 				}
-				// Domenico*/
+				*/
 			}
 			catch (ComJniException ex)
 			{
@@ -790,7 +790,6 @@ End Sub
 			*/
 
 			// Create automata for each entity in the IPart called mutexPartName
-
 			createMutexAutomata();
 
 		}
@@ -1032,7 +1031,7 @@ End Sub
 		// Wait for controller start
 		//mechanismListener.waitForControllerStart();
 		//D H: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
-		Thread.sleep(2500);
+		Thread.sleep(3500);
 
 		mech.remove_MechanismEventsListener(mechanismListener);
 
