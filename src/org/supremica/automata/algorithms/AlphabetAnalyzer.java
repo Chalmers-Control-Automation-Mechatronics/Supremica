@@ -154,9 +154,8 @@ public class AlphabetAnalyzer
 		Set automatonSet = (Set) eventToAutomataMap.get(ev);
 
 		if (automatonSet == null)
-		{
+		{   // There were no automata in the map for this event,
 			automatonSet = new HashSet();
-
 			eventToAutomataMap.put(ev, automatonSet);
 		}
 
@@ -164,7 +163,7 @@ public class AlphabetAnalyzer
 	}
 
 	/**
-	 * Determines if an event is not synchronized, that is, present in ledd than two automata.
+	 * Determines if an event is not synchronized, that is, present in less than two automata.
 	 *
 	 *@param  ev the event that should be examined.
 	 *@return  true if the given event is present in zero or one automata, and false if it is present on more than one automata.

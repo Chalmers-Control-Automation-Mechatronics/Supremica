@@ -83,7 +83,7 @@ public class AutomataVerifier
 	 *
 	 *@see  AlphabetAnalyzer
 	 */
-	private HashMap uncontrollableEventToPlantMap = new HashMap();
+	private HashMap uncontrollableEventToPlantMap; // = new HashMap();
 	private AutomataSynchronizerHelper synchHelper;
 	private ArrayList synchronizationExecuters = new ArrayList();
 	private StateMemorizer potentiallyUncontrollableStates;
@@ -176,7 +176,6 @@ public class AutomataVerifier
 		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
 
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
 		LabeledEvent currEvent;
