@@ -78,6 +78,7 @@ public class FileFormats
 	public static final FileFormats IL = new FileFormats(false, true, "IL", ".il", "IEC-1131 Instruction List files (*.il)");
 	public static final FileFormats NQC = new FileFormats(false, true, "NQC", ".nqc", "Mindstorm NQC files (*.nqc)");
 	public static final FileFormats C = new FileFormats(false, true, "C", ".c", "C files (*.c)");
+	public static final FileFormats JAVA = new FileFormats(false, true, "JAVA", ".java", "Java files (*.java)");
 	public static final FileFormats SMV = new FileFormats(false, true, "SMV", ".smv", "SMV files (*.smv)");
 	public static final FileFormats FSM = new FileFormats(false, true, "FSM", ".fsm", "UMDES files (*.fsm)");
 
