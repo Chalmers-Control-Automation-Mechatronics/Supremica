@@ -1,0 +1,141 @@
+/********************* MakeDeterministicAction.java *****************/
+package org.supremica.gui.useractions;
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.*;
+import javax.help.*;
+
+import org.supremica.log.*;
+
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
+import org.supremica.automata.algorithms.standard.Determinizer;
+import org.supremica.gui.Gui;
+import org.supremica.gui.Supremica;
+import org.supremica.gui.ActionMan;
+
+public class MakeDeterministicAction
+	extends AbstractAction
+{
+	private static Logger logger = LoggerFactory.createLogger(MakeDeterministicAction.class);
+
+	private static LabeledEvent epsilon = new LabeledEvent("");
+	private	Automata newautomata;
+
+	public MakeDeterministicAction()
+	{
+		super("Make Deterministic", null);
+		putValue(SHORT_DESCRIPTION, "Determinize selected automata (experimental)");
+		
+		epsilon.setEpsilon(true);
+		this.newautomata = new Automata();
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		logger.debug("MakeDeterministicAction::actionPerformed");
+		
+		Gui gui = ActionMan.getGui();
+		Automata automata = gui.getSelectedAutomata();
+		
+		// Iterate over all automata
+		for(Iterator autit = automata.iterator(); autit.hasNext(); )
+		{
+			Automaton automaton = (Automaton)autit.next();
+			determinize(new Automaton(automaton));
+		}
+		if(newautomata.nbrOfAutomata() > 0)
+		{
+			try
+			{
+				ActionMan.gui.addAutomata(newautomata);
+				newautomata = new Automata();
+			}
+			catch(Exception ex)
+			{
+				logger.debug("MakeDeterministicAction::actionPerformed() -- ", ex);
+				logger.debug(ex.getStackTrace());
+			}
+
+		}
+		
+		logger.debug("MakeDeterministicAction::actionPerformed done");
+
+	}
+	
+	// For each non-deterministic state, add "epsilon" transitions, then call Determinizer
+	// Note that we add a single epsilon event, so initially the automaton becomes even more non-detm
+	private void determinize(Automaton automaton)
+	{
+		// automaton.beginTransaction();
+		boolean doit = false;
+		
+		for(StateIterator stit = automaton.safeStateIterator(); stit.hasNext(); )
+		{
+			State state = stit.nextState();
+			doit |= epsilonize(state, automaton);
+		}
+		
+		if(doit)
+		{
+			Determinizer determinizer = new Determinizer(automaton);
+			determinizer.execute();
+
+			Automaton newautomaton = determinizer.getNewAutomaton();
+			newautomaton.setComment("detm(" + automaton.getName() + ")");
+			newautomata.addAutomaton(newautomaton);
+		}
+		else
+		{
+			logger.info(automaton.getName() + " is already deterministic");
+		}
+		// automaton.endTransaction();
+	}
+	
+	// Note the brilliant ingenuity here! We manage this with but a single pass!
+	// And the idea is that we need only to epsilonize n-1 transitions of n nondterministic ones.
+	// The first we see we leave as it is, the others (with same label) we epsilonize
+	// Brilliant!
+	private boolean epsilonize(State state, Automaton automaton)
+	{
+		boolean found = false;
+		HashMap arcset = new HashMap();
+		
+		ArcIterator arcit = state.safeOutgoingArcsIterator();
+		if(arcit.hasNext())
+		{
+			Arc arc = arcit.nextArc();
+			arcset.put(arc.getEvent().getLabel(), arc);	// put the first on the set
+		}
+
+		while(arcit.hasNext())
+		{
+			Arc arc = arcit.nextArc();
+			if(arcset.containsKey(arc.getEvent().getLabel())) // We've already seen this label from this state => non-detm
+			{
+				epsilonize(arc, automaton);
+				found = true;
+			}
+			else // we've not already seen it - add it
+			{
+				arcset.put(arc.getEvent().getLabel(), arc);
+			}
+		}
+		
+		return found;
+	}
+	
+	// For this arc, insert epsilon transition to a unique intermediate state
+	private void epsilonize(Arc arc, Automaton automaton)
+	{
+		State x = automaton.createAndAddUniqueState(""); // This is the new intermediate state
+		Arc arc1 = new Arc(arc.getFromState(), x, epsilon);
+		Arc arc2 = new Arc(x, arc.getToState(), arc.getEvent());
+		
+		automaton.addArc(arc1);
+		automaton.addArc(arc2);
+		automaton.removeArc(arc);
+	}
+}
