@@ -612,7 +612,8 @@ public final class AutomataSynchronizerHelper
 	/** Displats the amount of states examined during the execution. */
 	public void displayInfo()
 	{
-		logger.info("Synchronization statistics:\n\t" + helperData.getNumberOfCheckedStates() + " states were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
+		logger.info("Operation statistics:\n\t" + (helperData.getNumberOfCheckedStates()-1) + " transitions were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
+		// logger.info("Synchronization statistics:\n\t" + helperData.getNumberOfCheckedStates() + " states were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
 	}
 
 	/**

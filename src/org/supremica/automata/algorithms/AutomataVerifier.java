@@ -1158,6 +1158,13 @@ public class AutomataVerifier
 	private boolean modularNonBlockingVerification()
 		throws Exception
 	{
+		// Is this really a modular system?
+		if (theAutomata.size() == 1)
+		{
+			logger.info("The selected system has only one automaton - using monolithic verification...");
+			return monolithicNonblockingVerification();
+		}
+
 		// Ensure individual nonblocking
 		boolean allIndividuallyNonblocking = true;
 		Iterator autIt = theAutomata.iterator();
@@ -1207,6 +1214,7 @@ public class AutomataVerifier
 
 		// Ensure global nonblocking...
 		boolean allIncluded = true;
+		boolean automatonIsIncluded;
 		autIt = theAutomata.iterator();
 		Automata currAutomata = new Automata();
 		while (autIt.hasNext())
@@ -1219,9 +1227,11 @@ public class AutomataVerifier
 		    currAutomata.addAutomaton(currAutomaton);
 			// Perform the behavioural inclusion check!
 			logger.info("Examining the automaton " + currAutomaton.getName() + ".");
-			allIncluded = allIncluded && behaviouralInclusionVerification(currAutomata, theAutomata);
+			
+			automatonIsIncluded = behaviouralInclusionVerification(currAutomata, theAutomata);
+			allIncluded = allIncluded && automatonIsIncluded;
 			currAutomata.removeAutomaton(currAutomaton); // Examine one automaton at a time...
-			if (!allIncluded)
+			if (!automatonIsIncluded)
 			{
 				logger.error("The automaton " + currAutomaton.getName() + " is blocked by some other automaton!");
 			}
@@ -1231,9 +1241,12 @@ public class AutomataVerifier
 
 	/**
 	 * Verifies behavioural inclusion of the language of automataA in automataB. 
-	 * I.e. is the behaviour of automataA included in automataB?
-	 * It IS ok for automataB to contain automata in automataA, but not the other way around!
-	 * This method presupposes that all events are uncontrollable!
+	 * I.e. "Is the behaviour of automataA included in automataB?"
+	 * It IS ok for automataB to contain automata in automataA, but not the other
+	 * way around!... that is, automataA has priority over automataB... if you're
+	 * in A it doesn't matter if you're in B.
+	 *
+	 * This method presupposes that all events are uncontrollable!... very not intuitive! //Hguo.
 	 */
 	private boolean behaviouralInclusionVerification(Automata automataA, Automata automataB)
 		throws Exception
@@ -1453,7 +1466,10 @@ public class AutomataVerifier
 	 *@see  AutomataSynchronizerExecuter
 	 */
 	private boolean moduleIsNonblocking(Automaton theAutomaton)
+		throws Exception
 	{
+	    // Automaton theAutomatonCopy = new Automaton(theAutomaton);
+
 		// Examine all states, starting from the marked ones and moving backwards...
 		LinkedList statesToExamine = new LinkedList();
 		Iterator stateIterator = theAutomaton.stateIterator();
@@ -1494,7 +1510,10 @@ public class AutomataVerifier
 
 		while (stateIterator.hasNext())
 		{
-			logger.info("Blocking state: " + ((State) stateIterator.next()).getName());
+			currState = (State) stateIterator.next();
+			logger.info("Blocking state: " + currState.getName());
+			// If we did a copy of theAutomata before we destroyed it we could display the trace...
+			// logger.info("Trace to blocking state: " + (theAutomatonCopy.getTrace(currState)).toString());
 		}
 		
 		return theAutomaton.nbrOfStates() == 0;
