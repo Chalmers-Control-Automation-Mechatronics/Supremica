@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -235,10 +234,11 @@ public class AutomataVerifier
 				{
 					return monolithicNonblockingVerification();
 				}
-				//else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
-				//{
-				//	return modularNonblockingVerification();
-				//}
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				{
+					// This algorithm only verifies pairwise nonblocking!!!
+					return pairwiseNonblockingVerification();
+				}
 				else
 				{
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
@@ -407,7 +407,6 @@ public class AutomataVerifier
 	private boolean moduleIsControllable(ArrayList selectedAutomata)
 		throws Exception
 	{
-
 		// Clear the hash-table and set some variables in the synchronization helper
 		synchHelper.clear();
 		synchHelper.setRememberUncontrollable(true);
@@ -1160,13 +1159,13 @@ public class AutomataVerifier
 			throw ex;
 		}
 
-		return moduleIsNonBlocking(theAutomaton);
+		return moduleIsNonblocking(theAutomaton);
 	}
 
 	/**
 	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines non-blocking modularily
 	 * by examining pairwise non-blocking between all automata.
-	 * THIS DOES NOT WORK! IT'S JUST A TEST!
+	 * THIS DOES NOT WORK! IT'S JUST  A  TEST!
 	 *
 	 *@return True if non-blocking, false if blocking
 	 *@exception  Exception Description of the Exception
@@ -1178,17 +1177,104 @@ public class AutomataVerifier
 		// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
 		logger.error("Modular non-blocking verification is not implemented! This algorithm " +
 					 "examines pairwise non-blocking between all automata! DOES NOT WORK!!");
-
+		
+		boolean allPairsNonblocking = true;
+		
 		Iterator automatonIterator = theAutomata.iterator();
 		Automaton currAutomaton;
-
+		Automaton currOtherAutomaton;
+		
 		while (automatonIterator.hasNext())
 		{
 			currAutomaton = (Automaton) automatonIterator.next();
-			//Iterator subIterator = new Iterator(automatonIterator);
+			Iterator subIterator = theAutomata.iterator();
+			while (subIterator.next() != currAutomaton);
+			while (subIterator.hasNext())
+			{
+				currOtherAutomaton = (Automaton) subIterator.next();
+				boolean pairIsNonblocking = automatonPairIsNonblocking(currAutomaton, currOtherAutomaton);
+				allPairsNonblocking = allPairsNonblocking && pairIsNonblocking;
+				if (!pairIsNonblocking)
+				{
+					logger.error("The automata " + currAutomaton.getName() + 
+								 " and " + currOtherAutomaton.getName() + " are blocking each other.");
+				}
+			}
 		}
+		return allPairsNonblocking;
+	}
+	
+	/**
+	 * Examines non-blocking between pair of automata
+	 *
+	 * @param AutomatonA The first automata in the pair.
+	 * @param AutomatonB The second automata in the pair.
+	 */
+	private boolean automatonPairIsNonblocking(Automaton AutomatonA, Automaton AutomatonB)
+		throws Exception
+	{
+		logger.info("Synchronizing " + AutomatonA.getName() + " and " + AutomatonB.getName());
 
-		return false;
+		// Synchroniza the two automata and verify nonblocking on the result
+		Automaton AutomataSynk;
+		ArrayList selectedAutomata = new ArrayList();
+
+		selectedAutomata.add(AutomatonA);
+		selectedAutomata.add(AutomatonB);
+		
+		// Clear the hash-table in the helper and set some variables in the synchronization helper
+		synchHelper.clear();
+		// synchHelper.setRememberUncontrollable(true);
+		synchHelper.addState(initialState);
+		
+		if (stopRequested)
+		{
+			return false;
+		}
+		
+		// Initialize the synchronizationExecuters
+		synchronizationExecuters.clear();
+		
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+			
+			synchronizationExecuters.add(currSynchronizationExecuter);
+		}
+		
+		// Start all the synchronization executers and wait for completion
+		// For the moment we assume that we only have one thread
+		for (int i = 0; i < synchronizationExecuters.size(); i++)
+		{
+			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+			
+			currExec.selectAutomata(selectedAutomata);
+			currExec.start();
+		}
+		
+		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+		
+		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
+		
+		try
+		{
+			if (currExec.buildAutomaton())
+			{
+				AutomataSynk = synchHelper.getAutomaton();
+			}
+			else
+			{
+				AutomataSynk = null;
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error when building automaton: " + ex.toString());
+			logger.debug(ex.getStackTrace());
+			throw ex;
+		}
+		
+		return moduleIsNonblocking(AutomataSynk);
 	}
 
 	/**
@@ -1199,7 +1285,7 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 */
-	private boolean moduleIsNonBlocking(Automaton theAutomaton)
+	private boolean moduleIsNonblocking(Automaton theAutomaton)
 	{
 		// Examine all states, starting from the marked ones and moving backwards...
 		LinkedList statesToExamine = new LinkedList();
@@ -1242,7 +1328,8 @@ public class AutomataVerifier
 
 		while (stateIterator.hasNext())
 		{
-			System.out.println("Blocking state: " + ((State) stateIterator.next()).getName());
+			//System.out.println("Blocking state: " + ((State) stateIterator.next()).getName());
+			logger.info("Blocking state: " + ((State) stateIterator.next()).getName());
 		}
 
 		return theAutomaton.nbrOfStates() == 0;

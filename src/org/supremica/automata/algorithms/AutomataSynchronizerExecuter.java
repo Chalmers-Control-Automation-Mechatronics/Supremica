@@ -197,8 +197,8 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * Selects the automata in the ArrayList for synchronization.
 	 *
-	 *@param  automataToBeSelected Description of the Parameter
-	 *@exception  Exception Description of the Exception
+	 *@param  automataToBeSelected ArrayList of the automata to be selected
+	 *@exception  Exception Throws exception if exhaustiva search is used.
 	 */
 	public void selectAutomata(ArrayList automataToBeSelected)
 		throws Exception
@@ -222,8 +222,8 @@ public final class AutomataSynchronizerExecuter
 	/**
 	 * Selects the automata with the indices in automataIndices for synchronization
 	 *
-	 *@param  automataIndices Description of the Parameter
-	 *@exception  Exception Description of the Exception
+	 *@param automataIndices Array of int with the indexes of the automata to be selected.
+	 *@exception  Exception Throws exception if exhaustiva search is used.
 	 */
 	public void selectAutomata(int[] automataIndices)
 		throws Exception
