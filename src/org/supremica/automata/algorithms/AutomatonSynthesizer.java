@@ -520,7 +520,7 @@ public class AutomatonSynthesizer
 
 	private void purge()
 	{
-		LinkedList stateList = new LinkedList();
+		List stateList = new LinkedList();
 
 
 		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
@@ -529,14 +529,14 @@ public class AutomatonSynthesizer
 
 			if (currState.getCost() == State.MAX_COST)
 			{
-				stateList.addLast(currState);
+				stateList.add(currState);
 			}
 
 		}
 
-		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
+		for (Iterator stateIt = stateList.iterator(); stateIt.hasNext(); )
 		{
-			State currState = stateIt.nextState();
+			State currState = (State)stateIt.next();
 
 			theAutomaton.removeState(currState);
 		}
