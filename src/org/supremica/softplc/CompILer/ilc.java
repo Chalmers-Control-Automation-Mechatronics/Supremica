@@ -9,6 +9,12 @@ public class ilc
 {
 	public static void main(String[] args)
 	{
+		if (args.length < 1)
+		{
+			System.err.println("Usage: ilcompiler file.il");
+			return;
+		}
+
 		try
 		{
 			parser p = new parser(new BufferedReader(new FileReader(new File(args[0]))));
@@ -19,9 +25,10 @@ public class ilc
 
 				n.dump("");
 
-				// 
 				new VariableChecker(n);
+
 				n.dump("");
+
 				new JavaBytecodeGenerator(n, null);
 			}
 			catch (Exception e)

@@ -1,5 +1,5 @@
 (*
-FUNCTION_BLOCK Delayer
+FUNCTION_BLOCK Delayer_KK
 	VAR_IN_OUT
 		LOOPS : DINT;
 		L : DINT;
