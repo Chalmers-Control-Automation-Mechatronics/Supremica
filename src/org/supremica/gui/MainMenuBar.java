@@ -503,6 +503,24 @@ public class MainMenuBar
 			}
 		});
 
+		if (SupremicaProperties.includeUserInterface())
+		{
+
+			// Project.UserInterface
+			JMenuItem menuProjectUserInterface = new JMenuItem();
+
+			menuProjectUserInterface.setText("User Interface...");
+			menuProject.add(menuProjectUserInterface);
+			menuProjectUserInterface.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.userInterface_actionPerformed(ActionMan.getGui());
+				}
+			});
+		}
+
+
 		if (SupremicaProperties.includeAnimator())
 		{
 
@@ -764,7 +782,7 @@ public class MainMenuBar
 				ActionMan.ProjectTo1131ST(ActionMan.getGui());
 			}
 		});
-		
+
 		JMenuItem menuToolsCodeGenerationIEC61499 = new JMenuItem();
 
 		menuToolsCodeGenerationIEC61499.setText("IEC-61499 Function Block...");
@@ -776,7 +794,7 @@ public class MainMenuBar
 				ActionMan.ProjectToIEC61499(ActionMan.getGui());
 			}
 		});
-				
+
 		JMenuItem menuToolsCodeGenerationControlBuilderIL = new JMenuItem();
 
 		menuToolsCodeGenerationControlBuilderIL.setText("ABB Control Builder Instruction List...");
