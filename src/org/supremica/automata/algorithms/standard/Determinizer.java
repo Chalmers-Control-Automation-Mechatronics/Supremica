@@ -37,7 +37,7 @@ public class Determinizer
 
 	private StateSet openStates = new StateSet();
 	private StateSet closedStates = new StateSet();
-	
+
 	private boolean checkControlInconsistencies = false;
 	private boolean resolveControlInconsistencies = false;
 	private boolean isControlInconsistent = false;
@@ -69,7 +69,7 @@ public class Determinizer
 		this.epsilonTester = epsilonTester;
 		this.newAutomaton = createNewAutomaton();
 	}
-	
+
 	public void checkControlInconsistencies(boolean checkControlInconsistencies)
 	{
 		this.checkControlInconsistencies = checkControlInconsistencies;
@@ -79,20 +79,20 @@ public class Determinizer
 	{
 		this.resolveControlInconsistencies = resolveControlInconsistencies;
 	}
-	
+
 	public boolean isControlInconsistent()
 		throws IllegalStateException
 	{
-		if (checkControlInconsistencies || resolveControlInconsistencies)	
+		if (checkControlInconsistencies || resolveControlInconsistencies)
 		{
 			return isControlInconsistent;
 		}
 		else
 		{
-			throw new IllegalStateException("Only allowed to be called when checkControlInconsistencies or resolvedControlInconsistencies are set to true");	
+			throw new IllegalStateException("Only allowed to be called when checkControlInconsistencies or resolvedControlInconsistencies are set to true");
 		}
 	}
-	
+
 	public void execute()
 	{
 		// Clear the caches - is this necessary?
@@ -101,7 +101,7 @@ public class Determinizer
 			State state = (State)state_it.next();
 			state.setStateClass(null);
 		}
-			
+
 		logger.debug("Executing Determinizer(" + automaton.getName() + ") " + epsilonTester.showWhatYouGot());
 
 		/* This is how it goes - a variant of van Noords
@@ -170,7 +170,7 @@ public class Determinizer
 								logger.debug("In states " + Q2c.toString() + " the following events are inconsistent (resolved) " + inconsistentEvents.toString());
 								isControlInconsistent = true;
 							}
-						}						
+						}
 						add(Q2c);
 						State U = newAutomaton.addStateChecked(Q2c.createNewState());
 						newAutomaton.addArc(new Arc(T, U, e));
