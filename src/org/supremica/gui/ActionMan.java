@@ -198,7 +198,7 @@ public class ActionMan
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "An empty name is not allowed", "alert", JOptionPane.ERROR_MESSAGE);
 			}
-			else if (fileSecurity.isSuperUser(newName))
+			else if (fileSecurity.isSuperuser(newName))
 			{
 				if (fileSecurity.allowSuperUserLogin())
 				{
