@@ -662,7 +662,7 @@ public class AutomataToControlBuilderSFC
 			}
 			else
 			{
-				theCondition.append(" AND ");
+				theCondition.append(" OR ");
 			}
 			theCondition.append(theUcEvent.getLabel().replace('.', '_'));
 		}

@@ -135,12 +135,16 @@ public class AutomataToSattLineSFCForBallProcess
 
 	protected String ucDisablementCondition(Alphabet theAlphabet)
 	{
-		/* See above, we should not replace '.' with '_'. */
+		/* See above, we should not replace '.' with '_'.
+		 And we should preferably not include the timer event,
+		 but that's a tad bit more difficult since we don't have
+		 its precondition. Even so, it may not be useable since
+		 the step timer variable retains its value until the step
+		 is reactivated. Maye we should just ignore it. */
 
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstUcEvent = true;
 		theCondition.append("NOT (");
-
 
 		for (Iterator ucEventIt = theAlphabet.uncontrollableEventIterator(); ucEventIt.hasNext(); )
 		{
@@ -151,9 +155,16 @@ public class AutomataToSattLineSFCForBallProcess
 			}
 			else
 			{
-				theCondition.append(" AND ");
+				theCondition.append(" OR ");
 			}
-			theCondition.append(theUcEvent.getLabel());
+			if (theUcEvent.getLabel().equals("timer"))
+			{
+				theCondition.append("False");
+			}
+			else
+			{
+				theCondition.append(theUcEvent.getLabel());
+			}
 		}
 		theCondition.append(") AND ");
 		return theCondition.toString();
