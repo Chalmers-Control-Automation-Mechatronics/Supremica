@@ -48,18 +48,6 @@
  *  Supremica is owned and represented by KA.
  */
 
-// **************************************************************************************************
-// I quote Martin on this:
-//     "It's not that simple. The code below defeats that purpose. Where are the exporter objects?
-//      OO was invented just to avoid the type of code below. It's a maintenance nightmare!!"
-//
-// Suggested reading material for the author of this file
-//   - Design Patterns                                                                          ISBN 0201633612
-//   - The Object-Oriented Thought Process                                      ISBN 0672318539
-//   - The Java(TM) Programming Language (3rd Edition)          ISBN 0201704331
-//
-//    /Arash :)
-// **************************************************************************************************
 // This is the guy that ties together the Gui and the menus
 // This is nothing but the Controller in the ModelViewController pattern
 package org.supremica.gui;
