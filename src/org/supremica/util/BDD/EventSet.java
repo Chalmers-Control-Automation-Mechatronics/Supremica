@@ -33,7 +33,7 @@ public class EventSet
 		{
 			Event ev = (Event) e.nextElement();
 
-			if (ev.name_id.equals(name))
+			if (/* ev.name_id.equals(name) */ ev.label.equals(name))
 			{
 				return ev;
 			}
@@ -66,7 +66,7 @@ public class EventSet
 		BDDAssert.bddAssert(!in(label), "Duplicate event: " + label);
 
 		Event event = new Event();
-		
+
 		event.label = label;
 		event.name_id = id;
 		event.c = c;
@@ -104,14 +104,14 @@ public class EventSet
 	}
 
     public boolean overlap(EventSet es) {
-	for(int t = 0; t < total; t++) 
+	for(int t = 0; t < total; t++)
 	    if(events[t] != null && es.events[t] != null)
 		return true;
 
 	return false;
     }
  	// -------------------------------------------------------
-  
+
 	void close(EventManager alphabet)
 	{
 		BDDAssert.internalCheck(!closed, "[EventSet.close] BAD FUNCTION CALL!");

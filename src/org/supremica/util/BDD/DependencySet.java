@@ -6,12 +6,12 @@ import java.io.*;
 
 public class DependencySet {
     private BDDAutomata manager;
-    private BDDAutomaton [] all, dependent;    
+    private BDDAutomaton [] all, dependent;
     private BDDAutomaton me;
     private boolean [] map_dependency;
     private int bdd_keep_depend, bdd_keep_others, bdd_t_wave, bdd_t_wave_isolated;
     private int bdd_i, bdd_cube, bdd_cube_others;
-    
+
 
     public DependencySet(BDDAutomata manager, BDDAutomaton me) {
 	this.manager = manager;
@@ -19,7 +19,7 @@ public class DependencySet {
 	this.me  = me;
 
 	map_dependency = new boolean[all.length];
-	for(int i = 0; i < all.length; i++) 
+	for(int i = 0; i < all.length; i++)
 	    map_dependency[i] = true;
 
 
@@ -61,7 +61,7 @@ public class DependencySet {
 	// calc Twave etc
 	int follow = manager.getOne(); manager.ref(follow);
 	bdd_i = me.getI(); manager.ref(bdd_i);
-	
+
 
 	for(i = 0; i < len; i++) {
 	    BDDAutomaton a_i =  dependent[len-i-1];
@@ -89,7 +89,7 @@ public class DependencySet {
 	}
 
 
-       
+
        int tmp3 = manager.and(me.getT(), follow);
 	manager.deref(follow);
 
@@ -115,7 +115,7 @@ public class DependencySet {
 	manager.deref(bdd_t_wave);
 	manager.deref(bdd_i);
 	manager.deref(bdd_cube_others);
-	
+
     }
     // ------------------------------------------------------------------
     public BDDAutomaton [] getSet() { return dependent; }
@@ -126,7 +126,20 @@ public class DependencySet {
     public int getI() { return bdd_i; }
 
     // -----------------------------------------------------------------
-    public int getReachables(int start) {	
+    /* NOT TESTED  (to be used in workset-amoothing ? )
+    public int addDependency(int [] vector) {
+		int count = 0;
+		for(int i = 0; i < all.length; i++) {
+	    	if(all[i] != me) {
+				vector[i]++;
+				count++;
+			}
+		}
+		return count;
+	}
+	*/
+    // -----------------------------------------------------------------
+    public int getReachables(int start) {
 	int cube = manager.getStateCube();
 	int permute = manager.getPermuteSp2S();
 	int q,qp, front;
@@ -143,7 +156,7 @@ public class DependencySet {
 	    q = manager.orTo(q, tmp2);
 
 	    manager.deref(front);
-	    front = tmp2;	    
+	    front = tmp2;
 	} while(q != qp);
 
 	manager.deref(front);
@@ -159,7 +172,7 @@ public class DependencySet {
 	}
 	ps.println(" };");
     }
-    
+
     public String getName() {
 	return "DependencySet_" + me.getName();
     }

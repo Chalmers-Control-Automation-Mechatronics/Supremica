@@ -7,10 +7,12 @@ public class Options
 	ALGO_MONOLITHIC = 0,
 	ALGO_CONJUNCTIVE = 1,
 	ALGO_DISJUNCTIVE = 2,
-	ALGO_SMOOTHED_MONO = 3,
-	ALGO_SMOOTHED_PATH = 4,
-	ALGO_SMOOTHED_KEEP = 5,
-	ALGO_SMOOTHED_PART = 6
+	ALGO_DISJUNCTIVE_WORKSET = 3,
+
+	ALGO_SMOOTHED_MONO = 4,
+	ALGO_SMOOTHED_PATH = 5,
+	ALGO_SMOOTHED_KEEP = 6,
+	ALGO_SMOOTHED_PART = 7
 
 	;
 
@@ -47,7 +49,7 @@ public class Options
     public static boolean nb_optimistic = true;
 
     public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
-    public static int algo_family = ALGO_SMOOTHED_PATH;
+    public static int algo_family = ALGO_SMOOTHED_MONO;
     public static int count_algo  = COUNT_TREE;
     public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
 

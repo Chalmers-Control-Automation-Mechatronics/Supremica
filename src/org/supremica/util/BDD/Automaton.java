@@ -39,6 +39,8 @@ public class Automaton
 	private EventSet eventSet = new EventSet();
 	private ArcSet arcSet = new ArcSet();
 	private EventManager alphabet;
+	private int [][] eventFlowMatrix = null;
+
 
 	public Automaton(String name, EventManager alphabet)
 	{
@@ -111,12 +113,12 @@ public class Automaton
 	    }
 	}
 
-    
+
 	public void close()
 	    throws BDDException
 	{
-	    
-	 
+
+
 
 
 		// TODO: this function seems to be extremly inefficient, more linear searchs??
@@ -226,5 +228,59 @@ public class Automaton
 		}
 
 		return ret / 2;    // to get the average
+	}
+
+
+	//  ---------[ these are here to be used in a eventfolw/workset supervisor some day :)  ]---
+	/**
+	 * get event flow matrix.
+	 * m(s1,s2)  is the number of times s1 is followed by s1 in the automata
+	 */
+	public int [][]getEventFlowMatrix()
+	{
+
+		if(eventFlowMatrix == null)
+			computeEventFlowMatrix();
+		return eventFlowMatrix;
+
+	}
+
+	private void computeEventFlowMatrix()
+	{
+		int i, j;
+		int events = alphabet.getSize();
+		eventFlowMatrix = new int[events][events];
+		for(i = 0; i < events; i++) for(j = 0; j < events; j++) eventFlowMatrix[i][j] = 0;
+
+		Arc[] arcs = arcSet.getArcVector();
+		int arcs_count = arcSet.getSize();
+		for(int as = 0; as < arcs_count; as ++) {
+			Arc a1 = arcs[as];
+			for (Enumeration e = a1.next.elements(); e.hasMoreElements(); ) {
+				Arc a2 = (Arc) e.nextElement();
+				i = a1.o_event.id;
+				j = a2.o_event.id;
+				eventFlowMatrix[i][j]++;
+			}
+		}
+	}
+
+	/**
+	 * After which events just fired, we may do a transition
+	 *
+	 */
+	public boolean [] getEventFlow(boolean forward) {
+		int events = alphabet.getSize();
+		boolean [] ret = new boolean[events];
+		int [][]m = getEventFlowMatrix();
+
+		for(int i = 0; i < events; i++) {
+			int tmp = 0;
+			for(int j = 0; j < events; j++) {
+				tmp += forward ? m[i][j] : m[j][i];
+			}
+			ret[i] = tmp > 0;
+		}
+		return ret;
 	}
 }

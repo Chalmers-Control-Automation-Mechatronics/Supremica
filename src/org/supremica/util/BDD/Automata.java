@@ -60,6 +60,7 @@ public class Automata
 		return variable_count;
 	}
 
+
   	public int [][]getCommunicationMatrix()
 	    throws BDDException
 	{
@@ -69,7 +70,7 @@ public class Automata
 	    for(int i = 0; i < components; i++) {
 		Automaton a1 = (Automaton) automata.elementAt(i);
 		ret[i][i] = a1.getCommunicationComplexity(a1); // not actually needed :)
-		for (int j = 0; j < i; j++) {			
+		for (int j = 0; j < i; j++) {
 		    Automaton a2 = (Automaton) automata.elementAt(j);
 		    int cc = a1.getCommunicationComplexity(a2);
 		    ret[i][j] = ret[j][i] = cc;
@@ -97,29 +98,29 @@ public class Automata
 		Timer timer = new Timer(); // This times the ordering procedure
 		components = automata.size(); // number of automata to be ordered
 
-		
+
 		if(Options.ordering_algorithm == Options.ORDERING_ALGO_OLD_PCG) {
 		    // OLD ordering technique: PCG graph search
 		    PCG pcg = new PCG(automata);
-		    
+
 		    for (int i = 0; i < components; i++)
 			{    // get weights
 			    Automaton a1 = (Automaton) automata.elementAt(i);
-			    
+
 			    for (int j = 0; j < i; j++)
 				{
 				    Automaton a2 = (Automaton) automata.elementAt(j);
 				    int cc = a1.getCommunicationComplexity(a2);
-				    
+
 				    if (cc != 0)
 					{
 					    pcg.connect(a1, a2, cc);
 					}
 				}
 			}
-		
+
 		    // pcg.dump();
-		    grupp_ordering = pcg.getShortestPath();	
+		    grupp_ordering = pcg.getShortestPath();
 		} else {
 		    // TESTING THE NEW ORDERING-SOLVER ALGO:
 		    int [][]weightMatrix = getCommunicationMatrix();
@@ -130,7 +131,7 @@ public class Automata
 		    }
 		    grupp_ordering = os.getGoodOrder();
 		}
-		
+
 
 		// maybe the user needs to change something ?
 		if (Options.user_alters_PCG) {

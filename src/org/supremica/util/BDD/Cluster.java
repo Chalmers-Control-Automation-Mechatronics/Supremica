@@ -46,6 +46,21 @@ public class Cluster {
 		twave = manager.orTo (twave, with.twave);
 	}
 
+
+	public boolean interact(Cluster c) {
+
+		for(Enumeration e1 = members.elements(); e1.hasMoreElements(); ) {
+			BDDAutomaton a1 = (BDDAutomaton) e1.nextElement();
+			for(Enumeration e2 = c.members.elements(); e2.hasMoreElements(); ) {
+				BDDAutomaton a2 = (BDDAutomaton) e2.nextElement();
+				if(a1 != a2 && a1.interact(a2)) return true;
+			}
+		}
+
+		return false;
+	}
+
+
 	public int getTwave()
 	{
 		return twave;

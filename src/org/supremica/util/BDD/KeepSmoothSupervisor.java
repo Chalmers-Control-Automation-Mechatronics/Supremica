@@ -6,8 +6,6 @@ import java.util.*;
 public class KeepSmoothSupervisor extends DisjSupervisor
 {
 
-
-
     /** Constructor, passes to the base-class */
     public KeepSmoothSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
 		super(manager,as);
@@ -21,7 +19,6 @@ public class KeepSmoothSupervisor extends DisjSupervisor
 
     /** C++-style Destructor to cleanup unused BDD trees*/
     public void cleanup() {
-
 		super.cleanup();
     }
 

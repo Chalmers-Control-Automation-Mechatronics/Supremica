@@ -360,8 +360,11 @@ public class BDDAutomaton
 	}
 
     public boolean interact(BDDAutomaton ba) {
-	return automaton.interact(ba.automaton);
+		return automaton.interact(ba.automaton);
     }
+    public boolean [] getEventFlow(boolean forward) {
+		return automaton.getEventFlow(forward);
+	}
 	// ------------------------------------------------------------------
 	private void createI()
 	{

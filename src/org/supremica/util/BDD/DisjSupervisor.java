@@ -11,15 +11,15 @@ public class DisjSupervisor extends ConjSupervisor {
 
     /** Constructor, passes to the base-class */
     public DisjSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
-	super(manager,as);
-	init_disj();
+		super(manager,as);
+		init_disj();
     }
 
 
     /** Constructor, passes to the base-class */
     public DisjSupervisor(BDDAutomata manager, Group plant, Group spec) {
-	super(manager, plant, spec);
-	init_disj();
+		super(manager, plant, spec);
+		init_disj();
     }
 
     /** C++-style Destructor to cleanup unused BDD trees*/
