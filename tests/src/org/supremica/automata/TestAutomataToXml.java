@@ -91,7 +91,7 @@ public class TestAutomataToXml
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestProjectToXml.class);
+		TestSuite suite = new TestSuite(TestAutomataToXml.class);
 		return suite;
 	}
 

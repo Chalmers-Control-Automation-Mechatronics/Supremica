@@ -91,7 +91,7 @@ public class TestProjectToSP
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestInterClassFileIO.class);
+		TestSuite suite = new TestSuite(TestProjectToSP.class);
 		return suite;
 	}
 
