@@ -61,10 +61,11 @@ import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;
+import org.supremica.util.ToolBarButton;
 
 public class AutomataEditor
 	extends JFrame
-	implements TableModelListener
+	implements TableModelListener, EditorView
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataEditor.class);
 
@@ -77,10 +78,27 @@ public class AutomataEditor
 	private JSplitPane splitPaneHorizontal;
 	private EditorActions theActions;
 
+	// State
+	protected HashMap myMap = new HashMap();
+	protected AutomatonView myCurrentView = null;
+	protected JDesktopPane myDesktop = new JDesktopPane();
+	protected JMenuBar mainMenuBar = new JMenuBar();
+	protected JMenu filemenu = new JMenu();
+	protected JMenu editmenu = new JMenu();
+//	protected JMenu viewmenu = new JMenu();
+//  protected JMenu insertmenu = new JMenu();
+//	protected JMenu layoutmenu = new JMenu();
+	protected JMenu helpmenu = new JMenu();
+	protected JPanel myStatusArea = new JPanel();
+	protected JLabel myStatusLabel = new JLabel();
+	private int myDocCount = 1;	
+	
 	public AutomataEditor(VisualProject theVisualProject)
 	{
 		this.theVisualProject = theVisualProject;
 		theActions = new EditorActions(this);
+		
+		setTitle("Supremica Editor");
 
 		initMenus();
 		initToolbar();
@@ -114,64 +132,29 @@ public class AutomataEditor
 
 	void initMenus()
 	{
-		JMenuItem item = null;
-
+		JMenuItem item;
+		
+		// Create File Menu
 		filemenu.setText("File");
 		filemenu.setMnemonic('F');
 
+	
 		// Add
 		item = filemenu.add(theActions.getFileAddAction());
 
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Event.CTRL_MASK));
 		item.setMnemonic('A');
 
-		/*
-		 *   AppAction FileOpenAction = new AppAction("Open", this) {
-		 *     public void actionPerformed(ActionEvent e) { openDemo(); }
-		 *     public boolean canAct() { return true; } };  // doesn't depend on a view
-		 *
-		 *   item = filemenu.add(FileOpenAction);
-		 *   item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,Event.CTRL_MASK));
-		 *   item.setMnemonic('O');
-		 *
-		 *   AppAction FileCloseAction = new AppAction("Close", this) {
-		 *     public void actionPerformed(ActionEvent e) { closeDemo(); } };
-		 *
-		 *   item = filemenu.add(FileCloseAction);
-		 *   item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,Event.CTRL_MASK));
-		 *   item.setMnemonic('C');
-		 *
-		 *   AppAction FileSaveAction = new AppAction("Save", this) {
-		 *     public void actionPerformed(ActionEvent e) { saveDemo(); } };
-		 *
-		 *   item = filemenu.add(FileSaveAction);
-		 *   item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,Event.CTRL_MASK));
-		 *   item.setMnemonic('S');
-		 *
-		 *   AppAction FileSaveAsAction = new AppAction("Save As", this) {
-		 *     public void actionPerformed(ActionEvent e) { saveAsDemo(); } };
-		 *
-		 *   item = filemenu.add(FileSaveAsAction);
-		 *   item.setMnemonic('A');
-		 *
-		 *   filemenu.addSeparator();
-		 */
-
-		// Print
-		item = filemenu.add(theActions.getFilePrintAction());
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Event.CTRL_MASK));
-		item.setMnemonic('P');
-		filemenu.addSeparator();
-
 		// Close
 		item = filemenu.add(theActions.getFileCloseAction());
 
 		item.setMnemonic('x');
 		mainMenuBar.add(filemenu);
+		
 		editmenu.setText("Edit");
 		editmenu.setMnemonic('E');
 
+		/*
 		AppAction CutAction = new AppAction("Cut", this)
 		{
 			public void actionPerformed(ActionEvent e)
@@ -185,205 +168,11 @@ public class AutomataEditor
 			}
 		};
 
-		item = editmenu.add(CutAction);
+		item = editmenu.add(theActions.CutAction);
 
 		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK));
 		item.setMnemonic('t');
 
-		AppAction CopyAction = new AppAction("Copy", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().copy();
-			}
-
-			public boolean canAct()
-			{
-				return super.canAct() &&!getView().getSelection().isEmpty();
-			}
-		};
-
-		item = editmenu.add(CopyAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK));
-		item.setMnemonic('C');
-
-		AppAction PasteAction = new AppAction("Paste", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().paste();
-			}
-		};
-
-		item = editmenu.add(PasteAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK));
-		item.setMnemonic('P');
-
-		AppAction DeleteAction = new AppAction("Delete", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().deleteSelection();
-			}
-
-			public boolean canAct()
-			{
-				return super.canAct() &&!getView().getSelection().isEmpty();
-			}
-		};
-
-		item = editmenu.add(DeleteAction);
-
-		item.setMnemonic('D');
-
-		AppAction SelectAllAction = new AppAction("Select All", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().selectAll();
-			}
-		};
-
-		item = editmenu.add(SelectAllAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Event.CTRL_MASK));
-		item.setMnemonic('l');
-		mainMenuBar.add(editmenu);
-		viewmenu.setText("View");
-		viewmenu.setMnemonic('V');
-
-		AppAction ZoomNormalAction = new AppAction("Normal Zoom", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().zoomNormal();
-			}
-		};
-
-		item = viewmenu.add(ZoomNormalAction);
-
-		item.setMnemonic('N');
-
-		AppAction ZoomInAction = new AppAction("Zoom In", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().zoomIn();
-			}
-
-			public boolean canAct()
-			{
-				return super.canAct() && (getView().getScale() < 8.0f);
-			}
-		};
-
-		item = viewmenu.add(ZoomInAction);
-
-		item.setMnemonic('I');
-
-		AppAction ZoomOutAction = new AppAction("Zoom Out", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().zoomOut();
-			}
-
-			public boolean canAct()
-			{
-				return super.canAct() && (getView().getScale() > 0.13f);
-			}
-		};
-
-		item = viewmenu.add(ZoomOutAction);
-
-		item.setMnemonic('O');
-
-		AppAction ZoomToFitAction = new AppAction("Zoom To Fit", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().zoomToFit();
-			}
-		};
-
-		item = viewmenu.add(ZoomToFitAction);
-
-		item.setMnemonic('Z');
-		viewmenu.addSeparator();
-
-		AppAction GridAction = new AppAction("Toggle Grid", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().showGrid();
-			}
-		};
-
-		item = viewmenu.add(GridAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Event.CTRL_MASK));
-		item.setMnemonic('G');
-		mainMenuBar.add(viewmenu);
-		insertmenu.setText("Insert");
-		insertmenu.setMnemonic('I');
-
-		AppAction InsertNodeAction = new AppAction("Basic Node", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				nodeAction();
-			}
-		};
-
-		item = insertmenu.add(InsertNodeAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, Event.CTRL_MASK));
-		item.setMnemonic('B');
-		mainMenuBar.add(insertmenu);
-		layoutmenu.setText("Layout");
-		layoutmenu.setMnemonic('L');
-
-		AppAction RandomLayoutAction = new AppAction("Random Layout", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				randomAction();
-			}
-		};
-
-		item = layoutmenu.add(RandomLayoutAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Event.CTRL_MASK));
-		item.setMnemonic('R');
-
-		AppAction ForceLayoutAction = new AppAction("Force-Directed Layout", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				forceAction();
-			}
-		};
-
-		item = layoutmenu.add(ForceLayoutAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Event.CTRL_MASK));
-		item.setMnemonic('F');
-
-		AppAction LayerLayoutAction = new AppAction("Layered Digraph Layout", this)
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				layerAction();
-			}
-		};
-
-		item = layoutmenu.add(LayerLayoutAction);
-
-		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.CTRL_MASK));
-		item.setMnemonic('L');
-		mainMenuBar.add(layoutmenu);
 		helpmenu.setText("Help");
 		helpmenu.setMnemonic('H');
 
@@ -404,6 +193,8 @@ public class AutomataEditor
 
 		item.setMnemonic('A');
 		mainMenuBar.add(helpmenu);
+*/		
+
 		setJMenuBar(mainMenuBar);
 	}
 
@@ -411,297 +202,26 @@ public class AutomataEditor
 	{
 		return this;
 	}
+	
+	public 	JDesktopPane getDesktop()
+	{
+		return myDesktop;
+	}
 
 	public void initToolbar()
 	{
 		// Enables stylish rollover buttons - JDK 1.4 required
 		toolBar.setRollover(true);
 
-		Insets tmpInsets = new Insets(0, 0, 0, 0);
-		boolean separatorNeeded = false;
-		JButton addButton = new JButton();
-
-		addButton.setToolTipText("Add");
-
-		ImageIcon add16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Add16.gif"));
-
-		addButton.setIcon(add16Img);
-		addButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				fileAdd();
-			}
-		});
-		addButton.setMargin(tmpInsets);
-		toolBar.add(addButton, "WEST");
-
-		separatorNeeded = true;
-
-		if (SupremicaProperties.fileAllowOpen())
-		{
-			JButton openButton = new JButton();
-
-			openButton.setToolTipText("Open");
-
-			ImageIcon open16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Open16.gif"));
-
-			openButton.setIcon(open16Img);
-			openButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					fileOpen();
-				}
-			});
-			openButton.setMargin(tmpInsets);
-			toolBar.add(openButton, "WEST");
-
-			separatorNeeded = true;
-		}
-
-		if (SupremicaProperties.fileAllowSave())
-		{
-			JButton saveButton = new JButton();
-
-			saveButton.setToolTipText("Save");
-
-			ImageIcon save16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Save16.gif"));
-
-			saveButton.setIcon(save16Img);
-			saveButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					fileSave();
-				}
-			});
-
-			JButton saveAsButton = new JButton();
-
-			saveAsButton.setToolTipText("Save As");
-
-			ImageIcon saveAs16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/SaveAs16.gif"));
-
-			saveAsButton.setIcon(saveAs16Img);
-			saveAsButton.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					fileSaveAs();
-				}
-			});
-			saveButton.setMargin(tmpInsets);
-			saveAsButton.setMargin(tmpInsets);
-			toolBar.add(saveButton, "WEST");
-			toolBar.add(saveAsButton, "WEST");
-
-			separatorNeeded = true;
-		}
-
-		if (separatorNeeded)
-		{
-			toolBar.addSeparator();
-
-			separatorNeeded = true;
-		}
-
-		JButton printButton = new JButton();
-
-		printButton.setToolTipText("Print");
-
-		ImageIcon print16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Print16.gif"));
-
-		printButton.setIcon(print16Img);
-		printButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				filePrint();
-			}
-		});
-
-		JButton cutButton = new JButton();
-
-		cutButton.setToolTipText("Cut");
-
-		ImageIcon cut16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Cut16.gif"));
-
-		cutButton.setIcon(cut16Img);
-		cutButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton copyButton = new JButton();
-
-		copyButton.setToolTipText("Copy");
-
-		ImageIcon copy16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Copy16.gif"));
-
-		copyButton.setIcon(copy16Img);
-		copyButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton pasteButton = new JButton();
-
-		pasteButton.setToolTipText("Paste");
-
-		ImageIcon paste16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Paste16.gif"));
-
-		pasteButton.setIcon(paste16Img);
-		pasteButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton deleteButton = new JButton();
-
-		deleteButton.setToolTipText("Delete");
-
-		ImageIcon delete16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Delete16.gif"));
-
-		deleteButton.setIcon(delete16Img);
-		deleteButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton undoButton = new JButton();
-
-		undoButton.setToolTipText("Undo");
-
-		ImageIcon undo16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Undo16.gif"));
-
-		undoButton.setIcon(undo16Img);
-		undoButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton redoButton = new JButton();
-
-		redoButton.setToolTipText("Redo");
-
-		ImageIcon redo16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Redo16.gif"));
-
-		redoButton.setIcon(redo16Img);
-		redoButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton zoomButton = new JButton();
-
-		zoomButton.setToolTipText("Zoom");
-
-		ImageIcon zoom16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif"));
-
-		zoomButton.setIcon(zoom16Img);
-		zoomButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton zoomInButton = new JButton();
-
-		zoomInButton.setToolTipText("Zoom In");
-
-		ImageIcon zoomIn16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomIn16.gif"));
-
-		zoomInButton.setIcon(zoomIn16Img);
-		zoomInButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton zoomOutButton = new JButton();
-
-		zoomOutButton.setToolTipText("Zoom Out");
-
-		ImageIcon zoomOut16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomOut16.gif"));
-
-		zoomOutButton.setIcon(zoomOut16Img);
-		zoomOutButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-
-				// fileOpen();
-			}
-		});
-
-		JButton helpButton = new JButton();
-
-		helpButton.setToolTipText("Help");
-
-		ImageIcon help16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Help16.gif"));
-
-		helpButton.setIcon(help16Img);
-
-		// helpButton.addActionListener(helpDisplayer);
-		printButton.setMargin(tmpInsets);
-		cutButton.setMargin(tmpInsets);
-		copyButton.setMargin(tmpInsets);
-		pasteButton.setMargin(tmpInsets);
-		deleteButton.setMargin(tmpInsets);
-		undoButton.setMargin(tmpInsets);
-		redoButton.setMargin(tmpInsets);
-		zoomButton.setMargin(tmpInsets);
-		zoomInButton.setMargin(tmpInsets);
-		zoomOutButton.setMargin(tmpInsets);
-		helpButton.setMargin(tmpInsets);
-
-		// Add buttons to toolbar
-		toolBar.add(printButton, "WEST");
+		ToolBarButton addButton = new ToolBarButton(theActions.getFileAddAction());	
+		addButton.setText(""); // Quick and dirty fix, Change to its own class instead
+		toolBar.add(addButton);
+		
 		toolBar.addSeparator();
-		toolBar.add(cutButton, "WEST");
-		toolBar.add(copyButton, "WEST");
-		toolBar.add(pasteButton, "WEST");
-		toolBar.add(deleteButton, "WEST");
-		toolBar.addSeparator();
-		toolBar.add(undoButton, "WEST");
-		toolBar.add(redoButton, "WEST");
-		toolBar.addSeparator();
-		toolBar.add(zoomButton, "WEST");
-		toolBar.add(zoomInButton, "WEST");
-		toolBar.add(zoomOutButton, "WEST");
-		toolBar.addSeparator();
-		toolBar.add(helpButton, "EAST");
+
+		ToolBarButton printButton = new ToolBarButton(theActions.getFilePrintAction());
+		printButton.setText(""); // Fix
+		toolBar.add(printButton);
 	}
 
 	public void init()
@@ -732,24 +252,6 @@ public class AutomataEditor
 				 */
 			}
 		});
-//		setSize(new Dimension(800, 600));
-//		setIconImage(Supremica.cornerImage);
-//
-//		// Center the window
-//		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//		Dimension frameSize = getSize();
-//
-//		if (frameSize.height > screenSize.height)
-//		{
-//			frameSize.height = screenSize.height;
-//		}
-//
-//		if (frameSize.width > screenSize.width)
-//		{
-//			frameSize.width = screenSize.width;
-//		}
-//
-//		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
 		Utility.setupFrame(this, 800, 600);
 
@@ -780,13 +282,14 @@ public class AutomataEditor
 
 						theFrame.setVisible(true);
 						theFrame.setTitle(theAutomaton.getName());
-
+/*
 						if (theDocument.isLayoutNeeded())
 						{
 							randomAction();
 							theDocument.setLayoutNeeded(false);
 						}
-					}
+*/
+										}
 					catch (Exception ex)
 					{
 						logger.error("Error while displaying the automaton", ex);
@@ -836,58 +339,7 @@ public class AutomataEditor
 		});
 	}
 
-	/*
-	 * public void start()
-	 * {
-	 *   // enable drag-and-drop from separate thread
-	 *   new Thread(this).start();
-	 * }
-	 *
-	 * public void run() {
-	 *   newDemo();
-	 * }
-	 */
 
-	/*
-	 * static public void main(String args[])
-	 * {
-	 *   try {
-	 *     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	 *
-	 *     final JFrame mainFrame = new JFrame();
-	 *     final AutomataEditor app = new AutomataEditor();
-	 *
-	 *     // close the application when the main window closes
-	 *     mainFrame.addWindowListener(new WindowAdapter() {
-	 *       public void windowClosing(java.awt.event.WindowEvent event) {
-	 *         Object object = event.getSource();
-	 *         if (object == mainFrame)
-	 *           app.exit();
-	 *       }
-	 *     });
-	 *
-	 *     //mainFrame.setTitle("Supremica");
-	 *     Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
-	 *     mainFrame.setBounds(0, 0, screensize.width, screensize.height);
-	 *
-	 *     Container contentPane = mainFrame.getContentPane();
-	 *     contentPane.setLayout(new BorderLayout());
-	 *     contentPane.add("Center", app);
-	 *     contentPane.validate();
-	 *
-	 *     mainFrame.setVisible(true);
-	 *
-	 *     app.init();
-	 *     app.start();
-	 *   } catch (Throwable t) {
-	 *     System.err.println(t);
-	 *     t.printStackTrace();
-	 *     System.exit(1);
-	 *   }
-	 *
-	 *
-	 * }
-	 */
 	void showAbout()
 	{
 		AboutBox dlg = new AboutBox(this);
@@ -899,7 +351,12 @@ public class AutomataEditor
 		dlg.setModal(true);
 		dlg.setVisible(true);
 	}
-
+	
+	public VisualProject getVisualProject()
+	{
+		return theVisualProject;
+	}
+	
 	public JInternalFrame createFrame(AutomatonDocument doc)
 	{
 		final AutomatonView view = new AutomatonView(doc);
@@ -952,53 +409,7 @@ public class AutomataEditor
 		return frame;
 	}
 
-	/*
-	 * void openDemo()
-	 * {
-	 *   AutomatonDocument doc = AutomatonDocument.open();
-	 *   if (doc != null)
-	 *     createFrame(doc);
-	 * }
-	 *
-	 * void closeDemo()
-	 * {
-	 *   if (getCurrentView() != null) {
-	 *     JInternalFrame frame = getCurrentView().getInternalFrame();
-	 *     if (frame != null) {
-	 *       if (getCurrentView().isChanged()) {
-	 *         String msg = "Save Changes to " + getCurrentView().getDoc().getName();
-	 *         int choice = javax.swing.JOptionPane.showConfirmDialog(frame, msg, "AutomataEditor",
-	 *                     javax.swing.JOptionPane.YES_NO_CANCEL_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE);
-	 *         if (choice == javax.swing.JOptionPane.YES_OPTION)
-	 *           saveDemo();
-	 *         if((myCurrentView.isChanged() && choice == javax.swing.JOptionPane.YES_OPTION) ||
-	 *                     choice == javax.swing.JOptionPane.CANCEL_OPTION)
-	 *           //save was cancelled, or cancel was chosen.  Don't close.
-	 *           return;
-	 *       }
-	 *       getDesktop().getDesktopManager().closeFrame(frame);
-	 *       myCurrentView = null;
-	 *       AppAction.updateAllActions();
-	 *     }
-	 *   }
-	 * }
-	 *
-	 * void saveDemo()
-	 * {
-	 *   if (getCurrentView() != null) {
-	 *     AutomatonDocument doc = getCurrentView().getDoc();
-	 *     doc.save();
-	 *   }
-	 * }
-	 *
-	 * void saveAsDemo()
-	 * {
-	 *   if (getCurrentView() != null) {
-	 *     AutomatonDocument doc = getCurrentView().getDoc();
-	 *     doc.saveAs();
-	 *   }
-	 * }
-	 */
+
 	AutomatonDocument findAutomatonDocument(String path)
 	{
 		Object val = myMap.get(path);
@@ -1013,51 +424,14 @@ public class AutomataEditor
 		}
 	}
 
-	AutomatonView getCurrentView()
+	public AutomatonView getCurrentAutomatonView()
 	{
 		return myCurrentView;
 	}
-
-	void randomAction()
-	{
-		setStatus("");
-
-		AutomatonDocument doc = getCurrentView().getDoc();
-		Rectangle r = getCurrentView().getViewRect();
-		SimpleRAL s = new SimpleRAL(doc, (r.x + 100), ((r.width - r.x) - 100), (r.y + 100), ((r.height - r.y) - 100));
-
-		s.performLayout();
-		setStatus("Random Layout done");
-	}
-
-	void forceAction()
-	{
-		setStatus("");
-
-		ForceDialog f = new ForceDialog(getCurrentView().getFrame(), "Force-Directed Settings", true, getCurrentView(), this);
-
-		f.setVisible(true);
-	}
-
-	void layerAction()
-	{
-		setStatus("");
-
-		LayerDialog l = new LayerDialog(getCurrentView().getFrame(), "Layered-Digraph Settings", true, getCurrentView(), this);
-
-		l.setVisible(true);
-	}
-
-	void nodeAction()
-	{
-		NodeDialog n = new NodeDialog(getCurrentView().getFrame(), "Node Settings", true, getCurrentView());
-
-		n.setVisible(true);
-	}
-
-	JDesktopPane getDesktop()
-	{
-		return myDesktop;
+	
+	public AutomataEditor getAutomataEditor()
+	{	
+		return this;
 	}
 
 	public JPanel getStatusArea()
@@ -1067,7 +441,7 @@ public class AutomataEditor
 
 	public void setStatus(String s)
 	{
-		if (s.equals(""))
+		if (s == null || s.equals(""))
 		{
 			s = " ";
 		}
@@ -1090,24 +464,9 @@ public class AutomataEditor
 		theAutomatonTable.revalidate();
 	}
 
-	public void fileAdd()
-	{
-		String title = theVisualProject.getUniqueAutomatonName();
-		Automaton newAutomaton = new Automaton(title);
-
-		try
-		{
-			theVisualProject.addAutomaton(newAutomaton);
-		}
-		catch (Exception ex)
-		{
-			logger.error("Error while adding the automaton to the container", ex);
-			logger.debug(ex.getStackTrace());
-			return;
-		}
-
-		AutomatonDocument doc = new AutomatonDocument(theVisualProject, newAutomaton);
-
+/*
+<<<<<<< AutomataEditor.java
+=======
 		createFrame(doc);
 	}
 
@@ -1158,7 +517,9 @@ public class AutomataEditor
 	protected JPanel myStatusArea = new JPanel();
 	protected JLabel myStatusLabel = new JLabel();
 	private int myDocCount = 1;
+>>>>>>> 1.17
 
+*/
 	class CloseListener
 		implements VetoableChangeListener
 	{

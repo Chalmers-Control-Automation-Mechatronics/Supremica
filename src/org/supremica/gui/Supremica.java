@@ -635,7 +635,12 @@ public class Supremica
 			ActionMan.fileExit(this);
 		}
 	}
-
+	/*
+	public void updateFromJGrafchart()
+	{
+		
+	}
+*/
 	public String getNewProjectName()
 	{
 		String msg = "Enter new project name";

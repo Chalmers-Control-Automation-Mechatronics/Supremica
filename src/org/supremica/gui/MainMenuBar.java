@@ -629,11 +629,19 @@ public class MainMenuBar
 		{
 			menuTools.add(new JSeparator());
 
+			
+			
 			JMenu menuToolsJGrafchart = new JMenu();
-
 			menuToolsJGrafchart.setText("JGrafchart...");
 			menuTools.add(menuToolsJGrafchart);
+			
+			JMenuItem menuToolsOpenJGrafchart = new SupremicaMenuItem(ActionMan.openJGrafchartAction);
+			menuToolsJGrafchart.add(menuToolsOpenJGrafchart);
 
+			JMenuItem menuToolsUpdateFromJGrafchart = new SupremicaMenuItem(ActionMan.updateFromJGrafchartAction);
+			menuToolsJGrafchart.add(menuToolsUpdateFromJGrafchart);			
+			
+/*			
 			JMenuItem menuOpenEditor= new JMenuItem("Open Editor");
 
 			menuOpenEditor.addActionListener(new ActionListener()
@@ -644,7 +652,17 @@ public class MainMenuBar
 				}
 			});
 
-			menuToolsJGrafchart.add(menuOpenEditor);
+			JMenuItem menuUpdateFromJGrafchart = new JMenuItem("Update Automata");
+			menuUpdateFromJGrafchart.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							ActionMan.updateFromJGrafchart(ActionMan.getGui());
+						}
+					});			
+			
+			menuToolsJGrafchart.add(menuUpdateFromJGrafchart);
+	*/
 		}
 
 

@@ -44,6 +44,7 @@ public class FactoryExecutor
 					e.setTitle("Shoefactory");
 					Editor.singleton = e;
 					Editor.removePaletteAction();
+
 	
 					URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.xml");
 					

@@ -57,6 +57,7 @@ import javax.swing.*;
 import com.nwoods.jgo.*;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
+import org.supremica.gui.VisualProject;
 
 // Provide a view of a AutomatonDocument
 // Implement various command handlers
@@ -64,13 +65,16 @@ public class AutomatonView
 	extends JGoGridView
 	implements JGoViewListener
 {
+	private EditorActions editorActions = null;
 
 	// State
 	protected Point myDefaultLocation = new Point(80, 80);
-	protected AutomataEditor myApp = null;
-	protected JInternalFrame myInternalFrame = null;
+	protected AutomataEditor theAutomataEditor = null;
+	protected JInternalFrame theInternalFrame = null;
 	protected Automaton theAutomaton = null;
-	private JPopupMenu statePopupMenu;
+	private StatePopupMenu statePopupMenu;
+	private JPopupMenu linkPopupMenu;
+	private JPopupMenu nailPopupMenu;
 
 	public AutomatonView(AutomatonDocument doc)
 	{
@@ -78,40 +82,20 @@ public class AutomatonView
 
 		this.theAutomaton = doc.getAutomaton();
 
-		initPopups();
+		initPopups(doc.getEditorActions());
 	}
 
-	public void initPopups()
+	public void initPopups(EditorActions editorActions)
 	{
-		statePopupMenu = new JPopupMenu();
-
-		JMenuItem cutItem = new JMenuItem("Cut");
-
-		statePopupMenu.add(cutItem);
-
-		JMenuItem copyItem = new JMenuItem("Copy");
-
-		statePopupMenu.add(copyItem);
-
-		JMenuItem deleteItem = new JMenuItem("Delete");
-
-		statePopupMenu.add(deleteItem);
-		statePopupMenu.addSeparator();
-
-		JMenuItem selectAllItem = new JMenuItem("Select all");
-
-		statePopupMenu.add(selectAllItem);
-		statePopupMenu.addSeparator();
-
-		JMenuItem statusItem = new JMenuItem("Status");
-
-		statePopupMenu.add(statusItem);
+		statePopupMenu = new StatePopupMenu(editorActions);
+		//		initLinkPopups();
+//		initNailPopups();
 	}
 
 	public void initialize(AutomataEditor app, JInternalFrame frame)
 	{
-		myApp = app;
-		myInternalFrame = frame;
+		theAutomataEditor = app;
+		theInternalFrame = frame;
 
 		addViewListener(this);
 		setGridWidth(10);
@@ -119,6 +103,43 @@ public class AutomatonView
 		setSnapMove(JGoGridView.SnapJump);
 		showGrid();
 	}
+	
+	
+	/*
+	public void initLinkPopups()
+	{
+		// Initialize LinkPopupMenu
+		linkPopupMenu = new JPopupMenu();
+
+		JMenuItem deleteItem = new JMenuItem("Add nail");
+		deleteItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					actionMan.linkAddNail(e);
+				}
+			});		
+		linkPopupMenu.add(deleteItem);
+		
+		JMenuItem deleteItem = new JMenuItem("Delete");
+		linkPopupMenu.add(deleteItem);
+
+		JMenuItem statusItem = new JMenuItem("Status");
+		linkPopupMenu.add(statusItem);
+	}
+*/
+
+/*
+	public void initNailPopups()
+	{
+		// Initialize LinkPopupMenu
+		linkPopupMenu = new JPopupMenu();
+
+		JMenuItem deleteItem = new JMenuItem("Remove nail");
+		linkPopupMenu.add(deleteItem);
+	}	
+*/
+	
 
 	// convenience method--the return value is a AutomatonDocument instead
 	// of a JGoDocument
@@ -129,12 +150,12 @@ public class AutomatonView
 
 	AutomataEditor getApp()
 	{
-		return myApp;
+		return theAutomataEditor;
 	}
 
 	JInternalFrame getInternalFrame()
 	{
-		return myInternalFrame;
+		return theInternalFrame;
 	}
 
 	// handle DELETE key as well as the page up/down keys
@@ -419,6 +440,8 @@ public class AutomatonView
 		return getDoc().isChanged();
 	}
 
+	
+	
 	// an example of how to implement popup menus
 	public boolean doMouseDown(int modifiers, Point dc, Point vc)
 	{
@@ -453,9 +476,38 @@ public class AutomatonView
 	public boolean doPopupMenu(int modifiers, Point dc, Point vc)
 	{
 
-		// JGoObject obj =
-		statePopupMenu.show(this, vc.x, vc.y);
-
-		return true;
+		JGoObject obj = pickDocObject(dc, true);
+		
+		if (obj == null)
+		{ // Background menu
+			return true;
+		}
+		else if (obj.getTopLevelObject() instanceof StateNode)
+		{ // State selected
+			statePopupMenu.show(this, vc.x, vc.y);
+			return true;
+		}
+		else if (obj.getTopLevelObject() instanceof NailNode)
+		{ // Nail selected
+			return true;
+		}
+		else if (obj.getTopLevelObject() instanceof JGoLink)
+		{ // Link selected
+			//linkPopupMenu.show(this, vc.x, vc.y);
+			return true;
+		}
+		return false;
 	}
+
+/*	
+	public AutomataEditor getAutomataEditor()
+	{
+		return getApp();
+	}
+	
+	public AutomatonView getAutomatonView()
+	{
+		return this;
+	}
+*/	
 }

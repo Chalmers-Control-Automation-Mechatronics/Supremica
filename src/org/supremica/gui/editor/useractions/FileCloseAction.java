@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -47,36 +46,43 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.gui.editor;
 
-import com.nwoods.jgo.layout.JGoRandomAutoLayout;
-import com.nwoods.jgo.layout.JGoNetwork;
+package org.supremica.gui.editor.useractions;
 
-public class SimpleRAL
-	extends JGoRandomAutoLayout
+import java.awt.event.*;
+import javax.swing.*;
+
+//import org.supremica.gui.Supremica;
+import org.supremica.gui.editor.EditorView;
+//import org.supremica.gui.VisualProject;
+//import org.supremica.automata.Automaton;
+import org.supremica.log.*;
+
+public class FileCloseAction
+	extends EditorAction
 {
-	public SimpleRAL()
+	private static Logger logger = LoggerFactory.createLogger(AbstractAction.class);
+	
+	public FileCloseAction(EditorView editorView)
 	{
-		super();
+		super("Close Editor", editorView);
+		putValue(SHORT_DESCRIPTION, "Close Editor");
 	}
 
-	public SimpleRAL(AutomatonDocument pGoDoc)
+	public void actionPerformed(ActionEvent e)
 	{
-		super(pGoDoc);
+		/*
+		VisualProject theProject = getVisualProject();
+		String title = theProject.getUniqueAutomatonName();
+		Automaton newAutomaton = new Automaton(title);
+		theProject.addAutomaton(newAutomaton);
+		theProject.showInEditor(newAutomaton);
+		*/
 	}
 
-	public SimpleRAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork)
+	public boolean canAct()
 	{
-		super(pGoDoc, pNetwork);
+		return true;
 	}
 
-	public SimpleRAL(AutomatonDocument pGoDoc, int Nminx, int Nmaxx, int Nminy, int Nmaxy)
-	{
-		super(pGoDoc, Nminx, Nmaxx, Nminy, Nmaxy);
-	}
-
-	public SimpleRAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork, int Nminx, int Nmaxx, int Nminy, int Nmaxy)
-	{
-		super(pGoDoc, pNetwork, Nminx, Nmaxx, Nminy, Nmaxy);
-	}
 }

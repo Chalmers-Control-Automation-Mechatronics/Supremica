@@ -2,7 +2,6 @@ package org.supremica.gui.useractions;
 
 import java.awt.event.*;
 import javax.swing.*;
-
 import org.supremica.gui.Supremica;
 import org.supremica.gui.ActionMan;
 

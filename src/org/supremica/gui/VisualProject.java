@@ -61,6 +61,7 @@ import org.supremica.gui.animators.scenebeans.Animator;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
+import grafchart.sfc.JGrafchartSupremicaEditor;
 
 import org.supremica.properties.SupremicaProperties;
 
@@ -80,6 +81,7 @@ public class VisualProject
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private SimulatorExecuter theSimulator = null;	// Lazy construction
 	private RecipeEditor theRecipeEditor = null;	// Lazy construction
+	private JGrafchartSupremicaEditor theJGrafchartEditor = null;	// Lazy construction
 	private CellEditor theCellEditor = null;	// Lazy construction
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
@@ -219,6 +221,12 @@ public class VisualProject
 		return selectedAutomata;
 	}
 
+	public void showInEditor(Automaton theAutomaton)
+	{
+		
+		//return selectedAutomata;
+	}
+	
 	public void clearSelection()
 	{
 		selectedAutomata = null;
@@ -346,33 +354,6 @@ public class VisualProject
 		}
 
 		return null;
-
-		/*
-										else
-										{
-														Automaton currAutomaton = getAutomaton(automatonName);
-
-														if (currAutomaton != null)
-														{
-																		try
-																		{
-																						AutomatonDocument document = new AutomatonDocument(this, currAutomaton);
-
-																						theAutomatonDocumentContainer.put(automaton, document);
-
-																						return document;
-																		}
-																		catch (Exception ex)
-																		{
-																						throw new Exception("Error while viewing: " + automaton);
-																		}
-														}
-														else
-														{
-																		throw new Exception(automaton + " does not exist in VisualProjectContainer");
-														}
-										}
-		*/
 	}
 
 	public AutomatonExplorer getAutomatonExplorer(String automaton)
@@ -528,6 +509,23 @@ public class VisualProject
 		theRecipeEditor.setVisible(true);
 		return theRecipeEditor;
 	}
+	
+	public JGrafchartSupremicaEditor getJGrafchartEditor()
+	{
+		if (theJGrafchartEditor == null)
+		{
+			String[] args = new String[1];
+			args[0]="";
+			JGrafchartSupremicaEditor theEditor = new JGrafchartSupremicaEditor(args);
+			grafchart.sfc.Editor.singleton = theEditor;
+			theJGrafchartEditor = theEditor;  
+			//theRecipeEditor = org.supremica.gui.recipeEditor.RecipeEditor.createEditor(this);
+		}
+		theJGrafchartEditor.setVisible(true);
+		return theJGrafchartEditor;
+	}
+	
+
 
 
 	public void clearSimulationData()

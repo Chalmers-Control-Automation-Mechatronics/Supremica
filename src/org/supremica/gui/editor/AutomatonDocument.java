@@ -56,11 +56,6 @@ import org.supremica.automata.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 
-// AutomatonDocument, for this example, has just a few properties:
-// Location and Link Pen.
-// The latter two may appear to belong to a view instead of being
-// part of a document, but here these attributes can be conveniently
-// stored persistently.
 public class AutomatonDocument
 	extends JGoDocument
 {
@@ -77,11 +72,14 @@ public class AutomatonDocument
 	private Automaton theAutomaton = null;
 	private boolean changed = false;
 	private boolean layoutNeeded = false;
+	
+	private EditorActions theEditorActions;
 
-	public AutomatonDocument(VisualProject theVisualProject, Automaton theAutomaton)
+	public AutomatonDocument(VisualProject theVisualProject, Automaton theAutomaton, EditorActions theEditorActions)
 	{
 		this.theVisualProject = theVisualProject;
 		this.theAutomaton = theAutomaton;
+		this.theEditorActions = theEditorActions;
 
 		build();
 	}
@@ -266,6 +264,16 @@ public class AutomatonDocument
 		return theAutomaton;
 	}
 
+	public EditorActions getEditorActions()
+	{
+		return theEditorActions;
+	}
+
+	public VisualProject getVisualProject()
+	{
+		return theVisualProject;
+	}
+	
 	public void build()
 	{
 		HashMap stateToStateNodeMap = new HashMap(theAutomaton.nbrOfStates());

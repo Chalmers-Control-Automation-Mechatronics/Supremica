@@ -49,156 +49,61 @@
  */
 package org.supremica.gui.editor;
 
-import java.awt.event.*;
+// import java.awt.event.*;
+import org.supremica.gui.editor.useractions.*;
 
 public class EditorActions
 {
 	private AutomataEditor theEditor = null;
-	private AppAction fileAddAction = null;
-	private AppAction fileOpenAction = null;
-	private AppAction fileSaveAction = null;
-	private AppAction fileSaveAsAction = null;
-	private AppAction filePrintAction = null;
-	private AppAction fileCloseAction = null;
-	private AppAction editCutAction = null;
-	private AppAction editCopyAction = null;
-	private AppAction editPasteAction = null;
-	private AppAction editDeleteAction = null;
-	private AppAction editUndoAction = null;
-	private AppAction editRedoAction = null;
-	private AppAction viewZoomAction = null;
-	private AppAction viewZoomInAction = null;
-	private AppAction viewZoomOutAction = null;
-	private AppAction helpHelpTopicsAction = null;
 
+	private FileAddAction fileAddAction = null;
+	private FilePrintAction filePrintAction = null;
+	private FileCloseAction fileCloseAction = null;
+
+	private DeleteSelectionAction deleteSelectionAction = null;
+	private DeleteStateAction deleteStateAction = null;
+	
 	public EditorActions(AutomataEditor theEditor)
 	{
 		this.theEditor = theEditor;
+		
+		if (theEditor == null)
+		{
+			System.err.println("theEditor is null");
+		}
+		
+		fileAddAction = new FileAddAction(theEditor);
+		filePrintAction = new FilePrintAction(theEditor);		
+		fileCloseAction = new FileCloseAction(theEditor);		
+
+		deleteStateAction = new DeleteStateAction(theEditor);	
+		deleteSelectionAction = new DeleteSelectionAction(theEditor);	
 	}
 
-	public AppAction getFileAddAction()
+	public FileAddAction getFileAddAction()
 	{
-		if (fileAddAction == null)
-		{
-			fileAddAction = new AppAction("Add", theEditor)
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					theEditor.fileAdd();
-				}
-
-				public boolean canAct()
-				{
-					return true;
-				}
-			};
-		}
-
 		return fileAddAction;
-	}
+	}	
 
-	public AppAction getFileOpenAction()
+	public FilePrintAction getFilePrintAction()
 	{
-		if (fileOpenAction == null)
-		{
-			fileOpenAction = new AppAction("Open...", theEditor)
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					theEditor.fileOpen();
-				}
-
-				public boolean canAct()
-				{
-					return true;
-				}
-			};
-		}
-
-		return fileOpenAction;
-	}
-
-	public AppAction getFileSaveAction()
-	{
-		if (fileSaveAction == null)
-		{
-			fileSaveAction = new AppAction("Save", theEditor)
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					theEditor.fileSave();
-				}
-
-				public boolean canAct()
-				{
-					return true;
-				}
-			};
-		}
-
-		return fileSaveAction;
-	}
-
-	public AppAction getFileSaveAsAction()
-	{
-		if (fileSaveAsAction == null)
-		{
-			fileSaveAsAction = new AppAction("Save As...", theEditor)
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					theEditor.fileSaveAs();
-				}
-
-				public boolean canAct()
-				{
-					return true;
-				}
-			};
-		}
-
-		return fileSaveAsAction;
-	}
-
-	public AppAction getFilePrintAction()
-	{
-		if (filePrintAction == null)
-		{
-			filePrintAction = new AppAction("Print", theEditor)
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					theEditor.filePrint();
-				}
-
-				public boolean canAct()
-				{
-					return true;
-				}
-			};
-		}
-
 		return filePrintAction;
-	}
+	}		
 
-	public AppAction getFileCloseAction()
+	public FileCloseAction getFileCloseAction()
 	{
-		if (fileCloseAction == null)
-		{
-			fileCloseAction = new AppAction("Close", theEditor)
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					theEditor.fileClose();
-				}
-
-				public boolean canAct()
-				{
-					return true;
-				}
-			};
-		}
-
 		return fileCloseAction;
+	}		
+
+	public DeleteSelectionAction getDeleteSelectionAction()
+	{
+		return deleteSelectionAction;
 	}
+	
+	public DeleteStateAction getDeleteStateAction()
+	{
+		return deleteStateAction;
+	}
+	
+	
 }

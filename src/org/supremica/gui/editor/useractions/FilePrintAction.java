@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -47,88 +46,41 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.gui.editor;
 
-import java.awt.Container;
-import javax.swing.AbstractAction;
-import javax.swing.Icon; 
-import java.util.Vector;
+package org.supremica.gui.editor.useractions;
 
-// Define an Action that knows about views and supports enabling/disabling
-// depending on the current context.
-public abstract class AppAction
-	extends AbstractAction
+import java.awt.event.*;
+import javax.swing.*;
+
+import org.supremica.gui.Supremica;
+import org.supremica.gui.editor.EditorView;
+import org.supremica.gui.VisualProject;
+import org.supremica.automata.Automaton;
+import org.supremica.log.*;
+
+public class FilePrintAction
+	extends EditorAction
 {
-	private static Vector myAllActions = new Vector();
-	private Container myApp;
-
-	public AppAction(String name, Container app)
+	private static Logger logger = LoggerFactory.createLogger(AbstractAction.class);
+	
+	public FilePrintAction(EditorView editorView)
 	{
-		super(name);
-
-		init(app);
+		super("Print File", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Print16.gif")), editorView);
+		putValue(SHORT_DESCRIPTION, "Print Automaton");
 	}
 
-	public AppAction(String name, Icon icon, Container app)
+	public void actionPerformed(ActionEvent e)
 	{
-		super(name, icon);
-
-		init(app);
+		VisualProject theProject = getVisualProject();
+		String title = theProject.getUniqueAutomatonName();
+		Automaton newAutomaton = new Automaton(title);
+		theProject.addAutomaton(newAutomaton);
+//		theProject.showInEditor(newAutomaton);
 	}
 
-	public AutomataEditor getApp()
-	{
-		return (AutomataEditor) myApp;
-	}
-
-	public AutomatonView getView()
-	{
-		return getApp().getCurrentAutomatonView();
-	}
-
-	private final void init(Container app)
-	{
-		myApp = app;
-
-		myAllActions.add(this);
-	}
-
-	public String toString()
-	{
-		return (String) getValue(NAME);
-	}
-
-	// by default each AppAction is disabled if there's no current view
 	public boolean canAct()
 	{
-		return (getView() != null);
+		return true;
 	}
 
-	public void updateEnabled()
-	{
-		setEnabled(canAct());
-	}
-
-	public void free()
-	{
-		myAllActions.removeElement(this);
-
-		myApp = null;
-	}
-
-	// keep track of all instances of AppAction
-	public static void updateAllActions()
-	{
-		for (int i = 0; i < myAllActions.size(); i++)
-		{
-			AppAction act = (AppAction) myAllActions.elementAt(i);
-
-			act.updateEnabled();
-		}
-	}
-
-	public static Vector allActions()
-	{
-		return myAllActions;
-	}
 }

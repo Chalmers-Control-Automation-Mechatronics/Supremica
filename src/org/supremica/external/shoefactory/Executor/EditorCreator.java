@@ -1,9 +1,12 @@
 package org.supremica.external.shoefactory.Executor;
 
 import grafchart.sfc.*;
+import org.supremica.log.*;
 
 public class EditorCreator
 {
+	private static Logger logger = LoggerFactory.createLogger(EditorCreator.class);
+	
 	static EditorAPI e = null;
 	static boolean running = false;
 
@@ -12,7 +15,7 @@ public class EditorCreator
 		if(e == null)
 			e = new EditorAPI(args);
 		else
-			System.out.println("You cannot have another instance of Jgrafchart running!");
+			logger.info("You cannot have another instance of Jgrafchart running!");
 	}
 	
 	public EditorAPI getEditor()

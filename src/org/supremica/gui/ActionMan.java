@@ -97,8 +97,6 @@ import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 
-import grafchart.sfc.*;
-
 
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
@@ -143,6 +141,8 @@ public class ActionMan
 	public static final HelpAction helpAction = new HelpAction();
 	public static final OpenAction openAction = new OpenAction(); // defined in MainToolBar (just for fun :-)
 	public static final SynthesizeAction synthesizeAction = new SynthesizeAction();
+	public static final OpenJGrafchartAction openJGrafchartAction = new OpenJGrafchartAction();
+	public static final UpdateFromJGrafchartAction updateFromJGrafchartAction = new UpdateFromJGrafchartAction();
 
 	public static Gui getGui()
 	{
@@ -198,6 +198,13 @@ public class ActionMan
 		}
 	}
 
+	// File.NewFromTemplate action performed
+	//public static void updateFromJGrafchart(Gui gui)
+	//{
+
+		
+	//}	
+	
 	// File.Login action performed
 	public static void fileLogin(Gui gui)
 	{
@@ -3146,10 +3153,18 @@ public class ActionMan
 	//open JgrafchartEditor
 	public static void openJGrafchartEditor(Gui gui)
 	{
-		String[] args = new String[1];
-		args[0]="";
-		EditorAPI e = new EditorAPI(args);
-		Editor.singleton = e;
+		try
+		{
+			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
+			VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
+			theProject.getJGrafchartEditor();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception while getting JGrafchart Editor");
+			logger.debug(ex.getStackTrace());
+			return;
+		}		
 	}
 
 	//shoeFactory - Config

@@ -34,6 +34,7 @@ public class MainToolBar
 	private static final MoveAutomataAction moveAutomataDownAction = new MoveAutomataAction(false, false);
 	private static final MoveAutomataAction moveAutomataToBottomAction = new MoveAutomataAction(false, true);
 
+	
 	private static final PreferencesAction preferencesAction = new PreferencesAction();
 
 	private static final EditAction editAction = new EditAction(supremica);
@@ -76,6 +77,14 @@ public class MainToolBar
 		add(moveAutomataToBottomAction);
 		addSeparator();
 
+		if (SupremicaProperties.includeJGrafchart())
+		{			
+			add(ActionMan.openJGrafchartAction);
+			add(ActionMan.updateFromJGrafchartAction);
+	
+			addSeparator();
+		}
+		
 		add(preferencesAction);
 		addSeparator();
 
