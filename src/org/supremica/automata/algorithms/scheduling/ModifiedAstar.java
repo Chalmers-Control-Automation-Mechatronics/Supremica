@@ -228,6 +228,8 @@ public class ModifiedAstar
 	static void walk(Automata theAutomata)
 		throws Exception
 	{
+		int debugNum = 1;
+		
 		// Let's see if this is the way to do it, modeled after AutomataExplorer
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true);
@@ -244,12 +246,18 @@ public class ModifiedAstar
 			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
 		}
 
-
 		AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
 
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);
+
+		// These are From AutomataVerifier, not in AutomataExplorer, is it necessary?
+		onlineSynchronizer.selectAllAutomata(); 
+		helper.addState(initialState);
+		helper.setCoExecute(true);
+		helper.setCoExecuter(onlineSynchronizer);
+		helper.setExhaustiveSearch(true);
 
 		// Initialization done, now what...
 		
@@ -268,7 +276,7 @@ public class ModifiedAstar
 			CompositeState state = (CompositeState)open.first();
 			onlineSynchronizer.setCurrState(state.getArray());
 			
-			/**/ System.out.println("\nGlob State: " + state.toString());
+			/**/ System.out.println("\n(" + debugNum++ + ") Glob State: " + state.toString());
 			
 			// From this state, move in all directions one step
 			// First we need to find the events enabled in automaton i
@@ -280,7 +288,7 @@ public class ModifiedAstar
 				// Now we need to find the state with this index in currAutomaton
 				State s = currAutomaton.getStateWithIndex(stateIndex);
 				
-				/**/ System.out.println("Part State: " + currAutomaton.getName() + "::" + s.toString());
+				/**/ System.out.println("Part State: " + currAutomaton.getName() + "[" + stateIndex + " : " + s.getIndex() + "]::" + s.toString());
 				
 				// Now, let us iterate over all events enabled in this state
 				EventIterator evit = currAutomaton.outgoingEventsIterator(s);
@@ -347,7 +355,6 @@ public class ModifiedAstar
 		p2.addArc(new Arc(q21, q22, e22));
 		p2.addArc(new Arc(q22, q23, e23));
 
-
 		Automaton m1 = new Automaton("M1");
 		State m10 = new State("m10");			m1.addState(m10);	m1.setInitialState(m10);
 		State m11 = new State("m11");			m1.addState(m11);
@@ -360,7 +367,6 @@ public class ModifiedAstar
 		m1.addArc(new Arc(m11, m10, em13));
 		m1.addArc(new Arc(m11, m10, em14));
 
-
 		Automaton m2 = new Automaton("M2");
 		State m20 = new State("m20");			m2.addState(m20);	m2.setInitialState(m20);
 		State m21 = new State("m21");			m2.addState(m21);
@@ -368,6 +374,10 @@ public class ModifiedAstar
 		LabeledEvent em22 = new LabeledEvent("p2 ut ur m1 in i m2");m2.getAlphabet().addEvent(em22);
 		LabeledEvent em23 = new LabeledEvent("p1 ut ur m2");		m2.getAlphabet().addEvent(em23);
 		LabeledEvent em24 = new LabeledEvent("p2 ut ur m2");		m2.getAlphabet().addEvent(em24);
+		m2.addArc(new Arc(m20, m21, em21));
+		m2.addArc(new Arc(m20, m21, em22));
+		m2.addArc(new Arc(m21, m20, em23));
+		m2.addArc(new Arc(m21, m20, em24));
 		
 		Automata automata = new Automata();
 		automata.addAutomaton(p1);
