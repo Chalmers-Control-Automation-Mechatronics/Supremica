@@ -734,7 +734,7 @@ public final class AutomataSynchronizerExecuter
 					int[] currState = currStateTable[i];
 					State newState = new State();
 
-					newState.setIndex(i);
+					newState.setAutomataSynchronizerExecutorIndex(i);
 
 					if (longformId)
 					{

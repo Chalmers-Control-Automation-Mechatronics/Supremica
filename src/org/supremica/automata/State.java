@@ -154,9 +154,19 @@ public class State
 	 * needs special initialisation that is not automatically done.
 	 * This method is not recommended for general use.
 	 */
-	public void setIndex(int index)
+	void setIndex(int index)
 	{
 		this.index = index;
+	}
+
+	/**
+	 * Do not use this method.
+	 * This is temporary method for letting AutomataSynchronizerExecutor set the index.
+	 * This method will be remomoved ASAP.
+	 */
+	public void setAutomataSynchronizerExecutorIndex(int index)
+	{
+		setIndex(index);
 	}
 
 	/**

@@ -232,7 +232,7 @@ public class LabeledEvent
 		return synchIndex;
 	}
 
-	public void setSynchIndex(int synchIndex)
+	void setSynchIndex(int synchIndex)
 	{
 		this.synchIndex = synchIndex;
 	}

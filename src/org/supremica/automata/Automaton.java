@@ -851,14 +851,19 @@ public class Automaton
 	}
 */
 
-	public void setIndicies(int automatonIndex)
+	public void setIndicies()
+	{
+		setIndicies(0);
+	}
+
+	void setIndicies(int automatonIndex)
 	{
 		index = automatonIndex;
 		alphabet.setIndicies();
 		setStateIndicies();
 	}
 
-	public void setIndicies(int automatonIndex, Alphabet otherAlphabet)
+	void setIndicies(int automatonIndex, Alphabet otherAlphabet)
 	{
 		index = automatonIndex;
 		alphabet.setIndicies(otherAlphabet);
