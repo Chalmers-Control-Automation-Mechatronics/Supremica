@@ -254,7 +254,7 @@ class FindStatesTable
 						setRowSelectionInterval(row, row);
 					}
 
-					//
+					// 
 					if (getStatesTableModel().isRegexpColumn(col))
 					{
 						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);

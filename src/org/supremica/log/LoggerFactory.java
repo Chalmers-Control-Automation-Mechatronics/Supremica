@@ -60,9 +60,7 @@ public class LoggerFactory
 	private static final PatternLayout layout = new PatternLayout("%-5p %m%n");
 	private static ConsoleAppender consoleAppender = null;
 
-	private LoggerFactory()
-	{
-	}
+	private LoggerFactory() {}
 
 	public synchronized static Logger createLogger(Class theClass)
 	{
@@ -72,19 +70,24 @@ public class LoggerFactory
 	public synchronized static Logger createLogger(String name)
 	{
 		Category thisCategory = Category.getInstance(name);
+
 		if (logToConsole)
 		{
 			if (consoleAppender == null)
 			{
 				consoleAppender = new ConsoleAppender(layout);
 			}
+
 			thisCategory.addAppender(consoleAppender);
 		}
+
 		if (logToGui)
 		{
 			thisCategory.addAppender(LogDisplay.getInstance());
 		}
+
 		SupremicaCategory supremicaCategory = new SupremicaCategory(thisCategory);
+
 		return supremicaCategory;
 	}
 
@@ -93,5 +96,4 @@ public class LoggerFactory
 		logToGui = SupremicaProperties.logToGUI();
 		logToConsole = SupremicaProperties.logToConsole();
 	}
-
 }

@@ -145,10 +145,8 @@ public final class SupremicaProperties
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false");
 		setProperty(VERBOSE_MODE, "false");
 		setProperty(SUPERUSER_IDENTITY, "ESS030");
-
 		setProperty(LOG_TO_CONSOLE, "false");
 		setProperty(LOG_TO_GUI, "false");
-
 		setProperty(ALLOW_SUPERUSER_LOGIN, "true");
 		setProperty(SYNC_FORBID_UNCON_STATES, "true");
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true");
@@ -392,7 +390,6 @@ public final class SupremicaProperties
 	{
 		return toBoolean(wp.getProperty(ALLOW_SUPERUSER_LOGIN));
 	}
-
 
 	public static boolean logToConsole()
 	{

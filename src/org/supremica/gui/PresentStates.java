@@ -132,7 +132,7 @@ class PresentStatesFrame
 	}
 }
 
-//
+// 
 class NoStatesFoundFrame
 	extends JFrame
 {
@@ -147,7 +147,7 @@ class NoStatesFoundFrame
 	}
 }
 
-//
+// 
 class UserInterruptFrame
 	extends JFrame
 {
@@ -158,7 +158,7 @@ class UserInterruptFrame
 	}
 }
 
-//
+// 
 public class PresentStates
 {
 	private JFrame frame = null;

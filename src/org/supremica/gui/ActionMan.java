@@ -1675,7 +1675,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	//
+	// 
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);

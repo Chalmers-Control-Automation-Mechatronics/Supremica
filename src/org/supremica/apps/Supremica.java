@@ -85,7 +85,6 @@ public class Supremica
 
 	public static void startSupremica(String arg)
 	{
-
 		doSplash();
 
 		workbench = new org.supremica.gui.Supremica(arg);
@@ -129,7 +128,6 @@ public class Supremica
 
 		PreLoader preLoader = PreLoader.getPreLoader();
 	}
-
 
 	// Main method
 	public static void main(String[] args)

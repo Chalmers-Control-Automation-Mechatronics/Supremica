@@ -73,7 +73,6 @@ public class SupremicaServer
 	}
 
 	private static Logger logger = LoggerFactory.createLogger(SupremicaServer.class);
-
 	private AutomatonContainer theAutomatonContainer = null;
 	private Server xmlRpcServer = null;
 
