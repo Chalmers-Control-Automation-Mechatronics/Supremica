@@ -596,10 +596,11 @@
 			<pathelement location="${dist}/SupremicaLib.jar" />
 			<pathelement path="${java.class.path}" />
 		</classpath>
+<!--
 		<assertions>
 			 <enable/>
 		</assertions>		 
-
+-->
 	</java>
 </target>
 

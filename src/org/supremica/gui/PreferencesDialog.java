@@ -109,8 +109,10 @@ public class PreferencesDialog
 		theSimulationPanel = new SimulationPanel(this);
 		theTabbedPanel.add("Simulation", theSimulationPanel);
 
+		/*
 		theRobotCoordinationPanel = new RobotCoordinationPanel(this);
 		theTabbedPanel.add("Robot coordination", theRobotCoordinationPanel);
+		*/
 
 		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
 		{
