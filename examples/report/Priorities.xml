@@ -72,4 +72,42 @@
 		<Transition source="p3" dest="p4" event="c"/>
 	</Transitions>
 </Automaton>
+<Automaton name="A" type="Plant">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b"/>
+	</Events>
+	<States>
+		<State id="a1" initial="true" accepting="true" cost="0"/>
+		<State id="a2" accepting="true" cost="0"/>
+		<State id="a3" accepting="true" cost="0"/>
+		<State id="a4" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="a1" dest="a2" event="a"/>
+		<Transition source="a1" dest="a1" event="b"/>
+		<Transition source="a2" dest="a3" event="a"/>
+		<Transition source="a3" dest="a4" event="a"/>
+		<Transition source="a4" dest="a4" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B" type="Plant">
+	<Events>
+		<Event id="a" label="a"/>
+		<Event id="b" label="b" prioritized="false"/>
+	</Events>
+	<States>
+		<State id="b1" initial="true" accepting="true" cost="0"/>
+		<State id="b2" accepting="true" cost="0"/>
+		<State id="b3" accepting="true" cost="0"/>
+		<State id="b4" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="b1" dest="b2" event="a"/>
+		<Transition source="b2" dest="b2" event="b"/>
+		<Transition source="b2" dest="b3" event="a"/>
+		<Transition source="b3" dest="b4" event="a"/>
+		<Transition source="b3" dest="b3" event="b"/>
+	</Transitions>
+</Automaton>
 </Automata>
