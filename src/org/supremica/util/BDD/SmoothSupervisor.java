@@ -71,6 +71,23 @@ public class SmoothSupervisor extends DisjSupervisor {
 		return r;
 	}
 
+	/**
+	 * setup data needed for the delay operations (if any).
+	 * called during start of a search.
+	 *
+	 */
+	protected void init_delay() {
+	}
+
+
+	/**
+	 * cleanup data used in the delay operations (if any).
+	 * called after a search ends
+	 *
+	 */
+	protected void cleanup_delay() {
+	}
+
     // ------------------------------------------------------------------------
     protected void computeReachables() {
 		// statistic stuffs
@@ -78,6 +95,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+		init_delay();
 
 		SizeWatch.setOwner("SmoothSupervisor.computeReachables");
 		int i_all = manager.and(plant.getI(), spec.getI());
@@ -126,18 +144,9 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 				r_all = delay_forward(gf, clusters[a], r_all); // do the 'delay' thing...
 			}
-
-			int r_all_pp, front_s, front_sp;
-
-			do {
-			r_all_pp = r_all;
-			int front = dp.image(r_all);
-			r_all = manager.orTo(r_all, front);
-			manager.deref(front);
-			if(gf != null)    gf.add( r_all );
-
-			} while(r_all != r_all_pp);
+			r_all = dp.forward(gf, r_all);
 		}
+
 
 
 
@@ -149,6 +158,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 		bdd_reachables = r_all;
 		SizeWatch.report(r_all, "Qr");
 		dp.cleanup();
+		cleanup_delay();
 		if(gf != null) gf.stopTimer();
 		timer.report("Forward reachables found ("+ toString() + ")");
 		// SizeWatch.report(r_all, "R");
@@ -160,6 +170,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
+		init_delay();
 
 		SizeWatch.setOwner("SmoothSupervisor.computeCoReachables");
 
@@ -194,16 +205,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 				if(gf != null) gf.mark( clusters[a].toString() );
 				r_all = delay_backward(gf, clusters[a], r_all); // do the 'delay' thing...
 			}
-			int r_all_pp, front_s, front_sp;
-
-			do {
-			r_all_pp = r_all;
-			int front = dp.preImage(r_all);
-			r_all = manager.orTo(r_all, front);
-			manager.deref(front);
-			if(gf != null)    gf.add(r_all);
-
-			} while(r_all != r_all_pp);
+			r_all = dp.backward(gf, r_all);
 		}
 
 
@@ -221,6 +223,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 		timer.report("Co-reachables found ("+ toString() +")");
 
 		dp.cleanup();
+		cleanup_delay();
 		// SizeWatch.report(bdd_coreachables,"Coreachables");
     }
 

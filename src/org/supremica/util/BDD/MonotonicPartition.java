@@ -6,7 +6,7 @@ package org.supremica.util.BDD;
 public class MonotonicPartition {
 
     private int max_size, curr;
-    private int [] delta, permutation;
+    private int [] delta;
     private JBDD manager;
     private int cube, cubep, s2sp,sp2s;
 
@@ -21,8 +21,6 @@ public class MonotonicPartition {
 	this.sp2s     = manager.getPermuteSp2S();
 
 	this.delta = new int[max_size];
-	this.permutation = new int[max_size];
-	for(int i = 0; i < max_size; i++) permutation [i] = i;
     }
 
     public void cleanup() {
@@ -72,15 +70,12 @@ public class MonotonicPartition {
 
     /**
      * 1-step forward rechables.
-     * We use the permutation table to change the order of clusters each time
      */
     public int image(int q_k) {
-		Util.permutate(permutation, curr);
 
 	int front = manager.getZero(); manager.ref(front);
 	for(int i = 0; i < curr; i++) {
-		int a = permutation [i];
-	    int tmp = manager.relProd(delta[a], q_k, cube);
+	    int tmp = manager.relProd(delta[i], q_k, cube);
 	    front = manager.orTo(front, tmp);
 	    manager.deref(tmp);
 	}
@@ -94,15 +89,12 @@ public class MonotonicPartition {
      * Note: q_k must be in S' _not_ in S'!<br>
      * the returned BDD is also in S'
      *
-     * We use the permutation table to change the order of clusters each time
      */
     public int preImage(int q_k) {
-		Util.permutate(permutation, curr);
 
 	int front = manager.getZero(); manager.ref(front);
 	for(int i = 0; i < curr; i++) {
-		int a = permutation [i];
-	    int tmp = manager.relProd(delta[a], q_k, cubep);
+	    int tmp = manager.relProd(delta[i], q_k, cubep);
 	    front = manager.orTo(front, tmp);
 	    manager.deref(tmp);
 	}
@@ -112,4 +104,39 @@ public class MonotonicPartition {
 	return q_kplus1;
     }
 
+
+	// ------------------------------------------------------------------
+
+	 /** forward rechable fixedpoint */
+	 // XXX: can be much faster by moving out the permutations!
+	public int forward(GrowFrame gf, int q_k) {
+		int q_k_minus1;
+		do {
+			q_k_minus1 = q_k;
+			int front = image(q_k_minus1);
+			q_k = manager.orTo(q_k_minus1, front);
+			manager.deref(front);
+			if(gf != null)    gf.add( q_k );
+		} while(q_k_minus1 != q_k);
+
+
+		return q_k;
+	}
+
+
+	 /** backward rechable fixedpoint */
+	 // XXX: can be much faster by moving out the permutations!
+	public int backward(GrowFrame gf, int q_k) {
+		int q_k_minus1;
+		do {
+			q_k_minus1 = q_k;
+			int front = preImage(q_k_minus1);
+			q_k = manager.orTo(q_k_minus1, front);
+			manager.deref(front);
+			if(gf != null)    gf.add( q_k );
+		} while(q_k_minus1 != q_k);
+
+
+		return q_k;
+	}
 }
