@@ -249,5 +249,6 @@ public class TestAlgo {
 }
 
 /*
-$log$
+ $Log: not supported by cvs2svn $
+
 */
