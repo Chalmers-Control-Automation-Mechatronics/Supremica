@@ -49,19 +49,13 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.io.*;
-
 import java.util.*;
-
 import org.supremica.automata.*;
-
 
 public class AutomatonToDot
 	implements AutomataSerializer
 {
-
 	private Automaton aut;
 	private boolean leftToRight = false;
 	private boolean withLabel = true;
@@ -100,7 +94,6 @@ public class AutomatonToDot
 
 	private String getColor(State s)
 	{
-
 		if (!useColors)
 		{
 			return "";
@@ -122,7 +115,6 @@ public class AutomatonToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
 

@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 
 public class GCStepExceptionOutPort
 	extends JGoPort
 {
-
 	public GCStepExceptionOutPort()
 	{
-
 		super();
 
 		setSelectable(false);
@@ -25,7 +19,6 @@ public class GCStepExceptionOutPort
 
 	public boolean validLink(JGoPort to)
 	{
-
 		boolean valid1 = super.validLink(to);
 		boolean valid2 = ((to.getParent() instanceof ExceptionTransition));
 

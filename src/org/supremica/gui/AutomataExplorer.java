@@ -49,26 +49,18 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 
 public class AutomataExplorer
 	extends JFrame
 	implements AutomatonListener
 {
-
 	private Automata theAutomata;
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;
@@ -81,7 +73,6 @@ public class AutomataExplorer
 	public AutomataExplorer(Automata theAutomata)
 		throws Exception
 	{
-
 		this.theAutomata = theAutomata;
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), WorkbenchProperties.syncForbidUncontrollableStates(), WorkbenchProperties.syncExpandForbiddenStates(), false, false, false, WorkbenchProperties.verboseMode());
@@ -91,7 +82,7 @@ public class AutomataExplorer
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
-		int[] initialState = new int[this.theAutomata.size() + 1];		// + 1 status field
+		int[] initialState = new int[this.theAutomata.size() + 1];    // + 1 status field
 		Iterator autIt = this.theAutomata.iterator();
 
 		while (autIt.hasNext())
@@ -137,7 +128,6 @@ public class AutomataExplorer
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		addWindowListener(new WindowAdapter()
 		{
-
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
@@ -167,7 +157,6 @@ public class AutomataExplorer
 
 	private void initMenubar()
 	{
-
 		setJMenuBar(menuBar);
 
 		// File
@@ -184,7 +173,6 @@ public class AutomataExplorer
 		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
@@ -234,7 +222,6 @@ public class AutomataExplorer
 class AutomataStateViewer
 	extends JPanel
 {
-
 	private Automata theAutomata;
 	private AutomataSynchronizerHelper helper;
 	private int[] currState;
@@ -249,7 +236,6 @@ class AutomataStateViewer
 
 	public AutomataStateViewer(AutomataSynchronizerHelper helper)
 	{
-
 		setLayout(new BorderLayout());
 
 		theAutomata = helper.getAutomata();
@@ -278,7 +264,6 @@ class AutomataStateViewer
 
 	private void setCurrState(int[] newState, boolean isUndo)
 	{
-
 		if (!isUndo)
 		{
 			if (currState != null)
@@ -296,7 +281,6 @@ class AutomataStateViewer
 
 	public void goToInitialState()
 	{
-
 		prevStates.clear();
 
 		currState = null;
@@ -307,7 +291,6 @@ class AutomataStateViewer
 
 	public void undoState()
 	{
-
 		if (prevStates.size() > 0)
 		{
 			int[] newState = (int[]) prevStates.removeLast();
@@ -324,7 +307,6 @@ class AutomataStateViewer
 
 	public void redoState()
 	{
-
 		if (nextStates.size() > 0)
 		{
 			int[] newState = (int[]) nextStates.removeFirst();
@@ -358,7 +340,6 @@ class AutomataStateViewer
 class AutomataEventList
 	extends JPanel
 {
-
 	private boolean forward;
 	private boolean showStateId = false;
 	private Automata theAutomata;
@@ -369,7 +350,6 @@ class AutomataEventList
 
 	public AutomataEventList(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper, boolean forward)
 	{
-
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
@@ -401,10 +381,8 @@ class AutomataEventList
 		add(scrollPanel, BorderLayout.CENTER);
 		theList.addMouseListener(new MouseAdapter()
 		{
-
 			public void mouseClicked(MouseEvent e)
 			{
-
 				if (e.getClickCount() == 2)
 				{
 					int index = theList.locationToIndex(e.getPoint());
@@ -427,7 +405,6 @@ class AutomataEventList
 
 	public void setCurrState(int[] currState)
 	{
-
 		this.currState = currState;
 
 		theList.clearSelection();
@@ -448,7 +425,6 @@ class AutomataEventList
 class AutomataEventListModel
 	extends AbstractListModel
 {
-
 	private int[] currState;
 
 	// / private ArrayList currArcs = new ArrayList();
@@ -462,7 +438,6 @@ class AutomataEventListModel
 
 	public AutomataEventListModel(AutomataSynchronizerHelper helper, boolean forward)
 	{
-
 		this.forward = forward;
 		this.helper = helper;
 		this.theAutomata = helper.getAutomata();
@@ -471,7 +446,6 @@ class AutomataEventListModel
 
 	public void setCurrState(int[] currState)
 	{
-
 		this.currState = currState;
 
 		update();
@@ -484,7 +458,6 @@ class AutomataEventListModel
 
 	public void update()
 	{
-
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 
 		if (forward)
@@ -589,7 +562,6 @@ class AutomataEventListModel
 
 	public int[] getStateAt(int index)
 	{
-
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 
 		return onlineSynchronizer.doTransition(events[index]);
@@ -613,7 +585,6 @@ class AutomataEventListModel
 class AutomataStateDisplayer
 	extends JPanel
 {
-
 	private AutomataStateViewer stateViewer;
 	private Automata theAutomata;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
@@ -626,12 +597,11 @@ class AutomataStateDisplayer
 
 	public AutomataStateDisplayer(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper)
 	{
-
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
 		this.theAutomata = helper.getAutomata();
-		this.helper = helper;		// New!
+		this.helper = helper;    // New!
 
 		JLabel header = new JLabel("Current composite state");
 
@@ -665,7 +635,6 @@ class AutomataStateDisplayer
 
 	public void setCurrState(int[] currState)
 	{
-
 		helper.addStatus(currState);
 
 		if (!helper.getCoExecuter().isControllable())
@@ -692,7 +661,6 @@ class AutomataStateDisplayer
 class AutomataExplorerController
 	extends JPanel
 {
-
 	private AutomataStateViewer stateViewer;
 	private Automata theAutomata;
 	private JButton undoButton;
@@ -700,7 +668,6 @@ class AutomataExplorerController
 
 	public AutomataExplorerController(AutomataStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
 	{
-
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
@@ -720,7 +687,6 @@ class AutomataExplorerController
 		add(resetButton, BorderLayout.CENTER);
 		undoButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				undo_actionPerformed(e);
@@ -728,7 +694,6 @@ class AutomataExplorerController
 		});
 		redoButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				redo_actionPerformed(e);
@@ -736,7 +701,6 @@ class AutomataExplorerController
 		});
 		resetButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				reset_actionPerformed(e);
@@ -746,7 +710,6 @@ class AutomataExplorerController
 
 	public void reset_actionPerformed(ActionEvent e)
 	{
-
 		stateViewer.goToInitialState();
 
 		// stateViewer.initialize();
@@ -771,7 +734,6 @@ class AutomataExplorerController
 
 class AutomataExplorerHelper
 {
-
 	private static int[] initialState;
 
 	public static void setInitialState(int[] state)

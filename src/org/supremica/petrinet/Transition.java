@@ -49,14 +49,10 @@
  */
 package org.supremica.petrinet;
 
-
-
 import java.util.*;
-
 
 public class Transition
 {
-
 	private List prevPlaces = new LinkedList();
 	private List nextPlaces = new LinkedList();
 	private List prevInhibitorPlaces = new LinkedList();
@@ -77,7 +73,6 @@ public class Transition
 
 	public Transition(Transition orgTransition)
 	{
-
 		identity = orgTransition.identity;
 		label = orgTransition.label;
 		controllable = orgTransition.controllable;
@@ -150,7 +145,6 @@ public class Transition
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("Transition: " + identity + "\n");

@@ -49,29 +49,22 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
 import org.supremica.automata.algorithms.AutomataSynchronizer;
 import org.supremica.automata.algorithms.Stoppable;
-
 import java.util.*;
-
 import java.awt.event.*;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
-
 import javax.swing.*;
-
 
 public class ExecutionDialog
 	extends JDialog
 	implements ActionListener, Runnable
 {
-
 	private List executers;
 	private JPanel contentPanel = null;
 	private JLabel operationLabel = null;
@@ -97,9 +90,8 @@ public class ExecutionDialog
 	 * Creates dialog box for canceling the Stoppable classes in the supplied List.
 	 * @see Stoppable
 	 */
-	public ExecutionDialog(	/* Supremica workbench */Gui workbench, String title, List executers)
+	public ExecutionDialog( /* Supremica workbench */Gui workbench, String title, List executers)
 	{
-
 		super(workbench.getFrame());
 
 		// this.workbench = workbench;
@@ -163,7 +155,6 @@ public class ExecutionDialog
 
 	public void setMode(ExecutionDialogMode mode)
 	{
-
 		currentMode = mode;
 
 		updateMode();
@@ -180,7 +171,6 @@ public class ExecutionDialog
 
 	public void setProgress(int progressValue)
 	{
-
 		this.progressValue = progressValue;
 
 		update();
@@ -188,7 +178,6 @@ public class ExecutionDialog
 
 	public void setValue(int value)
 	{
-
 		this.value = value;
 
 		update();
@@ -201,7 +190,6 @@ public class ExecutionDialog
 
 	private void updateMode()
 	{
-
 		newMode = true;
 
 		update();
@@ -257,7 +245,7 @@ public class ExecutionDialog
 				currCenterPanel = infoPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.hide)
-			{		// Do nothing
+			{    // Do nothing
 			}
 
 			newMode = false;
@@ -284,7 +272,6 @@ public class ExecutionDialog
 
 	public void actionPerformed(ActionEvent event)
 	{
-
 		Object source = event.getSource();
 
 		if (source == stopButton)
@@ -296,7 +283,7 @@ public class ExecutionDialog
 					((Stoppable) exIt.next()).requestStop();
 				}
 
-				executers = null;		// Helping the garbage collector...
+				executers = null;    // Helping the garbage collector...
 			}
 
 			setMode(ExecutionDialogMode.hide);

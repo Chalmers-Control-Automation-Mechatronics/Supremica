@@ -11,21 +11,14 @@
  */
 package org.jgrafchart;
 
-
-
 import java.awt.*;
-
 import javax.swing.*;
-
 import com.nwoods.jgo.JGoText;
-
 import java.awt.event.*;
-
 
 public class TextPropsDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	javax.swing.JButton OKButton = new javax.swing.JButton();
 	javax.swing.JButton CancelButton = new javax.swing.JButton();
@@ -73,7 +66,6 @@ public class TextPropsDialog
 
 	public TextPropsDialog(Frame frame, String title, boolean modal, JGoText obj)
 	{
-
 		super(frame, title, modal);
 
 		try
@@ -99,11 +91,9 @@ public class TextPropsDialog
 	void jbInit()
 		throws Exception
 	{
-
 		panel1.setLayout(null);
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OKButton_actionPerformed(e);
@@ -111,7 +101,6 @@ public class TextPropsDialog
 		});
 		CancelButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				CancelButton_actionPerformed(e);
@@ -119,7 +108,6 @@ public class TextPropsDialog
 		});
 		textColorButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				textColorButton_actionPerformed(e);
@@ -127,7 +115,6 @@ public class TextPropsDialog
 		});
 		backgroundColorButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				backgroundColorButton_actionPerformed(e);
@@ -135,7 +122,6 @@ public class TextPropsDialog
 		});
 		OKButton.addKeyListener(new java.awt.event.KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent e)
 			{
 				OKButton_keyPressed(e);
@@ -143,7 +129,6 @@ public class TextPropsDialog
 		});
 		CancelButton.addKeyListener(new java.awt.event.KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent e)
 			{
 				CancelButton_keyPressed(e);
@@ -276,7 +261,6 @@ public class TextPropsDialog
 
 	void UpdateDialog()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -287,7 +271,7 @@ public class TextPropsDialog
 
 		heightField.setText(String.valueOf(rect.height));
 
-		Point pt = myObject.getLocation();		// dependent on alignment
+		Point pt = myObject.getLocation();    // dependent on alignment
 
 		xField.setText(String.valueOf(pt.x));
 		yField.setText(String.valueOf(pt.y));
@@ -346,7 +330,6 @@ public class TextPropsDialog
 
 	void UpdateControl()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -354,7 +337,7 @@ public class TextPropsDialog
 
 		Point newpt = new Point(Integer.parseInt(xField.getText()), Integer.parseInt(yField.getText()));
 
-		myObject.setLocation(newpt);	// do this before we change the alignment
+		myObject.setLocation(newpt);    // do this before we change the alignment
 		myObject.setFontSize(Integer.parseInt(fontSizeField.getText()));
 		myObject.setVisible(visibleBox.isSelected());
 		myObject.setSelectable(selectableBox.isSelected());
@@ -445,7 +428,6 @@ public class TextPropsDialog
 	 */
 	public void setVisible(boolean b)
 	{
-
 		if (b)
 		{
 			Rectangle bounds = getParent().getBounds();
@@ -464,11 +446,10 @@ public class TextPropsDialog
 
 	void OnOK()
 	{
-
 		try
 		{
 			UpdateControl();
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
@@ -480,17 +461,15 @@ public class TextPropsDialog
 
 	void OnCancel()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
 
 	void textColorButton_actionPerformed(ActionEvent e)
 	{
-
 		Color newcolor = JColorChooser.showDialog(this, "Foreground Color", myTextColor);
 
 		if (newcolor != null)
@@ -501,7 +480,6 @@ public class TextPropsDialog
 
 	void backgroundColorButton_actionPerformed(ActionEvent e)
 	{
-
 		Color newcolor = JColorChooser.showDialog(this, "Foreground Color", myBkColor);
 
 		if (newcolor != null)
@@ -512,7 +490,6 @@ public class TextPropsDialog
 
 	void OKButton_keyPressed(KeyEvent e)
 	{
-
 		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
 		{
 			OnOK();
@@ -525,7 +502,6 @@ public class TextPropsDialog
 
 	void CancelButton_keyPressed(KeyEvent e)
 	{
-
 		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
 		{
 			OnCancel();

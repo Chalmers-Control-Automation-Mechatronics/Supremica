@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 public class ParallelJoin
 	extends GrafcetObject
 	implements GCIdent
 {
-
 	public JGoStroke myTopLine = null;
 	public JGoStroke myBottomLine = null;
 	public JGoStroke myInline1 = null;
@@ -30,7 +24,6 @@ public class ParallelJoin
 
 	public ParallelJoin(Point loc)
 	{
-
 		super();
 
 		setSize(280, 20);
@@ -103,7 +96,6 @@ public class ParallelJoin
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		ParallelJoin newobj = (ParallelJoin) super.copyObject(env);
 
 		return newobj;
@@ -111,7 +103,6 @@ public class ParallelJoin
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		ParallelJoin newobj = (ParallelJoin) newarea;
 
 		newobj.myTopLine = (JGoStroke) myTopLine.copyObject(env);
@@ -160,7 +151,6 @@ public class ParallelJoin
 
 	public void layoutChildren()
 	{
-
 		if (myTopLine == null)
 		{
 			return;
@@ -236,7 +226,6 @@ public class ParallelJoin
 
 	public void compileUpwards(GCTransition t)
 	{
-
 		JGoListPosition pos = myInPort1.getFirstLinkPos();
 
 		while (pos != null)

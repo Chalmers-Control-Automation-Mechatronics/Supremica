@@ -49,10 +49,7 @@
  */
 package org.supremica.petrinet;
 
-
-
 import java.util.*;
-
 
 /**
  * This is a Petri net class
@@ -85,7 +82,6 @@ import java.util.*;
  **/
 public class PetriNet
 {
-
 	private HashMap places = new HashMap();
 	private List orderedPlaces = new LinkedList();
 	private HashMap transitions = new HashMap();
@@ -110,7 +106,6 @@ public class PetriNet
 	public void addPlace(Place place)
 		throws Exception
 	{
-
 		String id = place.getIdentity();
 
 		if (id == null)
@@ -131,7 +126,6 @@ public class PetriNet
 	public void addTransition(Transition transition)
 		throws Exception
 	{
-
 		String id = transition.getIdentity();
 
 		if (id == null)
@@ -206,7 +200,6 @@ public class PetriNet
 	public PetriNet createCopy(String newIdentity)
 		throws Exception
 	{
-
 		PetriNet newPetriNet = new PetriNet(newIdentity);
 
 		// Create copies of all places
@@ -276,7 +269,6 @@ public class PetriNet
 
 	public boolean hasInhibitorArcs()
 	{
-
 		Iterator transitionIt = transitionIterator();
 
 		while (transitionIt.hasNext())
@@ -294,7 +286,6 @@ public class PetriNet
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("PetriNet: " + identity + "\n");

@@ -1,20 +1,13 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 import org.jgrafchart.Transitions.*;
-
 
 public class GenericTransition
 	extends GrafcetObject
 {
-
 	public SimpleNode node;
 
 	// public JGoText myLabel = null;

@@ -55,7 +55,7 @@ indentLabels                              = true
 minimumCommentIndent                      = 4
 
 indentLeadingsByTabs                      = true
-indentCommentsByTabs                      = true
+indentCommentsByTabs                      = false
 indentDeclarationsByTabs                  = false
 indentAssignmentsByTabs                   = false
 
@@ -228,8 +228,8 @@ neverFormatFooter                         = false
 
 keepBlankLines                            = 0
 
-minLinesToInsertBlankLineInClasses        = 3
-minLinesToInsertBlankLineInMethods        = 3
+minLinesToInsertBlankLineInClasses        = infinite
+minLinesToInsertBlankLineInMethods        = infinite
 
 
 ### Separation -- Separate
@@ -239,7 +239,7 @@ allowBreakSeparatedFromCaseBlock          = false
 blankLinesBetweenCaseBlocks               = 1
 blankLinesBetweenChunks                   = 1
 
-comparableImportDepth                     = 2
+comparableImportDepth                     = 0
 blankLinesToSeparateImports               = 1
 
 blankLinesBetweenClassInterface           = 2
@@ -250,7 +250,7 @@ blankLinesBetweenClassInterface           = 2
 blankLinesAfterDeclarations               = 1
 blankLinesAfterMethods                    = 1
 blankLinesAfterClasses                    = 1
-blankLinesAfterInterfaces                 = 1
+blankLinesAfterInterfaces                 = 0
 
 blankLinesBeforeJavaDocComments           = 1
 blankLinesAfterJavaDocComments            = 0
@@ -258,15 +258,15 @@ blankLinesAfterJavaDocComments            = 0
 blankLinesBeforeBlockComments             = 1
 blankLinesAfterBlockComments              = 0
 
-blankLinesBeforeSingleLineComments        = 1
+blankLinesBeforeSingleLineComments        = 0
 blankLinesAfterSingleLineComments         = 0
 
 blankLinesBeforeEndOfLineComments         = 1
 blankLinesAfterEndOfLineComments          = 0
 
 blankLinesAfterSwitch                     = 1
-blankLinesAfterPackage                    = 3
-blankLinesAfterLastImport                 = 2
+blankLinesAfterPackage                    = 1
+blankLinesAfterLastImport                 = 1
 
 
 

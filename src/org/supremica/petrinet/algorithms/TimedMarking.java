@@ -49,21 +49,16 @@
  */
 package org.supremica.petrinet.algorithms;
 
-
-
 import org.supremica.petrinet.*;
-
 
 public class TimedMarking
 	extends Marking
 {
-
 	private int[] marking;
-	private int[] remainingTime;	// In current operation
+	private int[] remainingTime;    // In current operation
 	private int elapsedTime;
 	private static int nbrOfProductPlaces;
 	private static PetriNet pn;
-
 	/* Use one-product relaxation for this estimate */
 
 	/*

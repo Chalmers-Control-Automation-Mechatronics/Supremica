@@ -4,18 +4,11 @@
  */
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 import java.lang.*;
-
 import org.jgrafchart.Transitions.*;
-
 
 /**
  * A Step is an Area containing a Rectangle and two Ports and
@@ -25,7 +18,6 @@ public class GCTransition
 	extends GenericTransition
 	implements GCIdent
 {
-
 	public GCTransition()
 	{
 		super();
@@ -33,7 +25,6 @@ public class GCTransition
 
 	public GCTransition(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(30, 5);
@@ -127,7 +118,6 @@ public class GCTransition
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		GCTransition newobj = (GCTransition) super.copyObject(env);
 
 		return newobj;
@@ -135,7 +125,6 @@ public class GCTransition
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		GCTransition newobj = (GCTransition) newarea;
 
 		newobj.condition = condition;
@@ -186,7 +175,6 @@ public class GCTransition
 	// this area's natural "location" is the center of the rectangle
 	public Point getLocation(Point p)
 	{
-
 		if (myRectangle != null)
 		{
 			return myRectangle.getSpotLocation(TopCenter, p);
@@ -199,7 +187,6 @@ public class GCTransition
 
 	public void setLocation(int x, int y)
 	{
-
 		if (myRectangle != null)
 		{
 			myRectangle.setSpotLocation(TopCenter, x, y);
@@ -223,7 +210,6 @@ public class GCTransition
 	 */
 	public void layoutChildren()
 	{
-
 		if (myRectangle == null)
 		{
 			return;
@@ -367,7 +353,6 @@ public class GCTransition
 
 	public void removeSucceedingStep(GCStep s)
 	{
-
 		if (succeedingSteps.contains(s))
 		{
 			succeedingSteps.remove(succeedingSteps.indexOf(s));
@@ -381,7 +366,6 @@ public class GCTransition
 
 	public void removePrecedingStep(GCStep s)
 	{
-
 		if (precedingSteps.contains(s))
 		{
 			precedingSteps.remove(precedingSteps.indexOf(s));
@@ -407,7 +391,6 @@ public class GCTransition
 	 */
 	public void compileStructure()
 	{
-
 		precedingSteps.clear();
 		succeedingSteps.clear();
 
@@ -516,7 +499,6 @@ public class GCTransition
 
 	public void testAndFire()
 	{
-
 		GrafcetObject s;
 		boolean ok = false;
 
@@ -586,7 +568,6 @@ public class GCTransition
 
 	public void initialize()
 	{
-
 		condition = node.evaluate();
 		oldCondition = condition;
 

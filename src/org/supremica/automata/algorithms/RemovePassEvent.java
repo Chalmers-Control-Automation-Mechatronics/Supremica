@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 import org.supremica.automata.*;
-
 
 public class RemovePassEvent
 {
-
 	private RemovePassEvent() {}
 
 	/**
@@ -69,12 +64,11 @@ public class RemovePassEvent
 	public static void execute(Automaton theAutomaton)
 		throws Exception
 	{
-
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		Iterator stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())
-		{								// Find a state with an outgoing pass event
+		{                               // Find a state with an outgoing pass event
 			State currState = (State) stateIt.next();
 			Iterator arcIt = currState.safeOutgoingArcsIterator();
 
@@ -85,7 +79,7 @@ public class RemovePassEvent
 				Event currEvent = theAlphabet.getEventWithId(currEventId);
 
 				if (currEvent.getLabel().equals("pass"))
-				{						// A state with outgoing pass event is found
+				{                       // A state with outgoing pass event is found
 
 					// Copy all uncontrollable arcs
 					State currToState = currArc.getToState();
@@ -104,7 +98,7 @@ public class RemovePassEvent
 						}
 					}
 
-					currArc.clear();	// Remove the pass event
+					currArc.clear();    // Remove the pass event
 
 					// We can do a break here?
 				}

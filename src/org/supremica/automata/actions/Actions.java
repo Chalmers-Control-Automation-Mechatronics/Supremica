@@ -49,11 +49,8 @@
  */
 package org.supremica.automata.actions;
 
-
-
 public interface Actions
 {
-
 	public String getType();
 
 	public String getDescription();

@@ -1,10 +1,7 @@
 package helma.xmlrpc;
 
-
-
 import java.io.InputStream;
 import java.io.IOException;
-
 
 // This class is borrowed from Apache JServ
 class ServerInputStream
@@ -28,7 +25,6 @@ class ServerInputStream
 	public int read()
 		throws IOException
 	{
-
 		if (available > 0)
 		{
 			available--;
@@ -52,7 +48,6 @@ class ServerInputStream
 	public int read(byte b[], int off, int len)
 		throws IOException
 	{
-
 		if (available > 0)
 		{
 			if (len > available)
@@ -86,7 +81,6 @@ class ServerInputStream
 	public long skip(long n)
 		throws IOException
 	{
-
 		long skip = in.skip(n);
 
 		if (available > 0)

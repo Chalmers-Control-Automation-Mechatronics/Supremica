@@ -4,19 +4,12 @@
  */
 package org.jgrafchart;
 
-
-
 import java.applet.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import java.io.*;
-
 import com.nwoods.jgo.*;
-
 import org.jgrafchart.GCStep;
 import org.jgrafchart.GCTransition;
 import org.jgrafchart.DigitalIn;
@@ -24,24 +17,19 @@ import org.jgrafchart.DigitalOut;
 import org.jgrafchart.DigitalOut0;
 import org.jgrafchart.DigitalOut1;
 import org.jgrafchart.AppAction;
-
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
-
 import org.jgrafchart.Transitions.*;
 import org.jgrafchart.Actions.*;
-
 import java.util.*;
-
 
 /**
  * Two views.
  */
 public class Basic2GC
 	extends JFrame
-{		// Constructor
-
+{    // Constructor
 	public Basic2GC()
 	{
 
@@ -64,10 +52,8 @@ public class Basic2GC
 		setSize(1000, 1000);
 		addWindowListener(new WindowAdapter()
 		{
-
 			public void windowClosing(java.awt.event.WindowEvent event)
 			{
-
 				Object object = event.getSource();
 
 				if (object == this)
@@ -146,7 +132,6 @@ public class Basic2GC
 
 	AppAction CompileAction = new AppAction("Compile", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			compileAction();
@@ -164,7 +149,6 @@ public class Basic2GC
 	// &&  !getView().executing && getView().compiledOnce;}};
 	AppAction ExecuteAction = new AppAction("Execute", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			executeAction();
@@ -177,7 +161,6 @@ public class Basic2GC
 	};
 	AppAction StopAction = new AppAction("Stop", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			stopAction();
@@ -190,7 +173,6 @@ public class Basic2GC
 	};
 	AppAction DebugAction = new AppAction("Debug", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			debugAction();
@@ -198,7 +180,6 @@ public class Basic2GC
 	};
 	AppAction NewAction = new AppAction("New", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			newAction();
@@ -211,7 +192,6 @@ public class Basic2GC
 	};
 	AppAction OpenAction = new AppAction("Open", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			openAction();
@@ -224,7 +204,6 @@ public class Basic2GC
 	};
 	AppAction PrintAction = new AppAction("Print", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().print();
@@ -232,7 +211,6 @@ public class Basic2GC
 	};
 	AppAction SaveAction = new AppAction("Save", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			saveAction();
@@ -245,7 +223,6 @@ public class Basic2GC
 	};
 	AppAction SaveAsAction = new AppAction("Save As", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			saveAsAction();
@@ -258,7 +235,6 @@ public class Basic2GC
 	};
 	AppAction PropertiesAction = new AppAction("Properties", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			propertiesAction();
@@ -271,7 +247,6 @@ public class Basic2GC
 	};
 	AppAction ExitAction = new AppAction("Exit", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			exitAction();
@@ -284,7 +259,6 @@ public class Basic2GC
 	};
 	AppAction ZoomOutAction = new AppAction("Zoom out", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			zoomOutAction();
@@ -297,7 +271,6 @@ public class Basic2GC
 	};
 	AppAction ZoomInAction = new AppAction("Zoom in", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			zoomInAction();
@@ -310,7 +283,6 @@ public class Basic2GC
 	};
 	AppAction ZoomNormalAction = new AppAction("Zoom normal size", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			zoomNormalAction();
@@ -318,7 +290,6 @@ public class Basic2GC
 	};
 	AppAction ZoomToFitAction = new AppAction("Zoom to fit", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			zoomToFitAction();
@@ -326,7 +297,6 @@ public class Basic2GC
 	};
 	AppAction ZoomCutAction = new AppAction("Cut", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			cutAction();
@@ -339,7 +309,6 @@ public class Basic2GC
 	};
 	AppAction ZoomCopyAction = new AppAction("Copy", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			copyAction();
@@ -352,7 +321,6 @@ public class Basic2GC
 	};
 	AppAction ZoomPasteAction = new AppAction("Paste", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			pasteAction();
@@ -360,7 +328,6 @@ public class Basic2GC
 	};
 	AppAction ShowActionBlockAction = new AppAction("Show Action Block", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			showActionBlockAction(e);
@@ -373,7 +340,6 @@ public class Basic2GC
 	};
 	AppAction HideActionBlockAction = new AppAction("Hide Action Block", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			hideActionBlockAction(e);
@@ -386,7 +352,6 @@ public class Basic2GC
 	};
 	AppAction TransitionEditAction = new AppAction("Edit", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			transitionEditAction(e);
@@ -394,7 +359,6 @@ public class Basic2GC
 	};
 	AppAction StepEditAction = new AppAction("Edit", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			stepEditAction(e);
@@ -402,7 +366,6 @@ public class Basic2GC
 	};
 	AppAction ProcedureStepEditAction = new AppAction("Edit", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			procedureStepEditAction(e);
@@ -410,7 +373,6 @@ public class Basic2GC
 	};
 	AppAction ProcedureStepShowAction = new AppAction("Call", this)
 	{
-
 		public void actionPerformed(ActionEvent e)
 		{
 			procedureStepShowAction(e);
@@ -419,7 +381,6 @@ public class Basic2GC
 
 	void initMenus()
 	{
-
 		filemenu.setText("File");
 		filemenu.add(NewAction);
 		filemenu.add(OpenAction);
@@ -456,7 +417,6 @@ public class Basic2GC
 
 	void initPopupMenus()
 	{
-
 		stepmenu.setLabel("Step Menu");
 		stepmenu.add(ShowActionBlockAction);
 		stepmenu.add(HideActionBlockAction);
@@ -470,7 +430,6 @@ public class Basic2GC
 
 	void zoomInAction()
 	{
-
 		double newscale = Math.rint(myCurrentView.getScale() / 0.9f * 100f) / 100f;
 
 		myCurrentView.setScale(newscale);
@@ -479,7 +438,6 @@ public class Basic2GC
 
 	void zoomOutAction()
 	{
-
 		double newscale = Math.rint(myCurrentView.getScale() * 0.9f * 100f) / 100f;
 
 		myCurrentView.setScale(newscale);
@@ -488,7 +446,6 @@ public class Basic2GC
 
 	void zoomNormalAction()
 	{
-
 		double newscale = 1;
 
 		myCurrentView.setScale(newscale);
@@ -497,7 +454,6 @@ public class Basic2GC
 
 	void zoomToFitAction()
 	{
-
 		double newscale = 1;
 
 		if (!myCurrentView.getDocument().isEmpty())
@@ -524,7 +480,6 @@ public class Basic2GC
 
 	void cutAction()
 	{
-
 		GCView view = myCurrentView;
 		JGoSelection sel = view.getSelection();
 
@@ -544,7 +499,6 @@ public class Basic2GC
 
 	void newAction()
 	{
-
 		GCDocument doc = new GCDocument();
 		String t = "JGrafchart" + Integer.toString(myDocCount++);
 
@@ -559,10 +513,8 @@ public class Basic2GC
 		view.initialize(this, frame);
 		frame.addInternalFrameListener(new InternalFrameListener()
 		{
-
 			public void internalFrameActivated(InternalFrameEvent e)
 			{
-
 				myCurrentView = view;
 				topLevelView = true;
 
@@ -580,7 +532,6 @@ public class Basic2GC
 
 			public void internalFrameClosed(InternalFrameEvent e)
 			{
-
 				closeMacros(view.getDoc());
 				topGrafcharts.remove(view.getDoc());
 
@@ -607,7 +558,6 @@ public class Basic2GC
 
 	public void closeMacros(GCDocument doc)
 	{
-
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
 
@@ -700,10 +650,8 @@ public class Basic2GC
 			frame.setBounds(doc.bounds);
 			frame.addInternalFrameListener(new InternalFrameListener()
 			{
-
 				public void internalFrameActivated(InternalFrameEvent e)
 				{
-
 					myCurrentView = view;
 					topLevelView = true;
 
@@ -721,7 +669,6 @@ public class Basic2GC
 
 				public void internalFrameClosed(InternalFrameEvent e)
 				{
-
 					topGrafcharts.remove(view.getDoc());
 
 					myCurrentView = null;
@@ -750,7 +697,6 @@ public class Basic2GC
 	static public GCDocument loadObjects(InputStream ins)
 		throws IOException, ClassNotFoundException
 	{
-
 		ObjectInputStream istream = new ObjectInputStream(ins);
 		Object newObj = istream.readObject();
 
@@ -768,7 +714,6 @@ public class Basic2GC
 
 	void saveAction()
 	{
-
 		if (myCurrentView.getDoc().getWriteFileLocation().equals(""))
 		{
 			saveAsAction();
@@ -781,7 +726,6 @@ public class Basic2GC
 
 	void cleanUp(GCDocument doc)
 	{
-
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
 
@@ -854,7 +798,6 @@ public class Basic2GC
 
 	void saveAsAction()
 	{
-
 		GCDocument doc = myCurrentView.getDoc();
 		JFileChooser chooser = new JFileChooser(doc.getWriteFileLocation());
 
@@ -902,7 +845,6 @@ public class Basic2GC
 
 	public void store()
 	{
-
 		GCDocument doc = myCurrentView.getDoc();
 
 		if (!doc.getWriteFileLocation().equals(""))
@@ -941,7 +883,6 @@ public class Basic2GC
 	public void storeObjects(OutputStream outs, JGoDocument doc)
 		throws IOException
 	{
-
 		ObjectOutputStream ostream = new ObjectOutputStream(outs);
 
 		ostream.writeObject(doc);
@@ -950,7 +891,6 @@ public class Basic2GC
 
 	public void propertiesAction()
 	{
-
 		GCView v = myCurrentView;
 
 		if (v != null)
@@ -972,7 +912,6 @@ public class Basic2GC
 
 	void executeAction()
 	{
-
 		myCurrentView.initializeDocument(myCurrentView.getDoc());
 		myCurrentView.setDragDropEnabled(false);
 		myCurrentView.start();
@@ -981,7 +920,6 @@ public class Basic2GC
 
 	void compileJGoObject(JGoObject obj, ArrayList symbolList)
 	{
-
 		org.jgrafchart.Transitions.SimpleNode n;
 		org.jgrafchart.Actions.SimpleNode n1;
 
@@ -1254,7 +1192,6 @@ public class Basic2GC
 
 	ArrayList compileDocument(GCDocument doc, ArrayList symbolList)
 	{
-
 		ArrayList tempList = new ArrayList();
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
@@ -1274,7 +1211,7 @@ public class Basic2GC
 			obj = doc.getObjectAtPos(pos);
 		}
 
-		tempList.addAll(symbolList);	// adds to the end, i.e. lexical scoping
+		tempList.addAll(symbolList);    // adds to the end, i.e. lexical scoping
 
 		pos = doc.getFirstObjectPos();
 		obj = doc.getObjectAtPos(pos);
@@ -1292,7 +1229,6 @@ public class Basic2GC
 
 	void compileAction()
 	{
-
 		ArrayList symbolList = topGrafcharts.getStorage();
 
 		compileDocument((GCDocument) myCurrentView.getDocument(), symbolList);
@@ -1304,7 +1240,6 @@ public class Basic2GC
 
 	void stopAction()
 	{
-
 		myCurrentView.stopThread();
 		myCurrentView.stopDocument(myCurrentView.getDoc());
 		myCurrentView.setDragDropEnabled(true);
@@ -1313,7 +1248,6 @@ public class Basic2GC
 
 	void exitAction()
 	{
-
 		setVisible(false);
 		dispose();
 		System.exit(0);
@@ -1322,7 +1256,6 @@ public class Basic2GC
 	// ------------- Step menu Actions -------------------------
 	void showActionBlockAction(ActionEvent e)
 	{
-
 		GCStep s = (GCStep) selectedObject;
 
 		s.showActionBlock();
@@ -1334,7 +1267,6 @@ public class Basic2GC
 
 	void hideActionBlockAction(ActionEvent e)
 	{
-
 		GCStep s = (GCStep) selectedObject;
 
 		s.hideActionBlock();
@@ -1346,7 +1278,6 @@ public class Basic2GC
 
 	void stepEditAction(ActionEvent e)
 	{
-
 		GCStep s = (GCStep) selectedObject;
 		GCView v = myCurrentView;
 
@@ -1363,7 +1294,6 @@ public class Basic2GC
 	// --------------------- Transition menu Actions -------------------
 	void transitionEditAction(ActionEvent e)
 	{
-
 		GCTransition t = (GCTransition) selectedObject;
 		GCView v = myCurrentView;
 
@@ -1380,7 +1310,6 @@ public class Basic2GC
 	// --------------------- Procedure Step menu Actions -------------------
 	void procedureStepEditAction(ActionEvent e)
 	{
-
 		ProcedureStep s = (ProcedureStep) selectedObject;
 		GCView v = myCurrentView;
 
@@ -1396,7 +1325,6 @@ public class Basic2GC
 
 	void procedureStepShowAction(ActionEvent e)
 	{
-
 		ProcedureStep ps = (ProcedureStep) selectedObject;
 
 		handleProcedureStep(ps);
@@ -1407,7 +1335,6 @@ public class Basic2GC
 
 	public void initPalette()
 	{
-
 		JGoDocument paletteDoc = myPalette.getDocument();
 
 		paletteDoc.setSuspendUpdates(true);
@@ -1423,7 +1350,7 @@ public class Basic2GC
 		// create one initialstep
 		GCStepInitial istep = new GCStepInitial(new Point(45, 80), null);
 
-		paletteDoc.addObjectAtTail(istep);		// add to the document
+		paletteDoc.addObjectAtTail(istep);    // add to the document
 
 		String initString1 = "Initial Step";
 		JGoText textVar1 = new JGoText(new Point(45, 160), 12, initString1, "Serif", true, false, false, JGoText.ALIGN_CENTER, false, true);
@@ -1437,7 +1364,7 @@ public class Basic2GC
 		// create one step and one transition.
 		GCStep step1 = new GCStep(new Point(45, 200), null);
 
-		paletteDoc.addObjectAtTail(step1);		// add to the document
+		paletteDoc.addObjectAtTail(step1);    // add to the document
 
 		String initString2 = "Step";
 		JGoText textVar2 = new JGoText(new Point(45, 280), 12, initString2, "Serif", true, false, false, JGoText.ALIGN_CENTER, false, true);
@@ -1669,7 +1596,6 @@ public class Basic2GC
 
 	public void processViewChange(JGoViewEvent e)
 	{
-
 		switch (e.getHint())
 		{
 
@@ -1700,7 +1626,6 @@ public class Basic2GC
 
 	public void callDialog(JGoObject obj, JGoViewEvent e)
 	{
-
 		if (obj instanceof GCStep)
 		{
 			Point p = e.getPointViewCoords();
@@ -1748,7 +1673,6 @@ public class Basic2GC
 
 	public void handleGrafcetProcedure(GrafcetProcedure ms)
 	{
-
 		if (ms.frame == null)
 		{
 			ms.myContentDocument.setName(ms.myLabel.getText());
@@ -1763,10 +1687,8 @@ public class Basic2GC
 			view.initialize(this, frame);
 			frame.addInternalFrameListener(new InternalFrameListener()
 			{
-
 				public void internalFrameActivated(InternalFrameEvent e)
 				{
-
 					myCurrentView = view;
 					topLevelView = false;
 
@@ -1784,7 +1706,6 @@ public class Basic2GC
 
 				public void internalFrameClosed(InternalFrameEvent e)
 				{
-
 					myCurrentView = null;
 
 					AppAction.updateAllActions();
@@ -1840,7 +1761,6 @@ public class Basic2GC
 
 	public void handleMacroStep(MacroStep ms)
 	{
-
 		if (ms.frame == null)
 		{
 			ms.myContentDocument.setName(ms.myLabel.getText());
@@ -1858,10 +1778,8 @@ public class Basic2GC
 
 			frame.addInternalFrameListener(new InternalFrameListener()
 			{
-
 				public void internalFrameActivated(InternalFrameEvent e)
 				{
-
 					myCurrentView = view;
 					topLevelView = false;
 
@@ -1879,7 +1797,6 @@ public class Basic2GC
 
 				public void internalFrameClosed(InternalFrameEvent e)
 				{
-
 					myCurrentView = null;
 
 					AppAction.updateAllActions();
@@ -1970,7 +1887,6 @@ public class Basic2GC
 
 	public void handleProcedureStep(ProcedureStep ms)
 	{
-
 		if ((ms.frame == null) & (ms.myContentDocument != null))
 		{
 			ms.myContentDocument.setName("Call to " + ms.myLabel.getText());
@@ -1985,10 +1901,8 @@ public class Basic2GC
 			view.initialize(this, frame);
 			frame.addInternalFrameListener(new InternalFrameListener()
 			{
-
 				public void internalFrameActivated(InternalFrameEvent e)
 				{
-
 					myCurrentView = view;
 					topLevelView = false;
 
@@ -2006,7 +1920,6 @@ public class Basic2GC
 
 				public void internalFrameClosed(InternalFrameEvent e)
 				{
-
 					myCurrentView = null;
 
 					AppAction.updateAllActions();
@@ -2065,7 +1978,6 @@ public class Basic2GC
 
 	public void processDocChange(JGoDocumentEvent e)
 	{
-
 		org.jgrafchart.Transitions.SimpleNode n;
 		org.jgrafchart.Actions.SimpleNode n1;
 
@@ -2217,7 +2129,6 @@ public class Basic2GC
 
 	public void setCurrentView(GCView v)
 	{
-
 		myCurrentView = v;
 
 		myCurrentView.requestFocus();

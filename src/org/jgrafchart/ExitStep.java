@@ -1,13 +1,8 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 /**
  * A Step is an Area containing a Rectangle and two Ports and
@@ -17,7 +12,6 @@ public class ExitStep
 	extends GCStep
 	implements GCIdent
 {
-
 	static final int CONNECT_SPOT = 10;
 
 	/**
@@ -31,7 +25,6 @@ public class ExitStep
 
 	public ExitStep(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(60, 60);
@@ -158,7 +151,6 @@ public class ExitStep
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		ExitStep newobj = (ExitStep) super.copyObject(env);
 
 		return newobj;
@@ -166,7 +158,6 @@ public class ExitStep
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		ExitStep newobj = (ExitStep) newarea;
 
 		if (myRectangle != null)
@@ -243,7 +234,6 @@ public class ExitStep
 	// this area's natural "location" is the center of the rectangle
 	public Point getLocation(Point p)
 	{
-
 		if (myRectangle != null)
 		{
 			return myRectangle.getSpotLocation(TopCenter, p);
@@ -256,7 +246,6 @@ public class ExitStep
 
 	public void setLocation(int x, int y)
 	{
-
 		if (myRectangle != null)
 		{
 			myRectangle.setSpotLocation(TopCenter, x, y);
@@ -280,7 +269,6 @@ public class ExitStep
 	 */
 	public void layoutChildren()
 	{
-
 		if (myRectangle == null)
 		{
 			return;
@@ -389,7 +377,6 @@ public class ExitStep
 
 	public void removePrecedingTransition(GCTransition s)
 	{
-
 		if (precedingTransitions.contains(s))
 		{
 			precedingTransitions.remove(precedingTransitions.indexOf(s));
@@ -398,7 +385,6 @@ public class ExitStep
 
 	public void activate()
 	{
-
 		myToken.setBrush(JGoBrush.black);
 
 		newX = true;
@@ -406,7 +392,6 @@ public class ExitStep
 
 	public void deactivate()
 	{
-
 		myToken.setBrush(JGoBrush.Null);
 
 		newX = false;
@@ -425,7 +410,6 @@ public class ExitStep
 
 	public void changeState()
 	{
-
 		if (!x)
 		{
 			timer = 0;
@@ -472,7 +456,6 @@ public class ExitStep
 
 	public void showActionBlock()
 	{
-
 		actionBlockVisible = true;
 
 		myActionStroke.setPen(JGoPen.black);
@@ -494,7 +477,6 @@ public class ExitStep
 
 	public void hideActionBlock()
 	{
-
 		actionBlockVisible = false;
 
 		myActionStroke.setPen(JGoPen.Null);

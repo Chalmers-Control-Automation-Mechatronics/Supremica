@@ -49,23 +49,16 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import java.util.*;
-
 import java.io.PrintWriter;
-
 
 public class AutomataSynchronizer
 	implements Stoppable
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizer.class.getName());
 	private Automata theAutomata;
 	private AutomataSynchronizerHelper synchHelper;
@@ -78,7 +71,6 @@ public class AutomataSynchronizer
 	public AutomataSynchronizer(Automata theAutomata, SynchronizationOptions syncOptions)
 		throws Exception
 	{
-
 		this.theAutomata = theAutomata;
 		this.syncOptions = syncOptions;
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
@@ -99,9 +91,8 @@ public class AutomataSynchronizer
 	public void execute()
 		throws Exception
 	{
-
 		State currInitialState;
-		int[] initialState = new int[theAutomata.size() + 1];		// +1 status field
+		int[] initialState = new int[theAutomata.size() + 1];    // +1 status field
 
 		// Build the initial state
 		Iterator autIt = theAutomata.iterator();
@@ -131,7 +122,6 @@ public class AutomataSynchronizer
 	public Automaton getAutomaton()
 		throws Exception
 	{
-
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 
 		try
@@ -162,7 +152,6 @@ public class AutomataSynchronizer
 
 	public void requestStop()
 	{
-
 		stopRequested = true;
 
 		for (int i = 0; i < synchronizationExecuters.size(); i++)

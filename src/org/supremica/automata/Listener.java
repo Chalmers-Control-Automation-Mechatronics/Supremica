@@ -49,8 +49,6 @@
  */
 package org.supremica.automata;
 
-
-
 public interface Listener
 {
 	public void updated(Object o);

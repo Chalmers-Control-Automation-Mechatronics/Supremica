@@ -1,18 +1,12 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 public class IntegerVariable
 	extends InternalVariable
 {
-
 	private JGoText myTag = null;
 	public int val = 0;
 	public int oldval = 0;
@@ -24,7 +18,6 @@ public class IntegerVariable
 
 	public IntegerVariable(Point loc)
 	{
-
 		super();
 
 		setSize(65, 45);
@@ -75,7 +68,6 @@ public class IntegerVariable
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		IntegerVariable newobj = (IntegerVariable) super.copyObject(env);
 
 		return newobj;
@@ -83,7 +75,6 @@ public class IntegerVariable
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		IntegerVariable newobj = (IntegerVariable) newarea;
 
 		if (myBorder != null)
@@ -117,7 +108,6 @@ public class IntegerVariable
 
 	public void layoutChildren()
 	{
-
 		if (myBorder == null)
 		{
 			return;
@@ -156,7 +146,6 @@ public class IntegerVariable
 
 	public int getIntVal()
 	{
-
 		if (redirect == null)
 		{
 			return val;
@@ -173,7 +162,6 @@ public class IntegerVariable
 
 	public int getOldIntVal()
 	{
-
 		if (redirect == null)
 		{
 			return oldval;
@@ -198,7 +186,6 @@ public class IntegerVariable
 
 	public void setStoredIntAction(int n)
 	{
-
 		myValue.setText("" + n);
 
 		if (redirect == null)

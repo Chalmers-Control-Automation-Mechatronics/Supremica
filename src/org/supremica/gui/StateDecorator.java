@@ -49,23 +49,16 @@
  */
 package org.supremica.gui;
 
-
-
 import javax.swing.*;
 import javax.swing.event.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-
 import java.util.*;
-
 import org.supremica.automata.*;
-
 
 public class StateDecorator
 {
-
 	private static final Ellipse2D.Float circle = new Ellipse2D.Float();
 	private static final Rectangle2D.Float rect = new Rectangle2D.Float();
 
@@ -76,7 +69,6 @@ public class StateDecorator
 
 	public static final void paintState(State theState, Graphics2D g)
 	{
-
 		setDimensions(theState);
 		g.setColor(Color.blue);
 		g.draw(circle);
@@ -90,7 +82,6 @@ public class StateDecorator
 
 	private static final void setDimensions(State theState)
 	{
-
 		int x = theState.getX();
 		int y = theState.getY();
 		int radius = theState.getRadius();

@@ -49,14 +49,10 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 
 public class SynchronizationType
 {
-
 	private static Collection types = new LinkedList();
 	public static final SynchronizationType Prioritized = new SynchronizationType("Prioritized Synchronization");
 	public static final SynchronizationType Full = new SynchronizationType("Full Synchronization");
@@ -65,7 +61,6 @@ public class SynchronizationType
 
 	private SynchronizationType(String description)
 	{
-
 		types.add(this);
 
 		this.description = description;

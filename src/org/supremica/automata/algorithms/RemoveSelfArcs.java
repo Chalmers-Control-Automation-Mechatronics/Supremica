@@ -49,22 +49,16 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 import org.supremica.automata.*;
-
 
 public class RemoveSelfArcs
 {
-
 	private RemoveSelfArcs() {}
 
 	public static void execute(Automaton theAutomaton)
 		throws Exception
 	{
-
 		Iterator stateIt = theAutomaton.stateIterator();
 
 		while (stateIt.hasNext())

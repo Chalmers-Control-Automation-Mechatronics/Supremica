@@ -49,18 +49,12 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.io.*;
-
 import java.util.*;
-
 import org.supremica.automata.*;
-
 
 class AutomataExporter
 {
-
 	static final int TO_XML = 1;
 	static final int TO_DOT = 2;
 	static final int TO_DSX = 3;
@@ -72,7 +66,6 @@ class AutomataExporter
 	public static void main(String args[])
 		throws Exception
 	{
-
 		String inputFileName = "";
 		String outputFileName = "";
 		int outputType = TO_XML;
@@ -190,7 +183,7 @@ class AutomataExporter
 		{
 			AutomataToXml serializer;
 
-			if (automatonToExport == -1)	// Export all automata
+			if (automatonToExport == -1)    // Export all automata
 			{
 				serializer = new AutomataToXml(theAutomata);
 			}
@@ -203,7 +196,7 @@ class AutomataExporter
 		}
 		else if (outputType == TO_DOT)
 		{
-			if (automatonToExport == -1)	// Export the first automaton
+			if (automatonToExport == -1)    // Export the first automaton
 			{
 				automatonToExport = 0;
 			}
@@ -218,7 +211,7 @@ class AutomataExporter
 		}
 		else if (outputType == TO_DSX)
 		{
-			if (automatonToExport == -1)	// Export the first automaton
+			if (automatonToExport == -1)    // Export the first automaton
 			{
 				automatonToExport = 0;
 			}

@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import com.nwoods.jgo.*;
-
 
 public class GrafcetDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JButton OKButton = new JButton();
 	JButton CancelButton = new JButton();
@@ -30,7 +24,6 @@ public class GrafcetDialog
 
 	public GrafcetDialog(Frame frame, GCDocument obj, Basic2GC app)
 	{
-
 		super(frame, "Workspace Properties", true);
 
 		try
@@ -55,13 +48,11 @@ public class GrafcetDialog
 
 	private final void init()
 	{
-
 		panel1.setLayout(null);
 		panel1.setMinimumSize(new Dimension(294, 300));
 		panel1.setPreferredSize(new Dimension(294, 300));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnOK();
@@ -69,7 +60,6 @@ public class GrafcetDialog
 		});
 		CancelButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnCancel();
@@ -115,7 +105,6 @@ public class GrafcetDialog
 
 	void updateDialog()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -130,7 +119,6 @@ public class GrafcetDialog
 
 	void updateData()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -183,21 +171,19 @@ public class GrafcetDialog
 
 	void OnOK()
 	{
-
 		try
 		{
 			updateData();
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
 
 	void OnCancel()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}

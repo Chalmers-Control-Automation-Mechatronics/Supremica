@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 public final class IDDOptions
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(IDDOptions.class.getName());
 
 	public IDDOptions()

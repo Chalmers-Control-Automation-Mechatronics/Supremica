@@ -49,21 +49,15 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
-
 import com.nwoods.jgo.*;
 import com.nwoods.jgo.layout.JGoNetwork;
 
-
 public class EditorActions
 {
-
 	private AutomataEditor theEditor = null;
 	private AppAction fileAddAction = null;
 	private AppAction fileOpenAction = null;
@@ -89,12 +83,10 @@ public class EditorActions
 
 	public AppAction getFileAddAction()
 	{
-
 		if (fileAddAction == null)
 		{
 			fileAddAction = new AppAction("Add", theEditor)
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileAdd();
@@ -112,12 +104,10 @@ public class EditorActions
 
 	public AppAction getFileOpenAction()
 	{
-
 		if (fileOpenAction == null)
 		{
 			fileOpenAction = new AppAction("Open...", theEditor)
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileOpen();
@@ -135,12 +125,10 @@ public class EditorActions
 
 	public AppAction getFileSaveAction()
 	{
-
 		if (fileSaveAction == null)
 		{
 			fileSaveAction = new AppAction("Save", theEditor)
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileSave();
@@ -158,12 +146,10 @@ public class EditorActions
 
 	public AppAction getFileSaveAsAction()
 	{
-
 		if (fileSaveAsAction == null)
 		{
 			fileSaveAsAction = new AppAction("Save As...", theEditor)
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileSaveAs();
@@ -181,12 +167,10 @@ public class EditorActions
 
 	public AppAction getFilePrintAction()
 	{
-
 		if (filePrintAction == null)
 		{
 			filePrintAction = new AppAction("Print", theEditor)
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.filePrint();
@@ -204,12 +188,10 @@ public class EditorActions
 
 	public AppAction getFileCloseAction()
 	{
-
 		if (fileCloseAction == null)
 		{
 			fileCloseAction = new AppAction("Close", theEditor)
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					theEditor.fileClose();

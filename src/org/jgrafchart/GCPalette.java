@@ -5,27 +5,19 @@
  */
 package org.jgrafchart;
 
-
-
 import java.awt.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
-
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
-
 import com.nwoods.jgo.*;
-
 
 public class GCPalette
 	extends JGoView
 {
-
 	public GCPalette()
 	{
-
 		super();
 
 		setBorder(new TitledBorder("Palette"));
@@ -39,7 +31,6 @@ public class GCPalette
 
 	public GCPalette(JGoDocument doc)
 	{
-
 		super(doc);
 
 		setBorder(new TitledBorder("Palette"));

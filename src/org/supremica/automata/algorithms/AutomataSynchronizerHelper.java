@@ -49,23 +49,17 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.util.*;
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import java.util.*;
-
 
 /**
  * Contains information that is common to all synchronization threads.
  */
 public final class AutomataSynchronizerHelper
 {
-
 	private AutomataIndexForm theAutomataIndexForm;
 	private IntArrayHashTable theStates;
 	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
@@ -111,7 +105,6 @@ public final class AutomataSynchronizerHelper
 	public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
 		throws Exception
 	{
-
 		if (theAutomata == null)
 		{
 			throw new Exception("theAutomata must be non-null");
@@ -154,7 +147,6 @@ public final class AutomataSynchronizerHelper
 	public AutomataSynchronizerHelper(AutomataSynchronizerHelper orgHelper)
 		throws Exception
 	{
-
 		theAutomata = orgHelper.getAutomata();
 		theAutomaton = orgHelper.getAutomaton();
 		theAutomataIndexForm = orgHelper.getAutomataIndexForm();
@@ -169,7 +161,6 @@ public final class AutomataSynchronizerHelper
 
 	public void clear()
 	{
-
 		theStates.clear();
 
 		automataIsControllable = true;
@@ -178,7 +169,7 @@ public final class AutomataSynchronizerHelper
 		rememberTrace = false;
 		exhaustiveSearch = false;
 		rememberUncontrollable = false;
-		expandEventsUsingPriority = false;		// Should be an external option?!? FIXA!
+		expandEventsUsingPriority = false;    // Should be an external option?!? FIXA!
 
 		// Is there anything else that needs to be cleared?...
 	}
@@ -214,7 +205,6 @@ public final class AutomataSynchronizerHelper
 	 */
 	public void addStateToProcess(int[] state)
 	{
-
 		synchronized (addingToStatesToProcessLock)
 		{
 			statesToProcess.addLast(state);
@@ -228,7 +218,6 @@ public final class AutomataSynchronizerHelper
 	 */
 	public int[] getStateToProcess()
 	{
-
 		synchronized (gettingFromStatesToProcessLock)
 		{
 			if ((nbrOfStatesToProcess == 0) || (stopExecutionLimit == 0))
@@ -272,11 +261,11 @@ public final class AutomataSynchronizerHelper
 			else
 			{
 				if (coExecute)
-				{		// Depth first search
+				{    // Depth first search
 					return statesToProcess.removeLast();
 				}
 				else
-				{		// Width first search
+				{    // Width first search
 					return statesToProcess.removeFirst();
 				}
 			}
@@ -287,13 +276,12 @@ public final class AutomataSynchronizerHelper
 	public void addState(int[] state)
 		throws Exception
 	{
-
 		int[] newState = theStates.add(state);
 
 		if (newState != null)
 		{
 			if (rememberTrace && (stateTrace.size() == 0))
-			{		// Add initial state
+			{    // Add initial state
 				stateTrace.add(newState);
 			}
 
@@ -355,7 +343,6 @@ public final class AutomataSynchronizerHelper
 	public void addState(int[] fromState, int[] toState, int eventIndex)
 		throws Exception
 	{
-
 		if (rememberTrace)
 		{
 			fromStateList.addLast(fromState);
@@ -366,7 +353,6 @@ public final class AutomataSynchronizerHelper
 
 	public void addStatus(int[] state)
 	{
-
 		int[][] stateStatusTable = theAutomataIndexForm.getStateStatusTable();
 		int tmpStatus = stateStatusTable[0][state[0]];
 		boolean forbidden = AutomataIndexFormHelper.isForbidden(tmpStatus);
@@ -377,7 +363,7 @@ public final class AutomataSynchronizerHelper
 			if ((activeAutomata == null) || (activeAutomata[i] == true))
 			{
 				currStatus = stateStatusTable[i][state[i]];
-				tmpStatus &= currStatus;	// works for everything except forbidden
+				tmpStatus &= currStatus;    // works for everything except forbidden
 				forbidden |= AutomataIndexFormHelper.isForbidden(currStatus);
 			}
 		}
@@ -392,7 +378,6 @@ public final class AutomataSynchronizerHelper
 
 	public void setForbidden(int[] state, boolean forbidden)
 	{
-
 		int currStatus = state[state.length - 1];
 
 		if (forbidden)
@@ -489,7 +474,6 @@ public final class AutomataSynchronizerHelper
 	// Returns array with priorities, 0 is the highest priority, larger numbers - lower priority
 	public int[] getEventPriority()
 	{
-
 		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 		int[] eventPriority = new int[unionAlphabet.size()];
 		int index = 0;
@@ -499,13 +483,13 @@ public final class AutomataSynchronizerHelper
 			Event currEvent = (Event) eventIterator.next();
 
 			if (currEvent.getExpansionPriority() < 0)
-			{		// The events are already ordered after synchIndex!
+			{    // The events are already ordered after synchIndex!
 
 				// eventPriority[currEvent.getSynchIndex()] = 10;
 				eventPriority[index++] = 10;
 			}
 			else
-			{		// The events are already ordered after synchIndex!
+			{    // The events are already ordered after synchIndex!
 
 				// eventPriority[currEvent.getSynchIndex()] = currEvent.getExpansionPriority();
 				eventPriority[index++] = currEvent.getExpansionPriority();
@@ -538,7 +522,6 @@ public final class AutomataSynchronizerHelper
 	public void displayTrace()
 		throws Exception
 	{
-
 		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 
 		// We have to have an executer for finding the transitions
@@ -638,7 +621,6 @@ public final class AutomataSynchronizerHelper
 	public void printUncontrollableStates()
 		throws Exception
 	{
-
 		int[] automataIndices = new int[theAutomata.size()];
 
 		for (int i = 0; i < theAutomata.size(); i++)
@@ -652,7 +634,6 @@ public final class AutomataSynchronizerHelper
 	public void printUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
-
 		int problemPlant;
 		int problemEvent;
 		Automaton problemAutomaton;
@@ -700,7 +681,6 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataPlants()
 	{
-
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -716,7 +696,6 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataSupervisors()
 	{
-
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -732,7 +711,6 @@ public final class AutomataSynchronizerHelper
 
 	public boolean isAllAutomataSpecifications()
 	{
-
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -748,7 +726,6 @@ public final class AutomataSynchronizerHelper
 
 	public void selectAutomata(int[] automataIndices)
 	{
-
 		if (activeAutomata == null)
 		{
 			activeAutomata = new boolean[theAutomata.size()];

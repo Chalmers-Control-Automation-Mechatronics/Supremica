@@ -49,24 +49,17 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.tree.*;
-
 import java.util.*;
-
 
 public class AlphabetViewer
 	extends JFrame
 {
-
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private AlphabetViewerPanel alphabetPanel;
@@ -74,7 +67,6 @@ public class AlphabetViewer
 	public AlphabetViewer(Automaton theAutomaton)
 		throws Exception
 	{
-
 		alphabetPanel = new AlphabetViewerPanel(theAutomaton);
 		contentPane = (JPanel) getContentPane();
 
@@ -84,7 +76,6 @@ public class AlphabetViewer
 		setSize(400, 500);
 		addWindowListener(new WindowAdapter()
 		{
-
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
@@ -114,7 +105,6 @@ public class AlphabetViewer
 
 	private void initMenubar()
 	{
-
 		setJMenuBar(menuBar);
 
 		// File
@@ -131,7 +121,6 @@ public class AlphabetViewer
 		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);

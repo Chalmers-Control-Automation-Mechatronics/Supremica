@@ -1,23 +1,15 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 import java.lang.*;
-
 import org.jgrafchart.Transitions.*;
-
 
 public class ExceptionTransition
 	extends GenericTransition
 	implements GCIdent
 {
-
 	public ExceptionTransition()
 	{
 		super();
@@ -25,7 +17,6 @@ public class ExceptionTransition
 
 	public ExceptionTransition(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(5, 30);
@@ -99,7 +90,6 @@ public class ExceptionTransition
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		ExceptionTransition newobj = (ExceptionTransition) super.copyObject(env);
 
 		return newobj;
@@ -107,7 +97,6 @@ public class ExceptionTransition
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		ExceptionTransition newobj = (ExceptionTransition) newarea;
 
 		newobj.condition = condition;
@@ -157,7 +146,6 @@ public class ExceptionTransition
 
 	public Point getLocation(Point p)
 	{
-
 		if (myRectangle != null)
 		{
 			return myRectangle.getSpotLocation(RightCenter, p);
@@ -170,7 +158,6 @@ public class ExceptionTransition
 
 	public void setLocation(int x, int y)
 	{
-
 		if (myRectangle != null)
 		{
 			myRectangle.setSpotLocation(RightCenter, x, y);
@@ -185,7 +172,6 @@ public class ExceptionTransition
 
 	public void layoutChildren()
 	{
-
 		if (myRectangle == null)
 		{
 			return;
@@ -324,7 +310,6 @@ public class ExceptionTransition
 
 	public void removeSucceedingStep(GCStep s)
 	{
-
 		if (succeedingSteps.contains(s))
 		{
 			succeedingSteps.remove(succeedingSteps.indexOf(s));
@@ -338,7 +323,6 @@ public class ExceptionTransition
 
 	public void removePrecedingStep(GCStep s)
 	{
-
 		if (precedingSteps.contains(s))
 		{
 			precedingSteps.remove(precedingSteps.indexOf(s));
@@ -365,7 +349,6 @@ public class ExceptionTransition
 	 */
 	public void compileStructure()
 	{
-
 		precedingSteps.clear();
 		succeedingSteps.clear();
 
@@ -437,7 +420,6 @@ public class ExceptionTransition
 
 	public void testAndFire()
 	{
-
 		GrafcetObject s;
 		boolean ok = false;
 
@@ -499,7 +481,6 @@ public class ExceptionTransition
 
 	public void initialize()
 	{
-
 		condition = node.evaluate();
 		oldCondition = condition;
 

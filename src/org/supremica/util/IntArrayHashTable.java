@@ -49,19 +49,14 @@
  */
 package org.supremica.util;
 
-
-
 import org.supremica.automata.AutomataIndexFormHelper;
-
 import java.util.*;
-
 
 /**
  * Insert <int_1, int_2, int_3, ..., int_n, int_status>
  */
 public final class IntArrayHashTable
 {
-
 	private int[][] theTable;
 	private int size;
 	private float loadFactor;
@@ -75,7 +70,6 @@ public final class IntArrayHashTable
 
 	public IntArrayHashTable(int capacity, boolean doExpand)
 	{
-
 		this(capacity);
 
 		this.doExpand = doExpand;
@@ -83,7 +77,6 @@ public final class IntArrayHashTable
 
 	public IntArrayHashTable(int capacity, float loadFactor)
 	{
-
 		if ((capacity <= 0) || (loadFactor <= 0.0))
 		{
 			throw new IllegalArgumentException();
@@ -111,7 +104,6 @@ public final class IntArrayHashTable
 	public int[] add(int[] theArray)
 		throws Exception
 	{
-
 		int table[][] = theTable;
 		int hash = hashCodeIntArray(theArray);
 		int index = getTableIndex(hash);
@@ -154,7 +146,6 @@ public final class IntArrayHashTable
 
 	public void clear()
 	{
-
 		int table[][] = theTable;
 
 		for (int i = 0; i < table.length; i++)
@@ -168,7 +159,6 @@ public final class IntArrayHashTable
 	// Returns an int[] if it exists otherwise null
 	public int[] get(int[] theArray)
 	{
-
 		int table[][] = theTable;
 		int hash = hashCodeIntArray(theArray);
 		int index = getTableIndex(hash);
@@ -194,7 +184,6 @@ public final class IntArrayHashTable
 	// Returns the index of theArray if it exists otherwise -1
 	public int getIndex(int[] theArray)
 	{
-
 		int table[][] = theTable;
 		int hash = hashCodeIntArray(theArray);
 		int index = getTableIndex(hash);
@@ -224,7 +213,6 @@ public final class IntArrayHashTable
 
 	private void expandTable()
 	{
-
 		int[][] oldTable = theTable;
 		int oldCapacity = theTable.length;
 		int capacity = oldCapacity * 2 + 1;
@@ -261,8 +249,7 @@ public final class IntArrayHashTable
 	}
 
 	private static int hashCodeIntArray(int[] theArray)
-	{		// Assume that the last element is a status field
-
+	{    // Assume that the last element is a status field
 		int hashCode = 1;
 
 		for (int i = 0; i < theArray.length - 1; i++)
@@ -274,8 +261,7 @@ public final class IntArrayHashTable
 	}
 
 	public static boolean equalsIntArray(int[] firstArray, int[] secondArray)
-	{		// Assume that the last element is a status field
-
+	{    // Assume that the last element is a status field
 		for (int i = 0; i < firstArray.length - 1; i++)
 		{
 			if (firstArray[i] != secondArray[i])
@@ -299,7 +285,6 @@ public final class IntArrayHashTable
 
 	public String toString()
 	{
-
 		StringBuffer theString = new StringBuffer();
 		int[][] table = theTable;
 
@@ -342,7 +327,6 @@ public final class IntArrayHashTable
 
 	public static void main(String[] args)
 	{
-
 		int size = 4;
 		IntArrayHashTable theHashTable = new IntArrayHashTable(size);
 		int[] a1 = { 3, 4, 5, 1, 2, 2, 5 };
@@ -375,7 +359,6 @@ public final class IntArrayHashTable
 	private class IntArrayHashTableIterator
 		implements Iterator
 	{
-
 		private int currIndex = -1;
 		private int nextIndex = -1;
 
@@ -383,7 +366,6 @@ public final class IntArrayHashTable
 
 		public boolean hasNext()
 		{
-
 			if (nextIndex == -1)
 			{
 				nextIndex = currIndex + 1;
@@ -421,7 +403,6 @@ public final class IntArrayHashTable
 
 		public Object next()
 		{
-
 			if (hasNext())
 			{
 				Object currObject = theTable[nextIndex];
@@ -443,7 +424,6 @@ public final class IntArrayHashTable
 		 */
 		public int[] nextIntArray()
 		{
-
 			if (hasNext())
 			{
 				int[] currObject = theTable[nextIndex];

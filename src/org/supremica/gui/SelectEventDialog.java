@@ -49,24 +49,18 @@
  */
 package org.supremica.gui;
 
-
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Event;
 import org.supremica.automata.*;
 
-
 public class SelectEventDialog
 	extends JDialog
 {
-
 	private org.supremica.automata.Event selectedEvent = null;
 	private JPanel contentPane = null;
 	private Alphabet theAlphabet = null;
@@ -74,7 +68,6 @@ public class SelectEventDialog
 
 	public SelectEventDialog(Frame owner, Automaton theAutomaton)
 	{
-
 		super(owner, "Select event", true);
 
 		this.theAutomaton = theAutomaton;
@@ -108,7 +101,6 @@ public class SelectEventDialog
 		contentPane.add(horizBox2, BorderLayout.CENTER);
 		okButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
@@ -116,10 +108,8 @@ public class SelectEventDialog
 		});
 		cancelButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				selectedEvent = null;
 
 				setVisible(false);
@@ -145,7 +135,6 @@ public class SelectEventDialog
 
 	public org.supremica.automata.Event getEvent()
 	{
-
 		selectedEvent = null;
 
 		setVisible(true);
@@ -157,7 +146,6 @@ public class SelectEventDialog
 class AlphabetPanel
 	extends JPanel
 {
-
 	private Alphabet theAlphabet;
 
 	// private JList theEventList = new JList();
@@ -165,7 +153,6 @@ class AlphabetPanel
 
 	public AlphabetPanel(Alphabet theAlphabet)
 	{
-
 		this.theAlphabet = theAlphabet;
 
 		add(test1, BorderLayout.CENTER);
@@ -181,7 +168,6 @@ class AlphabetPanel
 class CreateEventPanel
 	extends JPanel
 {
-
 	private Alphabet theAlphabet;
 	private JTextField labelField;
 	private JCheckBox controllableCheckBox;
@@ -190,7 +176,6 @@ class CreateEventPanel
 
 	public CreateEventPanel(Alphabet theAlphabet)
 	{
-
 		this.theAlphabet = theAlphabet;
 
 		// setLayout(Box.createHorizontalBox());
@@ -222,10 +207,8 @@ class CreateEventPanel
 		vertBox.add(createEventButton);
 		createEventButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				Alphabet alph = getAlphabet();
 				String currLabel = labelField.getText();
 
@@ -260,7 +243,6 @@ class CreateEventPanel
 
 	public void setVisible(boolean visible)
 	{
-
 		labelField.setText("");
 		controllableCheckBox.setSelected(true);
 		prioritizedCheckBox.setSelected(true);

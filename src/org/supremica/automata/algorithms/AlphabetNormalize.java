@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 
 public class AlphabetNormalize
 {
-
 	private Automaton theAutomaton;
 	private HashMap labelMap;
 
@@ -70,7 +65,6 @@ public class AlphabetNormalize
 	public void execute()
 		throws Exception
 	{
-
 		labelMap = new HashMap();
 
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
@@ -115,7 +109,6 @@ public class AlphabetNormalize
 
 	public void removeControllable(Map labelMap)
 	{
-
 		Set entrySet = labelMap.entrySet();
 		Iterator entryIt = entrySet.iterator();
 
@@ -149,7 +142,6 @@ public class AlphabetNormalize
 
 	public void printLabelMap(Map labelMap)
 	{
-
 		System.err.println("***********");
 
 		Set entrySet = labelMap.entrySet();

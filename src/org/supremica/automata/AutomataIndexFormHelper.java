@@ -49,17 +49,12 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.StringTokenizer;
-
 
 public final class AutomataIndexFormHelper
 {
-
 	public static int[] createCopyOfState(int[] state)
 	{
-
 		int[] newState = new int[state.length];
 
 		System.arraycopy(state, 0, newState, 0, state.length);
@@ -78,7 +73,6 @@ public final class AutomataIndexFormHelper
 	*/
 	public static int createStatus(State state)
 	{
-
 		int status = 0;
 
 		if (state.isInitial())
@@ -166,7 +160,6 @@ public final class AutomataIndexFormHelper
 */
 	public static int[] buildStateFromString(String stringState)
 	{
-
 		String trimmedString = stringState.trim();
 		int indexOfLeft = trimmedString.indexOf('[');
 
@@ -226,7 +219,6 @@ public final class AutomataIndexFormHelper
 
 	public static String dumpState(int[] state)
 	{
-
 		StringBuffer sb = new StringBuffer("[");
 
 		for (int i = 0; i < state.length; i++)
@@ -246,7 +238,6 @@ public final class AutomataIndexFormHelper
 
 	public static void main(String[] args)
 	{
-
 		String orgString = "[10]";
 		int[] state = buildStateFromString(orgString);
 

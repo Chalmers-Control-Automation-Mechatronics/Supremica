@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import com.nwoods.jgo.*;
-
 
 public class StepDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JLabel label = new JLabel();
 	JTextArea nameField = new JTextArea();
@@ -26,7 +20,6 @@ public class StepDialog
 
 	public StepDialog(Frame frame, GCDocument obj, GCStep sin, GCView view)
 	{
-
 		super(frame, "Step", true);
 
 		try
@@ -53,13 +46,11 @@ public class StepDialog
 
 	private final void init()
 	{
-
 		panel1.setLayout(null);
 		panel1.setMinimumSize(new Dimension(294, 200));
 		panel1.setPreferredSize(new Dimension(294, 200));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnOK();
@@ -67,7 +58,6 @@ public class StepDialog
 		});
 		CancelButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnCancel();
@@ -75,7 +65,6 @@ public class StepDialog
 		});
 		HelpButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				onHelp();
@@ -105,7 +94,6 @@ public class StepDialog
 
 	void updateDialog()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -125,7 +113,6 @@ public class StepDialog
 
 	void updateData()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -177,21 +164,19 @@ public class StepDialog
 
 	void OnOK()
 	{
-
 		try
 		{
 			updateData();
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
 
 	void OnCancel()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}

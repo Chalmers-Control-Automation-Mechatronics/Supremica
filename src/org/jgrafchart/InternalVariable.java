@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 public abstract class InternalVariable
 	extends JGoArea
 	implements Readable, Writable
 {
-
 	protected JGoRectangle myBorder = null;
 	protected JGoText myValue = null;
 
@@ -28,7 +22,6 @@ public abstract class InternalVariable
 
 	public InternalVariable(Point loc)
 	{
-
 		super();
 
 		setSize(65, 45);
@@ -69,7 +62,6 @@ public abstract class InternalVariable
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		InternalVariable newobj = (InternalVariable) super.copyObject(env);
 
 		return newobj;
@@ -77,7 +69,6 @@ public abstract class InternalVariable
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		InternalVariable newobj = (InternalVariable) newarea;
 
 		if (myBorder != null)
@@ -115,7 +106,6 @@ public abstract class InternalVariable
 
 	public void layoutChildren()
 	{
-
 		if (myBorder == null)
 		{
 			return;
@@ -192,7 +182,6 @@ public abstract class InternalVariable
 
 	public void setRedirect(InternalVariable iv)
 	{
-
 		redirect = iv;
 
 		initializeDisplay();

@@ -49,26 +49,18 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 
 public class AutomatonExplorer
 	extends JFrame
 	implements AutomatonListener
 {
-
 	private Automaton theAutomaton;
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;
@@ -79,7 +71,6 @@ public class AutomatonExplorer
 	public AutomatonExplorer(Automaton theAutomaton)
 		throws Exception
 	{
-
 		this.theAutomaton = theAutomaton;
 
 		theAutomaton.getListeners().addListener(this);
@@ -110,7 +101,6 @@ public class AutomatonExplorer
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		addWindowListener(new WindowAdapter()
 		{
-
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
@@ -145,7 +135,6 @@ public class AutomatonExplorer
 
 	private void initMenubar()
 	{
-
 		setJMenuBar(menuBar);
 
 		// File
@@ -162,7 +151,6 @@ public class AutomatonExplorer
 		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
@@ -173,7 +161,6 @@ public class AutomatonExplorer
 
 	public void updated(Object o)
 	{
-
 		if (o == theAutomaton)
 		{
 			stateViewer.goToInitialState();
@@ -209,7 +196,6 @@ public class AutomatonExplorer
 class StateViewer
 	extends JPanel
 {
-
 	private Automaton theAutomaton;
 	private State currState;
 	private EventList forwardEvents;
@@ -223,7 +209,6 @@ class StateViewer
 
 	public StateViewer(Automaton theAutomaton)
 	{
-
 		setLayout(new BorderLayout());
 
 		this.theAutomaton = theAutomaton;
@@ -252,7 +237,6 @@ class StateViewer
 
 	private void setCurrState(State newState, boolean isUndo)
 	{
-
 		if (!isUndo)
 		{
 			if (currState != null)
@@ -275,7 +259,6 @@ class StateViewer
 
 	public void goToInitialState()
 	{
-
 		prevStates.clear();
 
 		currState = null;
@@ -285,7 +268,6 @@ class StateViewer
 
 	public void undoState()
 	{
-
 		if (prevStates.size() > 0)
 		{
 			State newState = (State) prevStates.removeLast();
@@ -302,7 +284,6 @@ class StateViewer
 
 	public void redoState()
 	{
-
 		if (nextStates.size() > 0)
 		{
 			State newState = (State) nextStates.removeFirst();
@@ -319,7 +300,6 @@ class StateViewer
 
 	public void update()
 	{
-
 		stateDisplayer.setCurrState(currState);
 		forwardEvents.setCurrState(currState);
 		backwardEvents.setCurrState(currState);
@@ -335,7 +315,6 @@ class StateViewer
 class EventList
 	extends JPanel
 {
-
 	private boolean forward;
 	private boolean showStateId = false;
 	private Automaton theAutomaton;
@@ -346,7 +325,6 @@ class EventList
 
 	public EventList(StateViewer stateViewer, Automaton theAutomaton, boolean forward)
 	{
-
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
@@ -378,10 +356,8 @@ class EventList
 		add(scrollPanel, BorderLayout.CENTER);
 		theList.addMouseListener(new MouseAdapter()
 		{
-
 			public void mouseClicked(MouseEvent e)
 			{
-
 				if (e.getClickCount() == 2)
 				{
 					int index = theList.locationToIndex(e.getPoint());
@@ -404,7 +380,6 @@ class EventList
 
 	public void setCurrState(State currState)
 	{
-
 		this.currState = currState;
 
 		theList.clearSelection();
@@ -425,7 +400,6 @@ class EventList
 class EventListModel
 	extends AbstractListModel
 {
-
 	private State currState;
 	private ArrayList currArcs = new ArrayList();
 	private boolean forward;
@@ -435,7 +409,6 @@ class EventListModel
 
 	public EventListModel(Automaton theAutomaton, boolean forward)
 	{
-
 		this.forward = forward;
 		this.theAutomaton = theAutomaton;
 		this.theAlphabet = theAutomaton.getAlphabet();
@@ -443,7 +416,6 @@ class EventListModel
 
 	public void setCurrState(State currState)
 	{
-
 		this.currState = currState;
 
 		update();
@@ -456,7 +428,6 @@ class EventListModel
 
 	public void update()
 	{
-
 		Iterator arcIt;
 
 		if (forward)
@@ -487,7 +458,6 @@ class EventListModel
 
 	public Object getElementAt(int index)
 	{
-
 		Arc currArc = (Arc) currArcs.get(index);
 		String eventId = currArc.getEventId();
 		org.supremica.automata.Event currEvent;
@@ -533,7 +503,6 @@ class EventListModel
 
 	public State getStateAt(int index)
 	{
-
 		Arc currArc = (Arc) currArcs.get(index);
 		State newState;
 
@@ -553,7 +522,6 @@ class EventListModel
 class StateDisplayer
 	extends JPanel
 {
-
 	private StateViewer stateViewer;
 	private Automaton theAutomaton;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
@@ -575,7 +543,6 @@ class StateDisplayer
 
 	public StateDisplayer(StateViewer stateViewer, Automaton theAutomaton)
 	{
-
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
@@ -596,7 +563,6 @@ class StateDisplayer
 		isAcceptingBox.setBackground(Color.white);
 		isAcceptingBox.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				changeStateAccepting(((JCheckBox) e.getSource()).isSelected());
@@ -607,7 +573,6 @@ class StateDisplayer
 		isForbiddenBox.setBackground(Color.white);
 		isForbiddenBox.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				changeStateForbidden(((JCheckBox) e.getSource()).isSelected());
@@ -629,7 +594,6 @@ class StateDisplayer
 
 	public void setCurrState(State currState)
 	{
-
 		isInitialBox.setSelected(currState.isInitial());
 		isAcceptingBox.setSelected(currState.isAccepting());
 		isForbiddenBox.setSelected(currState.isForbidden());
@@ -642,7 +606,6 @@ class StateDisplayer
 class ExplorerController
 	extends JPanel
 {
-
 	private StateViewer stateViewer;
 	private Automaton theAutomaton;
 	private JButton undoButton;
@@ -650,7 +613,6 @@ class ExplorerController
 
 	public ExplorerController(StateViewer stateViewer, Automaton theAutomaton)
 	{
-
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
@@ -670,7 +632,6 @@ class ExplorerController
 		add(resetButton, BorderLayout.CENTER);
 		undoButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				undo_actionPerformed(e);
@@ -678,7 +639,6 @@ class ExplorerController
 		});
 		redoButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				redo_actionPerformed(e);
@@ -686,7 +646,6 @@ class ExplorerController
 		});
 		resetButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				reset_actionPerformed(e);
@@ -696,7 +655,6 @@ class ExplorerController
 
 	public void reset_actionPerformed(ActionEvent e)
 	{
-
 		stateViewer.goToInitialState();
 
 		// stateViewer.initialize();

@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 /** For stopping running threads and stuff. */
 public interface Stoppable
 {

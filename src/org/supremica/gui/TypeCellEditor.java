@@ -1,22 +1,14 @@
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
 import java.util.*;
-
 import java.io.*;
-
 import org.apache.log4j.*;
-
 import javax.help.*;
-
 import org.supremica.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -24,11 +16,9 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 
-
 class TypeCellEditor
 	implements CellEditorListener
 {
-
 	private JTable theTable;
 	private TableSorter theTableSorter;
 	private JComboBox automatonTypeCombo;
@@ -37,7 +27,6 @@ class TypeCellEditor
 
 	public TypeCellEditor(JTable theTable, TableSorter theTableSorter, AutomatonContainer theAutomatonContainer)
 	{
-
 		this.theTable = theTable;
 		this.theAutomatonContainer = theAutomatonContainer;
 		this.theTableSorter = theTableSorter;
@@ -63,7 +52,6 @@ class TypeCellEditor
 
 	public void editingStopped(ChangeEvent e)
 	{
-
 		if (automatonTypeCombo.getSelectedIndex() >= 0)
 		{
 			AutomatonType selectedValue = (AutomatonType) automatonTypeCombo.getSelectedItem();

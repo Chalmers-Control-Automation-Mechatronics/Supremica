@@ -1,16 +1,11 @@
 package org.jgrafchart.Transitions;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.util.*;
-
 
 public class TRStart
 	extends SimpleNode
 {
-
 	TRStart(int id)
 	{
 		super(id);
@@ -18,7 +13,6 @@ public class TRStart
 
 	public boolean evaluate()
 	{
-
 		boolean res;
 
 		res = jjtGetChild(0).evaluate();

@@ -1,26 +1,19 @@
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import com.nwoods.jgo.*;
-
 
 public class TransitionHelpDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JTextArea nameField = new JTextArea();
 	JButton OKButton = new JButton();
 
 	public TransitionHelpDialog(Frame frame, GCView view)
 	{
-
 		super(frame, "Transition Help", true);
 
 		try
@@ -42,13 +35,11 @@ public class TransitionHelpDialog
 
 	private final void init()
 	{
-
 		panel1.setLayout(null);
 		panel1.setMinimumSize(new Dimension(450, 550));
 		panel1.setPreferredSize(new Dimension(450, 550));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnOK();
@@ -102,10 +93,9 @@ public class TransitionHelpDialog
 
 	void OnOK()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}

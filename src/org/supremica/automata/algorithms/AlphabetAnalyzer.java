@@ -49,20 +49,13 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import org.supremica.automata.*;
-
 
 public class AlphabetAnalyzer
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(AlphabetAnalyzer.class.getName());
 	private Automata theAutomata;
 
@@ -86,7 +79,6 @@ public class AlphabetAnalyzer
 	 */
 	public HashMap getUncontrollableEventToPlantMap()
 	{
-
 		try
 		{
 			buildUncontrollableEventToPlantMap();
@@ -102,7 +94,6 @@ public class AlphabetAnalyzer
 
 	private void buildEventToAutomataMap()
 	{
-
 		Iterator automataIt = theAutomata.iterator();
 
 		while (automataIt.hasNext())
@@ -125,7 +116,6 @@ public class AlphabetAnalyzer
 
 	private void buildUncontrollableEventToPlantMap()
 	{
-
 		Iterator automataIt = theAutomata.iterator();
 
 		while (automataIt.hasNext())
@@ -152,7 +142,6 @@ public class AlphabetAnalyzer
 
 	private void insertEvent(Event ev, Automaton aut)
 	{
-
 		Set automatonSet = (Set) eventToAutomataMap.get(ev);
 
 		if (automatonSet == null)
@@ -172,7 +161,6 @@ public class AlphabetAnalyzer
 	 */
 	public boolean isUnsynchronizedEvent(Event ev)
 	{
-
 		Set automatonSet = (Set) eventToAutomataMap.get(ev);
 
 		if (automatonSet == null)
@@ -185,7 +173,6 @@ public class AlphabetAnalyzer
 
 	public void printUnsynchronizedEvents()
 	{
-
 		Set eventSet = eventToAutomataMap.keySet();
 		Iterator eventIt = eventSet.iterator();
 
@@ -202,7 +189,6 @@ public class AlphabetAnalyzer
 
 	private void checkAllPairs()
 	{
-
 		eventCollection = eventToAutomataMap.values();
 
 		int nbrOfAutomata = theAutomata.size();
@@ -221,7 +207,6 @@ public class AlphabetAnalyzer
 
 	private void pairComparison(Automaton leftAut, Automaton rightAut)
 	{
-
 		int nbrOnlyLeft = 0;
 		int nbrOnlyRight = 0;
 		int nbrCommon = 0;

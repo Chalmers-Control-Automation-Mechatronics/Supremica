@@ -1,7 +1,5 @@
 package helma.xmlrpc;
 
-
-
 /**
  *  Provides encoding of raw bytes to base64-encoded characters, and
  *  decoding of base64 characters to raw bytes.
@@ -22,7 +20,6 @@ public class Base64
 	 */
 	static public char[] encode(byte[] data)
 	{
-
 		char[] out = new char[((data.length + 2) / 3) * 4];
 
 		// 
@@ -76,7 +73,6 @@ public class Base64
 	 */
 	static public byte[] decode(byte[] data)
 	{
-
 		int len = ((data.length + 3) / 4) * 3;
 
 		if ((data.length > 0) && (data[data.length - 1] == '='))
@@ -90,27 +86,27 @@ public class Base64
 		}
 
 		byte[] out = new byte[len];
-		int shift = 0;		// # of excess bits stored in accum
-		int accum = 0;		// excess bits
+		int shift = 0;    // # of excess bits stored in accum
+		int accum = 0;    // excess bits
 		int index = 0;
 
 		for (int ix = 0; ix < data.length; ix++)
 		{
-			int value = codes[data[ix] & 0xFF];		// ignore high byte of char
+			int value = codes[data[ix] & 0xFF];    // ignore high byte of char
 
 			if (value >= 0)
 			{
 
 				// skip over non-code
-				accum <<= 6;		// bits shift up by 6 each time thru
-				shift += 6;			// loop, with new bits being put in
-				accum |= value;		// at the bottom.
+				accum <<= 6;                       // bits shift up by 6 each time thru
+				shift += 6;                        // loop, with new bits being put in
+				accum |= value;                    // at the bottom.
 
 				if (shift >= 8)
 				{
 
 					// whenever there are 8 or more shifted in,
-					shift -= 8;		// write them out (from the top, leaving any
+					shift -= 8;    // write them out (from the top, leaving any
 
 					// excess at the bottom for next iteration.
 					out[index++] = (byte) ((accum >> shift) & 0xff);

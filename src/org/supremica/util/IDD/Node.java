@@ -49,10 +49,7 @@
  */
 package org.supremica.util.IDD;
 
-
-
 import java.util.*;
-
 
 public final class Node
 {
@@ -74,12 +71,11 @@ public final class Node
 
 	public Node(int nbrOfChildren, int level)
 	{
-
 		this.level = level;
 		id = nextFreeId++;
 
 		if (nbrOfChildren > 0)
-		{		// The terminal nodes does not have children
+		{    // The terminal nodes does not have children
 			children = new Node[nbrOfChildren];
 		}
 		else
@@ -94,7 +90,6 @@ public final class Node
 	 */
 	public Node(Node cloneNode)
 	{
-
 		this.level = cloneNode.level;
 
 		int nbrOfChildren = cloneNode.children.length;
@@ -116,7 +111,6 @@ public final class Node
 	 */
 	public boolean equals(Object other)
 	{
-
 		Node otherNode = (Node) other;
 
 		return id == otherNode.id;
@@ -124,7 +118,6 @@ public final class Node
 
 	public boolean sameChildren(Node other)
 	{
-
 		Node[] otherChildren = other.children;
 
 		for (int i = 0; i < children.length; i++)
@@ -212,7 +205,6 @@ public final class Node
 
 	public void negate()
 	{
-
 		if (level == -1)
 		{
 			level = -2;
@@ -230,7 +222,6 @@ public final class Node
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("Id: " + id);

@@ -5,16 +5,10 @@
  */
 package helma.xmlrpc;
 
-
-
 import java.net.*;
-
 import java.io.*;
-
 import java.util.*;
-
 import org.xml.sax.*;
-
 
 /**
  * A multithreaded, reusable XML-RPC client object. This version uses a homegrown
@@ -61,7 +55,6 @@ public class XmlRpcClientLite
 	public Object execute(String method, Vector params)
 		throws XmlRpcException, IOException
 	{
-
 		Worker worker = getWorker();
 
 		try
@@ -89,7 +82,6 @@ public class XmlRpcClientLite
 	private final Worker getWorker()
 		throws IOException
 	{
-
 		try
 		{
 			return (Worker) pool.pop();
@@ -110,7 +102,6 @@ public class XmlRpcClientLite
 	class Worker
 		extends XmlRpc
 	{
-
 		boolean fault;
 		Object result = null;
 		HttpClient client = null;
@@ -124,7 +115,6 @@ public class XmlRpcClientLite
 		public Object execute(String method, Vector params)
 			throws XmlRpcException, IOException
 		{
-
 			long now = System.currentTimeMillis();
 
 			fault = false;
@@ -246,7 +236,6 @@ public class XmlRpcClientLite
 		void writeRequest(XmlWriter writer, String method, Vector params)
 			throws IOException
 		{
-
 			writer.startElement("methodCall");
 			writer.startElement("methodName");
 			writer.write(method);
@@ -272,7 +261,6 @@ public class XmlRpcClientLite
 		public void startElement(String name, AttributeList atts)
 			throws SAXException
 		{
-
 			if ("fault".equals(name))
 			{
 				fault = true;
@@ -282,12 +270,11 @@ public class XmlRpcClientLite
 				super.startElement(name, atts);
 			}
 		}
-	}		// end of class Worker
+	}    // end of class Worker
 
 	// A replacement for java.net.URLConnection, which seems very slow on MS Java.
 	class HttpClient
 	{
-
 		String hostname;
 		String host;
 		int port;
@@ -301,7 +288,6 @@ public class XmlRpcClientLite
 		public HttpClient(URL url)
 			throws IOException
 		{
-
 			hostname = url.getHost();
 			port = url.getPort();
 
@@ -327,7 +313,6 @@ public class XmlRpcClientLite
 		protected void initConnection()
 			throws IOException
 		{
-
 			fresh = true;
 			socket = new Socket(hostname, port);
 			output = new BufferedOutputStream(socket.getOutputStream());
@@ -336,7 +321,6 @@ public class XmlRpcClientLite
 
 		protected void closeConnection()
 		{
-
 			try
 			{
 				socket.close();
@@ -347,7 +331,6 @@ public class XmlRpcClientLite
 		public void write(byte[] request)
 			throws IOException
 		{
-
 			try
 			{
 				output.write(("POST " + uri + " HTTP/1.0\r\n").getBytes());
@@ -393,7 +376,6 @@ public class XmlRpcClientLite
 		public InputStream getInputStream()
 			throws IOException
 		{
-
 			String line = readLine();
 
 			if (XmlRpc.debug)
@@ -462,7 +444,6 @@ public class XmlRpcClientLite
 		private String readLine()
 			throws IOException
 		{
-
 			if (buffer == null)
 			{
 				buffer = new byte[512];

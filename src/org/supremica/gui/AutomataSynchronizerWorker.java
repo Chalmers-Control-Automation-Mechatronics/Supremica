@@ -49,21 +49,15 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
 // import org.apache.log4j.*;
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 
 public class AutomataSynchronizerWorker
 	extends Thread
@@ -85,10 +79,9 @@ public class AutomataSynchronizerWorker
 	private boolean stopRequested = false;
 
 	// -- MF -- Changed stuff here to route output through the Gui
-	public AutomataSynchronizerWorker(Gui workbench,	// -- MF -- Supremica workbench,
+	public AutomataSynchronizerWorker(Gui workbench,    // -- MF -- Supremica workbench,
 									  Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
 	{
-
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
 
@@ -101,7 +94,6 @@ public class AutomataSynchronizerWorker
 
 	public void run()
 	{
-
 		if (mode == MODE_SYNC)
 		{
 			Date startDate = new Date();

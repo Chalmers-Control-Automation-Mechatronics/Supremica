@@ -49,28 +49,20 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.util.*;
-
 import com.nwoods.jgo.*;
-
 import java.awt.Rectangle;
-
 import org.supremica.automata.*;
-
 
 public class Labels
 	extends JGoArea
 {
-
 	private ArcSet theArcSet = null;
 	private AutomatonDocument doc = null;
 
 	public Labels(AutomatonDocument doc, ArcSet theArcSet)
 		throws Exception
 	{
-
 		this.doc = doc;
 		this.theArcSet = theArcSet;
 
@@ -79,7 +71,6 @@ public class Labels
 
 	public void initialize()
 	{
-
 		setSelectable(true);
 		setDraggable(true);
 		setResizable(true);
@@ -88,7 +79,6 @@ public class Labels
 	public void updateArcs()
 		throws Exception
 	{
-
 		Automaton theAutomaton = doc.getAutomaton();
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 

@@ -49,14 +49,10 @@
  */
 package org.supremica.gui;
 
-
-
 import java.util.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
 
 // MF -- Small changes here to make the main popup menu usefable from other tables
 // MF -- Instead of hardwiring the menuhandler to a certain table, it takes a table param where appropriate
@@ -73,7 +69,7 @@ public class MenuHandler
 	private final LinkedList oneAutomataItems = new LinkedList();
 	private final LinkedList twoAutomataItems = new LinkedList();
 
-	public MenuHandler(	/* JTable theTable */)
+	public MenuHandler( /* JTable theTable */)
 	{
 
 		// this.theTable = theTable;
@@ -81,7 +77,6 @@ public class MenuHandler
 
 	public void add(JMenuItem theMenuItem, int minNbrOfAutomata)
 	{
-
 		if (minNbrOfAutomata == 0)
 		{
 			zeroAutomataItems.add(theMenuItem);
@@ -117,7 +112,6 @@ public class MenuHandler
 
 	public void addSeparator()
 	{
-
 		if (!oneAutomataMenuLastSep)
 		{
 			oneAutomataMenu.addSeparator();
@@ -147,7 +141,6 @@ public class MenuHandler
 
 	public JPopupMenu getTrimmedPopupMenu(JTable theTable)
 	{
-
 		int nbrOfAutomata = theTable.getSelectedRowCount();
 
 		if (nbrOfAutomata >= 2)
@@ -160,7 +153,6 @@ public class MenuHandler
 
 	private void setEnabled(LinkedList theList, boolean enable)
 	{
-
 		Iterator menuItemIt = theList.iterator();
 
 		while (menuItemIt.hasNext())

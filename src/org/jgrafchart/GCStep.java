@@ -4,14 +4,9 @@
  */
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 /**
  * A Step is an Area containing a Rectangle and two Ports and
@@ -36,7 +31,6 @@ public class GCStep
 
 	public GCStep(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(60, 60);
@@ -165,7 +159,6 @@ public class GCStep
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		GCStep newobj = (GCStep) super.copyObject(env);
 
 		return newobj;
@@ -173,7 +166,6 @@ public class GCStep
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		GCStep newobj = (GCStep) newarea;
 
 		if (myRectangle != null)
@@ -260,7 +252,6 @@ public class GCStep
 	// this area's natural "location" is the center of the rectangle
 	public Point getLocation(Point p)
 	{
-
 		if (myRectangle != null)
 		{
 			return myRectangle.getSpotLocation(TopCenter, p);
@@ -273,7 +264,6 @@ public class GCStep
 
 	public void setLocation(int x, int y)
 	{
-
 		if (myRectangle != null)
 		{
 			myRectangle.setSpotLocation(TopCenter, x, y);
@@ -297,7 +287,6 @@ public class GCStep
 	 */
 	public void layoutChildren()
 	{
-
 		if (myRectangle == null)
 		{
 			return;
@@ -460,7 +449,6 @@ public class GCStep
 
 	public void removeSucceedingTransition(GCTransition s)
 	{
-
 		if (succeedingTransitions.contains(s))
 		{
 			succeedingTransitions.remove(succeedingTransitions.indexOf(s));
@@ -474,7 +462,6 @@ public class GCStep
 
 	public void removePrecedingTransition(GCTransition s)
 	{
-
 		if (precedingTransitions.contains(s))
 		{
 			precedingTransitions.remove(precedingTransitions.indexOf(s));
@@ -497,7 +484,6 @@ public class GCStep
 	// }
 	public void activate()
 	{
-
 		myToken.setBrush(JGoBrush.black);
 
 		newX = true;
@@ -505,7 +491,6 @@ public class GCStep
 
 	public void deactivate()
 	{
-
 		myToken.setBrush(JGoBrush.Null);
 
 		newX = false;
@@ -524,7 +509,6 @@ public class GCStep
 
 	public void changeState()
 	{
-
 		if (!x)
 		{
 			timer = 0;
@@ -571,7 +555,6 @@ public class GCStep
 
 	public void executeNormalActions(boolean b)
 	{
-
 		if (node != null)
 		{
 			node.executeNormalActions(b);
@@ -580,7 +563,6 @@ public class GCStep
 
 	public void executeExitActions()
 	{
-
 		if (node != null)
 		{
 
@@ -591,7 +573,6 @@ public class GCStep
 
 	public void showActionBlock()
 	{
-
 		actionBlockVisible = true;
 
 		myActionStroke.setPen(JGoPen.black);
@@ -614,7 +595,6 @@ public class GCStep
 
 	public void hideActionBlock()
 	{
-
 		actionBlockVisible = false;
 
 		myActionStroke.setPen(JGoPen.Null);

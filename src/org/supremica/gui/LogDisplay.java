@@ -49,20 +49,14 @@
  */
 package org.supremica.gui;
 
-
-
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
-
 import java.io.*;
-
 import java.net.URL;
-
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Hashtable;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTextPane;
@@ -75,7 +69,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
-
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.Loader;
@@ -84,11 +77,9 @@ import org.apache.log4j.helpers.QuietWriter;
 // import org.apache.log4j.helpers.TracerPrintWriter;
 import org.apache.log4j.helpers.OptionConverter;
 
-
 public class LogDisplay
 	extends AppenderSkeleton
 {
-
 	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private static LogDisplay theLogDisplay = null;
 	private JScrollPane theTextPaneScrollPane;
@@ -115,7 +106,6 @@ public class LogDisplay
 
 	private LogDisplay()
 	{
-
 		super();
 
 		// layout = new PatternLayout("%-5p %d [%t]:  %m%n");
@@ -139,7 +129,6 @@ public class LogDisplay
 
 	public synchronized static LogDisplay getInstance()
 	{
-
 		if (theLogDisplay == null)
 		{
 			theLogDisplay = new LogDisplay();
@@ -150,7 +139,6 @@ public class LogDisplay
 
 	public synchronized static Category createCategory(String name)
 	{
-
 		Category thisCategory = Category.getInstance(name);
 
 		thisCategory.addAppender(getInstance());
@@ -160,7 +148,6 @@ public class LogDisplay
 
 	private void createAttributes()
 	{
-
 		Priority prio[] = Priority.getAllPossiblePriorities();
 
 		attributes = new Hashtable();
@@ -183,7 +170,6 @@ public class LogDisplay
 
 	private void createIcons()
 	{
-
 		Priority prio[] = Priority.getAllPossiblePriorities();
 
 		icons = new Hashtable();
@@ -219,7 +205,6 @@ public class LogDisplay
 
 	public void append(LoggingEvent event)
 	{
-
 		String text = this.layout.format(event);
 		String trace = "";
 
@@ -273,7 +258,6 @@ public class LogDisplay
 
 	public String[] getOptionStrings()
 	{
-
 		return new String[]{ LABEL_OPTION, COLOR_OPTION_FATAL,
 							 COLOR_OPTION_ERROR, COLOR_OPTION_WARN,
 							 COLOR_OPTION_INFO, COLOR_OPTION_DEBUG,
@@ -283,7 +267,6 @@ public class LogDisplay
 
 	private Color parseColor(String v)
 	{
-
 		StringTokenizer st = new StringTokenizer(v, ",");
 		int val[] = { 255, 255, 255, 255 };
 		int i = 0;
@@ -310,7 +293,6 @@ public class LogDisplay
 
 	private void setTextPane(JTextPane textpane)
 	{
-
 		this.textpane = textpane;
 
 		textpane.setEditable(false);
@@ -326,7 +308,6 @@ public class LogDisplay
 
 	private void setFontSize(int size)
 	{
-
 		Enumeration e = attributes.elements();
 
 		while (e.hasMoreElements())
@@ -339,7 +320,6 @@ public class LogDisplay
 
 	private void setFontName(String name)
 	{
-
 		Enumeration e = attributes.elements();
 
 		while (e.hasMoreElements())
@@ -352,7 +332,6 @@ public class LogDisplay
 
 	public void setOption(String option, String value)
 	{
-
 		if (option.equalsIgnoreCase(LABEL_OPTION))
 		{
 			this.label = value;

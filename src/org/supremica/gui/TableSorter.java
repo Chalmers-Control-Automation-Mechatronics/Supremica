@@ -68,10 +68,7 @@
  */
 package org.supremica.gui;
 
-
-
 import java.util.*;
-
 import javax.swing.table.TableModel;
 import javax.swing.event.TableModelEvent;
 
@@ -79,16 +76,13 @@ import javax.swing.event.TableModelEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
-
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
-
 public class TableSorter
 	extends TableMap
 {
-
 	int indexes[];
 	Vector sortingColumns = new Vector();
 	boolean ascending = true;
@@ -96,7 +90,7 @@ public class TableSorter
 
 	public TableSorter()
 	{
-		indexes = new int[0];		// for consistency
+		indexes = new int[0];    // for consistency
 	}
 
 	public TableSorter(TableModel model)
@@ -112,7 +106,6 @@ public class TableSorter
 
 	public int compareRowsByColumn(int row1, int row2, int column)
 	{
-
 		Class type = model.getColumnClass(column);
 		TableModel data = model;
 
@@ -126,7 +119,7 @@ public class TableSorter
 			return 0;
 		}
 		else if (o1 == null)
-		{		// Define null less than everything.
+		{    // Define null less than everything.
 			return -1;
 		}
 		else if (o2 == null)
@@ -213,7 +206,7 @@ public class TableSorter
 				return 0;
 			}
 			else if (b1)
-			{		// Define false < true
+			{    // Define false < true
 				return 1;
 			}
 			else
@@ -246,7 +239,6 @@ public class TableSorter
 
 	public int compare(int row1, int row2)
 	{
-
 		compares++;
 
 		for (int level = 0; level < sortingColumns.size(); level++)
@@ -267,7 +259,6 @@ public class TableSorter
 
 	public void reallocateIndexes()
 	{
-
 		int rowCount = model.getRowCount();
 
 		// Set up a new array of indexes with the right number of elements
@@ -291,7 +282,6 @@ public class TableSorter
 
 	public void checkModel()
 	{
-
 		if (indexes.length != model.getRowCount())
 		{
 			System.err.println("Sorter not informed of a change in model.");
@@ -300,7 +290,6 @@ public class TableSorter
 
 	public void sort(Object sender)
 	{
-
 		checkModel();
 
 		compares = 0;
@@ -314,7 +303,6 @@ public class TableSorter
 
 	public void n2sort()
 	{
-
 		for (int i = 0; i < getRowCount(); i++)
 		{
 			for (int j = i + 1; j < getRowCount(); j++)
@@ -336,7 +324,6 @@ public class TableSorter
 	// using it here is that, unlike qsort, it is stable.
 	public void shuttlesort(int from[], int to[], int low, int high)
 	{
-
 		if (high - low < 2)
 		{
 			return;
@@ -392,7 +379,6 @@ public class TableSorter
 
 	public void swap(int i, int j)
 	{
-
 		int tmp = indexes[i];
 
 		indexes[i] = indexes[j];
@@ -403,7 +389,6 @@ public class TableSorter
 	// Pass all requests to these rows through the mapping array: "indexes".
 	public Object getValueAt(int aRow, int aColumn)
 	{
-
 		checkModel();
 
 		return model.getValueAt(indexes[aRow], aColumn);
@@ -427,7 +412,6 @@ public class TableSorter
 
 	public void sortByColumn(int column, boolean ascending)
 	{
-
 		this.ascending = ascending;
 
 		sortingColumns.removeAllElements();
@@ -441,7 +425,6 @@ public class TableSorter
 	// when a column heading is clicked in the JTable.
 	public void addMouseListenerToHeaderInTable(JTable table)
 	{
-
 		final TableSorter sorter = this;
 		final JTable tableView = table;
 
@@ -449,10 +432,8 @@ public class TableSorter
 
 		MouseAdapter listMouseListener = new MouseAdapter()
 		{
-
 			public void mouseClicked(MouseEvent e)
 			{
-
 				TableColumnModel columnModel = tableView.getColumnModel();
 				int viewColumn = columnModel.getColumnIndexAtX(e.getX());
 				int column = tableView.convertColumnIndexToModel(viewColumn);

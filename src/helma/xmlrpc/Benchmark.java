@@ -4,17 +4,12 @@
  */
 package helma.xmlrpc;
 
-
-
 import java.util.*;
-
 import java.io.IOException;
-
 
 public class Benchmark
 	implements Runnable
 {
-
 	XmlRpcClient client;
 	static String url;
 	static int clients = 8;
@@ -24,7 +19,6 @@ public class Benchmark
 	public Benchmark()
 		throws Exception
 	{
-
 		client = new XmlRpcClientLite(url);
 
 		Vector args = new Vector();
@@ -46,7 +40,6 @@ public class Benchmark
 
 	public void run()
 	{
-
 		int errors = 0;
 		int calls = 0;
 		long start = System.currentTimeMillis();
@@ -108,7 +101,6 @@ public class Benchmark
 
 	private synchronized void checkout(int calls, int errors, int millis)
 	{
-
 		clients--;
 
 		gCalls += calls;
@@ -126,7 +118,6 @@ public class Benchmark
 	public static void main(String args[])
 		throws Exception
 	{
-
 		if ((args.length > 0) && (args.length < 3))
 		{
 			url = args[0];

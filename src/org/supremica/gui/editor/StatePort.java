@@ -49,12 +49,8 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 
 /**
 * To get the link arrowheads' point at the edge of the ellipse,
@@ -64,17 +60,15 @@ import java.awt.*;
 public class StatePort
 	extends JGoPort
 {
-
 	public JGoEllipse myEllipse = null;
 
 	public StatePort()
 	{
-
 		super();
 
 		setSelectable(false);
 		setDraggable(false);
-		setStyle(StyleEllipse);		// black circle/ellipse
+		setStyle(StyleEllipse);    // black circle/ellipse
 
 		// use custom link spots for both links coming in and going out
 		setFromSpot(JGoObject.NoSpot);
@@ -86,7 +80,6 @@ public class StatePort
 	*/
 	public Point getLinkPointFromPoint(int x, int y, Point p)
 	{
-
 		if (p == null)
 		{
 			p = new Point();

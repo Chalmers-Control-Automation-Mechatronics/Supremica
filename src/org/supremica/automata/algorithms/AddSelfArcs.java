@@ -49,18 +49,12 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.automata.*;
-
 
 public class AddSelfArcs
 {
-
 	private AddSelfArcs() {}
 
 	public static void execute(Automaton theAutomaton)
@@ -77,7 +71,6 @@ public class AddSelfArcs
 	public static void execute(Automaton theAutomaton, boolean expandedSystem)
 		throws Exception
 	{
-
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		Event passEvent = null;
 		String passEventId = null;
@@ -127,7 +120,7 @@ public class AddSelfArcs
 			}
 		}
 		else
-		{		// The standard case
+		{    // The standard case
 			Iterator stateIt = theAutomaton.stateIterator();
 
 			while (stateIt.hasNext())
@@ -147,7 +140,6 @@ public class AddSelfArcs
 	private static void doState(State currState, Automaton theAutomaton, String passEventId)
 		throws Exception
 	{
-
 		Alphabet currAlphabet = new Alphabet(theAutomaton.getAlphabet());
 
 		// Remove all events that is possible from the current state
@@ -181,7 +173,6 @@ public class AddSelfArcs
 	private static void doPassState(State currState, Automaton theAutomaton, String passEventId)
 		throws Exception
 	{
-
 		Alphabet currAlphabet = new Alphabet(theAutomaton.getAlphabet());
 
 		// Remove all events that is possible from the current state
@@ -232,7 +223,6 @@ public class AddSelfArcs
 	private static boolean containsPassEvent(State theState, Alphabet currAlphabet, String passEventId)
 		throws Exception
 	{
-
 		if (passEventId == null)
 		{
 			return false;

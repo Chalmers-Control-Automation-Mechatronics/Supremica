@@ -49,14 +49,9 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 import java.io.PrintWriter;
-
 
 /**
  * @deprecated use AutomataVerifier instead.
@@ -64,7 +59,6 @@ import java.io.PrintWriter;
  */
 public class AutomataControllabilityCheck
 {
-
 	private Automata theAutomata;
 	private AutomataSynchronizerHelper synchHelper;
 	private ArrayList synchronizationExecuters;
@@ -72,14 +66,13 @@ public class AutomataControllabilityCheck
 	public AutomataControllabilityCheck(Automata theAutomata, SynchronizationOptions syncOptions)
 		throws Exception
 	{
-
 		this.theAutomata = theAutomata;
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
-		int[] initialState = new int[theAutomata.size() + 1];		// +1 status field
+		int[] initialState = new int[theAutomata.size() + 1];    // +1 status field
 		Iterator autIt = theAutomata.iterator();
 
 		while (autIt.hasNext())

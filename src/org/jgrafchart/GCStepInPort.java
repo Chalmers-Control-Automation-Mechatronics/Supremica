@@ -4,20 +4,14 @@
  */
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 
 public class GCStepInPort
 	extends JGoPort
 {
-
 	public GCStepInPort()
 	{
-
 		super();
 
 		setSelectable(false);

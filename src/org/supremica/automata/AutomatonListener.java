@@ -49,12 +49,9 @@
  */
 package org.supremica.automata;
 
-
-
 public interface AutomatonListener
 	extends Listener
 {
-
 	public void stateAdded(Automaton aut, State q);
 
 	public void stateRemoved(Automaton aut, State q);

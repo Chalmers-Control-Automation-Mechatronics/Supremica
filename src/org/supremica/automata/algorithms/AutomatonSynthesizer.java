@@ -49,20 +49,15 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.gui.*;
-
 import java.util.*;
-
 
 /**
  * A monolithic synthesizer that can handle non-blocking and controllability problems.
  */
 public class AutomatonSynthesizer
 {
-
 	private Automaton theAutomaton;
 	private LinkedList acceptingStates = new LinkedList();
 	private Gui workbench;
@@ -72,7 +67,6 @@ public class AutomatonSynthesizer
 	public AutomatonSynthesizer(Gui workbench, Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
 		throws Exception
 	{
-
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.Unknown)
 		{
 			throw new Exception("Invalid synthesis type: " + SynthesisType.Unknown.toString());
@@ -87,7 +81,6 @@ public class AutomatonSynthesizer
 	public void synthesize()
 		throws Exception
 	{
-
 		theAutomaton.beginTransaction();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
@@ -118,7 +111,6 @@ public class AutomatonSynthesizer
 	private void synthesizeControllableNonblocking()
 		throws Exception
 	{
-
 		boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
@@ -182,7 +174,6 @@ public class AutomatonSynthesizer
 	private void synthesizeControllable()
 		throws Exception
 	{
-
 		boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
@@ -245,7 +236,6 @@ public class AutomatonSynthesizer
 	private void synthesizeNonblocking()
 		throws Exception
 	{
-
 		boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 
@@ -282,7 +272,6 @@ public class AutomatonSynthesizer
 	private LinkedList doCoreachable()
 		throws Exception
 	{
-
 		if (debugMode)
 		{
 			System.err.println("doCoreachable");
@@ -351,7 +340,6 @@ public class AutomatonSynthesizer
 	private boolean doControllable(LinkedList stateStack)
 		throws Exception
 	{
-
 		if (debugMode)
 		{
 			System.err.println("doControllable");
@@ -403,7 +391,6 @@ public class AutomatonSynthesizer
 
 	private void doReachable()
 	{
-
 		if (debugMode)
 		{
 			System.err.println("doReachable");
@@ -463,7 +450,6 @@ public class AutomatonSynthesizer
 
 	private void purge()
 	{
-
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
 

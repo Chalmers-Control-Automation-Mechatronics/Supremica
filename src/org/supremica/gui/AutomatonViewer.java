@@ -49,30 +49,20 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-
 import org.apache.log4j.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 import att.grappa.*;
-
 
 public class AutomatonViewer
 	extends JFrame
 	implements AutomatonListener
 {
-
 	private Automaton theAutomaton;
 	private Graph theGraph;
 	private PrintWriter toDotWriter;
@@ -95,7 +85,6 @@ public class AutomatonViewer
 	public AutomatonViewer(Automaton theAutomaton)
 		throws Exception
 	{
-
 		this.theAutomaton = theAutomaton;
 
 		theAutomaton.getListeners().addListener(this);
@@ -124,7 +113,6 @@ public class AutomatonViewer
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		addWindowListener(new WindowAdapter()
 		{
-
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
@@ -141,7 +129,6 @@ public class AutomatonViewer
 
 	public void run()
 	{
-
 		setVisible(true);
 
 		try
@@ -156,7 +143,6 @@ public class AutomatonViewer
 
 	public void updated(Object o)
 	{
-
 		if (o == theAutomaton)
 		{
 			try
@@ -200,7 +186,6 @@ public class AutomatonViewer
 
 	public void setVisible(boolean toVisible)
 	{
-
 		super.setVisible(toVisible);
 
 		if (updateNeeded)
@@ -211,7 +196,6 @@ public class AutomatonViewer
 
 	private void initMenubar()
 	{
-
 		setJMenuBar(menuBar);
 
 		// File
@@ -268,10 +252,8 @@ public class AutomatonViewer
 		menuZoom.add(menuZoomReset);
 		menuZoomIn.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				scaleFactor *= SCALE_CHANGE;
 				scaleFactor = Math.max(scaleFactor, MIN_SCALE);
 
@@ -280,10 +262,8 @@ public class AutomatonViewer
 		});
 		menuZoomOut.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				scaleFactor /= SCALE_CHANGE;
 				scaleFactor = Math.min(scaleFactor, MAX_SCALE);
 
@@ -292,10 +272,8 @@ public class AutomatonViewer
 		});
 		menuZoomReset.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				if (scaleFactor != SCALE_RESET)
 				{
 					scaleFactor = SCALE_RESET;
@@ -306,7 +284,6 @@ public class AutomatonViewer
 		});
 		menuFileExport.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				fileExport_actionPerformed(e);
@@ -314,7 +291,6 @@ public class AutomatonViewer
 		});
 		menuFileClose.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
@@ -323,10 +299,8 @@ public class AutomatonViewer
 		});
 		leftToRightCheckBox.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				if (automaticUpdateCheckBox.isSelected())
 				{
 					update();
@@ -335,10 +309,8 @@ public class AutomatonViewer
 		});
 		withLabelsCheckBox.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				if (automaticUpdateCheckBox.isSelected())
 				{
 					update();
@@ -347,10 +319,8 @@ public class AutomatonViewer
 		});
 		withCirclesCheckBox.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				if (automaticUpdateCheckBox.isSelected())
 				{
 					update();
@@ -359,10 +329,8 @@ public class AutomatonViewer
 		});
 		useColorsCheckBox.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				if (automaticUpdateCheckBox.isSelected())
 				{
 					update();
@@ -371,7 +339,6 @@ public class AutomatonViewer
 		});
 		menuLayoutUpdate.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				update();
@@ -381,7 +348,6 @@ public class AutomatonViewer
 
 	public void update()
 	{
-
 		if (!isVisible())
 		{
 			updateNeeded = true;
@@ -404,7 +370,6 @@ public class AutomatonViewer
 	public void build()
 		throws Exception
 	{
-
 		Builder builder = new Builder(this);
 
 		builder.start();
@@ -413,7 +378,6 @@ public class AutomatonViewer
 	public void internalBuild()
 		throws Exception
 	{
-
 		AutomatonToDot exporter = new AutomatonToDot(theAutomaton);
 
 		exporter.setLeftToRight(leftToRightCheckBox.isSelected());
@@ -533,7 +497,6 @@ public class AutomatonViewer
 
 	public void fileExport_actionPerformed(ActionEvent e)
 	{
-
 		String epsString = "eps";
 		String mifString = "mif";
 		String dotString = "dot";
@@ -637,7 +600,6 @@ public class AutomatonViewer
 class Builder
 	extends Thread
 {
-
 	private AutomatonViewer theViewer = null;
 	private static final int BUILD = 1;
 	private static final int DRAW = 2;
@@ -651,7 +613,6 @@ class Builder
 
 	public void run()
 	{
-
 		if (mode == BUILD)
 		{
 			try

@@ -49,21 +49,13 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import java.io.*;
-
 import java.util.*;
-
 import com.nwoods.jgo.*;
-
 import org.supremica.automata.*;
-
 
 // AutomatonDocument, for this example, has just a few properties:
 // Location and Link Pen.
@@ -88,7 +80,6 @@ public class AutomatonDocument
 
 	public AutomatonDocument(AutomatonContainer theAutomatonContainer, Automaton theAutomaton)
 	{
-
 		this.theAutomatonContainer = theAutomatonContainer;
 		this.theAutomaton = theAutomaton;
 
@@ -107,7 +98,6 @@ public class AutomatonDocument
 
 	public void setLocation(String newloc)
 	{
-
 		String oldLocation = getLocation();
 
 		if (!oldLocation.equals(newloc))
@@ -120,7 +110,6 @@ public class AutomatonDocument
 
 	public StateNode newStateNode(Point p)
 	{
-
 		State newState = new State(theAutomaton.getUniqueStateId());
 
 		theAutomaton.addState(newState);
@@ -131,7 +120,6 @@ public class AutomatonDocument
 
 	public StateNode newStateNode(State theState)
 	{
-
 		StateNode stateNode = new StateNode(theState);
 
 		stateNode.initialize();
@@ -142,7 +130,6 @@ public class AutomatonDocument
 
 	public JGoLink newLink(StateNode from, StateNode to)
 	{
-
 		JGoLink ll = new JGoLink(from.getPort(), to.getPort());
 
 		ll.setPen(getLinkPen());
@@ -154,7 +141,6 @@ public class AutomatonDocument
 
 	public JGoLink newLink(StateNode from, StateNode to, ArcSet theArcSet)
 	{
-
 		JGoLabeledLink ll = new JGoLabeledLink(from.getPort(), to.getPort());
 
 		// JGoText textLabel = new JGoText(label);
@@ -181,7 +167,6 @@ public class AutomatonDocument
 	// creating a new link between layout nodes.
 	public JGoLink newLink(JGoPort from, JGoPort to)
 	{
-
 		JGoLink ll = new JGoLink(from, to);
 
 		ll.setPen(getLinkPen());
@@ -198,7 +183,6 @@ public class AutomatonDocument
 
 	public void setLinkPen(JGoPen p)
 	{
-
 		if (!getLinkPen().equals(p))
 		{
 			myPen = p;
@@ -225,7 +209,6 @@ public class AutomatonDocument
 
 	public StatePort pickPort(Point pointToCheck)
 	{
-
 		JGoListPosition pos = this.getLastObjectPos();
 
 		while (pos != null)
@@ -285,7 +268,6 @@ public class AutomatonDocument
 
 	public void build()
 	{
-
 		HashMap stateToStateNodeMap = new HashMap(theAutomaton.nbrOfStates());
 
 		// First add all states

@@ -49,11 +49,8 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 public class StateHolder
 {
-
 	private int[] theState;
 	private int problemPlant = 0;
 	private int problemEvent = 0;
@@ -66,7 +63,6 @@ public class StateHolder
 
 	public StateHolder(int[] theState, int problemPlant, int problemEvent)
 	{
-
 		this.theState = theState;
 		this.problemPlant = problemPlant;
 		this.problemEvent = problemEvent;
@@ -90,7 +86,6 @@ public class StateHolder
 	// ** MF ** Why isn't this code trivially optimised?
 	public boolean equals(Object other)
 	{
-
 		boolean equal = true;
 		int[] otherState = ((StateHolder) other).getArray();
 
@@ -108,18 +103,17 @@ public class StateHolder
 	/** MF ** trivial optimization
 	public boolean equals(Object other)
 	{
-																	int[] otherState = ((StateHolder)other).getArray();
-																	for (int i = 0; i < theState.length; i++)
-																																	if (theState[i] != otherState[i])
-																																																	return false;
-																	return true;
+																																	int[] otherState = ((StateHolder)other).getArray();
+																																	for (int i = 0; i < theState.length; i++)
+																																																																	if (theState[i] != otherState[i])
+																																																																																																	return false;
+																																	return true;
 	}
 	*/
 
 	// Stolen and modified version of the hashCodeIntArray method in IntArrayHashTable
 	public int hashCode()
 	{
-
 		int hashCode = 1;
 
 		for (int i = 0; i < theState.length; i++)

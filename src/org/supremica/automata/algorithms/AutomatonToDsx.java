@@ -49,19 +49,13 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.automata.*;
-
 
 public class AutomatonToDsx
 	implements AutomataSerializer
 {
-
 	private Automaton aut;
 
 	public AutomatonToDsx(Automaton aut)
@@ -72,7 +66,6 @@ public class AutomatonToDsx
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-
 		pw.println("STATESPACE;");
 		pw.println("number of states: " + aut.nbrOfStates());
 		pw.println("number of events: " + aut.nbrOfEvents());

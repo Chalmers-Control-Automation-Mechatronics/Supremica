@@ -5,14 +5,9 @@
  */
 package helma.xmlrpc;
 
-
-
 import java.io.*;
-
 import java.util.*;
-
 import java.lang.reflect.*;
-
 
 /**
  * A multithreaded, reusable XML-RPC server object. The name may be misleading because this does not open any
@@ -43,7 +38,6 @@ public class XmlRpcServer
 	 */
 	public void addHandler(String handlername, Object handler)
 	{
-
 		if ((handler instanceof XmlRpcHandler) || (handler instanceof AuthenticatedXmlRpcHandler))
 		{
 			handlers.put(handlername, handler);
@@ -78,7 +72,6 @@ public class XmlRpcServer
 	 */
 	public byte[] execute(InputStream is, String user, String password)
 	{
-
 		Worker worker = getWorker();
 		byte[] retval = worker.execute(is, user, password);
 
@@ -92,7 +85,6 @@ public class XmlRpcServer
 
 	private final Worker getWorker()
 	{
-
 		try
 		{
 			return (Worker) pool.pop();
@@ -113,7 +105,6 @@ public class XmlRpcServer
 	class Worker
 		extends XmlRpc
 	{
-
 		Vector inParams;
 		Object outParam;
 		byte[] result;
@@ -121,7 +112,6 @@ public class XmlRpcServer
 
 		public byte[] execute(InputStream is, String user, String password)
 		{
-
 			inParams = new Vector();
 
 			if (strbuf == null)
@@ -253,7 +243,6 @@ public class XmlRpcServer
 		 */
 		void writeResponse(Object param, XmlWriter writer)
 		{
-
 			writer.startElement("methodResponse");
 
 			// if (param == null) param = ""; // workaround for Frontier bug
@@ -282,20 +271,18 @@ public class XmlRpcServer
 			writer.endElement("fault");
 			writer.endElement("methodResponse");
 		}
-	}		// end of inner class Worker
-}			// XmlRpcServer
+	}    // end of inner class Worker
+}        // XmlRpcServer
 
 // This class uses Java Reflection to call methods matching an XML-RPC call
 class Invoker
 	implements XmlRpcHandler
 {
-
 	private Object invokeTarget;
 	private Class targetClass;
 
 	public Invoker(Object target)
 	{
-
 		invokeTarget = target;
 		targetClass = (invokeTarget instanceof Class)
 					  ? (Class) invokeTarget

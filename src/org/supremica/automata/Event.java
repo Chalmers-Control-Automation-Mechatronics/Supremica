@@ -49,15 +49,11 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class Event
 	implements Comparable
 {
-
 	private String id = "";
 	private String label = "";
 	private boolean controllable = true;
@@ -71,7 +67,6 @@ public class Event
 
 	public Event(String label)
 	{
-
 		this.label = label;
 
 		// ** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
@@ -87,7 +82,6 @@ public class Event
 
 	public Event(Event e)
 	{
-
 		id = e.id;
 		label = e.label;
 		controllable = e.controllable;

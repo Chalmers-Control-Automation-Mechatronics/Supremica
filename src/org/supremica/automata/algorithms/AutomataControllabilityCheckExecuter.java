@@ -49,15 +49,10 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import java.util.ArrayList;
-
 
 /**
  * @deprecated DYNG-DEPRECATED, ALLTIHOP, NU ANVÄNDS AutomataSynchronizerExecuter TILL ALLT SÅN'T HÄR TRAMS
@@ -65,7 +60,6 @@ import java.util.ArrayList;
 public final class AutomataControllabilityCheckExecuter
 	extends Thread
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(AutomataControllabilityCheckExecuter.class.getName());
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
@@ -90,7 +84,6 @@ public final class AutomataControllabilityCheckExecuter
 
 	public AutomataControllabilityCheckExecuter(AutomataSynchronizerHelper synchronizerHelper)
 	{
-
 		helper = synchronizerHelper;
 		indexForm = helper.getAutomataIndexForm();
 		nbrOfAutomata = helper.getAutomata().size();
@@ -105,7 +98,6 @@ public final class AutomataControllabilityCheckExecuter
 	// Select two automata
 	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
 	{
-
 		currSelectedAutomata = new int[2];
 		currSelectedAutomata[0] = plantIndex;
 		currSelectedAutomata[1] = supervisorIndex;
@@ -114,7 +106,6 @@ public final class AutomataControllabilityCheckExecuter
 	// Select some automata
 	public void selectAutomata(ArrayList automataToBeSelected)
 	{
-
 		currSelectedAutomata = new int[automataToBeSelected.size()];
 
 		for (int i = 0; i < automataToBeSelected.size(); i++)
@@ -129,7 +120,6 @@ public final class AutomataControllabilityCheckExecuter
 	// A more narrow selection can be made in many cases
 	public void selectAllAutomata()
 	{
-
 		currSelectedAutomata = new int[nbrOfAutomata];
 
 		for (int i = 0; i < nbrOfAutomata; i++)
@@ -140,18 +130,16 @@ public final class AutomataControllabilityCheckExecuter
 
 	private final void initialize()
 	{
-
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
-		nextState = new int[nbrOfAutomata + 1];		// +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1];		// Always end with Integer.MAX_VALUE
+		nextState = new int[nbrOfAutomata + 1];    // +1 status field
+		currEnabledEvents = new int[nbrOfEvents + 1];    // Always end with Integer.MAX_VALUE
 
 		// currPlantEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
 	}
 
 	private final void enabledEvents(int[] currState)
 	{
-
 		int currMinEventIndex = Integer.MAX_VALUE;
 		int nbrOfSelectedAutomata = currSelectedAutomata.length;
 
@@ -210,7 +198,7 @@ public final class AutomataControllabilityCheckExecuter
 				int currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
 
 				if (prioritizedEventsTable[currAutIndex][currEventIndex])
-				{		// The event is prioritized in currAutomaton
+				{    // The event is prioritized in currAutomaton
 					if (!(currEventIndex == currAutEventIndex))
 					{
 
@@ -244,7 +232,7 @@ public final class AutomataControllabilityCheckExecuter
 				// find the next event for this automaton and state
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
-				{		// Point to the next index;
+				{    // Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
 
 					currOutgoingEventsIndex[currAutIndex] = ++tmpIndex;
@@ -280,7 +268,6 @@ public final class AutomataControllabilityCheckExecuter
 
 	public void run()
 	{
-
 		initialize();
 
 		// Get the first state to process
@@ -346,7 +333,6 @@ public final class AutomataControllabilityCheckExecuter
 
 	public void buildAutomaton()
 	{
-
 		Automaton theAutomaton = helper.getAutomaton();
 
 		theAutomaton.setName("regaut");
@@ -463,7 +449,6 @@ public final class AutomataControllabilityCheckExecuter
 
 	public String printArray(int[] theArray)
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("[");

@@ -49,23 +49,16 @@
  */
 package org.supremica.gui.help;
 
-
-
 import javax.help.*;
-
 import java.net.URL;
-
 import org.supremica.gui.Supremica;
-
 
 public class ContentHelp
 {
-
 	private HelpBroker helpBroker = null;
 
 	public ContentHelp()
 	{
-
 		String helpsetName = "help/ccs.hs";
 		HelpSet hs = null;
 

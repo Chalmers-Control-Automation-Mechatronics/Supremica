@@ -49,29 +49,19 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-
 import org.apache.log4j.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 import att.grappa.*;
-
 
 public class PreLoader
 	extends Thread
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(PreLoader.class.getName());
 	private static PreLoader thisPreLoader = null;
 	private static final String dummyDot = "digraph state_automaton {graph [ center = true ];node [ label = \"Dummy\", shape = plaintext ];}";
@@ -114,7 +104,6 @@ public class PreLoader
 
 	public static synchronized PreLoader getPreLoader()
 	{
-
 		if (thisPreLoader == null)
 		{
 			thisPreLoader = new PreLoader();

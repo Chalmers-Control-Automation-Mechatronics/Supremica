@@ -49,14 +49,10 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.gui.WorkbenchProperties;
-
 
 public final class VerificationOptions
 {
-
 	private boolean dialogOK = false;
 	private int verificationType;
 	private int algorithmType;
@@ -72,7 +68,6 @@ public final class VerificationOptions
 
 	public VerificationOptions(int verificationType, int algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
 	{
-
 		this.verificationType = verificationType;
 		this.algorithmType = algorithmType;
 		this.exclusionStateLimit = exclusionStateLimit;
@@ -93,7 +88,6 @@ public final class VerificationOptions
 
 	public void setVerificationType(int index)
 	{
-
 		verificationType = index;
 
 		WorkbenchProperties.setVerifyVerificationType(index);
@@ -106,7 +100,6 @@ public final class VerificationOptions
 
 	public void setAlgorithmType(int index)
 	{
-
 		algorithmType = index;
 
 		WorkbenchProperties.setVerifyAlgorithmType(index);
@@ -119,7 +112,6 @@ public final class VerificationOptions
 
 	public void setExclusionStateLimit(int limit)
 	{
-
 		exclusionStateLimit = limit;
 
 		WorkbenchProperties.setVerifyExclusionStateLimit(limit);
@@ -132,7 +124,6 @@ public final class VerificationOptions
 
 	public void setReachabilityStateLimit(int limit)
 	{
-
 		reachabilityStateLimit = limit;
 
 		WorkbenchProperties.setVerifyReachabilityStateLimit(limit);
@@ -145,7 +136,6 @@ public final class VerificationOptions
 
 	public void setOneEventAtATime(boolean bool)
 	{
-
 		oneEventAtATime = bool;
 
 		WorkbenchProperties.setVerifyOneEventAtATime(bool);
@@ -158,7 +148,6 @@ public final class VerificationOptions
 
 	public void setSkipUncontrollabilityCheck(boolean bool)
 	{
-
 		skipUncontrollabilityCheck = bool;
 
 		WorkbenchProperties.setVerifySkipUncontrollabilityCheck(bool);

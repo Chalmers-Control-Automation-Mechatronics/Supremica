@@ -2,8 +2,6 @@
 /*************** DiningPhilosophers.java ******************/
 package org.supremica.testcases;
 
-
-
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
@@ -12,17 +10,15 @@ import org.supremica.automata.State;
 import org.supremica.automata.Event;
 import org.supremica.automata.Arc;
 
-
 // Builds a Philo automaton
 class Philosopher
 {
-
 	static State[] states =
 	{
-		new State("s0"), new State("lu"),		// left fork picked up
-		new State("ru"),						// right fork picked up
-		new State("eat"), new State("ld"),		// left fork put down
-		new State("rd")							// right fork put down
+		new State("s0"), new State("lu"),     // left fork picked up
+		new State("ru"),                      // right fork picked up
+		new State("eat"), new State("ld"),    // left fork put down
+		new State("rd")                       // right fork put down
 	};
 	static final int INIT = 0;
 	static final int L_UP = 1;
@@ -32,24 +28,23 @@ class Philosopher
 	static final int R_DN = 5;
 	static Event[] events =
 	{
-		new Event("L_take"),					// pick up left
-		new Event("R_take"),					// pick up right
-		new Event("L_put"),						// put down left
-		new Event("R_put"),						// put down right
+		new Event("L_take"),                  // pick up left
+		new Event("R_take"),                  // pick up right
+		new Event("L_put"),                   // put down left
+		new Event("R_put"),                   // put down right
 	};
 	static final int L_TAKE = 0;
 	static final int R_TAKE = 1;
 	static final int L_PUT = 2;
 	static final int R_PUT = 3;
-	static final String LABEL_SEP = ".";	// note, must be the same in both Philosopher and Fork
-	static final String NAME_SEP = ":";		// Need note be the same everywhere
+	static final String LABEL_SEP = ".";    // note, must be the same in both Philosopher and Fork
+	static final String NAME_SEP = ":";       // Need note be the same everywhere
 	static Automaton philo = null;
 	static boolean inited = false;
 
 	public Philosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
 		throws Exception
 	{
-
 		if (inited)
 		{
 			return;
@@ -99,8 +94,7 @@ class Philosopher
 	public Automaton build(int id, int l_fork, int r_fork)
 		throws Exception
 	{
-
-		Automaton sm = new Automaton(philo);	// deep copy, I hope
+		Automaton sm = new Automaton(philo);    // deep copy, I hope
 
 		sm.setName("Philo" + NAME_SEP + id);
 
@@ -115,7 +109,7 @@ class Philosopher
 		alpha.getEventWithId("R_take").setLabel("take" + id + LABEL_SEP + r_fork);
 		alpha.getEventWithId("L_put").setLabel("put" + id + LABEL_SEP + l_fork);
 		alpha.getEventWithId("R_put").setLabel("put" + id + LABEL_SEP + r_fork);
-		alpha.rehash();		// must rehash since we've changed the label (that's the way it works)
+		alpha.rehash();    // must rehash since we've changed the label (that's the way it works)
 
 		return sm;
 	}
@@ -124,7 +118,6 @@ class Philosopher
 // Builds a chopstick automaton
 class Chopstick
 {
-
 	static State[] states = { new State("0"), new State("1") };
 	static Event[] events = { new Event("L_up"), new Event("R_up"),
 							  new Event("L_dn"), new Event("R_dn") };
@@ -132,15 +125,14 @@ class Chopstick
 	static final int R_TAKE = 1;
 	static final int L_PUT = 2;
 	static final int R_PUT = 3;
-	static final String LABEL_SEP = ".";	// note, must be the same in both Philosopher and Fork
-	static final String NAME_SEP = ":";		// Need note be the same everywhere
+	static final String LABEL_SEP = ".";    // note, must be the same in both Philosopher and Fork
+	static final String NAME_SEP = ":";    // Need note be the same everywhere
 	static Automaton fork = null;
 	static boolean inited = false;
 
 	public Chopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
 		throws Exception
 	{
-
 		if (inited)
 		{
 			return;
@@ -181,8 +173,7 @@ class Chopstick
 	Automaton build(int id, int l_philo, int r_philo)
 		throws Exception
 	{
-
-		Automaton sm = new Automaton(fork);		// deep copy, I hope
+		Automaton sm = new Automaton(fork);    // deep copy, I hope
 
 		sm.setName("Fork" + NAME_SEP + id);
 
@@ -192,7 +183,7 @@ class Chopstick
 		alpha.getEventWithId("R_up").setLabel("take" + r_philo + LABEL_SEP + id);
 		alpha.getEventWithId("L_dn").setLabel("put" + l_philo + LABEL_SEP + id);
 		alpha.getEventWithId("R_dn").setLabel("put" + r_philo + LABEL_SEP + id);
-		alpha.rehash();		// must rehash since we've changed the label (that's the way it works)
+		alpha.rehash();    // must rehash since we've changed the label (that's the way it works)
 
 		return sm;
 	}
@@ -200,14 +191,12 @@ class Chopstick
 
 public class DiningPhilosophers
 {
-
 	Automata automata = new Automata();
 
 	// These are helpers for counting modulo num philos/forks
 	// Note that we adjust for 0's, indices are from 1 to modulo
 	int nextId(int id, int modulo)
 	{
-
 		int nxt = id + 1;
 
 		if (nxt > modulo)
@@ -222,7 +211,6 @@ public class DiningPhilosophers
 
 	int prevId(int id, int modulo)
 	{
-
 		int nxt = id - 1;
 
 		if (nxt <= 0)
@@ -244,7 +232,7 @@ public class DiningPhilosophers
 
 		for (int i = 0; i < num; ++i)
 		{
-			int id = i + 1;		// id's are from 1...n
+			int id = i + 1;    // id's are from 1...n
 
 			automata.addAutomaton(philo.build(id, id, prevId(id, num)));
 
@@ -256,7 +244,7 @@ public class DiningPhilosophers
 
 		for (int i = 0; i < num; ++i)
 		{
-			int id = i + 1;		// id's are from 1...n
+			int id = i + 1;    // id's are from 1...n
 
 			automata.addAutomaton(fork.build(id, nextId(id, num), id));
 

@@ -49,14 +49,10 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 
 public class SynthesisType
 {
-
 	private static Collection types = new LinkedList();
 	public static final SynthesisType Controllable = new SynthesisType("Controllable");
 	public static final SynthesisType Nonblocking = new SynthesisType("Nonblocking");
@@ -71,7 +67,6 @@ public class SynthesisType
 
 	private SynthesisType(String description, boolean selectable)
 	{
-
 		if (selectable)
 		{
 			types.add(this);
@@ -92,7 +87,6 @@ public class SynthesisType
 
 	public static SynthesisType toType(String type)
 	{
-
 		if (type.equals(Controllable.toString()))
 		{
 			return Controllable;

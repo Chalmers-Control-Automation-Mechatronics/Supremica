@@ -49,11 +49,8 @@
  */
 package org.supremica.gui;
 
-
-
 public class ExecutionDialogMode
 {
-
 	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing");
 	public static ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying");
 	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing");

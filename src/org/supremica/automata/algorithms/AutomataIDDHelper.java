@@ -49,21 +49,15 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.util.*;
 import org.supremica.gui.*;
 import org.supremica.util.IDD.*;
-
 import org.apache.log4j.*;
-
 import java.util.*;
-
 
 public final class AutomataIDDHelper
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
 	private AutomataIndexForm theAutomataIndexForm;
 	private Automata theAutomata;
@@ -74,7 +68,6 @@ public final class AutomataIDDHelper
 	public AutomataIDDHelper(Automata theAutomata, IDDOptions iddOptions)
 		throws Exception
 	{
-
 		if (theAutomata == null)
 		{
 			throw new Exception("theAutomata must be non-null");

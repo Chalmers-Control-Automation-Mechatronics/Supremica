@@ -49,14 +49,10 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class MultipleState
 {
-
 	private ArrayList theStates;
 
 	public MultipleState(int capacity)

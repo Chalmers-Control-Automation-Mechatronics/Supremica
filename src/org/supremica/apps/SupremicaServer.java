@@ -49,31 +49,22 @@
  */
 package org.supremica.apps;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
 import java.util.*;
-
 import java.io.*;
-
 import org.apache.log4j.*;
-
 import org.supremica.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.*;
 
-
 public class SupremicaServer
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(SupremicaServer.class.getName());
 	private AutomatonContainer theAutomatonContainer = null;
 	private Server xmlRpcServer = null;
@@ -81,7 +72,6 @@ public class SupremicaServer
 	// Construct the frame
 	public SupremicaServer()
 	{
-
 		theAutomatonContainer = new AutomatonContainer();
 
 		thisCategory.info("Supremica version: " + (new Version()).toString());

@@ -4,12 +4,8 @@
  */
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 
 /**
  * A Step is an Area containing a Rectangle and two Ports and
@@ -30,7 +26,6 @@ public class GCStepInitial
 
 	public GCStepInitial(Point loc, String labeltext)
 	{
-
 		super(loc, labeltext);
 
 		// create the inner rectangle
@@ -47,7 +42,6 @@ public class GCStepInitial
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		GCStepInitial newobj = (GCStepInitial) super.copyObject(env);
 		JGoEllipse myToken = newobj.getToken();
 
@@ -61,7 +55,6 @@ public class GCStepInitial
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		super.copyChildren(newarea, env);
 
 		GCStepInitial newobj = (GCStepInitial) newarea;
@@ -76,7 +69,6 @@ public class GCStepInitial
 
 	public void layoutChildren()
 	{
-
 		super.layoutChildren();
 
 		if (innerRectangle != null)
@@ -86,7 +78,7 @@ public class GCStepInitial
 	}
 
 	public void geometryChange(Rectangle prevRect)
-	{		// Cannot scale this step yet!
+	{    // Cannot scale this step yet!
 		super.geometryChange(prevRect);
 	}
 

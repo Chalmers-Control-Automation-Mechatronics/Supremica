@@ -49,18 +49,13 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import java.util.Arrays;
 
 // For the automata selection methods
 import java.util.ArrayList;
-
 
 /**
  * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
@@ -72,7 +67,6 @@ import java.util.ArrayList;
 public final class AutomataSynchronizerExecuter
 	extends Thread
 {
-
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
 	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerExecuter.class.getName());
@@ -137,7 +131,6 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
 	{
-
 		helper = synchronizerHelper;
 		indexForm = helper.getAutomataIndexForm();
 		nbrOfAutomata = helper.getAutomata().size();
@@ -183,7 +176,6 @@ public final class AutomataSynchronizerExecuter
 	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
 		throws Exception
 	{
-
 		automataIndices = new int[2];
 		automataIndices[0] = plantIndex;
 		automataIndices[1] = supervisorIndex;
@@ -200,7 +192,6 @@ public final class AutomataSynchronizerExecuter
 	public void selectAutomata(ArrayList automataToBeSelected)
 		throws Exception
 	{
-
 		automataIndices = new int[automataToBeSelected.size()];
 
 		for (int i = 0; i < automataToBeSelected.size(); i++)
@@ -208,7 +199,7 @@ public final class AutomataSynchronizerExecuter
 			automataIndices[i] = ((Automaton) automataToBeSelected.get(i)).getIndex();
 		}
 
-		helper.selectAutomata(automataIndices);		// FIXA!
+		helper.selectAutomata(automataIndices);    // FIXA!
 
 		if (exhaustiveSearch)
 		{
@@ -222,7 +213,6 @@ public final class AutomataSynchronizerExecuter
 	public void selectAutomata(int[] automataIndices)
 		throws Exception
 	{
-
 		this.automataIndices = automataIndices;
 
 		if (exhaustiveSearch)
@@ -236,7 +226,6 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public void selectAllAutomata()
 	{
-
 		automataIndices = new int[nbrOfAutomata];
 
 		for (int i = 0; i < nbrOfAutomata; i++)
@@ -250,7 +239,6 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public final void initialize()
 	{
-
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
 
@@ -259,8 +247,8 @@ public final class AutomataSynchronizerExecuter
 			selectAllAutomata();
 		}
 
-		nextState = new int[nbrOfAutomata + 1];		// +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1];		// Always end with Integer.MAX_VALUE
+		nextState = new int[nbrOfAutomata + 1];    // +1 status field
+		currEnabledEvents = new int[nbrOfEvents + 1];    // Always end with Integer.MAX_VALUE
 	}
 
 	/**
@@ -271,7 +259,6 @@ public final class AutomataSynchronizerExecuter
 	 */
 	private final void enabledEvents(int[] currState)
 	{
-
 		int currMinEventIndex = Integer.MAX_VALUE;
 		int nbrOfSelectedAutomata = automataIndices.length;
 
@@ -334,7 +321,7 @@ public final class AutomataSynchronizerExecuter
 				if (syncType == SynchronizationType.Prioritized)
 				{
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])
-					{			// The event is prioritized in currAutomaton
+					{        // The event is prioritized in currAutomaton
 						if (!(currEventIndex == currAutEventIndex))
 						{
 
@@ -391,13 +378,13 @@ public final class AutomataSynchronizerExecuter
 				if (!canExecuteInPlant && typeIsPlantTable[currAutIndex])
 				{
 					if (currEventIndex == currAutEventIndex)
-					{			// Then currIndex (the event) must also be the
+					{        // Then currIndex (the event) must also be the
 
 						// current event in this automaton
 						canExecuteInPlant = true;
 
 						if (rememberUncontrollable)
-						{		// Remember uncontrollable states
+						{    // Remember uncontrollable states
 							problemEvent = currEventIndex;
 							problemPlant = currAutIndex;
 						}
@@ -408,7 +395,7 @@ public final class AutomataSynchronizerExecuter
 				// find the next event for this automaton and state
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
-				{				// Point to the next index;
+				{            // Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
 
 					currOutgoingEventsIndex[currAutIndex] = ++tmpIndex;
@@ -425,7 +412,7 @@ public final class AutomataSynchronizerExecuter
 			if (thisEventOk)
 			{
 				if (immediateEventsTable[currEventIndex])
-				{		// Clear out everything else and abort the search for enabled events
+				{    // Clear out everything else and abort the search for enabled events
 
 					// If several events that are immediate are found
 					// Then the one with smallest index are chosen.
@@ -441,13 +428,13 @@ public final class AutomataSynchronizerExecuter
 			}
 
 			if (!thisEventOk && canExecuteInPlant && thisPlantEventOk &&!controllableEventsTable[currEventIndex])
-			{					// Uncontrollable state found
+			{                // Uncontrollable state found
 				controllableState = false;
 
 				helper.setAutomataIsControllable(false);
 
 				if (exhaustiveSearch)
-				{				// Stop when uncontrollable state found
+				{            // Stop when uncontrollable state found
 					if (verboseMode)
 					{
 						thisCategory.info("Uncontrollable state found.");
@@ -462,7 +449,7 @@ public final class AutomataSynchronizerExecuter
 		currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
 
 		if (expandEventsUsingPriority)
-		{		// Choose outgoing events among the possibilities, choose after priority...
+		{    // Choose outgoing events among the possibilities, choose after priority...
 			int insertionIndex = 0;
 			int i = 0;
 			int minPrio = 2;
@@ -497,7 +484,7 @@ public final class AutomataSynchronizerExecuter
 		}
 
 		if (coExecute)
-		{		// In co-execution mode, an enabledEvents-method in another executer
+		{    // In co-execution mode, an enabledEvents-method in another executer
 
 			// follows the automaton we're suspecting has uncontrollable states.
 			int insertionIndex = 0;
@@ -515,7 +502,7 @@ public final class AutomataSynchronizerExecuter
 			}
 
 			if (insertionIndex == 0)
-			{		// Found no corresponding transitions in the suspect automaton...
+			{    // Found no corresponding transitions in the suspect automaton...
 
 				// /*
 				if (verboseMode)
@@ -529,7 +516,7 @@ public final class AutomataSynchronizerExecuter
 				insertionIndex = currEnabledEvents.length - 1;
 			}
 			else
-			{		// There are transitions in the suspect automaton...
+			{    // There are transitions in the suspect automaton...
 
 				// /*
 				if (verboseMode)
@@ -549,7 +536,6 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public void run()
 	{
-
 		initialize();
 
 		// Get the first state to process
@@ -566,7 +552,7 @@ public final class AutomataSynchronizerExecuter
 			enabledEvents(currState);
 
 			if (!controllableState)
-			{		// We'd like to remember this state and later on try to show that
+			{    // We'd like to remember this state and later on try to show that
 
 				// it will be excluded in the total synchronization...  or not.
 				if (rememberUncontrollable)
@@ -591,13 +577,13 @@ public final class AutomataSynchronizerExecuter
 			}
 
 			if (controllableState || expandForbiddenStates)
-			{		// Expand state
+			{    // Expand state
 				int i = 0;
 				int currEventIndex = currEnabledEvents[i];
 
 				// Handle all events
 				while (currEventIndex != Integer.MAX_VALUE)
-				{		// Generate an array that contains the indicies of each state
+				{    // Generate an array that contains the indicies of each state
 					System.arraycopy(currState, 0, nextState, 0, currState.length);
 
 					// Iterate over all automata to construct the new state
@@ -671,7 +657,6 @@ public final class AutomataSynchronizerExecuter
 	public boolean buildAutomaton(boolean longformId)
 		throws Exception
 	{
-
 		try
 		{
 			Automaton theAutomaton = helper.getAutomaton();
@@ -850,7 +835,6 @@ public final class AutomataSynchronizerExecuter
 
 	private String printTypeIsPlantTable()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("[");
@@ -957,7 +941,6 @@ public final class AutomataSynchronizerExecuter
 	 */
 	public int findTransition(int[] fromState, int[] toState)
 	{
-
 		enabledEvents(fromState);
 
 		int i = 0;
@@ -965,7 +948,7 @@ public final class AutomataSynchronizerExecuter
 
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
-		{		// Generate an array that contains the indicies of each state
+		{    // Generate an array that contains the indicies of each state
 			System.arraycopy(fromState, 0, nextState, 0, fromState.length);
 
 			// Iterate over all automata to construct the new state
@@ -997,8 +980,7 @@ public final class AutomataSynchronizerExecuter
 	 * @return true if equal, false otherwise.
 	 */
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
-	{		// Assume that the last element is a status field
-
+	{    // Assume that the last element is a status field
 		for (int i = 0; i < firstArray.length - 1; i++)
 		{
 			if (firstArray[i] != secondArray[i])

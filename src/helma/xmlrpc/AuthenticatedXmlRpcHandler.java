@@ -4,10 +4,7 @@
  */
 package helma.xmlrpc;
 
-
-
 import java.util.Vector;
-
 
 /**
  * An XML-RPC handler that also handles user authentication.

@@ -49,20 +49,14 @@
  */
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import org.supremica.automata.algorithms.*;
-
 
 abstract class SynthesizerPanel
 	extends JPanel
 {
-
 	public abstract void update(SynthesizerOptions s);
 
 	public abstract void regain(SynthesizerOptions s);
@@ -71,7 +65,6 @@ abstract class SynthesizerPanel
 class SD_StandardPanel
 	extends SynthesizerPanel
 {
-
 	private JComboBox synthesisTypeBox;
 	private JComboBox algorithmTypeBox;
 	private JCheckBox purgeBox;
@@ -79,7 +72,6 @@ class SD_StandardPanel
 
 	public SD_StandardPanel()
 	{
-
 		Box standardBox = Box.createVerticalBox();
 
 		synthesisTypeBox = new JComboBox(SynthesisType.toArray());
@@ -96,7 +88,6 @@ class SD_StandardPanel
 
 	public void update(SynthesizerOptions synthesizerOptions)
 	{
-
 		synthesisTypeBox.setSelectedItem(synthesizerOptions.getSynthesisType());
 		algorithmTypeBox.setSelectedItem(synthesizerOptions.getSynthesisAlgorithm());
 		purgeBox.setSelected(synthesizerOptions.doPurge());
@@ -105,7 +96,6 @@ class SD_StandardPanel
 
 	public void regain(SynthesizerOptions synthesizerOptions)
 	{
-
 		synthesizerOptions.setSynthesisType((SynthesisType) synthesisTypeBox.getSelectedItem());
 		synthesizerOptions.setSynthesisAlgorithm((SynthesisAlgorithm) algorithmTypeBox.getSelectedItem());
 		synthesizerOptions.setPurge(purgeBox.isSelected());
@@ -116,12 +106,10 @@ class SD_StandardPanel
 class SD_AdvancedPanel
 	extends SynthesizerPanel
 {
-
 	private JCheckBox maximallyPermissiveBox;
 
 	public SD_AdvancedPanel()
 	{
-
 		Box advancedBox = Box.createVerticalBox();
 
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
@@ -144,7 +132,6 @@ class SD_AdvancedPanel
 public class SynthesizerDialog
 	implements ActionListener
 {
-
 	private JButton okButton;
 	private JButton cancelButton;
 	private SynthesizerOptions synthesizerOptions;
@@ -160,8 +147,7 @@ public class SynthesizerDialog
 	 */
 	public SynthesizerDialog(JFrame parentFrame, SynthesizerOptions synthesizerOptions)
 	{
-
-		dialog = new JDialog(parentFrame, true);	// modal
+		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;
 		this.synthesizerOptions = synthesizerOptions;
 
@@ -240,7 +226,6 @@ public class SynthesizerDialog
 
 	private JButton addButton(Container container, String name)
 	{
-
 		JButton button = new JButton(name);
 
 		button.addActionListener(this);
@@ -256,7 +241,6 @@ public class SynthesizerDialog
 
 	public void actionPerformed(ActionEvent event)
 	{
-
 		Object source = event.getSource();
 
 		if (source == okButton)
@@ -277,7 +261,7 @@ public class SynthesizerDialog
 		}
 		else if (source == cancelButton)
 		{
-			synthesizerOptions.setDialogOK(false);		// Already done...
+			synthesizerOptions.setDialogOK(false);    // Already done...
 			dialog.setVisible(false);
 			dialog.dispose();
 		}

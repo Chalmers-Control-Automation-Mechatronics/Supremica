@@ -5,28 +5,21 @@
  */
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 import java.awt.geom.*;
 import java.awt.print.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
-
 import java.util.*;
-
 import com.nwoods.jgo.*;
-
 
 public class GCView
 	extends JGoGridView
 	implements JGoViewListener
 {
-
 	private int stepCounter = 0;
 	private int macroStepCounter = 0;
 	protected Point myDefaultLocation = new Point(10, 10);
@@ -40,7 +33,6 @@ public class GCView
 
 	public GCView()
 	{
-
 		super();
 
 		setSnapMove(SnapJump);
@@ -56,7 +48,6 @@ public class GCView
 
 	public GCView(JGoDocument doc)
 	{
-
 		super(doc);
 
 		setSnapMove(SnapJump);
@@ -72,7 +63,6 @@ public class GCView
 
 	public GCView(JGoDocument doc, JInternalFrame frame)
 	{
-
 		super(doc);
 
 		setSnapMove(SnapJump);
@@ -94,7 +84,6 @@ public class GCView
 
 	public void moveSelection(JGoSelection sel, int flags, int offsetx, int offsety, int event)
 	{
-
 		int snapmove = getSnapMove();
 
 		if ((snapmove == SnapJump) || ((snapmove == SnapAfter) && (event == EventMouseUp)))
@@ -158,7 +147,6 @@ public class GCView
 
 	public void mySnapObject(JGoObject obj)
 	{
-
 		Point temp = new Point();
 		JGoObject tlo = obj.getTopLevelObject();
 
@@ -183,7 +171,6 @@ public class GCView
 
 	public void initialize(Basic2GC app, JInternalFrame frame)
 	{
-
 		myApp = app;
 		myInternalFrame = frame;
 
@@ -196,10 +183,8 @@ public class GCView
 		updateTitle();
 		addKeyListener(new KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent evt)
 			{
-
 				int t = evt.getKeyCode();
 
 				if (t == KeyEvent.VK_DELETE)
@@ -218,10 +203,8 @@ public class GCView
 		});
 		getDocument().addDocumentListener(new JGoDocumentListener()
 		{
-
 			public void documentChanged(JGoDocumentEvent e)
 			{
-
 				if (e.getHint() == GCDocument.NAME_CHANGED)
 				{
 					updateTitle();
@@ -244,7 +227,6 @@ public class GCView
 
 	public void updateTitle()
 	{
-
 		if (getInternalFrame() != null)
 		{
 			String title = getDoc().getName();
@@ -256,7 +238,6 @@ public class GCView
 
 	public void deleteHierarchies(JGoSelection sel)
 	{
-
 		JGoListPosition pos = sel.getFirstObjectPos();
 		JGoObject obj = sel.getObjectAtPos(pos);
 
@@ -304,7 +285,6 @@ public class GCView
 
 	public void deleteHierarchyDocs(GCDocument doc)
 	{
-
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
 
@@ -371,7 +351,6 @@ public class GCView
 
 	public void dragOver(DropTargetDragEvent e)
 	{
-
 		super.dragOver(e);
 
 		if (e.getDropAction() != DnDConstants.ACTION_NONE)
@@ -390,7 +369,6 @@ public class GCView
 
 	public void dragExit(DropTargetEvent e)
 	{
-
 		if (myGhost.getView() == this)
 		{
 			removeObject(myGhost);
@@ -406,7 +384,6 @@ public class GCView
 
 	public void newLink(JGoPort from, JGoPort to)
 	{
-
 		if (!connected(from, to))
 		{
 			GCLink nlink = new GCLink(from, to);
@@ -439,7 +416,6 @@ public class GCView
 
 	public boolean connected(JGoPort from, JGoPort to)
 	{
-
 		boolean found = false;
 		JGoListPosition pos = from.getFirstLinkPos();
 
@@ -466,7 +442,6 @@ public class GCView
 
 	public void drop(DropTargetDropEvent e)
 	{
-
 		try
 		{
 			JGoCopyEnvironment map = getDoc().createDefaultCopyEnvironment();
@@ -489,7 +464,7 @@ public class GCView
 					// go.viewOwner = this;
 					// }
 					if (o instanceof GCStep)
-					{		// Is this needed?
+					{    // Is this needed?
 						GCStep obj = (GCStep) o;
 
 						// System.out.println("In drop: GCStep " + obj);
@@ -540,10 +515,8 @@ public class GCView
 	private class GrafcetThread
 		extends Thread
 	{
-
 		public void run()
 		{
-
 			while (doIt)
 			{
 				executeOnce((GCDocument) getDoc());
@@ -625,7 +598,6 @@ public class GCView
 
 	void changeStateDocument(GCDocument doc)
 	{
-
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
 
@@ -671,7 +643,6 @@ public class GCView
 
 	void initializeDocument(GCDocument doc)
 	{
-
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
 
@@ -741,7 +712,6 @@ public class GCView
 
 	void stopDocument(GCDocument doc)
 	{
-
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
 
@@ -803,7 +773,6 @@ public class GCView
 
 	public void start()
 	{
-
 		executing = true;
 		doIt = true;
 		grafcetThread = new GrafcetThread();

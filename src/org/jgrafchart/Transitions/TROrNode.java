@@ -1,16 +1,11 @@
 package org.jgrafchart.Transitions;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.util.*;
-
 
 public class TROrNode
 	extends SimpleNode
 {
-
 	TROrNode(int id)
 	{
 		super(id);
@@ -18,7 +13,6 @@ public class TROrNode
 
 	public boolean evaluate()
 	{
-
 		boolean res;
 
 		res = jjtGetChild(0).evaluate() || jjtGetChild(1).evaluate();
@@ -33,7 +27,6 @@ public class TROrNode
 
 	public boolean compile(ArrayList doc)
 	{
-
 		boolean result = true;
 
 		result = result && jjtGetChild(0).compile(doc);

@@ -1,18 +1,12 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 public class DigitalOut1
 	extends DigitalOut
 {
-
 	public JGoEllipse myCircle = null;
 
 	public DigitalOut1()
@@ -22,7 +16,6 @@ public class DigitalOut1
 
 	public DigitalOut1(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(80, 60);
@@ -99,7 +92,6 @@ public class DigitalOut1
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		DigitalOut1 newobj = (DigitalOut1) super.copyObject(env);
 
 		return newobj;
@@ -107,7 +99,6 @@ public class DigitalOut1
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		DigitalOut1 newobj = (DigitalOut1) newarea;
 
 		if (myBorder != null)
@@ -170,7 +161,6 @@ public class DigitalOut1
 
 	public void layoutChildren()
 	{
-
 		if (myBorder == null)
 		{
 			return;
@@ -206,7 +196,6 @@ public class DigitalOut1
 
 	public void setStoredBoolAction(boolean newval)
 	{
-
 		val = newval;
 
 		if (newval)

@@ -49,15 +49,10 @@
  */
 package org.supremica.recipe;
 
-
-
 import org.supremica.petrinet.*;
 import org.supremica.petrinet.algorithms.*;
-
 import java.util.*;
-
 import java.io.*;
-
 
 public class RecipeResourcePetriNetBuilder
 {
@@ -84,7 +79,6 @@ public class RecipeResourcePetriNetBuilder
 	public PetriNet buildPetriNet(InternalOperationRecipes theRecipes)
 		throws Exception
 	{
-
 		this.theRecipes = theRecipes;
 		nbr_of_resource_places = 0;
 		product_start_index = new int[theRecipes.nbrOfRecipes()];
@@ -130,7 +124,6 @@ public class RecipeResourcePetriNetBuilder
 
 	public String buildComments()
 	{
-
 		StringBuffer sb = new StringBuffer();
 		int nbr_of_product_places = thePetriNet.nbrOfPlaces() - nbr_of_resource_places;
 
@@ -150,7 +143,6 @@ public class RecipeResourcePetriNetBuilder
 	private Place getResourcePlace(String name)
 		throws Exception
 	{
-
 		if (resourcePlaces.containsKey(name))
 		{
 			return (Place) resourcePlaces.get(name);
@@ -172,7 +164,6 @@ public class RecipeResourcePetriNetBuilder
 
 	private Place getPlace(String recipe, String operation, String resource)
 	{
-
 		String name = recipe + "_" + operation + "_" + resource;
 
 		return thePetriNet.getPlace(name);
@@ -181,7 +172,6 @@ public class RecipeResourcePetriNetBuilder
 	private void doInternalOperationRecipe(InternalOperationRecipe theRecipe)
 		throws Exception
 	{
-
 		String recipeName = theRecipe.getIdentity();
 
 		// Create first and last places
@@ -340,7 +330,6 @@ public class RecipeResourcePetriNetBuilder
 	public static void main(String args[])
 		throws Exception
 	{
-
 		InternalOperationRecipes recipes = new InternalOperationRecipes();
 		InternalOperationRecipe b1 = new InternalOperationRecipe("b1");
 

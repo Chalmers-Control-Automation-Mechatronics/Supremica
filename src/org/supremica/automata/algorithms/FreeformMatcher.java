@@ -2,24 +2,18 @@
 /************************ FreeformMatcher.java ***************************/
 package org.supremica.automata.algorithms;
 
-
-
 import org.apache.oro.text.regex.*;
-
 import org.supremica.automata.algorithms.Matcher;
 import org.supremica.automata.algorithms.SearchStates;
-
 
 public class FreeformMatcher
 	implements Matcher
 {
-
 	private PatternMatcher matcher;
 	private Pattern pattern;
 
 	public FreeformMatcher(PatternMatcher m, Pattern p)
 	{
-
 		matcher = m;
 		pattern = p;
 
@@ -37,7 +31,7 @@ public class FreeformMatcher
 			state_name.append(it.getState().getName());
 			it.inc();
 
-			if (it.hasNext())		// should the user have control over how this string is built?
+			if (it.hasNext())    // should the user have control over how this string is built?
 			{
 				state_name.append(',');
 			}

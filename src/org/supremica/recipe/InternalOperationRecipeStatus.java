@@ -49,14 +49,10 @@
  */
 package org.supremica.recipe;
 
-
-
 import java.util.*;
-
 
 public class InternalOperationRecipeStatus
 {
-
 	private static List collection = new LinkedList();
 	public static final InternalOperationRecipeStatus Undetermined = new InternalOperationRecipeStatus();
 	public static final InternalOperationRecipeStatus NotStarted = new InternalOperationRecipeStatus();

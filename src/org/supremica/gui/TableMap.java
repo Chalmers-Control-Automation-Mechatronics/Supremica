@@ -62,18 +62,14 @@
  */
 package org.supremica.gui;
 
-
-
 import javax.swing.table.*;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
-
 
 public class TableMap
 	extends AbstractTableModel
 	implements TableModelListener
 {
-
 	protected TableModel model;
 
 	public TableModel getModel()
@@ -83,7 +79,6 @@ public class TableMap
 
 	public void setModel(TableModel model)
 	{
-
 		this.model = model;
 
 		model.addTableModelListener(this);
@@ -103,7 +98,6 @@ public class TableMap
 
 	public int getRowCount()
 	{
-
 		return (model == null)
 			   ? 0
 			   : model.getRowCount();
@@ -111,7 +105,6 @@ public class TableMap
 
 	public int getColumnCount()
 	{
-
 		return (model == null)
 			   ? 0
 			   : model.getColumnCount();

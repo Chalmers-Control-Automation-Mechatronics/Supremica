@@ -49,14 +49,10 @@
  */
 package org.supremica.petrinet;
 
-
-
 import java.util.*;
-
 
 public class Place
 {
-
 	private List prevTransitions = new LinkedList();
 	private List nextTransitions = new LinkedList();
 	private List nextInhibitorTransitions = new LinkedList();
@@ -75,7 +71,6 @@ public class Place
 	 **/
 	public Place(Place orgPlace)
 	{
-
 		identity = orgPlace.identity;
 		time = orgPlace.time;
 		marking = orgPlace.time;
@@ -138,7 +133,6 @@ public class Place
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("Place: " + identity + "\n");

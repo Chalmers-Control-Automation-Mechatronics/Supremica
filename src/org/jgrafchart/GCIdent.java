@@ -4,11 +4,8 @@
  */
 package org.jgrafchart;
 
-
-
 interface GCIdent
 {
-
 	boolean isTransition();
 
 	boolean isStep();

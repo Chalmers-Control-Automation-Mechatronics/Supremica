@@ -49,10 +49,7 @@
  */
 package org.supremica.petrinet;
 
-
-
 import java.util.*;
-
 
 /**
  * This is container class for storing several
@@ -60,7 +57,6 @@ import java.util.*;
  */
 public class PetriNets
 {
-
 	private HashMap thePetriNets = new HashMap();
 
 	public PetriNets() {}
@@ -80,7 +76,6 @@ public class PetriNets
 	public void removePetriNet(String petriNetName)
 		throws Exception
 	{
-
 		if (!contains(petriNetName))
 		{
 			throw new Exception(petriNetName + " does not exists");
@@ -112,7 +107,6 @@ public class PetriNets
 	public static void main(String args[])
 		throws Exception
 	{
-
 		PetriNets thePetriNets = new PetriNets();
 		PetriNet firstPetriNet = new PetriNet("firstPetriNet");
 

@@ -49,14 +49,10 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 
 public class SynthesisAlgorithm
 {
-
 	private static Collection types = new LinkedList();
 	public static final SynthesisAlgorithm Monolithic = new SynthesisAlgorithm("Monolithic");
 	public static final SynthesisAlgorithm Modular = new SynthesisAlgorithm("Modular");
@@ -71,7 +67,6 @@ public class SynthesisAlgorithm
 
 	private SynthesisAlgorithm(String description, boolean selectable)
 	{
-
 		if (selectable)
 		{
 			types.add(this);
@@ -92,7 +87,6 @@ public class SynthesisAlgorithm
 
 	public static SynthesisAlgorithm toAlgorithm(String algorithm)
 	{
-
 		if (algorithm.equals(Monolithic.toString()))
 		{
 			return Monolithic;

@@ -49,27 +49,18 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
-
 import java.awt.*;
-
 import javax.swing.table.*;
-
 import java.io.File;
-
 import org.supremica.gui.*;
 import org.supremica.gui.editor.*;
-
 
 public class AutomatonContainer
 	implements AutomatonListener
 {
-
 	private ArrayList theAutomatonNames = null;
 	private HashMap theAutomatonContainer = null;
 	private HashMap theAutomatonViewerContainer = null;
@@ -87,7 +78,6 @@ public class AutomatonContainer
 
 	public AutomatonContainer()
 	{
-
 		theAutomatonNames = new ArrayList();
 		theAutomatonContainer = new HashMap();
 
@@ -102,7 +92,6 @@ public class AutomatonContainer
 	 **/
 	public AutomatonContainer(AutomatonContainer other)
 	{
-
 		theAutomatonNames = new ArrayList(other.theAutomatonNames);
 		theAutomatonContainer = new HashMap(other.theAutomatonContainer);
 
@@ -113,7 +102,6 @@ public class AutomatonContainer
 
 	public AutomatonContainer(Supremica workbench)
 	{
-
 		theAutomatonNames = new ArrayList();
 		theAutomatonContainer = new HashMap();
 
@@ -124,7 +112,6 @@ public class AutomatonContainer
 
 	private void initializeGUIContainers()
 	{
-
 		theAutomatonViewerContainer = new HashMap();
 		theAutomatonExplorerContainer = new HashMap();
 		theAutomatonFrameContainer = new HashMap();
@@ -134,7 +121,6 @@ public class AutomatonContainer
 
 	public void setProjectName(String projectName)
 	{
-
 		this.projectName = projectName;
 
 		updateFrameTitles();
@@ -147,7 +133,6 @@ public class AutomatonContainer
 
 	public void updateFrameTitles()
 	{
-
 		String title = "Supremica - " + getProjectName();
 
 		if (workbench != null)
@@ -180,7 +165,6 @@ public class AutomatonContainer
 	public void add(Automaton automaton)
 		throws Exception
 	{
-
 		String name = automaton.getName();
 
 		if (containsAutomaton(name))
@@ -197,7 +181,6 @@ public class AutomatonContainer
 	public void add(Automata automata)
 		throws Exception
 	{
-
 		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
 			add((Automaton) autIt.next());
@@ -207,7 +190,6 @@ public class AutomatonContainer
 	public void remove(String automatonName)
 		throws Exception
 	{
-
 		if (!containsAutomaton(automatonName))
 		{
 			throw new Exception(automatonName + " does not exist.");
@@ -224,7 +206,6 @@ public class AutomatonContainer
 	public void rename(Automaton automaton, String newName)
 		throws Exception
 	{
-
 		String name = automaton.getName();
 
 		if (!containsAutomaton(name))
@@ -255,7 +236,6 @@ public class AutomatonContainer
 
 	public String getUniqueAutomatonName(String prefix)
 	{
-
 		if (!containsAutomaton(prefix))
 		{
 			return prefix;
@@ -275,7 +255,6 @@ public class AutomatonContainer
 
 	public AutomataEditor getAutomataEditor()
 	{
-
 		if (workbench == null)
 		{
 			return null;
@@ -301,7 +280,6 @@ public class AutomatonContainer
 	public AutomatonViewer getAutomatonViewer(String automaton)
 		throws Exception
 	{
-
 		if (theAutomatonViewerContainer.containsKey(automaton))
 		{
 			AutomatonViewer viewer = (AutomatonViewer) theAutomatonViewerContainer.get(automaton);
@@ -344,7 +322,6 @@ public class AutomatonContainer
 	public JInternalFrame getAutomatonFrame(String automatonName)
 		throws Exception
 	{
-
 		if (theAutomatonFrameContainer.containsKey(automatonName))
 		{
 			JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(automatonName);
@@ -379,7 +356,6 @@ public class AutomatonContainer
 	public AutomatonDocument getAutomatonDocument(String automaton)
 		throws Exception
 	{
-
 		if (theAutomatonDocumentContainer.containsKey(automaton))
 		{
 			AutomatonDocument document = (AutomatonDocument) theAutomatonDocumentContainer.get(automaton);
@@ -415,7 +391,6 @@ public class AutomatonContainer
 	public AutomatonExplorer getAutomatonExplorer(String automaton)
 		throws Exception
 	{
-
 		if (theAutomatonExplorerContainer.containsKey(automaton))
 		{
 			AutomatonExplorer explorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(automaton);
@@ -457,7 +432,6 @@ public class AutomatonContainer
 	public AlphabetViewer getAlphabetViewer(String automaton)
 		throws Exception
 	{
-
 		if (theAlphabetViewerContainer.containsKey(automaton))
 		{
 			AlphabetViewer viewer = (AlphabetViewer) theAlphabetViewerContainer.get(automaton);
@@ -504,7 +478,6 @@ public class AutomatonContainer
 	public Automaton getAutomaton(String automatonName)
 		throws Exception
 	{
-
 		if (!containsAutomaton(automatonName))
 		{
 			throw new Exception(automatonName + " does not exist.");
@@ -516,7 +489,6 @@ public class AutomatonContainer
 	public Automaton getAutomatonAt(int index)
 		throws Exception
 	{
-
 		String automatonName = (String) theAutomatonNames.get(index);
 
 		return getAutomaton(automatonName);
@@ -524,7 +496,6 @@ public class AutomatonContainer
 
 	public Automata getAutomata()
 	{
-
 		Automata theAutomata = new Automata();
 
 		if (projectName != null)
@@ -555,7 +526,6 @@ public class AutomatonContainer
 
 	public void clear()
 	{
-
 		ArrayList aCopy = new ArrayList(theAutomatonNames);
 		Iterator autIt = aCopy.iterator();
 
@@ -568,7 +538,7 @@ public class AutomatonContainer
 				remove(name, false);
 			}
 			catch (Exception e)
-			{		// do nothing - maybe send an error to the log file
+			{    // do nothing - maybe send an error to the log file
 			}
 		}
 
@@ -578,7 +548,6 @@ public class AutomatonContainer
 	public void remove(String automatonName, boolean rename)
 		throws Exception
 	{
-
 		if (!rename)
 		{
 			theAutomatonNames.remove(automatonName);
@@ -639,7 +608,6 @@ public class AutomatonContainer
 	private void add(Automaton automaton, String name, boolean rename)
 		throws Exception
 	{
-
 		if (!rename)
 		{
 			theAutomatonNames.add(name);
@@ -657,7 +625,6 @@ public class AutomatonContainer
 
 	public AutomatonContainerListeners getListeners()
 	{
-
 		if (automataListeners == null)
 		{
 			automataListeners = new AutomatonContainerListeners(this);
@@ -668,7 +635,6 @@ public class AutomatonContainer
 
 	private void notifyListeners()
 	{
-
 		if (automataListeners != null)
 		{
 			automataListeners.notifyListeners();
@@ -677,7 +643,6 @@ public class AutomatonContainer
 
 	private void notifyListeners(int mode, Automaton a)
 	{
-
 		if (automataListeners != null)
 		{
 			automataListeners.notifyListeners(mode, a);
@@ -686,7 +651,6 @@ public class AutomatonContainer
 
 	public void beginTransaction()
 	{
-
 		if (automataListeners != null)
 		{
 			automataListeners.beginTransaction();
@@ -695,7 +659,6 @@ public class AutomatonContainer
 
 	public void endTransaction()
 	{
-
 		if (automataListeners != null)
 		{
 			automataListeners.endTransaction();
@@ -718,15 +681,15 @@ public class AutomatonContainer
 	}
 
 	public void arcAdded(Automaton aut, Arc a)
-	{		// Do nothing
+	{    // Do nothing
 	}
 
 	public void arcRemoved(Automaton aut, Arc a)
-	{		// Do nothing
+	{    // Do nothing
 	}
 
 	public void attributeChanged(Automaton aut)
-	{		// Do nothing
+	{    // Do nothing
 	}
 
 	public int getSize()
@@ -747,7 +710,6 @@ public class AutomatonContainer
 	private class LightTableModel
 		implements TableModel
 	{
-
 		private LinkedList listeners = new LinkedList();
 
 		public LightTableModel() {}
@@ -769,7 +731,6 @@ public class AutomatonContainer
 
 		public String getColumnName(int columnIndex)
 		{
-
 			if (columnIndex == 0)
 			{
 				return "Automata";
@@ -780,7 +741,6 @@ public class AutomatonContainer
 
 		public Class getColumnClass(int column)
 		{
-
 			if (column == 0)
 			{
 				return String.class;
@@ -801,7 +761,6 @@ public class AutomatonContainer
 
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-
 			String name = (String) theAutomatonNames.get(rowIndex);
 			Automaton theAutomaton = (Automaton) theAutomatonContainer.get(name);
 
@@ -822,7 +781,6 @@ public class AutomatonContainer
 
 		public void updateListeners()
 		{
-
 			Iterator theIt = listeners.iterator();
 			TableModelEvent event = new TableModelEvent(this, 0, theAutomatonNames.size() - 1);
 
@@ -838,7 +796,6 @@ public class AutomatonContainer
 	private class FullTableModel
 		implements TableModel
 	{
-
 		private LinkedList listeners = new LinkedList();
 
 		public FullTableModel() {}
@@ -860,7 +817,6 @@ public class AutomatonContainer
 
 		public String getColumnName(int columnIndex)
 		{
-
 			if (columnIndex == 0)
 			{
 				return "Automata";
@@ -886,7 +842,6 @@ public class AutomatonContainer
 
 		public Class getColumnClass(int column)
 		{
-
 			if (column == 0)
 			{
 				return String.class;
@@ -917,7 +872,6 @@ public class AutomatonContainer
 
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-
 			String name = (String) theAutomatonNames.get(rowIndex);
 			Automaton theAutomaton = (Automaton) theAutomatonContainer.get(name);
 
@@ -948,7 +902,6 @@ public class AutomatonContainer
 
 		public boolean isCellEditable(int rowIndex, int columnIndex)
 		{
-
 			if (columnIndex == 1)
 			{
 				return true;
@@ -961,7 +914,6 @@ public class AutomatonContainer
 
 		public void updateListeners()
 		{
-
 			Iterator theIt = listeners.iterator();
 			TableModelEvent event = new TableModelEvent(this, 0, theAutomatonNames.size() - 1);
 

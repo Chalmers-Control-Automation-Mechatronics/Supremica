@@ -49,19 +49,13 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import org.supremica.automata.*;
-
 
 public class StateNode
 	extends JGoArea
 {
-
 	static int myStdSize = 20;
 
 	// State
@@ -76,7 +70,6 @@ public class StateNode
 	*/
 	public StateNode(State theState)
 	{
-
 		super();
 
 		this.theState = theState;
@@ -84,7 +77,6 @@ public class StateNode
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		StateNode newobj = (StateNode) super.copyObject(env);
 
 		if (newobj != null)
@@ -149,7 +141,6 @@ public class StateNode
 	*/
 	public void layoutChildren()
 	{
-
 		if (myEllipse == null)
 		{
 			return;
@@ -175,7 +166,6 @@ public class StateNode
 
 	public void initialize()
 	{
-
 		if (theState == null)
 		{
 			System.err.println("State in StateNode is null");
@@ -252,7 +242,6 @@ public class StateNode
 
 	public String getToolTipText()
 	{
-
 		String stateId = theState.getId();
 
 		if (stateId == null)

@@ -1,18 +1,12 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 public class BooleanVariable
 	extends InternalVariable
 {
-
 	private JGoText myTag = null;
 	public boolean val = false;
 	public boolean oldval = false;
@@ -24,7 +18,6 @@ public class BooleanVariable
 
 	public BooleanVariable(Point loc)
 	{
-
 		super();
 
 		setSize(65, 45);
@@ -86,7 +79,6 @@ public class BooleanVariable
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		BooleanVariable newobj = (BooleanVariable) super.copyObject(env);
 
 		return newobj;
@@ -94,7 +86,6 @@ public class BooleanVariable
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		BooleanVariable newobj = (BooleanVariable) newarea;
 
 		if (myBorder != null)
@@ -128,7 +119,6 @@ public class BooleanVariable
 
 	public void layoutChildren()
 	{
-
 		if (myBorder == null)
 		{
 			return;
@@ -152,7 +142,6 @@ public class BooleanVariable
 
 	public void setStoredBoolAction(boolean n)
 	{
-
 		if (n)
 		{
 			myValue.setText("" + 1);
@@ -177,7 +166,6 @@ public class BooleanVariable
 
 	public boolean getBoolVal()
 	{
-
 		if (redirect == null)
 		{
 			return val;
@@ -201,7 +189,6 @@ public class BooleanVariable
 
 	public boolean getOldBoolVal()
 	{
-
 		if (redirect == null)
 		{
 			return oldval;

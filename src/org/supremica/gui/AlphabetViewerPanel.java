@@ -49,25 +49,18 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.tree.*;
-
 import java.util.*;
-
 
 public class AlphabetViewerPanel
 	extends JPanel
 	implements AutomatonListener
 {
-
 	private Automaton theAutomaton;
 	private Alphabet theAlphabet;
 	private boolean showId = false;
@@ -78,7 +71,6 @@ public class AlphabetViewerPanel
 	public AlphabetViewerPanel(Automaton theAutomaton)
 		throws Exception
 	{
-
 		this.theAutomaton = theAutomaton;
 
 		theAutomaton.getListeners().addListener(this);
@@ -96,7 +88,6 @@ public class AlphabetViewerPanel
 
 	public void updated(Object o)
 	{
-
 		if (o == theAutomaton)
 		{
 			update();
@@ -130,7 +121,6 @@ public class AlphabetViewerPanel
 
 	public void update()
 	{
-
 		if (!isVisible())
 		{
 			updateNeeded = true;
@@ -153,7 +143,6 @@ public class AlphabetViewerPanel
 	public void build()
 		throws Exception
 	{
-
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Alphabet");
 		int nbrOfEvents = 0;
 		Iterator eventIt = theAlphabet.iterator();
@@ -189,7 +178,6 @@ public class AlphabetViewerPanel
 
 	public void setVisible(boolean toVisible)
 	{
-
 		super.setVisible(toVisible);
 
 		if (updateNeeded)

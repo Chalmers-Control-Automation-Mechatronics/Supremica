@@ -49,16 +49,11 @@
  */
 package org.supremica.util.IDD;
 
-
-
 import java.io.*;
-
 import java.util.*;
-
 
 public class IDDToDot
 {
-
 	private IDD theIDD;
 	private boolean leftToRight = false;
 	private boolean withCircles = true;
@@ -93,7 +88,6 @@ public class IDDToDot
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-
 		pw.println("digraph IDD {");
 		pw.println("\tcenter = true;");
 
@@ -187,7 +181,6 @@ public class IDDToDot
 
 	private void serialize(PrintWriter pw, Node theNode)
 	{
-
 		pw.print("\t\"" + theNode.getId() + "\" [label = \"");
 
 		boolean prevText = false;

@@ -49,16 +49,12 @@
  */
 package org.supremica.petrinet.algorithms;
 
-
-
 import org.supremica.petrinet.*;
 import org.supremica.automata.*;
-
 
 public class Marking
 	extends State
 {
-
 	private int[] marking;
 
 	public Marking() {}

@@ -49,14 +49,10 @@
  */
 package org.supremica.recipe;
 
-
-
 import java.util.*;
-
 
 public class InternalOperationState
 {
-
 	private String[] activeOperations;
 	private int[] activeResources;
 	private static final String undeterminedResource = new String("");
@@ -70,7 +66,6 @@ public class InternalOperationState
 
 	public InternalOperationState(InternalOperationState oldState)
 	{
-
 		this(oldState.activeOperations.length);
 
 		System.arraycopy(oldState.activeOperations, 0, activeOperations, 0, oldState.activeOperations.length);
@@ -104,7 +99,6 @@ public class InternalOperationState
 
 	public void resetState()
 	{
-
 		for (int i = 0; i < activeOperations.length; i++)
 		{
 			activeOperations[i] = null;
@@ -125,7 +119,6 @@ public class InternalOperationState
 
 	public void resetResourceSet()
 	{
-
 		for (int i = 0; i < activeResources.length; i++)
 		{
 			activeResources[i] = -1;

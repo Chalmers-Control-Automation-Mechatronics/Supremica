@@ -49,23 +49,16 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
 // import org.apache.log4j.*;
 import org.supremica.gui.Gui;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 
 /**
  * Thread dealing with verification.
@@ -89,9 +82,8 @@ public class AutomataVerificationWorker
 	private boolean stopRequested = false;
 	private EventQueue eventQueue = new EventQueue();
 
-	public AutomataVerificationWorker(	/* Supremica workbench, */Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
+	public AutomataVerificationWorker( /* Supremica workbench, */Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 	{
-
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
 		theAutomatonContainer = workbench.getAutomatonContainer();
@@ -105,7 +97,6 @@ public class AutomataVerificationWorker
 
 	public void run()
 	{
-
 		Date startDate;
 		Date endDate;
 		final AutomataVerifier automataVerifier;
@@ -116,10 +107,8 @@ public class AutomataVerificationWorker
 		threadsToStop.add(this);
 		eventQueue.invokeLater(new Runnable()
 		{
-
 			public void run()
 			{
-
 				executionDialog = new ExecutionDialog(workbench, "Verifying", threadsToStop);
 
 				executionDialog.setMode(ExecutionDialogMode.verifying);
@@ -127,7 +116,7 @@ public class AutomataVerificationWorker
 		});
 
 		if (verificationOptions.getVerificationType() == 0)
-		{		// Controllability verification...
+		{    // Controllability verification...
 			boolean isControllable;
 
 			if (theAutomata.size() < 2)
@@ -144,7 +133,6 @@ public class AutomataVerificationWorker
 
 				eventQueue.invokeLater(new Runnable()
 				{
-
 					public void run()
 					{
 						automataVerifier.getHelper().setExecutionDialog(executionDialog);
@@ -170,15 +158,15 @@ public class AutomataVerificationWorker
 			try
 			{
 				if (verificationOptions.getAlgorithmType() == 0)
-				{		// Modular...
+				{    // Modular...
 					isControllable = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 1)
-				{		// Monolithic...
+				{    // Monolithic...
 					isControllable = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 2)
-				{		// IDD...
+				{    // IDD...
 					requestStop();
 
 					// thisCategory.error("Option not implemented...");
@@ -187,7 +175,7 @@ public class AutomataVerificationWorker
 					return;
 				}
 				else
-				{		// Error...
+				{    // Error...
 					requestStop();
 
 					// thisCategory.error("Unavailable option chosen.");
@@ -222,7 +210,7 @@ public class AutomataVerificationWorker
 			}
 		}
 		else if (verificationOptions.getVerificationType() == 1)
-		{				// Non-blocking verification...
+		{            // Non-blocking verification...
 			requestStop();
 
 			// thisCategory.error("Option not implemented...");
@@ -231,7 +219,7 @@ public class AutomataVerificationWorker
 			return;
 		}
 		else if (verificationOptions.getVerificationType() == 2)
-		{				// Language inclusion
+		{            // Language inclusion
 			boolean isIncluded;
 			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
 			Automata automataA = new Automata();
@@ -372,7 +360,6 @@ public class AutomataVerificationWorker
 
 				eventQueue.invokeLater(new Runnable()
 				{
-
 					public void run()
 					{
 						automataVerifier.getHelper().setExecutionDialog(executionDialog);
@@ -398,15 +385,15 @@ public class AutomataVerificationWorker
 			try
 			{
 				if (verificationOptions.getAlgorithmType() == 0)
-				{		// Modular...
+				{    // Modular...
 					isIncluded = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 1)
-				{		// Monolithic...
+				{    // Monolithic...
 					isIncluded = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 2)
-				{		// IDD...
+				{    // IDD...
 					requestStop();
 
 					// thisCategory.error("Option not implemented...");
@@ -415,7 +402,7 @@ public class AutomataVerificationWorker
 					return;
 				}
 				else
-				{		// Error...
+				{    // Error...
 					requestStop();
 
 					// thisCategory.error("Unavailable option chosen.");
@@ -450,7 +437,7 @@ public class AutomataVerificationWorker
 			}
 		}
 		else
-		{				// Error...
+		{            // Error...
 			requestStop();
 
 			// thisCategory.error("Unavailable option chosen.");
@@ -480,7 +467,6 @@ public class AutomataVerificationWorker
 
 	public void requestStop()
 	{
-
 		if (executionDialog != null)
 		{
 			executionDialog.setMode(ExecutionDialogMode.hide);

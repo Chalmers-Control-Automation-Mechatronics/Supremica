@@ -2,8 +2,6 @@
 /********************* BricksGame.java *********************/
 package org.supremica.testcases;
 
-
-
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
@@ -12,22 +10,19 @@ import org.supremica.automata.State;
 import org.supremica.automata.Event;
 import org.supremica.automata.Arc;
 
-
 class BrickBuilder
 {
-
 	private final State[][] shared_states;
 	private final int rows;
 	private final int cols;
 	private Automaton automaton = null;
-	private int number;		// this bricks number
+	private int number;    // this bricks number
 
 	private void addRight(int r, int c, int num, boolean reverse)
 		throws Exception
 	{
-
 		State source = automaton.getState(shared_states[r][c]);
-		State dest = automaton.getState(shared_states[r][c + 1]);		// to the right
+		State dest = automaton.getState(shared_states[r][c + 1]);    // to the right
 		Event src_dst = reverse
 						? new Event(dest.getId() + source.getId() + num)
 						: new Event(source.getId() + dest.getId() + num);
@@ -44,9 +39,8 @@ class BrickBuilder
 	private void addDown(int r, int c, int num, boolean reverse)
 		throws Exception
 	{
-
 		State source = automaton.getState(shared_states[r][c]);
-		State dest = automaton.getState(shared_states[r + 1][c]);		// downwards
+		State dest = automaton.getState(shared_states[r + 1][c]);    // downwards
 		Event src_dst = reverse
 						? new Event(dest.getId() + source.getId() + num)
 						: new Event(source.getId() + dest.getId() + num);
@@ -63,10 +57,9 @@ class BrickBuilder
 	public BrickBuilder(final int r, final int c)
 		throws Exception
 	{
-
 		rows = r;
 		cols = c;
-		shared_states = new State[rows + 1][cols + 1];		// the +1 is a quick fixx to set boundaries
+		shared_states = new State[rows + 1][cols + 1];    // the +1 is a quick fixx to set boundaries
 
 		// Create the shared states - all states are named the same between automata (even the zero one)
 		// Create them just once, then share them (will this work in practice?)
@@ -82,19 +75,18 @@ class BrickBuilder
 	public Automaton buildBrick(final int r, final int c)
 		throws Exception
 	{
-
 		number = (r - 1) * cols + c;
 		automaton = new Automaton("Brick" + number);
 
 		automaton.setType(AutomatonType.Plant);
-		shared_states[r][c].setInitial(true);		// the initial state for this automaton
+		shared_states[r][c].setInitial(true);    // the initial state for this automaton
 
 		// Now add these states to this automaton
 		for (int i = 1; i <= rows; ++i)
 		{
 			for (int j = 1; j <= cols; ++j)
 			{
-				automaton.addState(new State(shared_states[i][j]));		// we must copy, mustn't we
+				automaton.addState(new State(shared_states[i][j]));    // we must copy, mustn't we
 			}
 		}
 
@@ -102,7 +94,7 @@ class BrickBuilder
 		// Since each transition has a unique event, there's a 1-2-1 mapping
 		for (int i = 1; i < rows; ++i)
 		{
-			for (int j = 1; j < cols; ++j)		// goes only to cols-1
+			for (int j = 1; j < cols; ++j)    // goes only to cols-1
 			{
 				addRight(i, j, number, false);
 				addDown(i, j, number, false);
@@ -126,19 +118,18 @@ class BrickBuilder
 	public Automaton zeroBrick()
 		throws Exception
 	{
-
 		number = 0;
 		automaton = new Automaton("Brick0");
 
 		automaton.setType(AutomatonType.Plant);
-		shared_states[rows][cols].setInitial(true);		// the initial state for this automaton
+		shared_states[rows][cols].setInitial(true);    // the initial state for this automaton
 
 		// Now add these states to this automaton
 		for (int i = 1; i <= rows; ++i)
 		{
 			for (int j = 1; j <= cols; ++j)
 			{
-				automaton.addState(new State(shared_states[i][j]));		// we must copy, mustn't we
+				automaton.addState(new State(shared_states[i][j]));    // we must copy, mustn't we
 			}
 		}
 
@@ -146,7 +137,7 @@ class BrickBuilder
 		// Since each transition has a unique event, there's a 1-2-1 mapping
 		for (int i = 1; i < rows; ++i)
 		{
-			for (int j = 1; j < cols; ++j)		// goes only to cols-1
+			for (int j = 1; j < cols; ++j)    // goes only to cols-1
 			{
 				for (int k = 1; k < rows * cols; ++k)
 				{
@@ -179,13 +170,11 @@ class BrickBuilder
 
 public class BricksGame
 {
-
 	private Automata automata = new Automata();
 
 	public BricksGame(int rows, int cols)
 		throws Exception
 	{
-
 		BrickBuilder builder = new BrickBuilder(rows, cols);
 
 		// Create rows*cols-1 utomata. Note cols-1, the last one is special (the 0-brick)

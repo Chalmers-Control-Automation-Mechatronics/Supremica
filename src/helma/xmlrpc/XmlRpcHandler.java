@@ -4,10 +4,7 @@
  */
 package helma.xmlrpc;
 
-
-
 import java.util.Vector;
-
 
 /**
  * The XML-RPC server uses this interface to call a method of an RPC handler. This should

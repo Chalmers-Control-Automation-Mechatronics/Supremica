@@ -49,10 +49,7 @@
  */
 package org.supremica.recipe;
 
-
-
 import java.util.*;
-
 
 /**
  * This is container class for storing several
@@ -60,7 +57,6 @@ import java.util.*;
  */
 public class InternalOperationRecipes
 {
-
 	private HashMap theRecipes = new HashMap();
 
 	public InternalOperationRecipes() {}
@@ -80,7 +76,6 @@ public class InternalOperationRecipes
 	public void removeRecipe(String recipeName)
 		throws Exception
 	{
-
 		if (!contains(recipeName))
 		{
 			throw new Exception(recipeName + " does not exists");
@@ -117,7 +112,6 @@ public class InternalOperationRecipes
 	public static void main(String args[])
 		throws Exception
 	{
-
 		InternalOperationRecipes theRecipes = new InternalOperationRecipes();
 		InternalOperationRecipe firstRecipe = new InternalOperationRecipe("firstRecipe");
 

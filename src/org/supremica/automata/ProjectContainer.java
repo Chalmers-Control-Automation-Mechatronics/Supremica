@@ -49,20 +49,13 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import org.supremica.gui.*;
-
 
 public class ProjectContainer
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(ProjectContainer.class.getName());
 	private List theProjects;
 
@@ -83,7 +76,6 @@ public class ProjectContainer
 
 	public Project getProject(String name)
 	{
-
 		if (name == null)
 		{
 			return null;

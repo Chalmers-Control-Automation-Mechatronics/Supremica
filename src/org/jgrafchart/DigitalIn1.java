@@ -1,21 +1,14 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 import se.lth.control.realtime.*;
-
 
 public class DigitalIn1
 	extends DigitalIn
 	implements Readable
 {
-
 	public JGoEllipse myCircle = null;
 
 	public DigitalIn1()
@@ -25,7 +18,6 @@ public class DigitalIn1
 
 	public DigitalIn1(Point loc)
 	{
-
 		super();
 
 		setSize(80, 60);
@@ -102,7 +94,6 @@ public class DigitalIn1
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		DigitalIn1 newobj = (DigitalIn1) super.copyObject(env);
 
 		return newobj;
@@ -110,7 +101,6 @@ public class DigitalIn1
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		DigitalIn1 newobj = (DigitalIn1) newarea;
 
 		if (myBorder != null)
@@ -173,7 +163,6 @@ public class DigitalIn1
 
 	public void layoutChildren()
 	{
-
 		if (myBorder == null)
 		{
 			return;
@@ -225,7 +214,6 @@ public class DigitalIn1
 
 	public void readInput()
 	{
-
 		oldval = val;
 
 		if (((GCDocument) getDocument()).isSimulating())
@@ -275,7 +263,6 @@ public class DigitalIn1
 
 	public void initialize()
 	{
-
 		compile();
 
 		if (((GCDocument) getDocument()).isSimulating())
@@ -322,7 +309,6 @@ public class DigitalIn1
 
 	public boolean doMouseDblClick(int mod, java.awt.Point dc, java.awt.Point vc, JGoView view)
 	{
-
 		String s = myValue.getText();
 
 		if (s.compareTo("0") == 0)

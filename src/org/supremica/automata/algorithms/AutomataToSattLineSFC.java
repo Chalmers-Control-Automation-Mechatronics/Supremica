@@ -49,22 +49,15 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.gui.*;
-
 import java.io.*;
-
 import java.util.*;
-
 import org.apache.log4j.*;
-
 
 public class AutomataToSattLineSFC
 	implements AutomataSerializer
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(AutomataToSattLineSFC.class.getName());
 	private Automata automata;
 	private Automaton automaton;
@@ -78,11 +71,11 @@ public class AutomataToSattLineSFC
 	}
 
 	public void serialize(String filename)
-	{		// Empty
+	{    // Empty
 	}
 
 	public void serialize(PrintWriter pw)
-	{		// Empty
+	{    // Empty
 	}
 
 	public void serialize_s(PrintWriter pw)
@@ -91,7 +84,7 @@ public class AutomataToSattLineSFC
 		// Start of file header
 		pw.println("\"Syntax version 2.19, date: 2001-08-10-10:42:24.724 N\"");
 		pw.println("\"Original file date: ---\"");
-		pw.print("\"Program date: 2001-08-10-10:42:24.724, name: ");	// Should perhaps get current date and time
+		pw.print("\"Program date: 2001-08-10-10:42:24.724, name: ");    // Should perhaps get current date and time
 
 		if (automata.getName() != null)
 		{
@@ -109,7 +102,7 @@ public class AutomataToSattLineSFC
 		// Start of BasePicture Invocation
 		pw.println("BasePicture Invocation");
 		pw.println("   ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 ");
-		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896");		// Don't know importance of DateCode
+		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896");    // Don't know importance of DateCode
 		pw.println("\n");
 		pw.println("LOCALVARIABLES");
 
@@ -149,7 +142,7 @@ public class AutomataToSattLineSFC
 		// Start of Module definition.
 		pw.println("ModuleDef");
 		pw.println("ClippingBounds = ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
-		pw.println("ZoomLimits = 0.0 0.01\n");
+		pw.println("ZoomLimmits = 0.0 0.01\n");
 
 		// End of Module definition
 		// Start of Module code.
@@ -198,7 +191,6 @@ public class AutomataToSattLineSFC
 
 	public void serialize_p(PrintWriter pw)
 	{
-
 		pw.println("DistributionData");
 		pw.println(" ( Version \"Distributiondata version 1.0\" )");
 		pw.println("SourceCodeSystems");
@@ -214,7 +206,6 @@ public class AutomataToSattLineSFC
 
 	private void straightSequenceOutput(Automaton theAutomaton, State theState, PrintWriter pw)
 	{
-
 		printStep(theAutomaton, theState, pw);
 		theState.setVisited(true);
 
@@ -225,7 +216,8 @@ public class AutomataToSattLineSFC
 		{
 			pw.println("ALTERNATIVESEQ");
 
-			level = level + 1;
+			level++;
+
 			endAlternativeLevel = theState.nbrOfOutgoingArcs();
 		}
 
@@ -241,7 +233,7 @@ public class AutomataToSattLineSFC
 			{
 				pw.println("ALTERNATIVEBRANCH");
 
-				endAlternativeLevel = endAlternativeLevel - 1;
+				endAlternativeLevel--;
 
 				thisCategory.info("endAlternativeLevel = " + endAlternativeLevel);
 			}
@@ -269,14 +261,13 @@ public class AutomataToSattLineSFC
 
 		if (endAlternativeLevel == 1 /* && !alternativeEnded */)
 		{
-			pw.println("ENDALTERNATIVE");		// End of this subsequence
+			pw.println("ENDALTERNATIVE");    // End of this subsequence
 			thisCategory.info("EndAlternative");
 		}
 	}
 
 	private void printStep(Automaton theAutomaton, State theState, PrintWriter pw)
 	{
-
 		if (theState.isInitial())
 		{
 			pw.println("SEQINITSTEP " + theAutomaton.getName() + "_" + theState.getId());
@@ -289,7 +280,6 @@ public class AutomataToSattLineSFC
 
 	private void printTransition(Automaton theAutomaton, Arc theArc, PrintWriter pw)
 	{
-
 		Alphabet alpha = theAutomaton.getAlphabet();
 
 		try
@@ -298,7 +288,7 @@ public class AutomataToSattLineSFC
 
 			pw.println("SEQTRANSITION " + theAutomaton.getName() + "_Tr" + transitionCounter + " WAIT_FOR " + event.getLabel());
 
-			transitionCounter = transitionCounter + 1;
+			transitionCounter++;
 		}
 		catch (Exception ex)
 		{

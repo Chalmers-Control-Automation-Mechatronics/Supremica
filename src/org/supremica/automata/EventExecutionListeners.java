@@ -49,15 +49,11 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class EventExecutionListeners
 	extends Listeners
 {
-
 	public EventExecutionListeners(Event owner)
 	{
 		super(owner);
@@ -65,7 +61,6 @@ public class EventExecutionListeners
 
 	public void notifyListeners()
 	{
-
 		if (listeners != null)
 		{
 			Iterator listenerIt = listeners.iterator();

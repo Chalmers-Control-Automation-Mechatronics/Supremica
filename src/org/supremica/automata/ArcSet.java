@@ -49,14 +49,10 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class ArcSet
 {
-
 	private State fromState = null;
 	private State toState = null;
 
@@ -70,7 +66,6 @@ public class ArcSet
 
 	public ArcSet(State from, State to)
 	{
-
 		this();
 
 		fromState = from;

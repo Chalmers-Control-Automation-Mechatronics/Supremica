@@ -49,32 +49,26 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 public final class AutomataIndexForm
 {
-
-	private boolean[][] alphabetEventsTable;	// <automaton,event> -> <true|false>
-	private boolean[][] prioritizedEventsTable;		// <automaton,event> -> <true|false>
-	private int[][][] outgoingEventsTable;		// <automaton,state> -> <event[]>
-	private int[][][] incomingEventsTable;		// <automaton,state> -> <event[]>
-	private int[][][] nextStateTable;		// <automaton,state,event> -> <state>
-	private int[][][][] prevStatesTable;	// <automaton, state, event> -> <state[]>
-	private State[][] stateTable;					// <automaton,state> -> <State>
-	private int[][] stateStatusTable;				// <automaton,state> -> <status>
-	private boolean[] controllableEventsTable;		// <event> -> <true|false>
-	private boolean[] immediateEventsTable;			// <event> -> <true|false>
-	private boolean[] typeIsPlantTable;				// <automaton> -> <isPlant>
-	private int[] eventPriority;					// <event> -> <priority>
-	private int[] automataSize;						// <automaton> -> <nbr_of_states>
-	private int[][][] enableEventsTable;			// <automaton, event> -> <state[]>
+	private boolean[][] alphabetEventsTable;    // <automaton,event> -> <true|false>
+	private boolean[][] prioritizedEventsTable;    // <automaton,event> -> <true|false>
+	private int[][][] outgoingEventsTable;    // <automaton,state> -> <event[]>
+	private int[][][] incomingEventsTable;    // <automaton,state> -> <event[]>
+	private int[][][] nextStateTable;             // <automaton,state,event> -> <state>
+	private int[][][][] prevStatesTable;    // <automaton, state, event> -> <state[]>
+	private State[][] stateTable;                 // <automaton,state> -> <State>
+	private int[][] stateStatusTable;             // <automaton,state> -> <status>
+	private boolean[] controllableEventsTable;    // <event> -> <true|false>
+	private boolean[] immediateEventsTable;       // <event> -> <true|false>
+	private boolean[] typeIsPlantTable;           // <automaton> -> <isPlant>
+	private int[] eventPriority;                  // <event> -> <priority>
+	private int[] automataSize;                   // <automaton> -> <nbr_of_states>
+	private int[][][] enableEventsTable;          // <automaton, event> -> <state[]>
 	private static Category thisCategory = LogDisplay.createCategory(AutomataIndexForm.class.getName());
 
 	/**
@@ -84,7 +78,6 @@ public final class AutomataIndexForm
 	public AutomataIndexForm(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{
-
 		generateAutomataIndices(theAutomata);
 
 		try
@@ -111,7 +104,6 @@ public final class AutomataIndexForm
 
 	public AutomataIndexForm(AutomataIndexForm indexForm, boolean deepCopy)
 	{
-
 		if (deepCopy)
 		{
 			alphabetEventsTable = generateCopy2DBooleanArray(indexForm.alphabetEventsTable);
@@ -145,7 +137,7 @@ public final class AutomataIndexForm
 	}
 
 	public void generateAutomataIndices(Automata theAutomata)
-	{		// Give each automaton a unique index
+	{    // Give each automaton a unique index
 
 		// Remember that this index must be consistent with
 		// getAutomatonAt(int) in Automata
@@ -171,7 +163,6 @@ public final class AutomataIndexForm
 	void generateEventIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{
-
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
 		// Generate a synchIndex for each event
@@ -254,7 +245,6 @@ public final class AutomataIndexForm
 	 */
 	void generateStateIndices(Automata theAutomata)
 	{
-
 		stateTable = new State[theAutomata.size()][];
 		stateStatusTable = new int[theAutomata.size()][];
 
@@ -297,8 +287,7 @@ public final class AutomataIndexForm
 	 */
 	void generateNextStateTransitionIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
-	{		// Compute the nextStateTable and outgoingEventsTable
-
+	{    // Compute the nextStateTable and outgoingEventsTable
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		int nbrOfAutomata = theAutomata.size();
 		int nbrOfEvents = theAlphabet.size();
@@ -413,8 +402,7 @@ public final class AutomataIndexForm
 	 */
 	void generatePrevStatesTransitionIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
-	{		// Compute the prevStateTable and outgoingEventsTable
-
+	{    // Compute the prevStateTable and outgoingEventsTable
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		int nbrOfAutomata = theAutomata.size();
 		int nbrOfEvents = theAlphabet.size();
@@ -477,7 +465,7 @@ public final class AutomataIndexForm
 					int nbrOfIncomingArcs = currState.nbrOfIncomingArcs();
 
 					if (currPreviousStates == null)
-					{		// Allocate memory and initialize, last element contains the number of valid elements
+					{    // Allocate memory and initialize, last element contains the number of valid elements
 						currPreviousStates = new int[nbrOfIncomingArcs + 1];
 						currPreviousStates[nbrOfIncomingArcs] = 0;
 					}
@@ -506,7 +494,6 @@ public final class AutomataIndexForm
 	void generateControllableEventsTable(Automaton theAutomaton)
 		throws Exception
 	{
-
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
 		controllableEventsTable = new boolean[theAlphabet.size()];
@@ -593,7 +580,6 @@ public final class AutomataIndexForm
 
 	private int[] generateCopy1DIntArray(int[] oldArray)
 	{
-
 		int[] newArray = new int[oldArray.length];
 
 		System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
@@ -603,7 +589,6 @@ public final class AutomataIndexForm
 
 	private boolean[] generateCopy1DBooleanArray(boolean[] oldArray)
 	{
-
 		boolean[] newArray = new boolean[oldArray.length];
 
 		System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
@@ -613,7 +598,6 @@ public final class AutomataIndexForm
 
 	private boolean[][] generateCopy2DBooleanArray(boolean[][] oldArray)
 	{
-
 		boolean[][] newArray = new boolean[oldArray.length][];
 
 		for (int i = 0; i < oldArray.length; i++)
@@ -628,7 +612,6 @@ public final class AutomataIndexForm
 
 	private int[][][] generateCopy3DIntArray(int[][][] oldArray)
 	{
-
 		int[][][] newArray = new int[oldArray.length][][];
 
 		for (int i = 0; i < oldArray.length; i++)
@@ -648,7 +631,6 @@ public final class AutomataIndexForm
 
 	private int[][][][] generateCopy4DIntArray(int[][][][] oldArray)
 	{
-
 		int[][][][] newArray = new int[oldArray.length][][][];
 
 		for (int i = 0; i < oldArray.length; i++)
@@ -662,7 +644,7 @@ public final class AutomataIndexForm
 				for (int k = 0; k < oldArray[i][j].length; k++)
 				{
 					if (oldArray[i][j][k] != null)
-					{		// This can be null, see prevStateTable
+					{    // This can be null, see prevStateTable
 						newArray[i][j][k] = new int[oldArray[i][j][k].length];
 
 						System.arraycopy(oldArray[i][j][k], 0, newArray[i][j][k], 0, oldArray[i][j][k].length);
@@ -680,7 +662,6 @@ public final class AutomataIndexForm
 
 	private int[][] generateCopy2DIntArray(int[][] oldArray)
 	{
-
 		int[][] newArray = new int[oldArray.length][];
 
 		for (int i = 0; i < oldArray.length; i++)
@@ -695,7 +676,6 @@ public final class AutomataIndexForm
 
 	private State[][] generateCopy2DStateArray(State[][] oldArray)
 	{
-
 		State[][] newArray = new State[oldArray.length][];
 
 		for (int i = 0; i < oldArray.length; i++)

@@ -49,14 +49,10 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class AutomatonType
 {
-
 	private static List collection = new LinkedList();
 	public static final AutomatonType Undefined = new AutomatonType();
 	public static final AutomatonType Plant = new AutomatonType();
@@ -75,7 +71,6 @@ public class AutomatonType
 
 	public static AutomatonType toType(String value)
 	{
-
 		if (value == null)
 		{
 			return null;
@@ -106,7 +101,6 @@ public class AutomatonType
 
 	public String toString()
 	{
-
 		if (this == Undefined)
 		{
 			return "Undefined";

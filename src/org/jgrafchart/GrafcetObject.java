@@ -1,18 +1,12 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 
 public class GrafcetObject
 	extends JGoArea
 {
-
 	public boolean compiled = false;
 	public boolean x = false;
 	protected boolean newX = false;

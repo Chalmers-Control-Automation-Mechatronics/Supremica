@@ -49,10 +49,7 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 /**
  * Contains a collection of events.
@@ -69,7 +66,6 @@ import java.util.*;
  */
 public class Events
 {
-
 	private TreeMap theEvents;
 
 	/**
@@ -82,7 +78,6 @@ public class Events
 
 	public Events(Events orgEvents)
 	{
-
 		this();
 
 		// theEvents = new TreeMap(orgEvents.theEvents);
@@ -165,7 +160,6 @@ public class Events
 	public Event getEventWithIndex(int index)
 		throws Exception
 	{
-
 		Iterator eventIt = iterator();
 
 		while (eventIt.hasNext())
@@ -191,7 +185,6 @@ public class Events
 
 	public String toString()
 	{
-
 		StringBuffer tmpBuf = new StringBuffer("Events:\n   theEvents: " + theEvents);
 
 		return tmpBuf.toString();
@@ -210,7 +203,6 @@ public class Events
 	 */
 	public void rehash()
 	{
-
 		TreeMap newEvents = new TreeMap();
 
 		// theEvents = new TreeMap(orgEvents.theEvents);

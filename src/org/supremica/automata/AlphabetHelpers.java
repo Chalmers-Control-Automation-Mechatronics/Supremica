@@ -49,18 +49,13 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class AlphabetHelpers
 {
-
 	public static Alphabet getUnionAlphabet(Automata theAutomata)
 		throws Exception
 	{
-
 		EventsSet eventsSet = new EventsSet();
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
@@ -81,7 +76,6 @@ public class AlphabetHelpers
 	public static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
 		throws IllegalArgumentException, Exception
 	{
-
 		if (alphabets.size() < 1)
 		{
 			throw new IllegalArgumentException("At least one alphabet is necessary");

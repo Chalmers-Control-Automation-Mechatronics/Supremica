@@ -4,22 +4,16 @@
  */
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 
 public class GCLink
 	extends JGoLink
 {
-
 	private static JGoPen wideLinkPen = new JGoPen(JGoPen.SOLID, 2, new Color(0.0F, 0.0F, 0.0F));
 
 	public GCLink(JGoPort from, JGoPort to)
 	{
-
 		super(from, to);
 
 		setOrthogonal(true);
@@ -42,7 +36,6 @@ public class GCLink
 
 	public void removePointers()
 	{
-
 		GCStep s;
 		GCTransition t;
 		JGoPort fromPort = getFromPort();

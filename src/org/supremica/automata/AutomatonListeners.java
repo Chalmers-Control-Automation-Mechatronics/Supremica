@@ -49,15 +49,11 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class AutomatonListeners
 	extends Listeners
 {
-
 	public static final int MODE_STATE_ADDED = 1;
 	public static final int MODE_STATE_REMOVED = 2;
 	public static final int MODE_ARC_ADDED = 3;
@@ -71,7 +67,6 @@ public class AutomatonListeners
 
 	public void notifyListeners(int mode, Object o)
 	{
-
 		if (batchUpdate)
 		{
 			updateNeeded = true;

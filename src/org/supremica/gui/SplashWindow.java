@@ -1,21 +1,15 @@
 package org.supremica.gui;
 
-
-
 import java.awt.*;
-
 import javax.swing.*;
-
 
 public class SplashWindow
 	extends java.awt.Window
 {
-
 	private static ImageIcon splashIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"));
 
 	public SplashWindow()
 	{
-
 		super(new Frame());
 
 		int height = splashIcon.getIconHeight();

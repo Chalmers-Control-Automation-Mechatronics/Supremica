@@ -49,26 +49,17 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 import java.io.*;
-
 import org.jdom.*;
 import org.jdom.input.*;
 import org.jdom.output.*;
-
 import org.apache.log4j.*;
-
 import org.supremica.gui.*;
-
 
 public class AutomataBuildFromVALID
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(AutomataBuildFromVALID.class.getName());
 	private static AutomataBuildFromVALID builder = null;
 	private static Automata currAutomata = null;
@@ -89,7 +80,6 @@ public class AutomataBuildFromVALID
 	public static Automata build(File file, boolean validate)
 		throws Exception
 	{
-
 		currAutomata = new Automata();
 		filePath = file.getParent();
 
@@ -109,15 +99,15 @@ public class AutomataBuildFromVALID
 			Element root = doc.getRootElement();
 
 			if (root.getName() == "graph")
-			{		// DGRF-file
+			{    // DGRF-file
 				automatonFromDGRF(root, "", "Undefined");
 			}
 			else if (root.getName() == "module")
-			{		// VMOD-file
+			{    // VMOD-file
 				automataFromVMOD(root, "");
 			}
 			else if (root.getName() == "project")
-			{		// VPRJ-file
+			{    // VPRJ-file
 				automataFromVPRJ(root);
 			}
 			else
@@ -136,7 +126,6 @@ public class AutomataBuildFromVALID
 	private static void automataFromVPRJ(Element root)
 		throws Exception
 	{
-
 		Document subDoc = docBuilder.build(new File(filePath + File.separator + root.getChild("uses").getAttributeValue("module") + ".vmod"));
 		Element subRoot = subDoc.getRootElement();
 
@@ -149,9 +138,8 @@ public class AutomataBuildFromVALID
 	private static void automataFromVMOD(Element root, String name)
 		throws Exception
 	{
-
 		HashMap definitionHash = new HashMap();
-		Element element;	// Note! This variable is used many times in different situations
+		Element element;    // Note! This variable is used many times in different situations
 		Iterator i;
 
 		// Read "typeDefinition"s and store in HashMap as lists of strings
@@ -195,9 +183,9 @@ public class AutomataBuildFromVALID
 		// LOOP over VMOD-files ("instance"s)
 		List instanceList = root.getChild("parts").getChildren("foreach-instance");
 		Document subDoc;
-		Element subRoot;	// Here we need to examine two files at the same time (for renaming events)
+		Element subRoot;    // Here we need to examine two files at the same time (for renaming events)
 		List modificationList;
-		StringTokenizer st;		// Used on several occasions
+		StringTokenizer st;    // Used on several occasions
 		String oldAutomatonName;
 		String newAutomatonName;
 		String oldEventName;
@@ -320,7 +308,6 @@ public class AutomataBuildFromVALID
 	private static void automatonFromDGRF(Element root, String name, String type)
 		throws Exception
 	{
-
 		Automaton currAutomaton = new Automaton();
 		Alphabet currAlphabet = new Alphabet();
 		Element element;

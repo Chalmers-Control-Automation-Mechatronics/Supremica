@@ -49,14 +49,10 @@
  */
 package org.supremica.automata.templates;
 
-
-
 import java.util.*;
-
 
 public class TemplateProperties
 {
-
 	private String stateNamePrefix = null;
 	private String stateNameSuffix = null;
 	private String labelPrefix = null;
@@ -108,7 +104,6 @@ public class TemplateProperties
 
 	public String getNewStateName(String stateName)
 	{
-
 		if (!matchesStateName(stateName))
 		{
 			return stateName;
@@ -133,7 +128,6 @@ public class TemplateProperties
 
 	public String getNewLabel(String label)
 	{
-
 		if (!matchesLabel(label))
 		{
 			return label;

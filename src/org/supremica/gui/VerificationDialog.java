@@ -49,21 +49,15 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.automata.algorithms.VerificationOptions;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 
 // import javax.swing.event.*;
 // import javax.swing.table.*;
 interface VerificationPanel
 {
-
 	public void update(VerificationOptions v);
 
 	public void regain(VerificationOptions v);
@@ -74,13 +68,11 @@ class VD_StandardPanel
 	extends JPanel
 	implements VerificationPanel
 {
-
 	private JComboBox verificationTypeBox;
 	private JComboBox algorithmTypeBox;
 
 	public VD_StandardPanel()
 	{
-
 		Box standardBox = Box.createVerticalBox();
 
 		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -121,7 +113,6 @@ class VD_AdvancedPanel
 	extends JPanel
 	implements VerificationPanel
 {
-
 	private JTextField exclusionStateLimit;
 	private JTextField reachabilityStateLimit;
 	private JCheckBox oneEventAtATimeBox;
@@ -129,7 +120,6 @@ class VD_AdvancedPanel
 
 	public VD_AdvancedPanel()
 	{
-
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
 
@@ -152,7 +142,6 @@ class VD_AdvancedPanel
 
 	public void update(VerificationOptions verificationOptions)
 	{
-
 		exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
 		reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
 		oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
@@ -161,7 +150,6 @@ class VD_AdvancedPanel
 
 	public void regain(VerificationOptions verificationOptions)
 	{
-
 		verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("State limit", exclusionStateLimit.getText(), 10));
 		verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("State limit", reachabilityStateLimit.getText(), 10));
 		verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
@@ -172,7 +160,6 @@ class VD_AdvancedPanel
 public class VerificationDialog
 	implements ActionListener
 {
-
 	private JButton okButton;
 	private JButton cancelButton;
 	private VerificationOptions verificationOptions;
@@ -195,8 +182,7 @@ public class VerificationDialog
 	 */
 	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions)
 	{
-
-		dialog = new JDialog(parentFrame, true);	// modal
+		dialog = new JDialog(parentFrame, true);    // modal
 		this.verificationOptions = verificationOptions;
 
 		dialog.setTitle("Verification options");
@@ -235,10 +221,10 @@ public class VerificationDialog
 		/*** advancedPanel
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText =
-										new JLabel("Initial state limit for state exclusion");
+																		new JLabel("Initial state limit for state exclusion");
 		exclusionStateLimit = new JTextField();
 		JLabel reachabilityStateLimitText =
-										new JLabel("Initial state limit for reachability verification");
+																		new JLabel("Initial state limit for reachability verification");
 		reachabilityStateLimit = new JTextField();
 		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
 		skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
@@ -275,7 +261,6 @@ public class VerificationDialog
 	 */
 	public void update()
 	{
-
 		standardPanel.update(verificationOptions);
 
 		// verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
@@ -290,7 +275,6 @@ public class VerificationDialog
 
 	private JButton addButton(Container container, String name)
 	{
-
 		JButton button = new JButton(name);
 
 		button.addActionListener(this);
@@ -306,11 +290,10 @@ public class VerificationDialog
 
 	public void actionPerformed(ActionEvent event)
 	{
-
 		Object source = event.getSource();
 
 		if (source == okButton)
-		{												// Remember the selections
+		{                                              // Remember the selections
 			verificationOptions.setDialogOK(true);
 
 			// verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
@@ -327,7 +310,7 @@ public class VerificationDialog
 		}
 		else if (source == cancelButton)
 		{
-			verificationOptions.setDialogOK(false);		// Already done...
+			verificationOptions.setDialogOK(false);    // Already done...
 			dialog.setVisible(false);
 			dialog.dispose();
 		}

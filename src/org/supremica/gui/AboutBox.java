@@ -49,22 +49,16 @@
  */
 package org.supremica.gui;
 
-
-
 import org.supremica.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
-
 
 public class AboutBox
 	extends JDialog
 	implements ActionListener
 {
-
 	JPanel panel1 = new JPanel();
 	JPanel panel2 = new JPanel();
 	JPanel insetsPanel1 = new JPanel();
@@ -90,7 +84,6 @@ public class AboutBox
 	// "Chalmers University of Technology, Sweden\nUniversity of Illinois at Urbana-Champaign, USA";
 	public AboutBox(Frame parent)
 	{
-
 		super(parent);
 
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
@@ -145,7 +138,6 @@ public class AboutBox
 
 	protected void processWindowEvent(WindowEvent e)
 	{
-
 		if (e.getID() == WindowEvent.WINDOW_CLOSING)
 		{
 			cancel();
@@ -161,7 +153,6 @@ public class AboutBox
 
 	public void actionPerformed(ActionEvent e)
 	{
-
 		if (e.getSource() == button1)
 		{
 			cancel();

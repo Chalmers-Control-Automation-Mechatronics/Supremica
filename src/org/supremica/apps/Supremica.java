@@ -49,21 +49,14 @@
  */
 package org.supremica.apps;
 
-
-
 import java.io.*;
-
 import java.awt.*;
-
 import org.apache.log4j.*;
-
 import org.supremica.gui.*;
-
 
 // import org.jgrafchart.*;
 public class Supremica
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
 	private static org.supremica.gui.Supremica workbench;
 	private static SplashWindow splash;
@@ -72,7 +65,6 @@ public class Supremica
 
 	private static void doSplash()
 	{
-
 		splash = new SplashWindow();
 
 		splash.setVisible(true);
@@ -80,7 +72,6 @@ public class Supremica
 
 	public static void startSupremica()
 	{
-
 		doSplash();
 
 		workbench = new org.supremica.gui.Supremica();
@@ -104,7 +95,6 @@ public class Supremica
 
 	public static void init()
 	{
-
 		boolean packFrame = false;
 
 		// Validate frames that have preset sizes
@@ -151,7 +141,6 @@ public class Supremica
 	// Main method
 	public static void main(String[] args)
 	{
-
 		if (args.length > 0)
 		{
 			if (args[0].equalsIgnoreCase("Supremica"))

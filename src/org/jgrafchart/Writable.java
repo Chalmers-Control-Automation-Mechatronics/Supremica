@@ -1,11 +1,8 @@
 package org.jgrafchart;
 
-
-
 public interface Writable
 	extends Referencable
 {
-
 	public boolean isBoolean();
 
 	public boolean isInteger();

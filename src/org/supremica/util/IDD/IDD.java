@@ -49,20 +49,13 @@
  */
 package org.supremica.util.IDD;
 
-
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 public final class IDD
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(IDD.class.getName());
 	private final int nbrOfLevels;
 	private final int[] nbrOfBranches;
@@ -79,7 +72,6 @@ public final class IDD
 	 */
 	public IDD(int[] nbrOfBranches)
 	{
-
 		nbrOfLevels = nbrOfBranches.length;
 		this.nbrOfBranches = nbrOfBranches;
 		theNodes = new List[nbrOfLevels];
@@ -120,7 +112,6 @@ public final class IDD
 
 	public IDD(int[] nbrOfBranches, int variable, int value)
 	{
-
 		this(nbrOfBranches);
 
 		Node parentNode = rootNode;
@@ -167,7 +158,6 @@ public final class IDD
 	 */
 	public IDD(int[] nbrOfBranches, int variable, int[] values)
 	{
-
 		this(nbrOfBranches);
 
 		Node parentNode = rootNode;
@@ -216,7 +206,6 @@ public final class IDD
 
 	public static IDD getFalseIDD(int[] nbrOfBranches)
 	{
-
 		IDD newIDD = getTrueIDD(nbrOfBranches);
 
 		newIDD.not();
@@ -296,15 +285,14 @@ public final class IDD
 	 */
 	public List getNodesAtLevel(int level)
 	{
-
 		if (level < 1)
 		{
-			return null;	// Throw exception?
+			return null;    // Throw exception?
 		}
 
 		if (level >= nbrOfLevels)
 		{
-			return null;	// Throw exception?
+			return null;    // Throw exception?
 		}
 
 		return theNodes[level];
@@ -316,7 +304,6 @@ public final class IDD
 	 */
 	public Node getNode(Node theNode)
 	{
-
 		int level = theNode.getLevel();
 		Iterator nodeIt = theNodes[level].iterator();
 
@@ -339,7 +326,6 @@ public final class IDD
 	 */
 	public void addNode(Node theNode)
 	{
-
 		int level = theNode.getLevel();
 
 		if (level > 0)
@@ -354,7 +340,6 @@ public final class IDD
 
 	public int nbrOfSatisfyingAssignments()
 	{
-
 		boolean debug = true;
 
 		if (debug)
@@ -368,7 +353,6 @@ public final class IDD
 
 	private int nbrOfSatisfyingAssignments(Node currNode, int parentLevel)
 	{
-
 		if (currNode.isTerminal())
 		{
 			if (currNode.isTrue())
@@ -415,7 +399,6 @@ public final class IDD
 
 	public static IDD or(IDD source1IDD, IDD source2IDD)
 	{
-
 		IDD newIDD = new IDD(source1IDD);
 
 		newIDD.computeOr(source1IDD.rootNode, source2IDD.rootNode, newIDD.rootNode);
@@ -425,7 +408,6 @@ public final class IDD
 
 	public static IDD and(IDD source1IDD, IDD source2IDD)
 	{
-
 		IDD newIDD = new IDD(source1IDD);
 
 		newIDD.computeAnd(source1IDD.rootNode, source2IDD.rootNode, newIDD.rootNode);
@@ -435,7 +417,6 @@ public final class IDD
 
 	private void computeOr(Node source1Node, Node source2Node, Node destNode)
 	{
-
 		int level = source1Node.getLevel();
 		int nbrOfChildren = nbrOfBranches[level];
 		boolean debug = false;
@@ -474,7 +455,7 @@ public final class IDD
 				destNode.setChild(i, getFalseNode());
 			}
 			else if (source1ChildNode.isFalse())
-			{		// Note that the source1ChildNode is false but
+			{    // Note that the source1ChildNode is false but
 
 				// source2ChildNode is not
 				// The result is determined by source2ChildNode
@@ -512,7 +493,7 @@ public final class IDD
 				}
 			}
 			else if (source2ChildNode.isFalse())
-			{		// Note that the source2ChildNode is false but
+			{    // Note that the source2ChildNode is false but
 
 				// source1Child node is not
 				// The result is determined by source2ChildNode
@@ -550,7 +531,7 @@ public final class IDD
 				}
 			}
 			else
-			{		// Neither source1ChildNode nor source2ChildNode is
+			{    // Neither source1ChildNode nor source2ChildNode is
 
 				// a terminal node.
 				if (debug)
@@ -592,7 +573,6 @@ public final class IDD
 
 	private void computeAnd(Node source1Node, Node source2Node, Node destNode)
 	{
-
 		int level = source1Node.getLevel();
 		int nbrOfChildren = nbrOfBranches[level];
 		boolean debug = false;
@@ -627,7 +607,7 @@ public final class IDD
 				destNode.setChild(i, getFalseNode());
 			}
 			else if (source1ChildNode.isTrue())
-			{		// Note that the source1ChildNode is true but
+			{    // Note that the source1ChildNode is true but
 
 				// source2ChildNode is not
 				// The result is determined by source2ChildNode
@@ -665,7 +645,7 @@ public final class IDD
 				}
 			}
 			else if (source2ChildNode.isTrue())
-			{		// Note that the source2ChildNode is true but
+			{    // Note that the source2ChildNode is true but
 
 				// source1Child node is not
 				// The result is determined by source2ChildNode
@@ -703,7 +683,7 @@ public final class IDD
 				}
 			}
 			else
-			{		// Neither source1ChildNode nor source2ChildNode is
+			{    // Neither source1ChildNode nor source2ChildNode is
 
 				// a terminal node.
 				if (debug)
@@ -745,7 +725,6 @@ public final class IDD
 
 	public boolean valueOf(int[] variableValues)
 	{
-
 		Node currNode = rootNode;
 		int variableIndex = 0;
 
@@ -767,7 +746,6 @@ public final class IDD
 
 	public void copySubGraph(Node sourceNode, Node destNode)
 	{
-
 		boolean debug = false;
 
 		if (debug)
@@ -800,11 +778,11 @@ public final class IDD
 				Node destChildNode = getFromCopyCache(sourceChildNode);
 
 				if (destChildNode != null)
-				{		// Node found in cache
+				{    // Node found in cache
 					destNode.setChild(i, destChildNode);
 				}
 				else
-				{		// Node not found in cache
+				{    // Node not found in cache
 					destChildNode = new Node(sourceChildNode);
 
 					copySubGraph(sourceChildNode, destChildNode);
@@ -871,7 +849,6 @@ public final class IDD
 
 	public Node getTrueNode()
 	{
-
 		if (terminal1Node.isTrue())
 		{
 			return terminal1Node;
@@ -882,7 +859,6 @@ public final class IDD
 
 	public Node getFalseNode()
 	{
-
 		if (terminal1Node.isFalse())
 		{
 			return terminal1Node;
@@ -898,7 +874,6 @@ public final class IDD
 
 	public String toString(Node currNode)
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append(currNode);
@@ -923,7 +898,6 @@ public final class IDD
 
 	private String arrayToString(int[] theArray)
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("[");
@@ -946,7 +920,6 @@ public final class IDD
 	public static void main(String[] args)
 		throws Exception
 	{
-
 		int[] branches = new int[]{ 2, 2 };
 		IDD idd1 = new IDD(branches, 0, 1);
 
@@ -985,7 +958,6 @@ public final class IDD
 
 final class ComputeCacheNode
 {
-
 	private final Node key1;
 	private final Node key2;
 
@@ -997,7 +969,6 @@ final class ComputeCacheNode
 
 	public boolean equals(Object other)
 	{
-
 		ComputeCacheNode otherNode = (ComputeCacheNode) other;
 
 		return (otherNode.key1.getId() == key1.getId()) && (otherNode.key2.getId() == key1.getId());

@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import com.nwoods.jgo.*;
-
 
 public class ProcedureStepDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JLabel label = new JLabel();
 	JLabel label1 = new JLabel();
@@ -26,7 +20,6 @@ public class ProcedureStepDialog
 
 	public ProcedureStepDialog(Frame frame, GCDocument obj, ProcedureStep sin, GCView view)
 	{
-
 		super(frame, "Step", true);
 
 		try
@@ -52,13 +45,11 @@ public class ProcedureStepDialog
 
 	private final void init()
 	{
-
 		panel1.setLayout(null);
 		panel1.setMinimumSize(new Dimension(294, 280));
 		panel1.setPreferredSize(new Dimension(294, 280));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnOK();
@@ -66,7 +57,6 @@ public class ProcedureStepDialog
 		});
 		CancelButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnCancel();
@@ -99,7 +89,6 @@ public class ProcedureStepDialog
 
 	void updateDialog()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -113,7 +102,6 @@ public class ProcedureStepDialog
 
 	void updateData()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -159,21 +147,19 @@ public class ProcedureStepDialog
 
 	void OnOK()
 	{
-
 		try
 		{
 			updateData();
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
 
 	void OnCancel()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}

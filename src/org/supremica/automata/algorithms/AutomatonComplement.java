@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 
 public class AutomatonComplement
 {
-
 	private Automaton theAutomaton;
 
 	public AutomatonComplement(Automaton theAutomaton)
@@ -68,7 +63,6 @@ public class AutomatonComplement
 
 	public Automaton execute()
 	{
-
 		Alphabet alphabet = theAutomaton.getAlphabet();
 		State newState = null;
 		Event currEvent;

@@ -49,10 +49,7 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 /**
  * Similar to Events, but with allows for the fast lookup of an event based on the id.
@@ -68,7 +65,6 @@ import java.util.*;
 public class Alphabet
 	extends Events
 {
-
 	private HashMap idMap;
 	private int idIndex = 0;
 	private Listeners listeners = null;
@@ -80,7 +76,6 @@ public class Alphabet
 
 	public Alphabet(Alphabet orgAlphabet)
 	{
-
 		super(orgAlphabet);
 
 		idMap = new HashMap();
@@ -114,7 +109,6 @@ public class Alphabet
 	public Event getEventWithId(String id)
 		throws Exception
 	{
-
 		if (containsEventWithId(id))
 		{
 			return (Event) idMap.get(id);
@@ -133,7 +127,6 @@ public class Alphabet
 	public void addEvent(Event event)
 		throws Exception
 	{
-
 		if (!containsEventWithId(event.getId()))
 		{
 			idMap.put(event.getId(), event);
@@ -167,7 +160,6 @@ public class Alphabet
 	 */
 	public String toString()
 	{
-
 		StringBuffer tmpBuf = new StringBuffer("Alphabet:\n   idMap: " + idMap + '\n');
 
 		tmpBuf.append(super.toString());
@@ -177,7 +169,6 @@ public class Alphabet
 
 	public Listeners getListeners()
 	{
-
 		if (listeners == null)
 		{
 			listeners = new Listeners(this);
@@ -188,7 +179,6 @@ public class Alphabet
 
 	private void notifyListeners()
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -200,7 +190,6 @@ public class Alphabet
 	 */
 	public void rehash()
 	{
-
 		super.rehash();
 
 		Event event;

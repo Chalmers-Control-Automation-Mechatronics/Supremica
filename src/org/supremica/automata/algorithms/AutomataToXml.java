@@ -49,20 +49,14 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.gui.*;
-
 import java.io.*;
-
 import java.util.*;
-
 
 public class AutomataToXml
 	implements AutomataSerializer
 {
-
 	private Automata automata;
 	private Automaton automaton;
 	private boolean canonical;
@@ -79,7 +73,6 @@ public class AutomataToXml
 
 	public AutomataToXml(Automaton automaton)
 	{
-
 		this.automata = new Automata();
 
 		this.automata.addAutomaton(automaton);
@@ -89,7 +82,6 @@ public class AutomataToXml
 
 	public void serialize(PrintWriter pw)
 	{
-
 		pw.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		pw.print("<Automata");
 
@@ -243,7 +235,6 @@ public class AutomataToXml
 
 	private String normalize(String s)
 	{
-
 		StringBuffer str = new StringBuffer();
 		int len = (s != null)
 				  ? s.length()
@@ -306,7 +297,6 @@ public class AutomataToXml
 
 	void printIntArray(PrintWriter pw, int[] theArray)
 	{
-
 		for (int i = 0; i < theArray.length; i++)
 		{
 			if (i == 0)

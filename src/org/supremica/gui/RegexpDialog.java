@@ -6,19 +6,14 @@
 // * Horstmann ex 9-22 (is this good?)
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 
 // 
 public class RegexpDialog
-	extends JDialog		/* implements ActionListener */
+	extends JDialog    /* implements ActionListener */
 {
-
 	private JTextField reg_exp;
 	private boolean ok = false;
 
@@ -39,7 +34,6 @@ public class RegexpDialog
 
 	private JButton setDefaultButton(JButton b)
 	{
-
 		getRootPane().setDefaultButton(b);
 
 		return b;
@@ -49,12 +43,10 @@ public class RegexpDialog
 		extends JMenuItem
 		implements ActionListener
 	{
-
 		String pattern;
 
 		public RegexpMenuItem(String s, String p)
 		{
-
 			super(s + " - " + p);
 
 			pattern = p;
@@ -72,10 +64,8 @@ public class RegexpDialog
 	class RegexpMenuBar
 		extends JMenuBar
 	{
-
 		public RegexpMenuBar()
 		{
-
 			JMenu menu = new JMenu("Expressions");
 
 			menu.add(new RegexpMenuItem("any string", ".*"));
@@ -97,16 +87,13 @@ public class RegexpDialog
 	class OkButton
 		extends JButton
 	{
-
 		public OkButton()
 		{
-
 			super("OK");
 
 			setToolTipText("Exit, add regexp");
 			addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					action(e);
@@ -124,16 +111,13 @@ public class RegexpDialog
 	class CancelButton
 		extends JButton
 	{
-
 		public CancelButton()
 		{
-
 			super("Cancel");
 
 			setToolTipText("Exit, do not add regexp");
 			addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					action(e);
@@ -150,8 +134,7 @@ public class RegexpDialog
 	// * Pop up this dialog with the textfield set to str
 	public RegexpDialog(JFrame parent, String str)
 	{
-
-		super(parent, "Enter regular expression", true);	// modal
+		super(parent, "Enter regular expression", true);    // modal
 
 		JPanel p1 = new JPanel();
 
@@ -177,7 +160,7 @@ public class RegexpDialog
 
 		setLocation(Utility.getPosForCenter(dim));
 		setResizable(false);
-		reg_exp.selectAll();	// set the whole string as selected
+		reg_exp.selectAll();    // set the whole string as selected
 		show();
 
 		if (ok)

@@ -49,22 +49,15 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.*;
-
 import javax.swing.*;
-
 import java.awt.event.*;
-
 import com.nwoods.jgo.layout.JGoLayeredDigraphAutoLayout;
 import com.nwoods.jgo.layout.JGoNetwork;
-
 
 public class LayerDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JPanel panel2 = new JPanel();
 	JPanel panel3 = new JPanel();
@@ -108,7 +101,6 @@ public class LayerDialog
 
 	public LayerDialog(Frame frame, String title, boolean modal, AutomatonView view, AutomataEditor app)
 	{
-
 		super(frame, title, modal);
 
 		try
@@ -134,7 +126,6 @@ public class LayerDialog
 	void jbInit()
 		throws Exception
 	{
-
 		panel1.setLayout(null);
 		panel2.setLayout(null);
 		panel3.setLayout(null);
@@ -147,7 +138,6 @@ public class LayerDialog
 		panel1.setPreferredSize(new Dimension(480, 400));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OKButton_actionPerformed(e);
@@ -155,7 +145,6 @@ public class LayerDialog
 		});
 		CancelButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				CancelButton_actionPerformed(e);
@@ -163,7 +152,6 @@ public class LayerDialog
 		});
 		OKButton.addKeyListener(new java.awt.event.KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent e)
 			{
 				OKButton_keyPressed(e);
@@ -171,7 +159,6 @@ public class LayerDialog
 		});
 		CancelButton.addKeyListener(new java.awt.event.KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent e)
 			{
 				CancelButton_keyPressed(e);
@@ -307,7 +294,6 @@ public class LayerDialog
 
 	void UpdateControl()
 	{
-
 		if (myView != null)
 		{
 			int cycle, layering, initialize, direction, agr;
@@ -420,7 +406,6 @@ public class LayerDialog
 	 */
 	public void setVisible(boolean b)
 	{
-
 		if (b)
 		{
 			Rectangle bounds = getParent().getBounds();
@@ -438,11 +423,10 @@ public class LayerDialog
 
 	void OnOK()
 	{
-
 		try
 		{
 			UpdateControl();
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 
 			if (myAutoLayout != null)
 			{
@@ -462,17 +446,15 @@ public class LayerDialog
 
 	void OnCancel()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
 
 	void OKButton_keyPressed(KeyEvent e)
 	{
-
 		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
 		{
 			OnOK();
@@ -485,7 +467,6 @@ public class LayerDialog
 
 	void CancelButton_keyPressed(KeyEvent e)
 	{
-
 		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
 		{
 			OnCancel();

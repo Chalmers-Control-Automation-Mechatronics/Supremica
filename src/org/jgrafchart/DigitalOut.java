@@ -1,16 +1,11 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
 
 // import se.lth.control.realtime.*;
 import org.jgrafchart.io.*;
-
 
 /**
  * A DigitalIn is an Area containing a JGoStroke and two text labels
@@ -19,7 +14,6 @@ public class DigitalOut
 	extends JGoArea
 	implements Writable
 {
-
 	static protected int digitalOutputCounter = 0;
 	protected JGoStroke myBorder = null;
 	public JGoText myOuttext = null;
@@ -47,7 +41,6 @@ public class DigitalOut
 
 	public DigitalOut(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(80, 60);
@@ -115,7 +108,6 @@ public class DigitalOut
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		DigitalOut newobj = (DigitalOut) super.copyObject(env);
 
 		return newobj;
@@ -123,7 +115,6 @@ public class DigitalOut
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		DigitalOut newobj = (DigitalOut) newarea;
 
 		if (myBorder != null)
@@ -179,7 +170,6 @@ public class DigitalOut
 
 	public void layoutChildren()
 	{
-
 		if (myBorder == null)
 		{
 			return;
@@ -224,7 +214,6 @@ public class DigitalOut
 
 	public void compile()
 	{
-
 		if (!((GCDocument) getDocument()).isSimulating())
 		{
 			int newChan = Integer.parseInt(myChannel.getText());
@@ -248,7 +237,6 @@ public class DigitalOut
 
 	public void setStoredBoolAction(boolean newval)
 	{
-
 		val = newval;
 
 		if (newval)

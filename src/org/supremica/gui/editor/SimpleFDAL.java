@@ -49,22 +49,17 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.Color;
 import java.awt.Point;
-
 import com.nwoods.jgo.layout.JGoForceDirectedAutoLayout;
 import com.nwoods.jgo.layout.JGoNetwork;
 import com.nwoods.jgo.layout.JGoNetworkLink;
 import com.nwoods.jgo.layout.JGoNetworkNode;
 import com.nwoods.jgo.JGoSelection;
 
-
 public class SimpleFDAL
 	extends JGoForceDirectedAutoLayout
 {
-
 	public SimpleFDAL()
 	{
 		super();
@@ -87,7 +82,6 @@ public class SimpleFDAL
 
 	public SimpleFDAL(AutomatonDocument pGoDoc, int Nmax_iterations, double gravfieldX, double gravfieldY, double rcharge, double rmass, boolean rfixed, double gcharge, double gmass, boolean gfixed, double bcharge, double bmass, boolean bfixed, double rrlength, double rrstiffness, double rglength, double rgstiffness, double rblength, double rbstiffness, double gglength, double ggstiffness, double gblength, double gbstiffness, double bblength, double bbstiffness, AutomataEditor app)
 	{
-
 		super(pGoDoc, Nmax_iterations);
 
 		mygravfieldX = gravfieldX;
@@ -118,7 +112,6 @@ public class SimpleFDAL
 
 	public SimpleFDAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork, int Nmax_iterations, double gravfieldX, double gravfieldY, double rcharge, double rmass, boolean rfixed, double gcharge, double gmass, boolean gfixed, double bcharge, double bmass, boolean bfixed, double rrlength, double rrstiffness, double rglength, double rgstiffness, double rblength, double rbstiffness, double gglength, double ggstiffness, double gblength, double gbstiffness, double bblength, double bbstiffness, AutomataEditor app)
 	{
-
 		super(pGoDoc, pNetwork, Nmax_iterations);
 
 		mygravfieldX = gravfieldX;
@@ -149,7 +142,6 @@ public class SimpleFDAL
 
 	public double getElectricalFieldX(Point xy)
 	{
-
 		double border = 50.0;
 		double min = 0.0;
 		double max = getDocument().getDocumentSize().width;
@@ -169,7 +161,6 @@ public class SimpleFDAL
 
 	public double getElectricalFieldY(Point xy)
 	{
-
 		double border = 50.0;
 		double min = 0.0;
 		double max = getDocument().getDocumentSize().height;
@@ -199,7 +190,6 @@ public class SimpleFDAL
 
 	public double getElectricalCharge(JGoNetworkNode pNode)
 	{
-
 		if (pNode.getJGoObject() != null)
 		{
 			Color color = ((StateNode) (pNode.getJGoObject())).getColor();
@@ -225,7 +215,6 @@ public class SimpleFDAL
 
 	public double getGravitationalMass(JGoNetworkNode pNode)
 	{
-
 		if (pNode.getJGoObject() != null)
 		{
 			Color color = ((StateNode) (pNode.getJGoObject())).getColor();
@@ -251,7 +240,6 @@ public class SimpleFDAL
 
 	public boolean isFixed(JGoNetworkNode pNode)
 	{
-
 		if (pNode.getJGoObject() != null)
 		{
 			Color color = ((StateNode) (pNode.getJGoObject())).getColor();
@@ -277,7 +265,6 @@ public class SimpleFDAL
 
 	public double getSpringLength(JGoNetworkLink pLink)
 	{
-
 		JGoNetworkNode pFromNode = pLink.getFromNode();
 		JGoNetworkNode pToNode = pLink.getToNode();
 
@@ -340,7 +327,6 @@ public class SimpleFDAL
 
 	public double getSpringStiffness(JGoNetworkLink pLink)
 	{
-
 		JGoNetworkNode pFromNode = pLink.getFromNode();
 		JGoNetworkNode pToNode = pLink.getToNode();
 
@@ -403,7 +389,6 @@ public class SimpleFDAL
 
 	public void progressUpdate(double progress)
 	{
-
 		if (progress == 1.0)
 		{
 			myApp.setStatus("Simple Force-Directed Auto-Layout: 100% done.");

@@ -49,11 +49,8 @@
  */
 package org.supremica.gui;
 
-
-
 public class EditorMode
 {
-
 	public static final int MODE_EDIT = 1;
 	public static final int MODE_ADD_STATE = 2;
 	public static final int MODE_ADD_ARC = 3;

@@ -49,16 +49,12 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 // package org.supremica;
 import java.io.PrintWriter;
 import java.io.IOException;
 
-
 public interface AutomataSerializer
 {
-
 	void serialize(PrintWriter pr)
 		throws Exception;
 

@@ -49,18 +49,12 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.automata.*;
-
 
 public class AutomataExtender
 {
-
 	private Automaton orgAut;
 	private Automaton newAut;
 	private int k = 1;
@@ -96,7 +90,6 @@ public class AutomataExtender
 	public void execute()
 		throws Exception
 	{
-
 		newAut = new Automaton();
 
 		newAut.setName(orgAut.getName());
@@ -209,16 +202,16 @@ public class AutomataExtender
 					Event currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 
 					if (i < k)
-					{		// Copy all transitions
+					{        // Copy all transitions
 						if (currEvent.isControllable())
-						{		// Add an arc to the "first" copy of orgDestState
+						{    // Add an arc to the "first" copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
 							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 
 							newAut.addArc(newArc);
 						}
 						else
-						{		// Add an arc to the i + 1 copy of orgDestState
+						{    // Add an arc to the i + 1 copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(i + 1);
 							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 
@@ -226,9 +219,9 @@ public class AutomataExtender
 						}
 					}
 					else
-					{		// Copy only controllable transitions
+					{        // Copy only controllable transitions
 						if (currEvent.isControllable())
-						{		// Add an arc to the "first" copy of orgDestState
+						{    // Add an arc to the "first" copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
 							Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 

@@ -49,20 +49,13 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import org.supremica.util.IDD.*;
-
 
 public final class AutomataIDDForm
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(AutomataIDDForm.class.getName());
 	private Automata theAutomata;
 	private AutomataIndexForm theAutomataIndexForm;
@@ -74,7 +67,6 @@ public final class AutomataIDDForm
 	public AutomataIDDForm(Automata theAutomata)
 		throws Exception
 	{
-
 		this.theAutomata = theAutomata;
 		theAutomaton = new Automaton();
 
@@ -88,7 +80,6 @@ public final class AutomataIDDForm
 
 	private void buildEnableEventIDDs()
 	{
-
 		enableEventIDDs = new IDD[nbrOfEvents];
 
 		for (int i = 0; i < nbrOfEvents; i++)
@@ -102,7 +93,6 @@ public final class AutomataIDDForm
 	 */
 	private IDD createEnableEventIDD(int eventId)
 	{
-
 		IDDBuilder builder = new IDDBuilder(theAutomataIndexForm.getAutomataSize());
 
 		// Find all automata that has eventId in its alphabet
@@ -116,7 +106,7 @@ public final class AutomataIDDForm
 		for (int i = 0; i < alphabetEventsTable.length; i++)
 		{
 			if (alphabetEventsTable[i][eventId])
-			{		// automaton i includes eventId
+			{    // automaton i includes eventId
 
 				// Find all states that enables eventId
 				int[] enableState = enableEventsTable[i][eventId];

@@ -49,14 +49,9 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 /**
  * A collection of useful methods for manipulating Event.
@@ -64,7 +59,6 @@ import org.apache.log4j.*;
  */
 public class EventHelpers
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(EventHelpers.class.getName());
 
 	/**
@@ -73,7 +67,6 @@ public class EventHelpers
 	public static Event createEvent(EventsSet eventSet, String prefix)
 		throws IllegalArgumentException, Exception
 	{
-
 		if (eventSet.size() <= 0)
 		{
 			throw new IllegalArgumentException("At least one event in the set is necessary");
@@ -122,7 +115,7 @@ public class EventHelpers
 		// Create the new event
 		Event theEvent = new Event(label);
 
-		theEvent.setId(id);		// Do I need to tweak the id???
+		theEvent.setId(id);    // Do I need to tweak the id???
 		theEvent.setControllable(controllable);
 		theEvent.setPrioritized(prioritized);
 		theEvent.setImmediate(immediate);

@@ -1,16 +1,11 @@
 package org.jgrafchart.Transitions;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.util.*;
-
 
 public class TRConstant
 	extends SimpleNode
 {
-
 	protected String name;
 	protected boolean val;
 
@@ -21,7 +16,6 @@ public class TRConstant
 
 	public void setName(String n)
 	{
-
 		name = n;
 
 		if (n.compareTo("false") == 0)
@@ -46,7 +40,6 @@ public class TRConstant
 
 	public int intEvaluate()
 	{
-
 		if (val)
 		{
 			return 1;

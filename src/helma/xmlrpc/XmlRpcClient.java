@@ -5,16 +5,10 @@
  */
 package helma.xmlrpc;
 
-
-
 import java.net.*;
-
 import java.io.*;
-
 import java.util.*;
-
 import org.xml.sax.*;
-
 
 /**
  * A multithreaded, reusable XML-RPC client object. Use this if you need a full-grown
@@ -24,7 +18,6 @@ import org.xml.sax.*;
 public class XmlRpcClient
 	implements XmlRpcHandler
 {
-
 	URL url;
 	String auth;
 
@@ -60,7 +53,6 @@ public class XmlRpcClient
 	 */
 	public void setBasicAuthentication(String user, String password)
 	{
-
 		if ((user == null) || (password == null))
 		{
 			auth = null;
@@ -83,7 +75,6 @@ public class XmlRpcClient
 	public Object execute(String method, Vector params)
 		throws XmlRpcException, IOException
 	{
-
 		Worker worker = getWorker();
 
 		try
@@ -111,7 +102,6 @@ public class XmlRpcClient
 	private final Worker getWorker()
 		throws IOException
 	{
-
 		try
 		{
 			return (Worker) pool.pop();
@@ -132,7 +122,6 @@ public class XmlRpcClient
 	class Worker
 		extends XmlRpc
 	{
-
 		boolean fault;
 		Object result = null;
 		StringBuffer strbuf;
@@ -146,7 +135,6 @@ public class XmlRpcClient
 		public Object execute(String method, Vector params)
 			throws XmlRpcException, IOException
 		{
-
 			fault = false;
 
 			long now = System.currentTimeMillis();
@@ -201,7 +189,7 @@ public class XmlRpcClient
 			}
 
 			if (fault)
-			{		// generate an XmlRpcException
+			{    // generate an XmlRpcException
 				XmlRpcException exception = null;
 
 				try
@@ -242,7 +230,6 @@ public class XmlRpcClient
 		void writeRequest(XmlWriter writer, String method, Vector params)
 			throws IOException
 		{
-
 			writer.startElement("methodCall");
 			writer.startElement("methodName");
 			writer.write(method);
@@ -268,7 +255,6 @@ public class XmlRpcClient
 		public void startElement(String name, AttributeList atts)
 			throws SAXException
 		{
-
 			if ("fault".equals(name))
 			{
 				fault = true;
@@ -278,7 +264,7 @@ public class XmlRpcClient
 				super.startElement(name, atts);
 			}
 		}
-	}		// end of inner class Worker
+	}    // end of inner class Worker
 
 	/**
 	 * Just for testing.

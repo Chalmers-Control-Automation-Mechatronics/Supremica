@@ -49,22 +49,15 @@
  */
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 
 public class PreferencesDialog
 	extends JDialog
 {
-
 	private JPanel contentPane = null;
 	private JTabbedPane theTabbedPanel = null;
 	private FilePanel theFilePanel = null;
@@ -75,7 +68,6 @@ public class PreferencesDialog
 
 	public PreferencesDialog(Frame owner)
 	{
-
 		super(owner, "Preferences", true);
 
 		contentPane = (JPanel) getContentPane();
@@ -124,7 +116,6 @@ public class PreferencesDialog
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		addWindowListener(new WindowAdapter()
 		{
-
 			public void windowClosing(WindowEvent e)
 			{
 				doCancel();
@@ -140,7 +131,6 @@ public class PreferencesDialog
 
 	public void doApply()
 	{
-
 		if (setAttributes())
 		{
 			doCancel();
@@ -149,7 +139,6 @@ public class PreferencesDialog
 
 	public void setVisible(boolean toVisible)
 	{
-
 		if (toVisible)
 		{
 			getAttributes();
@@ -160,7 +149,6 @@ public class PreferencesDialog
 
 	private void getAttributes()
 	{
-
 		if (theFilePanel != null)
 		{
 			theFilePanel.update();
@@ -173,7 +161,6 @@ public class PreferencesDialog
 
 	private boolean setAttributes()
 	{
-
 		if (theFilePanel != null)
 		{
 			if (!theFilePanel.doApply())
@@ -207,7 +194,6 @@ public class PreferencesDialog
 
 	public static int getInt(String label, String theIntStr, int minValue)
 	{
-
 		int theInt = Integer.MIN_VALUE;
 
 		try
@@ -237,14 +223,12 @@ public class PreferencesDialog
 class FilePanel
 	extends JPanel
 {
-
 	private PreferencesDialog theDialog = null;
 	private JTextField fileOpenPath = null;
 	private JTextField fileSavePath = null;
 
 	public FilePanel(PreferencesDialog theDialog)
 	{
-
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
@@ -270,7 +254,6 @@ class FilePanel
 
 	public boolean doApply()
 	{
-
 		WorkbenchProperties.setFileOpenPath(fileOpenPath.getText());
 		WorkbenchProperties.setFileSavePath(fileSavePath.getText());
 
@@ -287,14 +270,12 @@ class FilePanel
 class CommunicationPanel
 	extends JPanel
 {
-
 	private PreferencesDialog theDialog = null;
 	private JCheckBox useXmlRpc = null;
 	private JTextField xmlRpcPort = null;
 
 	public CommunicationPanel(PreferencesDialog theDialog)
 	{
-
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
@@ -316,7 +297,6 @@ class CommunicationPanel
 
 	public boolean doApply()
 	{
-
 		WorkbenchProperties.setXmlRpcActive(useXmlRpc.isSelected());
 
 		int port = theDialog.getInt("XML-RPC Port", xmlRpcPort.getText(), 1);
@@ -341,7 +321,6 @@ class CommunicationPanel
 class LayoutPanel
 	extends JPanel
 {
-
 	private PreferencesDialog theDialog = null;
 	private JCheckBox dotLeftToRight = null;
 	private JCheckBox dotWithStateLabels = null;
@@ -353,7 +332,6 @@ class LayoutPanel
 
 	public LayoutPanel(PreferencesDialog theDialog)
 	{
-
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
@@ -399,7 +377,6 @@ class LayoutPanel
 
 	public boolean doApply()
 	{
-
 		WorkbenchProperties.setDotLeftToRight(dotLeftToRight.isSelected());
 		WorkbenchProperties.setDotWithStateLabels(dotWithStateLabels.isSelected());
 		WorkbenchProperties.setDotWithCircles(dotWithCircles.isSelected());
@@ -421,7 +398,6 @@ class LayoutPanel
 
 	public void update()
 	{
-
 		dotLeftToRight.setSelected(WorkbenchProperties.isDotLeftToRight());
 		dotWithStateLabels.setSelected(WorkbenchProperties.isDotWithStateLabels());
 		dotWithCircles.setSelected(WorkbenchProperties.isDotWithCircles());
@@ -435,7 +411,6 @@ class LayoutPanel
 class SynchronizationPanel
 	extends JPanel
 {
-
 	private PreferencesDialog theDialog = null;
 	private JCheckBox forbidUncontrollableStates = null;
 	private JCheckBox expandForbiddenStates = null;
@@ -446,7 +421,6 @@ class SynchronizationPanel
 
 	public SynchronizationPanel(PreferencesDialog theDialog)
 	{
-
 		this.theDialog = theDialog;
 
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
@@ -488,7 +462,6 @@ class SynchronizationPanel
 
 	public boolean doApply()
 	{
-
 		WorkbenchProperties.setSyncForbidUncontrollableStates(forbidUncontrollableStates.isSelected());
 		WorkbenchProperties.setSyncExpandForbiddenStates(expandForbiddenStates.isSelected());
 		WorkbenchProperties.setSyncExpandHashtable(expandHashtable.isSelected());
@@ -517,7 +490,6 @@ class SynchronizationPanel
 
 	public void update()
 	{
-
 		forbidUncontrollableStates.setSelected(WorkbenchProperties.syncForbidUncontrollableStates());
 		expandForbiddenStates.setSelected(WorkbenchProperties.syncExpandForbiddenStates());
 		expandHashtable.setSelected(WorkbenchProperties.syncExpandHashtable());
@@ -530,14 +502,12 @@ class SynchronizationPanel
 class PreferencesControllerPanel
 	extends JPanel
 {
-
 	private PreferencesDialog theDialog = null;
 	private JButton applyButton = null;
 	private JButton cancelButton = null;
 
 	public PreferencesControllerPanel(PreferencesDialog theDialog)
 	{
-
 		this.theDialog = theDialog;
 
 		Box buttonBox = new Box(BoxLayout.X_AXIS);
@@ -552,7 +522,6 @@ class PreferencesControllerPanel
 		buttonBox.add(cancelButton);
 		applyButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				apply_actionPerformed(e);
@@ -560,7 +529,6 @@ class PreferencesControllerPanel
 		});
 		cancelButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				cancel_actionPerformed(e);

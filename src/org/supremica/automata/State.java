@@ -49,17 +49,13 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
 
 // import org.supremica.gui.editor.*; //** MF ** The model should know _zilch_ about the view/UI
 import java.awt.Point;
 
-
 public class State
 {
-
 	public final static int MIN_COST = 0;
 	public final static int MAX_COST = Integer.MAX_VALUE;
 	public final static int UNDEF_COST = -1;
@@ -95,7 +91,6 @@ public class State
 
 	public State(String id)
 	{
-
 		this();
 
 		setId(id);
@@ -104,7 +99,6 @@ public class State
 
 	public State(String id, String name)
 	{
-
 		this();
 
 		setId(id);
@@ -117,7 +111,6 @@ public class State
 	 */
 	public State(State otherState)
 	{
-
 		this();
 
 		index = otherState.index;
@@ -218,7 +211,6 @@ public class State
 
 	public void setForbidden(boolean forbidden)
 	{
-
 		this.forbidden = forbidden;
 
 		if (forbidden)
@@ -299,7 +291,6 @@ public class State
 
 	public void addOutgoingArc(Arc theArc)
 	{
-
 		outgoingArcs.addLast(theArc);
 
 		ArcSet theArcSet = getArcSet(theArc);
@@ -325,7 +316,6 @@ public class State
 
 	public void removeOutgoingArc(Arc theArc)
 	{
-
 		outgoingArcs.remove(theArc);
 
 		ArcSet theArcSet = getArcSet(theArc);
@@ -338,7 +328,6 @@ public class State
 
 	private ArcSet getArcSet(Arc theArc)
 	{
-
 		State toState = theArc.getToState();
 
 		for (Iterator arcSetIt = outgoingArcSets.iterator(); arcSetIt.hasNext(); )
@@ -422,7 +411,6 @@ public class State
 
 	public void removeArcs()
 	{
-
 		LinkedList outArcs = (LinkedList) outgoingArcs.clone();
 		LinkedList inArcs = (LinkedList) incomingArcs.clone();
 		Iterator arcIt = outArcs.iterator();
@@ -455,15 +443,15 @@ public class State
 	}
 
 	/** MF ** I assume these have something with the view/UI to do
-																	public void setStateNode(StateNode stateNode)
-																	{
-																																	this.stateNode = stateNode;
-																	}
+																																	public void setStateNode(StateNode stateNode)
+																																	{
+																																																																	this.stateNode = stateNode;
+																																	}
 
-																	public StateNode getStateNode()
-																	{
-																																	return stateNode;
-																	}
+																																	public StateNode getStateNode()
+																																	{
+																																																																	return stateNode;
+																																	}
 	**/
 
 	/**
@@ -472,7 +460,6 @@ public class State
 	 **/
 	public State nextState(Event e)
 	{
-
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
 		String eventId = e.getId();
 
@@ -491,7 +478,6 @@ public class State
 
 	public boolean contains(int x1, int y1)
 	{
-
 		int radius2 = radius * radius;
 		int distance2 = (x - x1) * (x - x1) + (y - y1) * (y - y1);
 
@@ -500,7 +486,6 @@ public class State
 
 	public Listeners getListeners()
 	{
-
 		if (listeners == null)
 		{
 			listeners = new Listeners(this);
@@ -511,7 +496,6 @@ public class State
 
 	private void notifyListeners()
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners();

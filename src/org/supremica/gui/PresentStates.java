@@ -3,32 +3,23 @@
 // * (Various ways of?) Presents the found states for the user
 package org.supremica.gui;
 
-
-
 import java.util.Iterator;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.table.*;
-
 import org.apache.log4j.Category;
-
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.SearchStates;
-
 
 class PresentStatesTableModel
 	extends AbstractTableModel
 {
-
 	String[] heading = null;
 	String[][] body = null;
 
 	public PresentStatesTableModel(SearchStates ss, Automata a)
 	{
-
 		heading = new String[a.size()];
 
 		for (int i = 0; i < a.size(); ++i)
@@ -75,7 +66,6 @@ class PresentStatesTableModel
 class PresentStatesTable
 	extends JTable
 {
-
 	public PresentStatesTable(SearchStates ss, Automata a)
 	{
 		super(new PresentStatesTableModel(ss, a));
@@ -85,7 +75,6 @@ class PresentStatesTable
 class PresentStatesFrame
 	extends JFrame
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(PresentStatesFrame.class.getName());
 
 	private static void debug(String s)
@@ -95,7 +84,6 @@ class PresentStatesFrame
 
 	private JButton setDefaultButton(JButton b)
 	{
-
 		getRootPane().setDefaultButton(b);
 
 		return b;
@@ -104,16 +92,13 @@ class PresentStatesFrame
 	private class FineButton
 		extends JButton
 	{
-
 		public FineButton()
 		{
-
 			super("Close");
 
 			setToolTipText("I'm fine, thanks");
 			addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					action(e);
@@ -131,7 +116,6 @@ class PresentStatesFrame
 
 	public PresentStatesFrame(SearchStates ss, Automata a)
 	{
-
 		Utility.setupFrame(this, 400, 300);
 		setTitle("Found States");
 
@@ -152,10 +136,8 @@ class PresentStatesFrame
 class NoStatesFoundFrame
 	extends JFrame
 {
-
 	public NoStatesFoundFrame()
 	{
-
 		Utility.setupFrame(this, 0, 0);
 		JOptionPane.showMessageDialog(this, "No matching states found", "Zero States", JOptionPane.INFORMATION_MESSAGE);
 
@@ -168,7 +150,6 @@ class NoStatesFoundFrame
 // 
 public class PresentStates
 {
-
 	private JFrame frame = null;
 	private SearchStates searchs = null;
 	private Automata automata = null;
@@ -176,7 +157,6 @@ public class PresentStates
 
 	public PresentStates(SearchStates ss, Automata a)
 	{
-
 		searchs = ss;
 		automata = a;
 
@@ -188,7 +168,7 @@ public class PresentStates
 		else
 		{
 			frame = new NoStatesFoundFrame();
-			dispose_frame = true;		// for some reason the frame cannot dispose of itself
+			dispose_frame = true;    // for some reason the frame cannot dispose of itself
 		}
 	}
 
@@ -222,7 +202,6 @@ public class PresentStates
 
 	public void execute()
 	{
-
 		frame.show();
 
 		if (dispose_frame)

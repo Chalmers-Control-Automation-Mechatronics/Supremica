@@ -49,14 +49,10 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class Arc
 {
-
 	private String eventId;
 	private State fromState;
 	private State toState;
@@ -76,7 +72,6 @@ public class Arc
 
 	public Arc(State from, State to, String eventId)
 	{
-
 		fromState = from;
 		toState = to;
 		this.eventId = eventId;
@@ -107,7 +102,6 @@ public class Arc
 
 	public void clear()
 	{
-
 		if (fromState != null)
 		{
 			fromState.removeOutgoingArc(this);
@@ -127,7 +121,6 @@ public class Arc
 
 	public void computeDefaultDisplayParameters()
 	{
-
 		int x1 = fromState.getX();
 		int y1 = fromState.getY();
 		int x2 = toState.getX();
@@ -139,7 +132,6 @@ public class Arc
 
 	public void computeStartAndEndParameters()
 	{
-
 		int x1 = fromState.getX();
 		int y1 = fromState.getY();
 		int r1 = fromState.getRadius();
@@ -175,7 +167,6 @@ public class Arc
 
 	public Listeners getListeners()
 	{
-
 		if (listeners == null)
 		{
 			listeners = new ArcListeners(this);
@@ -186,7 +177,6 @@ public class Arc
 
 	private void notifyListeners()
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -195,7 +185,6 @@ public class Arc
 
 	private void notifyListeners(int mode, Object o)
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners(mode, o);
@@ -204,7 +193,6 @@ public class Arc
 
 	public static double angle(int x0, int y0, int x1, int y1)
 	{
-
 		double angle = 0;
 		double xDist = x1 - x0;
 		double yDist = y1 - y0;

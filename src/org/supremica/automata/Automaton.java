@@ -49,15 +49,11 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class Automaton
 	implements ArcListener
 {
-
 	private Alphabet alphabet;
 	private String name;
 	private List theStates;
@@ -74,7 +70,6 @@ public class Automaton
 
 	public Automaton()
 	{
-
 		alphabet = new Alphabet();
 		idStateMap = new HashMap();
 		indexStateMap = new HashMap();
@@ -84,7 +79,6 @@ public class Automaton
 
 	public Automaton(String name)
 	{
-
 		this();
 
 		setName(name);
@@ -92,7 +86,6 @@ public class Automaton
 
 	public Automaton(Automaton orgAut)
 	{
-
 		this();
 
 		Alphabet orgAlphabet = orgAut.getAlphabet();
@@ -115,7 +108,7 @@ public class Automaton
 		}
 
 		try
-		{		// Create all transitions
+		{    // Create all transitions
 			states = orgAut.stateIterator();
 
 			while (states.hasNext())
@@ -175,7 +168,6 @@ public class Automaton
 
 	public void addState(State state)
 	{
-
 		theStates.add(state);
 		idStateMap.put(state.getId(), state);
 		indexStateMap.put(new Integer(state.getIndex()), state);
@@ -190,7 +182,6 @@ public class Automaton
 
 	public void removeState(State state)
 	{
-
 		if (state == initialState)
 		{
 			initialState = null;
@@ -215,7 +206,6 @@ public class Automaton
 
 	public void addArc(Arc arc)
 	{
-
 		arc.getListeners().addListener(this);
 		theArcs.addArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
@@ -223,7 +213,6 @@ public class Automaton
 
 	public void removeArc(Arc arc)
 	{
-
 		theArcs.removeArc(arc);
 		arc.clear();
 		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
@@ -294,7 +283,6 @@ public class Automaton
 
 	public int nbrOfAcceptingStates()
 	{
-
 		int nbrOfAcceptingStates = 0;
 		Iterator stateIt = stateIterator();
 
@@ -313,7 +301,6 @@ public class Automaton
 
 	public int nbrOfForbiddenStates()
 	{
-
 		int nbrOfForbiddenStates = 0;
 		Iterator stateIt = stateIterator();
 
@@ -332,7 +319,6 @@ public class Automaton
 
 	public int nbrOfAcceptingAndForbiddenStates()
 	{
-
 		int nbrOfAcceptingAndForbiddenStates = 0;
 		Iterator stateIt = stateIterator();
 
@@ -409,7 +395,6 @@ public class Automaton
 
 	public String getUniqueStateId()
 	{
-
 		String newId;
 
 		do
@@ -423,7 +408,6 @@ public class Automaton
 
 	public void clearVisitedStates()
 	{
-
 		Iterator stateIt = stateIterator();
 
 		while (stateIt.hasNext())
@@ -436,7 +420,6 @@ public class Automaton
 
 	public void removeAllStates()
 	{
-
 		beginTransaction();
 		idStateMap.clear();
 		indexStateMap.clear();
@@ -454,7 +437,6 @@ public class Automaton
 
 	public State getState(int x, int y)
 	{
-
 		Iterator stateIt = stateIterator();
 
 		while (stateIt.hasNext())
@@ -481,8 +463,7 @@ public class Automaton
 	}
 
 	public long checksum()
-	{		// Ad-hoc checksum algorithm
-
+	{    // Ad-hoc checksum algorithm
 		long checksum = 0;
 
 		for (Iterator sIt = stateIterator(); sIt.hasNext(); )
@@ -545,7 +526,6 @@ public class Automaton
 
 	public Listeners getListeners()
 	{
-
 		if (listeners == null)
 		{
 			listeners = new AutomatonListeners(this);
@@ -556,7 +536,6 @@ public class Automaton
 
 	private void notifyListeners(int mode, Object o)
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners(mode, o);
@@ -565,7 +544,6 @@ public class Automaton
 
 	private void notifyListeners()
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -574,7 +552,6 @@ public class Automaton
 
 	public void invalidate()
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -583,7 +560,6 @@ public class Automaton
 
 	public void beginTransaction()
 	{
-
 		if (listeners != null)
 		{
 			listeners.beginTransaction();
@@ -592,7 +568,6 @@ public class Automaton
 
 	public void endTransaction()
 	{
-
 		if (listeners != null)
 		{
 			listeners.endTransaction();

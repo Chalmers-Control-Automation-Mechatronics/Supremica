@@ -49,20 +49,12 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 import org.supremica.util.IntArrayHashTable;
-
 import java.io.PrintWriter;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 /**
  * @deprecated No longer used! Use AutomataVerificationWorker instead!
@@ -70,7 +62,6 @@ import org.apache.log4j.*;
  */
 public class LanguageInclusionCheck
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(LanguageInclusionCheck.class.getName());
 	private Automata AutomataA;
 	private Automata AutomataB;
@@ -78,8 +69,7 @@ public class LanguageInclusionCheck
 
 	public LanguageInclusionCheck(Automata AutomataA, Automata AutomataB, SynchronizationOptions syncOptions)
 		throws IllegalArgumentException
-	{		// Make copies of AutomataA and AutomataB
-
+	{    // Make copies of AutomataA and AutomataB
 		this.AutomataA = new Automata(AutomataA);
 		this.AutomataB = new Automata(AutomataB);
 		this.syncOptions = syncOptions;
@@ -91,7 +81,6 @@ public class LanguageInclusionCheck
 	public boolean execute()
 		throws Exception
 	{
-
 		Automaton currAutomaton;
 		Iterator eventIteratorA;
 		Iterator eventIteratorB;

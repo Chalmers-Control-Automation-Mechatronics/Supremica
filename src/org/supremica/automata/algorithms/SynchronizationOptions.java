@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 public final class SynchronizationOptions
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(SynchronizationOptions.class.getName());
 	private final SynchronizationType syncType;
 	private final boolean forbidUnconStates;
@@ -80,7 +75,6 @@ public final class SynchronizationOptions
 	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode)
 		throws Exception
 	{
-
 		if (syncType == null)
 		{
 			throw new Exception("synchType must be non-null");

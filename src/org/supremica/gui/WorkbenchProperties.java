@@ -49,15 +49,10 @@
  */
 package org.supremica.gui;
 
-
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
-
 
 /**
  * To compile a student version with copy protected files set
@@ -72,7 +67,6 @@ import org.supremica.automata.algorithms.SynthesisAlgorithm;
 public final class WorkbenchProperties
 	extends Properties
 {
-
 	private static final String XML_RPC_ACTIVE = "xmlRpcActive";
 	private static final String XML_RPC_PORT = "xmlRpcPort";
 	private static final String DOT_USE = "dotUse";
@@ -125,7 +119,6 @@ public final class WorkbenchProperties
 
 	private WorkbenchProperties()
 	{
-
 		setProperty(FILE_OPEN_PATH, "../examples/");
 		setProperty(FILE_SAVE_PATH, ".");
 		setProperty(FILE_ALLOW_OPEN, "true");
@@ -180,7 +173,6 @@ public final class WorkbenchProperties
 
 	public static String getFileOpenPath()
 	{
-
 		File theFile = new File(wp.getProperty(FILE_OPEN_PATH));
 
 		return theFile.getAbsolutePath();
@@ -193,7 +185,6 @@ public final class WorkbenchProperties
 
 	public static String getFileSavePath()
 	{
-
 		File theFile = new File(wp.getProperty(FILE_SAVE_PATH));
 
 		return theFile.getAbsolutePath();
@@ -569,7 +560,6 @@ public final class WorkbenchProperties
 
 	private static String toString(boolean b)
 	{
-
 		if (b)
 		{
 			return Boolean.TRUE.toString();

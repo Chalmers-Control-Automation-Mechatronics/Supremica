@@ -1,28 +1,20 @@
 package org.jgrafchart;
 
-
-
 import javax.swing.*;
 import javax.swing.text.*;
-
 import java.awt.Toolkit;
-
 import java.text.NumberFormat;
 import java.text.ParseException;
-
 import java.util.Locale;
-
 
 public class WholeNumberField
 	extends JTextField
 {
-
 	private Toolkit toolkit;
 	private NumberFormat integerFormatter;
 
 	public WholeNumberField(int value, int columns)
 	{
-
 		super(columns);
 
 		toolkit = Toolkit.getDefaultToolkit();
@@ -34,7 +26,6 @@ public class WholeNumberField
 
 	public int getValue()
 	{
-
 		int retVal = 0;
 
 		try
@@ -65,11 +56,9 @@ public class WholeNumberField
 	protected class WholeNumberDocument
 		extends PlainDocument
 	{
-
 		public void insertString(int offs, String str, AttributeSet a)
 			throws BadLocationException
 		{
-
 			char[] source = str.toCharArray();
 			char[] result = new char[source.length];
 			int j = 0;

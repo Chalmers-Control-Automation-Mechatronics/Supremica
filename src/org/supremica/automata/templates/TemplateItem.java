@@ -49,21 +49,14 @@
  */
 package org.supremica.automata.templates;
 
-
-
 import java.util.*;
-
 import java.net.*;
-
 import java.io.*;
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 
-
 public class TemplateItem
 {
-
 	private String description;
 	private String path;
 
@@ -86,7 +79,6 @@ public class TemplateItem
 	public Automata createInstance()
 		throws Exception
 	{
-
 		try
 		{
 			URL url = TemplateItem.class.getResource(path);

@@ -49,14 +49,10 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.Color;
 import java.awt.Point;
-
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import com.nwoods.jgo.layout.JGoLayeredDigraphAutoLayout;
 import com.nwoods.jgo.layout.JGoNetwork;
 import com.nwoods.jgo.layout.JGoNetworkLink;
@@ -65,11 +61,9 @@ import com.nwoods.jgo.layout.JGoLayeredDigraphAutoLayoutLinkData;
 import com.nwoods.jgo.JGoPort;
 import com.nwoods.jgo.JGoLink;
 
-
 public class SimpleLDAL
 	extends JGoLayeredDigraphAutoLayout
 {
-
 	public SimpleLDAL()
 	{
 		super();
@@ -87,7 +81,6 @@ public class SimpleLDAL
 
 	public SimpleLDAL(AutomatonDocument pGoDoc, int NlayerSpacing, int NcolumnSpacing, int NdirectionOption, int NcycleremoveOption, int NlayeringOption, int NinitializeOption, int Niterations, int NaggressiveOption, AutomataEditor app)
 	{
-
 		super(pGoDoc, NlayerSpacing, NcolumnSpacing, NdirectionOption, NcycleremoveOption, NlayeringOption, NinitializeOption, Niterations, NaggressiveOption);
 
 		myApp = app;
@@ -95,7 +88,6 @@ public class SimpleLDAL
 
 	public SimpleLDAL(AutomatonDocument pGoDoc, JGoNetwork pNetwork, int NlayerSpacing, int NcolumnSpacing, int NdirectionOption, int NcycleremoveOption, int NlayeringOption, int NinitializeOption, int Niterations, int NaggressiveOption, AutomataEditor app)
 	{
-
 		super(pGoDoc, pNetwork, NlayerSpacing, NcolumnSpacing, NdirectionOption, NcycleremoveOption, NlayeringOption, NinitializeOption, Niterations, NaggressiveOption);
 
 		myApp = app;
@@ -103,7 +95,6 @@ public class SimpleLDAL
 
 	public int getLinkMinLength(JGoNetworkLink pLink)
 	{
-
 		JGoNetworkNode pFromNode = pLink.getFromNode();
 		JGoNetworkNode pToNode = pLink.getToNode();
 
@@ -127,7 +118,6 @@ public class SimpleLDAL
 
 	public void progressUpdate(double progress)
 	{
-
 		if (progress == 1.0)
 		{
 			myApp.setStatus("Simple Layered Digraph Auto-Layout: 100% done.");

@@ -4,20 +4,15 @@
 // Heap of useful classes we should all use
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.table.*;
-
 
 // ** This one sets its own background to white
 class WhitePane
 	extends JScrollPane
 {
-
 	private void setWhite()
 	{
 		Utility.setupPane(this);
@@ -31,7 +26,6 @@ class WhitePane
 
 	public WhitePane(Component view)
 	{
-
 		super(view);
 
 		setWhite();
@@ -39,7 +33,6 @@ class WhitePane
 
 	public WhitePane(Component view, int vsbPolicy, int hsbPolicy)
 	{
-
 		super(view, vsbPolicy, hsbPolicy);
 
 		setWhite();
@@ -47,7 +40,6 @@ class WhitePane
 
 	public WhitePane(int vsbPolicy, int hsbPolicy)
 	{
-
 		super(vsbPolicy, hsbPolicy);
 
 		setWhite();

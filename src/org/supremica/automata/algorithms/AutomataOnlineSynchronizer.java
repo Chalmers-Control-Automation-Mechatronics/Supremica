@@ -49,18 +49,13 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import java.util.Arrays;
 
 // For the automata selection methods
 import java.util.ArrayList;
-
 
 /**
  * Used in the "Automata Explorer" (an early version that is on ice since way back and therefore not completed).
@@ -69,7 +64,6 @@ import java.util.ArrayList;
 public final class AutomataOnlineSynchronizer
 	extends Thread
 {
-
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
 	private static Category thisCategory = LogDisplay.createCategory(AutomataOnlineSynchronizer.class.getName());
@@ -78,7 +72,7 @@ public final class AutomataOnlineSynchronizer
 	private final int nbrOfEvents;
 	private final int[][][] nextStateTable;
 	private final int[][][] outgoingEventsTable;
-	private final int[][][] incomingEventsTable;	// New!
+	private final int[][][] incomingEventsTable;    // New!
 	private final boolean[][] prioritizedEventsTable;
 	private final boolean[] typeIsPlantTable;
 	private final boolean[] controllableEventsTable;
@@ -110,7 +104,6 @@ public final class AutomataOnlineSynchronizer
 
 	public AutomataOnlineSynchronizer(AutomataSynchronizerHelper synchronizerHelper)
 	{
-
 		helper = synchronizerHelper;
 		indexForm = helper.getAutomataIndexForm();
 		nbrOfAutomata = helper.getAutomata().size();
@@ -147,11 +140,10 @@ public final class AutomataOnlineSynchronizer
 	// ÄNdrad till public istället för private... för att kunna köra findTransition
 	public final void initialize()
 	{
-
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
-		currState = new int[nbrOfAutomata + 1];		// +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1];		// Always end with Integer.MAX_VALUE
+		currState = new int[nbrOfAutomata + 1];    // +1 status field
+		currEnabledEvents = new int[nbrOfEvents + 1];    // Always end with Integer.MAX_VALUE
 
 		if (automataIndices == null)
 		{
@@ -167,7 +159,6 @@ public final class AutomataOnlineSynchronizer
 	public void selectTwoAutomata(int plantIndex, int supervisorIndex)
 		throws Exception
 	{
-
 		automataIndices = new int[2];
 		automataIndices[0] = plantIndex;
 		automataIndices[1] = supervisorIndex;
@@ -182,7 +173,6 @@ public final class AutomataOnlineSynchronizer
 	public void selectAutomata(ArrayList selectedAutomata)
 		throws Exception
 	{
-
 		automataIndices = new int[selectedAutomata.size()];
 
 		for (int i = 0; i < selectedAutomata.size(); i++)
@@ -200,7 +190,6 @@ public final class AutomataOnlineSynchronizer
 	public void selectAutomata(int[] automataIndices)
 		throws Exception
 	{
-
 		this.automataIndices = automataIndices;
 
 		if (exhaustiveSearch)
@@ -212,7 +201,6 @@ public final class AutomataOnlineSynchronizer
 	// Selects all automata
 	public void selectAllAutomata()
 	{
-
 		automataIndices = new int[nbrOfAutomata];
 
 		for (int i = 0; i < nbrOfAutomata; i++)
@@ -223,7 +211,6 @@ public final class AutomataOnlineSynchronizer
 
 	private final void enabledEvents(int[] currState)
 	{
-
 		int currMinEventIndex = Integer.MAX_VALUE;
 
 		nbrOfSelectedAutomata = automataIndices.length;
@@ -286,7 +273,7 @@ public final class AutomataOnlineSynchronizer
 				if (syncType == SynchronizationType.Prioritized)
 				{
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])
-					{			// The event is prioritized in currAutomaton
+					{        // The event is prioritized in currAutomaton
 						if (!(currEventIndex == currAutEventIndex))
 						{
 
@@ -350,7 +337,7 @@ public final class AutomataOnlineSynchronizer
 						canExecuteInPlant = true;
 
 						if (rememberUncontrollable)
-						{		// Remember uncontrollable states
+						{    // Remember uncontrollable states
 							problemEvent = currEventIndex;
 							problemPlant = currAutIndex;
 						}
@@ -361,7 +348,7 @@ public final class AutomataOnlineSynchronizer
 				// find the next event for this automaton and state
 				// Independently of the alphabets!
 				if (currEventIndex == currAutEventIndex)
-				{				// Point to the next index;
+				{            // Point to the next index;
 					int tmpIndex = currOutgoingEventsIndex[currAutIndex];
 
 					currOutgoingEventsIndex[currAutIndex] = ++tmpIndex;
@@ -400,7 +387,7 @@ public final class AutomataOnlineSynchronizer
 		currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
 
 		if (expandEventsUsingPriority)
-		{		// Choose outgoing events among the possibilities, choose after priority...
+		{    // Choose outgoing events among the possibilities, choose after priority...
 			int insertionIndex = 0;
 			int i = 0;
 			int minPrio = 2;
@@ -451,10 +438,9 @@ public final class AutomataOnlineSynchronizer
 	 */
 	public int findTransition(int[] fromState, int[] toState)
 	{
-
 		if (nextState == null)
 		{
-			nextState = new int[nbrOfAutomata + 1];		// +1 status field
+			nextState = new int[nbrOfAutomata + 1];    // +1 status field
 		}
 
 		setCurrState(fromState);
@@ -464,7 +450,7 @@ public final class AutomataOnlineSynchronizer
 
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
-		{		// Generate an array that contains the indicies of each state
+		{    // Generate an array that contains the indicies of each state
 			System.arraycopy(fromState, 0, nextState, 0, fromState.length);
 
 			// Iterate over all automata to construct the new state
@@ -493,8 +479,7 @@ public final class AutomataOnlineSynchronizer
 
 	// Compares int arrays, except for the last element (the status field)
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
-	{		// Assume that the last element is a status field
-
+	{    // Assume that the last element is a status field
 		for (int i = 0; i < firstArray.length - 1; i++)
 		{
 			if (firstArray[i] != secondArray[i])
@@ -508,7 +493,6 @@ public final class AutomataOnlineSynchronizer
 
 	public boolean isEnabled(int eventIndex)
 	{
-
 		int i = 0;
 		int currEventIndex = currEnabledEvents[i];
 
@@ -548,7 +532,7 @@ public final class AutomataOnlineSynchronizer
 	 * }
 	 */
 	public int[] doTransition(int eventIndex)
-	{		// Counting on correct input here... only enabled events, please...
+	{    // Counting on correct input here... only enabled events, please...
 
 		// Construct new state
 		int[] nextState = new int[currState.length];
@@ -580,14 +564,13 @@ public final class AutomataOnlineSynchronizer
 
 	public int[] getOutgoingEvents(int[] state)
 	{
-
 		enabledEvents(state);
 
 		return currEnabledEvents;
 	}
 
 	public int[] getIncomingEvents(int[] state)
-	{		// Not finished... FIXA!
+	{    // Not finished... FIXA!
 		return (new int[]{ 0, 1, Integer.MAX_VALUE });
 	}
 }

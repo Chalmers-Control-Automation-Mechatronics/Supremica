@@ -1,15 +1,9 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 import javax.swing.*;
-
 
 /**
  * A Step is an Area containing a Rectangle and two Ports and
@@ -19,7 +13,6 @@ public class MacroStep
 	extends GrafcetObject
 	implements GCIdent, Readable
 {
-
 	static protected int stepCounter = 0;
 
 	public MacroStep()
@@ -29,7 +22,6 @@ public class MacroStep
 
 	public MacroStep(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(60, 60);
@@ -186,7 +178,6 @@ public class MacroStep
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		MacroStep newobj = (MacroStep) super.copyObject(env);
 
 		return newobj;
@@ -194,7 +185,6 @@ public class MacroStep
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		MacroStep newobj = (MacroStep) newarea;
 
 		if (myRectangle != null)
@@ -294,7 +284,6 @@ public class MacroStep
 
 	public Point getLocation(Point p)
 	{
-
 		if (myRectangle != null)
 		{
 			return myRectangle.getSpotLocation(Center, p);
@@ -307,7 +296,6 @@ public class MacroStep
 
 	public void setLocation(int x, int y)
 	{
-
 		if (myRectangle != null)
 		{
 			myRectangle.setSpotLocation(Center, x, y);
@@ -322,7 +310,6 @@ public class MacroStep
 
 	public void layoutChildren()
 	{
-
 		if (myRectangle == null)
 		{
 			return;
@@ -434,7 +421,6 @@ public class MacroStep
 
 	public void activate()
 	{
-
 		myToken.setBrush(JGoBrush.black);
 
 		newX = true;
@@ -442,7 +428,6 @@ public class MacroStep
 
 	public void deactivate()
 	{
-
 		myToken.setBrush(JGoBrush.Null);
 
 		newX = false;
@@ -459,7 +444,6 @@ public class MacroStep
 
 	public void deactivateStrong()
 	{
-
 		myToken.setBrush(JGoBrush.Null);
 
 		newX = false;
@@ -478,7 +462,6 @@ public class MacroStep
 
 	public void deactivateBody(GCDocument doc)
 	{
-
 		JGoListPosition pos = doc.getFirstObjectPos();
 		JGoObject obj = doc.getObjectAtPos(pos);
 
@@ -531,7 +514,6 @@ public class MacroStep
 
 	public void changeState()
 	{
-
 		if (!x)
 		{
 			timer = 0;

@@ -49,19 +49,13 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.*;
-
 import javax.swing.*;
-
 import java.awt.event.*;
-
 
 public class NodeDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JLabel label1 = new JLabel();
 	JLabel label2 = new JLabel();
@@ -75,7 +69,6 @@ public class NodeDialog
 
 	public NodeDialog(Frame frame, String title, boolean modal, AutomatonView view)
 	{
-
 		super(frame, title, modal);
 
 		try
@@ -100,13 +93,11 @@ public class NodeDialog
 	void jbInit()
 		throws Exception
 	{
-
 		panel1.setLayout(null);
 		panel1.setMinimumSize(new Dimension(250, 100));
 		panel1.setPreferredSize(new Dimension(250, 100));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OKButton_actionPerformed(e);
@@ -114,7 +105,6 @@ public class NodeDialog
 		});
 		CancelButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				CancelButton_actionPerformed(e);
@@ -122,7 +112,6 @@ public class NodeDialog
 		});
 		OKButton.addKeyListener(new java.awt.event.KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent e)
 			{
 				OKButton_keyPressed(e);
@@ -130,7 +119,6 @@ public class NodeDialog
 		});
 		CancelButton.addKeyListener(new java.awt.event.KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent e)
 			{
 				CancelButton_keyPressed(e);
@@ -229,7 +217,6 @@ public class NodeDialog
 	 */
 	public void setVisible(boolean b)
 	{
-
 		if (b)
 		{
 			Rectangle bounds = getParent().getBounds();
@@ -248,11 +235,10 @@ public class NodeDialog
 
 	void OnOK()
 	{
-
 		try
 		{
 			UpdateControl();
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
@@ -264,17 +250,15 @@ public class NodeDialog
 
 	void OnCancel()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
 
 	void OKButton_keyPressed(KeyEvent e)
 	{
-
 		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
 		{
 			OnOK();
@@ -287,7 +271,6 @@ public class NodeDialog
 
 	void CancelButton_keyPressed(KeyEvent e)
 	{
-
 		if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
 		{
 			OnCancel();

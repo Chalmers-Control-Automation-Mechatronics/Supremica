@@ -49,10 +49,7 @@
  */
 package org.supremica.util;
 
-
-
 import java.util.*;
-
 
 /**
  * An efficient implementation of a list of int[].
@@ -62,10 +59,9 @@ import java.util.*;
  */
 public final class IntArrayList
 {
-
 	private final int blockSize;
-	private int currMinBlockIndex = -1;		// index of the first occupied entry
-	private int currMaxBlockIndex = -1;		// index of the first free entry
+	private int currMinBlockIndex = -1;    // index of the first occupied entry
+	private int currMaxBlockIndex = -1;    // index of the first free entry
 	private int size = -1;
 	private int maxSize = -1;
 	private int[][] firstBlock = null;
@@ -79,7 +75,6 @@ public final class IntArrayList
 
 	public IntArrayList(int blockSize)
 	{
-
 		this.blockSize = blockSize;
 		firstBlock = new int[blockSize][];
 		lastBlock = firstBlock;
@@ -104,7 +99,6 @@ public final class IntArrayList
 	 */
 	public void addFirst(int[] theArray)
 	{
-
 		if (currMinBlockIndex <= 0)
 		{
 			int[][] newBlock = new int[blockSize][];
@@ -130,7 +124,6 @@ public final class IntArrayList
 	 */
 	public void addLast(int[] theArray)
 	{
-
 		lastBlock[currMaxBlockIndex++] = theArray;
 
 		if (currMaxBlockIndex >= blockSize)
@@ -163,7 +156,6 @@ public final class IntArrayList
 	 */
 	public int[] getFirst()
 	{
-
 		if (size <= 0)
 		{
 			return null;
@@ -179,7 +171,6 @@ public final class IntArrayList
 	 */
 	public int[] getLast()
 	{
-
 		if (size <= 0)
 		{
 			return null;
@@ -188,7 +179,7 @@ public final class IntArrayList
 		int[] currArray = null;
 
 		if (currMaxBlockIndex <= 0)
-		{		// This is quick and dirty
+		{    // This is quick and dirty
 			currArray = removeLast();
 
 			addLast(currArray);
@@ -208,7 +199,6 @@ public final class IntArrayList
 	 */
 	public int[] removeFirst()
 	{
-
 		if (size <= 0)
 		{
 			return null;
@@ -239,7 +229,6 @@ public final class IntArrayList
 	 */
 	public int[] removeLast()
 	{
-
 		if (size <= 0)
 		{
 			return null;
@@ -283,7 +272,6 @@ public final class IntArrayList
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		for (Iterator it = iterator(); it.hasNext(); )
@@ -299,7 +287,6 @@ public final class IntArrayList
 
 	public String blocksToString()
 	{
-
 		StringBuffer sb = new StringBuffer("blocks: \n");
 
 		for (Iterator it = blocks.iterator(); it.hasNext(); )
@@ -314,7 +301,6 @@ public final class IntArrayList
 
 	private static String toString(int[][] theArray)
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		if (theArray == null)
@@ -338,7 +324,6 @@ public final class IntArrayList
 
 	public static String toString(int[] theArray)
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		if (theArray == null)
@@ -368,7 +353,6 @@ public final class IntArrayList
 	private class IntArrayListIterator
 		implements Iterator
 	{
-
 		private int[][] currBlock = null;
 		private int currIndex = 0;
 		private Iterator blockIterator = null;
@@ -377,7 +361,6 @@ public final class IntArrayList
 
 		public IntArrayListIterator()
 		{
-
 			currIndex = currMinBlockIndex;
 			blockIterator = blocks.iterator();
 			currBlock = (int[][]) blockIterator.next();
@@ -387,7 +370,6 @@ public final class IntArrayList
 
 		public boolean hasNext()
 		{
-
 			if (currElement < currSize)
 			{
 				return true;
@@ -398,7 +380,6 @@ public final class IntArrayList
 
 		public Object next()
 		{
-
 			Object theObject = (Object) currBlock[currIndex];
 
 			currElement++;
@@ -429,7 +410,6 @@ public final class IntArrayList
 
 	public static void main(String[] args)
 	{
-
 		IntArrayList theList = new IntArrayList(3);
 		int[] dummy0 = new int[]{ 0 };
 		int[] dummy1 = new int[]{ 1 };

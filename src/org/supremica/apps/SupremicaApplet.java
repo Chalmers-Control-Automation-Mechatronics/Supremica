@@ -49,23 +49,15 @@
  */
 package org.supremica.apps;
 
-
-
 import java.io.*;
-
 import java.awt.*;
-
 import javax.swing.*;
-
 import org.apache.log4j.*;
-
 import org.supremica.gui.*;
-
 
 public class SupremicaApplet
 	extends JApplet
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
 	private org.supremica.gui.Supremica workbench;
 	private SplashWindow splash;
@@ -74,7 +66,6 @@ public class SupremicaApplet
 
 	private void doSplash()
 	{
-
 		splash = new SplashWindow();
 
 		splash.setVisible(true);
@@ -82,7 +73,6 @@ public class SupremicaApplet
 
 	private void setProperties()
 	{
-
 		WorkbenchProperties.setFileAllowOpen(false);
 		WorkbenchProperties.setFileAllowSave(false);
 		WorkbenchProperties.setFileAllowImport(false);
@@ -95,7 +85,6 @@ public class SupremicaApplet
 
 	public void init()
 	{
-
 		setProperties();
 		setSize(200, 100);
 		setBackground(Color.gray);
@@ -152,7 +141,6 @@ public class SupremicaApplet
 
 	public void destroy()
 	{
-
 		if (workbench != null)
 		{
 			workbench.destroy();

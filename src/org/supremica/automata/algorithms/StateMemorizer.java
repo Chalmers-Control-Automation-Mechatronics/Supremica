@@ -49,26 +49,19 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 // Skräp
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Hashtable;
 
-
 public final class StateMemorizer
-{		// Skräp
-
+{    // Skräp
 	private static Category thisCategory = LogDisplay.createCategory(StateMemorizer.class.getName());
 
 	private class HashtableHolder
 	{
-
 		private Hashtable stateHash;
 		private int[] automataIndices;
 
@@ -103,7 +96,6 @@ public final class StateMemorizer
 
 	public void add(int[] automataIndices, int[] fullState, int problemPlant, int problemEvent)
 	{
-
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
 
@@ -120,7 +112,6 @@ public final class StateMemorizer
 
 	public void remove(int[] automataIndices, int[] fullState)
 	{
-
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
 
@@ -130,7 +121,6 @@ public final class StateMemorizer
 	// Iterates through the tableList and examines all hashtables for the state...
 	public boolean contains(int[] fullState)
 	{
-
 		HashtableHolder hashtableHolder;
 		Iterator tableIterator = tableList.iterator();
 
@@ -149,7 +139,6 @@ public final class StateMemorizer
 
 	public boolean contains(int[] automataIndices, int[] fullState)
 	{
-
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
 
@@ -158,7 +147,6 @@ public final class StateMemorizer
 
 	private StateHolder getStateHolder(int[] automataIndices, int[] fullState)
 	{
-
 		int[] stateIndices = stateCompression(automataIndices, fullState);
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
 
@@ -168,7 +156,6 @@ public final class StateMemorizer
 	// Returns indices of the states in the automata represented by the indices in automataIndices
 	private int[] stateCompression(int[] automataIndices, int[] fullState)
 	{
-
 		int[] stateIndices = new int[automataIndices.length];
 
 		for (int i = 0; i < automataIndices.length; i++)
@@ -182,7 +169,6 @@ public final class StateMemorizer
 	// Marks a state as found if found, see the method clean.
 	public boolean find(int[] automataIndices, int[] fullState)
 	{
-
 		if (contains(automataIndices, fullState))
 		{
 			getStateHolder(automataIndices, fullState).setFound(true);
@@ -198,7 +184,6 @@ public final class StateMemorizer
 	// Count uncontrollable states
 	public int size()
 	{
-
 		int count = 0;
 		HashtableHolder hashtableHolder;
 		Iterator tableIterator = tableList.iterator();
@@ -244,7 +229,6 @@ public final class StateMemorizer
 	// the hashtable associated with automataIndices
 	public void clean(int[] automataIndices)
 	{
-
 		Iterator stateIterator = iterator(automataIndices);
 		StateHolder stateHolder;
 
@@ -265,7 +249,6 @@ public final class StateMemorizer
 
 	public Iterator iterator(int[] automataIndices)
 	{
-
 		Hashtable stateHash = (Hashtable) tableHash.get(new StateHolder(automataIndices));
 
 		return stateHash.values().iterator();

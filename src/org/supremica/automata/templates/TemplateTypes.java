@@ -49,14 +49,10 @@
  */
 package org.supremica.automata.templates;
 
-
-
 import java.util.*;
-
 
 public class TemplateTypes
 {
-
 	private static List collection = new LinkedList();
 	public static final TemplateTypes Undefined = new TemplateTypes("Undefined");
 	public static final TemplateTypes CCSBookExample = new TemplateTypes("CCS-Book Examples");
@@ -68,7 +64,6 @@ public class TemplateTypes
 
 	private TemplateTypes(String description)
 	{
-
 		this.description = description;
 
 		collection.add(this);

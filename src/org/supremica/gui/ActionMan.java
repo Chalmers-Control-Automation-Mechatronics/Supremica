@@ -52,19 +52,13 @@
 // This is nothing but the Controller in the ModelViewController pattern
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.*;
 import org.supremica.automata.*;
 import org.supremica.automata.templates.*;
@@ -75,13 +69,10 @@ import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.gui.TestCasesDialog;
 
-
 public class ActionMan
 {
-
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
-
 		boolean finished = false;
 		String theInteger = "";
 		int theIntValue = -1;
@@ -110,7 +101,6 @@ public class ActionMan
 	// File.NewFromTemplate action performed
 	public static void fileNewFromTemplate(Gui gui, TemplateItem item)
 	{
-
 		Automata newAutomata;
 
 		try
@@ -128,7 +118,6 @@ public class ActionMan
 	// File.Login action performed
 	public static void fileLogin(Gui gui)
 	{
-
 		FileSecurity fileSecurity = gui.getFileSecurity();
 
 		if (fileSecurity.hasCurrentUser())
@@ -172,7 +161,6 @@ public class ActionMan
 	// Automata.AlphabetAnalyzer action performed
 	public static void alphabetAnalyzer_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() >= 2)
@@ -207,7 +195,6 @@ public class ActionMan
 	// Automata.AddSelfLoopArcs action performed
 	public static void automataAddSelfLoopArcs_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -237,7 +224,6 @@ public class ActionMan
 	// Automaton.AllAccepting action performed
 	public static void automataAllAccepting_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -268,7 +254,6 @@ public class ActionMan
 	// Automaton.Complement action performed
 	public static void automataComplement_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -308,7 +293,6 @@ public class ActionMan
 	// Automaton.Copy action performed
 	public static void automataCopy_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -347,7 +331,6 @@ public class ActionMan
 	// ** Delete - remove from the container, clear the selection, mark the project as dirty but do not close the project
 	public static void automataDelete_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -390,7 +373,6 @@ public class ActionMan
 	// ** Export - shouldn't there be an exporter object?
 	public static void automataExport(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -500,7 +482,6 @@ public class ActionMan
 	// ** Extend
 	public static void automataExtend_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -546,7 +527,6 @@ public class ActionMan
 	// ** Purge
 	public static void automataPurge_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -577,7 +557,6 @@ public class ActionMan
 	// ** RemovePass - removes all pass events
 	public static void automataRemovePass_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -607,7 +586,6 @@ public class ActionMan
 	// ** RemoveSelfLoopArcs
 	public static void automataRemoveSelfLoopArcs_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -637,7 +615,6 @@ public class ActionMan
 	// ** Rename
 	public static void automataRename_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -673,7 +650,6 @@ public class ActionMan
 	// ** Synchronize - Threaded version
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 2)
@@ -727,7 +703,6 @@ public class ActionMan
 	// ** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
-
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
 		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), synthesizerOptions);
 
@@ -754,7 +729,7 @@ public class ActionMan
 
 			try
 			{
-				syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), true,	// WorkbenchProperties.syncForbidUncontrollableStates(),
+				syncOptions = new SynchronizationOptions(WorkbenchProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, WorkbenchProperties.syncInitialHashtableSize(), WorkbenchProperties.syncExpandHashtable(), true,    // WorkbenchProperties.syncForbidUncontrollableStates(),
 														 WorkbenchProperties.syncExpandForbiddenStates(), false, false, true, WorkbenchProperties.verboseMode());
 			}
 			catch (Exception ex)
@@ -834,7 +809,6 @@ public class ActionMan
 	// Threaded version
 	public static void automataVerify_actionPerformed(Gui gui)
 	{
-
 		VerificationOptions verificationOptions = new VerificationOptions();
 		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), verificationOptions);
 
@@ -893,7 +867,6 @@ public class ActionMan
 	// Automaton.Alphabet action performed
 	public static void automatonAlphabet_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -926,7 +899,6 @@ public class ActionMan
 	// Automaton.Explore action performed
 	public static void automatonExplore_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -961,7 +933,7 @@ public class ActionMan
 		 * }
 		 */
 		if (selectedAutomata.size() == 1)
-		{		// One automata selected
+		{    // One automata selected
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
 
@@ -982,7 +954,7 @@ public class ActionMan
 			}
 		}
 		else
-		{		// Many automata selected
+		{    // Many automata selected
 			Automata currAutomata = new Automata();
 
 			while (autIt.hasNext())
@@ -1019,7 +991,6 @@ public class ActionMan
 	// Automaton.Minimization action performed
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -1146,7 +1117,7 @@ public class ActionMan
 				int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 
 				if (res == 0)
-				{		// Abort - YES
+				{    // Abort - YES
 					return;
 				}
 			}
@@ -1178,7 +1149,6 @@ public class ActionMan
 
 	public static void configurePreferences_actionPerformed(Gui gui)
 	{
-
 		if (thePreferencesDialog == null)
 		{
 			thePreferencesDialog = new PreferencesDialog(gui.getFrame());
@@ -1190,7 +1160,6 @@ public class ActionMan
 	// File.Exit action performed
 	public static void fileExit(Gui gui)
 	{
-
 		if (WorkbenchProperties.fileAllowQuit())
 		{
 			System.exit(0);
@@ -1204,7 +1173,6 @@ public class ActionMan
 	// File.Close action performed
 	public static void fileClose(Gui gui)
 	{
-
 		if (WorkbenchProperties.fileAllowQuit())
 		{
 			System.exit(0);
@@ -1271,7 +1239,6 @@ public class ActionMan
 
 	public static void fileImportValid(Gui gui)
 	{
-
 		JFileChooser fileOpener = FileDialogs.getVALIDFileImporter();
 
 		if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
@@ -1298,7 +1265,6 @@ public class ActionMan
 	// File.Open action performed
 	public static void fileOpen(Gui gui)
 	{
-
 		JFileChooser fileOpener = FileDialogs.getXMLFileImporter();
 
 		if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
@@ -1330,7 +1296,6 @@ public class ActionMan
 
 	public static void openAutomataXMLFile(Gui gui, File file)
 	{
-
 		Automata currAutomata = null;
 
 		gui.info("Opening " + file.getAbsolutePath() + " ...");
@@ -1339,7 +1304,7 @@ public class ActionMan
 		{
 			currAutomata = AutomataBuildFromXml.build(file);
 		}
-		catch (Exception e)		// this exception is caught while opening
+		catch (Exception e)    // this exception is caught while opening
 		{
 			gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
 
@@ -1400,99 +1365,98 @@ public class ActionMan
 		}
 
 		/*********
-																		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
+																																		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
 
-																		gui.info("Opening " + file.getAbsolutePath() + " ...");
-																		int nbrOfAddedAutomata = 0;
-																		try
-																		{
-																										Automata currAutomata = AutomataBuildFromXml.build(file);
-
-																										if (nbrOfAutomataBeforeOpening == 0)
-																										{
-																																		String projectName = currAutomata.getName();
-																																		if (projectName != null)
+																																		gui.info("Opening " + file.getAbsolutePath() + " ...");
+																																		int nbrOfAddedAutomata = 0;
+																																		try
 																																		{
-																																										gui.getAutomatonContainer().setProjectName(projectName);
-																																										gui.info("Project name changed to \"" + projectName + "\"");
-																																										gui.getAutomatonContainer().updateFrameTitles();
+																																																		Automata currAutomata = AutomataBuildFromXml.build(file);
+
+																																																		if (nbrOfAutomataBeforeOpening == 0)
+																																																		{
+																																																																		String projectName = currAutomata.getName();
+																																																																		if (projectName != null)
+																																																																		{
+																																																																																		gui.getAutomatonContainer().setProjectName(projectName);
+																																																																																		gui.info("Project name changed to \"" + projectName + "\"");
+																																																																																		gui.getAutomatonContainer().updateFrameTitles();
+																																																																		}
+																																																		}
+
+																																																		Iterator autIt = currAutomata.iterator();
+																																																		while (autIt.hasNext())
+																																																		{
+																																																																		Automaton currAutomaton = (Automaton)autIt.next();
+																																																																		boolean add = true;
+
+																																																																		// Force the user to enter a new name if the name is ""
+																																																																		// Note that a null name is not allowed by AutomataBuildFromXml
+																																																																		if (currAutomaton.getName().equals(""))
+																																																																		{
+																																																																																		String autName = gui.getNewAutomatonName("Enter a new name", "");
+																																																																																		if (autName == null)
+																																																																																		{
+																																																																																																		add = false;
+																																																																																																		return; // It's not ok to cancel!
+																																																																																		}
+																																																																																		else
+																																																																																		{
+																																																																																																		currAutomaton.setName(autName);
+																																																																																		}
+																																																																		}
+
+																																																																		if (gui.getAutomatonContainer().containsAutomaton(currAutomaton.getName()))
+																																																																		{
+																																																																																		String autName = currAutomaton.getName();
+
+																																																																																		JOptionPane.showMessageDialog(gui.getFrame(), autName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
+
+																																																																																		autName = gui.getNewAutomatonName("Enter a new name", autName + "(2)");
+																																																																																		if (autName == null)
+																																																																																		{
+																																																																																																		add = false;
+																																																																																																		return; // It's not ok to cancel!
+																																																																																		}
+																																																																																		else
+																																																																																		{
+																																																																																																		currAutomaton.setName(autName);
+																																																																																		}
+																																																																		}
+																																																																		if (add)
+																																																																		{
+																																																																																		nbrOfAddedAutomata++;
+																																																																																		gui.getAutomatonContainer().add(currAutomaton);
+																																																																		}
+																																																		}
 																																		}
-																										}
-
-																										Iterator autIt = currAutomata.iterator();
-																										while (autIt.hasNext())
-																										{
-																																		Automaton currAutomaton = (Automaton)autIt.next();
-																																		boolean add = true;
-
-																																		// Force the user to enter a new name if the name is ""
-																																		// Note that a null name is not allowed by AutomataBuildFromXml
-																																		if (currAutomaton.getName().equals(""))
+																																		catch (Exception e)
 																																		{
-																																										String autName = gui.getNewAutomatonName("Enter a new name", "");
-																																										if (autName == null)
-																																										{
-																																																		add = false;
-																																																		return; // It's not ok to cancel!
-																																										}
-																																										else
-																																										{
-																																																		currAutomaton.setName(autName);
-																																										}
+																																																		// thisCategory.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
+																																																		gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
+																																																		return;
 																																		}
+																																		// thisCategory.info("Successfully opened " + nbrOfAddedAutomata + " automata.");
+																																		gui.info("Successfully opened " + nbrOfAddedAutomata + " automata.");
 
-																																		if (gui.getAutomatonContainer().containsAutomaton(currAutomaton.getName()))
+																																		if (nbrOfAutomataBeforeOpening > 0)
 																																		{
-																																										String autName = currAutomaton.getName();
-
-																																										JOptionPane.showMessageDialog(gui.getFrame(), autName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
-
-																																										autName = gui.getNewAutomatonName("Enter a new name", autName + "(2)");
-																																										if (autName == null)
-																																										{
-																																																		add = false;
-																																																		return; // It's not ok to cancel!
-																																										}
-																																										else
-																																										{
-																																																		currAutomaton.setName(autName);
-																																										}
+																																																		File projectFile = gui.getAutomatonContainer().getProjectFile();
+																																																		if (projectFile != null)
+																																																		{
+																																																																		gui.getAutomatonContainer().setProjectFile(null);
+																																																		}
 																																		}
-																																		if (add)
+																																		else
 																																		{
-																																										nbrOfAddedAutomata++;
-																																										gui.getAutomatonContainer().add(currAutomaton);
+																																																		gui.getAutomatonContainer().setProjectFile(file);
 																																		}
-																										}
-																		}
-																		catch (Exception e)
-																		{
-																										// thisCategory.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
-																										gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
-																										return;
-																		}
-																		// thisCategory.info("Successfully opened " + nbrOfAddedAutomata + " automata.");
-																		gui.info("Successfully opened " + nbrOfAddedAutomata + " automata.");
-
-																		if (nbrOfAutomataBeforeOpening > 0)
-																		{
-																										File projectFile = gui.getAutomatonContainer().getProjectFile();
-																										if (projectFile != null)
-																										{
-																																		gui.getAutomatonContainer().setProjectFile(null);
-																										}
-																		}
-																		else
-																		{
-																										gui.getAutomatonContainer().setProjectFile(file);
-																		}
 		**************/
 	}
 
 	// File.Save action performed
 	public static void fileSave(Gui gui)
 	{
-
 		File currFile = gui.getAutomatonContainer().getProjectFile();
 
 		if (currFile == null)
@@ -1542,7 +1506,6 @@ public class ActionMan
 	// File.SaveAs action performed
 	public static void fileSaveAs(Gui gui)
 	{
-
 		FileSecurity fileSecurity = gui.getFileSecurity();
 
 		if (WorkbenchProperties.generalUseSecurity())
@@ -1598,67 +1561,66 @@ public class ActionMan
 		}
 
 		/***
-																		try
-																		{
-																										Automata currAutomata = AutomataBuildFromVALID.build(file);
-																										Iterator autIt = currAutomata.iterator();
-																										while (autIt.hasNext())
-																										{
-																																		Automaton currAutomaton = (Automaton)autIt.next();
-																																		boolean add = true;
-																																		if (currAutomaton.getName().equals(""))
+																																		try
 																																		{
-																																										String autName = gui.getNewAutomatonName("Enter a new name", "");
-																																										if (autName == null)
-																																										{
-																																																		add = false;
-																																																		return; // It's not ok to cancel!
-																																										}
-																																										else
-																																										{
-																																																		currAutomaton.setName(autName);
-																																										}
-																																		}
+																																																		Automata currAutomata = AutomataBuildFromVALID.build(file);
+																																																		Iterator autIt = currAutomata.iterator();
+																																																		while (autIt.hasNext())
+																																																		{
+																																																																		Automaton currAutomaton = (Automaton)autIt.next();
+																																																																		boolean add = true;
+																																																																		if (currAutomaton.getName().equals(""))
+																																																																		{
+																																																																																		String autName = gui.getNewAutomatonName("Enter a new name", "");
+																																																																																		if (autName == null)
+																																																																																		{
+																																																																																																		add = false;
+																																																																																																		return; // It's not ok to cancel!
+																																																																																		}
+																																																																																		else
+																																																																																		{
+																																																																																																		currAutomaton.setName(autName);
+																																																																																		}
+																																																																		}
 
-																																		if (gui.getAutomatonContainer().containsAutomaton(currAutomaton.getName()))
+																																																																		if (gui.getAutomatonContainer().containsAutomaton(currAutomaton.getName()))
+																																																																		{
+																																																																																		String autName = currAutomaton.getName();
+
+																																																																																		JOptionPane.showMessageDialog(gui.getFrame(), autName + " already exists", "Alert",
+																																																																																																																																																																																																		  JOptionPane.ERROR_MESSAGE);
+
+																																																																																		autName = gui.getNewAutomatonName("Enter a new name", autName + "(2)");
+																																																																																		if (autName == null)
+																																																																																		{
+																																																																																																		add = false; // It's not ok to cancel!
+																																																																																		}
+																																																																																		else
+																																																																																		{
+																																																																																																		currAutomaton.setName(autName);
+																																																																																		}
+																																																																		}
+																																																																		if (add)
+																																																																		{
+																																																																																		nbrOfAddedAutomata++;
+																																																																																		gui.getAutomatonContainer().add(currAutomaton);
+																																																																		}
+																																																		}
+																																		}
+																																		catch (Exception e)
 																																		{
-																																										String autName = currAutomaton.getName();
-
-																																										JOptionPane.showMessageDialog(gui.getFrame(), autName + " already exists", "Alert",
-																																																																																																		  JOptionPane.ERROR_MESSAGE);
-
-																																										autName = gui.getNewAutomatonName("Enter a new name", autName + "(2)");
-																																										if (autName == null)
-																																										{
-																																																		add = false; // It's not ok to cancel!
-																																										}
-																																										else
-																																										{
-																																																		currAutomaton.setName(autName);
-																																										}
+																																																		// thisCategory.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
+																																																		gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
+																																																		return;
 																																		}
-																																		if (add)
-																																		{
-																																										nbrOfAddedAutomata++;
-																																										gui.getAutomatonContainer().add(currAutomaton);
-																																		}
-																										}
-																		}
-																		catch (Exception e)
-																		{
-																										// thisCategory.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
-																										gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
-																										return;
-																		}
-																		// thisCategory.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
-																		gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+																																		// thisCategory.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+																																		gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		***/
 	}
 
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
 	{
-
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -1702,7 +1664,6 @@ public class ActionMan
 	// 
 	public static void findStates_action(Gui gui)
 	{
-
 		FindStates find_states = new FindStates(gui.getSelectedAutomata());
 
 		try
@@ -1720,7 +1681,6 @@ public class ActionMan
 	// Delete All - this really implements Close Project
 	public static void automataDeleteAll_actionPerformed(Gui gui)
 	{
-
 		gui.getAutomatonContainer().clear();
 		gui.clearSelection();
 		gui.getAutomatonContainer().setProjectFile(null);
@@ -1730,7 +1690,6 @@ public class ActionMan
 	public static void testCases(Gui gui)
 		throws Exception
 	{
-
 		TestCasesDialog testCasesDialog = new TestCasesDialog(gui.getFrame());
 
 		testCasesDialog.show();
@@ -1746,7 +1705,6 @@ public class ActionMan
 	// Generate SattLine SFCs
 	public static void AutomataToSattLineSFC(Gui gui)
 	{
-
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
@@ -1804,5 +1762,5 @@ public class ActionMan
 			}
 		}
 	}
-}		// ActionMan
+}    // ActionMan
 

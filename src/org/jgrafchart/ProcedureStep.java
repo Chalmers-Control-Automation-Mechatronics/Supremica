@@ -1,21 +1,14 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 import javax.swing.*;
-
 
 public class ProcedureStep
 	extends MacroStep
 	implements Readable
 {
-
 	public ProcedureStep()
 	{
 		super();
@@ -184,7 +177,6 @@ public class ProcedureStep
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		ProcedureStep newobj = (ProcedureStep) super.copyObject(env);
 
 		return newobj;
@@ -192,7 +184,6 @@ public class ProcedureStep
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		ProcedureStep newobj = (ProcedureStep) newarea;
 
 		if (myRectangle != null)
@@ -282,7 +273,6 @@ public class ProcedureStep
 
 	public Point getLocation(Point p)
 	{
-
 		if (myRectangle != null)
 		{
 			return myRectangle.getSpotLocation(Center, p);
@@ -295,7 +285,6 @@ public class ProcedureStep
 
 	public void setLocation(int x, int y)
 	{
-
 		if (myRectangle != null)
 		{
 			myRectangle.setSpotLocation(Center, x, y);
@@ -310,7 +299,6 @@ public class ProcedureStep
 
 	public void layoutChildren()
 	{
-
 		if (myRectangle == null)
 		{
 			return;
@@ -378,7 +366,6 @@ public class ProcedureStep
 
 	public void activate()
 	{
-
 		myToken.setBrush(JGoBrush.black);
 
 		newX = true;
@@ -445,7 +432,6 @@ public class ProcedureStep
 
 	public void deactivate()
 	{
-
 		myToken.setBrush(JGoBrush.Null);
 
 		newX = false;

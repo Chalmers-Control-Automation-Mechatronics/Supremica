@@ -1,11 +1,8 @@
 package org.jgrafchart;
 
-
-
 public interface Readable
 	extends Referencable
 {
-
 	public boolean getBoolVal();
 
 	public boolean getOldBoolVal();

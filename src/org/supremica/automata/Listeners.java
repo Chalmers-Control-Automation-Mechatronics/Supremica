@@ -49,14 +49,10 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class Listeners
 {
-
 	protected List listeners = null;
 	protected Object owner;
 	protected boolean batchUpdate = false;
@@ -71,7 +67,6 @@ public class Listeners
 
 	public void addListener(Listener l)
 	{
-
 		if (listeners == null)
 		{
 			listeners = new LinkedList();
@@ -82,7 +77,6 @@ public class Listeners
 
 	public void removeListener(Listener l)
 	{
-
 		if (listeners != null)
 		{
 			listeners.remove(l);
@@ -96,7 +90,6 @@ public class Listeners
 
 	public void endTransaction()
 	{
-
 		batchUpdate = false;
 
 		if (updateNeeded)
@@ -112,7 +105,6 @@ public class Listeners
 
 	public void notifyListeners()
 	{
-
 		if (batchUpdate)
 		{
 			updateNeeded = true;

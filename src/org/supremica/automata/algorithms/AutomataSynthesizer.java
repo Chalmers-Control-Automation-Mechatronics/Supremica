@@ -49,21 +49,14 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 import org.supremica.util.IntArrayHashTable;
-
 import java.io.PrintWriter;
-
 import org.supremica.gui.*;
 
 // import org.apache.log4j.*;
 import org.supremica.gui.Gui;
-
 
 public class AutomataSynthesizer
 {
@@ -87,14 +80,13 @@ public class AutomataSynthesizer
 	public AutomataSynthesizer(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws Exception
 	{
-
 		Automaton currAutomaton;
 		State currInitialState;
 
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
 		this.synthesizerOptions = synthesizerOptions;
-		initialState = new int[this.theAutomata.size() + 1];	// + 1 status field
+		initialState = new int[this.theAutomata.size() + 1];    // + 1 status field
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
 		this.workbench = workbench;
 		theAutomatonContainer = workbench.getAutomatonContainer();
@@ -140,7 +132,6 @@ public class AutomataSynthesizer
 
 	public static boolean validOptions(SynthesisType type, SynthesisAlgorithm algorithm)
 	{
-
 		if (type == SynthesisType.Unknown)
 		{
 			return false;
@@ -173,7 +164,6 @@ public class AutomataSynthesizer
 	public void execute()
 		throws Exception
 	{
-
 		Event currEvent;
 		Automaton theAutomaton;
 		Automaton currPlantAutomaton;
@@ -191,7 +181,7 @@ public class AutomataSynthesizer
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
 
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
-			{		// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
+			{    // Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				selectedAutomata.add(currSupervisorAutomaton);
 
 				ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
@@ -233,10 +223,10 @@ public class AutomataSynthesizer
 				}
 
 				if (selectedAutomata.size() > 1)
-				{		// Clear the hash-table and set some variables in the synchronization helper
+				{    // Clear the hash-table and set some variables in the synchronization helper
 					synchHelper.clear();
 					synchHelper.addState(initialState);
-					synchHelper.getAutomaton().removeAllStates();		// Essential when building more than one automaton
+					synchHelper.getAutomaton().removeAllStates();    // Essential when building more than one automaton
 
 					// Allocate and initialize the synchronizationExecuters
 					ArrayList synchronizationExecuters = new ArrayList(nbrOfExecuters);
@@ -261,7 +251,7 @@ public class AutomataSynthesizer
 					((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 
 					if (!synchHelper.getAutomataIsControllable())
-					{		// Only add supervisors with uncontrollable states
+					{    // Only add supervisors with uncontrollable states
 
 						// Print the names of the automata in selectedAutomata
 						Object[] automatonArray = selectedAutomata.toArray();
@@ -322,7 +312,6 @@ public class AutomataSynthesizer
 	public Alphabet unionAlphabet(ArrayList selectedAutomata)
 		throws Exception
 	{
-
 		Alphabet theAlphabet = new Alphabet();
 		EventsSet theAlphabets = new EventsSet();
 		Iterator autIt = selectedAutomata.iterator();
@@ -372,7 +361,6 @@ public class AutomataSynthesizer
 	 */
 	private void optimize(Automata theAutomata, Automata newAutomata)
 	{
-
 		Automata currAutomata = new Automata();
 		AutomataFastControllabilityCheck theFastControllabilityCheck;
 		SynchronizationOptions syncOptions;
@@ -391,7 +379,7 @@ public class AutomataSynthesizer
 		}
 
 		if (!synthesizerOptions.doPurge())
-		{		// The automata aren't purged but they must be for the optimization to work...
+		{    // The automata aren't purged but they must be for the optimization to work...
 			Iterator autIt = newAutomata.iterator();
 
 			while (autIt.hasNext())

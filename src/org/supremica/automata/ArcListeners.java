@@ -49,15 +49,11 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 
 public class ArcListeners
 	extends Listeners
 {
-
 	public static final int MODE_ARC_ADDED = 1;
 	public static final int MODE_ARC_REMOVED = 2;
 
@@ -68,7 +64,6 @@ public class ArcListeners
 
 	public void notifyListeners(int mode, Object o)
 	{
-
 		if (batchUpdate)
 		{
 			updateNeeded = true;

@@ -1,25 +1,18 @@
 package org.jgrafchart;
 
-
-
 import java.awt.datatransfer.*;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.print.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
-
 import java.util.*;
-
 import com.nwoods.jgo.*;
-
 
 public class GCDocument
 	extends JGoDocument
 	implements Referencable
 {
-
 	private String myName = "";
 	private String myLocation = "";
 	public boolean simulation = true;
@@ -36,7 +29,6 @@ public class GCDocument
 
 	public void setName(String newname)
 	{
-
 		String oldName = getName();
 
 		if (!oldName.equals(newname))
@@ -69,7 +61,6 @@ public class GCDocument
 
 	public ArrayList getSymbolTable()
 	{
-
 		ArrayList symbolList = new ArrayList();
 		JGoListPosition pos = getFirstObjectPos();
 		JGoObject obj = getObjectAtPos(pos);
@@ -90,7 +81,6 @@ public class GCDocument
 
 	public void propagateDimmingInfo(boolean dim, int i, int j)
 	{
-
 		dimming = dim;
 		dimTicks = i;
 		threadSpeed = j;
@@ -114,7 +104,6 @@ public class GCDocument
 
 	public void setReadFileLocation(String newloc)
 	{
-
 		String oldLocation = getReadFileLocation();
 
 		if (!oldLocation.equals(newloc))
@@ -134,7 +123,6 @@ public class GCDocument
 
 	public void setWriteFileLocation(String newloc)
 	{
-
 		String oldLocation = getWriteFileLocation();
 
 		if (!oldLocation.equals(newloc))

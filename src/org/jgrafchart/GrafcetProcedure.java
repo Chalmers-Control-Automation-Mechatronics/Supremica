@@ -1,21 +1,14 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
-
 import javax.swing.*;
-
 
 public class GrafcetProcedure
 	extends GrafcetObject
 	implements Readable
 {
-
 	public GrafcetProcedure()
 	{
 		super();
@@ -23,7 +16,6 @@ public class GrafcetProcedure
 
 	public GrafcetProcedure(Point loc, String labeltext)
 	{
-
 		super();
 
 		setSize(60, 60);
@@ -111,7 +103,6 @@ public class GrafcetProcedure
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		GrafcetProcedure newobj = (GrafcetProcedure) super.copyObject(env);
 
 		return newobj;
@@ -119,7 +110,6 @@ public class GrafcetProcedure
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		GrafcetProcedure newobj = (GrafcetProcedure) newarea;
 
 		if (myRectangle != null)
@@ -181,7 +171,6 @@ public class GrafcetProcedure
 
 	public Point getLocation(Point p)
 	{
-
 		if (myRectangle != null)
 		{
 			return myRectangle.getSpotLocation(TopCenter, p);
@@ -194,7 +183,6 @@ public class GrafcetProcedure
 
 	public void setLocation(int x, int y)
 	{
-
 		if (myRectangle != null)
 		{
 			myRectangle.setSpotLocation(TopCenter, x, y);
@@ -209,7 +197,6 @@ public class GrafcetProcedure
 
 	public void layoutChildren()
 	{
-
 		if (myRectangle == null)
 		{
 			return;

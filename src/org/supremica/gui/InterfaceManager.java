@@ -49,22 +49,16 @@
  */
 package org.supremica.gui;
 
-
-
 import javax.swing.*;
-
 import org.apache.log4j.*;
-
 
 public class InterfaceManager
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(InterfaceManager.class.getName());
 	private static InterfaceManager instance = null;
 
 	private InterfaceManager()
 	{
-
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -78,7 +72,6 @@ public class InterfaceManager
 
 	public static synchronized InterfaceManager getInstance()
 	{
-
 		if (instance == null)
 		{
 			instance = new InterfaceManager();

@@ -2,15 +2,10 @@
 /********************** TestCasesDialog.java ************************/
 package org.supremica.gui;
 
-
-
 import java.io.*;
-
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import org.supremica.automata.algorithms.AutomatonToDsx;
 import org.supremica.automata.algorithms.AutomataToXml;
 import org.supremica.automata.Automata;
@@ -18,12 +13,10 @@ import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;
 import org.supremica.testcases.DiningPhilosophers;
 
-
 // performs integer validation - see Horstmann
 class IntegerField
 	extends JTextField
 {
-
 	public IntegerField(String init, int cols)
 	{
 		super(init, cols);
@@ -47,7 +40,6 @@ class UsersPanel
 	extends JPanel
 	implements TestCase
 {
-
 	IntegerField int_num = null;
 	JCheckBox req = new JCheckBox("request (a)");
 	JCheckBox acc = new JCheckBox("access  (b)", true);
@@ -55,7 +47,6 @@ class UsersPanel
 
 	public UsersPanel()
 	{
-
 		JPanel cont = new JPanel();
 
 		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
@@ -74,7 +65,6 @@ class UsersPanel
 	public Automata doIt()
 		throws Exception
 	{
-
 		Users users = new Users(int_num.get(), req.isSelected(), acc.isSelected(), rel.isSelected());
 
 		return users.getAutomata();
@@ -85,7 +75,6 @@ class PhilosPanel
 	extends JPanel
 	implements TestCase
 {
-
 	IntegerField int_num = new IntegerField("3", 6);
 	JCheckBox l_take = new JCheckBox("take left fork", true);
 	JCheckBox r_take = new JCheckBox("take right fork", true);
@@ -94,7 +83,6 @@ class PhilosPanel
 
 	public PhilosPanel()
 	{
-
 		JPanel cont = new JPanel();
 
 		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
@@ -114,7 +102,6 @@ class PhilosPanel
 	public Automata doIt()
 		throws Exception
 	{
-
 		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected());
 
 		return dp.getAutomata();
@@ -125,13 +112,11 @@ class BricksPanel
 	extends JPanel
 	implements TestCase
 {
-
 	IntegerField num_rows = new IntegerField("4", 6);
 	IntegerField num_cols = new IntegerField("4", 6);
 
 	BricksPanel()
 	{
-
 		JPanel rows = new JPanel();
 
 		rows.add(new JLabel("Number of rows: "));
@@ -148,7 +133,6 @@ class BricksPanel
 	public Automata doIt()
 		throws Exception
 	{
-
 		BricksGame bg = new BricksGame(num_rows.get(), num_cols.get());
 
 		return bg.getAutomata();
@@ -158,10 +142,8 @@ class BricksPanel
 class ExampleTab
 	extends JTabbedPane
 {
-
 	ExampleTab()
 	{
-
 		addTab("Users", null, new UsersPanel(), "Mutual exclusion users");
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
@@ -171,28 +153,23 @@ class ExampleTab
 public class TestCasesDialog
 	extends JDialog
 {
-
 	private ExampleTab extab = new ExampleTab();
 	private Automata automata = null;
 
 	class DoitButton
 		extends JButton
 	{
-
 		DoitButton()
 		{
-
 			super("Do it");
 
 			setToolTipText("Go ahead and do it");
 			addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 
 				// throws Exception // cannot do this - what the f**k!
 				{
-
 					try
 					{
 						doit();
@@ -210,16 +187,13 @@ public class TestCasesDialog
 	class CancelButton
 		extends JButton
 	{
-
 		CancelButton()
 		{
-
 			super("Cancel");
 
 			setToolTipText("Enough of this");
 			addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					action();
@@ -236,16 +210,13 @@ public class TestCasesDialog
 	class HelpButton
 		extends JButton
 	{
-
 		HelpButton()
 		{
-
 			super("Help");
 
 			setToolTipText("Want some help?");
 			addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					action();
@@ -259,13 +230,12 @@ public class TestCasesDialog
 	void doit()
 		throws Exception
 	{
-
 		Component comp = extab.getSelectedComponent();
 
 		// We know that this is actually also a TestCase (right?)
 		TestCase tc = (TestCase) comp;
 
-		automata = tc.doIt();		// Should return a Project (named)
+		automata = tc.doIt();    // Should return a Project (named)
 
 		dispose();
 	}
@@ -277,8 +247,7 @@ public class TestCasesDialog
 
 	TestCasesDialog(JFrame frame)
 	{
-
-		super(frame, "Example Generator", true);	// modal dialog with frame as parent
+		super(frame, "Example Generator", true);    // modal dialog with frame as parent
 
 		// Utility.setupFrame(this, 400, 200);
 		Dimension size = new Dimension(400, 200);

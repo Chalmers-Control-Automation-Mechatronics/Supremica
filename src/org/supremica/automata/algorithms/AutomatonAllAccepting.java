@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 
 public class AutomatonAllAccepting
 {
-
 	private Automaton theAutomaton;
 
 	public AutomatonAllAccepting(Automaton theAutomaton)
@@ -68,7 +63,6 @@ public class AutomatonAllAccepting
 
 	public void execute()
 	{
-
 		theAutomaton.beginTransaction();
 
 		Iterator stateIt = theAutomaton.stateIterator();

@@ -49,16 +49,11 @@
  */
 package org.supremica.gui;
 
-
-
 import java.util.*;
-
 import org.supremica.automata.templates.*;
-
 
 public class ExampleTemplates
 {
-
 	private static ExampleTemplates templates = null;
 	private final TemplateGroup CCSBookExamples = new TemplateGroup(TemplateTypes.CCSBookExample);
 	private final TemplateGroup CCSBookExercises = new TemplateGroup(TemplateTypes.CCSBookExercise);
@@ -75,7 +70,6 @@ public class ExampleTemplates
 
 	private void initialize()
 	{
-
 		initializeCCSBookExamples();
 		initializeCCSBookExercises();
 		initializeCCSCourseAssignments();
@@ -85,7 +79,6 @@ public class ExampleTemplates
 
 	private void initializeCCSBookExamples()
 	{
-
 		TemplateGroup thisGroup = CCSBookExamples;
 
 		allGroups.add(thisGroup);
@@ -93,7 +86,6 @@ public class ExampleTemplates
 
 	private void initializeCCSBookExercises()
 	{
-
 		TemplateGroup thisGroup = CCSBookExercises;
 
 		allGroups.add(thisGroup);
@@ -105,7 +97,6 @@ public class ExampleTemplates
 
 	private void initializeCCSCourseAssignments()
 	{
-
 		TemplateGroup thisGroup = CCSCourseAssignments;
 
 		allGroups.add(thisGroup);
@@ -117,7 +108,6 @@ public class ExampleTemplates
 
 	private void initializeOtherExamples()
 	{
-
 		TemplateGroup thisGroup = OtherExamples;
 
 		allGroups.add(thisGroup);
@@ -130,7 +120,6 @@ public class ExampleTemplates
 
 	private void initializeStandardComponents()
 	{
-
 		TemplateGroup thisGroup = StandardComponents;
 
 		allGroups.add(thisGroup);
@@ -138,7 +127,6 @@ public class ExampleTemplates
 
 	public synchronized static ExampleTemplates getInstance()
 	{
-
 		if (templates == null)
 		{
 			templates = new ExampleTemplates();

@@ -49,19 +49,14 @@
  */
 package org.supremica.gui;
 
-
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Event;
 import org.supremica.automata.*;
-
 
 public class SynchronizationOptionsDialog
 	extends JDialog

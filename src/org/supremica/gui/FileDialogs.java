@@ -49,15 +49,11 @@
  */
 package org.supremica.gui;
 
-
-
 import javax.swing.filechooser.*;
 import javax.swing.*;
 
-
 public class FileDialogs
 {
-
 	private JFileChooser fileImporter = null;
 	private JFileChooser fileExporter = null;
 	private JFileChooser fileSaveAs = null;
@@ -77,7 +73,6 @@ public class FileDialogs
 
 	public static JFileChooser getXMLFileSaveAs()
 	{
-
 		JFileChooser fileSaveAs = fd.getFileSaveAs();
 
 		fileSaveAs.resetChoosableFileFilters();
@@ -88,7 +83,6 @@ public class FileDialogs
 
 	public static JFileChooser getXMLFileImporter()
 	{
-
 		JFileChooser fileImporter = fd.getFileImporter();
 
 		fileImporter.resetChoosableFileFilters();
@@ -99,7 +93,6 @@ public class FileDialogs
 
 	public static JFileChooser getVALIDFileImporter()
 	{
-
 		JFileChooser fileImporter = fd.getFileImporter();
 
 		fileImporter.resetChoosableFileFilters();
@@ -112,7 +105,6 @@ public class FileDialogs
 
 	public static JFileChooser getXMLFileExporter()
 	{
-
 		JFileChooser fileExporter = fd.getFileExporter();
 
 		fileExporter.resetChoosableFileFilters();
@@ -123,7 +115,6 @@ public class FileDialogs
 
 	public static JFileChooser getDSXFileExporter()
 	{
-
 		JFileChooser fileExporter = fd.getFileExporter();
 
 		fileExporter.resetChoosableFileFilters();
@@ -134,7 +125,6 @@ public class FileDialogs
 
 	public static JFileChooser getDOTFileExporter()
 	{
-
 		JFileChooser fileExporter = fd.getFileExporter();
 
 		fileExporter.resetChoosableFileFilters();
@@ -145,7 +135,6 @@ public class FileDialogs
 
 	public static JFileChooser getEPSFileExporter()
 	{
-
 		JFileChooser fileExporter = fd.getFileExporter();
 
 		fileExporter.resetChoosableFileFilters();
@@ -156,7 +145,6 @@ public class FileDialogs
 
 	public static JFileChooser getMIFFileExporter()
 	{
-
 		JFileChooser fileExporter = fd.getFileExporter();
 
 		fileExporter.resetChoosableFileFilters();
@@ -167,7 +155,6 @@ public class FileDialogs
 
 	public static JFileChooser getGIFFileExporter()
 	{
-
 		JFileChooser fileExporter = fd.getFileExporter();
 
 		fileExporter.resetChoosableFileFilters();
@@ -178,7 +165,6 @@ public class FileDialogs
 
 	public static JFileChooser getSFileExporter()
 	{
-
 		JFileChooser fileExporter = fd.getFileExporter();
 
 		fileExporter.resetChoosableFileFilters();
@@ -189,7 +175,6 @@ public class FileDialogs
 
 	private JFileChooser getFileImporter()
 	{
-
 		if (fileImporter == null)
 		{
 			fileImporter = new JFileChooser();
@@ -204,7 +189,6 @@ public class FileDialogs
 
 	private JFileChooser getFileExporter()
 	{
-
 		if (fileExporter == null)
 		{
 			fileExporter = new JFileChooser();
@@ -219,7 +203,6 @@ public class FileDialogs
 
 	private JFileChooser getFileSaveAs()
 	{
-
 		if (fileSaveAs == null)
 		{
 			fileSaveAs = new JFileChooser();
@@ -234,12 +217,10 @@ public class FileDialogs
 
 	private FileFilter getXMLFilter()
 	{
-
 		if (xmlFilter == null)
 		{
 			xmlFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".xml") || f.isDirectory();
@@ -257,12 +238,10 @@ public class FileDialogs
 
 	private FileFilter getVPRJFilter()
 	{
-
 		if (vprjFilter == null)
 		{
 			vprjFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".vprj") || f.isDirectory();
@@ -280,12 +259,10 @@ public class FileDialogs
 
 	private FileFilter getVMODFilter()
 	{
-
 		if (vmodFilter == null)
 		{
 			vmodFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".vmod") || f.isDirectory();
@@ -303,12 +280,10 @@ public class FileDialogs
 
 	private FileFilter getDGRFFilter()
 	{
-
 		if (dgrfFilter == null)
 		{
 			dgrfFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".dgrf") || f.isDirectory();
@@ -326,12 +301,10 @@ public class FileDialogs
 
 	private FileFilter getDSXFilter()
 	{
-
 		if (dsxFilter == null)
 		{
 			dsxFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".dsx") || f.isDirectory();
@@ -349,12 +322,10 @@ public class FileDialogs
 
 	private FileFilter getDOTFilter()
 	{
-
 		if (dotFilter == null)
 		{
 			dotFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".dot") || f.isDirectory();
@@ -372,12 +343,10 @@ public class FileDialogs
 
 	private FileFilter getEPSFilter()
 	{
-
 		if (epsFilter == null)
 		{
 			epsFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".eps") || f.isDirectory();
@@ -395,12 +364,10 @@ public class FileDialogs
 
 	private FileFilter getGIFFilter()
 	{
-
 		if (gifFilter == null)
 		{
 			gifFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".gif") || f.isDirectory();
@@ -418,12 +385,10 @@ public class FileDialogs
 
 	private FileFilter getMIFFilter()
 	{
-
 		if (mifFilter == null)
 		{
 			mifFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".mif") || f.isDirectory();
@@ -441,12 +406,10 @@ public class FileDialogs
 
 	private FileFilter getSFilter()
 	{
-
 		if (sFilter == null)
 		{
 			sFilter = new FileFilter()
-			{		// Anonymous class
-
+			{    // Anonymous class
 				public boolean accept(java.io.File f)
 				{
 					return f.getName().toLowerCase().endsWith(".s") || f.isDirectory();

@@ -49,26 +49,18 @@
  */
 package org.supremica.apps;
 
-
-
 import java.util.*;
-
 import org.apache.log4j.*;
-
 import helma.xmlrpc.*;
-
 import org.supremica.gui.*;
-
 
 public class SupremicaClient
 {
-
 	private SupremicaClient() {}
 
 	public static void main(String[] args)
 		throws Exception
 	{
-
 		XmlRpcClient xmlrpc = new XmlRpcClient("http://localhost:" + WorkbenchProperties.getXmlRpcPort());
 
 		// this method return a vector of strings

@@ -49,14 +49,10 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.gui.WorkbenchProperties;
-
 
 public final class SynthesizerOptions
 {
-
 	private boolean dialogOK = false;
 	private SynthesisType synthesisType;
 	private SynthesisAlgorithm synthesisAlgorithm;
@@ -71,7 +67,6 @@ public final class SynthesizerOptions
 
 	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive)
 	{
-
 		this.synthesisType = synthesisType;
 		this.synthesisAlgorithm = synthesisAlgorithm;
 		this.purge = purge;
@@ -96,7 +91,6 @@ public final class SynthesizerOptions
 
 	public void setSynthesisType(SynthesisType type)
 	{
-
 		synthesisType = type;
 
 		WorkbenchProperties.setSynthesisSynthesisType(type);
@@ -109,7 +103,6 @@ public final class SynthesizerOptions
 
 	public void setSynthesisAlgorithm(SynthesisAlgorithm algorithm)
 	{
-
 		synthesisAlgorithm = algorithm;
 
 		WorkbenchProperties.setSynthesisAlgorithmType(algorithm);
@@ -122,7 +115,6 @@ public final class SynthesizerOptions
 
 	public void setPurge(boolean bool)
 	{
-
 		purge = bool;
 
 		WorkbenchProperties.setSynthesisPurge(bool);
@@ -135,7 +127,6 @@ public final class SynthesizerOptions
 
 	public void setOptimize(boolean bool)
 	{
-
 		optimize = bool;
 
 		WorkbenchProperties.setSynthesisOptimize(bool);
@@ -148,7 +139,6 @@ public final class SynthesizerOptions
 
 	public void setMaximallyPermissive(boolean bool)
 	{
-
 		maximallyPermissive = bool;
 
 		WorkbenchProperties.setSynthesisMaximallyPermissive(bool);

@@ -4,8 +4,6 @@
  */
 package helma.xmlrpc;
 
-
-
 /**
  * This is thrown by the XmlRpcClient if the remote server reported an error. If something
  * went wrong at a lower level (e.g. no http connection) an IOException will be thrown instead.
@@ -22,7 +20,6 @@ public class XmlRpcException
 
 	public XmlRpcException(int code, String message)
 	{
-
 		super(message);
 
 		this.code = code;

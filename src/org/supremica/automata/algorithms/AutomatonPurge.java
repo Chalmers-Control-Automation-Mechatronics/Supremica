@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 
 public class AutomatonPurge
 {
-
 	private Automaton theAutomaton;
 
 	public AutomatonPurge(Automaton theAutomaton)
@@ -68,7 +63,6 @@ public class AutomatonPurge
 
 	public void execute()
 	{
-
 		LinkedList stateList = new LinkedList();
 		Iterator stateIt = theAutomaton.stateIterator();
 

@@ -2,8 +2,6 @@
 /************************** Users.java ************************/
 package org.supremica.testcases;
 
-
-
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
@@ -12,15 +10,12 @@ import org.supremica.automata.State;
 import org.supremica.automata.Event;
 import org.supremica.automata.Arc;
 
-
 class User
 	extends Automaton
 {
-
 	User(int id, boolean a, boolean b, boolean c)
 		throws Exception
 	{
-
 		super("User " + id);
 
 		setType(AutomatonType.Plant);
@@ -60,11 +55,9 @@ class User
 class Fifo
 	extends Automaton
 {
-
 	Fifo(int id1, int id2, boolean a, boolean b, boolean c)
 		throws Exception
 	{
-
 		super("Fifo " + id1 + "x" + id2);
 
 		setType(AutomatonType.Specification);
@@ -114,11 +107,9 @@ class Fifo
 class Mutex
 	extends Automaton
 {
-
 	Mutex(int id1, int id2, boolean a, boolean b, boolean c)
 		throws Exception
 	{
-
 		super("Mutex " + id1 + "x" + id2);
 
 		setType(AutomatonType.Specification);
@@ -159,7 +150,6 @@ class Mutex
 
 public class Users
 {
-
 	Automata automata = new Automata();
 
 	public Users(int num_users, boolean a, boolean b, boolean c)

@@ -49,16 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 
 public class AutomatonMinimizer
 {
-
 	private Automaton theAutomaton;
 	private Alphabet theAlphabet;
 
@@ -71,7 +66,6 @@ public class AutomatonMinimizer
 	public Automaton getMinimizedAutomaton()
 		throws Exception
 	{
-
 		EquivalenceClasses equivClasses = new EquivalenceClasses();
 		EquivalenceClass acceptingStates = new EquivalenceClass();
 		EquivalenceClass forbiddenStates = new EquivalenceClass();
@@ -133,7 +127,6 @@ public class AutomatonMinimizer
 	public Automaton getMinimizedAutomaton(boolean sameEquivClassInitially)
 		throws Exception
 	{
-
 		if (sameEquivClassInitially)
 		{
 			EquivalenceClasses equivClasses = new EquivalenceClasses();
@@ -173,7 +166,6 @@ public class AutomatonMinimizer
 
 	private Automaton buildAutomaton(EquivalenceClasses equivClasses)
 	{
-
 		Automaton newAutomaton = new Automaton();
 
 		newAutomaton.setType(theAutomaton.getType());
@@ -236,7 +228,6 @@ public class AutomatonMinimizer
 
 	private void doMinimization(EquivalenceClasses equivClasses)
 	{
-
 		boolean refined;
 
 		do
@@ -257,7 +248,6 @@ public class AutomatonMinimizer
 
 	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
 	{
-
 		boolean refined = false;
 		Iterator eventIt = theAlphabet.eventIterator();
 
@@ -316,7 +306,6 @@ public class AutomatonMinimizer
 
 class EquivalenceClasses
 {
-
 	private LinkedList equivClasses = new LinkedList();
 
 	public void add(EquivalenceClass equivClass)
@@ -326,7 +315,6 @@ class EquivalenceClasses
 
 	public void addAll(EquivalenceClassHolder equivClassHolder)
 	{
-
 		Iterator equivIt = equivClassHolder.iterator();
 
 		while (equivIt.hasNext())
@@ -365,7 +353,6 @@ class EquivalenceClasses
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 		Iterator equivClassIt = equivClasses.iterator();
 
@@ -386,7 +373,6 @@ class EquivalenceClasses
 
 class EquivalenceClass
 {
-
 	private LinkedList states = new LinkedList();
 	private State newState;
 	private EquivalenceClass nextClass = null;
@@ -405,7 +391,6 @@ class EquivalenceClass
 
 	public void update()
 	{
-
 		Iterator stateIt = states.iterator();
 
 		while (stateIt.hasNext())
@@ -438,7 +423,6 @@ class EquivalenceClass
 
 	public boolean isInitial()
 	{
-
 		Iterator stateIt = states.iterator();
 
 		while (stateIt.hasNext())
@@ -456,7 +440,6 @@ class EquivalenceClass
 
 	public boolean isAccepting()
 	{
-
 		State currState = (State) states.getFirst();
 
 		if (currState.isAccepting())
@@ -469,7 +452,6 @@ class EquivalenceClass
 
 	public boolean isForbidden()
 	{
-
 		State currState = (State) states.getFirst();
 
 		if (currState.isForbidden())
@@ -496,7 +478,6 @@ class EquivalenceClass
 
 	public Iterator outgoingArcsIterator()
 	{
-
 		State currState = (State) states.getFirst();
 		Iterator currIt = currState.outgoingArcsIterator();
 
@@ -544,7 +525,6 @@ class EquivalenceClass
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("[");
@@ -571,7 +551,6 @@ class EquivalenceClass
 class EquivalenceClassHolder
 	extends HashMap
 {
-
 	public void addState(State state, EquivalenceClass nextClass)
 	{
 
@@ -597,7 +576,6 @@ class EquivalenceClassHolder
 
 	public void update()
 	{
-
 		Iterator equivClassIt = iterator();
 
 		while (equivClassIt.hasNext())
@@ -610,7 +588,6 @@ class EquivalenceClassHolder
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 		Iterator equivClassIt = iterator();
 

@@ -49,12 +49,9 @@
  */
 package org.supremica.automata;
 
-
-
 public interface AutomatonContainerListener
 	extends Listener
 {
-
 	public void automatonAdded(AutomatonContainer container, Automaton automaton);
 
 	public void automatonRemoved(AutomatonContainer container, Automaton automaton);

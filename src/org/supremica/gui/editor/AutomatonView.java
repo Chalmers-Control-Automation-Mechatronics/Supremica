@@ -49,23 +49,16 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 import java.awt.geom.*;
-
 import javax.swing.*;
-
 import java.util.*;
-
 import com.nwoods.jgo.*;
-
 import org.supremica.automata.*;
-
 
 // Provide a view of a AutomatonDocument
 // Implement various command handlers
@@ -83,7 +76,6 @@ public class AutomatonView
 
 	public AutomatonView(AutomatonDocument doc)
 	{
-
 		super(doc);
 
 		this.theAutomaton = doc.getAutomaton();
@@ -93,7 +85,6 @@ public class AutomatonView
 
 	public void initPopups()
 	{
-
 		statePopupMenu = new JPopupMenu();
 
 		JMenuItem cutItem = new JMenuItem("Cut");
@@ -121,7 +112,6 @@ public class AutomatonView
 
 	public void initialize(AutomataEditor app, JInternalFrame frame)
 	{
-
 		myApp = app;
 		myInternalFrame = frame;
 
@@ -152,7 +142,6 @@ public class AutomatonView
 	// handle DELETE key as well as the page up/down keys
 	public void onKeyEvent(KeyEvent evt)
 	{
-
 		int t = evt.getKeyCode();
 
 		if (t == KeyEvent.VK_DELETE)
@@ -189,7 +178,6 @@ public class AutomatonView
 	// here we just need to keep the title bar up-to-date
 	public void documentChanged(JGoDocumentEvent evt)
 	{
-
 		if ((evt.getHint() == AutomatonDocument.NameChanged) && (getInternalFrame() != null))
 		{
 			updateTitle();
@@ -207,7 +195,6 @@ public class AutomatonView
 	// of the document
 	public void updateTitle()
 	{
-
 		if (getInternalFrame() != null)
 		{
 			String title = getDoc().getName();
@@ -228,7 +215,6 @@ public class AutomatonView
 	// let AutomatonDocument do the work
 	public void insertNode(Point loc)
 	{
-
 		if (loc == null)
 		{
 			loc = getDefaultLocation();
@@ -280,7 +266,6 @@ public class AutomatonView
 	// toggle the grid appearance
 	void showGrid()
 	{
-
 		int style = getGridStyle();
 
 		if (style == JGoGridView.GridInvisible)
@@ -336,7 +321,6 @@ public class AutomatonView
 
 	void zoomIn()
 	{
-
 		double newscale = Math.rint(getScale() / 0.9f * 100f) / 100f;
 
 		setScale(newscale);
@@ -344,7 +328,6 @@ public class AutomatonView
 
 	void zoomOut()
 	{
-
 		double newscale = Math.rint(getScale() * 0.9f * 100f) / 100f;
 
 		setScale(newscale);
@@ -357,7 +340,6 @@ public class AutomatonView
 
 	void zoomToFit()
 	{
-
 		double newscale = 1;
 
 		if (!getDocument().isEmpty())
@@ -383,7 +365,6 @@ public class AutomatonView
 
 	public void deleteSelection()
 	{
-
 		theAutomaton.beginTransaction();
 
 		JGoSelection theSelection = getSelection();
@@ -409,7 +390,6 @@ public class AutomatonView
 
 	public boolean doMouseDblClick(int modifiers, Point dc, Point vc)
 	{
-
 		JGoObject obj = pickDocObject(dc, false);
 
 		if (obj != null)
@@ -444,7 +424,6 @@ public class AutomatonView
 	// an example of how to implement popup menus
 	public boolean doMouseDown(int modifiers, Point dc, Point vc)
 	{
-
 		JGoObject obj = pickDocObject(dc, true);
 
 		if ((obj != null) && (getCurrentMouseEvent() != null) && getCurrentMouseEvent().isPopupTrigger())
@@ -460,7 +439,6 @@ public class AutomatonView
 
 	public boolean doMouseUp(int modifiers, Point dc, Point vc)
 	{
-
 		JGoObject obj = pickDocObject(dc, true);
 
 		if ((obj != null) && (getCurrentMouseEvent() != null) && getCurrentMouseEvent().isPopupTrigger())

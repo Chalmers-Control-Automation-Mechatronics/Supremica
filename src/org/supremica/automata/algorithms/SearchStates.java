@@ -12,32 +12,24 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.lang.Exception;
-
 import java.util.HashSet;
 import java.util.Iterator;
-
 import org.apache.oro.text.regex.*;
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
 import org.supremica.automata.algorithms.Matcher;
 
-
 // 
 public class SearchStates
 {
-
 	private AutomataSynchronizer syncher = null;
 	private IntArrayList list = null;
 
 	public void search(Matcher matcher)
 		throws Exception
 	{
-
 		syncher.execute();
 
 		list = new IntArrayList();
@@ -90,17 +82,15 @@ public class SearchStates
 	// iterates over the partial states
 	public class StateIterator
 	{
-
 		private State[][] states;
 		private int[] composite;
-		int index;		// holds the automaton index
+		int index;    // holds the automaton index
 
 		// ** Note, ctor should be private, but jikes 1.15 emits faulty bytecode then
 		// ** javac and jikes 1.14 ok for private.
 		// ** Do not instantiate, create only through getStateIterator()
 		public StateIterator(State[][] s, int[] c)
 		{
-
 			states = s;
 			composite = c;
 			index = 0;
@@ -108,15 +98,15 @@ public class SearchStates
 
 		public boolean hasNext()
 		{
-			return index < composite.length - 1;	// the last element of composite is not used
+			return index < composite.length - 1;    // the last element of composite is not used
 		}
 
-		public State getState()		// get the current state of the current automaton
+		public State getState()    // get the current state of the current automaton
 		{
 			return states[index][composite[index]];
 		}
 
-		public void inc()		// move to the next automaton
+		public void inc()    // move to the next automaton
 		{
 			++index;
 		}
@@ -134,7 +124,6 @@ public class SearchStates
 
 	public String toString(int[] composite_state)
 	{
-
 		AutomataSynchronizerHelper helper = syncher.getHelper();
 		State[][] states = helper.getIndexFormStateTable();
 		StringBuffer str = new StringBuffer();

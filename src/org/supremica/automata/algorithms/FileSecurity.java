@@ -49,17 +49,12 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import java.util.*;
-
 import org.supremica.automata.*;
 import org.supremica.gui.*;
 
-
 public class FileSecurity
 {
-
 	private Set superUsers = new HashSet();
 	private String currentUser = null;
 	private static final String superuserIdentity = WorkbenchProperties.getSuperuserIdentity();
@@ -93,7 +88,6 @@ public class FileSecurity
 
 	public boolean allowOpening(Automata theAutomata)
 	{
-
 		if (hasCurrentUser() && isSuperUser(currentUser))
 		{
 			return true;

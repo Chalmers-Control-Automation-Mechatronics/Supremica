@@ -49,32 +49,23 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
 import java.util.HashMap;
-
 import com.nwoods.jgo.*;
 import com.nwoods.jgo.layout.JGoNetwork;
-
 import java.beans.*;
-
 import org.supremica.gui.*;
 import org.supremica.automata.AutomatonContainer;
 import org.supremica.automata.Automaton;
-
 
 public class AutomataEditor
 	extends JFrame
 	implements TableModelListener
 {
-
 	private JPanel contentPane;
 	private Gui workbench = null;
 	private AutomatonContainer theAutomatonContainer = null;
@@ -87,7 +78,6 @@ public class AutomataEditor
 
 	public AutomataEditor(Gui workbench)
 	{
-
 		this.workbench = workbench;
 		this.theAutomatonContainer = workbench.getAutomatonContainer();
 		theActions = new EditorActions(this);
@@ -124,7 +114,6 @@ public class AutomataEditor
 
 	void initMenus()
 	{
-
 		JMenuItem item = null;
 
 		filemenu.setText("File");
@@ -185,7 +174,6 @@ public class AutomataEditor
 
 		AppAction CutAction = new AppAction("Cut", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().cut();
@@ -204,7 +192,6 @@ public class AutomataEditor
 
 		AppAction CopyAction = new AppAction("Copy", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().copy();
@@ -223,7 +210,6 @@ public class AutomataEditor
 
 		AppAction PasteAction = new AppAction("Paste", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().paste();
@@ -237,7 +223,6 @@ public class AutomataEditor
 
 		AppAction DeleteAction = new AppAction("Delete", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().deleteSelection();
@@ -255,7 +240,6 @@ public class AutomataEditor
 
 		AppAction SelectAllAction = new AppAction("Select All", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().selectAll();
@@ -272,7 +256,6 @@ public class AutomataEditor
 
 		AppAction ZoomNormalAction = new AppAction("Normal Zoom", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().zoomNormal();
@@ -285,7 +268,6 @@ public class AutomataEditor
 
 		AppAction ZoomInAction = new AppAction("Zoom In", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().zoomIn();
@@ -303,7 +285,6 @@ public class AutomataEditor
 
 		AppAction ZoomOutAction = new AppAction("Zoom Out", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().zoomOut();
@@ -321,7 +302,6 @@ public class AutomataEditor
 
 		AppAction ZoomToFitAction = new AppAction("Zoom To Fit", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().zoomToFit();
@@ -335,7 +315,6 @@ public class AutomataEditor
 
 		AppAction GridAction = new AppAction("Toggle Grid", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				getView().showGrid();
@@ -352,7 +331,6 @@ public class AutomataEditor
 
 		AppAction InsertNodeAction = new AppAction("Basic Node", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				nodeAction();
@@ -369,7 +347,6 @@ public class AutomataEditor
 
 		AppAction RandomLayoutAction = new AppAction("Random Layout", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				randomAction();
@@ -383,7 +360,6 @@ public class AutomataEditor
 
 		AppAction ForceLayoutAction = new AppAction("Force-Directed Layout", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				forceAction();
@@ -397,7 +373,6 @@ public class AutomataEditor
 
 		AppAction LayerLayoutAction = new AppAction("Layered Digraph Layout", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				layerAction();
@@ -414,7 +389,6 @@ public class AutomataEditor
 
 		AppAction AboutAction = new AppAction("About", this)
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				showAbout();
@@ -424,7 +398,7 @@ public class AutomataEditor
 			{
 				return true;
 			}
-		};		// doesn't depend on a view
+		};    // doesn't depend on a view
 
 		item = helpmenu.add(AboutAction);
 
@@ -440,7 +414,6 @@ public class AutomataEditor
 
 	public void initToolbar()
 	{
-
 		Insets tmpInsets = new Insets(0, 0, 0, 0);
 		boolean separatorNeeded = false;
 		JButton addButton = new JButton();
@@ -452,7 +425,6 @@ public class AutomataEditor
 		addButton.setIcon(add16Img);
 		addButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				fileAdd();
@@ -474,7 +446,6 @@ public class AutomataEditor
 			openButton.setIcon(open16Img);
 			openButton.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					fileOpen();
@@ -497,7 +468,6 @@ public class AutomataEditor
 			saveButton.setIcon(save16Img);
 			saveButton.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					fileSave();
@@ -513,7 +483,6 @@ public class AutomataEditor
 			saveAsButton.setIcon(saveAs16Img);
 			saveAsButton.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					fileSaveAs();
@@ -543,7 +512,6 @@ public class AutomataEditor
 		printButton.setIcon(print16Img);
 		printButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				filePrint();
@@ -559,7 +527,6 @@ public class AutomataEditor
 		cutButton.setIcon(cut16Img);
 		cutButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -576,7 +543,6 @@ public class AutomataEditor
 		copyButton.setIcon(copy16Img);
 		copyButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -593,7 +559,6 @@ public class AutomataEditor
 		pasteButton.setIcon(paste16Img);
 		pasteButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -610,7 +575,6 @@ public class AutomataEditor
 		deleteButton.setIcon(delete16Img);
 		deleteButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -627,7 +591,6 @@ public class AutomataEditor
 		undoButton.setIcon(undo16Img);
 		undoButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -644,7 +607,6 @@ public class AutomataEditor
 		redoButton.setIcon(redo16Img);
 		redoButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -661,7 +623,6 @@ public class AutomataEditor
 		zoomButton.setIcon(zoom16Img);
 		zoomButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -678,7 +639,6 @@ public class AutomataEditor
 		zoomInButton.setIcon(zoomIn16Img);
 		zoomInButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -695,7 +655,6 @@ public class AutomataEditor
 		zoomOutButton.setIcon(zoomOut16Img);
 		zoomOutButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 
@@ -744,7 +703,6 @@ public class AutomataEditor
 
 	public void init()
 	{
-
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -759,7 +717,6 @@ public class AutomataEditor
 		// close the application when the main window closes
 		addWindowListener(new WindowAdapter()
 		{
-
 			public void windowClosing(java.awt.event.WindowEvent event)
 			{
 
@@ -796,10 +753,8 @@ public class AutomataEditor
 		AppAction.updateAllActions();
 		theAutomatonTable.addMouseListener(new MouseAdapter()
 		{
-
 			public void mouseClicked(MouseEvent e)
 			{
-
 				if (e.getClickCount() == 2)
 				{
 					int currRow = theAutomatonTable.rowAtPoint(new Point(e.getX(), e.getY()));
@@ -929,7 +884,6 @@ public class AutomataEditor
 	 */
 	void showAbout()
 	{
-
 		AboutBox dlg = new AboutBox(this);
 		Dimension dlgSize = dlg.getPreferredSize();
 		Dimension frmSize = getSize();
@@ -942,7 +896,6 @@ public class AutomataEditor
 
 	public JInternalFrame createFrame(AutomatonDocument doc)
 	{
-
 		final AutomatonView view = new AutomatonView(doc);
 		final JInternalFrame frame = new JInternalFrame(doc.getName(), true, true, true);
 
@@ -955,10 +908,8 @@ public class AutomataEditor
 		frame.addVetoableChangeListener(new CloseListener(this, frame));
 		frame.addInternalFrameListener(new InternalFrameListener()
 		{
-
 			public void internalFrameActivated(InternalFrameEvent e)
 			{
-
 				myCurrentView = view;
 
 				view.requestFocus();
@@ -969,7 +920,6 @@ public class AutomataEditor
 
 			public void internalFrameOpened(InternalFrameEvent e)
 			{
-
 				view.zoomToFit();
 				view.showGrid();
 				view.setSnapMove(JGoGridView.NoSnap);
@@ -1045,7 +995,6 @@ public class AutomataEditor
 	 */
 	AutomatonDocument findAutomatonDocument(String path)
 	{
-
 		Object val = myMap.get(path);
 
 		if ((val != null) && (val instanceof AutomatonDocument))
@@ -1065,7 +1014,6 @@ public class AutomataEditor
 
 	void randomAction()
 	{
-
 		setStatus("");
 
 		AutomatonDocument doc = getCurrentView().getDoc();
@@ -1078,7 +1026,6 @@ public class AutomataEditor
 
 	void forceAction()
 	{
-
 		setStatus("");
 
 		ForceDialog f = new ForceDialog(getCurrentView().getFrame(), "Force-Directed Settings", true, getCurrentView(), this);
@@ -1088,7 +1035,6 @@ public class AutomataEditor
 
 	void layerAction()
 	{
-
 		setStatus("");
 
 		LayerDialog l = new LayerDialog(getCurrentView().getFrame(), "Layered-Digraph Settings", true, getCurrentView(), this);
@@ -1098,7 +1044,6 @@ public class AutomataEditor
 
 	void nodeAction()
 	{
-
 		NodeDialog n = new NodeDialog(getCurrentView().getFrame(), "Node Settings", true, getCurrentView());
 
 		n.setVisible(true);
@@ -1116,7 +1061,6 @@ public class AutomataEditor
 
 	public void setStatus(String s)
 	{
-
 		if (s.equals(""))
 		{
 			s = " ";
@@ -1128,7 +1072,6 @@ public class AutomataEditor
 
 	protected void initStatusArea()
 	{
-
 		getStatusArea().setMinimumSize(new Dimension(10, 10));
 		getStatusArea().setBorder(BorderFactory.createEtchedBorder());
 		getStatusArea().setLayout(new BorderLayout());
@@ -1143,7 +1086,6 @@ public class AutomataEditor
 
 	public void fileAdd()
 	{
-
 		String title = theAutomatonContainer.getUniqueAutomatonName();
 		Automaton newAutomaton = new Automaton(title);
 
@@ -1186,7 +1128,6 @@ public class AutomataEditor
 
 	public void filePrint()
 	{
-
 		AutomatonView currView = getCurrentView();
 
 		if (currView != null)
@@ -1218,7 +1159,6 @@ public class AutomataEditor
 	class CloseListener
 		implements VetoableChangeListener
 	{
-
 		CloseListener(AutomataEditor app, JInternalFrame frame)
 		{
 			myApp = app;

@@ -49,14 +49,9 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 /**
  * A collection of Automaton-objects.
@@ -64,9 +59,8 @@ import org.apache.log4j.*;
  */
 public class Automata
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(Automata.class.getName());
-	private ArrayList theAutomata;		// Efficiency reasons
+	private ArrayList theAutomata;    // Efficiency reasons
 	private HashMap nameMap;
 	private String name = null;
 	private AutomataListeners listeners = null;
@@ -81,7 +75,6 @@ public class Automata
 
 	public Automata(Automata oldAutomata)
 	{
-
 		this();
 
 		Iterator automataIterator = oldAutomata.iterator();
@@ -94,7 +87,6 @@ public class Automata
 
 	public void addAutomaton(Automaton aut)
 	{
-
 		theAutomata.add(aut);
 		nameMap.put(aut.getName(), aut);
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
@@ -102,7 +94,6 @@ public class Automata
 
 	public void addAutomata(Automata automata)
 	{
-
 		Iterator automataIterator = automata.iterator();
 
 		while (automataIterator.hasNext())
@@ -113,7 +104,6 @@ public class Automata
 
 	public void removeAutomaton(Automaton aut)
 	{
-
 		theAutomata.remove(aut);
 		nameMap.remove(aut.getName());
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_REMOVED, aut);
@@ -121,7 +111,6 @@ public class Automata
 
 	public void renameAutomaton(Automaton aut, String newName)
 	{
-
 		nameMap.remove(aut.getName());
 		aut.setName(newName);
 		nameMap.put(aut.getName(), aut);
@@ -150,7 +139,6 @@ public class Automata
 
 	public String computeHash()
 	{
-
 		long checksum = checksum();
 		long ownerhash = owner.hashCode();
 		long extrahash = 0x314C;
@@ -203,7 +191,6 @@ public class Automata
 
 	public AutomataListeners getListeners()
 	{
-
 		if (listeners == null)
 		{
 			listeners = new AutomataListeners(this);
@@ -213,8 +200,7 @@ public class Automata
 	}
 
 	public long checksum()
-	{		// Ad-hoc checksum algorithm
-
+	{    // Ad-hoc checksum algorithm
 		long checksum = 53562951413L;
 
 		for (Iterator aIt = iterator(); aIt.hasNext(); )
@@ -229,7 +215,6 @@ public class Automata
 
 	private void notifyListeners()
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners();
@@ -238,7 +223,6 @@ public class Automata
 
 	private void notifyListeners(int mode, Automaton a)
 	{
-
 		if (listeners != null)
 		{
 			listeners.notifyListeners(mode, a);
@@ -247,7 +231,6 @@ public class Automata
 
 	public void beginTransaction()
 	{
-
 		if (listeners != null)
 		{
 			listeners.beginTransaction();
@@ -256,7 +239,6 @@ public class Automata
 
 	public void endTransaction()
 	{
-
 		if (listeners != null)
 		{
 			listeners.endTransaction();

@@ -49,14 +49,10 @@
  */
 package org.supremica.recipe;
 
-
-
 import java.util.*;
-
 
 public class InternalTransition
 {
-
 	private List prevOperations = new LinkedList();
 	private List nextOperations = new LinkedList();
 	private String identity;
@@ -69,7 +65,6 @@ public class InternalTransition
 
 	public InternalTransition(String identity, boolean controllable)
 	{
-
 		if (identity == null)
 		{
 			System.err.println("null identity");
@@ -122,7 +117,6 @@ public class InternalTransition
 
 	public boolean isEnabled(InternalOperationState theState)
 	{
-
 		Iterator prevOperationIt = prevOperations.iterator();
 
 		while (prevOperationIt.hasNext())
@@ -140,7 +134,6 @@ public class InternalTransition
 
 	public InternalOperationState fire(InternalOperationState oldState)
 	{
-
 		InternalOperationState newState = new InternalOperationState(oldState);
 		Iterator operationIt = prevOperations.iterator();
 
@@ -165,7 +158,6 @@ public class InternalTransition
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("InternalTransition: " + identity + "\n");

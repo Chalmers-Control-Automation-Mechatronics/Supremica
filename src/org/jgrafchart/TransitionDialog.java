@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import com.nwoods.jgo.*;
-
 
 public class TransitionDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JLabel label = new JLabel();
 	JTextField nameField = new JTextField();
@@ -26,7 +20,6 @@ public class TransitionDialog
 
 	public TransitionDialog(Frame frame, GCDocument obj, GCTransition tin, GCView view)
 	{
-
 		super(frame, "Transition", true);
 
 		try
@@ -53,13 +46,11 @@ public class TransitionDialog
 
 	private final void init()
 	{
-
 		panel1.setLayout(null);
 		panel1.setMinimumSize(new Dimension(294, 141));
 		panel1.setPreferredSize(new Dimension(294, 141));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnOK();
@@ -67,7 +58,6 @@ public class TransitionDialog
 		});
 		CancelButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnCancel();
@@ -75,7 +65,6 @@ public class TransitionDialog
 		});
 		HelpButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				onHelp();
@@ -105,7 +94,6 @@ public class TransitionDialog
 
 	void updateDialog()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -117,7 +105,6 @@ public class TransitionDialog
 
 	void updateData()
 	{
-
 		if (myObject == null)
 		{
 			return;
@@ -162,21 +149,19 @@ public class TransitionDialog
 
 	void OnOK()
 	{
-
 		try
 		{
 			updateData();
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}
 
 	void OnCancel()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}

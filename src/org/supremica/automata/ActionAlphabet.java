@@ -49,19 +49,13 @@
  */
 package org.supremica.automata;
 
-
-
 import java.util.*;
-
 import org.supremica.gui.*;
-
 import org.apache.log4j.*;
-
 
 public class ActionAlphabet
 	extends Alphabet
 {
-
 	private static Category thisCategory = LogDisplay.createCategory(ActionAlphabet.class.getName());
 
 	public ActionAlphabet() {}

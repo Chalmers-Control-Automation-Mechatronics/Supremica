@@ -49,10 +49,7 @@
  */
 package org.supremica.recipe;
 
-
-
 import java.util.*;
-
 
 /**
  * This is an intermediate format, similar to Petri nets, for
@@ -60,7 +57,6 @@ import java.util.*;
  */
 public class InternalOperationRecipe
 {
-
 	private HashMap operations = new HashMap();
 	private List sortedOperations = new LinkedList();
 	private HashMap transitions = new HashMap();
@@ -86,7 +82,6 @@ public class InternalOperationRecipe
 	public void addOperation(InternalOperation operation)
 		throws Exception
 	{
-
 		String id = operation.getIdentity();
 
 		if (id == null)
@@ -107,7 +102,6 @@ public class InternalOperationRecipe
 	public void addTransition(InternalTransition transition)
 		throws Exception
 	{
-
 		String id = transition.getIdentity();
 
 		if (id == null)
@@ -127,7 +121,6 @@ public class InternalOperationRecipe
 	public void addArc(InternalOperation operation, InternalTransition transition)
 		throws Exception
 	{
-
 		if (!transitions.containsKey(transition.getIdentity()))
 		{
 			throw new Exception(identity + " does not exist");
@@ -145,7 +138,6 @@ public class InternalOperationRecipe
 	public void addArc(InternalTransition transition, InternalOperation operation)
 		throws Exception
 	{
-
 		if (!transitions.containsKey(transition.getIdentity()))
 		{
 			throw new Exception(identity + " does not exist");
@@ -163,7 +155,6 @@ public class InternalOperationRecipe
 	public InternalOperation getInternalOperation(String identity)
 		throws Exception
 	{
-
 		if (!operations.containsKey(identity))
 		{
 			throw new Exception(identity + " does not exist");
@@ -175,7 +166,6 @@ public class InternalOperationRecipe
 	public InternalTransition getInternalTransition(String identity)
 		throws Exception
 	{
-
 		if (!transitions.containsKey(identity))
 		{
 			throw new Exception(identity + " does not exist");
@@ -221,7 +211,6 @@ public class InternalOperationRecipe
 	public InternalOperationRecipe createCopy(String newIdentity)
 		throws Exception
 	{
-
 		InternalOperationRecipe newRecipe = new InternalOperationRecipe(newIdentity);
 
 		// Create copies of all operations
@@ -291,7 +280,6 @@ public class InternalOperationRecipe
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("InternalOperationRecipe: " + identity + "\n");
@@ -319,7 +307,6 @@ public class InternalOperationRecipe
 
 	public Iterator enabledTransitions(InternalOperationState theState)
 	{
-
 		List enabledTransitions = new LinkedList();
 		Iterator transitionIt = transitionIterator();
 
@@ -339,7 +326,6 @@ public class InternalOperationRecipe
 	public InternalOperationState createFirstState()
 		throws Exception
 	{
-
 		InternalOperationState theState = new InternalOperationState(nbrOfOperations());
 
 		if (status == InternalOperationRecipeStatus.Undetermined)
@@ -360,7 +346,7 @@ public class InternalOperationRecipe
 		}
 
 		if (status == InternalOperationRecipeStatus.Running)
-		{		// Find all operations that are active
+		{    // Find all operations that are active
 			Iterator operationIt = operationIterator();
 
 			while (operationIt.hasNext())
@@ -385,7 +371,6 @@ public class InternalOperationRecipe
 	 */
 	public boolean hasValidStructure()
 	{
-
 		int nbrOfInitialOperations = 0;
 		int nbrOfFinalOperations = 0;
 		Iterator operationIt = operationIterator();

@@ -1,18 +1,12 @@
 package org.jgrafchart.Transitions;
 
-
-
 import com.nwoods.jgo.*;
-
 import org.jgrafchart.*;
-
 import java.util.*;
-
 
 public class TRVar
 	extends SimpleNode
 {
-
 	protected String name;
 	protected Readable in;
 	protected boolean dotX = false;
@@ -25,7 +19,6 @@ public class TRVar
 
 	public void setName(String n)
 	{
-
 		name = n;
 
 		if (name.endsWith(".x") || name.endsWith(".X"))
@@ -56,7 +49,6 @@ public class TRVar
 
 	public boolean evaluate()
 	{
-
 		if (dotX)
 		{
 			return ((GrafcetObject) in).x;
@@ -76,7 +68,6 @@ public class TRVar
 
 	public int intEvaluate()
 	{
-
 		if (dotX)
 		{
 			return 0;
@@ -96,7 +87,6 @@ public class TRVar
 
 	public boolean compile(ArrayList doc)
 	{
-
 		boolean found;
 		boolean result = true;
 		Object obj;

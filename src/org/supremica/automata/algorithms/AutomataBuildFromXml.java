@@ -49,24 +49,16 @@
  */
 package org.supremica.automata.algorithms;
 
-
-
 import org.supremica.automata.*;
-
 import java.util.*;
-
 import java.io.*;
-
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
-
 import org.xml.sax.*;
-
 
 public class AutomataBuildFromXml
 	extends HandlerBase
 {
-
 	private static final String automataStr = "Automata";
 	private static final String automatonStr = "Automaton";
 	private static final String eventsStr = "Events";
@@ -127,7 +119,6 @@ public class AutomataBuildFromXml
 	public static Automata build(InputStream is, boolean validate)
 		throws Exception
 	{
-
 		InputSource source = new InputSource(is);
 
 		return build(source, validate);
@@ -136,7 +127,6 @@ public class AutomataBuildFromXml
 	public static Automata build(Reader r, boolean validate)
 		throws Exception
 	{
-
 		InputSource source = new InputSource(r);
 
 		return build(source, validate);
@@ -145,7 +135,6 @@ public class AutomataBuildFromXml
 	public static Automata build(String fileName, boolean validate)
 		throws Exception
 	{
-
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 
 		parserFactory.setValidating(validate);
@@ -172,7 +161,6 @@ public class AutomataBuildFromXml
 	public static Automata build(InputSource is, boolean validate)
 		throws Exception
 	{
-
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 
 		parserFactory.setValidating(validate);
@@ -238,7 +226,6 @@ public class AutomataBuildFromXml
 	public final void doAutomata(AttributeList attributes)
 		throws SAXException
 	{
-
 		currAutomata = new Automata();
 
 		String name = attributes.getValue("name");
@@ -292,7 +279,6 @@ public class AutomataBuildFromXml
 	public final void doAutomaton(AttributeList attributes)
 		throws SAXException
 	{
-
 		currAutomaton = new Automaton();
 		currAlphabet = new Alphabet();
 
@@ -339,7 +325,6 @@ public class AutomataBuildFromXml
 	public final void doEvent(AttributeList attributes)
 		throws SAXException
 	{
-
 		String id = null;
 		String label = null;
 		boolean controllable = true;
@@ -405,7 +390,6 @@ public class AutomataBuildFromXml
 	public final void doState(AttributeList attributes)
 		throws SAXException
 	{
-
 		String id = null;
 		String name = null;
 		boolean initial = false;
@@ -463,7 +447,6 @@ public class AutomataBuildFromXml
 	public final void doTransition(AttributeList attributes)
 		throws SAXException
 	{
-
 		String source = attributes.getValue("source");
 
 		if (source == null)
@@ -507,7 +490,6 @@ public class AutomataBuildFromXml
 	public final void throwException(String msg)
 		throws SAXException
 	{
-
 		int line = locator.getLineNumber();
 		int column = locator.getColumnNumber();
 		String exMsg = "Error while parsing at line: " + line + ". Reason: \"" + msg + "\"";

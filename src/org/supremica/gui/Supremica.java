@@ -49,23 +49,15 @@
  */
 package org.supremica.gui;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-
 import java.util.*;
-
 import java.io.*;
-
 import org.apache.log4j.*;
-
 import javax.help.*;
-
 import org.supremica.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
@@ -76,12 +68,10 @@ import org.supremica.gui.help.*;
 import org.supremica.gui.Gui;
 import org.supremica.gui.ActionMan;
 
-
 public class Supremica
 	extends JFrame
 	implements TableModelListener, Gui
 {
-
 	private static final InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
@@ -95,7 +85,7 @@ public class Supremica
 	private TableSorter theTableSorter;
 	private TableModel fullTableModel;
 	private JScrollPane theAutomatonTableScrollPane;
-	private MenuHandler menuHandler;	// MF -- made publically available
+	private MenuHandler menuHandler;    // MF -- made publically available
 	private static Category thisCategory = LogDisplay.createCategory(Supremica.class.getName());
 	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JSplitPane splitPaneVertical;
@@ -119,7 +109,6 @@ public class Supremica
 	// Construct the frame
 	public Supremica()
 	{
-
 		theAutomatonContainer = new AutomatonContainer(this);
 
 		thisCategory.info("Supremica version: " + (new Version()).toString());
@@ -152,7 +141,7 @@ public class Supremica
 
 		theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
 
-		menuHandler = new MenuHandler(	/* theAutomatonTable */);
+		menuHandler = new MenuHandler( /* theAutomatonTable */);
 		theAutomatonTableScrollPane = new JScrollPane(theAutomatonTable);
 
 		JViewport vp = theAutomatonTableScrollPane.getViewport();
@@ -178,7 +167,6 @@ public class Supremica
 		// This code used to be in the popup menu -------------
 		theAutomatonTable.addMouseListener(new MouseAdapter()
 		{
-
 			public void mousePressed(MouseEvent e)
 			{
 
@@ -196,7 +184,6 @@ public class Supremica
 
 			private void maybeShowPopup(MouseEvent e)
 			{
-
 				if (e.isPopupTrigger())
 				{
 					int currRow = theAutomatonTable.rowAtPoint(new Point(e.getX(), e.getY()));
@@ -223,8 +210,7 @@ public class Supremica
 	// MF -- added to allow a single commandline arg
 	public Supremica(String arg)
 	{
-
-		this();		// this calls the default constructor(?)
+		this();    // this calls the default constructor(?)
 
 		openAutomataXMLFile(new File(arg));
 	}
@@ -243,7 +229,6 @@ public class Supremica
 	private void jbInit()
 		throws Exception
 	{
-
 		contentPane = (JPanel) getContentPane();
 
 		contentPane.setLayout(layout);
@@ -258,10 +243,8 @@ public class Supremica
 		fullTableModel.addTableModelListener(this);
 		theAutomatonTable.addKeyListener(new KeyAdapter()
 		{
-
 			public void keyPressed(KeyEvent e)
 			{
-
 				if (e.getKeyCode() == KeyEvent.VK_DELETE)
 				{
 					ActionMan.automataDelete_actionPerformed(getGui());
@@ -282,7 +265,6 @@ public class Supremica
 
 	public void initialize()
 	{
-
 		setIconImage(Supremica.cornerImage);
 		setVisible(true);
 		splitPaneVertical.setDividerLocation(0.7);
@@ -291,11 +273,9 @@ public class Supremica
 
 	public void initMenubar()
 	{
-
 		class NewFromTemplateHandler
 			implements ActionListener
 		{
-
 			private TemplateItem item = null;
 
 			public NewFromTemplateHandler(TemplateItem item)
@@ -327,7 +307,6 @@ public class Supremica
 		menuFile.add(menuFileNew);
 		menuFileNew.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.fileNew(getGui());
@@ -371,7 +350,6 @@ public class Supremica
 			menuFile.add(menuFileOpen);
 			menuFileOpen.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileOpen(getGui());
@@ -392,7 +370,6 @@ public class Supremica
 			menuFile.add(menuFileSave);
 			menuFileSave.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileSave(getGui());
@@ -406,7 +383,6 @@ public class Supremica
 			menuFile.add(menuFileSaveAs);
 			menuFileSaveAs.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileSaveAs(getGui());
@@ -439,7 +415,6 @@ public class Supremica
 			menuFileImport.add(menuFileImportDesco);
 			menuFileImportDesco.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileImportDesco(getGui());
@@ -454,7 +429,6 @@ public class Supremica
 			menuFileImportTCT.setEnabled(false);
 			menuFileImportTCT.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 
@@ -470,7 +444,6 @@ public class Supremica
 			menuFileImportUMDES.setEnabled(false);
 			menuFileImportUMDES.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 
@@ -485,7 +458,6 @@ public class Supremica
 			menuFileImport.add(menuFileImportValid);
 			menuFileImportValid.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileImportValid(getGui());
@@ -511,7 +483,6 @@ public class Supremica
 			menuFileExport.add(menuFileExportDesco);
 			menuFileExportDesco.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileExportDesco(getGui());
@@ -526,7 +497,6 @@ public class Supremica
 			menuFileExportTCT.setEnabled(false);
 			menuFileExportTCT.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 
@@ -542,7 +512,6 @@ public class Supremica
 			menuFileExportUMDES.setEnabled(false);
 			menuFileExportUMDES.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 
@@ -558,7 +527,6 @@ public class Supremica
 			menuFileExportUMDES.setEnabled(false);
 			menuFileExportValid.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileExportValid(getGui());
@@ -585,7 +553,6 @@ public class Supremica
 			menuFile.add(menuFileLogin);
 			menuFileLogin.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileLogin(getGui());
@@ -612,7 +579,6 @@ public class Supremica
 			menuFile.add(menuFileExit);
 			menuFileExit.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileExit(getGui());
@@ -629,7 +595,6 @@ public class Supremica
 			menuFile.add(menuFileExit);
 			menuFileExit.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileClose(getGui());
@@ -651,7 +616,6 @@ public class Supremica
 		menuProject.add(menuProjectRename);
 		menuProjectRename.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				renameProject();
@@ -672,10 +636,8 @@ public class Supremica
 		menuTools.add(test_cases);
 		test_cases.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
-
 				try
 				{
 					ActionMan.testCases(getGui());
@@ -699,7 +661,6 @@ public class Supremica
 			menuTools.add(menuToolsAutomataEditor);
 			menuToolsAutomataEditor.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					toolsAutomataEditor();
@@ -718,7 +679,6 @@ public class Supremica
 			menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
 			menuToolsCodeGenerationIL.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 
@@ -733,7 +693,6 @@ public class Supremica
 			menuToolsCodeGeneration.add(menuToolsCodeGenerationBC);
 			menuToolsCodeGenerationBC.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 
@@ -747,7 +706,6 @@ public class Supremica
 			menuToolsCodeGeneration.add(menuToolsCodeGenerationSattLineSFC);
 			menuToolsCodeGenerationSattLineSFC.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.AutomataToSattLineSFC(getGui());
@@ -769,7 +727,6 @@ public class Supremica
 		menuConfigure.add(menuConfigurePreferences);
 		menuConfigurePreferences.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.configurePreferences_actionPerformed(getGui());
@@ -798,7 +755,6 @@ public class Supremica
 		menuHelp.add(menuHelpAbout);
 		menuHelpAbout.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				helpAbout();
@@ -808,7 +764,6 @@ public class Supremica
 
 	public void initToolbar()
 	{
-
 		Insets tmpInsets = new Insets(0, 0, 0, 0);
 
 		if (WorkbenchProperties.fileAllowOpen())
@@ -824,7 +779,6 @@ public class Supremica
 			openButton.setIcon(open16Img);
 			openButton.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileOpen(getGui());
@@ -845,7 +799,6 @@ public class Supremica
 			saveButton.setIcon(save16Img);
 			saveButton.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileSave(getGui());
@@ -861,7 +814,6 @@ public class Supremica
 			saveAsButton.setIcon(saveAs16Img);
 			saveAsButton.addActionListener(new ActionListener()
 			{
-
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.fileSaveAs(getGui());
@@ -883,7 +835,6 @@ public class Supremica
 		editButton.setIcon(edit16Img);
 		editButton.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				toolsAutomataEditor();
@@ -951,7 +902,6 @@ public class Supremica
 	 */
 	public Collection getSelectedAutomataAsCollection()
 	{
-
 		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
 		LinkedList selectedAutomata = new LinkedList();
 
@@ -976,7 +926,6 @@ public class Supremica
 
 	public Automata getSelectedAutomata()
 	{
-
 		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
 		Automata selectedAutomata = new Automata();
 
@@ -1007,7 +956,6 @@ public class Supremica
 
 	public void renameProject()
 	{
-
 		String newName = getNewProjectName();
 
 		if (newName != null)
@@ -1020,7 +968,6 @@ public class Supremica
 	// Help.About action performed
 	public void helpAbout()
 	{
-
 		AboutBox dlg = new AboutBox(this);
 		Dimension dlgSize = dlg.getPreferredSize();
 		Dimension frmSize = getSize();
@@ -1034,7 +981,6 @@ public class Supremica
 	// Overridden so we can exit when window is closed
 	protected void processWindowEvent(WindowEvent e)
 	{
-
 		super.processWindowEvent(e);
 
 		if (e.getID() == WindowEvent.WINDOW_CLOSING)
@@ -1045,7 +991,6 @@ public class Supremica
 
 	public String getNewProjectName()
 	{
-
 		String msg = "Enter new project name";
 		boolean finished = false;
 		String newName = "";
@@ -1073,7 +1018,6 @@ public class Supremica
 
 	public String getNewAutomatonName(String msg, String nameSuggestion)
 	{
-
 		boolean finished = false;
 		String newName = "";
 
@@ -1104,7 +1048,6 @@ public class Supremica
 
 	private int getIntegerInDialogWindow(String text)
 	{
-
 		boolean finished = false;
 		String theInteger = "";
 		int theIntValue = -1;
@@ -1144,7 +1087,6 @@ public class Supremica
 
 	public void openAutomataXMLFile(File file)
 	{
-
 		Automata currAutomata = null;
 
 		thisCategory.info("Opening " + file.getAbsolutePath() + " ...");
@@ -1153,7 +1095,7 @@ public class Supremica
 		{
 			currAutomata = AutomataBuildFromXml.build(file);
 		}
-		catch (Exception e)		// this exception is caught while opening
+		catch (Exception e)    // this exception is caught while opening
 		{
 			thisCategory.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
 
@@ -1204,7 +1146,6 @@ public class Supremica
 
 	public void importValidFile(File file)
 	{
-
 		thisCategory.info("Importing " + file.getAbsolutePath() + " ...");
 
 		// int nbrOfAddedAutomata = 0;
@@ -1235,7 +1176,6 @@ public class Supremica
 
 	public int addAutomata(Automata currAutomata)
 	{
-
 		int nbrOfAddedAutomata = 0;
 		Iterator autIt = currAutomata.iterator();
 
@@ -1269,7 +1209,7 @@ public class Supremica
 
 			if (autName == null)
 			{
-				return false;		// not added
+				return false;    // not added
 			}
 			else
 			{
@@ -1306,9 +1246,9 @@ public class Supremica
 
 		try
 		{
-			theAutomatonContainer.add(currAutomaton);		// throws Exception if the automaton already exists
+			theAutomatonContainer.add(currAutomaton);    // throws Exception if the automaton already exists
 		}
-		catch (Exception excp)		// should never occur, we test for this condition already
+		catch (Exception excp)    // should never occur, we test for this condition already
 		{
 			thisCategory.error("Error while adding: " + excp.getMessage());
 		}

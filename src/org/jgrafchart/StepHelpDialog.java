@@ -1,26 +1,19 @@
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
-
 import com.nwoods.jgo.*;
-
 
 public class StepHelpDialog
 	extends JDialog
 {
-
 	JPanel panel1 = new JPanel();
 	JTextArea nameField = new JTextArea();
 	JButton OKButton = new JButton();
 
 	public StepHelpDialog(Frame frame, GCView view)
 	{
-
 		super(frame, "Action Help", true);
 
 		try
@@ -42,13 +35,11 @@ public class StepHelpDialog
 
 	private final void init()
 	{
-
 		panel1.setLayout(null);
 		panel1.setMinimumSize(new Dimension(4600, 540));
 		panel1.setPreferredSize(new Dimension(450, 540));
 		OKButton.addActionListener(new java.awt.event.ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				OnOK();
@@ -102,10 +93,9 @@ public class StepHelpDialog
 
 	void OnOK()
 	{
-
 		try
 		{
-			this.dispose();		// Free system resources
+			this.dispose();    // Free system resources
 		}
 		catch (Exception e) {}
 	}

@@ -49,24 +49,17 @@
  */
 package org.supremica.petrinet.algorithms;
 
-
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.petrinet.*;
-
 
 public class PetriNetToDsx
 {
-
 	private PetriNet pn;
 
 	public PetriNetToDsx(PetriNet pn)
 		throws Exception
 	{
-
 		this.pn = pn;
 
 		if (pn.hasInhibitorArcs())
@@ -78,7 +71,6 @@ public class PetriNetToDsx
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-
 		pw.println("PETRINET;");
 		pw.println("number of places: " + pn.nbrOfPlaces());
 		pw.println("number of transitions: " + pn.nbrOfTransitions());
@@ -209,7 +201,6 @@ public class PetriNetToDsx
 	public static void main(String args[])
 		throws Exception
 	{
-
 		PetriNet firstPetriNet = new PetriNet("firstPetriNet");
 		Place p1 = new Place("p1");
 		Place p2 = new Place("p2");

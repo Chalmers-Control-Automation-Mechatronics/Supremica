@@ -1,19 +1,13 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 
 public class ExceptionTransitionInPort
 	extends JGoPort
 {
-
 	public ExceptionTransitionInPort()
 	{
-
 		super();
 
 		setSelectable(false);

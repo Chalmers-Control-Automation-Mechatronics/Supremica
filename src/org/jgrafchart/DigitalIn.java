@@ -1,16 +1,11 @@
 package org.jgrafchart;
 
-
-
 import com.nwoods.jgo.*;
-
 import java.awt.*;
-
 import java.util.*;
 
 // import se.lth.control.realtime.*;
 import org.jgrafchart.io.*;
-
 
 /**
  * A DigitalIn is an Area containing a JGoStroke and two text labels
@@ -19,7 +14,6 @@ public class DigitalIn
 	extends JGoArea
 	implements Readable
 {
-
 	static protected int digitalInputCounter = 0;
 	protected JGoStroke myBorder = null;
 	public JGoText myIntext = null;
@@ -46,7 +40,6 @@ public class DigitalIn
 
 	public DigitalIn(Point loc)
 	{
-
 		super();
 
 		setSize(80, 60);
@@ -115,7 +108,6 @@ public class DigitalIn
 
 	public JGoObject copyObject(JGoCopyEnvironment env)
 	{
-
 		DigitalIn newobj = (DigitalIn) super.copyObject(env);
 
 		return newobj;
@@ -123,7 +115,6 @@ public class DigitalIn
 
 	public void copyChildren(JGoArea newarea, JGoCopyEnvironment env)
 	{
-
 		DigitalIn newobj = (DigitalIn) newarea;
 
 		if (myBorder != null)
@@ -179,7 +170,6 @@ public class DigitalIn
 
 	public void layoutChildren()
 	{
-
 		if (myBorder == null)
 		{
 			return;
@@ -224,7 +214,6 @@ public class DigitalIn
 
 	public void compile()
 	{
-
 		if (!((GCDocument) getDocument()).isSimulating())
 		{
 			int newChan = Integer.parseInt(myChannel.getText());
@@ -248,7 +237,6 @@ public class DigitalIn
 
 	public void readInput()
 	{
-
 		oldval = val;
 
 		if (((GCDocument) getDocument()).isSimulating())
@@ -294,7 +282,6 @@ public class DigitalIn
 
 	public void initialize()
 	{
-
 		compile();
 
 		if (((GCDocument) getDocument()).isSimulating())
@@ -343,7 +330,6 @@ public class DigitalIn
 
 	public boolean doMouseDblClick(int mod, java.awt.Point dc, java.awt.Point vc, JGoView view)
 	{
-
 		String s = myValue.getText();
 
 		if (s.compareTo("0") == 0)

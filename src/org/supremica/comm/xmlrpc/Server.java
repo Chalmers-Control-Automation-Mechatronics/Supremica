@@ -49,29 +49,21 @@
  */
 package org.supremica.comm.xmlrpc;
 
-
-
 import java.util.*;
-
 import java.io.*;
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.gui.*;
-
 import helma.xmlrpc.*;
-
 
 public class Server
 {
-
 	private AutomatonContainer container;
 	private WebServer theServer;
 
 	public Server(AutomatonContainer container, int port)
 		throws Exception
 	{
-
 		this.container = container;
 		theServer = new WebServer(port);
 
@@ -80,7 +72,6 @@ public class Server
 
 	public Vector getAutomataIdentities()
 	{
-
 		Vector theIdentities = new Vector();
 		Iterator autIt = container.automatonIterator();
 
@@ -130,7 +121,6 @@ public class Server
 	public void addAutomata(String automataXmlEncoding)
 		throws XmlRpcException
 	{
-
 		StringReader reader = new StringReader(automataXmlEncoding);
 		Automata theAutomata;
 
@@ -163,7 +153,6 @@ public class Server
 	public void removeAutomata(Vector automataIdentities)
 		throws XmlRpcException
 	{
-
 		for (int i = 0; i < automataIdentities.size(); i++)
 		{
 			String currName = (String) automataIdentities.get(i);

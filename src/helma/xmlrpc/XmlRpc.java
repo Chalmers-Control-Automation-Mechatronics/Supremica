@@ -5,16 +5,10 @@
  */
 package helma.xmlrpc;
 
-
-
 import java.io.*;
-
 import java.util.*;
-
 import java.text.*;
-
 import org.xml.sax.*;
-
 
 /**
  * This abstract base class provides basic capabilities for XML-RPC, like parsing of parameters
@@ -27,7 +21,6 @@ import org.xml.sax.*;
 public abstract class XmlRpc
 	extends HandlerBase
 {
-
 	public static final String version = "helma XML-RPC 1.0";
 	String methodName;
 
@@ -44,7 +37,7 @@ public abstract class XmlRpc
 		saxDrivers.put("oracle1", "oracle.xml.parser.XMLParser");
 		saxDrivers.put("oracle2", "oracle.xml.parser.v2.SAXParser");
 		saxDrivers.put("openxml", "org.openxml.parser.XMLSAXParser");
-		saxDrivers.put("sun", "com.sun.xml.parser.Parser");		// Added by ka
+		saxDrivers.put("sun", "com.sun.xml.parser.Parser");    // Added by ka
 	}
 
 	// the stack we're parsing our values into.
@@ -108,7 +101,6 @@ public abstract class XmlRpc
 	public static void setDriver(String driver)
 		throws ClassNotFoundException
 	{
-
 		String parserClassName = null;
 
 		try
@@ -206,7 +198,7 @@ public abstract class XmlRpc
 
 			// try to get the name of the SAX driver from the System properties
 			// setDriver (System.getProperty ("sax.driver", "org.openxml.parser.XMLSAXParser"));
-			setDriver(System.getProperty("sax.driver", "com.sun.xml.parser.Parser"));		// By Ka
+			setDriver(System.getProperty("sax.driver", "com.sun.xml.parser.Parser"));    // By Ka
 		}
 
 		Parser parser = null;
@@ -238,7 +230,6 @@ public abstract class XmlRpc
 	 */
 	void writeObject(Object what, XmlWriter writer)
 	{
-
 		writer.startElement("value");
 
 		if (what == null)
@@ -345,7 +336,6 @@ public abstract class XmlRpc
 	public void characters(char ch[], int start, int length)
 		throws SAXException
 	{
-
 		if (!readCdata)
 		{
 			return;
@@ -360,7 +350,6 @@ public abstract class XmlRpc
 	public void endElement(String name)
 		throws SAXException
 	{
-
 		if (debug)
 		{
 			System.err.println("endElement: " + name);
@@ -433,7 +422,6 @@ public abstract class XmlRpc
 	public void startElement(String name, AttributeList atts)
 		throws SAXException
 	{
-
 		if (debug)
 		{
 			System.err.println("startElement: " + name);
@@ -526,7 +514,6 @@ public abstract class XmlRpc
 	public void error(SAXParseException e)
 		throws SAXException
 	{
-
 		System.err.println("Error parsing XML: " + e);
 
 		errorLevel = RECOVERABLE;
@@ -536,7 +523,6 @@ public abstract class XmlRpc
 	public void fatalError(SAXParseException e)
 		throws SAXException
 	{
-
 		System.err.println("Fatal error parsing XML: " + e);
 
 		errorLevel = FATAL;
@@ -548,7 +534,6 @@ public abstract class XmlRpc
 	 */
 	class Value
 	{
-
 		int type;
 		Object value;
 
@@ -570,7 +555,6 @@ public abstract class XmlRpc
 		 */
 		public void endElement(Value child)
 		{
-
 			if (type == ARRAY)
 			{
 				array.addElement(child.value);
@@ -607,7 +591,6 @@ public abstract class XmlRpc
 		 */
 		public void characterData(String cdata)
 		{
-
 			switch (type)
 			{
 
@@ -669,7 +652,6 @@ public abstract class XmlRpc
 	// A quick and dirty XML writer.
 	class XmlWriter
 	{
-
 		StringBuffer buf;
 		String enc;
 
@@ -682,7 +664,6 @@ public abstract class XmlRpc
 
 		public XmlWriter(StringBuffer buf, String enc)
 		{
-
 			this.buf = buf;
 			this.enc = enc;
 
@@ -694,7 +675,6 @@ public abstract class XmlRpc
 
 		public void startElement(String elem)
 		{
-
 			buf.append("<");
 			buf.append(elem);
 			buf.append(">");
@@ -702,7 +682,6 @@ public abstract class XmlRpc
 
 		public void endElement(String elem)
 		{
-
 			buf.append("</");
 			buf.append(elem);
 			buf.append(">");
@@ -710,7 +689,6 @@ public abstract class XmlRpc
 
 		public void emptyElement(String elem)
 		{
-
 			buf.append("<");
 			buf.append(elem);
 			buf.append("/>");
@@ -718,7 +696,6 @@ public abstract class XmlRpc
 
 		public void chardata(String text)
 		{
-
 			int l = text.length();
 
 			for (int i = 0; i < l; i++)
@@ -768,7 +745,6 @@ public abstract class XmlRpc
 // wraps a DateFormat because it's not threadsafe
 class Formatter
 {
-
 	private DateFormat f;
 
 	public Formatter()

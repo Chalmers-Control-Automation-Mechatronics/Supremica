@@ -49,16 +49,12 @@
  */
 package org.supremica.gui.editor;
 
-
-
 import com.nwoods.jgo.layout.JGoRandomAutoLayout;
 import com.nwoods.jgo.layout.JGoNetwork;
-
 
 public class SimpleRAL
 	extends JGoRandomAutoLayout
 {
-
 	public SimpleRAL()
 	{
 		super();

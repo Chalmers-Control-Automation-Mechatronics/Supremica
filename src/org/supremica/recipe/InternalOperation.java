@@ -49,14 +49,10 @@
  */
 package org.supremica.recipe;
 
-
-
 import java.util.*;
-
 
 public class InternalOperation
 {
-
 	private LinkedList prevTransitions = new LinkedList();
 	private LinkedList nextTransitions = new LinkedList();
 	private ArrayList resourceCandidates = new ArrayList();
@@ -72,7 +68,6 @@ public class InternalOperation
 
 	public InternalOperation(InternalOperation orgOperation)
 	{
-
 		identity = orgOperation.identity;
 		activeResource = orgOperation.activeResource;
 		time = orgOperation.time;
@@ -131,7 +126,6 @@ public class InternalOperation
 
 	public void addResourceCandidates(Iterator resourceIt)
 	{
-
 		while (resourceIt.hasNext())
 		{
 			String resource = (String) resourceIt.next();
@@ -188,7 +182,6 @@ public class InternalOperation
 
 	public String toString()
 	{
-
 		StringBuffer sb = new StringBuffer();
 
 		sb.append("InternalOperation: " + identity + " initial: " + isInitial() + " final: " + isFinal() + "\n");

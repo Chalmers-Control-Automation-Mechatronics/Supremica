@@ -1,13 +1,8 @@
 package helma.xmlrpc;
 
-
-
 import java.io.*;
-
 import java.net.*;
-
 import java.util.*;
-
 
 /**
  * A minimal web server that exclusively handles XML-RPC requests.
@@ -15,7 +10,6 @@ import java.util.*;
 public class WebServer
 	implements Runnable
 {
-
 	XmlRpcServer xmlrpc;
 	private ServerSocket serverSocket;
 	private int port;
@@ -86,7 +80,6 @@ public class WebServer
 	public WebServer(int port, InetAddress add)
 		throws IOException
 	{
-
 		this.port = port;
 		xmlrpc = new XmlRpcServer();
 		accept = new Vector();
@@ -137,7 +130,6 @@ public class WebServer
 	public void acceptClient(String address)
 		throws IllegalArgumentException
 	{
-
 		try
 		{
 			AddressMatcher m = new AddressMatcher(address);
@@ -161,7 +153,6 @@ public class WebServer
 	public void denyClient(String address)
 		throws IllegalArgumentException
 	{
-
 		try
 		{
 			AddressMatcher m = new AddressMatcher(address);
@@ -176,7 +167,6 @@ public class WebServer
 
 	private boolean checkSocket(Socket s)
 	{
-
 		int l = deny.size();
 		byte address[] = s.getInetAddress().getAddress();
 
@@ -210,7 +200,6 @@ public class WebServer
 	 */
 	public void run()
 	{
-
 		try
 		{
 			while (listener != null)
@@ -265,7 +254,6 @@ public class WebServer
 	 */
 	public void shutdown()
 	{
-
 		if (listener != null)
 		{
 			Thread l = listener;
@@ -278,7 +266,6 @@ public class WebServer
 
 	private Runner getRunner()
 	{
-
 		try
 		{
 			return (Runner) threadpool.pop();
@@ -302,7 +289,6 @@ public class WebServer
 	class Runner
 		implements Runnable
 	{
-
 		Thread thread;
 		Connection con;
 		int count;
@@ -310,7 +296,6 @@ public class WebServer
 		public synchronized void handle(Socket socket)
 			throws IOException
 		{
-
 			con = new Connection(socket);
 			count = 0;
 
@@ -324,13 +309,12 @@ public class WebServer
 			{
 
 				// notify();
-				this.notify();		// Modified by ka
+				this.notify();    // Modified by ka
 			}
 		}
 
 		public void run()
 		{
-
 			while (Thread.currentThread() == thread)
 			{
 				con.run();
@@ -352,7 +336,7 @@ public class WebServer
 					{
 
 						// wait ();
-						this.wait();	// Modified by ka
+						this.wait();    // Modified by ka
 					}
 					catch (InterruptedException ir)
 					{
@@ -361,12 +345,11 @@ public class WebServer
 				}
 			}
 		}
-	}		// end class Runner
+	}    // end class Runner
 
 	class Connection
 		implements Runnable
 	{
-
 		private Socket socket;
 		private BufferedInputStream input;
 		private BufferedOutputStream output;
@@ -392,7 +375,6 @@ public class WebServer
 
 		public void run()
 		{
-
 			try
 			{
 				boolean keepalive = false;
@@ -521,7 +503,6 @@ public class WebServer
 		private String readLine()
 			throws IOException
 		{
-
 			if (buffer == null)
 			{
 				buffer = new byte[512];
@@ -555,7 +536,6 @@ public class WebServer
 
 		private void parseAuth(String line)
 		{
-
 			try
 			{
 				byte[] c = Base64.decode(line.substring(21).getBytes());
@@ -571,13 +551,11 @@ public class WebServer
 
 	class AddressMatcher
 	{
-
 		int pattern[];
 
 		public AddressMatcher(String address)
 			throws Exception
 		{
-
 			pattern = new int[4];
 
 			StringTokenizer st = new StringTokenizer(address, ".");
@@ -604,10 +582,9 @@ public class WebServer
 
 		public boolean matches(byte address[])
 		{
-
 			for (int i = 0; i < 4; i++)
 			{
-				if (pattern[i] > 255)		// wildcard
+				if (pattern[i] > 255)    // wildcard
 				{
 					continue;
 				}
@@ -627,7 +604,6 @@ public class WebServer
 class Echo
 	implements XmlRpcHandler
 {
-
 	public Object execute(String method, Vector v)
 		throws Exception
 	{
@@ -639,7 +615,6 @@ class Echo
 class AuthDemo
 	implements AuthenticatedXmlRpcHandler
 {
-
 	public Object execute(String method, Vector v, String user, String password)
 		throws Exception
 	{

@@ -1,16 +1,11 @@
 package org.jgrafchart.Transitions;
 
-
-
 import com.nwoods.jgo.*;
-
 import org.jgrafchart.*;
-
 
 public class TREvdvar
 	extends TRVar
 {
-
 	TREvdvar(int id)
 	{
 		super(id);
@@ -28,7 +23,6 @@ public class TREvdvar
 
 	public boolean evaluate()
 	{
-
 		if (dotX)
 		{
 			return (!((GrafcetObject) in).x && ((GrafcetObject) in).oldx);

@@ -1,31 +1,23 @@
 package org.jgrafchart;
 
-
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 import java.awt.geom.*;
 import java.awt.print.*;
-
 import javax.swing.*;
 import javax.swing.border.*;
-
 import java.util.*;
-
 import com.nwoods.jgo.*;
-
 
 public class DimmerThread
 	extends Thread
 {
-
 	JGoObject step;
 
 	public DimmerThread(JGoObject s)
 	{
-
 		super();
 
 		step = s;
@@ -38,7 +30,6 @@ public class DimmerThread
 
 	public void run()
 	{
-
 		JGoEllipse token;
 
 		if (step instanceof GCStep)
