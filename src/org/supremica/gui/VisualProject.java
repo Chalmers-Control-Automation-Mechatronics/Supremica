@@ -77,6 +77,7 @@ public class VisualProject
 	private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
 	private Animator theAnimator = null;	// Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
+	private SimulatorExecuter theSimulator = null;	// Lazy construction
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
 	private HashMap theAutomatonDocumentContainer = new HashMap();
@@ -461,6 +462,18 @@ public class VisualProject
 		theAnimator.setVisible(true);
 		return theAnimator;
 	}
+
+	public SimulatorExecuter getSimulator()
+		throws Exception
+	{
+		if (theSimulator == null)
+		{
+			theSimulator = new SimulatorExecuter(this);
+		}
+		theSimulator.setVisible(true);
+		return theSimulator;
+	}
+
 
 	public int getSize()
 	{

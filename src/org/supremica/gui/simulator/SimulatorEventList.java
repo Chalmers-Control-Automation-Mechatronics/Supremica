@@ -70,7 +70,6 @@ import org.supremica.automata.LabeledEvent;
 public class SimulatorEventList
 	extends JPanel
 {
-	private boolean forward;
 	private boolean showStateId = false;
 	private Automata theAutomata;
 	private int[] currState;
@@ -78,32 +77,20 @@ public class SimulatorEventList
 	private SimulatorEventListModel eventsList;
 	private JList theList;
 
-	public SimulatorEventList(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper helper, boolean forward)
+	public SimulatorEventList(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper helper)
 	{
 		setLayout(new BorderLayout());
 
 		this.stateViewer = stateViewer;
 		this.theAutomata = helper.getAutomata();
-		this.forward = forward;
-		eventsList = new SimulatorEventListModel(helper, forward);
+		eventsList = new SimulatorEventListModel(helper);
 		theList = new JList(eventsList);
 
 		JScrollPane scrollPanel = new JScrollPane(theList);
 
 		theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		String label;
-
-		if (forward)
-		{
-			label = "Outgoing events";
-		}
-		else
-		{
-			label = "Incoming events";
-		}
-
-		JLabel jLabel = new JLabel(label);
+		JLabel jLabel = new JLabel("Outgoing events");
 
 		// jLabel.setOpaque(true);
 		// jLabel.setBackground(Color.yellow);
@@ -119,6 +106,8 @@ public class SimulatorEventList
 
 					if (index >= 0)
 					{
+						LabeledEvent currEvent = eventsList.getEventAt(index);
+						executeEvent(currEvent);
 						int[] newState = eventsList.getStateAt(index);
 
 						updateStateViewer(newState);
@@ -150,4 +139,10 @@ public class SimulatorEventList
 	{
 		stateViewer.setCurrState(newState);
 	}
+
+	private void executeEvent(LabeledEvent event)
+	{
+		stateViewer.executeEvent(event);
+	}
+
 }

@@ -50,6 +50,7 @@
 package org.supremica.gui.simulator;
 
 import org.supremica.gui.*;
+import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -66,12 +67,20 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.gui.animators.scenebeans.Animator;
+import uk.ac.ic.doc.scenebeans.event.AnimationListener;
+import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
+import uk.ac.ic.doc.scenebeans.animation.Animation;
+import uk.ac.ic.doc.scenebeans.animation.CommandException;
+import org.supremica.automata.execution.*;
+
 
 public class SimulatorExecuter
 	extends JFrame
-	implements AutomatonListener
+	implements AutomatonListener, AnimationListener
 {
-	private Automata theAutomata;
+	private static Logger logger = LoggerFactory.createLogger(SimulatorExecuter.class);
+
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
@@ -79,23 +88,41 @@ public class SimulatorExecuter
 	private SimulatorExecuterController controller;
 	private AutomataSynchronizerHelper helper;
 	private AutomataOnlineSynchronizer onlineSynchronizer;
+	private Actions theActions;
+	private Controls theControls;
+	private VisualProject theProject;
+	private Animator theAnimator;
+	private Animation theAnimation;
 
-	public SimulatorExecuter(Automata theAutomata)
+
+	public SimulatorExecuter(VisualProject theProject)
 		throws Exception
 	{
-		this.theAutomata = theAutomata;
+		this.theProject = theProject;
+		this.theActions = theProject.getActions();
+		this.theControls = theProject.getControls();
+
+		theAnimator = theProject.getAnimator();
+		if (theAnimator == null)
+		{
+			String msg = "Could not open animator: " + theProject.getAnimationPath();
+			logger.error(msg);
+			throw new Exception("Could not open animator: " + theProject.getAnimationPath());
+		}
+
+		theAnimation = theAnimator.getAnimation();
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true);
 
-		helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+		helper = new AutomataSynchronizerHelper(theProject, syncOptions);
 
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
-		int[] initialState = new int[this.theAutomata.size() + 1];
+		int[] initialState = new int[this.theProject.size() + 1];
 
 		// + 1 status field
-		Iterator autIt = this.theAutomata.iterator();
+		Iterator autIt = this.theProject.iterator();
 
 		while (autIt.hasNext())
 		{
@@ -111,7 +138,7 @@ public class SimulatorExecuter
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);
-		theAutomata.getListeners().addListener(this);
+		theProject.getListeners().addListener(this);
 		setBackground(Color.white);
 
 		contentPane = (JPanel) getContentPane();
@@ -120,7 +147,7 @@ public class SimulatorExecuter
 
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		// / setTitle(theAutomaton.getName());
-		setTitle("Animation Executer");
+		setTitle("Simulator");
 		setSize(400, 500);
 
 		// Center the window
@@ -148,8 +175,7 @@ public class SimulatorExecuter
 		});
 		initMenubar();
 
-		// / stateViewer = new StateViewer(theAutomaton);
-		stateViewer = new SimulatorStateViewer(helper);
+		stateViewer = new SimulatorStateViewer(this, helper);
 
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
@@ -196,13 +222,6 @@ public class SimulatorExecuter
 	public void updated(Object o)
 	{
 
-		/*
-		 *  Trams. FIXA!
-		 *  if (o == theAutomata)
-		 *  {
-		 *  stateViewer.goToInitialState();
-		 *  }
-		 */
 	}
 
 	public void stateAdded(Automaton aut, State q)
@@ -234,409 +253,47 @@ public class SimulatorExecuter
 	{
 		updated(aut);
 	}
+
+
+	public void animationEvent(AnimationEvent ev)
+	{
+		logger.info("AnimationEvent: " + ev.getName());
+	}
+
+	public void executeEvent(LabeledEvent event)
+	{
+		String label = event.getLabel();
+
+		if (theControls != null)
+		{
+
+		}
+
+		if (theActions != null)
+		{
+			if (theActions.hasAction(label))
+			{
+				org.supremica.automata.execution.Action currAction = theActions.getAction(label);
+				for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
+				{
+					String currCommand = (String)cmdIt.next();
+					try
+					{
+						theAnimation.invokeCommand(currCommand);
+					}
+					catch (CommandException ex)
+					{
+						logger.error("Execption while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
+					}
+				}
+			}
+		}
+	}
+
+	public void resetAnimation()
+	{
+		theAnimation.reset();
+	}
 }
 
-//DEL//class SimulatorStateViewer
-//DEL//	extends JPanel
-//DEL//{
-//DEL//	private Automata theAutomata;
-//DEL//	private AutomataSynchronizerHelper helper;
-//DEL//	private int[] currState;
-//DEL//	private SimulatorEventList forwardEvents;
-//DEL//	private SimulatorEventList backwardEvents;
-//DEL//	private SimulatorExecuterController controller;
-//DEL//	private AutomataStateDisplayer stateDisplayer;
-//DEL//	private JSplitPane eventSplitter;
-//DEL//	private JSplitPane stateEventSplitter;
-//DEL//	private LinkedList prevStates = new LinkedList();
-//DEL//	private LinkedList nextStates = new LinkedList();
-//DEL//
-//DEL//	public SimulatorStateViewer(AutomataSynchronizerHelper helper)
-//DEL//	{
-//DEL//		setLayout(new BorderLayout());
-//DEL//
-//DEL//		theAutomata = helper.getAutomata();
-//DEL//		this.helper = helper;
-//DEL//		forwardEvents = new SimulatorEventList(this, helper, true);
-//DEL//		backwardEvents = new SimulatorEventList(this, helper, false);
-//DEL//
-//DEL//		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
-//DEL//		stateDisplayer = new AutomataStateDisplayer(this, helper);
-//DEL//		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
-//DEL//
-//DEL//		add(stateEventSplitter, BorderLayout.CENTER);
-//DEL//	}
-//DEL//
-//DEL//	public void initialize()
-//DEL//	{
-//DEL//		eventSplitter.setDividerLocation(0.5);
-//DEL//		stateEventSplitter.setDividerLocation(0.6);
-//DEL//	}
-//DEL//
-//DEL//	public void setCurrState(int[] newState)
-//DEL//	{
-//DEL//		setCurrState(newState, false);
-//DEL//	}
-//DEL//
-//DEL//	private void setCurrState(int[] newState, boolean isUndo)
-//DEL//	{
-//DEL//		if (!isUndo)
-//DEL//		{
-//DEL//			if (currState != null)
-//DEL//			{
-//DEL//				prevStates.addLast(currState);
-//DEL//			}
-//DEL//
-//DEL//			nextStates.clear();
-//DEL//		}
-//DEL//
-//DEL//		currState = newState;
-//DEL//
-//DEL//		update();
-//DEL//	}
-//DEL//
-//DEL//	public void goToInitialState()
-//DEL//	{
-//DEL//		prevStates.clear();
-//DEL//
-//DEL//		currState = null;
-//DEL//
-//DEL//		helper.getCoExecuter().setCurrState(SimulatorExecuterHelper.getInitialState());
-//DEL//		setCurrState(SimulatorExecuterHelper.getInitialState(), false);
-//DEL//	}
-//DEL//
-//DEL//	public void undoState()
-//DEL//	{
-//DEL//		if (prevStates.size() > 0)
-//DEL//		{
-//DEL//			int[] newState = (int[]) prevStates.removeLast();
-//DEL//
-//DEL//			nextStates.addFirst(currState);
-//DEL//			setCurrState(newState, true);
-//DEL//		}
-//DEL//	}
-//DEL//
-//DEL//	public boolean undoEnabled()
-//DEL//	{
-//DEL//		return prevStates.size() > 0;
-//DEL//	}
-//DEL//
-//DEL//	public void redoState()
-//DEL//	{
-//DEL//		if (nextStates.size() > 0)
-//DEL//		{
-//DEL//			int[] newState = (int[]) nextStates.removeFirst();
-//DEL//
-//DEL//			prevStates.addLast(currState);
-//DEL//			setCurrState(newState, true);
-//DEL//		}
-//DEL//	}
-//DEL//
-//DEL//	public boolean redoEnabled()
-//DEL//	{
-//DEL//		return nextStates.size() > 0;
-//DEL//	}
-//DEL//
-//DEL//	public void update()
-//DEL//	{
-//DEL//
-//DEL//		// The order of theese are changed, for states to be properly forbidden...
-//DEL//		forwardEvents.setCurrState(currState);
-//DEL//		backwardEvents.setCurrState(currState);
-//DEL//		stateDisplayer.setCurrState(currState);
-//DEL//		controller.update();
-//DEL//	}
-//DEL//
-//DEL//	public void setController(SimulatorExecuterController controller)
-//DEL//	{
-//DEL//		this.controller = controller;
-//DEL//	}
-//DEL//}
-
-//DEL//class SimulatorEventList
-//DEL//	extends JPanel
-//DEL//{
-//DEL//	private boolean forward;
-//DEL//	private boolean showStateId = false;
-//DEL//	private Automata theAutomata;
-//DEL//	private int[] currState;
-//DEL//	private SimulatorStateViewer stateViewer;
-//DEL//	private SimulatorEventListModel eventsList;
-//DEL//	private JList theList;
-//DEL//
-//DEL//	public SimulatorEventList(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper helper, boolean forward)
-//DEL//	{
-//DEL//		setLayout(new BorderLayout());
-//DEL//
-//DEL//		this.stateViewer = stateViewer;
-//DEL//		this.theAutomata = helper.getAutomata();
-//DEL//		this.forward = forward;
-//DEL//		eventsList = new SimulatorEventListModel(helper, forward);
-//DEL//		theList = new JList(eventsList);
-//DEL//
-//DEL//		JScrollPane scrollPanel = new JScrollPane(theList);
-//DEL//
-//DEL//		theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//DEL//
-//DEL//		String label;
-//DEL//
-//DEL//		if (forward)
-//DEL//		{
-//DEL//			label = "Outgoing events";
-//DEL//		}
-//DEL//		else
-//DEL//		{
-//DEL//			label = "Incoming events";
-//DEL//		}
-//DEL//
-//DEL//		JLabel jLabel = new JLabel(label);
-//DEL//
-//DEL//		// jLabel.setOpaque(true);
-//DEL//		// jLabel.setBackground(Color.yellow);
-//DEL//		add(jLabel, BorderLayout.NORTH);
-//DEL//		add(scrollPanel, BorderLayout.CENTER);
-//DEL//		theList.addMouseListener(new MouseAdapter()
-//DEL//		{
-//DEL//			public void mouseClicked(MouseEvent e)
-//DEL//			{
-//DEL//				if (e.getClickCount() == 2)
-//DEL//				{
-//DEL//					int index = theList.locationToIndex(e.getPoint());
-//DEL//
-//DEL//					if (index >= 0)
-//DEL//					{
-//DEL//						int[] newState = eventsList.getStateAt(index);
-//DEL//
-//DEL//						updateStateViewer(newState);
-//DEL//					}
-//DEL//				}
-//DEL//			}
-//DEL//		});
-//DEL//	}
-//DEL//
-//DEL//	public void setShowStateId(boolean showStateId)
-//DEL//	{
-//DEL//		eventsList.setShowStateId(showStateId);
-//DEL//	}
-//DEL//
-//DEL//	public void setCurrState(int[] currState)
-//DEL//	{
-//DEL//		this.currState = currState;
-//DEL//
-//DEL//		theList.clearSelection();
-//DEL//		update();
-//DEL//	}
-//DEL//
-//DEL//	public void update()
-//DEL//	{
-//DEL//		eventsList.setCurrState(currState);
-//DEL//	}
-//DEL//
-//DEL//	private void updateStateViewer(int[] newState)
-//DEL//	{
-//DEL//		stateViewer.setCurrState(newState);
-//DEL//	}
-//DEL//}
-
-//DEL//class SimulatorEventListModel
-//DEL//	extends AbstractListModel
-//DEL//{
-//DEL//	private int[] currState;
-//DEL//
-//DEL//	// / private ArrayList currArcs = new ArrayList();
-//DEL//	private int[] events;
-//DEL//	private int eventAmount = 0;
-//DEL//	private boolean forward;
-//DEL//	private Automata theAutomata;
-//DEL//	private Alphabet theAlphabet;
-//DEL//	private boolean showState = false;
-//DEL//	private AutomataSynchronizerHelper helper;
-//DEL//
-//DEL//	public SimulatorEventListModel(AutomataSynchronizerHelper helper, boolean forward)
-//DEL//	{
-//DEL//		this.forward = forward;
-//DEL//		this.helper = helper;
-//DEL//		this.theAutomata = helper.getAutomata();
-//DEL//		this.theAlphabet = helper.getAutomaton().getAlphabet();
-//DEL//	}
-//DEL//
-//DEL//	public void setCurrState(int[] currState)
-//DEL//	{
-//DEL//		this.currState = currState;
-//DEL//
-//DEL//		update();
-//DEL//	}
-//DEL//
-//DEL//	public void setShowStateId(boolean showState)
-//DEL//	{
-//DEL//		this.showState = showState;
-//DEL//	}
-//DEL//
-//DEL//	public void update()
-//DEL//	{
-//DEL//		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-//DEL//
-//DEL//		if (forward)
-//DEL//		{
-//DEL//			events = onlineSynchronizer.getOutgoingEvents(currState);
-//DEL//		}
-//DEL//		else
-//DEL//		{
-//DEL//			events = onlineSynchronizer.getIncomingEvents(currState);
-//DEL//		}
-//DEL//
-//DEL//		eventAmount = 0;
-//DEL//
-//DEL//		while (events[eventAmount] != Integer.MAX_VALUE)
-//DEL//		{
-//DEL//			eventAmount++;
-//DEL//		}
-//DEL//
-//DEL//		fireContentsChanged(this, 0, eventAmount - 1);
-//DEL//	}
-//DEL//
-//DEL//	public int getSize()
-//DEL//	{
-//DEL//		return eventAmount;
-//DEL//	}
-//DEL//
-//DEL//	public Object getElementAt(int index)
-//DEL//	{
-//DEL//		org.supremica.automata.LabeledEvent currEvent;
-//DEL//
-//DEL//		try
-//DEL//		{
-//DEL//			currEvent = theAlphabet.getEventWithIndex(events[index]);
-//DEL//		}
-//DEL//		catch (Exception e)
-//DEL//		{
-//DEL//			System.err.println("Error: Could not find event in alphabet!\n");
-//DEL//
-//DEL//			return null;
-//DEL//		}
-//DEL//
-//DEL//		StringBuffer responseString = new StringBuffer();
-//DEL//
-//DEL//		if (!currEvent.isControllable())
-//DEL//		{
-//DEL//			responseString.append("!");
-//DEL//		}
-//DEL//
-//DEL//		responseString.append(currEvent.getLabel());
-//DEL//
-//DEL//		return responseString.toString();
-//DEL//	}
-//DEL//
-//DEL//	public int[] getStateAt(int index)
-//DEL//	{
-//DEL//		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-//DEL//
-//DEL//		return onlineSynchronizer.doTransition(events[index]);
-//DEL//	}
-//DEL//}
-
-
-//DEL//class SimulatorExecuterController
-//DEL//	extends JPanel
-//DEL//{
-//DEL//	private SimulatorStateViewer stateViewer;
-//DEL//	private Automata theAutomata;
-//DEL//	private JButton undoButton;
-//DEL//	private JButton redoButton;
-//DEL//
-//DEL//	public SimulatorExecuterController(SimulatorStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
-//DEL//	{
-//DEL//		setLayout(new BorderLayout());
-//DEL//
-//DEL//		this.stateViewer = stateViewer;
-//DEL//		this.theAutomata = synchHelper.getAutomata();
-//DEL//
-//DEL//		Box redoBox = new Box(BoxLayout.X_AXIS);
-//DEL//
-//DEL//		ImageIcon forwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
-//DEL//		ImageIcon backwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
-//DEL//		ImageIcon homeImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
-//DEL//
-//DEL//		undoButton = new JButton(backwardImg);
-//DEL//		undoButton.setToolTipText("Back");
-//DEL//		redoButton = new JButton(forwardImg);
-//DEL//		redoButton.setToolTipText("Forward");
-//DEL//		JButton resetButton = new JButton(homeImg);
-//DEL//		resetButton.setToolTipText("Go to the initial state");
-//DEL//
-//DEL//		redoBox.add(Box.createHorizontalGlue());
-//DEL//		redoBox.add(Box.createHorizontalGlue());
-//DEL//		redoBox.add(undoButton);
-//DEL//		redoBox.add(Box.createHorizontalGlue());
-//DEL//		redoBox.add(redoButton);
-//DEL//		redoBox.add(Box.createHorizontalGlue());
-//DEL//		redoBox.add(resetButton);
-//DEL//		redoBox.add(Box.createHorizontalGlue());
-//DEL//		redoBox.add(Box.createHorizontalGlue());
-//DEL//
-//DEL//		add(redoBox, BorderLayout.NORTH);
-//DEL//
-//DEL//		undoButton.addActionListener(new ActionListener()
-//DEL//		{
-//DEL//			public void actionPerformed(ActionEvent e)
-//DEL//			{
-//DEL//				undo_actionPerformed(e);
-//DEL//			}
-//DEL//		});
-//DEL//		redoButton.addActionListener(new ActionListener()
-//DEL//		{
-//DEL//			public void actionPerformed(ActionEvent e)
-//DEL//			{
-//DEL//				redo_actionPerformed(e);
-//DEL//			}
-//DEL//		});
-//DEL//		resetButton.addActionListener(new ActionListener()
-//DEL//		{
-//DEL//			public void actionPerformed(ActionEvent e)
-//DEL//			{
-//DEL//				reset_actionPerformed(e);
-//DEL//			}
-//DEL//		});
-//DEL//	}
-//DEL//
-//DEL//	public void reset_actionPerformed(ActionEvent e)
-//DEL//	{
-//DEL//		stateViewer.goToInitialState();
-//DEL//
-//DEL//		// stateViewer.initialize();
-//DEL//	}
-//DEL//
-//DEL//	public void undo_actionPerformed(ActionEvent e)
-//DEL//	{
-//DEL//		stateViewer.undoState();
-//DEL//	}
-//DEL//
-//DEL//	public void redo_actionPerformed(ActionEvent e)
-//DEL//	{
-//DEL//		stateViewer.redoState();
-//DEL//	}
-//DEL//
-//DEL//	public void update()
-//DEL//	{
-//DEL//		undoButton.setEnabled(stateViewer.undoEnabled());
-//DEL//		redoButton.setEnabled(stateViewer.redoEnabled());
-//DEL//	}
-//DEL//}
-
-//DEL//class SimulatorExecuterHelper
-//DEL//{
-//DEL//	private static int[] initialState;
-//DEL//
-//DEL//	public static void setInitialState(int[] state)
-//DEL//	{
-//DEL//		initialState = state;
-//DEL//	}
-//DEL//
-//DEL//	public static int[] getInitialState()
-//DEL//	{
-//DEL//
-//DEL//		// return (int[]) initialState.clone();
-//DEL//		return initialState;
-//DEL//	}
-//DEL//}
 

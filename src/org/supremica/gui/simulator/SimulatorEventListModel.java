@@ -72,19 +72,15 @@ public class SimulatorEventListModel
 	extends AbstractListModel
 {
 	private int[] currState;
-
-	// / private ArrayList currArcs = new ArrayList();
 	private int[] events;
 	private int eventAmount = 0;
-	private boolean forward;
 	private Automata theAutomata;
 	private Alphabet theAlphabet;
 	private boolean showState = false;
 	private AutomataSynchronizerHelper helper;
 
-	public SimulatorEventListModel(AutomataSynchronizerHelper helper, boolean forward)
+	public SimulatorEventListModel(AutomataSynchronizerHelper helper)
 	{
-		this.forward = forward;
 		this.helper = helper;
 		this.theAutomata = helper.getAutomata();
 		this.theAlphabet = helper.getAutomaton().getAlphabet();
@@ -105,15 +101,7 @@ public class SimulatorEventListModel
 	public void update()
 	{
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-
-		if (forward)
-		{
-			events = onlineSynchronizer.getOutgoingEvents(currState);
-		}
-		else
-		{
-			events = onlineSynchronizer.getIncomingEvents(currState);
-		}
+		events = onlineSynchronizer.getOutgoingEvents(currState);
 
 		eventAmount = 0;
 
@@ -132,7 +120,7 @@ public class SimulatorEventListModel
 
 	public Object getElementAt(int index)
 	{
-		org.supremica.automata.LabeledEvent currEvent;
+		LabeledEvent currEvent;
 
 		try
 		{
@@ -157,6 +145,23 @@ public class SimulatorEventListModel
 		return responseString.toString();
 	}
 
+	public LabeledEvent getEventAt(int index)
+	{
+		LabeledEvent currEvent;
+
+		try
+		{
+			currEvent = theAlphabet.getEventWithIndex(events[index]);
+		}
+		catch (Exception e)
+		{
+			System.err.println("Error: Could not find event in alphabet!\n");
+
+			return null;
+		}
+
+		return currEvent;
+	}
 	public int[] getStateAt(int index)
 	{
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();

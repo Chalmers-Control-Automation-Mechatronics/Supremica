@@ -777,13 +777,26 @@ public class Supremica
 		// Project.Animator
 		JMenuItem menuProjectAnimator = new JMenuItem();
 
-		menuProjectAnimator.setText("Show Animator...");
+		menuProjectAnimator.setText("Animator...");
 		menuProject.add(menuProjectAnimator);
 		menuProjectAnimator.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.animator_actionPerformed(getGui());
+			}
+		});
+
+		// Project.Simulator
+		JMenuItem menuProjectSimulator = new JMenuItem();
+
+		menuProjectSimulator.setText("Simulator...");
+		menuProject.add(menuProjectSimulator);
+		menuProjectSimulator.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.simulator_actionPerformed(getGui());
 			}
 		});
 

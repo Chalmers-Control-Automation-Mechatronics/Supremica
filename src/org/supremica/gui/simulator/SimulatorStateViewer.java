@@ -72,6 +72,7 @@ public class SimulatorStateViewer
 	extends JPanel
 {
 	private Automata theAutomata;
+	private VisualProject theProject;
 	private AutomataSynchronizerHelper helper;
 	private int[] currState;
 	private SimulatorEventList forwardEvents;
@@ -82,15 +83,18 @@ public class SimulatorStateViewer
 	private JSplitPane stateEventSplitter;
 	private LinkedList prevStates = new LinkedList();
 	private LinkedList nextStates = new LinkedList();
+	private SimulatorExecuter simulator;
 
-	public SimulatorStateViewer(AutomataSynchronizerHelper helper)
+	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper)
 	{
 		setLayout(new BorderLayout());
 
+		this.simulator = simulator;
+
 		theAutomata = helper.getAutomata();
 		this.helper = helper;
-		forwardEvents = new SimulatorEventList(this, helper, true);
-		backwardEvents = new SimulatorEventList(this, helper, false);
+		forwardEvents = new SimulatorEventList(this, helper);
+		backwardEvents = new SimulatorEventList(this, helper);
 
 		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
 		stateDisplayer = new SimulatorStateDisplayer(this, helper);
@@ -135,6 +139,7 @@ public class SimulatorStateViewer
 
 		helper.getCoExecuter().setCurrState(SimulatorExecuterHelper.getInitialState());
 		setCurrState(SimulatorExecuterHelper.getInitialState(), false);
+		simulator.resetAnimation();
 	}
 
 	public void undoState()
@@ -177,6 +182,11 @@ public class SimulatorStateViewer
 		backwardEvents.setCurrState(currState);
 		stateDisplayer.setCurrState(currState);
 		controller.update();
+	}
+
+	public void executeEvent(LabeledEvent event)
+	{
+		simulator.executeEvent(event);
 	}
 
 	public void setController(SimulatorExecuterController controller)

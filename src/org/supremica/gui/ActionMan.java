@@ -1223,6 +1223,27 @@ public class ActionMan
 		}
 	}
 
+
+	// Project.Simulator action performed
+	public static void simulator_actionPerformed(Gui gui)
+	{
+		try
+		{
+			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+			SimulatorExecuter simulator = currProject.getSimulator();
+			if (simulator != null)
+			{
+				simulator.setVisible(true);
+				simulator.initialize();
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception in Simulator");
+		}
+
+	}
+
 	// Automaton.Minimization action performed
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
