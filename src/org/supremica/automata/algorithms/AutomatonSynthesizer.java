@@ -122,6 +122,24 @@ public class AutomatonSynthesizer
 		return didSomething;
 	}
 
+	private void initializeAcceptingStates()
+	{
+		Iterator stateIt = theAutomaton.stateIterator();
+
+		logger.debug("AutomatonSynthesizer::initializeAcceptingStates");
+
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.isAccepting() && !currState.isForbidden())
+			{
+				acceptingStates.addLast(currState);
+				currState.setCost(State.MIN_COST);
+			}
+		}
+	}
+
 	// Synthesize a controllable and nonblocking supervisor
 	private boolean synthesizeControllableNonblocking()
 		throws Exception
@@ -266,6 +284,8 @@ public class AutomatonSynthesizer
 		boolean newUnsafeStates;
 		LinkedList stateList = new LinkedList();
 
+		initializeAcceptingStates();
+
 		do
 		{
 			stateList = doCoreachable();
@@ -354,10 +374,7 @@ public class AutomatonSynthesizer
 			}
 		}
 
-		if (debugMode)
-		{
-			System.err.println("found " + nbrOfNewUnsafeStates + " new blocking states");
-		}
+		logger.debug("found " + nbrOfNewUnsafeStates + " new blocking states");
 
 		return stateStack; // return the set of non-coreachable states
 	}
@@ -365,10 +382,7 @@ public class AutomatonSynthesizer
 	private boolean doControllable(LinkedList stateStack) // returns true if uncontrollable states found
 		throws Exception
 	{
-		if (debugMode)
-		{
-			System.err.println("doControllable");
-		}
+		logger.debug("AutomatonSynthesizer::doControllable");
 
 		boolean newUnsafeStates = false;
 		int nbrOfNewUnsafeStates = 0;
@@ -406,20 +420,14 @@ public class AutomatonSynthesizer
 			}
 		}
 
-		if (debugMode)
-		{
-			System.err.println("found " + nbrOfNewUnsafeStates + " new uncontrollable states");
-		}
+		logger.debug("found " + nbrOfNewUnsafeStates + " new uncontrollable states");
 
 		return newUnsafeStates;
 	}
 
 	private void doReachable()
 	{
-		if (debugMode)
-		{
-			System.err.println("doReachable");
-		}
+		logger.debug("AutomatonSynthesizer::doReachable");
 
 		theAutomaton.clearVisitedStates();
 
