@@ -14,9 +14,10 @@ public interface IEC_Program
 	void run();
 
 	/* An class implementing IEC_Program should have a constructor
-	 * that takes two arguments. The arguments are two arrays of 
+	 * that takes two arguments. The arguments are two arrays of
 	 * boolean (boolean[]) the first one is representing in signals and
 	 * the second out signals.
 	 */
+
 	// IEC_Program(Array in, Array out);
 }

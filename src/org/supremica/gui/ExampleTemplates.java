@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -62,6 +63,7 @@ public class ExampleTemplates
 	private final TemplateGroup CentralLockExamples = new TemplateGroup(TemplateTypes.CentralLockExample);
 	private final TemplateGroup OperatorSupervisorExamples = new TemplateGroup(TemplateTypes.OperatorSupervisorExample);
 	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
+
 	//private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
 	private static final String extraPrefix = "/includeInJarFile";
 	private List allGroups = new LinkedList();
@@ -76,17 +78,20 @@ public class ExampleTemplates
 		initializeCCSBookExamples();
 		initializeCCSBookExercises();
 		initializeCCSCourseAssignments();
+
 		//initializeCCSCourseAssignmentSolutions();
 		initializeCentralLockExamples();
 		initializeAIPExamples();
 		initializeOperatorSupervisorExamples();
 		initializeOtherExamples();
+
 		//initializeStandardComponents();
 	}
 
 	private void initializeCCSBookExamples()
 	{
 		TemplateGroup thisGroup = CCSBookExamples;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSBookExamples/";
@@ -113,6 +118,7 @@ public class ExampleTemplates
 	private void initializeCCSBookExercises()
 	{
 		TemplateGroup thisGroup = CCSBookExercises;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSBookExercises/";
@@ -131,6 +137,7 @@ public class ExampleTemplates
 	private void initializeCCSCourseAssignments()
 	{
 		TemplateGroup thisGroup = CCSCourseAssignments;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSCourseAssignments/";
@@ -143,6 +150,7 @@ public class ExampleTemplates
 	private void initializeCCSCourseAssignmentSolutions()
 	{
 		TemplateGroup thisGroup = CCSCourseAssignmentSolutions;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/CCSCourseAssignments/solutions/";
@@ -155,6 +163,7 @@ public class ExampleTemplates
 	private void initializeOtherExamples()
 	{
 		TemplateGroup thisGroup = OtherExamples;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OtherExamples/";
@@ -163,8 +172,10 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Flexible manufacturing system", prefix + "flexibleManufacturingSystem.xml"));
 		thisGroup.addItem(new TemplateItem("Robot assembly cell", prefix + "robotAssemblyCell.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacuring cell", prefix + "flexibleManufacturingCell.xml"));
+
 		//thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml")); // A variant of this one is included in the CCSBookExercises above
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicles", prefix + "agv.xml"));
+
 		//thisGroup.addItem(new TemplateItem("Automated Guided Vehicle, immediate events", prefix + "agvImmediate.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
 		thisGroup.addItem(new TemplateItem("Parrow's Protocol", prefix + "parrowsProtocol.xml"));
@@ -183,6 +194,7 @@ public class ExampleTemplates
 	private void initializeAIPExamples()
 	{
 		TemplateGroup thisGroup = AIPExamples;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OtherExamples/";
@@ -205,6 +217,7 @@ public class ExampleTemplates
 	private void initializeCentralLockExamples()
 	{
 		TemplateGroup thisGroup = CentralLockExamples;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OtherExamples/";
@@ -223,6 +236,7 @@ public class ExampleTemplates
 	private void initializeOperatorSupervisorExamples()
 	{
 		TemplateGroup thisGroup = OperatorSupervisorExamples;
+
 		allGroups.add(thisGroup);
 
 		String prefix = extraPrefix + "/OperatorSupervisor/";
@@ -236,12 +250,12 @@ public class ExampleTemplates
 	}
 
 /*
-	private void initializeStandardComponents()
-	{
-		TemplateGroup thisGroup = StandardComponents;
+		private void initializeStandardComponents()
+		{
+				TemplateGroup thisGroup = StandardComponents;
 
-		allGroups.add(thisGroup);
-	}
+				allGroups.add(thisGroup);
+		}
 */
 	public synchronized static ExampleTemplates getInstance()
 	{

@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -62,7 +63,6 @@ public class AutomataToXml
 	implements AutomataSerializer
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToXml.class);
-
 	private Automata automata;
 	private Automaton automaton;
 	private boolean canonical;
@@ -109,7 +109,7 @@ public class AutomataToXml
 			pw.print(" hash=\"" + automata.getHash() + "\"");
 		}
 
-		if ((automata.getComment() != null) && !automata.getComment().equals(""))
+		if ((automata.getComment() != null) &&!automata.getComment().equals(""))
 		{
 			pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment()) + "\"");
 		}
@@ -128,14 +128,17 @@ public class AutomataToXml
 			pw.println("\t<Events>");
 
 			int eventId = 0;
-
 			Iterator eventIt = aut.eventIterator();
+
 			while (eventIt.hasNext())
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
+
 				eventIdMap.put(event, new Integer(eventId));
 				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
+
 				eventId++;
+
 				//--
 				// pw.print("\t\t<Event id=\"" + EncodingHelper.normalize(event.getId()) + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
 				//--
@@ -182,23 +185,27 @@ public class AutomataToXml
 			// Print all states
 			pw.println("\t<States>");
 
-			int stateId = 0; // we need to make up ids
-
+			int stateId = 0;    // we need to make up ids
 			Iterator stateIt = aut.stateIterator();
+
 			while (stateIt.hasNext())
 			{
 				State state = (State) stateIt.next();
-				stateIdMap.put(state, new Integer(stateId)); // The arc must be able to find it fast
-				pw.print("\t\t<State id=\"" + stateId + "\""); // no longer need to normalize
+
+				stateIdMap.put(state, new Integer(stateId));    // The arc must be able to find it fast
+				pw.print("\t\t<State id=\"" + stateId + "\"");    // no longer need to normalize
+
 				stateId++;
+
 				//--
 				// pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
 				//--
-				pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\""); // always print the name
+				pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");    // always print the name
+
 				//--
 				// if (!state.getId().equals(state.getName()))
 				// {
-				// 	pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
+				//      pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
 				// }
 				//--
 				if (state.isInitial())
@@ -246,8 +253,8 @@ public class AutomataToXml
 			{
 				State sourceState = (State) stateIt.next();
 				Object sourceId = stateIdMap.get(sourceState);
-
 				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
+
 				while (outgoingArcsIt.hasNext())
 				{
 					Arc arc = (Arc) outgoingArcsIt.next();
@@ -255,9 +262,11 @@ public class AutomataToXml
 					Object destId = stateIdMap.get(destState);
 					LabeledEvent event = arc.getEvent();
 					Object eventID = eventIdMap.get(event);
+
 					pw.print("\t\t<Transition source=\"" + sourceId);
 					pw.print("\" dest=\"" + destId);
 					pw.println("\" event=\"" + eventID + "\"/>");
+
 					//--
 					// pw.print("\t\t<Transition source=\"" + EncodingHelper.normalize(sourceState.getId()));
 					// pw.print("\" dest=\"" + EncodingHelper.normalize(destState.getId()));
@@ -305,7 +314,9 @@ public class AutomataToXml
 	public boolean writeCost(boolean b)
 	{
 		boolean old = includeCost;
+
 		includeCost = b;
+
 		return old;
 	}
 }

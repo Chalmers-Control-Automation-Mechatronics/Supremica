@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -74,13 +75,13 @@ public class SimulatorExecuter
 	implements AutomatonListener, AnimationListener
 {
 	private static Logger logger = LoggerFactory.createLogger(SimulatorExecuter.class);
-
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private SimulatorStateViewer stateViewer;
 	private SimulatorExecuterController controller;
 	private AutomataSynchronizerHelper helper;
+
 	//private AutomataOnlineSynchronizer onlineSynchronizer;
 	private AutomataSynchronizerExecuter onlineSynchronizer;
 	private Actions theActions;
@@ -97,30 +98,33 @@ public class SimulatorExecuter
 		this.theProject = theProject;
 		this.theActions = theProject.getActions();
 		this.theControls = theProject.getControls();
-
 		theAnimator = theProject.getAnimator();
+
 		if (theAnimator == null)
 		{
 			String msg = "Could not open animator: " + theProject.getAnimationURL();
+
 			logger.error(msg);
+
 			throw new Exception("Could not open animator: " + theProject.getAnimationURL());
 		}
-		
+
 		theAnimation = theAnimator.getAnimation();
+
 		theAnimation.addAnimationListener(this);
-		
+
 		theAnimationSignals = new AnimationSignals(theAnimation);
-		
+
 		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
+
 		//SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true, false);
-		
 		helper = new AutomataSynchronizerHelper(theProject, syncOptions);
-		
+
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
 		int[] initialState = AutomataIndexFormHelper.createState(this.theProject.size());
-		
+
 		// + 1 status field
 		Iterator autIt = this.theProject.iterator();
 
@@ -135,11 +139,14 @@ public class SimulatorExecuter
 
 		//onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
 		onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
+
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 
 		currState = initialState;
+
 		helper.setCoExecuter(onlineSynchronizer);
+
 		//theProject.getListeners().addListener(this);
 		setBackground(Color.white);
 
@@ -182,8 +189,10 @@ public class SimulatorExecuter
 
 		//controller = new ExplorerController(stateViewer, theAutomaton);
 		controller = new SimulatorExecuterController(stateViewer, useExternalExecuter);
+
 		contentPane.add(controller, BorderLayout.SOUTH);
 		stateViewer.setController(controller);
+
 		//stateViewer.goToInitialState();
 		update();
 	}
@@ -223,17 +232,16 @@ public class SimulatorExecuter
 	private void close()
 	{
 		setVisible(false);
+
 		if (stateViewer != null)
 		{
 			stateViewer.close();
 		}
+
 		dispose();
 	}
 
-	public void updated(Object o)
-	{
-
-	}
+	public void updated(Object o) {}
 
 	public void stateAdded(Automaton aut, State q)
 	{
@@ -267,6 +275,7 @@ public class SimulatorExecuter
 
 	public void animationEvent(AnimationEvent ev)
 	{
+
 		//logger.info("AnimationEvent: " + ev.getName());
 	}
 
@@ -286,36 +295,35 @@ public class SimulatorExecuter
 	}
 
 /*
-	protected void updateSignals()
-	{
-		theAnimationSignals.updateSignals();
-	}
+		protected void updateSignals()
+		{
+				theAnimationSignals.updateSignals();
+		}
 */
-
 	public boolean executeEvent(LabeledEvent event)
 	{
 		String label = event.getLabel();
 
-		if (theControls != null)
-		{
-		}
+		if (theControls != null) {}
 
 		if (theActions != null)
 		{
 			if (theActions.hasAction(label))
 			{
 				org.supremica.automata.execution.Action currAction = theActions.getAction(label);
-				for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
+
+				for (Iterator cmdIt = currAction.commandIterator();
+						cmdIt.hasNext(); )
 				{
-					Command currCommand = (Command)cmdIt.next();
+					Command currCommand = (Command) cmdIt.next();
+
 					try
 					{
 						theAnimation.invokeCommand(currCommand.getLabel());
 					}
 					catch (CommandException ex)
 					{
-						logger.error("Exception while executing command: " + 
-									 currCommand + "\nMessage: " + ex.getMessage());
+						logger.error("Exception while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
 						logger.debug(ex.getStackTrace());
 					}
 				}
@@ -324,9 +332,11 @@ public class SimulatorExecuter
 
 		// Update the state here
 		onlineSynchronizer.setCurrState(currState);
+
 		if (onlineSynchronizer.isEnabled(event))
 		{
 			currState = onlineSynchronizer.doTransition(currState, event);
+
 			// return onlineSynchronizer.doTransition(events[index]);
 			update();
 		}
@@ -334,11 +344,13 @@ public class SimulatorExecuter
 		{
 			logger.error("The event " + event + " is not enabled");
 		}
+
 		return currState != null;
 	}
 
 	public void resetAnimation()
 	{
+
 		//logger.info("Reset animation");
 		//theAnimator.reset();
 	}
@@ -350,10 +362,7 @@ public class SimulatorExecuter
 
 	public void update()
 	{
+
 		//theAnimationSignals.notifyObservers();
 	}
 }
-
-
-
-

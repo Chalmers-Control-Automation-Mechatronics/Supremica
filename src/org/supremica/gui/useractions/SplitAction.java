@@ -1,3 +1,4 @@
+
 /********************* MakeDeterministicAction.java *****************/
 package org.supremica.gui.useractions;
 
@@ -5,10 +6,9 @@ package org.supremica.gui.useractions;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
+
 //import javax.help.*;
-
 import org.supremica.log.*;
-
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.gui.Gui;
@@ -18,12 +18,12 @@ public class SplitAction
 	extends AbstractAction
 {
 	private static Logger logger = LoggerFactory.createLogger(SplitAction.class);
-
-	private	Automata newautomata;
+	private Automata newautomata;
 
 	public SplitAction()
 	{
 		super("Split Automaton", null);
+
 		putValue(SHORT_DESCRIPTION, "Split automaton in two (experimental)");
 
 		this.newautomata = new Automata();
@@ -37,24 +37,26 @@ public class SplitAction
 		Automata automata = gui.getSelectedAutomata();
 
 		// Iterate over all automata
-		for(Iterator autit = automata.iterator(); autit.hasNext(); )
+		for (Iterator autit = automata.iterator(); autit.hasNext(); )
 		{
-			Automaton automaton = (Automaton)autit.next();
+			Automaton automaton = (Automaton) autit.next();
+
 			split(new Automaton(automaton));
 		}
-		if(newautomata.nbrOfAutomata() > 0)
+
+		if (newautomata.nbrOfAutomata() > 0)
 		{
 			try
 			{
 				ActionMan.gui.addAutomata(newautomata);
+
 				newautomata = new Automata();
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				logger.debug("SplitAction::actionPerformed() -- ", ex);
 				logger.debug(ex.getStackTrace());
 			}
-
 		}
 
 		logger.debug("SplitAction::actionPerformed done");
@@ -63,6 +65,7 @@ public class SplitAction
 	private void split(Automaton automaton)
 	{
 		Automata split = AutomatonSplit.split(automaton);
+
 		newautomata.addAutomata(split);
 	}
 }

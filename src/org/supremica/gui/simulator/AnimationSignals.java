@@ -10,7 +10,6 @@ class AnimationSignals
 	implements AnimationListener
 {
 	private static Logger logger = LoggerFactory.createLogger(AnimationSignals.class);
-
 	private Animation theAnimation;
 	private HashMap theSignals = new HashMap();
 	private LinkedList observers = new LinkedList();
@@ -18,27 +17,35 @@ class AnimationSignals
 	public AnimationSignals(Animation theAnimation)
 	{
 		this.theAnimation = theAnimation;
+
 		theAnimation.addAnimationListener(this);
+
 		Set theEvents = theAnimation.getEventNames();
-		for (Iterator evIt = theEvents.iterator(); evIt.hasNext();)
+
+		for (Iterator evIt = theEvents.iterator(); evIt.hasNext(); )
 		{
-			String currEvent = (String)evIt.next();
+			String currEvent = (String) evIt.next();
+
 			theSignals.put(currEvent, Boolean.TRUE);
 		}
 	}
 
 	public void registerInterest(SignalObserver observer)
 	{
-//		observers.add(observer);
+
+//              observers.add(observer);
 	}
 
 	public synchronized void animationEvent(AnimationEvent ev)
 	{
 		logger.info("AnimationEvent: " + ev.getName());
+
 		String currEvent = ev.getName();
+
 		if (currEvent.charAt(0) == '~')
 		{
 			String currSignal = currEvent.substring(1, currEvent.length());
+
 			logger.info("Setting " + currSignal + " to FALSE");
 			theSignals.put(currSignal, Boolean.FALSE);
 		}
@@ -47,36 +54,40 @@ class AnimationSignals
 			logger.info("Setting " + currEvent + " to TRUE");
 			theSignals.put(currEvent, Boolean.TRUE);
 		}
+
 		//logger.error("Calling notifyObservers");
 		//notifyObservers();
 		//logger.error("Finished Calling notifyObservers");
 	}
+
 /*
-	public void notifyObservers()
-	{
-		for (Iterator obsIt = observers.iterator(); obsIt.hasNext();)
+		public void notifyObservers()
 		{
-			SignalObserver currObserver = (SignalObserver)obsIt.next();
-			currObserver.signalUpdated();
+				for (Iterator obsIt = observers.iterator(); obsIt.hasNext();)
+				{
+						SignalObserver currObserver = (SignalObserver)obsIt.next();
+						currObserver.signalUpdated();
+				}
 		}
-	}
 */
 	public synchronized boolean isTrue(String theSignal)
 	{
-		Boolean currValue = (Boolean)theSignals.get(theSignal);
+		Boolean currValue = (Boolean) theSignals.get(theSignal);
 
 		if (currValue == null)
 		{
 			logger.error("Signal not found: " + theSignal);
+
 			return false;
 		}
+
 		return currValue == Boolean.TRUE;
 	}
 
 /*
-	public void updateSignals()
-	{
+		public void updateSignals()
+		{
 
-	}
+		}
 */
 }

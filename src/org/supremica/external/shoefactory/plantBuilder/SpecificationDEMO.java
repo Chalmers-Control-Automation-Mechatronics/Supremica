@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -54,57 +55,58 @@ public class SpecificationDEMO
 {
 	protected Project theSpec = null;
 	private Alphabet currAlphabet;
-	private int shoeNr,typ;
+	private int shoeNr, typ;
 
 	public SpecificationDEMO(int nr, boolean type)
 	{
 		theSpec = new Project();
 		shoeNr = nr;
 
-		Automaton currShoe = new Automaton("shoeSpec"+nr);
-	  	currShoe.setType(AutomatonType.Specification);
-	   	currAlphabet = currShoe.getAlphabet();
+		Automaton currShoe = new Automaton("shoeSpec" + nr);
+
+		currShoe.setType(AutomatonType.Specification);
+
+		currAlphabet = currShoe.getAlphabet();
 
 		State sInitial = currShoe.createAndAddUniqueState("q");
+
 		sInitial.setInitial(true);
 		sInitial.setAccepting(true);
 		currShoe.setInitialState(sInitial);
-		State s0 = currShoe.createAndAddUniqueState("q");
 
-		LabeledEvent putT0L = new LabeledEvent("Shoe_"+nr+"put_T0L");
-		LabeledEvent getT0R = new LabeledEvent("Shoe_"+nr+"get_T0R");
+		State s0 = currShoe.createAndAddUniqueState("q");
+		LabeledEvent putT0L = new LabeledEvent("Shoe_" + nr + "put_T0L");
+		LabeledEvent getT0R = new LabeledEvent("Shoe_" + nr + "get_T0R");
 
 		currAlphabet.addEvent(putT0L);
 		currAlphabet.addEvent(getT0R);
 
-
-		LabeledEvent putT0R = new LabeledEvent("Shoe_"+nr+"put_T0R");
-		LabeledEvent getT0L = new LabeledEvent("Shoe_"+nr+"get_T0L");
+		LabeledEvent putT0R = new LabeledEvent("Shoe_" + nr + "put_T0R");
+		LabeledEvent getT0L = new LabeledEvent("Shoe_" + nr + "get_T0L");
 
 		currAlphabet.addEvent(putT0R);
 		currAlphabet.addEvent(getT0L);
 
-		LabeledEvent putT1 = new LabeledEvent("Shoe_"+nr+"put_T1");
-		LabeledEvent getT1 = new LabeledEvent("Shoe_"+nr+"get_T1");
+		LabeledEvent putT1 = new LabeledEvent("Shoe_" + nr + "put_T1");
+		LabeledEvent getT1 = new LabeledEvent("Shoe_" + nr + "get_T1");
 
 		currAlphabet.addEvent(putT1);
 		currAlphabet.addEvent(getT1);
 
-		LabeledEvent putT2 = new LabeledEvent("Shoe_"+nr+"put_T2");
-		LabeledEvent getT2 = new LabeledEvent("Shoe_"+nr+"get_T2");
+		LabeledEvent putT2 = new LabeledEvent("Shoe_" + nr + "put_T2");
+		LabeledEvent getT2 = new LabeledEvent("Shoe_" + nr + "get_T2");
 
 		currAlphabet.addEvent(putT2);
 		currAlphabet.addEvent(getT2);
 
-
-		LabeledEvent putT1S0 = new LabeledEvent("Shoe_"+nr+"put_T1_S0");
-		LabeledEvent getT1S0 = new LabeledEvent("Shoe_"+nr+"get_T1_S0");
+		LabeledEvent putT1S0 = new LabeledEvent("Shoe_" + nr + "put_T1_S0");
+		LabeledEvent getT1S0 = new LabeledEvent("Shoe_" + nr + "get_T1_S0");
 
 		currAlphabet.addEvent(putT1S0);
 		currAlphabet.addEvent(getT1S0);
 
-		LabeledEvent putT2S1 = new LabeledEvent("Shoe_"+nr+"put_T2_S1");
-		LabeledEvent getT2S1 = new LabeledEvent("Shoe_"+nr+"get_T2_S1");
+		LabeledEvent putT2S1 = new LabeledEvent("Shoe_" + nr + "put_T2_S1");
+		LabeledEvent getT2S1 = new LabeledEvent("Shoe_" + nr + "get_T2_S1");
 
 		currAlphabet.addEvent(putT2S1);
 		currAlphabet.addEvent(getT2S1);
@@ -120,43 +122,40 @@ public class SpecificationDEMO
 		State s8 = currShoe.createAndAddUniqueState("q");
 		State s9 = currShoe.createAndAddUniqueState("q");
 		State s10 = currShoe.createAndAddUniqueState("q");
+		Arc putArc0 = new Arc(s0, s1, getT0R);
 
-
-		Arc putArc0 = new Arc(s0,s1, getT0R);
-
-		if(type)
+		if (type)
 		{
-			Arc putArc1 = new Arc(s1,s2, putT1);
-			Arc putArc2 = new Arc(s2,s3, getT1S0);
-			Arc putArc3 = new Arc(s3,s4, putT1S0);
-			Arc putArc4 = new Arc(s4,s5, getT1);
-			Arc putArc5 = new Arc(s5,s6, putT2);
-			Arc putArc6 = new Arc(s6,s7, getT2S1);
-			Arc putArc7 = new Arc(s7,s8, putT2S1);
-			Arc putArc8 = new Arc(s8,s9, getT2);
-			Arc putArc9 = new Arc(s9,s10, putT0R);
-			Arc putArc10 = new Arc(s10,sInitial, getT0L);
+			Arc putArc1 = new Arc(s1, s2, putT1);
+			Arc putArc2 = new Arc(s2, s3, getT1S0);
+			Arc putArc3 = new Arc(s3, s4, putT1S0);
+			Arc putArc4 = new Arc(s4, s5, getT1);
+			Arc putArc5 = new Arc(s5, s6, putT2);
+			Arc putArc6 = new Arc(s6, s7, getT2S1);
+			Arc putArc7 = new Arc(s7, s8, putT2S1);
+			Arc putArc8 = new Arc(s8, s9, getT2);
+			Arc putArc9 = new Arc(s9, s10, putT0R);
+			Arc putArc10 = new Arc(s10, sInitial, getT0L);
 		}
-
 		else
 		{
-			Arc putArc1 = new Arc(s1,s2, putT2);
-			Arc putArc2 = new Arc(s2,s3, getT2S1);
-			Arc putArc3 = new Arc(s3,s4, putT2S1);
-			Arc putArc4 = new Arc(s4,s5, getT2);
-			Arc putArc5 = new Arc(s5,s6, putT1);
-			Arc putArc6 = new Arc(s6,s7, getT1S0);
-			Arc putArc7 = new Arc(s7,s8, putT1S0);
-			Arc putArc8 = new Arc(s8,s9, getT1);
-			Arc putArc9 = new Arc(s9,s10, putT0R);
-			Arc putArc10 = new Arc(s10,sInitial, getT0L);
-
-		}
-			theSpec.addAutomaton(currShoe);
+			Arc putArc1 = new Arc(s1, s2, putT2);
+			Arc putArc2 = new Arc(s2, s3, getT2S1);
+			Arc putArc3 = new Arc(s3, s4, putT2S1);
+			Arc putArc4 = new Arc(s4, s5, getT2);
+			Arc putArc5 = new Arc(s5, s6, putT1);
+			Arc putArc6 = new Arc(s6, s7, getT1S0);
+			Arc putArc7 = new Arc(s7, s8, putT1S0);
+			Arc putArc8 = new Arc(s8, s9, getT1);
+			Arc putArc9 = new Arc(s9, s10, putT0R);
+			Arc putArc10 = new Arc(s10, sInitial, getT0L);
 		}
 
-		public Project getSpec()
-		{
-			return theSpec;
-		}
+		theSpec.addAutomaton(currShoe);
+	}
+
+	public Project getSpec()
+	{
+		return theSpec;
+	}
 }

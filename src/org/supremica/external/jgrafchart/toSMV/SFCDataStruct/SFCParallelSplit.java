@@ -1,4 +1,5 @@
 package org.supremica.external.jgrafchart.toSMV.SFCDataStruct;
+
 import java.util.*;
 
 public class SFCParallelSplit
@@ -9,7 +10,7 @@ public class SFCParallelSplit
 	List subSplits = new LinkedList();
 	SFCParallelJoin matchingJoin = null;
 
-	public SFCParallelSplit(String id,String prevTransitionId,List nextStepIds)
+	public SFCParallelSplit(String id, String prevTransitionId, List nextStepIds)
 	{
 		this.id = id;
 		this.nextStepIds = nextStepIds;
@@ -38,7 +39,7 @@ public class SFCParallelSplit
 
 	public void addSubSplits(SFCParallelSplit aSubSplit)
 	{
-		if(!subSplits.contains(aSubSplit))
+		if (!subSplits.contains(aSubSplit))
 		{
 			subSplits.add(aSubSplit);
 		}
@@ -63,5 +64,4 @@ public class SFCParallelSplit
 	{
 		return id;
 	}
-
 }

@@ -80,6 +80,7 @@ public class TemplateItem
 		try
 		{
 			URL url = TemplateItem.class.getResource(path);
+
 			//InputStream stream = url.openStream();
 			ProjectBuildFromXml builder = new ProjectBuildFromXml(theFactory);
 			Project theProject = builder.build(url);
@@ -88,6 +89,7 @@ public class TemplateItem
 		}
 		catch (Exception ex)
 		{
+
 			// logger.error("Exception building project." + ex);
 			// logger.debug(ex.getStackTrace());
 			throw ex;

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,12 +47,10 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor.useractions;
 
 import java.awt.event.*;
 import javax.swing.*;
-
 import org.supremica.gui.Supremica;
 import org.supremica.gui.editor.EditorView;
 import org.supremica.gui.VisualProject;
@@ -62,10 +61,11 @@ public class FileAddAction
 	extends EditorAction
 {
 	private static Logger logger = LoggerFactory.createLogger(AbstractAction.class);
-	
+
 	public FileAddAction(EditorView editorView)
 	{
 		super("Add File1", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Add16.gif")), editorView);
+
 		putValue(javax.swing.Action.SHORT_DESCRIPTION, "Add File2");
 		putValue(javax.swing.Action.SMALL_ICON, new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Add16.gif")));
 	}
@@ -75,6 +75,7 @@ public class FileAddAction
 		VisualProject theProject = getVisualProject();
 		String title = theProject.getUniqueAutomatonName();
 		Automaton newAutomaton = new Automaton(title);
+
 		theProject.addAutomaton(newAutomaton);
 		theProject.showInEditor(newAutomaton);
 	}
@@ -83,5 +84,4 @@ public class FileAddAction
 	{
 		return true;
 	}
-
 }

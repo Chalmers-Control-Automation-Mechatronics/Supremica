@@ -1,4 +1,5 @@
 package org.supremica.external.jgrafchart.toSMV.SFCDataStruct;
+
 import java.util.*;
 
 public class SFCStep
@@ -11,19 +12,21 @@ public class SFCStep
 	boolean initialStep;
 	List actions = null;
 
-	public SFCStep(String id,String actionText,boolean isInitialStep)
+	public SFCStep(String id, String actionText, boolean isInitialStep)
 	{
 		this.id = id;
 		this.actionText = actionText;
 		this.initialStep = isInitialStep;
+
 		finalizeActionsList();
 	}
 
-	public SFCStep(String id,String actionText)
+	public SFCStep(String id, String actionText)
 	{
 		this.id = id;
 		this.actionText = actionText;
 		this.initialStep = false;
+
 		finalizeActionsList();
 	}
 
@@ -34,7 +37,7 @@ public class SFCStep
 
 	public boolean isActive()
 	{
-			return active;
+		return active;
 	}
 
 	public String getId()
@@ -47,44 +50,44 @@ public class SFCStep
 		return initialStep;
 	}
 
-
 	/* for listing sfcAction objects based on makeActionsList procedure */
+
 	/*
 	public List getActionsList()
 	{
-		if(actions == null)
-			actions = new LinkedList();
+			if(actions == null)
+					actions = new LinkedList();
 
-		String anActionString = null;
-		String actionType = null;
-		String leftHandSide = null;
-		String rightHandSide = null;
+			String anActionString = null;
+			String actionType = null;
+			String leftHandSide = null;
+			String rightHandSide = null;
 
-		List stringActions = makeActionsList();
-		//System.out.println("String actions are :"+stringActions +" for Step :"+id);
-		Iterator it = stringActions.iterator();
-		while(it.hasNext())
-		{
-			anActionString = (String) it.next();
-			actionType = anActionString.substring(0,1);
-			int eqIndex = anActionString.indexOf("=");
-
-			if(eqIndex != -1)
+			List stringActions = makeActionsList();
+			//System.out.println("String actions are :"+stringActions +" for Step :"+id);
+			Iterator it = stringActions.iterator();
+			while(it.hasNext())
 			{
-				leftHandSide = anActionString.substring(1,eqIndex);
-				rightHandSide = anActionString.substring(eqIndex+1);
-			}
-			else
-			{
-				leftHandSide = anActionString.substring(1);
-				rightHandSide = null;
+					anActionString = (String) it.next();
+					actionType = anActionString.substring(0,1);
+					int eqIndex = anActionString.indexOf("=");
 
-			}
-			SFCAction sfcAction = new SFCAction(actionType,leftHandSide,rightHandSide);
-			actions.add(sfcAction);
-		}
+					if(eqIndex != -1)
+					{
+							leftHandSide = anActionString.substring(1,eqIndex);
+							rightHandSide = anActionString.substring(eqIndex+1);
+					}
+					else
+					{
+							leftHandSide = anActionString.substring(1);
+							rightHandSide = null;
 
-		return actions;
+					}
+					SFCAction sfcAction = new SFCAction(actionType,leftHandSide,rightHandSide);
+					actions.add(sfcAction);
+			}
+
+			return actions;
 
 	}
 	*/
@@ -96,35 +99,40 @@ public class SFCStep
 	/* for listing sfcAction objects based on makeActionsList procedure */
 	public void finalizeActionsList()
 	{
-		if(actions == null)
+		if (actions == null)
+		{
 			actions = new LinkedList();
+		}
 
 		String anActionString = null;
 		String actionType = null;
 		String leftHandSide = null;
 		String rightHandSide = null;
-
 		List stringActions = makeActionsList();
+
 		//System.out.println("String actions are :"+stringActions +" for Step :"+id);
 		Iterator it = stringActions.iterator();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
 			anActionString = (String) it.next();
-			actionType = anActionString.substring(0,1);
+			actionType = anActionString.substring(0, 1);
+
 			int eqIndex = anActionString.indexOf("=");
 
-			if(eqIndex != -1)
+			if (eqIndex != -1)
 			{
-				leftHandSide = anActionString.substring(1,eqIndex);
-				rightHandSide = anActionString.substring(eqIndex+1);
+				leftHandSide = anActionString.substring(1, eqIndex);
+				rightHandSide = anActionString.substring(eqIndex + 1);
 			}
 			else
 			{
 				leftHandSide = anActionString.substring(1);
 				rightHandSide = null;
-
 			}
-			SFCAction sfcAction = new SFCAction(actionType,leftHandSide,rightHandSide);
+
+			SFCAction sfcAction = new SFCAction(actionType, leftHandSide, rightHandSide);
+
 			actions.add(sfcAction);
 		}
 	}
@@ -134,38 +142,43 @@ public class SFCStep
 	{
 		List stringActions = new LinkedList();
 		int start = 0;
-		int index = 1;//just a dummy value
+		int index = 1;    //just a dummy value
 		String action = "";
+
 		actionText = actionText.trim();
-		while(start != actionText.length())
+
+		while (start != actionText.length())
 		{
-			index = actionText.indexOf(';',start);
-			action = actionText.substring(start,index);
-			if(action.trim().length() != 0)
+			index = actionText.indexOf(';', start);
+			action = actionText.substring(start, index);
+
+			if (action.trim().length() != 0)
 			{
 				stringActions.add(action.trim());
 			}
+
 			start = index + 1;
 		}
+
 		return stringActions;
 	}
 
 	public void addAction(SFCAction anAction)
 	{
-		if(actions != null)
+		if (actions != null)
 		{
 			actions.add(anAction);
 		}
 		else
 		{
 			List newActions = new LinkedList();
+
 			newActions.add(anAction);
-			System.out.println("Action has been added after making new list:"+anAction);
+			System.out.println("Action has been added after making new list:" + anAction);
+
 			actions = newActions;
 		}
-
 	}
-
 
 	public void setOutgoingTransitions(List outgoingTransitions)
 	{

@@ -57,8 +57,8 @@ import javax.swing.*;
 import com.nwoods.jgo.*;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-//import org.supremica.gui.VisualProject;
 
+//import org.supremica.gui.VisualProject;
 // Provide a view of a AutomatonDocument
 // Implement various command handlers
 public class AutomatonView
@@ -88,8 +88,9 @@ public class AutomatonView
 	public void initPopups(EditorActions editorActions)
 	{
 		statePopupMenu = new StatePopupMenu(editorActions);
-		//		initLinkPopups();
-//		initNailPopups();
+
+		//              initLinkPopups();
+//              initNailPopups();
 	}
 
 	public void initialize(AutomataEditor app, JInternalFrame frame)
@@ -103,43 +104,41 @@ public class AutomatonView
 		setSnapMove(JGoGridView.SnapJump);
 		showGrid();
 	}
-	
-	
+
 	/*
 	public void initLinkPopups()
 	{
-		// Initialize LinkPopupMenu
-		linkPopupMenu = new JPopupMenu();
+			// Initialize LinkPopupMenu
+			linkPopupMenu = new JPopupMenu();
 
-		JMenuItem deleteItem = new JMenuItem("Add nail");
-		deleteItem.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					actionMan.linkAddNail(e);
-				}
-			});		
-		linkPopupMenu.add(deleteItem);
-		
-		JMenuItem deleteItem = new JMenuItem("Delete");
-		linkPopupMenu.add(deleteItem);
+			JMenuItem deleteItem = new JMenuItem("Add nail");
+			deleteItem.addActionListener(new ActionListener()
+					{
+							public void actionPerformed(ActionEvent e)
+							{
+									actionMan.linkAddNail(e);
+							}
+					});
+			linkPopupMenu.add(deleteItem);
 
-		JMenuItem statusItem = new JMenuItem("Status");
-		linkPopupMenu.add(statusItem);
+			JMenuItem deleteItem = new JMenuItem("Delete");
+			linkPopupMenu.add(deleteItem);
+
+			JMenuItem statusItem = new JMenuItem("Status");
+			linkPopupMenu.add(statusItem);
 	}
 */
 
 /*
-	public void initNailPopups()
-	{
-		// Initialize LinkPopupMenu
-		linkPopupMenu = new JPopupMenu();
+		public void initNailPopups()
+		{
+				// Initialize LinkPopupMenu
+				linkPopupMenu = new JPopupMenu();
 
-		JMenuItem deleteItem = new JMenuItem("Remove nail");
-		linkPopupMenu.add(deleteItem);
-	}	
+				JMenuItem deleteItem = new JMenuItem("Remove nail");
+				linkPopupMenu.add(deleteItem);
+		}
 */
-	
 
 	// convenience method--the return value is a AutomatonDocument instead
 	// of a JGoDocument
@@ -440,8 +439,6 @@ public class AutomatonView
 		return getDoc().isChanged();
 	}
 
-	
-	
 	// an example of how to implement popup menus
 	public boolean doMouseDown(int modifiers, Point dc, Point vc)
 	{
@@ -475,39 +472,41 @@ public class AutomatonView
 
 	public boolean doPopupMenu(int modifiers, Point dc, Point vc)
 	{
-
 		JGoObject obj = pickDocObject(dc, true);
-		
+
 		if (obj == null)
-		{ // Background menu
+		{    // Background menu
 			return true;
 		}
 		else if (obj.getTopLevelObject() instanceof StateNode)
-		{ // State selected
+		{    // State selected
 			statePopupMenu.show(this, vc.x, vc.y);
+
 			return true;
 		}
 		else if (obj.getTopLevelObject() instanceof NailNode)
-		{ // Nail selected
+		{    // Nail selected
 			return true;
 		}
 		else if (obj.getTopLevelObject() instanceof JGoLink)
-		{ // Link selected
+		{    // Link selected
+
 			//linkPopupMenu.show(this, vc.x, vc.y);
 			return true;
 		}
+
 		return false;
 	}
 
-/*	
-	public AutomataEditor getAutomataEditor()
-	{
-		return getApp();
-	}
-	
-	public AutomatonView getAutomatonView()
-	{
-		return this;
-	}
-*/	
+/*
+		public AutomataEditor getAutomataEditor()
+		{
+				return getApp();
+		}
+
+		public AutomatonView getAutomatonView()
+		{
+				return this;
+		}
+*/
 }

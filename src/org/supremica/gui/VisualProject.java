@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -62,9 +63,7 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 import grafchart.sfc.JGrafchartSupremicaEditor;
-
 import org.supremica.properties.SupremicaProperties;
-
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -77,12 +76,12 @@ public class VisualProject
 	private Automata selectedAutomata = null;
 	private AutomataEditor theAutomataEditor = null;    // Lazy construction
 	private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
-	private Animator theAnimator = null;	// Lazy construction
+	private Animator theAnimator = null;    // Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
-	private SimulatorExecuter theSimulator = null;	// Lazy construction
-	private RecipeEditor theRecipeEditor = null;	// Lazy construction
-	private JGrafchartSupremicaEditor theJGrafchartEditor = null;	// Lazy construction
-	private CellEditor theCellEditor = null;	// Lazy construction
+	private SimulatorExecuter theSimulator = null;    // Lazy construction
+	private RecipeEditor theRecipeEditor = null;    // Lazy construction
+	private JGrafchartSupremicaEditor theJGrafchartEditor = null;    // Lazy construction
+	private CellEditor theCellEditor = null;    // Lazy construction
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
 	private HashMap theAutomatonDocumentContainer = new HashMap();
@@ -99,6 +98,7 @@ public class VisualProject
 	public VisualProject(String name)
 	{
 		super(name);
+
 		initialize();
 	}
 
@@ -111,98 +111,125 @@ public class VisualProject
 	public void clear()
 	{
 		super.clear();
+
 		if (theAutomataEditor != null)
 		{
 			theAutomataEditor.setVisible(false);
 			theAutomataEditor.dispose();
+
 			theAutomataEditor = null;
 		}
+
 		if (theAnimator != null)
 		{
 			theAnimator.setVisible(false);
 			theAnimator.dispose();
+
 			theAnimator = null;
 		}
+
 		if (theActionAndControlViewer != null)
 		{
 			theActionAndControlViewer.setVisible(false);
 			theActionAndControlViewer.dispose();
+
 			theActionAndControlViewer = null;
 		}
+
 		projectFile = null;
+
 		setName(null);
 		setComment(null);
 	}
 
 	public void automatonRenamed(Automaton aut, String oldName)
 	{
-		AutomatonViewer theViewer = (AutomatonViewer)theAutomatonViewerContainer.get(oldName);
+		AutomatonViewer theViewer = (AutomatonViewer) theAutomatonViewerContainer.get(oldName);
+
 		if (theViewer != null)
 		{
 			theAutomatonViewerContainer.remove(oldName);
 			theAutomatonViewerContainer.put(aut.getName(), theViewer);
 		}
+
 		AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(oldName);
+
 		if (theExplorer != null)
 		{
 			theAutomatonExplorerContainer.remove(oldName);
 			theAutomatonExplorerContainer.put(aut.getName(), theExplorer);
 		}
+
 		JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(oldName);
+
 		if (theFrame != null)
 		{
 			theAutomatonFrameContainer.remove(oldName);
 			theAutomatonFrameContainer.put(aut.getName(), theFrame);
 		}
+
 		AutomatonDocument theDocument = (AutomatonDocument) theAutomatonDocumentContainer.get(oldName);
+
 		if (theDocument != null)
 		{
 			theAutomatonDocumentContainer.remove(oldName);
 			theAutomatonDocumentContainer.put(aut.getName(), theDocument);
-
 		}
+
 		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(oldName);
+
 		if (theAlphabetViewer != null)
 		{
 			theAlphabetViewerContainer.remove(oldName);
 			theAlphabetViewerContainer.put(aut.getName(), theAlphabetViewer);
 		}
-		super.automatonRenamed(aut, oldName);
 
+		super.automatonRenamed(aut, oldName);
 	}
 
 	public void removeAutomaton(Automaton aut)
 	{
 		super.removeAutomaton(aut);
-		AutomatonViewer theViewer = (AutomatonViewer)theAutomatonViewerContainer.get(aut.getName());
+
+		AutomatonViewer theViewer = (AutomatonViewer) theAutomatonViewerContainer.get(aut.getName());
+
 		if (theViewer != null)
 		{
 			theViewer.setVisible(false);
 			theViewer.dispose();
 			theAutomatonViewerContainer.remove(aut.getName());
 		}
+
 		AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(aut.getName());
+
 		if (theExplorer != null)
 		{
 			theExplorer.setVisible(false);
 			theExplorer.dispose();
 			theAutomatonExplorerContainer.remove(aut.getName());
 		}
+
 		JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(aut.getName());
+
 		if (theFrame != null)
 		{
 			theFrame.setVisible(false);
 			theFrame.dispose();
 			theAutomatonFrameContainer.remove(aut.getName());
 		}
+
 		AutomatonDocument theDocument = (AutomatonDocument) theAutomatonDocumentContainer.get(aut.getName());
+
 		if (theDocument != null)
 		{
+
 			//theDocument.setVisible(false); // Are these necessary
 			//theDocument.dispose();
 			theAutomatonDocumentContainer.remove(aut.getName());
 		}
+
 		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(aut.getName());
+
 		if (theAlphabetViewer != null)
 		{
 			theAlphabetViewer.setVisible(false);
@@ -223,10 +250,10 @@ public class VisualProject
 
 	public void showInEditor(Automaton theAutomaton)
 	{
-		
+
 		//return selectedAutomata;
 	}
-	
+
 	public void clearSelection()
 	{
 		selectedAutomata = null;
@@ -443,7 +470,9 @@ public class VisualProject
 		{
 			theActionAndControlViewer = new ActionAndControlViewer(this);
 		}
+
 		theActionAndControlViewer.setVisible(true);
+
 		return theActionAndControlViewer;
 	}
 
@@ -454,11 +483,14 @@ public class VisualProject
 		{
 			return null;
 		}
+
 		if (theAnimator == null)
 		{
 			theAnimator = AnimationItem.createInstance(getAnimationURL());
 		}
+
 		theAnimator.setVisible(true);
+
 		return theAnimator;
 	}
 
@@ -467,27 +499,29 @@ public class VisualProject
 	{
 		if (theSimulator == null)
 		{
+
 			// ARASH: WAS
 			// theSimulator = new SimulatorExecuter(this, false);
 			theSimulator = new SimulatorExecuter(this, SupremicaProperties.getSimulationIsExternal());
 		}
+
 		theSimulator.setVisible(true);
+
 		return theSimulator;
 	}
 
 /*
-	public SimulatorExecuter getExternalExecuter()
-		throws Exception
-	{
-		if (theSimulator == null)
+		public SimulatorExecuter getExternalExecuter()
+				throws Exception
 		{
-			theSimulator = new SimulatorExecuter(this, true);
+				if (theSimulator == null)
+				{
+						theSimulator = new SimulatorExecuter(this, true);
+				}
+				theSimulator.setVisible(true);
+				return theSimulator;
 		}
-		theSimulator.setVisible(true);
-		return theSimulator;
-	}
 */
-
 	public CellEditor getCellEditor()
 		throws Exception
 	{
@@ -495,7 +529,9 @@ public class VisualProject
 		{
 			theCellEditor = org.supremica.gui.cellEditor.CellEditor.createEditor(this);
 		}
+
 		theCellEditor.setVisible(true);
+
 		return theCellEditor;
 	}
 
@@ -506,55 +542,65 @@ public class VisualProject
 		{
 			theRecipeEditor = org.supremica.gui.recipeEditor.RecipeEditor.createEditor(this);
 		}
+
 		theRecipeEditor.setVisible(true);
+
 		return theRecipeEditor;
 	}
-	
+
 	public JGrafchartSupremicaEditor getJGrafchartEditor()
 	{
 		if (theJGrafchartEditor == null)
 		{
 			String[] args = new String[1];
-			args[0]="";
+
+			args[0] = "";
+
 			JGrafchartSupremicaEditor theEditor = new JGrafchartSupremicaEditor(args);
+
 			grafchart.sfc.Editor.singleton = theEditor;
-			theJGrafchartEditor = theEditor;  
+			theJGrafchartEditor = theEditor;
+
 			//theRecipeEditor = org.supremica.gui.recipeEditor.RecipeEditor.createEditor(this);
 		}
+
 		theJGrafchartEditor.setVisible(true);
+
 		return theJGrafchartEditor;
 	}
-	
-
-
 
 	public void clearSimulationData()
 	{
+
 		/*
 		Actions theActions = getActions();
 		if (theActions != null)
 		{
-			theActions.clear();
+				theActions.clear();
 		}
 		Controls theControls = getControls();
 		if (theControls != null)
 		{
-			theControls.clear();
+				theControls.clear();
 		}*/
-
 		if (theActionAndControlViewer != null)
 		{
 			theActionAndControlViewer.setVisible(false);
+
 			theActionAndControlViewer = null;
 		}
+
 		if (theAnimator != null)
 		{
 			theAnimator.setVisible(false);
+
 			theAnimator = null;
 		}
+
 		if (theSimulator != null)
 		{
 			theSimulator.setVisible(false);
+
 			theSimulator = null;
 		}
 	}
@@ -655,7 +701,7 @@ public class VisualProject
 		}
 
 		public void actionsOrControlsChanged(Automata automata)
-		{ // Do nothing
+		{    // Do nothing
 		}
 
 		public void updated(Object theObject)
@@ -792,7 +838,7 @@ public class VisualProject
 		}
 
 		public void actionsOrControlsChanged(Automata automata)
-		{ // Do nothing
+		{    // Do nothing
 		}
 
 		public void updated(Object theObject)

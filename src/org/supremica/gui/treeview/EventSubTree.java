@@ -1,7 +1,8 @@
+
 /******************** EventSubTree.java *******************/
+
 // An EventSubTree is a tree node with the event name as root
 // and the event properties as children
-
 package org.supremica.gui.treeview;
 
 import javax.swing.*;
@@ -11,28 +12,31 @@ import org.supremica.gui.Supremica;
 public class EventSubTree
 	extends SupremicaTreeNode
 {
-	private static ImageIcon controllableIcon = 
-		new ImageIcon(Supremica.class.getResource("/icons/ControllableEvent16.gif"));
-	private static ImageIcon uncontrollableIcon = 
-		new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));
+	private static ImageIcon controllableIcon = new ImageIcon(Supremica.class.getResource("/icons/ControllableEvent16.gif"));
+	private static ImageIcon uncontrollableIcon = new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));
 
 	public EventSubTree(LabeledEvent event)
 	{
-		super(event);	// Note that this also caches the event for quick access
+		super(event);    // Note that this also caches the event for quick access
 
 		SupremicaTreeNode currControllableNode = new SupremicaTreeNode("controllable: " + event.isControllable());
+
 		add(currControllableNode);
 
 		SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
+
 		add(currPrioritizedNode);
 
 		SupremicaTreeNode currObservableNode = new SupremicaTreeNode("observable: " + event.isObservable());
+
 		add(currObservableNode);
 
 		SupremicaTreeNode currOperatorNode = new SupremicaTreeNode("operator: " + event.isOperator());
+
 		add(currOperatorNode);
 
 		SupremicaTreeNode isEpsilonNode = new SupremicaTreeNode("epsilon: " + event.isEpsilon());
+
 		add(isEpsilonNode);
 	}
 
@@ -47,7 +51,8 @@ public class EventSubTree
 	}
 
 	public Icon getOpenIcon()
-	{		
+	{
+
 		//return null;
 		if (((LabeledEvent) userObject).isControllable())
 		{
@@ -61,6 +66,7 @@ public class EventSubTree
 
 	public Icon getClosedIcon()
 	{
+
 		//return null;
 		return getOpenIcon();
 	}
@@ -70,4 +76,3 @@ public class EventSubTree
 		return ((LabeledEvent) userObject).getLabel();
 	}
 }
-

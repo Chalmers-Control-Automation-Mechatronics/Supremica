@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -56,23 +57,26 @@ import java.awt.event.WindowEvent;
 public class JGrafchartSupremicaEditor
 	extends grafchart.sfc.EditorAPI
 {
-
 	public JGrafchartSupremicaEditor(String[] args)
 	{
 		super(args);
+
 		init();
 	}
+
 	private void init()
 	{
-		setTitle("JGrafchart"); 
-		
+		setTitle("JGrafchart");
+
 		// Remove System.exit when closing window
 		WindowListener[] listeners = getWindowListeners();
+
 		// System.err.println("Nbr of listeners: " + listeners.length);
 		if (listeners.length == 1)
 		{
 			removeWindowListener(listeners[0]);
 		}
+
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
@@ -80,15 +84,15 @@ public class JGrafchartSupremicaEditor
 				exitAction();
 			}
 		});
-		
 		Utility.setupFrame(this, 750, 550);
 	}
+
 /*
-	public void shutDownAction()
-	{
-		exitAction();
-	}		
-*/	
+		public void shutDownAction()
+		{
+				exitAction();
+		}
+*/
 	public void exitAction()
 	{
 		setVisible(false);

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -54,7 +55,6 @@ import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
-
 import org.supremica.util.BDD.Options;
 
 /**
@@ -72,16 +72,10 @@ public final class SupremicaProperties
 
 	/** the last property file used, so we write back changes to the correct config file */
 	private static String lastPropertyFile = null;
-
-
 	private static final String DOC_DB_SERVER_NAME = "docdbHost";
 	private static final String DOC_DB_SERVER_PORT = "docdbPort";
 	private static final String DOC_DB_SERVER_USER = "docdbUser";
-	private static final String DOC_DB_SERVER_DOC  = "docdbDoc";
-
-
-
-
+	private static final String DOC_DB_SERVER_DOC = "docdbDoc";
 	private static final String XML_RPC_ACTIVE = "xmlRpcActive";
 	private static final String XML_RPC_PORT = "xmlRpcPort";
 	private static final String XML_RPC_FILTER = "xmlRpcFilter";
@@ -105,6 +99,7 @@ public final class SupremicaProperties
 	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
 	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
 	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
+
 	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
 	private static final String GENERAL_USE_RCP = "generalUseRcp";
 	private static final String GENERAL_USE_ROBOTCOORDINATION = "generalUseRobotCoordination";
@@ -152,27 +147,24 @@ public final class SupremicaProperties
 	// BDD Options. note that these mirror the stuff in org.supremica.util.BDD.Options
 	private static final String BDD_SHOW_GROW = "bddShowGrowth";
 	private static final String BDD_ALTER_PCG = "bddAlterPCG";
-	private static final String BDD_TRACE_ON  = "bddTraceOn";
-	private static final String BDD_DEBUG_ON  = "bddDebugOn";
-	private static final String BDD_PROFILE_ON  = "bddProfileOn";
+	private static final String BDD_TRACE_ON = "bddTraceOn";
+	private static final String BDD_DEBUG_ON = "bddDebugOn";
+	private static final String BDD_PROFILE_ON = "bddProfileOn";
 	private static final String BDD_ALGORITHM = "bddAlgorithm";
-	private static final String BDD_COUNT_ALGO= "bddCountAlgorithm";
+	private static final String BDD_COUNT_ALGO = "bddCountAlgorithm";
 	private static final String BDD_LOCAL_SATURATION = "bddLocalSaturation";
 	private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
 	private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
 	private static final String BDD_LIB_PATH = "bddLibPath";
-	private static final String BDD_LI_ALGO = "bddLanguageInclusionAlgorithm";	// inclsuion_algorithm
-	private static final String BDD_ORDER_ALGO = "bddAutomataOrderingAlgorithm";	// ordering_algorithm
-	private static final String BDD_AS_HEURISTIC = "bddAutomataSelectionHeuristics";	// as_heuristics
-	private static final String BDD_FRONTIER_TYPE = "bddFrontierType";	// frontier_strategy
-	private static final String BDD_H1 = "bddH1";	// es_heuristics
-	private static final String BDD_H2 = "bddH2";	// ndas_heuristics
-	private static final String BDD_DSSI_HEURISTIC = "bddDelayedStarSelection";	// dssi_heuristics
-	private static final String BDD_PARTITION_MAX = "bddMaxPartitionSize";	// max_partition_size
-	private static final String BDD_ENCODING_ALGO = "bddSatteEncodingAlgorithm";	// encoding_algorithm
-
-
-
+	private static final String BDD_LI_ALGO = "bddLanguageInclusionAlgorithm";    // inclsuion_algorithm
+	private static final String BDD_ORDER_ALGO = "bddAutomataOrderingAlgorithm";    // ordering_algorithm
+	private static final String BDD_AS_HEURISTIC = "bddAutomataSelectionHeuristics";    // as_heuristics
+	private static final String BDD_FRONTIER_TYPE = "bddFrontierType";    // frontier_strategy
+	private static final String BDD_H1 = "bddH1";    // es_heuristics
+	private static final String BDD_H2 = "bddH2";    // ndas_heuristics
+	private static final String BDD_DSSI_HEURISTIC = "bddDelayedStarSelection";    // dssi_heuristics
+	private static final String BDD_PARTITION_MAX = "bddMaxPartitionSize";    // max_partition_size
+	private static final String BDD_ENCODING_ALGO = "bddSatteEncodingAlgorithm";    // encoding_algorithm
 
 	// Simulation stuff
 	private static final String SIMULATION_IS_EXTERNAL = "simulationIsExternal";
@@ -201,15 +193,16 @@ public final class SupremicaProperties
 
 	// ActiveXBridge
 	private static final String USE_ACTIVEX_BRIDGE = "useActiveXBridge";
-
-
 	private Set forbidExternalModification = new HashSet();
 
 	// There is a good reason why we do the initialization like this.
 	// dont touch this code!!      /Arash
 	private static SupremicaProperties wp = null;
-	static {
+
+	static
+	{
 		wp = new SupremicaProperties();
+
 		updateBDDOptions(false);
 	}
 
@@ -222,12 +215,10 @@ public final class SupremicaProperties
 		setProperty(FILE_ALLOW_IMPORT, "true", true);
 		setProperty(FILE_ALLOW_EXPORT, "true", true);
 		setProperty(FILE_ALLOW_QUIT, "true", true);
-
 		setProperty(DOC_DB_SERVER_NAME, "localhost", true);
 		setProperty(DOC_DB_SERVER_PORT, "9111", true);
 		setProperty(DOC_DB_SERVER_USER, "", true);
 		setProperty(DOC_DB_SERVER_DOC, "work", true);
-
 		setProperty(XML_RPC_ACTIVE, "false", true);
 		setProperty(XML_RPC_DEBUG, "false", true);
 		setProperty(XML_RPC_PORT, "9112", true);
@@ -244,6 +235,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
+
 		//setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
@@ -255,7 +247,6 @@ public final class SupremicaProperties
 		setProperty(INCLUDE_JGRAFCHART, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, "false", true);
-
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
 		setProperty(SUPERUSER_IDENTITY, "ESS030", false);
@@ -288,20 +279,17 @@ public final class SupremicaProperties
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", true);
 		setProperty(USE_ACTIVEX_BRIDGE, "false", true);
 		setProperty(SHOW_COORDINATION_ABB, "false", true);
-
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
+
 		// Simulation stuff
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
 	}
 
-
-
 	// --------------------------------------------------------------
-
 	public static void setOption(String name, int value)
 	{
-		 wp.setProperty(name, toString(value));
+		wp.setProperty(name, toString(value));
 	}
 
 	public static void setOption(String name, boolean value)
@@ -317,88 +305,116 @@ public final class SupremicaProperties
 	public static boolean optionAsBoolean(String name, boolean default_)
 	{
 		String got = wp.getProperty(name);
-		return (got == null) ? default_ : toBoolean(got);
-	}
 
+		return (got == null)
+			   ? default_
+			   : toBoolean(got);
+	}
 
 	public static int optionAsInt(String name, int default_)
 	{
 		String got = wp.getProperty(name);
-		return (got == null) ? default_ : toInt(got);
+
+		return (got == null)
+			   ? default_
+			   : toInt(got);
 	}
 
 	public static String optionAsString(String name, String default_)
 	{
-			String got = wp.getProperty(name);
-			return (got == null) ? default_ : got;
+		String got = wp.getProperty(name);
+
+		return (got == null)
+			   ? default_
+			   : got;
 	}
 
-
 	// --------------------------------------------------------------
-
-
 	// ALL OF THIS IS COMING FROM THE JAVA SDK CODE (Properties.java)
-	private static char toHex(int nibble) {
+	private static char toHex(int nibble)
+	{
 		return hexDigit[(nibble & 0xF)];
 	}
 
 	/** A table of hex digits */
-	private static final char[] hexDigit = {
-		'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
-	};
-
-
+	private static final char[] hexDigit = { '0', '1', '2', '3', '4', '5',
+											 '6', '7', '8', '9', 'A', 'B',
+											 'C', 'D', 'E', 'F' };
 	private static final String keyValueSeparators = "=: \t\r\n\f";
-
 	private static final String strictKeyValueSeparators = "=:";
-
 	private static final String specialSaveChars = "=: \t\r\n\f#!";
-
 	private static final String whiteSpaceChars = " \t\r\n\f";
 
-	private static String convert(String theString, boolean escapeSpace) {
+	private static String convert(String theString, boolean escapeSpace)
+	{
 		int len = theString.length();
-		StringBuffer outBuffer = new StringBuffer(len*2);
+		StringBuffer outBuffer = new StringBuffer(len * 2);
 
-		for(int x=0; x<len; x++) {
+		for (int x = 0; x < len; x++)
+		{
 			char aChar = theString.charAt(x);
-			switch(aChar) {
-		case ' ':
-			if (x == 0 || escapeSpace)
-			outBuffer.append('\\');
 
-			outBuffer.append(' ');
-			break;
-				case '\\':outBuffer.append('\\'); outBuffer.append('\\');
-						  break;
-				case '\t':outBuffer.append('\\'); outBuffer.append('t');
-						  break;
-				case '\n':outBuffer.append('\\'); outBuffer.append('n');
-						  break;
-				case '\r':outBuffer.append('\\'); outBuffer.append('r');
-						  break;
-				case '\f':outBuffer.append('\\'); outBuffer.append('f');
-						  break;
-				default:
-					if ((aChar < 0x0020) || (aChar > 0x007e)) {
+			switch (aChar)
+			{
+
+			case ' ' :
+				if ((x == 0) || escapeSpace)
+				{
+					outBuffer.append('\\');
+				}
+
+				outBuffer.append(' ');
+				break;
+
+			case '\\' :
+				outBuffer.append('\\');
+				outBuffer.append('\\');
+				break;
+
+			case '\t' :
+				outBuffer.append('\\');
+				outBuffer.append('t');
+				break;
+
+			case '\n' :
+				outBuffer.append('\\');
+				outBuffer.append('n');
+				break;
+
+			case '\r' :
+				outBuffer.append('\\');
+				outBuffer.append('r');
+				break;
+
+			case '\f' :
+				outBuffer.append('\\');
+				outBuffer.append('f');
+				break;
+
+			default :
+				if ((aChar < 0x0020) || (aChar > 0x007e))
+				{
+					outBuffer.append('\\');
+					outBuffer.append('u');
+					outBuffer.append(toHex((aChar >> 12) & 0xF));
+					outBuffer.append(toHex((aChar >> 8) & 0xF));
+					outBuffer.append(toHex((aChar >> 4) & 0xF));
+					outBuffer.append(toHex(aChar & 0xF));
+				}
+				else
+				{
+					if (specialSaveChars.indexOf(aChar) != -1)
+					{
 						outBuffer.append('\\');
-						outBuffer.append('u');
-						outBuffer.append(toHex((aChar >> 12) & 0xF));
-						outBuffer.append(toHex((aChar >>  8) & 0xF));
-						outBuffer.append(toHex((aChar >>  4) & 0xF));
-						outBuffer.append(toHex( aChar        & 0xF));
-					} else {
-						if (specialSaveChars.indexOf(aChar) != -1)
-							outBuffer.append('\\');
-						outBuffer.append(aChar);
 					}
+
+					outBuffer.append(aChar);
+				}
 			}
 		}
+
 		return outBuffer.toString();
 	}
-
-
-
 
 	/**
 	 * save the property list to the configuration file.
@@ -408,8 +424,7 @@ public final class SupremicaProperties
 	public static final void savePropperties(String name)
 		throws IOException
 	{
-
-		updateBDDOptions(true); // first sync from BDD options
+		updateBDDOptions(true);    // first sync from BDD options
 
 		// CODE STOLEN FROM THE OTIGINAL Properties.java FILE FROM JDK :(
 		OutputStream os = new FileOutputStream(name);
@@ -419,25 +434,32 @@ public final class SupremicaProperties
 		awriter.newLine();
 		awriter.write("#" + new Date().toString());
 		awriter.newLine();
-		for (Enumeration e = wp.keys(); e.hasMoreElements();)
+
+		for (Enumeration e = wp.keys(); e.hasMoreElements(); )
 		{
-			String key = (String)e.nextElement();
-			if(!wp.allowExternalModification(key)) continue; 	// <---- NOTE!
+			String key = (String) e.nextElement();
+
+			if (!wp.allowExternalModification(key))
+			{
+				continue;    // <---- NOTE!
+			}
+
 			key = convert(key, true);
-			String val = convert((String)wp.get(key), false);
+
+			String val = convert((String) wp.get(key), false);
+
 			awriter.write(key + "=" + val);
 			awriter.newLine();
 		}
-        awriter.flush();
+
+		awriter.flush();
 		os.close();
 	}
-
-
 
 	public static final void savePropperties()
 		throws IOException
 	{
-		if(lastPropertyFile != null)
+		if (lastPropertyFile != null)
 		{
 			savePropperties(lastPropertyFile);
 		}
@@ -450,9 +472,11 @@ public final class SupremicaProperties
 	public static final void setProperties(File aFile)
 		throws Exception
 	{
-		lastPropertyFile = aFile.getAbsolutePath(); // save it for later days,,,,
+		lastPropertyFile = aFile.getAbsolutePath();    // save it for later days,,,,
+
 		FileInputStream fStream = new FileInputStream(aFile);
 		BufferedInputStream bStream = new BufferedInputStream(fStream);
+
 		setProperties(bStream);
 	}
 
@@ -460,17 +484,19 @@ public final class SupremicaProperties
 		throws Exception
 	{
 		Properties newProperties = new Properties();
+
 		newProperties.load(iStream);
 		setProperties(newProperties);
-
 		updateBDDOptions(false);
 	}
 
 	public static final void setProperties(Properties otherProperties)
 	{
-		for (Enumeration propEnum = otherProperties.propertyNames(); propEnum.hasMoreElements();)
+		for (Enumeration propEnum = otherProperties.propertyNames();
+				propEnum.hasMoreElements(); )
 		{
-			String currKey = (String)propEnum.nextElement();
+			String currKey = (String) propEnum.nextElement();
+
 			if (wp.allowExternalModification(currKey))
 			{
 				wp.setProperty(currKey, otherProperties.getProperty(currKey));
@@ -486,6 +512,7 @@ public final class SupremicaProperties
 	public void setProperty(String key, String value, boolean allowExternalModification)
 	{
 		setProperty(key, value);
+
 		if (!allowExternalModification)
 		{
 			forbidExternalModification.add(key.toLowerCase());
@@ -606,9 +633,7 @@ public final class SupremicaProperties
 		wp.setProperty(FILE_ALLOW_QUIT, toString(allow));
 	}
 
-
 	// -----------------------------------------
-
 	public static int getDocDBPort()
 	{
 		return toInt(wp.getProperty(DOC_DB_SERVER_PORT));
@@ -616,7 +641,7 @@ public final class SupremicaProperties
 
 	public static void setDocDBPort(int port)
 	{
-			wp.setProperty(DOC_DB_SERVER_PORT, toString(port));
+		wp.setProperty(DOC_DB_SERVER_PORT, toString(port));
 	}
 
 	public static String getDocDBHost()
@@ -648,7 +673,6 @@ public final class SupremicaProperties
 	{
 		wp.setProperty(DOC_DB_SERVER_DOC, x);
 	}
-
 
 	// -----------------------------------------
 	public static boolean isXmlRpcActive()
@@ -692,7 +716,6 @@ public final class SupremicaProperties
 	}
 
 	// -----------------------------------------
-
 	public static boolean generalRedirectStdout()
 	{
 		return toBoolean(wp.getProperty(GENERAL_REDIRECT_STDOUT));
@@ -957,24 +980,28 @@ public final class SupremicaProperties
 	public static VerificationType verifyVerificationType()
 	{
 		return VerificationType.toType(wp.getProperty(VERIFY_VERIFICATION_TYPE));
+
 		//return toInt(wp.getProperty(VERIFY_VERIFICATION_TYPE));
 	}
 
 	public static void setVerifyVerificationType(VerificationType type)
 	{
 		wp.setProperty(VERIFY_VERIFICATION_TYPE, type.toString());
+
 		// wp.setProperty(VERIFY_VERIFICATION_TYPE, toString(type));
 	}
 
 	public static VerificationAlgorithm verifyAlgorithmType()
 	{
 		return VerificationAlgorithm.toAlgorithm(wp.getProperty(VERIFY_ALGORITHM_TYPE));
+
 		//return toInt(wp.getProperty(VERIFY_ALGORITHM_TYPE));
 	}
 
 	public static void setVerifyAlgorithmType(VerificationAlgorithm type)
 	{
 		wp.setProperty(VERIFY_ALGORITHM_TYPE, type.toString());
+
 		// wp.setProperty(VERIFY_ALGORITHM_TYPE, toString(type));
 	}
 
@@ -1139,74 +1166,84 @@ public final class SupremicaProperties
 		softplcInterfaces = interfaces;
 	}
 
-
-
-
-
-
 	// Simulation
-	public static boolean getSimulationIsExternal(){  return toBoolean(wp.getProperty(SIMULATION_IS_EXTERNAL));    }
-	public static void setSimulationIsExternal(boolean a){  wp.setProperty(SIMULATION_IS_EXTERNAL, toString(a));    }
+	public static boolean getSimulationIsExternal()
+	{
+		return toBoolean(wp.getProperty(SIMULATION_IS_EXTERNAL));
+	}
 
-	public static int getSimulationCycleTime(){  return toInt(wp.getProperty(SIMULATION_CYCLE_TIME));    }
-	public static void setSimulationCycleTime(int a){  wp.setProperty(SIMULATION_CYCLE_TIME, toString(a));    }
+	public static void setSimulationIsExternal(boolean a)
+	{
+		wp.setProperty(SIMULATION_IS_EXTERNAL, toString(a));
+	}
 
+	public static int getSimulationCycleTime()
+	{
+		return toInt(wp.getProperty(SIMULATION_CYCLE_TIME));
+	}
+
+	public static void setSimulationCycleTime(int a)
+	{
+		wp.setProperty(SIMULATION_CYCLE_TIME, toString(a));
+	}
 
 	// BDD
+
 	/*
 	 * The problem is that we got to copies of BDD Options.
 	 * This will make sure they are both updated
 	 */
-	public static void updateBDDOptions(boolean from_Options) {
+	public static void updateBDDOptions(boolean from_Options)
+	{
+		if (from_Options)
+		{
 
-		if(from_Options) {
 			// Options -> Properties
 			setOption(BDD_ALGORITHM, Options.algo_family);
-			setOption(BDD_SHOW_GROW , Options.show_grow);
-			setOption(BDD_ALTER_PCG , Options.user_alters_PCG);
-			setOption(BDD_DEBUG_ON , Options.debug_on);
-			setOption(BDD_PROFILE_ON , Options.profile_on);
-			setOption(BDD_UC_OPTIMISTIC , Options.uc_optimistic);
-			setOption(BDD_NB_OPTIMISTIC , Options.nb_optimistic);
-			setOption(BDD_LOCAL_SATURATION , Options.local_saturation);
-			setOption(BDD_TRACE_ON , Options.trace_on);
-			setOption(BDD_COUNT_ALGO , Options.count_algo);
-			setOption(BDD_LI_ALGO , Options.inclsuion_algorithm);
-			setOption(BDD_ORDER_ALGO , Options.ordering_algorithm);
-			setOption(BDD_AS_HEURISTIC , Options.as_heuristics);
-			setOption(BDD_FRONTIER_TYPE , Options.frontier_strategy);
-			setOption(BDD_H1 , Options.es_heuristics);
-			setOption(BDD_H2 , Options.ndas_heuristics);
-			setOption(BDD_DSSI_HEURISTIC , Options.dssi_heuristics);
-			setOption(BDD_PARTITION_MAX , Options.max_partition_size);
-			setOption(BDD_ENCODING_ALGO , Options.encoding_algorithm);
-			setOption(BDD_LIB_PATH , Options.extraLibPath);
+			setOption(BDD_SHOW_GROW, Options.show_grow);
+			setOption(BDD_ALTER_PCG, Options.user_alters_PCG);
+			setOption(BDD_DEBUG_ON, Options.debug_on);
+			setOption(BDD_PROFILE_ON, Options.profile_on);
+			setOption(BDD_UC_OPTIMISTIC, Options.uc_optimistic);
+			setOption(BDD_NB_OPTIMISTIC, Options.nb_optimistic);
+			setOption(BDD_LOCAL_SATURATION, Options.local_saturation);
+			setOption(BDD_TRACE_ON, Options.trace_on);
+			setOption(BDD_COUNT_ALGO, Options.count_algo);
+			setOption(BDD_LI_ALGO, Options.inclsuion_algorithm);
+			setOption(BDD_ORDER_ALGO, Options.ordering_algorithm);
+			setOption(BDD_AS_HEURISTIC, Options.as_heuristics);
+			setOption(BDD_FRONTIER_TYPE, Options.frontier_strategy);
+			setOption(BDD_H1, Options.es_heuristics);
+			setOption(BDD_H2, Options.ndas_heuristics);
+			setOption(BDD_DSSI_HEURISTIC, Options.dssi_heuristics);
+			setOption(BDD_PARTITION_MAX, Options.max_partition_size);
+			setOption(BDD_ENCODING_ALGO, Options.encoding_algorithm);
+			setOption(BDD_LIB_PATH, Options.extraLibPath);
+		}
+		else
+		{
 
-
-		} else {
 			// Properties -> Options
-			Options.algo_family 				= optionAsInt(BDD_ALGORITHM, Options.algo_family);
-			Options.show_grow 					= optionAsInt(BDD_SHOW_GROW , Options.show_grow);
-			Options.user_alters_PCG 		= optionAsBoolean(BDD_ALTER_PCG , Options.user_alters_PCG);
-			Options.debug_on 						= optionAsBoolean(BDD_DEBUG_ON , Options.debug_on);
-			Options.uc_optimistic 			= optionAsBoolean(BDD_UC_OPTIMISTIC , Options.uc_optimistic);
-			Options.nb_optimistic 			= optionAsBoolean(BDD_NB_OPTIMISTIC , Options.nb_optimistic);
-			Options.local_saturation 		= optionAsBoolean(BDD_LOCAL_SATURATION , Options.local_saturation);
-			Options.trace_on 						= optionAsBoolean(BDD_TRACE_ON , Options.trace_on);
-			Options.profile_on          = optionAsBoolean(BDD_PROFILE_ON , Options.profile_on);
-			Options.count_algo 					= optionAsInt(BDD_COUNT_ALGO , Options.count_algo);
-			Options.inclsuion_algorithm = optionAsInt(BDD_LI_ALGO , Options.inclsuion_algorithm);
-			Options.ordering_algorithm 	= optionAsInt(BDD_ORDER_ALGO , Options.ordering_algorithm);
-			Options.as_heuristics 			= optionAsInt(BDD_AS_HEURISTIC , Options.as_heuristics);
-			Options.frontier_strategy 	= optionAsInt(BDD_FRONTIER_TYPE , Options.frontier_strategy);
-			Options.es_heuristics 			= optionAsInt(BDD_H1 , Options.es_heuristics);
-			Options.ndas_heuristics 		= optionAsInt(BDD_H2 , Options.ndas_heuristics);
-			Options.dssi_heuristics 		= optionAsInt(BDD_DSSI_HEURISTIC , Options.dssi_heuristics);
-			Options.max_partition_size 	= optionAsInt(BDD_PARTITION_MAX , Options.max_partition_size);
-			Options.encoding_algorithm 	= optionAsInt(BDD_ENCODING_ALGO , Options.encoding_algorithm);
-			Options.extraLibPath 				= optionAsString(BDD_LIB_PATH , Options.extraLibPath);
-
-
+			Options.algo_family = optionAsInt(BDD_ALGORITHM, Options.algo_family);
+			Options.show_grow = optionAsInt(BDD_SHOW_GROW, Options.show_grow);
+			Options.user_alters_PCG = optionAsBoolean(BDD_ALTER_PCG, Options.user_alters_PCG);
+			Options.debug_on = optionAsBoolean(BDD_DEBUG_ON, Options.debug_on);
+			Options.uc_optimistic = optionAsBoolean(BDD_UC_OPTIMISTIC, Options.uc_optimistic);
+			Options.nb_optimistic = optionAsBoolean(BDD_NB_OPTIMISTIC, Options.nb_optimistic);
+			Options.local_saturation = optionAsBoolean(BDD_LOCAL_SATURATION, Options.local_saturation);
+			Options.trace_on = optionAsBoolean(BDD_TRACE_ON, Options.trace_on);
+			Options.profile_on = optionAsBoolean(BDD_PROFILE_ON, Options.profile_on);
+			Options.count_algo = optionAsInt(BDD_COUNT_ALGO, Options.count_algo);
+			Options.inclsuion_algorithm = optionAsInt(BDD_LI_ALGO, Options.inclsuion_algorithm);
+			Options.ordering_algorithm = optionAsInt(BDD_ORDER_ALGO, Options.ordering_algorithm);
+			Options.as_heuristics = optionAsInt(BDD_AS_HEURISTIC, Options.as_heuristics);
+			Options.frontier_strategy = optionAsInt(BDD_FRONTIER_TYPE, Options.frontier_strategy);
+			Options.es_heuristics = optionAsInt(BDD_H1, Options.es_heuristics);
+			Options.ndas_heuristics = optionAsInt(BDD_H2, Options.ndas_heuristics);
+			Options.dssi_heuristics = optionAsInt(BDD_DSSI_HEURISTIC, Options.dssi_heuristics);
+			Options.max_partition_size = optionAsInt(BDD_PARTITION_MAX, Options.max_partition_size);
+			Options.encoding_algorithm = optionAsInt(BDD_ENCODING_ALGO, Options.encoding_algorithm);
+			Options.extraLibPath = optionAsString(BDD_LIB_PATH, Options.extraLibPath);
 		}
 	}
 
@@ -1267,13 +1304,13 @@ public final class SupremicaProperties
 		return Integer.parseInt(s);
 	}
 
-
 	/**
 	 * Looks for "-p propertyFile", and loads it if it exists.
 	 * Looks also for developer/user tags
 	 */
 	public static void loadProperties(String[] args)
 	{
+
 		// do we  want developer stuff by default
 		boolean enabled_developer_mode = true;
 
@@ -1285,6 +1322,7 @@ public final class SupremicaProperties
 				{
 					String fileName = args[i + 1];
 					File propFile = new File(fileName);
+
 					try
 					{
 						setProperties(propFile);
@@ -1305,10 +1343,9 @@ public final class SupremicaProperties
 			}
 		}
 
-
-		wp.setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, enabled_developer_mode ? "true" : "false", true);
-
-		updateBDDOptions(false); // sync BDD options to the newly loaded options
+		wp.setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, enabled_developer_mode
+														? "true"
+														: "false", true);
+		updateBDDOptions(false);    // sync BDD options to the newly loaded options
 	}
-
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -198,6 +199,7 @@ public final class StateMemorizer
 	// Count uncontrollable states in single hashtable
 	public int size(int[] automataIndices)
 	{
+
 		// return ((Hashtable) tableHash.get(new StateHolder(automataIndices))).size();
 		Hashtable hashtable = (Hashtable) tableHash.get(new StateHolder(automataIndices));
 
@@ -213,6 +215,7 @@ public final class StateMemorizer
 
 	public void clear(int[] automataIndices)
 	{
+
 		// ((Hashtable) tableHash.get(new StateHolder(automataIndices))).clear();
 		Hashtable hashtable = (Hashtable) tableHash.get(new StateHolder(automataIndices));
 

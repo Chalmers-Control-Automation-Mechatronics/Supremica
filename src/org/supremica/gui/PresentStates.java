@@ -20,9 +20,8 @@ import org.supremica.gui.Presenter;
 import org.supremica.gui.VisualProject;
 
 //-- owner: MF
-
 class PresentStatesTableModel
-	extends DefaultTableModel // AbstractTableModel
+	extends DefaultTableModel    // AbstractTableModel
 {
 	private IntArrayVector states;
 	private SearchStates ss;
@@ -35,10 +34,12 @@ class PresentStatesTableModel
 
 		for (int i = 0; i < a.size(); ++i)
 		{
-			v.add( a.getAutomatonAt(i).getName());
+			v.add(a.getAutomatonAt(i).getName());
 		}
+
 		return v;
 	}
+
 	public PresentStatesTableModel(SearchStates ss, Automata a)
 	{
 		super(formColumnNameVector(a), ss.numberFound());
@@ -53,6 +54,7 @@ class PresentStatesTableModel
 	{
 		return ss.getState(col, row).getName();
 	}
+
 	// None of the cells are editable (DefaultTableMode return true! AbstractTableModel does not!!)
 	public boolean isCellEditable(int rowIndex, int columnIndex)
 	{
@@ -60,11 +62,14 @@ class PresentStatesTableModel
 	}
 }
 
-interface SelectionListener // should this be a utility class?
+
+interface SelectionListener    // should this be a utility class?
 {
 	void emptySelection();
+
 	void nonEmptySelection();
 }
+
 
 class PresentStatesTable
 	extends JTable
@@ -78,6 +83,7 @@ class PresentStatesTable
 	public PresentStatesTable(SearchStates ss, Automata a, VisualProject theVisualProject)
 	{
 		super(new PresentStatesTableModel(ss, a));
+
 		this.theVisualProject = theVisualProject;
 		this.searchStates = ss;
 		this.theAutomata = a;
@@ -87,18 +93,18 @@ class PresentStatesTable
 		// This is changed so that a selected row is unselected by clicking it again
 		//-- Note, this works only for right-click selection (and it shouldn't really...)
 		//-- For left click the selection has appearently already been effected, so we always deselect
-
 		addMouseListener(new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e)
 			{
 				int currRow = rowAtPoint(new Point(e.getX(), e.getY()));
+
 				if (currRow < 0)
 				{
 					return;
 				}
 
-				if (isRowSelected(currRow)) // then unselect it
+				if (isRowSelected(currRow))    // then unselect it
 				{
 					removeRowSelectionInterval(currRow, currRow);
 				}
@@ -106,6 +112,7 @@ class PresentStatesTable
 				{
 					addRowSelectionInterval(currRow, currRow);
 				}
+
 				if (e.getClickCount() == 2)
 				{
 					if (theAutomata.size() == 1)
@@ -115,10 +122,12 @@ class PresentStatesTable
 				}
 			}
 		});
+
 		if (theAutomata.size() == 1)
 		{
 			setToolTipText("Doubleclick to view in explorer");
 		}
+
 		getTableHeader().setReorderingAllowed(false);
 	}
 
@@ -129,9 +138,11 @@ class PresentStatesTable
 	{
 		Automaton currAutomaton = theAutomata.getFirstAutomaton();
 		State currState = searchStates.getState(0, index);
+
 		try
 		{
 			AutomatonExplorer theExplorer = theVisualProject.getAutomatonExplorer(currAutomaton.getName());
+
 			theExplorer.setState(currState);
 		}
 		catch (Exception ex)
@@ -149,22 +160,28 @@ class PresentStatesTable
 	public void valueChanged(ListSelectionEvent e)
 	{
 		super.valueChanged(e);
-		if(listener != null)
+
+		if (listener != null)
 		{
-			if(selectionModel.isSelectionEmpty())
+			if (selectionModel.isSelectionEmpty())
+			{
 				listener.emptySelection();
+			}
 			else
+			{
 				listener.nonEmptySelection();
+			}
 		}
 	}
 }
 
 class PresentStatesFrame
 	extends JFrame
-	implements SelectionListener // listens to selection events, en/disables the RouteButton
+	implements SelectionListener    // listens to selection events, en/disables the RouteButton
 {
 	private static Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
-//	private RouteButton route_button;
+
+//      private RouteButton route_button;
 	private SearchStates search_states;
 	private VisualProject theVisualProject;
 
@@ -197,23 +214,24 @@ class PresentStatesFrame
 			dispose();
 		}
 	}
-/*
-	private class RouteButton
-		extends JButton
-	{
-		public RouteButton()
-		{
-			super("Route");
 
-			setToolTipText("Find traces to selected states");
-			addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+/*
+		private class RouteButton
+				extends JButton
+		{
+				public RouteButton()
 				{
+						super("Route");
+
+						setToolTipText("Find traces to selected states");
+						addActionListener(new ActionListener()
+						{
+								public void actionPerformed(ActionEvent e)
+								{
+								}
+						});
 				}
-			});
 		}
-	}
 */
 	public PresentStatesFrame(SearchStates ss, Automata a, VisualProject theVisualProject)
 	{
@@ -222,17 +240,19 @@ class PresentStatesFrame
 
 		Utility.setupFrame(this, 400, 300);
 		setTitle("Found States - " + ss.numberFound());
-//		route_button = new RouteButton();
-//		route_button.setEnabled(false);
 
+//              route_button = new RouteButton();
+//              route_button.setEnabled(false);
 		PresentStatesTable table = new PresentStatesTable(ss, a, theVisualProject);
+
 		table.setSelectionListener(this);
 
 		JPanel panel = new JPanel();
+
 		// panel.add(new JLabel(ss.numberFound() + " states found"));
 		panel.add(Utility.setDefaultButton(this, new FineButton()));
-//		panel.add(route_button);
 
+//              panel.add(route_button);
 		Container contentPane = getContentPane();
 
 		contentPane.add(new WhiteScrollPane(table), BorderLayout.CENTER);
@@ -242,12 +262,15 @@ class PresentStatesFrame
 	// SelectionListener interface implementation
 	public void emptySelection()
 	{
-//		route_button.setEnabled(false);
+
+//              route_button.setEnabled(false);
 	}
+
 	public void nonEmptySelection()
 	{
+
 		// Utility.setDefaultButton(this, route_button);
-//		route_button.setEnabled(false);	// enable when implemented
+//              route_button.setEnabled(false); // enable when implemented
 	}
 }
 
@@ -350,7 +373,8 @@ public class PresentStates
 		{
 			System.out.print("<");
 
-			for (SearchStates.StateIterator it2 = searchs.getStateIterator((int[]) it1.next()); it2.hasNext(); it2.inc())
+			for (SearchStates.StateIterator it2 = searchs.getStateIterator((int[]) it1.next());
+					it2.hasNext(); it2.inc())
 			{
 				System.out.print(it2.getState().getName() + ",");
 			}

@@ -84,7 +84,7 @@ public class StandardExtensionFileFilter
 		{
 			return false;
 		}
+
 		return filename.toLowerCase().endsWith(extension.toLowerCase());
 	}
-
 }

@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -46,7 +47,6 @@
  *
  *  Supremica is owned and represented by KA.
  */
-
 package org.supremica.external.jgrafchart;
 
 import org.supremica.automata.*;
@@ -59,18 +59,21 @@ public class Supervisor
 
 	public static boolean isEventEnabled(String supervisor, String event)
 	{
+
 		//System.out.println("isEventEnabled Supervisor: " + supervisor + " Event: " + event);
 		return supervisors.isEventEnabled(supervisor, event);
 	}
 
 	public static boolean executeEvent(String supervisor, String event)
 	{
+
 		//System.out.println("executeEvent Supervisor: " + supervisor + " Event: " + event);
 		return supervisors.executeEvent(supervisor, event);
 	}
 
 	public static boolean initializeSupervisor(String supervisor)
 	{
+
 		//System.out.println("initialize Supervisor: " + supervisor);
 		return supervisors.initializeSupervisor(supervisor);
 	}
@@ -78,27 +81,27 @@ public class Supervisor
 
 class InitializedSupervisors
 {
+
 	// automatonName -> Automation
 	protected HashMap supervisorMap = new HashMap();
 
 	// automationName -> State
 	protected HashMap stateMap = new HashMap();
 
-	public InitializedSupervisors()
-	{
-
-	}
-
+	public InitializedSupervisors() {}
 
 	public boolean isEventEnabled(String supervisor, String event)
 	{
 		Automaton currAutomaton = getAutomaton(supervisor);
+
 		if (currAutomaton == null)
 		{
 			return false;
 		}
+
 		State currState = getState(supervisor);
 		boolean isEnabled = currState.isEnabled(event);
+
 		// System.out.println("isEnabled: " + event + " : " + isEnabled);
 		return isEnabled;
 	}
@@ -106,27 +109,33 @@ class InitializedSupervisors
 	public boolean executeEvent(String supervisor, String event)
 	{
 		Automaton currAutomaton = getAutomaton(supervisor);
+
 		if (currAutomaton == null)
 		{
 			return false;
 		}
+
 		State currState = getState(supervisor);
 		State nextState = currState.nextState(event);
+
 		if (nextState == null)
 		{
 			System.err.println("Could not execute event: " + event);
+
 			return false;
 		}
+
 		stateMap.remove(supervisor);
 		stateMap.put(supervisor, nextState);
+
 		return true;
 	}
 
 	public boolean initializeSupervisor(String supervisor)
 	{
-
 		if (hasAutomaton(supervisor))
 		{
+
 			// If the supervisor already is initialized the remove it
 			// from the supervisor and stateMap
 			supervisorMap.remove(supervisor);
@@ -153,13 +162,15 @@ class InitializedSupervisors
 
 	public Automaton getAutomaton(String supervisor)
 	{
-		Automaton currAutomaton = (Automaton)supervisorMap.get(supervisor);
+		Automaton currAutomaton = (Automaton) supervisorMap.get(supervisor);
+
 		return currAutomaton;
 	}
 
 	public State getState(String supervisor)
 	{
-		State currState = (State)stateMap.get(supervisor);
+		State currState = (State) stateMap.get(supervisor);
+
 		return currState;
 	}
 }

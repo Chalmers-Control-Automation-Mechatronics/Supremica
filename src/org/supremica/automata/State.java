@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -49,7 +50,6 @@
 package org.supremica.automata;
 
 import java.util.*;
-
 import java.awt.Point;
 
 public class State
@@ -65,7 +65,6 @@ public class State
 
 	// name is the external identifier, i.e. the string appearing in Supremica
 	private String name = "";
-	
 	private boolean initial = false;
 	private boolean accepting = false;
 	private boolean mutuallyAccepting = false;
@@ -75,38 +74,38 @@ public class State
 	private boolean last = false;
 	private boolean visited = false;
 	private boolean selected = false;
-	
 	private int cost = UNDEF_COST;
 	private State assocState = null;
+
 	// private Object equivClass = null;
-	private StateSet stateClass = null;	//
+	private StateSet stateClass = null;    //
 	private int x = UNDEF_POS;
 	private int y = UNDEF_POS;
 	private int radius = 9;
-	
 
 	/** ARASH: this is used to speed up set operations in the AutomatonSynthesizerSingleFixpoint algorithm */
 	public int sethelper;
-	
+
 	// private StateNode stateNode = null;
 	private LinkedList incomingArcs = new LinkedList();
+
 	//private LinkedList outgoingArcs = new LinkedList();
 	protected LinkedList outgoingArcs = new LinkedList();
 	private List outgoingArcSets = new LinkedList();
 	private Listeners listeners = null;
-	
-	/** 
+
+	/**
 	 * Stores the cost accumulated from the initial state until this one.
 	 * The value depends normally (if synchronized automaton) on the path to this state.
 	 */
 	protected int accumulatedCost = UNDEF_COST;
-	
+
 	/**
 	 * Stores the parent to this State. Null by default unless the path to this
 	 * state is tracked.
 	 */
-//	protected State parent = null;
 
+//      protected State parent = null;
 	protected State() {}
 
 	public State(String id)
@@ -134,7 +133,7 @@ public class State
 	public State(State otherState)
 	{
 		this();
-		
+
 		index = otherState.index;
 		id = otherState.id;
 		name = otherState.name;
@@ -145,14 +144,16 @@ public class State
 		first = otherState.first;
 		last = otherState.last;
 		cost = otherState.cost;
+
 		// equivClass = otherState.equivClass;
 		stateClass = otherState.stateClass;
 		visited = otherState.visited;
 		x = otherState.x;
 		y = otherState.y;
 		radius = otherState.radius;
-// Här är skurken..... 	
-//		outgoingArcs = otherState.outgoingArcs;
+
+// Här är skurken.....  
+//              outgoingArcs = otherState.outgoingArcs;
 	}
 
 	// These two should be, and will be, private
@@ -162,6 +163,7 @@ public class State
 		{
 			return "";
 		}
+
 		return id;
 	}
 
@@ -233,6 +235,7 @@ public class State
 		{
 			return "";
 		}
+
 		return name;
 	}
 
@@ -263,6 +266,7 @@ public class State
 
 	public boolean isMutuallyAccepting()
 	{
+
 		// return mutuallyAccepting;
 		return mutuallyAccepting || accepting;
 	}
@@ -293,10 +297,11 @@ public class State
 		{
 			cost = State.MAX_COST;
 		}
+
 		/* // This has nothing to do with it, right?
 		else
 		{
-			cost = State.MIN_COST;
+				cost = State.MIN_COST;
 		}
 		*/
 	}
@@ -358,10 +363,11 @@ public class State
 
 	public boolean validLayout()
 	{
-		if (x < 0 || y < 0)
+		if ((x < 0) || (y < 0))
 		{
 			return false;
 		}
+
 		return true;
 	}
 
@@ -391,38 +397,47 @@ public class State
 		{
 			return false;
 		}
+
 		if (initial != otherState.initial)
 		{
 			return false;
 		}
+
 		if (accepting != otherState.accepting)
 		{
 			return false;
 		}
+
 		if (forbidden != otherState.forbidden)
 		{
 			return false;
 		}
+
 		if (active != otherState.active)
 		{
 			return false;
 		}
+
 		if (first != otherState.first)
 		{
 			return false;
 		}
+
 		if (last != otherState.last)
 		{
 			return false;
 		}
+
 		if (cost != otherState.cost)
 		{
 			return false;
 		}
+
 		if (visited != otherState.visited)
 		{
 			return false;
 		}
+
 		return true;
 	}
 
@@ -477,7 +492,8 @@ public class State
 	{
 		State toState = theArc.getToState();
 
-		for (Iterator arcSetIt = outgoingArcSets.iterator(); arcSetIt.hasNext(); )
+		for (Iterator arcSetIt = outgoingArcSets.iterator();
+				arcSetIt.hasNext(); )
 		{
 			ArcSet currArcSet = (ArcSet) arcSetIt.next();
 
@@ -514,18 +530,18 @@ public class State
 		return new ArcIterator(incomingArcs.iterator());
 	}
 
-/*	public StateIterator nextStateIterator()
-	{
-		StateSet nextStates = new StateSet();
-		for (Iterator arcSetIt = outgoingArcSetIterator(); arcSetIt.hasNext(); )
+/*      public StateIterator nextStateIterator()
 		{
-			ArcSet currArcSet = (ArcSet)arcSetIt.next();
-			nextStates.add(currArcSet.getToState());
+				StateSet nextStates = new StateSet();
+				for (Iterator arcSetIt = outgoingArcSetIterator(); arcSetIt.hasNext(); )
+				{
+						ArcSet currArcSet = (ArcSet)arcSetIt.next();
+						nextStates.add(currArcSet.getToState());
+				}
+				return nextStates.iterator();
 		}
-		return nextStates.iterator();
-	}
 */
-	
+
 	// Varför har man outgoingArcSet istället för helt enkelt outgoingArcs??
 	public StateIterator nextStateIterator()
 	{
@@ -570,15 +586,16 @@ public class State
 		return cost;
 	}
 
-	public void setStateClass(StateSet stateClass) // setEquivalenceClass(Object equivClass)
+	public void setStateClass(StateSet stateClass)    // setEquivalenceClass(Object equivClass)
 	{
+
 		// this.equivClass = equivClass;
 		this.stateClass = stateClass;
 	}
 
-	public StateSet getStateClass() // Object getEquivalenceClass()
+	public StateSet getStateClass()    // Object getEquivalenceClass()
 	{
-		return stateClass; // equivClass;
+		return stateClass;    // equivClass;
 	}
 
 	public void setVisited(boolean visited)
@@ -634,15 +651,14 @@ public class State
 	public State nextState(LabeledEvent event)
 	{
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
+
 		// String eventId = e.getId();
-
-
 		while (outgoingArcsIt.hasNext())
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
 
 			// if (currArc.getEventId().equals(eventId))
-			if(currArc.getEvent().equals(event))
+			if (currArc.getEvent().equals(event))
 			{
 				return currArc.getToState();
 			}
@@ -651,21 +667,19 @@ public class State
 		return null;
 	}
 
-
 	/**
 	 * Returns true if label is enabled by the supervisor.
 	 */
 	public boolean isEnabled(String label)
 	{
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
+
 		// String eventId = e.getId();
-
-
 		while (outgoingArcsIt.hasNext())
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
 
-			if(currArc.getEvent().equals(label))
+			if (currArc.getEvent().equals(label))
 			{
 				return true;
 			}
@@ -684,15 +698,14 @@ public class State
 	public State nextState(String event)
 	{
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
+
 		// String eventId = e.getId();
-
-
 		while (outgoingArcsIt.hasNext())
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
 
 			// if (currArc.getEventId().equals(eventId))
-			if(currArc.getEvent().getLabel().equals(event))
+			if (currArc.getEvent().getLabel().equals(event))
 			{
 				return currArc.getToState();
 			}
@@ -718,7 +731,7 @@ public class State
 
 		return listeners;
 	}
-		
+
 	protected void notifyListeners()
 	{
 		if (listeners != null)
@@ -728,41 +741,49 @@ public class State
 	}
 
 	/**
-	 *	Returns the cost accumulated when this state is reached. Note that the 
-	 *	path to the state is of importance. 
+	 *      Returns the cost accumulated when this state is reached. Note that the
+	 *      path to the state is of importance.
 	 */
-	public int getAccumulatedCost() { return accumulatedCost; }
-	
-	public void initCosts() { accumulatedCost = 0; }
-	
-	/**
-	 *	Updates the accumulated cost. This method is overloaded in CompositeState.
-	 */
-	public void updateCosts(State prevState) {
-		updateCosts(prevState, prevState.getAccumulatedCost()); 
+	public int getAccumulatedCost()
+	{
+		return accumulatedCost;
 	}
-	
+
+	public void initCosts()
+	{
+		accumulatedCost = 0;
+	}
+
 	/**
-	 *	This method updates explicitly the accumulatedCost. Normally, this version 
-	 *	of updateCosts() is only used from within Node.class. 
+	 *      Updates the accumulated cost. This method is overloaded in CompositeState.
 	 */
-	public void updateCosts(State prevState, int accumulatedCost) {
+	public void updateCosts(State prevState)
+	{
+		updateCosts(prevState, prevState.getAccumulatedCost());
+	}
+
+	/**
+	 *      This method updates explicitly the accumulatedCost. Normally, this version
+	 *      of updateCosts() is only used from within Node.class.
+	 */
+	public void updateCosts(State prevState, int accumulatedCost)
+	{
 		this.accumulatedCost = accumulatedCost + prevState.getCost();
 	}
-	
+
 	/**
-	 *	Returns an exact copy of this State. 
+	 *      Returns an exact copy of this State.
 	 */
-/*	public State copy() {
-		State copiedState = new State(this);
-		
-		if (isInitial())
-			copiedState.accumulatedCost = MIN_COST;
-		else
-			copiedState.accumulatedCost = UNDEF_COST;	
-			
-		return copiedState;
-	}
+
+/*      public State copy() {
+				State copiedState = new State(this);
+
+				if (isInitial())
+						copiedState.accumulatedCost = MIN_COST;
+				else
+						copiedState.accumulatedCost = UNDEF_COST;
+
+				return copiedState;
+		}
 */
 }
- 

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -48,29 +49,31 @@
  */
 
 /********************* MainMenuBar.java ***************/
+
 // Free standing leaf class implementing Supremicas
 // main menu bar. Prime reason for this is easy access
 // The class instantiates itself with the menu stuff
+
 /* Note:
-	This
-		JMenuItem menuFileNew = new JMenuItem();
+		This
+				JMenuItem menuFileNew = new JMenuItem();
 
-		menuFileNew.setText("New...");
-		menuFileNew.setEnabled(false);
-		menuFile.add(menuFileNew);
-		menuFileNew.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.fileNew(ActionMan.getGui());
-			}
-		});
+				menuFileNew.setText("New...");
+				menuFileNew.setEnabled(false);
+				menuFile.add(menuFileNew);
+				menuFileNew.addActionListener(new ActionListener()
+				{
+						public void actionPerformed(ActionEvent e)
+						{
+								ActionMan.fileNew(ActionMan.getGui());
+						}
+				});
 
-	Should be replaced with this
-		JMenuItem menuFileNew = new JMenuItem(ActionMan.fileNewAction);
-		menuFile.add(menuFileNew);
+		Should be replaced with this
+				JMenuItem menuFileNew = new JMenuItem(ActionMan.fileNewAction);
+				menuFile.add(menuFileNew);
 
-	where fileNewAction is a static AbstractAction descendant
+		where fileNewAction is a static AbstractAction descendant
 */
 package org.supremica.gui;
 
@@ -78,7 +81,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 import javax.help.*;
-
 import org.supremica.gui.help.ContentHelp;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.templates.TemplateItem;
@@ -93,10 +95,10 @@ public class MainMenuBar
 	extends JMenuBar
 {
 	private Supremica supremica;
- 	private ContentHelp help = null;
+	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
 
-	public MainMenuBar(Supremica supremica) // should get rid of supremica here
+	public MainMenuBar(Supremica supremica)    // should get rid of supremica here
 	{
 		this.supremica = supremica;
 		this.help = new ContentHelp();
@@ -105,7 +107,7 @@ public class MainMenuBar
 		initMenubar();
 	}
 
-	private void initMenubar()	// This is copied (almost) straight from Supremica.java
+	private void initMenubar()    // This is copied (almost) straight from Supremica.java
 	{
 		class NewFromTemplateHandler
 			implements ActionListener
@@ -143,27 +145,29 @@ public class MainMenuBar
 
 		// File
 		JMenu menuFile = new JMenu();
+
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		add(menuFile);
 
 /*
-		// File.New
-		JMenuItem menuFileNew = new JMenuItem();
-		menuFileNew.setText("New...");
-		menuFileNew.setEnabled(false);
-		menuFile.add(menuFileNew);
-		menuFileNew.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.fileNew(ActionMan.getGui());
-			}
-		});
+				// File.New
+				JMenuItem menuFileNew = new JMenuItem();
+				menuFileNew.setText("New...");
+				menuFileNew.setEnabled(false);
+				menuFile.add(menuFileNew);
+				menuFileNew.addActionListener(new ActionListener()
+				{
+						public void actionPerformed(ActionEvent e)
+						{
+								ActionMan.fileNew(ActionMan.getGui());
+						}
+				});
 */
 
 		// File.NewFromTemplate
 		JMenu menuFileNewFromTemplate = new JMenu();
+
 		menuFileNewFromTemplate.setText("New From Template");
 		menuFile.add(menuFileNewFromTemplate);
 
@@ -190,19 +194,22 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowOpen())
 		{
+
 			// File.Open
+
 			/* JMenuItem menuFileOpen = new JMenuItem();
 
 			menuFileOpen.setText("Open...");
 			menuFile.add(menuFileOpen);
 			menuFileOpen.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.fileOpen(ActionMan.getGui());
-				}
+					public void actionPerformed(ActionEvent e)
+					{
+							ActionMan.fileOpen(ActionMan.getGui());
+					}
 			});*/
 			JMenuItem menuFileOpen = new SupremicaMenuItem(ActionMan.openAction);
+
 			menuFile.add(menuFileOpen);
 
 			separatorNeeded = true;
@@ -210,8 +217,10 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowSave())
 		{
+
 			// File.Save
 			JMenuItem menuFileSave = new JMenuItem();
+
 			menuFileSave.setText("Save");
 			menuFileSave.setMnemonic(KeyEvent.VK_S);
 			menuFile.add(menuFileSave);
@@ -225,6 +234,7 @@ public class MainMenuBar
 
 			// File.SaveAs
 			JMenuItem menuFileSaveAs = new JMenuItem();
+
 			menuFileSaveAs.setText("Save As...");
 			menuFile.add(menuFileSaveAs);
 			menuFileSaveAs.addActionListener(new ActionListener()
@@ -241,18 +251,22 @@ public class MainMenuBar
 		if (separatorNeeded)
 		{
 			menuFile.addSeparator();
+
 			separatorNeeded = false;
 		}
 
 		if (SupremicaProperties.fileAllowImport())
 		{
+
 			// File.Import
 			JMenu menuFileImport = new JMenu();
+
 			menuFileImport.setText("Import");
 			menuFile.add(menuFileImport);
 
 			// File.Import.UMDES
 			JMenuItem menuFileImportUMDES = new JMenuItem();
+
 			menuFileImportUMDES.setText("From UMDES...");
 			menuFileImport.add(menuFileImportUMDES);
 			menuFileImportUMDES.addActionListener(new ActionListener()
@@ -265,6 +279,7 @@ public class MainMenuBar
 
 			// File.Import.Valid
 			JMenuItem menuFileImportValid = new JMenuItem();
+
 			menuFileImportValid.setText("From Valid...");
 			menuFileImport.add(menuFileImportValid);
 			menuFileImportValid.addActionListener(new ActionListener()
@@ -277,8 +292,10 @@ public class MainMenuBar
 
 			if (SupremicaProperties.generalUseRobotCoordination())
 			{
+
 				//File.Import.RobotCoordination
 				JMenuItem menuFileImportRobotCoordination = new JMenuItem();
+
 				menuFileImportRobotCoordination.setText("From Robot Coordinator...");
 				menuFileImport.add(menuFileImportRobotCoordination);
 				menuFileImportRobotCoordination.addActionListener(new ActionListener()
@@ -292,8 +309,10 @@ public class MainMenuBar
 
 			if (SupremicaProperties.generalUseRobotCoordinationABB())
 			{
+
 				// File.Import.RobotCoordinationABB
 				JMenuItem menuFileImportRobotCoordinationABB = new JMenuItem();
+
 				menuFileImportRobotCoordinationABB.setText("From Robot Coordinator ABB...");
 				menuFileImport.add(menuFileImportRobotCoordinationABB);
 				menuFileImportRobotCoordinationABB.addActionListener(new ActionListener()
@@ -310,13 +329,16 @@ public class MainMenuBar
 
 		if (false && SupremicaProperties.fileAllowExport())
 		{
+
 			// File.Export
 			JMenu menuFileExport = new JMenu();
+
 			menuFileExport.setText("Export");
 			menuFile.add(menuFileExport);
 
 			// File.Export.Html
 			JMenuItem menuFileExportHtml = new JMenuItem();
+
 			menuFileExportHtml.setText("To Html...");
 			menuFileExport.add(menuFileExportHtml);
 			menuFileExportHtml.addActionListener(new ActionListener()
@@ -327,9 +349,9 @@ public class MainMenuBar
 				}
 			});
 
-
 			// File.Export.Desco
 			JMenuItem menuFileExportDesco = new JMenuItem();
+
 			menuFileExportDesco.setText("To Desco...");
 			menuFileExport.add(menuFileExportDesco);
 			menuFileExportDesco.addActionListener(new ActionListener()
@@ -342,17 +364,16 @@ public class MainMenuBar
 
 			// File.Export.UMDES
 			JMenuItem menuFileExportUMDES = new JMenuItem();
+
 			menuFileExportUMDES.setText("To UMDES...");
 			menuFileExport.add(menuFileExportUMDES);
 			menuFileExportUMDES.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-
 					ActionMan.fileExportUMDES(ActionMan.getGui());
 				}
 			});
-
 		}
 
 		if (separatorNeeded)
@@ -364,8 +385,10 @@ public class MainMenuBar
 
 		if (SupremicaProperties.generalUseSecurity())
 		{
+
 			// File.Login
 			JMenuItem menuFileLogin = new JMenuItem();
+
 			menuFileLogin.setText("Login");
 			menuFile.add(menuFileLogin);
 			menuFileLogin.addActionListener(new ActionListener()
@@ -388,8 +411,10 @@ public class MainMenuBar
 
 		if (SupremicaProperties.fileAllowQuit())
 		{
+
 			// File.Exit
 			JMenuItem menuFileExit = new JMenuItem();
+
 			menuFileExit.setText("Exit");
 			menuFile.add(menuFileExit);
 			menuFileExit.addActionListener(new ActionListener()
@@ -402,8 +427,10 @@ public class MainMenuBar
 		}
 		else
 		{
+
 			// File.Close
 			JMenuItem menuFileExit = new JMenuItem();
+
 			menuFileExit.setText("Close");
 			menuFile.add(menuFileExit);
 			menuFileExit.addActionListener(new ActionListener()
@@ -417,12 +444,14 @@ public class MainMenuBar
 
 		// Project
 		JMenu menuProject = new JMenu();
+
 		menuProject.setText("Project");
 		menuProject.setMnemonic(KeyEvent.VK_P);
 		add(menuProject);
 
 		// Project.document db
 		JMenuItem menuProjectDocumentDB = new JMenuItem();
+
 		menuProjectDocumentDB.setText("Document Database...");
 		menuProject.add(menuProjectDocumentDB);
 		menuProjectDocumentDB.addActionListener(new ActionListener()
@@ -432,13 +461,11 @@ public class MainMenuBar
 				org.supremica.comm.documentdb.DocumentRPCDatabase.createNew(supremica);
 			}
 		});
-
 		menuProject.addSeparator();
-
-
 
 		// Project.Rename
 		JMenuItem menuProjectRename = new JMenuItem();
+
 		menuProjectRename.setText("Rename...");
 		menuProject.add(menuProjectRename);
 		menuProjectRename.addActionListener(new ActionListener()
@@ -451,6 +478,7 @@ public class MainMenuBar
 
 		// Project.Comment
 		JMenuItem menuProjectComment = new JMenuItem();
+
 		menuProjectComment.setText("Comment...");
 		menuProject.add(menuProjectComment);
 		menuProjectComment.addActionListener(new ActionListener()
@@ -460,11 +488,11 @@ public class MainMenuBar
 				supremica.commentProject();
 			}
 		});
-
 		menuProject.addSeparator();
 
 		// Project.ActionAndControlViewer
 		JMenuItem menuProjectActionAndControlViewer = new JMenuItem();
+
 		menuProjectActionAndControlViewer.setText("Execution Parameters...");
 		menuProject.add(menuProjectActionAndControlViewer);
 		menuProjectActionAndControlViewer.addActionListener(new ActionListener()
@@ -477,8 +505,10 @@ public class MainMenuBar
 
 		if (SupremicaProperties.includeAnimator())
 		{
+
 			// Project.Animator
 			JMenuItem menuProjectAnimator = new JMenuItem();
+
 			menuProjectAnimator.setText("Animator...");
 			menuProject.add(menuProjectAnimator);
 			menuProjectAnimator.addActionListener(new ActionListener()
@@ -491,6 +521,7 @@ public class MainMenuBar
 
 			// Project.Simulator
 			JMenuItem menuProjectSimulator = new JMenuItem();
+
 			menuProjectSimulator.setText("Simulator...");
 			menuProject.add(menuProjectSimulator);
 			menuProjectSimulator.addActionListener(new ActionListener()
@@ -503,6 +534,7 @@ public class MainMenuBar
 
 			// Project.Clear
 			JMenuItem menuProjectSimulatorClear = new JMenuItem();
+
 			menuProjectSimulatorClear.setText("Clear Simulation Data");
 			menuProject.add(menuProjectSimulatorClear);
 			menuProjectSimulatorClear.addActionListener(new ActionListener()
@@ -516,12 +548,14 @@ public class MainMenuBar
 
 		// Tools
 		JMenu menuTools = new JMenu();
+
 		menuTools.setText("Tools");
 		menuTools.setMnemonic(KeyEvent.VK_T);
 		add(menuTools);
 
 		// Tools.TestCases
 		JMenuItem test_cases = new JMenuItem();
+
 		test_cases.setText("Test Cases...");
 		menuTools.add(test_cases);
 		test_cases.addActionListener(new ActionListener()
@@ -534,6 +568,7 @@ public class MainMenuBar
 				}
 				catch (Exception excp)
 				{
+
 					// what the f*** do we do?
 				}
 			}
@@ -543,6 +578,7 @@ public class MainMenuBar
 		if (SupremicaProperties.includeAnimator())
 		{
 			JMenu menuToolsAnimations = new JMenu();
+
 			menuToolsAnimations.setText("Animations");
 			menuTools.add(menuToolsAnimations);
 
@@ -552,6 +588,7 @@ public class MainMenuBar
 			{
 				AnimationGroup currGroup = (AnimationGroup) groupIt.next();
 				JMenu menuToolsAnimationGroup = new JMenu();
+
 				menuToolsAnimationGroup.setText(currGroup.getDescription());
 				menuToolsAnimations.add(menuToolsAnimationGroup);
 
@@ -559,6 +596,7 @@ public class MainMenuBar
 				{
 					AnimationItem currItem = (AnimationItem) itemIt.next();
 					JMenuItem menuItem = new JMenuItem();
+
 					menuItem.setText(currItem.getDescription());
 					menuToolsAnimationGroup.add(menuItem);
 					menuItem.addActionListener(new ToolsAnimationHandler(currItem));
@@ -572,6 +610,7 @@ public class MainMenuBar
 			menuTools.add(new JSeparator());
 
 			JMenuItem menuToolsAutomataEditor = new JMenuItem();
+
 			menuToolsAutomataEditor.setText("Editor...");
 			menuTools.add(menuToolsAutomataEditor);
 			menuToolsAutomataEditor.addActionListener(new ActionListener()
@@ -589,6 +628,7 @@ public class MainMenuBar
 			menuTools.add(new JSeparator());
 
 			JMenu menuToolsShoeFactory = new JMenu();
+
 			menuToolsShoeFactory.setText("Shoe Factory...");
 			menuTools.add(menuToolsShoeFactory);
 
@@ -603,7 +643,6 @@ public class MainMenuBar
 					ActionMan.shoeFactoryBuildPlant(ActionMan.getGui());
 				}
 			});
-
 			menuBuildConfigit.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -618,7 +657,6 @@ public class MainMenuBar
 					ActionMan.shoeFactoryConfiguratorDEMO();
 				}
 			});
-
 			menuToolsShoeFactory.add(menuBuildConfigit);
 			menuToolsShoeFactory.add(menuBuildConfigitDEMO);
 			menuToolsShoeFactory.add(menuBuildPlant);
@@ -629,42 +667,42 @@ public class MainMenuBar
 		{
 			menuTools.add(new JSeparator());
 
-
-
 			JMenu menuToolsJGrafchart = new JMenu();
+
 			menuToolsJGrafchart.setText("JGrafchart");
 			menuTools.add(menuToolsJGrafchart);
 
 			JMenuItem menuToolsOpenJGrafchart = new SupremicaMenuItem(ActionMan.openJGrafchartAction);
+
 			menuToolsJGrafchart.add(menuToolsOpenJGrafchart);
 
 			JMenuItem menuToolsUpdateFromJGrafchart = new SupremicaMenuItem(ActionMan.updateFromJGrafchartAction);
+
 			menuToolsJGrafchart.add(menuToolsUpdateFromJGrafchart);
 
 /*
-			JMenuItem menuOpenEditor= new JMenuItem("Open Editor");
+						JMenuItem menuOpenEditor= new JMenuItem("Open Editor");
 
-			menuOpenEditor.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.openJGrafchartEditor(ActionMan.getGui());
-				}
-			});
-
-			JMenuItem menuUpdateFromJGrafchart = new JMenuItem("Update Automata");
-			menuUpdateFromJGrafchart.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
+						menuOpenEditor.addActionListener(new ActionListener()
 						{
-							ActionMan.updateFromJGrafchart(ActionMan.getGui());
-						}
-					});
+								public void actionPerformed(ActionEvent e)
+								{
+										ActionMan.openJGrafchartEditor(ActionMan.getGui());
+								}
+						});
 
-			menuToolsJGrafchart.add(menuUpdateFromJGrafchart);
-	*/
+						JMenuItem menuUpdateFromJGrafchart = new JMenuItem("Update Automata");
+						menuUpdateFromJGrafchart.addActionListener(new ActionListener()
+										{
+												public void actionPerformed(ActionEvent e)
+												{
+														ActionMan.updateFromJGrafchart(ActionMan.getGui());
+												}
+										});
+
+						menuToolsJGrafchart.add(menuUpdateFromJGrafchart);
+		*/
 		}
-
 
 		// Tools.CellEditor
 		if (SupremicaProperties.includeCellEditor())
@@ -692,9 +730,7 @@ public class MainMenuBar
 					ActionMan.startRecipeEditor(ActionMan.getGui());
 				}
 			});
-
 			menuTools.add(new JSeparator());
-
 		}
 
 		menuTools.add(new JSeparator());
@@ -713,7 +749,6 @@ public class MainMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
 				ActionMan.ProjectTo1131IL(ActionMan.getGui());
 			}
 		});
@@ -738,7 +773,6 @@ public class MainMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
 				ActionMan.ProjectToControlBuilderIL(ActionMan.getGui());
 			}
 		});
@@ -751,11 +785,9 @@ public class MainMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
 				ActionMan.ProjectToControlBuilderST(ActionMan.getGui());
 			}
 		});
-
 
 		JMenuItem menuToolsCodeGenerationControlBuilderSFC = new JMenuItem();
 
@@ -825,11 +857,9 @@ public class MainMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
 				ActionMan.AutomataToC(ActionMan.getGui());
 			}
 		});
-
 
 		JMenuItem menuToolsCodeGenerationNQC = new JMenuItem();
 
@@ -839,7 +869,6 @@ public class MainMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
 				ActionMan.AutomataToMindstormNQC(ActionMan.getGui());
 			}
 		});
@@ -852,15 +881,14 @@ public class MainMenuBar
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
 				ActionMan.AutomataToSMV(ActionMan.getGui());
 			}
 		});
 
-
 		// Tools.SoftPLC
 		if (SupremicaProperties.includeSoftPLC())
 		{
+
 			// Tools.RunSimulation
 			JMenuItem run_simulation = new JMenuItem();
 
@@ -870,49 +898,51 @@ public class MainMenuBar
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-						ActionMan.runSoftPLCSimulation(ActionMan.getGui());
+					ActionMan.runSoftPLCSimulation(ActionMan.getGui());
 				}
 			});
 		}
 
 /*
-		// Tools.CodeGeneration
-		JMenu menuToolsCodeGeneration = new JMenu();
+				// Tools.CodeGeneration
+				JMenu menuToolsCodeGeneration = new JMenu();
 
-		menuToolsCodeGeneration.setText("Code Generation");
-		menuTools.add(menuToolsCodeGeneration);
+				menuToolsCodeGeneration.setText("Code Generation");
+				menuTools.add(menuToolsCodeGeneration);
 
-		JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
+				JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
 
-		menuToolsCodeGenerationIL.setText("IEC-61131 Instruction List...");
-		menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
-		menuToolsCodeGenerationIL.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+				menuToolsCodeGenerationIL.setText("IEC-61131 Instruction List...");
+				menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
+				menuToolsCodeGenerationIL.addActionListener(new ActionListener()
+				{
+						public void actionPerformed(ActionEvent e)
+						{
 
-				ActionMan.ProjectTo1131IL(ActionMan.getGui());
-			}
-		});
+								ActionMan.ProjectTo1131IL(ActionMan.getGui());
+						}
+				});
 
-		JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
+				JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
 
-		menuToolsCodeGeneration1131ST.setText("IEC-61131 Structured Text...");
-		menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
-		menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.ProjectTo1131ST(ActionMan.getGui());
-			}
-		});
+				menuToolsCodeGeneration1131ST.setText("IEC-61131 Structured Text...");
+				menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
+				menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
+				{
+						public void actionPerformed(ActionEvent e)
+						{
+								ActionMan.ProjectTo1131ST(ActionMan.getGui());
+						}
+				});
 */
 
 		// Tools.RobotCellExaminer
 		if (false)
 		{
 			menuTools.add(new JSeparator());
+
 			JMenuItem robotCellExamine = new JMenuItem();
+
 			robotCellExamine.setText("Robot Coordination...");
 			menuTools.add(robotCellExamine);
 			robotCellExamine.addActionListener(new ActionListener()
@@ -930,148 +960,169 @@ public class MainMenuBar
 			menuTools.add(new JSeparator());
 
 			JMenu menuRobotStudioLink = new JMenu();
+
 			menuRobotStudioLink.setText("RobotStudio");
 			menuTools.add(menuRobotStudioLink);
 
 /*
-			// RobotStudioExtractAutomata
-			JMenuItem robLink = new JMenuItem();
-			robLink.setText("Extract Automata From Station...");
-			menuRobotStudioLink.add(robLink);
-			robLink.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioLink(ActionMan.getGui());
-					}
-				});
+						// RobotStudioExtractAutomata
+						JMenuItem robLink = new JMenuItem();
+						robLink.setText("Extract Automata From Station...");
+						menuRobotStudioLink.add(robLink);
+						robLink.addActionListener(new ActionListener()
+								{
+										public void actionPerformed(ActionEvent e)
+										{
+												ActionMan.robotStudioLink(ActionMan.getGui());
+										}
+								});
 */
 
 			// RobotStudioOpenStation
 			JMenuItem robOpen = new JMenuItem();
+
 			robOpen.setText("Open RobotStudio Station...");
 			menuRobotStudioLink.add(robOpen);
 			robOpen.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioOpenStation(ActionMan.getGui());
-					}
-				});
+					ActionMan.robotStudioOpenStation(ActionMan.getGui());
+				}
+			});
+
 			// RobotStudioCreateMutexZones
 			JMenuItem robMutex = new JMenuItem();
+
 			robMutex.setText("Create Mutex Zones 'Manually'");
 			menuRobotStudioLink.add(robMutex);
 			robMutex.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioCreateMutexZones(ActionMan.getGui());
-					}
-				});
+					ActionMan.robotStudioCreateMutexZones(ActionMan.getGui());
+				}
+			});
+
 			// RobotStudioCreateMutexZones
 			JMenuItem robMutexGrid = new JMenuItem();
+
 			robMutexGrid.setText("Create Mutex Zones Grid");
 			menuRobotStudioLink.add(robMutexGrid);
 			robMutexGrid.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioCreateMutexZonesGrid(ActionMan.getGui());
-					}
-				});
+					ActionMan.robotStudioCreateMutexZonesGrid(ActionMan.getGui());
+				}
+			});
+
 			// RobotStudioCreateMutexZones
 			JMenuItem robSpanMutex = new JMenuItem();
+
 			robSpanMutex.setText("Create Mutex Zones From Span");
 			menuRobotStudioLink.add(robSpanMutex);
 			robSpanMutex.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioCreateMutexZonesFromSpan(ActionMan.getGui());
-					}
-				});
+					ActionMan.robotStudioCreateMutexZonesFromSpan(ActionMan.getGui());
+				}
+			});
+
 			// RobotStudioExtractAutomata
 			JMenuItem robExtract = new JMenuItem();
+
 			robExtract.setText("Extract Automata");
 			menuRobotStudioLink.add(robExtract);
 			robExtract.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioExtractAutomata(ActionMan.getGui());
-					}
-				});
+					ActionMan.robotStudioExtractAutomata(ActionMan.getGui());
+				}
+			});
+
 			// RobotStudioExecuteAutomaton
 			JMenuItem robExec = new JMenuItem();
+
 			robExec.setText("Execute Robot Automaton");
 			menuRobotStudioLink.add(robExec);
 			robExec.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioExecuteRobot(ActionMan.getGui());
-					}
-				});
+					ActionMan.robotStudioExecuteRobot(ActionMan.getGui());
+				}
+			});
+
 			// RobotStudioKill
 			JMenuItem robKill = new JMenuItem();
+
 			robKill.setText("Kill RobotStudio Link");
 			menuRobotStudioLink.add(robKill);
 			robKill.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioKill();
-					}
-				});
+					ActionMan.robotStudioKill();
+				}
+			});
+
 			// RobotStudioTest
 			JMenuItem robTest = new JMenuItem();
+
 			robTest.setText("Run Demo");
 			menuRobotStudioLink.add(robTest);
 			robTest.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioTest(ActionMan.getGui());
-					}
-				});
+					ActionMan.robotStudioTest(ActionMan.getGui());
+				}
+			});
 		}
 
 		// Tools.CoordinationABB
-		if(SupremicaProperties.showCoordinationABB())
+		if (SupremicaProperties.showCoordinationABB())
 		{
 			menuTools.add(new JSeparator());
 
 			JMenu menuCoordinationABB = new JMenu();
+
 			menuCoordinationABB.setText("CoordinationABB");
 			menuTools.add(menuCoordinationABB);
 
 			// OpenRobotStudioStation
 			JMenuItem stationOpen = new JMenuItem();
+
 			stationOpen.setText("Open Robot Studio Station...");
 			menuCoordinationABB.add(stationOpen);
 			stationOpen.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.robotStudioOpenStation(ActionMan.getGui());
-						RobotStudioLink.configureCreateXml();
-					}
-				});
+					ActionMan.robotStudioOpenStation(ActionMan.getGui());
+					RobotStudioLink.configureCreateXml();
+				}
+			});
 
 			// CreatePaths
 			JMenuItem createPaths = new JMenuItem();
+
 			createPaths.setText("Create paths in Robot Studio");
 			menuCoordinationABB.add(createPaths);
 			createPaths.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.createPathsInRS(ActionMan.getGui());
-					}
-				});
+					ActionMan.createPathsInRS(ActionMan.getGui());
+				}
+			});
+
 			// CreateSpans
 			JMenuItem createSpans = new JMenuItem();
+
 			createSpans.setText("Simulations to create Spans");
 			menuCoordinationABB.add(createSpans);
 			createSpans.addActionListener(new ActionListener()
@@ -1081,8 +1132,10 @@ public class MainMenuBar
 					ActionMan.createSpansInRS(ActionMan.getGui());
 				}
 			});
+
 			// CreateMutexZones
 			JMenuItem createMutexZones = new JMenuItem();
+
 			createMutexZones.setText("Intersect Spans -> Mutex Zones");
 			menuCoordinationABB.add(createMutexZones);
 			createMutexZones.addActionListener(new ActionListener()
@@ -1092,8 +1145,10 @@ public class MainMenuBar
 					ActionMan.createMutexZonesInRS(ActionMan.getGui());
 				}
 			});
+
 			// AddViaPoints
 			JMenuItem addViaPoints = new JMenuItem();
+
 			addViaPoints.setText("Simulations to add via-points");
 			menuCoordinationABB.add(addViaPoints);
 			addViaPoints.addActionListener(new ActionListener()
@@ -1103,8 +1158,10 @@ public class MainMenuBar
 					ActionMan.addViaPointsInRS(ActionMan.getGui());
 				}
 			});
+
 			// BuildXmlFile
 			JMenuItem buildXmlFile = new JMenuItem();
+
 			buildXmlFile.setText("Build xml file");
 			menuCoordinationABB.add(buildXmlFile);
 			buildXmlFile.addActionListener(new ActionListener()
@@ -1114,29 +1171,31 @@ public class MainMenuBar
 					ActionMan.buildXmlFile(ActionMan.getGui());
 				}
 			});
+
 			// ExecuteScheduledAutomaton
 			JMenuItem scheduledExecute = new JMenuItem();
+
 			scheduledExecute.setText("Execute Optimal Coordination");
 			menuCoordinationABB.add(scheduledExecute);
 			scheduledExecute.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.executeScheduledAutomaton(ActionMan.getGui());
-					}
-				});
+					ActionMan.executeScheduledAutomaton(ActionMan.getGui());
+				}
+			});
 
 			JMenuItem demo = new JMenuItem();
+
 			demo.setText("Optimal coordination DEMO");
 			menuCoordinationABB.add(demo);
 			demo.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.demonstrate(ActionMan.getGui());
-					}
-				});
-
+					ActionMan.demonstrate(ActionMan.getGui());
+				}
+			});
 		}
 
 		// Tools.Evolution
@@ -1145,33 +1204,37 @@ public class MainMenuBar
 			menuTools.add(new JSeparator());
 
 			JMenu menuEvoComp = new JMenu();
+
 			menuEvoComp.setText("Evolution");
+
 			//menuEvoComp.setEnabled(false);
 			menuTools.add(menuEvoComp);
 
 			// EvoComp.CalculateSynchTable
 			JMenuItem synchTable = new JMenuItem();
+
 			synchTable.setText("Calculate Synchtable");
 			menuEvoComp.add(synchTable);
 			synchTable.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
-					}
-				});
+					ActionMan.evoCompSynchTable(ActionMan.getGui(), false);
+				}
+			});
 
 			// EvoComp.PredictSize
 			JMenuItem predictSize = new JMenuItem();
+
 			predictSize.setText("Predict Synchronization Size");
 			menuEvoComp.add(predictSize);
 			predictSize.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						ActionMan.evoCompPredictSize(ActionMan.getGui());
-					}
-				});
+					ActionMan.evoCompPredictSize(ActionMan.getGui());
+				}
+			});
 		}
 
 		/*
@@ -1182,12 +1245,12 @@ public class MainMenuBar
 		trainSimulator.setText("Train Simulator");
 		menuTools.add(trainSimulator);
 		trainSimulator.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
 				{
-					ActionMan.trainSimulator(ActionMan.getGui());
-				}
-			});
+						public void actionPerformed(ActionEvent e)
+						{
+								ActionMan.trainSimulator(ActionMan.getGui());
+						}
+				});
 		*/
 
 		// Configure
@@ -1219,6 +1282,7 @@ public class MainMenuBar
 
 		// Help.Help Topics
 		JMenuItem supremicaOnTheWeb = new JMenuItem("Supremica on the Web");
+
 		menuHelp.add(supremicaOnTheWeb);
 		supremicaOnTheWeb.addActionListener(new ActionListener()
 		{
@@ -1227,7 +1291,9 @@ public class MainMenuBar
 				BrowserControl.displayURL("http://www.supremica.org");
 			}
 		});
+
 		JMenuItem supremicaDocumentation = new JMenuItem("Documentation");
+
 		menuHelp.add(supremicaDocumentation);
 		supremicaDocumentation.addActionListener(new ActionListener()
 		{
@@ -1244,8 +1310,8 @@ public class MainMenuBar
 		menuHelp.add(menuHelpTopics);
 		*/
 		JMenuItem menuHelpTopics = new SupremicaMenuItem(ActionMan.helpAction);
-		menuHelp.add(menuHelpTopics);
 
+		menuHelp.add(menuHelpTopics);
 		menuHelp.addSeparator();
 
 		// Help.About

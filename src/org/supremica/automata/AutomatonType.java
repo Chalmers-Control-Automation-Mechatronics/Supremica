@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -58,7 +59,6 @@ public class AutomatonType
 	public static final AutomatonType Specification = new AutomatonType("Specification", true);
 	public static final AutomatonType Supervisor = new AutomatonType("Supervisor", true);
 	public static final AutomatonType Interface = new AutomatonType("Interface", false);
-
 	private String identifier;
 
 	private AutomatonType(String identifier, boolean add)
@@ -67,6 +67,7 @@ public class AutomatonType
 		{
 			collection.add(this);
 		}
+
 		this.identifier = identifier;
 	}
 
@@ -112,10 +113,11 @@ public class AutomatonType
 
 	private static boolean equalType(AutomatonType type, String ident)
 	{
-		if (type == null || ident == null)
+		if ((type == null) || (ident == null))
 		{
 			return false;
 		}
+
 		return ident.toLowerCase().equals(type.toString().toLowerCase());
 	}
 }

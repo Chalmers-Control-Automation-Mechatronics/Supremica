@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -111,6 +112,7 @@ public class AutomataStateDisplayer
 		{
 			helper.setForbidden(currState, true);
 		}
+
 		isInitialBox.setSelected(AutomataIndexFormHelper.isInitial(currState));
 		isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
 		isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));

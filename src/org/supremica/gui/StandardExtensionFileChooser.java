@@ -59,72 +59,86 @@ public class StandardExtensionFileChooser
 {
 	private static Logger logger = LoggerFactory.createLogger(StandardExtensionFileChooser.class);
 
-
-	public StandardExtensionFileChooser()
-	{
-	}
-
+	public StandardExtensionFileChooser() {}
 
 	/**
 	 * Adds the standard extension if nothing else is specificed.
 	 */
-
 	public File getSelectedFile()
 	{
+
 		//System.err.println("getSelectedFile");
 		File orgFile = super.getSelectedFile();
+
 		if (getDialogType() != JFileChooser.SAVE_DIALOG)
 		{
 			return orgFile;
 		}
+
 		if (orgFile == null)
 		{
 			return orgFile;
 		}
+
 		FileFilter theFilter = getFileFilter();
+
 		if (theFilter == null)
 		{
 			return orgFile;
 		}
+
 		if (!(theFilter instanceof StandardExtensionFileFilter))
 		{
 			return orgFile;
 		}
+
 		//System.err.println("all files pre");
-		StandardExtensionFileFilter standardFileFilter = (StandardExtensionFileFilter)theFilter;
+		StandardExtensionFileFilter standardFileFilter = (StandardExtensionFileFilter) theFilter;
+
 		if ("All Files".equals(theFilter.getDescription()))
-		{ // For some reason this does not work
+		{    // For some reason this does not work
+
 			//System.err.println("all files");
 			String fileName = getName(orgFile);
+
 			if (fileName == null)
 			{
 				return orgFile;
 			}
+
 			if (fileName.startsWith("\"") && fileName.endsWith("\""))
 			{
+
 				//System.err.println("all files with fnuttar");
 				File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
+
 				return newFile;
 			}
+
 			return orgFile;
 		}
+
 		String fileName = getName(orgFile);
+
 		if (fileName == null)
 		{
 			return orgFile;
 		}
+
 		if (fileName.startsWith("\"") && fileName.endsWith("\""))
 		{
 			File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
+
 			return newFile;
 		}
+
 		if (!standardFileFilter.hasExtension(fileName))
 		{
 			File newFile = new File(orgFile.getAbsolutePath() + standardFileFilter.getExtension());
+
 			return newFile;
 		}
 
 		return orgFile;
 	}
-
 }

@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.util.Vector;
 
 /**
@@ -62,18 +61,19 @@ import java.util.Vector;
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
  * @see org.apache.xmlrpc.AuthenticationFailed
- * @version $Id: ContextXmlRpcHandler.java,v 1.1 2004-02-02 15:56:16 vahidi Exp $
+ * @version $Id: ContextXmlRpcHandler.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  * @since 1.2
  */
 public interface ContextXmlRpcHandler
 {
-    /**
-     * Return the result, or throw an Exception if something went wrong.
-     *
-     * @throws AuthenticationFailed If authentication fails, an
-     * exception of this type must be thrown.
-     * @see org.apache.xmlrpc.AuthenticationFailed
-     */
-    public Object execute(String method, Vector params, XmlRpcContext context)
-            throws Exception;
+
+	/**
+	 * Return the result, or throw an Exception if something went wrong.
+	 *
+	 * @throws AuthenticationFailed If authentication fails, an
+	 * exception of this type must be thrown.
+	 * @see org.apache.xmlrpc.AuthenticationFailed
+	 */
+	public Object execute(String method, Vector params, XmlRpcContext context)
+		throws Exception;
 }

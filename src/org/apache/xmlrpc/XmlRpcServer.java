@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.io.InputStream;
 import java.util.EmptyStackException;
 import java.util.Stack;
@@ -71,116 +70,122 @@ import java.util.Stack;
  */
 public class XmlRpcServer
 {
-    private Stack pool;
-    private int nbrWorkers;
+	private Stack pool;
+	private int nbrWorkers;
 
-    /**
-     * We want the <code>$default</code> handler to always be
-     * available.
-     */
-    private DefaultHandlerMapping handlerMapping;
+	/**
+	 * We want the <code>$default</code> handler to always be
+	 * available.
+	 */
+	private DefaultHandlerMapping handlerMapping;
 
-    /**
-     * Construct a new XML-RPC server. You have to register handlers
-     * to make it do something useful.
-     */
-    public XmlRpcServer()
-    {
-        pool = new Stack();
-        nbrWorkers = 0;
-        handlerMapping = new DefaultHandlerMapping();
-    }
+	/**
+	 * Construct a new XML-RPC server. You have to register handlers
+	 * to make it do something useful.
+	 */
+	public XmlRpcServer()
+	{
+		pool = new Stack();
+		nbrWorkers = 0;
+		handlerMapping = new DefaultHandlerMapping();
+	}
 
-    /**
-     * @see org.apache.xmlrpc.DefaultHandlerMapping#addHandler(String, Object)
-     */
-    public void addHandler(String handlerName, Object handler)
-    {
-        handlerMapping.addHandler(handlerName, handler);
-    }
+	/**
+	 * @see org.apache.xmlrpc.DefaultHandlerMapping#addHandler(String, Object)
+	 */
+	public void addHandler(String handlerName, Object handler)
+	{
+		handlerMapping.addHandler(handlerName, handler);
+	}
 
-    /**
-     * @see org.apache.xmlrpc.DefaultHandlerMapping#removeHandler(String)
-     */
-    public void removeHandler(String handlerName)
-    {
-        handlerMapping.removeHandler(handlerName);
-    }
+	/**
+	 * @see org.apache.xmlrpc.DefaultHandlerMapping#removeHandler(String)
+	 */
+	public void removeHandler(String handlerName)
+	{
+		handlerMapping.removeHandler(handlerName);
+	}
 
-    /**
-     * Return the current XmlRpcHandlerMapping.
-     */
-    public XmlRpcHandlerMapping getHandlerMapping()
-    {
-        return handlerMapping;
-    }
+	/**
+	 * Return the current XmlRpcHandlerMapping.
+	 */
+	public XmlRpcHandlerMapping getHandlerMapping()
+	{
+		return handlerMapping;
+	}
 
-    /**
-     * Parse the request and execute the handler method, if one is
-     * found. Returns the result as XML.  The calling Java code
-     * doesn't need to know whether the call was successful or not
-     * since this is all packed into the response. No context information
-     * is passed.
-     */
-    public byte[] execute(InputStream is)
-    {
-        return execute(is, new DefaultXmlRpcContext(null, null, getHandlerMapping()));
-    }
+	/**
+	 * Parse the request and execute the handler method, if one is
+	 * found. Returns the result as XML.  The calling Java code
+	 * doesn't need to know whether the call was successful or not
+	 * since this is all packed into the response. No context information
+	 * is passed.
+	 */
+	public byte[] execute(InputStream is)
+	{
+		return execute(is, new DefaultXmlRpcContext(null, null, getHandlerMapping()));
+	}
 
-    /**
-     * Parse the request and execute the handler method, if one is
-     * found. If the invoked handler is AuthenticatedXmlRpcHandler,
-     * use the credentials to authenticate the user. No context information
-     * is passed.
-     */
-    public byte[] execute(InputStream is, String user, String password)
-    {
-        return execute(is, new DefaultXmlRpcContext(user, password, getHandlerMapping()));
-    }
-    
-    /**
-     * Parse the request and execute the handler method, if one is
-     * found. If the invoked handler is AuthenticatedXmlRpcHandler,
-     * use the credentials to authenticate the user. Context information
-     * is passed to the worker, and may be passed to the request handler.
-     */
-    public byte[] execute(InputStream is, XmlRpcContext context)
-    {
-        XmlRpcWorker worker = getWorker();
-        byte[] retval = worker.execute(is, context);
-        pool.push(worker);
-        return retval;
-    }
+	/**
+	 * Parse the request and execute the handler method, if one is
+	 * found. If the invoked handler is AuthenticatedXmlRpcHandler,
+	 * use the credentials to authenticate the user. No context information
+	 * is passed.
+	 */
+	public byte[] execute(InputStream is, String user, String password)
+	{
+		return execute(is, new DefaultXmlRpcContext(user, password, getHandlerMapping()));
+	}
 
-    /**
-     * Hands out pooled workers.
-     *
-     * @return A worker.
-     */
-    protected XmlRpcWorker getWorker()
-    {
-        try
-        {
-            return (XmlRpcWorker) pool.pop();
-        }
-        catch(EmptyStackException x)
-        {
-            int maxThreads = XmlRpc.getMaxThreads();
-            if (nbrWorkers < maxThreads)
-            {
-                nbrWorkers += 1;
-                if (nbrWorkers >= maxThreads * .95)
-                {
-                    System.out.println("95% of XML-RPC server threads in use");
-                }
-                return createWorker();
-            }
-            throw new RuntimeException("System overload");
-        }
-    }
+	/**
+	 * Parse the request and execute the handler method, if one is
+	 * found. If the invoked handler is AuthenticatedXmlRpcHandler,
+	 * use the credentials to authenticate the user. Context information
+	 * is passed to the worker, and may be passed to the request handler.
+	 */
+	public byte[] execute(InputStream is, XmlRpcContext context)
+	{
+		XmlRpcWorker worker = getWorker();
+		byte[] retval = worker.execute(is, context);
 
-    protected XmlRpcWorker createWorker()
-    {
-        return new XmlRpcWorker(handlerMapping);
-    }
+		pool.push(worker);
+
+		return retval;
+	}
+
+	/**
+	 * Hands out pooled workers.
+	 *
+	 * @return A worker.
+	 */
+	protected XmlRpcWorker getWorker()
+	{
+		try
+		{
+			return (XmlRpcWorker) pool.pop();
+		}
+		catch (EmptyStackException x)
+		{
+			int maxThreads = XmlRpc.getMaxThreads();
+
+			if (nbrWorkers < maxThreads)
+			{
+				nbrWorkers += 1;
+
+				if (nbrWorkers >= maxThreads * .95)
+				{
+					System.out.println("95% of XML-RPC server threads in use");
+				}
+
+				return createWorker();
+			}
+
+			throw new RuntimeException("System overload");
+		}
+	}
+
+	protected XmlRpcWorker createWorker()
+	{
+		return new XmlRpcWorker(handlerMapping);
+	}
 }

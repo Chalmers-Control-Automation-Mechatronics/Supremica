@@ -62,14 +62,13 @@ package org.apache.xmlrpc;
  * @see org.apache.xmlrpc.AuthenticatedXmlRpcHandler
  * @since 1.2
  */
-public class AuthenticationFailed extends RuntimeException
+public class AuthenticationFailed
+	extends RuntimeException
 {
-    public AuthenticationFailed()
-    {
-    }
+	public AuthenticationFailed() {}
 
-    public AuthenticationFailed(String msg)
-    {
-        super(msg);
-    }
+	public AuthenticationFailed(String msg)
+	{
+		super(msg);
+	}
 }

@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -73,6 +74,7 @@ public class AutomataExplorer
 	private AutomataStateViewer stateViewer;
 	private AutomataExplorerController controller;
 	private AutomataSynchronizerHelper helper;
+
 	//private AutomataOnlineSynchronizer onlineSynchronizer;
 	private AutomataSynchronizerExecuter onlineSynchronizer;
 
@@ -82,7 +84,7 @@ public class AutomataExplorer
 		this.theAutomata = theAutomata;
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true, false);
-		
+
 		helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
 		// Build the initial state
@@ -104,6 +106,7 @@ public class AutomataExplorer
 
 		//onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
 		onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
+
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);
@@ -117,6 +120,7 @@ public class AutomataExplorer
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		// / setTitle(theAutomaton.getName());
 		setTitle("AutomataExplorer");
+
 		/*
 		setSize(400, 500);
 
@@ -126,23 +130,23 @@ public class AutomataExplorer
 
 		if (frameSize.height > screenSize.height)
 		{
-			frameSize.height = screenSize.height;
+				frameSize.height = screenSize.height;
 		}
 
 		if (frameSize.width > screenSize.width)
 		{
-			frameSize.width = screenSize.width;
+				frameSize.width = screenSize.width;
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		*/
 		Utility.setupFrame(this, 400, 500);
-
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
+
 				//dispose();
 			}
 		});
@@ -188,6 +192,7 @@ public class AutomataExplorer
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
+
 				//dispose();
 			}
 		});
@@ -235,9 +240,3 @@ public class AutomataExplorer
 		updated(aut);
 	}
 }
-
-
-
-
-
-

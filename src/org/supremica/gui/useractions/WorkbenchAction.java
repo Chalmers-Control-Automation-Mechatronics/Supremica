@@ -1,16 +1,16 @@
+
 /******************** WorkbenchAction.java *****************/
+
 // Action class for the Workbench action
 // Owner: MF
 package org.supremica.gui.useractions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
-
 import org.supremica.log.*;
 import org.supremica.automata.Automata;
 import org.supremica.gui.ActionMan;
 import org.supremica.gui.VisualProject;
-
 import org.supremica.workbench.Workbench;
 
 public class WorkbenchAction
@@ -21,9 +21,10 @@ public class WorkbenchAction
 	public WorkbenchAction()
 	{
 		super("Workbench...", null);
+
 		putValue(SHORT_DESCRIPTION, "Manual supervisor synthesis");
 	}
-	
+
 	// Note, we avoid (short-circut) the ActionMan here... should we?
 	public void actionPerformed(ActionEvent e)
 	{
@@ -44,7 +45,6 @@ public class WorkbenchAction
 	public void execute(VisualProject theProject, Automata theAutomata)
 		throws Exception
 	{
-			new Workbench(theProject, theAutomata).show();
+		new Workbench(theProject, theAutomata).show();
 	}
-
 }

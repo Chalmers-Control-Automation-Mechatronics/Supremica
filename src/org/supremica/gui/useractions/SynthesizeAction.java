@@ -1,10 +1,11 @@
+
 /******************** SynthesizeAction.java *****************/
+
 // Encapuslates the synthesize action
 package org.supremica.gui.useractions;
 
 import java.awt.event.*;
 import javax.swing.*;
-
 import org.supremica.gui.ActionMan;
 
 public class SynthesizeAction
@@ -13,6 +14,7 @@ public class SynthesizeAction
 	public SynthesizeAction()
 	{
 		super("Synthesize...", null);
+
 		putValue(SHORT_DESCRIPTION, "Synthesize supervisor(s)");
 	}
 
@@ -20,5 +22,4 @@ public class SynthesizeAction
 	{
 		ActionMan.automataSynthesize_actionPerformed(ActionMan.getGui());
 	}
-
 }

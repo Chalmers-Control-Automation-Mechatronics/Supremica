@@ -5,33 +5,31 @@ import java.util.*;
 
 public class DLOReader
 {
-    private LinkedList booleans = new LinkedList();
+	private LinkedList booleans = new LinkedList();
 
-    public DLOReader(FileReader fr) throws IOException
-    {
+	public DLOReader(FileReader fr)
+		throws IOException
+	{
 		parse(fr);
-    }
+	}
 
+	void parse(FileReader fr)
+		throws IOException
+	{
+		String input;
+		BufferedReader br = new BufferedReader(fr);
 
-    void parse(FileReader fr) throws IOException
-    {
-        String input;
-	BufferedReader br = new BufferedReader(fr);
-
-        while ((input = br.readLine()) != null )
+		while ((input = br.readLine()) != null)
+		{
+			if (input.startsWith("#B"))
 			{
-				if (input.startsWith("#B"))
-					{
-						booleans.add(input.substring(13, input.indexOf("%", 13)));
-					}
-
+				booleans.add(input.substring(13, input.indexOf("%", 13)));
 			}
-    }
+		}
+	}
 
-    public LinkedList getBooleans()
-    {
+	public LinkedList getBooleans()
+	{
 		return booleans;
-    }
-
+	}
 }
-

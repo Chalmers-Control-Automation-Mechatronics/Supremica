@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -53,7 +54,6 @@ import org.supremica.log.*;
 public class Arc
 {
 	private static Logger logger = LoggerFactory.createLogger(Arc.class);
-
 	private LabeledEvent event;
 	private State fromState;
 	private State toState;
@@ -84,14 +84,16 @@ public class Arc
 		{
 			throw new IllegalArgumentException("State from must be non null");
 		}
+
 		if (to == null)
 		{
 			throw new IllegalArgumentException("State to must be non null");
 		}
+
 		this.fromState = from;
 		this.toState = to;
-		// this.eventId = eventId;
 
+		// this.eventId = eventId;
 		from.addOutgoingArc(this);
 		to.addIncomingArc(this);
 	}
@@ -100,6 +102,7 @@ public class Arc
 		throws IllegalArgumentException
 	{
 		this(from, to);
+
 		this.event = event;
 	}
 
@@ -140,8 +143,10 @@ public class Arc
 
 	public void reverse()
 	{
+
 		// swap the states
 		State tmpState = getToState();
+
 		toState = getFromState();
 		fromState = tmpState;
 	}
@@ -284,12 +289,15 @@ public class Arc
 	}
 
 	/**
-	 *	Returns a boolean vector where true means that the corresponding automata
-	 *	is (one of the) "responsible(s)" for the transition.
+	 *      Returns a boolean vector where true means that the corresponding automata
+	 *      is (one of the) "responsible(s)" for the transition.
 	 *
-	 *	@return firingAutomata
+	 *      @return firingAutomata
 	 */
-	 public boolean[] getFiringAutomata() { return firingAutomata; }
+	public boolean[] getFiringAutomata()
+	{
+		return firingAutomata;
+	}
 
 	// For debugging (etc)
 	public String toString()
@@ -303,19 +311,22 @@ public class Arc
 		sbuf.append(", ");
 		sbuf.append(getToState().toString());
 		sbuf.append(">");
+
 		return sbuf.toString();
 	}
 
 	/**
-	 *	Initializes the array of firingAutomata
+	 *      Initializes the array of firingAutomata
 	 *
-	 *	@param size
+	 *      @param size
 	 */
 	private void initFiringAutomata(int size)
 	{
 		firingAutomata = new boolean[size];
 
-		for (int i=0; i<size; i++)
+		for (int i = 0; i < size; i++)
+		{
 			firingAutomata[i] = false;
+		}
 	}
 }

@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -65,50 +64,56 @@ import java.util.Vector;
  * @author <a href="mailto:adam@megacz.com">Adam Megacz</a>
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
- * @version $Id: MultiCall.java,v 1.1 2004-02-02 15:56:17 vahidi Exp $
+ * @version $Id: MultiCall.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  * @since 1.2
  */
 public class MultiCall
-implements ContextXmlRpcHandler
+	implements ContextXmlRpcHandler
 {
-    public Object execute(String method, Vector params, XmlRpcContext context)
-            throws Exception
-    {
-        if ("multicall".equals(method))
-        {
-            return multicall(params, context);
-        }
+	public Object execute(String method, Vector params, XmlRpcContext context)
+		throws Exception
+	{
+		if ("multicall".equals(method))
+		{
+			return multicall(params, context);
+		}
 
-        throw new NoSuchMethodException("No method '" + method + "' in " + this.getClass().getName());
-    }
+		throw new NoSuchMethodException("No method '" + method + "' in " + this.getClass().getName());
+	}
 
-    public Vector multicall(Vector requests, XmlRpcContext context)
-    {
-        Vector response = new Vector();
-        XmlRpcRequest request;
-        for (int i = 0; i < requests.size(); i++)
-        {
-            try
-            {
-                Hashtable call = (Hashtable) requests.elementAt(i);
-                request = new XmlRpcRequest((String) call.get("methodName"),
-                                            (Vector) call.get("params"));
-                Object handler = context.getHandlerMapping().getHandler(request.getMethodName());
-                Vector v = new Vector();
-                v.addElement(XmlRpcWorker.invokeHandler(handler, request, context));
-                response.addElement(v);
-            }
-            catch (Exception x)
-            {
-                String message = x.toString();
-                int code = (x instanceof XmlRpcException ?
-                            ((XmlRpcException) x).code : 0);
-                Hashtable h = new Hashtable();
-                h.put("faultString", message);
-                h.put("faultCode", new Integer(code));
-                response.addElement(h);
-            }
-        }
-        return response;
-    }
+	public Vector multicall(Vector requests, XmlRpcContext context)
+	{
+		Vector response = new Vector();
+		XmlRpcRequest request;
+
+		for (int i = 0; i < requests.size(); i++)
+		{
+			try
+			{
+				Hashtable call = (Hashtable) requests.elementAt(i);
+
+				request = new XmlRpcRequest((String) call.get("methodName"), (Vector) call.get("params"));
+
+				Object handler = context.getHandlerMapping().getHandler(request.getMethodName());
+				Vector v = new Vector();
+
+				v.addElement(XmlRpcWorker.invokeHandler(handler, request, context));
+				response.addElement(v);
+			}
+			catch (Exception x)
+			{
+				String message = x.toString();
+				int code = ((x instanceof XmlRpcException)
+							? ((XmlRpcException) x).code
+							: 0);
+				Hashtable h = new Hashtable();
+
+				h.put("faultString", message);
+				h.put("faultCode", new Integer(code));
+				response.addElement(h);
+			}
+		}
+
+		return response;
+	}
 }

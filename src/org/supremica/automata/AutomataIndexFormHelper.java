@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -63,7 +64,9 @@ public final class AutomataIndexFormHelper
 	public static int[] createState(int nbrOfAutomata)
 	{
 		int[] newState = new int[nbrOfAutomata + STATE_EXTRA_DATA];
+
 		newState[nbrOfAutomata + STATE_EXTRA_DATA - STATE_PREVSTATE_FROM_END] = STATE_NO_PREVSTATE;
+
 		return newState;
 	}
 
@@ -247,6 +250,7 @@ public final class AutomataIndexFormHelper
 			}
 			catch (NumberFormatException ex)
 			{
+
 				// logger.debug(ex.getStackTrace());
 				return null;
 			}
@@ -287,7 +291,6 @@ public final class AutomataIndexFormHelper
 	public static String dumpVerboseState(int[] state, AutomataIndexForm theForm)
 	{
 		StringBuffer sb = new StringBuffer("[\n");
-
 		State[][] stateTable = theForm.getStateTable();
 
 		for (int i = 0; i < state.length - STATE_EXTRA_DATA; i++)
@@ -300,12 +303,10 @@ public final class AutomataIndexFormHelper
 
 		sb.append("Previous state index: " + state[state.length - STATE_PREVSTATE_FROM_END] + "\n");
 		sb.append("Status: " + state[state.length - STATE_STATUS_FROM_END] + "\n");
-
 		sb.append("]");
 
 		return sb.toString();
 	}
-
 
 	public static void main(String[] args)
 	{

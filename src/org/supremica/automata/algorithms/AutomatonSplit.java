@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -64,15 +65,17 @@ public class AutomatonSplit
 		Automata split = new Automata();
 		Automaton splitA = null;
 		Automaton splitB = null;
-
 		int bestValue = Integer.MAX_VALUE;
 
 		try
 		{
-			for (EventIterator evIt = original.eventIterator(); evIt.hasNext();)
+			for (EventIterator evIt = original.eventIterator();
+					evIt.hasNext(); )
 			{
+
 				// Remove one event from A's alphabet
 				LabeledEvent remove = evIt.nextEvent();
+
 				splitA = removeEvent(original, remove);
 				splitB = reduceAutomaton(new Automaton(original), new Automata(splitA));
 				splitA = reduceAutomaton(new Automaton(original), new Automata(splitB));
@@ -84,22 +87,24 @@ public class AutomatonSplit
 				logger.info("A: " + splitA.nbrOfStates() + " B: " + splitB.nbrOfStates());
 				if (bestValue > value && (splitA.nbrOfStates() > 1) && (splitB.nbrOfStates() > 1))
 				{
-					split.clear();
-					splitA.setComment(original.getName() + "_A");
-					splitB.setComment(original.getName() + "_B");
-					split.addAutomaton(splitA);
-					split.addAutomaton(splitB);
-					bestValue = value;
+						split.clear();
+						splitA.setComment(original.getName() + "_A");
+						splitB.setComment(original.getName() + "_B");
+						split.addAutomaton(splitA);
+						split.addAutomaton(splitB);
+						bestValue = value;
 				}
 				*/
-
-				if (splitA.nbrOfEvents() == 0 || splitB.nbrOfEvents() == 0)
+				if ((splitA.nbrOfEvents() == 0) || (splitB.nbrOfEvents() == 0))
+				{
 					continue;
+				}
 
 				splitA.setComment(original.getName() + "_A");
 				splitB.setComment(original.getName() + "_B");
 				split.addAutomaton(splitA);
 				split.addAutomaton(splitB);
+
 				break;
 			}
 		}
@@ -111,7 +116,7 @@ public class AutomatonSplit
 		// Fail?
 		if (split.size() == 0)
 		{
-			logger.info("Unable to split automaton " + original  + ".");
+			logger.info("Unable to split automaton " + original + ".");
 		}
 
 		// Return the results
@@ -132,33 +137,39 @@ public class AutomatonSplit
 	public static Automaton reduceAutomaton(Automaton supervisor, Automata parents)
 	{
 		if (supervisor.nbrOfStates() == 0)
+		{
 			return supervisor;
+		}
 
 		Automaton result = supervisor;
 		Automata automataB = new Automata(supervisor);
-
 		Alphabet parentUnion = parents.getUnionAlphabet();
 
 		try
 		{
+
 			// Remove event and examine if it was redundant
-			for (EventIterator evIt = result.eventIterator(); evIt.hasNext();)
+			for (EventIterator evIt = result.eventIterator(); evIt.hasNext(); )
 			{
 				LabeledEvent event = evIt.nextEvent();
 
 				// Do not remove an event that is local in the supervisor
 				if (!parentUnion.containsEqualEvent(event))
+				{
 					continue;
+				}
 
 				// Remove one event from the automaton´s alphabet
 				Automaton reduction = removeEvent(result, event);
 
 				// Have we removed something vital? (If not, that's good!)
 				Automata automataA = new Automata();
+
 				automataA.addAutomaton(reduction);
 				automataA.addAutomata(parents);
+
 				if (AutomataVerifier.verifyInclusion(automataA, automataB))
-				{   // Removing the event didn't make a difference!
+				{    // Removing the event didn't make a difference!
 					result = reduction;
 				}
 			}
@@ -167,19 +178,19 @@ public class AutomatonSplit
 			// Merge states and examine if it was redundant
 			for (ArcIterator arcIt = result.arcIterator(); arcIt.hasNext();)
 			{
-				Arc arc = arcIt.nextArc();
+					Arc arc = arcIt.nextArc();
 
-				// Merge states in transition, make selfloop
-				Automaton reduction = removeTransition(result, arc);
+					// Merge states in transition, make selfloop
+					Automaton reduction = removeTransition(result, arc);
 
-				// Have we removed something vital? (If not, that's good!)
-				Automata automataA = new Automata();
-				automataA.addAutomaton(reduction);
-				automataA.addAutomata(parents);
-				if (AutomataVerifier.verifyInclusion(automataA, automataB))
-				{   // Removing the event didn't make a difference!
-					result = reduction;
-				}
+					// Have we removed something vital? (If not, that's good!)
+					Automata automataA = new Automata();
+					automataA.addAutomaton(reduction);
+					automataA.addAutomata(parents);
+					if (AutomataVerifier.verifyInclusion(automataA, automataB))
+					{   // Removing the event didn't make a difference!
+							result = reduction;
+					}
 			}
 			*/
 		}
@@ -187,34 +198,43 @@ public class AutomatonSplit
 		{
 			logger.error("Error when reducing automaton " + supervisor + ", " + ex);
 		}
-		
+
 		// Give the new automaton an appropriate comment
 		//result.setComment("red(" + supervisor.getComment() + ")");
 		//result.setName(null);
 		result.setComment("red(" + supervisor.getName() + ")");
+
 		//result.setName("red(" + supervisor.getName() + ")");
-		
 		// Set the right type
-		result.setType(supervisor.getType());  // should be a supervisor...
-		
+		result.setType(supervisor.getType());    // should be a supervisor...
+
 		if (supervisor.nbrOfStates() < result.nbrOfStates())
+		{
 			return supervisor;
+		}
 		else
+		{
 			return result;
+		}
 	}
 
 	/**
 	 * Removes, by natural projection, one event from the alphabet.
 	 * The method returns a determinized and minimized automaton
- 	 */
+	 */
 	private static Automaton removeEvent(Automaton automaton, LabeledEvent event)
 		throws Exception
 	{
+
 		// Remove one event and make deterministic
 		Alphabet restrictAlphabet = new Alphabet();
+
 		restrictAlphabet.addEvent(event);
+
 		Determinizer detm = new Determinizer(automaton, restrictAlphabet, true);
+
 		detm.execute();
+
 		Automaton deterministic = detm.getNewAutomaton();
 
 		// Minimize
@@ -222,8 +242,10 @@ public class AutomatonSplit
 
 		// Set comment and return
 		Automaton result = minimizer.getMinimizedAutomaton();
+
 		result.setName(null);
 		result.setComment(automaton + "\\" + restrictAlphabet);
+
 		return result;
 	}
 
@@ -237,20 +259,27 @@ public class AutomatonSplit
 		State fromState = arc.getFromState();
 		State toState = arc.getToState();
 
-		for (ArcIterator arcIt = toState.incomingArcsIterator(); arcIt.hasNext();)
+		for (ArcIterator arcIt = toState.incomingArcsIterator();
+				arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.nextArc();
+
 			currArc.setToState(fromState);
 		}
-		for (ArcIterator arcIt = toState.outgoingArcsIterator(); arcIt.hasNext();)
+
+		for (ArcIterator arcIt = toState.outgoingArcsIterator();
+				arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.nextArc();
+
 			currArc.setFromState(fromState);
 		}
 
 		// Make deterministic
 		Determinizer detm = new Determinizer(automaton);
+
 		detm.execute();
+
 		Automaton deterministic = detm.getNewAutomaton();
 
 		// Minimize

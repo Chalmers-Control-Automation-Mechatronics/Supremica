@@ -61,25 +61,28 @@ package org.apache.xmlrpc;
  * IOException will be thrown instead.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: XmlRpcException.java,v 1.1 2004-02-02 15:56:20 vahidi Exp $
+ * @version $Id: XmlRpcException.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  */
-public class XmlRpcException extends Exception
+public class XmlRpcException
+	extends Exception
 {
-    /**
-     * The fault code of the exception. For servers based on this library, this
-     * will always be 0. (If there are predefined error codes, they should be in
-     * the XML-RPC spec.)
-     */
-    public final int code;
 
-    /**
-     *
-     * @param code
-     * @param message
-     */
-    public XmlRpcException(int code, String message)
-    {
-        super(message);
-        this.code = code;
-    }
+	/**
+	 * The fault code of the exception. For servers based on this library, this
+	 * will always be 0. (If there are predefined error codes, they should be in
+	 * the XML-RPC spec.)
+	 */
+	public final int code;
+
+	/**
+	 *
+	 * @param code
+	 * @param message
+	 */
+	public XmlRpcException(int code, String message)
+	{
+		super(message);
+
+		this.code = code;
+	}
 }

@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.util.Vector;
 
 /**
@@ -65,20 +64,20 @@ import java.util.Vector;
  */
 public interface AuthenticatedXmlRpcHandler
 {
-    /**
-     * Return the result, or throw an Exception if something went wrong.
-     *
-     * @param method The name of the XML-RPC method to invoke.
-     * @param params The parameters to the XML-RPC method.
-     * @param user The user name.
-     * @param password The password of <code>user</code>.
-     * @return The response.
-     *
-     * @throws AuthenticationFailed If authentication fails, an
-     * exception of this type must be thrown.
-     * @see org.apache.xmlrpc.AuthenticationFailed
-     */
-    public Object execute(String method, Vector params, String user,
-                          String password)
-        throws Exception;
+
+	/**
+	 * Return the result, or throw an Exception if something went wrong.
+	 *
+	 * @param method The name of the XML-RPC method to invoke.
+	 * @param params The parameters to the XML-RPC method.
+	 * @param user The user name.
+	 * @param password The password of <code>user</code>.
+	 * @return The response.
+	 *
+	 * @throws AuthenticationFailed If authentication fails, an
+	 * exception of this type must be thrown.
+	 * @see org.apache.xmlrpc.AuthenticationFailed
+	 */
+	public Object execute(String method, Vector params, String user, String password)
+		throws Exception;
 }

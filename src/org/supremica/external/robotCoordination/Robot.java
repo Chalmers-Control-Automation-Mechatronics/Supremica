@@ -4,6 +4,7 @@ import java.util.*;
 
 public interface Robot
 {
+
 	/**
 	 * Returns list of the positions for this robot.
 	 */
@@ -52,4 +53,3 @@ public interface Robot
 	public void jumpToPosition(Position position)
 		throws Exception;
 }
-

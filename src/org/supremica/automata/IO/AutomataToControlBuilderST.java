@@ -62,7 +62,7 @@ public class AutomataToControlBuilderST
 	public AutomataToControlBuilderST(Project theProject)
 		throws Exception
 	{
-		theHelper = (ControlBuilderHelper)ControlBuilderHelper.getInstance();
+		theHelper = (ControlBuilderHelper) ControlBuilderHelper.getInstance();
 		theExporter = new AutomataToIEC1131(theProject, theHelper);
 	}
 
@@ -70,6 +70,7 @@ public class AutomataToControlBuilderST
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		theExporter.serializeStructuredText(theWriter);
 		theWriter.close();
 	}
@@ -78,6 +79,7 @@ public class AutomataToControlBuilderST
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		theHelper.printPrj(theWriter, filename);
 		theWriter.close();
 	}

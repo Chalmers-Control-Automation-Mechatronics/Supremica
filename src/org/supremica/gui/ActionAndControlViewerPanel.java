@@ -55,19 +55,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-
 import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.automata.execution.*;
 import org.supremica.log.*;
-
 
 public class ActionAndControlViewerPanel
 	extends JPanel
 	implements AutomataListener
 {
 	private static Logger logger = LoggerFactory.createLogger(ActionAndControlViewerPanel.class);
-
 	private Project theProject;
 	private boolean updateNeeded = false;
 	private JTree theTree = new JTree();
@@ -77,8 +74,8 @@ public class ActionAndControlViewerPanel
 		throws Exception
 	{
 		this.theProject = theProject;
-		theProject.addListener(this);
 
+		theProject.addListener(this);
 		setLayout(new BorderLayout());
 
 		// setPreferredSize(new Dimension(75, 400));
@@ -92,101 +89,136 @@ public class ActionAndControlViewerPanel
 		throws Exception
 	{
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Execution");
-
 		DefaultMutableTreeNode inputSignalsNode = new DefaultMutableTreeNode("InputSignals");
+
 		root.add(inputSignalsNode);
 
 		DefaultMutableTreeNode outputSignalsNode = new DefaultMutableTreeNode("OutputSignals");
+
 		root.add(outputSignalsNode);
 
 		DefaultMutableTreeNode actionsNode = new DefaultMutableTreeNode("Actions");
+
 		root.add(actionsNode);
 
 		DefaultMutableTreeNode controlsNode = new DefaultMutableTreeNode("Controls");
+
 		root.add(controlsNode);
 
 		DefaultMutableTreeNode timersNode = new DefaultMutableTreeNode("Timers");
+
 		root.add(timersNode);
 
-		for (Iterator theIt = theProject.inputSignalsIterator(); theIt.hasNext();)
+		for (Iterator theIt = theProject.inputSignalsIterator();
+				theIt.hasNext(); )
 		{
-			Signal currSignal = (Signal)theIt.next();
+			Signal currSignal = (Signal) theIt.next();
 			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
+
 			inputSignalsNode.add(currSignalNode);
+
 			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
+
 			currSignalNode.add(currPortNode);
+
 			DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+
 			currPortNode.add(currPortNodeAttribute);
 		}
 
-		for (Iterator theIt = theProject.outputSignalsIterator(); theIt.hasNext();)
+		for (Iterator theIt = theProject.outputSignalsIterator();
+				theIt.hasNext(); )
 		{
-			Signal currSignal = (Signal)theIt.next();
+			Signal currSignal = (Signal) theIt.next();
 			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
+
 			outputSignalsNode.add(currSignalNode);
+
 			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
+
 			currSignalNode.add(currPortNode);
+
 			DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+
 			currPortNode.add(currPortNodeAttribute);
 		}
 
 		Actions currActions = theProject.getActions();
+
 		if (currActions != null)
 		{
-			for (Iterator actIt = currActions.iterator(); actIt.hasNext();)
+			for (Iterator actIt = currActions.iterator(); actIt.hasNext(); )
 			{
-				Action currAction = (Action)actIt.next();
+				Action currAction = (Action) actIt.next();
 				DefaultMutableTreeNode currActionNode = new DefaultMutableTreeNode(currAction.getLabel());
+
 				actionsNode.add(currActionNode);
-				for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext();)
+
+				for (Iterator cmdIt = currAction.commandIterator();
+						cmdIt.hasNext(); )
 				{
-					Command currCommand = (Command)cmdIt.next();
+					Command currCommand = (Command) cmdIt.next();
 					DefaultMutableTreeNode currCommandNode = new DefaultMutableTreeNode(currCommand);
+
 					currActionNode.add(currCommandNode);
 				}
 			}
-
 		}
 
 		Controls currControls = theProject.getControls();
+
 		if (currControls != null)
 		{
-			for (Iterator conIt = currControls.iterator(); conIt.hasNext();)
+			for (Iterator conIt = currControls.iterator(); conIt.hasNext(); )
 			{
-				Control currControl = (Control)conIt.next();
+				Control currControl = (Control) conIt.next();
 				DefaultMutableTreeNode currControlNode = new DefaultMutableTreeNode(currControl.getLabel());
+
 				controlsNode.add(currControlNode);
-				for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext();)
+
+				for (Iterator condIt = currControl.conditionIterator();
+						condIt.hasNext(); )
 				{
-					Condition currCondition = (Condition)condIt.next();
+					Condition currCondition = (Condition) condIt.next();
 					DefaultMutableTreeNode currConditionNode = new DefaultMutableTreeNode(currCondition);
+
 					currControlNode.add(currConditionNode);
 				}
 			}
 		}
 
-		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext();)
+		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext(); )
 		{
-			EventTimer currTimer = (EventTimer)theIt.next();
+			EventTimer currTimer = (EventTimer) theIt.next();
 			DefaultMutableTreeNode currTimerNode = new DefaultMutableTreeNode(currTimer.getName());
+
 			timersNode.add(currTimerNode);
 
 			// Start event
 			DefaultMutableTreeNode currStartEventNode = new DefaultMutableTreeNode("Start event");
+
 			currTimerNode.add(currStartEventNode);
+
 			DefaultMutableTreeNode currStartEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getStartEvent());
+
 			currStartEventNode.add(currStartEventNodeAttribute);
 
 			// Timeout event
 			DefaultMutableTreeNode currTimeoutEventNode = new DefaultMutableTreeNode("Timeout event");
+
 			currTimerNode.add(currTimeoutEventNode);
+
 			DefaultMutableTreeNode currTimeoutEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getTimeoutEvent());
+
 			currTimeoutEventNode.add(currTimeoutEventNodeAttribute);
 
 			// delay
 			DefaultMutableTreeNode currDelayNode = new DefaultMutableTreeNode("Delay (ms)");
+
 			currTimerNode.add(currDelayNode);
+
 			DefaultMutableTreeNode currDelayNodeAttribute = new DefaultMutableTreeNode(new Integer(currTimer.getDelay()));
+
 			currDelayNode.add(currDelayNodeAttribute);
 		}
 
@@ -215,15 +247,15 @@ public class ActionAndControlViewerPanel
 	}
 
 	public void automatonAdded(Automata automata, Automaton automaton)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void automatonRemoved(Automata automata, Automaton automaton)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void automatonRenamed(Automata automata, Automaton automaton)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void actionsOrControlsChanged(Automata automata)

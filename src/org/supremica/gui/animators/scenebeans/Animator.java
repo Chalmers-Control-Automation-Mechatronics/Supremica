@@ -18,7 +18,6 @@ public class Animator
 	implements ActionListener
 {
 	private static Logger logger = LoggerFactory.createLogger(Animator.class);
-
 	AnimationCanvas _canvas;
 	private MouseDispatcher _dispatcher;
 	private List _commands, _events, _announced;
@@ -193,6 +192,7 @@ public class Animator
 			{
 				_announced.add(ev.getName());
 				_announced.makeVisible(_announced.getItemCount() - 1);
+
 				//Toolkit.getDefaultToolkit().beep();
 			}
 		});
@@ -226,6 +226,7 @@ public class Animator
 	static void usageError()
 	{
 		logger.error("usage: Animator <xml-file> [<name> <value>]*");
+
 		return;
 	}
 

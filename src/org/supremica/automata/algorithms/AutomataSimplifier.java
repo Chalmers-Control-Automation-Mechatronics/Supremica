@@ -8,7 +8,6 @@ import org.supremica.automata.*;
  * simplify a project by removing and transformingthe automata
  *
  */
-
 public class AutomataSimplifier
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataSimplifier.class);
@@ -21,36 +20,40 @@ public class AutomataSimplifier
 		throws Exception
 	{
 		Automata ret = new Automata();
+
 		for (AutomatonIterator it = org.iterator(); it.hasNext(); )
 		{
 			Automaton a = it.nextAutomaton();
 			AutomatonMinimizer am = new AutomatonMinimizer(a);
-			Automaton mm = am.getMinimizedAutomaton() ;
-			mm.setName( "SIMP:" + a.getName() );
-			ret.addAutomaton( mm );
-		}
+			Automaton mm = am.getMinimizedAutomaton();
 
+			mm.setName("SIMP:" + a.getName());
+			ret.addAutomaton(mm);
+		}
 
 		// TODO:
 		// minimizer doesnt remove unreachable states, we should do that ourselves!
-
-
-
 		// first, remove automata that dont do anything
-		Vector toRemove = new Vector(); // automata to remove
-		HashSet toDisable = new HashSet(); // events to disable
+		Vector toRemove = new Vector();    // automata to remove
+		HashSet toDisable = new HashSet();    // events to disable
+
 		for (AutomatonIterator it = ret.iterator(); it.hasNext(); )
 		{
 			Automaton a = it.nextAutomaton();
 			StateSet ss = a.getStateSet();
-			if(ss.isEmpty()) {
+
+			if (ss.isEmpty())
+			{
+
 				// XXX: maybe we sould remove everything??? or at least every automata that shares its events?
 				toRemove.add(a);
-
 				logger.info("Removing NULL automaton " + a);
-			} else {
+			}
+			else
+			{
 				HashSet blocked = AlphabetAnalyzer.getBlockedEvents(a);
-				if(ss.size() == 1)
+
+				if (ss.size() == 1)
 				{
 					toRemove.add(a);
 					logger.info("Removing singe state automaton " + a);
@@ -60,26 +63,30 @@ public class AutomataSimplifier
 			}
 		}
 
-
-		for (Iterator e = toRemove.iterator() ; e.hasNext() ; )
+		for (Iterator e = toRemove.iterator(); e.hasNext(); )
 		{
 			Automaton a = (Automaton) e.next();
+
 			ret.removeAutomaton(a);
 		}
 
 		// let the user know...
-		if(! toDisable.isEmpty() ) {
-			for (Iterator e = toDisable.iterator() ; e.hasNext() ; )
+		if (!toDisable.isEmpty())
+		{
+			for (Iterator e = toDisable.iterator(); e.hasNext(); )
 			{
 				LabeledEvent event = (LabeledEvent) e.next();
+
 				logger.info("Removing blocked event " + event);
 			}
-
 
 			for (AutomatonIterator it = ret.iterator(); it.hasNext(); )
 			{
 				Automaton a = it.nextAutomaton();
-				if(blockEvent(a, toDisable)) {
+
+				if (blockEvent(a, toDisable))
+				{
+
 					// TODO: minimize a, see if its singleton, and so an...
 				}
 			}
@@ -88,26 +95,30 @@ public class AutomataSimplifier
 		return ret;
 	}
 
-
 	private static boolean blockEvent(Automaton a, HashSet events)
 	{
 		boolean changed = false;
+		Vector toRemove = new Vector();
 
-		Vector toRemove =  new Vector();
-		for(ArcIterator ai = a.arcIterator(); ai.hasNext();)
+		for (ArcIterator ai = a.arcIterator(); ai.hasNext(); )
 		{
 			Arc arc = ai.nextArc();
-			if(events.contains( arc.getLabel() ) ) {
+
+			if (events.contains(arc.getLabel()))
+			{
 				toRemove.add(arc);
+
 				changed = true;
 			}
 		}
 
-		for (Iterator e = toRemove.iterator() ; e.hasNext() ; )
+		for (Iterator e = toRemove.iterator(); e.hasNext(); )
 		{
 			Arc arc = (Arc) e.next();
+
 			a.removeArc(arc);
 		}
+
 		return changed;
 	}
 }

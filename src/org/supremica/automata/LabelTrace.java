@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -50,7 +51,6 @@ package org.supremica.automata;
 
 import java.util.*;
 
-
 /**
  * Models an event trace. Instead of storing the
  * event we do store only the label. This is done
@@ -80,25 +80,25 @@ public class LabelTrace
 	public String getFirst()
 		throws NoSuchElementException
 	{
-		return (String)theTrace.getFirst();
+		return (String) theTrace.getFirst();
 	}
 
 	public String getLast()
 		throws NoSuchElementException
 	{
-		return (String)theTrace.getLast();
+		return (String) theTrace.getLast();
 	}
 
 	public String removeFirst()
 		throws NoSuchElementException
 	{
-		return (String)theTrace.removeFirst();
+		return (String) theTrace.removeFirst();
 	}
 
 	public String removeLast()
 		throws NoSuchElementException
 	{
-		return (String)theTrace.removeLast();
+		return (String) theTrace.removeLast();
 	}
 
 	public int size()
@@ -119,15 +119,19 @@ public class LabelTrace
 	public String toString()
 	{
 		StringBuffer traceDesc = new StringBuffer();
-		for (Iterator eIt = iterator(); eIt.hasNext();)
+
+		for (Iterator eIt = iterator(); eIt.hasNext(); )
 		{
 			String currLabel = (String) eIt.next();
+
 			traceDesc.append("'" + currLabel + "'");
+
 			if (eIt.hasNext())
 			{
 				traceDesc.append("->");
 			}
 		}
+
 		return traceDesc.toString();
 	}
 }

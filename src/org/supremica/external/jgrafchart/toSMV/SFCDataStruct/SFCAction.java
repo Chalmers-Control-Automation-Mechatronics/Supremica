@@ -1,18 +1,24 @@
 package org.supremica.external.jgrafchart.toSMV.SFCDataStruct;
+
 public class SFCAction
 {
 	String actionType;
 	String leftHandSide;
 	String rightHandSide;
 
-	public SFCAction(String actionType,String leftHandSide,String rightHandSide)
+	public SFCAction(String actionType, String leftHandSide, String rightHandSide)
 	{
 		this.actionType = actionType.trim();
 		this.leftHandSide = leftHandSide.trim();
-		if(rightHandSide != null)
+
+		if (rightHandSide != null)
+		{
 			this.rightHandSide = rightHandSide.trim();
+		}
 		else
+		{
 			this.rightHandSide = rightHandSide;
+		}
 	}
 
 	public void setActionType(String newActionType)
@@ -44,17 +50,21 @@ public class SFCAction
 	{
 		return rightHandSide;
 	}
+
 	public String getActionString()
 	{
-		return leftHandSide+" := "+rightHandSide;
+		return leftHandSide + " := " + rightHandSide;
 	}
 
 	public String toString()
 	{
-		if(actionType.equals("N"))
-			return actionType+" "+leftHandSide;
+		if (actionType.equals("N"))
+		{
+			return actionType + " " + leftHandSide;
+		}
 		else
-			return actionType+" "+getActionString();
+		{
+			return actionType + " " + getActionString();
+		}
 	}
-
 }

@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -67,9 +68,9 @@ public class AutomatonToFSM
 	public void serialize(PrintWriter pw)
 		throws IOException
 	{
+
 		//System.err.println("Org Alph size: " + aut.getAlphabet().size());
 		//System.err.println("New Alph size: " + eventsNotOnTransitions.size());
-
 		if (!aut.hasInitialState())
 		{
 			throw new IllegalStateException("The automaton does not have an initial state");
@@ -79,6 +80,7 @@ public class AutomatonToFSM
 		pw.println();
 
 		State initialState = aut.getInitialState();
+
 		// Print the initial state first
 		serializeState(pw, initialState);
 
@@ -89,7 +91,7 @@ public class AutomatonToFSM
 			if (state.isInitial())
 			{
 				if (state != initialState)
-				{ // Check that we do not have multiple initial states
+				{    // Check that we do not have multiple initial states
 					throw new IllegalStateException("Multiple initial states are not allowed");
 				}
 			}
@@ -97,28 +99,36 @@ public class AutomatonToFSM
 			{
 				serializeState(pw, state);
 			}
-
 		}
 
 		serializeEventsNotOnTransitions(pw);
-
 		pw.flush();
 		pw.close();
 	}
 
 	protected void serializeState(PrintWriter pw, State state)
 	{
+
 		// Print the state information
-		pw.println(state.getName() + "\t" + (state.isAccepting() ? "1" : "0") + "\t" + state.nbrOfOutgoingArcs());
+		pw.println(state.getName() + "\t" + (state.isAccepting()
+											 ? "1"
+											 : "0") + "\t" + state.nbrOfOutgoingArcs());
 
 		// Print all outgoing arcs
-		for (ArcIterator arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
+		for (ArcIterator arcIt = state.outgoingArcsIterator();
+				arcIt.hasNext(); )
 		{
-		 	Arc currArc = arcIt.nextArc();
-		 	State targetState = currArc.getToState();
-		 	LabeledEvent currEvent = currArc.getEvent();
-		 	String label = currEvent.getLabel();
-		 	pw.println(label + "\t" + targetState.getName() + "\t" + (currEvent.isControllable() ? "c" : "uc") + "\t" + (currEvent.isObservable() ? "o" : "uo") );
+			Arc currArc = arcIt.nextArc();
+			State targetState = currArc.getToState();
+			LabeledEvent currEvent = currArc.getEvent();
+			String label = currEvent.getLabel();
+
+			pw.println(label + "\t" + targetState.getName() + "\t" + (currEvent.isControllable()
+																	  ? "c"
+																	  : "uc") + "\t" + (currEvent.isObservable()
+																						? "o"
+																						: "uo"));
+
 			if (eventsNotOnTransitions.contains(label))
 			{
 				eventsNotOnTransitions.removeEvent(label);
@@ -135,12 +145,18 @@ public class AutomatonToFSM
 		{
 			pw.println("EVENTS");
 
-			for (EventIterator evIt = eventsNotOnTransitions.iterator(); evIt.hasNext(); )
+			for (EventIterator evIt = eventsNotOnTransitions.iterator();
+					evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
-				pw.println(currEvent.getLabel() + "\t" + (currEvent.isControllable() ? "c" : "uc") + "\t" + (currEvent.isObservable() ? "o" : "uo") );
 
+				pw.println(currEvent.getLabel() + "\t" + (currEvent.isControllable()
+														  ? "c"
+														  : "uc") + "\t" + (currEvent.isObservable()
+																			? "o"
+																			: "uo"));
 			}
+
 			// Print empty line
 			pw.println();
 		}

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -50,29 +51,20 @@ package org.supremica.gui;
 
 public class ExecutionDialogMode
 {
-	public static ExecutionDialogMode synchronizing = 
-		new ExecutionDialogMode("Synchronizing...", "Number of states:", true, false);
-	public static ExecutionDialogMode verifying = 
-		//new ExecutionDialogMode("Verifying...", "Number of states:", true, false);
-		new ExecutionDialogMode("Verifying...", "", true, false);
-	public static ExecutionDialogMode synthesizing = 
-		new ExecutionDialogMode("Synthesizing...", "Number of states:", true, false);
-	public static ExecutionDialogMode buildingStates = 
-		new ExecutionDialogMode("Building automaton...", "Building states", false, true);
-	public static ExecutionDialogMode buildingTransitions = 
-		new ExecutionDialogMode("Building automaton...", "Building transitions", false, true);
-	public static ExecutionDialogMode matchingStates = 
-		new ExecutionDialogMode("Matching States...", "", false, true);
-	public static ExecutionDialogMode verifyingNonblocking = 
-		new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
-	public static ExecutionDialogMode verifyingMutualNonblockingFirstRun = 
-		new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
-	public static ExecutionDialogMode verifyingMutualNonblockingSecondRun = 
-		new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);
-	public static ExecutionDialogMode hide = 
-		new ExecutionDialogMode("Hide", "", false, false);
-	public static ExecutionDialogMode uninitialized = 
-		new ExecutionDialogMode("Uninitialized", "", false, false);
+	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing...", "Number of states:", true, false);
+	public static ExecutionDialogMode verifying =
+
+	//new ExecutionDialogMode("Verifying...", "Number of states:", true, false);
+	new ExecutionDialogMode("Verifying...", "", true, false);
+	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "Number of states:", true, false);
+	public static ExecutionDialogMode buildingStates = new ExecutionDialogMode("Building automaton...", "Building states", false, true);
+	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("Building automaton...", "Building transitions", false, true);
+	public static ExecutionDialogMode matchingStates = new ExecutionDialogMode("Matching States...", "", false, true);
+	public static ExecutionDialogMode verifyingNonblocking = new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
+	public static ExecutionDialogMode verifyingMutualNonblockingFirstRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
+	public static ExecutionDialogMode verifyingMutualNonblockingSecondRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);
+	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "", false, false);
+	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "", false, false);
 	private final String id;
 	private String text;
 	private boolean show_value;

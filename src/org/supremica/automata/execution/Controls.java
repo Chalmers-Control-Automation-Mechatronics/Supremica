@@ -56,9 +56,7 @@ public class Controls
 {
 	private Map labelToControlMap = new TreeMap();
 
-	public Controls()
-	{
-	}
+	public Controls() {}
 
 	public Controls(Controls otherControls)
 	{
@@ -90,11 +88,14 @@ public class Controls
 		{
 			return false;
 		}
+
 		if (labelToControlMap.containsKey(theControl.getLabel()))
 		{
 			return false;
 		}
+
 		labelToControlMap.put(theControl.getLabel(), theControl);
+
 		return true;
 	}
 

@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -71,7 +72,7 @@ public class EventHelpers
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	private static LabeledEvent createEvent(EventsSet eventSet) // , String prefix)
+	private static LabeledEvent createEvent(EventsSet eventSet)    // , String prefix)
 		throws IllegalArgumentException, Exception
 	{
 		return createEvent(eventSet, /* prefix,*/ true, true);
@@ -86,7 +87,7 @@ public class EventHelpers
 	 *@exception  IllegalArgumentException Description of the Exception
 	 *@exception  Exception Description of the Exception
 	 */
-	static LabeledEvent createEvent(EventsSet eventSet, /* String prefix,*/ 
+	static LabeledEvent createEvent(EventsSet eventSet,    /* String prefix,*/
 									boolean requireConsistentControllability, boolean requireConsistentImmediate)
 		throws IllegalArgumentException, Exception
 	{
@@ -105,8 +106,7 @@ public class EventHelpers
 		// Some initializations
 // This function (createEvent) is only used by AlphabetHelpers::getUnionAlphabet
 // That function (getUnionAlphabet) manages the id by itself, so avoiding id-fddlng here would seem to be safe
-//		String id = tmpEvent.getId();
-
+//              String id = tmpEvent.getId();
 		String label = tmpEvent.getLabel();
 		boolean controllable = tmpEvent.isControllable();
 		boolean prioritized = tmpEvent.isPrioritized();
@@ -130,7 +130,7 @@ public class EventHelpers
 				throw new Exception(errorMsg);
 			}
 
-			if (requireConsistentImmediate && immediate != tmpEvent.isImmediate())
+			if (requireConsistentImmediate && (immediate != tmpEvent.isImmediate()))
 			{
 				String errorMsg = "Immediate of an event must be the same in all automata. Immediate of " + label + " is not consistent.";
 
@@ -154,10 +154,9 @@ public class EventHelpers
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 
-		LabeledEvent theEvent = new LabeledEvent(label); // , id);
+		LabeledEvent theEvent = new LabeledEvent(label);    // , id);
 
 		// theEvent.setId(id);
-
 		// Do I need to tweak the id???
 		theEvent.setControllable(controllable);
 		theEvent.setPrioritized(prioritized);

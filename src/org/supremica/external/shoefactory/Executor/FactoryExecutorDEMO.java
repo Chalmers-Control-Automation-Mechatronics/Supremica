@@ -9,118 +9,135 @@ import java.net.URL;
 import java.util.*;
 import org.supremica.automata.*;
 
-public class FactoryExecutorDEMO extends JFrame
+public class FactoryExecutorDEMO
+	extends JFrame
 {
-	public static int threadSleepInterval=200;
+	public static int threadSleepInterval = 200;
 	boolean type;
 	static PlantDEMO shoePlant;
-	static int shoeNr=1, sNr=0, supervisorType=0;
+	static int shoeNr = 1, sNr = 0, supervisorType = 0;
 	static Gui gui;
 	static EditorAPI e;
 	static ArrayList shoes = new ArrayList();
 	static ArrayList shoeNumbers = new ArrayList();
 	static GCDocument top, jgSupervisor;
 
-	public FactoryExecutorDEMO()
-	{
+	public FactoryExecutorDEMO() {}
 
-	}
-
-	public void start(boolean [] sv, Gui g)
+	public void start(boolean[] sv, Gui g)
 	{
 		gui = g;
-		String[] args = {"-geometry", "1024x700"};
-		
-		if(sv[21])
-			type=true;
-		else 
-			type=false;
-			
+
+		String[] args = { "-geometry", "1024x700" };
+
+		if (sv[21])
+		{
+			type = true;
+		}
+		else
+		{
+			type = false;
+		}
 
 		try
 		{
-			if(shoeNr==1)
+			if (shoeNr == 1)
 			{
 				EditorCreator ec = new EditorCreator(args);
-				
-				if(!ec.isStarted())
+
+				if (!ec.isStarted())
 				{
 					e = ec.getEditor();
+
 					e.setTitle("Shoefactory DEMO");
+
 					Editor.singleton = e;
+
 					Editor.removePaletteAction();
-	
+
 					URL url = Supremica.class.getResource("/shoefactory/ShoeFactoryDEMO.xml");
-					
+
 					//needed to replace %20 with spaces in the path");
-					String xmlPath = (url.getPath()).replaceAll("%20"," ");
+					String xmlPath = (url.getPath()).replaceAll("%20", " ");
+
 					top = e.openWorkspace(xmlPath);
-	
 					jgSupervisor = e.newWorkspace();
-					JgrafSupervisorDEMO js = new JgrafSupervisorDEMO(jgSupervisor,shoeNr);
-	
+
+					JgrafSupervisorDEMO js = new JgrafSupervisorDEMO(jgSupervisor, shoeNr);
+
 					shoePlant = new PlantDEMO();
+
 					gui.addProject(shoePlant.getPlant());
-	
-					SpecificationDEMO shoeSpec = new SpecificationDEMO(shoeNr,type);
+
+					SpecificationDEMO shoeSpec = new SpecificationDEMO(shoeNr, type);
+
 					gui.addProject(shoeSpec.getSpec());
-	
+
 					SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-					
-					ImageIcon icon = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));			
-					String[] options = {"Synthesized", "Synchronized"};
+					ImageIcon icon = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));
+					String[] options = { "Synthesized", "Synchronized" };
+
 					supervisorType = JOptionPane.showOptionDialog(this, "Since this is a DEMO you may choose the type of supervisor.", "Choose supervisor", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, icon, options, "Synthesized");
 
-					if(supervisorType==1)
+					if (supervisorType == 1)
+					{
 						syncPlant.synchronizePlants("theSupervisor");
+					}
 					else
+					{
 						syncPlant.synthesizePlants("theSupervisor");
-			
+					}
+
 					//-----DEMO - reduce available slots--------
-					for(int i=0;i<9;i++)
+					for (int i = 0; i < 9; i++)
 					{
 						boolean b = JgrafSupervisorDEMO.moveInitial("Table0", "Shoe_1put_T0L");
 					}
 
-					for(int i=0;i<22;i++)
+					for (int i = 0; i < 22; i++)
 					{
 						boolean b = JgrafSupervisorDEMO.moveInitial("Table1", "Shoe_1put_T1");
+
 						b = JgrafSupervisorDEMO.moveInitial("Table2", "Shoe_1put_T2");
 					}
-					
-					for(int i=0;i<2;i++)
+
+					for (int i = 0; i < 2; i++)
 					{
 						boolean b = JgrafSupervisorDEMO.moveInitial("IO_1", "Shoe_1get_T0R");
 					}
+
 					//------------------------------------------
-			
 					GCDocument newShoe = e.newWorkspace();
 					ShoeDEMO s = new ShoeDEMO(newShoe, type, shoeNr);
+
 					shoes.add(newShoe);
 					shoeNumbers.add(new Integer(shoeNr));
-					
 					newShoe.setSpeed(threadSleepInterval);
 					top.setSpeed(threadSleepInterval);
 					jgSupervisor.setSpeed(threadSleepInterval);
-	
+
 					boolean OK = e.compileWorkspace(top);
-					if(OK)
+
+					if (OK)
 					{
 						e.startWorkspace(top);
 					}
-	
+
 					OK = e.compileWorkspace(jgSupervisor);
-					if(OK)
+
+					if (OK)
 					{
 						e.startWorkspace(jgSupervisor);
 					}
-	
+
 					OK = e.compileWorkspace(newShoe);
-					if(OK)
+
+					if (OK)
 					{
+
 						//e.startWorkspace(newShoe);
 					}
-					
+
 					shoeNr++;
 				}
 			}
@@ -128,92 +145,96 @@ public class FactoryExecutorDEMO extends JFrame
 			{
 				pauseSFC(10000);
 				e.stopWorkspace(jgSupervisor);
-				
-				shoePlant.add_shoe(shoeNr,true);
-				SpecificationDEMO shoeSpec = new SpecificationDEMO(shoeNr,type);
+				shoePlant.add_shoe(shoeNr, true);
+
+				SpecificationDEMO shoeSpec = new SpecificationDEMO(shoeNr, type);
+
 				gui.addProject(shoeSpec.getSpec());
 
 				GCDocument newShoe = e.newWorkspace();
 				ShoeDEMO s = new ShoeDEMO(newShoe, type, shoeNr);
+
 				shoes.add(newShoe);
 				shoeNumbers.add(new Integer(shoeNr));
-				
 				shoes.trimToSize();
 				shoeNumbers.trimToSize();
-				
-				remove_Aut(6+shoes.size());
+				remove_Aut(6 + shoes.size());
 
 				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-	
-				if(supervisorType==1)
-						syncPlant.synchronizePlants("theSupervisor");
+
+				if (supervisorType == 1)
+				{
+					syncPlant.synchronizePlants("theSupervisor");
+				}
 				else
+				{
 					syncPlant.synthesizePlants("theSupervisor");
-					
+				}
+
 				shoeNr++;
-	
+
 				boolean OK = e.compileWorkspace(jgSupervisor);
-				if(OK)
+
+				if (OK)
 				{
 					e.startWorkspace(jgSupervisor);
 				}
-				
+
 				pauseSFC(threadSleepInterval);
 
-
 				OK = e.compileWorkspace(newShoe);
-				if(OK)
+
+				if (OK)
 				{
 					e.startWorkspace(newShoe);
 				}
-
-
 			}
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
-			System.out.println("Error"+shoeNr);
+			System.out.println("Error" + shoeNr);
 		}
 	}
-	
+
 	public static boolean saveValues(int s)
 	{
 		sNr = s;
+
 		return true;
 	}
 
-	
 	public static int getSValue()
 	{
 		return sNr;
 	}
 
-	public static boolean deleteShoe (int nr)
+	public static boolean deleteShoe(int nr)
 	{
 		Integer i = new Integer(nr);
 		GCDocument temp = (GCDocument) shoes.get(shoeNumbers.indexOf(i));
+
 		e.stopWorkspace(temp);
 		e.deleteWorkspace(temp);
 		shoePlant.remove_shoe(nr);
-		remove_Aut(7+shoeNumbers.indexOf(i));
-
-		System.out.println("Shoe "+nr+" is manufactured and ready.");
-		
+		remove_Aut(7 + shoeNumbers.indexOf(i));
+		System.out.println("Shoe " + nr + " is manufactured and ready.");
 		shoes.remove(shoeNumbers.indexOf(i));
 		shoeNumbers.remove(shoeNumbers.indexOf(i));
-		
 		shoes.trimToSize();
 		shoeNumbers.trimToSize();
-		
+
 		return true;
 	}
 
 	public static void remove_Aut(int nr)
 	{
-		int[] sel ={nr};
+		int[] sel = { nr };
+
 		gui.selectAutomata(sel);
+
 		Automata selectedAutomata = gui.getSelectedAutomata();
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -223,37 +244,35 @@ public class FactoryExecutorDEMO extends JFrame
 			{
 				gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomatonName);
 			}
-			catch (Exception ex)
-			{
-
-			}
+			catch (Exception ex) {}
 		}
 	}
 
 	//A ugly way of pausing Jgrafchart by setting the Thread sleep to a very large number
 	public void pauseSFC(int time)
 	{
-		for(int nr=1; nr<=shoes.size(); nr++)
+		for (int nr = 1; nr <= shoes.size(); nr++)
 		{
-			GCDocument temp = (GCDocument)shoes.get(nr-1);
+			GCDocument temp = (GCDocument) shoes.get(nr - 1);
+
 			temp.setSpeed(time);
 		}
 
 		top.setSpeed(time);
 		jgSupervisor.setSpeed(time);
 	}
-	
+
 	public static int getShoeIndex(int currIndex)
 	{
-		Integer i=new Integer(0);
+		Integer i = new Integer(0);
 
-		if(currIndex==0)
+		if (currIndex == 0)
 		{
 			return Integer.parseInt(shoeNumbers.get(0).toString());
-		}	
-		else if(shoeNumbers.indexOf(new Integer(currIndex)) < shoeNumbers.size()-1)	
+		}
+		else if (shoeNumbers.indexOf(new Integer(currIndex)) < shoeNumbers.size() - 1)
 		{
-			return Integer.parseInt(shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex))+1).toString()) ;	
+			return Integer.parseInt(shoeNumbers.get(shoeNumbers.indexOf(new Integer(currIndex)) + 1).toString());
 		}
 		else
 		{

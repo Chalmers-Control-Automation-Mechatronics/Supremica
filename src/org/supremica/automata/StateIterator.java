@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -51,7 +52,6 @@ package org.supremica.automata;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-
 public class StateIterator
 	implements Iterator
 {
@@ -70,13 +70,13 @@ public class StateIterator
 	public Object next()
 		throws NoSuchElementException
 	{
-		return (State)theIterator.next();
+		return (State) theIterator.next();
 	}
 
 	public State nextState()
 		throws NoSuchElementException
 	{
-		return (State)next();
+		return (State) next();
 	}
 
 	public void remove()
@@ -84,6 +84,4 @@ public class StateIterator
 	{
 		throw new UnsupportedOperationException();
 	}
-
 }
-

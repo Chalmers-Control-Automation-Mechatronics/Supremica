@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -46,7 +47,6 @@
  *
  *  Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
 
 import javax.swing.*;
@@ -65,6 +65,7 @@ class StatePopupMenu
 	private void initPopups(EditorActions editorActions)
 	{
 		JMenuItem deleteItem = new JMenuItem(editorActions.getDeleteStateAction());
+
 		add(deleteItem);
 	}
 }

@@ -1,13 +1,13 @@
+
 /********************** StateSet.java *************************/
+
 // Implementation of a useful state set.
 // Note that a Set implmentation considers two elements e1 and e2 equal
 // if e1.equals(e2) == true; Surely this also means that e2.equals(e1)
 // must then also be true (but the docs do not require this).
 // For State, equals(Object obj) compares id's, so in practice
 // StateSet is only well-defined for states of the same automaton.
-
 // StateSet gurantees an ordering defined by the names of the states
-
 package org.supremica.automata;
 
 import java.util.*;
@@ -23,9 +23,8 @@ class StateComparator
 
 	public int compare(Object o1, Object o2)
 	{
-		return compare((State)o1, (State)o2);
+		return compare((State) o1, (State) o2);
 	}
-
 }
 
 public class StateSet
@@ -53,14 +52,18 @@ public class StateSet
 	public static StateSet union(StateSet s1, StateSet s2)
 	{
 		StateSet ss = new StateSet(s1);
+
 		ss.union(s2);
+
 		return ss;
 	}
 
 	public static StateSet intersect(StateSet s1, StateSet s2)
 	{
 		StateSet ss = new StateSet(s1);
+
 		ss.intersect(s2);
+
 		return ss;
 	}
 
@@ -94,7 +97,7 @@ public class StateSet
 	// Shallow copy (is that what we mean by clone, really?)
 	public Object clone()
 	{
-		return new StateSet(((TreeSet)theSet.clone()));
+		return new StateSet(((TreeSet) theSet.clone()));
 	}
 
 	public boolean contains(State state)
@@ -124,10 +127,11 @@ public class StateSet
 
 	public boolean equals(StateSet s2)
 	{
-		if(this == s2)	// avoid testing for self comparison
+		if (this == s2)    // avoid testing for self comparison
 		{
 			return true;
 		}
+
 		return theSet.equals(s2.theSet);
 	}
 
@@ -138,7 +142,8 @@ public class StateSet
 
 	public boolean equals(Object obj)
 	{
-		StateSet states = (StateSet)obj;
+		StateSet states = (StateSet) obj;
+
 		return equals(states);
 	}
 
@@ -149,56 +154,69 @@ public class StateSet
 		buf.append("StateSet[" + size() + "]:{");
 
 		Iterator it = iterator();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
-			State state = (State)it.next();
+			State state = (State) it.next();
+
 			buf.append(state.getName());
 			buf.append(",");
 		}
+
 		buf.append("}");
+
 		return buf.toString();
 	}
 
 	/**
-	 *	@return an arbitrary, not yet iterated element. Note, assumes that at least one exists
+	 *      @return an arbitrary, not yet iterated element. Note, assumes that at least one exists
 	 */
 	public State get()
 	{
-		return (State)iterator().next();
+		return (State) iterator().next();
 	}
 
 	/**
-	 *	Creates a new state named as the composition of the states in this set
+	 *      Creates a new state named as the composition of the states in this set
 	 *  Should use the globally defined state separator (and thus, this method
-	 *	should not even be here)
+	 *      should not even be here)
 	 */
 	public State createNewState()
 	{
-		// boolean i = false;	// initial?
-		boolean d = false;	// desired?
-		boolean x = false;	// forbidden?
 
+		// boolean i = false;   // initial?
+		boolean d = false;    // desired?
+		boolean x = false;    // forbidden?
 		StringBuffer buf = new StringBuffer();
-
 		Iterator stateit = iterator();
-		while(stateit.hasNext())
+
+		while (stateit.hasNext())
 		{
-			State state = (State)stateit.next();
+			State state = (State) stateit.next();
+
 			buf.append(state.getName());
-			buf.append(".");	// STATE_SEPARATOR -- should be globally user definable
+			buf.append(".");    // STATE_SEPARATOR -- should be globally user definable
 
 			// i |= state.isInitial();
 			d |= state.isAccepting();
 			x |= state.isForbidden();
 		}
 
-		buf.setLength(buf.length()-1);	// truncate last '.'
+		buf.setLength(buf.length() - 1);    // truncate last '.'
+
 		// System.out.println("StateSet::createNewState -- " + buf.toString());
 		State newstate = new State(buf.toString());
 
 		// if(i) newstate.setInitial(true);
-		if(d) newstate.setAccepting(true);
-		if(x) newstate.setForbidden(true);
+		if (d)
+		{
+			newstate.setAccepting(true);
+		}
+
+		if (x)
+		{
+			newstate.setForbidden(true);
+		}
 
 		return newstate;
 	}

@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -46,7 +47,6 @@
  *
  *  Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.simulator;
 
 import org.supremica.automata.algorithms.*;
@@ -66,6 +66,7 @@ public class SimulatorEventListModel
 	implements SignalObserver
 {
 	private static Logger logger = LoggerFactory.createLogger(SimulatorEventListModel.class);
+
 	// private int[] currState;
 	private int[] events;
 	private int eventAmount = 0;
@@ -76,7 +77,8 @@ public class SimulatorEventListModel
 	private boolean showState = false;
 	private boolean showDisabledEvents = false;
 	private AutomataSynchronizerHelper helper;
-//	private AnimationSignals theSignals;
+
+//      private AnimationSignals theSignals;
 	private SimulatorExecuter theExecuter;
 	protected boolean isLocked = false;
 
@@ -87,21 +89,22 @@ public class SimulatorEventListModel
 		this.theProject = theProject;
 		this.theControls = theProject.getControls();
 		this.theAlphabet = helper.getAutomaton().getAlphabet();
-//		this.showDisabledEvents = showDisabledEvents;
-//		this.theSignals = theSignals;
+
+//              this.showDisabledEvents = showDisabledEvents;
+//              this.theSignals = theSignals;
 		this.theExecuter = theExecuter;
 		events = new int[helper.getNbrOfEvents() + 1];
-//		theExecuter.registerSignalObserver(this);
-//		theSignals.registerInterest(this);
+
+//              theExecuter.registerSignalObserver(this);
+//              theSignals.registerInterest(this);
 	}
 
-//	public void setCurrState(int[] currState)
-//	{
-//		this.currState = currState;
+//      public void setCurrState(int[] currState)
+//      {
+//              this.currState = currState;
 //
-//		update();
-//	}
-
+//              update();
+//      }
 	public void setShowStateId(boolean showState)
 	{
 		this.showState = showState;
@@ -115,53 +118,69 @@ public class SimulatorEventListModel
 		//AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 		AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
 		int[] extEvents = onlineSynchronizer.getOutgoingEvents(theExecuter.getCurrentState());
+
 		System.arraycopy(extEvents, 0, events, 0, events.length);
+
 		if (!showDisabledEvents)
 		{
 			int currEventIndex = 0;
 			int nbrOfEvents = 0;
+
 			while (extEvents[currEventIndex] != Integer.MAX_VALUE)
 			{
 				LabeledEvent currEvent;
+
 				try
 				{
 					currEvent = theAlphabet.getEventWithIndex(events[currEventIndex]);
 				}
 				catch (Exception ex)
 				{
+
 					//logger.error("Exception in SimulatorEventListModel.update");
 					logger.debug(ex.getStackTrace());
+
 					return;
 				}
+
 				if (theControls.hasControl(currEvent.getLabel()))
 				{
+
 					//logger.info("hasControl: " + currEvent.getLabel());
 					Control currControl = theControls.getControl(currEvent.getLabel());
 					boolean conditionsFulfilled = true;
-					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext();)
+
+					for (Iterator condIt = currControl.conditionIterator();
+							condIt.hasNext(); )
 					{
-						Condition condition = (Condition)condIt.next();
+						Condition condition = (Condition) condIt.next();
+
 						conditionsFulfilled = conditionsFulfilled && theExecuter.isTrue(condition);
 					}
+
 					if (conditionsFulfilled)
 					{
 						events[nbrOfEvents] = events[currEventIndex];
+
 						nbrOfEvents++;
 					}
 					else
 					{
+
 						//logger.info("hasControl, event disabled: " + events[currEventIndex] + " " + currEvent.getLabel());
 					}
 				}
 				else
 				{
 					events[nbrOfEvents] = events[currEventIndex];
+
 					nbrOfEvents++;
 				}
+
 				currEventIndex++;
 			}
-			events[nbrOfEvents] = Integer.MAX_VALUE;
 
+			events[nbrOfEvents] = Integer.MAX_VALUE;
 		}
 
 		eventAmount = 0;
@@ -174,21 +193,19 @@ public class SimulatorEventListModel
 		logger.debug("Before fireContentsChanged");
 		fireContentsChanged(this, 0, eventAmount - 1);
 		logger.debug("After fireContentsChanged");
-
 		exitLock();
-
 	}
-
 
 	public Automata getAutomata()
 	{
 		return theAutomata;
 	}
 
-	public Alphabet getAlphabet ()
+	public Alphabet getAlphabet()
 	{
-		return theAlphabet ;
+		return theAlphabet;
 	}
+
 	public synchronized void enterLock()
 	{
 		try
@@ -197,6 +214,7 @@ public class SimulatorEventListModel
 			{
 				wait();
 			}
+
 			setLock(true);
 		}
 		catch (InterruptedException e)
@@ -210,7 +228,6 @@ public class SimulatorEventListModel
 		setLock(false);
 		notifyAll();
 	}
-
 
 	public synchronized boolean isLocked()
 	{
@@ -239,6 +256,7 @@ public class SimulatorEventListModel
 		{
 			logger.error("Error: Could not find event in alphabet.", ex);
 			logger.debug(ex.getStackTrace());
+
 			return null;
 		}
 
@@ -266,30 +284,28 @@ public class SimulatorEventListModel
 		{
 			logger.error("Error: Could not find event in alphabet.", ex);
 			logger.debug(ex.getStackTrace());
+
 			return null;
 		}
 
 		return currEvent;
 	}
 
-//	public int[] getStateAt(int index)
-//	{
-//		//System.err.println("getStateAt: " + index);
-//		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
+//      public int[] getStateAt(int index)
+//      {
+//              //System.err.println("getStateAt: " + index);
+//              AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 //
-//		return onlineSynchronizer.doTransition(events[index]);
-//	}
+//              return onlineSynchronizer.doTransition(events[index]);
+//      }
 //
-//	public synchronized boolean executeEvent(LabeledEvent theEvent)
-//	{
-//		theExecuter.executeEvent(theEvent);
-//		return true;
-//	}
-
+//      public synchronized boolean executeEvent(LabeledEvent theEvent)
+//      {
+//              theExecuter.executeEvent(theEvent);
+//              return true;
+//      }
 	public void signalUpdated()
 	{
 		update();
 	}
 }
-
-

@@ -49,14 +49,13 @@
  */
 package org.supremica.automata.execution.expressions;
 
-
 public class ConstVariable
 	extends Variable
 {
-
 	public ConstVariable(boolean value)
 	{
 		super(null);
+
 		this.value = value;
 	}
 
@@ -64,5 +63,4 @@ public class ConstVariable
 	{
 		return true;
 	}
-
 }

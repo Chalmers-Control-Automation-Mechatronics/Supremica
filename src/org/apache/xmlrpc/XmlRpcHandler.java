@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.util.Vector;
 
 /**
@@ -65,13 +64,14 @@ import java.util.Vector;
  * for an XML-RPC request.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: XmlRpcHandler.java,v 1.1 2004-02-02 15:56:20 vahidi Exp $
+ * @version $Id: XmlRpcHandler.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  */
 public interface XmlRpcHandler
 {
-    /**
-     * Return the result, or throw an Exception if something went wrong.
-     */
-    public Object execute (String method, Vector params)
-            throws Exception;
+
+	/**
+	 * Return the result, or throw an Exception if something went wrong.
+	 */
+	public Object execute(String method, Vector params)
+		throws Exception;
 }

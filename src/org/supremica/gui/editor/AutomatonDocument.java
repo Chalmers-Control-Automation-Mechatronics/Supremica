@@ -72,7 +72,6 @@ public class AutomatonDocument
 	private Automaton theAutomaton = null;
 	private boolean changed = false;
 	private boolean layoutNeeded = false;
-	
 	private EditorActions theEditorActions;
 
 	public AutomatonDocument(VisualProject theVisualProject, Automaton theAutomaton, EditorActions theEditorActions)
@@ -273,7 +272,7 @@ public class AutomatonDocument
 	{
 		return theVisualProject;
 	}
-	
+
 	public void build()
 	{
 		HashMap stateToStateNodeMap = new HashMap(theAutomaton.nbrOfStates());

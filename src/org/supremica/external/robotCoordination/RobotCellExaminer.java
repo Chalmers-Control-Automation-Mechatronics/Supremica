@@ -1,5 +1,3 @@
-
-
 package org.supremica.external.robotCoordination;
 
 import java.awt.*;
@@ -7,18 +5,15 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import java.util.*;
-
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
-
 import org.supremica.external.robotCoordination.RobotStudioInterface;
 
 public class RobotCellExaminer
 	extends JDialog
 {
 	private static Logger logger = LoggerFactory.createLogger(RobotCellExaminer.class);
-
 	private Frame owner = null;
 	private JPanel contentPane = null;
 
@@ -35,21 +30,25 @@ public class RobotCellExaminer
 	public RobotCellExaminer(Frame owner)
 	{
 		super(owner, "Robot cell examiner", false);
-		this.owner = owner;
 
+		this.owner = owner;
 		contentPane = (JPanel) getContentPane();
+
 		contentPane.setLayout(new FlowLayout());
 
 		JButton openButton = new JButton("Open cell");
+
 		openButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				JFileChooser fileOpener = FileDialogs.getRobotCellFileImporter();
+
 				if (fileOpener.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 				{
 					File f = fileOpener.getSelectedFile();
 					String cellName = f.getAbsolutePath();
+
 					openCell(cellName, RobotSimulatorType.RobotStudio);
 				}
 				else
@@ -61,6 +60,7 @@ public class RobotCellExaminer
 		contentPane.add(openButton);
 
 		JButton spanButton = new JButton("Generate spans");
+
 		spanButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -71,6 +71,7 @@ public class RobotCellExaminer
 		contentPane.add(spanButton);
 
 		JButton cutButton = new JButton("Intersect spans");
+
 		cutButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -81,6 +82,7 @@ public class RobotCellExaminer
 		contentPane.add(cutButton);
 
 		JButton collisionButton = new JButton("Examine collisions");
+
 		collisionButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -91,10 +93,12 @@ public class RobotCellExaminer
 		contentPane.add(collisionButton);
 
 		JButton demoButton = new JButton("Run demo (RobotStudio)");
+
 		demoButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+
 				//openCell("C:/temp/RobSuprTestStation/RobSuprTest.stn", RobotSimulatorType.RobotStudio);
 				openCell("C:/temp/DomStations/DemoSafe.stn", RobotSimulatorType.RobotStudio);
 				generateSpans();
@@ -104,9 +108,7 @@ public class RobotCellExaminer
 			}
 		});
 		contentPane.add(demoButton);
-
 		pack();
-
 		init();
 	}
 
@@ -115,6 +117,7 @@ public class RobotCellExaminer
 	 */
 	private void init()
 	{
+
 		//zoneAutomata = new Automata();
 		//robotAutomata = new Automata();
 	}
@@ -126,6 +129,7 @@ public class RobotCellExaminer
 	 */
 	private void openCell(String name, RobotSimulatorType simType)
 	{
+
 		// Which simulation software is used?
 		// This is the only "application specific" part of this class!
 		if (simType == RobotSimulatorType.RobotStudio)
@@ -148,9 +152,11 @@ public class RobotCellExaminer
 	{
 		try
 		{
+
 			// For each robot, generate spans
 			LinkedList robots = cell.getRobots();
-			for (Iterator robotIt = robots.iterator(); robotIt.hasNext();)
+
+			for (Iterator robotIt = robots.iterator(); robotIt.hasNext(); )
 			{
 				Robot robot = (Robot) robotIt.next();
 
@@ -159,10 +165,12 @@ public class RobotCellExaminer
 
 				// Generate span for each "path", i.e. unique pair of positions
 				LinkedList positions = robot.getPositions();
-				for (int i = 0; i<positions.size(); i++)
+
+				for (int i = 0; i < positions.size(); i++)
 				{
 					Position from = (Position) positions.get(i);
-					for (int j = i+1; j<positions.size(); j++)
+
+					for (int j = i + 1; j < positions.size(); j++)
 					{
 						Position to = (Position) positions.get(j);
 
@@ -189,18 +197,22 @@ public class RobotCellExaminer
 	{
 		try
 		{
+
 			// Intersect spans of robots, pairwise
 			LinkedList robots = cell.getRobots();
-			for (int i = 0; i<robots.size(); i++)
+
+			for (int i = 0; i < robots.size(); i++)
 			{
 				Robot robotA = (Robot) robots.get(i);
-				for (int j = i+1; j<robots.size(); j++)
+
+				for (int j = i + 1; j < robots.size(); j++)
 				{
 					Robot robotB = (Robot) robots.get(j);
 
 					// Intersect spans!
 					cell.intersectSpans(robotA, robotB);
 				}
+
 				// Hide finished spans
 				robotA.hideSpan();
 			}
@@ -220,6 +232,7 @@ public class RobotCellExaminer
 		{
 			zoneAutomata = cell.generateZoneAutomata();
 			robotAutomata = cell.generateRobotAutomata();
+
 			ActionMan.getGui().addAutomata(zoneAutomata);
 			ActionMan.getGui().addAutomata(robotAutomata);
 		}
@@ -236,9 +249,11 @@ public class RobotCellExaminer
 	{
 		try
 		{
+
 			// For each robot
 			LinkedList robots = cell.getRobots();
-			for (Iterator robotIt = robots.iterator(); robotIt.hasNext();)
+
+			for (Iterator robotIt = robots.iterator(); robotIt.hasNext(); )
 			{
 				Robot robot = (Robot) robotIt.next();
 
@@ -247,10 +262,12 @@ public class RobotCellExaminer
 
 				// Examine collisions for each "path", i.e. unique pair of positions
 				LinkedList positions = robot.getPositions();
-				for (int i = 0; i<positions.size(); i++)
+
+				for (int i = 0; i < positions.size(); i++)
 				{
 					Position from = (Position) positions.get(i);
-					for (int j = i+1; j<positions.size(); j++)
+
+					for (int j = i + 1; j < positions.size(); j++)
 					{
 						Position to = (Position) positions.get(j);
 

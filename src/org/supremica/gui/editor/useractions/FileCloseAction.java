@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,7 +47,6 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor.useractions;
 
 import java.awt.event.*;
@@ -54,6 +54,7 @@ import javax.swing.*;
 
 //import org.supremica.gui.Supremica;
 import org.supremica.gui.editor.EditorView;
+
 //import org.supremica.gui.VisualProject;
 //import org.supremica.automata.Automaton;
 import org.supremica.log.*;
@@ -62,15 +63,17 @@ public class FileCloseAction
 	extends EditorAction
 {
 	private static Logger logger = LoggerFactory.createLogger(AbstractAction.class);
-	
+
 	public FileCloseAction(EditorView editorView)
 	{
 		super("Close Editor", editorView);
+
 		putValue(SHORT_DESCRIPTION, "Close Editor");
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
+
 		/*
 		VisualProject theProject = getVisualProject();
 		String title = theProject.getUniqueAutomatonName();
@@ -84,5 +87,4 @@ public class FileCloseAction
 	{
 		return true;
 	}
-
 }

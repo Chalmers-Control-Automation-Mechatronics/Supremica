@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -54,12 +55,9 @@ import java.util.*;
 public class SattLineHelper
 	extends ControlBuilderHelper
 {
-
 	private static SattLineHelper theHelper;
 
-	protected SattLineHelper()
-	{
-	}
+	protected SattLineHelper() {}
 
 	public static IEC61131Helper getInstance()
 	{
@@ -67,6 +65,7 @@ public class SattLineHelper
 		{
 			theHelper = new SattLineHelper();
 		}
+
 		return theHelper;
 	}
 
@@ -89,6 +88,7 @@ public class SattLineHelper
 
 	public void printFileHeader(PrintWriter pw, String fileName)
 	{
+
 		// Start of file header
 		Date theDate = new Date();
 
@@ -96,7 +96,6 @@ public class SattLineHelper
 		pw.println("\" Syntax version 2.19, date: 2004-01-27-20:33:34.140 N \" ");
 		pw.println("\"Original file date: ---\"");
 		pw.println("\"Program date: 2004-01-27-20:33:34.140, name: " + fileName + "\"");    // Should perhaps get current date and time
-
 		pw.println("(* This program unit was created by Supremica. *)");
 		pw.println("");
 
@@ -105,6 +104,7 @@ public class SattLineHelper
 
 	public void printBasePictureInvocation(PrintWriter pw)
 	{
+
 		// Start of BasePicture Invocation
 		pw.println("BasePicture Invocation");
 		pw.println("   ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 ");
@@ -114,9 +114,9 @@ public class SattLineHelper
 
 	public void printTypeDefinitions(PrintWriter pw)
 	{
+
 		// Empty
 	}
-
 
 	public void printBeginLocalVariables(PrintWriter pw)
 	{
@@ -125,6 +125,7 @@ public class SattLineHelper
 
 	public void printEndLocalVariables(PrintWriter pw)
 	{
+
 		// We need a ProgStationData variable for generic SattLine code
 		pw.println("ProgStationData: ProgStationData;\n");
 
@@ -133,6 +134,7 @@ public class SattLineHelper
 
 	public void printSubModules(PrintWriter pw)
 	{
+
 		// Start of submodule invocations
 		pw.println("SUBMODULES");
 		pw.println("ProgStationControl1 Invocation");
@@ -154,6 +156,7 @@ public class SattLineHelper
 
 	public void printEndModuleDefinition(PrintWriter pw)
 	{
+
 		// End of Module code
 		pw.println("ENDDEF (*BasePicture*);");
 
@@ -174,8 +177,10 @@ public class SattLineHelper
 	{
 		return "";
 	}
+
 	public String getCoord()
 	{
+
 		// Should perhaps parameterise COORD
 		return " COORD 0.5, 0.5 OBJSIZE 0.5, 0.5";
 	}
@@ -205,13 +210,12 @@ public class SattLineHelper
 		return " = ";
 	}
 
-/*	Might as well use both SeqControl and SeqTimer. Note that SeqControl is default in
-	ControlBuilder but not in SattLine.
-	public String getSequenceControlString()
-	{
-		return "";
-	}*/
-
+/*      Might as well use both SeqControl and SeqTimer. Note that SeqControl is default in
+		ControlBuilder but not in SattLine.
+		public String getSequenceControlString()
+		{
+				return "";
+		}*/
 	public String getIdentifierLengthErrorMessage()
 	{
 		return " is too long. Identifiers are limited to 20 characters in SattLine. The new name is Automaton_";
@@ -236,5 +240,4 @@ public class SattLineHelper
 		pw.println("ExecutingSystems");
 		pw.println(" (  )");
 	}
-
 }

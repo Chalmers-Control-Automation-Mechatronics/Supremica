@@ -7,7 +7,6 @@ public class RobotSimulatorType
 	private static List collection = new LinkedList();
 	public static final RobotSimulatorType Undefined = new RobotSimulatorType("Undefined", false);
 	public static final RobotSimulatorType RobotStudio = new RobotSimulatorType("RobotStudio", true);
-
 	private String identifier;
 
 	private RobotSimulatorType(String identifier, boolean add)
@@ -16,6 +15,7 @@ public class RobotSimulatorType
 		{
 			collection.add(this);
 		}
+
 		this.identifier = identifier;
 	}
 
@@ -46,10 +46,11 @@ public class RobotSimulatorType
 
 	private static boolean equalType(RobotSimulatorType type, String ident)
 	{
-		if (type == null || ident == null)
+		if ((type == null) || (ident == null))
 		{
 			return false;
 		}
+
 		return ident.toLowerCase().equals(type.toString().toLowerCase());
 	}
 }

@@ -96,4 +96,3 @@ public class OrExpression
 		return leftExpression.evaluate() || rightExpression.evaluate();
 	}
 }
-

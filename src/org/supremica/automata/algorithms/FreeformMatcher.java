@@ -92,6 +92,7 @@ public class FreeformMatcher
 		 * return result;
 		 */
 		Matcher matcher = pattern.matcher(stateName.toString());
+
 		return matcher.matches();
 	}
 }

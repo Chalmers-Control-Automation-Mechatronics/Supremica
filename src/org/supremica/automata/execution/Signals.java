@@ -55,24 +55,24 @@ public class Signals
 {
 	private Map labelToSignalMap = new TreeMap();
 
-	public Signals()
-	{
-	}
+	public Signals() {}
 
 	public Signals(Signals other)
 	{
-		for (Iterator signalIt = other.iterator(); signalIt.hasNext();)
+		for (Iterator signalIt = other.iterator(); signalIt.hasNext(); )
 		{
-			Signal currSignal = (Signal)signalIt.next();
+			Signal currSignal = (Signal) signalIt.next();
+
 			addSignal(new Signal(currSignal));
 		}
 	}
 
 	public void addSignals(Signals other)
 	{
-		for (Iterator signalIt = other.iterator(); signalIt.hasNext();)
+		for (Iterator signalIt = other.iterator(); signalIt.hasNext(); )
 		{
-			Signal currSignal = (Signal)signalIt.next();
+			Signal currSignal = (Signal) signalIt.next();
+
 			addSignal(new Signal(currSignal));
 		}
 	}
@@ -89,9 +89,9 @@ public class Signals
 		{
 			throw new IllegalArgumentException("A key with label " + theSignal.getLabel() + " does already exist");
 		}
+
 		labelToSignalMap.put(theSignal.getLabel(), theSignal);
 	}
-
 
 	public boolean hasSignal(String label)
 	{
@@ -100,7 +100,7 @@ public class Signals
 
 	public Signal getSignal(String label)
 	{
-		return (Signal)labelToSignalMap.get(label);
+		return (Signal) labelToSignalMap.get(label);
 	}
 
 	public Iterator iterator()

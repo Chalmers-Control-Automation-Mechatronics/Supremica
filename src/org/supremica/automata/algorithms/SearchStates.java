@@ -11,14 +11,11 @@
  */
 
 //-- owner: MF
-
 package org.supremica.automata.algorithms;
 
 import java.lang.Exception;
 import java.util.Iterator;
-
 import org.supremica.log.*;
-
 import org.supremica.util.IntArrayVector;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -28,7 +25,6 @@ public class SearchStates
 	extends MonitorableThread
 {
 	private static Logger logger = LoggerFactory.createLogger(SearchStates.class);
-
 	private AutomataSynchronizer syncher = null;
 	private IntArrayVector container = null;
 	private StateMatcher matcher = null;
@@ -48,8 +44,10 @@ public class SearchStates
 
 		// !!Throws exception if automata is empty or has only one automaton!!
 		SynchronizationOptions syncOptions = new SynchronizationOptions();
+
 		syncOptions.setRequireConsistentControllability(false);
-		syncOptions.setBuildAutomaton(false); // don't build teh automaton until absolutely necessary
+		syncOptions.setBuildAutomaton(false);    // don't build teh automaton until absolutely necessary
+
 		this.syncher = new AutomataSynchronizer(automata, syncOptions);
 		this.matcher = m;
 		this.container = makeContainer();    // Must create the container, in case the thread is stopped
@@ -63,8 +61,10 @@ public class SearchStates
 		}
 		catch (Exception excp)
 		{
+
 			// How to work this (exception in a worker thread)??
 			logger.debug(excp.getStackTrace());
+
 			return;
 		}
 	}
@@ -78,7 +78,8 @@ public class SearchStates
 
 			// Note the difference between the two getStateIterator.
 			// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
-			for (Iterator it = syncher.getHelper().getStateIterator(); it.hasNext() && (!stopRequested); )
+			for (Iterator it = syncher.getHelper().getStateIterator();
+					it.hasNext() && (!stopRequested); )
 			{
 				int[] composite_state = (int[]) it.next();
 
@@ -121,7 +122,7 @@ public class SearchStates
 		{
 			return "Synching: " + syncher.getNumberOfStates() + " states checked";
 		}
-		else          // matching mode
+		else    // matching mode
 		{
 			return "Matching: " + progress + "% done";
 		}
@@ -129,6 +130,7 @@ public class SearchStates
 
 	public void stopTask()
 	{
+
 		// System.out.println("Stop requested");
 		stopRequested = true;
 
@@ -150,13 +152,16 @@ public class SearchStates
 	{
 		return container.iterator();
 	}
+
 	// Given index for an automaton and a composite state, return that state
 	public org.supremica.automata.State getState(int automaton, int index)
 	{
-		org.supremica.automata.State[][] states = syncher.getHelper().getIndexFormStateTable(); // should be cached?
+		org.supremica.automata.State[][] states = syncher.getHelper().getIndexFormStateTable();    // should be cached?
 		int[] composite = container.getElement(index);
+
 		return states[automaton][composite[automaton]];
 	}
+
 	// iterates over the partial states
 	public class StateIterator
 	{
@@ -181,25 +186,29 @@ public class SearchStates
 
 		public boolean hasNext()
 		{
+
 			// the last element of composite is not used
 			// return index < composite.length - 1;
-
 			// did Knut change this to not use the last two elements??
 			return index < composite.length - 2;
+
 			// Yes! He f***ing did. Where else did this break code???
 		}
 
 		public org.supremica.automata.State getState()
 		{
+
 			// get the current state of the current automaton
 			logger.debug("getState index: " + index);
 			logger.debug("getState composite.length: " + composite.length);
 			logger.debug("getState composite[index]: " + composite[index]);
+
 			return states[index][composite[index]];
 		}
 
 		public void inc()
 		{
+
 			// move to the next automaton
 			++index;
 		}
@@ -207,8 +216,10 @@ public class SearchStates
 
 	public StateIterator getStateIterator(int[] composite_state)
 	{
+
 		//
 		org.supremica.automata.State[][] states = syncher.getHelper().getIndexFormStateTable();
+
 		//
 		return new StateIterator(states, composite_state);
 	}
@@ -227,7 +238,7 @@ public class SearchStates
 		return new String(str);
 	}
 
-	private Automaton buildAutomaton() // once the states have been created, we could build an entire automaton
+	private Automaton buildAutomaton()    // once the states have been created, we could build an entire automaton
 		throws Exception
 	{
 		return syncher.getAutomaton();

@@ -61,7 +61,7 @@ public class AutomataToSattLineSFC
 
 	public AutomataToSattLineSFC(Project theProject)
 	{
-		this(theProject, (SattLineHelper)SattLineHelper.getInstance());
+		this(theProject, (SattLineHelper) SattLineHelper.getInstance());
 	}
 
 	public AutomataToSattLineSFC(Project theProject, IEC61131Helper theHelper)
@@ -92,25 +92,24 @@ public class AutomataToSattLineSFC
 
 		if (theProject.getName() != null)
 		{
-			pw.println(" " + theProject.getName().replace('.', '_') + " \"");
+				pw.println(" " + theProject.getName().replace('.', '_') + " \"");
 		}
 		else
 		{
-			pw.println("\"");
+				pw.println("\"");
 		}
 
 		pw.println("(* This program unit was created by Supremica. *)");
 		pw.println("");*/
-
 		theHelper.printBeginProgram(pw, filename);
 
 		// End of file header
+
 		/*// Start of BasePicture Invocation
 		pw.println("BasePicture Invocation");
 		pw.println("   ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 ");
 		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896 ( GroupConn = ProgStationData.");    // Don't know importance of DateCode
 		pw.println("GroupProgFast )\n");*/
-
 		((SattLineHelper) theHelper).printBasePictureInvocation(pw);
 
 		// Start of variable declarations
@@ -118,7 +117,6 @@ public class AutomataToSattLineSFC
 		((SattLineHelper) theHelper).printBeginLocalVariables(pw);
 
 		// Output local variables
-
 		Alphabet unionAlphabet = null;
 
 		try
@@ -129,6 +127,7 @@ public class AutomataToSattLineSFC
 		{
 			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 
@@ -176,6 +175,7 @@ public class AutomataToSattLineSFC
 
 		// End of variable declarations.
 		// Start of submodule invocations
+
 		/*pw.println("SUBMODULES");
 		pw.println("ProgStationControl1 Invocation");
 		pw.println("( 1.18 , 0.72 , 0.0 , 0.1 , 0.1 ) : ProgStationControl;");*/
@@ -183,6 +183,7 @@ public class AutomataToSattLineSFC
 
 		// End of submodule invocations
 		// Start of Module definition.
+
 		/*pw.println("ModuleDef");
 		pw.println("ClippingBounds = ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
 		pw.println("ZoomLimits = 0.0 0.01\n");
@@ -194,7 +195,6 @@ public class AutomataToSattLineSFC
 
 		// Here comes the automata, the tricky part.
 		automatonConverter(theProject, pw);
-
 
 		// Event Monitors should be generated here.
 		generateEventMonitors(theProject, pw);
@@ -211,6 +211,7 @@ public class AutomataToSattLineSFC
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		((SattLineHelper) theHelper).printGFile(theWriter, filename);
 		theWriter.close();
 	}
@@ -219,6 +220,7 @@ public class AutomataToSattLineSFC
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		((SattLineHelper) theHelper).printLFile(theWriter, filename);
 		theWriter.close();
 	}
@@ -227,6 +229,7 @@ public class AutomataToSattLineSFC
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		((SattLineHelper) theHelper).printPFile(theWriter, filename);
 		theWriter.close();
 	}

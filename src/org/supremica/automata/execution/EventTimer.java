@@ -64,18 +64,22 @@ public class EventTimer
 		{
 			throw new IllegalArgumentException("Name must be non null");
 		}
+
 		if (startEvent == null)
 		{
 			throw new IllegalArgumentException("startEvent must be non null");
 		}
+
 		if (timeoutEvent == null)
 		{
 			throw new IllegalArgumentException("timeoutEvent must be non null");
 		}
+
 		if (delay < 0)
 		{
 			throw new IllegalArgumentException("Delay must be non negative");
 		}
+
 		this.name = name;
 		this.startEvent = startEvent;
 		this.timeoutEvent = timeoutEvent;
@@ -96,6 +100,7 @@ public class EventTimer
 		{
 			return "";
 		}
+
 		return name;
 	}
 
@@ -106,6 +111,7 @@ public class EventTimer
 		{
 			throw new IllegalArgumentException("Name must be non null");
 		}
+
 		this.name = name;
 	}
 
@@ -115,6 +121,7 @@ public class EventTimer
 		{
 			return "";
 		}
+
 		return startEvent;
 	}
 
@@ -125,6 +132,7 @@ public class EventTimer
 		{
 			throw new IllegalArgumentException("startEvent must be non null");
 		}
+
 		this.startEvent = startEvent;
 	}
 
@@ -134,6 +142,7 @@ public class EventTimer
 		{
 			return "";
 		}
+
 		return timeoutEvent;
 	}
 
@@ -144,6 +153,7 @@ public class EventTimer
 		{
 			throw new IllegalArgumentException("timeoutEvent must be non null");
 		}
+
 		this.timeoutEvent = timeoutEvent;
 	}
 
@@ -159,9 +169,9 @@ public class EventTimer
 		{
 			throw new IllegalArgumentException("Delay must be non negative");
 		}
+
 		this.delay = delay;
 	}
-
 
 	public int getSynchIndex()
 	{

@@ -1,3 +1,4 @@
+
 /**************** KnutsEstimator.java **********************/
 package org.supremica.automata.algorithms.scheduling;
 
@@ -10,20 +11,21 @@ class KnutsEstimator
 	{
 		super(automata);
 	}
-	
+
 	// Try the estimate max Tv
-	public int h(Element state)			// For this composite state, return an estimate
+	public int h(Element state)    // For this composite state, return an estimate
 	{
 		int[] arr = state.getTimeArray();
 		int max = 0;
-		for(int i = 0; i < arr.length; ++i)
+
+		for (int i = 0; i < arr.length; ++i)
 		{
-			if(arr[i] > max)
+			if (arr[i] > max)
 			{
 				max = arr[i];
 			}
 		}
+
 		return max;
 	}
 }
-	

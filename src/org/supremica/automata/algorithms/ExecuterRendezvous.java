@@ -49,9 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
-
 import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
-
 
 /**
  * Boolean.TRUE implies that this executer wants wants to finish.
@@ -59,15 +57,16 @@ import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 class ExecuterRendezvous
 	implements Rendezvous.RendezvousFunction
 {
-
 	public void rendezvousFunction(java.lang.Object[] objects)
 	{
 		boolean moreStates = false;
+
 		for (int i = 0; i < objects.length; i++)
 		{
-			moreStates |= ((Boolean)objects[i]) == Boolean.FALSE;
+			moreStates |= ((Boolean) objects[i]) == Boolean.FALSE;
 			objects[i] = Boolean.FALSE;
 		}
+
 		if (!moreStates)
 		{
 			for (int i = 0; i < objects.length; i++)

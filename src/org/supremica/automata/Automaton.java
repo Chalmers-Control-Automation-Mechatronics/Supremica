@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -56,7 +57,6 @@ public class Automaton
 	implements ArcListener
 {
 	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
-
 	private final Alphabet alphabet;
 
 	/**
@@ -73,9 +73,8 @@ public class Automaton
 
 	// private List theStates = new LinkedList();
 	private final StateSet theStates = new StateSet();
-
 	private int index = -1;
-	private Map idStateMap;	// Want fast lookup on both id and index (but not name?)
+	private Map idStateMap;    // Want fast lookup on both id and index (but not name?)
 	private Map indexStateMap;
 	private ArcSet theArcs;
 	private State initialState;
@@ -92,7 +91,6 @@ public class Automaton
 	// Shouldn't then Interface inherit from Automata?
 	private Automata masterAutomata = null;
 	private Automata slaveAutomata = null;
-
 	private AutomatonListeners listeners = null;
 
 	public Automaton()
@@ -117,16 +115,20 @@ public class Automaton
 		this();
 
 		Alphabet orgAlphabet = orgAut.getAlphabet();
+
 		alphabet.union(orgAlphabet);
 
 		type = orgAut.type;
 
 		if (orgAut.hasName())
+		{
 			setName(orgAut.getName());
+		}
+
 		setComment(orgAut.getComment());
 
 		// Create all states
-		for(StateIterator states = orgAut.stateIterator(); states.hasNext();)
+		for (StateIterator states = orgAut.stateIterator(); states.hasNext(); )
 		{
 			State orgState = states.nextState();
 			State newState = new State(orgState);
@@ -136,22 +138,23 @@ public class Automaton
 
 		try
 		{
+
 			// Create all transitions
-			for (StateIterator states = orgAut.stateIterator(); states.hasNext(); )
+			for (StateIterator states = orgAut.stateIterator();
+					states.hasNext(); )
 			{
 				State orgSourceState = (State) states.next();
 				State newSourceState = getStateWithId(orgSourceState.getId());
 
-				for (ArcIterator outgoingArcs = orgSourceState.safeOutgoingArcsIterator(); outgoingArcs.hasNext(); )
+				for (ArcIterator outgoingArcs = orgSourceState.safeOutgoingArcsIterator();
+						outgoingArcs.hasNext(); )
 				{
 					Arc orgArc = outgoingArcs.nextArc();
-
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
-
 					LabeledEvent currEvent = alphabet.getEvent(orgArc.getEvent());
-
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
+
 					addArc(newArc);
 				}
 			}
@@ -171,6 +174,7 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Type must be non-null");
 		}
+
 		this.type = type;
 	}
 
@@ -180,6 +184,7 @@ public class Automaton
 		{
 			return AutomatonType.Undefined;
 		}
+
 		return type;
 	}
 
@@ -211,13 +216,13 @@ public class Automaton
 	public void setName(String name)
 		throws IllegalArgumentException
 	{
+
 		/*
 		if (name == null)
 		{
-			throw new IllegalArgumentException("Name must be non-null");
+				throw new IllegalArgumentException("Name must be non-null");
 		}
 		*/
-
 		String oldName = this.name;
 
 		this.name = name;
@@ -230,16 +235,23 @@ public class Automaton
 	 */
 	public String getName()
 	{
-		if (name == null || ((getComment() != "") && (name == "")))
+		if ((name == null) || ((getComment() != "") && (name == "")))
 		{
+
 			// This solved some ugly problems...
 			// but this isn't all that beautiful either... /hguo
 			if (comment != null)
+			{
 				return getComment();
+			}
 			else
+			{
 				logger.error("Error in Automata.java. Automaton with empty name and comment detected!");
+			}
+
 			return "";
 		}
+
 		return name;
 	}
 
@@ -248,7 +260,7 @@ public class Automaton
 	 */
 	public boolean hasName()
 	{
-		return !(name == null || name == "");
+		return !((name == null) || (name == ""));
 	}
 
 	/**
@@ -260,6 +272,7 @@ public class Automaton
 		{
 			return "";
 		}
+
 		return comment;
 	}
 
@@ -270,6 +283,7 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Comment must be non-null");
 		}
+
 		this.comment = comment;
 	}
 
@@ -292,9 +306,11 @@ public class Automaton
 	{
 		indexStateMap.clear();
 		idStateMap.clear();
-		for(StateIterator stit = stateIterator(); stit.hasNext(); )
+
+		for (StateIterator stit = stateIterator(); stit.hasNext(); )
 		{
 			State state = stit.nextState();
+
 			indexStateMap.put(new Integer(state.getIndex()), state);
 			idStateMap.put(state.getId(), state);
 		}
@@ -309,10 +325,12 @@ public class Automaton
 		}
 
 		theStates.add(state);
+
 		if (state.getIndex() == -1)
 		{
 			state.setIndex(getUniqueStateIndex());
 		}
+
 		idStateMap.put(state.getId(), state);
 		indexStateMap.put(new Integer(state.getIndex()), state);
 
@@ -343,13 +361,17 @@ public class Automaton
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
-			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+
+			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.nextArc();
 				State nextState = currArc.getToState();
+
 				if (nextState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
+
 					if (!explicitlyForbiddenEvents.includes(currEvent))
 					{
 						try
@@ -360,7 +382,6 @@ public class Automaton
 						{
 							logger.error("Could not add event in getControlInconsistentStates", ex);
 						}
-
 					}
 				}
 			}
@@ -371,16 +392,21 @@ public class Automaton
 		// that those are not in the list of explicitly
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
+
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
-			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+
+			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.nextArc();
 				State nextState = currArc.getToState();
+
 				if (!nextState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
+
 					if (explicitlyForbiddenEvents.includes(currEvent))
 					{
 						try
@@ -391,7 +417,6 @@ public class Automaton
 						{
 							logger.error("Could not add event in getControlInconsistentStates", ex);
 						}
-
 					}
 				}
 			}
@@ -415,13 +440,17 @@ public class Automaton
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
-			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+
+			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.nextArc();
 				State nextState = currArc.getToState();
+
 				if (nextState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
+
 					if (!explicitlyForbiddenEvents.includes(currEvent))
 					{
 						try
@@ -433,7 +462,6 @@ public class Automaton
 						{
 							logger.error("Could not add event in resolveControlInconsistencies", ex);
 						}
-
 					}
 				}
 			}
@@ -444,21 +472,27 @@ public class Automaton
 		// that those are not in the list of explicitly
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
+
 		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
-			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+
+			for (ArcIterator arcIt = currState.outgoingArcsIterator();
+					arcIt.hasNext(); )
 			{
 				Arc currArc = arcIt.nextArc();
 				State nextState = currArc.getToState();
+
 				if (!nextState.isForbidden())
 				{
 					LabeledEvent currEvent = currArc.getEvent();
+
 					if (explicitlyForbiddenEvents.includes(currEvent))
 					{
 						try
 						{
-							State forbiddenState = (State)eventToStateMap.get(currEvent);
+							State forbiddenState = (State) eventToStateMap.get(currEvent);
+
 							currArc.setToState(forbiddenState);
 							controlInconsistentEvents.addEvent(currEvent);
 						}
@@ -466,7 +500,6 @@ public class Automaton
 						{
 							logger.error("Could not add event in getControlInconsistentStates", ex);
 						}
-
 					}
 				}
 			}
@@ -484,13 +517,17 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("State must be non-null");
 		}
-		State existing = (State)idStateMap.get(state.getId());
-		if(existing != null)
+
+		State existing = (State) idStateMap.get(state.getId());
+
+		if (existing != null)
 		{
 			return existing;
 		}
+
 		// else, add it as usual
 		addState(state);
+
 		return state;
 	}
 
@@ -543,17 +580,18 @@ public class Automaton
 		}
 
 		State oldinit = getInitialState();
-
 		State newinit = getState(state);
-		if(newinit == null)
+
+		if (newinit == null)
 		{
 			throw new IllegalStateException("No such state. id = " + state.getId());
 		}
 
 		newinit.setInitial(true);
+
 		initialState = newinit;
 
-		if(oldinit != null)
+		if (oldinit != null)
 		{
 			oldinit.setInitial(false);
 		}
@@ -567,7 +605,8 @@ public class Automaton
 	public State createUniqueState(String prefix)
 	{
 		StringBuffer name = null;
-		if(prefix == null || prefix.equals(""))
+
+		if ((prefix == null) || prefix.equals(""))
 		{
 			name = new StringBuffer("q" + uniqueStateIndex++);
 		}
@@ -576,10 +615,11 @@ public class Automaton
 			name = new StringBuffer(prefix);
 		}
 
-		while(containsStateWithId(name.toString()))
+		while (containsStateWithId(name.toString()))
 		{
 			name.append(uniqueStateIndex++);
 		}
+
 		return new State(name.toString());
 	}
 
@@ -591,7 +631,9 @@ public class Automaton
 	public State createAndAddUniqueState(String prefix)
 	{
 		State newstate = createUniqueState(prefix);
+
 		addState(newstate);
+
 		return newstate;
 	}
 
@@ -611,6 +653,7 @@ public class Automaton
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -619,14 +662,16 @@ public class Automaton
 	 */
 	public boolean hasSelfLoop()
 	{
-		for(ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext();)
+		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.nextArc();
+
 			if (currArc.isSelfLoop())
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -634,11 +679,15 @@ public class Automaton
 	{
 		HashSet foundEvents = new HashSet();
 
-		for (SupremicaIterator stateIt = new SupremicaIterator(stateIterator()); stateIt.isValid(); stateIt.increase())
+		for (SupremicaIterator stateIt = new SupremicaIterator(stateIterator());
+				stateIt.isValid(); stateIt.increase())
 		{
-			State currState = (State)stateIt.get();
+			State currState = (State) stateIt.get();
+
 			foundEvents.clear();
-			for (EventIterator evIt = outgoingEventsIterator(currState); evIt.hasNext(); )
+
+			for (EventIterator evIt = outgoingEventsIterator(currState);
+					evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
 
@@ -650,6 +699,7 @@ public class Automaton
 
 				// Has this event been seen in another transition from this state?
 				boolean newElement = foundEvents.add(currEvent.getLabel());
+
 				if (!newElement)
 				{
 					return false;
@@ -670,7 +720,6 @@ public class Automaton
 		return alphabet.isAllEventsObservable();
 	}
 
-
 	/**
 	 * When adding an arc, both the two states associated with the
 	 * arc _must_ already be contained in the automaton, otherwise the
@@ -683,6 +732,7 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Arc must be non-null");
 		}
+
 		arc.getListeners().addListener(this);
 		theArcs.addArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
@@ -695,6 +745,7 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Arc must be non-null");
 		}
+
 		theArcs.removeArc(arc);
 		arc.clear();
 		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
@@ -707,6 +758,7 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("State must be non-null");
 		}
+
 		return idStateMap.containsKey(state.getId());
 	}
 
@@ -724,14 +776,16 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("State must be non-null");
 		}
+
 		return (State) idStateMap.get(state.getId());
 	}
 
 	// Given this state, which belongs to this stateset, return a unique id-string
 	public String getUniqueStateId(State state)
 	{
+
 		// prereq: state is in theStates:
-		return state.getId(); // at the moment do the simplest thing
+		return state.getId();    // at the moment do the simplest thing
 	}
 
 	/**
@@ -744,7 +798,9 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Name must be non-null");
 		}
+
 		State theState = getStateWithName(name);
+
 		return theState != null;
 	}
 
@@ -758,14 +814,17 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Name must be non-null");
 		}
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
+
 			if (currState.getName().equals(name))
 			{
 				return currState;
 			}
 		}
+
 		return null;
 	}
 
@@ -780,6 +839,7 @@ public class Automaton
 	}
 
 	// The index stuff should be exclusive to AutomataIndexForm, but how to manage that?
+
 	/**
 	 * This is an ugly method that is only needed when dealing
 	 * with automataIndexForm. All methods that works with index
@@ -806,15 +866,16 @@ public class Automaton
 	{
 		return (((State) (indexStateMap.get(new Integer(index)))).getName());
 	}
-	// end index stuff
 
+	// end index stuff
 	// What the f*** are these doing here?
+
 	/*
 	private LabeledEvent getEvent(String eventId)
-		throws Exception
+			throws Exception
 	{
-		// return alphabet.getEventWithId(eventId);
-		return alphabet.getEvent(new LabeledEvent(eventId));
+			// return alphabet.getEventWithId(eventId);
+			return alphabet.getEvent(new LabeledEvent(eventId));
 	}
 	*/
 
@@ -831,6 +892,7 @@ public class Automaton
 		}
 
 		StateIterator stateIt = new InternalStateIterator(eventLabel, true);
+
 		return stateIt;
 	}
 
@@ -846,9 +908,11 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("EventLabel must be non-null");
 		}
+
 		if (alphabet.contains(eventLabel))
 		{
 			LabeledEvent thisEvent = alphabet.getEvent(eventLabel);
+
 			return thisEvent.isPrioritized();
 		}
 		else
@@ -884,14 +948,17 @@ public class Automaton
 	public int nbrOfSelfLoops()
 	{
 		int amount = 0;
-		for(ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext();)
+
+		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.nextArc();
+
 			if (currArc.isSelfLoop())
 			{
 				amount++;
 			}
 		}
+
 		return amount;
 	}
 
@@ -901,14 +968,17 @@ public class Automaton
 	public int nbrOfSelfLoops(Alphabet anAlphabet)
 	{
 		int amount = 0;
-		for(ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext();)
+
+		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.nextArc();
+
 			if (currArc.isSelfLoop() && anAlphabet.contains(currArc.getEvent()))
 			{
 				amount++;
 			}
 		}
+
 		return amount;
 	}
 
@@ -957,7 +1027,7 @@ public class Automaton
 		{
 			State currState = (State) stateIt.next();
 
-			if (currState.isMutuallyAccepting() && !currState.isForbidden())
+			if (currState.isMutuallyAccepting() &&!currState.isForbidden())
 			{
 				nbrOfAcceptingStates++;
 			}
@@ -970,7 +1040,7 @@ public class Automaton
 	{
 		int nbrOfForbiddenStates = 0;
 
-		for  (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
 
@@ -987,7 +1057,7 @@ public class Automaton
 	{
 		int nbrOfAcceptingAndForbiddenStates = 0;
 
-		for  (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
 
@@ -1005,13 +1075,16 @@ public class Automaton
 	 */
 	public int depth()
 	{
-		int depth=0;
+		int depth = 0;
 
-		for (StateIterator stateIterator = stateIterator(); stateIterator.hasNext();)
+		for (StateIterator stateIterator = stateIterator();
+				stateIterator.hasNext(); )
 		{
+
 			// Measure the shortest trace to the state.
 			State currState = stateIterator.nextState();
 			int stateDepth;
+
 			try
 			{
 				stateDepth = getTrace(currState).size();
@@ -1019,9 +1092,11 @@ public class Automaton
 			catch (Exception ex)
 			{
 				logger.error(ex);
+
 				return Integer.MAX_VALUE;
 			}
-			if (stateDepth>depth)
+
+			if (stateDepth > depth)
 			{
 				depth = stateDepth;
 			}
@@ -1037,11 +1112,14 @@ public class Automaton
 	{
 		int depthSum = 0;
 
-		for (StateIterator stateIterator = stateIterator(); stateIterator.hasNext();)
+		for (StateIterator stateIterator = stateIterator();
+				stateIterator.hasNext(); )
 		{
+
 			// Measure the shortest trace to the state.
 			State currState = stateIterator.nextState();
 			int stateDepth;
+
 			try
 			{
 				stateDepth = getTrace(currState).size();
@@ -1049,14 +1127,18 @@ public class Automaton
 			catch (Exception ex)
 			{
 				logger.error(ex);
+
 				return Integer.MAX_VALUE;
 			}
 
 			// Calculate sum of
-			for (ArcIterator arcIterator = currState.outgoingArcsIterator();arcIterator.hasNext();)
+			for (ArcIterator arcIterator = currState.outgoingArcsIterator();
+					arcIterator.hasNext(); )
 			{
 				if (anAlphabet.contains(arcIterator.nextEvent()))
+				{
 					depthSum += stateDepth;
+				}
 			}
 		}
 
@@ -1090,12 +1172,14 @@ public class Automaton
 	public EventIterator outgoingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.outgoingArcsIterator();
+
 		return new InternalEventIterator(arcIt);
 	}
 
 	public EventIterator incomingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.incomingArcsIterator();
+
 		return new InternalEventIterator(arcIt);
 	}
 
@@ -1109,6 +1193,7 @@ public class Automaton
 		{
 			throw new IllegalStateException("This Automaton is not an interface");
 		}
+
 		return masterAutomata;
 	}
 
@@ -1119,6 +1204,7 @@ public class Automaton
 		{
 			throw new IllegalStateException("This Automaton is not an interface");
 		}
+
 		return slaveAutomata;
 	}
 
@@ -1134,7 +1220,8 @@ public class Automaton
 
 		for (Iterator autIt = currDependencies.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			if (!validAutomata.containsAutomaton(currAutomaton))
 			{
 				toBeRemoved.add(currAutomaton);
@@ -1143,7 +1230,8 @@ public class Automaton
 
 		for (Iterator autIt = toBeRemoved.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			currDependencies.removeAutomaton(currAutomaton);
 		}
 	}
@@ -1172,15 +1260,15 @@ public class Automaton
 	}
 
 /*
-	public void setAlphabet(Alphabet alphabet)
-		throws IllegalArgumentException
-	{
-		if (alphabet == null)
+		public void setAlphabet(Alphabet alphabet)
+				throws IllegalArgumentException
 		{
-			throw new IllegalArgumentException("Alphabet must be non-null");
+				if (alphabet == null)
+				{
+						throw new IllegalArgumentException("Alphabet must be non-null");
+				}
+				this.alphabet = alphabet;
 		}
-		this.alphabet = alphabet;
-	}
 */
 
 	/**
@@ -1192,11 +1280,14 @@ public class Automaton
 	public void normalizeStateIdentities()
 	{
 		setStateIndicies();
+
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
+
 			currState.setId("q_" + currState.getIndex());
 		}
+
 		remapStateIndices();
 	}
 
@@ -1208,6 +1299,7 @@ public class Automaton
 	void setIndicies(int automatonIndex)
 	{
 		index = automatonIndex;
+
 		alphabet.setIndicies();
 		setStateIndicies();
 	}
@@ -1215,6 +1307,7 @@ public class Automaton
 	void setIndicies(int automatonIndex, Alphabet otherAlphabet)
 	{
 		index = automatonIndex;
+
 		alphabet.setIndicies(otherAlphabet);
 		setStateIndicies();
 	}
@@ -1222,9 +1315,11 @@ public class Automaton
 	private void setStateIndicies()
 	{
 		int i = 0;
+
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
+
 			currState.setIndex(i++);
 		}
 	}
@@ -1265,7 +1360,9 @@ public class Automaton
 		{
 			uniqueStateIndex++;
 		}
+
 		uniqueStateIndex++;
+
 		return uniqueStateIndex - 1;
 	}
 
@@ -1278,6 +1375,7 @@ public class Automaton
 			currState.setVisited(false);
 		}
 	}
+
 	public void clearSelectedStates()
 	{
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
@@ -1293,6 +1391,7 @@ public class Automaton
 		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
+
 			if (!currState.isVisited())
 			{
 				currState.setAssociatedState(null);
@@ -1310,10 +1409,12 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Automaton.getTrace: toState must be non-null");
 		}
+
 		if (!hasInitialState())
 		{
 			throw new IllegalStateException("There is no initial state");
 		}
+
 		return getTrace(getInitialState(), toState);
 	}
 
@@ -1327,6 +1428,7 @@ public class Automaton
 		{
 			throw new IllegalArgumentException("Automaton.getTrace: fromState must be non-null");
 		}
+
 		if (toState == null)
 		{
 			throw new IllegalArgumentException("Automaton.getTrace: toState must be non-null");
@@ -1339,17 +1441,22 @@ public class Automaton
 		// Remove the associated state from all states that
 		// is not on the way between fromState and toState.
 		State thisState = toState;
+
 		thisState.setVisited(true);
+
 		State prevState = thisState.getAssociatedState();
+
 		while (prevState != null)
 		{
 			LabeledEvent currEvent = getLabeledEvent(prevState, thisState);
+
 			if (currEvent == null)
 			{
-				throw new Exception("Could not find an arc from " + prevState.getName() +
-									" to " + thisState.getName());
+				throw new Exception("Could not find an arc from " + prevState.getName() + " to " + thisState.getName());
 			}
+
 			theTrace.addFirst(currEvent.getLabel());
+
 			thisState = prevState;
 			prevState = prevState.getAssociatedState();
 		}
@@ -1371,16 +1478,21 @@ public class Automaton
 
 		// This implements a breath first search
 		LinkedList openStates = new LinkedList();
+
 		fromState.setAssociatedState(null);
 		openStates.addLast(fromState);
 		fromState.setVisited(true);
+
 		while (openStates.size() > 0)
 		{
-			State currState = (State)openStates.removeFirst();
-			for (Iterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext();)
+			State currState = (State) openStates.removeFirst();
+
+			for (Iterator arcIt = currState.outgoingArcsIterator();
+					arcIt.hasNext(); )
 			{
-				Arc currArc = (Arc)arcIt.next();
+				Arc currArc = (Arc) arcIt.next();
 				State currToState = currArc.getToState();
+
 				if (!currToState.isVisited())
 				{
 					currToState.setAssociatedState(currState);
@@ -1409,11 +1521,14 @@ public class Automaton
 		{
 			currState.setVisited(true);
 		}
+
 		if (currState.getAssociatedState() == null)
 		{
 			currState.setAssociatedState(nextState);
+
 			return;
 		}
+
 		reverseAssociatedState(currState.getAssociatedState(), currState);
 		currState.setAssociatedState(nextState);
 	}
@@ -1421,6 +1536,7 @@ public class Automaton
 	/**
 	 * Removes mutually accepting status from all states.
 	 */
+
 	/*
 	public void setMutuallyAcceptingStatus(boolean status)
 	{
@@ -1435,31 +1551,36 @@ public class Automaton
 	public void extendMutuallyAccepting(Alphabet safeEvents)
 	{
 		beginTransaction();
+
 		boolean changes = true;
+
 		while (changes)
 		{
 			changes = false;
 
-			for (Iterator stateIt = stateIterator(); stateIt.hasNext();)
+			for (Iterator stateIt = stateIterator(); stateIt.hasNext(); )
 			{
 				State currState = (State) stateIt.next();
 
 				// This state must be mutually accepting and not forbidden?
 				//if (currState.isMutuallyAccepting() && !currState.isForbidden())
-
 				// We don't care about forbidden states...
 				if (currState.isMutuallyAccepting())
 				{
-					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext();)
+					for (ArcIterator arcIt = currState.incomingArcsIterator();
+							arcIt.hasNext(); )
 					{
 						Arc currArc = arcIt.nextArc();
 						LabeledEvent arcEvent = currArc.getEvent();
+
 						if (safeEvents.contains(arcEvent.getLabel()))
 						{
 							State fromState = currArc.getFromState();
+
 							if (!fromState.isMutuallyAccepting())
 							{
 								fromState.setMutuallyAccepting(true);
+
 								//fromState.setAccepting(true);
 								changes = true;
 							}
@@ -1468,6 +1589,7 @@ public class Automaton
 				}
 			}
 		}
+
 		invalidate();
 		endTransaction();
 	}
@@ -1480,9 +1602,11 @@ public class Automaton
 	public void setAllStatesAsAccepting(boolean keepForbidden)
 	{
 		beginTransaction();
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
+
 			if (keepForbidden)
 			{
 				if (!currState.isForbidden())
@@ -1496,6 +1620,7 @@ public class Automaton
 				currState.setForbidden(false);
 			}
 		}
+
 		invalidate();
 		endTransaction();
 	}
@@ -1508,9 +1633,11 @@ public class Automaton
 	public void setAllMutuallyAcceptingStatesAsAccepting(boolean keepForbidden)
 	{
 		beginTransaction();
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
+
 			if (currState.isMutuallyAccepting())
 			{
 				if (keepForbidden)
@@ -1527,6 +1654,7 @@ public class Automaton
 				}
 			}
 		}
+
 		invalidate();
 		endTransaction();
 	}
@@ -1536,9 +1664,10 @@ public class Automaton
 	 */
 	public void invertMarking()
 	{
-		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
+
 			if (currState.isMutuallyAccepting() || currState.isAccepting())
 			{
 				currState.setAccepting(false);
@@ -1557,15 +1686,18 @@ public class Automaton
 	public LabeledEvent getLabeledEvent(State fromState, State toState)
 		throws Exception
 	{
-		for (ArcIterator arcIt = fromState.outgoingArcsIterator(); arcIt.hasNext();)
+		for (ArcIterator arcIt = fromState.outgoingArcsIterator();
+				arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.nextArc();
 			State currToState = currArc.getToState();
+
 			if (currToState == toState)
 			{
 				return currArc.getEvent();
 			}
 		}
+
 		return null;
 	}
 
@@ -1576,6 +1708,7 @@ public class Automaton
 		indexStateMap.clear();
 		theStates.clear();
 		theArcs.clear();
+
 		initialState = null;
 
 		if (listeners != null)
@@ -1623,7 +1756,6 @@ public class Automaton
 		this.width = width;
 	}
 
-
 	public int getHeight()
 	{
 		return height;
@@ -1636,18 +1768,21 @@ public class Automaton
 
 	public boolean validLayout()
 	{
-		if (width < 0 || height < 0)
+		if ((width < 0) || (height < 0))
 		{
 			return false;
 		}
+
 		for (Iterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
-			State currState = (State)stateIt.next();
+			State currState = (State) stateIt.next();
+
 			if (!currState.validLayout())
 			{
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -1688,6 +1823,7 @@ public class Automaton
 	public boolean equalAutomaton(Automaton other)
 	{
 		boolean debug = true;
+
 		// Should type, name, comment really be considered?
 		if (getType() != other.getType())
 		{
@@ -1695,23 +1831,29 @@ public class Automaton
 			{
 				System.err.println("equalAutomaton::non equal type");
 			}
+
 			return false;
 		}
+
 		if (!getName().equals(other.getName()))
 		{
 			if (debug)
 			{
+
 				// System.err.println(getName() + " " + other.getName());
 				System.err.println("equalAutomaton::non equal name");
 			}
+
 			return false;
 		}
+
 		if (!getComment().equals(other.getComment()))
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal comment");
 			}
+
 			return false;
 		}
 
@@ -1722,62 +1864,77 @@ public class Automaton
 			{
 				System.err.println("equalAutomaton::non equal accepting state");
 			}
+
 			return false;
 		}
+
 		if (hasSelfLoop() != other.hasSelfLoop())
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal has self loop");
 			}
+
 			return false;
 		}
+
 		if (isDeterministic() != other.isDeterministic())
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal is deterministic");
 			}
+
 			return false;
 		}
+
 		if (isAllEventsPrioritized() != other.isAllEventsPrioritized())
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal is all events prioritized");
 			}
+
 			return false;
 		}
+
 		if (nbrOfAcceptingStates() != other.nbrOfAcceptingStates())
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal name nbr of accepting states");
 			}
+
 			return false;
 		}
+
 		if (nbrOfForbiddenStates() != other.nbrOfForbiddenStates())
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal nbr of forbidden states");
 			}
+
 			return false;
 		}
+
 		if (nbrOfAcceptingAndForbiddenStates() != other.nbrOfAcceptingAndForbiddenStates())
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal name nbr of accepting and forbidden states");
 			}
+
 			return false;
 		}
+
 		if (!alphabet.equalAlphabet(other.alphabet))
 		{
 			if (debug)
 			{
 				System.err.println("equalAutomaton::non equal alphabet");
 			}
+
 			return false;
 		}
 
@@ -1786,6 +1943,7 @@ public class Automaton
 
 	public long checksum()
 	{
+
 		// Ad-hoc checksum algorithm
 		long checksum = 0;
 
@@ -1890,6 +2048,7 @@ public class Automaton
 
 	public void beginTransaction()
 	{
+
 		// System.err.println("beginTransaction");
 		if (listeners != null)
 		{
@@ -1899,8 +2058,8 @@ public class Automaton
 
 	public void endTransaction()
 	{
-		// System.err.println("endTransaction");
 
+		// System.err.println("endTransaction");
 		if (listeners != null)
 		{
 			listeners.endTransaction();
@@ -1918,28 +2077,39 @@ public class Automaton
 
 	public int hashCode()
 	{
+
 		// Generate hascode from name, or if that's null, from the comment
 		if (name != null)
+		{
 			return name.hashCode();
+		}
 		else if (comment != null)
+		{
 			return comment.hashCode();
+		}
 
 		logger.error("Error in Automaton.java. Some automaton has both name and comment empty! This is NOT recommended!");
+
 		return 0;
 	}
 
 	public static void main(String[] args)
 	{
 		Automaton theAutomaton = new Automaton();
-
 		State stateZero = new State("zero");
+
 		theAutomaton.addState(stateZero);
 
-		State st = theAutomaton.getStateWithIndex(0); // should be stateZero (not?)
-		if(st == null)
-				System.err.println("st == null");
+		State st = theAutomaton.getStateWithIndex(0);    // should be stateZero (not?)
+
+		if (st == null)
+		{
+			System.err.println("st == null");
+		}
 		else
-				System.err.println("st != null");
+		{
+			System.err.println("st != null");
+		}
 	}
 
 	class InternalEventIterator
@@ -1950,6 +2120,7 @@ public class Automaton
 		public InternalEventIterator(Iterator arcIt)
 		{
 			super(null);
+
 			this.arcIt = arcIt;
 		}
 
@@ -1958,20 +2129,23 @@ public class Automaton
 			return arcIt.hasNext();
 		}
 
-		public Object next() // really returns LabeledEvent
+		public Object next()    // really returns LabeledEvent
 		{
-			Arc nextArc = (Arc)arcIt.next();
+			Arc nextArc = (Arc) arcIt.next();
+
 			// String eventId = nextArc.getEventId();
 			LabeledEvent nextEvent = null;
+
 			try
 			{
-				nextEvent = nextArc.getEvent(); // eventId);
+				nextEvent = nextArc.getEvent();    // eventId);
 			}
 			catch (Exception ex)
 			{
 				logger.error("Automaton::InternalEventIterator.next: Error in getEvent", ex);
 				logger.debug(ex.getStackTrace());
 			}
+
 			return nextEvent;
 		}
 
@@ -1992,10 +2166,12 @@ public class Automaton
 		public InternalStateIterator(String eventLabel, boolean outgoing)
 		{
 			super(null);
+
 			this.eventLabel = eventLabel;
 			this.outgoing = outgoing;
 			this.arcIt = theArcs.iterator();
 			this.currState = null;
+
 			findNext();
 		}
 
@@ -2007,7 +2183,9 @@ public class Automaton
 		public Object next()
 		{
 			State returnState = currState;
+
 			findNext();
+
 			return returnState;
 		}
 
@@ -2022,20 +2200,24 @@ public class Automaton
 			{
 				Arc currArc = arcIt.nextArc();
 				String currLabel = currArc.getLabel();
+
 				if (eventLabel.equals(currLabel))
 				{
 					if (outgoing)
 					{
 						currState = currArc.getFromState();
+
 						return;
 					}
 					else
 					{
 						currState = currArc.getToState();
+
 						return;
 					}
 				}
 			}
+
 			currState = null;
 		}
 	}
@@ -2048,11 +2230,13 @@ public class Automaton
 		sbuf.append(getName());
 		sbuf.append("::");
 
-		for(Iterator it = arcIterator(); it.hasNext(); )
+		for (Iterator it = arcIterator(); it.hasNext(); )
 		{
-			Arc arc = (Arc)it.next();
+			Arc arc = (Arc) it.next();
+
 			sbuf.append(arc.toString());
 		}
+
 		return sbuf.toString();
 	}
 
@@ -2069,34 +2253,42 @@ public class Automaton
 		sbuf.append("Automaton " + getName() + " = new Automaton(\"" + getName() + "\");");
 		sbuf.append("\t\t{\t\t\t" + getName() + ".setType(AutomatonType." + getType().toString() + ");\n");
 
-		for(StateIterator sit = stateIterator(); sit.hasNext(); )
+		for (StateIterator sit = stateIterator(); sit.hasNext(); )
 		{
 			State state = sit.nextState();
+
 			sbuf.append("State " + state.getName() + " = new State(\"" + state.getName() + "\");");
 			sbuf.append("\t" + state.getName() + ".setCost(" + state.getCost() + ");");
 			sbuf.append("\t" + getName() + ".addState(" + state.getName() + ");");
-			if(state.isInitial())
+
+			if (state.isInitial())
 			{
 				sbuf.append("\t" + getName() + ".setInitialState(" + state.getName() + ");");
 			}
-			if(state.isAccepting())
+
+			if (state.isAccepting())
 			{
 				sbuf.append("\t" + state.getName() + ".setAccepting(true);");
 			}
+
 			sbuf.append("\n");
 		}
-		for(EventIterator eit = getAlphabet().iterator(); eit.hasNext(); )
+
+		for (EventIterator eit = getAlphabet().iterator(); eit.hasNext(); )
 		{
 			LabeledEvent ev = eit.nextEvent();
+
 			sbuf.append("LabeledEvent " + ev.getLabel() + " = new LabeledEvent(\"" + ev.getLabel() + "\");");
 			sbuf.append("\t" + getName() + ".getAlphabet().addEvent(" + ev.getLabel() + ");\n");
 		}
 
-		for(ArcIterator ait = arcIterator(); ait.hasNext(); )
+		for (ArcIterator ait = arcIterator(); ait.hasNext(); )
 		{
 			Arc arc = ait.nextArc();
+
 			sbuf.append(getName() + ".addArc(new Arc(" + arc.getFromState().getName() + ", " + arc.getToState().getName() + ", " + arc.getEvent().getLabel() + "));\n");
 		}
+
 		sbuf.append("}\n");
 
 		return sbuf.toString();

@@ -55,9 +55,7 @@ public interface Gui
 	void addAttributes(Project otherProject);
 
 	//public void addActions(Actions theActions);
-
 	//public void addControls(Controls theControls);
-
 	// Do we need this one?
 	JFrame getFrame();
 
@@ -67,6 +65,7 @@ public interface Gui
 	Collection getSelectedAutomataAsCollection();
 
 	Automata getSelectedAutomata();
+
 	Automata getUnselectedAutomata();
 
 	Project getSelectedProject();

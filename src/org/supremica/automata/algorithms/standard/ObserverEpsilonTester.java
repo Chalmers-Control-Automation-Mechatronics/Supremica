@@ -1,3 +1,4 @@
+
 /*
  * Created on 2003-jul-24
  *
@@ -19,9 +20,9 @@ public class ObserverEpsilonTester
 {
 	public boolean isThisEpsilon(LabeledEvent event)
 	{
-		return event.isEpsilon() || !event.isObservable();
+		return event.isEpsilon() ||!event.isObservable();
 	}
-	
+
 	// debug only
 	public String showWhatYouGot()
 	{

@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
@@ -71,132 +70,142 @@ import java.util.Hashtable;
  */
 public class XmlRpcResponseProcessor
 {
-    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+	private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
-    /**
-     * Process a successful response, and return output in the
-     * specified encoding.
-     *
-     * @param responseParam The response to process.
-     * @param encoding The output encoding.
-     * @return byte[] The XML-RPC response.
-     */
-    public byte[] processResponse(Object responseParam, String encoding)
-        throws IOException, UnsupportedEncodingException, XmlRpcException
-    {
-        long now = 0;
-        if (XmlRpc.debug)
-        {
-            now = System.currentTimeMillis();
-        }
+	/**
+	 * Process a successful response, and return output in the
+	 * specified encoding.
+	 *
+	 * @param responseParam The response to process.
+	 * @param encoding The output encoding.
+	 * @return byte[] The XML-RPC response.
+	 */
+	public byte[] processResponse(Object responseParam, String encoding)
+		throws IOException, UnsupportedEncodingException, XmlRpcException
+	{
+		long now = 0;
 
-        try
-        {
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            XmlWriter writer = new XmlWriter(buffer, encoding);
-            writeResponse(responseParam, writer);
-            writer.flush();
-            return buffer.toByteArray();
-        }
-        finally
-        {
-            if (XmlRpc.debug)
-            {
-                System.out.println("Spent " + (System.currentTimeMillis() - now)
-                        + " millis encoding response");
-            }
-        }
-    }
+		if (XmlRpc.debug)
+		{
+			now = System.currentTimeMillis();
+		}
 
-    /**
-     * Process an exception, and return output in the specified
-     * encoding.
-     *
-     * @param e The exception to process;
-     * @param encoding The output encoding.
-     * @return byte[] The XML-RPC response.
-     */
-    public byte[] processException(Exception x, String encoding)
-    {
-        if (XmlRpc.debug)
-        {
-            x.printStackTrace();
-        }
-        // Ensure that if there is anything in the buffer, it
-        // is cleared before continuing with the writing of exceptions.
-        // It is possible that something is in the buffer
-        // if there were an exception during the writeResponse()
-        // call above.
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		try
+		{
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+			XmlWriter writer = new XmlWriter(buffer, encoding);
 
-        XmlWriter writer = null;
-        try
-        {
-            writer = new XmlWriter(buffer, encoding);
-        }
-        catch (UnsupportedEncodingException encx)
-        {
-            System.err.println("XmlRpcServer attempted to use "
-                    + "unsupported encoding: " + encx);
-            // NOTE: If we weren't already using the default
-            // encoding, we could try it here.
-        }
-        catch (IOException iox)
-        {
-            System.err.println("XmlRpcServer experienced I/O error "
-                    + "writing error response: " + iox);
-        }
+			writeResponse(responseParam, writer);
+			writer.flush();
 
-        String message = x.toString();
-        // Retrieve XmlRpcException error code(if possible).
-        int code = x instanceof XmlRpcException ?
-               ((XmlRpcException) x).code : 0;
-        try
-        {
-            writeError(code, message, writer);
-            writer.flush();
-        }
-        catch (Exception e)
-        {
-            // Unlikely to occur, as we just sent a struct
-            // with an int and a string.
-            System.err.println("Unable to send error response to "
-                    + "client: " + e);
-        }
+			return buffer.toByteArray();
+		}
+		finally
+		{
+			if (XmlRpc.debug)
+			{
+				System.out.println("Spent " + (System.currentTimeMillis() - now) + " millis encoding response");
+			}
+		}
+	}
 
-        return (writer != null ? buffer.toByteArray() : EMPTY_BYTE_ARRAY);
-    }
+	/**
+	 * Process an exception, and return output in the specified
+	 * encoding.
+	 *
+	 * @param e The exception to process;
+	 * @param encoding The output encoding.
+	 * @return byte[] The XML-RPC response.
+	 */
+	public byte[] processException(Exception x, String encoding)
+	{
+		if (XmlRpc.debug)
+		{
+			x.printStackTrace();
+		}
 
-     /**
-      * Writes an XML-RPC response to the XML writer.
-      */
-    void writeResponse(Object param, XmlWriter writer)
-        throws XmlRpcException, IOException
-    {
-        writer.startElement("methodResponse");
-        // if (param == null) param = ""; // workaround for Frontier bug
-        writer.startElement("params");
-        writer.startElement("param");
-        writer.writeObject(param);
-        writer.endElement("param");
-        writer.endElement("params");
-        writer.endElement("methodResponse");
-    }
+		// Ensure that if there is anything in the buffer, it
+		// is cleared before continuing with the writing of exceptions.
+		// It is possible that something is in the buffer
+		// if there were an exception during the writeResponse()
+		// call above.
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		XmlWriter writer = null;
 
-    /**
-     * Writes an XML-RPC error response to the XML writer.
-     */
-    void writeError(int code, String message, XmlWriter writer)
-        throws XmlRpcException, IOException
-    {
-        // System.err.println("error: "+message);
-        Hashtable h = new Hashtable();
-        h.put("faultCode", new Integer(code));
-        h.put("faultString", message);
-        writer.startElement("methodResponse");
-        writer.startElement("fault");
-        writer.writeObject(h);
-        writer.endElement("fault");
-        writer.endElement("methodResponse");
-    }
+		try
+		{
+			writer = new XmlWriter(buffer, encoding);
+		}
+		catch (UnsupportedEncodingException encx)
+		{
+			System.err.println("XmlRpcServer attempted to use " + "unsupported encoding: " + encx);
+
+			// NOTE: If we weren't already using the default
+			// encoding, we could try it here.
+		}
+		catch (IOException iox)
+		{
+			System.err.println("XmlRpcServer experienced I/O error " + "writing error response: " + iox);
+		}
+
+		String message = x.toString();
+
+		// Retrieve XmlRpcException error code(if possible).
+		int code = (x instanceof XmlRpcException)
+				   ? ((XmlRpcException) x).code
+				   : 0;
+
+		try
+		{
+			writeError(code, message, writer);
+			writer.flush();
+		}
+		catch (Exception e)
+		{
+
+			// Unlikely to occur, as we just sent a struct
+			// with an int and a string.
+			System.err.println("Unable to send error response to " + "client: " + e);
+		}
+
+		return ((writer != null)
+				? buffer.toByteArray()
+				: EMPTY_BYTE_ARRAY);
+	}
+
+	/**
+	 * Writes an XML-RPC response to the XML writer.
+	 */
+	void writeResponse(Object param, XmlWriter writer)
+		throws XmlRpcException, IOException
+	{
+		writer.startElement("methodResponse");
+
+		// if (param == null) param = ""; // workaround for Frontier bug
+		writer.startElement("params");
+		writer.startElement("param");
+		writer.writeObject(param);
+		writer.endElement("param");
+		writer.endElement("params");
+		writer.endElement("methodResponse");
+	}
+
+	/**
+	 * Writes an XML-RPC error response to the XML writer.
+	 */
+	void writeError(int code, String message, XmlWriter writer)
+		throws XmlRpcException, IOException
+	{
+
+		// System.err.println("error: "+message);
+		Hashtable h = new Hashtable();
+
+		h.put("faultCode", new Integer(code));
+		h.put("faultString", message);
+		writer.startElement("methodResponse");
+		writer.startElement("fault");
+		writer.writeObject(h);
+		writer.endElement("fault");
+		writer.endElement("methodResponse");
+	}
 }

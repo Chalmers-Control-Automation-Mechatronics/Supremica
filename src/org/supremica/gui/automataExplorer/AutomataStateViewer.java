@@ -69,7 +69,6 @@ public class AutomataStateViewer
 	private JSplitPane stateEventSplitter;
 	private LinkedList prevStates = new LinkedList();
 	private LinkedList nextStates = new LinkedList();
-	
 
 	public AutomataStateViewer(AutomataSynchronizerHelper helper)
 	{
@@ -79,7 +78,6 @@ public class AutomataStateViewer
 		this.helper = helper;
 		forwardEvents = new AutomataEventList(this, helper, true);
 		backwardEvents = new AutomataEventList(this, helper, false);
-
 		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
 		stateDisplayer = new AutomataStateDisplayer(this, helper);
 		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);

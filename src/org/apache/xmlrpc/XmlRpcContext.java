@@ -59,29 +59,30 @@ package org.apache.xmlrpc;
  * The minimal context that an XML-RPC request will occur in.
  *
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
- * @version $Id: XmlRpcContext.java,v 1.1 2004-02-02 15:56:20 vahidi Exp $
+ * @version $Id: XmlRpcContext.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  * @since 1.2
  */
 public interface XmlRpcContext
 {
-    /**
-     * Get the username specified in the outer request.
-     *
-     * @returns the username (may be null).
-     */
-    public String getUserName();
 
-    /**
-     * Get the password specified in the outer request.
-     *
-     * @returns the password (may be null).
-     */
-    public String getPassword();
+	/**
+	 * Get the username specified in the outer request.
+	 *
+	 * @returns the username (may be null).
+	 */
+	public String getUserName();
 
-    /**
-     * Get the XML-RPC handler mapping for the server handling the request.
-     *
-     * @returns the handler mapping (may be null).
-     */
-    public XmlRpcHandlerMapping getHandlerMapping();
+	/**
+	 * Get the password specified in the outer request.
+	 *
+	 * @returns the password (may be null).
+	 */
+	public String getPassword();
+
+	/**
+	 * Get the XML-RPC handler mapping for the server handling the request.
+	 *
+	 * @returns the handler mapping (may be null).
+	 */
+	public XmlRpcHandlerMapping getHandlerMapping();
 }

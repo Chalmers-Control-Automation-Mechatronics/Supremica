@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.util.Vector;
 
 /**
@@ -67,105 +66,109 @@ import java.util.Vector;
  * @since 1.2
  */
 public class SystemHandler
-implements ContextXmlRpcHandler
+	implements ContextXmlRpcHandler
 {
-    private DefaultHandlerMapping systemMapping = null;
+	private DefaultHandlerMapping systemMapping = null;
 
-    /**
-     * Creates a new instance. This instance contains no system calls. Use the
-     * addDefaultSystemHandlers() method to add the 'default' set of handlers,
-     * or add handlers manually.
-     */
-    public SystemHandler()
-    {
-        this.systemMapping = new DefaultHandlerMapping();
-    }
+	/**
+	 * Creates a new instance. This instance contains no system calls. Use the
+	 * addDefaultSystemHandlers() method to add the 'default' set of handlers,
+	 * or add handlers manually.
+	 */
+	public SystemHandler()
+	{
+		this.systemMapping = new DefaultHandlerMapping();
+	}
 
-   /**
-     * Creates a new instance that delegates calls via the
-     * specified {@link org.apache.xmlrpc.XmlRpcHandlerMapping}. This
-     * method will add the system.multicall handler when a non-null
-     * handlerMapping is specified. The value itself is ignored.
-     *
-     * @deprecated use new SystemHandler() and addDefaultSystemHandlers() instead.
-     */
-    public SystemHandler(XmlRpcHandlerMapping handlerMapping)
-    {
-        this();
-        if (handlerMapping != null)
-        {
-          addDefaultSystemHandlers();
-        }
-    }
+	/**
+	  * Creates a new instance that delegates calls via the
+	  * specified {@link org.apache.xmlrpc.XmlRpcHandlerMapping}. This
+	  * method will add the system.multicall handler when a non-null
+	  * handlerMapping is specified. The value itself is ignored.
+	  *
+	  * @deprecated use new SystemHandler() and addDefaultSystemHandlers() instead.
+	  */
+	public SystemHandler(XmlRpcHandlerMapping handlerMapping)
+	{
+		this();
 
-    /**
-     * Creates a new instance that delegates its multicalls via
-     * the mapping used by the specified {@link org.apache.xmlrpc.XmlRpcServer}.
-     * This method will add the default handlers when the specfied server's
-     * getHandlerMapping() returns a non-null handler mapping.
-     *
-     * @param server The server to retrieve the XmlRpcHandlerMapping from.
-     *
-     * @deprecated use new SystemHandler() and addDefaultSystemHandlers() instead.
-     */
-    protected SystemHandler(XmlRpcServer server)
-    {
-        this(server.getHandlerMapping());
-    }
+		if (handlerMapping != null)
+		{
+			addDefaultSystemHandlers();
+		}
+	}
 
-    /**
-     * Add the default system handlers. The default system handlers are:
-     * <dl>
-     *  <dt>system.multicall</dt>
-     *  <dd>Make multiple XML-RPC calls in one request and receive multiple
-     *  responses.</dd>
-     * </dl>
-     */
-    public void addDefaultSystemHandlers()
-    {
-        addSystemHandler("multicall", new MultiCall());
-    }
+	/**
+	 * Creates a new instance that delegates its multicalls via
+	 * the mapping used by the specified {@link org.apache.xmlrpc.XmlRpcServer}.
+	 * This method will add the default handlers when the specfied server's
+	 * getHandlerMapping() returns a non-null handler mapping.
+	 *
+	 * @param server The server to retrieve the XmlRpcHandlerMapping from.
+	 *
+	 * @deprecated use new SystemHandler() and addDefaultSystemHandlers() instead.
+	 */
+	protected SystemHandler(XmlRpcServer server)
+	{
+		this(server.getHandlerMapping());
+	}
 
-    /**
-     * @see org.apache.xmlrpc.DefaultHandlerMapping#addHandler(String, Object)
-     */
-    public void addSystemHandler(String handlerName, ContextXmlRpcHandler handler)
-    {
-        systemMapping.addHandler(handlerName, handler);
-    }
+	/**
+	 * Add the default system handlers. The default system handlers are:
+	 * <dl>
+	 *  <dt>system.multicall</dt>
+	 *  <dd>Make multiple XML-RPC calls in one request and receive multiple
+	 *  responses.</dd>
+	 * </dl>
+	 */
+	public void addDefaultSystemHandlers()
+	{
+		addSystemHandler("multicall", new MultiCall());
+	}
 
-    /**
-     * @see org.apache.xmlrpc.DefaultHandlerMapping#removeHandler(String)
-     */
-    public void removeSystemHandler(String handlerName)
-    {
-        systemMapping.removeHandler(handlerName);
-    }
+	/**
+	 * @see org.apache.xmlrpc.DefaultHandlerMapping#addHandler(String, Object)
+	 */
+	public void addSystemHandler(String handlerName, ContextXmlRpcHandler handler)
+	{
+		systemMapping.addHandler(handlerName, handler);
+	}
 
-    /**
-     * Execute a &lt;ignored&gt;.&lt;name&gt; call by calling the handler for
-     * &lt;name&gt; in the the system handler mapping.
-     */
-    public Object execute(String method, Vector params, XmlRpcContext context)
-            throws Exception
-    {
-        Object handler = null;
-        String systemMethod = null;
-        int dot = method.lastIndexOf('.');
-        if (dot > -1)
-        {
-            // The last portion of the XML-RPC method name is the systen
-	    // method name. 
-	    systemMethod = method.substring(dot + 1);
+	/**
+	 * @see org.apache.xmlrpc.DefaultHandlerMapping#removeHandler(String)
+	 */
+	public void removeSystemHandler(String handlerName)
+	{
+		systemMapping.removeHandler(handlerName);
+	}
 
-            // Add the "." in at the end, the systemMapping will strip it off
-            handler = systemMapping.getHandler(systemMethod + ".");
-            if (handler != null)
-            {
-                return ((ContextXmlRpcHandler) handler).execute(systemMethod, params, context);
-            }
-        }
+	/**
+	 * Execute a &lt;ignored&gt;.&lt;name&gt; call by calling the handler for
+	 * &lt;name&gt; in the the system handler mapping.
+	 */
+	public Object execute(String method, Vector params, XmlRpcContext context)
+		throws Exception
+	{
+		Object handler = null;
+		String systemMethod = null;
+		int dot = method.lastIndexOf('.');
 
-        throw new NoSuchMethodException("No method '" + method + "' registered.");
-    }
+		if (dot > -1)
+		{
+
+			// The last portion of the XML-RPC method name is the systen
+			// method name. 
+			systemMethod = method.substring(dot + 1);
+
+			// Add the "." in at the end, the systemMapping will strip it off
+			handler = systemMapping.getHandler(systemMethod + ".");
+
+			if (handler != null)
+			{
+				return ((ContextXmlRpcHandler) handler).execute(systemMethod, params, context);
+			}
+		}
+
+		throw new NoSuchMethodException("No method '" + method + "' registered.");
+	}
 }

@@ -61,7 +61,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 	public AutomataToSattLineSFCForBallProcess(Project theProject)
 	{
-		this(theProject, (BallProcessHelper)BallProcessHelper.getInstance());
+		this(theProject, (BallProcessHelper) BallProcessHelper.getInstance());
 	}
 
 	public AutomataToSattLineSFCForBallProcess(Project theProject, IEC61131Helper theHelper)
@@ -81,6 +81,7 @@ public class AutomataToSattLineSFCForBallProcess
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		/* Macro for printing of Ball Process type definitions, variables
 		and the LabIO sub module handling the interaction with the physical
 		Ball Process. We assume that there are no user defined variables.
@@ -106,31 +107,37 @@ public class AutomataToSattLineSFCForBallProcess
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		((BallProcessHelper) theHelper).printGFile(theWriter, filename);
 		theWriter.close();
 	}
+
 	public void serialize_l(File theFile, String filename)
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		((BallProcessHelper) theHelper).printLFile(theWriter, filename);
 		theWriter.close();
 	}
+
 	public void serialize_p(File theFile, String filename)
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		((BallProcessHelper) theHelper).printPFile(theWriter, filename);
 		theWriter.close();
 	}
 
 	protected void printEventMonitorAction(LabeledEvent theEvent, PrintWriter pw)
 	{
+
 		/* We should not replace '.' with '_'. Needed for IP.xxx and (RE)SET_OP.yyy.
 		 No other such events are assumed. Petter must make sure of that in his
 		 PM for the assignment. */
-		pw.println(theHelper.getActionP1Prefix() + theEvent.getLabel() +  theHelper.getAssignmentOperator() + "True;" + theHelper.getActionP1Suffix());
-		pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel() +  theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
+		pw.println(theHelper.getActionP1Prefix() + theEvent.getLabel() + theHelper.getAssignmentOperator() + "True;" + theHelper.getActionP1Suffix());
+		pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel() + theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
 	}
 
 	protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
@@ -144,6 +151,7 @@ public class AutomataToSattLineSFCForBallProcess
 		if (theExtConfAlphabet.nbrOfUncontrollableEvents() > 0)
 		{
 			String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
+
 			theCondition.append(theUcCondition);
 		}
 
@@ -177,7 +185,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 					try
 					{
-						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -198,6 +206,7 @@ public class AutomataToSattLineSFCForBallProcess
 								nextAutomaton = false;
 
 								theCondition.append(" AND ");
+
 								lineLength = lineLength + 5;
 							}
 
@@ -206,12 +215,15 @@ public class AutomataToSattLineSFCForBallProcess
 								firstState = false;
 
 								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
+
 								lineLength = lineLength + 5 + aut.getName().length() + sourceState.getName().length();
+
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
 								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
+
 								lineLength = lineLength + 8 + aut.getName().length() + sourceState.getName().length();
 							}
 						}
@@ -222,11 +234,14 @@ public class AutomataToSattLineSFCForBallProcess
 						// This should not happen since the event exists in the automaton.
 						logger.error("Failed getting event label. Code generation erroneous. " + ex);
 						logger.debug(ex.getStackTrace());
+
 						return theCondition.toString();
 					}
+
 					if (lineLength > 100)
 					{
 						theCondition.append("\n");
+
 						lineLength = 0;
 					}
 				}
@@ -238,6 +253,7 @@ public class AutomataToSattLineSFCForBallProcess
 				else
 				{
 					theCondition.append(")");
+
 					lineLength = lineLength + 1;
 				}
 
@@ -250,6 +266,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 	protected String ucDisablementCondition(Alphabet theAlphabet)
 	{
+
 		/* Must fix 140 character line length limit. There are at least 31
 		 characters before the transition condition. There are none after it.
 		 Let's make the transition condition limit 100 characters.
@@ -259,7 +276,6 @@ public class AutomataToSattLineSFCForBallProcess
 		 its precondition. Even so, it may not be useable since
 		 the step timer variable retains its value until the step
 		 is reactivated. Maybe we should just ignore it. */
-
 		StringBuffer theCondition = new StringBuffer("");
 
 		/* QUICK AND DIRTY HACK preventing locking behaviour: !event AND NOT !event.
@@ -271,30 +287,30 @@ public class AutomataToSattLineSFCForBallProcess
 
 		for (Iterator ucEventIt = theAlphabet.uncontrollableEventIterator(); ucEventIt.hasNext(); )
 		{
-			LabeledEvent theUcEvent = (LabeledEvent) ucEventIt.next();
-			if (firstUcEvent)
-			{
-				firstUcEvent = false;
-			}
-			else
-			{
-				theCondition.append(" OR ");
-				lineLength = lineLength + 4;
-			}
-			if (theUcEvent.getLabel().equalsIgnoreCase("timer"))
-			{
-				theCondition.append("False");
-			}
-			else
-			{
-				theCondition.append(theUcEvent.getLabel());
-				lineLength = lineLength + theUcEvent.getLabel().length();
-			}
-			if (lineLength > 100)
-			{
-				theCondition.append("\n");
-				lineLength = 0;
-			}
+				LabeledEvent theUcEvent = (LabeledEvent) ucEventIt.next();
+				if (firstUcEvent)
+				{
+						firstUcEvent = false;
+				}
+				else
+				{
+						theCondition.append(" OR ");
+						lineLength = lineLength + 4;
+				}
+				if (theUcEvent.getLabel().equalsIgnoreCase("timer"))
+				{
+						theCondition.append("False");
+				}
+				else
+				{
+						theCondition.append(theUcEvent.getLabel());
+						lineLength = lineLength + theUcEvent.getLabel().length();
+				}
+				if (lineLength > 100)
+				{
+						theCondition.append("\n");
+						lineLength = 0;
+				}
 		}
 		theCondition.append(") AND ");*/
 		return theCondition.toString();
@@ -310,7 +326,6 @@ public class AutomataToSattLineSFCForBallProcess
 		/* This version takes care of line length limits and assumes that the
 		   ordering of the SFCs doesn't change. Then we can allow self loops.
 		   In general, that is not the case for IT/DA PLCs, such as Satt Line. */
-
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
@@ -331,7 +346,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 					try
 					{
-						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -358,6 +373,7 @@ public class AutomataToSattLineSFCForBallProcess
 								// theCondition.append(" OR ");
 								// lineLength = lineLength + 4;
 								theCondition.append(" AND ");
+
 								lineLength = lineLength + 5;
 							}
 
@@ -368,14 +384,18 @@ public class AutomataToSattLineSFCForBallProcess
 								// theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
 								// lineLength = lineLength + 5 + aut.getName().length() + sourceState.getName().length();
 								theCondition.append("(" + aut.getName().replace('.', '_') + "__" + destinationState.getName() + ".X");
+
 								lineLength = lineLength + 5 + aut.getName().length() + destinationState.getName().length();
+
 								logger.debug("Current transition condition: " + theCondition);
 							}
 							else
 							{
+
 								// theCondition.append(" AND " + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
 								// lineLength = lineLength + 9 + aut.getName().length() + sourceState.getName().length();
 								theCondition.append(" OR " + aut.getName().replace('.', '_') + "__" + destinationState.getName() + ".X");
+
 								lineLength = lineLength + 8 + aut.getName().length() + destinationState.getName().length();
 							}
 						}
@@ -386,11 +406,14 @@ public class AutomataToSattLineSFCForBallProcess
 						// This should not happen since the event exists in the automaton.
 						logger.error("Failed getting event label. Code generation erroneous. " + ex);
 						logger.debug(ex.getStackTrace());
+
 						return theCondition.toString();
 					}
+
 					if (lineLength > 100)
 					{
 						theCondition.append("\n");
+
 						lineLength = 0;
 					}
 				}
@@ -402,6 +425,7 @@ public class AutomataToSattLineSFCForBallProcess
 				else
 				{
 					theCondition.append(")");
+
 					lineLength = lineLength + 1;
 				}
 
@@ -420,7 +444,7 @@ public class AutomataToSattLineSFCForBallProcess
 		/* Again, we should not replace '.' with '_' in event labels. */
 		try
 		{
-			LabeledEvent event = theArc.getEvent(); // theAutomaton.getEvent(theArc.getEventId());
+			LabeledEvent event = theArc.getEvent();    // theAutomaton.getEvent(theArc.getEventId());
 
 			if (event.getLabel().equalsIgnoreCase("timer"))
 			{
@@ -443,6 +467,7 @@ public class AutomataToSattLineSFCForBallProcess
 		{
 			logger.error("Failed getting event label. Code generation aborted. " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}

@@ -71,18 +71,21 @@ public class AutomataExplorerController
 		this.theAutomata = synchHelper.getAutomata();
 
 		Box redoBox = new Box(BoxLayout.X_AXIS);
-
 		ImageIcon forwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
 		ImageIcon backwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
 		ImageIcon homeImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
 
 		undoButton = new JButton(backwardImg);
-		undoButton.setToolTipText("Back");
-		redoButton = new JButton(forwardImg);
-		redoButton.setToolTipText("Forward");
-		JButton resetButton = new JButton(homeImg);
-		resetButton.setToolTipText("Go to the initial state");
 
+		undoButton.setToolTipText("Back");
+
+		redoButton = new JButton(forwardImg);
+
+		redoButton.setToolTipText("Forward");
+
+		JButton resetButton = new JButton(homeImg);
+
+		resetButton.setToolTipText("Go to the initial state");
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(undoButton);
@@ -92,9 +95,7 @@ public class AutomataExplorerController
 		redoBox.add(resetButton);
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(Box.createHorizontalGlue());
-
 		add(redoBox, BorderLayout.NORTH);
-
 		undoButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -75,7 +76,7 @@ public final class SupremicaCategory
 	 */
 	public void debug(StackTraceElement[] trace)
 	{
-		for(int i = 0; i < trace.length; ++i)
+		for (int i = 0; i < trace.length; ++i)
 		{
 			category.debug(trace[i].toString());
 		}
@@ -89,6 +90,7 @@ public final class SupremicaCategory
 	public void error(Object message, Throwable t)
 	{
 		category.error(message, t);
+
 		//category.error(t.getMessage());
 	}
 
@@ -97,7 +99,7 @@ public final class SupremicaCategory
 	 */
 	public void error(StackTraceElement[] trace)
 	{
-		for(int i = 0; i < trace.length; ++i)
+		for (int i = 0; i < trace.length; ++i)
 		{
 			category.error(trace[i].toString());
 		}
@@ -118,7 +120,7 @@ public final class SupremicaCategory
 	 */
 	public void fatal(StackTraceElement[] trace)
 	{
-		for(int i = 0; i < trace.length; ++i)
+		for (int i = 0; i < trace.length; ++i)
 		{
 			category.fatal(trace[i].toString());
 		}
@@ -139,7 +141,7 @@ public final class SupremicaCategory
 	 */
 	public void warn(StackTraceElement[] trace)
 	{
-		for(int i = 0; i < trace.length; ++i)
+		for (int i = 0; i < trace.length; ++i)
 		{
 			category.warn(trace[i].toString());
 		}
@@ -160,7 +162,7 @@ public final class SupremicaCategory
 	 */
 	public void info(StackTraceElement[] trace)
 	{
-		for(int i = 0; i < trace.length; ++i)
+		for (int i = 0; i < trace.length; ++i)
 		{
 			category.info(trace[i].toString());
 		}

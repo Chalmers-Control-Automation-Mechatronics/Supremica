@@ -56,9 +56,7 @@ public class Timers
 {
 	private Map labelToTimerMap = new TreeMap();
 
-	public Timers()
-	{
-	}
+	public Timers() {}
 
 	public Timers(Timers otherTimers)
 	{
@@ -88,11 +86,14 @@ public class Timers
 		{
 			return false;
 		}
+
 		if (labelToTimerMap.containsKey(theTimer.getName()))
 		{
 			return false;
 		}
+
 		labelToTimerMap.put(theTimer.getName(), theTimer);
+
 		return true;
 	}
 
@@ -110,23 +111,28 @@ public class Timers
 	{
 		return (EventTimer) labelToTimerMap.get(label);
 	}
-	
+
 	/**
 	 * Returns the timer that has <code>event</code> as
-	 * it's timeout event. An event can not 
-	 * be a timeout event to more than one timer. 
+	 * it's timeout event. An event can not
+	 * be a timeout event to more than one timer.
 	 * @param event The timeout event
 	 * @return
 	 */
 	public EventTimer getTimerWithTimeoutEvent(LabeledEvent event)
 	{
 		EventTimer timer;
-		for (Iterator it = iterator(); it.hasNext();)
+
+		for (Iterator it = iterator(); it.hasNext(); )
 		{
-			timer = (EventTimer) it.next(); 
+			timer = (EventTimer) it.next();
+
 			if (timer.getTimeoutEvent().equals(event.getLabel()))
+			{
 				return timer;
+			}
 		}
+
 		return null;
 	}
 
@@ -137,8 +143,8 @@ public class Timers
 
 	/**
 	 * Returns an iterator to the timers that has
-	 * this event as start event. An event can be 
-	 * startevent to more than one timer.  
+	 * this event as start event. An event can be
+	 * startevent to more than one timer.
 	 * @param theEvent
 	 * @return
 	 */
@@ -160,9 +166,11 @@ public class Timers
 	public void setIndices()
 	{
 		int i = 0;
-		for (Iterator theIt = iterator(); theIt.hasNext();)
+
+		for (Iterator theIt = iterator(); theIt.hasNext(); )
 		{
-			EventTimer currTimer = (EventTimer)theIt.next();
+			EventTimer currTimer = (EventTimer) theIt.next();
+
 			currTimer.setSynchIndex(i++);
 		}
 	}
@@ -181,6 +189,7 @@ public class Timers
 			this.theIterator = theIterator;
 			this.theStartEvent = theStartEvent;
 			this.label = theStartEvent.getLabel();
+
 			findNextObject();
 		}
 
@@ -195,7 +204,9 @@ public class Timers
 			if (nextObject != null)
 			{
 				Object oldObject = nextObject;
+
 				findNextObject();
+
 				return oldObject;
 			}
 			else
@@ -214,15 +225,17 @@ public class Timers
 		{
 			while (theIterator.hasNext())
 			{
-				EventTimer currTimer = (EventTimer)theIterator.next();
+				EventTimer currTimer = (EventTimer) theIterator.next();
+
 				if (label.equals(currTimer.getStartEvent()))
 				{
 					nextObject = currTimer;
+
 					return;
 				}
 			}
+
 			nextObject = null;
 		}
 	}
-
 }

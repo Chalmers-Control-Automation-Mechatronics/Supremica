@@ -55,55 +55,50 @@ import org.supremica.gui.editor.useractions.*;
 public class EditorActions
 {
 	private AutomataEditor theEditor = null;
-
 	private FileAddAction fileAddAction = null;
 	private FilePrintAction filePrintAction = null;
 	private FileCloseAction fileCloseAction = null;
-
 	private DeleteSelectionAction deleteSelectionAction = null;
 	private DeleteStateAction deleteStateAction = null;
-	
+
 	public EditorActions(AutomataEditor theEditor)
 	{
 		this.theEditor = theEditor;
-		
+
 		if (theEditor == null)
 		{
 			System.err.println("theEditor is null");
 		}
-		
-		fileAddAction = new FileAddAction(theEditor);
-		filePrintAction = new FilePrintAction(theEditor);		
-		fileCloseAction = new FileCloseAction(theEditor);		
 
-		deleteStateAction = new DeleteStateAction(theEditor);	
-		deleteSelectionAction = new DeleteSelectionAction(theEditor);	
+		fileAddAction = new FileAddAction(theEditor);
+		filePrintAction = new FilePrintAction(theEditor);
+		fileCloseAction = new FileCloseAction(theEditor);
+		deleteStateAction = new DeleteStateAction(theEditor);
+		deleteSelectionAction = new DeleteSelectionAction(theEditor);
 	}
 
 	public FileAddAction getFileAddAction()
 	{
 		return fileAddAction;
-	}	
+	}
 
 	public FilePrintAction getFilePrintAction()
 	{
 		return filePrintAction;
-	}		
+	}
 
 	public FileCloseAction getFileCloseAction()
 	{
 		return fileCloseAction;
-	}		
+	}
 
 	public DeleteSelectionAction getDeleteSelectionAction()
 	{
 		return deleteSelectionAction;
 	}
-	
+
 	public DeleteStateAction getDeleteStateAction()
 	{
 		return deleteStateAction;
 	}
-	
-	
 }

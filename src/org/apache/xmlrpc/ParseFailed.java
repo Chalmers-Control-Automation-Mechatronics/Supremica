@@ -62,24 +62,27 @@ package org.apache.xmlrpc;
  * @see org.apache.xmlrpc.XmlRpcRequestProcessor
  * @since 1.2
  */
-public class ParseFailed extends RuntimeException
+public class ParseFailed
+	extends RuntimeException
 {
-    protected Exception cause;
+	protected Exception cause;
 
-    public ParseFailed(String message)
-    {
-        super(message);
-        this.cause = null;
-    }
+	public ParseFailed(String message)
+	{
+		super(message);
 
-    public ParseFailed(Exception cause)
-    {
-        super(cause.getMessage());
-        this.cause = cause;
-    }
+		this.cause = null;
+	}
 
-    public Throwable getCause()
-    {
-        return cause;
-    }
+	public ParseFailed(Exception cause)
+	{
+		super(cause.getMessage());
+
+		this.cause = cause;
+	}
+
+	public Throwable getCause()
+	{
+		return cause;
+	}
 }

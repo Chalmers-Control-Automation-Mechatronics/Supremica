@@ -1,4 +1,3 @@
-
 package org.supremica.external.robotCoordination;
 
 import java.util.*;
@@ -6,9 +5,10 @@ import org.supremica.automata.*;
 
 public interface RobotCell
 {
+
 	/**
 	 * Initializes simulation environment.
- 	 */
+	 */
 	public void init()
 		throws Exception;
 
@@ -21,9 +21,10 @@ public interface RobotCell
 	/**
 	 * Finds the index of a robot.
 	 */
+
 	/*
 	public int getRobotIndex(Robot robot)
-		throws Exception;
+			throws Exception;
 	*/
 
 	/**
@@ -52,4 +53,3 @@ public interface RobotCell
 	public Automata generateRobotAutomata()
 		throws Exception;
 }
-

@@ -8,6 +8,7 @@ package org.supremica.softplc.CompILer.CodeGen.IEC_Interfaces;
  */
 public interface IEC_FunctionBlock
 {
+
 	/**run is used for il CAL operations of (at least) three kinds:
 	 *   var
 	 *      neg : fb;

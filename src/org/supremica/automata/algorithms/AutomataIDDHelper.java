@@ -99,13 +99,15 @@ public final class AutomataIDDHelper
 
 		try
 		{
-			Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); //, "a");
+			Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets);    //, "a");
+
 			theAutomaton.getAlphabet().union(theAlphabet);
 		}
 		catch (Exception e)
 		{
 			logger.error("Error while generating union alphabet: " + e);
 			logger.debug(e.getStackTrace());
+
 			throw e;
 		}
 
@@ -117,6 +119,7 @@ public final class AutomataIDDHelper
 		{
 			logger.error("Error while computing AutomataIndexForm");
 			logger.debug(e.getStackTrace());
+
 			throw e;
 		}
 	}

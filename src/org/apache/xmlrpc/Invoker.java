@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
@@ -67,135 +66,149 @@ import java.util.Vector;
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
  */
-public class Invoker implements XmlRpcHandler
+public class Invoker
+	implements XmlRpcHandler
 {
-    private Object invokeTarget;
-    private Class targetClass;
+	private Object invokeTarget;
+	private Class targetClass;
 
-    public Invoker(Object target)
-    {
-        invokeTarget = target;
-        targetClass = (invokeTarget instanceof Class) ? (Class) invokeTarget :
-                invokeTarget.getClass();
-        if (XmlRpc.debug)
-        {
-            System.out.println("Target object is " + targetClass);
-        }
-    }
+	public Invoker(Object target)
+	{
+		invokeTarget = target;
+		targetClass = (invokeTarget instanceof Class)
+					  ? (Class) invokeTarget
+					  : invokeTarget.getClass();
 
-    /**
-     * main method, sucht methode in object, wenn gefunden dann aufrufen.
-     */
-    public Object execute(String methodName, Vector params) throws Exception
-    {
-        // Array mit Classtype bilden, ObjectAry mit Values bilden
-        Class[] argClasses = null;
-        Object[] argValues = null;
-        if (params != null)
-        {
-            argClasses = new Class[params.size()];
-            argValues = new Object[params.size()];
-            for (int i = 0; i < params.size(); i++)
-            {
-                argValues[i] = params.elementAt(i);
-                if (argValues[i] instanceof Integer)
-                {
-                    argClasses[i] = Integer.TYPE;
-                }
-                else if (argValues[i] instanceof Double)
-                {
-                    argClasses[i] = Double.TYPE;
-                }
-                else if (argValues[i] instanceof Boolean)
-                {
-                    argClasses[i] = Boolean.TYPE;
-                }
-                else
-                {
-                    argClasses[i] = argValues[i].getClass();
-                }
-            }
-        }
+		if (XmlRpc.debug)
+		{
+			System.out.println("Target object is " + targetClass);
+		}
+	}
 
-        // Methode da ?
-        Method method = null;
+	/**
+	 * main method, sucht methode in object, wenn gefunden dann aufrufen.
+	 */
+	public Object execute(String methodName, Vector params)
+		throws Exception
+	{
 
-        // The last element of the XML-RPC method name is the Java
-        // method name.
-        int dot = methodName.lastIndexOf('.');
-        if (dot > -1 && dot + 1 < methodName.length())
-        {
-            methodName = methodName.substring(dot + 1);
-        }
+		// Array mit Classtype bilden, ObjectAry mit Values bilden
+		Class[] argClasses = null;
+		Object[] argValues = null;
 
-        if (XmlRpc.debug)
-        {
-            System.out.println("Searching for method: " + methodName +
-                               " in class " + targetClass.getName());
-            for (int i = 0; i < argClasses.length; i++)
-            {
-                System.out.println("Parameter " + i + ": " + argValues[i]
-                        + " (" + argClasses[i] + ')');
-            }
-        }
+		if (params != null)
+		{
+			argClasses = new Class[params.size()];
+			argValues = new Object[params.size()];
 
-        try
-        {
-            method = targetClass.getMethod(methodName, argClasses);
-        }
-        // Wenn nicht da dann entsprechende Exception returnen
-        catch(NoSuchMethodException nsm_e)
-        {
-            throw nsm_e;
-        }
-        catch(SecurityException s_e)
-        {
-            throw s_e;
-        }
+			for (int i = 0; i < params.size(); i++)
+			{
+				argValues[i] = params.elementAt(i);
 
-        // Our policy is to make all public methods callable except
-        // the ones defined in java.lang.Object.
-        if (method.getDeclaringClass() == Object.class)
-        {
-            throw new XmlRpcException(0, "Invoker can't call methods "
-                    + "defined in java.lang.Object");
-        }
+				if (argValues[i] instanceof Integer)
+				{
+					argClasses[i] = Integer.TYPE;
+				}
+				else if (argValues[i] instanceof Double)
+				{
+					argClasses[i] = Double.TYPE;
+				}
+				else if (argValues[i] instanceof Boolean)
+				{
+					argClasses[i] = Boolean.TYPE;
+				}
+				else
+				{
+					argClasses[i] = argValues[i].getClass();
+				}
+			}
+		}
 
-        // invoke
-        Object returnValue = null;
-        try
-        {
-            returnValue = method.invoke(invokeTarget, argValues);
-        }
-        catch(IllegalAccessException iacc_e)
-        {
-            throw iacc_e;
-        }
-        catch(IllegalArgumentException iarg_e)
-        {
-            throw iarg_e;
-        }
-        catch(InvocationTargetException it_e)
-        {
-            if (XmlRpc.debug)
-            {
-                it_e.getTargetException().printStackTrace();
-            }
-            // check whether the thrown exception is XmlRpcException
-            Throwable t = it_e.getTargetException();
-            if (t instanceof XmlRpcException)
-            {
-                throw (XmlRpcException) t;
-            }
-            // It is some other exception
-            throw new Exception(t.toString());
-        }
-        if (returnValue == null && method.getReturnType() == Void.TYPE)
-        {
-            // Not supported by the spec.
-            throw new IllegalArgumentException
-                ("void return types for handler methods not supported");
-        }
-        return returnValue;
-    }
+		// Methode da ?
+		Method method = null;
+
+		// The last element of the XML-RPC method name is the Java
+		// method name.
+		int dot = methodName.lastIndexOf('.');
+
+		if ((dot > -1) && (dot + 1 < methodName.length()))
+		{
+			methodName = methodName.substring(dot + 1);
+		}
+
+		if (XmlRpc.debug)
+		{
+			System.out.println("Searching for method: " + methodName + " in class " + targetClass.getName());
+
+			for (int i = 0; i < argClasses.length; i++)
+			{
+				System.out.println("Parameter " + i + ": " + argValues[i] + " (" + argClasses[i] + ')');
+			}
+		}
+
+		try
+		{
+			method = targetClass.getMethod(methodName, argClasses);
+		}
+
+		// Wenn nicht da dann entsprechende Exception returnen
+		catch (NoSuchMethodException nsm_e)
+		{
+			throw nsm_e;
+		}
+		catch (SecurityException s_e)
+		{
+			throw s_e;
+		}
+
+		// Our policy is to make all public methods callable except
+		// the ones defined in java.lang.Object.
+		if (method.getDeclaringClass() == Object.class)
+		{
+			throw new XmlRpcException(0, "Invoker can't call methods " + "defined in java.lang.Object");
+		}
+
+		// invoke
+		Object returnValue = null;
+
+		try
+		{
+			returnValue = method.invoke(invokeTarget, argValues);
+		}
+		catch (IllegalAccessException iacc_e)
+		{
+			throw iacc_e;
+		}
+		catch (IllegalArgumentException iarg_e)
+		{
+			throw iarg_e;
+		}
+		catch (InvocationTargetException it_e)
+		{
+			if (XmlRpc.debug)
+			{
+				it_e.getTargetException().printStackTrace();
+			}
+
+			// check whether the thrown exception is XmlRpcException
+			Throwable t = it_e.getTargetException();
+
+			if (t instanceof XmlRpcException)
+			{
+				throw (XmlRpcException) t;
+			}
+
+			// It is some other exception
+			throw new Exception(t.toString());
+		}
+
+		if ((returnValue == null) && (method.getReturnType() == Void.TYPE))
+		{
+
+			// Not supported by the spec.
+			throw new IllegalArgumentException("void return types for handler methods not supported");
+		}
+
+		return returnValue;
+	}
 }

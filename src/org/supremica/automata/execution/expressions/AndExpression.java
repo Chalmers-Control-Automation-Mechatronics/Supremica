@@ -96,5 +96,3 @@ public class AndExpression
 		return leftExpression.evaluate() && rightExpression.evaluate();
 	}
 }
-
-

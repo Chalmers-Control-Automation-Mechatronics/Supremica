@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -86,7 +87,6 @@ public class AlphabetHelpers
 		return getUnionAlphabet(alphabets, /* idPrefix, */ true, true);
 	}
 
-
 	/**
 	 * Compute a new alphabet as the union of a set of alphabets.
 	 * Adjust the Event attributes properly.
@@ -111,6 +111,7 @@ public class AlphabetHelpers
 
 		// Iterate over all events - check consistency and add one for each label
 		Iterator eventsIt = unionEvents.iterator();
+
 		while (eventsIt.hasNext())
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventsIt.next();
@@ -120,6 +121,7 @@ public class AlphabetHelpers
 			// Iterate over all alphabets, and find those alphabets that
 			// contain an event with currEvent.getLabel
 			Iterator alphabetIt = alphabets.iterator();
+
 			while (alphabetIt.hasNext())
 			{
 				Alphabet currAlphabet = (Alphabet) alphabetIt.next();
@@ -133,7 +135,6 @@ public class AlphabetHelpers
 			LabeledEvent newEvent = EventHelpers.createEvent(eventsSet, requireConsistentControllability, requireConsistentImmediate);
 
 			// If we get here, the events are consistent (or consistency is not to be checked)
-
 			// newEvent.setId(newAlphabet.getUniqueId(idPrefix));
 			newAlphabet.addEvent(newEvent);
 		}
@@ -155,6 +156,7 @@ public class AlphabetHelpers
 	{
 		if (eventsSet.size() >= 1)
 		{
+
 			// this was >= 2 but why could we not have union over 1 or even 0 number of elements??
 			// Build the new set of events
 			Iterator eventsSetIt = eventsSet.iterator();

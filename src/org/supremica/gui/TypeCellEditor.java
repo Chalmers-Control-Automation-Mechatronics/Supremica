@@ -48,6 +48,7 @@
  * Supremica is owned and represented by KA.
  */
 package org.supremica.gui;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -114,6 +115,7 @@ class TypeCellEditor
 					{
 						logger.error("Could not find automaton at row " + orgRow);
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
 

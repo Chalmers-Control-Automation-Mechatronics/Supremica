@@ -201,12 +201,14 @@ public class StateNode
 		// if there is a string, create a label with a transparent
 		// background that is centered
 		String labeltext = theState.getName();
+
 /*
-		if (labeltext == null)
-		{
-			labeltext = theState.getId();
-		}
+				if (labeltext == null)
+				{
+						labeltext = theState.getId();
+				}
 */
+
 		/*
 		 *  if (labeltext != null)
 		 *  {
@@ -244,23 +246,26 @@ public class StateNode
 
 	public String getToolTipText()
 	{
-/*		String stateId = theState.getId();
 
-		if (stateId == null)
-		{
-			return null;
-		}
+/*              String stateId = theState.getId();
+
+				if (stateId == null)
+				{
+						return null;
+				}
 */
 		String stateName = theState.getName();
-		return stateName;
-		
-/*		if ((stateName == null) || stateName.equals(""))
-		{
-			return "Id: \"" + stateId + "\"";
-		}
 
-		return "Id: \"" + stateId + "\" Name: \"" + stateName + "\"";
-*/	}
+		return stateName;
+
+/*              if ((stateName == null) || stateName.equals(""))
+				{
+						return "Id: \"" + stateId + "\"";
+				}
+
+				return "Id: \"" + stateId + "\" Name: \"" + stateName + "\"";
+*/
+	}
 
 	public State getState()
 	{

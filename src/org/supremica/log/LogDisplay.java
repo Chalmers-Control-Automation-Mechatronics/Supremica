@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -83,10 +84,8 @@ public class LogDisplay
 	private Thread reader;
 	private Thread reader2;
 	private boolean quit;
-	
-	private final PipedInputStream pin=new PipedInputStream();
-	private final PipedInputStream pin2=new PipedInputStream();
-
+	private final PipedInputStream pin = new PipedInputStream();
+	private final PipedInputStream pin2 = new PipedInputStream();
 	static final String LABEL_OPTION = "Label";
 	static final String COLOR_OPTION_FATAL = "Color.Emerg";
 	static final String COLOR_OPTION_ERROR = "Color.Error";
@@ -101,7 +100,6 @@ public class LogDisplay
 	private LogDisplay()
 	{
 		super();
-
 
 		layout = new PatternLayout("%-5p %m%n");
 		name = "Debug";
@@ -125,6 +123,7 @@ public class LogDisplay
 		{
 			public void mousePressed(MouseEvent e)
 			{
+
 				// This is needed for the Linux platform
 				// where isPopupTrigger is true only on mousePressed.
 				maybeShowPopup(e);
@@ -132,6 +131,7 @@ public class LogDisplay
 
 			public void mouseReleased(MouseEvent e)
 			{
+
 				// This is for triggering the popup on Windows platforms
 				maybeShowPopup(e);
 			}
@@ -146,27 +146,31 @@ public class LogDisplay
 		});
 
 		// --------------------------------------//
-
 		if (SupremicaProperties.generalRedirectStdout())
 		{
 			try
 			{
-				PipedOutputStream pout=new PipedOutputStream(this.pin);
-				System.setOut(new PrintStream(pout,true));
+				PipedOutputStream pout = new PipedOutputStream(this.pin);
+
+				System.setOut(new PrintStream(pout, true));
 			}
 			catch (java.io.IOException io)
 			{
-				String text = "Couldn't redirect STDOUT to this console\n"+io.getMessage();
+				String text = "Couldn't redirect STDOUT to this console\n" + io.getMessage();
+
 				//doc.insertString(doc.getLength(), text);
 				System.err.println(text);
 			}
 			catch (SecurityException se)
 			{
-				String text = "Couldn't redirect STDOUT to this console\n"+se.getMessage();
+				String text = "Couldn't redirect STDOUT to this console\n" + se.getMessage();
+
 				//doc.insertString(doc.getLength(), text);
 				System.err.println(text);
 			}
-			reader=new Thread(this);
+
+			reader = new Thread(this);
+
 			reader.setDaemon(true);
 			reader.start();
 		}
@@ -175,27 +179,32 @@ public class LogDisplay
 		{
 			try
 			{
-				PipedOutputStream pout2=new PipedOutputStream(this.pin2);
-				System.setErr(new PrintStream(pout2,true));
+				PipedOutputStream pout2 = new PipedOutputStream(this.pin2);
+
+				System.setErr(new PrintStream(pout2, true));
 			}
 			catch (java.io.IOException io)
 			{
-				String text = "Couldn't redirect STDERR to this console\n"+io.getMessage();
+				String text = "Couldn't redirect STDERR to this console\n" + io.getMessage();
+
 				//doc.insertString(doc.getLength(), text);
 				System.err.println(text);
 			}
 			catch (SecurityException se)
 			{
-				String text = "Couldn't redirect STDERR to this console\n"+se.getMessage();
+				String text = "Couldn't redirect STDERR to this console\n" + se.getMessage();
+
 				//doc.insertString(doc.getLength(), text);
 				System.err.println(text);
 			}
-			reader2=new Thread(this);
+
+			reader2 = new Thread(this);
+
 			reader2.setDaemon(true);
 			reader2.start();
 		}
 
-		quit=false; // signals the Threads that they should exit
+		quit = false;    // signals the Threads that they should exit
 	}
 
 	public synchronized static LogDisplay getInstance()
@@ -212,48 +221,55 @@ public class LogDisplay
 
 	private void createAttributes()
 	{
-//		Priority prio[] = Priority.getAllPossiblePriorities();
 
+//              Priority prio[] = Priority.getAllPossiblePriorities();
 		attributes = new Hashtable();
-/*
-		for (int i = 0; i < prio.length; i++)
-		{
-			MutableAttributeSet att = new SimpleAttributeSet();
 
-			attributes.put(prio[i], att);
-			StyleConstants.setFontSize(att, 14);
-		}
+/*
+				for (int i = 0; i < prio.length; i++)
+				{
+						MutableAttributeSet att = new SimpleAttributeSet();
+
+						attributes.put(prio[i], att);
+						StyleConstants.setFontSize(att, 14);
+				}
 */
 		MutableAttributeSet attError = new SimpleAttributeSet();
+
 		attributes.put(Level.ERROR, attError);
 		StyleConstants.setFontSize(attError, 14);
 
 		MutableAttributeSet attWarn = new SimpleAttributeSet();
+
 		attributes.put(Level.WARN, attWarn);
 		StyleConstants.setFontSize(attWarn, 14);
 
 		MutableAttributeSet attInfo = new SimpleAttributeSet();
+
 		attributes.put(Level.INFO, attInfo);
 		StyleConstants.setFontSize(attInfo, 14);
 
 		MutableAttributeSet attDebug = new SimpleAttributeSet();
+
 		attributes.put(Level.DEBUG, attDebug);
 		StyleConstants.setFontSize(attDebug, 14);
 
 		MutableAttributeSet attFatal = new SimpleAttributeSet();
+
 		attributes.put(Level.FATAL, attFatal);
 		StyleConstants.setFontSize(attFatal, 14);
 
 		MutableAttributeSet attAll = new SimpleAttributeSet();
+
 		attributes.put(Level.ALL, attAll);
 		StyleConstants.setFontSize(attAll, 14);
 
 		MutableAttributeSet attOff = new SimpleAttributeSet();
+
 		attributes.put(Level.OFF, attOff);
 		StyleConstants.setFontSize(attOff, 14);
-
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.ERROR), Color.red);
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.WARN), new Color(255,128,0));
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.WARN), new Color(255, 128, 0));
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.INFO), new Color(0, 80, 0));
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.DEBUG), Color.blue);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.FATAL), Color.black);
@@ -278,57 +294,62 @@ public class LogDisplay
 		textpane.copy();
 	}
 
-	private ImageIcon getIcon(String file) 
+	private ImageIcon getIcon(String file)
 	{
+
 		// What the f**k is this?
 		//URL url = Supremica.class.getResource("/icons/BlackFlag.gif");
 		URL url = Supremica.class.getResource(file);
-		return  (url == null) ? new ImageIcon() : new ImageIcon(url);
+
+		return (url == null)
+			   ? new ImageIcon()
+			   : new ImageIcon(url);
 	}
 
 	private void createIcons()
 	{
-//		Priority prio[] = Priority.getAllPossiblePriorities();
 
+//              Priority prio[] = Priority.getAllPossiblePriorities();
 		icons = new Hashtable();
-		icons.put(Level.FATAL, getIcon("/icons/BlackFlag.gif") );
-		icons.put(Level.ERROR, getIcon("/icons/RedFlag.gif") );
-		icons.put(Level.WARN, getIcon("/icons/OrangeFlag.gif") );
-		icons.put(Level.INFO, getIcon("/icons/GreenFlag.gif") );
-		icons.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif") );
-		icons.put(Level.ALL, getIcon("/icons/BlackFlag.gif") );
-		icons.put(Level.OFF, getIcon("/icons/BlackFlag.gif") );
+
+		icons.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
+		icons.put(Level.ERROR, getIcon("/icons/RedFlag.gif"));
+		icons.put(Level.WARN, getIcon("/icons/OrangeFlag.gif"));
+		icons.put(Level.INFO, getIcon("/icons/GreenFlag.gif"));
+		icons.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif"));
+		icons.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
+		icons.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
 
 /*
-		for (int i = 0; i < prio.length; i++)
-		{
-			if (prio[i].equals(Priority.FATAL))
-			{
-				//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-				icons.put(prio[i], getIcon("/icons/BlackFlag.gif") );
-			}
+				for (int i = 0; i < prio.length; i++)
+				{
+						if (prio[i].equals(Priority.FATAL))
+						{
+								//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+								icons.put(prio[i], getIcon("/icons/BlackFlag.gif") );
+						}
 
-			if (prio[i].equals(Priority.ERROR))
-			{
-				icons.put(prio[i], getIcon("/icons/RedFlag.gif") );
-			}
+						if (prio[i].equals(Priority.ERROR))
+						{
+								icons.put(prio[i], getIcon("/icons/RedFlag.gif") );
+						}
 
-			if (prio[i].equals(Priority.WARN))
-			{
-				//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-				icons.put(prio[i], getIcon("/icons/OrangeFlag.gif") );
-			}
+						if (prio[i].equals(Priority.WARN))
+						{
+								//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+								icons.put(prio[i], getIcon("/icons/OrangeFlag.gif") );
+						}
 
-			if (prio[i].equals(Priority.INFO))
-			{
-				icons.put(prio[i], getIcon("/icons/GreenFlag.gif") );
-			}
+						if (prio[i].equals(Priority.INFO))
+						{
+								icons.put(prio[i], getIcon("/icons/GreenFlag.gif") );
+						}
 
-			if (prio[i].equals(Priority.DEBUG))
-			{
-				icons.put(prio[i], getIcon("/icons/BlueFlag.gif") );
-			}
-		}
+						if (prio[i].equals(Priority.DEBUG))
+						{
+								icons.put(prio[i], getIcon("/icons/BlueFlag.gif") );
+						}
+				}
 */
 	}
 
@@ -705,46 +726,77 @@ public class LogDisplay
 
 		try
 		{
-			while (Thread.currentThread()==reader)
+			while (Thread.currentThread() == reader)
 			{
-				try { this.wait(100);}catch(InterruptedException ie) {}
-				if (pin.available()!=0)
+				try
 				{
-					String input=this.readLine(pin);
+					this.wait(100);
+				}
+				catch (InterruptedException ie) {}
+
+				if (pin.available() != 0)
+				{
+					String input = this.readLine(pin);
+
 					logger.info("Stdout: " + input);
 				}
-				if (quit) return;
+
+				if (quit)
+				{
+					return;
+				}
 			}
 
-			while (Thread.currentThread()==reader2)
+			while (Thread.currentThread() == reader2)
 			{
-				try { this.wait(100);}catch(InterruptedException ie) {}
-				if (pin2.available()!=0)
+				try
 				{
-					String input=this.readLine(pin2);
+					this.wait(100);
+				}
+				catch (InterruptedException ie) {}
+
+				if (pin2.available() != 0)
+				{
+					String input = this.readLine(pin2);
+
 					logger.error("Stderr: " + input);
 				}
-				if (quit) return;
+
+				if (quit)
+				{
+					return;
+				}
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			logger.error("\nLogDiplay reports an internal error.");
-			logger.error("The error is: "+e);
+			logger.error("The error is: " + e);
 		}
-
 	}
 
-	public synchronized String readLine(PipedInputStream in) throws IOException
+	public synchronized String readLine(PipedInputStream in)
+		throws IOException
 	{
-		String input="";
+		String input = "";
+
 		do
 		{
-			int available=in.available();
-			if (available==0) break;
-			byte b[]=new byte[available];
+			int available = in.available();
+
+			if (available == 0)
+			{
+				break;
+			}
+
+			byte b[] = new byte[available];
+
 			in.read(b);
-			input=input+new String(b,0,b.length);
-		}while( !input.endsWith("\n") &&  !input.endsWith("\r\n") && !quit);
+
+			input = input + new String(b, 0, b.length);
+		}
+		while (!input.endsWith("\n") &&!input.endsWith("\r\n") &&!quit);
+
 		return input;
 	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -59,7 +60,6 @@ import org.jdom.input.*;
 public class AutomataBuilder
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataBuilder.class);
-
 	protected Document document;
 	protected Automata currAutomata;
 	protected Automata zones;
@@ -84,25 +84,29 @@ public class AutomataBuilder
 	public Automata build(File file, boolean validate)
 		throws Exception
 	{
+
 		/*
 		if (args.length <= 0)
 		{
-			System.err.println("Usage: AutomataBuilder file.xml");
-			return;
+				System.err.println("Usage: AutomataBuilder file.xml");
+				return;
 		}
 		*/
-
 		SAXBuilder parser = new SAXBuilder();
+
 		document = null;
+
 		try
 		{
 			document = parser.build(file);
 		}
+
 		// indicates a well-formedness error
 		catch (JDOMException e)
 		{
 			logger.error(file + " is not well-formed.");
 			logger.debug(e.getMessage());
+
 			return null;
 		}
 
@@ -111,15 +115,18 @@ public class AutomataBuilder
 
 		buildWeldingSpotMaps();
 
-
-		for (Iterator robotIt = robotToWeldingSpots.robotIterator(); robotIt.hasNext(); )
+		for (Iterator robotIt = robotToWeldingSpots.robotIterator();
+				robotIt.hasNext(); )
 		{
 			String currRobot = (String) robotIt.next();
-			//System.out.println(currRobot);
 
+			//System.out.println(currRobot);
 			Automaton currAutomaton = new Automaton(currRobot);
+
 			currAutomaton.setType(AutomatonType.Plant);
+
 			State initialState = currAutomaton.createUniqueState("initial");
+
 			initialState.setAccepting(false);
 			initialState.setInitial(true);
 			currAutomaton.addState(initialState);
@@ -129,9 +136,11 @@ public class AutomataBuilder
 			List remainingSpots = new LinkedList();
 			WeldingSpot initialSpot = null;
 			WeldingSpot endSpot = null;
+
 			for (Iterator spotIt = currSpots.iterator(); spotIt.hasNext(); )
 			{
 				WeldingSpot currSpot = (WeldingSpot) spotIt.next();
+
 				if (currSpot.isStartSpot())
 				{
 					initialSpot = currSpot;
@@ -149,11 +158,14 @@ public class AutomataBuilder
 			if (initialSpot == null)
 			{
 				logger.error("No initial spot");
+
 				return null;
 			}
+
 			if (endSpot == null)
 			{
 				logger.error("No end spot");
+
 				return null;
 			}
 			else
@@ -168,6 +180,7 @@ public class AutomataBuilder
 		{
 			currAutomata.addAutomata(zones);
 		}
+
 		if (paths != null)
 		{
 			currAutomata.addAutomata(paths);
@@ -177,30 +190,33 @@ public class AutomataBuilder
 	}
 
 /*
-	public Automata getAutomata()
-	{
-		return null;
-	}
+		public Automata getAutomata()
+		{
+				return null;
+		}
 */
-
 	protected void buildPath(Automaton currAutomaton, State currState, WeldingSpot currSpot, List remainingSpots, WeldingSpot endSpot)
 	{
 		if (currAutomaton == null)
 		{
 			throw new IllegalArgumentException("currAutomaton is null");
 		}
+
 		if (currState == null)
 		{
 			throw new IllegalArgumentException("currState is null");
 		}
+
 		if (currSpot == null)
 		{
 			throw new IllegalArgumentException("currSpot is null");
 		}
+
 		if (endSpot == null)
 		{
 			throw new IllegalArgumentException("endSpot is null");
 		}
+
 		if (remainingSpots == null)
 		{
 			throw new IllegalArgumentException("remainingSpots is null");
@@ -213,7 +229,9 @@ public class AutomataBuilder
 		if (remainingSpots.size() == 0)
 		{
 			State endState = constructAllocationDeallocation(currAutomaton, currState, currSpot, endSpot);
+
 			endState.setAccepting(true);
+
 			return;
 		}
 
@@ -221,15 +239,14 @@ public class AutomataBuilder
 		// spots from the current spot that are also in the remaining set.
 		for (Iterator spotIt = currSpot.nextSpotsIterator(); spotIt.hasNext(); )
 		{
-			WeldingSpot nextSpot = (WeldingSpot)spotIt.next();
+			WeldingSpot nextSpot = (WeldingSpot) spotIt.next();
 
 			if (remainingSpots.contains(nextSpot))
 			{
 				State deallocationState = constructAllocationDeallocation(currAutomaton, currState, currSpot, nextSpot);
-
 				List newRemainingSpots = new LinkedList(remainingSpots);
-				newRemainingSpots.remove(nextSpot);
 
+				newRemainingSpots.remove(nextSpot);
 				buildPath(currAutomaton, deallocationState, nextSpot, newRemainingSpots, endSpot);
 			}
 		}
@@ -237,13 +254,17 @@ public class AutomataBuilder
 
 	protected String computeLabel(String prefix, List zones)
 	{
+
 		// Build the string
 		StringBuffer allocString = new StringBuffer(prefix);
+
 		for (Iterator zoneIt = zones.iterator(); zoneIt.hasNext(); )
 		{
-			String currZone = (String)zoneIt.next();
+			String currZone = (String) zoneIt.next();
+
 			allocString.append("_" + currZone);
 		}
+
 		return allocString.toString();
 	}
 
@@ -259,6 +280,7 @@ public class AutomataBuilder
 
 		// Create the allocation state
 		State allocationSpotState = currAutomaton.createUniqueState("a_" + destSpot.getName());
+
 		currAutomaton.addState(allocationSpotState);
 		allocationSpotState.setCost(currMovement.getCost());
 
@@ -266,12 +288,16 @@ public class AutomataBuilder
 		List allocationZones = currMovement.getPreMoveAllocationZones();
 		String allocString = computeLabel("a_" + sourceSpot.getName(), allocationZones);
 		LabeledEvent allocationEvent = new LabeledEvent(allocString);
+
 		currAlphabet.addEvent(allocationEvent);
+
 		Arc allocationArc = new Arc(sourceState, allocationSpotState, allocationEvent);
+
 		currAutomaton.addArc(allocationArc);
 
 		// Create the deallocation state
 		State deallocationSpotState = currAutomaton.createUniqueState("d_" + destSpot.getName());
+
 		currAutomaton.addState(deallocationSpotState);
 		deallocationSpotState.setCost(0);
 
@@ -279,28 +305,34 @@ public class AutomataBuilder
 		List deallocationZones = currMovement.getPostMoveDeallocationZones();
 		String deallocString = computeLabel("d_" + destSpot.getName(), deallocationZones);
 		LabeledEvent deallocationEvent = new LabeledEvent(deallocString);
+
 		currAlphabet.addEvent(deallocationEvent);
+
 		Arc deallocationArc = new Arc(allocationSpotState, deallocationSpotState, deallocationEvent);
+
 		currAutomaton.addArc(deallocationArc);
 
 		return deallocationSpotState;
 	}
 
 	protected void buildWeldingSpotMaps()
-	{ // Build the maps robotToWeldingSpots
+	{    // Build the maps robotToWeldingSpots
 		Element root = document.getRootElement();
+
 		if (!root.getName().equals("RobotCoordination"))
 		{
 			logger.error("Wrong xml file format");
+
 			return;
 		}
+
 		listTree(root);
 	}
-
 
 	public void listTree(Element current)
 	{
 		String currName = current.getName();
+
 		if (currName.equals("InitialPosition"))
 		{
 			doInitialPosition(current);
@@ -312,9 +344,11 @@ public class AutomataBuilder
 		else
 		{
 			List children = current.getChildren();
+
 			for (Iterator iterator = children.iterator(); iterator.hasNext(); )
 			{
 				Element child = (Element) iterator.next();
+
 				listTree(child);
 			}
 		}
@@ -325,40 +359,46 @@ public class AutomataBuilder
 		if (!current.getName().equals("InitialPosition"))
 		{
 			logger.error("Wrong xml file format");
+
 			return;
 		}
 
 		String robot = current.getAttributeValue("robot");
 		String spot = current.getAttributeValue("point");
 
-		if (robot == null || robot.equals(""))
+		if ((robot == null) || robot.equals(""))
 		{
 			logger.error("Empty or no robot attribute");
+
 			return;
 		}
-		if (spot == null || spot.equals(""))
+
+		if ((spot == null) || spot.equals(""))
 		{
 			logger.error("Empty or no spot attribute");
 		}
 
 		WeldingSpots currSpots;
+
 		if (robotToWeldingSpots.containsRobot(robot))
 		{
-			currSpots = (WeldingSpots)robotToWeldingSpots.getWeldingSpots(robot);
+			currSpots = (WeldingSpots) robotToWeldingSpots.getWeldingSpots(robot);
 		}
 		else
 		{
 			currSpots = new WeldingSpots();
+
 			robotToWeldingSpots.put(robot, currSpots);
 		}
 
 		WeldingSpot currSpot = currSpots.getSpot(spot);
+
 		if (currSpot == null)
 		{
 			currSpot = new WeldingSpot(spot);
+
 			currSpot.setStartSpot(true);
 			currSpots.addSpot(currSpot);
-
 		}
 		else
 		{
@@ -366,16 +406,16 @@ public class AutomataBuilder
 		}
 
 /*
-		List children = current.getChildren();
-		for (Iterator iterator = children.iterator(); iterator.hasNext(); )
-		{
-			Element child = (Element) iterator.next();
-			if (child.getName().equals("Resource"))
-			{
-				String currResource = child.getAttributeValue("name");
-				theResources.add(currResource);
-			}
-		}
+				List children = current.getChildren();
+				for (Iterator iterator = children.iterator(); iterator.hasNext(); )
+				{
+						Element child = (Element) iterator.next();
+						if (child.getName().equals("Resource"))
+						{
+								String currResource = child.getAttributeValue("name");
+								theResources.add(currResource);
+						}
+				}
 */
 	}
 
@@ -388,43 +428,50 @@ public class AutomataBuilder
 		if (!current.getName().equals("Move"))
 		{
 			logger.error("Wrong xml file format");
+
 			return;
 		}
+
 		try
 		{
 			String robot = current.getAttributeValue("robot");
 			String source = current.getAttributeValue("source");
 			String dest = current.getAttributeValue("target");
+
 			cost = current.getAttribute("cost").getIntValue();
 
 			WeldingSpots currSpots;
+
 			if (robotToWeldingSpots.containsRobot(robot))
 			{
-				currSpots = (WeldingSpots)robotToWeldingSpots.getWeldingSpots(robot);
+				currSpots = (WeldingSpots) robotToWeldingSpots.getWeldingSpots(robot);
 			}
 			else
 			{
 				currSpots = new WeldingSpots();
+
 				robotToWeldingSpots.put(robot, currSpots);
 			}
 
 			currSpot = currSpots.getSpot(source);
+
 			if (currSpot == null)
 			{
 				currSpot = new WeldingSpot(source);
+
 				//System.out.println("New spot added: " + source);
 				currSpots.addSpot(currSpot);
-
 			}
 
 			destSpot = currSpots.getSpot(dest);
+
 			if (destSpot == null)
 			{
 				destSpot = new WeldingSpot(dest);
+
 				//System.out.println("New spot added: " + source);
 				currSpots.addSpot(destSpot);
 			}
-
 		}
 		catch (DataConversionException e)
 		{
@@ -434,43 +481,54 @@ public class AutomataBuilder
 		List preMove = new LinkedList();
 		List inMove = new LinkedList();
 		List postMove = new LinkedList();
-
 		List children = current.getChildren();
+
 		for (Iterator iterator = children.iterator(); iterator.hasNext(); )
 		{
 			Element child = (Element) iterator.next();
+
 			if (child.getName().equals("PreMove") || child.getName().equals("InMove") || child.getName().equals("PostMove"))
 			{
-//				System.out.println("in xxxMoves");
 
+//                              System.out.println("in xxxMoves");
 				List newchildren = child.getChildren();
-				for (Iterator childIterator = newchildren.iterator(); childIterator.hasNext(); )
+
+				for (Iterator childIterator = newchildren.iterator();
+						childIterator.hasNext(); )
 				{
 					Element newchild = (Element) childIterator.next();
+
 					if (newchild.getName().equals("Resources"))
 					{
-//						System.out.println("in Resources");
 
+//                                              System.out.println("in Resources");
 						List currResources = getResources(newchild);
+
 						if (currResources != null)
 						{
-							//System.out.println("Nbr of resources: " + currResources.size());
 
-							for (Iterator resourceIt = currResources.iterator(); resourceIt.hasNext(); )
+							//System.out.println("Nbr of resources: " + currResources.size());
+							for (Iterator resourceIt = currResources.iterator();
+									resourceIt.hasNext(); )
 							{
 								String currResource = (String) resourceIt.next();
+
 								if (!zones.containsAutomaton(currResource))
 								{
 									Automaton currAutomaton = new Automaton(currResource);
+
 									currAutomaton.setType(AutomatonType.Specification);
+
 									State idleState = currAutomaton.createUniqueState("idle");
+
 									idleState.setAccepting(true);
 									idleState.setInitial(true);
 									currAutomaton.addState(idleState);
 									zones.addAutomaton(currAutomaton);
-									//System.out.println("Mew automaton added: " + currResource);
 
+									//System.out.println("Mew automaton added: " + currResource);
 								}
+
 								if (child.getName().equals("PreMove"))
 								{
 									preMove.add(currResource);
@@ -491,14 +549,13 @@ public class AutomataBuilder
 						}
 					}
 				}
-
 			}
 		}
+
 		RobotMovement movement = new RobotMovement(preMove, inMove, postMove, cost);
 
 		// Add dest spot to source
 		currSpot.addNextSpot(destSpot, movement);
-
 	}
 
 	/**
@@ -509,21 +566,26 @@ public class AutomataBuilder
 		if (!current.getName().equals("Resources"))
 		{
 			logger.error("Wrong xml file format");
+
 			return null;
 		}
+
 		List theResources = new LinkedList();
 		List children = current.getChildren();
+
 		for (Iterator iterator = children.iterator(); iterator.hasNext(); )
 		{
 			Element child = (Element) iterator.next();
+
 			if (child.getName().equals("Resource"))
 			{
 				String currResource = child.getAttributeValue("name");
+
 				theResources.add(currResource);
 			}
 		}
-		return theResources;
 
+		return theResources;
 	}
 
 	protected int getCost()
@@ -532,21 +594,21 @@ public class AutomataBuilder
 	}
 
 /*
-	public static void main(String[] args)
-		throws Exception
-	{
+		public static void main(String[] args)
+				throws Exception
+		{
 
-	}
+		}
 */
-
 	public void printAutomata()
 	{
 		Automata allAutomata = new Automata(paths);
+
 		allAutomata.addAutomata(zones);
 
 		AutomataToXml exporter = new AutomataToXml(allAutomata);
-		exporter.serialize(new PrintWriter(System.out));
 
+		exporter.serialize(new PrintWriter(System.out));
 	}
 }
 
@@ -565,12 +627,13 @@ class RobotToWeldingSpots
 
 		if (robotToWeldingSpots.containsKey(theRobot))
 		{
-			theSpots = (WeldingSpots)robotToWeldingSpots.get(theRobot);
+			theSpots = (WeldingSpots) robotToWeldingSpots.get(theRobot);
 		}
 		else
 		{
 			theSpots = new WeldingSpots();
 		}
+
 		theSpots.addSpot(theSpot);
 	}
 
@@ -586,16 +649,16 @@ class RobotToWeldingSpots
 
 	public WeldingSpots getWeldingSpots(String robot)
 	{
-		return (WeldingSpots)robotToWeldingSpots.get(robot);
+		return (WeldingSpots) robotToWeldingSpots.get(robot);
 	}
 
 	public Iterator robotIterator()
 	{
 		Set robots = robotToWeldingSpots.keySet();
+
 		return robots.iterator();
 	}
 }
-
 
 /**
  * Contains the welding spots for a robot. Use one class per robot.
@@ -617,14 +680,16 @@ class WeldingSpots
 	public void addSpot(WeldingSpot theSpot)
 	{
 		WeldingSpot existingSpot = getSpot(theSpot.getName());
+
 		if (existingSpot == null)
 		{
 			theSpots.add(theSpot);
 		}
+
 		//
 		//else
 		//{
-		//	existingSpot.addNextSpot(theSpot, 10); // Fix the cost, is this correct??
+		//      existingSpot.addNextSpot(theSpot, 10); // Fix the cost, is this correct??
 		//}
 	}
 
@@ -633,11 +698,13 @@ class WeldingSpots
 		for (Iterator spotIt = iterator(); spotIt.hasNext(); )
 		{
 			WeldingSpot currSpot = (WeldingSpot) spotIt.next();
+
 			if (currSpot.equals(name))
 			{
 				return currSpot;
 			}
 		}
+
 		return null;
 	}
 
@@ -646,11 +713,13 @@ class WeldingSpots
 		for (Iterator spotIt = iterator(); spotIt.hasNext(); )
 		{
 			WeldingSpot currSpot = (WeldingSpot) spotIt.next();
+
 			if (currSpot.isStartSpot())
 			{
 				return currSpot;
 			}
 		}
+
 		return null;
 	}
 }
@@ -662,7 +731,6 @@ class WeldingSpot
 	protected List neededZones;
 	protected boolean isStartSpot = false;
 	protected boolean isEndSpot = false;
-
 
 	public WeldingSpot(String name)
 	{
@@ -708,15 +776,18 @@ class WeldingSpot
 
 	public int getCost(WeldingSpot nextSpot)
 	{
-		RobotMovement movement = (RobotMovement)nextSpots.get(nextSpot);
+		RobotMovement movement = (RobotMovement) nextSpots.get(nextSpot);
+
 		return movement.getCost();
+
 		//Integer cost = (Integer)nextSpots.get(nextSpot);
 		//return cost.intValue();
 	}
 
 	public RobotMovement getMovement(WeldingSpot nextSpot)
 	{
-		RobotMovement movement = (RobotMovement)nextSpots.get(nextSpot);
+		RobotMovement movement = (RobotMovement) nextSpots.get(nextSpot);
+
 		return movement;
 	}
 
@@ -727,7 +798,8 @@ class WeldingSpot
 
 	public boolean equals(Object other)
 	{
-		WeldingSpot otherSpot = (WeldingSpot)other;
+		WeldingSpot otherSpot = (WeldingSpot) other;
+
 		return name.equals(otherSpot.name);
 	}
 
@@ -736,7 +808,6 @@ class WeldingSpot
 		return name.equals(other);
 	}
 }
-
 
 class RobotMovement
 {
@@ -759,18 +830,22 @@ class RobotMovement
 	}
 
 	public List getPreMoveAllocationZones()
-	{ // This are all zones in inMoves and postMoves that are not in preMove
+	{    // This are all zones in inMoves and postMoves that are not in preMove
 		LinkedList allocateZones = new LinkedList(inMove);
+
 		allocateZones.addAll(postMove);
 		allocateZones.removeAll(preMove);
+
 		return allocateZones;
 	}
 
 	public List getPostMoveDeallocationZones()
-	{ // This are all zones in preMoves and postMoves that are not in postMoves.
+	{    // This are all zones in preMoves and postMoves that are not in postMoves.
 		LinkedList deallocateZones = new LinkedList(preMove);
+
 		deallocateZones.addAll(inMove);
 		deallocateZones.removeAll(postMove);
+
 		return deallocateZones;
 	}
 }

@@ -2,18 +2,21 @@ package org.supremica.gui;
 
 import java.io.File;
 
-public class SoftplcInterface extends File {
+public class SoftplcInterface
+	extends File
+{
+	private SoftplcInterface()
+	{
+		super("");
+	}
 
-        private SoftplcInterface() {
-                super("");
-        }
+	public SoftplcInterface(String path)
+	{
+		super(path);
+	}
 
-        public SoftplcInterface(String path) {
-                super(path);
-        }
-
-        public String toString() {
-                return super.getName();
-        }
-
+	public String toString()
+	{
+		return super.getName();
+	}
 }

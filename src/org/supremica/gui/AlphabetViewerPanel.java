@@ -53,9 +53,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.util.*;
-
 import org.supremica.log.*;
-
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -67,10 +65,10 @@ import org.supremica.gui.treeview.*;
 // AlphabetViewer was opened for each automaton.
 public class AlphabetViewerPanel
 	extends JPanel
-	// implements AutomatonListener // to what are we to listen?
+
+// implements AutomatonListener // to what are we to listen?
 {
 	private static Logger logger = LoggerFactory.createLogger(AlphabetViewerPanel.class);
-
 	private Automata theAutomata;
 	private Alphabet theAlphabet;
 	private boolean showId = false;
@@ -78,16 +76,13 @@ public class AlphabetViewerPanel
 	private JTree theTree = new JTree();
 	private JScrollPane scrollPanel = new JScrollPane(theTree);
 
-	public AlphabetViewerPanel(Automata theAutomata)	// What's the reason for passing an automata here?
-		throws Exception								// Alphabets cannot exist outside an automaton?
+	public AlphabetViewerPanel(Automata theAutomata)    // What's the reason for passing an automata here?
+		throws Exception    // Alphabets cannot exist outside an automaton?
 	{
-
 		this.theAutomata = theAutomata;
 
-		// theAutomaton.getListeners().addListener(this);	// What are we to listen to?
-
+		// theAutomaton.getListeners().addListener(this);       // What are we to listen to?
 		// theAlphabet = theAutomaton.getAlphabet();
-
 		setLayout(new BorderLayout());
 
 		// setPreferredSize(new Dimension(75, 400));
@@ -96,133 +91,136 @@ public class AlphabetViewerPanel
 	}
 
 /** AutomataListener stuff
-	public void initialize() {}
+		public void initialize() {}
 
-	public void updated(Object o)
-	{
-		if (o == theAutomaton)
+		public void updated(Object o)
 		{
-			update();
+				if (o == theAutomaton)
+				{
+						update();
+				}
 		}
-	}
 
-	public void stateAdded(Automaton aut, State q)
-	{
-		updated(aut);
-	}
-
-	public void stateRemoved(Automaton aut, State q)
-	{
-		updated(aut);
-	}
-
-	public void arcAdded(Automaton aut, Arc a)
-	{
-		updated(aut);
-	}
-
-	public void arcRemoved(Automaton aut, Arc a)
-	{
-		updated(aut);
-	}
-
-	public void attributeChanged(Automaton aut)
-	{
-		updated(aut);
-	}
-
-	public void automatonRenamed(Automaton aut, String oldName)
-	{
-		updated(aut);
-	}
-
-	public void update()
-	{
-		if (!isVisible())
+		public void stateAdded(Automaton aut, State q)
 		{
-			updateNeeded = true;
+				updated(aut);
 		}
-		else
-		{
-			try
-			{
-				build();
 
-				updateNeeded = false;
-			}
-			catch (Exception ex)
-			{
-				logger.error("Error while updating AlphabetViewer", ex);
-				logger.debug(ex.getStackTrace());
-			}
+		public void stateRemoved(Automaton aut, State q)
+		{
+				updated(aut);
 		}
-	}
+
+		public void arcAdded(Automaton aut, Arc a)
+		{
+				updated(aut);
+		}
+
+		public void arcRemoved(Automaton aut, Arc a)
+		{
+				updated(aut);
+		}
+
+		public void attributeChanged(Automaton aut)
+		{
+				updated(aut);
+		}
+
+		public void automatonRenamed(Automaton aut, String oldName)
+		{
+				updated(aut);
+		}
+
+		public void update()
+		{
+				if (!isVisible())
+				{
+						updateNeeded = true;
+				}
+				else
+				{
+						try
+						{
+								build();
+
+								updateNeeded = false;
+						}
+						catch (Exception ex)
+						{
+								logger.error("Error while updating AlphabetViewer", ex);
+								logger.debug(ex.getStackTrace());
+						}
+				}
+		}
 **/
 	public void build()
 	{
-		SupremicaTreeNode root = new SupremicaTreeNode(); // Really AutomataSubTree(theAutomata, showalpha, nostates)?
-		
+		SupremicaTreeNode root = new SupremicaTreeNode();    // Really AutomataSubTree(theAutomata, showalpha, nostates)?
 		Iterator autit = theAutomata.iterator();
-		while(autit.hasNext())
+
+		while (autit.hasNext())
 		{
-			root.add(new AutomatonSubTree((Automaton)autit.next(), true, false));
+			root.add(new AutomatonSubTree((Automaton) autit.next(), true, false));
 		}
-		
+
 		DefaultTreeModel treeModel = new DefaultTreeModel(root);
+
 		theTree.setModel(treeModel);
 		theTree.setRootVisible(false);
 		theTree.setShowsRootHandles(true);
-		// theTree.setExpanded(new TreePath(node));		
 
+		// theTree.setExpanded(new TreePath(node));             
 		revalidate();
 	}
-	
-/* We use AlphabetViewerSubTree instead **	
-	public void build()
-		throws Exception
-	{
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(theAutomaton.getName());
-		int nbrOfEvents = 0;
-		Iterator eventIt = theAlphabet.iterator();
 
-		while (eventIt.hasNext())
+/* We use AlphabetViewerSubTree instead **
+		public void build()
+				throws Exception
 		{
-			org.supremica.automata.LabeledEvent currEvent = (org.supremica.automata.LabeledEvent) eventIt.next();
-			DefaultMutableTreeNode currEventNode = new DefaultMutableTreeNode(currEvent.getLabel());
+				DefaultMutableTreeNode root = new DefaultMutableTreeNode(theAutomaton.getName());
+				int nbrOfEvents = 0;
+				Iterator eventIt = theAlphabet.iterator();
 
-			root.add(currEventNode);
+				while (eventIt.hasNext())
+				{
+						org.supremica.automata.LabeledEvent currEvent = (org.supremica.automata.LabeledEvent) eventIt.next();
+						DefaultMutableTreeNode currEventNode = new DefaultMutableTreeNode(currEvent.getLabel());
 
-			DefaultMutableTreeNode currControllableNode = new DefaultMutableTreeNode("controllable: " + currEvent.isControllable());
+						root.add(currEventNode);
 
-			currEventNode.add(currControllableNode);
+						DefaultMutableTreeNode currControllableNode = new DefaultMutableTreeNode("controllable: " + currEvent.isControllable());
 
-			DefaultMutableTreeNode currPrioritizedNode = new DefaultMutableTreeNode("prioritized: " + currEvent.isPrioritized());
+						currEventNode.add(currControllableNode);
 
-			currEventNode.add(currPrioritizedNode);
+						DefaultMutableTreeNode currPrioritizedNode = new DefaultMutableTreeNode("prioritized: " + currEvent.isPrioritized());
 
-			if (showId)
-			{
-				DefaultMutableTreeNode currIdNode = new DefaultMutableTreeNode("id: " + currEvent.getId());
+						currEventNode.add(currPrioritizedNode);
 
-				currEventNode.add(currIdNode);
-			}
+						if (showId)
+						{
+								DefaultMutableTreeNode currIdNode = new DefaultMutableTreeNode("id: " + currEvent.getId());
+
+								currEventNode.add(currIdNode);
+						}
+				}
+
+				DefaultTreeModel treeModel = new DefaultTreeModel(root);
+
+				theTree.setModel(treeModel);
+				revalidate();
 		}
-
-		DefaultTreeModel treeModel = new DefaultTreeModel(root);
-
-		theTree.setModel(treeModel);
-		revalidate();
-	}
 **/
 	public void setVisible(boolean toVisible)
 	{
 		super.setVisible(toVisible);
+
 /*
-		if (updateNeeded)
-		{
-			update();
-		}
-*/	}
+				if (updateNeeded)
+				{
+						update();
+				}
+*/
+	}
 }
 
 /*

@@ -112,6 +112,7 @@ public class ProjectToSP
 			Automaton aut = (Automaton) projectIt.next();
 
 			pw.print("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\"");
+
 			if (aut.getComment() != null)
 			{
 				if (!aut.getComment().equals(""))
@@ -125,14 +126,17 @@ public class ProjectToSP
 			// Print all events
 			pw.println("\t<Events>");
 
-			int eventId = 0;	// need to make up ids
+			int eventId = 0;    // need to make up ids
 
 			for (Iterator eventIt = aut.eventIterator(); eventIt.hasNext(); )
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
+
 				eventIdMap.put(event, new Integer(eventId));
 				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
+
 				eventId++;
+
 				//--
 				// pw.print("\t\t<Event id=\"" + EncodingHelper.normalize(event.getId()) + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
 				//--
@@ -174,22 +178,26 @@ public class ProjectToSP
 			// Print all states
 			pw.println("\t<States>");
 
-			int stateId = 0; // we need to make up ids
+			int stateId = 0;    // we need to make up ids
 
 			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 			{
 				State state = (State) stateIt.next();
-				stateIdMap.put(state, new Integer(stateId)); // The arc must be able to find it fast
-				pw.print("\t\t<State id=\"" + stateId + "\""); // no longer need to normalize
+
+				stateIdMap.put(state, new Integer(stateId));    // The arc must be able to find it fast
+				pw.print("\t\t<State id=\"" + stateId + "\"");    // no longer need to normalize
+
 				stateId++;
+
 				//--
 				// pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
 				//--
-				pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\""); // always print the name
+				pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");    // always print the name
+
 				//--
 				// if (!state.getId().equals(state.getName()))
 				// {
-				// 	pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
+				//      pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
 				// }
 				//--
 				if (state.isInitial())
@@ -235,16 +243,19 @@ public class ProjectToSP
 				State sourceState = (State) stateIt.next();
 				Object sourceId = stateIdMap.get(sourceState);
 
-				for (Iterator outgoingArcsIt = sourceState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
+				for (Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
+						outgoingArcsIt.hasNext(); )
 				{
 					Arc arc = (Arc) outgoingArcsIt.next();
 					State destState = arc.getToState();
 					Object destId = stateIdMap.get(destState);
 					LabeledEvent event = arc.getEvent();
 					Object eventID = eventIdMap.get(event);
+
 					pw.print("\t\t<Transition source=\"" + sourceId);
 					pw.print("\" dest=\"" + destId);
 					pw.println("\" event=\"" + eventID + "\"/>");
+
 					//--
 					// pw.print("\t\t<Transition source=\"" + EncodingHelper.normalize(sourceState.getId()));
 					// pw.print("\" dest=\"" + EncodingHelper.normalize(destState.getId()));
@@ -263,7 +274,8 @@ public class ProjectToSP
 				// Print State Layout
 				pw.println("\t\t<StatesLayout>");
 
-				for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+				for (Iterator stateIt = aut.stateIterator();
+						stateIt.hasNext(); )
 				{
 					State state = (State) stateIt.next();
 
@@ -279,13 +291,14 @@ public class ProjectToSP
 				// Print Transition Layout
 				pw.println("\t\t<TransitionsLayout>");
 
-				for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+				for (Iterator stateIt = aut.stateIterator();
+						stateIt.hasNext(); )
 				{
 					State sourceState = (State) stateIt.next();
 
 					/*
-	for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
-	{
+for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
+{
 					ArcSet currArcSet = (ArcSet) arcSets.next();
 					State fromState = currArcSet.getFromState();
 					State toState = currArcSet.getToState();
@@ -293,14 +306,14 @@ public class ProjectToSP
 
 					for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
 					{
-									Arc currArc = (Arc) arcIt.next();
-									LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
+													Arc currArc = (Arc) arcIt.next();
+													LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
 
-									pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
+													pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
 					}
 
 					pw.println("\t\t\t</ArcSet>");
-	}
+}
 					*/
 					pw.println("\t\t</TransitionsLayout>");
 				}
@@ -320,13 +333,15 @@ public class ProjectToSP
 
 			if (theActions != null)
 			{
-				for (Iterator actionIt = theActions.iterator(); actionIt.hasNext(); )
+				for (Iterator actionIt = theActions.iterator();
+						actionIt.hasNext(); )
 				{
 					Action currAction = (Action) actionIt.next();
 
 					pw.println("\t\t<Action label=\"" + EncodingHelper.normalize(currAction.getLabel()) + "\">");
 
-					for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
+					for (Iterator cmdIt = currAction.commandIterator();
+							cmdIt.hasNext(); )
 					{
 						Command currCommand = (Command) cmdIt.next();
 
@@ -344,22 +359,25 @@ public class ProjectToSP
 
 			if (theControls != null)
 			{
-				for (Iterator controlIt = theControls.iterator(); controlIt.hasNext(); )
+				for (Iterator controlIt = theControls.iterator();
+						controlIt.hasNext(); )
 				{
 					Control currControl = (Control) controlIt.next();
 
 					pw.println("\t\t<Control label=\"" + EncodingHelper.normalize(currControl.getLabel()) + "\">");
 
-					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext(); )
+					for (Iterator condIt = currControl.conditionIterator();
+							condIt.hasNext(); )
 					{
 						Condition currCondition = (Condition) condIt.next();
 
 						pw.println("\t\t\t<Condition condition=\"" + EncodingHelper.normalize(currCondition.toString()) + "\"/>");
 					}
+
 					/*
 					if (currControl.getCondition() != null && !currControl.getCondition().equals(""))
 					{
-						pw.println("\t\t\t<Condition condition=\"" + EncodingHelper.normalize(currControl.getCondition()) + "\"/>");
+							pw.println("\t\t\t<Condition condition=\"" + EncodingHelper.normalize(currControl.getCondition()) + "\"/>");
 					}
 					*/
 					pw.println("\t\t</Control>");

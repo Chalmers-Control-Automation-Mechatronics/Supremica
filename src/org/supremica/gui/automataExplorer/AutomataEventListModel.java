@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -89,6 +90,7 @@ public class AutomataEventListModel
 
 	public void update()
 	{
+
 		//AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 		AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
 
@@ -179,6 +181,7 @@ public class AutomataEventListModel
 
 	public int[] getStateAt(int[] currState, int index)
 	{
+
 		//AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
 		AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
 

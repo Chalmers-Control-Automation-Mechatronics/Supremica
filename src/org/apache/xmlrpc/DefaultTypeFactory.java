@@ -54,9 +54,7 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.text.ParseException;
-
 import org.apache.xmlrpc.util.DateTool;
 
 /**
@@ -70,7 +68,7 @@ import org.apache.xmlrpc.util.DateTool;
  *   <tr><td>&lt;string&gt;</td>            <td>java.lang.String</td></tr>
  *   <tr><td>&lt;double&gt;</td>            <td>java.lang.Double</td></tr>
  *   <tr><td>&lt;dateTime.iso8601&gt;</td>  <td>java.util.Date</td></tr>
- *   <tr><td>&lt;base64&gt;</td>            <td>byte[ ]</td></tr> 
+ *   <tr><td>&lt;base64&gt;</td>            <td>byte[ ]</td></tr>
  * </table>
  *
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
@@ -78,57 +76,56 @@ import org.apache.xmlrpc.util.DateTool;
  * @since 1.2
  */
 public class DefaultTypeFactory
-    implements TypeFactory
+	implements TypeFactory
 {
-    /**
-     * Thread-safe wrapper for the <code>DateFormat</code> object used
-     * to parse date/time values.
-     */
-    private static DateTool dateTool = new DateTool();
 
-    /**
-     * Creates a new instance.
-     */
-    public DefaultTypeFactory()
-    {
-    }
+	/**
+	 * Thread-safe wrapper for the <code>DateFormat</code> object used
+	 * to parse date/time values.
+	 */
+	private static DateTool dateTool = new DateTool();
 
-    public Object createInteger(String cdata)
-    {
-        return new Integer(cdata.trim());
-    }
+	/**
+	 * Creates a new instance.
+	 */
+	public DefaultTypeFactory() {}
 
-    public Object createBoolean(String cdata)
-    {
-        return ("1".equals(cdata.trim ())
-               ? Boolean.TRUE : Boolean.FALSE);
-    }
+	public Object createInteger(String cdata)
+	{
+		return new Integer(cdata.trim());
+	}
 
-    public Object createDouble(String cdata)
-    {
-        return new Double(cdata.trim ());
+	public Object createBoolean(String cdata)
+	{
+		return ("1".equals(cdata.trim())
+				? Boolean.TRUE
+				: Boolean.FALSE);
+	}
 
-    }
+	public Object createDouble(String cdata)
+	{
+		return new Double(cdata.trim());
+	}
 
-    public Object createDate(String cdata)
-    {
-        try
-        {
-            return dateTool.parse(cdata.trim());
-        }
-        catch (ParseException p)
-        {
-            throw new RuntimeException(p.getMessage());
-        }
-    }
+	public Object createDate(String cdata)
+	{
+		try
+		{
+			return dateTool.parse(cdata.trim());
+		}
+		catch (ParseException p)
+		{
+			throw new RuntimeException(p.getMessage());
+		}
+	}
 
-    public Object createBase64(String cdata)
-    {
-        return Base64.decode(cdata.getBytes());
-    }
+	public Object createBase64(String cdata)
+	{
+		return Base64.decode(cdata.getBytes());
+	}
 
-    public Object createString(String cdata)
-    {
-        return cdata;
-    }
+	public Object createString(String cdata)
+	{
+		return cdata;
+	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,16 +47,13 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor.useractions;
 
 import java.util.*;
 import javax.swing.*;
-
 import com.nwoods.jgo.JGoSelection;
 import com.nwoods.jgo.JGoObject;
 import com.nwoods.jgo.JGoLink;
-
 import org.supremica.gui.editor.AutomataEditor;
 import org.supremica.gui.editor.AutomatonView;
 import org.supremica.gui.editor.EditorView;
@@ -66,26 +64,28 @@ import org.supremica.gui.VisualProject;
 public abstract class EditorAction
 	extends AbstractAction
 {
-	private static Collection theActions = new ArrayList();	
-
+	private static Collection theActions = new ArrayList();
 	private EditorView editorView;
-	private int mnemonic = Integer.MIN_VALUE; 
-	
+	private int mnemonic = Integer.MIN_VALUE;
+
 	public EditorAction(EditorView editorView)
 	{
 		super();
+
 		init(editorView);
 	}
 
 	public EditorAction(String name, EditorView editorView)
 	{
 		super(name);
+
 		init(editorView);
 	}
-	
+
 	public EditorAction(String name, Icon icon, EditorView editorView)
 	{
 		super(name, icon);
+
 		init(editorView);
 	}
 
@@ -93,67 +93,93 @@ public abstract class EditorAction
 	{
 		return mnemonic;
 	}
-	
+
 	private final void init(EditorView editorView)
 	{
 		this.editorView = editorView;
+
 		theActions.add(this);
 	}
-	
+
 	public EditorView getEditorView()
 	{
 		return editorView;
 	}
-	
+
 	public VisualProject getVisualProject()
 	{
 		return editorView.getVisualProject();
-	}	
-	
+	}
+
 	public StateNode getSelectedState()
 	{
 		JGoSelection currSelection = getSelection();
-		if (currSelection == null) return null;
+
+		if (currSelection == null)
+		{
+			return null;
+		}
+
 		JGoObject primarySelection = currSelection.getPrimarySelection();
+
 		if (primarySelection instanceof StateNode)
 		{
-			return (StateNode)primarySelection;
+			return (StateNode) primarySelection;
 		}
+
 		return null;
 	}
 
 	public NailNode getSelectedNail()
 	{
 		JGoSelection currSelection = getSelection();
-		if (currSelection == null) return null;
+
+		if (currSelection == null)
+		{
+			return null;
+		}
+
 		JGoObject primarySelection = currSelection.getPrimarySelection();
+
 		if (primarySelection instanceof NailNode)
 		{
-			return (NailNode)primarySelection;
+			return (NailNode) primarySelection;
 		}
+
 		return null;
-	}	
+	}
 
 	public JGoLink getSelectedLink()
 	{
 		JGoSelection currSelection = getSelection();
-		if (currSelection == null) return null;		
+
+		if (currSelection == null)
+		{
+			return null;
+		}
+
 		JGoObject primarySelection = currSelection.getPrimarySelection();
+
 		if (primarySelection instanceof JGoLink)
 		{
-			return (JGoLink)primarySelection;
+			return (JGoLink) primarySelection;
 		}
+
 		return null;
 	}
-	
+
 	private JGoSelection getSelection()
 	{
 		AutomatonView currView = editorView.getCurrentAutomatonView();
+
 		if (currView == null)
 		{
 			return null;
 		}
-		else return currView.getSelection();
+		else
+		{
+			return currView.getSelection();
+		}
 	}
 
 	public AutomataEditor getApp()
@@ -195,6 +221,7 @@ public abstract class EditorAction
 		for (Iterator actIt = theActions.iterator(); actIt.hasNext(); )
 		{
 			EditorAction currAction = (EditorAction) actIt.next();
+
 			currAction.updateEnabled();
 		}
 	}

@@ -54,7 +54,6 @@ package org.apache.xmlrpc.util;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,38 +67,37 @@ import java.util.Date;
  */
 public class DateTool
 {
-    protected static final String FORMAT = "yyyyMMdd'T'HH:mm:ss";
+	protected static final String FORMAT = "yyyyMMdd'T'HH:mm:ss";
+	private DateFormat df;
 
-    private DateFormat df;
+	/**
+	 * Uses the <code>DateFormat</code> string
+	 * <code>yyyyMMdd'T'HH:mm:ss</code>.
+	 *
+	 * @see #FORMAT
+	 */
+	public DateTool()
+	{
+		df = new SimpleDateFormat(FORMAT);
+	}
 
-    /**
-     * Uses the <code>DateFormat</code> string
-     * <code>yyyyMMdd'T'HH:mm:ss</code>.
-     *
-     * @see #FORMAT
-     */
-    public DateTool()
-    {
-        df = new SimpleDateFormat(FORMAT);
-    }
+	/**
+	 * @param d The date to format.
+	 * @return The formatted date.
+	 */
+	public synchronized String format(Date d)
+	{
+		return df.format(d);
+	}
 
-    /**
-     * @param d The date to format.
-     * @return The formatted date.
-     */
-    public synchronized String format(Date d)
-    {
-        return df.format(d);
-    }
-
-    /**
-     * @param s The text to parse a date from.
-     * @return The parsed date.
-     * @exception ParseException If the date could not be parsed.
-     */
-    public synchronized Date parse(String s)
-        throws ParseException
-    {
-        return df.parse(s);
-    }
+	/**
+	 * @param s The text to parse a date from.
+	 * @return The parsed date.
+	 * @exception ParseException If the date could not be parsed.
+	 */
+	public synchronized Date parse(String s)
+		throws ParseException
+	{
+		return df.parse(s);
+	}
 }

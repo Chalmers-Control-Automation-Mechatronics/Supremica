@@ -1,68 +1,75 @@
+
 /************************ EnumerateStates.java ***************/
+
 // Walks the state set and renames the states as <prfx><num>
 // where <prfx> is given and <num> is calculated. Initial state
 // is always numbered 0
 // Note that the original automata are altered
-
 package org.supremica.automata.algorithms;
 
 import java.util.*;
-
 import org.supremica.automata.State;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
 public class EnumerateStates
-//	extends InterruptableAlgorithm
+
+//      extends InterruptableAlgorithm
 {
 	Automata automata = null;
 	StringBuffer prefix = null;
 	int prefixlen = 0;
-	
+
 	public EnumerateStates(Automata automata, String prefix)
 	{
 		this.automata = automata;
 		this.prefix = new StringBuffer(prefix);
 		this.prefixlen = prefix.length();
 	}
-	
+
 	public void execute()
 	{
 		Iterator autit = automata.iterator();
-		while(autit.hasNext())
+
+		while (autit.hasNext())
 		{
-			enumerate((Automaton)autit.next());
+			enumerate((Automaton) autit.next());
 		}
 	}
-	
+
 	private void enumerate(Automaton automaton)
 	{
 		automaton.beginTransaction();
-		
-		prefix.append("0"); 
+		prefix.append("0");
+
 		State init = automaton.getInitialState();
-		if(init != null)
+
+		if (init != null)
 		{
 			init.setName(prefix.toString());
 		}
-		
+
 		prefix.setLength(prefixlen);
+
 		int num = 1;
 		Iterator stateit = automaton.stateIterator();
-		while(stateit.hasNext())
+
+		while (stateit.hasNext())
 		{
-			State state = (State)stateit.next();
-			if(!state.isInitial())
+			State state = (State) stateit.next();
+
+			if (!state.isInitial())
 			{
 				prefix.append(num);
 				state.setName(prefix.toString());
+
 				num++;
-				prefix.setLength(prefixlen);			
+
+				prefix.setLength(prefixlen);
 			}
 		}
 
 		automaton.invalidate();
 		automaton.endTransaction();
-
 	}
 }

@@ -71,6 +71,7 @@ public class AboutBox
 	JLabel label2 = new JLabel();
 	JLabel label3 = new JLabel();
 	JLabel label4 = new JLabel();
+
 	//JLabel label5 = new JLabel();
 	BorderLayout borderLayout1 = new BorderLayout();
 	BorderLayout borderLayout2 = new BorderLayout();
@@ -81,8 +82,8 @@ public class AboutBox
 	String version = Version.version();
 	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, Arash Vahidi 1999-2003";
 	String comments = "Thanks to Northwoods Software - http://www.nwoods.com, and AT&T Research - http://www.graphviz.org.";
-	//String thanks = "";
 
+	//String thanks = "";
 	public AboutBox(Frame parent)
 	{
 		super(parent);
@@ -105,8 +106,8 @@ public class AboutBox
 	private void jbInit()
 		throws Exception
 	{
-
 		imageIcon = new ImageIcon(getClass().getResource("/icons/Supremica.gif"));
+
 		this.setTitle("About");
 		setResizable(false);
 		panel1.setLayout(borderLayout1);
@@ -120,6 +121,7 @@ public class AboutBox
 		label2.setText("Version: " + version);
 		label3.setText(copyright);
 		label4.setText(comments);
+
 		//label5.setText(thanks);
 		insetsPanel3.setLayout(gridLayout1);
 		insetsPanel3.setBorder(new EmptyBorder(10, 60, 10, 10));

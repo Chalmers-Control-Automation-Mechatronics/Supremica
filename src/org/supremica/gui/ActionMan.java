@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -47,27 +48,18 @@
  *  Supremica is owned and represented by KA.
  */
 
-
-
-
-
 // **************************************************************************************************
 // I quote Martin on this:
 //     "It's not that simple. The code below defeats that purpose. Where are the exporter objects?
 //      OO was invented just to avoid the type of code below. It's a maintenance nightmare!!"
 //
 // Suggested reading material for the author of this file
-//   - Design Patterns										ISBN 0201633612
-//   - The Object-Oriented Thought Process					ISBN 0672318539
-//   - The Java(TM) Programming Language (3rd Edition)		ISBN 0201704331
+//   - Design Patterns                                                                          ISBN 0201633612
+//   - The Object-Oriented Thought Process                                      ISBN 0672318539
+//   - The Java(TM) Programming Language (3rd Edition)          ISBN 0201704331
 //
 //    /Arash :)
 // **************************************************************************************************
-
-
-
-
-
 // This is the guy that ties together the Gui and the menus
 // This is nothing but the Controller in the ModelViewController pattern
 package org.supremica.gui;
@@ -81,6 +73,7 @@ import org.supremica.automata.templates.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
+
 //import org.supremica.gui.animators.tsim.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
@@ -88,15 +81,12 @@ import org.supremica.external.robotCoordination.*;
 import org.supremica.external.robotCoordinationABB.*;
 import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Configurator.*;
-
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
 import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.RobotStudioLink;
-
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
-
 
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
@@ -134,12 +124,11 @@ public class ActionMan
 	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
 	// gui here is filled in by (who?)
 	public static Gui gui = null;
-
 	public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
 	public static final FindStates findStates = new FindStates();
 	public static final StateEnumerator stateEnumerator = new StateEnumerator();
 	public static final HelpAction helpAction = new HelpAction();
-	public static final OpenAction openAction = new OpenAction(); // defined in MainToolBar (just for fun :-)
+	public static final OpenAction openAction = new OpenAction();    // defined in MainToolBar (just for fun :-)
 	public static final SynthesizeAction synthesizeAction = new SynthesizeAction();
 	public static final OpenJGrafchartAction openJGrafchartAction = new OpenJGrafchartAction();
 	public static final UpdateFromJGrafchartAction updateFromJGrafchartAction = new UpdateFromJGrafchartAction();
@@ -180,6 +169,7 @@ public class ActionMan
 	// File.NewFromTemplate action performed
 	public static void fileNewFromTemplate(Gui gui, TemplateItem item)
 	{
+
 		// logger.debug("ActionMan.fileNewFromTemplate Start");
 		Automata newAutomata;
 
@@ -187,7 +177,7 @@ public class ActionMan
 		{
 			newAutomata = item.createInstance(new VisualProjectFactory());
 
-			gui.addProject((Project)newAutomata);
+			gui.addProject((Project) newAutomata);
 
 			// logger.debug("ActionMan.fileNewFromTemplate");
 		}
@@ -201,10 +191,7 @@ public class ActionMan
 	// File.NewFromTemplate action performed
 	//public static void updateFromJGrafchart(Gui gui)
 	//{
-
-
 	//}
-
 	// File.Login action performed
 	public static void fileLogin(Gui gui)
 	{
@@ -252,6 +239,7 @@ public class ActionMan
 	public static void alphabetAnalyzer_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 2, false, false, true))
 		{
 			return;
@@ -259,6 +247,7 @@ public class ActionMan
 
 		// Analyze the alphabets
 		AlphabetAnalyzer theAnalyzer = new AlphabetAnalyzer(selectedAutomata);
+
 		try
 		{
 			theAnalyzer.execute();
@@ -276,29 +265,29 @@ public class ActionMan
 
 		if (selectedAutomata.size() >= 2)
 		{
-			Iterator autIt = selectedAutomata.iterator();
-			Automata currAutomata = new Automata();
+				Iterator autIt = selectedAutomata.iterator();
+				Automata currAutomata = new Automata();
 
-			while (autIt.hasNext())
-			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				currAutomata.addAutomaton(currAutomaton);
-			}
+				while (autIt.hasNext())
+				{
+						Automaton currAutomaton = (Automaton) autIt.next();
+						currAutomata.addAutomaton(currAutomaton);
+				}
 
-			AlphabetAnalyzer theAnalyzer = new AlphabetAnalyzer(currAutomata);
-			try
-			{
-				theAnalyzer.execute();
-			}
-			catch (Exception ex)
-			{
-				logger.error("Exception in AlphabetAnalyzer ", ex);
-				logger.debug(ex.getStackTrace());
-			}
+				AlphabetAnalyzer theAnalyzer = new AlphabetAnalyzer(currAutomata);
+				try
+				{
+						theAnalyzer.execute();
+				}
+				catch (Exception ex)
+				{
+						logger.error("Exception in AlphabetAnalyzer ", ex);
+						logger.debug(ex.getStackTrace());
+				}
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 		}
 		*/
 	}
@@ -316,6 +305,7 @@ public class ActionMan
 
 			return;
 		}
+
 		if (selectedAutomata.size() > 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At most one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -324,6 +314,7 @@ public class ActionMan
 		}
 
 		Automaton theInterface = selectedAutomata.getAutomatonAt(0);
+
 		if (theInterface == null)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Could not find the interface!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -332,8 +323,7 @@ public class ActionMan
 		}
 
 		VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-		VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
-
+		VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
 		UpdateInterface updateInterface = new UpdateInterface(gui.getFrame(), theProject, theInterface);
 
 		try
@@ -345,13 +335,13 @@ public class ActionMan
 			logger.error(ex.toString());
 			logger.debug(ex.getStackTrace());
 		}
-
 	}
 
 	// Automata.AddSelfLoopArcs action performed
 	public static void automataAddSelfLoopArcs_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
@@ -362,13 +352,13 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 		*/
-
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -389,6 +379,7 @@ public class ActionMan
 	public static void automataAllAccepting_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
@@ -399,13 +390,13 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 		*/
-
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -427,6 +418,7 @@ public class ActionMan
 	public static void automataComplement_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
@@ -437,13 +429,13 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 		*/
-
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -474,6 +466,7 @@ public class ActionMan
 	public static void automataCopy_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
@@ -484,13 +477,13 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 		*/
-
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -521,6 +514,7 @@ public class ActionMan
 	public static void automataDelete_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
@@ -531,13 +525,13 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 		*/
-
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -576,12 +570,14 @@ public class ActionMan
 	public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp, boolean allTheWay)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		Project theProject = gui.getVisualProjectContainer().getActiveProject();
+
 		if (selectedAutomata.size() == theProject.size())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "No point in moving all automata, right?", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -595,39 +591,50 @@ public class ActionMan
 
 		if (allTheWay)
 		{
+
 			// Move all the way...
 			if (directionIsUp)
 			{
 				int i = 0;
-				for (AutomatonIterator autIt = selectedAutomata.iterator(); autIt.hasNext();)
+
+				for (AutomatonIterator autIt = selectedAutomata.iterator();
+						autIt.hasNext(); )
 				{
 					theProject.moveAutomaton(autIt.nextAutomaton(), i);
+
 					selectionIndices[index++] = i++;
 				}
 			}
 			else
 			{
 				int i = theProject.size() - 1;
-				for (AutomatonIterator autIt = selectedAutomata.backwardsIterator(); autIt.hasNext();)
+
+				for (AutomatonIterator autIt = selectedAutomata.backwardsIterator();
+						autIt.hasNext(); )
 				{
 					theProject.moveAutomaton(autIt.nextAutomaton(), i);
+
 					selectionIndices[index++] = i--;
 				}
 			}
 		}
 		else
 		{
+
 			// Avoid automata that can't move any further
 			Iterator autIt;
+
 			if (directionIsUp)
 			{
 				autIt = selectedAutomata.iterator();
 
 				// Avoid the automata already at the top!
 				int i = 0;
-				while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+
+				while (selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
 				{
 					autIt.next();
+
 					selectionIndices[index++] = i++;
 				}
 			}
@@ -637,19 +644,24 @@ public class ActionMan
 
 				// Avoid the automata already at the bottom!
 				int i = theProject.size() - 1;
-				while(selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
+
+				while (selectedAutomata.containsAutomaton(theProject.getAutomatonAt(i)))
 				{
 					autIt.next();
+
 					selectionIndices[index++] = i--;
 				}
 			}
 
 			// Move automata that can move! The thing is that we're using the same iterator here and above!!!!!!!!!!
 			Automaton currAutomaton;
+
 			while (autIt.hasNext())
 			{
 				currAutomaton = (Automaton) autIt.next();
+
 				theProject.moveAutomaton(currAutomaton, directionIsUp);
+
 				selectionIndices[index++] = theProject.getAutomatonIndex(currAutomaton);
 			}
 		}
@@ -661,36 +673,33 @@ public class ActionMan
 
 	// This is baaad!
 	private static final int    // instead of using constants later below :)
-		FORMAT_UNKNOWN = -1,
-		FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3,
-		FORMAT_SP = 4, FORMAT_HTML = 5,
-		FORMAT_XML_DEBUG = 6, FORMAT_DOT_DEBUG = 7, FORMAT_DSX_DEBUG = 8,
-		FORMAT_SP_DEBUG = 9, FORMAT_HTML_DEBUG = 10,
-		FORMAT_FSM = 11, FORMAT_FSM_DEBUG = 12,
-
-		FORMAT_PCG = 13, FORMAT_PCG_DEBUG = 14, // ARASH: process communication graphs
-		FORMAT_SSPC = 15; // ARASH: Sanchez SSPC tool
-
+		 FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3,
+		 FORMAT_SP = 4, FORMAT_HTML = 5, FORMAT_XML_DEBUG = 6,
+		 FORMAT_DOT_DEBUG = 7, FORMAT_DSX_DEBUG = 8, FORMAT_SP_DEBUG = 9,
+		 FORMAT_HTML_DEBUG = 10, FORMAT_FSM = 11, FORMAT_FSM_DEBUG = 12,
+		 FORMAT_PCG = 13, FORMAT_PCG_DEBUG = 14,    // ARASH: process communication graphs
+		 FORMAT_SSPC = 15;    // ARASH: Sanchez SSPC tool
 
 	// This class should really act as a factory for exporter objects, but that
 	// would mean rewriting the entire export/saveAs functionality. Should I bother?
 	static class ExportDialog
-	//	extends JDialog
+
+	//      extends JDialog
 	{
 		private static final String xmlString = "xml";
 		private static final String spString = "sp";
 		private static final String dotString = "dot";
 		private static final String dsxString = "dsx";
-		private static final String htmlString ="html";
+		private static final String htmlString = "html";
 		private static final String fsmString = "fsm";
 		private static final String pcgString = "pcg";
 		private static final String sspcString = "sspc";
-
-		private static final Object[] possibleValues =
-		{
-			xmlString, spString, dotString, dsxString, fsmString, htmlString, pcgString, sspcString
-		};
-
+		private static final Object[] possibleValues = { xmlString, spString,
+														 dotString, dsxString,
+														 fsmString,
+														 htmlString,
+														 pcgString,
+														 sspcString };
 		private JOptionPane pane = null;
 		private JDialog dialog = null;
 		private JCheckBox checkbox = null;
@@ -698,20 +707,20 @@ public class ActionMan
 
 		ExportDialog(Frame comp)
 		{
-			this.pane = new JOptionPane("Export as::",
-										JOptionPane.INFORMATION_MESSAGE,
-										JOptionPane.OK_CANCEL_OPTION,
-										null,	// icon
-										null, 	// options
-										null);	// initialValue
+			this.pane = new JOptionPane("Export as::", JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,    // icon
+										null,    // options
+										null);    // initialValue
 
 			pane.setWantsInput(true);
 			pane.setSelectionValues(possibleValues);
 			pane.setInitialSelectionValue(possibleValues[0]);
-			pane.setComponentOrientation(((comp == null) ? JOptionPane.getRootFrame() : comp).getComponentOrientation());
+			pane.setComponentOrientation(((comp == null)
+										  ? JOptionPane.getRootFrame()
+										  : comp).getComponentOrientation());
 			pane.selectInitialValue();
 
 			this.checkbox = new JCheckBox("Export to debugview");
+
 			pane.add(checkbox);
 
 			// int style = styleFromMessageType(JOptionPane.INFORMATION_MESSAGE);
@@ -720,17 +729,20 @@ public class ActionMan
 
 		public void show()
 		{
+
 			// this.selectedValue = JOptionPane.showInputDialog(comp, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 			dialog.show();
-	        dialog.dispose();
-			// Is this the right thing to do? It seems to work, but the manuals...
-	        if(((Integer)pane.getValue()).intValue() == JOptionPane.CANCEL_OPTION)
-	        {
-	        	selectedValue = null;
-	        	return;
-	        }
+			dialog.dispose();
 
-	        selectedValue = pane.getInputValue();
+			// Is this the right thing to do? It seems to work, but the manuals...
+			if (((Integer) pane.getValue()).intValue() == JOptionPane.CANCEL_OPTION)
+			{
+				selectedValue = null;
+
+				return;
+			}
+
+			selectedValue = pane.getInputValue();
 		}
 
 		public boolean wasCancelled()
@@ -743,60 +755,67 @@ public class ActionMan
 		{
 			if (selectedValue == xmlString)
 			{
-				if(checkbox.isSelected())
+				if (checkbox.isSelected())
 				{
 					return FORMAT_XML_DEBUG;
 				}
-				return FORMAT_XML;	// Should return an XmlExporter object
+
+				return FORMAT_XML;    // Should return an XmlExporter object
 			}
 			else if (selectedValue == dotString)
 			{
-				if(checkbox.isSelected())
+				if (checkbox.isSelected())
 				{
 					return FORMAT_DOT_DEBUG;
 				}
-				return FORMAT_DOT;	// Should return a DotExporter object
+
+				return FORMAT_DOT;    // Should return a DotExporter object
 			}
 			else if (selectedValue == dsxString)
 			{
-				if(checkbox.isSelected())
+				if (checkbox.isSelected())
 				{
 					return FORMAT_DSX_DEBUG;
 				}
-				return FORMAT_DSX;	// Should return a DsxExporter object
+
+				return FORMAT_DSX;    // Should return a DsxExporter object
 			}
 			else if (selectedValue == fsmString)
 			{
-				if(checkbox.isSelected())
+				if (checkbox.isSelected())
 				{
 					return FORMAT_FSM_DEBUG;
 				}
-				return FORMAT_FSM;	// Should return a FsmExporter object
+
+				return FORMAT_FSM;    // Should return a FsmExporter object
 			}
 			else if (selectedValue == spString)
 			{
-				if(checkbox.isSelected())
+				if (checkbox.isSelected())
 				{
 					return FORMAT_SP_DEBUG;
 				}
-				return FORMAT_SP;	// Should return a SpExporter object
+
+				return FORMAT_SP;    // Should return a SpExporter object
 			}
 			else if (selectedValue == htmlString)
 			{
-				if(checkbox.isSelected())
+				if (checkbox.isSelected())
 				{
 					return FORMAT_HTML_DEBUG;
 				}
-				return FORMAT_HTML;	// Should return a HtmlExporter object
+
+				return FORMAT_HTML;    // Should return a HtmlExporter object
 			}
 			else if (selectedValue == pcgString)
 			{
-				return (checkbox.isSelected()) ? FORMAT_PCG_DEBUG: FORMAT_PCG;
+				return (checkbox.isSelected())
+					   ? FORMAT_PCG_DEBUG
+					   : FORMAT_PCG;
 			}
-
 			else if (selectedValue == sspcString)
 			{
-				return FORMAT_SSPC; // no debugview here (multiple files)
+				return FORMAT_SSPC;    // no debugview here (multiple files)
 			}
 			else
 			{
@@ -810,21 +829,24 @@ public class ActionMan
 	public static void automataExport(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		ExportDialog dlg = new ExportDialog(gui.getFrame());
+
 		dlg.show();
-		if(dlg.wasCancelled())
+
+		if (dlg.wasCancelled())
 		{
 			return;
 		}
 
 		int exportMode = dlg.getExportMode();
 
-		if(exportMode != FORMAT_UNKNOWN)
+		if (exportMode != FORMAT_UNKNOWN)
 		{
 			automataExport(gui, exportMode);
 		}
@@ -837,16 +859,18 @@ public class ActionMan
 	public static void automataExport(Gui gui, int exportMode)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
-		if (exportMode == FORMAT_FSM_DEBUG || exportMode == FORMAT_FSM)
-		{   // UMDES cannot deal with forbidden states
+		if ((exportMode == FORMAT_FSM_DEBUG) || (exportMode == FORMAT_FSM))
+		{    // UMDES cannot deal with forbidden states
 			if (selectedAutomata.hasForbiddenState())
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "UMDES cannot handle forbidden states", "Alert", JOptionPane.ERROR_MESSAGE);
+
 				return;
 			}
 		}
@@ -856,145 +880,180 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 		*/
 
 		// Take care of the new debug stuff first. This is really silly.
 		// Proper design would have solved this problem
-		if(exportMode == FORMAT_XML_DEBUG)
+		if (exportMode == FORMAT_XML_DEBUG)
 		{
 			AutomataToXml xport = new AutomataToXml(gui.getSelectedProject());
 			TextFrame textframe = new TextFrame("XML debug output");
+
 			xport.serialize(textframe.getPrintWriter());
+
 			return;
 		}
+
 		if (exportMode == FORMAT_SP_DEBUG)
 		{
 			ProjectToSP exporter = new ProjectToSP(gui.getSelectedProject());
 			TextFrame textframe = new TextFrame("SP debug output");
+
 			exporter.serialize(textframe.getPrintWriter());
+
 			return;
 		}
-		if(exportMode == FORMAT_DOT_DEBUG)
+
+		if (exportMode == FORMAT_DOT_DEBUG)
 		{
-			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			for (Iterator autIt = selectedAutomata.iterator();
+					autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
 				TextFrame textframe = new TextFrame("Dot debug output");
+
 				try
 				{
 					exporter.serialize(textframe.getPrintWriter());
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					logger.debug(ex.getStackTrace());
 				}
 			}
+
 			return;
 		}
-		if(exportMode == FORMAT_DSX_DEBUG)
+
+		if (exportMode == FORMAT_DSX_DEBUG)
 		{
-			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			for (Iterator autIt = selectedAutomata.iterator();
+					autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
 				TextFrame textframe = new TextFrame("DSX debug output");
+
 				try
 				{
 					exporter.serialize(textframe.getPrintWriter());
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					logger.debug(ex.getStackTrace());
 				}
 			}
+
 			return;
 		}
-		if(exportMode == FORMAT_FSM_DEBUG)
+
+		if (exportMode == FORMAT_FSM_DEBUG)
 		{
-			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			for (Iterator autIt = selectedAutomata.iterator();
+					autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
 				TextFrame textframe = new TextFrame("FSM debug output");
+
 				try
 				{
 					exporter.serialize(textframe.getPrintWriter());
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					logger.debug(ex.getStackTrace());
 				}
 			}
+
 			return;
 		}
-		if(exportMode == FORMAT_PCG_DEBUG)
-		{
-			AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph( selectedAutomata );
 
+		if (exportMode == FORMAT_PCG_DEBUG)
+		{
+			AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
 			TextFrame textframe = new TextFrame("PCG debug output");
+
 			try
 			{
 				a2cg.serialize(textframe.getPrintWriter());
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				logger.debug(ex.getStackTrace());
 			}
+
 			return;
 		}
-		else if (exportMode == FORMAT_PCG || exportMode == FORMAT_SSPC)
+		else if ((exportMode == FORMAT_PCG) || (exportMode == FORMAT_SSPC))
 		{
-			JFileChooser  fileExporter = new JFileChooser();
+			JFileChooser fileExporter = new JFileChooser();
+
 			fileExporter.setDialogTitle("Save as ...");
-			if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION) {
+
+			if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+			{
 				File currFile = fileExporter.getSelectedFile();
-				if(currFile == null) return;
+
+				if (currFile == null)
+				{
+					return;
+				}
+
 				try
 				{
-					if(exportMode == FORMAT_PCG ) {
-						AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph( selectedAutomata );
+					if (exportMode == FORMAT_PCG)
+					{
+						AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
+
 						a2cg.serialize(currFile.getAbsolutePath());
-					} else {
+					}
+					else
+					{
 						new AutomataSSPCExporter(selectedAutomata, currFile.getAbsolutePath());
 					}
 				}
-				catch(Exception ex)
-				{
-				logger.debug(ex.getStackTrace());
-				ex.printStackTrace(); // TEMP!
-				}
-			}
-			return;
-		}
-/*		if(exportMode == FORMAT_HTML_DEBUG)
-		{
-			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
-			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				AutomatonToHtml exporter = new AutomatonToHtml(currAutomaton);
-				TextFrame textframe = new TextFrame("HTML debug output");
-				try
-				{
-					exporter.serialize(textframe.getPrintWriter());
-				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					logger.debug(ex.getStackTrace());
+					ex.printStackTrace();    // TEMP!
 				}
 			}
+
 			return;
 		}
+
+/*              if(exportMode == FORMAT_HTML_DEBUG)
+				{
+						for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+						{
+								Automaton currAutomaton = (Automaton) autIt.next();
+								AutomatonToHtml exporter = new AutomatonToHtml(currAutomaton);
+								TextFrame textframe = new TextFrame("HTML debug output");
+								try
+								{
+										exporter.serialize(textframe.getPrintWriter());
+								}
+								catch(Exception ex)
+								{
+										logger.debug(ex.getStackTrace());
+								}
+						}
+						return;
+				}
 */
-		if (exportMode == FORMAT_DOT || exportMode == FORMAT_DSX || exportMode == FORMAT_FSM || exportMode == FORMAT_PCG)
+		if ((exportMode == FORMAT_DOT) || (exportMode == FORMAT_DSX) || (exportMode == FORMAT_FSM) || (exportMode == FORMAT_PCG))
 		{
-			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			for (Iterator autIt = selectedAutomata.iterator();
+					autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
+
 				automatonExport(gui, exportMode, currAutomaton);
 			}
 		}
@@ -1005,6 +1064,7 @@ public class ActionMan
 			if (exportMode == FORMAT_XML)
 			{
 				fileExporter = FileDialogs.getXMLFileExporter();
+
 				return;
 			}
 			else if (exportMode == FORMAT_SP)
@@ -1130,27 +1190,29 @@ public class ActionMan
 						{
 							Project selectedProject = gui.getSelectedProject();
 							Project newProject = new Project();
+
 							newProject.addAttributes(selectedProject);
+
 							//newProject.addActions(selectedProject.getActions());
 							//newProject.addControls(selectedProject.getControls());
 							//newProject.setAnimationURL(selectedProject.getAnimationURL());
-
 							ProjectToSP exporter = new ProjectToSP(newProject);
 
 							exporter.serialize(currFile);
 						}
+
 						/*
 						else if (exportMode == FORMAT_HTML)
 						{
-							Project selectedProject = gui.getSelectedProject();
-							Project newProject = new Project();
-							newProject.addActions(selectedProject.getActions());
-							newProject.addControls(selectedProject.getControls());
-							newProject.setAnimationURL(selectedProject.getAnimationURL());
+								Project selectedProject = gui.getSelectedProject();
+								Project newProject = new Project();
+								newProject.addActions(selectedProject.getActions());
+								newProject.addControls(selectedProject.getControls());
+								newProject.setAnimationURL(selectedProject.getAnimationURL());
 
-							ProjectToHtml exporter = new ProjectToHtml(newProject);
+								ProjectToHtml exporter = new ProjectToHtml(newProject);
 
-							exporter.serialize(currFile);
+								exporter.serialize(currFile);
 						}
 						*/
 					}
@@ -1168,12 +1230,14 @@ public class ActionMan
 	public static void automataExtend_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1210,19 +1274,21 @@ public class ActionMan
 	public static void automataLifting_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		int k = getIntegerInDialogWindow("Select k", gui.getComponent());
-
 		ComputerHumanExtender extender = new ComputerHumanExtender(selectedAutomata, k);
 
 		try
 		{
 			extender.execute();
+
 			Automaton newAutomaton = extender.getNewAutomaton();
+
 			gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
 		}
 		catch (Exception ex)
@@ -1230,19 +1296,20 @@ public class ActionMan
 			logger.error("Error in ComputerHumanExtender");
 			logger.debug(ex.getStackTrace());
 		}
-
 	}
 
 	// ** Purge
 	public static void automataPurge_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1264,12 +1331,14 @@ public class ActionMan
 	public static void automataRemovePass_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1297,6 +1366,7 @@ public class ActionMan
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1317,12 +1387,14 @@ public class ActionMan
 	public static void automataRename_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1348,8 +1420,10 @@ public class ActionMan
 	// ** Synchronize - Threaded version
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
+
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 2, true, false, true))
 		{
 			return;
@@ -1358,9 +1432,9 @@ public class ActionMan
 		/*
 		if (selectedAutomata.size() < 2)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getComponent(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 
 		// Do a sanity check, does all automata have initial states?
@@ -1369,18 +1443,19 @@ public class ActionMan
 		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
 		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-			String currAutomatonName = currAutomaton.getName();
-			if (!currAutomaton.hasInitialState())
-			{
-				JOptionPane.showMessageDialog(gui.getComponent(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+				Automaton currAutomaton = (Automaton) autIt.next();
+				String currAutomatonName = currAutomaton.getName();
+				if (!currAutomaton.hasInitialState())
+				{
+						JOptionPane.showMessageDialog(gui.getComponent(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+						return;
+				}
 		}
 		*/
 
 		// Get the default options
 		SynchronizationOptions synchronizationOptions;
+
 		try
 		{
 			synchronizationOptions = new SynchronizationOptions();
@@ -1389,12 +1464,15 @@ public class ActionMan
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Error constructing synchronizationOptions: " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 
 		// Start a dialog to allow the user changing the options
 		SynchronizationDialog synchronizationDialog = new SynchronizationDialog(gui.getFrame(), synchronizationOptions);
+
 		synchronizationDialog.show();
+
 		if (!synchronizationOptions.getDialogOK())
 		{
 			return;
@@ -1407,8 +1485,10 @@ public class ActionMan
 	// ** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
+
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, true, true, true))
 		{
 			return;
@@ -1416,9 +1496,10 @@ public class ActionMan
 
 		// Get the default options and allow the user to change them...
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(),
-																	synthesizerOptions);
+		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), synthesizerOptions);
+
 		synthesizerDialog.show();
+
 		if (!synthesizerOptions.getDialogOK())
 		{
 			return;
@@ -1429,31 +1510,33 @@ public class ActionMan
 		if (selectedAutomata.size() > 1)
 		{
 			SynchronizationOptions syncOptions;
+
 			// try
 			// {
-				syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+			syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
 
-				/*
-				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
-														 SynchronizationType.Prioritized,
-														 SupremicaProperties.syncInitialHashtableSize(),
-														 SupremicaProperties.syncExpandHashtable(),
-														 true, // This is the only difference from default!
-														 SupremicaProperties.syncExpandForbiddenStates(),
-														 false,
-														 false,
-														 true,
-														 SupremicaProperties.verboseMode(),
-														 true,
-														 true);
-				*/
+			/*
+			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
+																							 SynchronizationType.Prioritized,
+																							 SupremicaProperties.syncInitialHashtableSize(),
+																							 SupremicaProperties.syncExpandHashtable(),
+																							 true, // This is the only difference from default!
+																							 SupremicaProperties.syncExpandForbiddenStates(),
+																							 false,
+																							 false,
+																							 true,
+																							 SupremicaProperties.verboseMode(),
+																							 true,
+																							 true);
+			*/
+
 			/*
 			}
 			catch (Exception ex)
 			{
-				JOptionPane.showMessageDialog(gui.getComponent(), "Invalid synchronizationOptions", "Alert", JOptionPane.ERROR_MESSAGE);
-				logger.debug(ex.getStackTrace());
-				return;
+					JOptionPane.showMessageDialog(gui.getComponent(), "Invalid synchronizationOptions", "Alert", JOptionPane.ERROR_MESSAGE);
+					logger.debug(ex.getStackTrace());
+					return;
 			}
 			*/
 
@@ -1463,53 +1546,52 @@ public class ActionMan
 
 			while (autIt.hasNext())
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				String currAutomatonName = currAutomaton.getName();
+					Automaton currAutomaton = (Automaton) autIt.next();
+					String currAutomatonName = currAutomaton.getName();
 
-				// No initial state -- remove from synthesis (or cancel entirely)
-				if (!currAutomaton.hasInitialState())
-				{
-					int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
-												"The automaton " + currAutomatonName +
-												" does not have an initial state.\nSkip it or cancel...",
-												"Alert",
-												JOptionPane.OK_CANCEL_OPTION,
-												JOptionPane.WARNING_MESSAGE);
+					// No initial state -- remove from synthesis (or cancel entirely)
+					if (!currAutomaton.hasInitialState())
+					{
+							int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
+																					"The automaton " + currAutomatonName +
+																					" does not have an initial state.\nSkip it or cancel...",
+																					"Alert",
+																					JOptionPane.OK_CANCEL_OPTION,
+																					JOptionPane.WARNING_MESSAGE);
 
-					if(cont == JOptionPane.OK_OPTION)
-					{
-						continue; // skip currAutomaton from the synthesis
+							if(cont == JOptionPane.OK_OPTION)
+							{
+									continue; // skip currAutomaton from the synthesis
+							}
+							else // JOptionPane.CANCEL_OPTION
+							{
+									return; // cancel entirely
+							}
 					}
-					else // JOptionPane.CANCEL_OPTION
+					// Undefined type -- remove from synthesis (or cancel entirely)
+					if(currAutomaton.getType() == AutomatonType.Undefined)
 					{
-						return;	// cancel entirely
+							int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
+																									"The automaton " + currAutomatonName + " is of 'Undefined' type.\nSkip it or cancel...",
+																									"Alert",
+																									JOptionPane.OK_CANCEL_OPTION,
+																									JOptionPane.WARNING_MESSAGE);
+							if(cont == JOptionPane.OK_OPTION)
+							{
+									continue; // skip currAutomaton from the synthesis
+							}
+							else // JOptionPane.CANCEL_OPTION
+							{
+									return; // cancel entirely
+							}
 					}
-				}
-				// Undefined type -- remove from synthesis (or cancel entirely)
-				if(currAutomaton.getType() == AutomatonType.Undefined)
-				{
-					int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
-														"The automaton " + currAutomatonName + " is of 'Undefined' type.\nSkip it or cancel...",
-														"Alert",
-														JOptionPane.OK_CANCEL_OPTION,
-														JOptionPane.WARNING_MESSAGE);
-					if(cont == JOptionPane.OK_OPTION)
-					{
-						continue; // skip currAutomaton from the synthesis
-					}
-					else // JOptionPane.CANCEL_OPTION
-					{
-						return;	// cancel entirely
-					}
-				}
-				currAutomata.addAutomaton(currAutomaton);
+					currAutomata.addAutomaton(currAutomaton);
 			}
 			*/
-
 			try
 			{
-				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions,
-																		  synthesizerOptions);
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions, synthesizerOptions);
+
 				synthesizer.execute();
 
 				// elapsedTime = synthesizer.elapsedTime();
@@ -1521,21 +1603,20 @@ public class ActionMan
 				logger.debug(ex.getStackTrace());
 			}
 		}
-		else // single automaton selected
+		else    // single automaton selected
 		{
 			Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
 
 			try
 			{
+
 				// ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
 				// (this is a dirty fix, should use a factory instead)
-				AutomatonSynthesizer synthesizer =
-				 	synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint ?
-					new AutomatonSynthesizerSingleFixpoint(theAutomaton, synthesizerOptions) :
-					new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
+				AutomatonSynthesizer synthesizer = (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
+												   ? new AutomatonSynthesizerSingleFixpoint(theAutomaton, synthesizerOptions)
+												   : new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
 
 				// AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
-
 				synthesizer.synthesize();
 			}
 			catch (Exception ex)
@@ -1549,29 +1630,29 @@ public class ActionMan
 
 			while (autIt.hasNext())
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				AutomatonSynthesizer synthesizer;
+					Automaton currAutomaton = (Automaton) autIt.next();
+					AutomatonSynthesizer synthesizer;
 
-				try
-				{
-					synthesizer = new AutomatonSynthesizer(currAutomaton, synthesizerOptions);
-				}
-				catch (Exception ex)
-				{
-					JOptionPane.showMessageDialog(gui.getComponent(), ex.toString(), "Alert", JOptionPane.ERROR_MESSAGE);
-					logger.debug(ex.getStackTrace());
-					return;
-				}
+					try
+					{
+							synthesizer = new AutomatonSynthesizer(currAutomaton, synthesizerOptions);
+					}
+					catch (Exception ex)
+					{
+							JOptionPane.showMessageDialog(gui.getComponent(), ex.toString(), "Alert", JOptionPane.ERROR_MESSAGE);
+							logger.debug(ex.getStackTrace());
+							return;
+					}
 
-				try
-				{
-					synthesizer.synthesize();
-				}
-				catch (Exception ex)
-				{
-					logger.error("Exception in AutomatonSynthesizer. Automaton: " + currAutomaton.getName(), ex);
-					logger.debug(ex.getStackTrace());
-				}
+					try
+					{
+							synthesizer.synthesize();
+					}
+					catch (Exception ex)
+					{
+							logger.error("Exception in AutomatonSynthesizer. Automaton: " + currAutomaton.getName(), ex);
+							logger.debug(ex.getStackTrace());
+					}
 			}
 			*/
 		}
@@ -1586,8 +1667,10 @@ public class ActionMan
 	// Threaded version
 	public static void automataVerify_actionPerformed(Gui gui)
 	{
+
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, true, false, true))
 		{
 			return;
@@ -1596,7 +1679,9 @@ public class ActionMan
 		// Get the default options and allow the user to change them...
 		VerificationOptions verificationOptions = new VerificationOptions();
 		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), verificationOptions);
+
 		verificationDialog.show();
+
 		if (!verificationOptions.getDialogOK())
 		{
 			return;
@@ -1609,26 +1694,23 @@ public class ActionMan
 		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
 		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-			String currAutomatonName = currAutomaton.getName();
+				Automaton currAutomaton = (Automaton) autIt.next();
+				String currAutomatonName = currAutomaton.getName();
 
-			if (!currAutomaton.hasInitialState())
-			{
-				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+				if (!currAutomaton.hasInitialState())
+				{
+						JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+						return;
+				}
 
-			currAutomata.addAutomaton(currAutomaton);
+				currAutomata.addAutomaton(currAutomaton);
 		}
 		*/
-
-
 		SynchronizationOptions syncOptions;
 
 		syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
-		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata,
-																		   syncOptions, verificationOptions);
+		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, syncOptions, verificationOptions);
 	}
 
 	// Automaton.ActionAndControlViewer action performed
@@ -1642,6 +1724,7 @@ public class ActionMan
 		{
 			logger.error("Exception in ActionAndControlViewer.", ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
@@ -1652,11 +1735,14 @@ public class ActionMan
 		try
 		{
 			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+
 			if (!currProject.hasAnimation())
 			{
 				logger.info("No animation present");
+
 				return;
 			}
+
 			Animator animator = currProject.getAnimator();
 		}
 		catch (Exception ex)
@@ -1669,6 +1755,7 @@ public class ActionMan
 	// Automaton.Explore action performed
 	public static void automatonExplore_actionPerformed(Gui gui)
 	{
+
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
@@ -1680,15 +1767,14 @@ public class ActionMan
 		/*
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!",
-										  "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!",
+																		  "Alert", JOptionPane.ERROR_MESSAGE);
 
-			return;
+				return;
 		}
 		*/
-
 		if (selectedAutomata.size() == 1)
-		{	// One automaton selected
+		{    // One automaton selected
 
 			/*
 			// One automaton selected
@@ -1697,18 +1783,16 @@ public class ActionMan
 
 			if (!currAutomaton.hasInitialState())
 			{
-				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName +
-				" does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName +
+					" does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			*/
-
 			Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
 			String currAutomatonName = theAutomaton.getName();
 
 			try
 			{
-				AutomatonExplorer explorer = gui.getVisualProjectContainer().
-				getActiveProject().getAutomatonExplorer(currAutomatonName);
+				AutomatonExplorer explorer = gui.getVisualProjectContainer().getActiveProject().getAutomatonExplorer(currAutomatonName);
 			}
 			catch (Exception ex)
 			{
@@ -1717,32 +1801,33 @@ public class ActionMan
 			}
 		}
 		else
-		{   // Many automata selected
+		{    // Many automata selected
+
 			/*
 			// Many automata selected
 			Automata currAutomata = new Automata();
 
 			while (autIt.hasNext())
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				String currAutomatonName = currAutomaton.getName();
+					Automaton currAutomaton = (Automaton) autIt.next();
+					String currAutomatonName = currAutomaton.getName();
 
-				if (!currAutomaton.hasInitialState())
-				{
-					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+					if (!currAutomaton.hasInitialState())
+					{
+							JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
 
-					return;
-				}
+							return;
+					}
 
-				currAutomata.addAutomaton(currAutomaton);
+					currAutomata.addAutomaton(currAutomaton);
 			}
 			*/
-
 			try
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "The automata explorer only works in the \"forward\" direction!", "Alert", JOptionPane.INFORMATION_MESSAGE);
 
 				AutomataExplorer explorer = new AutomataExplorer(selectedAutomata);
+
 				explorer.setVisible(true);
 				explorer.initialize();
 			}
@@ -1760,12 +1845,16 @@ public class ActionMan
 		try
 		{
 			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+
 			if (!currProject.hasAnimation())
 			{
 				logger.info("No simulation present");
+
 				return;
 			}
+
 			SimulatorExecuter simulator = currProject.getSimulator();
+
 			if (simulator != null)
 			{
 				simulator.setVisible(true);
@@ -1777,7 +1866,6 @@ public class ActionMan
 			logger.error("Exception in Simulator", ex);
 			logger.debug(ex.getStackTrace());
 		}
-
 	}
 
 	// Project.SimulatorClear action performed
@@ -1786,43 +1874,47 @@ public class ActionMan
 		try
 		{
 			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+
 			currProject.clearSimulationData();
 		}
 		catch (Exception ex)
 		{
 			logger.error("Exception in Simulator");
 		}
-
 	}
 
 	// Automaton.Minimization action performed
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
+
 			/* String newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
 
 			if (newAutomatonName == null)
 			{
-				return;
+					return;
 			}
 			*/
 			try
 			{
 				AutomatonMinimizer autMinimizer = new AutomatonMinimizer(currAutomaton);
 				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton();
-				// Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(true);
 
+				// Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(true);
 				// newAutomaton.setName(newAutomatonName);
 				newAutomaton.setComment("min(" + currAutomaton.getName() + ")");
+
 				// gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
 				gui.addAutomaton(newAutomaton);
 			}
@@ -1840,12 +1932,13 @@ public class ActionMan
 		gui.info("Number of automata: " + gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata());
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
 		{
 			return;
 		}
-		gui.info("Number of selected automata: " + selectedAutomata.size());
 
+		gui.info("Number of selected automata: " + selectedAutomata.size());
 		gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
 		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -1854,10 +1947,12 @@ public class ActionMan
 			StringBuffer statusStr = new StringBuffer();
 
 			statusStr.append("Status for automaton: " + currAutomaton.getName());
-			if(currAutomaton.getComment() != null && !currAutomaton.getComment().equals(""))
+
+			if ((currAutomaton.getComment() != null) &&!currAutomaton.getComment().equals(""))
 			{
 				statusStr.append("\nComment: \"" + currAutomaton.getComment() + "\"");
 			}
+
 			statusStr.append("\n\tis deterministic: " + currAutomaton.isDeterministic());
 			statusStr.append("\n\tNumber of states: " + currAutomaton.nbrOfStates());
 			statusStr.append("\n\tNumber of events: " + currAutomaton.nbrOfEvents());
@@ -1877,11 +1972,12 @@ public class ActionMan
 			gui.info(statusStr.toString());
 		}
 
-		if(selectedAutomata.size() > 1)
+		if (selectedAutomata.size() > 1)
 		{
 			double potentialNumberOfStates = 1.0;
 
-			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			for (Iterator autIt = selectedAutomata.iterator();
+					autIt.hasNext(); )
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 
@@ -1896,6 +1992,7 @@ public class ActionMan
 	public static void hierarchyView_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 2, false, false, true))
 		{
 			return;
@@ -1906,6 +2003,7 @@ public class ActionMan
 			AutomataHierarchyViewer viewer = new AutomataHierarchyViewer(selectedAutomata);
 
 			viewer.setVisible(true);
+
 			//viewer.setState(Frame.NORMAL);
 		}
 		catch (Exception ex)
@@ -1921,6 +2019,7 @@ public class ActionMan
 	public static void statesView_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
 		{
 			return;
@@ -1929,13 +2028,16 @@ public class ActionMan
 		try
 		{
 			AutomataViewer statesViewer = new AutomataViewer(selectedAutomata, false, true);
+
 			statesViewer.setVisible(true);
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
+
 			// logger.error("Exception in AlphabetViewer", ex);
 			logger.error("Exception in AutomataViewer: " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
@@ -1944,9 +2046,10 @@ public class ActionMan
 	// public static void automatonAlphabet_actionPerformed(Gui gui)
 	public static void alphabetView_actionPerformed(Gui gui)
 	{
-		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
 
+		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
 		{
 			return;
@@ -1956,15 +2059,19 @@ public class ActionMan
 		// automata object?? Use AutomataViewer instead!
 		try
 		{
+
 			// AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
 			AutomataViewer alphabetViewer = new AutomataViewer(selectedAutomata, true, false);
+
 			alphabetViewer.setVisible(true);
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
+
 			// logger.error("Exception in AlphabetViewer", ex);
 			logger.error("Exception in AutomataViewer: " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
@@ -1972,10 +2079,11 @@ public class ActionMan
 	// Automaton.View action performed
 	public static void automatonView_actionPerformed(Gui gui)
 	{
-		// gui.debug("ActionMan to the rescue!");
 
+		// gui.debug("ActionMan to the rescue!");
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, true, false, false))
 		{
 			return;
@@ -1984,15 +2092,16 @@ public class ActionMan
 		/*
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-			return;
+				JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				return;
 		}
 		*/
-
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
+
 			//String currAutomatonName = currAutomaton.getName();
 			int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
 
@@ -2001,9 +2110,7 @@ public class ActionMan
 
 				// Why isn't this in AutomatonViewer??
 				// Every user of AutomatonViewer has to manage this for himself!?
-				String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() +
-					" states. It is not recommended to display an automaton with more than " +
-					maxNbrOfStates + " states. Do you want to abort viewing?";
+				String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states. Do you want to abort viewing?";
 
 				msg = EncodingHelper.linebreakAdjust(msg);
 
@@ -2011,6 +2118,7 @@ public class ActionMan
 
 				if (res == 0)
 				{
+
 					// Abort - YES
 					return;
 				}
@@ -2019,11 +2127,10 @@ public class ActionMan
 			/*
 			if (!currAutomaton.hasInitialState())
 			{
-				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-				return;
+					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+					return;
 			}
 			*/
-
 			try
 			{
 				AutomatonViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomaton.getName());
@@ -2107,11 +2214,9 @@ public class ActionMan
 			logger.error("fileExportHtml: Exception - ", ex);
 			logger.debug(ex.getStackTrace());
 		}
-
 	}
 
 	// -------------- TODO: ADD EXPORTES FOR THESE TOO ------------------------------------
-
 	public static void fileExportUMDES(Gui gui)
 	{
 		automataExport(gui);
@@ -2156,21 +2261,21 @@ public class ActionMan
 	}
 
 	/**
-	 * What is this!?!?? Wasn't the friggin' point of this whole thing to AVOID having 
+	 * What is this!?!?? Wasn't the friggin' point of this whole thing to AVOID having
 	 * application specific import functions?!? Why is there a fileImportRobotCoordination
 	 * AND a fileImportRobotCoordinationABB????? GRRRRRrrrrRRRR!! /hguo
 	 */
 
-    // File.Import.FromRobotCoordinationABB (format representing RobotStudio station)
-    public static void fileImportRobotCoordinationABB(Gui gui)
+	// File.Import.FromRobotCoordinationABB (format representing RobotStudio station)
+	public static void fileImportRobotCoordinationABB(Gui gui)
+	{
+		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
 		{
-			new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
+			void openFile(Gui g, File f)
 			{
-				void openFile(Gui g, File f)
-				{
-					importRobotCoordinationFileABB(g, f);
-				}
-			};
+				importRobotCoordinationFileABB(g, f);
+			}
+		};
 	}
 
 	// Aldebaran format, a simple format for specifying des
@@ -2217,13 +2322,16 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
+
 			// this exception is caught while opening
 			logger.error("Error while opening " + file.getAbsolutePath(), ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 
 		FileSecurity fileSecurity = gui.getFileSecurity();
+
 		if (SupremicaProperties.generalUseSecurity())
 		{
 			if (!fileSecurity.allowOpening(currProject))
@@ -2236,24 +2344,17 @@ public class ActionMan
 
 		if (!currProject.isDeterministic())
 		{
+
 			// JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
 			// return;
 			Object[] options = { "Continue", "Abort" };
+			int conf = JOptionPane.showOptionDialog(gui.getComponent(), "All automata are not determinstic. Abort?", "Non-determinism Found", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 
-			int conf = JOptionPane.showOptionDialog(gui.getComponent(),
-													"All automata are not determinstic. Abort?",
-													"Non-determinism Found",
-													JOptionPane.YES_NO_OPTION,
-													JOptionPane.WARNING_MESSAGE,
-													null,
-													options,
-													options[1]);
-
-			if(conf == JOptionPane.YES_OPTION)
+			if (conf == JOptionPane.YES_OPTION)
 			{
 				logger.warn("Non-deterministic automaton loaded. You're on your own.");
 			}
-			else // NO_OPTION
+			else    // NO_OPTION
 			{
 				return;
 			}
@@ -2270,9 +2371,9 @@ public class ActionMan
 		try
 		{
 			int nbrOfAddedAutomata = gui.addProject(currProject);
+
 			//gui.addActions(currProject.getActions());
 			//gui.addControls(currProject.getControls());
-
 			gui.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
 		}
 		catch (Exception excp)
@@ -2286,17 +2387,16 @@ public class ActionMan
 		/*
 		if (nbrOfAutomataBeforeOpening == 0)
 		{
-			String projectName = currProject.getName();
+				String projectName = currProject.getName();
 
-			if (projectName != null)
-			{
-				gui.getVisualProjectContainer().getActiveProject().setName(projectName);
-				//gui.info("Project name changed to \"" + projectName + "\"");
-				gui.getVisualProjectContainer().getActiveProject().updateFrameTitles();
-			}
+				if (projectName != null)
+				{
+						gui.getVisualProjectContainer().getActiveProject().setName(projectName);
+						//gui.info("Project name changed to \"" + projectName + "\"");
+						gui.getVisualProjectContainer().getActiveProject().updateFrameTitles();
+				}
 		}
 		*/
-
 		if (nbrOfAutomataBeforeOpening > 0)
 		{
 			File projectFile = gui.getVisualProjectContainer().getActiveProject().getProjectFile();
@@ -2333,13 +2433,13 @@ public class ActionMan
 				try
 				{
 					if (currProject.hasExecutionParameters())
-						if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(gui.getComponent(),
-								"The project contains an execution part which will be lost when saving. Do a backup copy of " + currFile.getPath() + " first. Continue saving (and erase execution part from file)?",
-								"Saving will erase execution part from file",
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.WARNING_MESSAGE))
+					{
+						if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(gui.getComponent(), "The project contains an execution part which will be lost when saving. Do a backup copy of " + currFile.getPath() + " first. Continue saving (and erase execution part from file)?", "Saving will erase execution part from file", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE))
+						{
 							return;
-						
+						}
+					}
+
 					FileSecurity fileSecurity = gui.getFileSecurity();
 
 					if (SupremicaProperties.generalUseSecurity())
@@ -2420,12 +2520,14 @@ public class ActionMan
 		{
 			logger.error("Error while importing " + file.getAbsolutePath(), ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
 
 	public static void importValidFile(Gui gui, File file)
 	{
+
 		// logger.info("Importing " + file.getAbsolutePath() + " ...");
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -2441,6 +2543,7 @@ public class ActionMan
 		{
 			logger.error("Error while importing " + file.getAbsolutePath(), ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
@@ -2461,12 +2564,14 @@ public class ActionMan
 		{
 			logger.error("Error while importing " + file.getAbsolutePath(), ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
 
 	public static void importRobotCoordinationFile(Gui gui, File file)
 	{
+
 		// logger.info("Importing " + file.getAbsolutePath() + " ...");
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
 
@@ -2482,29 +2587,32 @@ public class ActionMan
 		{
 			logger.error("Error while importing " + file.getAbsolutePath(), ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
 
 	// File.Import.FromRobotCoordinationABB
 	public static void importRobotCoordinationFileABB(Gui gui, File file)
-		{
-			// logger.info("Importing " + file.getAbsolutePath() + " ...");
-			gui.info("Importing " + file.getAbsolutePath() + " ...");
+	{
 
-			ConvertToAutomata.conversionToAutomata(file);
+		// logger.info("Importing " + file.getAbsolutePath() + " ...");
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+		ConvertToAutomata.conversionToAutomata(file);
 	}
 
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true))
 		{
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
+
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -2526,30 +2634,32 @@ public class ActionMan
 	// selectAll action performed
 	public static void selectAll_actionPerformed(Gui gui)
 	{
+
 		// theAutomatonTable.selectAll();
 		gui.selectAll();
 	}
 
 /* Moved to the FindStates UserAction
-	// Find States... action selected
-	public static void findStates_action(Gui gui)
-	{
-		VisualProject theProject = gui.getVisualProjectContainer().getActiveProject();
-		Automata selectedAutomata = gui.getSelectedAutomata();
-		// gui.info("Nbr of selected automata: " + selectedAutomata.size());
-		FindStates find_states = new FindStates(theProject, selectedAutomata);
+		// Find States... action selected
+		public static void findStates_action(Gui gui)
+		{
+				VisualProject theProject = gui.getVisualProjectContainer().getActiveProject();
+				Automata selectedAutomata = gui.getSelectedAutomata();
+				// gui.info("Nbr of selected automata: " + selectedAutomata.size());
+				FindStates find_states = new FindStates(theProject, selectedAutomata);
 
-		try
-		{
-			find_states.execute();
+				try
+				{
+						find_states.execute();
+				}
+				catch (Exception ex)
+				{
+						logger.error("Exception in Find States. ", ex);
+						logger.debug(ex.getStackTrace());
+				}
 		}
-		catch (Exception ex)
-		{
-			logger.error("Exception in Find States. ", ex);
-			logger.debug(ex.getStackTrace());
-		}
-	}
 */
+
 	// Delete All - this really implements Close Project
 	public static void automataDeleteAll_actionPerformed(Gui gui)
 	{
@@ -2561,20 +2671,25 @@ public class ActionMan
 	// Crop to selection - delete all unselected automata
 	public static void automataCrop_actionPerformed(Gui gui)
 	{
+
 		//Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() == 0)
 		{
+
 			// Use DeleteAll instead
 			automataDeleteAll_actionPerformed(gui);
+
 			return;
 		}
 
 		Automaton currAutomaton;
 		String currAutomatonName;
 
-		for (int i = 0; i < gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata(); i++)
+		for (int i = 0;
+				i < gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
+				i++)
 		{
 			try
 			{
@@ -2584,6 +2699,7 @@ public class ActionMan
 			{
 				logger.error("Exception in VisualProjectContainer. " + ex);
 				logger.debug(ex.getStackTrace());
+
 				return;
 			}
 
@@ -2599,11 +2715,14 @@ public class ActionMan
 				{
 					logger.error("Exception while removing " + currAutomatonName, ex);
 					logger.debug(ex.getStackTrace());
+
 					return;
 				}
-				i--; // Step back! One automaton has been removed!
+
+				i--;    // Step back! One automaton has been removed!
 			}
 		}
+
 		gui.clearSelection();
 	}
 
@@ -2627,6 +2746,7 @@ public class ActionMan
 	public static void evoCompSynchTable(Gui gui, boolean append)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
@@ -2638,52 +2758,62 @@ public class ActionMan
 
 		// Reuse syncOptions
 		SynchronizationOptions syncOptions;
-
-		double[] data;// = new double[8+1];
+		double[] data;    // = new double[8+1];
 
 		try
 		{
+
 			// Synchronize the automata using default options (prediction will
 			// probably be a problem if there are non-prioritized events)
 			syncOptions = new SynchronizationOptions();
 			outFile = new FileWriter("SynchTable.txt", append);
 
 			int dataAmount = 1000;
-			for (int i=0; i<dataAmount; i++)
-			{
-				// Find two random automata
-				automatonA = selectedAutomata.getAutomatonAt((int) (Math.random()*selectedAutomata.size()));
-				automatonB = selectedAutomata.getAutomatonAt((int) (Math.random()*selectedAutomata.size()));
-				//System.out.println(automatonA.getName() + " " + automatonB.getName());
 
+			for (int i = 0; i < dataAmount; i++)
+			{
+
+				// Find two random automata
+				automatonA = selectedAutomata.getAutomatonAt((int) (Math.random() * selectedAutomata.size()));
+				automatonB = selectedAutomata.getAutomatonAt((int) (Math.random() * selectedAutomata.size()));
+
+				//System.out.println(automatonA.getName() + " " + automatonB.getName());
 				data = GeneticAlgorithms.extractData(automatonA, automatonB);
+
 				Automata theTwoAutomata = new Automata();
+
 				theTwoAutomata.addAutomaton(automatonA);
 				theTwoAutomata.addAutomaton(automatonB);
+
 				double correctValue = (double) GeneticAlgorithms.calculateSynchronizationSize(theTwoAutomata, syncOptions);
 
-				if ((i>dataAmount/4) && (data[0]*data[1] == correctValue))
+				if ((i > dataAmount / 4) && (data[0] * data[1] == correctValue))
 				{
+
 					// Too much data of this kind otherwise...
 					i--;
 				}
 				else
 				{
+
 					// Writes data[0]..data[GA_DATA_SIZE] and correctValue to the file
-					for (int j=0;j<data.length;j++)
+					for (int j = 0; j < data.length; j++)
 					{
 						outFile.write(data[j] + "\t");
 					}
+
 					outFile.write(correctValue + "\t");
 					outFile.write(automatonA.getName() + " " + automatonB.getName() + "\n");
 					outFile.flush();
 				}
 			}
+
 			outFile.close();
 		}
 		catch (Exception ex)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Error in ActionMan.evoCompSynchTable(): " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
 	}
@@ -2691,6 +2821,7 @@ public class ActionMan
 	public static void evoCompPredictSize(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
@@ -2701,47 +2832,53 @@ public class ActionMan
 		if (predictedSize > 0.0)
 		{
 			double[] data;
+
 			if (selectedAutomata.size() == 2)
-			    data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(1));
+			{
+				data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(1));
+			}
 			else if (selectedAutomata.size() == 1)
+			{
 				data = GeneticAlgorithms.extractData(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(0));
+			}
 			else
+			{
 				return;
+			}
+
 			int realSize = GeneticAlgorithms.calculateSynchronizationSize(selectedAutomata);
-			int worstSize = (int) (data[0]*data[1]);
-			JOptionPane.showMessageDialog(gui.getComponent(), "The synchronization is predicted to have "
-										  + (float) predictedSize + " states. \nSynchronization actually " +
-										  "gives exactly " + realSize + " states (worst case " + worstSize +
-										  ").", "Prediction", JOptionPane.INFORMATION_MESSAGE);
+			int worstSize = (int) (data[0] * data[1]);
+
+			JOptionPane.showMessageDialog(gui.getComponent(), "The synchronization is predicted to have " + (float) predictedSize + " states. \nSynchronization actually " + "gives exactly " + realSize + " states (worst case " + worstSize + ").", "Prediction", JOptionPane.INFORMATION_MESSAGE);
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "The prediction failed. (Predicted size: " + predictedSize + ")", "Prediction",
-										  JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "The prediction failed. (Predicted size: " + predictedSize + ")", "Prediction", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	/**
 	 * Just a test...
 	 */
+
 	/*
 	public static void trainSimulator(Gui gui)
 	{
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
+			Thread thread = new Thread(new Runnable()
 			{
-				TrainSimulator trainSimulator = new TrainSimulator();
-				trainSimulator.exec();
-			}
-		});
-		thread.start();
-		//TrainSimulator trainSimulator = new TrainSimulator();
-		//trainSimulator.exec();
+					public void run()
+					{
+							TrainSimulator trainSimulator = new TrainSimulator();
+							trainSimulator.exec();
+					}
+			});
+			thread.start();
+			//TrainSimulator trainSimulator = new TrainSimulator();
+			//trainSimulator.exec();
 	}
 	*/
-
 	static RobotCellExaminer theRobotCellExaminer = null;
+
 	public static void showRobotCellExaminer(Gui gui)
 	{
 		Thread thread = new Thread(new Runnable()
@@ -2749,14 +2886,19 @@ public class ActionMan
 			public void run()
 			{
 				if (theRobotCellExaminer == null)
+				{
 					theRobotCellExaminer = new RobotCellExaminer(ActionMan.getGui().getFrame());
+				}
+
 				theRobotCellExaminer.setVisible(true);
+
 				/*
 				RobotCellExaminer examiner = new RobotCellExaminer(ActionMan.getGui().getFrame());
 				examiner.setVisible(true);
 				*/
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2767,9 +2909,11 @@ public class ActionMan
 			void openFile(Gui g, File f)
 			{
 				String stationName;
+
 				stationName = f.getAbsolutePath();
 
 				RobotStudioLink robotStudioLink = new RobotStudioLink(g, stationName);
+
 				robotStudioLink.init();
 			}
 		};
@@ -2784,6 +2928,7 @@ public class ActionMan
 				RobotStudioLink.createMutexZonesManual();
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2796,6 +2941,7 @@ public class ActionMan
 				RobotStudioLink.createMutexZonesGrid();
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2808,6 +2954,7 @@ public class ActionMan
 				RobotStudioLink.createMutexZonesFromSpan();
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2820,30 +2967,31 @@ public class ActionMan
 				RobotStudioLink.extractAutomata();
 			}
 		});
+
 		thread.start();
 	}
 
 /*
-	public static void robotStudioLink(Gui gui)
-	{
-		new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
+		public static void robotStudioLink(Gui gui)
 		{
-			void openFile(Gui g, File f)
-			{
-				String stationName;
-				stationName = f.getAbsolutePath();
+				new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
+				{
+						void openFile(Gui g, File f)
+						{
+								String stationName;
+								stationName = f.getAbsolutePath();
 
-				// Start thread
-				RobotStudioLink robotStudioLink = new RobotStudioLink(g, stationName);
-				robotStudioLink.start();
-			}
-		};
-	}
+								// Start thread
+								RobotStudioLink robotStudioLink = new RobotStudioLink(g, stationName);
+								robotStudioLink.start();
+						}
+				};
+		}
 */
-
 	public static void robotStudioExecuteRobot(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (selectedAutomata.size() != 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -2874,6 +3022,7 @@ public class ActionMan
 				CreateXml.createPathsInRS();
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2886,6 +3035,7 @@ public class ActionMan
 				CreateXml.createSpansInRS();
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2898,6 +3048,7 @@ public class ActionMan
 				CreateXml.createMutexZonesInRS();
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2910,6 +3061,7 @@ public class ActionMan
 				CreateXml.addViaPointsInRS();
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2921,12 +3073,14 @@ public class ActionMan
 	public static void executeScheduledAutomaton(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+
 		if (selectedAutomata.size() != 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
+
 		final Automaton a = new Automaton(selectedAutomata.getAutomatonAt(0));
 		Thread thread = new Thread(new Runnable()
 		{
@@ -2935,6 +3089,7 @@ public class ActionMan
 				CreateXml.executeScheduledAutomaton(a);
 			}
 		});
+
 		thread.start();
 	}
 
@@ -2947,11 +3102,11 @@ public class ActionMan
 				CreateXml.demoCoordination();
 			}
 		});
+
 		thread.start();
 	}
 
-
-	// TestCases... - open the test cases dialog, and add the result to the current set of automata	public static void testCases(Gui gui)
+	// TestCases... - open the test cases dialog, and add the result to the current set of automata public static void testCases(Gui gui)
 	public static void testCases(Gui gui)
 		throws Exception
 	{
@@ -2960,11 +3115,12 @@ public class ActionMan
 		testCasesDialog.show();
 
 		//Project project = testCasesDialog.getProject();
+
 /*
-		if (project != null)
-		{
-			gui.addProject(project);
-		}
+				if (project != null)
+				{
+						gui.addProject(project);
+				}
 */
 	}
 
@@ -2995,9 +3151,11 @@ public class ActionMan
 
 			return;
 		}
+
 		if (!selectedProject.isAllEventsPrioritized())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
 
@@ -3023,10 +3181,12 @@ public class ActionMan
 					{
 						prefixName = pathName;
 					}
+
 					File sFile = new File(prefixName + ".s");
 					File gFile = new File(prefixName + ".g");
 					File lFile = new File(prefixName + ".l");
 					File pFile = new File(prefixName + ".p");
+
 					try
 					{
 						AutomataToSattLineSFC exporter = new AutomataToSattLineSFC(selectedProject);
@@ -3040,10 +3200,11 @@ public class ActionMan
 					{
 						logger.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
-					logger.info("SattLine SFC files successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 
+					logger.info("SattLine SFC files successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 				}
 			}
 		}
@@ -3060,9 +3221,11 @@ public class ActionMan
 
 			return;
 		}
+
 		if (!selectedProject.isAllEventsPrioritized())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
 
@@ -3088,10 +3251,12 @@ public class ActionMan
 					{
 						prefixName = pathName;
 					}
+
 					File sFile = new File(prefixName + ".s");
 					File gFile = new File(prefixName + ".g");
 					File lFile = new File(prefixName + ".l");
 					File pFile = new File(prefixName + ".p");
+
 					try
 					{
 						AutomataToSattLineSFCForBallProcess exporter = new AutomataToSattLineSFCForBallProcess(selectedProject);
@@ -3105,10 +3270,11 @@ public class ActionMan
 					{
 						logger.error("Exception while generating Ball Process SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
-					logger.info("SattLine SFC files for the Ball Process successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 
+					logger.info("SattLine SFC files for the Ball Process successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 				}
 			}
 		}
@@ -3125,16 +3291,21 @@ public class ActionMan
 
 			return;
 		}
+
 		if (selectedProject.hasSelfLoop())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Self-loops are not supported in SFC. The ST and IL mode can handle self-loops!", "Not supported", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
+
 		if (!selectedProject.isAllEventsPrioritized())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode. The ST and IL mode can handle non-prioritized events!", "Not supported", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
+
 		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
@@ -3148,6 +3319,7 @@ public class ActionMan
 					String pathName = currFile.getAbsolutePath();
 					String prefixName = null;
 					String filename = currFile.getName();
+
 					if (pathName.endsWith(".prj"))
 					{
 						prefixName = pathName.substring(0, pathName.length() - 4);
@@ -3157,28 +3329,30 @@ public class ActionMan
 					{
 						prefixName = pathName;
 					}
+
 					File appFile = new File(prefixName + ".app");
 					File prjFile = new File(prefixName + ".prj");
+
 					try
 					{
 						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedProject);
 
 						exporter.serializeApp(appFile, filename);
 						exporter.serializePrj(prjFile, filename);
-
 					}
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("ABB Control Builder SFC files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
 				}
 			}
 		}
 	}
-
 
 	//open JgrafchartEditor
 	public static void openJGrafchartEditor(Gui gui)
@@ -3186,13 +3360,15 @@ public class ActionMan
 		try
 		{
 			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-			VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
+			VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
+
 			theProject.getJGrafchartEditor();
 		}
 		catch (Exception ex)
 		{
 			logger.error("Exception while getting JGrafchart Editor");
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
@@ -3201,8 +3377,10 @@ public class ActionMan
 	public static void shoeFactoryConfigurator()
 	{
 		Configit con = new Configit(gui);
+
 		con.setLocationRelativeTo(null);
 		con.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
 		try
 		{
 			con.show();
@@ -3216,13 +3394,14 @@ public class ActionMan
 	// shoeFactory - build plant
 	public static void shoeFactoryBuildPlant(Gui gui)
 	{
+
 		//Project selectedProject = gui.getSelectedProject();
 		Plant newPlant = new Plant();
 		Project newProject = newPlant.getPlant();
+
 		try
 		{
 			gui.addProject(newProject);
-
 		}
 		catch (Exception ex)
 		{
@@ -3234,8 +3413,10 @@ public class ActionMan
 	public static void shoeFactoryConfiguratorDEMO()
 	{
 		ConfigitDEMO con = new ConfigitDEMO(gui);
+
 		con.setLocationRelativeTo(null);
 		con.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
 		try
 		{
 			con.show();
@@ -3245,7 +3426,6 @@ public class ActionMan
 			logger.error("shoeFactoryConfigurator: " + ex.getMessage());
 		}
 	}
-
 
 	// Generate ABB Control Builder IL
 	public static void ProjectToControlBuilderIL(Gui gui)
@@ -3258,6 +3438,7 @@ public class ActionMan
 
 			return;
 		}
+
 		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
@@ -3271,6 +3452,7 @@ public class ActionMan
 					String pathName = currFile.getAbsolutePath();
 					String prefixName = null;
 					String filename = currFile.getName();
+
 					if (pathName.endsWith(".prj"))
 					{
 						prefixName = pathName.substring(0, pathName.length() - 4);
@@ -3280,8 +3462,10 @@ public class ActionMan
 					{
 						prefixName = pathName;
 					}
+
 					File appFile = new File(prefixName + ".app");
 					File prjFile = new File(prefixName + ".prj");
+
 					try
 					{
 						AutomataToControlBuilderIL exporter = new AutomataToControlBuilderIL(selectedProject);
@@ -3293,8 +3477,10 @@ public class ActionMan
 					{
 						logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("ABB Control Builder IL files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
 				}
 			}
@@ -3312,6 +3498,7 @@ public class ActionMan
 
 			return;
 		}
+
 		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
 
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
@@ -3325,6 +3512,7 @@ public class ActionMan
 					String pathName = currFile.getAbsolutePath();
 					String prefixName = null;
 					String filename = currFile.getName();
+
 					if (pathName.endsWith(".prj"))
 					{
 						prefixName = pathName.substring(0, pathName.length() - 4);
@@ -3334,11 +3522,14 @@ public class ActionMan
 					{
 						prefixName = pathName;
 					}
+
 					File appFile = new File(prefixName + ".app");
 					File prjFile = new File(prefixName + ".prj");
+
 					try
 					{
 						AutomataToControlBuilderST exporter = new AutomataToControlBuilderST(selectedProject);
+
 						exporter.serializeApp(appFile, filename);
 						exporter.serializePrj(prjFile, filename);
 					}
@@ -3346,8 +3537,10 @@ public class ActionMan
 					{
 						logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("ABB Control Builder ST files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
 				}
 			}
@@ -3378,49 +3571,56 @@ public class ActionMan
 				{
 					try
 					{
-
 						AutomataToC exporter = new AutomataToC(selectedAutomata);
-
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
 						exporter.serialize(theWriter);
-
 						theWriter.close();
-
 					}
 					catch (Exception ex)
 					{
-						logger.error("Exception while generating C code to file " + currFile.getAbsolutePath());						logger.debug(ex.getStackTrace());
+						logger.error("Exception while generating C code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("C file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
 		}
 	}
+
 	// Generate Java-code
 	public static void AutomataToJava(Gui gui)
 	{
 		Project selectedProject = gui.getSelectedProject();
+
 		if (selectedProject.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
+
 		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.JAVA);
+
 		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = fileExporter.getSelectedFile();
+
 			if (currFile != null)
 			{
 				if (!currFile.isDirectory())
 				{
 					try
 					{
+
 						//Assuming a filename in the form classname.java
 						String classname = currFile.getName().substring(0, currFile.getName().length() - 5);
 						AutomataToJava exporter = new AutomataToJava(selectedProject, classname);
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
+
 						exporter.serialize(theWriter);
 						theWriter.close();
 					}
@@ -3428,8 +3628,10 @@ public class ActionMan
 					{
 						logger.error("Exception while generating Java code to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("Java file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
@@ -3460,22 +3662,20 @@ public class ActionMan
 				{
 					try
 					{
-
 						AutomataToNQC exporter = new AutomataToNQC(selectedAutomata);
-
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
 						exporter.serializeNQC(theWriter);
-
 						theWriter.close();
-
 					}
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating Mindstorm NQC text code to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("Mindstorm NQC file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
@@ -3497,6 +3697,7 @@ public class ActionMan
 		if (!selectedAutomata.isAllEventsPrioritized())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode!", "Not supported", JOptionPane.ERROR_MESSAGE);
+
 			return;
 		}
 
@@ -3512,22 +3713,20 @@ public class ActionMan
 				{
 					try
 					{
-
 						AutomataToSMV exporter = new AutomataToSMV(selectedAutomata);
-
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
 						exporter.serializeSMV(theWriter);
-
 						theWriter.close();
-
 					}
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating SMV text code to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("SMVfile successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
@@ -3537,6 +3736,7 @@ public class ActionMan
 	// Generate 1131 Structured Text
 	public static void ProjectTo1131ST(Gui gui)
 	{
+
 		// Automata selectedProject = gui.getselectedProject();
 		Project selectedProject = gui.getSelectedProject();
 
@@ -3559,23 +3759,21 @@ public class ActionMan
 				{
 					try
 					{
-
 						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
-
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
 						exporter.serializeStructuredText(theWriter);
-
 						theWriter.close();
-
 					}
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating 1131 Structured text code to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getMessage());
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("IEC-61131 ST file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
@@ -3585,6 +3783,7 @@ public class ActionMan
 	// Generate 1131 Instruction List
 	public static void ProjectTo1131IL(Gui gui)
 	{
+
 		//Automata selectedProject = gui.getselectedProject();
 		Project selectedProject = gui.getSelectedProject();
 
@@ -3617,21 +3816,20 @@ public class ActionMan
 					try
 					{
 						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
-
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
 						exporter.serializeInstructionList(theWriter);
-
 						theWriter.close();
-
 					}
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating 1131 Instruction list code to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getMessage());
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("IEC-61131 IL file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
@@ -3651,6 +3849,7 @@ public class ActionMan
 		}
 
 		JFileChooser outputDir = new JFileChooser();
+
 		outputDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
 		if (outputDir.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
@@ -3663,23 +3862,25 @@ public class ActionMan
 				{
 					try
 					{
-						File tmpFile  = File.createTempFile("softplc", ".il");
+						File tmpFile = File.createTempFile("softplc", ".il");
+
 						tmpFile.deleteOnExit();
+
 						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
 						PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
 
 						exporter.serializeInstructionList(theWriter);
-
 						theWriter.close();
-
 						new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), currFile.getAbsolutePath());
 					}
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating Java Bytecode to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
+
 					logger.info("Java Bytecode file successfully generated at " + currFile.getAbsolutePath());
 				}
 				else
@@ -3694,7 +3895,7 @@ public class ActionMan
 	public static void runSoftPLCSimulation(Gui gui)
 	{
 		Project selectedProject = gui.getSelectedProject();
-                File tmpdir;
+		File tmpdir;
 
 		if (selectedProject.size() < 1)
 		{
@@ -3703,31 +3904,37 @@ public class ActionMan
 			return;
 		}
 
-        SoftplcSimulationDialog d = new SoftplcSimulationDialog(null, "Run Simulation...", true);
+		SoftplcSimulationDialog d = new SoftplcSimulationDialog(null, "Run Simulation...", true);
 
-        if (!d.showDialog())
-        	return;
-
-        System.out.println(d.getIOInterface().getPath());
-        try
+		if (!d.showDialog())
 		{
-			File tmpFile  = File.createTempFile("softplc", ".il");
+			return;
+		}
+
+		System.out.println(d.getIOInterface().getPath());
+
+		try
+		{
+			File tmpFile = File.createTempFile("softplc", ".il");
+
 			tmpFile.deleteOnExit();
+
 			AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
 			PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
 
 			exporter.serializeInstructionList(theWriter);
 			theWriter.close();
 
-   			tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
+			tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
 
 			new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), tmpdir.getAbsolutePath());
-   			new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
+			new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
 		}
 		catch (Exception ex)
 		{
 			logger.error("Exception while generating Java Bytecode to file");
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 
@@ -3739,13 +3946,15 @@ public class ActionMan
 		try
 		{
 			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-			VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
+			VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
+
 			theProject.getRecipeEditor();
 		}
 		catch (Exception ex)
 		{
 			logger.error("Exception while getting Recipe Editor");
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
@@ -3755,13 +3964,15 @@ public class ActionMan
 		try
 		{
 			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-			VisualProject theProject = (VisualProject)projectContainer.getActiveProject();
+			VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
+
 			theProject.getCellEditor();
 		}
 		catch (Exception ex)
 		{
 			logger.error("Exception while getting Recipe Editor");
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}
@@ -3775,111 +3986,115 @@ public class ActionMan
 	 * @param mustHaveInitial Test requires automata to have initial states.
 	 * @param mustHaveType Test requires that the automata are not of undefined type.
 	 */
+
 	/* This method now resides in automata.Automata
 	private static boolean sanityCheck(Automata theAutomata, int minSize, boolean mustHaveInitial,
-											   boolean mustHaveType)
+																					   boolean mustHaveType)
 	{
-		if (mustHaveInitial)
-		{
-			// All automata must have initial states.
-			// There is another method for this, Automata.hasInitialState(),
-			// but it doesn't tell which automaton breaks the test...
-			Iterator autIt = theAutomata.iterator();
-			while (autIt.hasNext())
+			if (mustHaveInitial)
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
+					// All automata must have initial states.
+					// There is another method for this, Automata.hasInitialState(),
+					// but it doesn't tell which automaton breaks the test...
+					Iterator autIt = theAutomata.iterator();
+					while (autIt.hasNext())
+					{
+							Automaton currAutomaton = (Automaton) autIt.next();
 
-				// Does this automaton have an initial state?
-				if (!currAutomaton.hasInitialState())
-				{
-					String message = "The automaton \"" + currAutomaton.getName() +
-						"\" does not have an initial state.\n" +
-						"Skip this automaton or Cancel the whole operation?";
-					Object[] options = { "Skip", "Cancel" };
-					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-															JOptionPane.OK_CANCEL_OPTION,
-															JOptionPane.WARNING_MESSAGE, null,
-															options, options[1]);
+							// Does this automaton have an initial state?
+							if (!currAutomaton.hasInitialState())
+							{
+									String message = "The automaton \"" + currAutomaton.getName() +
+											"\" does not have an initial state.\n" +
+											"Skip this automaton or Cancel the whole operation?";
+									Object[] options = { "Skip", "Cancel" };
+									int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																													JOptionPane.OK_CANCEL_OPTION,
+																													JOptionPane.WARNING_MESSAGE, null,
+																													options, options[1]);
 
-					if(cont == JOptionPane.OK_OPTION)
-					{   // Skip
-						// Unselect the automaton
-						gui.unselectAutomaton(theAutomata.getAutomatonIndex(currAutomaton));
-						// Skip this automaton (remove it from this)
-						autIt.remove();
+									if(cont == JOptionPane.OK_OPTION)
+									{   // Skip
+											// Unselect the automaton
+											gui.unselectAutomaton(theAutomata.getAutomatonIndex(currAutomaton));
+											// Skip this automaton (remove it from this)
+											autIt.remove();
+									}
+									else // JOptionPane.CANCEL_OPTION
+									{   // Cancel
+											// This is iNsanE!
+											return false;
+									}
+							}
 					}
-					else // JOptionPane.CANCEL_OPTION
-					{   // Cancel
-						// This is iNsanE!
-						return false;
-					}
-				}
 			}
-		}
 
-		if (mustHaveType)
-		{
-			// All automata must have a defined type, i.e. must not be of type "Undefined".
-			Iterator autIt = theAutomata.iterator();
-			while (autIt.hasNext())
+			if (mustHaveType)
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
+					// All automata must have a defined type, i.e. must not be of type "Undefined".
+					Iterator autIt = theAutomata.iterator();
+					while (autIt.hasNext())
+					{
+							Automaton currAutomaton = (Automaton) autIt.next();
 
-				// Is this Automaton's type AutomatonType.Undefined?
-				if(currAutomaton.getType() == AutomatonType.Undefined)
-				{
-					String message = "The automaton \"" + currAutomaton.getName() +
-						"\" is of type \"Undefined\".\n" +
-						"Skip this automaton or Cancel the whole operation?";
-					Object[] options = { "Skip", "Cancel" };
-					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-															JOptionPane.OK_CANCEL_OPTION,
-															JOptionPane.WARNING_MESSAGE, null,
-															options, options[1]);
+							// Is this Automaton's type AutomatonType.Undefined?
+							if(currAutomaton.getType() == AutomatonType.Undefined)
+							{
+									String message = "The automaton \"" + currAutomaton.getName() +
+											"\" is of type \"Undefined\".\n" +
+											"Skip this automaton or Cancel the whole operation?";
+									Object[] options = { "Skip", "Cancel" };
+									int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																													JOptionPane.OK_CANCEL_OPTION,
+																													JOptionPane.WARNING_MESSAGE, null,
+																													options, options[1]);
 
-					if(cont == JOptionPane.OK_OPTION)
-					{   // Skip
-						// Unselect the automaton
-						gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
-						// Skip this automaton (remove it from this)
-						autIt.remove();
+									if(cont == JOptionPane.OK_OPTION)
+									{   // Skip
+											// Unselect the automaton
+											gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
+											// Skip this automaton (remove it from this)
+											autIt.remove();
+									}
+									else // JOptionPane.CANCEL_OPTION
+									{   // Cancel
+											// This is iNsaNe!
+											return false;
+									}
+							}
 					}
-					else // JOptionPane.CANCEL_OPTION
-					{   // Cancel
-						// This is iNsaNe!
-						return false;
-					}
-				}
 			}
-		}
 
-		// Make sure the automata has the right size!
-		if (minSize > 0 && theAutomata.size() < minSize)
-		{
-			String size;
-			if (minSize == 1)
-				size = "one automaton";
-			else if (minSize == 2)
-				size = "two automata";
-			else
-				size = minSize + " automata";
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least " +
-										  size + " must be selected!",
-										  "Alert", JOptionPane.ERROR_MESSAGE);
-			// This is inSaNe!
-			return false;
-		}
+			// Make sure the automata has the right size!
+			if (minSize > 0 && theAutomata.size() < minSize)
+			{
+					String size;
+					if (minSize == 1)
+							size = "one automaton";
+					else if (minSize == 2)
+							size = "two automata";
+					else
+							size = minSize + " automata";
+					JOptionPane.showMessageDialog(gui.getFrame(), "At least " +
+																			  size + " must be selected!",
+																			  "Alert", JOptionPane.ERROR_MESSAGE);
+					// This is inSaNe!
+					return false;
+			}
 
-		// Sane!
-		return true;
+			// Sane!
+			return true;
 	}
 	*/
 
 	// BDD developer stuff: these are disabled if org.supremica.util.BDD.Options.dev_mode == false
-	public static void DoBDDReachability() {
+	public static void DoBDDReachability()
+	{
 		org.supremica.util.BDD.test.DeveloperTest.DoReachability(gui.getSelectedAutomata());
 	}
-	public static void DoBDDCoReachability() {
+
+	public static void DoBDDCoReachability()
+	{
 		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
 	}
 
@@ -3894,6 +4109,7 @@ public class ActionMan
 		{
 			Automata all = gui.getVisualProjectContainer().getActiveProject();
 			Collection v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
+
 			gui.selectAutomata(v);
 		}
 		catch (Exception ex)
@@ -3912,6 +4128,7 @@ public class ActionMan
 		{
 			Automata all = gui.getVisualProjectContainer().getActiveProject();
 			Collection v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
+
 			gui.selectAutomata(v);
 		}
 		catch (Exception ex)
@@ -3928,7 +4145,6 @@ public class ActionMan
 	{
 		try
 		{
-
 			Project all = gui.getVisualProjectContainer().getActiveProject();
 			Automata new_ = AutomataSimplifier.simplify(all);
 
@@ -3944,9 +4160,7 @@ public class ActionMan
 		{
 			logger.error(ex);
 		}
-
 	}
-
 }
 
 // ActionMan

@@ -2,7 +2,6 @@ package org.supremica.gui.useractions;
 
 import java.awt.event.*;
 import javax.swing.*;
-
 import org.supremica.gui.Supremica;
 import org.supremica.gui.ActionMan;
 
@@ -12,6 +11,7 @@ public class OpenAction
 	public OpenAction()
 	{
 		super("Open...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));
+
 		putValue(SHORT_DESCRIPTION, "Open a new project");
 	}
 
@@ -19,5 +19,4 @@ public class OpenAction
 	{
 		ActionMan.fileOpen(ActionMan.getGui());
 	}
-
 }

@@ -4,24 +4,22 @@ import java.io.*;
 import java.util.*;
 import org.supremica.external.jgrafchart.toSMV.SFCDataStruct.*;
 
-
 public class SFCToSMV
 {
 	SFC sfc;
 	FileWriter writer;
-
-	List allVariables ;
+	List allVariables;
 	List allDigitalInputs;
 	List listOfSFCsSteps = new LinkedList();
 	List allTransitions;
 	List allSteps;
 	List allParallelJoins;
 	List allParallelSplits;
-	List mainSet = new LinkedList();//This main set consists of Steps,Variables and Digital outputs
-	List digitalInputSet = new LinkedList();//This set consists of digital input signals
+	List mainSet = new LinkedList();    //This main set consists of Steps,Variables and Digital outputs
+	List digitalInputSet = new LinkedList();    //This set consists of digital input signals
 	List setOfModifiedSMVVars;
 
-	public SFCToSMV(SFC sfc,String outputFilePath)
+	public SFCToSMV(SFC sfc, String outputFilePath)
 	{
 		this.sfc = sfc;
 
@@ -29,14 +27,13 @@ public class SFCToSMV
 		{
 			writer = new FileWriter(new File(outputFilePath));
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			System.err.println("IOException while creating the file");
 		}
 
 		retrieveSFCInfo();
 		buildSMVVariableSets();
-
 	}
 
 	public void writeCode()
@@ -44,75 +41,84 @@ public class SFCToSMV
 		writeMain();
 		writeStartBracket();
 		writeVariables();
+
 		int numberOfSFCs = listOfSFCsSteps.size();
-		if(numberOfSFCs > 1)
+
+		if (numberOfSFCs > 1)
 		{
-			defineTurnVariable(numberOfSFCs+1);
+			defineTurnVariable(numberOfSFCs + 1);
 		}
 
-		Iterator itLists = listOfSFCsSteps.iterator();//List having Lists of steps(each list an SFC)
+		Iterator itLists = listOfSFCsSteps.iterator();    //List having Lists of steps(each list an SFC)
 		int sfcNumber = 1;
 
 		/* For defining steps and start variables */
-		while(itLists.hasNext())
+		while (itLists.hasNext())
 		{
 			List stepsInOneSFC = (List) itLists.next();
+
 			defineSMVSteps(stepsInOneSFC);
-			writeVarDefinition("start_"+sfcNumber,"boolean");
-			writeVarInitValue("start_"+sfcNumber,"1");
+			writeVarDefinition("start_" + sfcNumber, "boolean");
+			writeVarInitValue("start_" + sfcNumber, "1");
 			writeBlankLine();
+
 			sfcNumber++;
 		}
-
 
 		itLists = listOfSFCsSteps.iterator();
 		sfcNumber = 1;
+
 		/* For defining Transition Relation */
-		while(itLists.hasNext())
+		while (itLists.hasNext())
 		{
 			List stepsInOneSFC = (List) itLists.next();
-			if(numberOfSFCs > 1)
+
+			if (numberOfSFCs > 1)
 			{
 				writeBlankLine();
-				write("\t--****************SFC # "+sfcNumber+"****************");
+				write("\t--****************SFC # " + sfcNumber + "****************");
 				writeBlankLine();
 			}
-			transitionRelation(stepsInOneSFC,sfcNumber,numberOfSFCs);
+
+			transitionRelation(stepsInOneSFC, sfcNumber, numberOfSFCs);
 			writeBlankLine();
+
 			sfcNumber++;
 		}
-		if(numberOfSFCs > 1)
+
+		if (numberOfSFCs > 1)
 		{
 			write("\t--**************** Input Phase ****************");
-			writeInputPhaseBlock("\t",numberOfSFCs);
+			writeInputPhaseBlock("\t", numberOfSFCs);
 		}
+
 		writeSpecifications();
 		writeEndBracket();
 		closeFile();
-
 	}
 
 	private void writeSpecifications()
 	{
 		write("\t--**************** Specifications ****************");
-
 		write("\n \t--**************** Reachability of all steps ****************");
 
 		for (Iterator sfcIt = allSteps.iterator(); sfcIt.hasNext(); )
 		{
 			SFCStep currStep = (SFCStep) sfcIt.next();
+
 			// reach_S1 : assert ( F(S1) );
 			write("\treachable_" + currStep.getId() + ": assert ( F(" + currStep.getId() + ") );");
 		}
 
 		write("\n \t--**************** Deadlock check all steps ****************");
+
 		for (Iterator sfcIt = allSteps.iterator(); sfcIt.hasNext(); )
 		{
 			SFCStep currStep = (SFCStep) sfcIt.next();
+
 			// dead_S1 : assert G( S -> F(~S) );
 			write("\tdeadlockfree_" + currStep.getId() + ": assert G( " + currStep.getId() + " -> F(~" + currStep.getId() + ") );");
 		}
-
 	}
 
 	private void writeMain()
@@ -134,13 +140,15 @@ public class SFCToSMV
 		allParallelJoins = sfc.getAllParallelJoins();
 
 		scanForMultipleSfc(allSteps);
-		System.out.println("Number of SFCs :"+ listOfSFCsSteps.size());
+		System.out.println("Number of SFCs :" + listOfSFCsSteps.size());
 
-		if(allParallelSplits != null)
+		if (allParallelSplits != null)
 		{
-			System.out.println("Number of Parallel Links :"+allParallelJoins.size());
+			System.out.println("Number of Parallel Links :" + allParallelJoins.size());
+
 			List splitTrans = getParallelSplitTrans(allTransitions);
-			System.out.println("Number of Parallel Splits"+allParallelSplits.size());
+
+			System.out.println("Number of Parallel Splits" + allParallelSplits.size());
 		}
 	}
 
@@ -149,29 +157,34 @@ public class SFCToSMV
 		Iterator it = allSteps.iterator();
 		int numberOfInitialSteps = 0;
 		List allInitialSteps = new LinkedList();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
 			SFCStep step = (SFCStep) it.next();
-			if(step.isInitialStep())
+
+			if (step.isInitialStep())
 			{
 				numberOfInitialSteps++;
+
 				allInitialSteps.add(step);
 			}
 		}
-		if(numberOfInitialSteps == 1) //implies that it is a single SFC
+
+		if (numberOfInitialSteps == 1)    //implies that it is a single SFC
 		{
 			listOfSFCsSteps.add(allSteps);
 		}
-		else if(numberOfInitialSteps > 1)// implies that there are more than 1 SFCs
+		else if (numberOfInitialSteps > 1)    // implies that there are more than 1 SFCs
 		{
 			Iterator itMultiSFC = allInitialSteps.iterator();
 
-			while(itMultiSFC.hasNext())
+			while (itMultiSFC.hasNext())
 			{
 				SFCStep aStep = (SFCStep) itMultiSFC.next();
 				List allNextStepsForOneSFC = new LinkedList();
+
 				allNextStepsForOneSFC.add(aStep);
-				getNextSteps(aStep,allNextStepsForOneSFC);
+				getNextSteps(aStep, allNextStepsForOneSFC);
 				listOfSFCsSteps.add(allNextStepsForOneSFC);
 			}
 		}
@@ -179,35 +192,38 @@ public class SFCToSMV
 		{
 			System.out.println("No initial Step :-|......strange SFC!!");
 		}
-
 	}
-
 
 	private void buildSMVVariableSets()
 	{
 		Iterator itSteps = allSteps.iterator();
-		while(itSteps.hasNext())
+
+		while (itSteps.hasNext())
 		{
 			SFCStep step = (SFCStep) itSteps.next();
-			mainSet.add(step.getId());
 
+			mainSet.add(step.getId());
 		}
+
 		Iterator itVariables = allVariables.iterator();
-		while(itVariables.hasNext())
+
+		while (itVariables.hasNext())
 		{
 			SFCVariable aVariable = (SFCVariable) itVariables.next();
 			String varName = aVariable.getName();
+
 			mainSet.add(varName);
 		}
 
 		Iterator itDigitalInputs = allDigitalInputs.iterator();
-		while(itDigitalInputs.hasNext())
+
+		while (itDigitalInputs.hasNext())
 		{
 			SFCVariable aDigitalInput = (SFCVariable) itDigitalInputs.next();
 			String inputName = aDigitalInput.getName();
+
 			digitalInputSet.add(inputName);
 		}
-
 	}
 
 	/*
@@ -218,418 +234,471 @@ public class SFCToSMV
 	{
 		List splitTransitions = new LinkedList();
 		Iterator itTrans = transitions.iterator();
-		while(itTrans.hasNext())
+
+		while (itTrans.hasNext())
 		{
 			SFCTransition aTrans = (SFCTransition) itTrans.next();
-			if(aTrans.getOutgoingSteps().size() > 1)
+
+			if (aTrans.getOutgoingSteps().size() > 1)
 			{
 				splitTransitions.add(aTrans);
 			}
-
 		}
+
 		return splitTransitions;
 	}
 
-	private void getNextSteps(SFCStep aStep,List nextStepsList)
+	private void getNextSteps(SFCStep aStep, List nextStepsList)
 	{
-		Iterator itTrans = aStep.outgoingTransIterator();//Check for outgoing Transitions
-		while(itTrans != null && itTrans.hasNext())
+		Iterator itTrans = aStep.outgoingTransIterator();    //Check for outgoing Transitions
+
+		while ((itTrans != null) && itTrans.hasNext())
 		{
-			SFCTransition aTrans = (SFCTransition) itTrans.next();//first outgoing transition
-			Iterator itSteps = aTrans.outgoingStepsIterator();//from this transition outgoing Steps
-			while(itSteps.hasNext())
+			SFCTransition aTrans = (SFCTransition) itTrans.next();    //first outgoing transition
+			Iterator itSteps = aTrans.outgoingStepsIterator();    //from this transition outgoing Steps
+
+			while (itSteps.hasNext())
 			{
 				SFCStep nextStep = (SFCStep) itSteps.next();
-				if(!nextStepsList.contains(nextStep))//If not already present in the list..check self or back referencing
+
+				if (!nextStepsList.contains(nextStep))    //If not already present in the list..check self or back referencing
 				{
 					nextStepsList.add(nextStep);
-					getNextSteps(nextStep,nextStepsList);//Recursive call
+					getNextSteps(nextStep, nextStepsList);    //Recursive call
 				}
 			}
 		}
 	}
 
-	private void transitionRelation(List stepsInOneSFC,int sfcNumber,int numberOfSFCs)
+	private void transitionRelation(List stepsInOneSFC, int sfcNumber, int numberOfSFCs)
 	{
 		boolean initial = true;
 		boolean noInitCondition = false;
-		if(numberOfSFCs > 1 && sfcNumber == 1)
+
+		if ((numberOfSFCs > 1) && (sfcNumber == 1))
 		{
 			write("\tif(turn = 1)");
 			write("\t{");
 		}
-		else if(numberOfSFCs > 1 && sfcNumber > 1)
+		else if ((numberOfSFCs > 1) && (sfcNumber > 1))
 		{
-			write("\telse if(turn = "+sfcNumber+")");
+			write("\telse if(turn = " + sfcNumber + ")");
 			write("\t{");
 		}
 
 		Iterator it = stepsInOneSFC.iterator();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
 			setOfModifiedSMVVars = new LinkedList();
+
 			SFCStep step = (SFCStep) it.next();
 			String condition = "";
-			Iterator prevTransIt= step.incomingTransIterator();
+			Iterator prevTransIt = step.incomingTransIterator();
 			boolean multiPrevSteps = false;
-
-			Vector prevSteps = null ;
+			Vector prevSteps = null;
 			Vector mainVector = new Vector();
-
 			StepsConditions stepsConds = null;
 
-			while(prevTransIt.hasNext())
+			while (prevTransIt.hasNext())
 			{
+				SFCTransition transition = (SFCTransition) prevTransIt.next();
+				Iterator prevStepIt = transition.incomingStepsIterator();
 
-				 SFCTransition transition = (SFCTransition) prevTransIt.next();
-				 Iterator prevStepIt = transition.incomingStepsIterator();
-				 prevSteps = new Vector();
+				prevSteps = new Vector();
 
-				 int i = 0;
-				 String partialCondition = "";//consists of StepId and Transition Condition
-				 while(prevStepIt.hasNext())
-				 {
-				 	SFCStep prevStep = (SFCStep) prevStepIt.next();
-				 	String prevStepId = prevStep.getId();
-				 	prevSteps.add(prevStep);
+				int i = 0;
+				String partialCondition = "";    //consists of StepId and Transition Condition
 
-				 	if(i > 0)
-				 		partialCondition = partialCondition.concat(" & ");
-				 	partialCondition = partialCondition.concat(prevStepId);
-				 	i++;
-				 }
-				 String transCondition = transition.getTransCondition();
-				 partialCondition =partialCondition.concat(" & ("+transCondition +")") ;
-				 partialCondition = "("+partialCondition+")";
-
-
-				 stepsConds = new StepsConditions(prevSteps,partialCondition);
-				 mainVector.add(stepsConds);
-
-
-				 if(!condition.equals(""))//Means if more than one transition comes to step
-				 {
-				 	multiPrevSteps = true;
-				 	condition = condition.concat(" | "+partialCondition) ;
-				 }
-				 else
-				 {
-				 	multiPrevSteps = false;
-				 	condition = condition.concat(partialCondition);
-				 }
-
-			}
-/*
-			if (initial)
-			{
-				if(condition.equals(""))
-					condition = condition.concat("start_"+sfcNumber);
-				else
-					condition = condition.concat(" | start_"+sfcNumber);
-			}
-*/
-			
-			if (initial)
-			{
-				if(condition.equals(""))
+				while (prevStepIt.hasNext())
 				{
-					condition = condition.concat("start_"+sfcNumber);
-					noInitCondition = true;
-				}	
-			}	
-					
-			
-			if(initial)
-				write("\t\tif( "+condition+" )");	//Completing the If part
-			else
-				write("\t\telse if( "+condition+" )");	//Completing the else If part
+					SFCStep prevStep = (SFCStep) prevStepIt.next();
+					String prevStepId = prevStep.getId();
 
+					prevSteps.add(prevStep);
+
+					if (i > 0)
+					{
+						partialCondition = partialCondition.concat(" & ");
+					}
+
+					partialCondition = partialCondition.concat(prevStepId);
+
+					i++;
+				}
+
+				String transCondition = transition.getTransCondition();
+
+				partialCondition = partialCondition.concat(" & (" + transCondition + ")");
+				partialCondition = "(" + partialCondition + ")";
+				stepsConds = new StepsConditions(prevSteps, partialCondition);
+
+				mainVector.add(stepsConds);
+
+				if (!condition.equals(""))    //Means if more than one transition comes to step
+				{
+					multiPrevSteps = true;
+					condition = condition.concat(" | " + partialCondition);
+				}
+				else
+				{
+					multiPrevSteps = false;
+					condition = condition.concat(partialCondition);
+				}
+			}
+
+/*
+						if (initial)
+						{
+								if(condition.equals(""))
+										condition = condition.concat("start_"+sfcNumber);
+								else
+										condition = condition.concat(" | start_"+sfcNumber);
+						}
+*/
+			if (initial)
+			{
+				if (condition.equals(""))
+				{
+					condition = condition.concat("start_" + sfcNumber);
+					noInitCondition = true;
+				}
+			}
+
+			if (initial)
+			{
+				write("\t\tif( " + condition + " )");    //Completing the If part
+			}
+			else
+			{
+				write("\t\telse if( " + condition + " )");    //Completing the else If part
+			}
 
 			write("\t\t{");
 
-			if(initial)
+			if (initial)
 			{
-				write("\t\t\tnext(start_"+sfcNumber+") := 0;");
+				write("\t\t\tnext(start_" + sfcNumber + ") := 0;");
+
 				initial = false;
 			}
-			write("\t\t\tnext("+step.getId()+") := 1;");
+
+			write("\t\t\tnext(" + step.getId() + ") := 1;");
 			setOfModifiedSMVVars.add(step.getId());
-			if(numberOfSFCs > 1)
+
+			if (numberOfSFCs > 1)
 			{
-				write("\t\t\tnext(turn) := (turn mod "+(numberOfSFCs+1)+")+1;");
+				write("\t\t\tnext(turn) := (turn mod " + (numberOfSFCs + 1) + ")+1;");
 			}
 
-			/* For avoiding duplicate action strings to be written	e-g This step can have S or N action
+			/* For avoiding duplicate action strings to be written  e-g This step can have S or N action
 			 * associated with some variable but previous action might have N or X type action associated
 			 * for which exit action will be written in this step..So will cause redefinition of same variable in SMV
 			 */
 			Vector avoidDupActions = new Vector();
-
 			List aStepActions = step.getActionsList();
-			if(aStepActions != null)
+
+			if (aStepActions != null)
 			{
-					//System.out.println("Action List is has :"+aStepActions+" actions for step :"+step);
-					Iterator aStepActionsIt = aStepActions.iterator();
-					while(aStepActionsIt.hasNext())
+
+				//System.out.println("Action List is has :"+aStepActions+" actions for step :"+step);
+				Iterator aStepActionsIt = aStepActions.iterator();
+
+				while (aStepActionsIt.hasNext())
+				{
+					SFCAction anAction = (SFCAction) aStepActionsIt.next();
+
+					if (anAction.getActionType().equals("N"))
 					{
-							SFCAction anAction = (SFCAction) aStepActionsIt.next();
-
-							if(anAction.getActionType().equals("N"))
-							{
-								write("\t\t\t"+getNActionString(anAction.getLeftHandSide()));
-								avoidDupActions.add(anAction.getLeftHandSide());
-								setOfModifiedSMVVars.add(anAction.getLeftHandSide());
-							}
-							else if(anAction.getActionType().equals("S"))
-							{
-
-								write("\t\t\t"+getSActionString(anAction));
-								avoidDupActions.add(anAction.getLeftHandSide());
-								setOfModifiedSMVVars.add(anAction.getLeftHandSide());
-							}
+						write("\t\t\t" + getNActionString(anAction.getLeftHandSide()));
+						avoidDupActions.add(anAction.getLeftHandSide());
+						setOfModifiedSMVVars.add(anAction.getLeftHandSide());
 					}
+					else if (anAction.getActionType().equals("S"))
+					{
+						write("\t\t\t" + getSActionString(anAction));
+						avoidDupActions.add(anAction.getLeftHandSide());
+						setOfModifiedSMVVars.add(anAction.getLeftHandSide());
+					}
+				}
 			}
 
-
 			Enumeration e = mainVector.elements();
-
 			boolean first = true;
-			while(e.hasMoreElements())
+
+			while (e.hasMoreElements())
 			{
 				StepsConditions stepsConditions = (StepsConditions) e.nextElement();
-
 				Vector stepsVector = stepsConditions.getStep();
 				String stepCondition = stepsConditions.getCondition();
 				Enumeration enumSteps = stepsVector.elements();
 
-				while(enumSteps.hasMoreElements())
+				while (enumSteps.hasMoreElements())
 				{
-						SFCStep innerStep = (SFCStep) enumSteps.nextElement();
-						if(multiPrevSteps)
+					SFCStep innerStep = (SFCStep) enumSteps.nextElement();
+
+					if (multiPrevSteps)
+					{
+						if (first)
 						{
-							if(first)
-							{
-								write("\t\t\tif"+stepCondition);
-								first = false;
-							}
-							else
-								write("\t\t\telse if"+stepCondition);
+							write("\t\t\tif" + stepCondition);
 
-							write("\t\t\t{");
-							write("\t\t\t\tnext("+innerStep.getId()+") := 0;");
-							setOfModifiedSMVVars.add(innerStep.getId());
-							write_NX_PrevStep_Actions(innerStep,avoidDupActions,"\t\t\t\t");
-							write("\t\t\t}");
-
+							first = false;
 						}
 						else
 						{
-							write("\t\t\tnext("+innerStep.getId()+") := 0;");
-							setOfModifiedSMVVars.add(innerStep.getId());
-							write_NX_PrevStep_Actions(innerStep,avoidDupActions,"\t\t\t");
+							write("\t\t\telse if" + stepCondition);
 						}
+
+						write("\t\t\t{");
+						write("\t\t\t\tnext(" + innerStep.getId() + ") := 0;");
+						setOfModifiedSMVVars.add(innerStep.getId());
+						write_NX_PrevStep_Actions(innerStep, avoidDupActions, "\t\t\t\t");
+						write("\t\t\t}");
+					}
+					else
+					{
+						write("\t\t\tnext(" + innerStep.getId() + ") := 0;");
+						setOfModifiedSMVVars.add(innerStep.getId());
+						write_NX_PrevStep_Actions(innerStep, avoidDupActions, "\t\t\t");
+					}
 				}
-			}//while for previous steps
-			writeRestOfSMVVars(setOfModifiedSMVVars,"\t\t\t");
+			}    //while for previous steps
+
+			writeRestOfSMVVars(setOfModifiedSMVVars, "\t\t\t");
 			write("\t\t}");
+		}    //main while loop
 
-		}//main while loop
-
-		if(!noInitCondition)
+		if (!noInitCondition)
 		{
-			for(Iterator stepIt = stepsInOneSFC.iterator(); stepIt.hasNext(); )
+			for (Iterator stepIt = stepsInOneSFC.iterator(); stepIt.hasNext(); )
 			{
 				SFCStep currStep = (SFCStep) stepIt.next();
-				System.err.println("Debug: " + currStep.getId() + "isInitial: " + currStep.isInitialStep() );
+
+				System.err.println("Debug: " + currStep.getId() + "isInitial: " + currStep.isInitialStep());
+
 				if (currStep.isInitialStep())
 				{
 					List initialModList = new LinkedList();
 					List initialStepActions = new LinkedList();
+
 					write("\t\telse if (start_" + sfcNumber + ")");
 					write("\t\t{");
 					write("\t\t\tnext(start_" + sfcNumber + ") := 0;");
+
 					String stepId = currStep.getId();
+
 					initialModList.add(stepId);
 					write("\t\t\tnext(" + stepId + ") := 1;");
+
 					initialStepActions = currStep.getActionsList();
+
 					/************************************************************/
-					if(initialStepActions != null)
+					if (initialStepActions != null)
 					{
-	
 						Iterator initStepActionsIt = initialStepActions.iterator();
-						while(initStepActionsIt.hasNext())
+
+						while (initStepActionsIt.hasNext())
 						{
 							SFCAction anAction = (SFCAction) initStepActionsIt.next();
-	
-							if(anAction.getActionType().equals("N"))
+
+							if (anAction.getActionType().equals("N"))
 							{
-								write("\t\t\t"+getNActionString(anAction.getLeftHandSide()));
+								write("\t\t\t" + getNActionString(anAction.getLeftHandSide()));
+
 								//avoidDupActions.add(anAction.getLeftHandSide());
 								initialModList.add(anAction.getLeftHandSide());
 							}
-							else if(anAction.getActionType().equals("S"))
+							else if (anAction.getActionType().equals("S"))
 							{
-	
-								write("\t\t\t"+getSActionString(anAction));
+								write("\t\t\t" + getSActionString(anAction));
+
 								//avoidDupActions.add(anAction.getLeftHandSide());
 								initialModList.add(anAction.getLeftHandSide());
 							}
 						}
 					}
-					writeRestOfSMVVars(initialModList,"\t\t\t");
-					write("\t\t\tnext(turn) := (turn mod "+(numberOfSFCs+1)+")+1;");
+
+					writeRestOfSMVVars(initialModList, "\t\t\t");
+					write("\t\t\tnext(turn) := (turn mod " + (numberOfSFCs + 1) + ")+1;");
+
 					/************************************************************/
 					write("\t\t}");
 				}
 			}
 		}
-		writeFinalElseBlock("\t\t\t",numberOfSFCs);
-		if(numberOfSFCs > 1)
+
+		writeFinalElseBlock("\t\t\t", numberOfSFCs);
+
+		if (numberOfSFCs > 1)
+		{
 			write("\t}");
+		}
 	}
 
-	private void write_NX_PrevStep_Actions(SFCStep aPrevStep,Vector avoidDupActions,String tabs)
+	private void write_NX_PrevStep_Actions(SFCStep aPrevStep, Vector avoidDupActions, String tabs)
 	{
 		List actions = aPrevStep.getActionsList();
 
-			if(actions != null)
+		if (actions != null)
+		{
+			System.out.println("Actions from previous Step are :" + actions);
+
+			Iterator actionIt = actions.iterator();
+
+			while (actionIt.hasNext())
 			{
-				System.out.println("Actions from previous Step are :"+actions);
-				Iterator actionIt = actions.iterator();
-				while(actionIt.hasNext())
+				SFCAction anAction = (SFCAction) actionIt.next();
+
+				if (anAction.getActionType().equals("X") && (avoidDupActions.indexOf(anAction.getLeftHandSide()) == -1))
 				{
-					SFCAction anAction = (SFCAction) actionIt.next();
 
+					//Exit Action for Previous Step
+					write(tabs + "next(" + anAction.getLeftHandSide() + ") := " + anAction.getRightHandSide() + ";");
+					setOfModifiedSMVVars.add(anAction.getLeftHandSide());
+				}
+				else if (anAction.getActionType().equals("N") && (avoidDupActions.indexOf(anAction.getLeftHandSide()) == -1))
+				{
 
-
-						if(anAction.getActionType().equals("X") && avoidDupActions.indexOf(anAction.getLeftHandSide()) == -1)
-						{
-							//Exit Action for Previous Step
-							write(tabs+"next("+anAction.getLeftHandSide()+") := "+anAction.getRightHandSide()+";");
-							setOfModifiedSMVVars.add(anAction.getLeftHandSide());
-						}
-
-						else if(anAction.getActionType().equals("N") && avoidDupActions.indexOf(anAction.getLeftHandSide()) == -1)
-						{
-							//Exit Action for Previous Step
-							write(tabs+"next("+anAction.getLeftHandSide()+") := ~("+anAction.getLeftHandSide()+");");
-							setOfModifiedSMVVars.add(anAction.getLeftHandSide());
-						}
+					//Exit Action for Previous Step
+					write(tabs + "next(" + anAction.getLeftHandSide() + ") := ~(" + anAction.getLeftHandSide() + ");");
+					setOfModifiedSMVVars.add(anAction.getLeftHandSide());
 				}
 			}
+		}
 	}
 
-	private void writeRestOfSMVVars(List modifiedSMVVars,String tabs)
+	private void writeRestOfSMVVars(List modifiedSMVVars, String tabs)
 	{
 		List restOfSMVVars = new LinkedList();
+
 		restOfSMVVars.addAll(mainSet);
 		restOfSMVVars.addAll(digitalInputSet);
 		restOfSMVVars.removeAll(modifiedSMVVars);
+
 		Iterator it = restOfSMVVars.iterator();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
 			String variable = (String) it.next();
-			write(tabs+"next("+variable+") := "+variable+";");
+
+			write(tabs + "next(" + variable + ") := " + variable + ";");
 		}
 	}
 
 	private void writeFinalElseBlock(String tabs, int numberOfSFCs)
 	{
 		List elseList = new LinkedList();
+
 		elseList.addAll(mainSet);
 		elseList.addAll(digitalInputSet);
+
 		Iterator it = elseList.iterator();
-		write(tabs.substring(0,(tabs.length()-1))+"else");
-		write(tabs.substring(0,(tabs.length()-1))+"{");
-		while(it.hasNext())
+
+		write(tabs.substring(0, (tabs.length() - 1)) + "else");
+		write(tabs.substring(0, (tabs.length() - 1)) + "{");
+
+		while (it.hasNext())
 		{
 			String variable = (String) it.next();
-			write(tabs+"next("+variable+") := "+variable+";");
-		}
-		write(tabs+"next(turn) := (turn mod "+(numberOfSFCs+1)+")+1;");
-		write(tabs.substring(0,(tabs.length()-1))+"}");
 
+			write(tabs + "next(" + variable + ") := " + variable + ";");
+		}
+
+		write(tabs + "next(turn) := (turn mod " + (numberOfSFCs + 1) + ")+1;");
+		write(tabs.substring(0, (tabs.length() - 1)) + "}");
 	}
 
-	private void writeInputPhaseBlock(String tabs,int numberOfSFCs)
+	private void writeInputPhaseBlock(String tabs, int numberOfSFCs)
 	{
-		write(tabs+"else if(turn = "+(numberOfSFCs+1)+")");
-		write(tabs+"{");
+		write(tabs + "else if(turn = " + (numberOfSFCs + 1) + ")");
+		write(tabs + "{");
+
 		Iterator it = mainSet.iterator();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
 			String variable = (String) it.next();
-			write(tabs+"\tnext("+variable+") := "+variable+";");
+
+			write(tabs + "\tnext(" + variable + ") := " + variable + ";");
 		}
-		write(tabs+"\tnext(turn) := (turn mod "+(numberOfSFCs+1)+")+1;");
-		write(tabs+"}");
+
+		write(tabs + "\tnext(turn) := (turn mod " + (numberOfSFCs + 1) + ")+1;");
+		write(tabs + "}");
 	}
 
 	private void writeVariables()
 	{
 		List localList = new LinkedList();
+
 		localList.addAll(allVariables);
 		localList.addAll(allDigitalInputs);
+
 		Iterator it = localList.iterator();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
-			SFCVariable variable =(SFCVariable) it.next();
+			SFCVariable variable = (SFCVariable) it.next();
 			String name = variable.getName();
 			String type = variable.getType();
 			String initValue = variable.getInitialValue();
-			writeVarDefinition(name,type);
 
-			if(initValue != null && !initValue.equals(""))
+			writeVarDefinition(name, type);
+
+			if ((initValue != null) &&!initValue.equals(""))
 			{
-				writeVarInitValue(name,initValue);
+				writeVarInitValue(name, initValue);
 			}
-
 		}
-
 	}
 
 	private void defineTurnVariable(int size)
 	{
-		write("\tturn : 1.."+size+";");
+		write("\tturn : 1.." + size + ";");
 		write("\tinit(turn) := 1;");
 	}
 
 	private void defineSMVSteps(List stepsInOneSFC)
 	{
-
 		boolean initialStep = true;
 		Iterator it = stepsInOneSFC.iterator();
-		while(it.hasNext())
+
+		while (it.hasNext())
 		{
 			SFCStep step = (SFCStep) it.next();
 			String id = step.getId();
-			writeVarDefinition(id,"boolean");
-			if(initialStep)
+
+			writeVarDefinition(id, "boolean");
+
+			if (initialStep)
 			{
-				writeVarInitValue(id,"0");// it was changed later from 1 to 0
+				writeVarInitValue(id, "0");    // it was changed later from 1 to 0
+
 				initialStep = false;
 			}
 			else
 			{
-				writeVarInitValue(id,"0");
+				writeVarInitValue(id, "0");
 			}
-
 		}
 	}
 
 	private String getNActionString(String outVar)
 	{
-		 String nAction = "";
-		 	nAction = "next("+outVar+") := 1;";
-		 return nAction;
+		String nAction = "";
+
+		nAction = "next(" + outVar + ") := 1;";
+
+		return nAction;
 	}
 
 	private String getSActionString(SFCAction anAction)
 	{
-		 String leftHandSide = anAction.getLeftHandSide();
-		 String rightHandSide = anAction.getRightHandSide();
-		 String sAction = "next("+leftHandSide+") := "+rightHandSide+";";
-		 return sAction;
+		String leftHandSide = anAction.getLeftHandSide();
+		String rightHandSide = anAction.getRightHandSide();
+		String sAction = "next(" + leftHandSide + ") := " + rightHandSide + ";";
+
+		return sAction;
 	}
 
 	private void writeStartBracket()
@@ -642,15 +711,16 @@ public class SFCToSMV
 		write("}");
 	}
 
-	private void writeVarDefinition(String name,String type)
+	private void writeVarDefinition(String name, String type)
 	{
-		write("\t"+name+" : "+type+";");
+		write("\t" + name + " : " + type + ";");
 	}
 
-	private void writeVarInitValue(String name,String initValue)
+	private void writeVarInitValue(String name, String initValue)
 	{
-		write("\tinit("+name+") := "+initValue+";");
+		write("\tinit(" + name + ") := " + initValue + ";");
 	}
+
 	private void writeBlankLine()
 	{
 		write("\n");
@@ -660,9 +730,9 @@ public class SFCToSMV
 	{
 		try
 		{
-			writer.write(str+"\n");
+			writer.write(str + "\n");
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			System.err.println("IOException while closing the file");
 		}
@@ -670,17 +740,17 @@ public class SFCToSMV
 
 	private void closeFile()
 	{
+
 		//Close the file
 		try
 		{
 			writer.close();
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			System.err.println("IOException while closing the file");
 		}
 	}
-
 }
 
 class StepsConditions
@@ -688,12 +758,11 @@ class StepsConditions
 	Vector steps;
 	String stepCondition;
 
-	public StepsConditions( Vector steps,String stepCondition)
+	public StepsConditions(Vector steps, String stepCondition)
 	{
 		this.steps = steps;
 		this.stepCondition = stepCondition;
 	}
-
 
 	public Vector getStep()
 	{
@@ -704,7 +773,6 @@ class StepsConditions
 	{
 		return stepCondition;
 	}
-
 }
 
 class SplitsJoins
@@ -737,5 +805,4 @@ class SplitsJoins
 	{
 		return endingTrans;
 	}
-
 }

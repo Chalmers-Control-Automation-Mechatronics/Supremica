@@ -52,7 +52,6 @@ package org.supremica.automata.algorithms;
 import java.util.*;
 import org.supremica.automata.*;
 
-
 /**
  * Changes the name of all states in the automata. The state name will
  * be "prefix" followed by an integer, followed by "postfix".
@@ -101,30 +100,37 @@ public class DefaultEventRenamer
 		{
 			prefixString = "";
 		}
+
 		if (postfixString == null)
 		{
 			postfixString = "";
 		}
-		
+
 		// Build union alphabet
 		Alphabet unionAlphabet = theAutomata.setIndicies();
-		
+
 		// Build a map from old events to new.
 		HashMap oldToNew = new HashMap();
-		for (Iterator theIt = unionAlphabet.iterator(); theIt.hasNext();)
+
+		for (Iterator theIt = unionAlphabet.iterator(); theIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) theIt.next();
+
 			oldToNew.put(currEvent.getLabel(), newLabel(currEvent));
 		}
-		
+
 		// Change the labels
-		for (Iterator theIterator = theAutomata.iterator(); theIterator.hasNext(); )
+		for (Iterator theIterator = theAutomata.iterator();
+				theIterator.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)theIterator.next();
-			for (Iterator evIt = currAutomaton.eventIterator(); evIt.hasNext(); )
+			Automaton currAutomaton = (Automaton) theIterator.next();
+
+			for (Iterator evIt = currAutomaton.eventIterator();
+					evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = (LabeledEvent) evIt.next();
-				String newEvent = (String)oldToNew.get(currEvent.getLabel());
+				String newEvent = (String) oldToNew.get(currEvent.getLabel());
+
 				currEvent.setLabel(newEvent);
 			}
 		}
@@ -137,6 +143,7 @@ public class DefaultEventRenamer
 	protected String newLabel(LabeledEvent currEvent)
 	{
 		currIndex++;
-		return prefixString + (currIndex-1) + postfixString;
+
+		return prefixString + (currIndex - 1) + postfixString;
 	}
 }

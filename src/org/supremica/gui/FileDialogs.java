@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -78,11 +79,9 @@ public class FileDialogs
 	private FileFilter ilFilter = null;
 	private FileFilter nqcFilter = null;
 	private FileFilter stnFilter = null;
-
 	private static FileDialogs fd = new FileDialogs();
 
 	private FileDialogs() {}
-
 
 	public static JFileChooser getSaveAsFileChooser(FileFormats fileType)
 	{
@@ -113,7 +112,6 @@ public class FileDialogs
 
 		return fileImport;
 	}
-
 
 	public static JFileChooser getXMLFileSaveAs()
 	{
@@ -342,7 +340,7 @@ public class FileDialogs
 		JFileChooser cellFileImporter = fd.getFileImporter();
 
 		cellFileImporter.resetChoosableFileFilters();
-		cellFileImporter.setFileFilter(fd.getSTNFilter()); // RobotStudio
+		cellFileImporter.setFileFilter(fd.getSTNFilter());    // RobotStudio
 
 		return cellFileImporter;
 	}

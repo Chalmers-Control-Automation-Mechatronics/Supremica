@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -54,9 +55,7 @@ public class EncodingHelper
 {
 	private static Logger logger = LoggerFactory.createLogger(EncodingHelper.class);
 
-	private EncodingHelper()
-	{
-	}
+	private EncodingHelper() {}
 
 	/**
 	 * Places line breaks '\n' at as even distances as possible.
@@ -70,48 +69,55 @@ public class EncodingHelper
 	public static String linebreakAdjust(String input, int lineWidth)
 	{
 		if (input == null)
+		{
 			return "";
+		}
 
 		// Normalize string
 		String s = input.replaceAll("[\n\r]", " ");
+
 		s = s.replaceAll(" +", " ");
 
 		// Chop up the string
 		int len = s.length();
 		int lastBreak = 0;
+
 		while (len - lastBreak > lineWidth)
 		{
 			int nextBreak = s.lastIndexOf(' ', lastBreak + lineWidth);
+
 			if (nextBreak == -1)
 			{
-				s = s.substring(0, lastBreak+lineWidth) + "\n" + s.substring(lastBreak+lineWidth);
-				nextBreak = lastBreak+lineWidth;
+				s = s.substring(0, lastBreak + lineWidth) + "\n" + s.substring(lastBreak + lineWidth);
+				nextBreak = lastBreak + lineWidth;
 			}
 			else
 			{
-				s = s.substring(0, nextBreak) + "\n" + s.substring(nextBreak+1);
+				s = s.substring(0, nextBreak) + "\n" + s.substring(nextBreak + 1);
 			}
+
 			lastBreak = nextBreak;
 		}
 
 		return s;
 	}
-	
+
 	public static String normalize(String input, boolean replacedot)
 	{
 		String s = input;
+
 /*
-		try
-		{
-			s = new String(input.getBytes("UTF-8"), "ISO-8859-1");
-			//logger.info("org: " + input + " new: " + s);
-		}
-		catch (UnsupportedEncodingException ex)
-		{
-			logger.error("UTF-8 is an unsupported encoding");
-			throw new RuntimeException("UTF-8 is an unsupported encoding");
-		}
-		return s.toString();
+				try
+				{
+						s = new String(input.getBytes("UTF-8"), "ISO-8859-1");
+						//logger.info("org: " + input + " new: " + s);
+				}
+				catch (UnsupportedEncodingException ex)
+				{
+						logger.error("UTF-8 is an unsupported encoding");
+						throw new RuntimeException("UTF-8 is an unsupported encoding");
+				}
+				return s.toString();
 */
 		StringBuffer str = new StringBuffer();
 		int len = (s != null)
@@ -124,6 +130,7 @@ public class EncodingHelper
 
 			switch (ch)
 			{
+
 			case '.' :
 			{
 				if (replacedot)
@@ -134,9 +141,9 @@ public class EncodingHelper
 				{
 					str.append(".");
 				}
+
 				break;
 			}
-
 			case '<' :
 			{
 				str.append("&lt;");
@@ -164,6 +171,7 @@ public class EncodingHelper
 			case '\r' :
 			case '\n' :
 			{
+
 				// else, default append char
 			}
 			default :

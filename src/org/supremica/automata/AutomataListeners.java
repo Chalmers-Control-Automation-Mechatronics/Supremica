@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -60,7 +61,6 @@ public class AutomataListeners
 	public static final int MODE_AUTOMATON_RENAMED = 3;
 	public static final int MODE_ACTIONS_OR_CONTROLS_CHANGED = 4;
 
-
 	public AutomataListeners(Automata owner)
 	{
 		super(owner);
@@ -68,6 +68,7 @@ public class AutomataListeners
 
 	public void notifyListeners(int mode, Automaton a)
 	{
+
 		// logger.debug("AutomataListeners.notifyListeners Start");
 		if (batchUpdate)
 		{
@@ -77,8 +78,10 @@ public class AutomataListeners
 		{
 			if (listeners != null)
 			{
+
 				// logger.debug("AutomataListeners.notifyListeners notifying");
-				for (Iterator listenerIt = listeners.iterator(); listenerIt.hasNext(); )
+				for (Iterator listenerIt = listeners.iterator();
+						listenerIt.hasNext(); )
 				{
 					AutomataListener currListener = (AutomataListener) listenerIt.next();
 

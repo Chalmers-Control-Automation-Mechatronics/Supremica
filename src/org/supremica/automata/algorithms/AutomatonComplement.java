@@ -98,7 +98,8 @@ public class AutomatonComplement
 				while (outgoingArcsIterator.hasNext())
 				{
 					Arc currArc = (Arc) outgoingArcsIterator.next();
-					if (currEvent.equals(currArc.getEvent())) // equalId(((Arc) outgoingArcsIterator.next()).getEventId()))
+
+					if (currEvent.equals(currArc.getEvent()))    // equalId(((Arc) outgoingArcsIterator.next()).getEventId()))
 					{
 						found = true;
 
@@ -112,6 +113,7 @@ public class AutomatonComplement
 					{
 						dumpState = theAutomaton.createAndAddUniqueState("dump");
 					}
+
 					// theAutomaton.addArc(new Arc(currState, dumpState, currEvent.getId()));
 					theAutomaton.addArc(new Arc(currState, dumpState, currEvent));
 				}
@@ -119,7 +121,7 @@ public class AutomatonComplement
 		}
 
 		// If complementation has been done, add the state, mark it as accepting and add self loops to the dump state...
-		if(dumpState != null)
+		if (dumpState != null)
 		{
 			dumpState.setAccepting(true);
 
@@ -127,6 +129,7 @@ public class AutomatonComplement
 
 			while (eventIterator.hasNext())
 			{
+
 				// theAutomaton.addArc(new Arc(dumpState, dumpState, ((LabeledEvent) eventIterator.next()).getId()));
 				theAutomaton.addArc(new Arc(dumpState, dumpState, ((LabeledEvent) eventIterator.next())));
 			}

@@ -65,6 +65,7 @@ public class StateMatcherOptions
 		private Accepting(String description)
 		{
 			this.description = description;
+
 			types.add(this);
 		}
 
@@ -115,6 +116,7 @@ public class StateMatcherOptions
 		private Forbidden(String description)
 		{
 			this.description = description;
+
 			types.add(this);
 		}
 
@@ -165,6 +167,7 @@ public class StateMatcherOptions
 		private Deadlock(String description)
 		{
 			this.description = description;
+
 			types.add(this);
 		}
 
@@ -204,16 +207,11 @@ public class StateMatcherOptions
 		}
 	}
 
-
 	private Accepting acceptingCondition = Accepting.DontCare;
 	private Forbidden forbiddenCondition = Forbidden.DontCare;
 	private Deadlock deadlockCondition = Deadlock.DontCare;
 
-
-	public StateMatcherOptions()
-	{
-
-	}
+	public StateMatcherOptions() {}
 
 	public boolean matches(State theState)
 	{
@@ -233,8 +231,8 @@ public class StateMatcherOptions
 					return false;
 				}
 			}
-
 		}
+
 		if (forbiddenCondition != Forbidden.DontCare)
 		{
 			if (forbiddenCondition == Forbidden.Yes)
@@ -252,6 +250,7 @@ public class StateMatcherOptions
 				}
 			}
 		}
+
 		if (deadlockCondition != Deadlock.DontCare)
 		{
 			if (deadlockCondition == Deadlock.Yes)
@@ -269,6 +268,7 @@ public class StateMatcherOptions
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -302,4 +302,3 @@ public class StateMatcherOptions
 		return deadlockCondition;
 	}
 }
-

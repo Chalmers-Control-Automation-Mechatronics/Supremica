@@ -54,39 +54,38 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.util.Vector;
 
 /**
  * Encapsulates an XML-RPC request.
  *
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
- * @version $Id: XmlRpcRequest.java,v 1.1 2004-02-02 15:56:21 vahidi Exp $
+ * @version $Id: XmlRpcRequest.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  * @since 1.2
  */
 public class XmlRpcRequest
 {
-    protected final String methodName;
-    protected final Vector parameters;
+	protected final String methodName;
+	protected final Vector parameters;
 
-    public XmlRpcRequest(String methodName, Vector parameters)
-    {
-        this.parameters = parameters;
-        this.methodName = methodName;
-    }
+	public XmlRpcRequest(String methodName, Vector parameters)
+	{
+		this.parameters = parameters;
+		this.methodName = methodName;
+	}
 
-    public Vector getParameters()
-    {
-        return parameters;
-    }
+	public Vector getParameters()
+	{
+		return parameters;
+	}
 
-    public Object getParameter(int index)
-    {
-        return parameters.elementAt(index);
-    }
+	public Object getParameter(int index)
+	{
+		return parameters.elementAt(index);
+	}
 
-    public String getMethodName()
-    {
-        return methodName;
-    }
+	public String getMethodName()
+	{
+		return methodName;
+	}
 }

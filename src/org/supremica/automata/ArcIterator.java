@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -51,7 +52,6 @@ package org.supremica.automata;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-
 public class ArcIterator
 	implements Iterator
 {
@@ -76,13 +76,13 @@ public class ArcIterator
 	public Arc nextArc()
 		throws NoSuchElementException
 	{
-		return (Arc)next();
+		return (Arc) next();
 	}
 
 	public LabeledEvent nextEvent()
 		throws NoSuchElementException
 	{
-		return (LabeledEvent)nextArc().getEvent();
+		return (LabeledEvent) nextArc().getEvent();
 	}
 
 	public void remove()
@@ -90,5 +90,4 @@ public class ArcIterator
 	{
 		throw new UnsupportedOperationException();
 	}
-
 }

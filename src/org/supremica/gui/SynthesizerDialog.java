@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -62,7 +63,8 @@ abstract class SynthesizerPanel
 }
 
 class SynthesizerDialogStandardPanel
-	extends SynthesizerPanel implements ActionListener
+	extends SynthesizerPanel
+	implements ActionListener
 {
 	private SynthesisSelector synthesisTypeBox;
 	private AlgorithmSelector algorithmTypeBox;
@@ -73,7 +75,7 @@ class SynthesizerDialogStandardPanel
 	static class AlgorithmSelector
 		extends JComboBox
 	{
-		private AlgorithmSelector(Object [] array)
+		private AlgorithmSelector(Object[] array)
 		{
 			super(array);
 		}
@@ -82,30 +84,30 @@ class SynthesizerDialogStandardPanel
 		{
 			addItem(algo);
 		}
+
 		public SynthesisAlgorithm getAlgorithm()
 		{
 			return (SynthesisAlgorithm) getSelectedItem();
 		}
+
 		public void setAlgorithm(SynthesisAlgorithm algo)
 		{
 			setSelectedItem(algo);
 		}
+
 		public static AlgorithmSelector create(int num)
 		{
-
-			if(num == 1)
+			if (num == 1)
 			{
+
 				// return new AlgorithmSelector(SynthesisAlgorithm.Monolithic);
-				return new AlgorithmSelector(SynthesisAlgorithm.toArray_oneAutomaton() );
+				return new AlgorithmSelector(SynthesisAlgorithm.toArray_oneAutomaton());
 			}
 			else
 			{
 				return new AlgorithmSelector(SynthesisAlgorithm.toArray());
 			}
-
-
 		}
-
 	}
 
 	static class SynthesisSelector
@@ -120,10 +122,12 @@ class SynthesizerDialogStandardPanel
 		{
 			return (SynthesisType) getSelectedItem();
 		}
+
 		public void setType(SynthesisType type)
 		{
 			setSelectedItem(type);
 		}
+
 		public static SynthesisSelector create()
 		{
 			return new SynthesisSelector();
@@ -137,38 +141,40 @@ class SynthesizerDialogStandardPanel
 
 		public NonblockNote()
 		{
-			super("Note:\n" +
-				"Currently, the modular nonblocking algorithm\n" +
-				"does not guarantee global nonblocking. The only\n" +
-				"gurantee is that each supervisor is nonblockng\n" +
-				"with respect to the plants that it controls");
-			super.setBackground(new Color(0,0,0,transparent));
+			super("Note:\n" + "Currently, the modular nonblocking algorithm\n" + "does not guarantee global nonblocking. The only\n" + "gurantee is that each supervisor is nonblockng\n" + "with respect to the plants that it controls");
+
+			super.setBackground(new Color(0, 0, 0, transparent));
 		}
 	}
 
 	public SynthesizerDialogStandardPanel(int num)
 	{
 		algorithmTypeBox = AlgorithmSelector.create(num);
+
 		algorithmTypeBox.addActionListener(this);
 
 		synthesisTypeBox = SynthesisSelector.create();
+
 		synthesisTypeBox.addActionListener(this);
 
 		purgeBox = new JCheckBox("Purge result");
+
 		purgeBox.setToolTipText("Remove all forbidden states");
 
 		optimizeBox = new JCheckBox("Optimize result");
+
 		optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
 
 		nbNote = new NonblockNote();
 
-		if(num == 1)
+		if (num == 1)
 		{
 			optimizeBox.setEnabled(false);
 			nbNote.setVisible(false);
 		}
 
 		Box standardBox = Box.createVerticalBox();
+
 		standardBox.add(synthesisTypeBox);
 		standardBox.add(algorithmTypeBox);
 		standardBox.add(purgeBox);
@@ -195,11 +201,12 @@ class SynthesizerDialogStandardPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
-		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
+		if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
 			optimizeBox.setEnabled(false);
 		}
-		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
+
+		if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
 			optimizeBox.setEnabled(false);
 		}
@@ -207,24 +214,26 @@ class SynthesizerDialogStandardPanel
 		if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Modular)
 		{
 			optimizeBox.setEnabled(true);
-			if(synthesisTypeBox.getType() == SynthesisType.Controllable)
+
+			if (synthesisTypeBox.getType() == SynthesisType.Controllable)
 			{
 				nbNote.setVisible(false);
 			}
-			else // some type of nb, show the sign
+			else    // some type of nb, show the sign
 			{
 				nbNote.setVisible(true);
 			}
 		}
 		else
 		{
-				nbNote.setVisible(false);
+			nbNote.setVisible(false);
 		}
 	}
 }
 
 class SynthesizerDialogAdvancedPanel
-	extends SynthesizerPanel implements ActionListener
+	extends SynthesizerPanel
+	implements ActionListener
 {
 	private JCheckBox reduceSupervisorsBox;
 	private JCheckBox maximallyPermissiveBox;
@@ -236,14 +245,16 @@ class SynthesizerDialogAdvancedPanel
 		Box advancedBox = Box.createVerticalBox();
 
 		reduceSupervisorsBox = new JCheckBox("Reduce supervisors");
+
 		reduceSupervisorsBox.setToolTipText("Remove redundant states and events from synthesized supervisors");
 
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
+
 		maximallyPermissiveBox.setToolTipText("Guarantee maximally permissive result");
 
 		maximallyPermissiveIncrementalBox = new JCheckBox("Incremental algorithm");
-		maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm for maximally permissive synthesis");
 
+		maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm for maximally permissive synthesis");
 		reduceSupervisorsBox.addActionListener(this);
 		maximallyPermissiveIncrementalBox.addActionListener(this);
 		maximallyPermissiveBox.addActionListener(this);
@@ -251,12 +262,10 @@ class SynthesizerDialogAdvancedPanel
 		advancedBox.add(maximallyPermissiveBox);
 		advancedBox.add(maximallyPermissiveIncrementalBox);
 
-		note = new JTextArea("Note:\n" +
-				"'Purge result' must be selected for supervisor\n" +
-				"reduction to work.\n");
-		note.setBackground(new Color(0,0,0,0));
-		note.setVisible(false);
+		note = new JTextArea("Note:\n" + "'Purge result' must be selected for supervisor\n" + "reduction to work.\n");
 
+		note.setBackground(new Color(0, 0, 0, 0));
+		note.setVisible(false);
 		this.add(advancedBox, BorderLayout.CENTER);
 		this.add(note, BorderLayout.SOUTH);
 	}
@@ -277,6 +286,7 @@ class SynthesizerDialogAdvancedPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
+
 		// Incremental box enabled?
 		maximallyPermissiveIncrementalBox.setEnabled(maximallyPermissiveBox.isSelected());
 
@@ -292,7 +302,6 @@ public class SynthesizerDialog
 	private JButton cancelButton;
 	private SynthesizerOptions synthesizerOptions;
 	SynthesizerDialogStandardPanel standardPanel;
-
 	SynthesizerDialogAdvancedPanel advancedPanel;
 	private JDialog dialog;
 	private JFrame parentFrame;
@@ -327,7 +336,6 @@ public class SynthesizerDialog
 
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
-
 		Utility.setDefaultButton(dialog, okButton);
 
 		// ** MF ** Fix to get the frigging thing centered

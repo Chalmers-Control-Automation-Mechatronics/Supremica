@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -69,15 +70,17 @@ public class AlphabetViewer
 		throws Exception
 	{
 		Automata automata = new Automata();
+
 		automata.addAutomaton(automaton);
 		init(automata);
 	}
-	
+
 	public AlphabetViewer(Automata theAutomata)
 		throws Exception
 	{
 		init(theAutomata);
 	}
+
 	private void init(Automata theAutomata)
 		throws Exception
 	{
@@ -86,13 +89,15 @@ public class AlphabetViewer
 
 		// contentPane.setLayout(new BorderLayout());
 		// contentPane.add(toolBar, BorderLayout.NORTH);
-		setTitle("Alphabet Viewer"); // : " + theAutomaton.getName());
+		setTitle("Alphabet Viewer");    // : " + theAutomaton.getName());
+
 		// setSize(200, 500);
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
+
 				//dispose();
 			}
 		});
@@ -103,12 +108,12 @@ public class AlphabetViewer
 
 		if (frameSize.height > screenSize.height)
 		{
-			frameSize.height = screenSize.height;
+				frameSize.height = screenSize.height;
 		}
 
 		if (frameSize.width > screenSize.width)
 		{
-			frameSize.width = screenSize.width;
+				frameSize.width = screenSize.width;
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
@@ -124,49 +129,51 @@ public class AlphabetViewer
 
 		// File
 		JMenu menuFile = new JMenu();
+
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 
 		// File.Close
 		JMenuItem menuFileClose = new JMenuItem();
+
 		menuFileClose.setText("Close");
 		menuFileClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
+
 				//dispose();
 			}
 		});
-		
 		menuFile.add(menuFileClose);
 		menuBar.add(menuFile);
-		
+
 		// View
 		JMenu viewMenu = new JMenu("View");
+
 		viewMenu.setMnemonic(KeyEvent.VK_V);
-		
+
 		// View.Union (default, therefore initially checked)
 		JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);
+
 		viewMenuUnion.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-			}
+			public void actionPerformed(ActionEvent e) {}
 		});
-		
+
 		// View.Intersection
 		JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");
+
 		viewMenuIntersection.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-			}
+			public void actionPerformed(ActionEvent e) {}
 		});
+
 		ButtonGroup buttongroup = new ButtonGroup();
+
 		buttongroup.add(viewMenuUnion);
 		buttongroup.add(viewMenuIntersection);
-		
 		viewMenu.add(viewMenuUnion);
 		viewMenu.add(viewMenuIntersection);
 		menuBar.add(viewMenu);

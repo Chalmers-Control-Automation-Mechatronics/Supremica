@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -63,7 +64,7 @@ import org.supremica.automata.LabelTrace;
 import org.supremica.log.*;
 
 /**
- * This class is responsible for the "exploreStates"-window. 
+ * This class is responsible for the "exploreStates"-window.
  */
 public class AutomatonExplorer
 	extends JFrame
@@ -77,13 +78,13 @@ public class AutomatonExplorer
 	private StateViewer stateViewer;
 	private ExplorerController controller;
 	private VisualProject theProject;
-		
+
 	public AutomatonExplorer(VisualProject theProject, Automaton theAutomaton)
 		throws Exception
-	{	
+	{
 		this.theProject = theProject;
 		this.theAutomaton = theAutomaton;
-		
+
 		theAutomaton.getListeners().addListener(this);
 		setBackground(Color.white);
 
@@ -93,31 +94,31 @@ public class AutomatonExplorer
 
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		setTitle(theAutomaton.getName());
-//		setSize(400, 500);
-//
-//		// Center the window
-//		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//		Dimension frameSize = getSize();
-//
-//		if (frameSize.height > screenSize.height)
-//		{
-//			frameSize.height = screenSize.height;
-//		}
-//
-//		if (frameSize.width > screenSize.width)
-//		{
-//			frameSize.width = screenSize.width;
-//		}
-//
-//		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
+//              setSize(400, 500);
+//
+//              // Center the window
+//              Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//              Dimension frameSize = getSize();
+//
+//              if (frameSize.height > screenSize.height)
+//              {
+//                      frameSize.height = screenSize.height;
+//              }
+//
+//              if (frameSize.width > screenSize.width)
+//              {
+//                      frameSize.width = screenSize.width;
+//              }
+//
+//              setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		Utility.setupFrame(this, 400, 500);
-
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
+
 				//dispose();
 			}
 		});
@@ -137,7 +138,6 @@ public class AutomatonExplorer
 		controller = new ExplorerController(theProject, stateViewer, theAutomaton);
 
 		contentPane.add(controller, BorderLayout.SOUTH);
-
 		stateViewer.setController(controller);
 		stateViewer.goToInitialState();
 	}
@@ -169,6 +169,7 @@ public class AutomatonExplorer
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
+
 				//dispose();
 			}
 		});
@@ -261,11 +262,11 @@ class StateViewer
 		setCurrState(newState, false);
 	}
 
-	private void setCurrState(State newState, boolean isUndo) 
+	private void setCurrState(State newState, boolean isUndo)
 	{
-		setCurrState(newState, isUndo, true); 	
+		setCurrState(newState, isUndo, true);
 	}
-	
+
 	public void setCurrState(State newState, boolean isUndo, boolean forward)
 	{
 		if (!isUndo)
@@ -276,9 +277,11 @@ class StateViewer
 			}
 
 			nextStates.clear();
-	
-			if (forward) 
+
+			if (forward)
+			{
 				updateCosts(currState, newState);
+			}
 		}
 
 		currState = newState;
@@ -344,21 +347,25 @@ class StateViewer
 	{
 		this.controller = controller;
 	}
-	
+
 	/**
-	 *	Performs any action only if the current automaton is composite (otherwise 
-	 *	it is not necessary). Updates the current costs (see also CompositeState) 
-	 *	if the current state is not initial. Otherwise, the method initializes the 
-	 *	current and accumulated costs. 
+	 *      Performs any action only if the current automaton is composite (otherwise
+	 *      it is not necessary). Updates the current costs (see also CompositeState)
+	 *      if the current state is not initial. Otherwise, the method initializes the
+	 *      current and accumulated costs.
 	 */
-	public void updateCosts(State currState, State newState) 
+	public void updateCosts(State currState, State newState)
 	{
 		if (currState instanceof CompositeState)
 		{
 			if (newState.isInitial())
+			{
 				((CompositeState) newState).initCosts();
+			}
 			else
+			{
 				((CompositeState) newState).updateCosts(currState);
+			}
 		}
 	}
 }
@@ -463,7 +470,7 @@ class EventListModel
 	{
 		this.forward = forward;
 		this.theAutomaton = theAutomaton;
-		this.theAlphabet = theAutomaton.getAlphabet();			
+		this.theAlphabet = theAutomaton.getAlphabet();
 	}
 
 	public void setCurrState(State currState)
@@ -511,30 +518,31 @@ class EventListModel
 	public Object getElementAt(int index)
 	{
 		Arc currArc = (Arc) currArcs.get(index);
+
 		// String eventId = currArc.getEventId();
 		org.supremica.automata.LabeledEvent currEvent = currArc.getEvent();
 
 /** Can this exception ever occur? Arc::getEvent does not throw anything
-		try
-		{
-			currEvent = currArc.getEvent(); // theAlphabet.getEventWithId(eventId);
-		}
-		catch (Exception e)
-		{
-			System.err.println("Error: Could not find " + eventId + " in alphabet!\n");
+				try
+				{
+						currEvent = currArc.getEvent(); // theAlphabet.getEventWithId(eventId);
+				}
+				catch (Exception e)
+				{
+						System.err.println("Error: Could not find " + eventId + " in alphabet!\n");
 
-			return null;
-		}
+						return null;
+				}
 **/
 		StringBuffer responseString = new StringBuffer();
-
 		boolean terminateFont = false;
+
 		if (nextStateAssociated(currArc))
 		{
 			responseString.append("<html><font color=BLUE>");
+
 			terminateFont = true;
 		}
-
 
 		if (!currEvent.isControllable())
 		{
@@ -558,10 +566,12 @@ class EventListModel
 
 			responseString.append(" [state name: " + currState.getName() + "]");
 		}
+
 		if (terminateFont)
 		{
 			responseString.append("</font></html>");
 		}
+
 		return responseString.toString();
 	}
 
@@ -573,19 +583,22 @@ class EventListModel
 			{
 				return false;
 			}
+
 			State nextState = currArc.getToState();
+
 			return nextState == currState.getAssociatedState();
 		}
 		else
 		{
 			State nextState = currArc.getFromState();
-			if (nextState == null || nextState.getAssociatedState() == null)
+
+			if ((nextState == null) || (nextState.getAssociatedState() == null))
 			{
 				return false;
 			}
+
 			return nextState.getAssociatedState() == currState;
 		}
-
 	}
 
 	public State getStateAt(int index)
@@ -619,7 +632,7 @@ class StateDisplayer
 	private JLabel stateId = new JLabel();
 	private JLabel stateName = new JLabel();
 	private JLabel currentCosts = new JLabel();
-	
+
 	private void changeStateAccepting(boolean b)
 	{
 		stateViewer.getCurrState().setAccepting(b);
@@ -698,8 +711,8 @@ class StateDisplayer
 	}
 
 	/**
-	 *	This method sets the values of the graphical components building up the 
-	 *	stateDisplayer. 
+	 *      This method sets the values of the graphical components building up the
+	 *      stateDisplayer.
 	 */
 	public void setCurrState(State currState)
 	{
@@ -707,22 +720,27 @@ class StateDisplayer
 		isAcceptingBox.setSelected(currState.isAccepting());
 		isMutuallyAcceptingBox.setSelected(currState.isMutuallyAccepting());
 		isForbiddenBox.setSelected(currState.isForbidden());
-	
-		if (currState instanceof CompositeState) 
+
+		if (currState instanceof CompositeState)
 		{
 			StringBuffer str = new StringBuffer();
 			int[] costs = ((CompositeState) currState).getCurrentCosts();
-			for (int i=0; i<costs.length-1; i++)
+
+			for (int i = 0; i < costs.length - 1; i++)
+			{
 				str.append(costs[i] + "  ");
-			str.append(costs[costs.length-1] + "");
+			}
+
+			str.append(costs[costs.length - 1] + "");
 			currentCosts.setText("composite costs: [" + str + "]");
-			
 			stateCost.setText("accumulated cost: " + ((CompositeState) currState).getAccumulatedCost());
 		}
 		else
+		{
 			stateCost.setText("cost: " + currState.getCost());
-		
-		//		stateId.setText("id: " + currState.getId());
+		}
+
+		//              stateId.setText("id: " + currState.getId());
 		stateName.setText("name: " + currState.getName());
 	}
 }
@@ -738,7 +756,7 @@ class ExplorerController
 	private VisualProject theProject;
 
 	public ExplorerController(VisualProject theProject, StateViewer stateViewer, Automaton theAutomaton)
-	{		
+	{
 		setLayout(new BorderLayout());
 
 		this.theProject = theProject;
@@ -746,7 +764,6 @@ class ExplorerController
 		this.theAutomaton = theAutomaton;
 
 		Box redoBox = new Box(BoxLayout.X_AXIS);
-
 		ImageIcon forwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
 		ImageIcon backwardImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
 		ImageIcon homeImg = new ImageIcon(ExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
@@ -754,16 +771,24 @@ class ExplorerController
 		ImageIcon routeImg = new ImageIcon(ExplorerController.class.getResource("/icons/Route24.gif"));
 
 		undoButton = new JButton(backwardImg);
-		undoButton.setToolTipText("Back");
-		redoButton = new JButton(forwardImg);
-		redoButton.setToolTipText("Forward");
-		JButton resetButton = new JButton(homeImg);
-		resetButton.setToolTipText("Go to the initial state");
-		JButton findButton = new JButton(findImg);
-		findButton.setToolTipText("Search for a state");
-		JButton routeButton = new JButton(routeImg);
-		routeButton.setToolTipText("Find shortest path from the initial state to this state and mark the corresponding events in blue.");
 
+		undoButton.setToolTipText("Back");
+
+		redoButton = new JButton(forwardImg);
+
+		redoButton.setToolTipText("Forward");
+
+		JButton resetButton = new JButton(homeImg);
+
+		resetButton.setToolTipText("Go to the initial state");
+
+		JButton findButton = new JButton(findImg);
+
+		findButton.setToolTipText("Search for a state");
+
+		JButton routeButton = new JButton(routeImg);
+
+		routeButton.setToolTipText("Find shortest path from the initial state to this state and mark the corresponding events in blue.");
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(undoButton);
@@ -777,9 +802,7 @@ class ExplorerController
 		redoBox.add(routeButton);
 		redoBox.add(Box.createHorizontalGlue());
 		redoBox.add(Box.createHorizontalGlue());
-
 		add(redoBox, BorderLayout.NORTH);
-
 		undoButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -835,6 +858,7 @@ class ExplorerController
 	public void find_actionPerformed(ActionEvent e)
 	{
 		Automata theAutomata = new Automata();
+
 		theAutomata.addAutomaton(theAutomaton);
 
 		try
@@ -842,7 +866,7 @@ class ExplorerController
 			ActionMan.findStates.execute(theProject, theAutomata);
 		}
 		catch (Exception ex)
-		{			
+		{
 			logger.error(ex.toString());
 			logger.debug(ex.getStackTrace());
 		}
@@ -853,7 +877,8 @@ class ExplorerController
 		try
 		{
 			LabelTrace trace = theAutomaton.getTrace(stateViewer.getCurrState());
-//			logger.info("Trace to state " + stateViewer.getCurrState().getId() + ": " + trace);
+
+//                      logger.info("Trace to state " + stateViewer.getCurrState().getId() + ": " + trace);
 			logger.info("Trace to state " + stateViewer.getCurrState().getName() + ": " + trace);
 		}
 		catch (Exception ex)
@@ -861,6 +886,7 @@ class ExplorerController
 			logger.error("Error when performing route: ", ex);
 			logger.debug(ex.getStackTrace());
 		}
+
 		stateViewer.update();
 	}
 

@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -63,8 +64,6 @@ public class AutomatonToDot
 	// We hope that this is the size of an A4 page (isn't 8.5" times 11" ??)
 	private static final int DEFAULT_WIDTH = 7;
 	private static final int DEFAULT_HEIGHT = 11;
-
-
 	private Automaton aut;
 	private boolean leftToRight = false;
 	private boolean withLabel = true;
@@ -108,12 +107,12 @@ public class AutomatonToDot
 			return "";
 		}
 
-		if (s.isAccepting() && !s.isForbidden())
+		if (s.isAccepting() &&!s.isForbidden())
 		{
 			return ", color = green3";
 		}
 
-		if (s.isMutuallyAccepting() && !s.isForbidden())
+		if (s.isMutuallyAccepting() &&!s.isForbidden())
 		{
 			return ", color = yellow";
 		}
@@ -125,11 +124,12 @@ public class AutomatonToDot
 
 		return "";
 	}
-	protected String getColor(boolean is_ctrl, boolean is_prio,	boolean is_imm, boolean is_eps, boolean is_obs)
+
+	protected String getColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs)
 	{
-		if(useColors)
+		if (useColors)
 		{
-			if(is_ctrl)
+			if (is_ctrl)
 			{
 				return ", color = green3";
 			}
@@ -138,8 +138,8 @@ public class AutomatonToDot
 				return ", color = red1";
 			}
 		}
-		return "";
 
+		return "";
 	}
 
 	public void serialize(PrintWriter pw)
@@ -149,7 +149,6 @@ public class AutomatonToDot
 
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
-
 		String standardShape = null;
 		String acceptingShape = null;
 		String mutuallyAcceptingShape = null;
@@ -160,7 +159,6 @@ public class AutomatonToDot
 
 		// fix page size to this:
 		pw.println("\tsize = \"" + DEFAULT_WIDTH + "," + DEFAULT_HEIGHT + "\";");
-
 
 		if (leftToRight)
 		{
@@ -208,11 +206,12 @@ public class AutomatonToDot
 				pw.println("\t{node [shape = plaintext, style=invis] \"" + initPrefix + state.getId() + "\"};");
 			}
 
-			if (state.isAccepting() && !state.isForbidden())
+			if (state.isAccepting() &&!state.isForbidden())
 			{
 				pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getId() + "\"};");
 			}
-			if (state.isMutuallyAccepting() && !state.isForbidden())
+
+			if (state.isMutuallyAccepting() &&!state.isForbidden())
 			{
 				pw.println("\t{node [shape = " + mutuallyAcceptingShape + "] \"" + state.getId() + "\"};");
 			}
@@ -237,7 +236,6 @@ public class AutomatonToDot
 		}
 
 		//Alphabet theAlphabet = aut.getAlphabet();
-
 		for (Iterator states = aut.stateIterator(); states.hasNext(); )
 		{
 			State sourceState = (State) states.next();
@@ -251,14 +249,14 @@ public class AutomatonToDot
 
 			pw.println("\"" + getColor(sourceState) + "]; ");
 
-			for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
+			for (Iterator arcSets = sourceState.outgoingArcSetIterator();
+					arcSets.hasNext(); )
 			{
 				boolean is_ctrl = true;
 				boolean is_prio = false;
 				boolean is_imm = false;
 				boolean is_eps = false;
 				boolean is_obs = false;
-
 				ArcSet currArcSet = (ArcSet) arcSets.next();
 				State fromState = currArcSet.getFromState();
 				State toState = currArcSet.getToState();
@@ -269,35 +267,40 @@ public class AutomatonToDot
 				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
 				{
 					Arc currArc = (Arc) arcIt.next();
-					LabeledEvent thisEvent = currArc.getEvent(); // theAlphabet.getEventWithId(currArc.getEventId());
+					LabeledEvent thisEvent = currArc.getEvent();    // theAlphabet.getEventWithId(currArc.getEventId());
 
 					if (!thisEvent.isControllable())
 					{
 						pw.print("!");
+
 						is_ctrl = false;
 					}
 
 					if (!thisEvent.isPrioritized())
 					{
 						pw.print("?");
+
 						is_prio = true;
 					}
 
 					if (thisEvent.isImmediate())
 					{
 						pw.print("#");
+
 						is_imm = true;
 					}
 
 					if (thisEvent.isEpsilon())
 					{
 						pw.print("@");
+
 						is_eps = true;
 					}
 
 					if (!thisEvent.isObservable())
 					{
 						pw.print("$");
+
 						is_obs = true;
 					}
 
@@ -318,11 +321,12 @@ public class AutomatonToDot
 		// Ok, new versions of dot seems to be able to deal with this.
 		for (Iterator stateIt = initialStates.iterator(); stateIt.hasNext(); )
 		{
-		 	State currState = (State)stateIt.next();
-		 	pw.println("\t{ rank = min ;");
-		 	pw.println("\t\t\"" + initPrefix + currState.getId() + "\";");
-		 	pw.println("\t\t\"" + currState.getId() + "\";");
-		 	pw.println("\t}");
+			State currState = (State) stateIt.next();
+
+			pw.println("\t{ rank = min ;");
+			pw.println("\t\t\"" + initPrefix + currState.getId() + "\";");
+			pw.println("\t\t\"" + currState.getId() + "\";");
+			pw.println("\t}");
 		}
 
 		pw.println("}");

@@ -82,7 +82,6 @@ public class FileFormats
 	public static final FileFormats SMV = new FileFormats(false, true, "SMV", ".smv", "SMV files (*.smv)");
 	public static final FileFormats FSM = new FileFormats(false, true, "FSM", ".fsm", "UMDES files (*.fsm)");
 
-
 	// Input only
 	public static final FileFormats VPRJ = new FileFormats(true, false, "VPRJ", ".vprj", "Valid Project files (*.vprj)");
 	public static final FileFormats VMOD = new FileFormats(true, false, "VMOD", ".vmod", "Valid Module files (*.vmod)");
@@ -90,7 +89,6 @@ public class FileFormats
 
 	// Neither input nor output
 	public static final FileFormats Directory = new FileFormats(false, false, "Directory", "", "Directory");
-
 	private String identifier;
 	private String extension;
 	private String description;
@@ -100,14 +98,17 @@ public class FileFormats
 	private FileFormats(boolean input, boolean output, String identifier, String extension, String description)
 	{
 		collection.add(this);
+
 		if (input)
 		{
 			inputs.add(this);
 		}
+
 		if (output)
 		{
 			outputs.add(this);
 		}
+
 		this.input = input;
 		this.output = output;
 		this.identifier = identifier;
@@ -144,5 +145,4 @@ public class FileFormats
 	{
 		return description;
 	}
-
 }

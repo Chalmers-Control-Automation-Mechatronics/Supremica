@@ -1,4 +1,3 @@
-
 package org.supremica.automata.IO;
 
 import java.io.*;
@@ -9,7 +8,6 @@ import org.supremica.automata.*;
  *
  *  /Arash
  */
-
 public class AutomataToCommunicationGraph
 	implements AutomataSerializer
 {
@@ -19,7 +17,6 @@ public class AutomataToCommunicationGraph
 	{
 		this.theAutomata = aut;
 	}
-
 
 	public void serialize(PrintWriter pw)
 		throws Exception
@@ -31,28 +28,35 @@ public class AutomataToCommunicationGraph
 		pw.println("#     /Arash ");
 
 		int edges = 0, nodes = 0;
-		for (int i=0; i<theAutomata.size(); i++)
+
+		for (int i = 0; i < theAutomata.size(); i++)
 		{
 			Automaton currAutomaton = theAutomata.getAutomatonAt(i);
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 			int save_edges = edges;
-			for (int j=i+1; j<theAutomata.size(); j++)
+
+			for (int j = i + 1; j < theAutomata.size(); j++)
 			{
 				Automaton otherAutomaton = theAutomata.getAutomatonAt(j);
 				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
 				int weight = currAlphabet.nbrOfCommonEvents(otherAlphabet);
+
 				if (weight > 0)
 				{
 					pw.println("" + currAutomaton.getName() + "\t" + otherAutomaton.getName() + "\t" + weight);
+
 					edges++;
 				}
 			}
-			if(save_edges < edges) nodes++;
+
+			if (save_edges < edges)
+			{
+				nodes++;
+			}
 		}
 
 		// TODO:
 		// we have num of edges and nodes, give a simple statistic and analysis about the graph type here
-
 		pw.flush();
 		pw.close();
 	}

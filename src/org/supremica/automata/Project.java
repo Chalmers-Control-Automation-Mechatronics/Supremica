@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -81,6 +82,7 @@ public class Project
 	public Project(String name)
 	{
 		this();
+
 		setName(name);
 	}
 
@@ -93,6 +95,7 @@ public class Project
 		theInputSignals = new Signals(otherProject.theInputSignals);
 		theOutputSignals = new Signals(otherProject.theOutputSignals);
 		theTimers = new Timers(otherProject.theTimers);
+
 		setName(otherProject.getName());
 	}
 
@@ -149,14 +152,15 @@ public class Project
 	public boolean hasAnimation()
 	{
 		return animationURL != null;
+
 		/*
 		if (animationPath == null)
 		{
-			return false;
+				return false;
 		}
 		if (animationPath.equals(""))
 		{
-			return false;
+				return false;
 		}
 		return true;
 		*/
@@ -176,17 +180,16 @@ public class Project
 	}
 
 /*
-	public InputProtocol getInputProtocol()
-	{
-		return inputProtocol;
-	}
+		public InputProtocol getInputProtocol()
+		{
+				return inputProtocol;
+		}
 
-	public void setInputProtocol(InputProtocol theProtocol)
-	{
-		this.inputProtocol = theProtocol;
-	}
+		public void setInputProtocol(InputProtocol theProtocol)
+		{
+				this.inputProtocol = theProtocol;
+		}
 */
-
 	public void addAttributes(Project otherProject)
 	{
 		addInputSignals(otherProject.getInputSignals());
@@ -203,6 +206,7 @@ public class Project
 		{
 			theInputSignals = new Signals();
 		}
+
 		theInputSignals.addSignals(otherSignals);
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
@@ -213,6 +217,7 @@ public class Project
 		{
 			theOutputSignals = new Signals();
 		}
+
 		theOutputSignals.addSignals(otherSignals);
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
@@ -223,6 +228,7 @@ public class Project
 		{
 			theActions = new Actions();
 		}
+
 		theActions.addActions(otherActions);
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
@@ -233,6 +239,7 @@ public class Project
 		{
 			theControls = new Controls();
 		}
+
 		theControls.addControls(otherControls);
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
@@ -243,6 +250,7 @@ public class Project
 		{
 			theTimers = new Timers();
 		}
+
 		theTimers.addTimers(otherTimers);
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
@@ -283,8 +291,8 @@ public class Project
 
 	public boolean validExecutionParameters()
 	{
-
 		Alphabet theAlphabet;
+
 		try
 		{
 			theAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
@@ -293,63 +301,85 @@ public class Project
 		{
 			throw new RuntimeException(ex);
 		}
+
 		boolean valid = true;
+
 		for (Iterator theIt = actionIterator(); theIt.hasNext(); )
 		{
-			Action currAction = (Action)theIt.next();
+			Action currAction = (Action) theIt.next();
 			String currLabel = currAction.getLabel();
+
 			if (!theAlphabet.contains(currLabel))
 			{
 				valid = false;
+
 				logger.error("The action " + currLabel + " is not a valid event");
 			}
-			for (Iterator theCmdIt = currAction.commandIterator(); theCmdIt.hasNext();)
+
+			for (Iterator theCmdIt = currAction.commandIterator();
+					theCmdIt.hasNext(); )
 			{
-				Command currCommand = (Command)theCmdIt.next();
+				Command currCommand = (Command) theCmdIt.next();
 				String currCommandLabel = currCommand.getLabel();
+
 				if (!theOutputSignals.hasSignal(currCommandLabel))
 				{
 					valid = false;
+
 					logger.error("The command " + currCommandLabel + " is not a valid output signal");
 				}
 			}
 		}
+
 		for (Iterator theIt = controlIterator(); theIt.hasNext(); )
 		{
-			Control currControl = (Control)theIt.next();
+			Control currControl = (Control) theIt.next();
 			String currLabel = currControl.getLabel();
+
 			if (!theAlphabet.contains(currLabel))
 			{
 				valid = false;
+
 				logger.error("The control " + currLabel + " is not a valid event");
 			}
-			for (Iterator theCondIt = currControl.conditionIterator(); theCondIt.hasNext();)
+
+			for (Iterator theCondIt = currControl.conditionIterator();
+					theCondIt.hasNext(); )
 			{
-				Condition currCondition = (Condition)theCondIt.next();
+				Condition currCondition = (Condition) theCondIt.next();
 				String currConditionLabel = currCondition.getLabel();
+
 				if (!theInputSignals.hasSignal(currConditionLabel))
 				{
 					valid = false;
+
 					logger.error("The condition " + currConditionLabel + " is not a valid output signal");
 				}
 			}
 		}
+
 		for (Iterator theIt = timerIterator(); theIt.hasNext(); )
 		{
-			EventTimer currTimer = (EventTimer)theIt.next();
+			EventTimer currTimer = (EventTimer) theIt.next();
 			String currStartEvent = currTimer.getStartEvent();
+
 			if (!theAlphabet.contains(currStartEvent))
 			{
 				valid = false;
+
 				logger.error("The start event, " + currStartEvent + ", in timer " + currTimer.getName() + " is not a valid event");
 			}
+
 			String currTimeoutEvent = currTimer.getTimeoutEvent();
+
 			if (!theAlphabet.contains(currTimeoutEvent))
 			{
 				valid = false;
+
 				logger.error("The timeout event, " + currStartEvent + ", in timer " + currTimer.getName() + " is not a valid event");
 			}
 		}
+
 		return valid;
 	}
 
@@ -360,6 +390,7 @@ public class Project
 	public Alphabet setIndicies()
 	{
 		theTimers.setIndices();
+
 		return super.setIndicies();
 	}
 
@@ -375,16 +406,13 @@ public class Project
 		{
 			return false;
 		}
+
 		// Add more checks here
 		return true;
 	}
 
-	public boolean hasExecutionParameters() {
-		return hasAnimation()
-				|| getTimers().size() > 0
-				|| getInputSignals().size() > 0
-				|| getOutputSignals().size() > 0
-				|| getActions().size() > 0
-				|| getControls().size() > 0;
+	public boolean hasExecutionParameters()
+	{
+		return hasAnimation() || (getTimers().size() > 0) || (getInputSignals().size() > 0) || (getOutputSignals().size() > 0) || (getActions().size() > 0) || (getControls().size() > 0);
 	}
 }

@@ -25,6 +25,4 @@ public class Units
 	{
 		return theUnits.values().iterator();
 	}
-
-
 }

@@ -1,23 +1,24 @@
-/********************** HelpAction.java ************************/
-// Implementation of the Help stuff
 
+/********************** HelpAction.java ************************/
+
+// Implementation of the Help stuff
 package org.supremica.gui.useractions;
 
 import java.awt.event.*;
 import javax.swing.*;
 import javax.help.*;
-
 import org.supremica.gui.help.ContentHelp;
 
 public class HelpAction
 	extends AbstractAction
 {
- 	private ContentHelp help = null;
+	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
 
 	public HelpAction()
 	{
 		super("Supervisory Control", new ImageIcon(HelpAction.class.getResource("/toolbarButtonGraphics/general/Help16.gif")));
+
 		putValue(SHORT_DESCRIPTION, "Provides help on supervisory control theory");
 
 		this.help = new ContentHelp();
@@ -28,5 +29,4 @@ public class HelpAction
 	{
 		helpDisplayer.actionPerformed(e);
 	}
-
 }

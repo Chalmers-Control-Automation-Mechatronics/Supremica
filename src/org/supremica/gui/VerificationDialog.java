@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -58,8 +59,10 @@ import javax.swing.*;
 interface VerificationPanel
 {
 	void update(VerificationOptions v);
+
 	void regain(VerificationOptions v);
 }
+
 
 class VerificationDialogStandardPanel
 	extends JPanel
@@ -68,12 +71,11 @@ class VerificationDialogStandardPanel
 	private JComboBox verificationTypeBox;
 	private AlgorithmSelector algorithmSelector;
 	private JTextArea note;
+
 	//private JTextArea note;// = new JTextArea("Bananas...");
-
 	//final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake! 
-	//									"Non-blocking",       // No! God has nothing to do with programming!! 
-	//									"Language inclusion"};// Programming is fate-driven!
-
+	//                                                                      "Non-blocking",       // No! God has nothing to do with programming!! 
+	//                                                                      "Language inclusion"};// Programming is fate-driven!
 	static class AlgorithmSelector
 		extends JComboBox
 	{
@@ -81,21 +83,26 @@ class VerificationDialogStandardPanel
 		{
 			super(VerificationAlgorithm.toArray());
 		}
+
 		public void forceMonolithic()
 		{
 			allowAll();
 			removeItem(VerificationAlgorithm.Modular);
 		}
+
 		public void forceModular()
 		{
 			allowAll();
 			removeItem(VerificationAlgorithm.Monolithic);
 		}
+
 		public void allowAll()
 		{
 			removeAllItems();
+
 			Object[] alternatives = VerificationAlgorithm.toArray();
-			for (int i=0; i<alternatives.length; i++)
+
+			for (int i = 0; i < alternatives.length; i++)
 			{
 				addItem(alternatives[i]);
 			}
@@ -105,30 +112,34 @@ class VerificationDialogStandardPanel
 	public VerificationDialogStandardPanel()
 	{
 		verificationTypeBox = new JComboBox(VerificationType.toArray());
+
 		verificationTypeBox.addActionListener(this);
 
 		algorithmSelector = new AlgorithmSelector();
+		note = new JTextArea("Note:\n" + "Currently, modular non-blocking\n" + "verification is not supported");
 
-		note = new JTextArea("Note:\n" +
-							 "Currently, modular non-blocking\n" +
-							 "verification is not supported");
 		note.setBackground(this.getBackground());
 
 		Box standardBox = Box.createVerticalBox();
+
 		standardBox.add(verificationTypeBox);
 		standardBox.add(algorithmSelector);
 
 		// NEW TRY
-		this.setLayout(new GridLayout(2,1));
+		this.setLayout(new GridLayout(2, 1));
+
 		JPanel choicePanel = new JPanel();
+
 		choicePanel.setLayout(new FlowLayout());
 		choicePanel.add(standardBox);
 		this.add(choicePanel);
+
 		JPanel notePanel = new JPanel();
+
 		notePanel.setLayout(new FlowLayout());
 		notePanel.add(note);
 		note.setVisible(false);
-		this.add(notePanel);		
+		this.add(notePanel);
 	}
 
 	public void update(VerificationOptions verificationOptions)
@@ -139,42 +150,35 @@ class VerificationDialogStandardPanel
 
 	public void regain(VerificationOptions verificationOptions)
 	{
-		verificationOptions.setVerificationType((VerificationType)verificationTypeBox.getSelectedItem());
-		verificationOptions.setAlgorithmType((VerificationAlgorithm)algorithmSelector.getSelectedItem());
+		verificationOptions.setVerificationType((VerificationType) verificationTypeBox.getSelectedItem());
+		verificationOptions.setAlgorithmType((VerificationAlgorithm) algorithmSelector.getSelectedItem());
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
-		if((verificationTypeBox.getSelectedItem()) == VerificationType.Nonblocking)
+		if ((verificationTypeBox.getSelectedItem()) == VerificationType.Nonblocking)
 		{
+
 			// force the monolithic algorithm
 			algorithmSelector.forceMonolithic();
-			note.setText("Note:\n" +
-						 "Currently, modular non-blocking\n" +
-						 "verification is not supported.");
+			note.setText("Note:\n" + "Currently, modular non-blocking\n" + "verification is not supported.");
 			note.setVisible(true);
 		}
-		else if((verificationTypeBox.getSelectedItem()) == VerificationType.MutuallyNonblocking)
+		else if ((verificationTypeBox.getSelectedItem()) == VerificationType.MutuallyNonblocking)
 		{
+
 			// force the modular algorithm
 			algorithmSelector.forceModular();
-			note.setText("Note:\n" +
-						 "Mutual nonblocking is inherently modular\n" +
-						 "and hence there is no monolithic algoritm.");
+			note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" + "and hence there is no monolithic algoritm.");
 			note.setVisible(true);
 		}
 		else if ((verificationTypeBox.getSelectedItem()) == VerificationType.LanguageInclusion)
 		{
 			algorithmSelector.allowAll();
-			note.setText("Note:\n" +
-						 "This verifies whether the language of the unselected\n" + 
-						 "automata is included in the inverse projection of\n" +
-						 "the language of the selected automata.\n" +
-						 "  The alphabet of the unselected automata must\n" + 
-						 "include the alphabet of the selected automata.\n");
+			note.setText("Note:\n" + "This verifies whether the language of the unselected\n" + "automata is included in the inverse projection of\n" + "the language of the selected automata.\n" + "  The alphabet of the unselected automata must\n" + "include the alphabet of the selected automata.\n");
 			note.setVisible(true);
 		}
-		else // Something else is selected
+		else    // Something else is selected
 		{
 			algorithmSelector.allowAll();
 			note.setVisible(false);
@@ -196,15 +200,17 @@ class VerificationDialogAdvancedPanel
 	{
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
+
 		exclusionStateLimit = new JTextField();
 
 		JLabel reachabilityStateLimitText = new JLabel("Initial state limit for reachability verification");
-		reachabilityStateLimit = new JTextField();
 
+		reachabilityStateLimit = new JTextField();
 		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
 		skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
 
 		JLabel nbrOfAttemptsText = new JLabel("Number of verification attempts");
+
 		nbrOfAttempts = new JTextField();
 
 		advancedBox.add(exclusionStateLimitText);
@@ -277,7 +283,6 @@ public class VerificationDialog
 
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
-
 		Utility.setDefaultButton(dialog, okButton);
 
 		// ** MF ** Fix to get the frigging thing centered
@@ -318,7 +323,7 @@ public class VerificationDialog
 		Object source = event.getSource();
 
 		if (source == okButton)
-		{                                              // Remember the selections
+		{    // Remember the selections
 			verificationOptions.setDialogOK(true);
 			standardPanel.regain(verificationOptions);
 			advancedPanel.regain(verificationOptions);

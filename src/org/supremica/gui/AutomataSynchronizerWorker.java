@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -49,7 +50,6 @@
 package org.supremica.gui;
 
 import org.supremica.automata.algorithms.*;
-
 import javax.swing.*;
 import java.util.*;
 import org.supremica.automata.Automata;
@@ -85,9 +85,12 @@ public class AutomataSynchronizerWorker
 	{
 		if (mode == MODE_SYNC)
 		{
+
 			// Date startDate = new Date();
 			ActionTimer timer = new ActionTimer();
+
 			timer.start();
+
 			AutomataSynchronizer theSynchronizer;
 
 			try
@@ -97,6 +100,7 @@ public class AutomataSynchronizerWorker
 			catch (Exception e)
 			{
 				timer.stop();
+
 				// -- MF -- should really put up a message box here? Why not let the Gui manage that?
 				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
@@ -107,10 +111,12 @@ public class AutomataSynchronizerWorker
 			}
 
 			ArrayList threadsToStop = new ArrayList();
+
 			threadsToStop.add(theSynchronizer);
 			threadsToStop.add(this);
 
 			ExecutionDialog executionDialog = new ExecutionDialog(workbench.getFrame(), "Synchronizing", threadsToStop);
+
 			theSynchronizer.getHelper().setExecutionDialog(executionDialog);
 			executionDialog.setMode(ExecutionDialogMode.synchronizing);
 
@@ -139,9 +145,11 @@ public class AutomataSynchronizerWorker
 				catch (Exception ex)
 				{
 					timer.stop();
+
 					// -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					workbench.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
 					ex.printStackTrace();
+
 					// logger.debug(ex.getStackTrace());
 					return;
 				}
@@ -153,16 +161,21 @@ public class AutomataSynchronizerWorker
 				/*-- MF -- Removed the name-fiddling let the project handle this -- But who, where?? */
 				if (theAutomaton != null)
 				{
+
 					//theAutomaton.setName(newAutomatonName);
 					StringBuffer buf = new StringBuffer();
-					for(Iterator it = theAutomata.iterator(); it.hasNext(); )
+
+					for (Iterator it = theAutomata.iterator(); it.hasNext(); )
 					{
-						Automaton automaton = (Automaton)it.next();
+						Automaton automaton = (Automaton) it.next();
+
 						buf.append(automaton.getName() + "||");
 					}
+
 					// Remove trailing "||"
-					theAutomaton.setComment(buf.substring(0, buf.length()-2));
+					theAutomaton.setComment(buf.substring(0, buf.length() - 2));
 				}
+
 				mode = MODE_UPDATE;
 
 				java.awt.EventQueue.invokeLater(this);
@@ -176,6 +189,7 @@ public class AutomataSynchronizerWorker
 			}
 			else
 			{
+
 				// Date endDate = new Date();
 				timer.stop();
 
@@ -189,11 +203,13 @@ public class AutomataSynchronizerWorker
 		}
 		else if (mode == MODE_UPDATE)
 		{
+
 			// Display automaton
 			try
 			{
 				if (theAutomaton != null)
 				{
+
 					// -- MF -- container.add(theAutomaton);
 					// workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
 					workbench.addAutomaton(theAutomaton);
@@ -201,6 +217,7 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception ex)
 			{
+
 				// logger.error("Could not add the new automaton after synchronization");
 				// logger.debug(ex.getStackTrace());
 				workbench.error("Could not add the new automaton after synchronization");

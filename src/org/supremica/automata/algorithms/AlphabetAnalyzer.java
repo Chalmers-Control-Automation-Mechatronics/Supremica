@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -71,8 +72,8 @@ public class AlphabetAnalyzer
 	public void execute()
 	{
 		buildEventToAutomataMap();
-
 		checkAllPairs();
+
 		//printUnsynchronizedEvents();
 	}
 
@@ -83,15 +84,18 @@ public class AlphabetAnalyzer
 
 	private void buildEventToAutomataMap(Automata anAutomata)
 	{
+
 		// Loop over automata
-		for (Iterator automataIt = anAutomata.iterator(); automataIt.hasNext();)
+		for (Iterator automataIt = anAutomata.iterator();
+				automataIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) automataIt.next();
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 			// Loop over alphabet
-			for (EventIterator eventIt = currAlphabet.iterator(); eventIt.hasNext();)
-			{	// Insert in map
+			for (EventIterator eventIt = currAlphabet.iterator();
+					eventIt.hasNext(); )
+			{    // Insert in map
 				insertEvent(eventIt.nextEvent(), currAutomaton);
 			}
 		}
@@ -105,6 +109,7 @@ public class AlphabetAnalyzer
 	public HashMap getEventToAutomataMap(Automata anAutomata)
 	{
 		buildEventToAutomataMap(anAutomata);
+
 		return eventToAutomataMap;
 	}
 
@@ -114,22 +119,24 @@ public class AlphabetAnalyzer
 	 *@return HashMap mapping uncontrollable Event-object to Set of plant-type Automaton-objects.
 	 */
 	public HashMap getUncontrollableEventToPlantMap()
-		 throws Exception
+		throws Exception
 	{
-		///* There will be no exceptions
-  		  try
-		  {
-		      buildUncontrollableEventToPlantMap();
-		  }
-		  catch (Exception e)
-		  {
-			  logger.error("Error in AlphabetAnalyzer. " + e);
-			  logger.debug(e.getStackTrace());
-			  throw e;
-		  }
-		  //*/
 
-		  //buildUncontrollableEventToPlantMap();
+		///* There will be no exceptions
+		try
+		{
+			buildUncontrollableEventToPlantMap();
+		}
+		catch (Exception e)
+		{
+			logger.error("Error in AlphabetAnalyzer. " + e);
+			logger.debug(e.getStackTrace());
+
+			throw e;
+		}
+
+		//*/
+		//buildUncontrollableEventToPlantMap();
 		return eventToAutomataMap;
 	}
 
@@ -164,8 +171,9 @@ public class AlphabetAnalyzer
 		HashSet automatonSet = (HashSet) eventToAutomataMap.get(ev);
 
 		if (automatonSet == null)
-		{   // There were no automata in the map for this event,
+		{    // There were no automata in the map for this event,
 			automatonSet = new HashSet();
+
 			eventToAutomataMap.put(ev, automatonSet);
 		}
 
@@ -279,21 +287,18 @@ public class AlphabetAnalyzer
 
 		if ((nbrOnlyLeft == 0) && (nbrOnlyRight == 0))
 		{
-			logger.info("Alphabet: " + leftAut.getName() + " == " +
-						rightAut.getName() + " new unsych: " + newUnique);
+			logger.info("Alphabet: " + leftAut.getName() + " == " + rightAut.getName() + " new unsych: " + newUnique);
 		}
 		else
 		{
 			if (nbrOnlyLeft == 0)
 			{
-				logger.info("Alphabet: " + leftAut.getName() + " <= " +
-							rightAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + leftAut.getName() + " <= " + rightAut.getName() + " new unsych: " + newUnique);
 			}
 
 			if (nbrOnlyRight == 0)
 			{
-				logger.info("Alphabet: " + rightAut.getName() + " <= " +
-							leftAut.getName() + " new unsych: " + newUnique);
+				logger.info("Alphabet: " + rightAut.getName() + " <= " + leftAut.getName() + " new unsych: " + newUnique);
 			}
 		}
 
@@ -313,6 +318,7 @@ public class AlphabetAnalyzer
 	}
 
 	// -----------------------------------------------------------------
+
 	/**
 	 * returns the events that are always blocked in an automaton.
 	 * assumes that the automaton is trim, or it will give an underapproximated answer.
@@ -322,19 +328,21 @@ public class AlphabetAnalyzer
 	public static HashSet getBlockedEvents(Automaton a)
 	{
 		HashSet ret = new HashSet();
-
 		Alphabet alfa = a.getAlphabet();
+
 		for (EventIterator evIt = alfa.iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
-			ret.add( currEvent.getLabel() );
+
+			ret.add(currEvent.getLabel());
 		}
 
-		for(ArcIterator ai = a.arcIterator();  ai.hasNext();)
+		for (ArcIterator ai = a.arcIterator(); ai.hasNext(); )
 		{
 			Arc currArc = ai.nextArc();
-//			currArc.getEvent().extra1 = 1;
-			ret.remove( currArc.getEvent().getLabel() );
+
+//                      currArc.getEvent().extra1 = 1;
+			ret.remove(currArc.getEvent().getLabel());
 		}
 
 		return ret;

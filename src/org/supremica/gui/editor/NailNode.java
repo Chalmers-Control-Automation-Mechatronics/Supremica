@@ -132,6 +132,7 @@ public class NailNode
 		if (thePort != null)
 		{
 			Point c = myEllipse.getSpotLocation(Center);
+
 			thePort.setSpotLocation(Center, c.x, c.y);
 		}
 	}
@@ -160,16 +161,17 @@ public class NailNode
 
 		// can't setLocation until myEllipse exists
 		//myEllipse.setSpotLocation(JGoObject.Center, theState.getLocation());
-
 		// if there is a string, create a label with a transparent
 		// background that is centered
 		// String labeltext = theState.getName();
+
 /*
-		if (labeltext == null)
-		{
-			labeltext = theState.getId();
-		}
+				if (labeltext == null)
+				{
+						labeltext = theState.getId();
+				}
 */
+
 		/*
 		 *  if (labeltext != null)
 		 *  {
@@ -191,11 +193,10 @@ public class NailNode
 		// add all the children to the area
 		addObjectAtHead(myEllipse);
 
-//		if (myLabel != null)
-//		{
-//			addObjectAtTail(myLabel);
-//		}
-
+//              if (myLabel != null)
+//              {
+//                      addObjectAtTail(myLabel);
+//              }
 		addObjectAtTail(thePort);
 
 		// now position the label and port appropriately
@@ -209,7 +210,6 @@ public class NailNode
 	{
 		return "Nail";
 	}
-
 
 	// Convenience methods: control the ellipse's pen and brush
 	public JGoPen getPen()
@@ -279,5 +279,4 @@ public class NailNode
 	{
 		return myEllipse;
 	}
-
 }

@@ -75,7 +75,7 @@ public class AutomataToControlBuilderSFC
 	public AutomataToControlBuilderSFC(Project theProject, IEC61131Helper theHelper)
 	{
 		this.theProject = theProject;
-		this.theHelper = (ControlBuilderHelper)theHelper;
+		this.theHelper = (ControlBuilderHelper) theHelper;
 	}
 
 	public void serialize(String fileName)
@@ -93,7 +93,9 @@ public class AutomataToControlBuilderSFC
 			FileWriter theWriter = new FileWriter(theFile);
 			PrintWriter thePrintWriter = new PrintWriter(theWriter);
 			String theFileName = theFile.getName();
+
 			fileName = theFileName.substring(0, theFileName.length() - 4);
+
 			serializeApp(thePrintWriter, filename);
 			thePrintWriter.close();
 		}
@@ -125,6 +127,7 @@ public class AutomataToControlBuilderSFC
 		pw.println(filename);
 		pw.println("Invocation ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 )");
 		pw.println(": ROOT_MODULE");
+
 		// Use generic Program1 for now
 		pw.println("PROGRAM Program1 : SINGLE_PROGRAM");
 
@@ -141,6 +144,7 @@ public class AutomataToControlBuilderSFC
 		{
 			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 
@@ -161,7 +165,6 @@ public class AutomataToControlBuilderSFC
 		pw.println("END_VAR\n");
 
 		// End of variable declarations.
-
 		// Here comes the automata, the tricky part.
 		automatonConverter(theProject, pw);
 
@@ -170,20 +173,19 @@ public class AutomataToControlBuilderSFC
 
 		// End of Program code
 		pw.println("END_PROGRAM;\n");
-
 		pw.println("ModuleDef");
 		pw.println("ClippingBounds := ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
 		pw.println("ZoomLimits := 0.0 0.01\n");
+
 		// End of Module definition
-
 		pw.println("END_MODULE");
-
 	}
 
 	public void serializePrj(File theFile, String filename)
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
 		serializePrj(theWriter, filename);
 		theWriter.close();
 	}
@@ -209,8 +211,11 @@ public class AutomataToControlBuilderSFC
 	protected void automatonConverter(Project theProject, PrintWriter pw)
 	{
 		EnumerateStates enumer = new EnumerateStates(theProject, "q");
+
 		enumer.execute();
-		for (Iterator automataIt = theProject.iterator(); automataIt.hasNext(); )
+
+		for (Iterator automataIt = theProject.iterator();
+				automataIt.hasNext(); )
 		{
 
 			// Each automaton is translated into a ControlBuilder Sequence.
@@ -275,6 +280,7 @@ public class AutomataToControlBuilderSFC
 		{
 			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 
@@ -300,7 +306,6 @@ public class AutomataToControlBuilderSFC
 				 We must take care of the controllability of the events in this
 				 step. Only controllable events should be generated. The uncontrollable
 				 ones should disable the generation of the controllable. */
-
 				printEventMonitor(theProject, extConfAlphabet, pw);
 			}
 		}    // Step 5. Terminate if event set exhausted
@@ -323,6 +328,7 @@ public class AutomataToControlBuilderSFC
 			// This should not happen since theExtConfAlphabet is empty.
 			logger.error("Failed adding event when computing extended conflict. Code generation erroneous. " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return theExtConfAlphabet;
 		}
 
@@ -332,7 +338,8 @@ public class AutomataToControlBuilderSFC
 		{
 
 			// Step 2. Pick e in C \ D.
-			for (Iterator alphaIt = iteratorAlphabet.iterator(); alphaIt.hasNext(); )
+			for (Iterator alphaIt = iteratorAlphabet.iterator();
+					alphaIt.hasNext(); )
 			{
 				LabeledEvent confEvent = (LabeledEvent) alphaIt.next();
 
@@ -354,6 +361,7 @@ public class AutomataToControlBuilderSFC
 						// This should not happen since testAlphabet didn't contain the event.
 						logger.error("Failed adding event when computing extended conflict. Code generation erroneous " + ex);
 						logger.debug(ex.getStackTrace());
+
 						return theExtConfAlphabet;
 					}
 				}
@@ -385,6 +393,7 @@ public class AutomataToControlBuilderSFC
 			// This should not happen since confAlphabet is empty.
 			logger.error("Failed adding event when computing conflict. " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return confAlphabet;
 		}
 
@@ -409,7 +418,7 @@ public class AutomataToControlBuilderSFC
 
 					try
 					{
-						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -424,20 +433,20 @@ public class AutomataToControlBuilderSFC
 								// It is only necessary to get the conflicting transitions for this state once?
 								sourceState.setVisited(true);
 
-								for (Iterator outgoingIt = sourceState.outgoingArcsIterator(); outgoingIt.hasNext(); )
+								for (Iterator outgoingIt = sourceState.outgoingArcsIterator();
+										outgoingIt.hasNext(); )
 								{
 									Arc currArc = (Arc) outgoingIt.next();
 
 									try
 									{
-										LabeledEvent currArcEvent = currArc.getEvent(); // (LabeledEvent) aut.getEvent(currArc.getEventId());
+										LabeledEvent currArcEvent = currArc.getEvent();    // (LabeledEvent) aut.getEvent(currArc.getEventId());
 										Alphabet dummyAlphabet = new Alphabet();
 
 										try
 										{
 											dummyAlphabet.addEvent(currArcEvent);
 											logger.debug("Event " + currArcEvent.getLabel() + " is in conflict with " + theEvent.getLabel());
-
 											confAlphabet.union(dummyAlphabet);
 										}
 										catch (Exception ex)
@@ -446,6 +455,7 @@ public class AutomataToControlBuilderSFC
 											// This should not happen since dummyAlphabet is empty.
 											logger.error("Failed adding event when computing conflict. " + ex);
 											logger.debug(ex.getStackTrace());
+
 											return confAlphabet;
 										}
 									}
@@ -455,6 +465,7 @@ public class AutomataToControlBuilderSFC
 										// This should not happen since the event exists in the automaton.
 										logger.error("Failed getting event label. Code generation erroneous. " + ex);
 										logger.debug(ex.getStackTrace());
+
 										return confAlphabet;
 									}
 								}
@@ -467,6 +478,7 @@ public class AutomataToControlBuilderSFC
 						// This should not happen since the event exists in the automaton.
 						logger.error("Failed getting event label. Code generation erroneous. " + ex);
 						logger.debug(ex.getStackTrace());
+
 						return confAlphabet;
 					}
 				}
@@ -484,9 +496,9 @@ public class AutomataToControlBuilderSFC
 		 in the case that there are controllable events in theAlphabet. Perhaps
 		 it is better to handle this in generateEventMonitor, but I think it is
 		 easier to do it here. */
-
 		if (theAlphabet.nbrOfControllableEvents() == 0)
 		{
+
 			// Nothing to generate.
 			return;
 		}
@@ -508,7 +520,8 @@ public class AutomataToControlBuilderSFC
 			pw.println("ALTERNATIVESEQ");
 		}
 
-		for (Iterator eventIt = theAlphabet.controllableEventIterator(); eventIt.hasNext(); )
+		for (Iterator eventIt = theAlphabet.controllableEventIterator();
+				eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
@@ -525,6 +538,7 @@ public class AutomataToControlBuilderSFC
 			 That is, a controllable event should not be generated when an uncontrollable
 			 event in extended conflict has occurred. */
 			String transitionCondition = computeGenerationCondition(theProject, theAlphabet, currEvent);
+
 			transitionCounter = printEventMonitorTransition(transitionCounter, eventMonitorCounter, transitionCondition, pw);
 
 			// (b) Create step with action e
@@ -548,15 +562,15 @@ public class AutomataToControlBuilderSFC
 	protected int printEventMonitorTransition(int transitionCounter, int eventMonitorCounter, String transitionCondition, PrintWriter pw)
 	{
 		pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + transitionCondition + theHelper.getTransitionConditionSuffix());
+
 		return transitionCounter;
 	}
 
 	protected void printEventMonitorAction(LabeledEvent theEvent, PrintWriter pw)
 	{
-		pw.println(theHelper.getActionP1Prefix() + theEvent.getLabel().replace('.', '_') +  theHelper.getAssignmentOperator() + "True;" + theHelper.getActionP1Suffix());
-		pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel().replace('.', '_') +  theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
+		pw.println(theHelper.getActionP1Prefix() + theEvent.getLabel().replace('.', '_') + theHelper.getAssignmentOperator() + "True;" + theHelper.getActionP1Suffix());
+		pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel().replace('.', '_') + theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
 	}
-
 
 	protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
 	{
@@ -569,6 +583,7 @@ public class AutomataToControlBuilderSFC
 		if (theExtConfAlphabet.nbrOfUncontrollableEvents() > 0)
 		{
 			String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
+
 			theCondition.append(theUcCondition);
 		}
 
@@ -593,7 +608,7 @@ public class AutomataToControlBuilderSFC
 
 					try
 					{
-						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -635,6 +650,7 @@ public class AutomataToControlBuilderSFC
 						// This should not happen since the event exists in the automaton.
 						logger.error("Failed getting event label. Code generation erroneous. " + ex);
 						logger.debug(ex.getStackTrace());
+
 						return theCondition.toString();
 					}
 				}
@@ -657,6 +673,7 @@ public class AutomataToControlBuilderSFC
 
 	protected String ucDisablementCondition(Alphabet theAlphabet)
 	{
+
 		/* We have to compute a conflict set first. Note that this is,
 		   in fact, a dynamic property. It may well be the case that
 		   statically the rising and falling edge of an input signal
@@ -665,11 +682,14 @@ public class AutomataToControlBuilderSFC
 		   Nevertheless, let's not bother about this now ... */
 		StringBuffer theCondition = new StringBuffer();
 		boolean firstUcEvent = true;
+
 		theCondition.append("NOT (");
 
-		for (Iterator ucEventIt = theAlphabet.uncontrollableEventIterator(); ucEventIt.hasNext(); )
+		for (Iterator ucEventIt = theAlphabet.uncontrollableEventIterator();
+				ucEventIt.hasNext(); )
 		{
 			LabeledEvent theUcEvent = (LabeledEvent) ucEventIt.next();
+
 			if (firstUcEvent)
 			{
 				firstUcEvent = false;
@@ -678,9 +698,12 @@ public class AutomataToControlBuilderSFC
 			{
 				theCondition.append(" OR ");
 			}
+
 			theCondition.append(theUcEvent.getLabel().replace('.', '_'));
 		}
+
 		theCondition.append(") AND ");
+
 		return theCondition.toString();
 	}
 
@@ -710,7 +733,7 @@ public class AutomataToControlBuilderSFC
 
 					try
 					{
-						LabeledEvent arcEvent = anArc.getEvent(); // (LabeledEvent) aut.getEvent(anArc.getEventId());
+						LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -754,6 +777,7 @@ public class AutomataToControlBuilderSFC
 						// This should not happen since the event exists in the automaton.
 						logger.error("Failed getting event label. Code generation erroneous. " + ex);
 						logger.debug(ex.getStackTrace());
+
 						return theCondition.toString();
 					}
 				}
@@ -793,7 +817,8 @@ public class AutomataToControlBuilderSFC
 
 		boolean firstArc = true;
 
-		for (Iterator outgoingArcsIt = theState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
+		for (Iterator outgoingArcsIt = theState.outgoingArcsIterator();
+				outgoingArcsIt.hasNext(); )
 		{
 			if (firstArc)
 			{
@@ -856,7 +881,7 @@ public class AutomataToControlBuilderSFC
 	{
 		try
 		{
-			LabeledEvent event = theArc.getEvent(); // theAutomaton.getEvent(theArc.getEventId());
+			LabeledEvent event = theArc.getEvent();    // theAutomaton.getEvent(theArc.getEventId());
 
 			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel().replace('.', '_') + theHelper.getTransitionConditionSuffix());
 		}
@@ -864,6 +889,7 @@ public class AutomataToControlBuilderSFC
 		{
 			logger.error("Failed getting event label. Code generation aborted. " + ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 	}

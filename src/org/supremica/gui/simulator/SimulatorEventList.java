@@ -47,7 +47,6 @@
  *
  *  Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.simulator;
 
 import org.supremica.automata.algorithms.*;
@@ -69,21 +68,23 @@ public class SimulatorEventList
 	private boolean showStateId = false;
 	private Automata theAutomata;
 	private int[] currState;
-//	private SimulatorStateViewer stateViewer;
+
+//      private SimulatorStateViewer stateViewer;
 	private SimulatorExecuter theExecuter;
 	private SimulatorEventListModel eventsList;
 	private JList theList;
-//	private boolean allowEventSelection = false;
 
+//      private boolean allowEventSelection = false;
 	public SimulatorEventList(SimulatorExecuter theExecuter, AutomataSynchronizerHelper helper, Project theProject)
 	{
 		setLayout(new BorderLayout());
 
-//		this.stateViewer = stateViewer;
+//              this.stateViewer = stateViewer;
 		this.theExecuter = theExecuter;
 		this.theAutomata = helper.getAutomata();
 		eventsList = new SimulatorEventListModel(theExecuter, helper, theProject);
-//		allowEventSelection = true;
+
+//              allowEventSelection = true;
 		theList = new JList(eventsList);
 
 		JScrollPane scrollPanel = new JScrollPane(theList);
@@ -92,15 +93,15 @@ public class SimulatorEventList
 
 		JLabel jLabel = null;
 
-//		if (showDisabledEvents)
-//		{
-//			jLabel = new JLabel("Outgoing events");
-//		}
-//		else
-//		{
-			jLabel = new JLabel("Enabled events");
-//		}
+//              if (showDisabledEvents)
+//              {
+//                      jLabel = new JLabel("Outgoing events");
+//              }
+//              else
+//              {
+		jLabel = new JLabel("Enabled events");
 
+//              }
 		add(jLabel, BorderLayout.NORTH);
 		add(scrollPanel, BorderLayout.CENTER);
 		theList.addMouseListener(new MouseAdapter()
@@ -115,19 +116,22 @@ public class SimulatorEventList
 
 						if (index >= 0)
 						{
+
 							// KA : These two commands should probably be executed without interruption
 							// Try with a wrapper object
 							LabeledEvent currEvent = eventsList.getEventAt(index);
+
 							executeEvent(currEvent);
-//							int[] newState = eventsList.getStateAt(index);
-//							if (!eventsList.executeEvent(currEvent))
-//							{
-//								logger.warn("Failed to execute event: " + currEvent.getLabel());
-//							}
-//							else
-//							{
-//								executeEvent(currEvent, newState);
-//							}
+
+//                                                      int[] newState = eventsList.getStateAt(index);
+//                                                      if (!eventsList.executeEvent(currEvent))
+//                                                      {
+//                                                              logger.warn("Failed to execute event: " + currEvent.getLabel());
+//                                                      }
+//                                                      else
+//                                                      {
+//                                                              executeEvent(currEvent, newState);
+//                                                      }
 						}
 					}
 				}
@@ -145,30 +149,29 @@ public class SimulatorEventList
 		eventsList.setShowStateId(showStateId);
 	}
 
-//	public void setCurrState(int[] currState)
-//	{
-//		this.currState = currState;
+//      public void setCurrState(int[] currState)
+//      {
+//              this.currState = currState;
 //
-//		theList.clearSelection();
-//		update();
-//	}
-
+//              theList.clearSelection();
+//              update();
+//      }
 	public void update()
 	{
 		theList.clearSelection();
-//		eventsList.setCurrState(currState);
+
+//              eventsList.setCurrState(currState);
 	}
 
-//	private void updateStateViewer(int[] newState)
-//	{
-//		stateViewer.setCurrState(newState);
-//	}
+//      private void updateStateViewer(int[] newState)
+//      {
+//              stateViewer.setCurrState(newState);
+//      }
 //
-//	private void executeEvent(LabeledEvent event)
-//	{
-//		stateViewer.executeEvent(event);
-//	}
-
+//      private void executeEvent(LabeledEvent event)
+//      {
+//              stateViewer.executeEvent(event);
+//      }
 	private void executeEvent(LabeledEvent currEvent)
 	{
 		theExecuter.executeEvent(currEvent);
@@ -193,5 +196,4 @@ public class SimulatorEventList
 	{
 		contentsChanged(e);
 	}
-
 }

@@ -1,8 +1,9 @@
+
 /*********************** MainPopupMenu.java *****************/
+
 // Free standing leaf class implementing Supremicas
 // main popup menu. Prime reason for this is easy access
 // The class instantiates itself with the menu stuff
-
 package org.supremica.gui;
 
 import java.awt.*;
@@ -28,29 +29,34 @@ class MainPopupMenu
 	private void initPopups()
 	{
 		JMenuItem selectAllItem = new JMenuItem("Select all");
-		menuHandler.add(selectAllItem, 0);
 
+		menuHandler.add(selectAllItem, 0);
 		menuHandler.addSeparator();
 
-
 		JMenuItem statusItem = new JMenuItem("Status");
+
 		menuHandler.add(statusItem, 0);
 
 		JMenuItem exploreItem = new JMenuItem("Explore states");
+
 		menuHandler.add(exploreItem, 1);
 
 		JMenuItem hierarchyItem = new JMenuItem("View hierarchy");
+
 		menuHandler.add(hierarchyItem, 1);
 
 		JMenuItem alphabetItem = new JMenuItem("View alphabet");
+
 		menuHandler.add(alphabetItem, 1);
 
 		JMenuItem statesItem = new JMenuItem("View states");
+
 		menuHandler.add(statesItem, 1);
 
 		if (SupremicaProperties.useDot())
 		{
 			JMenuItem viewItem = new JMenuItem("View automaton");
+
 			menuHandler.add(viewItem, 1);
 			viewItem.addActionListener(new ActionListener()
 			{
@@ -65,22 +71,25 @@ class MainPopupMenu
 		menuHandler.addSeparator();
 
 		JMenuItem synchronizeItem = new JMenuItem("Synchronize...");
+
 		menuHandler.add(synchronizeItem, 2);
 
 		JMenuItem verifyItem = new JMenuItem("Verify...");
+
 		menuHandler.add(verifyItem, 1);
 
 		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
-		menuHandler.add(synthesizeItem, 1);
 
+		menuHandler.add(synthesizeItem, 1);
 		menuHandler.addSeparator();
 
 		JMenuItem workbench = new SupremicaMenuItem(new WorkbenchAction());
-		menuHandler.add(workbench, 1);
 
+		menuHandler.add(workbench, 1);
 		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
+
 		menuHandler.add(purgeItem, 1);
 
 		// These are the "standard" algorithms
@@ -88,59 +97,66 @@ class MainPopupMenu
 		// ** This has to be reworked ** Use the Action concept instead **
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
-
 		JMenuItem minimizeItem = new JMenuItem("Minimize");
+
 		menuHandler.add(minimizeItem, 1);
 
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");
+
 		menuHandler.add(allAcceptingItem, 1);
 
 		JMenuItem stateEnumerator = new JMenuItem(ActionMan.stateEnumerator);
+
 		menuHandler.add(stateEnumerator, 1);
 
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
+
 		complementItem.setToolTipText("Generate an automaton with complementary marked language");
 		menuHandler.add(complementItem, 1);
 
 		// Do this...
 		JMenuItem languageRestrictor = new SupremicaMenuItem(ActionMan.languageRestrictor);
+
 		menuHandler.add(languageRestrictor, 1);
+
 		/* ...and you can forget about this
 		languageRestrictor.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.languageRestrictor_actionPerformed(getGui());
-				getGui().repaint();
-			}
+				public void actionPerformed(ActionEvent e)
+				{
+						ActionMan.languageRestrictor_actionPerformed(getGui());
+						getGui().repaint();
+				}
 		});*/
-
-
-
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
+
 		//menuHandler.add(interfaceItem, 1);
-
 		menuHandler.addSeparator();
-
 
 		if (SupremicaProperties.includeBoundedUnconTools())
 		{
 			JMenuItem extendItem = new JMenuItem("Extend");
+
 			menuHandler.add(extendItem, 1);
 
 			JMenuItem liftingItem = new JMenuItem("Compute lifting automaton");
+
 			menuHandler.add(liftingItem, 1);
 
 			JMenuItem removePassItem = new JMenuItem("Remove pass events");
+
 			menuHandler.add(removePassItem, 1);
 
 			JMenuItem addSelfLoopArcsItem = new JMenuItem("Add self-loop arcs");
+
 			menuHandler.add(addSelfLoopArcsItem, 1);
 
 			JMenuItem removeSelfLoopArcsItem = new JMenuItem("Remove self-loop arcs");
+
 			menuHandler.add(removeSelfLoopArcsItem, 1);
 
 			JMenuItem normalizeAlphabetItem = new JMenuItem("Normalize alphabet");
+
 			menuHandler.add(normalizeAlphabetItem, 1);
 			menuHandler.addSeparator();
 			extendItem.addActionListener(new ActionListener()
@@ -209,18 +225,20 @@ class MainPopupMenu
 		JMenuItem findStatesItem = new JMenuItem(ActionMan.findStates);
 
 		menuHandler.add(findStatesItem, 1);
-/*		findStatesItem.addActionListener(new ActionListener()
-		{
 
-			// anonymous class (is this a good thing?)
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.findStates_action(getGui());
-				getGui().repaint();
-			}
-		});
+/*              findStatesItem.addActionListener(new ActionListener()
+				{
+
+						// anonymous class (is this a good thing?)
+						public void actionPerformed(ActionEvent e)
+						{
+								ActionMan.findStates_action(getGui());
+								getGui().repaint();
+						}
+				});
 */
 		menuHandler.addSeparator();
+
 		// ----------------------------------------------
 		JMenuItem copyItem = new JMenuItem("Copy");
 
@@ -252,11 +270,12 @@ class MainPopupMenu
 		// menuHandler.add(saveAsItem, 1);
 		if (SupremicaProperties.fileAllowExport())
 		{
+
 			// This is how it would be done with an export command object
 			// JMenuItem exportItem = new SupremicaMenuItem(ActionMan.exportItem);
 			// menuHandler.add(exportItem, 1);
-
 			JMenuItem exportItem = new JMenuItem("Export...");
+
 			menuHandler.add(exportItem, 1);
 			exportItem.addActionListener(new ActionListener()
 			{
@@ -268,65 +287,94 @@ class MainPopupMenu
 			});
 		}
 
-
-
 		// --------------------------------------------------------------
-
 		// ***************** UNDER DEVELOPMENT MENUES ARE ADDED HERE:
-		if(SupremicaProperties.includeExperimentalAlgorithms() ) {
+		if (SupremicaProperties.includeExperimentalAlgorithms())
+		{
 			JMenu expMenu = new JMenu("Experimental algorithms");
+
 			menuHandler.add(expMenu, 1);
 
-
 			// Strictly EXPERIMENTAL
-
 			JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
+
 			expMenu.add(automatonDiminisher);
 
 			JMenuItem automatonDeterminizer = new SupremicaMenuItem(new MakeDeterministicAction());
+
 			expMenu.add(automatonDeterminizer);
 
 			JMenuItem automatonBuildObserver = new SupremicaMenuItem(new BuildObserverAction());
+
 			expMenu.add(automatonBuildObserver);
 
 			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());
+
 			expMenu.add(automatonSplit);
 
 			// De följande två Schedule-knapparna borde bli till ett inom en viss (snar?) framtid
 			expMenu.addSeparator();
 
-
 			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
+
 			expMenu.add(automataScheduler);
 
 			JMenuItem automataScheduler2 = new SupremicaMenuItem(new ScheduleAction2());
+
 			expMenu.add(automataScheduler2);
 
-
-
 			JMenuItem mMd, mMmc, mSp;
+
 			expMenu.addSeparator();
 			expMenu.add(mMd = new JMenuItem("Mark dependency set"));
-			expMenu.add(mMmc= new JMenuItem("Mark maximal component"));
+			expMenu.add(mMmc = new JMenuItem("Mark maximal component"));
 			expMenu.add(mSp = new JMenuItem("Simplify Project"));
-			mMd .addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.markDependencySet(); } } );
-			mMmc.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.markMaximalComponent(); } } );
-			mSp.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.simplifyProject(); } } );
-
+			mMd.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.markDependencySet();
+				}
+			});
+			mMmc.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.markMaximalComponent();
+				}
+			});
+			mSp.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.simplifyProject();
+				}
+			});
 
 			// BDD crap, sorry for the compressed lines... /Arash
 			JMenuItem miR, miCR;
+
 			expMenu.addSeparator();
 			expMenu.add(miR = new JMenuItem("BDD/Reachability"));
 			expMenu.add(miCR = new JMenuItem("BDD/CoReachability"));
 			expMenu.addSeparator();
-			miR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDReachability(); } } );
-			miCR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDCoReachability(); } } );
-
-
+			miR.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.DoBDDReachability();
+				}
+			});
+			miCR.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.DoBDDCoReachability();
+				}
+			});
 		}
-		// ------------------------------------------------------------------
 
+		// ------------------------------------------------------------------
 		selectAllItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -361,6 +409,7 @@ class MainPopupMenu
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+
 				// ActionMan.automatonAlphabet_actionPerformed(getGui());
 				ActionMan.alphabetView_actionPerformed(getGui());
 				getGui().repaint();
@@ -390,14 +439,15 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
+
 		/* Taken care of by SynthesizeAction -- all in one place y'know.
 		synthesizeItem.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.automataSynthesize_actionPerformed(getGui());
-				getGui().repaint();
-			}
+				public void actionPerformed(ActionEvent e)
+				{
+						ActionMan.automataSynthesize_actionPerformed(getGui());
+						getGui().repaint();
+				}
 		});
 		*/
 		purgeItem.addActionListener(new ActionListener()
@@ -508,7 +558,6 @@ class MainPopupMenu
 
 		// Ugly fixx, temporary
 		ActionMan.gui = gui;
-
 		menuHandler = new MenuHandler();
 
 		initPopups();

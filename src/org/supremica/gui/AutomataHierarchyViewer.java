@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -49,7 +50,6 @@
 package org.supremica.gui;
 
 import org.supremica.automata.IO.*;
-
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
@@ -64,6 +64,7 @@ public class AutomataHierarchyViewer
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
+
 		//super.setObjectName("Hierarchy " + theAutomata);
 		super.setObjectName("Hierarchy");
 		theAutomata.getListeners().addListener(this);
@@ -79,18 +80,18 @@ public class AutomataHierarchyViewer
 	{
 		updated(automata, theAutomata);
 	}
-	
+
 	public void automatonRenamed(Automata automata, Automaton automaton)
 	{
 		updated(automata, theAutomata);
 	}
-	
+
 	public void actionsOrControlsChanged(Automata automata)
 	{
 		updated(automata, theAutomata);
 	}
-	// End of interface implementation
 
+	// End of interface implementation
 	public AutomataSerializer getSerializer()
 	{
 		AutomataToHierarchyToDot serializer = new AutomataToHierarchyToDot(theAutomata);
@@ -99,14 +100,12 @@ public class AutomataHierarchyViewer
 		serializer.setWithLabels(withLabelsCheckBox.isSelected());
 		serializer.setWithCircles(withCirclesCheckBox.isSelected());
 		serializer.setUseColors(useColorsCheckBox.isSelected());
-		
+
 		try
 		{
 			serializer.serialize("Output.txt");
 		}
-		catch (Exception tjenis)
-		{
-		}
+		catch (Exception tjenis) {}
 
 		return serializer;
 	}

@@ -55,12 +55,9 @@ import java.util.*;
 public class ControlBuilderHelper
 	extends IEC61131Helper
 {
-
 	private static ControlBuilderHelper theHelper;
 
-	protected ControlBuilderHelper()
-	{
-	}
+	protected ControlBuilderHelper() {}
 
 	public static IEC61131Helper getInstance()
 	{
@@ -68,6 +65,7 @@ public class ControlBuilderHelper
 		{
 			theHelper = new ControlBuilderHelper();
 		}
+
 		return theHelper;
 	}
 
@@ -92,31 +90,34 @@ public class ControlBuilderHelper
 		pw.println(fileName);
 		pw.println("Invocation ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 )");
 		pw.println(": ROOT_MODULE");
+
 		// Use generic Program1 for now
 		pw.println("PROGRAM Program1 : SINGLE_PROGRAM");
 	}
 
 	public void printEndProgram(PrintWriter pw)
 	{
+
 		// End of Program code
 		pw.println("\nEND_PROGRAM;\n");
-
 		pw.println("ModuleDef");
 		pw.println("ClippingBounds := ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
 		pw.println("ZoomLimits := 0.0 0.01\n");
+
 		// End of Module definition
-
 		pw.println("END_MODULE");
-
 	}
 
 	public void printBooleanVariableDeclaration(PrintWriter pw, String variableName, String comment)
 	{
 		pw.print("\t\t" + variableName + " : bool; ");
+
 		if (comment != null)
 		{
+
 			//pw.print(comment);
 		}
+
 		pw.println();
 	}
 

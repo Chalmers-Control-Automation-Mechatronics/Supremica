@@ -60,34 +60,34 @@ package org.apache.xmlrpc;
  * handler mapping.
  *
  * @author <a href="mailto:andrew@kungfoocoder.org">Andrew Evers</a>
- * @version $Id: DefaultXmlRpcContext.java,v 1.1 2004-02-02 15:56:17 vahidi Exp $
+ * @version $Id: DefaultXmlRpcContext.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  * @since 1.2
  */
 public class DefaultXmlRpcContext
-implements XmlRpcContext
+	implements XmlRpcContext
 {
-    protected String userName, password;
-    protected XmlRpcHandlerMapping handlerMapping;
+	protected String userName, password;
+	protected XmlRpcHandlerMapping handlerMapping;
 
-    public DefaultXmlRpcContext(String userName, String password, XmlRpcHandlerMapping handlerMapping)
-    {
-        this.userName = userName;
-        this.password = password;
-        this.handlerMapping = handlerMapping;
-    }
+	public DefaultXmlRpcContext(String userName, String password, XmlRpcHandlerMapping handlerMapping)
+	{
+		this.userName = userName;
+		this.password = password;
+		this.handlerMapping = handlerMapping;
+	}
 
-    public String getUserName()
-    {
-        return userName;
-    }
+	public String getUserName()
+	{
+		return userName;
+	}
 
-    public String getPassword()
-    {
-        return password;
-    }
+	public String getPassword()
+	{
+		return password;
+	}
 
-    public XmlRpcHandlerMapping getHandlerMapping()
-    {
-        return handlerMapping;
-    }
+	public XmlRpcHandlerMapping getHandlerMapping()
+	{
+		return handlerMapping;
+	}
 }

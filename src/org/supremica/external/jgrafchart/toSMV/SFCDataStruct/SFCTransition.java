@@ -1,4 +1,5 @@
 package org.supremica.external.jgrafchart.toSMV.SFCDataStruct;
+
 import java.util.*;
 
 public class SFCTransition
@@ -8,7 +9,7 @@ public class SFCTransition
 	String id;
 	String actionText;
 
-	public SFCTransition(String id,String actionText)
+	public SFCTransition(String id, String actionText)
 	{
 		this.id = id;
 		this.actionText = actionText;
@@ -51,18 +52,20 @@ public class SFCTransition
 
 	public void addOutgoingStep(SFCStep aStep)
 	{
-		if(!outgoingSteps.contains(aStep))
+		if (!outgoingSteps.contains(aStep))
 		{
 			outgoingSteps.add(aStep);
-			//System.out.println("&&&&&&&&&&&&&&&&&Added outgoing Step :"+aStep+" for Transition :"+id);
 
+			//System.out.println("&&&&&&&&&&&&&&&&&Added outgoing Step :"+aStep+" for Transition :"+id);
 		}
 	}
 
 	public void addIncomingStep(SFCStep aStep)
 	{
-		if(!incomingSteps.contains(aStep))
+		if (!incomingSteps.contains(aStep))
+		{
 			incomingSteps.add(aStep);
+		}
 	}
 
 	public String getTransCondition()
@@ -72,12 +75,11 @@ public class SFCTransition
 
 	public void appendActionText(String newActionText)
 	{
-		actionText = "("+actionText+") "+newActionText;
+		actionText = "(" + actionText + ") " + newActionText;
 	}
 
 	public String toString()
 	{
 		return id;
 	}
-
 }

@@ -54,7 +54,6 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.io.InputStream;
 import java.util.Vector;
 
@@ -67,75 +66,79 @@ import java.util.Vector;
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
  * @since 1.2
  */
-public class XmlRpcRequestProcessor extends XmlRpc
+public class XmlRpcRequestProcessor
+	extends XmlRpc
 {
-    private Vector requestParams;
+	private Vector requestParams;
 
-    /**
-     * Creates a new instance.
-     */
-    protected XmlRpcRequestProcessor()
-    {
-        requestParams = new Vector();
-    }
+	/**
+	 * Creates a new instance.
+	 */
+	protected XmlRpcRequestProcessor()
+	{
+		requestParams = new Vector();
+	}
 
-    /**
-     * Process a request.
-     *
-     * @param is the stream to read the request from.
-     * @returns XMLRpcRequest the request.
-     * @throws ParseFailed if unable to parse the request.
-     */
-    public XmlRpcRequest processRequest(InputStream is)
-    {
-        long now = 0;
+	/**
+	 * Process a request.
+	 *
+	 * @param is the stream to read the request from.
+	 * @returns XMLRpcRequest the request.
+	 * @throws ParseFailed if unable to parse the request.
+	 */
+	public XmlRpcRequest processRequest(InputStream is)
+	{
+		long now = 0;
 
-        if (XmlRpc.debug)
-        {
-            now = System.currentTimeMillis();
-        }
-        try
-        {
-            try
-            {
-                parse(is);
-            }
-            catch (Exception e)
-            {
-                throw new ParseFailed(e);
-            }
-            if (XmlRpc.debug)
-            {
-                System.out.println("XML-RPC method name: " + methodName);
-                System.out.println("Request parameters: " + requestParams);
-            }
-            // check for errors from the XML parser
-            if (errorLevel > NONE)
-            {
-                throw new ParseFailed(errorMsg);
-            }
+		if (XmlRpc.debug)
+		{
+			now = System.currentTimeMillis();
+		}
 
-            return new XmlRpcRequest(methodName, (Vector) requestParams.clone());
-        }
-        finally
-        {
-            requestParams.removeAllElements();
-            if (XmlRpc.debug)
-            {
-                System.out.println("Spent " + (System.currentTimeMillis() - now)
-                        + " millis decoding request");
-            }
-        }
-    }
+		try
+		{
+			try
+			{
+				parse(is);
+			}
+			catch (Exception e)
+			{
+				throw new ParseFailed(e);
+			}
 
-    /**
-     * Called when an object to be added to the argument list has been
-     * parsed.
-     *
-     * @param what The parameter parsed from the request.
-     */
-    protected void objectParsed(Object what)
-    {
-        requestParams.addElement(what);
-    }
+			if (XmlRpc.debug)
+			{
+				System.out.println("XML-RPC method name: " + methodName);
+				System.out.println("Request parameters: " + requestParams);
+			}
+
+			// check for errors from the XML parser
+			if (errorLevel > NONE)
+			{
+				throw new ParseFailed(errorMsg);
+			}
+
+			return new XmlRpcRequest(methodName, (Vector) requestParams.clone());
+		}
+		finally
+		{
+			requestParams.removeAllElements();
+
+			if (XmlRpc.debug)
+			{
+				System.out.println("Spent " + (System.currentTimeMillis() - now) + " millis decoding request");
+			}
+		}
+	}
+
+	/**
+	 * Called when an object to be added to the argument list has been
+	 * parsed.
+	 *
+	 * @param what The parameter parsed from the request.
+	 */
+	protected void objectParsed(Object what)
+	{
+		requestParams.addElement(what);
+	}
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -55,7 +56,7 @@ public class VerificationAlgorithm
 	private static Collection types = new LinkedList();
 	public static final VerificationAlgorithm Monolithic = new VerificationAlgorithm("Monolithic");
 	public static final VerificationAlgorithm Modular = new VerificationAlgorithm("Modular");
-    public static final VerificationAlgorithm BDD = new VerificationAlgorithm("BDD");
+	public static final VerificationAlgorithm BDD = new VerificationAlgorithm("BDD");
 	public static final VerificationAlgorithm IDD = new VerificationAlgorithm("IDD", false);
 	public static final VerificationAlgorithm Unknown = new VerificationAlgorithm("Unknown", false);
 	private String description = null;

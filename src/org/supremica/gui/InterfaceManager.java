@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -62,6 +63,7 @@ public class InterfaceManager
 		try
 		{
 			String lookAndFeel = SupremicaProperties.getLookAndFeel();
+
 			if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
 			{
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

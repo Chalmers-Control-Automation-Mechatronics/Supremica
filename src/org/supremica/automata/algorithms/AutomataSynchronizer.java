@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -80,6 +81,7 @@ public class AutomataSynchronizer
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 	}
@@ -105,7 +107,8 @@ public class AutomataSynchronizer
 			comment.append(currAutomaton.getName());
 			comment.append("||");
 		}
-		comment.delete(comment.length()-2, comment.length());
+
+		comment.delete(comment.length() - 2, comment.length());
 		synchHelper.addState(initialState);
 		synchHelper.addComment(comment.toString());
 
@@ -113,6 +116,7 @@ public class AutomataSynchronizer
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+
 			currExec.start();
 		}
 
@@ -143,6 +147,7 @@ public class AutomataSynchronizer
 		{
 			if (currExec.buildAutomaton())
 			{
+
 				// System.out.println(synchHelper.getAutomaton() == null);
 				return synchHelper.getAutomaton();
 			}
@@ -155,6 +160,7 @@ public class AutomataSynchronizer
 		{
 			logger.error(ex.toString());
 			logger.debug(ex.getStackTrace());
+
 			throw ex;
 		}
 	}
@@ -167,17 +173,16 @@ public class AutomataSynchronizer
 	/* GAAAH! The garbage collection is too slow... and this won't make it faster... /Hugo.
 	public void clear()
 	{
-		synchHelper = null;
-		for (int i = 0; i < synchronizationExecuters.size(); i++)
-		{
-			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-			
-			currExec = null;
-		}
-		synchronizationExecuters = null;
+			synchHelper = null;
+			for (int i = 0; i < synchronizationExecuters.size(); i++)
+			{
+					AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+
+					currExec = null;
+			}
+			synchronizationExecuters = null;
 	}
 	*/
-
 	public void requestStop()
 	{
 		stopRequested = true;
@@ -196,6 +201,7 @@ public class AutomataSynchronizer
 		throws Exception
 	{
 		Automata automata = new Automata();
+
 		automata.addAutomaton(autA);
 		automata.addAutomaton(autB);
 
@@ -210,11 +216,13 @@ public class AutomataSynchronizer
 		throws Exception
 	{
 		SynchronizationOptions syncOptions;
+
 		syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 
 		AutomataSynchronizer synchronizer = new AutomataSynchronizer(theAutomata, syncOptions);
+
 		synchronizer.execute();
-		
+
 		return synchronizer.getAutomaton();
 	}
 }

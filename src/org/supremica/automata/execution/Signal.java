@@ -77,7 +77,7 @@ public class Signal
 
 	public boolean equals(Object other)
 	{
-		return label.equals(((Signal)other).label);
+		return label.equals(((Signal) other).label);
 	}
 
 	public int hashCode()

@@ -22,7 +22,7 @@ public class Utility
 
 	public static void setupFrame(JFrame frame, int width, int height)
 	{
-		frame.setSize(width, height);                 // from Component
+		frame.setSize(width, height);    // from Component
 		frame.setLocation(getPosForCenter(new Dimension(width, height)));    // from Component
 		frame.setIconImage(Supremica.cornerImage);    // from Frame
 	}
@@ -34,29 +34,30 @@ public class Utility
 
 	public static void setupDialog(JDialog dialog, int width, int height)
 	{
-		dialog.setSize(width, height);                 // from Component
+		dialog.setSize(width, height);    // from Component
 		dialog.setLocation(getPosForCenter(new Dimension(width, height)));    // from Component
+
 		// dialog.setIconImage(Supremica.cornerImage);    // from Frame
 	}
 
 	public static JButton setDefaultButton(JFrame frame, JButton b)
 	{
 		frame.getRootPane().setDefaultButton(b);
+
 		return b;
 	}
 
 	public static JButton setDefaultButton(JDialog dialog, JButton b)
 	{
 		dialog.getRootPane().setDefaultButton(b);
+
 		return b;
 	}
 
 	public static JButton setDisabledButton(JFrame frame, JButton b)
 	{
 		b.setEnabled(false);
+
 		return b;
 	}
-
-
-
 }

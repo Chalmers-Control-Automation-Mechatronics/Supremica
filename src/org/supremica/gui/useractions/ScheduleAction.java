@@ -1,11 +1,10 @@
+
 /*************************** ScheduleAction.java ***************/
 package org.supremica.gui.useractions;
 
 import java.awt.event.*;
 import javax.swing.*;
-
 import org.supremica.log.*;
-
 import org.supremica.gui.ScheduleDialog;
 
 public class ScheduleAction
@@ -16,6 +15,7 @@ public class ScheduleAction
 	public ScheduleAction()
 	{
 		super("Schedule...", null);
+
 		putValue(SHORT_DESCRIPTION, "Schedule selected automata (experimental)");
 	}
 
@@ -25,20 +25,19 @@ public class ScheduleAction
 
 		dlg.show();
 
-/*		Automata automata = ActionMan.getGui().getSelectedAutomata();
-		try
-		{
-			ModifiedAstar mastar = new ModifiedAstar(automata);
-			Element elem = mastar.walk1();
-			logger.info(mastar.trace(elem));
-			Automaton automaton = mastar.getAutomaton(elem);
-			ActionMan.getGui().addAutomaton(automaton);
-		}
-		catch(Exception excp)
-		{
-			logger.error(excp);
-		}
-*/	
+/*              Automata automata = ActionMan.getGui().getSelectedAutomata();
+				try
+				{
+						ModifiedAstar mastar = new ModifiedAstar(automata);
+						Element elem = mastar.walk1();
+						logger.info(mastar.trace(elem));
+						Automaton automaton = mastar.getAutomaton(elem);
+						ActionMan.getGui().addAutomaton(automaton);
+				}
+				catch(Exception excp)
+				{
+						logger.error(excp);
+				}
+*/
 	}
-
 }

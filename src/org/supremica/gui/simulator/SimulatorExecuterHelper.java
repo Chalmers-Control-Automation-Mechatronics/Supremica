@@ -47,7 +47,6 @@
  *
  *  Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.simulator;
 
 class SimulatorExecuterHelper

@@ -52,7 +52,6 @@ package org.supremica.automata.algorithms;
 import java.util.*;
 import org.supremica.automata.*;
 
-
 /**
  * Changes the name of all states in the automata. The state name will
  * be "prefix" followed by an integer, followed by "postfix".
@@ -112,20 +111,26 @@ public class DefaultStateRenamer
 		{
 			prefixString = "";
 		}
+
 		if (postfixString == null)
 		{
 			postfixString = "";
 		}
-		for (Iterator theIterator = theAutomata.iterator(); theIterator.hasNext(); )
+
+		for (Iterator theIterator = theAutomata.iterator();
+				theIterator.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)theIterator.next();
+			Automaton currAutomaton = (Automaton) theIterator.next();
+
 			newAutomaton();
-			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+
+			for (StateIterator stateIt = currAutomaton.stateIterator();
+					stateIt.hasNext(); )
 			{
 				State currState = stateIt.nextState();
+
 				renameState(currState);
 			}
-
 		}
 	}
 
@@ -140,6 +145,7 @@ public class DefaultStateRenamer
 	protected void renameState(State currState)
 	{
 		currState.setName(prefixString + currIndex + postfixString);
+
 		currIndex++;
 	}
 }

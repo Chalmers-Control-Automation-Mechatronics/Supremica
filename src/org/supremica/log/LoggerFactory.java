@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -73,7 +74,7 @@ public class LoggerFactory
 
 	public synchronized static Logger createLogger(String name)
 	{
-		Category thisCategory = Category.getInstance(name); // Deprecated
+		Category thisCategory = Category.getInstance(name);    // Deprecated
 
 		if (logToConsole)
 		{
@@ -89,7 +90,7 @@ public class LoggerFactory
 
 		return supremicaCategory;
 	}
-	
+
 	synchronized static ConsoleAppender getConsoleAppender()
 	{
 		if (consoleAppender == null)
@@ -98,10 +99,10 @@ public class LoggerFactory
 
 			consoleAppender.addFilter(filter);
 		}
+
 		return consoleAppender;
-	
 	}
-	
+
 	synchronized static boolean hasConsoleAppender()
 	{
 		return consoleAppender != null;

@@ -99,16 +99,18 @@ public class AutomataExtender
 
 		//Alphabet orgAlphabet = orgAut.getAlphabet();
 		Alphabet newAlphabet = new Alphabet(orgAut.getAlphabet());
+
 		// String passEventId = orgAlphabet.getUniqueId(newAut.getName());
 		LabeledEvent passEvent = new LabeledEvent("pass");
-		// newAlphabet.addEvent(passEvent);
 
+		// newAlphabet.addEvent(passEvent);
 		if (mode == MODE_REMOVE_UNCON_TOP_EVENTS)
 		{
-			// LabeledEvent passEvent = new LabeledEvent("pass");
 
+			// LabeledEvent passEvent = new LabeledEvent("pass");
 			passEvent.setControllable(true);
-//			passEvent.setId(passEventId);
+
+//                      passEvent.setId(passEventId);
 			newAlphabet.addEvent(passEvent);
 		}
 
@@ -130,6 +132,7 @@ public class AutomataExtender
 				if (!currEvent.isControllable())
 				{
 					LabeledEvent newEvent = new LabeledEvent(currEvent.getLabel() + "_c");
+
 					newEvent.setPrioritized(currEvent.isPrioritized());
 					newEvent.setControllable(true);
 					newEvents.add(newEvent);
@@ -138,9 +141,11 @@ public class AutomataExtender
 
 			// add the events to the new alphabet
 			eventIt = newEvents.iterator();
+
 			while (eventIt.hasNext())
 			{
 				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
+
 				newAlphabet.addEvent(currEvent);
 			}
 		}
@@ -201,9 +206,10 @@ public class AutomataExtender
 				{
 					Arc orgArc = (Arc) outgoingArcs.next();
 					State orgDestState = orgArc.getToState();
+
 					// LabeledEvent currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
 					// BIG WARNING, Red Flag here, may be broken...
-					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent()); // newAlphabet.getEventWithId(orgArc.getEventId());
+					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent());    // newAlphabet.getEventWithId(orgArc.getEventId());
 
 					if (i < k)
 					{
@@ -214,6 +220,7 @@ public class AutomataExtender
 
 							// Add an arc to the "first" copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
+
 							// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 							Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
@@ -224,6 +231,7 @@ public class AutomataExtender
 
 							// Add an arc to the i + 1 copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(i + 1);
+
 							// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 							Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
@@ -239,6 +247,7 @@ public class AutomataExtender
 
 							// Add an arc to the "first" copy of orgDestState
 							State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(0);
+
 							// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
 							Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
@@ -250,11 +259,12 @@ public class AutomataExtender
 							if (!currEvent.isControllable())
 							{
 								State newDestState = (State) ((ArrayList) stateMap.get(orgDestState)).get(k);
+
 								// Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId() + "_c");
 								// WARNING Red Flag, may be broken...
 								// Do we know this event id (currEvent.getId() + "_c") exists? What if not?
 								// It does, it was created above and added to newAlphabet
-								LabeledEvent cEvent = newAlphabet.getEvent(new LabeledEvent()); // newAlphabet.getEventWithId(currEvent.getId() + "_c");
+								LabeledEvent cEvent = newAlphabet.getEvent(new LabeledEvent());    // newAlphabet.getEventWithId(currEvent.getId() + "_c");
 								Arc newArc = new Arc(newSourceState, newDestState, cEvent);
 
 								newAut.addArc(newArc);
@@ -271,6 +281,7 @@ public class AutomataExtender
 					if (i == nbrOfStateCopies - 1)
 					{
 						State newDestState = (State) newStates.get(i - 1);
+
 						// Arc newArc = new Arc(newSourceState, newDestState, passEventId);
 						// WARNING, Red Flag, may be broken...
 						Arc newArc = new Arc(newSourceState, newDestState, passEvent);

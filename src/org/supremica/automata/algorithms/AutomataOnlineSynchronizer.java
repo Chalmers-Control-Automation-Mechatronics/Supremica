@@ -1,9 +1,7 @@
 
-
-      ////////////////
-      // DEPRECATED //
-      ////////////////
-
+////////////////
+// DEPRECATED //
+////////////////
 
 /*
  *  Supremica Software License Agreement
@@ -65,12 +63,13 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 
 /**
- * Used in the "Automata Explorer" (an early version that is on ice since way 
+ * Used in the "Automata Explorer" (an early version that is on ice since way
  * back and therefore not completed).
  * Also used in the uncontrollability verification.
  */
 public final class AutomataOnlineSynchronizer
-//	extends Thread
+
+//      extends Thread
 {
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
@@ -115,8 +114,8 @@ public final class AutomataOnlineSynchronizer
 	public AutomataOnlineSynchronizer(AutomataSynchronizerHelper synchronizerHelper)
 	{
 		System.err.println("The class AutomataOnlineSynchronizer is deprecated!");
-		//setPriority(Thread.MIN_PRIORITY);
 
+		//setPriority(Thread.MIN_PRIORITY);
 		helper = synchronizerHelper;
 		indexForm = helper.getAutomataIndexForm();
 		nbrOfAutomata = helper.getAutomata().size();
@@ -155,8 +154,7 @@ public final class AutomataOnlineSynchronizer
 		currOutgoingEvents = new int[nbrOfAutomata][];
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
 		currState = AutomataIndexFormHelper.createState(nbrOfAutomata);
-
-		currEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
+		currEnabledEvents = new int[nbrOfEvents + 1];    // Always end with Integer.MAX_VALUE
 
 		if (automataIndices == null)
 		{
@@ -268,7 +266,8 @@ public final class AutomataOnlineSynchronizer
 				// This is the index of the "next" event in the current automaton
 				currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
 
-logger.warn("syncType = " + syncType);
+				logger.warn("syncType = " + syncType);
+
 				if (syncType == SynchronizationType.Prioritized)
 				{
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])
@@ -444,68 +443,72 @@ logger.warn("syncType = " + syncType);
 	 *@param  toState the state to which we want to know if there is a transition
 	 *@return  index of one (there may be more) transition between fromState and toState or -1 if none exists.
 	 */
+
 	/*
 	public int findTransition(int[] fromState, int[] toState)
 	{
-		if (nextState == null)
-		{
-			nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
-		}
-
-		setCurrState(fromState);
-
-		int i = 0;
-		int currEventIndex = currEnabledEvents[i];
-
-		// Handle all events
-		while (currEventIndex != Integer.MAX_VALUE)
-		{
-			// Generate an array that contains the indicies of each state
-			System.arraycopy(fromState, 0, nextState, 0, fromState.length);
-
-			// Iterate over all automata to construct the new state
-			for (int j = 0; j < nbrOfAutomata; j++)
+			if (nextState == null)
 			{
-				int currAutomatonIndex = j;
-				int currSingleNextState = nextStateTable[currAutomatonIndex][fromState[currAutomatonIndex]][currEventIndex];
-
-				// Jump in all automata that have this event active.
-				if (currSingleNextState != Integer.MAX_VALUE)
-				{
-					nextState[currAutomatonIndex] = currSingleNextState;
-				}
+					nextState = AutomataIndexFormHelper.createState(nbrOfAutomata);
 			}
 
-			if (equalsIntArray(nextState, toState))
+			setCurrState(fromState);
+
+			int i = 0;
+			int currEventIndex = currEnabledEvents[i];
+
+			// Handle all events
+			while (currEventIndex != Integer.MAX_VALUE)
 			{
-				return currEventIndex;
+					// Generate an array that contains the indicies of each state
+					System.arraycopy(fromState, 0, nextState, 0, fromState.length);
+
+					// Iterate over all automata to construct the new state
+					for (int j = 0; j < nbrOfAutomata; j++)
+					{
+							int currAutomatonIndex = j;
+							int currSingleNextState = nextStateTable[currAutomatonIndex][fromState[currAutomatonIndex]][currEventIndex];
+
+							// Jump in all automata that have this event active.
+							if (currSingleNextState != Integer.MAX_VALUE)
+							{
+									nextState[currAutomatonIndex] = currSingleNextState;
+							}
+					}
+
+					if (equalsIntArray(nextState, toState))
+					{
+							return currEventIndex;
+					}
+
+					currEventIndex = currEnabledEvents[++i];
 			}
 
-			currEventIndex = currEnabledEvents[++i];
-		}
-
-		return -1;
+			return -1;
 	}
 	*/
 
 	// Compares int arrays, except for the last elements (the status field)
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
 	{
+
 		// Assume that the last element is a status field
-		for (int i = 0; i < (firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA); i++)
+		for (int i = 0;
+				i < (firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA);
+				i++)
 		{
 			if (firstArray[i] != secondArray[i])
 			{
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public boolean isEnabled(LabeledEvent theEvent)
 	{
-		return isEnabled(theEvent.getSynchIndex());	
+		return isEnabled(theEvent.getSynchIndex());
 	}
 
 	public boolean isEnabled(int eventIndex)
@@ -545,24 +548,22 @@ logger.warn("syncType = " + syncType);
 	 *  return isControllable;
 	 *  }
 	 */
-
 	public int[] doTransition(LabeledEvent theEvent)
 	{
-		return doTransition(theEvent.getSynchIndex());	
+		return doTransition(theEvent.getSynchIndex());
 	}
 
 	public int[] doTransition(int eventIndex)
 	{
+
 		//System.err.println("doTransition: eventIndex " + eventIndex);
 		// Counting on correct input here... only enabled events, please...
 		// Construct new state
 		int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
+
 		//int[] nextState = new int[currState.length];
-
 		//System.arraycopy(currState, 0, nextState, 0, currState.length);
-
 		//System.err.println("doTransition: nbrOfSelectedAutomata " + nbrOfSelectedAutomata);
-
 		// Iterate over all automata to construct the new state
 		for (int j = 0; j < nbrOfSelectedAutomata; j++)
 		{
@@ -595,6 +596,7 @@ logger.warn("syncType = " + syncType);
 
 	public int[] getIncomingEvents(int[] state)
 	{
+
 		// Not finished... FIXA!
 		return (new int[]{ 0, 1, Integer.MAX_VALUE });
 	}

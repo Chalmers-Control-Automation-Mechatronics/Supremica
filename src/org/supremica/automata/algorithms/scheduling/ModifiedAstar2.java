@@ -1,24 +1,23 @@
+
 /******************** ModifiedAstar2.java **************************
  * AKs implementation of Tobbes modified Astar search algo
  * Basically this is a guided tree-search algorithm, like
  *
- *	list processed = 0;				// closed
- *	list waiting = initial_state; 	// open
+ *      list processed = 0;                             // closed
+ *      list waiting = initial_state;   // open
  *
- *	while still waiting
- *	{
- *		choose an element from waiting	// the choice is guided by heuristics
- *		generate successors of this element
- *		if a successor is not already waiting or processed
- *			put it on waiting
- *		place the element on processed, remove it from waiting
- *	}
+ *      while still waiting
+ *      {
+ *              choose an element from waiting  // the choice is guided by heuristics
+ *              generate successors of this element
+ *              if a successor is not already waiting or processed
+ *                      put it on waiting
+ *              place the element on processed, remove it from waiting
+ *      }
  */
-
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
-
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.util.ActionTimer;
@@ -36,37 +35,46 @@ public class ModifiedAstar2
 	/** Contains already examined (i.e. "closed") nodes. */
 	private ArrayList closedList;
 
-	/** The automaton to be scheduled. */ //Den kanske man inte behöver spara... AK
+	/** The automaton to be scheduled. */
+
+	//Den kanske man inte behöver spara... AK
 	private Automaton theAutomaton;
 
-	public ModifiedAstar2(Automaton theAutomaton) {
+	public ModifiedAstar2(Automaton theAutomaton)
+	{
 		this.theAutomaton = theAutomaton;
 
 		init();
 	}
 
-	private void init() {
+	private void init()
+	{
 		timer = new ActionTimer();
 		openList = new ArrayList();
 		closedList = new ArrayList();
 	}
 
 	/**
-	 *	Walks through the tree of possible paths in search for the optimal one.
+	 *      Walks through the tree of possible paths in search for the optimal one.
 	 */
-	public Node walk() {
+	public Node walk()
+	{
 		timer.start();
+
 		int counter = 0;
 
-		openList.add(new Node(((State)theAutomaton.getInitialState())));
+		openList.add(new Node(((State) theAutomaton.getInitialState())));
 
-
-		while (!openList.isEmpty()) {
+		while (!openList.isEmpty())
+		{
 			Node currNode = (Node) openList.remove(0);
+
 			counter++;
 
-			if (insertIntoClosedList(currNode)) {
-				if (currNode.isAccepting()) {
+			if (insertIntoClosedList(currNode))
+			{
+				if (currNode.isAccepting())
+				{
 					timer.stop();
 					logger.info("Nr of searched states = " + counter);
 
@@ -75,7 +83,8 @@ public class ModifiedAstar2
 
 				StateIterator states = currNode.getCorrespondingState().nextStateIterator();
 
-				while (states.hasNext()) {
+				while (states.hasNext())
+				{
 					Node currChildNode = new Node((State) states.nextState(), currNode);
 
 					insertIntoOpenList(currChildNode);
@@ -87,40 +96,50 @@ public class ModifiedAstar2
 	}
 
 	/**
-	 *	Inserts a state into openList in descending accumulatedTime order.
+	 *      Inserts a state into openList in descending accumulatedTime order.
 	 */
-	private void insertIntoOpenList(Node node) {
+	private void insertIntoOpenList(Node node)
+	{
 		int accCost = node.getAccumulatedCost();
 		int cursor = 0;
 
-		while ((cursor < openList.size()) && (accCost > ((Node) openList.get(cursor)).getAccumulatedCost())) {
-			cursor++ ;
+		while ((cursor < openList.size()) && (accCost > ((Node) openList.get(cursor)).getAccumulatedCost()))
+		{
+			cursor++;
 		}
 
 		openList.add(cursor, node);
 	}
 
 	/**
-	 *	Inserts the state into the closedList unless  an instance
-	 *	of this state with a cheaper cost has already been examined and placed
-	 *	into closedList.
+	 *      Inserts the state into the closedList unless  an instance
+	 *      of this state with a cheaper cost has already been examined and placed
+	 *      into closedList.
 	 *
-	 *	@return true if the insertion operation has been performed.
+	 *      @return true if the insertion operation has been performed.
 	 */
-	private boolean insertIntoClosedList(Node node) {
+	private boolean insertIntoClosedList(Node node)
+	{
 		String key = node.getId();
 		int cursor = 0;
 
-		while ((cursor < closedList.size()) && (key.compareTo(((Node) closedList.get(cursor)).getId()) > -1)) {
-			Node currListNode =  (Node) closedList.get(cursor);
+		while ((cursor < closedList.size()) && (key.compareTo(((Node) closedList.get(cursor)).getId()) > -1))
+		{
+			Node currListNode = (Node) closedList.get(cursor);
 
-			if (key.compareTo(currListNode.getId()) == 0) {
-				if (isCheaper(node, currListNode)) {
+			if (key.compareTo(currListNode.getId()) == 0)
+			{
+				if (isCheaper(node, currListNode))
+				{
+
 					// om mindre -> Länka den stängda noden till state. Return true.
 					currListNode = node;
+
 					return true;
 				}
-				else if (isCheaper(currListNode, node)) {
+				else if (isCheaper(currListNode, node))
+				{
+
 					// Om större -> returnera false, det ska inte läggas till i closedList
 					return false;
 				}
@@ -135,19 +154,22 @@ public class ModifiedAstar2
 		return true;
 	}
 
-	public Automaton buildScheduleAutomaton(Node currNode) {
+	public Automaton buildScheduleAutomaton(Node currNode)
+	{
 		Automaton scheduleAuto = new Automaton();
-		scheduleAuto.setComment("Schedule");
 
+		scheduleAuto.setComment("Schedule");
 		logger.info("optimal cost = " + currNode.getAccumulatedCost() + "; search time = " + timer.elapsedTime() + " milliseconds");
 
 		State nextState = new State(currNode.getCorrespondingState());
+
 		scheduleAuto.addState(nextState);
 
-		while (currNode.getParent() != null) {
-			try {
+		while (currNode.getParent() != null)
+		{
+			try
+			{
 				State currState = currNode.getParent().getCorrespondingState();
-
 				Arc currArc = findCurrentArc(currState, nextState);
 
 				currState = new State(currState);
@@ -159,11 +181,11 @@ public class ModifiedAstar2
 				currNode = currNode.getParent();
 				nextState = currState;
 			}
-			catch (NullPointerException ex){
+			catch (NullPointerException ex)
+			{
 				logger.error("ModifiedAstar2::buildScheduleAutomaton() --> Could not find the arc between " + currNode.getId() + " and " + currNode.getParent().getId());
 				logger.debug(ex.getStackTrace());
 			}
-
 		}
 
 		scheduleAuto.addState(currNode.getCorrespondingState());
@@ -172,39 +194,49 @@ public class ModifiedAstar2
 	}
 
 	/**
-	 *	Returns the Arc between two States.
-	 *	@return null if the Arc doesn't exist (this must not happen).
+	 *      Returns the Arc between two States.
+	 *      @return null if the Arc doesn't exist (this must not happen).
 	 */
-	private Arc findCurrentArc(State parent, State child) {
+	private Arc findCurrentArc(State parent, State child)
+	{
 		ArcIterator it = parent.outgoingArcsIterator();
 
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			Arc currArc = it.nextArc();
 
 			if (currArc.getToState().getId().equals(child.getId()))
+			{
 				return currArc;
+			}
 		}
 
 		return null;
 	}
 
 	/**
-	 *	Checks if a possible accumulatedCost-loss is fully compensated by
-	 *	every currentCosts-savings.
+	 *      Checks if a possible accumulatedCost-loss is fully compensated by
+	 *      every currentCosts-savings.
 	 */
-	private boolean isCheaper(Node theNode, Node checkNode) {
-		if (theNode.getCurrentCosts() == null) {
+	private boolean isCheaper(Node theNode, Node checkNode)
+	{
+		if (theNode.getCurrentCosts() == null)
+		{
 			return (theNode.getAccumulatedCost() < checkNode.getAccumulatedCost());
 		}
-		else {
+		else
+		{
 			int accCost1 = theNode.getAccumulatedCost();
 			int accCost2 = checkNode.getAccumulatedCost();
 			int[] currCosts1 = theNode.getCurrentCosts();
 			int[] currCosts2 = checkNode.getCurrentCosts();
 
-			for (int i=0; i<currCosts1.length; i++) {
+			for (int i = 0; i < currCosts1.length; i++)
+			{
 				if ((accCost1 + currCosts1[i]) > (accCost2 + currCosts2[i]))
+				{
 					return false;
+				}
 			}
 
 			return true;

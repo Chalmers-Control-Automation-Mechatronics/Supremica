@@ -9,7 +9,7 @@ public class DefaultEpsilonTester
 	{
 		return event.isEpsilon();
 	}
-	
+
 	// debug only
 	public String showWhatYouGot()
 	{

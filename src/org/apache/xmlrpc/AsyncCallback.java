@@ -54,24 +54,24 @@ package org.apache.xmlrpc;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-
 import java.net.URL;
 
 /**
  * A callback interface for an asynchronous XML-RPC call.
  *
  * @author <a href="mailto:hannes@apache.org">Hannes Wallnoefer</a>
- * @version $Id: AsyncCallback.java,v 1.1 2004-02-02 15:56:15 vahidi Exp $
+ * @version $Id: AsyncCallback.java,v 1.2 2004-06-11 21:01:00 knut Exp $
  */
 public interface AsyncCallback
 {
-    /**
-     * Call went ok, handle result.
-     */
-    public void handleResult(Object result, URL url, String method);
 
-    /**
-     * Something went wrong, handle error.
-     */
-    public void handleError(Exception exception, URL url, String method);
+	/**
+	 * Call went ok, handle result.
+	 */
+	public void handleResult(Object result, URL url, String method);
+
+	/**
+	 * Something went wrong, handle error.
+	 */
+	public void handleError(Exception exception, URL url, String method);
 }

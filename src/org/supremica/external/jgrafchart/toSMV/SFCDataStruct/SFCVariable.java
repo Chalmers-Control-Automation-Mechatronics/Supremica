@@ -7,7 +7,7 @@ public class SFCVariable
 	String value;
 	String initialValue = null;
 
-	public SFCVariable(String name,String type,String value,String initialValue)
+	public SFCVariable(String name, String type, String value, String initialValue)
 	{
 		this.name = name;
 		this.type = type;
@@ -15,7 +15,7 @@ public class SFCVariable
 		this.initialValue = initialValue;
 	}
 
-	public SFCVariable(String name,String type,String value)
+	public SFCVariable(String name, String type, String value)
 	{
 		this.name = name;
 		this.type = type;
@@ -31,10 +31,12 @@ public class SFCVariable
 	{
 		value = newValue;
 	}
+
 	public void setInitialValue(String newInitValue)
 	{
 		initialValue = newInitValue;
 	}
+
 	public void setType(String newType)
 	{
 		type = newType;

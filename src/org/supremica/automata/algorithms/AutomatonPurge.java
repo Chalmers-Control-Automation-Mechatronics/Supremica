@@ -71,7 +71,7 @@ public class AutomatonPurge
 		{
 			State currState = (State) stateIt.next();
 
-			if (currState.getCost() == State.MAX_COST || currState.isForbidden())
+			if ((currState.getCost() == State.MAX_COST) || currState.isForbidden())
 			{
 				stateList.addLast(currState);
 			}

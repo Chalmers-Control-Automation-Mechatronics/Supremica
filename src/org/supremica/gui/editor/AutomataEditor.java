@@ -57,6 +57,7 @@ import javax.swing.table.*;
 import java.util.HashMap;
 import com.nwoods.jgo.*;
 import java.beans.*;
+
 //import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
@@ -68,7 +69,6 @@ public class AutomataEditor
 	implements TableModelListener, EditorView
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataEditor.class);
-
 	private VisualProject theVisualProject = null;
 	private JPanel contentPane;
 	private JToolBar toolBar = new JToolBar();
@@ -85,21 +85,21 @@ public class AutomataEditor
 	protected JMenuBar mainMenuBar = new JMenuBar();
 	protected JMenu filemenu = new JMenu();
 	protected JMenu editmenu = new JMenu();
-//	protected JMenu viewmenu = new JMenu();
+
+//      protected JMenu viewmenu = new JMenu();
 //  protected JMenu insertmenu = new JMenu();
-//	protected JMenu layoutmenu = new JMenu();
+//      protected JMenu layoutmenu = new JMenu();
 	protected JMenu helpmenu = new JMenu();
 	protected JPanel myStatusArea = new JPanel();
 	protected JLabel myStatusLabel = new JLabel();
-	private int myDocCount = 1;	
-	
+	private int myDocCount = 1;
+
 	public AutomataEditor(VisualProject theVisualProject)
 	{
 		this.theVisualProject = theVisualProject;
 		theActions = new EditorActions(this);
-		
-		setTitle("Supremica Editor");
 
+		setTitle("Supremica Editor");
 		initMenus();
 		initToolbar();
 
@@ -133,12 +133,11 @@ public class AutomataEditor
 	void initMenus()
 	{
 		JMenuItem item;
-		
+
 		// Create File Menu
 		filemenu.setText("File");
 		filemenu.setMnemonic('F');
 
-	
 		// Add
 		item = filemenu.add(theActions.getFileAddAction());
 
@@ -150,22 +149,21 @@ public class AutomataEditor
 
 		item.setMnemonic('x');
 		mainMenuBar.add(filemenu);
-		
 		editmenu.setText("Edit");
 		editmenu.setMnemonic('E');
 
 		/*
 		AppAction CutAction = new AppAction("Cut", this)
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				getView().cut();
-			}
+				public void actionPerformed(ActionEvent e)
+				{
+						getView().cut();
+				}
 
-			public boolean canAct()
-			{
-				return super.canAct() &&!getView().getSelection().isEmpty();
-			}
+				public boolean canAct()
+				{
+						return super.canAct() &&!getView().getSelection().isEmpty();
+				}
 		};
 
 		item = editmenu.add(theActions.CutAction);
@@ -178,23 +176,22 @@ public class AutomataEditor
 
 		AppAction AboutAction = new AppAction("About", this)
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				showAbout();
-			}
+				public void actionPerformed(ActionEvent e)
+				{
+						showAbout();
+				}
 
-			public boolean canAct()
-			{
-				return true;
-			}
+				public boolean canAct()
+				{
+						return true;
+				}
 		};    // doesn't depend on a view
 
 		item = helpmenu.add(AboutAction);
 
 		item.setMnemonic('A');
 		mainMenuBar.add(helpmenu);
-*/		
-
+*/
 		setJMenuBar(mainMenuBar);
 	}
 
@@ -202,25 +199,27 @@ public class AutomataEditor
 	{
 		return this;
 	}
-	
-	public 	JDesktopPane getDesktop()
+
+	public JDesktopPane getDesktop()
 	{
 		return myDesktop;
 	}
 
 	public void initToolbar()
 	{
+
 		// Enables stylish rollover buttons - JDK 1.4 required
 		toolBar.setRollover(true);
 
-		ToolBarButton addButton = new ToolBarButton(theActions.getFileAddAction());	
-		addButton.setText(""); // Quick and dirty fix, Change to its own class instead
+		ToolBarButton addButton = new ToolBarButton(theActions.getFileAddAction());
+
+		addButton.setText("");    // Quick and dirty fix, Change to its own class instead
 		toolBar.add(addButton);
-		
 		toolBar.addSeparator();
 
 		ToolBarButton printButton = new ToolBarButton(theActions.getFilePrintAction());
-		printButton.setText(""); // Fix
+
+		printButton.setText("");    // Fix
 		toolBar.add(printButton);
 	}
 
@@ -234,6 +233,7 @@ public class AutomataEditor
 		{
 			logger.error(t);
 			logger.debug(t.getStackTrace());
+
 			return;
 		}
 
@@ -252,9 +252,7 @@ public class AutomataEditor
 				 */
 			}
 		});
-
 		Utility.setupFrame(this, 800, 600);
-
 		myDesktop.setBackground(new Color(132, 130, 130));
 		setVisible(true);
 		splitPaneHorizontal.setDividerLocation(0.2);
@@ -282,18 +280,20 @@ public class AutomataEditor
 
 						theFrame.setVisible(true);
 						theFrame.setTitle(theAutomaton.getName());
+
 /*
-						if (theDocument.isLayoutNeeded())
-						{
-							randomAction();
-							theDocument.setLayoutNeeded(false);
-						}
+												if (theDocument.isLayoutNeeded())
+												{
+														randomAction();
+														theDocument.setLayoutNeeded(false);
+												}
 */
-										}
+					}
 					catch (Exception ex)
 					{
 						logger.error("Error while displaying the automaton", ex);
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
 				}
@@ -339,7 +339,6 @@ public class AutomataEditor
 		});
 	}
 
-
 	void showAbout()
 	{
 		AboutBox dlg = new AboutBox(this);
@@ -351,12 +350,12 @@ public class AutomataEditor
 		dlg.setModal(true);
 		dlg.setVisible(true);
 	}
-	
+
 	public VisualProject getVisualProject()
 	{
 		return theVisualProject;
 	}
-	
+
 	public JInternalFrame createFrame(AutomatonDocument doc)
 	{
 		final AutomatonView view = new AutomatonView(doc);
@@ -409,7 +408,6 @@ public class AutomataEditor
 		return frame;
 	}
 
-
 	AutomatonDocument findAutomatonDocument(String path)
 	{
 		Object val = myMap.get(path);
@@ -428,9 +426,9 @@ public class AutomataEditor
 	{
 		return myCurrentView;
 	}
-	
+
 	public AutomataEditor getAutomataEditor()
-	{	
+	{
 		return this;
 	}
 
@@ -441,7 +439,7 @@ public class AutomataEditor
 
 	public void setStatus(String s)
 	{
-		if (s == null || s.equals(""))
+		if ((s == null) || s.equals(""))
 		{
 			s = " ";
 		}
@@ -467,56 +465,56 @@ public class AutomataEditor
 /*
 <<<<<<< AutomataEditor.java
 =======
-		createFrame(doc);
-	}
-
-	public void fileOpen()
-	{
-
-		// ActionMan.fileOpen(workbench);
-	}
-
-	public void fileSave()
-	{
-
-		// ActionMan.fileSave(workbench);
-	}
-
-	public void fileSaveAs()
-	{
-
-		// ActionMan.fileSaveAs(workbench);
-	}
-
-	public void filePrint()
-	{
-		AutomatonView currView = getCurrentView();
-
-		if (currView != null)
-		{
-			currView.print();
+				createFrame(doc);
 		}
-	}
 
-	public void fileClose()
-	{
-		this.setVisible(false);
-	}
+		public void fileOpen()
+		{
 
-	// State
-	protected HashMap myMap = new HashMap();
-	protected AutomatonView myCurrentView = null;
-	protected JDesktopPane myDesktop = new JDesktopPane();
-	protected JMenuBar mainMenuBar = new JMenuBar();
-	protected JMenu filemenu = new JMenu();
-	protected JMenu editmenu = new JMenu();
-	protected JMenu viewmenu = new JMenu();
-	protected JMenu insertmenu = new JMenu();
-	protected JMenu layoutmenu = new JMenu();
-	protected JMenu helpmenu = new JMenu();
-	protected JPanel myStatusArea = new JPanel();
-	protected JLabel myStatusLabel = new JLabel();
-	private int myDocCount = 1;
+				// ActionMan.fileOpen(workbench);
+		}
+
+		public void fileSave()
+		{
+
+				// ActionMan.fileSave(workbench);
+		}
+
+		public void fileSaveAs()
+		{
+
+				// ActionMan.fileSaveAs(workbench);
+		}
+
+		public void filePrint()
+		{
+				AutomatonView currView = getCurrentView();
+
+				if (currView != null)
+				{
+						currView.print();
+				}
+		}
+
+		public void fileClose()
+		{
+				this.setVisible(false);
+		}
+
+		// State
+		protected HashMap myMap = new HashMap();
+		protected AutomatonView myCurrentView = null;
+		protected JDesktopPane myDesktop = new JDesktopPane();
+		protected JMenuBar mainMenuBar = new JMenuBar();
+		protected JMenu filemenu = new JMenu();
+		protected JMenu editmenu = new JMenu();
+		protected JMenu viewmenu = new JMenu();
+		protected JMenu insertmenu = new JMenu();
+		protected JMenu layoutmenu = new JMenu();
+		protected JMenu helpmenu = new JMenu();
+		protected JPanel myStatusArea = new JPanel();
+		protected JLabel myStatusLabel = new JLabel();
+		private int myDocCount = 1;
 >>>>>>> 1.17
 
 */

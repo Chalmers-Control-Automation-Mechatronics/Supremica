@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -108,7 +109,6 @@ public class MenuHandler
 		 */
 	}
 
-
 	/**
 	 * Add a sub-menu
 	 *
@@ -127,11 +127,11 @@ public class MenuHandler
 		{
 			twoAutomataItems.add(theMenu);
 		}
+
 		twoAutomataMenu.add(theMenu);
+
 		twoAutomataMenuLastSep = false;
 	}
-
-
 
 	public void addSeparator()
 	{

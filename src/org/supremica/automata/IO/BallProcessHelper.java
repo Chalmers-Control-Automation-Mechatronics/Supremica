@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -53,12 +54,9 @@ import java.io.*;
 public class BallProcessHelper
 	extends SattLineHelper
 {
-
 	private static BallProcessHelper theHelper;
 
-	protected BallProcessHelper()
-	{
-	}
+	protected BallProcessHelper() {}
 
 	public static IEC61131Helper getInstance()
 	{
@@ -66,6 +64,7 @@ public class BallProcessHelper
 		{
 			theHelper = new BallProcessHelper();
 		}
+
 		return theHelper;
 	}
 
@@ -76,7 +75,6 @@ public class BallProcessHelper
 	 * @param pw does this and that
 	 * @see org.supremica.gui.Supremica
 	 */
-
 	public void printBeginProgram(PrintWriter pw, String fileName)
 	{
 		printFileHeader(pw, fileName);
@@ -158,6 +156,7 @@ public class BallProcessHelper
 
 	public void printEndLocalVariables(PrintWriter pw)
 	{
+
 		// Empty for the Ball Process
 	}
 
@@ -431,140 +430,140 @@ public class BallProcessHelper
 		pw.println("   Slot240 => OPCpanel3, ");
 		pw.println("   Slot300 => IPCpanel4, ");
 		pw.println("   Slot340 => OPCpanel4);");
-
 	}
 
 	public void printOutputSignalHandlers(PrintWriter pw)
 	{
 		int stepCounter = 0;
 		int transitionCounter = 0;
+
 		pw.println("SEQUENCE InPortvaktHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.InPortvakt" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.InPortvakt" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.InPortvakt" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.InPortvakt" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.InPortvakt" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.InPortvakt" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UrPortvaktHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UrPortvakt" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UrPortvakt" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UrPortvakt" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UrPortvakt" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UrPortvakt" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UrPortvakt" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UppMätningHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppMätlyft" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppMätlyft" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UppMätlyft" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UppMätlyft" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppMätlyft" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppMätlyft" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UrMätningHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UrMätning" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UrMätning" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UrMätning" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UrMätning" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UrMätning" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UrMätning" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE MätHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.Mät" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.Mät" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.Mät" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.Mät" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.Mät" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.Mät" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UppHissVån1Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppHissVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppHissVån1" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UppHissVån1" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UppHissVån1" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppHissVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppHissVån1" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UppHissVån2Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppHissVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppHissVån2" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UppHissVån2" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UppHissVån2" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppHissVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppHissVån2" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UtVån1Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UtVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UtVån1" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UtVån1" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UtVån1" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UtVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UtVån1" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UtVån2Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UtVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UtVån2" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UtVån2" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UtVån2" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UtVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UtVån2" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE LyftVån1Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.LyftVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.LyftVån1" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.LyftVån1" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.LyftVån1" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.LyftVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.LyftVån1" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE LyftVån2Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.LyftVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.LyftVån2" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.LyftVån2" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.LyftVån2" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.LyftVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.LyftVån2" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UppArmVån1Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppArmVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppArmVån1" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UppArmVån1" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UppArmVån1" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppArmVån1" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppArmVån1" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE UppArmVån2Handler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppArmVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.UppArmVån2" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.UppArmVån2" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.UppArmVån2" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppArmVån2" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.UppArmVån2" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE VridArmHögerHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.VridArmHöger" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.VridArmHöger" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.VridArmHöger" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.VridArmHöger" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.VridArmHöger" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.VridArmHöger" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE SugHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.Sug" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.Sug" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.Sug" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.Sug" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.Sug" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.Sug" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 		pw.println("SEQUENCE TändLampaHandler" + getCoord());
 		pw.println("SEQINITSTEP OPH" + stepCounter++);
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.TändLampa" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "SET_OP.TändLampa" + getTransitionConditionSuffix());
 		pw.println("SEQSTEP OPH" + stepCounter++);
 		pw.println(getActionP1Prefix() + "OP.TändLampa" + getAssignmentOperator() + "True;" + getActionP1Suffix());
 		pw.println(getActionP0Prefix() + "OP.TändLampa" + getAssignmentOperator() + "False;" + getActionP0Suffix());
-		pw.println("SEQTRANSITION OPTr"  + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.TändLampa" + getTransitionConditionSuffix());
+		pw.println("SEQTRANSITION OPTr" + transitionCounter++ + getTransitionConditionPrefix() + "RESET_OP.TändLampa" + getTransitionConditionSuffix());
 		pw.println("ENDSEQUENCE\n\n");
 	}
 

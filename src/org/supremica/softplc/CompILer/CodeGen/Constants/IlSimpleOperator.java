@@ -1,5 +1,7 @@
 package org.supremica.softplc.CompILer.CodeGen.Constants;
+
 import java.util.*;
+
 /**Class IlSimpleOperators provides common constants for
  * representing IL's instructions
  * @author Anders Röding

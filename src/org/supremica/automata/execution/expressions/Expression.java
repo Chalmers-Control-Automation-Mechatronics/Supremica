@@ -52,6 +52,6 @@ package org.supremica.automata.execution.expressions;
 public abstract class Expression
 {
 	public abstract boolean isVariable();
+
 	public abstract boolean evaluate();
 }
-

@@ -5,32 +5,32 @@ import java.util.*;
 
 public class HIEReader
 {
+	LinkedList programs = new LinkedList();
 
-    LinkedList programs = new LinkedList();
+	public HIEReader(FileReader fr)
+		throws IOException
+	{
+		BufferedReader br = new BufferedReader(fr);
 
-    public HIEReader(FileReader fr) throws IOException
-    {
-	BufferedReader br = new BufferedReader(fr);
-	parse(br);
-    }
+		parse(br);
+	}
 
+	void parse(BufferedReader br)
+		throws IOException
+	{
+		String input;
 
-    void parse(BufferedReader br) throws IOException
-    {
-        String input;
-	
-        while ((input = br.readLine()) != null)
-	    {
-		if (input.endsWith("(_FBD)"))
-		    {
-			programs.add(input.substring(0, input.indexOf("(_FBD)")));
-		    }
-	    }
-    }
+		while ((input = br.readLine()) != null)
+		{
+			if (input.endsWith("(_FBD)"))
+			{
+				programs.add(input.substring(0, input.indexOf("(_FBD)")));
+			}
+		}
+	}
 
-    public LinkedList getPrograms()
-    {
-	return programs;
-    }
-    
+	public LinkedList getPrograms()
+	{
+		return programs;
+	}
 }

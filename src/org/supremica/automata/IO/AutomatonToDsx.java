@@ -154,7 +154,7 @@ public class AutomatonToDsx
 				Arc arc = (Arc) outgoingArcs.next();
 				State destState = arc.getToState();
 				LabeledEvent event = arc.getEvent();
-				
+
 				// pw.print(" " + destState.getName() + ":" + aut.getAlphabet().getEventWithId(arc.getEventId()).getLabel());
 				pw.print(" " + destState.getName() + ":" + event.getLabel());
 			}

@@ -62,8 +62,7 @@ public class HelpDlg
 		LogoLabel.setMaximumSize(new Dimension(1200, 17));
 		LogoLabel.setIcon(logo);
 		LogoLabel.setText("<html><font face=\"Arial\" size=\"5\">Supremica Recipe Editor</font></html>");
-		TextLabel.setText("<html>" + "Create and view recipes<br>" +
-		"</html>");
+		TextLabel.setText("<html>" + "Create and view recipes<br>" + "</html>");
 		panel1.setMaximumSize(new Dimension(5000, 5000));
 		panel1.setMinimumSize(new Dimension(100, 100));
 		panel1.setPreferredSize(new Dimension(550, 350));

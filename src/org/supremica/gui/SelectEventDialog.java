@@ -58,7 +58,6 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.log.*;
 
-
 public class SelectEventDialog
 	extends JDialog
 {
@@ -171,7 +170,6 @@ class CreateEventPanel
 	extends JPanel
 {
 	private static Logger logger = LoggerFactory.createLogger(CreateEventPanel.class);
-
 	private Alphabet theAlphabet;
 	private JTextField labelField;
 	private JCheckBox controllableCheckBox;
@@ -221,12 +219,11 @@ class CreateEventPanel
 				{
 					JOptionPane.showMessageDialog(null, "Existing event", "An event " + currLabel + "does already exists", JOptionPane.ERROR_MESSAGE);
 				}
-				else //it does not contain an event with this label, just add it
+				else    //it does not contain an event with this label, just add it
 				{
 					LabeledEvent newEvent = new LabeledEvent(currLabel);
 
 					// newEvent.setId(alph.getUniqueId("e"));
-
 					try
 					{
 						alph.addEvent(newEvent);
@@ -235,6 +232,7 @@ class CreateEventPanel
 					{
 						logger.error("Exception in Alphabet.addEvent", ex);
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
 				}

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -53,6 +54,7 @@ import org.supremica.log.*;
 
 public final class AutomataIndexForm
 {
+
 	// <automaton,event> -> <true|false>
 	private boolean[][] alphabetEventsTable;
 
@@ -100,10 +102,7 @@ public final class AutomataIndexForm
 
 	// <automaton> -> <max state index in current automaton>
 	private int[] automatonStateMaxIndex;
-
 	private Automata theAutomata = null;
-
-
 	private static Logger logger = LoggerFactory.createLogger(AutomataIndexForm.class);
 
 	/**
@@ -114,12 +113,14 @@ public final class AutomataIndexForm
 	public AutomataIndexForm(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{
+
 		//Automata newAutomata = new Automata(theAutomata);
 		//newAutomata.addAutomaton(theAutomaton);
 		Alphabet unionAlphabet = theAutomata.setIndicies();
-		theAutomaton.getAlphabet().union(unionAlphabet);
-		//theAutomaton.setIndicies();
 
+		theAutomaton.getAlphabet().union(unionAlphabet);
+
+		//theAutomaton.setIndicies();
 		this.theAutomata = theAutomata;
 
 		generateAutomataIndices(theAutomata);
@@ -132,10 +133,12 @@ public final class AutomataIndexForm
 		{
 			logger.error("Error while generating AutomataIndexForm", ex);
 			logger.debug(ex.getStackTrace());
+
 			throw ex;
 		}
 
 		generateStateIndices(theAutomata);
+
 		// Här blir det fel!
 		generateNextStateTransitionIndices(theAutomata, theAutomaton);
 		generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
@@ -192,6 +195,7 @@ public final class AutomataIndexForm
 
 	public void generateAutomataIndices(Automata theAutomata)
 	{
+
 		// Give each automaton a unique index
 		// Remember that this index must be consistent with
 		// getAutomatonAt(int) in Automata
@@ -199,16 +203,14 @@ public final class AutomataIndexForm
 		typeIsSupSpecTable = new boolean[theAutomata.size()];
 		automataSize = new int[theAutomata.size()];
 
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-
 			int i = currAutomaton.getIndex();
-
 			AutomatonType currAutomatonType = currAutomaton.getType();
+
 			typeIsPlantTable[i] = currAutomatonType == AutomatonType.Plant;
-			typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.Supervisor) ||
-									 (currAutomatonType == AutomatonType.Specification));
+			typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.Supervisor) || (currAutomatonType == AutomatonType.Specification));
 			automataSize[i] = currAutomaton.nbrOfStates();
 		}
 	}
@@ -223,12 +225,15 @@ public final class AutomataIndexForm
 	 */
 	public void defineTypeIsPlantTable(Automata plantAutomata)
 	{
-		for (int i=0,j=0; i<theAutomata.size(); i++)
+		for (int i = 0, j = 0; i < theAutomata.size(); i++)
 		{
 			typeIsPlantTable[i] = (j < plantAutomata.size()) && (i == plantAutomata.getAutomatonAt(j).getIndex());
 			typeIsSupSpecTable[i] = !typeIsPlantTable[i];
+
 			if (typeIsPlantTable[i])
+			{
 				j++;
+			}
 		}
 	}
 
@@ -239,8 +244,8 @@ public final class AutomataIndexForm
 
 		// Generate a synchIndex for each event
 		//Collection eventCollection = theAlphabet.values();
-
 		eventPriority = new int[theAlphabet.size()];
+
 		for (int i = 0; i < eventPriority.length; i++)
 		{
 			eventPriority[i] = 1;
@@ -253,7 +258,8 @@ public final class AutomataIndexForm
 		alphabetEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
 		prioritizedEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
 
-		for (Iterator theAlphabetIt = theAlphabet.iterator(); theAlphabetIt.hasNext(); )
+		for (Iterator theAlphabetIt = theAlphabet.iterator();
+				theAlphabetIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();
 			String currLabel = currEvent.getLabel();
@@ -273,6 +279,7 @@ public final class AutomataIndexForm
 				}
 				else
 				{
+
 					//System.err.println("i: " + i + " currEventSynchIndex: " + currEventSynchIndex);
 					alphabetEventsTable[i][currEventSynchIndex] = false;
 					prioritizedEventsTable[i][currEventSynchIndex] = false;
@@ -295,7 +302,7 @@ public final class AutomataIndexForm
 		stateStatusTable = new int[theAutomata.size()][];
 		automatonStateMaxIndex = new int[theAutomata.size()];
 
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			int currAutomatonIndex = currAutomaton.getIndex();
@@ -305,20 +312,24 @@ public final class AutomataIndexForm
 			stateStatusTable[currAutomatonIndex] = new int[currNbrOfStates];
 
 			int maxIndex = 0;
-			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+
+			for (StateIterator stateIt = currAutomaton.stateIterator();
+					stateIt.hasNext(); )
 			{
 				State currState = stateIt.nextState();
-
 				int currIndex = currState.getIndex();
 
 				stateTable[currAutomatonIndex][currIndex] = currState;
 				stateStatusTable[currAutomatonIndex][currIndex] = AutomataIndexFormHelper.createStatus(currState);
+
 				if (currIndex > maxIndex)
 				{
 					maxIndex = currIndex;
 				}
+
 				//currIndex++;
 			}
+
 			automatonStateMaxIndex[currAutomatonIndex] = maxIndex;
 		}
 	}
@@ -339,6 +350,7 @@ public final class AutomataIndexForm
 	void generateNextStateTransitionIndices(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{
+
 		// Compute the nextStateTable and outgoingEventsTable
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 		int nbrOfAutomata = theAutomata.size();
@@ -390,13 +402,14 @@ public final class AutomataIndexForm
 
 				// Insert all indices in a tree (sorted)
 				Iterator outgoingArcsIt = currState.outgoingArcsIterator();
+
 				while (outgoingArcsIt.hasNext())
 				{
 					Arc currArc = (Arc) outgoingArcsIt.next();
 
 					// Get the event from the automaton
 					// String eventId = currArc.getEventId();
-					LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(eventId);
+					LabeledEvent currEvent = currArc.getEvent();    // currAlphabet.getEventWithId(eventId);
 					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
@@ -418,6 +431,7 @@ public final class AutomataIndexForm
 					}
 
 					enableEventsTable[currAutomatonIndex][currEventIndex][i] = currStateIndex;
+
 					try
 					{
 						enableEventsTable[currAutomatonIndex][currEventIndex][i + 1] = Integer.MAX_VALUE;
@@ -425,6 +439,7 @@ public final class AutomataIndexForm
 					catch (Exception ex)
 					{
 						logger.error("Error in AutomataIndexForm.generateNextStateTransitionIndices. " + ex);
+
 						// logger.info("Automaton: " + theAutomaton + " automata: " + theAutomata);
 					}
 				}
@@ -510,7 +525,7 @@ public final class AutomataIndexForm
 
 					// Get the event from the automaton
 					// String eventId = currArc.getEventId();
-					LabeledEvent currEvent = currArc.getEvent(); // currAlphabet.getEventWithId(eventId);
+					LabeledEvent currEvent = currArc.getEvent();    // currAlphabet.getEventWithId(eventId);
 					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 

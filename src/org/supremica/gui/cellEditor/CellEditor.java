@@ -3,7 +3,6 @@ package org.supremica.gui.cellEditor;
 import javax.swing.*;
 import org.supremica.gui.VisualProject;
 
-
 public class CellEditor
 	extends JFrame
 {

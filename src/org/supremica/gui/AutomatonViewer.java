@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -49,7 +50,6 @@
 package org.supremica.gui;
 
 import org.supremica.automata.IO.*;
-
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
@@ -65,6 +65,7 @@ public class AutomatonViewer
 		throws Exception
 	{
 		this.theAutomaton = theAutomaton;
+
 		super.setObjectName(theAutomaton.getName());
 		theAutomaton.getListeners().addListener(this);
 	}
@@ -100,8 +101,8 @@ public class AutomatonViewer
 		setObjectName(aut.getName());
 		updated(aut, theAutomaton);
 	}
-	// End of interface implementation
 
+	// End of interface implementation
 	public AutomataSerializer getSerializer()
 	{
 		AutomatonToDot serializer = new AutomatonToDot(theAutomaton);
@@ -113,7 +114,7 @@ public class AutomatonViewer
 
 		return serializer;
 	}
-	
+
 	public Automaton getAutomaton()
 	{
 		return theAutomaton;

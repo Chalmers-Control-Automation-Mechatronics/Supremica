@@ -1,3 +1,4 @@
+
 /*
 * Supremica Software License Agreement
 *
@@ -54,7 +55,7 @@ import org.supremica.gui.*;
 
 public class SyncBuilder
 {
-	private AutomatonSynthesizer synthes =null;
+	private AutomatonSynthesizer synthes = null;
 	private SynchronizationOptions synchronizationOptions = null;
 	private SynthesizerOptions synthesizerOptions = null;
 	private Automata selectedAutomata = null;
@@ -62,60 +63,56 @@ public class SyncBuilder
 	private AutomataSynchronizer theSynchronizer = null;
 	private Gui gui;
 
-public SyncBuilder(Gui g, Project thePlant)
-{
-	gui = g;
-	synchronizationOptions = new SynchronizationOptions();
-	synthesizerOptions = new SynthesizerOptions();
-	synthesizerOptions.setPurge(true);
-	gui.selectAll();
-	selectedAutomata = gui.getSelectedAutomata();
-}
-
-
-
-public void synchronizePlants(String name)
-{
-	try
+	public SyncBuilder(Gui g, Project thePlant)
 	{
-	theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
-	theSynchronizer.execute();
-	theAutomaton = theSynchronizer.getAutomaton();
+		gui = g;
+		synchronizationOptions = new SynchronizationOptions();
+		synthesizerOptions = new SynthesizerOptions();
+
+		synthesizerOptions.setPurge(true);
+		gui.selectAll();
+
+		selectedAutomata = gui.getSelectedAutomata();
 	}
-	catch (Exception ex)
+
+	public void synchronizePlants(String name)
 	{
+		try
+		{
+			theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
+
+			theSynchronizer.execute();
+
+			theAutomaton = theSynchronizer.getAutomaton();
+		}
+		catch (Exception ex) {}
+
+		theAutomaton.setName(name);
+		gui.addAutomaton(theAutomaton);
 	}
-	theAutomaton.setName(name);
-	gui.addAutomaton(theAutomaton);
-}
 
-
-
-
-public void synthesizePlants(String name)
-{
-	try
+	public void synthesizePlants(String name)
 	{
-	theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
-	theSynchronizer.execute();
-	theAutomaton = theSynchronizer.getAutomaton();
-	}
-	catch (Exception ex)
-	{}
+		try
+		{
+			theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
 
-	try
-	{
-		synthes = new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
-		boolean s = synthes.synthesize();
+			theSynchronizer.execute();
 
+			theAutomaton = theSynchronizer.getAutomaton();
+		}
+		catch (Exception ex) {}
 
-	}
-	
-	catch (Exception ex)
-	{
-	}
-	theAutomaton.setComment(name);
-	theAutomaton.setName(name);
-	gui.addAutomaton(theAutomaton);
+		try
+		{
+			synthes = new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
+
+			boolean s = synthes.synthesize();
+		}
+		catch (Exception ex) {}
+
+		theAutomaton.setComment(name);
+		theAutomaton.setName(name);
+		gui.addAutomaton(theAutomaton);
 	}
 }

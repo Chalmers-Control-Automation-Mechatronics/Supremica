@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -68,7 +69,8 @@ public class AlphabetNormalize
 
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
-		for (EventIterator eventIt = theAlphabet.iterator(); eventIt.hasNext();)
+		for (EventIterator eventIt = theAlphabet.iterator();
+				eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = eventIt.nextEvent();
 			LinkedList currList = (LinkedList) labelMap.get(currEvent.getLabel());
@@ -95,9 +97,10 @@ public class AlphabetNormalize
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();
+
 			// WARNING, Red Flag, may be broken code...
-//			String eventId = currArc.getEventId();
-//			LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
+			//<String eventId = currArc.getEventId();
+			// LabeledEvent currEvent = theAlphabet.getEventWithId(eventId);
 			LabeledEvent currEvent = currArc.getEvent();
 			String currLabel = currEvent.getLabel();
 			LinkedList currList = (LinkedList) labelMap.get(currLabel);
@@ -162,9 +165,10 @@ public class AlphabetNormalize
 			{
 				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
-				System.err.println("   " + currEvent.toString() // getId()
-											+ "   " + (currEvent.isControllable() ? "" : "!")
-											+ currEvent.getLabel());
+				System.err.println("   " + currEvent.toString()    // getId()
+								   + "   " + (currEvent.isControllable()
+											  ? ""
+											  : "!") + currEvent.getLabel());
 			}
 		}
 	}

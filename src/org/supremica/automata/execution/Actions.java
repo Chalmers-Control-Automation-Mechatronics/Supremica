@@ -56,9 +56,7 @@ public class Actions
 {
 	private Map labelToActionMap = new TreeMap();
 
-	public Actions()
-	{
-	}
+	public Actions() {}
 
 	public Actions(Actions otherActions)
 	{
@@ -88,11 +86,14 @@ public class Actions
 		{
 			return false;
 		}
+
 		if (labelToActionMap.containsKey(theAction.getLabel()))
 		{
 			return false;
 		}
+
 		labelToActionMap.put(theAction.getLabel(), theAction);
+
 		return true;
 	}
 

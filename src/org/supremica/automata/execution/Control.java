@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -74,12 +75,14 @@ public class Control
 	public Control(String label, boolean invert, Condition condition)
 	{
 		this(label, invert);
+
 		addCondition(condition);
 	}
 
 	public Control(Control otherControl)
 	{
 		this(otherControl.label, otherControl.invert);
+
 		conditions = new LinkedList(otherControl.conditions);
 		expr = new ConstVariable(true);
 	}
@@ -105,20 +108,22 @@ public class Control
 	}
 
 	/** This should be in conditions instead, Remove this later **/
+
 /*
-	public boolean doInvert()
-	{
-		return invert;
-	}
-*/
-	/** This should be in conditions instead, Remove this later **/
-/*
-	public void setInvert(boolean invert)
-	{
-		this.invert = invert;
-	}
+		public boolean doInvert()
+		{
+				return invert;
+		}
 */
 
+	/** This should be in conditions instead, Remove this later **/
+
+/*
+		public void setInvert(boolean invert)
+		{
+				this.invert = invert;
+		}
+*/
 	public boolean equals(Object other)
 	{
 		if (!(other instanceof Control))

@@ -9,12 +9,12 @@ public class ProcessCellType
 	public static final ProcessCellType Continuous = new ProcessCellType("Continuous");
 	public static final ProcessCellType Discrete = new ProcessCellType("Discrete");
 	public static final ProcessCellType Batch = new ProcessCellType("Batch");
-
 	private String identifier;
 
 	private ProcessCellType(String identifier)
 	{
 		collection.add(this);
+
 		this.identifier = identifier;
 	}
 
@@ -55,11 +55,11 @@ public class ProcessCellType
 
 	private static boolean equalType(ProcessCellType type, String ident)
 	{
-		if (type == null || ident == null)
+		if ((type == null) || (ident == null))
 		{
 			return false;
 		}
+
 		return ident.toLowerCase().equals(type.toString().toLowerCase());
 	}
-
 }

@@ -4,41 +4,40 @@ import java.util.*;
 
 public class Dictionary
 {
-    private LinkedList booleans = new LinkedList();
-    private LinkedList integers = new LinkedList();
+	private LinkedList booleans = new LinkedList();
+	private LinkedList integers = new LinkedList();
 
-    public void setBooleans(LinkedList booleans)
-    {
-	this.booleans = booleans;
-    }
+	public void setBooleans(LinkedList booleans)
+	{
+		this.booleans = booleans;
+	}
 
-    public void setIntegers(LinkedList integers)
-    {
-	this.integers = integers;
-    }
+	public void setIntegers(LinkedList integers)
+	{
+		this.integers = integers;
+	}
 
+	public void addBoolean(String name)
+	{
+		booleans.add(name);
+	}
 
-    public void addBoolean(String name)
-    {
-	booleans.add(name);
-	
-    }
+	public void addInteger(String name)
+	{
+		integers.add(name);
+	}
 
-    public void addInteger(String name)
-    {
-	integers.add(name);
-    }
+	public LinkedList getBooleans()
+	{
+		Collections.sort(booleans);
 
-    public LinkedList getBooleans()
-    {
-	Collections.sort(booleans);
-	return booleans;
-    }
+		return booleans;
+	}
 
-    public LinkedList getIntegers()
-    {
-	Collections.sort(integers);
-	return integers;
-    }
+	public LinkedList getIntegers()
+	{
+		Collections.sort(integers);
+
+		return integers;
+	}
 }
-

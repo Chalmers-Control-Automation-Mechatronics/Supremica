@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -75,7 +76,7 @@ public class AutomatonIterator
 	public Automaton nextAutomaton()
 		throws NoSuchElementException
 	{
-		return (Automaton)next();
+		return (Automaton) next();
 	}
 
 	public void remove()
@@ -83,5 +84,4 @@ public class AutomatonIterator
 	{
 		throw new UnsupportedOperationException();
 	}
-
 }

@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -115,5 +116,4 @@ public class ArcSet
 	{
 		return new ArcIterator(theArcs.iterator());
 	}
-
 }

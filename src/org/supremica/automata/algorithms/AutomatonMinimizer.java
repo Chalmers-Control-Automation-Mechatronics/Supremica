@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -50,7 +51,6 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 import org.supremica.log.*;
-
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
@@ -64,6 +64,7 @@ class EqClassFactory
 	{
 		return new EqClass();
 	}
+
 	static EquivalenceClass getEqClass(EquivalenceClass eqc)
 	{
 		return new EqClass(eqc);
@@ -73,13 +74,14 @@ class EqClassFactory
 public class AutomatonMinimizer
 {
 	private Automaton theAutomaton;
-	//private Alphabet theAlphabet;
 
+	//private Alphabet theAlphabet;
 	private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
 
 	public AutomatonMinimizer(Automaton theAutomaton)
 	{
 		this.theAutomaton = theAutomaton;
+
 		//this.theAlphabet = theAutomaton.getAlphabet();
 	}
 
@@ -97,22 +99,23 @@ public class AutomatonMinimizer
 
 			if (currState.isForbidden())
 			{
-				currState.setStateClass(forbiddenStates); // setEquivalenceClass(forbiddenStates);
+				currState.setStateClass(forbiddenStates);    // setEquivalenceClass(forbiddenStates);
 				forbiddenStates.add(currState);
 			}
 			else if (currState.isAccepting())
 			{
-				currState.setStateClass(acceptingStates); // setEquivalenceClass(acceptingStates);
+				currState.setStateClass(acceptingStates);    // setEquivalenceClass(acceptingStates);
 				acceptingStates.add(currState);
 			}
 			else
 			{
-				currState.setStateClass(rejectingStates); // setEquivalenceClass(rejectingStates);
+				currState.setStateClass(rejectingStates);    // setEquivalenceClass(rejectingStates);
 				rejectingStates.add(currState);
 			}
 		}
 
 		EquivalenceClasses equivClasses = new EquivalenceClasses();
+
 		if (acceptingStates.size() > 0)
 		{
 			equivClasses.add(acceptingStates);
@@ -134,8 +137,10 @@ public class AutomatonMinimizer
 		}
 		catch (Exception ex)
 		{
+
 			// e.printStackTrace(System.err);
 			logger.debug(ex.getStackTrace());
+
 			throw ex;
 		}
 
@@ -159,7 +164,7 @@ public class AutomatonMinimizer
 			{
 				State currState = (State) stateIt.next();
 
-				currState.setStateClass(initialClass); // setEquivalenceClass(initialClass);
+				currState.setStateClass(initialClass);    // setEquivalenceClass(initialClass);
 				initialClass.add(currState);
 			}
 
@@ -171,8 +176,10 @@ public class AutomatonMinimizer
 			}
 			catch (Exception ex)
 			{
+
 				// ex.printStackTrace(System.err);
 				logger.debug(ex.getStackTrace());
+
 				throw ex;
 			}
 
@@ -216,11 +223,13 @@ public class AutomatonMinimizer
 			while (outgoingArcsIt.hasNext())
 			{
 				Arc currArc = (Arc) outgoingArcsIt.next();
+
 				// String currEventId = currArc.getEventId();
 				LabeledEvent currEvent = currArc.getEvent();
 				State oldToState = currArc.getToState();
-				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateClass(); // getEquivalenceClass();
+				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateClass();    // getEquivalenceClass();
 				State toState = nextEquivalenceClass.getState(newAutomaton);
+
 				// Arc newArc = new Arc(fromState, toState, currEventId);
 				Arc newArc = new Arc(fromState, toState, currEvent);
 
@@ -230,10 +239,10 @@ public class AutomatonMinimizer
 
 		// Give the automaton an appropriate comment
 		//if (theAutomaton.getName() != "")
-			newAutomaton.setComment("min(" + theAutomaton.getName() + ")");
+		newAutomaton.setComment("min(" + theAutomaton.getName() + ")");
+
 		//else
 		//    newAutomaton.setComment("min(" + theAutomaton.getComment() + ")");
-
 		return newAutomaton;
 	}
 
@@ -261,7 +270,8 @@ public class AutomatonMinimizer
 	{
 		boolean refined = false;
 
-		for (Iterator eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext();)
+		for (Iterator eventIt = theAutomaton.getAlphabet().iterator();
+				eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
@@ -318,19 +328,46 @@ public class AutomatonMinimizer
 		logger.setLogToConsole(true);
 
 		Automaton automaton = new Automaton("Minimizer Test");
+		State q0 = new State("q0");
 
-		State q0 = new State("q0"); automaton.addState(q0); automaton.setInitialState(q0);
-		State q1 = new State("q1"); automaton.addState(q1);
-		State q2 = new State("q2"); automaton.addState(q2);
-		State q3 = new State("q3"); automaton.addState(q3);
-		State q4 = new State("q4"); automaton.addState(q4);
-		State q5 = new State("q5"); automaton.addState(q5);
+		automaton.addState(q0);
+		automaton.setInitialState(q0);
 
-		LabeledEvent a = new LabeledEvent("a"); automaton.getAlphabet().addEvent(a);
-		LabeledEvent b = new LabeledEvent("b"); automaton.getAlphabet().addEvent(b);
-		LabeledEvent c = new LabeledEvent("c"); automaton.getAlphabet().addEvent(c);
-		LabeledEvent d = new LabeledEvent("d"); automaton.getAlphabet().addEvent(d);
+		State q1 = new State("q1");
 
+		automaton.addState(q1);
+
+		State q2 = new State("q2");
+
+		automaton.addState(q2);
+
+		State q3 = new State("q3");
+
+		automaton.addState(q3);
+
+		State q4 = new State("q4");
+
+		automaton.addState(q4);
+
+		State q5 = new State("q5");
+
+		automaton.addState(q5);
+
+		LabeledEvent a = new LabeledEvent("a");
+
+		automaton.getAlphabet().addEvent(a);
+
+		LabeledEvent b = new LabeledEvent("b");
+
+		automaton.getAlphabet().addEvent(b);
+
+		LabeledEvent c = new LabeledEvent("c");
+
+		automaton.getAlphabet().addEvent(c);
+
+		LabeledEvent d = new LabeledEvent("d");
+
+		automaton.getAlphabet().addEvent(d);
 		automaton.addArc(new Arc(q0, q1, a));
 		automaton.addArc(new Arc(q1, q1, a));
 		automaton.addArc(new Arc(q1, q2, b));
@@ -339,16 +376,19 @@ public class AutomatonMinimizer
 		automaton.addArc(new Arc(q3, q5, d));
 
 		AutomatonMinimizer minimizer = new AutomatonMinimizer(automaton);
+
 		try
 		{
 			Automaton minauto = minimizer.getMinimizedAutomaton();
 			org.supremica.automata.IO.AutomatonToDsx todsx = new org.supremica.automata.IO.AutomatonToDsx(minauto);
+
 			todsx.serialize(new java.io.PrintWriter(System.out));
 		}
-		catch(Exception excp)
+		catch (Exception excp)
 		{
 			logger.error(excp);
 			logger.debug(excp.getStackTrace());
+
 			// excp.printStackTrace();
 			return;
 		}
@@ -427,6 +467,7 @@ class EquivalenceClasses
 class EquivalenceClass
 	extends StateSet
 {
+
 	// private LinkedList states = new LinkedList();
 	protected State newState = null;
 	private EquivalenceClass nextClass = null;
@@ -451,30 +492,31 @@ class EquivalenceClass
 		{
 			State currState = (State) stateIt.next();
 
-			currState.setStateClass(this); // setEquivalenceClass(this);
+			currState.setStateClass(this);    // setEquivalenceClass(this);
 		}
 	}
 
-/*	public boolean add(State state)
-	{
-		return states.add(state);
-	}
+/*      public boolean add(State state)
+		{
+				return states.add(state);
+		}
 
-	public boolean remove(State state)
-	{
-		return states.remove(state);
-	}
+		public boolean remove(State state)
+		{
+				return states.remove(state);
+		}
 
-	public boolean addAll(Collection c)
-	{
-		return states.addAll(c);
-	}
+		public boolean addAll(Collection c)
+		{
+				return states.addAll(c);
+		}
 
-	public Iterator iterator()
-	{
-		return states.iterator();
-	}
+		public Iterator iterator()
+		{
+				return states.iterator();
+		}
 */
+
 	// Returns true if one state in this equivalence class is marked as 'initial'
 	public boolean isInitial()
 	{
@@ -497,7 +539,7 @@ class EquivalenceClass
 	// Thus, we need only check the first state
 	public boolean isAccepting()
 	{
-		State currState = get(); // (State) states.getFirst();
+		State currState = get();    // (State) states.getFirst();
 
 		if (currState.isAccepting())
 		{
@@ -511,7 +553,7 @@ class EquivalenceClass
 	// Thus, we need only check the first state
 	public boolean isForbidden()
 	{
-		State currState = get(); // (State) states.getFirst();
+		State currState = get();    // (State) states.getFirst();
 
 		if (currState.isForbidden())
 		{
@@ -534,10 +576,11 @@ class EquivalenceClass
 
 	public State getState(Automaton theAutomaton)
 	{
-		if(newState == null)
+		if (newState == null)
 		{
 			createNewState(theAutomaton, "q");
 		}
+
 		return newState;
 	}
 
@@ -563,7 +606,7 @@ class EquivalenceClass
 
 	public Iterator outgoingArcsIterator()
 	{
-		State currState = get(); // (State) states.getFirst();
+		State currState = get();    // (State) states.getFirst();
 		Iterator currIt = currState.outgoingArcsIterator();
 
 		return currIt;
@@ -592,7 +635,7 @@ class EquivalenceClass
 
 			if (nextState != null)
 			{
-				nextEquivalenceClass = (EquivalenceClass) nextState.getStateClass(); // getEquivalenceClass();
+				nextEquivalenceClass = (EquivalenceClass) nextState.getStateClass();    // getEquivalenceClass();
 			}
 
 			newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
@@ -600,36 +643,37 @@ class EquivalenceClass
 
 		return newEquivalenceClassHolder;
 	}
+
 /*
-	public void clear()
-	{
-		states.clear();
-	}
-
-	public int size()
-	{
-		return states.size();
-	}
-
-	public String toString()
-	{
-		StringBuffer sb = new StringBuffer();
-
-		sb.append("[");
-
-		Iterator stateIt = states.iterator();
-
-		while (stateIt.hasNext())
+		public void clear()
 		{
-			State currState = (State) stateIt.next();
-
-			sb.append(" " + currState.getId());
+				states.clear();
 		}
 
-		sb.append("]");
+		public int size()
+		{
+				return states.size();
+		}
 
-		return sb.toString();
-	}*/
+		public String toString()
+		{
+				StringBuffer sb = new StringBuffer();
+
+				sb.append("[");
+
+				Iterator stateIt = states.iterator();
+
+				while (stateIt.hasNext())
+				{
+						State currState = (State) stateIt.next();
+
+						sb.append(" " + currState.getId());
+				}
+
+				sb.append("]");
+
+				return sb.toString();
+		}*/
 }
 
 /**
@@ -641,11 +685,11 @@ class EquivalenceClass
 class EqClass
 	extends EquivalenceClass
 {
-
 	public EqClass()
 	{
 		super();
 	}
+
 	public EqClass(EquivalenceClass ec)
 	{
 		super(ec);
@@ -653,19 +697,23 @@ class EqClass
 
 	public State getState(Automaton theAutomaton)
 	{
+
 		// State newState = super.getState();
-		if(newState == null)
+		if (newState == null)
 		{
+
 			// create a new state named as the concatenation of all state-names
 			StringBuffer str = new StringBuffer();
 			Iterator it = iterator();
-			while(it.hasNext())
-			{
-				str.append(((State)it.next()).getName());
-			}
-			createNewState(theAutomaton, str.toString());
 
+			while (it.hasNext())
+			{
+				str.append(((State) it.next()).getName());
+			}
+
+			createNewState(theAutomaton, str.toString());
 		}
+
 		return newState;
 	}
 
@@ -673,6 +721,7 @@ class EqClass
 	// Should the eq-class also add itself to the state?
 	public boolean add(State state)
 	{
+
 		// System.out.println("EqClass(" + name +")::addState(" + state.getName() + ")");
 		return super.add(state);
 	}

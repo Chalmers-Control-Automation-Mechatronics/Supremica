@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -46,12 +47,10 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor.useractions;
 
 import java.awt.event.*;
 import javax.swing.*;
-
 import org.supremica.gui.Supremica;
 import org.supremica.gui.editor.EditorView;
 import org.supremica.gui.editor.StateNode;
@@ -61,16 +60,18 @@ public class DeleteSelectionAction
 	extends EditorAction
 {
 	private static Logger logger = LoggerFactory.createLogger(AbstractAction.class);
-	
+
 	public DeleteSelectionAction(EditorView editorView)
 	{
 		super("Delete", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Delete16.gif")), editorView);
+
 		putValue(SHORT_DESCRIPTION, "Delete");
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
 		StateNode selectedState = getSelectedState();
+
 		logger.info("DeleteSelection");
 	}
 }

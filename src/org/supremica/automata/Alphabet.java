@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -66,7 +67,6 @@ import org.supremica.log.*;
 public class Alphabet
 {
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
-
 	private int idIndex = 0;
 	private Listeners listeners = null;
 	private TreeMap theEvents = null;
@@ -74,12 +74,12 @@ public class Alphabet
 	public Alphabet()
 	{
 		theEvents = new TreeMap();
-
 	}
 
 	public Alphabet(Alphabet orgAlphabet)
 	{
 		this();
+
 		for (Iterator it = orgAlphabet.iterator(); it.hasNext(); )
 		{
 			LabeledEvent newEvent = new LabeledEvent((LabeledEvent) it.next());
@@ -162,14 +162,17 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException("addEvent: event mist be non-null");
 		}
+
 		if (ev.getLabel() == null)
 		{
 			throw new IllegalArgumentException("addEvent: event label mist be non-null");
 		}
+
 		if (theEvents.containsKey(ev.getLabel()))
 		{
 			throw new IllegalArgumentException("getEvent: event is already in the alphabet ");
 		}
+
 		theEvents.put(ev.getLabel(), ev);
 	}
 
@@ -186,13 +189,14 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException("getEvent: event mist be non-null");
 		}
+
 		if (ev.getLabel() == null)
 		{
 			throw new IllegalArgumentException("getEvent: event label mist be non-null");
 		}
-		return (LabeledEvent)theEvents.get(ev.getLabel());
-	}
 
+		return (LabeledEvent) theEvents.get(ev.getLabel());
+	}
 
 	/**
 	 * Adds all events in another Events to this Events.
@@ -200,9 +204,11 @@ public class Alphabet
 	 */
 	public void addEvents(Alphabet otherEvents)
 	{
-		for (EventIterator eventIt = otherEvents.iterator(); eventIt.hasNext(); )
+		for (EventIterator eventIt = otherEvents.iterator();
+				eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = eventIt.nextEvent();
+
 			if (!contains(currEvent))
 			{
 				addEvent(currEvent);
@@ -217,6 +223,7 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException("The event is not included in this alphabet");
 		}
+
 		removeEvent(ev.getLabel());
 	}
 
@@ -227,6 +234,7 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException("The event is not included in this alphabet");
 		}
+
 		theEvents.remove(label);
 	}
 
@@ -253,6 +261,7 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException("Event label must be non-null");
 		}
+
 		return theEvents.containsKey(label);
 	}
 
@@ -271,6 +280,7 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException("Event label must be non-null");
 		}
+
 		return (LabeledEvent) theEvents.get(label);
 	}
 
@@ -295,28 +305,34 @@ public class Alphabet
 	public int nbrOfControllableEvents()
 	{
 		int nbrOfFoundEvents = 0;
+
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
+
 			if (currEvent.isControllable())
 			{
 				nbrOfFoundEvents++;
 			}
 		}
+
 		return nbrOfFoundEvents;
 	}
 
 	public int nbrOfUncontrollableEvents()
 	{
 		int nbrOfFoundEvents = 0;
+
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
+
 			if (!currEvent.isControllable())
 			{
 				nbrOfFoundEvents++;
 			}
 		}
+
 		return nbrOfFoundEvents;
 	}
 
@@ -327,59 +343,70 @@ public class Alphabet
 	public int nbrOfUnobservableEvents()
 	{
 		int nbrOfFoundEvents = 0;
+
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
+
 			if (!currEvent.isObservable() || currEvent.isEpsilon())
 			{
 				nbrOfFoundEvents++;
 			}
 		}
+
 		return nbrOfFoundEvents;
 	}
 
 	public int nbrOfPrioritizedEvents()
 	{
 		int nbrOfFoundEvents = 0;
+
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
+
 			if (currEvent.isPrioritized())
 			{
 				nbrOfFoundEvents++;
 			}
 		}
+
 		return nbrOfFoundEvents;
 	}
 
 	public int nbrOfImmediateEvents()
 	{
 		int nbrOfFoundEvents = 0;
+
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
+
 			if (currEvent.isImmediate())
 			{
 				nbrOfFoundEvents++;
 			}
 		}
+
 		return nbrOfFoundEvents;
 	}
 
 	public int nbrOfEpsilonEvents()
 	{
 		int nbrOfFoundEvents = 0;
+
 		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
+
 			if (currEvent.isEpsilon())
 			{
 				nbrOfFoundEvents++;
 			}
 		}
+
 		return nbrOfFoundEvents;
 	}
-
 
 	/**
 	 * True, if the event is in the set already, false otherwise.
@@ -405,21 +432,23 @@ public class Alphabet
 
 		if (size() > 0)
 		{
-			for(EventIterator it = iterator(); it.hasNext(); )
+			for (EventIterator it = iterator(); it.hasNext(); )
 			{
 				LabeledEvent event = it.nextEvent();
+
 				sbuf.append(event);
+
 				if (it.hasNext())
 				{
 					sbuf.append(", ");
 				}
 			}
+
 			sbuf.append("}");
 		}
 
 		return sbuf.toString();
 	}
-
 
 	/**
 	 * Returns collection of the events..
@@ -430,7 +459,6 @@ public class Alphabet
 	{
 		return theEvents.values();
 	}
-
 
 	/** Must be called after an event label is modified. */
 	public void rehash()
@@ -458,11 +486,11 @@ public class Alphabet
 		private final boolean controllableEvents;
 		private Object nextEvent = null;
 
-
 		public ControllableEventIterator(Iterator theIterator, boolean controllableEvents)
 		{
 			this.theIterator = theIterator;
 			this.controllableEvents = controllableEvents;
+
 			findNextEvent();
 		}
 
@@ -477,7 +505,9 @@ public class Alphabet
 			if (nextEvent != null)
 			{
 				Object oldEvent = nextEvent;
+
 				findNextEvent();
+
 				return oldEvent;
 			}
 			else
@@ -496,17 +526,19 @@ public class Alphabet
 		{
 			while (theIterator.hasNext())
 			{
-				LabeledEvent currEvent = (LabeledEvent)theIterator.next();
+				LabeledEvent currEvent = (LabeledEvent) theIterator.next();
+
 				if (currEvent.isControllable() == controllableEvents)
 				{
 					nextEvent = currEvent;
+
 					return;
 				}
 			}
+
 			nextEvent = null;
 		}
 	}
-
 
 	/**
 	 * Computes A \ B (difference) where A is this alphabet and B is other
@@ -526,17 +558,20 @@ public class Alphabet
 					removeEvent(currEvent.getLabel());
 				}
 				catch (Exception ex)
-				{   // This should be impossible
+				{    // This should be impossible
 					logger.error("Alphabet.minus. Trying to remove a non-existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}
 			}
 		}
 	}
+
 	static public Alphabet minus(Alphabet op1, Alphabet op2)
 	{
 		Alphabet result = new Alphabet(op1);
+
 		result.minus(op2);
+
 		return result;
 	}
 
@@ -553,20 +588,21 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if(!other.contains(currEvent.getLabel()))
+			if (!other.contains(currEvent.getLabel()))
 			{
 				removeList.add(currEvent);
+
 				//removeList.add(currEvent.getLabel());
 
 				/*
 				try
 				{
-				    removeEvent(currEvent.getLabel());
+					removeEvent(currEvent.getLabel());
 				}
 				catch (Exception ex)
 				{   // This should be impossible
-					logger.error("Alphabet.intersect. Trying to remove a non-existing event. " + ex);
-					logger.debug(ex.getStackTrace());
+						logger.error("Alphabet.intersect. Trying to remove a non-existing event. " + ex);
+						logger.debug(ex.getStackTrace());
 				}
 				*/
 			}
@@ -575,6 +611,7 @@ public class Alphabet
 		for (Iterator removeIt = removeList.iterator(); removeIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) removeIt.next();
+
 			//String currEvent = (String) removeIt.next();
 			removeEvent(currEvent);
 		}
@@ -593,7 +630,7 @@ public class Alphabet
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
-			if(other.contains(currEvent.getLabel()))
+			if (other.contains(currEvent.getLabel()))
 			{
 				return true;
 			}
@@ -608,7 +645,9 @@ public class Alphabet
 	public static Alphabet intersect(Alphabet a1, Alphabet a2)
 	{
 		Alphabet result = new Alphabet(a1);
+
 		result.intersect(a2);
+
 		return result;
 	}
 
@@ -626,8 +665,8 @@ public class Alphabet
 			if (!contains(currEvent.getLabel()))
 			{
 				LabeledEvent newEvent = new LabeledEvent(currEvent);
-				// newEvent.setId(getUniqueId("e"));
 
+				// newEvent.setId(getUniqueId("e"));
 				try
 				{
 					addEvent(newEvent);
@@ -640,10 +679,13 @@ public class Alphabet
 			}
 		}
 	}
+
 	static public Alphabet union(Alphabet op1, Alphabet op2)
 	{
 		Alphabet result = new Alphabet(op1);
+
 		result.union(op2);
+
 		return result;
 	}
 
@@ -653,7 +695,8 @@ public class Alphabet
 	public Alphabet getControllableAlphabet()
 	{
 		Alphabet subAlphabet = new Alphabet();
-		for (EventIterator evIt = controllableEventIterator(); evIt.hasNext();)
+
+		for (EventIterator evIt = controllableEventIterator(); evIt.hasNext(); )
 		{
 			subAlphabet.addEvent(evIt.nextEvent());
 		}
@@ -667,7 +710,9 @@ public class Alphabet
 	public Alphabet getUncontrollableAlphabet()
 	{
 		Alphabet subAlphabet = new Alphabet();
-		for (EventIterator evIt = uncontrollableEventIterator(); evIt.hasNext();)
+
+		for (EventIterator evIt = uncontrollableEventIterator();
+				evIt.hasNext(); )
 		{
 			subAlphabet.addEvent(evIt.nextEvent());
 		}
@@ -678,9 +723,11 @@ public class Alphabet
 	public void setIndicies()
 	{
 		int i = 0;
-		for (EventIterator evIt = iterator(); evIt.hasNext();)
+
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
+
 			currEvent.setSynchIndex(i++);
 		}
 	}
@@ -688,14 +735,16 @@ public class Alphabet
 	public void setIndicies(Alphabet otherAlphabet)
 		throws IllegalArgumentException
 	{
-		for (EventIterator evIt = iterator(); evIt.hasNext();)
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
 			LabeledEvent otherEvent = otherAlphabet.getEvent(currEvent.getLabel());
+
 			if (otherEvent == null)
 			{
 				throw new IllegalArgumentException("otherAlphabet must contains all events in this alphabet");
 			}
+
 			currEvent.setSynchIndex(otherEvent.getSynchIndex());
 		}
 	}
@@ -711,6 +760,7 @@ public class Alphabet
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -725,6 +775,7 @@ public class Alphabet
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -746,7 +797,9 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException();
 		}
+
 		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
+
 		return thisEvent.isPrioritized();
 	}
 
@@ -760,42 +813,54 @@ public class Alphabet
 		{
 			throw new IllegalArgumentException();
 		}
+
 		LabeledEvent thisEvent = getEvent(otherEvent.getLabel());
+
 		return thisEvent.isControllable();
 	}
-
 
 	public boolean equalAlphabet(Alphabet other)
 	{
 		if (nbrOfEvents() != other.nbrOfEvents())
 		{
+
 			//System.err.println("equalAlphabet::non equal nbr of events");
 			return false;
 		}
+
 		if (nbrOfControllableEvents() != other.nbrOfControllableEvents())
 		{
+
 			//System.err.println("equalAlphabet::non equal nbr of controllable events");
 			return false;
 		}
+
 		if (nbrOfPrioritizedEvents() != other.nbrOfPrioritizedEvents())
 		{
+
 			//System.err.println("equalAlphabet::non equal nbr of prioritized events");
 			return false;
 		}
+
 		if (nbrOfUnobservableEvents() != other.nbrOfUnobservableEvents())
 		{
 			return false;
 		}
+
 		if (nbrOfImmediateEvents() != other.nbrOfImmediateEvents())
 		{
+
 			//System.err.println("equalAlphabet::non equal nbr of immediate events");
 			return false;
 		}
+
 		if (nbrOfEpsilonEvents() != other.nbrOfEpsilonEvents())
 		{
+
 			//System.err.println("equalAlphabet::non equal nbr of epsilon events");
 			return false;
 		}
+
 		return true;
 	}
 
@@ -848,6 +913,7 @@ public class Alphabet
 	 */
 	public boolean hasEqualLowercaseEventNames()
 	{
+
 		// Make copy to make iterating easier...
 		Alphabet copy = new Alphabet(this);
 
@@ -855,43 +921,45 @@ public class Alphabet
 		boolean found = false;
 
 		// Iterate
-		for (EventIterator copyIt = copy.iterator(); copyIt.hasNext();)
+		for (EventIterator copyIt = copy.iterator(); copyIt.hasNext(); )
 		{
 			LabeledEvent eventA = copyIt.nextEvent();
 
 			// Another iterator
 			EventIterator eventIt = iterator();
-			
+
 			// Make sure each pair is only examined once
 			while (!eventA.equals(eventIt.nextEvent()));
-			while(eventIt.hasNext())
+
+			while (eventIt.hasNext())
 			{
 				LabeledEvent eventB = eventIt.nextEvent();
-				
+
 				// Compare lowercase names
 				if (eventA.getLabel().toLowerCase().equals(eventB.getLabel().toLowerCase()))
 				{
-					logger.warn("The events " + eventA + " and " + eventB + " have dangerously " +
-								"similar names.");
+					logger.warn("The events " + eventA + " and " + eventB + " have dangerously " + "similar names.");
+
 					found = true;
 				}
 			}
 		}
+
 		return found;
 	}
 
 	public static void main(String[] args)
 	{
 		Alphabet sigma1 = new Alphabet();
+
 		sigma1.addEvent(new LabeledEvent("e1"));
 		sigma1.addEvent(new LabeledEvent("e2"));
 
 		Alphabet sigma2 = new Alphabet();
+
 		sigma2.addEvent(new LabeledEvent("e2"));
 		sigma2.addEvent(new LabeledEvent("e3"));
-
 		sigma1.union(sigma2);
 		System.out.println("sigma1 + sigma2 = " + sigma1.toString());
-
 	}
 }

@@ -73,10 +73,12 @@ public class FixedformMatcher
 		{
 			State currState = it.getState();
 			Matcher matcher = patterns[i].matcher(currState.getName());
+
 			if (!matcher.matches())
 			{
 				return false;
 			}
+
 			if (!options[i].matches(currState))
 			{
 				return false;

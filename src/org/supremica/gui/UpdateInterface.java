@@ -61,7 +61,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
-
 import org.supremica.log.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -69,18 +68,16 @@ import org.supremica.automata.AutomataListener;
 
 class UpdateInterfaceTableModel
 	extends AbstractTableModel
-	implements AutomataListener // could usefully inherit from AutomataTableModel or something like that
+	implements AutomataListener    // could usefully inherit from AutomataTableModel or something like that
 {
 	private static Logger logger = LoggerFactory.createLogger(UpdateInterfaceTableModel.class);
-	private String[] columnNames = { "Automaton", "Type"};
+	private String[] columnNames = { "Automaton", "Type" };
 	private Automata selectableAutomata;
-
 	public final static int AUTOMATON_COL = 0;
 	public final static int TYPE_COL = AUTOMATON_COL + 1;
 
 	public UpdateInterfaceTableModel(Automata selectableAutomata)
 	{
-
 		this.selectableAutomata = selectableAutomata;
 
 		selectableAutomata.addListener(this);
@@ -104,17 +101,21 @@ class UpdateInterfaceTableModel
 	public Object getValueAt(int row, int col)
 	{
 		Automaton automaton = selectableAutomata.getAutomatonAt(row);
-		switch(col)
+
+		switch (col)
 		{
-			case AUTOMATON_COL: return automaton.getName();
-			case TYPE_COL: return automaton.getType();
+
+		case AUTOMATON_COL :
+			return automaton.getName();
+
+		case TYPE_COL :
+			return automaton.getType();
 		}
+
 		return null;
 	}
 
-	public void setValueAt(Object obj, int row, int col)
-	{
-	}
+	public void setValueAt(Object obj, int row, int col) {}
 
 	public boolean isCellEditable(int row, int col)
 	{
@@ -125,6 +126,7 @@ class UpdateInterfaceTableModel
 	private void updateListeners()
 	{
 		TableModelEvent event = new TableModelEvent(this, 0, selectableAutomata.getNbrOfAutomata() - 1);
+
 		fireTableChanged(event);
 	}
 
@@ -144,7 +146,7 @@ class UpdateInterfaceTableModel
 	}
 
 	public void actionsOrControlsChanged(Automata automata)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void updated(Object theObject)
@@ -158,7 +160,6 @@ class UpdateInterfaceTable
 	extends JTable
 {
 	private static Logger logger = LoggerFactory.createLogger(UpdateInterfaceTable.class);
-
 	private Automata selectableAutomata;
 	private Automata selectedAutomata;
 	private UpdateInterfaceDialog theFrame;
@@ -172,9 +173,7 @@ class UpdateInterfaceTable
 		this.theFrame = theFrame;
 
 		getTableSorterModel().addMouseListenerToHeaderInTable(this);
-
 		setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
 		setSelectedAutomata();
 
 		// Note! This code is duplicated (almost) from Supremica.java
@@ -198,25 +197,26 @@ class UpdateInterfaceTable
 			// Does not do anything useful
 			private void maybeShowPopup(MouseEvent e)
 			{
+
 /*
-				int col = columnAtPoint(new Point(e.getX(), e.getY()));
+								int col = columnAtPoint(new Point(e.getX(), e.getY()));
 
-				if (e.isPopupTrigger())
-				{
-					int row = rowAtPoint(new Point(e.getX(), e.getY()));
+								if (e.isPopupTrigger())
+								{
+										int row = rowAtPoint(new Point(e.getX(), e.getY()));
 
-					if (row < 0)
-					{
-						return;
-					}
+										if (row < 0)
+										{
+												return;
+										}
 
-					if (!isRowSelected(row))
-					{
-						clearSelection();
-						setRowSelectionInterval(row, row);
-					}
+										if (!isRowSelected(row))
+										{
+												clearSelection();
+												setRowSelectionInterval(row, row);
+										}
 
-				}
+								}
 */
 			}
 		});
@@ -231,12 +231,14 @@ class UpdateInterfaceTable
 	private Automaton getAutomaton(int row)
 	{
 		String name = (String) getModel().getValueAt(row, UpdateInterfaceTableModel.AUTOMATON_COL);
+
 		System.err.println(name);
+
 		return selectableAutomata.getAutomaton(name);
 	}
 
 	private int getRow(Automaton theAutomaton)
-	{ // This implementation is only valid if no resorting has been made
+	{    // This implementation is only valid if no resorting has been made
 		return selectedAutomata.getAutomatonIndex(theAutomaton);
 	}
 
@@ -250,20 +252,24 @@ class UpdateInterfaceTable
 		return this;
 	}
 
-
 	public void setSelectedAutomata()
 	{
 		ListSelectionModel selectionModel = getSelectionModel();
+
 		selectionModel.clearSelection();
+
 		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
 			int currRow = getRow(currAutomaton);
+
 			if (currRow < 0)
 			{
 				logger.error("setSelectedAutomata: currRow < 0");
+
 				return;
 			}
+
 			setRowSelectionInterval(currRow, currRow);
 		}
 	}
@@ -271,11 +277,14 @@ class UpdateInterfaceTable
 	public void updateSelectedAutomata()
 	{
 		int[] selectedRows = getSelectedRows();
+
 		selectedAutomata.clear();
+
 		for (int i = 0; i < selectedRows.length; i++)
 		{
 			int currRow = selectedRows[i];
 			Automaton currAutomaton = getAutomaton(currRow);
+
 			System.err.println(currRow + " " + currAutomaton);
 			selectedAutomata.addAutomaton(currAutomaton);
 		}
@@ -290,12 +299,10 @@ class UpdateInterfaceTable
 
 		return sorter;
 	}
-
 }
 
 
 // ------------------------------------------
-
 interface UpdateInterfaceTab
 {
 	String getTitle();
@@ -343,18 +350,18 @@ class UpdateInterfaceDialog
 	private CancelButton cancel_button = null;
 	private static Logger logger = LoggerFactory.createLogger(UpdateInterfaceDialog.class);
 
-
 	public UpdateInterfaceDialog(JFrame owner, VisualProject theProject, Automaton theInterface)
 	{
 		super(owner, "Update Interface", true);
+
 		Utility.setupDialog(this, 500, 300);
 
 		this.theInterface = theInterface;
 		this.theProject = theProject;
 
 		Automata selectableAutomata = new Automata(theProject, true);
-		selectableAutomata.removeAutomaton(theInterface);
 
+		selectableAutomata.removeAutomaton(theInterface);
 		theInterface.purgeInterfaceAutomata(theProject);
 
 		this.masterTable = new UpdateInterfaceTable(selectableAutomata, theInterface.getMasterAutomata(), this);
@@ -446,8 +453,6 @@ class UpdateInterfaceDialog
 		slaveTable.updateSelectedAutomata();
 		setVisible(false);
 	}
-
-
 }
 
 public class UpdateInterface

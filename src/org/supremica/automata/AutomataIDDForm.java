@@ -68,7 +68,7 @@ public final class AutomataIDDForm
 		this.theAutomata = theAutomata;
 		theAutomaton = new Automaton();
 
-		Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, true, true); // theAutomata.getUnionAlphabet();
+		Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, true, true);    // theAutomata.getUnionAlphabet();
 
 		theAutomaton.getAlphabet().union(theAlphabet);
 

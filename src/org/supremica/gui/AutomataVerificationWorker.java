@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -51,10 +52,8 @@ package org.supremica.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.util.*;
-
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
-
 import org.supremica.automata.Automata;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.util.ActionTimer;
@@ -70,6 +69,7 @@ public class AutomataVerificationWorker
 	implements Stoppable
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
+
 	// -- MF --      private Supremica workbench = null;
 	private Gui workbench = null;
 	private Automata theAutomata = null;
@@ -88,9 +88,7 @@ public class AutomataVerificationWorker
 	private static final int MODULAR = 1;
 	private static final int IDD = 2;
 
-	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, 
-									  SynchronizationOptions synchronizationOptions, 
-									  VerificationOptions verificationOptions)
+	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
@@ -106,58 +104,60 @@ public class AutomataVerificationWorker
 	public void run()
 	{
 		final AutomataVerifier automataVerifier;
-
 		boolean verificationSuccess;
 		String successMessage;
 		String failureMessage;
-		
+
 		// Examine the validity of the chosen options
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
+
 		if (errorMessage != null)
 		{
-			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, "Alert", 
-										  JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
 			requestStop();
+
 			return;
 		}
 
 		// Perform verification according to the VerificationType.
 		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
 		{
+
 			// Controllability verification...
 			successMessage = "The system is controllable!";
 			failureMessage = "The system is NOT controllable!";
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
 		{
+
 			// Non-blocking verification...
 			successMessage = "The system is non-blocking!";
 			failureMessage = "The system is blocking!";
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
 		{
+
 			// Mutual non-blocking verification...
 			successMessage = "The system is mutually non-blocking!";
+
 			//failureMessage = "The system is (globally and mutually) blocking!";
 			failureMessage = "The system might be blocking...";
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
+
 			// Language inclusion verification...
-			successMessage = "The language of the unselected automata is \n" +
-				             "included in the language of the selected automata.";
-			failureMessage = "The language of the unselected automata is NOT\n" +
-				             "included in the language of the selected automata.";
+			successMessage = "The language of the unselected automata is \n" + "included in the language of the selected automata.";
+			failureMessage = "The language of the unselected automata is NOT\n" + "included in the language of the selected automata.";
 
 			// In language inclusion, not only the currently selected automata are used!
 			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
 		}
 		else
-		{	// Error... this can't happen!
+		{    // Error... this can't happen!
 			requestStop();
-			logger.error("Unavailable option chosen... this can't happen...\n" +
-						 "don't ever do whatever you just did again, please.\n" +
-						 "Please send bug report to bugs@supremica.org.");
+			logger.error("Unavailable option chosen... this can't happen...\n" + "don't ever do whatever you just did again, please.\n" + "Please send bug report to bugs@supremica.org.");
+
 			return;
 		}
 
@@ -170,87 +170,91 @@ public class AutomataVerificationWorker
 		// Initialize the AutomataVerifier
 		try
 		{
-			automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, 
-													verificationOptions);
+			automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
 		}
 		catch (Exception ex)
 		{
 			requestStop();
-			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", 
-										  JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			logger.error(ex.getMessage());
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 
 		// Are further preparations needed?
 		// This can't be done earlier, since the helper must be initialized! Ugly.
-	    if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
+
 			// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
 			automataVerifier.prepareForLanguageInclusion(workbench.getUnselectedAutomata());
 		}
 
 		// Initialize the ExecutionDialog
 		final ArrayList threadsToStop = new ArrayList();
+
 		threadsToStop.add(this);
 		threadsToStop.add(automataVerifier);
-		
 		EventQueue.invokeLater(new Runnable()
+		{
+			public void run()
 			{
-				public void run()
-				{
-					executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
-					// executionDialog.setMode(ExecutionDialogMode.hide);
-					executionDialog.setMode(ExecutionDialogMode.verifying);
-					automataVerifier.getHelper().setExecutionDialog(executionDialog);
-				}
-			});
-		
+				executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
+
+				// executionDialog.setMode(ExecutionDialogMode.hide);
+				executionDialog.setMode(ExecutionDialogMode.verifying);
+				automataVerifier.getHelper().setExecutionDialog(executionDialog);
+			}
+		});
+
 		// Solve the problem (and measure the time to)!
 		ActionTimer timer = new ActionTimer();
+
 		timer.start();
+
 		verificationSuccess = automataVerifier.verify();
+
 		timer.stop();
-		
+
 		// Make sure(?) the ExecutionDialog is hidden!
 		// I thought this wouldn't work... but it seems
 		// it does!! /hguo
 		EventQueue.invokeLater(new Runnable()
+		{
+			public void run()
 			{
-				public void run()
+				if (executionDialog != null)
 				{
-					if (executionDialog != null)
-						executionDialog.setMode(ExecutionDialogMode.hide);
+					executionDialog.setMode(ExecutionDialogMode.hide);
 				}
-			});
-		
+			}
+		});
+
 		// Present the result
 		if (!stopRequested)
 		{
+
 			// Show message dialog with result
 			if (verificationSuccess)
 			{
-				JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", 
-											  JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", JOptionPane.INFORMATION_MESSAGE);
 			}
 			else
 			{
-				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", 
-											  JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.INFORMATION_MESSAGE);
 			}
+
 			automataVerifier.getHelper().displayInfo();
 			logger.info("Execution completed after " + timer.toString());
 		}
 		else
 		{
-			JOptionPane.showMessageDialog(workbench.getFrame(), "Execution stopped after " + 
-										  timer.toString(), "Execution stopped", 
-										  JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(workbench.getFrame(), "Execution stopped after " + timer.toString(), "Execution stopped", JOptionPane.INFORMATION_MESSAGE);
 			automataVerifier.getHelper().displayInfo();
 			logger.info("Execution stopped after " + timer.toString());
 		}
-		
+
 		// We're finished! Bail out! Make sure to kill the ExecutionDialog!
 		if (executionDialog != null)
 		{
@@ -266,6 +270,7 @@ public class AutomataVerificationWorker
 	public void requestStop()
 	{
 		stopRequested = true;
+
 		logger.debug("AutomataVerificationWorker requested to stop.");
 
 		if (executionDialog != null)

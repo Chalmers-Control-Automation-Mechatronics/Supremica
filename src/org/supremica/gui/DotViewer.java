@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -63,7 +64,6 @@ public class DotViewer
 	extends JFrame
 {
 	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
-
 	private Graph theGraph;
 	private PrintWriter toDotWriter;
 	private InputStream fromDotStream;
@@ -79,29 +79,31 @@ public class DotViewer
 	protected JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", SupremicaProperties.isDotWithStateLabels());
 	protected JCheckBoxMenuItem useColorsCheckBox = new JCheckBoxMenuItem("Draw colors", SupremicaProperties.isDotUseColors());
 	protected JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", SupremicaProperties.isDotAutomaticUpdate());
-	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5, MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
+	private final static double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5,
+								MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
 	private Process dotProcess;
 	private Builder builder;
-
 	private String objectName = "";
 
 	public DotViewer()
 		throws Exception
 	{
 		setBackground(Color.white);
+
 		contentPane = (JPanel) getContentPane();
+
 		contentPane.setLayout(layout);
 
 		// Set size and center frame, all in one method!
 		Utility.setupFrame(this, 400, 500);
-
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
 				terminateProcesses();
+
 				//dispose();
 			}
 		});
@@ -111,9 +113,7 @@ public class DotViewer
 		updateNeeded = true;
 	}
 
-	public void initialize()
-	{
-	}
+	public void initialize() {}
 
 	public void run()
 	{
@@ -138,6 +138,7 @@ public class DotViewer
 	public void setObjectName(String name)
 	{
 		setTitle(name);
+
 		objectName = name;
 	}
 
@@ -157,15 +158,15 @@ public class DotViewer
 
 		// File
 		JMenu menuFile = new JMenu();
+
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
-
 		menuBar.add(menuFile);
 
 		// File.Export
 		JMenuItem menuFileExport = new JMenuItem();
-		menuFileExport.setText("Export...");
 
+		menuFileExport.setText("Export...");
 		menuFile.add(menuFileExport);
 
 		/* File.Import, see below
@@ -242,13 +243,14 @@ public class DotViewer
 				fileExport_actionPerformed(e);
 			}
 		});
+
 		/* see below
 		menuFileImport.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				fileImport_actionPerformed(e);
-			}
+				public void actionPerformed(ActionEvent e)
+				{
+						fileImport_actionPerformed(e);
+				}
 		});
 		*/
 		menuFileClose.addActionListener(new ActionListener()
@@ -257,6 +259,7 @@ public class DotViewer
 			{
 				setVisible(false);
 				terminateProcesses();
+
 				//dispose();
 			}
 		});
@@ -343,7 +346,6 @@ public class DotViewer
 		});
 		exportButton.setMargin(tmpInsets);
 		toolBar.add(exportButton, "WEST");
-
 		toolBar.addSeparator();
 
 		JButton zoominButton = new JButton();
@@ -408,6 +410,7 @@ public class DotViewer
 
 	public void updated(Object update, Object original)
 	{
+
 		//System.err.println("updated");
 		if (update == original)
 		{
@@ -462,6 +465,7 @@ public class DotViewer
 		{
 			toDotWriter.close();
 			logger.debug(ex.getStackTrace());
+
 			throw ex;
 		}
 
@@ -474,6 +478,7 @@ public class DotViewer
 		{
 			logger.error("Exception while serializing ", ex);
 			logger.debug(ex.getStackTrace());
+
 			return;
 		}
 		finally
@@ -487,6 +492,7 @@ public class DotViewer
 	private void parseResponse(InputStream inputStream)
 		throws Exception
 	{
+
 		// Parse the response from dot
 		Parser parser = new Parser(inputStream);
 
@@ -498,13 +504,13 @@ public class DotViewer
 		{
 			logger.error("Exception while parsing dot file", ex);
 			logger.debug(ex.getStackTrace());
+
 			throw ex;
 		}
 		finally
 		{
 			inputStream.close();
 		}
-
 
 		try
 		{
@@ -514,6 +520,7 @@ public class DotViewer
 		{
 			logger.error("Exception while getting dot graph", ex);
 			logger.debug(ex.getStackTrace());
+
 			throw ex;
 		}
 	}
@@ -523,6 +530,7 @@ public class DotViewer
 		if (dotProcess != null)
 		{
 			dotProcess.destroy();
+
 			updateNeeded = true;
 		}
 	}
@@ -537,6 +545,7 @@ public class DotViewer
 
 	public void draw()
 	{
+
 		// logger.debug("Before creating panel");
 		// theGraph.printGraph(System.err);
 		viewerPanel = new GrappaPanel(theGraph);
@@ -573,6 +582,7 @@ public class DotViewer
 		{
 			logger.error("Cannot run dot. Make sure dot is in the path.");
 			logger.debug(ex.getStackTrace());
+
 			throw ex;
 		}
 
@@ -612,43 +622,40 @@ public class DotViewer
 	// This class is almost identical to the same named class in ActionMan
 	// Should really merge and fixx, but for now.... Should I bother?
 	static class ExportDialog
-	//	extends JDialog
+
+	//      extends JDialog
 	{
 		private static final String epsString = "eps";
 		private static final String mifString = "mif";
 		private static final String dotString = "dot";
 		private static final String pngString = "png";
 		private static final String svgString = "svg";
-
-		private static final Object[] possibleValues =
-		{
-			epsString, mifString, dotString, pngString, svgString
-		};
-
+		private static final Object[] possibleValues = { epsString, mifString,
+														 dotString, pngString,
+														 svgString };
 		private JOptionPane pane = null;
 		private JDialog dialog = null;
 		private JCheckBox checkbox = null;
 		private Object selectedValue = null;
-
 		private String dotArgument = null;
 		private JFileChooser fileExporter = null;
 
 		ExportDialog(Frame comp)
 		{
-			this.pane = new JOptionPane("Export as::",
-										JOptionPane.INFORMATION_MESSAGE,
-										JOptionPane.OK_CANCEL_OPTION,
-										null,	// icon
-										null, 	// options
-										null);	// initialValue
+			this.pane = new JOptionPane("Export as::", JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,    // icon
+										null,    // options
+										null);    // initialValue
 
 			pane.setWantsInput(true);
 			pane.setSelectionValues(possibleValues);
 			pane.setInitialSelectionValue(possibleValues[0]);
-			pane.setComponentOrientation(((comp == null) ? JOptionPane.getRootFrame() : comp).getComponentOrientation());
+			pane.setComponentOrientation(((comp == null)
+										  ? JOptionPane.getRootFrame()
+										  : comp).getComponentOrientation());
 			pane.selectInitialValue();
 
 			this.checkbox = new JCheckBox("Export to debugview");
+
 			pane.add(checkbox);
 
 			// int style = styleFromMessageType(JOptionPane.INFORMATION_MESSAGE);
@@ -658,37 +665,37 @@ public class DotViewer
 		public void show()
 		{
 			dialog.show();
-	        dialog.dispose();
+			dialog.dispose();
 
 			// Is this the right thing to do? It seems to work, but the manuals...
-	        if(((Integer)pane.getValue()).intValue() == JOptionPane.CANCEL_OPTION)
-	        {
-	        	return;
-	        }
+			if (((Integer) pane.getValue()).intValue() == JOptionPane.CANCEL_OPTION)
+			{
+				return;
+			}
 
-	        selectedValue = pane.getInputValue();
+			selectedValue = pane.getInputValue();
 
-			if(selectedValue == epsString)
+			if (selectedValue == epsString)
 			{
 				fileExporter = FileDialogs.getEPSFileExporter();
 				dotArgument = "-Tps";
 			}
-			else if(selectedValue == mifString)
+			else if (selectedValue == mifString)
 			{
 				fileExporter = FileDialogs.getMIFFileExporter();
 				dotArgument = "-Tmif";
 			}
-			else if(selectedValue == dotString)
+			else if (selectedValue == dotString)
 			{
 				fileExporter = FileDialogs.getDOTFileExporter();
 				dotArgument = "";
 			}
-			else if(selectedValue == pngString)
+			else if (selectedValue == pngString)
 			{
 				fileExporter = FileDialogs.getPNGFileExporter();
 				dotArgument = "-Tpng";
 			}
-			else if(selectedValue == svgString)
+			else if (selectedValue == svgString)
 			{
 				fileExporter = FileDialogs.getSVGFileExporter();
 				dotArgument = "-Tsvg";
@@ -698,6 +705,7 @@ public class DotViewer
 				fileExporter = null;
 				dotArgument = null;
 			}
+
 			// System.out.println("selectedValue == " + selectedValue.toString());
 		}
 
@@ -705,21 +713,25 @@ public class DotViewer
 		{
 			return selectedValue == null;
 		}
+
 		public boolean toDebugView()
 		{
 			return checkbox.isSelected();
 		}
+
 		public String getDotArgument()
 		{
 			return dotArgument;
 		}
+
 		public JFileChooser getFileExporter()
 		{
 			return fileExporter;
 		}
+
 		public String getSelectedValue()
 		{
-			return (String)selectedValue;
+			return (String) selectedValue;
 		}
 	}
 
@@ -732,19 +744,22 @@ public class DotViewer
 	public void fileExport_actionPerformed(ActionEvent e)
 	{
 		ExportDialog dlg = new ExportDialog(this);
+
 		dlg.show();
-		if(dlg.wasCancelled())	// never mind...
+
+		if (dlg.wasCancelled())    // never mind...
 		{
 			return;
 		}
 
 		// Ugly duplication of code here, but a man can only do so much...
 		// (the real reason is that there's no (obvious) conversion from Writer to OutputStream)
-		if(dlg.toDebugView())
+		if (dlg.toDebugView())
 		{
 			try
 			{
 				AutomataSerializer serializer = getSerializer();
+
 				initializeStreams(dlg.getDotArgument());
 
 				// Send the file to dot
@@ -762,22 +777,25 @@ public class DotViewer
 					writer.write(currChar);
 
 					currChar = buffInStream.read();
+
 					// Toolkit.getDefaultToolkit().beep();
 				}
 
 				buffInStream.close();
 			}
-			catch(Exception excp)
+			catch (Exception excp)
 			{
 				logger.error("Error while writing to the debugview", excp);
 				logger.debug(excp.getStackTrace());
 			}
+
 			return;
 		}
 
 		JFileChooser fileExporter = dlg.getFileExporter();
+
 		// Suggest a reasonable filename based on the name of the automaton...
-		fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" +  objectName + "." + dlg.getSelectedValue()));
+		fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" + objectName + "." + dlg.getSelectedValue()));
 
 		if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 		{
@@ -801,7 +819,6 @@ public class DotViewer
 						BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
 						FileOutputStream fw = new FileOutputStream(currFile);
 						BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
-
 						int currChar = buffInStream.read();
 
 						while (currChar != -1)
@@ -818,6 +835,7 @@ public class DotViewer
 					{
 						logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
 						logger.debug(ex.getStackTrace());
+
 						return;
 					}
 				}
@@ -829,22 +847,22 @@ public class DotViewer
 	 * This is not the way to do it.
 	public void fileImport_actionPerformed(ActionEvent e)
 	{
-		// Open an inputstream to the file and have it parsed as an ordinary dot response
-		try
-		{
-			FileInputStream fistream = new FileInputStream("D:\\Temp\\User1.dot");
-			parseResponse(fistream);
-		}
-		catch(FileNotFoundException excp)
-		{
-			logger.error("File not found");
-		}
-		catch(Exception excp)
-		{
-			logger.error("Exception parsing the file");
-			logger.debug(excp.getStackTrace());
-		}
-		draw();
+			// Open an inputstream to the file and have it parsed as an ordinary dot response
+			try
+			{
+					FileInputStream fistream = new FileInputStream("D:\\Temp\\User1.dot");
+					parseResponse(fistream);
+			}
+			catch(FileNotFoundException excp)
+			{
+					logger.error("File not found");
+			}
+			catch(Exception excp)
+			{
+					logger.error("Exception parsing the file");
+					logger.debug(excp.getStackTrace());
+			}
+			draw();
 	}
 	*/
 }
@@ -861,6 +879,7 @@ class Builder
 	public Builder(DotViewer theViewer)
 	{
 		this.theViewer = theViewer;
+
 		setPriority(Thread.MIN_PRIORITY);
 	}
 
@@ -876,6 +895,7 @@ class Builder
 			{
 				logger.error("Cannot display object.");
 				logger.debug(ex.getStackTrace());
+
 				return;
 			}
 

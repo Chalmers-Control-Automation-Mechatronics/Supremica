@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -51,13 +52,13 @@ package org.supremica.automata;
 public class LabeledEvent
 	implements Comparable
 {
+
 	// The id is the local identifier of an event, should be
 	// different from any other id:s in the same automaton
 	// private String id = "";
 	// The label is what shows in the dot-figures, this is the
 	// global identifier of an event, appearing in the alphabet
 	private String label = "";
-
 	private boolean controllable = true;
 	private boolean prioritized = true;
 	private boolean observable = true;
@@ -71,8 +72,8 @@ public class LabeledEvent
 	 * extra variable used to speed up algorithms.
 	 * dont store your stuff here, it may be changed by other algos
 	 */
-//	public int extra1;
 
+//      public int extra1;
 	// private Action theAction = null;
 	public LabeledEvent() {}
 
@@ -82,20 +83,20 @@ public class LabeledEvent
 
 		// ** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
 		// ** MF ** adding this cannot break any code, can it?
-//		this.id = label;
+//              this.id = label;
 	}
 
 /*
-	public LabeledEvent(String label, String id)
-	{
-		setLabel(label);
-		setId(id);
-	}
+		public LabeledEvent(String label, String id)
+		{
+				setLabel(label);
+				setId(id);
+		}
 */
-
 	public LabeledEvent(LabeledEvent e)
 	{
-//		id = e.id;
+
+//              id = e.id;
 		label = e.label;
 		controllable = e.controllable;
 		prioritized = e.prioritized;
@@ -108,7 +109,7 @@ public class LabeledEvent
 
 	public String toString()
 	{
-		return "'" + label + "'"; //  + " (" + id + ")";
+		return "'" + label + "'";    //  + " (" + id + ")";
 	}
 
 	/**
@@ -125,18 +126,18 @@ public class LabeledEvent
 	 */
 
 	// get/setId are now _only_ used by Alphabet
+
 /*
-	String getId() // default access, accessible within package, not outside (poor java mans friend declaration)
-	{
-		return id;
-	}
+		String getId() // default access, accessible within package, not outside (poor java mans friend declaration)
+		{
+				return id;
+		}
 
-	void setId(String id)
-	{
-		this.id = id;
-	}
+		void setId(String id)
+		{
+				this.id = id;
+		}
 */
-
 	public String getLabel()
 	{
 		return label;
@@ -220,9 +221,9 @@ public class LabeledEvent
 	// This method must exist and work, since every map from event to something-else calls this one
 	public boolean equals(Object obj)
 	{
-		return equals((LabeledEvent)obj);
-		// throw new RuntimeException("LabeledEvent::equals(Object), not expected to be called!");
+		return equals((LabeledEvent) obj);
 
+		// throw new RuntimeException("LabeledEvent::equals(Object), not expected to be called!");
 		// System.err.println("equalsObject");
 		// return this.label.equals(((LabeledEvent) obj).label);
 	}
@@ -231,33 +232,34 @@ public class LabeledEvent
 	// The Java people have messed it all up with inheriting equals(Object)
 	public boolean equals(LabeledEvent event)
 	{
+
 		// return getId().equals(event.getId());
 		return getLabel().equals(event.getLabel());
 	}
 
 	public boolean equals(String label)
 	{
+
 		// System.err.println("equalsString");
 		return this.label.equals(label);
 	}
 
 	public boolean isEqual(LabeledEvent ev)
 	{
-		return this.label.equals(ev.label); // should also check priority & controllability?
+		return this.label.equals(ev.label);    // should also check priority & controllability?
 	}
 
 /*
-	private boolean equalId(Object obj)
-	{
-		return this.id.equals(((LabeledEvent) obj).id);
-	}
+		private boolean equalId(Object obj)
+		{
+				return this.id.equals(((LabeledEvent) obj).id);
+		}
 
-	private boolean equalId(String id)
-	{
-		return this.id.equals(id);
-	}
+		private boolean equalId(String id)
+		{
+				return this.id.equals(id);
+		}
 */
-
 	public int hashCode()
 	{
 		return label.hashCode();
@@ -275,6 +277,7 @@ public class LabeledEvent
 
 	public int compareTo(Object event)
 	{
+
 		// System.err.println("CompareTo");
 		return label.compareTo(((LabeledEvent) event).label);
 	}

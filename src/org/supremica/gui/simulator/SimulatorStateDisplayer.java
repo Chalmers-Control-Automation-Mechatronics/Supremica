@@ -54,12 +54,12 @@ import java.awt.*;
 import javax.swing.*;
 import org.supremica.automata.AutomataIndexFormHelper;
 
-
 public class SimulatorStateDisplayer
 	extends JPanel
 {
-//	private SimulatorStateViewer stateViewer;
-//	private Automata theAutomata;
+
+//      private SimulatorStateViewer stateViewer;
+//      private Automata theAutomata;
 	private JCheckBox isInitialBox = new JCheckBox("initial");
 	private JCheckBox isAcceptingBox = new JCheckBox("accepting");
 	private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
@@ -72,8 +72,8 @@ public class SimulatorStateDisplayer
 	{
 		setLayout(new BorderLayout());
 
-//		this.stateViewer = stateViewer;
-//		this.theAutomata = helper.getAutomata();
+//              this.stateViewer = stateViewer;
+//              this.theAutomata = helper.getAutomata();
 		this.helper = helper;
 
 		JLabel header = new JLabel("Current composite state");
@@ -112,6 +112,7 @@ public class SimulatorStateDisplayer
 		{
 			helper.setForbidden(currState, true);
 		}
+
 		isInitialBox.setSelected(AutomataIndexFormHelper.isInitial(currState));
 		isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
 		isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));

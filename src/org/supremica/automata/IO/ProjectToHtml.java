@@ -90,14 +90,17 @@ public class ProjectToHtml
 		for (Iterator projectIt = project.iterator(); projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
+
 			serializeAutomaton(aut);
 		}
 
 		// Serialize all events
-		Alphabet projectAlphabet = AlphabetHelpers.getUnionAlphabet(project, true, true); // project.getUnionAlphabet();
+		Alphabet projectAlphabet = AlphabetHelpers.getUnionAlphabet(project, true, true);    // project.getUnionAlphabet();
+
 		for (Iterator alphIt = projectAlphabet.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent ev = (LabeledEvent) alphIt.next();
+
 			serializeEvent(ev);
 		}
 	}
@@ -106,46 +109,56 @@ public class ProjectToHtml
 		throws Exception
 	{
 		PrintWriter pw = getPrintWriter("index.html");
+
 		printHtmlBegin(pw, "Supremica Project: " + project.getName());
 		pw.println("<h1>Project: " + EncodingHelper.normalize(project.getName()) + "</h1>");
 		pw.println("<h2>Plants:</h2>");
 		pw.println("<ul>");
-		for (Iterator projectIt = project.plantIterator(); projectIt.hasNext(); )
+
+		for (Iterator projectIt = project.plantIterator();
+				projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
-			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 
+			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
 		}
+
 		pw.println("</ul>");
 		pw.println("<h2>Specifications:</h2>");
 		pw.println("<ul>");
-		for (Iterator projectIt = project.specificationIterator(); projectIt.hasNext(); )
+
+		for (Iterator projectIt = project.specificationIterator();
+				projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
 			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
-
 		}
+
 		pw.println("</ul>");
 		pw.println("<h2>Supervisors:</h2>");
 		pw.println("<ul>");
-		for (Iterator projectIt = project.supervisorIterator(); projectIt.hasNext(); )
+
+		for (Iterator projectIt = project.supervisorIterator();
+				projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
 			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
-
 		}
+
 		pw.println("</ul>");
 		pw.println("<h2>Interfaces:</h2>");
 		pw.println("<ul>");
-		for (Iterator projectIt = project.interfaceIterator(); projectIt.hasNext(); )
+
+		for (Iterator projectIt = project.interfaceIterator();
+				projectIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
 			pw.println("<li> <a href=\"automaton" + aut.getSynchIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
-
 		}
+
 		pw.println("</ul>");
 		printHtmlEnd(pw);
 	}
@@ -154,24 +167,32 @@ public class ProjectToHtml
 		throws Exception
 	{
 		PrintWriter pw = getPrintWriter("automaton" + theAutomaton.getSynchIndex() + ".html");
+
 		printHtmlBegin(pw, "Supremica Automaton: " + theAutomaton.getName());
 		pw.println("<h1>Automaton: " + EncodingHelper.normalize(theAutomaton.getName()) + "</h1>");
 		pw.println("<h2>Type: " + theAutomaton.getType() + "</h2>");
 		pw.println("<h2>Alphabet:</h2>");
 		pw.println("<ul>");
-		for (Iterator eventIt = theAutomaton.eventIterator(); eventIt.hasNext(); )
+
+		for (Iterator eventIt = theAutomaton.eventIterator();
+				eventIt.hasNext(); )
 		{
 			LabeledEvent event = (LabeledEvent) eventIt.next();
+
 			pw.println("<li> <a href=\"event" + event.getSynchIndex() + ".html\">" + EncodingHelper.normalize(event.getLabel()) + "</a></li>");
 		}
+
 		pw.println("</ul>");
+
 		boolean pngCreated = createPngFile(theAutomaton);
+
 		if (pngCreated)
 		{
 			pw.println("<center>");
 			pw.println("<img src=\"automaton" + theAutomaton.getSynchIndex() + ".png\"</img>");
 			pw.println("</center>");
 		}
+
 		printHtmlEnd(pw);
 	}
 
@@ -179,8 +200,8 @@ public class ProjectToHtml
 		throws Exception
 	{
 		PrintWriter pw = getPrintWriter("event" + theEvent.getSynchIndex() + ".html");
-		printHtmlBegin(pw, "Supremica Event: " + theEvent.getLabel());
 
+		printHtmlBegin(pw, "Supremica Event: " + theEvent.getLabel());
 		pw.println("<h1>Event: " + EncodingHelper.normalize(theEvent.getLabel()) + "</h1>");
 		pw.println("<ul>");
 		pw.println("<li>" + "Controllable: " + theEvent.isControllable() + "</li>");
@@ -190,7 +211,6 @@ public class ProjectToHtml
 		pw.println("<h2>Broadcast in:</h2>");
 		printHtmlEnd(pw);
 	}
-
 
 	private void printHtmlBegin(PrintWriter pw, String title)
 	{
@@ -210,7 +230,6 @@ public class ProjectToHtml
 		pw.close();
 	}
 
-
 	private boolean createPngFile(Automaton theAutomaton)
 		throws Exception
 	{
@@ -218,6 +237,7 @@ public class ProjectToHtml
 		{
 			return false;
 		}
+
 		File currFile = getFile("automaton" + theAutomaton.getSynchIndex() + ".png");
 
 		if (currFile != null)
@@ -227,6 +247,7 @@ public class ProjectToHtml
 				try
 				{
 					AutomatonToDot exporter = new AutomatonToDot(theAutomaton);
+
 					exporter.setUseColors(true);
 
 					try
@@ -237,6 +258,7 @@ public class ProjectToHtml
 					{
 						logger.error("Cannot run dot. Make sure dot is in the path.");
 						logger.debug(ex.getStackTrace());
+
 						throw ex;
 					}
 
@@ -270,12 +292,13 @@ public class ProjectToHtml
 				{
 					logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
 					logger.debug(ex.getStackTrace());
+
 					return false;
 				}
 			}
 		}
-		return true;
 
+		return true;
 	}
 
 	/**
@@ -285,6 +308,7 @@ public class ProjectToHtml
 		throws Exception
 	{
 		File newFile = new File(directory, name);
+
 		return newFile;
 	}
 
@@ -296,5 +320,4 @@ public class ProjectToHtml
 	{
 		return new PrintWriter(new FileWriter(getFile(name)));
 	}
-
 }

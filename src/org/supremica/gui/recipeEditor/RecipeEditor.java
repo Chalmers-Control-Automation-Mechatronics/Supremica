@@ -34,14 +34,13 @@ public class RecipeEditor
 	public RecipeEditor(VisualProject theProject)
 	{
 		this.theProject = theProject;
+
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-
 			//final RecipeEditor app = new RecipeEditor(theProject);
 			//final JFrame mainFrame = new JFrame();
-
 			// close the application when the main window closes
 			addWindowListener(new WindowAdapter()
 			{
@@ -66,16 +65,12 @@ public class RecipeEditor
 			setTitle("Recipe Editor");
 
 			//Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
-
-
 			Utility.setupFrame(this, 200, 500);
 
 			//setBounds(0, 0, 800, 600);
-
 			Container contentPane = getContentPane();
 
 			contentPane.setLayout(new BorderLayout());
-
 
 			/*contentPane.add("Center", app);
 			contentPane.validate();
@@ -84,7 +79,6 @@ public class RecipeEditor
 			*/
 
 			// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
 			mainMenuBar = new JMenuBar();
 			toolBar = new JToolBar();
 			filemenu = new JMenu();
@@ -111,7 +105,6 @@ public class RecipeEditor
 			splitPane.setDividerLocation(100);
 
 			// Container contentPane = getContentPane();
-
 			contentPane.setLayout(new BorderLayout());
 			contentPane.add(toolBar, "North");
 			contentPane.add(splitPane, "Center");
@@ -125,21 +118,22 @@ public class RecipeEditor
 	}
 
 /*
-	public void setVisible(boolean doVisible)
-	{
-		frame.setVisible(doVisible);
-	}
+		public void setVisible(boolean doVisible)
+		{
+				frame.setVisible(doVisible);
+		}
 */
-/*
-	public void show(boolean doShow)
-	{
-		frame.show(doShow);
-	}
 
-	public void show()
-	{
-		show(true);
-	}
+/*
+		public void show(boolean doShow)
+		{
+				frame.show(doShow);
+		}
+
+		public void show()
+		{
+				show(true);
+		}
 */
 
 	// ==============================================================
@@ -744,33 +738,33 @@ public class RecipeEditor
 	}
 
 /*
-	public void init()    // Applet initialization
-	{
-		JGoImage.setDefaultBase(getCodeBase());
-	}
-
-
-	public void start()
-	{
-
-		// enable drag-and-drop from separate thread
-		new Thread(this).start();
-		initPalette();
-
-		MultiPortNodePort.FULL = new JGoBrush(JGoBrush.SOLID, Color.green);
-	}
-
-	public void run()
-	{
-		getPalette().initializeDragDropHandling();
-
-		if (getDesktop().getAllFrames().length == 0)
+		public void init()    // Applet initialization
 		{
-			newRecipe();
+				JGoImage.setDefaultBase(getCodeBase());
 		}
 
-		AppAction.updateAllActions();
-	}
+
+		public void start()
+		{
+
+				// enable drag-and-drop from separate thread
+				new Thread(this).start();
+				initPalette();
+
+				MultiPortNodePort.FULL = new JGoBrush(JGoBrush.SOLID, Color.green);
+		}
+
+		public void run()
+		{
+				getPalette().initializeDragDropHandling();
+
+				if (getDesktop().getAllFrames().length == 0)
+				{
+						newRecipe();
+				}
+
+				AppAction.updateAllActions();
+		}
 
 */
 	public void destroy()
@@ -788,11 +782,12 @@ public class RecipeEditor
 			catch (Exception x) {}
 		}
 	}
-/*
-	static public void main(String args[])
-	{
 
-	}
+/*
+		static public void main(String args[])
+		{
+
+		}
 */
 	void exit()
 	{
@@ -1034,55 +1029,55 @@ public class RecipeEditor
 		return new RecipeEditor(theProject);
 
 /*
-		try
-		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-			final RecipeEditor app = new RecipeEditor(theProject);
-			final JFrame mainFrame = new JFrame();
-
-			// close the application when the main window closes
-			mainFrame.addWindowListener(new WindowAdapter()
-			{
-				public void windowActivated(WindowEvent evt)
+				try
 				{
-					if (app.getCurrentView() != null)
-					{
-						app.getCurrentView().getDoc().updateLocationModifiable();
-					}
-				}
+						UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-				public void windowClosing(WindowEvent event)
+						final RecipeEditor app = new RecipeEditor(theProject);
+						final JFrame mainFrame = new JFrame();
+
+						// close the application when the main window closes
+						mainFrame.addWindowListener(new WindowAdapter()
+						{
+								public void windowActivated(WindowEvent evt)
+								{
+										if (app.getCurrentView() != null)
+										{
+												app.getCurrentView().getDoc().updateLocationModifiable();
+										}
+								}
+
+								public void windowClosing(WindowEvent event)
+								{
+										Object object = event.getSource();
+
+										if (object == mainFrame)
+										{
+												app.exit();
+										}
+								}
+						});
+						app.addExitCommand();
+						mainFrame.setTitle("Recipe Editor");
+
+						//Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
+
+						mainFrame.setBounds(0, 0, 800, 600);
+
+						Container contentPane = mainFrame.getContentPane();
+
+						contentPane.setLayout(new BorderLayout());
+						contentPane.add("Center", app);
+						contentPane.validate();
+						mainFrame.setVisible(true);
+						app.start();
+				}
+				catch (Throwable t)
 				{
-					Object object = event.getSource();
-
-					if (object == mainFrame)
-					{
-						app.exit();
-					}
+						System.err.println(t);
+						t.printStackTrace();
+						System.exit(1);
 				}
-			});
-			app.addExitCommand();
-			mainFrame.setTitle("Recipe Editor");
-
-			//Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
-
-			mainFrame.setBounds(0, 0, 800, 600);
-
-			Container contentPane = mainFrame.getContentPane();
-
-			contentPane.setLayout(new BorderLayout());
-			contentPane.add("Center", app);
-			contentPane.validate();
-			mainFrame.setVisible(true);
-			app.start();
-		}
-		catch (Throwable t)
-		{
-			System.err.println(t);
-			t.printStackTrace();
-			System.exit(1);
-		}
 
 */
 	}

@@ -1,4 +1,5 @@
 package org.supremica.softplc.CompILer.CodeGen.Datatypes;
+
 import java.util.*;
 
 /**HelpMethods provides users of this package for IEC 6-1131-3 dataypes
@@ -10,6 +11,7 @@ import java.util.*;
  */
 public class HelpMethods
 {
+
 	/** parses a string and returns a TypeBOOL object
 	 * @param s string to parse
 	 * @return boolean value wrapped into a TypeBOOL

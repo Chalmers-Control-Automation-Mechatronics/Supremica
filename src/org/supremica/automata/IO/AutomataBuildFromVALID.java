@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -62,7 +63,6 @@ public class AutomataBuildFromVALID
 	private Project currAutomata = null;
 	private SAXBuilder docBuilder;
 	private String filePath;
-
 	private int autonum = 0;
 
 	// mappings between id and state/event
@@ -88,6 +88,7 @@ public class AutomataBuildFromVALID
 
 		try
 		{
+
 			// Find SAXparser using JAXP, validation optional
 			docBuilder = new SAXBuilder(validate);
 
@@ -97,16 +98,19 @@ public class AutomataBuildFromVALID
 
 			if (root.getName() == "graph")
 			{
+
 				// DGRF-file
 				automatonFromDGRF(root, "", "Undefined");
 			}
 			else if (root.getName() == "module")
 			{
+
 				// VMOD-file
 				automataFromVMOD(root, "");
 			}
 			else if (root.getName() == "project")
 			{
+
 				// VPRJ-file
 				automataFromVPRJ(root);
 			}
@@ -117,6 +121,7 @@ public class AutomataBuildFromVALID
 		}
 		catch (Exception ex)
 		{
+
 			// throw new Exception(ex.getMessage()); // why not simply throw ex;?
 			throw ex;
 		}
@@ -322,13 +327,13 @@ public class AutomataBuildFromVALID
 		/* Name automaton and set type
 		if (name.equals(""))
 		{
-			// Fix here to handle no-named graphs
-			name = root.getAttributeValue("name");
-			if(name == null || name.equals(""))
-			{
-				name = "Automaton " + ++autonum;
-			}
-			//currAutomaton.setName();
+				// Fix here to handle no-named graphs
+				name = root.getAttributeValue("name");
+				if(name == null || name.equals(""))
+				{
+						name = "Automaton " + ++autonum;
+				}
+				//currAutomaton.setName();
 		}
 		else*/
 		{
@@ -361,14 +366,14 @@ public class AutomataBuildFromVALID
 			element = (Element) i.next();
 
 			String eventName = element.getAttributeValue("name");
-// 			currEvent.setId(eventName);
-//			currEvent.setLabel(eventName);
+
+//                      currEvent.setId(eventName);
+//                      currEvent.setLabel(eventName);
 			LabeledEvent currEvent = new LabeledEvent(eventName);
+
 			currEvent.setControllable(element.getAttributeValue("controllable").equals("1"));
 			currEvent.setPrioritized(true);
-
 			idEventMap.put(eventName, currEvent);
-
 			currAlphabet.addEvent(currEvent);
 		}
 
@@ -384,15 +389,14 @@ public class AutomataBuildFromVALID
 			element = (Element) i.next();
 
 			String stateName = element.getChild("label").getAttributeValue("name");
-//			currState.setId(stateName);
-//			currState.setName(stateName);	// id and name, always the same
 
+//                      currState.setId(stateName);
+//                      currState.setName(stateName);   // id and name, always the same
 			State currState = new State(stateName);
+
 			currState.setInitial(element.getAttributeValue("initial").equals("1"));
 			currState.setAccepting(element.getAttributeValue("marked").equals("1"));
-
 			idStateMap.put(stateName, currState);
-
 			currAutomaton.addState(currState);
 		}
 
@@ -403,10 +407,11 @@ public class AutomataBuildFromVALID
 
 		while (i.hasNext())
 		{
-			// State sourceState = null; // new State();
-			State destState = null; // new State();
-			// String event = "";
 
+			// State sourceState = null; // new State();
+			State destState = null;    // new State();
+
+			// String event = "";
 			element = (Element) i.next();
 
 			// Grouped states
@@ -420,14 +425,16 @@ public class AutomataBuildFromVALID
 			}
 
 			// Self loops
-			if((element.getAttributeValue("isLoop") != null) && (element.getAttributeValue("isLoop").equals("1")))
+			if ((element.getAttributeValue("isLoop") != null) && (element.getAttributeValue("isLoop").equals("1")))
 			{
-				destState = (State)idStateMap.get(element.getChild("source").getAttributeValue("name"));
+				destState = (State) idStateMap.get(element.getChild("source").getAttributeValue("name"));
+
 				// destState = currAutomaton.getStateWithId(element.getChild("source").getAttributeValue("name"));
 			}
 			else
 			{
-				destState = (State)idStateMap.get(element.getChild("target").getAttributeValue("name"));
+				destState = (State) idStateMap.get(element.getChild("target").getAttributeValue("name"));
+
 				// destState = currAutomaton.getStateWithId(element.getChild("target").getAttributeValue("name"));
 			}
 
@@ -438,18 +445,18 @@ public class AutomataBuildFromVALID
 			while (j.hasNext())
 			{
 				element = (Element) j.next();
-				String eventId = element.getAttributeValue("name");
-				LabeledEvent event = (LabeledEvent)idEventMap.get(eventId);
 
+				String eventId = element.getAttributeValue("name");
+				LabeledEvent event = (LabeledEvent) idEventMap.get(eventId);
 				Iterator k = stateList.iterator();
 
 				while (k.hasNext())
 				{
 					element = (Element) k.next();
 
-					State sourceState = (State)idStateMap.get(element.getAttributeValue("name"));
-					// sourceState = currAutomaton.getStateWithId(element.getAttributeValue("name"));
+					State sourceState = (State) idStateMap.get(element.getAttributeValue("name"));
 
+					// sourceState = currAutomaton.getStateWithId(element.getAttributeValue("name"));
 					currAutomaton.addArc(new Arc(sourceState, destState, event));
 				}
 			}

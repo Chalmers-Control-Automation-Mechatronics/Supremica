@@ -1,3 +1,4 @@
+
 /** TypeConstant supplies constants for the elementary datatypes in IEC 61131-3
  * @see "Chapter 2.3 Datatypes in Programming industrial control
  *       systems using IEC 1131-3 by R. W. Lewis. ISBN: 0 85296 827 2"
@@ -55,5 +56,5 @@ public final class TypeConstant
 	T_WSTRING = new TypeConstant("WSTRING"),
 
 	// Derived datatypes
-		T_DERIVED = new TypeConstant("DERIVED");
+	T_DERIVED = new TypeConstant("DERIVED");
 }

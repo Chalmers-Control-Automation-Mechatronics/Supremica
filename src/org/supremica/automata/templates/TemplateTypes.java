@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -62,7 +63,8 @@ public class TemplateTypes
 	public static final TemplateTypes AIPExample = new TemplateTypes("AIP Examples");
 	public static final TemplateTypes CentralLockExample = new TemplateTypes("Central Lock Examples");
 	public static final TemplateTypes OperatorSupervisorExample = new TemplateTypes("Hybrid Human-Computer Supervisors");
-//	public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
+
+//      public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
 	private String description;
 
 	private TemplateTypes(String description)

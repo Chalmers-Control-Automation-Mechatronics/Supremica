@@ -1,3 +1,4 @@
+
 /*
  *  Supremica Software License Agreement
  *
@@ -46,7 +47,6 @@
  *
  *  Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.algorithms;
 
 import java.util.*;
@@ -61,12 +61,11 @@ import org.supremica.automata.*;
 class AutomataSelector
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataSelector.class);
-
 	private Automata globalSet;
 	private Automata partialSet = new Automata();
 	private Iterator specIterator;
 	private HashMap eventToAutomataMap = new HashMap();
-	private boolean seenSpec = false; // keep track of wether no spec exists, may need to do some job anyway
+	private boolean seenSpec = false;    // keep track of wether no spec exists, may need to do some job anyway
 
 	public AutomataSelector(Automata globalSet)
 		throws Exception
@@ -75,6 +74,7 @@ class AutomataSelector
 		this.specIterator = globalSet.iterator();
 
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(globalSet);
+
 		eventToAutomataMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 	}
 
@@ -91,7 +91,7 @@ class AutomataSelector
 			// Is this really a sup/spec?
 			if (currSupervisorAutomaton.isSupervisor() || currSupervisorAutomaton.isSpecification())
 			{
-				seenSpec = true; // yes, we've found a spec/sup
+				seenSpec = true;    // yes, we've found a spec/sup
 
 				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				partialSet.addAutomaton(currSupervisorAutomaton);
@@ -106,30 +106,31 @@ class AutomataSelector
 					if (!currEvent.isControllable())
 					{
 						addPlants(currEvent);
+
 						/*
 						if (eventToAutomataMap.get(currEvent) != null)
 						{
-							Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
+								Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
 
-							while (plantIterator.hasNext())
-							{
-								Automaton currPlantAutomaton = (Automaton) plantIterator.next();
-
-								// This check is performed in eventToAutomataMap
-								// if (currPlantAutomaton.getType() == AutomatonType.Plant)
-								if (!partialSet.containsAutomaton(currPlantAutomaton))
+								while (plantIterator.hasNext())
 								{
-									partialSet.addAutomaton(currPlantAutomaton);
-									logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
+										Automaton currPlantAutomaton = (Automaton) plantIterator.next();
 
-									// If we want a closed set, we need to add plants with
-									// uncontrollable events common to the already added plants too...
-									if (closedSet)
-									{
-										eventList.addAll(currPlantAutomaton.eventCollection());
-									}
+										// This check is performed in eventToAutomataMap
+										// if (currPlantAutomaton.getType() == AutomatonType.Plant)
+										if (!partialSet.containsAutomaton(currPlantAutomaton))
+										{
+												partialSet.addAutomaton(currPlantAutomaton);
+												logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
+
+												// If we want a closed set, we need to add plants with
+												// uncontrollable events common to the already added plants too...
+												if (closedSet)
+												{
+														eventList.addAll(currPlantAutomaton.eventCollection());
+												}
+										}
 								}
-							}
 						}
 						*/
 					}
@@ -137,11 +138,11 @@ class AutomataSelector
 
 				// Did we find any plants?
 				if (partialSet.size() > 1)
-				{   // Nice! Then we're ready
+				{    // Nice! Then we're ready
 					break;
 				}
 				else
-				{	// Have another go...
+				{    // Have another go...
 					partialSet.clear();
 				}
 			}
@@ -175,7 +176,8 @@ class AutomataSelector
 				}
 			}
 		}
-		return partialSet; // return the updated set
+
+		return partialSet;    // return the updated set
 	}
 
 	/**
@@ -183,10 +185,11 @@ class AutomataSelector
 	 */
 	public Automata addPlants(Alphabet events)
 	{
-		for(Iterator it = events.iterator(); it.hasNext(); )
+		for (Iterator it = events.iterator(); it.hasNext(); )
 		{
-			addPlants((LabeledEvent)it.next());
+			addPlants((LabeledEvent) it.next());
 		}
+
 		return partialSet;
 	}
 

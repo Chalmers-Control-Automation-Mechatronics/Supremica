@@ -63,13 +63,14 @@ package org.apache.xmlrpc;
  */
 public interface XmlRpcHandlerMapping
 {
-  /**
-   * Return the handler for the specified handler name.
-   *
-   * @param handlerName The name of the handler to retrieve.
-   * @return Object The desired handler.
-   * @throws Exception If a handler can not be found.
-   */
-  public Object getHandler(String handlerName)
-      throws Exception;
+
+	/**
+	 * Return the handler for the specified handler name.
+	 *
+	 * @param handlerName The name of the handler to retrieve.
+	 * @return Object The desired handler.
+	 * @throws Exception If a handler can not be found.
+	 */
+	public Object getHandler(String handlerName)
+		throws Exception;
 }

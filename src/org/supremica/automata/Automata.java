@@ -1,3 +1,4 @@
+
 /*
  * Supremica Software License Agreement
  *
@@ -91,6 +92,7 @@ public class Automata
 	public Automata(Automaton theAutomaton)
 	{
 		this();
+
 		addAutomaton(theAutomaton);
 	}
 
@@ -100,6 +102,7 @@ public class Automata
 	public Automata(Automata oldAutomata, boolean shallowCopy)
 	{
 		this();
+
 		if (shallowCopy)
 		{
 			shallowAutomataCopy(oldAutomata);
@@ -112,7 +115,8 @@ public class Automata
 
 	private void deepAutomataCopy(Automata oldAutomata)
 	{
-		for (Iterator automataIterator = oldAutomata.iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = oldAutomata.iterator();
+				automataIterator.hasNext(); )
 		{
 			addAutomaton(new Automaton((Automaton) automataIterator.next()));
 		}
@@ -120,7 +124,8 @@ public class Automata
 
 	private void shallowAutomataCopy(Automata oldAutomata)
 	{
-		for (Iterator automataIterator = oldAutomata.iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = oldAutomata.iterator();
+				automataIterator.hasNext(); )
 		{
 			addAutomaton((Automaton) automataIterator.next());
 		}
@@ -145,26 +150,27 @@ public class Automata
 	}
 
 	/**
-	 * Iterates over all automata in automata. 
+	 * Iterates over all automata in automata.
 	 * If an automaton with the same name is not in the cureent
 	 * automata then the automata is added. If there already is an automaton
-	 * then that automaton is replace with the new one. 
+	 * then that automaton is replace with the new one.
 	 * @param automata
 	 */
 	public void updateAutomata(Automata automata)
 	{
-
 		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			if (containsAutomaton(currAutomaton.getName()))
 			{
 				removeAutomaton(currAutomaton.getName());
 			}
+
 			addAutomaton(currAutomaton);
 		}
 	}
-	
+
 	public void removeAutomaton(Automaton aut)
 	{
 		theAutomata.remove(aut);
@@ -174,12 +180,13 @@ public class Automata
 
 	public void removeAutomata(Automata theAutomata)
 	{
-		for (Iterator automataIterator = theAutomata.iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = theAutomata.iterator();
+				automataIterator.hasNext(); )
 		{
-			Automaton a = (Automaton)automataIterator.next();
+			Automaton a = (Automaton) automataIterator.next();
+
 			removeAutomaton((Automaton) a);
 		}
-
 	}
 
 	public void removeAutomaton(String name)
@@ -197,13 +204,19 @@ public class Automata
 	{
 		int firstAutomatonIndex = theAutomata.indexOf(aut);
 		int secondAutomatonIndex;
+
 		if (directionIsUp)
+		{
 			secondAutomatonIndex = firstAutomatonIndex - 1;
+		}
 		else
+		{
 			secondAutomatonIndex = firstAutomatonIndex + 1;
+		}
 
 		Automaton firstAutomaton = aut;
 		Automaton secondAutomaton = (Automaton) theAutomata.get(secondAutomatonIndex);
+
 		theAutomata.set(firstAutomatonIndex, secondAutomaton);
 		theAutomata.set(secondAutomatonIndex, firstAutomaton);
 		notifyListeners();
@@ -215,11 +228,19 @@ public class Automata
 		int originIndex = theAutomata.indexOf(aut);
 
 		if (originIndex > destinationIndex)
+		{
 			for (int i = originIndex; i > destinationIndex; i--)
+			{
 				moveAutomaton(aut, true);
+			}
+		}
 		else if (originIndex < destinationIndex)
+		{
 			for (int i = originIndex; i < destinationIndex; i++)
+			{
 				moveAutomaton(aut, false);
+			}
+		}
 	}
 
 	public void renameAutomaton(Automaton aut, String newName)
@@ -274,10 +295,12 @@ public class Automata
 	{
 		ArrayList backwardList = new ArrayList();
 		Iterator forwardIterator = iterator();
+
 		while (forwardIterator.hasNext())
 		{
 			backwardList.add(0, forwardIterator.next());
 		}
+
 		return new AutomatonIterator(backwardList.iterator());
 	}
 
@@ -294,11 +317,14 @@ public class Automata
 	public Automata getPlantAutomata()
 	{
 		Automata newAutomata = new Automata();
-		for (Iterator theIt = plantIterator(); theIt.hasNext();)
+
+		for (Iterator theIt = plantIterator(); theIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)theIt.next();
+			Automaton currAutomaton = (Automaton) theIt.next();
+
 			newAutomata.addAutomaton(currAutomaton);
 		}
+
 		return newAutomata;
 	}
 
@@ -315,11 +341,14 @@ public class Automata
 	public Automata getSpecificationAutomata()
 	{
 		Automata newAutomata = new Automata();
-		for (Iterator theIt = specificationIterator(); theIt.hasNext();)
+
+		for (Iterator theIt = specificationIterator(); theIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)theIt.next();
+			Automaton currAutomaton = (Automaton) theIt.next();
+
 			newAutomata.addAutomaton(currAutomaton);
 		}
+
 		return newAutomata;
 	}
 
@@ -336,11 +365,14 @@ public class Automata
 	public Automata getSupervisorAutomata()
 	{
 		Automata newAutomata = new Automata();
-		for (Iterator theIt = supervisorIterator(); theIt.hasNext();)
+
+		for (Iterator theIt = supervisorIterator(); theIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)theIt.next();
+			Automaton currAutomaton = (Automaton) theIt.next();
+
 			newAutomata.addAutomaton(currAutomaton);
 		}
+
 		return newAutomata;
 	}
 
@@ -352,16 +384,21 @@ public class Automata
 	public Automata getSpecificationSupervisorAutomata()
 	{
 		Automata newAutomata = new Automata();
-		for (Iterator theIt = specificationIterator(); theIt.hasNext();)
+
+		for (Iterator theIt = specificationIterator(); theIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)theIt.next();
+			Automaton currAutomaton = (Automaton) theIt.next();
+
 			newAutomata.addAutomaton(currAutomaton);
 		}
-		for (Iterator theIt = supervisorIterator(); theIt.hasNext();)
+
+		for (Iterator theIt = supervisorIterator(); theIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)theIt.next();
+			Automaton currAutomaton = (Automaton) theIt.next();
+
 			newAutomata.addAutomaton(currAutomaton);
 		}
+
 		return newAutomata;
 	}
 
@@ -375,15 +412,17 @@ public class Automata
 	 */
 	public boolean isDeterministic()
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = iterator();
+				automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
 
-			if(!automaton.isDeterministic())
+			if (!automaton.isDeterministic())
 			{
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -392,15 +431,17 @@ public class Automata
 	 */
 	public boolean hasInitialState()
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = iterator();
+				automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
 
-			if(!automaton.hasInitialState())
+			if (!automaton.hasInitialState())
 			{
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -411,15 +452,17 @@ public class Automata
 	 */
 	public boolean hasAcceptingState()
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = iterator();
+				automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
 
-			if(!automaton.hasAcceptingState())
+			if (!automaton.hasAcceptingState())
 			{
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -428,15 +471,17 @@ public class Automata
 	 */
 	public boolean hasForbiddenState()
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = iterator();
+				automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
 
-			if(automaton.nbrOfForbiddenStates() > 0)
+			if (automaton.nbrOfForbiddenStates() > 0)
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -444,19 +489,20 @@ public class Automata
 	 * Returns name of first automaton found that has no accepting states. Returns null
 	 * if all automata have at least one accepting state.
 	 */
+
 	/*
 	public String hasAcceptingState()
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
-		{
-			Automaton automaton = (Automaton) automataIterator.next();
-
-			if(!automaton.hasAcceptingState())
+			for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
 			{
-				return automaton.getName();
+					Automaton automaton = (Automaton) automataIterator.next();
+
+					if(!automaton.hasAcceptingState())
+					{
+							return automaton.getName();
+					}
 			}
-		}
-		return null;
+			return null;
 	}
 	*/
 
@@ -465,15 +511,17 @@ public class Automata
 	 */
 	public boolean isAllEventsPrioritized()
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = iterator();
+				automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
 
-			if(!automaton.isAllEventsPrioritized())
+			if (!automaton.isAllEventsPrioritized())
 			{
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -559,8 +607,7 @@ public class Automata
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 
-			if (currAutomaton.getType() == AutomatonType.Specification
-			 	|| currAutomaton.getType() == AutomatonType.Supervisor)
+			if ((currAutomaton.getType() == AutomatonType.Specification) || (currAutomaton.getType() == AutomatonType.Supervisor))
 			{
 				return false;
 			}
@@ -576,26 +623,30 @@ public class Automata
 	 */
 	public boolean isPrioritizedInAtleastOneAutomaton(LabeledEvent theEvent)
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = iterator();
+				automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
 
-			if(automaton.isEventPrioritized(theEvent.getLabel()))
+			if (automaton.isEventPrioritized(theEvent.getLabel()))
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
 	/**
-	 * Returns true if there are no events with alphabetically equal names, i.e. 
+	 * Returns true if there are no events with alphabetically equal names, i.e.
 	 * lowercase equal.
 	 */
 	public boolean isEventNameConsistent()
 	{
+
 		// Get the union alphabet, ignoring consistency for now
 		Alphabet unionAlphabet = null;
+
 		try
 		{
 			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
@@ -613,8 +664,10 @@ public class Automata
 	 */
 	public boolean isEventControllabilityConsistent()
 	{
+
 		// Get the union alphabet, ignoring consistency for now
 		Alphabet unionAlphabet = null;
+
 		try
 		{
 			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
@@ -625,38 +678,39 @@ public class Automata
 		}
 
 		// Iterate over the alphabet and examine all automata
-		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext();)
+		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
 
 			// Examine each automata
-			for (AutomatonIterator autIt = iterator(); autIt.hasNext();)
+			for (AutomatonIterator autIt = iterator(); autIt.hasNext(); )
 			{
 				Alphabet currAlpha = autIt.nextAutomaton().getAlphabet();
 
 				if (currAlpha.contains(currEvent.getLabel()))
 				{
-					if (currEvent.isControllable() !=
-						currAlpha.getEvent(currEvent.getLabel()).isControllable())
+					if (currEvent.isControllable() != currAlpha.getEvent(currEvent.getLabel()).isControllable())
 					{
 						logger.error("The event " + currEvent + " is not controllability consistent.");
+
 						return false;
 					}
 				}
 			}
 		}
+
 		return true;
 
 		/*
 		// ?(/¤#&# WHAT THE ¤@@%& IS THIS! IT'S NOT DOING WHAT THE DESCRIPTION SAYS IT DOES!! %"GRR#%/& /hugo
 		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
 		{
-			Automaton automaton = (Automaton) automataIterator.next();
+				Automaton automaton = (Automaton) automataIterator.next();
 
-			if(!automaton.isAllEventsPrioritized())
-			{
-				return false;
-			}
+				if(!automaton.isAllEventsPrioritized())
+				{
+						return false;
+				}
 		}
 		return true;
 		*/
@@ -667,15 +721,17 @@ public class Automata
 	 */
 	public boolean hasSelfLoop()
 	{
-		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		for (Iterator automataIterator = iterator();
+				automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
 
-			if(automaton.hasSelfLoop())
+			if (automaton.hasSelfLoop())
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -704,11 +760,13 @@ public class Automata
 
 	public boolean containsAutomaton(Automaton otherAutomaton)
 	{
-		Automaton thisAutomaton = (Automaton)nameMap.get(otherAutomaton.getName());
+		Automaton thisAutomaton = (Automaton) nameMap.get(otherAutomaton.getName());
+
 		if (thisAutomaton == null)
 		{
 			return false;
 		}
+
 		return thisAutomaton == otherAutomaton;
 	}
 
@@ -718,10 +776,13 @@ public class Automata
 	 */
 	public Alphabet setIndicies()
 	{
+
 		// Get the union alphabet
 		Alphabet theAlphabet;
+
 		try
 		{
+
 			// Why "this, false, false"?!? Shouldn't it be "this, true, true"?  /hugo
 			theAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
 		}
@@ -732,12 +793,16 @@ public class Automata
 
 		// Adjust the indices
 		theAlphabet.setIndicies();
+
 		int i = 0;
-		for (Iterator autIt = iterator(); autIt.hasNext();)
+
+		for (Iterator autIt = iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			currAutomaton.setIndicies(i++, theAlphabet);
 		}
+
 		return theAlphabet;
 	}
 
@@ -776,11 +841,13 @@ public class Automata
 		for (int i = 0; i < theAutomata.size(); i++)
 		{
 			Automaton currAutomaton = getAutomatonAt(i);
+
 			if (currAutomaton == theAutomaton)
 			{
 				return i;
 			}
 		}
+
 		return -1;
 	}
 
@@ -792,32 +859,43 @@ public class Automata
 	 */
 	public boolean equalAutomata(Automata other)
 	{
+
 		//System.err.println("equalAutomata: " + getName() + " " + other.getName());
 		if (nbrOfAutomata() != other.nbrOfAutomata())
 		{
 			return false;
 		}
+
 		if (!getName().equals(other.getName()))
 		{
 			return false;
 		}
-		for (Iterator thisAutIt = iterator(), otherAutIt = other.iterator(); thisAutIt.hasNext() || otherAutIt.hasNext(); )
+
+		for (Iterator thisAutIt = iterator(), otherAutIt = other.iterator();
+				thisAutIt.hasNext() || otherAutIt.hasNext(); )
 		{
+
 			//System.err.println("automata i");
 			if (!thisAutIt.hasNext())
 			{
+
 				//System.err.println("automata i this");
 				return false;
 			}
+
 			if (!otherAutIt.hasNext())
 			{
+
 				//System.err.println("automata i other");
 				return false;
 			}
-			Automaton thisAutomaton = (Automaton)thisAutIt.next();
-			Automaton otherAutomaton = (Automaton)otherAutIt.next();
+
+			Automaton thisAutomaton = (Automaton) thisAutIt.next();
+			Automaton otherAutomaton = (Automaton) otherAutIt.next();
+
 			if (!thisAutomaton.equalAutomaton(otherAutomaton))
 			{
+
 				//System.err.println("unequal automaton");
 				return false;
 			}
@@ -838,6 +916,7 @@ public class Automata
 		{
 			return "";
 		}
+
 		return name;
 	}
 
@@ -852,17 +931,21 @@ public class Automata
 		{
 			return "";
 		}
+
 		return comment;
 	}
 
 	public void clear()
 	{
 		ArrayList theAutomataCopy = new ArrayList(theAutomata);
-		for (Iterator autIt = theAutomataCopy.iterator(); autIt.hasNext();)
+
+		for (Iterator autIt = theAutomataCopy.iterator(); autIt.hasNext(); )
 		{
-			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currAutomaton = (Automaton) autIt.next();
+
 			removeAutomaton(currAutomaton.getName());
 		}
+
 		theAutomata.clear();
 		nameMap.clear();
 	}
@@ -897,23 +980,23 @@ public class Automata
 	}
 
 	public void stateAdded(Automaton aut, State q)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void stateRemoved(Automaton aut, State q)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void arcAdded(Automaton aut, Arc a)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void arcRemoved(Automaton aut, Arc a)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void attributeChanged(Automaton aut)
-	{ // Do nothing
+	{    // Do nothing
 	}
 
 	public void automatonRenamed(Automaton aut, String oldName)
@@ -946,7 +1029,7 @@ public class Automata
 	}
 
 	public long checksum()
-	{   // Ad-hoc checksum algorithm
+	{    // Ad-hoc checksum algorithm
 		long checksum = 53562951413L;
 
 		for (Iterator aIt = iterator(); aIt.hasNext(); )
@@ -969,9 +1052,11 @@ public class Automata
 
 	void notifyListeners(int mode, Automaton a)
 	{
+
 		// logger.debug("Automata.notifyListeners Start");
 		if (listeners != null)
 		{
+
 			// logger.debug("Automata.notifyListeners");
 			listeners.notifyListeners(mode, a);
 		}
@@ -1004,6 +1089,7 @@ public class Automata
 		{
 			this.autIt = theAutomata.iterator();
 			this.theType = theType;
+
 			findNext();
 		}
 
@@ -1015,7 +1101,9 @@ public class Automata
 		public Object next()
 		{
 			Automaton returnAutomaton = theAutomaton;
+
 			findNext();
+
 			return returnAutomaton;
 		}
 
@@ -1028,12 +1116,14 @@ public class Automata
 		{
 			while (autIt.hasNext())
 			{
-				theAutomaton = (Automaton)autIt.next();
+				theAutomaton = (Automaton) autIt.next();
+
 				if (theAutomaton.getType() == theType)
 				{
 					return;
 				}
 			}
+
 			theAutomaton = null;
 		}
 	}
@@ -1043,12 +1133,14 @@ public class Automata
 	{
 		StringBuffer sbuf = new StringBuffer();
 
-		for(Iterator it = iterator(); it.hasNext(); )
+		for (Iterator it = iterator(); it.hasNext(); )
 		{
-			Automaton automaton = (Automaton)it.next();
+			Automaton automaton = (Automaton) it.next();
+
 			sbuf.append(automaton.toString());
 			sbuf.append("\n");
 		}
+
 		return sbuf.toString();
 	}
 
@@ -1058,12 +1150,14 @@ public class Automata
 
 		if (size() > 0)
 		{
-			for(Iterator it = iterator(); it.hasNext(); )
+			for (Iterator it = iterator(); it.hasNext(); )
 			{
-				Automaton automaton = (Automaton)it.next();
+				Automaton automaton = (Automaton) it.next();
+
 				sbuf.append(automaton.toString() + ", ");
 			}
-			sbuf.delete(sbuf.length()-2, sbuf.length());
+
+			sbuf.delete(sbuf.length() - 2, sbuf.length());
 		}
 
 		return sbuf.toString();
@@ -1073,16 +1167,21 @@ public class Automata
 	public String toCode()
 	{
 		StringBuffer sbuf = new StringBuffer();
-		for(Iterator it = iterator(); it.hasNext(); )
+
+		for (Iterator it = iterator(); it.hasNext(); )
 		{
-			Automaton automaton = (Automaton)it.next();
+			Automaton automaton = (Automaton) it.next();
+
 			sbuf.append(automaton.toCode());
 			sbuf.append("\n");
 		}
+
 		sbuf.append("Automata automata = new Automata();\n");
-		for(Iterator it = iterator(); it.hasNext(); )
+
+		for (Iterator it = iterator(); it.hasNext(); )
 		{
-			Automaton automaton = (Automaton)it.next();
+			Automaton automaton = (Automaton) it.next();
+
 			sbuf.append("automata.addAutomaton(" + automaton.getName() + ");");
 			sbuf.append("\n");
 		}
@@ -1094,11 +1193,14 @@ public class Automata
 	{
 		StringBuffer sbuf = new StringBuffer();
 		int i = 0;
-		for(Iterator it = iterator(); it.hasNext(); )
+
+		for (Iterator it = iterator(); it.hasNext(); )
 		{
-			Automaton automaton = (Automaton)it.next();
+			Automaton automaton = (Automaton) it.next();
 			State state = automaton.getStateWithIndex(arrstate[i]);
+
 			sbuf.append(state.getName() + ".");
+
 			++i;
 		}
 
@@ -1123,24 +1225,26 @@ public class Automata
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial,
-							   boolean mustHaveValidType, boolean mustBeControllabilityConsistent)
+	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, boolean mustBeControllabilityConsistent)
 	{
+
 		// Warns if there are events with equal (lowercase) names.
 		isEventNameConsistent();
 
 		// Examines controllability consitency
-		if (mustBeControllabilityConsistent && !isEventControllabilityConsistent())
+		if (mustBeControllabilityConsistent &&!isEventControllabilityConsistent())
 		{
 			return false;
 		}
 
 		if (mustHaveInitial)
 		{
+
 			// All automata must have initial states.
 			// There is another method for this, Automata.hasInitialState(),
 			// but it doesn't tell which automaton breaks the test...
 			Iterator autIt = iterator();
+
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
@@ -1150,37 +1254,31 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton " + currAutomaton +
-							" does not have an initial state.\n" +
-							"Please specify an initial state.";
-
+						String message = "The automaton " + currAutomaton + " does not have an initial state.\n" + "Please specify an initial state.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																JOptionPane.OK_OPTION,
-																JOptionPane.WARNING_MESSAGE, null,
-																options, options[0]);
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
 						/*
 						String message = "The automaton " + currAutomaton +
-							" does not have an initial state.\n" +
-							"Skip this automaton or Cancel the whole operation?";
+								" does not have an initial state.\n" +
+								"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
 						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																JOptionPane.OK_CANCEL_OPTION,
-																JOptionPane.WARNING_MESSAGE, null,
-																options, options[1]);
+																										JOptionPane.OK_CANCEL_OPTION,
+																										JOptionPane.WARNING_MESSAGE, null,
+																										options, options[1]);
 
 						if(cont == JOptionPane.OK_OPTION)
 						{   // Skip
-							// Unselect the automaton
-							gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
-							// Skip this automaton (remove it from this)
-							autIt.remove();
+								// Unselect the automaton
+								gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
+								// Skip this automaton (remove it from this)
+								autIt.remove();
 						}
 						else // JOptionPane.CANCEL_OPTION
 						{   // Cancel
-							// This is iNsanE!
-							return false;
+								// This is iNsanE!
+								return false;
 						}
 						*/
 					}
@@ -1197,80 +1295,82 @@ public class Automata
 
 		if (mustHaveValidType && (size() > 1))
 		{
+
 			// All automata must have a defined type, i.e. must not be of type "Undefined".
 			Iterator autIt = iterator();
+
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 
 				// Is this Automaton's type AutomatonType.Undefined?
-				if(currAutomaton.getType() == AutomatonType.Undefined)
+				if (currAutomaton.getType() == AutomatonType.Undefined)
 				{
 					if (gui != null)
 					{
-						String message = "The automaton " + currAutomaton +
-							" is of type 'Undefined'.\n" +
-							"Please specify a type.";
-
+						String message = "The automaton " + currAutomaton + " is of type 'Undefined'.\n" + "Please specify a type.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																JOptionPane.OK_OPTION,
-																JOptionPane.WARNING_MESSAGE, null,
-																options, options[0]);
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
 						/*
 						String message = "The automaton " + currAutomaton. +
-						    " is of type 'Undefined'.\n" +
-							"Skip this automaton or Cancel the whole operation?";
+							" is of type 'Undefined'.\n" +
+								"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
 						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																JOptionPane.OK_CANCEL_OPTION,
-																JOptionPane.WARNING_MESSAGE, null,
-																options, options[1]);
+																										JOptionPane.OK_CANCEL_OPTION,
+																										JOptionPane.WARNING_MESSAGE, null,
+																										options, options[1]);
 
 						if(cont == JOptionPane.OK_OPTION)
 						{   // Skip
-							// Unselect the automaton
-							gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
-							// Skip this automaton (remove it from this)
-							autIt.remove();
+								// Unselect the automaton
+								gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
+								// Skip this automaton (remove it from this)
+								autIt.remove();
 						}
 						else // JOptionPane.CANCEL_OPTION
 						{   // Cancel
-							// This is iNsaNe!
-							return false;
+								// This is iNsaNe!
+								return false;
 						}
 						*/
 					}
 					else
 					{
-						logger.error("The automaton " + currAutomaton +
-									 " is of type 'Undefined'. Please specify a type.");
+						logger.error("The automaton " + currAutomaton + " is of type 'Undefined'. Please specify a type.");
 					}
 
- 					// This is iNsaNe!
+					// This is iNsaNe!
 					return false;
 				}
 			}
 		}
 
 		// Make sure the automata has the right size!
-		if (minSize > 0 && size() < minSize)
+		if ((minSize > 0) && (size() < minSize))
 		{
 			String size;
+
 			if (minSize == 1)
+			{
 				size = "one automaton";
+			}
 			else if (minSize == 2)
+			{
 				size = "two automata";
+			}
 			else
+			{
 				size = minSize + " automata";
+			}
+
 			String message = "At least " + size + " must be selected!";
 
 			// Present result
 			if (gui != null)
 			{
-				JOptionPane.showMessageDialog(gui.getFrame(), message,
-											  "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getFrame(), message, "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else
 			{
