@@ -10,7 +10,7 @@ companies require constantly changing and evolving
 production plants. Such plants are called flexible
 production plants. The plant is constantly adopted to the
 products with the goal of production of highest quality
-products in as little time as posibble. To achieve this the
+products in as little time as possible. To achieve this the
 software for the automatic control of such a plant has to be
 developed and upgraded along with the plant. The problem is
 that when using today established development methods this
@@ -20,7 +20,7 @@ that can last for several weeks in some cases.
 To avoid the down time associated with the upgrade of the
 control software in the production plants a more agile
 architecture for the control software is needed. To be more
-specific an object oriented architecutre and development
+specific an object oriented architecture and development
 method are needed as opposed to the loop based architecture
 and structured development method implemented with PLCs. The
 advantages of object oriented software development are
@@ -29,29 +29,39 @@ it has not been widely adopted in the automatic control
 software development is for the most part because of the
 high investment already made in the PLCs making the
 companies reluctant to invest in yet another expensive
-thechnology driven upgrade. In other words, as long as the
+technology driven upgrade. In other words, as long as the
 automation control problems in the existing plants are
 possible to be solved with PLCs there will be no adoption of
-object orented architectures. Another big reason for slow
+object oriented architectures. Another big reason for slow
 adoption of object oriented development methods is the lack
-of standard object oreinted platform suitable for the
-automation software applications.
+of standard object oriented platform suitable for the
+automation software applications. The latter reason is being
+addressed by several vendors but their offerings are
+proprietary, incompatible and only add-ons to the IEC 61131
+standard which defines a non object oriented development
+platform.
 
 %Define other approaches, state of the art.
 
 
 
-
-
-
-
-
-
-
-
 %Introduce Function Blocks
-
-
+The International Electrotechnical Commission (IEC) is making
+an effort to standardize a platform for the software of next
+generation of systems for industrial measurement and
+control. The standard is named IEC 61499 and it defines the
+architecture, software tool requirements and application
+guidelines. The architecture defines object oriented
+platform for distributable software components and is
+described in more detail in chapter~\ref{functionblocks}.
 
 %Introduce Automation Objects
+The standard defines the common ground for the distributed
+industrial control applications but it is not enough. To
+ease the effective and rapid control application development
+a more user friendly software objects are needed. The kind
+of objects that will run on any IEC 61499 compatible system
+but provide a greater support for the task of application
+developing. That kind of objects are defined in
+chapter~\ref{automationobjects}.
 
