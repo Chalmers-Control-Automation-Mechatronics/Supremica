@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema 
-	targetNamespace="http://supremica.org/functionblocks/xsd/datatype"
-	xmlns="http://supremica.org/functionblocks/xsd/datatype"
+	targetNamespace="http://www.holobloc.com/xml/DataType"
+	xmlns="http://www.holobloc.com/xml/DataType"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
-	xmlns:B="http://supremica.org/xsd"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
 	version="1.0">  
