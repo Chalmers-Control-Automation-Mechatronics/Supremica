@@ -68,6 +68,7 @@ import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
+import org.supremica.util.*;
 import org.supremica.gui.animators.scenebeans.*;
 import java.beans.*;
 
@@ -874,7 +875,28 @@ public class Supremica
 		menuBar.add(menuHelp);
 
 		// Help.Help Topics
-		JMenuItem menuHelpTopics = new JMenuItem("Help Topics");
+		JMenuItem supremicaOnTheWeb = new JMenuItem("Supremica on the Web");
+		menuHelp.add(supremicaOnTheWeb);
+		supremicaOnTheWeb.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				BrowserControl.displayURL("http://www.supremica.org");
+			}
+		});
+		JMenuItem supremicaDocumentation = new JMenuItem("Documentation");
+		menuHelp.add(supremicaDocumentation);
+		supremicaDocumentation.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				BrowserControl.displayURL("http://www.supremica.org/documentation");
+			}
+		});
+		menuHelp.addSeparator();
+
+		// Help.Help Topics
+		JMenuItem menuHelpTopics = new JMenuItem("Supervisory Control");
 
 		// menuHelpTopics.setMnemonic(KeyEvent.VK_H);
 		menuHelpTopics.addActionListener(helpDisplayer);
