@@ -18,7 +18,7 @@ import org.supremica.util.BDD.heuristics.*;
 
 
 public class AutomataConfiguration {
-	private boolean [] selection, type; /** type: true if member of G1 */
+	private boolean [] selection, type; /** type: true if member of G1 (i.e. 'spec') */
 	private boolean [] workset_events, current_events, tmp_events; // original Sigma' events and the extended events
 	private boolean include_both; /* both g1 and g2 are choosen */
 	private int size1, size2, size_all, selected;
@@ -34,6 +34,7 @@ public class AutomataConfiguration {
 	private double [] queue_costs; /* cost of elements in the queue */
 	private int queue_size;
 	private boolean queue_sorted; /* if the elemnts in the queue are sorted  (see costs) */
+	private boolean last_was_plant; /* the last automaton was a 'plant' ?? */
 	private int my_index, max_size;
 
 	// and the quese selection herustic:
@@ -111,6 +112,8 @@ public class AutomataConfiguration {
 
 		selected = 1;
 		resetQueue();
+
+		last_was_plant = false; // nop, automaton must be a spec (see incremental algos to understand)
 
 		this.workset_events = workset_events;
 		this.automaton = automaton;
@@ -198,10 +201,13 @@ public class AutomataConfiguration {
 			Options.out.println("   -- Adding automaton " + all[pop].getName() + " (taken from the queue)..." );
 
 		// check if it was from g1 or g2
-		if(type[pop])	l1.add( all[pop]);
-		else {
+		if(type[pop]) {	/** "spec" */
+			l1.add( all[pop]);
+			last_was_plant  = false;
+		} else {	/** "plant" */
 			l2.add( all[pop]);
 			all[pop].removeEventUsage(workset_events_to_be_used_in_plant);
+			last_was_plant  = true;
 		}
 
 		return all[pop];
@@ -300,6 +306,9 @@ public class AutomataConfiguration {
 		return ! ((selected == max_size) && queue_size == 0);
 	}
 
+	public boolean lastAutomatonWasPlant() {
+		return last_was_plant;
+	}
 
 	/** make queue empty */
 	private void resetQueue() {

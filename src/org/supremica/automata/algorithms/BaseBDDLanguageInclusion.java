@@ -439,7 +439,7 @@ public abstract class BaseBDDLanguageInclusion {
 			"Algorithm statistics: " +
 			num_syncs_done  + " syncs, " +
 			num_specs_tested + " tests, maximum sync depth = " +
-			max_sync_depth
+			(max_sync_depth + 1) /* because max_sync_depth starts at _zero_ :( */
 		);
 	}
 	// ---------------------------------------------------------------------------------------

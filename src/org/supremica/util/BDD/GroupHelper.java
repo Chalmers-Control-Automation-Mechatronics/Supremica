@@ -16,6 +16,7 @@ public class GroupHelper {
 
     private int size;
     private int [] tpri, cube, cubep, twave;
+    private boolean [] type;
     private BDDAutomaton [] sorted_list;
     private BinaryHeap bh;
 
@@ -29,19 +30,40 @@ public class GroupHelper {
 
 		bh = new BinaryHeap();
 
+		// "plant"
 		BDDAutomaton [] tmp = g1.getMembers();
-		for(int i = 0; i < g1.getSize(); i++) bh.insert( tmp[i]);
+		for(int i = 0; i < g1.getSize(); i++) {
+			bh.insert( tmp[i]);
+			tmp[i].setMembership(1);
+		}
 
+		// "spec"
 		tmp = g2.getMembers();
-		for(int i = 0; i < g2.getSize(); i++) bh.insert( tmp[i]);
+		for(int i = 0; i < g2.getSize(); i++) {
+			bh.insert( tmp[i]);
+			tmp[i].setMembership(0);
+		}
 		sort();
+		get_type();
     }
 
     public GroupHelper(BDDAutomaton [] a) {
 		bh = new BinaryHeap();
-		for(int i = 0; i < a.length; i++) bh.insert( a[i]);
+		for(int i = 0; i < a.length; i++) {
+			bh.insert( a[i]);
+			a[i].setMembership( a[i].getType() == Automaton.TYPE_PLANT ? 1 : 0);
+		}
 		sort();
+		get_type();
     }
+
+    private void get_type() {
+		int len = sorted_list.length;
+		type = new boolean[len];
+
+		for(int i = 0; i < len; i++)
+			type[i] = sorted_list[i].getMembership() == 1;
+	}
 
     private void sort() {
 		size  = bh.size();
@@ -87,6 +109,10 @@ public class GroupHelper {
     public BDDAutomaton [] getSortedList() {
 		return sorted_list;
     }
+    /** true if its a plant */
+    public boolean [] getSortedType() {
+		return type;
+	}
 
     /** get ~T (disjunctive T). <br>
      * This will probably trigger a long sequence of computation first time.<br>

@@ -10,7 +10,7 @@ public class BDDAutomaton
 	private BDDAutomata manager;
 	private Automaton automaton;
     private DependencySet dependency = null;
-    private int index;
+    private int index, membership; /** membership is used to modify plant/spec time */
 	private int num_bits, num_states, num_arcs;
 	private State[] states;
 	private Arc[] arcs;
@@ -369,6 +369,14 @@ public class BDDAutomaton
 
 	public int getNumArcs() {
 		return num_arcs;
+	}
+
+	public int getMembership() {
+		return membership;
+	}
+
+	public void setMembership(int m) {
+		membership = m;
 	}
 	// --------------------------------------------------------
 

@@ -45,6 +45,10 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	private int bdd_events = -1;
 	private int bdd_theta  = -1;
 	private int bdd_initial_states  = -1;
+	private int bdd_theta_plant = -1;
+	private int bdd_theta_spec = -1;
+	private int bdd_spec_care = -1;
+
 	private Supervisor sup = null;
 
 
@@ -242,7 +246,7 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 	private boolean control_check(BDDAutomaton k, AutomataConfiguration ac, boolean [] workset_events)
 	{
-
+		int tmp;
 
 		// get events that are considred and in k
 		boolean sane = ac.reset(k, considred_events,  workset_events);
@@ -259,19 +263,32 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
 
 
-		// get first round theta:
-		int tmp = ba.exists(k.getTpri(), bdd_cube_sp );
-		bdd_theta = ba.not(tmp);
-		ba.deref(tmp);
-		tmp = ba.and(bdd_theta, k.getCareS());
+
+
+		// -------------------- get initial theta halves:
+		// for plant
+		bdd_theta_plant = ba.getOne();
+		ba.ref(bdd_theta_plant);
+
+		// for spec
+		bdd_theta_spec = ba.exists(k.getTpri(), bdd_cube_sp );
+		bdd_spec_care  = k.getCareS();
+		ba.ref(bdd_spec_care);
+
+		// --------------------- get first round theta:
+		bdd_theta = ba.not(bdd_theta_spec);
+		tmp = ba.and(bdd_theta, bdd_spec_care);
 		ba.deref(bdd_theta);
 		bdd_theta = ba.and(tmp, bdd_events);
 		ba.deref(tmp);
+
+
 
 		sup = null;
 
 		bdd_initial_states  = k.getI();
 		ba.ref(bdd_initial_states);
+
 
 		for(;;) {
 			num_syncs_done++; // statistic stuffs
@@ -279,8 +296,36 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
+
+			// ++new code
+			if( ac.lastAutomatonWasPlant() ) {
+				int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
+				bdd_theta_plant = ba.andTo(bdd_theta_plant, bdd_theta_delta);
+				bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
+				ba.deref(bdd_theta_delta);
+			} else {
+				bdd_spec_care = ba.andTo(bdd_spec_care, next.getCareS() );
+				tmp = ba.exists(next.getTpri(), bdd_cube_sp );
+				bdd_theta_spec = ba.andTo(bdd_theta_spec, tmp);
+				ba.deref(tmp);
+
+				// re-compute theta:
+				ba.deref(bdd_theta);
+
+				// XXX: there must be a more efficient method for this!!!
+				bdd_theta = ba.not(bdd_theta_spec);
+				tmp = ba.and(bdd_theta, bdd_spec_care); // is this really needed?
+				ba.deref(bdd_theta);
+				bdd_theta = ba.and(tmp, bdd_events);
+				ba.deref(tmp);
+			}
+
+			/*
+			// --old code: this didnt give correct answer for AIP TU 4
 			int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
 			bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
+			*/
+
 			bdd_initial_states = ba.andTo(bdd_initial_states, next.getI() );
 
 
@@ -400,6 +445,21 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 	// ----- [ all common code goes here ] -------------------------------------------------------
 
 	private void cleanup_bdds() {
+
+		if(bdd_spec_care != -1) {
+			ba.deref(bdd_spec_care);
+			bdd_spec_care = -1;
+		}
+
+		if(bdd_theta_spec != -1) {
+			ba.deref(bdd_theta_spec);
+			bdd_theta_spec = -1;
+		}
+
+		if(bdd_theta_plant != -1) {
+			ba.deref(bdd_theta_plant);
+			bdd_theta_plant = -1;
+		}
 
 		if(bdd_theta != -1) {
 			ba.deref(bdd_theta);
