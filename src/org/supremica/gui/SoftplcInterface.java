@@ -20,7 +20,10 @@ public class SoftplcInterface
 		return super.getName();
 	}
 
-	/** Why do I need to implement this method!!!? */
+	/** 
+	 * Why does this class have to implement this method!!!? It's because 
+	 * File says it implements Comparable<File>, I guess? 
+	 */
 	public int compareTo(Object object)
 	{
 		return super.compareTo((File) object);
