@@ -854,8 +854,8 @@ public class RouteController
 	outSignals[20] = (armLevel == armVertVan1Length) && (armAngle == armHoriLength);    // ArmVån1
 	outSignals[21] = (armLevel == armVertLength) && (armAngle == armHoriLength);      // ArmVån2
 	outSignals[22] = inSignals[16] &&!(legBallList[9].isEmpty()); // KulaFast
-	outSignals[23] = false;                                      // AutoStart
-	outSignals[24] = false;                                     // ManuellStart
+	outSignals[23] = true;                                       // AutoStart, inverterad
+	outSignals[24] = true;                                      // ManuellStart, inverterad
 	outSignals[25] = false;                                    // NödStopp
 	outSignals[26] = false;                                   // LarmKvittering
     }

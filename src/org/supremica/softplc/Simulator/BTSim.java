@@ -19,7 +19,7 @@ public class BTSim
     private boolean[] outSignals = { false, true, false, false, false, false, false,
 				     true, false, false, false, false, false, false,
 				     false, false, false, true, false, false, false,
-				     false, false, false, false, false, false };
+				     false, false, true, true, false, false };
 
     public BTSim()
     {
