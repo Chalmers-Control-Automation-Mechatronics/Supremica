@@ -60,7 +60,7 @@ public class CompositeState extends State
 	private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
 	
 	/** The indices of the underlying states */
-	private int[] compositeIndices = null;
+//rivate int[] compositeIndices = null;
 	
 	/** The costs corresponding to the underlying states */
 	private int[] compositeCosts = null;
@@ -78,6 +78,8 @@ public class CompositeState extends State
 	 */
 	private int accumulatedCost = -1;
 	
+	private ArrayList composingStates;
+	
 	// Behövs den??? )(och theStates också...)
 /*	public CompositeState(int capacity)
 	{
@@ -93,41 +95,39 @@ public class CompositeState extends State
 		super(id);	
 	}
 	
-	public CompositeState(String id, int[] indices) 
+	public CompositeState(String id, int[] indices, Automata compositeAutomata) 
 	{
 		this(id);
-		initialize(indices);
-	}
-	
-	public CompositeState(String id, int[] indices, Automata theAutomata) 
-	{
-		this(id);
-		initialize(indices, theAutomata);
-	}
-	
-	public void initialize(int[] indices) 
-	{
-		// -2 since the last two indices correspond to something funny, not the nbrs of the underlying states. 
-		compositeIndices = new int[indices.length-2];
-//		nextCosts = new int[indices.length-2];
-//		theStates = new int[indices.length-2];
-		compositeCosts = new int[indices.length-2];
-		currentCosts = new int[indices.length-2];
-		
-		setCompositeIndices(indices);
-		
-		for (int i=0; i<currentCosts.length; i++)
-			currentCosts[i] = -1;
-	}
 
+//setOwnerAutomaton(ownerAutomaton);
+		initialize(indices, compositeAutomata);
+	}
+	
 	public void initialize(int[] indices, Automata theAutomata) 
 	{
-		initialize(indices);
+		composingStates = new ArrayList();
 		
-		for (int i=0; i<compositeCosts.length; i++) 
+		// -2 since the last two indices correspond to something funny, not the nbrs of the underlying states. 	
+		for (int i=0; i<indices.length-2; i++)
 		{
-			compositeCosts[i] = theAutomata.getAutomatonAt(i).getStateWithIndex(indices[i]).getCost();
-		}			
+			//Behövs pgs nån bugg
+			theAutomata.getAutomatonAt(i).remapStateIndices();
+			
+			initComposingStates(theAutomata.getAutomatonAt(i).getStateWithIndex(indices[i]));
+		}
+		
+		initCosts();
+	}
+	
+	/**
+	 *	Stores the underlying (non-composite) states. 
+	 */
+	private void initComposingStates(State currState) 
+	{
+		if (currState instanceof CompositeState)
+			composingStates.addAll(((CompositeState) currState).getComposingStates());
+		else
+			composingStates.add(currState);
 	}
 	
 	/**
@@ -136,13 +136,20 @@ public class CompositeState extends State
 	 */
 	public void initCosts() 
 	{
-		if (isInitial()) 
+		compositeCosts = new int[composingStates.size()];
+		currentCosts = new int[composingStates.size()];
+		
+		for (int i=0; i<currentCosts.length; i++)
 		{
-			for (int i=0; i<currentCosts.length; i++)
+			compositeCosts[i] = ((State) composingStates.get(i)).getCost();
+			
+			if (isInitial()) 
 				currentCosts[i] = compositeCosts[i];
-				
-			accumulatedCost = 0;
+			else
+				currentCosts[i] = -1;
 		}
+				
+		accumulatedCost = 0;
 	}
 
 /*	public State getStateAt(int index)
@@ -158,12 +165,12 @@ public class CompositeState extends State
 	/**
 	 *	Returns the indices of the underlying states.
 	 */
-	public int[] getCompositeIndices() { return compositeIndices; }
+//	public int[] getCompositeIndices() { return compositeIndices; }
 	
 	/**
 	 *	Stores the indices of the constituting states. 
 	 */
-	protected void setCompositeIndices(int[] indices) 
+/*	protected void setCompositeIndices(int[] indices) 
 	{
 		if (compositeIndices == null) 
 			initialize(indices);
@@ -171,7 +178,7 @@ public class CompositeState extends State
 		for (int i=0; i<compositeIndices.length; i++) 
 			compositeIndices[i] = indices[i];
 	}
-	
+*/	
 	/** 
 	 *	Returns the costs corresponding to the underlying states. Overrides 
 	 *	the @link getCost() method in org.supremica.automata.State.java. 
@@ -235,12 +242,12 @@ public class CompositeState extends State
 		{
 			if (prevState.isTimed())
 			{
-				boolean[] firingAutomata = new boolean[compositeIndices.length];
-				int[] prevCompositeIndices = prevState.getCompositeIndices();
+				boolean[] firingAutomata = new boolean[composingStates.size()];
+				ArrayList prevComposingStates = prevState.getComposingStates();
 				
 				for (int i=0; i<firingAutomata.length; i++) 
 				{
-					if (compositeIndices[i] == prevCompositeIndices[i])
+					if (composingStates.get(i).equals(prevComposingStates.get(i)))
 						firingAutomata[i] = false;
 					else
 						firingAutomata[i] = true;
@@ -289,6 +296,22 @@ public class CompositeState extends State
 	}
 	
 	/**
+	 *	Returns the compositeIndices on a string form (maybe not always very necessary).
+	 */
+/*	public String getCompositeIndicesAsString() 
+	{
+		StringBuffer str = new StringBuffer("[");
+		for (int i=0; i<compositeIndices.length-1; i++)
+		{
+			str.append(compositeIndices[i] + " ");
+		}
+		
+		str.append(compositeIndices[compositeIndices.length-1] + "]");
+		
+		return new String(str);
+	}
+*/	
+	/**
 	 *	Returns the cost vector representing the cost for choosing to move every 
 	 *	one of the composing automata. 
 	 */
@@ -306,4 +329,6 @@ public class CompositeState extends State
 		return theStates.hashCode();
 	}	
 */
+
+	public ArrayList getComposingStates() { return composingStates; }
 }

@@ -204,6 +204,7 @@ public class ScheduleDialog
 	private WeightsPanel weights;
 	// private JCheckBox invertPlantSpec = new JCheckBox("Treat plants as spec and vice versa");
 	private JCheckBox getTimeFromPlants = new JCheckBox("Get times from plants");
+	private JCheckBox closeOnFinishing = new JCheckBox("Close on finishing", true);
 	private OkButton okButton;
 	private CancelButton cancelButton;
 	private ProgressPanel progress;
@@ -216,7 +217,7 @@ public class ScheduleDialog
 	public ScheduleDialog(JFrame frame)
 	{
 		super(frame, "Schedule Selected Automata", true);
-		getContentPane().setLayout(new GridLayout(5, 1));
+		getContentPane().setLayout(new GridLayout(6, 1));
 
 		this.okButton = new	OkButton();
 		this.cancelButton = new CancelButton();
@@ -235,10 +236,11 @@ public class ScheduleDialog
 		// getContentPane().add(algorithms);
 		getContentPane().add(weights);
 		getContentPane().add(buttonpanel);
+		getContentPane().add(closeOnFinishing);
 		getContentPane().add(progress);
 
 		Utility.setDefaultButton(this, okButton);
-		Utility.setupDialog(this, 300, 300);
+		Utility.setupDialog(this, 400, 350);
 	}
 
 	void doit()
@@ -274,21 +276,25 @@ public class ScheduleDialog
 			logger.error("ScheduleDialog::doit "  + excp);
 			logger.debug(excp.getStackTrace());
 		}
-
-		// Enable what was previously disabled
-		estimates.setEnabled(true);
-		okButton.setEnabled(true);
-		getTimeFromPlants.setEnabled(true);
-
-
-		cancelButton.setText("Close");
-
+		
 		if(getTimeFromPlants.isSelected())
-		{
-			// reset the automaton types
-			invertTypes(automata);
-		}
+			{
+				// reset the automaton types
+				invertTypes(automata);
+			}
 
+		if(closeOnFinishing.isSelected())
+			done();
+		else 
+		{
+			// Enable what was previously disabled
+			estimates.setEnabled(true);
+			okButton.setEnabled(true);
+			getTimeFromPlants.setEnabled(true);
+	
+	
+			cancelButton.setText("Close");
+		}
 	}
 
 	void done()

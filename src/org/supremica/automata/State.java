@@ -84,11 +84,6 @@ public class State
 	private int y = UNDEF_POS;
 	private int radius = 9;
 	
-	/**
-	 * Contains the indices of the underlying states if this state is composite. 
-	 */
-	private int[] compositeIndices = null;
-
 
 	/** ARASH: this is used to speed up set operations in the AutomatonSynthesizerSingleFixpoint algorithm */
 	public int sethelper;

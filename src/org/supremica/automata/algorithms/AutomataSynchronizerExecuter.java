@@ -28,7 +28,7 @@
  *  431 42 Molndal
  *  SWEDEN
  *
- *  to discuss license terms. No cost evaluation licenses are
+4 *  to discuss license terms. No cost evaluation licenses are
  *  available.
  *
  *  Licensee may not use the name, logo, or any other symbol
@@ -796,9 +796,9 @@ public final class AutomataSynchronizerExecuter
 		throws Exception
 	{
 		try
-		{
+		{	
 			Automaton theAutomaton = helper.getAutomaton();
-
+					
 			// theAutomaton.setName("regaut");
 
 			Alphabet theAlphabet = theAutomaton.getAlphabet();
@@ -944,7 +944,6 @@ public final class AutomataSynchronizerExecuter
 								Arc newArc = new Arc(thisState, nextState, theEvent);
 
 								theAutomaton.addArc(newArc);
-								newArc.updateFiringAutomata();
 							}
 						}
 						catch (Exception e)

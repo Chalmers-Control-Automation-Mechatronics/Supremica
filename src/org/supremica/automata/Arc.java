@@ -284,40 +284,6 @@ public class Arc
 	}
 	
 	/**
-	 *	Checks which initial automata have changed their states and updates the 
-	 *	firingAutomata accordingly.
-	 *
-	 *	@param fromState The starting point of the Arc
-	 *	@param toState The ending point of the Arc
-	 */
-	public void updateFiringAutomata() 
-	{
-		if (fromState instanceof CompositeState)
-		{
-			try 
-			{
-				int[] fromStateInd = ((CompositeState) fromState).getCompositeIndices();
-				int[] toStateInd = ((CompositeState) toState).getCompositeIndices();
-				
-				initFiringAutomata(fromStateInd.length);
-				
-				for (int i=0; i<fromStateInd.length; i++)
-				{
-					if (fromStateInd[i] != toStateInd[i])
-						firingAutomata[i] = true;
-				}
-			}
-			catch (NullPointerException ex) 
-			{
-				logger.error("The composite indices are not defined.");
-			}
-		}
-		else
-			logger.error("The state is not composite. Synchronize first.");
-
-	}
-	
-	/**
 	 *	Returns a boolean vector where true means that the corresponding automata
 	 *	is (one of the) "responsible(s)" for the transition.
 	 *
