@@ -48,8 +48,9 @@ public class Util
 		double d = 10000 * (size + 1);
 		int nodes = (int) Math.max(Math.min(d, MAX_NODES), MIN_NODES);
 
-		BDDAssert.debug("suggsted " + nodes + " nodes for " +
-				size + " variables.");
+		if(Options.size_watch) {
+			Options.out.println("suggsted " + nodes + " nodes for " + size + " variables.");
+		}
 
 		return nodes;
 	}
