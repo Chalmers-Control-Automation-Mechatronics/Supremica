@@ -70,7 +70,7 @@
 	</delete>
 </target>
 
-<target name="initialize" depends="builddirectories, rebuild">
+<target name="initialize" depends="builddirectories,rebuild">
 </target>
 
 <target name="builddirectories" depends="clean">
