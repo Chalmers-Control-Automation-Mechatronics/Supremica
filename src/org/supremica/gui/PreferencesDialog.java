@@ -859,7 +859,7 @@ class BDDPanel2
 	private PreferencesDialog theDialog = null;
 	private JComboBox cbReordering, showGrow, countAlgorithm;
 	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup, cReorderGroupFree;
-	private JTextField maxPartitionSize;
+	private JTextField maxPartitionSize, extraLibDir;
 	private JButton bProofFile;
 	private int maxsize;
 
@@ -903,7 +903,7 @@ class BDDPanel2
 		add(pRight, BorderLayout.EAST);
 
 		// TOP RIGHT
-		JPanel pTopRight  = new JPanel( new GridLayout(3,1) );
+		JPanel pTopRight  = new JPanel( new GridLayout(4,1) );
 		pRight.add(pTopRight, BorderLayout.NORTH);
 
 
@@ -923,6 +923,13 @@ class BDDPanel2
 		pPartitionSize.add( new JLabel("Max BDD nodes/cluster"));
 		pPartitionSize.add( maxPartitionSize = new JTextField("" + Options.max_partition_size, 5));
 		pTopRight.add(pPartitionSize);
+
+
+		JPanel pExtraLib = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+		pExtraLib.add( new JLabel("Additinal DLL path"));
+		pExtraLib.add( extraLibDir = new JTextField("" + Options.extraLibPath, 15));
+		pTopRight.add(pExtraLib);
+
 
 
 		// BOTTOM RIGHT
@@ -954,7 +961,8 @@ class BDDPanel2
 		int maxsize = PreferencesDialog.getInt("Max cluster size", maxPartitionSize.getText(), 0);
 		if(maxsize == Integer.MIN_VALUE) return false;
 
-		Options.max_partition_size =  maxsize;
+		Options.extraLibPath         = extraLibDir.getText();
+		Options.max_partition_size   =  maxsize;
 		Options.reorder_algo         = cbReordering.getSelectedIndex();
 		Options.reorder_dyanmic      = cReorderDynamic.isSelected();
 		Options.reorder_after_build  = cReorderBuild.isSelected();

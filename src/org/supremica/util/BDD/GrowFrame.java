@@ -214,10 +214,12 @@ public class GrowFrame
 		public void force_repaint() {
 			if(!showGraph) return;
 
-			Graphics g = this.getGraphics();
+
+			Graphics g = GrowCanvas.this.getGraphics();
+
 			if(g!= null)
 			{
-				g.clearRect(0,0, this.getWidth(), this.getHeight() );
+				g.clearRect(0,0, GrowCanvas.this.getWidth(), GrowCanvas.this.getHeight() );
 				paint(g);
 			}
 

@@ -137,6 +137,7 @@ public final class SupremicaProperties
     private static final String BDD_LOCAL_SATURATION = "bddLocalSaturation";
     private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
     private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
+    private static final String BDD_LIB_PATH = "bddLibPath";
 
 	// Simulation stuff
 	private static final String SIMULATION_IS_EXTERNAL = "simulationIsExternal";
@@ -882,11 +883,14 @@ public final class SupremicaProperties
 
 
     // BDD
+    public static String getBDDLibPath() { return wp.getProperty(BDD_LIB_PATH); }
+
     	public static int getBDDAlgorithm(){  return toInt(wp.getProperty(BDD_ALGORITHM));    }
     	public static void setBDDAlgorithm(int a){  wp.setProperty(BDD_ALGORITHM, toString(a));    }
 
     	public static int getBDDCountAlgorithm(){  return toInt(wp.getProperty(BDD_COUNT_ALGO));    }
     	public static void setBDDCountAlgorithm(int a){  wp.setProperty(BDD_COUNT_ALGO, toString(a));    }
+
 
 	public static int getBDDShowGrow(){  return toInt(wp.getProperty(BDD_SHOW_GROW));    }
     public static void setBDDShowGrow(int a){  wp.setProperty(BDD_SHOW_GROW, toString(a));    }
@@ -914,6 +918,7 @@ public final class SupremicaProperties
      * This will make sure they are both updated
      */
     public static void updateBDDOptions(boolean from_Options) {
+
 	if(from_Options) {
 	    // Options -> Properties
 	    setBDDAlgorithm(Options.algo_family);
@@ -936,6 +941,7 @@ public final class SupremicaProperties
 	    Options.trace_on         = getBDDTraceOn();
 	    Options.local_saturation = getBDDLocalSaturation();
 	    Options.count_algo       = getBDDCountAlgorithm();
+	    if(getBDDLibPath() != null) Options.extraLibPath = getBDDLibPath() ;
 	}
     }
 

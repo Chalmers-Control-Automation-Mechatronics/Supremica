@@ -1,6 +1,7 @@
 package org.supremica.util.BDD;
 
 import java.io.*;
+import org.supremica.properties.SupremicaProperties;
 
 public class Options
 {
@@ -13,6 +14,10 @@ public class Options
 		MAX_MONOLITHIC_GROUP_SIZE = 4,
 		MAX_MONOLITHIC_TOTAL_SIZE = 6
 		;
+
+
+	// current directory is always a good start
+	public static String extraLibPath = ".";
 
 
 

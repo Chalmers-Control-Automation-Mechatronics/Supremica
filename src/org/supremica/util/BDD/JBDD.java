@@ -57,9 +57,10 @@ class JBDD {
 	try {
 	    System.loadLibrary(lib);
 	} catch(UnsatisfiedLinkError ule) {
-	    System.err.println("DLL " + lib + " not in the path, trying current directory");
+	    System.err.println("DLL " + lib + " not in the path, trying user supplied directory");
 	    try {
-		System.load(System.getProperty("user.dir")+ java.io.File.separator + System.mapLibraryName(lib) );
+			java.io.File f = new java.io.File(Options.extraLibPath, System.mapLibraryName(lib)  );
+			System.load(f.getAbsolutePath());
 	    } catch(UnsatisfiedLinkError ule2) {
 		System.err.println("Unable to load the DLL: " + ule2);
 		System.err.println("If you are using linux, this may be a GCC 3.x vs GCC 2.x issue :(");

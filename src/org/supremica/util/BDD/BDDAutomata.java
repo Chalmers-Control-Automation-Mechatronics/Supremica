@@ -30,11 +30,20 @@ public class BDDAutomata
 	// private int events_bits;
 	private int bdd_events_cube, bdd_events_u, bdd_events_c;
 
+	// we dont like to hang the system, so we decrease our priority:
+	int saved_priority;
+
 	public BDDAutomata(Automata a)
 	{
 		super(a.getVariableCount(), Util.suggest_nodecount(a));
 		ref_count++;
 
+
+		if(Options.developer_mode) {
+			Thread t = Thread.currentThread() ;
+			saved_priority = t.getPriority();
+			t.setPriority(Thread.MIN_PRIORITY);
+		}
 
 		SizeWatch.setManager(this);
 
@@ -336,6 +345,13 @@ public class BDDAutomata
 		// printStats();
 		kill();
 		ref_count--;
+
+
+		// restore our priority
+		if(Options.developer_mode) {
+			Thread t = Thread.currentThread() ;
+			t.setPriority(saved_priority );
+		}
 	}
 
 	public void dump(PrintStream ps)
@@ -535,7 +551,7 @@ public class BDDAutomata
 		return (long) states;
 	    case Options.COUNT_EXACT:
 		// the hard/boring/slow way :(
-		Counter c = new Counter();		
+		Counter c = new Counter();
 		count_transitions_rec0(c, bdd, 0);
 		return c.get();
 	    }
