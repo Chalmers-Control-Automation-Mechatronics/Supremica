@@ -22,6 +22,7 @@ public class Supervisor
 	/** just declare these once for all subclasses ... */
 	protected int s_cube, sp_cube, e_cube;
 	protected int perm_s2sp, perm_sp2s;
+	protected  FrontierSetOptimizer fso;
 
 	public Supervisor(BDDAutomata manager, Group plant, Group spec)
 	{
@@ -56,6 +57,7 @@ public class Supervisor
 	private void init()
 	{
 		timer = new Timer("Supervisor");
+		fso = new FrontierSetOptimizer(manager);
 
 		if (Options.debug_on)
 		{
@@ -76,6 +78,8 @@ public class Supervisor
 
 	public void cleanup()
 	{
+		fso.cleanup();
+
 		if (has_reachable_uncontrollables)
 		{
 			has_reachable_uncontrollables = false;
@@ -122,6 +126,37 @@ public class Supervisor
 	public Group getSp()
 	{
 		return spec;
+	}
+
+
+
+	// ------------------------------------------------------------------------------
+	/**
+	 * returns an info string with the some relevant options highlighted
+	 *
+	 */
+	protected String type() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("-");
+		sb.append(Options.REACH_ALGO_NAMES[Options.algo_family]);
+		sb.append(": ");
+
+		// frontier set
+		if( Options.algo_family == Options.ALGO_MONOLITHIC  ||
+			Options.algo_family == Options.ALGO_CONJUNCTIVE
+			) {
+			sb.append(Options.FRONTIER_STRATEGY_NAMES[Options.frontier_strategy]);
+			sb.append("/");
+		}
+
+		// event-selection
+		if(	Options.algo_family == Options.ALGO_PETRINET ||
+			Options.algo_family == Options.ALGO_DISJUNCTIVE_WORKSET  ||
+			Options.algo_family == Options.ALGO_SMOOTHED_MONO_WORKSET) {
+			sb.append( Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+			sb.append( "/");
+		}
+		return sb.toString();
 	}
 
 	// ------------------------------------------------------------------------------
@@ -374,7 +409,7 @@ public class Supervisor
 	 */
 	protected int internal_computeReachables(int t_all, int i_all) {
 	// Note: we remove events from t_all, it is needed for forward reachability
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 
 
 		timer.reset();
@@ -384,8 +419,8 @@ public class Supervisor
 		// int i_all = manager.and(plant.getI(), spec.getI());
 		int r_all_p, r_all = i_all;
 
-		manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
-
+		manager.ref(r_all);    // gets derefed by orTo and finally a recursiveDeref
+		int front = manager.ref(r_all); // has its own ref problems...
 
 		SizeWatch.report(t_all, "T");
 
@@ -393,22 +428,21 @@ public class Supervisor
 		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(t_all, r_all, s_cube);
+			int tmp = manager.relProd(t_all, front, s_cube);
 			int tmp2 = manager.replace(tmp, perm_sp2s);
 			manager.deref(tmp);
-
-
+			manager.deref(front);
 			r_all = manager.orTo(r_all, tmp2);
-			manager.deref(tmp2);
+			front = fso.choose(r_all, tmp2); // Takes care of tmp2!
+
 
 			if (gf != null)
 			{
 				gf.add( r_all );
 			}
-		}
-		while (r_all_p != r_all);
+		} while (r_all_p != r_all);
 
-		// manager.deref(i_all);
+		manager.deref(front);
 
 		SizeWatch.report(r_all, "R");
 		if(gf != null) gf.stopTimer();
@@ -496,7 +530,7 @@ public class Supervisor
 
 	protected void computeCoReachables()
 	{
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
 
 
 		timer.reset();
@@ -511,21 +545,23 @@ public class Supervisor
 
 		// gets derefed in first orTo ??
 		int r_all_p, r_all = manager.replace(m_all, perm_s2sp);
-
+		int front = manager.ref(r_all);
 
 		// manager.ref(r_all);
 		do
 		{
 			r_all_p = r_all;
 
-			int tmp = manager.relProd(t_all, r_all, sp_cube);
+			int tmp = manager.relProd(t_all, front, sp_cube);
 			int tmp2 = manager.replace(tmp, perm_s2sp);
 
 			manager.deref(tmp);
+			manager.deref(front);
 
 			r_all = manager.orTo(r_all, tmp2);
+			front = fso.choose(r_all, tmp2); // Takes care of tmp2!
 
-			manager.deref(tmp2);
+
 
 			if (gf != null)
 			{
@@ -534,6 +570,7 @@ public class Supervisor
 		}
 		while (r_all_p != r_all);
 
+		manager.deref(front);
 		manager.deref(t_all);
 		manager.deref(m_all);
 

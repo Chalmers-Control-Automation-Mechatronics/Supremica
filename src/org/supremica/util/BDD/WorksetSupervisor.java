@@ -128,8 +128,7 @@ public class WorksetSupervisor extends DisjSupervisor
 	private int internal_computeReachablesWorkset(int bdd_i) {
 
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager,
-			"Forward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 
 		timer.reset();
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
@@ -142,6 +141,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		while(!workset.empty()) {
 			int p = workset.pickOne();
 			int r_all_org = r_all;
+
 			do {
 				r_all_p = r_all;
 				int tmp = manager.relProd(clusters[p].getTwave() , r_all, s_cube);
@@ -170,8 +170,8 @@ public class WorksetSupervisor extends DisjSupervisor
    protected void computeCoReachables() {
 
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager,
-			"Backward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
+
 		timer.reset();
 
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
@@ -197,7 +197,6 @@ public class WorksetSupervisor extends DisjSupervisor
 
 				if (gf != null)	gf.add( r_all );
 			} while(r_all_p != r_all);
-
 
 			workset.advance(p, r_all != r_all_org);
 		}

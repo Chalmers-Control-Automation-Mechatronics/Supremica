@@ -5,7 +5,7 @@ package org.supremica.testcases;
 
 import org.supremica.automata.*;
 
-public class PigeonHole extends Automata {
+public class PigeonHole {
 	private Project project;
 	private int pigeons, holes;
 	private LabeledEvent [] iEvents, lEvents;

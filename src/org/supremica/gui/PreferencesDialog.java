@@ -595,11 +595,11 @@ class SoftPLCPanel
 	private JTextField cycleTime = new JTextField();
 	private Vector interfaces = new Vector();
 	private JList ioInterfaceList;
-	
+
 	public SoftPLCPanel(PreferencesDialog theDialog)
 	{
 		this.theDialog = theDialog;
-		
+
 		JPanel contentPane = new JPanel();
 		GridBagLayout gridBagLayout1 = new GridBagLayout();
 		JLabel jLabel1 = new JLabel("Default cycle time (ms)");
@@ -609,36 +609,36 @@ class SoftPLCPanel
 		JScrollPane interfaceScrollPane = new JScrollPane();
 		interfaces = SupremicaProperties.getSoftplcInterfaces();
 		ioInterfaceList = new JList(interfaces);
-		
+
 		contentPane.setLayout(gridBagLayout1);
 		ioInterfaceList.setVisibleRowCount(2);
 		interfaceScrollPane.getViewport().setView(ioInterfaceList);
-		
+
 		addButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					addButton_actionPerformed(e);
 				}
 			});
-		
+
 		removeButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					removeButton_actionPerformed(e);
 				}
 			});
-		
+
 		contentPane.add(interfaceScrollPane, new GridBagConstraints(0, 3, 1, 2, 1.0, 1.0, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 80, 60, 20), 60, 0));
 		contentPane.add(jLabel1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.SOUTH, GridBagConstraints.NONE, new Insets(10, 81, 3, 40), 199, 0));
 		contentPane.add(cycleTime,  new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0, GridBagConstraints.SOUTHWEST, GridBagConstraints.NONE, new Insets(8, 82, 23, 0), 181, 0));
 		contentPane.add(removeButton,  new GridBagConstraints(1, 4, 1, 1, 0.4, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(2, 0, 74, 8), 5, 0));
 		contentPane.add(addButton,  new GridBagConstraints(1, 3, 1, 1, 0.4, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(3, 0, 7, 40), 0, 0));
 		contentPane.add(jLabel2,  new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 81, 9, 10), 0, 0));
-		
+
 		add(contentPane, BorderLayout.CENTER);
 	}
-	
+
 	void addButton_actionPerformed(ActionEvent e) {
 		JFileChooser outputDir = new JFileChooser();
-		
+
 		if (outputDir.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = outputDir.getSelectedFile();
@@ -652,22 +652,22 @@ class SoftPLCPanel
 			}
 		}
 	}
-	
-	void removeButton_actionPerformed(ActionEvent e) 
+
+	void removeButton_actionPerformed(ActionEvent e)
 	{
 		interfaces.removeElementAt(ioInterfaceList.getSelectedIndex());
 		ioInterfaceList.updateUI();
 	}
-	
+
 	public boolean doApply()
 	{
 		int cycleTimeInt = PreferencesDialog.getInt("Cycle time", cycleTime.getText());
 		SupremicaProperties.setSoftplcCycleTime(cycleTimeInt);
 		SupremicaProperties.setSoftplcInterfaces(interfaces);
-		
+
 		return true;
 	}
-	
+
 	public void update()
 	{
 		cycleTime.setText(Integer.toString(SupremicaProperties.getSoftplcCycleTime()));
@@ -683,93 +683,103 @@ class BDDPanel1
     private JCheckBox alterPCG, traceOn, ucOptimistic, nbOptimistic;
     /* package access */ JCheckBox debugOn;
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
-	
+
     private JComboBox algorithmFamily, orderingAlgorithm, dssiHeuristics;
-    private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics;
-	
+    private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics, frontierStrategy;
+
     public BDDPanel1(PreferencesDialog theDialog)
-    {		
+    {
 		this.theDialog = theDialog;
 		JLabel tmp;
-		
+
 		JPanel pLeft  = new JPanel( new BorderLayout() );
 		add(pLeft, BorderLayout.WEST);
-		
-		
+
+
 		// pLeft.add(tmp = new JLabel("Please don't touch anything", SwingConstants.CENTER), BorderLayout.NORTH);
 		// tmp.setForeground(Color.red);
-		
+
 		JPanel pWest  = new JPanel( new GridLayout(10,1));
 		pLeft.add(pWest, BorderLayout.CENTER);
-		
+
 		pWest.add( tmp = new JLabel("User interaction and reports:", SwingConstants.LEFT));
 		tmp.setForeground(Color.blue);
-		
+
 		pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
-		pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
+		pWest.add( traceOn = new JCheckBox("Dump execution trace (SLOW!)", Options.trace_on) );
 		pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
 		pWest.add( profileOn = new JCheckBox("Profile", Options.profile_on) );
 		pWest.add( sizeWatch = new JCheckBox("report nodcount", Options.size_watch) );
-		
+
 		pWest.add( tmp = new JLabel("Computation options:"));
 		tmp.setForeground(Color.blue);
-		
+
 		// pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
 		// pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
-		
+
 		pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
 		localSaturation.setEnabled(false);
-		
+
 		pWest.add( encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars) );
 		encodingFill.setEnabled(false);
-		
+
 		// -------------------------------------------------------
 		Box p = new Box(BoxLayout.Y_AXIS);
 		add(p, BorderLayout.EAST);
-		
+
 		JPanel pLabel= new JPanel(new FlowLayout(FlowLayout.LEFT) );
 		p.add( pLabel);
 		pLabel.add( tmp = new JLabel("Algorithm selection:"));
 		tmp.setForeground(Color.blue);
-		
+
 		JPanel pOrdering = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pOrdering);
 		pOrdering.add( new JLabel("Automaton (not BDD) ordering"));
 		pOrdering.add( orderingAlgorithm = new JComboBox());
 		insert( orderingAlgorithm, Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
-		
+
+
+		JPanel pFrontier = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+		p.add(pFrontier);
+		pFrontier.add( new JLabel("Frontier choice"));
+		pFrontier.add( frontierStrategy = new JComboBox());
+		insert( frontierStrategy, Options.FRONTIER_STRATEGY_NAMES, Options.frontier_strategy);
+
+
+
+
 		JPanel pInclusion = new JPanel( new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pInclusion);
 		pInclusion.add( new JLabel("Language containment algorithm"));
 		pInclusion.add( inclusionAlgorithm = new JComboBox() );
 		insert(inclusionAlgorithm, Options.INCLUSION_ALGORITHM_NAMES, Options.inclsuion_algorithm);
-		
+
 		JPanel pFamily = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pFamily);
 		pFamily.add( new JLabel("Favour reachability algorithm"));
 		pFamily.add( algorithmFamily = new JComboBox());
 		insert(algorithmFamily, Options.REACH_ALGO_NAMES, Options.algo_family);
-		
+
 		JPanel pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pHeuristics);
 		pHeuristics.add( new JLabel("Automaton selection heuristic"));
 		pHeuristics.add( asHeuristics = new JComboBox());
-		
+
 		insert(asHeuristics, Options.AS_HEURISTIC_NAMES, Options.as_heuristics);
-		
+
 		JPanel pDelayed= new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pDelayed);
 		pDelayed.add( new JLabel("Delayed* insertation heuristic"));
 		pDelayed.add( dssiHeuristics = new JComboBox());
 		insert(dssiHeuristics, Options.DSSI_HEURISTIC_NAMES, Options.dssi_heuristics);
-		
+
 		pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 		p.add(pHeuristics);
 		pHeuristics.add( new JLabel("Event selection heuristic"));
 		pHeuristics.add( esHeuristics = new JComboBox());
 		insert(esHeuristics, Options.ES_HEURISTIC_NAMES, Options.es_heuristics);
     }
-	
+
 	// ------------------------------------------
 	private void insert(JComboBox cb, String [] names, int def) {
 		for(int i = 0; i < names.length; i++)
@@ -777,17 +787,19 @@ class BDDPanel1
 		cb.setSelectedIndex(def);
 		cb.setMaximumRowCount(20);
 	}
-	
+
     public boolean doApply()
     {
-		// SupremicaProperties.updateBDDOptions(true);		
+		// SupremicaProperties.updateBDDOptions(true);
 		Options.algo_family      = algorithmFamily.getSelectedIndex();
+		Options.frontier_strategy= frontierStrategy.getSelectedIndex();
+
 		Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
 		Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
 		Options.as_heuristics = asHeuristics.getSelectedIndex();
 		Options.es_heuristics = esHeuristics.getSelectedIndex();
 		Options.dssi_heuristics = dssiHeuristics.getSelectedIndex();
-		
+
 		Options.user_alters_PCG  = alterPCG.isSelected();
 		// Options.uc_optimistic    = ucOptimistic.isSelected();
 		// Options.nb_optimistic    = nbOptimistic.isSelected();
@@ -799,7 +811,7 @@ class BDDPanel1
 		Options.fill_statevars   = encodingFill.isSelected();
 		return true;
     }
-	
+
     public void update()
     {
     }

@@ -99,6 +99,12 @@ public class PetriNetSupervisor
 				for(int i = 0; i < size; i++) // anything is ok
 					if(workset[i] > 0)  queue[queue_size++] = i;
 				break;
+
+			case Options.ES_HEURISTIC_TOPDOWN:
+				for(int i = 0; i < size; i++)
+					if(workset[i] > 0)  return i;
+				break;
+
 			case Options.ES_HEURISTIC_MOST_PENDING: // largest usage
 				best = 0;
 				for(int i = 0; i < size; i++) {
@@ -199,8 +205,7 @@ public class PetriNetSupervisor
 		// start with all events
 		for(int i = 0; i < size; i++) workset[i] = 1;
 
-		GrowFrame gf = BDDGrow.getGrowFrame(manager,
-			"[PetriNetSupervisor] forward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+		GrowFrame gf = BDDGrow.getGrowFrame(manager,"Forward reachability" + type());
 
 		int r_all_p, r_all = i_all;
 		manager.ref(r_all);
@@ -246,8 +251,7 @@ public class PetriNetSupervisor
 	{
 		for(int i = 0; i < size; i++) workset[i] = 1; 	// start with all events
 
-		GrowFrame gf = BDDGrow.getGrowFrame(manager,
-			"[PetriNetSupervisor] backward reachability /" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+		GrowFrame gf = BDDGrow.getGrowFrame(manager,"Backward reachability" + type());
 
 		int r_all_p, r_all = manager.replace(q_m, perm_s2sp);
 		manager.ref(r_all);

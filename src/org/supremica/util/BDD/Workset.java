@@ -34,23 +34,9 @@ public class Workset
 	}
 
 	public String getHeuristicName() {
-		switch(Options.es_heuristics) {
-			case Options.ES_HEURISTIC_RANDOM:
-				return "random";
-			case Options.ES_HEURISTIC_MOST_PENDING:
-				return "most pending";
-			case Options.ES_HEURISTIC_LEAST_PENDING:
-				return "least pending";
-			case Options.ES_HEURISTIC_MOST_MEMBERS:
-			case Options.ES_HEURISTIC_MOST_FOLLOWERS:
-				return "most followers";
-			case Options.ES_HEURISTIC_LEAST_MEMBERS:
-			case Options.ES_HEURISTIC_LEAST_FOLLOWERS:
-				return "least followers";
-			default:
-				return "(unknown??)";
-		}
+		return Options.ES_HEURISTIC_NAMES[Options.es_heuristics];
 	}
+
 
 	/**
 	 * choose the next automaton
@@ -65,6 +51,10 @@ public class Workset
 			case Options.ES_HEURISTIC_RANDOM:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(workset[i] > 0)  queue[queue_size++] = i;
+				break;
+			case Options.ES_HEURISTIC_TOPDOWN:
+				for(int i = 0; i < size; i++)
+					if(workset[i] > 0)  return i;
 				break;
 			case Options.ES_HEURISTIC_MOST_PENDING:
 				// one of the largest one (most affected so far)
@@ -153,6 +143,13 @@ public class Workset
 			case Options.ES_HEURISTIC_RANDOM:
 				for(int i = 0; i < size; i++) // anything is ok
 					if(remaining[i] && workset[i] > 0)  queue[queue_size++] = i;
+				break;
+			case Options.ES_HEURISTIC_TOPDOWN:
+				for(int i = 0; i < size; i++)
+					if(remaining[i] && workset[i] > 0) {
+						queue[queue_size++] = i;
+						break;
+					}
 				break;
 			case Options.ES_HEURISTIC_MOST_PENDING:
 				// one of the largest one (most affected so far)

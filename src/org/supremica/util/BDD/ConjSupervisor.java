@@ -233,7 +233,7 @@ public class ConjSupervisor
 	{
 
 		// Note: we remove events from t_all, it is needed for forward reachability
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Conjunctive forward reachability");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type() );
 
 
 		timer.reset();
@@ -250,10 +250,10 @@ public class ConjSupervisor
 			int tmp2;
 			if(event_mask == -1)	tmp2 = cp.image(front);
 			else					tmp2 = cp.image(front, event_mask);
+			manager.deref(front);
 
 			r_all = manager.orTo(r_all, tmp2);
-			manager.deref(front);
-			front = tmp2;
+			front = fso.choose(r_all, tmp2); // Takes care of tmp2!
 
 			if (gf != null)
 			gf.add(r_all);
@@ -273,7 +273,7 @@ public class ConjSupervisor
 	// -------------------------------------------------------------------------------------
     protected void computeCoReachables()
 	{
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "[Conjunctive] backward reachability");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type() );
 
 
 		timer.reset();
@@ -294,10 +294,10 @@ public class ConjSupervisor
 			r_all_p = r_all;
 
 			int tmp = cp.preImage(front);
-			r_all = manager.orTo(r_all, tmp);
 			manager.deref(front);
-			front = tmp;
 
+			r_all = manager.orTo(r_all, tmp);
+			front = fso.choose(r_all, tmp); // Takes care of tmp2!
 
 			if (gf != null)
 			{

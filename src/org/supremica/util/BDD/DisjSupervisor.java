@@ -50,7 +50,7 @@ public class DisjSupervisor extends ConjSupervisor {
 
     protected int internal_computeReachablesDisj(int i_all) {
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (disjunctive)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" +  type());
 
 		timer.reset();
 		DisjPartition dp = getDisjPartition();
@@ -60,13 +60,17 @@ public class DisjSupervisor extends ConjSupervisor {
 		manager.ref(front); // get derefed
 
 
+		// NOTE: we cant use FrontierSetOptimizer here [ DisjPartition.image() used frontier sets]
+
 		do {
 			r_all_p = r_all;
 
-			int new_front = dp.image(front);
-			r_all = manager.orTo(r_all, new_front);
+			int tmp = dp.image(front);
 			manager.deref(front);
-			front = new_front;
+
+			r_all = manager.orTo(r_all, tmp);
+			front = tmp;
+
 
 			if(gf != null)    gf.add( r_all);
 		} while(r_all_p != r_all);
@@ -97,7 +101,7 @@ public class DisjSupervisor extends ConjSupervisor {
 	// -------------------------------
     protected void computeCoReachables() {
 
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (disjuncted)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability" + type());
 
 		timer.reset();
 		DisjPartition dp = getDisjPartition();
@@ -115,13 +119,17 @@ public class DisjSupervisor extends ConjSupervisor {
 		SizeWatch.report(r_all, "Qm");
 
 
+		// NOTE: we cant use FrontierSetOptimizer here [ DisjPartition.preImage() used frontier sets]
+
 		do {
 
 			r_all_p = r_all;
-			int new_front = dp.preImage(front);
-			r_all = manager.orTo(r_all, new_front);
+			int tmp  = dp.preImage(front);
 			manager.deref(front);
-			front = new_front;
+
+			r_all = manager.orTo(r_all, tmp);
+			front = tmp;
+
 			if(gf != null)    gf.add( r_all);
 		} while(r_all != r_all_p);
 

@@ -46,7 +46,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 	 * just return my names, make it easy for the subclasses
 	 * to reuse my GUI related code that puts my/our name in the title..
 	 */
-	public String toString() { return "smoothed"; }
+	// public String toString() { return "smoothed"; }
 
 
 	/**
@@ -91,7 +91,7 @@ public class SmoothSupervisor extends DisjSupervisor {
     // ------------------------------------------------------------------------
     protected void computeReachables() {
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability ("+ toString() + ")");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -160,13 +160,13 @@ public class SmoothSupervisor extends DisjSupervisor {
 		dp.cleanup();
 		cleanup_delay();
 		if(gf != null) gf.stopTimer();
-		timer.report("Forward reachables found ("+ toString() + ")");
+		timer.report("Forward reachables found"+ type());
 		// SizeWatch.report(r_all, "R");
     }
     // -------------------------------------------------------------------------------
 
     protected void computeCoReachables() {
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability ("+ toString() +")");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability"+ type() );
 
 		timer.reset();
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());

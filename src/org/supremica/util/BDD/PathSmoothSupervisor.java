@@ -30,7 +30,7 @@ public class PathSmoothSupervisor extends DisjSupervisor
     protected void computeReachables() {
 
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (path smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 		timer.reset();
 		SizeWatch.setOwner("PathSmoothSupervisor.computeReachables");
 
@@ -66,7 +66,7 @@ public class PathSmoothSupervisor extends DisjSupervisor
 
 
 	protected void computeCoReachables() {
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (path smoothed)");
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type() );
 
 		timer.reset();
 		SizeWatch.setOwner("PathSmoothSupervisor.computeCoReachables");

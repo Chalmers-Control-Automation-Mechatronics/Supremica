@@ -120,20 +120,39 @@ public class Options
 	public static int as_heuristics  = AS_HEURISTIC_HYBRID;
 
 
+	/** The choice between R and frontier set in image computation */
+	public static final String [] FRONTIER_STRATEGY_NAMES = {
+			"Random R/front  ", "R", "front", "front \\ R", "min[front, R]"
+			};
+
+	public static final int
+		FRONTIER_STRATEGY_RANDOM = 0,
+		FRONTIER_STRATEGY_R = 1,
+		FRONTIER_STRATEGY_FRONT = 2,
+		FRONTIER_STRATEGY_FRONT_MINUS_R = 3,
+		FRONTIER_STRATEGY_MIN = 4
+		// FRONTIER_STRATEGY_RESTRICT = 5,
+		// FRONTIER_STRATEGY_CONSTRAIN = 6,
+		;
+	// public static int frontier_strategy  = FRONTIER_STRATEGY_R;
+	public static int frontier_strategy  = FRONTIER_STRATEGY_FRONT_MINUS_R;
+
+
 
 	/** Event (Transition) selection heuristics, see petrinet related stuff */
 	public static final String [] ES_HEURISTIC_NAMES =  {
-		"Random","Max pending req.","Min pending req.","Max follow","Min follow",
+		"Random", "Top-down", "Max pending req.","Min pending req.","Max follow","Min follow",
 		"Largest cover", "Smallest cover"
 	};
 	public static final int
 		ES_HEURISTIC_RANDOM = 0,
-		ES_HEURISTIC_MOST_PENDING = 1,
-		ES_HEURISTIC_LEAST_PENDING = 2,
-		ES_HEURISTIC_MOST_FOLLOWERS = 3,
-		ES_HEURISTIC_LEAST_FOLLOWERS = 4,
-		ES_HEURISTIC_MOST_MEMBERS = 5,
-		ES_HEURISTIC_LEAST_MEMBERS = 6;
+		ES_HEURISTIC_TOPDOWN = 1,
+		ES_HEURISTIC_MOST_PENDING = 2,
+		ES_HEURISTIC_LEAST_PENDING = 3,
+		ES_HEURISTIC_MOST_FOLLOWERS = 4,
+		ES_HEURISTIC_LEAST_FOLLOWERS = 5,
+		ES_HEURISTIC_MOST_MEMBERS = 6,
+		ES_HEURISTIC_LEAST_MEMBERS = 7;
 	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
 
 

@@ -30,7 +30,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 		Workset workset = getWorkset(true);
 
 		// statistic stuffs
-		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability (smoothed+workset)/" + workset.getHeuristicName());
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Forward reachability" + type());
 		SizeWatch.setOwner("SmoothWorksetSupervisor.computeReachables");
 		timer.reset();
 
@@ -86,9 +86,9 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
     protected void computeCoReachables() {
 		Workset workset = getWorkset(true);
 
-	GrowFrame gf = BDDGrow.getGrowFrame(manager, "backward reachability (smoothed+workset)/" + workset.getHeuristicName());
-	SizeWatch.setOwner("SmoothWorksetSupervisor.computeCoReachables");
-	timer.reset();
+		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Backward reachability" + type());
+		SizeWatch.setOwner("SmoothWorksetSupervisor.computeCoReachables");
+		timer.reset();
 
 	MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
 
