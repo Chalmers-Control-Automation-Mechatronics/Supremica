@@ -52,6 +52,7 @@ package org.supremica.tools.updater;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import javax.swing.*;
 
 public class Updater
 {
@@ -161,7 +162,16 @@ public class Updater
 	public static void main(String[] args)
 	{
 
-		Updater updater = new Updater("http://www.s2.chalmers,se/~ka/Supremica/");
+		Updater updater = new Updater("http://www.s2.chalmers.se/~ka/supremica/");
+		try
+		{
+			updater.update();
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error during update", JOptionPane.ERROR_MESSAGE);
+		}
+
 
 	}
 }
