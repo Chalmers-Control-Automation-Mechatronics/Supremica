@@ -451,12 +451,16 @@
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
+	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
 	<copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>	
 	<copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaProperties.cfg" perm="644"/>	
+	<copy file="${templates}/SupremicaPropertiesStandard.cfg" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaPropertiesStandard.cfg" perm="644"/>
 	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>	
 	<chmod file="${dist}/buddy.dll" perm="644"/>
 	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>	
@@ -556,10 +560,27 @@
 </target>
 
 
-<target name="deploy" depends="deployNT">
+<target name="deploy" depends="deployWeb">
 </target>
 
-<target name="deployNT">
+<target name="deployLocal">
+	<copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
+	<copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
+	<copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>	
+	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
+	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
+	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
+	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>	
+	<chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
+	<exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
+		<arg value="C:\Supremica Installer\SupremicaDist.iss"/>
+	</exec>
+</target>
+
+<target name="deployWeb">
 	<copy file="${dist}/Supremica.jar" todir="W:\public_html\Supremica\updates\noarch"/>	
 	<copy file="${dist}/SupremicaLib.jar" todir="W:\public_html\Supremica\updates\noarch"/>	
 	<copy file="${dist}/SupremicaVersion.txt" todir="W:\public_html\Supremica\updates\noarch"/>

@@ -348,7 +348,6 @@ public class MainMenuBar
 
 			// File.Export.UMDES
 			JMenuItem menuFileExportUMDES = new JMenuItem();
-			menuFileExportUMDES.setEnabled(false);
 			menuFileExportUMDES.setText("To UMDES...");
 			menuFileExport.add(menuFileExportUMDES);
 			menuFileExportUMDES.addActionListener(new ActionListener()
@@ -356,7 +355,7 @@ public class MainMenuBar
 				public void actionPerformed(ActionEvent e)
 				{
 
-					// ActionMan.fileExportUMDES(ActionMan.getGui());
+					ActionMan.fileExportUMDES(ActionMan.getGui());
 				}
 			});
 
@@ -671,31 +670,37 @@ public class MainMenuBar
 			menuToolsJGrafchart.add(menuOpenEditor);
 		}
 
-		menuTools.add(new JSeparator());
 
-		JMenuItem menuToolsCellEditor = new JMenuItem();
-
-		menuToolsCellEditor.setText("Cell Editor...");
-		menuTools.add(menuToolsCellEditor);
-		menuToolsCellEditor.addActionListener(new ActionListener()
+		// Tools.CellEditor
+		if (SupremicaProperties.includeCellEditor())
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.startCellEditor(ActionMan.getGui());
-			}
-		});
+			JMenuItem menuToolsCellEditor = new JMenuItem();
 
-		JMenuItem menuToolsRecipeEditor = new JMenuItem();
-
-		menuToolsRecipeEditor.setText("Recipe Editor...");
-		menuTools.add(menuToolsRecipeEditor);
-		menuToolsRecipeEditor.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			menuToolsCellEditor.setText("Cell Editor...");
+			menuTools.add(menuToolsCellEditor);
+			menuToolsCellEditor.addActionListener(new ActionListener()
 			{
-				ActionMan.startRecipeEditor(ActionMan.getGui());
-			}
-		});
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.startCellEditor(ActionMan.getGui());
+				}
+			});
+
+			JMenuItem menuToolsRecipeEditor = new JMenuItem();
+
+			menuToolsRecipeEditor.setText("Recipe Editor...");
+			menuTools.add(menuToolsRecipeEditor);
+			menuToolsRecipeEditor.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.startRecipeEditor(ActionMan.getGui());
+				}
+			});
+
+			menuTools.add(new JSeparator());
+
+		}
 
 		menuTools.add(new JSeparator());
 
@@ -833,25 +838,23 @@ public class MainMenuBar
 			}
 		});
 
-		// Tools.RunSimulation
-		JMenuItem run_simulation = new JMenuItem();
 
-		run_simulation.setText("Run Simulation...");
-		menuTools.add(run_simulation);
-		run_simulation.addActionListener(new ActionListener()
+		// Tools.RobotStudio
+		if (SupremicaProperties.includeSoftPLC())
 		{
-			public void actionPerformed(ActionEvent e)
+			// Tools.RunSimulation
+			JMenuItem run_simulation = new JMenuItem();
+
+			run_simulation.setText("Run SoftPLC Simulation...");
+			menuTools.add(run_simulation);
+			run_simulation.addActionListener(new ActionListener()
 			{
-			        ActionMan.RunSimulation(ActionMan.getGui());
-			}
-		});
-
-
-
-
-
-
-
+				public void actionPerformed(ActionEvent e)
+				{
+						ActionMan.runSoftPLCSimulation(ActionMan.getGui());
+				}
+			});
+		}
 
 /*
 		// Tools.CodeGeneration

@@ -3456,7 +3456,7 @@ public class ActionMan
 	}
 
 	// Run simulation
-	public static void RunSimulation(Gui gui)
+	public static void runSoftPLCSimulation(Gui gui)
 	{
 		Project selectedProject = gui.getSelectedProject();
                 File tmpdir;

@@ -76,6 +76,7 @@ public final class SupremicaProperties
 	private static final String DOT_USE_MULTI_LABELS = "dotUseMultiLabels";
 	private static final String DOT_AUTOMATIC_UPDATE = "dotAutomaticUpdate";
 	private static final String INCLUDE_EDITOR = "includeEditor";
+	private static final String INCLUDE_CELLEDITOR = "includeCellEditor";
 	private static final String INCLUDE_BOUNDED_UNCON_TOOLS = "includeBoundedUnconTools";
 	private static final String VERBOSE_MODE = "verboseMode";
 	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
@@ -150,6 +151,7 @@ public final class SupremicaProperties
 	private static final String INCLUDE_JGRAFCHART = "includeJGrafchart";
 
 	// SoftPLC Options
+	private static final String INCLUDE_SOFTPLC = "includeSoftPLC";
 	private static final String SOFTPLC_CYCLE_TIME = "softplcCycleTime";
 	private static Vector softplcInterfaces = new Vector();
 
@@ -181,7 +183,7 @@ public final class SupremicaProperties
 		setProperty(FILE_ALLOW_OPEN, "true", true);
 		setProperty(FILE_ALLOW_SAVE, "true", true);
 		setProperty(FILE_ALLOW_IMPORT, "true", true);
-		setProperty(FILE_ALLOW_EXPORT, "true", true);
+		setProperty(FILE_ALLOW_EXPORT, "false", true);
 		setProperty(FILE_ALLOW_QUIT, "true", true);
 		setProperty(XML_RPC_ACTIVE, "false", true);
 		setProperty(XML_RPC_PORT, "9112", true);
@@ -201,9 +203,10 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(GENERAL_USE_ROBOTCOORDINATION, "false", true);
-		setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, "true", true);
+		setProperty(GENERAL_USE_ROBOTCOORDINATION_ABB, "false", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
+		setProperty(INCLUDE_SOFTPLC, "false", true);
 		setProperty(INCLUDE_JGRAFCHART, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
@@ -231,10 +234,10 @@ public final class SupremicaProperties
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
-		setProperty(SHOW_GENETIC_ALGORITHMS, "true", false);
-		setProperty(SHOW_ROBOTSTUDIO_LINK, "true", false);
-		setProperty(USE_ACTIVEX_BRIDGE, "true", false);
-		setProperty(SHOW_COORDINATION_ABB, "true", false);
+		setProperty(SHOW_GENETIC_ALGORITHMS, "false", false);
+		setProperty(SHOW_ROBOTSTUDIO_LINK, "false", false);
+		setProperty(USE_ACTIVEX_BRIDGE, "false", false);
+		setProperty(SHOW_COORDINATION_ABB, "false", false);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 
@@ -567,6 +570,16 @@ public final class SupremicaProperties
 	public static boolean includeEditor()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_EDITOR));
+	}
+
+	public static boolean includeSoftPLC()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_SOFTPLC));
+	}
+
+	public static boolean includeCellEditor()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_CELLEDITOR));
 	}
 
 	public static boolean includeShoeFactory()
