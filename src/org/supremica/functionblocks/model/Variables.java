@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -51,10 +50,6 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT InputVars (VarDeclaration+)>
-<!ELEMENT OutputVars (VarDeclaration+)>
-*/
 
 public class Variables
 {

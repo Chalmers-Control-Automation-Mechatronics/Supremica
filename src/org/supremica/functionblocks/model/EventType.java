@@ -1,4 +1,3 @@
-// TODO: Don't Need This!
 /*
  * Supremica Software License Agreement
  *
@@ -48,25 +47,15 @@
  * Supremica is owned and represented by KA.
  */
 
+/*
+ * Created on Dec 16, 2004
+ */
 package org.supremica.functionblocks.model;
 
-import java.util.*;
-/*
-<!ELEMENT EventInputs (Event+)>
-<!ELEMENT EventOutputs (Event+)>
-
-*/
-
-public class Events
+/**
+ * @author cengic
+ */
+public abstract class EventType
 {
-	List events = new LinkedList();
 
-	public Events()
-	{
-	}
-
-	public Iterator iterator()
-	{
-		return events.iterator();
-	}
 }

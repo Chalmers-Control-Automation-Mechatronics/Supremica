@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -51,16 +50,6 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
-/*
-<!ELEMENT VarDeclaration EMPTY>
-<!ATTLIST VarDeclaration
- Name CDATA #REQUIRED
- Type CDATA #REQUIRED
- ArraySize CDATA #IMPLIED
- InitialValue CDATA #IMPLIED
- Comment CDATA #IMPLIED
->
-*/
 
 public class Variable
 {
