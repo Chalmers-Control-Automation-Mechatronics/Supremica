@@ -49,16 +49,18 @@ public class JavaBytecodeGenerator
 	boolean errorsPresentInPOU;
 
         private File temp;
+        private String outDir;
 
-	public JavaBytecodeGenerator(SimpleNode abstractSyntaxTreeRoot, String outputDir /* not used */)
+	public JavaBytecodeGenerator(SimpleNode abstractSyntaxTreeRoot, String outputDir)
 	{
+	        outDir = outputDir;
 		System.out.println(abstractSyntaxTreeRoot.toString());
 
 		Node[] children = abstractSyntaxTreeRoot.getChildren();
-
+		
 		visitChildren(0, children);
 	}
-
+    
 	/**visitChildren is used to visit all nodes in an array (
 	 * ie. the children array of a node) when you are not
 	 * interested in the returned values, just the visiting itself
@@ -340,13 +342,12 @@ public class JavaBytecodeGenerator
 		Node[] children = n.getChildren();
 		String programname = (String) ((SimpleNode) children[0]).visit(this, null);
 
-		builder = new ProgramBuilder(programname);
+		builder = new ProgramBuilder(programname, outDir);
 
 		visitChildren(1, children);
 
 		// errorsPresentInPOU
 		builder.dumpCode();
-		//temp = builder.getTempFile();
 
 		return null;
 	}
@@ -358,7 +359,7 @@ public class JavaBytecodeGenerator
 		Node[] children = n.getChildren();
 		String fbName = (String) ((SimpleNode) children[0]).visit(this, null);
 
-		builder = new FunctionBlockBuilder(fbName);
+		builder = new FunctionBlockBuilder(fbName, outDir);
 
 		visitChildren(1, children);
 

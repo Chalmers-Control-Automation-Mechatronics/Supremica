@@ -30,11 +30,11 @@ public class FunctionBlockBuilder
 	 *@param functionBlockName name of IL function block be
 	 *                         generated (i.e. classfile name)
 	 */
-	public FunctionBlockBuilder(String functionBlockName)
+	public FunctionBlockBuilder(String functionBlockName, String outDir)
 	{
 		implementedInterfaces = programInterfaces;
 		className = functionBlockName;
-		classFileName = className.concat(".class");
+		classFileName = outDir + "/" + className.concat(".class");
 
 		/* create the new function block class */
 		classGen = new ClassGen(className, "java.lang.Object", "<generated>",

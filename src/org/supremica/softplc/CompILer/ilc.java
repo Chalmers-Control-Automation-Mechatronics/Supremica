@@ -13,26 +13,22 @@ public class ilc
 {
     public static void main(String[] args) {
 	System.out.println("ilc startar...");
-	if (args.length < 1)
+	if (args.length != 2)
 	    {
-		System.err.println("Usage: ilcompiler file.il");
+		System.err.println("Usage: ilcompiler file.il outputDir");
 		return;
 	    }
-	try {
-	    BufferedReader ilReader = new BufferedReader(new FileReader(new File(args[0])));
-	    new ilc(ilReader);
-	}
-	catch (Throwable e) {
-	    System.err.println("Error reading file " + args[0]);
-	}
+	new ilc(args[1], args[2]);
     }
 
-    public ilc(BufferedReader ilReader) {
-	this(ilReader, null);
+    public ilc(String ilFile, String outDir) {
+	this(ilFile, outDir, null);
     }
 
-    public ilc(BufferedReader ilReader, Logger logger) {
+    public ilc(String ilFile, String outDir, Logger logger) {
 	try {
+	    BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
+	
 	    parser p = new parser(ilReader);
 	    
 	    try {
@@ -45,7 +41,7 @@ public class ilc
 		
 		n.dump("");
 		
-		JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, null/*output directory*/);
+		JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir);
 		//XXXnew JavaBytecodeGenerator(n, null/*output directory*/, logger);
 		File temp = jb.getTempFile();
 	    }
@@ -61,5 +57,4 @@ public class ilc
 		System.out.println("Unable to parse input " + e);
 	    }
     }
-    
 }

@@ -1,4 +1,3 @@
 #/bin/sh
 
 java -cp .:${SUPREMICADEV_PATH}/build:${SUPREMICADEV_PATH}/lib/unjared org.supremica.softplc.CompILer.ilc $*
-

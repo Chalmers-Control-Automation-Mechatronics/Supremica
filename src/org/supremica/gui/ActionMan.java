@@ -2562,30 +2562,31 @@ public class ActionMan
 			return;
 		}
 
-		JFileChooser fileExporter = FileDialogs.getBytecodeFileExporter();
+	        JFileChooser outputDir = new JFileChooser();
+		outputDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		if (outputDir.showOpenDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
-			File currFile = fileExporter.getSelectedFile();
-
+			File currFile = outputDir.getSelectedFile();
+			
 			if (currFile != null)
 			{
-				if (!currFile.isDirectory())
+			    if (currFile.isDirectory())
 				{
-					String prefixName = null;
-
-					try
+				    try
 					{
-						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
-
-						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
-
-						exporter.serializeInstructionList(theWriter);
-
-						theWriter.close();
-
+					    File tmpFile  = File.createTempFile("softplc", ".il");
+					    tmpFile.deleteOnExit();
+					    AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
+					    PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
+					    
+					    exporter.serializeInstructionList(theWriter);
+					    
+					    theWriter.close();
+					    
+					    new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), currFile.getAbsolutePath());
 					}
-					catch (Exception ex)
+				    catch (Exception ex)
 					{
 						logger.error("Exception while generating Java Bytecode to file " + currFile.getAbsolutePath());
 						logger.debug(ex.getStackTrace());

@@ -78,7 +78,6 @@ public class FileDialogs
 	private FileFilter stFilter = null;
 	private FileFilter ilFilter = null;
 	private FileFilter nqcFilter = null;
-	private FileFilter classFilter = null;
 
 
 	private static FileDialogs fd = new FileDialogs();
@@ -315,17 +314,6 @@ public class FileDialogs
 
 		fileExporter.resetChoosableFileFilters();
 		fileExporter.setFileFilter(fd.getNQCFilter());
-
-		return fileExporter;
-	}
-
-	public static JFileChooser getBytecodeFileExporter()
-	{
-		JFileChooser fileExporter = fd.getFileExporter();
-
-		fileExporter.resetChoosableFileFilters();
-		//fileExporter.setFileFilter(fd.getILFilter());
-		fileExporter.setFileFilter(fd.getCLASSFilter());
 
 		return fileExporter;
 	}
@@ -582,15 +570,5 @@ public class FileDialogs
 		}
 
 		return nqcFilter;
-	}
-
-	private FileFilter getCLASSFilter()
-	{
-		if (classFilter == null)
-		{
-			classFilter = makeFileFilter(".class", "Java class files (*.class)");
-		}
-
-		return classFilter;
 	}
 }

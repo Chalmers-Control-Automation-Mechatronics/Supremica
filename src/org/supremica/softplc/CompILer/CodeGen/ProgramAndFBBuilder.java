@@ -56,7 +56,7 @@ public abstract class ProgramAndFBBuilder
 		{
 			try
 			{
-				classGen.getJavaClass().dump(classFileName);
+			    classGen.getJavaClass().dump(classFileName);
 			}
 			catch (java.io.IOException e)
 			{

@@ -21,17 +21,12 @@ public class ProgramBuilder
      * IL program generation
      *@param programName name of IL program be generated (i.e. classfile name)
      */
-    public ProgramBuilder(String programName)
+    public ProgramBuilder(String programName, String dumpClassDir)
     {
 	implementedInterfaces = programInterfaces;
 	className = programName;
 
-	//	try {
-	    //temp = File.createTempFile("ilc", ".class");
-	    classFileName = programName.concat(".class"); //temp.getCanonicalPath();
-	    //temp.deleteOnExit();
-	    //}
-	    //catch (Exception e) { System.err.println(e); }
+	classFileName = dumpClassDir.concat("/" + programName.concat(".class"));
 
 	// create the new program class
 	classGen = new ClassGen(className, "java.lang.Object", "<generated>", 
@@ -77,10 +72,6 @@ public class ProgramBuilder
 	ilInit.append(fac.createFieldAccess(className, directOutput, 
 					    new ArrayType(Type.BOOLEAN, 1), 
 					    Constants.PUTFIELD));
-    }
-
-    public File getTempFile() {
-    	return temp;
     }
 
     public void emitDirectInit(IECDirectVariable v, TypeBOOL i)
