@@ -1,11 +1,11 @@
+
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.2 2005-02-17 21:46:17 flordal Exp $
+//# $Id: EditorMenu.java,v 1.3 2005-02-18 03:09:06 knut Exp $
 //###########################################################################
-
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -19,141 +19,180 @@ import java.io.File;
  *
  * @author Gian Perrone
  */
-public class EditorMenu extends JMenuBar implements ActionListener {
-    public final JMenuItem FileNewMenu;
-    public final JMenuItem FileExitMenu;
-    public final JMenuItem ToolsCreateShadeMenu;
-    public final JMenuItem ToolsOptionsMenu;
-    public final JMenuItem editDeleteMenu;
+public class EditorMenu
+	extends JMenuBar
+	implements ActionListener
+{
+	public final JMenuItem FileNewMenu;
+	public final JMenuItem FileExitMenu;
+	public final JMenuItem ToolsCreateShadeMenu;
+	public final JMenuItem ToolsOptionsMenu;
+	public final JMenuItem editDeleteMenu;
+	public final JMenuItem editCopyAsWMFMenu;
+	EditorWindow root;
+	ControlledSurface C;
+	JFileChooser fileChooser;
 
-    EditorWindow root;
-    ControlledSurface C;
-    JFileChooser fileChooser;
-
-    public EditorMenu(ControlledSurface c, EditorWindow r) 
+	public EditorMenu(ControlledSurface c, EditorWindow r)
 	{
 		root = r;
-        C = c;
-		
+		C = c;
+
 		JMenu menu = new JMenu("File");
-		
+
 		menu.setMnemonic(KeyEvent.VK_F);
 		menu.getAccessibleContext().setAccessibleDescription("The File menu");
 		this.add(menu);
-		
+
 		JMenuItem menuItem = new JMenuItem("Clear all", KeyEvent.VK_O);
-        menuItem.addActionListener(this);
-        FileNewMenu = menuItem;
-		menu.add(menuItem);	
-		
-        menu.addSeparator();
-		
-        menuItem = new JMenuItem("Page Setup...", KeyEvent.VK_G);
+
+		menuItem.addActionListener(this);
+
+		FileNewMenu = menuItem;
+
+		menu.add(menuItem);
+		menu.addSeparator();
+
+		menuItem = new JMenuItem("Page Setup...", KeyEvent.VK_G);
+
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
-		
+
 		menuItem = new JMenuItem("Print...", KeyEvent.VK_P);
+
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
-		
-        menu.addSeparator();
-		
-		menuItem = new JMenuItem("Close Window",
-								 KeyEvent.VK_X);
+		menu.addSeparator();
+
+		menuItem = new JMenuItem("Close Window", KeyEvent.VK_X);
+
 		menu.add(menuItem);
-        menuItem.addActionListener(this);
-		
-        FileExitMenu = menuItem;
-		
-        menu = new JMenu("Edit");
-        this.add(menu);
-		
-        menuItem = new JMenuItem("Undo");
+		menuItem.addActionListener(this);
+
+		FileExitMenu = menuItem;
+		menu = new JMenu("Edit");
+
+		this.add(menu);
+
+		menuItem = new JMenuItem("Undo");
+
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
-        menu.add(menuItem);		
-        menu.addSeparator();
-        
-        menuItem = new JMenuItem("Copy");
+		menu.add(menuItem);
+		menu.addSeparator();
+
+		menuItem = new JMenuItem("Copy");
+
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
-        menu.add(menuItem);
+		menu.add(menuItem);
 
-        menuItem = new JMenuItem("Cut");
+		menuItem = new JMenuItem("Copy as WMF");
+
+		menu.add(menuItem);
+		menuItem.addActionListener(this);
+
+		editCopyAsWMFMenu = menuItem;
+		menuItem = new JMenuItem("Cut");
+
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
-        menu.add(menuItem);
+		menu.add(menuItem);
 
-        menuItem = new JMenuItem("Paste");
+		menuItem = new JMenuItem("Paste");
+
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
-        menu.add(menuItem);
-        menu.addSeparator();
+		menu.add(menuItem);
+		menu.addSeparator();
 
-        menuItem = new JMenuItem("Delete");
-        menu.add(menuItem);
-	menuItem.addActionListener(this);
-	editDeleteMenu = menuItem;
+		menuItem = new JMenuItem("Delete");
 
-        menu = new JMenu("Tools");
-        this.add(menu);
+		menu.add(menuItem);
+		menuItem.addActionListener(this);
 
-        menuItem = new JMenuItem("Select Tool");
-        menu.add(menuItem);
+		editDeleteMenu = menuItem;
+		menu = new JMenu("Tools");
 
-        menuItem = new JMenuItem("Node Tool");
-        menu.add(menuItem);
+		this.add(menu);
 
-        menuItem = new JMenuItem("Edge Tool");
-        menu.add(menuItem);
+		menuItem = new JMenuItem("Select Tool");
 
-        menuItem = new JMenuItem("Initial Node Tool");
-        menu.add(menuItem);
+		menu.add(menuItem);
 
-        menu.addSeparator();
-        menuItem = new JMenuItem("Color selector");
-	ToolsCreateShadeMenu = menuItem;
-        menu.add(menuItem);
-        menuItem.addActionListener(this);
+		menuItem = new JMenuItem("Node Tool");
 
-        menu.addSeparator();
-        
-        menuItem = new JMenuItem("Options...");
-        menu.add(menuItem);
-        ToolsOptionsMenu = menuItem;
-        menuItem.addActionListener(this);
-        
+		menu.add(menuItem);
 
-        menu = new JMenu("Help");
-        this.add(menu);
+		menuItem = new JMenuItem("Edge Tool");
 
-        menuItem = new JMenuItem("About...");
-        menu.add(menuItem);
+		menu.add(menuItem);
 
-        fileChooser = new JFileChooser();
-        fileChooser.addChoosableFileFilter(new WmodFileFilter());
-    }
-    
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == FileNewMenu) {
-            C.clearAll();
-        }
+		menuItem = new JMenuItem("Initial Node Tool");
 
-        if (e.getSource() == FileExitMenu) {
-	    root.dispose();
-   	}
+		menu.add(menuItem);
+		menu.addSeparator();
 
-	if (e.getSource() == editDeleteMenu) {
-	    root.getControlledSurface().deleteSelected();
+		menuItem = new JMenuItem("Color selector");
+		ToolsCreateShadeMenu = menuItem;
+
+		menu.add(menuItem);
+		menuItem.addActionListener(this);
+		menu.addSeparator();
+
+		menuItem = new JMenuItem("Options...");
+
+		menu.add(menuItem);
+
+		ToolsOptionsMenu = menuItem;
+
+		menuItem.addActionListener(this);
+
+		menu = new JMenu("Help");
+
+		this.add(menu);
+
+		menuItem = new JMenuItem("About...");
+
+		menu.add(menuItem);
+
+		fileChooser = new JFileChooser();
+
+		fileChooser.addChoosableFileFilter(new WmodFileFilter());
 	}
 
-	if (e.getSource() == ToolsCreateShadeMenu){
-            ShadeDialog dialog = new ShadeDialog(root);
-        }
-        if (e.getSource() == ToolsOptionsMenu) {
-            root.getControlledSurface().setOptionsVisible(true);
-        }
-    }
+	public void actionPerformed(ActionEvent e)
+	{
+		if (e.getSource() == FileNewMenu)
+		{
+			C.clearAll();
+		}
+
+		if (e.getSource() == FileExitMenu)
+		{
+			root.dispose();
+		}
+
+		if (e.getSource() == editDeleteMenu)
+		{
+			root.getControlledSurface().deleteSelected();
+		}
+
+		if (e.getSource() == ToolsCreateShadeMenu)
+		{
+			ShadeDialog dialog = new ShadeDialog(root);
+		}
+
+		if (e.getSource() == ToolsOptionsMenu)
+		{
+			root.getControlledSurface().setOptionsVisible(true);
+		}
+
+		if (e.getSource() == editCopyAsWMFMenu)
+		{
+			root.copyAsWMFToClipboard();
+		}
+	}
 }

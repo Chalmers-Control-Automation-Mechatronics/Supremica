@@ -1,11 +1,11 @@
+
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   ComponentInfo
 //###########################################################################
-//# $Id: ComponentInfo.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ComponentInfo.java,v 1.2 2005-02-18 03:09:06 knut Exp $
 //###########################################################################
-
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -21,25 +21,29 @@ import java.util.ArrayList;
 import java.beans.*;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+public class ComponentInfo
+{
+	ElementProxy e;
+	String name;
 
-public class ComponentInfo {
-    ElementProxy e;
-    String name;
-    
-    public ComponentInfo(String name, ElementProxy e) {
-	this.e = e;
-	this.name = name;
-    }
+	public ComponentInfo(String name, ElementProxy e)
+	{
+		this.e = e;
+		this.name = name;
+	}
 
-    public String toString() {
-	return name;
-    }
+	public String toString()
+	{
+		return name;
+	}
 
-    public ElementProxy getComponent() {
-	return e;
-    }
+	public ElementProxy getComponent()
+	{
+		return e;
+	}
 
-    public String getName() {
-	return name;
-    }
+	public String getName()
+	{
+		return name;
+	}
 }

@@ -1,11 +1,11 @@
+
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.3 2005-02-17 19:59:55 robi Exp $
+//# $Id: EditorWindow.java,v 1.4 2005-02-18 03:09:06 knut Exp $
 //###########################################################################
-
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -20,99 +20,132 @@ import net.sourceforge.waters.model.module.ModuleMarshaller;
 import net.sourceforge.waters.model.module.*;
 import java.util.ArrayList;
 import net.sourceforge.waters.model.expr.IdentifierProxy;
+import org.supremica.gui.GraphicsToClipboard;
+import java.awt.geom.Rectangle2D;
 
-class EditorWindow extends JFrame {
-    private EditorToolbar toolbar;
-    private ControlledSurface surface;
-    private EditorEvents events;
-    private EditorMenu menu;
-    private SimpleComponentProxy element = null;
-    private ModuleProxy module = null;
-    private boolean isSaved = false;
-    
-    public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element)
-    {
-        JFrame.setDefaultLookAndFeelDecorated(true);
-	setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setTitle(title);
+class EditorWindow
+	extends JFrame
+{
+	private EditorToolbar toolbar;
+	private ControlledSurface surface;
+	private EditorEvents events;
+	private EditorMenu menu;
+	private SimpleComponentProxy element = null;
+	private ModuleProxy module = null;
+	private boolean isSaved = false;
+	private GraphicsToClipboard toClipboard = null;
 
-	toolbar = new EditorToolbar();
+	public EditorWindow(String title, ModuleProxy module, SimpleComponentProxy element)
+	{
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle(title);
 
-	surface = new ControlledSurface(toolbar, this);
-        surface.setPreferredSize(new Dimension(500,500));
-        surface.setMinimumSize(new Dimension(0,0));
+		toolbar = new EditorToolbar();
+		surface = new ControlledSurface(toolbar, this);
 
-        events = new EditorEvents(module, element, this);
-        menu = new EditorMenu(surface, this);
+		surface.setPreferredSize(new Dimension(500, 500));
+		surface.setMinimumSize(new Dimension(0, 0));
 
-	final Container panel = getContentPane();
-	final GridBagLayout gridbag = new GridBagLayout();
-	final GridBagConstraints constraints = new GridBagConstraints();
-	constraints.gridy = 0;
-	constraints.weighty = 1.0;
-	constraints.anchor = GridBagConstraints.NORTH;
-	panel.setLayout(gridbag);
+		events = new EditorEvents(module, element, this);
+		menu = new EditorMenu(surface, this);
 
-	gridbag.setConstraints(toolbar, constraints);
-	panel.add(toolbar);
+		final Container panel = getContentPane();
+		final GridBagLayout gridbag = new GridBagLayout();
+		final GridBagConstraints constraints = new GridBagConstraints();
 
-	final JScrollPane scrollsurface = new JScrollPane(surface);
+		constraints.gridy = 0;
+		constraints.weighty = 1.0;
+		constraints.anchor = GridBagConstraints.NORTH;
 
-	final JScrollPane scrollevents = new JScrollPane(events);
+		panel.setLayout(gridbag);
+		gridbag.setConstraints(toolbar, constraints);
+		panel.add(toolbar);
 
-	final JSplitPane split =
-	  new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-		         scrollsurface, scrollevents);
-	split.setResizeWeight(1.0);
-	constraints.weightx = 1.0;
-	constraints.fill = GridBagConstraints.BOTH;
-	gridbag.setConstraints(split, constraints);
-	panel.add(split);
-	
-        setJMenuBar(menu);
-        pack();
-        setVisible(true);
+		final JScrollPane scrollsurface = new JScrollPane(surface);
+		final JScrollPane scrollevents = new JScrollPane(events);
+		final JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
 
-        this.module = module;
-        this.element = element;
+		split.setResizeWeight(1.0);
 
-        if(element != null && module != null) {
-            surface.loadElement(module, element);
-        }
-	surface.createOptions(this);
-    }
+		constraints.weightx = 1.0;
+		constraints.fill = GridBagConstraints.BOTH;
 
-    public IdentifierProxy getBuffer(){
-	return events.getBuffer();
-    }
+		gridbag.setConstraints(split, constraints);
+		panel.add(split);
+		setJMenuBar(menu);
+		pack();
+		setVisible(true);
 
-    public void setBuffer(IdentifierProxy i){
-	events.setBuffer(i);
-    }
+		this.module = module;
+		this.element = element;
 
-    public boolean isSaved() {
-	return isSaved;
-    }
+		if ((element != null) && (module != null))
+		{
+			surface.loadElement(module, element);
+		}
 
-    public void setSaved(boolean s) {
-	isSaved = s;
-    }
+		surface.createOptions(this);
+	}
 
-    public java.util.List getEventDeclList(){
-	return module.getEventDeclList();
-    }
+	public IdentifierProxy getBuffer()
+	{
+		return events.getBuffer();
+	}
 
-    public JFrame getFrame()
-    {
-	return (JFrame)this;
-    }
+	public void setBuffer(IdentifierProxy i)
+	{
+		events.setBuffer(i);
+	}
 
-    public ControlledSurface getControlledSurface()
-    {
-	return surface;
-    }
+	public boolean isSaved()
+	{
+		return isSaved;
+	}
 
+	public void setSaved(boolean s)
+	{
+		isSaved = s;
+	}
 
+	public java.util.List getEventDeclList()
+	{
+		return module.getEventDeclList();
+	}
+
+	public JFrame getFrame()
+	{
+		return (JFrame) this;
+	}
+
+	public ControlledSurface getControlledSurface()
+	{
+		return surface;
+	}
+
+	void copyAsWMFToClipboard()
+	{
+		if (toClipboard == null)
+		{
+			toClipboard = GraphicsToClipboard.getInstance();
+		}
+
+		//Rectangle2D bb = surface.getBoundingBox();
+		//double minX = bb.getMinX();
+		//double maxX = bb.getMaxX();
+		//double minY = bb.getMinY();
+		//double maxY = bb.getMaxY();
+		//logger.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
+		//create a WMF object
+		//int width = (int)(maxX - minX) + 1;
+		//int height = (int)(maxY - minY) + 1;
+		// Copy a larger area, approx 10 percent, there seems to be
+		// a problem with the size of wmf-data
+		//width += (int)0.1*width;
+		//height += (int)0.1*height;
+		Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
+
+		surface.paint(theGraphics);
+		toClipboard.copyToClipboard();
+	}
 }
-
-    

@@ -1,11 +1,11 @@
+
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   InstanceEditorDialog
 //###########################################################################
-//# $Id: InstanceEditorDialog.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: InstanceEditorDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
 //###########################################################################
-
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -28,88 +28,104 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Vector;
 
-public class InstanceEditorDialog extends JDialog implements ActionListener {
-    private final JTextField name = new JTextField(16);
-    private final JTextField modName = new JTextField(16);
-    private final JButton okButton = new JButton("OK");
-    ModuleWindow root = null;
-    DefaultListModel data = null;
-    JList dataList = null;
+public class InstanceEditorDialog
+	extends JDialog
+	implements ActionListener
+{
+	private final JTextField name = new JTextField(16);
+	private final JTextField modName = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	ModuleWindow root = null;
+	DefaultListModel data = null;
+	JList dataList = null;
 
-    public InstanceEditorDialog(ModuleWindow root) {
-	setTitle("Instance Component Editor");
-	this.root = root;
+	public InstanceEditorDialog(ModuleWindow root)
+	{
+		setTitle("Instance Component Editor");
 
-	// TODO: Change the selection mode for the JList component (Single selection)
+		this.root = root;
 
-	// Center this element on the screen
-	setModal(true);
-	setLocationRelativeTo(null);
+		// TODO: Change the selection mode for the JList component (Single selection)
+		// Center this element on the screen
+		setModal(true);
+		setLocationRelativeTo(null);
 
-	JButton cancelButton = new JButton("Cancel");
-	okButton.setActionCommand("OK");
-	cancelButton.setActionCommand("Cancel");
-	okButton.addActionListener(this);
-	cancelButton.addActionListener(this);
+		JButton cancelButton = new JButton("Cancel");
 
-	JPanel contentPanel = new JPanel();
-	Box b = new Box(BoxLayout.PAGE_AXIS);
-	contentPanel.add(b);
+		okButton.setActionCommand("OK");
+		cancelButton.setActionCommand("Cancel");
+		okButton.addActionListener(this);
+		cancelButton.addActionListener(this);
 
-	JPanel r1 = new JPanel();
-	b.add(r1);
-	r1.add(new JLabel("Name: "));
-	r1.add(name);	
+		JPanel contentPanel = new JPanel();
+		Box b = new Box(BoxLayout.PAGE_AXIS);
 
-	//TODO: Make this a file selector
-	JPanel r2 = new JPanel();
-	b.add(r2);
-	r2.add(new JLabel("Module Name: "));
-	r2.add(modName);
+		contentPanel.add(b);
 
-	JPanel r3 = new JPanel();
-	b.add(r3);
-	r3.add(okButton);
-	r3.add(cancelButton);
+		JPanel r1 = new JPanel();
 
-	setContentPane(contentPanel);
-	pack();
-	show();
-    }
+		b.add(r1);
+		r1.add(new JLabel("Name: "));
+		r1.add(name);
 
-    public void actionPerformed(ActionEvent e) {	
-	if("OK".equals(e.getActionCommand())) {
-	    ExpressionParser parser = null;
-	    SimpleExpressionProxy expr = null;
-	    InstanceProxy ip = null;
+		//TODO: Make this a file selector
+		JPanel r2 = new JPanel();
 
-	    try {
-		if(name.getText().length() != 0) {
-		    parser = new ExpressionParser();
-		    expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-		    root.logEntry("Instance component name passed validation: " + name.getText());
-		}
-		else {
-		    JOptionPane.showMessageDialog(this, "Invalid identifier");
-		    root.logEntry("Instance component name was found to be invalid: " + name.getText());
-		}
-	    } catch(final ParseException exception) {
-		ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(),
-						 name.getText(),
-						 exception.getPosition());
-		root.logEntry("ParseException in component name: " + exception.getMessage());
-		return;
-	    }
+		b.add(r2);
+		r2.add(new JLabel("Module Name: "));
+		r2.add(modName);
 
-	    ip = new InstanceProxy((IdentifierProxy)expr,modName.getText());
+		JPanel r3 = new JPanel();
 
-	    root.addComponent(ip);
-
-	    dispose();
+		b.add(r3);
+		r3.add(okButton);
+		r3.add(cancelButton);
+		setContentPane(contentPanel);
+		pack();
+		show();
 	}
-	if("Cancel".equals(e.getActionCommand())) {
-	    dispose();
+
+	public void actionPerformed(ActionEvent e)
+	{
+		if ("OK".equals(e.getActionCommand()))
+		{
+			ExpressionParser parser = null;
+			SimpleExpressionProxy expr = null;
+			InstanceProxy ip = null;
+
+			try
+			{
+				if (name.getText().length() != 0)
+				{
+					parser = new ExpressionParser();
+					expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
+
+					root.logEntry("Instance component name passed validation: " + name.getText());
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(this, "Invalid identifier");
+					root.logEntry("Instance component name was found to be invalid: " + name.getText());
+				}
+			}
+			catch (final ParseException exception)
+			{
+				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), name.getText(), exception.getPosition());
+
+				root.logEntry("ParseException in component name: " + exception.getMessage());
+
+				return;
+			}
+
+			ip = new InstanceProxy((IdentifierProxy) expr, modName.getText());
+
+			root.addComponent(ip);
+			dispose();
+		}
+
+		if ("Cancel".equals(e.getActionCommand()))
+		{
+			dispose();
+		}
 	}
-    }
 }
-

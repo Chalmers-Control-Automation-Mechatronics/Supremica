@@ -1,11 +1,11 @@
+
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EventEditorDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
 //###########################################################################
-
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -27,223 +27,270 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Vector;
 
-public class EventEditorDialog extends JDialog implements ActionListener {
-    private final JTextField name = new JTextField(16);
-    private final JButton okButton = new JButton("OK");
-    private ButtonGroup group = new ButtonGroup();
-    ModuleWindow root = null;
-    DefaultListModel data = null;
-    JList dataList = null;
+public class EventEditorDialog
+	extends JDialog
+	implements ActionListener
+{
+	private final JTextField name = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	private ButtonGroup group = new ButtonGroup();
+	ModuleWindow root = null;
+	DefaultListModel data = null;
+	JList dataList = null;
 
-    public EventEditorDialog(ModuleWindow root) {
-	setTitle("Events Editor");
-	this.root = root;
+	public EventEditorDialog(ModuleWindow root)
+	{
+		setTitle("Events Editor");
 
-	// TODO: Change the selection mode for the JList component (Single selection)
+		this.root = root;
 
-	// Center this element on the screen
-	setModal(true);
-	setLocationRelativeTo(null);
+		// TODO: Change the selection mode for the JList component (Single selection)
+		// Center this element on the screen
+		setModal(true);
+		setLocationRelativeTo(null);
+		okButton.setActionCommand("OK");
 
-	okButton.setActionCommand("OK");
-	
-	JPanel contentPanel = new JPanel();
-	Box b = new Box(BoxLayout.PAGE_AXIS);
-	contentPanel.add(b);
+		JPanel contentPanel = new JPanel();
+		Box b = new Box(BoxLayout.PAGE_AXIS);
 
-	JPanel r1 = new JPanel();
-	b.add(r1);
-	r1.add(new JLabel("Name: "));
-	r1.add(name);	
+		contentPanel.add(b);
 
-	JRadioButton controllable, uncontrollable, proposition;
+		JPanel r1 = new JPanel();
 
-	group.add(controllable = new JRadioButton("Controllable"));
-	group.add(uncontrollable = new JRadioButton("Uncontrollable"));
-	group.add(proposition = new JRadioButton("Proposition"));
+		b.add(r1);
+		r1.add(new JLabel("Name: "));
+		r1.add(name);
 
-	controllable.setSelected(true);
-	controllable.setActionCommand("controllable");
-	uncontrollable.setActionCommand("uncontrollable");
-	proposition.setActionCommand("proposition");
+		JRadioButton controllable, uncontrollable, proposition;
 
-	JPanel buttons = new JPanel();
-	buttons.setLayout(new GridLayout(3,1));
+		group.add(controllable = new JRadioButton("Controllable"));
+		group.add(uncontrollable = new JRadioButton("Uncontrollable"));
+		group.add(proposition = new JRadioButton("Proposition"));
+		controllable.setSelected(true);
+		controllable.setActionCommand("controllable");
+		uncontrollable.setActionCommand("uncontrollable");
+		proposition.setActionCommand("proposition");
 
-	buttons.add(controllable);
-	buttons.add(uncontrollable);
-	buttons.add(proposition);
+		JPanel buttons = new JPanel();
 
-	b.add(buttons);
+		buttons.setLayout(new GridLayout(3, 1));
+		buttons.add(controllable);
+		buttons.add(uncontrollable);
+		buttons.add(proposition);
+		b.add(buttons);
 
-	// Add some BorderFactory trickery to make a line separator
-	
-	JPanel r2 = new JPanel();
-	r2.setLayout(new GridLayout(1,2));
-	b.add(r2);
-	data = new DefaultListModel();
+		// Add some BorderFactory trickery to make a line separator
+		JPanel r2 = new JPanel();
 
-	dataList = new JList(data);
+		r2.setLayout(new GridLayout(1, 2));
+		b.add(r2);
 
-	r2.add(new JScrollPane(dataList));
-	JPanel buttonBox = new JPanel();
-	buttonBox.setLayout(new GridLayout(4,1));
-	r2.add(buttonBox);
+		data = new DefaultListModel();
+		dataList = new JList(data);
 
-	JButton tButton;
-	
-	buttonBox.add(tButton = new JButton("Add"));
-	tButton.setActionCommand("add");
-	tButton.addActionListener(this);
+		r2.add(new JScrollPane(dataList));
 
-	buttonBox.add(tButton = new JButton("Remove"));
-	tButton.setActionCommand("remove");
-	tButton.addActionListener(this);
+		JPanel buttonBox = new JPanel();
 
-	buttonBox.add(tButton = new JButton("Up"));
-	tButton.setActionCommand("up");
-	tButton.addActionListener(this);
+		buttonBox.setLayout(new GridLayout(4, 1));
+		r2.add(buttonBox);
 
-	buttonBox.add(tButton = new JButton("Down"));
-	tButton.setActionCommand("down");
-	tButton.addActionListener(this);
+		JButton tButton;
 
-	JButton cancelButton = new JButton("Cancel");
-	JPanel r4 = new JPanel();
-	r4.add(okButton);
-	okButton.setActionCommand("okbutton");
-	okButton.addActionListener(this);
-	r4.add(cancelButton);
-	cancelButton.setActionCommand("cancelbutton");
-	cancelButton.addActionListener(this);
-	b.add(r4);
+		buttonBox.add(tButton = new JButton("Add"));
+		tButton.setActionCommand("add");
+		tButton.addActionListener(this);
+		buttonBox.add(tButton = new JButton("Remove"));
+		tButton.setActionCommand("remove");
+		tButton.addActionListener(this);
+		buttonBox.add(tButton = new JButton("Up"));
+		tButton.setActionCommand("up");
+		tButton.addActionListener(this);
+		buttonBox.add(tButton = new JButton("Down"));
+		tButton.setActionCommand("down");
+		tButton.addActionListener(this);
 
-	setContentPane(contentPanel);
-	pack();
-	show();
-    }
-    
-    public void actionPerformed(ActionEvent e) {
-	EventDeclProxy event = null;
+		JButton cancelButton = new JButton("Cancel");
+		JPanel r4 = new JPanel();
 
-	if("okbutton".equals(e.getActionCommand())) {
-	    // addEvent(...);
-	    EventKind eventkind = null;
-	    if(group.getSelection().getActionCommand().equals("controllable")) {
-		eventkind = EventKind.CONTROLLABLE;
-	    }
-	    if(group.getSelection().getActionCommand().equals("uncontrollable")) {
-		eventkind = EventKind.UNCONTROLLABLE;
-	    }
-	    if(group.getSelection().getActionCommand().equals("proposition")) {
-		eventkind = EventKind.PROPOSITION;
-	    }
+		r4.add(okButton);
+		okButton.setActionCommand("okbutton");
+		okButton.addActionListener(this);
+		r4.add(cancelButton);
+		cancelButton.setActionCommand("cancelbutton");
+		cancelButton.addActionListener(this);
+		b.add(r4);
+		setContentPane(contentPanel);
+		pack();
+		show();
+	}
 
-	    ExpressionParser parser = null;
+	public void actionPerformed(ActionEvent e)
+	{
+		EventDeclProxy event = null;
 
-	    try {
-		if(name.getText().length() != 0) {
-		    parser = new ExpressionParser();
-		    SimpleExpressionProxy expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-		    root.logEntry("Event name passed validation: " + name.getText());
+		if ("okbutton".equals(e.getActionCommand()))
+		{
+
+			// addEvent(...);
+			EventKind eventkind = null;
+
+			if (group.getSelection().getActionCommand().equals("controllable"))
+			{
+				eventkind = EventKind.CONTROLLABLE;
+			}
+
+			if (group.getSelection().getActionCommand().equals("uncontrollable"))
+			{
+				eventkind = EventKind.UNCONTROLLABLE;
+			}
+
+			if (group.getSelection().getActionCommand().equals("proposition"))
+			{
+				eventkind = EventKind.PROPOSITION;
+			}
+
+			ExpressionParser parser = null;
+
+			try
+			{
+				if (name.getText().length() != 0)
+				{
+					parser = new ExpressionParser();
+
+					SimpleExpressionProxy expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
+
+					root.logEntry("Event name passed validation: " + name.getText());
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(this, "Invalid identifier");
+					root.logEntry("Event name was found to be invalid: " + name.getText());
+				}
+			}
+			catch (final ParseException exception)
+			{
+				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), name.getText(), exception.getPosition());
+
+				root.logEntry("ParseException in event name: " + exception.getMessage());
+
+				return;
+			}
+
+			event = new EventDeclProxy(name.getText(), eventkind);
+
+			for (int i = 0; i < data.getSize(); i++)
+			{
+				try
+				{
+					parser = new ExpressionParser();
+
+					SimpleExpressionProxy expr = parser.parse((String) data.get(i), SimpleExpressionProxy.TYPE_RANGE);
+
+					event.getRanges().add(expr);
+				}
+				catch (final ParseException exception)
+				{
+					ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), (String) data.get(i), exception.getPosition());
+
+					root.logEntry("ParseException in event range: " + exception.getMessage());
+
+					return;
+				}
+			}
+
+			try
+			{
+				root.getModuleProxy().insertEventDeclaration(event);
+			}
+			catch (final net.sourceforge.waters.model.base.DuplicateNameException exn)
+			{
+				root.logEntry("DuplicateNameException: " + exn.getMessage());
+				JOptionPane.showMessageDialog(this, "Duplicate event");
+
+				return;
+			}
+
+			root.getEventDataList().add(root.getEventDataList().getSize(), event);
+			dispose();
 		}
-		else {
-		    JOptionPane.showMessageDialog(this, "Invalid identifier");
-		    root.logEntry("Event name was found to be invalid: " + name.getText());
+
+		if ("cancelbutton".equals(e.getActionCommand()))
+		{
+			dispose();
 		}
-	    } catch(final ParseException exception) {
-		ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(),
-						 name.getText(),
-						 exception.getPosition());
-		root.logEntry("ParseException in event name: " + exception.getMessage());
-		return;
-	    }
-	    
-	    event = new EventDeclProxy(name.getText(), eventkind);
 
-	    for(int i = 0; i<data.getSize(); i++) {
-		try {
-		    parser = new ExpressionParser();
-		    SimpleExpressionProxy expr = parser.parse((String)data.get(i), SimpleExpressionProxy.TYPE_RANGE);
-		    event.getRanges().add(expr);
-		} catch(final ParseException exception) {
-		    ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(),
-						     (String)data.get(i),
-						     exception.getPosition());
-		    root.logEntry("ParseException in event range: " + exception.getMessage());
-		    return;
+		if ("add".equals(e.getActionCommand()))
+		{
+			String range = JOptionPane.showInputDialog("Please enter a range:");
+			int index = dataList.getSelectedIndex();
+
+			if ((index == -1) && (data.getSize() != 0))
+			{
+				index = data.getSize() - 1;
+			}
+
+			ExpressionParser parser = null;
+
+			try
+			{
+				if (range.length() != 0)
+				{
+					parser = new ExpressionParser();
+
+					SimpleExpressionProxy expr = parser.parse(range, SimpleExpressionProxy.TYPE_RANGE);
+
+					root.logEntry("Event range passed validation: " + range);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(this, "Invalid range");
+					root.logEntry("Event range was found to be invalid: " + range);
+				}
+			}
+			catch (final ParseException exception)
+			{
+				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), range, exception.getPosition());
+
+				root.logEntry("ParseException in event range: " + exception.getMessage());
+
+				return;
+			}
+
+			data.add(index + 1, range);
+
+			//TODO: Finish prompting for input etc.
 		}
-	    }
 
-	    try {
-		root.getModuleProxy().insertEventDeclaration(event);
-	    } catch(final net.sourceforge.waters.model.base.DuplicateNameException exn) {
-		root.logEntry("DuplicateNameException: " + exn.getMessage());
-		JOptionPane.showMessageDialog(this, "Duplicate event");
-		return;
-	    }
+		if ("remove".equals(e.getActionCommand()))
+		{
+			int index = dataList.getSelectedIndex();
 
-	    root.getEventDataList().add(root.getEventDataList().getSize(), event);
-	    dispose();
-	}
-	if("cancelbutton".equals(e.getActionCommand())) {
-	    dispose();
-	}
-
-	if("add".equals(e.getActionCommand())) {
-	    String range = JOptionPane.showInputDialog("Please enter a range:");
-	    int index = dataList.getSelectedIndex();
-	    if(index == -1 && data.getSize() != 0) {
-		index = data.getSize()-1;
-	    }
-
-	    ExpressionParser parser = null;
-	    try {
-		if(range.length() != 0) {
-		    parser = new ExpressionParser();
-		    SimpleExpressionProxy expr = parser.parse(range, SimpleExpressionProxy.TYPE_RANGE);
-		    root.logEntry("Event range passed validation: " + range);
+			data.remove(index);
 		}
-		else {
-		    JOptionPane.showMessageDialog(this, "Invalid range");
-		    root.logEntry("Event range was found to be invalid: " + range);
+
+		if ("up".equals(e.getActionCommand()))
+		{
+			int index = dataList.getSelectedIndex();
+			Object o = data.get(index);
+
+			if (index != 0)
+			{
+				data.remove(index);
+				data.add(index - 1, o);
+			}
 		}
-	    } catch(final ParseException exception) {
-		ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(),
-						 range,
-						 exception.getPosition());
-		root.logEntry("ParseException in event range: " + exception.getMessage());
-		return;
-	    }
 
-	    data.add(index+1, range);
-	    //TODO: Finish prompting for input etc.
+		if ("down".equals(e.getActionCommand()))
+		{
+			int index = dataList.getSelectedIndex();
+			Object o = data.get(index);
+
+			if (index < data.size() - 1)
+			{
+				data.remove(index);
+				data.add(index + 1, o);
+			}
+		}
 	}
-
-	if("remove".equals(e.getActionCommand())) {
-	    int index = dataList.getSelectedIndex();
-	    data.remove(index);
-	}
-
-	if("up".equals(e.getActionCommand())) {
-	    int index = dataList.getSelectedIndex();
-	    Object o = data.get(index);
-	    if(index != 0) {
-		data.remove(index);
-		data.add(index-1,o);
-	    }
-	}
-
-	if("down".equals(e.getActionCommand())) {
-	    int index = dataList.getSelectedIndex();
-	    Object o = data.get(index);
-	    if(index < data.size()-1) {
-		data.remove(index);
-		data.add(index+1,o);
-	    }
-	}
-
-    }
 }
-
-

@@ -1,11 +1,11 @@
- //###########################################################################
+
+//###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: EditorLabel.java,v 1.2 2005-02-18 03:09:06 knut Exp $
 //###########################################################################
-
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -21,163 +21,216 @@ import java.beans.*;
 import net.sourceforge.waters.model.module.*;
 
 /** <p>Editable label object for representing Events and Node names.</p>
- * 
+ *
  * <p>A label works based on an offset from the central point of
  * the object it is tied to (the center of a node or the control point of
  * an edge, in this case).</p>
  *
  * @author Gian Perrone
  */
-public class EditorLabel extends EditorObject {
-    private JTextField text;
-    private JLabel label;
-    private String backup = "";
-    private Rectangle boundingRect = new Rectangle();
-    private boolean editing = false;
-    private EditorNode parent = null;
-    private LabelGeometryProxy geometry;
+public class EditorLabel
+	extends EditorObject
+{
+	private JTextField text;
+	private JLabel label;
+	private String backup = "";
+	private Rectangle boundingRect = new Rectangle();
+	private boolean editing = false;
+	private EditorNode parent = null;
+	private LabelGeometryProxy geometry;
 
-    /** Get the object which this label is attached to
-     */
-    public EditorNode getParent() {
-        return parent;
-    }
-
-    public void removeFromSurface(EditorSurface e)
-    {
-    	e.remove(text);
-	e.remove(label);
-    }
-
-    public void setEditing(boolean edit) {
-	if (edit){
-	    backup = text.getText();
-	    text.requestFocus();
-	    text.selectAll();
+	/** Get the object which this label is attached to
+	 */
+	public EditorNode getParent()
+	{
+		return parent;
 	}
-	else{	   
-	    if(editing && !backup.equals(text.getText())){
-		if(!parent.setName(text.getText(), (JComponent)text.getRootPane())){
-		    edit = true;
-		    text.requestFocus();
-		    text.selectAll();
+
+	public void removeFromSurface(EditorSurface e)
+	{
+		e.remove(text);
+		e.remove(label);
+	}
+
+	public void setEditing(boolean edit)
+	{
+		if (edit)
+		{
+			backup = text.getText();
+
+			text.requestFocus();
+			text.selectAll();
 		}
-	    }
-	}
-   	editing = edit;
-        text.setVisible(edit);
-	label.setVisible(!edit);
-    }
-   
-    public boolean getEditing() {
-        return editing;
-    }
+		else
+		{
+			if (editing &&!backup.equals(text.getText()))
+			{
+				if (!parent.setName(text.getText(), (JComponent) text.getRootPane()))
+				{
+					edit = true;
 
-    public void moveTo( int x, int y ) {
-	geometry.getOffset().setLocation(x - parent.getX(), y - parent.getY());
-    }
-
-    public void setOffset(int x, int y) {
-	geometry.getOffset().setLocation(x, y);
-    }
-
-    public int getOffsetX() {
-	return (int)geometry.getOffset().getX();
-    }
-
-    public int getOffsetY() {
-	return (int)geometry.getOffset().getY();
-    }
-
-    public void drawObject(Graphics g) {
-        if(text == null || parent == null) {
-            return;
-        }
-	if (text.getText().length() == 0 && !editing)
-		text.setText(backup);
-	
-
-	if (text.getText().length() == 0){
-	    text.setSize(5, text.getHeight());
-	}else{
-	    text.setSize(text.getPreferredSize());
-	}
-	if(!selected) {
-	    label.setForeground(Color.BLACK);
-	}
-	else {
-	    label.setForeground(Color.BLUE);
-	}	
-	int xposition = parent.getX() + (int)geometry.getOffset().getX();
-	int yposition = parent.getY() + (int)geometry.getOffset().getY();
-     	text.setLocation(xposition-1, yposition-14);
-	label.setLocation(xposition-1, yposition-14);
-	label.setText(text.getText());
-	label.setFont(text.getFont());
-	label.setSize(label.getPreferredSize());
-	boundingRect.setRect(xposition-1, yposition-14, text.getWidth(), text.getHeight());
-    }
-
-    public boolean wasClicked(int ex, int ey) {
-        if(boundingRect == null) {
-            return false;
-        }
-	return boundingRect.contains(ex, ey);
-    }
-
-    public int getX(){
-	return (int)text.getBounds().getCenterX();
-    }
-    
-    public int getY(){
-	return (int)text.getBounds().getCenterY();
-    }
-
-    public int getHeight(){
-	return text.getHeight();
-    }
-
-    public int getWidth(){
-	return text.getWidth();
-    }
-
-    public EditorLabel(EditorNode par, String t, EditorSurface e) {
-        if(par.getName() == null) {
-            text = new JTextField(t);
-        } else {
-	    text = new JTextField(par.getName());
-	}      
-	backup = text.getText();
-	if (par.getProxy().getLabelGeometry() == null){
-	    geometry = new LabelGeometryProxy(0, 20);
-	    par.getProxy().setLabelGeometry(geometry);
-	}
-	else{
-	    geometry = par.getProxy().getLabelGeometry();
-	}
-	label = new JLabel(text.getText());
-	text.setOpaque(false);
-	label.setOpaque(false);
-	text.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
-	label.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
-	text.setVisible(false);
-	text.setForeground(Color.BLUE);
-	e.add(text);
-	e.add(label);   
-        parent = par;
-        type = LABEL;
-        text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
-        text.getActionMap().put("enter", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    setEditing(false);
+					text.requestFocus();
+					text.selectAll();
+				}
+			}
 		}
-	    });
-	text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
-        text.getActionMap().put("escape", new AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    text.setText(backup);
-		    setEditing(false);
+
+		editing = edit;
+
+		text.setVisible(edit);
+		label.setVisible(!edit);
+	}
+
+	public boolean getEditing()
+	{
+		return editing;
+	}
+
+	public void moveTo(int x, int y)
+	{
+		geometry.getOffset().setLocation(x - parent.getX(), y - parent.getY());
+	}
+
+	public void setOffset(int x, int y)
+	{
+		geometry.getOffset().setLocation(x, y);
+	}
+
+	public int getOffsetX()
+	{
+		return (int) geometry.getOffset().getX();
+	}
+
+	public int getOffsetY()
+	{
+		return (int) geometry.getOffset().getY();
+	}
+
+	public void drawObject(Graphics g)
+	{
+		if ((text == null) || (parent == null))
+		{
+			return;
 		}
-	    });		
-    }
+
+		if ((text.getText().length() == 0) &&!editing)
+		{
+			text.setText(backup);
+		}
+
+		if (text.getText().length() == 0)
+		{
+			text.setSize(5, text.getHeight());
+		}
+		else
+		{
+			text.setSize(text.getPreferredSize());
+		}
+
+		if (!selected)
+		{
+			label.setForeground(Color.BLACK);
+		}
+		else
+		{
+			label.setForeground(Color.BLUE);
+		}
+
+		int xposition = parent.getX() + (int) geometry.getOffset().getX();
+		int yposition = parent.getY() + (int) geometry.getOffset().getY();
+
+		text.setLocation(xposition - 1, yposition - 14);
+		label.setLocation(xposition - 1, yposition - 14);
+		label.setText(text.getText());
+		label.setFont(text.getFont());
+		label.setSize(label.getPreferredSize());
+		boundingRect.setRect(xposition - 1, yposition - 14, text.getWidth(), text.getHeight());
+	}
+
+	public boolean wasClicked(int ex, int ey)
+	{
+		if (boundingRect == null)
+		{
+			return false;
+		}
+
+		return boundingRect.contains(ex, ey);
+	}
+
+	public int getX()
+	{
+		return (int) text.getBounds().getCenterX();
+	}
+
+	public int getY()
+	{
+		return (int) text.getBounds().getCenterY();
+	}
+
+	public int getHeight()
+	{
+		return text.getHeight();
+	}
+
+	public int getWidth()
+	{
+		return text.getWidth();
+	}
+
+	public EditorLabel(EditorNode par, String t, EditorSurface e)
+	{
+		if (par.getName() == null)
+		{
+			text = new JTextField(t);
+		}
+		else
+		{
+			text = new JTextField(par.getName());
+		}
+
+		backup = text.getText();
+
+		if (par.getProxy().getLabelGeometry() == null)
+		{
+			geometry = new LabelGeometryProxy(0, 20);
+
+			par.getProxy().setLabelGeometry(geometry);
+		}
+		else
+		{
+			geometry = par.getProxy().getLabelGeometry();
+		}
+
+		label = new JLabel(text.getText());
+
+		text.setOpaque(false);
+		label.setOpaque(false);
+		text.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
+		label.setBorder(new EmptyBorder(text.getBorder().getBorderInsets(text)));
+		text.setVisible(false);
+		text.setForeground(Color.BLUE);
+		e.add(text);
+		e.add(label);
+
+		parent = par;
+		type = LABEL;
+
+		text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
+		text.getActionMap().put("enter", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				setEditing(false);
+			}
+		});
+		text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+		text.getActionMap().put("escape", new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				text.setText(backup);
+				setEditing(false);
+			}
+		});
+	}
 }

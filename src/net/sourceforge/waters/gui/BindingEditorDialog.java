@@ -1,11 +1,11 @@
+
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   BindingEditorDialog
 //###########################################################################
-//# $Id: BindingEditorDialog.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: BindingEditorDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
 //###########################################################################
-
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -28,90 +28,108 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Vector;
 
-public class BindingEditorDialog extends JDialog implements ActionListener {
-    private final JTextField name = new JTextField(16);
-    private final JTextField expr = new JTextField(16);
-    private final JButton okButton = new JButton("OK");
-    ModuleWindow root = null;
-    DefaultListModel data = null;
-    JList dataList = null;
+public class BindingEditorDialog
+	extends JDialog
+	implements ActionListener
+{
+	private final JTextField name = new JTextField(16);
+	private final JTextField expr = new JTextField(16);
+	private final JButton okButton = new JButton("OK");
+	ModuleWindow root = null;
+	DefaultListModel data = null;
+	JList dataList = null;
 
-    public BindingEditorDialog(ModuleWindow root) {
-	setTitle("Parameter Binding Editor");
-	this.root = root;
+	public BindingEditorDialog(ModuleWindow root)
+	{
+		setTitle("Parameter Binding Editor");
 
-	// Center this element on the screen
-	setModal(true);
-	setLocationRelativeTo(null);
+		this.root = root;
 
-	JButton cancelButton = new JButton("Cancel");
-	okButton.setActionCommand("OK");
-	cancelButton.setActionCommand("Cancel");
-	okButton.addActionListener(this);
-	cancelButton.addActionListener(this);
+		// Center this element on the screen
+		setModal(true);
+		setLocationRelativeTo(null);
 
-	JPanel contentPanel = new JPanel();
-	Box b = new Box(BoxLayout.PAGE_AXIS);
-	contentPanel.add(b);
+		JButton cancelButton = new JButton("Cancel");
 
-	JPanel r1 = new JPanel();
-	b.add(r1);
-	r1.add(new JLabel("Parameter Name: "));
-	r1.add(name);	
+		okButton.setActionCommand("OK");
+		cancelButton.setActionCommand("Cancel");
+		okButton.addActionListener(this);
+		cancelButton.addActionListener(this);
 
-	//TODO: Make this a file selector
-	JPanel r2 = new JPanel();
-	b.add(r2);
-	r2.add(new JLabel("Expression: "));
-	r2.add(expr);
+		JPanel contentPanel = new JPanel();
+		Box b = new Box(BoxLayout.PAGE_AXIS);
 
-	JPanel r3 = new JPanel();
-	b.add(r3);
-	r3.add(okButton);
-	r3.add(cancelButton);
+		contentPanel.add(b);
 
-	setContentPane(contentPanel);
-	pack();
-	show();
-    }
+		JPanel r1 = new JPanel();
 
-    public void actionPerformed(ActionEvent e) {	
-	if("OK".equals(e.getActionCommand())) {
-	    ExpressionParser parser = null;
-	    SimpleExpressionProxy exp = null;
-	    ParameterBindingProxy pb = null;
+		b.add(r1);
+		r1.add(new JLabel("Parameter Name: "));
+		r1.add(name);
 
-	    try {
-		if(name.getText().length() != 0) {
-		    parser = new ExpressionParser();
-		    exp = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-		    root.logEntry("Binding name passed validation: " + name.getText());
+		//TODO: Make this a file selector
+		JPanel r2 = new JPanel();
 
-		    parser = new ExpressionParser();
-		    exp = parser.parse(expr.getText());
-		    root.logEntry("Binding expression passed validation: " + name.getText());
-		}
-		else {
-		    JOptionPane.showMessageDialog(this, "Invalid identifier");
-		    root.logEntry("Binding name was found to be invalid: " + name.getText());
-		}
-	    } catch(final ParseException exception) {
-		ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(),
-						 expr.getText(),
-						 exception.getPosition());
-		root.logEntry("ParseException in binding: " + exception.getMessage());
-		return;
-	    }
+		b.add(r2);
+		r2.add(new JLabel("Expression: "));
+		r2.add(expr);
 
-	    pb = new ParameterBindingProxy(name.getText(), exp);
-	    
-	    root.addComponent(pb);
+		JPanel r3 = new JPanel();
 
-	    dispose();
+		b.add(r3);
+		r3.add(okButton);
+		r3.add(cancelButton);
+		setContentPane(contentPanel);
+		pack();
+		show();
 	}
-	if("Cancel".equals(e.getActionCommand())) {
-	    dispose();
+
+	public void actionPerformed(ActionEvent e)
+	{
+		if ("OK".equals(e.getActionCommand()))
+		{
+			ExpressionParser parser = null;
+			SimpleExpressionProxy exp = null;
+			ParameterBindingProxy pb = null;
+
+			try
+			{
+				if (name.getText().length() != 0)
+				{
+					parser = new ExpressionParser();
+					exp = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
+
+					root.logEntry("Binding name passed validation: " + name.getText());
+
+					parser = new ExpressionParser();
+					exp = parser.parse(expr.getText());
+
+					root.logEntry("Binding expression passed validation: " + name.getText());
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(this, "Invalid identifier");
+					root.logEntry("Binding name was found to be invalid: " + name.getText());
+				}
+			}
+			catch (final ParseException exception)
+			{
+				ErrorWindow ew = new ErrorWindow("Parse error: " + exception.getMessage(), expr.getText(), exception.getPosition());
+
+				root.logEntry("ParseException in binding: " + exception.getMessage());
+
+				return;
+			}
+
+			pb = new ParameterBindingProxy(name.getText(), exp);
+
+			root.addComponent(pb);
+			dispose();
+		}
+
+		if ("Cancel".equals(e.getActionCommand()))
+		{
+			dispose();
+		}
 	}
-    }
 }
-
