@@ -65,6 +65,7 @@ import org.supremica.automata.LabeledEvent;
 public class ProjectBuildFromXml
 	extends AutomataBuildFromXml
 {
+/*
 	private final static String projectStr = "Project";
 
 	private Project currProject = null;
@@ -245,5 +246,5 @@ public class ProjectBuildFromXml
 			throw new SAXException("Unsupported file format.");
 		}
 	}
-
+*/
 }
