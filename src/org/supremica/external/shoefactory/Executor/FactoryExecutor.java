@@ -51,8 +51,8 @@ public class FactoryExecutor
 				Specification shoeSpec = new Specification(shoeNr,sv);
 				gui.addProject(shoeSpec.getSpec());
 
-				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant(), syncAutomata);
-				syncPlant.synthesizePlants("theSupervisor");
+				//SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant(), syncAutomata);
+				//syncPlant.synthesizePlants("theSupervisor");
 
 				GCDocument newShoe = e.newWorkspace();
 				Shoe s = new Shoe(newShoe, stationV, shoeNr);
@@ -89,13 +89,13 @@ public class FactoryExecutor
 				shoes.add(shoeNr-1,newShoe);
 				
 				
-				remove_Aut(44+shoeNr);				
+				/*remove_Aut(44+shoeNr);				
 							
 				
 				syncAutomata = addSyncAutomata(syncAutomata,shoeNr+44);
 				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant(), syncAutomata);
 				syncPlant.synthesizePlants("theSupervisor");
-				
+				*/
 				shoeNr++;
 /*
 				boolean OK = e.compileWorkspace(newShoe);
