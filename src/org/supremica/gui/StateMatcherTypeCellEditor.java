@@ -70,19 +70,14 @@ import org.supremica.automata.AutomatonType;
 abstract class StateMatcherTypeCellEditor
 	implements CellEditorListener
 {
-	private static Logger logger = LoggerFactory.createLogger(StateMatcherTypeCellEditor.class);
+/*	private static Logger logger = LoggerFactory.createLogger(StateMatcherTypeCellEditor.class);
 
-	private JTable theTable;
-	private TableSorter theTableSorter;
 	private JComboBox stateMatcherTypeCombo;
-	private VisualProjectContainer theVisualProjectContainer;
+	private StateMatcherOptions theOptions;
 
-
-	StateMatcherTypeCellEditor(JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
+	StateMatcherTypeCellEditor(StateMatcherOptions theOptions)
 	{
-		this.theTable = theTable;
-		this.theVisualProjectContainer = theVisualProjectContainer;
-		this.theTableSorter = theTableSorter;
+		this.theOptions = theOptions;
 		stateMatcherTypeCombo = new JComboBox();
 
 		Iterator typeIt = StateMatcherOptions.Accepting.iterator();
@@ -134,14 +129,16 @@ abstract class StateMatcherTypeCellEditor
 			}
 		}
 	}
-}
 
+	public abstract TableColumn getTableColumn();*/
+}
+/*
 class StateMatcherAcceptingCellEditor
 	extends StateMatcherTypeCellEditor
 {
 	private StateMatcherOptions.Accepting theAcceptingCondition;
 
-	public StateMatcherAcceptingCellEditor(StateMatcherOptions.Accepting theAcceptingCondition, JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
+	public StateMatcherAcceptingCellEditor(StateMatcherOptions.Accepting theAcceptingCondition, JTable theTable)
 	{
 		super(theTable, theTableSorter, theVisualProjectContainer);
 		this.theAcceptingCondition = theAcceptingCondition;
@@ -151,6 +148,12 @@ class StateMatcherAcceptingCellEditor
 	public Iterator iterator()
 	{
 		return theAcceptingCondition.iterator();
+	}
+
+	public TableColumn getTableColumn()
+	{
+		TableColumnModel columnModel = theTable.getColumnModel();
+		TableColumn typeColumn = columnModel.getColumn(Supremica.TABLE_TYPE_COLUMN);
 	}
 }
 
@@ -169,3 +172,4 @@ class StateMatcherForbiddenCellEditor
 		return theForbiddenCondition.iterator();
 	}
 }
+*/
