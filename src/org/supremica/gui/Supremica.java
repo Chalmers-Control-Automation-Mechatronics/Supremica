@@ -986,6 +986,20 @@ public class Supremica
 			}
 		});
 
+		JMenuItem menuToolsCodeGenerationNQC = new JMenuItem();
+
+		menuToolsCodeGenerationNQC.setText("Lego Mindstorm NQC...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationNQC);
+		menuToolsCodeGenerationNQC.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				ActionMan.AutomataToMindstormNQC(getGui());
+			}
+		});
+
+
 		// Configure
 		JMenu menuConfigure = new JMenu();
 

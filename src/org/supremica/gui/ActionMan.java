@@ -108,10 +108,10 @@ public class ActionMan
 		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4, FORMAT_SP = 5;
 
 	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
-	// gui here is filled in by 
+	// gui here is filled in by
 	public static Gui gui = null;
 	public static LanguageRestrictor languageRestrictor = new LanguageRestrictor();
-	
+
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
 		boolean finished = false;
@@ -961,17 +961,17 @@ public class ActionMan
 
 			try
 			{
-				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), 
-														SynchronizationType.Prioritized, 
-														SupremicaProperties.syncInitialHashtableSize(), 
-														SupremicaProperties.syncExpandHashtable(), 
+				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
+														SynchronizationType.Prioritized,
+														SupremicaProperties.syncInitialHashtableSize(),
+														SupremicaProperties.syncExpandHashtable(),
 														true,
-														SupremicaProperties.syncExpandForbiddenStates(), 
-														false, 
-														false, 
-														true, 
-														SupremicaProperties.verboseMode(), 
-														true, 
+														SupremicaProperties.syncExpandForbiddenStates(),
+														false,
+														false,
+														true,
+														SupremicaProperties.verboseMode(),
+														true,
 														true);
 			}
 			catch (Exception ex)
@@ -992,9 +992,9 @@ public class ActionMan
 				// No initial state -- remove from synthesis (or cancel entirely)
 				if (currAutomaton.getInitialState() == null)
 				{
-					int cont = JOptionPane.showConfirmDialog(gui.getComponent(), 
-												"The automaton " + currAutomatonName + " does not have an initial state.\nSkip it or cancel...", 
-												"Alert", 
+					int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
+												"The automaton " + currAutomatonName + " does not have an initial state.\nSkip it or cancel...",
+												"Alert",
 												JOptionPane.OK_CANCEL_OPTION,
 												JOptionPane.WARNING_MESSAGE);
 
@@ -1010,7 +1010,7 @@ public class ActionMan
 				// Undefined type -- remove from synthesis (or cancel entirely)
 				if(currAutomaton.getType() == AutomatonType.Undefined)
 				{
-					int cont = JOptionPane.showConfirmDialog(gui.getComponent(), 
+					int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
 														"The automaton " + currAutomatonName + " is of 'Undefined' type.\nSkip it or cancel...",
 														"Alert",
 														JOptionPane.OK_CANCEL_OPTION,
@@ -1138,7 +1138,7 @@ public class ActionMan
 	public static void automatonAlphabet_actionPerformed(Gui gui)
 	{
 		logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
-		
+
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
@@ -1149,7 +1149,7 @@ public class ActionMan
 		}
 
 	/* I don't understand all this, and I don't see the meaning (and there are no comments to explain)
-	
+
 		Iterator autIt = selectedAutomata.iterator();
 
 		while (autIt.hasNext())
@@ -2173,6 +2173,52 @@ public class ActionMan
 						return;
 					}
 					logger.info("ABB Control Builder ST files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
+				}
+			}
+		}
+	}
+
+	// Generate Mindstorm NQC (Not Quite C)
+	public static void AutomataToMindstormNQC(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
+		JFileChooser fileExporter = FileDialogs.getNQCFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					try
+					{
+
+						AutomataToNQC exporter = new AutomataToNQC(selectedAutomata);
+
+						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
+
+						exporter.serializeNQC(theWriter);
+
+						theWriter.close();
+
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						gui.error("Exception while generating Mindstorm NQC text code to file " + currFile.getAbsolutePath());
+						return;
+					}
+					logger.info("Mindstorm NQC file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
 		}

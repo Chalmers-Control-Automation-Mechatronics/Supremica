@@ -76,6 +76,8 @@ public class FileDialogs
 	private FileFilter autFilter = null;
 	private FileFilter stFilter = null;
 	private FileFilter ilFilter = null;
+	private FileFilter nqcFilter = null;
+
 
 	private static FileDialogs fd = new FileDialogs();
 
@@ -269,6 +271,16 @@ public class FileDialogs
 
 		fileExporter.resetChoosableFileFilters();
 		fileExporter.setFileFilter(fd.getILFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getNQCFileExporter()
+	{
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getNQCFilter());
 
 		return fileExporter;
 	}
@@ -510,5 +522,15 @@ public class FileDialogs
 		}
 
 		return ilFilter;
+	}
+
+	private FileFilter getNQCFilter()
+	{
+		if (nqcFilter == null)
+		{
+			nqcFilter = makeFileFilter(".nqc", "Mindstorm NQC files (*.nqc)");
+		}
+
+		return nqcFilter;
 	}
 }
