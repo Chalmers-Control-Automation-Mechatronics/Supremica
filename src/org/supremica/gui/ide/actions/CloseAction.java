@@ -8,20 +8,18 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 
-public class NewAction
+public class CloseAction
 	extends AbstractAction
 	implements IDEAction
 {
 	private IDE ide;
 
-	public NewAction(IDE ide)
+	public CloseAction(IDE ide)
 	{
 		this.ide = ide;
 
-		putValue(Action.NAME, "New");
-		putValue(Action.SHORT_DESCRIPTION, "New module");
-		putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_N));
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/New16.gif")));
+		putValue(Action.NAME, "Close");
+		putValue(Action.SHORT_DESCRIPTION, "Close module");
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -31,8 +29,7 @@ public class NewAction
 
 	public void doAction()
 	{
-		ModuleContainer moduleContainer = ide.createNewModuleContainer();
-		ide.add(moduleContainer);
-		ide.setActive(moduleContainer);
+		ModuleContainer moduleContainer = ide.getActiveModuleContainer();
+		ide.remove(moduleContainer);
 	}
 }

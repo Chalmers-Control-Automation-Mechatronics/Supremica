@@ -3,16 +3,17 @@ package org.supremica.gui.ide;
 import java.util.*;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
-class ModuleContainers
+public class ModuleContainers
 {
 	private IDE ide;
 	private LinkedList moduleContainers = new LinkedList();
+	private ModuleContainer activeModuleContainer = null;
+
 	private int newModuleCounter = 1;
 
 	public ModuleContainers(IDE ide)
 	{
 		this.ide = ide;
-		add(createNewModuleContainer());
 	}
 
 	public ModuleContainer getModuleContainer(String name)
@@ -30,16 +31,15 @@ class ModuleContainers
 
 	public void add(ModuleContainer moduleContainer)
 	{
-		moduleContainers.addFirst(moduleContainer);
-		setActive(moduleContainer);
+		moduleContainers.addLast(moduleContainer);
 	}
 
 	public void remove(ModuleContainer moduleContainer)
 	{
-		// The module container will at least contain one module
-		if (moduleContainers.size() >= 2)
+		moduleContainers.remove(moduleContainer);
+		if (moduleContainer == activeModuleContainer)
 		{
-			moduleContainers.remove(moduleContainer);
+			activeModuleContainer = null;
 		}
 	}
 
@@ -48,15 +48,39 @@ class ModuleContainers
 
 		if (getActiveModuleContainer() != moduleContainer)
 		{
-			remove(moduleContainer);
-			add(moduleContainer);
+			activeModuleContainer = moduleContainer;
 		}
 		ide.setTitle(ide.getIDEName() + " [" + moduleContainer.getName() + "]");
 	}
 
 	public ModuleContainer getActiveModuleContainer()
 	{
+		return activeModuleContainer;
+	}
+
+	public ModuleContainer getFirst()
+	{
 		return (ModuleContainer)moduleContainers.getFirst();
+	}
+
+	public ModuleContainer getLast()
+	{
+		return (ModuleContainer)moduleContainers.getLast();
+	}
+
+	public ModuleContainer getNext(ModuleContainer moduleContainer)
+	{
+		int moduleIndex = moduleContainers.indexOf(moduleContainer);
+		int nextModuleIndex = moduleIndex + 1;
+		if (nextModuleIndex == size())
+		{
+			nextModuleIndex = 0;
+		}
+		if (size() >= 1)
+		{
+			return (ModuleContainer)moduleContainers.get(nextModuleIndex);
+		}
+		return null;
 	}
 
 	public int size()

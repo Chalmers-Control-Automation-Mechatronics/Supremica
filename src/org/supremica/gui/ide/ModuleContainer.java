@@ -4,7 +4,7 @@ import java.util.*;
 import javax.swing.JComponent;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
-class ModuleContainer
+public class ModuleContainer
 {
 	private IDE ide;
 	private final ModuleProxy module;
@@ -60,4 +60,5 @@ class ModuleContainer
 		}
 		return simulatorPanel;
 	}
+
 }

@@ -87,24 +87,13 @@ public class AutomatonType
 
 	public static AutomatonType toType(String type)
 	{
-		if (equalType(Plant, type))
+		for (Iterator it = collection.iterator(); it.hasNext(); )
 		{
-			return Plant;
-		}
-
-		if (equalType(Specification, type))
-		{
-			return Specification;
-		}
-
-		if (equalType(Supervisor, type))
-		{
-			return Supervisor;
-		}
-
-		if (equalType(Interface, type))
-		{
-			return Interface;
+			AutomatonType thisOne = (AutomatonType) it.next();
+			if (equals(thisOne, type))
+			{
+				return thisOne;
+			}
 		}
 
 		return Undefined;
@@ -136,7 +125,7 @@ public class AutomatonType
 		return collection.toArray();
 	}
 
-	private static boolean equalType(AutomatonType type, String ident)
+	private static boolean equals(AutomatonType type, String ident)
 	{
 		if ((type == null) || (ident == null))
 		{

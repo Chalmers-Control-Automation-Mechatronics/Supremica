@@ -61,6 +61,8 @@ public class FileFormats
 	public static final FileFormats XML = new FileFormats(true, true, "XML", ".xml", "XML files (*.xml)");
 	public static final FileFormats SP = new FileFormats(true, true, "SP", ".sp", "Supremica Project files (*.sp)");
 	public static final FileFormats CLASS = new FileFormats(true, true, "CLASS", ".class", "Java Bytecode files (*.class)");
+	public static final FileFormats WMOD = new FileFormats(true, true, "WMOD", ".wmod", "Waters Module files (*.wmod)");
+
 
 	// Output only
 	public static final FileFormats RCP = new FileFormats(false, true, "RCP", ".rcp", "RCP files (*.rcp)");

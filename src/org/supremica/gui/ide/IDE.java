@@ -36,6 +36,9 @@ public class IDE
 		Utility.setupFrame(this, 900, 700);
 		setTitle(ideName);
 		moduleContainers = new ModuleContainers(this);
+		ModuleContainer defaultModule = createNewModuleContainer();
+		moduleContainers.add(defaultModule);
+		moduleContainers.setActive(defaultModule);
 
 		contentPanel = (JPanel)getContentPane();
 		contentLayout = new BorderLayout();
@@ -86,10 +89,23 @@ public class IDE
 
 	public void remove(ModuleContainer moduleContainer)
 	{
-		if (moduleContainers.size() >= 2)
+		ModuleContainer activeModuleContainer = getActiveModuleContainer();
+		ModuleContainer nextModuleContainer = null;
+
+		if (activeModuleContainer == moduleContainer)
 		{
-			moduleContainers.remove(moduleContainer);
+			if (moduleContainers.size() <= 1)
+			{
+				nextModuleContainer = createNewModuleContainer();
+				moduleContainers.add(nextModuleContainer);
+			}
+			else
+			{
+				nextModuleContainer = moduleContainers.getNext(moduleContainer);
+			}
 		}
+		setActive(nextModuleContainer);
+		moduleContainers.remove(moduleContainer);
 	}
 
 	public ModuleContainer getActiveModuleContainer()
@@ -102,11 +118,11 @@ public class IDE
 		ModuleContainer oldModuleContainer = getActiveModuleContainer();
 		if (moduleContainer != oldModuleContainer)
 		{
+			moduleContainers.setActive(moduleContainer);
+
 			tabPanel.remove(oldModuleContainer.getEditorPanel());
 			tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
 			tabPanel.remove(oldModuleContainer.getSimulatorPanel());
-
-			moduleContainers.setActive(moduleContainer);
 
 			tabPanel.add(moduleContainer.getEditorPanel());
 			tabPanel.add(moduleContainer.getAnalyzerPanel());

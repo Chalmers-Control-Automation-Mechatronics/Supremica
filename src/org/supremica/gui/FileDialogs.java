@@ -64,6 +64,7 @@ public class FileDialogs
 	private FileFilter spFilter = null;
 	private FileFilter vprjFilter = null;
 	private FileFilter vmodFilter = null;
+	private FileFilter wmodFilter = null;
 	private FileFilter dgrfFilter = null;
 	private FileFilter hybFilter = null;
 	private FileFilter dsxFilter = null;
@@ -461,6 +462,17 @@ public class FileDialogs
 		return vmodFilter;
 	}
 
+/*
+	private FileFilter getWMODFilter()
+	{
+		if (wmodFilter == null)
+		{
+			wmodFilter = makeFileFilter(".wmod", "Waters Module files (*.wmod)");
+		}
+
+		return wmodFilter;
+	}
+*/
 	private FileFilter getDGRFFilter()
 	{
 		if (dgrfFilter == null)
