@@ -1472,7 +1472,7 @@ public class ActionMan
 		}
 
 		// Get the default options and allow the user to change them...
-		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+		SynthesizerOptions synthesizerOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
 		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), synthesizerOptions);
 
 		synthesizerDialog.show();
@@ -1644,10 +1644,8 @@ public class ActionMan
 	// Threaded version
 	public static void automataVerify_actionPerformed(Gui gui)
 	{
-
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-
 		if (!selectedAutomata.sanityCheck(gui, 1, true, false, true))
 		{
 			return;
@@ -1656,35 +1654,13 @@ public class ActionMan
 		// Get the default options and allow the user to change them...
 		VerificationOptions verificationOptions = new VerificationOptions();
 		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), verificationOptions);
-
 		verificationDialog.show();
-
 		if (!verificationOptions.getDialogOK())
 		{
 			return;
 		}
 
-		/*
-		Automata currAutomata = new Automata();
-
-		// The automata must have initial states.
-		Iterator autIt = selectedAutomata.iterator();
-		while (autIt.hasNext())
-		{
-				Automaton currAutomaton = (Automaton) autIt.next();
-				String currAutomatonName = currAutomaton.getName();
-
-				if (!currAutomaton.hasInitialState())
-				{
-						JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-						return;
-				}
-
-				currAutomata.addAutomaton(currAutomaton);
-		}
-		*/
 		SynchronizationOptions syncOptions;
-
 		syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
 		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, syncOptions, verificationOptions);
@@ -1928,42 +1904,44 @@ public class ActionMan
 	// Automaton.Minimization action performed
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
+		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-
 		if (!selectedAutomata.sanityCheck(gui, 1))
 		{
 			return;
 		}
 
-		Iterator autIt = selectedAutomata.iterator();
+		// Get the default options and allow the user to change them...
+		MinimizationOptions options = new MinimizationOptions();
+		MinimizationDialog dialog = new MinimizationDialog(gui.getFrame(), options);
+		dialog.show();
+		if (!options.getDialogOK())
+		{
+			return;
+		}
 
+		// Iterate over automata and minimiza
+		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 
-			/* String newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
-
-			if (newAutomatonName == null)
-			{
-					return;
-			}
-			*/
 			try
 			{
 				AutomatonMinimizer autMinimizer = new AutomatonMinimizer(currAutomaton);
-				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton();
-
-				// Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(true);
-				// newAutomaton.setName(newAutomatonName);
-				newAutomaton.setComment("min(" + currAutomaton.getName() + ")");
-
-				// gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
+				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(options);
 				gui.addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomatonMinimize. Automaton: " + currAutomaton.getName(), ex);
+				logger.error("Exception in AutomatonMinimize. Automaton: " + 
+							 currAutomaton.getName() + " " + ex);
 				logger.debug(ex.getStackTrace());
+			}
+
+			if (!options.getKeepOriginal())
+			{
+				gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomaton);
 			}
 		}
 	}
@@ -2035,11 +2013,31 @@ public class ActionMan
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
+		// Sanity check
 		if (!selectedAutomata.sanityCheck(gui, 2, false, false, true))
 		{
 			return;
 		}
 
+		// Warn if there are too many "states" i.e. automata
+		int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
+		if (maxNbrOfStates < selectedAutomata.size())
+		{
+			String msg = "You have selected " + selectedAutomata.size() + " automata. It is not " + 
+				"recommended to display the modular structure for more than " + maxNbrOfStates + 
+				" automata.";
+			msg = EncodingHelper.linebreakAdjust(msg);
+
+			Object[] options = { "Continue", "Abort" };
+			int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning", 
+				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+			if(response == JOptionPane.NO_OPTION)
+			{
+				return;
+			}	
+		}
+
+		// View
 		try
 		{
 			AutomataHierarchyViewer viewer = new AutomataHierarchyViewer(selectedAutomata);
@@ -2088,7 +2086,6 @@ public class ActionMan
 	// public static void automatonAlphabet_actionPerformed(Gui gui)
 	public static void alphabetView_actionPerformed(Gui gui)
 	{
-
 		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
@@ -2109,7 +2106,6 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-
 			// logger.error("Exception in AlphabetViewer", ex);
 			logger.error("Exception in AutomataViewer: " + ex);
 			logger.debug(ex.getStackTrace());
@@ -2121,7 +2117,6 @@ public class ActionMan
 	// Automaton.View action performed
 	public static void automatonView_actionPerformed(Gui gui)
 	{
-
 		// gui.debug("ActionMan to the rescue!");
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();

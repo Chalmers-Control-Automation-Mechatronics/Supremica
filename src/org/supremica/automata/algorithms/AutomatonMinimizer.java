@@ -44,18 +44,15 @@
  *
  *  Supremica or KA shall not be liable for any damages
  *  suffered by Licensee from the use of this software.
- *
+ *going
  *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
 import java.util.*;
 import org.supremica.log.*;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.StateSet;
+import org.supremica.automata.*;
+import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.SupremicaProperties;
 
 // Factory object for generating the correct class according to prefs
@@ -74,72 +71,105 @@ class EqClassFactory
 
 public class AutomatonMinimizer
 {
-	private Automaton theAutomaton;
-
-	//private Alphabet theAlphabet;
 	private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
+
+	/** The "original" automaton (possible saturated). */
+	private Automaton theAutomaton;
+	private MinimizationOptions options;
 
 	public AutomatonMinimizer(Automaton theAutomaton)
 	{
 		this.theAutomaton = theAutomaton;
-
-		//this.theAlphabet = theAutomaton.getAlphabet();
 	}
 
-	public Automaton getMinimizedAutomaton()
+	/**
+	 * Returns minimized automaton, minimized with respect to the supplied equivalence relation
+	 */
+	public Automaton getMinimizedAutomaton(MinimizationOptions options)
 		throws Exception
 	{
+		this.options = options;
+
+		// If we're about to modify theAutomaton, make a copy first!!
+		if (options.getMinimizationType() == EquivalenceRelation.ObservationEquivalence)
+		{
+			theAutomaton = new Automaton(theAutomaton);
+		}
+		
+		// Find the initial sets of states for the minimization
+		EquivalenceClasses equivClasses = new EquivalenceClasses();
+		
+		// Divide the state space into three initial equivalence classes, based on markings
 		EquivalenceClass acceptingStates = EqClassFactory.getEqClass();
 		EquivalenceClass forbiddenStates = EqClassFactory.getEqClass();
 		EquivalenceClass rejectingStates = EqClassFactory.getEqClass();
-		Iterator stateIt = theAutomaton.stateIterator();
-
+		
+		// Examine each state for which class it fits into
+		StateIterator stateIt = theAutomaton.stateIterator();
 		while (stateIt.hasNext())
 		{
-			State currState = (State) stateIt.next();
-
+			State currState = stateIt.nextState();
+			
 			if (currState.isForbidden())
 			{
-				currState.setStateClass(forbiddenStates);    // setEquivalenceClass(forbiddenStates);
+				currState.setStateSet(forbiddenStates);
 				forbiddenStates.add(currState);
 			}
-			else if (currState.isAccepting())
+			else if (currState.isAccepting() && !options.getIgnoreMarking())
 			{
-				currState.setStateClass(acceptingStates);    // setEquivalenceClass(acceptingStates);
-				acceptingStates.add(currState);
+				currState.setStateSet(acceptingStates);
+					acceptingStates.add(currState);
 			}
 			else
 			{
-				currState.setStateClass(rejectingStates);    // setEquivalenceClass(rejectingStates);
+				currState.setStateSet(rejectingStates);
 				rejectingStates.add(currState);
 			}
 		}
-
-		EquivalenceClasses equivClasses = new EquivalenceClasses();
-
+			
+		// Put these new classes into a single object
+		// Only if there are any states in the class...
 		if (acceptingStates.size() > 0)
 		{
 			equivClasses.add(acceptingStates);
 		}
-
+		
 		if (rejectingStates.size() > 0)
 		{
 			equivClasses.add(rejectingStates);
 		}
-
+		
 		if (forbiddenStates.size() > 0)
 		{
 			equivClasses.add(forbiddenStates);
 		}
 
+		// Do the minimization, starting from these classes
+		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
 		try
 		{
-			doMinimization(equivClasses);
+			if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
+			{
+				// Minimize
+				doLanguageEquivalenceMinimization(equivClasses);
+			}
+			else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
+			{
+				// Make copy, we're going to modify things...
+				doTransitiveClosure(theAutomaton);
+				equivClasses.update();
+
+				// Now... language equivalence minimization will yield the (considering states)
+				// minimal observation equivalent automaton
+				doLanguageEquivalenceMinimization(equivClasses);
+			}
+			else
+			{
+				throw new Exception("Unknown equivalence relation");
+			}
 		}
 		catch (Exception ex)
 		{
-
-			// e.printStackTrace(System.err);
 			logger.debug(ex.getStackTrace());
 
 			throw ex;
@@ -147,65 +177,30 @@ public class AutomatonMinimizer
 
 		Automaton newAutomaton = buildAutomaton(equivClasses);
 
+		// Should we remove redundant transitions to minimize also with respect to transitions?
+		if (options.getAlsoTransitions())
+		{
+			removeRedundantTransitions(newAutomaton);
+		}
+
+		// Return the result of the minimization!
 		return newAutomaton;
 	}
 
-	// This one's not used (a call existed in ActionMan::1145, but is commented out)
-	// What is it good for?
-	public Automaton getMinimizedAutomaton(boolean sameEquivClassInitially)
-		throws Exception
-	{
-		if (sameEquivClassInitially)
-		{
-			EquivalenceClasses equivClasses = new EquivalenceClasses();
-			EquivalenceClass initialClass = new EquivalenceClass();
-			Iterator stateIt = theAutomaton.stateIterator();
-
-			while (stateIt.hasNext())
-			{
-				State currState = (State) stateIt.next();
-
-				currState.setStateClass(initialClass);    // setEquivalenceClass(initialClass);
-				initialClass.add(currState);
-			}
-
-			equivClasses.add(initialClass);
-
-			try
-			{
-				doMinimization(equivClasses);
-			}
-			catch (Exception ex)
-			{
-
-				// ex.printStackTrace(System.err);
-				logger.debug(ex.getStackTrace());
-
-				throw ex;
-			}
-
-			Automaton newAutomaton = buildAutomaton(equivClasses);
-
-			return newAutomaton;
-		}
-		else
-		{
-			return getMinimizedAutomaton();
-		}
-	}
-
+	/**
+	 * Returns the minimized automaton
+	 */
 	private Automaton buildAutomaton(EquivalenceClasses equivClasses)
 		throws Exception
 	{
 		Automaton newAutomaton = new Automaton();
 
 		newAutomaton.setType(theAutomaton.getType());
-		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet());
+		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... it works, of course, but why like this?
 
 		// Associate one state with each equivalence class
 		int currNbrOfStates = 0;
 		Iterator equivClassIt = equivClasses.iterator();
-
 		while (equivClassIt.hasNext())
 		{
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
@@ -214,40 +209,46 @@ public class AutomatonMinimizer
 
 		// Build all transitions
 		equivClassIt = equivClasses.iterator();
-
 		while (equivClassIt.hasNext())
 		{
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
 			State fromState = currEquivClass.getState(newAutomaton);
 			Iterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
-
+					
 			while (outgoingArcsIt.hasNext())
 			{
 				Arc currArc = (Arc) outgoingArcsIt.next();
 
-				// String currEventId = currArc.getEventId();
 				LabeledEvent currEvent = currArc.getEvent();
 				State oldToState = currArc.getToState();
-				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateClass();    // getEquivalenceClass();
+				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateSet(); 
 				State toState = nextEquivalenceClass.getState(newAutomaton);
 				
-				// Arc newArc = new Arc(fromState, toState, currEventId);
 				Arc newArc = new Arc(fromState, toState, currEvent);
-
-				newAutomaton.addArc(newArc);
+				
+				// If we should minimize the number of transitions, make sure a transition is never
+				// present more than once (this is performed in an ugly way below)
+				if (!(options.getAlsoTransitions() && newAutomaton.containsArc(newArc)))
+				{
+					// Add arc
+					newAutomaton.addArc(newArc);
+				}
 			}
 		}
 
 		// Give the automaton an appropriate comment
-		//if (theAutomaton.getName() != "")
 		newAutomaton.setComment("min(" + theAutomaton.getName() + ")");
 
-		//else
-		//    newAutomaton.setComment("min(" + theAutomaton.getComment() + ")");
+		// Return the new automaton!
 		return newAutomaton;
 	}
 
-	private void doMinimization(EquivalenceClasses equivClasses)
+	/**
+	 * Splits the equivalence classes with respect to language equivalence, based
+	 * on this, an automaton with a minimal number of state can be generated from
+	 * the equivalence classes!
+	 */
+	private void doLanguageEquivalenceMinimization(EquivalenceClasses equivClasses)
 	{
 		boolean refined;
 
@@ -261,13 +262,12 @@ public class AutomatonMinimizer
 			{
 				EquivalenceClass currClass = (EquivalenceClass) classIt.next();
 
-				refined = doMinimization(equivClasses, currClass) || refined;
+				refined = doLanguageEquivalenceMinimization(equivClasses, currClass) || refined;
 			}
 		}
 		while (refined);
 	}
-
-	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
+	private boolean doLanguageEquivalenceMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
 	{
 		boolean refined = false;
 
@@ -276,22 +276,19 @@ public class AutomatonMinimizer
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
 
-			refined = doMinimization(equivClasses, equivClass, currEvent) || refined;
+			refined = doLanguageEquivalenceMinimization(equivClasses, equivClass, currEvent) || refined;
 		}
 
 		return refined;
 	}
-
-	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass, LabeledEvent e)
+	private boolean doLanguageEquivalenceMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass, LabeledEvent e)
 	{
-
 		// System.err.println("A iteration in doMinimization <classes, class, event>");
 		EquivalenceClassHolder newEquivClassHolder = equivClass.split(e);
 
 		// System.err.println(newEquivClassHolder.size() + " new equivalence classes");
 		if (newEquivClassHolder.size() > 1)
 		{
-
 			// System.err.println("------------------");
 			// System.err.println("equivClasses" + equivClasses);
 			// System.err.println("newEquivClasses" + newEquivClassHolder);
@@ -322,6 +319,171 @@ public class AutomatonMinimizer
 
 			return false;
 		}
+	}
+
+	/**
+	 * Add transitions to cover for the epsilon events. More formally, each time there is a
+	 * transition "p =a=> q", after completing the transitive closure (or "saturation"), 
+	 * there is also a transition "p -a-> q".
+	 */
+	public void doTransitiveClosure(Automaton aut)
+	{
+		// For calculating the epsilon closure, we need this
+		Determinizer determinizer = new Determinizer(aut);
+		
+		// Find epsilon closure for each state, put this info in each state
+		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+
+			// Find closure, associate it with this state
+			currState.setStateSet(null); // This is unfortunately necessary!!
+			StateSet closure = determinizer.epsilonClosure(currState);
+			currState.setStateSet(closure);
+		}
+
+		// From each state add transitions that are present in its closure
+		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			StateSet closure = currState.getStateSet();
+
+			// Iterate over outgoing arcs in the closure
+			for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
+			{
+				for (ArcIterator arcIt = closureIt.nextState().safeOutgoingArcsIterator(); arcIt.hasNext(); )
+				{
+					Arc arc = arcIt.nextArc();
+					
+					// Where may we end up if we move along this transition? 
+					// Anywhere in the epsilon closure of the toState...
+					StateSet toClosure = arc.getToState().getStateSet();					
+					for (StateIterator toIt = toClosure.iterator(); toIt.hasNext(); )
+					{
+						State toState = toIt.nextState();
+					   
+						// Don't add already existing transitions
+						if (!(currState.equals(arc.getFromState()) && toState.equals(arc.getToState())))
+						{
+							Arc newArc = new Arc(currState, toState, arc.getEvent());
+							aut.addArc(newArc);
+						}
+					}
+				}
+			}
+			
+			// Add silent self-loop
+			LabeledEvent tau = new LabeledEvent("tau");
+			tau.setEpsilon(true);
+			if (!aut.getAlphabet().contains(tau))
+			{
+				aut.getAlphabet().addEvent(tau);
+			}
+			aut.addArc(new Arc(currState, currState, tau));
+		}
+	} 
+
+	/**
+	 * Algorithm inspired by "Minimizing the Number of Transitions with Respect to Observation Equivalence"
+	 * by Jaana Eloranta. 
+	 * Removes all transitions that are redundant.
+	 */
+	public void removeRedundantTransitions(Automaton aut)
+	{
+		// Are there any silent-self-loops? Remove them, they are redundant! 
+		// Note! This is not Jaana Elorantas definition of redundant transitions! 
+		// Her "redundant transitions" are removed below (which requires that all 
+		// silent self-loops have already been removed).
+		boolean hasSilentSelfloop = false;
+		// Put them in a list, remove afterwards
+		LinkedList toBeRemoved = new LinkedList();
+		for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+		{
+			Arc currArc = arcIt.nextArc();
+			
+			if (currArc.isSelfLoop() && currArc.getEvent().isEpsilon())
+			{
+				toBeRemoved.add(currArc);
+			}
+		}
+		while (toBeRemoved.size() > 0)
+		{
+			aut.removeArc((Arc) toBeRemoved.remove(0));
+		}
+		
+		// Put redundant arcs in set, remove after all have been found
+		toBeRemoved.clear();
+		loop: for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+		{
+			Arc arc = arcIt.nextArc();
+			
+			// Using Elorantas notation... (s1, s2 and s3)
+			State s1 = arc.getFromState();
+			State s2 = arc.getToState();
+
+			// Is the criteria fulfilled? (does there exist a s3 such that either
+			// (s1 -a-> a3 and s3 -tau-> s2) or (s1 -tau-> s3 and s3 -a-> s2) holds?)
+			test: for (ArcIterator outIt = s1.outgoingArcsIterator(); outIt.hasNext(); )
+			{
+				Arc firstArc = outIt.nextArc();
+				LabeledEvent firstEvent = firstArc.getEvent();
+				
+				if (firstEvent.isEpsilon() || firstEvent.equals(arc.getEvent()))
+				{
+					State s3 = firstArc.getToState();
+
+					for (ArcIterator inIt = s2.incomingArcsIterator(); inIt.hasNext(); )
+					{
+						Arc secondArc = inIt.nextArc();
+						if (s3.equals(secondArc.getFromState()))
+						{
+							LabeledEvent secondEvent = secondArc.getEvent();
+							// The order (wrt ||) in this if-clause is important!!
+							if ((secondEvent.isEpsilon() && (!firstEvent.isEpsilon() || arc.getEvent().isEpsilon())) || (secondEvent.equals(arc.getEvent()) && !firstEvent.equals(secondEvent)))
+							{
+								// Redundant!!!!
+								toBeRemoved.add(arc);
+								break test;
+							}
+						}
+					}
+				}
+			}
+		}	   
+		while (toBeRemoved.size() > 0)
+		{
+			aut.removeArc((Arc) toBeRemoved.remove(0));
+		}
+	}
+
+	/**
+	 * Splits equivClasses with respect to observation equivalence.
+	 */
+	private void doObservationEquivalenceMinimization(EquivalenceClasses equivClasses)
+	{
+		/*
+		// The same notation as in "An Implementation of an Efficient 
+		// Algorithm for Bisimulation Equivalence". 
+		EquivalenceClasses W = (EquivalenceClasses) equivClasses.clone();
+		EquivalenceClasses q = equivClasses;
+		
+		// The alphabet, used several times below
+		Alphabet A = theAutomaton.getAlphabet();
+		
+		// The main loop
+		while (W.size() != 0)
+		{
+		    // Get and remove a StateSet from W
+		    StateSet splitter = W.getFirst();
+		    W.remove((EquivalenceClass) splitter);
+		
+			// Loop over the "actions"
+			for (EventIterator evIt = A.iterator(); evIt.hasNext();)
+			{
+				LabeledEvent a = evIt.nextEvent();
+			}
+		}
+		*/
 	}
 
 	public static void main(String[] args)
@@ -380,7 +542,8 @@ public class AutomatonMinimizer
 
 		try
 		{
-			Automaton minauto = minimizer.getMinimizedAutomaton();
+			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+			Automaton minauto = minimizer.getMinimizedAutomaton(options);
 			org.supremica.automata.IO.AutomatonToDsx todsx = new org.supremica.automata.IO.AutomatonToDsx(minauto);
 
 			todsx.serialize(new java.io.PrintWriter(System.out));
@@ -397,14 +560,8 @@ public class AutomatonMinimizer
 }
 
 class EquivalenceClasses
+	extends StateSets
 {
-	private LinkedList equivClasses = new LinkedList();
-
-	public void add(EquivalenceClass equivClass)
-	{
-		equivClasses.add(equivClass);
-	}
-
 	public void addAll(EquivalenceClassHolder equivClassHolder)
 	{
 		Iterator equivIt = equivClassHolder.iterator();
@@ -414,8 +571,16 @@ class EquivalenceClasses
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivIt.next();
 
 			currEquivClass.update();
-			equivClasses.add(currEquivClass);
+			super.add(currEquivClass);
 		}
+	}
+
+	/*
+	private LinkedList equivClasses = new LinkedList();
+
+	public void add(EquivalenceClass equivClass)
+	{
+		equivClasses.add(equivClass);
 	}
 
 	public void remove(EquivalenceClass equivClass)
@@ -461,14 +626,17 @@ class EquivalenceClasses
 
 		return sb.toString();
 	}
+	*/
 }
 
 // at the moment, this is only for being able to use get/setStateClaa
 // will StateSet do most of the job correctly?
+
+// I've extended StateSet with most of these methods, but I didn't have the guts for and neither did I feel
+// for changing the above to use StateSet (and StateSets) instead...  /hguo
 class EquivalenceClass
 	extends StateSet
 {
-
 	// private LinkedList states = new LinkedList();
 	protected State newState = null;
 	private EquivalenceClass nextClass = null;
@@ -493,7 +661,7 @@ class EquivalenceClass
 		{
 			State currState = (State) stateIt.next();
 
-			currState.setStateClass(this);    // setEquivalenceClass(this);
+			currState.setStateSet(this);    // setEquivalenceClass(this);
 		}
 	}
 
@@ -620,7 +788,6 @@ class EquivalenceClass
 	 */
 	public EquivalenceClassHolder split(LabeledEvent e)
 	{
-
 		// System.err.println("Splitting " + e.getLabel());
 		EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
 
@@ -636,7 +803,7 @@ class EquivalenceClass
 
 			if (nextState != null)
 			{
-				nextEquivalenceClass = (EquivalenceClass) nextState.getStateClass();    // getEquivalenceClass();
+				nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet();    // getEquivalenceClass();
 			}
 
 			newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
@@ -698,11 +865,9 @@ class EqClass
 
 	public State getState(Automaton theAutomaton)
 	{
-
 		// State newState = super.getState();
 		if (newState == null)
 		{
-
 			// create a new state named as the concatenation of all state-names
 			StringBuffer str = new StringBuffer();
 			Iterator it = iterator();
@@ -723,7 +888,6 @@ class EqClass
 	// Should the eq-class also add itself to the state?
 	public boolean add(State state)
 	{
-
 		// System.out.println("EqClass(" + name +")::addState(" + state.getName() + ")");
 		return super.add(state);
 	}
@@ -741,7 +905,6 @@ class EquivalenceClassHolder
 {
 	public void addState(State state, EquivalenceClass nextClass)
 	{
-
 		// If the next equivalence class does not exist create it
 		if (!containsKey(nextClass))
 		{

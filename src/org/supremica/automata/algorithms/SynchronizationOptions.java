@@ -69,6 +69,9 @@ public final class SynchronizationOptions
 	private boolean rememberDisabledEvents;    // redirect disabled transitions to forbidden dump-state
 	private boolean dialogOK = false;
 
+	/**
+	 * The default options, based on earlier user preferences.
+	 */
 	public SynchronizationOptions()
 		throws IllegalArgumentException
 	{
@@ -80,13 +83,13 @@ public final class SynchronizationOptions
 			 false);    // rememberDisabledEvents
 	}
 
-	// This one's so we only have to care about "relevant" options
-	public SynchronizationOptions(SynchronizationType syncType, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
-	{
-		this(SupremicaProperties.syncNbrOfExecuters(), syncType, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), forbidUnconStates, expandForbiddenStates, expandEventsUsingPriority, buildAutomaton, verboseMode, requireConsistentControllability, requireConsistentImmediate, rememberDisabledEvents);
-	}
-
-	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
+	/**
+	 * This is not a good constructor so it is private, it is impossible to read in the code. 
+	 * Use the "getDefault..."-methods in this class instead or when they won't suit you, 
+	 * modify the necessary options one by one, starting from default! Much more readable and
+	 * also more practical when adding new options.
+	 */
+	private SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
 		throws IllegalArgumentException
 	{
 		if (syncType == null)
@@ -173,9 +176,19 @@ public final class SynchronizationOptions
 		expandForbiddenStates = set;
 	}
 	
+	public void setExpandEventsUsingPriority(boolean set)
+	{
+		expandEventsUsingPriority = set;
+	}
+
 	public boolean expandEventsUsingPriority()
 	{
 		return expandEventsUsingPriority;
+	}
+
+	public void setVerboseMode(boolean set)
+	{
+		verboseMode = set;
 	}
 
 	public boolean verboseMode()
@@ -208,7 +221,7 @@ public final class SynchronizationOptions
 		return rememberDisabledEvents;
 	}
 
-	public void rememberDisabledEvents(boolean remember)
+	public void setRememberDisabledEvents(boolean remember)
 	{
 		rememberDisabledEvents = remember;
 	}
@@ -260,8 +273,9 @@ public final class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultVerificationOptions()
 	{
-		return new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false,    // This is the only difference from default!
-										  SupremicaProperties.verboseMode(), true, true, false);
+		SynchronizationOptions options = new SynchronizationOptions();
+		options.setBuildAutomaton(false);
+		return options;
 	}
 
 	/**
@@ -269,7 +283,8 @@ public final class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultSynthesisOptions()
 	{
-		return new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), true,    // This is the only difference from default!
-										  SupremicaProperties.syncExpandForbiddenStates(), false, true, SupremicaProperties.verboseMode(), true, true, false);
+		SynchronizationOptions options = new SynchronizationOptions();
+		options.setForbidUncontrollableStates(true);
+		return options;
 	}
 }

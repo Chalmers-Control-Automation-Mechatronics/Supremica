@@ -93,9 +93,10 @@ public class Arc
 		this.fromState = from;
 		this.toState = to;
 
-		// this.eventId = eventId;
+		/* I think these should be in Automaton.java... maybe we're not actually going to add this arc, right?
 		from.addOutgoingArc(this);
 		to.addIncomingArc(this);
+		*/
 	}
 
 	public Arc(State from, State to, LabeledEvent event)
@@ -104,6 +105,11 @@ public class Arc
 		this(from, to);
 
 		this.event = event;
+	}
+
+	public LabeledEvent getEvent()
+	{
+		return event;
 	}
 
 	public void setEvent(LabeledEvent event)
@@ -121,6 +127,11 @@ public class Arc
 		this.toState = toState;
 	}
 
+	public State getFromState()
+	{
+		return fromState;
+	}
+
 	public void setFromState(State fromState)
 	{
 		this.fromState = fromState;
@@ -129,16 +140,6 @@ public class Arc
 	public String getLabel()
 	{
 		return event.getLabel();
-	}
-
-	public State getFromState()
-	{
-		return fromState;
-	}
-
-	public LabeledEvent getEvent()
-	{
-		return event;
 	}
 
 	public void reverse()
@@ -298,17 +299,28 @@ public class Arc
 		return firingAutomata;
 	}
 
+	public boolean equals(Arc obj)
+	{
+		if (obj == null)
+		{
+			return (this == null); // Hehe
+		}
+
+		Arc arc = (Arc) obj;
+		return (toState.equals(arc.getToState()) && fromState.equals(arc.getFromState()) && event.equals(arc.getEvent()));
+	}
+
 	// For debugging (etc)
 	public String toString()
 	{
 		StringBuffer sbuf = new StringBuffer();
 
 		sbuf.append("<");
-		sbuf.append(getFromState().toString());
+		sbuf.append(getFromState());
 		sbuf.append(", ");
-		sbuf.append(getEvent().toString());
+		sbuf.append(getEvent());
 		sbuf.append(", ");
-		sbuf.append(getToState().toString());
+		sbuf.append(getToState());
 		sbuf.append(">");
 
 		return sbuf.toString();

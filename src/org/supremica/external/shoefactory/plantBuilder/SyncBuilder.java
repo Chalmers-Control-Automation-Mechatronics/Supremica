@@ -66,8 +66,8 @@ public class SyncBuilder
 	public SyncBuilder(Gui g, Project thePlant)
 	{
 		gui = g;
-		synchronizationOptions = new SynchronizationOptions();
-		synthesizerOptions = new SynthesizerOptions();
+		synchronizationOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+		synthesizerOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
 
 		synthesizerOptions.setPurge(true);
 		gui.selectAll();

@@ -11,7 +11,7 @@
 package org.supremica.automata;
 
 import java.util.*;
-import org.supremica.automata.State;
+import org.supremica.automata.*;
 import org.supremica.properties.SupremicaProperties;
 
 class StateComparator
@@ -63,6 +63,9 @@ public class StateSet
 		this(ss.theSet);
 	}
 
+	/**
+	 * Find the union of the two StateSet:s s1 and s2, returning a new StateSet.
+	 */
 	public static StateSet union(StateSet s1, StateSet s2)
 	{
 		StateSet ss = new StateSet(s1);
@@ -72,6 +75,9 @@ public class StateSet
 		return ss;
 	}
 
+	/**
+	 * Intersect the two StateSet:s s1 and s2, returning a new StateSet.
+	 */
 	public static StateSet intersect(StateSet s1, StateSet s2)
 	{
 		StateSet ss = new StateSet(s1);
@@ -129,6 +135,23 @@ public class StateSet
 		return new StateIterator(theSet.iterator());
 	}
 
+	/*
+	public ArcIterator outgoingArcsIterator()
+	{
+		LinkedList arcs = new LinkedList();
+		
+		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
+		{
+			for (ArcIterator arcIt = stateIt.nextState().outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				arcs.add(arcIt.nextArc());
+			}
+		}
+		
+		return new ArcIterator(arcs.iterator());
+	}
+	*/
+
 	public boolean remove(State state)
 	{
 		return theSet.remove(state);
@@ -149,16 +172,16 @@ public class StateSet
 		return theSet.equals(s2.theSet);
 	}
 
-	public int hashCode()
-	{
-		return theSet.hashCode();
-	}
-
 	public boolean equals(Object obj)
 	{
 		StateSet states = (StateSet) obj;
 
 		return equals(states);
+	}
+
+	public int hashCode()
+	{
+		return theSet.hashCode();
 	}
 
 	public String toString()
@@ -229,7 +252,7 @@ public class StateSet
 			State state = (State) stateit.next();
 
 			buf.append(state.getName());
- 			buf.append(SupremicaProperties.getStateSeparator());    // STATE_SEPARATOR -- should be globally user definable
+ 			buf.append(SupremicaProperties.getStateSeparator());
 
 			// i |= state.isInitial();
 			d |= state.isAccepting();
@@ -254,5 +277,20 @@ public class StateSet
 		}
 
 		return newstate;
+	}
+
+	/**
+	 * Inform each individual State of which StateSet it belongs to (this one).
+	 */
+	public void update()
+	{
+		StateIterator stateIt = iterator();
+
+		while (stateIt.hasNext())
+		{
+			State currState = stateIt.nextState();
+
+			currState.setStateSet(this);
+		}
 	}
 }

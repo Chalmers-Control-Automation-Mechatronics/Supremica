@@ -119,17 +119,16 @@ class SynchButton
 	// Probably this will change the look of the graph after comparison, but what can we do?
 	void action(ActionEvent e)
 	{
-		SynchronizationOptions synch_ops = new SynchronizationOptions(SynchronizationType.Full,    // full synch
-			false,    // do *not* forbid uc-states
-			true,    // expand forbidden states (may be explicit ones)
-			false,    // expandEventsUsingPriority??
-			true,    // build entire automaton
-			false,    // no verbose mode
-			true,    // require consistent controllability
-			false,    // don't require consistent immediate
-			false    // don't redirect disabled events to dump-state
-				);
-
+		SynchronizationOptions synch_ops = SynchronizationOptions.getDefaultSynchronizationOptions();
+		synch_ops.setForbidUncontrollableStates(false);
+		synch_ops.setExpandForbiddenStates(true); // (may be explicit ones)
+		synch_ops.setExpandEventsUsingPriority(false);
+		synch_ops.setBuildAutomaton(true);
+		synch_ops.setVerboseMode(false);
+		synch_ops.setRequireConsistentControllability(true);
+		synch_ops.setRequireConsistentImmediate(false);
+		synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
+		
 		try
 		{    // wb.syncher *should* be null here - we assume this!
 			wb.syncher = new AutomataSynchronizer(wb.automata, synch_ops);
@@ -188,15 +187,15 @@ class CompareButton
 		// This should not be the case, first press the SynchButton...
 		if (wb.automaton == null)    // Then also the syncher does not exist
 		{
-			SynchronizationOptions synch_ops = new SynchronizationOptions(SynchronizationType.Full,    // full synch
-				true,    // *do* forbid uc-states
-				true,    // expand forbidden states (may be explicit ones)
-				false,    // expandEventsUsingPriority??
-				true,    // build entire automaton
-				false,    // no verbose mode
-				true,    // require consistent controllability
-				false,    // don't require consistent immediate
-				false);    // don't redirect disabled events to dump-state
+			SynchronizationOptions synch_ops = SynchronizationOptions.getDefaultSynchronizationOptions();
+			synch_ops.setForbidUncontrollableStates(true);
+			synch_ops.setExpandForbiddenStates(true); // (may be explicit ones)
+			synch_ops.setExpandEventsUsingPriority(false);
+			synch_ops.setBuildAutomaton(true);
+			synch_ops.setVerboseMode(false);
+			synch_ops.setRequireConsistentControllability(true);
+			synch_ops.setRequireConsistentImmediate(false);
+			synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
 
 			try
 			{
@@ -220,19 +219,15 @@ class CompareButton
 		}
 		else    // wb.automaton (and hence wb.syncher) exists
 		{
-			SynchronizationOptions synch_ops = new SynchronizationOptions(SynchronizationType.Full,    // full synch
-				true,    // *do* forbid uc-states
-				true,    // expand forbidden states (may be explicit ones)
-				false,    // expandEventsUsingPriority??
-
-			// false,       // do *not* build entire automaton
-			true,    // *yes* do build full, otherwise we have to fiddle with index-formats etc (a class for that would be useful)
-
-			// and in any case, the automata are (supposed to be) usefully small
-			false,    // no verbose mode
-			true,    // require consistent controllability
-			false,    // don't require consistent immediate
-			false);    // don't redirect disabled events to dump-state
+			SynchronizationOptions synch_ops = SynchronizationOptions.getDefaultSynchronizationOptions();
+			synch_ops.setForbidUncontrollableStates(true);
+			synch_ops.setExpandForbiddenStates(true); // (may be explicit ones)
+			synch_ops.setExpandEventsUsingPriority(false);
+			synch_ops.setBuildAutomaton(true);
+			synch_ops.setVerboseMode(false);
+			synch_ops.setRequireConsistentControllability(true);
+			synch_ops.setRequireConsistentImmediate(false);
+			synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
 
 			try
 			{
@@ -320,7 +315,7 @@ class ContButton
 		{
 			int num_x_states = wb.calcForbiddenStates();    // cache this value so we know the number of new ones
 			StateSet state_set = new StateSet();    // store the newly forbidden states her, want to avoid duplicates
-			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, new SynthesizerOptions());
+			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, SynthesizerOptions.getDefaultSynthesizerOptions());
 
 			// Now, for each state that is forbidden now, calc the new uncontrollable ones
 			for (Iterator it = wb.automaton.stateIterator(); it.hasNext(); )
@@ -381,7 +376,7 @@ class NonblockButton
 		try
 		{
 			int num_x_states = wb.calcForbiddenStates();    // cache this value so we know the number of new ones
-			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, new SynthesizerOptions());
+			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, SynthesizerOptions.getDefaultSynthesizerOptions());
 
 			synth.initializeAcceptingStates();
 
@@ -436,7 +431,7 @@ class ReachButton
 
 			wb.automaton.clearSelectedStates();
 
-			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, new SynthesizerOptions());
+			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, SynthesizerOptions.getDefaultSynthesizerOptions());
 
 			synth.doReachable();
 
@@ -486,7 +481,7 @@ class PurgeButton
 	{
 		try
 		{
-			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, new SynthesizerOptions());
+			AutomatonSynthesizer synth = new AutomatonSynthesizer(wb.automaton, SynthesizerOptions.getDefaultSynthesizerOptions());
 
 			synth.purge();
 			wb.showGraph();

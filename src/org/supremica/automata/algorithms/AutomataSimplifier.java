@@ -6,7 +6,6 @@ import org.supremica.automata.*;
 
 /**
  * simplify a project by removing and transforming the automata
- *
  */
 public class AutomataSimplifier
 {
@@ -21,11 +20,14 @@ public class AutomataSimplifier
 	{
 		Automata ret = new Automata();
 
+		/**
+		 * Minimize with respect to language equivalence (is this really clever?)
+		 */
 		for (AutomatonIterator it = org.iterator(); it.hasNext(); )
 		{
 			Automaton a = it.nextAutomaton();
 			AutomatonMinimizer am = new AutomatonMinimizer(a);
-			Automaton mm = am.getMinimizedAutomaton();
+			Automaton mm = am.getMinimizedAutomaton(MinimizationOptions.getDefaultMinimizationOptions());
 
 			mm.setName("SIMP:" + a.getName());
 			ret.addAutomaton(mm);

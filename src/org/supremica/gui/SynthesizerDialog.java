@@ -170,12 +170,13 @@ class SynthesizerDialogStandardPanel
 		}
 
 		Box standardBox = Box.createVerticalBox();
-
 		standardBox.add(synthesisTypeBox);
 		standardBox.add(algorithmTypeBox);
-		standardBox.add(purgeBox);
-		standardBox.add(optimizeBox);
+		Box anotherBox = Box.createVerticalBox();
+		anotherBox.add(purgeBox);
+		anotherBox.add(optimizeBox);
 		this.add(standardBox, BorderLayout.CENTER);
+		this.add(anotherBox, BorderLayout.CENTER);
 		this.add(nbNote, BorderLayout.SOUTH);
 	}
 
@@ -370,12 +371,14 @@ public class SynthesizerDialog
 
 		if (source == okButton)
 		{
-			synthesizerOptions.setDialogOK(true);
 			standardPanel.regain(synthesizerOptions);
 			advancedPanel.regain(synthesizerOptions);
 
 			if (synthesizerOptions.isValid())
 			{
+				synthesizerOptions.saveOptions();
+				synthesizerOptions.setDialogOK(true);
+
 				dialog.setVisible(false);
 				dialog.dispose();
 			}

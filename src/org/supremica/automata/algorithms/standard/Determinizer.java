@@ -84,14 +84,13 @@ public class Determinizer
 
 	public void execute()
 	{
-
 		// Clear the caches - is this necessary?
 		for (Iterator state_it = automaton.stateIterator();
 				state_it.hasNext(); )
 		{
 			State state = (State) state_it.next();
-
-			state.setStateClass(null);
+			
+			state.setStateSet(null);
 		}
 
 		logger.debug("Executing Determinizer(" + automaton.getName() + ") " + epsilonTester.showWhatYouGot());
@@ -137,14 +136,12 @@ public class Determinizer
 			// for each event not to be disregarded, calc the closure, create the arc
 			/* Alphabet */
 			Iterator it = automaton.getAlphabet().iterator();
-
 			while (it.hasNext())
 			{
 				LabeledEvent e = (LabeledEvent) it.next();
 
 				if (!epsilonTester.isThisEpsilon(e))
 				{
-
 					// From this set, via this event, calc the reached state
 					StateSet Q2 = eventClosure(Q1, e);    // this is vanNoords U
 					StateSet Q2c = epsilonClosure(Q2);
@@ -206,7 +203,8 @@ public class Determinizer
 
 	private Automaton createNewAutomaton()
 	{
-		Automaton newautomaton = new Automaton();
+		Automaton aut = new Automaton();
+		aut.setType(automaton.getType());
 
 		// Add all events except the epsilons
 		Iterator alphait = automaton.getAlphabet().iterator();
@@ -219,7 +217,7 @@ public class Determinizer
 			{
 				try    // we know it can't throw, still we have to do this
 				{
-					newautomaton.getAlphabet().addEvent(event);
+					aut.getAlphabet().addEvent(event);
 				}
 				catch (Exception excp)
 				{
@@ -229,7 +227,7 @@ public class Determinizer
 			}
 		}
 
-		return newautomaton;
+		return aut;
 	}
 
 	private void add(StateSet states)
@@ -341,18 +339,20 @@ public class Determinizer
 		return closure;
 	}
 
-	// Calc the epsilon closure for this particular state
-	private StateSet epsilonClosure(State state)
+	/**
+	 * Calc the epsilon closure for this particular state
+	 */
+	public StateSet epsilonClosure(State state)
 	{
 		debugPrint("(eCS) epsilonClosure(" + state.getName() + ")", true);
 
-		if (state.getStateClass() != null)    // if already calculated and cached, return it
+		if (state.getStateSet() != null)    // if already calculated and cached, return it
 		{
-			StateSet closure = (StateSet) state.getStateClass();
+			StateSet closure = (StateSet) state.getStateSet();
 
 			debugPrint("(eCS) return cached closure" + closure.toString() + ")", false);
 
-			return (StateSet) state.getStateClass();
+			return (StateSet) state.getStateSet();
 		}
 
 		StateSet closure = new StateSet();
@@ -382,7 +382,7 @@ public class Determinizer
 			while (prevsize != nextsize);
 		}
 
-		state.setStateClass(closure);    // cache the result
+		state.setStateSet(closure);    // cache the result
 		debugPrint("(eCS) return closure" + closure.toString() + ")", false);
 
 		return closure;
@@ -452,7 +452,7 @@ public class Determinizer
 		{
 			State state = stateit.nextState();
 
-			state.setStateClass(null);
+			state.setStateSet(null);
 		}
 	}
 
@@ -465,7 +465,7 @@ public class Determinizer
 			State state = (State) stateit.next();
 
 			// System.out.print(state.getName());
-			StateSet stateset = (StateSet) state.getStateClass();
+			StateSet stateset = (StateSet) state.getStateSet();
 
 			if (stateset != null)
 			{
@@ -476,7 +476,7 @@ public class Determinizer
 				System.out.println(": <null state class>");
 			}
 
-			state.setStateClass(null);
+			state.setStateSet(null);
 		}
 	}
 

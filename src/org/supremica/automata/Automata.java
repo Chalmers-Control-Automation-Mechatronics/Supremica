@@ -412,6 +412,8 @@ public class Automata
 	 */
 	public boolean isDeterministic()
 	{
+		boolean deterministic = true;
+
 		for (Iterator automataIterator = iterator();
 				automataIterator.hasNext(); )
 		{
@@ -419,12 +421,12 @@ public class Automata
 
 			if (!automaton.isDeterministic())
 			{
-				logger.info("Automaton " + automaton + " is not deterministic");
-				return false;
+				logger.warn("Automaton " + automaton + " is not deterministic");
+				deterministic = false;
 			}
 		}
 
-		return true;
+		return deterministic;
 	}
 
 	/**

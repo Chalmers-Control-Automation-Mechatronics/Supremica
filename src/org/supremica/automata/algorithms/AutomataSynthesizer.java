@@ -560,7 +560,7 @@ public class AutomataSynthesizer
 		// This is used when checking for observability
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
 		{
-			synchronizationOptions.rememberDisabledEvents(true);
+			synchronizationOptions.setRememberDisabledEvents(true);
 		}
 
 		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
@@ -574,7 +574,7 @@ public class AutomataSynthesizer
 		{
 
 			// Reset the synchronization type
-			synchronizationOptions.rememberDisabledEvents(orgRememberDisabledEvents);
+			synchronizationOptions.setRememberDisabledEvents(orgRememberDisabledEvents);
 		}
 
 		// We need to synthesize even if the result above is controllable

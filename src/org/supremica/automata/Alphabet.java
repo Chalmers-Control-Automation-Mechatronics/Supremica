@@ -187,12 +187,12 @@ public class Alphabet
 	{
 		if (ev == null)
 		{
-			throw new IllegalArgumentException("getEvent: event mist be non-null");
+			throw new IllegalArgumentException("getEvent: event must be non-null");
 		}
 
 		if (ev.getLabel() == null)
 		{
-			throw new IllegalArgumentException("getEvent: event label mist be non-null");
+			throw new IllegalArgumentException("getEvent: event label must be non-null");
 		}
 
 		return (LabeledEvent) theEvents.get(ev.getLabel());

@@ -139,7 +139,6 @@ public class Automaton
 
 		try
 		{
-
 			// Create all transitions
 			for (StateIterator states = orgAut.stateIterator();
 					states.hasNext(); )
@@ -236,9 +235,8 @@ public class Automaton
 	 */
 	public String getName()
 	{
-		if ((name == null) || ((getComment() != "") && (name == "")))
+		if ((name == null) || (name.equals("") && !getComment().equals("")))
 		{
-
 			// This solved some ugly problems...
 			// but this isn't all that beautiful either... /hguo
 			if (comment != null)
@@ -734,6 +732,10 @@ public class Automaton
 			throw new IllegalArgumentException("Arc must be non-null");
 		}
 
+		// Add the arc to the individual states
+		arc.getFromState().addOutgoingArc(arc);
+		arc.getToState().addIncomingArc(arc);
+
 		arc.getListeners().addListener(this);
 		theArcs.addArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
@@ -747,10 +749,27 @@ public class Automaton
 			throw new IllegalArgumentException("Arc must be non-null");
 		}
 
-		theArcs.removeArc(arc);
 		arc.clear();
+		theArcs.removeArc(arc);
 		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
+	
+	/*
+	public void removeArcs(ArcSet arcSet)
+	{
+		try
+		{
+			for (ArcIterator arcIt = arcSet.iterator(); arcIt.hasNext(); )
+			{
+				removeArc(arcIt.nextArc());
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error in Automaton.java when removing arcs.");
+		}
+	}
+	*/
 
 	public boolean containsState(State state)
 		throws IllegalArgumentException
@@ -763,7 +782,6 @@ public class Automaton
 		return idStateMap.containsKey(state.getId());
 	}
 
-	// Is this getter good design?
 	public StateSet getStateSet()
 	{
 		return theStates;
@@ -1170,6 +1188,11 @@ public class Automaton
 		return (new ArcSet(theArcs)).iterator();
 	}
 
+	public boolean containsArc(Arc arc)
+	{
+		return theArcs.containsArc(arc);
+	}
+
 	public EventIterator outgoingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.outgoingArcsIterator();
@@ -1235,14 +1258,6 @@ public class Automaton
 
 			currDependencies.removeAutomaton(currAutomaton);
 		}
-	}
-
-	/**
-	 *@return  Description of the Return Value
-	 */
-	public Iterator groupedArcIterator()
-	{
-		return null;
 	}
 
 	public EventIterator eventIterator()
@@ -1857,7 +1872,7 @@ public class Automaton
 
 			return false;
 		}
-
+		
 		// The following stuff seems useful to consider
 		if (hasAcceptingState() != other.hasAcceptingState())
 		{

@@ -116,7 +116,7 @@ class SynchronizationDialogStandardPanel
 	{
 		synchronizationOptions.setForbidUncontrollableStates(forbidUnconStatesBox.isSelected());
 		synchronizationOptions.setExpandForbiddenStates(expandForbiddenStatesBox.isSelected());
-		synchronizationOptions.rememberDisabledEvents(rememberDisabledEventsBox.isSelected());
+		synchronizationOptions.setRememberDisabledEvents(rememberDisabledEventsBox.isSelected());
 		synchronizationOptions.setBuildAutomaton(buildAutomatonBox.isSelected());
 	}
 
@@ -242,9 +242,9 @@ public class SynchronizationDialog
 
 		if (source == okButton)
 		{
-			synchronizationOptions.setDialogOK(true);
 			standardPanel.regain(synchronizationOptions);
 			advancedPanel.regain(synchronizationOptions);
+			synchronizationOptions.setDialogOK(true);
 
 			if (synchronizationOptions.isValid())
 			{

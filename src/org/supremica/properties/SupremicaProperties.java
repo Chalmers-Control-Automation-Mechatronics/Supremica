@@ -55,6 +55,7 @@ import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
+import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.util.BDD.Options;
 
 /**
@@ -145,7 +146,13 @@ public final class SupremicaProperties
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = "synthesisMaximallyPermissiveIncremental";
 	private static final String SYNTHESIS_REDUCE_SUPERVISORS = "synthesisReduceSupervisors";
-	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
+	private static final String GENERAL_USE_SECURITY = "generalUseSecurity";
+
+	// Minimization Options
+	private static final String MINIMIZATION_EQUIVALENCE_RELATION = "minimizationEquivalenceRelation";
+	private static final String MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = "minimizationAlsoMinimizaTransitions";
+	private static final String MINIMIZATION_KEEP_ORIGINAL = "minimizationKeepOriginal";
+	private static final String MINIMIZATION_IGNORE_MARKING = "minimizationIgnoreMarking";
 
 	// BDD Options. note that these mirror the stuff in org.supremica.util.BDD.Options
 	private static final String BDD_SHOW_GROW = "bddShowGrowth";
@@ -294,10 +301,15 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL, "true", true);
 		setProperty(SYNTHESIS_REDUCE_SUPERVISORS, "false", true);
+		// Minimization
+		setProperty(MINIMIZATION_EQUIVALENCE_RELATION, EquivalenceRelation.LanguageEquivalence.toString(), true);
+		setProperty(MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS, "true", true);
+		setProperty(MINIMIZATION_KEEP_ORIGINAL, "true", true);
+		setProperty(MINIMIZATION_IGNORE_MARKING, "false", true);
 		// Simulation stuff
 		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
-		// The rest (move to where it belongs!!!)
+		// The rest (move to where it belongs if you know where that is!!!)
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(INCLUDE_ANIMATOR, "false", true);
 		setProperty(INCLUDE_USERINTERFACE, "false", true);
@@ -904,187 +916,150 @@ public final class SupremicaProperties
 	{
 		return wp.getProperty(GENERAL_STATE_SEPARATOR);
 	}
-
 	public static void setStateSeparator(String command)
 	{
 		wp.setProperty(GENERAL_STATE_SEPARATOR, command);
 	}
-
 	public static String getDotExecuteCommand()
 	{
 		return wp.getProperty(DOT_EXECUTE_COMMAND);
 	}
-
 	public static void setDotExecuteCommand(String command)
 	{
 		wp.setProperty(DOT_EXECUTE_COMMAND, command);
 	}
-
 	public static int getDotMaxNbrOfStatesWithoutWarning()
 	{
 		return toInt(wp.getProperty(DOT_MAX_NBR_OF_STATES));
 	}
-
 	public static void setDotMaxNbrOfStatesWithoutWarning(int maxNbrOfStates)
 	{
 		wp.setProperty(DOT_MAX_NBR_OF_STATES, toString(maxNbrOfStates));
 	}
-
 	public static boolean isDotLeftToRight()
 	{
 		return toBoolean(wp.getProperty(DOT_LEFT_TO_RIGHT));
 	}
-
 	public static void setDotLeftToRight(boolean leftToRight)
 	{
 		wp.setProperty(DOT_LEFT_TO_RIGHT, toString(leftToRight));
 	}
-
 	public static boolean isDotWithStateLabels()
 	{
 		return toBoolean(wp.getProperty(DOT_WITH_STATE_LABELS));
 	}
-
 	public static void setDotWithStateLabels(boolean withStateLabels)
 	{
 		wp.setProperty(DOT_WITH_STATE_LABELS, toString(withStateLabels));
 	}
-
 	public static boolean isDotWithEventLabels()
 	{
 		return toBoolean(wp.getProperty(DOT_WITH_EVENT_LABELS));
 	}
-
 	public static void setDotWithEventLabels(boolean withEventLabels)
 	{
 		wp.setProperty(DOT_WITH_EVENT_LABELS, toString(withEventLabels));
 	}
-
 	public static boolean isDotWithCircles()
 	{
 		return toBoolean(wp.getProperty(DOT_WITH_CIRCLES));
 	}
-
 	public static void setDotWithCircles(boolean withCircles)
 	{
 		wp.setProperty(DOT_WITH_CIRCLES, toString(withCircles));
 	}
-
 	public static boolean isDotUseArcColors()
 	{
 		return toBoolean(wp.getProperty(DOT_USE_ARC_COLORS));
 	}
-
 	public static void setDotUseArcColors(boolean useArcColors)
 	{
 		wp.setProperty(DOT_USE_ARC_COLORS, toString(useArcColors));
 	}
-
 	public static boolean isDotUseStateColors()
 	{
 		return toBoolean(wp.getProperty(DOT_USE_STATE_COLORS));
 	}
-
 	public static void setDotUseStateColors(boolean useStateColors)
 	{
 		wp.setProperty(DOT_USE_STATE_COLORS, toString(useStateColors));
 	}
-
 	public static boolean isDotUseMultipleLabels()
 	{
 		return toBoolean(wp.getProperty(DOT_USE_MULTI_LABELS));
 	}
-
 	public static void setDotUseMultipleLabels(boolean useMultiLabels)
 	{
 		wp.setProperty(DOT_USE_MULTI_LABELS, toString(useMultiLabels));
 	}
-
 	public static boolean isDotAutomaticUpdate()
 	{
 		return toBoolean(wp.getProperty(DOT_AUTOMATIC_UPDATE));
 	}
-
 	public static void setDotAutomaticUpdate(boolean automaticUpdate)
 	{
 		wp.setProperty(DOT_AUTOMATIC_UPDATE, toString(automaticUpdate));
 	}
-
 	public static boolean includeEditor()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_EDITOR));
 	}
-
 	public static boolean includeExperimentalAlgorithms()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS));
 	}
-
 	public static boolean includeSoftPLC()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_SOFTPLC));
 	}
-
 	public static boolean includeCellEditor()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_CELLEDITOR));
 	}
-
 	public static boolean includeShoeFactory()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_SHOE_FACTORY));
 	}
-
 	public static boolean includeJGrafchart()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_JGRAFCHART));
 	}
-
 	public static boolean includeBoundedUnconTools()
 	{
 		return toBoolean(wp.getProperty(INCLUDE_BOUNDED_UNCON_TOOLS));
 	}
-
 	public static boolean verboseMode()
 	{
 		return toBoolean(wp.getProperty(VERBOSE_MODE));
 	}
-
 	public static void setVerboseMode(boolean mode)
 	{
 		wp.setProperty(VERBOSE_MODE, toString(mode));
 	}
-
 	public static String getSuperuserIdentity()
 	{
 		return wp.getProperty(SUPERUSER_IDENTITY);
 	}
-
 	public static boolean allowSuperUserLogin()
 	{
 		return toBoolean(wp.getProperty(ALLOW_SUPERUSER_LOGIN));
 	}
-
 	public static void setAllowSuperUserLogin(boolean mode)
 	{
 		wp.setProperty(ALLOW_SUPERUSER_LOGIN, toString(mode));
 	}
-
 	public static boolean logToConsole()
 	{
 		return toBoolean(wp.getProperty(LOG_TO_CONSOLE));
 	}
-
 	public static void setLogToConsole(boolean mode)
 	{
 		wp.setProperty(LOG_TO_CONSOLE, toString(mode));
 	}
-
 	public static boolean logToGUI()
 	{
 		return toBoolean(wp.getProperty(LOG_TO_GUI));
 	}
-
 	public static void setLogToGUI(boolean mode)
 	{
 		wp.setProperty(LOG_TO_GUI, toString(mode));
@@ -1095,47 +1070,38 @@ public final class SupremicaProperties
 	{
 		return toBoolean(wp.getProperty(SYNC_FORBID_UNCON_STATES));
 	}
-
 	public static void setSyncForbidUncontrollableStates(boolean forbid)
 	{
 		wp.setProperty(SYNC_FORBID_UNCON_STATES, toString(forbid));
 	}
-
 	public static boolean syncExpandForbiddenStates()
 	{
 		return toBoolean(wp.getProperty(SYNC_EXPAND_FORBIDDEN_STATES));
 	}
-
 	public static void setSyncExpandForbiddenStates(boolean expand)
 	{
 		wp.setProperty(SYNC_EXPAND_FORBIDDEN_STATES, toString(expand));
 	}
-
 	public static int syncInitialHashtableSize()
 	{
 		return toInt(wp.getProperty(SYNC_INITIAL_HASHTABLE_SIZE));
 	}
-
 	public static void setSyncInitialHashtableSize(int size)
 	{
 		wp.setProperty(SYNC_INITIAL_HASHTABLE_SIZE, toString(size));
 	}
-
 	public static boolean syncExpandHashtable()
 	{
 		return toBoolean(wp.getProperty(SYNC_EXPAND_HASHTABLE));
 	}
-
 	public static void setSyncExpandHashtable(boolean expand)
 	{
 		wp.setProperty(SYNC_EXPAND_HASHTABLE, toString(expand));
 	}
-
 	public static int syncNbrOfExecuters()
 	{
 		return toInt(wp.getProperty(SYNC_NBR_OF_EXECUTERS));
 	}
-
 	public static void setSyncNbrOfExecuters(int nbrOfExecuters)
 	{
 		wp.setProperty(SYNC_NBR_OF_EXECUTERS, toString(nbrOfExecuters));
@@ -1148,73 +1114,60 @@ public final class SupremicaProperties
 
 		//return toInt(wp.getProperty(VERIFY_VERIFICATION_TYPE));
 	}
-
 	public static void setVerifyVerificationType(VerificationType type)
 	{
 		wp.setProperty(VERIFY_VERIFICATION_TYPE, type.toString());
 
 		// wp.setProperty(VERIFY_VERIFICATION_TYPE, toString(type));
 	}
-
 	public static VerificationAlgorithm verifyAlgorithmType()
 	{
 		return VerificationAlgorithm.toAlgorithm(wp.getProperty(VERIFY_ALGORITHM_TYPE));
 
 		//return toInt(wp.getProperty(VERIFY_ALGORITHM_TYPE));
 	}
-
 	public static void setVerifyAlgorithmType(VerificationAlgorithm type)
 	{
 		wp.setProperty(VERIFY_ALGORITHM_TYPE, type.toString());
 
 		// wp.setProperty(VERIFY_ALGORITHM_TYPE, toString(type));
 	}
-
 	public static int verifyExclusionStateLimit()
 	{
 		return toInt(wp.getProperty(VERIFY_EXCLUSION_STATE_LIMIT));
 	}
-
 	public static void setVerifyExclusionStateLimit(int limit)
 	{
 		wp.setProperty(VERIFY_EXCLUSION_STATE_LIMIT, toString(limit));
 	}
-
 	public static int verifyReachabilityStateLimit()
 	{
 		return toInt(wp.getProperty(VERIFY_REACHABILITY_STATE_LIMIT));
 	}
-
 	public static void setVerifyReachabilityStateLimit(int limit)
 	{
 		wp.setProperty(VERIFY_REACHABILITY_STATE_LIMIT, toString(limit));
 	}
-
 	public static boolean verifyOneEventAtATime()
 	{
 		return toBoolean(wp.getProperty(VERIFY_ONE_EVENT_AT_A_TIME));
 	}
-
 	public static void setVerifyOneEventAtATime(boolean bool)
 	{
 		wp.setProperty(VERIFY_ONE_EVENT_AT_A_TIME, toString(bool));
 	}
-
 	public static boolean verifySkipUncontrollabilityCheck()
 	{
 		return toBoolean(wp.getProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK));
 	}
-
 	public static void setVerifySkipUncontrollabilityCheck(boolean bool)
 	{
 		wp.setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, toString(bool));
 	}
-
 	public static int verifyNbrOfAttempts()
 	{
 		return toInt(wp.getProperty(VERIFY_NBR_OF_ATTEMPTS));
 	}
-
 	public static void setVerifyNbrOfAttempts(int nbr)
 	{
 		wp.setProperty(VERIFY_NBR_OF_ATTEMPTS, toString(nbr));
@@ -1225,120 +1178,91 @@ public final class SupremicaProperties
 	{
 		return SynthesisType.toType(wp.getProperty(SYNTHESIS_SYNTHESIS_TYPE));
 	}
-
 	public static void setSynthesisSynthesisType(SynthesisType type)
 	{
 		wp.setProperty(SYNTHESIS_SYNTHESIS_TYPE, type.toString());
 	}
-
 	public static SynthesisAlgorithm synthesisAlgorithmType()
 	{
 		return SynthesisAlgorithm.toAlgorithm(wp.getProperty(SYNTHESIS_ALGORITHM_TYPE));
 	}
-
 	public static void setSynthesisAlgorithmType(SynthesisAlgorithm type)
 	{
 		wp.setProperty(SYNTHESIS_ALGORITHM_TYPE, type.toString());
 	}
-
 	public static boolean synthesisPurge()
 	{
 		return toBoolean(wp.getProperty(SYNTHESIS_PURGE));
 	}
-
 	public static void setSynthesisPurge(boolean purge)
 	{
 		wp.setProperty(SYNTHESIS_PURGE, toString(purge));
 	}
-
 	public static boolean synthesisOptimize()
 	{
 		return toBoolean(wp.getProperty(SYNTHESIS_OPTIMIZE));
 	}
-
 	public static void setSynthesisOptimize(boolean bool)
 	{
 		wp.setProperty(SYNTHESIS_OPTIMIZE, toString(bool));
 	}
-
 	public static boolean synthesisMaximallyPermissive()
 	{
 		return toBoolean(wp.getProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE));
 	}
-
 	public static void setSynthesisMaximallyPermissive(boolean bool)
 	{
 		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, toString(bool));
 	}
-
 	public static boolean synthesisMaximallyPermissiveIncremental()
 	{
 		return toBoolean(wp.getProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL));
 	}
-
 	public static void setSynthesisMaximallyPermissiveIncremental(boolean bool)
 	{
 		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL, toString(bool));
 	}
-
 	public static boolean synthesisReduceSupervisors()
 	{
 		return toBoolean(wp.getProperty(SYNTHESIS_REDUCE_SUPERVISORS));
 	}
-
 	public static void setSynthesisReduceSupervisors(boolean bool)
 	{
 		wp.setProperty(SYNTHESIS_REDUCE_SUPERVISORS, toString(bool));
 	}
 
-	public static boolean generalUseSecurity()
+	// Minimization
+	public static EquivalenceRelation minimizationMinimizationType()
 	{
-		return toBoolean(wp.getProperty(GENERAL_USE_SECURITY));
+		return EquivalenceRelation.toType(wp.getProperty(MINIMIZATION_EQUIVALENCE_RELATION));
 	}
-
-	public static void setUseSecurity(boolean useSecurity)
+	public static void setMinimizationMinimizationType(EquivalenceRelation type)
 	{
-		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
+		wp.setProperty(MINIMIZATION_EQUIVALENCE_RELATION, type.toString());
 	}
-
-	public static boolean includeAnimator()
+	public static boolean minimizationAlsoTransitions()
 	{
-		return toBoolean(wp.getProperty(INCLUDE_ANIMATOR));
+		return toBoolean(wp.getProperty(MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS));
 	}
-
-	public static void setIncludeAnimator(boolean includeAnimator)
+	public static void setMinimizationAlsoTransitions(boolean bool)
 	{
-		wp.setProperty(INCLUDE_ANIMATOR, toString(includeAnimator));
+		wp.setProperty(MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS, toString(bool));
 	}
-
-	public static boolean includeUserInterface()
+	public static boolean minimizationKeepOriginal()
 	{
-		return toBoolean(wp.getProperty(INCLUDE_USERINTERFACE));
+		return toBoolean(wp.getProperty(MINIMIZATION_KEEP_ORIGINAL));
 	}
-
-	public static void setIncludeUserInterface(boolean includeUserInterface)
+	public static void setMinimizationKeepOriginal(boolean bool)
 	{
-		wp.setProperty(INCLUDE_USERINTERFACE, toString(includeUserInterface));
+		wp.setProperty(MINIMIZATION_KEEP_ORIGINAL, toString(bool));
 	}
-
-	public static int getSoftplcCycleTime()
+	public static boolean minimizationIgnoreMarking()
 	{
-		return toInt(wp.getProperty(SOFTPLC_CYCLE_TIME));
+		return toBoolean(wp.getProperty(MINIMIZATION_IGNORE_MARKING));
 	}
-
-	public static void setSoftplcCycleTime(int cycleTime)
+	public static void setMinimizationIgnoreMarking(boolean bool)
 	{
-		wp.setProperty(SOFTPLC_CYCLE_TIME, toString(cycleTime));
-	}
-
-	public static Vector getSoftplcInterfaces()
-	{
-		return softplcInterfaces;
-	}
-
-	public static void setSoftplcInterfaces(Vector interfaces)
-	{
-		softplcInterfaces = interfaces;
+		wp.setProperty(MINIMIZATION_IGNORE_MARKING, toString(bool));
 	}
 
 	// Simulation
@@ -1346,20 +1270,59 @@ public final class SupremicaProperties
 	{
 		return toBoolean(wp.getProperty(SIMULATION_IS_EXTERNAL));
 	}
-
 	public static void setSimulationIsExternal(boolean a)
 	{
 		wp.setProperty(SIMULATION_IS_EXTERNAL, toString(a));
 	}
-
 	public static int getSimulationCycleTime()
 	{
 		return toInt(wp.getProperty(SIMULATION_CYCLE_TIME));
 	}
-
 	public static void setSimulationCycleTime(int a)
 	{
 		wp.setProperty(SIMULATION_CYCLE_TIME, toString(a));
+	}
+
+	// Other (I think)
+	public static boolean generalUseSecurity()
+	{
+		return toBoolean(wp.getProperty(GENERAL_USE_SECURITY));
+	}
+	public static void setUseSecurity(boolean useSecurity)
+	{
+		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
+	}
+	public static boolean includeAnimator()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_ANIMATOR));
+	}
+	public static void setIncludeAnimator(boolean includeAnimator)
+	{
+		wp.setProperty(INCLUDE_ANIMATOR, toString(includeAnimator));
+	}
+	public static boolean includeUserInterface()
+	{
+		return toBoolean(wp.getProperty(INCLUDE_USERINTERFACE));
+	}
+	public static void setIncludeUserInterface(boolean includeUserInterface)
+	{
+		wp.setProperty(INCLUDE_USERINTERFACE, toString(includeUserInterface));
+	}
+	public static int getSoftplcCycleTime()
+	{
+		return toInt(wp.getProperty(SOFTPLC_CYCLE_TIME));
+	}
+	public static void setSoftplcCycleTime(int cycleTime)
+	{
+		wp.setProperty(SOFTPLC_CYCLE_TIME, toString(cycleTime));
+	}
+	public static Vector getSoftplcInterfaces()
+	{
+		return softplcInterfaces;
+	}
+	public static void setSoftplcInterfaces(Vector interfaces)
+	{
+		softplcInterfaces = interfaces;
 	}
 
 	// BDD

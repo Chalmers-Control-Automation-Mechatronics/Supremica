@@ -83,8 +83,12 @@ public class AutomataExplorer
 	{
 		this.theAutomata = theAutomata;
 
-		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, SupremicaProperties.verboseMode(), false, true, false);
+		// Generate options from defaule
+		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+		syncOptions.setBuildAutomaton(false);
+		syncOptions.setRequireConsistentControllability(false);
 
+		// Get helper
 		helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
 		// Build the initial state

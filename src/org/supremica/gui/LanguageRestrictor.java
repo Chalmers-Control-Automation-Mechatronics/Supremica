@@ -322,7 +322,6 @@ class RestrictEventsViewerPanel
 
 	public void eraseThese()
 	{
-
 		// automaton.setName("Erase These Events");
 		root.setUserObject("Erase These Events");
 
@@ -333,7 +332,6 @@ class RestrictEventsViewerPanel
 
 	public void keepThese()
 	{
-
 		// automaton.setName("Keep These Events");
 		root.setUserObject("Keep These Events");
 
@@ -641,7 +639,6 @@ class LanguageRestrictorDialog
 
 	private void doRestrict()
 	{
-
 		// Get the restriction alphabet
 		Alphabet alpha = restrictEvents.getAlphabet();
 		Automata newautomata = new Automata();

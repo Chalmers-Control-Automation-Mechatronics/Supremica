@@ -242,7 +242,7 @@ public class AutomatonSplit
 		AutomatonMinimizer minimizer = new AutomatonMinimizer(deterministic);
 
 		// Set comment and return
-		Automaton result = minimizer.getMinimizedAutomaton();
+		Automaton result = minimizer.getMinimizedAutomaton(MinimizationOptions.getDefaultMinimizationOptions());
 
 		result.setName(null);
 		result.setComment(automaton + "\\" + restrictAlphabet);
@@ -285,7 +285,7 @@ public class AutomatonSplit
 
 		// Minimize
 		AutomatonMinimizer minimizer = new AutomatonMinimizer(deterministic);
-		Automaton result = minimizer.getMinimizedAutomaton();
+		Automaton result = minimizer.getMinimizedAutomaton(MinimizationOptions.getDefaultMinimizationOptions());
 
 		return result;
 	}

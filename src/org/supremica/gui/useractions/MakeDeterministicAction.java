@@ -38,7 +38,6 @@ public class MakeDeterministicAction
 		// Iterate over all automata
 		for (Iterator autit = automata.iterator(); autit.hasNext(); )
 		{
-
 			// Determinize this automaton!
 			Automaton automaton = (Automaton) autit.next();
 
@@ -50,7 +49,6 @@ public class MakeDeterministicAction
 		{
 			try
 			{
-
 				// Add automaton to gui
 				ActionMan.gui.addAutomata(newautomata);
 
@@ -72,7 +70,6 @@ public class MakeDeterministicAction
 	// more non-detm
 	private void determinize(Automaton automaton)
 	{
-
 		// automaton.beginTransaction();
 		boolean doit = false;
 
@@ -106,7 +103,7 @@ public class MakeDeterministicAction
 	}
 
 	// Note the brilliant ingenuity here! We manage this with but a single pass!
-	// And the idea is that we need only to epsilonize n-1 transitions of n nondterministic 
+	// And the idea is that we need only to epsilonize n-1 transitions of n nondeterministic 
 	// ones.
 	// The first we see we leave as it is, the others (with same label) we epsilonize
 	// Brilliant!

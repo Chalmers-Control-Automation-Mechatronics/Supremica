@@ -98,8 +98,8 @@ class MainPopupMenu
 		// ** This has to be reworked ** Use the Action concept instead **
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
-		JMenuItem minimizeItem = new JMenuItem("Minimize");
-		minimizeItem.setToolTipText("Minimize with respect to language equivalence");
+		JMenuItem minimizeItem = new JMenuItem("Minimize...");
+		minimizeItem.setToolTipText("Minimize automata");
 		menuHandler.add(minimizeItem, 1);
 
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");

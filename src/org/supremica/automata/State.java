@@ -78,7 +78,7 @@ public class State
 	private State assocState = null;
 
 	// private Object equivClass = null;
-	private StateSet stateClass = null;    //
+	private StateSet stateSet = null;    //
 	private int x = UNDEF_POS;
 	private int y = UNDEF_POS;
 	private int radius = 9;
@@ -146,7 +146,7 @@ public class State
 		cost = otherState.cost;
 
 		// equivClass = otherState.equivClass;
-		stateClass = otherState.stateClass;
+		stateSet = otherState.stateSet;
 		visited = otherState.visited;
 		x = otherState.x;
 		y = otherState.y;
@@ -459,12 +459,9 @@ public class State
 
 		if (theArcSet == null)
 		{
-
 			// Did not find an arcset - generate one.
 			State fromState = theArc.getToState();
-
 			theArcSet = new ArcSet(theArc.getFromState(), theArc.getToState());
-
 			outgoingArcSets.add(theArcSet);
 		}
 
@@ -479,10 +476,12 @@ public class State
 	public void removeOutgoingArc(Arc theArc)
 	{
 		outgoingArcs.remove(theArc);
-
+		
+		// Also empty the arcset
 		ArcSet theArcSet = getArcSet(theArc);
-
-		if (theArcSet != null)
+		theArcSet.removeArc(theArc);
+		// Remove it if it is empty!
+		if (theArcSet.size() == 0)
 		{
 			outgoingArcSets.remove(theArcSet);
 		}
@@ -620,16 +619,22 @@ public class State
 		return cost;
 	}
 
-	public void setStateClass(StateSet stateClass)    // setEquivalenceClass(Object equivClass)
+	/**
+	 * Method used by e.g. AutomatonMinimizer for faster lookup of which equivalence class
+	 * a state belongs to.
+	 */
+	public void setStateSet(StateSet stateSet)    // setEquivalenceClass(Object equivClass)
 	{
-
 		// this.equivClass = equivClass;
-		this.stateClass = stateClass;
+		this.stateSet = stateSet;
 	}
-
-	public StateSet getStateClass()    // Object getEquivalenceClass()
+	/**
+	 * Method used by e.g. AutomatonMinimizer for faster lookup of which equivalence class
+	 * a state belongs to.
+	 */
+	public StateSet getStateSet()    // Object getEquivalenceClass()
 	{
-		return stateClass;    // equivClass;
+		return stateSet;    // equivClass;
 	}
 
 	public void setVisited(boolean visited)

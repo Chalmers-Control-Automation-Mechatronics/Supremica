@@ -62,12 +62,21 @@ public final class VerificationOptions
 	private boolean skipUncontrollabilityCheck;
 	private int nbrOfAttempts;
 
+	/**
+	 * The default options, based on earlier user preferences.
+	 */
 	public VerificationOptions()
 	{
 		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck(), SupremicaProperties.verifyNbrOfAttempts());
 	}
 
-	public VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts)
+	/**
+	 * This is not a good constructor so it is private, it is impossible to read in the code. 
+	 * Use the "getDefault..."-methods in this class instead or when they won't suit you, 
+	 * modify the necessary options one by one, starting from default! Much more readable and
+	 * also more practical when adding new options.
+	 */
+	private VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts)
 	{
 		this.verificationType = verificationType;
 		this.algorithmType = algorithmType;
@@ -91,8 +100,6 @@ public final class VerificationOptions
 	public void setVerificationType(VerificationType type)
 	{
 		verificationType = type;
-
-		SupremicaProperties.setVerifyVerificationType(type);
 	}
 
 	public VerificationType getVerificationType()
@@ -103,8 +110,6 @@ public final class VerificationOptions
 	public void setAlgorithmType(VerificationAlgorithm algorithm)
 	{
 		algorithmType = algorithm;
-
-		SupremicaProperties.setVerifyAlgorithmType(algorithm);
 	}
 
 	public VerificationAlgorithm getAlgorithmType()
@@ -115,8 +120,6 @@ public final class VerificationOptions
 	public void setExclusionStateLimit(int limit)
 	{
 		exclusionStateLimit = limit;
-
-		SupremicaProperties.setVerifyExclusionStateLimit(limit);
 	}
 
 	public int getExclusionStateLimit()
@@ -127,8 +130,6 @@ public final class VerificationOptions
 	public void setReachabilityStateLimit(int limit)
 	{
 		reachabilityStateLimit = limit;
-
-		SupremicaProperties.setVerifyReachabilityStateLimit(limit);
 	}
 
 	public int getReachabilityStateLimit()
@@ -139,8 +140,6 @@ public final class VerificationOptions
 	public void setOneEventAtATime(boolean bool)
 	{
 		oneEventAtATime = bool;
-
-		SupremicaProperties.setVerifyOneEventAtATime(bool);
 	}
 
 	public boolean getOneEventAtATime()
@@ -151,8 +150,6 @@ public final class VerificationOptions
 	public void setSkipUncontrollabilityCheck(boolean bool)
 	{
 		skipUncontrollabilityCheck = bool;
-
-		SupremicaProperties.setVerifySkipUncontrollabilityCheck(bool);
 	}
 
 	public boolean getSkipUncontrollabilityCheck()
@@ -163,8 +160,6 @@ public final class VerificationOptions
 	public void setNbrOfAttempts(int nbr)
 	{
 		nbrOfAttempts = nbr;
-
-		SupremicaProperties.setVerifyNbrOfAttempts(nbr);
 	}
 
 	public int getNbrOfAttempts()
@@ -173,12 +168,17 @@ public final class VerificationOptions
 	}
 
 	/**
-	 * Returns the default options for verification. This is the same as
-	 * in the default constructor in this class.
+	 * Stores the current set of options in SupremicaProperties.
 	 */
-	public static VerificationOptions getDefaultVerificationOptions()
+	public void saveOptions()
 	{
-		return new VerificationOptions();
+		SupremicaProperties.setVerifyVerificationType(verificationType);
+		SupremicaProperties.setVerifyAlgorithmType(algorithmType);
+		SupremicaProperties.setVerifyExclusionStateLimit(exclusionStateLimit);
+		SupremicaProperties.setVerifyReachabilityStateLimit(reachabilityStateLimit);
+		SupremicaProperties.setVerifyOneEventAtATime(oneEventAtATime);
+		SupremicaProperties.setVerifySkipUncontrollabilityCheck(skipUncontrollabilityCheck);
+		SupremicaProperties.setVerifyNbrOfAttempts(nbrOfAttempts);
 	}
 
 	/**
@@ -186,7 +186,10 @@ public final class VerificationOptions
 	 */
 	public static VerificationOptions getDefaultControllabilityOptions()
 	{
-		return new VerificationOptions(VerificationType.Controllability, VerificationAlgorithm.Modular, SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck(), SupremicaProperties.verifyNbrOfAttempts());
+		VerificationOptions options = new VerificationOptions();
+		options.setVerificationType(VerificationType.Controllability);
+		options.setAlgorithmType(VerificationAlgorithm.Modular);
+		return options;
 	}
 
 	/**
@@ -194,6 +197,9 @@ public final class VerificationOptions
 	 */
 	public static VerificationOptions getDefaultLanguageInclusionOptions()
 	{
-		return new VerificationOptions(VerificationType.LanguageInclusion, VerificationAlgorithm.Modular, SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck(), SupremicaProperties.verifyNbrOfAttempts());
+		VerificationOptions options = new VerificationOptions();
+		options.setVerificationType(VerificationType.LanguageInclusion);
+		options.setAlgorithmType(VerificationAlgorithm.Modular);
+		return options;
 	}
 }

@@ -330,12 +330,13 @@ public class VisualProject
 		Automaton automaton = getAutomaton(automatonName);
 		if(automaton == null)
 		{
-			throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");		
+			throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");
 		}
 		
 		if (existsAutomatonViewer(automaton)) 
 		{
-			if(showAutomatonViewer(automaton))
+			// Check with the user that its ok to display the automaton
+			if (showAutomatonViewer(automaton))
 			{
 				AutomatonViewer viewer = returnAutomatonViewer(automaton);
 
@@ -344,7 +345,11 @@ public class VisualProject
 
 				return viewer;
 			}
-			else return null; // null here means "viewer exists but user cancelled due to large num states"
+			else 
+			{
+				// The user didn't like what was presented to her
+				return null; 
+			}
 		}
 		else if(maker != null)
 		{
@@ -376,7 +381,7 @@ public class VisualProject
 		int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
 		if (maxNbrOfStates < automaton.nbrOfStates())
 		{
-			String msg = automaton.getName() + " has " + automaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states.";
+			String msg = "The automata " + automaton + " has " + automaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states.";
 			msg = EncodingHelper.linebreakAdjust(msg);
 
 			Object[] options = { "Continue", "Abort" };

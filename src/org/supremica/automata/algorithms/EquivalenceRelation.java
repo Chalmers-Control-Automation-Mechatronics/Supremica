@@ -47,85 +47,75 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class ArcSet
+public class EquivalenceRelation
 {
-	private State fromState = null;
-	private State toState = null;
+	private static List collection = new LinkedList();
+	public static final EquivalenceRelation LanguageEquivalence = 
+		new EquivalenceRelation("Language equivalence", true);
+	public static final EquivalenceRelation ObservationEquivalence = 
+		new EquivalenceRelation("Observation equivalence", true);
+	public static final EquivalenceRelation FailureEquivalence = 
+		new EquivalenceRelation("Failure equivalence", false);
+	public static final EquivalenceRelation Undefined = 
+		new EquivalenceRelation("Undefined", false);
+	private String identifier;
 
-	// private ArcListeners listeners = null;
-	private List theArcs = null;
-
-	public ArcSet()
+	private EquivalenceRelation(String identifier, boolean add)
 	{
-		theArcs = new LinkedList();
-	}
-
-	public ArcSet(State from, State to)
-	{
-		this();
-
-		fromState = from;
-		toState = to;
-	}
-
-	public ArcSet(ArcSet other)
-	{
-		theArcs = new LinkedList(other.theArcs);
-	}
-
-	public State getToState()
-	{
-		return toState;
-	}
-
-	public State getFromState()
-	{
-		return fromState;
-	}
-
-	public boolean containsArc(Arc theArc)
-	{
-		for (int i=0; i<theArcs.size(); i++)
+		if (add)
 		{
-			if (theArc.equals((Arc) theArcs.get(i)))
-			{
-				return true;
-			}
+			collection.add(this);
 		}
-		return false;
+
+		this.identifier = identifier;
 	}
 
-	public void addArc(Arc theArc)
+	public static Iterator iterator()
 	{
-		theArcs.add(theArc);
+		return collection.iterator();
 	}
 
-	public void removeArc(Arc theArc)
+	public String toString()
 	{
-		theArcs.remove(theArc);
+		return identifier;
 	}
 
-	public Arc removeArc()
+	public static EquivalenceRelation toType(String type)
 	{
-		return (Arc) theArcs.remove(0);
+		if (equalType(LanguageEquivalence, type))
+		{
+			return LanguageEquivalence;
+		}
+		
+		if (equalType(ObservationEquivalence, type))
+		{
+			return ObservationEquivalence;
+		}
+
+		if (equalType(FailureEquivalence, type))
+		{
+			return FailureEquivalence;
+		}
+
+		return Undefined;
 	}
 
-	public void clear()
+	public static Object[] toArray()
 	{
-		theArcs.clear();
+		return collection.toArray();
 	}
 
-	public int size()
+	private static boolean equalType(EquivalenceRelation type, String ident)
 	{
-		return theArcs.size();
-	}
+		if ((type == null) || (ident == null))
+		{
+			return false;
+		}
 
-	public ArcIterator iterator()
-	{
-		return new ArcIterator(theArcs.iterator());
+		return ident.toLowerCase().equals(type.toString().toLowerCase());
 	}
 }

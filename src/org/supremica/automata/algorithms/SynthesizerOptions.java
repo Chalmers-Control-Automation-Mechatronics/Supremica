@@ -63,12 +63,21 @@ public final class SynthesizerOptions
 	private boolean reduceSupervisors;
 	private boolean rememberDisabledEvents;
 
+	/**
+	 * The default options, based on earlier user preferences.
+	 */
 	public SynthesizerOptions()
 	{
 		this(SupremicaProperties.synthesisSynthesisType(), SupremicaProperties.synthesisAlgorithmType(), SupremicaProperties.synthesisPurge(), SupremicaProperties.synthesisOptimize(), SupremicaProperties.synthesisMaximallyPermissive(), SupremicaProperties.synthesisMaximallyPermissiveIncremental(), SupremicaProperties.synthesisReduceSupervisors());
 	}
 
-	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean maximallyPermissiveIncremental, boolean reduceSupervisors)
+	/**
+	 * This is not a good constructor so it is private, it is impossible to read in the code. 
+	 * Use the "getDefault..."-methods in this class instead or when they won't suit you, 
+	 * modify the necessary options one by one, starting from default! Much more readable and
+	 * also more practical when adding new options.
+	 */
+	private SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm, boolean purge, boolean optimize, boolean maximallyPermissive, boolean maximallyPermissiveIncremental, boolean reduceSupervisors)
 	{
 		this.synthesisType = synthesisType;
 		this.synthesisAlgorithm = synthesisAlgorithm;
@@ -97,8 +106,6 @@ public final class SynthesizerOptions
 	public void setSynthesisType(SynthesisType type)
 	{
 		synthesisType = type;
-
-		SupremicaProperties.setSynthesisSynthesisType(type);
 	}
 
 	public SynthesisType getSynthesisType()
@@ -109,8 +116,6 @@ public final class SynthesizerOptions
 	public void setSynthesisAlgorithm(SynthesisAlgorithm algorithm)
 	{
 		synthesisAlgorithm = algorithm;
-
-		SupremicaProperties.setSynthesisAlgorithmType(algorithm);
 	}
 
 	public SynthesisAlgorithm getSynthesisAlgorithm()
@@ -121,8 +126,6 @@ public final class SynthesizerOptions
 	public void setPurge(boolean bool)
 	{
 		purge = bool;
-
-		SupremicaProperties.setSynthesisPurge(bool);
 	}
 
 	public boolean doPurge()
@@ -143,8 +146,6 @@ public final class SynthesizerOptions
 	public void setOptimize(boolean bool)
 	{
 		optimize = bool;
-
-		SupremicaProperties.setSynthesisOptimize(bool);
 	}
 
 	public boolean getOptimize()
@@ -155,8 +156,6 @@ public final class SynthesizerOptions
 	public void setMaximallyPermissive(boolean bool)
 	{
 		maximallyPermissive = bool;
-
-		SupremicaProperties.setSynthesisMaximallyPermissive(bool);
 	}
 
 	public boolean getMaximallyPermissive()
@@ -167,8 +166,6 @@ public final class SynthesizerOptions
 	public void setMaximallyPermissiveIncremental(boolean bool)
 	{
 		maximallyPermissiveIncremental = bool;
-
-		SupremicaProperties.setSynthesisMaximallyPermissiveIncremental(bool);
 	}
 
 	public boolean getMaximallyPermissiveIncremental()
@@ -179,12 +176,32 @@ public final class SynthesizerOptions
 	public void setReduceSupervisors(boolean bool)
 	{
 		reduceSupervisors = bool;
-
-		SupremicaProperties.setSynthesisReduceSupervisors(bool);
 	}
 
 	public boolean getReduceSupervisors()
 	{
 		return reduceSupervisors;
+	}
+
+	/**
+	 * Stores the current set of options in SupremicaProperties.
+	 */
+	public void saveOptions()
+	{
+		SupremicaProperties.setSynthesisMaximallyPermissiveIncremental(maximallyPermissiveIncremental);
+		SupremicaProperties.setSynthesisReduceSupervisors(reduceSupervisors);
+		SupremicaProperties.setSynthesisSynthesisType(synthesisType);
+		SupremicaProperties.setSynthesisAlgorithmType(synthesisAlgorithm);
+		SupremicaProperties.setSynthesisPurge(purge);
+		SupremicaProperties.setSynthesisOptimize(optimize);
+		SupremicaProperties.setSynthesisMaximallyPermissive(maximallyPermissive);
+	}
+
+	/**
+	 * Returns the default options for synthesis.
+	 */
+	public static SynthesizerOptions getDefaultSynthesizerOptions()
+	{
+		return new SynthesizerOptions();
 	}
 }
