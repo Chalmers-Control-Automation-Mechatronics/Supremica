@@ -51,36 +51,42 @@ package org.supremica.gui;
 
 public class ExecutionDialogMode
 {
-	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing...", "Number of states:");
-	public static ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying...", "Number of states:");
-	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "Number of states:");
-	public static ExecutionDialogMode buildingStates = new ExecutionDialogMode("Building states...", "");
-	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("Building transitions...", "");
-	public static ExecutionDialogMode matchingStates = new ExecutionDialogMode("Matching States...", "");
-	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "");
-	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "");
+	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing...", "Number of states:", true, false);
+	public static ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying...", "Number of states:", true, false);
+	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "Number of states:", true, false);
+	public static ExecutionDialogMode buildingStates = new ExecutionDialogMode("Building states...", "", false, true);
+	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("Building transitions...", "", false, true);
+	public static ExecutionDialogMode matchingStates = new ExecutionDialogMode("Matching States...", "", false, true);
+	public static ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "", false, false);
+	public static ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "", false, false);
+
 	private final String id;
 	private final String text;
-
-	private ExecutionDialogMode(String id, String txt)
+	private boolean show_value;
+	private boolean show_progress;
+	
+	private ExecutionDialogMode(String id, String txt, boolean value, boolean progress)
 	{
 		this.id = id;
 		this.text = txt;
+		this.show_value = value;
+		this.show_progress = progress;
 	}
 
-	/*
-	 *       public String toString()
-	 *       {
-	 *               return id;
-	 *       }
-	 */
 	public String getId()
 	{
 		return id;
 	}
-
 	public String getText()
 	{
 		return text;
+	}
+	public boolean showValue()
+	{
+		return show_value;
+	}
+	public boolean showProgress()
+	{
+		return show_progress;
 	}
 }

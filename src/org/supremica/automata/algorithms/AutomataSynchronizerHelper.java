@@ -423,6 +423,10 @@ public final class AutomataSynchronizerHelper
 	{
 		return theStates.iterator();
 	}
+	public int getNumberOfStates()
+	{
+		return helperData.nbrOfCheckedStates;
+	}
 
 	public State[][] getIndexFormStateTable()
 	{

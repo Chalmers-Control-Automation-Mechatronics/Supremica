@@ -21,29 +21,48 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
-
+import org.supremica.gui.Monitorable;
 // 
-public class SearchStates
-	extends Thread
-	implements Stoppable
+public class SearchStates extends Thread implements Monitorable // Stoppable
 {
 	private AutomataSynchronizer syncher = null;
 	private IntArrayList list = null;
 	private Matcher matcher = null;
 	private ExecutionDialog exedlg = null;
 	private /* volatile */ boolean stopRequested = false;
-
-	public void run()    // throws Exception
-	{		
-		exedlg.setMode(ExecutionDialogMode.synchronizing);
-		// java.awt.EventQueue.invokeLater(new Runnable()
-		//	{
-		//		public void run()
-		//		{
+	
+	private boolean mode = false; // fals emeans sychronization mode, true is matching mode
+	private int progress = 1;
+	private String activity = "";
+	private int test = 0;
+	
+	public void run() // throws Exception
+	{
+		// syncher.getHelper().setExecutionDialog(exedlg);
+		// exedlg.setMode(ExecutionDialogMode.synchronizing);
+		System.out.println("SearchStates::run()");
+		while(!stopRequested && test < 10000)
+		{
+			test++;
+		}
+		mode = true;
+		while(!stopRequested && progress < 100)
+		{
+			try
+			{
+				progress += (int)(Math.random()*20);
+				sleep(500);
+				System.out.println(progress);
+			}
+			catch(InterruptedException iexcp)
+			{
+			}
+		}
+		return;
+/*				
 		syncher.getHelper().setExecutionDialog(exedlg);
-		//		}
-		//	});
-		
+		exedlg.setMode(ExecutionDialogMode.synchronizing);
+
 		try
 		{
 			syncher.execute();    // Starts the synch thread and waits for it to stop
@@ -54,12 +73,14 @@ public class SearchStates
 			// How to work this (exception in a worker thread)??
 			return;
 		}
-
-		if (!stopRequested)
+		mode = true; // macthing mode
+		
+		if(!stopRequested)
 		{
-			exedlg.setMode(ExecutionDialogMode.matchingStates);
-
-			// Note the difference between the two getStateIterator.
+			// exedlg.setMode(ExecutionDialogMode.matchingStates);
+			int num_total = syncher.getHelper().getNumberOfStates();
+			int num_processed = 0;
+			// Note the difference between the two getStateIterator. 
 			// This is AutomataSynchronizerHelper::getStateIterator, returns Iterator...
 			for (Iterator it = syncher.getHelper().getStateIterator(); it.hasNext() &&!stopRequested; )
 			{
@@ -70,6 +91,7 @@ public class SearchStates
 				{
 					list.add(composite_state);
 				}
+				progress = ++num_processed / num_total;
 			}
 
 			if (stopRequested)
@@ -77,12 +99,34 @@ public class SearchStates
 				list = new IntArrayList();    // thread stopped - clear the list
 			}
 		}
-
-		exedlg.setMode(ExecutionDialogMode.hide);
+	*/	// exedlg.setMode(ExecutionDialogMode.hide);
 	}
-
+	// These implement the Monitorable interface
+	public int getProgress()
+	{
+		return progress;
+	}
+	public String getActivity()
+	{
+		if(mode) // progress mode
+			return "Matching: " + progress + "% done";
+		else // synching
+			return "Synching: " + // syncher.getHelper().getNumberOfStates() + " states done";
+									test + " states done";
+	}
+	public void stopTask()
+	{
+		requestStop();
+	}
+	public ExecutionDialogMode getMode()
+	{
+		return null;
+	}
+	// end of Monitorable interace
+	
 	public void requestStop()
 	{
+		System.out.println("Stop requested");
 		stopRequested = true;
 
 		syncher.requestStop();

@@ -573,35 +573,81 @@ class FindStatesFrame
 			dispose();
 		}
 	}
-
-	private void goAhead()
+// ****************** Testing only ********** copied straight (almost) from the Monitor project
+class Task extends Thread implements Monitorable
+{
+	private int p;
+	private int i = 0;
+	private boolean mode = false; // false is "no progressbar"
+	private /* volatile */ boolean requestStop = false;
+	public void run()
 	{
-
-		// synchronize the automata but don't build the new automaton (throw away the edges)
-		// just save the states (efficiently) and mark those that match as matching
-		// ** TODO ** Disable the Find button, enable the Break button, start a new thread for searching
-		// ** TODO ** If the Cancel or Break buttons are pressed, break the search thread
 		try
 		{
-
-			// Pattern[] patterns = getRegexpPatterns();
-			// ss.search(new Perl5Matcher(), patterns);
+			while(i < 100 && !requestStop)
+			{
+				sleep(750);
+				i += (int)(Math.random()*20);
+			}
+			mode = !mode;
+			while(p < 100 && !requestStop)
+			{
+				p += (int)(Math.random()*20);
+				sleep(500);
+			}
+		}
+		catch(InterruptedException iexcp)
+		{
+			return;
+		}
+	}
+	
+	public int getProgress()
+	{
+		if(mode)
+			return p;
+		else
+		{
+			return 1; // no progress
+		}
+	}
+	public String getActivity()
+	{
+		if(mode)
+			return ("Building transitions: " + p + "% complete");
+		else
+			return ("Synchronizing: " + i + " number of states");
+	}
+	public void stopTask() 
+	{ 
+		requestStop = true;
+	}
+	public ExecutionDialogMode getMode() // ** Changed but not used **
+	{
+		return null;
+	}
+}// ****************************************************
+	private void goAhead()
+	{
+		try
+		{
 			Matcher matcher = ((FindStatesTab) getSelectedComponent()).getMatcher();
 
 			if (matcher != null)
 			{
-				SearchStates ss = new SearchStates(getAutomata(), matcher);
+				// SearchStates ss = new SearchStates(getAutomata(), matcher);
+				Task ss = new Task();
+				ss.start();	// Start the synchronization thread
 
 				// /setCursor(WAIT_CURSOR);
-				// find_button.setEnabled(false);
-				ExecutionDialog exedlg = new ExecutionDialog(this, "Finding States...", ss);
-
-				ss.setExecutionDialog(exedlg);
-				ss.run();    // Start the synchronization thread
-				// ss.join(); // at the moment, simply wait for ss to finish
-				// find_button.setEnabled(true);
+				// ExecutionDialog exedlg = new ExecutionDialog(this, "Finding States...", ss);
+				Monitor monitor = new Monitor("Finding states...", "", ss);
+				monitor.spawn(this); // spawn the monitor with this as parent
+				// ss.setExecutionDialog(exedlg);
+				ss.join(); // wait for ss to finish
 				// /setCursor(DEFAULT_CURSOR);
-				showCompositeStates(ss);
+				
+				//showCompositeStates(ss);
 			}
 
 			// else do nothing

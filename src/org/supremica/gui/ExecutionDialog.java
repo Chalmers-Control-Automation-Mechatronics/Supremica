@@ -89,7 +89,7 @@ public class ExecutionDialog
 	private void Init(String title)
 	{
 		setTitle(title);
-		setSize(new Dimension(240, 110));
+		setSize(new Dimension(250, 120));
 		setResizable(false);
 
 		// Center the window
@@ -292,8 +292,10 @@ public class ExecutionDialog
 		}
 
 		// Update labels
-		boolean showValues = ((currentMode == ExecutionDialogMode.synchronizing) || (currentMode == ExecutionDialogMode.verifying) || (currentMode == ExecutionDialogMode.synthesizing));
-		boolean showProgress = ((currentMode == ExecutionDialogMode.buildingStates) || (currentMode == ExecutionDialogMode.buildingTransitions));
+		boolean showValues = currentMode.showValue();
+		// = ((currentMode == ExecutionDialogMode.synchronizing) || (currentMode == ExecutionDialogMode.verifying) || (currentMode == ExecutionDialogMode.synthesizing));
+		boolean showProgress = currentMode.showProgress();
+		// = ((currentMode == ExecutionDialogMode.buildingStates) || (currentMode == ExecutionDialogMode.buildingTransitions));
 
 		if (showValues)
 		{
