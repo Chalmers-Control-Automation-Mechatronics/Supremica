@@ -804,7 +804,19 @@ public class Supremica
 			public void actionPerformed(ActionEvent e)
 			{
 
-				// toolsAutomataEditor();
+				ActionMan.AutomataTo1131IL(getGui());
+			}
+		});
+
+		JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
+
+		menuToolsCodeGeneration1131ST.setText("IEC-1131 Structured Text...");
+		menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
+		menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.AutomataTo1131ST(getGui());
 			}
 		});
 
@@ -843,19 +855,6 @@ public class Supremica
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.AutomataToControlBuilderSFC(getGui());
-			}
-		});
-
-
-		JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
-
-		menuToolsCodeGeneration1131ST.setText("IEC 1131 ST...");
-		menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
-		menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.AutomataTo1131ST(getGui());
 			}
 		});
 
