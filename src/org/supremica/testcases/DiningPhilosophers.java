@@ -424,7 +424,7 @@ class Chopstick
 
 public class DiningPhilosophers
 {
-	Project project = new Project();
+	Project project = new Project("Dining philosophers");
 
 	// These are helpers for counting modulo num philos/forks
 	// Note that we adjust for 0's, indices are from 1 to modulo

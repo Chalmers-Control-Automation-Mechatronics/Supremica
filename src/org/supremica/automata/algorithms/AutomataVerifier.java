@@ -223,19 +223,19 @@ public class AutomataVerifier
 		{
 			if (theAutomata.size() < 1)
 			{
-				return "At least one automaton must be selected";
+				return "At least one automaton must be selected.";
 			}
 
 			if (ActionMan.getGui().getUnselectedAutomata().size() < 1)
 			{
-				return "At least one automaton must be unselected";
+				return "At least one automaton must be unselected.";
 			}
 
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
 				{
-					return "All event must be prioritized in the modular algorithm";
+					return "All event must be prioritized in the modular algorithm.";
 				}
 			}
 		}
@@ -1375,7 +1375,9 @@ public class AutomataVerifier
 			}
 			else
 			{
+				// Execution stopped?
 				theAutomaton = null;
+				return false;
 			}
 		}
 		catch (Exception ex)

@@ -18,6 +18,7 @@ import org.supremica.testcases.TransferLine;
 import org.supremica.testcases.PigeonHole;
 import org.supremica.testcases.SanchezTestCase;
 import org.supremica.testcases.RoundRobin;
+import org.supremica.testcases.Arbiter;
 import org.supremica.testcases.warehouse.Warehouse;
 import org.supremica.testcases.warehouse.SelectEventsWindow;
 
@@ -450,17 +451,21 @@ class PigeonHolePanel
 
 	public PigeonHolePanel()
 	{
-		JPanel panel  = new JPanel(new GridLayout(3,2));
-		add(panel, BorderLayout.NORTH);
+		Box theBox = Box.createVerticalBox();
+		add(theBox, BorderLayout.NORTH);
 
-		panel.add(new JLabel("Ref: 'The Intractability",  SwingConstants.RIGHT) );
-		panel.add(new JLabel(" of Resolution', Armin Haken", SwingConstants.LEFT ));
+		JPanel labelPanel = new JPanel();
+		labelPanel.add(new JLabel("Ref: 'The Intractability of Resolution', Armin Haken."));
 
+		JPanel panel  = new JPanel(new GridLayout(2,2));
 		panel.add(new JLabel("Number of pigeons: "));
 		panel.add(int_pigeons = new IntegerField("5", 3));
 
 		panel.add(new JLabel("Number of holes: "));
 		panel.add(int_holes = new IntegerField("6", 3));
+
+		theBox.add(labelPanel);
+		theBox.add(panel);
 	}
 
 	public Project doIt()
@@ -515,14 +520,19 @@ class RoundRobinPanel
 
 	public RoundRobinPanel()
 	{
-		JPanel panel  = new JPanel(new GridLayout(2,2));
-		panel.add(new JLabel("Ref: 'Compositional Minimization of ",  SwingConstants.RIGHT) );
-		panel.add(new JLabel("Finite State Systems', S. Graf et. al.", SwingConstants.LEFT ));
+		Box theBox = Box.createVerticalBox();
+		add(theBox, BorderLayout.NORTH);
 
+		JPanel labelPanel = new JPanel();
+		labelPanel.add(new JLabel("Ref: 'Compositional Minimization of " + 
+								  "Finite State Systems', S. Graf et. al."));		
+
+		JPanel panel  = new JPanel(new GridLayout(1,2));
 		panel.add(new JLabel("Number of processes: "));
 		panel.add(num_proc);
 
-		add(panel);
+		theBox.add(labelPanel);
+		theBox.add(panel);
 	}
 
 	public Project doIt()
@@ -534,6 +544,47 @@ class RoundRobinPanel
 	}
 }
 
+class ArbiterPanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField num_users = new IntegerField("4", 2);
+	JCheckBox synchronize = new JCheckBox("Synchronize arbiter cells", true);
+
+	public ArbiterPanel()
+	{
+		Box theBox = Box.createVerticalBox();
+		add(theBox, BorderLayout.NORTH);
+
+		JPanel labelPanel = new JPanel();
+		labelPanel.add(new JLabel("Ref: 'Compositional Model Checking', E.M. Clarke et. al."));
+		
+		JPanel panel  = new JPanel(new GridLayout(1, 2));
+		panel.add(new JLabel("Number of users: "));
+		panel.add(num_users);
+		
+		JPanel synchronizePanel = new JPanel();
+		synchronizePanel.add(synchronize, BorderLayout.NORTH);
+
+		theBox.add(labelPanel);
+		theBox.add(panel);
+		theBox.add(synchronizePanel);
+	}
+
+	public Project doIt()
+		throws Exception
+	{
+		// At least two users!!
+		if (num_users.get() < 2) 
+		   throw new Exception("The arbiter tree must have at least two users.");
+
+		//Arbiter arb = new Arbiter(users, synchronize.isSelected());
+		Arbiter arb = new Arbiter(num_users.get(), synchronize.isSelected());
+
+		return arb.getProject();
+	}
+}
+
 class ExampleTab
 	extends JTabbedPane
 {
@@ -542,14 +593,15 @@ class ExampleTab
 		addTab("Users", null, new UsersPanel(), "Mutual exclusion users");
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
-		addTab("Sticks Game", null, new StickGamePanel(), "Stick picking game");
-		addTab("Transfer Line", null, new TransferLinePanel(), "Transfer Line");
+		addTab("Sticks game", null, new StickGamePanel(), "Stick picking game");
+		addTab("Transfer line", null, new TransferLinePanel(), "Transfer line");
 		addTab("Counters", null, new CountersPanel(), "Independent Counters");
 		addTab("Random automata", null, new RandomPanel(), "Random automata");
 		addTab("Pigeon-Hole", null, new PigeonHolePanel(), "Pigeon-Hole");
 		addTab("Sanchez-BM", null, new SanchezPanel(), "Sanchez-BM");
 		addTab("Warehouse", null, new WarehousePanel(), "Warehouse");
 		addTab("Round robin", null, new RoundRobinPanel(), "Round robin access");
+		addTab("Arbiter", null, new ArbiterPanel(), "Arbiter tree");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
 }
@@ -582,7 +634,7 @@ public class TestCasesDialog
 					}
 					catch (Exception ex)
 					{
-						logger.error("Exception while constructing test case: ", ex);
+						logger.error("Exception while constructing test case: " + ex);
 						logger.debug(ex.getStackTrace());
 						// what are we supposed to do?
 					}

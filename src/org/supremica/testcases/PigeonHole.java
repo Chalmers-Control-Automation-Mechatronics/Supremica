@@ -21,7 +21,7 @@ public class PigeonHole {
 
 		project = new Project();
 		if(first)
-			project.setComment("The Pigeon-Hole Principe (PHP): having n pigeons in m holes, if m < n, " +
+			project.setComment("The Pigeon-Hole Principle (PHP): having n pigeons in m holes, if m < n, " +
 				"then there is at least one hole that contains more than one pigeon. " +
 				"Note that similar situations often arise in reality, for example in a batch system with large buffers. " +
 				"In this testcase model, the (globally) marked states represent states where all the pigeons are inside the " +

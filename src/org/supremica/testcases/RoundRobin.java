@@ -12,7 +12,7 @@ public class RoundRobin
 	public RoundRobin(final int processes)
 		throws Exception
 	{
-		project = new Project();
+		project = new Project("Round robin access");
 		project.setComment("Adapted from 'Compositional Minimization of Finite State Systems' by S. Graf and B. Steffen. Round robin access by token passing, the token starts at Process 1. The system is mutually but not globally nonblocking and the behaviour of the plants does not violate the specification (language inclusion).");
 
 		Automaton resource = buildResource(processes);
@@ -26,7 +26,7 @@ public class RoundRobin
 		project.addAutomaton(spec);
 	}
 
-	public Automaton buildResource(int processes)
+	private Automaton buildResource(int processes)
 	{
 		Automaton resource = new Automaton("Resource");
 		Alphabet alpha = resource.getAlphabet();
@@ -53,7 +53,7 @@ public class RoundRobin
 		return resource;
 	}
 
-	public Automata buildBuffers(int processes)
+	private Automata buildBuffers(int processes)
 	{
 		Automata buffers = new Automata();
 
@@ -84,7 +84,7 @@ public class RoundRobin
 		return buffers;
 	}
 
-	public Automata buildProcesses(int processes)
+	private Automata buildProcesses(int processes)
 	{
 		Automata procs = new Automata();
 
@@ -136,7 +136,7 @@ public class RoundRobin
 		return procs;
 	}
 
-	public Automaton buildSpecification(int processes)
+	private Automaton buildSpecification(int processes)
 	{
 		Automaton spec = new Automaton("Token passing");
 		Alphabet alpha = spec.getAlphabet();
