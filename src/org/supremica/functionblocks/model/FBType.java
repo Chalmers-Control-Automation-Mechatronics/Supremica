@@ -54,7 +54,7 @@ import java.util.*;
 /*
 <!-- FBType elements -->
 <!ELEMENT FBType (Identification?,VersionInfo+,CompilerInfo?,InterfaceList,
- (BasicFB | FBNetwork)?, Service?) >
+ (BasicFBInstance | FBNetwork)?, Service?) >
 <!ATTLIST FBType
  Name CDATA #REQUIRED
  Comment CDATA #IMPLIED
@@ -62,7 +62,7 @@ import java.util.*;
 
 */
 
-public class FBType
+public abstract class FBType
 	extends NamedObject
 {
 	String name;
@@ -71,7 +71,7 @@ public class FBType
 	List versionInfo = new LinkedList();
 	String compilerInfo = null;
 	InterfaceList interfaceList = new InterfaceList();
-	BasicFB basicFB = null;
+	BasicFBInstance basicFB = null;
 	FBNetwork fbNetwork = null;
 	String service = null;
 
