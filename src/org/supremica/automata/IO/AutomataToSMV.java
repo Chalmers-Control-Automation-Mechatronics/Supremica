@@ -338,6 +338,8 @@ public class AutomataToSMV
 					String enableConditionPlant = getEnableCondition(currEvent, true, true);
 					if (enableConditionPlant.equals(""))
 					{
+						// In this case the event can never be enabled in the plant
+						// and thus it might not induce a controllability problem
 						pw.print("TRUE)");
 						continue;
 					}
