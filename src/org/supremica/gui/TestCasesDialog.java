@@ -15,6 +15,7 @@ import org.supremica.testcases.AllocationBatch;
 import org.supremica.testcases.Counters;
 import org.supremica.testcases.RandomAutomata;
 import org.supremica.testcases.TransferLine;
+import org.supremica.testcases.warehouse.Warehouse;
 
 // should perform integer validation - see Horstmann
 class IntegerField
@@ -177,14 +178,14 @@ class BricksPanel
 	}
 }
 
-class Warehouse
+class WarehousePanel
 	extends JPanel
 	implements TestCase
 {
-	IntegerField nbr_events_k = new IntegerField("4", 6);
-	IntegerField nbr_events_l = new IntegerField("4", 6);
+	IntegerField nbr_events_k = new IntegerField("3", 6);
+	IntegerField nbr_events_l = new IntegerField("1", 6);
 
-	Warehouse()
+	WarehousePanel()
 	{
 
 
@@ -203,9 +204,9 @@ class Warehouse
 	public Project doIt()
 		throws Exception
 	{
-		BricksGame bg = new BricksGame(nbr_events_k.get(), nbr_events_l.get());
+		Warehouse warehouse = new Warehouse(nbr_events_k.get(), nbr_events_l.get());
 
-		return bg.getProject();
+		return warehouse.getProject();
 	}
 }
 
@@ -421,6 +422,7 @@ class ExampleTab
 		addTab("Transfer Line", null, new TransferLinePanel(), "Transfer Line");
 		addTab("Counters", null, new CountersPanel(), "Independent Counters");
 		addTab("Random automata", null, new RandomPanel(), "Random automata");
+		addTab("Warehouse", null, new WarehousePanel(), "Warehouse");
 		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
 }
