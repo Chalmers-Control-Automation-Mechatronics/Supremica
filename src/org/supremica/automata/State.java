@@ -601,6 +601,57 @@ public class State
 	}
 
 
+	/**
+	 * Returns true if label is enabled by the supervisor.
+	 */
+	public boolean isEnabled(String label)
+	{
+		Iterator outgoingArcsIt = outgoingArcs.iterator();
+		// String eventId = e.getId();
+
+
+		while (outgoingArcsIt.hasNext())
+		{
+			Arc currArc = (Arc) outgoingArcsIt.next();
+
+			if(currArc.getEvent().equals(label))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Follow the label e and return the next state.
+	 * If e is not active then return null.
+	 *
+	 *@param  e Description of the Parameter
+	 *@return  Description of the Return Value
+	 */
+	public State nextState(String event)
+	{
+		Iterator outgoingArcsIt = outgoingArcs.iterator();
+		// String eventId = e.getId();
+
+
+		while (outgoingArcsIt.hasNext())
+		{
+			Arc currArc = (Arc) outgoingArcsIt.next();
+
+			// if (currArc.getEventId().equals(eventId))
+			if(currArc.getEvent().getLabel().equals(event))
+			{
+				return currArc.getToState();
+			}
+		}
+
+		return null;
+	}
+
+
+
 	public boolean contains(int x1, int y1)
 	{
 		int radius2 = radius * radius;

@@ -49,23 +49,117 @@
 
 package org.supremica.external.jgrafchart;
 
+import org.supremica.automata.*;
+import org.supremica.gui.*;
+import java.util.*;
+
 public class Supervisor
 {
+	private static InitializedSupervisors supervisors = new InitializedSupervisors();
+
 	public static boolean isEventEnabled(String supervisor, String event)
 	{
-		System.out.println("isEventEnabled Supervisor: " + supervisor + " Event: " + event);
-		return true;
+		//System.out.println("isEventEnabled Supervisor: " + supervisor + " Event: " + event);
+		return supervisors.isEventEnabled(supervisor, event);
 	}
 
 	public static boolean executeEvent(String supervisor, String event)
 	{
-		System.out.println("executeEvent Supervisor: " + supervisor + " Event: " + event);
-		return true;
+		//System.out.println("executeEvent Supervisor: " + supervisor + " Event: " + event);
+		return supervisors.executeEvent(supervisor, event);
 	}
 
 	public static boolean initializeSupervisor(String supervisor)
 	{
-		System.out.println("initialize Supervisor: " + supervisor);
+		//System.out.println("initialize Supervisor: " + supervisor);
+		return supervisors.initializeSupervisor(supervisor);
+	}
+}
+
+class InitializedSupervisors
+{
+	// automatonName -> Automation
+	protected HashMap supervisorMap = new HashMap();
+
+	// automationName -> State
+	protected HashMap stateMap = new HashMap();
+
+	public InitializedSupervisors()
+	{
+
+	}
+
+
+	public boolean isEventEnabled(String supervisor, String event)
+	{
+		Automaton currAutomaton = getAutomaton(supervisor);
+		if (currAutomaton == null)
+		{
+			return false;
+		}
+		State currState = getState(supervisor);
+		boolean isEnabled = currState.isEnabled(event);
+		// System.out.println("isEnabled: " + event + " : " + isEnabled);
+		return isEnabled;
+	}
+
+	public boolean executeEvent(String supervisor, String event)
+	{
+		Automaton currAutomaton = getAutomaton(supervisor);
+		if (currAutomaton == null)
+		{
+			return false;
+		}
+		State currState = getState(supervisor);
+		State nextState = currState.nextState(event);
+		if (nextState == null)
+		{
+			System.err.println("Could not execute event: " + event);
+			return false;
+		}
+		stateMap.remove(supervisor);
+		stateMap.put(supervisor, nextState);
 		return true;
+	}
+
+	public boolean initializeSupervisor(String supervisor)
+	{
+
+		if (hasAutomaton(supervisor))
+		{
+			// If the supervisor already is initialized the remove it
+			// from the supervisor and stateMap
+			supervisorMap.remove(supervisor);
+			stateMap.remove(supervisor);
+		}
+
+		Gui theGui = ActionMan.getGui();
+		VisualProjectContainer container = theGui.getVisualProjectContainer();
+		Project activeProject = container.getActiveProject();
+		Automaton currAutomaton = activeProject.getAutomaton(supervisor);
+		State currState = currAutomaton.getInitialState();
+
+		// Add automaton and state
+		supervisorMap.put(supervisor, currAutomaton);
+		stateMap.put(supervisor, currState);
+
+		return true;
+	}
+
+	public boolean hasAutomaton(String supervisor)
+	{
+		return supervisorMap.containsKey(supervisor);
+	}
+
+	public Automaton getAutomaton(String supervisor)
+	{
+		Automaton currAutomaton = (Automaton)supervisorMap.get(supervisor);
+		return currAutomaton;
+	}
+
+	public State getState(String supervisor)
+	{
+		State currState = (State)stateMap.get(supervisor);
+		return currState;
 	}
 }

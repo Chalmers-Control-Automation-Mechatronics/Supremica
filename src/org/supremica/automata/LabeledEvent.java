@@ -54,7 +54,7 @@ import java.util.*;
 public class LabeledEvent
 	implements Comparable
 {
-	// The id is the local identifier of an event, should be 
+	// The id is the local identifier of an event, should be
 	// different from any other id:s in the same automaton
 	private String id = "";
 	// The label is what shows in the dot-figures, this is the
@@ -76,7 +76,7 @@ public class LabeledEvent
 		this.label = label;
 
 		// ** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
-		// ** MF ** adding this cannot break any code, cannit?
+		// ** MF ** adding this cannot break any code, can it?
 		this.id = label;
 	}
 
