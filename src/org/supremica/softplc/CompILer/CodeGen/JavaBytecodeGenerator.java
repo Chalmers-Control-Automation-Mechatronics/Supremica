@@ -385,6 +385,13 @@ public class JavaBytecodeGenerator
 		return null;
 	}
 
+	public Object visitJAVA_BLOCK_DECLARATION(ASTjava_block_declaration n, Object o)
+	{
+		System.out.println("   " + n.toString());
+
+		return null;
+	}
+
 	/* This part takes care of some variable declarations */
 	public Object visitOTHER_VAR_DECLARATIONS(ASTother_var_declarations n, Object o)
 	{

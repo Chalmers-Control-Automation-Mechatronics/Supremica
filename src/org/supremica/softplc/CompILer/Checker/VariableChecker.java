@@ -113,6 +113,36 @@ public class VariableChecker implements SimpleNodeVisitor {
     }
 
 
+    public Object visitJAVA_BLOCK_DECLARATION(             
+								ASTjava_block_declaration n,
+								Object o){
+
+        Node[] children = n.getChildren();
+		String fbName;
+
+	    fbName = ((ASTderived_function_block_name)children[0]).getName();
+
+		if (((VCinfo)o).pass == 1) {
+			// Lägg in en ny hashtabell i den stora hashtabellen med
+			// alla funktionsblock
+			functionBlocks.put(fbName, new Hashtable());
+		}
+
+		if (children != null) {
+			for (int i=0; i < children.length; i++) {
+				SimpleNode c = (SimpleNode)children[i];
+				if (c != null) {
+					((VCinfo)o).blockType = "functionBlock";
+					((VCinfo)o).functionBlockName = fbName;
+					c.visit(this, o);
+				}
+			}
+		}
+        return null;
+
+    }
+
+
 
     public Object visitVAR1_DECLARATION(ASTvar1_declaration n, Object o) {
         Node[] children = n.getChildren();

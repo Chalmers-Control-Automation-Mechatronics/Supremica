@@ -45,6 +45,8 @@ public interface SimpleNodeVisitor
 
 	Object visitIO_VAR_DECLARATIONS(ASTio_var_declarations n, Object o);
 
+	Object visitJAVA_BLOCK_DECLARATION(ASTjava_block_declaration n, Object o);
+
 	Object visitLABEL(ASTlabel n, Object o);
 
 	Object visitLOCATED_VAR_DECL(ASTlocated_var_decl n, Object o);
