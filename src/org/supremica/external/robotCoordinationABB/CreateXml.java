@@ -68,9 +68,8 @@ import org.supremica.log.*;
 import org.supremica.gui.*;
 
 
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.*;
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsKinematicRole;
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsSimulationState;
+import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.*;
+import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.enum.*;
 
 import com.inzoom.comjni.Variant;
 import com.inzoom.comjni.SafeArray;

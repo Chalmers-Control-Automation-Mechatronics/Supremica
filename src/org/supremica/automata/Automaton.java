@@ -225,6 +225,11 @@ public class Automaton
 		return name;
 	}
 
+	public boolean hasName()
+	{
+		return !(name == null || name == "");
+	}
+
 	public String getComment()
 	{
 		if (comment == null)

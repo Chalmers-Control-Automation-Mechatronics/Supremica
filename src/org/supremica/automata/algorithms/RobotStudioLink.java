@@ -55,9 +55,8 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.external.robotCoordinationABB.CreateXml;
 
-
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.*;
-import org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.enum.RsKinematicRole;
+import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.*;
+import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.enum.RsKinematicRole;
 
 import org.supremica.automata.*;
 import org.supremica.log.*;
@@ -103,8 +102,6 @@ public class RobotStudioLink
 	private static Automata robotAutomata;
 	private static Automata mutexAutomata;
 
-	//private static Thread rsl; // = new Thread(this);
-
 	public RobotStudioLink(Gui gui, String stationName)
 	{
 		RobotStudioLink.gui = gui;
@@ -122,6 +119,8 @@ public class RobotStudioLink
 	public static void test(Gui gui)
 	{
 		String stationName = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
+
+		logger.info("Opening station " + stationName + "...");
 
 		Thread thread = new Thread(new RobotStudioLink(gui, stationName));
 		thread.start();
@@ -235,6 +234,9 @@ End Sub
 		}
 	}
 
+	/**
+	 * Run some commands, a demo essentially.
+	 */
 	public void run()
 	{
 		// Initialize
@@ -299,9 +301,11 @@ End Sub
 	public static void extractAutomata()
 	{
 		try
-		{	// Examine mechanisms
+		{
+			// Examine mechanisms
+			// Ugly fix to make sure everything is stable
 			boolean ok = false;
-			while (!ok) // Ugly fix to make sure everything is stable
+			while (!ok)
 			{
 				try
 				{
@@ -310,7 +314,7 @@ End Sub
 				}
 				catch (Exception ex)
 				{	// Wait for a while and try again
-					Thread.sleep(1000);
+					Thread.sleep(500);
 				}
 			}
 
@@ -320,35 +324,31 @@ End Sub
 			//LinkedList externalAxes = getMechanismsWithRole(activeStation, RsKinematicRole.rsKinematicRoleExternalAxes);
 
 			// Build automata from the robots
-			//for (int i=0;i<1;i++)
 			for (int i=0;i<robots.size();i++)
 			{
+				// Get the i:th robot
 				IMechanism robot = (IMechanism) robots.get(i);
-
-				//robot.examine();
-				//robot.unexamine();
+				robot.examine();
+				robot.unexamine();
 
 				// Clear all selections
 				activeStation.getSelections().removeAll();
 
+				// Start controller
+				IABBS4Controller controller = startController(robot);
+
 				// Run simulation and gather transition times
-				// Add MechanismListener
+				// Add CollisionListener
 				Mechanism mech = Mechanism.getMechanismFromUnknown(robot);
-				MechanismListener mechanismListener = new MechanismListener();
-				mech.add_MechanismEventsListener(mechanismListener);
-				// Start virtual controller
-				activeStation.setActiveMechanism((IMechanism2) robot);
-				logger.info("Starting the Virtual Controller...");
-				IABBS4Controller controller = robot.startABBS4Controller(true);
-				// Wait for controller start
-				//mechanismListener.waitForControllerStart();
-				//D: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
-				mechanismListener.setController(controller);
+				CollisionListener collisionListener = new CollisionListener(controller);
+				mech.add_MechanismEventsListener(collisionListener);
+
 				// Add SimulationListener
 				ISimulation simulation = activeStation.getSimulations().item(var(1));
 				Simulation sim = Simulation.getSimulationFromUnknown(simulation);
 				SimulationListener simulationListener = new SimulationListener();
 				sim.addDSimulationEventsListener(simulationListener);
+
 				// Start a thread running the simulation in RobotStudio
 				simulation.start();
 
@@ -356,7 +356,7 @@ End Sub
 				simulationListener.waitForSimulationStop();
 
 				// Generate automaton and add automaton to gui
-				double[] targetTimes = mechanismListener.getTargetTimes();
+				double[] targetTimes = collisionListener.getTargetTimes();
 				Automaton robotAutomaton = buildAutomaton(robot, targetTimes);
 				robotAutomata.addAutomaton(robotAutomaton);
 				gui.addAutomaton(robotAutomaton);
@@ -369,7 +369,7 @@ End Sub
 					Automaton mutexAutomaton = mutexAutomata.getAutomatonAt(j);
 					String zoneName = mutexAutomaton.getName();
 					// Get the collision times for this zone recorded during the simulation
-					double[][] collisionTimes = mechanismListener.getCollisionTimes(zoneName);
+					double[][] collisionTimes = collisionListener.getCollisionTimes(zoneName);
 					if (collisionTimes != null)
 					{
 						// Examine the times of target reaching and mutexzone collisions
@@ -378,12 +378,10 @@ End Sub
 				}
 
 				// Shut down the controller
-				logger.info("Shutting down the Virtual Controller...");
-				controller.shutDown();
-				mechanismListener.waitForControllerShutDown();
+				stopController(robot);
 
 				// Stop listening!
-				mech.remove_MechanismEventsListener(mechanismListener);
+				mech.remove_MechanismEventsListener(collisionListener);
 				sim.removeDSimulationEventsListener(simulationListener);
 			}
 	    }
@@ -396,7 +394,7 @@ End Sub
 		return;
 	}
 
-
+/*
 	//So far the following method is never used
 	public static void NEWextractAutomata()
 	{
@@ -426,41 +424,38 @@ End Sub
 				// Clear all selections
 				activeStation.getSelections().removeAll();
 
-				// Add MechanismListener
+				// Add CollisionListener
 				Mechanism mech = Mechanism.getMechanismFromUnknown(robot);
-				MechanismListener mechanismListener = new MechanismListener();
-				mech.add_MechanismEventsListener(mechanismListener);
+				CollisionListener collisionListener = new CollisionListener();
+				mech.add_MechanismEventsListener(collisionListener);
 				// Start virtual controller
 				activeStation.setActiveMechanism((IMechanism2) robot);
 				logger.info("Starting the Virtual Controller...");
 				IABBS4Controller controller = robot.startABBS4Controller(true);
 				// Wait for controller start
-				// mechanismListener.waitForControllerStart();
+				// collisionListener.waitForControllerStart();
 				//D H: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
-				mechanismListener.setController(controller);
+				collisionListener.setController(controller);
 
 				// Simulate program path by path
 				IABBS4Procedure main = getMainProcedure(robot);
 	 			IABBS4ProcedureCalls calls = main.getProcedureCalls();
 				calls.setModuleName("BananApan");
-/*				for (int j=1; j<=calls.getCount(); j++)
-				{
-					IPath path = calls.item(var(j)).getProcedure().getPath();
-					logger.info("Simulatin' path " + path.getName());
-					runSimulation(path);
-					break;
-				}*/
+				//for (int j=1; j<=calls.getCount(); j++)
+				//{
+				//	IPath path = calls.item(var(j)).getProcedure().getPath();
+				//	logger.info("Simulatin' path " + path.getName());
+				//	runSimulation(path);
+				//	break;
+				//}
 
-				break;
-/*
 				// Shut down the controller
-				logger.info("Shutting down the Virtual Controller...");
-				controller.shutDown();
-				mechanismListener.waitForControllerShutDown();
+				//logger.info("Shutting down the Virtual Controller...");
+				//controller.shutDown();
+				//collisionListener.waitForControllerShutDown();
 
 				// Stop listening!
-				mech.remove_MechanismEventsListener(mechanismListener);
-*/
+				//mech.remove_MechanismEventsListener(collisionListener);
 			}
 	    }
 	    catch(Exception e)
@@ -471,6 +466,7 @@ End Sub
 
 		return;
 	}
+*/
 
 	/**
 	 * Runs simulation of certain path presuming the controller is started.
@@ -676,6 +672,7 @@ End Sub
 					activeStation.getSelections().removeAll();
 				}
 			}
+
 			// Delete the spans
 			/*
 			for (int i=0;i<robots.size();i++)
@@ -702,154 +699,18 @@ End Sub
 		}
 	}
 
-	/**
-	 * Creates mutex zones that supposedly guarantees no collisions between
-	 * robots. The individual zones are IEntity:s in the IPart named mutexPartName.
-	 * At present, the zones have been specified manually in this code.
-     */
-	public static void createMutexZonesManual()
-	{
-		if (app == null || activeStation == null)
-		{
-			logger.error("No connection to RobotStudio.");
-			return;
-		}
+	/**	 * Creates mutex zones that supposedly guarantees no collisions between	 * robots. The individual zones are IEntity:s in the IPart named mutexPartName.	 * At present, the zones have been specified manually in this code.     */	public static void createMutexZonesManual()	{		if (app == null || activeStation == null)		{			logger.error("No connection to RobotStudio.");			return;		}
+		try		{			// Make sure there is a part called mutexPartName			addPart(mutexPartName);
+			// CRASHES HERE IF ZONES ALREADY CREATED! FIXA!			// Create three boxes (IEntity:s), members of the IPart mutexPartName			createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneA");			createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneB");			createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");			// 3 equal boxes			//createBox(-0.1875, 0.1875, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneA");			//createBox(-0.1875, -0.5625, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneB");			//createBox(-0.1875, -0.1875, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneC");			// 4 equal boxes			//createBox(-0.125, -0.5, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneA");			//createBox(-0.125, -0.25, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneB");			//createBox(-0.125, 0.00, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");			//createBox(-0.125, 0.25, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneD");
+			// Create automata for each entity in the IPart called mutexPartName			createMutexAutomata();		}		catch (Exception ex)		{			logger.error("Error when creating mutex zones. " + ex);		}	}
+	/**	 * Creates mutex zones that supposedly guarantees no collisions between	 * robots. The individual zones are IEntity:s in the IPart named mutexPartName.	 * At present, the zones have been specified manually in this code.     */	public static void createMutexZonesGrid()	{		if (app == null || activeStation == null)		{			logger.error("No connection to RobotStudio.");			return;		}
+		try		{			// Make sure there is a part called mutexPartName			addPart(mutexPartName);
 
-		try
-		{	// Make sure there is a part called mutexPartName
-			try
-			{
-				activeStation = app.getActiveStation();
-				activeStation.getParts().item(var(mutexPartName));
-
-				/*
-				try
-				{
-					CreateXml.createXmlStation(activeStation);
-				}
-				catch (Exception u)
-				{
-					logger.error("Error building the xml file for the coordinated station");
-				}
-				*/
-			}
-			catch (ComJniException ex)
-			{
-				if (ex.ErrorCode == HResult.E_FAIL)
-				{   // No such item, construct one!
-					activeStation.getParts().add().setName(mutexPartName);
-				}
-				else
-				{  //Something is really wrong
-				   logger.error("Something is wrong! " + ex);
-			    }
-			}
-
-			// CRASHES HERE IF ZONES ALREADY CREATED! FIXA!
-			// Create three boxes (IEntity:s), members of the IPart mutexPartName
-			createBox(-0.25, 0.125, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneA");
-			createBox(-0.25, -0.625, 0.75, 0, 0, 0, 0.5, 0.5, 0.5, "MutexZoneB");
-			createBox(-0.125, -0.125, 0.875, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");
-			// 3 equal boxes
-			//createBox(-0.1875, 0.1875, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneA");
-			//createBox(-0.1875, -0.5625, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneB");
-			//createBox(-0.1875, -0.1875, 0.75, 0, 0, 0, 0.375, 0.375, 0.375, "MutexZoneC");
-			// 4 equal boxes
-			//createBox(-0.125, -0.5, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneA");
-			//createBox(-0.125, -0.25, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneB");
-			//createBox(-0.125, 0.00, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneC");
-			//createBox(-0.125, 0.25, 0.75, 0, 0, 0, 0.25, 0.25, 0.25, "MutexZoneD");
-
-			// Create automata for each entity in the IPart called mutexPartName
-			createMutexAutomata();
-		}
-		catch (Exception ex)
-		{
-			logger.error("Error when creating mutex zones. " + ex);
-		}
-	}
+			// Grid with boxes of size (side * side * side) (m^3)			//activeStation.setFloorDepth(1);			//activeStation.setFloorWidth(1);			//logger.info("Floor depth: " + activeStation.getFloorDepth() + ", floor width: " + activeStation.getFloorWidth() + ".");			double side = .33;			double width = 1; // [m]			double depth = 1; // [m]			//double xSize = activeStation.getFloorWidth();			double xSize = width;			double x = Math.round(xSize/side);			//double ySize = activeStation.getFloorDepth();			double ySize = depth;			double y = Math.round(ySize/side);			double zSize = 1.5;			double z = Math.round(zSize/side);			// Nested for-loop in three dimensions!			for (int i=0; i<x; i++)			{				for (int j=0; j<y; j++)				{					for (int k=0; k<z; k++)					{						createBox((i-x/2)*side, (j-y/2)*side, k*side, 0, 0, 0, side, side, side, "Mutex"+i+j+k);					}				}			}
+			// Create automata for each entity in the IPart called mutexPartName			createMutexAutomata();		}		catch (Exception ex)		{			logger.error("Error when creating mutex zones. " + ex);		}	}
 
 	/**
-	 * Creates mutex zones that supposedly guarantees no collisions between
-	 * robots. The individual zones are IEntity:s in the IPart named mutexPartName.
-	 * At present, the zones have been specified manually in this code.
-     */
-	public static void createMutexZonesGrid()
-	{
-		if (app == null || activeStation == null)
-		{
-			logger.error("No connection to RobotStudio.");
-			return;
-		}
-
-		try
-		{	// Make sure there is a part called mutexPartName
-			try
-			{
-				activeStation = app.getActiveStation();
-				activeStation.getParts().item(var(mutexPartName));
-
-				/*
-				try
-				{
-					CreateXml.createXmlStation(activeStation);
-				}
-				catch (Exception u)
-				{
-					logger.error("Error building the xml file for the coordinated station");
-				}
-				*/
-			}
-			catch (ComJniException ex)
-			{
-				if (ex.ErrorCode == HResult.E_FAIL)
-				{   // No such item, construct one!
-					activeStation.getParts().add().setName(mutexPartName);
-				}
-				else
-				{  //Something is really wrong
-				   logger.error("Something is wrong! " + ex);
-			    }
-			}
-
-			// Grid with boxes of size (side * side * side) (m^3)
-			//activeStation.setFloorDepth(1);
-			//activeStation.setFloorWidth(1);
-			//logger.info("Floor depth: " + activeStation.getFloorDepth() + ", floor width: " + activeStation.getFloorWidth() + ".");
-			double side = .33;
-			double width = 1; // [m]
-			double depth = 1; // [m]
-			//double xSize = activeStation.getFloorWidth();
-			double xSize = width;
-			double x = Math.round(xSize/side);
-			//double ySize = activeStation.getFloorDepth();
-			double ySize = depth;
-			double y = Math.round(ySize/side);
-			double zSize = 1.5;
-			double z = Math.round(zSize/side);
-			// Nested for-loop in three dimensions!
-			for (int i=0; i<x; i++)
-			{
-				for (int j=0; j<y; j++)
-				{
-					for (int k=0; k<z; k++)
-					{
-						createBox((i-x/2)*side, (j-y/2)*side, k*side, 0, 0, 0, side, side, side, "Mutex"+i+j+k);
-					}
-				}
-			}
-
-			// Create automata for each entity in the IPart called mutexPartName
-			createMutexAutomata();
-		}
-		catch (Exception ex)
-		{
-			logger.error("Error when creating mutex zones. " + ex);
-		}
-	}
-
-	/**
-	 *
+	 * Creates automata, one for each zone, with two states.
 	 */
 	private static void createMutexAutomata()
 	  throws Exception
@@ -904,13 +765,13 @@ End Sub
 		newBox.setVisible(true);
 	}
 
-
 	/**
 	 * Generates a 3D object (IEntity) representing the span of robot.
 	 */
 	public static void generateSpan(IMechanism robot)
 		throws Exception
 	{
+		// Start controller
 		IABBS4Controller controller = startController(robot);
 
 		// Start simulation listener
@@ -918,18 +779,17 @@ End Sub
 		Simulation sim = Simulation.getSimulationFromUnknown(simulation);
 		SpanGenerator simulationListener = new SpanGenerator(robot);
 		sim.addDSimulationEventsListener(simulationListener);
+
 		// Start a thread running the simulation in RobotStudio
 		simulation.start();
+
 		// Wait for the simulation to stop
 		simulationListener.waitForSimulationStop();
 		sim.removeDSimulationEventsListener(simulationListener);
 
 		// Shut down controller
 		// If you DON'T do this, BOTH robots move!! Coooooool.
-		controller.shutDown();
-		Thread.sleep(2500);
-		logger.info("Controller shut down");
-
+		stopController(robot);
 	}
 
 
@@ -985,15 +845,6 @@ End Sub
 			IABBS4Controller controller;
 			try
 			{
-				/*
-				IMechanism robot = activeStation.getMechanisms().item(var(automaton.getName()));
-				activeStation.setActiveMechanism((IMechanism2) robot);
-				logger.info("Starting Virtual Controller...");
-				controller = robot.startABBS4Controller(true);
-				//logger.info("Sleeping...");
-				Thread.sleep(5000);
-				logger.info("Virtual Controller started.");
-				*/
 				IMechanism robot = activeStation.getMechanisms().item(var(automaton.getName()));
 				controller = startController(robot);
 			}
@@ -1002,8 +853,8 @@ End Sub
 				logger.error("Virtual Controller could not be started.");
 				return;
 			}
-			//IABBS4Controller controller = robot.getController();
 
+			// Dialog with simple execution gui
 			new ExecuterWindow(controller, automaton);
 		}
 		catch (Exception e)
@@ -1046,17 +897,24 @@ End Sub
 		startController(robot);
 
 		// Move robot along path
-		//moveRobotAlongPath(robot, path);
+		moveRobotAlongPath(robot, path);
 
 		return robot;
 	}
 
 	/**
 	 * Starts the IABBS4Controller for robot if it is not already started.
+	 *
+	 * The lines marked "\\Unnecessary" at the end can be removed but they
+	 * are intended to have a function... that doesn't seem to be supported
+	 * by RS3.0, reporting starting of the VC, see ControllerListener.
 	 */
 	public static IABBS4Controller startController(IMechanism robot)
 		throws Exception
 	{
+		activeStation.setActiveMechanism((IMechanism2) robot);
+
+		// Already started?
 		IABBS4Controller controller;
 		try
 		{
@@ -1069,22 +927,62 @@ End Sub
 			// Do we have to shut down any controllers that are running?
 		}
 
-		// Add MechanismListener
-		Mechanism mech = Mechanism.getMechanismFromUnknown(robot);
-		MechanismListener mechanismListener = new MechanismListener();
-		mech.add_MechanismEventsListener(mechanismListener);
+		// Add ControllerListener to the robot so we can listen to the controller
+		Mechanism mech = Mechanism.getMechanismFromUnknown(robot); //Unnecessary
+		ControllerListener controllerListener = new ControllerListener(false); //Unnecessary
+		mech.add_MechanismEventsListener(controllerListener); //Unnecessary
+
 		// Start virtual controller
-		activeStation.setActiveMechanism((IMechanism2) robot);
 		controller = robot.startABBS4Controller(true);
 
+		// We don't have to wait! In RS3.0, the above call won't return until
+		// the controller is started!
+
 		// Wait for controller start
-		//mechanismListener.waitForControllerStart();
+		//controllerListener.waitForControllerStart();
 		//D H: Is there a bug in RS2.1? the event afterControllerStarted doesn´t seem firing
-		Thread.sleep(3500);
+		//Thread.sleep(3500);
 
-		mech.remove_MechanismEventsListener(mechanismListener);
+		// We're ready! Stop listening!
+		mech.remove_MechanismEventsListener(controllerListener); //Unnecessary
 
+		// Return the controller
 		return controller;
+	}
+
+	/**
+	 * Stops the controller for robot.
+	 */
+	public static void stopController(IMechanism robot)
+		throws Exception
+	{
+		// The controller should be up and running!
+		IABBS4Controller controller;
+		try
+		{
+			controller = robot.getController();
+		}
+		catch (Exception e)
+		{
+			// No controller started for this robot? Strange!
+			logger.warn("Attempt to shut down an already shut down controller.");
+			return;
+		}
+
+		// Add ControllerListener to the robot so we can listen to the controller
+		Mechanism mech = Mechanism.getMechanismFromUnknown(robot);
+		ControllerListener controllerListener = new ControllerListener(true);
+		mech.add_MechanismEventsListener(controllerListener);
+
+		// Initialize shut down and wait for completion...
+		controller.shutDown();
+		controllerListener.waitForControllerShutDown();
+
+		// We're ready! Stop listening!
+		mech.remove_MechanismEventsListener(controllerListener);
+
+		// We're ready!
+		return;
 	}
 
 	/**
@@ -1128,6 +1026,9 @@ End Sub
 		return new Variant(i);
 	}
 
+	/**
+	 * Shuts down RobotStudio.
+	 */
 	public static void kill()
 	{
 		if (app != null)
@@ -1162,7 +1063,7 @@ End Sub
   	{
 		// This is fatal, cause this has never ever happened
 		// and I'd like to know if it ever does! (It should!)
-		logger.fatal("RobotStudio is shutting down. Please tell Hugo if you get this message!");
+		logger.fatal("RobotStudio is shutting down. Please tell Hugo if and how you get this message!");
 		clean();
   	}
   	public int stationBeforeOpen(String Path,boolean[] Cancel)
@@ -1170,17 +1071,17 @@ End Sub
 		//logger.info("Station being opened...");
     	return 0;
   	}
-  	public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.Station Station)
+  	public int stationAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station)
   	{
 		logger.info("Station opened.");
     	return 0;
   	}
-  	public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.Station Station,boolean[] Cancel)
+  	public int stationBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station,boolean[] Cancel)
   	{
 		//logger.info("Station being saved...");
     	return 0;
   	}
-  	public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.Station Station)
+  	public int stationAfterSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.Station Station)
   	{
 		logger.info("Station saved...");
     	return 0;
@@ -1190,17 +1091,17 @@ End Sub
 		//logger.info("Library being opened...");
     	return 0;
   	}
-	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject RsObject)
+	public int libraryAfterOpen(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
   	{
 		//logger.info("Library opened.");
     	return 0;
   	}
-  	public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject RsObject,boolean[] Cancel)
+  	public int libraryBeforeSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject,boolean[] Cancel)
   	{
 		//logger.info("Library being saved...");
     	return 0;
   	}
-  	public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject RsObject)
+  	public int libraryAfterSave(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject RsObject)
   	{
 		//logger.info("Library saved.");
     	return 0;
@@ -1402,12 +1303,12 @@ End Sub
 				frame.setVisible(false);
 				try
 				{
-					//IABBS4Controller controller = robot.getController();
-					IABBS4Controller controller = activeStation.getActiveMechanism().getController();
-					controller.shutDown();
-					//logger.info("Sleeping...");
-					Thread.sleep(2500);
-					logger.info("Controller shut down");
+					//IABBS4Controller controller = activeStation.getActiveMechanism().getController();
+					//controller.shutDown();
+					//Thread.sleep(2500);
+					//logger.info("Controller shut down");
+
+					stopController(activeStation.getActiveMechanism());
 				}
 				catch (Exception ex)
 				{
@@ -1460,139 +1361,117 @@ End Sub
 		}
 	}
 
-	private static class MechanismListener extends _MechanismEventsAdapter
+	/**
+	 * Keeps trach of the controller status, is it started or shut down?
+	 * The _MechanismEventsAdapter lacks information about the current mechanism
+	 * and its controller but this information is supplied in this class...
+	 */
+	private static class ControllerListener extends _MechanismEventsAdapter
 	{
-		private static Logger logger = LoggerFactory.createLogger(MechanismListener.class);
+		private boolean controllerRunning = false;  // Used in the wait-methods
 
-		private IABBS4Controller controller = null;
-		private LinkedList targetTimes = new LinkedList(); // Doubles of targetReached-times
-		private LinkedList collisions = new LinkedList();  // CollisionDatas of collisionStart/End-times
-		private boolean leavingTarget = true;       // targetReached is invoked twice for every Target!
-		private boolean controllerStarted = false;  // Used in the wait-methods
+		/**
+		 * Initialize the listener with the isRunning argument.
+		 */
+		public ControllerListener(boolean isRunning)
+		{
+			controllerRunning = isRunning;
+		}
 
-		// Events generated by RobotStudio.Mechanism
-		public int targetReached()
+		/**
+		 * Returns when the controller has started
+		 *
+		 * This method is not used (?) because it's need seems to have
+		 * disappeared with RS3.0.
+		 */
+		public synchronized void waitForControllerStart()
 		{
 			try
 			{
-				double motionTime = controller.getMotionTime();
-				targetTimes.add(new Double(motionTime));
-				if (!leavingTarget)
-					logger.info("Target reached at time " + (float) motionTime);
-				leavingTarget = !leavingTarget;
+				while (!controllerRunning)
+				{
+					wait();
+				}
+
+				// Make sure the controller is really started before we return
+				//Thread.sleep(3000);
 			}
-			catch(Exception seeIfICare)
+			catch (Exception ex)
 			{
+				//System.out.println("Interrupted! " + ex);
+				logger.error("Interrupted! " + ex);
 			}
-			return 0;
+			return;
 		}
-		public int selected()
-		{
-			logger.fatal("Selected");
-			return 0;
-		}
-		public int unSelected()
-		{
-			logger.fatal("Unselected");
-			return 0;
-		}
-		public int tick(float systemTime)
-		{
-			// This is fatal, cause this has never ever happened
-			// and I'd like to know if it ever does!
-			logger.fatal("Mechtick: " + systemTime + ", please tell Hugo if you get this message.");
-			return 0;
-		}
-		public synchronized int collisionStart(RsObject collidingObject)
+		/**
+		 * Returns when the controller has shut down
+		 */
+		public synchronized void waitForControllerShutDown()
 		{
 			try
 			{
-				String objectName = collidingObject.getName();
-				CollisionData data;
-				if (!collisions.contains(new CollisionData(objectName)))
+				while (controllerRunning)
 				{
-					data = new CollisionData();
-					data.setName(objectName);
-					data.setCount(0);
-					collisions.add(data);
-				}
-				else
-				{
-					data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
+					wait();
 				}
 
-				// Is this the start?
-				if (data.getCount() == 0)
-				{
-					data.setStartTime(controller.getMotionTime());
-					logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
-					createTargetAtTCP(controller.getMechanism().getName() + "Enter" + objectName);
-
-				}
-				data.setCount(data.getCount()+1);
+				// Make sure the controller is really shut down before we return
+				//Thread.sleep(2500);
 			}
-			catch (Exception whatever)
+			catch (Exception ex)
 			{
+				//System.out.println("Interrupted! " + ex);
+				logger.error("Interrupted! " + ex);
 			}
+			return;
+		}
+
+		// Implementation of _MechanismEventsAdapter methods
+		public int beforeControllerStarted()
+		{
+			// This method works fine... but is quite useless here? Post some info...
+			logger.info("Starting Virtual Controller...");
 			return 0;
 		}
-		public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_2_1.RobotStudio.RsObject collidingObject)
-		{
-			try
-			{
-				String objectName = collidingObject.getName();
-				CollisionData data;
-				if (!collisions.contains(new CollisionData(objectName)))
-				{
-					logger.error("Collision ended mysteriously.");
-					return 1;
-				}
-				else
-				{
-					data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
-				}
-
-				// Is this the end?
-				data.setCount(data.getCount()-1);
-				if (data.getCount() == 0)
-				{
-					data.setEndTime(controller.getMotionTime());
-					logger.info("End of collision with " + objectName + " at time " + (float) data.endTime);
-					createTargetAtTCP(controller.getMechanism().getName() + "Exit" + objectName);
-				}
-			}
-			catch (Exception whatever)
-			{
-			}
-			return 0;
-		}
-		/*public int beforeControllerStarted()
-		{
-			logger.info("BeforeControllerStarted.");
-			return 0;
-		}*/
 		public int afterControllerStarted()
 		{
-			controllerStarted = true;
-			logger.info("Virtual Controller started.");
+			// This never happens!? (But since RS3.0 we don't seem to need it!?)
+			controllerRunning = true;
+			logger.fatal("AfterControllerStarted. Tell Hugo you got this message!");
 			notify();
 			return 0;
 		}
 		public int afterControllerShutdown()
 		{
-			controllerStarted = false;
+			// Works fine?
+			controllerRunning = false;
 			logger.info("Virtual Controller shut down.");
 			notify();
 			return 0;
 		}
+	}
+
+	/**
+	 * Collision detection stuff.
+	 */
+	private static class CollisionListener extends _MechanismEventsAdapter
+	{
+		private static Logger logger = LoggerFactory.createLogger(CollisionListener.class);
+
+		private IABBS4Controller controller = null;
+		private LinkedList targetTimes = new LinkedList(); // Doubles of targetReached-times
+		private LinkedList collisions = new LinkedList();  // CollisionDatas of collisionStart/End-times
+		private boolean leavingTarget = true;       // targetReached is invoked twice for every Target!
 
 		// Junk constructed by me
-		public void setController(IABBS4Controller controller)
+
+		public CollisionListener(IABBS4Controller controller)
 		{
 			this.controller = controller;
 		}
 		public double[] getTargetTimes()
 		{
+			// Return array of times when targets were reached
 			double[] times = new double[targetTimes.size()];
 			for (int i=0; i<times.length; i++)
 				times[i] = ((Double) targetTimes.get(i)).doubleValue();
@@ -1600,9 +1479,8 @@ End Sub
 		}
 		public double[][] getCollisionTimes(String mutexZone)
 		{
-			//CollisionData data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(mutexZone)));
+			// Return array of times corresponding to collisions with mutexZone
 			int index = collisions.indexOf(new CollisionData(mutexZone));
-			//int index = collisions.indexOf(mutexZone);
 			if (index >= 0)
 			{
 				CollisionData data = (CollisionData) collisions.get(index);
@@ -1612,43 +1490,6 @@ End Sub
 			{
 				return null;
 			}
-		}
-		public synchronized void waitForControllerStart()
-		{
-			try
-			{
-				while (!controllerStarted)
-				{
-					wait();
-				}
-				// Make sure the controller is really started before we return
-				Thread.sleep(3000);
-			}
-			catch (Exception ex)
-			{
-				//System.out.println("Interrupted! " + ex);
-				logger.error("Interrupted! " + ex);
-			}
-			return;
-		}
-		public synchronized void waitForControllerShutDown()
-		{
-			try
-			{
-				while (controllerStarted)
-				{
-					wait();
-				}
-
-				// Make sure the controller is really shut down before we return
-				Thread.sleep(2500);
-			}
-			catch (Exception ex)
-			{
-				//System.out.println("Interrupted! " + ex);
-				logger.error("Interrupted! " + ex);
-			}
-			return;
 		}
 		/**
 	 	 * Creates a new target at the current position. The target will be
@@ -1683,6 +1524,117 @@ End Sub
 			}
 		}
 
+		// Implementation of _MechanismEventsAdapter methods
+		public int targetReached()
+		{
+			try
+			{
+				double motionTime = controller.getMotionTime();
+				targetTimes.add(new Double(motionTime));
+				if (!leavingTarget)
+					logger.info("Target reached at time " + (float) motionTime);
+				leavingTarget = !leavingTarget;
+			}
+			catch(Exception seeIfICare)
+			{
+			}
+			return 0;
+		}
+		public int selected()
+		{
+			logger.fatal("Selected");
+			return 0;
+		}
+		public int unSelected()
+		{
+			logger.fatal("Unselected");
+			return 0;
+		}
+		public int tick(float systemTime)
+		{
+			// This is fatal, cause this has never ever happened
+			// and I'd like to know if it ever does!
+			logger.fatal("Mechtick: " + systemTime + ", please tell Hugo if and how you get this message.");
+			return 0;
+		}
+		/**
+		 * This method is called each time a PART of the robot starts its collision with
+		 * something. In general, this does NOT mean that the whole robot has just started colliding.
+		 * Therefore, we must count the collision starts...
+		 */
+		public synchronized int collisionStart(RsObject collidingObject)
+		{
+			try
+			{
+				// What did we collide with?
+				String objectName = collidingObject.getName();
+				CollisionData data;
+				if (!collisions.contains(new CollisionData(objectName)))
+				{
+					data = new CollisionData(objectName);
+					data.setCount(0);
+					collisions.add(data);
+				}
+				else
+				{
+					data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
+				}
+
+				// Is this THE start?
+				if (data.getCount() == 0)
+				{
+					// Log message
+					data.setStartTime(controller.getMotionTime());
+					logger.info("Start of collision with " + objectName + " at time " + (float) data.startTime);
+					// Create a target at the zone border!
+					createTargetAtTCP(controller.getMechanism().getName() + "Enter" + objectName);
+				}
+				// Count the starts...
+				data.setCount(data.getCount()+1);
+			}
+			catch (Exception whatever)
+			{
+			}
+			return 0;
+		}
+		/**
+		 * This method is called each time a PART of the robot stops its collision with
+		 * something. In general, this does NOT mean that the whole robot has stopped colliding.
+		 * Therefore, we must count the collision ends...
+		 */
+		public synchronized int collisionEnd(org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.RsObject collidingObject)
+		{
+			try
+			{
+				// What did we end colliding with?
+				String objectName = collidingObject.getName();
+				CollisionData data;
+				if (!collisions.contains(new CollisionData(objectName)))
+				{
+					logger.error("Collision ended mysteriously.");
+					return 1;
+				}
+				else
+				{
+					data = (CollisionData) collisions.get(collisions.indexOf(new CollisionData(objectName)));
+				}
+
+				// Count the ends
+				data.setCount(data.getCount()-1);
+				// Is this THE end?
+				if (data.getCount() == 0)
+				{
+					data.setEndTime(controller.getMotionTime());
+					logger.info("End of collision with " + objectName + " at time " + (float) data.endTime);
+					createTargetAtTCP(controller.getMechanism().getName() + "Exit" + objectName);
+				}
+			}
+			catch (Exception whatever)
+			{
+			}
+			return 0;
+		}
+
 		/**
 		 * An object containing data concerning the collision with a certain object
 		 */
@@ -1698,9 +1650,6 @@ End Sub
 
 			private LinkedList timeList = new LinkedList();
 
-			CollisionData()
-			{
-			}
 			CollisionData(String name)
 			{
 				this.name = name;
@@ -1748,6 +1697,9 @@ End Sub
 		}
 	}
 
+	/**
+	 * A listener for determining when a simulation is finished.
+	 */
 	private static class SimulationListener extends DSimulationEventsAdapter
 	{
 		private static Logger logger = LoggerFactory.createLogger(SimulationListener.class);
@@ -1778,7 +1730,7 @@ End Sub
 				}
 
 				// Make sure the simulation is really over before we return
-				Thread.sleep(2500);
+				//Thread.sleep(2500);
 			}
 			catch (Exception ex)
 			{
@@ -1789,6 +1741,46 @@ End Sub
 		}
 	}
 
+	/**
+	 * Adds part to activeStation and returns it. If there already was
+	 * a part with the same name, it is returned instead.
+	 */
+	private static IPart addPart(String name)
+	{
+		IPart part = null;
+
+		try
+		{
+			try
+			{
+				// If there already is one, get it!
+				activeStation = app.getActiveStation();
+				part = activeStation.getParts().item(var(name));
+			}
+			catch (ComJniException ex)
+			{
+				// If there was none, create it!
+				if (ex.ErrorCode == HResult.E_FAIL)
+				{   // No such item, construct one!
+					part = activeStation.getParts().add();
+					part.setName(mutexPartName);
+				}
+				else
+				{  //Something is really wrong
+				   logger.error("Something is wrong! " + ex);
+			    }
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error! " + ex);
+		}
+		return part;
+	}
+
+	/**
+	 * A listener that listens throughout a simulation and generates spans.
+	 */
 	private static class SpanGenerator extends SimulationListener
 	{
 		private IMechanism robot;
@@ -1802,7 +1794,7 @@ End Sub
 		private static double cylinderLength = 1.15; // [m]
 		private static double cylinderRadius = 0.06; // [m]
 		private static double stepSize = boxSize*3/4; // [m]
-		// The margin that should be added to the approximations
+		// The margin that should be added to all sides
 		private static double margin = 0.05; // [m]
 
 		private Transform oldTransform;
@@ -1813,9 +1805,11 @@ End Sub
 			this.robot = robot;
 			if (ruu == null)
 				ruu = new RsUnitsUtility();
-			spanPart = activeStation.getParts().add();
-			spanPart.setVisible(true);
-			spanPart.setName(robot.getName() + "_Span");
+
+			// Add part for the span to the station
+			spanPart = addPart(robot.getName() + "_Span");
+			spanPart.setVisible(true); // Why?
+
 			tool0 = robot.getToolFrames().item(var("tool0"));
 			//robot.setActiveToolFrame(tool0);
 			oldTransform = transformCopy(tool0.getTransform());

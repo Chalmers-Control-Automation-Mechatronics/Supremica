@@ -275,11 +275,9 @@ public class MainMenuBar
 				}
 			});
 
-
-
 			if (SupremicaProperties.generalUseRobotCoordination())
 			{
-				// File.Import.RobotCoordination
+				//File.Import.RobotCoordination
 				JMenuItem menuFileImportRobotCoordination = new JMenuItem();
 				menuFileImportRobotCoordination.setText("From Robot Coordinator...");
 				menuFileImport.add(menuFileImportRobotCoordination);
@@ -802,7 +800,7 @@ public class MainMenuBar
 		});
 
 
-		// Tools.RobotStudio
+		// Tools.SoftPLC
 		if (SupremicaProperties.includeSoftPLC())
 		{
 			// Tools.RunSimulation
@@ -954,7 +952,7 @@ public class MainMenuBar
 				});
 			// RobotStudioTest
 			JMenuItem robTest = new JMenuItem();
-			robTest.setText("Run Tests");
+			robTest.setText("Run Demo");
 			menuRobotStudioLink.add(robTest);
 			robTest.addActionListener(new ActionListener()
 				{
@@ -1074,7 +1072,7 @@ public class MainMenuBar
 
 			JMenu menuEvoComp = new JMenu();
 			menuEvoComp.setText("Evolution");
-			menuEvoComp.setEnabled(false);
+			//menuEvoComp.setEnabled(false);
 			menuTools.add(menuEvoComp);
 
 			// EvoComp.CalculateSynchTable
@@ -1101,11 +1099,11 @@ public class MainMenuBar
 					}
 				});
 		}
-		
+
 		/*
 		// Tools.TrainSimulator
 		menuTools.add(new JSeparator());
-		
+
 		JMenuItem trainSimulator = new JMenuItem();
 		trainSimulator.setText("Train Simulator");
 		menuTools.add(trainSimulator);
@@ -1117,7 +1115,7 @@ public class MainMenuBar
 				}
 			});
 		*/
-		
+
 		// Configure
 		JMenu menuConfigure = new JMenu();
 

@@ -412,13 +412,13 @@ public class Supremica
 	/**
 	 * Unselects automaton indicated by automaton index
 	 *
-	 * @param index The relative index of the automaton among the other 
+	 * @param index The relative index of the automaton among the other
 	 * selected automata. (Should be Automata.getAutomatonIndex)
 	 */
 	public void unselectAutomaton(int index)
 	{
 		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-		theAutomatonTable.changeSelection(selectedRowIndices[index],0,true,false);		
+		theAutomatonTable.changeSelection(selectedRowIndices[index],0,true,false);
 	}
 
 	/**
@@ -674,7 +674,7 @@ public class Supremica
 			// newComment = JOptionPane.showInputDialog(this, msg, oldComment);
 			EditCommentDialog dialog = new EditCommentDialog(this, oldComment);
 			newComment = dialog.getComment();
-			
+
 			if (newComment == null)
 			{
 				return null;
@@ -891,7 +891,7 @@ public class Supremica
 		throws Exception
 	{
 		int nbrOfAutomataBeforeOpening = getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
-		
+
 		int nbrOfAddedAutomata = addAutomata(theProject);
 		if (theProject != null)
 		{
@@ -909,7 +909,7 @@ public class Supremica
 
 		if (theProject.getComment() != "")
 		{
-			JOptionPane.showMessageDialog(this, EncodingHelper.linebreakAdjust(theProject.getComment()), 
+			JOptionPane.showMessageDialog(this, EncodingHelper.linebreakAdjust(theProject.getComment()),
 										  "Project information", JOptionPane.INFORMATION_MESSAGE);
 		}
 
@@ -942,7 +942,8 @@ public class Supremica
 	{
 		logger.debug("Supremica::addAutomaton(" + currAutomaton.getName() + ")");
 		// Force the user to enter a new name if it has no name
-		if (currAutomaton.getName() == null || currAutomaton.getName().equals(""))
+		//if (currAutomaton.getName() == null || currAutomaton.getName().equals(""))
+		if (!currAutomaton.hasName())
 		{
 			String autName = getNewAutomatonName("Enter a new name", currAutomaton.getComment());
 
