@@ -328,9 +328,9 @@ public class ProjectToSP
 
 					for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
 					{
-						String currCommand = (String) cmdIt.next();
+						Command currCommand = (Command) cmdIt.next();
 
-						pw.println("\t\t\t<Command command=\"" + EncodingHelper.normalize(currCommand) + "\"/>");
+						pw.println("\t\t\t<Command command=\"" + EncodingHelper.normalize(currCommand.toString()) + "\"/>");
 					}
 
 					pw.println("\t\t</Action>");
@@ -352,9 +352,9 @@ public class ProjectToSP
 
 					for (Iterator condIt = currControl.conditionIterator(); condIt.hasNext(); )
 					{
-						String currCondition = (String) condIt.next();
+						Condition currCondition = (Condition) condIt.next();
 
-						pw.println("\t\t\t<Condition condition=\"" + EncodingHelper.normalize(currCondition) + "\"/>");
+						pw.println("\t\t\t<Condition condition=\"" + EncodingHelper.normalize(currCondition.toString()) + "\"/>");
 					}
 					/*
 					if (currControl.getCondition() != null && !currControl.getCondition().equals(""))

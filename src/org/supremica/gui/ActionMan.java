@@ -2807,16 +2807,17 @@ public class ActionMan
 	public static void testCases(Gui gui)
 		throws Exception
 	{
-		TestCasesDialog testCasesDialog = new TestCasesDialog(gui.getFrame());
+		TestCasesDialog testCasesDialog = new TestCasesDialog(gui.getFrame(), gui);
 
 		testCasesDialog.show();
 
-		Project project = testCasesDialog.getProject();
-
+		//Project project = testCasesDialog.getProject();
+/*
 		if (project != null)
 		{
 			gui.addProject(project);
 		}
+*/
 	}
 
 	// Animations

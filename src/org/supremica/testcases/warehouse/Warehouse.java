@@ -194,20 +194,21 @@ public class Warehouse
 	protected Project theProject= null;	
 	protected int k = 3;
 	protected int l = 1;
+	protected Automaton agvAutomaton = null;
+	protected Automaton truckAutomaton = null;
 	
+	public Warehouse()
+	{
+		this(3, 1);
+	}
+		
 	public Warehouse(int k, int l)
 	{
 		this.k = k;
 		this.l = l;
-	}
-	
-	protected void buildProject()
-	{
 		theProject = new Project("Warehouse");	
-		
 		User u1 = new User("agv", true, theProject);
 		User u2 = new User("truck", false, theProject);
-
 		Resource r11 = new Resource(1, 0, true, u1, u2);
 		Resource r12 = new Resource(2, 0, true, u1, u2);
 		Resource r13 = new Resource(3, 0, true, u1, u2);
@@ -287,15 +288,53 @@ public class Warehouse
 		u2.addTransition(r32, new Resource[]{r31, r33});
 		u2.addTransition(r33, new Resource[]{r32, r27});
 
-		theProject.addAutomaton(u1.build());
-		theProject.addAutomaton(u2.build());
-		
+		agvAutomaton = u1.build();
+		truckAutomaton = u2.build();
+		theProject.addAutomaton(agvAutomaton);
+		theProject.addAutomaton(truckAutomaton);
+	}
+	
+	public void setK(int k)
+	{
+		this.k = k;
+	}
+	
+	public int getK()
+	{
+		return k;
+	}
+	
+	public void setL(int l)
+	{
+		this.l = l;
+	}
+	
+	public int getL()
+	{
+		return l;
+	}
+	
+	public Alphabet getAGVAlphabet()
+	{
+		// return new Alphabet();
+		return agvAutomaton.getAlphabet();
+	}
+	
+	public Alphabet getTruckAlphabet()
+	{
+		// return new Alphabet();
+		return truckAutomaton.getAlphabet();
+	}
+	
+	protected void buildProject()
+	{
 		ComputerHumanExtender extender = new ComputerHumanExtender(theProject, k);
 
 		try
 		{
 			extender.execute();
 			Automaton newAutomaton = extender.getNewAutomaton();
+			newAutomaton.setName("Extender");
 			theProject.addAutomaton(newAutomaton);
 		}
 		catch (Exception ex)
@@ -307,7 +346,10 @@ public class Warehouse
 
 	public Project getProject()
 	{
+		//System.err.println("warehouse get project");
 		buildProject();
+		//System.err.println(theProject.nbrOfAutomata());
+		//System.err.println("Warehouse getProject");
 		return theProject;	
 	}
 }

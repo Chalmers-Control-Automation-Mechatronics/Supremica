@@ -16,6 +16,7 @@ import org.supremica.testcases.Counters;
 import org.supremica.testcases.RandomAutomata;
 import org.supremica.testcases.TransferLine;
 import org.supremica.testcases.warehouse.Warehouse;
+import org.supremica.testcases.warehouse.SelectEventsWindow;
 
 // should perform integer validation - see Horstmann
 class IntegerField
@@ -182,14 +183,15 @@ class WarehousePanel
 	extends JPanel
 	implements TestCase
 {
+	Warehouse warehouse = new Warehouse();
 	IntegerField nbr_events_k = new IntegerField("3", 6);
 	IntegerField nbr_events_l = new IntegerField("1", 6);
-
+	SelectEventsWindow selectOperatorEventsWindow = null;
+	SelectEventsWindow selectUnobservableEventsWindow = null;
+	
 	WarehousePanel()
 	{
-
-
-		JPanel panel  = new JPanel( new GridLayout(2,2));
+		JPanel panel  = new JPanel( new GridLayout(3,2));
 		add(panel, BorderLayout.WEST);
 
 		panel.add(new JLabel("Number of operator events (k): "));
@@ -197,15 +199,50 @@ class WarehousePanel
 
 		panel.add(new JLabel("Number of supervisor events (l): "));
 		panel.add(nbr_events_l);
+		
+		JButton selectOperatorEventsButton = new JButton("Select operator events");
+		selectOperatorEventsButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (selectOperatorEventsWindow == null)
+				{
+					selectOperatorEventsWindow = new SelectEventsWindow(warehouse.getTruckAlphabet(), "Select operator events", "Select operator events", true);
+				}
+				selectOperatorEventsWindow.actionPerformed(e);
+				// ActionMan.fileOpen(ActionMan.getGui());
+			}
+		});
 
+		panel.add(selectOperatorEventsButton);
 
+		
+		//JButton selectControlEventsButton = new JButton("Select control events");
+		//panel.add(selectControlEventsButton);
+
+		JButton selectUnobservableEventsButton = new JButton("Select unobservable events");
+		selectUnobservableEventsButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (selectUnobservableEventsWindow == null)
+				{
+					selectUnobservableEventsWindow = new SelectEventsWindow(warehouse.getTruckAlphabet(), "Select unobservable events", "Select unobservable events", false);
+				}
+				selectUnobservableEventsWindow.actionPerformed(e);
+				// ActionMan.fileOpen(ActionMan.getGui());
+			}
+		});
+		panel.add(selectUnobservableEventsButton);
 	}
 
 	public Project doIt()
 		throws Exception
 	{
-		Warehouse warehouse = new Warehouse(nbr_events_k.get(), nbr_events_l.get());
+		warehouse.setK(nbr_events_k.get());
+		warehouse.setL(nbr_events_l.get());
 
+		//System.err.println("Warehouse doIt");
 		return warehouse.getProject();
 	}
 }
@@ -434,6 +471,7 @@ public class TestCasesDialog
 
 	private ExampleTab extab = new ExampleTab();
 	private Project project = null;
+	private Gui gui;
 
 	class DoitButton
 		extends JButton
@@ -516,18 +554,19 @@ public class TestCasesDialog
 		TestCase tc = (TestCase) comp;
 
 		project = tc.doIt();    // Should return a Project (named)
+		gui.addProject(project);
 		dispose();
 	}
-
+/*
 	Project getProject()
 	{
 		return project;
 	}
-
-	TestCasesDialog(JFrame frame)
+*/
+	TestCasesDialog(JFrame frame, Gui gui)
 	{
-		super(frame, "Example Generator", true);    // modal dialog with frame as parent
-
+		super(frame, "Example Generator", false);    // modal dialog with frame as parent
+		this.gui = gui;
 		Container pane = getContentPane();
 
 		pane.setLayout(new BorderLayout(10, 10));

@@ -50,9 +50,11 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
+import org.supremica.log.*;
 
 public class ComputerHumanExtender
 {
+	protected static Logger logger = LoggerFactory.createLogger(ComputerHumanExtender.class);
 	protected Alphabet theAlphabet;
 
 	protected Alphabet controllableEvents;
@@ -84,6 +86,7 @@ public class ComputerHumanExtender
 		}
 		catch (Exception e)
 		{
+			logger.debug(e);
 			throw new IllegalStateException("Alphabets not consistent");
 		}
 	}
@@ -107,7 +110,7 @@ public class ComputerHumanExtender
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
 
-			if (currEvent.isImmediate() || !currEvent.isObservable())
+			if (currEvent.isImmediate())
 			{
 				throw new IllegalStateException("All events must be observable and non immediate");
 			}
