@@ -62,7 +62,7 @@ public class Resource
 
     public Resource(String name)
     {
-	this.name = name;
+        this.name = name;
     }
 
 }

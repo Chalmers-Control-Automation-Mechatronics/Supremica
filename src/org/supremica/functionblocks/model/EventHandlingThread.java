@@ -58,4 +58,8 @@ package org.supremica.functionblocks.model;
 class EventHandlingThread extends Thread
 {
 
+    public EventHandlingThread()
+    {
+        
+    }
 }

@@ -64,6 +64,14 @@ public class Scheduler
     private List scheduledJobs = Collections.synchronizedList(new LinkedList());
     private List finishedJobs = Collections.synchronizedList(new LinkedList());
 
+    private EventHandlingThread eventThread = null;
+    private AlgorithmExecutingThread algorithmThread = null;
+    
+    public Scheduler()
+    {
+        algorithmThread = new AlgorithmExecutingThread(this);
+    }
+    
     public int getNumberOfScheduledJobs()
     {
         return scheduledJobs.size();
