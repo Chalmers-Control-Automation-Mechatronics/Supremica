@@ -100,7 +100,12 @@ public class Alphabet
 	 */
 	public String getUniqueId(String prefix)
 	{
-		return prefix + new Integer(idIndex++);
+		String newId = null;
+		do
+		{
+			newId = prefix + new Integer(idIndex++);
+		} while (containsEventWithId(newId));
+		return newId;
 	}
 
 	/**
@@ -158,7 +163,7 @@ public class Alphabet
 	}
 
 	/**
-	 * Computes A \ B where A is this alphabet and B is other
+	 * Computes A \ B (difference) where A is this alphabet and B is other
 	 *
 	 *@param  other The other alphabet
 	 */
@@ -180,6 +185,33 @@ public class Alphabet
 			}
 		}
 	}
+
+	/**
+	 * Computes A + B (union) where A is this alphabet and B is other
+	 *
+	 *@param  other The other alphabet
+	 */
+	public void plus(Alphabet other)
+	{
+		for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
+		{
+			EventLabel currEvent = (EventLabel) alphIt.next();
+			if (!containsEventWithLabel(currEvent.getLabel()))
+			{
+				EventLabel newEvent = new EventLabel(currEvent);
+				newEvent.setId(getUniqueId("e"));
+				try
+				{
+					addEvent(newEvent);
+				}
+				catch (Exception e)
+				{  // This should be impossible
+					thisCategory.error("Alphabet.plus. Trying to add an existing event.");
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * Remove event from alphabet.
