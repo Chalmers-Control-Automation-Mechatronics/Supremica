@@ -35,12 +35,22 @@ class MyAutomatonToDot
 
 	protected String getStateColor(State state)
 	{
+		/*
 		if (state.isForbidden() && state.isSelected())
 		{
 			return ", color = red, style=bold";
 		}
 
 		return super.getStateColor(state);
+		*/
+		if(state.isSelected())
+		{
+			return super.getStateColor(state) + ", style=bold";
+		}
+		else
+		{
+			return super.getStateColor(state);
+		}
 	}
 }
 
@@ -456,6 +466,10 @@ class ReachButton
 				if (state.getCost() == State.MAX_COST)
 				{
 					state.setForbidden(true);
+					state.setSelected(false);
+				}
+				else
+				{
 					state.setSelected(true);
 				}
 			}
@@ -725,7 +739,7 @@ public class Workbench
 	{
 		hideGraph();
 
-		if (toAddIt() == false)
+		if (automaton != null && toAddIt() == false)
 		{
 			project.removeAutomaton(automaton);
 		}
@@ -734,7 +748,7 @@ public class Workbench
 	void showGraph()
 		throws Exception
 	{
-		if (toShowGraph())    // we should show it
+		if (toShowGraph() && automaton != null)    // we should show it and there's something to show
 		{
 			try
 			{
@@ -766,7 +780,7 @@ public class Workbench
 	{
 		try
 		{
-			if (project.existsAutomatonViewer(automaton))
+			if (automaton != null && project.existsAutomatonViewer(automaton))
 			{
 				AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
 				if (viewer.isVisible())
