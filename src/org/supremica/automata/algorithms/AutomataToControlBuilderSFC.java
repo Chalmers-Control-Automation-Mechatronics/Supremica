@@ -72,6 +72,13 @@ public class AutomataToControlBuilderSFC
 	protected int transitionCounter = 0;
 	protected int eventMonitorCounter = 0;
 	protected int automatonCounter = 1;
+	protected String coord = getCoord();
+	protected String transitionConditionPrefix = getTransitionConditionPrefix();
+	protected String transitionConditionSuffix = getTransitionConditionSuffix();
+	protected String actionP1Prefix = getActionP1Prefix();
+	protected String actionP1Suffix = getActionP1Suffix();
+	protected String actionP0Prefix = getActionP0Prefix();
+	protected String actionP0Suffix = getActionP0Suffix();
 
 	public AutomataToControlBuilderSFC(Automata automata)
 	{
@@ -192,11 +199,11 @@ public class AutomataToControlBuilderSFC
 
 			if (initState.nbrOfIncomingArcs() > 0)
 			{
-				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + "  (SeqControl) COORD 0.0, 0.0 OBJSIZE 1.0, 1.0");
+				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + "  (SeqControl)" + coord);
 			}
 			else
 			{
-				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + "  (SeqControl) COORD 0.0, 0.0 OBJSIZE 1.0, 1.0");
+				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + "  (SeqControl)" + coord);
 			}
 
 			printSequence(aut, initState, pw);
@@ -464,7 +471,7 @@ public class AutomataToControlBuilderSFC
 		transitionCounter = 1;
 
 		// eventMonitorCounter++;
-		pw.println("SEQUENCE EventMonitor_" + ++eventMonitorCounter + " COORD 0.0, 0.0 OBJSIZE 1.0, 1.0");
+		pw.println("SEQUENCE EventMonitor_" + ++eventMonitorCounter + coord);
 		pw.println("SEQINITSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
 
 		// Step 2. For each event e in theAlphabet
@@ -489,19 +496,17 @@ public class AutomataToControlBuilderSFC
 			// (a) Create transition t with t.C = preset()
 			String transitionCondition = computeGenerationCondition(theAutomata, currEvent);
 
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + " TRANSITIONCODEBLOCK\n STRUCTUREDTEXT\n" + transitionCondition + "\nEND_CODEBLOCK");
+			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + transitionConditionPrefix + transitionCondition + transitionConditionSuffix);
 
 			// (b) Create step with action e
 			pw.println("SEQSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
-			pw.println("ENTERCODEBLOCK STRUCTUREDTEXT");
-			pw.println(currEvent.getLabel().replace('.', '_') + " := True;\nEND_CODEBLOCK");
-			pw.println("EXITCODEBLOCK STRUCTUREDTEXT");
-			pw.println(currEvent.getLabel().replace('.', '_') + " := False;\nEND_CODEBLOCK");
+			pw.println(actionP1Prefix + currEvent.getLabel().replace('.', '_') + " := True;" + actionP1Suffix);
+			pw.println(actionP0Prefix + currEvent.getLabel().replace('.', '_') + " := False;" + actionP0Suffix);
 
 			// (c) Create transition t' with t'.C = not preset()
 			transitionCondition = computeCeaseCondition(theAutomata, currEvent);
 
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + " TRANSITIONCODEBLOCK\n STRUCTUREDTEXT\n" + transitionCondition + "\nEND_CODEBLOCK");
+			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + transitionConditionPrefix + transitionCondition + transitionConditionSuffix);
 		}
 
 		if (theAlphabet.size() > 1)
@@ -773,9 +778,7 @@ public class AutomataToControlBuilderSFC
 		{
 			LabeledEvent event = theAutomaton.getEvent(theArc.getEventId());
 
-			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter + " TRANSITIONCODEBLOCK\n STRUCTUREDTEXT\n" + event.getLabel().replace('.', '_') + "\nEND_CODEBLOCK");
-
-			transitionCounter++;
+			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + transitionConditionPrefix + event.getLabel().replace('.', '_') + transitionConditionSuffix);
 		}
 		catch (Exception ex)
 		{
@@ -788,5 +791,40 @@ public class AutomataToControlBuilderSFC
 	protected void printFork(Automaton theAutomaton, State theState, PrintWriter pw)
 	{
 		pw.println("SEQFORK " + theAutomaton.getName().replace('.', '_') + "__" + theState.getId() + " SEQBREAK");
+	}
+
+	protected String getTransitionConditionPrefix()
+	{
+		return " TRANSITIONCODEBLOCK\nSTRUCTUREDTEXT\n";
+	}
+
+	protected String getTransitionConditionSuffix()
+	{
+		return "\nEND_CODEBLOCK";
+	}
+
+	protected String getCoord()
+	{
+		return " COORD 0.0, 0.0 OBJSIZE 1.0, 1.0";
+	}
+
+	protected String getActionP1Prefix()
+	{
+		return "ENTERCODEBLOCK STRUCTUREDTEXT\n";
+	}
+
+	protected String getActionP1Suffix()
+	{
+		return "\nEND_CODEBLOCK";
+	}
+
+	protected String getActionP0Prefix()
+	{
+		return "EXITCODEBLOCK STRUCTUREDTEXT\n";
+	}
+
+	protected String getActionP0Suffix()
+	{
+		return "\nEND_CODEBLOCK";
 	}
 }

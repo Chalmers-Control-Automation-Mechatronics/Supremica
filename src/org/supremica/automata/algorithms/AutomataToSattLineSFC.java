@@ -65,6 +65,13 @@ public class AutomataToSattLineSFC
 	extends AutomataToControlBuilderSFC
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToSattLineSFC.class);
+	/*protected String coord = getCoord();
+	protected String transitionConditionPrefix = getTransitionConditionPrefix();
+	protected String transitionConditionSuffix = getTransitionConditionSuffix();
+	protected String actionP1Prefix = getActionP1Prefix();
+	protected String actionP1Suffix = getActionP1Suffix();
+	protected String actionP0Prefix = getActionP0Prefix();
+	protected String actionP0Suffix = getActionP0Suffix();*/
 
 	public AutomataToSattLineSFC(Automata automata)
 	{
@@ -210,11 +217,11 @@ public class AutomataToSattLineSFC
 
 			if (initState.nbrOfIncomingArcs() > 0)
 			{
-				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
+				pw.println("SEQUENCE " + aut.getName().replace('.', '_') + coord);
 			}
 			else
 			{
-				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
+				pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + coord);
 			}
 
 			printSequence(aut, initState, pw);
@@ -259,80 +266,38 @@ public class AutomataToSattLineSFC
 		pw.println("nucleuslib");
 	}
 
-	protected void printEventMonitor(Automata theAutomata, Alphabet theAlphabet, PrintWriter pw)
+	protected String getTransitionConditionPrefix()
 	{
-
-		// Step 1. Initialise. Create initial step
-		int stepCounter = 0;
-		boolean firstEvent = true;
-
-		transitionCounter = 1;
-
-		// eventMonitorCounter++;
-		pw.println("SEQUENCE EventMonitor_" + ++eventMonitorCounter + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
-		pw.println("SEQINITSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
-
-		// Step 2. For each event e in theAlphabet
-		if (theAlphabet.size() > 1)
-		{
-			pw.println("ALTERNATIVESEQ");
-		}
-
-		for (Iterator eventIt = theAlphabet.iterator(); eventIt.hasNext(); )
-		{
-			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-
-			if (firstEvent)
-			{
-				firstEvent = false;
-			}
-			else
-			{
-				pw.println("ALTERNATIVEBRANCH");
-			}
-
-			// (a) Create transition t with t.C = preset()
-			String transitionCondition = computeGenerationCondition(theAutomata, currEvent);
-
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + " WAIT_FOR " + transitionCondition);
-
-			// (b) Create step with action e
-			pw.println("SEQSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
-			pw.println("ENTERCODE");
-			pw.println(currEvent.getLabel().replace('.', '_') + " = True;");
-			pw.println("EXITCODE");
-			pw.println(currEvent.getLabel().replace('.', '_') + " = False;");
-
-			// (c) Create transition t' with t'.C = not preset()
-			transitionCondition = computeCeaseCondition(theAutomata, currEvent);
-
-			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + " WAIT_FOR " + transitionCondition);
-		}
-
-		if (theAlphabet.size() > 1)
-		{
-			pw.println("ENDALTERNATIVE");
-		}
-
-		pw.println("ENDSEQUENCE\n\n");
-		logger.debug("Printing Event Monitor");
+		return " WAIT_FOR ";
 	}
 
-	protected void printTransition(Automaton theAutomaton, Arc theArc, PrintWriter pw)
+	protected String getTransitionConditionSuffix()
 	{
-		try
-		{
-			LabeledEvent event = theAutomaton.getEvent(theArc.getEventId());
+		return "";
+	}
+	protected String getCoord()
+	{
+		// Should perhaps parameterise COORD
+		return " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5";
+	}
 
-			pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter + " WAIT_FOR " + event.getLabel().replace('.', '_'));
+	protected String getActionP1Prefix()
+	{
+		return "ENTERCODE";
+	}
 
-			transitionCounter++;
-		}
-		catch (Exception ex)
-		{
-			logger.error("Failed getting event label. Code generation aborted.");
+	protected String getActionP1Suffix()
+	{
+		return "";
+	}
 
-			return;
-		}
+	protected String getActionP0Prefix()
+	{
+		return "EXITCODE";
+	}
+
+	protected String getActionP0Suffix()
+	{
+		return "";
 	}
 }
