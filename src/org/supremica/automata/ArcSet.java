@@ -51,19 +51,42 @@ package org.supremica.automata;
 
 import java.util.*;
 
+/*
+class ArcComparator
+	implements Comparator
+{
+	private int compareArc(Arc a, Arc b)
+	{
+		//return a.toString().compareTo(b.toString());
+		int apa = (a.getFromState().getName() + a.getEvent().getLabel() + a.getToState().getName()).compareTo(b.getFromState().getName() + b.getEvent().getLabel() + b.getToState().getName());
+		return apa;
+	}
+
+	public int compare(Object a, Object b)
+	{
+		return compareArc((Arc) a, (Arc) b);
+	}
+}
+*/
+
 public class ArcSet
 {
 	private State fromState = null;
 	private State toState = null;
 
-	// private ArcListeners listeners = null;
-	private List theArcs = null;
+	//private List theArcs = null;
+	private Collection theArcs = null;
 
 	public ArcSet()
 	{
 		theArcs = new LinkedList();
+		//theArcs = new TreeSet(new ArcComparator());
 	}
 
+	/**
+	 * In states, outgoing arcs are ordered in sets like this. So all arcs that go to a certain
+	 * state are in the same set.
+	 */
 	public ArcSet(State from, State to)
 	{
 		this();
@@ -75,6 +98,8 @@ public class ArcSet
 	public ArcSet(ArcSet other)
 	{
 		theArcs = new LinkedList(other.theArcs);
+		//this();
+		//this.add(other);
 	}
 
 	public State getToState()
@@ -87,11 +112,11 @@ public class ArcSet
 		return fromState;
 	}
 
-	public boolean containsArc(Arc theArc)
+	public boolean contains(Arc theArc)
 	{
-		for (int i=0; i<theArcs.size(); i++)
+		for (ArcIterator it = iterator(); it.hasNext(); )
 		{
-			if (theArc.equals((Arc) theArcs.get(i)))
+			if (theArc.equals(it.nextArc()))
 			{
 				return true;
 			}
@@ -99,6 +124,18 @@ public class ArcSet
 		return false;
 	}
 
+	private void addAll(ArcSet set)
+	{
+		for (ArcIterator it = set.iterator(); it.hasNext(); )
+		{
+			this.addArc(it.nextArc());
+		}
+	}
+
+	public void add(Object obj)
+	{
+		addArc((Arc) obj);
+	}
 	public void addArc(Arc theArc)
 	{
 		theArcs.add(theArc);
@@ -109,10 +146,13 @@ public class ArcSet
 		theArcs.remove(theArc);
 	}
 
+	/*
 	public Arc removeArc()
 	{
-		return (Arc) theArcs.remove(0);
+	    //return (Arc) theArcs.remove(0);
+		return (Arc) theArcs.remove(iterator().nextArc());
 	}
+	*/
 
 	public void clear()
 	{

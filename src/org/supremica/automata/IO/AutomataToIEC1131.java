@@ -749,7 +749,7 @@ public class AutomataToIEC1131
 
 		    if (theAlphabet.contains(currEvent.getLabel()))
 		    {
-			LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
+			LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
 
 			if (currAutomatonEvent == null)
 			{
@@ -861,7 +861,7 @@ public class AutomataToIEC1131
 
 		    if (currAlphabet.contains(currEvent.getLabel()))
 		    {
-			LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
+			LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
 
 			if (currAutomatonEvent == null)
 			{

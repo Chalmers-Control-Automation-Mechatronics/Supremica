@@ -716,8 +716,7 @@ public class Automaton
 
 			foundEvents.clear();
 
-			for (EventIterator evIt = outgoingEventsIterator(currState);
-					evIt.hasNext(); )
+			for (ArcIterator evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
 
@@ -729,7 +728,6 @@ public class Automaton
 
 				// Has this event been seen in another transition from this state?
 				boolean newElement = foundEvents.add(currEvent.getLabel());
-
 				if (!newElement)
 				{
 					return false;
@@ -919,16 +917,6 @@ public class Automaton
 	}
 
 	// end index stuff
-	// What the f*** are these doing here?
-
-	/*
-	private LabeledEvent getEvent(String eventId)
-			throws Exception
-	{
-			// return alphabet.getEventWithId(eventId);
-			return alphabet.getEvent(new LabeledEvent(eventId));
-	}
-	*/
 
 	/**
 	 * Returns an iterator to all states in this automaton
@@ -970,12 +958,6 @@ public class Automaton
 		{
 			return false;
 		}
-	}
-
-	public LabeledEvent getEvent(String eventLabel)
-		throws IllegalArgumentException
-	{
-		return alphabet.getEvent(eventLabel);
 	}
 
 	public int nbrOfStates()
@@ -1148,7 +1130,6 @@ public class Automaton
 		for (StateIterator stateIterator = stateIterator();
 				stateIterator.hasNext(); )
 		{
-
 			// Measure the shortest trace to the state.
 			State currState = stateIterator.nextState();
 			int stateDepth;
@@ -1183,7 +1164,6 @@ public class Automaton
 		for (StateIterator stateIterator = stateIterator();
 				stateIterator.hasNext(); )
 		{
-
 			// Measure the shortest trace to the state.
 			State currState = stateIterator.nextState();
 			int stateDepth;
@@ -1232,16 +1212,19 @@ public class Automaton
 		return theArcs.iterator();
 	}
 
+	/*
 	public ArcIterator safeArcIterator()
 	{
 		return (new ArcSet(theArcs)).iterator();
 	}
+	*/
 
 	public boolean containsArc(Arc arc)
 	{
-		return theArcs.containsArc(arc);
+		return theArcs.contains(arc);
 	}
 
+	/*
 	public EventIterator outgoingEventsIterator(State theState)
 	{
 		Iterator arcIt = theState.outgoingArcsIterator();
@@ -1255,6 +1238,7 @@ public class Automaton
 
 		return new InternalEventIterator(arcIt);
 	}
+	*/
 
 	/**
 	 * These are only valid if the automatonType is interface.
@@ -1324,17 +1308,17 @@ public class Automaton
 		return alphabet;
 	}
 
-/*
-		public void setAlphabet(Alphabet alphabet)
-				throws IllegalArgumentException
+	/*
+	public void setAlphabet(Alphabet alphabet)
+		throws IllegalArgumentException
+	{
+		if (alphabet == null)
 		{
-				if (alphabet == null)
-				{
-						throw new IllegalArgumentException("Alphabet must be non-null");
-				}
-				this.alphabet = alphabet;
+			throw new IllegalArgumentException("Alphabet must be non-null");
 		}
-*/
+		this.alphabet = alphabet;
+	}
+	*/
 
 	/**
 	 * In some situation, for example in the dot output
@@ -1603,17 +1587,6 @@ public class Automaton
 	}
 
 	/**
-	 * Removes mutually accepting status from all states.
-	 */
-
-	/*
-	public void setMutuallyAcceptingStatus(boolean status)
-	{
-
-	}
-	*/
-
-	/**
 	 * Backwards extend accepting and mutually accepting states along transitions with safeEvents.
 	 * some kind of "coreachability along a subset of the alphabet".
 	 */
@@ -1729,7 +1702,8 @@ public class Automaton
 	}
 
 	/**
-	 * Makes all mutually accepting or accepting states non-accepting and all non-accepting states accepting.
+	 * Makes all mutually accepting or accepting states non-accepting
+	 * and all non-accepting states accepting.
 	 */
 	public void invertMarking()
 	{

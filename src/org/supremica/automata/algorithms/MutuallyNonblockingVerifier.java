@@ -692,15 +692,19 @@ public class MutuallyNonblockingVerifier
 		Automaton automatonCopy = new Automaton(automaton);
 
 		// Remove all arcs wich are not safe events
-		for (ArcIterator arcIt = automatonCopy.safeArcIterator();
-				arcIt.hasNext(); )
+		LinkedList toBeRemoved = new LinkedList();
+		for (ArcIterator arcIt = automatonCopy.arcIterator(); arcIt.hasNext(); )
 		{
 			Arc currArc = arcIt.nextArc();
 
 			if (!safeEvents.contains(currArc.getEvent()))
 			{
-				automatonCopy.removeArc(currArc);
+				toBeRemoved.add(currArc);
 			}
+		}
+		while (toBeRemoved.size() != 0)
+		{
+			automatonCopy.removeArc((Arc) toBeRemoved.remove(0));
 		}
 
 		// logger.info("Nbroftransitions then: " + automaton.nbrOfTransitions() + ", now: " + automatonCopy.nbrOfTransitions());

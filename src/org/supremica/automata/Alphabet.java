@@ -871,7 +871,6 @@ public class Alphabet
 		}
 	}
 
-	// Why was this method out-commented before? Something wrong? Or... did I do that?  /hguo
 	public int nbrOfCommonEvents(Alphabet otherAlphabet)
 	{
 		int nbrOfCommon = 0;
@@ -946,6 +945,16 @@ public class Alphabet
 		}
 
 		return found;
+	}
+
+	public boolean equals(Object other)
+	{
+		return this.theEvents.equals(((Alphabet) other).theEvents);
+	}
+
+	public int hashCode()
+	{
+		return theEvents.hashCode();
 	}
 
 	public static void main(String[] args)

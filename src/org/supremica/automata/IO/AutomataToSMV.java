@@ -162,11 +162,10 @@ public class AutomataToSMV
 		{
 			State currState = stateIt.nextState();
 
-			for (EventIterator evIt = currAutomaton.outgoingEventsIterator(currState);
-					evIt.hasNext(); )
+			for (ArcIterator evIt = currState.outgoingArcsIterator(); evIt.hasNext(); )
 			{
-				LabeledEvent currEvent = (LabeledEvent) evIt.next();
-
+				LabeledEvent currEvent = evIt.nextEvent();
+				
 				pw.print("\t\t\t(s.event = e_" + currEvent.getSynchIndex() + ") & ");
 				pw.print("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currState.getSynchIndex() + ") & ");
 				pw.print("TRUE");    // Broadcast synchronization

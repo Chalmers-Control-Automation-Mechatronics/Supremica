@@ -228,15 +228,15 @@ public class AutomatonMinimizer
 					return null;
 				}
 
-				////////////
-				// RULE D //
-				////////////
-				
 				if (debug)
 				{
 					adjustMarkingTimer.start();	
 				}
 
+				////////////
+				// RULE D //
+				////////////
+				
 				// Adjust marking based on epsilon transitions 
 				adjustMarking(theAutomaton); // Not OE
 				
@@ -315,13 +315,6 @@ public class AutomatonMinimizer
 			removeTransitionsTimer.start();
 		}
 
-		// Should we remove redundant transitions to minimize also with respect to transitions?
-		if (options.getAlsoTransitions())
-		{
-			doTransitiveClosure(newAutomaton);
-			removeRedundantTransitions(newAutomaton);
-		}
-
    		if (debug)
 		{
 			removeTransitionsTimer.stop();
@@ -334,6 +327,10 @@ public class AutomatonMinimizer
 		// Post minimization adjustments
 		if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 		{
+			///////////////////
+			// RULES A, B, C //
+			///////////////////
+
 			// Merge conflict equivalent states and stuff...
 			// (This is a FEATURE!)
 			int count = postMinimizationMergeConflictEquivalentStates(newAutomaton); // Not OE
@@ -343,7 +340,14 @@ public class AutomatonMinimizer
 							 "after running partitioning.");
 			}
 		}
-		
+
+		// Should we remove redundant transitions to minimize also with respect to transitions?
+		if (options.getAlsoTransitions())
+		{
+			doTransitiveClosure(newAutomaton);
+			removeRedundantTransitions(newAutomaton);
+		}
+
 		// Remove from alphabet epsilon events that are never used
 		removeUnusedEpsilonEvents(newAutomaton);
 
@@ -589,157 +593,6 @@ public class AutomatonMinimizer
 
 			return false;
 		}
-	}
-
-	/**
-	 * Merges states, preserving conflict equivalence.
-	 *
-	 * @return Number of states that have been removed by merging.
-	 */
-	public int postMinimizationMergeConflictEquivalentStates(Automaton aut)
-		throws Exception
-	{
-		StateSet statesToExamine = new StateSet(aut.getStateSet());
-
-		// Count the removed states
-		int count = 0;
-
-		// Mark noncoreachable states with State.MAX_COST
-		AutomatonSynthesizer synth = new AutomatonSynthesizer(aut, SynthesizerOptions.getDefaultSynthesizerOptions());
-		synth.doCoreachable();
-
-		// Remove all outgoing arcs from these states
-		for (Iterator it = aut.stateIterator(); it.hasNext(); )
-		{
-			State state = (State) it.next();
-			if ((state.getCost() == State.MAX_COST))
-			{
-				if (state.isAccepting())
-				{
-					// How did this happen!? An accepting state is always coreachable!?!?
-					logger.fatal("The state " + state + " forb: " + state.isForbidden() + 
-								 " accept: " + state.isAccepting() + " init: " + state.isInitial());
-					throw new Exception("Error in AutomatonMinimizer, coreachability failed!");
-				}
-
-				// We will never want to propagate from here...
-				// ... or from any state in the backwards epsilon closure!!
-				StateSet statesToModify = new StateSet();
-				statesToModify.add(state);
-				while (statesToModify.size() != 0)
-				{
-					State currState = statesToModify.get();
-					statesToModify.remove(currState);
-
-					// Accepting states that by epsilons may reach a block are modified to be 
-					// nonaccepting an exception is made if this is the initial state!
-					if (currState.isAccepting())
-					{
-						if (currState.isInitial())
-						{
-							if (debug)
-								logger.info("The system was found to be blocking.");
-							// Do nothing...
-							continue;
-						}
-						else
-						{
-							currState.setAccepting(false);
-						}
-					}
-
-					// We won't want to propagate from here
-					currState.removeOutgoingArcs();
-					//logger.info("I removed arcs from " + currState);
-
-					// Follow all epsilon transitions backwards
-					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
-					{
-						Arc arc = arcIt.nextArc();
-						if (arc.getEvent().isEpsilon())
-						{
-							statesToModify.add(arc.getFromState());
-						}
-					}
-				}
-
-				// Reset cost...
-				if (!state.isForbidden())
-				{
-					state.setCost(State.UNDEF_COST);
-				}
-			}
-		}
-		// Make reachable
-		synth.doReachable();
-		LinkedList toBeRemoved = new LinkedList();
-		for (StateIterator it = aut.stateIterator(); it.hasNext(); )
-		{
-			State state = it.nextState();
-			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
-			{
-				toBeRemoved.add(state);
-			}
-		}
-		while (toBeRemoved.size() != 0)
-		{
-			count++;
-			aut.removeState((State) toBeRemoved.remove(0));
-		}
-
-		// Do the merging
-		while (statesToExamine.size() != 0)
-		{
-			// Get and remove arbitrary state
-			State one = statesToExamine.get();
-			statesToExamine.remove(one);
-
-			// If there is only one incoming transition to this state AND it is an epsilon-transition
-			// AND there is at least one outgoing epsilon transition
-			// merge this and previous state.
-			if (one.nbrOfIncomingArcs() == 1)
-			{
-				Arc arc = one.incomingArcsIterator().nextArc();
-				State two = arc.getFromState();
-
-				if ((!one.equals(two)) && arc.getEvent().isEpsilon())
-				{
-					// Is there at least one epsilon outgoing?
-					boolean ok = false;
-					for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
-					{
-						if (outIt.nextArc().getEvent().isEpsilon())
-						{
-							ok = true;
-							break;
-						}
-					}
-
-					// OK to merge?
-					if (ok)
-					{
-						count++;
-						aut.removeArc(arc); // We can remove this one, it will become an epsilon self-loop!
-						statesToExamine.remove(two);
-						State mergeState = aut.mergeStates(two, one, useShortNames);
-						statesToExamine.add(mergeState);
-						// Add states that may have changed to stack
-						for (ArcIterator arcIt = mergeState.outgoingArcsIterator(); arcIt.hasNext(); )
-						{
-							Arc epsilonArc = arcIt.nextArc();
-							if (epsilonArc.getEvent().isEpsilon())
-							{
-								statesToExamine.add(epsilonArc.getToState());
-							}
-						}
-						//logger.info("I merged " + one + " and " + two + " since I thought they were CE");
-						continue; // Get next "one" from stack
-					}
-				}
-			}
-		}
-
-		return count;
 	}
 
 	/**
@@ -1026,6 +879,247 @@ public class AutomatonMinimizer
 	}
 
 	/**
+	 * Merges states, preserving conflict equivalence.
+	 *
+	 * @return Number of states that have been removed by merging.
+	 */
+	public int postMinimizationMergeConflictEquivalentStates(Automaton aut)
+		throws Exception
+	{
+		// Count the removed states
+		int count = 0;
+
+		////////////////////////////
+		// RULE C (not all cases) //
+		////////////////////////////
+
+		// Mark noncoreachable states with State.MAX_COST
+		AutomatonSynthesizer synth = new AutomatonSynthesizer(aut, SynthesizerOptions.getDefaultSynthesizerOptions());
+		synth.doCoreachable();
+
+		// Remove all outgoing arcs from these states
+		for (Iterator it = aut.stateIterator(); it.hasNext(); )
+		{
+			State state = (State) it.next();
+			if ((state.getCost() == State.MAX_COST))
+			{
+				// This state can not be acepting if the coreachability worked!
+				assert(!state.isAccepting());
+
+				// We will never want to propagate from here...
+				// ... or from any state in the backwards epsilon closure!!
+				StateSet statesToModify = new StateSet();
+				statesToModify.add(state);
+				while (statesToModify.size() != 0)
+				{
+					State currState = statesToModify.remove();
+
+					// Accepting states that by epsilons may reach a block are modified to be 
+					// nonaccepting an exception is made if this is the initial state!
+					// We might as well exchange the below if-clause with 
+					// only one statement, "currState.setAccepting(false);".
+					if (currState.isAccepting())
+					{
+						if (currState.isInitial())
+						{
+							// We know that the system is blocking!
+							logger.info("The system was found to be blocking.");
+							
+							// Do nothing...
+							continue;
+						}
+						else
+						{
+							currState.setAccepting(false);
+						}
+					}
+
+					// We won't want to propagate from here
+					currState.removeOutgoingArcs();
+					//logger.info("I removed arcs from " + currState);
+
+					////////////////
+					// RULE C.1-3 //
+					////////////////
+
+					// This stuff actually NEVER occured in the central lock example,
+					// perhaps it's not much to hope for?
+					// Follow all epsilon transitions backwards
+					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
+					{
+						Arc arc = arcIt.nextArc();
+						if (arc.getEvent().isEpsilon())
+						{
+							//logger.debug("Rule C.3 came to use.");
+							statesToModify.add(arc.getFromState());
+						}
+						else 
+						{
+							State previous = arc.getFromState();
+							ArcIterator outIt = previous.outgoingArcsIterator();
+							boolean fail = false;
+							LinkedList toBeRemoved = new LinkedList();
+							while (outIt.hasNext())
+							{
+							 	Arc currArc = outIt.nextArc();
+							 	
+							 	if (!currArc.getToState().equals(currState))
+							 	{									
+ 									if (currArc.getEvent().equals(arc.getEvent()))
+ 									{
+ 										//logger.debug("Rule C.1 came to use.");
+ 										// The arc "currArc" can be removed
+ 										toBeRemoved.add(currArc);
+									}
+									else
+									{
+										fail = true;
+									}
+								}
+							}
+							while (toBeRemoved.size() != 0)
+							{
+								aut.removeArc((Arc) toBeRemoved.remove(0));
+							}
+							if (!fail)
+							{
+								//logger.debug("Rule C.2 came to use.");
+								statesToModify.add(previous);								
+							}							
+						}
+					}
+				}
+
+				// Reset cost...
+				if (!state.isForbidden())
+				{
+					state.setCost(State.UNDEF_COST);
+				}
+			}
+		}
+		// After the above there may be nonreachable parts... make reachable!
+		synth.doReachable();
+		LinkedList toBeRemoved = new LinkedList();
+		for (StateIterator it = aut.stateIterator(); it.hasNext(); )
+		{
+			State state = it.nextState();
+			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
+			{
+				toBeRemoved.add(state);
+			}
+		}
+		while (toBeRemoved.size() != 0)
+		{
+			aut.removeState((State) toBeRemoved.remove(0));
+			count++;
+		}
+		
+		////////////
+		// RULE A //
+		////////////
+
+		// If there is only one incoming transition to a state AND it is an epsilon-transition
+		// AND there is at least one outgoing epsilon transition
+		// merge this and previous state.
+		StateSet statesToExamine = new StateSet(aut.getStateSet());
+		while (statesToExamine.size() != 0)
+		{
+			// Get and remove arbitrary state
+			State one = statesToExamine.remove();
+
+			// Examine this state
+			ArcIterator it = one.incomingArcsIterator();
+			Arc arc = null;
+			if (it.hasNext())
+			{
+				arc = it.nextArc();
+			}
+			if (arc != null && !it.hasNext())
+			{
+				State two = arc.getFromState();
+
+				if ((!one.equals(two)) && arc.getEvent().isEpsilon())
+				{
+					// Is there at least one epsilon outgoing?
+					boolean ok = false;
+					for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
+					{
+						if (outIt.nextArc().getEvent().isEpsilon())
+						{
+							ok = true;
+							break;
+						}
+					}
+
+					// OK to merge?
+					if (ok)
+					{
+						aut.removeArc(arc); // We can remove this one, it will become an epsilon self-loop!
+						statesToExamine.remove(two);
+						State mergeState = aut.mergeStates(two, one, useShortNames);
+						count++;
+						statesToExamine.add(mergeState);
+						// Add states that may have changed to stack
+						for (ArcIterator arcIt = mergeState.outgoingArcsIterator(); arcIt.hasNext(); )
+						{
+							Arc epsilonArc = arcIt.nextArc();
+							if (epsilonArc.getEvent().isEpsilon())
+							{
+								statesToExamine.add(epsilonArc.getToState());
+							}
+						}
+						//logger.info("I merged " + one + " and " + two + " since I thought they were CE");
+						continue; // Get next "one" from stack
+					}
+				}
+			}
+		}
+
+		////////////
+		// RULE B //
+		////////////
+
+		// If two states has the same incoming arcs (from the same state(s) and with the same event(s))
+		// AND if both states have the same enabled events, then they can be merged!
+		boolean change = true;
+		while (change)
+		{
+			change = false;
+			statesToExamine = new StateSet(aut.getStateSet());
+			HashSet infoHash = new HashSet(statesToExamine.size()*2+1);
+			while (statesToExamine.size() != 0)
+			{
+				State state = statesToExamine.remove();
+				StateInfo info = new StateInfo(state);
+				infoHash.add(info);
+			}
+			
+			Iterator it = infoHash.iterator();
+			assert(it.hasNext());
+			StateInfo last = (StateInfo) it.next();
+			while (it.hasNext())
+			{
+				StateInfo curr = (StateInfo) it.next();
+				//logger.fatal(curr.toString());
+				
+				if (curr.equalCharacterization(last))
+				{
+					//logger.info("Merging " + last.getState() + " and " + curr.getState() + ".");
+					State state = aut.mergeStates(last.getState(), curr.getState());
+					count++;
+					curr.setState(state);
+					change = true;
+				}
+
+				last = null;
+				last = curr;
+			}
+		}
+
+		return count;
+	}
+
+	/**
 	 * Add transitions to cover for the epsilon events (aka "saturate"). More formally, each
 	 * time there is a transition "p =a=> q", after completing the transitive closure (or
 	 * "saturation"), there is also a transition "p -a-> q".
@@ -1209,6 +1303,10 @@ public class AutomatonMinimizer
 		}
 		*/
 
+		////////////
+		// RULE D //
+		////////////
+		
 		// States that can reach marked states by epsilon events only can be considered marked
 		LinkedList toBeMarked = new LinkedList();
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
@@ -1429,17 +1527,177 @@ public class AutomatonMinimizer
 	}
 }
 
+/**
+ * Class for characterizing states. For use with the "B-rule".
+ */
+class StateInfo
+{
+	private State state;
+	private Alphabet enabledEvents;
+	private Arclets incomingArcs;
+	private boolean isInitial;
+	private boolean isMarked;
+	
+	private int hash = 0;
+
+	public StateInfo(State state)
+	{
+		this.state = state;
+		enabledEvents = state.enabledEvents(true);
+		incomingArcs = new Arclets(state.backwardsEpsilonClosure().incomingArcsIterator());
+		isInitial = state.backwardsEpsilonClosure().hasInitialState();
+		isMarked = state.isAccepting();
+	}	
+
+	public void setState(State state)
+	{
+		this.state = state;
+	}
+
+	public State getState()
+	{
+		return state;
+	}
+
+	public boolean equalCharacterization(StateInfo other)
+	{
+		boolean result = true;
+		result &= enabledEvents.equals(other.enabledEvents);
+		result &= incomingArcs.equals(other.incomingArcs);
+		result &= isInitial == other.isInitial;
+		result &= isMarked == other.isMarked;
+		
+		return result;
+	}
+
+	public boolean equals(Object object)
+	{
+		StateInfo other = (StateInfo) object;
+
+		return state.equals(other.state);
+	}
+
+	public int hashCode()
+	{
+		if (hash != 0)
+		{
+			return hash;
+		}
+
+		hash = 1;
+		hash = hash * 31 + enabledEvents.hashCode();
+		hash = hash * 31 + incomingArcs.hashCode();
+		hash = hash * 31 + (isInitial ? 1231 : 1237);
+		hash = hash * 31 + (isMarked ? 1231 : 1237);
+
+		return hash;
+	}
+
+	public String toString()
+	{
+		String result = "";
+		result += "State: " + state + "\n";
+		result += "  Enabled: " + enabledEvents + "\n";
+		result += "  Arclets: " + incomingArcs + "\n";
+		result += "  Initial: " + isInitial + "\n";
+		result += "  Marked : " + isMarked + "\n";
+		return result;
+	}
+
+	/**
+	 * Class describing "half" arcs, i.e. only one state and the event.
+	 */
+	class Arclet
+	{
+		private State state;
+		private LabeledEvent event; 
+
+		public Arclet(Arc arc)
+		{
+			state = arc.getFromState();
+			event = arc.getEvent();
+		}
+
+		public boolean equals(Object obj)
+		{
+			Arclet other = (Arclet) obj;
+
+			return (state.equals(other.state) && event.equals(other.event));
+		}
+
+		public int hashCode()
+		{
+			return (17*state.hashCode())*event.hashCode();
+		}
+
+		public String toString()
+		{
+			return "<" + state.getName() + ", " + event.getLabel() + ">";
+		}
+	}
+
+	class Arclets 
+	{
+		// Why can't I have a TreeSet here!?!?!?
+		private TreeMap arclets = new TreeMap();
+		//private TreeSet arclets = new TreeSet();
+
+		public Arclets(ArcIterator arcIterator)
+		{
+			while (arcIterator.hasNext())
+			{
+				Arc arc = arcIterator.nextArc();
+
+				// Ignore epsilon events
+				if (!arc.getEvent().isEpsilon())
+				{
+					Arclet arclet = new Arclet(arc);
+					arclets.put("" + arclet.hashCode(), arclet);
+					//arclets.add(arclet);
+				}
+			}
+		}
+
+		public boolean equals(Object obj)
+		{		
+			return arclets.equals(((Arclets) obj).arclets);
+		}
+
+		public int hashCode()
+		{
+			return arclets.hashCode();
+		}
+
+		public String toString()
+		{
+			String result = "";
+
+			//Iterator it = arclets.iterator();
+			Iterator it = arclets.values().iterator();
+			while (it.hasNext())
+			{
+				result += (Arclet) it.next();
+				if (it.hasNext())
+				{
+					result += ", ";
+				}
+			}
+	   		
+			return result;
+		}
+	}
+}
+
 class EquivalenceClasses
 	extends StateSets
 {
 	public void addAll(EquivalenceClassHolder equivClassHolder)
 	{
 		Iterator equivIt = equivClassHolder.iterator();
-
 		while (equivIt.hasNext())
 		{
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivIt.next();
-
+			
 			currEquivClass.update();
 			super.add(currEquivClass);
 		}

@@ -627,10 +627,9 @@ public class AutomatonSynthesizer
 			// Is this a forbidden state (so all incoming from nonforbidden states should be disabled)
 			if (currState.getCost() == State.MAX_COST)
 			{
-				for (Iterator evIt = theAutomaton.incomingEventsIterator(currState);
-						evIt.hasNext(); )
+				for (ArcIterator evIt = currState.incomingArcsIterator(); evIt.hasNext(); )
 				{
-					LabeledEvent currEvent = (LabeledEvent) evIt.next();
+					LabeledEvent currEvent = evIt.nextEvent();
 
 					if (!currEvent.isControllable())
 					{

@@ -463,7 +463,7 @@ public class AutomataToJava
 
 				if (alphabet.contains(event))
 				{
-					LabeledEvent automatonEvent = automaton.getEvent(event.getLabel());
+					LabeledEvent automatonEvent = automaton.getAlphabet().getEvent(event.getLabel());
 
 					if (automatonEvent == null)
 					{

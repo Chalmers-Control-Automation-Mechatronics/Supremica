@@ -285,7 +285,7 @@ public class Automata
 	}
 
 	/**
-	 * Iterates backwars through the automata... necessary
+	 * Iterates backwards through the automata... necessary
 	 * in the automataMove_actionPerformed in ActionMan when
 	 * moving down
 	 *

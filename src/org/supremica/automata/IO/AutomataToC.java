@@ -477,7 +477,7 @@ public class AutomataToC
 
 				if (currAlphabet.contains(currEvent.getLabel()))
 				{
-					LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
+					LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
 
 					if (currAutomatonEvent == null)
 					{

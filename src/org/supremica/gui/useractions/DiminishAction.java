@@ -159,27 +159,31 @@ public class DiminishAction
 		automaton.beginTransaction();
 
 		// Remove all arcs between two forbidden states (is it safe to do this?)
-		for (Iterator arcit = automaton.safeArcIterator(); arcit.hasNext(); )
+		LinkedList toBeRemoved = new LinkedList();
+		for (Iterator arcit = automaton.arcIterator(); arcit.hasNext(); )
 		{
 			Arc arc = (Arc) arcit.next();
 
 			if (arc.getFromState().isForbidden() && arc.getToState().isForbidden())
 			{
-				automaton.removeArc(arc);
+				toBeRemoved.add(arc);
 			}
 		}
+		while (toBeRemoved.size() != 0)
+		{
+			automaton.removeArc((Arc) toBeRemoved.remove(0));
+		}				
 
 		// Now, lets adjust the remaining arcs. 
 		// If we reach a forbidden state, we need to take that arc further down the chain
 		// Do we know that it is a chain? What about nondeterminism??
-		for (Iterator arcit = automaton.safeArcIterator(); arcit.hasNext(); )
+		for (Iterator arcit = automaton.arcIterator(); arcit.hasNext(); )
 		{
 			Arc arc = (Arc) arcit.next();
 			State nextstate = arc.getToState();
 
 			if (nextstate.isForbidden())
 			{
-
 				// We know that from the forbidden state, we reach a non-forbidden one
 				// (otherwise this transition would have been removed above)
 				// We don't know if there are multiple non-forbidden states reached, however!
@@ -192,9 +196,13 @@ public class DiminishAction
 					automaton.addArc(new Arc(arc.getFromState(), newarc.getToState(), arc.getEvent()));
 				}
 
-				automaton.removeArc(arc);    // Remove it (must not remove before adjusting!!)
+				toBeRemoved.add(arc);    // Remove it (must not remove before adjusting!!)
 			}
 		}
+		while (toBeRemoved.size() != 0)
+		{
+			automaton.removeArc((Arc) toBeRemoved.remove(0));
+		}				
 
 		// Remove the forbidden states
 		AutomatonPurge automatonPurge = new AutomatonPurge(automaton);

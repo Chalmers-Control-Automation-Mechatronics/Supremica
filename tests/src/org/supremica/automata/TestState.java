@@ -51,15 +51,15 @@ package org.supremica.automata;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.supremica.automata.IO.*;
 import org.supremica.testhelpers.*;
-import org.supremica.automata.algorithms.AutomataSynchronizer;
 
-public class TestAlphabet
+
+public class TestState
 	extends TestCase
 {
-
-	public TestAlphabet(String name)
+	public TestState(String name)
 	{
 		super(name);
 	}
@@ -86,89 +86,37 @@ public class TestAlphabet
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestAlphabet.class);
+		TestSuite suite = new TestSuite(TestState.class);
 		return suite;
 	}
 
-
-	public void testSimpleOperations()
-	{
-		Alphabet alph1 = new Alphabet();
-		assertTrue(alph1.size() == 0);
-		{
-			LabeledEvent e1 = new LabeledEvent("e1");
-			alph1.addEvent(e1);
-			assertTrue(alph1.size() == 1);
-			LabeledEvent e2 = new LabeledEvent("e2");
-			alph1.addEvent(e2);
-			assertTrue(alph1.size() == 2);
-			LabeledEvent e3 = new LabeledEvent("e3");
-			alph1.addEvent(e3);
-			assertTrue(alph1.size() == 3);
-		}
-
-
-		Alphabet alph2 = new Alphabet();
-		assertTrue(alph2.size() == 0);
-		{
-			LabeledEvent e1 = new LabeledEvent("e1");
-			alph2.addEvent(e1);
-			assertTrue(alph2.size() == 1);
-			LabeledEvent e2 = new LabeledEvent("e2");
-			alph2.addEvent(e2);
-			assertTrue(alph2.size() == 2);
-			LabeledEvent e3 = new LabeledEvent("e3");
-			alph2.addEvent(e3);
-			assertTrue(alph2.size() == 3);
-		}
-
-		Alphabet alph3 = new Alphabet(alph1);
-		assertTrue(alph3.size() == 3);
-		alph3.union(alph2);
-		assertTrue(alph3.size() == 3);
-		alph3.intersect(alph2);
-		assertTrue(alph3.size() == 3);
-		alph3.minus(alph2);
-		assertTrue(alph3.size() == 0);
-
-		Alphabet alph4 = new Alphabet(alph1);
-		{
-			LabeledEvent e2 = alph4.getEvent("e2");
-			alph4.removeEvent(e2);
-			assertTrue(alph4.size() == 2);
-			alph2.minus(alph4);
-			assertTrue(alph2.size() == 1);
-			alph2.union(alph1);
-			assertTrue(alph2.size() == 3);
-		}
-
-		alph1.setIndicies();
-		int minIndex = 0;
-		int maxIndex = alph1.size() - 1;
-		for (EventIterator evIt = alph1.iterator(); evIt.hasNext(); )
-		{
-			LabeledEvent currEvent = evIt.nextEvent();
-			int currIndex = currEvent.getSynchIndex();
-			assertTrue(currIndex >= minIndex);
-			assertTrue(currIndex <= maxIndex);
-		}
-	}
-
-	public void testAlphabetEquality()
+	public void testEpsilonClosure()
 	{
 		try
 		{
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Bisimulation));
+			Automaton aut = theProject.getAutomaton("P1F1F2");
+			State state = aut.getInitialState();
+			
+			assertTrue(state.enabledEvents(false).size() == 2);
+			assertTrue(state.enabledEvents(true).size() == 2);
 
-			// Test equality
-			Automaton plant = AutomataSynchronizer.synchronizeAutomata(theProject.getPlantAutomata());
-			Automaton spec = AutomataSynchronizer.synchronizeAutomata(theProject.getSpecificationAutomata());
-			assertTrue(plant.getAlphabet().equals(spec.getAlphabet()));
+			LabeledEvent event = new LabeledEvent("apa");
+			aut.getAlphabet().addEvent(event);
+			State from = aut.getStateWithName("ready.2.2");
+			State to = aut.getStateWithName("think.0.1");
+			aut.addArc(new Arc(from, to, event));
+			assertTrue(state.enabledEvents(false).size() == 2);
+			assertTrue(state.enabledEvents(true).size() == 3);
 
-			// Test inequality
-			spec = theProject.getAutomaton("Functional mode");
-			assertTrue(!plant.getAlphabet().equals(spec.getAlphabet()));
+			LabeledEvent tau = aut.getAlphabet().getEvent("tau");
+			assertTrue(state.nextStateSet(tau, false).size() == 3);
+			assertTrue(state.nextStateSet(tau, true).size() == 7);			
+
+			aut.addArc(new Arc(to, from, tau));
+			assertTrue(state.epsilonClosure().size() == 7);
+			assertTrue(state.backwardsEpsilonClosure().size() == 9);
 		}
 		catch (Exception ex)
 		{

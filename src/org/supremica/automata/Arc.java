@@ -310,7 +310,10 @@ public class Arc
 		return (toState.equals(arc.getToState()) && fromState.equals(arc.getFromState()) && event.equals(arc.getEvent()));
 	}
 
-	// For debugging (etc)
+	/**
+	 * Returns a string representation of the arc as an ordered triple, 
+	 * with from-state, to-state and event.
+	 */
 	public String toString()
 	{
 		StringBuffer sbuf = new StringBuffer();

@@ -377,7 +377,7 @@ public class AutomataToIEC61499
 
 		if (theAlphabet.contains(currEvent.getLabel()))
 		{
-		    LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
+		    LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
 
 		    if (currAutomatonEvent == null)
 		    {

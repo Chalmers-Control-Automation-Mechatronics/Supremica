@@ -55,11 +55,9 @@ import junit.framework.TestSuite;
 import org.supremica.automata.IO.*;
 import org.supremica.testhelpers.*;
 
-
 public class TestAutomaton
 	extends TestCase
 {
-
 	public TestAutomaton(String name)
 	{
 		super(name);
@@ -89,22 +87,6 @@ public class TestAutomaton
 	{
 		TestSuite suite = new TestSuite(TestAutomaton.class);
 		return suite;
-	}
-
-	public void testAddState()
-	{
-		Automaton theAutomaton = new Automaton();
-		assertTrue(theAutomaton.nbrOfStates() == 0);
-		assertTrue(theAutomaton.nbrOfTransitions() == 0);
-		assertTrue(theAutomaton.nbrOfEvents() == 0);
-		// assertTrue(theAutomaton.getName().equals(""));
-		State q1 = new State("q1");
-		State q2 = new State("q2");
-		assertTrue(theAutomaton.nbrOfStates() == 0);
-		theAutomaton.addState(q1);
-		assertTrue(theAutomaton.nbrOfStates() == 1);
-		theAutomaton.addState(q2);
-		assertTrue(theAutomaton.nbrOfStates() == 2);
 	}
 
 	public void testCopyConstructor()
@@ -140,6 +122,22 @@ public class TestAutomaton
 			ex.printStackTrace();
 			assertTrue(false);
 		}
+	}
+
+	public void testAddState()
+	{
+		Automaton theAutomaton = new Automaton();
+		assertTrue(theAutomaton.nbrOfStates() == 0);
+		assertTrue(theAutomaton.nbrOfTransitions() == 0);
+		assertTrue(theAutomaton.nbrOfEvents() == 0);
+		// assertTrue(theAutomaton.getName().equals(""));
+		State q1 = new State("q1");
+		State q2 = new State("q2");
+		assertTrue(theAutomaton.nbrOfStates() == 0);
+		theAutomaton.addState(q1);
+		assertTrue(theAutomaton.nbrOfStates() == 1);
+		theAutomaton.addState(q2);
+		assertTrue(theAutomaton.nbrOfStates() == 2);
 	}
 
 	public void testRemove()

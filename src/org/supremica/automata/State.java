@@ -501,6 +501,7 @@ public class State
 
 			if (currArcSet.getToState() == toState)
 			{
+				assert(currArcSet.getFromState().equals(this));
 				return currArcSet;
 			}
 		}
@@ -905,16 +906,33 @@ public class State
 	}
 
 	/**
-	 * Returns true if an event with the label label is enabled by the supervisor.
+	 * Returns true if an event with the label "label" is enabled by the supervisor.
 	 */
 	public boolean isEnabled(String label)
 	{
-		Iterator outgoingArcsIt = outgoingArcs.iterator();
+		return isEnabled(label, false);
+	}
+	/**
+	 * Returns true if an event with the label "label" is enabled by the supervisor.
+	 * If considerEpsilonClosure is true, it can be anywhere in the epsilon closure
+	 * of this state instead of just in this state.
+	 */
+	public boolean isEnabled(String label, boolean considerEpsilonClosure)
+	{
+		ArcIterator arcIt;
+		if (considerEpsilonClosure)
+		{
+			arcIt = epsilonClosure().outgoingArcsIterator();
+		}
+		else
+		{
+			arcIt = outgoingArcsIterator();
+		}
 
 		// String eventId = e.getId();
-		while (outgoingArcsIt.hasNext())
+		while (arcIt.hasNext())
 		{
-			Arc currArc = (Arc) outgoingArcsIt.next();
+			Arc currArc = (Arc) arcIt.next();
 
 			if (currArc.getEvent().getLabel().equals(label))
 			{
@@ -924,9 +942,49 @@ public class State
 
 		return false;
 	}
+	/**
+	 * Returns true if an event with the label "label" is enabled by the supervisor.
+	 */
 	public boolean isEnabled(LabeledEvent event)
 	{
 		return isEnabled(event.getLabel());
+	}
+	/**
+	 * Returns true if an event with the label "label" is enabled by the supervisor.
+	 * If considerEpsilonClosure is true, it can be anywhere in the epsilon closure
+	 * of this state instead of just in this state.
+	 */
+	public boolean isEnabled(LabeledEvent event, boolean considerEpsilonClosure)
+	{
+		return isEnabled(event.getLabel(), considerEpsilonClosure);
+	}
+
+	/**
+	 * Returns the alphabet of enabled events. Epsilon events are left out.
+	 */
+	public Alphabet enabledEvents(boolean considerEpsilonClosure)
+	{
+		Alphabet enabled = new Alphabet();
+		
+		ArcIterator arcIt;
+		if (considerEpsilonClosure)
+		{
+			arcIt = epsilonClosure().outgoingArcsIterator();
+		}
+		else
+		{
+			arcIt = outgoingArcsIterator();
+		}
+		while (arcIt.hasNext())
+		{
+			LabeledEvent event = arcIt.nextEvent();
+			if (!enabled.contains(event) && !event.isEpsilon())
+			{
+				enabled.addEvent(event);
+			}
+		}
+
+		return enabled;
 	}
 
 	public boolean contains(int x1, int y1)

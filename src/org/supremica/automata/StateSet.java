@@ -11,20 +11,19 @@
 package org.supremica.automata;
 
 import java.util.*;
-import org.supremica.automata.*;
 import org.supremica.properties.SupremicaProperties;
 
 class StateComparator
 	implements Comparator
 {
-	int compare(State s1, State s2)
+	private int compare(State a, State b)
 	{
-		return s1.getName().compareTo(s2.getName());
+		return a.getName().compareTo(b.getName());
 	}
 
-	public int compare(Object o1, Object o2)
+	public int compare(Object a, Object b)
 	{
-		return compare((State) o1, (State) o2);
+		return compare((State) a, (State) b);
 	}
 }
 
@@ -149,7 +148,12 @@ public class StateSet
 
 	public ArcIterator outgoingArcsIterator()
 	{
-		return new ArcIterator(new StateSetOutgoingArcsIterator(this));
+		return new ArcIterator(new StateSetArcIterator(this, true));
+	}
+
+	public ArcIterator incomingArcsIterator()
+	{
+		return new ArcIterator(new StateSetArcIterator(this, false));
 	}
 
 	public boolean remove(State state)
@@ -228,7 +232,8 @@ public class StateSet
 
 		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
 		{
-			for (StateIterator prevIt = stateIt.nextState().previousStateIterator(event); prevIt.hasNext(); )
+			for (StateIterator prevIt = stateIt.nextState().previousStateIterator(event); 
+				 prevIt.hasNext(); )
 			{
 				prevStates.add(prevIt.nextState());
 			}
@@ -322,7 +327,9 @@ public class StateSet
 		}
 	}
 
-	// Returns true if at least one state in this equivalence class is marked as 'initial'
+	/**
+	 * Returns true if at least one state in this equivalence class is marked as 'initial'
+	 */
 	public boolean hasInitialState()
 	{
 		Iterator stateIt = iterator();
@@ -340,7 +347,9 @@ public class StateSet
 		return false;
 	}
 
-	// Returns true if at least one state in this equivalence class is marked as 'accepting'
+	/**
+	 * Returns true if at least one state in this equivalence class is marked as 'accepting'
+	 */
 	public boolean hasAcceptingState()
 	{
 		Iterator stateIt = iterator();
@@ -358,7 +367,9 @@ public class StateSet
 		return false;
 	}
 
-	// Returns true if at least one state in this equivalence class is marked as 'forbidden'
+	/**
+	 * Returns true if at least one state in this equivalence class is marked as 'forbidden'
+	 */
 	public boolean hasForbiddenState()
 	{
 		Iterator stateIt = iterator();
@@ -384,25 +395,35 @@ public class StateSet
 		singleStateRepresentation = null;
 	}
 
-	private class StateSetOutgoingArcsIterator
+	private class StateSetArcIterator
 		implements Iterator
 	{
 		private StateIterator stateIterator = null;
-		private ArcIterator currArcIterator = null;
+		private ArcIterator arcIterator = null;
+		private boolean outgoing;
 
-		public StateSetOutgoingArcsIterator(StateSet stateSet)
+		public StateSetArcIterator(StateSet stateSet, boolean outgoing)
 		{
+			this.outgoing = outgoing;
 			stateIterator = stateSet.iterator();
 			
-			// Find a state that has outgoing arcs
+			// Find a state that has at least one outgoing/incoming arcs
 			while (stateIterator.hasNext())
 			{
-				ArcIterator arcIt = stateIterator.nextState().outgoingArcsIterator();
+				ArcIterator arcIt;
+				if (outgoing)
+				{
+					arcIt = stateIterator.nextState().outgoingArcsIterator();
+				}
+				else
+				{
+					arcIt = stateIterator.nextState().incomingArcsIterator();
+				}
 				
 				// If there are arcs in this iterator, we're done!
 				if (arcIt.hasNext())
 				{
-					currArcIterator = arcIt;
+					arcIterator = arcIt;
 					break;
 				}
 			}
@@ -410,12 +431,12 @@ public class StateSet
 
 		public boolean hasNext()
 		{
-			if (currArcIterator == null)
+			if (arcIterator == null)
 			{
 				return false;
 			}
 
-			return currArcIterator.hasNext();
+			return arcIterator.hasNext();
 		}
 		
 		public Object next()
@@ -427,20 +448,28 @@ public class StateSet
 		public Arc nextArc()
 			throws NoSuchElementException
 		{
-			Arc arc = currArcIterator.nextArc();
+			Arc arc = arcIterator.nextArc();
 			
 			// Jump to the next state?
-			if (!currArcIterator.hasNext())
+			if (!arcIterator.hasNext())
 			{
 				// Find a state that has outgoing arcs
 				while (stateIterator.hasNext())
 				{
-					ArcIterator arcIt = stateIterator.nextState().outgoingArcsIterator();
+					ArcIterator arcIt;
+					if (outgoing)
+					{
+						arcIt = stateIterator.nextState().outgoingArcsIterator();
+					}
+					else
+					{
+						arcIt = stateIterator.nextState().incomingArcsIterator();
+					}
 
 					// If there are arcs in this iterator, we're done!
 					if (arcIt.hasNext())
 					{
-						currArcIterator = arcIt;
+						arcIterator = arcIt;
 						break;
 					}
 				}

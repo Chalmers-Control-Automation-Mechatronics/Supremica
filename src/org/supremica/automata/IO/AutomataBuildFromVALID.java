@@ -275,7 +275,7 @@ public class AutomataBuildFromVALID
 
 						// Nowadays it's more complicated than the above. Oh woe!
 						Automaton currAutomaton = currAutomata.getAutomaton(newAutomatonName);
-						LabeledEvent currEvent = currAutomaton.getEvent(oldEventName);
+						LabeledEvent currEvent = currAutomaton.getAlphabet().getEvent(oldEventName);
 
 						// Make the new event a copy of the old one but with new label
 						LabeledEvent newEvent = new LabeledEvent(currEvent);

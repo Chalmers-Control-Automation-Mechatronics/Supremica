@@ -109,8 +109,7 @@ class DefaultExpander
 				logger.debug("Part State: " + currAutomaton.getName() + "[" + stateIndex + ":" + s.getIndex() + "]::" + s.toString());
 
 				// Now, let us iterate over *all* events (locally) enabled in this state
-				EventIterator evit = currAutomaton.outgoingEventsIterator(s);
-
+				ArcIterator evit = s.outgoingArcsIterator();
 				while (evit.hasNext())
 				{
 					int[] currState = elem.getStateArray();

@@ -4,15 +4,13 @@ import java.io.*;
 
 public class Options
 {
-
 	/**
 	 * The number of automata in a group or total before we switch from the
 	 * monolithic supervisor -- see SupervisorFactory.createNonDisjSupervisor()
 	 */
-	public static final int MAX_MONOLITHIC_GROUP_SIZE = 4, MAX_MONOLITHIC_TOTAL_SIZE = 6
-	;
+	public static final int MAX_MONOLITHIC_GROUP_SIZE = 4, MAX_MONOLITHIC_TOTAL_SIZE = 6;
 
-	// current directory is always a good start
+	/** current directory is always a good start */
 	public static String extraLibPath = ".";
 
 	/** Variable re-ordering method. NOTE: must use the same order as the constants in JBDD !!*/

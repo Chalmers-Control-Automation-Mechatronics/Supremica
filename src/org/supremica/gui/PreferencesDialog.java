@@ -1109,7 +1109,7 @@ class BDDPanel2
 
 		JPanel pExtraLib = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-		pExtraLib.add(new JLabel("Additinal DLL path"));
+		pExtraLib.add(new JLabel("Additional DLL path"));
 		pExtraLib.add(extraLibDir = new JTextField("" + Options.extraLibPath, 15));
 		pTopRight.add(pExtraLib);
 
