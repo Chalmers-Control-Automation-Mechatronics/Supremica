@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<frame size="640,480" title="Hello SWIXML World" DefaultCloseOperation="JFrame.EXIT_ON_CLOSE">
+<frame size="640,480" title="Hello SWIXML World" DefaultCloseOperation="DISPOSE_ON_CLOSE">
   <panel constraints="BorderLayout.CENTER">
     <label LabelFor="tf" Font="Comic Sans MS-BOLD-12" Foreground="blue" text="Hello World!"/>
     <textfield id="tf" Columns="20" Text="Swixml"/>

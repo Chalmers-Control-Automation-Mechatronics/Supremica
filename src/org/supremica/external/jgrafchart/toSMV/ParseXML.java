@@ -76,7 +76,10 @@ public class ParseXML
 		{
 			e.printStackTrace();
 		}
-
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 /* This exception cannot be thrown
 		catch(IOException ioe)
 						{

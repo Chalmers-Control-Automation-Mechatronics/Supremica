@@ -1052,6 +1052,7 @@ public class ProjectBuildFromXml
 		catch (MalformedURLException ex)
 		{    // This was not an url
 			url = null;
+			//logger.error(ex);
 		}
 
 		try
@@ -1085,6 +1086,7 @@ public class ProjectBuildFromXml
 		catch (MalformedURLException ex)
 		{    // This was not an url
 			url = null;
+			//logger.error(ex);
 		}
 
 		currProject.setAnimationURL(url);
@@ -1116,6 +1118,7 @@ public class ProjectBuildFromXml
 		catch (MalformedURLException ex)
 		{    // This was not an url
 			url = null;
+			//logger.error(ex);
 		}
 
 		try
@@ -1143,14 +1146,18 @@ public class ProjectBuildFromXml
 			}
 			else if ((url == null) && (inputProtocol == InputProtocol.JarProtocol))
 			{
+				logger.info("Tried to load from jar: " + path);
 				url = ProjectBuildFromXml.class.getResource(path);
+				logger.info("Tried to load from jar 2: " + url);
 			}
 		}
 		catch (MalformedURLException ex)
 		{    // This was not an url
 			url = null;
+			logger.error(ex);
 		}
 
+		logger.info("Loaded user interface from: " + url);
 		currProject.setUserInterfaceURL(url);
 	}
 

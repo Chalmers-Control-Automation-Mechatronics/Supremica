@@ -55,6 +55,7 @@ import org.jdom.JDOMException;
 import org.jdom.DataConversionException;
 import org.jdom.input.SAXBuilder;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.log.*;
@@ -106,6 +107,13 @@ public class ConvertToAutomata
 			// and get its children
 		}
 		catch (JDOMException a)
+		{
+			logger.error(stationFile + ": wrong format file");
+			logger.debug(a.getMessage());
+
+			return;
+		}
+		catch (IOException a)
 		{
 			logger.error(stationFile + ": wrong format file");
 			logger.debug(a.getMessage());

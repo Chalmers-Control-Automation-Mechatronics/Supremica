@@ -415,6 +415,7 @@
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>		
+		<fileset dir="${userinterfaces}"/>	
 		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
@@ -433,7 +434,8 @@
 		</fileset>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
-		<fileset dir="${animations}"/>			
+		<fileset dir="${animations}"/>	
+		<fileset dir="${userinterfaces}"/>		
 		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
@@ -443,7 +445,8 @@
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
-		<fileset dir="${animations}"/>			
+		<fileset dir="${animations}"/>	
+		<fileset dir="${userinterfaces}"/>		
 		<fileset dir="${runtimesoftplcbuild}"/>	
 	</jar>
 </target>
@@ -454,6 +457,7 @@
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
+		<fileset dir="${userinterfaces}"/>
 		<fileset dir="${runtimesoftplcbuild}"/>	
 
 	</jar>
