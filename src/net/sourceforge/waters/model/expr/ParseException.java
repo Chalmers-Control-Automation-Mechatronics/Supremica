@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.expr
 //# CLASS:   ParseException
 //###########################################################################
-//# $Id: ParseException.java,v 1.2 2005-02-17 19:41:43 robi Exp $
+//# $Id: ParseException.java,v 1.3 2005-02-20 23:08:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -80,7 +80,7 @@ public class ParseException extends WatersException
    *         of&nbsp;0 would indicate an error at the first character that
    *         was read.
    */
-  public int getPosition()
+  public int getErrorOffset()
   {
     return mPosition;
   }

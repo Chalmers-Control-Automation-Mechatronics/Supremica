@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.model.expr
 //# CLASS:   ExpressionScanner
 //###########################################################################
-//# $Id: ExpressionScanner.java,v 1.2 2005-02-17 19:33:42 robi Exp $
+//# $Id: ExpressionScanner.java,v 1.3 2005-02-20 23:08:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -83,37 +84,40 @@ public class ExpressionScanner {
   private void storeNextToken()
     throws IOException, ParseException
   {
-    int ch;
-    do {
-      ch = getNextCharacter();
-    } while (isWhitespace(ch));
-    mTokenStart = mPosition;
-    mTokenText.append((char) ch);
-    if (isDigit(ch)) {
-      storeNumberToken();
-    } else if (isIdentifierStart(ch)) {
-      storeSymbolToken();
-    } else if (ch == '-') {
-      ch = getNextCharacter();
+    try {
+      int ch;
+      do {
+        ch = getNextCharacter();
+      } while (isWhitespace(ch));
+      mTokenStart = mPosition;
+      mTokenText.append((char) ch);
       if (isDigit(ch)) {
-	mTokenText.append((char) ch);
-	storeNumberToken();
+        storeNumberToken();
+      } else if (isIdentifierStart(ch)) {
+        storeSymbolToken();
+      } else if (ch == '-') {
+        ch = getNextCharacter();
+        if (isDigit(ch)) {
+          mTokenText.append((char) ch);
+          storeNumberToken();
+        } else {
+          putback(ch);
+          mNextToken = createOperatorToken();
+        }
+      } else if (isOperatorCharacter(ch)) {
+        storeOperatorToken();
+      } else if (isSeparatorCharacter(ch)) {
+        mNextToken = createSeparatorToken(ch);
+      } else if (ch >= 32) {
+        throw new ParseException
+          ("Illegal character '" + (char) ch + "'!", mPosition);
       } else {
-	putback(ch);
-	mNextToken = createOperatorToken();
+        throw new ParseException
+          ("Illegal character code " + ch + "!", mPosition);
       }
-    } else if (isOperatorCharacter(ch)) {
-      storeOperatorToken();
-    } else if (isSeparatorCharacter(ch)) {
-      mNextToken = createSeparatorToken(ch);
-    } else if (ch >= 32) {
-      throw new ParseException
-	("Illegal character '" + (char) ch + "'!", mPosition);
-    } else {
-      throw new ParseException
-	("Illegal character code " + ch + "!", mPosition);
+    } finally {
+      clearTokenText();
     }
-    clearTokenText();
   }
 
   private void storeNumberToken()
@@ -143,17 +147,27 @@ public class ExpressionScanner {
   private void storeOperatorToken()
     throws IOException, ParseException
   {
+    Token token;
     final int ch = getNextCharacter();
-    mTokenText.append((char) ch);
-    Token token = createOperatorToken();
-    if (token == null) {
+    if (isOperatorCharacter(ch)) {
+      mTokenText.append((char) ch);
+      token = createOperatorToken();
+      if (token == null) {
+	putback(ch);
+	mTokenText.deleteCharAt(1);
+	token = createOperatorToken();
+	if (token == null) {
+	  throw new ParseException
+	    ("Unknown operator '" + mTokenText + "' or '" +
+	     mTokenText + (char) ch + "'!", mTokenStart);
+	}
+      }
+    } else {
       putback(ch);
-      mTokenText.deleteCharAt(1);
       token = createOperatorToken();
       if (token == null) {
 	throw new ParseException
-	  ("Unknown operator '" + mTokenText + "' or '" +
-	   mTokenText + (char) ch + "'!", mTokenStart);
+	  ("Unknown operator '" + mTokenText + "'!", mTokenStart);
       }
     }
     mNextToken = token;
