@@ -73,7 +73,7 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 import org.supremica.automata.IO.FileFormats;
 
-import org.supremica.gui.useractions.HelpAction;
+import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
 
 // -- MF -- Abstract class to save on duplicate code

@@ -1,4 +1,4 @@
-import org.supremica.gui.Supremica;
+package org.supremica.gui.useractions;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -25,4 +25,3 @@ public class OpenAction
 	}
 
 }
-	
