@@ -68,8 +68,9 @@ import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.gui.animators.scenebeans.*;
 
-// -- MF -- Abstract class to sav eon duplicate code
+// -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
 abstract class FileImporter
 {
@@ -1696,7 +1697,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	// 
+	//
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);
@@ -1735,6 +1736,38 @@ public class ActionMan
 		{
 			gui.addAutomata(automata);
 		}
+	}
+
+	// TestCases... - open the test cases dialog, and add the result to the current set of automata
+	public static void animator(Gui gui, AnimationItem item)
+	{
+		/*
+		try
+		{
+			final Animator view = new Animator(args[0]);
+
+			view.addWindowListener(new WindowAdapter()
+			{
+				public void windowClosing(WindowEvent ev)
+				{
+					view.dispose();
+				}
+
+				public void windowClosed(WindowEvent ev)
+				{
+					view.dispose();
+				}
+			});
+
+			XMLAnimationParser parser = new XMLAnimationParser(new File(args[0]), view._canvas);
+
+			view.setAnimation(parser.parseAnimation());
+			view.setVisible(true);
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+		}*/
 	}
 
 	// Generate SattLine SFCs

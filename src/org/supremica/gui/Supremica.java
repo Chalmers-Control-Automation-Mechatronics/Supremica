@@ -68,6 +68,7 @@ import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonContainer;
+import org.supremica.gui.animators.scenebeans.*;
 
 public class Supremica
 	extends JFrame
@@ -88,7 +89,6 @@ public class Supremica
 	private JScrollPane theAutomatonTableScrollPane;
 	private MenuHandler menuHandler;
 
-	// MF -- made publically available
 	private static Logger logger = LoggerFactory.createLogger(Supremica.class);
 	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JSplitPane splitPaneVertical;
@@ -96,6 +96,7 @@ public class Supremica
 	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
 	private FileSecurity fileSecurity = new FileSecurity();
+	// MF -- made publically available
 	public static int TABLE_IDENTITY_COLUMN = 0;
 	public static int TABLE_TYPE_COLUMN = 1;
 	public static int TABLE_STATES_COLUMN = 2;
@@ -296,6 +297,22 @@ public class Supremica
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.fileNewFromTemplate(getGui(), item);
+			}
+		}
+
+		class ToolsAnimationHandler
+			implements ActionListener
+		{
+			private AnimationItem item = null;
+
+			public ToolsAnimationHandler(AnimationItem item)
+			{
+				this.item = item;
+			}
+
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.animator(getGui(), item);
 			}
 		}
 
@@ -674,6 +691,33 @@ public class Supremica
 				}
 			}
 		});
+
+		// Tools.Animations
+		JMenu menuToolsAnimations = new JMenu();
+
+		menuToolsAnimations.setText("Animations");
+		menuFile.add(menuToolsAnimations);
+
+		ExampleAnimations exAnim = ExampleAnimations.getInstance();
+
+		for (Iterator groupIt = exAnim.iterator(); groupIt.hasNext(); )
+		{
+			AnimationGroup currGroup = (AnimationGroup) groupIt.next();
+			JMenu menuToolsAnimationGroup = new JMenu();
+
+			menuToolsAnimationGroup.setText(currGroup.getDescription());
+			menuToolsAnimations.add(menuToolsAnimationGroup);
+
+			for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+			{
+				AnimationItem currItem = (AnimationItem) itemIt.next();
+				JMenuItem menuItem = new JMenuItem();
+
+				menuItem.setText(currItem.getDescription());
+				menuToolsAnimationGroup.add(menuItem);
+				menuItem.addActionListener(new ToolsAnimationHandler(currItem));
+			}
+		}
 
 		// Tools.AutomataEditor
 		if (SupremicaProperties.includeEditor())
