@@ -547,6 +547,12 @@ public class Automaton
 		return listeners;
 	}
 
+	public void addListener(AutomatonListener listener)
+	{
+		Listeners currListeners = getListeners();
+		currListeners.addListener(listener);
+	}
+
 	private void notifyListeners(int mode, Object o)
 	{
 		if (listeners != null)

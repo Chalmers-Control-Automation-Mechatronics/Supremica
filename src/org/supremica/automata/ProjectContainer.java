@@ -57,6 +57,7 @@ public class ProjectContainer
 	private static Logger logger = LoggerFactory.createLogger(ProjectContainer.class);
 	private List theProjects;
 	private Project currentProject;
+	private ProjectContainerListeners projectListeners = null;
 
 	public ProjectContainer()
 	{
@@ -126,5 +127,53 @@ public class ProjectContainer
 	public String getUniqueProjectName()
 	{    // Implement this
 		return "Untitled";
+	}
+
+	public ProjectContainerListeners getListeners()
+	{
+		if (projectListeners == null)
+		{
+			projectListeners = new ProjectContainerListeners(this);
+		}
+
+		return projectListeners;
+	}
+
+	public void addListener(ProjectContainerListener listener)
+	{
+		Listeners currListeners = getListeners();
+		currListeners.addListener(listener);
+	}
+
+	private void notifyListeners()
+	{
+		if (projectListeners != null)
+		{
+			projectListeners.notifyListeners();
+		}
+	}
+
+	private void notifyListeners(int mode, Project p)
+	{
+		if (projectListeners != null)
+		{
+			projectListeners.notifyListeners(mode, p);
+		}
+	}
+
+	public void beginTransaction()
+	{
+		if (projectListeners != null)
+		{
+			projectListeners.beginTransaction();
+		}
+	}
+
+	public void endTransaction()
+	{
+		if (projectListeners != null)
+		{
+			projectListeners.endTransaction();
+		}
 	}
 }
