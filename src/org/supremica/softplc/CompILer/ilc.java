@@ -11,7 +11,7 @@ public class ilc
 	{
 		try
 		{
-			parser p = new parser(new BufferedReader(new FileReader(new File(arnetgs[0]))));
+			parser p = new parser(new BufferedReader(new FileReader(new File(args[0]))));
 
 			try
 			{
