@@ -761,6 +761,8 @@ public class Supremica
 			}
 		});
 
+		menuProject.addSeparator();
+
 		// Project.ActionAndControlViewer
 		JMenuItem menuProjectActionAndControlViewer = new JMenuItem();
 
@@ -797,6 +799,19 @@ public class Supremica
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.simulator_actionPerformed(getGui());
+			}
+		});
+
+		// Project.Clear
+		JMenuItem menuProjectSimulatorClear = new JMenuItem();
+
+		menuProjectSimulatorClear.setText("Clear simulation data");
+		menuProject.add(menuProjectSimulatorClear);
+		menuProjectSimulatorClear.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.simulatorClear_actionPerformed(getGui());
 			}
 		});
 

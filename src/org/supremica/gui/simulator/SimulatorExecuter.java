@@ -72,6 +72,7 @@ import uk.ac.ic.doc.scenebeans.event.AnimationListener;
 import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
 import uk.ac.ic.doc.scenebeans.animation.Animation;
 import uk.ac.ic.doc.scenebeans.animation.CommandException;
+import uk.ac.ic.doc.scenebeans.animation.ResetActivityCommand;
 import org.supremica.automata.execution.*;
 
 
@@ -111,6 +112,7 @@ public class SimulatorExecuter
 		}
 
 		theAnimation = theAnimator.getAnimation();
+		theAnimation.addAnimationListener(this);
 
 		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true);
 
@@ -283,7 +285,7 @@ public class SimulatorExecuter
 					}
 					catch (CommandException ex)
 					{
-						logger.error("Execption while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
+						logger.error("Exception while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
 					}
 				}
 			}
@@ -292,7 +294,8 @@ public class SimulatorExecuter
 
 	public void resetAnimation()
 	{
-		theAnimation.reset();
+		//logger.info("Reset animation");
+		//theAnimator.reset();
 	}
 }
 

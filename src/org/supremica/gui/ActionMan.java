@@ -1244,6 +1244,21 @@ public class ActionMan
 
 	}
 
+	// Project.SimulatorClear action performed
+	public static void simulatorClear_actionPerformed(Gui gui)
+	{
+		try
+		{
+			VisualProject currProject = gui.getVisualProjectContainer().getActiveProject();
+			currProject.clearSimulationData();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception in Simulator");
+		}
+
+	}
+
 	// Automaton.Minimization action performed
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{

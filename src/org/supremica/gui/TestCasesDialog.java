@@ -80,7 +80,7 @@ class PhilosPanel
 	extends JPanel
 	implements TestCase
 {
-	IntegerField int_num = new IntegerField("3", 6);
+	IntegerField int_num = new IntegerField("5", 6);
 	JCheckBox l_take = new JCheckBox("take left fork", true);
 	JCheckBox r_take = new JCheckBox("take right fork", true);
 	JCheckBox l_put = new JCheckBox("put left fork", true);

@@ -56,6 +56,7 @@ import javax.swing.event.*;
 import java.awt.*;
 import javax.swing.table.*;
 import org.supremica.automata.*;
+import org.supremica.automata.execution.*;
 import org.supremica.log.*;
 import org.supremica.gui.editor.*;
 import uk.ac.ic.doc.scenebeans.animation.Animation;
@@ -474,6 +475,35 @@ public class VisualProject
 		return theSimulator;
 	}
 
+	public void clearSimulationData()
+	{
+		Actions theActions = getActions();
+		if (theActions != null)
+		{
+			theActions.clear();
+		}
+		Controls theControls = getControls();
+		if (theControls != null)
+		{
+			theControls.clear();
+		}
+
+		if (theActionAndControlViewer != null)
+		{
+			theActionAndControlViewer.setVisible(false);
+			theActionAndControlViewer = null;
+		}
+		if (theAnimator != null)
+		{
+			theAnimator.setVisible(false);
+			theAnimator = null;
+		}
+		if (theSimulator != null)
+		{
+			theSimulator.setVisible(false);
+			theSimulator = null;
+		}
+	}
 
 	public int getSize()
 	{
