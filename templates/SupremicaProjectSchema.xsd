@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation>
+This XML Schema file describes the organization of a Supremica project file.
+Nice tutorials on XML Schema can be fount at
+http://www.w3schools.com/schema/default.asp and
+http://www.xml.com/pub/a/2000/11/29/schemas/part1.html
+Specification of XML Schema etc can be found at http://www.w3.org/XML/Schema
+		</xs:documentation>
+	</xs:annotation>
+	<!-- Definition of types -->
+	<xs:simpleType name="AutomatonType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Plant" />
+			<xs:enumeration value="Specification" />
+			<xs:enumeration value="Supervisor" />
+			<xs:enumeration value="Interface" />
+			<xs:enumeration value="Undefined" /> <!-- Deprecated, use Specification instead -->
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="Automaton">
+		<xs:sequence>
+			<xs:element name="Events" type="Events" />
+			<xs:element name="States" type="States" />
+			<xs:element name="Transitions" type="Transitions" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:attribute name="type" type="AutomatonType" default="Specification" />
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Event:
+An event is globally identified by it's label. If the label is undefined,
+then the id is used as the label. If the label is explicitly defined,
+then the id must only be unique within the automaton. If you are not sure
+how to use id and label, then use only id.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Event">
+		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="label" type="xs:string" />
+		<xs:attribute name="controllable" type="xs:boolean" default="true" />
+		<xs:attribute name="observable" type="xs:boolean" default="true" />
+		<xs:attribute name="prioritized" type="xs:boolean" default="true" />
+		<xs:attribute name="operator" type="xs:boolean" default="false" />
+		<xs:attribute name="immediate" type="xs:boolean" default="false" />
+		<xs:attribute name="epsilon" type="xs:boolean" default="false" />
+	</xs:complexType>
+	<xs:complexType name="Events">
+		<xs:sequence>
+			<xs:element name="Event" type="Event" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+State:
+The name attribute is the label displayed in Supremica. If the name is undefined,
+then the id attribute is used as the name. The id must only be unique within the
+automaton. If you are uncertain of how to use id and name, then only use id.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="State">
+		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="initial" type="xs:boolean" default="false" />
+		<xs:attribute name="accepting" type="xs:boolean" default="false" />
+		<xs:attribute name="forbidden" type="xs:boolean" default="false" />
+		<xs:attribute name="cost" type="xs:integer" />
+		<xs:attribute name="x" type="xs:integer" />
+		<xs:attribute name="y" type="xs:integer" />
+	</xs:complexType>
+	<xs:complexType name="States">
+		<xs:sequence>
+			<xs:element name="State" type="State" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Transition:
+The event attribute should be given the id of the corresponding event, not
+the label. The source and dest attributes should be given the id of the
+source and destination state respectively, not the name of the state.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Transition">
+		<xs:attribute name="event" type="xs:string" use="required" />
+		<xs:attribute name="source" type="xs:string" use="required" />
+		<xs:attribute name="dest" type="xs:string" use="required" />
+		<xs:attribute name="x" type="xs:integer" />
+		<xs:attribute name="y" type="xs:integer" />
+	</xs:complexType>
+	<xs:complexType name="Transitions">
+		<xs:sequence>
+			<xs:element name="Transition" type="Transition" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Execution:
+Includes timers and signals.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Execution">
+		<xs:sequence>
+			<xs:element name="Timers" type="Timers" minOccurs="0" />
+			<xs:element name="InputSignals" type="Signals"  minOccurs="0" />
+			<xs:element name="OutputSignals" type="Signals" minOccurs="0" />
+			<xs:element name="Actions" type="Actions" minOccurs="0" />
+			<xs:element name="Controls" type="Controls" minOccurs="0" />
+			<xs:element name="Animation" type="Animation" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Timer:
+The name attribute should be globally unique. The startEvent and timeoutEvent
+attributes should be given the label of the corresponding event. (If label
+is undefined for the event, then the id is used). The delay is in milliseconds.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Timer">
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:attribute name="startEvent" type="xs:string" use="required" />
+		<xs:attribute name="timeoutEvent" type="xs:string" use="required" />
+		<xs:attribute name="delay" type="xs:nonNegativeInteger" use="required" />
+	</xs:complexType>
+	<xs:complexType name="Timers">
+		<xs:sequence>
+			<xs:element name="Timer" type="Timer" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Signal:
+The label and port should both individually be unique within either the output
+signals or within the input signals.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Signal">
+		<xs:attribute name="label" type="xs:string" use="required" />
+		<xs:attribute name="port" type="xs:nonNegativeInteger" use="required" />
+	</xs:complexType>
+	<xs:complexType name="Signals">
+		<xs:sequence>
+			<xs:element name="Signal" type="Signal" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Action:
+Describes how some output signal are affected by an event. The label attribute
+is the label of the associated event. Use id if the label is unspecified for the
+event.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Action">
+		<xs:sequence>
+			<xs:element name="Command" type="Command" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="label" type="xs:string" use="required" />
+	</xs:complexType>
+	<xs:complexType name="Actions">
+		<xs:sequence>
+			<xs:element name="Action" type="Action" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Command:
+Describes the set or reset of an output signal. The command attribute 
+refers to the label of an output signal.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Command">
+		<xs:attribute name="command" type="xs:string" use="required" />
+		<xs:attribute name="value" type="xs:boolean" default="true" />
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Control:
+Describes how the enabling of an event is controlled by the input signals.
+The label attribute should refer to the label of the event.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Control">
+		<xs:sequence>
+			<xs:element name="Condition" type="Condition" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="label" type="xs:string" use="required" />
+	</xs:complexType>
+	<xs:complexType name="Controls">
+		<xs:sequence>
+			<xs:element name="Control" type="Control" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Condition:
+Describes a nessesary condition for the event to be enabled. The condition
+attribute refers to a label of an input signal.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Condition">
+		<xs:attribute name="condition" type="xs:string" use="required" />
+		<xs:attribute name="invert" type="xs:boolean" default="false" />
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+Animation:
+Specifies an animation file.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="Animation">
+		<xs:attribute name="path" type="xs:string" use="required" />
+	</xs:complexType>
+	<xs:annotation>
+		<xs:documentation>
+SupremicaProject:
+This is the root element type.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType name="SupremicaProject">
+		<xs:sequence>
+			<xs:element ref="Automaton" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element ref="Execution" minOccurs="0" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="comment" type="xs:string" />
+		<xs:attribute name="major" type="xs:nonNegativeInteger" fixed="0" />
+		<xs:attribute name="minor">
+			<xs:simpleType>
+				<xs:restriction base="xs:nonNegativeInteger">
+					<xs:maxInclusive value="10" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- Predefined elements -->
+	<xs:element name="Automaton" type="Automaton">
+		<!-- Attribute id must exist and be unique for all events within an automaton -->
+		<xs:key name="EventId">
+			<xs:selector xpath="Events/Event" />
+			<xs:field xpath="attribute::id" />
+		</xs:key>
+		<!-- Attribute label must be unique for all events within an automaton -->
+		<xs:unique name="EventLabel">
+			<xs:selector xpath="Events/Event" />
+			<xs:field xpath="attribute::label" />
+		</xs:unique>
+		<!-- Attribute id must exist and be unique for all states within an automaton -->
+		<xs:key name="StateId">
+			<xs:selector xpath="States/State" />
+			<xs:field xpath="attribute::id" />
+		</xs:key>
+		<!-- Attribute event must refer an existing event id -->
+		<xs:keyref name="TransitionEventId" refer="EventId">
+			<xs:selector xpath="Transitions/Transition" />
+			<xs:field xpath="attribute::event" />
+		</xs:keyref>
+		<!-- Attribute source must refer to an existing state id -->
+		<xs:keyref name="TransitionSourceStateId" refer="StateId">
+			<xs:selector xpath="Transitions/Transition" />
+			<xs:field xpath="attribute::source" />
+		</xs:keyref>
+		<!-- Attribute dest must refer to an existing state id -->
+		<xs:keyref name="TransitionDestStateId" refer="StateId">
+			<xs:selector xpath="Transitions/Transition" />
+			<xs:field xpath="attribute::dest" />
+		</xs:keyref>
+	</xs:element>
+	<xs:element name="Execution" type="Execution">
+		<!-- Attribute name must exist and be unique for all timers -->
+		<xs:key name="TimerName">
+			<xs:selector xpath="Timers/Timer" />
+			<xs:field xpath="attribute::name" />
+		</xs:key>
+		<!-- Attribute label must exist and be unique for all input signals -->
+		<xs:key name="InputSignalLabel">
+			<xs:selector xpath="InputSignals/Signal" />
+			<xs:field xpath="attribute::label" />
+		</xs:key>
+		<!-- Attribute port must exist and be unique for all input signals -->
+		<xs:key name="InputSignalPort">
+			<xs:selector xpath="InputSignals/Signal" />
+			<xs:field xpath="attribute::port" />
+		</xs:key>
+		<!-- Attribute label must exist and be unique for all output signals -->
+		<xs:key name="OutputSignalLabel">
+			<xs:selector xpath="OutputSignals/Signal" />
+			<xs:field xpath="attribute::label" />
+		</xs:key>
+		<!-- Attribute port must exist and be unique for all output signals -->
+		<xs:key name="OutputSignalPort">
+			<xs:selector xpath="OutputSignals/Signal" />
+			<xs:field xpath="attribute::port" />
+		</xs:key>
+	</xs:element>
+	<xs:annotation>
+		<xs:documentation>
+Root element:
+SupremicaProject is the reccomended name of the root element, but Automata
+is allowed for backward compatibility.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:element name="SupremicaProject" type="SupremicaProject" />
+	<xs:element name="Automata" substitutionGroup="SupremicaProject" />
+</xs:schema>
