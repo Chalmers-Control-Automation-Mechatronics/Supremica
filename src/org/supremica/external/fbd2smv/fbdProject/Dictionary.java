@@ -12,6 +12,12 @@ public class Dictionary
 	this.booleans = booleans;
     }
 
+    public void setIntegers(LinkedList integers)
+    {
+	this.integers = integers;
+    }
+
+
     public void addBoolean(String name)
     {
 	booleans.add(name);

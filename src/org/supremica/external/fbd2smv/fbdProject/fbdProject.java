@@ -25,6 +25,12 @@ public class fbdProject
 	dictionary.setBooleans(booleans);
     }
     
+    public void dictionarySetIntegers(LinkedList integers)
+    {
+	dictionary.setIntegers(integers);
+    }
+
+
     public LinkedList dictionaryGetBooleans()
     {
 	return dictionary.getBooleans();

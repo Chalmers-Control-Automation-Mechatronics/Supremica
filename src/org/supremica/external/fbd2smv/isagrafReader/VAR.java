@@ -31,7 +31,18 @@ public class VAR
 
     public String getName()
     {
-	return name;
+	if (name.equals("TRUE"))
+	{
+	    return "1";
+	}
+	else if (name.equals("FALSE"))
+	{    
+	    return "0";
+	}
+	else
+	{
+	    return name;
+	}
     }
 
     public String toString()
@@ -52,4 +63,6 @@ public class VAR
     
 	return false;
     }
+
+
 }

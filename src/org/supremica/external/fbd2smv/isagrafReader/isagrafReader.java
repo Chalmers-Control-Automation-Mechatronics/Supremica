@@ -31,7 +31,13 @@ public class isagrafReader
     {
 		FileReader fr = new FileReader(fbdProjectPath + "appli.dlo");
 		DLOReader dloReader = new DLOReader(fr);
-	    fbdProj.dictionarySetBooleans(dloReader.getBooleans());
+		fbdProj.dictionarySetBooleans(dloReader.getBooleans());
+		System.out.println("\t\tisagrafReader DCOReader");
+		fr.close();
+
+		fr = new FileReader(fbdProjectPath + "appli.dco");
+		DCOReader dcoReader = new DCOReader(fr);
+		fbdProj.dictionarySetIntegers(dcoReader.getIntegers());
 		fr.close();
 	}
 

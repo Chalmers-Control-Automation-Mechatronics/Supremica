@@ -21,6 +21,7 @@ public class DCOReader
 
         while ((input = br.readLine()) != null)
         {
+	    System.out.println("\t\t\t DCOReader parse");
 	    if (input.startsWith("#A"))
 		{
 		    if ((input.substring(input.indexOf("%%")+2, input.indexOf("%%")+3)).compareTo("I") == 0)

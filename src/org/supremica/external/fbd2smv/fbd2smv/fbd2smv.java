@@ -200,9 +200,9 @@ public class fbd2smv
 	String blockName;
 
 
-	//		HashMap variables = program.getVariables();
+	//HashMap variables = program.getVariables();
 	//LinkedList arcs   = program.getArcs();
-	//		HashMap boxes         = program.getBoxes()
+	//HashMap boxes         = program.getBoxes()
 	LinkedList boxesList;
 	Program program;
 	HashMap variables;
@@ -226,15 +226,26 @@ public class fbd2smv
 	    }
 
 
+	System.out.println("varIntegers.size()=" + varIntegers.size());
+	if (varIntegers.size() > 0 )
+	    {
+		str = "\t";
+		for (int i = 0; i<varIntegers.size(); i++) 
+		    {
+			str = str + varIntegers.get(i);
+			if (i < varIntegers.size() - 1)
+			    {
+				str = str + ", ";
+			    }
+		    }
+		str = str + ": -32..32;";
+		pw.println(str);
+	    }
+
+
 
 	for (int i = 0; i<varBooleans.size(); i++) 
 	    {
-		//VAR var = (VAR)variables.get(varBooleans.get(i));
-		
-		//if (var != null)
-		//{
-		//if (!var.isOutputVariable(arcs)) {
-				
 		String varName = (String)varBooleans.get(i);
 			    
 		if (!fbdProj.isOutputVariable(varName))
@@ -244,6 +255,25 @@ public class fbd2smv
 			pw.println("\tnext(" + varName + ") := case");
 			pw.println("\t{");
 			pw.println("\t\tctrl.state = read_input : {0, 1};");
+			pw.println("\t\t1                       : " +  varName + ";");
+			pw.println("\t};");
+			//}
+			//}
+		    }
+	    }
+
+
+	for (int i = 0; i<varIntegers.size(); i++) 
+	    {
+		String varName = (String)varIntegers.get(i);
+			    
+		if (!fbdProj.isOutputVariable(varName))
+
+		    {
+			pw.println("");
+			pw.println("\tnext(" + varName + ") := case");
+			pw.println("\t{");
+			pw.println("\t\tctrl.state = read_input : {-32..32};");
 			pw.println("\t\t1                       : " +  varName + ";");
 			pw.println("\t};");
 			//}
@@ -335,7 +365,7 @@ public class fbd2smv
 				System.out.println("OUTPUT VARIABLE: " + currVAR.getName());
 
 
-				outputVariableDeclaration = "\t" + currVAR.getName() + ": ";
+				outputVariableDeclaration = "\t" + currVAR.getName() + ":= ";
 
 				String S = null;
  
@@ -410,7 +440,7 @@ public class fbd2smv
 					    {
 
 						String formalArgName = ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getOutputArgumentName(sourceOutputNumber);
-						 outputVariableDeclaration =  outputVariableDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + ", ";
+						 outputVariableDeclaration =  outputVariableDeclaration + program.getName() + "_" + ((Block)smvBlocks.get(((BOX)theFBDElement.getElement()).getName())).getName() + "_" + sourceIndex + "." + formalArgName + "; ";
 			
 					    }
 

@@ -93,7 +93,7 @@ public class BLKReader
 		    {
 			if (input.indexOf("output ") > 0 )
 			    {
-				pw.println(input.substring(input.indexOf("output ")+6, input.length()));
+				pw.println("\t" + input.substring(input.indexOf("output ")+6, input.length()));
 			    }
 			else
 			    {
