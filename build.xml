@@ -510,7 +510,7 @@
 </target>
 
 
-<target name="deploy" depends="deployNT,deploy9X">
+<target name="deploy" depends="deployNT">
 </target>
 
 <target name="deployNT">
@@ -524,6 +524,7 @@
 	<copy file="U:\temp\SupremicaInstaller\Output\setup.exe" todir="H:\public_html\Supremica\distributions\windows"/>	
 </target>
 
+<!--
 <target name="deploy9X">
 	<copy file="${dist}/Supremica.jar" todir="U:\temp\SupremicaInstallerX\SupremicaDist\Runtime\NoArch"/>	
 	<copy file="${dist}/SupremicaVersion.txt" todir="U:\temp\SupremicaInstallerX\SupremicaDist\Runtime\NoArch"/>
@@ -546,6 +547,6 @@
 	</exec>
 	<copy file="U:\temp\SupremicaInstaller\Output\setup.exe" tofile="H:\public_html\Supremica\distributions\windows\setupSecret.exe"/>	
 </target>
-
+-->
 </project>
        

@@ -44,7 +44,7 @@ public class BallTrackView
 
     // private int nrOfBalls = 0;
     private java.util.List balls;    // keep track of the balls
-    public JButton insSmallBall, insLargeBall, delBall, changeImage, manuellStart, autoStart, nodStop, larmKvitt, exit;
+    public JButton insSmallBall, insLargeBall, delBall, changeImage, manuellStart, autoStart, nodStop, larmKvitt;
     public JPanel south       = new JPanel();    //panel to collect the button panels
     public JPanel simButtons  = new JPanel();   //panel for buttons used to simulate the BallTrack
     public JPanel realButtons = new JPanel();  //panel for buttons simulating real life actions
@@ -145,7 +145,7 @@ public class BallTrackView
 
 	south.add(simButtons, BorderLayout.NORTH);
 	south.add(realButtons, BorderLayout.CENTER);
-	south.add(exit, BorderLayout.SOUTH);
+	//south.add(exit, BorderLayout.SOUTH);
 	south.setVisible(true);
 
 	contentPane.add(canvas,BorderLayout.NORTH);
@@ -229,6 +229,7 @@ public class BallTrackView
 	    }
 
         });
+/*
 	exit.addMouseListener(new java.awt.event.MouseAdapter()
 	{
 	    public void mouseClicked(MouseEvent e)
@@ -236,7 +237,7 @@ public class BallTrackView
 		exit_mouseClicked(e);
 	    }
         });
-
+*/
 
 	pack();//Paint the components (buttons) the first time
     }
