@@ -1157,12 +1157,6 @@ public class AutomataVerifier
 		throws Exception
 	{
 
-		// ARASH: DEBUG
-		System.out.print("automataIndices = " );
-		for(int i = 0; i < automataIndices.length; i++) System.out.print(" " + automataIndices[i] );
-		System.out.println();
-
-
 		// WOHOOPS! Eventuellt är det listigt att göra ny onlinesynchronizer,
 		// med den nya automataIndices varje gång... tänk på det. FIXA!
 		if (uncontrollabilityCheckHelper == null)
