@@ -281,11 +281,23 @@ public class Automaton
 		return (State) idStateMap.get(id);
 	}
 
+	/**
+	 * This is an ugly method that only are needed when dealing
+	 * with automataIndexForm. All methods that works with index
+	 * needs special initialisation that is not automatically done.
+	 * This method is not recommended for general use.
+	 */
 	public boolean containsStateWithIndex(int index)
 	{
 		return indexStateMap.containsKey(new Integer(index));
 	}
 
+	/**
+	 * This is an ugly method that only are needed when dealing
+	 * with automataIndexForm. All methods that works with index
+	 * needs special initialisation that is not automatically done.
+	 * This method is not recommended for general use.
+	 */
 	public State getStateWithIndex(int index)
 	{
 		return (State) indexStateMap.get(new Integer(index));

@@ -141,11 +141,23 @@ public class State
 		this.id = id;
 	}
 
+	/**
+	 * This is an ugly method that only are needed when dealing
+	 * with automataIndexForm. All methods that works with index
+	 * needs special initialisation that is not automatically done.
+	 * This method is not recommended for general use.
+	 */
 	public void setIndex(int index)
 	{
 		this.index = index;
 	}
 
+	/**
+	 * This is an ugly method that only are needed when dealing
+	 * with automataIndexForm. All methods that works with index
+	 * needs special initialisation that is not automatically done.
+	 * This method is not recommended for general use.
+	 */
 	public int getIndex()
 	{
 		return index;
