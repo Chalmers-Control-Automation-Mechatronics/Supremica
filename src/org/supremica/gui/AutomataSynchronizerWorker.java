@@ -153,23 +153,6 @@ public class AutomataSynchronizerWorker
 			// Present result
 			if (!stopRequested)
 			{
-				/*-- MF -- Removed the name-fiddling let the project handle this -- But who, where?? */
-				if (theAutomaton != null)
-				{
-					//theAutomaton.setName(newAutomatonName);
-					StringBuffer buf = new StringBuffer();
-
-					for (Iterator it = theAutomata.iterator(); it.hasNext(); )
-					{
-						Automaton automaton = (Automaton) it.next();
-
-						buf.append(automaton.getName() + "||");
-					}
-
-					// Remove trailing "||"
-					theAutomaton.setComment(buf.substring(0, buf.length() - 2));
-				}
-
 				mode = MODE_UPDATE;
 
 				java.awt.EventQueue.invokeLater(this);
