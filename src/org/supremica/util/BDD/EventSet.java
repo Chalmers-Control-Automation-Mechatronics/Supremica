@@ -150,6 +150,10 @@ public class EventSet
 
 				ps.print(events[i].label);
 
+				// DEBUG
+				if(!events[i].c) ps.print(":u");
+				if(!events[i].p) ps.print(":p");
+
 				if (!events[i].c)
 				{
 					uc++;

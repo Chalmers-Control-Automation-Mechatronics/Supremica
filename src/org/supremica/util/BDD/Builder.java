@@ -54,7 +54,7 @@ public class Builder {
 
 		// insert events
 		for(EventIterator ei = s_a.eventIterator(); ei.hasNext(); ) {
-		    LabeledEvent le = (LabeledEvent) ei.next();				
+		    LabeledEvent le = (LabeledEvent) ei.next();	
 		    String id = le.getLabel(); // le.getId() has DEFAULT ACCESS, why??
 		    String label = le.getLabel();
 		    if(label == null) label = id;
@@ -102,8 +102,11 @@ public class Builder {
 		a.close();
 	    }
 
-	// close automata
+	// close automata	
 	automata.close();
+
+	// DEBUG:
+	// automata.dump(System.out);
     }
     
     public BDDAutomata getBDDAutomata() {

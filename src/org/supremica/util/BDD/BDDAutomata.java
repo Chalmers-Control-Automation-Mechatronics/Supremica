@@ -169,6 +169,9 @@ public class BDDAutomata
 		size_all = 2 * size_states + size_events;
 	}
 
+    public BDDAutomaton [] getAutomataVector() {
+	return automata;
+    }
 	public int getSize()
 	{
 		return components;
@@ -678,7 +681,7 @@ public class BDDAutomata
 	}
 
 	// ----------------------------------------------------------------------
-	int removeSelfLoops(int bdd)
+	public int removeSelfLoops(int bdd)
 	{
 		ref(bdd);
 
@@ -702,7 +705,7 @@ public class BDDAutomata
 		return bdd;
 	}
 
-	int removeDontCareS(int bdd)
+	public int removeDontCareS(int bdd)
 	{
 		ref(bdd);
 
@@ -714,7 +717,7 @@ public class BDDAutomata
 		return bdd;
 	}
 
-	int removeDontCareSp(int bdd)
+	public int removeDontCareSp(int bdd)
 	{
 		ref(bdd);
 
