@@ -69,6 +69,7 @@ public class Project
 	private Signals theOutputSignals = null;
 	private Timers theTimers = null;
 	private URL animationURL = null;
+	private URL userInterfaceURL = null;
 
 	public Project()
 	{
@@ -152,18 +153,6 @@ public class Project
 	public boolean hasAnimation()
 	{
 		return animationURL != null;
-
-		/*
-		if (animationPath == null)
-		{
-				return false;
-		}
-		if (animationPath.equals(""))
-		{
-				return false;
-		}
-		return true;
-		*/
 	}
 
 	public URL getAnimationURL()
@@ -177,6 +166,26 @@ public class Project
 	public void setAnimationURL(URL url)
 	{
 		animationURL = url;
+	}
+
+
+	public boolean hasUserInterface()
+	{
+		return userInterfaceURL != null;
+
+	}
+
+	public URL getUserInterfaceURL()
+	{
+		return userInterfaceURL;
+	}
+
+	/**
+	 * Set an absolute path
+	 **/
+	public void setUserInterfaceURL(URL url)
+	{
+		userInterfaceURL = url;
 	}
 
 /*
@@ -198,6 +207,7 @@ public class Project
 		addControls(otherProject.getControls());
 		addTimers(otherProject.getTimers());
 		setAnimationURL(otherProject.getAnimationURL());
+		setUserInterfaceURL(otherProject.getUserInterfaceURL());
 	}
 
 	private void addInputSignals(Signals otherSignals)

@@ -112,6 +112,7 @@ public class ProjectBuildFromXml
 	private final static String slavesStr = "Slaves";
 	private final static String slaveStr = "Slave";
 	private final static String animationStr = "Animation";
+	private final static String userInterfaceStr = "UserInterface";
 	private final static String expressionStr = "Expression";
 	private final static String orStr = "Or";
 	private final static String andStr = "And";
@@ -366,6 +367,10 @@ public class ProjectBuildFromXml
 		else if (animationStr.equals(name))
 		{
 			doAnimation(attributes);
+		}
+		else if (userInterfaceStr.equals(name))
+		{
+			doUserInterface(attributes);
 		}
 		else if (eventsStr.equals(name)) {}
 		else if (statesStr.equals(name)) {}
@@ -1084,4 +1089,71 @@ public class ProjectBuildFromXml
 
 		currProject.setAnimationURL(url);
 	}
+
+
+
+	public final void doUserInterface(Attributes attributes)
+		throws SAXException
+	{
+		if (currProject == null)
+		{
+			throwException("Project section is missing");
+		}
+
+		String path = attributes.getValue("path");
+
+		if (path == null)
+		{
+			throwException("path attribute is missing");
+		}
+
+		URL url = null;
+
+		try
+		{
+			url = new URL(path);
+		}
+		catch (MalformedURLException ex)
+		{    // This was not an url
+			url = null;
+		}
+
+		try
+		{
+			if ((url == null) && (inputProtocol == InputProtocol.FileProtocol))
+			{
+				File theUserInterfaceFile = new File(path);
+
+				if (theUserInterfaceFile.isAbsolute())
+				{
+					url = theUserInterfaceFile.toURL();
+				}
+				else
+				{    // Make it absolute
+					if (thisFile != null)
+					{
+						File newUserInterfaceFile = new File(thisFile.getParentFile(), path);
+
+						url = newUserInterfaceFile.toURL();
+					}
+					else
+					{    // What to do
+					}
+				}
+			}
+			else if ((url == null) && (inputProtocol == InputProtocol.JarProtocol))
+			{
+				url = ProjectBuildFromXml.class.getResource(path);
+			}
+		}
+		catch (MalformedURLException ex)
+		{    // This was not an url
+			url = null;
+		}
+
+		currProject.setUserInterfaceURL(url);
+	}
+
+
+
 }

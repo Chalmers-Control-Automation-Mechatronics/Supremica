@@ -64,6 +64,7 @@ import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 import grafchart.sfc.JGrafchartSupremicaEditor;
 import org.supremica.properties.SupremicaProperties;
+import org.swixml.SwingEngine;
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -77,6 +78,7 @@ public class VisualProject
 	private AutomataEditor theAutomataEditor = null;    // Lazy construction
 	private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
 	private Animator theAnimator = null;    // Lazy construction
+	private SwingEngine theUserInterface = null;    // Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private SimulatorExecuter theSimulator = null;    // Lazy construction
 	private RecipeEditor theRecipeEditor = null;    // Lazy construction
@@ -492,6 +494,39 @@ public class VisualProject
 		theAnimator.setVisible(true);
 
 		return theAnimator;
+	}
+
+
+	public SwingEngine getSwingEngine()
+		throws Exception
+	{
+		if (!hasUserInterface())
+		{
+			return null;
+		}
+
+		try
+		{
+			theUserInterface = new SwingEngine();
+			Container container = null;
+			container = theUserInterface.render(getUserInterfaceURL());
+			if (container instanceof JDialog)
+			{
+				((JDialog) container).pack();
+				container.setVisible(true);
+			}
+			if (container instanceof JFrame)
+			{
+				((JFrame)container).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				container.setVisible(true);
+			}
+		}
+		catch (Exception exception)
+		{
+			exception.printStackTrace();
+		}
+
+		return theUserInterface;
 	}
 
 	public SimulatorExecuter getSimulator()

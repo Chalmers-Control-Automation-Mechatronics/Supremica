@@ -391,6 +391,11 @@ for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext();
 				pw.println("\t<Animation path=\"" + EncodingHelper.normalize(project.getAnimationURL().toString()) + "\"/>");
 			}
 
+			if (project.hasUserInterface())
+			{
+				pw.println("\t<UserInterface path=\"" + EncodingHelper.normalize(project.getUserInterfaceURL().toString()) + "\"/>");
+			}
+
 			pw.println("</Execution>");
 		}
 
