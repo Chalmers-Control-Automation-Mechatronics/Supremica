@@ -51,6 +51,7 @@ package org.supremica.gui;
 
 import javax.swing.*;
 import org.supremica.log.*;
+import org.supremica.properties.*;
 
 public class InterfaceManager
 {
@@ -59,16 +60,23 @@ public class InterfaceManager
 
 	private InterfaceManager()
 	{
-		/*
 		try
 		{
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			String lookAndFeel = SupremicaProperties.getLookAndFeel();
+			if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
+			{
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			}
+			else
+			{
+				UIManager.setLookAndFeel(lookAndFeel);
+			}
 		}
 		catch (Exception e)
 		{
 			logger.fatal("Error while setting LookAndFeel");
 			System.exit(0);
-		}*/
+		}
 	}
 
 	public static synchronized InterfaceManager getInstance()

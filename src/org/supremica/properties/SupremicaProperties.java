@@ -79,6 +79,7 @@ public final class SupremicaProperties
 	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
 	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
 	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
+	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
 
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
@@ -142,6 +143,7 @@ public final class SupremicaProperties
 		setProperty(DOT_AUTOMATIC_UPDATE, "true", true);
 		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
+		setProperty(GENERAL_LOOKANDFEEL, "javax.swing.plaf.metal.MetalLookAndFeel", true);
 		setProperty(INCLUDE_EDITOR, "true", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
@@ -343,6 +345,24 @@ public final class SupremicaProperties
 	public static void setUseDot(boolean useDot)
 	{
 		wp.setProperty(DOT_USE, toString(useDot));
+	}
+
+	public static String getLookAndFeel()
+	{
+		return wp.getProperty(GENERAL_LOOKANDFEEL);
+	}
+
+	/**
+	 * Possible values
+	 * javax.swing.plaf.metal.MetalLookAndFeel : All platforms
+	 * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
+	 * com.sun.java.swing.plaf.motif.MotifLookAndFeel : All platforms
+	 * javax.swing.plaf.mac.MacLookAndFeel : Mac only
+	 * System : All platforms
+	 */
+	public static void setLookAndFeel(String command)
+	{
+		wp.setProperty(GENERAL_LOOKANDFEEL, command);
 	}
 
 	public static String getDotExecuteCommand()
