@@ -1562,31 +1562,8 @@ public class ActionMan
 
 
 		SynchronizationOptions syncOptions;
-		try
-		{
-			syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
-			/*
-			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
-													 SynchronizationType.Prioritized,
-													 SupremicaProperties.syncInitialHashtableSize(),
-													 SupremicaProperties.syncExpandHashtable(),
-													 SupremicaProperties.syncForbidUncontrollableStates(),
-													 SupremicaProperties.syncExpandForbiddenStates(),
-													 false,
-													 false,
-													 false, // This is the only difference from default!
-													 SupremicaProperties.verboseMode(),
-													 true,
-													 true);
-			*/
-		}
-		catch (Exception ex)
-		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "Invalid synchronizationOptions", "Alert", JOptionPane.ERROR_MESSAGE);
-			logger.debug(ex.getStackTrace());
-			return;
-		}
+		syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
 		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata,
 																		   syncOptions, verificationOptions);
