@@ -91,7 +91,7 @@ import org.supremica.gui.animators.scenebeans.AnimationGroup;
 import org.supremica.util.BrowserControl;
 import org.supremica.util.SupremicaMenuItem;
 import org.supremica.automata.algorithms.GeneticAlgorithms;
-import org.supremica.external.SuprRobLink;
+//import org.supremica.external.RobotStudioLink;
 
 public class MainMenuBar
 	extends JMenuBar

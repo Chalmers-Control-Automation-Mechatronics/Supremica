@@ -71,7 +71,7 @@ import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
-import org.supremica.external.SuprRobLink;
+//import org.supremica.external.RobotStudioLink;
 
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
@@ -2398,8 +2398,8 @@ public class ActionMan
 	 */
 	public static void robotStudioTest(Gui gui)
 	{
-		RobotStudioLink robotStudioLink = new RobotStudioLink();
-		robotStudioLink.test();
+		//RobotStudioLink robotStudioLink = new RobotStudioLink();
+		//robotStudioLink.test();
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata
