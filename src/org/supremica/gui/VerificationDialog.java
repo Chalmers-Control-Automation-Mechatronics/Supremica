@@ -52,6 +52,8 @@ package org.supremica.gui;
 import org.supremica.automata.algorithms.VerificationOptions;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
+import org.supremica.automata.algorithms.MinimizationOptions;
+import org.supremica.automata.algorithms.MinimizationStrategy;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -71,18 +73,21 @@ public class VerificationDialog
 	private VerificationOptions verificationOptions;
 	private VerificationDialogStandardPanel standardPanel;
 	private VerificationDialogAdvancedPanelControllability advancedPanelControllability;
-	private VerificationDialogAdvancedPanelNonblocking advancedPanelNonblocking;
+	private VerificationDialogAdvancedPanelModularNonblocking advancedPanelNonblocking;
+	private MinimizationOptions minimizationOptions;
 	private JDialog dialog;
 
 	private JTabbedPane tabbedPane;
 
 	/**
-	 * Creates modal dialog box for input of verification options.
+	 * Creates modal dialog box for input of options for verification.
 	 */
-	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions)
+	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions, 
+							  MinimizationOptions minimizationOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.verificationOptions = verificationOptions;
+		this.minimizationOptions = minimizationOptions;
 
 		dialog.setTitle("Verification options");
 		dialog.setSize(new Dimension(400, 300));
@@ -92,7 +97,7 @@ public class VerificationDialog
 
 		standardPanel = new VerificationDialogStandardPanel();
 		advancedPanelControllability = new VerificationDialogAdvancedPanelControllability();
-		advancedPanelNonblocking = new VerificationDialogAdvancedPanelNonblocking();
+		advancedPanelNonblocking = new VerificationDialogAdvancedPanelModularNonblocking();
 
 		tabbedPane = new JTabbedPane();
 
@@ -125,6 +130,7 @@ public class VerificationDialog
 	{
 		standardPanel.update(verificationOptions);
 		advancedPanelControllability.update(verificationOptions);
+		advancedPanelNonblocking.update(minimizationOptions);
 	}
 
 	private JButton addButton(Container container, String name)
@@ -151,6 +157,7 @@ public class VerificationDialog
 			// Remember the selections
 			standardPanel.regain(verificationOptions);
 			advancedPanelControllability.regain(verificationOptions);
+			advancedPanelNonblocking.regain(minimizationOptions);
 			verificationOptions.saveOptions();
 			verificationOptions.setDialogOK(true);
 			dialog.setVisible(false);
@@ -268,12 +275,17 @@ public class VerificationDialog
 				tabbedPane.setComponentAt(1, advancedPanelControllability);
 				tabbedPane.setEnabledAt(1, true);
 			}
-			else
+			else if ((verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking) &&
+				  (algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular))
 			{
 				// Show advanced nonblocking options!
 				//tabbedPane.remove(advancedPanelControllability);
 				//int index = tabbedPane.indexOfComponent(advancedPanelControllability);
 				tabbedPane.setComponentAt(1, advancedPanelNonblocking);
+				tabbedPane.setEnabledAt(1, true);
+			}
+			else
+			{
 				tabbedPane.setEnabledAt(1, false);
 			}
 		}
@@ -323,16 +335,47 @@ public class VerificationDialog
 		}
 	}
 
-	class VerificationDialogAdvancedPanelNonblocking
+	class VerificationDialogAdvancedPanelModularNonblocking
 		extends JPanel
-		implements VerificationPanel
+		// implements MinimizationDialog.MinimizationPanel
 	{
-		public void update(VerificationOptions verificationOptions)
+		JComboBox minimizationStrategy;
+		JCheckBox ruleA;
+		JCheckBox ruleB;
+		JCheckBox ruleF;
+
+		public VerificationDialogAdvancedPanelModularNonblocking()
 		{
+			minimizationStrategy = new JComboBox(MinimizationStrategy.toArray());
+			Box strategyBox = Box.createHorizontalBox();
+			strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
+			strategyBox.add(new JLabel("Minimization strategy: "));
+			strategyBox.add(minimizationStrategy);
+			strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
+			this.add(strategyBox);
+
+			ruleA = new JCheckBox("Rule A");
+			ruleB = new JCheckBox("Rule B");
+			ruleF = new JCheckBox("Rule F");
+			this.add(ruleA);
+			this.add(ruleB);
+			this.add(ruleF);
+		}
+
+		public void update(MinimizationOptions options)
+		{
+			minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
+			ruleA.setSelected(options.getUseRuleA());
+			ruleB.setSelected(options.getUseRuleB());
+			ruleF.setSelected(options.getUseRuleF());
 		}
 	
-		public void regain(VerificationOptions verificationOptions)
+		public void regain(MinimizationOptions options)
 		{
+			options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
+			options.setUseRuleA(ruleA.isSelected());
+			options.setUseRuleB(ruleB.isSelected());
+			options.setUseRuleF(ruleF.isSelected());
 		}
 	}
 

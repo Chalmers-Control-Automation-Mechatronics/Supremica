@@ -110,6 +110,7 @@ public class AutomataVerifier
 	 */
 	private VerificationOptions verificationOptions;
 	private SynchronizationOptions synchronizationOptions;
+	private MinimizationOptions minimizationOptions;
 
 	/** For stopping execution. */
 	private ExecutionDialog executionDialog = null;
@@ -119,7 +120,7 @@ public class AutomataVerifier
 	/** For error message when Supremica can't be certain on the answer. */
 	private boolean failure = false;
 
-	public AutomataVerifier(Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
+	public AutomataVerifier(Automata theAutomata, VerificationOptions verificationOptions, SynchronizationOptions synchronizationOptions, MinimizationOptions minimizationOptions)
 		throws IllegalArgumentException, Exception
 	{
 		Automaton currAutomaton;
@@ -127,6 +128,7 @@ public class AutomataVerifier
 		this.theAutomata = theAutomata;
 		this.verificationOptions = verificationOptions;
 		this.synchronizationOptions = synchronizationOptions;
+		this.minimizationOptions = minimizationOptions;
 	}
 
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
@@ -1811,17 +1813,8 @@ public class AutomataVerifier
 				minimizer.setExecutionDialog(executionDialog);
 			}
 
-			// Choose options
-			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
-			//options.setAlsoTransitions(true);
-			options.setAlsoTransitions(false);
-			options.setKeepOriginal(false);
-			options.setCompositionalMinimization(true);
-			options.setSkipLast(true);
-			options.setTargetAlphabet(new Alphabet()); // Empty alphabet!
-
-			result = minimizer.getCompositionalMinimization(options);
+			// Minimize!
+			result = minimizer.getCompositionalMinimization(minimizationOptions);
 			threadToStop = null;
 		}
 		catch (Exception ex)
@@ -2018,11 +2011,11 @@ public class AutomataVerifier
 		SynchronizationOptions synchronizationOptions;
 		VerificationOptions verificationOptions;
 
-		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
 		verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
-		AutomataVerifier verifier = new AutomataVerifier(automata, synchronizationOptions, verificationOptions);
+		AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, null);
 
 		return verifier.verify();
 	}
@@ -2033,13 +2026,15 @@ public class AutomataVerifier
 	public static boolean verifyModularNonblocking(Automata automata)
 		throws Exception
 	{
-		SynchronizationOptions synchronizationOptions;
 		VerificationOptions verificationOptions;
+		SynchronizationOptions synchronizationOptions;
+		MinimizationOptions minimizationOptions;
 
-		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
 
-		AutomataVerifier verifier = new AutomataVerifier(automata, synchronizationOptions, verificationOptions);
+		AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, minimizationOptions);
 
 		return verifier.verify();
 	}
@@ -2056,7 +2051,7 @@ public class AutomataVerifier
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
 
-		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+		AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, null);
 
 		return verifier.verify();
 	}
@@ -2075,19 +2070,16 @@ public class AutomataVerifier
 		SynchronizationOptions synchronizationOptions;
 		VerificationOptions verificationOptions;
 
-		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultLanguageInclusionOptions();
 		verificationOptions.setInclusionAutomata(automataA);
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		
 		Automata theAutomata = new Automata();
-
 		theAutomata.addAutomata(automataA);
 		theAutomata.addAutomata(automataB);
 		//theAutomata.setIndicies();
 
-		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
-
-		//verifier.prepareForLanguageInclusion(automataA);
+		AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, null);
 
 		return verifier.verify();
 	}

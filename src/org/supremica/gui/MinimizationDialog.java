@@ -50,6 +50,7 @@
 package org.supremica.gui;
 
 import org.supremica.automata.algorithms.MinimizationOptions;
+import org.supremica.automata.algorithms.MinimizationStrategy;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import java.awt.*;
 import java.awt.event.*;
@@ -91,9 +92,9 @@ class MinimizationDialogStandardPanel
 		note.setBackground(this.getBackground());
 
 		Box standardBox = Box.createHorizontalBox();
-		standardBox.add(new Label("     ")); // Ugly fix to get stuff centered
+		standardBox.add(new JLabel("     ")); // Ugly fix to get stuff centered
 		standardBox.add(minimizationTypeBox);
-		standardBox.add(new Label("     ")); // Ugly fix to get stuff centered
+		standardBox.add(new JLabel("     ")); // Ugly fix to get stuff centered
 		Box anotherBox = Box.createVerticalBox();
 		anotherBox.add(alsoTransitions);
 		anotherBox.add(keepOriginal);
@@ -187,6 +188,7 @@ class MinimizationDialogAdvancedPanel
 	implements ActionListener
 {
 	private JCheckBox compositionalMinimization;
+	private JComboBox minimizationStrategy;
 	private Alphabet unionAlphabet;
 	private Alphabet targetAlphabet;
 	private JList targetAlphabetSelector;
@@ -201,6 +203,13 @@ class MinimizationDialogAdvancedPanel
 		compositionalMinimization = new JCheckBox("Compositional minimization (keep selected events)");
 		compositionalMinimization.setToolTipText("Minimizes selected automata compositionally, keeps the events that have been selected from the list below");
 		compositionalMinimization.addActionListener(this);
+
+		minimizationStrategy = new JComboBox(MinimizationStrategy.toArray());
+		Box strategyBox = Box.createHorizontalBox();
+		strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
+		strategyBox.add(new JLabel("Strategy: "));
+		strategyBox.add(minimizationStrategy);
+		strategyBox.add(new JLabel("   ")); // Ugly fix to get stuff centered
 		
 		/*
 		targetAlphabetSelector = new List(7, true);
@@ -228,35 +237,52 @@ class MinimizationDialogAdvancedPanel
 			}
 		}
 		targetAlphabetSelector = new JList(list);
-		targetAlphabetSelector.setVisibleRowCount(10);
+		targetAlphabetSelector.setVisibleRowCount(8);
 		targetAlphabetSelector.setPrototypeCellValue("AT LEAST THIS WIDE");
-		JScrollPane scrollPane = new JScrollPane(targetAlphabetSelector);
+		JScrollPane alphaPane = new JScrollPane(targetAlphabetSelector);
 
 		//note = new JTextArea("Note:\n" + "I have nothing to say.");
 		//note.setBackground(this.getBackground());
 
 		// Add components
-		this.setLayout(new BorderLayout());
+		this.add(compositionalMinimization);
+		this.add(strategyBox);
+		this.add(alphaPane);
 
+		/*
+		// Add components
+		this.setLayout(new BorderLayout());
+		
 		JPanel choicePanel = new JPanel();
 		choicePanel.setLayout(new FlowLayout());
 		//choicePanel.add(advancedBox);
 		choicePanel.add(compositionalMinimization);
+		choicePanel.add(minimizationStrategy);
 		this.add("North", choicePanel);
 
 		JPanel alphaPanel = new JPanel();
 		alphaPanel.setLayout(new FlowLayout());
 		//alphaPanel.add(targetAlphabetSelector);
-		alphaPanel.add(scrollPane);
+		alphaPanel.add(alphaPane);
 		targetAlphabetSelector.setEnabled(false);
-		this.add("Center", alphaPanel);
+		this.add("South", alphaPanel);
+		*/
 	}
 
 	public void update(MinimizationOptions options)
 	{
 		// compositionalMinimization.setSelected(options.getCompositionalMinimization());
+		minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
+		updatePanel();
+	}
+
+	/**
+	 * Options that are not related to the current MinimizationOptions.
+	 */
+	public void updatePanel()
+	{
 		targetAlphabetSelector.setEnabled(compositionalMinimization.isSelected());
-		//targetAlphabetSelector.setVisible(compositionalMinimization.isSelected());
+		minimizationStrategy.setEnabled(compositionalMinimization.isSelected());
 		this.repaint();
 	}
 
@@ -286,11 +312,15 @@ class MinimizationDialogAdvancedPanel
 		}
 
 		options.setCompositionalMinimization(compositionalMinimization.isSelected());
+		options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
 		options.setTargetAlphabet(targetAlphabet);
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
+		updatePanel();
+
+		/*
 		if (compositionalMinimization.isSelected())
 		{
 			targetAlphabetSelector.setEnabled(true);
@@ -304,6 +334,7 @@ class MinimizationDialogAdvancedPanel
 			//targetAlphabetSelector.setVisible(false);
 			//note.setVisible(false);
 		}
+		*/
 	}
 }
 

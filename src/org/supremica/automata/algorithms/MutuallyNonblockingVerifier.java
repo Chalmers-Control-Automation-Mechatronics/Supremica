@@ -1162,14 +1162,13 @@ public class MutuallyNonblockingVerifier
 
 		try
 		{
-
 			// Disable warning messages during verification (we know there will be a lot of those)
 			LoggerFilter filter = LoggerFactory.getLoggerFilter();
 			boolean allowWarn = filter.allowWarn();
 
 			filter.setAllowWarn(false);
 
-			theVerifier = new AutomataVerifier(totalSystem, synchronizationOptions, verificationOptions);
+			theVerifier = new AutomataVerifier(totalSystem, verificationOptions, synchronizationOptions, null);
 			isSafe = theVerifier.verify();
 
 			filter.setAllowWarn(allowWarn);

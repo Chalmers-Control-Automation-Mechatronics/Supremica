@@ -573,11 +573,12 @@ public class DiningPhilosophers
 		}
 	}
 
-	public DiningPhilosophers(int num, boolean l_take, boolean r_take, boolean l_put, boolean r_put, boolean animation, boolean forkmemory)
+	public DiningPhilosophers(int num, boolean l_take, boolean r_take, 
+							  boolean l_put, boolean r_put, boolean animation, boolean forkmemory)
 		throws Exception
 	{
 		// Add comment
-		project.setComment("The classical dining philosophers problem.");
+		project.setComment("The classical dining philosophers problem, here with " + num + " philosophers.");
 
 		// First the philosphers
 		// Philosopher philo = new Philosopher(l_take, r_take, l_put, r_put);

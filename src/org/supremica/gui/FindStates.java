@@ -154,9 +154,8 @@ class FindStatesTableModel
 
 	public int getRowCount()
 	{
-
 		// return cells.length;
-		return automata.getNbrOfAutomata();
+		return automata.nbrOfAutomata();
 	}
 
 	public Object getValueAt(int row, int col)
@@ -354,7 +353,7 @@ class FindStatesTableModel
 	// implementation of AutomataListener interface
 	private void updateListeners()
 	{
-		TableModelEvent event = new TableModelEvent(this, 0, automata.getNbrOfAutomata() - 1);
+		TableModelEvent event = new TableModelEvent(this, 0, automata.nbrOfAutomata() - 1);
 
 		fireTableChanged(event);
 	}

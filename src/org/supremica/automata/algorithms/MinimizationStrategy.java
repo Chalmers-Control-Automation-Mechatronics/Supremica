@@ -55,9 +55,9 @@ public class MinimizationStrategy
 {
 	private static Collection collection = new LinkedList();
 	public static final MinimizationStrategy BestPair = 
-		new MinimizationStrategy("Best unique-to-total-ratio pair", true);
+		new MinimizationStrategy("Best pair", true);
 	public static final MinimizationStrategy AtLeastOneUnique = 
-		new MinimizationStrategy("At least one unique in set", true);
+		new MinimizationStrategy("At least one unique", true);
 	public static final MinimizationStrategy Undefined = 
 		new MinimizationStrategy("Undefined", false);
 	private String description = null;

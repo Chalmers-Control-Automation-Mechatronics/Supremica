@@ -455,7 +455,7 @@ public class ConvertToAutomata
 			state.setCost(cost);
 			a.addArc(new Arc(previousState, state, event));
 
-			if (mZonesAutomata.getNbrOfAutomata() > 0)
+			if (mZonesAutomata.nbrOfAutomata() > 0)
 			{
 				Automaton synchroAutomaton = mZonesAutomata.getAutomaton(nameGet(firstP));
 
@@ -504,7 +504,7 @@ public class ConvertToAutomata
 			state.setCost(cost);
 			a.addArc(new Arc(previousState, state, event));
 
-			if (mZonesAutomata.getNbrOfAutomata() > 0)
+			if (mZonesAutomata.nbrOfAutomata() > 0)
 			{
 				Automaton synchroAutomaton = mZonesAutomata.getAutomaton(nameGet(firstP));
 				State free = synchroAutomaton.getStateWithName("Free_" + nameGet(firstP));

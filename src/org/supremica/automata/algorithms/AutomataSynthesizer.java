@@ -684,12 +684,12 @@ public class AutomataSynthesizer
 			Automata automata = new Automata(currAutomata, true);
 			automata.addAutomaton(currSupervisor);
 			*/
-			SynchronizationOptions synchronizationOptions;
 			VerificationOptions verificationOptions;
-			synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+			SynchronizationOptions synchronizationOptions;
 			verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
-			AutomataVerifier verifier = new AutomataVerifier(currAutomata, synchronizationOptions, 
-															 verificationOptions);			
+			synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+			AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions, 
+															 synchronizationOptions, null);			
 
 			if (stopRequested)
 			{

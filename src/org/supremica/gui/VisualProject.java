@@ -786,7 +786,7 @@ public class VisualProject
 
 		public int getRowCount()
 		{
-			return getNbrOfAutomata();
+			return nbrOfAutomata();
 		}
 
 		public int getSize()
@@ -901,7 +901,7 @@ public class VisualProject
 
 		public int getRowCount()
 		{
-			return getNbrOfAutomata();
+			return nbrOfAutomata();
 		}
 
 		public int getSize()

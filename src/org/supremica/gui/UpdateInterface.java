@@ -96,7 +96,7 @@ class UpdateInterfaceTableModel
 
 	public int getRowCount()
 	{
-		return selectableAutomata.getNbrOfAutomata();
+		return selectableAutomata.nbrOfAutomata();
 	}
 
 	public Object getValueAt(int row, int col)
@@ -126,7 +126,7 @@ class UpdateInterfaceTableModel
 	// implementation of AutomataListener interface
 	private void updateListeners()
 	{
-		TableModelEvent event = new TableModelEvent(this, 0, selectableAutomata.getNbrOfAutomata() - 1);
+		TableModelEvent event = new TableModelEvent(this, 0, selectableAutomata.nbrOfAutomata() - 1);
 
 		fireTableChanged(event);
 	}

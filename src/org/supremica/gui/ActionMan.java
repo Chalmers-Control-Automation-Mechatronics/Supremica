@@ -1410,30 +1410,6 @@ public class ActionMan
 		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, selectedAutomata, "" /* newAutomatonName */, synchronizationOptions);
 	}
 
-	/*
-	// Automaton.Minimization action performed
-	public static void automatonMinimize_actionPerformed(Gui gui)
-	{
-		// Retrieve the selected automata and make a sanity check
-		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1))
-		{
-			return;
-		}
-
-		// Get the current options and allow the user to change them...
-		MinimizationOptions options = new MinimizationOptions();
-		MinimizationDialog dialog = new MinimizationDialog(gui.getFrame(), options, selectedAutomata);
-		dialog.show();
-		if (!options.getDialogOK())
-		{
-			return;
-		}
-
-		AutomataMinimizationWorker worker = new AutomataMinimizationWorker(gui, selectedAutomata, options);
-	}
-	*/
-
 	// ** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
@@ -1519,21 +1495,24 @@ public class ActionMan
 		}
 
 		// Get the current options and allow the user to change them...
-		VerificationOptions verificationOptions = new VerificationOptions();
-		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), verificationOptions);
+		VerificationOptions vOptions = new VerificationOptions();
+		MinimizationOptions mOptions = MinimizationOptions.getDefaultVerificationOptions();
+		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), vOptions, mOptions);
 		verificationDialog.show();
-		if (!verificationOptions.getDialogOK())
+		if (!vOptions.getDialogOK())
 		{
 			return;
 		}
-		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+		if (vOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
-			verificationOptions.setInclusionAutomata(gui.getUnselectedAutomata());
+			vOptions.setInclusionAutomata(gui.getUnselectedAutomata());
 		}
-		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
+
+		SynchronizationOptions sOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
 		// Work!
-		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, syncOptions, verificationOptions);
+		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, 
+																		   vOptions, sOptions, mOptions);
 	}
 
 	// Automaton.ActionAndControlViewer action performed
@@ -1849,7 +1828,7 @@ public class ActionMan
 	// Automaton.Status action performed
 	public static void automatonStatus_actionPerformed(Gui gui)
 	{
-		int nbrOfAutomata = gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
+		int nbrOfAutomata = gui.getVisualProjectContainer().getActiveProject().nbrOfAutomata();
 		//gui.info("Number of automata: " + nbrOfAutomata);
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
@@ -2300,7 +2279,7 @@ public class ActionMan
 			JOptionPane.showMessageDialog(gui.getComponent(), "The project has an invalid hash", "alert", JOptionPane.WARNING_MESSAGE);
 		}
 
-		int nbrOfAutomataBeforeOpening = gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
+		int nbrOfAutomataBeforeOpening = gui.getVisualProjectContainer().getActiveProject().nbrOfAutomata();
 
 		try
 		{
@@ -2652,7 +2631,7 @@ public class ActionMan
 		String currAutomatonName;
 
 		for (int i = 0;
-				i < gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
+				i < gui.getVisualProjectContainer().getActiveProject().nbrOfAutomata();
 				i++)
 		{
 			try
@@ -2704,8 +2683,6 @@ public class ActionMan
 	 * To use this you have to set a boolean in GeneticAlgorithms.java.
 	 *
 	 * Writes 16 columns of data and a correct value on each line of an output file
-	 *
-	 * @author Hugo Flordal, hugo@s2.chalmers.se
 	 */
 	public static void evoCompSynchTable(Gui gui, boolean append)
 	{

@@ -173,9 +173,12 @@ public class Automata
 
 	public void removeAutomaton(Automaton aut)
 	{
-		theAutomata.remove(aut);
-		nameMap.remove(aut.getName());
-		notifyListeners(AutomataListeners.MODE_AUTOMATON_REMOVED, aut);
+		if (containsAutomaton(aut))
+		{
+			theAutomata.remove(aut);
+			nameMap.remove(aut.getName());
+			notifyListeners(AutomataListeners.MODE_AUTOMATON_REMOVED, aut);
+		}
 	}
 
 	public void removeAutomata(Automata theAutomata)
@@ -184,7 +187,7 @@ public class Automata
 				automataIterator.hasNext(); )
 		{
 			Automaton a = (Automaton) automataIterator.next();
-
+			
 			removeAutomaton(a.getName());
 		}
 	}
@@ -851,22 +854,20 @@ public class Automata
 		return false;
 	}
 
+	/**
+	 * Returns the number of Automaton:s in this Automata.
+	 */
 	public int size()
 	{
 		return theAutomata.size();
 	}
 
+	/**
+	 * Returns the number of Automaton:s in this Automata.
+	 */
 	public int nbrOfAutomata()
 	{
 		return size();
-	}
-
-	/**
-	 * Use nbrOfAutomata instead.
-	 */
-	public int getNbrOfAutomata()
-	{
-		return nbrOfAutomata();
 	}
 
 	public boolean containsAutomaton(String name)
@@ -1367,12 +1368,14 @@ public class Automata
 			return false;
 		}
 
+		/*
 		// Warns if there are events with equal (lowercase) names.
 		// Always do this check (irritating? well yes... but those are really bad names!)
 		if (!isEventNamesSafe())
 		{
 			// Warning has been written in log window by isEventNamesSafe.
 		}
+		*/
 
 		// Examines controllability consistency
 		if (mustBeControllabilityConsistent)
@@ -1388,6 +1391,7 @@ public class Automata
 			}
 		}
 		
+		/*
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
 		if (examineStructure)
@@ -1397,6 +1401,7 @@ public class Automata
 				// Warning has been written in the log window by isSeveralSystems.
 			}
 		}
+		*/
 
 		// Examines each automaton for an initial state
 		if (mustHaveInitial)
@@ -1438,10 +1443,10 @@ public class Automata
 		if (mustHaveValidType && (size() > 1))
 		{
 			// All automata must have a defined type, i.e. must not be of type "Undefined".
-			Iterator autIt = iterator();
+			AutomatonIterator autIt = iterator();
 			while (autIt.hasNext())
 			{
-				Automaton currAutomaton = (Automaton) autIt.next();
+				Automaton currAutomaton = autIt.nextAutomaton();
 
 				// Is this Automaton's type AutomatonType.Undefined?
 				if (currAutomaton.getType() == AutomatonType.Undefined)

@@ -75,6 +75,9 @@ public class AutomataMinimizer
 	/** Largest single automaton considered */
 	int largestAutomatonSize = 0;
 
+	/** Event to automata map, for choosing the next task in compositional minimization. */
+	private EventToAutomataMap eventToAutomataMap;
+
 	/**
 	 * Basic constructor.
 	 */
@@ -115,6 +118,12 @@ public class AutomataMinimizer
 			executionDialog.initProgressBar(0, theAutomata.size()-1);
 		}
 
+		// For each event, fint the automata that has this event in its alphabet
+		if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
+		{
+			eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
+		}
+		
 		// As long as there are at least two automata, compose and minimize!
 		while (theAutomata.size() >= 2)
 		{
@@ -137,13 +146,6 @@ public class AutomataMinimizer
 				// Just synch and hide
 				min = AutomataSynchronizer.synchronizeAutomata(automata);
 				min.hide(hideThese);
-				
-				if (AutomatonMinimizer.debug)
-				{
-					// Print total reduction statistics
-					AutomatonMinimizer.printTotal();
-					AutomatonMinimizer.resetTotal();
-				}
 			}
 			else
 			{
@@ -154,6 +156,25 @@ public class AutomataMinimizer
 			if (stopRequested)
 			{
 				return null;
+			}
+
+			// Adjust the eventToAutomataMap?
+			if (options.getMinimizationStrategy() == MinimizationStrategy.AtLeastOneUnique)
+			{
+				// Remove the examined automata from the map
+				for (EventIterator it = automata.getUnionAlphabet().iterator(); it.hasNext(); )
+				{
+					Automata aut = eventToAutomataMap.get(it.nextEvent());
+					if (aut != null)
+					{
+						aut.removeAutomata(automata);
+					}
+				}
+				// And add the new one!
+				for (EventIterator it = min.getAlphabet().iterator(); it.hasNext(); )
+				{
+					eventToAutomataMap.put(it.nextEvent(), min);
+				}
 			}
 
 			//min.remapStateIndices(); // Why did I do that?
@@ -174,6 +195,13 @@ public class AutomataMinimizer
 			{
 				executionDialog.setProgress(nbrOfAutomata-theAutomata.size());
 			}
+		}
+
+		if (AutomatonMinimizer.debug)
+		{
+			// Print total reduction statistics
+			AutomatonMinimizer.printTotal();
+			AutomatonMinimizer.resetTotal();
 		}
 
 		/*
@@ -229,9 +257,7 @@ public class AutomataMinimizer
 		Alphabet hideThese;
 
 		// Which strategy should be used to select the next task?
-		//MinimizationStrategy strategy = options.getMinimizationSelectionStrategy();
-		//MinimizationStrategy strategy = MinimizationStrategy.AtLeastOneUnique;
-		MinimizationStrategy strategy = MinimizationStrategy.BestPair;
+		MinimizationStrategy strategy = options.getMinimizationStrategy();
 		if (strategy == MinimizationStrategy.BestPair)
 		{
 			result = new Automata();
@@ -335,9 +361,6 @@ public class AutomataMinimizer
 		}	
 		else if (strategy == MinimizationStrategy.AtLeastOneUnique)
 		{
-			// For each event, fint the automata that has this event in its alphabet
-			EventToAutomataMap eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
-
 			// Target alphabet
 			Alphabet targetAlphabet = options.getTargetAlphabet();
 
@@ -388,12 +411,19 @@ public class AutomataMinimizer
 			{
 				// This must mean that there were only targetAlphabet events left? We should not
 				// take all of them at once (they may be many!) but I'll do that for now...
-				result = theAutomata;
+				result = new Automata(theAutomata);
 
 				// Just in case... but it should be empty?
-				hideThese = theAutomata.getUnionAlphabet();
+				hideThese = result.getUnionAlphabet();
 				hideThese.minus(targetAlphabet);
 				assert(hideThese.size() == 0);
+			}
+
+			// Adjust the EventToAutomataMap! (We don't want to recalculate it every time.)
+			// Remove the hidden ones
+			for (EventIterator it = hideThese.iterator(); it.hasNext(); )
+			{
+				eventToAutomataMap.remove(it.nextEvent());
 			}
 		}
 		else
@@ -416,13 +446,35 @@ public class AutomataMinimizer
 	 */
 	private Alphabet getUniqueEvents(Automata autA, Automata autB)
 	{
+		/*
 		Automata autNotA = new Automata(autB);
 		autNotA.removeAutomata(autA);
 
 		Alphabet alphaA = autA.getUnionAlphabet();
 		Alphabet alphaNotA = autNotA.getUnionAlphabet();
-		
-		return AlphabetHelpers.minus(alphaA, alphaNotA);
+		*/
+
+		Alphabet unique = autA.getUnionAlphabet();
+		Alphabet toBeRemoved = new Alphabet();
+		for (EventIterator it = unique.iterator(); it.hasNext(); )
+		{
+			LabeledEvent event = it.nextEvent();
+
+			Automata sharers = eventToAutomataMap.get(event);
+			
+			for (AutomatonIterator autIt = sharers.iterator(); autIt.hasNext(); )
+			{
+				// If there is an automaton here that is not in autA, this event is not unique to autA...
+				if (!autA.containsAutomaton(autIt.nextAutomaton()))
+				{
+					toBeRemoved.addEvent(event);
+					break;
+				}
+			}
+		}
+		unique.minus(toBeRemoved);
+
+		return unique;
 	}
 
 	/**

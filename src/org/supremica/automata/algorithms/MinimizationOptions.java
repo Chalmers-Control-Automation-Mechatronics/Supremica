@@ -89,10 +89,21 @@ public final class MinimizationOptions
 	 */
 	private boolean compositionalMinimization;
 	/**
+	 * Which strategy should be used for selecting the next step in the compositional minimization?
+	 */
+	private MinimizationStrategy minimizationStrategy;
+	/**
 	 * The target alphabet, the events that are not in this alphabet will be hidden in the
 	 * final result.
 	 */
 	private Alphabet targetAlphabet;
+
+	/** Use conflict equivalence rule A? */
+	private boolean useRuleA = true;
+	/** Use conflict equivalence rule B? */
+	private boolean useRuleB = true;
+	/** Use conflict equivalence rule F? */
+	private boolean useRuleF = true;
 
 	/**
 	 * This constructor returns the options previously chosen by the user as per the 
@@ -103,21 +114,23 @@ public final class MinimizationOptions
 		this(SupremicaProperties.minimizationMinimizationType(),
 			 SupremicaProperties.minimizationAlsoTransitions(),
 			 SupremicaProperties.minimizationKeepOriginal(),
-			 SupremicaProperties.minimizationIgnoreMarking());
+			 SupremicaProperties.minimizationIgnoreMarking(),
+			 MinimizationStrategy.BestPair);
 	}
 
 	/**
 	 * This constructor lets you choose exactly what options you want. This is not recommended and is
 	 * therefore private. It is better to first use the "getDefault..."-methods and then
-	 * modify the options you want (perhaps all of them).
+	 * modify the options that you want to change.
 	 */
 	private MinimizationOptions(EquivalenceRelation equivalenceRelation, boolean alsoTransitions,
-							   boolean keepOriginal, boolean ignoreMarking)
+							   boolean keepOriginal, boolean ignoreMarking, MinimizationStrategy strategy)
 	{
 		this.equivalenceRelation = equivalenceRelation;
 		this.alsoTransitions = alsoTransitions;
 		this.keepOriginal = keepOriginal;
 		this.ignoreMarking = ignoreMarking;
+		this.minimizationStrategy = strategy;
 	}
 
 	public boolean isValid()
@@ -210,6 +223,15 @@ public final class MinimizationOptions
 		return compositionalMinimization;
 	}
 
+	public void setMinimizationStrategy(MinimizationStrategy strategy)
+	{
+		minimizationStrategy = strategy;
+	}
+	public MinimizationStrategy getMinimizationStrategy()
+	{
+		return minimizationStrategy;
+	}
+
 	public void setSkipLast(boolean bool)
 	{
 		skipLast = bool;
@@ -226,6 +248,31 @@ public final class MinimizationOptions
 	public Alphabet getTargetAlphabet()
 	{
 		return targetAlphabet;
+	}
+
+	public void setUseRuleA(boolean bool)
+	{
+		useRuleA = bool;
+	}
+	public boolean getUseRuleA()
+	{
+		return useRuleA;
+	}
+	public void setUseRuleB(boolean bool)
+	{
+		useRuleB = bool;
+	}
+	public boolean getUseRuleB()
+	{
+		return useRuleB;
+	}
+	public void setUseRuleF(boolean bool)
+	{
+		useRuleF = bool;
+	}
+	public boolean getUseRuleF()
+	{
+		return useRuleF;
 	}
 
 	/**
@@ -250,5 +297,29 @@ public final class MinimizationOptions
 		options.setKeepOriginal(true);
 		options.setIgnoreMarking(false);
 		return options;
+	}
+
+	/**
+	 * Returns the default options for nonblocking verification - this is with respect to conflict equivalence.
+	 */
+	public static MinimizationOptions getDefaultNonblockingOptions()
+	{
+		MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+		options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+		options.setAlsoTransitions(false);
+		options.setKeepOriginal(false);
+		options.setCompositionalMinimization(true);
+		options.setSkipLast(true);
+		options.setTargetAlphabet(new Alphabet()); 
+		options.setMinimizationStrategy(MinimizationStrategy.BestPair);
+		return options;
+	}
+
+	/**
+	 * Returns the default options for verification, presumably nonblocking?
+	 */
+	public static MinimizationOptions getDefaultVerificationOptions()
+	{
+		return getDefaultNonblockingOptions();
 	}
 }

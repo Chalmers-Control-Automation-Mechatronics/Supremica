@@ -628,6 +628,20 @@ public class State
 		return incomingArcs.size();
 	}
 
+	public int nbrOfIncomingEpsilonArcs()
+	{
+		int count = 0;
+		for (ArcIterator it = incomingArcsIterator(); it.hasNext(); )
+		{
+			if (it.nextEvent().isEpsilon())
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	public int nbrOfOutgoingArcs()
 	{
 		return outgoingArcs.size();

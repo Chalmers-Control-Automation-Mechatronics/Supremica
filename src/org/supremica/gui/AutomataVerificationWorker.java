@@ -77,8 +77,9 @@ public class AutomataVerificationWorker
 
 	// private String newAutomatonName = null;
 	// private Automaton theAutomaton = null;
-	private SynchronizationOptions synchronizationOptions;
 	private VerificationOptions verificationOptions;
+	private SynchronizationOptions synchronizationOptions;
+	private MinimizationOptions minimizationOptions;
 	private ExecutionDialog executionDialog;
 	private boolean stopRequested = false;
 	private EventQueue eventQueue = new EventQueue();
@@ -88,15 +89,19 @@ public class AutomataVerificationWorker
 	private static final int MODULAR = 1;
 	private static final int IDD = 2;
 
-	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
+	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, 
+									  VerificationOptions verificationOptions, 
+									  SynchronizationOptions synchronizationOptions, 
+									  MinimizationOptions minimizationOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
 		theVisualProjectContainer = workbench.getVisualProjectContainer();
 
 		// this.newAutomatonName = newAutomatonName;
-		this.synchronizationOptions = synchronizationOptions;
 		this.verificationOptions = verificationOptions;
+		this.synchronizationOptions = synchronizationOptions;
+		this.minimizationOptions = minimizationOptions;
 
 		this.start();
 	}
@@ -170,7 +175,8 @@ public class AutomataVerificationWorker
 		// Initialize the AutomataVerifier
 		try
 		{
-			automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+			automataVerifier = new AutomataVerifier(theAutomata, verificationOptions, 
+													synchronizationOptions, minimizationOptions);
 		}
 		catch (Exception ex)
 		{

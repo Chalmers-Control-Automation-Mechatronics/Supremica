@@ -99,7 +99,8 @@ public class TestAutomataVerifier
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.Controllability);
-			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
+																synchronizationOptions, null);
 			assertTrue(theVerifier.verify());
 			// The same test again (hopefully)
 			assertTrue(AutomataVerifier.verifyModularControllability(theProject));
@@ -120,7 +121,8 @@ public class TestAutomataVerifier
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.Controllability);
-			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
+																synchronizationOptions, null);
 			assertTrue(!theVerifier.verify());
 			// The same test again (hopefully)
 			assertTrue(!AutomataVerifier.verifyModularControllability(theProject));
@@ -205,8 +207,8 @@ public class TestAutomataVerifier
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
-			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, 
-																verificationOptions);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
+																synchronizationOptions, null);
 			Automata inclusionAutomata = new Automata(theProject,true);
 			inclusionAutomata.removeAutomaton("sicherheit_vr3");
 			Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_vr3"));
@@ -231,8 +233,8 @@ public class TestAutomataVerifier
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
-			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, 
-																verificationOptions);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
+																synchronizationOptions, null);
 			Automata inclusionAutomata = new Automata(theProject,true);
 			inclusionAutomata.removeAutomaton("sicherheit_er");
 			Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_er"));

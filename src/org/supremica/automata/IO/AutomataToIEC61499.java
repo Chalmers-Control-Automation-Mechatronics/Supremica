@@ -111,7 +111,7 @@ public class AutomataToIEC61499
 			pw.println("(* Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()) + " *)");
 		}
 	
-		if (theProject.getNbrOfAutomata() >= 2)
+		if (theProject.nbrOfAutomata() >= 2)
 		{
 			pw.println("FUNCTION_BLOCK AUTOGEN_FB");
 		}

@@ -443,7 +443,6 @@ public class Supremica
 	 */
 	public void selectAutomata(int[] selectionIndices)
 	{
-
 		// We must set the autoscrolls property false for esthetical reasons
 		// but keep it unchanged after the operation for consistency
 		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
@@ -476,7 +475,6 @@ public class Supremica
 	 */
 	public void invertSelection()
 	{
-
 		// We must set the autoscrolls property false for esthetical reasons
 		// but keep it unchanged after the operation for consistency
 		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
@@ -565,7 +563,6 @@ public class Supremica
 
 	public Automata getUnselectedAutomata()
 	{
-
 		/* Simple... but flickery!
 		   invertSelection();
 		   Automata unSelectedAutomata = getSelectedAutomata();
@@ -848,7 +845,7 @@ public class Supremica
 			return;
 		}
 
-		int nbrOfProjectBeforeOpening = getActiveProject().getNbrOfAutomata();
+		int nbrOfProjectBeforeOpening = getActiveProject().nbrOfAutomata();
 
 		try
 		{
@@ -951,7 +948,6 @@ public class Supremica
 			}
 			else
 			{
-
 				// Must have a way to say, "cancel all"?
 			}
 		}
@@ -962,7 +958,7 @@ public class Supremica
 	public int addProject(Project theProject)
 		throws Exception
 	{
-		int nbrOfAutomataBeforeOpening = getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
+		int nbrOfAutomataBeforeOpening = getVisualProjectContainer().getActiveProject().nbrOfAutomata();
 		int nbrOfAddedAutomata = addAutomata(theProject);
 
 		if (theProject != null)

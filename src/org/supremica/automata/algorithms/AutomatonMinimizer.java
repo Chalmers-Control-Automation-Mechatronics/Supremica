@@ -962,26 +962,47 @@ public class AutomatonMinimizer
 			do
 			{
 				// Remove redundant transitions
-				int countArcs = 0;
-				countArcs = removeRedundantTransitions(aut);
+				int countArcs = removeRedundantTransitions(aut);
+				
+				// Merge conflict equivalent states and stuff...
+				// Rule A
+				int countA = 0;
+				if (options.getUseRuleA())
+				{
+					countA = ruleA(aut);
+					totalA += countA;
+				}
+				if (countA > 0)
+				{
+					countArcs += removeRedundantTransitions(aut);
+				}
+				// Rule B
+				int countB = 0;
+				if (options.getUseRuleB())
+				{
+					countB = ruleB(aut);
+					totalB += countB;
+				}
+				if (countB > 0)
+				{
+					countArcs += removeRedundantTransitions(aut);
+				}
+				// Rule C
+				int countC = ruleC(aut);
+				totalC += countC;
+				// Rule F
+				int countF = 0;
+				if (options.getUseRuleF())
+				{
+					countF = ruleF(aut);
+					totalF += countF;
+				}
+
 				totalArcs += countArcs;
 				if (debug && countArcs > 0)
 				{
 					logger.verbose("Removed " + countArcs + " redundant transitions.");
 				}
-				
-				// Merge conflict equivalent states and stuff...
-				int countA = ruleA(aut);
-				int countB = ruleB(aut);
-				int countC = ruleC(aut);
-				int countF = ruleF(aut);
-
-				totalA += countA;
-				totalB += countB;
-				totalC += countC;
-				totalF += countF;
-
-				//ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(new Automaton(aut));
 				
 				if (debug)
 					logger.warn("Rule A: " + countA + ", rule B: " + countB + 
@@ -1080,6 +1101,80 @@ public class AutomatonMinimizer
 						continue loop; // Get next "one" from stack
 					}
 				}
+			}
+		}
+
+		return countA;
+	}
+
+	/**
+	 * Rule A.
+	 *
+	 * @return the number of states that have been removed or -1 if method didn't complete successfully.
+	 */
+	public int ruleAA(Automaton aut)
+		throws Exception
+	{
+		////////////
+		// RULE A //
+		////////////
+
+		// Count the removed states
+		int countA = 0;
+
+		// If there is at least one outgoing epsilon transition AND this is not the initial state AND
+		// all incoming transitions are epsilon!
+		// Copy the outgoing of this state to all the previous states, and remove this state!
+		StateSet statesToExamine = new StateSet(aut.getStateSet());
+		loop: while (statesToExamine.size() != 0)
+		{
+			if (stopRequested)
+			{
+				return -1;
+			}
+
+			// Get and remove arbitrary state
+			State one = statesToExamine.remove();
+
+			// Don't fiddle with the initial state!
+			if (one.isInitial())
+			{
+				continue loop;
+			}
+
+			// Examine this state
+			// Is there at least one epsilon outgoing?
+			boolean ok = false;
+			for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
+			{
+				if (outIt.nextArc().getEvent().isEpsilon())
+				{
+					ok = true;
+					break;
+				}
+			}
+			
+			// Are all incoming epsilon?
+			if (ok && (one.nbrOfIncomingArcs() == one.nbrOfIncomingEpsilonArcs()))
+			{
+				// "Copy" outgoing arcs from one to the previous states.
+				for (ArcIterator inIt = one.incomingArcsIterator(); inIt.hasNext(); )
+				{
+					State fromState = inIt.nextArc().getFromState();
+					
+					for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
+					{
+						Arc arc = outIt.nextArc();
+						State toState = arc.getToState();
+						LabeledEvent event = arc.getEvent();
+
+						Arc newArc = new Arc(fromState, toState, event);
+						aut.addArc(newArc);
+					}
+				}
+				
+				aut.removeState(one);
+				countA++;
 			}
 		}
 
