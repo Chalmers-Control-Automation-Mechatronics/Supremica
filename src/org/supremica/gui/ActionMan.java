@@ -3817,7 +3817,7 @@ public class ActionMan
 						PrintWriter theWriter =
 							new PrintWriter(new FileWriter(currFile));
 
-						exporter.serializeStructuredText(theWriter);
+						exporter.printSource(theWriter);
 						theWriter.close();
 					} catch (Exception ex) {
 						logger.error(
