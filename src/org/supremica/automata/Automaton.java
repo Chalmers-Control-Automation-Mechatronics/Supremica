@@ -644,7 +644,6 @@ public class Automaton
 	 * automaton. If the event is not included in this automaton or is not
 	 * prioritized then it returns false.
 	 */
-/*
 	public boolean isEventPrioritized(String eventLabel)
 		throws IllegalArgumentException
 	{
@@ -662,7 +661,6 @@ public class Automaton
 			return false;
 		}
 	}
-*/
 
 	public LabeledEvent getEventWithLabel(String eventLabel)
 		throws IllegalArgumentException

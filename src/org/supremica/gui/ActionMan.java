@@ -1183,6 +1183,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() > 1)
 		{
+
 			SynchronizationOptions syncOptions;
 
 			try
@@ -2567,6 +2568,12 @@ public class ActionMan
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
+			return;
+		}
+
+		if (!selectedAutomata.isAllEventsPrioritized())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "All events must prioritized in this mode!", "Not supported", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 

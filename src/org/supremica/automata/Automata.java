@@ -199,15 +199,86 @@ public class Automata
 		return new AutomatonTypeIterator(AutomatonType.Plant);
 	}
 
+	/**
+	 * Returns a new automata object with all plant
+	 * in this automata. Note that this reuses the references
+	 * to the plant automata.
+	 */
+	public Automata getPlantAutomata()
+	{
+		Automata newAutomata = new Automata();
+		for (Iterator theIt = plantIterator(); theIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)theIt.next();
+			newAutomata.addAutomaton(currAutomaton);
+		}
+		return newAutomata;
+	}
+
 	public Iterator specificationIterator()
 	{
 		return new AutomatonTypeIterator(AutomatonType.Specification);
+	}
+
+	/**
+	 * Returns a new automata object with all specifications
+	 * in this automata. Note that this reuses the references
+	 * to the specification automata.
+	 */
+	public Automata getSpecificationAutomata()
+	{
+		Automata newAutomata = new Automata();
+		for (Iterator theIt = specificationIterator(); theIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)theIt.next();
+			newAutomata.addAutomaton(currAutomaton);
+		}
+		return newAutomata;
 	}
 
 	public Iterator supervisorIterator()
 	{
 		return new AutomatonTypeIterator(AutomatonType.Supervisor);
 	}
+
+	/**
+	 * Returns a new automata object with all specifications
+	 * in this automata. Note that this reuses the references
+	 * to the specification automata.
+	 */
+	public Automata getSupervisorAutomata()
+	{
+		Automata newAutomata = new Automata();
+		for (Iterator theIt = supervisorIterator(); theIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)theIt.next();
+			newAutomata.addAutomaton(currAutomaton);
+		}
+		return newAutomata;
+	}
+
+	/**
+	 * Returns a new automata object with all specification and supervisor automata
+	 * in this automata. Note that this reuses the references
+	 * to the plant automata.
+	 */
+	public Automata getSpecificationSupervisorAutomata()
+	{
+		Automata newAutomata = new Automata();
+		for (Iterator theIt = specificationIterator(); theIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)theIt.next();
+			newAutomata.addAutomaton(currAutomaton);
+		}
+		for (Iterator theIt = supervisorIterator(); theIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)theIt.next();
+			newAutomata.addAutomaton(currAutomaton);
+		}
+		return newAutomata;
+	}
+
+
 
 	public Iterator interfaceIterator()
 	{
@@ -281,6 +352,25 @@ public class Automata
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Returns true if at least one automaton has the event as prioritized.
+	 * Returns false if the event is not included in any alphabet or
+	 * all automata has this event as as non-prioritized.
+	 */
+	public boolean isPrioritizedInAtleastOneAutomaton(LabeledEvent theEvent)
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+
+			if(automaton.isEventPrioritized(theEvent.getLabel()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

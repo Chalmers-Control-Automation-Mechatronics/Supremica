@@ -220,6 +220,12 @@ public class AutomataToSMV
 
 	String getEnableCondition(LabeledEvent currEvent)
 	{
+		return getEnableCondition(currEvent, false, false);
+	}
+
+
+	String getEnableCondition(LabeledEvent currEvent, boolean filter, boolean selectPlant)
+	{
 		StringBuffer buff = new StringBuffer("(");
 
 		int currEventIndex = currEvent.getSynchIndex();
@@ -227,6 +233,23 @@ public class AutomataToSMV
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
+
+			// For example when checking for controllability
+			// we want to be able to only build conditions based on plants or supervisors.
+			// Note, that we do not make a difference between supervisor or plant.
+			if (filter)
+			{
+				if (selectPlant && !(currAutomaton.getType() == AutomatonType.Plant))
+				{
+					continue;
+				}
+
+				if (!selectPlant && !(currAutomaton.getType() == AutomatonType.Supervisor || currAutomaton.getType() == AutomatonType.Specification))
+				{
+					continue;
+				}
+			}
+
 			Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 			int currAutomatonIndex = currAutomaton.getSynchIndex();
@@ -267,30 +290,87 @@ public class AutomataToSMV
 				}
 				buff.append(")");
 			}
-
-			else
-			{
-				throw new IllegalArgumentException("Unsupported SynchronizationType");
-			}
 		}
 		buff.append(")");
 		return buff.toString();
 	}
 
-
 	void printSpecifications(PrintWriter pw)
 	{
-		//printControllabilitySpecification(pw);
+		printControllabilitySpecification(pw);
 		printNonblockingSpecification(pw);
-		//printLivenessSpecification(pw);
+		printLivenessSpecification(pw);
+		printAvoidanceOfForbiddenStates(pw);
 	}
 
+	// TODO: Fix this to work for prioritized events too
 	void printControllabilitySpecification(PrintWriter pw)
 	{
 		pw.println("-- Controllability verification");
-		pw.print("SPEC");
+		pw.print("SPEC AG (");
+		boolean previousUncontrollableEvent = false;
 
-		pw.println("");
+		//Automata plantAutomata = theAutomata.getPlantAutomata();
+		Automata specSupAutomata = theAutomata.getSpecificationSupervisorAutomata();
+
+		// Iterate over all uncontrollable events and find conditions for controllability
+		for (EventIterator evIt = allEvents.iterator(); evIt.hasNext();)
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (!currEvent.isControllable())
+			{
+				// A condition is only necessary if this event is included
+				// in the supervisor/specification and is also prioritized
+				// by at least one supervisor/spec
+				if (specSupAutomata.isPrioritizedInAtleastOneAutomaton(currEvent))
+				{
+
+					if (previousUncontrollableEvent)
+					{
+						pw.print(" & ");
+					}
+					else
+					{
+						previousUncontrollableEvent = true;
+					}
+
+					pw.print("(");
+					String enableConditionPlant = getEnableCondition(currEvent, true, true);
+					pw.print(enableConditionPlant);
+					// First find conditions for when this event is enabled in the plant
+					//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+					//{
+					//	pw.print("(");
+					//	Automaton currAutomaton = (Automaton)autIt.next();
+					//
+					//	pw.print(")");
+					//}
+
+
+					// When an event is enabled in the plant it must also be
+					// enabled in the supervisor/specification
+					pw.print(" -> ");
+					String enableConditionSpecSup = getEnableCondition(currEvent, true, false);
+					pw.print(enableConditionSpecSup);
+					//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+					//{
+					//	pw.print("(");
+					//	Automaton currAutomaton = (Automaton)autIt.next();
+					//
+					//	pw.print(")");
+					//}
+					pw.print(")");
+				}
+			}
+		}
+
+		if (!previousUncontrollableEvent)
+		{
+			pw.print("TRUE");
+		}
+
+		pw.println(")");
+		pw.println();
 	}
 
 
@@ -332,12 +412,74 @@ public class AutomataToSMV
 		}
 
 		pw.println(")");
+		pw.println();
 	}
 
 	void printLivenessSpecification(PrintWriter pw)
 	{
 		pw.println("-- Liveness verification");
-		pw.print("SPEC ");
+		pw.print("SPEC AG (");
+
+		boolean hasPreviousTerm = false;
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			int currAutomatonIndex = currAutomaton.getSynchIndex();
+			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+			{
+				State currState = stateIt.nextState();
+				int currStateIndex = currState.getSynchIndex();
+				if (hasPreviousTerm)
+				{
+					pw.print(" & ");
+				}
+				else
+				{
+					hasPreviousTerm = true;
+				}
+				pw.print("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currStateIndex + " -> EF !(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currStateIndex + "))");
+			}
+		}
+
+		pw.println(")");
+		pw.println();
+	}
+
+	void printAvoidanceOfForbiddenStates(PrintWriter pw)
+	{
+		pw.println("-- Avoidance of forbidden states verification");
+		pw.print("SPEC AG (");
+
+		boolean hasPreviousTerm = false;
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			int currAutomatonIndex = currAutomaton.getSynchIndex();
+			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+			{
+				State currState = stateIt.nextState();
+				int currStateIndex = currState.getSynchIndex();
+				if (currState.isForbidden())
+				{
+					if (hasPreviousTerm)
+					{
+						pw.print(" & ");
+					}
+					else
+					{
+						hasPreviousTerm = true;
+					}
+					pw.print("!(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currStateIndex + ")");
+				}
+			}
+		}
+
+		if (!hasPreviousTerm)
+		{
+			pw.print("TRUE");
+		}
+
+		pw.println(")");
 		pw.println();
 	}
 
