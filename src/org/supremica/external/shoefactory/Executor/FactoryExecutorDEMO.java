@@ -50,7 +50,7 @@ public class FactoryExecutorDEMO
 				e.removePaletteAction();
 
 				URL url = Supremica.class.getResource("/shoefactory/ShoeFactoryDEMO.xml");
-				//top = e.openWorkspace(url.getPath());
+				top = e.openWorkspace(url.getPath());
 
 				jgSupervisor = e.newWorkspace();
 				JgrafSupervisorDEMO js = new JgrafSupervisorDEMO(jgSupervisor,shoeNr);
@@ -176,7 +176,7 @@ public class FactoryExecutorDEMO
 		Integer i = new Integer(nr);
 		GCDocument temp = (GCDocument) shoes.get(shoeNumbers.indexOf(i));
 		e.stopWorkspace(temp);
-		//e.deleteWorkspace(temp);
+		e.deleteWorkspace(temp);
 		shoePlant.remove_shoe(nr);
 		remove_Aut(7+shoeNumbers.indexOf(i));
 

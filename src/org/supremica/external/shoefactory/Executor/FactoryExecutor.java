@@ -46,7 +46,7 @@ public class FactoryExecutor
 				e.removePaletteAction();
 
 				URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.xml");
-				//top = e.openWorkspace(url.getPath());
+				top = e.openWorkspace(url.getPath());
 
 				jgSupervisor = e.newWorkspace();
 				JgrafSupervisor js = new JgrafSupervisor(jgSupervisor,shoeNr);
@@ -57,8 +57,8 @@ public class FactoryExecutor
 				Specification shoeSpec = new Specification(shoeNr,sv);
 				gui.addProject(shoeSpec.getSpec());
 
-				//SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-				//syncPlant.synthesizePlants("theSupervisor");
+				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
+				syncPlant.synthesizePlants("theSupervisor");
 
 				GCDocument newShoe = e.newWorkspace();
 				Shoe s = new Shoe(newShoe, stationV, shoeNr);
@@ -109,8 +109,8 @@ public class FactoryExecutor
 				
 				remove_Aut(44+shoes.size());
 
-				//SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
-				//syncPlant.synthesizePlants("theSupervisor");
+				SyncBuilder syncPlant = new SyncBuilder(gui, shoePlant.getPlant());
+				syncPlant.synthesizePlants("theSupervisor");
 					
 				shoeNr++;
 	
@@ -161,7 +161,7 @@ public class FactoryExecutor
 		Integer i = new Integer(nr);
 		GCDocument temp = (GCDocument) shoes.get(shoeNumbers.indexOf(i));
 		e.stopWorkspace(temp);
-		//e.deleteWorkspace(temp);
+		e.deleteWorkspace(temp);
 		shoePlant.remove_shoe(nr);
 		remove_Aut(45+shoeNumbers.indexOf(i));
 		
