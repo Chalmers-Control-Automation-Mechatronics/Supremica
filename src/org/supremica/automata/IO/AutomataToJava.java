@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -676,7 +675,11 @@ public class AutomataToJava
 					}
 				}
 				else
-					assert false;
+				{
+					// assert false;
+					System.err.println("Error in AutomataToJava.java");
+					return;
+				}
 			}
 			pw.println(";");
 		}
