@@ -206,6 +206,13 @@ public final class IntArrayHashTable
 		}
 	}
 
+/*
+	private static int getIndex(int[][] theTable, int[] theArray)
+	{
+		return theTable.getIndex(theArray);
+	}
+*/
+
 	private int getTableIndex(int hash)
 	{
 		return (hash & 0x7FFFFFFF) % theTable.length;
@@ -243,6 +250,22 @@ public final class IntArrayHashTable
 
 						break;
 					}
+				}
+			}
+		}
+
+		// Adjust the prev state indicies
+		for (int i = 0; i < oldTable.length; i++)
+		{
+			if (oldTable[i] != null)
+			{
+				int[] currState = oldTable[i];
+				int prevStateIndex = currState[currState.length - AutomataIndexFormHelper.STATE_PREVSTATE_FROM_END];
+				if (prevStateIndex != AutomataIndexFormHelper.STATE_NO_PREVSTATE)
+				{
+					int[] prevState = oldTable[prevStateIndex];
+					int newPrevStateIndex = getIndex(prevState);
+					AutomataIndexFormHelper.setPrevStateIndex(prevState, newPrevStateIndex);
 				}
 			}
 		}

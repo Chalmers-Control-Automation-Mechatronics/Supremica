@@ -56,12 +56,21 @@ public final class AutomataIndexFormHelper
 	public static final int STATE_EXTRA_DATA = 2;
 	public static final int STATE_STATUS_FROM_END = 1;
 	public static final int STATE_PREVSTATE_FROM_END = 2;
+	public static final int STATE_NO_PREVSTATE = -1;
 
+	/**
+	 * Allocate a new state + extra data fields
+	 */
 	public static int[] createState(int nbrOfAutomata)
 	{
-		return new int[nbrOfAutomata + STATE_EXTRA_DATA];
+		int[] newState = new int[nbrOfAutomata + STATE_EXTRA_DATA];
+		newState[STATE_PREVSTATE_FROM_END] = STATE_NO_PREVSTATE;
+		return newState;
 	}
 
+	/**
+	 * Create a copy of an existing state
+	 */
 	public static int[] createCopyOfState(int[] state)
 	{
 		int[] newState = new int[state.length];
@@ -69,6 +78,22 @@ public final class AutomataIndexFormHelper
 		System.arraycopy(state, 0, newState, 0, state.length);
 
 		return newState;
+	}
+
+	/**
+	 * Set the previous state index of an existing state
+	 */
+	public static void setPrevStateIndex(int[] state, int stateIndex)
+	{
+		state[state.length - STATE_PREVSTATE_FROM_END] = stateIndex;
+	}
+
+	/**
+	 * Get the previous state index
+	 */
+	public static int getPrevStateIndex(int[] state)
+	{
+		return state[state.length - STATE_PREVSTATE_FROM_END];
 	}
 
 	/**
@@ -274,6 +299,7 @@ public final class AutomataIndexFormHelper
 			sb.append("Automaton index:" + i + " name: \"" + currAutomaton.getName() + "\", State: index:" + state[i] + " name:\"" + currState.getName() + "\"\n");
 		}
 
+		sb.append("Previous state index: " + state[state.length - STATE_PREVSTATE_FROM_END] + "\n");
 		sb.append("Status: " + state[state.length - STATE_STATUS_FROM_END] + "\n");
 
 		sb.append("]");
