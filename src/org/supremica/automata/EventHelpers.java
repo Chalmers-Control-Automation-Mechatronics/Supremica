@@ -68,8 +68,13 @@ public class EventHelpers
 		throws IllegalArgumentException, Exception
 	{
 		if (eventSet.size() <= 0)
+		{	
 			throw new IllegalArgumentException("At least one event in the set is necessary");
-
+			// IllegalArgumentException excp = new IllegalArgumentException("At least one event in the set is necessary");
+			// excp.printStackTrace();
+			// throw excp;
+		}
+		
 		Iterator eventIt = eventSet.iterator();
 		Event tmpEvent = (Event)eventIt.next();
 
