@@ -1,0 +1,40 @@
+Xinitaler = klarade test   (ex. Xar för Anders)
+Vdag.månad = klarade inte test
+
+Simple operators:
+-----------------
+Testad för:
+        BOOL DINT REAL WSTRING iFB       avFB
+LD      Xar  Xar  Xar  Xar     Xar       ej imp 25.4
+LDN     Xar  -    -    -       ??
+ST      Xar  Xar  Xar  Xar     Xar
+STN     Xar  -    -    -       ??
+//XXX NOT 
+S
+R
+// S1  
+// R1  
+// CLK 
+// CU  
+// CD  
+// PV  
+// IN  
+// PT  
+AND
+OR
+//XXX XOR 
+ANDN
+//XXX ORN 
+//XXX XORN
+ADD
+SUB
+MUL
+DIV
+MOD
+GT
+GE
+EQ
+LT
+LE
+NE
+

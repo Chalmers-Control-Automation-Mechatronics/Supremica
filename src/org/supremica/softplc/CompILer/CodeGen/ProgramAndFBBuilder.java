@@ -96,7 +96,7 @@ public abstract class ProgramAndFBBuilder
 		    }
 		catch (java.io.IOException e)
 		    {
-			System.err.println(e);
+			error(e);
 		    }
 	    }
 	else
@@ -556,8 +556,11 @@ public abstract class ProgramAndFBBuilder
 	    {
 		emitST(arg);
 	    }
-	//XXX else if (op == IlSimpleOperator.STN )
-	//XXX else if (op == IlSimpleOperator.NOT )
+	else if (op == IlSimpleOperator.STN )
+	    {
+		emitSTN(arg);
+	    }
+	//XXX	else if (op == IlSimpleOperator.NOT )
 	else if (op == IlSimpleOperator.S)
 	    {
 		emitS(arg);
@@ -737,16 +740,7 @@ public abstract class ProgramAndFBBuilder
 		ilRun.append(InstructionConstants.POP);
 		emitLoad(arg);
 		/* negate value */
-		InstructionHandle end_ldn, iffalse;
-		BranchInstruction ifeq = new IFEQ(null);
-		BranchInstruction jmp = new GOTO(null);
-		ilRun.append(ifeq);    //if stack == false jump
-		ilRun.append(new PUSH(constPoolGen, false));
-		ilRun.append(jmp);
-		iffalse = ilRun.append(new PUSH(constPoolGen, true));
-		end_ldn = ilRun.append(InstructionConstants.NOP);
-		ifeq.setTarget(iffalse);
-		jmp.setTarget(end_ldn);
+		emitNOT();
 	    }
 	else
 	    {
@@ -756,6 +750,41 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
+    /**emitST stores the negated top of stack value (IL's result register) in a
+     * specified variable
+     * @param arg where the value is to be stored (must be of type BOOL)
+     */
+    private void emitSTN(Object arg)
+    {
+	if (arg instanceof IECConstant)
+	    {
+		System.err.println("Fatal error: Operator STN cannot " +
+				   "store in constant");
+	    }
+	else if (arg instanceof IECVariable)
+	    {
+		IECVariable var = (IECVariable) arg;
+		/*
+		 * first we must duplicate stack value to be able to keep
+		 * IL's result register value
+		 */
+		if (var.getType() == TypeConstant.T_BOOL)
+		    {
+			ilRun.append(InstructionConstants.DUP);
+			emitNOT();
+			ilRun.append(emitStoreVariable(var));
+		    }
+		else
+		    {
+			error("STN cannot store i variable of type " + 
+			      var.getType() +". Only in BOOL variables.");
+		    }
+	    }
+	else
+	    {
+		error("Can't store in anything else than a variable");
+	    }
+    }
     /**emitST stores the top of stack value (IL's result register) in a
      * specified variable
      * @param arg where the value is to be stored
@@ -795,6 +824,20 @@ public abstract class ProgramAndFBBuilder
 	    }
     }
 
+    /**emitNOT negates the boolean value on the stack
+     */
+    private void emitNOT() {
+	InstructionHandle end_ldn, iffalse;
+	BranchInstruction ifeq = new IFEQ(null);
+	BranchInstruction jmp = new GOTO(null);
+	ilRun.append(ifeq);    //if stack == false jump
+	ilRun.append(new PUSH(constPoolGen, false));
+	ilRun.append(jmp);
+	iffalse = ilRun.append(new PUSH(constPoolGen, true));
+	end_ldn = ilRun.append(InstructionConstants.NOP);
+	ifeq.setTarget(iffalse);
+	jmp.setTarget(end_ldn);
+    }
     /**emitS set the argument (a variable) to true if the TOS value is true
      * @param arg an IL BOOL-variable
      */

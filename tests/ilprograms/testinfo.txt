@@ -1,0 +1,70 @@
+Tester som skall göras och har gjorts
+======================
+Förkortningar:
+
+RR   = il's result register
+?... = fråga som kräver svar
+!... = lyckades det true/false
+X    = klarade test
+V    = klarade inte test
+
+---------------------------------
+Dokumentera vilka variabelnamn man inte får använda:
+ex.:
+ R1,S1,IN,
+
+
+
+----------------------------------
+Testa load, store och init för io-var, var, tmp-var, at-var,
+för datatyperna:
+    DINT
+    REAL
+    BOOL
+    WSTRING
+    FB
+
+LDST testat: konstant  variabel
+ BOOL        X	       X
+ DINT        X         X
+ REAL        X         X
+ WSTRING     ¤ fungerar ej
+
+
+Filer:
+------------------------------
+Test av JMP (JMPC, JMPCN)
+
+
+
+
+
+---------------------------------
+Test av EQ (för att kunna använda i övriga test)
+
+
+
+
+
+-------------------------------
+Test av alla il-simpleoperators
+
+
+
+
+
+
+
+Filer:
+------------------------------
+Test av alla il-expression....
+
+
+
+
+
+
+
+Filer:
+-------------------------------------------
+Testa stdFBs skrivna i java (och även i il)

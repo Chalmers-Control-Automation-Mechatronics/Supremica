@@ -38,7 +38,7 @@ public class ilc
 		SimpleNode n = p.Start();
 		
 		// XXX
-		n.dump("");
+		//n.dump("");
 		
 		new VariableChecker(n);
 		//XXX new VaribleChecker(n,logger);
