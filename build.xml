@@ -758,7 +758,7 @@
 	<javadoc
 		sourcepath="${src}"
 		destdir="${doc}/api"
-		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*"
+		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*,${supremica_basepackage}.functionblocks.*"
 		classpath="${lib}/${unjared}"
 		encoding="ISO-8859-1"
 		author="true"
