@@ -1,0 +1,5 @@
+#/bin/sh
+
+#SUPREMICADEV_PATH skall innehålla sökvägen till Supremica-katalogen
+java -cp .:${SUPREMICADEV_PATH}/build:${SUPREMICADEV_PATH}/lib/unjared:${SUPREMICADEV_PATH}/images:${CLASSPATH} org.supremica.softplc.RunTime.Shell -IO org.supremica.softplc.Simulator.BTSim -IL $*
+
