@@ -62,7 +62,7 @@ abstract class SynthesizerPanel
 	public abstract void regain(SynthesizerOptions s);
 }
 
-class SD_StandardPanel
+class SynthesizerDialogStandardPanel
 	extends SynthesizerPanel
 {
 	private JComboBox synthesisTypeBox;
@@ -70,7 +70,7 @@ class SD_StandardPanel
 	private JCheckBox purgeBox;
 	private JCheckBox optimizeBox;
 
-	public SD_StandardPanel()
+	public SynthesizerDialogStandardPanel()
 	{
 		Box standardBox = Box.createVerticalBox();
 
@@ -103,12 +103,12 @@ class SD_StandardPanel
 	}
 }
 
-class SD_AdvancedPanel
+class SynthesizerDialogAdvancedPanel
 	extends SynthesizerPanel
 {
 	private JCheckBox maximallyPermissiveBox;
 
-	public SD_AdvancedPanel()
+	public SynthesizerDialogAdvancedPanel()
 	{
 		Box advancedBox = Box.createVerticalBox();
 
@@ -135,10 +135,10 @@ public class SynthesizerDialog
 	private JButton okButton;
 	private JButton cancelButton;
 	private SynthesizerOptions synthesizerOptions;
-	SD_StandardPanel standardPanel;
+	SynthesizerDialogStandardPanel standardPanel;
 
 	// private JCheckBox maximallyPermissiveBox;
-	SD_AdvancedPanel advancedPanel;
+	SynthesizerDialogAdvancedPanel advancedPanel;
 	private JDialog dialog;
 	private JFrame parentFrame;
 
@@ -156,46 +156,13 @@ public class SynthesizerDialog
 
 		Container contentPane = dialog.getContentPane();
 
-		standardPanel = new SD_StandardPanel();
-		advancedPanel = new SD_AdvancedPanel();
+		standardPanel = new SynthesizerDialogStandardPanel();
+		advancedPanel = new SynthesizerDialogAdvancedPanel();
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
 		tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
-
-		/** standardPanel
-		Box standardBox = Box.createVerticalBox();
-		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		String[] synthesisData = {"controllable", "non-blocking", "both"};
-		synthesisTypeBox = new JComboBox(synthesisData);
-		String[] algorithmData = {"modular", "monolithic", "IDD"};
-		algorithmTypeBox = new JComboBox(algorithmData);
-		purgeBox = new JCheckBox("Purge result");
-		optimizeBox = new JCheckBox("Optimize result");
-		// leftPanel.add(synthesisTypeBox);
-		// leftPanel.add(algorithmTypeBox);
-		// rightPanel.add(purgeBox);
-		// rightPanel.add(optimizeBox);
-		// standardPanel.setLayout(new GridLayout(1,2));
-		// standardPanel.add("Center", leftPanel);
-		// standardPanel.add("Center", rightPanel);
-
-		standardBox.add(synthesisTypeBox);
-		standardBox.add(algorithmTypeBox);
-		standardBox.add(purgeBox);
-		standardBox.add(optimizeBox);
-
-		standardPanel.add(standardBox); **/
-
-		/** advancedPanel
-		Box advancedBox = Box.createVerticalBox();
-		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
-
-		advancedBox.add(maximallyPermissiveBox);
-
-		advancedPanel.add(advancedBox); **/
 
 		// buttonPanel
 		JPanel buttonPanel = new JPanel();

@@ -56,16 +56,17 @@ import org.supremica.properties.SupremicaProperties;
 public final class SynchronizationOptions
 {
 	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
-	private final SynchronizationType syncType;
-	private final boolean forbidUnconStates;
-	private final boolean expandForbiddenStates;
-	private final int initialHashtableSize;
-	private final boolean expandHashtable;
-	private final int nbrOfExecuters;
-	private final boolean terminateIfUnconState;
-	private final boolean buildAutomaton;
-	private final boolean expandEventsUsingPriority;
-	private final boolean verboseMode;
+	private SynchronizationType syncType;
+	private boolean forbidUnconStates;
+	private boolean expandForbiddenStates;
+	private int initialHashtableSize;
+	private boolean expandHashtable;
+	private int nbrOfExecuters;
+	private boolean terminateIfUnconStates;
+	private boolean buildAutomaton;
+	private boolean expandEventsUsingPriority;
+	private boolean verboseMode;
+	private boolean dialogOK = false;
 
 	public SynchronizationOptions()
 		throws Exception
@@ -97,10 +98,20 @@ public final class SynchronizationOptions
 		this.expandHashtable = expandHashtable;
 		this.forbidUnconStates = forbidUnconStates;
 		this.expandForbiddenStates = expandForbiddenStates;
-		this.terminateIfUnconState = terminateIfUnconState;
+		this.terminateIfUnconStates = terminateIfUnconState;
 		this.expandEventsUsingPriority = expandEventsUsingPriority;
 		this.buildAutomaton = buildAutomaton;
 		this.verboseMode = verboseMode;
+	}
+
+	public void setDialogOK(boolean bool)
+	{
+		dialogOK = bool;
+	}
+
+	public boolean getDialogOK()
+	{
+		return dialogOK;
 	}
 
 	public int getNbrOfExecuters()
@@ -111,6 +122,11 @@ public final class SynchronizationOptions
 	public SynchronizationType getSynchronizationType()
 	{
 		return syncType;
+	}
+
+	public void setSynchronizationType(SynchronizationType type)
+	{
+		syncType = type;
 	}
 
 	public int getInitialHashtableSize()
@@ -128,14 +144,29 @@ public final class SynchronizationOptions
 		return forbidUnconStates;
 	}
 
+	public void setForbidUncontrollableStates(boolean set)
+	{
+		forbidUnconStates = set;
+	}
+
 	public boolean expandForbiddenStates()
 	{
 		return expandForbiddenStates;
 	}
 
+	public void setExpandForbiddenStates(boolean set)
+	{
+		 expandForbiddenStates = set;
+	}
+
 	public boolean terminateIfUncontrollableState()
 	{
-		return terminateIfUnconState;
+		return terminateIfUnconStates;
+	}
+
+	public void setTerminateIfUncontrollableState(boolean set)
+	{
+		 terminateIfUnconStates = set;
 	}
 
 	public boolean expandEventsUsingPriority()
@@ -154,5 +185,29 @@ public final class SynchronizationOptions
 	public boolean buildAutomaton()
 	{
 		return buildAutomaton;
+	}
+
+	public void setBuildAutomaton(boolean set)
+	{
+		 buildAutomaton = set;
+	}
+
+	public boolean isValid()
+	{
+		if (syncType == null)
+		{
+			return false;
+		}
+
+		if (nbrOfExecuters < 1)
+		{
+			return false;
+		}
+
+		if (initialHashtableSize < 100)
+		{
+			return false;
+		}
+		return true;
 	}
 }

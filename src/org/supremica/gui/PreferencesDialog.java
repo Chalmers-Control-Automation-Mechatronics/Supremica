@@ -64,7 +64,7 @@ public class PreferencesDialog
 	private FilePanel theFilePanel = null;
 	private CommunicationPanel theCommunicationPanel = null;
 	private LayoutPanel theLayoutPanel = null;
-	private SynchronizationPanel theSynchronizationPanel = null;
+	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
 	private PreferencesControllerPanel theControllerPanel = null;
 
 	public PreferencesDialog(Frame owner)
@@ -76,7 +76,7 @@ public class PreferencesDialog
 
 		contentPane.add(theTabbedPanel, BorderLayout.CENTER);
 
-		theSynchronizationPanel = new SynchronizationPanel(this);
+		theSynchronizationPanel = new SynchronizationPropertiesPanel(this);
 
 		theTabbedPanel.add("Synchronization", theSynchronizationPanel);
 
@@ -409,7 +409,7 @@ class LayoutPanel
 	}
 }
 
-class SynchronizationPanel
+class SynchronizationPropertiesPanel
 	extends JPanel
 {
 	private PreferencesDialog theDialog = null;
@@ -420,7 +420,7 @@ class SynchronizationPanel
 	private JTextField hashtableSize = null;
 	private JTextField nbrOfExecuters = null;
 
-	public SynchronizationPanel(PreferencesDialog theDialog)
+	public SynchronizationPropertiesPanel(PreferencesDialog theDialog)
 	{
 		this.theDialog = theDialog;
 

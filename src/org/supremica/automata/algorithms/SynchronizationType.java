@@ -57,11 +57,20 @@ public class SynchronizationType
 	public static final SynchronizationType Prioritized = new SynchronizationType("Prioritized Synchronization");
 	public static final SynchronizationType Full = new SynchronizationType("Full Synchronization");
 	public static final SynchronizationType Broadcast = new SynchronizationType("Broadcast Synchronization");
+	public static final SynchronizationType Unknown = new SynchronizationType("Unknown", false);
 	private String description = null;
 
 	private SynchronizationType(String description)
 	{
-		types.add(this);
+		this(description, true);
+	}
+
+	private SynchronizationType(String description, boolean selectable)
+	{
+		if (selectable)
+		{
+			types.add(this);
+		}
 
 		this.description = description;
 	}
@@ -74,5 +83,30 @@ public class SynchronizationType
 	public String toString()
 	{
 		return description;
+	}
+
+	public static SynchronizationType toType(String type)
+	{
+		if (type.equals(Prioritized.toString()))
+		{
+			return Prioritized;
+		}
+
+		if (type.equals(Full.toString()))
+		{
+			return Full;
+		}
+
+		if (type.equals(Broadcast.toString()))
+		{
+			return Broadcast;
+		}
+
+		return Unknown;
+	}
+
+	public static Object[] toArray()
+	{
+		return types.toArray();
 	}
 }

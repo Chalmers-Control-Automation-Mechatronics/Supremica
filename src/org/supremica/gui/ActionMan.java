@@ -740,6 +740,26 @@ public class ActionMan
 			return;
 		}
 
+		SynchronizationOptions synchronizationOptions = null;
+		try
+		{
+			synchronizationOptions = new SynchronizationOptions();
+		}
+		catch (Exception ex)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "Error constructing synchronizationOptions: " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		SynchronizationDialog synchronizationDialog = new SynchronizationDialog(gui.getFrame(), synchronizationOptions);
+
+		synchronizationDialog.show();
+
+		if (!synchronizationOptions.getDialogOK())
+		{
+			return;
+		}
+
+
 		String newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
 
 		if (newAutomatonName == null)
@@ -765,25 +785,21 @@ public class ActionMan
 			currAutomata.addAutomaton(currAutomaton);
 		}
 
-		SynchronizationOptions syncOptions;
-
-		try
-		{
-			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode());
-		}
-		catch (Exception ex)
-		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "Invalid synchronizationOptions", "Alert", JOptionPane.ERROR_MESSAGE);
-
-			return;
-		}
-
-		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, currAutomata, newAutomatonName, syncOptions);
+		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, currAutomata, newAutomatonName, synchronizationOptions);
 	}
 
 	// ** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
+		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
 		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), synthesizerOptions);
 
@@ -795,14 +811,6 @@ public class ActionMan
 		}
 
 		Date startDate = new Date();
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
-		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-			return;
-		}
 
 		if (selectedAutomata.size() > 1)
 		{
