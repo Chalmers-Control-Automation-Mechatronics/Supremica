@@ -1,13 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata>
-	<Automaton name="ballp" type="Plant">
+	<Automaton name="Gatekeeper" type="Specification">
 		<Events>
-			<Event id="enter_ball" label="enter_ball" controllable="true" prioritized="true" />
-			<Event id="ball_in" label="ball_in" controllable="false" prioritized="true" />
-			<Event id="exit_ball" label="exit_ball" controllable="true" prioritized="true" />
-			<Event id="ball_out" label="ball_out" controllable="false" prioritized="true" />
-			<Event id="t1.start" label="t1.start" controllable="true" prioritized="true" />
-			<Event id="t1.timeout" label="t1.timeout" controllable="false" prioritized="true" />
+			<Event id="gk.enter_ball" label="gk.enter_ball" controllable="true" prioritized="true" />
+			<Event id="gk.ball_in_gatekeeper" label="gk.ball_in_gatekeeper" controllable="false" prioritized="true" />
+			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
+			<Event id="gk.ball_out_of_gatekeeper" label="gk.ball_out_of_gatekeeper" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+			<State id="q_3" />		
+		</States>
+		<Transitions>
+			<Transition event="gk.enter_ball" source="q_0" dest="q_1" />
+			<Transition event="gk.ball_in_gatekeeper" source="q_1" dest="q_2" />
+			<Transition event="gk.release_ball" source="q_2" dest="q_3" />
+			<Transition event="gk.ball_out_of_gatekeeper" source="q_3" dest="q_0" />		
+		</Transitions>
+	</Automaton>
+	<Automaton name="plant_measure" type="Plant">
+		<Events>
+			<Event id="em.start_measure" label="em.start_measure" controllable="true" prioritized="true" />
+			<Event id="em.timer_measure.start" label="em.timer_measure.start" controllable="true" prioritized="true" />
+			<Event id="em.timer_measure.timeout" label="em.timer_measure.timeout" controllable="false" prioritized="true" />
+			<Event id="em.small_ball" label="em.small_ball" controllable="false" prioritized="true" />
+			<Event id="em.large_ball" label="em.large_ball" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true" />
+			<State id="q_2" accepting="true" />
+			<State id="q_3" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="em.start_measure" source="q_0" dest="q_1" />
+			<Transition event="em.timer_measure.start" source="q_1" dest="q_2" />
+			<Transition event="em.timer_measure.timeout" source="q_2" dest="q_3" />
+			<Transition event="em.small_ball" source="q_3" dest="q_0" />
+			<Transition event="em.large_ball" source="q_3" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="manual_button" type="Plant">
+		<Events>
+			<Event id="manual_button_pressed" label="manual_button_pressed" controllable="false" prioritized="true" />
+			<Event id="start_manual_mode" label="start_manual_mode" controllable="true" prioritized="true" />
+			<Event id="manual_button_released" label="manual_button_released" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true" />
+			<State id="q_2" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="manual_button_pressed" source="q_0" dest="q_1" />
+			<Transition event="start_manual_mode" source="q_1" dest="q_2" />
+			<Transition event="manual_button_released" source="q_2" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="automatic_button" type="Plant">
+		<Events>
+			<Event id="automatic_button_pressed" label="automatic_button_pressed" controllable="false" prioritized="true" />
+			<Event id="start_automatic_mode" label="start_automatic_mode" controllable="true" prioritized="true" />
+			<Event id="automatic_button_released" label="automatic_button_released" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true" />
+			<State id="q_2" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="automatic_button_pressed" source="q_0" dest="q_1" />
+			<Transition event="start_automatic_mode" source="q_1" dest="q_2" />
+			<Transition event="automatic_button_released" source="q_2" dest="q_0" />
+		</Transitions>
+	</Automaton>	
+	<Automaton name="spec_mode" type="Specification">
+		<Events>
+			<Event id="start_automatic_mode" label="start_automatic_mode" controllable="true" prioritized="true" />
+			<Event id="start_manual_mode" label="start_manual_mode" controllable="true" prioritized="true" />
+			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
 		</Events>
 		<States>
 			<State id="q_0" initial="true" accepting="true" />
@@ -15,20 +88,245 @@
 			<State id="q_2" />
 			<State id="q_3" />
 			<State id="q_4" />
-			<State id="q_5" />			
+			<State id="q_5" />
+			<State id="q_6" />
+			<State id="q_7" />
 		</States>
 		<Transitions>
-			<Transition event="enter_ball" source="q_0" dest="q_1" />
-			<Transition event="ball_in" source="q_1" dest="q_2" />
-			<Transition event="exit_ball" source="q_2" dest="q_3" />
-			<Transition event="ball_out" source="q_3" dest="q_4" />
-			<Transition event="t1.start" source="q_4" dest="q_5" />
-			<Transition event="t1.timeout" source="q_5" dest="q_0" />			
+			<Transition event="start_automatic_mode" source="q_0" dest="q_2" />
+			<Transition event="start_manual_mode" source="q_0" dest="q_1" />
+			<Transition event="gk.release_ball" source="q_1" dest="q_0" />
+			<Transition event="gk.release_ball" source="q_2" dest="q_3" />
+			<Transition event="gk.release_ball" source="q_3" dest="q_4" />
+			<Transition event="gk.release_ball" source="q_4" dest="q_5" />
+			<Transition event="gk.release_ball" source="q_5" dest="q_6" />
+			<Transition event="gk.release_ball" source="q_6" dest="q_7" />
+			<Transition event="gk.release_ball" source="q_7" dest="q_0" />
+		</Transitions>
+	</Automaton>	
+	<Automaton name="variable_ball_size" type="Specification">
+		<Events>
+			<Event id="em.small_ball" label="em.small_ball" controllable="false" prioritized="true" />
+			<Event id="em.large_ball" label="em.large_ball" controllable="false" prioritized="true" />
+			<Event id="is_large_ball" label="is_large_ball" controllable="true" prioritized="true" />
+			<Event id="is_small_ball" label="is_small_ball" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true" />
+			<State id="q_2" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="em.small_ball" source="q_0" dest="q_2" />
+			<Transition event="em.large_ball" source="q_0" dest="q_1" />
+			<Transition event="em.large_ball" source="q_2" dest="q_1" />
+			<Transition event="em.small_ball" source="q_1" dest="q_2" />
+			<Transition event="is_large_ball" source="q_1" dest="q_1" />
+			<Transition event="is_small_ball" source="q_2" dest="q_2" />
 		</Transitions>
 	</Automaton>
+	<Automaton name="spec_em_es" type="Specification">
+		<Events>
+			<Event id="es.is_down" label="es.is_down" controllable="true" prioritized="true" />
+			<Event id="em.is_small" label="em.is_small" controllable="false" prioritized="true" />
+			<Event id="em.is_large" label="em.is_large" controllable="false" prioritized="true" />
+			<Event id="es.go_lower" label="es.go_lower" controllable="true" prioritized="true" />
+			<Event id="es.go_upper" label="es.go_upper" controllable="true" prioritized="true" />
+			<Event id="es.is_not_down" label="es.is_not_down" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+			<State id="q_3" />
+			<State id="q_4" />
+		</States>
+		<Transitions>
+			<Transition event="es.is_down" source="q_0" dest="q_1" />
+			<Transition event="em.is_small" source="q_1" dest="q_2" />
+			<Transition event="em.is_large" source="q_1" dest="q_3" />
+			<Transition event="es.go_lower" source="q_2" dest="q_4" />
+			<Transition event="es.go_upper" source="q_3" dest="q_4" />
+			<Transition event="es.is_not_down" source="q_4" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="spec_es_p_lower" type="Specification">
+		<Events>
+			<Event id="p.allocate_lower_buffer" label="p.allocate_lower_buffer" controllable="true" prioritized="true" />
+			<Event id="p.release_lower_buffer" label="p.release_lower_buffer" controllable="true" prioritized="true" />
+			<Event id="es.allocate_lower_buffer" label="es.allocate_lower_buffer" controllable="true" prioritized="true" />
+			<Event id="es.release_lower_buffer" label="es.release_lower_buffer" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+		</States>
+		<Transitions>
+			<Transition event="p.allocate_lower_buffer" source="q_0" dest="q_1" />
+			<Transition event="p.release_lower_buffer" source="q_1" dest="q_0" />
+			<Transition event="es.allocate_lower_buffer" source="q_0" dest="q_2" />
+			<Transition event="es.release_lower_buffer" source="q_2" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="spec_es_p_upper" type="Specification">
+		<Events>
+			<Event id="p.allocate_upper_buffer" label="p.allocate_upper_buffer" controllable="true" prioritized="true" />
+			<Event id="p.release_upper_buffer" label="p.release_upper_buffer" controllable="true" prioritized="true" />
+			<Event id="es.allocate_upper_buffer" label="es.allocate_upper_buffer" controllable="true" prioritized="true" />
+			<Event id="es.release_upper_buffer" label="es.release_upper_buffer" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+		</States>
+		<Transitions>
+			<Transition event="p.allocate_upper_buffer" source="q_0" dest="q_1" />
+			<Transition event="p.release_upper_buffer" source="q_1" dest="q_0" />
+			<Transition event="es.allocate_upper_buffer" source="q_0" dest="q_2" />
+			<Transition event="es.release_upper_buffer" source="q_2" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="spec_gk_em" type="Specification">
+		<Events>
+			<Event id="em.is_down" label="em.is_down" controllable="true" prioritized="true" />
+			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
+			<Event id="em.is_not_down" label="em.is_not_down" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+		</States>
+		<Transitions>
+			<Transition event="em.is_down" source="q_0" dest="q_1" />
+			<Transition event="gk.release_ball" source="q_1" dest="q_2" />
+			<Transition event="em.is_not_down" source="q_2" dest="q_0" />
+		</Transitions>
+	</Automaton>	
+	<Automaton name="em.timer.before_up" type="Plant">
+		<Events>
+			<Event id="em.timer.before_up.start" label="em.timer.before_up.start" controllable="true" prioritized="true" />
+			<Event id="em.timer.before_up.timeout" label="em.timer.before_up.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="em.timer.before_up.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.before_up.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="em.timer.before_measure" type="Plant">
+		<Events>
+			<Event id="em.timer.before_measure.start" label="em.timer.before_measure.start" controllable="true" prioritized="true" />
+			<Event id="em.timer.before_measure.timeout" label="em.timer.before_measure.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="em.timer.before_measure.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.before_measure.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="em.timer.measure" type="Plant">
+		<Events>
+			<Event id="em.timer.measure.start" label="em.timer.measure.start" controllable="true" prioritized="true" />
+			<Event id="em.timer.measure.timeout" label="em.timer.measure.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="em.timer.measure.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.measure.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="em.timer.before_put" type="Plant">
+		<Events>
+			<Event id="em.timer.before_put.start" label="em.timer.before_put.start" controllable="true" prioritized="true" />
+			<Event id="em.timer.before_put.timeout" label="em.timer.before_put.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="em.timer.before_put.start" source="q_0" dest="q_1" />
+			<Transition event="em.timer.before_put.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="es.timer.before_up" type="Plant">
+		<Events>
+			<Event id="es.timer.before_up.start" label="es.timer.before_up.start" controllable="true" prioritized="true" />
+			<Event id="es.timer.before_up.timeout" label="es.timer.before_up.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="es.timer.before_up.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_up.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="es.timer.before_put" type="Plant">
+		<Events>
+			<Event id="es.timer.before_put.start" label="es.timer.before_put.start" controllable="true" prioritized="true" />
+			<Event id="es.timer.before_put.timeout" label="es.timer.before_put.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="es.timer.before_put.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_put.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="es.timer.before_deput" type="Plant">
+		<Events>
+			<Event id="es.timer.before_deput.start" label="es.timer.before_deput.start" controllable="true" prioritized="true" />
+			<Event id="es.timer.before_deput.timeout" label="es.timer.before_deput.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="es.timer.before_deput.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_deput.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="p.timer.before_turnleft" type="Plant">
+		<Events>
+			<Event id="p.timer.before_turnleft.start" label="p.timer.before_turnleft.start" controllable="true" prioritized="true" />
+			<Event id="p.timer.before_turnleft.timeout" label="p.timer.before_turnleft.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="p.timer.before_turnleft.start" source="q_0" dest="q_1" />
+			<Transition event="p.timer.before_turnleft.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>	
 <Execution>
 	<Timers>
-		<Timer name="timer1" startEvent="t1.start" timeoutEvent="t1.timeout" delay="500" />
+		<Timer name="em.timer.before_up" startEvent="em.timer.before_up.start" timeoutEvent="em.timer.before_up.timeout" delay="1000" />
+		<Timer name="em.timer.before_measure" startEvent="em.timer.before_measure.start" timeoutEvent="em.timer.before_measure.timeout" delay="1000" />
+		<Timer name="em.timer.measure" startEvent="em.timer.measure.start" timeoutEvent="em.timer.measure.timeout" delay="1000" />
+		<Timer name="em.timer.before_put" startEvent="em.timer.before_put.start" timeoutEvent="em.timer.before_put.timeout" delay="1000" />
+		<Timer name="es.timer.before_up" startEvent="es.timer.before_up.start" timeoutEvent="es.timer.before_up.timeout" delay="1000" />
+		<Timer name="es.timer.before_put" startEvent="es.timer.before_put.start" timeoutEvent="es.timer.before_put.timeout" delay="1000" />
+		<Timer name="es.timer.before_deput" startEvent="es.timer.before_deput.start" timeoutEvent="es.timer.before_deput.timeout" delay="1000" />
+		<Timer name="p.timer.before_turnleft" startEvent="p.timer.before_turnleft.start" timeoutEvent="p.timer.before_turnleft.timeout" delay="1000" />
 	</Timers>
 	<InputSignals>
 		<Signal label="KulaPortvakt" port="0"/>
@@ -73,32 +371,34 @@
 		<Signal label="Sug" port="16"/>			
 	</OutputSignals>
 	<Actions>
-		<Action label="enter_ball">
+		<Action label="gk.enter_ball">
 			<Command command="InPortvakt" value="true"/>
 		</Action>
-		<Action label="ball_in">
+		<Action label="gk.ball_in_gatekeeper">
 			<Command command="InPortvakt" value="false"/>
 		</Action>
-		<Action label="exit_ball">
+		<Action label="gk.release_ball">
 			<Command command="UrPortvakt" value="true"/>
 		</Action>
-		<Action label="ball_out">
+		<Action label="gk.ball_out_of_gatekeeper">
 			<Command command="UrPortvakt" value="false"/>
 		</Action>
 	</Actions>
 	<Controls>
-		<Control label="enter_ball">
+		<Control label="manual_button_pressed">
 			<Condition condition="ManuellStart" invert="true"/>			
-			<Condition condition="KulaPortvakt" invert="true"/>	
 		</Control>
-		<Control label="ball_in">
+		<Control label="manual_button_released">
+			<Condition condition="ManuellStart" invert="false"/>			
+		</Control>
+		<Control label="automatic_button_pressed">
+			<Condition condition="Autostart" invert="true"/>			
+		</Control>
+		<Control label="automatic_button_released">
+			<Condition condition="Autostart" invert="false"/>			
+		</Control>
+		<Control label="gk.ball_in_gatekeeper">
 			<Condition condition="KulaPortvakt"/>
-		</Control>
-		<Control label="exit_ball">
-			<Condition condition="MatlyftNere"/>		
-		</Control>
-		<Control label="ball_out">
-			<Condition condition="KulaMatlyft"/>
 		</Control>
 	</Controls>
 </Execution>
