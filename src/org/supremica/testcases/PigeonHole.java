@@ -31,7 +31,6 @@ public class PigeonHole {
 				"An anonymous Petri-Net model on the other hand, would be extremly easy to traverse. " +
 				"To see why this problem is so hard, refer to 'The Intractability of Resolution' by A. Haken. "
 				);
-
 		// first = false;
 
 		// create events:

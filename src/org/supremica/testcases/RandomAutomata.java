@@ -22,9 +22,11 @@ public class RandomAutomata extends Automata {
 		project =  new Project();
 
 		if(first)
-			project.setComment("Composition of random automata tend to have very few states (often only one). "+
-				"This is very favourable for traditional algorithms in contrast to the symbolic ones (e.g. BDD-based). " +
-				"In this sense, the Random Automata testcase is the exact opposite to the Counter test case."
+			project.setComment("Composition of random automata tend to have very few states (often " + 
+							   "only one). This is very favourable for traditional algorithms in " + 
+							   "contrast to the symbolic ones (e.g. BDD-based). In this sense, the " + 
+							   "'Random automata' testcase is the exact opposite to the 'Counters' " + 
+							   "test case."
 				);
 
 		first = false;
@@ -33,7 +35,6 @@ public class RandomAutomata extends Automata {
 		{
 			dens = 1.0;
 		}
-
 
 		LabeledEvent [] events_vector = new LabeledEvent[events];
 		boolean [] events_used = new boolean[events];
@@ -50,7 +51,6 @@ public class RandomAutomata extends Automata {
 		{
 			transitions[i] = new TransitionStruct();
 		}
-
 
 		for (int i = 0; i < num; ++i)
 		{
@@ -99,15 +99,11 @@ public class RandomAutomata extends Automata {
 						);
 			}
 
-
-
-
 			random.setType(AutomatonType.Plant);
 			project.addAutomaton(random);
 		}
 
 	}
-
 
 	// this is highly inefficient :(
 	private void computeRandomTransitions(TransitionStruct []ts, int states, int events)

@@ -549,7 +549,7 @@ class ArbiterPanel
 	implements TestCase
 {
 	IntegerField num_users = new IntegerField("4", 2);
-	JCheckBox synchronize = new JCheckBox("Synchronize arbiter cells", true);
+	JCheckBox synchronize = new JCheckBox("Synchronize arbiter cells (yields an appealing hierarchy)", true);
 
 	public ArbiterPanel()
 	{
@@ -591,7 +591,7 @@ class ExampleTab
 	ExampleTab()
 	{
 		addTab("Users", null, new UsersPanel(), "Mutual exclusion users");
-		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
+		addTab("Philos", null, new PhilosPanel(), "Dininig philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
 		addTab("Sticks game", null, new StickGamePanel(), "Stick picking game");
 		addTab("Transfer line", null, new TransferLinePanel(), "Transfer line");

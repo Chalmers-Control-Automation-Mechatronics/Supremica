@@ -2155,6 +2155,12 @@ public class ActionMan
 		};
 	}
 
+	/**
+	 * What is this!?!?? Wasn't the friggin' point of this whole thing to AVOID having 
+	 * application specific import functions?!? Why is there a fileImportRobotCoordination
+	 * AND a fileImportRobotCoordinationABB????? GRRRRRrrrrRRRR!! /hguo
+	 */
+
     // File.Import.FromRobotCoordinationABB (format representing RobotStudio station)
     public static void fileImportRobotCoordinationABB(Gui gui)
 		{

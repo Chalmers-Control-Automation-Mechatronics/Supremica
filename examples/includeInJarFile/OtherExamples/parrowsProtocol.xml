@@ -36,6 +36,7 @@
 		<Transition source="r2" dest="r0" event="acknowledge"/>
 	</Transitions>
 </Automaton>
+<!-- A modified receiver that causes problems...
 <Automaton name="Receiver ack rec" type="Plant">
 	<Events>
 		<Event id="out"/>
@@ -53,6 +54,7 @@
 		<Transition source="r1" dest="r2" event="acknowledge"/>
 	</Transitions>
 </Automaton>
+-->
 <Automaton name="Medium" type="Plant">
 	<Events>
 		<Event id="in"/>

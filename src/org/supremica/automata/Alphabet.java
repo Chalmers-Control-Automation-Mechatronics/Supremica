@@ -292,7 +292,6 @@ public class Alphabet
 		throw new IllegalArgumentException("No event with index '" + index + "' exists");
 	}
 
-
 	public int nbrOfControllableEvents()
 	{
 		int nbrOfFoundEvents = 0;
@@ -581,8 +580,7 @@ public class Alphabet
 		}
 	}
 
-
-  /**
+	/**
 	 * returns true if the two alphabets overlap, that is, they have at least one common event
 	 *
 	 *@param  other The other alphabet
@@ -603,7 +601,6 @@ public class Alphabet
 
 		return false;
 	}
-
 
 	/**
 	 * Computes and returns "A intersection B"
@@ -846,6 +843,43 @@ public class Alphabet
 		return nbrOfCommon;
 	}
 
+	/**
+	 * Returns true if the alphabet has alphabetically (lowecase) equal event names.
+	 */
+	public boolean hasEqualLowercaseEventNames()
+	{
+		// Make copy to make iterating easier...
+		Alphabet copy = new Alphabet(this);
+
+		// Did we find any alphabetically equal names?
+		boolean found = false;
+
+		// Iterate
+		for (EventIterator copyIt = copy.iterator(); copyIt.hasNext();)
+		{
+			LabeledEvent eventA = copyIt.nextEvent();
+
+			// Another iterator
+			EventIterator eventIt = iterator();
+			
+			// Make sure each pair is only examined once
+			while (!eventA.equals(eventIt.nextEvent()));
+			while(eventIt.hasNext())
+			{
+				LabeledEvent eventB = eventIt.nextEvent();
+				
+				// Compare lowercase names
+				if (eventA.getLabel().toLowerCase().equals(eventB.getLabel().toLowerCase()))
+				{
+					logger.warn("The events " + eventA + " and " + eventB + " have dangerously " +
+								"similar names.");
+					found = true;
+				}
+			}
+		}
+		return found;
+	}
+
 	public static void main(String[] args)
 	{
 		Alphabet sigma1 = new Alphabet();
@@ -860,5 +894,4 @@ public class Alphabet
 		System.out.println("sigma1 + sigma2 = " + sigma1.toString());
 
 	}
-
 }

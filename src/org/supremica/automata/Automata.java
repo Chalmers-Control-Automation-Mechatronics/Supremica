@@ -589,6 +589,26 @@ public class Automata
 	}
 
 	/**
+	 * Returns true if there are no events with alphabetically equal names, i.e. 
+	 * lowercase equal.
+	 */
+	public boolean isEventNameConsistent()
+	{
+		// Get the union alphabet, ignoring consistency for now
+		Alphabet unionAlphabet = null;
+		try
+		{
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+
+		return !unionAlphabet.hasEqualLowercaseEventNames();
+	}
+
+	/**
 	 * Returns true if the controllability is consistent through all the automata.
 	 */
 	public boolean isEventControllabilityConsistent()
@@ -1106,6 +1126,10 @@ public class Automata
 	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial,
 							   boolean mustHaveValidType, boolean mustBeControllabilityConsistent)
 	{
+		// Warns if there are events with equal (lowercase) names.
+		isEventNameConsistent();
+
+		// Examines controllability consitency
 		if (mustBeControllabilityConsistent && !isEventControllabilityConsistent())
 		{
 			return false;
