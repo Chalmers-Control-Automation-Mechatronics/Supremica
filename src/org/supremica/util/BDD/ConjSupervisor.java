@@ -57,6 +57,7 @@ public class ConjSupervisor
 	conj_partition = new ConjPartition(manager, conj_size);
 	for(int i = 0; i < conj_size; i++) 
 	    conj_partition.add ( tpri[i]);
+	conj_partition.report(); // show some states
     }
     // -----------------------------------------------------------------
     // TODO
@@ -120,15 +121,13 @@ public class ConjSupervisor
 	
 	
 	timer.reset();
+	ConjPartition cp = getConjPartition();		
 	SizeWatch.setOwner("ConjSupervisor.computeReachables");
 
 	int i_all = manager.and(plant.getI(), spec.getI());
 	int r_all_p, r_all = i_all, front = i_all;
 	manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
 	manager.ref(front); // gets derefed 
-		
-
-	ConjPartition cp = getConjPartition();
 
 	do {
 	    r_all_p = r_all;
@@ -165,12 +164,12 @@ public class ConjSupervisor
 		}
 
 		timer.reset();
+		ConjPartition cp = getConjPartition();
 		SizeWatch.setOwner("ConjSupervisor.computeReachables");
 
 
 		int permute1 = manager.getPermuteS2Sp();
 		int permute2 = manager.getPermuteSp2S();
-		ConjPartition cp = getConjPartition();
 	      
 		int m_all = GroupHelper.getM(manager, spec, plant);
 		int r_all_p, r_all = manager.replace(m_all, permute1);  // r_all refed

@@ -50,6 +50,7 @@ public class DisjSupervisor extends ConjSupervisor {
 	for(int i = 0; i < size; i++) 
 	    disj_partition.add( twave[i]);
 
+	disj_partition.report(); // show some states	
     }
     
     // --------------------------------------------------------
@@ -60,6 +61,7 @@ public class DisjSupervisor extends ConjSupervisor {
 	    gf = new GrowFrame("Forward reachability (disjunctive)");
 
 	timer.reset();
+	DisjPartition dp = getDisjPartition();
 	SizeWatch.setOwner("DisjSupervisor.computeReachables");
 
 
@@ -68,10 +70,7 @@ public class DisjSupervisor extends ConjSupervisor {
 	int r_all_p, r_all = i_all, front = i_all;
 	manager.ref(i_all); //gets derefed by orTo and finally a deref
 	manager.ref(front); // get derefed
-	
-	DisjPartition dp = getDisjPartition();
-	
-
+		
 	do {
 	    r_all_p = r_all;
 
@@ -99,6 +98,7 @@ public class DisjSupervisor extends ConjSupervisor {
 	if(Options.show_grow) gf = new GrowFrame("backward reachability (disjuncted)");
 
 	timer.reset();
+	DisjPartition dp = getDisjPartition();
 	SizeWatch.setOwner("DisjSupervisor.computecoReachables");
 
 	int permute1 = manager.getPermuteS2Sp();
@@ -115,7 +115,6 @@ public class DisjSupervisor extends ConjSupervisor {
 
 	SizeWatch.report(r_all, "Qm");
 
-	DisjPartition dp = getDisjPartition();
 
 	do {
 

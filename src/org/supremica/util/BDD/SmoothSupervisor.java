@@ -33,13 +33,9 @@ public class SmoothSupervisor extends DisjSupervisor {
 	    gf = new GrowFrame("Forward reachability (smoothed)");
       
 	timer.reset();
-	SizeWatch.setOwner("SmoothSupervisor.computeReachables");
-
-	int cube    = manager.getStateCube();
-	//	int permute = manager.getPermuteSp2S();
 	DisjPartition dp = new DisjPartition(manager, plant.getSize() + spec.getSize());
-
-	
+	SizeWatch.setOwner("SmoothSupervisor.computeReachables");
+	int cube    = manager.getStateCube();	
 	int i_all = manager.and(plant.getI(), spec.getI());
 
 	if(Options.local_saturation) {
@@ -50,18 +46,15 @@ public class SmoothSupervisor extends DisjSupervisor {
 	    for(int i = 0; i < gh.getSize(); i++) {	    
 		DependencySet ds = as[i].getDependencySet();
 		int i2 = ds.getReachables( ds.getI());
-		int i_others = manager.exists(i_first, ds.getCube());
-		
-		i2 = manager.andTo(i2, i_others);
-		
-		
+		int i_others = manager.exists(i_first, ds.getCube());		
+		i2 = manager.andTo(i2, i_others);				
 		manager.deref(i_others);
 		i_all = manager.orTo(i_all, i2);
 		manager.deref(i2);
 	    }
 	    manager.deref(i_first);
-	    // End of computing saturated I
-	}
+	} // End of computing saturated I
+	
 
 	int r_all_p, r_all = i_all;
 	manager.ref(i_all); //gets derefed by orTo and finally a deref
@@ -76,7 +69,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 	for(int a = 0; a < disj_size; a++) {
 	    if(remaining[a]) {	    
 		remaining[a] = false;
-		dp.add(twave[a]);
+		dp.add(twave[a]);		
 	    }
 	    int r_all_pp, front_s, front_sp;
 
@@ -109,15 +102,12 @@ public class SmoothSupervisor extends DisjSupervisor {
 	if(Options.show_grow) gf = new GrowFrame("backward reachability (smoothed)");
 
 	timer.reset();
+	DisjPartition dp = new DisjPartition(manager, plant.getSize() + spec.getSize());
 	SizeWatch.setOwner("SmoothSupervisor.computeCoReachables");
-
-
 
 	int cube    = manager.getStatepCube();
 	int permute1 = manager.getPermuteS2Sp();
 	int permute2 = manager.getPermuteSp2S();
-	DisjPartition dp = new DisjPartition(manager, plant.getSize() + spec.getSize());
-
 
 
 	int m_all = GroupHelper.getM(manager, spec, plant);

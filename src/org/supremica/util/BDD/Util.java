@@ -17,10 +17,13 @@ public class Util
 
 		// I dont know why and I dont know how... :)
 		int size = a.getVariableCount();
-		double d = free_memory * 10000 * Math.log(size + 1) / Math.log(2);
+		// double d = free_memory * 100000 * Math.log(size + 2) / Math.log(2);
+		double d = 10000 * (size + 1);
 		int nodes = (int) Math.max(Math.min(d, MAX_NODES), MIN_NODES);
 
-		// System.out.println("NODES="+nodes);
+		BDDAssert.debug("suggsted " + nodes + " nodes for " + 
+				size + " variables.");
+
 		return nodes;
 	}
     

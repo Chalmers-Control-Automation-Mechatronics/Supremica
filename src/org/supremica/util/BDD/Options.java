@@ -16,6 +16,14 @@ public class Options
 	COUNT_TREE = 1,
 	COUNT_EXACT = 2;
 
+    
+    /** Automaton ordering algorithm */
+    public static final int
+	ORDERING_ALGO_OLD_PCG = 0,
+	ORDERING_ALGO_RANDOM  = 1,
+	ORDERING_ALGO_NEW_TSP = 2;	
+
+	
     // constants
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
     private static final int DEFAULT_MAX_PARTITION_SIZE = 3000; // max nodes/partition
@@ -31,6 +39,7 @@ public class Options
     public static boolean uc_optimistic = true;
     public static boolean nb_optimistic = true;
 
+    public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
     public static int algo_family = ALGO_SMOOTHED;
     public static int count_algo  = COUNT_TREE;
     public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;

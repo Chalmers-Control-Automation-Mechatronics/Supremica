@@ -60,12 +60,30 @@ public class Automata
 		return variable_count;
 	}
 
+  	public int [][]getCommunicationMatrix()
+	    throws BDDException
+	{
+	    int components = automata.size();
+	    int [][]ret = new int[components][components];
+
+	    for(int i = 0; i < components; i++) {
+		Automaton a1 = (Automaton) automata.elementAt(i);
+		ret[i][i] = a1.getCommunicationComplexity(a1); // not actually needed :)
+		for (int j = 0; j < i; j++) {			
+		    Automaton a2 = (Automaton) automata.elementAt(j);
+		    int cc = a1.getCommunicationComplexity(a2);
+		    ret[i][j] = ret[j][i] = cc;
+		}
+	    }
+	    return ret;
+	}
 	public void close()
 	    throws BDDException
 	{
 		BDDAssert.bddAssert(!closed, "[Automata.close] BAD function call");
 		alphabet.close();
 
+		int components;
 
 		for(Enumeration e = automata.elements(); e.hasMoreElements();)
 		{
@@ -74,31 +92,53 @@ public class Automata
 			a.close2();
 		}
 
-		// get PCG graph
-		Timer timer = new Timer();
-		PCG pcg = new PCG(automata);
-		int components = automata.size();
 
-		for (int i = 0; i < components; i++)
-		{    // get weights
-			Automaton a1 = (Automaton) automata.elementAt(i);
+		// --[ Automata ordering which affects the BDD variable ordering starts HERE ] --
+		Timer timer = new Timer(); // This times the ordering procedure
+		components = automata.size(); // number of automata to be ordered
 
-			for (int j = 0; j < i; j++)
-			{
-				Automaton a2 = (Automaton) automata.elementAt(j);
-				int cc = a1.getCommunicationComplexity(a2);
-
-				if (cc != 0)
+		
+		if(Options.ordering_algorithm == Options.ORDERING_ALGO_OLD_PCG) {
+		    // OLD ordering technique: PCG graph search
+		    PCG pcg = new PCG(automata);
+		    
+		    for (int i = 0; i < components; i++)
+			{    // get weights
+			    Automaton a1 = (Automaton) automata.elementAt(i);
+			    
+			    for (int j = 0; j < i; j++)
 				{
-					pcg.connect(a1, a2, cc);
+				    Automaton a2 = (Automaton) automata.elementAt(j);
+				    int cc = a1.getCommunicationComplexity(a2);
+				    
+				    if (cc != 0)
+					{
+					    pcg.connect(a1, a2, cc);
+					}
 				}
 			}
+		
+		    // pcg.dump();
+		    grupp_ordering = pcg.getShortestPath();	
+		} else {
+		    // TESTING THE NEW ORDERING-SOLVER ALGO:
+		    int [][]weightMatrix = getCommunicationMatrix();
+		    OrderingSolver os = new OrderingSolver(components);
+		    for(int i = 0; i < components; i++) {
+			Automaton a1 = (Automaton) automata.elementAt(i);
+			os.addNode(a1, weightMatrix[i], i-1);
+		    }
+		    grupp_ordering = os.getGoodOrder();
+		}
+		
+
+		// maybe the user needs to change something ?
+		if (Options.user_alters_PCG) {
+		    PCGFrame frame = new PCGFrame(grupp_ordering, automata);
+		    frame.getUserPermutation();
 		}
 
-		// pcg.dump();
-		grupp_ordering = pcg.getShortestPath();
-
-		// now, reorder
+		// now, use the new ordering to re-order the list:
 		Vector tmp = new Vector();
 
 		for (int i = 0; i < components; i++)

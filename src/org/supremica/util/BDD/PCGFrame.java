@@ -15,35 +15,44 @@ public class PCGFrame
 	private java.awt.List order;
 	private Object lock = new Object();
 
-	public PCGFrame(int[] perm, PCGNode[] nodes)
-	{
-		super("[PCGFrame]");
+    public PCGFrame(int [] perm, Vector all) {
+	super("[PCGFrame]");
+	PCGNode [] nods = new PCGNode[perm.length];
+	for(int i = 0; i < perm.length; i++) nods[i] = (PCGNode) all.elementAt( i);
+	init(perm, nods);
+    }
+    public PCGFrame(int[] perm, PCGNode[] nodes) {
+	super("[PCGFrame]");
+	init(perm, nodes);
+    }
 
-		this.perm = perm;
-		this.nodes = nodes;
-		this.size = perm.length - 1;
-
-		Panel pNorth = new Panel();
-
-		add(pNorth, BorderLayout.NORTH);
-		pNorth.add(bDone = new Button("Done"));
-
-		Panel pEast = new Panel(new GridLayout(6, 1));
-
-		add(pEast, BorderLayout.EAST);
-		pEast.add(new Label());
-		pEast.add(new Label());
-		pEast.add(bUp = new Button("Up"));
-		pEast.add(bDown = new Button("Down"));
-		pEast.add(new Label());
-		pEast.add(new Label());
-		add(order = new java.awt.List(25, false));
-		build_list();
-		bUp.addActionListener(this);
-		bDown.addActionListener(this);
-		bDone.addActionListener(this);
-		add(new Label("reorder PCG, then press done"), BorderLayout.SOUTH);
-	}
+    private void init(int [] perm, PCGNode [] nodes) {
+	
+	this.perm = perm;
+	this.nodes = nodes;
+	this.size = perm.length;
+	
+	Panel pNorth = new Panel();
+	
+	add(pNorth, BorderLayout.NORTH);
+	pNorth.add(bDone = new Button("Done"));
+	
+	Panel pEast = new Panel(new GridLayout(6, 1));
+	
+	add(pEast, BorderLayout.EAST);
+	pEast.add(new Label());
+	pEast.add(new Label());
+	pEast.add(bUp = new Button("Up"));
+	pEast.add(bDown = new Button("Down"));
+	pEast.add(new Label());
+	pEast.add(new Label());
+	add(order = new java.awt.List(25, false));
+	build_list();
+	bUp.addActionListener(this);
+	bDown.addActionListener(this);
+	bDone.addActionListener(this);
+	add(new Label("reorder PCG, then press done"), BorderLayout.SOUTH);
+    }
 
 	public void getUserPermutation()
 	{

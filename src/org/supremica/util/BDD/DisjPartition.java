@@ -51,6 +51,14 @@ public class DisjPartition {
 	curr++;
     }
 
+
+    // -------------------------------------------------
+    public void report() {
+	SizeWatch.setOwner("DisjPartition");	
+	for(int i = 0; i < curr; i++) 
+	    SizeWatch.report(delta[i], "Cluster " + (i + 1));
+    }
+
     // --------------------------------------------------
 
     /** 1-step forward rechables */

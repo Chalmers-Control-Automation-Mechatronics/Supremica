@@ -112,7 +112,7 @@ public class PCG
 		return index;
 	}
 
-	// ------------------------------------------------------------------------------
+	// ------------------------------------------------------------
 	public int[] getShortestPath()
 	    throws BDDException
 	{
@@ -130,36 +130,9 @@ public class PCG
 			return perm;
 		}
 
-		Timer t = new Timer();
-
 		perm = getShortestPath_greedy2();
-
 		// perm = getShortestPath_complete();
-		if (Options.user_alters_PCG)
-		{    // user can change the ordering??
-			int cost_before = compute_path_cost(perm);
-			PCGFrame frame = new PCGFrame(perm, org_nodes);
 
-			frame.getUserPermutation();
-
-			int cost_after = compute_path_cost(perm);
-
-			if (cost_before > cost_after)
-			{
-				System.out.print("Ordering improved by user");
-			}
-			else if (cost_before < cost_after)
-			{
-				System.out.print("Ordering weaken by user");
-			}
-
-			if (cost_before != cost_after)
-			{
-				System.out.println(" (was " + cost_before + ", is " + cost_after + ")");
-			}
-		}
-
-		t.report("PCG reordering found");
 
 		if (Options.debug_on)
 		{
@@ -173,7 +146,11 @@ public class PCG
 			System.out.println("  (score=" + perm[size] + ")");
 		}
 
-		return perm;
+		// we dont want the last element (score) any more
+		int [] ret = new int[size];
+		for(int i = 0; i < size; i++) ret[i] = perm[i];
+
+		return ret;
 	}
 
 	// ----------------------------------- complete search
@@ -422,6 +399,23 @@ public class PCG
 		return index;
 	}
 
+    // --------------------------------------------------------------
+    // Nearest insertation TSP heruistic.
+    // see Disrcrete Optimization lecture notes , chap 4: PH-2
+    //
+    // 1. chose a cycle C of length 3
+    // 2. if V=V(C) then stop (C is a tour)
+    // 3. Find a city p \in V - V(C) such there there exists a q \in V(C) satisfying    
+    //             c_pq   = min { min { c_ij | j \in V(C)} | i \in V - V(C)
+    // 4. Determine an edge uv \in C such that
+    //             c_up + c_pv - c_uv = {main c_ip + c_pj-c_ij| ic \in C }
+    // 5. set C := ( C \ {uv}} \cup {up,pv} and goto 2
+    public int [] getShortestPath_NearesInsertation() {
+	// TODO
+	return null;
+    }
+    
+
 	// -----------------------------------------------------------------------------
 	public void dump()
 	{
@@ -433,7 +427,8 @@ public class PCG
 			{
 				if (nodes[i].weights[j] != NOT_CONNECTED)
 				{
-					System.out.println("\t --> " + j + "    (weight = " + nodes[i].weights[j] + ")");
+					System.out.println("\t --> " + j + "    (weight = " + 
+							   nodes[i].weights[j] + ")");
 				}
 			}
 		}
