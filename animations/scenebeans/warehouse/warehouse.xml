@@ -4,22 +4,22 @@
 
 	<behaviour id="truckX" algorithm="constantSpeedMove" event="truckX.end">
 		<param name="from" value = "103" />
-		<param name="speed" value="0.02" />
+		<param name="speed" value="0.01" />
 	</behaviour>
 
 	<behaviour id="truckY" algorithm="constantSpeedMove" event="truckY.end">
 		<param name="from" value = "403" />
-		<param name="speed" value="0.02"/>
+		<param name="speed" value="0.01"/>
 	</behaviour>
 
 	<behaviour id="agvX" algorithm="constantSpeedMove" event="agvX.end">
 		<param name="from" value = "307" />
-		<param name="speed" value="0.02"/>
+		<param name="speed" value="0.01"/>
 	</behaviour>
 
 	<behaviour id="agvY" algorithm="constantSpeedMove" event="agvY.end">
 		<param name="from" value = "103" />
-		<param name="speed" value="0.02"/>
+		<param name="speed" value="0.01"/>
 	</behaviour>
 	
 
