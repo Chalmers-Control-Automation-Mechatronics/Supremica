@@ -110,6 +110,9 @@ public class OrderingSolver {
 			case Options.AO_HEURISTIC_DFS:
 				sol = new DFSSolver(nods);
 				break;
+			case Options.AO_HEURISTIC_STCT:
+				sol = new STCTSolver(nods);
+				break;
 			default:
 				System.err.println("[INTERNAL] unknown ordering-solver!");
 		}

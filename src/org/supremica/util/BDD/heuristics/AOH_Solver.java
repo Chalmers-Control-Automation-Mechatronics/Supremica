@@ -15,6 +15,7 @@ public class AOH_Solver extends AutomataOrderingHeuristic  {
 	private int [] order;
 
 	public int [] ordering() { return order; }
+
 	public void init(Automata a) throws BDDException {
 		Vector automata = a.getAutomata();
 		PCG pcg = new PCG(automata);

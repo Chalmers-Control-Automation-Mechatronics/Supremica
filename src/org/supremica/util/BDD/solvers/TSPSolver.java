@@ -54,7 +54,6 @@ public class TSPSolver extends Solver {
 
 
 		// insert them in that order:
-		solved = new Node[size];
 		for(int i = 0; i < size; i++) solved[i] = org[ tour[(i + start_index) % size]];
 
 	}

@@ -137,7 +137,7 @@ public class Supervisor
 	 */
 	public  String type() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("-");
+		sb.append(" ");
 		sb.append(Options.REACH_ALGO_NAMES[Options.algo_family]);
 		sb.append(": ");
 
@@ -147,6 +147,14 @@ public class Supervisor
 			) {
 			sb.append(Options.FRONTIER_STRATEGY_NAMES[Options.frontier_strategy]);
 			sb.append("/");
+		}
+
+
+		if(Options.algo_family == Options.ALGO_SMOOTHED_DELAYED_MONO ||
+			Options.algo_family == Options.ALGO_SMOOTHED_DELAYED_STAR_MONO
+			) {
+			sb.append(Options.DSSI_HEURISTIC_NAMES[Options.dssi_heuristics]);
+			sb.append(", ");
 		}
 
 		// event-selection
