@@ -421,6 +421,7 @@ public class Supremica
 		JMenuItem menuFileNew = new JMenuItem();
 
 		menuFileNew.setText("New...");
+		menuFileNew.setEnabled(false);
 		menuFile.add(menuFileNew);
 		menuFileNew.addActionListener(new ActionListener()
 		{
@@ -595,6 +596,20 @@ public class Supremica
 
 			menuFileExport.setText("Export");
 			menuFile.add(menuFileExport);
+
+			// File.Export.Html
+			JMenuItem menuFileExportHtml = new JMenuItem();
+
+			menuFileExportHtml.setText("To Html...");
+			menuFileExport.add(menuFileExportHtml);
+			menuFileExportHtml.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.fileExportHtml(getGui());
+				}
+			});
+
 
 			// File.Export.Desco
 			JMenuItem menuFileExportDesco = new JMenuItem();

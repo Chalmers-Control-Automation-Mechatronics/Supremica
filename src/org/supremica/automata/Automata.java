@@ -51,6 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.log.*;
+import org.supremica.automata.algorithms.*;
 
 /**
  * An ordered set of Automaton-objects.
@@ -187,6 +188,19 @@ public class Automata
 		return newHash;
 	}
 
+	/**
+	 * Set a synchronization index in all states and events.
+	 */
+	public void setSynchronizationIndicies()
+		throws Exception
+	{
+		AutomataSynchronizerHelper syncHelper = new AutomataSynchronizerHelper(this, new SynchronizationOptions());
+	}
+
+	/**
+	 * If you want the synchronization indicies to be valid then you have to call setSynchronizationIndicies
+	 * before calling this method.
+	 */
 	public Alphabet getUnionAlphabet()
 		throws Exception
 	{
@@ -202,6 +216,27 @@ public class Automata
 	public Iterator iterator()
 	{
 		return theAutomata.iterator();
+	}
+
+
+	public Iterator plantIterator()
+	{
+		return new AutomatonTypeIterator(AutomatonType.Plant);
+	}
+
+	public Iterator specificationIterator()
+	{
+		return new AutomatonTypeIterator(AutomatonType.Specification);
+	}
+
+	public Iterator supervisorIterator()
+	{
+		return new AutomatonTypeIterator(AutomatonType.Supervisor);
+	}
+
+	public Iterator interfaceIterator()
+	{
+		return new AutomatonTypeIterator(AutomatonType.Interface);
 	}
 
 	/**
@@ -508,6 +543,52 @@ public class Automata
 		if (listeners != null)
 		{
 			listeners.endTransaction();
+		}
+	}
+
+
+	class AutomatonTypeIterator
+		implements Iterator
+	{
+		private Iterator autIt;
+		private AutomatonType theType;
+		private Automaton theAutomaton = null;
+
+		public AutomatonTypeIterator(AutomatonType theType)
+		{
+			this.autIt = theAutomata.iterator();
+			this.theType = theType;
+			findNext();
+		}
+
+		public boolean hasNext()
+		{
+			return theAutomaton != null;
+		}
+
+		public Object next()
+		{
+			Automaton returnAutomaton = theAutomaton;
+			findNext();
+			return returnAutomaton;
+		}
+
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private void findNext()
+		{
+			while (autIt.hasNext())
+			{
+				theAutomaton = (Automaton)autIt.next();
+				if (theAutomaton.getType() == theType)
+				{
+					return;
+				}
+			}
+			theAutomaton = null;
 		}
 	}
 }

@@ -105,7 +105,7 @@ public class ActionMan
 {
 	private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
 	private static final int    // instead of using constants later below :)
-		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4, FORMAT_SP = 5;
+		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4, FORMAT_SP = 5, FORMAT_HTML = 6;
 
 	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
 	// gui here is filled in by
@@ -487,10 +487,11 @@ public class ActionMan
 		String spString = "sp";
 		String dotString = "dot";
 		String dsxString = "dsx";
+		String htmlString ="html";
 		String rcpString = "rcp";                         // ++ ARASH
 		Object[] possibleValues =
 		{
-			xmlString, spString, dotString, dsxString
+			xmlString, spString, dotString, dsxString, htmlString
 		};
 		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 
@@ -520,6 +521,10 @@ public class ActionMan
 		else if (selectedValue == spString)
 		{
 			exportMode = FORMAT_SP;
+		}
+		else if (selectedValue == htmlString)
+		{
+			exportMode = FORMAT_HTML;
 		}
 		else
 		{
@@ -688,6 +693,20 @@ public class ActionMan
 
 							exporter.serialize(currFile);
 						}
+						/*
+						else if (exportMode == FORMAT_HTML)
+						{
+							Project selectedProject = gui.getSelectedProject();
+							Project newProject = new Project();
+							newProject.addActions(selectedProject.getActions());
+							newProject.addControls(selectedProject.getControls());
+							newProject.setAnimationURL(selectedProject.getAnimationURL());
+
+							ProjectToHtml exporter = new ProjectToHtml(newProject);
+
+							exporter.serialize(currFile);
+						}
+						*/
 					}
 					catch (Exception ex)
 					{
@@ -1557,6 +1576,24 @@ public class ActionMan
 	public static void fileExportSupremica(Gui gui)
 	{
 		automataExport(gui, FORMAT_XML);
+	}
+
+	public static void fileExportHtml(Gui gui)
+	{
+		try
+		{
+			File dir = new File("C:\\Temp\\");
+			Project selectedProject = gui.getSelectedProject();
+			ProjectToHtml exporter = new ProjectToHtml(selectedProject, dir);
+
+			exporter.serialize();
+		}
+		catch (Exception ex)
+		{
+			logger.error("fileExportHtml: Exception - " + ex.getMessage());
+			ex.printStackTrace();
+		}
+
 	}
 
 	// -------------- TODO: ADD EXPORTES FOR THESE TOO ------------------------------------
