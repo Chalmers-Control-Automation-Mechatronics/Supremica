@@ -82,7 +82,7 @@ public final class SupremicaProperties
 	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
 	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
 	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
-	private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
+	//private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
 	private static final String GENERAL_USE_RCP = "generalUseRcp";
 
 	// Logging options
@@ -122,7 +122,7 @@ public final class SupremicaProperties
 	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
 
 	// Animator Options
-	private static final String ANIMATOR_IN_USE = "animatorInUse";
+	private static final String INCLUDE_ANIMATOR = "includeAnimator";
 
 	private Set forbidExternalModification = new HashSet();
 
@@ -178,6 +178,7 @@ public final class SupremicaProperties
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true", true);
 		setProperty(GENERAL_USE_SECURITY, "false", false);
 		setProperty(ANIMATOR_IN_USE, "false", true);
+		setProperty(INCLUDE_ANIMATOR, "false", true);
 	}
 
 
@@ -277,18 +278,6 @@ public final class SupremicaProperties
 		wp.setProperty(FILE_ALLOW_SAVE, toString(allow));
 	}
 
-/*
-	public static boolean generalIncludeAnimations()
-	{
-		return toBoolean(wp.getProperty(GENERAL_INCLUDE_ANIMATIONS));
-	}
-
-	public static void setGeneralIncludeAnimations(boolean allow)
-	{
-		wp.setProperty(GENERAL_INCLUDE_ANIMATIONS, toString(allow));
-	}
-
-*/
 	public static boolean generalUseRCP()
 	{
 		return toBoolean(wp.getProperty(GENERAL_USE_RCP));
@@ -710,14 +699,14 @@ public final class SupremicaProperties
 		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
 	}
 
-	public static boolean animatorInUse()
+	public static boolean includeAnimator()
 	{
-		return toBoolean(wp.getProperty(ANIMATOR_IN_USE));
+		return toBoolean(wp.getProperty(INCLUDE_ANIMATOR));
 	}
 
-	public static void setAnimatorInUse(boolean useAnimator)
+	public static void setIncludeAnimator(boolean includeAnimator)
 	{
-		wp.setProperty(ANIMATOR_IN_USE, toString(useAnimator));
+		wp.setProperty(INCLUDE_ANIMATOR, toString(includeAnimator));
 	}
 
 	private static String toString(boolean b)

@@ -479,7 +479,7 @@ public class MainMenuBar
 			}
 		});
 
-		if (SupremicaProperties.animatorInUse())
+		if (SupremicaProperties.includeAnimator())
 		{
 			// Project.Animator
 			JMenuItem menuProjectAnimator = new JMenuItem();
@@ -550,7 +550,7 @@ public class MainMenuBar
 		});
 
 		// Tools.Animations
-		if (SupremicaProperties.animatorInUse())
+		if (SupremicaProperties.includeAnimator())
 		{
 			JMenu menuToolsAnimations = new JMenu();
 
