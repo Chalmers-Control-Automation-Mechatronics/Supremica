@@ -147,6 +147,9 @@ public class EventHider
 	 */
 	public static void hide(Automaton aut, Alphabet alpha)
 	{
+		// Remove the hidden events
+		aut.getAlphabet().minus(alpha);
+
 		// Get/create silent event tau
 		LabeledEvent tau = aut.getAlphabet().getEvent("tau");
 		if (tau == null)
@@ -163,7 +166,7 @@ public class EventHider
 				return;
 			}
 		}
-		
+
 		// Modify arcs
 		for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
 		{
@@ -175,8 +178,5 @@ public class EventHider
 				arc.setEvent(tau);
 			}
 		}
-		
-		// Remove the hidden events
-		aut.getAlphabet().minus(alpha);
 	}
 }

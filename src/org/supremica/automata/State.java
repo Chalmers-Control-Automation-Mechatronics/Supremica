@@ -384,6 +384,16 @@ public class State
 		return id.equals(((State) state).id);
 	}
 
+	/**
+	 * True if this state and otherState have equal attributes considering
+	 * * accepting
+	 * * forbidden
+	 */
+	public boolean hasEqualMarking(State otherState)
+	{
+		return ((accepting == otherState.accepting) && (forbidden == otherState.forbidden));
+	}
+
 	public boolean equalState(State otherState)
 	{
 		if (!getName().equals(otherState.getName()))
@@ -674,6 +684,7 @@ public class State
 
 	public void removeArcs()
 	{
+		/*
 		LinkedList outArcs = (LinkedList) outgoingArcs.clone();
 		LinkedList inArcs = (LinkedList) incomingArcs.clone();
 
@@ -697,8 +708,43 @@ public class State
 		incomingArcs.clear();
 		outArcs.clear();
 		inArcs.clear();
+		*/
+		removeOutgoingArcs();
+		removeIncomingArcs();
 	}
 
+	public void removeOutgoingArcs()
+	{
+		LinkedList outArcs = (LinkedList) outgoingArcs.clone();
+
+		Iterator arcIt = outArcs.iterator();
+		while (arcIt.hasNext())
+		{
+			Arc currArc = (Arc) arcIt.next();
+
+			currArc.clear();
+		}
+
+		outgoingArcs.clear();
+		outArcs.clear();
+	}
+
+	public void removeIncomingArcs()
+	{
+		LinkedList inArcs = (LinkedList) incomingArcs.clone();
+
+		Iterator arcIt = inArcs.iterator();
+		while (arcIt.hasNext())
+		{
+			Arc currArc = (Arc) arcIt.next();
+
+			currArc.clear();
+		}
+
+		incomingArcs.clear();
+		inArcs.clear();
+	}
+	
 	public boolean isSafe()
 	{
 		return cost < MAX_COST;

@@ -17,7 +17,8 @@ public class Counters
 
 		if (first)
 		{
-			project.setComment("Independent counters. Used to produce huge state spaces " + "with no interaction. For such models, BDDs are superior " + "to traditional methods. Note however that this behaviour " + "is very uncommon in real-life models.");
+			project.setComment("Independent counters. Used to produce huge state spaces " + 
+							   "with no interaction.");
 
 			first = false;
 		}

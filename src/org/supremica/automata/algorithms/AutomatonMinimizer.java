@@ -96,6 +96,12 @@ public class AutomatonMinimizer
 		throws Exception
 	{
 		this.options = options;
+		
+		// Are the options valid?
+		if (!options.isValid())
+		{
+			return null;
+		}
 
 		// Do we have to care about the original?
 		if (options.getKeepOriginal())
@@ -134,40 +140,62 @@ public class AutomatonMinimizer
 					theAutomaton = determinizer.getNewAutomaton();
 				}
 
-				// Find initial partitioning
-				equivClasses = findInitialPartitioning(theAutomaton);
-
-				// Minimize
-				doLanguageEquivalenceMinimization(equivClasses);
+				// Now we're ready for minimization!
 			}
 			else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
 			{
-				// Merge silent loops
-				mergeSilentLoops(theAutomaton);
+				// Merge silent loops and other obvious OE stuff (to save computation later)
+				int count = preMinimizationMergeObservationEquivalentStates(theAutomaton); 
+				if (count > 0)
+				{
+					logger.debug("Removed " + count + " observation equivalent states " + 
+								"before running the minimization.");
+				}
 
+				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
+				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
+				
+				// Saturate
+				doTransitiveClosure(theAutomaton);
+				
+				// Now... language equivalence minimization will yield the (considering states)
+				// minimal observation equivalent automaton
+			}
+			else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+			{
+				// Merge silent loops and other obvious OE stuff (to save computation later)
+				int count = preMinimizationMergeObservationEquivalentStates(theAutomaton); 
+				if (count > 0)
+				{
+					logger.debug("Removed " + count + " observation equivalent states " + 
+								"before running minimization.");
+				}
+					
 				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
 				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
 
 				// Saturate
 				doTransitiveClosure(theAutomaton);
 
-				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
-				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
-
-				// Adjust marking based on epsilon transitions
-				adjustMarking(theAutomaton);
-
-				// Find initial partitioning
-				equivClasses = findInitialPartitioning(theAutomaton);
-
-				// Now... language equivalence minimization will yield the (considering states)
-				// minimal observation equivalent automaton
-				doLanguageEquivalenceMinimization(equivClasses);
+				// Adjust marking based on epsilon transitions (it IS ok (actually necessary) 
+				// to do this AFTER doTransitiveClosure) this is not an expensive computation
+				adjustMarking(theAutomaton); // Not OE
+								
+				// Now... language equivalence minimization will yield a smaller (considering states)
+				// conflict equivalent automaton
 			}
 			else
 			{
 				throw new Exception("Unknown equivalence relation");
 			}
+
+			// After the above preparations, we can do the minimization in the same way for all cases!
+
+			// Find initial partitioning
+			equivClasses = findInitialPartitioning(theAutomaton);
+			
+			// Minimize
+			doLanguageEquivalenceMinimization(equivClasses);
 		}
 		catch (Exception ex)
 		{
@@ -185,11 +213,28 @@ public class AutomatonMinimizer
 			removeRedundantTransitions(newAutomaton);
 		}
 
-		// How did it go?
-		if (!isMinimal(newAutomaton))
+		// Post minimization adjustments
+		if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
 		{
-			// The minimization sometimes misses stuff that is easy to see (for the trained eye)
-			mergeSilentLoops(newAutomaton);
+			// The minimization sometimes misses stuff that is easy to see (for the trained eye...)
+			// (BUG!)
+			int count = preMinimizationMergeObservationEquivalentStates(newAutomaton);
+			if (count > 0)
+			{
+				logger.debug("Removed " + count + " observation equivalent states " + 
+							"after running the minimization (it didn't work properly).");
+			}
+		}
+		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+		{
+			// Merge conflict equivalent states and stuff...
+			// (FEATURE!)
+			int count = postMinimizationMergeConflictEquivalentStates(newAutomaton); // Not OE
+			if (count > 0)
+			{
+				logger.debug("Removed " + count + " conflict equivalent states after " + 
+							"running observation equivalence minimization.");
+			}
 		}
 
 		// Remove from alphabet epsilon events that are never used
@@ -392,20 +437,161 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * Merges all states in loops of silent transitions and "single-outgoing-epsilon-transition-states"
+	 * Merges states, preserving conflict equivalence.
+	 *
+	 * @return Number of states that have been removed by merging.
 	 */
-	public void mergeSilentLoops(Automaton aut)
+	public int postMinimizationMergeConflictEquivalentStates(Automaton aut)
+		throws Exception
 	{
 		StateSet statesToExamine = new StateSet(aut.getStateSet());
 
+		// Count the removed states
 		int count = 0;
+
+		// Mark noncoreachable states with State.MAX_COST
+		AutomatonSynthesizer synth = new AutomatonSynthesizer(aut, SynthesizerOptions.getDefaultSynthesizerOptions());
+		synth.doCoreachable();
+		for (Iterator it = aut.stateIterator(); it.hasNext(); )
+		{
+			State state = (State) it.next();
+			if ((state.getCost() == State.MAX_COST))
+			{
+				if (state.isAccepting())
+					logger.fatal("EEEEEEERRRRRRRRRRRROOOOOOOOOOOORRRRRRRRRRRRRRRRRRRR!");
+				
+				// We will never want to propagate from here... 
+				// ... or from any state in the backwards epsilon closure!!
+				StateSet statesToModify = new StateSet();
+				statesToModify.add(state);
+				while (statesToModify.size() != 0)
+				{
+					State currState = statesToModify.get();
+					statesToModify.remove(currState);
+
+					// Accepting states that by epsilons may reach a block are modified to be nonaccepting
+					// an exception is made if this is the initial state!
+					if (currState.isAccepting())
+					{
+						if (currState.isInitial())
+						{
+							// Do nothing...
+							continue;
+						}
+						else
+						{
+							currState.setAccepting(false);
+						}
+					}
+
+					// We won't want to propagate from here
+					currState.removeOutgoingArcs();	
+					//logger.info("I removed arcs from " + currState);
+					
+					// Follow all epsilon transitions backwards
+					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
+					{
+						Arc arc = arcIt.nextArc();
+						if (arc.getEvent().isEpsilon())
+						{
+							statesToModify.add(arc.getFromState());
+						}
+					}
+				}
+				
+				// Reset cost...
+				if (!state.isForbidden())
+				{
+					state.setCost(State.UNDEF_COST);
+				}
+			}
+		}
+		// Make reachable
+		synth.doReachable();
+		for (Iterator it = aut.safeStateIterator(); it.hasNext(); )
+		{
+			State state = (State) it.next();
+			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
+			{
+				aut.removeState(state);
+			}
+		}
+
+		// Do the merging
 		while (statesToExamine.size() != 0)
 		{
 			// Get and remove arbitrary state
 			State one = statesToExamine.get();
 			statesToExamine.remove(one);
 
-			// If there is only one transition out of this state, and it is an epsilon-transition
+			// If there is only one incoming transition to this state AND it is an epsilon-transition
+			// AND there is at least one outgoing epsilon transition
+			// merge this and previous state.
+			if (one.nbrOfIncomingArcs() == 1)
+			{
+				Arc arc = one.incomingArcsIterator().nextArc();
+				State two = arc.getFromState();
+
+				if ((!one.equals(two)) && arc.getEvent().isEpsilon())
+				{
+					// Is there at least one epsilon outgoing?
+					boolean ok = false;
+					for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
+					{
+						if (outIt.nextArc().getEvent().isEpsilon())
+						{
+							ok = true;
+							break;
+						}
+					}
+					
+					// OK to merge?
+					if (ok)
+					{
+						count++;
+						aut.removeArc(arc); // We can remove this one, it will be an epsilon self-loop!
+						statesToExamine.remove(two);
+						State mergeState = aut.mergeStates(two, one);
+						statesToExamine.add(mergeState);
+						// Add states that may have changed to stack
+						for (ArcIterator arcIt = mergeState.outgoingArcsIterator(); arcIt.hasNext(); )
+						{
+							Arc epsilonArc = arcIt.nextArc();
+							if (epsilonArc.getEvent().isEpsilon())
+							{
+								statesToExamine.add(epsilonArc.getToState());
+							}
+						}
+						//logger.info("I merged " + one + " and " + two + " since I thought they were CE");
+						continue; // Get next "one" from stack
+					}
+				}
+			}
+		}		
+
+		return count;
+	}
+
+	/**
+	 * Merges all states in loops of silent transitions and "single-outgoing-epsilon-transition-states".
+	 *
+	 * @return Number of states that have been removed by merging.
+	 */
+	public int preMinimizationMergeObservationEquivalentStates(Automaton aut)
+	{
+		StateSet statesToExamine = new StateSet(aut.getStateSet());
+
+		// Count the removed states
+		int count = 0;
+
+		// Do the merging
+		while (statesToExamine.size() != 0)
+		{
+			// Get and remove arbitrary state
+			State one = statesToExamine.get();
+			statesToExamine.remove(one);
+
+			// If there is only one transition out of this state AND it is an epsilon-transition
 			// merge this and next state.
 			if (one.nbrOfOutgoingArcs() == 1)
 			{
@@ -413,15 +599,30 @@ public class AutomatonMinimizer
 				State two = arc.getToState();
 
 				// If 1!=2 etc.
-				if ((!one.equals(two)) && arc.getEvent().isEpsilon())
+				boolean markingOK = options.getIgnoreMarking() || one.hasEqualMarking(two);
+				if (!one.equals(two) && arc.getEvent().isEpsilon() && markingOK)
 				{
 					count++;
 					aut.removeArc(arc); // We can remove this one, it will be an epsilon self-loop!
 					statesToExamine.remove(two);
-					statesToExamine.add(aut.mergeStates(one, two));
-					continue;
+					//statesToExamine.add(aut.mergeStates(one, two));
+					State mergeState = aut.mergeStates(one, two);
+					statesToExamine.add(mergeState);
+					// Add states that may have changed to stack 
+					for (ArcIterator arcIt = mergeState.incomingArcsIterator(); arcIt.hasNext(); )
+					{
+						Arc epsilonArc = arcIt.nextArc();
+						if (epsilonArc.getEvent().isEpsilon())
+						{
+							statesToExamine.add(epsilonArc.getFromState());
+						}
+					}
+					//logger.info("I merged " + one + " and " + two + " since I thought they were OE.");
+					continue; // Get next "one" from stack
 				}
 			}
+
+			// Merge loops
 
 			// Find epsilon-closure for this state
 			one.setStateSet(null); // This is unfortunately necessary!!
@@ -435,18 +636,57 @@ public class AutomatonMinimizer
 				State two = closureIt.nextState();
 				two.setStateSet(null);
 				StateSet closureTwo = determinizer.epsilonClosure(two);
+
+				// Good to merge?
+				boolean markingOK = options.getIgnoreMarking() || one.hasEqualMarking(two);
+				//if (closureTwo.contains(one) && markingOK)
 				if (closureTwo.contains(one))
 				{
 					count++;
-
+					
 					// Remove the other state from stack, merge and add
 					// new state to stack
 					statesToExamine.remove(two);
 					statesToExamine.add(aut.mergeStates(one, two));
-					break;
+					break; // Get next "one" from stack
 				}
 			}
+			/* // Alternative implementation, appears to suck
+			// Find, in closure, if there is a state which has the first state in its closure
+			State mergeState = null;
+			for (StateIterator closureIt = closureOne.iterator(); closureIt.hasNext(); )
+			{
+				State two = closureIt.nextState();
+				two.setStateSet(null);
+				StateSet closureTwo = determinizer.epsilonClosure(two);
+
+				// Good to merge?
+				boolean markingOK = !options.ignoreMarking() || one.hasEqualMarking(two);
+				if (closureTwo.contains(one) && markingOK)
+				{
+					count++;
+
+					// Remove the other state from stack, merge 
+					statesToExamine.remove(two);
+					if (mergeState == null)
+					{
+						mergeState = aut.mergeStates(one, two);
+					}
+					else
+					{
+						mergeState = aut.mergeStates(mergeState, two);
+					}
+				}
+			}
+			if (mergeState != null)
+			{
+				statesToExamine.add(mergeState);
+				continue;
+			}
+			*/
 		}
+
+		return count;
 	}
 
 	/**
@@ -538,6 +778,8 @@ public class AutomatonMinimizer
 	/**
 	 * All states could as well be marked in an epsilon-loop where at least one state is marked.
 	 * This method adjusts this.
+	 *   States that can reach marked states by epsilon events are also considered marked
+	 *
 	 *   NOTE: This method assumes that the epsilon-closure of each state is already calculated
 	 * and that the closure is returned by each state's getStateSet-method. (This is true if
 	 * doTransitiveClosure was called previously.)
@@ -545,12 +787,14 @@ public class AutomatonMinimizer
 	public void adjustMarking(Automaton aut)
 	{
 		LinkedList toBeMarked = new LinkedList();
+		/*
+		// States in epsilon loops where there are at least one marked state can be considered marked
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
 			State markedState = stateIt.nextState();
 			if (markedState.isAccepting())
 			{
-				// Is currState in the closure of a state in its closure?
+				// Is markedState in the closure of a state in its closure?
 				// Then that state should be marked.
 				StateSet closure = markedState.getStateSet();
 				for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
@@ -567,6 +811,26 @@ public class AutomatonMinimizer
 				}
 			}
 		}
+		*/
+
+		// States that can reach marked states by epsilon events only can be considered marked
+		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			if (!currState.isAccepting() && !currState.isInitial())
+			{
+				StateSet closure = currState.getStateSet();
+				for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
+				{
+					State otherState = closureIt.nextState();
+					if (otherState.isAccepting())
+					{
+						toBeMarked.add(currState);
+					}
+				}
+			}
+		}
+
 		// Adjust the marking!
 		while (toBeMarked.size() != 0)
 		{
@@ -677,38 +941,6 @@ public class AutomatonMinimizer
 		while (toBeRemoved.size() > 0)
 		{
 			alpha.removeEvent((LabeledEvent) toBeRemoved.remove(0));
-		}
-	}
-
-	/**
-	 * Examines (not very well!!!) if there are any obvious places where more
-	 * minimization could have been done.
-	 */
-	private boolean isMinimal(Automaton aut)
-	{
-		int count = 0;
-
-		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
-		{
-			State state = stateIt.nextState();
-
-			if (state.nbrOfOutgoingArcs() == 1 && state.outgoingArcsIterator().nextArc().getEvent().isEpsilon())
-			{
-				logger.debug("Minimization missed minimizing state " + state + ".");
-
-				// Could have done better!
-				count++;
-			}
-		}
-
-		if (count != 0)
-		{
-			logger.debug("Automaton is not minimal. At least " + count + " states more could be removed.");
-			return false;
-		}
-		else
-		{
-			return true;
 		}
 	}
 

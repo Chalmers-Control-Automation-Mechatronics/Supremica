@@ -74,7 +74,7 @@ class VerificationDialogStandardPanel
 
 	//private JTextArea note;// = new JTextArea("Bananas...");
 	//final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake! 
-	//   "Non-blocking",       // No! God has nothing to do with programming!! 
+	//   "nonblocking",       // No! God has nothing to do with programming!! 
 	//   "Language inclusion"};// Programming is fate-driven!
 	static class AlgorithmSelector
 		extends JComboBox
@@ -116,7 +116,7 @@ class VerificationDialogStandardPanel
 		verificationTypeBox.addActionListener(this);
 
 		algorithmSelector = new AlgorithmSelector();
-		note = new JTextArea("Note:\n" + "Currently, modular non-blocking\n" + "verification is not supported.");
+		note = new JTextArea("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
 		note.setBackground(this.getBackground());
 
 		Box standardBox = Box.createVerticalBox();
@@ -158,8 +158,11 @@ class VerificationDialogStandardPanel
 		if ((verificationTypeBox.getSelectedItem()) == VerificationType.Nonblocking)
 		{
 			// Force the monolithic algorithm
-			algorithmSelector.forceMonolithic();
-			note.setText("Note:\n" + "Currently, modular non-blocking\n" + "verification is not supported.");
+			//algorithmSelector.forceMonolithic();
+			//note.setText("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
+			note.setText("Note:\n" + "This algorithm uses incremental\n" + 
+						 "composition and minimization with\n" + 
+						 "respect to conflict equivalence.");
 			note.setVisible(true);
 		}
 		else if ((verificationTypeBox.getSelectedItem()) == VerificationType.MutuallyNonblocking)

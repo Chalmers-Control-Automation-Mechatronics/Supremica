@@ -439,7 +439,6 @@ public class Determinizer
 					stateset.add(arc.getToState());
 				}
 			}
-
 			// Note this is a (ugly?) workaround, since I know that getEvent _cannot_ throw above
 			// I just got the arc from a state of the automaton. Thus, getEvent must be able to
 			// perform correctly, else the automaton is broken and we are lost anyway.

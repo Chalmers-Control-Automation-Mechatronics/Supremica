@@ -963,6 +963,23 @@ public class Automaton
 		return theArcs.size();
 	}
 
+	public int nbrOfEpsilonTransitions()
+	{
+		int amount = 0;
+
+		for (ArcIterator arcIt = theArcs.iterator(); arcIt.hasNext(); )
+		{
+			Arc currArc = arcIt.nextArc();
+			
+			if (currArc.getEvent().isEpsilon())
+			{
+				amount++;
+			}
+		}
+
+		return amount;
+	}
+
 	/**
 	 * Amount of selfloops in automaton.
 	 */

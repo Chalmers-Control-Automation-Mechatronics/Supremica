@@ -157,11 +157,17 @@ public class AutomataVerifier
 
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
+		// Modular algorithms demand system with more than one module...
+		if ((theAutomata.size() <= 1) && (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular))
+		{
+			logger.warn("Using monolithic algorithm instead, since the system is not modular.");
+			verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
+		}
 
 		// Check IDD
 		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 		{
-			return "The IDD Algorithm is not fully implemented yet";
+			return "The IDD Algorithm is not fully implemented yet.";
 		}
 
 		// Check Controllability
@@ -169,14 +175,14 @@ public class AutomataVerifier
 		{
 			if (theAutomata.size() < 2)
 			{
-				return "At least two automata must be selected";
+				return "At least two automata must be selected.";
 			}
 
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
 				{
-					return "All events must be prioritized in the modular algorithm";
+					return "All events must be prioritized in the modular algorithm.";
 				}
 			}
 		}
@@ -186,18 +192,20 @@ public class AutomataVerifier
 		{
 			if (theAutomata.size() < 1)
 			{
-				return "At least one automaton must be selected!";
+				return "At least one automaton must be selected.";
 			}
 
 			if (!theAutomata.hasAcceptingState())
 			{
-				return "Some automaton has no marked states!";
+				return "Some automaton has no marked states. This system is blocking!";
 			}
 
+			/*
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				return "The modular nonblocking algorithm \n" + "is not fully implemented!";
 			}
+			*/
 		}
 
 		// Check MutuallyNonblocking
@@ -284,9 +292,9 @@ public class AutomataVerifier
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
-
 					// This algorithm is under implementation!!
-					return modularNonblockingVerification();
+					//return modularNonblockingVerification();
+					return compositionalNonblockingVerification();
 
 					// This algorithm only verifies pairwise nonblocking!!!
 					// return pairwiseNonblockingVerification();
@@ -300,13 +308,8 @@ public class AutomataVerifier
 			{
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
-
 					// This algorithm is under implementation!!
 					return modularMutuallyNonblockingVerification();
-					//return compositionalNonblockingVerification();
-
-					// This algorithm only verifies pairwise nonblocking!!!
-					// return pairwiseNonblockingVerification();
 				}
 				else
 				{
@@ -1377,9 +1380,9 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Answers YES/NO to the NON-BLOCKING problem
+	 * Answers YES/NO to the NONBLOCKING problem
 	 *
-	 *@return  true if the system is non-blocking
+	 *@return  true if the system is nonblocking
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
 	private boolean BDDNonblockingVerification()
@@ -1440,17 +1443,16 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines non-blocking monolithically, by examining all reachable states.
+	 * Examines nonblocking monolithically, by examining all reachable states.
 	 * Lots and lots of work for big systems.
 	 *
-	 *@return True if non-blocking, false if blocking
+	 *@return True if nonblocking, false if blocking
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 */
 	private boolean monolithicNonblockingVerification()
 		throws Exception
 	{
-
 		// Maybe the system is monolithic already?
 		if (theAutomata.size() == 1)
 		{
@@ -1495,7 +1497,6 @@ public class AutomataVerifier
 			}
 			else
 			{
-
 				// Execution stopped?
 				theAutomaton = null;
 
@@ -1547,7 +1548,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines non-blocking modularily... not fully implemented yet!
+	 * Examines nonblocking modularily... not fully implemented yet!
 	 */
 	private boolean modularNonblockingVerification()
 		throws Exception
@@ -1615,7 +1616,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines non-blocking modularily... not fully implemented yet!
+	 * Examines nonblocking modularily... not fully implemented yet!
 	 */
 	private boolean modularNonblockingVerification2()
 		throws Exception
@@ -1778,7 +1779,7 @@ public class AutomataVerifier
 	private boolean compositionalNonblockingVerification()
 	{
 		// Make a copy that we can fiddle with
-		//Automata theAutomata = new Automata(theAutomata);
+		//Automata theAutomata = new Automata(theAutomata); // Don't need to fiddle
 		int nbrOfAutomata = theAutomata.size();
 
 		// Initialize execution dialog
@@ -1846,7 +1847,7 @@ public class AutomataVerifier
 					}
 				}
 
-				// Find ratioa
+				// Find ratios
 				int nbrOfUniqueEvents = uniqueEvents.size();
 				int unionAlphabetSize = alphaA.size() + alphaB.size() - nbrOfCommonEvents;
 				double thisUniqueRatio = ((double) nbrOfUniqueEvents)/((double) unionAlphabetSize);
@@ -1877,23 +1878,26 @@ public class AutomataVerifier
 				Automaton min = composeAndMinimize(automata, hideThese);
 				min.remapStateIndices();
 				theAutomata.removeAutomata(automata);
-				ActionMan.getGui().getVisualProjectContainer().getActiveProject().removeAutomata(automata);
 				theAutomata.addAutomaton(min);
+
+				/*
+				// Update gui
+				ActionMan.getGui().getVisualProjectContainer().getActiveProject().removeAutomata(automata);
 				ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(min);
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch (Exception apa)
+				{
+					
+				}
+				*/
 			}
 			else
 			{
 				logger.error("Disjoint system?");
 				return false;
-			}
-
-			try
-			{
-				Thread.sleep(1000);
-			}
-			catch (Exception apa)
-			{
-
 			}
 
 			// Update execution dialog
@@ -1903,20 +1907,31 @@ public class AutomataVerifier
 			}
 		}
 
+		try
+		{
+			Thread.sleep(1000);
+		}
+		catch (Exception apa)
+		{
+		}
+		ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomata(theAutomata);
+		
 		// How did it go?
 		if (theAutomata.size() == 1)
 		{
+			logger.info("Automaton: " + theAutomata.getFirstAutomaton() + " nbrOfStates " + theAutomata.getFirstAutomaton().nbrOfStates() + ".");
 			return verifyNonblocking(theAutomata.getFirstAutomaton());
 		}
 		else
 		{
+			logger.error("Error while performing modular nonblocking verification.");
 			return false;
 		}
 	}
 
 	/**
  	 * Composes automata and minimizes the result with respect to
- 	 * observation equivalence, with hideThese considered as epsilon
+ 	 * conflict equivalence, with hideThese considered as epsilon
  	 * events.
 	 */
 	private static Automaton composeAndMinimize(Automata automata, Alphabet hideThese)
@@ -1927,9 +1942,12 @@ public class AutomataVerifier
 		{
 			aut = AutomataSynchronizer.synchronizeAutomata(automata);
 			EventHider.hide(aut, hideThese);
+
+			logger.info("Minimizing " + aut + " states: " + aut.nbrOfStates() + " epsilons: " + aut.nbrOfEpsilonTransitions());
+
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
 			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-			options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
+			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
 			options.setAlsoTransitions(true);
 			options.setKeepOriginal(false);
 			//options.setIgnoreMarking(true);
@@ -2001,11 +2019,11 @@ public class AutomataVerifier
 
 	/*
 	/**
-	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines non-blocking modularily
-	 * by examining pairwise non-blocking between all automata.
+	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines nonblocking modularily
+	 * by examining pairwise nonblocking between all automata.
 	 * THIS DOES NOT WORK! IT'S JUST  A  TEST!
 	 *
-	 *@return True if non-blocking, false if blocking
+	 *@return True if nonblocking, false if blocking
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 *
@@ -2018,8 +2036,8 @@ public class AutomataVerifier
 			}
 
 			// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
-			logger.warn("NOTE! Modular non-blocking verification is not really implemented! " +
-									"This algorithm examines pairwise non-blocking between all automata, " +
+			logger.warn("NOTE! Modular nonblocking verification is not really implemented! " +
+									"This algorithm examines pairwise nonblocking between all automata, " +
 									"respectively! THIS DOES NOT PROVE GENERAL NONBLOCKING!!");
 
 			boolean allPairsNonblocking = true;
@@ -2047,15 +2065,15 @@ public class AutomataVerifier
 			}
 
 			// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
-			logger.warn("NOTE! Modular non-blocking verification is not really implemented! " +
-									"This algorithm examines pairwise non-blocking between all automata, " +
+			logger.warn("NOTE! Modular nonblocking verification is not really implemented! " +
+									"This algorithm examines pairwise nonblocking between all automata, " +
 									"respectively! THIS DOES NOT PROVE GENERAL NONBLOCKING!!");
 
 			return allPairsNonblocking;
 	}
 
 	/**
-	 * Examines non-blocking between a pair of automata
+	 * Examines nonblocking between a pair of automata
 	 *
 	 * @param AutomatonA The first automata in the pair.
 	 * @param AutomatonB The second automata in the pair.
@@ -2182,10 +2200,10 @@ public class AutomataVerifier
 	*/
 
 	/**
-	 * Examines non-blocking monolithically, by examining all reachable states.
+	 * Examines nonblocking monolithically, by examining all reachable states.
 	 * Lots and lots of work for big systems.
 	 *
-	 *@return True if non-blocking, false if blocking
+	 *@return True if nonblocking, false if blocking
 	 *@exception  Exception Description of the Exception
 	 *@see AutomataSynchronizerExecuter
 	 */
@@ -2195,10 +2213,10 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines non-blocking monolithically, by examining all reachable states.
+	 * Examines nonblocking monolithically, by examining all reachable states.
 	 * Allows destructive verification (perhaps we don't need to make a copy)
 	 *
-	 *@return True if non-blocking, false if blocking
+	 *@return True if nonblocking, false if blocking
 	 *@exception  Exception Description of the Exception
 	 *@see AutomataSynchronizerExecuter
 	 */

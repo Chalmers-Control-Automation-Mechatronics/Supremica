@@ -130,7 +130,7 @@ class MinimizationDialogStandardPanel
 		// Should we display a note?
 		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.ObservationEquivalence)
 		{
-			note.setText("Note:\n" + "This minimization algorithm is experimental, the\n" +
+			note.setText("Note:\n" + "This minimization algorithm is experimental! The\n" +
 						 "result may not be minimal but should at least be\n" +
 						 "observation equivalent to the input.");
 			note.setVisible(true);
@@ -143,21 +143,32 @@ class MinimizationDialogStandardPanel
 						 "made deterministic.");
 			note.setVisible(true);
 		}
+		else if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.ConflictEquivalence)
+		{
+			note.setText("Note:\n" + "This minimization algorithm is experimental! The\n" +
+						 "result may not be minimal but should at least be\n" +
+						 "conflict equivalent to the input.");
+			note.setVisible(true);
+		}
 		else
 		{
 			note.setVisible(false);
 		}
 
 		// Not else if!
+		alsoTransitions.setEnabled(true);
+		ignoreMarking.setEnabled(true);
 		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
 		{
 			// This already implies that the number of transitions are minimized
 			alsoTransitions.setSelected(true);
 			alsoTransitions.setEnabled(false);
 		}
-		else // Something else is selected
+		else if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.ConflictEquivalence)
 		{
-			alsoTransitions.setEnabled(true);
+			// When considering conflicts, the marking is essential!
+			ignoreMarking.setSelected(false);
+			ignoreMarking.setEnabled(false);
 		}
 	}
 }

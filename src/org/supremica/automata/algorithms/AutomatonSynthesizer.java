@@ -388,6 +388,11 @@ public class AutomatonSynthesizer
 
 		// Push all marked states on the stack
 		// Mark the state as visited
+		if (acceptingStates.size() == 0)
+		{
+			// Not initialized? Do it.
+			initializeAcceptingStates();
+		}
 		LinkedList stateStack = new LinkedList(acceptingStates);
 
 		logger.debug(stateStack.size() + " nbr of accepting states");
@@ -396,18 +401,16 @@ public class AutomatonSynthesizer
 		while (stateStack.size() > 0)
 		{
 			State currState = (State) stateStack.removeLast();
-
 			currState.setVisited(true);
 
 			Iterator arcIt = currState.incomingArcsIterator();
-
 			while (arcIt.hasNext())
 			{
 				Arc currArc = (Arc) arcIt.next();
 				LabeledEvent currEvent = currArc.getEvent();    // theAutomaton.getEvent(currArc.getEventId());
 				State fromState = currArc.getFromState();
 
-				if ((fromState.getCost() != State.MAX_COST) &&!fromState.isVisited())
+				if ((fromState.getCost() != State.MAX_COST) && !fromState.isVisited())
 				{
 					fromState.setVisited(true);
 					stateStack.addLast(fromState);
@@ -415,11 +418,12 @@ public class AutomatonSynthesizer
 			}
 		}
 
+		// The stateStack is now empty!!
+
 		// Find all states that are not coreachable and
 		// mark them as unsafe.
 		int nbrOfNewUnsafeStates = 0;
 		Iterator stateIt = theAutomaton.stateIterator();
-
 		while (stateIt.hasNext())
 		{
 			State currState = (State) stateIt.next();

@@ -92,4 +92,32 @@
 		<Transition source="m2" dest="m0" event="r"/>
 	</Transitions>
 </Automaton>
+<Automaton name="AltStart" type="Specification">
+	<Events>
+		<Event id="s1" label="Start1"/>
+		<Event id="s2" label="Start2"/>
+	</Events>
+	<States>
+		<State id="s0" name="Start1" initial="true" accepting="true"/>
+		<State id="s1" name="Start2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="s1"/>
+		<Transition source="s1" dest="s0" event="s2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="AltFinish" type="Specification">
+	<Events>
+		<Event id="s1" label="End1"/>
+		<Event id="s2" label="End2"/>
+	</Events>
+	<States>
+		<State id="s0" name="End1" initial="true" accepting="true"/>
+		<State id="s1" name="End2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="s1"/>
+		<Transition source="s1" dest="s0" event="s2"/>
+	</Transitions>
+</Automaton>
 </Automata>

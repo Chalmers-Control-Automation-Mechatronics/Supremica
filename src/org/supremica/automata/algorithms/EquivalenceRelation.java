@@ -58,6 +58,8 @@ public class EquivalenceRelation
 		new EquivalenceRelation("Language equivalence", true);
 	public static final EquivalenceRelation ObservationEquivalence = 
 		new EquivalenceRelation("Observation equivalence", true);
+	public static final EquivalenceRelation ConflictEquivalence = 
+		new EquivalenceRelation("Conflict equivalence", true);
 	public static final EquivalenceRelation FailureEquivalence = 
 		new EquivalenceRelation("Failure equivalence", false);
 	public static final EquivalenceRelation Undefined = 
@@ -86,21 +88,15 @@ public class EquivalenceRelation
 
 	public static EquivalenceRelation toType(String type)
 	{
-		if (equalType(LanguageEquivalence, type))
+		for (Iterator it = collection.iterator(); it.hasNext(); )
 		{
-			return LanguageEquivalence;
+			EquivalenceRelation relation = (EquivalenceRelation) it.next();
+			if (equalType(relation, type))
+			{
+				return relation;
+			}
 		}
 		
-		if (equalType(ObservationEquivalence, type))
-		{
-			return ObservationEquivalence;
-		}
-
-		if (equalType(FailureEquivalence, type))
-		{
-			return FailureEquivalence;
-		}
-
 		return Undefined;
 	}
 

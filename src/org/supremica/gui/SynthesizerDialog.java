@@ -280,7 +280,6 @@ class SynthesizerDialogAdvancedPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
-
 		// Incremental box enabled?
 		maximallyPermissiveIncrementalBox.setEnabled(maximallyPermissiveBox.isSelected());
 

@@ -50,9 +50,12 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.log.*;
 
 public final class MinimizationOptions
 {
+	private static Logger logger = LoggerFactory.createLogger(MinimizationOptions.class);
+
 	private boolean dialogOK = false;
 	private EquivalenceRelation equivalenceRelation;
 	private boolean alsoTransitions;
@@ -82,6 +85,21 @@ public final class MinimizationOptions
 		this.alsoTransitions = alsoTransitions;
 		this.keepOriginal = keepOriginal;
 		this.ignoreMarking = ignoreMarking;
+	}
+
+	public boolean isValid()
+	{
+		if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+		{
+			if (ignoreMarking)
+			{
+				logger.error("Invalid minimization options chosen. Conflict equivalence " + 
+							 "implies that the marking must not be ignored.");
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public void setDialogOK(boolean bool)
