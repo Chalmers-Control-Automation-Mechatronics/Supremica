@@ -63,7 +63,6 @@ public class GeneticAlgorithms
 	private static Logger logger = LoggerFactory.createLogger(GeneticAlgorithms.class);
 
 	private static final int GA_DATA_SIZE = 8;
-	private static final boolean USE_GA = false;
 
 	public static double[] extractData(Automaton autA, Automaton autB)
 	{
@@ -140,11 +139,6 @@ public class GeneticAlgorithms
 		// * Maximum depth of automata
 
 		return data;
-	}
-
-	public static boolean useGeneticAlgorithms()
-	{
-		return USE_GA;
 	}
 
 	public static int getGADataSize()
