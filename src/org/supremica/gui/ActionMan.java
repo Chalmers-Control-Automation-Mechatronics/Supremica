@@ -474,13 +474,13 @@ public class ActionMan
 
 	// This is baaad!
 	private static final int    // instead of using constants later below :)
-		FORMAT_UNKNOWN = -1, 	
-		FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, 
+		FORMAT_UNKNOWN = -1,
+		FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3,
 		FORMAT_RCP = 4, FORMAT_SP = 5, FORMAT_HTML = 6,
-		FORMAT_XML_DEBUG = 7, FORMAT_DOT_DEBUG = 8, FORMAT_DSX_DEBUG = 9, 
+		FORMAT_XML_DEBUG = 7, FORMAT_DOT_DEBUG = 8, FORMAT_DSX_DEBUG = 9,
 		FORMAT_RCP_DEBUG = 10, FORMAT_SP_DEBUG = 11, FORMAT_HTML_DEBUG = 12;
 
-	// This class should really act as a factory for exporter objects, but that 
+	// This class should really act as a factory for exporter objects, but that
 	// would mean rewriting the entire export/saveAs functionality. Should I bother?
 	static class ExportDialog
 	//	extends JDialog
@@ -491,39 +491,39 @@ public class ActionMan
 		private final String dsxString = "dsx";
 		private final String htmlString ="html";
 		private final String rcpString = "rcp";                         // ++ ARASH
-		
+
 		private final Object[] possibleValues =
 		{
 			xmlString, spString, dotString, dsxString, htmlString, rcpString
 		};
-		
+
 		private JOptionPane pane = null;
 		private JDialog dialog = null;
 		private JCheckBox checkbox = null;
 		private Object selectedValue = null;
-		
+
 		ExportDialog(Frame comp)
 		{
-			this.pane = new JOptionPane("Export as::", 
+			this.pane = new JOptionPane("Export as::",
 										JOptionPane.INFORMATION_MESSAGE,
-										JOptionPane.OK_CANCEL_OPTION, 
+										JOptionPane.OK_CANCEL_OPTION,
 										null,	// icon
 										null, 	// options
 										null);	// initialValue
-		
+
 			pane.setWantsInput(true);
 			pane.setSelectionValues(possibleValues);
 			pane.setInitialSelectionValue(possibleValues[0]);
 			pane.setComponentOrientation(((comp == null) ? pane.getRootFrame() : comp).getComponentOrientation());
 			pane.selectInitialValue();
-		
+
 			this.checkbox = new JCheckBox("Export to debugview");
 			pane.add(checkbox);
-			
+
 			// int style = styleFromMessageType(JOptionPane.INFORMATION_MESSAGE);
 			dialog = pane.createDialog(comp, "Export");
 		}
-		
+
 		public void show()
 		{
 			// this.selectedValue = JOptionPane.showInputDialog(comp, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
@@ -531,7 +531,7 @@ public class ActionMan
 	        dialog.dispose();
 
 	        selectedValue = pane.getInputValue();
-		}				
+		}
 
 		public boolean wasCancelled()
 		{
@@ -596,7 +596,7 @@ public class ActionMan
 		}
 
 	}
-	
+
 	// ** Export - shouldn't there be an exporter object?
 	// it is now (ARASH)
 	public static void automataExport(Gui gui)
@@ -619,9 +619,9 @@ public class ActionMan
 		{
 			return;
 		}
-		
+
 		int exportMode = dlg.getExportMode();
-		
+
 		if(exportMode != FORMAT_UNKNOWN)
 		{
 			automataExport(gui, exportMode);
@@ -643,14 +643,14 @@ public class ActionMan
 			return;
 		}
 
-		// Take care of the new debug stuff first. This is really silly. 
+		// Take care of the new debug stuff first. This is really silly.
 		// Proper design would have solved this problem
 		if(exportMode == FORMAT_XML_DEBUG)
 		{
 			AutomataToXml xport = new AutomataToXml(gui.getSelectedProject());
 			TextFrame textframe = new TextFrame("XML debug output");
 			xport.serialize(textframe.getPrintWriter());
-			return;		
+			return;
 		}
 		if (exportMode == FORMAT_SP_DEBUG)
 		{
@@ -672,7 +672,7 @@ public class ActionMan
 				}
 				catch(Exception ex)
 				{
-					logger.debug(ex.getStackTrace()); 
+					logger.debug(ex.getStackTrace());
 				}
 			}
 			return;
@@ -690,7 +690,7 @@ public class ActionMan
 				}
 				catch(Exception ex)
 				{
-					logger.debug(ex.getStackTrace()); 
+					logger.debug(ex.getStackTrace());
 				}
 			}
 			return;
@@ -708,7 +708,7 @@ public class ActionMan
 				}
 				catch(Exception ex)
 				{
-					logger.debug(ex.getStackTrace()); 
+					logger.debug(ex.getStackTrace());
 				}
 			}
 			return;
@@ -726,7 +726,7 @@ public class ActionMan
 				}
 				catch(Exception ex)
 				{
-					logger.debug(ex.getStackTrace()); 
+					logger.debug(ex.getStackTrace());
 				}
 			}
 			return;
@@ -872,9 +872,10 @@ public class ActionMan
 						{
 							Project selectedProject = gui.getSelectedProject();
 							Project newProject = new Project();
-							newProject.addActions(selectedProject.getActions());
-							newProject.addControls(selectedProject.getControls());
-							newProject.setAnimationURL(selectedProject.getAnimationURL());
+							newProject.addAttributes(selectedProject);
+							//newProject.addActions(selectedProject.getActions());
+							//newProject.addControls(selectedProject.getControls());
+							//newProject.setAnimationURL(selectedProject.getAnimationURL());
 
 							ProjectToSP exporter = new ProjectToSP(newProject);
 

@@ -53,9 +53,11 @@ public interface Gui
 
 	public Component getComponent();
 
-	public void addActions(Actions theActions);
+	public void addAttributes(Project otherProject);
 
-	public void addControls(Controls theControls);
+	//public void addActions(Actions theActions);
+
+	//public void addControls(Controls theControls);
 
 	// Do we need this one?
 	public JFrame getFrame();

@@ -1305,9 +1305,10 @@ public class Supremica
 		Project activeProject = getActiveProject();
 		if (activeProject != null)
 		{
-			selectedProject.addActions(activeProject.getActions());
-			selectedProject.addControls(activeProject.getControls());
-			selectedProject.setAnimationURL(activeProject.getAnimationURL());
+			selectedProject.addAttributes(activeProject);
+			//selectedProject.addActions(activeProject.getActions());
+			//selectedProject.addControls(activeProject.getControls());
+			//selectedProject.setAnimationURL(activeProject.getAnimationURL());
 		}
 		return selectedProject;
 	}
@@ -1523,6 +1524,14 @@ public class Supremica
 		return mainPopupMenu;
 	}
 
+	public void addAttributes(Project otherProject)
+	{
+		Project currProject = getActiveProject();
+		currProject.addAttributes(otherProject);
+	}
+
+
+/*
 	public void addActions(Actions theActions)
 	{
 		Project currProject = getActiveProject();
@@ -1540,6 +1549,7 @@ public class Supremica
 		Project currProject = getActiveProject();
 		currProject.setAnimationURL(animationURL);
 	}
+*/
 
 	public int addAutomata(Automata currAutomata)
 	{
@@ -1578,9 +1588,10 @@ public class Supremica
 		int nbrOfAddedAutomata = addAutomata(theProject);
 		if (theProject != null)
 		{
-			addActions(theProject.getActions());
-			addControls(theProject.getControls());
-			setAnimationURL(theProject.getAnimationURL());
+			addAttributes(theProject);
+			//addActions(theProject.getActions());
+			//addControls(theProject.getControls());
+			//setAnimationURL(theProject.getAnimationURL());
 			/*
 			String animPath = theProject.getAnimationPath();
 			if (animPath != null && !animPath.equals(""))

@@ -140,7 +140,15 @@ public class Project
 	}
 */
 
-	public void addActions(Actions otherActions)
+	public void addAttributes(Project otherProject)
+	{
+		addActions(otherProject.getActions());
+		addControls(otherProject.getControls());
+		setAnimationURL(otherProject.getAnimationURL());
+	}
+
+
+	private void addActions(Actions otherActions)
 	{
 		if (theActions == null)
 		{
@@ -150,7 +158,7 @@ public class Project
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
 
-	public void addControls(Controls otherControls)
+	private void addControls(Controls otherControls)
 	{
 		if (theControls == null)
 		{
