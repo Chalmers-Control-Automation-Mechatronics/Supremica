@@ -1,12 +1,14 @@
 /********************** HelpAction.java ************************/
 // Implementation of the Help stuff
 
-package org.supremica.gui.help;
+package org.supremica.gui.useractions;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.help.*;
+
+import org.supremica.gui.help.ContentHelp;
 
 public class HelpAction
 	extends AbstractAction
