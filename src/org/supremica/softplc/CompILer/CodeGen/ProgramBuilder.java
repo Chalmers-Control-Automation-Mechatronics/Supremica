@@ -4,6 +4,7 @@ import org.supremica.softplc.CompILer.Parser.*;
 import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
 import org.supremica.softplc.CompILer.CodeGen.Constants.*;
 import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
+import org.supremica.log.Logger;
 import de.fub.bytecode.generic.*;
 import de.fub.bytecode.Constants;
 import java.io.File;
@@ -21,8 +22,10 @@ public class ProgramBuilder
      * IL program generation
      *@param programName name of IL program be generated (i.e. classfile name)
      */
-    public ProgramBuilder(String programName, String dumpClassDir)
+    public ProgramBuilder(String programName, String dumpClassDir, Logger logger, boolean debug)
     {
+	this.logger = logger;
+	this.debug = debug;
 	implementedInterfaces = programInterfaces;
 	className = programName;
 
@@ -78,8 +81,7 @@ public class ProgramBuilder
     {
 	if (v.isInput())
 	    {
-		System.err.println("Initialisation of direct input variables not allowed.");
-		errorsPresent = true;
+		error("Initialisation of direct input variables not allowed.");
 	    }
 	else
 	    {
@@ -117,9 +119,7 @@ public class ProgramBuilder
 	    }
 	else
 	    {
-		System.err.println("Loading direct variables of type " + type + 
-				   " not yet implemented");
-		errorsPresent = true;
+		error("Loading direct variables of type " + type + " not yet implemented");
 	    }
 	return il;
     }
@@ -138,9 +138,8 @@ public class ProgramBuilder
 
 	if (var.isInput())
 	{
-		System.err.println(var + " is read only");
-		errorsPresent = true;
-	    }
+		error(var + " is read only");
+	}
 	else
 	    {
 		if (type == TypeConstant.T_BOOL)
@@ -156,9 +155,8 @@ public class ProgramBuilder
 		    }
 		else
 		    {
-			System.err.println("Storing direct variables of type " + type + 
-					   " not yet implemented");
-			errorsPresent = true;
+			error("Storing direct variables of type " + type + 
+			      " not yet implemented");
 		    }
 	    }
 

@@ -18,30 +18,30 @@ public class ilc
 		System.err.println("Usage: ilcompiler file.il outputDir");
 		return;
 	    }
-	new ilc(args[1], args[2]);
+	new ilc(args[0], args[1]);
     }
 
     public ilc(String ilFile, String outDir) {
-	this(ilFile, outDir, null);
+	this(ilFile, outDir, null, false);
     }
 
-    public ilc(String ilFile, String outDir, Logger logger) {
+    public ilc(String ilFile, String outDir, Logger logger, boolean debug) {
 	try {
 	    BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
-	
+	    
 	    parser p = new parser(ilReader);
 	    
 	    try {
 		SimpleNode n = p.Start();
 		
-		n.dump("");
+		// XXXn.dump("");
 		
 		new VariableChecker(n);
 		//XXX new VaribleChecker(n,logger);
 		
-		n.dump("");
+		// XXXn.dump("");
 		
-		JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir);
+		JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
 		//XXXnew JavaBytecodeGenerator(n, null/*output directory*/, logger);
 		File temp = jb.getTempFile();
 	    }
