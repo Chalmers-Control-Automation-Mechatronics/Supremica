@@ -104,8 +104,7 @@ public class AutomataSynchronizerWorker
 			AutomataSynchronizer theSynchronizer;
 			try
 			{
-				theSynchronizer =
-					new AutomataSynchronizer(theAutomata, syncOptions);
+				theSynchronizer = new AutomataSynchronizer(theAutomata, syncOptions);
 			}
 			catch (Exception e)
 			{

@@ -209,5 +209,4 @@ public class Events
 		theEvents.clear();
 		theEvents = newEvents;
 	}
-
 }

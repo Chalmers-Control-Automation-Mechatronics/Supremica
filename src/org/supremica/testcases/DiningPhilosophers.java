@@ -103,11 +103,13 @@ class Philosopher
 		// L_put becomes put<id>.<l_fork>
 		// R_put becomes put<id>.<r_fork>
 		Alphabet alpha = sm.getAlphabet();
-		alpha.getEventWithId("L_take").setLabel("take" + id + "." + l_fork);
-		alpha.getEventWithId("R_take").setLabel("take" + id + "." + r_fork);
-		alpha.getEventWithId("L_put").setLabel("put" + id + "." + l_fork);
-		alpha.getEventWithId("R_put").setLabel("put" + id + "." + r_fork);
+		alpha.getEventWithId("L_take").setLabel("take" + id +"." + l_fork);
+		alpha.getEventWithId("R_take").setLabel("take" + id +"." + r_fork);
+		alpha.getEventWithId("L_put").setLabel("put" + id +"." + l_fork);
+		alpha.getEventWithId("R_put").setLabel("put" + id +"." + r_fork);
+
 		alpha.rehash();
+
 		return sm;
 	}
 }
@@ -179,7 +181,9 @@ class Chopstick
 		alpha.getEventWithId("R_up").setLabel("take" + r_philo + "." + id);		
 		alpha.getEventWithId("L_dn").setLabel("put" + l_philo + "." + id);		
 		alpha.getEventWithId("R_dn").setLabel("put" + r_philo + "." + id);	
+			
 		alpha.rehash();
+
 		return sm;	
 	}
 }

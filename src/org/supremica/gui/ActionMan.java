@@ -497,6 +497,7 @@ public class ActionMan
 			}
 		}
 	}
+
 	//** Synchronize - Threaded version
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
@@ -560,6 +561,7 @@ public class ActionMan
 
 		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, currAutomata, newAutomatonName, syncOptions);
 	}
+
 	//** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
@@ -662,6 +664,7 @@ public class ActionMan
 		Date endDate = new Date();
 		gui.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 	}
+
 	// Automaton.Verify action performed
 	// Threaded version
 	public static void automataVerify_actionPerformed(Gui gui)
@@ -716,6 +719,7 @@ public class ActionMan
 
 		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, currAutomata, syncOptions, verificationOptions);
 	}
+
 	// Automaton.Alphabet action performed
 	public static void automatonAlphabet_actionPerformed(Gui gui)
 	{
@@ -742,6 +746,7 @@ public class ActionMan
 			}
 		}
     }
+
 	// Automaton.Explore action performed
     public static void automatonExplore_actionPerformed(Gui gui)
     {
@@ -826,6 +831,7 @@ public class ActionMan
 			}
 		}
 	}
+
 	// Automaton.Minimization action performed
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
@@ -861,6 +867,7 @@ public class ActionMan
 			}
 		}
 	}
+
     // Automaton.Status action performed
     public static void automatonStatus_actionPerformed(Gui gui)
     {
@@ -904,6 +911,7 @@ public class ActionMan
 			gui.info(statusStr.toString());
 		}
     }
+
     // Automaton.View action performed
     public static void automatonView_actionPerformed(Gui gui)
     {
@@ -956,6 +964,7 @@ public class ActionMan
 
 		}
     }
+
 	// Variable declared here, wanted it to be local to this func, but...
 	static PreferencesDialog thePreferencesDialog = null;
 	public static void configurePreferences_actionPerformed(Gui gui)
@@ -1039,6 +1048,7 @@ public class ActionMan
 			// theAutomatonTable.repaint(); // shoudl this really be necessary??
        	}
     }
+
 	// File.Open action performed
 	public static void fileOpen(Gui gui)
 	{
@@ -1060,6 +1070,7 @@ public class ActionMan
 			// theAutomatonTable.repaint(); // necessary?
        	}
     }
+
 	// Why this indirection?
 	public static void openFile(Gui gui, File file)
 	{

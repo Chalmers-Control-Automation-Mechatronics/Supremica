@@ -189,6 +189,6 @@ public class Alphabet
 		{
 			event = (Event) eventIt.next();
 			idMap.put(event.getId(), event);
-		}			
+		}	
 	}
 }
