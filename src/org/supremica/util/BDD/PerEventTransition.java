@@ -84,7 +84,7 @@ public class PerEventTransition
 					for (int k = 0; k < ec; k++)
 					{
 						int event = event_list[j];
-						if(event != i) {
+						if(event != k) {
 							next_event[k] += flow[event][k];
 							prev_event[k] += flow[k][event];
 						}
