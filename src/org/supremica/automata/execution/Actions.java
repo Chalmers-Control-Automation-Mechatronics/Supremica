@@ -53,13 +53,25 @@ import java.util.*;
 
 public class Actions
 {
-	private Set theActions = null;
-	private Map labelToActionMap = null;
+	private HashSet theActions = null;
+	private HashMap labelToActionMap = null;
 
 	public Actions()
 	{
 		theActions = new HashSet();
 		labelToActionMap = new HashMap();
+	}
+
+	public Actions(Actions otherActions)
+	{
+		theActions = new HashSet((int)(otherActions.size()*1.5));
+		labelToActionMap = new HashMap((int)(otherActions.size()*1.5));
+		for (Iterator actIt = otherActions.iterator(); actIt.hasNext();)
+		{
+			Action currAction = (Action)actIt.next();
+			Action newAction = new Action(currAction);
+			addAction(newAction);
+		}
 	}
 
 	public void addAction(Action theAction)
@@ -92,5 +104,11 @@ public class Actions
 	public int size()
 	{
 		return theActions.size();
+	}
+
+	public void clear()
+	{
+		theActions.clear();
+		labelToActionMap.clear();
 	}
 }

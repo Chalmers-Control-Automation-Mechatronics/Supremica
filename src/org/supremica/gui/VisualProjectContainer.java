@@ -47,29 +47,30 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.gui;
 
 import java.util.*;
+import org.supremica.automata.*;
 import org.supremica.log.*;
 
-public class ProjectContainer
+public class VisualProjectContainer
 {
-	private static Logger logger = LoggerFactory.createLogger(ProjectContainer.class);
+	private static Logger logger = LoggerFactory.createLogger(VisualProjectContainer.class);
 	private List theProjects;
-	private Project currentProject;
-	private ProjectContainerListeners projectListeners = null;
+	private VisualProject currentProject;
+	private VisualProjectContainerListeners projectListeners = null;
 
-	public ProjectContainer()
+	public VisualProjectContainer()
 	{
 		theProjects = new LinkedList();
 	}
 
-	public void addProject(Project theProject)
+	public void addProject(VisualProject theProject)
 	{
 		addProject(theProject, false);
 	}
 
-	public void addProject(Project theProject, boolean setActive)
+	public void addProject(VisualProject theProject, boolean setActive)
 	{
 		theProjects.add(theProject);
 
@@ -79,7 +80,7 @@ public class ProjectContainer
 		}
 	}
 
-	public void removeProject(Project theProject)
+	public void removeProject(VisualProject theProject)
 	{
 		theProjects.remove(theProject);
 
@@ -89,7 +90,7 @@ public class ProjectContainer
 		}
 	}
 
-	public Project getProject(String name)
+	public VisualProject getProject(String name)
 	{
 		if (name == null)
 		{
@@ -98,7 +99,7 @@ public class ProjectContainer
 
 		for (Iterator projIt = iterator(); projIt.hasNext(); )
 		{
-			Project currProject = (Project) projIt.next();
+			VisualProject currProject = (VisualProject) projIt.next();
 
 			if (name.equals(currProject.getName()))
 			{
@@ -109,12 +110,12 @@ public class ProjectContainer
 		return null;
 	}
 
-	public Project getActiveProject()
+	public VisualProject getActiveProject()
 	{
 		return currentProject;
 	}
 
-	public void setActiveProject(Project theProject)
+	public void setActiveProject(VisualProject theProject)
 	{
 		this.currentProject = theProject;
 	}
@@ -129,17 +130,17 @@ public class ProjectContainer
 		return "Untitled";
 	}
 
-	public ProjectContainerListeners getListeners()
+	public VisualProjectContainerListeners getListeners()
 	{
 		if (projectListeners == null)
 		{
-			projectListeners = new ProjectContainerListeners(this);
+			projectListeners = new VisualProjectContainerListeners(this);
 		}
 
 		return projectListeners;
 	}
 
-	public void addListener(ProjectContainerListener listener)
+	public void addListener(VisualProjectContainerListener listener)
 	{
 		Listeners currListeners = getListeners();
 		currListeners.addListener(listener);

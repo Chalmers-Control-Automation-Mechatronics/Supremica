@@ -47,14 +47,20 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.gui;
 
-public interface AutomatonContainerListener
-	extends Listener
+import org.supremica.automata.*;
+import org.supremica.log.*;
+
+public class VisualProjectFactory
+	implements ProjectFactory
 {
-	public void automatonAdded(AutomatonContainer container, Automaton automaton);
+	private static Logger logger = LoggerFactory.createLogger(VisualProjectFactory.class);
 
-	public void automatonRemoved(AutomatonContainer container, Automaton automaton);
+	public VisualProjectFactory(){};
 
-	public void automatonRenamed(AutomatonContainer container, Automaton automaton);
+	public Project getProject()
+	{
+		return new VisualProject();
+	}
 }

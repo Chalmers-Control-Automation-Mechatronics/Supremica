@@ -47,14 +47,16 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.gui;
 
-public interface ProjectContainerListener
+import org.supremica.automata.*;
+
+public interface VisualProjectContainerListener
 	extends Listener
 {
-	public void projectAdded(ProjectContainer container, Project theProject);
+	public void projectAdded(VisualProjectContainer container, Project theProject);
 
-	public void projectRemoved(ProjectContainer container, Project theProject);
+	public void projectRemoved(VisualProjectContainer container, Project theProject);
 
-	public void projectRenamed(ProjectContainer container, Project theProject);
+	public void projectRenamed(VisualProjectContainer container, Project theProject);
 }

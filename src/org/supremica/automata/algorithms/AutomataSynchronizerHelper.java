@@ -86,7 +86,7 @@ public final class AutomataSynchronizerHelper
 	private Automaton theAutomaton;
 	private boolean automataIsControllable = true;
 
-	/** Keeps information common to helpers. */
+	// Keeps information common to helpers.
 	private HelperData helperData;
 	private SynchronizationOptions syncOptions = null;
 
@@ -424,7 +424,7 @@ public final class AutomataSynchronizerHelper
 	{
 		return helperData.nbrOfAddedStates;
 	}
-	
+
 	public State[][] getIndexFormStateTable()
 	{
 		return theAutomataIndexForm.getStateTable();

@@ -53,7 +53,7 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.automata.Automata;
+import org.supremica.automata.*;
 
 public class TemplateItem
 {
@@ -76,14 +76,14 @@ public class TemplateItem
 		return path;
 	}
 
-	public Automata createInstance()
+	public Automata createInstance(ProjectFactory theFactory)
 		throws Exception
 	{
 		try
 		{
 			URL url = TemplateItem.class.getResource(path);
 			InputStream stream = url.openStream();
-			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+			AutomataBuildFromXml builder = new AutomataBuildFromXml(theFactory);
 			Automata theAutomata = builder.build(stream);
 
 			return theAutomata;

@@ -65,21 +65,21 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonContainer;
+import org.supremica.automata.*;
+import org.supremica.gui.*;
+import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
 
 public class Supremica
 	extends JFrame
-	implements TableModelListener, Gui
+	implements TableModelListener, Gui, VisualProjectContainerListener
 {
 	private final static InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private JToolBar toolBar = new JToolBar();
 	private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
-	private AutomatonContainer theAutomatonContainer;
+	private VisualProjectContainer theVisualProjectContainer;
 	private TypeCellEditor typeEditor;
 	private PreferencesDialog thePreferencesDialog = null;
 	private BorderLayout layout;
@@ -104,16 +104,17 @@ public class Supremica
 	public static ImageIcon cornerIcon = (new ImageIcon(Supremica.class.getResource("/icons/cornerIcon.gif")));
 	public static Image cornerImage = cornerIcon.getImage();
 
-	// local helper utility
-	Gui getGui()
-	{
-		return this;
-	}
-
 	// Construct the frame
 	public Supremica()
 	{
-		theAutomatonContainer = new AutomatonContainer(this);
+		theVisualProjectContainer = new VisualProjectContainer();
+		theVisualProjectContainer.addListener(this);
+		VisualProject theVisualProject = new VisualProject("Single Visual Project");
+		theVisualProjectContainer.addProject(theVisualProject);
+		theVisualProjectContainer.setActiveProject(theVisualProject);
+
+		//theVisualProjectContainer = currProject.getVisualProjectContainer();
+		//theVisualProjectContainer.addListener(this);
 
 		logger.info("Supremica version: " + (new Version()).toString());
 
@@ -123,7 +124,7 @@ public class Supremica
 
 			try
 			{
-				xmlRpcServer = new Server(theAutomatonContainer, SupremicaProperties.getXmlRpcPort());
+				xmlRpcServer = new Server(theVisualProjectContainer, SupremicaProperties.getXmlRpcPort());
 			}
 			catch (Exception e)
 			{
@@ -139,7 +140,7 @@ public class Supremica
 		}
 
 		layout = new BorderLayout();
-		fullTableModel = theAutomatonContainer.getFullTableModel();
+		fullTableModel = getActiveProject().getFullTableModel();
 		theTableSorter = new TableSorter(fullTableModel);
 		theAutomatonTable = new JTable(theTableSorter);
 
@@ -226,6 +227,17 @@ public class Supremica
 		}
 	}
 
+	// local helper utility
+	Gui getGui()
+	{
+		return this;
+	}
+
+	public VisualProject getActiveProject()
+	{
+		return theVisualProjectContainer.getActiveProject();
+	}
+
 	private JFrame getCurrentFrame()
 	{
 		return this;
@@ -246,7 +258,7 @@ public class Supremica
 		contentPane.setOpaque(true);
 		contentPane.setBackground(Color.white);
 		setSize(new Dimension(800, 600));
-		theAutomatonContainer.updateFrameTitles();
+		// theVisualProjectContainer.updateFrameTitles();
 		contentPane.add(toolBar, BorderLayout.NORTH);
 		contentPane.add(splitPaneVertical, BorderLayout.CENTER);
 		splitPaneVertical.setContinuousLayout(false);
@@ -267,7 +279,7 @@ public class Supremica
 			public void keyTyped(KeyEvent e) {}
 		});
 
-		typeEditor = new TypeCellEditor(theAutomatonTable, theTableSorter, theAutomatonContainer);
+		typeEditor = new TypeCellEditor(theAutomatonTable, theTableSorter, theVisualProjectContainer);
 		helpDisplayer = new CSH.DisplayHelpFromSource(help.getStandardHelpBroker());
 
 		initMenubar();
@@ -982,7 +994,7 @@ public class Supremica
 			{
 				int currIndex = selectedRowIndicies[i];
 				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-				Automaton currAutomaton = theAutomatonContainer.getAutomatonAt(orgIndex);
+				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
 
 				selectedAutomata.add(currAutomaton);
 			}
@@ -1006,7 +1018,7 @@ public class Supremica
 			{
 				int currIndex = selectedRowIndicies[i];
 				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-				Automaton currAutomaton = theAutomatonContainer.getAutomatonAt(orgIndex);
+				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
 
 				selectedAutomata.addAutomaton(currAutomaton);
 			}
@@ -1022,7 +1034,7 @@ public class Supremica
 	// Tools.AutomataEditor
 	public void toolsAutomataEditor()
 	{
-		theAutomatonContainer.getAutomataEditor();
+		getActiveProject().getAutomataEditor();
 	}
 
 	public void renameProject()
@@ -1031,8 +1043,8 @@ public class Supremica
 
 		if (newName != null)
 		{
-			theAutomatonContainer.setProjectName(newName);
-			theAutomatonContainer.setProjectFile(null);
+			getActiveProject().setName(newName);
+			getActiveProject().setProjectFile(null);
 		}
 	}
 
@@ -1104,7 +1116,7 @@ public class Supremica
 			{
 				JOptionPane.showMessageDialog(this, "An empty name is not allowed", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
-			else if (theAutomatonContainer.containsAutomaton(newName))
+			else if (getActiveProject().containsAutomaton(newName))
 			{
 				JOptionPane.showMessageDialog(this, newName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
@@ -1164,7 +1176,7 @@ public class Supremica
 
 		try
 		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+			AutomataBuildFromXml builder = new AutomataBuildFromXml(new VisualProjectFactory());
 
 			currAutomata = builder.build(file);
 		}
@@ -1177,7 +1189,7 @@ public class Supremica
 			return;
 		}
 
-		int nbrOfAutomataBeforeOpening = theAutomatonContainer.getSize();
+		int nbrOfAutomataBeforeOpening = getActiveProject().getNbrOfAutomata();
 
 		try
 		{
@@ -1198,24 +1210,23 @@ public class Supremica
 
 			if (projectName != null)
 			{
-				theAutomatonContainer.setProjectName(projectName);
+				getActiveProject().setName(projectName);
 				logger.info("Project name changed to \"" + projectName + "\"");
-				theAutomatonContainer.updateFrameTitles();
 			}
 		}
 
 		if (nbrOfAutomataBeforeOpening > 0)
 		{
-			File projectFile = theAutomatonContainer.getProjectFile();
+			File projectFile = getActiveProject().getProjectFile();
 
 			if (projectFile != null)
 			{
-				theAutomatonContainer.setProjectFile(null);
+				getActiveProject().setProjectFile(null);
 			}
 		}
 		else
 		{
-			theAutomatonContainer.setProjectFile(file);
+			getActiveProject().setProjectFile(file);
 		}
 	}
 
@@ -1226,7 +1237,8 @@ public class Supremica
 		// int nbrOfAddedAutomata = 0;
 		try
 		{
-			Automata currAutomata = AutomataBuildFromVALID.build(file);
+			AutomataBuildFromVALID builder = new AutomataBuildFromVALID(new VisualProjectFactory());
+			Automata currAutomata = builder.build(file);
 			int nbrOfAddedAutomata = addAutomata(currAutomata);
 
 			logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
@@ -1239,9 +1251,9 @@ public class Supremica
 		}
 	}
 
-	public AutomatonContainer getAutomatonContainer()
+	public VisualProjectContainer getVisualProjectContainer()
 	{
-		return theAutomatonContainer;
+		return theVisualProjectContainer;
 	}
 
 	public MainPopupMenu getMainPopupMenu()
@@ -1294,10 +1306,10 @@ public class Supremica
 			}
 		}
 
-		if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
+		if (getActiveProject().containsAutomaton(currAutomaton.getName()))
 		{
 			String autName = currAutomaton.getName();
-			String newName = theAutomatonContainer.getUniqueAutomatonName(autName);
+			String newName = getActiveProject().getUniqueAutomatonName(autName);
 
 			currAutomaton.setName(newName);
 
@@ -1323,7 +1335,7 @@ public class Supremica
 
 		try
 		{
-			theAutomatonContainer.add(currAutomaton);
+			getActiveProject().addAutomaton(currAutomaton);
 
 			// throws Exception if the automaton already exists
 		}
@@ -1346,5 +1358,25 @@ public class Supremica
 	public void destroy()
 	{
 		close();
+	}
+
+	public void projectAdded(VisualProjectContainer container, Project theProject)
+	{
+		logger.info("Project added: " + theProject.getName());
+	}
+
+	public void projectRemoved(VisualProjectContainer container, Project theProject)
+	{
+		logger.info("Project removed: " + theProject.getName());
+	}
+
+	public void projectRenamed(VisualProjectContainer container, Project theProject)
+	{
+		logger.info("Project renamed: " + theProject.getName());
+	}
+
+	public void updated(Object theObject)
+	{
+
 	}
 }

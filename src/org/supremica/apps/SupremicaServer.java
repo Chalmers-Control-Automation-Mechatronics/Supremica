@@ -61,7 +61,7 @@ import org.supremica.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.*;
-import org.supremica.automata.AutomatonContainer;
+import org.supremica.gui.VisualProjectContainer;
 import org.supremica.properties.SupremicaProperties;
 
 public class SupremicaServer
@@ -73,13 +73,13 @@ public class SupremicaServer
 	}
 
 	private static Logger logger = LoggerFactory.createLogger(SupremicaServer.class);
-	private AutomatonContainer theAutomatonContainer = null;
+	private VisualProjectContainer theVisualProjectContainer = null;
 	private Server xmlRpcServer = null;
 
 	// Construct the frame
 	public SupremicaServer()
 	{
-		theAutomatonContainer = new AutomatonContainer();
+		theVisualProjectContainer = new VisualProjectContainer();
 
 		logger.info("Supremica version: " + (new Version()).toString());
 
@@ -87,7 +87,7 @@ public class SupremicaServer
 
 		try
 		{
-			xmlRpcServer = new Server(theAutomatonContainer, SupremicaProperties.getXmlRpcPort());
+			xmlRpcServer = new Server(theVisualProjectContainer, SupremicaProperties.getXmlRpcPort());
 		}
 		catch (Exception e)
 		{

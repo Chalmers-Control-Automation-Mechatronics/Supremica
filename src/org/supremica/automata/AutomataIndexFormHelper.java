@@ -63,14 +63,14 @@ public final class AutomataIndexFormHelper
 	}
 
 	/**
-	* bit
-	* 0: initial
-	* 1: accepting
-* 2: forbidden
-* 3: first
-* 4: last
-* 5: fastClearStatus
-	*/
+	 * bit
+	 * 0: initial
+	 * 1: accepting
+	 * 2: forbidden
+	 * 3: first
+	 * 4: last
+	 * 5: fastClearStatus
+	 **/
 	public static int createStatus(State state)
 	{
 		int status = 0;

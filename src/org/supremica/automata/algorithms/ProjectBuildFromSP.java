@@ -59,6 +59,11 @@ import org.supremica.automata.*;
 public class ProjectBuildFromSP
 	extends AutomataBuildFromXml
 {
+	public ProjectBuildFromSP(ProjectFactory theProjectFactory)
+	{
+		super(theProjectFactory);
+	}
+
 /*
 	private final static String projectStr = "SupremicaProject";
 	private final static String layoutStr = "Layout";
@@ -68,9 +73,13 @@ public class ProjectBuildFromSP
 	private final static String controlsStr = "Controls";
 	private final static String controlStr = "Control";
 
+	private ProjectFactory theProjectFactory = null;
 	private Project currProject = null;
 
-	public ProjectBuildFromSP() {}
+	public ProjectBuildFromSP(ProjectFactory theProjectFactory)
+	{
+		this.theProjectFactory = theProjectFactory;
+	}
 
 	public Project buildProject(File file)
 		throws Exception
@@ -221,7 +230,7 @@ public class ProjectBuildFromSP
 	public final void doProject(AttributeList attributes)
 		throws SAXException
 	{
-		currProject = new Project();
+		currProject = theProjectFactory.getProject();
 
 		String name = attributes.getValue("name");
 
@@ -275,7 +284,7 @@ public class ProjectBuildFromSP
 	public final void doLayout(AttributeList attributes)
 		throws SAXException
 	{
-		currProject = new Project();
+		currProject = theProjectFactory.getProject();
 
 		String name = attributes.getValue("name");
 
@@ -328,7 +337,7 @@ public class ProjectBuildFromSP
 	public final void doExecution(AttributeList attributes)
 		throws SAXException
 	{
-		currProject = new Project();
+		currProject = theProjectFactory.getProject();
 
 		String name = attributes.getValue("name");
 

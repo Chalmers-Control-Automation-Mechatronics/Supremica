@@ -53,13 +53,13 @@ import java.util.*;
 import org.supremica.log.*;
 
 /**
- * A collection of Automaton-objects.
+ * An ordered set of Automaton-objects.
  * @see Automaton
  */
 public class Automata
 {
 	private static Logger logger = LoggerFactory.createLogger(Automata.class);
-	private ArrayList theAutomata;    // Efficiency reasons
+	private ArrayList theAutomata;
 	private HashMap nameMap;
 	private String name = null;
 	private AutomataListeners listeners = null;
@@ -106,6 +106,15 @@ public class Automata
 		theAutomata.remove(aut);
 		nameMap.remove(aut.getName());
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_REMOVED, aut);
+	}
+
+	public void removeAutomaton(String name)
+	{
+		Automaton currAutomaton = getAutomaton(name);
+		if (currAutomaton != null)
+		{
+			removeAutomaton(currAutomaton);
+		}
 	}
 
 	public void renameAutomaton(Automaton aut, String newName)
@@ -163,9 +172,9 @@ public class Automata
 		return theAutomata.size();
 	}
 
-	public Automaton getAutomatonAt(int i)
+	public int getNbrOfAutomata()
 	{
-		return (Automaton) theAutomata.get(i);
+		return size();
 	}
 
 	public boolean containsAutomaton(String name)
@@ -178,6 +187,11 @@ public class Automata
 		return (Automaton) nameMap.get(name);
 	}
 
+	public Automaton getAutomatonAt(int i)
+	{
+		return (Automaton) theAutomata.get(i);
+	}
+
 	public String getName()
 	{
 		return name;
@@ -186,6 +200,36 @@ public class Automata
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	public void clear()
+	{
+		theAutomata.clear();
+		nameMap.clear();
+	}
+
+	public String getUniqueAutomatonName()
+	{
+		return getUniqueAutomatonName("Untitled");
+	}
+
+	public String getUniqueAutomatonName(String prefix)
+	{
+		if (!containsAutomaton(prefix))
+		{
+			return prefix;
+		}
+
+		int index = 1;
+		String newName;
+
+		do
+		{
+			newName = prefix + "(" + index++ + ")";
+		}
+		while (containsAutomaton(newName));
+
+		return newName;
 	}
 
 	public AutomataListeners getListeners()

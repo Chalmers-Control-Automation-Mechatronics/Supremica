@@ -59,7 +59,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonContainer;
+import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.LabeledEvent;
@@ -79,7 +79,7 @@ public class AutomataVerificationWorker
 	// -- MF --      private Supremica workbench = null;
 	private Gui workbench = null;
 	private Automata theAutomata = null;
-	private AutomatonContainer theAutomatonContainer = null;
+	private VisualProjectContainer theVisualProjectContainer = null;
 
 	// private String newAutomatonName = null;
 	// private Automaton theAutomaton = null;
@@ -98,7 +98,7 @@ public class AutomataVerificationWorker
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
-		theAutomatonContainer = workbench.getAutomatonContainer();
+		theVisualProjectContainer = workbench.getVisualProjectContainer();
 
 		// this.newAutomatonName = newAutomatonName;
 		this.synchronizationOptions = synchronizationOptions;
@@ -357,18 +357,18 @@ public class AutomataVerificationWorker
 
 			// The automata must have an initial state
 			// Put selected automata in automataB and unselected in automataA
-			for (int i = 0; i < theAutomatonContainer.getSize(); i++)
+			for (int i = 0; i < theVisualProjectContainer.getActiveProject().getNbrOfAutomata(); i++)
 			{
 				try
 				{
-					currAutomaton = theAutomatonContainer.getAutomatonAt(i);
+					currAutomaton = theVisualProjectContainer.getActiveProject().getAutomatonAt(i);
 				}
 				catch (Exception ex)
 				{
 					requestStop();
 
-					// logger.error("Exception in AutomatonContainer.");
-					workbench.error("Exception in AutomatonContainer.");
+					// logger.error("Exception in VisualProjectContainer.");
+					workbench.error("Exception in VisualProjectContainer.");
 
 					return;
 				}

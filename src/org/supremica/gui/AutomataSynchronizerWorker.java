@@ -191,7 +191,7 @@ public class AutomataSynchronizerWorker
 				{
 
 					// -- MF -- container.add(theAutomaton);
-					workbench.getAutomatonContainer().add(theAutomaton);
+					workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
 				}
 			}
 			catch (Exception ex)

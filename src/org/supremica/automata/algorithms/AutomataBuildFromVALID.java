@@ -55,44 +55,34 @@ import org.jdom.*;
 import org.jdom.input.*;
 import org.jdom.output.*;
 import org.supremica.log.*;
-import org.supremica.gui.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 
 public class AutomataBuildFromVALID
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataBuildFromVALID.class);
-	private static AutomataBuildFromVALID builder = null;
-	private static Automata currAutomata = null;
+	private ProjectFactory theProjectFactory;
 
-	// private static Automaton currAutomaton = null;
-	// private static Alphabet currAlphabet = null;
-	private static SAXBuilder docBuilder;
-	private static String filePath;
+	private Project currAutomata = null;
 
-	private AutomataBuildFromVALID() {}
+	private SAXBuilder docBuilder;
+	private String filePath;
 
-	public static Automata build(File file)
+	public AutomataBuildFromVALID(ProjectFactory theProjectFactory)
+	{
+		this.theProjectFactory = theProjectFactory;
+	}
+
+	public Automata build(File file)
 		throws Exception
 	{
 		return build(file, false);
 	}
 
-	public static Automata build(File file, boolean validate)
+	public Automata build(File file, boolean validate)
 		throws Exception
 	{
-		currAutomata = new Automata();
+		currAutomata = theProjectFactory.getProject();
 		filePath = file.getParent();
-
-		if (builder == null)
-		{
-			builder = new AutomataBuildFromVALID();
-		}
 
 		try
 		{
@@ -132,10 +122,10 @@ public class AutomataBuildFromVALID
 			throw new Exception(ex.getMessage());
 		}
 
-		return builder.currAutomata;
+		return currAutomata;
 	}
 
-	private static void automataFromVPRJ(Element root)
+	private void automataFromVPRJ(Element root)
 		throws Exception
 	{
 		Document subDoc = docBuilder.build(new File(filePath + File.separator + root.getChild("uses").getAttributeValue("module") + ".vmod"));
@@ -147,7 +137,7 @@ public class AutomataBuildFromVALID
 	// Builds automata in currAutomata
 	// Brasklapp: I'm not quite pleased with this name-argument
 	// everywhere... but it works (it's needed in the recursion)
-	private static void automataFromVMOD(Element root, String name)
+	private void automataFromVMOD(Element root, String name)
 		throws Exception
 	{
 		HashMap definitionHash = new HashMap();
@@ -323,7 +313,7 @@ public class AutomataBuildFromVALID
 	}
 
 	// Builds one automaton and returns it
-	private static void automatonFromDGRF(Element root, String name, String type)
+	private void automatonFromDGRF(Element root, String name, String type)
 		throws Exception
 	{
 		Automaton currAutomaton = new Automaton();

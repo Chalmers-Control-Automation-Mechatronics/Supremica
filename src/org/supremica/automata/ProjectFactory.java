@@ -49,52 +49,7 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
-
-public class ProjectContainerListeners
-	extends Listeners
+public interface ProjectFactory
 {
-	public static final int MODE_PROJECT_ADDED = 1;
-	public static final int MODE_PROJECT_REMOVED = 2;
-	public static final int MODE_PROJECT_RENAMED = 3;
-
-	public ProjectContainerListeners(Object owner)
-	{
-		super(owner);
-	}
-
-	public void notifyListeners(int mode, Object o)
-	{
-		if (batchUpdate)
-		{
-			updateNeeded = true;
-		}
-		else
-		{
-			if (listeners != null)
-			{
-				Iterator listenerIt = listeners.iterator();
-
-				while (listenerIt.hasNext())
-				{
-					ProjectContainerListener currListener = (ProjectContainerListener) listenerIt.next();
-
-					if (mode == MODE_PROJECT_ADDED)
-					{
-						currListener.projectAdded((ProjectContainer) owner, (Project) o);
-					}
-					else if (mode == MODE_PROJECT_REMOVED)
-					{
-						currListener.projectRemoved((ProjectContainer) owner, (Project) o);
-					}
-					else if (mode == MODE_PROJECT_RENAMED)
-					{
-						currListener.projectRenamed((ProjectContainer) owner, (Project) o);
-					}
-				}
-			}
-
-			updateNeeded = false;
-		}
-	}
+	public Project getProject();
 }

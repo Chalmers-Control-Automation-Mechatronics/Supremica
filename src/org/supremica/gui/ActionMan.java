@@ -66,8 +66,7 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
+import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
 
 // -- MF -- Abstract class to save on duplicate code
@@ -101,7 +100,7 @@ abstract class FileImporter
 // --------------------
 public class ActionMan
 {
-	private static final int    // instead of using conststs later below :)
+	private static final int    // instead of using constants later below :)
 		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4;
 
 	private static int getIntegerInDialogWindow(String text, Component parent)
@@ -138,7 +137,7 @@ public class ActionMan
 
 		try
 		{
-			newAutomata = item.createInstance();
+			newAutomata = item.createInstance(new VisualProjectFactory());
 
 			gui.addAutomata(newAutomata);
 		}
@@ -314,7 +313,7 @@ public class ActionMan
 				Automaton newAutomaton = automataComplement.execute();
 
 				newAutomaton.setName(newAutomatonName);
-				gui.getAutomatonContainer().add(newAutomaton);
+				gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{
@@ -352,7 +351,7 @@ public class ActionMan
 				Automaton newAutomaton = new Automaton(currAutomaton);
 
 				newAutomaton.setName(newAutomatonName);
-				gui.getAutomatonContainer().add(newAutomaton);
+				gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{
@@ -382,7 +381,7 @@ public class ActionMan
 
 			try
 			{
-				gui.getAutomatonContainer().remove(currAutomatonName);
+				gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomatonName);
 			}
 			catch (Exception ex)
 			{
@@ -392,9 +391,9 @@ public class ActionMan
 
 		/*
 		 *  And this "closes" the project, should it, really?
-		 *  if (theAutomatonContainer.getSize() == 0)
+		 *  if (theVisualProjectContainer.getSize() == 0)
 		 *  {
-		 *  theAutomatonContainer.setProjectFile(null);
+		 *  theVisualProjectContainer.setProjectFile(null);
 		 *  }
 		 */
 
@@ -492,14 +491,10 @@ public class ActionMan
 			{
 				fileExporter = FileDialogs.getDSXFileExporter();
 			}
-
-			// ++ ARASH
 			else if (exportMode == FORMAT_RCP)
 			{
 				fileExporter = FileDialogs.getRCPFileExporter();
 			}
-
-			// -- ARASH
 			else
 			{
 				return;
@@ -593,7 +588,7 @@ public class ActionMan
 				Automaton newAutomaton = extender.getNewAutomaton();
 
 				newAutomaton.setName(newAutomatonName);
-				gui.getAutomatonContainer().add(newAutomaton);
+				gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{
@@ -715,7 +710,7 @@ public class ActionMan
 
 				if (newName != null)
 				{
-					gui.getAutomatonContainer().rename(currAutomaton, newName);
+					gui.getVisualProjectContainer().getActiveProject().renameAutomaton(currAutomaton, newName);
 				}
 			}
 			catch (Exception ex)
@@ -980,7 +975,7 @@ public class ActionMan
 
 			try
 			{
-				AlphabetViewer viewer = gui.getAutomatonContainer().getAlphabetViewer(currAutomatonName);
+				AlphabetViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAlphabetViewer(currAutomatonName);
 			}
 			catch (Exception ex)
 			{
@@ -1005,28 +1000,6 @@ public class ActionMan
 
 		Iterator autIt = selectedAutomata.iterator();
 
-		/*
-		 *  while (autIt.hasNext())
-		 *  {
-		 *  Automaton currAutomaton = (Automaton)autIt.next();
-		 *  String currAutomatonName = currAutomaton.getName();
-		 *  if (currAutomaton.getInitialState() == null)
-		 *  {
-		 *  JOptionPane.showMessageDialog(this, "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-		 *  }
-		 *  else
-		 *  {
-		 *  try
-		 *  {
-		 *  AutomatonExplorer explorer = getAutomatonContainer.getAutomatonExplorer(currAutomatonName);
-		 *  }
-		 *  catch (Exception ex)
-		 *  {
-		 *  logger.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName());
-		 *  }
-		 *  }
-		 *  }
-		 */
 		if (selectedAutomata.size() == 1)
 		{
 
@@ -1041,7 +1014,7 @@ public class ActionMan
 
 			try
 			{
-				AutomatonExplorer explorer = gui.getAutomatonContainer().getAutomatonExplorer(currAutomatonName);
+				AutomatonExplorer explorer = gui.getVisualProjectContainer().getActiveProject().getAutomatonExplorer(currAutomatonName);
 			}
 			catch (Exception ex)
 			{
@@ -1117,7 +1090,7 @@ public class ActionMan
 				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(true);
 
 				newAutomaton.setName(newAutomatonName);
-				gui.getAutomatonContainer().add(newAutomaton);
+				gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{
@@ -1132,8 +1105,8 @@ public class ActionMan
 	public static void automatonStatus_actionPerformed(Gui gui)
 	{
 
-		// logger.info("Number of automata: " + gui.getAutomatonContainer().getSize());
-		gui.info("Number of automata: " + gui.getAutomatonContainer().getSize());
+		// logger.info("Number of automata: " + gui.getVisualProjectContainer().getSize());
+		gui.info("Number of automata: " + gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata());
 
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
@@ -1232,7 +1205,7 @@ public class ActionMan
 
 			try
 			{
-				AutomatonViewer viewer = gui.getAutomatonContainer().getAutomatonViewer(currAutomatonName);
+				AutomatonViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomatonName);
 			}
 			catch (Exception ex)
 			{
@@ -1324,64 +1297,10 @@ public class ActionMan
 	public static void fileImportDesco(Gui gui)
 	{
 
-		/*
-		 * JFileChooser fileOpener = FileDialogs.getDescoFileImporter();
-		 * if (fileOpener.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
-		 * {
-		 *       File[] currFiles = fileOpener.getSelectedFiles();
-		 *       if (currFiles != null)
-		 *       {
-		 *               for (int i = 0; i < currFiles.length; i++)
-		 *               {
-		 *                       if (currFiles[i].isFile())
-		 *                       {
-		 *                               importDescoFile(gui, currFiles[i]);
-		 *                       }
-		 *               }
-		 *       }
-		 *       repaint();
-		 *       theAutomatonTable.repaint();
-		 * }
-		 */
-
-		/*
-		 * Not implemented yet
-		 * new FileImporter(FileDialogs.getDescoFileImporter(), gui)
-		 * {
-		 *     void openFile(Gui g, File f)
-		 *     {
-		 *             importDescoFile(g, f);
-		 *     }
-		 * };
-		 */
 	}
 
 	public static void fileImportValid(Gui gui)
 	{
-
-		/*
-		 * JFileChooser fileOpener = FileDialogs.getVALIDFileImporter();
-		 *
-		 * if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
-		 * {
-		 *       File[] currFiles = fileOpener.getSelectedFiles();
-		 *
-		 *       if (currFiles != null)
-		 *       {
-		 *               for (int i = 0; i < currFiles.length; i++)
-		 *               {
-		 *                       if (currFiles[i].isFile())
-		 *                       {
-		 *                               importValidFile(gui, currFiles[i]);
-		 *                       }
-		 *               }
-		 *       }
-		 *
-		 *       gui.repaint();
-		 *
-		 *       // theAutomatonTable.repaint(); // shoudl this really be necessary??
-		 * }
-		 */
 		new FileImporter(FileDialogs.getVALIDFileImporter(), gui)    // anonymous class
 		{
 			void openFile(Gui g, File f)
@@ -1391,7 +1310,7 @@ public class ActionMan
 		};
 	}
 
-	// -- MF -- Aldebaran format, a simple format for specifying des
+	// Aldebaran format, a simple format for specifying des
 	public static void fileImportAut(Gui gui)
 	{
 		new FileImporter(FileDialogs.getAutFileImporter(), gui)    // anonymous class
@@ -1406,30 +1325,6 @@ public class ActionMan
 	// File.Open action performed
 	public static void fileOpen(Gui gui)
 	{
-
-		/*
-		 * JFileChooser fileOpener = FileDialogs.getXMLFileImporter();
-		 *
-		 * if (fileOpener.showOpenDialog(gui.getFrame()) == JFileChooser.APPROVE_OPTION)
-		 * {
-		 *       File[] currFiles = fileOpener.getSelectedFiles();
-		 *
-		 *       if (currFiles != null)
-		 *       {
-		 *               for (int i = 0; i < currFiles.length; i++)
-		 *               {
-		 *                       if (currFiles[i].isFile())
-		 *                       {
-		 *                               openFile(gui, currFiles[i]);
-		 *                       }
-		 *               }
-		 *       }
-		 *
-		 *       gui.getFrame().repaint();
-		 *
-		 *       // theAutomatonTable.repaint(); // necessary?
-		 * }
-		 */
 		new FileImporter(FileDialogs.getXMLFileImporter(), gui)    // anonymous class
 		{
 			void openFile(Gui g, File f)
@@ -1453,7 +1348,7 @@ public class ActionMan
 
 		try
 		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+			AutomataBuildFromXml builder = new AutomataBuildFromXml(new VisualProjectFactory());
 
 			currAutomata = builder.build(file);
 		}
@@ -1484,7 +1379,7 @@ public class ActionMan
 			JOptionPane.showMessageDialog(gui.getComponent(), "The automata has an invalid hash", "alert", JOptionPane.WARNING_MESSAGE);
 		}
 
-		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
+		int nbrOfAutomataBeforeOpening = gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
 
 		try
 		{
@@ -1505,31 +1400,31 @@ public class ActionMan
 
 			if (projectName != null)
 			{
-				gui.getAutomatonContainer().setProjectName(projectName);
+				gui.getVisualProjectContainer().getActiveProject().setName(projectName);
 				gui.info("Project name changed to \"" + projectName + "\"");
-				gui.getAutomatonContainer().updateFrameTitles();
+				gui.getVisualProjectContainer().getActiveProject().updateFrameTitles();
 			}
 		}
 
 		if (nbrOfAutomataBeforeOpening > 0)
 		{
-			File projectFile = gui.getAutomatonContainer().getProjectFile();
+			File projectFile = gui.getVisualProjectContainer().getActiveProject().getProjectFile();
 
 			if (projectFile != null)
 			{
-				gui.getAutomatonContainer().setProjectFile(null);
+				gui.getVisualProjectContainer().getActiveProject().setProjectFile(null);
 			}
 		}
 		else
 		{
-			gui.getAutomatonContainer().setProjectFile(file);
+			gui.getVisualProjectContainer().getActiveProject().setProjectFile(file);
 		}
 	}
 
 	// File.Save action performed
 	public static void fileSave(Gui gui)
 	{
-		File currFile = gui.getAutomatonContainer().getProjectFile();
+		File currFile = gui.getVisualProjectContainer().getActiveProject().getProjectFile();
 
 		if (currFile == null)
 		{
@@ -1538,7 +1433,7 @@ public class ActionMan
 			return;
 		}
 
-		Automata currAutomata = gui.getAutomatonContainer().getAutomata();
+		Automata currAutomata = gui.getVisualProjectContainer().getActiveProject();
 
 		if (currFile != null)
 		{
@@ -1591,7 +1486,7 @@ public class ActionMan
 		}
 
 		JFileChooser fileSaveAs = FileDialogs.getXMLFileSaveAs();
-		String projectName = gui.getAutomatonContainer().getProjectName();
+		String projectName = gui.getVisualProjectContainer().getActiveProject().getName();
 
 		if (projectName != null)
 		{
@@ -1606,7 +1501,7 @@ public class ActionMan
 
 			if (currFile != null)
 			{
-				gui.getAutomatonContainer().setProjectFile(currFile);
+				gui.getVisualProjectContainer().getActiveProject().setProjectFile(currFile);
 				fileSave(gui);
 			}
 		}
@@ -1639,7 +1534,8 @@ public class ActionMan
 
 		try
 		{
-			Automata currAutomata = AutomataBuildFromVALID.build(file);
+			AutomataBuildFromVALID builder = new AutomataBuildFromVALID(new VisualProjectFactory());
+			Automata currAutomata = builder.build(file);
 			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
 			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
@@ -1695,7 +1591,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	// 
+	//
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);
@@ -1715,9 +1611,9 @@ public class ActionMan
 	// Delete All - this really implements Close Project
 	public static void automataDeleteAll_actionPerformed(Gui gui)
 	{
-		gui.getAutomatonContainer().clear();
+		gui.getVisualProjectContainer().getActiveProject().clear();
 		gui.clearSelection();
-		gui.getAutomatonContainer().setProjectFile(null);
+		gui.getVisualProjectContainer().getActiveProject().setProjectFile(null);
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata

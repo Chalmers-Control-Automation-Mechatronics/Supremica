@@ -54,13 +54,7 @@ import java.io.*;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import org.xml.sax.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 
 public class AutomataBuildFromXml
 	extends HandlerBase
@@ -84,12 +78,16 @@ public class AutomataBuildFromXml
 	private final static String immediateStr = "immediate";
 	private final static String owner = "owner";
 	private final static String hash = "hash";
+	private ProjectFactory theProjectFactory = null;
 	private Automata currAutomata = null;
 	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
 	private Locator locator = null;
 
-	public AutomataBuildFromXml() {}
+	public AutomataBuildFromXml(ProjectFactory theProjectFactory)
+	{
+		this.theProjectFactory = theProjectFactory;
+	}
 
 	public Automata build(File file)
 		throws Exception
@@ -221,7 +219,7 @@ public class AutomataBuildFromXml
 	public final void doAutomata(AttributeList attributes)
 		throws SAXException
 	{
-		currAutomata = new Automata();
+		currAutomata = theProjectFactory.getProject();
 
 		String name = attributes.getValue("name");
 

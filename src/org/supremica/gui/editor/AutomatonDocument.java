@@ -55,10 +55,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.*;
 import com.nwoods.jgo.*;
-import org.supremica.automata.ArcSet;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonContainer;
-import org.supremica.automata.State;
+import org.supremica.automata.*;
+import org.supremica.gui.*;
 
 // AutomatonDocument, for this example, has just a few properties:
 // Location and Link Pen.
@@ -76,14 +74,14 @@ public class AutomatonDocument
 	// State
 	private JGoPen myPen = JGoPen.make(JGoPen.SOLID, 2, Color.black);
 	private String myLocation = "";
-	private AutomatonContainer theAutomatonContainer = null;
+	private VisualProject theVisualProject = null;
 	private Automaton theAutomaton = null;
 	private boolean changed = false;
 	private boolean layoutNeeded = false;
 
-	public AutomatonDocument(AutomatonContainer theAutomatonContainer, Automaton theAutomaton)
+	public AutomatonDocument(VisualProject theVisualProject, Automaton theAutomaton)
 	{
-		this.theAutomatonContainer = theAutomatonContainer;
+		this.theVisualProject = theVisualProject;
 		this.theAutomaton = theAutomaton;
 
 		build();

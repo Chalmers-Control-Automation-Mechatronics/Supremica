@@ -68,6 +68,12 @@ public class Action
 		addCommand(command);
 	}
 
+	public Action(Action otherAction)
+	{
+		this.label = otherAction.label;
+		commands = new LinkedList(commands);
+	}
+
 
 	public String getLabel()
 	{

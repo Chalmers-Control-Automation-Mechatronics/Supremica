@@ -9,17 +9,17 @@ import javax.swing.JFrame;    // jag VILL inte ha sånt i mitt program!
 import java.awt.Component;    // se ovan
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.*;
-import org.supremica.gui.Gui;
+import org.supremica.gui.*;
 
 public class ConsoleUI
 	implements Gui
 {
-	private AutomatonContainer theAutomatonContainer;
+	private VisualProjectContainer theVisualProjectContainer;
 	private BufferedReader reader;
 
 	public ConsoleUI(String[] args)
 	{
-		theAutomatonContainer = new AutomatonContainer();
+		theVisualProjectContainer = new VisualProjectContainer();
 		reader = new BufferedReader(new InputStreamReader(System.in));
 
 		// todo : handle args
@@ -38,7 +38,7 @@ public class ConsoleUI
 
 		try
 		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+			AutomataBuildFromXml builder = new AutomataBuildFromXml(new DefaultProjectFactory());
 
 			aut = builder.build(new File(name));
 
@@ -248,7 +248,7 @@ public class ConsoleUI
 		return null;
 	}
 
-	public AutomatonContainer getAutomatonContainer()
+	public VisualProjectContainer getVisualProjectContainer()
 	{
 		return null;    // TODO
 	}

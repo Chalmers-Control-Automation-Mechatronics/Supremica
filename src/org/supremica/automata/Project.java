@@ -50,88 +50,39 @@
 package org.supremica.automata;
 
 import java.util.*;
-import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.automata.execution.*;
 
 /**
- * A set of Automata with common actions and an AutomatonContainer.
- * @see org.supremica.gui.AutomatonContainer
+ * A project is a automata object together with actions and controls.
+ * A Project might be encapulated in a gui.VisualProject object
+ * if this is a graphical application.
  */
 public class Project
 	extends Automata
 {
 	private static Logger logger = LoggerFactory.createLogger(Project.class);
-	private AutomatonContainer theContainer = null;
-	private Automata selectedAutomata = null;
-	private String name = null;
 	private Actions theActions = null;
 	private Controls theControls = null;
 
 	public Project()
 	{
-		this("");
 	}
 
 	public Project(String name)
 	{
-		theContainer = new AutomatonContainer();
-		this.name = name;
+		theActions = new Actions();
+		theControls = new Controls();
+		setName(name);
 	}
 
 	public Project(Project otherProject)
 	{
 		super(otherProject);
-
-		theContainer = new AutomatonContainer(otherProject.theContainer);
-
-		try
-		{
-			theContainer.add(otherProject);
-		}
-		catch (Exception e)
-		{
-			logger.error("Error while copying project");
-		}
+		theActions = new Actions(otherProject.theActions);
+		theControls = new Controls(otherProject.theControls);
+		setName(otherProject.getName());
 	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public AutomatonContainer getAutomatonContainer()
-	{
-		return theContainer;
-	}
-
-	public void setSelectedAutomata(Automata theAutomata)
-	{
-		this.selectedAutomata = theAutomata;
-	}
-
-	public Automata getSelectedAutomata()
-	{
-		return selectedAutomata;
-	}
-
-	public void clearSelection()
-	{
-		selectedAutomata = null;
-	}
-
-	public boolean containsAutomaton(String name)
-	{
-		return false;
-	}
-
-	// What is this supposed to do!!?
-	public void close() {}
 
 	public Actions getActions()
 	{
@@ -142,4 +93,12 @@ public class Project
 	{
 		return theControls;
 	}
+
+	public void clear()
+	{
+		super.clear();
+		theActions.clear();
+		theControls.clear();
+	}
+
 }

@@ -47,48 +47,55 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.execution;
+package org.supremica.gui;
 
-public class Control
+import java.util.*;
+import org.supremica.automata.*;
+
+public class VisualProjectContainerListeners
+	extends Listeners
 {
-	private String label = null;
-	private String condition = null;
+	public static final int MODE_PROJECT_ADDED = 1;
+	public static final int MODE_PROJECT_REMOVED = 2;
+	public static final int MODE_PROJECT_RENAMED = 3;
 
-	public Control(String label, String condition)
+	public VisualProjectContainerListeners(Object owner)
 	{
-		this.label = label;
-		this.condition = condition;
+		super(owner);
 	}
 
-	public Control(Control otherControl)
+	public void notifyListeners(int mode, Object o)
 	{
-		this(otherControl.label, otherControl.condition);
-	}
-
-	public String getLabel()
-	{
-		return label;
-	}
-
-	public String getCondition()
-	{
-		return condition;
-	}
-
-	public boolean equals(Object other)
-	{
-		if (!(other instanceof Control))
+		if (batchUpdate)
 		{
-			return false;
+			updateNeeded = true;
 		}
+		else
+		{
+			if (listeners != null)
+			{
+				Iterator listenerIt = listeners.iterator();
 
-		Control otherControl = (Control) other;
+				while (listenerIt.hasNext())
+				{
+					VisualProjectContainerListener currListener = (VisualProjectContainerListener) listenerIt.next();
 
-		return label.equals(otherControl.label) && condition.equals(otherControl.condition);
-	}
+					if (mode == MODE_PROJECT_ADDED)
+					{
+						currListener.projectAdded((VisualProjectContainer) owner, (Project) o);
+					}
+					else if (mode == MODE_PROJECT_REMOVED)
+					{
+						currListener.projectRemoved((VisualProjectContainer) owner, (Project) o);
+					}
+					else if (mode == MODE_PROJECT_RENAMED)
+					{
+						currListener.projectRenamed((VisualProjectContainer) owner, (Project) o);
+					}
+				}
+			}
 
-	public int hashCode()
-	{
-		return label.hashCode() + condition.hashCode();
+			updateNeeded = false;
+		}
 	}
 }

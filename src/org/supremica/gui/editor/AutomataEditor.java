@@ -60,16 +60,15 @@ import com.nwoods.jgo.layout.JGoNetwork;
 import java.beans.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
-import org.supremica.automata.AutomatonContainer;
-import org.supremica.automata.Automaton;
+import org.supremica.automata.*;
+
 
 public class AutomataEditor
 	extends JFrame
 	implements TableModelListener
 {
+	private VisualProject theVisualProject = null;
 	private JPanel contentPane;
-	private Gui workbench = null;
-	private AutomatonContainer theAutomatonContainer = null;
 	private JToolBar toolBar = new JToolBar();
 	private JTable theAutomatonTable;
 	private JScrollPane theAutomatonTableScrollPane;
@@ -77,10 +76,10 @@ public class AutomataEditor
 	private JSplitPane splitPaneHorizontal;
 	private EditorActions theActions;
 
-	public AutomataEditor(Gui workbench)
+	public AutomataEditor(VisualProject theVisualProject)
 	{
-		this.workbench = workbench;
-		this.theAutomatonContainer = workbench.getAutomatonContainer();
+		this.theVisualProject = theVisualProject;
+
 		theActions = new EditorActions(this);
 
 		initMenus();
@@ -91,7 +90,7 @@ public class AutomataEditor
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(toolBar, BorderLayout.NORTH);
 
-		lightTableModel = theAutomatonContainer.getLightTableModel();
+		lightTableModel = theVisualProject.getLightTableModel();
 
 		lightTableModel.addTableModelListener(this);
 
@@ -769,9 +768,9 @@ public class AutomataEditor
 
 					try
 					{
-						AutomatonDocument theDocument = theAutomatonContainer.getAutomatonDocument(automatonName);
+						AutomatonDocument theDocument = theVisualProject.getAutomatonDocument(automatonName);
 						Automaton theAutomaton = theDocument.getAutomaton();
-						JInternalFrame theFrame = theAutomatonContainer.getAutomatonFrame(automatonName);
+						JInternalFrame theFrame = theVisualProject.getAutomatonFrame(automatonName);
 
 						theFrame.setVisible(true);
 						theFrame.setTitle(theAutomaton.getName());
@@ -1087,12 +1086,12 @@ public class AutomataEditor
 
 	public void fileAdd()
 	{
-		String title = theAutomatonContainer.getUniqueAutomatonName();
+		String title = theVisualProject.getUniqueAutomatonName();
 		Automaton newAutomaton = new Automaton(title);
 
 		try
 		{
-			theAutomatonContainer.add(newAutomaton);
+			theVisualProject.addAutomaton(newAutomaton);
 		}
 		catch (Exception e)
 		{
@@ -1101,7 +1100,7 @@ public class AutomataEditor
 			return;
 		}
 
-		AutomatonDocument doc = new AutomatonDocument(theAutomatonContainer, newAutomaton);
+		AutomatonDocument doc = new AutomatonDocument(theVisualProject, newAutomaton);
 
 		createFrame(doc);
 	}
@@ -1109,22 +1108,18 @@ public class AutomataEditor
 	public void fileOpen()
 	{
 
-		// workbench.fileOpen(getCurrentFrame());
-		ActionMan.fileOpen(workbench);
+		//ActionMan.fileOpen(workbench);
 	}
 
 	public void fileSave()
 	{
-
-		// workbench.fileSave();
-		ActionMan.fileSave(workbench);
+		//ActionMan.fileSave(workbench);
 	}
 
 	public void fileSaveAs()
 	{
 
-		// workbench.fileSaveAs();
-		ActionMan.fileSaveAs(workbench);
+		//ActionMan.fileSaveAs(workbench);
 	}
 
 	public void filePrint()

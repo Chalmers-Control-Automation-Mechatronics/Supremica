@@ -60,7 +60,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonContainer;
+import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
@@ -78,7 +78,7 @@ public class AutomataSynthesizer
 	private SynchronizationOptions synchronizationOptions;
 	private SynthesizerOptions synthesizerOptions;
 	private int[] initialState;
-	private AutomatonContainer theAutomatonContainer;
+	private VisualProjectContainer theVisualProjectContainer;
 	private Gui workbench;
 
 	// For the optimization...
@@ -99,7 +99,7 @@ public class AutomataSynthesizer
 		// + 1 status field
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
 		this.workbench = workbench;
-		theAutomatonContainer = workbench.getAutomatonContainer();
+		theVisualProjectContainer = workbench.getVisualProjectContainer();
 		maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
@@ -289,7 +289,7 @@ public class AutomataSynthesizer
 						{
 							theAutomaton = new Automaton(synchHelper.getAutomaton());
 
-							String newName = theAutomatonContainer.getUniqueAutomatonName("Synth_" + ((Automaton) selectedAutomata.get(0)).getName());
+							String newName = theVisualProjectContainer.getActiveProject().getUniqueAutomatonName("Synth_" + ((Automaton) selectedAutomata.get(0)).getName());
 
 							theAutomaton.setName(newName);
 							theAutomaton.setType(AutomatonType.Supervisor);
@@ -318,7 +318,7 @@ public class AutomataSynthesizer
 			optimize(theAutomata, new Automata(newAutomata));
 		}
 
-		// theAutomatonContainer.add(newAutomata);
+		// theVisualProjectContainer.add(newAutomata);
 		workbench.addAutomata(newAutomata);
 	}
 

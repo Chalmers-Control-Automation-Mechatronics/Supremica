@@ -14,7 +14,7 @@ import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonContainer;
+import org.supremica.gui.VisualProjectContainer;
 
 public interface Gui
 {
@@ -51,7 +51,7 @@ public interface Gui
 	public JFrame getFrame();
 
 	// this should be the main frame
-	public AutomatonContainer getAutomatonContainer();
+	public VisualProjectContainer getVisualProjectContainer();
 
 	public Collection getSelectedAutomataAsCollection();
 

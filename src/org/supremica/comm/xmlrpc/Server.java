@@ -54,28 +54,26 @@ import java.io.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.gui.*;
 import helma.xmlrpc.*;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonContainer;
+import org.supremica.automata.*;
 
 public class Server
 {
-	private AutomatonContainer container;
-	private WebServer theServer;
+//	private VisualProjectContainer container;
+//	private WebServer theServer;
 
-	public Server(AutomatonContainer container, int port)
+	public Server(VisualProjectContainer container, int port)
 		throws Exception
 	{
-		this.container = container;
-		theServer = new WebServer(port);
+//		this.container = container;
+//		theServer = new WebServer(port);
 
-		theServer.addHandler("$default", this);
+//		theServer.addHandler("$default", this);
 	}
-
+/*
 	public Vector getAutomataIdentities()
 	{
 		Vector theIdentities = new Vector();
-		Iterator autIt = container.automatonIterator();
+		Iterator autIt = container.getActiveProject().iterator();
 
 		while (autIt.hasNext())
 		{
@@ -101,7 +99,7 @@ public class Server
 
 			try
 			{
-				currAutomaton = container.getAutomaton(currName);
+				currAutomaton = container.getActiveProject().getAutomaton(currName);
 			}
 			catch (Exception e)
 			{
@@ -128,7 +126,7 @@ public class Server
 
 		try
 		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+			AutomataBuildFromXml builder = new AutomataBuildFromXml(new ProjectProjectFactory());
 
 			theAutomata = builder.build(reader);
 		}
@@ -177,4 +175,9 @@ public class Server
 
 	public void minimizeAutomaton(String automatonIdentity, String newIdentity)
 		throws XmlRpcException {}
+
+
+*/
 }
+
+

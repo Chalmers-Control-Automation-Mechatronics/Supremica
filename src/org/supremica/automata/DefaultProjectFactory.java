@@ -47,48 +47,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.execution;
+package org.supremica.automata;
 
-public class Control
+public class DefaultProjectFactory
+	implements ProjectFactory
 {
-	private String label = null;
-	private String condition = null;
-
-	public Control(String label, String condition)
+	public DefaultProjectFactory()
 	{
-		this.label = label;
-		this.condition = condition;
 	}
 
-	public Control(Control otherControl)
+	public Project getProject()
 	{
-		this(otherControl.label, otherControl.condition);
-	}
-
-	public String getLabel()
-	{
-		return label;
-	}
-
-	public String getCondition()
-	{
-		return condition;
-	}
-
-	public boolean equals(Object other)
-	{
-		if (!(other instanceof Control))
-		{
-			return false;
-		}
-
-		Control otherControl = (Control) other;
-
-		return label.equals(otherControl.label) && condition.equals(otherControl.condition);
-	}
-
-	public int hashCode()
-	{
-		return label.hashCode() + condition.hashCode();
+		return new Project();
 	}
 }

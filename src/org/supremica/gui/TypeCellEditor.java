@@ -15,7 +15,7 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonContainer;
+import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
 
 class TypeCellEditor
@@ -24,13 +24,13 @@ class TypeCellEditor
 	private JTable theTable;
 	private TableSorter theTableSorter;
 	private JComboBox automatonTypeCombo;
-	private AutomatonContainer theAutomatonContainer;
+	private VisualProjectContainer theVisualProjectContainer;
 	private static Logger logger = LoggerFactory.createLogger(TypeCellEditor.class);
 
-	public TypeCellEditor(JTable theTable, TableSorter theTableSorter, AutomatonContainer theAutomatonContainer)
+	public TypeCellEditor(JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
 	{
 		this.theTable = theTable;
-		this.theAutomatonContainer = theAutomatonContainer;
+		this.theVisualProjectContainer = theVisualProjectContainer;
 		this.theTableSorter = theTableSorter;
 		automatonTypeCombo = new JComboBox();
 
@@ -69,7 +69,7 @@ class TypeCellEditor
 
 					try
 					{
-						currAutomaton = theAutomatonContainer.getAutomatonAt(orgRow);
+						currAutomaton = theVisualProjectContainer.getActiveProject().getAutomatonAt(orgRow);
 					}
 					catch (Exception ex)
 					{

@@ -62,6 +62,18 @@ public class Controls
 		labelToControlMap = new HashMap();
 	}
 
+	public Controls(Controls otherControls)
+	{
+		theControls = new HashSet((int)(otherControls.size()*1.5));
+		labelToControlMap = new HashMap((int)(otherControls.size()*1.5));
+		for (Iterator conIt = otherControls.iterator(); conIt.hasNext();)
+		{
+			Control currControl = (Control)conIt.next();
+			Control newControl = new Control(currControl);
+			addControl(newControl);
+		}
+	}
+
 	public void addControl(Control theControl)
 	{
 		theControls.add(theControl);
@@ -92,5 +104,11 @@ public class Controls
 	public int size()
 	{
 		return theControls.size();
+	}
+
+	public void clear()
+	{
+		theControls.clear();
+		labelToControlMap.clear();
 	}
 }
