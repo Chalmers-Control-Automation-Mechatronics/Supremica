@@ -93,7 +93,7 @@ public class AutomataToControlBuilderSFC
 	{    // Empty
 	}
 
-	public void serialize_app(File theFile)
+	public void serializeApp(File theFile)
 	{
 		try
 		{
@@ -101,7 +101,7 @@ public class AutomataToControlBuilderSFC
 			PrintWriter thePrintWriter = new PrintWriter(theWriter);
 			String theFileName = theFile.getName();
 			fileName = theFileName.substring(0, theFileName.length() - 4);
-			serialize_app(thePrintWriter);
+			serializeApp(thePrintWriter);
 			thePrintWriter.close();
 		}
 		catch (Exception ex)
@@ -110,7 +110,7 @@ public class AutomataToControlBuilderSFC
 		}
 	}
 
-	public void serialize_app(PrintWriter pw)
+	public void serializeApp(PrintWriter pw)
 	{
 
 		// Start of file header
@@ -234,7 +234,14 @@ public class AutomataToControlBuilderSFC
 
 	}
 
-	public void serialize_prj(PrintWriter pw)
+	public void serializePrj(File theFile)
+		throws Exception
+	{
+		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		serializePrj(theWriter);
+	}
+
+	public void serializePrj(PrintWriter pw)
 	{
 		pw.println("'2002-01-11-16:24:38.775'");
 		pw.println("Header");

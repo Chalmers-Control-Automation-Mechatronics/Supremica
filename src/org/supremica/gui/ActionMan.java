@@ -1824,12 +1824,9 @@ public class ActionMan
 					{
 						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedAutomata);
 
-						PrintWriter pw_prj = new PrintWriter(new FileWriter(prjFile));
+						exporter.serializeApp(appFile);
+						exporter.serializePrj(prjFile);
 
-						exporter.serialize_app(appFile);
-						exporter.serialize_prj(pw_prj);
-
-						pw_prj.close();
 					}
 					catch (Exception ex)
 					{
@@ -1843,6 +1840,113 @@ public class ActionMan
 		}
 	}
 
+
+	// Generate ABB Control Builder IL
+	public static void AutomataToControlBuilderIL(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String pathName = currFile.getAbsolutePath();
+					String prefixName = null;
+					String filename = currFile.getName();
+					if (pathName.endsWith(".prj"))
+					{
+						prefixName = pathName.substring(0, pathName.length() - 4);
+						filename = filename.substring(0, filename.length() - 4);
+					}
+					else
+					{
+						prefixName = pathName;
+					}
+					File appFile = new File(prefixName + ".app");
+					File prjFile = new File(prefixName + ".prj");
+					try
+					{
+						AutomataToControlBuilderIL exporter = new AutomataToControlBuilderIL(selectedAutomata);
+
+						exporter.serializeApp(appFile, filename);
+						exporter.serializePrj(prjFile, filename);
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						gui.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						return;
+					}
+					logger.info("ABB Control Builder IL files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
+				}
+			}
+		}
+	}
+
+	// Generate ABB Control Builder ST
+	public static void AutomataToControlBuilderST(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+		JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					String pathName = currFile.getAbsolutePath();
+					String prefixName = null;
+					String filename = currFile.getName();
+					if (pathName.endsWith(".prj"))
+					{
+						prefixName = pathName.substring(0, pathName.length() - 4);
+						filename = filename.substring(0, filename.length() - 4);
+					}
+					else
+					{
+						prefixName = pathName;
+					}
+					File appFile = new File(prefixName + ".app");
+					File prjFile = new File(prefixName + ".prj");
+					try
+					{
+						AutomataToControlBuilderST exporter = new AutomataToControlBuilderST(selectedAutomata);
+						exporter.serializeApp(appFile, filename);
+						exporter.serializePrj(prjFile, filename);
+					}
+					catch (Exception ex)
+					{
+						ex.printStackTrace();
+						gui.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
+						return;
+					}
+					logger.info("ABB Control Builder ST files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
+				}
+			}
+		}
+	}
 
 	// Generate 1131 Structured Text
 	public static void AutomataTo1131ST(Gui gui)
@@ -1869,8 +1973,7 @@ public class ActionMan
 					try
 					{
 
-						SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata, synchronizationOptions);
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
 
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 
@@ -1917,9 +2020,7 @@ public class ActionMan
 
 					try
 					{
-
-						SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata, synchronizationOptions);
+						AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedAutomata);
 
 						PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
 

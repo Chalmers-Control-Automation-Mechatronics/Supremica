@@ -54,9 +54,25 @@ import java.io.*;
 import java.util.*;
 
 public class ControlBuilderHelper
+	extends IEC61131Helper
 {
 
-	public static void serializeAppBegin(PrintWriter pw, String fileName)
+	private static ControlBuilderHelper theHelper;
+
+	protected ControlBuilderHelper()
+	{
+	}
+
+	public static IEC61131Helper getInstance()
+	{
+		if (theHelper == null)
+		{
+			theHelper = new ControlBuilderHelper();
+		}
+		return theHelper;
+	}
+
+	public void printBeginProgram(PrintWriter pw, String fileName)
 	{
 
 		// Start of file header
@@ -81,10 +97,10 @@ public class ControlBuilderHelper
 		pw.println("PROGRAM Program1 : SINGLE_PROGRAM");
 	}
 
-	public static void serializeAppEnd(PrintWriter pw)
+	public void printEndProgram(PrintWriter pw)
 	{
 		// End of Program code
-		pw.println("END_PROGRAM;\n");
+		pw.println("\nEND_PROGRAM;\n");
 
 		pw.println("ModuleDef");
 		pw.println("ClippingBounds := ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
@@ -95,39 +111,54 @@ public class ControlBuilderHelper
 
 	}
 
-	public static void serializeVarBegin(PrintWriter pw)
+	public void printBooleanVariableDeclaration(PrintWriter pw, String variableName, String comment)
 	{
-		pw.println("VAR");
+		pw.print("\t\t" + variableName + " : bool; ");
+		if (comment != null)
+		{
+			//pw.print(comment);
+		}
+		pw.println();
 	}
 
-	public static void serializeVarEnd(PrintWriter pw)
+	public void printBeginVariables(PrintWriter pw)
 	{
-		pw.println("END_VAR\n");
+		pw.println("\tVAR");
 	}
 
-	public static void serializeILBegin(PrintWriter pw)
+	public void printEndVariables(PrintWriter pw)
+	{
+		pw.println("\tEND_VAR\n");
+	}
+
+	public void printILBegin(PrintWriter pw)
 	{
 		pw.println("      CODEBLOCK Code COORD 0.0, 0.0 OBJSIZE 0.0, 0.0 :");
 		pw.println("         INSTRUCTIONLIST");
 	}
 
-	public static void serializeILEnd(PrintWriter pw)
+	public void printILEnd(PrintWriter pw)
 	{
 		pw.println("\n         END_CODEBLOCK\n");
 	}
 
-	public static void serializeSTBegin(PrintWriter pw)
+	public void printSTBegin(PrintWriter pw)
 	{
 		pw.println("      CODEBLOCK Code COORD 0.0, 0.0 OBJSIZE 0.0, 0.0 :");
 		pw.println("         STRUCTUREDTEXT");
 	}
 
-	public static void serializeSTEnd(PrintWriter pw)
+	public void printSTEnd(PrintWriter pw)
 	{
 		pw.println("\n         END_CODEBLOCK\n");
 	}
 
-	public static void serializePrj(PrintWriter pw, String fileName)
+	public void printILComment(PrintWriter pw, String comment)
+	{
+		printILStatement(pw, null, null, null, comment);
+	}
+
+	public void printPrj(PrintWriter pw, String fileName)
 	{
 		pw.println("'2002-01-11-16:24:38.775'");
 		pw.println("Header");

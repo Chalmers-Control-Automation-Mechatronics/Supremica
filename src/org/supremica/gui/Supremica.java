@@ -819,6 +819,32 @@ public class Supremica
 			}
 		});
 
+		JMenuItem menuToolsCodeGenerationControlBuilderIL = new JMenuItem();
+
+		menuToolsCodeGenerationControlBuilderIL.setText("ABB Control Builder Instruction List...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderIL);
+		menuToolsCodeGenerationControlBuilderIL.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				ActionMan.AutomataToControlBuilderIL(getGui());
+			}
+		});
+
+		JMenuItem menuToolsCodeGenerationControlBuilderST = new JMenuItem();
+
+		menuToolsCodeGenerationControlBuilderST.setText("ABB Control Builder Structured Text...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderST);
+		menuToolsCodeGenerationControlBuilderST.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				ActionMan.AutomataToControlBuilderST(getGui());
+			}
+		});
+
 		JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
 
 		menuToolsCodeGenerationBC.setText("Java Bytecode...");
@@ -835,7 +861,7 @@ public class Supremica
 
 		JMenuItem menuToolsCodeGenerationSattLineSFC = new JMenuItem();
 
-		menuToolsCodeGenerationSattLineSFC.setText("SattLine SFC...");
+		menuToolsCodeGenerationSattLineSFC.setText("ABB SattLine Sequential Function Chart...");
 		menuToolsCodeGeneration.add(menuToolsCodeGenerationSattLineSFC);
 		menuToolsCodeGenerationSattLineSFC.addActionListener(new ActionListener()
 		{
@@ -847,7 +873,7 @@ public class Supremica
 
 		JMenuItem menuToolsCodeGenerationControlBuilderSFC = new JMenuItem();
 
-		menuToolsCodeGenerationControlBuilderSFC.setText("ControlBuilder SFC...");
+		menuToolsCodeGenerationControlBuilderSFC.setText("ABB Control Builder Sequential Function Chart...");
 		menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderSFC);
 		menuToolsCodeGenerationControlBuilderSFC.addActionListener(new ActionListener()
 		{
