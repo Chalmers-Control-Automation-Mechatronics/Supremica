@@ -72,16 +72,19 @@ public class BasicFBInstance extends FBInstance
 		this.name = n;
 		fbType = t;
 		resource = r;
-		variables = new Variables();
-
-		// fix for testing -- will not be here too long
-		variables.addVariable("OCCURRED", new BooleanVariable("EventInput",false));
-		variables.addVariable("DONE", new BooleanVariable("EventOutput",false));
-		variables.addVariable("invoked", new IntegerVariable("Local",0));
-		
 		currentECState = fbType.getECC().getInitialState();
 	}
 
+	public void setVariables(Variables vars)
+	{
+		variables = vars;
+	}
+
+	public void addVariable(String name, Variable var)
+	{
+		variables.addVariable(name,var);
+	}
+	
 	public void addEventInputQueue(String event)
 	{
 		eventInputQueues.put(event,new EventQueue());
@@ -105,7 +108,15 @@ public class BasicFBInstance extends FBInstance
 	public void queueEvent(String eventInput)
 	{
 		System.out.println("BasicFBInstace.queueEvent(): " + eventInput);
-		((EventQueue) eventInputQueues.get(eventInput)).add(new Event(eventInput));
+		EventQueue tempQueue = (EventQueue) eventInputQueues.get(eventInput);
+		if(tempQueue != null)
+		{
+			tempQueue.add(new Event(eventInput));
+		}
+		else
+		{
+			System.out.println("BasicFBInstance: No even input " + eventInput);
+		}
 	}
 	
 	public void handleEvent()
@@ -133,7 +144,7 @@ public class BasicFBInstance extends FBInstance
 	public void finishedJob(Job theJob)
 	{
 		System.out.println("BasicFBInstance.finishedJob()");
-		updateVariables(theJob.getVariables());
+		setVariables(theJob.getVariables());
 		sendOutput();
 		handleState();
 	}
@@ -155,10 +166,6 @@ public class BasicFBInstance extends FBInstance
 		// get the data variables associated with this event and put the in variables attribute
 	}
 	
-	private void updateVariables(Variables vars)
-	{
-		variables = vars;
-	}
 
 	private ECState updateECC()
 	{

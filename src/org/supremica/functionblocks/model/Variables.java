@@ -52,14 +52,27 @@
 package org.supremica.functionblocks.model;
 
 import java.util.*;
+import java.util.Iterator;
 
 public class Variables
 {
 	
 	private Map variables = new HashMap();
 
+	private Map eventInputVariables = new HashMap();
+	private Map eventOutputVariables = new HashMap();
+	private Map dataInputVariables = new HashMap();
+	private Map dataOutputVariables = new HashMap();
+	private Map localVariables = new HashMap();
+
 	public Variable getVariable(String name)
 	{
+		if(!variables.keySet().contains(name))
+		{
+			System.out.println("Variables: no variable " + name + " in this instance");
+			System.out.println("\tContained Variables:" + toString());
+			System.exit(0);
+		}
 		return (Variable) variables.get(name);
 	}
 
@@ -84,5 +97,22 @@ public class Variables
 		}
 		return newVars;
 	}
-	
+
+	public String toString()
+	{
+		String thisVars = "[";
+		for(Iterator iter = variables.keySet().iterator();iter.hasNext();)
+		{
+			String curName = (String )iter.next();
+			if(iter.hasNext())
+			{
+				thisVars = thisVars + curName + " " + getVariable(curName).toString() + ",";
+			}
+			else
+			{
+				thisVars = thisVars + curName + " " + getVariable(curName).toString() + "]";
+			}
+		}
+		return thisVars;
+	}
 }

@@ -77,4 +77,9 @@ public class FloatVariable extends Variable
 		return new FloatVariable(getType(),getValue().floatValue());
 	}
 
+	public String toString()
+	{
+		return getType() + " " + value.toString();
+	}
+
 }

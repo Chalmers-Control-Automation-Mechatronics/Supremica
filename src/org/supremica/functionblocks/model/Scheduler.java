@@ -110,8 +110,7 @@ public class Scheduler
 			//System.out.println("all FB instances are busy handling an event!");
 			return null;
 		} 
-		
-		System.out.println("Scheduler.selectFBInstanceToHandleEvent(): found FB idle instance!");
+		System.out.println("Scheduler.selectFBInstanceToHandleEvent(): found idle FB instance!");
 		return resource.fbInstance;
 	}
 	

@@ -77,4 +77,9 @@ public class IntegerVariable extends Variable
 		return new IntegerVariable(getType(),getValue().intValue());
 	}
  
+	public String toString()
+	{
+		return getType() + " " + value.toString();
+	}
+
 }

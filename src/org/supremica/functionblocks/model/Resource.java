@@ -77,7 +77,7 @@ public class Resource
 		BasicFBType fbType = new BasicFBType("P1", this);
 
 		// only one event input and output for now
-		fbType.addVariable("OCCURED", new BooleanVariable("EventInput",false));
+		fbType.addVariable("OCURRED", new BooleanVariable("EventInput",false));
 		fbType.addVariable("DONE", new BooleanVariable("EventOutput",false));
 		fbType.addVariable("invoked", new IntegerVariable("Local",0));
 

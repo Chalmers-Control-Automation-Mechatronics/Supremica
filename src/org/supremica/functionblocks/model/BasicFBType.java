@@ -60,7 +60,9 @@ public class BasicFBType extends FBType
 {
 
 	private ECC theECC = new ECC();
-	//not needed private Map instances = new HashMap();
+
+	// needed to update all the instances when the type def is updated
+	private Map instances = new HashMap();
 
 	private Variables variables = new Variables();
 
@@ -82,21 +84,27 @@ public class BasicFBType extends FBType
 	{
 		System.out.println("BasicFBType.createInstace(" + name + ")");
 		BasicFBInstance newInstance = new BasicFBInstance(name,resource,this);
+
 		// construct the newInstance
-		//    copy all variables
+
+		//System.out.println("BasicFBType.createInstace(" + name + "): cloning variables");
+		newInstance.setVariables((Variables) variables.clone());
+
 		//    for all InputEvents make queueus
+
 		return newInstance;
 	}
 
 	public ECC getECC()
 	{
-		System.out.println("BasicFBType.getECC()");
+		//System.out.println("BasicFBType.getECC()");
 		return theECC;
 	}
 
 	public void addVariable(String name, Variable var)
 	{
 		variables.addVariable(name,var);
+		// update instances
 	}
 	
 }

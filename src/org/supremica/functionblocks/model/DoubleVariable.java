@@ -77,5 +77,10 @@ public class DoubleVariable extends Variable
 		return new DoubleVariable(getType(),getValue().doubleValue());
 	}
 
+	public String toString()
+	{
+		return getType() + " " + value.toString();
+	}
+
     
 }

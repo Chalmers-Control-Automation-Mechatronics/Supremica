@@ -78,5 +78,9 @@ public class BooleanVariable extends Variable
 		return new BooleanVariable(getType(),getValue().booleanValue());
 	}
 
+	public String toString()
+	{
+		return getType() + " " + value.toString();
+	}
 
 }

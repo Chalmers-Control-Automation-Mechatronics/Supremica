@@ -78,4 +78,9 @@ public class StringVariable extends Variable
 		return new StringVariable(getType(),getValue());
 	}
 
+	public String toString()
+	{
+		return getType() + " " + value;
+	}
+
 }
