@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.11 2005-03-03 12:52:54 flordal Exp $
+//# $Id: EditorSurface.java,v 1.12 2005-03-03 21:49:14 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -258,9 +258,11 @@ public class EditorSurface
 			showDragSelect(g);
 		}
 
-		Rectangle rect = getDrawnArea();
-		g.setColor(Color.PINK);
-		g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
+		/*
+		  Rectangle rect = getDrawnArea();
+		  g.setColor(Color.PINK);
+		  g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth(), (int) rect.getHeight());
+		*/ 
 	}
 
 	public static boolean isSimpleComponentProxy(Object o)
@@ -1199,7 +1201,6 @@ public class EditorSurface
 	{  
 		final double INCH = 72;
 		
-		int i;
         Graphics2D g2d;
 		
         // Validate the page number, we only print the first page
@@ -1207,15 +1208,33 @@ public class EditorSurface
 		{
 			g2d = (Graphics2D) g;
 
-			// Translate the origin to be (0,0)
+			// Translate the origin to be (0,0) at the margin
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
 			// This is the place to do rescaling if the figure won't fit on the page!
-			//g2d.scale(0.5, 0.5);
+			// The below is quick and dirty... getDrawnArea() is not correct for example.
+			Rectangle area = getDrawnArea();
+			double scaleX = pageFormat.getImageableWidth() / (area.getWidth() + 2*INCH);
+			double scaleY = pageFormat.getImageableHeight() / (area.getHeight() + 2*INCH);
+			double scale;
+			//System.err.println("x: " + scaleX + " y: " + scaleY);			
+			if (scaleX < scaleY)
+			{
+				scale = scaleX;
+			}
+			else
+			{
+				scale = scaleY;
+			}
+			if (scale < 1)
+			{
+				g2d.scale(scale, scale);
+			}
 
-			// Get the current figure
+			// Put the current figure into the Graphics object!
 			print(g);
 						
+			// OK to print!
 			return (PAGE_EXISTS);
         }
         else

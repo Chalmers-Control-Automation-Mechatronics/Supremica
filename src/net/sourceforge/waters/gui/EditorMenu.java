@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.8 2005-03-03 13:32:55 knut Exp $
+//# $Id: EditorMenu.java,v 1.9 2005-03-03 21:49:14 flordal Exp $
 //###########################################################################
 
 
@@ -176,8 +176,6 @@ public class EditorMenu
 		{
 			ControlledSurface surface = root.getControlledSurface();
 
-			System.err.println(surface.getDrawnArea());
-			
 			PrinterJob printJob = PrinterJob.getPrinterJob();
 			if (printJob.getPrintService() == null)
 			{
