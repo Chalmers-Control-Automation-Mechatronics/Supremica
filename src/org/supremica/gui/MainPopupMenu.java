@@ -147,6 +147,9 @@ class MainPopupMenu
 			JMenuItem extendItem = new JMenuItem("Extend");
 			menuHandler.add(extendItem, 1);
 
+			JMenuItem liftingItem = new JMenuItem("Compute lifting automaton");
+			menuHandler.add(liftingItem, 1);
+
 			JMenuItem removePassItem = new JMenuItem("Remove pass events");
 			menuHandler.add(removePassItem, 1);
 
@@ -164,6 +167,14 @@ class MainPopupMenu
 				public void actionPerformed(ActionEvent e)
 				{
 					ActionMan.automataExtend_actionPerformed(getGui());
+					getGui().repaint();
+				}
+			});
+			liftingItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.automataLifting_actionPerformed(getGui());
 					getGui().repaint();
 				}
 			});

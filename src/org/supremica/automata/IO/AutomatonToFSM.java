@@ -50,28 +50,26 @@ package org.supremica.automata.IO;
 
 import java.io.*;
 import java.util.*;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.Arc;
-import org.supremica.automata.ArcSet;
-import org.supremica.automata.ArcIterator;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
-import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.*;
 
 public class AutomatonToFSM
 	implements AutomataSerializer
 {
-	private Automaton aut;
+	protected Automaton aut;
+	protected Alphabet eventsNotOnTransitions;
 
 	public AutomatonToFSM(Automaton aut)
 	{
 		this.aut = aut;
+		eventsNotOnTransitions = new Alphabet(aut.getAlphabet());
 	}
 
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
-/*
+		//System.err.println("Org Alph size: " + aut.getAlphabet().size());
+		//System.err.println("New Alph size: " + eventsNotOnTransitions.size());
+
 		if (!aut.hasInitialState())
 		{
 			throw new IllegalStateException("The automaton does not have an initial state");
@@ -81,6 +79,7 @@ public class AutomatonToFSM
 		pw.println();
 
 		State initialState = aut.getInitialState();
+		// Print the initial state first
 		serializeState(pw, initialState);
 
 		for (Iterator states = aut.stateIterator(); states.hasNext(); )
@@ -90,8 +89,8 @@ public class AutomatonToFSM
 			if (state.isInitial())
 			{
 				if (state != initialState)
-				{
-					throw IllegalStateException("Initial states are not consistent");
+				{ // Check that we do not have multiple initial states
+					throw new IllegalStateException("Multiple initial states are not allowed");
 				}
 			}
 			else
@@ -101,90 +100,8 @@ public class AutomatonToFSM
 
 		}
 
-		for (int i = 0; i < initialStates.size(); i++)
-		{
-			String stateId = ((State) initialStates.elementAt(i)).getId();
+		serializeEventsNotOnTransitions(pw);
 
-			pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
-		}
-
-		//Alphabet theAlphabet = aut.getAlphabet();
-
-		for (Iterator states = aut.stateIterator(); states.hasNext(); )
-		{
-			State sourceState = (State) states.next();
-
-			pw.print("\t\"" + sourceState.getId() + "\" [label = \"");
-
-			if (withLabel)
-			{
-				pw.print(EncodingHelper.normalize(sourceState.getName()));
-			}
-
-			pw.println("\"" + getColor(sourceState) + "]; ");
-
-			for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
-			{
-				ArcSet currArcSet = (ArcSet) arcSets.next();
-				State fromState = currArcSet.getFromState();
-				State toState = currArcSet.getToState();
-
-				pw.print("\t\"" + fromState.getId() + "\" -> \"" + toState.getId());
-				pw.print("\" [ label = \"");
-
-				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
-				{
-					Arc currArc = (Arc) arcIt.next();
-					LabeledEvent thisEvent = currArc.getEvent(); // theAlphabet.getEventWithId(currArc.getEventId());
-
-					if (!thisEvent.isControllable())
-					{
-						pw.print("!");
-					}
-
-					if (!thisEvent.isPrioritized())
-					{
-						pw.print("?");
-					}
-
-					if (thisEvent.isImmediate())
-					{
-						pw.print("#");
-					}
-
-					if (thisEvent.isEpsilon())
-					{
-						pw.print("@");
-						// pw.print("\356" + "");  // ascii-epsilon
-					}
-
-					pw.print(EncodingHelper.normalize(thisEvent.getLabel()));
-
-					if (arcIt.hasNext())
-					{
-						pw.print("\\n");
-					}
-				}
-
-				pw.println("\" ];");
-			}
-		}
-
-		// An attemp to always start at the initial state.
-		// The problem is that a rectangle is drawn around the initial state.
-		// Ok, new versions of dot seems to be able to deal with this.
-		for (Iterator stateIt = initialStates.iterator(); stateIt.hasNext(); )
-		{
-		 	State currState = (State)stateIt.next();
-		 	pw.println("\t{ rank = min ;");
-		 	pw.println("\t\t" + initPrefix + currState.getId() + ";");
-		 	pw.println("\t\t" + currState.getId() + ";");
-		 	pw.println("\t}");
-		}
-
-		pw.println("}");
-
-*/
 		pw.flush();
 		pw.close();
 	}
@@ -198,13 +115,35 @@ public class AutomatonToFSM
 		for (ArcIterator arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
 		{
 		 	Arc currArc = arcIt.nextArc();
-		 	String label = currArc.getLabel();
 		 	State targetState = currArc.getToState();
-		 	pw.println(label + "\t" + targetState.getName());
+		 	LabeledEvent currEvent = currArc.getEvent();
+		 	String label = currEvent.getLabel();
+		 	pw.println(label + "\t" + targetState.getName() + "\t" + (currEvent.isControllable() ? "c" : "uc") + "\t" + (currEvent.isObservable() ? "o" : "uo") );
+			if (eventsNotOnTransitions.containsEventWithLabel(label))
+			{
+				eventsNotOnTransitions.removeEvent(label);
+			}
 		}
 
 		// Print empty line
 		pw.println();
+	}
+
+	protected void serializeEventsNotOnTransitions(PrintWriter pw)
+	{
+		if (eventsNotOnTransitions.size() > 0)
+		{
+			pw.println("EVENTS");
+
+			for (EventIterator evIt = eventsNotOnTransitions.iterator(); evIt.hasNext(); )
+			{
+				LabeledEvent currEvent = evIt.nextEvent();
+				pw.println(currEvent.getLabel() + "\t" + (currEvent.isControllable() ? "c" : "uc") + "\t" + (currEvent.isObservable() ? "o" : "uo") );
+
+			}
+			// Print empty line
+			pw.println();
+		}
 	}
 
 	public void serialize(String fileName)

@@ -619,7 +619,8 @@ public class ActionMan
 		FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3,
 		FORMAT_RCP = 4, FORMAT_SP = 5, FORMAT_HTML = 6,
 		FORMAT_XML_DEBUG = 7, FORMAT_DOT_DEBUG = 8, FORMAT_DSX_DEBUG = 9,
-		FORMAT_RCP_DEBUG = 10, FORMAT_SP_DEBUG = 11, FORMAT_HTML_DEBUG = 12;
+		FORMAT_RCP_DEBUG = 10, FORMAT_SP_DEBUG = 11, FORMAT_HTML_DEBUG = 12,
+		FORMAT_FSM = 13, FORMAT_FSM_DEBUG = 14;
 
 	// This class should really act as a factory for exporter objects, but that
 	// would mean rewriting the entire export/saveAs functionality. Should I bother?
@@ -632,10 +633,11 @@ public class ActionMan
 		private final String dsxString = "dsx";
 		private final String htmlString ="html";
 		private final String rcpString = "rcp";                         // ++ ARASH
+		private final String fsmString = "fsm";
 
 		private final Object[] possibleValues =
 		{
-			xmlString, spString, dotString, dsxString, htmlString, rcpString
+			xmlString, spString, dotString, dsxString, fsmString, htmlString, rcpString
 		};
 
 		private JOptionPane pane = null;
@@ -712,6 +714,14 @@ public class ActionMan
 				}
 				return FORMAT_DSX;	// Should return a DsxExporter object
 			}
+			else if (selectedValue == fsmString)
+			{
+				if(checkbox.isSelected())
+				{
+					return FORMAT_FSM_DEBUG;
+				}
+				return FORMAT_FSM;	// Should return a FsmExporter object
+			}
 			else if (selectedValue == rcpString)
 			{
 				if(checkbox.isSelected())
@@ -781,6 +791,15 @@ public class ActionMan
 			return;
 		}
 
+		if (exportMode == FORMAT_FSM_DEBUG || exportMode == FORMAT_FSM)
+		{ // UMDES cannot deal with forbidden states
+			if (selectedAutomata.hasForbiddenState())
+			{
+				JOptionPane.showMessageDialog(gui.getComponent(), "UMDES cannot handle forbidden states", "Alert", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+
 		/*
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
@@ -844,6 +863,24 @@ public class ActionMan
 			}
 			return;
 		}
+		if(exportMode == FORMAT_FSM_DEBUG)
+		{
+			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
+				TextFrame textframe = new TextFrame("FSM debug output");
+				try
+				{
+					exporter.serialize(textframe.getPrintWriter());
+				}
+				catch(Exception ex)
+				{
+					logger.debug(ex.getStackTrace());
+				}
+			}
+			return;
+		}
 		if(exportMode == FORMAT_RCP_DEBUG)
 		{
 			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -881,7 +918,7 @@ public class ActionMan
 			return;
 		}
 */
-		if (exportMode == FORMAT_DOT || exportMode == FORMAT_DSX || exportMode == FORMAT_RCP)
+		if (exportMode == FORMAT_DOT || exportMode == FORMAT_DSX || exportMode == FORMAT_FSM || exportMode == FORMAT_RCP)
 		{
 			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 			{
@@ -963,6 +1000,10 @@ public class ActionMan
 		{
 			fileExporter = FileDialogs.getExportFileChooser(FileFormats.DSX);
 		}
+		else if (exportMode == FORMAT_FSM)
+		{
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
+		}
 		else if (exportMode == FORMAT_RCP)
 		{
 			fileExporter = FileDialogs.getExportFileChooser(FileFormats.RCP);
@@ -1008,6 +1049,12 @@ public class ActionMan
 						else if (exportMode == FORMAT_DSX)
 						{
 							AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
+
+							exporter.serialize(currFile.getAbsolutePath());
+						}
+						else if (exportMode == FORMAT_FSM)
+						{
+							AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
 
 							exporter.serialize(currFile.getAbsolutePath());
 						}
@@ -1095,6 +1142,33 @@ public class ActionMan
 				logger.debug(ex.getStackTrace());
 			}
 		}
+	}
+
+	// ** Lifting according to the computer human theory
+	public static void automataLifting_actionPerformed(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		{
+			return;
+		}
+
+		int k = getIntegerInDialogWindow("Select k", gui.getComponent());
+
+		ComputerHumanExtender extender = new ComputerHumanExtender(selectedAutomata, k);
+
+		try
+		{
+			extender.execute();
+			Automaton newAutomaton = extender.getNewAutomaton();
+			gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error in ComputerHumanExtender");
+			logger.debug(ex.getStackTrace());
+		}
+
 	}
 
 	// ** Purge
@@ -1867,11 +1941,11 @@ public class ActionMan
 				msg.append("It is not recommended to display an automaton with more than ");
 				msg.append(maxNbrOfStates + " states.\n" + "Do you want to abort viewing?");
 				*/
-				
-				String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() + 
-					" states. It is not recommended to display an automaton with more than " + 
+
+				String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() +
+					" states. It is not recommended to display an automaton with more than " +
 					maxNbrOfStates + " states. Do you want to abort viewing?";
-					
+
 				msg = EncodingHelper.linebreakAdjust(msg);
 
 				int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);

@@ -373,7 +373,7 @@ public class Automata
 
 	/**
 	 * Returns true if each automaton has at least one accepting state
-	 * Of course, this is no guarantee that the composition will have 
+	 * Of course, this is no guarantee that the composition will have
 	 * an accepting state.
 	 */
 	public boolean hasAcceptingState()
@@ -390,7 +390,23 @@ public class Automata
 		return true;
 	}
 
-	
+	/**
+	 * Returns true if any of the automata has a forbidden state.
+	 */
+	public boolean hasForbiddenState()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+
+			if(automaton.nbrOfForbiddenStates() > 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Returns name of first automaton found that has no accepting states. Returns null
 	 * if all automata have at least one accepting state.
@@ -1012,7 +1028,7 @@ public class Automata
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, 
+	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial,
 											   boolean mustHaveValidType)
 	{
 		if (mustHaveInitial)
@@ -1030,15 +1046,15 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton " + currAutomaton + 
+						String message = "The automaton " + currAutomaton +
 							" does not have an initial state.\n" +
 							"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
-																JOptionPane.OK_CANCEL_OPTION, 
-																JOptionPane.WARNING_MESSAGE, null, 
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																JOptionPane.OK_CANCEL_OPTION,
+																JOptionPane.WARNING_MESSAGE, null,
 																options, options[1]);
-						
+
 						if(cont == JOptionPane.OK_OPTION)
 						{   // Skip
 							// Unselect the automaton
@@ -1078,23 +1094,23 @@ public class Automata
 							" is of type 'Undefined'.\n" +
 							"Please specify a type.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
-																JOptionPane.OK_OPTION, 
-																JOptionPane.WARNING_MESSAGE, null, 
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																JOptionPane.OK_OPTION,
+																JOptionPane.WARNING_MESSAGE, null,
 																options, options[0]);
-						
+
 						return false;
-						
+
 						/*
 						String message = "The automaton " + currAutomaton. +
 						    " is of type 'Undefined'.\n" +
 							"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
-																JOptionPane.OK_CANCEL_OPTION, 
-																JOptionPane.WARNING_MESSAGE, null, 
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																JOptionPane.OK_CANCEL_OPTION,
+																JOptionPane.WARNING_MESSAGE, null,
 																options, options[1]);
-						
+
 						if(cont == JOptionPane.OK_OPTION)
 						{   // Skip
 							// Unselect the automaton

@@ -106,12 +106,13 @@ public class EventHelpers
 
 		// Some initializations
 // This function (createEvent) is only used by AlphabetHelpers::getUnionAlphabet
-// That function (getUnionAlphabet) manages the id by itself, so avoiding id-fddlng here would seem to be safe 
+// That function (getUnionAlphabet) manages the id by itself, so avoiding id-fddlng here would seem to be safe
 //		String id = tmpEvent.getId();
 
 		String label = tmpEvent.getLabel();
 		boolean controllable = tmpEvent.isControllable();
 		boolean prioritized = tmpEvent.isPrioritized();
+		boolean operator = tmpEvent.isOperator();
 		boolean immediate = tmpEvent.isImmediate();
 
 		while (eventIt.hasNext())
@@ -137,6 +138,13 @@ public class EventHelpers
 				throw new Exception(errorMsg);
 			}
 
+			if (operator != tmpEvent.isOperator())
+			{
+				String errorMsg = "Operator of an event must be the same in all automata. Operator of " + label + " is not consistent.";
+
+				throw new Exception(errorMsg);
+			}
+
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 
@@ -148,6 +156,7 @@ public class EventHelpers
 		theEvent.setControllable(controllable);
 		theEvent.setPrioritized(prioritized);
 		theEvent.setImmediate(immediate);
+		theEvent.setOperator(operator);
 
 		return theEvent;
 	}

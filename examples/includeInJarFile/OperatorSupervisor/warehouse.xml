@@ -108,26 +108,26 @@
 </Automaton>
 <Automaton name="truck" type="Plant">
 	<Events>
-		<Event id="0" label="truck00" controllable="false"/>
-		<Event id="1" label="truck03" controllable="false"/>
-		<Event id="2" label="truck06" controllable="false"/>
-		<Event id="3" label="truck10" controllable="false"/>
-		<Event id="4" label="truck11" controllable="false"/>
-		<Event id="5" label="truck12" controllable="false"/>
-		<Event id="6" label="truck14" controllable="false"/>
-		<Event id="7" label="truck15" controllable="false"/>
-		<Event id="8" label="truck16" controllable="false"/>
-		<Event id="9" label="truck20" controllable="false"/>
-		<Event id="10" label="truck21" controllable="false"/>
-		<Event id="11" label="truck22" controllable="false"/>
-		<Event id="12" label="truck24" controllable="false"/>
-		<Event id="13" label="truck25" controllable="false"/>
-		<Event id="14" label="truck30" controllable="false"/>
-		<Event id="15" label="truck31" controllable="false"/>
-		<Event id="16" label="truck32" controllable="false"/>
-		<Event id="17" label="truck34" controllable="false"/>
-		<Event id="18" label="truck35" controllable="false"/>
-		<Event id="19" label="truck36" controllable="false"/>
+		<Event id="0" label="truck00" controllable="false" operator="true"/>
+		<Event id="1" label="truck03" controllable="false" operator="true"/>
+		<Event id="2" label="truck06" controllable="false" operator="true"/>
+		<Event id="3" label="truck10" controllable="false" operator="true"/>
+		<Event id="4" label="truck11" controllable="false" operator="true"/>
+		<Event id="5" label="truck12" controllable="false" operator="true"/>
+		<Event id="6" label="truck14" controllable="false" operator="true"/>
+		<Event id="7" label="truck15" controllable="false" operator="true"/>
+		<Event id="8" label="truck16" controllable="false" operator="true"/>
+		<Event id="9" label="truck20" controllable="false" operator="true"/>
+		<Event id="10" label="truck21" controllable="false" operator="true"/>
+		<Event id="11" label="truck22" controllable="false" operator="true"/>
+		<Event id="12" label="truck24" controllable="false" operator="true"/>
+		<Event id="13" label="truck25" controllable="false" operator="true"/>
+		<Event id="14" label="truck30" controllable="false" operator="true"/>
+		<Event id="15" label="truck31" controllable="false" operator="true"/>
+		<Event id="16" label="truck32" controllable="false" operator="true"/>
+		<Event id="17" label="truck34" controllable="false" operator="true"/>
+		<Event id="18" label="truck35" controllable="false" operator="true"/>
+		<Event id="19" label="truck36" controllable="false" operator="true"/>
 	</Events>
 	<States>
 		<State id="0" name="00"/>
