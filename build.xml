@@ -138,9 +138,9 @@
 	<delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
 	<copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>	
 	<replace file="${src}/${supremica_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
-	<delete quiet="true" file="${dist}/SupremicaVersion.cfg"/>
-	<copy file="${templates}/SupremicaVersion.cfg" tofile="${dist}/SupremicaVersion.cfg"/>	
-	<replace file="${dist}/SupremicaVersion.cfg" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
+	<delete quiet="true" file="${dist}/SupremicaVersion.txt"/>
+	<copy file="${templates}/SupremicaVersion.txt" tofile="${dist}/SupremicaVersion.txt"/>	
+	<replace file="${dist}/SupremicaVersion.txt" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
 </target>
 
 <!-- Compile:
@@ -293,7 +293,12 @@
 
 <target name="jar_supremica">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
-		<fileset dir="${build}"/>
+		<fileset dir="${build}">
+			<patternset>
+				<include name="**/*"/>
+				<exclude name="org/supremica/apps/SupremicaTeacher.class"/>
+			</patternset>			
+		</fileset>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>		
@@ -322,16 +327,7 @@
 
 <target name="jar_supremica_teacher">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
-		<fileset dir="${build}">
-			<patternset>
-				<include name="**/*"/>
-				<exclude name="org/supremica/apps/Supremica.class"/>
-				<exclude name="org/supremica/apps/SupremicaApplet.class"/>
-				<exclude name="org/supremica/apps/SupremicaStudent.class"/>
-				<exclude name="org/supremica/apps/SupremicaClient.class"/>
-				<exclude name="org/supremica/apps/SupremicaServer.class"/>
-			</patternset>			
-		</fileset>
+		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
 		<fileset dir="${examples}"/>
 		<fileset dir="${animations}"/>			
