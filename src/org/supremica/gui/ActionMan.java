@@ -1324,7 +1324,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}

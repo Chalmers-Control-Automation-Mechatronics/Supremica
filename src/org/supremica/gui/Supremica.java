@@ -423,6 +423,8 @@ public class Supremica
 	/**
 	 * This is a deprecated method, use getSelectedAutomata instead.
 	 *
+	 * THIS METHOD IS USED BY (AT LEAST) ActionMan AND AutomataVerificationWorker!!!
+	 *
 	 *@return  The selectedAutomataAsCollection value
 	 */
 	public Collection getSelectedAutomataAsCollection()

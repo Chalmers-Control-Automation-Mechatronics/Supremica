@@ -240,6 +240,23 @@ public class AutomataVerifier
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
 				}
 			}
+			else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+			{
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+				{
+					// Language inclusion is performed as a controllability verification!
+					return monolithicControllabilityVerification();
+				}
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				{
+					// Language inclusion is performed as a controllability verification!
+					return modularControllabilityVerification();
+				}
+				else
+				{
+					throw new UnsupportedOperationException("The selected algorithm is not implemented");
+				}
+			}
 			else
 			{
 				throw new UnsupportedOperationException("The selected type of verification is not implemented");
