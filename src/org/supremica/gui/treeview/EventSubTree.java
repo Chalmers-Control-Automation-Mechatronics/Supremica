@@ -1,5 +1,5 @@
 /******************** EventSubTree.java *******************/
-// An EventSubTree is a tree node with the event name as root 
+// An EventSubTree is a tree node with the event name as root
 // and the event properties as children
 
 package org.supremica.gui.treeview;
@@ -31,18 +31,24 @@ public class EventSubTree
 
 		SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
 		add(currPrioritizedNode);
-		
+
+		SupremicaTreeNode currObservableNode = new SupremicaTreeNode("observable: " + event.isObservable());
+		add(currObservableNode);
+
+		SupremicaTreeNode currOperatorNode = new SupremicaTreeNode("operator: " + event.isOperator());
+		add(currOperatorNode);
+
 		SupremicaTreeNode isEpsilonNode = new SupremicaTreeNode("epsilon: " + event.isEpsilon());
 		add(isEpsilonNode);
 	}
-	
+
 	// Change this to reflect the correct number of children/properties/leaves
-	// Could this be calculated from sizeof(LabeledEvent)? It should not. 
+	// Could this be calculated from sizeof(LabeledEvent)? It should not.
 	// This depends only on the above construction
 	public int numDirectLeafs()
 	{
-		return 3;
+		return 4;
 	}
-	
+
 }
-	
+

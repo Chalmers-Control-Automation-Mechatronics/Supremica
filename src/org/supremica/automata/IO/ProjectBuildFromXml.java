@@ -82,6 +82,8 @@ public class ProjectBuildFromXml
 	private final static String labelStr = "label";
 	private final static String controllableStr = "controllable";
 	private final static String prioritizedStr = "prioritized";
+	private final static String observableStr = "observable";
+	private final static String operatorStr = "operator";
 	private final static String immediateStr = "immediate";
 	private final static String epsilonStr = "epsilon";
 	private final static String owner = "owner";
@@ -411,6 +413,8 @@ public class ProjectBuildFromXml
 		String label = null;
 		boolean controllable = true;
 		boolean prioritized = true;
+		boolean observable = true;
+		boolean operator = false;
 		boolean immediate = false;
 		boolean epsilon = false;
 		int length = attributes.getLength();
@@ -435,6 +439,14 @@ public class ProjectBuildFromXml
 			else if (prioritizedStr.equals(currName))
 			{
 				prioritized = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
+			}
+			else if (observableStr.equals(currName))
+			{
+				observable = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
+			}
+			else if (operatorStr.equals(currName))
+			{
+				operator = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
 			}
 			else if (immediateStr.equals(currName))
 			{
@@ -461,6 +473,8 @@ public class ProjectBuildFromXml
 //		currEvent.setLabel(label);
 		currEvent.setControllable(controllable);
 		currEvent.setPrioritized(prioritized);
+		currEvent.setObservable(observable);
+		currEvent.setOperator(operator);
 		currEvent.setImmediate(immediate);
 		currEvent.setEpsilon(epsilon);
 
@@ -538,7 +552,7 @@ public class ProjectBuildFromXml
 		currState.setAccepting(accepting);
 		currState.setForbidden(forbidden);
 		currState.setCost(cost);
-		
+
 		// Associate the id with the state
 		idStateMap.put(id, currState);
 

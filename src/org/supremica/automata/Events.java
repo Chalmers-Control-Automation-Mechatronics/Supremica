@@ -150,9 +150,9 @@ public class Events
 	{
 		theEvents.put(ev.getLabel(), ev);
 	}
-	
+
 	/**
-	 * Adds all events in another Events to this Events. 
+	 * Adds all events in another Events to this Events.
 	 * Makes sure they are not already included!
 	 */
 	public void addEvents(Events otherEvents)
@@ -262,6 +262,20 @@ public class Events
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
 			if (currEvent.isControllable())
+			{
+				nbrOfFoundEvents++;
+			}
+		}
+		return nbrOfFoundEvents;
+	}
+
+	public int nbrOfObservableEvents()
+	{
+		int nbrOfFoundEvents = 0;
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			if (currEvent.isObservable())
 			{
 				nbrOfFoundEvents++;
 			}

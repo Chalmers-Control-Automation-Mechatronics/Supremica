@@ -79,6 +79,7 @@ public class FileFormats
 	public static final FileFormats NQC = new FileFormats(false, true, "NQC", ".nqc", "Mindstorm NQC files (*.nqc)");
 	public static final FileFormats C = new FileFormats(false, true, "C", ".c", "C files (*.c)");
 	public static final FileFormats SMV = new FileFormats(false, true, "SMV", ".smv", "SMV files (*.smv)");
+	public static final FileFormats FSM = new FileFormats(false, true, "FSM", ".fsm", "UMDES files (*.fsm)");
 
 
 	// Input only

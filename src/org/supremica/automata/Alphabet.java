@@ -269,7 +269,7 @@ public class Alphabet
 		for (Iterator alphIt = this.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			
+
 			if(!other.containsEventWithLabel(currEvent.getLabel()))
 			{
 				removeList.add(currEvent);
@@ -296,7 +296,7 @@ public class Alphabet
 			removeEvent(currEvent);
 		}
 	}
-	
+
 	/**
 	 * Computes and returns "A intersection B"
 	 */
@@ -308,7 +308,7 @@ public class Alphabet
 
 		/*
 		Alphabet result = new Alphabet();
-		
+
 		for (Iterator alphIt = a2.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
@@ -324,7 +324,7 @@ public class Alphabet
 					logger.error("Alphabet.intersect. Trying to add an existing event. " + ex);
 					logger.debug(ex.getStackTrace());
 				}
-			}			
+			}
 		}
 		return result;
 		*/
@@ -501,6 +501,11 @@ public class Alphabet
 			//System.err.println("equalAlphabet::non equal nbr of prioritized events");
 			return false;
 		}
+		if (nbrOfObservableEvents() != other.nbrOfObservableEvents())
+		{
+			//System.err.println("equalAlphabet::non equal nbr of prioritized events");
+			return false;
+		}
 		if (nbrOfImmediateEvents() != other.nbrOfImmediateEvents())
 		{
 			//System.err.println("equalAlphabet::non equal nbr of immediate events");
@@ -573,13 +578,13 @@ public class Alphabet
 		while (eventIterator.hasNext())
 		{
 			currEvent = eventIterator.nextEvent();
-			
+
 			if (otherAlphabet.containsEventWithLabel(currEvent.getLabel()))
 			{
 				nbrOfCommon++;
 			}
 		}
-		
+
 		return nbrOfCommon;
 	}
 

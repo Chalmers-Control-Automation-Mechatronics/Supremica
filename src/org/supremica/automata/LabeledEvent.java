@@ -62,6 +62,8 @@ public class LabeledEvent
 
 	private boolean controllable = true;
 	private boolean prioritized = true;
+	private boolean observable = true;
+	private boolean operator = false;
 	private boolean immediate = false;
 	private boolean epsilon = false;
 	private int expansionPriority = -1;
@@ -91,6 +93,8 @@ public class LabeledEvent
 		label = e.label;
 		controllable = e.controllable;
 		prioritized = e.prioritized;
+		observable = e.observable;
+		operator = e.operator;
 		immediate = e.immediate;
 		epsilon = e.epsilon;
 		synchIndex = e.synchIndex;
@@ -143,6 +147,26 @@ public class LabeledEvent
 	public void setControllable(boolean controllable)
 	{
 		this.controllable = controllable;
+	}
+
+	public boolean isObservable()
+	{
+		return observable;
+	}
+
+	public void setObservable(boolean observable)
+	{
+		this.observable = observable;
+	}
+
+	public boolean isOperator()
+	{
+		return operator;
+	}
+
+	public void setOperator(boolean operator)
+	{
+		this.operator = operator;
 	}
 
 	public boolean isImmediate()

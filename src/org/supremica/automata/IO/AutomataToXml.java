@@ -149,6 +149,16 @@ public class AutomataToXml
 					pw.print(" prioritized=\"false\"");
 				}
 
+				if (!event.isObservable())
+				{
+					pw.print(" observable=\"false\"");
+				}
+
+				if (event.isOperator())
+				{
+					pw.print(" operator=\"true\"");
+				}
+
 				if (event.isImmediate())
 				{
 					pw.print(" immediate=\"true\"");
