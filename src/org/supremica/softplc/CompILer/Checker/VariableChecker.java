@@ -264,8 +264,7 @@ public class VariableChecker implements SimpleNodeVisitor {
 		/* Skapa referens till function_block_body */
 		greatParent = parent.jjtGetParent();
 
-		fb_
-name = ((ASTfb_name)(((ASTil_fb_call)parent).getChildren())[1]).getName();
+		fb_name = ((ASTfb_name)(((ASTil_fb_call)parent).getChildren())[1]).getName();
 
 		/* il_fb_call's index i function_block_body's barn
            (il_fb_call är il_param_list's förälder)          */
