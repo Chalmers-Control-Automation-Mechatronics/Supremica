@@ -52,7 +52,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.automata.algorithms.*;
 import org.supremica.automata.IO.*;
 import org.supremica.testhelpers.*;
 
