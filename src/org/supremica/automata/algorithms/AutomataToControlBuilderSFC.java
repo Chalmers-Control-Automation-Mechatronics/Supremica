@@ -93,7 +93,7 @@ public class AutomataToControlBuilderSFC
 	{    // Empty
 	}
 
-	public void serializeApp(File theFile)
+	public void serializeApp(File theFile, String filename)
 	{
 		try
 		{
@@ -101,7 +101,7 @@ public class AutomataToControlBuilderSFC
 			PrintWriter thePrintWriter = new PrintWriter(theWriter);
 			String theFileName = theFile.getName();
 			fileName = theFileName.substring(0, theFileName.length() - 4);
-			serializeApp(thePrintWriter);
+			serializeApp(thePrintWriter, filename);
 			thePrintWriter.close();
 		}
 		catch (Exception ex)
@@ -110,7 +110,7 @@ public class AutomataToControlBuilderSFC
 		}
 	}
 
-	public void serializeApp(PrintWriter pw)
+	public void serializeApp(PrintWriter pw, String filename)
 	{
 
 		// Start of file header
@@ -128,7 +128,7 @@ public class AutomataToControlBuilderSFC
 
 		// End of file header
 		// Start of Program invocation
-		pw.println(fileName);
+		pw.println(filename);
 		pw.println("Invocation ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 )");
 		pw.println(": ROOT_MODULE");
 		// Use generic Program1 for now
@@ -234,24 +234,25 @@ public class AutomataToControlBuilderSFC
 
 	}
 
-	public void serializePrj(File theFile)
+	public void serializePrj(File theFile, String filename)
 		throws Exception
 	{
 		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
-		serializePrj(theWriter);
+		serializePrj(theWriter, filename);
+		theWriter.close();
 	}
 
-	public void serializePrj(PrintWriter pw)
+	public void serializePrj(PrintWriter pw, String filename)
 	{
 		pw.println("'2002-01-11-16:24:38.775'");
 		pw.println("Header");
 		pw.println(" ( SyntaxVersion '3.0'");
 		pw.println("   SavedDate '2002-01-11-16:47:35.825'");
 		pw.println("   ChangedDate '2002-01-11-16:24:38.775'");
-		pw.println("   FileName '" + fileName + "'\n\n  )");
+		pw.println("   FileName '" + filename + "'\n\n  )");
 		pw.println("FileUnits");
 		pw.println(" ( Application");
-		pw.println("    ( Name '" + fileName + "'");
+		pw.println("    ( Name '" + filename + "'");
 		pw.println("      Directory '' ) )");
 		pw.println("ControlSystem");
 		pw.println(" ( Name\n Directory '' )");

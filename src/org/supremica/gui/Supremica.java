@@ -845,17 +845,16 @@ public class Supremica
 			}
 		});
 
-		JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
 
-		menuToolsCodeGenerationBC.setText("Java Bytecode...");
-		menuToolsCodeGenerationBC.setEnabled(false);
-		menuToolsCodeGeneration.add(menuToolsCodeGenerationBC);
-		menuToolsCodeGenerationBC.addActionListener(new ActionListener()
+		JMenuItem menuToolsCodeGenerationControlBuilderSFC = new JMenuItem();
+
+		menuToolsCodeGenerationControlBuilderSFC.setText("ABB Control Builder Sequential Function Chart...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderSFC);
+		menuToolsCodeGenerationControlBuilderSFC.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-
-				//ActionMan.AutomataToJavaBytecode(getGui());
+				ActionMan.AutomataToControlBuilderSFC(getGui());
 			}
 		});
 
@@ -871,18 +870,19 @@ public class Supremica
 			}
 		});
 
-		JMenuItem menuToolsCodeGenerationControlBuilderSFC = new JMenuItem();
+		JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
 
-		menuToolsCodeGenerationControlBuilderSFC.setText("ABB Control Builder Sequential Function Chart...");
-		menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderSFC);
-		menuToolsCodeGenerationControlBuilderSFC.addActionListener(new ActionListener()
+		menuToolsCodeGenerationBC.setText("Java Bytecode...");
+		menuToolsCodeGenerationBC.setEnabled(false);
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationBC);
+		menuToolsCodeGenerationBC.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				ActionMan.AutomataToControlBuilderSFC(getGui());
+
+				//ActionMan.AutomataToJavaBytecode(getGui());
 			}
 		});
-
 
 		// Configure
 		JMenu menuConfigure = new JMenu();

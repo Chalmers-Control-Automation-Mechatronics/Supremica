@@ -1810,9 +1810,11 @@ public class ActionMan
 				{
 					String pathName = currFile.getAbsolutePath();
 					String prefixName = null;
+					String filename = currFile.getName();
 					if (pathName.endsWith(".prj"))
 					{
 						prefixName = pathName.substring(0, pathName.length() - 4);
+						filename = filename.substring(0, filename.length() - 4);
 					}
 					else
 					{
@@ -1824,17 +1826,17 @@ public class ActionMan
 					{
 						AutomataToControlBuilderSFC exporter = new AutomataToControlBuilderSFC(selectedAutomata);
 
-						exporter.serializeApp(appFile);
-						exporter.serializePrj(prjFile);
+						exporter.serializeApp(appFile, filename);
+						exporter.serializePrj(prjFile, filename);
 
 					}
 					catch (Exception ex)
 					{
 						ex.printStackTrace();
-						gui.error("Exception while generating ControlBuilder code to files " + prefixName + "{\".prj\", \".app\"}");
+						gui.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
 						return;
 					}
-					logger.info("ControlBuilder SFC files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
+					logger.info("ABB Control Builder SFC files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
 				}
 			}
 		}
