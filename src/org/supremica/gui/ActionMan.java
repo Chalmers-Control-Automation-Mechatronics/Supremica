@@ -438,6 +438,7 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
+				ex.printStackTrace();
 				gui.error("Exception while removing " + currAutomatonName);
 			}
 		}

@@ -143,7 +143,7 @@ public class SimulatorExecuter
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);
-		theProject.getListeners().addListener(this);
+		//theProject.getListeners().addListener(this);
 		setBackground(Color.white);
 
 		contentPane = (JPanel) getContentPane();
