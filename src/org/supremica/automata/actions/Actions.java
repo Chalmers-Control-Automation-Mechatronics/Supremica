@@ -47,9 +47,15 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.automata;
+package org.supremica.automata.actions;
 
-public interface BooleanActions
-	extends Actions
+public interface Actions
 {
+	public String getType();
+	public String getDescription();
+
+	public boolean isValid();
+	public String getErrorMessage();
+
+	public String serialize();
 }

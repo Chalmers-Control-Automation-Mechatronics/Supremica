@@ -46,84 +46,87 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.gui.editor;
 
+
+
 import java.util.*;
+
 import com.nwoods.jgo.*;
+
 import java.awt.Rectangle;
 
 import org.supremica.automata.*;
 
-public class Labels
-	extends JGoArea
-{
-	private ArcSet theArcSet = null;
-	private AutomatonDocument doc = null;
+public class Labels extends JGoArea {
 
-	public Labels(AutomatonDocument doc, ArcSet theArcSet)
-		throws Exception
-	{
-		this.doc = doc;
-		this.theArcSet = theArcSet;
-		updateArcs();
-	}
+    private ArcSet            theArcSet = null;
+    private AutomatonDocument doc       = null;
 
-	public void initialize()
-	{
-		setSelectable(true);
-		setDraggable(true);
-		setResizable(true);
-	}
+    public Labels(AutomatonDocument doc, ArcSet theArcSet) throws Exception {
 
+        this.doc       = doc;
+        this.theArcSet = theArcSet;
 
-	public void updateArcs()
-		throws Exception
-	{
-		Automaton theAutomaton = doc.getAutomaton();
-		Alphabet theAlphabet = theAutomaton.getAlphabet();
-		for (Iterator arcIt = theArcSet.iterator(); arcIt.hasNext();)
-		{
-			Arc currArc = (Arc)arcIt.next();
-			String eventId = currArc.getEventId();
-			Event currEvent = theAlphabet.getEventWithId(eventId);
-			JGoText theText = new JGoText(currEvent.getLabel());
-			addObjectAtTail(theText);
-		}
-	
-	}
+        updateArcs();
+    }
 
-	public void geometryChange(Rectangle rect)
-	{
-		super.geometryChange(rect);
-		layoutChildren();
-	}
+    public void initialize() {
 
-	public void layoutChildren()
-	{
-		// System.err.println("layoutChildren");
-		int top = getTop();
-		int left = getLeft();
-		JGoText prevText = null;
-		int i = 0;
-		for (JGoListPosition pos = getFirstObjectPos(); pos != null; pos = getNextObjectPos(pos))
-		{
-			// System.out.println("layout: " + i);
-			JGoText theText = (JGoText)getObjectAtPos(pos);
-			theText.setSpotLocation(Center, left, top + 15*i);
-			i++;
+        setSelectable(true);
+        setDraggable(true);
+        setResizable(true);
+    }
 
-			/*
-			if (prevText != null)
-			{
-				theText.setSpotLocation(TopLeft, prevText, BottomLeft);
-			}
-			else
-			{
-				theText.setSpotLocation(TopLeft, getSpotLocation(TopLeft));
-			}*/
-			prevText = theText;
-		}
-	}
+    public void updateArcs() throws Exception {
 
+        Automaton theAutomaton = doc.getAutomaton();
+        Alphabet  theAlphabet  = theAutomaton.getAlphabet();
+
+        for (Iterator arcIt = theArcSet.iterator(); arcIt.hasNext(); ) {
+            Arc     currArc   = (Arc) arcIt.next();
+            String  eventId   = currArc.getEventId();
+            Event   currEvent = theAlphabet.getEventWithId(eventId);
+            JGoText theText   = new JGoText(currEvent.getLabel());
+
+            addObjectAtTail(theText);
+        }
+    }
+
+    public void geometryChange(Rectangle rect) {
+        super.geometryChange(rect);
+        layoutChildren();
+    }
+
+    public void layoutChildren() {
+
+        // System.err.println("layoutChildren");
+        int     top      = getTop();
+        int     left     = getLeft();
+        JGoText prevText = null;
+        int     i        = 0;
+
+        for (JGoListPosition pos = getFirstObjectPos(); pos != null;
+                pos = getNextObjectPos(pos)) {
+
+            // System.out.println("layout: " + i);
+            JGoText theText = (JGoText) getObjectAtPos(pos);
+
+            theText.setSpotLocation(Center, left, top + 15 * i);
+
+            i++;
+
+            /*
+            if (prevText != null)
+            {
+                    theText.setSpotLocation(TopLeft, prevText, BottomLeft);
+            }
+            else
+            {
+                    theText.setSpotLocation(TopLeft, getSpotLocation(TopLeft));
+            }*/
+            prevText = theText;
+        }
+    }
 }
+

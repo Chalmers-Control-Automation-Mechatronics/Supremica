@@ -47,11 +47,34 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.automata;
+package org.supremica.automata.actions;
 
-public interface Actions
+public class IEC1131ILActions
+	implements Actions
 {
-	public void setOwner(Object theOwner);
+	public String getType()
+	{
+		return "IEC 61331-1 IL";
+	}
 
-	public void run();
+	public String getDescription()
+	{
+		return "Instruction list (IL) actions as defined in IEC 61131-3.";
+	}
+
+	public boolean isValid()
+	{
+		return true;
+	}
+
+	public String getErrorMessage()
+	{
+		return "";
+	}
+
+	public String serialize()
+	{
+		return "";
+	}
+
 }
