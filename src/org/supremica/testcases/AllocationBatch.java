@@ -6,7 +6,7 @@ public class AllocationBatch
 {
 	public AllocationBatch(String filename) {}
 
-	public Automata getAutomata()
+	public Project getProject()
 	{
 		return null;
 	}

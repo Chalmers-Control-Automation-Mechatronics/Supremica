@@ -76,9 +76,10 @@ import org.supremica.automata.LabeledEvent;
 public final class AutomataSynchronizerExecuter
 	extends Thread
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerExecuter.class);
+
 	private final AutomataSynchronizerHelper helper;
 	private final AutomataIndexForm indexForm;
-	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerExecuter.class);
 	private final int nbrOfAutomata;
 	private final int nbrOfEvents;
 	private final int[][][] nextStateTable;

@@ -146,7 +146,7 @@ public final class SupremicaProperties
 		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
-		setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
+		setProperty(GENERAL_INCLUDE_ANIMATIONS, "true", true);
 		setProperty(GENERAL_USE_RCP, "false", true);
 		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);

@@ -163,6 +163,11 @@ public class ConsoleUI
 
 	}
 
+	public int addProject(Project theProject)
+	{ // Implement this
+		return 0;
+	}
+
 	public Project getSelectedProject()
 	{ // Implement this
 		return null;

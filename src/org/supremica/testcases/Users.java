@@ -4,7 +4,7 @@ package org.supremica.testcases;
 
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
@@ -147,7 +147,7 @@ class Mutex
 
 public class Users
 {
-	Automata automata = new Automata();
+	Project project = new Project();
 
 	public Users(int num_users, boolean a, boolean b, boolean c)
 		throws Exception
@@ -156,7 +156,7 @@ public class Users
 		// first generate the users - numbered 1...n
 		for (int i = 0; i < num_users; ++i)
 		{
-			automata.addAutomaton(new User(i + 1, a, b, c));
+			project.addAutomaton(new User(i + 1, a, b, c));
 		}
 
 		// Next go for the fifo specs - 2-by-2 for all combinations
@@ -164,7 +164,7 @@ public class Users
 		{
 			for (int j = i + 1; j < num_users; ++j)
 			{
-				automata.addAutomaton(new Fifo(i + 1, j + 1, a, b, c));
+				project.addAutomaton(new Fifo(i + 1, j + 1, a, b, c));
 			}
 		}
 
@@ -173,13 +173,13 @@ public class Users
 		{
 			for (int j = i + 1; j < num_users; ++j)
 			{
-				automata.addAutomaton(new Mutex(i + 1, j + 1, a, b, c));
+				project.addAutomaton(new Mutex(i + 1, j + 1, a, b, c));
 			}
 		}
 	}
 
-	public Automata getAutomata()
+	public Project getProject()
 	{
-		return automata;
+		return project;
 	}
 }

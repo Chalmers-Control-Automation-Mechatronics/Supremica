@@ -141,6 +141,24 @@ public class Project
 		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
 	}
 
+	public void clearActions()
+	{
+		if (theActions != null)
+		{
+			theActions.clear();
+			notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+		}
+	}
+
+	public void clearControls()
+	{
+		if (theControls != null)
+		{
+			theControls.clear();
+			notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+		}
+	}
+
 	public void clear()
 	{
 		super.clear();

@@ -44,6 +44,9 @@ public interface Gui
 	public int addAutomata(Automata a)
 		throws Exception;
 
+	public int addProject(Project p)
+		throws Exception;
+
 	// returns number added
 	public boolean addAutomaton(Automaton a);
 

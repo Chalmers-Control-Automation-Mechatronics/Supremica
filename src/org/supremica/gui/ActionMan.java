@@ -68,6 +68,8 @@ import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
+import org.supremica.gui.automataExplorer.AutomataExplorer;
+import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
 
 // -- MF -- Abstract class to save on duplicate code
@@ -1797,11 +1799,11 @@ public class ActionMan
 
 		testCasesDialog.show();
 
-		Automata automata = testCasesDialog.getAutomata();
+		Project project = testCasesDialog.getProject();
 
-		if (automata != null)
+		if (project != null)
 		{
-			gui.addAutomata(automata);
+			gui.addProject(project);
 		}
 	}
 

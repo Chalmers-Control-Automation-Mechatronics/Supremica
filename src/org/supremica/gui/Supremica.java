@@ -1246,6 +1246,7 @@ public class Supremica
 		{
 			selectedProject.addActions(activeProject.getActions());
 			selectedProject.addControls(activeProject.getControls());
+			selectedProject.setAnimationPath(activeProject.getAnimationPath());
 		}
 		return selectedProject;
 	}
@@ -1473,6 +1474,12 @@ public class Supremica
 		currProject.addControls(theControls);
 	}
 
+	public void setAnimationPath(String animationPath)
+	{
+		Project currProject = getActiveProject();
+		currProject.setAnimationPath(animationPath);
+	}
+
 	public int addAutomata(Automata currAutomata)
 	{
 		//-- MF -- debug stuff, is there no way to remove the if under no-debug-build?
@@ -1498,6 +1505,24 @@ public class Supremica
 			{
 
 				// Must have a way to say, "cancel all"?
+			}
+		}
+
+		return nbrOfAddedAutomata;
+	}
+
+	public int addProject(Project theProject)
+		throws Exception
+	{
+		int nbrOfAddedAutomata = addAutomata(theProject);
+		if (theProject != null)
+		{
+			addActions(theProject.getActions());
+			addControls(theProject.getControls());
+			String animPath = theProject.getAnimationPath();
+			if (animPath != null && !animPath.equals(""))
+			{
+				setAnimationPath(animPath);
 			}
 		}
 

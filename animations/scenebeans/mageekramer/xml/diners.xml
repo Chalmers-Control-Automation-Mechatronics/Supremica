@@ -2,7 +2,7 @@
 
 <animation width="400" height="400">
 
-<forall var = "i" values ="0 1 2 3 4">
+<forall var = "i" values ="1 2 3 4 5">
      <!-- Philosopher + comands and events -->
 	 
 	<define id="phil${i}">      
@@ -76,16 +76,16 @@
 <draw>
   <transform type="translate">
       <param name="translation" value="(200,200)" />
-	  <paste object="phil0"/>
 	  <paste object="phil1"/>
 	  <paste object="phil2"/>
 	  <paste object="phil3"/>
 	  <paste object="phil4"/>
-	  <paste object="fork0"/>
+	  <paste object="phil5"/>
 	  <paste object="fork1"/>
 	  <paste object="fork2"/>
 	  <paste object="fork3"/>
 	  <paste object="fork4"/>
+	  <paste object="fork5"/>
       <paste object="table"/>
   </transform>
   <paste object="title"/>

@@ -4,7 +4,7 @@ package org.supremica.testcases;
 
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
@@ -182,7 +182,7 @@ class BrickBuilder
 
 public class BricksGame
 {
-	private Automata automata = new Automata();
+	private Project project = new Project();
 
 	public BricksGame(int rows, int cols)
 		throws Exception
@@ -198,26 +198,26 @@ public class BricksGame
 			{
 				sm = builder.buildBrick(i, j);
 
-				automata.addAutomaton(sm);
+				project.addAutomaton(sm);
 			}
 
 			sm = builder.buildBrick(i, cols);
 
-			automata.addAutomaton(sm);
+			project.addAutomaton(sm);
 		}
 
 		for (int j = 1; j < cols; ++j)
 		{
 			sm = builder.buildBrick(rows, j);
 
-			automata.addAutomaton(sm);
+			project.addAutomaton(sm);
 		}
 
-		automata.addAutomaton(builder.zeroBrick());
+		project.addAutomaton(builder.zeroBrick());
 	}
 
-	public Automata getAutomata()
+	public Project getProject()
 	{
-		return automata;
+		return project;
 	}
 }

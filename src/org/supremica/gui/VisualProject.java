@@ -61,6 +61,8 @@ import org.supremica.gui.editor.*;
 import uk.ac.ic.doc.scenebeans.animation.Animation;
 import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.Animator;
+import org.supremica.gui.automataExplorer.AutomataExplorer;
+import org.supremica.gui.simulator.SimulatorExecuter;
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources

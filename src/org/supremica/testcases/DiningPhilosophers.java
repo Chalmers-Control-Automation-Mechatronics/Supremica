@@ -4,11 +4,12 @@ package org.supremica.testcases;
 
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.execution.*;
 
 // Builds a Philo automaton
 class Philosopher
@@ -75,8 +76,9 @@ class Philosopher
 
 		philo.setType(AutomatonType.Plant);
 
-		// These are fivestate automata
+		// These are fivestate project
 		states[0].setInitial(true);
+		states[0].setAccepting(true);
 
 		for (int i = 0; i < states.length; ++i)
 		{
@@ -158,6 +160,7 @@ class Chopstick
 	static Automaton fork = null;
 	static boolean inited = false;
 
+
 	public Chopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
 		throws Exception
 	{
@@ -172,6 +175,7 @@ class Chopstick
 
 		// First the states
 		states[0].setInitial(true);
+		states[0].setAccepting(true);
 
 		for (int i = 0; i < states.length; ++i)
 		{
@@ -221,7 +225,7 @@ class Chopstick
 
 public class DiningPhilosophers
 {
-	Automata automata = new Automata();
+	Project project = new Project();
 
 	// These are helpers for counting modulo num philos/forks
 	// Note that we adjust for 0's, indices are from 1 to modulo
@@ -253,7 +257,7 @@ public class DiningPhilosophers
 		}
 	}
 
-	public DiningPhilosophers(int num, boolean l_take, boolean r_take, boolean l_put, boolean r_put)
+	public DiningPhilosophers(int num, boolean l_take, boolean r_take, boolean l_put, boolean r_put, boolean animation)
 		throws Exception
 	{
 
@@ -264,10 +268,47 @@ public class DiningPhilosophers
 		{
 			int id = i + 1;
 
+			Automaton currPhil = philo.build(id, id, prevId(id, num));
 			// id's are from 1...n
-			automata.addAutomaton(philo.build(id, id, prevId(id, num)));
+			project.addAutomaton(currPhil);
 
 			// To his left a philo has fork #id, and to his right is fork #id-1
+
+
+			if (animation)
+			{
+				Alphabet alpha = currPhil.getAlphabet();
+
+				LabeledEvent lTake = alpha.getEventWithId("L_take");
+				LabeledEvent rTake = alpha.getEventWithId("R_take");
+				LabeledEvent lPut = alpha.getEventWithId("L_put");
+				LabeledEvent rPut = alpha.getEventWithId("R_put");
+
+				Actions currActions = project.getActions();
+				// The forks in the animation are numbered 0 to nbr of forks - 1
+
+				Action lTakeAction = new Action(lTake.getLabel());
+				currActions.addAction(lTakeAction);
+				lTakeAction.addCommand("fork." + id  + ".get");
+				lTakeAction.addCommand("phil." + id  + ".leftfork");
+
+				Action rTakeAction = new Action(rTake.getLabel());
+				currActions.addAction(rTakeAction);
+				rTakeAction.addCommand("fork." + prevId(id, num) + ".get");
+				rTakeAction.addCommand("phil." + id + ".rightfork");
+
+				Action lPutAction = new Action(lPut.getLabel());
+				currActions.addAction(lPutAction);
+				lPutAction.addCommand("fork." + id  + ".put");
+				lPutAction.addCommand("phil." + id  + ".thinking.begin");
+
+				Action rPutAction = new Action(rPut.getLabel());
+				currActions.addAction(rPutAction);
+				rPutAction.addCommand("fork." + prevId(id, num) + ".put");
+				rPutAction.addCommand("phil." + id + ".thinking.begin");
+
+			}
+
 		}
 
 		// Next the forks aka chopsticks
@@ -278,14 +319,19 @@ public class DiningPhilosophers
 			int id = i + 1;
 
 			// id's are from 1...n
-			automata.addAutomaton(fork.build(id, nextId(id, num), id));
+			project.addAutomaton(fork.build(id, nextId(id, num), id));
 
 			// To its left a fork has philo #id+1, and to its right philo #id
 		}
+
+		if (animation)
+		{
+			project.setAnimationPath("/scenebeans/mageekramer/xml/diners.xml");
+		}
 	}
 
-	public Automata getAutomata()
+	public Project getProject()
 	{
-		return automata;
+		return project;
 	}
 }

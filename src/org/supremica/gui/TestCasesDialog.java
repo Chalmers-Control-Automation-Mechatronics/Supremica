@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 import org.supremica.automata.algorithms.AutomatonToDsx;
 import org.supremica.automata.algorithms.AutomataToXml;
-import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 import org.supremica.properties.*;
 import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;
@@ -34,7 +34,7 @@ class IntegerField
 
 interface TestCase
 {
-	public Automata doIt()
+	public Project doIt()
 		throws Exception;
 }
 
@@ -67,12 +67,12 @@ class UsersPanel
 		add(BorderLayout.SOUTH, num_users);
 	}
 
-	public Automata doIt()
+	public Project doIt()
 		throws Exception
 	{
 		Users users = new Users(int_num.get(), req.isSelected(), acc.isSelected(), rel.isSelected());
 
-		return users.getAutomata();
+		return users.getProject();
 	}
 }
 
@@ -85,12 +85,19 @@ class PhilosPanel
 	JCheckBox r_take = new JCheckBox("take right fork", true);
 	JCheckBox l_put = new JCheckBox("put left fork", true);
 	JCheckBox r_put = new JCheckBox("put right fork", true);
+	JCheckBox animation = new JCheckBox("Include animation (5 philos)", true);
 
 	public PhilosPanel()
 	{
-		super(new GridLayout(2, 1, 10, 10));
+		// super(new GridLayout(2, 1, 10, 10));
+		super();
+
+		Box theBox = Box.createVerticalBox();
+		add(theBox, BorderLayout.NORTH);
 
 		JPanel cont = new JPanel();
+
+		//cont.setLayout(new BoxLayout());
 
 		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
 		cont.add(l_take);
@@ -100,18 +107,24 @@ class PhilosPanel
 
 		JPanel num_users = new JPanel();
 
-		num_users.add(new JLabel("Number of philosophers and forks: "));
-		num_users.add(int_num);
-		add(cont, BorderLayout.NORTH);
-		add(num_users, BorderLayout.SOUTH);
+		num_users.add(new JLabel("Number of philosophers and forks: "), BorderLayout.NORTH);
+		num_users.add(int_num, BorderLayout.NORTH);
+
+		JPanel animationPanel = new JPanel();
+
+		animationPanel.add(animation, BorderLayout.NORTH);
+
+		theBox.add(cont);
+		theBox.add(num_users);
+		theBox.add(animationPanel);
 	}
 
-	public Automata doIt()
+	public Project doIt()
 		throws Exception
 	{
-		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected());
+		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected());
 
-		return dp.getAutomata();
+		return dp.getProject();
 	}
 }
 
@@ -136,12 +149,12 @@ class BricksPanel
 		add(BorderLayout.SOUTH, cols);
 	}
 
-	public Automata doIt()
+	public Project doIt()
 		throws Exception
 	{
 		BricksGame bg = new BricksGame(num_rows.get(), num_cols.get());
 
-		return bg.getAutomata();
+		return bg.getProject();
 	}
 }
 
@@ -166,12 +179,12 @@ class StickGamePanel
 		add(sticks, BorderLayout.SOUTH);
 
 	}
-	public Automata doIt()
+	public Project doIt()
 		throws Exception
 	{
 		// System.err.println("SticksGamePanel::doIt()");
 		StickPickingGame spg = new StickPickingGame(num_players.get(), num_sticks.get());
-		return spg.getAutomata();
+		return spg.getProject();
 	}
 }
 
@@ -196,7 +209,7 @@ class AllocationBatchPanel
 		add(new JLabel("Experimental serialized allocation batch"), BorderLayout.NORTH);
 	}
 
-	public Automata doIt()
+	public Project doIt()
 		throws Exception
 	{
 		String file = filename.getText();
@@ -205,7 +218,7 @@ class AllocationBatchPanel
 		{
 			AllocationBatch ab = new AllocationBatch(file);
 
-			return ab.getAutomata();
+			return ab.getProject();
 		}    // else...
 
 		throw new Exception("you must choose a filename");
@@ -240,7 +253,7 @@ class ExampleTab
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
 		addTab("Sticks Game", null, new StickGamePanel(), "Stick picking game");
-		addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
+		//addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
 }
 
@@ -248,7 +261,7 @@ public class TestCasesDialog
 	extends JDialog
 {
 	private ExampleTab extab = new ExampleTab();
-	private Automata automata = null;
+	private Project project = null;
 
 	class DoitButton
 		extends JButton
@@ -329,13 +342,13 @@ public class TestCasesDialog
 		// We know that this is actually also a TestCase (right?)
 		TestCase tc = (TestCase) comp;
 
-		automata = tc.doIt();    // Should return a Project (named)
+		project = tc.doIt();    // Should return a Project (named)
 		dispose();
 	}
 
-	Automata getAutomata()
+	Project getProject()
 	{
-		return automata;
+		return project;
 	}
 
 	TestCasesDialog(JFrame frame)

@@ -63,10 +63,12 @@ public class ActionAndControlViewer
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private ActionAndControlViewerPanel thePanel;
+	private Project theProject;
 
 	public ActionAndControlViewer(Project theProject)
 		throws Exception
 	{
+		this.theProject = theProject;
 		thePanel = new ActionAndControlViewerPanel(theProject);
 		contentPane = (JPanel) getContentPane();
 
@@ -125,6 +127,30 @@ public class ActionAndControlViewer
 			{
 				setVisible(false);
 				dispose();
+			}
+		});
+
+		// Edit
+		JMenu menuEdit = new JMenu();
+
+		menuEdit.setText("Edit");
+		menuEdit.setMnemonic(KeyEvent.VK_E);
+
+		// Edit.ClearActions
+		JMenuItem menuEditClearActions = new JMenuItem();
+
+		menuEditClearActions.setText("Clear actions and controls");
+		menuEdit.add(menuEditClearActions);
+		menuBar.add(menuEdit);
+		menuEdit.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (theProject != null)
+				{
+					theProject.clearActions();
+					theProject.clearControls();
+				}
 			}
 		});
 	}
