@@ -19,7 +19,7 @@ class Philosopher
 		new State("s0"),
 		new State("lu"),	// left fork picked up
 		new State("ru"),	// right fork picked up
-		new State("eat"),
+		new State("eat"),   // eating
 		new State("ld"),	// left fork put down
 		new State("rd")	// right fork put down
 	};
@@ -149,10 +149,12 @@ class EatingPhilosopher
 		new State("think"),
 		new State("lu"),	// left fork picked up
 		new State("ru"),	// right fork picked up
-		new State("eat"),
+		//new State("eat"),
+		new State("ready"), // ready for eating
 		new State("ld"),	// left fork put down
 		new State("rd"),	// right fork put down
-		new State("eat2")
+		//new State("eat2")
+		new State("eat")
 	};
 	final static int INIT = 0;
 	final static int L_UP = 1;

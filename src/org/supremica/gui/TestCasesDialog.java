@@ -574,7 +574,6 @@ public class TestCasesDialog
 			addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
-
 				// throws Exception // cannot do this - what the f**k!
 				{
 					try
@@ -667,7 +666,7 @@ public class TestCasesDialog
 		// Point point = Utility.getPosForCenter(size);
 		// setSize(size);
 		// setLocation(point);
-		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton tmp;
 
 		buttons.add(tmp = new DoitButton());

@@ -23,10 +23,11 @@ public class PigeonHole {
 		if(first)
 			project.setComment("The Pigeon-Hole Principe (PHP): having n pigeons in m holes, if m < n, " +
 				"then there is at least one hole that contains more than one pigeon. " +
-				"Note that similar situations arise often in reality, for example in a batch system with large buffers... " +
-				"In this testcase model, the marked states represent states when each pigeons are in some hole, " +
-				"but there are no more than a pigeon in each hole. Clearly, if m < n, the system is blocking.... " +
-				"Here, we have choosen a model where each Pigeon and Hole have unique identies, which makes the problem very hard. "+
+				"Note that similar situations often arise in reality, for example in a batch system with large buffers. " +
+				"In this testcase model, the (globally) marked states represent states where all the pigeons are inside the " +
+				"holes, but there is no more than one pigeon in each hole. Clearly, if m < n, this can not be achieved  " +
+				"and the system is blocking. Here, we have choosen a model where each Pigeon and Hole have unique " + 
+				"identies, which makes the problem very hard. " +
 				"An anonymous Petri-Net model on the other hand, would be extremly easy to traverse. " +
 				"To see why this problem is so hard, refer to 'The Intractability of Resolution' by A. Haken. "
 				);
@@ -37,14 +38,14 @@ public class PigeonHole {
 		iEvents = new LabeledEvent[ pigeons * holes ];
 		lEvents = new LabeledEvent[ pigeons * holes ];
 
-		for (int i = 0; i < pigeons; i++) {
-			for (int j = 0; j < holes; j++) {
+		for (int i = 0; i < pigeons; i++) 
+		{
+			for (int j = 0; j < holes; j++) 
+			{
 				iEvents[ i + j * pigeons] = new LabeledEvent("I:" + (i+1) + ":" + (j + 1) );
 				lEvents[ i + j * pigeons] = new LabeledEvent("L:" + (i+1) + ":" + (j + 1) );
 			}
 		}
-
-
 
 		// add pigeons
 		for (int i = 0; i < pigeons; i++)

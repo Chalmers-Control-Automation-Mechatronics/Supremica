@@ -13,7 +13,7 @@ public class RoundRobin
 		throws Exception
 	{
 		project = new Project();
-		project.setComment("Adapted from 'Compositional Minimization of Finite State Systems' by S. Graf and B. Steffen. Round robin access by token passing, the token starts at Process 1. The system is mutually but not globally nonblocking and the behaviour of the plants does not violate the specification.");
+		project.setComment("Adapted from 'Compositional Minimization of Finite State Systems' by S. Graf and B. Steffen. Round robin access by token passing, the token starts at Process 1. The system is mutually but not globally nonblocking and the behaviour of the plants does not violate the specification (language inclusion).");
 
 		Automaton resource = buildResource(processes);
 		Automata buffers = buildBuffers(processes);

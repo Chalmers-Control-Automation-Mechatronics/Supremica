@@ -502,8 +502,8 @@ public class MutuallyNonblockingVerifier
 		int bestValue = Integer.MAX_VALUE;
 		for (int i = 0; i < interestingEvents.size(); i++)
 		{
-			int index = i;
-			// int index = (int) Math.floor(Math.random() * interestingEvents.size());
+			// int index = i;
+			int index = (int) Math.floor(Math.random() * interestingEvents.size());
 
 			LabeledEvent currEvent = (LabeledEvent) interestingEvents.elementAt(index);
 			

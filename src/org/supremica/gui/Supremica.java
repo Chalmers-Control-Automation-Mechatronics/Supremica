@@ -671,8 +671,10 @@ public class Supremica
 
 		while (!finished)
 		{
-			newComment = JOptionPane.showInputDialog(this, msg, oldComment);
-
+			// newComment = JOptionPane.showInputDialog(this, msg, oldComment);
+			EditCommentDialog dialog = new EditCommentDialog(this, oldComment);
+			newComment = dialog.getComment();
+			
 			if (newComment == null)
 			{
 				return null;
