@@ -506,7 +506,7 @@ public class Automaton
 		// prereq: state is in theStates:
 		return state.getId(); // at the moment do the simplest thing
 	}
-	
+
 	/**
 	 * True if a state with the name exists, otherwise false.
 	 */
@@ -665,7 +665,7 @@ public class Automaton
 */
 
 	public LabeledEvent getEventWithLabel(String eventLabel)
-		throws Exception
+		throws IllegalArgumentException
 	{
 		return alphabet.getEventWithLabel(eventLabel);
 	}
@@ -1215,7 +1215,7 @@ public class Automaton
 			//System.err.println("equalAutomaton::non equal comment");
 			return false;
 		}
-		
+
 		// The following stuff seems useful to consider
 		if (hasAcceptingState() != other.hasAcceptingState())
 		{

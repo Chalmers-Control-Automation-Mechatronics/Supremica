@@ -6,24 +6,29 @@
 			<Event id="ball_in" label="ball_in" controllable="false" prioritized="true" />
 			<Event id="exit_ball" label="exit_ball" controllable="true" prioritized="true" />
 			<Event id="ball_out" label="ball_out" controllable="false" prioritized="true" />
+			<Event id="t1.start" label="t1.start" controllable="true" prioritized="true" />
+			<Event id="t1.timeout" label="t1.timeout" controllable="false" prioritized="true" />
 		</Events>
 		<States>
 			<State id="q_0" initial="true" accepting="true" />
 			<State id="q_1" />
 			<State id="q_2" />
 			<State id="q_3" />
+			<State id="q_4" />
+			<State id="q_5" />			
 		</States>
 		<Transitions>
 			<Transition event="enter_ball" source="q_0" dest="q_1" />
 			<Transition event="ball_in" source="q_1" dest="q_2" />
 			<Transition event="exit_ball" source="q_2" dest="q_3" />
-			<Transition event="ball_out" source="q_3" dest="q_0" />
+			<Transition event="ball_out" source="q_3" dest="q_4" />
+			<Transition event="t1.start" source="q_4" dest="q_5" />
+			<Transition event="t1.timeout" source="q_5" dest="q_0" />			
 		</Transitions>
 	</Automaton>
 <Execution>
 	<Timers>
-		<Timer name="timer1" startEvent="enter_ball" timeoutEvent="enter_ball_timeout" delay="500" />
-		<Timer name="timer2" startEvent="exit_ball" timeoutEvent="exit_ball_timeout" delay="700" />	
+		<Timer name="timer1" startEvent="t1.start" timeoutEvent="t1.timeout" delay="500" />
 	</Timers>
 	<InputSignals>
 		<Signal label="KulaPortvakt" port="0"/>

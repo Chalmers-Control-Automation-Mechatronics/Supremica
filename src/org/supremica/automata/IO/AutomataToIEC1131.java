@@ -212,7 +212,6 @@ public class AutomataToIEC1131
 	 * after_initialization:
 	 */
 	void printInitializationStructureAsST(PrintWriter pw)
-		throws Exception
 	{
 		pw.println("\n\t(* Set the initial state *)");
 		pw.println("\tIF (NOT initialized)");
@@ -225,7 +224,9 @@ public class AutomataToIEC1131
 			State initialState = currAutomaton.getInitialState();
 			if (initialState == null)
 			{
-				throw new Exception("AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state");
+				String errMessage = "AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state";
+				logger.error(errMessage);
+				throw new IllegalStateException(errMessage);
 			}
 			int currStateIndex = initialState.getSynchIndex();
 			pw.println("\t\tq_" + currAutomatonIndex + "_" + currStateIndex + " := TRUE;");
@@ -263,6 +264,13 @@ public class AutomataToIEC1131
 		theHelper.printILComment(pw, "Set the initial state");
 		theHelper.printILCommand(pw, "LD", "initialized");
 		theHelper.printILCommand(pw, "JMPC", "after_initialization");
+		// Initialize timer delays
+		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext();)
+		{
+			EventTimer currTimer = (EventTimer)theIt.next();
+			theHelper.printILCommand(pw, "LD", "DINT#" + currTimer.getDelay());
+			theHelper.printILCommand(pw, "ST", "timer_" + currTimer.getSynchIndex() + ".tonPT");
+		}
 		theHelper.printILCommand(pw, "LD", "TRUE");
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
 		{
@@ -272,19 +280,13 @@ public class AutomataToIEC1131
 			State initialState = currAutomaton.getInitialState();
 			if (initialState == null)
 			{
-				throw new Exception("AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state");
+				String errMessage = "AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state";
+				logger.error(errMessage);
+				throw new Exception(errMessage);
 			}
 			int currStateIndex = initialState.getSynchIndex();
 			theHelper.printILCommand(pw, "S", "q_" + currAutomatonIndex + "_" + currStateIndex);
 		}
-		// Initialize timer delays
-		for (Iterator theIt = theProject.timerIterator(); theIt.hasNext();)
-		{
-			EventTimer currTimer = (EventTimer)theIt.next();
-			theHelper.printILCommand(pw, "LD", "DINT#" + currTimer.getDelay());
-			theHelper.printILCommand(pw, "ST", "timer_" + currTimer.getSynchIndex() + ".tonPT");
-		}
-
 		theHelper.printILCommand(pw, "S", "initialized");
 		theHelper.printILLabel(pw, "after_initialization");
 	}
@@ -316,7 +318,6 @@ public class AutomataToIEC1131
 	 * ST e_1
 	 */
 	void printComputeEnabledEventsAsST(PrintWriter pw)
-		throws Exception
 	{
 		pw.println("\n\tenabledEvent = FALSE;");
 
@@ -379,7 +380,9 @@ public class AutomataToIEC1131
 					}
 					else
 					{
-						throw new Exception("Unsupported SynchronizationType");
+						String errMessage = "Unsupported SynchronizationType";
+						logger.error(errMessage);
+						throw new IllegalStateException(errMessage);
 					}
 				}
 				pw.println(";");
@@ -483,7 +486,9 @@ public class AutomataToIEC1131
 				}
 				else
 				{
-					throw new Exception("Unsupported SynchronizationType");
+						String errMessage = "Unsupported SynchronizationType";
+						logger.error(errMessage);
+						throw new IllegalStateException(errMessage);
 				}
 			}
 			theHelper.printILCommand(pw, "ST", "e_" + currEventIndex);
@@ -492,7 +497,6 @@ public class AutomataToIEC1131
 
 
 	void printCheckEnabledEventsAsIL(PrintWriter pw)
-		throws Exception
 	{
 
 		theHelper.printILComment(pw, "Check if the events are externally enabled");
@@ -519,7 +523,9 @@ public class AutomataToIEC1131
 			String currTimeoutLabel = currTimer.getTimeoutEvent();
 			if (!allEvents.containsEventWithLabel(currTimeoutLabel))
 			{
-				throw new IllegalStateException("Could not find event: " + currTimeoutLabel);
+				String errMessage = "Could not find event: " + currTimeoutLabel;
+				logger.error(errMessage);
+				throw new IllegalStateException(errMessage);
 			}
 			LabeledEvent currEvent = allEvents.getEventWithLabel(currTimeoutLabel);
 			int currEventIndex = currEvent.getSynchIndex();
@@ -555,7 +561,9 @@ public class AutomataToIEC1131
 			String currTimeoutLabel = currTimer.getStartEvent();
 			if (!allEvents.containsEventWithLabel(currTimeoutLabel))
 			{
-				throw new IllegalStateException("Could not find event: " + currTimeoutLabel);
+				String errMessage = "Could not find event: " + currTimeoutLabel;
+				logger.error(errMessage);
+				throw new IllegalStateException(errMessage);
 			}
 			LabeledEvent currEvent = allEvents.getEventWithLabel(currTimeoutLabel);
 			int currEventIndex = currEvent.getSynchIndex();
@@ -750,7 +758,6 @@ public class AutomataToIEC1131
 	 * end_of_jumps:
 	 */
 	void printChangeStateTransitionsAsIL(PrintWriter pw)
-		throws Exception
 	{
 		theHelper.printILComment(pw, "Change state in the automata");
 		theHelper.printILComment(pw, "It is in general not safe to have more than one event set to true at this point");
@@ -781,7 +788,7 @@ public class AutomataToIEC1131
 						LabeledEvent currAutomatonEvent = currAutomaton.getEventWithLabel(currEvent.getLabel());
 						if (currAutomatonEvent == null)
 						{
-							throw new Exception("AutomataToIEC1131.printChangeTransitionsAsIL: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+							throw new IllegalStateException("AutomataToIEC1131.printChangeTransitionsAsIL: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 						}
 
 						theHelper.printILComment(pw, "Transitions in " + currAutomaton.getName());
@@ -794,7 +801,7 @@ public class AutomataToIEC1131
 							State toState = currState.nextState(currAutomatonEvent);
 							if (toState == null)
 							{
-								throw new Exception("AutomataToIEC1131.printChangeTransitionsAsIL: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+								throw new IllegalStateException("AutomataToIEC1131.printChangeTransitionsAsIL: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 							}
 							int toStateIndex = toState.getSynchIndex();
 							if (currState != toState)
@@ -919,7 +926,6 @@ public class AutomataToIEC1131
 	}
 
 	void printCheckConditionsAsIL(PrintWriter pw)
-		throws Exception
 	{
 		Controls theControls = theProject.getControls();
 		Signals inputSignals = theProject.getInputSignals();
@@ -944,7 +950,9 @@ public class AutomataToIEC1131
 					Condition currCondition = (Condition)it.next();
 					if (!inputSignals.hasSignal(currCondition.getLabel()))
 					{
-						throw new Exception("Could not find input signal " + currCondition.getLabel());
+						String errMessage = "Could not find input signal " + currCondition.getLabel();
+						logger.error(errMessage);
+						throw new IllegalStateException(errMessage);
 					}
 					Signal currSignal = inputSignals.getSignal(currCondition.getLabel());
 
