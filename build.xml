@@ -766,6 +766,7 @@
 		use="true"
 		private="true"
 		source="1.4"
+		maxmemory="512m"
 		windowtitle="Supremica API"
 		link="http://java.sun.com/j2se/1.5/docs/api"				
 		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson. All Rights Reserved.">
