@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.automata.Automata;
 
 public final class VerificationOptions
 {
@@ -61,6 +62,7 @@ public final class VerificationOptions
 	private boolean oneEventAtATime;
 	private boolean skipUncontrollabilityCheck;
 	private int nbrOfAttempts;
+	private Automata inclusionAutomata = null;
 
 	/**
 	 * The current options, based on earlier user preferences.
@@ -165,6 +167,16 @@ public final class VerificationOptions
 	public int getNbrOfAttempts()
 	{
 		return nbrOfAttempts;
+	}
+
+	public void setInclusionAutomata(Automata aut)
+	{
+		inclusionAutomata = aut;
+	}
+
+	public Automata getInclusionAutomata()
+	{
+		return inclusionAutomata;
 	}
 
 	/**

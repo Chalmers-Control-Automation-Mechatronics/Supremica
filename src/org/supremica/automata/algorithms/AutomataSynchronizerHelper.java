@@ -195,6 +195,33 @@ public final class AutomataSynchronizerHelper
 		// Is there anything else that needs to be cleared?...
 	}
 
+	/**
+	 * Initializes the helper for a new run. Generates a new initial state and adds it to the queue. 
+	 */
+	public void initialize()
+		throws Exception
+	{
+		// The helper (or rather theStates) should be clear before executing this method
+		if (theStates.size() > 0)
+		{
+			throw new Exception("AutomataSynchronizerHelper not cleared properly before reinitialization.");
+		}
+
+		// Build the initial state  (including 2 status fields)
+		int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
+
+		Iterator autIt = theAutomata.iterator();
+		while (autIt.hasNext())
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+			State currInitialState = currAutomaton.getInitialState();
+			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+		}
+
+		// Add state to stack
+		addState(initialState);
+	}
+
 	public SynchronizationOptions getSynchronizationOptions()
 	{
 		return syncOptions;
@@ -488,6 +515,11 @@ public final class AutomataSynchronizerHelper
 		return theStates.getTable();
 	}
 
+	public int getStateTableSize()
+	{
+		return theStates.size();
+	}
+
 	public Iterator getStateIterator()
 	{
 		return theStates.iterator();
@@ -603,16 +635,26 @@ public final class AutomataSynchronizerHelper
 	}
 
 	public void setRememberTrace(boolean rememberTrace)
+		throws Exception
 	{
+		if (theStates.size() > 0)
+		{
+			throw new Exception("Error in AutomataSynchronizerHelper. Helper must be cleared before calling setRememberTrace().");
+		}
+
 		this.rememberTrace = rememberTrace;
 	}
 
-	/** Displats the amount of states examined during the execution. */
+	/** 
+	 * Logs the amount of states examined during the execution and some other stuff. 
+	 */
 	public void displayInfo()
 	{
-		logger.info("Operation statistics:\n\t" + (helperData.getNumberOfCheckedStates() - 1) + " transitions were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
-
-		// logger.info("Synchronization statistics:\n\t" + helperData.getNumberOfCheckedStates() + " states were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
+		// Did we do anything?
+		if (helperData.getNumberOfCheckedStates() != 0)
+		{
+			logger.info("Operation statistics:\n\t" + (helperData.getNumberOfCheckedStates() - 1) + " transitions were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
+		}
 	}
 
 	/**

@@ -1527,8 +1527,13 @@ public class ActionMan
 		{
 			return;
 		}
+		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+		{
+			verificationOptions.setInclusionAutomata(gui.getUnselectedAutomata());
+		}
 		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
+		// Work!
 		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, syncOptions, verificationOptions);
 	}
 

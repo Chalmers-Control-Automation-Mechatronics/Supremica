@@ -97,11 +97,18 @@ public final class IntArrayHashTable
 		}
 	}
 
-	// Try to add theArray to the table.
-	// If there already exists an entry with the
-	// first theArray.length-2 first equals then return
-	// that entry. Otherwise add theArray
-	// and return null.
+	public int size()
+	{
+		return size;
+	}
+
+	/**
+	 * Try to add theArray to the table.
+	 * If there already exists an entry with the
+	 * first theArray.length-2 first equals then return
+	 * that entry. Otherwise add theArray
+	 * and return null.
+	 */
 	public int[] add(int[] theArray)
 		throws Exception
 	{
@@ -136,7 +143,7 @@ public final class IntArrayHashTable
 					}
 					else
 					{
-						throw new SupremicaException("HashTable is nearly full");
+						throw new SupremicaException("IntArrayHashTable is nearly full");
 					}
 				}
 
@@ -442,6 +449,7 @@ public final class IntArrayHashTable
 
 		public Object next()
 		{
+			/*
 			if (hasNext())
 			{
 				Object currObject = theTable[nextIndex];
@@ -455,6 +463,9 @@ public final class IntArrayHashTable
 			{
 				throw new NoSuchElementException();
 			}
+			*/
+			
+			return nextIntArray();
 		}
 
 		/**
@@ -480,7 +491,15 @@ public final class IntArrayHashTable
 
 		public void remove()
 		{
-			throw new UnsupportedOperationException();
+			if (theTable[currIndex] == null)
+			{
+				throw new IllegalStateException();
+			}
+			else
+			{
+				theTable[currIndex] = null;
+				size--;
+			}
 		}
 	}
 }

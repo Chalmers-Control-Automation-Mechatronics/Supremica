@@ -183,20 +183,6 @@ public class AutomataVerificationWorker
 			return;
 		}
 
-		// Are further preparations needed?
-		// This can't be done earlier, since the helper must be initialized!
-		// Can't be done much later either, since we need to know which automata are
-		// selected. Ugly.
-		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
-		{
-			// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
-			automataVerifier.prepareForLanguageInclusion(workbench.getUnselectedAutomata());
-		}
-		if (verificationOptions.getVerificationType() == VerificationType.InverseControllability)
-		{
-			automataVerifier.prepareForInverseControllability();
-		}
-
 		// Initialize the ExecutionDialog
 		final ArrayList threadsToStop = new ArrayList();
 		threadsToStop.add(this);

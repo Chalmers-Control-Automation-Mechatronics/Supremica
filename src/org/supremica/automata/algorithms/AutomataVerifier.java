@@ -91,7 +91,6 @@ public class AutomataVerifier
 	private AutomataSynchronizerHelper synchHelper;
 	private ArrayList synchronizationExecuters = new ArrayList();
 	private StateMemorizer potentiallyUncontrollableStates;
-	private int[] initialState;
 
 	// Used by findUncontrollableStates
 	private AutomataSynchronizerHelper uncontrollabilityCheckHelper;
@@ -126,21 +125,6 @@ public class AutomataVerifier
 		this.theAutomata = theAutomata;
 		this.verificationOptions = verificationOptions;
 		this.synchronizationOptions = synchronizationOptions;
-
-		// We're gonna do some serious synchronization! Initialize a synchronization helper!
-		// Can't this be done later?
-		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-
-		// Build the initial state  (including 2 status fields)
-		initialState = AutomataIndexFormHelper.createState(theAutomata.size());
-
-		Iterator autIt = theAutomata.iterator();
-		while (autIt.hasNext())
-		{
-			currAutomaton = (Automaton) autIt.next();
-			State currInitialState = currAutomaton.getInitialState();
-			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-		}
 	}
 
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
@@ -224,7 +208,8 @@ public class AutomataVerifier
 				return "At least one automaton must be selected.";
 			}
 
-			if (ActionMan.getGui().getUnselectedAutomata().size() < 1)
+			if ((verificationOptions.getInclusionAutomata() != null) && 
+				(verificationOptions.getInclusionAutomata().size() < 1))
 			{
 				return "At least one automaton must be unselected.";
 			}
@@ -250,16 +235,26 @@ public class AutomataVerifier
 	{
 		try
 		{
-			/*
 			// Need initialisation?
 			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
-				(verificationOptions.getVerificationType() == VerificationType.InverseControllability) ||
+			 	(verificationOptions.getVerificationType() == VerificationType.InverseControllability) ||
 				(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion))
-			{
+			{ 
 				// We're gonna do some serious synchronization! Initialize a synchronization helper!
 				synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+				synchHelper.setExecutionDialog(executionDialog);
+
+				// Are further preparations needed?
+				if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+				{
+					// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
+					prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
+				}
+				if (verificationOptions.getVerificationType() == VerificationType.InverseControllability)
+				{
+					prepareForInverseControllability();
+				}
 			}
-			*/
 
 			// Find out what should be done and do it!
 			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
@@ -296,10 +291,11 @@ public class AutomataVerifier
 				{
 					// This algorithm is under implementation!!
 					//return modularNonblockingVerification();
-					return compositionalNonblockingVerification();
 
 					// This algorithm only verifies pairwise nonblocking!!!
 					// return pairwiseNonblockingVerification();
+
+					return compositionalNonblockingVerification();
 				}
 				else
 				{
@@ -341,7 +337,8 @@ public class AutomataVerifier
 			}
 			else
 			{
-				throw new UnsupportedOperationException("The selected type of verification is not implemented");
+				throw new UnsupportedOperationException("The selected type of verification " + 
+														"is not implemented");
 			}
 		}
 		catch (Exception e)
@@ -374,7 +371,13 @@ public class AutomataVerifier
 	 *@param inclusionAutomata The automata that should be verified for inclusion
 	 */
 	public void prepareForLanguageInclusion(Automata inclusionAutomata)
+		throws Exception
 	{
+		if (inclusionAutomata == null)
+		{
+			throw new IllegalArgumentException("Inclusion automata must be non null for language inclusion verification.");
+		}
+
 		// Maybe we should just make a copy of the whole project and modify what needs to
 		// be modified right there instead?
 
@@ -588,7 +591,7 @@ public class AutomataVerifier
 		// Clear the hash-table and set some variables in the synchronization helper
 		synchHelper.clear();
 		synchHelper.setRememberUncontrollable(true);
-		synchHelper.addState(initialState);
+		synchHelper.initialize();
 
 		if (stopRequested)
 		{
@@ -985,7 +988,6 @@ public class AutomataVerifier
 
 		if (attempt == 1)
 		{
-
 			// First attempt
 			stateAmountLimit = verificationOptions.getExclusionStateLimit();
 
@@ -996,7 +998,6 @@ public class AutomataVerifier
 		}
 		else
 		{
-
 			// Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 			{
@@ -1024,7 +1025,7 @@ public class AutomataVerifier
 			{
 				// Synchronize...
 				// synchHelper.clear(); // This is done while analyzing the result se *** below
-				synchHelper.addState(initialState);
+				synchHelper.initialize();
 
 				if (stopRequested)
 				{
@@ -1060,6 +1061,21 @@ public class AutomataVerifier
 
 				// Examine if there are states in potentiallyUncontrollableStates
 				// that are not represented in the new synchronization
+				int stateCount = 0;
+				Iterator stateIt = synchHelper.getStateIterator();
+				while (stateIt.hasNext())
+				{
+					int[] currState = (int[]) stateIt.next();
+					
+					// Look for the state among the potentially uncontrollable states
+					potentiallyUncontrollableStates.find(automataIndices, currState);
+
+					// Instead of using clear()... se *** above
+					stateIt.remove();
+
+					stateCount++;
+				}
+				/*
 				int[][] currStateTable = synchHelper.getStateTable();
 				int stateCount = 0;
 
@@ -1067,7 +1083,6 @@ public class AutomataVerifier
 				{
 					if (currStateTable[j] != null)
 					{
-
 						// Look for the state among the potentially uncontrollable states
 						potentiallyUncontrollableStates.find(automataIndices, currStateTable[j]);
 
@@ -1077,6 +1092,7 @@ public class AutomataVerifier
 						stateCount++;
 					}
 				}
+				*/
 
 				logger.verbose("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 
@@ -1151,9 +1167,7 @@ public class AutomataVerifier
 		// med den nya automataIndices varje gång... tänk på det. FIXA!
 		if (uncontrollabilityCheckHelper == null)
 		{
-			//AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
 			AutomataSynchronizerExecuter onlineSynchronizer = new AutomataSynchronizerExecuter(synchHelper);
-
 			onlineSynchronizer.selectAutomata(automataIndices);
 			onlineSynchronizer.initialize();
 
@@ -1161,15 +1175,14 @@ public class AutomataVerifier
 
 			if (SupremicaProperties.verboseMode())
 			{
-				// It's important that setRememberTrace occurs before addState(initialState)!
+				// It's important that setRememberTrace occurs before initialize()!
 				uncontrollabilityCheckHelper.setRememberTrace(true);
 			}
-
-			uncontrollabilityCheckHelper.addState(initialState);
 			uncontrollabilityCheckHelper.setCoExecute(true);
 			uncontrollabilityCheckHelper.setCoExecuter(onlineSynchronizer);
 			uncontrollabilityCheckHelper.setExhaustiveSearch(true);
 			uncontrollabilityCheckHelper.setRememberUncontrollable(true);
+			uncontrollabilityCheckHelper.initialize();
 		}
 
 		// Stop after having found a suitable amount of new states
@@ -1395,8 +1408,8 @@ public class AutomataVerifier
 	private boolean monolithicControllabilityVerification()
 		throws Exception
 	{
-		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(true);
+		synchHelper.initialize();
 
 		// Initialize the synchronizationExecuters
 		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
@@ -1444,8 +1457,8 @@ public class AutomataVerifier
 		}
 
 		// Otherwise we must synchronize...
-		synchHelper.addState(initialState);
 		synchHelper.setExhaustiveSearch(false);
+		synchHelper.initialize();
 
 		// Initialize the synchronizationExecuters
 		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
@@ -1834,6 +1847,7 @@ public class AutomataVerifier
  	 * conflict equivalence, with hideThese considered as epsilon
  	 * events.
 	 */
+	/*
 	private static Automaton composeAndMinimize(Automata automata, Alphabet hideThese)
 	{
 		Automaton aut;
@@ -1861,6 +1875,7 @@ public class AutomataVerifier
 
 		return aut;
 	}
+	*/
 
 	private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
 		throws Exception
@@ -1877,227 +1892,6 @@ public class AutomataVerifier
 
 		return monolithicControllabilityVerification();
 	}
-
-	/**
-	 * Verifies behavioural inclusion of the language of automataA in automataB.
-	 * I.e. "Is the behaviour of automataA included in automataB?"
-	 * It IS ok for automataB to contain automata in automataA, but not the other
-	 * way around!... that is, automataA has priority over automataB... if you're
-	 * in A it doesn't matter if you're in B.
-	 *
-	 * This method presupposes that all events are uncontrollable!... very not intuitive! //Hguo.
-	 */
-	/*
-	private boolean behaviouralInclusionVerification(Automata automataA, Automata automataB)
-			throws Exception
-	{
-			// Change the automata in automataB to specifications
-			Automaton currAutomaton;
-			Iterator automatonIterator = automataB.iterator();
-			while (automatonIterator.hasNext())
-			{
-					currAutomaton = (Automaton) automatonIterator.next();
-					currAutomaton.setType(AutomatonType.Supervisor);
-			}
-
-			// Change the automata in automataA to plants
-			automatonIterator = automataA.iterator();
-			while (automatonIterator.hasNext())
-			{
-					currAutomaton = (Automaton) automatonIterator.next();
-					currAutomaton.setType(AutomatonType.Plant);
-			}
-
-			// Update the typeIsPlantTable in the AutomataIndexForm in the synchHelper!
-			synchHelper.getAutomataIndexForm().generateAutomataIndices(theAutomata);
-
-			// After the above preparations, the behavioural inclusion check
-			// can be performed as a controllability check...
-			return modularControllabilityVerification();
-	}
-	*/
-
-	/*
-	/**
-	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines nonblocking modularily
-	 * by examining pairwise nonblocking between all automata.
-	 * THIS DOES NOT WORK! IT'S JUST  A  TEST!
-	 *
-	 *@return True if nonblocking, false if blocking
-	 *@exception  Exception Description of the Exception
-	 *@see  AutomataSynchronizerExecuter
-	 *
-	private boolean pairwiseNonblockingVerification()
-			throws Exception
-	{
-			if (theAutomata.size() <= 2)
-			{   // This is better verified as a monolithic system!
-					return monolithicNonblockingVerification();
-			}
-
-			// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
-			logger.warn("NOTE! Modular nonblocking verification is not really implemented! " +
-									"This algorithm examines pairwise nonblocking between all automata, " +
-									"respectively! THIS DOES NOT PROVE GENERAL NONBLOCKING!!");
-
-			boolean allPairsNonblocking = true;
-
-			Iterator automatonIterator = theAutomata.iterator();
-			Automaton currAutomaton;
-			Automaton currOtherAutomaton;
-
-			while (automatonIterator.hasNext())
-			{
-					currAutomaton = (Automaton) automatonIterator.next();
-					Iterator subIterator = theAutomata.iterator();
-					while (subIterator.next() != currAutomaton);
-					while (subIterator.hasNext())
-					{
-							currOtherAutomaton = (Automaton) subIterator.next();
-							boolean pairIsNonblocking = automatonPairIsNonblocking(currAutomaton, currOtherAutomaton);
-							allPairsNonblocking = allPairsNonblocking && pairIsNonblocking;
-							if (!pairIsNonblocking)
-							{
-									logger.error("The automata " + currAutomaton.getName() +
-															 " and " + currOtherAutomaton.getName() + " are blocking each other.");
-							}
-					}
-			}
-
-			// NOTE!! THIS ALGORITHM DOES NOT WORK! IT IS JUST A PRELIMINARY TEST!!
-			logger.warn("NOTE! Modular nonblocking verification is not really implemented! " +
-									"This algorithm examines pairwise nonblocking between all automata, " +
-									"respectively! THIS DOES NOT PROVE GENERAL NONBLOCKING!!");
-
-			return allPairsNonblocking;
-	}
-
-	/**
-	 * Examines nonblocking between a pair of automata
-	 *
-	 * @param AutomatonA The first automata in the pair.
-	 * @param AutomatonB The second automata in the pair.
-	 *
-	private boolean automatonPairIsNonblocking(Automaton AutomatonA, Automaton AutomatonB)
-			throws Exception
-	{
-			logger.info("Synchronizing " + AutomatonA.getName() + " and " + AutomatonB.getName() + "...");
-
-			// Synchronize the two automata and verify nonblocking on the result
-			Automaton AutomataSynk;
-			ArrayList selectedAutomata = new ArrayList();
-
-			selectedAutomata.add(AutomatonA);
-			selectedAutomata.add(AutomatonB);
-
-			try
-			{
-					AutomataSynk = synchronizeAutomata(selectedAutomata);
-			}
-			catch (Exception ex)
-			{
-					logger.error("Error in AutomataVerifier when synchronizing automata: " + ex.toString());
-					logger.debug(ex.getStackTrace());
-					throw ex;
-			}
-
-			return moduleIsNonblocking(AutomataSynk);
-	}
-
-	/**
-	 * Performs synchronous composition on the automata represented by selectedAutomata
-	 *
-	 * @param selectedAutomata The Automata to be synchronized, ArrayList of Automaton objects
-	 * @return The automaton that constitutes the synchronization of the automata
-	 * represented by selectedAutomata.
-	 *
-	private Automaton synchronizeAutomata(ArrayList selectedAutomata)
-			throws Exception
-	{
-			Automaton AutomataSynk;
-
-			// BUILD A NEW SYNCHHELPER! The status of the states must not be affected by the
-			// automata we're not looking at for the moment...
-			Automata currAutomata = new Automata();
-			while (selectedAutomata.size() != 0)
-			{
-					currAutomata.addAutomaton((Automaton) selectedAutomata.remove(0));
-			}
-
-			// Build the initial state  (including 2 status fields)
-			int[] currInitialState = AutomataIndexFormHelper.createState(currAutomata.size());
-			Iterator autIt = currAutomata.iterator();
-			State localInitialState;
-			Automaton currAutomaton;
-
-			// The automata have indexes corresponding to theAutomata, we ignore
-			// this by using the variable "index".
-			int index = 0;
-			while (autIt.hasNext())
-			{
-					currAutomaton = (Automaton) autIt.next();
-					localInitialState = currAutomaton.getInitialState();
-					currInitialState[index++] = localInitialState.getIndex();
-					//currInitialState[currAutomaton.getIndex()] = localInitialState.getIndex();
-			}
-
-			// Initialize new synchHelper and move the executionDialog to the new helper...
-			ExecutionDialog excutionDialog = synchHelper.getExecutionDialog();
-			synchHelper = new AutomataSynchronizerHelper(currAutomata, synchronizationOptions);
-			synchHelper.setExecutionDialog(excutionDialog);
-
-			// Clear the hash-table in the helper and set some variables in the synchronization helper
-			// synchHelper.clear();
-			// synchHelper.setRememberUncontrollable(true);
-			synchHelper.addState(currInitialState);
-
-			if (stopRequested)
-			{
-					return null;
-			}
-
-			// Initialize the synchronizationExecuters
-			synchronizationExecuters.clear();
-
-			for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
-			{
-					AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-					synchronizationExecuters.add(currSynchronizationExecuter);
-			}
-
-			// Start all the synchronization executers and wait for completion
-			// For the moment we assume that we only have one thread
-			for (int i = 0; i < synchronizationExecuters.size(); i++)
-			{
-					AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-					currExec.selectAllAutomata();
-					currExec.start();
-			}
-			((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
-			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
-
-			// Build automaton
-			try
-			{
-					if (currExec.buildAutomaton())
-					{
-							AutomataSynk = synchHelper.getAutomaton();
-					}
-					else
-					{
-							AutomataSynk = null;
-					}
-			}
-			catch (Exception ex)
-			{
-					logger.error("Error when building automaton: " + ex.toString());
-					logger.debug(ex.getStackTrace());
-					throw ex;
-			}
-
-			return AutomataSynk;
-	}
-	*/
 
 	/**
 	 * Examines nonblocking monolithically, by examining all reachable states.
@@ -2310,6 +2104,7 @@ public class AutomataVerifier
 
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultLanguageInclusionOptions();
+		verificationOptions.setInclusionAutomata(automataA);
 
 		Automata theAutomata = new Automata();
 
@@ -2319,7 +2114,7 @@ public class AutomataVerifier
 
 		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
 
-		verifier.prepareForLanguageInclusion(automataA);
+		//verifier.prepareForLanguageInclusion(automataA);
 
 		return verifier.verify();
 	}

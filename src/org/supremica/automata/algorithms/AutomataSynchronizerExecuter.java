@@ -899,25 +899,25 @@ public final class AutomataSynchronizerExecuter
 			Automaton theAutomaton = helper.getAutomaton();
 			Alphabet theAlphabet = theAutomaton.getAlphabet();
 
-			int[][] currStateTable = helper.getStateTable();
-			int stateNumber = 0;
-			ExecutionDialog executionDialog = helper.getExecutionDialog();
-			org.supremica.automata.State rememberDisabledEventsState = null;
-
+			// Should we add disabled events to a dump state? If so, create that state!
+			org.supremica.automata.State dumpState = null;
 			if (rememberDisabledEvents)
 			{
-				rememberDisabledEventsState = theAutomaton.createAndAddUniqueState("qf");
-
-				rememberDisabledEventsState.setForbidden(true);
+				dumpState = theAutomaton.createAndAddUniqueState("qf");
+				dumpState.setForbidden(true);
 			}
 
+			// Initialize execution dialog
+			ExecutionDialog executionDialog = helper.getExecutionDialog();
 			if (executionDialog != null)
 			{
-				executionDialog.initProgressBar(0, currStateTable.length);
+				executionDialog.initProgressBar(0, helper.getStateTableSize());
 				executionDialog.setMode(ExecutionDialogMode.synchronizingBuildingStates);
 			}
 
 			// Create all states
+			int[][] currStateTable = helper.getStateTable();
+			int stateNumber = 0;
 			for (int i = 0; i < currStateTable.length; i++)
 			{
 				if (i % 100 == 0)
@@ -1081,7 +1081,7 @@ public final class AutomataSynchronizerExecuter
 						while (currDisabledEventIndex != Integer.MAX_VALUE)
 						{
 							LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);
-							Arc newArc = new Arc(thisState, rememberDisabledEventsState, theEvent);
+							Arc newArc = new Arc(thisState, dumpState, theEvent);
 
 							theAutomaton.addArc(newArc);
 

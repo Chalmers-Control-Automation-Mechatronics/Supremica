@@ -162,7 +162,7 @@ public class TestAutomataVerifier
 			Automata inclusionAutomata = new Automata(theProject,true);
 			inclusionAutomata.removeAutomaton("sicherheit_vr3");
 			Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_vr3"));
-			theVerifier.prepareForLanguageInclusion(inclusionAutomata);
+			verificationOptions.setInclusionAutomata(inclusionAutomata);
 			assertTrue(theVerifier.verify());
 			// The same test again (hopefully)
 			assertTrue(AutomataVerifier.verifyInclusion(inclusionAutomata, targetAutomata));
@@ -188,7 +188,7 @@ public class TestAutomataVerifier
 			Automata inclusionAutomata = new Automata(theProject,true);
 			inclusionAutomata.removeAutomaton("sicherheit_er");
 			Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_er"));
-			theVerifier.prepareForLanguageInclusion(inclusionAutomata);
+			verificationOptions.setInclusionAutomata(inclusionAutomata);
 			assertTrue(!theVerifier.verify());
 			// The same test again (hopefully)
 			assertTrue(!AutomataVerifier.verifyInclusion(inclusionAutomata, targetAutomata));
