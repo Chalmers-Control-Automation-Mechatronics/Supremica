@@ -541,8 +541,8 @@
 			<include name="net/sourceforge/waters/xsd/**"/>
 		</fileset>
 		<fileset dir="${src}/">
-			<include name="org/w3/*.properties"/>
-			<include name="org/w3/*.ser"/>
+			<include name="**/*.properties"/>
+			<include name="**/*.ser"/>
 		</fileset>
 	</jar>
 	<delete>
