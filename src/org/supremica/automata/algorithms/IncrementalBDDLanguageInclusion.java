@@ -187,7 +187,8 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				// no idea doing this if we have added all automaton that can be added :(
 				else if(ac.moreToGo()) {
 					// sess discussion about self loops in C-algo
-					int locals = try_and_remember_local_reachability(sup, next, bdd_theta, bdd_initial_states);
+					int locals = try_and_remember_local_reachability(sup, next, true,
+																	bdd_theta, bdd_initial_states);
 
 					if(locals == ba.getZero() ) {
 						cleanup_bdds();
@@ -292,15 +293,15 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
+			boolean was_plant = ac.lastAutomatonWasPlant();
 
 			// ++new code
-			if( ac.lastAutomatonWasPlant() ) {
+			if( was_plant ) {
 				int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
 				bdd_theta_plant = ba.andTo(bdd_theta_plant, bdd_theta_delta);
 				bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
 				ba.deref(bdd_theta_delta);
 			} else {
-
 				// update theta_Sp
 				tmp1 = ba.exists(next.getTpri(), bdd_cube_sp );
 				tmp2 = ba.not(tmp1);
@@ -362,7 +363,8 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 
 					// resuing local reachables now:
-					int locals = try_and_remember_local_reachability(sup, next, bdd_theta, bdd_initial_states);
+					int locals = try_and_remember_local_reachability(sup, next, was_plant,
+																	bdd_theta, bdd_initial_states);
 
 
 					if(locals == ba.getZero() ) {

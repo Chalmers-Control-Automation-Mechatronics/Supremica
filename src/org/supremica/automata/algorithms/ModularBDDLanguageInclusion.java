@@ -89,6 +89,8 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
+			boolean was_plant = ac.lastAutomatonWasPlant();
+
 			if(Options.debug_on) {
 				Options.out.println("\n -----------------------------------------------------------\n");
 				Options.out.println("Check C(" + work2.toString() + ", " + work1.toString()  + ") ?");
@@ -104,6 +106,8 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 				sup = SupervisorFactory.suggestSupervisorForModularReachability(ba, work2, work1);
 
+
+
 				bdd_bad = sup.computeReachableLanguageDifference(bdd_events);
 				boolean ret = (bdd_bad == ba.getZero());
 
@@ -115,7 +119,7 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 				// proof reachability by local events and thus reachability globally:
 				// no idea doing this if we have added all automaton that can be added :(
-				if(ac.moreToGo()  && try_local_reachability(sup, next, bdd_bad)) {
+				if(ac.moreToGo()  && try_local_reachability(sup, next, was_plant, bdd_bad)) {
 					cleanup_bdds();
 					return false;
 				}
