@@ -35,8 +35,12 @@ public class BDDAutomata
 		super(a.getVariableCount(), Util.suggest_nodecount(a));
 		ref_count++;
 
+
+		SizeWatch.setManager(this);
+
 		// some funny thing with CUDD ...
-		BDDAssert.internalCheck((not(getZero()) == getOne()) && (not(getOne()) == getZero()), "[INTERNAL] either  ~1 != 0  or  ~0 != 1");
+		BDDAssert.internalCheck((not(getZero()) == getOne()) && (not(getOne()) == getZero()), 
+					"[INTERNAL] either  ~1 != 0  or  ~0 != 1");
 
 		Timer timer = new Timer();
 

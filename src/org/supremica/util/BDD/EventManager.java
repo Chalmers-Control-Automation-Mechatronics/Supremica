@@ -60,8 +60,24 @@ public class EventManager
 
 		e.id = old.id;    // copy the id (possibly just created)
 
+		old.owners++; // mark that this event has been used once
+
 		return old.id;
 	}
+
+	// -----------------------------------------------------
+	public Vector getLocalEvents(Automaton owner)
+	{
+	    Vector ret = new Vector();
+	    BDDAssert.internalCheck(closed, "[EventManager.registerEvent] BAD function call");
+	
+	    for (int i = 0; i < size; i++) {
+		if(events[i].owners == 1 && events[i].automaton == owner) ret.add(events[i]);
+	    }
+	    return ret;
+
+	}
+	
 
 	// -----------------------------------------------------
 	public void close()

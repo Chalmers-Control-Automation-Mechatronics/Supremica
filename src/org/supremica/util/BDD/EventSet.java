@@ -59,20 +59,21 @@ public class EventSet
 		return Automaton.FAILED;
 	}
 
-	public void add(EventManager alphabet, String label, String id, boolean c, boolean p)
+	public void add(EventManager alphabet, String label, String id, boolean c, boolean p, Automaton owner)
 	    throws BDDException
 	{
 		BDDAssert.internalCheck(!closed, "[EventSet.add] BAD FUNCTION CALL!");
 		BDDAssert.bddAssert(!in(label), "Duplicate event: " + label);
 
 		Event event = new Event();
-
+		
 		event.label = label;
 		event.name_id = id;
 		event.c = c;
 		event.p = p;
 		event.code = count++;
 		event.id = alphabet.registerEvent(event);
+		event.automaton = owner;
 
 		addElement(event);
 	}

@@ -96,7 +96,7 @@ public class GroupHelper {
 	if(twave == null) {
 	    twave = new int[size];
 	    for(int i = 0; i < size; i++) 
-		twave[i] = sorted_list[i].getDependencySet().getTwave();
+		twave[i] = sorted_list[i].getDependencySet().getTwave();	 
 	}
 	return twave;
     }

@@ -66,9 +66,8 @@ public class Automata
 		BDDAssert.bddAssert(!closed, "[Automata.close] BAD function call");
 		alphabet.close();
 
-		Enumeration e = automata.elements();
 
-		while (e.hasMoreElements())
+		for(Enumeration e = automata.elements(); e.hasMoreElements();)
 		{
 			Automaton a = (Automaton) e.nextElement();
 
@@ -117,7 +116,7 @@ public class Automata
 		total_size = 1;
 		variable_count = 0;
 
-		for (e = automata.elements(); e.hasMoreElements(); )
+		for (Enumeration e = automata.elements(); e.hasMoreElements(); )
 		{
 			Automaton a = (Automaton) e.nextElement();
 			int size = a.getStatesSize();

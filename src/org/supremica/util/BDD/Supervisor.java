@@ -130,6 +130,10 @@ public class Supervisor
 		bdd_uncontrollables = computeLanguageDifference(sigma_u);
 		has_uncontrollables = true;
 
+		SizeWatch.setOwner("Supervisor.computeUncontrollables");
+		SizeWatch.report(sigma_u, "Sigma_u");
+		SizeWatch.report(bdd_uncontrollables, "Q_nc");
+
 		manager.deref(sigma_u);
 
 		timer.report("Uncontrollable states found");
@@ -143,18 +147,31 @@ public class Supervisor
 	int cubep_sp = spec.getCubep();
 	int cubep_p = plant.getCubep();
 	int sigma_cube = manager.getEventCube();
+
+
+	
+	SizeWatch.setOwner("Supervisor.computeLanguageDifference");
+	SizeWatch.report(t_sp, "Tsp");
+	SizeWatch.report(t_p, "Tp");
+
 	int tmp10 = manager.exists(t_sp, cubep_sp);
-	int tmp1 = manager.not(tmp10);
-	
+	int tmp1 = manager.not(tmp10);	
 	manager.deref(tmp10);
-	
+	SizeWatch.report(tmp1, "~Eq'sp. Tsp");
+
 	int tmp2 = manager.and(tmp1, considred_events);	
 	manager.deref(tmp1);
+
+	SizeWatch.report(tmp2, "~Eq'sp. Tsp ^ (sigma in some Sigma)");
+
 	int cube2 = manager.and(sigma_cube, cubep_p);
 	int tmp4 = manager.relProd(t_p, tmp2, cube2);
 	
 	manager.deref(tmp2);
 	manager.deref(cube2);	
+
+	SizeWatch.report(tmp4, "(Language diff)");
+
 	return tmp4;
 	
     }
@@ -241,6 +258,7 @@ public class Supervisor
 		}
 
 		timer.reset();
+		SizeWatch.setOwner("Supervisor.computeReachables");
 
 		int cube = manager.getStateCube();
 		int permute = manager.getPermuteSp2S();
@@ -249,6 +267,9 @@ public class Supervisor
 		int r_all_p, r_all = i_all;
 
 		manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
+
+
+		SizeWatch.report(t_all, "T");
 
 		do
 		{
@@ -273,6 +294,7 @@ public class Supervisor
 		manager.deref(t_all);
 
 
+		SizeWatch.report(r_all, "R");
 
 		has_reachables = true;
 		bdd_reachables = r_all;
@@ -337,8 +359,15 @@ public class Supervisor
 		// note: dont use timer here (get reseted in two places below)
 		int r_all = getReachables();
 		int u_all = getUncontrollableStates();
+	
 
 		bdd_reachable_uncontrollables = manager.and(r_all, u_all);
+
+		SizeWatch.setOwner("Supervisor.computeReachableUncontrollables");
+		SizeWatch.report(r_all, "Qr");
+		SizeWatch.report(u_all, "Qnc");
+		SizeWatch.report(bdd_reachable_uncontrollables, "Qu");
+
 		has_reachable_uncontrollables = true;
 	}
 
@@ -371,7 +400,10 @@ public class Supervisor
 		int m_all = GroupHelper.getM(manager,spec, plant);
 
 
-
+		SizeWatch.setOwner("Supervisor.computeCoReachables");
+		SizeWatch.report(t_all, "T");
+		SizeWatch.report(m_all, "Qm");
+	
 		// gets derefed in first orTo ??
 		int r_all_p, r_all = manager.replace(m_all, permute1);    
 
@@ -407,6 +439,8 @@ public class Supervisor
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
+
+		SizeWatch.report(bdd_coreachables, "Qco");
 		timer.report("Co-reachables found");
 
 		if (gf != null)
@@ -447,6 +481,12 @@ public class Supervisor
 	int r_all_p, r_all = i_all;
 	
 	manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
+
+
+	SizeWatch.setOwner("Supervisor.computeReachableSubset");
+	SizeWatch.report(t_all, "T");
+	SizeWatch.report(set, "set");
+
 	
 	do {
 	    r_all_p = r_all;
@@ -464,6 +504,8 @@ public class Supervisor
 		manager.deref(t_all);
 		manager.deref(i_all);
 		manager.deref(tmp2);
+
+		SizeWatch.report(intersection, "set intersection Qr");
 		timer.report("Forward reachablility with constraint");
 		return intersection;
 	    }
@@ -487,6 +529,9 @@ public class Supervisor
 	// since we got reachables anyway, lets save it		
 	has_reachables = true;
 	bdd_reachables = r_all;
+
+	SizeWatch.report(bdd_reachables, "Qr");
+
 
 	// nothing to report, return 0
 	int ret = manager.getZero();

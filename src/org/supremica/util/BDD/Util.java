@@ -23,7 +23,7 @@ public class Util
 		// System.out.println("NODES="+nodes);
 		return nodes;
 	}
-
+    
 	public static int log2ceil(int num)
 	{
 		if (num <= 1)
@@ -81,4 +81,25 @@ public class Util
 
 		return ret;
 	}
+
+
+    /** 
+     * Actually SHOW the BDD as an EPS file<br>
+     * requires: AT&T dot, ghostview.<br>
+     * works only on UNIX :)
+     */
+    public static void showBDD(JBDD manager, int bdd, String name) {
+	String file = "/tmp/BDD_" + name ;
+
+	manager.printDot(bdd, file + ".dot");
+	try {
+
+	    Runtime.getRuntime().exec("dot -Tps " + file + ".dot -o " + file + ".eps");
+	    Runtime.getRuntime().exec("ghostview " + file + ".eps &");
+
+	    Thread.sleep(1000); // calm down [for user]
+	} catch(Exception exx) {
+	    exx.printStackTrace();
+	}
+    }
 }

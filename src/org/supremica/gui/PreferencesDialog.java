@@ -660,6 +660,7 @@ class BDDPanel
 {
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
+    private JCheckBox localSaturation;
     private JComboBox algorithmFamily, countAlgorithm;
     
     public BDDPanel(PreferencesDialog theDialog)
@@ -677,7 +678,8 @@ class BDDPanel
 	p.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
 	p.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
 	p.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
-	p.add( debugOn = new JCheckBox("Debug mode", Options.debug_on) );
+	p.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
+	p.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
 	p.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
 	p.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
 
@@ -710,15 +712,15 @@ class BDDPanel
     
     public boolean doApply()
     {
-	Options.algo_family     = algorithmFamily.getSelectedIndex();
-	Options.count_algo      = countAlgorithm.getSelectedIndex();
-	Options.show_grow       = showGrow.isSelected();
-	Options.user_alters_PCG = alterPCG.isSelected();
-	Options.uc_optimistic   = ucOptimistic.isSelected();
-	Options.nb_optimistic   = nbOptimistic.isSelected();
-	Options.trace_on        = traceOn.isSelected();
-	Options.debug_on        = debugOn.isSelected();
-	
+	Options.algo_family      = algorithmFamily.getSelectedIndex();
+	Options.count_algo       = countAlgorithm.getSelectedIndex();
+	Options.show_grow        = showGrow.isSelected();
+	Options.user_alters_PCG  = alterPCG.isSelected();
+	Options.uc_optimistic    = ucOptimistic.isSelected();
+	Options.nb_optimistic    = nbOptimistic.isSelected();
+	Options.trace_on         = traceOn.isSelected();
+	Options.debug_on         = debugOn.isSelected();
+	Options.local_saturation = localSaturation.isSelected();
 
 	SupremicaProperties.updateBDDOptions(true);		
 	return true;

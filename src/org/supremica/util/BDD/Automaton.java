@@ -78,7 +78,7 @@ public class Automaton
 	{
 		if (!closed)
 		{
-			eventSet.add(alphabet, label, id, c, p);
+			eventSet.add(alphabet, label, id, c, p, this);
 		}
 	}
 
@@ -91,23 +91,56 @@ public class Automaton
 		}
 	}
 
+
+	private void saturate(Vector v)
+	{
+	    Enumeration it = v.elements();
+	    while(it.hasMoreElements()) {
+		Event e = (Event) it.nextElement();
+		    saturate(e);
+	    }
+	}
+	private void saturate(Event e)
+	{
+
+	    Vector v = arcSet.getArcVector(e);
+	    Enumeration it = v.elements();
+	    while(it.hasMoreElements()) {
+		Arc a = (Arc) it.nextElement();
+		arcSet.saturate(a.state1, a.state2, e, eventSet);
+	    }
+	}
+
+    
 	public void close()
 	    throws BDDException
 	{
+	    
+	 
+
 
 		// TODO: this function seems to be extremly inefficient, more linear searchs??
 		closed = true;
 
-		arcSet.close(stateSet, eventSet);
-
 		// Dont call close yet (we dont know the size of global alphabet yet)
 		// eventSet.close();
-		stateSet.close();
+
 	}
 
 	public void close2()
 	    throws BDDException
 	{
+
+
+	    // find my local events
+	    if(Options.local_saturation) {
+		Vector v = alphabet.getLocalEvents(this);
+		saturate(v);
+	    }
+
+	    arcSet.close(stateSet, eventSet);
+	    stateSet.close();
+
 
 		// EventManager.close() has been called and we can proceed
 		eventSet.close(alphabet);

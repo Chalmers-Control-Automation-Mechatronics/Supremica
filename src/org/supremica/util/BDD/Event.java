@@ -4,11 +4,12 @@ public class Event
 {
 	Event()
 	{
-		use = 0;
+		owners = use = 0;
 	}
 
 	String name_id, label;
-	int id, code, use;
+	int id, code, use, owners;
 	int bdd;
 	boolean c, p;
+    Automaton automaton;
 }

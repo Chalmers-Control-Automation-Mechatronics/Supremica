@@ -130,8 +130,10 @@ public final class SupremicaProperties
     private static final String BDD_DEBUG_ON  = "bddDebugOn";
     private static final String BDD_ALGORITHM = "bddAlgorithm";
     private static final String BDD_COUNT_ALGO= "bddCountAlgorithm";
+    private static final String BDD_LOCAL_SATURATION = "bddLocalSaturation";
     private static final String BDD_UC_OPTIMISTIC = "bddUCOptimistic";
     private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
+
 
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
@@ -223,6 +225,7 @@ public final class SupremicaProperties
 		setProperty(BDD_DEBUG_ON  , toString(Options.debug_on), true);
 		setProperty(BDD_UC_OPTIMISTIC, toString(Options.uc_optimistic), true);
 		setProperty(BDD_NB_OPTIMISTIC, toString(Options.nb_optimistic), true);
+		setProperty(BDD_LOCAL_SATURATION, toString(Options.local_saturation), true);
 		setProperty(BDD_ALGORITHM , toString(Options.algo_family), true);
 		setProperty(BDD_COUNT_ALGO, toString(Options.count_algo), true);		
 	}
@@ -798,6 +801,8 @@ public final class SupremicaProperties
 	public static boolean getBDDDebugOn(){  return toBoolean(wp.getProperty(BDD_DEBUG_ON));    }
     	public static void setBDDDebugOn(boolean a){  wp.setProperty(BDD_DEBUG_ON, toString(a));    }
 
+	public static boolean getBDDLocalSaturation(){  return toBoolean(wp.getProperty(BDD_LOCAL_SATURATION));    }
+    	public static void setBDDLocalSaturation(boolean a){  wp.setProperty(BDD_LOCAL_SATURATION, toString(a));    }
 
 	public static boolean isBDDUCOptimistic(){  return toBoolean(wp.getProperty(BDD_UC_OPTIMISTIC));    }
     	public static void setBDDUCOptimistic(boolean a){  wp.setProperty(BDD_UC_OPTIMISTIC, toString(a));    }
@@ -818,18 +823,20 @@ public final class SupremicaProperties
 	    setBDDDebugOn(Options.debug_on);
 	    setBDDUCOptimistic(Options.uc_optimistic);
 	    setBDDNBOptimistic(Options.nb_optimistic);
+	    setBDDLocalSaturation(Options.local_saturation);
 	    setBDDTraceOn(Options.trace_on);
 	    setBDDCountAlgorithm(Options.count_algo);
 	} else {
 	    // Properties -> Options
-	    Options.algo_family     = getBDDAlgorithm();
-	    Options.show_grow       = getBDDShowGrow();
-	    Options.user_alters_PCG = getBDDAlterPCG();
-	    Options.uc_optimistic   = isBDDUCOptimistic();
-	    Options.nb_optimistic   = isBDDNBOptimistic();
-	    Options.debug_on        = getBDDDebugOn();
-	    Options.trace_on        = getBDDTraceOn();
-	    Options.count_algo      = getBDDCountAlgorithm();
+	    Options.algo_family      = getBDDAlgorithm();
+	    Options.show_grow        = getBDDShowGrow();
+	    Options.user_alters_PCG  = getBDDAlterPCG();
+	    Options.uc_optimistic    = isBDDUCOptimistic();
+	    Options.nb_optimistic    = isBDDNBOptimistic();
+	    Options.debug_on         = getBDDDebugOn();
+	    Options.trace_on         = getBDDTraceOn();
+	    Options.local_saturation = getBDDLocalSaturation();
+	    Options.count_algo       = getBDDCountAlgorithm();
 	}
     }
 

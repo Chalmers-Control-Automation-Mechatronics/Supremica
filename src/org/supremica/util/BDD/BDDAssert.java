@@ -5,6 +5,9 @@ public class BDDAssert
 	public static void fatal(String s)
 	{
 		System.err.println("FATAL ERROR: " + s);
+		try {
+		    Thread.sleep(5000);
+		} catch(Exception exx) { }
 		System.exit(20);
 	}
 

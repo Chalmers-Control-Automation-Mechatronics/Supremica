@@ -69,7 +69,7 @@ class JBDD {
 		*/
     private static final int
 	DEFAULT_VAR_COUNT = 64,
-	DEFAULT_NODE_COUNT = 10000; //
+	DEFAULT_NODE_COUNT = 3 * 10000; //
 
 	/** Supported dyanmic reorering method */
 	public static final int
@@ -78,32 +78,32 @@ class JBDD {
 
 
 
-		/** BDD trees for constant one and constant zero */
+    /** BDD trees for constant one and constant zero */
     public int one, zero;
 
-	/** Create the BDD object using the default number
-		if variables and node-count	*/
-	  public JBDD() { this(DEFAULT_VAR_COUNT, DEFAULT_NODE_COUNT); }
-
-
-			/** Create the BDD object using the default node count and the given number of variables
-			@param vars maximum number of BDD variables to be used */
+    /** Create the BDD object using the default number
+	if variables and node-count	*/
+    public JBDD() { this(DEFAULT_VAR_COUNT, DEFAULT_NODE_COUNT); }
+    
+    
+    /** Create the BDD object using the default node count and the given number of variables
+	@param vars maximum number of BDD variables to be used */
     public JBDD(int vars) { this(vars, DEFAULT_NODE_COUNT); }
-
-
-    	/** Create the BDD object using the given number of variables and node count
-					@param vars maximum number of BDD variables to be used
-					@param nodes the initial number of BDD nodes
-					The BuDDy manual suggest the follwoing values for inital node count:
-					<pre>
-					small test examples      1000 nodes
-					small examples           10000
-					medium sized examples    100000
-					large examples           1000000
-					</pre>
-
-					*/
-
+    
+    
+    /** Create the BDD object using the given number of variables and node count
+	@param vars maximum number of BDD variables to be used
+	@param nodes the initial number of BDD nodes
+	The BuDDy manual suggest the follwoing values for inital node count:
+	<pre>
+	small test examples      1000 nodes
+	small examples           10000
+	medium sized examples    100000
+	large examples           1000000
+	</pre>
+	
+    */
+    
     public JBDD(int vars, int nodes) {
 	init(vars, nodes);
 	one = getOne();

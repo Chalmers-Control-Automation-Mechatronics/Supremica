@@ -27,6 +27,7 @@ public class ArcSet
 		return false;
 	}
 
+  
 	public void add(String event, String s1, String s2)
 	    throws BDDException
 	{
@@ -59,6 +60,18 @@ public class ArcSet
 		return arcs;
 	}
 
+	public Vector getArcVector(Event e)
+	{
+		BDDAssert.internalCheck(!closed, "[ArcSet.getArcVector] BAD FUNCTION CALL!");
+		Vector v = new Vector();
+
+		for (Enumeration it = elements(); it.hasMoreElements(); ) {
+		    Arc arc = (Arc) it.nextElement();
+		    if(arc.event.equals(e.name_id)) v.add(arc);
+		}
+		return v;
+	}
+
 	public Arc getArc(int index)
 	{
 		BDDAssert.internalCheck(closed, "[ArcSet.getArc]BAD FUNCTION CALL!");
@@ -66,6 +79,42 @@ public class ArcSet
 
 		return arcs[index];
 	}
+
+    
+	public void saturate(String from, String to, Event e1, EventSet es) 
+	{
+	    BDDAssert.internalCheck(!closed, "[ArcSet.saturate]BAD FUNCTION CALL!");
+
+
+	   
+	    for (Enumeration e = elements(); e.hasMoreElements(); ) {
+		Arc arc = (Arc) e.nextElement();
+
+		// FORWARD SATURATE
+		if(arc.state2.equals(from)) {
+		    Event e2 = es.getEventByName(arc.event);
+		    if(e2.c == e1.c /* && e2.p == e1.p */) {
+			if(!in(e2.name_id, arc.state1, to)) {
+			    			    
+			    Arc new_arc = new Arc();
+			    
+			    new_arc.event  = e2.name_id;
+			    new_arc.state1 = arc.state1;
+			    new_arc.state2 = to;
+			    new_arc.id     = count++;
+			    new_arc.e_code = new_arc.s1_code = new_arc.s2_code;
+			    
+			    addElement(new_arc); 
+			}
+		    }
+		}
+
+
+
+	    }
+	}
+
+	
 
 	public void close(StateSet ss, EventSet es)
 	    throws BDDException

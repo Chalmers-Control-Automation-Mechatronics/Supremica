@@ -15,10 +15,10 @@ public class ConjSupervisor
 {
 
 
-    
+    private ConjPartition conj_partition;
     protected GroupHelper gh;
     protected int [] tpri;
-    protected int size;
+    protected int conj_size;
 
     /** Constructor, passes to the base-class */
     public ConjSupervisor(BDDAutomata manager, Group plant, Group spec) {
@@ -33,12 +33,31 @@ public class ConjSupervisor
 
     // -----------------------------------------------------------------
     private void init_conj() {
+	conj_partition = null; // not needed yet
 	// get the ordred automata list!
 	gh = new GroupHelper(plant, spec);
 	tpri = gh.getTpri();
-	size = gh.getSize();
+	conj_size = gh.getSize();
     }
 
+    // -----------------------------------------------------------------
+    public void cleanup() {
+	if(conj_partition != null) {
+	    conj_partition.cleanup();
+	    conj_partition = null;
+	}
+	super.cleanup();
+    }
+    protected ConjPartition getConjPartition() {
+	if(conj_partition == null) computeConjPartition();
+	return conj_partition;
+    }
+    
+    private void computeConjPartition() {
+	conj_partition = new ConjPartition(manager, conj_size);
+	for(int i = 0; i < conj_size; i++) 
+	    conj_partition.add ( tpri[i]);
+    }
     // -----------------------------------------------------------------
     // TODO
 
@@ -101,53 +120,36 @@ public class ConjSupervisor
 	
 	
 	timer.reset();
+	SizeWatch.setOwner("ConjSupervisor.computeReachables");
 
-	BDDAutomaton [] Sp = spec.getMembers();
-	BDDAutomaton [] P  = plant.getMembers();
-	int Sp_size = spec.getSize();
-	int P_size  = plant.getSize();
-
-	int cube = manager.and(manager.getStateCube(), manager.getEventCube());
-	int permute = manager.getPermuteSp2S();
 	int i_all = manager.and(plant.getI(), spec.getI());
-	int r_all_p, r_all = i_all;	
+	int r_all_p, r_all = i_all, front = i_all;
 	manager.ref(i_all);    // gets derefed by orTo and finally a recursiveDeref
-
-	int front = r_all;
-	manager.ref(front); // gets derefed by andTo
+	manager.ref(front); // gets derefed 
 		
+
+	ConjPartition cp = getConjPartition();
 
 	do {
 	    r_all_p = r_all;
 	    
-
-	    // apply the conjunctive transition relations in reverse order
-	    // (to build the BDD bottom up ?)
-	    for(int i = 0; i < size; i++) 
-		front = manager.andTo( front, tpri[i]);
-
-	    int tmp = manager.exists(front, cube);
-	    manager.deref(front);
-
-
-	    int tmp2 = manager.replace(tmp, permute);
-	    manager.deref(tmp);
-
-
+	    int tmp2 = cp.image(front);
 	    r_all = manager.orTo(r_all, tmp2);
-	    front = tmp2; // dont deref!
+	    manager.deref(front);
+	    front = tmp2; 
 	    
 	    if (gf != null)
 		gf.add(manager.nodeCount(r_all));
 	} while (r_all_p != r_all);
 	
-	manager.deref(cube);
+
 	manager.deref(i_all);
 	manager.deref(front);
 	
 	has_reachables = true;
 	bdd_reachables = r_all;
 	
+	SizeWatch.report(bdd_reachables, "Qr");
 	timer.report("[Conjunctive] forward reachables found");
     }
 
@@ -163,35 +165,30 @@ public class ConjSupervisor
 		}
 
 		timer.reset();
+		SizeWatch.setOwner("ConjSupervisor.computeReachables");
 
-		int cube = manager.and(manager.getStatepCube(), manager.getEventCube());
+
 		int permute1 = manager.getPermuteS2Sp();
 		int permute2 = manager.getPermuteSp2S();
+		ConjPartition cp = getConjPartition();
 	      
-
 		int m_all = GroupHelper.getM(manager, spec, plant);
-
-		// gets derefed in first orTo ??
-		int r_all_p, r_all = manager.replace(m_all, permute1);    
-
+		int r_all_p, r_all = manager.replace(m_all, permute1);  // r_all refed
 		int front = r_all;
-		manager.ref(front);
+		manager.ref(front); // gets derefed
+		manager.deref(m_all);
+
+
+		SizeWatch.report(r_all, "Qm");
 
 		do
 		{
 			r_all_p = r_all;
 			
-			for(int i = i = 0; i < size; i++) 
-			    front = manager.andTo( front, tpri[i]);
-			
-			int tmp = manager.exists(front, cube);
+			int tmp = cp.preImage(front);
+			r_all = manager.orTo(r_all, tmp);
 			manager.deref(front);
-
-			int tmp2 = manager.replace(tmp, permute1);
-			manager.deref(tmp);
-			
-			r_all = manager.orTo(r_all, tmp2);
-			front = tmp2;
+			front = tmp;
 
 
 			if (gf != null)
@@ -201,18 +198,16 @@ public class ConjSupervisor
 		}
 		while (r_all_p != r_all);
 
-		manager.deref(m_all);
-		manager.deref(cube);
+		manager.deref(front);
 
 		int ret = manager.replace(r_all, permute2);
-
 		manager.deref(r_all);
-
 		
 		has_coreachables = true;
 		bdd_coreachables = ret;
 
 		timer.report("[Conjunctive] Co-reachables found");
+		SizeWatch.report(bdd_coreachables, "Qco");
 
 		if (gf != null)
 		{
