@@ -913,7 +913,7 @@ public class Supremica
 
 		if (theProject.hasAnimation())
 		{
-			JOptionPane.showMessageDialog(this, "This project includes an animation. ",
+			JOptionPane.showMessageDialog(this, "This project includes an animation.",
 										  "Project information", JOptionPane.INFORMATION_MESSAGE);
 		}
 

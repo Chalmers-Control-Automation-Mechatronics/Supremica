@@ -88,7 +88,9 @@ public class AutomataVerificationWorker
 	private static final int MODULAR = 1;
 	private static final int IDD = 2;
 
-	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
+	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, 
+									  SynchronizationOptions synchronizationOptions, 
+									  VerificationOptions verificationOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
@@ -113,7 +115,8 @@ public class AutomataVerificationWorker
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
 		if (errorMessage != null)
 		{
-			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, "Alert", 
+										  JOptionPane.ERROR_MESSAGE);
 			requestStop();
 			return;
 		}
@@ -135,7 +138,7 @@ public class AutomataVerificationWorker
 		{
 			// Mutual non-blocking verification...
 			successMessage = "The system is mutually non-blocking!";
-			failureMessage = "The system might be mutually blocking.";
+			failureMessage = "The system is (globally and mutually) blocking!";
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{

@@ -1408,6 +1408,7 @@ public class Automaton
 	 */
 	public void extendMutuallyAccepting(Events safeEvents)
 	{
+		beginTransaction();
 		boolean changes = true;
 		while (changes)
 		{
@@ -1430,6 +1431,7 @@ public class Automaton
 							if (!fromState.isMutuallyAccepting())
 							{
 								fromState.setMutuallyAccepting(true);
+								//fromState.setAccepting(true);
 								changes = true;
 							}
 						}
@@ -1437,6 +1439,8 @@ public class Automaton
 				}
 			}
 		}
+		invalidate();
+		endTransaction();
 	}
 	
 	public void setAllStatesAsAccepting()
@@ -1465,7 +1469,38 @@ public class Automaton
 		}
 		invalidate();
 		endTransaction();		
-	}	
+	}
+
+	public void setAllMutuallyAcceptingStatesAsAccepting()
+	{
+		setAllMutuallyAcceptingStatesAsAccepting(false);
+	}
+
+	public void setAllMutuallyAcceptingStatesAsAccepting(boolean keepForbidden)
+	{
+		beginTransaction();
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			if (currState.isMutuallyAccepting())
+			{
+				if (keepForbidden)
+				{
+					if (!currState.isForbidden())
+					{	
+						currState.setAccepting(true);
+					}
+				}
+				else
+				{
+					currState.setAccepting(true);
+					currState.setForbidden(false);	
+				}
+			}
+		}
+		invalidate();
+		endTransaction();		
+	}		
 
 	/**
 	 * Returns a event on a arc that starts in fromState and ends in toState.
@@ -1499,7 +1534,7 @@ public class Automaton
 		{
 			listeners.setUpdateNeeded(true);
 		}
-
+ 		
 		endTransaction();
 	}
 

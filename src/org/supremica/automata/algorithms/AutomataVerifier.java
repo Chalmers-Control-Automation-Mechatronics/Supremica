@@ -214,7 +214,7 @@ public class AutomataVerifier
 
 			if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.Modular)
 			{
-				return "The mutually nonblocking algorithm \n" + "is a modular algorithm!";
+				return "The mutual nonblocking algorithm \n" + "is a modular algorithm!";
 			}
 		}
 
@@ -606,7 +606,7 @@ public class AutomataVerifier
 							 " that might be uncontrollable...");
 			}
 
-			// Set a sorted array of indexes of automata with similar alphabets
+			// Get a sorted array of indexes of automata with similar alphabets
 			int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 			if (similarAutomata == null)
 			{

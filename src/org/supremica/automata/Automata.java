@@ -594,7 +594,7 @@ public class Automata
 		return true;
 
 		/*
-		// ?(/¤#)=%&# WHAT IS THIS! IT'S NOT DOING WHAT THE METHOD SAYS IT DOES!! %"#¤&#%/" /hugo
+		// ?(/¤#)=%&# WHAT THE ¤@@%& IS THIS! IT'S NOT DOING WHAT THE METHOD SAYS IT DOES!! %"#¤&#%/" /hugo
 		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
 		{
 			Automaton automaton = (Automaton) automataIterator.next();
@@ -1064,6 +1064,8 @@ public class Automata
 	 * @param minSize Minimum size of the automata.
 	 * @param mustHaveInitial Test requires automata to have initial states.
 	 * @param mustHaveType Test requires that the automata are not of undefined type.
+	 * @param mustBeControllabilityConsistent Test requires that an event has the same
+	 * controllability status in all automata.
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */

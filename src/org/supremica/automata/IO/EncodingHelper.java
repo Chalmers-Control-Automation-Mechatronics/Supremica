@@ -76,15 +76,16 @@ public class EncodingHelper
 		String s = input.replaceAll("[\n\r]", " ");
 		s = s.replaceAll(" +", " ");
 
+		// Chop up the string
 		int len = s.length();
 		int lastBreak = 0;
-
 		while (len - lastBreak > lineWidth)
 		{
 			int nextBreak = s.lastIndexOf(' ', lastBreak + lineWidth);
 			if (nextBreak == -1)
-				nextBreak = lastBreak + lineWidth;
-			s = s.substring(0, nextBreak) + "\n" + s.substring(nextBreak+1,len);
+				s = s.substring(0, lastBreak+lineWidth) + "\n" + s.substring(lastBreak+lineWidth);
+			else
+				s = s.substring(0, nextBreak) + "\n" + s.substring(nextBreak+1);
 			lastBreak = nextBreak;
 		}
 
