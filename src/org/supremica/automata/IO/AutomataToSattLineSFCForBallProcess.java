@@ -157,7 +157,7 @@ public class AutomataToSattLineSFCForBallProcess
 			{
 				theCondition.append(" OR ");
 			}
-			if (theUcEvent.getLabel().equals("timer"))
+			if (theUcEvent.getLabel().equalsIgnoreCase("timer"))
 			{
 				theCondition.append("False");
 			}
