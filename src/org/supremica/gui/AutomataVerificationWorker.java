@@ -93,7 +93,7 @@ public class AutomataVerificationWorker
 	private static final int MODULAR = 1;
 	private static final int MONOLITHIC = 0;
 	private static final int IDD = 2;
-	
+
 	public AutomataVerificationWorker(
 
 	/*
@@ -132,7 +132,7 @@ public class AutomataVerificationWorker
 			}
 		});
 
-		if (verificationOptions.getVerificationType() == 0)
+		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
 		{
 
 			// Controllability verification...
@@ -176,19 +176,19 @@ public class AutomataVerificationWorker
 
 			try
 			{
-				if (verificationOptions.getAlgorithmType() == MODULAR)
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 
 					// Modular...
 					isControllable = automataVerifier.modularControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == MONOLITHIC)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
 
 					// Monolithic...
 					isControllable = automataVerifier.monolithicControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == IDD)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
 
 					// IDD...
@@ -236,7 +236,7 @@ public class AutomataVerificationWorker
 				}
 			}
 		}
-		else if (verificationOptions.getVerificationType() == 1)
+		else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
 		{
 
 			// Non-blocking verification...
@@ -284,7 +284,7 @@ public class AutomataVerificationWorker
 
 			try
 			{
-				if (verificationOptions.getAlgorithmType() == MODULAR)
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 
 					// Modular...
@@ -295,13 +295,13 @@ public class AutomataVerificationWorker
 
 					return;
 				}
-				else if (verificationOptions.getAlgorithmType() == MONOLITHIC)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
 
 					// Monolithic...
 					isNonBlocking = automataVerifier.monolithicNonBlockingVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == IDD)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
 
 					// IDD...
@@ -349,7 +349,7 @@ public class AutomataVerificationWorker
 				}
 			}
 		}
-		else if (verificationOptions.getVerificationType() == 2)
+		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 
 			// Language inclusion
@@ -517,19 +517,19 @@ public class AutomataVerificationWorker
 
 			try
 			{
-				if (verificationOptions.getAlgorithmType() == MODULAR)
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 
 					// Modular...
 					isIncluded = automataVerifier.modularControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == MONOLITHIC)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
 
 					// Monolithic...
 					isIncluded = automataVerifier.monolithicControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == IDD)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 				{
 
 					// IDD...

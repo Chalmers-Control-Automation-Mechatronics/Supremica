@@ -50,6 +50,8 @@
 package org.supremica.gui;
 
 import org.supremica.automata.algorithms.VerificationOptions;
+import org.supremica.automata.algorithms.VerificationType;
+import org.supremica.automata.algorithms.VerificationAlgorithm;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -70,36 +72,36 @@ class VerificationDialogStandardPanel
 	private AlgorithmSelector algorithmSelector;
 	private JTextArea nbNote;
 
-	final String[] verificationData = { "Controllability",	// keep them in this order, for God's sake!
-										"Non-blocking",
-										"Language inclusion" };
+	//final String[] verificationData = { "Controllability",	// keep them in this order, for God's sake!
+	//									"Non-blocking",
+	//									"Language inclusion" };
 
 
 	static class AlgorithmSelector
 		extends JComboBox
 	{
-		final static int MONOLITHIC = 0;
-		final static int MODULAR = 1;
+		//final static int MONOLITHIC = 0;
+		//final static int MODULAR = 1;
 		//final static int IDD = 2;
-		final static String[] algorithmData = { "Monolithic",  "Modular"};
+		//final static String[] algorithmData = { "Monolithic",  "Modular"};
 
 		public AlgorithmSelector()
 		{
-			super(algorithmData);
+			super(VerificationAlgorithm.toArray());
 		}
 		public void forceMonolithic()
 		{
-			removeItemAt(MODULAR);
+			//removeItemAt(MODULAR);
 		}
 		public void allowAll()
 		{
-			addItem(algorithmData[MODULAR]);
+			//addItem(algorithmData[MODULAR]);
 		}
 	}
 
 	public VerificationDialogStandardPanel()
 	{
-		verificationTypeBox = new JComboBox(verificationData);
+		verificationTypeBox = new JComboBox(VerificationType.toArray());
 		verificationTypeBox.addActionListener(this);
 
 		algorithmSelector = new AlgorithmSelector();
@@ -119,19 +121,19 @@ class VerificationDialogStandardPanel
 
 	public void update(VerificationOptions verificationOptions)
 	{
-		verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
-		algorithmSelector.setSelectedIndex(verificationOptions.getAlgorithmType());
+		verificationTypeBox.setSelectedItem(verificationOptions.getVerificationType());
+		algorithmSelector.setSelectedItem(verificationOptions.getAlgorithmType());
 	}
 
 	public void regain(VerificationOptions verificationOptions)
 	{
-		verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
-		verificationOptions.setAlgorithmType(algorithmSelector.getSelectedIndex());
+		verificationOptions.setVerificationType((VerificationType)verificationTypeBox.getSelectedItem());
+		verificationOptions.setAlgorithmType((VerificationAlgorithm)algorithmSelector.getSelectedItem());
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
-		if(((String)verificationTypeBox.getSelectedItem()) == verificationData[1]) // non-blocking
+		if((verificationTypeBox.getSelectedItem()) == VerificationType.Nonblocking) // non-blocking
 		{
 			// force the monolithic algorithm
 			algorithmSelector.forceMonolithic();

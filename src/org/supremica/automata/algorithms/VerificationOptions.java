@@ -54,8 +54,8 @@ import org.supremica.properties.SupremicaProperties;
 public final class VerificationOptions
 {
 	private boolean dialogOK = false;
-	private int verificationType;
-	private int algorithmType;
+	private VerificationType verificationType;
+	private VerificationAlgorithm algorithmType;
 	private int exclusionStateLimit;
 	private int reachabilityStateLimit;
 	private boolean oneEventAtATime;
@@ -66,7 +66,7 @@ public final class VerificationOptions
 		this(SupremicaProperties.verifyVerificationType(), SupremicaProperties.verifyAlgorithmType(), SupremicaProperties.verifyExclusionStateLimit(), SupremicaProperties.verifyReachabilityStateLimit(), SupremicaProperties.verifyOneEventAtATime(), SupremicaProperties.verifySkipUncontrollabilityCheck());
 	}
 
-	public VerificationOptions(int verificationType, int algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
+	public VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
 	{
 		this.verificationType = verificationType;
 		this.algorithmType = algorithmType;
@@ -86,26 +86,26 @@ public final class VerificationOptions
 		return dialogOK;
 	}
 
-	public void setVerificationType(int index)
+	public void setVerificationType(VerificationType type)
 	{
-		verificationType = index;
+		verificationType = type;
 
-		SupremicaProperties.setVerifyVerificationType(index);
+		SupremicaProperties.setVerifyVerificationType(type);
 	}
 
-	public int getVerificationType()
+	public VerificationType getVerificationType()
 	{
 		return verificationType;
 	}
 
-	public void setAlgorithmType(int index)
+	public void setAlgorithmType(VerificationAlgorithm algorithm)
 	{
-		algorithmType = index;
+		algorithmType = algorithm;
 
-		SupremicaProperties.setVerifyAlgorithmType(index);
+		SupremicaProperties.setVerifyAlgorithmType(algorithm);
 	}
 
-	public int getAlgorithmType()
+	public VerificationAlgorithm getAlgorithmType()
 	{
 		return algorithmType;
 	}

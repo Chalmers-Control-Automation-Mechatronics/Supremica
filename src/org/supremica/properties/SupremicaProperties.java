@@ -53,6 +53,8 @@ import java.util.*;
 import java.io.*;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
+import org.supremica.automata.algorithms.VerificationType;
+import org.supremica.automata.algorithms.VerificationAlgorithm;
 
 /**
  * Properties for Supremica.
@@ -160,8 +162,8 @@ public final class SupremicaProperties
 		setProperty(SYNC_INITIAL_HASHTABLE_SIZE, Integer.toString((1 << 14) - 1), true);
 		setProperty(SYNC_EXPAND_HASHTABLE, "true", true);
 		setProperty(SYNC_NBR_OF_EXECUTERS, "1", true);
-		setProperty(VERIFY_VERIFICATION_TYPE, "0", true);
-		setProperty(VERIFY_ALGORITHM_TYPE, "0", true);
+		setProperty(VERIFY_VERIFICATION_TYPE, VerificationType.Controllability.toString(), true);
+		setProperty(VERIFY_ALGORITHM_TYPE, VerificationAlgorithm.Modular.toString(), true);
 		setProperty(VERIFY_EXCLUSION_STATE_LIMIT, "1000", true);
 		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000", true);
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false", true);
@@ -577,24 +579,28 @@ public final class SupremicaProperties
 	}
 
 	// Verification...
-	public static int verifyVerificationType()
+	public static VerificationType verifyVerificationType()
 	{
-		return toInt(wp.getProperty(VERIFY_VERIFICATION_TYPE));
+		return VerificationType.toType(wp.getProperty(VERIFY_VERIFICATION_TYPE));
+		//return toInt(wp.getProperty(VERIFY_VERIFICATION_TYPE));
 	}
 
-	public static void setVerifyVerificationType(int type)
+	public static void setVerifyVerificationType(VerificationType type)
 	{
-		wp.setProperty(VERIFY_VERIFICATION_TYPE, toString(type));
+		wp.setProperty(VERIFY_VERIFICATION_TYPE, type.toString());
+		// wp.setProperty(VERIFY_VERIFICATION_TYPE, toString(type));
 	}
 
-	public static int verifyAlgorithmType()
+	public static VerificationAlgorithm verifyAlgorithmType()
 	{
-		return toInt(wp.getProperty(VERIFY_ALGORITHM_TYPE));
+		return VerificationAlgorithm.toAlgorithm(wp.getProperty(VERIFY_ALGORITHM_TYPE));
+		//return toInt(wp.getProperty(VERIFY_ALGORITHM_TYPE));
 	}
 
-	public static void setVerifyAlgorithmType(int type)
+	public static void setVerifyAlgorithmType(VerificationAlgorithm type)
 	{
-		wp.setProperty(VERIFY_ALGORITHM_TYPE, toString(type));
+		wp.setProperty(VERIFY_ALGORITHM_TYPE, type.toString());
+		// wp.setProperty(VERIFY_ALGORITHM_TYPE, toString(type));
 	}
 
 	public static int verifyExclusionStateLimit()
