@@ -58,21 +58,24 @@ public final class SynthesizerOptions
 	private int algorithmType;
 	private boolean purge;
 	private boolean optimize;
+	private boolean maximallyPermissive;
 
 	public SynthesizerOptions()
 	{
 		this(WorkbenchProperties.synthesisSynthesisType(), 
 			 WorkbenchProperties.synthesisAlgorithmType(),
 			 WorkbenchProperties.synthesisPurge(), 
-			 WorkbenchProperties.synthesisOptimize());
+			 WorkbenchProperties.synthesisOptimize(),
+			 WorkbenchProperties.synthesisMaximallyPermissive());
 	}
 
-	public SynthesizerOptions(int synthesisType, int algorithmType, boolean purge, boolean optimize)
+	public SynthesizerOptions(int synthesisType, int algorithmType, boolean purge, boolean optimize, boolean maximallyPermissive)
 	{
 		this.synthesisType = synthesisType;
 		this.algorithmType = algorithmType; 
 		this.purge = purge;
 		this.optimize = optimize;
+		this.maximallyPermissive = maximallyPermissive;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -83,6 +86,28 @@ public final class SynthesizerOptions
 	public boolean getDialogOK()
 	{
 		return dialogOK;
+	}
+
+	public void setSynthesisType(int index)
+	{
+	    synthesisType = index;
+		WorkbenchProperties.setSynthesisSynthesisType(index);
+	}
+
+	public int getSynthesisType()
+	{
+		return synthesisType;
+	}
+
+	public void setAlgorithmType(int index)
+	{
+	    algorithmType = index;
+		WorkbenchProperties.setSynthesisAlgorithmType(index);
+	}
+
+	public int getAlgorithmType()
+	{
+		return algorithmType;
 	}
 
 	public void setPurge(boolean bool)
@@ -107,25 +132,14 @@ public final class SynthesizerOptions
 		return optimize;
 	}
 
-	public void setSynthesisType(int index)
+	public void setMaximallyPermissive(boolean bool)
 	{
-	    synthesisType = index;
-		WorkbenchProperties.setSynthesisSynthesisType(index);
+	    maximallyPermissive = bool;
+		WorkbenchProperties.setSynthesisMaximallyPermissive(bool);
 	}
 
-	public int getSynthesisType()
+	public boolean getMaximallyPermissive()
 	{
-		return synthesisType;
-	}
-
-	public void setAlgorithmType(int index)
-	{
-	    algorithmType = index;
-		WorkbenchProperties.setSynthesisAlgorithmType(index);
-	}
-
-	public int getAlgorithmType()
-	{
-		return algorithmType;
+		return maximallyPermissive;
 	}
 }

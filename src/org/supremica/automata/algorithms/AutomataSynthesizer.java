@@ -76,6 +76,7 @@ public class AutomataSynthesizer
 
 	// For the optimization...
 	private Automata newAutomata = new Automata();
+	private boolean maximallyPermissive;
 
     public AutomataSynthesizer(Supremica workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws IllegalArgumentException
@@ -90,6 +91,7 @@ public class AutomataSynthesizer
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
 
 		theAutomatonContainer = workbench.getAutomatonContainer();
+		maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
  		try
 		{
@@ -156,9 +158,10 @@ public class AutomataSynthesizer
 								if (!selectedAutomata.contains(currPlantAutomaton))
 								{
 									selectedAutomata.add(currPlantAutomaton);
-									// We want to add plants with uncontrollable events 
-									// common to the already added plants too...
-									eventList.addAll(currPlantAutomaton.eventCollection());
+									// If we want a maximally permissive result, we need to add plants with 
+									// uncontrollable events common to the already added plants too...
+									if (maximallyPermissive)
+										eventList.addAll(currPlantAutomaton.eventCollection());
 								}
 							}
 						}

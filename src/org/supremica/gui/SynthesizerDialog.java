@@ -67,6 +67,7 @@ public class SynthesizerDialog
 	private JComboBox algorithmTypeBox;
 	private JCheckBox purgeBox;
 	private JCheckBox optimizeBox;
+	private JCheckBox maximallyPermissiveBox;
 	private JDialog dialog;
 
 	/**
@@ -118,7 +119,12 @@ public class SynthesizerDialog
 		standardPanel.add(standardBox);
 		
 		// advancedPanel
-		// null...
+		Box advancedBox = Box.createVerticalBox();
+		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
+		
+		advancedBox.add(maximallyPermissiveBox);
+
+		advancedPanel.add(advancedBox);
 
 		// buttonPanel
 		JPanel buttonPanel = new JPanel();
@@ -141,6 +147,7 @@ public class SynthesizerDialog
 		algorithmTypeBox.setSelectedIndex(synthesizerOptions.getAlgorithmType());
 		purgeBox.setSelected(synthesizerOptions.getPurge());
 		optimizeBox.setSelected(synthesizerOptions.getOptimize());
+		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
 	}	
 
    	private JButton addButton(Container container, String name)
@@ -162,10 +169,11 @@ public class SynthesizerDialog
 		if (source == okButton)
 		{
 			synthesizerOptions.setDialogOK(true);
-			synthesizerOptions.setPurge(purgeBox.isSelected());
-			synthesizerOptions.setOptimize(optimizeBox.isSelected());
 			synthesizerOptions.setSynthesisType(synthesisTypeBox.getSelectedIndex());
 			synthesizerOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+			synthesizerOptions.setPurge(purgeBox.isSelected());
+			synthesizerOptions.setOptimize(optimizeBox.isSelected());
+			synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
 			dialog.setVisible(false);
 			dialog.dispose();
 		}

@@ -87,6 +87,7 @@ public final class WorkbenchProperties
 	private static final String SYNTHESIS_ALGORITHM_TYPE = "synthesisAlgorithmType";
 	private static final String SYNTHESIS_PURGE = "synthesisPurge";
 	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
+	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 
 	private static final WorkbenchProperties wp = new WorkbenchProperties();
 
@@ -121,6 +122,7 @@ public final class WorkbenchProperties
 		setProperty(SYNTHESIS_ALGORITHM_TYPE, "0");
 		setProperty(SYNTHESIS_PURGE, "true");
 		setProperty(SYNTHESIS_OPTIMIZE, "true");
+		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true");
 	}
 
 	public static void load(String fileName)
@@ -410,9 +412,19 @@ public final class WorkbenchProperties
 		return toBoolean(wp.getProperty(SYNTHESIS_OPTIMIZE));
 	}
 
-	public static void setSynthesisOptimize(boolean optimize)
+	public static void setSynthesisOptimize(boolean maximallyPermissive)
 	{
-		wp.setProperty(SYNTHESIS_OPTIMIZE, toString(optimize));
+		wp.setProperty(SYNTHESIS_OPTIMIZE, toString(maximallyPermissive));
+	}
+
+	public static boolean synthesisMaximallyPermissive()
+	{
+		return toBoolean(wp.getProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE));
+	}
+
+	public static void setSynthesisMaximallyPermissive(boolean maximallyPermissive)
+	{
+		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, toString(maximallyPermissive));
 	}
 
 	private static String toString(boolean b)
