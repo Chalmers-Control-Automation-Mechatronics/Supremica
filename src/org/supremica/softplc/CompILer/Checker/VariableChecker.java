@@ -77,6 +77,159 @@ public class VariableChecker implements SimpleNodeVisitor {
 		return null;
 	}
 
+
+
+
+	public ASTil_simple_operation create_LD_Node(String type, String value, String fb_name) {
+		ASTil_simple_operation jjtn_simple_op;
+		ASTnumeric_literal     jjtn_numeric_literal;
+		ASTboolean_literal     jjtn_boolean_literal;
+		ASTcharacter_string    jjtn_character_string;
+		ASTvariable            jjtn_variable;
+
+		Variable               v;
+
+		jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
+		jjtn_simple_op.setName("LD");
+
+
+		if (type == "numeric_literal") {
+			jjtn_numeric_literal = new ASTnumeric_literal(parserTreeConstants.JJTNUMERIC_LITERAL);
+			jjtn_numeric_literal.setName(value);
+			jjtn_simple_op.jjtAddChild(jjtn_numeric_literal, 0);
+
+		} else if (type == "character_string") {
+			jjtn_character_string = new ASTcharacter_string(parserTreeConstants.JJTCHARACTER_STRING);
+			jjtn_character_string.setName(value);
+			jjtn_simple_op.jjtAddChild(jjtn_character_string, 0);
+
+		} else if (type == "boolean_literal") {
+			jjtn_boolean_literal = new ASTboolean_literal(parserTreeConstants.JJTBOOLEAN_LITERAL);
+			jjtn_boolean_literal.setName(value);
+			jjtn_simple_op.jjtAddChild(jjtn_boolean_literal, 0);
+
+		} else if (type == "symbolic_variable") {
+			v = getVariableInfo(value, fb_name);
+
+			jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
+			jjtn_variable.setName(v.name);
+			jjtn_variable.setTypeName(v.typeName);
+			jjtn_variable.setIsDirectVariable(v.directVariable);
+			jjtn_variable.setFieldSelector(v.fieldSelector);
+			jjtn_variable.setFieldSelectorTypeName(v.fieldSelectorTypeName);
+			jjtn_variable.setIsFunctionBlock(v.isFunctionBlock);
+
+			jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
+		}
+
+		return jjtn_simple_op;
+
+	}
+
+
+	public ASTil_simple_operation create_ST_Node(String variableName, String fb_name) {
+		ASTil_simple_operation jjtn_simple_op;
+		ASTvariable            jjtn_variable;
+
+		Variable               v;
+
+		jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
+		jjtn_simple_op.setName("ST");
+
+
+		v = getVariableInfo(variableName, fb_name);
+
+		jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
+		jjtn_variable.setName(v.name);
+		jjtn_variable.setTypeName(v.typeName);
+		jjtn_variable.setIsDirectVariable(v.directVariable);
+		jjtn_variable.setFieldSelector(v.fieldSelector);
+		jjtn_variable.setFieldSelectorTypeName(v.fieldSelectorTypeName);
+		jjtn_variable.setIsFunctionBlock(v.isFunctionBlock);
+
+		jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
+
+
+		return jjtn_simple_op;
+
+	}
+
+
+	public Variable getVariableInfo(String variableName, String fb_name) {
+		Variable v = new Variable();
+		Hashtable fbVariables;
+
+		StringTokenizer tokens = new StringTokenizer(variableName, ".", false);
+		int TokenCount = tokens.countTokens();
+		v.name = tokens.nextToken();
+
+		if (TokenCount == 2)
+		{
+			v.fieldSelector = tokens.nextToken();
+		}
+
+
+
+		/*
+         * Kolla att variabeln är deklarerad och hämta typeName
+         */
+		if (fb_name == null)
+			/* variabeln finns i ett program */
+			{
+				if (!(   symbolicVariables.containsKey(v.name)
+						 || locatedVariables.containsKey(v.name)
+						 )) {
+					success = false;
+					System.err.println("Error: Undeclared variable: " + v.name);
+				}
+
+				v.typeName = (String)symbolicVariables.get(v.name);
+			}
+		else
+			/* variabeln finns i ett function block */
+			{
+				fbVariables = (Hashtable)functionBlocks.get(fb_name);
+
+				if (!fbVariables.containsKey(v.name)) {
+					success = false;
+					System.err.println("Error: Undeclared variable: " + v.name);
+				}
+
+				v.typeName = (String)fbVariables.get(variableName);
+			}
+
+
+		/*
+		 * Om variabeln är en located variable ...
+         */
+		if (locatedVariables.containsKey(variableName))
+			{
+				v.directVariable = true;
+				v.name = ((String)locatedVariables.get(v.name));
+			}
+
+
+		/*
+         * Om variabeln är ett funktionsblock
+         * ska detta anges i variabel-noden, och
+         * fieldselector-typen ska sättas.
+         */
+		else if (functionBlocks.containsKey(v.typeName))
+			{
+				v.isFunctionBlock = true;
+
+				fbVariables = (Hashtable)functionBlocks.get(v.typeName);
+				v.fieldSelectorTypeName = (String)fbVariables.get(v.fieldSelector);
+			}
+
+		return v;
+	}
+
+
+
+
+
+
 	public Object visitIL_PARAM_LIST(ASTil_param_list n, Object o){
 		LinkedList inParameters;
 		LinkedList outParameters;
@@ -85,16 +238,8 @@ public class VariableChecker implements SimpleNodeVisitor {
 		Node parent;
 		Node greatParent;
 		ASTil_simple_operation jjtn_simple_op;
-		ASTnumeric_literal jjtn_numeric_literal;
-		ASTboolean_literal jjtn_boolean_literal;
-		ASTcharacter_string jjtn_character_string;
-		ASTvariable jjtn_variable;
 		Param p;
 		String fb_name;
-		String fb_type;
-		String fieldSelectorType = null;
-		String outParameterType = null;
-		String inParameterType = null;
 
 		inParameters = n.getInParameters();
 		outParameters = n.getOutParameters();
@@ -120,127 +265,44 @@ public class VariableChecker implements SimpleNodeVisitor {
 					/*
                      * LD
                      */
-					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
-					jjtn_simple_op.setName("LD");
+					if (((VCinfo)o).blockType=="program") {
+						jjtn_simple_op = create_LD_Node(p.parameterType, p.value, null);
+					} else {
+						jjtn_simple_op = create_LD_Node(p.parameterType, p.value, ((VCinfo)o).functionBlockName);
+					}
+
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
 
 					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
 
-					if (p.parameterType == "numeric_literal") {
-						jjtn_numeric_literal = new ASTnumeric_literal(parserTreeConstants.JJTNUMERIC_LITERAL);
-						jjtn_numeric_literal.setName(p.value);
-						jjtn_simple_op.jjtAddChild(jjtn_numeric_literal, 0);
-					} else if (p.parameterType == "character_string") {
-						jjtn_character_string = new ASTcharacter_string(parserTreeConstants.JJTCHARACTER_STRING);
-						jjtn_character_string.setName(p.value);
-						jjtn_simple_op.jjtAddChild(jjtn_character_string, 0);
-					} else if (p.parameterType == "boolean_literal") {
-						jjtn_boolean_literal = new ASTboolean_literal(parserTreeConstants.JJTBOOLEAN_LITERAL);
-						jjtn_boolean_literal.setName(p.value);
-						jjtn_simple_op.jjtAddChild(jjtn_boolean_literal, 0);
-					} else if (p.parameterType == "symbolic_variable") {
-						if (((VCinfo)o).blockType == "program")
-							{
-								inParameterType = (String)symbolicVariables.get(p.value);
-							}
-						else
-							{
-								//								Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_name);
-								//								fb_type = (String)fbVariables.get(p.parameter);
-							}
 
-
-
-						/*
-						 * Om variabeln är ett funktionsblock
-						 * ska detta anges i variabel-noden, och
-						 * fieldselector-typen ska sättas.
-						 */
-						if (functionBlocks.containsKey(p.value))
-							{
-
-								//								Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_type);
-								//								fieldSelectorType = ((String)fbVariables.get(p.parameter));
-							}
-
-
-
-						jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
-						jjtn_variable.setName(p.value);
-						jjtn_variable.setTypeName(inParameterType);
-
-						/*
-						jjtn_variable.setIsFunctionBlock(true);
-						jjtn_variable.setFieldSelector(p.parameter);
-						jjtn_variable.setFieldSelectorTypeName(fieldSelectorType);
-						*/
-
-
-						jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
-					}
 
 
 					/*
                      * ST
                      */
-					if (((VCinfo)o).blockType == "program")
-						{
-							fb_type = (String)symbolicVariables.get(fb_name);
-						}
-					else
-						{
-							Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_name);
-							fb_type = (String)fbVariables.get(p.parameter);
-						}
+					if (((VCinfo)o).blockType=="program") {
+						jjtn_simple_op = create_ST_Node(fb_name + "." + p.parameter, null);
+					} else {
+						jjtn_simple_op = create_ST_Node(fb_name + "." + p.parameter, ((VCinfo)o).functionBlockName);
+					}
 
-
-
-					/*
-					 * Om variabeln är en located variable
-					 * ska location sättas in i variabel-noden
-					 */
-					if (locatedVariables.containsKey(p.value))
-						{
-							//n.setIsDirectVariable(true);
-							//n.setName((String)locatedVariables.get(p.value));
-						}
-
-
-					/*
-					 * Om variabeln är ett funktionsblock
-					 * ska detta anges i variabel-noden, och
-					 * fieldselector-typen ska sättas.
-					 */
-					else if (functionBlocks.containsKey(fb_type))
-						{
-							Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_type);
-							fieldSelectorType = ((String)fbVariables.get(p.parameter));
-						}
-
-
-					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
-					jjtn_simple_op.setName("ST");
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
 
 					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
-
-					jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
-					jjtn_variable.setName(fb_name);
-					jjtn_variable.setTypeName(fb_type);
-					jjtn_variable.setIsFunctionBlock(true);
-					jjtn_variable.setFieldSelector(p.parameter);
-					jjtn_variable.setFieldSelectorTypeName(fieldSelectorType);
-
-					jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
-
-
 				}
+
 		}
 
+		/* Ta bort noden il_param_list och inkrementera pos
+         * så att output-parameter-noderna läggs in efter
+         * il_fb_call-noden
+         */
 		parent.jjtDeleteChild(2);
-  		pos = pos + 1;
+		pos = pos + 1;
+
 
 		if (outParameters != null) {
 			for (i = 0; i < outParameters.size(); i++)
@@ -250,117 +312,36 @@ public class VariableChecker implements SimpleNodeVisitor {
 
 					p = (Param)outParameters.get(i);
 
+
 					/*
                      * LD
                      */
-					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
-					jjtn_simple_op.setName("LD");
+					if (((VCinfo)o).blockType=="program") {
+						jjtn_simple_op = create_LD_Node(p.parameterType, fb_name + "." + p.parameter, null);
+					} else {
+						jjtn_simple_op = create_LD_Node(p.parameterType, fb_name + "." + p.parameter, ((VCinfo)o).functionBlockName);
+					}
+
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
 
 					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
-
-
-					if (((VCinfo)o).blockType == "program")
-						{
-							fb_type = (String)symbolicVariables.get(fb_name);
-						}
-					else
-						{
-							Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_name);
-							fb_type = (String)fbVariables.get(p.parameter);
-						}
-
-
-
-					/*
-					 * Om variabeln är ett funktionsblock
-					 * ska detta anges i variabel-noden, och
-					 * fieldselector-typen ska sättas.
-					 */
-					if (functionBlocks.containsKey(fb_type))
-						{
-							Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_type);
-							fieldSelectorType = ((String)fbVariables.get(p.parameter));
-						}
-
-
-
-					jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
-					jjtn_variable.setName(fb_name);
-					jjtn_variable.setTypeName(fb_type);
-					jjtn_variable.setIsFunctionBlock(true);
-					jjtn_variable.setFieldSelector(p.parameter);
-					jjtn_variable.setFieldSelectorTypeName(fieldSelectorType);
-
-					jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
-
 
 
 
 					/*
                      * ST
                      */
+					if (((VCinfo)o).blockType=="program") {
+						jjtn_simple_op = create_ST_Node(p.value, null);
+					} else {
+						jjtn_simple_op = create_ST_Node(p.value, ((VCinfo)o).functionBlockName);
+					}
 
-
-					if (((VCinfo)o).blockType == "program")
-						{
-							fb_type = (String)symbolicVariables.get(fb_name);
-						}
-					else
-						{
-							Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_name);
-							fb_type = (String)fbVariables.get(p.value);
-						}
-
-
-
-					/*
-					 * Om variabeln är ett funktionsblock
-					 * ska detta anges i variabel-noden, och
-					 * fieldselector-typen ska sättas.
-					 */
-
-					if (functionBlocks.containsKey(fb_type))
-						{
-							Hashtable fbVariables = (Hashtable)functionBlocks.get(fb_type);
-							fieldSelectorType = ((String)fbVariables.get(p.value));
-						}
-
-
-					jjtn_simple_op = new ASTil_simple_operation(parserTreeConstants.JJTIL_SIMPLE_OPERATION);
-					jjtn_simple_op.setName("ST");
 					greatParent.jjtInsertChild(jjtn_simple_op, pos);
 
 					((VCinfo)o).childIndex = ((VCinfo)o).childIndex + 1;
 					pos = pos + 1;
-
-
-
-					if (((VCinfo)o).blockType == "program")
-						{
-							outParameterType = (String)symbolicVariables.get(p.value);
-						}
-					else
-						{
-							//							Hashtable fbVariables = (Hashtable)functionBlocks.get(p.value);
-							//							fb_type = (String)fbVariables.get(p.parameter);
-						}
-
-					//System.out.println("### OutParameterType=" + outParameterType);
-
-					jjtn_variable = new ASTvariable(parserTreeConstants.JJTVARIABLE);
-					jjtn_variable.setName(p.value);
-					jjtn_variable.setTypeName(outParameterType);
-
-					/*
-					jjtn_variable.setIsFunctionBlock(true);
-					jjtn_variable.setFieldSelector(p.parameter);
-					jjtn_variable.setFieldSelectorTypeName(fieldSelectorType);
-					*/
-
-
-					jjtn_simple_op.jjtAddChild(jjtn_variable, 0);
 
 
 				}
@@ -1224,5 +1205,15 @@ public class VariableChecker implements SimpleNodeVisitor {
 		}
 
 	}
+
+	private class Variable{
+		public String name;
+		public String typeName;
+		public boolean directVariable;
+		public String fieldSelector;
+		public String fieldSelectorTypeName;
+		public boolean isFunctionBlock;
+	}
+
 
 }
