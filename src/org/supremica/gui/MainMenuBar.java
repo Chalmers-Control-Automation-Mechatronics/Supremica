@@ -764,7 +764,19 @@ public class MainMenuBar
 				ActionMan.ProjectTo1131ST(ActionMan.getGui());
 			}
 		});
+		
+		JMenuItem menuToolsCodeGenerationIEC61499 = new JMenuItem();
 
+		menuToolsCodeGenerationIEC61499.setText("IEC-61499 Function Block...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationIEC61499);
+		menuToolsCodeGenerationIEC61499.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.ProjectToIEC61499(ActionMan.getGui());
+			}
+		});
+				
 		JMenuItem menuToolsCodeGenerationControlBuilderIL = new JMenuItem();
 
 		menuToolsCodeGenerationControlBuilderIL.setText("ABB Control Builder Instruction List...");
