@@ -456,6 +456,8 @@
 	<chmod file="${dist}/SupremicaLocal" perm="755"/>
 	<copy file="${templates}/SupremicaRobot.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaRobot.cmd" perm="755"/>
+	<copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
 </target>
 
 <target name="startfiles_supremica" depends="startfiles_local_supremica,startfiles_supremica_student,startfiles_supremica_teacher">

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GCDocument name="J1" threadSpeed="40" simulationMode="1" tokenLuminance="0" dimTicks="25" boundsHeight="600.0" boundsWidth="843.0" scale="0.81" viewPositionX="0.0" viewPositionY="-15.0" color="-1" x="0.0" y="0.0" socketHost="" socketPort="-1" modifiable="1" horizontalScrollBar="1" verticalScrollBar="1">
+  <GCInitialStep id="S9" x="90.0" y="120.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText=";" actionBlockVisible="0" />
+  <GCTransition id="T9" x="75.0" y="200.0" height="25.0" width="30.0" actionText="in1" conditionVisible="1" />
+  <GCStep id="S10" x="90.0" y="240.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText="N M1;" actionBlockVisible="1" />
+  <GCTransition id="T10" x="75.0" y="310.0" height="25.0" width="30.0" actionText="!M2" conditionVisible="1" />
+  <GCInitialStep id="S11" x="370.0" y="120.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText=";" actionBlockVisible="0" />
+  <GCTransition id="T11" x="355.0" y="200.0" height="25.0" width="30.0" actionText="in2" conditionVisible="1" />
+  <GCStep id="S12" x="370.0" y="240.0" height="70.0" width="200.0" name="" useIcon="0" fileName="" actionText="N M2;" actionBlockVisible="1" />
+  <GCTransition id="T12" x="355.0" y="310.0" height="25.0" width="30.0" actionText="!M1" conditionVisible="1" />
+  <BooleanVariable height="61.0" x="650.0" y="100.0" width="65.0" name="M1" value="0" initialValue="0" />
+  <BooleanVariable height="61.0" x="650.0" y="180.0" width="65.0" name="M2" value="0" initialValue="0" />
+  <DigitalIn x="650.0" y="260.0" height="83.0" width="80.0" name="DIn" value="0" channel="0" />
+  <DigitalIn x="650.0" y="360.0" height="83.0" width="80.0" name="DIn" value="0" channel="0" />
+  <GCLink fromObject="S9" toObject="T9">
+    <Stroke x="90" y="185" />
+    <Stroke x="90" y="195" />
+    <Stroke x="90" y="195" />
+    <Stroke x="90" y="190" />
+    <Stroke x="90" y="190" />
+    <Stroke x="90" y="200" />
+  </GCLink>
+  <GCLink fromObject="T9" toObject="S10">
+    <Stroke x="90" y="225" />
+    <Stroke x="90" y="235" />
+    <Stroke x="90" y="235" />
+    <Stroke x="90" y="225" />
+    <Stroke x="90" y="225" />
+    <Stroke x="90" y="235" />
+  </GCLink>
+  <GCLink fromObject="S10" toObject="T10">
+    <Stroke x="90" y="305" />
+    <Stroke x="90" y="315" />
+    <Stroke x="90" y="315" />
+    <Stroke x="90" y="300" />
+    <Stroke x="90" y="300" />
+    <Stroke x="90" y="310" />
+  </GCLink>
+  <GCLink fromObject="T10" toObject="S9">
+    <Stroke x="90" y="335" />
+    <Stroke x="90" y="345" />
+    <Stroke x="262" y="345" />
+    <Stroke x="262" y="105" />
+    <Stroke x="90" y="105" />
+    <Stroke x="90" y="115" />
+  </GCLink>
+  <GCLink fromObject="S11" toObject="T11">
+    <Stroke x="370" y="185" />
+    <Stroke x="370" y="195" />
+    <Stroke x="370" y="195" />
+    <Stroke x="370" y="190" />
+    <Stroke x="370" y="190" />
+    <Stroke x="370" y="200" />
+  </GCLink>
+  <GCLink fromObject="T11" toObject="S12">
+    <Stroke x="370" y="225" />
+    <Stroke x="370" y="235" />
+    <Stroke x="370" y="235" />
+    <Stroke x="370" y="225" />
+    <Stroke x="370" y="225" />
+    <Stroke x="370" y="235" />
+  </GCLink>
+  <GCLink fromObject="S12" toObject="T12">
+    <Stroke x="370" y="305" />
+    <Stroke x="370" y="315" />
+    <Stroke x="370" y="315" />
+    <Stroke x="370" y="300" />
+    <Stroke x="370" y="300" />
+    <Stroke x="370" y="310" />
+  </GCLink>
+  <GCLink fromObject="T12" toObject="S11">
+    <Stroke x="370" y="335" />
+    <Stroke x="370" y="345" />
+    <Stroke x="542" y="345" />
+    <Stroke x="542" y="105" />
+    <Stroke x="370" y="105" />
+    <Stroke x="370" y="115" />
+  </GCLink>
+</GCDocument>
+
