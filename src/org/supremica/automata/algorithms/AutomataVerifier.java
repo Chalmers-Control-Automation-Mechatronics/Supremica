@@ -1144,6 +1144,12 @@ public class AutomataVerifier
 			theAutomaton.removeState(examinedState);
 		}
 
+		stateIterator = theAutomaton.stateIterator();
+			while (stateIterator.hasNext())
+		{
+			System.out.println("Blocking state: " + ((State) stateIterator.next()).getName());
+		}
+
 		return theAutomaton.nbrOfStates()==0;
 	}
 }
