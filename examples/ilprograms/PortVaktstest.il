@@ -81,7 +81,7 @@ PROGRAM PortVaktstest
 		MatningGjord : BOOL;
 *)
 		delay2, delay4, delay5, delay6,delay66: TON;
-		delay8, delay88,delay10,delay20 : TON;
+		delay8, delay88,delay10,delay20, delay21 : TON;
 		tmpb   : BOOL;
 		tmpd   : DINT;		
 		Init  : BOOL := TRUE;
@@ -111,28 +111,12 @@ PROGRAM PortVaktstest
 		ST delay6.tonPT
 		ST delay66.tonPT (*PaborjaMatn-fördröjning*)
 		ST delay20.tonPT
+		ST delay21.tonPT
 		LD DINT#2000
 		ST delay10.tonPT (*Hiss*)
 		LD FALSE
 		ST Init
 end_init:
-
-(*
-CAL WPrint("manuell start")
-CAL BPrintln(%IX24)
-
-
-
-CAL WPrint("Manuel Start = ")
-LD %IX24
-ST tmpb
-CAL BPrintln(tmpb)
-
-CAL WPrint("KulaPortVakt = ")
-LD KulaPortvakt
-ST tmpb
-CAL BPrintln(tmpb)
-*)
 
 (* autostart, special för simulator, funkar ej för riktig kulbana*)
 (*	if !(fsfsdfsd || (KulaPortvakt || UrPortvakt))
@@ -301,12 +285,9 @@ END6:
 		LD StorKula
 		OR LitenKula
 		JMPCN noMat
-		CAL WPrint("Läser av=")
-		CAL BPrintln(StorKula)
-
+		
 		LD StorKula
 		ST IsStorKula
-		(*lägg till lite bättre logik*)
 	noMat:	LD FALSE
 		ST Mat (*släpp upp mätaren*)
 		ST delay6.tonIN (*återställ delayen*)
@@ -441,7 +422,7 @@ END13:
 		ST UtVan1		
 END14:
 
-(* if (ArmHemma && !Sug)
+(* if (ArmHemma && !Sug && !KulaFast)
 		Skicka upp arm om kula finns där uppe
 		if (PlockaVan1)
 			Arm1
@@ -459,6 +440,7 @@ END14:
 
 	LD   ArmHemma
 	ANDN Sug
+	ANDN KulaFast
 	JMPCN END15
 		LD PlockaVan1
 		JMPCN ingenvan1
@@ -476,7 +458,23 @@ END14:
 			ST UppArmVan2
 			ST VridArmHoger
 		ingenvan2:
+		CAL delay21(tonIN := FALSE)
 END15:
+
+CAL WPrint ("Sug        = ")
+CAL BPrintln (Sug)
+CAL WPrint ("Armhemma   = ")
+CAL BPrintln (ArmHemma)
+CAL WPrint ("KulaFast   = ")
+CAL BPrintln (KulaFast)
+CAL WPrint ("PlockaVan1 = ")
+CAL BPrintln (PlockaVan1)
+CAL WPrint ("PlockaVan2 = ")
+CAL BPrintln (PlockaVan2)
+
+
+
+
 
 (*	if (ArmVan1 && PlockaVan1 && !KulaFast)
 		Sug
@@ -556,17 +554,10 @@ END20:
 		LD KulaFast
 		AND ArmHemma
 		JMPCN END21
-			LD FALSE
-			ST Sug
+			CAL delay21(tonIN := TRUE)
+			LD  delay21.tonQ
+			STN Sug
 END21:
-
-
-
-
-(*
-CAL WPrint("IsStorKula= ")
-CAL BPrintln(IsStorKula)
-*)
 END_PROGRAM
 
 
