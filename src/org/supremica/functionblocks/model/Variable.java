@@ -49,7 +49,7 @@
 
 package org.supremica.functionblocks.model;
 
-import java.util.*;
+//import java.util.*;
 
 public class Variable
 {

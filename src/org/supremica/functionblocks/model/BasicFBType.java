@@ -58,4 +58,13 @@ package org.supremica.functionblocks.model;
 public class BasicFBType extends FBType
 {
 
+    /* (non-Javadoc)
+     * @see org.supremica.functionblocks.model.FBType#createInstance()
+     */
+    public FBInstance createInstance()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

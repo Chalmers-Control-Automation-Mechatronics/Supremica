@@ -46,21 +46,24 @@
  *
  * Supremica is owned and represented by KA.
  */
-
+/**
+ * @author cengic
+ */
 package org.supremica.functionblocks.model;
 
 import java.util.*;
 
 public class Variables
 {
-	List varDeclarations = new LinkedList();
-
+    
+	private List inputEvents = new LinkedList();
+	private List outputEvents = new LinkedList();
+	private List inputData = new LinkedList();
+	private List outputData = new LinkedList();
+	private List localVariables = new LinkedList();
+	
 	public Variables()
 	{
-	}
-
-	public Iterator iterator()
-	{
-		return varDeclarations.iterator();
+	    
 	}
 }

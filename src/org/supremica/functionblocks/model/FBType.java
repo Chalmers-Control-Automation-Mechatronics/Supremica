@@ -37,37 +37,31 @@
  * 
  * Supremica is owned and represented by KA.
  */
-
+/**
+ * @author cengic
+ */
 package org.supremica.functionblocks.model;
 
 import java.util.*;
 
-/*
- * <!-- FBType elements --> <!ELEMENT FBType
- * (Identification?,VersionInfo+,CompilerInfo?,InterfaceList, (BasicFBInstance |
- * FBNetwork)?, Service?) > <!ATTLIST FBType Name CDATA #REQUIRED Comment CDATA
- * #IMPLIED >
- *  
- */
-
 public abstract class FBType extends NamedObject
 {
-    //String name;
-    //String comment;
-    //String identification = null;
-    //List versionInfo = new LinkedList();
-    //String compilerInfo = null;
-    //InterfaceList interfaceList = new InterfaceList();
-    //BasicFBInstance basicFB = null;
-    //FBNetwork fbNetwork = null;
-    //String service = null;
+    private String name;
+    private String comment;
+    private List versionInfo = new LinkedList();
+    
+    private Variables variables = new Variables(); 
+   
+    //public FBType()
+    //{
 
-    public FBType()
-    {
-    }
+    //}
 
-    public FBType(String name)
-    {
-        //this.name = name;
-    }
+    //public FBType(String name)
+    //{
+    //    this.name = name;
+    //}
+
+    public abstract FBInstance createInstance();
+    
 }

@@ -58,4 +58,13 @@ package org.supremica.functionblocks.model;
 public class ServiceFBInstance extends FBInstance
 {
 
+    /* (non-Javadoc)
+     * @see org.supremica.functionblocks.model.FBInstance#handleEvent()
+     */
+    public void handleEvent()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

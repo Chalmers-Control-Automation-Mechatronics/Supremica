@@ -50,12 +50,32 @@
 /*
  * Created on Dec 14, 2004
  */
-package org.supremica.functionblocks.model;
-
 /**
  * @author cengic
  */
+package org.supremica.functionblocks.model;
+
 public class Scheduler
 {
 
+    public void runEvents()
+    {
+        while (true)
+        {
+            FBInstance selectedFB = selectFBInstanceToHandleEvent();
+            selectedFB.handleEvent();
+            notifyFinished();
+        }
+    }
+
+    public FBInstance selectFBInstanceToHandleEvent()
+    {
+        System.out.println("Scheduler.selectFBInstanceToHandleEvent");
+        return null;
+    }
+    
+    public void notifyFinished()
+    {
+        
+    }
 }

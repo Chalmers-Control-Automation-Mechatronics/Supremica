@@ -54,4 +54,13 @@ public class BasicFBInstance extends FBInstance
     public BasicFBInstance(String name)
     {
     }
+
+    /* (non-Javadoc)
+     * @see org.supremica.functionblocks.model.FBInstance#handleEvent()
+     */
+    public void handleEvent()
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }

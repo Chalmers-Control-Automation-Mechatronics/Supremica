@@ -57,4 +57,6 @@ public abstract class FBInstance extends NamedObject
     public FBInstance()
     {
     }
+    
+    public abstract void handleEvent();
 }
