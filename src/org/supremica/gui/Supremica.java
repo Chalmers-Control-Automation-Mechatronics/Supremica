@@ -924,9 +924,16 @@ public class Supremica
 				currProject.setAnimationURL(animationURL);
 		}
 */
+
+	/**
+	 * Adds the automata in currAutomata to the display.
+	 *
+	 * @param currAutomata the automata to be added.
+	 */
 	public int addAutomata(Automata currAutomata)
 	{
 		//-- MF -- debug stuff, is there no way to remove the if under no-debug-build?
+		// Yes there is! We could use an assertion! /hguo
 		if (currAutomata.size() == 0)
 		{
 			logger.debug("Supremica::addAutomata(): adding empty automata.");
@@ -934,7 +941,6 @@ public class Supremica
 			return 0;    // "nothing to do, nowhere to go-o" [Ramones 1978]
 		}
 
-		//-- MF --
 		int nbrOfAddedAutomata = 0;
 		Iterator autIt = currAutomata.iterator();
 

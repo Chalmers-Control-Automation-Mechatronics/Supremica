@@ -99,12 +99,14 @@ class AutomataSelector
 				partialSet.addAutomaton(currSupervisorAutomaton);
 				logger.debug("AutomataSelector::Added spec/sup " + currSupervisorAutomaton.getName());
 
-				ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
-
-				while (!eventList.isEmpty())
+				//ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
+				//while (!eventList.isEmpty())
+				for (EventIterator it = currSupervisorAutomaton.eventIterator(); it.hasNext(); )
 				{
-					LabeledEvent currEvent = (LabeledEvent) eventList.remove(0);
+					//LabeledEvent currEvent = (LabeledEvent) eventList.remove(0);
+					LabeledEvent currEvent = it.nextEvent();
 
+					// Add plants for uncontrollable events only
 					if (!currEvent.isControllable())
 					{
 						addPlants(currEvent);
@@ -136,8 +138,26 @@ class AutomataSelector
 	{
 		if (eventToAutomataMap.get(currEvent) != null)
 		{
+			/*
 			partialSet.addAutomata(eventToAutomataMap.get(currEvent));
+			*/
 
+			Iterator plantIterator = eventToAutomataMap.get(currEvent).iterator();
+			while (plantIterator.hasNext())
+			{
+				Automaton currPlantAutomaton = (Automaton) plantIterator.next();
+				
+				// This check is performed in eventToAutomataMap
+				// if (currPlantAutomaton.getType() == AutomatonType.Plant)
+				if (!partialSet.containsAutomaton(currPlantAutomaton))
+				{
+					partialSet.addAutomaton(currPlantAutomaton);
+					logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
+					
+					// closedSet stuff removed
+				}
+			}
+			
 			/*
 			Iterator plantIterator = ((Set) eventToAutomataMap.get(currEvent)).iterator();
 

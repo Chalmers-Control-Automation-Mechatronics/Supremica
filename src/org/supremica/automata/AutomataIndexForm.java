@@ -118,12 +118,13 @@ public final class AutomataIndexForm
 	public AutomataIndexForm(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{
+		this.theAutomata = theAutomata;
+
 		// Set the indices of the events in theAutomata (this method returns the union alphabet)
 		Alphabet unionAlphabet = theAutomata.setIndicies();
 		theAutomaton.getAlphabet().union(unionAlphabet);
 
 		//theAutomaton.setIndicies();
-		this.theAutomata = theAutomata;
 
 		generateAutomataIndices(theAutomata);
 
@@ -205,7 +206,6 @@ public final class AutomataIndexForm
 
 	public void generateAutomataIndices(Automata theAutomata)
 	{
-
 		// Give each automaton a unique index
 		// Remember that this index must be consistent with
 		// getAutomatonAt(int) in Automata

@@ -394,7 +394,6 @@ public final class AutomataSynchronizerHelper
 		{
 			if (rememberTrace && (stateTrace.size() == 0))
 			{
-
 				// Add initial state
 				stateTrace.add(newState);
 			}
@@ -441,12 +440,12 @@ public final class AutomataSynchronizerHelper
 		boolean forbidden = AutomataIndexFormHelper.isForbidden(tmpStatus);
 		int currStatus;
 
-		for (int i = 1;
-				i < state.length - AutomataIndexFormHelper.STATE_EXTRA_DATA;
-				i++)
+		for (int i = 1; i < state.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
 			if ((activeAutomata == null) || (activeAutomata[i] == true))
 			{
+				//logger.info("i: " + 1 + " state[i]: " + state[i]);
+				//logger.info("stateStatTab: " + stateStatusTable[i][state[i]]);
 				currStatus = stateStatusTable[i][state[i]];
 				tmpStatus &= currStatus;
 

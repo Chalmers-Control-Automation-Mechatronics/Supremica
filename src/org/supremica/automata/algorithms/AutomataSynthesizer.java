@@ -383,8 +383,7 @@ public class AutomataSynthesizer
 						logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
 									"' might not be maximally permissive since:");
 
-						for (Iterator evIt = disabledUncontrollableEvents.iterator();
-								evIt.hasNext(); )
+						for (Iterator evIt = disabledUncontrollableEvents.iterator(); evIt.hasNext(); )
 						{
 							LabeledEvent currEvent = (LabeledEvent) evIt.next();
 
