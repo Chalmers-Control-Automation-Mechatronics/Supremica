@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+
+<animation width="450" height="300">
+
+<behaviour id="skater.y" algorithm="relativeMove" event="end.y">
+  <param name="duration" value="1.0"/>
+</behaviour>
+
+<behaviour id="skater.x" algorithm="relativeMove" event="end.x">
+  <param name="duration" value="1.0"/>
+</behaviour>
+
+<define id="skater">
+  <transform type = "translate">
+  <param name = "y" value ="-12"/>
+  <style type="RGBAColor" id = "color_north">
+    <param name="color" value="0000FF" />
+	<input type="mouseClick" id="north">
+	    <param name="pressedEvent" value="pressed"/>
+		<primitive type="circle">
+			 <param name="radius" value="7" />
+		</primitive>
+    </input>
+  </style>
+  </transform>
+  <transform type = "translate">
+    <param name = "x" value ="-12"/>
+    <style type="RGBAColor" id = "color_west" >
+      <param name="color" value="0000FF" />
+	  	<input type="mouseClick" id="west">
+		<param name="pressedEvent" value="pressed"/>
+      <primitive type="circle">
+           <param name="radius" value="7" />
+      </primitive>
+	  </input>
+    </style>
+    </transform>
+<transform type = "translate">
+  <param name = "x" value ="12"/>
+  <style type="RGBAColor" id = "color_east">
+    <param name="color" value="0000FF" />
+    <input type="mouseClick" id="east">
+	<param name="pressedEvent" value="pressed"/>
+    <primitive type="circle">
+         <param name="radius" value="7" />
+    </primitive>
+	</input>
+  </style>
+  </transform>
+<transform type = "translate">
+  <param name = "y" value ="12"/>
+  <style type="RGBAColor" id = "color_south">
+    <param name="color" value="0000FF" />
+	<input type="mouseClick" id="south">
+    <param name="pressedEvent" value="pressed"/>
+    <primitive type="circle">
+         <param name="radius" value="7" />
+    </primitive>
+	</input>
+  </style>
+  </transform>
+
+  <style type="RGBAColor">
+    <param name="color" value="FF0000" />
+    <primitive type="circle">
+       <param name="radius" value="25" />
+    </primitive>
+   </style>
+</define>
+
+<draw>
+	<transform type="translate">
+	  <param name="x" value="-50"/>
+	  <param name="y" value="-50"/>
+	  <animate param="x" behaviour="skater.x"/>
+	  <animate param="y" behaviour="skater.y"/>
+	  <paste object="skater" /> 
+	</transform>
+	<primitive type = "sprite">
+       <param name ="src" value="image/maze.gif"/>
+	   <param name="hotspot" value="(0,0)" />
+	</primitive>
+</draw>
+
+<command name="south">
+  <announce event = "~end"/>
+  <reset behaviour="skater.y"/>
+  <set object="skater.y" param="delta" value="75"/>
+  <set object="color_south" param="color" value="00FFFF"/> 
+  <start behaviour="skater.y"/>
+</command>
+
+
+<command name="north">
+  <announce event = "~end"/>
+  <reset behaviour="skater.y"/>
+  <set object="skater.y" param="delta" value="-75"/>
+  <set object="color_north" param="color" value="00FFFF"/> 
+  <start behaviour="skater.y"/>
+</command>
+
+<command name="east">
+  <announce event = "~end"/>
+  <reset behaviour="skater.x"/>
+  <set object="skater.x" param="delta" value="75"/>
+  <set object="color_east" param="color" value="00FFFF"/>
+  <start behaviour="skater.x"/>
+</command>
+
+
+<command name="west">
+  <announce event = "~end"/>
+  <reset behaviour="skater.x"/>
+  <set object="skater.x" param="delta" value="-75"/>
+  <set object="color_west" param="color" value="00FFFF"/>
+  <start behaviour="skater.x"/>
+</command>
+
+
+<event object="skater.y" event="end.y">
+  <announce event="end"/>
+    <announce event = "~north"/>
+     <announce event = "~south"/>
+     <announce event = "~east"/>
+     <announce event = "~west"/>
+     <set object="color_north" param="color" value="0000FF"/>
+     <set object="color_south" param="color" value="0000FF"/>
+     <set object="color_east" param="color" value="0000FF"/>
+     <set object="color_west" param="color" value="0000FF"/>
+  <stop behaviour = "skater.y"/>
+</event>
+
+<event object="skater.x" event="end.x">
+  <announce event="end"/>
+    <announce event = "~north"/>
+     <announce event = "~south"/>
+     <announce event = "~east"/>
+     <announce event = "~west"/>
+     <set object="color_north" param="color" value="0000FF"/>
+     <set object="color_south" param="color" value="0000FF"/>
+     <set object="color_east" param="color" value="0000FF"/>
+     <set object="color_west" param="color" value="0000FF"/>
+  <stop behaviour = "skater.x"/>
+</event>
+
+<command name="init.0">
+	<set object="skater.x" param="from" value="80"/>
+	<set object="skater.y" param="from" value="103"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+    <announce event = "~east"/>
+    <announce event = "~west"/>
+</command>
+
+<command name="init.1">
+	<set object="skater.x" param="from" value="155"/>
+	<set object="skater.y" param="from" value="103"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+	<announce event = "~east"/>
+	<announce event = "~west"/>
+</command>
+
+<command name="init.2">
+	<set object="skater.x" param="from" value="230"/>
+	<set object="skater.y" param="from" value="103"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+	<announce event = "~east"/>
+	<announce event = "~west"/>
+</command>
+
+<command name="init.3">
+	<set object="skater.x" param="from" value="80"/>
+	<set object="skater.y" param="from" value="178"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+    <announce event = "~east"/>
+    <announce event = "~west"/>
+</command>
+
+<command name="init.4">
+	<set object="skater.x" param="from" value="155"/>
+	<set object="skater.y" param="from" value="178"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+    <announce event = "~east"/>
+    <announce event = "~west"/>
+</command>
+
+<command name="init.5">
+	<set object="skater.x" param="from" value="230"/>
+	<set object="skater.y" param="from" value="178"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+    <announce event = "~east"/>
+    <announce event = "~west"/>
+</command>
+
+<command name="init.6">
+	<set object="skater.x" param="from" value="80"/>
+	<set object="skater.y" param="from" value="253"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+    <announce event = "~east"/>
+    <announce event = "~west"/>
+</command>
+
+<command name="init.7">
+	<set object="skater.x" param="from" value="155"/>
+	<set object="skater.y" param="from" value="253"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+    <announce event = "~east"/>
+    <announce event = "~west"/>
+</command>
+
+<command name="init.8">
+	<set object="skater.x" param="from" value="230"/>
+	<set object="skater.y" param="from" value="253"/>
+	<reset behaviour = "skater.x"/>
+	<reset behaviour = "skater.y"/>
+	<announce event = "~north"/>
+	<announce event = "~south"/>
+    <announce event = "~east"/>
+    <announce event = "~west"/>
+</command>
+
+<forall var="i" values = "north south east west">
+<event object = "${i}" event = "pressed">
+   <announce event = "${i}"/>
+</event>
+</forall>
+
+</animation>

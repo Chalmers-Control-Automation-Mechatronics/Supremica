@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+
+<animation width="256" height="256">
+  <behaviour id="rotor-spin" algorithm="Loop" state="${rotor_state=stopped}">
+    <param name="from" value="0.0" />
+    <param name="to" value="2*pi" />
+    <param name="duration" value="1.0" />
+  </behaviour>
+  
+  <command name="start">
+    <start behaviour="rotor-spin" />
+  </command>
+  
+  <command name="stop">
+    <stop behaviour="rotor-spin" />
+  </command>
+  
+  <define id="rotor">
+    <primitive type="polygon">
+      <param name="pointCount" value="4" />
+      <param name="points" index="0" value="(0,0)" />
+      <param name="points" index="1" value="(-16,96)" />
+      <param name="points" index="2" value="(0,100)" />
+      <param name="points" index="3" value="(16,96)" />
+    </primitive>
+  </define>
+  
+  <define id="rotors">
+    <style type="RGBAColor">
+      <param name="red" value="0" />
+      <param name="green" value="0" />
+      <param name="blue" value="0" />
+      
+      <primitive type="circle">
+        <param name="radius" value="12" />
+      </primitive>
+    </style>
+    
+    <style type="RGBAColor">
+      <param name="red" value="0.25" />
+      <param name="green" value="0.25" />
+      <param name="blue" value="0.25" />
+      <param name="alpha" value="0.5" />
+
+      <primitive type="circle">
+        <param name="radius" value="100" />
+      </primitive>
+    </style>
+    
+    <transform type="rotate">
+      <param name="angle" value="1.0" />
+      <animate param="angle" behaviour="rotor-spin" />
+      
+      <style type="RGBAColor">
+        <param name="red" value="0.5" />
+        <param name="green" value="0.5" />
+        <param name="blue" value="0.5" />
+        
+        <paste object="rotor" />
+        
+        <transform type="rotate">
+          <param name="angle" value="2*pi/3" />
+          <paste object="rotor" />
+        </transform>
+        
+        <transform type="rotate">
+          <param name="angle" value="4*pi/3" />
+          <paste object="rotor" />
+        </transform>
+      </style>
+    </transform>
+  </define>
+  
+  <draw>
+    <paste object="rotors" />
+    
+    <transform type="translate">
+      <param name="x" value="24" />
+      
+      <style type="RGBAColor">
+        <param name="red" value="0" />
+        <param name="blue" value="1" />
+        <param name="green" value="0" />
+        
+        <primitive type="polygon">
+          <param name="pointCount" value="4" />
+          <param name="points" index="0" value="(0,24)" />
+          <param name="points" index="1" value="(0,-24)" />
+          <param name="points" index="2" value="(16,-16)" />
+          <param name="points" index="3" value="(16,16)" />
+        </primitive>
+      </style>
+      
+      <style type="RGBAColor">
+        <param name="red" value="1" />
+        <param name="blue" value="0" />
+        <param name="green" value="0" />
+        
+        <primitive type="circle">
+          <param name="radius" value="32" />
+        </primitive>
+        
+        <primitive type="polygon">
+          <param name="pointCount" value="3" />
+          <param name="points" index="0" value="(0,16)" />
+          <param name="points" index="1" value="(0,-16)" />
+          <param name="points" index="2" value="(-160,0)" />
+        </primitive>
+        
+        <primitive type="polygon">
+          <param name="pointCount" value="5" />
+          <param name="points" index="0" value="(-132,0)" />      
+          <param name="points" index="1" value="(-140,24)" />      
+          <param name="points" index="2" value="(-160,24)" />      
+          <param name="points" index="3" value="(-160,-24)" />      
+          <param name="points" index="4" value="(-140,-24)" />      
+        </primitive>
+      </style>
+    </transform>
+  </draw>
+</animation>
+

@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+
+<animation width="301" height="301">
+
+<forall var="x" values="0 1 2">
+<forall var="y" values="0 1 2">
+   <define id = "cell${x}${y}">
+      <transform type = "translate">
+	    <param name = "translation" value = "(100*${x},100*${y})"/>
+	    <include src="cellXO.xml" id="cell_src${x}${y}"/>
+      </transform>
+   </define>
+</forall>
+</forall>
+
+<forall var="x" values="0 1 2">
+<forall var="y" values="0 1 2">
+   
+   <command name = "placeX.${x}.${y}">
+   	  <invoke object="cell_src${x}${y}" command="setX"/>
+   </command>
+   
+   <command name = "placeO.${x}.${y}">
+      <invoke object="cell_src${x}${y}" command="setO"/>
+   </command>
+   
+   <command name = "clear.${x}.${y}">
+      <invoke object="cell_src${x}${y}" command="clear"/>
+   </command>
+
+   <event object="cell_src${x}${y}" event="pressed">
+   	   <announce event="pressed.${x}.${y}"/>
+   </event>
+   
+   <event object="cell_src${x}${y}" event="~pressed">
+       <announce event="~pressed.${x}.${y}"/>
+   </event>
+   
+</forall>
+</forall>
+
+<forall var="x" values="0 1 2">
+<define id = "col${x}">
+   <transform type = "translate">
+     <param name = "translation" value="(47+100*${x},10)"/>
+	 <style type="RGBAColor">
+	    <param name="color" value="FF0000" />
+		<compose id="col.${x}" type = "switch">
+	       <primitive type = "null" />
+			<primitive type = "rectangle">
+			  <param name = "width" value = "5"/>
+			  <param name = "height" value = "280"/>
+			</primitive>
+	    </compose>
+     </style>
+   </transform>
+</define>
+</forall>
+
+<forall var="y" values="0 1 2">
+<define id = "row${y}">
+   <transform type = "translate">
+     <param name = "translation" value="(10,47+100*${y})"/>
+	 <style type="RGBAColor">
+	    <param name="color" value="FF0000" />
+		<compose id="row.${y}" type = "switch">
+		    <primitive type = "null" />
+			<primitive type = "rectangle">
+			  <param name = "width" value = "280"/>
+			  <param name = "height" value = "5"/>
+			</primitive>
+		</compose>
+     </style>
+   </transform>
+</define>
+</forall>
+
+<define id = "diag1">
+   <transform type = "translate">
+     <param name = "translation" value="(10,10)"/>
+	 <transform type = "rotate">
+	 	<param name="angle" value = "pi/4"/>
+		 <style type="RGBAColor">
+			<param name="color" value="FF0000" />
+			<compose id="diag.1" type = "switch">
+			    <primitive type = "null" />
+				<primitive type = "rectangle">
+				  <param name = "width" value = "395"/>
+				  <param name = "height" value = "5"/>
+				</primitive>
+			</compose>
+		 </style>
+     </transform>
+   </transform>
+</define>
+
+<define id = "diag2">
+   <transform type = "translate">
+     <param name = "translation" value="(10,290)"/>
+	 <transform type = "rotate">
+	 	<param name="angle" value = "-pi/4"/>
+		 <style type="RGBAColor">
+			<param name="color" value="FF0000" />
+			<compose id="diag.2" type = "switch">
+			    <primitive type = "null" />
+				<primitive type = "rectangle">
+				  <param name = "width" value = "395"/>
+				  <param name = "height" value = "5"/>
+				</primitive>
+			</compose>
+		 </style>
+     </transform>
+   </transform>
+</define>
+
+
+<draw>
+  <paste object = "col0"/>
+  <paste object = "col1"/>
+  <paste object = "col2"/>
+  <paste object = "row0"/>
+  <paste object = "row1"/>
+  <paste object = "row2"/>
+  <paste object = "diag1"/>
+  <paste object = "diag2"/>
+  <paste object = "cell00"/>
+  <paste object = "cell01"/>
+  <paste object = "cell02"/>
+  <paste object = "cell10"/>
+  <paste object = "cell11"/>
+  <paste object = "cell12"/>
+  <paste object = "cell20"/>
+  <paste object = "cell21"/>
+  <paste object = "cell22"/>
+ </draw>
+ 
+ <forall var = "i" values = "0 1 2">
+    <command name = "winrow.${i}">
+	   <set object="row.${i}" param="current" value="1" />
+	</command>
+	<command name = "wincol.${i}">
+        <set object="col.${i}" param="current" value="1" />
+    </command>
+ </forall>
+ 
+ <command name = "windiag1">
+ 	   <set object="diag.1" param="current" value="1" />
+ </command>
+ 
+ <command name = "windiag2">
+  	   <set object="diag.2" param="current" value="1" />
+ </command>
+
+</animation>

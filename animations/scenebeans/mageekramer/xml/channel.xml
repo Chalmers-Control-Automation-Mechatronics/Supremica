@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+  
+<animation width="400" height="136">
+
+<behaviour id="channel" algorithm="track" event="channel.end">
+  <param name="pointCount" value="3" />
+  <param name="point" index="0" value="(71,64)" />
+  <param name="duration" index="0" value="2" />
+  <param name="event" index="0" value="channel.fail" />
+  <param name="point" index="1" value="(197,64)" />
+  <param name="duration" index="1" value="2" />
+  <param name="point" index="2" value="(323,64)" />
+</behaviour>
+
+<define id="explosion">      
+  <include src="explosion.xml" id="explosion_inc"/>
+</define>
+
+
+
+<define id="title">
+    <transform type="translate">
+	  <param name="translation" value="(140,25)" />
+	  <style type="font">
+	     <param name="font" value="Helvetica-BOLD-24" />
+         <primitive type="text">
+           <param name="text" value = "Channel"/>
+         </primitive>
+	  </style>
+	</transform>
+</define>
+
+<draw>
+	<transform type="translate">
+	<param name="translation" value="(71,64)" />
+	<animate param="translation" behaviour="channel" />
+	<compose id="show" type = "switch">
+		<primitive type = "null" />
+		<primitive type = "sprite">
+		   <param name =  "src" value ="image/ablank.gif"/>
+		   <param name =  "hotspot" value = "(23,13)"/>
+		</primitive>
+		<paste object="explosion" />
+	  </compose> 
+	</transform>
+	<paste object ="title"/>
+	<primitive type = "sprite">
+	  <param name = "src" value="image/channel.gif"/>
+	</primitive>
+</draw>
+
+<command name="channel.begin">
+  <announce event="~channel.end"/>
+  <announce event="~channel.fail"/>
+  <set object="show" param="current" value="1" />
+  <reset behaviour="channel"/>
+  <start behaviour="channel"/>
+</command>
+
+<command name="explode">
+  <stop behaviour="channel" />
+  <announce event = "~channel.fail.end"/>
+  <set object="show" param="current" value="2" />
+  <invoke object="explosion_inc" command="explosion.begin"/>
+</command>
+
+<event object="channel" event="channel.end">
+   <stop behaviour="channel" />
+   <announce event="channel.end"/>
+</event>
+
+<event object="channel" event="channel.fail">
+  <announce event="channel.fail" />
+</event>
+
+<event object="explosion_inc" event="explosion.end">
+  <announce event="explode.end" />
+</event>
+
+</animation>

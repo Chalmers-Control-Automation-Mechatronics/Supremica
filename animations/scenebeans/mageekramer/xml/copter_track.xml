@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+
+<animation width="512" height="512">
+
+<define id="copter">
+    <transform type="scale">
+      <param name="x" value="0.3" />
+      <param name="y" value="0.3" />
+      
+      <include src="copter.xml" id="copter_inc" />
+    </transform>
+</define>
+
+  <seq id="flight_path" event="finished">
+    <behaviour algorithm="move" id="move.right">
+      <param name="from" value="64" />
+      <param name="to" value="512-64" />
+      <param name="duration" value="4" />
+    </behaviour>
+    <behaviour algorithm="move" id="move.turn1">
+      <param name="from" value="0" />
+      <param name="to" value="pi/2" />
+      <param name="duration" value="0.5" />
+    </behaviour>
+        
+    <behaviour algorithm="move" id="move.down">
+      <param name="from" value="64" />
+      <param name="to" value="512-64" />
+      <param name="duration" value="2" />
+    </behaviour>
+    <behaviour algorithm="move" id="move.turn2">
+      <param name="from" value="pi/2" />
+      <param name="to" value="pi" />
+      <param name="duration" value="0.5" />
+    </behaviour>
+
+    <behaviour algorithm="move" id="move.left">
+      <param name="from" value="512-64" />
+      <param name="to" value="64" />
+      <param name="duration" value="2" />
+    </behaviour>
+    <behaviour algorithm="move" id="move.turn3">
+      <param name="from" value="pi" />
+      <param name="to" value="1.5*pi" />
+      <param name="duration" value="0.5" />
+    </behaviour>
+
+    <behaviour algorithm="move" id="move.up">
+      <param name="from" value="512-64" />
+      <param name="to" value="64" />
+      <param name="duration" value="2" />
+    </behaviour>
+    <behaviour algorithm="move" id="move.turn4">
+      <param name="from" value="1.5*pi" />
+      <param name="to" value="2*pi" />
+      <param name="duration" value="0.5" />
+    </behaviour>
+  </seq>
+
+<draw>
+  <transform type="translate">
+    <param name="x" value="64" />
+      <animate param="x" behaviour="move.left" />
+      <animate param="x" behaviour="move.right" />
+    <param name="y" value="64" />
+      <animate param="y" behaviour="move.up" />
+      <animate param="y" behaviour="move.down" />
+    
+    <transform type="rotate" id="copter_angle">
+      <param name="angle" value="0" />
+        <animate param="angle" behaviour="move.turn1" />
+        <animate param="angle" behaviour="move.turn2" />
+        <animate param="angle" behaviour="move.turn3" />
+        <animate param="angle" behaviour="move.turn4" />
+      
+      <paste object="copter" />
+    </transform>
+  </transform>
+</draw>
+
+<command name="flight.start">
+  <announce event = "~flight.landed"/>
+  <reset behaviour="flight_path" />
+  <invoke object="copter_inc" command="start"/>
+  <start behaviour="flight_path" />
+</command>
+
+<command name="flight.hover">
+  <stop behaviour="flight_path" />
+</command>
+
+<command name="flight.resume">
+  <start behaviour="flight_path" />
+</command>
+
+<event object="flight_path" event="finished">
+  <invoke object="copter_inc" command="stop"/>
+  <stop behaviour="flight_path" />
+  <set object="copter_angle" param="angle" value="0" />
+  <announce event="flight.landed" />
+</event>
+
+
+</animation>

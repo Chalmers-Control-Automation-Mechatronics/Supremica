@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<animation width="500" height="197">
+
+<behaviour id="redcar1" algorithm="track" event="redcar1.end">
+  <param name="pointCount" value="6" />
+  <param name="point" index="0" value="(-50,74)" />
+  <param name="duration" index="0" value="(1.19)" />
+  <param name="event" index="0" value="redcar1.enter" />
+  
+  <param name="point" index="1" value="(69,74)" />
+  <param name="duration" index="1" value="1" />
+  
+  <param name="point" index="2" value="(126,110)" />
+  <param name="duration" index="2" value="2.35" />
+  
+  <param name="point" index="3" value="(361,110)" />
+  <param name="duration" index="3" value="0.73" />
+  <param name="event" index="3" value="redcar1.exit" />
+  
+  <param name="point" index="4" value="(434,74)" />
+  <param name="duration" index="4" value="1.16" />
+  
+  <param name="point" index="5" value="(550,74)" />
+</behaviour>
+
+<behaviour id="redcar2" algorithm="multiTrack" event="redcar2.end">
+  <param name ="spacing" value ="90" />
+  <animate param = "avoid" behaviour = "redcar1" />
+  <param name="pointCount" value="6" />
+  <param name="point" index="0" value="(-50,74)" />
+  <param name="duration" index="0" value="(1.19)" />
+  <param name="event" index="0" value="redcar2.enter" />
+  
+  <param name="point" index="1" value="(69,74)" />
+  <param name="duration" index="1" value="1" />
+  
+  <param name="point" index="2" value="(126,110)" />
+  <param name="duration" index="2" value="2.35" />
+  
+  <param name="point" index="3" value="(361,110)" />
+  <param name="duration" index="3" value="0.73" />
+  <param name="event" index="3" value="redcar2.exit" />
+  
+  <param name="point" index="4" value="(434,74)" />
+  <param name="duration" index="4" value="1.16" />
+  
+  <param name="point" index="5" value="(550,74)" />
+</behaviour>
+
+<behaviour id="bluecar1" algorithm="track" event="bluecar1.end">
+  <param name="pointCount" value="6" />
+  <param name="point" index="0" value="(550,145)" />
+  <param name="duration" index="0" value="(1.19)" />
+  <param name="event" index="0" value="bluecar1.enter" />
+  
+  <param name="point" index="1" value="(434,145)" />
+  <param name="duration" index="1" value="1" />
+  
+  <param name="point" index="2" value="(361,110)" />
+  <param name="duration" index="2" value="2.35" />
+  
+  <param name="point" index="3" value="(126,110)" />
+  <param name="duration" index="3" value="0.73" />
+  <param name="event" index="3" value="bluecar1.exit" />
+  
+  <param name="point" index="4" value="(69,145)" />
+  <param name="duration" index="4" value="1.16" />
+  
+  <param name="point" index="5" value="(-50,145)" />
+</behaviour>
+
+<behaviour id="bluecar2" algorithm="multiTrack" event="bluecar2.end">
+  <param name ="spacing" value ="90" />
+  <animate param = "avoid" behaviour = "bluecar1" />
+  <param name="pointCount" value="6" />
+  <param name="point" index="0" value="(550,145)" />
+  <param name="duration" index="0" value="(1.19)" />
+  <param name="event" index="0" value="bluecar2.enter" />
+  
+  <param name="point" index="1" value="(434,145)" />
+  <param name="duration" index="1" value="1" />
+  
+  <param name="point" index="2" value="(361,110)" />
+  <param name="duration" index="2" value="2.35" />
+  
+  <param name="point" index="3" value="(126,110)" />
+  <param name="duration" index="3" value="0.73" />
+  <param name="event" index="3" value="bluecar2.exit" />
+  
+  <param name="point" index="4" value="(69,145)" />
+  <param name="duration" index="4" value="1.16" />
+  
+  <param name="point" index="5" value="(-50,145)" />
+</behaviour>
+
+
+
+
+<define id="title">
+    <transform type="translate">
+	  <param name="translation" value="(120,25)" />
+	  <style type="font">
+	     <param name="font" value="Helvetica-BOLD-24" />
+         <primitive type="text">
+           <param name="text" value = "Single Lane Bridge"/>
+         </primitive>
+	  </style>
+	</transform>
+</define>
+
+<forall var = "car" values ="red blue">
+<forall var = "i" values ="1 2">
+<define id = "${car}${i}">
+	<transform type="translate">
+	    <param name="translation" value="(-50,74)" />
+	    <animate param="translation" behaviour="${car}car${i}" />
+		<primitive type = "sprite">
+		   <param name = "src" value ="image/${car}car.gif"/>
+		   <param name = "hotspot" value = "(40,16)"/>
+		</primitive>
+    </transform>
+</define>
+</forall>
+</forall>
+
+<draw>
+    <paste object ="red1"/>
+	<paste object ="red2"/>
+	<paste object ="blue1"/>
+    <paste object ="blue2"/>
+	<paste object ="title"/>
+	<primitive type = "sprite">
+	  <param name = "src" value="image/bridge.gif"/>
+	  <param name="hotspot" value="(0,0)" />
+	</primitive>	
+</draw>
+
+<forall var = "car" values ="redcar bluecar">
+<forall var = "i" values ="1 2">
+<command name="${car}.${i}.begin">
+  <announce event="~${car}.${i}.end"/>
+  <announce event="~${car}.${i}.enter"/>
+  <announce event="~${car}.${i}.exit"/>
+  <reset behaviour="${car}${i}"/>
+  <start behaviour="${car}${i}"/>
+</command>
+
+<command name = "${car}.${i}.resume">
+  <start behaviour = "${car}${i}"/>
+</command>
+
+<event object="${car}${i}" event="${car}${i}.end">
+   <stop behaviour="${car}${i}" />
+   <reset behaviour="${car}${i}" />
+   <announce event="${car}.${i}.end"/>
+</event>
+
+<event object="${car}${i}" event="${car}${i}.enter">
+   <stop behaviour="${car}${i}" />
+   <announce event="${car}.${i}.enter"/>
+</event>
+
+<event object="${car}${i}" event="${car}${i}.exit">
+   <stop behaviour="${car}${i}" />
+   <announce event="${car}.${i}.exit"/>
+</event>
+</forall>
+</forall>
+
+
+</animation>

@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+
+<animation width="100" height="100">
+
+
+<define id="cell">
+  <transform type="translate">
+    <param name="translation" value="(28,65)" />
+    <style type="font">
+      <param name="font" value="Helvetica-BOLD-48" />	  
+      <primitive type="text" id = "set_text">
+        <param name="text" value = " "/>
+      </primitive>
+     </style>
+  </transform>
+  <transform type="translate">
+  <param name="translation" value="(1,1)" />
+  <style id = "tilecolor" type="RGBAColor">
+    <param name="color" value="00FFFF" />
+    <primitive type="rectangle">
+       <param name="height" value="98" />
+	   <param name="width"  value="98" />
+    </primitive>
+   </style>
+  </transform>
+  <style type="RGBAColor">
+    <param name="color" value="000000" />
+    <primitive type="rectangle">
+       <param name="height" value="100" />
+	   <param name="width"  value="100" />
+    </primitive>
+   </style>
+</define>
+
+<draw>
+   <input type="mouseClick" id="click.cell">
+	 <param name="pressedEvent" value="pressed"/>
+	    <paste object="cell" /> 
+      </input>
+ </draw>
+
+<command name = "setX">
+  <set object="set_text" param="text" value="X"/>
+  <announce event = "~pressed"/>
+</command>
+
+<command name = "setO">
+  <set object="set_text" param="text" value="O"/>
+  <announce event = "~pressed"/>
+</command>
+
+<command name = "clear">
+  <set object="set_text" param="text" value=" "/>
+  <announce event = "~pressed"/>
+</command>
+
+<event object = "click.cell" event = "pressed">
+   <announce event = "pressed"/>
+</event>
+
+
+
+
+</animation>

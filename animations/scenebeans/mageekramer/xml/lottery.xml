@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<animation width="505" height="168">
+
+<forall var="i" values="1 2 3 4 5 6">
+	<define id = "ball${i}">
+	  <transform type="translate">
+	  	  <param name="translation" value="(84*(${i}-1),42)"/>
+	      <include src="ball.xml" id="ball_inc${i}"/>
+	  </transform>
+	</define>
+</forall>
+
+<forall var="i" values="1 2 3 4 5 6">
+	<forall var="j" values = "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49">
+	  <command name = "ball.${i}.${j}">
+		 <announce event = "~end"/>
+			  <invoke object="ball_inc${i}" command="${j}"/>
+	  </command>
+	</forall>
+	
+	<command name = "reset.${i}">
+	   <invoke object="ball_inc${i}" command="reset"/>
+	</command>
+	
+	<event object="ball_inc${i}" event="end">
+	  <announce event="end" />
+	</event>
+</forall>
+
+<draw>
+  <paste object = "ball1"/>
+  <paste object = "ball2"/>
+  <paste object = "ball3"/>
+  <paste object = "ball4"/>
+  <paste object = "ball5"/>
+  <paste object = "ball6"/>
+  <style type = "RGBAColor">
+    <param name="color" value="00FF00" />
+  	<primitive type = "rectangle">
+  	   <param name = "width" value = "505"/>
+  	   <param name = "height" value = "168"/>
+  	</primitive>
+  </style>
+</draw>
+
+</animation>

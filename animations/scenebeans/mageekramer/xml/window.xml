@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<animation width="350" height="350">
+
+<behaviour id="move" algorithm="constantSpeedMove" event="move.end">
+  <param name="from" value = "10" />
+  <param name="speed" value="0.02"/>
+</behaviour>
+
+<define id = "window">
+	<style type="RGBAColor">
+      <param name="red" value="0.25" />
+      <param name="green" value="0.25" />
+      <param name="blue" value="0.25" />
+      <param name="alpha" value="0.5" />
+      <primitive type="rectangle">
+        <param name="width" value="332"/>
+		<param name="height" value="330"/>
+      </primitive>
+    </style>
+</define>
+
+
+<draw>
+    <transform type="translate">
+	  <param name="x" value="10.0" /> 
+	  <param name="y" value="10.0" />
+	  <animate param = "y" behaviour = "move"/>
+	  <paste object = "window"/>
+	</transform>
+	<primitive type = "sprite">
+	   <param name = "src" value ="image/church.gif"/>
+	   <param name="hotspot" value="(0,0)" />
+	</primitive>
+</draw>
+
+<command name="open">
+  <announce event = "~end"/>
+  <reset behaviour = "move"/>
+  <set object="move" param="to" value="300"/>
+  <start behaviour="move"/>
+</command>
+
+<command name="close">
+  <announce event = "~end"/>
+  <reset behaviour = "move"/>
+  <set object="move" param="to" value="10"/>
+  <start behaviour="move"/>
+</command>
+
+<command name="stop">
+  <stop behaviour="move"/>
+</command>
+
+<event object="move" event="move.end">
+  <announce event="end"/>
+  <stop behaviour = "move"/>
+</event>
+
+</animation>

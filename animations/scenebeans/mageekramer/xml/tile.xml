@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+
+<animation width="301" height="301">
+
+<behaviour id="tile.x" algorithm="relativeMove" event="end.x">
+  <param name="duration" value="1.0"/>
+</behaviour>
+
+<behaviour id="tile.y" algorithm="relativeMove" event="end.y">
+  <param name="duration" value="1.0"/>
+</behaviour>
+
+<define id="tile">
+  <transform type="translate">
+     	  <param name="translation" value="(35,65)" />
+     	  <style type="font">
+     	     <param name="font" value="Helvetica-BOLD-48" />
+              <primitive type="text">
+                <param name="text" value = "${tile_id=0}"/>
+              </primitive>
+     	  </style>
+  </transform>
+  <transform type="translate">
+  <param name="translation" value="(1,1)" />
+  <style id = "tilecolor" type="RGBAColor">
+    <param name="color" value="00FFFF" />
+    <primitive type="rectangle">
+       <param name="height" value="98" />
+	   <param name="width"  value="98" />
+    </primitive>
+   </style>
+  </transform>
+  <style type="RGBAColor">
+    <param name="color" value="000000" />
+    <primitive type="rectangle">
+       <param name="height" value="100" />
+	   <param name="width"  value="100" />
+    </primitive>
+   </style>
+</define>
+
+<draw>
+	<transform type="translate">
+	  <animate param="x" behaviour="tile.x"/>
+	  <animate param="y" behaviour="tile.y"/>
+	  <input type="mouseClick" id="click.tile">
+	    <param name="pressedEvent" value="pressed"/>
+	    <paste object="tile" /> 
+      </input>
+	</transform>
+ </draw>
+
+<command name="south">
+  <announce event = "~end"/>
+  <reset behaviour="tile.y"/>
+  <set object="tile.y" param="delta" value="100"/>
+  <set object="tilecolor" param="color" value="00FFFF"/>
+  <start behaviour="tile.y"/>
+</command>
+
+
+<command name="north">
+  <announce event = "~end"/>
+  <reset behaviour="tile.y"/>
+  <set object="tile.y" param="delta" value="-100"/>
+  <set object="tilecolor" param="color" value="00FFFF"/>
+  <start behaviour="tile.y"/>
+</command>
+
+<command name="east">
+  <announce event = "~end"/>
+  <reset behaviour="tile.x"/>
+  <set object="tile.x" param="delta" value="100"/>
+  <set object="tilecolor" param="color" value="00FFFF"/>
+  <start behaviour="tile.x"/>
+</command>
+
+<command name="west">
+  <announce event = "~end"/>
+  <reset behaviour="tile.x"/>
+  <set object="tile.x" param="delta" value="-100"/>
+  <set object="tilecolor" param="color" value="00FFFF"/>
+  <start behaviour="tile.x"/>
+</command>
+
+
+<event object="tile.y" event="end.y">
+  <announce event="end"/>
+  <stop behaviour = "tile.y"/>
+</event>
+
+<event object="tile.x" event="end.x">
+  <announce event="end"/>
+  <stop behaviour = "tile.x"/>
+</event>
+
+<event object = "click.tile" event = "pressed">
+   <set object="tilecolor" param="color" value="FF0000"/>
+   <announce event = "pressed"/>
+</event>
+
+<command name="end">
+   <set object="tilecolor" param="color" value="FF0000"/>
+</command>
+
+<command name="init.0">
+	<set object="tile.x" param="from" value="0"/>
+	<set object="tile.y" param="from" value="0"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.1">
+	<set object="tile.x" param="from" value="100"/>
+	<set object="tile.y" param="from" value="0"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.2">
+	<set object="tile.x" param="from" value="200"/>
+	<set object="tile.y" param="from" value="0"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.3">
+	<set object="tile.x" param="from" value="0"/>
+	<set object="tile.y" param="from" value="100"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.4">
+	<set object="tile.x" param="from" value="100"/>
+	<set object="tile.y" param="from" value="100"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.5">
+	<set object="tile.x" param="from" value="200"/>
+	<set object="tile.y" param="from" value="100"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.6">
+	<set object="tile.x" param="from" value="0"/>
+	<set object="tile.y" param="from" value="200"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.7">
+	<set object="tile.x" param="from" value="100"/>
+	<set object="tile.y" param="from" value="200"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+<command name="init.8">
+	<set object="tile.x" param="from" value="200"/>
+	<set object="tile.y" param="from" value="200"/>
+	<reset behaviour = "tile.x"/>
+	<reset behaviour = "tile.y"/>
+</command>
+
+
+</animation>

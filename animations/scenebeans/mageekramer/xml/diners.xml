@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+
+<animation width="400" height="400">
+
+<forall var = "i" values ="0 1 2 3 4">
+     <!-- Philosopher + comands and events -->
+	 
+	<define id="phil${i}">      
+	  <transform type="rotate">
+		  <param name="angle" value = "2.0*pi*(1.0 - ${i}.0/5.0)"/>
+		  <transform type="translate">
+			  <param name="translation" value="(0,-125)" /> 
+			  <include src="phil.xml" id="phil.${i}" />
+		  </transform>
+	  </transform>
+	</define>
+
+    <forall var="com" values = "eating.begin thinking.begin rightfork leftfork"> 
+		<command name="phil.${i}.${com}">
+		  <invoke object="phil.${i}" command="${com}"/>
+		</command>
+     </forall>
+	
+     <forall var="ev" values = "eating.end thinking.end">   
+	   <event object="phil.${i}" event="${ev}">
+	     <announce event="phil.${i}.${ev}"/>
+	   </event>
+	   <event object="phil.${i}" event="~${ev}">
+   		<announce event="~phil.${i}.${ev}"/>
+	   </event>
+     </forall>
+
+     <!-- Fork +  comands  -->
+	 
+	<define id="fork${i}">      
+	  <transform type="rotate">
+		  <param name="angle" value = "pi*(1.0-2*${i}.0)/5.0" />	  
+		  <transform type="translate">
+			 <param name="translation" value="(0,-65)" />
+			 <include src="fork.xml" id="fork.${i}" />
+		  </transform>
+	  </transform>
+	</define>
+
+	  <forall var="com" values = "put get">
+		 <command name="fork.${i}.${com}">
+			<invoke object="fork.${i}" command="${com}"/>
+		 </command>
+	  </forall>
+
+</forall>
+
+ <define id="table">
+    <primitive type = "sprite">
+ 	   <param name = "src" value ="image/fruitbowl.gif"/>
+	   <param name = "hotspot" value ="(29,21)"/>
+	</primitive>
+	<style type="RGBAColor">
+		<param name="color" value="FF0000"/>    
+		<primitive type="circle">
+			<param name="radius" value="75" />
+		</primitive>
+	 </style>
+</define> 
+
+ <define id="title">
+    <transform type="translate">
+	  <param name="translation" value="(10,30)" />
+      <primitive type="text">
+        <param name="text" value = "Dining Philosophers"/>
+      </primitive>
+	</transform>
+</define> 
+
+
+<draw>
+  <transform type="translate">
+      <param name="translation" value="(200,200)" />
+	  <paste object="phil0"/>
+	  <paste object="phil1"/>
+	  <paste object="phil2"/>
+	  <paste object="phil3"/>
+	  <paste object="phil4"/>
+	  <paste object="fork0"/>
+	  <paste object="fork1"/>
+	  <paste object="fork2"/>
+	  <paste object="fork3"/>
+	  <paste object="fork4"/>
+      <paste object="table"/>
+  </transform>
+  <paste object="title"/>
+</draw>
+
+</animation>

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<animation width="301" height="301">
+
+<forall var="i" values="0 1 2 3 4 5 6 7">
+	<define id = "tile${i}">
+	  <include src="tile.xml" id="tile_inc${i}">
+		 <param name="tile_id" value="${i}"/>
+	  </include>
+	</define>
+</forall>
+
+<forall var="i" values="0 1 2 3 4 5 6 7">
+	<forall var="direction" values = "north south east west">
+		<command name = "${direction}.${i}">
+		  <announce event = "~endMove"/>
+		  <announce event = "~${i}"/>
+		  <invoke object="tile_inc${i}" command="${direction}"/>
+		</command>
+	</forall>
+	
+	<command name = "end.${i}">
+		<invoke object="tile_inc${i}" command="end"/>
+    </command>
+	
+	<event object="tile_inc${i}" event="end">
+	  <announce event="endMove" />
+	</event>
+	
+	<event object="tile_inc${i}" event="pressed">
+	   <announce event="${i}"/>
+	</event>
+	
+	<forall var="j" values="0 1 2 3 4 5 6 7 8">
+	   <command name = "init.${i}.${j}">
+	   	  <invoke object="tile_inc${i}" command="init.${j}"/>
+		  <announce event = "~${i}"/>
+	   </command>
+	</forall>
+</forall>
+
+<draw>
+  <paste object = "tile0"/>
+  <paste object = "tile1"/>
+  <paste object = "tile2"/>
+  <paste object = "tile3"/>
+  <paste object = "tile4"/>
+  <paste object = "tile5"/>
+  <paste object = "tile6"/>
+  <paste object = "tile7"/>
+</draw>
+
+</animation>

@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+
+<animation width="60" height="60">
+
+<behaviour id="explosion" algorithm="track" event="explosion.end">
+  <param name="pointCount" value="18" />
+  <param name="duration" index="0" value="0.1" />
+  <param name="event" index="0" value="explosion.1" />
+  <param name="duration" index="1" value="0.1" />
+  <param name="event" index="1" value="explosion.2" />
+  <param name="duration" index="2" value="0.1" />
+  <param name="event" index="2" value="explosion.3" />
+  <param name="duration" index="3" value="0.1" />
+  <param name="event" index="3" value="explosion.4" />
+  <param name="duration" index="4" value="0.1" />
+  <param name="event" index="4" value="explosion.5" />
+  <param name="duration" index="5" value="0.1" />
+  <param name="event" index="5" value="explosion.6" />
+  <param name="duration" index="6" value="0.1" />
+  <param name="event" index="6" value="explosion.7" />
+  <param name="duration" index="7" value="0.1" />
+  <param name="event" index="7" value="explosion.8" />
+  <param name="duration" index="8" value="0.1" />
+  <param name="event" index="8" value="explosion.9" />
+  <param name="duration" index="9" value="0.1" />
+  <param name="event" index="9" value="explosion.10" />
+  <param name="duration" index="10" value="0.1" />
+  <param name="event" index="10" value="explosion.11" />
+  <param name="duration" index="11" value="0.1" />
+  <param name="event" index="11" value="explosion.12" />
+  <param name="duration" index="12" value="0.1" />
+  <param name="event" index="12" value="explosion.13" />
+  <param name="duration" index="12" value="0.1" />
+  <param name="event" index="13" value="explosion.14" />
+  <param name="duration" index="14" value="0.1" />
+  <param name="event" index="14" value="explosion.15" />
+  <param name="duration" index="15" value="0.1" />
+  <param name="event" index="15" value="explosion.16" />
+  <param name="duration" index="16" value="0.1" />
+</behaviour>
+
+<draw>
+    <compose id="show" type = "switch">
+	 <primitive type = "null" />
+	 <forall var = "i" values = "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16">
+	 <primitive type = "sprite">
+	    <param name = "src" value ="image/explosion${i}.gif"/>
+		<param name = "hotspot" value = "(30,30)"/>
+     </primitive>
+	 </forall>
+	 <primitive type = "null" />
+	</compose> 
+</draw>
+
+<event object="explosion" event="explosion.end">
+  <set object="show" param="current" value="17" />
+  <stop behaviour="explosion" />
+  <announce event="explosion.end" />
+</event>
+
+<forall var = "i" values = "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16">
+  <event object="explosion" event="explosion.${i}">
+    <set object="show" param="current" value="${i}" />
+  </event>
+</forall>
+
+<command name="explosion.begin">
+  <announce event="~explosion.end"/>
+  <set object="show" param="current" value="0" />
+  <reset behaviour="explosion"/>
+  <start behaviour="explosion"/>
+</command>
+
+</animation>

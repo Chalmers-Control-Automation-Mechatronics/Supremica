@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+  
+<animation width="100" height="100">
+
+<behaviour id="thinking" algorithm="randomTimer" event="thinking.end">
+  <param name="maxDuration" value="8"/>
+</behaviour>
+
+<behaviour id="eating" algorithm="randomTimer" event="eating.end">
+  <param name="maxDuration" value="4"/>
+</behaviour>
+
+<draw>
+	<compose id="show" type = "switch">
+	 <primitive type = "sprite">
+	    <param name = "src" value ="image/thinking.gif"/>
+		<param name = "hotspot" value = "(50,43)"/>
+	 </primitive>
+	 <primitive type = "sprite">
+	    <param name = "src" value="image/hungry.gif"/>
+		<param name = "hotspot" value = "(50,43)"/>
+	 </primitive>
+	 <primitive type = "sprite">  
+	    <param name = "src" value="image/gotright.gif"/>
+		<param name = "hotspot" value = "(50,43)"/>
+	 </primitive>
+	 <primitive type = "sprite">
+	    <param name = "src" value="image/gotleft.gif"/>
+		<param name = "hotspot" value = "(50,43)"/>
+	 </primitive>
+	 <primitive type = "sprite">
+	    <param name = "src" value="image/eating.gif"/>
+		<param name = "hotspot" value = "(50,43)"/>
+	 </primitive>
+	</compose> 
+</draw>
+
+<event object="thinking" event="thinking.end">
+  <set object="show" param="current" value="1" />
+  <stop behaviour="thinking" />
+  <announce event="thinking.end" />
+</event>
+
+<event object="eating" event="eating.end">
+  <set object="show" param="current" value="0" />
+  <stop behaviour="eating" />
+  <announce event="eating.end" />
+</event>
+
+<command name="thinking.begin">
+  <announce event="~thinking.end"/>
+  <set object="show" param="current" value="0" />
+  <reset behaviour="thinking"/>
+  <start behaviour="thinking"/>
+</command>
+
+<command name="eating.begin">
+  <announce event="~eating.end"/>
+  <set object="show" param="current" value="4" />
+  <reset behaviour="eating"/>
+  <start behaviour="eating"/>
+</command>
+
+<command name="leftfork">
+  <set object="show" param="current" value="3" />
+</command>
+
+<command name="rightfork">
+  <set object="show" param="current" value="2" />
+</command>
+
+</animation>
