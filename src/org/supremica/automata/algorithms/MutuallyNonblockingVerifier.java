@@ -937,7 +937,7 @@ public class MutuallyNonblockingVerifier
 
 		try
 		{
-			if (AutomataVerifier.verifyInclusion(theAutomata, new Automata(automatonCopy)))
+			if (AutomataVerifier.verifyModularInclusion(theAutomata, new Automata(automatonCopy)))
 			{
 				logger.warn("WOHOHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!");
 			}

@@ -162,6 +162,7 @@ public class AutomatonMinimizer
 		{
 			reachabilityTimer.stop();
 			logger.fatal("Reachability: " + reachabilityTimer);
+			Thread.sleep(0);
 			preMinimizationTimer.start();
 		}
 
@@ -182,6 +183,7 @@ public class AutomatonMinimizer
 			{
 				preMinimizationTimer.stop();
 				logger.fatal("Determinization: " + preMinimizationTimer);
+				Thread.sleep(0);
 			}
 
 			// Now we're ready for minimization!
@@ -201,6 +203,7 @@ public class AutomatonMinimizer
 			{
 				preMinimizationTimer.stop();
 				logger.fatal("Pre minimization: " + preMinimizationTimer);
+				Thread.sleep(0);
 				saturationTimer.start();
 			}
 
@@ -212,6 +215,7 @@ public class AutomatonMinimizer
 				saturationTimer.stop();	
 				logger.fatal("Saturation: " + saturationTimer + 
 							 " (added " + transitions + " new transitions)");
+				Thread.sleep(0);
 			}
 			
 			// Now we're ready for minimization!
@@ -231,6 +235,7 @@ public class AutomatonMinimizer
 			{
 				preMinimizationTimer.stop();
 				logger.fatal("Pre minimization: " + preMinimizationTimer);
+				Thread.sleep(0);
 				saturationTimer.start();
 			}
 		
@@ -242,6 +247,7 @@ public class AutomatonMinimizer
 				saturationTimer.stop();	
 				logger.fatal("Saturation: " + saturationTimer + 
 							 " (added " + transitions + " new transitions)");
+				Thread.sleep(0);
 				adjustMarkingTimer.start();
 			}
 			
@@ -253,8 +259,9 @@ public class AutomatonMinimizer
 			{
 				adjustMarkingTimer.stop();	
 				logger.fatal("Adjust markings: " + adjustMarkingTimer);
+				Thread.sleep(0);
 			}
-
+			
 			// Now we're ready for minimization!
 		}
 		else
@@ -295,11 +302,12 @@ public class AutomatonMinimizer
 
 			throw ex;
 		}
-
+		
 		if (debug)
 		{
 			partitioningTimer.stop();	
 			logger.fatal("Partitioning: " + partitioningTimer);
+			Thread.sleep(0);
 			automataBuildTimer.start();
 		}
 
@@ -315,6 +323,7 @@ public class AutomatonMinimizer
 		{
 			automataBuildTimer.stop();
 			logger.fatal("Automaton build: " + automataBuildTimer);
+			Thread.sleep(0);
 			removeTransitionsTimer.start();
 		}
 
@@ -328,6 +337,7 @@ public class AutomatonMinimizer
 		{
 			removeTransitionsTimer.stop();
 			logger.fatal("Remove transitions: " + removeTransitionsTimer);
+			Thread.sleep(0);
 			postMinimizationTimer.start();
 		}
 
@@ -363,6 +373,7 @@ public class AutomatonMinimizer
 		{
 			postMinimizationTimer.stop();
 			logger.fatal("Post minimization: " + postMinimizationTimer);
+			Thread.sleep(0);
 		}
 
 		// Return the result of the minimization!
@@ -527,6 +538,7 @@ public class AutomatonMinimizer
 				// Don't try to refine single-state classes!
 				if (currClass.size() > 1)
 				{
+					// refined = refined || partition(equivClasses, currClass); // WRONG!
 					refined = partition(equivClasses, currClass) || refined;
 				}
 			}
@@ -540,7 +552,8 @@ public class AutomatonMinimizer
 		for (Iterator eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-			refined = partition(equivClasses, equivClass, currEvent) || refined;
+			// refined = partition(equivClasses, equivClass, currEvent) || refined; // WRONG!
+			refined = refined || partition(equivClasses, equivClass, currEvent);
 		}
 
 		return refined;
@@ -705,7 +718,7 @@ public class AutomatonMinimizer
 					if (ok)
 					{
 						count++;
-						aut.removeArc(arc); // We can remove this one, it will be an epsilon self-loop!
+						aut.removeArc(arc); // We can remove this one, it will become an epsilon self-loop!
 						statesToExamine.remove(two);
 						State mergeState = aut.mergeStates(two, one);
 						statesToExamine.add(mergeState);
@@ -1362,8 +1375,11 @@ class EquivalenceClass
 			// System.err.println("Splitting " + e.getLabel());
 			EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
 
-			// Build a list of equivalance classes that e transfers to from each of the states in this eq-class
-			// Note, for each state there is only one successor state for this event (determinism)
+			// Build a list of equivalance classes that e transfers to
+			// from each of the states in this eq-class
+			// Note, for each state there is only one successor state 
+			// for this event (determinism)
+			// NOOOOOOOOOOOOOOOOO! NOT DETERMINISTIC!!
 			Iterator stateIt = iterator();
 			while (stateIt.hasNext())
 			{
@@ -1372,7 +1388,7 @@ class EquivalenceClass
 				EquivalenceClass nextEquivalenceClass = null;
 				if (nextState != null)
 				{
-					nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet();    // getEquivalenceClass();
+					nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet();
 				}
 				newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
 			}
@@ -1383,21 +1399,15 @@ class EquivalenceClass
 		{
 			EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
 
-			// Build a list of equivalence classes that e transfers to from each of the states in this eq-class
-			// Note, for each state there is only one successor state for this event (determinism)
-			// NOOOOOOOOOOOOOOOOO! NOT DETERMINISTIC!!
+			// Build a list of equivalence classes that e transfers to 
+			// from each of the states in this eq-class
+			// Note, for each state there may be several successor state 
+			// for this event (nondeterminism)
 			Iterator stateIt = iterator();
 			while (stateIt.hasNext())
 			{
 				State currState = (State) stateIt.next();
 				StateSet nextStates = currState.nextStateSet(e);
-				/*
-				if (nextStates.size() == 0)
-				{
-					newEquivalenceClassHolder.addState(currState, null);
-				}
-				System.err.println("nextStates " + nextStates.size());
-				*/
 				EquivalenceClass nextClass = new EquivalenceClass();
 				for (StateIterator nextIt = nextStates.iterator(); nextIt.hasNext(); )
 				{
