@@ -2821,8 +2821,10 @@ public class ActionMan
 	public static void openJGrafchartEditor(Gui gui)
 	{
 		String[] args = new String[1];
+		args[0] = "";
 		EditorAPI e = new EditorAPI(args);
 		Editor.singleton = e;
+/*
 		e.removePaletteAction();
 		// Create Top-level Workspace
 		GCDocument top = e.newWorkspace();
@@ -2853,6 +2855,7 @@ public class ActionMan
 		{
 			e.startWorkspace(top);
 		}
+*/
     }
 
 	//shoeFactory - Config

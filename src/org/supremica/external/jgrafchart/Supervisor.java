@@ -51,14 +51,21 @@ package org.supremica.external.jgrafchart;
 
 public class Supervisor
 {
-	public static boolean isEventEnabled(int supervisor, String event)
+	public static boolean isEventEnabled(String supervisor, String event)
 	{
-		System.out.println("Supervisor: " + supervisor + " Event: " + event);
+		System.out.println("isEventEnabled Supervisor: " + supervisor + " Event: " + event);
 		return true;
 	}
 
-	public static void executeEvent(int supervisor, String event)
+	public static boolean executeEvent(String supervisor, String event)
 	{
+		System.out.println("executeEvent Supervisor: " + supervisor + " Event: " + event);
+		return true;
+	}
 
+	public static boolean initializeSupervisor(String supervisor)
+	{
+		System.out.println("initialize Supervisor: " + supervisor);
+		return true;
 	}
 }
