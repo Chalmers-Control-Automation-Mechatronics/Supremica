@@ -2,7 +2,7 @@
  * Supremica Software License Agreement
  *
  * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
+ * However, It is freely available without fee for education,
  * research, and non-profit purposes.  By obtaining copies of
  * this and other files that comprise the Supremica software,
  * you, the Licensee, agree to abide by the following

@@ -59,96 +59,103 @@ import java.util.*;
 
 public class Scheduler
 {
-    private Resource resource;
-    
-    private List scheduledJobs = Collections.synchronizedList(new LinkedList());
-    private List finishedJobs = Collections.synchronizedList(new LinkedList());
-
-    //private EventHandlingThread eventThread = null; // maybe not needed
-    private AlgorithmExecutingThread algorithmThread = null;
-    
-
-    private Scheduler() {}
-
-
-    public Scheduler(Resource res)
-    {
-	System.out.println("Scheduler(" + res.getName()  + ")");
-	resource = res;
-        algorithmThread = new AlgorithmExecutingThread(this);
-    }
-    
-
-    public int getNumberOfScheduledJobs()
-    {
-        return scheduledJobs.size();
-    }
-    
-
-    public Job getNextScheduledJob()
-    {
-        return (Job) scheduledJobs.remove(0);
-    }
-    
-
-    public void addFinishedJob(Job j)
-    {
-        finishedJobs.add(j);
-    }
-    
-
-    public FBInstance selectFBInstanceToHandleEvent()
-    {
-        System.out.println("Scheduler.selectFBInstanceToHandleEvent(): " + resource.fbInstance.isHandlingEvent());
-        // TODO: implement selection algorithm
-	if(resource.fbInstance.isHandlingEvent())
+	private Resource resource;
+	
+	private List scheduledJobs = Collections.synchronizedList(new LinkedList());
+	private List finishedJobs = Collections.synchronizedList(new LinkedList());
+	
+	//private EventHandlingThread eventThread = null; // maybe not needed
+	private AlgorithmExecutingThread algorithmThread = null;
+	
+	
+	private Scheduler() {}
+	
+	
+	public Scheduler(Resource res)
 	{
-	    return null;
-	} 
-
-	return resource.fbInstance;
-    }
-    
-
-    public void notifyFinished()
-    {
-	System.out.println("Scheduler.notifyFinished()");
-        for (Iterator iter = finishedJobs.iterator(); iter.hasNext();)
-	{
-	    Job finishedJob = (Job) iter.next();
-	    finishedJob.getInstance().finishedJob(finishedJob);
-	    System.out.println("Scheduler.notifyFinished(): notified one");
-	    iter.remove();
+		System.out.println("Scheduler(" + res.getName()  + ")");
+		resource = res;
+		algorithmThread = new AlgorithmExecutingThread(this);
 	}
-    }
-    
-
-    public void runEvents()
-    {
-	System.out.println("Scheduler.runEvents()");
-	while (true)
+	
+	
+	public int getNumberOfScheduledJobs()
 	{
-	    BasicFBInstance selectedFBInstance = (BasicFBInstance) selectFBInstanceToHandleEvent();
-	    if(selectedFBInstance == null)
-	    {
-		System.out.println("Scheduler.runEvents(): waiting on the algorithm");
-		try{ Thread.sleep(5000); } catch(Exception e) {}
-	    }
-	    else
-	    {
-		selectedFBInstance.handleEvent();
-	    }
-	    notifyFinished();
-	    //resource.handleConfigurationRequests();
-
-
+		return scheduledJobs.size();
 	}
-    }
+	
+	
+	public Job getNextScheduledJob()
+	{
+		return (Job) scheduledJobs.remove(0);
+	}
+	
+	
+	public void addFinishedJob(Job j)
+	{
+		finishedJobs.add(j);
+	}
+	
+	
+	public FBInstance selectFBInstanceToHandleEvent()
+	{
+		//System.out.print("Scheduler.selectFBInstanceToHandleEvent(): ");
+		// TODO: implement selection algorithm
+		if(resource.fbInstance.isHandlingEvent())
+		{
+			
+			//System.out.println("all FB instances are busy handling an event!");
+			return null;
+		} 
+		
+		System.out.println("Scheduler.selectFBInstanceToHandleEvent(): found FB idle instance!");
+		return resource.fbInstance;
+	}
+	
+	
+	public void notifyFinished()
+	{
+		
+		synchronized(finishedJobs)
+		{
+			//System.out.println("Scheduler.notifyFinished()");
+			for (Iterator iter = finishedJobs.iterator(); iter.hasNext();)
+			{
+				Job finishedJob = (Job) iter.next();
+				finishedJob.getInstance().finishedJob(finishedJob);
+				System.out.println("Scheduler.notifyFinished(): notified one");
+				iter.remove();
+			}
+		}
+	}
+	
+	
+	public void runEvents()
+	{
+		System.out.println("Scheduler.runEvents()");
+		while (true)
+		{
+			BasicFBInstance selectedFBInstance = (BasicFBInstance) selectFBInstanceToHandleEvent();
+			if(selectedFBInstance == null)
+			{
+				//System.out.println("Scheduler.runEvents(): no instances to shedule");
+				//try{ Thread.sleep(1); } catch(Exception e) {}
+			}
+			else
+			{
+				selectedFBInstance.handleEvent();
+			}
+			notifyFinished();
+			//resource.handleConfigurationRequests();
+
+
+		}
+	}
     
-    public void scheduleJob(Job j)
-    {
-	System.out.println("Scheduler.scheduleJob()");
-	scheduledJobs.add(j);
-    }
+	public void scheduleJob(Job j)
+	{
+		System.out.println("Scheduler.scheduleJob()");
+		scheduledJobs.add(j);
+	}
     
 }
