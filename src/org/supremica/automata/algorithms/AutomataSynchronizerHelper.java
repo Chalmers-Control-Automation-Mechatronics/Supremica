@@ -131,15 +131,15 @@ public final class AutomataSynchronizerHelper
 		statesToProcess  = new IntArrayList();
 		nbrOfStatesToProcess = 0;
 
-       	theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
+		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
   		theAutomaton = new Automaton();
 
-		Alphabet theAlphabet = theAutomata.createUnionAlphabet();
+		Alphabet theAlphabet = theAutomata.getUnionAlphabet();
 		theAutomaton.setAlphabet(theAlphabet);
 
   		try
   		{
-    		theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
+			theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
 		}
 		catch (Exception e)
 		{
@@ -166,7 +166,7 @@ public final class AutomataSynchronizerHelper
 		statesToProcess  = new IntArrayList();
 		nbrOfStatesToProcess = 0;
 
-       	theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
+		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
 	}
 
 	public void clear()

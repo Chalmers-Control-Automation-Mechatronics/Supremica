@@ -73,7 +73,7 @@ public final class AutomataIDDForm
 		this.theAutomata = theAutomata;
 
 		theAutomaton = new Automaton();
-  		Alphabet theAlphabet = theAutomata.createUnionAlphabet();
+  		Alphabet theAlphabet = theAutomata.getUnionAlphabet();
   		theAutomaton.setAlphabet(theAlphabet);
 
 		theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);

@@ -144,24 +144,22 @@ public class Automata
 		return newHash;	
 	}
 
+	public Alphabet getUnionAlphabet()
+		throws Exception
+	{
+		return AlphabetHelpers.getUnionAlphabet(this);
+	}
+
+	/**
+ 	 * @deprecated Use getUnionAlphabet instead
+	 **/
+/*
 	public Alphabet createUnionAlphabet()
 		throws Exception
 	{
-  		// Compute the new alphabet
-		EventsSet theAlphabets = new EventsSet();
-		Iterator autIt = iterator();
-		while (autIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton)autIt.next();
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-			theAlphabets.add(currAlphabet);
-		}
-		Alphabet theAlphabet = null;
-
-		theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
-     	return theAlphabet;
+		return getUnionAlphabet();
 	}
-
+*/
 	public Iterator iterator()
 	{
 		return theAutomata.iterator();
