@@ -216,6 +216,92 @@
 			<Transition event="em.putter.finished" source="q_6" dest="q_0" />			
 		</Transitions>
 	</Automaton>
+	<Automaton name="Progress spec: Elevate and sort (es)" type="Specification">
+		<Events>
+			<Event id="es.is_down" label="es.is_down" controllable="true" prioritized="true" />
+			<Event id="es.got_ball" label="es.got_ball" controllable="true" prioritized="true" />
+			<Event id="es.timer_before_up.start" label="es.timer_before_up.start" controllable="true" prioritized="true" />
+			<Event id="es.timer_before_up.timeout" label="es.timer_before_up.timeout" controllable="false" prioritized="true" />
+			<Event id="es.up_lower" label="es.up_lower" controllable="true" prioritized="true" />
+			<Event id="es.up_upper" label="es.up_upper" controllable="true" prioritized="true" />		
+			<Event id="es.is_lower" label="es.is_lower" controllable="false" prioritized="true" />
+			<Event id="es.is_upper" label="es.is_upper" controllable="false" prioritized="true" />
+			<Event id="es.ball_lower_level" label="es.ball_lower_level" controllable="false" prioritized="true" />
+			<Event id="es.no_ball_lower_level" label="es.no_ball_lower_level" controllable="false" prioritized="true" />
+			<Event id="es.ball_upper_level" label="es.ball_upper_level" controllable="false" prioritized="true" />
+			<Event id="es.no_ball_upper_level" label="es.no_ball_upper_level" controllable="false" prioritized="true" />
+			<Event id="es.allocate_lower_buffer" label="es.allocate_lower_buffer" controllable="true" prioritized="true" />
+			<Event id="es.release_lower_buffer" label="es.release_lower_buffer" controllable="true" prioritized="true" />
+			<Event id="es.allocate_upper_buffer" label="es.allocate_upper_buffer" controllable="true" prioritized="true" />
+			<Event id="es.release_upper_buffer" label="es.release_upper_buffer" controllable="true" prioritized="true" />
+			<Event id="es.timer_before_put.start" label="es.timer_before_put.start" controllable="true" prioritized="true" />
+			<Event id="es.timer_before_put.timeout" label="es.timer_before_put.timeout" controllable="false" prioritized="true" />
+			<Event id="es.put_ball_lower" label="es.lower_putter.go_out" controllable="true" prioritized="true" />
+			<Event id="es.put_ball_upper" label="es.upper_putter.go_out" controllable="true" prioritized="true" />
+			<Event id="es.timer_before_deput.start" label="es.timer_before_deput.start" controllable="true" prioritized="true" />
+			<Event id="es.timer_before_deput.timeout" label="es.timer_before_deput.timeout" controllable="false" prioritized="true" />
+			<Event id="es.deput_ball_lower" label="es.lower_putter.go_in" controllable="true" prioritized="true" />
+			<Event id="es.deput_ball_upper" label="es.upper_putter.go_in" controllable="true" prioritized="true" />
+			<Event id="es.go_down" label="es.go_down" controllable="true" prioritized="true" />
+			<Event id="es.is_not_down" label="es.is_not_down" controllable="true" prioritized="true" />
+			<Event id="is_small_ball" label="is_small_ball" controllable="true" prioritized="true" />		
+			<Event id="is_large_ball" label="is_large_ball" controllable="true" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" />
+			<State id="q_2" />
+			<State id="q_3" />
+			<State id="q_4_lower" />
+			<State id="q_5_lower" />
+			<State id="q_6_lower" />
+			<State id="q_7_lower" />
+			<State id="q_8_lower" />
+			<State id="q_8_lower_1" />
+			<State id="q_9_lower" />
+			<State id="q_10_lower" />
+			<State id="q_11_lower" />
+			<State id="q_4_upper" />
+			<State id="q_5_upper" />
+			<State id="q_6_upper" />
+			<State id="q_7_upper" />
+			<State id="q_8_upper" />
+			<State id="q_8_upper_1" />
+			<State id="q_9_upper" />
+			<State id="q_10_upper" />
+			<State id="q_11_upper" />
+			<State id="q_12" />
+		</States>
+		<Transitions>
+			<Transition event="es.is_down" source="q_0" dest="q_0" />
+			<Transition event="es.got_ball" source="q_0" dest="q_1" />
+			<Transition event="es.timer_before_up.start" source="q_1" dest="q_2" />
+			<Transition event="es.timer_before_up.timeout" source="q_2" dest="q_3" />
+			<Transition event="is_small_ball" source="q_3" dest="q_4_lower" />
+			<Transition event="is_large_ball" source="q_3" dest="q_4_upper" />
+			<Transition event="es.up_lower" source="q_4_lower" dest="q_5_lower" />		
+			<Transition event="es.up_upper" source="q_4_upper" dest="q_5_upper" />	
+			<Transition event="es.is_lower" source="q_5_lower" dest="q_6_lower" />
+			<Transition event="es.is_upper" source="q_5_upper" dest="q_6_upper" />
+			<Transition event="es.timer_before_put.start" source="q_6_lower" dest="q_7_lower" />
+			<Transition event="es.timer_before_put.timeout" source="q_7_lower" dest="q_8_lower_1" />
+			<Transition event="es.ball_lower_level" source="q_8_lower_1" dest="q_8_lower" />			
+			<Transition event="es.no_ball_lower_level" source="q_8_lower_1" dest="q_12" />			
+			<Transition event="es.timer_before_put.start" source="q_6_upper" dest="q_7_upper" />
+			<Transition event="es.timer_before_put.timeout" source="q_7_upper" dest="q_8_upper_1" />
+			<Transition event="es.ball_upper_level" source="q_8_upper_1" dest="q_8_upper" />			
+			<Transition event="es.no_ball_upper_level" source="q_8_upper_1" dest="q_12" />	
+			<Transition event="es.put_ball_lower" source="q_8_lower" dest="q_9_lower" />
+			<Transition event="es.put_ball_upper" source="q_8_upper" dest="q_9_upper" />
+			<Transition event="es.timer_before_deput.start" source="q_9_lower" dest="q_10_lower" />
+			<Transition event="es.timer_before_deput.timeout" source="q_10_lower" dest="q_11_lower" />
+			<Transition event="es.timer_before_deput.start" source="q_9_upper" dest="q_10_upper" />
+			<Transition event="es.timer_before_deput.timeout" source="q_10_upper" dest="q_11_upper" />
+			<Transition event="es.deput_ball_lower" source="q_11_lower" dest="q_12" />
+			<Transition event="es.deput_ball_upper" source="q_11_upper" dest="q_12" />		
+			<Transition event="es.go_down" source="q_12" dest="q_0" />
+		</Transitions>
+	</Automaton>
 
 	<!-- -->
 	<!-- Interaction specs -->
@@ -550,6 +636,51 @@
 			<Transition event="em.timer.putting.timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
+	<Automaton name="Timer: es.timer.before_up" type="Plant">
+		<Events>
+			<Event id="es.timer.before_up.start" label="es.timer.before_up.start" controllable="true" prioritized="true" />
+			<Event id="es.timer.before_up.timeout" label="es.timer.before_up.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="es.timer.before_up.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_up.start" source="q_1" dest="q_1" />
+			<Transition event="es.timer.before_up.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="Timer: es.timer.before_ballcheck" type="Plant">
+		<Events>
+			<Event id="es.timer.before_ballcheck.start" label="es.timer.before_ballcheck.start" controllable="true" prioritized="true" />
+			<Event id="es.timer.before_ballcheck.timeout" label="es.timer.before_ballcheck.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="es.timer.before_ballcheck.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_ballcheck.start" source="q_1" dest="q_1" />
+			<Transition event="es.timer.before_ballcheck.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
+	<Automaton name="Timer: es.timer.before_deput" type="Plant">
+		<Events>
+			<Event id="es.timer.before_deput.start" label="es.timer.before_deput.start" controllable="true" prioritized="true" />
+			<Event id="es.timer.before_deput.timeout" label="es.timer.before_deput.timeout" controllable="false" prioritized="true" />
+		</Events>
+		<States>
+			<State id="q_0" initial="true" accepting="true" />
+			<State id="q_1" accepting="true"/>		
+		</States>
+		<Transitions>
+			<Transition event="es.timer.before_deput.start" source="q_0" dest="q_1" />
+			<Transition event="es.timer.before_deput.start" source="q_1" dest="q_1" />
+			<Transition event="es.timer.before_deput.timeout" source="q_1" dest="q_0" />	
+		</Transitions>
+	</Automaton>
 <Execution>
 	<Timers>
 		<Timer name="em.timer.before_up" startEvent="em.timer.before_up.start" timeoutEvent="em.timer.before_up.timeout" delay="1000" />
@@ -557,6 +688,9 @@
 		<Timer name="em.timer.measure" startEvent="em.timer.measure.start" timeoutEvent="em.timer.measure.timeout" delay="1000" />
 		<Timer name="em.timer.before_put" startEvent="em.timer.before_put.start" timeoutEvent="em.timer.before_put.timeout" delay="1000" />
 		<Timer name="em.timer.putting" startEvent="em.timer.putting.start" timeoutEvent="em.timer.putting.timeout" delay="2000" />
+		<Timer name="es.timer.before_up" startEvent="es.timer.before_up.start" timeoutEvent="es.timer.before_up.timeout" delay="1000" />
+		<Timer name="es.timer.before_ballcheck" startEvent="es.timer.before_ballcheck.start" timeoutEvent="es.timer.before_ballcheck.timeout" delay="1000" />
+		<Timer name="es.timer.before_deput" startEvent="es.timer.before_deput.start" timeoutEvent="es.timer.before_deput.timeout" delay="2000" />
 	</Timers>
 	<InputSignals>
 		<Signal label="KulaPortvakt" port="0"/>
@@ -631,6 +765,30 @@
 		<Action label="em.putter.go_in">
 			<Command command="UrMatning" value="false"/>
 		</Action>	
+		<Action label="es.put_ball_lower">
+			<Command command="UtVan1" value="true"/>
+		</Action>
+		<Action label="es.put_ball_lower">
+			<Command command="UtVan1" value="false"/>
+		</Action>
+		<Action label="es.put_ball_upper">
+			<Command command="UtVan2" value="true"/>
+		</Action>
+		<Action label="es.deput_ball_upper">
+			<Command command="UtVan2" value="false"/>
+		</Action>
+		<Action label="es.up_lower">
+			<Command command="UppHissVan1" value="true"/>
+			<Command command="UppHissVan2" value="false"/>
+		</Action>
+		<Action label="es.up_upper">
+			<Command command="UppHissVan1" value="true"/>
+			<Command command="UppHissVan2" value="true"/>
+		</Action>
+		<Action label="es.go_down">
+			<Command command="UppHissVan1" value="false"/>
+			<Command command="UppHissVan2" value="false"/>
+		</Action>	
 	</Actions>
 	<Controls>
 		<Control label="button.manual.pressed">
@@ -662,6 +820,12 @@
 		</Control>
 		<Control label="em.measure.has_no_ball">
 			<Condition condition="KulaMatstation" invert="true"/>			
+		</Control>
+		<Control label="em.large_ball">
+			<Condition condition="StorKula"/>			
+		</Control>		
+		<Control label="em.small_ball">
+			<Condition condition="LitenKula"/>			
 		</Control>
 	</Controls>
 </Execution>
