@@ -317,6 +317,40 @@ public class AutomataSynthesizer
 									disabledEvents.minus(currAlphabet);
 								}
 							}
+							// Remove those disabled events that is not included in another plant
+							LinkedList eventsToBeRemoved = new LinkedList();
+
+							for (Iterator evIt = disabledEvents.iterator(); evIt.hasNext();)
+							{
+								LabeledEvent currEvent = (LabeledEvent)evIt.next();
+								Set currAutomata = (Set) eventToAutomataMap.get(currEvent);
+								boolean removeEvent = true;
+								// currAutomata contains those plant automata that contains this event.
+								for (Iterator autIt = currAutomata.iterator(); autIt.hasNext();)
+								{
+									Automaton currAutomaton = (Automaton) autIt.next();
+									if (currAutomaton.isPlant())
+									{
+										// Check if there is a plant not included in this
+										// modular supervisor. If no such plant exists then remove this
+										// event from the set of disabled events.
+										if (!automata.containsAutomaton(currAutomaton.getName()))
+										{
+											removeEvent = false;
+										}
+									}
+								}
+								if (removeEvent)
+								{
+									eventsToBeRemoved.add(currEvent);
+								}
+							}
+
+							for (Iterator evIt = eventsToBeRemoved.iterator(); evIt.hasNext();)
+							{
+								LabeledEvent currEvent = (LabeledEvent)evIt.next();
+								disabledEvents.removeEvent(currEvent);
+							}
 						}
 						if (disabledEvents.size() > 0)
 						{
