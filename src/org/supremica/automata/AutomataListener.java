@@ -57,4 +57,6 @@ public interface AutomataListener
 	public void automatonRemoved(Automata automata, Automaton automaton);
 
 	public void automatonRenamed(Automata automata, Automaton automaton);
+
+	public void actionsOrControlsChanged(Automata automata);
 }

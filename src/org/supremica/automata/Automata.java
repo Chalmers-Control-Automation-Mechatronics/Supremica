@@ -458,7 +458,7 @@ public class Automata
 		return checksum;
 	}
 
-	private void notifyListeners()
+	void notifyListeners()
 	{
 		if (listeners != null)
 		{
@@ -466,7 +466,7 @@ public class Automata
 		}
 	}
 
-	private void notifyListeners(int mode, Automaton a)
+	void notifyListeners(int mode, Automaton a)
 	{
 
 		// logger.debug("Automata.notifyListeners Start");

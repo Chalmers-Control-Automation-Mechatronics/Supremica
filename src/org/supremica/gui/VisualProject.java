@@ -69,6 +69,7 @@ public class VisualProject
 	private static Logger logger = LoggerFactory.createLogger(VisualProject.class);
 	private Automata selectedAutomata = null;
 	private AutomataEditor theAutomataEditor = null;    // Lazy construction
+	private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
 	private HashMap theAutomatonViewerContainer = new HashMap();
 	private HashMap theAutomatonExplorerContainer = new HashMap();
 	private HashMap theAutomatonFrameContainer = new HashMap();
@@ -428,6 +429,26 @@ public class VisualProject
 		}
 	}
 
+
+	public ActionAndControlViewer getActionAndControlViewer()
+		throws Exception
+	{
+		if (theActionAndControlViewer == null)
+		{
+			theActionAndControlViewer = new ActionAndControlViewer(this);
+
+			theActionAndControlViewer.setVisible(true);
+
+			return theActionAndControlViewer;
+		}
+		else
+		{
+			theActionAndControlViewer.setVisible(true);
+
+			return theActionAndControlViewer;
+		}
+	}
+
 	public int getSize()
 	{
 		return lightTableModel.getRowCount();
@@ -521,6 +542,10 @@ public class VisualProject
 		public void automatonRenamed(Automata automata, Automaton automaton)
 		{
 			updateListeners();
+		}
+
+		public void actionsOrControlsChanged(Automata automata)
+		{ // Do nothing
 		}
 
 		public void updated(Object theObject)
@@ -654,6 +679,10 @@ public class VisualProject
 		public void automatonRenamed(Automata automata, Automaton automaton)
 		{
 			updateListeners();
+		}
+
+		public void actionsOrControlsChanged(Automata automata)
+		{ // Do nothing
 		}
 
 		public void updated(Object theObject)

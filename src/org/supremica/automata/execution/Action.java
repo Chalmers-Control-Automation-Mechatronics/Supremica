@@ -72,7 +72,7 @@ public class Action
 	public Action(Action otherAction)
 	{
 		this.label = otherAction.label;
-		commands = new LinkedList(commands);
+		commands = new LinkedList(otherAction.commands);
 	}
 
 	public String getLabel()

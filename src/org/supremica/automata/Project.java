@@ -97,6 +97,26 @@ public class Project
 		return theControls;
 	}
 
+	public void addActions(Actions otherActions)
+	{
+		if (theActions == null)
+		{
+			theActions = new Actions();
+		}
+		theActions.addActions(otherActions);
+		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+	}
+
+	public void addControls(Controls otherControls)
+	{
+		if (theControls == null)
+		{
+			theControls = new Controls();
+		}
+		theControls.addControls(otherControls);
+		notifyListeners(AutomataListeners.MODE_ACTIONS_OR_CONTROLS_CHANGED, null);
+	}
+
 	public void clear()
 	{
 		super.clear();

@@ -14,6 +14,8 @@ import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.execution.Actions;
+import org.supremica.automata.execution.Controls;
 import org.supremica.gui.VisualProjectContainer;
 
 public interface Gui
@@ -46,6 +48,10 @@ public interface Gui
 
 	// returns true if added
 	public Component getComponent();
+
+	public void addActions(Actions theActions);
+
+	public void addControls(Controls theControls);
 
 	// Do we need this one?
 	public JFrame getFrame();

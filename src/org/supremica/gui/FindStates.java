@@ -347,6 +347,10 @@ class FindStatesTableModel
 		updateListeners();
 	}
 
+	public void actionsOrControlsChanged(Automata automata)
+	{ // Do nothing
+	}
+
 	public void updated(Object theObject)
 	{
 		updateListeners();

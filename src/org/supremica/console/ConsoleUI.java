@@ -59,6 +59,8 @@ import java.awt.Component;    // se ovan
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.*;
 import org.supremica.gui.*;
+import org.supremica.automata.execution.Controls;
+import org.supremica.automata.execution.Actions;
 
 public class ConsoleUI
 	implements Gui
@@ -150,6 +152,17 @@ public class ConsoleUI
 			System.err.println("(command interrupted)");
 		}
 	}
+
+	public void addActions(Actions theActions)
+	{ // Implement this
+
+	}
+
+	public void addControls(Controls theControls)
+	{ // Implement this
+
+	}
+
 
 	// -------------------------------------------------------
 	private boolean handleCommand(String cmd, StringTokenizer args)

@@ -76,10 +76,30 @@ public class Controls
 		}
 	}
 
-	public void addControl(Control theControl)
+	public void addControls(Controls otherControls)
 	{
+		for (Iterator conIt = otherControls.iterator(); conIt.hasNext(); )
+		{
+			Control currControl = (Control) conIt.next();
+			Control newControl = new Control(currControl);
+
+			addControl(newControl);
+		}
+	}
+
+	public boolean addControl(Control theControl)
+	{
+		if (theControl == null)
+		{
+			return false;
+		}
+		if (labelToControlMap.containsKey(theControl.getLabel()))
+		{
+			return false;
+		}
 		theControls.add(theControl);
 		labelToControlMap.put(theControl.getLabel(), theControl);
+		return true;
 	}
 
 	public void removeControl(Control theControl)

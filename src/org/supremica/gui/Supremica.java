@@ -69,6 +69,8 @@ import org.supremica.automata.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.util.*;
+import org.supremica.automata.execution.Controls;
+import org.supremica.automata.execution.Actions;
 import org.supremica.gui.animators.scenebeans.*;
 import java.beans.*;
 
@@ -759,6 +761,19 @@ public class Supremica
 			}
 		});
 
+		// Project.ActionAndControlViewer
+		JMenuItem menuProjectActionAndControlViewer = new JMenuItem();
+
+		menuProjectActionAndControlViewer.setText("Action & Control Viewer...");
+		menuProject.add(menuProjectActionAndControlViewer);
+		menuProjectActionAndControlViewer.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.actionAndControlViewer_actionPerformed(getGui());
+			}
+		});
+
 		// Tools
 		JMenu menuTools = new JMenu();
 
@@ -1401,6 +1416,18 @@ public class Supremica
 	public MainPopupMenu getMainPopupMenu()
 	{
 		return mainPopupMenu;
+	}
+
+	public void addActions(Actions theActions)
+	{
+		Project currProject = getActiveProject();
+		currProject.addActions(theActions);
+	}
+
+	public void addControls(Controls theControls)
+	{
+		Project currProject = getActiveProject();
+		currProject.addControls(theControls);
 	}
 
 	public int addAutomata(Automata currAutomata)

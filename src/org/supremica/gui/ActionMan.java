@@ -1041,6 +1041,19 @@ public class ActionMan
 		}
 	}
 
+	// Automaton.Alphabet action performed
+	public static void actionAndControlViewer_actionPerformed(Gui gui)
+	{
+		try
+		{
+			ActionAndControlViewer viewer = gui.getVisualProjectContainer().getActiveProject().getActionAndControlViewer();
+		}
+		catch (Exception ex)
+		{
+			gui.error("Exception in ActionAndControlViewer.");
+		}
+	}
+
 	// Automaton.Explore action performed
 	public static void automatonExplore_actionPerformed(Gui gui)
 	{
@@ -1446,11 +1459,14 @@ public class ActionMan
 		try
 		{
 			int nbrOfAddedAutomata = gui.addAutomata(currProject);
+			gui.addActions(currProject.getActions());
+			gui.addControls(currProject.getControls());
 
 			gui.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
 		}
 		catch (Exception excp)
 		{
+			excp.printStackTrace();
 			gui.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
 
 			return;

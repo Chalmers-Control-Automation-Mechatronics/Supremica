@@ -61,11 +61,13 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.log.*;
 
 public class AlphabetViewerPanel
 	extends JPanel
 	implements AutomatonListener
 {
+	private static Logger logger = LoggerFactory.createLogger(AlphabetViewerPanel.class);
 	private Automaton theAutomaton;
 	private Alphabet theAlphabet;
 	private boolean showId = false;
@@ -76,6 +78,7 @@ public class AlphabetViewerPanel
 	public AlphabetViewerPanel(Automaton theAutomaton)
 		throws Exception
 	{
+
 		this.theAutomaton = theAutomaton;
 
 		theAutomaton.getListeners().addListener(this);

@@ -59,6 +59,8 @@ public class AutomataListeners
 	public static final int MODE_AUTOMATON_ADDED = 1;
 	public static final int MODE_AUTOMATON_REMOVED = 2;
 	public static final int MODE_AUTOMATON_RENAMED = 3;
+	public static final int MODE_ACTIONS_OR_CONTROLS_CHANGED = 4;
+
 
 	public AutomataListeners(Automata owner)
 	{
@@ -94,6 +96,10 @@ public class AutomataListeners
 					else if (mode == MODE_AUTOMATON_RENAMED)
 					{
 						currListener.automatonRenamed((Automata) owner, a);
+					}
+					else if (mode == MODE_ACTIONS_OR_CONTROLS_CHANGED)
+					{
+						currListener.actionsOrControlsChanged((Automata) owner);
 					}
 				}
 			}

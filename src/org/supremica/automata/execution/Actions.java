@@ -76,10 +76,30 @@ public class Actions
 		}
 	}
 
-	public void addAction(Action theAction)
+	public void addActions(Actions otherActions)
 	{
+		for (Iterator actIt = otherActions.iterator(); actIt.hasNext(); )
+		{
+			Action currAction = (Action) actIt.next();
+			Action newAction = new Action(currAction);
+
+			addAction(newAction);
+		}
+	}
+
+	public boolean addAction(Action theAction)
+	{
+		if (theAction == null)
+		{
+			return false;
+		}
+		if (labelToActionMap.containsKey(theAction.getLabel()))
+		{
+			return false;
+		}
 		theActions.add(theAction);
 		labelToActionMap.put(theAction.getLabel(), theAction);
+		return true;
 	}
 
 	public void removeAction(Action theAction)

@@ -679,11 +679,34 @@ public class ProjectBuildFromXml
 	public final void doCommand(Attributes attributes)
 		throws SAXException
 	{
+		if (currAction == null)
+		{
+			throwException("Action section is missing");
+		}
+		String command = attributes.getValue("command");
 
+		if (command == null)
+		{
+			throwException("command attribute is missing");
+		}
+
+		currAction.addCommand(command);
 	}
 
 	public final void doCondition(Attributes attributes)
 		throws SAXException
 	{
+		if (currControl == null)
+		{
+			throwException("Control section is missing");
+		}
+		String condition = attributes.getValue("condition");
+
+		if (condition == null)
+		{
+			throwException("condition attribute is missing");
+		}
+
+		currControl.setCondition(condition);
 	}
 }
