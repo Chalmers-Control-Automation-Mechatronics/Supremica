@@ -252,39 +252,47 @@ public class LogDisplay
 		textpane.copy();
 	}
 
+	/** ARASH: temp fix until we get the imagaes working... */
+	private ImageIcon getIcon(String file) {
+		URL url = Supremica.class.getResource("/icons/BlackFlag.gif");
+		return  (url == null) ? new ImageIcon() : new ImageIcon(url);
+	}
+
 	private void createIcons()
 	{
 		Priority prio[] = Priority.getAllPossiblePriorities();
 
 		icons = new Hashtable();
 
+
+
 		for (int i = 0; i < prio.length; i++)
 		{
 			if (prio[i].equals(Priority.FATAL))
 			{
 				//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/BlackFlag.gif")));
+				icons.put(prio[i], getIcon("/icons/BlackFlag.gif") );
 			}
 
 			if (prio[i].equals(Priority.ERROR))
 			{
-				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
+				icons.put(prio[i], getIcon("/icons/RedFlag.gif") );
 			}
 
 			if (prio[i].equals(Priority.WARN))
 			{
 				//icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/RedFlag.gif")));
-				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/OrangeFlag.gif")));
+				icons.put(prio[i], getIcon("/icons/OrangeFlag.gif") );
 			}
 
 			if (prio[i].equals(Priority.INFO))
 			{
-				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/GreenFlag.gif")));
+				icons.put(prio[i], getIcon("/icons/GreenFlag.gif") );
 			}
 
 			if (prio[i].equals(Priority.DEBUG))
 			{
-				icons.put(prio[i], new ImageIcon(Supremica.class.getResource("/icons/BlueFlag.gif")));
+				icons.put(prio[i], getIcon("/icons/BlueFlag.gif") );
 			}
 		}
 	}

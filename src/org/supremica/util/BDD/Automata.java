@@ -170,7 +170,7 @@ public class Automata
 		}
 
 		total_size_allocated = Math.pow(2, variable_count);
-		variable_count = variable_count * 2 + Util.log2ceil(alphabet.getSize());
+		variable_count = variable_count * 3 + Util.log2ceil(alphabet.getSize());
 
 		if(Options.debug_on || Options.profile_on)
 			Options.out.println("The theoretical number of states is " + Util.showHugeNumber( total_size));

@@ -682,7 +682,8 @@ class BDDPanel
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
     private JCheckBox localSaturation, encodingFill, sizeWatch, profileOn;
-    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm, asHeuristics;
+    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm;
+    private JComboBox  asHeuristics, esHeuristics;
 	private JButton bProofFile;
 
     public BDDPanel(PreferencesDialog theDialog)
@@ -770,6 +771,7 @@ class BDDPanel
 
 	algorithmFamily.addItem("Monolithic");
 	algorithmFamily.addItem("Conjunctive");
+	algorithmFamily.addItem("Conjunctive: LatticeWalk");
 	algorithmFamily.addItem("Disjunctive: Simple");
 	algorithmFamily.addItem("Disjunctive: Workset");
 	algorithmFamily.addItem("Smoothed: Monotonic");
@@ -777,6 +779,7 @@ class BDDPanel
 	algorithmFamily.addItem("Smoothed: Path          (V1)");
 	algorithmFamily.addItem("Smoothed: Keep          (V2)");
 	algorithmFamily.addItem("Smoothed: Partitioned   (P1)");
+	algorithmFamily.addItem("PerEvent: Petri Net");
 	algorithmFamily.setSelectedIndex(Options.algo_family);
 
 
@@ -796,6 +799,16 @@ class BDDPanel
 	asHeuristics.addItem("Most local events");
 	asHeuristics.setSelectedIndex(Options.as_heuristics);
 
+
+
+	pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
+	p.add(pHeuristics);
+	pHeuristics.add( new JLabel("Event selection heuristic"));
+	pHeuristics.add( esHeuristics = new JComboBox());
+
+	for(int i = 0; i < Options.ES_HEURISTIC_NAMES.length; i++)
+		esHeuristics.addItem(Options.ES_HEURISTIC_NAMES[i]);
+	esHeuristics.setSelectedIndex(Options.es_heuristics);
 
 	p.add( new JSeparator() );
 
@@ -831,7 +844,8 @@ class BDDPanel
 	Options.count_algo       = countAlgorithm.getSelectedIndex();
 	Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
 	Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
-		Options.as_heuristics = asHeuristics.getSelectedIndex();
+	Options.as_heuristics = asHeuristics.getSelectedIndex();
+	Options.es_heuristics = esHeuristics.getSelectedIndex();
 
 	Options.show_grow        = showGrow.isSelected();
 	Options.user_alters_PCG  = alterPCG.isSelected();

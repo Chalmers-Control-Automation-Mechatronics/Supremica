@@ -6,9 +6,9 @@ import java.util.*;
 public class Workset
 {
 
-	private int [] workset;
+	private int [] workset, queue;
 	private int [][] dependent;
-	private boolean [] remaining;
+	private boolean [] remaining;// this is for the exclusive stuff
 	private int size;
 	private int workset_count;// sum of workset_i
 
@@ -17,75 +17,195 @@ public class Workset
 		this.size = size;
 		this.dependent = dependent;
 		this.workset = new int[size];
+		this.queue = new int[size];
 
-
-
-		// all automata are enabled from start
-		for(int i = 0; i < size; i++) workset[i] = 1;
-		this.workset_count = size;
-
-
-
-		// this is for the exclusive stuff
 		remaining = new boolean[size];
-		for(int i = 0; i < size; i++) remaining[i] = true;
+
 	}
 
 
+	public void init_workset(boolean exclusive) {
+		// all automata are enabled from start
+		workset_count = size;
+		for(int i = 0; i < size; i++) workset[i] = 1;
 
-	/** choose the next automaton (to be re-written) */
-	public int pickOne() {
-			/*
-			// first best
-			for(int i = 0; i < list.length; i++) {
-				if(list[i] > 0) return i;
-			}
-			return -1;
-			*/
-
-			/*
-			// the largest one (most affected so far)
-			int max = 0, maxdex = -1;
-			for(int i = 0; i < list.length; i++) {
-				if(max < list[i]) {
-					maxdex = i;
-					max = list[i];
-				}
-			}
-			return maxdex;
-			*/
-
-			// the smallest one (least affected so far)
-			int min = 0xFFFF, mindex = -1;
-			for(int i = 0; i < size; i++) {
-				if(min >  workset[i] && workset[i] > 0) {
-					mindex = i;
-					min = workset[i];
-				}
-			}
-			return mindex;
+		if(exclusive) // everything reamining, yet...
+			for(int i = 0; i < size; i++) remaining[i] = true;
 	}
 
-
-	/** this does the same thing as pickOne, but chosses each automaton/cluster only once
-	 * this is used in monotonic algorithms where each automaton is added only once
+	/**
+	 * choose the next automaton
+	 *
+	 * This is a rip-off from the PetriNetSupervisor :)
 	 */
+	public int pickOne() {
+
+		int best, queue_size = 0;
+
+		switch(Options.es_heuristics) {
+			case Options.ES_HEURISTIC_RANDOM:
+				for(int i = 0; i < size; i++) // anything is ok
+					if(workset[i] > 0)  queue[queue_size++] = i;
+				break;
+			case Options.ES_HEURISTIC_MOST_PENDING:
+				// one of the largest one (most affected so far)
+				best = 0;
+				for(int i = 0; i < size; i++) {
+					if(workset[i] > 0) {
+						if(best < workset[i]) {
+							best = workset[i];
+							queue_size = 0;
+						}
+						if(best == workset[i]) queue[queue_size++] = i;
+					}
+				}
+				break;
+
+			case Options.ES_HEURISTIC_LEAST_PENDING:
+			// one of the smallest one (least affected so far)
+				best = Integer.MAX_VALUE;
+				for(int i = 0; i < size; i++) {
+					if(workset[i] > 0) {
+						if(best >  workset[i]) {
+							best = workset[i];
+							queue_size = 0;
+						}
+						if(best == workset[i]) queue[queue_size++] = i;
+					}
+				}
+				break;
+			case Options.ES_HEURISTIC_MOST_MEMBERS:
+			case Options.ES_HEURISTIC_MOST_FOLLOWERS:
+				best = 0;
+				for(int i = 0; i < size; i++) {
+					if(workset[i] > 0) {
+						int c = dependent[i][0];
+						if(best < c) {
+							best = c;
+							queue_size = 0;
+						}
+						if(best == c) queue[queue_size++] = i;
+					}
+				}
+
+			break;
+			case Options.ES_HEURISTIC_LEAST_MEMBERS:
+			case Options.ES_HEURISTIC_LEAST_FOLLOWERS:
+				best = Integer.MAX_VALUE;;
+				for(int i = 0; i < size; i++) {
+					if(workset[i] > 0) {
+						int c = dependent[i][0];
+						if(best > c) {
+							best = c;
+							queue_size = 0;
+						}
+						if(best == c) queue[queue_size++] = i;
+					}
+				}
+			break;
+		}
+
+
+		// choose one by random
+		if(queue_size > 1) {
+			return queue[ (int)(Math.random() * queue_size) ];
+		} else {
+			return (queue_size == 1) ? queue[0] : -1;
+		}
+	}
+
+
+	/**
+	 * this does the same thing as pickOne, but chosses each automaton/cluster only once.
+	 * this is used in monotonic algorithms where each automaton is added only once
+	 *
+	 * again, this is another rip-off from the PetriNetSupervisor :)
+	 * (if i wanst me, me should sue myself)
+	 *
+	 */
+
 	public int pickOneExcelsuive()
 	{
 
-		int min = 0xFFFF, mindex = -1;
-		for(int i = 0; i < size; i++) {
-		// for(int j = 0; j < size; j++) { int i = size - j -1;
-			if(remaining[i] && min >  workset[i] && workset[i] > 0) {
-				mindex = i;
-				min = workset[i];
-			}
+
+		int best, queue_size = 0;
+
+		switch(Options.es_heuristics) {
+			case Options.ES_HEURISTIC_RANDOM:
+				for(int i = 0; i < size; i++) // anything is ok
+					if(remaining[i] && workset[i] > 0)  queue[queue_size++] = i;
+				break;
+			case Options.ES_HEURISTIC_MOST_PENDING:
+				// one of the largest one (most affected so far)
+				best = 0;
+				for(int i = 0; i < size; i++) {
+					if(remaining[i] && workset[i] > 0 ) {
+						if(best < workset[i]) {
+							best = workset[i];
+							queue_size = 0;
+						}
+						if(best == workset[i]) queue[queue_size++] = i;
+					}
+				}
+				break;
+
+			case Options.ES_HEURISTIC_MOST_MEMBERS:
+			case Options.ES_HEURISTIC_MOST_FOLLOWERS:
+				best = 0;
+				for(int i = 0; i < size; i++) {
+					if(remaining[i] && workset[i] > 0) {
+						int c = dependent[i][0];
+						if(best < c) {
+							best = c;
+							queue_size = 0;
+						}
+						if(best == c) queue[queue_size++] = i;
+					}
+				}
+
+			break;
+			// -------------------------------------------------------------
+			case Options.ES_HEURISTIC_LEAST_PENDING:
+			// one of the smallest one (least affected so far)
+				best = Integer.MAX_VALUE;
+				for(int i = 0; i < size; i++) {
+					if(remaining[i] && workset[i] > 0) {
+						if(best >  workset[i]) {
+							best = workset[i];
+							queue_size = 0;
+						}
+						if(best == workset[i]) queue[queue_size++] = i;
+					}
+				}
+				break;
+
+			case Options.ES_HEURISTIC_LEAST_MEMBERS:
+			case Options.ES_HEURISTIC_LEAST_FOLLOWERS:
+				best = Integer.MAX_VALUE;;
+				for(int i = 0; i < size; i++) {
+					if(remaining[i] && workset[i] > 0 ) {
+						int c = dependent[i][0];
+						if(best > c) {
+							best = c;
+							queue_size = 0;
+						}
+						if(best == c) queue[queue_size++] = i;
+					}
+				}
+			break;
 		}
 
-		// mark the choosen one as taken
-		if(mindex >= 0 && mindex < size) remaining[mindex] = false;
 
-		return mindex;
+		if(queue_size > 1) {
+			// choose one by random
+			best = queue[ (int)(Math.random() * queue_size) ];
+		} else {
+			if(queue_size == 0) return -1;
+			best = queue[0]; // no neead to call random, since "random() * 0 = 0"
+		}
+
+		remaining[best] = false;
+		return best;
 	}
 
 	/**

@@ -41,6 +41,7 @@ public class WorksetSupervisor extends DisjSupervisor
 	private int size;
 	private BDDAutomaton [] bas;
 	private Cluster [] clusters;
+	private Workset workset;
 
     /** Constructor, passes to the base-class */
     public WorksetSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
@@ -63,6 +64,8 @@ public class WorksetSupervisor extends DisjSupervisor
 
 	/** this build ups the dependency matrix, once for all */
 	private void init_worksets() {
+		workset = null; // not created yet
+
 		size = dop.getSize();
 		clusters = dop.getClusters();
 		int count;
@@ -83,9 +86,11 @@ public class WorksetSupervisor extends DisjSupervisor
 
 
 	/** workset to start from: all automata are enabled */
-	protected Workset createWorkset()
+	protected Workset getWorkset(boolean monotonic)
 	{
-		return new Workset(size, dependent);
+		if(workset == null) workset = new Workset(size, dependent);
+		workset.init_workset(monotonic);
+		return workset;
 	}
 
 
@@ -93,7 +98,7 @@ public class WorksetSupervisor extends DisjSupervisor
 
 		// statistic stuffs
 		GrowFrame gf = null;
-		if(Options.show_grow) gf = new GrowFrame("Forward reachability (workset smoothed)");
+		if(Options.show_grow) gf = new GrowFrame("Forward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
 		timer.reset();
 
 		MonotonicPartition dp = new MonotonicPartition(manager, plant.getSize() + spec.getSize());
@@ -101,7 +106,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
 
 
-		Workset workset = createWorkset();
+		Workset workset = getWorkset(false);
 
 		int cube = manager.getStateCube();
 		int permute = manager.getPermuteSp2S();
@@ -133,7 +138,7 @@ public class WorksetSupervisor extends DisjSupervisor
 
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
-		timer.report("Forward reachables found (workset smoothed)");
+		timer.report("Forward reachables found (workset)");
 	}
 
 
@@ -141,7 +146,7 @@ public class WorksetSupervisor extends DisjSupervisor
 
 		// statistic stuffs
 		GrowFrame gf = null;
-		if(Options.show_grow) gf = new GrowFrame("Backward reachability (workset smoothed)");
+		if(Options.show_grow) gf = new GrowFrame("Backward reachability (workset)/" + Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
 		timer.reset();
 
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
@@ -150,7 +155,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		SizeWatch.setOwner("WorksetSupervisor.computeReachables");
 
 
-		Workset workset = createWorkset();
+		Workset workset = getWorkset(false);
 
 		int cube = manager.getStatepCube();
 		int permute1 = manager.getPermuteS2Sp();
@@ -189,6 +194,6 @@ public class WorksetSupervisor extends DisjSupervisor
 
 		if(gf != null) gf.stopTimer();
 		SizeWatch.report(bdd_reachables, "Qr");
-		timer.report("Backward reachables found (workset smoothed)");
+		timer.report("Backward reachables found (workset)");
 	}
 }

@@ -19,16 +19,14 @@ public class BDDAutomaton
 	// BDDs
 	private int[] var_s;
 	private int[] var_sp;
-	private int cube_s, cube_sp;
+	private int[] var_spp;
+	private int cube_s, cube_sp, cube_spp;
 	private int bdd_i, bdd_t, bdd_tu, bdd_t_top, bdd_t_pri;
 	private int bdd_m, bdd_f;
 	private int bdd_events_p, bdd_events, bdd_events_u;
 	private int bdd_keep;
 	private int bdd_care_s, bdd_dontcare_s;
 	private int bdd_care_sp, bdd_dontcare_sp;
-
-	// BDD misc
-	private int permute_s2sp, permute_sp2s;
 
 	public BDDAutomaton(BDDAutomata manager, Automaton a, int index)
 	{
@@ -42,6 +40,7 @@ public class BDDAutomaton
 		num_bits = Util.log2ceil(num_states);
 		var_s = new int[num_bits];
 		var_sp = new int[num_bits];
+		var_spp = new int[num_bits];
 		bdd_keep = manager.getOne();
 
 		manager.ref(bdd_keep);
@@ -50,6 +49,7 @@ public class BDDAutomaton
 		{
 			var_s[i] = manager.createBDD();
 			var_sp[i] = manager.createBDD();
+			var_spp[i] = manager.createBDD();
 
 			int equal = manager.biimp(var_s[i], var_sp[i]);
 
@@ -62,11 +62,11 @@ public class BDDAutomaton
 	 * now, we also have the global alphabet since all automata has been read */
 	public void init()
 	{
+
 		events = manager.getEvents();
 		cube_s = manager.makeSet(var_s, num_bits);
 		cube_sp = manager.makeSet(var_sp, num_bits);
-		permute_sp2s = manager.createPair(var_sp, var_s);
-		permute_s2sp = manager.createPair(var_s, var_sp);
+		cube_spp = manager.makeSet(var_spp, num_bits);
 
 		// precalculate STATE -> BDD map
 		bdd_m = manager.getZero();
@@ -205,10 +205,11 @@ public class BDDAutomaton
 
 	public void cleanup()
 	{
-		check("Cleanup");
+		// check("Cleanup");
 
-		manager.deletePair(permute_s2sp);
-		manager.deletePair(permute_sp2s);
+		manager.deref(cube_s);
+		manager.deref(cube_sp);
+		manager.deref(cube_spp);
 
 		if(dependency != null) {
 		    dependency.cleanup();
@@ -248,6 +249,10 @@ public class BDDAutomaton
 		return cube_sp;
 	}
 
+	public int getCubepp()
+	{
+		return cube_spp;
+	}
 	public int getI()
 	{
 		return bdd_i;
@@ -321,16 +326,6 @@ public class BDDAutomaton
 	public int getKeep()
 	{
 		return bdd_keep;
-	}
-
-	public int getPermuteS2SP()
-	{
-		return permute_s2sp;
-	}
-
-	public int getPermuteSP2S()
-	{
-		return permute_sp2s;
 	}
 
 	public State[] getStates()
@@ -423,6 +418,11 @@ public class BDDAutomaton
 		return automaton.getEventCareSet(uncontrollable_events_only);
 	}
 
+	/**
+	 * See Automaton.getEventFlow() for more info :(
+	 * After which events just fired, we may do a transition
+	 *
+	 */
     public boolean [] getEventFlow(boolean forward) {
 		return automaton.getEventFlow(forward);
 	}
@@ -442,6 +442,7 @@ public class BDDAutomaton
 	public void addEventUsage(int [] count) {
 		automaton.addEventUsage(count);
 	}
+
 
 
 	// ------------------------------------------------------------------

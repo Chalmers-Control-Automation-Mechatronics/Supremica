@@ -47,7 +47,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 		int size = dop.getSize();
 		Cluster [] clusters = dop.getClusters();
 
-		Workset workset = createWorkset();
+		Workset workset = getWorkset(true);
 
 		for(int a = 0; a < size; a++) {
 			int p = workset.pickOneExcelsuive();
@@ -114,7 +114,7 @@ public class SmoothWorksetSupervisor extends WorksetSupervisor {
 	int size = dop.getSize();
 	Cluster [] clusters = dop.getClusters();
 
-	Workset workset = createWorkset();
+	Workset workset = getWorkset(true);
 
 
 	for(int a = 0; a < size; a++) {

@@ -18,14 +18,15 @@ public class Options
     public static final int
 	ALGO_MONOLITHIC = 0,
 	ALGO_CONJUNCTIVE = 1,
-	ALGO_DISJUNCTIVE = 2,
-	ALGO_DISJUNCTIVE_WORKSET = 3,
-
-	ALGO_SMOOTHED_MONO = 4,
-	ALGO_SMOOTHED_MONO_WORKSET = 5,
-	ALGO_SMOOTHED_PATH = 6,
-	ALGO_SMOOTHED_KEEP = 7,
-	ALGO_SMOOTHED_PART = 8
+	ALGO_CONJUNCTIVE_LOCAL_EVENT = 2,
+	ALGO_DISJUNCTIVE = 3,
+	ALGO_DISJUNCTIVE_WORKSET = 4,
+	ALGO_SMOOTHED_MONO = 5,
+	ALGO_SMOOTHED_MONO_WORKSET = 6,
+	ALGO_SMOOTHED_PATH = 7,
+	ALGO_SMOOTHED_KEEP = 8,
+	ALGO_SMOOTHED_PART = 9,
+	ALGO_PETRINET = 10
 	;
 
 	/** language controllability/inclusion algorithms */
@@ -63,11 +64,32 @@ public class Options
 		AS_HEURISTIC_MOST_LOCAL = 8
 		;
 
+
+
+	/** Event (Transition) selection heuristics, see petrinet related stuff */
+	public static final String [] ES_HEURISTIC_NAMES =  {
+		"Random","Max pending req.","Min pending req.","Max follow","Min follow",
+		"Largest cover", "Smallest cover"
+	};
+	public static final int
+		ES_HEURISTIC_RANDOM = 0,
+		ES_HEURISTIC_MOST_PENDING = 1,
+		ES_HEURISTIC_LEAST_PENDING = 2,
+		ES_HEURISTIC_MOST_FOLLOWERS = 3,
+		ES_HEURISTIC_LEAST_FOLLOWERS = 4,
+		ES_HEURISTIC_MOST_MEMBERS = 5,
+		ES_HEURISTIC_LEAST_MEMBERS = 6
+	;
+
+
     // constants
     public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
     private static final int DEFAULT_MAX_PARTITION_SIZE = 3000; // max nodes/partition
+	public static final int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
+
 
     // options
+	public static boolean developer_mode = false;
     public static final boolean use_cudd = false;
     public static boolean fill_statevars = false;
     public static boolean profile_on = false; // misc profiling stuff
@@ -83,12 +105,17 @@ public class Options
     public static boolean nb_optimistic = true;
 
 
-    public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
-    public static int algo_family = ALGO_SMOOTHED_MONO;
-    public static int count_algo  = COUNT_TREE;
-    public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
-    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;
+
+    // algorithms
+    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;	/** C/LI algorithm */
+    public static int algo_family = ALGO_DISJUNCTIVE_WORKSET; /** reachability algorithm */
+    public static int count_algo  = COUNT_TREE; /** state counting, nothing important ... */
+
+    // heurisitcs
 	public static int as_heuristics  = AS_HEURISTIC_MOST_LOCAL;
+	public static int es_heuristics  = ES_HEURISTIC_LEAST_FOLLOWERS;
+	public static int ordering_algorithm = ORDERING_ALGO_NEW_TSP;
+
 
     // out own out stream, might be changed to point to a file
     public static PrintStream out = System.out;

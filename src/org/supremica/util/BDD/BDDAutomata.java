@@ -13,13 +13,13 @@ public class BDDAutomata
 	private Automata original_automata;
 	private int components;    // number of automata
 	private BDDAutomaton[] automata;
-	private int permute_s2sp, permute_sp2s;
+	private int permute_s2sp, permute_sp2s, permute_spp2sp, permute_sp2spp;
 	private int keep;    // the global keep
 
 	// the global alphabet
 	private Event[] original_events;
 	private int events_size;
-	private int bdd_total_initial, bdd_total_cube, bdd_total_cubep;
+	private int bdd_total_initial, bdd_total_cube, bdd_total_cubep, bdd_total_cubepp;
 
 	// vector sizes
 	private int size_states, size_events, size_all;
@@ -39,8 +39,12 @@ public class BDDAutomata
 		SizeWatch.setManager(this);
 
 		// some funny thing with CUDD ...
-		BDDAssert.internalCheck((not(getZero()) == getOne()) && (not(getOne()) == getZero()),
+		int check0 = not(getZero());
+		int check1 = not(getOne());
+		BDDAssert.internalCheck((check0 == getOne()) && (check1 == getZero()),
 					"[INTERNAL] either  ~1 != 0  or  ~0 != 1");
+		deref(check0);
+		deref(check1);
 
 		Timer timer = new Timer();
 
@@ -80,17 +84,16 @@ public class BDDAutomata
 		ref(keep);
 
 		bdd_total_initial = getOne();
-
 		ref(bdd_total_initial);
 
 		bdd_total_cube = getOne();
-
 		ref(bdd_total_cube);
 
 		bdd_total_cubep = getOne();
-
 		ref(bdd_total_cubep);
 
+		bdd_total_cubepp = getOne();
+		ref(bdd_total_cubepp);
 		for (i = components - 1; i >= 0; --i)
 		{
 			automata[i].init();
@@ -99,6 +102,7 @@ public class BDDAutomata
 			bdd_total_initial = andTo(bdd_total_initial, automata[i].getI());
 			bdd_total_cube = andTo(bdd_total_cube, automata[i].getCube());
 			bdd_total_cubep = andTo(bdd_total_cubep, automata[i].getCubep());
+			bdd_total_cubepp = andTo(bdd_total_cubepp, automata[i].getCubepp());
 
 			// check("Createdautomaton " + automata[i].getName() );
 		}
@@ -172,17 +176,28 @@ public class BDDAutomata
 		// ---------------------------------------- create global S->S' and S'->S permutations
 		int[] tmp1 = new int[size_states];
 		int[] tmp2 = new int[size_states];
+		int[] tmp3 = new int[size_states];
 
 		for (int i = 0; i < size_states; i++)
 		{
-			tmp1[i] = getBDD(i * 2);    // S[i]
-			tmp2[i] = getBDD(i * 2 + 1);    // S´[i]
+			tmp1[i] = getBDD(i * 3);    	// S[i]
+			tmp2[i] = getBDD(i * 3 + 1);    // S´[i]
+			tmp3[i] = getBDD(i * 3 + 2);    // S´'[i]
 		}
 
-		permute_s2sp = createPair(tmp1, tmp2);
-		permute_sp2s = createPair(tmp2, tmp1);
-		size_all = 2 * size_states + size_events;
+		permute_s2sp   = createPair(tmp1, tmp2);
+		permute_sp2s   = createPair(tmp2, tmp1);
+		permute_spp2sp = createPair(tmp3, tmp2);
+		permute_sp2spp = createPair(tmp2, tmp3);
+
+
+		// Options.out.println("cube_s   -> " + internal_refcount(cube_s));
+		// Options.out.println("cube_s'  -> " + internal_refcount(cube_sp));
+		// Options.out.println("cube_s'' -> " + internal_refcount(cube_spp));
+
+		size_all = 3 * size_states + size_events;
 	}
+
 
 	// -------------------------------------------------------------------------------------
 
@@ -231,6 +246,11 @@ public class BDDAutomata
 		return bdd_events_c;
 	}
 
+	/** BDD for (forall i in state-variables) (v_i <--> v'_i) , i.e. (S <-> S') */
+	public int getKeep()
+	{
+		return keep;
+	}
 	public int getPermuteS2Sp()
 	{
 		return permute_s2sp;
@@ -239,6 +259,16 @@ public class BDDAutomata
 	public int getPermuteSp2S()
 	{
 		return permute_sp2s;
+	}
+
+	public int getPermuteSpp2Sp()
+	{
+		return permute_spp2sp;
+	}
+
+	public int getPermuteSp2Spp()
+	{
+		return permute_sp2spp;
 	}
 
 	public Event[] getEvents()
@@ -272,10 +302,17 @@ public class BDDAutomata
 	public void cleanup()
 	{
 
+		check("cleanup");
+
 		for (int i = 0; i < components; i++)
 		{
 			automata[i].cleanup();
 		}
+
+		deletePair(permute_s2sp);
+		deletePair(permute_sp2s);
+		deletePair(permute_spp2sp);
+		deletePair(permute_sp2spp);
 
 		// printStats();
 		kill();
@@ -474,7 +511,7 @@ public class BDDAutomata
 		int new_bdd = removeDontCareS(bdd);
 		double states = satCount(new_bdd);
 		if(states != -1)
-		    states /= Math.pow(2, size_states + size_events);
+		    states /= Math.pow(2, 2 * size_states + size_events);
 		deref(new_bdd);
 		return (long) states;
 	    case Options.COUNT_EXACT:

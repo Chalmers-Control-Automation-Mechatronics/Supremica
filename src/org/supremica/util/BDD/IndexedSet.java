@@ -31,7 +31,7 @@ public class IndexedSet {
 	}
 
 	/** compute set union, return cardinality */
-	public static int untion(boolean [] left, boolean [] right, boolean [] result) {
+	public static int union(boolean [] left, boolean [] right, boolean [] result) {
 			int len = left.length;
 			int c = 0;
 			for(int i = 0; i < len; i++)
@@ -63,6 +63,11 @@ public class IndexedSet {
 		for(int i = 0; i < len; i++) x[i] = true;
 	}
 
+	/** set inverse*/
+	public static void negate(boolean [] x)  {
+		int len = x.length;
+		for(int i = 0; i < len; i++) x[i] = ! x[i];
+	}
 
 	/** create a  full subset (all elements are memmbers, a universe set) */
 	public static void copy(boolean [] src, boolean[] dst)  {

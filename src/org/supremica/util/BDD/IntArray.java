@@ -65,7 +65,13 @@ public class IntArray
 	{
 		size = 0;
 	}
+	/** make a copy of exactly the right size */
+	public int [] copy() {
+		int [] c = new int[size];
+		for(int i = 0; i < size; i++) c[i] = array[i];
+		return c;
 
+	}
 
 	private void resize()
 	{

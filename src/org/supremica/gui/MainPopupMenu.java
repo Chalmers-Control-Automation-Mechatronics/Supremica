@@ -77,7 +77,7 @@ class MainPopupMenu
 
 		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
 		menuHandler.add(synthesizeItem, 1);
-		
+
 		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
@@ -88,7 +88,7 @@ class MainPopupMenu
 		// ** This has to be reworked ** Use the Action concept instead **
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
-			
+
 		JMenuItem minimizeItem = new JMenuItem("Minimize");
 		menuHandler.add(minimizeItem, 1);
 
@@ -101,7 +101,7 @@ class MainPopupMenu
 		JMenuItem complementItem = new JMenuItem("Automaton complement");
 		complementItem.setToolTipText("Generate an automaton with complementary marked language");
 		menuHandler.add(complementItem, 1);
-		
+
 		// Do this...
 		JMenuItem languageRestrictor = new SupremicaMenuItem(ActionMan.languageRestrictor);
 		menuHandler.add(languageRestrictor, 1);
@@ -114,7 +114,7 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});*/
-		
+
 		// Strictly EXPERIMENTAL
 		JMenuItem automatonDiminisher = new SupremicaMenuItem(new DiminishAction());
 		menuHandler.add(automatonDiminisher, 1);
@@ -122,12 +122,25 @@ class MainPopupMenu
 		menuHandler.add(automatonDeterminizer, 1);
 		JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
 		menuHandler.add(automataScheduler, 1);
-		
+
 
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 		//menuHandler.add(interfaceItem, 1);
 
 		menuHandler.addSeparator();
+
+
+		if(org.supremica.util.BDD.Options.developer_mode) {
+			JMenuItem miR, miCR, miD;
+			menuHandler.add(miR = new JMenuItem("BDD/Reachability"), 1);
+			menuHandler.add(miCR = new JMenuItem("BDD/CoReachability"), 1);
+			menuHandler.add(miD = new JMenuItem("BDD/Deadlock"), 1);
+			menuHandler.addSeparator();
+
+			miR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDReachability(); } } );
+			miCR.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDCoReachability(); } } );
+			miD.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) { ActionMan.DoBDDDeadlock(); } } );
+		}
 
 		if (SupremicaProperties.includeBoundedUnconTools())
 		{
@@ -432,10 +445,10 @@ class MainPopupMenu
 	public MainPopupMenu(Gui gui)
 	{
 		setInvoker(gui.getFrame());
-		
+
 		// Ugly fixx, temporary
 		ActionMan.gui = gui;
-		
+
 		menuHandler = new MenuHandler();
 
 		initPopups();

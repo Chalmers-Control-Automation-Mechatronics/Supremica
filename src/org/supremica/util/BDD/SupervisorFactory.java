@@ -17,6 +17,7 @@ public class SupervisorFactory {
 	case Options.ALGO_MONOLITHIC: return new Supervisor(manager, automata);
 
 	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,automata);
+	case Options.ALGO_CONJUNCTIVE_LOCAL_EVENT:	return new LocalEventSupervisor(manager,automata);
 
 	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,automata);
 	case Options.ALGO_DISJUNCTIVE_WORKSET: return new WorksetSupervisor(manager,automata);
@@ -27,6 +28,8 @@ public class SupervisorFactory {
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,automata);
 	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,automata);
+
+	case Options.ALGO_PETRINET: return new PetriNetSupervisor(manager,automata);
 
 	}
 
@@ -42,6 +45,7 @@ public class SupervisorFactory {
 	case Options.ALGO_MONOLITHIC: return new Supervisor(manager, plant,spec);
 
 	case Options.ALGO_CONJUNCTIVE: return new ConjSupervisor(manager,plant, spec);
+	case Options.ALGO_CONJUNCTIVE_LOCAL_EVENT:	return new LocalEventSupervisor(manager,plant, spec);
 
  	case Options.ALGO_DISJUNCTIVE: return new DisjSupervisor(manager,plant, spec);
  	case Options.ALGO_DISJUNCTIVE_WORKSET: return new WorksetSupervisor(manager,plant, spec);
@@ -52,6 +56,8 @@ public class SupervisorFactory {
 	case Options.ALGO_SMOOTHED_PATH: return new PathSmoothSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_KEEP: return new KeepSmoothSupervisor(manager,plant, spec);
 	case Options.ALGO_SMOOTHED_PART: return new PartitionSmoothSupervisor(manager,plant, spec);
+
+	case Options.ALGO_PETRINET: return new PetriNetSupervisor(manager,plant, spec);
 
 	}
 	// the type is not supported:
@@ -70,7 +76,8 @@ public class SupervisorFactory {
 
 		if(s1 > Options.MAX_MONOLITHIC_GROUP_SIZE || s1 > Options.MAX_MONOLITHIC_GROUP_SIZE
 			|| (s1 + s2) > Options.MAX_MONOLITHIC_TOTAL_SIZE) {
-			return new ConjSupervisor(manager,plant, spec);
+			// return new ConjSupervisor(manager,plant, spec);
+			return new PetriNetSupervisor(manager,plant, spec);
 		} else {
 			return new Supervisor(manager, plant,spec);
 		}

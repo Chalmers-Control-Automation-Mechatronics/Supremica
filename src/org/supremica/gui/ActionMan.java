@@ -3572,6 +3572,18 @@ public class ActionMan
 		return true;
 	}
 	*/
+
+	// BDD developer stuff:
+
+	public static void DoBDDReachability() {
+		org.supremica.util.BDD.DeveloperTest.DoReachability(gui.getSelectedAutomata());
+	}
+	public static void DoBDDCoReachability() {
+		org.supremica.util.BDD.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
+	}
+	public static void DoBDDDeadlock() {
+		org.supremica.util.BDD.DeveloperTest.DoDeadlock(gui.getSelectedAutomata());
+	}
 }
 
 // ActionMan
