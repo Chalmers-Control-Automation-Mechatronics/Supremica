@@ -71,6 +71,27 @@ public class Server
 		}
 	}
 
+	public static String escape(String was) {
+		int len = was.length();
+		StringBuffer sb = new StringBuffer(len);
+
+		for(int i = 0; i < len; i++) {
+			char c = was.charAt(i);
+			switch (c) {
+				case '<': sb.append("&lt;"); break;
+				case '>': sb.append("&gt;"); break;
+				case '&': sb.append("&amp;"); break;
+				case '\"': sb.append("&quot;"); break;
+				case '/':
+				case '\n':
+				case '\r': sb.append("&#"); sb.append((int)(c)); sb.append(';'); break;
+				default: sb.append(c);;
+			}
+		}
+
+		return sb.toString();
+	}
+
 	// -----------------------------------------------------
 
 	private VisualProjectContainer container;
@@ -99,6 +120,8 @@ public class Server
 
 
 
+	// ---------------------------------------------------
+
 		public Vector getAutomataIdentities()
 		{
 
@@ -113,6 +136,70 @@ public class Server
 			}
 
 			return theIdentities;
+		}
+
+
+		public int deleteAutomaton(String name)
+			throws XmlRpcException
+		{
+
+			Automata as = container.getActiveProject();
+			int oldsize = as.size();
+			as.removeAutomaton(name);
+
+			if(oldsize == as.size())
+			{
+				throw new XmlRpcException(0, name + " does not exist.");
+			}
+
+			return 0; // ignored
+		}
+
+
+		public int renameAutomaton(String name, String newname)
+			throws XmlRpcException
+		{
+			Automata as = container.getActiveProject();
+			try
+			{
+				Automaton currAutomaton = as.getAutomaton(name);
+				as.renameAutomaton(currAutomaton, newname );
+			}
+			catch (Exception e)
+			{
+					throw new XmlRpcException(0, name + " does not exist.");
+			}
+			return 0;
+		}
+
+		// ----------------------------------------------
+
+		public String getAutomaton(String name)
+				throws XmlRpcException
+		{
+
+			Automaton currAutomaton = null;
+			try
+			{
+				currAutomaton = container.getActiveProject().getAutomaton(name);
+			}
+			catch (Exception e)
+			{
+					throw new XmlRpcException(0, name + " does not exist.");
+			}
+
+			Automata theAutomata = new Automata();
+			theAutomata.addAutomaton(currAutomaton);
+
+			AutomataToXml exporter = new AutomataToXml(theAutomata);
+			StringWriter response = new StringWriter();
+			PrintWriter pw = new PrintWriter(response);
+
+			exporter.serialize(pw);
+
+			String escaped_xml = escape(response.toString() );
+			// System.out.println("Escaped document: " + escaped_xml);
+			return escaped_xml;
 		}
 
 
@@ -146,8 +233,38 @@ public class Server
 
 				exporter.serialize(pw);
 
-				return response.toString();
+				return escape( response.toString() );
 		}
+
+		public void addAutomaton(String name, String automatonXmlEncoding)
+			throws XmlRpcException
+		{
+			// System.out.println("name = " + name);
+			// System.out.println("automatonXmlEncoding = " + automatonXmlEncoding);
+
+
+			StringBufferInputStream sbis = new StringBufferInputStream(automatonXmlEncoding);
+			Project project = null;
+
+			try
+			{
+				ProjectBuildFromXml builder = new ProjectBuildFromXml();
+				project = builder.build(sbis);
+			}
+			catch (Exception e)
+			{
+				throw new XmlRpcException(0, "Error while parsing automatonXmlEncoding: " + e.getMessage());
+			}
+
+			Iterator autIt = project.iterator();
+			if(!autIt.hasNext()) throw new XmlRpcException(0,"no documents found in RPC message");
+
+			Automaton currAutomaton = (Automaton) autIt.next();
+			currAutomaton.setName( name);
+			container.getActiveProject().addAutomaton(currAutomaton);
+
+		}
+
 
 		public void addAutomata(String automataXmlEncoding)
 				throws XmlRpcException

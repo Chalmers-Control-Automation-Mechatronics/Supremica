@@ -160,9 +160,17 @@ public class PreferencesDialog
 
 	public void doApply()
 	{
+
 		if (setAttributes())
 		{
-			doCancel();
+
+			try {
+				SupremicaProperties.savePropperties(); // write back the changes to the config file too!!
+			} catch(IOException exx) {
+				System.err.println("Failed to save changed to config-file: " + exx.getMessage() );
+			}
+
+			doCancel(); // ok, not really cancel. what we do is to close the dialog
 		}
 	}
 

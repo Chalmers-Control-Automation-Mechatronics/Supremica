@@ -64,6 +64,12 @@ import org.supremica.util.BDD.Options;
 public final class SupremicaProperties
 	extends Properties
 {
+
+	/** the last property file used, so we write back changes to the correct config file */
+	private static String lastPropertyFile = null;
+
+
+
 	private static final String XML_RPC_ACTIVE = "xmlRpcActive";
 	private static final String XML_RPC_PORT = "xmlRpcPort";
 	private static final String XML_RPC_FILTER = "xmlRpcFilter";
@@ -268,10 +274,42 @@ public final class SupremicaProperties
 		setProperty(SIMULATION_CYCLE_TIME, "100", false);
 	}
 
+
+	/**
+	 * save the property list to the configuration file.
+	 *
+	 * @param name is the name of the config file
+	 */
+	public static final void savePropperties(String name)
+		throws IOException
+	{
+
+		OutputStream os = new FileOutputStream(name);
+		wp.store(os, "# Supremica configuration file");
+		os.close();
+	}
+
+
+	public static final void savePropperties()
+		throws IOException
+	{
+		if(lastPropertyFile != null)
+		{
+			savePropperties(lastPropertyFile);
+		}
+		else
+		{
+			System.err.println("Could not write to configuration file, unknown file name.");
+		}
+	}
+
+
+
+
 	public static final void setProperties(File aFile)
 		throws Exception
 	{
-
+		lastPropertyFile = aFile.getAbsolutePath(); // save it for later days,,,,
 		FileInputStream fStream = new FileInputStream(aFile);
 		BufferedInputStream bStream = new BufferedInputStream(fStream);
 		setProperties(bStream);
