@@ -105,17 +105,21 @@ public class SizeWatch
 
 		if (me != null)
 		{
-			long size = manager.nodeCount(bdd);
-			StringBuffer buf = new StringBuffer(what);
 
-			while (buf.length() < 40)
+			StringBuffer buf = new StringBuffer();
+
+			long size = manager.nodeCount(bdd);
+			buf.append(size);
+
+			while (buf.length() < 10)
 			{
 				buf.append(' ');
 			}
 
-			buf.append("  "); // extra space in case we are larger than 40
+			buf.append(" "); // extra space in case we are to large
+			buf.append(what);
 
-			buf.append(size);
+
 			me.addString(buf.toString());
 		}
 	}

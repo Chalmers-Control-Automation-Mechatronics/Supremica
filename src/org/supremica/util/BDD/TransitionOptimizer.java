@@ -244,17 +244,6 @@ public class TransitionOptimizer {
 		}
 
 
-		// DEBUG
-		for(int i = 0; i < n; i++)  {
-			Options.out.print("" + i + " ==> ");
-			org[i].dump();
-		}
-		for(int i = 0; i < k; i++) {
-			Options.out.print("" + i + " ==> ");
-			optimized[i].dump();
-		}
-
-
 	}
 
 	// ---------------------------------------------------------

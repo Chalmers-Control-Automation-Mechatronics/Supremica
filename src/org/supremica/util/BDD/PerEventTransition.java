@@ -180,14 +180,6 @@ public class PerEventTransition implements WeightedObject
 		next_events = ec - Util.countEQ(next_event, 0);
 		prev_events = ec - Util.countEQ(prev_event, 0);
 
-
-		// DEBUG:
-		p1.dump();
-		p2.dump();
-		Options.out.println("GIVES ==>");
-		this.dump();
-		Options.out.println();
-
 	}
 
 
