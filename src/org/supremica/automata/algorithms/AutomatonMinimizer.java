@@ -54,6 +54,7 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.gui.ActionMan;
 import java.awt.Toolkit;
 
 // Factory object for generating the correct class according to prefs
@@ -97,7 +98,7 @@ public class AutomatonMinimizer
 		this.options = options;
 				
 		// We need a copy since we must make the system reachable (and maybe deterministic) first!
-		//theAutomaton = new Automaton(theAutomaton);
+		theAutomaton = new Automaton(theAutomaton);
 
 		// Make reachable
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, SynthesizerOptions.getDefaultSynthesizerOptions());
@@ -138,10 +139,19 @@ public class AutomatonMinimizer
 			}
 			else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
 			{
+				// Merge silent loops
+				mergeSilentLoops(theAutomaton);
+
+				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
+				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));			
+
 				// Saturate
 				doTransitiveClosure(theAutomaton);
 
-				// Adjust marking to transitive closure
+				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
+				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));			
+
+				// Adjust marking based on epsilon transitions
 				adjustMarking(theAutomaton);
 
 				// Find initial partitioning
@@ -274,7 +284,7 @@ public class AutomatonMinimizer
 				
 				// If we should minimize the number of transitions, make sure a transition is never
 				// present more than once (this is performed in an ugly way below)
-				if (!(options.getAlsoTransitions() && newAutomaton.containsArc(newArc)))
+				if (!(options.getAlsoTransitions() && newArc.getFromState().containsOutgoingArc(newArc)))
 				{
 					// Add arc
 					newAutomaton.addArc(newArc);
@@ -366,7 +376,42 @@ public class AutomatonMinimizer
 			return false;
 		}
 	}
-
+	
+	/**
+	 * Merges all states in loops of silent transitions
+	 */
+	public void mergeSilentLoops(Automaton aut)
+	{
+		StateSet statesToExamine = new StateSet(aut.getStateSet());
+		
+		while (statesToExamine.size() != 0)
+		{
+			// Get and remove arbitrary state
+			State one = statesToExamine.get();			
+			statesToExamine.remove(one);
+			
+			// Find epsilon-closure for this state
+			one.setStateSet(null); // This is unfortunately necessary!!
+			Determinizer determinizer = new Determinizer(aut);
+			StateSet closureOne = determinizer.epsilonClosure(one);
+			
+			// Find, in closure, if there is a state which has the first state in its closure
+			for (StateIterator closureIt = closureOne.iterator(); closureIt.hasNext(); )
+			{
+				State two = closureIt.nextState();
+				two.setStateSet(null);
+				StateSet closureTwo = determinizer.epsilonClosure(two);
+				closureTwo.remove(two);
+				if (closureTwo.contains(one))
+				{
+					// Merge and add to stack, take next state to examine
+					statesToExamine.add(aut.mergeStates(one, two));
+					break;
+				}
+			}		
+		}	
+	}
+	
 	/**
 	 * Add transitions to cover for the epsilon events. More formally, each time there is a
 	 * transition "p =a=> q", after completing the transitive closure (or "saturation"), 
@@ -374,10 +419,10 @@ public class AutomatonMinimizer
 	 */
 	public void doTransitiveClosure(Automaton aut)
 	{
-		// For calculating the epsilon closure, we need this
+		// For calculating the epsilon-closure, we need this
 		Determinizer determinizer = new Determinizer(aut);
 		
-		// Find epsilon closure for each state, put this info in each state
+		// Find epsilon-closure for each state, put this info in each state
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
 			State currState = stateIt.nextState();
@@ -416,7 +461,7 @@ public class AutomatonMinimizer
 					}
 					
 					// Where may we end up if we move along this transition? 
-					// Anywhere in the epsilon closure of the toState...
+					// Anywhere in the epsilon-closure of the toState...
 					StateSet toClosure = arc.getToState().getStateSet();					
 					for (StateIterator toIt = toClosure.iterator(); toIt.hasNext(); )
 					{
@@ -441,11 +486,12 @@ public class AutomatonMinimizer
 			toBeAdded.add(new Arc(currState, currState, tau));
 		}
 		// Add the new arcs!
+		logger.info("Added " + toBeAdded.size() + " transitions to " + aut + ".");
 		while (toBeAdded.size() != 0)
 		{
 			// Add if not already there
 			Arc arc = (Arc) toBeAdded.remove(0);
-			if (!aut.containsArc(arc))
+			if (!arc.getFromState().containsOutgoingArc(arc))
 			{
 				aut.addArc(arc);
 			}
@@ -455,6 +501,9 @@ public class AutomatonMinimizer
 	/** 
 	 * All states could as well be marked in an epsilon-loop where at least one state is marked.
 	 * This method adjusts this.
+	 *   NOTE: This method assumes that the epsilon-closure of each state is already calculated 
+	 * and that the closure is returned by each state's getStateSet-method. (This is true if
+	 * doTransitiveClosure was called previously.)
 	 */
 	public void adjustMarking(Automaton aut)
 	{
@@ -475,7 +524,6 @@ public class AutomatonMinimizer
 						StateSet otherClosure = otherState.getStateSet();
 						if (otherClosure.contains(markedState))
 						{
-							logger.info("Marking " + otherState);
 							toBeMarked.add(otherState);
 						}
 					}
@@ -491,15 +539,14 @@ public class AutomatonMinimizer
 
 	/**
 	 * Algorithm inspired by "Minimizing the Number of Transitions with Respect to Observation Equivalence"
-	 * by Jaana Eloranta. 
-	 * Removes all transitions that are redundant.
+	 * by Jaana Eloranta. Removes all transitions that are redundant.
 	 */
 	public void removeRedundantTransitions(Automaton aut)
 	{
 		// Are there any silent-self-loops? Remove them, they are redundant! 
 		// Note! This is not Jaana Elorantas definition of redundant transitions! 
 		// Her "redundant transitions" are removed below (which requires that all 
-		// silent self-loops have already been removed).
+		// silent self-loops have already been removed). 
 		boolean hasSilentSelfloop = false;
 		// Put them in a list, remove afterwards
 		LinkedList toBeRemoved = new LinkedList();

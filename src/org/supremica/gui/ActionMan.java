@@ -114,6 +114,7 @@ public class ActionMan
 	// gui here is filled in by (who?)
 	public static Gui gui = null;
 	public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
+	public static final EventHider eventHider = new EventHider();
 	public static final FindStates findStates = new FindStates();
 	public static final StateEnumerator stateEnumerator = new StateEnumerator();
 	public static final HelpAction helpAction = new HelpAction();

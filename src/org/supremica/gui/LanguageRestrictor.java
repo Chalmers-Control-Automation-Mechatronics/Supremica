@@ -362,12 +362,50 @@ class LanguageRestrictorDialog
 	extends JFrame
 {
 	private static Logger logger = LoggerFactory.createLogger(LanguageRestrictorDialog.class);
-	private Automata automata;
+	protected Automata automata;
 	private boolean doit = false;
-	private EventsViewerPanel sourceEvents;
-	private RestrictEventsViewerPanel restrictEvents;
+	protected EventsViewerPanel sourceEvents;
+	protected RestrictEventsViewerPanel restrictEvents;
+	protected JButton okButton;
 
-	private void shutWindow()
+	public LanguageRestrictorDialog(Automata automata)
+	{
+		super("Language Restrictor");
+
+		this.automata = automata;
+		this.sourceEvents = new EventsViewerPanel(automata);
+		this.restrictEvents = new RestrictEventsViewerPanel();
+
+		initMenubar();
+
+		JPanel okcancelpanel = new JPanel();    // default is flowlayout
+
+		okButton = new OkButton();
+		okcancelpanel.add(okButton);
+		okcancelpanel.add(new CancelButton());
+
+		JPanel movebuttonpanel = new JPanel(new BorderLayout());
+
+		movebuttonpanel.add(new MoveButton(), BorderLayout.NORTH);
+		movebuttonpanel.add(new RemoveButton(), BorderLayout.SOUTH);
+
+		JPanel buttonpanel = new JPanel(new BorderLayout());
+
+		buttonpanel.add(movebuttonpanel, BorderLayout.CENTER);
+		buttonpanel.add(okcancelpanel, BorderLayout.SOUTH);
+
+		JPanel panel = new JPanel(new BorderLayout());
+
+		panel.add(sourceEvents, BorderLayout.WEST);
+		panel.add(restrictEvents, BorderLayout.EAST);
+		panel.add(buttonpanel, BorderLayout.CENTER);
+		getContentPane().add(panel);
+		Utility.setupFrame(this, 600, 600);
+		pack();
+		show();
+	}
+
+	protected void shutWindow()
 	{
 		setVisible(false);
 		dispose();
@@ -498,7 +536,6 @@ class LanguageRestrictorDialog
 	// Almost identical to AlphabetViewer menubar
 	private void initMenubar()
 	{
-
 		// File
 		JMenu menuFile = new JMenu();
 
@@ -601,43 +638,7 @@ class LanguageRestrictorDialog
 		setJMenuBar(menuBar);
 	}
 
-	public LanguageRestrictorDialog(Automata automata)
-	{
-		super("Language Restrictor");
-
-		this.automata = automata;
-		this.sourceEvents = new EventsViewerPanel(automata);
-		this.restrictEvents = new RestrictEventsViewerPanel();
-
-		initMenubar();
-
-		JPanel okcancelpanel = new JPanel();    // default is flowlayout
-
-		okcancelpanel.add(new OkButton());
-		okcancelpanel.add(new CancelButton());
-
-		JPanel movebuttonpanel = new JPanel(new BorderLayout());
-
-		movebuttonpanel.add(new MoveButton(), BorderLayout.NORTH);
-		movebuttonpanel.add(new RemoveButton(), BorderLayout.SOUTH);
-
-		JPanel buttonpanel = new JPanel(new BorderLayout());
-
-		buttonpanel.add(movebuttonpanel, BorderLayout.CENTER);
-		buttonpanel.add(okcancelpanel, BorderLayout.SOUTH);
-
-		JPanel panel = new JPanel(new BorderLayout());
-
-		panel.add(sourceEvents, BorderLayout.WEST);
-		panel.add(restrictEvents, BorderLayout.EAST);
-		panel.add(buttonpanel, BorderLayout.CENTER);
-		getContentPane().add(panel);
-		Utility.setupFrame(this, 600, 600);
-		pack();
-		show();
-	}
-
-	private void doRestrict()
+	protected void doRestrict()
 	{
 		// Get the restriction alphabet
 		Alphabet alpha = restrictEvents.getAlphabet();
@@ -653,7 +654,17 @@ class LanguageRestrictorDialog
 
 			Automaton newautomaton = detm.getNewAutomaton();
 
-			newautomaton.setComment(automaton.getName() + "\\" + alpha.toString());
+			if (restrictEvents.toErase())
+			{
+				newautomaton.setComment(automaton.getName() + "\\" + 
+										Alphabet.intersect(alpha, automaton.getAlphabet()));
+			}
+			else
+			{
+				newautomaton.setComment(automaton.getName() + "\\" + 
+										Alphabet.minus(automaton.getAlphabet(), alpha));
+			}
+
 			newautomata.addAutomaton(newautomaton);
 		}
 

@@ -53,6 +53,7 @@ import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaIterator;
+import org.supremica.properties.SupremicaProperties;
 
 public class Automaton
 	implements ArcListener
@@ -1716,6 +1717,101 @@ public class Automaton
 
 		return null;
 	}
+
+	/**
+	 * Merges two states, giving the new state the union of incoming and outgoing transitions, 
+	 * if at least one state was accepting, the result is accepting, and similarily for 
+	 * initial and forbidden states
+	 */
+	public State mergeStates(State one, State two)
+	{
+		// Don't merge if equal
+		if (one.equals(two))
+		{
+			return one;
+		}
+
+		// Make new state
+		State newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
+		addState(newState);
+		if (one.isAccepting() || two.isAccepting())
+		{
+			newState.setAccepting(true);
+		}
+		if (one.isForbidden() || two.isForbidden())
+		{
+			newState.setForbidden(true);
+		}
+		if (one.isInitial() || two.isInitial())
+		{
+			newState.setInitial(true);
+			setInitialState(newState);
+		}
+
+		// Add transitions
+		LinkedList toBeAdded = new LinkedList();
+		for (ArcIterator arcIt = one.outgoingArcsIterator(); arcIt.hasNext(); )
+		{
+			Arc arc = arcIt.nextArc();
+			State toState = arc.getToState();
+			if (toState.equals(one) || toState.equals(two))
+			{
+				toState = newState;
+			}
+			
+			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
+		}
+		for (ArcIterator arcIt = two.outgoingArcsIterator(); arcIt.hasNext(); )
+		{
+			Arc arc = arcIt.nextArc();
+			State toState = arc.getToState();
+			if (toState.equals(one) || toState.equals(two))
+			{
+				toState = newState;
+			}
+			
+			toBeAdded.add(new Arc(newState, toState, arc.getEvent()));
+		}
+		for (ArcIterator arcIt = one.incomingArcsIterator(); arcIt.hasNext(); )
+		{
+			Arc arc = arcIt.nextArc();
+			State fromState = arc.getFromState();
+			if (fromState.equals(one) || fromState.equals(two))
+			{
+				fromState = newState;
+			}
+			
+			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
+		}
+		for (ArcIterator arcIt = two.incomingArcsIterator(); arcIt.hasNext(); )
+		{
+			Arc arc = arcIt.nextArc();
+			State fromState = arc.getFromState();
+			if (fromState.equals(one) || fromState.equals(two))
+			{
+				fromState = newState;
+			}
+			
+			toBeAdded.add(new Arc(fromState, newState, arc.getEvent()));
+		}
+		// Add the new arcs!
+		while (toBeAdded.size() != 0)
+		{
+			// Add if not already there
+			Arc arc = (Arc) toBeAdded.remove(0);
+			if (!arc.getFromState().containsOutgoingArc(arc))
+			{
+				addArc(arc);				
+			}
+		}
+
+		// Remove the states
+		removeState(one);
+		removeState(two);
+
+		// Return the new state
+		return newState;
+	}	
 
 	public void removeAllStates()
 	{

@@ -88,9 +88,7 @@ public class State
 
 	// private StateNode stateNode = null;
 	private LinkedList incomingArcs = new LinkedList();
-
-	//private LinkedList outgoingArcs = new LinkedList();
-	protected LinkedList outgoingArcs = new LinkedList();
+	private LinkedList outgoingArcs = new LinkedList();
 	private List outgoingArcSets = new LinkedList();
 	private Listeners listeners = null;
 
@@ -100,12 +98,6 @@ public class State
 	 */
 	protected int accumulatedCost = UNDEF_COST;
 
-	/**
-	 * Stores the parent to this State. Null by default unless the path to this
-	 * state is tracked.
-	 */
-
-//      protected State parent = null;
 	protected State() {}
 
 	public State(String id)
@@ -152,7 +144,8 @@ public class State
 		y = otherState.y;
 		radius = otherState.radius;
 
-// Här är skurken..... vilken jäv**a skurk? Skriv ordentliga kommentarer!!!
+// Här är skurken..... 
+// Vilken jäv**a skurk? Skriv ordentliga kommentarer!!!
 //              outgoingArcs = otherState.outgoingArcs;
 	}
 
@@ -524,6 +517,38 @@ public class State
 		return new ArcIterator(((LinkedList) outgoingArcs.clone()).iterator());
 	}
 
+	/**
+	 * Retuns true if there is an outgoing arc from this state that is equal to the
+	 * supplied arc.
+	 */
+	public boolean containsOutgoingArc(Arc arc)
+	{
+		for (Iterator arcIt = outgoingArcs.iterator(); arcIt.hasNext(); )
+		{
+			if (arc.equals((Arc) arcIt.next()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Retuns true if there is an incoming arc from this state that is equal to the
+	 * supplied arc.
+	 */
+	public boolean containsIncomingArc(Arc arc)
+	{
+		for (Iterator arcIt = incomingArcs.iterator(); arcIt.hasNext(); )
+		{
+			if (arc.equals((Arc) arcIt.next()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public ArcIterator incomingArcsIterator()
 	{
 		return new ArcIterator(incomingArcs.iterator());
@@ -651,8 +676,8 @@ public class State
 	{
 		LinkedList outArcs = (LinkedList) outgoingArcs.clone();
 		LinkedList inArcs = (LinkedList) incomingArcs.clone();
-		Iterator arcIt = outArcs.iterator();
 
+		Iterator arcIt = outArcs.iterator();
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();
@@ -661,7 +686,6 @@ public class State
 		}
 
 		arcIt = inArcs.iterator();
-
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();

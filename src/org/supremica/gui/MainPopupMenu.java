@@ -117,6 +117,10 @@ class MainPopupMenu
 		JMenuItem languageRestrictor = new SupremicaMenuItem(ActionMan.languageRestrictor);
 		menuHandler.add(languageRestrictor, 1);
 
+		// Do this...
+		JMenuItem eventHider = new SupremicaMenuItem(ActionMan.eventHider);
+		menuHandler.add(eventHider, 1);
+
 		/* ...and you can forget about this
 		languageRestrictor.addActionListener(new ActionListener()
 		{
@@ -134,27 +138,23 @@ class MainPopupMenu
 		if (SupremicaProperties.includeBoundedUnconTools())
 		{
 			JMenuItem extendItem = new JMenuItem("Extend");
-
 			menuHandler.add(extendItem, 1);
 
 			JMenuItem liftingItem = new JMenuItem("Compute lifting automaton");
-
 			menuHandler.add(liftingItem, 1);
 
 			JMenuItem removePassItem = new JMenuItem("Remove pass events");
-
 			menuHandler.add(removePassItem, 1);
 
 			JMenuItem addSelfLoopArcsItem = new JMenuItem("Add self-loop arcs");
-
+			addSelfLoopArcsItem.setToolTipText("Add self loops so that each state has the whole alphabet elabled");
 			menuHandler.add(addSelfLoopArcsItem, 1);
 
 			JMenuItem removeSelfLoopArcsItem = new JMenuItem("Remove self-loop arcs");
-
+			removeSelfLoopArcsItem.setToolTipText("Remove all self-loops");
 			menuHandler.add(removeSelfLoopArcsItem, 1);
 
 			JMenuItem normalizeAlphabetItem = new JMenuItem("Normalize alphabet");
-
 			menuHandler.add(normalizeAlphabetItem, 1);
 			menuHandler.addSeparator();
 			extendItem.addActionListener(new ActionListener()

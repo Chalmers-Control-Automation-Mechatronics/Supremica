@@ -125,30 +125,37 @@ class MinimizationDialogStandardPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
+		// Should we display a note?
 		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.ObservationEquivalence)
 		{
-			note.setText("Note:\n" + "This minimization algorithm is experimental!");
+			note.setText("Note:\n" + "This minimization algorithm is experimental, the\n" + 
+						 "result may not be minimal but should at least be\n" + 
+						 "observation equivalent to the input.");
 			note.setVisible(true);
 		}
-
-		// Not else if!
-		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
+		else if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
 		{
 			note.setText("Note:\n" + "Returns an automaton representing the same language\n" + 
 						 "using a minimal number of states and transitions.\n" + 
 						 "  If the automaton is nondeterministic, it is first made\n" + 
-						 "deterministic.");
-			
-			// This implies that the number of transitions are minimized
-			alsoTransitions.setSelected(true);
-			alsoTransitions.setEnabled(false);
-
+						 "deterministic.");			
 			note.setVisible(true);
 		}
-		else    // Something else is selected
+		else
+		{
+			note.setVisible(false);
+		}
+		
+		// Not else if!
+		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
+		{
+			// This already implies that the number of transitions are minimized
+			alsoTransitions.setSelected(true);
+			alsoTransitions.setEnabled(false);
+		}
+		else // Something else is selected
 		{
 			alsoTransitions.setEnabled(true);
-			note.setVisible(false);
 		}
 	}
 }
@@ -213,7 +220,6 @@ public class MinimizationDialog
 
 		// ** MF ** Fix to get the frigging thing centered
 		Dimension dim = dialog.getMinimumSize();
-
 		dialog.setLocation(Utility.getPosForCenter(dim));
 		dialog.setResizable(false);
 		update();

@@ -142,13 +142,12 @@ public final class AutomataSynchronizerHelper
 		helperData = new HelperData();
 		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
-		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
+		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), 
+										  syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
 		executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
 
-		// Alphabet theAlphabet = theAutomata.getUnionAlphabet(syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
-		//Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
-		//theAutomaton.getAlphabet().union(theAlphabet);
+		// Calculate the automataIndexForm (a more efficient representation of an automata)
 		try
 		{
 			theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
@@ -163,7 +162,8 @@ public final class AutomataSynchronizerHelper
 	}
 
 	/**
-	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and Automaton-Objects.
+	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and 
+	 * Automaton-Objects.
 	 *
 	 *@param  orgHelper The old helper to collect information from
 	 *@see  AutomataVerificationOptions#findUncontrollableStates(int[])

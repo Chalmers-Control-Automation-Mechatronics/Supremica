@@ -279,7 +279,6 @@ public class ProjectBuildFromXml
 	public void startElement(String uri, String localName, String name, Attributes attributes)
 		throws SAXException
 	{
-
 		// in order of frequency
 		if (transitionStr.equals(name))
 		{

@@ -70,6 +70,9 @@ public final class AutomataIndexForm
 	// <automaton,state,event> -> <state>
 	private int[][][] nextStateTable;
 
+	// <automaton,state,event> -> <state[]>
+	//private int[][][] nextStatesTable;
+
 	// <automaton, state, event> -> <state[]>
 	private int[][][][] prevStatesTable;
 
