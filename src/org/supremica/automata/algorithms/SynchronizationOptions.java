@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.log.*;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.util.SupremicaException;
 
 public final class SynchronizationOptions
 {
@@ -68,58 +69,49 @@ public final class SynchronizationOptions
 	private boolean requireConsistentImmediate;    // check that common evenst have same immediaticity
 	private boolean rememberDisabledEvents;    // redirect disabled transitions to forbidden dump-state
 	private boolean dialogOK = false;
+	private String automatonNameSeparator;
+	private String stateNameSeparator;
 
 	/**
-	 * The current options, based on earlier user preferences.
-	 */
-	public SynchronizationOptions()
-		throws IllegalArgumentException
-	{
-		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(),
-			 false,                               // expandEventsUsingPriority
-			 true,                                // buildAutomaton
-			 false,                               // useShortStateNames
-			 true,                                // requireConsistentControllability
-			 true,                                // requireConsistentImmediate
-			 false);                              // rememberDisabledEvents
-	}
-
-	/**
-	 * This is not a good constructor so it is private, it is impossible to read in the code.
-	 * Use the "getDefault..."-methods in this class instead and when they won't suit you,
+	 * Default constructor
+	 * 
+	 * The parametrisized constructor was removed due to unreadable code.
+	 * Use the "getDefault..."-methods in this class instead or when they won't suit you,
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
+	 * @throws SupremicaException
 	 */
-	private SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean useShortStateNames, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
-		throws IllegalArgumentException
+	public SynchronizationOptions()
+//		throws SupremicaException
 	{
-		if (syncType == null)
+		this.nbrOfExecuters = SupremicaProperties.syncNbrOfExecuters();
+		//The following check should ideally be done within SupremicaProperties
+		if (this.nbrOfExecuters != 1)
 		{
-			throw new IllegalArgumentException("synchType must be non-null");
+//			throw new SupremicaException("Error in SupremicaProperties. The property synchNbrOfExecuters must be at least 1.");
 		}
 
-		if (nbrOfExecuters < 1 || nbrOfExecuters > 1)
+		this.syncType = SynchronizationType.Prioritized;
+		assert this.syncType != null;
+		
+		this.initialHashtableSize = SupremicaProperties.syncInitialHashtableSize();
+		//The following check should ideally be done within SupremicaProperties
+		if (this.initialHashtableSize < 100)
 		{
-			throw new IllegalArgumentException("nbrOfExcuters must be 1");
+//			throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
 		}
-
-		if (initialHashtableSize < 100)
-		{
-			throw new IllegalArgumentException("initialHashtableSize must be at least 100");
-		}
-
-		this.nbrOfExecuters = nbrOfExecuters;
-		this.syncType = syncType;
-		this.initialHashtableSize = initialHashtableSize;
-		this.expandHashtable = expandHashtable;
-		this.forbidUnconStates = forbidUnconStates;
-		this.expandForbiddenStates = expandForbiddenStates;
-		this.expandEventsUsingPriority = expandEventsUsingPriority;
-		this.buildAutomaton = buildAutomaton;
-		this.useShortStateNames = useShortStateNames;
-		this.requireConsistentControllability = requireConsistentControllability;
-		this.requireConsistentImmediate = requireConsistentImmediate;
-		this.rememberDisabledEvents = rememberDisabledEvents;
+		
+		this.expandHashtable = SupremicaProperties.syncExpandHashtable();
+		this.forbidUnconStates = SupremicaProperties.syncForbidUncontrollableStates();
+		this.expandForbiddenStates = SupremicaProperties.syncExpandForbiddenStates();
+		this.expandEventsUsingPriority = false;
+		this.buildAutomaton = true;
+		this.useShortStateNames = false;
+		this.requireConsistentControllability = true;
+		this.requireConsistentImmediate = true;
+		this.rememberDisabledEvents = false;
+		this.automatonNameSeparator = SupremicaProperties.syncAutomatonNameSeparator();
+		this.stateNameSeparator = SupremicaProperties.getStateSeparator();
 	}
 
 	public void setDialogOK(boolean bool)
@@ -300,5 +292,37 @@ public final class SynchronizationOptions
 		options.setForbidUncontrollableStates(true); // This is important!
 		options.setExpandForbiddenStates(false); // Don't need to do that if we're not using it anyway...
 		return options;
+	}
+
+	/**
+	 * @param automatonNameSeparator The automatonNameSeparator to set.
+	 */
+	public void setAutomatonNameSeparator(String automatonNameSeparator)
+	{
+		this.automatonNameSeparator = automatonNameSeparator;
+	}
+
+	/**
+	 * @return Returns the automatonNameSeparator.
+	 */
+	public String getAutomatonNameSeparator()
+	{
+		assert automatonNameSeparator != null;
+		return automatonNameSeparator;
+	}
+	/**
+	 * @return Returns the stateNameSeparator.
+	 */
+	public String getStateNameSeparator()
+	{
+		assert stateNameSeparator != null;
+		return stateNameSeparator;
+	}
+	/**
+	 * @param stateNameSeparator The stateNameSeparator to set.
+	 */
+	public void setStateNameSeparator(String stateNameSeparator)
+	{
+		this.stateNameSeparator = stateNameSeparator;
 	}
 }
