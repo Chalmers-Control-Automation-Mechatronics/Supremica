@@ -432,7 +432,7 @@ public class TestAlgo
 			Options.encoding_algorithm = save_encoding;
 
 			// test different encodings
-			System.out.println("\n***** Testing all encoding functions");
+			System.out.println("\n***** Testing all ordering algorithms (slow!)");
 
 			int save_ordering = Options.ordering_algorithm;
 
@@ -477,23 +477,18 @@ public class TestAlgo
 			System.out.println();
 		}
 
+		// ------------------------- testing safe state supervisor synthesis:
 		System.out.println("\n***** Testing SCT/synthesis algorithms");
 		for (int i = 0; i < TEST_FILES_SUP.length; i++)
 		{
 			System.out.println("Loading " + TEST_FILES_SUP[i] + "...");
 
-			// once with reachables
-			System.out.println(" Reachable controllability mode");
-			Options.restrict_subC_to_reachables = true;
-			testSupNBC(TEST_FILES_SUP[i]);
-
-			// once with anything
-			System.out.println(" Dont-care controllability mode");
-			Options.restrict_subC_to_reachables = false;
-			testSupNBC(TEST_FILES_SUP[i]);
+			for(int j = 0; j < Options.SUP_REACHABILITY_NAMES.length; j++) {
+				System.out.println(" Reachability mode: " + Options.SUP_REACHABILITY_NAMES[j]);
+				Options.sup_reachability_type = j;
+				testSupNBC(TEST_FILES_SUP[i]);
+			}
 		}
-
-
 
 
 		if (fail == 0)
@@ -549,6 +544,13 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.17  2004/07/21 12:47:08  vahidi
+ the test algo is more sane when it coes to supNBC tests.
+
+ for some very odd reason, AGV.xml does not fail when using the StepStoneSupervisor anymore.
+
+ something is wrong !
+
  Revision 1.16  2004/07/09 14:56:01  vahidi
 
  safe state supNBC support added to the StepStoneSupervisor (not working yet)

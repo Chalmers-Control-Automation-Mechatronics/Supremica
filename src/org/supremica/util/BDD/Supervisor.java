@@ -998,31 +998,55 @@ public class Supervisor
 		GrowFrame gf = BDDGrow.getGrowFrame(manager, "Safe states: nodeCount(X)");
 
 		Timer timer = new Timer("SafeStatesNBC");
+
+		// 1.a find the uncontrollable pairs
 		int xp, x = manager.ref( getUncontrollableStates() );
 		timer.report("Uncontrollable by syncronization found", true);
 
-		int marked = GroupHelper.getM(manager, spec, plant);
 
-		if(Options.restrict_subC_to_reachables)
+
+
+		// 1.b if there are any explicitly forbidden states, we must add them to!
+		int explicitly_forbidden = manager.computeF();
+		x = manager.orTo(x, explicitly_forbidden);
+		manager.deref(explicitly_forbidden);
+
+		// 1.c maybe the user has some request about the reachability of the computed safe states ?
+		if(Options.sup_reachability_type == Options.SUP_REACHABILITY_UC || Options.sup_reachability_type == Options.SUP_REACHABILITY_ALL)
 		{
 			Timer t2 = null;
 			if(Options.profile_on)
 			{
 				t2 = new Timer("Supervisor.getSafeStatesNBC");
 			}
-			int forward = getReachables();
-			x = manager.andTo(x, forward);
 
-			if(Options.profile_on)
+			// first, we need the reachable states:
+			int forward = getReachables();
+
+			// now, how do we handle this ?
+			if( Options.sup_reachability_type == Options.SUP_REACHABILITY_UC )  // only uc(P||Sp) is tested for reachability
 			{
-				t2.report("computed the intersection of reachable states and uncontrollables");
+				x = manager.andTo(x, forward);
+				if(Options.profile_on)
+				{
+					t2.report("computed the intersection of reachable states and uncontrollables");
+				}
+			}
+			else /* Options.sup_reachability_type == Options.SUP_REACHABILITY_ALL */ // everything must be reachable
+			{
+				int not_reachable = manager.not(forward);
+				x = manager.orTo(x, not_reachable);
+				manager.deref(not_reachable);
+				if(Options.profile_on)
+				{
+					t2.report("added unreachable states as forbidden states");
+				}
 			}
 		}
 
 
-		int implicitly_forbidden = manager.computeF();
-		x = manager.orTo(x, implicitly_forbidden);
-		manager.deref(implicitly_forbidden);
+		// 2. get the marked state
+		int marked = GroupHelper.getM(manager, spec, plant);
 
 		int itr = 0;
 		do

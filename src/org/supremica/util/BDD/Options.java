@@ -219,6 +219,17 @@ public class Options
 							ENCODING_BFS_I = 4, ENCODING_BFS_M = 5;
 	public static int encoding_algorithm = ENCODING_BFS_M;
 
+
+	/** In safe-state supervisor synthesis, we must decide to include reachability or not */
+	public static final String[] SUP_REACHABILITY_NAMES = {
+		"ignored", "uc(P||Sp) must be reachable", "total reachability constraint"
+	};
+	public static final int SUP_REACHABILITY_IGNORE = 0,
+		SUP_REACHABILITY_UC = 1,
+		SUP_REACHABILITY_ALL = 2;
+	public static int sup_reachability_type = SUP_REACHABILITY_IGNORE;
+
+
 	// --- [ constants ] -------------------------------------------------
 	public static final int LINE_WIDTH = 55;    // # of chars per line?, screen width
 	private static final int DEFAULT_MAX_PARTITION_SIZE = 3000;    // max nodes/partition
@@ -242,7 +253,7 @@ public class Options
 	public static boolean uc_optimistic = true;
 	public static boolean nb_optimistic = true;
 	public static boolean burst_mode = false;
-	public static boolean restrict_subC_to_reachables = false; // P||Sp uncontrollable states should be reachable only!
+
 
 	/** initial burst mode: to do some initial work before the reachability algo realy starts */
 

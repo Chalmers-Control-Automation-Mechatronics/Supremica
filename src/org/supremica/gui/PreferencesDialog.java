@@ -788,7 +788,7 @@ class BDDPanel1
 	private JCheckBox sizeWatch, profileOn;
 	private JComboBox algorithmFamily, dssiHeuristics, ndasHeuristics;
 	private JComboBox inclusionAlgorithm, asHeuristics, esHeuristics;
-	private JComboBox showGrow, frontierStrategy;
+	private JComboBox showGrow, frontierStrategy, supReachability;
 	private JButton bProofFile;
 
 	public BDDPanel1(PreferencesDialog theDialog)
@@ -805,8 +805,8 @@ class BDDPanel1
 		JPanel pWest = new JPanel(new GridLayout(7, 1));
 		pLeft.add(pWest, BorderLayout.CENTER);
 
-		pWest.add(tmp = new JLabel("User interaction and reports:", SwingConstants.LEFT));
-		tmp.setForeground(Color.blue);
+		addCaption(pWest, "User interaction and reports:");
+
 		pWest.add(alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG));
 		pWest.add(traceOn = new JCheckBox("Dump execution trace (SLOW!)", Options.trace_on));
 		pWest.add(debugOn = new JCheckBox("Verbose", Options.debug_on));
@@ -817,14 +817,10 @@ class BDDPanel1
 		JPanel pWest2 = new JPanel(new GridLayout(2, 1));
 		pLeft.add(pWest2, BorderLayout.SOUTH);
 
-		JPanel pGrow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		pWest2.add(pGrow);
-		pGrow.add(new JLabel("BDD graphs"));
-		pGrow.add(showGrow = new JComboBox());
-		insert(showGrow, Options.SHOW_GROW_NAMES, Options.show_grow);
+		showGrow = addCombo(pWest2,"BDD graphs", Options.SHOW_GROW_NAMES, Options.show_grow);
+
 
 		JPanel pProof = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
 		pProof.add(bProofFile = new JButton("Set proof file"));
 		pProof.add(new JLabel(" (verbose and slow!)"));
 		bProofFile.addActionListener(this);
@@ -832,77 +828,25 @@ class BDDPanel1
 
 
 		// -------------------------------------------------------
-		Box p = new Box(BoxLayout.Y_AXIS);
+		// Box p = new Box(BoxLayout.Y_AXIS);
+		JPanel p = new JPanel(new GridLayout(9, 1));
 
 		add(p, BorderLayout.EAST);
 
-		JPanel pLabel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-		p.add(pLabel);
-		pLabel.add(tmp = new JLabel("Algorithm selection:"));
-		tmp.setForeground(Color.blue);
+		addCaption(p, "Algorithm/heuristic selection:");
+		frontierStrategy  = addCombo(p, "Frontier choice", Options.FRONTIER_STRATEGY_NAMES, Options.frontier_strategy);
+		supReachability  = addCombo(p, "safe-state supNBC reachability", Options.SUP_REACHABILITY_NAMES, Options.sup_reachability_type);
+		inclusionAlgorithm  = addCombo(p, "Language containment algorithm", Options.INCLUSION_ALGORITHM_NAMES, Options.inclsuion_algorithm);
+		algorithmFamily  = addCombo(p, "Favour reachability algorithm", Options.REACH_ALGO_NAMES, Options.algo_family);
+		asHeuristics  = addCombo(p, "Automaton selection heuristic", Options.AS_HEURISTIC_NAMES, Options.as_heuristics);
+		dssiHeuristics  = addCombo(p, "Delayed* insertation heuristic", Options.DSSI_HEURISTIC_NAMES, Options.dssi_heuristics);
+		esHeuristics  = addCombo(p, "H1: PN-event and workset-automaton selection", Options.ES_HEURISTIC_NAMES, Options.es_heuristics);
+		ndasHeuristics  = addCombo(p, "H2: Non-deteministic selection of equals", Options.NDAS_HEURISTIC_NAMES, Options.ndas_heuristics);
 
-		JPanel pFrontier = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		p.add(pFrontier);
-		pFrontier.add(new JLabel("Frontier choice"));
-		pFrontier.add(frontierStrategy = new JComboBox());
-		insert(frontierStrategy, Options.FRONTIER_STRATEGY_NAMES, Options.frontier_strategy);
-
-		JPanel pInclusion = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		p.add(pInclusion);
-		pInclusion.add(new JLabel("Language containment algorithm"));
-		pInclusion.add(inclusionAlgorithm = new JComboBox());
-		insert(inclusionAlgorithm, Options.INCLUSION_ALGORITHM_NAMES, Options.inclsuion_algorithm);
-
-		JPanel pFamily = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		p.add(pFamily);
-		pFamily.add(new JLabel("Favour reachability algorithm"));
-		pFamily.add(algorithmFamily = new JComboBox());
-		insert(algorithmFamily, Options.REACH_ALGO_NAMES, Options.algo_family);
-
-		JPanel pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		p.add(pHeuristics);
-		pHeuristics.add(new JLabel("Automaton selection heuristic"));
-		pHeuristics.add(asHeuristics = new JComboBox());
-		insert(asHeuristics, Options.AS_HEURISTIC_NAMES, Options.as_heuristics);
-
-		JPanel pDelayed = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		p.add(pDelayed);
-		pDelayed.add(new JLabel("Delayed* insertation heuristic"));
-		pDelayed.add(dssiHeuristics = new JComboBox());
-		insert(dssiHeuristics, Options.DSSI_HEURISTIC_NAMES, Options.dssi_heuristics);
-
-		pHeuristics = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		p.add(pHeuristics);
-		pHeuristics.add(new JLabel("H1: PN-event and workset-automaton selection"));
-		pHeuristics.add(esHeuristics = new JComboBox());
-		insert(esHeuristics, Options.ES_HEURISTIC_NAMES, Options.es_heuristics);
-
-		JPanel pNdas = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		p.add(pNdas);
-		pNdas.add(new JLabel("H2: Non-deteministic selection of equals"));
-		pNdas.add(ndasHeuristics = new JComboBox());
-		insert(ndasHeuristics, Options.NDAS_HEURISTIC_NAMES, Options.ndas_heuristics);
 	}
 
-	// ------------------------------------------
-	private void insert(JComboBox cb, String[] names, int def)
-	{
-		for (int i = 0; i < names.length; i++)
-		{
-			cb.addItem(names[i]);
-		}
-
-		cb.setSelectedIndex(def);
-		cb.setMaximumRowCount(20);
-	}
+	// ----------------------------------------------------------------
 
 	public boolean doApply()
 	{
@@ -921,6 +865,7 @@ class BDDPanel1
 		Options.debug_on = debugOn.isSelected();
 		Options.size_watch = sizeWatch.isSelected();
 		Options.show_grow = showGrow.getSelectedIndex();
+		Options.sup_reachability_type = supReachability.getSelectedIndex();
 
 		return true;
 	}
@@ -971,6 +916,35 @@ class BDDPanel1
 			}
 		}
 	}
+
+	// ----------------------------------------------------------------
+	// code for simplifying the GUI building
+	public static JComboBox addCombo(JPanel parent, String desc, String [] choices, int default_)
+	{
+		JComboBox ret;
+		JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		parent.add(p);
+		p.add(new JLabel(desc));
+		p.add(ret = new JComboBox());
+		insert(ret, choices, default_);
+		return ret;
+	}
+	public static void insert(JComboBox cb, String[] names, int def)
+	{
+		for (int i = 0; i < names.length; i++)
+		{
+			cb.addItem(names[i]);
+		}
+
+		cb.setSelectedIndex(def);
+		cb.setMaximumRowCount(20);
+	}
+	public static void addCaption(JPanel parent,  String caption)
+	{
+		JLabel tmp = new JLabel(caption, SwingConstants.LEFT);
+		parent.add(tmp);
+		tmp.setForeground(Color.blue);
+	}
 }
 
 
@@ -984,7 +958,7 @@ class BDDPanel2
 					  orderingAlgorithm, encodingAlgorithm;
 	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup;
 	private JCheckBox localSaturation, encodingFill,  cReorderGroupFree;
-	private JCheckBox burstMode, supCreachableonly;
+	private JCheckBox burstMode;
 	private JTextField maxPartitionSize, extraLibDir;
 
 	public BDDPanel2(PreferencesDialog theDialog)
@@ -1001,33 +975,13 @@ class BDDPanel2
 
 		pLeft.add(pTopLeft, BorderLayout.NORTH);
 
-		JLabel tmp;
+		BDDPanel1.addCaption(pLeft, "Automata to BDD conversion");
+		orderingAlgorithm = BDDPanel1.addCombo(pTopLeft,"Automaton ordering", Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
+		encodingAlgorithm = BDDPanel1.addCombo(pTopLeft,"State encoding", Options.ENCODING_NAMES, Options.encoding_algorithm);
 
-		pTopLeft.add(tmp = new JLabel("Automata to BDD conversion", SwingConstants.LEFT));
-		tmp.setForeground(Color.blue);
 
-		JPanel pOrdering = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		pOrdering.add(new JLabel("Automaton ordering"));
-		pOrdering.add(orderingAlgorithm = new JComboBox());
-		insert(orderingAlgorithm, Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
-		pTopLeft.add(pOrdering);
-
-		JPanel pEncoding = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		pEncoding.add(new JLabel("State encoding"));
-		pEncoding.add(encodingAlgorithm = new JComboBox());
-		insert(encodingAlgorithm, Options.ENCODING_NAMES, Options.encoding_algorithm);
-		pTopLeft.add(pEncoding);
-		pTopLeft.add(tmp = new JLabel("Dynamic variable ordering (NOT recommended)", SwingConstants.LEFT));
-		tmp.setForeground(Color.blue);
-
-		JPanel ptmp = new JPanel();
-
-		ptmp.add(new JLabel("Dynamic reordering method"));
-		ptmp.add(cbReordering = new JComboBox());
-		insert(cbReordering, Options.REORDER_ALGO_NAMES, Options.reorder_algo);
-		pTopLeft.add(ptmp);
+		BDDPanel1.addCaption(pTopLeft, "Dynamic variable ordering (NOT recommended)");
+		cbReordering = BDDPanel1.addCombo(pTopLeft, "Dynamic reordering method", Options.REORDER_ALGO_NAMES, Options.reorder_algo);
 
 		// CENTER LEFT
 		JPanel pLeftLeft = new JPanel(new GridLayout(4, 1));
@@ -1047,15 +1001,10 @@ class BDDPanel2
 		JPanel pTopRight = new JPanel(new GridLayout(4, 1));
 
 		pRight.add(pTopRight, BorderLayout.NORTH);
-		pTopRight.add(tmp = new JLabel("Misc. options:"));
-		tmp.setForeground(Color.blue);
+		BDDPanel1.addCaption( pTopRight, "Misc. options:");
 
-		JPanel pCount = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-		pTopRight.add(pCount);
-		pCount.add(new JLabel("State enumeration algorithm"));
-		pCount.add(countAlgorithm = new JComboBox());
-		insert(countAlgorithm, Options.COUNT_ALGO_NAMES, Options.count_algo);
+		countAlgorithm = BDDPanel1.addCombo(pTopRight,"State enumeration algorithm", Options.COUNT_ALGO_NAMES, Options.count_algo);
 
 		JPanel pPartitionSize = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
@@ -1073,8 +1022,7 @@ class BDDPanel2
 		JPanel pBottomRight = new JPanel(new GridLayout(5, 1));
 		pRight.add(pBottomRight, BorderLayout.SOUTH);
 
-		pBottomRight.add(tmp = new JLabel("Computation options:"));
-		tmp.setForeground(Color.blue);
+		BDDPanel1.addCaption(pBottomRight, "Computation options:");
 		// pBottomRight.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
 		// pBottomRight.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
 		pBottomRight.add(localSaturation = new JCheckBox("Locally saturate", Options.local_saturation));
@@ -1082,29 +1030,7 @@ class BDDPanel2
 		pBottomRight.add(encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars));
 		encodingFill.setEnabled(false);
 		pBottomRight.add(burstMode = new JCheckBox("Burst-mode workset", Options.burst_mode));
-		pBottomRight.add(supCreachableonly = new JCheckBox("uncontrollable(P||Sp) must be reahcable in supNBC ", Options.restrict_subC_to_reachables));
 
-		/*
-		JPanel pBottomRight = new JPanel(new GridLayout(3, 1));
-
-		pRight.add(pBottomRight, BorderLayout.SOUTH);
-		pBottomRight.add(tmp = new JLabel("Administrativa:"));
-		tmp.setForeground(Color.blue);
-
-		JPanel pGrow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		pBottomRight.add(pGrow);
-		pGrow.add(new JLabel("BDD graphs"));
-		pGrow.add(showGrow = new JComboBox());
-		insert(showGrow, Options.SHOW_GROW_NAMES, Options.show_grow);
-
-		JPanel pProof = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-		pProof.add(bProofFile = new JButton("Set proof file"));
-		pProof.add(new JLabel(" (verbose and slow!)"));
-		bProofFile.addActionListener(this);
-		pBottomRight.add(pProof);
-		*/
 	}
 
 	public boolean doApply()
@@ -1131,23 +1057,11 @@ class BDDPanel2
 		// Options.uc_optimistic    = ucOptimistic.isSelected();
 		// Options.nb_optimistic    = nbOptimistic.isSelected();
 		Options.burst_mode = burstMode.isSelected();
-		Options.restrict_subC_to_reachables = supCreachableonly.isSelected();
 		return true;
 	}
 
 	public void update() {}
 
-	// ----------------------------------------------------------
-	private void insert(JComboBox cb, String[] names, int def)
-	{
-		for (int i = 0; i < names.length; i++)
-		{
-			cb.addItem(names[i]);
-		}
-
-		cb.setSelectedIndex(def);
-		cb.setMaximumRowCount(20);
-	}
 }
 
 
