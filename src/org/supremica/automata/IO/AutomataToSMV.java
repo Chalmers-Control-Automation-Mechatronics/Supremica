@@ -231,45 +231,43 @@ public class AutomataToSMV
 
 			int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-			if (syncType == SynchronizationType.Prioritized)
-			{ // All automata that has this event as prioritized must be able to execute it
-				if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
-				{ // Find all states that enables this event
-				  // Use OR between states in the same automaton.
-				  // Use AND between states in different automata.
-					if (previousCondition)
+			if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
+			{ // Find all states that enables this event
+			  // Use OR between states in the same automaton.
+			  // Use AND between states in different automata.
+				if (previousCondition)
+				{
+					buff.append(" & ");
+				}
+				else
+				{
+					previousCondition = true;
+				}
+
+				boolean previousState = false;
+				buff.append("(");
+				for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
+				{
+					State currState = (State)stateIt.next();
+					int currStateIndex = currState.getSynchIndex();
+					if (previousState)
 					{
-						buff.append(" & ");
+						buff.append(" | ");
 					}
 					else
 					{
-						previousCondition = true;
+						previousState = true;
 					}
+					buff.append("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currStateIndex + ")");
 
-					boolean previousState = false;
-					buff.append("(");
-					for (Iterator stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel()); stateIt.hasNext();)
-					{
-						State currState = (State)stateIt.next();
-						int currStateIndex = currState.getSynchIndex();
-						if (previousState)
-						{
-							buff.append(" | ");
-						}
-						else
-						{
-							previousState = true;
-						}
-						buff.append("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currStateIndex + ")");
-
-					}
-					if (!previousState)
-					{
-						buff.append(" FALSE ");
-					}
-					buff.append(")");
 				}
+				if (!previousState)
+				{
+					buff.append(" FALSE ");
+				}
+				buff.append(")");
 			}
+
 			else
 			{
 				throw new IllegalArgumentException("Unsupported SynchronizationType");
