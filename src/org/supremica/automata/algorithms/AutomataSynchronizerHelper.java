@@ -87,6 +87,7 @@ public final class AutomataSynchronizerHelper
 
 	// Used by AutomataSynchronizerExecuter
 	private StateMemorizer stateMemorizer = new StateMemorizer();
+
 	private boolean rememberUncontrollable = false;
 	private boolean expandEventsUsingPriority = false;
 	private IntArrayList fromStateList = new IntArrayList();
@@ -205,7 +206,7 @@ public final class AutomataSynchronizerHelper
 	{
 		return helperData;
 	}
-	
+
     /**
      * Add a state to the queue of states waiting for being processed.
      * This is only called by the addInitialState and addState methods.
@@ -230,18 +231,18 @@ public final class AutomataSynchronizerHelper
 			{
 	        	return null;
 			}
-			
+
 			if (stopExecutionLimit > 0)
 			{
 				stopExecutionLimit--;
 			}
-				
+
 			nbrOfStatesToProcess--;
 
 			if (rememberTrace)
 			{
 				if (fromStateList.size() > 0)
-				{  
+				{
 					while (!(Arrays.equals(fromStateList.getLast(), stateTrace.getLast())))
 					{
 						stateTrace.removeLast();
@@ -309,7 +310,7 @@ public final class AutomataSynchronizerHelper
 
 		// helperData.incrNbrOfCheckedStates();
 		helperData.nbrOfCheckedStates++;
-		
+
 		// if (helperData.getNbrOfCheckedStates() % 2000 == 0)
 		if (helperData.nbrOfCheckedStates % 2000 == 0)
 		{
@@ -760,7 +761,7 @@ public final class AutomataSynchronizerHelper
 		// private int nbrOfCheckedStates = 0;
 		public int nbrOfAddedStates = 0;
 		public int nbrOfCheckedStates = 0;
-		
+
 		public HelperData()
 		{
 		}
@@ -779,7 +780,7 @@ public final class AutomataSynchronizerHelper
 		{
 		    nbrOfCheckedStates++;
 		}
-		
+
 		public int getNbrOfCheckedStates()
 		{
 			return nbrOfCheckedStates;
