@@ -9,6 +9,7 @@ import java.awt.event.*;
 import org.supremica.automata.algorithms.AutomatonToDsx;
 import org.supremica.automata.algorithms.AutomataToXml;
 import org.supremica.automata.Automata;
+import org.supremica.properties.*;
 import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;
 import org.supremica.testcases.DiningPhilosophers;
@@ -130,7 +131,7 @@ class BricksPanel
 		JPanel cols = new JPanel();
 		cols.add(new JLabel("Number of cols: "));
 		cols.add(num_cols);
-		
+
 		add(BorderLayout.NORTH, rows);
 		add(BorderLayout.SOUTH, cols);
 	}
@@ -150,20 +151,20 @@ class StickGamePanel
 {
 	IntegerField num_players = new IntegerField("2", 6);
 	IntegerField num_sticks = new IntegerField("5", 6);
-	
+
 	StickGamePanel()
 	{
 		JPanel players = new JPanel();
 		players.add(new JLabel("Number of players: "));
 		players.add(num_players);
-		
+
 		JPanel sticks = new JPanel();
 		sticks.add(new JLabel("Number of sticks: "));
 		sticks.add(num_sticks);
-		
+
 		add(players, BorderLayout.NORTH);
 		add(sticks, BorderLayout.SOUTH);
-		
+
 	}
 	public Automata doIt()
 		throws Exception
@@ -174,7 +175,6 @@ class StickGamePanel
 	}
 }
 
-// ++ ARASH
 class AllocationBatchPanel
 	extends JPanel
 	implements TestCase, ActionListener
@@ -231,7 +231,6 @@ class AllocationBatchPanel
 	}
 }
 
-// -- ARASH
 class ExampleTab
 	extends JTabbedPane
 {
@@ -241,7 +240,10 @@ class ExampleTab
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
 		addTab("Game", null, new StickGamePanel(), "Stick picking game");
-		addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
+		if (SupremicaProperties.generalUseRCP())
+		{
+			addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
+		}
 	}
 }
 

@@ -513,14 +513,20 @@ class PreferencesControllerPanel
 
 		Box buttonBox = new Box(BoxLayout.X_AXIS);
 
-		add(buttonBox, BorderLayout.CENTER);
-
 		applyButton = new JButton("Apply");
 		cancelButton = new JButton("Cancel");
 
-		buttonBox.add(applyButton);
-		buttonBox.add(Box.createVerticalGlue());
-		buttonBox.add(cancelButton);
+		add(applyButton, BorderLayout.CENTER);
+		add(cancelButton, BorderLayout.CENTER);
+
+//		buttonBox.add(Box.createHorizontalGlue());
+//		buttonBox.add(applyButton);
+//		buttonBox.add(Box.createHorizontalGlue());
+//		buttonBox.add(cancelButton);
+//		buttonBox.add(Box.createHorizontalGlue());
+
+//		add(buttonBox, BorderLayout.NORTH);
+
 		applyButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

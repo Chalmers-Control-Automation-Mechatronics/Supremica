@@ -93,7 +93,7 @@ class MainPopupMenu
 
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 
-		menuHandler.add(interfaceItem, 1);
+		//menuHandler.add(interfaceItem, 1);
 
 		menuHandler.addSeparator();
 

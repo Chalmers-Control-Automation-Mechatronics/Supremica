@@ -477,6 +477,7 @@ public class Supremica
 
 			// File.Import.Desco
 			JMenuItem menuFileImportDesco = new JMenuItem();
+			menuFileImportDesco.setEnabled(false);
 
 			menuFileImportDesco.setText("From Desco...");
 			menuFileImport.add(menuFileImportDesco);
@@ -490,6 +491,7 @@ public class Supremica
 
 			// File.Import.TCT
 			JMenuItem menuFileImportTCT = new JMenuItem();
+			menuFileImportTCT.setEnabled(false);
 
 			menuFileImportTCT.setText("From TCT...");
 			menuFileImport.add(menuFileImportTCT);
@@ -505,6 +507,7 @@ public class Supremica
 
 			// File.Import.UMDES
 			JMenuItem menuFileImportUMDES = new JMenuItem();
+			menuFileImportDesco.setEnabled(false);
 
 			menuFileImportUMDES.setText("From UMDES...");
 			menuFileImport.add(menuFileImportUMDES);
@@ -558,6 +561,7 @@ public class Supremica
 
 			// File.Export.TCT
 			JMenuItem menuFileExportTCT = new JMenuItem();
+			menuFileExportTCT.setEnabled(false);
 
 			menuFileExportTCT.setText("To TCT...");
 			menuFileExport.add(menuFileExportTCT);
@@ -573,6 +577,7 @@ public class Supremica
 
 			// File.Export.UMDES
 			JMenuItem menuFileExportUMDES = new JMenuItem();
+			menuFileExportUMDES.setEnabled(false);
 
 			menuFileExportUMDES.setText("To UMDES...");
 			menuFileExport.add(menuFileExportUMDES);
@@ -588,6 +593,7 @@ public class Supremica
 
 			// File.Export.Valid
 			JMenuItem menuFileExportValid = new JMenuItem();
+			menuFileExportValid.setEnabled(false);
 
 			menuFileExportValid.setText("To Valid...");
 			menuFileExport.add(menuFileExportValid);
@@ -602,20 +608,22 @@ public class Supremica
 
 			// ++ ARASH:
 			// File.Export.RCP
-			JMenuItem menuFileExportRCP = new JMenuItem();
-
-			menuFileExportRCP.setText("To RCP...");
-			menuFileExport.add(menuFileExportRCP);
-			menuFileExportRCP.addActionListener(new ActionListener()
+			if (SupremicaProperties.generalUseRCP())
 			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.fileExportRCP(getGui());
-				}
-			});
+				JMenuItem menuFileExportRCP = new JMenuItem();
 
-			// -- ARASH
-			separatorNeeded = true;
+				menuFileExportRCP.setText("To RCP...");
+				menuFileExport.add(menuFileExportRCP);
+				menuFileExportRCP.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileExportRCP(getGui());
+					}
+				});
+
+				separatorNeeded = true;
+			}
 		}
 
 		if (separatorNeeded)
@@ -733,29 +741,32 @@ public class Supremica
 		});
 
 		// Tools.Animations
-		JMenu menuToolsAnimations = new JMenu();
-
-		menuToolsAnimations.setText("Animations");
-		menuTools.add(menuToolsAnimations);
-
-		ExampleAnimations exAnim = ExampleAnimations.getInstance();
-
-		for (Iterator groupIt = exAnim.iterator(); groupIt.hasNext(); )
+		if (SupremicaProperties.generalIncludeAnimations())
 		{
-			AnimationGroup currGroup = (AnimationGroup) groupIt.next();
-			JMenu menuToolsAnimationGroup = new JMenu();
+			JMenu menuToolsAnimations = new JMenu();
 
-			menuToolsAnimationGroup.setText(currGroup.getDescription());
-			menuToolsAnimations.add(menuToolsAnimationGroup);
+			menuToolsAnimations.setText("Animations");
+			menuTools.add(menuToolsAnimations);
 
-			for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+			ExampleAnimations exAnim = ExampleAnimations.getInstance();
+
+			for (Iterator groupIt = exAnim.iterator(); groupIt.hasNext(); )
 			{
-				AnimationItem currItem = (AnimationItem) itemIt.next();
-				JMenuItem menuItem = new JMenuItem();
+				AnimationGroup currGroup = (AnimationGroup) groupIt.next();
+				JMenu menuToolsAnimationGroup = new JMenu();
 
-				menuItem.setText(currItem.getDescription());
-				menuToolsAnimationGroup.add(menuItem);
-				menuItem.addActionListener(new ToolsAnimationHandler(currItem));
+				menuToolsAnimationGroup.setText(currGroup.getDescription());
+				menuToolsAnimations.add(menuToolsAnimationGroup);
+
+				for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+				{
+					AnimationItem currItem = (AnimationItem) itemIt.next();
+					JMenuItem menuItem = new JMenuItem();
+
+					menuItem.setText(currItem.getDescription());
+					menuToolsAnimationGroup.add(menuItem);
+					menuItem.addActionListener(new ToolsAnimationHandler(currItem));
+				}
 			}
 		}
 
@@ -775,64 +786,65 @@ public class Supremica
 					toolsAutomataEditor();
 				}
 			});
-
-			JMenu menuToolsCodeGeneration = new JMenu();
-
-			menuToolsCodeGeneration.setText("Code Generation");
-			menuTools.add(menuToolsCodeGeneration);
-
-			JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
-
-			menuToolsCodeGenerationIL.setText("IEC-1131 Instruction List...");
-			menuToolsCodeGenerationIL.setEnabled(false);
-			menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
-			menuToolsCodeGenerationIL.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-
-					// toolsAutomataEditor();
-				}
-			});
-
-			JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
-
-			menuToolsCodeGenerationBC.setText("Java Bytecode...");
-			menuToolsCodeGenerationBC.setEnabled(false);
-			menuToolsCodeGeneration.add(menuToolsCodeGenerationBC);
-			menuToolsCodeGenerationBC.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-
-					// toolsAutomataEditor();
-				}
-			});
-
-			JMenuItem menuToolsCodeGenerationSattLineSFC = new JMenuItem();
-
-			menuToolsCodeGenerationSattLineSFC.setText("SattLine SFC...");
-			menuToolsCodeGeneration.add(menuToolsCodeGenerationSattLineSFC);
-			menuToolsCodeGenerationSattLineSFC.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.AutomataToSattLineSFC(getGui());
-				}
-			});
-
-			JMenuItem menuToolsCodeGenerationControlBuilderSFC = new JMenuItem();
-
-			menuToolsCodeGenerationControlBuilderSFC.setText("ControlBuilder SFC...");
-			menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderSFC);
-			menuToolsCodeGenerationControlBuilderSFC.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.AutomataToControlBuilderSFC(getGui());
-				}
-			});
 		}
+
+		JMenu menuToolsCodeGeneration = new JMenu();
+
+		menuToolsCodeGeneration.setText("Code Generation");
+		menuTools.add(menuToolsCodeGeneration);
+
+		JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
+
+		menuToolsCodeGenerationIL.setText("IEC-1131 Instruction List...");
+		menuToolsCodeGenerationIL.setEnabled(false);
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
+		menuToolsCodeGenerationIL.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				// toolsAutomataEditor();
+			}
+		});
+
+		JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
+
+		menuToolsCodeGenerationBC.setText("Java Bytecode...");
+		menuToolsCodeGenerationBC.setEnabled(false);
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationBC);
+		menuToolsCodeGenerationBC.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+
+				// toolsAutomataEditor();
+			}
+		});
+
+		JMenuItem menuToolsCodeGenerationSattLineSFC = new JMenuItem();
+
+		menuToolsCodeGenerationSattLineSFC.setText("SattLine SFC...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationSattLineSFC);
+		menuToolsCodeGenerationSattLineSFC.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.AutomataToSattLineSFC(getGui());
+			}
+		});
+
+		JMenuItem menuToolsCodeGenerationControlBuilderSFC = new JMenuItem();
+
+		menuToolsCodeGenerationControlBuilderSFC.setText("ControlBuilder SFC...");
+		menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderSFC);
+		menuToolsCodeGenerationControlBuilderSFC.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.AutomataToControlBuilderSFC(getGui());
+			}
+		});
+
 
 		// Configure
 		JMenu menuConfigure = new JMenu();
@@ -947,23 +959,27 @@ public class Supremica
 			toolBar.addSeparator();
 		}
 
-		JButton editButton = new JButton();
-
-		editButton.setToolTipText("Edit");
-
-		ImageIcon edit16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Edit16.gif"));
-
-		editButton.setIcon(edit16Img);
-		editButton.addActionListener(new ActionListener()
+		// Tools.AutomataEditor
+		if (SupremicaProperties.includeEditor())
 		{
-			public void actionPerformed(ActionEvent e)
+			JButton editButton = new JButton();
+
+			editButton.setToolTipText("Edit");
+
+			ImageIcon edit16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Edit16.gif"));
+
+			editButton.setIcon(edit16Img);
+			editButton.addActionListener(new ActionListener()
 			{
-				toolsAutomataEditor();
-			}
-		});
-		editButton.setMargin(tmpInsets);
-		toolBar.add(editButton, "WEST");
-		toolBar.addSeparator();
+				public void actionPerformed(ActionEvent e)
+				{
+					toolsAutomataEditor();
+				}
+			});
+			editButton.setMargin(tmpInsets);
+			toolBar.add(editButton, "WEST");
+			toolBar.addSeparator();
+		}
 
 		JButton helpButton = new JButton();
 

@@ -474,7 +474,7 @@ public class ActionMan
 		String rcpString = "rcp";                         // ++ ARASH
 		Object[] possibleValues =
 		{
-			xmlString, dotString, dsxString, rcpString    /* <-- ARASH */
+			xmlString, dotString, dsxString
 		};
 		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Input", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 

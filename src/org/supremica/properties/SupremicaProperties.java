@@ -80,6 +80,8 @@ public final class SupremicaProperties
 	private static final String GENERAL_REDIRECT_STDOUT = "generalRedirectStdout";
 	private static final String GENERAL_REDIRECT_STDERR = "generalRedirectStderr";
 	private static final String GENERAL_LOOKANDFEEL = "generalLookAndFeel";
+	private static final String GENERAL_INCLUDE_ANIMATIONS = "generalIncludeAnimations";
+	private static final String GENERAL_USE_RCP = "generalUseRcp";
 
 	// Logging options
 	private static final String LOG_TO_CONSOLE = "logToConsole";
@@ -144,7 +146,9 @@ public final class SupremicaProperties
 		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(GENERAL_LOOKANDFEEL, "System", true);
-		setProperty(INCLUDE_EDITOR, "true", true);
+		setProperty(GENERAL_INCLUDE_ANIMATIONS, "false", true);
+		setProperty(GENERAL_USE_RCP, "false", true);
+		setProperty(INCLUDE_EDITOR, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);
 		setProperty(SUPERUSER_IDENTITY, "ESS030", false);
@@ -265,6 +269,26 @@ public final class SupremicaProperties
 	public static void setFileAllowSave(boolean allow)
 	{
 		wp.setProperty(FILE_ALLOW_SAVE, toString(allow));
+	}
+
+	public static boolean generalIncludeAnimations()
+	{
+		return toBoolean(wp.getProperty(GENERAL_INCLUDE_ANIMATIONS));
+	}
+
+	public static void setGeneralIncludeAnimations(boolean allow)
+	{
+		wp.setProperty(GENERAL_INCLUDE_ANIMATIONS, toString(allow));
+	}
+
+	public static boolean generalUseRCP()
+	{
+		return toBoolean(wp.getProperty(GENERAL_USE_RCP));
+	}
+
+	public static void setGeneralUseRCP(boolean allow)
+	{
+		wp.setProperty(GENERAL_USE_RCP, toString(allow));
 	}
 
 	public static boolean fileAllowImport()
