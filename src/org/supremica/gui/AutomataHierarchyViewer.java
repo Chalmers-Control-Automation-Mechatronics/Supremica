@@ -58,6 +58,7 @@ public class AutomataHierarchyViewer
 	extends DotViewer
 	implements AutomataListener
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(AutomataHierarchyViewer.class);
 	private Automata theAutomata;
 

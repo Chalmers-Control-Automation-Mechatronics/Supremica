@@ -68,6 +68,7 @@ public class AlphabetViewerPanel
 
 // implements AutomatonListener // to what are we to listen?
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(AlphabetViewerPanel.class);
 	private Automata theAutomata;
 	private Alphabet theAlphabet;

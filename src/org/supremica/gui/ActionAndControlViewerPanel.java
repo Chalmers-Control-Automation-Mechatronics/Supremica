@@ -64,6 +64,7 @@ public class ActionAndControlViewerPanel
 	extends JPanel
 	implements AutomataListener
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(ActionAndControlViewerPanel.class);
 	private Project theProject;
 	private boolean updateNeeded = false;

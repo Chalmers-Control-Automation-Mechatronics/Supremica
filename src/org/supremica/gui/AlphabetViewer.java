@@ -62,6 +62,7 @@ import org.supremica.automata.Automaton;
 public class AlphabetViewer
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private AlphabetViewerPanel alphabetPanel;

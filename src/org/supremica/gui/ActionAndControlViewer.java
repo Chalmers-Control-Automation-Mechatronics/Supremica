@@ -57,6 +57,7 @@ import org.supremica.automata.*;
 public class ActionAndControlViewer
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
 	private ActionAndControlViewerPanel thePanel;

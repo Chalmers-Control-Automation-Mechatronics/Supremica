@@ -59,6 +59,7 @@ public class AboutBox
 	extends JDialog
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	JPanel panel1 = new JPanel();
 	JPanel panel2 = new JPanel();
 	JPanel insetsPanel1 = new JPanel();
