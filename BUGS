@@ -1,0 +1,9 @@
+Known bugs...
+
+* Multiple executors won't work properly... especially with the
+ExhaustiveSearch-option. The executor that finds the uncontrollable state
+doesn't stop the other executors!
+
+* The extra state for complement automata has a fix name. If an automaton
+already has a state with that name, bad things happen.
+

@@ -273,9 +273,11 @@ public final class AutomataSynchronizerHelper
 			}
             addStatus(newState);
         	addStateToProcess(newState);
+			++nbrOfAddedStates;
+			
 			/*
 			if (verboseMode)
-				if (++nbrOfAddedStates % 10000 == 0)
+			    if (nbrOfAddedStates % 10000 == 0)
 					thisCategory.debug(nbrOfAddedStates + " new states found so far.");
 			*/
         }
@@ -465,6 +467,7 @@ public final class AutomataSynchronizerHelper
 	public void displayInfo()
 	{
 		thisCategory.info("During the execution, " + nbrOfCheckedStates + " states were examined.");
+		thisCategory.info("During the execution, " + nbrOfAddedStates + " new states were found.");
 	}
 
 	public void displayTrace()

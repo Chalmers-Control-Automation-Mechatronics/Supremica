@@ -1,0 +1,11 @@
+List of things to do...
+
+* Fixa så att man kan iterera över plants istället för supervisors vid modulär
+styrbarhetsverifikation. Alltså ytgå från plant och hitta supervisors med samma
+icke-styrebara händelser.
+
+* Fixa så att man kan testa en supervisor mot en plant i taget (funkar troligen
+dåligt, men för sakens skull).
+
+* Fixa så att man kan tömma log-fönstret... det blir lätt fullt av trams. 
+
