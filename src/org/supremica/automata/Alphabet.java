@@ -53,8 +53,8 @@ import java.util.*;
 
 /**
  * Similar to Events, but with allows for the fast lookup of an event based on the id.
- * @see org.supremica.Events
- * @see org.supremica.AlphabetHelpers
+ * @see org.supremica.automata.Events
+ * @see org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet
 	extends Events

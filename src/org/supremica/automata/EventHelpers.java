@@ -53,7 +53,7 @@ import java.util.*;
 
 /**
  * A collection of useful methods for manipulating Event.
- * @see org.supremica.Event
+ * @see org.supremica.automata.Event
  */
 public class EventHelpers
 {

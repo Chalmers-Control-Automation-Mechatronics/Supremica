@@ -54,8 +54,8 @@ import java.util.*;
 /**
  * Contains a collection of events. Implements functionality for quickly
  * returning a event with a given label.
- * @see org.supremica.Alphabet
- * @see org.supremica.EventsHelpers
+ * @see org.supremica.automata.Alphabet
+ * @see org.supremica.automata.EventsHelpers
  */
 public class Events
 {

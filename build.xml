@@ -114,7 +114,7 @@
 </target>
 
 <target name="version" depends="init">
-	<delete file="${src}/${my_basedir}/Version.java"/>
+	<delete quiet="true" file="${src}/${my_basedir}/Version.java"/>
 	<copy file="${templates}/Version.tmpl" tofile="${src}/${my_basedir}/Version.java"/>	
 	<replace file="${src}/${my_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
 </target>
@@ -174,12 +174,15 @@
 		sourcepath="${src}"
 		destdir="${doc}/api"
 		packagenames="${my_basepackage}.automata.*,${my_basepackage}.gui.*,${my_basepackage}.util.*,${my_basepackage}.apps.*"
+		classpath="${lib}/${unjared}"
 		author="true"
 		version="true"
 		use="true"
 		private="true"
 		windowtitle="Supremica API"
-		doctitle="Test"
+		overview="${templates}/Overview.html"
+		doctitle="Supremica"
+		
 		bottom="Copyright &#169; 2001 Supremica and Knut Akesson. All Rights Reserved.">
 	</javadoc>
 </target>
