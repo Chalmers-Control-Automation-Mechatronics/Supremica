@@ -186,7 +186,9 @@ public class AutomatonMinimizer
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
 			State currState = new State();
 
-			currState.setId("q" + currNbrOfStates++);
+			String newName = "q" + currNbrOfStates++;
+			currState.setId(newName);
+			currState.setName(newName);
 
 			if (currEquivClass.isInitial())
 			{

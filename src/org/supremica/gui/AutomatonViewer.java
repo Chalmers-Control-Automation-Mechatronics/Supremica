@@ -631,7 +631,7 @@ public class AutomatonViewer
 
 		// String gifString = "gif";
 		Object[] possibleValues = { epsString, mifString, pngString, svgString, dotString };
-		Object selectedValue = JOptionPane.showInputDialog(null, "Export as", "Input", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
+		Object selectedValue = JOptionPane.showInputDialog(null, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 
 		if (selectedValue == null)
 		{

@@ -48,7 +48,7 @@ class MainPopupMenu
 
 		if (SupremicaProperties.useDot())
 		{
-			JMenuItem viewItem = new JMenuItem("View graph");
+			JMenuItem viewItem = new JMenuItem("View automaton");
 
 			menuHandler.add(viewItem, 1);
 			viewItem.addActionListener(new ActionListener()

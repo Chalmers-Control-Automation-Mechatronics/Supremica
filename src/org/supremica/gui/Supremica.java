@@ -147,6 +147,7 @@ public class Supremica
 		fullTableModel = getActiveProject().getFullTableModel();
 		theTableSorter = new TableSorter(fullTableModel);
 		theAutomatonTable = new JTable(theTableSorter);
+		theAutomatonTable.getTableHeader().setReorderingAllowed(false);
 
 		theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
 
@@ -181,6 +182,31 @@ public class Supremica
 		// This code used to be in the popup menu -------------
 		theAutomatonTable.addMouseListener(new MouseAdapter()
 		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 2)
+				{
+					int col = theAutomatonTable.columnAtPoint(e.getPoint());
+					int row = theAutomatonTable.rowAtPoint(e.getPoint());
+
+					if (row < 0)
+					{
+						return;
+					}
+
+					if (SupremicaProperties.useDot())
+					{
+						if (col == TABLE_IDENTITY_COLUMN)
+						{
+							ActionMan.automatonView_actionPerformed(getGui());
+							getGui().repaint();
+						}
+
+					}
+				}
+			}
+
+
 			public void mousePressed(MouseEvent e)
 			{
 
@@ -200,7 +226,7 @@ public class Supremica
 			{
 				if (e.isPopupTrigger())
 				{
-					int currRow = theAutomatonTable.rowAtPoint(new Point(e.getX(), e.getY()));
+					int currRow = theAutomatonTable.rowAtPoint(e.getPoint());
 
 					if (currRow < 0)
 					{

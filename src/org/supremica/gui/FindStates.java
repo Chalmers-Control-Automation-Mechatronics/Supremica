@@ -632,12 +632,38 @@ class FindStatesTable
 				maybeShowPopup(e);
 			}
 
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 2)
+				{
+					int col = columnAtPoint(e.getPoint());
+					int row = rowAtPoint(e.getPoint());
+
+					if (row < 0)
+					{
+						return;
+					}
+					if (col == FindStatesTableModel.REGEXP_COL)
+					{
+						String str = (String) getModel().getValueAt(row, FindStatesTableModel.REGEXP_COL);
+						RegexpDialog regexp_dialog = new RegexpDialog(null, getAutomaton(row), str);
+
+						if (regexp_dialog.isOk())
+						{
+							getModel().setValueAt(regexp_dialog.getText(), row, FindStatesTableModel.REGEXP_COL);
+						}
+
+						doRepaint();
+					}
+				}
+			}
+
 			private void maybeShowPopup(MouseEvent e)
 			{
 				//logger.info("maybeShowpopup");
 
-				int col = columnAtPoint(new Point(e.getX(), e.getY()));
-				int row = rowAtPoint(new Point(e.getX(), e.getY()));
+				int col = columnAtPoint(e.getPoint());
+				int row = rowAtPoint(e.getPoint());
 
 				//logger.info("row " + row + " col " + col);
 
@@ -656,20 +682,8 @@ class FindStatesTable
 
 				if (e.isPopupTrigger())
 				{
-
-					// Dec'01, only edit through the dialog and through click in any column
-					//if (getStatesTableModel().isRegexpColumn(col))
-					{
-						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row);
-
-						regexp_popup.show(e.getComponent(), e.getX(), e.getY());
-					}
-//					else
-					{
-						// in table but not in the regexp column - show main menu
-						// Supremica.menuHandler.getDisabledPopupMenu(getThisTable()).show(e.getComponent(), e.getX(), e.getY());
-						// getMainPopupMenu().show(getThisTable().getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
-					}
+					RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row);
+					regexp_popup.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
@@ -679,6 +693,7 @@ class FindStatesTable
 		acceptingEditor = new StateMatcherAcceptingCellEditor();
 		forbiddenEditor = new StateMatcherForbiddenCellEditor();
 		deadlockEditor = new StateMatcherDeadlockCellEditor();
+		getTableHeader().setReorderingAllowed(false);
 
 	}
 

@@ -207,6 +207,23 @@ public class Automata
 	/**
 	 * Returns true if all automata have initial states
 	 */
+	public boolean isDeterministic()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+
+			if(!automaton.isDeterministic())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns true if all automata have initial states
+	 */
 	public boolean hasInitialState()
 	{
 		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )

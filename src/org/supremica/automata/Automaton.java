@@ -288,6 +288,28 @@ public class Automaton
 		return false;
 	}
 
+	public boolean isDeterministic()
+	{
+		HashSet foundEvents = new HashSet();
+
+		for (Iterator stateIt = stateIterator(); stateIt.hasNext(); )
+		{
+			State currState = (State)stateIt.next();
+			foundEvents.clear();
+			for (Iterator evIt = outgoingEventsIterator(currState); evIt.hasNext(); )
+			{
+				LabeledEvent currEvent = (LabeledEvent)evIt.next();
+				boolean newElement = foundEvents.add(currEvent.getLabel());
+				if (!newElement)
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	public boolean isAllEventsPrioritized()
 	{
 		return alphabet.isAllEventsPrioritized();

@@ -476,7 +476,7 @@ public class ActionMan
 		{
 			xmlString, dotString, dsxString
 		};
-		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Input", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
+		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 
 		if (selectedValue == null)
 		{
@@ -1141,7 +1141,8 @@ public class ActionMan
 			try
 			{
 				AutomatonMinimizer autMinimizer = new AutomatonMinimizer(currAutomaton);
-				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(true);
+				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton();
+				// Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(true);
 
 				newAutomaton.setName(newAutomatonName);
 				gui.getVisualProjectContainer().getActiveProject().addAutomaton(newAutomaton);
@@ -1181,6 +1182,7 @@ public class ActionMan
 			{
 				statusStr.append("\nComment: \"" + currAutomaton.getComment() + "\"");
 			}
+			statusStr.append("\n\tis deterministic: " + currAutomaton.isDeterministic());
 			statusStr.append("\n\tNumber of states: " + currAutomaton.nbrOfStates());
 			statusStr.append("\n\tNumber of events: " + currAutomaton.nbrOfEvents());
 			statusStr.append("\n\tNumber of accepting states: " + currAutomaton.nbrOfAcceptingStates());
@@ -1411,6 +1413,12 @@ public class ActionMan
 			// this exception is caught while opening
 			gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
 
+			return;
+		}
+
+		if (!currProject.isDeterministic())
+		{
+			JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 

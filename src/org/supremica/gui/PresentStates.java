@@ -120,6 +120,7 @@ class PresentStatesTable
 		{
 			setToolTipText("Doubleclick to view in explorer");
 		}
+		getTableHeader().setReorderingAllowed(false);
 	}
 
 	/**
