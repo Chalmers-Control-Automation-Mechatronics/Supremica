@@ -1503,6 +1503,25 @@ public class Automaton
 	}		
 
 	/**
+	 * Makes all mutually accepting or accepting states non-accepting and all non-accepting states accepting.
+	 */
+	public void invertMarking()
+	{
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			if (currState.isMutuallyAccepting() || currState.isAccepting())
+			{
+				currState.setAccepting(false);
+			}
+			else
+			{
+				currState.setAccepting(true);
+			}
+		}		
+	}
+
+	/**
 	 * Returns a event on a arc that starts in fromState and ends in toState.
 	 * If no such event exists, null is returned.
 	 */

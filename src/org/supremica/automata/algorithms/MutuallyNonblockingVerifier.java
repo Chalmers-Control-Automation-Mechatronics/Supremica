@@ -306,10 +306,18 @@ public class MutuallyNonblockingVerifier
 				Automaton interestingAutomaton = getInterestingAutomaton(currSynchAutomata, currSynchAutomaton);
 				if (interestingAutomaton == null)
 				{
-					logger.info("The automaton " + currAutomaton + " definitely has blocking states!");
-					int index = theAutomata.getAutomatonIndex(currAutomaton);
-					automatonIsMutuallyNonblocking[index] = MUTUALLY_NONBLOCKING_NO;
-					ok = false;
+					if (verifyBlocking(currSynchAutomaton, currSafeEvents))
+					{
+						logger.info("The automaton " + currAutomaton + " definitely has blocking states!");
+						int index = theAutomata.getAutomatonIndex(currAutomaton);
+						automatonIsMutuallyNonblocking[index] = MUTUALLY_NONBLOCKING_NO;
+						ok = false;
+					}
+					else
+					{
+						// We should try to find another automaton and try to prove that the blocking
+						// states are unreachable... or give up.
+					}
 					break;
 				}
 
@@ -357,10 +365,15 @@ public class MutuallyNonblockingVerifier
 				int nbrAccepting = currAutomaton.nbrOfMutuallyAcceptingStates();
 				projectAcceptingStatus(currAutomaton, currSynchAutomaton);
 				
-				// If the amount of accepting states has increased, rerun from this state
+				// If the amount of accepting states has increased, maybe we're finished!
 				if (currAutomaton.nbrOfMutuallyAcceptingStates() > nbrAccepting)
 				{
-					logger.error("THERE WERE NEW ACCEPTING STATES FOUND! (" + currAutomaton.nbrOfMutuallyAcceptingStates() + " > " + nbrAccepting + ")");
+					logger.error("THERE WERE NEW MUTUALLY ACCEPTING STATES FOUND! (" + currAutomaton.nbrOfMutuallyAcceptingStates() + " > " + nbrAccepting + ")");
+
+					// Mutually nonblocking? We need to examine currSynchAutomaton... one could think that it's 
+					// enough examining the original automaton, now that we have projected the accepting 
+					// status, but there might be states there that are unreachable!!
+					ok = (currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates());
 
 					// Restart loop with (refined) original automaton
 					currSynchAutomaton = new Automaton(currAutomaton);
@@ -369,8 +382,6 @@ public class MutuallyNonblockingVerifier
 					currSafeEvents = new Events(safeEventsMap.getEvents(currAutomaton));
 				}
 				
-				// Mutually nonblocking?
-				ok = (currAutomaton.nbrOfStates() == currAutomaton.nbrOfMutuallyAcceptingStates());
 				// Assuming the system is controllable, we can ignore all uncontrollable (forbidden) states!!
 				//ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
 
@@ -381,14 +392,20 @@ public class MutuallyNonblockingVerifier
 				{
 					maxSynchronized = currSynchAutomata.size();
 				}
+
+				// Have we had enough of this madness?
+				if (currSynchAutomaton.nbrOfStates() > 2500)
+				{
+					break;
+				}
 			}
 
 			// It went ok?
 			if (ok)
 			{
 				// It worked! Set all states as mutually accepting in currAutomaton
-				AutomatonAllMutuallyAccepting allAccepting = new AutomatonAllMutuallyAccepting(currAutomaton);
-				allAccepting.execute();
+				//AutomatonAllMutuallyAccepting allAccepting = new AutomatonAllMutuallyAccepting(currAutomaton);
+				//allAccepting.execute();
 
 				int index = theAutomata.getAutomatonIndex(currAutomaton);
 				automatonIsMutuallyNonblocking[index] = MUTUALLY_NONBLOCKING_YES;
@@ -505,14 +522,8 @@ public class MutuallyNonblockingVerifier
 		}
 		
 		// If we haven't found any automaton... then there can be no interesting events, right?
-		// Yes there can! But then the system must be blocking and the interesting events go
-		// from a mutually accepting state to a ordinary state!
-		/*
-		if (interestingEvents.size() > 0)
-		{
-			logger.fatal("This can't happen, right?");
-		}
-		*/
+		// Yes there can! But then the subsystem is blocking and we must prove that the blocking
+		// states are unreachable!
 		return null;
 	}
 
@@ -552,6 +563,24 @@ public class MutuallyNonblockingVerifier
 		}
 
 		theAutomata.addAutomata(newAutomata);
+	}
+
+	/** 
+	 * Tries to prove that the blocking states in automaton are reachable by safeEvents.
+	 *
+	 * It's important that automaton is marked in all states that are not blocking!!
+	 */
+	private boolean verifyBlocking(Automaton automaton, Events safeEvents)
+	{
+		Automaton automatonCopy = new Automaton(automaton);
+
+		// The unmarked states should be blocking in the input of this method!
+		automatonCopy.invertMarking();
+		automatonCopy.extendMutuallyAccepting(safeEvents);
+
+		// If the initial state is mutually accepting, then the blocking states are 
+		// guaranteed to be reachable!
+		return (automatonCopy.getInitialState().isMutuallyAccepting());
 	}
 
 	/**
@@ -819,7 +848,7 @@ public class MutuallyNonblockingVerifier
 		if (noValue)
 		{
 			// It seems blocking! Use blockValue instead!
-			logger.error("The systems appears blocking, but we will se...");
+			logger.error("This subsystem has blocking states, but maybe they're unreachable...");
 			value = blockValue;
 
 			//We can merge all states that are not accepting! But the gain is limited?

@@ -256,7 +256,7 @@ public class LogDisplay
 		StyleConstants.setFontSize(attOff, 14);
 
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.ERROR), Color.red);
-		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.WARN), new Color(255,127,0)); // Color.orange);
+		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.WARN), new Color(255,128,0));
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.INFO), new Color(0, 80, 0));
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.DEBUG), Color.blue);
 		StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.FATAL), Color.black);
@@ -281,7 +281,6 @@ public class LogDisplay
 		textpane.copy();
 	}
 
-	/** ARASH: temp fix until we get the imagaes working... */
 	private ImageIcon getIcon(String file) 
 	{
 		// What the f**k is this?
@@ -459,7 +458,6 @@ public class LogDisplay
 		{
 			StyleConstants.setFontFamily((MutableAttributeSet) e.nextElement(), name);
 		}
-
 	}
 
 	public void setOption(String option, String value)
