@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.11 2005-03-04 05:40:22 knut Exp $
+//# $Id: EditorMenu.java,v 1.12 2005-03-30 23:15:31 flordal Exp $
 //###########################################################################
 
 
@@ -17,6 +17,9 @@ import java.io.File;
 
 // Printing
 import java.awt.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
+import java.util.Locale;
 
 /**
  * <p>The EditorWindow menu.</p>
@@ -39,13 +42,13 @@ public class EditorMenu
 	public final JMenuItem editCopyAsWMFMenu;
 	public final JMenuItem editCreatePDFMenu;
 	EditorWindowInterface root;
-	ControlledSurface C;
+	ControlledSurface surface;
 	JFileChooser fileChooser;
 
 	public EditorMenu(ControlledSurface c, EditorWindowInterface r)
 	{
 		root = r;
-		C = c;
+		surface = c;
 
 		JMenu menu = new JMenu("File");
 
@@ -164,7 +167,6 @@ public class EditorMenu
 		menu.add(menuItem);
 
 		fileChooser = new JFileChooser();
-
 		fileChooser.addChoosableFileFilter(new WmodFileFilter());
 	}
 
@@ -172,7 +174,7 @@ public class EditorMenu
 	{
 		if (e.getSource() == FileNewMenu)
 		{
-			C.clearAll();
+			surface.clearAll();
 		}
 
 		if (e.getSource() == FileExitMenu)
@@ -184,20 +186,21 @@ public class EditorMenu
 		{
 			ControlledSurface surface = root.getControlledSurface();
 
-			// System.err.println(surface.getDrawnArea());
-
-
 			PrinterJob printJob = PrinterJob.getPrinterJob();
 			if (printJob.getPrintService() == null)
 			{
 				System.err.println("No default printer set.");
 				return;
 			}
-
 			printJob.setPrintable((EditorSurface) surface);
 
+			// Printing attributes
+			PrintRequestAttribute name = new JobName("Waters Printing", Locale.ENGLISH);
+			PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+			attributes.add(name);
+
 			// Show printing dialog
-			if (printJob.printDialog())
+			if (printJob.printDialog(attributes))
 			{
 				try
 				{
@@ -233,8 +236,22 @@ public class EditorMenu
 
 		if (e.getSource() == editCreatePDFMenu)
 		{
+			/*
 			File f = new File("C:/Temp/test.pdf");
 			root.createPDF(f);
+			*/
+
+			JFileChooser chooser = new JFileChooser();
+			int returnVal = chooser.showSaveDialog(surface);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION) 
+			{
+				File file = chooser.getSelectedFile();
+				root.createPDF(file);
+			} 
+			else 
+			{
+			}
 		}
 
 	}
