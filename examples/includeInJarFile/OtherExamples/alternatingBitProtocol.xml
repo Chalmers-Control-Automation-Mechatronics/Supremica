@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Alternating bit protocol" comment="The alternating bit protocol. The Sender, Receiver, Medium and Medium_ack should together show the Desired behaviour. The events timeout_i should not be executed unless no other event can be executed. I.e. no 'premature timeout'.">
+<Automaton name="Sender" type="Plant">
+	<Events>
+		<Event id="send" />
+		<Event id="in_0"/>
+		<Event id="in_1"/>
+		<Event id="acks_0"/>
+		<Event id="acks_1"/>
+		<Event controllable="false" id="timeout_0" epsilon="true"/>
+		<Event controllable="false" id="timeout_1" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3" accepting="true"/>
+		<State id="s4"/>
+		<State id="s5"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="send"/>
+		<Transition source="s1" dest="s2" event="in_0"/>
+		<Transition source="s2" dest="s1" event="timeout_0"/>
+		<Transition source="s2" dest="s2" event="acks_1"/> 
+		<Transition source="s2" dest="s3" event="acks_0"/>
+		<Transition source="s3" dest="s4" event="send"/> 
+		<Transition source="s4" dest="s5" event="in_1"/>
+		<Transition source="s5" dest="s4" event="timeout_1"/>
+		<Transition source="s5" dest="s5" event="acks_0"/>
+        <Transition source="s5" dest="s0" event="acks_1"/> 
+	</Transitions>
+</Automaton>
+<Automaton name="Receiver" type="Plant">
+	<Events>
+		<Event id="out_0"/>
+		<Event id="out_1"/>
+		<Event id="receive"/>
+		<Event id="ackr_0"/>
+		<Event id="ackr_1"/>
+	</Events>
+	<States>
+		<State id="r0" initial="true" accepting="true"/>
+		<State id="r1"/>
+		<State id="r2"/>
+		<State id="r3" accepting="true"/>
+		<State id="r4"/>
+		<State id="r5"/>
+	</States>
+	<Transitions>
+		<Transition source="r0" dest="r1" event="out_0"/>
+		<Transition source="r1" dest="r2" event="receive"/>
+		<Transition source="r2" dest="r3" event="ackr_0"/>
+		<Transition source="r3" dest="r2" event="out_0"/>
+	    <Transition source="r3" dest="r4" event="out_1"/>
+		<Transition source="r4" dest="r5" event="receive"/>
+		<Transition source="r5" dest="r0" event="ackr_1"/>
+		<Transition source="r0" dest="r5" event="out_1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Medium" type="Plant">
+	<Events>
+		<Event id="in_0"/>
+		<Event id="in_1"/>
+		<Event id="out_0"/>
+		<Event id="out_1"/>
+		<Event controllable="false" id="tau_2" epsilon="true"/>
+		<Event controllable="false" id="tau_3" epsilon="true"/>
+		<Event controllable="false" id="tau_4" epsilon="true"/>
+		<Event controllable="false" id="tau_5" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="m0" initial="true" accepting="true"/>
+		<State id="m1"/>
+		<State id="m2"/>
+		<State id="m3"/>
+		<State id="m4"/>
+	</States>
+	<Transitions>
+		<Transition source="m0" dest="m1" event="in_0"/>
+		<Transition source="m1" dest="m0" event="tau_2"/>
+		<Transition source="m1" dest="m3" event="tau_3"/>
+		<Transition source="m3" dest="m0" event="out_0"/>
+		<Transition source="m4" dest="m0" event="out_1"/>
+		<Transition source="m0" dest="m2" event="in_1"/>
+		<Transition source="m2" dest="m0" event="tau_4"/>
+		<Transition source="m2" dest="m4" event="tau_5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Medium_ack" type="Plant">
+	<Events>
+		<Event id="ackr_0"/>
+		<Event id="ackr_1"/>
+		<Event id="acks_0"/>
+		<Event id="acks_1"/>
+		<Event controllable="false" id="tau_6" epsilon="true"/>
+		<Event controllable="false" id="tau_7" epsilon="true"/>
+		<Event controllable="false" id="tau_8" epsilon="true"/>
+		<Event controllable="false" id="tau_9" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="ma0" initial="true" accepting="true"/>
+		<State id="ma1"/>
+		<State id="ma2"/>
+		<State id="ma3"/>
+		<State id="ma4"/>
+	</States>
+	<Transitions>
+		<Transition source="ma0" dest="ma1" event="ackr_0"/>
+		<Transition source="ma1" dest="ma0" event="tau_6"/>
+		<Transition source="ma1" dest="ma3" event="tau_7"/>
+		<Transition source="ma3" dest="ma0" event="acks_0"/>
+		<Transition source="ma4" dest="ma0" event="acks_1"/>
+		<Transition source="ma0" dest="ma2" event="ackr_1"/>
+		<Transition source="ma2" dest="ma0" event="tau_8"/>
+		<Transition source="ma2" dest="ma4" event="tau_9"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Desired behaviour" type="Specification">
+	<Events>
+		<Event id="0" label="send"/>
+		<Event id="1" label="receive"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="0"/>
+		<Transition source="q1" dest="q0" event="1"/>
+	</Transitions>
+</Automaton>
+</Automata>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Parrows protocol" comment="Parrow's protocol, an ideal protocol for data transmission, however not physically viable since the 'acknowledgement' signals also have to travel in an unreliable medium. The Sender, Receiver and Medium should together show the Desired behaviour. A physically viable protocol is the alternating bit protocol... not shown here">
+<Automata name="Parrows protocol" comment="Parrow's protocol, an ideal protocol for data transmission, however not physically viable since the 'acknowledgement' signals also have to travel in an unreliable medium. The Sender, Receiver and Medium should together show the Desired behaviour. A physically viable protocol is the alternating bit protocol.">
 <Automaton name="Sender" type="Plant">
 	<Events>
 		<Event id="send"/>
@@ -36,20 +36,43 @@
 		<Transition source="r2" dest="r0" event="acknowledge"/>
 	</Transitions>
 </Automaton>
+<Automaton name="Receiver ack rec" type="Plant">
+	<Events>
+		<Event id="out"/>
+		<Event id="receive"/>
+		<Event id="acknowledge"/>
+	</Events>
+	<States>
+		<State id="r0" initial="true" accepting="true"/>
+		<State id="r1"/>
+		<State id="r2"/>
+	</States>
+	<Transitions>
+		<Transition source="r0" dest="r1" event="out"/>
+		<Transition source="r2" dest="r0" event="receive"/>
+		<Transition source="r1" dest="r2" event="acknowledge"/>
+	</Transitions>
+</Automaton>
 <Automaton name="Medium" type="Plant">
 	<Events>
 		<Event id="in"/>
 		<Event id="out"/>
+		<Event id="tau_0" epsilon="true"/>
+		<Event id="tau_1" epsilon="true"/>
 		<Event id="timeout"/>
 	</Events>
 	<States>
-		<State id="m0" initial="true" accepting="true"/>
+        <State id="m0" initial="true" accepting="true"/>
 		<State id="m1"/>
+		<State id="m2"/>
+		<State id="m3"/>
 	</States>
 	<Transitions>
 		<Transition source="m0" dest="m1" event="in"/>
-		<Transition source="m1" dest="m0" event="out"/>
-		<Transition source="m1" dest="m0" event="timeout"/>
+		<Transition source="m1" dest="m2" event="tau_0"/>
+		<Transition source="m1" dest="m3" event="tau_1"/>
+		<Transition source="m2" dest="m0" event="out"/>
+		<Transition source="m3" dest="m0" event="timeout"/>
 	</Transitions>
 </Automaton>
 <Automaton name="Desired behaviour" type="Specification">
@@ -59,6 +82,7 @@
 	</Events>
 	<States>
 		<State id="q0" initial="true" accepting="true"/>
+		<State id="q0" initial="true"/>
 		<State id="q1"/>
 	</States>
 	<Transitions>
