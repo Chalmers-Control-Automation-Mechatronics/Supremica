@@ -106,8 +106,6 @@ abstract class FileImporter
 public class ActionMan
 {
 	private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
-	private static final int    // instead of using constants later below :)
-		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4, FORMAT_SP = 5, FORMAT_HTML = 6;
 
 	// Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
 	// gui here is filled in by
@@ -474,6 +472,131 @@ public class ActionMan
 		gui.clearSelection();
 	}
 
+	// This is baaad!
+	private static final int    // instead of using constants later below :)
+		FORMAT_UNKNOWN = -1, 	
+		FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, 
+		FORMAT_RCP = 4, FORMAT_SP = 5, FORMAT_HTML = 6,
+		FORMAT_XML_DEBUG = 7, FORMAT_DOT_DEBUG = 8, FORMAT_DSX_DEBUG = 9, 
+		FORMAT_RCP_DEBUG = 10, FORMAT_SP_DEBUG = 11, FORMAT_HTML_DEBUG = 12;
+
+	// This class should really act as a factory for exporter objects, but that 
+	// would mean rewriting the entire export/saveAs functionality. Should I bother?
+	static class ExportDialog
+	//	extends JDialog
+	{
+		private final String xmlString = "xml";
+		private final String spString = "sp";
+		private final String dotString = "dot";
+		private final String dsxString = "dsx";
+		private final String htmlString ="html";
+		private final String rcpString = "rcp";                         // ++ ARASH
+		
+		private final Object[] possibleValues =
+		{
+			xmlString, spString, dotString, dsxString, htmlString, rcpString
+		};
+		
+		private JOptionPane pane = null;
+		private JDialog dialog = null;
+		private JCheckBox checkbox = null;
+		private Object selectedValue = null;
+		
+		ExportDialog(Frame comp)
+		{
+			this.pane = new JOptionPane("Export as::", 
+										JOptionPane.INFORMATION_MESSAGE,
+										JOptionPane.OK_CANCEL_OPTION, 
+										null,	// icon
+										null, 	// options
+										null);	// initialValue
+		
+			pane.setWantsInput(true);
+			pane.setSelectionValues(possibleValues);
+			pane.setInitialSelectionValue(possibleValues[0]);
+			pane.setComponentOrientation(((comp == null) ? pane.getRootFrame() : comp).getComponentOrientation());
+			pane.selectInitialValue();
+		
+			this.checkbox = new JCheckBox("Export to debugview");
+			pane.add(checkbox);
+			
+			// int style = styleFromMessageType(JOptionPane.INFORMATION_MESSAGE);
+			dialog = pane.createDialog(comp, "Export");
+		}
+		
+		public void show()
+		{
+			// this.selectedValue = JOptionPane.showInputDialog(comp, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
+			dialog.show();
+	        dialog.dispose();
+
+	        selectedValue = pane.getInputValue();
+		}				
+
+		public boolean wasCancelled()
+		{
+			return selectedValue == null;
+		}
+
+		// public Exporter getExporter()
+		public int getExportMode()
+		{
+			if (selectedValue == xmlString)
+			{
+				if(checkbox.isSelected())
+				{
+					return FORMAT_XML_DEBUG;
+				}
+				return FORMAT_XML;	// Should return an XmlExporter object
+			}
+			else if (selectedValue == dotString)
+			{
+				if(checkbox.isSelected())
+				{
+					return FORMAT_DOT_DEBUG;
+				}
+				return FORMAT_DOT;	// Should return a DotExporter object
+			}
+			else if (selectedValue == dsxString)
+			{
+				if(checkbox.isSelected())
+				{
+					return FORMAT_DSX_DEBUG;
+				}
+				return FORMAT_DSX;	// Should return a DsxExporter object
+			}
+			else if (selectedValue == rcpString)
+			{
+				if(checkbox.isSelected())
+				{
+					return FORMAT_RCP_DEBUG;
+				}
+				return FORMAT_RCP;	// Should return an RcpExporter object
+			}
+			else if (selectedValue == spString)
+			{
+				if(checkbox.isSelected())
+				{
+					return FORMAT_SP_DEBUG;
+				}
+				return FORMAT_SP;	// Should return a SpExporter object
+			}
+			else if (selectedValue == htmlString)
+			{
+				if(checkbox.isSelected())
+				{
+					return FORMAT_HTML_DEBUG;
+				}
+				return FORMAT_HTML;	// Should return a HtmlExporter object
+			}
+			else
+			{
+				return FORMAT_UNKNOWN;
+			}
+		}
+
+	}
+	
 	// ** Export - shouldn't there be an exporter object?
 	// it is now (ARASH)
 	public static void automataExport(Gui gui)
@@ -490,59 +613,25 @@ public class ActionMan
 			return;
 		}
 
-		String xmlString = "xml";
-		String spString = "sp";
-		String dotString = "dot";
-		String dsxString = "dsx";
-		String htmlString ="html";
-		String rcpString = "rcp";                         // ++ ARASH
-		Object[] possibleValues =
-		{
-			xmlString, spString, dotString, dsxString, htmlString
-		};
-		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
-
-		if (selectedValue == null)
+		ExportDialog dlg = new ExportDialog(gui.getFrame());
+		dlg.show();
+		if(dlg.wasCancelled())
 		{
 			return;
 		}
-
-		int exportMode = FORMAT_UNKNOWN;
-
-		if (selectedValue == xmlString)
+		
+		int exportMode = dlg.getExportMode();
+		
+		if(exportMode != FORMAT_UNKNOWN)
 		{
-			exportMode = FORMAT_XML;
+			automataExport(gui, exportMode);
 		}
-		else if (selectedValue == dotString)
-		{
-			exportMode = FORMAT_DOT;
-		}
-		else if (selectedValue == dsxString)
-		{
-			exportMode = FORMAT_DSX;
-		}
-		else if (selectedValue == rcpString)
-		{
-			exportMode = FORMAT_RCP;
-		}
-		else if (selectedValue == spString)
-		{
-			exportMode = FORMAT_SP;
-		}
-		else if (selectedValue == htmlString)
-		{
-			exportMode = FORMAT_HTML;
-		}
-		else
-		{
-			return;
-		}
-
-		automataExport(gui, exportMode);
 	}
 
 	// Exporter when the type is already known
 	// Add new export functions here and to the function above
+	// MF: It's not that simple. The code below defeats that purpose. Where are the exporter objects?
+	// OO was invented just to avoid the type of code below. It's a maintenance nightmare!!
 	public static void automataExport(Gui gui, int exportMode)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
@@ -554,6 +643,95 @@ public class ActionMan
 			return;
 		}
 
+		// Take care of the new debug stuff first. This is really silly. 
+		// Proper design would have solved this problem
+		if(exportMode == FORMAT_XML_DEBUG)
+		{
+			AutomataToXml xport = new AutomataToXml(gui.getSelectedProject());
+			TextFrame textframe = new TextFrame("XML debug output");
+			xport.serialize(textframe.getPrintWriter());
+			return;		
+		}
+		if (exportMode == FORMAT_SP)
+		{
+			ProjectToSP exporter = new ProjectToSP(gui.getSelectedProject());
+			TextFrame textframe = new TextFrame("SP debug output");
+			exporter.serialize(textframe.getPrintWriter());
+			return;
+		}
+		if(exportMode == FORMAT_DOT_DEBUG)
+		{
+			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
+				TextFrame textframe = new TextFrame("Dot debug output");
+				try
+				{
+					exporter.serialize(textframe.getPrintWriter());
+				}
+				catch(Exception ex)
+				{
+					logger.debug(ex.getStackTrace()); 
+				}
+			}
+			return;
+		}
+		if(exportMode == FORMAT_DSX_DEBUG)
+		{
+			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
+				TextFrame textframe = new TextFrame("DSX debug output");
+				try
+				{
+					exporter.serialize(textframe.getPrintWriter());
+				}
+				catch(Exception ex)
+				{
+					logger.debug(ex.getStackTrace()); 
+				}
+			}
+			return;
+		}
+		if(exportMode == FORMAT_RCP_DEBUG)
+		{
+			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
+				TextFrame textframe = new TextFrame("RCP debug output");
+				try
+				{
+					exporter.serialize(textframe.getPrintWriter());
+				}
+				catch(Exception ex)
+				{
+					logger.debug(ex.getStackTrace()); 
+				}
+			}
+			return;
+		}
+/*		if(exportMode == FORMAT_HTML_DEBUG)
+		{
+			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				AutomatonToHtml exporter = new AutomatonToHtml(currAutomaton);
+				TextFrame textframe = new TextFrame("HTML debug output");
+				try
+				{
+					exporter.serialize(textframe.getPrintWriter());
+				}
+				catch(Exception ex)
+				{
+					logger.debug(ex.getStackTrace()); 
+				}
+			}
+			return;
+		}
+*/
 		if (exportMode == FORMAT_DOT || exportMode == FORMAT_DSX || exportMode == FORMAT_RCP)
 		{
 			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -568,10 +746,7 @@ public class ActionMan
 
 			if (exportMode == FORMAT_XML)
 			{
-				// fileExporter = FileDialogs.getXMLFileExporter();
-				AutomataToXml xport = new AutomataToXml(gui.getSelectedProject());
-				TextFrame textframe = new TextFrame("Debug output");
-				xport.serialize(textframe.getPrintWriter());
+				fileExporter = FileDialogs.getXMLFileExporter();
 				return;
 			}
 			else if (exportMode == FORMAT_SP)

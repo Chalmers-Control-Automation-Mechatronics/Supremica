@@ -134,15 +134,27 @@ class DefaultEpsilonTester
 class AlphaEpsilonTester
 	implements EpsilonTester
 {
-	Alphabet epsilons;
+	Alphabet events;
+	boolean notin;
 	
-	public AlphaEpsilonTester(Alphabet epsilons)
+	public AlphaEpsilonTester(Alphabet events, boolean contains)
 	{
-		this.epsilons = epsilons;
+		this.events = events;
+		this.notin = !contains;
 	}
 	public boolean isThisEpsilon(LabeledEvent event)
 	{
-		return epsilons.contains(event);
+		/*
+		if(notin)
+		{
+			return !events.contains(event);
+		}
+		else
+		{
+			return events.contains(event);
+		}
+		*/
+		return notin^events.contains(event);
 	}
 }
 //
@@ -182,7 +194,8 @@ public class Determinizer
 		logger.debug(str);
 	}
 	// end debug stuff
-	
+
+	// For this automaton, determinize with respect to the events marked as isEpsilon()
 	public Determinizer(Automaton automaton)
 	{
 		this.automaton = automaton;
@@ -190,10 +203,13 @@ public class Determinizer
 		this.newAutomaton = createNewAutomaton();
 	}
 
-	public Determinizer(Automaton automaton, Alphabet epsilons)
+	// For this automaton, determinize with respect to the given events
+	// If contains == true, the events are considered to be epsilons
+	// If contains == false, the events are considered as non-epsilons (and all other epsilons) 
+	public Determinizer(Automaton automaton, Alphabet events, boolean contains)
 	{
 		this.automaton = automaton;
-		this.epsilonTester = new AlphaEpsilonTester(epsilons);
+		this.epsilonTester = new AlphaEpsilonTester(events, contains);
 		this.newAutomaton = createNewAutomaton();
 	}
 	

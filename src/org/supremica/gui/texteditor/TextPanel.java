@@ -35,18 +35,10 @@ public class TextPanel
 		textarea.setLineWrap(true);
 		textarea.setWrapStyleWord(true);
 		textarea.setTabSize(4);
+		textarea.setEditable(false);
 		
         JScrollPane areaScrollPane = new JScrollPane(textarea);
-//        areaScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         areaScrollPane.setPreferredSize(new Dimension(width, height));
- /*       areaScrollPane.setBorder(
-            BorderFactory.createCompoundBorder(
-                BorderFactory.createCompoundBorder(
-                                BorderFactory.createTitledBorder("Plain Text"),
-                                BorderFactory.createEmptyBorder(5,5,5,5)),
-                areaScrollPane.getBorder()));*/
-		// JViewport port = scroller.getViewport();
-		// port.add(textarea);
 		add(areaScrollPane);
 	}
 	

@@ -220,8 +220,11 @@ class MainPopupMenu
 		// menuHandler.add(saveAsItem, 1);
 		if (SupremicaProperties.fileAllowExport())
 		{
-			JMenuItem exportItem = new JMenuItem("Export...");
+			// This is how it would be done with an export command object
+			// JMenuItem exportItem = new JMenuItem(ActionMan.exportItem);
+			// menuHandler.add(exportItem, 1);
 
+			JMenuItem exportItem = new JMenuItem("Export...");
 			menuHandler.add(exportItem, 1);
 			exportItem.addActionListener(new ActionListener()
 			{

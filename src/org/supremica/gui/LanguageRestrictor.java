@@ -441,7 +441,7 @@ class LanguageRestrictorDialog
 		}		
 	}
 	
-	// Retunr the the restrictEvents
+	// Return the the restrictEvents
 	public Alphabet getRestrictionAlphabet()
 	{
 		return restrictEvents.getAlphabet();
@@ -532,10 +532,8 @@ class LanguageRestrictorDialog
 		
 		restrictMenu.add(restrictMenuErase);
 		restrictMenu.add(restrictMenuKeep);
-
-		// For the moment, until we get the Alphabet impl fixed
-		restrictMenuErase.setEnabled(false);
-		restrictMenuKeep.setEnabled(false);
+		restrictMenuErase.setEnabled(true);
+		restrictMenuKeep.setEnabled(true);
 		
 		JMenuBar menuBar = new JMenuBar();		
 		menuBar.add(menuFile);
@@ -580,14 +578,8 @@ class LanguageRestrictorDialog
 	
 	private void doRestrict()
 	{
-		logger.debug("LanguageRestriction::doRestrict()");
 		// Get the restriction alphabet
 		Alphabet alpha = restrictEvents.getAlphabet();
-		
-		if(!restrictEvents.toErase()) // if these are to be kept, the others should be erased
-		{
-			// Create an alphabet that is the union of 
-		}
 		
 		Automata newautomata = new Automata();
 		
@@ -595,7 +587,7 @@ class LanguageRestrictorDialog
 		while(autit.hasNext())
 		{
 			Automaton automaton = (Automaton)autit.next();
-			Determinizer detm = new Determinizer(automaton, alpha);
+			Determinizer detm = new Determinizer(automaton, alpha, restrictEvents.toErase());
 			detm.execute();
 			Automaton newautomaton = detm.getNewAutomaton();
 			newautomaton.setComment(automaton.getName() + "\\" + alpha.toString());
@@ -605,7 +597,6 @@ class LanguageRestrictorDialog
 		try
 		{
 			ActionMan.gui.addAutomata(newautomata);
-			logger.debug("LanguageRestriction::doRestrict() -- ok");
 		}
 		catch(Exception ex)
 		{
