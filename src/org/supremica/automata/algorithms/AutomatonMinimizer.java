@@ -88,7 +88,7 @@ public class AutomatonMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
-	// Debug flag...
+	// Debug flag... 
 	public static final boolean debug = false;
 
 	// Use short names
@@ -119,7 +119,8 @@ public class AutomatonMinimizer
 		// Do we have to care about the original?
 		if (options.getKeepOriginal())
 		{
-			// We need a copy since we must make the system reachable (and maybe deterministic) first!
+			// We need a copy since we must make the system reachable 
+			// (and maybe deterministic) first!
 			theAutomaton = new Automaton(theAutomaton);
 		}
 		
@@ -186,18 +187,18 @@ public class AutomatonMinimizer
 		else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
 		{
 			// Merge silent loops and other obvious OE stuff (to save computation later)...
-			// This is actually NOT entirely OE!! 
+			// This is actually NOT entirely OE, considering the marked states!! 
 			int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
 			if (count > 0)
 			{
-				logger.debug("Removed " + count + " observation equivalent states " +
-							 "before running the minimization.");
-			}
+				logger.debug("Removed " + count + " conflict equivalent states " +
+							 "before running the partitioning.");
+		}
 
 			if (debug)
 			{
 				preMinimizationTimer.stop();
-				logger.fatal("Pre minimization: " + preMinimizationTimer);
+				logger.fatal("Pre partitioning: " + preMinimizationTimer);
 				Thread.sleep(0);
 				saturationTimer.start();
 			}
@@ -223,13 +224,13 @@ public class AutomatonMinimizer
 			if (count > 0)
 			{
 				logger.debug("Removed " + count + " observation equivalent states " +
-							 "before running minimization.");
+							 "before running partitioning.");
 			}
 				
 			if (debug)
 			{
 				preMinimizationTimer.stop();
-				logger.fatal("Pre minimization: " + preMinimizationTimer);
+				logger.fatal("Pre partitioning: " + preMinimizationTimer);
 				Thread.sleep(0);
 				saturationTimer.start();
 			}
@@ -274,12 +275,14 @@ public class AutomatonMinimizer
 			partitioningTimer.start();
 		}
 
-		// After the above preparations, we can do the minimization in the same way for all cases!
+		// After the above preparations, we can do the minimization 
+		// in the same way for all cases!
+	
 		// Find the coarsest partitioning
 		EquivalenceClasses equivClasses = new EquivalenceClasses();
 		try
 		{
-			// Find initial partitioning
+			// Find initial partitioning (based on marking, basically)
 			equivClasses = findInitialPartitioning(theAutomaton);
 
 			if (stopRequested)
@@ -331,7 +334,8 @@ public class AutomatonMinimizer
    		if (debug)
 		{
 			removeTransitionsTimer.stop();
-			logger.fatal("Remove transitions: " + removeTransitionsTimer);
+			if (options.getAlsoTransitions())
+				logger.fatal("Remove transitions: " + removeTransitionsTimer);
 			Thread.sleep(0);
 			postMinimizationTimer.start();
 		}
@@ -344,8 +348,8 @@ public class AutomatonMinimizer
 			int count = postMinimizationMergeConflictEquivalentStates(newAutomaton); // Not OE
 			if (count > 0)
 			{
-				logger.debug("Removed " + count + " conflict equivalent states after " +
-							 "running observation equivalence minimization.");
+				logger.debug("Removed " + count + " conflict equivalent states " +
+							 "after running partitioning.");
 			}
 		}
 		
@@ -355,7 +359,7 @@ public class AutomatonMinimizer
 		if (debug)
 		{
 			postMinimizationTimer.stop();
-			logger.fatal("Post minimization: " + postMinimizationTimer);
+			logger.fatal("Post partitioning: " + postMinimizationTimer);
 			Thread.sleep(0);
 		}
 
@@ -1004,15 +1008,13 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * All states could as well be marked in an epsilon-loop where at least one state is marked.
-	 * This method adjusts this.
-	 *  States that can reach marked states by epsilon events are also considered marked
+	 * All states that can reach marked states by epsilon events are also considered marked.
 	 *
-	 *  NOTE: This method assumes that the epsilon-closure of each state is already calculated
+	 * NOTE: This method assumes that the epsilon-closure of each state is already calculated
 	 * and that the closure is returned by each state's getStateSet-method. (This is true if
 	 * doTransitiveClosure was called previously.)
 	 */
-	public void adjustMarking(Automaton aut)
+	private void adjustMarking(Automaton aut)
 	{
 		if (aut == null)
 		{
@@ -1054,8 +1056,11 @@ public class AutomatonMinimizer
 			if (!currState.isAccepting())
 			{
 				StateSet closure = currState.getStateSet();
-				if (closure == null)
+				if (closure == null) 
 				{
+					// The closure was not calculated? Bail out!
+					logger.fatal("Transitive closure must be calculated before calling " + 
+								 "the method AutomatonMinimizer.adjustMarking.");
 					aut = null;
 					return;
 				}
@@ -1079,15 +1084,14 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * Algorithm inspired by "Minimizing the Number of Transitions with Respect to Observation Equivalence"
-	 * by Jaana Eloranta. Removes all transitions that are redundant.
+	 * Algorithm inspired by "Minimizing the Number of Transitions with Respect to Observation 
+	 * Equivalence" by Jaana Eloranta. Removes all transitions that are redundant.
 	 */
-	public void removeRedundantTransitions(Automaton aut)
+	private void removeRedundantTransitions(Automaton aut)
 	{
-		// Are there any silent-self-loops? Remove them, they are redundant!
-		// Note! This is not Jaana Elorantas definition of redundant transitions!
-		// Her "redundant transitions" are removed below (which requires that all
-		// silent self-loops have already been removed).
+		// Are there any silent-self-loops? They can be removed!
+		// Note! These are not "redundant" by Jaana Elorantas definition, but must be
+		// removed before removing her "redundant transitions" (see below).
 
 		// Put silent self-loops in a list, remove afterwards
 		LinkedList toBeRemoved = new LinkedList();
@@ -1105,7 +1109,7 @@ public class AutomatonMinimizer
 			aut.removeArc((Arc) toBeRemoved.remove(0));
 		}
 
-		// Put redundant arcs in set, remove after all have been found
+		// Put redundant arcs in list, remove after all have been found
 		toBeRemoved.clear();
 		loop: for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
 		{
@@ -1135,7 +1139,8 @@ public class AutomatonMinimizer
 							// The order (wrt ||) in this if-clause is important!!
 							if ((secondEvent.isEpsilon() && 
 								 (!firstEvent.isEpsilon() || arc.getEvent().isEpsilon())) || 
-								(secondEvent.equals(arc.getEvent()) && !firstEvent.equals(secondEvent)))
+								(secondEvent.equals(arc.getEvent()) && 
+								 !firstEvent.equals(secondEvent)))
 							{
 								// Redundant!!!!
 								toBeRemoved.add(arc);
@@ -1155,7 +1160,7 @@ public class AutomatonMinimizer
 	/**
 	 * Removes epsilon events that are never used from alphabet.
 	 */
-	public void removeUnusedEpsilonEvents(Automaton aut)
+	private void removeUnusedEpsilonEvents(Automaton aut)
 	{
 		Alphabet alpha = aut.getAlphabet();
 

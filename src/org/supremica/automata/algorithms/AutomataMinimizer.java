@@ -83,6 +83,10 @@ public class AutomataMinimizer
 		this.theAutomata = theAutomata;
 	}
 
+	/**
+	 * Sets the executionDialog of this AutomataMinimizer. If executionDialog is null,
+	 * the dialog is not updated.
+	 */
 	public void setExecutionDialog(ExecutionDialog executionDialog)
 	{
 		this.executionDialog = executionDialog;
@@ -117,7 +121,7 @@ public class AutomataMinimizer
 			}
 		});
 
-		// Minimize...
+		// While there are more than two automata, compose and minimize!
 		while (theAutomata.size() >= 2)
 		{
 			if (stopRequested)
@@ -315,7 +319,8 @@ public class AutomataMinimizer
 					   " states and " + epsilons + " epsilon transitions (" + 
 					   ((double) epsilons)*100/total + "%).");
 		
-		// Is it at all possible to minimize?
+		// Is it at all possible to minimize? (It may actually be possible even
+		// if there are no epsilons.)
 		if (epsilons > 0)
 		{
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);

@@ -1793,7 +1793,7 @@ public class AutomataVerifier
 	{
 		// Make a copy that we can fiddle with
 		//Automata theAutomata = new Automata(theAutomata); // Don't need to fiddle
-		int nbrOfAutomata = theAutomata.size();
+		//int nbrOfAutomata = theAutomata.size();
 
 		// Initialize execution dialog
 		java.awt.EventQueue.invokeLater(new Runnable()
@@ -1846,41 +1846,6 @@ public class AutomataVerifier
 		// Present result!
 		return moduleIsNonblocking(result, true);
 	}
-
-	/**
- 	 * Composes automata and minimizes the result with respect to
- 	 * conflict equivalence, with hideThese considered as epsilon
- 	 * events.
-	 */
-	/*
-	private static Automaton composeAndMinimize(Automata automata, Alphabet hideThese)
-	{
-		Automaton aut;
-
-		try
-		{
-			aut = AutomataSynchronizer.synchronizeAutomata(automata);
-			aut.hide(hideThese);
-
-			logger.info("Minimizing " + aut + " states: " + aut.nbrOfStates() + " epsilons: " + aut.nbrOfEpsilonTransitions());
-
-			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
-			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
-			options.setAlsoTransitions(true);
-			options.setKeepOriginal(false);
-			//options.setIgnoreMarking(true);
-			aut = minimizer.getMinimizedAutomaton(options);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-			return null;
-		}
-
-		return aut;
-	}
-	*/
 
 	private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
 		throws Exception
