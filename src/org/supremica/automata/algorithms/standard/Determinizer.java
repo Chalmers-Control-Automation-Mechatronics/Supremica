@@ -139,9 +139,13 @@ public class Determinizer
 		newAutomaton.addState(init);
 		newAutomaton.setInitialState(init);
 
-		// Loop as long as there are states in openStateSets
+		// Loop as long as there are StateSet:s in openStateSets
 		while (!openStateSets.isEmpty())
 		{
+			// Note that the getSingleStateRepresentation call ALWAYS returns a new representation
+			// i.e. (if you look at the implementation ni StateSet) it never reuses the same
+			// representation, the local singleStateRepresentation is never null!! (I think.)
+
 			StateSet Q1 = openStateSets.get();    // This is vanNoords T
 			State T = newAutomaton.addStateChecked(Q1.getSingleStateRepresentation());
 

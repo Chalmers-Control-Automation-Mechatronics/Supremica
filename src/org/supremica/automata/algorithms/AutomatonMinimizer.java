@@ -91,6 +91,9 @@ public class AutomatonMinimizer
 	// Debug flag...
 	public static final boolean debug = false;
 
+	// Use short names
+	private boolean shortNames = false;
+
 	/**
 	 * Basic constructor.
 	 */
@@ -120,7 +123,6 @@ public class AutomatonMinimizer
 			theAutomaton = new Automaton(theAutomaton);
 		}
 		
-		ActionTimer reachabilityTimer = new ActionTimer();
 		ActionTimer preMinimizationTimer = new ActionTimer();
 		ActionTimer saturationTimer = new ActionTimer();
 		ActionTimer adjustMarkingTimer = new ActionTimer();
@@ -129,11 +131,7 @@ public class AutomatonMinimizer
 		ActionTimer removeTransitionsTimer = new ActionTimer();
 		ActionTimer automataBuildTimer = new ActionTimer();
 
-		if (debug)
-		{
-			reachabilityTimer.start();
-		}
-
+		/*
 		// Make reachable
         SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
@@ -144,24 +142,23 @@ public class AutomatonMinimizer
 			State state = it.nextState();
 			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
 			{
-				logger.fatal("The state " + state + " is not reachable.");
+				// logger.fatal("The state " + state + " is not reachable.");
 				toBeRemoved.add(state);
 			}
 
 			if (state.isForbidden())
 			{
-				logger.fatal("The state " + state + " is forbidden.");
+				// logger.fatal("The state " + state + " is forbidden.");
 			}
 		}
 		while (toBeRemoved.size() != 0)
 		{
 			theAutomaton.removeState((State) toBeRemoved.remove(0));
 		}
+		*/
 
 		if (debug)
 		{
-			reachabilityTimer.stop();
-			logger.fatal("Reachability: " + reachabilityTimer);
 			Thread.sleep(0);
 			preMinimizationTimer.start();
 		}
@@ -440,6 +437,13 @@ public class AutomatonMinimizer
 		return equivClasses;
     }
 
+	/**
+	 * Generate states with short names!
+	 */
+	public void useShortStateNames(boolean bool)
+	{
+		shortNames = bool;
+	}
 
 	/**
 	 * Returns the minimized automaton, based on the partitioning in equivClasses.
@@ -450,21 +454,31 @@ public class AutomatonMinimizer
 		Automaton newAutomaton = new Automaton();
 
 		newAutomaton.setType(theAutomaton.getType());
-		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... but it works. Why like this?
+		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... but it works.
 
 		// Associate one state with each equivalence class
-		int currNbrOfStates = 0;
+		int stateNumber = 1; // Number 0 is dedicated to the initial state
 		Iterator equivClassIt = equivClasses.iterator();
 		while (equivClassIt.hasNext())
 		{
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
-			//State currState = currEquivClass.getState(newAutomaton);
 			State currState = currEquivClass.getSingleStateRepresentation();
-			newAutomaton.addState(currState);
 			if (currEquivClass.hasInitialState())
 			{
-				newAutomaton.setInitialState(currState);
+				currState.setInitial(true);
+				if (shortNames)
+				{
+					currState.setName("q" + 0);
+				}
 			}
+			else
+			{
+				if (shortNames)
+				{
+					currState.setName("q" + stateNumber++);
+				}
+			}
+			newAutomaton.addState(currState);
 		}
 
 		// Build all transitions

@@ -261,7 +261,7 @@ public class StateSet
 	 * The "initial" attribute should be set in the automaton that this state
 	 * should be long to, not here!
 	 */
-	public State createSingleStateRepresentation()
+	private State createSingleStateRepresentation()
 	{
 		// boolean i = false;   // initial?
 		boolean d = false;    // desired?
@@ -285,12 +285,16 @@ public class StateSet
 			x |= state.isForbidden();
 		}
 
-		// Create new state
+		// Get name for new state
 		String newName = buf.toString();
-		if (newName.length() > 10)
-		{
-			newName = newName.substring(0,10) + Math.random() + "...";
+		/*
+		if (newName.length() > nameLimit)
+		    {
+		newName = newName.substring(0, nameLimit) + Math.random() + "...";
 		}
+		*/
+
+		// Create new state
 		State newstate = new State(newName);
 		// if(i) newstate.setInitial(true);
 		if (d) newstate.setAccepting(true);

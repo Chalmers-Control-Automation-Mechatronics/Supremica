@@ -2116,12 +2116,12 @@ public class AutomataVerifier
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultLanguageInclusionOptions();
 		verificationOptions.setInclusionAutomata(automataA);
-
+		
 		Automata theAutomata = new Automata();
 
 		theAutomata.addAutomata(automataA);
 		theAutomata.addAutomata(automataB);
-		theAutomata.setIndicies();
+		//theAutomata.setIndicies();
 
 		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
 

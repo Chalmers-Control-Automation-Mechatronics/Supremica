@@ -667,7 +667,6 @@ public final class SupremicaProperties
 	public static void load(String fileName)
 		throws IOException
 	{
-
 		// System.err.println("PropertiesLoad");
 		FileInputStream fileStream = new FileInputStream(fileName);
 
@@ -739,7 +738,7 @@ public final class SupremicaProperties
 	}
 
 	/* WHAT'S THE DIFFERENCE!??!? WHY IS THERE A DIFFERENCE!! WASN'T THE WHOLE BLOODY
-	   POINT THAT THERE WOULDN'T BE A DIFFERENCE? AAARGH. I'M SO UPSET!!!
+	   POINT THAT THERE WOULDN'T BE A DIFFERENCE? AAARGH. I'M SO UPSET!!! /hguo
 	public static boolean generalUseRobotCoordinationABB()
 	{
 		return toBoolean(wp.getProperty(GENERAL_USE_ROBOTCOORDINATION_ABB));
@@ -1337,7 +1336,6 @@ public final class SupremicaProperties
 	{
 		if (from_Options)
 		{
-
 			// Options -> Properties
 			setOption(BDD_ALGORITHM, Options.algo_family);
 			setOption(BDD_SHOW_GROW, Options.show_grow);
@@ -1370,7 +1368,6 @@ public final class SupremicaProperties
 		}
 		else
 		{
-
 			// Properties -> Options
 			Options.algo_family = optionAsInt(BDD_ALGORITHM, Options.algo_family);
 			Options.show_grow = optionAsInt(BDD_SHOW_GROW, Options.show_grow);
@@ -1460,7 +1457,6 @@ public final class SupremicaProperties
 	 */
 	public static void loadProperties(String[] args)
 	{
-
 		// do we  want developer stuff by default
 		boolean enabled_developer_mode = true;
 

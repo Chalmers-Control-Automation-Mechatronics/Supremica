@@ -68,8 +68,7 @@ public class AutomatonSynthesizer
 	protected Automaton theAutomaton;
 	protected LinkedList acceptingStates = new LinkedList();
 	protected SynthesizerOptions synthesizerOptions;
-	protected boolean rememberDisabledEvents = false;
-	protected Alphabet disabledEvents;
+	protected Alphabet disabledUncontrollableEvents;
 	protected final static boolean debugMode = false;
 	protected boolean forcedPurge = false;
 
@@ -117,9 +116,9 @@ public class AutomatonSynthesizer
 			didSomething = synthesizeControllableNonblockingObservable();
 		}
 
-		if (synthesizerOptions.doRememberDisabledEvents())
+		if (synthesizerOptions.doRememberDisabledUncontrollableEvents())
 		{
-			computeDisabledEvents();
+			computeDisabledUncontrollableEvents();
 		}
 
 		if (synthesizerOptions.doPurge() || forcedPurge)
@@ -572,7 +571,8 @@ public class AutomatonSynthesizer
 				Arc currArc = (Arc) arcIt.next();
 				State toState = currArc.getToState();
 
-				if ((toState.getCost() != State.MAX_COST) &&!toState.isVisited())
+				//if (!toState.isVisited())
+				if ((toState.getCost() != State.MAX_COST) && !toState.isVisited())
 				{
 					toState.setVisited(true);
 					stateStack.addLast(toState);
@@ -595,23 +595,24 @@ public class AutomatonSynthesizer
 
 	/**
 	 * Returns the set of UNCONTROLLABLE events that needed to be disabled in the synthesis.
-	 * If not rememberDisabledEvents are set to true then null is returned.
-	 * This method might only be called after synthesize has returned.
+	 * If not rememberDisabledUncontrollableEvents are set to true then null is returned.
+	 * This method must only be called after synthesize has returned.
 	 */
-	public Alphabet getDisabledEvents()
+	public Alphabet getDisabledUncontrollableEvents()
 	{
-		return disabledEvents;
+		return disabledUncontrollableEvents;
 	}
 
-	protected void computeDisabledEvents()
+	protected void computeDisabledUncontrollableEvents()
 	{
-		disabledEvents = new Alphabet();
+		disabledUncontrollableEvents = new Alphabet();
 
 		for (Iterator stateIt = theAutomaton.stateIterator();
 				stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
+			// Is this a forbidden state (so all incoming from nonforbidden states should be disabled)
 			if (currState.getCost() == State.MAX_COST)
 			{
 				for (Iterator evIt = theAutomaton.incomingEventsIterator(currState);
@@ -623,14 +624,14 @@ public class AutomatonSynthesizer
 					{
 						try
 						{
-							if (!disabledEvents.contains(currEvent.getLabel()))
+							if (!disabledUncontrollableEvents.contains(currEvent.getLabel()))
 							{
-								disabledEvents.addEvent(currEvent);
+								disabledUncontrollableEvents.addEvent(currEvent);
 							}
 						}
 						catch (Exception ex)
 						{
-							logger.error("AutomatonSynthesizer::computeDisabledEvents: " + ex.getMessage());
+							logger.error("AutomatonSynthesizer::computeDisabledUncontrollableEvents: " + ex.getMessage());
 							logger.debug(ex.getStackTrace());
 						}
 					}

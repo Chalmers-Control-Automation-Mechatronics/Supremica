@@ -24,7 +24,6 @@ public class StateEnumerator
 
 	public void actionPerformed(ActionEvent event)
 	{
-
 		// Get the selected automata
 		Automata automata = ActionMan.getGui().getSelectedAutomata();
 

@@ -64,7 +64,7 @@ public final class SynthesizerOptions
 	private boolean maximallyPermissive;
 	private boolean maximallyPermissiveIncremental;
 	private boolean reduceSupervisors;
-	private boolean rememberDisabledEvents;
+	private boolean rememberDisabledUncontrollableEvents;
 
 	/**
 	 * The current options, based on earlier user preferences.
@@ -162,14 +162,14 @@ public final class SynthesizerOptions
 		return purge;
 	}
 
-	public void setRememberDisabledEvents(boolean remember)
+	public void setRememberDisabledUncontrollableEvents(boolean remember)
 	{
-		rememberDisabledEvents = remember;
+		rememberDisabledUncontrollableEvents = remember;
 	}
 
-	public boolean doRememberDisabledEvents()
+	public boolean doRememberDisabledUncontrollableEvents()
 	{
-		return rememberDisabledEvents;
+		return rememberDisabledUncontrollableEvents;
 	}
 
 	public void setOptimize(boolean bool)

@@ -74,7 +74,7 @@ public final class VerificationOptions
 
 	/**
 	 * This is not a good constructor so it is private, it is impossible to read in the code. 
-	 * Use the "getDefault..."-methods in this class instead or when they won't suit you, 
+	 * Use the "getDefault..."-methods in this class instead and, when they won't suit you, 
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
 	 */

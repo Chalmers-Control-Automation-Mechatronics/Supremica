@@ -52,11 +52,10 @@ package org.supremica.gui;
 public class ExecutionDialogMode
 {
 	public static ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing...", "Number of states:", true, false);
-	public static ExecutionDialogMode verifying =
-
-	//new ExecutionDialogMode("Verifying...", "Number of states:", true, false);
-	new ExecutionDialogMode("Verifying...", "", true, false);
-	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "Number of states:", false, true);
+	public static ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying...", "", true, false);
+	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "", false, true);
+	public static ExecutionDialogMode synthesizingOptimizing = new ExecutionDialogMode("Optimizing...", "", false, true);
+	public static ExecutionDialogMode synthesizingReducing = new ExecutionDialogMode("Reducing...", "", false, true);
 	public static ExecutionDialogMode synchronizingBuildingStates = new ExecutionDialogMode("Building automaton...", "Building states", false, true);
 	public static ExecutionDialogMode synchronizingBuildingTransitions = new ExecutionDialogMode("Building automaton...", "Building transitions", false, true);
 	public static ExecutionDialogMode synchronizingMatchingStates = new ExecutionDialogMode("Matching States...", "", false, true);

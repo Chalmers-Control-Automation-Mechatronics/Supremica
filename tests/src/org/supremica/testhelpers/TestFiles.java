@@ -82,6 +82,7 @@ public class TestFiles
 	public static final TestFiles UMDES_1 = new TestFiles("umdes_test1.fsm");
 	public static final TestFiles UMDES_2 = new TestFiles("umdes_test2.fsm");
 	public static final TestFiles Split = new TestFiles("split.xml");
+	public static final TestFiles MachineBufferMachine = new TestFiles("MachineBufferMachine.xml");
 
 	private static final String testFilePrefix = "./tests/testfiles/";
 

@@ -65,6 +65,7 @@ class AutomataSelector
 	private Automata partialSet = new Automata();
 	private Iterator specIterator;
 	private HashMap eventToAutomataMap = new HashMap();
+	private int progress = 0;
 	private boolean seenSpec = false;    // keep track of wether no spec exists, may need to do some job anyway
 
 	public AutomataSelector(Automata globalSet)
@@ -92,6 +93,7 @@ class AutomataSelector
 			if (currSupervisorAutomaton.isSupervisor() || currSupervisorAutomaton.isSpecification())
 			{
 				seenSpec = true;    // yes, we've found a spec/sup
+				progress++;
 
 				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				partialSet.addAutomaton(currSupervisorAutomaton);
@@ -199,5 +201,14 @@ class AutomataSelector
 	boolean hadSpec()
 	{
 		return seenSpec;
+	}
+
+	/**
+	 * Return the sequential number of the last supervisor/spec considered or 0 if no
+	 * supervisor/spec has ever been considered.
+	 */
+	int getProgress()
+	{
+		return progress;
 	}
 }

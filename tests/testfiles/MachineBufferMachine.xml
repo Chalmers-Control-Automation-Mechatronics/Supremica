@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Maching-Buffer-Machine" comment="Classical example. The specification is uncontrollable. Neat example of where 'supervisor reduction' works perfectly.">
+<Automaton name="Machine 1" type="Plant">
+	<Events>
+		<Event id="s" label="Start1"/>
+		<Event id="e" label="End1" controllable="false"/>
+		<Event id="b" label="Breakdown1" controllable="false"/>
+		<Event id="r" label="Repair1"/>
+	</Events>
+	<States>
+		<State id="m0" name="Idle1" initial="true" accepting="true"/>
+		<State id="m1" name="Processing1"/>
+		<State id="m2" name="Down1"/>
+	</States>
+	<Transitions>
+		<Transition source="m0" dest="m1" event="s"/>
+		<Transition source="m1" dest="m0" event="e"/>
+		<Transition source="m1" dest="m2" event="b"/>
+		<Transition source="m2" dest="m0" event="r"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Buffer" type="Specification">
+	<Events>
+		<Event id="u1" label="End1" controllable="false"/>
+		<Event id="l2" label="Start2"/>
+	</Events>
+	<States>
+		<State id="b0" name="Empty" initial="true" accepting="true"/>
+		<State id="b1" name="Full"/>
+	</States>
+	<Transitions>
+		<Transition source="b0" dest="b1" event="u1"/>
+		<Transition source="b1" dest="b0" event="l2"/>
+	</Transitions>
+</Automaton>
+<!--
+<Automaton name="Prioritize repair of Machine 2" type="Specification">
+	<Events>
+		<Event id="b1" label="Breakdown1" controllable="false"/>
+		<Event id="b2" label="Breakdown2" controllable="false"/>
+		<Event id="r1" label="Repair1"/>
+		<Event id="r2" label="Repair2"/>
+	</Events>
+	<States>
+		<State id="p0" name="BothOK" initial="true" accepting="true"/>
+		<State id="p1" name="OneDown"/>
+		<State id="p2" name="TwoDown"/>
+	</States>
+	<Transitions>
+		<Transition source="p0" dest="p1" event="b1"/>
+		<Transition source="p0" dest="p1" event="b2"/>
+		<Transition source="p1" dest="p0" event="r1"/>
+		<Transition source="p1" dest="p0" event="r2"/>
+		<Transition source="p1" dest="p2" event="b1"/>
+		<Transition source="p1" dest="p2" event="b2"/>
+		<Transition source="p2" dest="p1" event="r2"/>
+	</Transitions>
+</Automaton>
+-->
+<Automaton name="Prioritize repair of Machine 2" type="Specification">
+	<Events>
+		<Event id="b2" label="Breakdown2" controllable="false"/>
+		<Event id="r1" label="Repair1"/>
+		<Event id="r2" label="Repair2"/>
+	</Events>
+	<States>
+		<State id="p0" name="TwoOK" initial="true" accepting="true"/>
+		<State id="p1" name="TwoDown"/>
+	</States>
+	<Transitions>
+		<Transition source="p0" dest="p0" event="r1"/>
+		<Transition source="p0" dest="p1" event="b2"/>
+		<Transition source="p1" dest="p0" event="r2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Machine 2" type="Plant">
+	<Events>
+		<Event id="s" label="Start2"/>
+		<Event id="e" label="End2" controllable="false"/>
+		<Event id="b" label="Breakdown2" controllable="false"/>
+		<Event id="r" label="Repair2"/>
+	</Events>
+	<States>
+		<State id="m0" name="Idle2" initial="true" accepting="true"/>
+		<State id="m1" name="Processing2"/>
+		<State id="m2" name="Down2"/>
+	</States>
+	<Transitions>
+		<Transition source="m0" dest="m1" event="s"/>
+		<Transition source="m1" dest="m0" event="e"/>
+		<Transition source="m1" dest="m2" event="b"/>
+		<Transition source="m2" dest="m0" event="r"/>
+	</Transitions>
+</Automaton>
+</Automata>

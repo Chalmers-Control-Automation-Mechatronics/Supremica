@@ -45,7 +45,7 @@
  * Supremica or KA shall not be liable for any damages
  * suffered by Licensee from the use of this software.
  *
- * Supremica is owned and represented by KA.
+ * Supremica is owned and represented by KA.setProgress
  */
 package org.supremica.gui;
 
@@ -290,12 +290,17 @@ public final class ExecutionDialog
 	{
 		newMode = true;
 
+		// Should we replace the "value panel"
+		if (currCenterPanel != null)
+		{
+			contentPanel.remove(currCenterPanel);
+		}
+
 		update();
 	}
 
 	public void run()
 	{
-
 		// Update labels
 		if (newMode)
 		{
@@ -426,7 +431,6 @@ public final class ExecutionDialog
 
 		if (showValues)
 		{
-
 			// Don't show negative values in the dialog
 			if (value >= 0)
 			{

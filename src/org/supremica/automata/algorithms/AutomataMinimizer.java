@@ -319,6 +319,7 @@ public class AutomataMinimizer
 		if (epsilons > 0)
 		{
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
+			minimizer.useShortStateNames(true);
 			threadToStop = minimizer;
 			aut = minimizer.getMinimizedAutomaton(options);
 			threadToStop = null;

@@ -95,17 +95,43 @@ public class TestAutomatonMinimizer
 	{
 		try
 		{
+			/*
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Bisimulation));
 			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
 			options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
-			options.setAlsoTransitions(true);
 			options.setKeepOriginal(true);
 
 			// Test language equivalence minimization
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
 			Automaton languageMin = minimizer.getMinimizedAutomaton(options);
 			assertTrue((languageMin.nbrOfStates() == 3) && (languageMin.nbrOfTransitions() == 4));
+			*/
+
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
+			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			syncOptions.setForbidUncontrollableStates(true);
+			AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+			synchronizer.execute();
+			Automaton synch = synchronizer.getAutomaton();
+			Alphabet alpha = synch.getAlphabet();
+			Alphabet hide = new Alphabet();
+			hide.addEvent(alpha.getEvent("Start1"));
+			hide.addEvent(alpha.getEvent("Start2"));
+			hide.addEvent(alpha.getEvent("End1"));
+			hide.addEvent(alpha.getEvent("End2"));
+			hide = Alphabet.minus(alpha, hide);
+			synch.hide(hide);
+					
+			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+			options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
+
+			// Test language equivalence minimization
+			AutomatonMinimizer minimizer = new AutomatonMinimizer(synch);
+			Automaton languageMin = minimizer.getMinimizedAutomaton(options);
+			assertTrue(languageMin.nbrOfStates() == 8);
+			assertTrue(languageMin.nbrOfTransitions() == 18);
 		}
 		catch (Exception ex)
 		{
@@ -134,7 +160,8 @@ public class TestAutomatonMinimizer
 			// Test a part of the dining philosophers example (observation equivalence minimization)
 			minimizer = new AutomatonMinimizer(theProject.getAutomaton("P1F1F2"));
 			observationMin = minimizer.getMinimizedAutomaton(options);
-			assertTrue((observationMin.nbrOfStates() == 6) && (observationMin.nbrOfTransitions() == 10));
+			assertTrue(observationMin.nbrOfStates() == 6);
+			assertTrue(observationMin.nbrOfTransitions() == 10);
 		}
 		catch (Exception ex)
 		{
