@@ -46,38 +46,66 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica;
+package org.supremica.util.compactStateSet;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.supremica.automata.TestPackageAutomata;
-import org.supremica.util.TestPackageUtil;
-import org.supremica.properties.SupremicaProperties;
+import org.supremica.testhelpers.*;
 
-public class TestPackageSupremica
+public class TestCompactStateSet
 	extends TestCase
 {
-	static
-	{
-		SupremicaProperties.setLogToConsole(true);
-		SupremicaProperties.setLogToGUI(false);
-	}
 
-	public TestPackageSupremica(String name)
+	public TestCompactStateSet(String name)
 	{
 		super(name);
 	}
 
 	/**
+	 * Sets up the test fixture.
+	 * Called before every test case method.
+	 */
+	protected void setUp()
+	{
+	}
+
+	/**
+	 * Tears down the test fixture.
+	 * Called after every test case method.
+	 */
+	protected void tearDown()
+	{
+	}
+
+	/**
 	 * Assembles and returns a test suite
-	 * containing all known tests.
+	 * for all the test methods of this test case.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestPackageAutomata.suite());
-		suite.addTest(TestPackageUtil.suite());
+		TestSuite suite = new TestSuite(TestCompactStateSet.class);
 		return suite;
 	}
+
+
+	public void testSimpleOperations()
+	{
+/*
+		Alphabet alph1 = new Alphabet();
+		assertTrue(alph1.size() == 0);
+		{
+			LabeledEvent e1 = new LabeledEvent("e1");
+			alph1.addEvent(e1);
+			assertTrue(alph1.size() == 1);
+			LabeledEvent e2 = new LabeledEvent("e2");
+			alph1.addEvent(e2);
+			assertTrue(alph1.size() == 2);
+			LabeledEvent e3 = new LabeledEvent("e3");
+			alph1.addEvent(e3);
+			assertTrue(alph1.size() == 3);
+		}
+*/
+	}
+
 }

@@ -46,25 +46,19 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica;
+package org.supremica.util;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.supremica.automata.TestPackageAutomata;
-import org.supremica.util.TestPackageUtil;
-import org.supremica.properties.SupremicaProperties;
 
-public class TestPackageSupremica
+import org.supremica.util.compactStateSet.TestPackageCompactStateSet;
+
+public class TestPackageUtil
 	extends TestCase
 {
-	static
-	{
-		SupremicaProperties.setLogToConsole(true);
-		SupremicaProperties.setLogToGUI(false);
-	}
 
-	public TestPackageSupremica(String name)
+	public TestPackageUtil(String name)
 	{
 		super(name);
 	}
@@ -76,8 +70,7 @@ public class TestPackageSupremica
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite();
-		suite.addTest(TestPackageAutomata.suite());
-		suite.addTest(TestPackageUtil.suite());
+		suite.addTest(TestPackageCompactStateSet.suite());
 		return suite;
 	}
 }
