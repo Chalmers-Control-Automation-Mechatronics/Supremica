@@ -98,7 +98,7 @@ Supremica is following.
 
 4. Update
 	Enter the Supremica directory, write:
-	> cvs update -d
+	> cvs update -d -P
 
 5. Commit changes
  	Enter the Supremica directory, write:
