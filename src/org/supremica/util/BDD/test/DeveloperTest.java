@@ -38,6 +38,8 @@ public class DeveloperTest
 		automata.cleanup();
 	}
 
+	// -----------------------------------------------------------------------------
+
 	private void do_reachability()
 	{
 		int bdd_r = sup.getReachables();
@@ -48,15 +50,32 @@ public class DeveloperTest
 	private void do_coreachability()
 	{
 		int bdd_r = sup.getCoReachables();
-
 		automata.count_states("CoReachable states", bdd_r);
+
+
 	}
 
+	private void do_under_construction()
+	{
+		// currentlty, we are playing with the synthesis algo:
+		int bdd_safe = sup.getSafeStates(true, true);
+		automata.count_states("safe states", bdd_safe);
+
+
+		int bdd_r = sup.getReachables();
+		int tmp = automata.and(bdd_r, bdd_safe);
+		automata.count_states("REACHABLE safe states", tmp);
+	}
+
+/*
 	private void do_deadlock()
 	{
 		System.err.println("UNDER DEVELOPMENT...");
 	}
+	*/
 
+
+	// -----------------------------------------------------------------------------
 	public static void DoReachability(org.supremica.automata.Automata a)
 	{
 		try
@@ -87,6 +106,7 @@ public class DeveloperTest
 		}
 	}
 
+/*
 	public static void DoDeadlock(org.supremica.automata.Automata a)
 	{
 		try
@@ -94,6 +114,22 @@ public class DeveloperTest
 			DeveloperTest dt = new DeveloperTest(a);
 
 			dt.do_deadlock();
+			dt.cleanup();
+		}
+		catch (BDDException exx)
+		{
+			exx.printStackTrace();
+		}
+	}
+	*/
+
+	public static void DoUnderConstruction(org.supremica.automata.Automata a)
+	{
+		try
+		{
+			DeveloperTest dt = new DeveloperTest(a);
+
+			dt.do_under_construction();
 			dt.cleanup();
 		}
 		catch (BDDException exx)
