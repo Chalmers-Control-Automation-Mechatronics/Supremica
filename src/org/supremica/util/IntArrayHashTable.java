@@ -275,7 +275,7 @@ public final class IntArrayHashTable
 				{
 					int[] prevState = oldTable[prevStateIndex];
 					int newPrevStateIndex = getIndex(prevState);
-					AutomataIndexFormHelper.setPrevStateIndex(prevState, newPrevStateIndex);
+					AutomataIndexFormHelper.setPrevStateIndex(currState, newPrevStateIndex);
 				}
 			}
 		}

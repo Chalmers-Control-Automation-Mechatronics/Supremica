@@ -448,7 +448,7 @@ public final class AutomataSynchronizerHelper
 	public void setDeadlocked(int[] state, boolean deadlocked)
 	{
 		logger.debug(AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
-		displayTrace(state);
+		logger.debug(displayTrace(state));
 		int currStatus = state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END];
 
 		if (deadlocked)
@@ -632,12 +632,13 @@ public final class AutomataSynchronizerHelper
 
 	}
 
+/*
 	public void displayTrace(int[] currState)
 	{
-/*
 		Alphabet unionAlphabet = theAutomaton.getAlphabet();
 
-		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
+		// AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
+		AutomataSynchronizerExecuter executer = new AutomataSynchronizerExecuter(this);
 
 		executer.initialize();
 
@@ -649,13 +650,76 @@ public final class AutomataSynchronizerHelper
 			{
 				displayTrace(prevState);
 				int currEventIndex = executer.findTransition(prevState, currState);
-
-				logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
+				if (currEventIndex >= 0)
+				{
+					logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
+				}
+				else
+				{
+					logger.error("Could not find an event between prevState and currState");
+					logger.error("Current state, index: " + theStates.getIndex(currState));
+					logger.error(AutomataIndexFormHelper.dumpVerboseState(currState, theAutomataIndexForm));
+					logger.error("Previous state, index: " + theStates.getIndex(prevState));
+					logger.error(AutomataIndexFormHelper.dumpVerboseState(prevState, theAutomataIndexForm));
+				}
 			}
 		}
-*/
 	}
+*/
 
+	/**
+	 * Returns a string with events from the initial state to currState
+	 * "a" -> "b" -> "c"
+	 */
+	public String displayTrace(int[] currState)
+	{
+		Alphabet unionAlphabet = theAutomaton.getAlphabet();
+
+		// AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
+		AutomataSynchronizerExecuter executer = new AutomataSynchronizerExecuter(this);
+
+		executer.initialize();
+
+		int prevStateIndex = AutomataIndexFormHelper.getPrevStateIndex(currState);
+		if (prevStateIndex != AutomataIndexFormHelper.STATE_NO_PREVSTATE)
+		{
+			int[] prevState = theStates.get(prevStateIndex);
+			if (prevState != null)
+			{
+				String prevString = displayTrace(prevState);
+				int currEventIndex = executer.findTransition(prevState, currState);
+				if (currEventIndex >= 0)
+				{
+					if (prevString.equals(""))
+					{
+						return "\"" + unionAlphabet.getEventWithIndex(currEventIndex).getLabel() + "\"";
+					}
+					else
+					{
+						return prevString + " -> \"" + unionAlphabet.getEventWithIndex(currEventIndex).getLabel() + "\"";
+					}
+					// logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
+				}
+				else
+				{
+					logger.error("Could not find an event between prevState and currState");
+					logger.error("Current state, index: " + theStates.getIndex(currState));
+					logger.error(AutomataIndexFormHelper.dumpVerboseState(currState, theAutomataIndexForm));
+					logger.error("Previous state, index: " + theStates.getIndex(prevState));
+					logger.error(AutomataIndexFormHelper.dumpVerboseState(prevState, theAutomataIndexForm));
+					return "";
+				}
+			}
+			else
+			{
+				return "";
+			}
+		}
+		else
+		{
+			return "";
+		}
+	}
 
 	public void setCoExecute(boolean coExecute)
 	{

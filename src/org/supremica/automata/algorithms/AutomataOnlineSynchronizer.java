@@ -153,10 +153,8 @@ public final class AutomataOnlineSynchronizer
 		currOutgoingEventsIndex = new int[nbrOfAutomata];
 		currState = AutomataIndexFormHelper.createState(nbrOfAutomata);
 
-		// +1 status field
-		currEnabledEvents = new int[nbrOfEvents + 1];
+		currEnabledEvents = new int[nbrOfEvents + 1]; // Always end with Integer.MAX_VALUE
 
-		// Always end with Integer.MAX_VALUE
 		if (automataIndices == null)
 		{
 			selectAllAutomata();
@@ -500,12 +498,12 @@ public final class AutomataOnlineSynchronizer
 		return -1;
 	}
 
-	// Compares int arrays, except for the last element (the status field)
+	// Compares int arrays, except for the last elements (the status field)
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
 	{
 
 		// Assume that the last element is a status field
-		for (int i = 0; i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
+		for (int i = 0; i < (firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA); i++)
 		{
 			if (firstArray[i] != secondArray[i])
 			{
