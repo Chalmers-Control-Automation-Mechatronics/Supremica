@@ -187,15 +187,16 @@ public class AutomatonSplit
 		{
 			logger.error("Error when reducing automaton " + supervisor + ", " + ex);
 		}
-
+		
 		// Give the new automaton an appropriate comment
 		//result.setComment("red(" + supervisor.getComment() + ")");
-		result.setName(null);
+		//result.setName(null);
 		result.setComment("red(" + supervisor.getName() + ")");
-
+		//result.setName("red(" + supervisor.getName() + ")");
+		
 		// Set the right type
 		result.setType(supervisor.getType());  // should be a supervisor...
-
+		
 		if (supervisor.nbrOfStates() < result.nbrOfStates())
 			return supervisor;
 		else
@@ -221,6 +222,7 @@ public class AutomatonSplit
 
 		// Set comment and return
 		Automaton result = minimizer.getMinimizedAutomaton();
+		result.setName(null);
 		result.setComment(automaton + "\\" + restrictAlphabet);
 		return result;
 	}

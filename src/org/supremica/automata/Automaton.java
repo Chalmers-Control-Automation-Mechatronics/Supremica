@@ -121,7 +121,8 @@ public class Automaton
 
 		type = orgAut.type;
 
-		setName(orgAut.getName());
+		if (orgAut.hasName())
+			setName(orgAut.getName());
 		setComment(orgAut.getComment());
 
 		// Create all states
@@ -210,10 +211,12 @@ public class Automaton
 	public void setName(String name)
 		throws IllegalArgumentException
 	{
+		/*
 		if (name == null)
 		{
 			throw new IllegalArgumentException("Name must be non-null");
 		}
+		*/
 
 		String oldName = this.name;
 
@@ -222,9 +225,12 @@ public class Automaton
 		notifyListeners(AutomatonListeners.MODE_AUTOMATON_RENAMED, oldName);
 	}
 
+	/**
+	 * Returns the name of the automaton, or, if there is no name, returns the comment
+	 */
 	public String getName()
 	{
-		if (name == null)
+		if (name == null || ((getComment() != "") && (name == "")))
 		{
 			// This solved some ugly problems...
 			// but this isn't all that beautiful either... /hguo
@@ -237,11 +243,17 @@ public class Automaton
 		return name;
 	}
 
+	/**
+	 * Returns true if the automaton has a name (not comment) that is not null or empty.
+	 */
 	public boolean hasName()
 	{
 		return !(name == null || name == "");
 	}
 
+	/**
+	 * Returns the comment of the automaton.
+	 */
 	public String getComment()
 	{
 		if (comment == null)

@@ -1,50 +1,50 @@
 /*
- *  Supremica Software License Agreement
+ * Supremica Software License Agreement
  *
- *  The Supremica software is not in the public domain
- *  However, it is freely available without fee for education,
- *  research, and non-profit purposes.  By obtaining copies of
- *  this and other files that comprise the Supremica software,
- *  you, the Licensee, agree to abide by the following
- *  conditions and understandings with respect to the
- *  copyrighted software:
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes. By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
  *
- *  The software is copyrighted in the name of Supremica,
- *  and ownership of the software remains with Supremica.
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
  *
- *  Permission to use, copy, and modify this software and its
- *  documentation for education, research, and non-profit
- *  purposes is hereby granted to Licensee, provided that the
- *  copyright notice, the original author's names and unit
- *  identification, and this permission notice appear on all
- *  such copies, and that no charge be made for such copies.
- *  Any entity desiring permission to incorporate this software
- *  into commercial products or to use it for commercial
- *  purposes should contact:
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
  *
- *  Knut Akesson (KA), knut@supremica.org
- *  Supremica,
- *  Haradsgatan 26A
- *  431 42 Molndal
- *  SWEDEN
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
  *
- *  to discuss license terms. No cost evaluation licenses are
- *  available.
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
  *
- *  Licensee may not use the name, logo, or any other symbol
- *  of Supremica nor the names of any of its employees nor
- *  any adaptation thereof in advertising or publicity
- *  pertaining to the software without specific prior written
- *  approval of the Supremica.
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
  *
- *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
  *
- *  Supremica is owned and represented by KA.
+ * Supremica is owned and represented by KA.
  */
 package org.supremica.automata;
 
@@ -136,6 +136,7 @@ public final class AutomataIndexForm
 		}
 
 		generateStateIndices(theAutomata);
+		// Här blir det fel!
 		generateNextStateTransitionIndices(theAutomata, theAutomaton);
 		generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
 		generateControllableEventsTable(theAutomaton);
@@ -389,7 +390,6 @@ public final class AutomataIndexForm
 
 				// Insert all indices in a tree (sorted)
 				Iterator outgoingArcsIt = currState.outgoingArcsIterator();
-
 				while (outgoingArcsIt.hasNext())
 				{
 					Arc currArc = (Arc) outgoingArcsIt.next();
@@ -408,7 +408,7 @@ public final class AutomataIndexForm
 
 					nextStateTable[currAutomatonIndex][currStateIndex][currEventIndex] = currNextStateIndex;
 
-					// Insert all state that enables the current event into
+					// Insert all states that enables the current event into
 					// enableEventsTable. This could easily be optimized to avoid the search.
 					int i = 0;
 
@@ -418,7 +418,15 @@ public final class AutomataIndexForm
 					}
 
 					enableEventsTable[currAutomatonIndex][currEventIndex][i] = currStateIndex;
-					enableEventsTable[currAutomatonIndex][currEventIndex][i + 1] = Integer.MAX_VALUE;
+					try 
+					{
+						enableEventsTable[currAutomatonIndex][currEventIndex][i + 1] = Integer.MAX_VALUE;
+					}
+					catch (Exception ex)
+					{
+						logger.error("Error in AutomataIndexForm.generateNextStateTransitionIndices. " + ex);
+						// logger.info("Automaton: " + theAutomaton + " automata: " + theAutomata);
+					}
 				}
 
 				outgoingEventsTable[currAutomatonIndex][currStateIndex] = new int[sortedArcs.size() + 1];

@@ -549,8 +549,9 @@ public class AutomataSynthesizer
 		retval.disabledEvents = synthesizer.getDisabledEvents();
 		retval.automaton = synthesizer.getAutomaton();
 
-		// Set an apropriate name...
+		// Set an apropriate name... (the name should be null afterwards)
 		retval.automaton.setComment("sup(" + retval.automaton.getName() + ")");
+		retval.automaton.setName(null);
 
 		// Shall we reduce the supervisor?
 		if (synthesizerOptions.getReduceSupervisors() && synthesizerOptions.doPurge())

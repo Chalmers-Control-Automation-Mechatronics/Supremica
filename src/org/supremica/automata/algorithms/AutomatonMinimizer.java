@@ -229,10 +229,10 @@ public class AutomatonMinimizer
 		}
 
 		// Give the automaton an appropriate comment
-		if (theAutomaton.getName() != "")
+		//if (theAutomaton.getName() != "")
 			newAutomaton.setComment("min(" + theAutomaton.getName() + ")");
-		else
-			newAutomaton.setComment("min(" + theAutomaton.getComment() + ")");
+		//else
+		//    newAutomaton.setComment("min(" + theAutomaton.getComment() + ")");
 
 		return newAutomaton;
 	}

@@ -1510,7 +1510,7 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomataSynthesizer. ", ex);
+				logger.error("Exception in AutomataSynthesizer. " + ex);
 				logger.debug(ex.getStackTrace());
 			}
 		}
