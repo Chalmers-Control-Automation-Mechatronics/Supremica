@@ -146,7 +146,6 @@ public final class AutomataOnlineSynchronizer
 		}
 	}
 
-	// ÄNdrad till public istället för private... för att kunna köra findTransition
 	public final void initialize()
 	{
 		currOutgoingEvents = new int[nbrOfAutomata][];
