@@ -1,13 +1,4 @@
-Known bugs...
+All bugs are reported and stored in the bug datbase,
 
-* Multiple executors won't work properly... especially with the
-ExhaustiveSearch-option. The executor that finds the uncontrollable state
-doesn't stop the other executors!
-
-* The extra state for complement automata has a fix name. If an automaton
-already has a state with that name, bad things happen.
-
-* AutomataExplorer does not show correct set of incoming events.
-
-* Setting the AutomatonType does not work with Java 1.4 beta 3 but it works with Java 1.3.1. The bug shows up on Windows 2000 but not on Windows NT. What about Linux?
+see, http://www.supremica.org/bugtracking
 
