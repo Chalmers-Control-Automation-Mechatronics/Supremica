@@ -83,10 +83,16 @@ public class State
 	private int x = UNDEF_POS;
 	private int y = UNDEF_POS;
 	private int radius = 9;
+	
+	/**
+	 * Contains the indices of the underlying states if this state is composite. 
+	 */
+	private int[] compositeIndices = null;
+
 
 	/** ARASH: this is used to speed up set operations in the AutomatonSynthesizerSingleFixpoint algorithm */
 	public int sethelper;
-
+	
 	// private StateNode stateNode = null;
 	private LinkedList incomingArcs = new LinkedList();
 	private LinkedList outgoingArcs = new LinkedList();
@@ -120,7 +126,7 @@ public class State
 	public State(State otherState)
 	{
 		this();
-
+		
 		index = otherState.index;
 		id = otherState.id;
 		name = otherState.name;
@@ -457,7 +463,7 @@ public class State
 		}
 	}
 
-	private ArcSet getArcSet(Arc theArc)
+	protected ArcSet getArcSet(Arc theArc)
 	{
 		State toState = theArc.getToState();
 
@@ -670,8 +676,6 @@ public class State
 		return null;
 	}
 
-
-
 	public boolean contains(int x1, int y1)
 	{
 		int radius2 = radius * radius;
@@ -689,8 +693,8 @@ public class State
 
 		return listeners;
 	}
-
-	private void notifyListeners()
+		
+	protected void notifyListeners()
 	{
 		if (listeners != null)
 		{

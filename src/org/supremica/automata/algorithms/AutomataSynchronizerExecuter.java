@@ -62,6 +62,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.State;
+import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabeledEvent;
 import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
 
@@ -234,7 +235,7 @@ public final class AutomataSynchronizerExecuter
 		{
 			automataIndices[i++] = autIt.nextAutomaton().getIndex();
 		}
-
+		
 		helper.selectAutomata(automataIndices);
 
 		// FIXA!
@@ -621,7 +622,7 @@ public final class AutomataSynchronizerExecuter
 
 		// Get the first state to process
 		int[] currState = helper.getStateToProcess();
-
+		
 		// main loop
 		while ((currState != null) && !stopRequested)
 		{
@@ -633,7 +634,7 @@ public final class AutomataSynchronizerExecuter
 
 			// Update currEnabledEvents
 			enabledEvents(currState);
-
+			
 			// Is this state deadlocked?
 			if (syncOptions.buildAutomaton() && currEnabledEvents[0] == Integer.MAX_VALUE)
 			{
@@ -725,6 +726,7 @@ public final class AutomataSynchronizerExecuter
 
 			// Get a new state to process from the helper!
 			currState = helper.getStateToProcess();
+			
 			if (currState == null)
 			{
 				// This thread tells the other threads that it failed to get
@@ -803,9 +805,9 @@ public final class AutomataSynchronizerExecuter
 			int[][] currStateTable = helper.getStateTable();
 			int stateNumber = 0;
 			ExecutionDialog executionDialog = helper.getExecutionDialog();
-			
+
 			State rememberDisabledEventsState = null;
-			
+
 			if (rememberDisabledEvents)
 			{
 				rememberDisabledEventsState = theAutomaton.createAndAddUniqueState("qf");
@@ -837,7 +839,7 @@ public final class AutomataSynchronizerExecuter
 				if (currStateTable[i] != null)
 				{
 					int[] currState = currStateTable[i];
-					State newState = null;
+					CompositeState newState = null;
 
 					//newState.setAutomataSynchronizerExecutorIndex(i);
 
@@ -853,11 +855,11 @@ public final class AutomataSynchronizerExecuter
 							sb.append(stateTable[j][currState[j]].getName());
 						}
 
-						newState = new State(sb.toString());
+						newState = new CompositeState(sb.toString(), currState, helper.getAutomata());
 					}
 					else
 					{
-						newState = new State("q" + stateNumber++);
+						newState = new CompositeState("q" + stateNumber++, currState, helper.getAutomata());
 					}
 
 					newState.setAutomataSynchronizerExecutorIndex(i);
@@ -941,6 +943,7 @@ public final class AutomataSynchronizerExecuter
 								Arc newArc = new Arc(thisState, nextState, theEvent);
 
 								theAutomaton.addArc(newArc);
+								newArc.updateFiringAutomata();
 							}
 						}
 						catch (Exception e)
@@ -953,8 +956,8 @@ public final class AutomataSynchronizerExecuter
 
 						currEventIndex = currEnabledEvents[++i];
 					}
-					
-					
+
+
 					if (rememberDisabledEvents)
 					{
 						i = 0;
@@ -962,14 +965,14 @@ public final class AutomataSynchronizerExecuter
 						// Handle all events
 						while (currDisabledEventIndex != Integer.MAX_VALUE)
 						{
-							LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);							
+							LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);
 							Arc newArc = new Arc(thisState, rememberDisabledEventsState, theEvent);
 
 							theAutomaton.addArc(newArc);
-	
-							currDisabledEventIndex = currDisabledEvents[++i];							
-						}	
-					}			
+
+							currDisabledEventIndex = currDisabledEvents[++i];
+						}
+					}
 				}
 			}
 
@@ -991,7 +994,7 @@ public final class AutomataSynchronizerExecuter
 				// Changed the default type to specification
 				theAutomaton.setType(AutomatonType.Specification);
 			}
-
+	
 			return true;
 		}
 		catch (OutOfMemoryError ex)

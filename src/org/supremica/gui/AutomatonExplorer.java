@@ -58,9 +58,13 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
+import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabelTrace;
 import org.supremica.log.*;
 
+/**
+ * This class is responsible for the "exploreStates"-window. 
+ */
 public class AutomatonExplorer
 	extends JFrame
 	implements AutomatonListener
@@ -72,13 +76,13 @@ public class AutomatonExplorer
 	private StateViewer stateViewer;
 	private ExplorerController controller;
 	private VisualProject theProject;
-
+	
 	public AutomatonExplorer(VisualProject theProject, Automaton theAutomaton)
 		throws Exception
-	{
+	{	
 		this.theProject = theProject;
 		this.theAutomaton = theAutomaton;
-
+		
 		theAutomaton.getListeners().addListener(this);
 		setBackground(Color.white);
 
@@ -215,6 +219,7 @@ public class AutomatonExplorer
 class StateViewer
 	extends JPanel
 {
+	private static Logger logger = LoggerFactory.createLogger(StateViewer.class);
 	private Automaton theAutomaton;
 	private State currState;
 	private EventList forwardEvents;
@@ -585,6 +590,7 @@ class StateDisplayer
 	private JLabel stateCost = new JLabel();
 	private JLabel stateId = new JLabel();
 	private JLabel stateName = new JLabel();
+	private JLabel compositeCosts = new JLabel();
 
 	private void changeStateAccepting(boolean b)
 	{
@@ -652,6 +658,7 @@ class StateDisplayer
 		statusBox.add(stateCost);
 		statusBox.add(stateId);
 		statusBox.add(stateName);
+		statusBox.add(compositeCosts);
 
 		JScrollPane boxScroller = new JScrollPane(statusBox);
 
@@ -671,6 +678,13 @@ class StateDisplayer
 		stateCost.setText("cost: " + currState.getCost());
 //		stateId.setText("id: " + currState.getId());
 		stateName.setText("name: " + currState.getName());
+		
+		StringBuffer str = new StringBuffer();
+		int[] costs = ((CompositeState) currState).getCompositeCosts();
+		for (int i=0; i<costs.length-1; i++)
+			str.append(costs[i] + "  ");
+		str.append(costs[costs.length-1] + "");
+		compositeCosts.setText("composite costs = [" + str + "]");
 	}
 }
 
@@ -685,7 +699,7 @@ class ExplorerController
 	private VisualProject theProject;
 
 	public ExplorerController(VisualProject theProject, StateViewer stateViewer, Automaton theAutomaton)
-	{
+	{		
 		setLayout(new BorderLayout());
 
 		this.theProject = theProject;

@@ -160,14 +160,19 @@ public class StateSet
 		return buf.toString();
 	}
 
-	// Return an arbitrary element. Note, assumes that at least one exists
+	/**
+	 *	@return an arbitrary, not yet iterated element. Note, assumes that at least one exists
+	 */
 	public State get()
 	{
 		return (State)iterator().next();
 	}
 
-	// Create a new state named as the composition of the states in this set
-	// Should use the globally defined state separator (and thus, this method should not even be here)
+	/** 
+	 *	Creates a new state named as the composition of the states in this set
+	 *  Should use the globally defined state separator (and thus, this method 
+	 *	should not even be here)
+	 */
 	public State createNewState()
 	{
 		// boolean i = false;	// initial?

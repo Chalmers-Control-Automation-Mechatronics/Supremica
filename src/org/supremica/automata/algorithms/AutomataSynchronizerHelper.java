@@ -53,6 +53,7 @@ import org.supremica.gui.*;
 import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
@@ -336,7 +337,7 @@ public final class AutomataSynchronizerHelper
 	 */
 	public void addState(int[] fromState, int[] toState, int eventIndex)
 		throws Exception
-	{
+	{			
 		if (rememberTrace)
 		{
 			fromStateList.addLast(fromState);

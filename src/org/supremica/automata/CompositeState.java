@@ -51,22 +51,63 @@ package org.supremica.automata;
 
 import java.util.*;
 
-public class CompositeState
+public class CompositeState extends State
 {
-	private ArrayList theStates;
+	//private ArrayList theStates;
+//	private int[] theStates;
+	
+	/** The indices of the underlying states */
+	private int[] compositeIndices = null;
+	
+	/** The costs corresponding to the underlying states */
+	private int[] compositeCosts = null;
 
-	public CompositeState(int capacity)
+	// Behövs den??? )(och theStates också...)
+/*	public CompositeState(int capacity)
 	{
 		theStates = new ArrayList(capacity);
 	}
-
-	public CompositeState(CompositeState state)
+*/	
+	public CompositeState(State state) 
 	{
-
-		// Todo
+		super(state);	
+	}
+	
+	public CompositeState(String id) {
+		super(id);	
+	}
+	
+	public CompositeState(String id, int[] indices) 
+	{
+		this(id);
+		initialize(indices);
+	}
+	
+	public CompositeState(String id, int[] indices, Automata theAutomata) 
+	{
+		this(id);
+		initialize(indices, theAutomata);
+	}
+	
+	public void initialize(int[] indices) 
+	{
+		// -2 since the last two indices correspond to something funny, not the nbrs of the underlying states. 
+		compositeIndices = new int[indices.length-2];
+//		nextCosts = new int[indices.length-2];
+//		theStates = new int[indices.length-2];
+		compositeCosts = new int[indices.length-2];
+	}
+	
+	public void initialize(int[] indices, Automata theAutomata) 
+	{
+		initialize(indices);
+		
+		for (int i=0; i<compositeCosts.length; i++) 
+			compositeCosts[i] = theAutomata.getAutomatonAt(i).getStateWithIndex(indices[i]).getCost();
+			
 	}
 
-	public State getStateAt(int index)
+/*	public State getStateAt(int index)
 	{
 		return (State) theStates.get(index);
 	}
@@ -75,14 +116,54 @@ public class CompositeState
 	{
 		theStates.add(index, state);
 	}
-
-	public boolean equals(Object state)
+*/	
+	/**
+	 *	Returns the indices of the underlying states.
+	 */
+	public int[] getCompositeIndices() { return compositeIndices; }
+	
+	/**
+	 *	Stores the indices of the constituting states. 
+	 */
+	protected void setCompositeIndices(int[] indices) 
+	{
+		if (compositeIndices == null) 
+			initialize(indices);
+		
+		for (int i=0; i<compositeIndices.length; i++) 
+			compositeIndices[i] = indices[i];
+	}
+	
+	/** 
+	 *	Returns the costs corresponding to the underlying states. Overrides 
+	 *	the @link getCost() method in org.supremica.automata.State.java. 
+	 */
+	public int[] getCompositeCosts() { return compositeCosts; }
+	
+	/**
+	 *	Returns the cost accumulated when this state is reached. Note that the 
+	 *	path to the state is of importance. 
+	 */
+/*	public int getAccumulatedCost() { return accumulatedCost; }
+	
+	public void setAccumulatedCost(int cost) {} 
+*/	
+	/**
+	 *	Returns the cost vector representing the cost for choosing to move every 
+	 *	one of the composing automata. 
+	 */
+/*	public int[] getNextCosts() { return nextCosts; }
+	
+	public void setNextCosts(int[] costs) {}
+*/	
+/*	public boolean equals(Object state)
 	{
 		return theStates.equals(((CompositeState) state).theStates);
 	}
-
-	public int hashCode()
+*/
+/*	public int hashCode()
 	{
 		return theStates.hashCode();
-	}
+	}	
+*/
 }

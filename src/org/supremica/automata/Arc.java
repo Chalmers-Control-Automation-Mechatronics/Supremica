@@ -48,8 +48,12 @@
  */
 package org.supremica.automata;
 
+import org.supremica.log.*;
+
 public class Arc
 {
+	private static Logger logger = LoggerFactory.createLogger(Arc.class);
+	
 	private LabeledEvent event;
 	private State fromState;
 	private State toState;
@@ -66,6 +70,12 @@ public class Arc
 	private int beginY = -1;
 	private int endX = -1;
 	private int endY = -1;
+	
+	/**
+	 * This variable indicates which (initial) automata are "the brains behind" 
+	 * this Arc. It has only a reasonable value if synchronization is performed. 
+	 */
+	private boolean[] firingAutomata = null;
 
 	private Arc(State from, State to)
 		throws IllegalArgumentException
@@ -273,6 +283,40 @@ public class Arc
 		return angle;
 	}
 	
+	/**
+	 *	Checks which initial automata have changed their states and updates the 
+	 *	firingAutomata accordingly.
+	 *
+	 *	@param fromState The starting point of the Arc
+	 *	@param toState The ending point of the Arc
+	 */
+	public void updateFiringAutomata() 
+	{
+		if (fromState instanceof CompositeState)
+		{
+			try 
+			{
+				int[] fromStateInd = ((CompositeState) fromState).getCompositeIndices();
+				int[] toStateInd = ((CompositeState) toState).getCompositeIndices();
+				
+				initFiringAutomata(fromStateInd.length);
+				
+				for (int i=0; i<fromStateInd.length; i++)
+				{
+					if (fromStateInd[i] != toStateInd[i])
+						firingAutomata[i] = true;
+				}
+			}
+			catch (NullPointerException ex) 
+			{
+				logger.error("The composite indices are not defined.");
+			}
+		}
+		else
+			logger.error("The state is not composite. Synchronize first.");
+
+	}
+	
 	// For debugging (etc)
 	public String toString()
 	{
@@ -286,5 +330,18 @@ public class Arc
 		sbuf.append(getToState().toString());
 		sbuf.append(">");
 		return sbuf.toString();
+	}
+	
+	/**
+	 *	Initializes the array of firingAutomata
+	 *
+	 *	@param size
+	 */
+	private void initFiringAutomata(int size)
+	{
+		firingAutomata = new boolean[size];	
+		
+		for (int i=0; i<size; i++)
+			firingAutomata[i] = false;
 	}
 }
