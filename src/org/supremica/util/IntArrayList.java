@@ -282,7 +282,7 @@ public final class IntArrayList
 	}
 
 
-	private static String toString(int[] theArray)
+	public static String toString(int[] theArray)
 	{
 		StringBuffer sb = new StringBuffer();
 		if (theArray == null)
@@ -290,13 +290,13 @@ public final class IntArrayList
 			sb.append("[null]");
 			return sb.toString();
 		}
-	
+
 		sb.append("[");
 		for (int i = 0; i < theArray.length; i++)
 		{
 			if (i != 0)
 			{
-				sb.append(" ");	
+				sb.append(" ");
 			}
 			sb.append(theArray[i]);
 		}
@@ -317,7 +317,7 @@ public final class IntArrayList
 		{
 			currIndex = currMinBlockIndex;
 			blockIterator = blocks.iterator();
-			currBlock = (int[][])blockIterator.next();			
+			currBlock = (int[][])blockIterator.next();
 			currSize = size();
 			currElement = 0;
 		}
@@ -387,18 +387,18 @@ public final class IntArrayList
 		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
 
 		System.out.println(theList.blocksToString());
-		
-		
-		System.out.println("new");
-		
-		theList.removeFirst();
-		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());	
-		System.out.println(theList.blocksToString());		
 
-		theList.removeLast();	
+
+		System.out.println("new");
+
+		theList.removeFirst();
 		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
-		System.out.println(theList.blocksToString());	
-		
+		System.out.println(theList.blocksToString());
+
+		theList.removeLast();
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+		System.out.println(theList.blocksToString());
+
 		theList.addFirst(dummy0);
 		theList.addLast(dummy3);
 
@@ -406,27 +406,27 @@ public final class IntArrayList
 		System.out.println(theList.toString(theList.getLast()));
 
 		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
-		System.out.println(theList.blocksToString());	
+		System.out.println(theList.blocksToString());
 
 		theList.addFirst(dummy3);
 		theList.addLast(dummy0);
 
 		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
-		System.out.println(theList.blocksToString());	
+		System.out.println(theList.blocksToString());
 
 
 		theList.removeFirst();
-		theList.removeLast();						
+		theList.removeLast();
 		theList.removeFirst();
-		theList.removeLast();	
+		theList.removeLast();
 		theList.removeFirst();
 		theList.removeLast();
 
 		theList.add(dummy2);
 		theList.add(dummy2);
-		
+
 		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
-		System.out.println(theList.blocksToString());	
+		System.out.println(theList.blocksToString());
 	}
 
 }

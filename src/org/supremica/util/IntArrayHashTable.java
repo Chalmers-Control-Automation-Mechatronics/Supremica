@@ -51,6 +51,8 @@ package org.supremica.util;
 
 import org.supremica.automata.AutomataIndexFormHelper;
 
+import java.util.*;
+
 /**
  * Insert <int_1, int_2, int_3, ..., int_n, int_status>
  */
@@ -244,6 +246,16 @@ public final class IntArrayHashTable
         return true;
 	}
 
+  	public int[][] getTable()
+   	{
+		return theTable;
+    }
+
+    public Iterator iterator()
+    {
+		return new IntArrayHashTableIterator();
+	}
+
  	public String toString()
   	{
 		StringBuffer theString = new StringBuffer();
@@ -295,10 +307,80 @@ public final class IntArrayHashTable
 		}
  		System.out.println("theHashTable: \n" + theHashTable);
 
+ 		Iterator hashIt = theHashTable.iterator();
+ 		while (hashIt.hasNext())
+ 		{
+			int[] currElement = (int[])hashIt.next();
+			System.out.println(IntArrayList.toString(currElement));
+		}
+
  	}
 
-  	public int[][] getTable()
-   	{
-		return theTable;
-    }
+
+	private class IntArrayHashTableIterator
+		implements Iterator
+	{
+		private int currIndex = -1;
+		private int nextIndex = -1;
+
+		public IntArrayHashTableIterator()
+		{
+		}
+
+		public boolean hasNext()
+		{
+			if (nextIndex == -1)
+			{
+				nextIndex = currIndex + 1;
+				int size = theTable.length;
+				while (nextIndex < size && theTable[nextIndex] == null)
+				{
+					nextIndex++;
+				}
+
+				if (nextIndex == size)
+				{
+					nextIndex = Integer.MAX_VALUE;
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			else
+			{
+				if (nextIndex == Integer.MAX_VALUE)
+				{
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+		}
+
+		public Object next()
+		{
+			if (hasNext())
+			{
+				Object currObject = theTable[nextIndex];
+				currIndex = nextIndex;
+				nextIndex = -1;
+				return currObject;
+			}
+			else
+			{
+				throw new NoSuchElementException();
+			}
+		}
+
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
 }
