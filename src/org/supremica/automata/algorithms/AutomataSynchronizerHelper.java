@@ -68,7 +68,7 @@ public final class AutomataSynchronizerHelper
 
    	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerHelper.class.getName());
 
-  	private LinkedList statesToProcess;
+	private IntArrayList statesToProcess;
 	private int nbrOfStatesToProcess = 0;
 
   	// Two locks are used to limit the access the statesToProcess
@@ -122,7 +122,8 @@ public final class AutomataSynchronizerHelper
 		this.theAutomata = theAutomata;
 		this.syncOptions = syncOptions;
 		verboseMode = syncOptions.verboseMode();
-    	statesToProcess = new LinkedList();
+
+		statesToProcess  = new IntArrayList();
 		nbrOfStatesToProcess = 0;
 
        	theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
@@ -232,10 +233,10 @@ public final class AutomataSynchronizerHelper
 				{
 					while (!(Arrays.equals((int[]) fromStateList.getLast(),(int[]) stateTrace.getLast())))
 						stateTrace.removeLast();
-					
+
 					if (stateTrace.size() == 0)
 						thisCategory.error("Error when recording trace.");
-					
+
 					fromStateList.removeLast();
 					stateTrace.addLast(statesToProcess.getLast());
 				}
@@ -250,12 +251,12 @@ public final class AutomataSynchronizerHelper
 				if (coExecute)
 				{
 					// Depth first search
-					return (int[])statesToProcess.removeLast();
+					return statesToProcess.removeLast();
 				}
 				else
 				{
-					// Width first search
-					return (int[])statesToProcess.removeFirst();
+					// Breath first search
+					return statesToProcess.removeFirst();
 				}
    		}
     }
@@ -274,7 +275,7 @@ public final class AutomataSynchronizerHelper
             addStatus(newState);
         	addStateToProcess(newState);
 			++nbrOfAddedStates;
-			
+
 			/*
 			if (verboseMode)
 			    if (nbrOfAddedStates % 10000 == 0)
@@ -293,7 +294,7 @@ public final class AutomataSynchronizerHelper
 		{
 			if (cancelDialog != null)
 				cancelDialog.updateCounter(nbrOfCheckedStates);
-			
+
 			/*
 			if (verboseMode)
 				if (nbrOfCheckedStates % 10000 == 0)
