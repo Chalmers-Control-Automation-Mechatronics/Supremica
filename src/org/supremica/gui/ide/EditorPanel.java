@@ -98,28 +98,32 @@ class EditorPanel
 	}
 
 
-	public void setActiveComponentEditorPanel(JPanel currPanel)
+	public void setActiveComponentEditorPanel(JPanel newPanel)
 	{
-		System.err.println("setActiveComponentEditorPanel");
+//		System.err.println("setActiveComponentEditorPanel");
 
 		Component oldPanel = splitPanelHorizontal.getRightComponent();
-		if (oldPanel != currPanel)
+		if (oldPanel != newPanel)
 		{
-			System.err.println("Switching panel");
+//			System.err.println("Switching panel");
+			Dimension oldSize = emptyComponentEditorPanel.getSize();
 
 			if (oldPanel != null)
 			{
 				splitPanelHorizontal.remove(oldPanel);
+				oldSize = oldPanel.getSize();
 			}
 
-			if (currPanel == null)
+			if (newPanel == null)
 			{
+				emptyComponentEditorPanel.setPreferredSize(oldSize);
 				splitPanelHorizontal.setRightComponent(emptyComponentEditorPanel);
 			}
 			else
 			{
-				splitPanelHorizontal.setRightComponent(currPanel);
-				System.err.println("setRightPanel");
+				newPanel.setPreferredSize(oldSize);
+				splitPanelHorizontal.setRightComponent(newPanel);
+//				System.err.println("setRightPanel");
 			}
 		}
 

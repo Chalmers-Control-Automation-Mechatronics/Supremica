@@ -47,7 +47,7 @@ public class ComponentEditorPanel
 		surface = new ControlledSurface(toolbar, this);
 
 		surface.setPreferredSize(new Dimension(500, 500));
-		surface.setMinimumSize(new Dimension(0, 0));
+		surface.setMinimumSize(new Dimension(100, 100));
 
 		events = new EditorEvents(module, element, this);
 		menu = new EditorMenu(surface, this);
