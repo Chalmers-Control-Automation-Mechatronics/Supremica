@@ -6,6 +6,7 @@
 <property name="testssrc" value="tests/src"/>
 <property name="runtimesoftplcsrc" value="runtime/softplc/src"/>
 <property name="build" value="build"/>
+<property name="platform" value="platform"/>
 <property name="testsbuild" value="tests/build"/>
 <property name="runtimesoftplcbuild" value="runtime/softplc/build"/>
 <property name="dist"  value="dist"/>
@@ -427,6 +428,10 @@
 	<chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>	
 	<copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaProperties.cfg" perm="644"/>	
+	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>	
+	<chmod file="${dist}/buddy.dll" perm="644"/>
+	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>	
+	<chmod file="${dist}/libbuddy.so" perm="644"/>
 </target>
 
 <target name="startfiles_supremica_student">
