@@ -12,7 +12,7 @@ import java.awt.GridBagConstraints;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.actions.Actions;
 
-class MainPanel
+abstract class MainPanel
 	extends JPanel
 {
 	private IDEToolBar thisToolBar = null;
@@ -60,10 +60,7 @@ class MainPanel
 		return constraints;
 	}
 
-	public void addToolBarEntries(IDEToolBar toolbar)
-	{
-		return; //Default is to do nothing
-	}
+	public abstract void addToolBarEntries(IDEToolBar toolbar);
 
 	public void setRightComponent(JComponent newComponent)
 	{

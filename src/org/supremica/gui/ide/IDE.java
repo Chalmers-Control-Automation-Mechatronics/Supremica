@@ -31,7 +31,6 @@ public class IDE
 	}
 	private static Logger logger = LoggerFactory.createLogger(IDE.class);
 	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
-//	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 
 	private Actions theActions;
 
