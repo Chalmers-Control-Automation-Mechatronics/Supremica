@@ -294,7 +294,27 @@
 			${jgrafchart_basedir}/**,
 			${supremica_basedir}/external/comInterfaces/**,
 			${supremica_basedir}/sattline/**,
-			${supremica_basedir}/supervisor/**"	
+			${supremica_basedir}/supervisor/**,	
+			${supremica_basedir}/functionblocks/xsd/**"	
+		source="1.4"
+	/>
+</target>
+
+<!-- Compile:
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile_functionblocks_jaxb">
+	<javac
+		srcdir="${src}"
+		destdir="${build}"
+		classpath="${lib}/${unjared}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false"
+		nowarn="true"
+		includes="
+			${supremica_basedir}/functionblocks/xsd/**"		
 		source="1.4"
 	/>
 </target>
@@ -560,7 +580,7 @@
 	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
 </target>
 
-<target name="jar_functionblocks_jaxb">
+<target name="jar_functionblocks_jaxb" depends="compile_functionblocks_jaxb">
 	<jar jarfile="${lib}/functionblocks_jaxb.jar"> 
 		<fileset dir="${build}/">
 			<include name="org/w3/**"/>

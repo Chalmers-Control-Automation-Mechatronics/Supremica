@@ -24,9 +24,17 @@
         <pathelement path="${jwsdp.classpath}"/>
       </classpath>
     </taskdef>
-    <xjc target="${src}" extension="true" removeOldOutput="yes">
-      <schema dir="${xsd_61499}" includes="DataType.xsd FBMGT.xsd LibraryElement.xsd"/>
-      <produces dir="${src}/org/supremica/functionblocks/xsd/"/>
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.datatype">
+      <schema dir="${xsd_61499}" includes="DataType.xsd"/>
+      <produces dir="${src}/org/supremica/functionblocks/xsd/datatype"/>
+    </xjc>
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.fbmanagement">
+      <schema dir="${xsd_61499}" includes="FBMGT.xsd"/>
+      <produces dir="${src}/org/supremica/functionblocks/xsd/fbmanagement"/>
+    </xjc>
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.libraryelement">
+      <schema dir="${xsd_61499}" includes="LibraryElement.xsd"/>
+      <produces dir="${src}/org/supremica/functionblocks/xsd/libraryelement"/>
     </xjc>
   </target>
 
