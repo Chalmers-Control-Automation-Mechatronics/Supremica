@@ -64,12 +64,10 @@ abstract class SynchronizationPanel
 
 class SynchronizationDialogStandardPanel
 	extends SynchronizationPanel
-	implements ActionListener
 {
 	private JCheckBox forbidUnconStatesBox;
-	private JCheckBox expandForbiddenStatesBox;
 	private JCheckBox buildAutomatonBox;
-	private JCheckBox rememberDisabledEventsBox;
+	private JCheckBox useShortStateNamesBox;
 
 	public SynchronizationDialogStandardPanel()
 	{
@@ -78,28 +76,91 @@ class SynchronizationDialogStandardPanel
 		forbidUnconStatesBox = new JCheckBox("Mark uncontrollable states as forbidden");
 		forbidUnconStatesBox.setToolTipText("If checked, uncontrollable states become forbidden " +
 											"in the synchronization");
-		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
-		expandForbiddenStatesBox.setToolTipText("If cheched, transitions from forbidden states are " + 
-												"examined, otherwise, the states are considered terminal");
-		expandForbiddenStatesBox.addActionListener(this);
-		rememberDisabledEventsBox = new JCheckBox("Add disabled transitions to a forbidden state");
-		rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in the plant that are disabled by the specification");
 		buildAutomatonBox = new JCheckBox("Build a full automaton model");
 		buildAutomatonBox.setToolTipText("If not checked, the only output is statistics about the operation (saves computation)");
+		useShortStateNamesBox = new JCheckBox("Use short state names");
+		useShortStateNamesBox.setToolTipText("Give the states in the composition short, abstract names instead of keeping the original state names");
 
 		standardBox.add(forbidUnconStatesBox);
-		standardBox.add(expandForbiddenStatesBox);
-		standardBox.add(rememberDisabledEventsBox);
 		standardBox.add(buildAutomatonBox);
+		standardBox.add(useShortStateNamesBox);
 		this.add(standardBox);
 	}
 
 	public void update(SynchronizationOptions synchronizationOptions)
 	{
 		forbidUnconStatesBox.setSelected(synchronizationOptions.forbidUncontrollableStates());
+		buildAutomatonBox.setSelected(synchronizationOptions.buildAutomaton());
+		useShortStateNamesBox.setSelected(synchronizationOptions.useShortStateNames());
+	}
+
+	public void regain(SynchronizationOptions synchronizationOptions)
+	{
+		synchronizationOptions.setForbidUncontrollableStates(forbidUnconStatesBox.isSelected());
+		synchronizationOptions.setBuildAutomaton(buildAutomatonBox.isSelected());
+		synchronizationOptions.setUseShortStateNames(useShortStateNamesBox.isSelected());
+	}
+}
+
+class SynchronizationDialogAdvancedPanel
+	extends SynchronizationPanel
+	implements ActionListener
+{
+	private JComboBox synchronizationTypeBox;
+	private JCheckBox expandForbiddenStatesBox;
+	private JCheckBox rememberDisabledEventsBox;
+
+	public SynchronizationDialogAdvancedPanel()
+	{
+		this.setLayout(new BorderLayout());
+
+		synchronizationTypeBox = new JComboBox(SynchronizationType.toArray());
+		synchronizationTypeBox.setToolTipText("Choose the type of composition");
+		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
+		expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " + 
+												"examined, otherwise, the states are considered terminal");
+		expandForbiddenStatesBox.addActionListener(this);
+		rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
+		rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in a plant that are disabled by a specification");
+
+		JPanel choicePanel = new JPanel();
+		choicePanel.setLayout(new FlowLayout());
+		choicePanel.add(synchronizationTypeBox);
+		this.add("North", choicePanel);
+
+		JPanel checkBoxPanel = new JPanel();
+		checkBoxPanel.setLayout(new FlowLayout());
+		Box checkBoxBox = Box.createVerticalBox();
+		//checkBoxBox.setLayout(new FlowLayout());
+		checkBoxBox.add(expandForbiddenStatesBox);
+		checkBoxBox.add(rememberDisabledEventsBox);
+		checkBoxPanel.add(checkBoxBox);
+		this.add("Center", checkBoxPanel);
+
+		/*
+		Box advancedBox = Box.createVerticalBox();
+
+		synchronizationTypeBox = new JComboBox(SynchronizationType.toArray());
+		synchronizationTypeBox.setToolTipText("Choose the type of composition");
+		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
+		expandForbiddenStatesBox.setToolTipText("If cheched, transitions from forbidden states are " + 
+												"examined, otherwise, the states are considered terminal");
+		expandForbiddenStatesBox.addActionListener(this);
+		rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
+		rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in a plant that are disabled by a specification");
+
+		advancedBox.add(synchronizationTypeBox);
+		advancedBox.add(expandForbiddenStatesBox);
+		advancedBox.add(rememberDisabledEventsBox);
+		this.add(advancedBox);
+		*/
+	}
+
+	public void update(SynchronizationOptions synchronizationOptions)
+	{
+		synchronizationTypeBox.setSelectedItem(synchronizationOptions.getSynchronizationType());
 		expandForbiddenStatesBox.setSelected(synchronizationOptions.expandForbiddenStates());
 		rememberDisabledEventsBox.setSelected(synchronizationOptions.rememberDisabledEvents());
-		buildAutomatonBox.setSelected(synchronizationOptions.buildAutomaton());
 
 		if (!expandForbiddenStatesBox.isSelected())
 		{
@@ -114,10 +175,9 @@ class SynchronizationDialogStandardPanel
 
 	public void regain(SynchronizationOptions synchronizationOptions)
 	{
-		synchronizationOptions.setForbidUncontrollableStates(forbidUnconStatesBox.isSelected());
+		synchronizationOptions.setSynchronizationType((SynchronizationType) synchronizationTypeBox.getSelectedItem());
 		synchronizationOptions.setExpandForbiddenStates(expandForbiddenStatesBox.isSelected());
 		synchronizationOptions.setRememberDisabledEvents(rememberDisabledEventsBox.isSelected());
-		synchronizationOptions.setBuildAutomaton(buildAutomatonBox.isSelected());
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -131,32 +191,6 @@ class SynchronizationDialogStandardPanel
 		{
 			rememberDisabledEventsBox.setEnabled(true);			
 		}
-	}
-}
-
-class SynchronizationDialogAdvancedPanel
-	extends SynchronizationPanel
-{
-	private JComboBox synchronizationTypeBox;
-
-	public SynchronizationDialogAdvancedPanel()
-	{
-		Box advancedBox = Box.createVerticalBox();
-
-		synchronizationTypeBox = new JComboBox(SynchronizationType.toArray());
-
-		advancedBox.add(synchronizationTypeBox);
-		this.add(advancedBox);
-	}
-
-	public void update(SynchronizationOptions synchronizationOptions)
-	{
-		synchronizationTypeBox.setSelectedItem(synchronizationOptions.getSynchronizationType());
-	}
-
-	public void regain(SynchronizationOptions synchronizationOptions)
-	{
-		synchronizationOptions.setSynchronizationType((SynchronizationType) synchronizationTypeBox.getSelectedItem());
 	}
 }
 

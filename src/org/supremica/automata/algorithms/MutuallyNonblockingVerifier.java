@@ -399,13 +399,14 @@ public class MutuallyNonblockingVerifier
 				addSafeEvents(currSafeEvents, currSynchAutomata, theAutomataCopy);
 				logger.info("Checking " + currSynchAutomata + ". \nSafe events: " + currSafeEvents + ".");
 
-				// BELOW COMES THE MONOLITHIC-APPROACH SPECIFIC CODE!
+				// BELOW COMES THE MONOLITHIC-APPROACH-SPECIFIC CODE!
 				// Synchronize!
 				// Make sure the accepting status propagates
 				currSynchAutomaton.setAllMutuallyAcceptingStatesAsAccepting();
-
-				currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomaton, interestingAutomaton);
-
+				Automata synchThese = new Automata();
+				synchThese.addAutomaton(currSynchAutomaton);
+				synchThese.addAutomaton(interestingAutomaton);
+				currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(synchThese);
 				currSynchAutomaton.setName(currSynchAutomaton.getComment());
 
 				// Extend the safe event coaccessibility

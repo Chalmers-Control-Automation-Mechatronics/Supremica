@@ -230,21 +230,17 @@ public class AutomatonMinimizer
 		{
 			// Merge silent loops and other obvious OE stuff (to save computation later)...
 			// This is actually NOT entirely OE, considering the marked states!! 
-			// Don't bother if there is only one event in alphabet (epsilon or not)
-			if (theAutomaton.getAlphabet().size() > 1)
+			int trivialCount = mergeTriviallyObservationEquivalentStates(theAutomaton);
+			if (trivialCount > 0)
 			{
-				int trivialCount = mergeTriviallyObservationEquivalentStates(theAutomaton);
-				if (trivialCount > 0 && debug)
-				{
-					logger.fatal("Removed " + trivialCount + " trivially equivalent states " +
-								 "before running the partitioning.");
-				}
-				int loopCount = mergeEpsilonLoops(theAutomaton); // Not entirely OE if marking is considered!
-				if (loopCount > 0 && debug)
-				{
-					logger.fatal("Removed " + loopCount + " states involved in epsilon loops " +
-								 "before running the partitioning.");
-				}
+				logger.verbose("Removed " + trivialCount + " trivially silent states " +
+							   "before running the partitioning.");
+			}
+			int loopCount = mergeEpsilonLoops(theAutomaton); // Not entirely OE if marking is considered!
+			if (loopCount > 0)
+			{
+				logger.verbose("Removed " + loopCount + " states involved in silent loops " +
+							   "before running the partitioning.");
 			}
 
 			if (debug)
@@ -264,11 +260,25 @@ public class AutomatonMinimizer
 			if (theAutomaton.getAlphabet().size() > 1)
 			{
 				int loopCount = mergeEpsilonLoops(theAutomaton);
-				if (loopCount > 0 && debug)
+				if (loopCount > 0)
 				{
-					logger.fatal("Removed " + loopCount + " states involved in epsilon loops " +
-								 "before running the partitioning.");
+					logger.verbose("Removed " + loopCount + " states involved in silent loops " +
+								   "before running the partitioning.");
 				}
+			}
+			else if (theAutomaton.nbrOfEpsilonEvents() == 1)
+			{
+				// The conflict equivalent automaton is just one state, the initial state. 
+				// Marked if the automaton is nonblocking, nonmarked otherwise.
+				Automaton newAutomaton = new Automaton("min(" + theAutomaton.getName() + ")");
+				State initial = new State("q0");
+				initial.setInitial(true);
+				newAutomaton.addState(initial);	
+
+				// Accepting iff nonblocking
+				initial.setAccepting(AutomataVerifier.verifyMonolithicNonblocking(new Automata(theAutomaton)));
+
+				return newAutomaton;
 			}
 
 			if (debug)
@@ -362,7 +372,13 @@ public class AutomatonMinimizer
 
 		// Build the minimized automaton based on the partitioning in equivClasses
 		Automaton newAutomaton = buildAutomaton(equivClasses);
-
+		int diffSize = theAutomaton.nbrOfStates() - newAutomaton.nbrOfStates();
+		if (diffSize > 0)
+		{
+			logger.verbose("Removed " + diffSize + " states based on partitioning with " + 
+						   "respect to observation equivalence.");
+		}
+		
 		if (stopRequested)
 		{
 			return null;
@@ -956,9 +972,12 @@ public class AutomatonMinimizer
 				int countB = ruleB(aut);
 				int countC = ruleC(aut);
 				int countF = ruleF(aut);
+
+				//ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(new Automaton(aut));
 				
 				if (debug)
-					logger.warn("Rule A: " + countA + ", rule B: " + countB + ", rule C: " + countC + ", rule F: " + countF);
+					logger.warn("Rule A: " + countA + ", rule B: " + countB + 
+								", rule C: " + countC + ", rule F: " + countF);
 				count = countA+countB+countC+countF;
 				total += count;
 			} while (count > 0);
@@ -1448,7 +1467,14 @@ public class AutomatonMinimizer
 
 						aut.addArc(newArc);
 						arcCount++;
-					}					
+					}
+
+					if (!useShortNames)
+					{
+						State toState = outArc.getToState();
+						toState.setName(state.getName() + SupremicaProperties.getStateSeparator() + 
+										toState.getName());
+					}
 				}
 				
 				aut.removeState(state);
@@ -1626,7 +1652,6 @@ public class AutomatonMinimizer
 			count++;
 		}
 
-		/*
 		// Put redundant arcs in list, remove after all have been found
 		toBeRemoved.clear();
 		for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
@@ -1675,15 +1700,17 @@ public class AutomatonMinimizer
 				}
 			}
 		}
-		*/
+		/*
 		// Put redundant arcs in list, remove after all have been found
 		toBeRemoved.clear();
+		int i=0;
 		arcLoop: for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
 		{
+			logger.info("" + ++i);
 			Arc arc = arcIt.nextArc();
-			LabeledEvent a = arc.getEvent();
 
-			// Using Elorantas notation... (a, s1, s2 and (later) s3)... but not her method...
+			// Using Elorantas notation... (a, s1, s2 and (not exactly) s3)... but not her method...
+			LabeledEvent a = arc.getEvent();
 			State s1 = arc.getFromState();
 			State s2 = arc.getToState();
 				
@@ -1728,6 +1755,7 @@ public class AutomatonMinimizer
 				continue arcLoop;
 			}
 		}
+		*/
 		while (toBeRemoved.size() > 0)
 		{
 			aut.removeArc((Arc) toBeRemoved.remove(0));

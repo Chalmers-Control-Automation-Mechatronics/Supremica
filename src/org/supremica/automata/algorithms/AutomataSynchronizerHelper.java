@@ -758,11 +758,11 @@ public final class AutomataSynchronizerHelper
 				{
 					if (prevString.equals(""))
 					{
-						return "\"" + unionAlphabet.getEventWithIndex(currEventIndex).getLabel() + "\"";
+						return prevString + unionAlphabet.getEventWithIndex(currEventIndex);
 					}
 					else
 					{
-						return prevString + " -> \"" + unionAlphabet.getEventWithIndex(currEventIndex).getLabel() + "\"";
+						return prevString + " -> " + unionAlphabet.getEventWithIndex(currEventIndex);
 					}
 
 					// logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
@@ -850,7 +850,8 @@ public final class AutomataSynchronizerHelper
 			for (int i = 0; i < currState.length; i++)
 			{
 				// Only print states that are not initial if we are looking at a full state
-				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || (automataIndices.length < theAutomata.size()))
+				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || 
+					(automataIndices.length < theAutomata.size()))
 				{
 					if (firstEntry)
 					{
@@ -866,16 +867,14 @@ public final class AutomataSynchronizerHelper
 					state.append(stateTable[automataIndices[i]][currState[i]].getName());
 				}
 			}
-
-			String reason = "the event " +
-							 theAutomaton.getAlphabet().getEventWithIndex(problemEvent).toString() +
-							 " is enabled in " +
-							 problemAutomaton.toString();
-
+			
+			String reason = "the event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent) +
+				" is enabled in " + problemAutomaton;
+			
 			// Log the message
 			if (!state.toString().equals(""))
 			{
-				logger.info("The state '" + state.toString() + "' is uncontrollable since " + reason + ".");
+				logger.info("The state " + state + " is uncontrollable since " + reason + ".");
 			}
 			else
 			{

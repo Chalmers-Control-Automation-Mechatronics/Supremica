@@ -1868,7 +1868,7 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see AutomataSynchronizerExecuter
 	 */
-	private static boolean moduleIsNonblocking(Automaton theAutomaton)
+	private boolean moduleIsNonblocking(Automaton theAutomaton)
 		throws Exception
 	{
 		return moduleIsNonblocking(theAutomaton, false);
@@ -1882,7 +1882,7 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see AutomataSynchronizerExecuter
 	 */
-	private static boolean moduleIsNonblocking(Automaton original, boolean destructive)
+	private boolean moduleIsNonblocking(Automaton original, boolean destructive)
 		throws Exception
 	{
 		Automaton aut;

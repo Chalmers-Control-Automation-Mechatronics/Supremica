@@ -61,7 +61,8 @@ public final class SynchronizationOptions
 	private int initialHashtableSize;
 	private boolean expandHashtable;
 	private int nbrOfExecuters;
-	private boolean buildAutomaton;    // add also the arcs
+	private boolean buildAutomaton;    // Build automaton (also add the arcs)
+	private boolean useShortStateNames;    // Generate short, abstract, state names
 	private boolean expandEventsUsingPriority;    // ??
 	private boolean requireConsistentControllability;    // check that common events have same controllability
 	private boolean requireConsistentImmediate;    // check that common evenst have same immediaticity
@@ -75,20 +76,21 @@ public final class SynchronizationOptions
 		throws IllegalArgumentException
 	{
 		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(),
-			 false,                                   // expandEventsUsingPriority
-			 true,                                    // buildAutomaton
-			 true,                                    // requireConsistentControllability
-			 true,                                    // requireConsistentImmediate
-			 false);                                  // rememberDisabledEvents
+			 false,                               // expandEventsUsingPriority
+			 true,                                // buildAutomaton
+			 false,                               // useShortStateNames
+			 true,                                // requireConsistentControllability
+			 true,                                // requireConsistentImmediate
+			 false);                              // rememberDisabledEvents
 	}
 
 	/**
 	 * This is not a good constructor so it is private, it is impossible to read in the code.
-	 * Use the "getDefault..."-methods in this class instead or when they won't suit you,
+	 * Use the "getDefault..."-methods in this class instead and when they won't suit you,
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
 	 */
-	private SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
+	private SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean useShortStateNames, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
 		throws IllegalArgumentException
 	{
 		if (syncType == null)
@@ -114,6 +116,7 @@ public final class SynchronizationOptions
 		this.expandForbiddenStates = expandForbiddenStates;
 		this.expandEventsUsingPriority = expandEventsUsingPriority;
 		this.buildAutomaton = buildAutomaton;
+		this.useShortStateNames = useShortStateNames;
 		this.requireConsistentControllability = requireConsistentControllability;
 		this.requireConsistentImmediate = requireConsistentImmediate;
 		this.rememberDisabledEvents = rememberDisabledEvents;
@@ -218,10 +221,7 @@ public final class SynchronizationOptions
 	{
 		rememberDisabledEvents = remember;
 	}
-
-	/**
-	 Build an Automaton after synchronization.
-	*/
+	
 	public boolean buildAutomaton()
 	{
 		return buildAutomaton;
@@ -230,6 +230,16 @@ public final class SynchronizationOptions
 	public void setBuildAutomaton(boolean set)
 	{
 		buildAutomaton = set;
+	}
+
+	public boolean useShortStateNames()
+	{
+		return useShortStateNames;
+	}
+
+	public void setUseShortStateNames(boolean set)
+	{
+		useShortStateNames = set;
 	}
 
 	public boolean isValid()

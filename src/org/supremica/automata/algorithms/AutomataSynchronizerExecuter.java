@@ -109,7 +109,7 @@ public final class AutomataSynchronizerExecuter
 	private int numberOfAddedStates = 0;
 
 	/** Options determining how the synchronization should be performed. */
-	private final SynchronizationOptions syncOptions;
+	private final SynchronizationOptions options;
 
 	/**
 	 * Determines if uncontrollable states should be marked as forbidden.
@@ -198,11 +198,11 @@ public final class AutomataSynchronizerExecuter
 		epsilonEventsTable = indexForm.getEpsilonEventsTable();
 
 		// Syncoptions parameters
-		syncOptions = synchronizerHelper.getSynchronizationOptions();
-		syncType = syncOptions.getSynchronizationType();
-		forbidUncontrollableStates = syncOptions.forbidUncontrollableStates();
-		expandForbiddenStates = syncOptions.expandForbiddenStates();
-		rememberDisabledEvents = syncOptions.rememberDisabledEvents();
+		options = synchronizerHelper.getSynchronizationOptions();
+		syncType = options.getSynchronizationType();
+		forbidUncontrollableStates = options.forbidUncontrollableStates();
+		expandForbiddenStates = options.expandForbiddenStates();
+		rememberDisabledEvents = options.rememberDisabledEvents();
 
 		// Overrides
 		if (expandEventsUsingPriority)
@@ -637,7 +637,7 @@ public final class AutomataSynchronizerExecuter
 			enabledEvents(currState);
 
 			// Is this state deadlocked?
-			if (syncOptions.buildAutomaton() && (currEnabledEvents[0] == Integer.MAX_VALUE))
+			if (options.buildAutomaton() && (currEnabledEvents[0] == Integer.MAX_VALUE))
 			{
 				helper.setDeadlocked(currState, true);
 			}
@@ -872,26 +872,13 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Builds automaton using concatenated state names as new state names.
+	 * Builds automaton using either concatenated state names or new, 
+	 * short, unique names as new state names.
 	 *
 	 *@return  true if build successful, false if build is stopped with requestStop().
 	 *@exception  Exception Description of the Exception
 	 */
 	public boolean buildAutomaton()
-		throws Exception
-	{
-		return buildAutomaton(true);
-	}
-
-	/**
-	 * Builds automaton using either concatenated state names or new, 
-	 * short, unique names as new state names.
-	 *
-	 *@param  longformId true for concateated state names, false for new names.
-	 *@return  true if build successful, false if build is stopped with requestStop().
-	 *@exception  Exception Description of the Exception
-	 */
-	public boolean buildAutomaton(boolean longformId)
 		throws Exception
 	{
 		try
@@ -917,7 +904,7 @@ public final class AutomataSynchronizerExecuter
 
 			// Create all states
 			int[][] currStateTable = helper.getStateTable();
-			int stateNumber = 0;
+			int stateNumber = 1; // 0 is reserved for the inital state
 			for (int i = 0; i < currStateTable.length; i++)
 			{
 				if (i % 100 == 0)
@@ -937,33 +924,39 @@ public final class AutomataSynchronizerExecuter
 				{
 					int[] currState = currStateTable[i];
 					CompositeState newState = null;
-
+					
 					// Should the state name be based on the names of the states that
-					// it is constructed from? (That's what "longformId" decides.)
-					if (longformId)
+					// it is constructed from or not? 
+					if (options.useShortStateNames())
+					{
+						// Make sure the initial state gets number 0
+						if (AutomataIndexFormHelper.isInitial(currState))
+						{
+							newState = new CompositeState("q0", currState, helper.getAutomata());
+						}
+						else
+						{
+							newState = new CompositeState("q" + stateNumber++, currState, helper.getAutomata());
+						}
+					}
+					else
 					{
 						org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
 						StringBuffer sb = new StringBuffer();
-
-						for (int j = 0;
-								j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA;
-								j++)
+						
+						for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
 						{
 							// It should be name here, right? That's what the method description says...
 							//sb.append(stateTable[j][currState[j]].getId());
 							sb.append(stateTable[j][currState[j]].getName());
 							sb.append(SEPARATOR_STRING);
 						}
-
+						
 						// Remove last separator string element
 						sb.setLength(sb.length() - SEPARATOR_LENGTH);
-
+						
 						// Create state
 						newState = new CompositeState(sb.toString(), currState, helper.getAutomata());
-					}
-					else
-					{
-						newState = new CompositeState("q" + stateNumber++, currState, helper.getAutomata());
 					}
 
 					// Set some attributes of the state

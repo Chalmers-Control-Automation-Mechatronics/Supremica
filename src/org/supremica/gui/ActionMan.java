@@ -1878,7 +1878,7 @@ public class ActionMan
 			statusStr.append("\n\tNumber of events: " + currAutomaton.nbrOfEvents());
 			statusStr.append("\n\tNumber of transitions: " + currAutomaton.nbrOfTransitions());
 			statusStr.append("\n\tNumber of accepting states: " + currAutomaton.nbrOfAcceptingStates());
-			statusStr.append("\n\tNumber of mutually accepting states: " + currAutomaton.nbrOfMutuallyAcceptingStates());
+			//statusStr.append("\n\tNumber of mutually accepting states: " + currAutomaton.nbrOfMutuallyAcceptingStates());
 			statusStr.append("\n\tNumber of forbidden states: " + currAutomaton.nbrOfForbiddenStates());
 
 			int acceptingAndForbiddenStates = currAutomaton.nbrOfAcceptingAndForbiddenStates();

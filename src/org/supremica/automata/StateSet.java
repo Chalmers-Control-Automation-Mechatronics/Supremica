@@ -277,16 +277,36 @@ public class StateSet
 	 */
 	public StateSet epsilonClosure(boolean includeSelf)
 	{
-		StateSet closure = new StateSet();
-
-		// Find closure of each state
-		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
+		StateSet result = new StateSet();
+		
+		// Include self?
+		if (includeSelf)
 		{
-			State state = stateIt.nextState();
-			closure.add(state.epsilonClosure(includeSelf));
+			result.add(this);
 		}
 
-		return closure;		
+		// Examine states 
+		StateSet statesToExamine = new StateSet();
+		statesToExamine.add(this);
+		while (statesToExamine.size() != 0)
+		{
+			State currState = (State) statesToExamine.remove();
+
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+				State state = currArc.getToState();
+				
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
+					!result.contains(state))
+				{
+					statesToExamine.add(state);
+					result.add(state);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

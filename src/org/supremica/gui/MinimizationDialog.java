@@ -56,16 +56,17 @@ import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.automata.*;
 
-interface MinimizationPanel
+abstract class MinimizationPanel
+	extends JPanel
 {
-	void update(MinimizationOptions options);
+	public abstract void update(MinimizationOptions options);
 
-	void regain(MinimizationOptions options);
+	public abstract void regain(MinimizationOptions options);
 }
 
 class MinimizationDialogStandardPanel
-	extends JPanel
-	implements MinimizationPanel, ActionListener
+	extends MinimizationPanel
+	implements ActionListener
 {
 	private JComboBox minimizationTypeBox;
 	private JCheckBox alsoTransitions;
@@ -80,8 +81,11 @@ class MinimizationDialogStandardPanel
 		minimizationTypeBox.addActionListener(this);
 
 		alsoTransitions = new JCheckBox("Also minimize number of transitions");
+		alsoTransitions.setToolTipText("Make sure that the number of the transitions is the minimal number (with respect to observation equivalence))");
 		keepOriginal = new JCheckBox("Keep original");
+		keepOriginal.setToolTipText("If unchecked, the selected automata are thrown away after completed execution");
 		ignoreMarking = new JCheckBox("Ignore marking of states");
+		ignoreMarking.setToolTipText("If checked, the marking is ignored, i.e. a marked state is not considered to be different from a nonmarked state with respect to equivalence");
 
 		note = new JTextArea("Note:\n" + "I have nothing to say.");
 		note.setBackground(this.getBackground());
@@ -179,8 +183,8 @@ class MinimizationDialogStandardPanel
 }
 
 class MinimizationDialogAdvancedPanel
-	extends JPanel
-	implements MinimizationPanel, ActionListener
+	extends MinimizationPanel
+	implements ActionListener
 {
 	private JCheckBox compositionalMinimization;
 	private Alphabet unionAlphabet;
@@ -194,7 +198,8 @@ class MinimizationDialogAdvancedPanel
 		unionAlphabet = automata.getUnionAlphabet();
 		targetAlphabet = null;
 
-		compositionalMinimization = new JCheckBox("Compositional minimization");
+		compositionalMinimization = new JCheckBox("Compositional minimization (keep selected events)");
+		compositionalMinimization.setToolTipText("Minimizes selected automata compositionally, keeps the events that have been selected from the list below");
 		compositionalMinimization.addActionListener(this);
 		
 		/*

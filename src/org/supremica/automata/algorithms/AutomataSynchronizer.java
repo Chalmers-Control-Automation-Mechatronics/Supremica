@@ -195,29 +195,30 @@ public class AutomataSynchronizer
 	}
 
 	/**
-	 * Standard method for synchronizing two automata with default options.
-	 * @returns Automaton object representing the synchronous composition.
-	 */
-	public static Automaton synchronizeAutomata(Automaton autA, Automaton autB)
-		throws Exception
-	{
-		Automata automata = new Automata();
-
-		automata.addAutomaton(autA);
-		automata.addAutomaton(autB);
-
-		return synchronizeAutomata(automata);
-	}
-
-	/**
-	 * Standard method for synchronizing automata with default options.
-	 * @returns Automaton object representing the synchronous composition.
+	 * Method for synchronizing automata with default options.
+	 *
+	 * @param theAutomata the automata to be synchronized.
+	 * @return automaton representing the synchronous composition.
 	 */
 	public static Automaton synchronizeAutomata(Automata theAutomata)
 		throws Exception
 	{
-		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-		AutomataSynchronizer synchronizer = new AutomataSynchronizer(theAutomata, syncOptions);
+		SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
+
+		return synchronizeAutomata(theAutomata, options);
+	}
+
+	/**
+	 * Method for synchronizing automata with supplied options.
+	 *
+	 * @param theAutomata the automata to be synchronized.
+	 * @param options the SynchronizationOptions that should be used.
+	 * @return automaton representing the synchronous composition.
+	 */
+	public static Automaton synchronizeAutomata(Automata theAutomata, SynchronizationOptions options)
+		throws Exception
+	{
+		AutomataSynchronizer synchronizer = new AutomataSynchronizer(theAutomata, options);
 		synchronizer.execute();
 		Automaton result = synchronizer.getAutomaton();
 		synchronizer.clear();

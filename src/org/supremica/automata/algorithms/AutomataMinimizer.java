@@ -313,8 +313,12 @@ public class AutomataMinimizer
 			synchTimer.start();
 		}
 
+		boolean useShortStateNames = true;
+
 		// Synch and hide
-		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata);
+		SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+		synchOptions.setUseShortStateNames(useShortStateNames);
+		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
 		aut.hide(hideThese);
 
  		if (AutomatonMinimizer.debug)
@@ -334,7 +338,7 @@ public class AutomataMinimizer
 		if (aut.nbrOfEpsilonTransitions() > 0)
 		{
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
-			minimizer.useShortStateNames(true);
+			minimizer.useShortStateNames(useShortStateNames);
 			threadToStop = minimizer;
 			aut = minimizer.getMinimizedAutomaton(options);
 			threadToStop = null;
