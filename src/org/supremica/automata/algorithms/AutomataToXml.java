@@ -61,6 +61,7 @@ public class AutomataToXml
 	private Automata automata;
 	private Automaton automaton;
 	private boolean canonical;
+	private boolean includeCost = false;
 	private boolean debugMode = false;
 
 	private static final int majorFileVersion = 0;
@@ -96,6 +97,7 @@ public class AutomataToXml
 			pw.print(" owner=\"" + automata.getOwner() + "\"");
 			pw.print(" hash=\"" + automata.getHash() + "\"");
 		}
+
 		pw.println(">");
 
 		Iterator automataIt = automata.iterator();
@@ -138,9 +140,12 @@ public class AutomataToXml
 					pw.print(" accepting=\"true\"");
 				if (state.isForbidden())
 					pw.print(" forbidden=\"true\"");
-				int value = state.getCost();
-				if (value != State.UNDEF_COST)
-					pw.print(" cost=\"" + value + "\"");
+				if (includeCost)
+				{
+					int value = state.getCost();
+					if (value != State.UNDEF_COST)
+						pw.print(" cost=\"" + value + "\"");
+				}
 				if (debugMode)
 					pw.print(" synchIndex=" + state.getIndex());
      			// printIntArray(pw, ((StateRegular)state).getOutgoingEventsIndicies());

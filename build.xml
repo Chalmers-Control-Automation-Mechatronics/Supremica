@@ -9,6 +9,7 @@
 <property name="examples" value="examples"/>
 <property name="templates" value="templates"/>
 <property name="images" value="images"/>
+<property name="examples" value="examples/includeInJarFile"/>
 <property name="help" value="help"/>
 <property name="lib" value="lib"/>
 <property name="unjared" value="unjared"/>
@@ -255,6 +256,7 @@
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
+		<fileset dir="${examples}"/>
 		<fileset dir="${javalibs.dir}">		
 		</fileset>
 	</jar>
@@ -264,6 +266,7 @@
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/ALL_MANIFEST.MF"> 
 		<fileset dir="${build}"/>
 		<fileset dir="${images}"/>
+		<fileset dir="${examples}"/>
 		<fileset dir="${javalibs.dir}">	
 		</fileset>
 	</jar>
@@ -276,6 +279,8 @@
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
+	<copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>	
 </target>
 
 <target name="startfiles_jgrafchart">

@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="FlexibleManufacturingSystem"  major="0"  minor="9" >
+<Automaton name="blocks_on_conveyor4" type="Specification">
+	<Events>
+		<Event id="r1_p_bl_c4" label="r1_p_bl_c4"/>
+		<Event id="r2_g_bl_c4" label="r2_g_bl_c4"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r1_p_bl_c4"/>
+		<Transition source="q1" dest="q2" event="r1_p_bl_c4"/>
+		<Transition source="q1" dest="q0" event="r2_g_bl_c4"/>
+		<Transition source="q2" dest="q3" event="r1_p_bl_c4"/>
+		<Transition source="q2" dest="q1" event="r2_g_bl_c4"/>
+		<Transition source="q3" dest="q4" event="r1_p_bl_c4"/>
+		<Transition source="q3" dest="q2" event="r2_g_bl_c4"/>
+		<Transition source="q4" dest="q5" event="r1_p_bl_c4"/>
+		<Transition source="q4" dest="q3" event="r2_g_bl_c4"/>
+		<Transition source="q5" dest="q4" event="r2_g_bl_c4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="blocks_on_conveyor2" type="Specification">
+	<Events>
+		<Event id="r2_p_bl_c2" label="r2_p_bl_c2"/>
+		<Event id="r3_g_bl_c2" label="r3_g_bl_c2"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_bl_c2"/>
+		<Transition source="q1" dest="q2" event="r2_p_bl_c2"/>
+		<Transition source="q1" dest="q0" event="r3_g_bl_c2"/>
+		<Transition source="q2" dest="q3" event="r2_p_bl_c2"/>
+		<Transition source="q2" dest="q1" event="r3_g_bl_c2"/>
+		<Transition source="q3" dest="q4" event="r2_p_bl_c2"/>
+		<Transition source="q3" dest="q2" event="r3_g_bl_c2"/>
+		<Transition source="q4" dest="q5" event="r2_p_bl_c2"/>
+		<Transition source="q4" dest="q3" event="r3_g_bl_c2"/>
+		<Transition source="q5" dest="q4" event="r3_g_bl_c2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="pegs_on_convoyer4" type="Specification">
+	<Events>
+		<Event id="r1_p_pe_c4" label="r1_p_pe_c4"/>
+		<Event id="r2_g_pef_c4" label="r2_g_pef_c4"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r1_p_pe_c4"/>
+		<Transition source="q1" dest="q2" event="r1_p_pe_c4"/>
+		<Transition source="q1" dest="q0" event="r2_g_pef_c4"/>
+		<Transition source="q2" dest="q3" event="r1_p_pe_c4"/>
+		<Transition source="q2" dest="q1" event="r2_g_pef_c4"/>
+		<Transition source="q3" dest="q4" event="r1_p_pe_c4"/>
+		<Transition source="q3" dest="q2" event="r2_g_pef_c4"/>
+		<Transition source="q4" dest="q5" event="r1_p_pe_c4"/>
+		<Transition source="q4" dest="q3" event="r2_g_pef_c4"/>
+		<Transition source="q5" dest="q4" event="r2_g_pef_c4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="assembly_cell" type="Plant">
+	<Events>
+		<Event id="r1_g_prd" label="r1_g_prd"/>
+		<Event id="r1_p_blf" label="r1_p_blf"/>
+		<Event id="re1_p_pef" label="re1_p_pef"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r1_p_blf"/>
+		<Transition source="q1" dest="q2" event="re1_p_pef"/>
+		<Transition source="q2" dest="q0" event="r1_g_prd"/>
+	</Transitions>
+</Automaton>
+<Automaton name="pallets" type="Plant">
+	<Events>
+		<Event id="r1_g_pa" label="r1_g_pa"/>
+		<Event id="r1_p_paf" label="r1_p_paf"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r1_g_pa"/>
+		<Transition source="q1" dest="q2" event="r1_g_pa"/>
+		<Transition source="q1" dest="q0" event="r1_p_paf"/>
+		<Transition source="q2" dest="q3" event="r1_g_pa"/>
+		<Transition source="q2" dest="q1" event="r1_p_paf"/>
+		<Transition source="q3" dest="q4" event="r1_g_pa"/>
+		<Transition source="q3" dest="q2" event="r1_p_paf"/>
+		<Transition source="q4" dest="q5" event="r1_g_pa"/>
+		<Transition source="q4" dest="q3" event="r1_p_paf"/>
+		<Transition source="q5" dest="q4" event="r1_p_paf"/>
+	</Transitions>
+</Automaton>
+<Automaton name="finished_blocks_on_conveyor4" type="Specification">
+	<Events>
+		<Event id="r1_g_blf_c4" label="r1_g_blf_c4"/>
+		<Event id="r2_p_blf_c4" label="r2_p_blf_c4"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_blf_c4"/>
+		<Transition source="q1" dest="q2" event="r2_p_blf_c4"/>
+		<Transition source="q1" dest="q0" event="r1_g_blf_c4"/>
+		<Transition source="q2" dest="q3" event="r2_p_blf_c4"/>
+		<Transition source="q2" dest="q1" event="r1_g_blf_c4"/>
+		<Transition source="q3" dest="q4" event="r2_p_blf_c4"/>
+		<Transition source="q3" dest="q2" event="r1_g_blf_c4"/>
+		<Transition source="q4" dest="q5" event="r2_p_blf_c4"/>
+		<Transition source="q4" dest="q3" event="r1_g_blf_c4"/>
+		<Transition source="q5" dest="q4" event="r1_g_blf_c4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="finished_blocks_on_conveyor1_and_asrs" type="Specification">
+	<Events>
+		<Event id="r2_g_blf_c1" label="r2_g_blf_c1"/>
+		<Event id="r2_p_blf_c1" label="r2_p_blf_c1"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_blf_c1"/>
+		<Transition source="q1" dest="q2" event="r2_p_blf_c1"/>
+		<Transition source="q1" dest="q0" event="r2_g_blf_c1"/>
+		<Transition source="q2" dest="q3" event="r2_p_blf_c1"/>
+		<Transition source="q2" dest="q1" event="r2_g_blf_c1"/>
+		<Transition source="q3" dest="q4" event="r2_p_blf_c1"/>
+		<Transition source="q3" dest="q2" event="r2_g_blf_c1"/>
+		<Transition source="q4" dest="q5" event="r2_p_blf_c1"/>
+		<Transition source="q4" dest="q3" event="r2_g_blf_c1"/>
+		<Transition source="q5" dest="q4" event="r2_g_blf_c1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="finished_blocks_on_conveyor3" type="Specification">
+	<Events>
+		<Event id="r2_g_blf_c2" label="r2_g_blf_c2"/>
+		<Event id="r3_p_blf_c2" label="r3_p_blf_c2"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r3_p_blf_c2"/>
+		<Transition source="q1" dest="q2" event="r3_p_blf_c2"/>
+		<Transition source="q1" dest="q0" event="r2_g_blf_c2"/>
+		<Transition source="q2" dest="q3" event="r3_p_blf_c2"/>
+		<Transition source="q2" dest="q1" event="r2_g_blf_c2"/>
+		<Transition source="q3" dest="q4" event="r3_p_blf_c2"/>
+		<Transition source="q3" dest="q2" event="r2_g_blf_c2"/>
+		<Transition source="q4" dest="q5" event="r3_p_blf_c2"/>
+		<Transition source="q4" dest="q3" event="r2_g_blf_c2"/>
+		<Transition source="q5" dest="q4" event="r2_g_blf_c2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="finished_pallets_on_conveyor4" type="Specification">
+	<Events>
+		<Event id="r1_g_blf_c4" label="r1_g_blf_c4"/>
+		<Event id="r1_g_pa_c4" label="r1_g_pa_c4"/>
+		<Event id="r1_g_pef_c4" label="r1_g_pef_c4"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r1_g_blf_c4"/>
+		<Transition source="q0" dest="q1" event="r1_g_pef_c4"/>
+		<Transition source="q1" dest="q2" event="r1_g_blf_c4"/>
+		<Transition source="q1" dest="q0" event="r1_g_pa_c4"/>
+		<Transition source="q1" dest="q2" event="r1_g_pef_c4"/>
+		<Transition source="q2" dest="q3" event="r1_g_blf_c4"/>
+		<Transition source="q2" dest="q1" event="r1_g_pa_c4"/>
+		<Transition source="q2" dest="q3" event="r1_g_pef_c4"/>
+		<Transition source="q3" dest="q4" event="r1_g_blf_c4"/>
+		<Transition source="q3" dest="q2" event="r1_g_pa_c4"/>
+		<Transition source="q3" dest="q4" event="r1_g_pef_c4"/>
+		<Transition source="q4" dest="q5" event="r1_g_blf_c4"/>
+		<Transition source="q4" dest="q3" event="r1_g_pa_c4"/>
+		<Transition source="q4" dest="q5" event="r1_g_pef_c4"/>
+		<Transition source="q5" dest="q4" event="r1_g_pa_c4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="lathe" type="Plant">
+	<Events>
+		<Event id="L_f_b1" label="L_f_b1"/>
+		<Event id="r3_g_blf" label="r3_g_blf"/>
+		<Event id="r3_p_bl" label="r3_p_bl"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r3_p_bl"/>
+		<Transition source="q1" dest="q2" event="L_f_b1"/>
+		<Transition source="q2" dest="q0" event="r3_g_blf"/>
+	</Transitions>
+</Automaton>
+<Automaton name="pegs_on_conveyor3" type="Specification">
+	<Events>
+		<Event id="r2_p_pe_c3" label="r2_p_pe_c3"/>
+		<Event id="r3_g_pe_c3" label="r3_g_pe_c3"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_pe_c3"/>
+		<Transition source="q1" dest="q2" event="r2_p_pe_c3"/>
+		<Transition source="q1" dest="q0" event="r3_g_pe_c3"/>
+		<Transition source="q2" dest="q3" event="r2_p_pe_c3"/>
+		<Transition source="q2" dest="q1" event="r3_g_pe_c3"/>
+		<Transition source="q3" dest="q4" event="r2_p_pe_c3"/>
+		<Transition source="q3" dest="q2" event="r3_g_pe_c3"/>
+		<Transition source="q4" dest="q5" event="r2_p_pe_c3"/>
+		<Transition source="q4" dest="q3" event="r3_g_pe_c3"/>
+		<Transition source="q5" dest="q4" event="r3_g_pe_c3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="pallets_on_conveyor4" type="Specification">
+	<Events>
+		<Event id="r1_p_bl_c4" label="r1_p_bl_c4"/>
+		<Event id="r1_p_pa_c4" label="r1_p_pa_c4"/>
+		<Event id="r1_p_pe_c4" label="r1_p_pe_c4"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r1_p_pa_c4"/>
+		<Transition source="q1" dest="q2" event="r1_p_pa_c4"/>
+		<Transition source="q1" dest="q0" event="r1_p_pe_c4"/>
+		<Transition source="q1" dest="q0" event="r1_p_bl_c4"/>
+		<Transition source="q2" dest="q3" event="r1_p_pa_c4"/>
+		<Transition source="q2" dest="q1" event="r1_p_pe_c4"/>
+		<Transition source="q2" dest="q1" event="r1_p_bl_c4"/>
+		<Transition source="q3" dest="q4" event="r1_p_pa_c4"/>
+		<Transition source="q3" dest="q2" event="r1_p_pe_c4"/>
+		<Transition source="q3" dest="q2" event="r1_p_bl_c4"/>
+		<Transition source="q4" dest="q5" event="r1_p_pa_c4"/>
+		<Transition source="q4" dest="q3" event="r1_p_pe_c4"/>
+		<Transition source="q4" dest="q3" event="r1_p_bl_c4"/>
+		<Transition source="q5" dest="q4" event="r1_p_pe_c4"/>
+		<Transition source="q5" dest="q4" event="r1_p_bl_c4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="finished_pegs_on_conveyor1_and_asrs" type="Specification">
+	<Events>
+		<Event id="r2_g_pef_c1" label="r2_g_pef_c1"/>
+		<Event id="r2_p_pef_c1" label="r2_p_pef_c1"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_pef_c1"/>
+		<Transition source="q1" dest="q2" event="r2_p_pef_c1"/>
+		<Transition source="q1" dest="q0" event="r2_g_pef_c1"/>
+		<Transition source="q2" dest="q3" event="r2_p_pef_c1"/>
+		<Transition source="q2" dest="q1" event="r2_g_pef_c1"/>
+		<Transition source="q3" dest="q4" event="r2_p_pef_c1"/>
+		<Transition source="q3" dest="q2" event="r2_g_pef_c1"/>
+		<Transition source="q4" dest="q5" event="r2_p_pef_c1"/>
+		<Transition source="q4" dest="q3" event="r2_g_pef_c1"/>
+		<Transition source="q5" dest="q4" event="r2_g_pef_c1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="blocks_on_conveyor_and_asrs" type="Specification">
+	<Events>
+		<Event id="r2_g_bl_c1" label="r2_g_bl_c1"/>
+		<Event id="r2_p_bl_c1" label="r2_p_bl_c1"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_bl_c1"/>
+		<Transition source="q1" dest="q2" event="r2_p_bl_c1"/>
+		<Transition source="q1" dest="q0" event="r2_g_bl_c1"/>
+		<Transition source="q2" dest="q3" event="r2_p_bl_c1"/>
+		<Transition source="q2" dest="q1" event="r2_g_bl_c1"/>
+		<Transition source="q3" dest="q4" event="r2_p_bl_c1"/>
+		<Transition source="q3" dest="q2" event="r2_g_bl_c1"/>
+		<Transition source="q4" dest="q5" event="r2_p_bl_c1"/>
+		<Transition source="q4" dest="q3" event="r2_g_bl_c1"/>
+		<Transition source="q5" dest="q4" event="r2_g_bl_c1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="milling_machine" type="Plant">
+	<Events>
+		<Event id="M_f_pe" label="M_f_pe"/>
+		<Event id="r3_g_pef" label="r3_g_pef"/>
+		<Event id="r3_p_pe" label="r3_p_pe"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r3_p_pe"/>
+		<Transition source="q1" dest="q2" event="M_f_pe"/>
+		<Transition source="q2" dest="q0" event="r3_g_pef"/>
+	</Transitions>
+</Automaton>
+<Automaton name="r3" type="Plant">
+	<Events>
+		<Event id="r3_g_bl_L" label="r3_g_bl_L"/>
+		<Event id="r3_g_bl_c3" label="r3_g_bl_c3"/>
+		<Event id="r3_g_blf_L" label="r3_g_blf_L"/>
+		<Event id="r3_g_blf_M" label="r3_g_blf_M"/>
+		<Event id="r3_g_pe_M" label="r3_g_pe_M"/>
+		<Event id="r3_g_pe_c3" label="r3_g_pe_c3"/>
+		<Event id="r3_g_pef_M" label="r3_g_pef_M"/>
+		<Event id="r3_g_pef_c3" label="r3_g_pef_c3"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r3_g_pe_c3"/>
+		<Transition source="q0" dest="q2" event="r3_g_bl_c3"/>
+		<Transition source="q0" dest="q4" event="r3_g_blf_L"/>
+		<Transition source="q0" dest="q3" event="r3_g_pef_M"/>
+		<Transition source="q1" dest="q0" event="r3_g_pe_M"/>
+		<Transition source="q2" dest="q0" event="r3_g_bl_L"/>
+		<Transition source="q3" dest="q0" event="r3_g_pef_c3"/>
+		<Transition source="q4" dest="q0" event="r3_g_blf_M"/>
+	</Transitions>
+</Automaton>
+<Automaton name="r2" type="Plant">
+	<Events>
+		<Event id="r2_g_bl_c1" label="r2_g_bl_c1"/>
+		<Event id="r2_g_bl_c4" label="r2_g_bl_c4"/>
+		<Event id="r2_g_blf_c1" label="r2_g_blf_c1"/>
+		<Event id="r2_g_blf_c3" label="r2_g_blf_c3"/>
+		<Event id="r2_g_paf_c1" label="r2_g_paf_c1"/>
+		<Event id="r2_g_paf_c3" label="r2_g_paf_c3"/>
+		<Event id="r2_g_pe_c1" label="r2_g_pe_c1"/>
+		<Event id="r2_g_pe_c4" label="r2_g_pe_c4"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_g_pe_c1"/>
+		<Transition source="q0" dest="q1" event="r2_g_pe_c4"/>
+		<Transition source="q0" dest="q2" event="r2_g_bl_c4"/>
+		<Transition source="q0" dest="q2" event="r2_g_bl_c1"/>
+		<Transition source="q0" dest="q3" event="r2_g_paf_c1"/>
+		<Transition source="q0" dest="q3" event="r2_g_paf_c3"/>
+		<Transition source="q0" dest="q4" event="r2_g_blf_c3"/>
+		<Transition source="q0" dest="q4" event="r2_g_blf_c1"/>
+		<Transition source="q1" dest="q0" event="r2_g_pe_c4"/>
+		<Transition source="q1" dest="q0" event="r2_g_pe_c1"/>
+		<Transition source="q2" dest="q0" event="r2_g_bl_c1"/>
+		<Transition source="q2" dest="q0" event="r2_g_bl_c4"/>
+		<Transition source="q3" dest="q0" event="r2_g_paf_c1"/>
+		<Transition source="q3" dest="q0" event="r2_g_paf_c3"/>
+		<Transition source="q4" dest="q0" event="r2_g_blf_c1"/>
+		<Transition source="q4" dest="q0" event="r2_g_blf_c3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="r1" type="Plant">
+	<Events>
+		<Event id="r1_g_b1" label="r1_g_b1"/>
+		<Event id="r1_g_blf" label="r1_g_blf"/>
+		<Event id="r1_g_pa" label="r1_g_pa"/>
+		<Event id="r1_g_paf" label="r1_g_paf"/>
+		<Event id="r1_g_pe" label="r1_g_pe"/>
+		<Event id="r1_g_pef" label="r1_g_pef"/>
+		<Event id="r1_g_prd" label="r1_g_prd"/>
+		<Event id="r1_p_b1" label="r1_p_b1"/>
+		<Event id="r1_p_blf" label="r1_p_blf"/>
+		<Event id="r1_p_pa" label="r1_p_pa"/>
+		<Event id="r1_p_paf" label="r1_p_paf"/>
+		<Event id="r1_p_pe" label="r1_p_pe"/>
+		<Event id="r1_p_pef" label="r1_p_pef"/>
+		<Event id="r1_p_prd" label="r1_p_prd"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+		<State id="q6"/>
+		<State id="q7"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r1_g_pa"/>
+		<Transition source="q0" dest="q2" event="r1_g_b1"/>
+		<Transition source="q0" dest="q3" event="r1_g_pe"/>
+		<Transition source="q0" dest="q4" event="r1_g_prd"/>
+		<Transition source="q0" dest="q5" event="r1_g_paf"/>
+		<Transition source="q0" dest="q6" event="r1_g_blf"/>
+		<Transition source="q0" dest="q7" event="r1_g_pef"/>
+		<Transition source="q1" dest="q0" event="r1_p_pa"/>
+		<Transition source="q2" dest="q0" event="r1_p_b1"/>
+		<Transition source="q3" dest="q0" event="r1_p_pe"/>
+		<Transition source="q4" dest="q0" event="r1_p_prd"/>
+		<Transition source="q5" dest="q0" event="r1_p_paf"/>
+		<Transition source="q6" dest="q0" event="r1_p_blf"/>
+		<Transition source="q7" dest="q0" event="r1_p_pef"/>
+	</Transitions>
+</Automaton>
+<Automaton name="pegs_on_conveyor1_and_asrs" type="Specification">
+	<Events>
+		<Event id="r2_g_pe_c1" label="r2_g_pe_c1"/>
+		<Event id="r2_p_pe_c1" label="r2_p_pe_c1"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_pe_c1"/>
+		<Transition source="q1" dest="q2" event="r2_p_pe_c1"/>
+		<Transition source="q1" dest="q0" event="r2_g_pe_c1"/>
+		<Transition source="q2" dest="q3" event="r2_p_pe_c1"/>
+		<Transition source="q2" dest="q1" event="r2_g_pe_c1"/>
+		<Transition source="q3" dest="q4" event="r2_p_pe_c1"/>
+		<Transition source="q3" dest="q2" event="r2_g_pe_c1"/>
+		<Transition source="q4" dest="q5" event="r2_p_pe_c1"/>
+		<Transition source="q4" dest="q3" event="r2_g_pe_c1"/>
+		<Transition source="q5" dest="q4" event="r2_g_pe_c1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="finished_pegs_on_conveyor4" type="Specification">
+	<Events>
+		<Event id="r1_g_pef_c4" label="r1_g_pef_c4"/>
+		<Event id="r2_p_pe_c4" label="r2_p_pe_c4"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r2_p_pe_c4"/>
+		<Transition source="q1" dest="q2" event="r2_p_pe_c4"/>
+		<Transition source="q1" dest="q0" event="r1_g_pef_c4"/>
+		<Transition source="q2" dest="q3" event="r2_p_pe_c4"/>
+		<Transition source="q2" dest="q1" event="r1_g_pef_c4"/>
+		<Transition source="q3" dest="q4" event="r2_p_pe_c4"/>
+		<Transition source="q3" dest="q2" event="r1_g_pef_c4"/>
+		<Transition source="q4" dest="q5" event="r2_p_pe_c4"/>
+		<Transition source="q4" dest="q3" event="r1_g_pef_c4"/>
+		<Transition source="q5" dest="q4" event="r1_g_pef_c4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="finished_pegs_on_conveyor2" type="Specification">
+	<Events>
+		<Event id="r2_g_pef_c3" label="r2_g_pef_c3"/>
+		<Event id="r3_p_pef_c3" label="r3_p_pef_c3"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="r3_p_pef_c3"/>
+		<Transition source="q1" dest="q2" event="r3_p_pef_c3"/>
+		<Transition source="q1" dest="q0" event="r2_g_pef_c3"/>
+		<Transition source="q2" dest="q3" event="r3_p_pef_c3"/>
+		<Transition source="q2" dest="q1" event="r2_g_pef_c3"/>
+		<Transition source="q3" dest="q4" event="r3_p_pef_c3"/>
+		<Transition source="q3" dest="q2" event="r2_g_pef_c3"/>
+		<Transition source="q4" dest="q5" event="r3_p_pef_c3"/>
+		<Transition source="q4" dest="q3" event="r2_g_pef_c3"/>
+		<Transition source="q5" dest="q4" event="r2_g_pef_c3"/>
+	</Transitions>
+</Automaton>
+</Automata>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="CommunicationChannel"  major="0"  minor="9" >
+<Automaton name="sender" type="Plant">
+	<Events>
+		<Event id="cksumerrack" label="cksumerrack" controllable="false"/>
+		<Event id="getframe" label="getframe"/>
+		<Event id="rcvack" label="rcvack" controllable="false"/>
+		<Event id="send0" label="send0"/>
+		<Event id="send1" label="send1"/>
+		<Event id="timeout" label="timeout" controllable="false"/>
+		<Event id="timer" label="timer" immediate="true"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+		<State id="s6"/>
+		<State id="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="getframe"/>
+		<Transition source="s1" dest="s2" event="send0"/>
+		<Transition source="s2" dest="s3" event="timer"/>
+		<Transition source="s3" dest="s1" event="timeout"/>
+		<Transition source="s3" dest="s1" event="cksumerrack"/>
+		<Transition source="s3" dest="s4" event="rcvack"/>
+		<Transition source="s4" dest="s5" event="getframe"/>
+		<Transition source="s5" dest="s6" event="send1"/>
+		<Transition source="s6" dest="s7" event="timer"/>
+		<Transition source="s7" dest="s5" event="timeout"/>
+		<Transition source="s7" dest="s5" event="cksumerrack"/>
+		<Transition source="s7" dest="s0" event="rcvack"/>
+	</Transitions>
+</Automaton>
+<Automaton name="channel" type="Specification">
+	<Events>
+		<Event id="cksumerr" label="cksumerr" controllable="false"/>
+		<Event id="cksumerrack" label="cksumerrack" controllable="false"/>
+		<Event id="loseack" label="loseack" controllable="false"/>
+		<Event id="losemess" label="losemess" controllable="false"/>
+		<Event id="rcv0" label="rcv0" controllable="false"/>
+		<Event id="rcv1" label="rcv1" controllable="false"/>
+		<Event id="rcvack" label="rcvack" controllable="false"/>
+		<Event id="send0" label="send0"/>
+		<Event id="send1" label="send1"/>
+		<Event id="sendack" label="sendack"/>
+	</Events>
+	<States>
+		<State id="c0" initial="true"/>
+		<State id="c1"/>
+		<State id="c2"/>
+		<State id="c3"/>
+		<State id="c4"/>
+		<State id="c5"/>
+	</States>
+	<Transitions>
+		<Transition source="c0" dest="c2" event="send1"/>
+		<Transition source="c0" dest="c1" event="send0"/>
+		<Transition source="c0" dest="c3" event="sendack"/>
+		<Transition source="c1" dest="c0" event="rcv0"/>
+		<Transition source="c1" dest="c0" event="losemess"/>
+		<Transition source="c1" dest="c0" event="cksumerr"/>
+		<Transition source="c1" dest="c4" event="sendack"/>
+		<Transition source="c2" dest="c0" event="rcv1"/>
+		<Transition source="c2" dest="c0" event="losemess"/>
+		<Transition source="c2" dest="c0" event="cksumerr"/>
+		<Transition source="c2" dest="c5" event="sendack"/>
+		<Transition source="c3" dest="c0" event="rcvack"/>
+		<Transition source="c3" dest="c0" event="loseack"/>
+		<Transition source="c3" dest="c0" event="cksumerrack"/>
+		<Transition source="c3" dest="c4" event="send0"/>
+		<Transition source="c3" dest="c5" event="send1"/>
+		<Transition source="c4" dest="c1" event="cksumerrack"/>
+		<Transition source="c4" dest="c1" event="loseack"/>
+		<Transition source="c4" dest="c1" event="rcvack"/>
+		<Transition source="c4" dest="c3" event="cksumerr"/>
+		<Transition source="c4" dest="c3" event="losemess"/>
+		<Transition source="c4" dest="c3" event="rcv0"/>
+		<Transition source="c5" dest="c2" event="cksumerrack"/>
+		<Transition source="c5" dest="c2" event="loseack"/>
+		<Transition source="c5" dest="c2" event="rcvack"/>
+		<Transition source="c5" dest="c3" event="cksumerr"/>
+		<Transition source="c5" dest="c3" event="losemess"/>
+		<Transition source="c5" dest="c3" event="rcv1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="receiver" type="Plant">
+	<Events>
+		<Event id="cksumerr" label="cksumerr" controllable="false"/>
+		<Event id="passtohost" label="passtohost"/>
+		<Event id="rcv0" label="rcv0" controllable="false"/>
+		<Event id="rcv1" label="rcv1" controllable="false"/>
+		<Event id="sendack" label="sendack"/>
+	</Events>
+	<States>
+		<State id="r0" initial="true"/>
+		<State id="r1"/>
+		<State id="r2"/>
+		<State id="r3"/>
+		<State id="r4"/>
+		<State id="r5"/>
+	</States>
+	<Transitions>
+		<Transition source="r0" dest="r5" event="rcv1"/>
+		<Transition source="r0" dest="r1" event="rcv0"/>
+		<Transition source="r0" dest="r0" event="cksumerr"/>
+		<Transition source="r1" dest="r2" event="passtohost"/>
+		<Transition source="r2" dest="r3" event="sendack"/>
+		<Transition source="r3" dest="r2" event="rcv0"/>
+		<Transition source="r3" dest="r3" event="cksumerr"/>
+		<Transition source="r3" dest="r4" event="rcv1"/>
+		<Transition source="r4" dest="r5" event="passtohost"/>
+		<Transition source="r5" dest="r0" event="sendack"/>
+	</Transitions>
+</Automaton>
+</Automata>
