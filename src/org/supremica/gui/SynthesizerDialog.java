@@ -56,44 +56,21 @@ import java.awt.event.*;
 import javax.swing.*;
 // import javax.swing.event.*;
 // import javax.swing.table.*;
-
-public class SynthesizerDialog 
-	implements ActionListener
+abstract class SynthesizerPanel extends JPanel
 {
-	private JButton okButton;
-	private JButton cancelButton;
-	private SynthesizerOptions synthesizerOptions;
+	public abstract void update(SynthesizerOptions s);
+	public abstract void regain(SynthesizerOptions s);
+}
+
+class SD_StandardPanel extends SynthesizerPanel
+{
 	private JComboBox synthesisTypeBox;
 	private JComboBox algorithmTypeBox;
 	private JCheckBox purgeBox;
 	private JCheckBox optimizeBox;
-	private JCheckBox maximallyPermissiveBox;
-	private JDialog dialog;
 
-	/**
-	 * Creates modal dialog box for input of synthesizer options.
-	 */
-	public SynthesizerDialog(JFrame parentFrame, SynthesizerOptions synthesizerOptions)
+	public SD_StandardPanel()
 	{
-		dialog = new JDialog(parentFrame, true); //modal		
-		this.synthesizerOptions = synthesizerOptions;
-		dialog.setTitle("Synthesizer options");
-		dialog.setSize(new Dimension(400, 300));
-
-		Container contentPane = dialog.getContentPane();
-
-		JPanel standardPanel = new JPanel();
-		JPanel advancedPanel = new JPanel();
-        
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Standard options", null, 
-                          standardPanel,
-                          "Standard options");
-        tabbedPane.addTab("Advanced options", null, 
-                          advancedPanel,
-                          "Advanced options");
-		
-		// standardPanel
 		Box standardBox = Box.createVerticalBox();
 		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -116,15 +93,118 @@ public class SynthesizerDialog
 		standardBox.add(purgeBox);
 		standardBox.add(optimizeBox);
 		
-		standardPanel.add(standardBox);
-		
-		// advancedPanel
+		this.add(standardBox);
+	}
+	public void update(SynthesizerOptions synthesizerOptions)
+	{
+		synthesisTypeBox.setSelectedIndex(synthesizerOptions.getSynthesisType());
+		algorithmTypeBox.setSelectedIndex(synthesizerOptions.getAlgorithmType());
+		purgeBox.setSelected(synthesizerOptions.getPurge());
+		optimizeBox.setSelected(synthesizerOptions.getOptimize());
+	}
+	public void regain(SynthesizerOptions synthesizerOptions)
+	{
+		synthesizerOptions.setSynthesisType(synthesisTypeBox.getSelectedIndex());
+		synthesizerOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+		synthesizerOptions.setPurge(purgeBox.isSelected());
+		synthesizerOptions.setOptimize(optimizeBox.isSelected());
+	}
+}
+class SD_AdvancedPanel extends SynthesizerPanel
+{
+	private JCheckBox maximallyPermissiveBox;
+
+	public SD_AdvancedPanel()
+	{
 		Box advancedBox = Box.createVerticalBox();
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
 		
 		advancedBox.add(maximallyPermissiveBox);
 
-		advancedPanel.add(advancedBox);
+		this.add(advancedBox);
+	}
+	public void update(SynthesizerOptions synthesizerOptions)
+	{
+		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
+	}
+	public void regain(SynthesizerOptions synthesizerOptions)
+	{
+		synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
+	}
+}
+
+public class SynthesizerDialog 
+	implements ActionListener
+{
+	private JButton okButton;
+	private JButton cancelButton;
+	private SynthesizerOptions synthesizerOptions;
+	// private JComboBox synthesisTypeBox;
+	// private JComboBox algorithmTypeBox;
+	// private JCheckBox purgeBox;
+	// private JCheckBox optimizeBox;
+	SD_StandardPanel standardPanel;
+	
+	// private JCheckBox maximallyPermissiveBox;
+	SD_AdvancedPanel advancedPanel;
+	
+	private JDialog dialog;
+
+	/**
+	 * Creates modal dialog box for input of synthesizer options.
+	 */
+	public SynthesizerDialog(JFrame parentFrame, SynthesizerOptions synthesizerOptions)
+	{
+		dialog = new JDialog(parentFrame, true); //modal		
+		this.synthesizerOptions = synthesizerOptions;
+		dialog.setTitle("Synthesizer options");
+		dialog.setSize(new Dimension(400, 300));
+
+		Container contentPane = dialog.getContentPane();
+
+		standardPanel = new SD_StandardPanel();
+		advancedPanel = new SD_AdvancedPanel();
+        
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Standard options", null, 
+                          standardPanel,
+                          "Standard options");
+        tabbedPane.addTab("Advanced options", null, 
+                          advancedPanel,
+                          "Advanced options");
+		
+		/** standardPanel
+		Box standardBox = Box.createVerticalBox();
+		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		String[] synthesisData = {"controllable", "non-blocking", "both"};
+		synthesisTypeBox = new JComboBox(synthesisData);
+		String[] algorithmData = {"modular", "monolithic", "IDD"};
+		algorithmTypeBox = new JComboBox(algorithmData);
+		purgeBox = new JCheckBox("Purge result");
+		optimizeBox = new JCheckBox("Optimize result");
+		// leftPanel.add(synthesisTypeBox);
+		// leftPanel.add(algorithmTypeBox);
+		// rightPanel.add(purgeBox);
+		// rightPanel.add(optimizeBox);
+		// standardPanel.setLayout(new GridLayout(1,2));
+		// standardPanel.add("Center", leftPanel);
+		// standardPanel.add("Center", rightPanel);
+
+		standardBox.add(synthesisTypeBox);
+		standardBox.add(algorithmTypeBox);
+		standardBox.add(purgeBox);
+		standardBox.add(optimizeBox);
+		
+		standardPanel.add(standardBox); **/
+		
+		/** advancedPanel
+		Box advancedBox = Box.createVerticalBox();
+		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
+		
+		advancedBox.add(maximallyPermissiveBox);
+
+		advancedPanel.add(advancedBox); **/
 
 		// buttonPanel
 		JPanel buttonPanel = new JPanel();
@@ -148,11 +228,13 @@ public class SynthesizerDialog
 	 */
 	public void update()
 	{
-		synthesisTypeBox.setSelectedIndex(synthesizerOptions.getSynthesisType());
-		algorithmTypeBox.setSelectedIndex(synthesizerOptions.getAlgorithmType());
-		purgeBox.setSelected(synthesizerOptions.getPurge());
-		optimizeBox.setSelected(synthesizerOptions.getOptimize());
-		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
+		// synthesisTypeBox.setSelectedIndex(synthesizerOptions.getSynthesisType());
+		// algorithmTypeBox.setSelectedIndex(synthesizerOptions.getAlgorithmType());
+		// purgeBox.setSelected(synthesizerOptions.getPurge());
+		// optimizeBox.setSelected(synthesizerOptions.getOptimize());
+		standardPanel.update(synthesizerOptions);
+		// maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
+		advancedPanel.update(synthesizerOptions);
 	}	
 
    	private JButton addButton(Container container, String name)
@@ -174,11 +256,13 @@ public class SynthesizerDialog
 		if (source == okButton)
 		{
 			synthesizerOptions.setDialogOK(true);
-			synthesizerOptions.setSynthesisType(synthesisTypeBox.getSelectedIndex());
-			synthesizerOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
-			synthesizerOptions.setPurge(purgeBox.isSelected());
-			synthesizerOptions.setOptimize(optimizeBox.isSelected());
-			synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
+			// synthesizerOptions.setSynthesisType(synthesisTypeBox.getSelectedIndex());
+			// synthesizerOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+			// synthesizerOptions.setPurge(purgeBox.isSelected());
+			// synthesizerOptions.setOptimize(optimizeBox.isSelected());
+			standardPanel.regain(synthesizerOptions);
+			// synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
+			advancedPanel.regain(synthesizerOptions);
 			dialog.setVisible(false);
 			dialog.dispose();
 		}

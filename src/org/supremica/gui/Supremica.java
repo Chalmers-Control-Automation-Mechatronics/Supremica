@@ -487,10 +487,14 @@ public class Supremica
 			{
 					public void actionPerformed(ActionEvent e)
 					{
-						// throw new RuntimeException("Something TODO here! Hint: exercisegenerator");
-
-						// KA - Removed, since it does not compile
-						// ActionMan.testCases(getGui());
+						try
+						{
+							ActionMan.testCases(getGui());
+						}
+						catch(Exception excp)
+						{
+							// what the f*** do we do?
+						}
 					}
 				});
 
@@ -907,77 +911,42 @@ public class Supremica
 
 	public void openAutomataXMLFile(File file)
 	{
-		int nbrOfAutomataBeforeOpening = theAutomatonContainer.getSize();
-
+		Automata currAutomata = null;
 		thisCategory.info("Opening " + file.getAbsolutePath() + " ...");
-		int nbrOfAddedAutomata = 0;
 		try
 		{
-			Automata currAutomata = AutomataBuildFromXml.build(file);
-
-			if (nbrOfAutomataBeforeOpening == 0)
-			{
-				String projectName = currAutomata.getName();
-				if (projectName != null)
-				{
-					theAutomatonContainer.setProjectName(projectName);
-					thisCategory.info("Project name changed to \"" + projectName + "\"");
-					theAutomatonContainer.updateFrameTitles();
-				}
-			}
-
-			Iterator autIt = currAutomata.iterator();
-			while (autIt.hasNext())
-			{
-				Automaton currAutomaton = (Automaton)autIt.next();
-				boolean add = true;
-
-				// Force the user to enter a new name if the name is ""
-				// Note that a null name is not allowed by AutomataBuildFromXml
-				if (currAutomaton.getName().equals(""))
-				{
-					String autName = getNewAutomatonName("Enter a new name", "");
-					if (autName == null)
-					{
-						add = false;
-						return; // It's not ok to cancel!
-					}
-					else
-					{
-						currAutomaton.setName(autName);
-					}
-				}
-
-				if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
-				{
-					String autName = currAutomaton.getName();
-
-					JOptionPane.showMessageDialog(this, autName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
-
-					autName = getNewAutomatonName("Enter a new name", autName + "(2)");
-					if (autName == null)
-					{
-						add = false;
-						return; // It's not ok to cancel!
-					}
-					else
-					{
-						currAutomaton.setName(autName);
-					}
-				}
-				if (add)
-				{
-					nbrOfAddedAutomata++;
-					theAutomatonContainer.add(currAutomaton);
-				}
-			}
+			currAutomata = AutomataBuildFromXml.build(file);
 		}
-		catch (Exception e)
+		catch (Exception e) // this exception is caught while opening
 		{
 			thisCategory.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
 			return;
 		}
-		thisCategory.info("Successfully opened " + nbrOfAddedAutomata + " automata.");
+
+		int nbrOfAutomataBeforeOpening = theAutomatonContainer.getSize();
+		
+		try
+		{
+			int nbrOfAddedAutomata = addAutomata(currAutomata);
+			thisCategory.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
+		}	
+		catch(Exception excp)
+		{
+			thisCategory.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
+			return;
+		}
+
+
+		if (nbrOfAutomataBeforeOpening == 0)
+		{
+			String projectName = currAutomata.getName();
+			if (projectName != null)
+			{
+				theAutomatonContainer.setProjectName(projectName);
+				thisCategory.info("Project name changed to \"" + projectName + "\"");
+				theAutomatonContainer.updateFrameTitles();
+			}
+		}
 
 		if (nbrOfAutomataBeforeOpening > 0)
 		{
@@ -996,60 +965,19 @@ public class Supremica
 	public void importValidFile(File file)
 	{
 		thisCategory.info("Importing " + file.getAbsolutePath() + " ...");
-		int nbrOfAddedAutomata = 0;
+		// int nbrOfAddedAutomata = 0;
 
 		try
 		{
   			Automata currAutomata = AutomataBuildFromVALID.build(file);
-			Iterator autIt = currAutomata.iterator();
-			while (autIt.hasNext())
-			{
-				Automaton currAutomaton = (Automaton)autIt.next();
-				boolean add = true;
-				if (currAutomaton.getName().equals(""))
-				{
-					String autName = getNewAutomatonName("Enter a new name", "");
-					if (autName == null)
-					{
-						add = false;
-						return; // It's not ok to cancel!
-					}
-					else
-					{
-						currAutomaton.setName(autName);
-					}
-				}
-
-				if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
-				{
-					String autName = currAutomaton.getName();
-
-					JOptionPane.showMessageDialog(this, autName + " already exists", "Alert",
-												  JOptionPane.ERROR_MESSAGE);
-
-					autName = getNewAutomatonName("Enter a new name", autName + "(2)");
-					if (autName == null)
-					{
-						add = false; // It's not ok to cancel!
-					}
-					else
-					{
-						currAutomaton.setName(autName);
-					}
-				}
-				if (add)
-				{
-					nbrOfAddedAutomata++;
-					theAutomatonContainer.add(currAutomaton);
-				}
-			}
+  			int nbrOfAddedAutomata = addAutomata(currAutomata);
+			thisCategory.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		}
 		catch (Exception e)
 		{
 			thisCategory.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
 			return;
 		}
-		thisCategory.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 	}
 
 	public AutomatonContainer getAutomatonContainer()
@@ -1061,10 +989,10 @@ public class Supremica
 		return mainPopupMenu;
 	}
 
-	public void addAutomata(Automata currAutomata)
-		throws Exception
+	public int addAutomata(Automata currAutomata)
+		// throws Exception
 	{
-		// Note - this is copied from importValidFile above!!
+		// Note - this code was both in importValidFile and openAutomataXMLFile above - duplicate code!!
 		int nbrOfAddedAutomata = 0;
 		Iterator autIt = currAutomata.iterator();
 
@@ -1072,13 +1000,16 @@ public class Supremica
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			boolean add = true;
+
+			// Force the user to enter a new name if the name is ""
+			// Note that a null name is not allowed by AutomataBuildFromXml
 			if (currAutomaton.getName().equals(""))
 			{
 				String autName = getNewAutomatonName("Enter a new name", "");
 				if (autName == null)
 				{
 					add = false;
-					return; // It's not ok to cancel!
+					return 0; // It's not ok to cancel!
 				}
 				else
 				{
@@ -1106,9 +1037,18 @@ public class Supremica
 			if (add)
 			{
 				nbrOfAddedAutomata++;
-				theAutomatonContainer.add(currAutomaton);
+				try
+				{
+					theAutomatonContainer.add(currAutomaton); // throws Exception if the automaton already exists
+				}
+				catch(Exception excp) // should never occur, we test for this condition already
+				{
+					thisCategory.error("Error while adding: " + excp.getMessage());
+					return nbrOfAddedAutomata;
+				}
 			}
-		}
+		}	
+		return nbrOfAddedAutomata;
 	}
 }
 

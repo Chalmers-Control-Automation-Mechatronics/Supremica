@@ -57,44 +57,19 @@ import javax.swing.*;
 // import javax.swing.event.*;
 // import javax.swing.table.*;
 
-public class VerificationDialog 
-	implements ActionListener
+interface VerificationPanel
 {
-	private JButton okButton;
-	private JButton cancelButton;
-	private VerificationOptions verificationOptions;
+	public void update(VerificationOptions v);
+	public void regain(VerificationOptions v);
+}
+
+class VD_StandardPanel extends JPanel implements VerificationPanel
+{
 	private JComboBox verificationTypeBox;
 	private JComboBox algorithmTypeBox;
-	private JTextField exclusionStateLimit;
-	private JTextField reachabilityStateLimit;
-	private JCheckBox oneEventAtATimeBox;
-	private JCheckBox skipUncontrollabilityBox;
-	private JDialog dialog;
 
-	/**
-	 * Creates modal dialog box for input of synthesizer options.
-	 */
-	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions)
+	public VD_StandardPanel()
 	{
-		dialog = new JDialog(parentFrame, true); //modal		
-		this.verificationOptions = verificationOptions;
-		dialog.setTitle("Verification options");
-		dialog.setSize(new Dimension(400, 300));
-		// dialog.setResizable(false);
-		Container contentPane = dialog.getContentPane();
-
-		JPanel standardPanel = new JPanel();
-		JPanel advancedPanel = new JPanel();
-        
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Standard options", null, 
-                          standardPanel,
-                          "Standard options");
-        tabbedPane.addTab("Advanced options", null, 
-                          advancedPanel,
-                          "Advanced options");
-		
-		// standardPanel
 		Box standardBox = Box.createVerticalBox();
 		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -111,9 +86,29 @@ public class VerificationDialog
 		standardBox.add(verificationTypeBox);
 		standardBox.add(algorithmTypeBox);
 
-		standardPanel.add(standardBox);
-		
-		// advancedPanel
+		this.add(standardBox);
+	}
+	public void update(VerificationOptions verificationOptions)
+	{
+		verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
+		algorithmTypeBox.setSelectedIndex(verificationOptions.getAlgorithmType());
+	}
+	public void regain(VerificationOptions verificationOptions)
+	{
+		verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
+		verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+	}
+}
+
+class VD_AdvancedPanel extends JPanel implements VerificationPanel
+{
+	private JTextField exclusionStateLimit;
+	private JTextField reachabilityStateLimit;
+	private JCheckBox oneEventAtATimeBox;
+	private JCheckBox skipUncontrollabilityBox;
+
+	public VD_AdvancedPanel()
+	{
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText =
 			new JLabel("Initial state limit for state exclusion");
@@ -131,8 +126,105 @@ public class VerificationDialog
 		advancedBox.add(oneEventAtATimeBox);
 		advancedBox.add(skipUncontrollabilityBox);
 
-		advancedPanel.add(advancedBox, BorderLayout.CENTER);
+		this.add(advancedBox, BorderLayout.CENTER);
 
+	}
+	public void update(VerificationOptions verificationOptions)
+	{
+		exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
+		reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
+		oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
+		skipUncontrollabilityBox.setSelected(verificationOptions.getSkipUncontrollabilityCheck());
+	}
+	public void regain(VerificationOptions verificationOptions)
+	{
+		verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("State limit", exclusionStateLimit.getText(), 10));
+		verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("State limit", reachabilityStateLimit.getText(), 10));
+		verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
+		verificationOptions.setSkipUncontrollabilityCheck(skipUncontrollabilityBox.isSelected());
+	}
+}
+
+public class VerificationDialog 
+	implements ActionListener
+{
+	private JButton okButton;
+	private JButton cancelButton;
+	private VerificationOptions verificationOptions;
+	//-- standard panel stuff
+	// private JComboBox verificationTypeBox;
+	// private JComboBox algorithmTypeBox;
+	private VD_StandardPanel standardPanel;
+	//-- advanced panel stuff
+	// private JTextField exclusionStateLimit;
+	// private JTextField reachabilityStateLimit;
+	// private JCheckBox oneEventAtATimeBox;
+	// private JCheckBox skipUncontrollabilityBox;
+	private VD_AdvancedPanel advancedPanel;
+	private JDialog dialog;
+
+	/**
+	 * Creates modal dialog box for input of synthesizer options.
+	 */
+	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions)
+	{
+		dialog = new JDialog(parentFrame, true); //modal		
+		this.verificationOptions = verificationOptions;
+		dialog.setTitle("Verification options");
+		dialog.setSize(new Dimension(400, 300));
+		// dialog.setResizable(false);
+		Container contentPane = dialog.getContentPane();
+
+		standardPanel = new VD_StandardPanel();
+		advancedPanel = new VD_AdvancedPanel();
+        
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Standard options", null, 
+                          standardPanel,
+                          "Standard options");
+        tabbedPane.addTab("Advanced options", null, 
+                          advancedPanel,
+                          "Advanced options");
+		
+		/*** standardPanel
+		Box standardBox = Box.createVerticalBox();
+		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		String[] verificationData = {"controllability", "non-blocking", "language inclusion"};
+		verificationTypeBox = new JComboBox(verificationData);
+		String[] algorithmData = {"modular", "monolithic", "IDD"};
+		algorithmTypeBox = new JComboBox(algorithmData);
+		// leftPanel.add(verificationTypeBox);
+		// leftPanel.add(algorithmTypeBox);
+		// standardPanel.setLayout(new GridLayout(1,2));
+		// standardPanel.add(leftPanel);
+		// standardPanel.add(rightPanel);
+		
+		standardBox.add(verificationTypeBox);
+		standardBox.add(algorithmTypeBox);
+
+		standardPanel.add(standardBox); ***/
+		
+		/*** advancedPanel
+		Box advancedBox = Box.createVerticalBox();
+		JLabel exclusionStateLimitText =
+			new JLabel("Initial state limit for state exclusion");
+		exclusionStateLimit = new JTextField();
+		JLabel reachabilityStateLimitText =
+			new JLabel("Initial state limit for reachability verification");
+		reachabilityStateLimit = new JTextField();
+		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
+		skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
+		
+		advancedBox.add(exclusionStateLimitText);
+		advancedBox.add(exclusionStateLimit);
+		advancedBox.add(reachabilityStateLimitText);
+		advancedBox.add(reachabilityStateLimit);
+		advancedBox.add(oneEventAtATimeBox);
+		advancedBox.add(skipUncontrollabilityBox);
+
+		advancedPanel.add(advancedBox, BorderLayout.CENTER); ***/
+		
 		// buttonPanel;
 		JPanel buttonPanel = new JPanel();
 		okButton = addButton(buttonPanel, "OK");
@@ -155,12 +247,14 @@ public class VerificationDialog
 	 */
 	public void update()
 	{
-		verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
-		algorithmTypeBox.setSelectedIndex(verificationOptions.getAlgorithmType());
-		exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
-		reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
-		oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
-		skipUncontrollabilityBox.setSelected(verificationOptions.getSkipUncontrollabilityCheck());
+		standardPanel.update(verificationOptions);
+		// verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
+		// algorithmTypeBox.setSelectedIndex(verificationOptions.getAlgorithmType());
+		advancedPanel.update(verificationOptions);
+		// exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
+		// reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
+		// oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
+		// skipUncontrollabilityBox.setSelected(verificationOptions.getSkipUncontrollabilityCheck());
 	}
 	
    	private JButton addButton(Container container, String name)
@@ -182,12 +276,16 @@ public class VerificationDialog
 		if (source == okButton)
 		{   // Remember the selections
 			verificationOptions.setDialogOK(true);
-			verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
-			verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
-			verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("State limit", exclusionStateLimit.getText(), 10));
-			verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("State limit", reachabilityStateLimit.getText(), 10));
-			verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
-			verificationOptions.setSkipUncontrollabilityCheck(skipUncontrollabilityBox.isSelected());
+			// verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
+			// verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+			standardPanel.regain(verificationOptions);
+			
+			// verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("State limit", exclusionStateLimit.getText(), 10));
+			// verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("State limit", reachabilityStateLimit.getText(), 10));
+			// verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
+			// verificationOptions.setSkipUncontrollabilityCheck(skipUncontrollabilityBox.isSelected());
+			advancedPanel.regain(verificationOptions);
+			
 			dialog.setVisible(false);
 			dialog.dispose();
 		}

@@ -865,7 +865,7 @@ public class ActionMan
     // Automaton.View action performed
     public static void automatonView_actionPerformed(Gui gui)
     {
-    	gui.debug("ActionMan to the rescue!");
+    	// gui.debug("ActionMan to the rescue!");
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 		if (selectedAutomata.size() < 1)
 		{
@@ -1290,7 +1290,6 @@ public class ActionMan
 	public static void testCases(Gui gui)
 		throws Exception
 	{
-		/*
 		TestCasesDialog tc_dlg = new TestCasesDialog(gui.getFrame());
 		tc_dlg.show();
 		Automata automata = tc_dlg.getAutomata();
@@ -1298,7 +1297,6 @@ public class ActionMan
 		{
 			gui.addAutomata(automata);
 		}
-		*/
 	}
 
 } // ActionMan
