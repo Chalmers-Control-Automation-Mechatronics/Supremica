@@ -63,7 +63,6 @@ public class AutomataToNQC
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToNQC.class);
 	private Automata theAutomata;
-	//private SynchronizationOptions syncOptions;
 	private AutomataSynchronizerHelper syncHelper;
 	private SynchronizationType syncType = SynchronizationType.Prioritized;
 	private Alphabet allEvents;
@@ -72,8 +71,6 @@ public class AutomataToNQC
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
-		//this.syncOptions = new SynchronizationOptions();
-		//this.syncType = syncOptions.getSynchronizationType();
 	}
 
 
@@ -130,20 +127,8 @@ public class AutomataToNQC
 				throw new Exception("AutomataToNQC.printStateVariables: all automata must have an initial state");
 			}
 			int currAutomatonIndex = currAutomaton.getSynchIndex();
-			for (Iterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
-			{
-				State currState = (State)stateIt.next();
-				int currStateIndex = currState.getSynchIndex();
-				if (currState == initialState)
-				{
-					printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(), "true");
-				}
-				else
-				{
-					printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(), "false");
-				}
-
-			}
+			int currStateIndex = initialState.getSynchIndex();
+			printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex, initialState.getName() + " in " + currAutomaton.getName(), Integer.toString(currStateIndex));
 		}
 	}
 
@@ -249,7 +234,7 @@ public class AutomataToNQC
 								{
 									previousState = true;
 								}
-								pw.print("q_" + currAutomatonIndex + "_" + currStateIndex);
+								pw.print("(q_" + currAutomatonIndex + " == " + currStateIndex + ")");
 
 							}
 							if (!previousState)
@@ -400,10 +385,11 @@ public class AutomataToNQC
 									pw.println("\t\t\t}");
 									pw.print("\t\t\telse if");
 								}
-								pw.println(" (q_" + currAutomatonIndex + "_" + currStateIndex + ")");
+								pw.println(" (q_" + currAutomatonIndex + " == " + currStateIndex + ")");
 								pw.println("\t\t\t{");
-								pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + toStateIndex + " = true;");
-								pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + currStateIndex + " = false;");
+								//pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + toStateIndex + " = true;");
+								//pw.println("\t\t\t\tq_" + currAutomatonIndex + "_" + currStateIndex + " = false;");
+								pw.println("\t\t\t\tq_" + currAutomatonIndex + " = " + toStateIndex + ";");
 							}
 							else
 							{
