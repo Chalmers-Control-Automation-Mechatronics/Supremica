@@ -62,35 +62,60 @@ import org.supremica.gui.editor.*;
 public class AutomatonContainer
 	implements AutomatonListener
 {
-    private ArrayList theAutomatonNames = new ArrayList();
-    private HashMap theAutomatonContainer = new HashMap();
-//	private HashMap theAutomatonListeners = new HashMap();
-    private HashMap theAutomatonViewerContainer = new HashMap();
-    private HashMap theAutomatonExplorerContainer = new HashMap();
-    private HashMap theAutomatonFrameContainer = new HashMap();
-    private HashMap theAutomatonDocumentContainer = new HashMap();
-    //private HashMap theVisualAutomatonContainer = new HashMap();
-    private HashMap theAlphabetViewerContainer = new HashMap();
-    private AutomataEditor theAutomataEditor = null;
-	//private LinkedList listeners = new LinkedList();
+	private ArrayList theAutomatonNames = null;
+	private HashMap theAutomatonContainer = null;
+	private HashMap theAutomatonViewerContainer = null;
+	private HashMap theAutomatonExplorerContainer = null;
+	private HashMap theAutomatonFrameContainer = null;
+	private HashMap theAutomatonDocumentContainer = null;
+	private HashMap theAlphabetViewerContainer = null;
+	private AutomataEditor theAutomataEditor = null;
 	private AutomatonContainerListeners automataListeners = null;
 	private Supremica workbench = null;
+
 	private LightTableModel lightTableModel = new LightTableModel();
 	private FullTableModel fullTableModel = new FullTableModel();
 
 	private String projectName = "Untitled";
 	private File projectFile = null;
 
-//			fileImporter.setCurrentDirectory(
-//				new java.io.File(WorkbenchProperties.getFileOpenPath()));
-
 	public AutomatonContainer()
 	{
+		theAutomatonNames = new ArrayList();
+		theAutomatonContainer = new HashMap();
+
+		initializeGUIContainers();
+		this.workbench = null;		
+	}
+
+	/**
+	 * This make a shallow copy of the other container. No copies of
+	 * automata or windows are made.
+	 **/
+	public AutomatonContainer(AutomatonContainer other)
+	{
+		theAutomatonNames = new ArrayList(other.theAutomatonNames);
+		theAutomatonContainer = new HashMap(other.theAutomatonContainer);
+		initializeGUIContainers();
+		this.workbench = other.workbench;
 	}
 
 	public AutomatonContainer(Supremica workbench)
 	{
+		theAutomatonNames = new ArrayList();
+		theAutomatonContainer = new HashMap();
+
+		initializeGUIContainers();
 		this.workbench = workbench;
+	}
+
+	private void initializeGUIContainers()
+	{
+		theAutomatonViewerContainer = new HashMap();
+		theAutomatonExplorerContainer = new HashMap();
+		theAutomatonFrameContainer = new HashMap();
+		theAutomatonDocumentContainer = new HashMap();
+		theAlphabetViewerContainer = new HashMap();
 	}
 
 	public void setProjectName(String projectName)
@@ -150,8 +175,7 @@ public class AutomatonContainer
 	public void add(Automata automata)
 		throws Exception
 	{
-		Iterator autIt = automata.iterator();
-		while (autIt.hasNext())
+		for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 		{
 			add((Automaton) autIt.next());
 		}
@@ -373,43 +397,6 @@ public class AutomatonContainer
     	}
     }
 
-/*
-    public VisualAutomaton getVisualAutomaton(String automaton)
-    	throws Exception
-    {
-    	if (theVisualAutomatonContainer.containsKey(automaton))
-    	{
-    		VisualAutomaton visualAutomaton =
-    			(VisualAutomaton)theVisualAutomatonContainer.get(automaton);
-    		return visualAutomaton;
-    	}
-    	else
-    	{
-    		Automaton currAutomaton = (Automaton)theAutomatonContainer.get(automaton);
-    		if (currAutomaton != null)
-    		{
-    			try
-    			{
-    				VisualAutomaton visualAutomaton = new VisualAutomaton(
-    					getAutomataEditor(), currAutomaton);
-					theVisualAutomatonContainer.put(automaton, visualAutomaton);
-					visualAutomaton.initialize();
-					//addAutomatonListener(currAutomaton, visualAutomaton);
-					return visualAutomaton;
-    			}
-  				catch (Exception ex)
-  				{
-  					throw new Exception("Error while creating visual automaton: " + automaton);
-  				}
-    		}
-    		else
-    		{
-    			throw new Exception(automaton + " does not exist in AutomatonContainer");
-    		}
-    	}
-    }
-*/
-
     public AlphabetViewer getAlphabetViewer(String automaton)
     	throws Exception
     {
@@ -514,6 +501,7 @@ public class AutomatonContainer
     	update();
     }
 
+
     public void remove(String automatonName, boolean rename)
 		throws Exception
     {
@@ -560,14 +548,7 @@ public class AutomatonContainer
 			automatonExplorer.dispose();
 			theAutomatonExplorerContainer.remove(automatonName);
 		}
-/*
-		// Clear visual automaton, if it exists
-		VisualAutomaton visualAutomaton = (VisualAutomaton)theVisualAutomatonContainer.get(automatonName);
-		if (visualAutomaton != null)
-		{
-			theVisualAutomatonContainer.remove(automatonName);
-		}
-		*/
+		
 		// Clear alphabet viewer, if it exists
 		AlphabetViewer alphabetViewer = (AlphabetViewer)theAlphabetViewerContainer.get(automatonName);
 		if (alphabetViewer != null)
@@ -594,18 +575,6 @@ public class AutomatonContainer
 		updateListeners();
 	}
 
-/*
-	public void updateAutomatonListeners(Automaton theAutomaton)
-	{
-		LinkedList listenerList = (LinkedList)theAutomatonListeners.get(theAutomaton.getName());
-		Iterator listenerListIt = listenerList.iterator();
-		while (listenerListIt.hasNext())
-		{
-			AutomatonListener l = (AutomatonListener)listenerListIt.next();
-			l.automatonUpdated(theAutomaton);
-		}
-	}
-*/
 
 	public AutomatonContainerListeners getListeners()
 	{

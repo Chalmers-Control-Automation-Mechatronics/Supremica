@@ -55,38 +55,47 @@ import org.apache.log4j.*;
 
 import org.supremica.gui.*;
 
-/**
- * A set of Automata with common actions and an AutomatonContainer.
- * @see org.supremica.gui.AutomatonContainer
- */
-public class Project
-	extends Automata
+public class ProjectContainer
 {
-	private static Category thisCategory = LogDisplay.createCategory(Project.class.getName());
-	private AutomatonContainer theContainer = null;
+	private static Category thisCategory = LogDisplay.createCategory(ProjectContainer.class.getName());
 
-	public Project()
+	private List theProjects;
+
+	public ProjectContainer()
 	{
-		theContainer = new AutomatonContainer();
+		theProjects = new LinkedList();
 	}
 
-	public Project(Project otherProject)
+	public void addProject(Project theProject)
 	{
-		super(otherProject);
-		theContainer = new AutomatonContainer(otherProject.theContainer);
-		try
+		theProjects.add(theProject);
+	}
+
+	public void removeProject(Project theProject)
+	{
+		theProjects.remove(theProject);
+	}
+
+	public Project getProject(String name)
+	{
+		if (name == null)
 		{
-			theContainer.add(otherProject);
+			return null;
 		}
-		catch (Exception e)
+
+		for (Iterator projIt = iterator(); projIt.hasNext(); )
 		{
-			thisCategory.error("Error while copying project");
+			Project currProject = (Project)projIt.next();
+			if (name.equals(currProject.getName()))
+			{
+				return currProject;
+			}
 		}
+		return null;
 	}
 
-	public AutomatonContainer getAutomatonContainer()
+	public Iterator iterator()
 	{
-		return theContainer;
-	}
-	
+		return theProjects.iterator();
+	}	
 }

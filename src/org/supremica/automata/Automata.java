@@ -50,8 +50,8 @@
 package org.supremica.automata;
 
 import java.util.*;
-// import org.supremica.gui.*; //** MF ** The model should know _nothing_ of the view/UI!
-// import org.apache.log4j.*;
+import org.supremica.gui.*; 
+import org.apache.log4j.*;
 
 /**
  * A collection of Automaton-objects.
@@ -59,7 +59,7 @@ import java.util.*;
  */
 public class Automata
 {
-//	private static Category thisCategory = LogDisplay.createCategory(Automata.class.getName());
+	private static Category thisCategory = LogDisplay.createCategory(Automata.class.getName());
 
 	private ArrayList theAutomata; // Efficiency reasons
  	private HashMap nameMap;
@@ -80,7 +80,6 @@ public class Automata
 		Iterator automataIterator = oldAutomata.iterator();
 		while (automataIterator.hasNext())
 		{
-			// addAutomaton((Automaton) automataIterator.next());
 			addAutomaton(new Automaton((Automaton) automataIterator.next()));
 		}
 	}
@@ -150,16 +149,6 @@ public class Automata
 		return AlphabetHelpers.getUnionAlphabet(this);
 	}
 
-	/**
- 	 * @deprecated Use getUnionAlphabet instead
-	 **/
-/*
-	public Alphabet createUnionAlphabet()
-		throws Exception
-	{
-		return getUnionAlphabet();
-	}
-*/
 	public Iterator iterator()
 	{
 		return theAutomata.iterator();
