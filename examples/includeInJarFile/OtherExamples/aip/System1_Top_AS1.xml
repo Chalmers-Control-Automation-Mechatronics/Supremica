@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata name="Single Visual Project"  major="0"  minor="9" >
+<Automaton name="h_HndlComEventsAS" type="Specification">
+	<Events>
+		<Event id="DetStnsUp" label="DetStnsUp"/>
+		<Event id="IsPalletCL.TU1" label="IsPalletCL.TU1" controllable="false"/>
+		<Event id="IsPalletCL.TU2" label="IsPalletCL.TU2" controllable="false"/>
+		<Event id="NoPalletCL.TU1" label="NoPalletCL.TU1" controllable="false"/>
+		<Event id="NoPalletCL.TU2" label="NoPalletCL.TU2" controllable="false"/>
+		<Event id="QPalletAtCL.TU1" label="QPalletAtCL.TU1"/>
+		<Event id="QPalletAtCL.TU2" label="QPalletAtCL.TU2"/>
+		<Event id="QStnUp.AS1" label="QStnUp.AS1"/>
+		<Event id="QStnUp.AS2" label="QStnUp.AS2"/>
+		<Event id="StnDwn.AS1" label="StnDwn.AS1" controllable="false"/>
+		<Event id="StnDwn.AS2" label="StnDwn.AS2" controllable="false"/>
+		<Event id="StnUp.AS1" label="StnUp.AS1" controllable="false"/>
+		<Event id="StnUp.AS2" label="StnUp.AS2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s3" event="DetStnsUp"/>
+		<Transition source="s0" dest="s2" event="QPalletAtCL.TU2"/>
+		<Transition source="s0" dest="s1" event="QPalletAtCL.TU1"/>
+		<Transition source="s1" dest="s4" event="IsPalletCL.TU1"/>
+		<Transition source="s1" dest="s0" event="NoPalletCL.TU1"/>
+		<Transition source="s2" dest="s5" event="IsPalletCL.TU2"/>
+		<Transition source="s2" dest="s0" event="NoPalletCL.TU2"/>
+		<Transition source="s3" dest="s3" event="QStnUp.AS1"/>
+		<Transition source="s3" dest="s3" event="StnUp.AS1"/>
+		<Transition source="s3" dest="s3" event="StnDwn.AS1"/>
+		<Transition source="s3" dest="s3" event="QStnUp.AS2"/>
+		<Transition source="s3" dest="s0" event="StnUp.AS2"/>
+		<Transition source="s3" dest="s0" event="StnDwn.AS2"/>
+		<Transition source="s4" dest="s4" event="QStnUp.AS1"/>
+		<Transition source="s4" dest="s0" event="StnUp.AS1"/>
+		<Transition source="s4" dest="s0" event="StnDwn.AS1"/>
+		<Transition source="s5" dest="s5" event="QStnUp.AS2"/>
+		<Transition source="s5" dest="s0" event="StnUp.AS2"/>
+		<Transition source="s5" dest="s0" event="StnDwn.AS2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU1" type="Specification">
+	<Events>
+		<Event id="IsPalletCL.TU1" label="IsPalletCL.TU1" controllable="false"/>
+		<Event id="IsPalletEL.TU1" label="IsPalletEL.TU1"/>
+		<Event id="LibPallet.TU1" label="LibPallet.TU1"/>
+		<Event id="NoPalletCL.TU1" label="NoPalletCL.TU1" controllable="false"/>
+		<Event id="NoPalletEL.TU1" label="NoPalletEL.TU1" controllable="false"/>
+		<Event id="NoTrnsfEL.TU1" label="NoTrnsfEL.TU1"/>
+		<Event id="PalletRlsd.TU1" label="PalletRlsd.TU1"/>
+		<Event id="QPalletAtCL.TU1" label="QPalletAtCL.TU1"/>
+		<Event id="QPalletAtEL.TU1" label="QPalletAtEL.TU1"/>
+		<Event id="QStnUp.AS1" label="QStnUp.AS1"/>
+		<Event id="StnDwn.AS1" label="StnDwn.AS1" controllable="false"/>
+		<Event id="StnUp.AS1" label="StnUp.AS1" controllable="false"/>
+		<Event id="TrnsfCplToCL.TU1" label="TrnsfCplToCL.TU1"/>
+		<Event id="TrnsfCplToEL.TU1" label="TrnsfCplToEL.TU1"/>
+		<Event id="TrnsfELToCL.TU1" label="TrnsfELToCL.TU1"/>
+		<Event id="TrnsfToEL.TU1" label="TrnsfToEL.TU1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+		<State id="s6"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s3" event="NoPalletEL.TU1"/>
+		<Transition source="s0" dest="s2" event="IsPalletEL.TU1"/>
+		<Transition source="s0" dest="s0" event="QPalletAtEL.TU1"/>
+		<Transition source="s0" dest="s0" event="QStnUp.AS1"/>
+		<Transition source="s0" dest="s0" event="StnUp.AS1"/>
+		<Transition source="s0" dest="s0" event="StnDwn.AS1"/>
+		<Transition source="s2" dest="s3" event="TrnsfCplToCL.TU1"/>
+		<Transition source="s2" dest="s2" event="QStnUp.AS1"/>
+		<Transition source="s2" dest="s2" event="StnUp.AS1"/>
+		<Transition source="s2" dest="s2" event="StnDwn.AS1"/>
+		<Transition source="s2" dest="s2" event="TrnsfELToCL.TU1"/>
+		<Transition source="s3" dest="s4" event="IsPalletCL.TU1"/>
+		<Transition source="s3" dest="s3" event="QPalletAtCL.TU1"/>
+		<Transition source="s3" dest="s3" event="QStnUp.AS1"/>
+		<Transition source="s3" dest="s3" event="StnUp.AS1"/>
+		<Transition source="s3" dest="s3" event="StnDwn.AS1"/>
+		<Transition source="s3" dest="s0" event="NoPalletCL.TU1"/>
+		<Transition source="s4" dest="s4" event="QStnUp.AS1"/>
+		<Transition source="s4" dest="s6" event="StnDwn.AS1"/>
+		<Transition source="s4" dest="s5" event="StnUp.AS1"/>
+		<Transition source="s5" dest="s0" event="PalletRlsd.TU1"/>
+		<Transition source="s5" dest="s0" event="TrnsfCplToEL.TU1"/>
+		<Transition source="s5" dest="s6" event="NoTrnsfEL.TU1"/>
+		<Transition source="s5" dest="s5" event="LibPallet.TU1"/>
+		<Transition source="s5" dest="s5" event="TrnsfToEL.TU1"/>
+		<Transition source="s5" dest="s5" event="QStnUp.AS1"/>
+		<Transition source="s5" dest="s5" event="StnUp.AS1"/>
+		<Transition source="s5" dest="s5" event="StnDwn.AS1"/>
+		<Transition source="s6" dest="s0" event="PalletRlsd.TU1"/>
+		<Transition source="s6" dest="s6" event="LibPallet.TU1"/>
+		<Transition source="s6" dest="s6" event="QStnUp.AS1"/>
+		<Transition source="s6" dest="s6" event="StnUp.AS1"/>
+		<Transition source="s6" dest="s6" event="StnDwn.AS1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU2" type="Specification">
+	<Events>
+		<Event id="IsPalletCL.TU2" label="IsPalletCL.TU2" controllable="false"/>
+		<Event id="IsPalletEL.TU2" label="IsPalletEL.TU2"/>
+		<Event id="LibPallet.TU2" label="LibPallet.TU2"/>
+		<Event id="NoPalletCL.TU2" label="NoPalletCL.TU2" controllable="false"/>
+		<Event id="NoPalletEL.TU2" label="NoPalletEL.TU2" controllable="false"/>
+		<Event id="NoTrnsfEL.TU2" label="NoTrnsfEL.TU2"/>
+		<Event id="PalletRlsd.TU2" label="PalletRlsd.TU2"/>
+		<Event id="QPalletAtCL.TU2" label="QPalletAtCL.TU2"/>
+		<Event id="QPalletAtEL.TU2" label="QPalletAtEL.TU2"/>
+		<Event id="QStnUp.AS2" label="QStnUp.AS2"/>
+		<Event id="StnDwn.AS2" label="StnDwn.AS2" controllable="false"/>
+		<Event id="StnUp.AS2" label="StnUp.AS2" controllable="false"/>
+		<Event id="TrnsfCplToCL.TU2" label="TrnsfCplToCL.TU2"/>
+		<Event id="TrnsfCplToEL.TU2" label="TrnsfCplToEL.TU2"/>
+		<Event id="TrnsfELToCL.TU2" label="TrnsfELToCL.TU2"/>
+		<Event id="TrnsfToEL.TU2" label="TrnsfToEL.TU2"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+		<State id="s6"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s3" event="NoPalletEL.TU2"/>
+		<Transition source="s0" dest="s2" event="IsPalletEL.TU2"/>
+		<Transition source="s0" dest="s0" event="QPalletAtEL.TU2"/>
+		<Transition source="s0" dest="s0" event="QStnUp.AS2"/>
+		<Transition source="s0" dest="s0" event="StnUp.AS2"/>
+		<Transition source="s0" dest="s0" event="StnDwn.AS2"/>
+		<Transition source="s2" dest="s3" event="TrnsfCplToCL.TU2"/>
+		<Transition source="s2" dest="s2" event="QStnUp.AS2"/>
+		<Transition source="s2" dest="s2" event="StnUp.AS2"/>
+		<Transition source="s2" dest="s2" event="StnDwn.AS2"/>
+		<Transition source="s2" dest="s2" event="TrnsfELToCL.TU2"/>
+		<Transition source="s3" dest="s3" event="QPalletAtCL.TU2"/>
+		<Transition source="s3" dest="s3" event="QStnUp.AS2"/>
+		<Transition source="s3" dest="s3" event="StnUp.AS2"/>
+		<Transition source="s3" dest="s3" event="StnDwn.AS2"/>
+		<Transition source="s3" dest="s4" event="IsPalletCL.TU2"/>
+		<Transition source="s3" dest="s0" event="NoPalletCL.TU2"/>
+		<Transition source="s4" dest="s6" event="StnDwn.AS2"/>
+		<Transition source="s4" dest="s5" event="StnUp.AS2"/>
+		<Transition source="s4" dest="s4" event="QStnUp.AS2"/>
+		<Transition source="s5" dest="s6" event="NoTrnsfEL.TU2"/>
+		<Transition source="s5" dest="s5" event="LibPallet.TU2"/>
+		<Transition source="s5" dest="s5" event="TrnsfToEL.TU2"/>
+		<Transition source="s5" dest="s5" event="QStnUp.AS2"/>
+		<Transition source="s5" dest="s5" event="StnUp.AS2"/>
+		<Transition source="s5" dest="s5" event="StnDwn.AS2"/>
+		<Transition source="s5" dest="s0" event="PalletRlsd.TU2"/>
+		<Transition source="s5" dest="s0" event="TrnsfCplToEL.TU2"/>
+		<Transition source="s6" dest="s6" event="LibPallet.TU2"/>
+		<Transition source="s6" dest="s6" event="QStnUp.AS2"/>
+		<Transition source="s6" dest="s6" event="StnUp.AS2"/>
+		<Transition source="s6" dest="s6" event="StnDwn.AS2"/>
+		<Transition source="s6" dest="s0" event="PalletRlsd.TU2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU3" type="Specification">
+	<Events>
+		<Event id="DetStnsUp" label="DetStnsUp"/>
+		<Event id="IsPalletCL.TU3" label="IsPalletCL.TU3" controllable="false"/>
+		<Event id="IsPalletEL.TU3" label="IsPalletEL.TU3"/>
+		<Event id="LibPallet.TU3" label="LibPallet.TU3"/>
+		<Event id="NoPalletCL.TU3" label="NoPalletCL.TU3" controllable="false"/>
+		<Event id="NoPalletEL.TU3" label="NoPalletEL.TU3" controllable="false"/>
+		<Event id="NoTrnsfEL.TU3" label="NoTrnsfEL.TU3"/>
+		<Event id="PalletRlsd.TU3" label="PalletRlsd.TU3"/>
+		<Event id="QPalletAtCL.TU3" label="QPalletAtCL.TU3"/>
+		<Event id="QPalletAtEL.TU3" label="QPalletAtEL.TU3"/>
+		<Event id="TrnsfCplToCL.TU3" label="TrnsfCplToCL.TU3"/>
+		<Event id="TrnsfCplToEL.TU3" label="TrnsfCplToEL.TU3"/>
+		<Event id="TrnsfELToCL.TU3" label="TrnsfELToCL.TU3"/>
+		<Event id="TrnsfToEL3_1D" label="TrnsfToEL3_1D"/>
+		<Event id="TrnsfToEL3_2D" label="TrnsfToEL3_2D"/>
+		<Event id="TrnsfToEL3_BD" label="TrnsfToEL3_BD"/>
+		<Event id="TrnsfToEL3_Up" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+		<State id="s6"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s0" event="QPalletAtEL.TU3"/>
+		<Transition source="s0" dest="s2" event="IsPalletEL.TU3"/>
+		<Transition source="s0" dest="s3" event="NoPalletEL.TU3"/>
+		<Transition source="s2" dest="s2" event="TrnsfELToCL.TU3"/>
+		<Transition source="s2" dest="s3" event="TrnsfCplToCL.TU3"/>
+		<Transition source="s3" dest="s0" event="NoPalletCL.TU3"/>
+		<Transition source="s3" dest="s3" event="QPalletAtCL.TU3"/>
+		<Transition source="s3" dest="s6" event="IsPalletCL.TU3"/>
+		<Transition source="s4" dest="s5" event="NoTrnsfEL.TU3"/>
+		<Transition source="s4" dest="s0" event="TrnsfCplToEL.TU3"/>
+		<Transition source="s4" dest="s4" event="TrnsfToEL3_Up"/>
+		<Transition source="s4" dest="s4" event="TrnsfToEL3_1D"/>
+		<Transition source="s4" dest="s4" event="TrnsfToEL3_2D"/>
+		<Transition source="s4" dest="s4" event="TrnsfToEL3_BD"/>
+		<Transition source="s5" dest="s5" event="LibPallet.TU3"/>
+		<Transition source="s5" dest="s0" event="PalletRlsd.TU3"/>
+		<Transition source="s6" dest="s4" event="DetStnsUp"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU4" type="Specification">
+	<Events>
+		<Event id="IsPalletCL.TU4" label="IsPalletCL.TU4" controllable="false"/>
+		<Event id="IsPalletEL.TU4" label="IsPalletEL.TU4"/>
+		<Event id="LibPallet.TU4" label="LibPallet.TU4"/>
+		<Event id="NoPalletCL.TU4" label="NoPalletCL.TU4" controllable="false"/>
+		<Event id="NoPalletEL.TU4" label="NoPalletEL.TU4" controllable="false"/>
+		<Event id="NoTrnsfEL.TU4" label="NoTrnsfEL.TU4"/>
+		<Event id="PalletRlsd.TU4" label="PalletRlsd.TU4"/>
+		<Event id="QPalletAtCL.TU4" label="QPalletAtCL.TU4"/>
+		<Event id="QPalletAtEL.TU4" label="QPalletAtEL.TU4"/>
+		<Event id="TrnsfCplToCL.TU4" label="TrnsfCplToCL.TU4"/>
+		<Event id="TrnsfCplToEL.TU4" label="TrnsfCplToEL.TU4"/>
+		<Event id="TrnsfELToCL.TU4" label="TrnsfELToCL.TU4"/>
+		<Event id="TrnsfToEL.TU4" label="TrnsfToEL.TU4"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s3" event="NoPalletEL.TU4"/>
+		<Transition source="s0" dest="s0" event="QPalletAtEL.TU4"/>
+		<Transition source="s0" dest="s2" event="IsPalletEL.TU4"/>
+		<Transition source="s2" dest="s3" event="TrnsfCplToCL.TU4"/>
+		<Transition source="s2" dest="s2" event="TrnsfELToCL.TU4"/>
+		<Transition source="s3" dest="s3" event="QPalletAtCL.TU4"/>
+		<Transition source="s3" dest="s0" event="NoPalletCL.TU4"/>
+		<Transition source="s3" dest="s4" event="IsPalletCL.TU4"/>
+		<Transition source="s4" dest="s0" event="TrnsfCplToEL.TU4"/>
+		<Transition source="s4" dest="s4" event="TrnsfToEL.TU4"/>
+		<Transition source="s4" dest="s5" event="NoTrnsfEL.TU4"/>
+		<Transition source="s5" dest="s0" event="PalletRlsd.TU4"/>
+		<Transition source="s5" dest="s5" event="LibPallet.TU4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL3_2" type="Plant">
+	<Events>
+		<Event id="PalletArvGEL_2.AS3" label="PalletArvGEL_2.AS3" controllable="false"/>
+		<Event id="ProcPallet.AS3" label="ProcPallet.AS3"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="PalletArvGEL_2.AS3"/>
+		<Transition source="s1" dest="s0" event="ProcPallet.AS3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfAssmbStn3" type="Plant">
+	<Events>
+		<Event id="PalletRepd.AS3" label="PalletRepd.AS3"/>
+		<Event id="ProcCpl.AS3" label="ProcCpl.AS3"/>
+		<Event id="ProcErr.AS3" label="ProcErr.AS3"/>
+		<Event id="ProcPallet.AS3" label="ProcPallet.AS3"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="ProcPallet.AS3"/>
+		<Transition source="s1" dest="s0" event="ProcCpl.AS3"/>
+		<Transition source="s1" dest="s0" event="ProcErr.AS3"/>
+		<Transition source="s1" dest="s0" event="PalletRepd.AS3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU3" type="Plant">
+	<Events>
+		<Event id="LibPallet.TU3" label="LibPallet.TU3"/>
+		<Event id="NoTrnsfEL.TU3" label="NoTrnsfEL.TU3"/>
+		<Event id="PalletRlsd.TU3" label="PalletRlsd.TU3"/>
+		<Event id="TrnsfCplToCL.TU3" label="TrnsfCplToCL.TU3"/>
+		<Event id="TrnsfCplToEL.TU3" label="TrnsfCplToEL.TU3"/>
+		<Event id="TrnsfELToCL.TU3" label="TrnsfELToCL.TU3"/>
+		<Event id="TrnsfToEL3_1D" label="TrnsfToEL3_1D"/>
+		<Event id="TrnsfToEL3_2D" label="TrnsfToEL3_2D"/>
+		<Event id="TrnsfToEL3_BD" label="TrnsfToEL3_BD"/>
+		<Event id="TrnsfToEL3_Up" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="TrnsfToEL3_Up"/>
+		<Transition source="s0" dest="s1" event="TrnsfToEL3_1D"/>
+		<Transition source="s0" dest="s1" event="TrnsfToEL3_2D"/>
+		<Transition source="s0" dest="s1" event="TrnsfToEL3_BD"/>
+		<Transition source="s0" dest="s3" event="LibPallet.TU3"/>
+		<Transition source="s0" dest="s2" event="TrnsfELToCL.TU3"/>
+		<Transition source="s1" dest="s0" event="NoTrnsfEL.TU3"/>
+		<Transition source="s1" dest="s0" event="TrnsfCplToEL.TU3"/>
+		<Transition source="s2" dest="s0" event="TrnsfCplToCL.TU3"/>
+		<Transition source="s3" dest="s0" event="PalletRlsd.TU3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DetWhichStnUp" type="Specification">
+	<Events>
+		<Event id="DetStnsUp" label="DetStnsUp"/>
+		<Event id="LibPallet.TU3" label="LibPallet.TU3"/>
+		<Event id="QStnUp.AS1" label="QStnUp.AS1"/>
+		<Event id="QStnUp.AS2" label="QStnUp.AS2"/>
+		<Event id="StnDwn.AS1" label="StnDwn.AS1" controllable="false"/>
+		<Event id="StnDwn.AS2" label="StnDwn.AS2" controllable="false"/>
+		<Event id="StnUp.AS1" label="StnUp.AS1" controllable="false"/>
+		<Event id="StnUp.AS2" label="StnUp.AS2" controllable="false"/>
+		<Event id="TrnsfToEL3_1D" label="TrnsfToEL3_1D"/>
+		<Event id="TrnsfToEL3_2D" label="TrnsfToEL3_2D"/>
+		<Event id="TrnsfToEL3_BD" label="TrnsfToEL3_BD"/>
+		<Event id="TrnsfToEL3_Up" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+		<State id="s6"/>
+		<State id="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s0" event="QStnUp.AS1"/>
+		<Transition source="s0" dest="s0" event="StnUp.AS1"/>
+		<Transition source="s0" dest="s0" event="StnDwn.AS1"/>
+		<Transition source="s0" dest="s0" event="QStnUp.AS2"/>
+		<Transition source="s0" dest="s0" event="StnUp.AS2"/>
+		<Transition source="s0" dest="s0" event="StnDwn.AS2"/>
+		<Transition source="s0" dest="s0" event="LibPallet.TU3"/>
+		<Transition source="s0" dest="s1" event="DetStnsUp"/>
+		<Transition source="s1" dest="s5" event="StnDwn.AS1"/>
+		<Transition source="s1" dest="s1" event="QStnUp.AS1"/>
+		<Transition source="s1" dest="s2" event="StnUp.AS1"/>
+		<Transition source="s2" dest="s4" event="StnDwn.AS2"/>
+		<Transition source="s2" dest="s2" event="QStnUp.AS2"/>
+		<Transition source="s2" dest="s3" event="StnUp.AS2"/>
+		<Transition source="s3" dest="s0" event="LibPallet.TU3"/>
+		<Transition source="s3" dest="s0" event="TrnsfToEL3_Up"/>
+		<Transition source="s4" dest="s0" event="LibPallet.TU3"/>
+		<Transition source="s4" dest="s0" event="TrnsfToEL3_2D"/>
+		<Transition source="s5" dest="s7" event="StnUp.AS2"/>
+		<Transition source="s5" dest="s5" event="QStnUp.AS2"/>
+		<Transition source="s5" dest="s6" event="StnDwn.AS2"/>
+		<Transition source="s6" dest="s0" event="LibPallet.TU3"/>
+		<Transition source="s6" dest="s0" event="TrnsfToEL3_BD"/>
+		<Transition source="s7" dest="s0" event="LibPallet.TU3"/>
+		<Transition source="s7" dest="s0" event="TrnsfToEL3_1D"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL1" type="Specification">
+	<Events>
+		<Event id="ASDwn.AS1" label="ASDwn.AS1"/>
+		<Event id="IsPalletCL.TU1" label="IsPalletCL.TU1" controllable="false"/>
+		<Event id="IsPalletEL.TU1" label="IsPalletEL.TU1"/>
+		<Event id="LibPallet.TU1" label="LibPallet.TU1"/>
+		<Event id="NoTrnsfEL.TU1" label="NoTrnsfEL.TU1"/>
+		<Event id="ProcCpl.AS1" label="ProcCpl.AS1"/>
+		<Event id="ProcErr.AS1" label="ProcErr.AS1"/>
+		<Event id="ProcPallet.AS1" label="ProcPallet.AS1"/>
+		<Event id="StnDwn.AS1" label="StnDwn.AS1" controllable="false"/>
+		<Event id="StnUp.AS1" label="StnUp.AS1" controllable="false"/>
+		<Event id="TrnsfCplToCL.TU1" label="TrnsfCplToCL.TU1"/>
+		<Event id="TrnsfCplToEL.TU1" label="TrnsfCplToEL.TU1"/>
+		<Event id="TrnsfELToCL.TU1" label="TrnsfELToCL.TU1"/>
+		<Event id="TrnsfToEL.TU1" label="TrnsfToEL.TU1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s3" event="IsPalletCL.TU1"/>
+		<Transition source="s0" dest="s2" event="NoTrnsfEL.TU1"/>
+		<Transition source="s0" dest="s0" event="TrnsfToEL.TU1"/>
+		<Transition source="s0" dest="s0" event="StnUp.AS1"/>
+		<Transition source="s0" dest="s0" event="StnDwn.AS1"/>
+		<Transition source="s0" dest="s1" event="TrnsfCplToEL.TU1"/>
+		<Transition source="s1" dest="s4" event="ProcCpl.AS1"/>
+		<Transition source="s1" dest="s4" event="ProcErr.AS1"/>
+		<Transition source="s1" dest="s4" event="ASDwn.AS1"/>
+		<Transition source="s1" dest="s1" event="LibPallet.TU1"/>
+		<Transition source="s1" dest="s1" event="StnUp.AS1"/>
+		<Transition source="s1" dest="s1" event="StnDwn.AS1"/>
+		<Transition source="s1" dest="s1" event="IsPalletCL.TU1"/>
+		<Transition source="s1" dest="s1" event="ProcPallet.AS1"/>
+		<Transition source="s2" dest="s2" event="StnUp.AS1"/>
+		<Transition source="s2" dest="s2" event="StnDwn.AS1"/>
+		<Transition source="s2" dest="s0" event="LibPallet.TU1"/>
+		<Transition source="s3" dest="s2" event="StnDwn.AS1"/>
+		<Transition source="s3" dest="s0" event="StnUp.AS1"/>
+		<Transition source="s4" dest="s4" event="LibPallet.TU1"/>
+		<Transition source="s4" dest="s4" event="IsPalletCL.TU1"/>
+		<Transition source="s4" dest="s4" event="StnUp.AS1"/>
+		<Transition source="s4" dest="s4" event="StnDwn.AS1"/>
+		<Transition source="s4" dest="s4" event="TrnsfELToCL.TU1"/>
+		<Transition source="s4" dest="s4" event="IsPalletEL.TU1"/>
+		<Transition source="s4" dest="s0" event="TrnsfCplToCL.TU1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL2" type="Specification">
+	<Events>
+		<Event id="ASDwn.AS2" label="ASDwn.AS2"/>
+		<Event id="IsPalletCL.TU2" label="IsPalletCL.TU2" controllable="false"/>
+		<Event id="IsPalletEL.TU2" label="IsPalletEL.TU2"/>
+		<Event id="LibPallet.TU2" label="LibPallet.TU2"/>
+		<Event id="NoTrnsfEL.TU2" label="NoTrnsfEL.TU2"/>
+		<Event id="ProcCpl.AS2" label="ProcCpl.AS2"/>
+		<Event id="ProcErr.AS2" label="ProcErr.AS2"/>
+		<Event id="ProcPallet.AS2" label="ProcPallet.AS2"/>
+		<Event id="StnDwn.AS2" label="StnDwn.AS2" controllable="false"/>
+		<Event id="StnUp.AS2" label="StnUp.AS2" controllable="false"/>
+		<Event id="TrnsfCplToCL.TU2" label="TrnsfCplToCL.TU2"/>
+		<Event id="TrnsfCplToEL.TU2" label="TrnsfCplToEL.TU2"/>
+		<Event id="TrnsfELToCL.TU2" label="TrnsfELToCL.TU2"/>
+		<Event id="TrnsfToEL.TU2" label="TrnsfToEL.TU2"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s0" event="TrnsfToEL.TU2"/>
+		<Transition source="s0" dest="s0" event="StnUp.AS2"/>
+		<Transition source="s0" dest="s0" event="StnDwn.AS2"/>
+		<Transition source="s0" dest="s3" event="IsPalletCL.TU2"/>
+		<Transition source="s0" dest="s2" event="NoTrnsfEL.TU2"/>
+		<Transition source="s0" dest="s1" event="TrnsfCplToEL.TU2"/>
+		<Transition source="s1" dest="s4" event="ProcCpl.AS2"/>
+		<Transition source="s1" dest="s4" event="ProcErr.AS2"/>
+		<Transition source="s1" dest="s4" event="ASDwn.AS2"/>
+		<Transition source="s1" dest="s1" event="LibPallet.TU2"/>
+		<Transition source="s1" dest="s1" event="StnUp.AS2"/>
+		<Transition source="s1" dest="s1" event="StnDwn.AS2"/>
+		<Transition source="s1" dest="s1" event="IsPalletCL.TU2"/>
+		<Transition source="s1" dest="s1" event="ProcPallet.AS2"/>
+		<Transition source="s2" dest="s0" event="LibPallet.TU2"/>
+		<Transition source="s2" dest="s2" event="StnUp.AS2"/>
+		<Transition source="s2" dest="s2" event="StnDwn.AS2"/>
+		<Transition source="s3" dest="s0" event="StnUp.AS2"/>
+		<Transition source="s3" dest="s2" event="StnDwn.AS2"/>
+		<Transition source="s4" dest="s0" event="TrnsfCplToCL.TU2"/>
+		<Transition source="s4" dest="s4" event="LibPallet.TU2"/>
+		<Transition source="s4" dest="s4" event="IsPalletCL.TU2"/>
+		<Transition source="s4" dest="s4" event="StnUp.AS2"/>
+		<Transition source="s4" dest="s4" event="StnDwn.AS2"/>
+		<Transition source="s4" dest="s4" event="TrnsfELToCL.TU2"/>
+		<Transition source="s4" dest="s4" event="IsPalletEL.TU2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_RWDeviceAS1" type="Plant">
+	<Events>
+		<Event id="DoneRead.AS1" label="DoneRead.AS1" controllable="false"/>
+		<Event id="DoneWrite.AS1" label="DoneWrite.AS1" controllable="false"/>
+		<Event id="ReadLabel.AS1" label="ReadLabel.AS1"/>
+		<Event id="WrtCplT1A_1B.AS1" label="WrtCplT1A_1B.AS1"/>
+		<Event id="WrtErr1A.AS1" label="WrtErr1A.AS1"/>
+		<Event id="WrtErr1B.AS1" label="WrtErr1B.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s2" event="WrtCplT1A_1B.AS1"/>
+		<Transition source="s0" dest="s2" event="WrtErr1A.AS1"/>
+		<Transition source="s0" dest="s2" event="WrtErr1B.AS1"/>
+		<Transition source="s0" dest="s1" event="ReadLabel.AS1"/>
+		<Transition source="s1" dest="s0" event="DoneRead.AS1"/>
+		<Transition source="s2" dest="s0" event="DoneWrite.AS1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_Extractor.AS1" type="Plant">
+	<Events>
+		<Event id="ExtrArvConv.j" label="ExtrArvConv.AS1" controllable="false"/>
+		<Event id="ExtrArvPlatf.j" label="ExtrArvPlatf.AS1" controllable="false"/>
+		<Event id="MvExtrToConv.j" label="MvExtrToConv.AS1"/>
+		<Event id="MvExtrToPlatf.j" label="MvExtrToPlatf.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="MvExtrToPlatf.j"/>
+		<Transition source="s1" dest="s2" event="ExtrArvPlatf.j"/>
+		<Transition source="s2" dest="s3" event="MvExtrToConv.j"/>
+		<Transition source="s3" dest="s0" event="ExtrArvConv.j"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfAssmbStn.AS2" type="Plant">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS2"/>
+		<Event id="DoRpr.k" label="DoRpr.AS2"/>
+		<Event id="ProcCpl.k" label="ProcCpl.AS2"/>
+		<Event id="ProcErr.k" label="ProcErr.AS2"/>
+		<Event id="ProcPallet.k" label="ProcPallet.AS2"/>
+		<Event id="RobUp.k" label="RobUp.AS2"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="ProcPallet.k"/>
+		<Transition source="s0" dest="s2" event="DoRpr.k"/>
+		<Transition source="s1" dest="s0" event="ProcCpl.k"/>
+		<Transition source="s1" dest="s0" event="ProcErr.k"/>
+		<Transition source="s1" dest="s0" event="ASDwn.k"/>
+		<Transition source="s2" dest="s0" event="RobUp.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_HndlPallet.AS1" type="Specification">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS1"/>
+		<Event id="AssmbErrA.k" label="AssmbErrA.AS1"/>
+		<Event id="AssmbErrB.k" label="AssmbErrB.AS1"/>
+		<Event id="DoneRead.AS1" label="DoneRead.AS1" controllable="false"/>
+		<Event id="DoneWrite.AS1" label="DoneWrite.AS1" controllable="false"/>
+		<Event id="ExtrArvConv.k" label="ExtrArvConv.AS1" controllable="false"/>
+		<Event id="ExtrArvPlatf.k" label="ExtrArvPlatf.AS1" controllable="false"/>
+		<Event id="IsType1.k" label="IsType1.AS1" controllable="false"/>
+		<Event id="IsType2.k" label="IsType2.AS1" controllable="false"/>
+		<Event id="MvExtrToConv.k" label="MvExtrToConv.AS1"/>
+		<Event id="MvExtrToPlatf.k" label="MvExtrToPlatf.AS1"/>
+		<Event id="PArvAtExtractor.k" label="PArvAtExtractor.AS1" controllable="false"/>
+		<Event id="ProcCpl.k" label="ProcCpl.AS1"/>
+		<Event id="ProcErr.k" label="ProcErr.AS1"/>
+		<Event id="ProcTyp1.k" label="ProcTyp1.AS1"/>
+		<Event id="ProcTyp2.k" label="ProcTyp2.AS1"/>
+		<Event id="QType.k" label="QType.AS1"/>
+		<Event id="RTasksCpl.k" label="RTasksCpl.AS1"/>
+		<Event id="ReadLabel.AS1" label="ReadLabel.AS1"/>
+		<Event id="RelPallet.k" label="RelPallet.AS1"/>
+		<Event id="RobDwn.k" label="RobDwn.AS1"/>
+		<Event id="WrtCplT1A_1B.AS1" label="WrtCplT1A_1B.AS1"/>
+		<Event id="WrtErr1A.AS1" label="WrtErr1A.AS1"/>
+		<Event id="WrtErr1B.AS1" label="WrtErr1B.AS1"/>
+	</Events>
+	<States>
+		<State id="s10"/>
+		<State id="s11"/>
+		<State id="s12"/>
+		<State id="s13"/>
+		<State id="s14"/>
+		<State id="s15"/>
+		<State id="s16"/>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+		<State id="s4"/>
+		<State id="s5"/>
+		<State id="s6"/>
+		<State id="s7"/>
+		<State id="s8"/>
+		<State id="s9"/>
+	</States>
+	<Transitions>
+		<Transition source="s10" dest="s10" event="WrtCplT1A_1B.AS1"/>
+		<Transition source="s10" dest="s11" event="DoneWrite.AS1"/>
+		<Transition source="s11" dest="s0" event="ProcCpl.k"/>
+		<Transition source="s11" dest="s11" event="RelPallet.k"/>
+		<Transition source="s12" dest="s12" event="MvExtrToConv.k"/>
+		<Transition source="s12" dest="s13" event="ExtrArvConv.k"/>
+		<Transition source="s13" dest="s13" event="WrtErr1A.AS1"/>
+		<Transition source="s13" dest="s14" event="DoneWrite.AS1"/>
+		<Transition source="s14" dest="s0" event="ProcErr.k"/>
+		<Transition source="s14" dest="s14" event="RelPallet.k"/>
+		<Transition source="s15" dest="s16" event="ExtrArvConv.k"/>
+		<Transition source="s15" dest="s15" event="MvExtrToConv.k"/>
+		<Transition source="s16" dest="s16" event="WrtErr1B.AS1"/>
+		<Transition source="s16" dest="s14" event="DoneWrite.AS1"/>
+		<Transition source="s0" dest="s1" event="PArvAtExtractor.k"/>
+		<Transition source="s1" dest="s1" event="ReadLabel.AS1"/>
+		<Transition source="s1" dest="s2" event="DoneRead.AS1"/>
+		<Transition source="s2" dest="s2" event="MvExtrToPlatf.k"/>
+		<Transition source="s2" dest="s3" event="ExtrArvPlatf.k"/>
+		<Transition source="s3" dest="s4" event="IsType1.k"/>
+		<Transition source="s3" dest="s3" event="QType.k"/>
+		<Transition source="s3" dest="s5" event="IsType2.k"/>
+		<Transition source="s4" dest="s6" event="ProcTyp1.k"/>
+		<Transition source="s5" dest="s6" event="ProcTyp2.k"/>
+		<Transition source="s6" dest="s12" event="AssmbErrA.k"/>
+		<Transition source="s6" dest="s9" event="RTasksCpl.k"/>
+		<Transition source="s6" dest="s15" event="AssmbErrB.k"/>
+		<Transition source="s6" dest="s7" event="RobDwn.k"/>
+		<Transition source="s7" dest="s8" event="ExtrArvConv.k"/>
+		<Transition source="s7" dest="s7" event="MvExtrToConv.k"/>
+		<Transition source="s8" dest="s8" event="RelPallet.k"/>
+		<Transition source="s8" dest="s0" event="ASDwn.k"/>
+		<Transition source="s9" dest="s10" event="ExtrArvConv.k"/>
+		<Transition source="s9" dest="s9" event="MvExtrToConv.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_PSenAtExtractor.AS1" type="Plant">
+	<Events>
+		<Event id="PArvAtExtractor.j" label="PArvAtExtractor.AS1" controllable="false"/>
+		<Event id="PalletLvAS.j" label="PalletLvAS.AS1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="PArvAtExtractor.j"/>
+		<Transition source="s1" dest="s0" event="PalletLvAS.j"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtTU.TU1" type="Plant">
+	<Events>
+		<Event id="IsPalletCL.i" label="IsPalletCL.TU1" controllable="false"/>
+		<Event id="IsPalletEL.i" label="IsPalletEL.TU1"/>
+		<Event id="NoPalletCL.i" label="NoPalletCL.TU1" controllable="false"/>
+		<Event id="NoPalletEL.i" label="NoPalletEL.TU1" controllable="false"/>
+		<Event id="QPalletAtCL.i" label="QPalletAtCL.TU1"/>
+		<Event id="QPalletAtEL.i" label="QPalletAtEL.TU1"/>
+	</Events>
+	<States>
+		<State id="s0"/>
+		<State id="s2" initial="true" accepting="true"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s2" event="IsPalletCL.i"/>
+		<Transition source="s0" dest="s2" event="NoPalletCL.i"/>
+		<Transition source="s2" dest="s0" event="QPalletAtCL.i"/>
+		<Transition source="s2" dest="s3" event="QPalletAtEL.i"/>
+		<Transition source="s3" dest="s2" event="NoPalletEL.i"/>
+		<Transition source="s3" dest="s2" event="IsPalletEL.i"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtTU.TU2" type="Plant">
+	<Events>
+		<Event id="IsPalletCL.i" label="IsPalletCL.TU2" controllable="false"/>
+		<Event id="IsPalletEL.i" label="IsPalletEL.TU2"/>
+		<Event id="NoPalletCL.i" label="NoPalletCL.TU2" controllable="false"/>
+		<Event id="NoPalletEL.i" label="NoPalletEL.TU2" controllable="false"/>
+		<Event id="QPalletAtCL.i" label="QPalletAtCL.TU2"/>
+		<Event id="QPalletAtEL.i" label="QPalletAtEL.TU2"/>
+	</Events>
+	<States>
+		<State id="s0"/>
+		<State id="s2" initial="true" accepting="true"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s2" event="IsPalletCL.i"/>
+		<Transition source="s0" dest="s2" event="NoPalletCL.i"/>
+		<Transition source="s2" dest="s0" event="QPalletAtCL.i"/>
+		<Transition source="s2" dest="s3" event="QPalletAtEL.i"/>
+		<Transition source="s3" dest="s2" event="NoPalletEL.i"/>
+		<Transition source="s3" dest="s2" event="IsPalletEL.i"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtTU.TU3" type="Plant">
+	<Events>
+		<Event id="IsPalletCL.i" label="IsPalletCL.TU3" controllable="false"/>
+		<Event id="IsPalletEL.i" label="IsPalletEL.TU3"/>
+		<Event id="NoPalletCL.i" label="NoPalletCL.TU3" controllable="false"/>
+		<Event id="NoPalletEL.i" label="NoPalletEL.TU3" controllable="false"/>
+		<Event id="QPalletAtCL.i" label="QPalletAtCL.TU3"/>
+		<Event id="QPalletAtEL.i" label="QPalletAtEL.TU3"/>
+	</Events>
+	<States>
+		<State id="s0"/>
+		<State id="s2" initial="true" accepting="true"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s2" event="IsPalletCL.i"/>
+		<Transition source="s0" dest="s2" event="NoPalletCL.i"/>
+		<Transition source="s2" dest="s0" event="QPalletAtCL.i"/>
+		<Transition source="s2" dest="s3" event="QPalletAtEL.i"/>
+		<Transition source="s3" dest="s2" event="NoPalletEL.i"/>
+		<Transition source="s3" dest="s2" event="IsPalletEL.i"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtTU.TU4" type="Plant">
+	<Events>
+		<Event id="IsPalletCL.i" label="IsPalletCL.TU4" controllable="false"/>
+		<Event id="IsPalletEL.i" label="IsPalletEL.TU4"/>
+		<Event id="NoPalletCL.i" label="NoPalletCL.TU4" controllable="false"/>
+		<Event id="NoPalletEL.i" label="NoPalletEL.TU4" controllable="false"/>
+		<Event id="QPalletAtCL.i" label="QPalletAtCL.TU4"/>
+		<Event id="QPalletAtEL.i" label="QPalletAtEL.TU4"/>
+	</Events>
+	<States>
+		<State id="s0"/>
+		<State id="s2" initial="true" accepting="true"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s2" event="IsPalletCL.i"/>
+		<Transition source="s0" dest="s2" event="NoPalletCL.i"/>
+		<Transition source="s2" dest="s0" event="QPalletAtCL.i"/>
+		<Transition source="s2" dest="s3" event="QPalletAtEL.i"/>
+		<Transition source="s3" dest="s2" event="NoPalletEL.i"/>
+		<Transition source="s3" dest="s2" event="IsPalletEL.i"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_DepGateNExtrSen.AS1" type="Plant">
+	<Events>
+		<Event id="PArvAtExtractor.j" label="PArvAtExtractor.AS1" controllable="false"/>
+		<Event id="PalletLvGEL_2.j" label="PalletLvGEL_2.AS1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="PalletLvGEL_2.j"/>
+		<Transition source="s1" dest="s2" event="PalletLvGEL_2.j"/>
+		<Transition source="s1" dest="s0" event="PArvAtExtractor.j"/>
+		<Transition source="s2" dest="s1" event="PArvAtExtractor.j"/>
+	</Transitions>
+</Automaton>
+<Automaton name="IntfAssmbStn.AS1" type="Specification">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS1"/>
+		<Event id="DoRpr.k" label="DoRpr.AS1"/>
+		<Event id="ProcCpl.k" label="ProcCpl.AS1"/>
+		<Event id="ProcErr.k" label="ProcErr.AS1"/>
+		<Event id="ProcPallet.k" label="ProcPallet.AS1"/>
+		<Event id="RobUp.k" label="RobUp.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s2" event="DoRpr.k"/>
+		<Transition source="s0" dest="s1" event="ProcPallet.k"/>
+		<Transition source="s1" dest="s0" event="ProcCpl.k"/>
+		<Transition source="s1" dest="s0" event="ProcErr.k"/>
+		<Transition source="s1" dest="s0" event="ASDwn.k"/>
+		<Transition source="s2" dest="s0" event="RobUp.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_PalletStopEL_2.AS1" type="Plant">
+	<Events>
+		<Event id="PStopClosesEL_2.j" label="PStopClosesEL_2.AS1"/>
+		<Event id="PStopOpensEL_2.j" label="PStopOpensEL_2.AS1"/>
+		<Event id="PalletLvAS.j" label="PalletLvAS.AS1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="PStopOpensEL_2.j"/>
+		<Transition source="s1" dest="s1" event="PalletLvAS.j"/>
+		<Transition source="s1" dest="s0" event="PStopClosesEL_2.j"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ASStoreUpState.AS1" type="Plant">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS1"/>
+		<Event id="DoRpr.k" label="DoRpr.AS1"/>
+		<Event id="ProcPallet.k" label="ProcPallet.AS1"/>
+		<Event id="QStnUp.k" label="QStnUp.AS1"/>
+		<Event id="RobUp.k" label="RobUp.AS1"/>
+		<Event id="StnDwn.k" label="StnDwn.AS1" controllable="false"/>
+		<Event id="StnUp.k" label="StnUp.AS1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0"/>
+		<State id="s1"/>
+		<State id="s2" initial="true" accepting="true"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="StnDwn.k"/>
+		<Transition source="s0" dest="s0" event="DoRpr.k"/>
+		<Transition source="s0" dest="s3" event="RobUp.k"/>
+		<Transition source="s1" dest="s1" event="DoRpr.k"/>
+		<Transition source="s1" dest="s0" event="QStnUp.k"/>
+		<Transition source="s1" dest="s2" event="RobUp.k"/>
+		<Transition source="s2" dest="s1" event="ASDwn.k"/>
+		<Transition source="s2" dest="s3" event="QStnUp.k"/>
+		<Transition source="s2" dest="s2" event="ProcPallet.k"/>
+		<Transition source="s3" dest="s0" event="ASDwn.k"/>
+		<Transition source="s3" dest="s3" event="ProcPallet.k"/>
+		<Transition source="s3" dest="s2" event="StnUp.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ASStoreUpState.AS2" type="Plant">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS2"/>
+		<Event id="DoRpr.k" label="DoRpr.AS2"/>
+		<Event id="ProcPallet.k" label="ProcPallet.AS2"/>
+		<Event id="QStnUp.k" label="QStnUp.AS2"/>
+		<Event id="RobUp.k" label="RobUp.AS2"/>
+		<Event id="StnDwn.k" label="StnDwn.AS2" controllable="false"/>
+		<Event id="StnUp.k" label="StnUp.AS2" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0"/>
+		<State id="s1"/>
+		<State id="s2" initial="true" accepting="true"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="StnDwn.k"/>
+		<Transition source="s0" dest="s0" event="DoRpr.k"/>
+		<Transition source="s0" dest="s3" event="RobUp.k"/>
+		<Transition source="s1" dest="s1" event="DoRpr.k"/>
+		<Transition source="s1" dest="s0" event="QStnUp.k"/>
+		<Transition source="s1" dest="s2" event="RobUp.k"/>
+		<Transition source="s2" dest="s1" event="ASDwn.k"/>
+		<Transition source="s2" dest="s3" event="QStnUp.k"/>
+		<Transition source="s2" dest="s2" event="ProcPallet.k"/>
+		<Transition source="s3" dest="s0" event="ASDwn.k"/>
+		<Transition source="s3" dest="s3" event="ProcPallet.k"/>
+		<Transition source="s3" dest="s2" event="StnUp.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_QueryPalletTyp.AS1" type="Plant">
+	<Events>
+		<Event id="IsType1.k" label="IsType1.AS1" controllable="false"/>
+		<Event id="IsType2.k" label="IsType2.AS1" controllable="false"/>
+		<Event id="QType.k" label="QType.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="QType.k"/>
+		<Transition source="s1" dest="s0" event="IsType1.k"/>
+		<Transition source="s1" dest="s0" event="IsType2.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_CapGateEL_2.AS1" type="Plant">
+	<Events>
+		<Event id="PalletArvGEL_2.j" label="PalletArvGEL_2.AS1" controllable="false"/>
+		<Event id="PalletLvGEL_2.j" label="PalletLvGEL_2.AS1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="PalletArvGEL_2.j"/>
+		<Transition source="s1" dest="s2" event="PalletArvGEL_2.j"/>
+		<Transition source="s1" dest="s0" event="PalletLvGEL_2.j"/>
+		<Transition source="s2" dest="s1" event="PalletLvGEL_2.j"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_OperateGateEL_2.AS1" type="Specification">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS1"/>
+		<Event id="GClosesEL_2.k" label="GClosesEL_2.AS1"/>
+		<Event id="GOpensEL_2.k" label="GOpensEL_2.AS1"/>
+		<Event id="PalletArvGEL_2.k" label="PalletArvGEL_2.AS1" controllable="false"/>
+		<Event id="PalletLvGEL_2.k" label="PalletLvGEL_2.AS1" controllable="false"/>
+		<Event id="ProcCpl.k" label="ProcCpl.AS1"/>
+		<Event id="ProcErr.k" label="ProcErr.AS1"/>
+		<Event id="ProcPallet.k" label="ProcPallet.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="PalletArvGEL_2.k"/>
+		<Transition source="s0" dest="s0" event="ProcPallet.k"/>
+		<Transition source="s0" dest="s0" event="ProcCpl.k"/>
+		<Transition source="s0" dest="s0" event="ProcErr.k"/>
+		<Transition source="s0" dest="s0" event="ASDwn.k"/>
+		<Transition source="s1" dest="s1" event="GOpensEL_2.k"/>
+		<Transition source="s1" dest="s2" event="PalletLvGEL_2.k"/>
+		<Transition source="s2" dest="s0" event="GClosesEL_2.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_ASNewEvents.AS1" type="Plant">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS1"/>
+		<Event id="ProcCpl.k" label="ProcCpl.AS1"/>
+		<Event id="ProcErr.k" label="ProcErr.AS1"/>
+		<Event id="ProcPallet.k" label="ProcPallet.AS1"/>
+		<Event id="RelPallet.k" label="RelPallet.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s0" event="ProcPallet.k"/>
+		<Transition source="s0" dest="s0" event="ProcCpl.k"/>
+		<Transition source="s0" dest="s0" event="ProcErr.k"/>
+		<Transition source="s0" dest="s0" event="ASDwn.k"/>
+		<Transition source="s0" dest="s0" event="RelPallet.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_IntfRobot.AS1" type="Plant">
+	<Events>
+		<Event id="AssmbErrA.k" label="AssmbErrA.AS1"/>
+		<Event id="AssmbErrB.k" label="AssmbErrB.AS1"/>
+		<Event id="DoRpr.k" label="DoRpr.AS1"/>
+		<Event id="ProcTyp1.k" label="ProcTyp1.AS1"/>
+		<Event id="ProcTyp2.k" label="ProcTyp2.AS1"/>
+		<Event id="RTasksCpl.k" label="RTasksCpl.AS1"/>
+		<Event id="RobDwn.k" label="RobDwn.AS1"/>
+		<Event id="RobUp.k" label="RobUp.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="ProcTyp1.k"/>
+		<Transition source="s0" dest="s1" event="ProcTyp2.k"/>
+		<Transition source="s0" dest="s2" event="DoRpr.k"/>
+		<Transition source="s1" dest="s0" event="RTasksCpl.k"/>
+		<Transition source="s1" dest="s0" event="RobDwn.k"/>
+		<Transition source="s1" dest="s0" event="AssmbErrA.k"/>
+		<Transition source="s1" dest="s0" event="AssmbErrB.k"/>
+		<Transition source="s2" dest="s0" event="RobUp.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU.TU1" type="Plant">
+	<Events>
+		<Event id="LibPallet.q" label="LibPallet.TU1"/>
+		<Event id="NoTrnsfEL.q" label="NoTrnsfEL.TU1"/>
+		<Event id="PalletRlsd.q" label="PalletRlsd.TU1"/>
+		<Event id="TrnsfCplToCL.q" label="TrnsfCplToCL.TU1"/>
+		<Event id="TrnsfCplToEL.q" label="TrnsfCplToEL.TU1"/>
+		<Event id="TrnsfELToCL.q" label="TrnsfELToCL.TU1"/>
+		<Event id="TrnsfToEL.q" label="TrnsfToEL.TU1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="TrnsfToEL.q"/>
+		<Transition source="s0" dest="s2" event="TrnsfELToCL.q"/>
+		<Transition source="s0" dest="s3" event="LibPallet.q"/>
+		<Transition source="s1" dest="s0" event="NoTrnsfEL.q"/>
+		<Transition source="s1" dest="s0" event="TrnsfCplToEL.q"/>
+		<Transition source="s2" dest="s0" event="TrnsfCplToCL.q"/>
+		<Transition source="s3" dest="s0" event="PalletRlsd.q"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU.TU2" type="Plant">
+	<Events>
+		<Event id="LibPallet.q" label="LibPallet.TU2"/>
+		<Event id="NoTrnsfEL.q" label="NoTrnsfEL.TU2"/>
+		<Event id="PalletRlsd.q" label="PalletRlsd.TU2"/>
+		<Event id="TrnsfCplToCL.q" label="TrnsfCplToCL.TU2"/>
+		<Event id="TrnsfCplToEL.q" label="TrnsfCplToEL.TU2"/>
+		<Event id="TrnsfELToCL.q" label="TrnsfELToCL.TU2"/>
+		<Event id="TrnsfToEL.q" label="TrnsfToEL.TU2"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="TrnsfToEL.q"/>
+		<Transition source="s0" dest="s2" event="TrnsfELToCL.q"/>
+		<Transition source="s0" dest="s3" event="LibPallet.q"/>
+		<Transition source="s1" dest="s0" event="NoTrnsfEL.q"/>
+		<Transition source="s1" dest="s0" event="TrnsfCplToEL.q"/>
+		<Transition source="s2" dest="s0" event="TrnsfCplToCL.q"/>
+		<Transition source="s3" dest="s0" event="PalletRlsd.q"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU.TU4" type="Plant">
+	<Events>
+		<Event id="LibPallet.q" label="LibPallet.TU4"/>
+		<Event id="NoTrnsfEL.q" label="NoTrnsfEL.TU4"/>
+		<Event id="PalletRlsd.q" label="PalletRlsd.TU4"/>
+		<Event id="TrnsfCplToCL.q" label="TrnsfCplToCL.TU4"/>
+		<Event id="TrnsfCplToEL.q" label="TrnsfCplToEL.TU4"/>
+		<Event id="TrnsfELToCL.q" label="TrnsfELToCL.TU4"/>
+		<Event id="TrnsfToEL.q" label="TrnsfToEL.TU4"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="TrnsfToEL.q"/>
+		<Transition source="s0" dest="s2" event="TrnsfELToCL.q"/>
+		<Transition source="s0" dest="s3" event="LibPallet.q"/>
+		<Transition source="s1" dest="s0" event="NoTrnsfEL.q"/>
+		<Transition source="s1" dest="s0" event="TrnsfCplToEL.q"/>
+		<Transition source="s2" dest="s0" event="TrnsfCplToCL.q"/>
+		<Transition source="s3" dest="s0" event="PalletRlsd.q"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_PalletArvGateSenEL_2.AS1" type="Plant">
+	<Events>
+		<Event id="PalletArvGEL_2.k" label="PalletArvGEL_2.AS1" controllable="false"/>
+		<Event id="ProcPallet.k" label="ProcPallet.AS1"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="ProcPallet.k"/>
+		<Transition source="s1" dest="s0" event="PalletArvGEL_2.k"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_PalletGateEL_2.AS1" type="Plant">
+	<Events>
+		<Event id="GClosesEL_2.j" label="GClosesEL_2.AS1"/>
+		<Event id="GOpensEL_2.j" label="GOpensEL_2.AS1"/>
+		<Event id="PalletLvGEL_2.j" label="PalletLvGEL_2.AS1" controllable="false"/>
+	</Events>
+	<States>
+		<State id="s0" initial="true" accepting="true"/>
+		<State id="s1"/>
+		<State id="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="s0" dest="s1" event="GOpensEL_2.j"/>
+		<Transition source="s1" dest="s2" event="PalletLvGEL_2.j"/>
+		<Transition source="s2" dest="s0" event="GClosesEL_2.j"/>
+	</Transitions>
+</Automaton>
+<Automaton name="l_HndlPalletLvAS.AS1" type="Specification">
+	<Events>
+		<Event id="ASDwn.k" label="ASDwn.AS1"/>
+		<Event id="PStopClosesEL_2.k" label="PStopClosesEL_2.AS1"/>
+		<Event id="PStopOpensEL_2.k" label="PStopOpensEL_2.AS1"/>
+		<Event id="PalletLvAS.k" label="PalletLvAS.AS1" controllable="false"/>
+		<Event id="ProcCpl.k" label="ProcCpl.AS1"/>
+		<Event id="ProcErr.k" label="ProcErr.AS1"/>
+		<Event id="RelPallet.k" label="RelPallet.AS1"/>
+	</Events>
+	<States>
+		<State id="s3"/>
+		<State id="s2"/>
+		<State id="s1"/>
+		<State id="s0" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="s3" dest="s0" event="ProcCpl.k"/>
+		<Transition source="s3" dest="s0" event="ProcErr.k"/>
+		<Transition source="s3" dest="s0" event="ASDwn.k"/>
+		<Transition source="s2" dest="s3" event="PStopClosesEL_2.k"/>
+		<Transition source="s1" dest="s1" event="PStopOpensEL_2.k"/>
+		<Transition source="s1" dest="s2" event="PalletLvAS.k"/>
+		<Transition source="s0" dest="s1" event="RelPallet.k"/>
+	</Transitions>
+</Automaton>
+</Automata>
