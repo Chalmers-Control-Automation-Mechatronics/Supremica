@@ -8,6 +8,7 @@ import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.Automaton;
 
 import att.grappa.Graph;
+import att.grappa.GrappaPanel;
 
 class AnalyzerAutomatonViewerPanel
 	extends WhiteScrollPane
@@ -16,10 +17,9 @@ class AnalyzerAutomatonViewerPanel
 	private ModuleContainer moduleContainer;
 	private String name;
 	private DotBuilder builder;
-	private Graph theGraph = null;
 	private Automaton theAutomaton;
 
-	AnalyzerAutomatonViewerPanel(ModuleContainer moduleContainer, Automaton theAutomaton, String name)
+	AnalyzerAutomatonViewerPanel(ModuleContainer moduleContainer, String name, Automaton theAutomaton)
 	{
 		this.moduleContainer = moduleContainer;
 		this.name = name;
@@ -41,7 +41,10 @@ class AnalyzerAutomatonViewerPanel
 
 	public void setGraph(Graph theGraph)
 	{
-		this.theGraph = theGraph;
+		GrappaPanel viewerPanel = new GrappaPanel(theGraph);
+		viewerPanel.setScaleToFit(false);
+		getViewport().add(viewerPanel);
+		revalidate();
 	}
 
 }

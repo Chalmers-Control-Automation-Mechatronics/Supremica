@@ -37,7 +37,7 @@ class AnalyzerPanel
 		tabPanel.setPreferredSize(panelPreferredSize);
 		tabPanel.setMinimumSize(panelMinimumSize);
 
-		automataPanel = new AnalyzerAutomataPanel(moduleContainer, "All");
+		automataPanel = new AnalyzerAutomataPanel(this, moduleContainer, "All");
 		automataPanel.setPreferredSize(panelPreferredSize);
 		automataPanel.setMinimumSize(panelMinimumSize);
 		tabPanel.add(automataPanel);
@@ -77,8 +77,9 @@ class AnalyzerPanel
 	}
 
 
-	public void setActiveAutomatonViewerPanel(JPanel newPanel)
+	public void setActiveAutomatonViewerPanel(JScrollPane newPanel)
 	{
+		System.err.println("setActiveAutomatonViewerPanel: " + newPanel);
 		Component oldPanel = splitPanelHorizontal.getRightComponent();
 		if (oldPanel != newPanel)
 		{
@@ -97,12 +98,14 @@ class AnalyzerPanel
 			}
 			else
 			{
+				System.err.println("setting new right panel");
 				newPanel.setPreferredSize(oldSize);
 				splitPanelHorizontal.setRightComponent(newPanel);
 			}
 		}
 
 		validate();
+		repaint();
 
 	}
 
@@ -111,7 +114,7 @@ class AnalyzerPanel
  	{
 		public EmptyAutomatonViewerPanel()
 		{
-			setPreferredSize(new Dimension(400, preferredHeight));
+			setPreferredSize(new Dimension(200, preferredHeight));
 			setMinimumSize(panelMinimumSize);
 		}
 	}

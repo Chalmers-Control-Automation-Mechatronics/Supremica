@@ -1,14 +1,16 @@
 package org.supremica.gui.ide;
 
 import javax.swing.*;
+import java.util.*;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.TableSorter;
+import org.supremica.gui.AutomatonViewer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import org.supremica.gui.VisualProject;
-//import org.supremica.gui.MainPopupMenu;
+import org.supremica.log.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -16,11 +18,18 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Dimension;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.Automata;
+
 
 class AnalyzerAutomataPanel
 	extends WhiteScrollPane
 	implements TableModelListener
 {
+	private static Logger logger = LoggerFactory.createLogger(AnalyzerAutomataPanel.class);
+
+	private AnalyzerPanel analyzerPanel;
 	private ModuleContainer moduleContainer;
 	private String name;
 	private JTable theAutomatonTable;
@@ -28,10 +37,20 @@ class AnalyzerAutomataPanel
 	private TableModel fullTableModel;
 //	private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
 
-	AnalyzerAutomataPanel(ModuleContainer moduleContainer, String name)
+	public static int TABLE_IDENTITY_COLUMN = 0;
+	public static int TABLE_TYPE_COLUMN = 1;
+	public static int TABLE_STATES_COLUMN = 2;
+	public static int TABLE_EVENTS_COLUMN = 3;
+
+	AnalyzerAutomataPanel(AnalyzerPanel analyzerPanel, ModuleContainer moduleContainer, String name)
 	{
+		this.analyzerPanel = analyzerPanel;
 		this.moduleContainer = moduleContainer;
 		this.name = name;
+		Dimension panelPreferredSize = new Dimension(500, 400);
+		Dimension panelMinimumSize = new Dimension(100, 100);
+		setPreferredSize(panelPreferredSize);
+		setMinimumSize(panelMinimumSize);
 		initialize();
 	}
 
@@ -108,13 +127,45 @@ class AnalyzerAutomataPanel
 					}
 
 					// Show in the panel
-					/*
 					if (col == TABLE_IDENTITY_COLUMN)
 					{
-						ActionMan.automatonView_actionPerformed(getGui());
-						getGui().repaint();
+						Automata selectedAutomata = getSelectedAutomata();
+
+						if (selectedAutomata.size() >= 2)
+						{
+							//moduleContainer.getVisualProject();
+
+							for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext();)
+							{
+								Automaton currAutomaton = (Automaton) autIt.next();
+
+								try
+								{
+									AutomatonViewer viewer = moduleContainer.getVisualProject().getAutomatonViewer(currAutomaton.getName());
+								}
+								catch (Exception ex)
+								{
+									logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton, ex);
+									logger.debug(ex.getStackTrace());
+
+									return;
+								}
+							}
+						}
+						else if (selectedAutomata.size() == 1)
+						{
+							Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
+							AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel(moduleContainer, "Dot View", selectedAutomaton);
+							analyzerPanel.setActiveAutomatonViewerPanel(automatonPanel);
+						}
+						else
+						{
+							return;
+						}
+
+//						ActionMan.automatonView_actionPerformed(getGui());
+//						getGui().repaint();
 					}
-					*/
 				}
 			}
 
@@ -175,4 +226,30 @@ class AnalyzerAutomataPanel
 
 		theAutomatonTable.revalidate();
 	}
+
+	public Automata getSelectedAutomata()
+	{
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+		Automata selectedAutomata = new Automata();
+
+		for (int i = 0; i < selectedRowIndices.length; i++)
+		{
+			try
+			{
+				int currIndex = selectedRowIndices[i];
+				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
+				selectedAutomata.addAutomaton(currAutomaton);
+			}
+			catch (Exception ex)
+			{
+				logger.error("Trying to get an automaton that does not exist. Index: " + i);
+				logger.debug(ex.getStackTrace());
+			}
+		}
+
+		return selectedAutomata;
+	}
+
 }

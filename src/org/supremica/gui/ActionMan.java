@@ -119,8 +119,8 @@ public class ActionMan
 	public static final StateEnumerator stateEnumerator = new StateEnumerator();
 	public static final HelpAction helpAction = new HelpAction();
 	public static final OpenAction openAction = new OpenAction();    // defined in MainToolBar (just for fun :-)
-	public static final SaveAction saveAction = new SaveAction(); 
-	public static final SaveAsAction saveAsAction = new SaveAsAction(); 
+	public static final SaveAction saveAction = new SaveAction();
+	public static final SaveAsAction saveAsAction = new SaveAsAction();
 	public static final SynthesizeAction synthesizeAction = new SynthesizeAction();
 	public static final OpenJGrafchartAction openJGrafchartAction = new OpenJGrafchartAction();
 	public static final UpdateFromJGrafchartAction updateFromJGrafchartAction = new UpdateFromJGrafchartAction();
@@ -139,7 +139,7 @@ public class ActionMan
 		while (!finished)
 		{
 			theInteger = JOptionPane.showInputDialog(parent, text);
-			
+
 			try
 			{
 				theIntValue = Integer.parseInt(theInteger);
@@ -163,13 +163,13 @@ public class ActionMan
 	{
 		// logger.debug("ActionMan.fileNewFromTemplate Start");
 		Automata newAutomata;
-		
+
 		try
 		{
 			newAutomata = item.createInstance(new VisualProjectFactory());
-			
+
 			gui.addProject((Project) newAutomata);
-			
+
 			// logger.debug("ActionMan.fileNewFromTemplate");
 		}
 		catch (Exception ex)
@@ -1513,7 +1513,7 @@ public class ActionMan
 		SynchronizationOptions sOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
 		// Work!
-		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, 
+		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata,
 																		   vOptions, sOptions, mOptions);
 	}
 
@@ -2009,30 +2009,6 @@ public class ActionMan
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-
-			/*-- Now in VisulaProject::getAutomatonViewer
-			 *
-			 *	//String currAutomatonName = currAutomaton.getName();
-			 *	int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
-			 *
-			 *	if (maxNbrOfStates < currAutomaton.nbrOfStates())
-			 *	{
-			 *
-			 *	// Why isn't this in AutomatonViewer??
-			 *	// Every user of AutomatonViewer has to manage this for himself!?
-			 *	String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states. Do you want to abort viewing?";
-			 *
-			 *	msg = EncodingHelper.linebreakAdjust(msg);
-			 *
-			 *	int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
-			 *
-			 *	if (res == 0)
-			 *	{
-			 *		// Abort - YES
-			 *		return;
-			 *	}
-			 *	}
-			 */
 
 			try
 			{
@@ -3659,53 +3635,53 @@ public class ActionMan
 			}
 		}
 	}
-    
+
 	// Generate IEC-61499 Function Block
-	public static void ProjectToIEC61499(Gui gui) 
+	public static void ProjectToIEC61499(Gui gui)
 	{
 		// Automata selectedProject = gui.getselectedProject();
 		Project selectedProject = gui.getSelectedProject();
-		
+
 		if (selectedProject.size() < 1) {
 			JOptionPane.showMessageDialog(
 						      gui.getComponent(),
 						      "At least one automaton must be selected!",
 						      "Alert",
 						      JOptionPane.ERROR_MESSAGE);
-			
+
 			return;
 		}
-		
+
 		JFileChooser fileExporter = FileDialogs.getExportFileChooser(FileFormats.FBT);
-		
-		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION) 
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = fileExporter.getSelectedFile();
-			
-			if (currFile != null) 
+
+			if (currFile != null)
 			{
-				try 
+				try
 				{
 					AutomataToIEC61499 exporter = new AutomataToIEC61499(selectedProject);
 					exporter.printSources(currFile);
-				} 
-				catch (Exception ex) 
+				}
+				catch (Exception ex)
 				{
 					logger.error("Exception while generating IEC-61499 Function Block code to file "
 						     + currFile.getAbsolutePath());
 					logger.debug(ex.getMessage());
 					logger.debug(ex.getStackTrace());
-					
+
 					return;
 				}
-				
+
 				logger.info(
 					    "IEC-61499 Function Block file successfully generated at "
 					    + currFile.getAbsolutePath());
 			}
 		}
 	}
-	
+
         // Generate 1131 Structured Text
 	public static void ProjectTo1131ST(Gui gui)
 	{
@@ -3890,15 +3866,15 @@ public class ActionMan
 			File tmpFile = File.createTempFile("softplc", ".il");
 
 			tmpFile.deleteOnExit();
-			
+
 			AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
 			PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
-			
+
 			exporter.serializeInstructionList(theWriter);
 			theWriter.close();
-			
+
 			tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
-			
+
 			new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), tmpdir.getAbsolutePath());
 			new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
 		}
@@ -3906,7 +3882,7 @@ public class ActionMan
 		{
 			logger.error("Exception while generating Java Bytecode to file");
 			logger.debug(ex.getStackTrace());
-			
+
 			return;
 		}
 
@@ -3937,18 +3913,18 @@ public class ActionMan
 		{
 			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
 			VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
-			
+
 			theProject.getCellEditor();
 		}
 		catch (Exception ex)
 		{
 			logger.error("Exception while getting Recipe Editor");
 			logger.debug(ex.getStackTrace());
-			
+
 			return;
 		}
 	}
-	
+
 	/**
 	 * Simplify the Supremica project.
 	 */
@@ -3975,23 +3951,23 @@ public class ActionMan
 	///////////////
 	// BDD STUFF //
 	///////////////
-	
+
 	// BDD developer stuff: these are disabled if org.supremica.util.BDD.Options.dev_mode == false
 	public static void DoBDDReachability()
 	{
 		org.supremica.util.BDD.test.DeveloperTest.DoReachability(gui.getSelectedAutomata());
 	}
-	
+
 	public static void DoBDDCoReachability()
 	{
 		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
 	}
-	
+
 	public static void DoBDDUnderConstruction()
 	{
 		org.supremica.util.BDD.test.DeveloperTest.DoUnderConstruction(gui.getSelectedAutomata());
 	}
-	
+
 	/**
 	 * Mark (select) automata in the dependency group of the selected automata.
 	 */
@@ -4001,7 +3977,7 @@ public class ActionMan
 		{
 			Automata all = gui.getVisualProjectContainer().getActiveProject();
 			Collection v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
-			
+
 			gui.selectAutomata(v);
 		}
 		catch (Exception ex)
@@ -4009,7 +3985,7 @@ public class ActionMan
 			logger.error(ex);
 		}
 	}
-	
+
 	/**
 	 * select the maximal component the current selection is a part of
 	 * (the current selection must be connected!)
