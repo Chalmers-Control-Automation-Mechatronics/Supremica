@@ -707,7 +707,7 @@ public class Supremica
 			}
 			else if (getActiveProject().containsAutomaton(newName))
 			{
-				JOptionPane.showMessageDialog(this, newName + " already exists", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "'" + newName + "' already exists", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else
 			{
@@ -964,7 +964,7 @@ public class Supremica
 			String newName = getActiveProject().getUniqueAutomatonName(autName);
 
 			currAutomaton.setName(newName);
-			logger.info("Name conflict - " + autName + " does already exist. Changed name of new " + autName + " to " + newName + ".");
+			logger.info("Name conflict - '" + autName + "' does already exist. Changed name of new '" + autName + "' to '" + newName + "'.");
 		}
 
 		try
