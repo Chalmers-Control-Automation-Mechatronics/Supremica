@@ -269,6 +269,11 @@ public class Automaton
 	{
 		return alphabet.size();
 	}
+	
+	public int nbrOfTransitions()
+	{
+		return theArcs.size();
+	}
 
 	public int nbrOfAcceptingStates()
 	{
@@ -426,6 +431,64 @@ public class Automaton
 	public void setHasLayout(boolean hasLayout)
 	{
 		this.hasLayout = hasLayout;
+	}
+	
+	public long checksum()
+	{ // Ad-hoc checksum algorithm
+		long checksum = 0;
+		
+		for (Iterator sIt = stateIterator(); sIt.hasNext();)
+		{
+			State currState = (State) sIt.next();
+			
+			int part1 = 1;
+			int part2 = 2;
+						
+			String id = currState.getId();
+			if (id != null)
+			{
+				part1 = id.hashCode();
+			}
+
+			String name = currState.getName();
+			if (name != null)
+			{
+				part2 = name.hashCode();
+			}
+						
+			int part3 = currState.nbrOfIncomingArcs();
+			int part4 = currState.nbrOfOutgoingArcs();
+			
+			checksum = part1 + part2 + part3 + part4;
+		}
+		
+		int part5 = nbrOfStates();
+		int part6 = nbrOfEvents();
+		int part7 = nbrOfTransitions();
+		
+		int part8 = 1;
+		if (name != null)
+		{
+			part8 = name.hashCode(); 
+		}
+		
+		if (part5 > 0)
+		{
+			checksum = checksum * part5;
+		}
+		if (part6 > 0)
+		{
+			checksum = checksum * part6;
+		}
+		if (part7 > 0)
+		{
+			checksum = checksum * part7;
+		}
+		if (part8 > 0)
+		{
+			checksum = checksum * part8;
+		}			
+		return checksum;
 	}
 
 	public Listeners getListeners()

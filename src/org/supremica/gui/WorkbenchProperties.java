@@ -90,6 +90,8 @@ public final class WorkbenchProperties
 	private static final String SYNTHESIS_OPTIMIZE = "synthesisOptimize";
 	private static final String SYNTHESIS_MAXIMALLY_PERMISSIVE = "synthesisMaximallyPermissive";
 
+	private static final String GENERAL_USE_SECURITY = "GeneralUseSecurity";
+	
 	private static final WorkbenchProperties wp = new WorkbenchProperties();
 
 	private WorkbenchProperties()
@@ -125,6 +127,8 @@ public final class WorkbenchProperties
 		setProperty(SYNTHESIS_PURGE, "true");
 		setProperty(SYNTHESIS_OPTIMIZE, "true");
 		setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, "true");
+
+		setProperty(GENERAL_USE_SECURITY, "false");
 	}
 
 	public static void load(String fileName)
@@ -437,6 +441,16 @@ public final class WorkbenchProperties
 	public static void setSynthesisMaximallyPermissive(boolean maximallyPermissive)
 	{
 		wp.setProperty(SYNTHESIS_MAXIMALLY_PERMISSIVE, toString(maximallyPermissive));
+	}
+
+	public static boolean generalUseSecurity()
+	{
+		return toBoolean(wp.getProperty(GENERAL_USE_SECURITY));
+	}
+
+	public static void setUseSecurity(boolean useSecurity)
+	{
+		wp.setProperty(GENERAL_USE_SECURITY, toString(useSecurity));
 	}
 
 	private static String toString(boolean b)

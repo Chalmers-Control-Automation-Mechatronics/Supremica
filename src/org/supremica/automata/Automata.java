@@ -65,6 +65,7 @@ public class Automata
  	private HashMap nameMap;
  	private String name = null;
 	private AutomataListeners listeners = null;
+	private String owner = "Supremica";
 
 	public Automata()
 	{
@@ -170,6 +171,18 @@ public class Automata
 			listeners = new AutomataListeners(this);
 		}
 		return listeners;
+	}
+	
+	public long checksum()
+	{ // Ad-hoc checksum algorithm
+		long checksum = 53562951413L;
+		for (Iterator aIt = iterator(); aIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)aIt.next();
+			checksum = checksum + currAutomaton.checksum();
+		}
+		
+		return checksum;
 	}
 
 	private void notifyListeners()

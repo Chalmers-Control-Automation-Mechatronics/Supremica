@@ -225,6 +225,7 @@ public class AutomataBuildFromXml
 	}
 
 	public final void doAutomata(AttributeList attributes)
+		throws SAXException
 	{
 		currAutomata = new Automata();
 
@@ -232,6 +233,29 @@ public class AutomataBuildFromXml
 		if (name != null)
 		{
 			currAutomata.setName(name);
+		}
+
+		int majorVersion = 0;
+		String majorStringVersion = attributes.getValue("major");
+		if (majorStringVersion != null)
+		{
+			majorVersion = Integer.parseInt(majorStringVersion);
+		}
+
+		int minorVersion = 0;
+		String minorStringVersion = attributes.getValue("minor");		
+		if (minorStringVersion != null)
+		{
+			minorVersion = Integer.parseInt(minorStringVersion);
+		}
+		
+		if (majorVersion > 0)
+		{
+			throw new SAXException("Unsupported file format.");
+		}
+		if (minorVersion > 9)
+		{
+			throw new SAXException("Unsupported file format.");
 		}
 	}
 
