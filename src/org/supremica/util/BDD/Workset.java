@@ -294,7 +294,6 @@ public class Workset
 	public int pickOne()
 	{
 		int queue_size = h1_heuristic(heuristic, false);
-		Options.out.println("DEBUG: took " + queue_size + " out of " + workset_count);
 		last_choice = ndas.choose(queue, queue_size);
 		return last_choice;
 	}
