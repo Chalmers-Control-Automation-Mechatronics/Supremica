@@ -1,0 +1,3 @@
+#/bin/sh
+java -cp .:../../lib/unjared org.supremica.softplc.RunTime.DigitalIODisplay org.supremica.softplc.Simulator.BTSim
+
