@@ -110,9 +110,9 @@ public class AutomataToC
 		{
 			LabeledEvent currEvent = (LabeledEvent)alphIt.next();
 			int currEventIndex = currEvent.getSynchIndex();
-			printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable() ? " controllable" : " uncontrollable"), "false");
+			printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable() ? " controllable" : " uncontrollable"), "0");
 		}
-		printBooleanVariableDeclaration(pw, "enabledEvent", "True if a event is enabled, false otherwise", "false");
+		printBooleanVariableDeclaration(pw, "enabledEvent", "True if a event is enabled, false otherwise", "0");
 
 	}
 
@@ -152,7 +152,7 @@ public class AutomataToC
 	{
 		pw.println("\n\tinitialize(); // Initialize the supervisor");
 		pw.println("\n\t// Main scancycle");
-		pw.println("\twhile (true)");
+		pw.println("\twhile (1)");
 		pw.println("\t{");
 	}
 
@@ -189,7 +189,7 @@ public class AutomataToC
 	void printComputeEnabledEvents(PrintWriter pw)
 		throws Exception
 	{
-		pw.println("\n\t\tenabledEvent = false;");
+		pw.println("\n\t\tenabledEvent = 0;");
 
 
 		pw.println("\n\t\t// Compute the enabled events");
@@ -242,7 +242,7 @@ public class AutomataToC
 						}
 						if (!previousState)
 						{
-							pw.print(" false ");
+							pw.print(" 0 ");
 						}
 						pw.print(")");
 					}
@@ -501,6 +501,10 @@ public class AutomataToC
 		throws Exception
 	{
 		initialize();
+		printInitializationFunction(pw);
+		printComputeExternalEnabledEventsFunctions(pw);
+		printDoEnabledEventsFunctions(pw);
+
 		printBeginProgram(pw);
 		printEventVariables(pw);
 		printStateVariables(pw);
@@ -511,9 +515,6 @@ public class AutomataToC
 		printChangeStateTransitions(pw);
 		printEndScanCycle(pw);
 		printEndProgram(pw);
-		printInitializationFunction(pw);
-		printComputeExternalEnabledEventsFunctions(pw);
-		printDoEnabledEventsFunctions(pw);
 	}
 
 }
