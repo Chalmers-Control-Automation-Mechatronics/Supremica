@@ -141,11 +141,8 @@ public final class AutomataIndexForm
 
 		generateStateIndices(theAutomata);
 
-		// Här blir det fel!
-		//  Bra kommentar, killar. Jättebra. /hguo
-		//   Men nu har jag också råkat ut för det. Plötsligt får man ArrayIndexOutOfBoundsException i
-		//   metoden nedanför... Undrar varför... det verkar inte vara helt lätt att reproducera,
-		//   heller. Min gissning är att det är State.index som blir fel t.ex. om man gör merge. /hguo igen
+		// Sometimes stuff go wrong here... perhaps because some State.index has been messed up
+		// as a result of an Automaton.merge? It does not seem to be easily reproducible?
 		generateNextStateTransitionIndices(theAutomata, theAutomaton);
 		generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
 
@@ -451,10 +448,8 @@ public final class AutomataIndexForm
 					enableEventsTable[currAutomatonIndex][currEventIndex][i] = currStateIndex;
 					try
 					{
-						// Här är felet! För icke deterministiska system förekommer
-						// FLERA övergångar med samma händelse utifrån ett tillstånd.
-						// Därför måste man se till att enableEventsTable inte innehåller samma
-						// tillstånd flera gånger!
+					    // This is wrong! In nondeterministic systems, there may be MULTIPLE outgoing
+						// transitions on the same event...
 						enableEventsTable[currAutomatonIndex][currEventIndex][i + 1] = Integer.MAX_VALUE;
 					}
 					catch (Exception ex)

@@ -420,6 +420,28 @@
 	</jar>
 </target>
 
+<!--
+<target name="compile_robotstudiointerface" depends="startfiles_local_supremica">
+	<javac
+		srcdir="${supremica_basepackage}/temp/"
+		destdir="/research/rs"
+		classpath="${lib}/${unjared}"
+		includeJavaRuntime="yes"
+		deprecation="false"
+		verbose="false"
+		nowarn="true"
+		source="1.4"
+	/>
+</target>
+
+<target name="jar_robotstudiointerface">
+	<jar jarfile="${dist}/interfaceRobotStudio3_1.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
+		<fileset dir="${supremica_basepackage}/temp/">
+		</fileset>
+	</jar>
+</target>
+-->
+
 <target name="jar_supremica_student">
 	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
 		<fileset dir="${build}">
@@ -574,17 +596,19 @@
 		destdir="${doc}/api"
 		packagenames="${supremica_basepackage}.automata.*,${supremica_basepackage}.gui.*,${supremica_basepackage}.util.*,${supremica_basepackage}.apps.*"
 		classpath="${lib}/${unjared}"
+		encoding="ISO-8859-1"
 		author="true"
 		version="true"
 		use="true"
 		private="true"
 		windowtitle="Supremica API"
-		overview="${templates}/Overview.html"
 		doctitle="Supremica"
 		
 		bottom="Copyright &#169; 2001, 2002, 2003 Supremica and Knut Akesson. All Rights Reserved.">
 	</javadoc>
 </target>
+<!--	THIS ONE WAS PREVIOUSLY INCLUDED ABOVE...  -->
+<!--	overview="${templates}/Overview.html"      -->
 
 <!--
 <target name="doc_jgrafchart">

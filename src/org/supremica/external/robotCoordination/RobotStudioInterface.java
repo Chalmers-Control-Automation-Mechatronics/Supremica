@@ -499,7 +499,7 @@ public class RobotStudioInterface
 				}
 			}
 
-			logger.info(robotName + " not present in cell?");
+			logger.error(robotName + " not present in cell?");
 
 			return 0;
 		}
@@ -597,10 +597,12 @@ public class RobotStudioInterface
 				path.getTargetRefs().item(var(path.getTargetRefs().getCount())).setMotionType(1);
 
 				// Print richPath
+				/*
 				for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
 				{
 					logger.info((RichPosition) posIt.next());
 				}
+				*/
 
 				// Rearrange richPath so that the start and finish states are first and last
 				// There is a problem since the current RobotStudio version (3.1) sometimes
@@ -633,11 +635,12 @@ public class RobotStudioInterface
 				((RichPosition) richPath.getLast()).setName(toName);
 
 				// Print richPath
-				// logger.info("The path for " + robot + " moving from " + from + " to " + to + ".");
+				/*
 				for (Iterator posIt = richPath.iterator(); posIt.hasNext();)
 				{
 					logger.fatal((RichPosition) posIt.next());
 				}
+				*/
 
 				// If no collisions, return!
 				if (richPath.size() == 2)
@@ -1170,7 +1173,7 @@ public class RobotStudioInterface
 					if (!leavingTarget)
 					{
 						// Log
-						logger.debug("Target reached at time " + (float) motionTime + ".");
+						//logger.debug("Target reached at time " + (float) motionTime + ".");
 
 						// Set the cost
 						//Double realCost = new Double((motionTime - previousTime) * 1000);    // [ms]
@@ -1886,7 +1889,7 @@ public class RobotStudioInterface
 			}
 
 			// There is no main procedure!!
-			logger.info("No main procedure found! Trying again...");
+			logger.warn("No main procedure found! Trying again...");
 
 			if (tries++ == 10)
 			{

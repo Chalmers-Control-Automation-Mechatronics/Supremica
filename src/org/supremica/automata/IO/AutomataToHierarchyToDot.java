@@ -53,6 +53,13 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
+/**
+ * Generates output to dot for viewing the moular structure of an automata. I.e. Automaton-Objects
+ * become nodes and if a pair of automata share a number of events, there is an edge between the
+ * corresponding nodes labeled with the number of common events.
+ *
+ * @author hugo
+ */
 public class AutomataToHierarchyToDot
 	implements AutomataSerializer
 {

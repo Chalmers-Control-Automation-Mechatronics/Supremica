@@ -4,9 +4,10 @@ import java.io.*;
 import org.supremica.automata.*;
 
 /**
- * skapar en PCG-fil. det mesta kopierat från AutomataToHierarchyToDot.java
+ * Creates a PCG-file, most of this file is copied from AutomataToHierarchyToDot.
  *
- *  /Arash
+ * @author Arash
+ * @see AutomataToHierarchyToDot
  */
 public class AutomataToCommunicationGraph
 	implements AutomataSerializer

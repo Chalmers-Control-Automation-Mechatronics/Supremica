@@ -397,9 +397,9 @@ public class AutomataToControlBuilderSFC
 			return confAlphabet;
 		}
 
-		// Iterera över automaterna, finns händelsen i en automat så måste vi hitta
-		// samtliga tillstånd som har en övergång med händelsen. För varje tillstånd
-		// itereras över utgående bågar för att hitta motsvarande händelser.
+		// Iterate over the automata, if the event is present we must find all states
+		// that have transitions with this event. For each state, an iterator over the
+		// outgoing arcs find such events.
 		for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
