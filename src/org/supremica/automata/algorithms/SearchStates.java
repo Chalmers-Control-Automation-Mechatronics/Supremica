@@ -139,7 +139,10 @@ public class SearchStates
 		private int[] composite;
 		int index; // holds the automaton index
 		
-		private StateIterator(State[][] s, int[] c)
+		//** Note, ctor should be private, but jikes 1.15 emits faulty bytecode then
+		//** javac and jikes 1.14 ok for private.
+		//** Do not instantiate, create only through getStateIterator()
+		public StateIterator(State[][] s, int[] c)
 		{
 			states = s;
 			composite = c;
@@ -161,7 +164,10 @@ public class SearchStates
 	
 	public StateIterator getStateIterator(int[] composite_state)
 	{
-		return new StateIterator(syncher.getHelper().getIndexFormStateTable(), composite_state);
+		//
+		State[][] states = syncher.getHelper().getIndexFormStateTable();
+		//
+		return new StateIterator(states, composite_state);
 
 	}
 	public String toString(int[] composite_state)
