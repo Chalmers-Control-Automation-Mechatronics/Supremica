@@ -72,6 +72,11 @@ Supremica is following.
 	to check that some change you done is going though the
 	compiler.
 	
+	It is also possible to build only supremica or jgrafchart.
+	The commands are:
+		compile_supremica, build_supremica, rebuild_supremica,
+		compile_jgrafchart, build_jgrafchart, rebuild_jgrafchart.
+	
 3. Run
 	Two alternatives:
 	
