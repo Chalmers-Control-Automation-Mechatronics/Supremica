@@ -71,6 +71,7 @@ public class TestPackageIO
 		TestSuite suite = new TestSuite();
 		suite.addTest(TestProjectBuildFromXml.suite());
 		suite.addTest(TestAutomataToXml.suite());
+		suite.addTest(TestAutomataToJava.suite());
 		suite.addTest(TestProjectToSP.suite());
 		suite.addTest(TestProjectBuildFromFSM.suite());
 		suite.addTest(TestAutomatonToFSM.suite());
