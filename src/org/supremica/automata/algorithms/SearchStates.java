@@ -34,10 +34,16 @@ public class SearchStates
 	private /* volatile */ boolean stopRequested = false;
 
 	public void run()    // throws Exception
-	{
-		syncher.getHelper().setExecutionDialog(exedlg);
+	{		
 		exedlg.setMode(ExecutionDialogMode.synchronizing);
-
+		java.awt.EventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					syncher.getHelper().setExecutionDialog(exedlg);
+				}
+			});
+		
 		try
 		{
 			syncher.execute();    // Starts the synch thread and waits for it to stop

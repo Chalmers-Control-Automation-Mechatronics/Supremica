@@ -61,6 +61,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
+import org.supremica.automata.Arc;
 import org.supremica.automata.EventLabel;
 
 /**
@@ -148,11 +149,12 @@ public class AutomataVerifier
 	/**
 	 * Performs verification using the AutomataSynchronizerExecuter.
 	 *
-	 *@return  true if controllable, false if not or false if don't know.
+	 *@return  true if controllable, false if not or false if don't know (along with log message).
 	 *@exception  Exception Description of the Exception
 	 *@deprecated  this is done in AutomataVerificationWorker.
 	 *@see  AutomataSynchronizerExecuter
 	 */
+	/*
 	public boolean execute()
 		throws Exception
 	{
@@ -185,6 +187,7 @@ public class AutomataVerifier
 			return false;
 		}
 	}
+	*/
 
 	/**
 	 * Method called from external class stopping AutomataVerifier as soon as possible.
@@ -274,7 +277,7 @@ public class AutomataVerifier
 								{
 
 									// Check module
-									allModulesControllable = allModulesControllable && checkModule(selectedAutomata);
+									allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
 
 									// Stop if uncontrollable
 									if (!allModulesControllable)
@@ -306,7 +309,7 @@ public class AutomataVerifier
 					{
 
 						// Check module
-						allModulesControllable = allModulesControllable && checkModule(selectedAutomata);
+						allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
 
 						// Stop if uncontrollable
 						if (!allModulesControllable)
@@ -337,7 +340,7 @@ public class AutomataVerifier
 	 *@exception  Exception Description of the Exception
 	 *@see  AutomataSynchronizerExecuter
 	 */
-	private boolean checkModule(ArrayList selectedAutomata)
+	private boolean moduleIsControllable(ArrayList selectedAutomata)
 		throws Exception
 	{
 
@@ -1041,5 +1044,106 @@ public class AutomataVerifier
 	public AutomataSynchronizerHelper getHelper()
 	{
 		return synchHelper;
+	}
+
+	/**
+	 * Examines non-blocking monolithically, by examining all reachable states. 
+	 * Lots and lots of work for big systems.
+	 *
+	 *@return True if non-blocking, false if blocking
+	 *@exception  Exception Description of the Exception
+	 *@see  AutomataSynchronizerExecuter
+	 */
+	public boolean monolithicNonBlockingVerification()
+		throws Exception
+	{
+		synchHelper.addState(initialState);
+		synchHelper.setExhaustiveSearch(false);
+		
+		// Initialize the synchronizationExecuters
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
+			
+			synchronizationExecuters.add(currSynchronizationExecuter);
+		}
+		
+		// Start all the synchronization executers and wait for completion
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
+			
+			currExec.selectAllAutomata();
+			currExec.start();
+		}
+		
+		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
+		
+		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
+
+		Automaton theAutomaton;
+
+		try
+		{
+			if (currExec.buildAutomaton())
+			{
+				theAutomaton = synchHelper.getAutomaton();
+			}
+			else
+			{
+				theAutomaton = null;
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error when building automaton: " + ex.toString());
+			throw ex;
+		}
+
+		return moduleIsNonBlocking(theAutomaton);
+	}
+
+	/**
+	 * Examines non-blocking monolithically, by examining all reachable states. 
+	 * Lots and lots of work for big systems.
+	 *
+	 *@return True if non-blocking, false if blocking
+	 *@exception  Exception Description of the Exception
+	 *@see  AutomataSynchronizerExecuter
+	 */
+	private boolean moduleIsNonBlocking(Automaton theAutomaton)
+	{
+		// Examine all states, starting from the marked ones and moving backwards...
+		LinkedList statesToExamine = new LinkedList();
+		Iterator stateIterator = theAutomaton.stateIterator();
+		State currState;
+		// Add all marked states
+		while (stateIterator.hasNext())
+		{
+			currState = (State) stateIterator.next();
+			if (currState.isAccepting())
+			{
+				statesToExamine.add(currState);
+			}
+		}
+		
+		State examinedState;
+		Iterator incomingArcIterator;
+		while (statesToExamine.size() > 0)
+		{
+			examinedState = (State) statesToExamine.removeFirst(); // OBS. removeFirst!
+			incomingArcIterator = examinedState.incomingArcsIterator();
+			while (incomingArcIterator.hasNext())
+			{
+				currState = ((Arc) incomingArcIterator.next()).getFromState(); 
+				if (!currState.equals(examinedState)) // Self-loops...
+				{
+					statesToExamine.add(currState);
+				}
+			}
+			theAutomaton.removeState(examinedState);
+		}
+
+		return theAutomaton.nbrOfStates()==0;
 	}
 }

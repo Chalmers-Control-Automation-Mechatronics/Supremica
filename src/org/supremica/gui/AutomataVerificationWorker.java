@@ -129,7 +129,6 @@ public class AutomataVerificationWorker
 
 		if (verificationOptions.getVerificationType() == 0)
 		{
-
 			// Controllability verification...
 			boolean isControllable;
 
@@ -173,19 +172,16 @@ public class AutomataVerificationWorker
 			{
 				if (verificationOptions.getAlgorithmType() == 0)
 				{
-
 					// Modular...
 					isControllable = automataVerifier.modularControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 1)
 				{
-
 					// Monolithic...
 					isControllable = automataVerifier.monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == 2)
 				{
-
 					// IDD...
 					requestStop();
 
@@ -196,7 +192,6 @@ public class AutomataVerificationWorker
 				}
 				else
 				{
-
 					// Error...
 					requestStop();
 
@@ -211,7 +206,7 @@ public class AutomataVerificationWorker
 				requestStop();
 
 				// logger.error("Error in AutomataVerificationWorker when verifying automata. " + e);
-				workbench.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				workbench.error("Error in AutomataVerificationWorker when verifying controllability. " + e);
 
 				return;
 			}
@@ -233,18 +228,114 @@ public class AutomataVerificationWorker
 		}
 		else if (verificationOptions.getVerificationType() == 1)
 		{
-
 			// Non-blocking verification...
-			requestStop();
-
+			// requestStop();		
 			// logger.error("Option not implemented...");
-			workbench.error("Option not implemented...");
+			// workbench.error("Option not implemented...");
+			// return;
+			boolean isNonBlocking;
+			
+			if (theAutomata.size() < 1)
+			{
+				JOptionPane.showMessageDialog(workbench.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				requestStop();
+				
+				return;
+			}
 
-			return;
+			try
+			{
+				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+
+				eventQueue.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						automataVerifier.getHelper().setExecutionDialog(executionDialog);
+					}
+				});
+
+				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
+				threadsToStop.add(automataVerifier);
+			}
+			catch (Exception e)
+			{
+				requestStop();
+				JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+				// logger.error(e.getMessage());
+				workbench.error(e.getMessage());
+
+				return;
+			}
+
+			startDate = new Date();
+
+			try
+			{
+				if (verificationOptions.getAlgorithmType() == 0)
+				{
+					// Modular...
+					requestStop();
+
+					// logger.error("Option not implemented...");
+					workbench.error("Option not implemented... try the monolithic algorithm instead, it's great!!");
+
+					return;
+				}
+				else if (verificationOptions.getAlgorithmType() == 1)
+				{
+					// Monolithic...
+					isNonBlocking = automataVerifier.monolithicNonBlockingVerification();
+				}
+				else if (verificationOptions.getAlgorithmType() == 2)
+				{
+					// IDD...
+					requestStop();
+
+					// logger.error("Option not implemented...");
+					workbench.error("Option not implemented...");
+
+					return;
+				}
+				else
+				{
+					// Error...
+					requestStop();
+
+					// logger.error("Unavailable option chosen.");
+					workbench.error("Unavailable option chosen.");
+
+					return;
+				}
+			}
+			catch (Exception e)
+			{
+				requestStop();
+
+				// logger.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				workbench.error("Error in AutomataVerificationWorker when verifying non-blocking. " + e);
+
+				return;
+			}
+
+			endDate = new Date();
+			
+			// Present result...
+			if (!stopRequested)
+			{
+				if (isNonBlocking)
+				{
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is non-blocking!", "Good news", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is blocking!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}		
 		}
 		else if (verificationOptions.getVerificationType() == 2)
 		{
-
 			// Language inclusion
 			boolean isIncluded;
 			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
