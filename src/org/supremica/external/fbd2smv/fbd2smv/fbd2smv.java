@@ -275,6 +275,8 @@ public class fbd2smv
 	String previousElementName  = null;
 	String previousElementIndex = null;
 
+	boolean firstElement = true;
+
 	for (int i=0; i<fbdElements.size(); i++)
 	{
 	    FBDElement fbdElement = (FBDElement)fbdElements.get(i);
@@ -285,9 +287,10 @@ public class fbd2smv
 
 	    if (elementType.equals("variable") || elementType.equals("box"))
 		{
-		    if (i==0)
+		    if (firstElement)
 			{
 			    pw.println("\t\t\tstate = read_input: compute_" + programName + "_" + elementName + "_" + elementIndex + ";"); 
+			    firstElement = false;
 			}
 		    
 		    else
