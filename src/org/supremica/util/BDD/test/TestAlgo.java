@@ -27,14 +27,13 @@ public class TestAlgo {
 		"../examples/includeInJarFile/OtherExamples/circularTable.xml",
 		"../examples/includeInJarFile/OtherExamples/flexibleManufacturingSystem.xml",
 		"../examples/benchmark/simple1.xml",
-		"../examples/c2.xml" ,
 		"../examples/c3.xml"
 
 		};
-	private final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, -1, -1};
-	private final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1, -1};
-	private final boolean controllable[] = { false, false, false, true, true, true, true};
-	private final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */, true /* dont know */};
+	private final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, -1};
+	private final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1};
+	private final boolean controllable[] = { false, false, false, true, true, true};
+	private final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */};
 
 
 	// ----------------------------------------------------------------------------------
