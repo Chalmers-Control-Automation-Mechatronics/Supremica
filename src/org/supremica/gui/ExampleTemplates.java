@@ -124,6 +124,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("4.4 - Cat & Mouse", prefix + "Ex4_4.xml"));
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: All events controllable", prefix + "Ex4_5_all_con.xml"));
 		thisGroup.addItem(new TemplateItem("4.5 - Robot & Machine: Put is uncontrollable", prefix + "Ex4_5_b_uncon.xml"));
+		thisGroup.addItem(new TemplateItem("4.6 - Two Machines & a Buffer", prefix + "Ex4_6.xml"));
 	}
 
 	private void initializeCCSCourseAssignments()
@@ -165,6 +166,8 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Automated Guided Vehicles", prefix + "agv.xml"));
 		//thisGroup.addItem(new TemplateItem("Automated Guided Vehicle, immediate events", prefix + "agvImmediate.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
+		thisGroup.addItem(new TemplateItem("Parrow's Protocol", prefix + "parrowsProtocol.xml"));
+		thisGroup.addItem(new TemplateItem("Alternating Bit Protocol", prefix + "alternatingBitProtocol.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
 		thisGroup.addItem(new TemplateItem("Rotation Table", prefix + "rotationTable.xml"));

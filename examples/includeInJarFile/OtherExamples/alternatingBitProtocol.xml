@@ -8,7 +8,7 @@
 		<Event id="acks_0"/>
 		<Event id="acks_1"/>
 		<Event controllable="false" id="timeout_0" epsilon="true"/>
-		<Event controllable="false" id="timeout_1" epsilon="true"/>
+	    <Event controllable="false" id="timeout_1" epsilon="true"/>
 	</Events>
 	<States>
 		<State id="s0" initial="true" accepting="true"/>
