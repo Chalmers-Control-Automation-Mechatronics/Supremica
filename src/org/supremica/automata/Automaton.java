@@ -434,7 +434,7 @@ public class Automaton
 			Arc currArc = arcIt.nextArc();
 			if (currArc.isSelfLoop())
 			{
-				return false;
+				return true;
 			}
 		}
 		return false;
@@ -466,6 +466,12 @@ public class Automaton
 	{
 		return alphabet.isAllEventsPrioritized();
 	}
+
+	public boolean isAllEventsObservable()
+	{
+		return alphabet.isAllEventsObservable();
+	}
+
 
 	/**
 	 * When adding an arc, both the two states associated with the
@@ -1382,6 +1388,11 @@ public class Automaton
 	public int nbrOfEpsilonEvents()
 	{
 		return alphabet.nbrOfEpsilonEvents();
+	}
+
+	public int nbrOfObservableEvents()
+	{
+		return alphabet.nbrOfObservableEvents();
 	}
 
 	/**

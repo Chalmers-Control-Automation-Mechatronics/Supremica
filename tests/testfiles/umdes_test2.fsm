@@ -1,0 +1,14 @@
+3
+
+s1	1	3
+put1	s1	uc	uo
+put2	s2	uo
+
+put3	s3	uc
+
+s2	0	1
+load	s3
+
+s3	0	1
+unload_A	s1	c	o
+

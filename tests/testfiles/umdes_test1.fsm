@@ -1,0 +1,17 @@
+4
+
+r1m1s1	1	1
+take	r2m1s1	c	o
+
+r1m1s2	0	1
+load	r1m2s3	c	o
+
+r1m2s3	0	1
+unload_A	r1m1s1	c	o
+
+r2m1s1	1	1
+put	r1m1s2	uc	o
+
+EVENTS
+unload_B	c	o
+

@@ -404,6 +404,20 @@ public class Alphabet
 		return true;
 	}
 
+	public boolean isAllEventsObservable()
+	{
+		for (Iterator evIt = eventIterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = (LabeledEvent) evIt.next();
+
+			if (!currEvent.isObservable())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * Returns true if this alphabet contains an event with the same label as other.
 	 */

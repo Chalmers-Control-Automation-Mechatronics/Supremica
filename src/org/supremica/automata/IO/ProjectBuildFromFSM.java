@@ -316,7 +316,7 @@ public class ProjectBuildFromFSM
 					while (tokenizer.hasMoreTokens())
 					{
 						String optionalParameter = tokenizer.nextToken();
-						System.err.println(currEvent + " " + destStateName + " " + optionalParameter);
+						//System.err.println(currEvent + " " + destStateName + " " + optionalParameter);
 						if (optionalParameter.equalsIgnoreCase("c"))
 						{
 							currEventControllable = true;
@@ -377,7 +377,38 @@ public class ProjectBuildFromFSM
 						{
 							logger.warn(currEvent + " is already defined");
 						}
+
+						boolean currEventControllable = true;
+						boolean currEventObservable = true;
+
+						while (tokenizer.hasMoreTokens())
+						{
+							String optionalParameter = tokenizer.nextToken();
+							if (optionalParameter.equalsIgnoreCase("c"))
+							{
+								currEventControllable = true;
+							}
+							else if (optionalParameter.equalsIgnoreCase("uc"))
+							{
+								currEventControllable = false;
+							}
+							else if (optionalParameter.equalsIgnoreCase("o"))
+							{
+								currEventObservable = true;
+							}
+							else if (optionalParameter.equalsIgnoreCase("uo"))
+							{
+								currEventObservable = false;
+							}
+							else
+							{
+								logger.warn("Unknown event attribute: " + optionalParameter);
+							}
+						}
 						LabeledEvent currLabeledEvent = new LabeledEvent(currEvent);
+						currLabeledEvent.setControllable(currEventControllable);
+						currLabeledEvent.setObservable(currEventObservable);
+						currLabeledEvent.setPrioritized(true);
 						currAlphabet.addEvent(currLabeledEvent);
 					}
 				}

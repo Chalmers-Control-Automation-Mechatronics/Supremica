@@ -72,6 +72,7 @@ public class TestPackageIO
 		suite.addTest(TestProjectBuildFromXml.suite());
 		suite.addTest(TestAutomataToXml.suite());
 		suite.addTest(TestProjectToSP.suite());
+		suite.addTest(TestProjectBuildFromFSM.suite());
 		return suite;
 	}
 }
