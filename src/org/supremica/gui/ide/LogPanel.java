@@ -1,13 +1,13 @@
 package org.supremica.gui.ide;
 
-import javax.swing.*;
 import org.supremica.gui.WhiteScrollPane;
-import java.awt.Dimension;
 import org.supremica.log.*;
 
 class LogPanel
 	extends WhiteScrollPane
 {
+	private static final long serialVersionUID = 1L;
+
 	private IDE ide;
 	private String title;
 

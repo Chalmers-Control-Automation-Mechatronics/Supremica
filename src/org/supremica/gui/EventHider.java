@@ -13,19 +13,14 @@
 package org.supremica.gui;
 
 import java.util.*;
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.tree.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.ArcIterator;
-import org.supremica.automata.Arc;
 
 /**
  * Gaaaah! LanguageRestrictorDialog has lots of stuff in it that should be somewhere else.
@@ -36,6 +31,8 @@ import org.supremica.automata.Arc;
 class EventHiderDialog
 	extends LanguageRestrictorDialog
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(EventHiderDialog.class);
 
 	public EventHiderDialog(Automata automata)
@@ -51,6 +48,8 @@ class EventHiderDialog
 	private class OkButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public OkButton()
 		{
 			super("Ok");
@@ -118,6 +117,8 @@ class EventHiderDialog
 public class EventHider
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(EventHider.class);
 
 	public EventHider()

@@ -56,7 +56,6 @@ import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.gui.VisualProjectContainer;
 import org.supremica.util.ActionTimer;
 
 /**

@@ -4,21 +4,17 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.1 2005-03-04 11:35:57 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.2 2005-03-24 10:08:54 torda Exp $
 //###########################################################################
 package org.supremica.gui.ide;
 
 import javax.swing.*;
 import javax.swing.tree.*;
-import java.awt.*;
 import java.awt.event.*;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.IdentifierProxy;
 import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
@@ -35,6 +31,8 @@ public class EditorNewComponentDialog
 	extends JDialog
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
+
 	public static int FOREACH = 1;
 	public static int SIMPLE = 2;
 	private final JTextField name = new JTextField(16);
@@ -111,7 +109,7 @@ public class EditorNewComponentDialog
 		name.requestFocusInWindow();
 		this.setContentPane(b);
 		this.pack();
-		this.show();
+		this.setVisible(true);
 		name.requestFocusInWindow();
 	}
 

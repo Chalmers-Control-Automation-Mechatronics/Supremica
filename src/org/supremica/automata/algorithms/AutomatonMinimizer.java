@@ -54,9 +54,7 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.gui.ActionMan;
 import org.supremica.gui.ExecutionDialog;
-import java.awt.Toolkit;
 import org.supremica.util.ActionTimer;
 
 // Factory object for generating the correct class according to prefs

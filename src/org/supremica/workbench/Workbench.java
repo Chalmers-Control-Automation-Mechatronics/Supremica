@@ -16,8 +16,6 @@ import org.supremica.util.VerticalFlowLayout;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomataSerializer;
-import org.supremica.util.SupremicaException;
-
 // For debug
 import org.supremica.testcases.StickPickingGame;
 
@@ -51,6 +49,8 @@ class MyAutomatonToDot
 class MyAutomatonViewer
 	extends AutomatonViewer
 {
+	private static final long serialVersionUID = 1L;
+
 	public MyAutomatonViewer(Automaton theAutomaton)
 		throws Exception
 	{
@@ -85,6 +85,8 @@ class MyAutomatonViewerFactory
 class ButtonImpl
 	extends JButton
 {
+	private static final long serialVersionUID = 1L;
+
 	Workbench wb = null;
 
 	ButtonImpl(String text, Workbench wb, String tooltip)
@@ -100,6 +102,8 @@ class ButtonImpl
 class SynchButton
 	extends ButtonImpl
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(SynchButton.class);
 
 	SynchButton(Workbench wb)
@@ -161,6 +165,8 @@ class SynchButton
 class CompareButton
 	extends ButtonImpl
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(CompareButton.class);
 
 	CompareButton(Workbench wb)
@@ -289,6 +295,8 @@ class CompareButton
 class ContButton
 	extends ButtonImpl
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(ContButton.class);
 
 	ContButton(Workbench wb)
@@ -350,6 +358,8 @@ class ContButton
 class NonblockButton
 	extends ButtonImpl
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(NonblockButton.class);
 
 	NonblockButton(Workbench wb)
@@ -404,6 +414,8 @@ class NonblockButton
 class ReachButton
 	extends ButtonImpl
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(ReachButton.class);
 
 	ReachButton(Workbench wb)
@@ -458,6 +470,8 @@ class ReachButton
 class PurgeButton
 	extends ButtonImpl
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(ReachButton.class);
 
 	PurgeButton(Workbench wb)
@@ -495,6 +509,8 @@ class PurgeButton
 class DoneButton
 	extends ButtonImpl
 {
+	private static final long serialVersionUID = 1L;
+
 	DoneButton(Workbench wb)
 	{
 		super("Done", wb, "Done already... close");
@@ -518,6 +534,8 @@ class DoneButton
 class ParamPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	Workbench wb = null;
 	JCheckBox show_graph;
 	JCheckBox list_uc;
@@ -587,6 +605,8 @@ class ParamPanel
 class ButtonPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	public ButtonPanel(Workbench wb)
 	{
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Synthesize"));
@@ -616,6 +636,8 @@ class ButtonPanel
 class InfoPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	JTextField text = new JTextField("Supervisor Workbench", 18);
 
 	InfoPanel(Workbench wb)
@@ -633,6 +655,8 @@ class InfoPanel
 public class Workbench
 	extends CenteredFrame
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(Workbench.class);
 	Automata automata = null;    // these are used "globally" in this file
 	Automaton automaton = null;    // eventually the resulting supervisor
@@ -802,6 +826,6 @@ public class Workbench
 		StickPickingGame game = new StickPickingGame(2, 7);
 		Workbench wb = new Workbench(null, game.getProject());
 
-		wb.show();
+		wb.setVisible(true);
 	}
 }

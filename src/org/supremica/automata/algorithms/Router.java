@@ -10,7 +10,6 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.automata.Automata;
-import org.supremica.automata.State;
 import org.supremica.gui.MonitorableThread;
 
 public class Router

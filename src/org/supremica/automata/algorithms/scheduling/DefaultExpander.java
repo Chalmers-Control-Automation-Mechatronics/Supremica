@@ -10,7 +10,6 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.properties.SupremicaProperties;
 
 class DefaultExpander
 	implements Expander

@@ -2,9 +2,6 @@ package org.supremica.util.BDD.li;
 
 import org.supremica.util.BDD.*;
 
-// import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-
 public class IncrementalLI
 	extends BaseLI
 {
@@ -442,6 +439,9 @@ public class IncrementalLI
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.9  2004/11/25 16:04:52  vahidi
+fixed hugos "fixes" where the HeperData was not created for BDD operations.
+
 Revision 1.8  2004/10/08 13:36:58  vahidi
 bug fixes :(
 

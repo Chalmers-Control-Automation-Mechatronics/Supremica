@@ -56,7 +56,6 @@ import org.jdom.*;
 import org.jdom.input.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import java.util.regex.Pattern;
 
 public class AutomataBuildFromVALID
 {

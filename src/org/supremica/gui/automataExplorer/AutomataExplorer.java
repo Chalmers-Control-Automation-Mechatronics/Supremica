@@ -55,7 +55,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;

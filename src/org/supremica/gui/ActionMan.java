@@ -71,7 +71,6 @@ import org.supremica.external.shoefactory.plantBuilder.*;
 import org.supremica.external.shoefactory.Configurator.*;
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
-import org.supremica.util.ActionTimer;
 //import org.supremica.automata.algorithms.RobotStudioLink;
 import org.supremica.gui.useractions.*;
 import org.supremica.gui.texteditor.TextFrame;
@@ -673,7 +672,7 @@ public class ActionMan
 		{
 
 			// this.selectedValue = JOptionPane.showInputDialog(comp, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
-			dialog.show();
+			dialog.setVisible(true);
 			dialog.dispose();
 
 			// Is this the right thing to do? It seems to work, but the manuals...
@@ -1571,7 +1570,7 @@ public class ActionMan
 			}
 
 			Container userInterface = currProject.getUserInterface();
-			userInterface.show();
+			userInterface.setVisible(true);
 		}
 		catch (Exception ex)
 		{
@@ -3015,7 +3014,7 @@ public class ActionMan
 	{
 		TestCasesDialog testCasesDialog = new TestCasesDialog(gui.getFrame(), gui);
 
-		testCasesDialog.show();
+		testCasesDialog.setVisible(true);
 
 		//Project project = testCasesDialog.getProject();
 
@@ -3286,7 +3285,7 @@ public class ActionMan
 
 		try
 		{
-			con.show();
+			con.setVisible(true);
 		}
 		catch (Exception ex)
 		{
@@ -3322,7 +3321,7 @@ public class ActionMan
 
 		try
 		{
-			con.show();
+			con.setVisible(true);
 		}
 		catch (Exception ex)
 		{

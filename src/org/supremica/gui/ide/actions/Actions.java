@@ -1,7 +1,6 @@
 
 package org.supremica.gui.ide.actions;
 
-import org.supremica.gui.ide.IDE;
 import java.util.*;
 
 public class Actions

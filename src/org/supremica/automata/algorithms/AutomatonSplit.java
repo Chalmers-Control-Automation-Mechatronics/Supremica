@@ -49,10 +49,8 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.awt.*; // For the beep only...
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import org.supremica.automata.algorithms.standard.*;
 
 public class AutomatonSplit
 {

@@ -50,8 +50,6 @@
 package org.supremica.automata.IO;
 
 import java.util.*;
-import java.io.*;
-import java.net.URL;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 import net.sourceforge.waters.model.base.DocumentManager;

@@ -4,14 +4,13 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: FileImporter.java,v 1.3 2005-03-03 23:40:20 knut Exp $
+//# $Id: FileImporter.java,v 1.4 2005-03-24 10:09:16 torda Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide.actions;
 
 import javax.swing.JFileChooser;
-import org.supremica.gui.ide.IDE;
 import java.io.File;
 
 abstract class FileImporter

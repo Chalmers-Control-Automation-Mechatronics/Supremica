@@ -1,6 +1,5 @@
 package org.supremica.gui.ide;
 
-import javax.swing.*;
 import java.awt.Dimension;
 import java.io.InputStream;
 
@@ -17,6 +16,8 @@ class AnalyzerAutomatonViewerPanel
 	extends WhiteScrollPane
 	implements DotBuilderObserver
 {
+	private static final long serialVersionUID = 1L;
+
 	private ModuleContainer moduleContainer;
 	private String name;
 	private DotBuilder builder;

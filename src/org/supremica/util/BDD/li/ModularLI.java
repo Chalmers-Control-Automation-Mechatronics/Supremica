@@ -1,7 +1,6 @@
 package org.supremica.util.BDD.li;
 
 import org.supremica.util.BDD.*;
-import org.supremica.automata.algorithms.*;
 
 /** Modular LI algo */
 public class ModularLI

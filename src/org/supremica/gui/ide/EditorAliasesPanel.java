@@ -1,11 +1,12 @@
 package org.supremica.gui.ide;
 
-import javax.swing.*;
 import org.supremica.gui.WhiteScrollPane;
 
 class EditorAliasesPanel
 	extends WhiteScrollPane
 {
+	private static final long serialVersionUID = 1L;
+
 	private ModuleContainer moduleContainer;
 	private String name;
 

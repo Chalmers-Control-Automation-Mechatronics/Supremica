@@ -53,19 +53,14 @@ package org.supremica.functionblocks.model;
 
 import java.lang.Exception;
 import java.io.StringReader;
-import java.io.FileReader;
 import java.io.Reader;
 
 import java_cup.runtime.Scanner;
-import java_cup.runtime.Symbol;
 
 import org.supremica.functionblocks.model.interpreters.st.Lexer;
 import org.supremica.functionblocks.model.interpreters.st.Parser;
 import org.supremica.functionblocks.model.interpreters.st.Evaluator;
-import org.supremica.functionblocks.model.interpreters.st.Printer;
-
 import org.supremica.functionblocks.model.interpreters.st.abstractsyntax.Expression;
-
 
 public class ECCondition
 {

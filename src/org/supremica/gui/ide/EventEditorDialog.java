@@ -4,35 +4,27 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.2 2005-03-03 01:46:03 knut Exp $
+//# $Id: EventEditorDialog.java,v 1.3 2005-03-24 10:08:54 torda Exp $
 //###########################################################################
 package org.supremica.gui.ide;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.xml.bind.JAXBException;
 import net.sourceforge.waters.gui.ErrorWindow;
-import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.expr.IdentifierProxy;
-import net.sourceforge.waters.model.expr.SimpleIdentifierProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Vector;
 import org.supremica.log.*;
 
 public class EventEditorDialog
 	extends JDialog
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(EventEditorDialog.class);
 
 	private final JTextField name = new JTextField(16);
@@ -126,7 +118,7 @@ public class EventEditorDialog
 		b.add(r4);
 		setContentPane(contentPanel);
 		pack();
-		show();
+		setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent e)

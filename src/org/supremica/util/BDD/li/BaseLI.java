@@ -2,9 +2,6 @@ package org.supremica.util.BDD.li;
 
 import org.supremica.util.BDD.*;
 
-// import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-
 /**
  * base class for the language containment verification (LI/ctrl)
  *

@@ -16,7 +16,6 @@ import java.util.*;
 import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
-import org.supremica.automata.IO.FileFormats;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.log.*;
 import org.supremica.Version;
@@ -25,6 +24,8 @@ public class IDE
     extends JFrame
     implements ChangeListener, IDEActionInterface
 {
+	private static final long serialVersionUID = 1L;
+
 	static
 	{
 		SupremicaProperties.setUseSecurity(false);

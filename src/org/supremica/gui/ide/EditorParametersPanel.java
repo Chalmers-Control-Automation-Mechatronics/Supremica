@@ -2,7 +2,6 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import org.supremica.gui.WhiteScrollPane;
-import java.util.*;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.gui.ParameterListCell;
@@ -11,6 +10,8 @@ import net.sourceforge.waters.gui.ParameterListCell;
 class EditorParametersPanel
 	extends WhiteScrollPane
 {
+	private static final long serialVersionUID = 1L;
+
 	private ModuleContainer moduleContainer;
 	private String name;
 

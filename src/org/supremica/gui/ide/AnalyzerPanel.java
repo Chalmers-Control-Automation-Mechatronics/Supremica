@@ -1,14 +1,14 @@
 package org.supremica.gui.ide;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 
 
 public class AnalyzerPanel
 	extends MainPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	private JTabbedPane tabPanel;
 	private JComponent automatonViewerPanel;
 	private AnalyzerAutomataPanel automataPanel;

@@ -1,10 +1,7 @@
 package org.supremica.gui;
 
 import org.supremica.log.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
-import javax.swing.*;
 import att.grappa.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.IO.AutomataSerializer;

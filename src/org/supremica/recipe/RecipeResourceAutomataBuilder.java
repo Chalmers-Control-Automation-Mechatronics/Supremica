@@ -48,8 +48,6 @@
  *  Supremica is owned and represented by KA.
  */
 package org.supremica.recipe;
-
-import org.supremica.util.SupremicaException;
 // Remove this class
 class PlantConnections
 {

@@ -1,7 +1,6 @@
 
 package org.supremica.gui.ide.actions;
 
-import org.supremica.gui.ide.IDE;
 import javax.swing.AbstractButton;
 import javax.swing.AbstractAction;
 

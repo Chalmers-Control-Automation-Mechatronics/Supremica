@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.7 2005-03-03 23:40:20 knut Exp $
+//# $Id: OpenAction.java,v 1.8 2005-03-24 10:09:16 torda Exp $
 //###########################################################################
 
 
@@ -14,7 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.File;
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -36,6 +35,8 @@ import org.supremica.gui.ide.ModuleContainer;
 public class OpenAction
 	extends IDEAction
 {
+	private static final long serialVersionUID = 1L;
+
 	public OpenAction(IDEActionInterface ide)
 	{
 		super(ide);

@@ -48,7 +48,6 @@
  */
 package org.supremica.functionblocks.model;
 
-import org.supremica.functionblocks.model.interpreters.st.Tester;
 import java.util.*;
 
 /**

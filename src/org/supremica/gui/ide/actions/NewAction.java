@@ -1,6 +1,5 @@
 package org.supremica.gui.ide.actions;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
@@ -11,6 +10,8 @@ import org.supremica.gui.ide.IDE;
 public class NewAction
 	extends IDEAction
 {
+	private static final long serialVersionUID = 1L;
+
 	public NewAction(IDEActionInterface ide)
 	{
 		super(ide);

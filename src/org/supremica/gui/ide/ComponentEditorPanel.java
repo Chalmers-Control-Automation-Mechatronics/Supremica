@@ -2,18 +2,10 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.dnd.*;
 import java.io.File;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.module.IdentifiedElementProxy;
-import net.sourceforge.waters.model.base.ProxyMarshaller;
-import net.sourceforge.waters.model.module.ModuleMarshaller;
 import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
 import net.sourceforge.waters.model.expr.IdentifierProxy;
 import org.supremica.gui.GraphicsToClipboard;
-import java.awt.geom.Rectangle2D;
 import net.sourceforge.waters.gui.EditorToolbar;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorMenu;
@@ -26,6 +18,8 @@ public class ComponentEditorPanel
 	extends JPanel
 	implements EditorWindowInterface
 {
+	private static final long serialVersionUID = 1L;
+
 	private ModuleContainer moduleContainer;
 	private EditorToolbar toolbar;
 	private ControlledSurface surface;

@@ -1,14 +1,14 @@
 package org.supremica.gui.ide;
 
 import javax.swing.*;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 
 public class EditorPanel
 	extends MainPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	private JTabbedPane tabPanel;
 	private JComponent componentEditorPanel;
 

@@ -9,15 +9,14 @@ import java.awt.event.MouseEvent;
 import org.supremica.gui.WhiteScrollPane;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.base.*;
-import net.sourceforge.waters.gui.EditorWindow;
 import net.sourceforge.waters.gui.ComponentInfo;
 import net.sourceforge.waters.gui.ModuleTreeRenderer;
-
-import javax.swing.tree.*;
 
 class EditorComponentsPanel
 	extends WhiteScrollPane
 {
+	private static final long serialVersionUID = 1L;
+
 	private String name;
 	private ModuleContainer moduleContainer;
 

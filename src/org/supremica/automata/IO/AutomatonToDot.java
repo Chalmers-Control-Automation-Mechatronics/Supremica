@@ -57,7 +57,6 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.automata.algorithms.EnumerateStates;
 
 public class AutomatonToDot
 	implements AutomataSerializer

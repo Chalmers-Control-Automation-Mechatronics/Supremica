@@ -5,7 +5,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import java.awt.Dimension;
-import java.awt.Component;
 import javax.swing.JComponent;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -130,6 +129,8 @@ abstract class MainPanel
  	class EmptyRightPanel
  		extends WhiteScrollPane
  	{
+		private static final long serialVersionUID = 1L;
+
 		public EmptyRightPanel()
 		{
 			setPreferredSize(IDEDimensions.rightEmptyPreferredSize);

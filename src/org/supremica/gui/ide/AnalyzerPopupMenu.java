@@ -3,7 +3,6 @@
 package org.supremica.gui.ide;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.gui.MenuHandler;
 import org.supremica.util.VPopupMenu;

@@ -1,6 +1,5 @@
 package org.supremica.gui.ide.actions;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
@@ -12,6 +11,8 @@ import org.supremica.log.*;
 public class SaveAction
 	extends IDEAction
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(SaveAction.class);
 
 	public SaveAction(IDEActionInterface ide)

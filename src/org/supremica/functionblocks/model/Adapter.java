@@ -49,7 +49,6 @@
 
 package org.supremica.functionblocks.model;
 
-import java.util.*;
 /*
 <!ELEMENT AdapterDeclaration EMPTY>
 <!ATTLIST AdapterDeclaration

@@ -18,7 +18,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.Dimension;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 
@@ -27,6 +26,8 @@ class AnalyzerAutomataPanel
 	extends WhiteScrollPane
 	implements TableModelListener
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(AnalyzerAutomataPanel.class);
 
 	private AnalyzerPanel analyzerPanel;

@@ -145,7 +145,7 @@ public class VerificationDialog
 
 	public void show()
 	{
-		dialog.show();
+		dialog.setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent event)
@@ -174,6 +174,8 @@ public class VerificationDialog
 	private static class AlgorithmSelector
 		extends JComboBox
 	{
+		private static final long serialVersionUID = 1L;
+
 		public AlgorithmSelector()
 		{
 			super(VerificationAlgorithm.toArray());
@@ -212,6 +214,8 @@ public class VerificationDialog
 		extends JPanel
 		implements VerificationPanel, ActionListener
 	{
+		private static final long serialVersionUID = 1L;
+
 		private JComboBox verificationTypeBox;
 		private AlgorithmSelector algorithmSelector;
 		private JTextArea note;
@@ -339,6 +343,8 @@ public class VerificationDialog
 		extends JPanel
 		// implements MinimizationDialog.MinimizationPanel
 	{
+		private static final long serialVersionUID = 1L;
+
 		JComboBox minimizationStrategy;
 		JCheckBox ruleA;
 		JCheckBox ruleAA;
@@ -388,6 +394,8 @@ public class VerificationDialog
 		extends JPanel
 		implements VerificationPanel
 	{
+		private static final long serialVersionUID = 1L;
+
 		private JTextField exclusionStateLimit;
 		private JTextField reachabilityStateLimit;
 		private JCheckBox oneEventAtATimeBox;

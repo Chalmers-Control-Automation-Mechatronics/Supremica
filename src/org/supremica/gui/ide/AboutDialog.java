@@ -54,8 +54,6 @@ import org.supremica.gui.Utility;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
-
 
 public class AboutDialog
 	extends JDialog
@@ -102,7 +100,7 @@ public class AboutDialog
 
 	void cancel()
 	{
-		hide();
+		setVisible(false);
 		dispose();
 	}
 

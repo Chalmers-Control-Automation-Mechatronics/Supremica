@@ -49,8 +49,6 @@
 
 package org.supremica.functionblocks.model;
 
-import java.util.*;
-
 public class Event
 {
 	private String name;

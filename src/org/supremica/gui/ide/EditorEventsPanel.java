@@ -3,16 +3,16 @@ package org.supremica.gui.ide;
 import javax.swing.*;
 import java.util.*;
 import java.awt.event.*;
-import java.awt.GridLayout;
 import org.supremica.gui.WhiteScrollPane;
 import net.sourceforge.waters.gui.EventListCell;
 import net.sourceforge.waters.model.module.*;
-
 
 class EditorEventsPanel
 	extends WhiteScrollPane
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
+
 	private String name;
 	private ModuleContainer moduleContainer;
 
