@@ -171,6 +171,8 @@ public class SynchronizationDialog
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
 
+		Utility.setDefaultButton(dialog, okButton);
+
 		// ** MF ** Fix to get the frigging thing centered
 		Dimension dim = dialog.getMinimumSize();
 

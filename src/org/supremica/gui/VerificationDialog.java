@@ -69,23 +69,23 @@ class VerificationDialogStandardPanel
 	private JComboBox verificationTypeBox;
 	private AlgorithmSelector algorithmSelector;
 	private JTextArea nbNote;
-	
+
 	final String[] verificationData = { "controllability",	// keep them in this order, for God's sake!
 										"non-blocking",
 										"language inclusion" };
-	
-	
+
+
 	static class AlgorithmSelector
 		extends JComboBox
-	{	
+	{
 		final static int MONOLITHIC = 0;
 		final static int MODULAR = 1;
 		final static int IDD = 2;
 		final static String[] algorithmData = { "monolithic",  "modular"/*, "IDD" */ };
-		
+
 		public AlgorithmSelector()
 		{
-			super(algorithmData);			
+			super(algorithmData);
 		}
 		public void forceMonolithic()
 		{
@@ -96,25 +96,25 @@ class VerificationDialogStandardPanel
 			addItem(algorithmData[MODULAR]);
 		}
 	}
-	
+
 	public VerificationDialogStandardPanel()
 	{
 		verificationTypeBox = new JComboBox(verificationData);
 		verificationTypeBox.addActionListener(this);
-		
+
 		algorithmSelector = new AlgorithmSelector();
-		
-		nbNote = new JTextArea("Note:\n" + 
+
+		nbNote = new JTextArea("Note:\n" +
 								"Currently, modular non-blocking\n" +
 								"verification is not supported");
 		nbNote.setBackground(new Color(0,0,0,0)); // transparent
-	
+
 		Box standardBox = Box.createVerticalBox();
 		standardBox.add(verificationTypeBox);
 		standardBox.add(algorithmSelector);
 		this.add(standardBox, BorderLayout.CENTER);
 		this.add(nbNote, BorderLayout.SOUTH);
-		
+
 	}
 
 	public void update(VerificationOptions verificationOptions)
@@ -234,6 +234,8 @@ public class VerificationDialog
 
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
+
+		Utility.setDefaultButton(dialog, okButton);
 
 		// ** MF ** Fix to get the frigging thing centered
 		Dimension dim = dialog.getMinimumSize();

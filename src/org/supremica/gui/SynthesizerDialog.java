@@ -70,7 +70,7 @@ class SynthesizerDialogStandardPanel
 	private JCheckBox purgeBox;
 	private JCheckBox optimizeBox;
 	private NonblockNote nbNote;
-	
+
 	static class AlgorithmSelector
 		extends JComboBox
 	{
@@ -102,9 +102,9 @@ class SynthesizerDialogStandardPanel
 				return new AlgorithmSelector(SynthesisAlgorithm.toArray());
 			}
 		}
-		
+
 	}
-	
+
 	static class SynthesisSelector
 		extends JComboBox
 	{
@@ -112,7 +112,7 @@ class SynthesizerDialogStandardPanel
 		{
 			super(SynthesisType.toArray());
 		}
-		
+
 		public SynthesisType getType()
 		{
 			return (SynthesisType) getSelectedItem();
@@ -126,7 +126,7 @@ class SynthesizerDialogStandardPanel
 			return new SynthesisSelector();
 		}
 	}
-	
+
 	class NonblockNote
 /*		extends JPanel
 	{
@@ -139,12 +139,12 @@ class SynthesizerDialogStandardPanel
 			super.add(new JLabel("gurantee is that each supervisor is nonblockng"));
 			super.add(new JLabel("with respect to the plants that it controls"));
 		}
-		
+
 	}*/ // Just showing off the power of correct structuring
 		extends JTextArea
 	{
 		private final int transparent = 0;
-		
+
 		public NonblockNote()
 		{
 			super("Note:\n" +
@@ -152,33 +152,33 @@ class SynthesizerDialogStandardPanel
 				"does not gurantee global nonblocking. The only\n" +
 				"gurantee is that each supervisor is nonblockng\n" +
 				"with respect to the plants that it controls");
-			super.setBackground(new Color(0,0,0,transparent));  
+			super.setBackground(new Color(0,0,0,transparent));
 		}
 	}
 
 	public SynthesizerDialogStandardPanel(int num)
 	{
-		
+
 		algorithmTypeBox = AlgorithmSelector.create(num);
 		algorithmTypeBox.addActionListener(this);
-		
+
 		synthesisTypeBox = SynthesisSelector.create();
 		synthesisTypeBox.addActionListener(this);
-		
+
 		purgeBox = new JCheckBox("Purge result");
 		purgeBox.setToolTipText("Remove all forbidden states");
-		
+
 		optimizeBox = new JCheckBox("Optimize result");
 		optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
-		
+
 		nbNote = new NonblockNote();
-		
+
 		if(num == 1)
-		{		
+		{
 			optimizeBox.setEnabled(false);
 			nbNote.setVisible(false);
 		}
-		
+
 		Box standardBox = Box.createVerticalBox();
 		standardBox.add(synthesisTypeBox);
 		standardBox.add(algorithmTypeBox);
@@ -203,7 +203,7 @@ class SynthesizerDialogStandardPanel
 		synthesizerOptions.setPurge(purgeBox.isSelected());
 		synthesizerOptions.setOptimize(optimizeBox.isSelected());
 	}
-	
+
 	public void actionPerformed(ActionEvent e)
 	{
 		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
@@ -295,6 +295,8 @@ public class SynthesizerDialog
 
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
+
+		Utility.setDefaultButton(dialog, okButton);
 
 		// ** MF ** Fix to get the frigging thing centered
 		Dimension dim = dialog.getMinimumSize();
