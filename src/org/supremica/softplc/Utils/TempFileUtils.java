@@ -39,9 +39,11 @@ public class TempFileUtils {
 		if (prefix.length() < 3)
 			throw new IllegalArgumentException("Prefix string too short");
 		Random rand = new Random();
-		File temporaryFile = File.createTempFile("aaa","aaa");
-		File systemTempDir = temporaryFile.getParentFile();
-		temporaryFile.delete();
+		String systemTempDir = System.getProperty("java.io.tmpdir");
+		SecurityManager security = System.getSecurityManager();
+		if (security != null) {
+			security.checkWrite(systemTempDir);
+		}
 		File tempDir;
 		for (int i = 0; i<200; i++){
 			tempDir = new File(systemTempDir, prefix + rand.nextInt(999999));
@@ -49,7 +51,7 @@ public class TempFileUtils {
 				return tempDir;
 		}
 		throw new IOException("Could not create directory in " +
-							  systemTempDir.getPath());
+							  systemTempDir);
 	}
 
 
