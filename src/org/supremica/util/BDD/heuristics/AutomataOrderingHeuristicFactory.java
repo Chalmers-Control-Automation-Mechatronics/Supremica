@@ -1,6 +1,3 @@
-
-
-
 package org.supremica.util.BDD.heuristics;
 
 import org.supremica.util.BDD.*;
@@ -30,6 +27,8 @@ public class AutomataOrderingHeuristicFactory {
 			case Options.AO_HEURISTIC_TSP:
 			case Options.AO_HEURISTIC_DFS:
 			case Options.AO_HEURISTIC_STCT:
+			case Options.AO_HEURISTIC_TSP_STCT:
+			case Options.AO_HEURISTIC_TSP_SIFT:
 				aoh = new AOH_Solver();
 				break;
 		 	default:

@@ -363,7 +363,7 @@ public class Automaton
 
 	}
 
-	//  ---------[ these are here to be used in a eventfolw/workset supervisor some day :)  ]---
+	//  ---------[ these are here to be used in a eventflow/workset supervisor some day :)  ]---
 	/**
 	 * get event flow matrix.
 	 * m(s1,s2)  is the number of times s1 is followed by s1 in the automata

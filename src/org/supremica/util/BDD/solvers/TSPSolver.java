@@ -1,5 +1,4 @@
 
-
 package org.supremica.util.BDD.solvers;
 
 import org.supremica.util.BDD.*;
@@ -105,9 +104,3 @@ public class TSPSolver extends Solver {
 			return tour;
 	}
 }
-
-
-
-
-
-

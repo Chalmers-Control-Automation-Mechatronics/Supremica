@@ -1,5 +1,4 @@
 
-
 package org.supremica.util.BDD.solvers;
 
 import org.supremica.util.BDD.*;

@@ -34,6 +34,7 @@ public class OrderingSolver {
 		Node nod = new Node();
 		nod.org    = n;
 		nod.index  = index;
+		nod.index_local = index; // temporary
 		nod.weight = w;
 		nod.size   = n.getSize();
 		nodes[index] = nod;
@@ -112,6 +113,12 @@ public class OrderingSolver {
 				break;
 			case Options.AO_HEURISTIC_STCT:
 				sol = new STCTSolver(nods);
+				break;
+			case Options.AO_HEURISTIC_TSP_STCT:
+				sol = new BootstrapSTCTSolver(nods);
+				break;
+			case Options.AO_HEURISTIC_TSP_SIFT:
+				sol = new SiftTCPSolver(nods);
 				break;
 			default:
 				System.err.println("[INTERNAL] unknown ordering-solver!");

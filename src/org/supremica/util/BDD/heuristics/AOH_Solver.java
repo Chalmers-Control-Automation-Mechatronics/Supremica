@@ -1,5 +1,4 @@
 
-
 package org.supremica.util.BDD.heuristics;
 
 import org.supremica.util.BDD.*;
@@ -32,5 +31,3 @@ public class AOH_Solver extends AutomataOrderingHeuristic  {
 		order = os.getGoodOrder();
 	}
 }
-
-

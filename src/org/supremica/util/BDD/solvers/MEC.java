@@ -51,6 +51,18 @@ class MEC {
 	}
 
 
+
+	// -------------------------------------------------------------------------
+	/** update the Node.local_index member according to the current groups */
+	private void computeLocalIndex() {
+		for(int i = 0; i < localnodes.length; i++) {
+			Node [] g = localnodes[i];
+			for(int j = 0; j < g.length; j++) g[j].index_local = j;
+		}
+	}
+
+
+	/** sort the groups, the smallest firs... */
 	private void sortClasses() {
 		// we used to have insert-sort here since we belived that automata are normally
 		// not disjoint, but then we saw Sanchez benchmarks and changed this to quick sort
@@ -102,6 +114,7 @@ class MEC {
 		}
 
 		sortClasses(); // sort
+		computeLocalIndex();
 	}
 
 	private void copyToLocalWeights(Node [] group) {

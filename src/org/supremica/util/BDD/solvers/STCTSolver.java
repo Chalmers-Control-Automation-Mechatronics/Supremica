@@ -17,18 +17,22 @@ import java.util.*;
  *
  */
 
+// XXX: this code is slow as hell, must make it go faster!!!
+
 public class STCTSolver extends Solver {
 
-	public Node [] work;
+	protected Node [] work = null;
+	protected double  overallResult, oldResult;
+	public int improvments; /* for profiling only: howmany times did we improve our solution? */
 
 	public STCTSolver(Node [] org_ ) {	super(org_); }
 
 
 	public void solve() {
-		double overallResult = Double.POSITIVE_INFINITY;
-		double oldResult = Double.POSITIVE_INFINITY;
-		work = new Node[size];
 
+		pre_solve(); // fix some initial things first...
+
+		improvments = 0;
 		double [] Force = new double[size];
 
 		for(int n = 0; n < 3 * size; n++) {
@@ -75,6 +79,7 @@ public class STCTSolver extends Solver {
 			if(oldResult < overallResult) {
 				for(int i = 0; i < size; i++) solved[i] = work[i];
 				overallResult = oldResult;
+				improvments++;
 			}
 		}
 
@@ -83,6 +88,29 @@ public class STCTSolver extends Solver {
 		if(overallResult == Double.POSITIVE_INFINITY) {
 			for(int i = 0; i < size; i++) solved[i] = org[i];
 		}
+
+		if(Options.profile_on) {
+			Options.out.println("STCT:SA algorithm " +
+				(improvments  > 0 ?
+					(" imporved automata ordering " + improvments + " times.") :
+					(" could not improve the automata ordering.")
+				)
+			);
+		}
+
+	}
+
+
+
+	/**
+	 * This is called before the simulated annealing process.
+	 * The first (initial) solution [if any] can be decided here
+	 */
+
+	protected void pre_solve() {
+		overallResult = Double.POSITIVE_INFINITY;
+		oldResult = Double.POSITIVE_INFINITY;
+		if(work == null) work = new Node[size];
 	}
 
 
@@ -92,7 +120,7 @@ public class STCTSolver extends Solver {
 		double best = Double.NEGATIVE_INFINITY;
 
 		for(int i = 0; i < size; i++) {
-			if(vector[i] < best) {
+			if(vector[i] > best) {
 				best = vector[i];
 				best_index = i;
 			}
@@ -108,9 +136,8 @@ public class STCTSolver extends Solver {
 	private int force(int k) {
 		int sum = 0;
 
-		int me = work[k].extra1;
 		for(int i = 0; i < size; i++) {
-			int curr = work[i].extra1;
+			int curr = work[i].index_local;
 			if(i != k && work[k].wlocal[curr] > 0) sum += ( i - k);
 		}
 		return sum;
@@ -121,7 +148,7 @@ public class STCTSolver extends Solver {
 		double sum = 0;
 		for(int j = 0; j < i; j++)
 			for(int k = i+1; k < size; k++)	{
-			sum += work[k].wlocal[ work[j].extra1];
+			sum += work[k].wlocal[ work[j].index_local];
 		}
 		return sum;
 	}
@@ -130,7 +157,7 @@ public class STCTSolver extends Solver {
 	 * The overall crossing, the measure of the optimality of the given ordering.
 	 * Accroding to Zhang, the number "4" is only here to make the sum grow faster for large crosse(i)'es
 	 */
-	private double eval() {
+	protected double eval() {
 		double sum = 0;
 		for(int i = 0; i < size; i++)
 			sum += Math.pow(4, cross(i) );
@@ -140,10 +167,7 @@ public class STCTSolver extends Solver {
 	/** just create some random order to begin with */
 	private void initialize_random_order() {
 
-		for(int i = 0; i < size; i++) {
-			work[i] = org[i];
-			work[i].extra1 = i; // good to have an index
-		}
+		for(int i = 0; i < size; i++) work[i] = org[i];
 
 		for(int i = 0; i < size; i++) {
 			int j = (int)(Math.random() * size);
