@@ -49,25 +49,44 @@
  */
 package org.supremica.automata.execution;
 
+import java.util.*;
+
 public class Action
 {
 	private String label = null;
-	private String command = null;
+	private List commands = null;
+
+	public Action(String label)
+	{
+		this.label = label;
+		commands = new LinkedList();
+	}
 
 	public Action(String label, String command)
 	{
-		this.label = label;
-		this.command = command;
+		this(label);
+		addCommand(command);
 	}
+
 
 	public String getLabel()
 	{
 		return label;
 	}
 
-	public String getCommand()
+	public void addCommand(String command)
 	{
-		return command;
+		commands.add(command);
+	}
+
+	public void removeCommand(String command)
+	{
+		commands.remove(command);;
+	}
+
+	public Iterator commandIterator()
+	{
+		return commands.iterator();
 	}
 
 	public boolean equals(Object other)
@@ -79,11 +98,11 @@ public class Action
 
 		Action otherAction = (Action) other;
 
-		return label.equals(otherAction.label) && command.equals(otherAction.command);
+		return label.equals(otherAction.label) && commands.equals(otherAction.commands);
 	}
 
 	public int hashCode()
 	{
-		return label.hashCode() + command.hashCode();
+		return label.hashCode() + commands.hashCode();
 	}
 }

@@ -47,37 +47,40 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.project.algorithms;
+package org.supremica.automata.algorithms;
 
 import java.io.*;
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.project.Arc;
-import org.supremica.project.Project;
-import org.supremica.project.Automaton;
-import org.supremica.project.State;
-import org.supremica.project.LabeledEvent;
+import org.supremica.automata.*;
+import org.supremica.automata.execution.*;
 
-public class ProjectToXml
-	implements ProjectSerializer
+public class ProjectToSP
+	implements AutomataSerializer
 {
 	private Project project;
 	private boolean canonical;
 	private boolean includeCost = false;
 	private boolean debugMode = false;
 	private boolean includeLayout = true;
+	private boolean includeExecution = true;
 	private final static int majorFileVersion = 0;
 	private final static int minorFileVersion = 9;
 
-	public ProjectToXml(Project project)
+	public ProjectToSP(Project project)
 	{
 		this.project = project;
 		canonical = false;
 	}
 
-	public boolean void setIncludeLayout(boolean includeLayout)
+	public void setIncludeLayout(boolean includeLayout)
 	{
 		this.includeLayout = includeLayout;
+	}
+
+	public void setIncludeExecution(boolean includeExecution)
+	{
+		this.includeExecution = includeExecution;
 	}
 
 	public void serialize(PrintWriter pw)
@@ -101,7 +104,7 @@ public class ProjectToXml
 
 		pw.println(">");
 
-		for (projectIt = project.iterator(); projectIt.hasNext();)
+		for (Iterator projectIt = project.iterator(); projectIt.hasNext();)
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
@@ -110,7 +113,7 @@ public class ProjectToXml
 			// Print all events
 			pw.println("\t<Events>");
 
-			while (	Iterator eventIt = aut.eventIterator(); eventIt.hasNext(); )
+			for (	Iterator eventIt = aut.eventIterator(); eventIt.hasNext(); )
 			{
 				LabeledEvent event = (LabeledEvent) eventIt.next();
 
@@ -193,7 +196,7 @@ public class ProjectToXml
 			// Print all transitions
 			pw.println("\t<Transitions>");
 
-			for (stateIt = aut.stateIterator(); stateIt.hasNext(); )
+			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 			{
 				State sourceState = (State) stateIt.next();
 
@@ -214,14 +217,15 @@ public class ProjectToXml
 
 			if (includeLayout)
 			{
+				pw.println("\t<Layout>");
 				// Print State Layout
-				pw.println("\t<StatesLayout>");
+				pw.println("\t\t<StatesLayout>");
 
 				for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 				{
 					State state = (State) stateIt.next();
 
-					pw.print("\t\t<StateLayout id=\"" + normalize(state.getId()) + "\"");
+					pw.print("\t\t\t<StateLayout id=\"" + normalize(state.getId()) + "\"");
 
 					pw.print(" x=\"" + state.getX() + "\"");
 					pw.print(" y=\"" + state.getY() + "\"");
@@ -229,94 +233,86 @@ public class ProjectToXml
 					pw.println("/>");
 				}
 
-				pw.println("\t</StatesLayout>");
+				pw.println("\t\t</StatesLayout>");
 
 				// Print Transition Layout
+				pw.println("\t\t<TransitionsLayout>");
+				for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+				{
+					State sourceState = (State) stateIt.next();
+/*
+					for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
+					{
+						ArcSet currArcSet = (ArcSet) arcSets.next();
+						State fromState = currArcSet.getFromState();
+						State toState = currArcSet.getToState();
+						pw.println("\t\t\t<ArcSet from=\"" + fromState.getId() + "\" to=\"" + toState.getId() + "\">");
 
+						for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
+						{
+							Arc currArc = (Arc) arcIt.next();
+							LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
+
+							pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
+						}
+
+						pw.println("\t\t\t</ArcSet>");
+					}
+*/
+					pw.println("\t\t</TransitionsLayout>");
+				}
+
+				pw.println("\t</Layout>");
 			}
 			pw.println("</Automaton>");
 		}
 
-		for (projectIt = project.iterator(); projectIt.hasNext();)
+		if (includeExecution)
 		{
-			Automaton aut = (Automaton) projectIt.next();
-
-			pw.println("<Layout>");
-
-			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+			for (Iterator projectIt = project.iterator(); projectIt.hasNext();)
 			{
-				State state = (State) stateIt.next();
+				Automaton aut = (Automaton) projectIt.next();
 
-				pw.print("\t\t<StateLayout id=\"" + normalize(state.getId()) + "\"");
+				pw.println("<Execution>");
+				pw.println("\t<Actions>");
 
-				if (!state.getId().equals(state.getName()))
+				Actions theActions = project.getActions();
+				if (theActions != null)
 				{
-					pw.print(" name=\"" + normalize(state.getName()) + "\"");
-				}
-
-				if (state.isInitial())
-				{
-					pw.print(" initial=\"true\"");
-				}
-
-				if (state.isAccepting())
-				{
-					pw.print(" accepting=\"true\"");
-				}
-
-				if (state.isForbidden())
-				{
-					pw.print(" forbidden=\"true\"");
-				}
-
-				if (includeCost)
-				{
-					int value = state.getCost();
-
-					if (value != State.UNDEF_COST)
+					for (Iterator actionIt = theActions.iterator(); actionIt.hasNext(); )
 					{
-						pw.print(" cost=\"" + value + "\"");
+						Action currAction = (Action)actionIt.next();
+						pw.println("\t\t<Action label=\"" + normalize(currAction.getLabel()) + "\">");
+						for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
+						{
+							String currCommand = (String)cmdIt.next();
+							pw.println("\t\t\t<Command>" + normalize(currCommand) + "</Command>");
+						}
+
+						pw.println("\t\t</Action>");
 					}
 				}
+				pw.println("\t</Actions>");
+				pw.println("\t<Controls>");
 
-				if (debugMode)
+				Controls theControls = project.getControls();
+				if (theControls != null)
 				{
-					pw.print(" synchIndex=" + state.getIndex());
+					for (Iterator controlIt = theControls.iterator(); controlIt.hasNext(); )
+					{
+						Control currControl = (Control)controlIt.next();
+						pw.println("\t\t<Control label=\"" + normalize(currControl.getLabel()) + "\">");
+						pw.println("\t\t\t<Condition>" + normalize(currControl.getCondition()) + "</Condition>");
+						pw.println("\t\t</Action>");
+					}
 				}
-
-				pw.println("/>");
+				pw.println("\t</Controls>");
+				pw.println("</Execution>");
 			}
-
-			pw.println("\t</States>");
-
-			// Print all transitions
-			pw.println("\t<Transitions>");
-
-			stateIt = aut.stateIterator();
-
-			while (stateIt.hasNext())
-			{
-				State sourceState = (State) stateIt.next();
-				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
-
-				while (outgoingArcsIt.hasNext())
-				{
-					Arc arc = (Arc) outgoingArcsIt.next();
-					State destState = arc.getToState();
-
-					pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-					pw.print("\" dest=\"" + normalize(destState.getId()));
-					pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
-				}
-			}
-
-			pw.println("\t</Transitions>");
-			pw.println("</Layout>");
 		}
 
 		pw.println("</SupremicaProject>");
 		pw.flush();
-		pw.close();
 	}
 
 	public void serialize(String fileName)
