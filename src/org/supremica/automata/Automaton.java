@@ -264,18 +264,16 @@ public class Automaton
 		StringBuffer name = null;
 		if(prefix == null || prefix.equals(""))
 		{
-			name = new StringBuffer("q");
+			name = new StringBuffer("q" + uniqueStateIndex++);
 		}
 		else
 		{
 			name = new StringBuffer(prefix);
 		}
 
-		Random rand = new Random();
-
 		while(containsStateWithId(name.toString()))
 		{
-			name.append(rand.nextInt(10));
+			name.append(uniqueStateIndex++);
 		}
 		State newState = new State(name.toString());
 		addState(newState);
