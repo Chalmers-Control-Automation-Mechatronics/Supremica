@@ -1,26 +1,135 @@
 \chapter{Automation Objects}
 \label{automationobjects}
 
-%Introduce Automation Objects
+%% Background
+With function blocks the main technological problem of
+distributed automation has been solved. A general framework
+for development and deployment of distributed automation
+system has been developed and established. What is still
+needed is a way of encapsulating function blocks together
+with the data about their properties and, more importantly,
+their functionality in a way that will enable diminishing of
+the time to market and facilitate effective rapid object
+oriented development of automation systems.
+%% Why automation objects? What do we want to do?
+After considering the following arguments it will become
+clear why such encapsulation is needed and how it can help
+in achieving the afore mentioned goal.
 
-%% Why automation objects? Background.
-Using only function blocks efficient hierarchical control
-system design is very time consumig. To facilitate easier
-and more rapid design process a new kind of design object
-needs to be introduced. Before that the purpose of that kind
-of object has to be defined.
+%%     effective reuse of software
+Object oriented system development as presented in
+\cite{iec:614991:2000} is not enough for achieving
+\textit{effective reuse of software} in automation systems
+development. This is the case because effective software
+reuse demands efficient exchange of information about how
+the software that is supposed to be reused is used and what
+it does. In other words, interfaces of the software objects
+have to be well specified and well documented. The
+\cite{iec:614991:2000} makes sure that the interfaces are
+well specified but it does not provide anything that will
+assure that they are well documented.
 
-%% Definition. Multi view objects where the view is the
-%% interface exposed for different purposes.
+%%     effective decentralization of software development
+Effective software reuse facilitates \textit{effective
+  decentralization of software development}. If anyone could
+use the software that somebody else developed without
+wasting time on resolving the difficulties that arise from
+poorly documented interfaces, or resorting to
+reimplementation because of the same problem, than everyone
+could concentrate on providing the best implementation for
+their part of the automation system software.
+
+%%     easier integration and deployment of software
+Leveraging effective software reuse and decentralized
+software development \textit{makes integration and
+  deployment much easier}. System integrator's task is
+hereby reduced to picking the right software objects from
+the library and connecting them in correct patterns for the
+specific application.
+
+%%     development of libraries
+Using the encapsulation of software objects with well
+specified information about their usage makes it possible to
+\textit{build libraries} of elements that can easily be
+shared over the Internet since everything that is needed for
+the usage of the elements comes with the elements
+themselves. This is unlike the Java system where the objects
+are distributed in binary only format and the interface
+documentation has to be downloaded or reviewed on-line prior
+to usage.
+
+%%     all of these result in rapid development of automation systems
+The arguments presented are enough to support the idea that
+the software objects encapsulated with the information about
+their usage will increase the speed of the development of
+the automation systems. 
+
+After a formal definition of the encapsulation the benefits
+beyond the ones discussed above will be presented followed
+by the presentation about the implementation issues and the
+support in Supremica that is planned for such data objects.
 
 
 
-% Define the different views (Model-View-Controller) if relevant.
-%% Configuration
-%% Human-Machine Interface
-%% Control
-%% Simulation
 
 
 
-% Introduce the example
+%% Definition. 
+%%     multi view objects
+%%     view is the interface exposed for different purposes.
+An \textbf{automation object} is defined as a set of
+applications, subapplications and function blocks (as
+defined in \cite{iec:614991:2000}) encapsulated with a
+declaration of \textit{attributes} and \textit{views} of
+these.
+
+An \textbf{attribute} is user defined and specified data that
+describes some significant property of the automation
+object. 
+
+A \textbf{view} is a description of a certain aspect of the
+automation object and information about how that aspect is
+used in the automation system.
+% view is functional description and its name should only
+% contain what is needed to understand its function
+% eg elevator, pump, oven, sensor
+% all the information about what hardware this automation
+% block is for should be in the attributes
+% eg attribute hardware='abb robot N25'
+
+%% How this definition supports the arguments above
+
+%% Further benefits of the the automation objects that could
+%% not be described prior to definition
+%%     views facilitate several different implementations of
+%%     the same functionality for different hardware and it
+%%     is the hardware vendors that should supply these
+
+
+
+
+
+% Support in Supremica
+
+%% implementation of automation objects
+%%     archive of XML files
+%%     attribute and view declarations in MetaInformation.xml 
+
+%% libraries 
+%%     non-hierarchical pool of automation objects
+%%     libraries  may be Internet repositories
+%%     searching and sorting by multiple attributes
+%%     searching and sorting by multiple views
+
+
+
+
+% Example of usage in Supremica. Three scenarios with the
+% lab equipment (kulbanan).
+% 1. Student does everything.
+% 2. Library is provided and the logic is done by the student.
+% 3. Library is proviede and the logic is synthesised by the
+%    Supremica.
+
+
+

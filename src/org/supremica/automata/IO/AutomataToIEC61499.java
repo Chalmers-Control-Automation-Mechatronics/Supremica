@@ -69,6 +69,7 @@ import org.supremica.automata.algorithms.SynchronizationType;
  * is only the first one.
  * 
  * @author Goran Cengic
+ * @author cengic@s2.chalmers.se
  */ 
 public class AutomataToIEC61499
 
