@@ -33,12 +33,26 @@
 *	has been updated.
 -->
 <target name="initialize" depends="clean">
+ 	<mkdir dir="${build}"/>
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${build}" />
+	</delete>
 
+ 	<mkdir dir="${dist}"/>
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${dist}" />
+	</delete>
+	
+ 	<mkdir dir="${doc}"/>
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${doc}" />
+	</delete>
+		 
 	<mkdir dir="${lib}/${unjared}"/>
 	<delete includeEmptyDirs="true" >
 		<fileset dir="${lib}/${unjared}" />
 	</delete>
-  
+			 
 	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
