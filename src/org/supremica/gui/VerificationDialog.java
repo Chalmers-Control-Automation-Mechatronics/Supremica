@@ -49,7 +49,7 @@
 
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.automata.algorithms.VerificationOptions;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -57,26 +57,26 @@ import javax.swing.*;
 // import javax.swing.event.*;
 // import javax.swing.table.*;
 
-public class SynthesizerDialog 
+public class VerificationDialog 
 	implements ActionListener
 {
 	private JButton okButton;
 	private JButton cancelButton;
-	private SynthesizerOptions synthesizerOptions;
-	private JComboBox synthesisTypeBox;
+	private VerificationOptions verificationOptions;
+	private JComboBox verificationTypeBox;
 	private JComboBox algorithmTypeBox;
-	private JCheckBox purgeBox;
-	private JCheckBox optimizeBox;
+	// private JCheckBox purgeBox;
+	// private JCheckBox optimizeBox;
 	private JDialog dialog;
 
 	/**
 	 * Creates modal dialog box for input of synthesizer options.
 	 */
-	public SynthesizerDialog(JFrame parentFrame, SynthesizerOptions synthesizerOptions)
+	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions)
 	{
 		dialog = new JDialog(parentFrame, true); //modal		
-		this.synthesizerOptions = synthesizerOptions;
-		dialog.setTitle("Synthesizer options");
+		this.verificationOptions = verificationOptions;
+		dialog.setTitle("Verification options");
 		dialog.setSize(new Dimension(500, 400));
 		dialog.setResizable(false);
 		Container contentPane = dialog.getContentPane();
@@ -95,20 +95,20 @@ public class SynthesizerDialog
 		// standardPanel
 		JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		String[] synthesisData = {"controllable", "non-blocking", "both"};
-		synthesisTypeBox = new JComboBox(synthesisData);
+		String[] verificationData = {"controllability", "non-blocking", "language inclusion"};
+		verificationTypeBox = new JComboBox(verificationData);
 		String[] algorithmData = {"modular", "monolithic", "IDD"};
 		algorithmTypeBox = new JComboBox(algorithmData);
-		purgeBox = new JCheckBox("Purge result", true);
-		optimizeBox = new JCheckBox("Optimize result", true);
-		leftPanel.add(synthesisTypeBox);
+		// purgeBox = new JCheckBox("Purge result", true);
+		// optimizeBox = new JCheckBox("Optimize result", true);
+		leftPanel.add(verificationTypeBox);
 		leftPanel.add(algorithmTypeBox);
-		rightPanel.add(purgeBox);
-		rightPanel.add(optimizeBox);
+		// rightPanel.add(purgeBox);
+		// rightPanel.add(optimizeBox);
 
 		standardPanel.setLayout(new GridLayout(1,2));
-		standardPanel.add("Center", leftPanel);
-		standardPanel.add("Center", rightPanel);
+		standardPanel.add(leftPanel);
+		standardPanel.add(rightPanel);
 		
 		// advancedPanel
 		// null...
@@ -140,16 +140,16 @@ public class SynthesizerDialog
 		Object source = event.getSource();
 		if (source == okButton)
 		{
-			synthesizerOptions.setDialogOK(true);
-			synthesizerOptions.setPurge(purgeBox.isSelected());
-			synthesizerOptions.setOptimize(optimizeBox.isSelected());
-			synthesizerOptions.setSynthesisType(synthesisTypeBox.getSelectedIndex());
-			synthesizerOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
+			verificationOptions.setDialogOK(true);
+			// verificationOptions.setPurge(purgeBox.isSelected());
+			// verificationOptions.setOptimize(optimizeBox.isSelected());
+			verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
+			verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
 			dialog.setVisible(false);
 		}
 		else if (source == cancelButton)
 		{
-			synthesizerOptions.setDialogOK(false); // Already done...
+			verificationOptions.setDialogOK(false); // Already done...
 			dialog.setVisible(false);
 		}
 	}

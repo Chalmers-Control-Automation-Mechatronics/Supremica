@@ -131,7 +131,7 @@ public final class AutomataSynchronizerExecuter
     public AutomataSynchronizerExecuter(AutomataSynchronizerHelper synchronizerHelper)
     {
         helper = synchronizerHelper;
-        indexForm = helper.getAutomataIndexForm();
+		indexForm = helper.getAutomataIndexForm();
  		nbrOfAutomata = helper.getAutomata().size();
 		nbrOfEvents = helper.getAutomaton().getAlphabet().size();
   		nextStateTable = indexForm.getNextStateTable();
@@ -575,19 +575,23 @@ public final class AutomataSynchronizerExecuter
         int[][] currStateTable = helper.getStateTable();
 		int stateNumber = 0;
 
-		/*
+		// /*
 		CancelDialog cancelDialog = helper.getCancelDialog();
-		cancelDialog.updateHeader("Building states...");
-		cancelDialog.makeProgressBar(0, currStateTable.length);		
-		*/
+		if (cancelDialog != null)
+		{
+			cancelDialog.updateHeader("Building states...");
+			cancelDialog.makeProgressBar(0, currStateTable.length);		
+		}
+		// */
 
         // Create all states
 		for (int i = 0; i < currStateTable.length; i++)
   		{
-			/*
+			// /*
 			if (i % 100 == 0) 
-				cancelDialog.updateCounter(i);
-			*/
+				if (cancelDialog != null)
+					cancelDialog.updateCounter(i);
+			// */
 
 			if (stopRequested)
 			{
@@ -629,18 +633,23 @@ public final class AutomataSynchronizerExecuter
           		theAutomaton.addState(newState);
 			}
         }
-
-		/*
-		cancelDialog.updateHeader("Building transitions...");
-		*/
+		
+		// /*
+		if (cancelDialog != null)
+		{
+			cancelDialog.updateCounter(0);
+			cancelDialog.updateHeader("Building transitions...");
+		}
+		// */
 
         // Create all transitions
  		for (int k = 0; k < currStateTable.length; k++)
   		{
-			/*
+			// /*
 			if (k % 100 == 0) 
-				cancelDialog.updateCounter(k);
-			*/
+				if (cancelDialog != null)
+					cancelDialog.updateCounter(k);
+			// */
 
 			if (stopRequested)
 			{

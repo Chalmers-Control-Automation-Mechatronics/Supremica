@@ -122,7 +122,8 @@ public class CancelDialog
 		headerLabel = new JLabel();
 		// headerLabel.setVerticalAlignment(SwingConstants.BOTTOM);
 		// headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		counterLabel = new JLabel();
+		// counterLabel = new JLabel();
+		makeCounter();
 		// counterLabel.setVerticalAlignment(SwingConstants.TOP);
 		// counterLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		headerPanel.add(headerLabel, "South");
@@ -138,7 +139,9 @@ public class CancelDialog
 	{
 		progressBar = null;
 		counterLabel = new JLabel();
+		JLabel stateLabel = new JLabel("States examined:");
 		counterPanel.removeAll();
+		counterPanel.add(stateLabel);
 		counterPanel.add(counterLabel);
 	}
 
@@ -203,6 +206,8 @@ public class CancelDialog
 
 	public void destroy()
 	{
+		executers = null; // Helping the garbage collector...
+		// workbench = null; // Helping the garbage collector...
 		dialog.setVisible(false);
 	}
     
@@ -213,6 +218,8 @@ public class CancelDialog
 		{
 			for (int i = 0; i < executers.size(); i++)
 			    ((Stoppable) executers.get(i)).requestStop();
+			executers = null; // Helping the garbage collector...
+			// workbench = null; // Helping the garbage collector...
 			dialog.setVisible(false);
 		}
 		else

@@ -59,14 +59,13 @@ import org.supremica.gui.*;
 import org.apache.log4j.*;
 
 /**
- * For performing controllability verification. Uses AutomataSynchronizerExecuter for the actual verification work.
- * @deprecated use AutomataVerifier instead.
- * @see AutomataVerifier
+ * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
  * @see AutomataSynchronizerExecuter
  */
-public class AutomataFastControllabilityCheck
+public class AutomataVerifier
+	implements Stoppable
 {
-	private static Category thisCategory = LogDisplay.createCategory(AutomataFastControllabilityCheck.class.getName());
+	private static Category thisCategory = LogDisplay.createCategory(AutomataVerifier.class.getName());
 
     private Automata theAutomata;
 	private int nbrOfExecuters;
@@ -91,19 +90,26 @@ public class AutomataFastControllabilityCheck
 	 * @see SynchronizationOptions */
 	private boolean verboseMode;
 
-    public AutomataFastControllabilityCheck(Automata theAutomata, SynchronizationOptions syncOptions)
+	private VerificationOptions verificationOptions;
+	private SynchronizationOptions synchronizationOptions;
+
+	private boolean stopRequested = false;
+
+    public AutomataVerifier(Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 		throws IllegalArgumentException
     {
 		Automaton currAutomaton;
 		State currInitialState;
 
 		this.theAutomata = theAutomata;
-		nbrOfExecuters = syncOptions.getNbrOfExecuters();
-		verboseMode = syncOptions.verboseMode();
+		this.verificationOptions = verificationOptions;
+		this.synchronizationOptions = synchronizationOptions;
+		nbrOfExecuters = synchronizationOptions.getNbrOfExecuters();
+		verboseMode = synchronizationOptions.verboseMode();
 
 		try
 		{
-			synchHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+			synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 		}
 		catch (Exception e)
 		{
@@ -112,11 +118,9 @@ public class AutomataFastControllabilityCheck
           	System.exit(0);
 	    }
 		
-		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
-		
-		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
-		
+		// Allocate the synchronizationExecuters
+		synchronizationExecuters = new ArrayList(nbrOfExecuters);
+
 		// Build the initial state
 	    initialState = new int[theAutomata.size() + 1]; // + 1 status field
 		Iterator autIt = theAutomata.iterator();
@@ -126,7 +130,7 @@ public class AutomataFastControllabilityCheck
 			currInitialState = currAutomaton.getInitialState();
 			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
 		}
-    }
+	}
 	
 	/**
 	 * Performs verification using the AutomataSynchronizerExecuter.
@@ -136,6 +140,40 @@ public class AutomataFastControllabilityCheck
     public boolean execute()
 		throws Exception
 	{
+		if (verificationOptions.getAlgorithmType() == 0)				
+		{   // Modular...
+			return modularControllabilityVerification();
+		}
+		else if (verificationOptions.getAlgorithmType() == 1)				
+		{	// Monolithic...
+			return monolithicControllabilityVerification();
+		}
+		else if (verificationOptions.getAlgorithmType() == 2)
+		{   // IDD...
+			thisCategory.error("Option not implemented...");
+			return false;
+		}				
+		{   // Error...
+			thisCategory.error("Unavailable option chosen.");
+			return false;
+		}
+	}		
+
+	public void requestStop()
+	{
+		stopRequested = true;		
+		for (int i = 0; i < synchronizationExecuters.size(); i++)
+			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
+	}
+
+	private boolean modularControllabilityVerification()
+		throws Exception
+	{
+		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
+		
+		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
+		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
+		
 		Event currEvent;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
@@ -176,15 +214,15 @@ public class AutomataFastControllabilityCheck
 					synchHelper.setRememberUncontrollable(true);
 					synchHelper.addState(initialState);
 					
-					// Allocate and initialize the synchronizationExecuters
-					ArrayList synchronizationExecuters = new ArrayList(nbrOfExecuters);
+					// Initialize the synchronizationExecuters
+					synchronizationExecuters.clear();
 					for (int i = 0; i < nbrOfExecuters; i++)
 					{
 						AutomataSynchronizerExecuter currSynchronizationExecuter =
-						   	new AutomataSynchronizerExecuter(synchHelper);
+							new AutomataSynchronizerExecuter(synchHelper);
 						synchronizationExecuters.add(currSynchronizationExecuter);
 					}
-
+					
 					// Start all the synchronization executers and wait for completion
 					// For the moment we assume that we only have one thread
 					for (int i = 0; i < synchronizationExecuters.size(); i++)
@@ -195,7 +233,7 @@ public class AutomataFastControllabilityCheck
 						currExec.start();
 					}
 					((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
-
+					
 					String automataNames = "";
 					if (verboseMode)
 					{	// For printing the names of the automata in selectedAutomata
@@ -207,7 +245,7 @@ public class AutomataFastControllabilityCheck
 						while (autIt.hasNext())
 							automataNames = automataNames + ((Automaton) autIt.next()).getName() + " ";
 					}
-
+					
 					if (synchHelper.getAutomataIsControllable())
 					{	// Very nice
 						if (verboseMode)
@@ -215,7 +253,7 @@ public class AutomataFastControllabilityCheck
 					}
 					else
 					{   // Try to add some more automata
-
+						
 						// Make array with indices of selected automata to remember which were originally selected
 						int[] automataIndices = new int[selectedAutomata.size()];
 						for (int i = 0; i < selectedAutomata.size(); i++)
@@ -224,13 +262,13 @@ public class AutomataFastControllabilityCheck
 						}
 						if (verboseMode)
 							thisCategory.error(automataNames + "has " + potentiallyUncontrollableStates.size(automataIndices) + " states that might be uncontrollable...");
-
+						
 						// Sort automata in order of similar alphabets
 						int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 						if (similarAutomata != null)
 							if (verboseMode)
 								thisCategory.info("There are " + similarAutomata.length + " automata with similar alphabets...");
-
+						
 						for (int attempt = 1; attempt <= 5; attempt++)
 						{
 							if (verboseMode)
@@ -267,10 +305,11 @@ public class AutomataFastControllabilityCheck
 								break;
 							}
 						}
-							
+						
 						if (potentiallyUncontrollableStates.size(automataIndices) > 0)
-						{
-							// We now have no idea what so ever on the controllability... we choose to give up.
+						{	// There are still some uncontrollable states that we're not sure as of being either 
+							// controllable or uncontrollable. We now have no idea what so ever on the 
+							// controllability... we chicken out and give up.
 							// Print remaining suspected uncontrollable state(s)
 							if (verboseMode)
 							{
@@ -280,7 +319,7 @@ public class AutomataFastControllabilityCheck
 							allSupervisorsControllable = false;
 						}
 					}
- 				}
+				}
 				selectedAutomata.clear();
 			}
 		}
@@ -596,5 +635,36 @@ public class AutomataFastControllabilityCheck
 		executer.join();
 
 		return !synchHelper.getAutomataIsControllable();
+	}
+
+	private boolean monolithicControllabilityVerification()
+		throws Exception
+	{
+		synchHelper.addState(initialState);
+		synchHelper.setExhaustiveSearch(true);
+		
+		// Initialize the synchronizationExecuters
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currSynchronizationExecuter =
+				new AutomataSynchronizerExecuter(synchHelper);
+			synchronizationExecuters.add(currSynchronizationExecuter);
+		}
+		
+		// Start all the synchronization executers and wait for completion
+		for (int i = 0; i < nbrOfExecuters; i++)
+		{
+			AutomataSynchronizerExecuter currExec =
+				(AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
+			currExec.selectAllAutomata();
+			currExec.start();
+		}
+		((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+		return synchHelper.getAutomataIsControllable();
+	}
+
+	public AutomataSynchronizerHelper getHelper()
+	{
+		return synchHelper;
 	}
 }

@@ -643,6 +643,9 @@ public class Supremica
 		JMenuItem synchronizeItem = new JMenuItem("Synchronize");
 		menuHandler.add(synchronizeItem, 2);
 
+		JMenuItem verifyItem = new JMenuItem("Verify");
+		menuHandler.add(verifyItem, 1);
+
 		JMenuItem controllabilityCheckItem = new JMenuItem("Controllability check");
 		menuHandler.add(controllabilityCheckItem, 2);
 
@@ -817,6 +820,15 @@ public class Supremica
 				public void actionPerformed(ActionEvent e)
 				{
 					automataSynchronize_actionPerformed(e);
+					repaint();
+				}
+			});
+
+		verifyItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					automataVerify_actionPerformed(e);
 					repaint();
 				}
 			});
@@ -1365,6 +1377,71 @@ public class Supremica
 		}
 
 		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(this, currAutomata, newAutomatonName, syncOptions);
+	}
+
+	// Automaton.Verify action performed
+	// Threaded version
+	public void automataVerify_actionPerformed(ActionEvent e)
+	{
+		VerificationOptions verificationOptions = new VerificationOptions();
+		VerificationDialog verificationDialog = new VerificationDialog(this, verificationOptions);
+		verificationDialog.show();
+
+		if (!verificationOptions.getDialogOK())
+			return;
+
+		Collection selectedAutomata = getSelectedAutomata();
+
+ 		if (selectedAutomata.size() < 1)
+ 		{
+			JOptionPane.showMessageDialog(this, "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		Automata currAutomata = new Automata();
+
+		Iterator autIt = selectedAutomata.iterator();
+		while (autIt.hasNext())
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			String currAutomatonName = currAutomaton.getName();
+			if (currAutomaton.getInitialState() == null)
+			{
+				JOptionPane.showMessageDialog(this,
+					"The automaton " + currAutomatonName + " does not have an initial state!",
+					"Alert",
+					JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			currAutomata.addAutomaton(currAutomaton);
+		}
+
+		SynchronizationOptions syncOptions;
+		try
+		{
+			syncOptions = new SynchronizationOptions(
+				WorkbenchProperties.syncNbrOfExecuters(),
+				SynchronizationType.Prioritized,
+				WorkbenchProperties.syncInitialHashtableSize(),
+				WorkbenchProperties.syncExpandHashtable(),
+				WorkbenchProperties.syncForbidUncontrollableStates(),
+				WorkbenchProperties.syncExpandForbiddenStates(),
+				false,
+				false,
+				true,
+				WorkbenchProperties.verboseMode()
+			);
+		}
+		catch (Exception ex)
+		{
+				JOptionPane.showMessageDialog(this,
+					"Invalid synchronizationOptions",
+					"Alert",
+					JOptionPane.ERROR_MESSAGE);
+				return;
+		}
+
+		AutomataVerificationWorker worker = new AutomataVerificationWorker(this, currAutomata, syncOptions, verificationOptions);
 	}
 
 /*

@@ -54,6 +54,10 @@ import org.supremica.automata.*;
 import java.util.*;
 import java.io.PrintWriter;
 
+/**
+ * @deprecated use AutomataVerifier instead.
+ * @see AutomataVerifier
+ */
 public class AutomataControllabilityCheck
 {
     private Automata theAutomata;

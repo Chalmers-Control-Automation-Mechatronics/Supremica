@@ -62,6 +62,7 @@ import java.util.*;
 
 public class AutomataSynchronizerWorker
 	extends Thread
+	implements Stoppable
 {
 	private static Category thisCategory = LogDisplay.createCategory(AutomataSynchronizerWorker.class.getName());
 
@@ -74,6 +75,8 @@ public class AutomataSynchronizerWorker
 	private int mode = MODE_SYNC;
 	private Automaton theAutomaton = null;
 	private SynchronizationOptions syncOptions;
+
+	private boolean stopRequested = false;
 
 	public AutomataSynchronizerWorker(Supremica workbench,
 		Automata theAutomata,
@@ -112,6 +115,7 @@ public class AutomataSynchronizerWorker
 			theSynchronizer.getHelper().setCancelDialog(cancelDialog);
 			cancelDialog.updateHeader("Synchronizing...");
 
+			// Synchronize automaton
 			try
 			{
 				theSynchronizer.execute();
@@ -121,22 +125,30 @@ public class AutomataSynchronizerWorker
 				thisCategory.error("Exception while executing AutomataSynchronizer");
 				return;
 			}
-			try
+			
+			// Build automaton
+			if (!stopRequested)
 			{
-				theAutomaton = theSynchronizer.getAutomaton();
-			}
-			catch (Exception ex)
-			{
-				thisCategory.error("Exception in AutomatonSynchronizer while getting the automaton");
-				return;
+				try
+				{
+					theAutomaton = theSynchronizer.getAutomaton();
+				}
+				catch (Exception ex)
+				{
+					thisCategory.error("Exception in AutomatonSynchronizer while getting the automaton");
+					return;
+				}
 			}
 
-			if (theAutomaton != null)
+			// Present result
+			if (!stopRequested)
 			{
 				theAutomaton.setName(newAutomatonName);
 				mode = MODE_UPDATE;
 				java.awt.EventQueue.invokeLater(this);
+				
 				cancelDialog.destroy();
+				
 				Date endDate = new Date();
 				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");	
 			}
@@ -149,6 +161,7 @@ public class AutomataSynchronizerWorker
 		}
 		else if (mode == MODE_UPDATE)
 		{
+			// Display automaton
 			try
 			{
 				if (theAutomaton != null)
@@ -162,5 +175,10 @@ public class AutomataSynchronizerWorker
 				return;
 			}
 		}
+	}
+
+	public void requestStop()
+	{
+		stopRequested = true;		
 	}
 }

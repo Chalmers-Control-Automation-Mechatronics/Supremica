@@ -63,7 +63,6 @@ public class AutomataSynthesizer
 	private static Category thisCategory = LogDisplay.createCategory(AutomataSynthesizer.class.getName());
 
     private Automata theAutomata;
-    private Automaton theAutomaton;
 	private int nbrOfExecuters;
 	private HashMap eventToAutomataMap = new HashMap();
 
@@ -121,6 +120,7 @@ public class AutomataSynthesizer
 		throws Exception
 	{
 		Event currEvent;
+		Automaton theAutomaton;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;
 		ArrayList selectedAutomata = new ArrayList();
@@ -285,8 +285,11 @@ public class AutomataSynthesizer
 		return theAlphabet;
 	}
 
-	// Remove unnecessary automata...
-	private void optimize(Automata theAutomata, Automata newAutomata)
+	/** 
+	 * Removes unnecessary automata, i.e. synthesized supervisors that don't affect the controllability.
+	 * @param newAutomata the Automata-object containing the new supervisors. 
+	 */
+ 	private void optimize(Automata theAutomata, Automata newAutomata)
 	{
 		Automata currAutomata = new Automata();
 		AutomataFastControllabilityCheck theFastControllabilityCheck;
@@ -328,7 +331,7 @@ public class AutomataSynthesizer
 			}
 			catch (Exception ex)
 			{
-				thisCategory.error("Exception in AutomataSynthesizer.optimize." + ex);
+				thisCategory.error("Exception in AutomataSynthesizer.optimize. " + ex);
 				return;
 			}
 		}
