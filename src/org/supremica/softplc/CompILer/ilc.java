@@ -45,10 +45,9 @@ public class ilc
 		//XXX new VaribleChecker(n,logger);
 		//System.out.println("VarChecker färdig");
 		// XXX
-		//n.dump("");
-
 		
 		if (v.check()) {
+		    //n.dump("");
 		    JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);
 		    File temp = jb.getTempFile();
 		} else {

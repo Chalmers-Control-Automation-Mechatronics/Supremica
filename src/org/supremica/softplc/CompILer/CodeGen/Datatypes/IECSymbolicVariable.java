@@ -15,6 +15,8 @@ public class IECSymbolicVariable
 	private String typeName;
 	private TypeConstant fieldType;
 	private String fieldSelector;
+	private String fieldSelectorTypeName;
+    
 
 	public IECSymbolicVariable(String s, TypeConstant t)
 	{
@@ -28,13 +30,15 @@ public class IECSymbolicVariable
 	 * @param fieldSelector the selector name (eg. B in LD A.B)
 	 * @param fieldType the selector type
 	 */
-	public IECSymbolicVariable(String name, TypeConstant varType, String typeName, String fieldSelector, TypeConstant fieldType)
+	public IECSymbolicVariable(String name, TypeConstant varType, String typeName, String fieldSelector, TypeConstant fieldType, 
+				   String fieldSelectorTypeName)
 	{
 		this.name = name;
 		this.type = varType;
 		this.typeName = typeName;
 		this.fieldType = fieldType;
 		this.fieldSelector = fieldSelector;
+		this.fieldSelectorTypeName = fieldSelectorTypeName;		
 	}
 
 	public TypeConstant getType()
@@ -60,5 +64,9 @@ public class IECSymbolicVariable
 	public String getFieldSelector()
 	{
 		return fieldSelector;
+	}
+	public String getFieldSelectorTypeName()
+	{
+		return fieldSelectorTypeName;
 	}
 }

@@ -284,6 +284,15 @@ public class JavaBytecodeGenerator
 	    }
 	else if (n.getType() == TypeConstant.T_DERIVED)
 	    {
+	        if (n.getFieldSelector() != null) {
+		    return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
+						   n.getFieldSelector(), n.getFieldSelectorType(), n.getFieldSelectorTypeName());
+		}
+		else {
+		    return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
+						   null, null, null);
+		}
+		/*
 		if (n.isFunctionBlock())
 		    {
 			return new IECSymbolicVariable(n.getName(), n.getType(), n.getTypeName(), 
@@ -294,6 +303,7 @@ public class JavaBytecodeGenerator
 			error("Function blocks are the only derived " + "datatypes allowed");
 			return null;
 		    }
+		*/
 	    }
 	else
 	    {

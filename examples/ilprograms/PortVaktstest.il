@@ -27,6 +27,7 @@ FUNCTION_BLOCK TON
         ST  tonQ
 END_FUNCTION_BLOCK
 
+
 PROGRAM PortVaktstest
 	VAR
 		(*Insignaler*)

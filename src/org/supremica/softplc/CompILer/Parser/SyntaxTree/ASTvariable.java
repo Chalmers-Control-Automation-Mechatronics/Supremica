@@ -40,13 +40,13 @@ public class ASTvariable
 
 	public TypeConstant getType()
 	{
-		if (isFunctionBlock)
+	    if (isFunctionBlock || HelpMethods.parseTypeConstants(typeName) == null)
 		{
-			return TypeConstant.T_DERIVED;
+		    return TypeConstant.T_DERIVED;
 		}
-		else
+	    else
 		{
-			return HelpMethods.parseTypeConstants(typeName);
+		    return HelpMethods.parseTypeConstants(typeName);
 		}
 	}
 
@@ -62,9 +62,14 @@ public class ASTvariable
 
 	public TypeConstant getFieldSelectorType()
 	{
-
-		// HelpMethods helper = new HelpMethods();
-		return HelpMethods.parseTypeConstants(fieldSelectorTypeName);
+	    if (HelpMethods.parseTypeConstants(fieldSelectorTypeName) == null)
+		{ /*the fieldselector itself is probably a functionblock/other derived variable*/
+		    return TypeConstant.T_DERIVED;
+		}
+	    else
+		{
+		    return HelpMethods.parseTypeConstants(fieldSelectorTypeName);
+		}
 	}
 
 	public boolean isDirectVariable()
@@ -135,7 +140,6 @@ public class ASTvariable
 		catch (Exception e)
 		{
 			System.err.println("Caught Exception: " + e.getMessage());
-
 			return null;
 		}
 	}

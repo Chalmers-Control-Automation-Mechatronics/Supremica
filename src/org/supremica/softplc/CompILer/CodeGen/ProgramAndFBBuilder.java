@@ -358,9 +358,9 @@ public abstract class ProgramAndFBBuilder
 			    { //XXX den här måste kontrolleras
 				il.append(fac.createFieldAccess
 					  (/*fb type name*/var.getTypeName(),
-					   var.getFieldSelector(), Type.OBJECT
+					   var.getFieldSelector(), new ObjectType(var.getFieldSelectorTypeName())
 					   , Constants.GETFIELD));
-				warn("Type not checked when loading derived data types"); //XXX stämmer det
+				warn("Not tested. loading derived types from derived types"); //XXX stämmer det
 			    }
 			else
 			    {
@@ -369,8 +369,13 @@ public abstract class ProgramAndFBBuilder
 		    }
 		else
 		    {    /* the derived variable itself should be loaded*/
+			il.append(InstructionConstants.THIS);
+			il.append(fac.createFieldAccess(className, varName,
+							new ObjectType(var.getTypeName()),
+							Constants.GETFIELD));
+
 			// XXX should implement this
-			error("Only loading of elements in " +
+			warn("Not tested properly sofar. Only loading of elements in " +
 			      "derived variables are implemented " +
 			      "so far. Not load of derived itself"); //XXX
 		    }
@@ -496,7 +501,7 @@ public abstract class ProgramAndFBBuilder
 				il.append(InstructionConstants.SWAP);
 				il.append(fac.createFieldAccess
 					  (/*fb type name*/var.getTypeName(),
-					   var.getFieldSelector(), Type.OBJECT,
+					   var.getFieldSelector(), new ObjectType(var.getFieldSelectorTypeName()),
 					   Constants.PUTFIELD));
 			    }
 			else
@@ -508,7 +513,12 @@ public abstract class ProgramAndFBBuilder
 		else
 		    {    /* the derived variable itself */
 			// XXX should implement this
-			error("Only storing of elements in " +
+			il.append(InstructionConstants.THIS);
+			il.append(InstructionConstants.SWAP);
+			il.append(fac.createFieldAccess(className, varName,
+							new ObjectType(var.getTypeName()),
+							Constants.PUTFIELD));
+			warn("Not properly tested. Only storing of elements in " +
 			      "derived variables are implemented " +
 			      "so far. Not store of derived itself."); //XXX
 		    }
