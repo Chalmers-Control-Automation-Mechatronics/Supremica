@@ -405,6 +405,19 @@ public class Supremica
 		theAutomatonTable.clearSelection();
 	}
 
+	/**
+	  Inverts the selection in theAutomatonTable.
+	 */
+	public void invertSelection()
+	{
+		// We must set the autoscrolls property false but keep it unchanged after the operation for safety
+		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
+		theAutomatonTable.setAutoscrolls(false);
+		for (int i=0; i<theAutomatonTable.getRowCount(); i++)
+			theAutomatonTable.changeSelection(i,1,true,false);
+		theAutomatonTable.setAutoscrolls(autoscrolls);
+	}
+	
 	public void selectAll()
 	{
 		theAutomatonTable.selectAll();

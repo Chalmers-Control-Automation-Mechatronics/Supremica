@@ -239,6 +239,7 @@ public class AutomataVerifier
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 					// This algorithm only verifies pairwise nonblocking!!!
+					// return modularNonBlockingVerification();
 					return pairwiseNonblockingVerification();
 				}
 				else
@@ -1156,6 +1157,16 @@ public class AutomataVerifier
 	}
 
 	/**
+	 * Examines non-blocking modularily by examining language 
+	 *  inclusion of all automata, respectively
+	 */
+	private boolean modularNonBlockingVerification()
+		throws Exception
+	{
+		return false;
+	}
+
+	/**
 	 * THIS DOES NOT WORK! IT'S JUST A TEST! Examines non-blocking modularily
 	 * by examining pairwise non-blocking between all automata.
 	 * THIS DOES NOT WORK! IT'S JUST  A  TEST!
@@ -1210,7 +1221,7 @@ public class AutomataVerifier
 	}
 	
 	/**
-	 * Examines non-blocking between pair of automata
+	 * Examines non-blocking between a pair of automata
 	 *
 	 * @param AutomatonA The first automata in the pair.
 	 * @param AutomatonB The second automata in the pair.
@@ -1244,7 +1255,7 @@ public class AutomataVerifier
 	/**
 	 * Performs synchronous composition on the automata represented by selectedAutomata
 	 *
-	 * @param selectedAutomata The Automata to be synchronized
+	 * @param selectedAutomata The Automata to be synchronized, ArrayList of Automaton objects
 	 * @return The automaton that constitutes the synchronization of the automata 
 	 * represented by selectedAutomata.
 	 */

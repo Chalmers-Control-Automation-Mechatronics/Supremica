@@ -38,6 +38,8 @@ public interface Gui
 	// ActionMan does!!
 	void clearSelection();
 
+	void invertSelection();
+
 	void selectAll();
 
 	void close();

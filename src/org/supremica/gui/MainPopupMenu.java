@@ -228,6 +228,10 @@ class MainPopupMenu
 
 		menuHandler.add(cropItem, 0);
 
+		JMenuItem invertItem = new JMenuItem("Invert selection");
+
+		menuHandler.add(invertItem, 0);
+
 		JMenuItem renameItem = new JMenuItem("Rename");
 
 		menuHandler.add(renameItem, 1);
@@ -379,6 +383,14 @@ class MainPopupMenu
 			{
 				ActionMan.automataCrop_actionPerformed(getGui());
 				ActionMan.selectAll_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
+		invertItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automataInvert_actionPerformed(getGui());
 				getGui().repaint();
 			}
 		});

@@ -2188,6 +2188,58 @@ public class ActionMan
 		gui.clearSelection();
 	}
 
+	// Invert selection - select all unselected automata instead
+	public static void automataInvert_actionPerformed(Gui gui)
+	{
+		gui.invertSelection();
+		
+		/*
+		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+
+		if (selectedAutomata.size() == 0)
+		{
+			// Use SelectAll instead
+			automataSelectAll_actionPerformed(gui);
+			return;
+		}
+
+		Automaton currAutomaton;
+		String currAutomatonName;
+
+		for (int i = 0; i < gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata(); i++)
+		{
+			try
+			{
+				currAutomaton = gui.getVisualProjectContainer().getActiveProject().getAutomatonAt(i);
+			}
+			catch (Exception ex)
+			{
+				logger.error("Exception in VisualProjectContainer. " + ex);
+				logger.debug(ex.getStackTrace());
+				return;
+			}
+
+			currAutomatonName = currAutomaton.getName();
+
+			if (!selectedAutomata.contains(currAutomaton))
+			{
+				try
+				{
+					gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomatonName);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Exception while removing " + currAutomatonName, ex);
+					logger.debug(ex.getStackTrace());
+					return;
+				}
+				i--; // Step back! One automaton has been removed!
+			}
+		}
+		gui.clearSelection();		
+		*/
+	}
+
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata
 	public static void testCases(Gui gui)
 		throws Exception

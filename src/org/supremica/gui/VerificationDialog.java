@@ -73,9 +73,9 @@ class VerificationDialogStandardPanel
 	private JTextArea nbNote;
 	//private JTextArea note;// = new JTextArea("Bananas...");
 
-	//final String[] verificationData = { "Controllability",	// keep them in this order, for God's sake!
-	//									"Non-blocking",
-	//									"Language inclusion" };
+	//final String[] verificationData = { "Controllability",	// keep them in this order, for God's sake! 
+	//									"Non-blocking",         // No! God has nothing to do with programming!! 
+	//									"Language inclusion" }; // Programming is fate-driven!
 
 
 	static class AlgorithmSelector
