@@ -51,7 +51,7 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
 import java.util.*;
-
+//-- MF -- Lots of duplicate code here, should be cleaned up!
 public class AutomatonSynthesizer
 {
 	private Automaton theAutomaton;
@@ -162,8 +162,8 @@ public class AutomatonSynthesizer
 			}
 		} while (newUnsafeStates);
 
-		doReachable();
 		*/
+		doReachable();
 		
 		// Set MIN_COST to all safe states
 		// Forbid the rest
@@ -186,6 +186,47 @@ public class AutomatonSynthesizer
 		theAutomaton.endTransaction();
 	}
 
+//-- MF -- My try for doing only nonbloicking (even more duplicate code!!)
+	public void synthesizeNonblocking()
+		throws Exception
+	{
+		theAutomaton.beginTransaction();
+		boolean newUnsafeStates;
+
+		LinkedList stateList = new LinkedList();
+
+		do
+		{
+			stateList = doCoreachable();
+			newUnsafeStates = stateList.size() > 0;
+
+		} while (newUnsafeStates);
+
+		doReachable();
+
+		// Set MIN_COST to all safe states
+		// Forbid the rest
+		Iterator stateIt = theAutomaton.stateIterator();
+		while (stateIt.hasNext())
+		{
+			State currState = (State)stateIt.next();
+			if (currState.getCost() != State.MAX_COST)
+			{
+				currState.setCost(State.MIN_COST);
+			}
+			else
+			{
+				currState.setForbidden(true);
+			}
+		}
+
+		
+		theAutomaton.setType(AutomatonType.Supervisor);
+
+		theAutomaton.invalidate();
+		theAutomaton.endTransaction();
+	}
+//-------------------------------------
 	private LinkedList doCoreachable()
 		throws Exception
 	{

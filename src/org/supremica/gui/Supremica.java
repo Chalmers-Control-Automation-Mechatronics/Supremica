@@ -691,11 +691,11 @@ public class Supremica
 		toolBar.add(helpButton, "EAST");
 	}
 	//** MF ** Implementation of Gui stuff
-	public void error(Object msg)
+	public void error(String msg)
 	{
 		thisCategory.error(msg);
 	}
-	public void error(Object msg, Throwable t)
+	public void error(String msg, Throwable t)
 	{
 		thisCategory.error(msg, t);
 	}
@@ -999,6 +999,7 @@ public class Supremica
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
+			/* Use the addAutoamaton function below
 			boolean add = true;
 
 			// Force the user to enter a new name if the name is ""
@@ -1047,8 +1048,63 @@ public class Supremica
 					return nbrOfAddedAutomata;
 				}
 			}
+			***/
+			if(addAutomaton(currAutomaton))
+			{
+				nbrOfAddedAutomata++;
+			}
+			else
+			{
+				// Must have a way to say, "cancel all"?
+			}
 		}	
 		return nbrOfAddedAutomata;
+	}
+	// We need a single entry to add automata to the gui
+	// Here we manage all necessary user interaction
+	public boolean addAutomaton(Automaton currAutomaton)
+	{
+		// Force the user to enter a new name if the name is ""
+		if (currAutomaton.getName().equals(""))
+		{
+			String autName = getNewAutomatonName("Enter a new name", "");
+			if (autName == null)
+			{
+				return false; // not added
+			}
+			else
+			{
+				currAutomaton.setName(autName);
+			}
+		}
+
+		if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
+		{
+			String autName = currAutomaton.getName();
+
+			JOptionPane.showMessageDialog(this, autName + " already exists", "Alert",
+										  JOptionPane.ERROR_MESSAGE);
+
+			autName = getNewAutomatonName("Enter a new name", autName + "(2)");
+			if (autName == null)
+			{
+				return false; // It's not ok to cancel!
+			}
+			else
+			{
+				currAutomaton.setName(autName);
+			}
+		}
+		
+		try
+		{
+			theAutomatonContainer.add(currAutomaton); // throws Exception if the automaton already exists
+		}
+		catch(Exception excp) // should never occur, we test for this condition already
+		{
+			thisCategory.error("Error while adding: " + excp.getMessage());
+		}
+		return true;
 	}
 }
 

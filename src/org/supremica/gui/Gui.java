@@ -17,8 +17,8 @@ import org.supremica.gui.help.*;
 
 public interface Gui
 {
-	public void error(Object msg); // outputs an error message
-	public void error(Object msg, Throwable t);
+	public void error(String msg); // outputs an error message
+	public void error(String msg, Throwable t);
 	public void info(String msg);
 	public void debug(String msg);
 		
@@ -28,6 +28,7 @@ public interface Gui
 	public void selectAll();
 	
 	public int addAutomata(Automata a) throws Exception; // returns number added
+	public boolean addAutomaton(Automaton a); // returns true if added
 	
 	public Component getComponent(); 	// Do we need this one?
 	public JFrame getFrame(); // this should be the main frame

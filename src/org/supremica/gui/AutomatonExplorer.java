@@ -245,6 +245,11 @@ class StateViewer
 		update();
 	}
 
+	public State getCurrState()
+	{
+		return currState;
+	}
+	
 	public void goToInitialState()
 	{
 		prevStates.clear();
@@ -498,6 +503,15 @@ class StateDisplayer
 	private JLabel stateId = new JLabel();
 	private JLabel stateName = new JLabel();
 
+	private void changeStateAccepting(boolean b)
+	{
+		stateViewer.getCurrState().setAccepting(b);
+	}
+	private void changeStateForbidden(boolean b)
+	{
+		stateViewer.getCurrState().setForbidden(b);
+	}
+	
 	public StateDisplayer(StateViewer stateViewer, Automaton theAutomaton)
 	{
 		setLayout(new BorderLayout());
@@ -513,12 +527,29 @@ class StateDisplayer
         isInitialBox.setEnabled(false);
 		isInitialBox.setBackground(Color.white);
         statusBox.add(isInitialBox);
-        isAcceptingBox.setEnabled(false);
+        
+        isAcceptingBox.setEnabled(true);
 		isAcceptingBox.setBackground(Color.white);
+		isAcceptingBox.addActionListener(new ActionListener()
+										{
+											public void actionPerformed(ActionEvent e)
+											{
+												changeStateAccepting(((JCheckBox)e.getSource()).isSelected());
+											}
+										});
         statusBox.add(isAcceptingBox);
-        isForbiddenBox.setEnabled(false);
+        
+        isForbiddenBox.setEnabled(true);
 		isForbiddenBox.setBackground(Color.white);
+		isForbiddenBox.addActionListener(new ActionListener()
+										{
+											public void actionPerformed(ActionEvent e)
+											{
+												changeStateForbidden(((JCheckBox)e.getSource()).isSelected());
+											}
+										});
         statusBox.add(isForbiddenBox);
+        
         statusBox.add(stateCost);
         statusBox.add(stateId);
         statusBox.add(stateName);

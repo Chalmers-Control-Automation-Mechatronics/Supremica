@@ -60,6 +60,15 @@ public final class SynthesizerOptions
 	private boolean optimize;
 	private boolean maximallyPermissive;
 
+	// Fixx for more convenient synthesis type handling (give me enums!)
+	public static int CONTROLLABLE = 0;
+	public static int NONBLOCKING = 1;
+	public static int BOTH = 2;
+	// And agorithm type
+	public static int MODULAR = 0;
+	public static int MONOLITHIC = 1;
+	public static int IDD = 2;
+	
 	public SynthesizerOptions()
 	{
 		this(WorkbenchProperties.synthesisSynthesisType(), 

@@ -222,17 +222,22 @@ public class AutomataSynthesizer
 							theAutomaton.setAlphabet(unionAlphabet(selectedAutomata));
 
 							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton);
-							if (synthesizerOptions.getSynthesisType() == 0)
+							
+							if (synthesizerOptions.getSynthesisType() == SynthesizerOptions.CONTROLLABLE)
+							{
 								synthesizer.synthesizeControllable();
-							else if (synthesizerOptions.getSynthesisType() == 1)
-							{
-								//-- MF -- thisCategory.error("Option not implemented...");
-								workbench.error("Option not implemented...");
 							}
-							else if (synthesizerOptions.getSynthesisType() == 2)
+							else if (synthesizerOptions.getSynthesisType() == SynthesizerOptions.NONBLOCKING)
 							{
+								synthesizer.synthesizeNonblocking();
 								//-- MF -- thisCategory.error("Option not implemented...");
-								workbench.error("Option not implemented...");
+								// workbench.error("Option not implemented...");
+							}
+							else if (synthesizerOptions.getSynthesisType() == SynthesizerOptions.BOTH)
+							{
+								synthesizer.synthesize();
+								//-- MF -- thisCategory.error("Option not implemented...");
+								// workbench.error("Option not implemented...");
 							}
 							else
 							{
@@ -260,7 +265,8 @@ public class AutomataSynthesizer
 		{
 			optimize(theAutomata, new Automata(newAutomata));
 		}
-		theAutomatonContainer.add(newAutomata);
+		// theAutomatonContainer.add(newAutomata);
+		workbench.addAutomata(newAutomata);
 	}
 
 	/**

@@ -580,7 +580,7 @@ class AutomataStateDisplayer
 		this.theAutomata = helper.getAutomata();
 		this.helper = helper; // New!
 
-		JLabel header = new JLabel("Current state");
+		JLabel header = new JLabel("Current composite state");
         //header.setOpaque(true);
         //header.setBackground(Color.yellow);
         add(header, BorderLayout.NORTH);

@@ -586,7 +586,8 @@ public class ActionMan
 			catch (Exception ex)
 			{
 				gui.error("Exception in AutomataSynthesizer: " + ex);
-			}									//!! was 'e' here^^, should be 'exe?
+				ex.printStackTrace();
+			}
 		}
 		else
 		{
@@ -1026,9 +1027,58 @@ public class ActionMan
 
 	public static void openAutomataXMLFile(Gui gui, File file)
 	{
+		Automata currAutomata = null;
+		gui.info("Opening " + file.getAbsolutePath() + " ...");
+		try
+		{
+			currAutomata = AutomataBuildFromXml.build(file);
+		}
+		catch (Exception e) // this exception is caught while opening
+		{
+			gui.error("Error while opening " + file.getAbsolutePath() + " " + e.getMessage());
+			return;
+		}
+
+		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
+		
+		try
+		{
+			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+			gui.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
+		}	
+		catch(Exception excp)
+		{
+			gui.error("Error adding automata " + file.getAbsolutePath() + " " + excp.getMessage());
+			return;
+		}
+
+
+		if (nbrOfAutomataBeforeOpening == 0)
+		{
+			String projectName = currAutomata.getName();
+			if (projectName != null)
+			{
+				gui.getAutomatonContainer().setProjectName(projectName);
+				gui.info("Project name changed to \"" + projectName + "\"");
+				gui.getAutomatonContainer().updateFrameTitles();
+			}
+		}
+
+		if (nbrOfAutomataBeforeOpening > 0)
+		{
+			File projectFile = gui.getAutomatonContainer().getProjectFile();
+			if (projectFile != null)
+			{
+				gui.getAutomatonContainer().setProjectFile(null);
+			}
+		}
+		else
+		{
+			gui.getAutomatonContainer().setProjectFile(file);
+		}
+/*********
 		int nbrOfAutomataBeforeOpening = gui.getAutomatonContainer().getSize();
 
-		// thisCategory.info("Opening " + file.getAbsolutePath() + " ...");
 		gui.info("Opening " + file.getAbsolutePath() + " ...");
 		int nbrOfAddedAutomata = 0;
 		try
@@ -1041,7 +1091,6 @@ public class ActionMan
 				if (projectName != null)
 				{
 					gui.getAutomatonContainer().setProjectName(projectName);
-					// thisCategory.info("Project name changed to \"" + projectName + "\"");
 					gui.info("Project name changed to \"" + projectName + "\"");
 					gui.getAutomatonContainer().updateFrameTitles();
 				}
@@ -1114,6 +1163,7 @@ public class ActionMan
 		{
 			gui.getAutomatonContainer().setProjectFile(file);
 		}
+**************/
 	}
 
 	// File.Save action performed
@@ -1171,8 +1221,19 @@ public class ActionMan
 	{
 		// thisCategory.info("Importing " + file.getAbsolutePath() + " ...");
 		gui.info("Importing " + file.getAbsolutePath() + " ...");
-		int nbrOfAddedAutomata = 0;
+		try
+		{
+  			Automata currAutomata = AutomataBuildFromVALID.build(file);
+  			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+		}
+		catch (Exception e)
+		{
+			gui.error("Error while importing " + file.getAbsolutePath() + " " + e.getMessage());
+			return;
+		}
 
+/***
 		try
 		{
   			Automata currAutomata = AutomataBuildFromVALID.build(file);
@@ -1227,6 +1288,8 @@ public class ActionMan
 		}
 		// thisCategory.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
 		gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+***/
+
 	}
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
@@ -1251,8 +1314,7 @@ public class ActionMan
 			{
 				// thisCategory.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName());
 				// thisCategory.error(ex);
-				gui.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName());
-				gui.error(ex);
+				gui.error("Exception in AlphabetNormalizer. Automaton: " + currAutomaton.getName(), ex);
 				ex.printStackTrace();
 			}
 		}
