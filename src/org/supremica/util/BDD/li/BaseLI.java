@@ -7,7 +7,12 @@ import org.supremica.automata.algorithms.*;
 
 /**
  * base class for the language containment verification (LI/ctrl)
+ *
+ * <p>
+ * NOTE: the algorithms may temporarly change the automata ordering algo to something
+ * it more efficient for language containment.
  */
+
 public class BaseLI
 {
 
@@ -40,6 +45,8 @@ public class BaseLI
 	boolean controllaibilty_test;
 	protected int bdd_cube_sp;
 
+	private int saved_order; /** the original ordering algo */
+
 	// -------------------------------------------------------------------------------
 
 	/**
@@ -58,11 +65,17 @@ public class BaseLI
 		theAutomata.addAutomata(selected);
 		theAutomata.addAutomata(unselected);
 
+
+
 		try
 		{
+			change_order();
 			Builder bu = new Builder(theAutomata);
 
 			ba = bu.getBDDAutomata();
+			restore_order();
+
+
 			all = ba.getAutomataVector();
 			L1 = new Group(ba, all, new AutomatonMembership(selected), "Selected");
 			L2 = new Group(ba, all, new AutomatonMembership(unselected), "Unselected");
@@ -74,8 +87,12 @@ public class BaseLI
 			cleanup();
 
 			throw pass;
+		} finally {
+			// once more, in case we died before the old order was restored
+			restore_order();
 		}
 	}
+
 
 	// -------------------------------------------------------------------------------
 
@@ -94,9 +111,12 @@ public class BaseLI
 
 		try
 		{
+			change_order();
 			Builder bu = new Builder(theAutomata);
 
 			ba = bu.getBDDAutomata();
+			restore_order();
+
 			all = ba.getAutomataVector();
 			L1 = new Group(ba, all, new AutomatonTypeMembership(false), "Spec");
 			L2 = new Group(ba, all, new AutomatonTypeMembership(true), "Plant");
@@ -108,6 +128,9 @@ public class BaseLI
 			cleanup();
 
 			throw pass;
+		} finally {
+			// once more, in case we died before the old order was restored
+			restore_order();
 		}
 	}
 
@@ -163,7 +186,31 @@ public class BaseLI
 		}
 	}
 
-	// ------------------------------------------------------
+	// -----------------------------------------------------------------------------------------
+	/**
+	 * we know that some ordering algos are more sutied for this kind of work:
+	 */
+	private void change_order() {
+		int good_order = Options.AO_HEURISTIC_BFS;
+		if(Options.ordering_algorithm != good_order) {
+			System.err.println("\nNOTE:\n\nFor better performance, Supremica will now use the '"
+				+ Options.ORDERING_ALGORITHM_NAMES[good_order]
+				+ "' variable ordering heuristic instead of the choosen heuristic.\n");
+		}
+
+		saved_order = Options.ordering_algorithm;
+		Options.ordering_algorithm = good_order;
+
+	}
+
+	/**
+	 * cgange back the order to whatever it was before
+	 */
+	private void restore_order() {
+		Options.ordering_algorithm = saved_order;
+	}
+
+	// -----------------------------------------------------------------------------------------
 
 	/**
 	 * Modular controllability check
