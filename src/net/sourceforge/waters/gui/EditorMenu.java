@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.3 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorMenu.java,v 1.4 2005-02-19 03:26:56 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -45,29 +45,24 @@ public class EditorMenu
 		this.add(menu);
 
 		JMenuItem menuItem = new JMenuItem("Clear all", KeyEvent.VK_O);
-
 		menuItem.addActionListener(this);
-
 		FileNewMenu = menuItem;
-
 		menu.add(menuItem);
+
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Page Setup...", KeyEvent.VK_G);
-
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Print...", KeyEvent.VK_P);
-
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Close Window", KeyEvent.VK_X);
-
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
 
@@ -77,39 +72,34 @@ public class EditorMenu
 		this.add(menu);
 
 		menuItem = new JMenuItem("Undo");
-
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Copy");
-
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Copy as WMF");
-
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
 
 		editCopyAsWMFMenu = menuItem;
-		menuItem = new JMenuItem("Cut");
 
+		menuItem = new JMenuItem("Cut");
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Paste");
-
 		menuItem.setEnabled(false);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Delete");
-
 		menu.add(menuItem);
 		menuItem.addActionListener(this);
 
@@ -123,16 +113,14 @@ public class EditorMenu
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Node Tool");
-
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Edge Tool");
-
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Initial Node Tool");
-
 		menu.add(menuItem);
+
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Color selector");
@@ -143,7 +131,6 @@ public class EditorMenu
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Options...");
-
 		menu.add(menuItem);
 
 		ToolsOptionsMenu = menuItem;
@@ -151,11 +138,11 @@ public class EditorMenu
 		menuItem.addActionListener(this);
 
 		menu = new JMenu("Help");
-
 		this.add(menu);
 
 		menuItem = new JMenuItem("About...");
-
+		menuItem.setEnabled(false);
+		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		fileChooser = new JFileChooser();

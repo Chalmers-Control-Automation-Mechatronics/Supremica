@@ -1564,7 +1564,7 @@ public class AutomatonMinimizer
 					// hashCode of the state is changed... not gooooood...
 					//   On the other hand... maybe we shouldn't give the state a new name at all? 
 					// After all, we don't merge states, we just remove a state?
-					if (!useShortNames && false)
+					if (!useShortNames)
 					{
 						State toState = outArc.getToState();
 						toState.setName(state.getName() + SupremicaProperties.getStateSeparator() + 

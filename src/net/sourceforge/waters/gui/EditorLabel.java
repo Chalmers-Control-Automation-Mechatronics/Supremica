@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorLabel.java,v 1.3 2005-02-19 03:26:56 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -20,7 +20,8 @@ import java.lang.reflect.*;
 import java.beans.*;
 import net.sourceforge.waters.model.module.*;
 
-/** <p>Editable label object for representing Events and Node names.</p>
+/** 
+ * <p>Editable label object for representing Events and Node names.</p>
  *
  * <p>A label works based on an offset from the central point of
  * the object it is tied to (the center of a node or the control point of
@@ -39,7 +40,8 @@ public class EditorLabel
 	private EditorNode parent = null;
 	private LabelGeometryProxy geometry;
 
-	/** Get the object which this label is attached to
+	/** 
+	 * Get the object which this label is attached to
 	 */
 	public EditorNode getParent()
 	{

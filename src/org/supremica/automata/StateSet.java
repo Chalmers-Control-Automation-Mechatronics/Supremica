@@ -13,24 +13,10 @@ package org.supremica.automata;
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;
 
-class StateComparator
-	implements Comparator
-{
-	private int compare(State a, State b)
-	{
-		return a.getName().compareTo(b.getName());
-		//return a.getId().compareTo(b.getId());
-	}
-
-	public int compare(Object a, Object b)
-	{
-		return compare((State) a, (State) b);
-	}
-}
-
 public class StateSet
 {
 	private TreeSet theSet = null;
+	private HashMap nameToStateMap = null;
 	private State singleStateRepresentation = null;
 
 	// Private constructor for cloning
@@ -42,7 +28,7 @@ public class StateSet
 	// Create an empty set
 	public StateSet()
 	{
-		theSet = new TreeSet(new StateComparator());
+		theSet = new TreeSet(new State.StateComparator());
 	}
 
 	/**

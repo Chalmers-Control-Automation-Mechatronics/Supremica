@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorSurface.java,v 1.3 2005-02-19 03:26:56 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -25,7 +25,8 @@ import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.*;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
-/** <p>A component which allows for the display of module data.</p>
+/** 
+ * <p>A component which allows for the display of module data.</p>
  *
  * <p>The EditorSurface is a viewer-only component.  It can load components from {@link ModuleProxy} objects
  * and translate them into its internal storage format, which allows for it to be displayed.
@@ -563,7 +564,6 @@ public class EditorSurface
 
 	public EditorObject getObjectAtPosition(int ex, int ey)
 	{
-
 		// Order of precedence: Nodes, Edges, Labels
 		for (int i = 0; i < nodes.size(); i++)
 		{
@@ -830,7 +830,6 @@ public class EditorSurface
 				}
 				else
 				{
-
 					//TODO: Do something here!
 					System.out.println("SOURCE OR TARGET IS NULL!");
 				}
@@ -870,7 +869,8 @@ public class EditorSurface
 		shades = s;
 	}
 
-	/** This should reduce the size of the controlled surface to the minimum required
+	/** 
+	 * This should reduce the size of the controlled surface to the minimum required
 	 */
 	public void minimizeSize()
 	{

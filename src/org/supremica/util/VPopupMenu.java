@@ -5,12 +5,13 @@ import java.awt.*;
 import org.supremica.gui.InterfaceManager;
 
 /**
-This component extends JPopupMenu and adds a method to display the menu inside the screen, even if the mouse pointer is near the edge of the screen.
-<br>
-Class created by Cris Sinnott
-<br>
-Source at : http://www.egroups.com/list/advanced-java/md1875700976.html
-*/
+ * This component extends JPopupMenu and adds a method to display the menu inside the screen, 
+ * even if the mouse pointer is near the edge of the screen.
+ * <br>
+ * Class created by Cris Sinnott
+ * <br>
+ * Source at : http://www.egroups.com/list/advanced-java/md1875700976.html
+ */
 public class VPopupMenu
 	extends JPopupMenu
 {

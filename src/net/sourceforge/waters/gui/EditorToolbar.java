@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorToolbar.java,v 1.3 2005-02-19 03:26:56 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -22,12 +22,18 @@ import javax.swing.border.Border;
 public class EditorToolbar
 	extends JPanel
 {
-
 	//#########################################################################
 	//# Data Members
 	private final ButtonGroup mGroup = new ButtonGroup();
 	private ToolButtonListener mLastSelected;
 	private static final Color SELECTIONCOLOR = new Color(255, 200, 240);
+
+	public static final String SELECT = "select";
+	public static final String NODE = "node";
+	public static final String NODEGROUP = "nodegroup";
+	public static final String INITIAL = "initial";
+	public static final String EDGE = "edge";
+	public static final String COLOR = "color";
 
 	//#########################################################################
 	//# Constructors
@@ -35,13 +41,12 @@ public class EditorToolbar
 	{
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		mLastSelected = createButton("select", "Select", true);
-
-		createButton("node", "Create Nodes", false);
-		createButton("nodegroup", "Create Group Nodes", false);
-		createButton("initial", "Set Initial Nodes", false);
-		createButton("edge", "Create Edges", false);
-		createButton("color", "Drag Events", false);
+		mLastSelected = createButton(SELECT, "Select", true);
+		createButton(NODE, "Create Nodes", false);
+		createButton(NODEGROUP, "Create Group Nodes", false);
+		createButton(INITIAL, "Set Initial Nodes", false);
+		createButton(EDGE, "Create Edges", false);
+		createButton(COLOR, "Drag Events", false);
 	}
 
 	//#########################################################################

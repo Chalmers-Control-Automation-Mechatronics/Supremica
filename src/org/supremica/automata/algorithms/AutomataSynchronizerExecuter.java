@@ -959,7 +959,8 @@ public final class AutomataSynchronizerExecuter
 					}
 
 					// Set some attributes of the state
-					newState.setAutomataSynchronizerExecutorIndex(i);
+					//newState.setAutomataSynchronizerExecutorIndex(i);
+					newState.setIndex(i);
 					//newState.setName(newState.getName());
 					newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
 					newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
@@ -1322,8 +1323,8 @@ public final class AutomataSynchronizerExecuter
 	/*
 	 * public boolean isValidTransition(int[] fromState, int[] toState, int event)
 	 * {
-	 * if (prioritizedEventInResultAutomaton[event])
-	 * { // Check that event is possible from all automata that have
+	 * if (prioritizedEventInResultAutomaton[ewent])
+	`* { // Check that event is possible from all automata that have
 	 * // this event as prioritized.
 	 *
 	 * // To do

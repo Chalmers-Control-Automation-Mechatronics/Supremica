@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.3 2005-02-18 03:09:06 knut Exp $
+//# $Id: EditorEvents.java,v 1.4 2005-02-19 03:26:56 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -70,14 +70,12 @@ class EditorEvents
 		setIntercellSpacing(ispacing);
 
 		final TableColumn column0 = getColumnModel().getColumn(0);
-
 		column0.setMinWidth(20);
 		column0.setPreferredWidth(24);
 		column0.setMaxWidth(24);
 		column0.setResizable(false);
 
 		final TableColumn column1 = getColumnModel().getColumn(1);
-
 		column1.setMinWidth(100);
 		column1.setResizable(false);
 
@@ -107,7 +105,6 @@ class EditorEvents
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
-
 				//Ignore extra messages.
 				if (e.getValueIsAdjusting())
 				{
@@ -248,7 +245,6 @@ class EditorEvents
 				}
 				catch (final java.text.ParseException exception)
 				{
-
 					// Can't happen if input is valid.
 					throw new UnexpectedWatersException(exception);
 				}

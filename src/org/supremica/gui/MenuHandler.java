@@ -150,11 +150,8 @@ public class MenuHandler
 		}
 	}
 
-	// Shoudl not knwo anything about table, doesnät even need to know about gui
-	public JPopupMenu getDisabledPopupMenu(int nbrOfAutomata /* JTable theTable */)
+	public JPopupMenu getDisabledPopupMenu(int nbrOfAutomata)
 	{
-
-		// int nbrOfAutomata = theTable.getSelectedRowCount();
 		setEnabled(twoAutomataItems, nbrOfAutomata >= 2);
 		setEnabled(oneAutomataItems, nbrOfAutomata >= 1);
 		setEnabled(zeroAutomataItems, nbrOfAutomata >= 0);

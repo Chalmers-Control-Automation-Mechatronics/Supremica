@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   SimpleNodeProxy
 //###########################################################################
-//# $Id: SimpleNodeProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: SimpleNodeProxy.java,v 1.2 2005-02-19 03:26:56 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -84,14 +84,14 @@ public class SimpleNodeProxy extends NodeProxy {
    */
   public SimpleNodeProxy(final SimpleNodeProxy partner)
   {
-    super(partner);
-    mIsInitial = partner.mIsInitial;
-    if (partner.mPointGeometry != null) {
-      mPointGeometry = new PointGeometryProxy(partner.mPointGeometry);
-    }
-    if (partner.mLabelGeometry != null) {
-      mLabelGeometry = new LabelGeometryProxy(partner.mLabelGeometry);
-    }
+	  super(partner);
+	  mIsInitial = partner.mIsInitial;
+	  if (partner.mPointGeometry != null) {
+		  mPointGeometry = new PointGeometryProxy(partner.mPointGeometry);
+	  }
+	  if (partner.mLabelGeometry != null) {
+		  mLabelGeometry = new LabelGeometryProxy(partner.mLabelGeometry);
+	  }
   }
 
   /**

@@ -60,11 +60,16 @@ public class State
 	public final static int UNDEF_POS = Integer.MIN_VALUE;
 	private int index = -1;
 
-	// id is the internal identifier, i.e. for directing arcs etc.
-	private String id = "";
+	/** 
+	 * id is the internal identifier, i.e. for directing arcs etc.
+	 * It is used for generating the hashcode.
+	 */
+	private final String id;
 
-	// name is the external identifier, i.e. the string appearing in Supremica
-	private String name = "";
+	/**
+	 * Name is the external identifier, i.e. the string appearing in Supremica
+	 */
+	private String name;
 	private boolean initial = false;
 	private boolean accepting = false;
 	private boolean mutuallyAccepting = false;
@@ -182,19 +187,9 @@ public class State
 	 * needs special initialisation that is not automatically done.
 	 * This method is not recommended for general use.
 	 */
-	void setIndex(int index)
+	public void setIndex(int index)
 	{
 		this.index = index;
-	}
-
-	/**
-	 * Do not use this method.
-	 * This is temporary method for letting AutomataSynchronizerExecutor set the index.
-	 * This method will be remomoved ASAP. Oh yea?
-	 */
-	public void setAutomataSynchronizerExecutorIndex(int index)
-	{
-		setIndex(index);
 	}
 
 	/**
@@ -1133,4 +1128,19 @@ public class State
 				return copiedState;
 		}
 */
+
+	static class StateComparator
+		implements Comparator
+	{
+		private int compare(State a, State b)
+		{
+			//return a.getName().compareTo(b.getName());
+			return a.getId().compareTo(b.getId());
+		}
+		
+		public int compare(Object a, Object b)
+		{
+			return compare((State) a, (State) b);
+		}
+	}
 }
