@@ -282,7 +282,7 @@ public class Automaton
 			Arc currArc = (Arc)arcIt.next();
 			if (currArc.isSelfLoop())
 			{
-				return false;
+				return true;
 			}
 		}
 		return false;

@@ -1770,7 +1770,7 @@ public class ActionMan
 						gui.error("Exception while generating SattLine code to files " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 						return;
 					}
-					logger.info("SattLine files successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
+					logger.info("SattLine SFC files successfully generated at " + prefixName + "{\".s\", \".g\", \".l\", \".p\"}");
 
 				}
 			}
@@ -1837,7 +1837,7 @@ public class ActionMan
 						gui.error("Exception while generating ControlBuilder code to files " + prefixName + "{\".prj\", \".app\"}");
 						return;
 					}
-					logger.info("ControlBuilder files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
+					logger.info("ControlBuilder SFC files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
 				}
 			}
 		}
@@ -1866,8 +1866,6 @@ public class ActionMan
 			{
 				if (!currFile.isDirectory())
 				{
-					String prefixName = null;
-
 					try
 					{
 
@@ -1885,7 +1883,9 @@ public class ActionMan
 					{
 						ex.printStackTrace();
 						gui.error("Exception while generating 1131 Structured text code to file " + currFile.getAbsolutePath());
+						return;
 					}
+					logger.info("IEC-61131 ST file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
 		}
@@ -1932,7 +1932,9 @@ public class ActionMan
 					{
 						ex.printStackTrace();
 						gui.error("Exception while generating 1131 Instruction list code to file " + currFile.getAbsolutePath());
+						return;
 					}
+					logger.info("IEC-61131 IL file successfully generated at " + currFile.getAbsolutePath());
 				}
 			}
 		}
