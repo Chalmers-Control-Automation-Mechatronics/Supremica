@@ -59,6 +59,12 @@ import org.supremica.automata.LabeledEvent;
 public class AutomatonToDot
 	implements AutomataSerializer
 {
+
+	// We hope that this is the size of an A4 page (isn't 8.5" times 11" ??)
+	private static final int DEFAULT_WIDTH = 7;
+	private static final int DEFAULT_HEIGHT = 11;
+
+
 	private Automaton aut;
 	private boolean leftToRight = false;
 	private boolean withLabel = true;
@@ -124,7 +130,7 @@ public class AutomatonToDot
 		throws Exception
 	{
 		aut.normalizeStateIdentities();
-		
+
 		Vector initialStates = new Vector();
 		final String initPrefix = "__init_";
 
@@ -135,6 +141,10 @@ public class AutomatonToDot
 
 		pw.println("digraph state_automaton {");
 		pw.println("\tcenter = true;");
+
+		// fix page size to this:
+		pw.println("\tsize = \"" + DEFAULT_WIDTH + "," + DEFAULT_HEIGHT + "\";");
+
 
 		if (leftToRight)
 		{

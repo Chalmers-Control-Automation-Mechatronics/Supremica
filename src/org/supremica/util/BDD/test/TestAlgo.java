@@ -174,6 +174,9 @@ public class TestAlgo {
 		if(n > 0) nam = nam.substring(n+1);
 		adjust(nam + ":", 40);
 	}
+
+
+
 	// ------------------------------------------------------------------------------------
 	public void runTests() throws Exception {
 		fail  = pass = 0;
@@ -301,6 +304,9 @@ public class TestAlgo {
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.11  2004/05/03 08:11:48  torda
+ Made some constants static
+
  Revision 1.10  2004/04/26 08:35:44  torda
  Removed all(?) unused import statements (hundreds) for the following reasons:
  
