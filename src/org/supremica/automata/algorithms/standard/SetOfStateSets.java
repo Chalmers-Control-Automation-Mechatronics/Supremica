@@ -12,15 +12,7 @@ import org.supremica.log.*;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.StateSet;
-import org.supremica.automata.Events;
-import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
-import org.supremica.automata.StateIterator;
-import org.supremica.automata.Arc;
-import org.supremica.automata.ArcIterator;
+import org.supremica.automata.*;
 
 // Would this have any public use?
 public class SetOfStateSets
