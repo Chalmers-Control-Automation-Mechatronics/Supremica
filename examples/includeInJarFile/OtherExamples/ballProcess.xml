@@ -351,131 +351,208 @@
 			<Transition event="es.got_ball" source="q_1" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Putter" type="Plant">
+	
+	<!-- -->
+	<!-- Here comes all new plant automata -->
+	<!-- -->
+	
+	<Automaton name="Elevator: Measure" type="Plant">
 		<Events>
-			<Event id="em.putter.go_in" label="em.putter.go_in" controllable="true" prioritized="true" />
-			<Event id="em.putter.go_out" label="em.putter.go_out" controllable="true" prioritized="true" />
-			<Event id="em.putter.is_out" label="em.putter.is_out" controllable="true" prioritized="true" />
-			<Event id="em.putter.is_in" label="em.putter.is_in" controllable="true" prioritized="true" />
+			<Event id="go_down" label="elevator.measure.go_down" controllable="true" prioritized="true" />
+			<Event id="go_up" label="elevator.measure.go_up" controllable="true" prioritized="true" />
+			<Event id="is_up" label="elevator.measure.is_up" controllable="true" prioritized="true" />
+			<Event id="is_down" label="elevator.measure.is_down" controllable="true" prioritized="true" />
 		</Events>
 		<States>
-			<State id="q_0" initial="true" accepting="true" />
-			<State id="q_1" accepting="true" />
+			<State id="q_0" name="down" initial="true" accepting="true" />
+			<State id="q_1" name="up" accepting="true" />
 		</States>
 		<Transitions>
-			<Transition event="em.putter.go_in" source="q_0" dest="q_0" />
-			<Transition event="em.putter.go_out" source="q_1" dest="q_1" />
-			<Transition event="em.putter.go_out" source="q_0" dest="q_1" />
-			<Transition event="em.putter.go_in" source="q_1" dest="q_0" />
-			<Transition event="em.putter.is_out" source="q_1" dest="q_1" />
-			<Transition event="em.putter.is_in" source="q_0" dest="q_0" />
+			<Transition event="go_down" source="q_0" dest="q_0" />
+			<Transition event="go_up" source="q_1" dest="q_1" />
+			<Transition event="go_up" source="q_0" dest="q_1" />
+			<Transition event="go_down" source="q_1" dest="q_0" />
+			<Transition event="is_up" source="q_1" dest="q_1" />
+			<Transition event="is_down" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Measure 2" type="Plant">
+	<Automaton name="Elevator: Sorter" type="Plant">
 		<Events>
-			<Event id="em.measure.go_in" label="em.measure.go_in" controllable="true" prioritized="true" />
-			<Event id="em.measure.go_out" label="em.measure.go_out" controllable="true" prioritized="true" />
-			<Event id="em.measure.is_out" label="em.measure.is_out" controllable="true" prioritized="true" />
-			<Event id="em.measure.is_in" label="em.measure.is_in" controllable="true" prioritized="true" />
+			<Event id="go_down" label="elevator.sorter.go_down" />
+			<Event id="go_upper" label="elevator.sorter.go_upper" />
+			<Event id="go_lower" label="elevator.sorter.go_lower" />
+			<Event id="is_upper" label="elevator.sorter.is_upper" />
+			<Event id="is_lower" label="elevator.sorter.is_lower" />
+			<Event id="is_down" label="elevator.sorter.is_down" />
 		</Events>
 		<States>
-			<State id="q_0" initial="true" accepting="true" />
-			<State id="q_1" accepting="true" />
+			<State id="q_0" name="down" initial="true" accepting="true" />
+			<State id="q_1" name="upper" accepting="true" />
+			<State id="q_2" name="lower" accepting="true" />
 		</States>
 		<Transitions>
-			<Transition event="em.measure.go_in" source="q_0" dest="q_0" />
-			<Transition event="em.measure.go_out" source="q_1" dest="q_1" />
-			<Transition event="em.measure.go_out" source="q_0" dest="q_1" />
-			<Transition event="em.measure.go_in" source="q_1" dest="q_0" />
-			<Transition event="em.measure.is_out" source="q_1" dest="q_1" />
-			<Transition event="em.measure.is_in" source="q_0" dest="q_0" />
+			<Transition event="go_down" source="q_0" dest="q_0" />
+			<Transition event="go_upper" source="q_1" dest="q_1" />
+			<Transition event="go_upper" source="q_0" dest="q_1" />
+			<Transition event="go_lower" source="q_2" dest="q_2" />
+			<Transition event="go_lower" source="q_0" dest="q_2" />
+			<Transition event="go_down" source="q_1" dest="q_0" />
+			<Transition event="go_down" source="q_2" dest="q_0" />			
+			<Transition event="is_lower" source="q_2" dest="q_2" />
+			<Transition event="is_upper" source="q_1" dest="q_1" />	
+			<Transition event="is_down" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Measure elevator" type="Plant">
+	<Automaton name="Measure" type="Plant">
 		<Events>
-			<Event id="em.elevator.go_down" label="em.elevator.go_down" controllable="true" prioritized="true" />
-			<Event id="em.elevator.go_up" label="em.elevator.go_up" controllable="true" prioritized="true" />
-			<Event id="em.elevator.is_up" label="em.elevator.is_up" controllable="true" prioritized="true" />
-			<Event id="em.elevator.is_down" label="em.elevator.is_down" controllable="true" prioritized="true" />
+			<Event id="go_in" label="measure.go_in" />
+			<Event id="go_out" label="measure.go_out" />
+			<Event id="is_out" label="measure.is_out" />
+			<Event id="is_in" label="measure.is_in" />
 		</Events>
 		<States>
-			<State id="q_0" initial="true" accepting="true" />
-			<State id="q_1" accepting="true" />
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
 		</States>
 		<Transitions>
-			<Transition event="em.elevator.go_down" source="q_0" dest="q_0" />
-			<Transition event="em.elevator.go_up" source="q_1" dest="q_1" />
-			<Transition event="em.elevator.go_up" source="q_0" dest="q_1" />
-			<Transition event="em.elevator.go_down" source="q_1" dest="q_0" />
-			<Transition event="em.elevator.is_up" source="q_1" dest="q_1" />
-			<Transition event="em.elevator.is_down" source="q_0" dest="q_0" />
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
-	</Automaton>
-	<Automaton name="Sorter elevator" type="Plant">
+	</Automaton>	
+	<Automaton name="Putter: Measure" type="Plant">
 		<Events>
-			<Event id="es.elevator.go_down" label="es.elevator.go_down" controllable="true" prioritized="true" />
-			<Event id="es.elevator.go_upper" label="es.elevator.go_upper" controllable="true" prioritized="true" />
-			<Event id="es.elevator.go_lower" label="es.elevator.go_lower" controllable="true" prioritized="true" />
-			<Event id="es.elevator.is_upper" label="es.elevator.is_up" controllable="true" prioritized="true" />
-			<Event id="es.elevator.is_lower" label="es.elevator.is_down" controllable="true" prioritized="true" />
+			<Event id="go_in" label="putter.measure.go_in" />
+			<Event id="go_out" label="putter.measure.go_out" />
+			<Event id="is_out" label="putter.measure.is_out" />
+			<Event id="is_in" label="putter.measure.is_in" />
 		</Events>
 		<States>
-			<State id="q_0" initial="true" accepting="true" />
-			<State id="q_1" accepting="true" />
-			<State id="q_2" accepting="true" />
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
 		</States>
 		<Transitions>
-			<Transition event="es.elevator.go_down" source="q_0" dest="q_0" />
-			<Transition event="es.elevator.go_upper" source="q_1" dest="q_1" />
-			<Transition event="es.elevator.go_upper" source="q_0" dest="q_1" />
-			<Transition event="es.elevator.go_lower" source="q_2" dest="q_2" />
-			<Transition event="es.elevator.go_lower" source="q_0" dest="q_2" />
-			<Transition event="es.elevator.go_down" source="q_1" dest="q_0" />
-			<Transition event="es.elevator.is_lower" source="q_2" dest="q_2" />
-			<Transition event="es.elevator.is_upper" source="q_1" dest="q_1" />			
-			<Transition event="es.elevator.is_down" source="q_0" dest="q_0" />
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Lower putter" type="Plant">
+	<Automaton name="Putter: Lower sorter" type="Plant">
 		<Events>
-			<Event id="es.lower_putter.go_in" label="es.lower_putter.go_in" controllable="true" prioritized="true" />
-			<Event id="es.lower_putter.go_out" label="es.lower_putter.go_out" controllable="true" prioritized="true" />
-			<Event id="es.lower_putter.is_out" label="es.lower_putter.is_out" controllable="true" prioritized="true" />
-			<Event id="es.lower_putter.is_in" label="es.lower_putter.is_in" controllable="true" prioritized="true" />
+			<Event id="go_in" label="putter.lower_sorter.go_in" />
+			<Event id="go_out" label="putter.lower_sorter.go_out" />
+			<Event id="is_out" label="putter.lower_sorter.is_out" />
+			<Event id="is_in" label="putter.lower_sorter.is_in" />
 		</Events>
 		<States>
-			<State id="q_0" initial="true" accepting="true" />
-			<State id="q_1" accepting="true" />
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
 		</States>
 		<Transitions>
-			<Transition event="es.lower_putter.go_in" source="q_0" dest="q_0" />
-			<Transition event="es.lower_putter.go_out" source="q_1" dest="q_1" />
-			<Transition event="es.lower_putter.go_out" source="q_0" dest="q_1" />
-			<Transition event="es.lower_putter.go_in" source="q_1" dest="q_0" />
-			<Transition event="es.lower_putter.is_out" source="q_1" dest="q_1" />
-			<Transition event="es.lower_putter.is_in" source="q_0" dest="q_0" />
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Upper putter" type="Plant">
+	<Automaton name="Putter: Upper sorter" type="Plant">
 		<Events>
-			<Event id="es.upper_putter.go_in" label="es.upper_putter.go_in" controllable="true" prioritized="true" />
-			<Event id="es.upper_putter.go_out" label="es.upper_putter.go_out" controllable="true" prioritized="true" />
-			<Event id="es.upper_putter.is_out" label="es.upper_putter.is_out" controllable="true" prioritized="true" />
-			<Event id="es.upper_putter.is_in" label="es.upper_putter.is_in" controllable="true" prioritized="true" />
+			<Event id="go_in" label="putter.upper_sorter.go_in" />
+			<Event id="go_out" label="putter.upper_sorter.go_out" />
+			<Event id="is_out" label="putter.upper_sorter.is_out" />
+			<Event id="is_in" label="putter.upper_sorter.is_in" />
 		</Events>
 		<States>
-			<State id="q_0" initial="true" accepting="true" />
-			<State id="q_1" accepting="true" />
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
 		</States>
 		<Transitions>
-			<Transition event="es.upper_putter.go_in" source="q_0" dest="q_0" />
-			<Transition event="es.upper_putter.go_out" source="q_1" dest="q_1" />
-			<Transition event="es.upper_putter.go_out" source="q_0" dest="q_1" />
-			<Transition event="es.upper_putter.go_in" source="q_1" dest="q_0" />
-			<Transition event="es.upper_putter.is_out" source="q_1" dest="q_1" />
-			<Transition event="es.upper_putter.is_in" source="q_0" dest="q_0" />
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
+	<Automaton name="Arm" type="Plant">
+		<Events>
+			<Event id="go_down" label="arm.go_down" />
+			<Event id="go_upper" label="arm.go_upper" />
+			<Event id="go_lower" label="arm.go_lower" />
+			<Event id="is_upper" label="arm.is_upper" />
+			<Event id="is_lower" label="arm.is_lower" />
+			<Event id="is_down" label="arm.is_down" />
+		</Events>
+		<States>
+			<State id="q_0" name="down" initial="true" accepting="true" />
+			<State id="q_1" name="upper" accepting="true" />
+			<State id="q_2" name="lower" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="go_down" source="q_0" dest="q_0" />
+			<Transition event="go_upper" source="q_1" dest="q_1" />
+			<Transition event="go_upper" source="q_0" dest="q_1" />
+			<Transition event="go_lower" source="q_2" dest="q_2" />
+			<Transition event="go_lower" source="q_0" dest="q_2" />
+			<Transition event="go_down" source="q_1" dest="q_0" />
+			<Transition event="go_down" source="q_2" dest="q_0" />			
+			<Transition event="is_lower" source="q_2" dest="q_2" />
+			<Transition event="is_upper" source="q_1" dest="q_1" />	
+			<Transition event="is_down" source="q_0" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="Gatekeeper: In" type="Plant">
+		<Events>
+			<Event id="go_in" label="gatekeeper.in.go_in" />
+			<Event id="go_out" label="gatekeeper.in.go_out" />
+			<Event id="is_out" label="gatekeeper.in.is_out" />
+			<Event id="is_in" label="gatekeeper.in.is_in" />
+		</Events>
+		<States>
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<Automaton name="Gatekeeper: Out" type="Plant">
+		<Events>
+			<Event id="go_in" label="gatekeeper.out.go_in" />
+			<Event id="go_out" label="gatekeeper.out.go_out" />
+			<Event id="is_out" label="gatekeeper.out.is_out" />
+			<Event id="is_in" label="gatekeeper.out.is_in" />
+		</Events>
+		<States>
+			<State id="q_0" name="in" initial="true" accepting="true" />
+			<State id="q_1" name="out" accepting="true" />
+		</States>
+		<Transitions>
+			<Transition event="go_in" source="q_0" dest="q_0" />
+			<Transition event="go_out" source="q_1" dest="q_1" />
+			<Transition event="go_out" source="q_0" dest="q_1" />
+			<Transition event="go_in" source="q_1" dest="q_0" />
+			<Transition event="is_out" source="q_1" dest="q_1" />
+			<Transition event="is_in" source="q_0" dest="q_0" />
+		</Transitions>
+	</Automaton>
+	<!-- -->
+	<!-- End of new plant automata -->
+	<!-- -->
 	<Automaton name="Automatic button" type="Plant">
 		<Events>
 			<Event id="automatic_button_pressed" label="automatic_button_pressed" controllable="false" prioritized="true" />
@@ -618,23 +695,6 @@
 			<Transition event="p.pickup_ball_upper" source="q_2" dest="q_0" />
 		</Transitions>
 	</Automaton>	
-	
-<!--
-	<Automaton name="Progress spec: Manual mode" type="Specification">
-		<Events>
-			<Event id="start_manual_mode" label="start_manual_mode" controllable="true" prioritized="true" />
-			<Event id="gk.release_ball" label="gk.release_ball" controllable="true" prioritized="true" />
-		</Events>
-		<States>
-			<State id="q_0" initial="true" accepting="true" />
-			<State id="q_1" />
-		</States>
-		<Transitions>
-			<Transition event="start_manual_mode" source="q_0" dest="q_1" />
-			<Transition event="gk.release_ball" source="q_1" dest="q_0" />
-		</Transitions>
-	</Automaton>
--->
 	<Automaton name="Variable: size of ball" type="Specification">
 		<Events>
 			<Event id="em.small_ball" label="em.small_ball" controllable="false" prioritized="true" />
