@@ -1,2 +1,2 @@
-@java -jar JGrafChart.jar
+@java -cp Supremica.jar org.jgrafchart.Basic2GC
 

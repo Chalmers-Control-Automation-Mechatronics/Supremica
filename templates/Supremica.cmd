@@ -1,2 +1,1 @@
-@java -jar Supremica.jar
-
+@java -cp Supremica.jar org.supremica.apps.Supremica

@@ -204,7 +204,7 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild" depends="clean,version,compile,jar">
+<target name="rebuild" depends="clean,version,build">
 </target>
 
 <!-- Build:
@@ -219,7 +219,7 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild_supremica" depends="clean,version,compile_supremica,jar_supremica,startfiles_supremica">
+<target name="rebuild_supremica" depends="clean,version,build_supremica">
 </target>
 
 
@@ -235,11 +235,11 @@
 *	and packages all files into a jar file that can
 *	be executed without any other dependencies. 
 -->
-<target name="rebuild_jgrafchart" depends="clean,compile_jgrafchart,jar_jgrafchart,startfiles_jgrafchart">
+<target name="rebuild_jgrafchart" depends="clean,version,build_jgrafchart">
 </target>
 
 <target name="jar_jgrafchart">
-	<jar jarfile="${dist}/JGrafChart.jar" manifest="${templates}/JGRAFCHART_MANIFEST.MF"> 
+	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/JGRAFCHART_MANIFEST.MF"> 
 		<fileset dir="${build}"/>
 		<fileset dir="${javalibs.dir}">		
 			<patternset>
