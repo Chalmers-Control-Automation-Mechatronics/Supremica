@@ -141,16 +141,16 @@ public class Automaton
 				State orgSourceState = (State) states.next();
 				State newSourceState = getStateWithId(orgSourceState.getId());
 
-				for (ArcIterator outgoingArcs = orgSourceState.outgoingArcsIterator(); outgoingArcs.hasNext(); )
+				for (ArcIterator outgoingArcs = orgSourceState.safeOutgoingArcsIterator(); outgoingArcs.hasNext(); )
 				{
 					Arc orgArc = outgoingArcs.nextArc();
+					
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
-
+					
 					LabeledEvent currEvent = alphabet.getEvent(orgArc.getEvent());
-
+					
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
-
 					addArc(newArc);
 				}
 			}
@@ -158,6 +158,7 @@ public class Automaton
 		catch (Exception ex)
 		{
 			logger.error("Error while copying transitions", ex);
+			ex.printStackTrace();
 			logger.debug(ex.getStackTrace());
 		}
 	}

@@ -95,6 +95,8 @@ public class State
 	private List outgoingArcSets = new LinkedList();
 	private Listeners listeners = null;
 	
+	private static org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(State.class);
+	
 	/**
 	 * Stores the parent to this State. Null by default unless the path to this 
 	 * state is tracked.
@@ -516,8 +518,10 @@ public class State
 	// Varför har man outgoingArcSet istället för helt enkelt outgoingArcs??
 	public StateIterator nextStateIterator()
 	{
+		logger.warn("inne i nextStateIter, State.java");
 		StateSet nextStates = new StateSet();
-		ArcIterator arcIt = outgoingArcsIterator();
+	//	ArcIterator arcIt = outgoingArcsIterator();
+		ArcIterator arcIt = safeOutgoingArcsIterator();
 		
 		//for (Iterator arcSetIt = outgoingArcSetIterator(); arcSetIt.hasNext(); )
 		while (arcIt.hasNext())
