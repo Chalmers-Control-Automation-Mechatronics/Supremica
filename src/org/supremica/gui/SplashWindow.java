@@ -42,8 +42,9 @@ public class SplashWindow
                 throws Exception
         {
                 this.setSize(new Dimension(300, 170));
-                this.setLayout(new BorderLayout());
+                BorderLayout layout = new BorderLayout();
+                this.setLayout(layout);
                 ImageIcon imageIcon = new ImageIcon(Supremica.class.getResource("/splash_v1.gif"));
-                this.add(imageIcon.getImage(), BorderLayout.CENTER);
+                layout.add(imageIcon.getImage(), BorderLayout.CENTER);
         }
 }
