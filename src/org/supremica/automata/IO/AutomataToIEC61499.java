@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -263,6 +262,7 @@ public class AutomataToIEC61499
 		pw.println("\tINIT TO RESET := 1;");
 		pw.println("\tRESET TO COMP_ENABLED := 1;");
 		pw.println("\tCOMP_ENABLED TO START := 1;");
+		pw.println("\tTRANSITION TO COMP_ENABLED := 1;");
 		pw.println("END_TRANSITIONS");
 	
 	
