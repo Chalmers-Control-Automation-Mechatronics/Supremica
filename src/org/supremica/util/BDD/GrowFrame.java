@@ -15,13 +15,16 @@ public class GrowFrame
 	private Button bQuit, bDump, bReturn;
 	private Label status;
 	private TextArea ta;
+	private boolean showGraph;
 	private boolean stopped;
+
 
 	public GrowFrame(String txt)
 	{
 		super(txt);
 
-		vars = new IntArray();
+		this.showGraph = true;
+		this.vars = new IntArray();
 
 		Panel pNorth = new Panel(new FlowLayout(FlowLayout.LEFT));
 
@@ -149,10 +152,12 @@ public class GrowFrame
 		}
 		else if (src == bDump)
 		{
+			showGraph = false;
 			onDump();
 		}
 		else if (src == bReturn)
 		{
+			showGraph = true;
 			onReturn();
 		}
 	}
@@ -168,6 +173,8 @@ public class GrowFrame
 
 		public void paint(Graphics g)
 		{
+			if(!showGraph) return;
+
 			int min = vars.getMin();
 
 			if (min > 0)

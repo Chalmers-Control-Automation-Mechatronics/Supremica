@@ -66,6 +66,8 @@ import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.util.ActionTimer;
 import org.supremica.automata.algorithms.standard.Determinizer;
 
+import org.supremica.util.BDD.*;
+
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
  *
@@ -124,6 +126,8 @@ public class AutomataVerifier
 	public AutomataVerifier(Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 		throws IllegalArgumentException, Exception
 	{
+		System.out.println("DEBUG.......... " + theAutomata.size() ); // ARASH: DEBUG
+
 		Automaton currAutomaton;
 		State currInitialState;
 
@@ -435,7 +439,7 @@ public class AutomataVerifier
 								if (selectedAutomata.size() > 1)
 								{
 									// Check module
-									allModulesControllable = allModulesControllable && 
+									allModulesControllable = allModulesControllable &&
 										moduleIsControllable(selectedAutomata);
 
 									// Stop if uncontrollable
@@ -469,7 +473,7 @@ public class AutomataVerifier
 					if (selectedAutomata.size() > 1)
 					{
 						// Check module
-						allModulesControllable = allModulesControllable && 
+						allModulesControllable = allModulesControllable &&
 							moduleIsControllable(selectedAutomata);
 
 						// Stop if uncontrollable
@@ -591,8 +595,8 @@ public class AutomataVerifier
 		if (failure)
 		{
 			logger.error("Supremica's modular verification algorithm can't solve this\n" +
-						 "problem. Try the monolithic algorithm instead. There are " + 
-						 potentiallyUncontrollableStates.size() + "\n" + 
+						 "problem. Try the monolithic algorithm instead. There are " +
+						 potentiallyUncontrollableStates.size() + "\n" +
 						 "states that perhaps makes this system uncontrollable.");
 		}
 
@@ -671,8 +675,8 @@ public class AutomataVerifier
 
 			if (verboseMode)
 			{
-				logger.error(automataNames + "has " + 
-							 potentiallyUncontrollableStates.size(automataIndices) + 
+				logger.error(automataNames + "has " +
+							 potentiallyUncontrollableStates.size(automataIndices) +
 							 " states that might be uncontrollable...");
 			}
 
@@ -695,9 +699,10 @@ public class AutomataVerifier
 				logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 			}
 
-			// Make nbrOfAttempts attempts on prooving controllability and 
+			// Make nbrOfAttempts attempts on prooving controllability and
 			// uncontrollability alternatingly and then give up
 			int nbrOfAttempts = 5;
+
 			stateAmount = 1;
 			for (attempt = 1; attempt <= nbrOfAttempts; attempt++)
 			{
@@ -716,13 +721,13 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							logger.info("All similar automata are already added, " + 
+							logger.info("All similar automata are already added, " +
 										"trying to add some more...");
 						}
 
-						System.arraycopy(similarAutomata, 0, newSimilarAutomata, 
+						System.arraycopy(similarAutomata, 0, newSimilarAutomata,
 										 0, similarAutomata.length);
-						System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata, 
+						System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata,
 										 similarAutomata.length, moreSimilarAutomata.length);
 
 						similarAutomata = newSimilarAutomata;
@@ -731,7 +736,7 @@ public class AutomataVerifier
 					{
 						if (verboseMode)
 						{
-							logger.info("All similar automata are already added, " + 
+							logger.info("All similar automata are already added, " +
 										"no chance for controllability.");
 
 							// Print the uncontrollable state(s)...
@@ -764,7 +769,7 @@ public class AutomataVerifier
 						{
 							logger.info("Couldn't prove controllability, trying to prove uncontrollability...");
 						}
-						
+
 						// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
 						if (findUncontrollableStates(automataIndices))
 						{
@@ -931,8 +936,8 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Compares two alphabets for determining how similar they are in some sense. 
-	 * All events in rightAlphabet are examined if they are unique to rightAlphabet 
+	 * Compares two alphabets for determining how similar they are in some sense.
+	 * All events in rightAlphabet are examined if they are unique to rightAlphabet
 	 * or appear in leftAlphabet too.
 	 *
 	 *@param  leftAlphabet the alphabet to compare.
@@ -1119,10 +1124,10 @@ public class AutomataVerifier
 					}
 					logger.info(message + "left after adding" + addedAutomata + ", this subsystem is controllable.");
 				}
-				
+
 				if (statesLeft == 0)
 					return;
-				
+
 				if (stateAmount > stateAmountLimit)
 				{
 
@@ -1249,12 +1254,24 @@ public class AutomataVerifier
     private boolean BDDLanguageInclusionVerification()
 	throws Exception
     {
+
+		boolean ret  = false;
+
 		Automata unselected = ActionMan.getGui().getUnselectedAutomata();
-		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, unselected, synchHelper.getHelperData() );
-		boolean ret = abf.passLanguageInclusion();
-		
-		abf.cleanup();
-		return ret;		
+		Automata selected = new Automata(theAutomata, true); /* <-- MUST BE SHALLOW COPY ... */
+		selected.removeAutomata(unselected); /* .. OR THIS REMOVE WONT WORK !!! */
+
+
+		if(Options.bdd_modular) {
+			ModularBDDLanguageInclusion mli = new ModularBDDLanguageInclusion(selected, unselected, synchHelper.getHelperData(), false);
+			ret = mli.passLanguageInclusion();
+			mli.cleanup();
+		} else {
+			AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected, synchHelper.getHelperData() );
+			ret = abf.passLanguageInclusion();
+			abf.cleanup();
+		}
+		return ret;
     }
 
 	/**
@@ -1266,6 +1283,7 @@ public class AutomataVerifier
     private boolean BDDControllabilityVerification()
 		throws Exception
     {
+
     	// timer.start();
 		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
 		boolean ret = abf.isControllable();
@@ -1453,7 +1471,7 @@ public class AutomataVerifier
 				Automaton restrictAutomaton = new Automaton((Automaton) restrictIt.next());
 				if (targetAutomaton.equalAutomaton(restrictAutomaton))
 					continue;
-				
+
 				Determinizer determinizer = new Determinizer(restrictAutomaton, targetAlphabet, false);
 				determinizer.execute();
 				newAutomaton = determinizer.getNewAutomaton();
@@ -1464,8 +1482,8 @@ public class AutomataVerifier
 			Automaton synchAutomaton = AutomataSynchronizer.synchronizeAutomata(restrictedAutomata);
 			synchAutomaton.setName(targetAutomaton.getName() + "_BLOB");
 			newAutomata.addAutomaton(synchAutomaton);
-		}		
-		
+		}
+
 		ActionMan.getGui().addAutomata(newAutomata);
 		//ActionMan.getGui().addAutomata(restrictedAutomata);
 
@@ -1942,15 +1960,15 @@ public class AutomataVerifier
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
 
-		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, 
+		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions,
 														 verificationOptions);
 		return verifier.verify();
 	}
 
 	/**
-	 * Standard method for performing languageInclusion verification on automataA 
+	 * Standard method for performing languageInclusion verification on automataA
 	 * and automataB.
-	 * 
+	 *
 	 * @param automataA the automata that should be included.
 	 * @param automataB the automata that should include
 	 * @return true if automataA is included in "L^-1(automataB)".
@@ -1968,7 +1986,7 @@ public class AutomataVerifier
 		theAutomata.addAutomata(automataB);
 		//theAutomata.setIndicies();
 
-		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions, 
+		AutomataVerifier verifier = new AutomataVerifier(theAutomata, synchronizationOptions,
 														 verificationOptions);
 		verifier.prepareForLanguageInclusion(automataA);
 		return verifier.verify();

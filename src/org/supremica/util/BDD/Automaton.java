@@ -40,6 +40,8 @@ public class Automaton
 	private ArcSet arcSet = new ArcSet();
 	private EventManager alphabet;
 	private int [][] eventFlowMatrix = null;
+	private boolean [] care_set, care_set_uc; // Events that we have in our alphabeth, and are uncontrollaböe
+	private int [] event_usage; // how many times each event was used
 
 
 	public Automaton(String name, EventManager alphabet)
@@ -119,8 +121,6 @@ public class Automaton
 	{
 
 
-
-
 		// TODO: this function seems to be extremly inefficient, more linear searchs??
 		closed = true;
 
@@ -136,13 +136,14 @@ public class Automaton
 
 	    // find my local events
 	    if(Options.local_saturation) {
-		Vector v = alphabet.getLocalEvents(this);
-		saturate(v);
+			Vector v = alphabet.getLocalEvents(this);
+			saturate(v);
 	    }
 
-	    arcSet.close(stateSet, eventSet);
-	    stateSet.close();
 
+
+	    arcSet.close(stateSet, eventSet, alphabet.getSize());
+	    stateSet.close();
 
 		// EventManager.close() has been called and we can proceed
 		eventSet.close(alphabet);
@@ -150,12 +151,69 @@ public class Automaton
 		// System.out.println("closing " + name);
 		// arcSet.close(stateSet, eventSet);
 		// System.out.println("done!");
+
+		care_set = eventSet.getEventCareSet(false);
+		care_set_uc = eventSet.getEventCareSet(true);
+
+		event_usage = arcSet.getEventUsageCount();
+
 	}
 
 	// ------------------------------------------------------------
-    public boolean interact(Automaton a) {
-	return eventSet.overlap(a.eventSet);
+
+	/** maps event -> number of times that event was used in a transition */
+	public int [] getEventUsageCount() {
+		return arcSet.getEventUsageCount();
+	}
+
+    public boolean interact(Automaton a)
+    {
+		// return eventSet.overlap(a.eventSet);
+
+		int es = care_set.length;
+		for(int i = 0; i < es; i++)
+			if(a.care_set[i] && care_set[i])
+				return true;
+		return false;
     }
+
+	public boolean interact(Automaton a, boolean [] cares)
+	{
+		// return eventSet.overlap(a.eventSet, careSet);
+
+		int es = care_set.length;
+		for(int i = 0; i < es; i++)
+			if(cares[i] && a.care_set[i] && care_set[i])
+				return true;
+		return false;
+    }
+
+    public boolean interact(boolean [] cares)
+    {
+		// return eventSet.overlap(careSet);
+		int es = care_set.length;
+		for(int i = 0; i < es; i++)
+			if(cares[i] && care_set[i])
+				return true;
+		return false;
+    }
+
+    public void addEventCareSet(boolean [] events, boolean getEventCareSet)
+    {
+		// eventSet.addEventCareSet(events, uncontrollable_events_only);
+		boolean [] es = getEventCareSet(getEventCareSet);
+		int size= es.length;
+		for(int i = 0; i < size; i++)
+			events[i] |= es[i];
+	}
+
+	public boolean [] getEventCareSet(boolean uncontrollable_events_only)
+	{
+		// return eventSet.getEventCareSet(uncontrollable_events_only);
+		return uncontrollable_events_only ? care_set : care_set_uc ;
+	}
+
+
 	public String getName()
 	{
 		return name;

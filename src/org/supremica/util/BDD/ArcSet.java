@@ -7,6 +7,7 @@ public class ArcSet
 	extends Vector
 {
 	private int count = 0;
+	private int [] event_count  = null; // maps each event to number of times it was used
 	private boolean closed = false;
 
 	// ------------------------------------------------ stuffs used BEFORE closing!
@@ -139,12 +140,15 @@ public class ArcSet
 		a.o_from.next.addElement(a.o_to); // State -- (ARC) --> State
 	}
 
-	public void close(StateSet ss, EventSet es)
+	public void close(StateSet ss, EventSet es, int total_events)
 	    throws BDDException
 	{
 		BDDAssert.internalCheck(!closed, "[ArcSet.close] BAD FUNCTION CALL!");
 
 		arcs = new Arc[count];
+
+		event_count = new int[total_events];
+		for(int i = 0; i < total_events; i++) event_count[i] = 0;
 
 		for (Enumeration e = elements(); e.hasMoreElements(); )
 		{
@@ -161,6 +165,9 @@ public class ArcSet
 			// mark that this event has been used one time in a transition
 			event.use++;
 
+			// and mark it localy too
+			event_count[ev.id]++;
+
 		}
 
 
@@ -174,6 +181,10 @@ public class ArcSet
 
 
 		closed = true;
+	}
+
+	public int [] getEventUsageCount() {
+		return event_count;
 	}
 
 	public void dump(PrintStream ps)

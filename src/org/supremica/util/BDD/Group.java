@@ -9,20 +9,25 @@ public class Group
 	private String name;
 	private int bdd_i, bdd_cube, bdd_cubep, bdd_sigma, bdd_sigma_u, bdd_t, bdd_m, bdd_tu;
 	private boolean has_t, has_tu, has_m;
+	/* if this flags is set, the Supervisor derivats should not attempt to cleanup this group after they are done,
+	 * since it is probably owned by an incremental algorithm that will _reuse_ this group in the next run and
+	 * hopefully :) clean it up when the algorithm terminates ...*/
+	private boolean cleanup_flag = true;
 
 
     public Group(BDDAutomata manager, BDDAutomaton [] automata, String name)
     {
-	this(manager, automata, null, name);
-
+		this(manager, automata, null, name);
     }
     public Group(BDDAutomata manager, BDDAutomaton [] automata, GroupMembership member, String name)
     {
-	this(manager, automata.length, name);
-	init();
-	for(int i = 0; i < automata.length; i++)
-	    if(member == null || member.shouldInclude(automata[i]))
-		add(automata[i]);
+		this(manager, automata.length, name);
+		init();
+		for(int i = 0; i < automata.length; i++)
+		    if(member == null || member.shouldInclude(automata[i]))
+		    {
+				add(automata[i]);
+			}
     }
 
 	public Group(BDDAutomata manager, int max_capacity, String name)
@@ -32,12 +37,29 @@ public class Group
 		capacity = max_capacity;
 		size = 0;
 		members = new BDDAutomaton[capacity];
+		init();
+
+	}
+
+
+
+	/* ------------------------------------------------------------------ */
+	/** empty the group and start from the beginning */
+	public void empty() {
+		cleanup();
+		init();
+		size = 0;
+	}
+
+    private void init() {
+
+    	// no pre-calculations are valid
+		has_t = false;
+		has_tu = false;
+		has_m = false;
 
 		bdd_i = manager.getOne();
 		manager.ref(bdd_i);
-
-		bdd_m = manager.getOne();
-		manager.ref(bdd_m);
 
 		bdd_cube = manager.getOne();
 		manager.ref(bdd_cube);
@@ -51,19 +73,13 @@ public class Group
 		bdd_sigma = manager.getZero();
 		manager.ref(bdd_sigma);
 
-		init();
 
-	}
-
-
-    private void init() {
-    	// no pre-calculations are valid
-		has_t = false;
-		has_tu = false;
-		has_m = false;
     }
 
-	// Note: strange things will happen if you try to use this object _after_ calling cleanup :)
+	/**
+	 * standard cleanup code
+	 * Note: strange things will happen if you try to use this object _after_ calling cleanup :)
+   	 */
 	public void cleanup()
 	{
 		reset();
@@ -73,23 +89,6 @@ public class Group
 		manager.deref(bdd_cubep);
 		manager.deref(bdd_sigma_u);
 		manager.deref(bdd_sigma);
-	}
-
-	public void add(BDDAutomaton a)
-	{
-		BDDAssert.internalCheck(size < capacity, "[Group.add] Group size exceeded");
-
-		members[size] = a;
-
-		size++;
-
-		bdd_i = manager.andTo(bdd_i, a.getI());
-		bdd_cube = manager.andTo(bdd_cube, a.getCube());
-		bdd_cubep = manager.andTo(bdd_cubep, a.getCubep());
-		bdd_sigma   = manager.orTo(bdd_sigma, a.getSigma());
-		bdd_sigma_u = manager.orTo(bdd_sigma_u, a.getSigmaU());
-
-		reset();
 	}
 
 	private void reset()
@@ -115,6 +114,26 @@ public class Group
 		}
 	}
 
+	/** ---------------------------------------------------------------- */
+
+	public void add(BDDAutomaton a)
+	{
+		BDDAssert.internalCheck(size < capacity, "[Group.add] Group size exceeded");
+
+		members[size] = a;
+
+		size++;
+
+		bdd_i = manager.andTo(bdd_i, a.getI());
+		bdd_cube = manager.andTo(bdd_cube, a.getCube());
+		bdd_cubep = manager.andTo(bdd_cubep, a.getCubep());
+		bdd_sigma   = manager.orTo(bdd_sigma, a.getSigma());
+		bdd_sigma_u = manager.orTo(bdd_sigma_u, a.getSigmaU());
+
+		reset();
+	}
+
+	/** ---------------------------------------------------------------- */
     public boolean isEmpty()
     {
 		return size == 0;
@@ -159,6 +178,20 @@ public class Group
 	public int getCubep()
 	{
 		return bdd_cubep;
+	}
+
+
+	/** careSet[i] is true if the Event is used by any automata in this group */
+	public boolean [] getEventCareSet(boolean uncontrollable_events_only)
+	{
+		int es = manager.getEvents().length;
+		boolean [] ret = new boolean [es] ;
+		for(int i = 0; i < es; i++) ret[i] = false;
+
+		for (int i = 0; i < size; i++)
+			members[i].addEventCareSet(ret, uncontrollable_events_only);
+
+		return ret;
 	}
 
     // --------------------------------------------------------------------------
@@ -206,6 +239,16 @@ public class Group
 	}
 
 	// ---------------------------------------------------------------------
+	/** to signal Supervisor etc if it should cleanup the Group when it terminates */
+	public void setCleanup(boolean cu) { cleanup_flag  = cu; }
+
+	/** to signal Supervisor etc if it should cleanup the Group when it terminates */
+	public boolean getCleanup() { return cleanup_flag ; }
+
+
+	// ---------------------------------------------------------------------
+
+
 	public int getT()
 	{
 		if (has_t)
@@ -257,6 +300,8 @@ public class Group
 
 		has_t = true;
 	}
+
+	// --------------------------------------------------------------------------------
 
 	public int forward_reachables()
 	{
@@ -369,5 +414,20 @@ public class Group
 
 			manager.deref(tmp);
 		}
+	}
+
+	// ---------------------------------------------------------------------------
+
+
+	public String toString()
+	{
+		StringBuffer sb = new StringBuffer();
+		sb.append("{ ");
+		for (int i = 0; i < size; i++) {
+			if(i != 0) sb.append(", ");
+			sb.append( members[i].getName() );
+		}
+		sb.append("}");
+		return sb.toString();
 	}
 }

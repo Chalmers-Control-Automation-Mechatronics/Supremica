@@ -673,7 +673,7 @@ class BDDPanel
 {
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
-    private JCheckBox localSaturation, encodingFill;
+    private JCheckBox localSaturation, encodingFill, bddModular;
     private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm;
 
     public BDDPanel(PreferencesDialog theDialog)
@@ -691,10 +691,12 @@ class BDDPanel
 	pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
 	pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
+
 	// pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
 	// pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
 
 	pWest.add( encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars) );
+	pWest.add( bddModular = new JCheckBox("Modular language inclusion/controllability", Options.bdd_modular) );
 
 
 	Box p = new Box(BoxLayout.Y_AXIS);
@@ -704,7 +706,7 @@ class BDDPanel
 	JPanel pOrdering = new JPanel();
 	p.add(pOrdering);
 
-	pOrdering.add( new JLabel("Automata (not BDD) ordering"));
+	pOrdering.add( new JLabel("Automaton (not BDD) ordering"));
 	pOrdering.add( orderingAlgorithm = new JComboBox());
 
 	orderingAlgorithm.addItem("PCG search");
@@ -758,6 +760,7 @@ class BDDPanel
 	Options.debug_on         = debugOn.isSelected();
 	Options.local_saturation = localSaturation.isSelected();
 	Options.fill_statevars   = encodingFill.isSelected();
+	Options.bdd_modular      = bddModular.isSelected();
 
 	SupremicaProperties.updateBDDOptions(true);
 	return true;

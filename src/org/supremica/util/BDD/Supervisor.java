@@ -90,8 +90,8 @@ public class Supervisor
 			manager.deref(bdd_coreachables);
 		}
 
-		plant.cleanup();
-		spec.cleanup();
+		if(plant.getCleanup())	plant.cleanup();
+		if(spec.getCleanup())	spec.cleanup();
 	}
 
 	// ------------------------------------------------------------------------------

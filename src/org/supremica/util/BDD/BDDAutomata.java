@@ -177,8 +177,10 @@ public class BDDAutomata
 		size_all = 2 * size_states + size_events;
 	}
 
-    public BDDAutomaton [] getAutomataVector() {
-	return automata;
+
+    public BDDAutomaton [] getAutomataVector()
+    {
+		return automata;
     }
 	public int getSize()
 	{
@@ -777,6 +779,8 @@ public class BDDAutomata
 		 *   else       BDDAssert.warning("Automata " + automata[i].getName() + " has no states!");
 		 * }
 		 */
+
+		 // Note to myself: who the f**k is Theo??? can t remember why i wrote this...
 		double theo_states = Math.pow(2, size_states);
 		double efficiency = (100 * states) / theo_states;
 

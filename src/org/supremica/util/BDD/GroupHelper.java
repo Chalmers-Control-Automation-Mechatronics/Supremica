@@ -1,4 +1,7 @@
 
+// TODO: this code IS SLOW, we need a prioroty queue!
+//       we also need to remember from which group each automaton was taken!
+
 package org.supremica.util.BDD;
 
 import java.util.*;

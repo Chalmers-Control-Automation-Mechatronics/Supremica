@@ -369,10 +369,41 @@ public class BDDAutomaton
     public boolean interact(BDDAutomaton ba) {
 		return automaton.interact(ba.automaton);
     }
+
+    public boolean interact(BDDAutomaton ba, boolean [] careSet) {
+		return automaton.interact(ba.automaton, careSet);
+    }
+
+    public boolean interact(boolean [] careSet) {
+		return automaton.interact(careSet);
+    }
+
+	/**
+	 * maps event -> number of times that event was used in a transition
+	 * good for heuristics...
+     */
+	public int [] getEventUsageCount() {
+		return automaton.getEventUsageCount();
+	}
+
+	public void addEventCareSet(boolean [] events, boolean uncontrollable_events_only)
+	{
+		automaton.addEventCareSet(events, uncontrollable_events_only);
+	}
+
+	public boolean [] getEventCareSet(boolean uncontrollable_events_only)
+	{
+		return automaton.getEventCareSet(uncontrollable_events_only);
+	}
+
     public boolean [] getEventFlow(boolean forward) {
 		return automaton.getEventFlow(forward);
 	}
+
+
 	// ------------------------------------------------------------------
+
+
 	private void createI()
 	{
 		bdd_i = manager.getOne();

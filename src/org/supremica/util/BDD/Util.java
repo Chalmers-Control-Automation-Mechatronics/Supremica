@@ -9,10 +9,34 @@ public class Util
 
 	static
 	{
+		// I have no idea why i wrote this part....
 		Runtime rt = Runtime.getRuntime();
-
 		free_memory = (int) (rt.freeMemory() / (1024 * 1024));
 	}
+
+
+	// -------------------------------------------------
+
+	/** duplicates a vector of booleans */
+	public static boolean [] duplicate(boolean [] x) {
+		int len = x.length;
+		boolean [] ret = new boolean[len];
+		System.arraycopy(x, 0,  ret, 0, len);
+		return ret;
+	}
+
+
+	/** duplicates a vector of integers.
+	 * MY KINGDOM FOR JAVA-TEMPLATES.... James Gosling, please :)
+	 */
+	public static int [] duplicate(int [] x) {
+		int len = x.length;
+		int [] ret = new int[len];
+		System.arraycopy(x, 0,  ret, 0, len);
+		return ret;
+	}
+
+	// -------------------------------------------------
 
 	public static int suggest_nodecount(Automata a)
 	{
@@ -29,6 +53,8 @@ public class Util
 		return nodes;
 	}
 
+	// -------------------------------------------------
+	/** this is an extremely sophisticated math algorithm, do not try to understand it, you cant */
 	public static int log2ceil(int num)
 	{
 		if (num <= 1)
@@ -50,6 +76,10 @@ public class Util
 		return 0;    // damn compiler :)
 	}
 
+	/**
+	 * create a BDD for a number, using the default encoding.
+	 *
+	 */
 	public static int getNumber(BDDAutomata manager, int[] vars, int number)
 	{
 		int ret = manager.getOne();
@@ -91,7 +121,7 @@ public class Util
 
 
 
-
+	// --[BDD tree quicksort] ------------------------------------------------------------------
 
 	/** helper function to sort_variable_list (quicksort partition) */
 	private static int partition_bdd(JBDD manager, int [] list, int p, int r) {
@@ -139,7 +169,8 @@ public class Util
 	}
 
 
-	/* reverse some list */
+	// ------------------------------------------------------------------------------
+	/** reverse some list */
 	public static void reverse(Object [] variables, int size) {
 		for(int j = 0; j < size / 2; j++) {
 			int i = size - j -1;
@@ -149,7 +180,7 @@ public class Util
 		}
 	}
 
-	/** reverse some array */
+	/** reverse some int-array */
 	public static void reverse(int [] variables, int size) {
 		for(int j = 0; j < size / 2; j++) {
 			int i = size - j -1;
@@ -160,9 +191,11 @@ public class Util
 	}
 
 
+	// ------------------------------------------------------------------------------
+
 	/**
-     * write to stderr and wait until user presses ENTER
-     *
+     * write to stderr and wait until user presses ENTER.
+     * good to make user see why we are going to die before we die...
      */
 	public static void notify(String msg) {
 		System.err.println(msg);
@@ -171,6 +204,9 @@ public class Util
 			while( System.in.read() != '\n') ;
 		} catch(Exception exxx) { }
 	}
+
+
+	// ------------------------------------------------------------------------------
 
     /**
      * append_to := append_to + append_from<br>
@@ -183,6 +219,7 @@ public class Util
 			append_to.addElement( e.nextElement() );
 	}
 
+	// ------------------------------------------------------------------------------
 
     /**
      * Actually SHOW the BDD as an EPS file<br>

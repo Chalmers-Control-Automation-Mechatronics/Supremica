@@ -149,6 +149,16 @@ public class Automata
 		notifyListeners(AutomataListeners.MODE_AUTOMATON_REMOVED, aut);
 	}
 
+	public void removeAutomata(Automata theAutomata)
+	{
+		for (Iterator automataIterator = theAutomata.iterator(); automataIterator.hasNext(); )
+		{
+			Automaton a = (Automaton)automataIterator.next();
+			removeAutomaton((Automaton) a);
+		}
+
+	}
+
 	public void removeAutomaton(String name)
 	{
 		Automaton currAutomaton = getAutomaton(name);
