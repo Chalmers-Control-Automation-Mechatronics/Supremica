@@ -978,9 +978,9 @@ class Builder
 
 	public void run()
 	{
-		theViewer.setCursor(java.awt.Cursor.WAIT_CURSOR);
 		if (mode == BUILD)
 		{
+			theViewer.setCursor(java.awt.Cursor.WAIT_CURSOR);
 			try
 			{
 				theViewer.internalBuild();
@@ -1000,9 +1000,10 @@ class Builder
 		}
 		else if (mode == DRAW)
 		{
+			// theViewer.setCursor(java.awt.Cursor.WAIT_CURSOR);
 			theViewer.draw();
+			theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
 		}
-		theViewer.setCursor(java.awt.Cursor.DEFAULT_CURSOR);
 	}
 
 	public void stopProcess()

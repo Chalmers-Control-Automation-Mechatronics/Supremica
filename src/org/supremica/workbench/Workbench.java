@@ -719,16 +719,15 @@ public class Workbench
 					AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
 					if (viewer.isVisible() == false)
 					{
-						viewer.show();
+						viewer.setVisible(true);
 					}
-					viewer.update();
 				}
 				else
 				{
 					if(project.showAutomatonViewer(automaton))
 					{
 						AutomatonViewer viewer = project.createAutomatonViewer(automaton, new MyAutomatonViewerFactory());
-						viewer.show();
+						viewer.setVisible(true);
 					}
 				}
 			}
@@ -748,7 +747,7 @@ public class Workbench
 				AutomatonViewer viewer = project.returnAutomatonViewer(automaton);
 				if (viewer.isVisible())
 				{
-					viewer.hide();
+					viewer.setVisible(false);
 				}
 			}
 		}
