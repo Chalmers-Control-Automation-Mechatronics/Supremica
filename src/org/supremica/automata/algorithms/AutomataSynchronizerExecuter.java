@@ -356,19 +356,18 @@ public final class AutomataSynchronizerExecuter
 
 				if (syncType == SynchronizationType.Prioritized)
 				{
+					// If the event is prioritized in this automaton (and hence is in the alphabet)
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])
 					{
-
-						// The event is prioritized in currAutomaton
-						if (!(currEventIndex == currAutEventIndex))
+						// but it is not the event we're looking for, then...
+						if (currEventIndex != currAutEventIndex)
 						{
-							thisEventOk = false;
+							//... this event should not be executed
+							thisEventOk = false; 
 
+							// For controllability we need to know whether the event was disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
 							{
-
-								// Then currIndex (the event) must also be the
-								// current event in this automaton
 								thisPlantEventOk = false;
 							}
 						}
@@ -376,19 +375,18 @@ public final class AutomataSynchronizerExecuter
 				}
 				else if (syncType == SynchronizationType.Full)
 				{
+					// If the event is in the alphabet (and hence is considered prioritized)
 					if (alphabetEventsTable[currAutIndex][currEventIndex])
 					{
-						// The event is prioritized in currAutomaton
-						if (!(currEventIndex == currAutEventIndex))
+						// but it is not the event we're looking for, then...
+						if (currEventIndex != currAutEventIndex)
 						{
-
+							//... this event should not be executed
 							thisEventOk = false;
 
+							// For controllability we need to know whether the event was disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
 							{
-
-								// Then currIndex (the event) must also be the
-								// current event in this automaton
 								thisPlantEventOk = false;
 							}
 						}

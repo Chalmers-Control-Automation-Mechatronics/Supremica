@@ -78,7 +78,8 @@ class AutomataSelector
 	private Automata partialSet = new Automata();
 	private Iterator specIterator;
 	private HashMap eventToAutomataMap = new HashMap();
-
+	private boolean seenSpec = false; // keep track of wether no spec exists, may need to do some job anyway
+	
 	public AutomataSelector(Automata globalSet, boolean closedSet)
 	{
 		this.globalSet = globalSet;
@@ -100,6 +101,8 @@ class AutomataSelector
 
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			{
+				seenSpec = true; // yes, we've found a spec/sup
+				
 				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				partialSet.addAutomaton(currSupervisorAutomaton);
 				logger.debug("AutomataSelector::Added spec/sup " + currSupervisorAutomaton.getName());
@@ -144,6 +147,11 @@ class AutomataSelector
 		return partialSet; // empty, only when we're done. For a spec with no matching plants, this spec will be included
 	}
 
+	// Return wether we've seen a spec/sup or not
+	boolean hadSpec()
+	{
+		return seenSpec;
+	}
 }
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -312,6 +320,16 @@ public class AutomataSynthesizer
 					}
 				}
 			}
+			// If no spec/sup is in the selected automata, only nonblocking requires work
+			if(selector.hadSpec() == false) // if we've not seen any spec, do monolithic synthesis on the entire set
+			{
+				logger.debug("No spec/sup seen, doing monolithic synthesis on the entire set");
+				MonolithicReturnValue retval = doMonolithic(theAutomata);
+				if(retval.didSomething)
+				{
+					modSupervisors.addAutomaton(retval.automaton);
+				}
+			}
 			if(synthesizerOptions.getOptimize())
 			{
 				optimize(theAutomata, modSupervisors);
@@ -337,6 +355,8 @@ public class AutomataSynthesizer
 	private MonolithicReturnValue doMonolithic(Automata automata)
 		throws Exception // simply throws everything upwards
 	{
+		logger.debug("AutomataSynthesizer::doMonolithic");
+		
 		MonolithicReturnValue retval = new MonolithicReturnValue();
 		retval.didSomething = false;
 
@@ -579,6 +599,7 @@ public class AutomataSynthesizer
 	 */
 	private void optimize(Automata theAutomata, Automata newAutomata)
 	{
+		logger.debug("AutomataSynthesizer.optimize");
 		Automata tempAutomata = new Automata(newAutomata); // deep copy, so we can purge without affecting the originals
 		SynchronizationOptions syncOptions;
 
