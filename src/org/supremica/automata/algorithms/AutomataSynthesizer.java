@@ -455,13 +455,16 @@ public class AutomataSynthesizer
 		// Did we do anything at all?
 		if (modSupervisors.size() == 0)
 		{
-			logger.info("No problems found, the current specifications and supervisors " + "can be used to supervise the system.");
+			logger.info("No problems found, the current specifications and supervisors " + 
+						"can be used to supervise the system.");
 		}
 
 		// Nonblocking synthesis is not implemented...
 		if ((synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking) || (synthesizerOptions.getSynthesisType() == SynthesisType.Both))
 		{
-			logger.info("NOTE! Currently global nonblocking is NOT guaranteed. The only guarantee " + "is that each supervisor is individually nonblocking with respect to the " + "plants it controls");
+			logger.warn("Currently global nonblocking is NOT guaranteed. The only guarantee " + 
+						"is that each supervisor is individually nonblocking with respect to the " + 
+						"plants it controls");
 		}
 
 		// Return the new supervisors

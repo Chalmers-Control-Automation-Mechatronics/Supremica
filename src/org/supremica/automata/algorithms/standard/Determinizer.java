@@ -34,7 +34,9 @@ public class Determinizer
 	// Debug stuff
 	private int tabs = 0;    // keeps track on num tabs to insert, for formatting output
 
-	// For this automaton, determinize with respect to the events marked as isEpsilon()
+	/**
+	 * For this automaton, determinize with respect to the events marked as isEpsilon()
+	 */
 	public Determinizer(Automaton automaton)
 	{
 		this.automaton = automaton;
@@ -42,16 +44,22 @@ public class Determinizer
 		this.newAutomaton = createNewAutomaton();
 	}
 
-	// For this automaton, determinize with respect to the given events
-	// If contains == true, the events are considered to be epsilons
-	// If contains == false, the events are considered as non-epsilons (and all other epsilons)
+	/**
+	 * For this automaton, determinize with respect to the given events
+	 * If contains == true, the events are considered to be epsilons
+	 * If contains == false, the events are considered as non-epsilons (and all other epsilons)
+	 */
 	public Determinizer(Automaton automaton, Alphabet events, boolean contains)
 	{
 		this.automaton = automaton;
 		this.epsilonTester = new AlphaEpsilonTester(events, contains);
 		this.newAutomaton = createNewAutomaton();
 	}
-
+	
+	/**
+	 * Determinize using a supplied epsilonTester for deciding which (and when...) events are 
+	 * considered to be epsilons. 
+	 */
 	public Determinizer(Automaton automaton, EpsilonTester epsilonTester)
 	{
 		this.automaton = automaton;
@@ -99,35 +107,39 @@ public class Determinizer
 
 		let Qinit = epsilonClosure(initialState)
 		put Qinit on openStates
-
+		
 		while openStates is not empty
 		{
-				get Q1 from openStates
+			get Q1 from openStates
 
-				for all non-epsilon events e
+			for all non-epsilon events e
+			{
+			    let Q2 = eventClosure(Q1, e) [the state set Q2 reached from Q1 via e, one-step]
+				let Q2c = epsilonClosure(Q2)
+				if(Q2c != empty)
 				{
-						let Q2 = eventClosure(Q1, e) [the state set Q2 reached from Q1 via e, one-step]
-						let Q2c = epsilonClosure(Q2)
-						if(Q2c != empty)
-						{
-								add Q2c to openStates
-								add arc <Q1, e, Q2c>
-						}
+					add Q2c to openStates
+					add arc <Q1, e, Q2c>
 				}
+			}
 
-				put Q1 on closedStates
+			put Q1 on closedStates
 		}
 
 		and that's how it goes */
-		StateSet initset = epsilonClosure(automaton.getInitialState());    // This should be the one and only initial state!
+		
+		// This should be the one and only initial state!
+		StateSet initset = epsilonClosure(automaton.getInitialState());    
 
-		add(initset);    // put it on openStateSets (if not already seen)
+		// put it on openStateSets (if not already seen)
+		add(initset);  
 
+		// Create initial state
 		State init = initset.createNewState();
-
 		newAutomaton.addState(init);
 		newAutomaton.setInitialState(init);
 
+		// Loop as long as there are states in openStateSets
 		while (!openStateSets.isEmpty())
 		{
 			StateSet Q1 = openStateSets.get();    // This is vanNoords T

@@ -75,8 +75,13 @@ public class AutomatonMinimizer
 
 	/** The "original" automaton (possible saturated). */
 	private Automaton theAutomaton;
+
+	/** The supplied options. */
 	private MinimizationOptions options;
 
+	/**
+	 * Basic constructor.
+	 */
 	public AutomatonMinimizer(Automaton theAutomaton)
 	{
 		this.theAutomaton = theAutomaton;
@@ -89,14 +94,93 @@ public class AutomatonMinimizer
 		throws Exception
 	{
 		this.options = options;
-
-		// If we're about to modify theAutomaton, make a copy first!!
-		if (options.getMinimizationType() == EquivalenceRelation.ObservationEquivalence)
-		{
-			theAutomaton = new Automaton(theAutomaton);
-		}
 		
-		// Find the initial sets of states for the minimization
+		// We need a copy since we must make the system reachable (and maybe deterministic) first!
+		theAutomaton = new Automaton(theAutomaton);
+		
+		// Make reachable
+		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, SynthesizerOptions.getDefaultSynthesizerOptions());
+		synth.doReachable();
+		for (Iterator it = theAutomaton.safeStateIterator(); it.hasNext(); )
+		{
+			State state = (State) it.next();
+			
+			if (state.getCost() == State.MAX_COST)
+			{
+				theAutomaton.removeState(state);
+			}
+		}
+
+		// The current partitioning
+		EquivalenceClasses equivClasses = new EquivalenceClasses();
+
+		// Find out what to do
+		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
+		try
+		{
+			if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
+			{
+				// Is this automaton nondeterministic?
+				if (!theAutomaton.isDeterministic())
+				{
+					// Make deterministic			   
+					Determinizer determinizer = new Determinizer(theAutomaton);
+					determinizer.execute();
+					theAutomaton = determinizer.getNewAutomaton();
+				}
+
+				// Find initial partitioning
+				equivClasses = findInitialPartitioning(theAutomaton);
+
+				// Minimize
+				doLanguageEquivalenceMinimization(equivClasses);
+			}
+			else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
+			{
+				// We need a copy since we must do "saturation"
+				theAutomaton = new Automaton(theAutomaton);
+
+				// Make copy, we're going to modify things...
+				doTransitiveClosure(theAutomaton);
+
+				// Find initial partitioning
+				equivClasses = findInitialPartitioning(theAutomaton);
+
+				// Now... language equivalence minimization will yield the (considering states)
+				// minimal observation equivalent automaton
+				doLanguageEquivalenceMinimization(equivClasses);
+			}
+			else
+			{
+				throw new Exception("Unknown equivalence relation");
+			}
+		}
+		catch (Exception ex)
+		{
+			logger.debug(ex.getStackTrace());
+
+			throw ex;
+		}
+
+		Automaton newAutomaton = buildAutomaton(equivClasses);
+
+		// Should we remove redundant transitions to minimize also with respect to transitions?
+		if (options.getAlsoTransitions())
+		{
+			removeRedundantTransitions(newAutomaton);
+		}
+
+		// Return the result of the minimization!
+		return newAutomaton;
+	}
+
+	/**
+	 * Find the initial partitioning of this automaton, based on the marking and forbidden
+	 * states (marking can be ignored using the minimization option ignoreMarking.
+	 */	
+	private EquivalenceClasses findInitialPartitioning(Automaton theAutomaton)
+	{
+		// Find the initial partitioning for the minimization
 		EquivalenceClasses equivClasses = new EquivalenceClasses();
 		
 		// Divide the state space into three initial equivalence classes, based on markings
@@ -144,51 +228,12 @@ public class AutomatonMinimizer
 			equivClasses.add(forbiddenStates);
 		}
 
-		// Do the minimization, starting from these classes
-		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
-		try
-		{
-			if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
-			{
-				// Minimize
-				doLanguageEquivalenceMinimization(equivClasses);
-			}
-			else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
-			{
-				// Make copy, we're going to modify things...
-				doTransitiveClosure(theAutomaton);
-				equivClasses.update();
+		return equivClasses;
+    }
 
-				// Now... language equivalence minimization will yield the (considering states)
-				// minimal observation equivalent automaton
-				doLanguageEquivalenceMinimization(equivClasses);
-			}
-			else
-			{
-				throw new Exception("Unknown equivalence relation");
-			}
-		}
-		catch (Exception ex)
-		{
-			logger.debug(ex.getStackTrace());
-
-			throw ex;
-		}
-
-		Automaton newAutomaton = buildAutomaton(equivClasses);
-
-		// Should we remove redundant transitions to minimize also with respect to transitions?
-		if (options.getAlsoTransitions())
-		{
-			removeRedundantTransitions(newAutomaton);
-		}
-
-		// Return the result of the minimization!
-		return newAutomaton;
-	}
 
 	/**
-	 * Returns the minimized automaton
+	 * Returns the minimized automaton, based on the partitioning in equivClasses.
 	 */
 	private Automaton buildAutomaton(EquivalenceClasses equivClasses)
 		throws Exception

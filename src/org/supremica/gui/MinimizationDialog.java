@@ -130,16 +130,24 @@ class MinimizationDialogStandardPanel
 			//note.setText("Note:\n" + "This minimization algorithm is experimental!");
 			note.setVisible(false);
 		}
-		else if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
+
+		// Not else if!
+		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
 		{
 			note.setText("Note:\n" + "Returns an automaton representing the same language\n" + 
-						 "using a minimal number of states.\n" + 
-						 "  This is not guaranteed to hold for nondeterministic\n" + 
-						 "systems. Make sure the system is deterministic first.");
+						 "using a minimal number of states and transitions.\n" + 
+						 "  If the automaton is nondeterministic, it is first made\n." + 
+						 "deterministic.");
+			
+			// This implies that the number of transitions are minimized
+			alsoTransitions.setSelected(true);
+			alsoTransitions.setEnabled(false);
+
 			note.setVisible(true);
 		}
 		else    // Something else is selected
 		{
+			alsoTransitions.setEnabled(true);
 			note.setVisible(false);
 		}
 	}
