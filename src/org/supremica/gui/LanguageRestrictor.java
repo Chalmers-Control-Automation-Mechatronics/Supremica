@@ -292,6 +292,8 @@ class RestrictEventsViewerPanel
 class LanguageRestrictorDialog
 	extends JFrame
 {
+	private static Logger logger = LoggerFactory.createLogger(LanguageRestrictorDialog.class);
+
 	private Automata automata;
 	private boolean doit = false;
 	private EventsViewerPanel sourceEvents;
@@ -310,9 +312,7 @@ class LanguageRestrictorDialog
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					doit = true;
-					System.out.println(restrictEvents.getAlphabet().toString());
-
+					doRestrict();
 				}
 			});
 		}
@@ -382,17 +382,20 @@ class LanguageRestrictorDialog
 	{
 		TreePath[] paths = sourceEvents.getSelectionPaths();
 		
-		for(int i = 0; i < paths.length; ++i)
+		if(paths != null) // gotta have something selected
 		{
-			TreePath path = paths[i];
-			// The second element is the one we're interested in. Get its event object
-			SupremicaTreeNode node = (SupremicaTreeNode)path.getPathComponent(1);
-			LabeledEvent event = (LabeledEvent)node.getUserObject();
+			for(int i = 0; i < paths.length; ++i)
+			{
+				TreePath path = paths[i];
+				// The second element is the one we're interested in. Get its event object
+				SupremicaTreeNode node = (SupremicaTreeNode)path.getPathComponent(1);
+				LabeledEvent event = (LabeledEvent)node.getUserObject();
+				
+				restrictEvents.add(event);
+			}
 			
-			restrictEvents.add(event);
+			restrictEvents.rebuild();
 		}
-		
-		restrictEvents.rebuild();
 	}
 	
 	// Remove the selected events from restrictEvents to sourceEvents
@@ -400,17 +403,19 @@ class LanguageRestrictorDialog
 	{
 		TreePath[] paths = restrictEvents.getSelectionPaths();
 		
-		for(int i = 0; i < paths.length; ++i)
+		if(paths != null) // gotta have something selected
 		{
-			TreePath path = paths[i];
-			// The second element is the one we're interested in
-			SupremicaTreeNode node = (SupremicaTreeNode)path.getPathComponent(1);
-			LabeledEvent event = (LabeledEvent)node.getUserObject();
-			restrictEvents.remove(event);
-		}
-		
-		restrictEvents.rebuild();
-		
+			for(int i = 0; i < paths.length; ++i)
+			{
+				TreePath path = paths[i];
+				// The second element is the one we're interested in
+				SupremicaTreeNode node = (SupremicaTreeNode)path.getPathComponent(1);
+				LabeledEvent event = (LabeledEvent)node.getUserObject();
+				restrictEvents.remove(event);
+			}
+			
+			restrictEvents.rebuild();
+		}		
 	}
 	
 	// Retunr the the restrictEvents
@@ -483,6 +488,8 @@ class LanguageRestrictorDialog
 	
 	public LanguageRestrictorDialog(Automata automata)
 	{
+		super("Language Restrictor");
+		
 		this.automata = automata;
 		this.sourceEvents = new EventsViewerPanel(automata);
 		this.restrictEvents = new RestrictEventsViewerPanel();
@@ -512,6 +519,37 @@ class LanguageRestrictorDialog
 		pack();
 		show();
 	}
+	
+	private void doRestrict()
+	{
+		logger.debug("LanguageRestriction::doRestrict()");
+		// Get the restriction alphabet
+		Alphabet alpha = restrictEvents.getAlphabet();
+		Automata newautomata = new Automata();
+		
+		Iterator autit = automata.iterator();
+		while(autit.hasNext())
+		{
+			Automaton automaton = (Automaton)autit.next();
+			Determinizer detm = new Determinizer(automaton, alpha);
+			detm.execute();
+			Automaton newautomaton = detm.getNewAutomaton();
+			newautomaton.setComment(automaton.getName() + "\\" + alpha.toString());
+			newautomata.addAutomaton(newautomaton);
+		}
+		
+		try
+		{
+			ActionMan.gui.addAutomata(newautomata);
+			logger.debug("LanguageRestriction::doRestrict() -- ok");
+		}
+		catch(Exception excp)
+		{
+			logger.debug("LanguageRestriction::doRestrict() -- error");
+			excp.printStackTrace();
+		}
+	}
+
 }
 
 public class LanguageRestrictor
@@ -533,6 +571,5 @@ public class LanguageRestrictor
 		// Throw up the dialog, let the user select the alphabet
 
 		LanguageRestrictorDialog dlg = new LanguageRestrictorDialog(automata);
-		Alphabet alpha = dlg.getRestrictionAlphabet();
 	}
 }

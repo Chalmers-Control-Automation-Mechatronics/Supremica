@@ -164,12 +164,12 @@ public class Determinizer
 	private int tabs = 0; // keeps track on num tabs to insert, for formatting output
 	private void printTabs()
 	{
-		for(int i = 0; i < tabs; ++i)
-			System.out.print("\t");
+	//	for(int i = 0; i < tabs; ++i)
+	//		System.out.print("\t");
 	}
 	private void debugPrint(String str, boolean enter)
 	{
-		if(enter)
+	/*	if(enter)
 			++tabs;
 		
 		printTabs();	
@@ -177,6 +177,7 @@ public class Determinizer
 
 		if(!enter)
 			--tabs;
+	*/
 	}
 	// end debug stuff
 	
@@ -236,7 +237,7 @@ public class Determinizer
 			while(it.hasNext())
 			{
 				LabeledEvent e = (LabeledEvent)it.next();
-				if(!e.isEpsilon())
+				if(!epsilonTester.isThisEpsilon(e))
 				{
 					// From this set, via this event, calc the reached state
 					StateSet Q2 = eventClosure(Q1, e);	// this is vanNoords U
@@ -288,7 +289,7 @@ public class Determinizer
 		if(!openStateSets.contains(states) && !closedStateSets.contains(states))
 		{
 			// printTabs();
-			System.out.println("adding " + states.toString());
+			// System.out.println("adding " + states.toString());
 			openStateSets.add(states);
 			// never mind marking and forbidden for now
 		}
@@ -496,16 +497,16 @@ public class Determinizer
 		while(stateit.hasNext())
 		{
 			State state = (State)stateit.next();
-			System.out.print(state.getName());
+			// System.out.print(state.getName());
 			
 			StateSet stateset = state.getStateClass();
 			if(stateset != null)
 			{
-				System.out.println(": " + stateset.toString());
+				// System.out.println(": " + stateset.toString());
 			}
 			else
 			{
-				System.out.println(": <null state class>");
+				// System.out.println(": <null state class>");
 			} 
 			state.setStateClass(null);
 		}
