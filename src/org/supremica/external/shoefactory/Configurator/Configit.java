@@ -53,13 +53,20 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.ImageIcon.*;
+import java.net.URL;
+import java.io.*;
 import com.configit_software.ctrlmngr.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import org.supremica.gui.*;
+import org.supremica.log.*;
 
-public class Configit extends JFrame implements ItemListener,  ActionListener
+public class Configit extends JFrame
+	implements ItemListener, ActionListener
 {
-	CS_CtrlMngr ctrl_mngr = new CS_CtrlMngr("../src/org/supremica/external/shoeFactory/Configurator/ShoeFactory.vt", CS_CtrlMngr.CONFIG_STATIC);
+	private static Logger logger = LoggerFactory.createLogger(Configit.class);
+
+	CS_CtrlMngr ctrl_mngr = null;
 	Container c;
 	boolean resetok = true;
 	JPanel space = new JPanel();
@@ -111,11 +118,25 @@ public class Configit extends JFrame implements ItemListener,  ActionListener
 	Border panelBorder = BorderFactory.createRaisedBevelBorder();
 	Border choicesBorder = BorderFactory.createTitledBorder(panelBorder,"Additional choices");
 
-   	ImageIcon icon1 = new ImageIcon("../src/org/supremica/external/shoeFactory/Configurator/blshoe.gif");
-	ImageIcon icon2 = new ImageIcon("../src/org/supremica/external/shoeFactory/Configurator/pnkshoe.gif");
+   	ImageIcon icon1 = new ImageIcon(Supremica.class.getResource("/shoefactory/blshoe.gif"));
+   	ImageIcon icon2 = new ImageIcon(Supremica.class.getResource("/shoefactory/pnkshoe.gif"));
 
 	public Configit ()
 	{
+		URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.vt");
+
+		InputStream vtStream = null;
+		try
+		{
+			vtStream = url.openStream();
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex.getStackTrace());
+			return;
+		}
+		ctrl_mngr = new CS_CtrlMngr(vtStream, CS_CtrlMngr.CONFIG_STATIC);
+
 	    setTitle("Configit");
     	addWindowListener(new WindowAdapter()
     	{
