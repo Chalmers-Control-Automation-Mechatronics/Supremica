@@ -75,6 +75,7 @@ public class SimulatorExecuter
 	extends JFrame
 	implements AutomatonListener, AnimationListener
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(SimulatorExecuter.class);
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;

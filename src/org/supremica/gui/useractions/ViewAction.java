@@ -8,6 +8,8 @@ import org.supremica.gui.ActionMan;
 public class ViewAction
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
+
 	public ViewAction()
 	{
 		super("View...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif")));

@@ -29,6 +29,7 @@ import org.supremica.gui.*;
 public class RecipeEditor
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	protected VisualProject theProject = null;
 
 	public RecipeEditor(VisualProject theProject)
@@ -153,6 +154,8 @@ public class RecipeEditor
 
 	AppAction FileNewAction = new AppAction("New", iconImage("/toolbarButtonGraphics/general/New16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			newRecipe();
@@ -165,6 +168,8 @@ public class RecipeEditor
 	};    // doesn't depend on a view
 	AppAction FileOpenAction = new AppAction("Open", iconImage("/toolbarButtonGraphics/general/Open16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			openRecipe();
@@ -177,6 +182,8 @@ public class RecipeEditor
 	};    // doesn't depend on a view
 	AppAction FileCloseAction = new AppAction("Close", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			closeRecipe();
@@ -184,6 +191,8 @@ public class RecipeEditor
 	};
 	AppAction FileSaveAction = new AppAction("Save", iconImage("/toolbarButtonGraphics/general/Save16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			saveRecipe();
@@ -196,6 +205,8 @@ public class RecipeEditor
 	};    // doesn't depend on a view
 	AppAction FileSaveAsAction = new AppAction("Save As", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			saveAsRecipe();
@@ -203,6 +214,8 @@ public class RecipeEditor
 	};
 	AppAction FilePropertiesAction = new AppAction("Properties", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			editRecipeProperties();
@@ -210,6 +223,8 @@ public class RecipeEditor
 	};
 	AppAction PrintAction = new AppAction("Print", iconImage("/toolbarButtonGraphics/general/Print16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().print();
@@ -217,6 +232,8 @@ public class RecipeEditor
 	};
 	AppAction CutAction = new AppAction("Cut", iconImage("/toolbarButtonGraphics/general/Cut16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().cut();
@@ -229,6 +246,8 @@ public class RecipeEditor
 	};    // doesn't depend on a view
 	AppAction CopyAction = new AppAction("Copy", iconImage("/toolbarButtonGraphics/general/Copy16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().copy();
@@ -241,6 +260,8 @@ public class RecipeEditor
 	};    // doesn't depend on a view
 	AppAction PasteAction = new AppAction("Paste", iconImage("/toolbarButtonGraphics/general/Paste16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().paste();
@@ -253,6 +274,8 @@ public class RecipeEditor
 	};    // doesn't depend on a view
 	AppAction DeleteAction = new AppAction("Delete", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().deleteSelection();
@@ -265,6 +288,8 @@ public class RecipeEditor
 	};
 	AppAction SelectAllAction = new AppAction("Select All", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().selectAll();
@@ -273,6 +298,8 @@ public class RecipeEditor
 	JMenuItem UndoMenuItem = null;
 	AppAction UndoAction = new AppAction("Undo", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().getDocument().undo();
@@ -297,6 +324,8 @@ public class RecipeEditor
 	JMenuItem RedoMenuItem = null;
 	AppAction RedoAction = new AppAction("Redo", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().getDocument().redo();
@@ -320,6 +349,8 @@ public class RecipeEditor
 	};
 	AppAction DrawRoutedLinkAction = new AppAction("Draw Routed Link", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().editDrawRoutedLink();
@@ -332,6 +363,8 @@ public class RecipeEditor
 	};
 	AppAction MovePortAction = new AppAction("Move Port", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().editMovePort();
@@ -344,6 +377,8 @@ public class RecipeEditor
 	};
 	AppAction ObjectPropertiesAction = new AppAction("Properties", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().editObjectProperties();
@@ -357,6 +392,8 @@ public class RecipeEditor
 	JCheckBoxMenuItem LinksJumpOverMenuItem = null;
 	AppAction LinksJumpOverAction = new AppAction("Links Jump Over", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().getDoc().setLinksJumpOver(!getView().getDoc().getLinksJumpOver());
@@ -379,6 +416,8 @@ public class RecipeEditor
 	};
 	AppAction ZoomNormalAction = new AppAction("Normal Zoom", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().zoomNormal();
@@ -386,6 +425,8 @@ public class RecipeEditor
 	};
 	AppAction ZoomInAction = new AppAction("Zoom In", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().zoomIn();
@@ -398,6 +439,8 @@ public class RecipeEditor
 	};
 	AppAction ZoomOutAction = new AppAction("Zoom Out", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().zoomOut();
@@ -410,6 +453,8 @@ public class RecipeEditor
 	};
 	AppAction ZoomToFitAction = new AppAction("Zoom To Fit", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().zoomToFit();
@@ -417,6 +462,8 @@ public class RecipeEditor
 	};
 	AppAction InsertCommentAction = new AppAction("Comment", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().insertComment();
@@ -429,6 +476,8 @@ public class RecipeEditor
 	};
 	AppAction InsertInputAction = new AppAction("Start", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().insertInput();
@@ -441,6 +490,8 @@ public class RecipeEditor
 	};
 	AppAction InsertOutputAction = new AppAction("Finish", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().insertOutput();
@@ -453,6 +504,8 @@ public class RecipeEditor
 	};
 	AppAction InsertOperationAction = new AppAction("Operation", this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			getView().insertOperation();
@@ -465,6 +518,8 @@ public class RecipeEditor
 	};
 	AppAction AboutAction = new AppAction("About", iconImage("/toolbarButtonGraphics/general/About16.gif"), this)
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void actionPerformed(ActionEvent e)
 		{
 			showAbout();
@@ -689,6 +744,8 @@ public class RecipeEditor
 
 		AppAction ExitAction = new AppAction("Exit", this)
 		{
+			private static final long serialVersionUID = 1L;
+
 			public void actionPerformed(ActionEvent e)
 			{
 				exit();

@@ -61,6 +61,7 @@ import org.supremica.log.*;
 public class SelectEventDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	private org.supremica.automata.LabeledEvent selectedEvent = null;
 	private JPanel contentPane = null;
 	private Alphabet theAlphabet = null;
@@ -147,6 +148,8 @@ public class SelectEventDialog
 class AlphabetPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	private Alphabet theAlphabet;
 
 	// private JList theEventList = new JList();
@@ -169,6 +172,7 @@ class AlphabetPanel
 class CreateEventPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(CreateEventPanel.class);
 	private Alphabet theAlphabet;
 	private JTextField labelField;

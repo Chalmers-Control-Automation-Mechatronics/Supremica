@@ -13,6 +13,7 @@ import org.supremica.automata.algorithms.scheduling.*;
 class Estimates
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private JRadioButton zeroEstimate = new JRadioButton("zero estimate", true);    // default selected
 	private JRadioButton leastRemainingTime = new JRadioButton("least remaining time");
 	private JRadioButton oneProductRelaxation = new JRadioButton("one product relaxation");
@@ -65,6 +66,7 @@ class Estimates
 class AlgorithmsPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private JRadioButton algo1 = new JRadioButton("Algo 1");
 	private JRadioButton algo3 = new JRadioButton("Algo 3", true);    // default selected
 
@@ -100,12 +102,15 @@ class AlgorithmsPanel
 class WeightsPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private JTextField gWeight = new JTextField("1");
 	private JTextField hWeight = new JTextField("1");
 
 	class EnableButton
 		extends JCheckBox
 	{
+		private static final long serialVersionUID = 1L;
+
 		EnableButton()
 		{
 			super("Use weights");
@@ -164,6 +169,8 @@ class WeightsPanel
 class ProgressPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	ProgressPanel()
 	{
 		setBorder(BorderFactory.createTitledBorder("Progress"));
@@ -173,11 +180,15 @@ class ProgressPanel
 public class ScheduleDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
 
 	class OkButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		OkButton()
 		{
 			super("Ok");
@@ -195,6 +206,8 @@ public class ScheduleDialog
 	class CancelButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		CancelButton()
 		{
 			super("Cancel");

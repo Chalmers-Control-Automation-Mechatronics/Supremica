@@ -11,6 +11,8 @@ import javax.swing.*;
 public class CenteredFrame
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
+
 	public CenteredFrame(int width, int height)
 	{
 		Utility.setupFrame(this, width, height);

@@ -23,6 +23,7 @@ import org.supremica.gui.VisualProject;
 class PresentStatesTableModel
 	extends DefaultTableModel    // AbstractTableModel
 {
+	private static final long serialVersionUID = 1L;
 	private IntArrayVector states;
 	private SearchStates ss;
 	private final int rows;
@@ -74,6 +75,7 @@ interface SelectionListener    // should this be a utility class?
 class PresentStatesTable
 	extends JTable
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(PresentStatesTable.class);
 	private SelectionListener listener;
 	private VisualProject theVisualProject;
@@ -179,6 +181,8 @@ class PresentStatesFrame
 	extends JFrame
 	implements SelectionListener    // listens to selection events, en/disables the RouteButton
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
 
 //      private RouteButton route_button;
@@ -193,6 +197,8 @@ class PresentStatesFrame
 	private class FineButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public FineButton()
 		{
 			super("Close");
@@ -278,6 +284,8 @@ class PresentStatesFrame
 class NoStatesFoundFrame
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
+
 	public NoStatesFoundFrame()
 	{
 		Utility.setupFrame(this, 0, 0);
@@ -293,6 +301,8 @@ class NoStatesFoundFrame
 class UserInterruptFrame
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
+
 	public UserInterruptFrame()
 	{
 		Utility.setupFrame(this, 0, 0);

@@ -60,6 +60,7 @@ public class SimulatorStateViewer
 
 //      implements SignalObserver
 {
+	private static final long serialVersionUID = 1L;
 	private Automata theAutomata;
 	private Project theProject;
 	private AutomataSynchronizerHelper helper;

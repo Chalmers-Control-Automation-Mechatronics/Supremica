@@ -17,6 +17,7 @@ import org.supremica.automata.Automaton;
 public class RegexpDialog
 	extends JDialog    /* implements ActionListener */
 {
+	private static final long serialVersionUID = 1L;
 	private JTextField reg_exp;
 	private boolean ok = false;
 
@@ -46,6 +47,7 @@ public class RegexpDialog
 		extends JMenuItem
 		implements ActionListener
 	{
+		private static final long serialVersionUID = 1L;
 		String pattern;
 
 		public RegexpMenuItem(String s, String p)
@@ -68,6 +70,8 @@ public class RegexpDialog
 		extends JMenuItem
 		implements ActionListener
 	{
+		private static final long serialVersionUID = 1L;
+
 		public StatesMenuItem(String s)
 		{
 			super(s);
@@ -87,6 +91,8 @@ public class RegexpDialog
 	class RegexpMenuBar
 		extends JMenuBar
 	{
+		private static final long serialVersionUID = 1L;
+
 		private JMenu makeExpressionMenu()
 		{
 			JMenu menu = new JMenu("Expressions");
@@ -142,6 +148,8 @@ public class RegexpDialog
 	class OkButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public OkButton()
 		{
 			super("OK");
@@ -166,6 +174,8 @@ public class RegexpDialog
 	class CancelButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public CancelButton()
 		{
 			super("Cancel");

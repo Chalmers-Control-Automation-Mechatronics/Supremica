@@ -29,6 +29,8 @@ import org.supremica.gui.Utility;
 class EventNodeRenderer
 	extends DefaultTreeCellRenderer
 {
+	private static final long serialVersionUID = 1L;
+
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
 	{
 		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
@@ -55,17 +57,22 @@ class EventNodeRenderer
 class EventSelectionModel
 	extends DefaultTreeSelectionModel
 {
+
+	private static final long serialVersionUID = 1L;
 }
 
 class ViewerPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	public ViewerPanel() {}
 }
 
 class EventsViewerPanel    // compare AlphabetsViewerPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private JTree theTree = new JTree();
 	private SupremicaTreeNode root = new SupremicaTreeNode();
 	private JScrollPane scrollPanel = new JScrollPane(theTree);
@@ -250,6 +257,7 @@ class EventsViewerPanel    // compare AlphabetsViewerPanel
 class RestrictEventsViewerPanel
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private JTree tree = null;
 	private JScrollPane scrollpane = null;
 
@@ -365,6 +373,7 @@ class RestrictEventsViewerPanel
 class SelectOperatorEventsDialog
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(SelectOperatorEventsDialog.class);
 	private Alphabet alphabet;
 	private boolean doit = false;
@@ -382,6 +391,8 @@ class SelectOperatorEventsDialog
 	private class OkButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public OkButton()
 		{
 			super("Ok");
@@ -401,6 +412,8 @@ class SelectOperatorEventsDialog
 	private class CancelButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public CancelButton()
 		{
 			super("Close");
@@ -419,6 +432,8 @@ class SelectOperatorEventsDialog
 	private class MoveButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public MoveButton()
 		{
 			super(">>");
@@ -437,6 +452,8 @@ class SelectOperatorEventsDialog
 	private class RemoveButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public RemoveButton()
 		{
 			super("<<");
@@ -724,6 +741,7 @@ class SelectOperatorEventsDialog
 public class SelectEventsWindow
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(SelectEventsWindow.class);
 	private Alphabet theAlphabet = null;
 	private SelectOperatorEventsDialog dlg = null;

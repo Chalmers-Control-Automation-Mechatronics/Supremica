@@ -57,6 +57,7 @@ import org.supremica.log.*;
 public class StandardExtensionFileChooser
 	extends JFileChooser
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(StandardExtensionFileChooser.class);
 
 	public StandardExtensionFileChooser() {}

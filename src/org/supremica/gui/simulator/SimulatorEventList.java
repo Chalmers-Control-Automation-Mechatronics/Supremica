@@ -64,6 +64,7 @@ public class SimulatorEventList
 	extends JPanel
 	implements ListDataListener
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(SimulatorEventList.class);
 	private boolean showStateId = false;
 	private Automata theAutomata;

@@ -16,6 +16,8 @@ class Structure
 	private static class StateComparator
 		implements /* Comparator, */ BinaryPredicate
 	{
+		private static final long serialVersionUID = 1L;
+
 		int compare(Element e1, Element e2)
 		{
 			return e1.compareTo(e2);
@@ -35,6 +37,8 @@ class Structure
 	private static class BoundComparator
 		implements /* Comparator, */ BinaryPredicate
 	{
+		private static final long serialVersionUID = 1L;
+
 		int compare(Element e1, Element e2)
 		{
 			return e1.compareBound(e2);

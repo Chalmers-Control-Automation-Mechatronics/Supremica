@@ -14,6 +14,7 @@ import org.supremica.gui.Utility;
 public class TextFrame
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	TextPanel textpanel = null;
 	static final int WIDTH = 500;
 	static final int HEIGHT = 600;

@@ -11,6 +11,7 @@ import org.supremica.automata.algorithms.scheduling.*;
 public class ScheduleDialog2
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	private static final String[] optiMethodNames = new String[]{ "Modified A*" };
 	private static final String[] heuristicsNames = new String[]{ "Default" };
 	private static Logger logger = LoggerFactory.createLogger(ScheduleDialog2.class);

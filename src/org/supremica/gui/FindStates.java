@@ -90,6 +90,8 @@ class FindStatesTableModel
 	extends AbstractTableModel
 	implements AutomataListener    // could usefully inherit from AutomataTableModel or something like that
 {
+	private static final long serialVersionUID = 1L;
+
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
 
 	// private Pattern[] patterns = null;
@@ -390,6 +392,7 @@ class FindStatesTableModel
 class FindStatesTable
 	extends JTable
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
 	private Automata automata;
 	private JFrame frame;
@@ -434,6 +437,7 @@ class FindStatesTable
 	class RegexpPopupMenu
 		extends JPopupMenu
 	{
+		private static final long serialVersionUID = 1L;
 		int row;
 
 		public RegexpPopupMenu(int r)
@@ -760,6 +764,7 @@ class FreeFormPanel
 	extends JPanel    /* FindStatesPanel */
 	implements FindStatesTab
 {
+	private static final long serialVersionUID = 1L;
 	private String title = "Free Form";
 	private String tip = "Search with a free form regexp";
 	private JTextField reg_exp;
@@ -785,6 +790,7 @@ class FreeFormPanel
 		extends JMenuItem
 		implements ActionListener
 	{
+		private static final long serialVersionUID = 1L;
 		String pattern;
 
 		public RegexpMenuItem(String s, String p)
@@ -806,6 +812,8 @@ class FreeFormPanel
 	class RegexpMenuBar
 		extends JMenuBar
 	{
+		private static final long serialVersionUID = 1L;
+
 		public RegexpMenuBar()
 		{
 			JMenu menu = new JMenu("Expressions");
@@ -904,6 +912,7 @@ class FixedFormPanel
 	extends WhiteScrollPane
 	implements FindStatesTab
 {
+	private static final long serialVersionUID = 1L;
 	private static final String title = "Fixed Form";
 	private static final String tip = "Search with state specific content";
 	FindStatesTable table = null;
@@ -935,6 +944,7 @@ class FixedFormPanel
 class FindStatesFrame
 	extends JFrame
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
 	private FindStatesTable table = null;
 	private Automata automata = null;
@@ -999,6 +1009,8 @@ class FindStatesFrame
 	class FindButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public FindButton()
 		{
 			super("Find");
@@ -1022,6 +1034,8 @@ class FindStatesFrame
 	class CancelButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public CancelButton()
 		{
 			super("Cancel");
@@ -1090,6 +1104,7 @@ class FindStatesFrame
 public class FindStates
 	extends AbstractAction
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(FindStates.class);
 
 	public FindStates()

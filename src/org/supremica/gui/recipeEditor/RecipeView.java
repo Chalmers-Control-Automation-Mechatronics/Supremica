@@ -27,6 +27,8 @@ public class RecipeView
 	extends JGoView
 	implements JGoViewListener
 {
+	private static final long serialVersionUID = 1L;
+
 	public RecipeView() {}
 
 	public RecipeView(JGoDocument doc)
@@ -223,6 +225,8 @@ public class RecipeView
 					FlowLink link = (FlowLink) obj;
 					AppAction insertPointAction = new AppAction("Insert Point", getApp())
 					{
+						private static final long serialVersionUID = 1L;
+
 						public void actionPerformed(ActionEvent e)
 						{
 							insertPointIntoLink();
@@ -242,6 +246,8 @@ public class RecipeView
 					{
 						AppAction removeSegmentAction = new AppAction("Remove Segment", getApp())
 						{
+							private static final long serialVersionUID = 1L;
+
 							public void actionPerformed(ActionEvent e)
 							{
 								removeSegmentFromLink();
@@ -260,6 +266,8 @@ public class RecipeView
 					{
 						AppAction remoteConnectionAction = new AppAction("Remote Connection", getApp())
 						{
+							private static final long serialVersionUID = 1L;
+
 							public void actionPerformed(ActionEvent e)
 							{
 								replaceLinkWithRemoteConnection();
@@ -289,6 +297,8 @@ public class RecipeView
 
 				AppAction pasteAction = new AppAction("Paste", getApp())
 				{
+					private static final long serialVersionUID = 1L;
+
 					public void actionPerformed(ActionEvent e)
 					{
 						pasteHere();

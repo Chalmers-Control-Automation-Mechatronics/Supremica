@@ -70,6 +70,7 @@ class UpdateInterfaceTableModel
 	extends AbstractTableModel
 	implements AutomataListener    // could usefully inherit from AutomataTableModel or something like that
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(UpdateInterfaceTableModel.class);
 	private String[] columnNames = { "Automaton", "Type" };
 	private Automata selectableAutomata;
@@ -159,6 +160,7 @@ class UpdateInterfaceTableModel
 class UpdateInterfaceTable
 	extends JTable
 {
+	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(UpdateInterfaceTable.class);
 	private Automata selectableAutomata;
 	private Automata selectedAutomata;
@@ -315,6 +317,7 @@ class InterfaceAutomataPanel
 	extends WhiteScrollPane
 	implements UpdateInterfaceTab
 {
+	private static final long serialVersionUID = 1L;
 	private static final String title = "Interface Automata";
 	private static final String tip = "Select the automata dependencies for this interface";
 	UpdateInterfaceTable table = null;
@@ -341,6 +344,7 @@ class InterfaceAutomataPanel
 class UpdateInterfaceDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	private UpdateInterfaceTable masterTable = null;
 	private UpdateInterfaceTable slaveTable = null;
 	private VisualProject theProject = null;
@@ -404,6 +408,8 @@ class UpdateInterfaceDialog
 	class OkButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public OkButton()
 		{
 			super("Ok");
@@ -427,6 +433,8 @@ class UpdateInterfaceDialog
 	class CancelButton
 		extends JButton
 	{
+		private static final long serialVersionUID = 1L;
+
 		public CancelButton()
 		{
 			super("Cancel");

@@ -9,6 +9,7 @@ import java.awt.event.*;
 public class EditCommentDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	String newComment = null;
 	JEditorPane text;
 

@@ -60,6 +60,7 @@ import java.io.Writer;
 public class ErrorDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	JEditorPane text;
 
 	private ErrorDialog()

@@ -56,6 +56,8 @@ import javax.swing.*;
 class SimulatorExecuterController
 	extends JPanel
 {
+	private static final long serialVersionUID = 1L;
+
 	private SimulatorStateViewer stateViewer;
 
 //      private Automata theAutomata;

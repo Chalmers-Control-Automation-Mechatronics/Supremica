@@ -9,6 +9,7 @@ import org.supremica.properties.SupremicaProperties;
 public class SoftplcSimulationDialog
 	extends JDialog
 {
+	private static final long serialVersionUID = 1L;
 	private boolean ok = false;
 	private JComboBox interfaces;
 	private Vector interfacesVector;

@@ -8,4 +8,6 @@ package org.supremica.softplc.CompILer.CodeGen.Constants;
 public class IllegalOperatorException
 	extends Exception
 {
+
+	private static final long serialVersionUID = 1L;
 }
