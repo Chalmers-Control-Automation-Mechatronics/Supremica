@@ -17,7 +17,12 @@ import org.apache.oro.text.regex.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.util.*;
-//---------------------------------------------------
+//----------------------------------------------------------------------------------
+// compiler type should be adjustable, but as for now, we only support a single type
+class CompilerFactory
+{
+	static public PatternCompiler getCompiler() { return new Perl5Compiler(); }
+}
 // The table model manages the input of the regexp patterns
 // It takes a compiler to be able to verify the correctness
 // of the patterns on-line
@@ -90,7 +95,8 @@ class FindStatesTableModel extends AbstractTableModel
 			}
 			catch(MalformedPatternException excp)
 			{
-				JOptionPane.showMessageDialog(null, "Incorrect pattern", "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
+				LogDisplay.createCategory(FindStatesTableModel.class.getName()).debug("FindStatesTable::Incorrect pattern \"" + (String)obj +"\"");
+				JOptionPane.showMessageDialog(null, "Incorrect pattern: " + (String)obj, "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 
@@ -151,7 +157,7 @@ class FindStatesTable extends JTable
 	private static TableSorter makeTableModel(Automata a)
 	{
 		TableSorter sorter = new TableSorter();
-		sorter.setModel(new FindStatesTableModel(a, new Perl5Compiler())); // compiler type should be adjustable
+		sorter.setModel(new FindStatesTableModel(a, CompilerFactory.getCompiler()));
 		return sorter;
 	}
 	public FindStatesTable(Automata a)
@@ -218,6 +224,13 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 	private Automata getAutomata() { return automata; }
 	private Pattern[] getRegexpPatterns() { return table.getRegexpPatterns(); }
 	private JButton setDefaultButton(JButton b) { getRootPane().setDefaultButton(b); return b; }
+	private void doRepaint() { repaint(); }
+
+	private void showCompositeStates(SearchStates ss)
+	{
+		PresentStates present_states = new PresentStates(ss, getAutomata());
+		present_states.execute();
+	}
 
 	class FindButton extends JButton
 	{
@@ -244,10 +257,8 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			try
 			{
 				SearchStates ss = new SearchStates(getAutomata());
-				// Debug("SearchStates == " + (ss == null ? "null" : "ok"));
 				Pattern[] patterns = getRegexpPatterns();
 				ss.search(new Perl5Matcher(), patterns);
-				// Debug("Show composite states");
 				showCompositeStates(ss);
 
 			}
@@ -257,11 +268,6 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 				debug("FindButton - " + excp);
 				excp.printStackTrace();
 			}
-		}
-		void showCompositeStates(SearchStates ss)
-		{
-			PresentStates present_states = new PresentStates(ss, getAutomata());
-			present_states.execute();
 		}
 	}
 
@@ -283,11 +289,76 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 
 		void action(ActionEvent e)
 		{
-			debug("QuitButton disposing");
+			// debug("QuitButton disposing");
 			dispose();
 		}
 	}
 
+	class FreeFormButton extends JButton
+	{
+		private PatternCompiler comp = null;
+		private Pattern pattern = null;
+		
+		public FreeFormButton(PatternCompiler c)
+		{
+			super("FreeForm");
+			setToolTipText("Search with a free form regexp");
+			addActionListener(
+				new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						action(e);
+					}
+				});
+				
+			comp = c;
+			try
+			{
+				pattern = comp.compile(".*");
+			}
+			catch(MalformedPatternException excp)
+			{
+				System.err.println("FreeFormButton::impossible exception");
+			}
+		}
+		
+		void action(ActionEvent evt)
+		{
+			RegexpDialog regexp_dlg = new RegexpDialog(null, pattern.getPattern());
+			
+			if(regexp_dlg.isOk())
+			{
+				try
+				{
+					pattern = comp.compile(regexp_dlg.getText());
+				}
+				catch(MalformedPatternException excp)
+				{
+					debug("FindStatesTable::Incorrect pattern \"" + regexp_dlg.getText() +"\"");
+					JOptionPane.showMessageDialog(null, "Incorrect pattern: " + regexp_dlg.getText(), "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+			}
+			else 
+				return;
+				
+			doRepaint();
+			try
+			{
+				SearchStates ss = new SearchStates(getAutomata());
+				ss.search(new Perl5Matcher(), pattern);
+				showCompositeStates(ss);
+			}
+			catch(Exception excp)
+			{
+				// Let it silently die, how the f*** do get these excp specs to work?
+				debug("FindButton - " + excp);
+				excp.printStackTrace();
+			}
+		}
+	}
+	
 	public FindStatesFrame(Automata a)
 	{
 		// super(400, 300); // for CenteredFrame inheritance
@@ -300,6 +371,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 		JPanel panel = new JPanel();
 		panel.add(setDefaultButton(new FindButton()));
 		panel.add(new QuitButton());
+		panel.add(new FreeFormButton(CompilerFactory.getCompiler()));
 
 		Container contentPane = getContentPane();
 		contentPane.add(new WhitePane(table), "Center");

@@ -78,7 +78,7 @@ class PresentStatesFrame extends JFrame
 	{
 		public FineButton()
 		{
-			super("Quit");
+			super("Close");
 			setToolTipText("I'm fine, thanks");
 			addActionListener(
 				new ActionListener()
@@ -92,7 +92,7 @@ class PresentStatesFrame extends JFrame
 
 		void action(ActionEvent e)
 		{
-			debug("FineButton disposing");
+			// debug("FineButton disposing");
 			dispose();
 		}
 	}
@@ -114,19 +114,39 @@ class PresentStatesFrame extends JFrame
 		
 	}
 }
+//
+class NoStatesFoundFrame extends JFrame
+{
+	public NoStatesFoundFrame()
+	{
+		Utility.setupFrame(this, 0, 0);
+		JOptionPane.showMessageDialog(this, "No matching states found", "Zero States", JOptionPane.INFORMATION_MESSAGE);
 
+		//** for some reason the frame cannot dispose of itself
+		// hide();
+		// dispose();
+	}
+}
+//
 public class PresentStates
 {
 	private JFrame frame = null;
 	private SearchStates searchs = null;
 	private Automata automata = null;
+	private boolean dispose_frame = false;
 	
 	public PresentStates(SearchStates ss, Automata a)
 	{
 		searchs = ss;
 		automata = a;
-		conOut();
-		frame = new PresentStatesFrame(ss, a);
+		// conOut(); // for debug purposes
+		if(ss.numberFound() > 0)
+			frame = new PresentStatesFrame(ss, a);
+		else 
+		{		
+			frame = new NoStatesFoundFrame();
+			dispose_frame = true; // for some reason the frame cannot dispose of itself
+		}
 		
 	}
 	private void conOut()
@@ -159,6 +179,8 @@ public class PresentStates
 	public void execute()
 	{
 		frame.show();
+		if(dispose_frame)
+			frame.dispose();
 	}
 
 }

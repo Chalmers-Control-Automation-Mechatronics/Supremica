@@ -56,6 +56,7 @@ class FreeformMatcher implements Matcher
 	{
 		matcher = m;
 		pattern = p;
+		// dbg: System.err.println("FreeformMatcher::constructing");
 	}
 	
 	public boolean matches(SearchStates.StateIterator it)
@@ -71,6 +72,11 @@ class FreeformMatcher implements Matcher
 				state_name.append(','); 
 
 		}
+		/* Debug stuff
+		boolean result = matcher.matches(state_name.toString(), pattern);
+		System.err.println("FreeformMatcher::matching(\"" + state_name.toString() + "\"," + pattern.getPattern() + ") = " + new Boolean(result).toString());
+		return result;
+		*/
 		return matcher.matches(state_name.toString(), pattern);
 	}
 }
