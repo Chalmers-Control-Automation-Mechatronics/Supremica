@@ -53,6 +53,7 @@ import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
 import org.supremica.log.*;
+import org.supremica.util.BDD.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -226,6 +227,10 @@ public class AutomataVerifier
 				{
 					return modularControllabilityVerification();
 				}
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MonolithicBDD) 
+				    {
+					return monolithicBDDControllabilityVerification();
+				    }
 				else
 				{
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
@@ -1192,6 +1197,32 @@ public class AutomataVerifier
 		 *
 		 *  return !synchHelper.getAutomataIsControllable();
 		 */
+	}
+
+	/**
+	 * Answers YES/NO to the controllability problem
+	 *
+	 *@return  true if the system is controllable
+	 *@see  BDDAutomata
+	 */
+    private boolean monolithicBDDControllabilityVerification()
+	{
+		Builder bu = new Builder(theAutomata);
+		BDDAutomata ba = bu.getBDDAutomata();
+		// NOTE: ba.getAutomataVector() NOT IMPLEMENTED YET
+		Supervisor sup = new Supervisor(ba,	ba.getAutomataVector());
+
+
+		int Q_u = sup.getReachableUncontrollables();
+		Q_u = ba.removeDontCareS(Q_u);
+		boolean is_controllable = ba.getZero() == Q_u;
+		if(!is_controllable) {
+		    sup.trace_set("uncontrollable", Q_u, 1);
+		}
+
+		sup.cleanup();
+		ba.cleanup();
+		return is_controllable;
 	}
 
 	/**
