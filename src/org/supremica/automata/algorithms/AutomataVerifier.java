@@ -53,7 +53,6 @@ import org.supremica.util.IntArrayHashTable;
 import java.io.PrintWriter;
 import org.supremica.gui.*;
 import org.supremica.log.*;
-import org.supremica.util.BDD.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -243,6 +242,10 @@ public class AutomataVerifier
 				{
 					return monolithicNonblockingVerification();
 				}
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MonolithicBDD) 
+				    {
+					return monolithicBDDNonBlockingVerification();
+				    }
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 					// This algorithm is under implementation!!
@@ -1203,27 +1206,30 @@ public class AutomataVerifier
 	 * Answers YES/NO to the controllability problem
 	 *
 	 *@return  true if the system is controllable
-	 *@see  BDDAutomata
+	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
     private boolean monolithicBDDControllabilityVerification()
-	{
-		Builder bu = new Builder(theAutomata);
-		BDDAutomata ba = bu.getBDDAutomata();
-		// NOTE: ba.getAutomataVector() NOT IMPLEMENTED YET
-		Supervisor sup = new Supervisor(ba,	ba.getAutomataVector());
+    {
+	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
+	boolean ret = abf.isControllable();
+	abf.cleanup();
+	return ret;
 
+    }
+	/**
+	 * Answers YES/NO to the NON-BLOCKING problem
+	 *
+	 *@return  true if the system is non-blocking
+	 *@see  BDDAutomata, AutomataBDDVerifier
+	 */
+    private boolean monolithicBDDNonBlockingVerification()
+    {
+	AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
+	boolean ret = abf.isNonBlocking();
+	abf.cleanup();
+	return ret;
 
-		int Q_u = sup.getReachableUncontrollables();
-		Q_u = ba.removeDontCareS(Q_u);
-		boolean is_controllable = ba.getZero() == Q_u;
-		if(!is_controllable) {
-		    sup.trace_set("uncontrollable", Q_u, 1);
-		}
-
-		sup.cleanup();
-		ba.cleanup();
-		return is_controllable;
-	}
+    }
 
 	/**
 	 * Examines controllability by synchronizing all automata in the system and in each state check if some
