@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="edge0" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ComponentList>
+        <SimpleComponent Kind="SPEC">
+            <SimpleIdentifier Name="edge0"/>
+            <Graph Deterministic="true">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q0"/>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
+

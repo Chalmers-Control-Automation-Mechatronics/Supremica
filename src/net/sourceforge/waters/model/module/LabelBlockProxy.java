@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   LabelBlockProxy
 //###########################################################################
-//# $Id: LabelBlockProxy.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: LabelBlockProxy.java,v 1.2 2005-03-16 02:06:27 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -41,7 +41,7 @@ public class LabelBlockProxy extends EventListProxy {
 
   /**
    * Creates a label block from a parsed XML structure.
-   * @param  parent      The parsed XML structure representing the label
+   * @param  block       The parsed XML structure representing the label
    *                     block to be created.
    * @throws ModelException to indicate that the XML structure could
    *                     not be converted due to serious semantic
@@ -51,9 +51,11 @@ public class LabelBlockProxy extends EventListProxy {
     throws ModelException
   {
     super(block);
-    final LabelGeometryType geo = block.getLabelGeometry();
-    if (geo != null) {
-      mGeometry = new LabelGeometryProxy(geo);
+    if (block != null) {
+      final LabelGeometryType geo = block.getLabelGeometry();
+      if (geo != null) {
+	mGeometry = new LabelGeometryProxy(geo);
+      }
     }
   }
 

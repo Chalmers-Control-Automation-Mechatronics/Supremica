@@ -471,7 +471,7 @@
     <xs:complexContent>
       <xs:extension base="M:NodeType">
         <xs:sequence>
-          <xs:element ref="M:NodeRef" maxOccurs="unbounded">
+          <xs:element ref="M:NodeRef" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="Nodes"/>
             </xs:appinfo></xs:annotation>
@@ -496,7 +496,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:LabelBlock"/>
+          <xs:element ref="M:LabelBlock" minOccurs="0"/>
           <xs:element ref="M:StartPointGeometry" minOccurs="0"/>
           <xs:element ref="M:SplineGeometry" minOccurs="0"/>
           <xs:element ref="M:EndPointGeometry" minOccurs="0"/>

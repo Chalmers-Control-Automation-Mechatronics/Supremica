@@ -3,7 +3,7 @@
 //# PACKAGE: waters.junit
 //# CLASS:   ModuleTest
 //###########################################################################
-//# $Id: ModuleTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
+//# $Id: ModuleTest.java,v 1.3 2005-03-16 02:06:27 robi Exp $
 //###########################################################################
 
 
@@ -12,6 +12,7 @@ package net.sourceforge.waters.junit;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import javax.xml.bind.JAXBException;
 import junit.framework.Test;
@@ -124,6 +125,20 @@ public class ModuleTest
 
   //#########################################################################
   //# Handcrafting Test Cases
+  public void testHandcraft_edge0()
+    throws JAXBException, ModelException, IOException
+  {
+    final ModuleProxy handcrafted = handcraft_edge0();
+    testHandcraft(handcrafted);
+  }
+
+  public void testHandcraft_nodegroup0()
+    throws JAXBException, ModelException, IOException
+  {
+    final ModuleProxy handcrafted = handcraft_nodegroup0();
+    testHandcraft(handcrafted);
+  }
+
   public void testHandcraft_nodegroup1()
     throws JAXBException, ModelException, IOException
   {
@@ -179,6 +194,49 @@ public class ModuleTest
 
   //#########################################################################
   //# Handcrafting Modules
+  private ModuleProxy handcraft_edge0()
+    throws ModelException
+  {
+    final String name  ="edge0";
+    final ModuleProxy module = new ModuleProxy(name, null);
+    final Collection comps = module.getComponentList();
+    final SimpleIdentifierProxy nodegroup1 = new SimpleIdentifierProxy(name);
+    final SimpleComponentProxy comp =
+      new SimpleComponentProxy(nodegroup1, ComponentKind.SPEC);
+    comps.add(comp);
+    final GraphProxy graph = comp.getGraph();
+    final Collection nodes = graph.getNodes();
+    final Collection edges = graph.getEdges();
+    final SimpleNodeProxy q0 = new SimpleNodeProxy("q0", true);
+    nodes.add(q0);
+    final EdgeProxy edge = new EdgeProxy(q0, q0);
+    edges.add(edge);
+    final Collection labels = edge.getLabelBlock();
+    assertTrue("No label block!", labels != null);
+    assertTrue("Nonempty block!", labels.isEmpty());
+    return module;
+  }
+
+  private ModuleProxy handcraft_nodegroup0()
+    throws ModelException
+  {
+    final String name  ="nodegroup0";
+    final ModuleProxy module = new ModuleProxy(name, null);
+    final Collection comps = module.getComponentList();
+    final SimpleIdentifierProxy nodegroup1 = new SimpleIdentifierProxy(name);
+    final SimpleComponentProxy comp =
+      new SimpleComponentProxy(nodegroup1, ComponentKind.SPEC);
+    comps.add(comp);
+    final GraphProxy graph = comp.getGraph();
+    final Collection nodes = graph.getNodes();
+    final SimpleNodeProxy q0 = new SimpleNodeProxy("q0", true);
+    nodes.add(q0);
+    final GroupNodeProxy group =
+      new GroupNodeProxy(":group", Collections.EMPTY_SET);
+    nodes.add(group);
+    return module;
+  }
+
   private ModuleProxy handcraft_nodegroup1()
     throws ModelException
   {
