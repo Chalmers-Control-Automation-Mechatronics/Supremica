@@ -79,7 +79,7 @@ public class AboutBox
 	GridLayout gridLayout1 = new GridLayout();
 	String product = "Supremica";
 	String version = Version.version();
-	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, Arash Vahidi 1999-2002";
+	String copyright = "Copyright (c) Knut \u00c5kesson, Hugo Flordal, Martin Fabian, Anders Hellgren, Arash Vahidi 1999-2003";
 	String comments = "Thanks to Northwoods Software - http://www.nwoods.com, and AT&T Research - http://www.graphviz.org.";
 	//String thanks = "";
 

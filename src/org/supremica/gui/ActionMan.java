@@ -2035,10 +2035,6 @@ public class ActionMan
 	}
 
 	// -------------- TODO: ADD EXPORTES FOR THESE TOO ------------------------------------
-	public static void fileExportTCT(Gui gui)
-	{
-		automataExport(gui);
-	}
 
 	public static void fileExportUMDES(Gui gui)
 	{
@@ -2049,8 +2045,6 @@ public class ActionMan
 	{
 		automataExport(gui);
 	}
-
-	public static void fileImportDesco(Gui gui) {}
 
 	public static void fileImportValid(Gui gui)
 	{

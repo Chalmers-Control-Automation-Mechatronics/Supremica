@@ -56,6 +56,52 @@ import org.supremica.automata.*;
 import org.supremica.automata.execution.*;
 import org.supremica.log.*;
 
+
+/**
+ * Import UMDES files, http://www.eecs.umich.edu/umdes/
+ * From the UMDES documentation:
+ *
+ * Individual FSM
+ * The default for each event (transition) is controllable and
+ * observable (c and o). If an event is uncontrollable and unobservable,
+ * you may specify so after the new state with `uc' and `uo'.
+ * If the event is either uncontrollable but observable or unobservable
+ * but controllable, you may simply state the variable (`uc' or `uo')
+ * that describe the negative characteristic. Please note that you may
+ * ignore `uc' and `uo' completely if you choose to create the unobservable
+ * events file manually by writing this text file. If you choose to use the
+ * routine write_uo, you have to state the event properties in the machine.fsm
+ * files. Also, the program called "add_prop" adds the uc and uo
+ * properties to all events in the FSM file based on the events.uo and
+ * event.uc inputs.
+ *
+ * 4
+ * {# States}
+ *
+ *
+ * VC	1/0	4
+ * {State}  {Marked/Unmarked} {# Transitions}
+ * SC1	VSC
+ * {Event} {New State}
+ * CV VC
+ * OV VO
+ * SO1 VSO
+ *
+ *
+ * VO 0 4
+ * ... ...
+ * ... ...
+ * Optionally, additional events not appearing in transitions can
+ * be added to a machine. To do this, after the last state and transition,
+ * add a new line begining with the key work EVENTS After this line
+ * additional events can be listed in the format for an event list.
+ * i.e. To add uncontrollable and unobservable event 'a' to an FSM,
+ * add the following at the end of the file
+ *
+ * EVENTS
+ * a uc uo
+ *
+ */
 public class ProjectBuildFromFSM
 {
 	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromFSM.class);
@@ -64,10 +110,15 @@ public class ProjectBuildFromFSM
 	private Project currProject = null;
 	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
+	protected String automatonName = "Imported from UMDES";
 
 	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
 
+	private static int STATE_READ_NUMBER_OF_STATES = 1;
+	private static int STATE_READ_STATE = 2;
+	private static int STATE_READ_TRANSITION = 3;
+	private static int STATE_READ_ADDITIONAL_EVENTS = 4;
 
 	public ProjectBuildFromFSM()
 	{
@@ -89,6 +140,7 @@ public class ProjectBuildFromFSM
 			inputProtocol = InputProtocol.FileProtocol;
 			String fileName = url.getFile();
 			thisFile = new File(fileName);
+			automatonName = thisFile.getName();
 
 		}
 		else if (protocol.equals("jar"))
@@ -109,9 +161,41 @@ public class ProjectBuildFromFSM
 	private Project build(InputStream is)
 		throws Exception
 	{
-		//InputSource source = new InputSource(is);
-		//return build(source);
-		return null;
+		InputStreamReader isReader = new InputStreamReader(is);
+		BufferedReader reader = new BufferedReader(isReader);
+		Project currProject = theProjectFactory.getProject();
+
+		Automaton currAutomaton = new Automaton(automatonName);
+
+		int currState = STATE_READ_NUMBER_OF_STATES;
+
+		String currLine = reader.readLine();
+		while (currLine != null)
+		{
+			StringTokenizer tokenizer = new StringTokenizer(currLine);
+
+			while (tokenizer.hasMoreTokens())
+			{
+				String currToken = tokenizer.nextToken();
+
+
+				//println(tokenizer.nextToken());
+			}
+
+
+			currLine = reader.readLine();
+		}
+		return currProject;
+	}
+
+	protected void readState()
+	{
+
+	}
+
+	protected void readTransition()
+	{
+
 	}
 
 

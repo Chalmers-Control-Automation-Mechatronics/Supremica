@@ -61,7 +61,7 @@ public class ExampleTemplates
 	private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
 	private final TemplateGroup AIPExamples = new TemplateGroup(TemplateTypes.AIPExample);
 	private final TemplateGroup OperatorSupervisorExamples = new TemplateGroup(TemplateTypes.OperatorSupervisorExample);
-	private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
+	//private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
 	private static final String extraPrefix = "/includeInJarFile";
 	private List allGroups = new LinkedList();
 
@@ -79,7 +79,7 @@ public class ExampleTemplates
 		initializeOtherExamples();
 		initializeAIPExamples();
 		initializeOperatorSupervisorExamples();
-		initializeStandardComponents();
+		//initializeStandardComponents();
 	}
 
 	private void initializeCCSBookExamples()
@@ -209,14 +209,14 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Warehouse k=13", prefix + "warehouse_k13.xml"));
 	}
 
-
+/*
 	private void initializeStandardComponents()
 	{
 		TemplateGroup thisGroup = StandardComponents;
 
 		allGroups.add(thisGroup);
 	}
-
+*/
 	public synchronized static ExampleTemplates getInstance()
 	{
 		if (templates == null)

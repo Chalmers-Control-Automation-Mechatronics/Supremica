@@ -252,41 +252,11 @@ public class MainMenuBar
 			menuFileImport.setText("Import");
 			menuFile.add(menuFileImport);
 
-			// File.Import.Desco
-			JMenuItem menuFileImportDesco = new JMenuItem();
-			menuFileImportDesco.setEnabled(false);
-			menuFileImportDesco.setText("From Desco...");
-			menuFileImport.add(menuFileImportDesco);
-			//menuFileImportDesco.setEnabled(false);
-			menuFileImportDesco.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					ActionMan.fileImportDesco(ActionMan.getGui());
-				}
-			});
-
-			// File.Import.TCT
-			JMenuItem menuFileImportTCT = new JMenuItem();
-			menuFileImportTCT.setEnabled(false);
-			menuFileImportTCT.setText("From TCT...");
-			menuFileImport.add(menuFileImportTCT);
-			//menuFileImportTCT.setEnabled(false);
-			menuFileImportTCT.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-
-					// ActionMan.fileImportTCT(ActionMan.getGui());
-				}
-			});
-
 			// File.Import.UMDES
 			JMenuItem menuFileImportUMDES = new JMenuItem();
 			menuFileImportUMDES.setEnabled(false);
 			menuFileImportUMDES.setText("From UMDES...");
 			menuFileImport.add(menuFileImportUMDES);
-			//menuFileImportUMDES.setEnabled(false);
 			menuFileImportUMDES.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -350,6 +320,7 @@ public class MainMenuBar
 			menuFileExport.setText("Export");
 			menuFile.add(menuFileExport);
 
+/*
 			// File.Export.Html
 			JMenuItem menuFileExportHtml = new JMenuItem();
 			menuFileExportHtml.setText("To Html...");
@@ -361,7 +332,7 @@ public class MainMenuBar
 					ActionMan.fileExportHtml(ActionMan.getGui());
 				}
 			});
-
+*/
 
 			// File.Export.Desco
 			JMenuItem menuFileExportDesco = new JMenuItem();
@@ -375,27 +346,11 @@ public class MainMenuBar
 				}
 			});
 
-			// File.Export.TCT
-			JMenuItem menuFileExportTCT = new JMenuItem();
-			menuFileExportTCT.setEnabled(false);
-			menuFileExportTCT.setText("To TCT...");
-			menuFileExport.add(menuFileExportTCT);
-			//menuFileExportTCT.setEnabled(false);
-			menuFileExportTCT.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-
-					// ActionMan.fileExportTCT(ActionMan.getGui());
-				}
-			});
-
 			// File.Export.UMDES
 			JMenuItem menuFileExportUMDES = new JMenuItem();
 			menuFileExportUMDES.setEnabled(false);
 			menuFileExportUMDES.setText("To UMDES...");
 			menuFileExport.add(menuFileExportUMDES);
-			//menuFileExportUMDES.setEnabled(false);
 			menuFileExportUMDES.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -405,12 +360,12 @@ public class MainMenuBar
 				}
 			});
 
+/*
 			// File.Export.Valid
 			JMenuItem menuFileExportValid = new JMenuItem();
 			menuFileExportValid.setEnabled(false);
 			menuFileExportValid.setText("To Valid...");
 			menuFileExport.add(menuFileExportValid);
-			//menuFileExportUMDES.setEnabled(false);
 			menuFileExportValid.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -418,6 +373,7 @@ public class MainMenuBar
 					ActionMan.fileExportValid(ActionMan.getGui());
 				}
 			});
+*/
 
 			// ++ ARASH:
 			// File.Export.RCP

@@ -54,18 +54,21 @@ import java.util.*;
 public class AutomatonType
 {
 	private static List collection = new LinkedList();
-	public static final AutomatonType Undefined = new AutomatonType("Undefined");
-	public static final AutomatonType Plant = new AutomatonType("Plant");
-	public static final AutomatonType Specification = new AutomatonType("Specification");
-	public static final AutomatonType Supervisor = new AutomatonType("Supervisor");
-	public static final AutomatonType Interface = new AutomatonType("Interface");
+	public static final AutomatonType Undefined = new AutomatonType("Undefined", true);
+	public static final AutomatonType Plant = new AutomatonType("Plant", true);
+	public static final AutomatonType Specification = new AutomatonType("Specification", true);
+	public static final AutomatonType Supervisor = new AutomatonType("Supervisor", true);
+	public static final AutomatonType Interface = new AutomatonType("Interface", false);
 
 	private String identifier;
 
-	private AutomatonType(String identifier)
+	private AutomatonType(String identifier, boolean add)
 	{
-		collection.add(this);
-		this.identifier = identifier;
+		if (add)
+		{
+			collection.add(this);
+			this.identifier = identifier;
+		}
 	}
 
 	public static Iterator iterator()
