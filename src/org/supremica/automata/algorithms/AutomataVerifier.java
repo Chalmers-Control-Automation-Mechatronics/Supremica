@@ -401,7 +401,6 @@ public class AutomataVerifier
 	private boolean modularMutuallyNonblockingVerification()
 		throws Exception
 	{
-
 		// Ensure individual nonblocking
 		if (!isIndividuallyNonblocking())
 		{
@@ -551,7 +550,10 @@ public class AutomataVerifier
 		// Did the loop finish without failure?
 		if (failure)
 		{
-			logger.warn("Supremica's modular verification algorithm can't solve this " + "problem. Try the monolithic or BDD algorithm instead. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this system uncontrollable.");
+			logger.warn("Supremica's modular verification algorithm can't solve this " + 
+						"problem. Try the monolithic or BDD algorithm instead. There are " + 
+						potentiallyUncontrollableStates.size() + 
+						" states that perhaps makes this system uncontrollable.");
 
 			return false;
 		}
@@ -1776,6 +1778,9 @@ public class AutomataVerifier
 		*/
 	}
 
+	/**
+	 * Incrementally composes and minimizes the automata and examines the end result...
+	 */
 	private boolean compositionalNonblockingVerification()
 	{
 		// Make a copy that we can fiddle with
@@ -1788,145 +1793,47 @@ public class AutomataVerifier
 			public void run()
 			{
 				ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
-				executionDialog.initProgressBar(0, theAutomata.size()-1);
-				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);				
 			}
 		});
 
-		// Verify...
-		while (theAutomata.size() >= 2)
-		// There will be theAutomata.size()-1 pairs to examine!
-		//for (int n=1; n<theAutomata.size(); n++)
+		Automaton result;
+		try 
 		{
-			if (stopRequested)
-			{
-				return false;
+			// Minimizer
+		 	AutomataMinimizer minimizer= new AutomataMinimizer(theAutomata);
+			threadToStop = minimizer;
+			ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
+			if (executionDialog != null)
+			{			
+				minimizer.setExecutionDialog(executionDialog);
 			}
 
-			// Get any automaton
-			Automaton autA = theAutomata.getFirstAutomaton();
-			Alphabet alphaA = autA.getAlphabet();
-
-			// Find the pair (in which autA is a part) with the highest
-			// "unique to total" (number of events) ratio
-			double bestUniqueRatio = 0;
-			double bestCommonRatio = 0;
-			Automaton bestAutB = null;
-			Alphabet hideThese = null;
-			for (int i=1; i<theAutomata.size(); i++)
-			{
-				Automaton autB = theAutomata.getAutomatonAt(i);
-				Alphabet alphaB = autB.getAlphabet();
-
-				// If there is no common events, try next automaton
-				int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alphaB);
-				if (nbrOfCommonEvents == 0)
-				{
-					continue;
-				}
-
-				// Calculate the alphabet of unique events
-				Alphabet uniqueEvents = Alphabet.union(alphaA, alphaB);
-				for (int j=1; j<theAutomata.size(); j++)
-				{
-					// Skip self
-					if (i == j)
-					{
-						continue;
-					}
-
-					// Remove the events that are present in C, they are not unique to A and B.
-					Automaton autC = theAutomata.getAutomatonAt(j);
-					Alphabet alphaC = autC.getAlphabet();
-					uniqueEvents.minus(alphaC);
-
-					// Early termination
-					if (uniqueEvents.size() == 0)
-					{
-						break;
-					}
-				}
-
-				// Find ratios
-				int nbrOfUniqueEvents = uniqueEvents.size();
-				int unionAlphabetSize = alphaA.size() + alphaB.size() - nbrOfCommonEvents;
-				double thisUniqueRatio = ((double) nbrOfUniqueEvents)/((double) unionAlphabetSize);
-				//double thisUniqueRatio = (double) nbrOfUniqueEvents;
-				double thisCommonRatio = ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
-
-				// Improvement?
-				if (thisUniqueRatio > bestUniqueRatio)
-				{
-					bestAutB = autB;
-					bestUniqueRatio = thisUniqueRatio;
-					hideThese = uniqueEvents;
-				}
-				else if ((bestUniqueRatio == 0) && (thisCommonRatio > bestCommonRatio))
-				{
-					bestAutB = autB;
-					bestCommonRatio = thisCommonRatio;
-					hideThese = new Alphabet();
-				}
-			}
-
-			if ((bestUniqueRatio > 0) || (bestCommonRatio > 0))
-			{
-				Automata automata = new Automata();
-				automata.addAutomaton(autA);
-				automata.addAutomaton(bestAutB);
-
-				Automaton min = composeAndMinimize(automata, hideThese);
-				min.remapStateIndices();
-				theAutomata.removeAutomata(automata);
-				theAutomata.addAutomaton(min);
-
-				/*
-				// Update gui
-				ActionMan.getGui().getVisualProjectContainer().getActiveProject().removeAutomata(automata);
-				ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomaton(min);
-				try
-				{
-					Thread.sleep(1000);
-				}
-				catch (Exception apa)
-				{
-					
-				}
-				*/
-			}
-			else
-			{
-				logger.error("Disjoint system?");
-				return false;
-			}
-
-			// Update execution dialog
-			if (synchHelper.getExecutionDialog() != null)
-			{
-				synchHelper.getExecutionDialog().setProgress(nbrOfAutomata-1-theAutomata.size());
-			}
+			// Choose options
+			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+			options.setAlsoTransitions(true);
+			options.setKeepOriginal(false);
+			options.setCompositionalMinimization(true);
+			options.setTargetAlphabet(new Alphabet()); // Empty alphabet!
+			
+			result = minimizer.getCompositionalMinimization(options);
+			threadToStop = null;
 		}
-
-		try
+		catch (Exception ex)
 		{
-			Thread.sleep(1000);
-		}
-		catch (Exception apa)
-		{
-		}
-		ActionMan.getGui().getVisualProjectContainer().getActiveProject().addAutomata(theAutomata);
-		
-		// How did it go?
-		if (theAutomata.size() == 1)
-		{
-			logger.info("Automaton: " + theAutomata.getFirstAutomaton() + " nbrOfStates " + theAutomata.getFirstAutomaton().nbrOfStates() + ".");
-			return verifyNonblocking(theAutomata.getFirstAutomaton());
-		}
-		else
-		{
-			logger.error("Error while performing modular nonblocking verification.");
+			logger.error("Error in AutomataVerifier when verifying nonblocking compositionally. " + ex);
 			return false;
 		}
+
+		if (stopRequested)
+		{
+			return false;
+		}
+
+		// Present result!
+		logger.info("Automaton: " + result + " nbrOfStates " + result.nbrOfStates() + ".");
+		return verifyNonblocking(result);
 	}
 
 	/**

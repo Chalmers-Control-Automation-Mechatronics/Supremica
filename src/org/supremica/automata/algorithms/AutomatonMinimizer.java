@@ -72,8 +72,12 @@ class EqClassFactory
 }
 
 public class AutomatonMinimizer
+	implements Stoppable
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
+
+	// Stoppable stuff
+	private boolean stopRequested = false;
 
 	/** The automaton being minimized (may be a copy of the original). */
 	private Automaton theAutomaton;
@@ -194,6 +198,11 @@ public class AutomatonMinimizer
 			// Find initial partitioning
 			equivClasses = findInitialPartitioning(theAutomaton);
 			
+			if (stopRequested)
+			{
+				return null;
+			}
+			
 			// Minimize
 			doLanguageEquivalenceMinimization(equivClasses);
 		}
@@ -206,6 +215,11 @@ public class AutomatonMinimizer
 
 		// Build the minimized automaton
 		Automaton newAutomaton = buildAutomaton(equivClasses);
+
+		if (stopRequested)
+		{
+			return null;
+		}
 
 		// Should we remove redundant transitions to minimize also with respect to transitions?
 		if (options.getAlsoTransitions())
@@ -326,6 +340,11 @@ public class AutomatonMinimizer
 		equivClassIt = equivClasses.iterator();
 		while (equivClassIt.hasNext())
 		{
+			if (stopRequested)
+			{
+				return null;
+			}
+
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
 			State fromState = currEquivClass.getState(newAutomaton);
 			Iterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
@@ -426,7 +445,6 @@ public class AutomatonMinimizer
 		}
 		else
 		{
-
 			// All classifies to the same class.
 			// No need to do anything except maybe helping
 			// the garbage collector
@@ -587,6 +605,11 @@ public class AutomatonMinimizer
 		// Do the merging
 		while (statesToExamine.size() != 0)
 		{
+			if (stopRequested)
+			{
+				return 0;
+			}
+
 			// Get and remove arbitrary state
 			State one = statesToExamine.get();
 			statesToExamine.remove(one);
@@ -702,6 +725,11 @@ public class AutomatonMinimizer
 		// Find epsilon-closure for each state, put this info in each state
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
+			if (stopRequested) 
+			{
+				return;
+			}
+
 			State currState = stateIt.nextState();
 
 			// Find closure, associate it with this state
@@ -714,6 +742,11 @@ public class AutomatonMinimizer
 		LinkedList toBeAdded = new LinkedList();
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
+			if (stopRequested) 
+			{
+				return;
+			}
+
 			State currState = stateIt.nextState();
 			StateSet closure = currState.getStateSet();
 
@@ -942,6 +975,18 @@ public class AutomatonMinimizer
 		{
 			alpha.removeEvent((LabeledEvent) toBeRemoved.remove(0));
 		}
+	}
+
+	/**
+	 * Method that stops AutomatonMinimizer as soon as possible.
+	 *
+	 * @see  ExecutionDialog
+	 */
+	public void requestStop()
+	{
+		stopRequested = true;
+
+		logger.debug("AutomatonMinimizer requested to stop.");
 	}
 
 	public static void main(String[] args)

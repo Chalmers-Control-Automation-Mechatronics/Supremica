@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.log.*;
+import org.supremica.automata.Alphabet;
 
 public final class MinimizationOptions
 {
@@ -61,6 +62,8 @@ public final class MinimizationOptions
 	private boolean alsoTransitions;
 	private boolean keepOriginal;
 	private boolean ignoreMarking;
+	private boolean compositionalMinimization;
+	private Alphabet targetAlphabet;
 
 	/**
 	 * This constructor returns the options previously chosen by the user as per the state SupremicaProperties.
@@ -89,17 +92,38 @@ public final class MinimizationOptions
 
 	public boolean isValid()
 	{
+		String errorMessage = validOptions();
+		if (errorMessage != null)
+		{
+			logger.error(errorMessage);
+			return false;
+		}
+		
+		return true;
+	}
+
+	public String validOptions()
+	{
 		if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 		{
 			if (ignoreMarking)
 			{
-				logger.error("Invalid minimization options chosen. Conflict equivalence " + 
-							 "implies that the marking must not be ignored.");
-				return false;
+				String message = "Invalid minimization options chosen. Conflict equivalence " + 
+					"implies that the marking must not be ignored.";
+				return message;
 			}
 		}
 
-		return true;
+		if (compositionalMinimization)
+		{
+			if (targetAlphabet == null)
+			{
+				String message = "Null target alphabet selected for compositional minimization.";
+				return message;
+			}
+		}
+
+		return null;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -150,6 +174,26 @@ public final class MinimizationOptions
 	public boolean getIgnoreMarking()
 	{
 		return ignoreMarking;
+	}
+
+	public void setCompositionalMinimization(boolean bool)
+	{
+		compositionalMinimization = bool;
+	}
+
+	public boolean getCompositionalMinimization()
+	{
+		return compositionalMinimization;
+	}
+
+	public void setTargetAlphabet(Alphabet alpha)
+	{
+		targetAlphabet = alpha;
+	}
+
+	public Alphabet getTargetAlphabet()
+	{
+		return targetAlphabet;
 	}
 
 	/**

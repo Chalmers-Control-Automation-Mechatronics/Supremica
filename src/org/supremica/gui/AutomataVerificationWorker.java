@@ -110,10 +110,10 @@ public class AutomataVerificationWorker
 
 		// Examine the validity of the chosen options
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
-
 		if (errorMessage != null)
 		{
-			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, 
+										  "Alert", JOptionPane.ERROR_MESSAGE);
 			requestStop();
 
 			return;
@@ -143,8 +143,10 @@ public class AutomataVerificationWorker
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Language inclusion verification...
-			successMessage = "The language of the unselected automata is \n" + "included in the language of the selected automata.";
-			failureMessage = "The language of the unselected automata is NOT\n" + "included in the language of the selected automata.";
+			successMessage = "The language of the unselected automata is \n" + 
+				"included in the language of the selected automata.";
+			failureMessage = "The language of the unselected automata is NOT\n" + 
+				"included in the language of the selected automata.";
 
 			// In language inclusion, not only the currently selected automata are used!
 			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
@@ -152,7 +154,9 @@ public class AutomataVerificationWorker
 		else
 		{    // Error... this can't happen!
 			requestStop();
-			logger.error("Unavailable option chosen... this can't happen...\n" + "don't ever do whatever you just did again, please.\n" + "Please send bug report to bugs@supremica.org.");
+			logger.error("Unavailable option chosen... this can't happen...\n" + 
+						 "don't ever do whatever you just did again, please.\n" + 
+						 "Please send bug report to bugs@supremica.org.");
 
 			return;
 		}
@@ -171,7 +175,8 @@ public class AutomataVerificationWorker
 		catch (Exception ex)
 		{
 			requestStop();
-			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), 
+										  "Error", JOptionPane.ERROR_MESSAGE);
 			logger.error(ex.getMessage());
 			logger.debug(ex.getStackTrace());
 
@@ -191,25 +196,14 @@ public class AutomataVerificationWorker
 
 		threadsToStop.add(this);
 		threadsToStop.add(automataVerifier);
-		EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
+		executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
+		executionDialog.setMode(ExecutionDialogMode.verifying);
+		automataVerifier.getHelper().setExecutionDialog(executionDialog);
 
-				// executionDialog.setMode(ExecutionDialogMode.hide);
-				executionDialog.setMode(ExecutionDialogMode.verifying);
-				automataVerifier.getHelper().setExecutionDialog(executionDialog);
-			}
-		});
-
-		// Solve the problem (and measure the time to)!
+		// Solve the problem (and measure the time)!
 		ActionTimer timer = new ActionTimer();
-
 		timer.start();
-
 		verificationSuccess = automataVerifier.verify();
-
 		timer.stop();
 
 		// Make sure(?) the ExecutionDialog is hidden!
@@ -229,7 +223,6 @@ public class AutomataVerificationWorker
 		// Present the result
 		if (!stopRequested)
 		{
-
 			// Show message dialog with result
 			if (verificationSuccess)
 			{
@@ -258,7 +251,7 @@ public class AutomataVerificationWorker
 	}
 
 	/**
-	 * Method that stops AutomataVerifier as soon as possible.
+	 * Method that stops AutomataVerificationWorker as soon as possible.
 	 *
 	 *@see  ExecutionDialog
 	 */

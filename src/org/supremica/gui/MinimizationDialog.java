@@ -54,6 +54,7 @@ import org.supremica.automata.algorithms.EquivalenceRelation;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import org.supremica.automata.*;
 
 interface MinimizationPanel
 {
@@ -70,6 +71,7 @@ class MinimizationDialogStandardPanel
 	private JCheckBox alsoTransitions;
 	private JCheckBox keepOriginal;
 	private JCheckBox ignoreMarking;
+
 	private JTextArea note;
 
 	public MinimizationDialogStandardPanel()
@@ -175,18 +177,104 @@ class MinimizationDialogStandardPanel
 
 class MinimizationDialogAdvancedPanel
 	extends JPanel
-	implements MinimizationPanel
+	implements MinimizationPanel, ActionListener
 {
-	public MinimizationDialogAdvancedPanel()
+	private JCheckBox compositionalMinimization;
+	private Alphabet unionAlphabet;
+	private Alphabet targetAlphabet;
+	private List targetAlphabetSelector;
+
+	//private JTextArea note;
+
+	public MinimizationDialogAdvancedPanel(Automata automata)
 	{
+		unionAlphabet = automata.getUnionAlphabet();
+		targetAlphabet = null;
+		
+		compositionalMinimization = new JCheckBox("Compositional minimization");
+		compositionalMinimization.addActionListener(this);
+		targetAlphabetSelector = new List(8, true);
+		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent event = evIt.nextEvent();
+
+			// Only non-epsilon events!
+			if (!event.isEpsilon())
+			{
+				targetAlphabetSelector.add(event.getLabel());
+			}
+		}
+		
+		//note = new JTextArea("Note:\n" + "I have nothing to say.");
+		//note.setBackground(this.getBackground());
+
+		//Box advancedBox = Box.createHorizontalBox();
+		//advancedBox.add(new Label("         ")); // Ugly fix to get stuff centered
+		//advancedBox.add(compositionalMinimization);
+		//advancedBox.add(new Label("         ")); // Ugly fix to get stuff centered
+		//Box anotherBox = Box.createVerticalBox();
+		//anotherBox.add(targetAlphabetSelector);
+
+		// NEW TRY
+		this.setLayout(new BorderLayout());
+
+		JPanel choicePanel = new JPanel();
+		choicePanel.setLayout(new FlowLayout());
+		//choicePanel.add(advancedBox);
+		choicePanel.add(compositionalMinimization);
+		this.add("North", choicePanel);
+
+		JPanel alphaPanel = new JPanel();
+		alphaPanel.setLayout(new FlowLayout());
+		alphaPanel.add(targetAlphabetSelector);
+		targetAlphabetSelector.setEnabled(false);
+		this.add("Center", alphaPanel);
 	}
 
 	public void update(MinimizationOptions options)
 	{
+		// compositionalMinimization.setSelected(options.getCompositionalMinimization());
+		targetAlphabetSelector.setEnabled(compositionalMinimization.isSelected());
+		//targetAlphabetSelector.setVisible(compositionalMinimization.isSelected());
+		this.repaint();
 	}
 
 	public void regain(MinimizationOptions options)
+	{	
+		// Update targetAlphabet
+		if (compositionalMinimization.isSelected())
+		{
+			targetAlphabet = new Alphabet();
+			int[] selected = targetAlphabetSelector.getSelectedIndexes();
+			for (int i=0; i<selected.length; i++)
+			{
+				targetAlphabet.addEvent(unionAlphabet.getEvent(targetAlphabetSelector.getItem(selected[i])));
+			}
+		}
+		else
+		{
+			targetAlphabet = null;
+		}
+		
+		options.setCompositionalMinimization(compositionalMinimization.isSelected());
+		options.setTargetAlphabet(targetAlphabet);
+	}
+
+	public void actionPerformed(ActionEvent e)
 	{
+		if (compositionalMinimization.isSelected())
+		{
+			targetAlphabetSelector.setEnabled(true);
+			//targetAlphabetSelector.setVisible(true);
+			//note.setText("Note:\n" + "This minimization algorithm is experimental!");
+			//note.setVisible(true);
+		}
+		else
+		{
+			targetAlphabetSelector.setEnabled(false);
+			//targetAlphabetSelector.setVisible(false);
+			//note.setVisible(false);			
+		}
 	}
 }
 
@@ -203,7 +291,7 @@ public class MinimizationDialog
 	/**
 	 * Creates modal dialog box for input of verification options.
 	 */
-	public MinimizationDialog(JFrame parentFrame, MinimizationOptions options)
+	public MinimizationDialog(JFrame parentFrame, MinimizationOptions options, Automata automata)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.options = options;
@@ -214,13 +302,16 @@ public class MinimizationDialog
 		// dialog.setResizable(false);
 		Container contentPane = dialog.getContentPane();
 
+		advancedPanel = new MinimizationDialogAdvancedPanel(automata);
 		standardPanel = new MinimizationDialogStandardPanel();
-		advancedPanel = new MinimizationDialogAdvancedPanel();
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-
 		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
-		//tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
+		if (automata.size() > 1)
+		{
+			tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
+			tabbedPane.setSelectedComponent(advancedPanel);
+		}
 
 		// buttonPanel;
 		JPanel buttonPanel = new JPanel();
@@ -244,8 +335,8 @@ public class MinimizationDialog
 	 */
 	public void update()
 	{
-		standardPanel.update(options);
 		advancedPanel.update(options);
+		standardPanel.update(options);
 	}
 
 	private JButton addButton(Container container, String name)

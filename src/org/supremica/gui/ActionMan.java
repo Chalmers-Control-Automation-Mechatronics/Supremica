@@ -1500,9 +1500,7 @@ public class ActionMan
 		{
 			return;
 		}
-
-		SynchronizationOptions syncOptions;
-		syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
 		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, syncOptions, verificationOptions);
 	}
@@ -1733,40 +1731,72 @@ public class ActionMan
 
 		// Get the current options and allow the user to change them...
 		MinimizationOptions options = new MinimizationOptions();
-		MinimizationDialog dialog = new MinimizationDialog(gui.getFrame(), options);
+		MinimizationDialog dialog = new MinimizationDialog(gui.getFrame(), options, selectedAutomata);
 		dialog.show();
 		if (!options.getDialogOK())
 		{
 			return;
 		}
 
+		AutomataMinimizationWorker worker = new AutomataMinimizationWorker(gui, selectedAutomata, options);
+	}
+
+	/*
 		// Timer
 		ActionTimer timer = new ActionTimer();
 		timer.start();
 
-		// Iterate over automata and minimiza
+		// The result...
 		Automata result = new Automata();
-		Iterator autIt = selectedAutomata.iterator();
-		while (autIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
 
+		// Minimize!
+		if (!options.getCompositionalMinimization())
+		{
+			// Iterate over automata and minimize each on itself
+			Iterator autIt = selectedAutomata.iterator();
+			while (autIt.hasNext())
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				
+				// Minimize this one
+				try
+				{
+					AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
+					Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
+					result.addAutomaton(newAutomaton);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Exception in AutomatonMinimizer. Automaton: " + 
+								 currAutomaton.getName() + " " + ex);
+					logger.debug(ex.getStackTrace());
+				}
+				
+				if (!options.getKeepOriginal())
+				{
+					gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomaton);
+				}
+			}
+		}
+		else
+		{
+			// Compositional minimization!
 			try
 			{
-				AutomatonMinimizer autMinimizer = new AutomatonMinimizer(currAutomaton);
-				Automaton newAutomaton = autMinimizer.getMinimizedAutomaton(options);
+				AutomataMinimizer minimizer = new AutomataMinimizer(selectedAutomata);
+				Automaton newAutomaton = minimizer.getCompositionalMinimization(options);
 				result.addAutomaton(newAutomaton);
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomatonMinimize. Automaton: " + 
-							 currAutomaton.getName() + " " + ex);
+				logger.error("Exception in AutomatonMinimizer when compositionally minimizing " + 
+							 selectedAutomata + " " + ex);
 				logger.debug(ex.getStackTrace());
 			}
 			
 			if (!options.getKeepOriginal())
 			{
-				gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomaton);
+				gui.getVisualProjectContainer().getActiveProject().removeAutomata(selectedAutomata);
 			}
 		}
 
@@ -1784,6 +1814,7 @@ public class ActionMan
 			logger.error(ex);
 		}
 	}
+	*/
 
 	// Automaton.Status action performed
 	public static void automatonStatus_actionPerformed(Gui gui)
