@@ -27,10 +27,8 @@ public class AdlinkPCI7432
 	private boolean invertInputs = false;
 	private boolean invertOutputs = false;
 	private static final boolean[] defaultOutputs = new boolean[nrOfDigitalOutputs];
-
-
-    private static final short nrOfSignalsIn = 32;
-    private static final short nrOfSignalsOut = 32;
+	private static final short nrOfSignalsIn = 32;
+	private static final short nrOfSignalsOut = 32;
 
 	public AdlinkPCI7432()
 		throws Exception
@@ -229,7 +227,6 @@ public class AdlinkPCI7432
 		boolean[] inputs = new boolean[nrOfDigitalInputs];
 
 		getSignalArray(inputs);
-
 		System.out.println(AdlinkPCI7432.toString(inputs));
 	}
 

@@ -1,14 +1,27 @@
 ###
-### Jindent 3.24 property file -- http://www.jindent.de
+### Converted from "Supremica.jin", please enter own header here...
 ###
 
 
 
 
+###
+### Jindent 3.5b1 property file -- http://www.jindent.com
+###
+
+
+
+### Jindent property format
+
+version                                   = "3.5b1"
+
+
+
 ### General -- Convention
 
+date                                      = "EEE, MMM d, ''yy"
 conventionName                            = "Supremica Style"
-conventionString                          = "'Formatted in $conventionName$ Style on' EEE, MMM d, ''yy"
+conventionNote                            = "Formatted in $conventionName$ Style on $date$"
 conventionNotePosition                    = "none"
 blankLinesToSeparateConventionNote        = 2
 
@@ -62,12 +75,14 @@ indentAssignmentsByTabs                   = false
 
 ### Indentation -- Alignment
 
-alignComments                             = true
+alignComments                             = false
 alignDeclarations                         = false
 alignAssignments                          = false
 alignTernaryConditions                    = true
 alignTernaryExpressions                   = true
 alignTooLongComments                      = false
+alignTooLongDeclarations                  = false
+alignTooLongAssignments                   = false
 
 
 
@@ -82,6 +97,8 @@ indentAfterRightBraceGeneral              = 0
 cuddleEmptyBracesGeneral                  = true
 indentCuddledBracesGeneral                = 1
 
+noBlankLinesAfterLeftBraceGeneral         = false
+
 
 leftBraceNewLineClassInterface            = true
 rightBraceNewLineClassInterface           = true
@@ -91,6 +108,8 @@ indentAfterRightBraceClassInterface       = 0
 
 cuddleEmptyBracesClassInterface           = false
 indentCuddledBracesClassInterface         = 1
+
+noBlankLinesAfterLeftBraceClassInterface  = false
 
 
 leftBraceNewLineMethod                    = true
@@ -102,6 +121,8 @@ indentAfterRightBraceMethod               = 0
 cuddleEmptyBracesMethod                   = true
 indentCuddledBracesMethod                 = 1
 
+noBlankLinesAfterLeftBraceMethod          = false
+
 
 leftBraceNewLineTryCatch                  = true
 rightBraceNewLineTryCatch                 = true
@@ -111,6 +132,8 @@ indentAfterRightBraceTryCatch             = 0
 
 cuddleEmptyBracesTryCatch                 = true
 indentCuddledBracesTryCatch               = 1
+
+noBlankLinesAfterLeftBraceTryCatch        = false
 
 
 ### Braces -- Insert At
@@ -208,16 +231,16 @@ deleteSingleLineComments                  = false
 deleteTrailingComments                    = false
 deleteEndOfLineComments                   = false
 
-formatBlockComments                       = false
-formatSingleLineComments                  = false
-formatTrailingComments                    = false
-formatEndOfLineComments                   = false
+formatBlockComments                       = true
+formatSingleLineComments                  = true
+formatTrailingComments                    = true
+formatEndOfLineComments                   = true
 
 
 ### Comments -- Exceptions
 
-neverIndentFirstColumnComments            = false
-neverFormatFirstColumnComments            = false
+neverIndentFirstColumnComments            = true
+neverFormatFirstColumnComments            = true
 
 neverFormatHeader                         = false
 neverFormatFooter                         = false
@@ -235,6 +258,7 @@ minLinesToInsertBlankLineInMethods        = infinite
 ### Separation -- Separate
 
 separateChunksByComments                  = true
+separateChunksByTooLongLines              = true
 allowBreakSeparatedFromCaseBlock          = false
 blankLinesBetweenCaseBlocks               = 1
 blankLinesBetweenChunks                   = 1
@@ -268,6 +292,9 @@ blankLinesAfterSwitch                     = 1
 blankLinesAfterPackage                    = 1
 blankLinesAfterLastImport                 = 1
 
+blankLinesBeforeFilteredCode              = 1
+blankLinesAfterFilteredCode               = 0
+
 
 
 ### Whitespaces -- Padding
@@ -278,7 +305,10 @@ separateComparisonOperators               = true
 separateNumericalOperators                = true
 
 paddingCastParenthesis                    = false
-paddingParenthesis                        = false
+paddingStatementParenthesis               = false
+paddingMethodDeclarationParenthesis       = false
+paddingMethodCallParenthesis              = false
+
 paddingBrackets                           = false
 paddingBraces                             = true
 
@@ -290,7 +320,15 @@ spaceBeforeMethodCallParenthesis          = false
 spaceBeforeBrackets                       = false
 spaceBeforeBracketsInTypes                = false
 spaceBeforeStatementParenthesis           = true
-spaceBeforeConditionBang                  = false
+
+spaceBeforeBang                           = false
+spaceAfterBang                            = false
+spaceBeforeBangAfterAndOr                 = false
+spaceAfterBangAfterAndOr                  = false
+
+spaceBeforeTilde                          = false
+spaceAfterTilde                           = false
+
 spaceBeforeCaseColon                      = true
 
 
@@ -319,9 +357,16 @@ deepIndent                                = 45
 forceIndent                               = 8
 forceIndentTolerance                      = 4
 
+deepIndentForMultipleDeclarations         = 45
+
 allowWrappingAfterAssignments             = true
+wrapDeclarationAssignmentsToRightSide     = false
 allowWrappingAfterParenthesis             = true
 preferWrappingAfterThrows                 = true
+
+wrapAfterConditionalOperators             = false
+wrapAfterComparisonOperators              = false
+wrapAfterNumericalOperators               = false
 
 
 alwaysWrapThrows                          = true

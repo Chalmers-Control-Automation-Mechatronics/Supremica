@@ -1,4 +1,5 @@
 package org.supremica.softplc.Drivers;
+
 // package corejava;
 
 /**
@@ -16,7 +17,7 @@ public class Console
 
    @param prompt the prompt string to display
  */
-public static void printPrompt(String prompt)
+	public static void printPrompt(String prompt)
 	{
 		System.out.print(prompt + " ");
 		System.out.flush();
