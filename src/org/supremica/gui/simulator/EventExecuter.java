@@ -1,8 +1,10 @@
 package org.supremica.gui.simulator;
 
+
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.log.*;
 
 /**
@@ -15,14 +17,14 @@ class EventExecuter
 	extends Thread
 //	implements ListDataListener
 {
-	private static Logger logger = LoggerFactory.createLogger(EventExecuter.class);
+	protected static Logger logger = LoggerFactory.createLogger(EventExecuter.class);
 
-	private long sleepTime = 100;
-	private boolean doRun = true;
-	private boolean executeControllableEvents = false;
-	private boolean executeUncontrollableEvents = false;
-	private SimulatorEventListModel eventModel;
-	private SimulatorExecuter theExecuter;
+	protected long sleepTime = 100;
+	protected boolean doRun = true;
+	protected boolean executeControllableEvents = false;
+	protected boolean executeUncontrollableEvents = false;
+	protected SimulatorEventListModel eventModel;
+	protected SimulatorExecuter theExecuter;
 
 	public EventExecuter(SimulatorExecuter theExecuter, SimulatorEventListModel eventModel)
 	{
@@ -30,6 +32,10 @@ class EventExecuter
 		this.eventModel = eventModel;
 		this.theExecuter = theExecuter;
 //		eventModel.addListDataListener(this);
+
+
+		sleepTime = SupremicaProperties.getSimulationCycleTime();
+		System.out.println("sleepTime = " + sleepTime); // DEBUG
 	}
 
 	public void run()
@@ -67,57 +73,103 @@ class EventExecuter
 		doRun = false;
 	}
 
-	private synchronized void tryExecuteEvent()
+	protected void tryExecuteUncontrollableEvents()
+	{
+		eventModel.enterLock();
+
+		int nbrOfEvents = eventModel.getSize();
+
+		for (int i = 0; i < nbrOfEvents; i++)
+		{
+			LabeledEvent currEvent = eventModel.getEventAt(i);
+			if (!currEvent.isControllable())
+			{
+				logger.info("Automatically executed event: " + currEvent.getLabel());
+				if (!theExecuter.executeEvent(currEvent))
+				{
+					logger.warn("Failed to execute event: " + currEvent.getLabel());
+				}
+				eventModel.exitLock();
+				return;
+			}
+		}
+
+		eventModel.exitLock();
+	}
+
+	protected void tryExecuteControllableEvents()
+	{
+		eventModel.enterLock();
+
+		int nbrOfEvents = eventModel.getSize();
+		for (int i = 0; i < nbrOfEvents; i++)
+		{
+			LabeledEvent currEvent = eventModel.getEventAt(i);
+			if (currEvent.isControllable())
+			{
+				logger.info("Automatically executed event: " + currEvent.getLabel());
+				if (!theExecuter.executeEvent(currEvent))
+				{
+					logger.warn("Failed to execute event: " + currEvent.getLabel());
+				}
+				eventModel.exitLock();
+				return;
+			}
+		}
+
+		eventModel.exitLock();
+	}
+
+	protected void tryExecuteAnyEvents()
+	{
+		eventModel.enterLock();
+
+		int nbrOfEvents = eventModel.getSize();
+		for (int i = 0; i < nbrOfEvents; i++)
+		{
+			LabeledEvent currEvent = eventModel.getEventAt(i);
+			logger.info("Automatically executed event: " + currEvent.getLabel());
+			if (!theExecuter.executeEvent(currEvent))
+			{
+				logger.warn("Failed to execute event: " + currEvent.getLabel());
+			}
+			eventModel.exitLock();
+			return;
+		}
+
+		eventModel.exitLock();
+	}
+
+
+	protected synchronized void tryExecuteEvent()
 	{
 		updateSignals();
 
+/*
+		int nbrOfEvents = eventModel.getSize();
+		logger.debug("2.a ----------------------------");
+		eventModel.enterLock();
+		StringBuffer dum = new StringBuffer();
+		dum.append("Enabled events are: " );
+		for (int i = 0; i < nbrOfEvents; i++) dum.append(" " + eventModel.getEventAt(i).getLabel());
+		logger.debug(dum.toString() );
+		eventModel.exitLock();
+*/
+
+
+
 		if (executeUncontrollableEvents)
 		{
-			eventModel.enterLock();
-
-			int nbrOfEvents = eventModel.getSize();
-			for (int i = 0; i < nbrOfEvents; i++)
-			{
-				LabeledEvent currEvent = eventModel.getEventAt(i);
-				if (!currEvent.isControllable())
-				{
-					logger.info("Automatically executed event: " + currEvent.getLabel());
-					if (!theExecuter.executeEvent(currEvent))
-					{
-						logger.warn("Failed to execute event: " + currEvent.getLabel());
-					}
-					eventModel.exitLock();
-					return;
-				}
-			}
-
-			eventModel.exitLock();
-
+			tryExecuteUncontrollableEvents();
 		}
+
+
 
 		updateSignals();
 
 		if (executeControllableEvents)
 		{
-			eventModel.enterLock();
-
-			int nbrOfEvents = eventModel.getSize();
-			for (int i = 0; i < nbrOfEvents; i++)
-			{
-				LabeledEvent currEvent = eventModel.getEventAt(i);
-				if (currEvent.isControllable())
-				{
-					logger.info("Automatically executed event: " + currEvent.getLabel());
-					if (!theExecuter.executeEvent(currEvent))
-					{
-						logger.warn("Failed to execute event: " + currEvent.getLabel());
-					}
-					eventModel.exitLock();
-					return;
-				}
-			}
-
-			eventModel.exitLock();
+			tryExecuteControllableEvents();
 		}
 	}
 

@@ -86,8 +86,9 @@ public class SimulatorStateViewer
 //	private LinkedList nextStates = new LinkedList();
 	private SimulatorExecuter simulator;
 	private EventExecuter theExecuter;
+	private boolean executerIsExternal;
 
-	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper)
+	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper, boolean executerIsExternal)
 	{
 		setLayout(new BorderLayout());
 
@@ -105,7 +106,13 @@ public class SimulatorStateViewer
 
 		add(stateEventSplitter, BorderLayout.CENTER);
 		//theAnimationSignals.registerInterest(this);
-		theExecuter = new EventExecuter(simulator, forwardEvents.getEventListModel());
+
+
+
+		this.executerIsExternal = executerIsExternal;
+		theExecuter = executerIsExternal ?
+			new ExternalEventExecuter(simulator, forwardEvents.getEventListModel())
+			: new EventExecuter(simulator, forwardEvents.getEventListModel());
 	}
 
 	public void initialize()
@@ -113,6 +120,12 @@ public class SimulatorStateViewer
 //		eventSplitter.setDividerLocation(0.5);
 		stateEventSplitter.setDividerLocation(0.6);
 		theExecuter.start();
+	}
+
+	/** we do not use the built in executer /Arash */
+	public boolean isExternal()
+	{
+		return executerIsExternal;
 	}
 
 //	public void setCurrState(int[] newState)

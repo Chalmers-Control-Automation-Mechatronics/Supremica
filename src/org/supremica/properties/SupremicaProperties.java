@@ -137,6 +137,12 @@ public final class SupremicaProperties
     private static final String BDD_NB_OPTIMISTIC = "bddNBOptimistic";
 
 
+	// Simulation stuff
+	private static final String SIMULATION_IS_EXTERNAL = "simulationIsExternal";
+	private static final String SIMULATION_CYCLE_TIME = "simulationCycleTime";
+
+
+
 	// Animator Options
 	private static final String INCLUDE_ANIMATOR = "includeAnimator";
 
@@ -232,6 +238,12 @@ public final class SupremicaProperties
 		setProperty(BDD_LOCAL_SATURATION, toString(Options.local_saturation), true);
 		setProperty(BDD_ALGORITHM , toString(Options.algo_family), true);
 		setProperty(BDD_COUNT_ALGO, toString(Options.count_algo), true);
+
+		// Simulation stuff
+		setProperty(SIMULATION_IS_EXTERNAL, "false", false);
+		setProperty(SIMULATION_CYCLE_TIME, "100", false);
+
+
 	}
 
 
@@ -794,6 +806,18 @@ public final class SupremicaProperties
 	{
 		softplcInterfaces = interfaces;
 	}
+
+
+
+
+
+
+	// Simulation
+	public static boolean getSimulationIsExternal(){  return toBoolean(wp.getProperty(SIMULATION_IS_EXTERNAL));    }
+	public static void setSimulationIsExternal(boolean a){  wp.setProperty(SIMULATION_IS_EXTERNAL, toString(a));    }
+
+	public static int getSimulationCycleTime(){  return toInt(wp.getProperty(SIMULATION_CYCLE_TIME));    }
+	public static void setSimulationCycleTime(int a){  wp.setProperty(SIMULATION_CYCLE_TIME, toString(a));    }
 
 
     // BDD

@@ -181,14 +181,24 @@ public class SimulatorEventListModel
 			eventAmount++;
 		}
 
-		logger.error("Before fireContentsChanged");
+		logger.debug("Before fireContentsChanged");
 		fireContentsChanged(this, 0, eventAmount - 1);
-		logger.error("After fireContentsChanged");
+		logger.debug("After fireContentsChanged");
 
 		exitLock();
 
 	}
 
+
+	public Automata getAutomata()
+	{
+		return theAutomata;
+	}
+
+	public Alphabet getAlphabet ()
+	{
+		return theAlphabet ;
+	}
 	public synchronized void enterLock()
 	{
 		try

@@ -98,7 +98,7 @@ public class SimulatorExecuter
 	private int[] currState;
 
 
-	public SimulatorExecuter(VisualProject theProject)
+	public SimulatorExecuter(VisualProject theProject, boolean useExternalExecuter)
 		throws Exception
 	{
 		this.theProject = theProject;
@@ -181,12 +181,12 @@ public class SimulatorExecuter
 		});
 		initMenubar();
 
-		stateViewer = new SimulatorStateViewer(this, helper);
+		stateViewer = new SimulatorStateViewer(this, helper, useExternalExecuter);
 
 		contentPane.add(stateViewer, BorderLayout.CENTER);
 
 		// / controller = new ExplorerController(stateViewer, theAutomaton);
-		controller = new SimulatorExecuterController(stateViewer);
+		controller = new SimulatorExecuterController(stateViewer, useExternalExecuter);
 		contentPane.add(controller, BorderLayout.SOUTH);
 		stateViewer.setController(controller);
 //		stateViewer.goToInitialState();

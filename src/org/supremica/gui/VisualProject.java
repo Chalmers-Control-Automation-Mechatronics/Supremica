@@ -66,6 +66,8 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 
+import org.supremica.properties.SupremicaProperties;
+
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -487,11 +489,26 @@ public class VisualProject
 	{
 		if (theSimulator == null)
 		{
-			theSimulator = new SimulatorExecuter(this);
+			// ARASH: WAS
+			// theSimulator = new SimulatorExecuter(this, false);
+			theSimulator = new SimulatorExecuter(this, SupremicaProperties.getSimulationIsExternal());
 		}
 		theSimulator.setVisible(true);
 		return theSimulator;
 	}
+
+/*
+	public SimulatorExecuter getExternalExecuter()
+		throws Exception
+	{
+		if (theSimulator == null)
+		{
+			theSimulator = new SimulatorExecuter(this, true);
+		}
+		theSimulator.setVisible(true);
+		return theSimulator;
+	}
+*/
 
 	public CellEditor getCellEditor()
 		throws Exception

@@ -65,6 +65,7 @@ public class PreferencesDialog
 	private JTabbedPane theTabbedPanel = null;
 	private FilePanel theFilePanel = null;
 	private CommunicationPanel theCommunicationPanel = null;
+	private SimulationPanel  theSimulationPanel = null;
     private BDDPanel theBDDPanel = null;
 	private LayoutPanel theLayoutPanel = null;
 	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
@@ -98,6 +99,10 @@ public class PreferencesDialog
 
 		theBDDPanel = new BDDPanel(this);
 		theTabbedPanel.add("BDD", theBDDPanel);
+
+
+		theSimulationPanel = new SimulationPanel(this);
+		theTabbedPanel.add("Simulation", theSimulationPanel);
 
 		if (SupremicaProperties.fileAllowOpen() || SupremicaProperties.fileAllowSave())
 		{
@@ -172,6 +177,7 @@ public class PreferencesDialog
 			theFilePanel.update();
 		}
 
+		theSimulationPanel.update();
 		theBDDPanel.update();
 		theCommunicationPanel.update();
 		theLayoutPanel.update();
@@ -182,7 +188,7 @@ public class PreferencesDialog
 	private boolean setAttributes()
 	{
 
-	    	if (theBDDPanel != null)
+	    if (theBDDPanel != null)
 		{
 			if (!theBDDPanel.doApply())
 			{
@@ -213,10 +219,17 @@ public class PreferencesDialog
 			return false;
 		}
 
-       		if (!theSoftPLCPanel.doApply())
+       	if (!theSoftPLCPanel.doApply())
 		{
 			return false;
 		}
+
+
+       	if (!theSimulationPanel.doApply())
+		{
+			return false;
+		}
+
 
 		return true;
 	}
@@ -754,3 +767,62 @@ class BDDPanel
 	// fuck it
     }
 }
+
+
+
+
+
+
+
+class SimulationPanel
+    extends JPanel
+{
+    private PreferencesDialog theDialog = null;
+    private JCheckBox useExternal;
+    private JTextField cycleTime;
+
+
+    public SimulationPanel(PreferencesDialog theDialog)
+    {
+
+		this.theDialog = theDialog;
+		JPanel contentPane = new JPanel();
+
+		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
+		add(propertiesBox, BorderLayout.CENTER);
+
+
+		propertiesBox.add( new JLabel("Note: event source should be changed BEFORE any simulations are started."));
+
+		propertiesBox.add(useExternal = new JCheckBox("Use external event source"));
+		JPanel jp = new JPanel();
+		propertiesBox.add(jp);
+		jp.add(new JLabel("Simulation cycle time (lower bound)"));
+		jp.add(cycleTime = new JTextField("" + SupremicaProperties.getSimulationCycleTime(), 10 ));
+		jp.add(new JLabel("[ms]"));
+    }
+
+
+
+
+    public boolean doApply()
+    {
+
+		SupremicaProperties.setSimulationIsExternal(useExternal.isSelected());
+		int time = theDialog.getInt("Simulation cycle time", cycleTime.getText(), 0);
+		if (time == Integer.MIN_VALUE)
+		{
+			return false;
+		}
+		SupremicaProperties.setSimulationCycleTime(time);
+		return true;
+    }
+
+    public void update()
+    {
+		useExternal.setSelected( SupremicaProperties.getSimulationIsExternal() );
+		cycleTime.setText( "" + SupremicaProperties.getSimulationCycleTime() );
+
+    }
+}
+

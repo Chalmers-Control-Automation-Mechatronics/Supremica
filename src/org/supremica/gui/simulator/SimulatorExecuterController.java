@@ -77,7 +77,7 @@ class SimulatorExecuterController
 	private JCheckBox executeUncontrollableEvents;
 	private JCheckBox executeControllableEvents;
 
-	public SimulatorExecuterController(SimulatorStateViewer stateViewer)
+	public SimulatorExecuterController(SimulatorStateViewer stateViewer, boolean executerIsExternal)
 	{
 		setLayout(new BorderLayout());
 
@@ -113,6 +113,10 @@ class SimulatorExecuterController
 //		redoBox.add(Box.createHorizontalGlue());
 
 		add(redoBox, BorderLayout.NORTH);
+		if(executerIsExternal) {
+			executeUncontrollableEvents.setEnabled(false);
+			executeControllableEvents.setEnabled(false);
+		}
 
 		executeUncontrollableEvents.addActionListener(new ActionListener()
 		{
@@ -129,7 +133,7 @@ class SimulatorExecuterController
 				executeControllableEvents_actionPerformed(e);
 			}
 		});
-		
+
 //		undoButton.addActionListener(new ActionListener()
 //		{
 //			public void actionPerformed(ActionEvent e)
