@@ -76,7 +76,7 @@ public class AutomatonExplorer
 	private StateViewer stateViewer;
 	private ExplorerController controller;
 	private VisualProject theProject;
-	
+		
 	public AutomatonExplorer(VisualProject theProject, Automaton theAutomaton)
 		throws Exception
 	{	
@@ -136,6 +136,7 @@ public class AutomatonExplorer
 		controller = new ExplorerController(theProject, stateViewer, theAutomaton);
 
 		contentPane.add(controller, BorderLayout.SOUTH);
+
 		stateViewer.setController(controller);
 		stateViewer.goToInitialState();
 	}
@@ -591,6 +592,8 @@ class StateDisplayer
 	private JLabel stateId = new JLabel();
 	private JLabel stateName = new JLabel();
 	private JLabel compositeCosts = new JLabel();
+	
+		private static Logger logger = LoggerFactory.createLogger(StateDisplayer.class);
 
 	private void changeStateAccepting(boolean b)
 	{
@@ -678,13 +681,16 @@ class StateDisplayer
 		stateCost.setText("cost: " + currState.getCost());
 //		stateId.setText("id: " + currState.getId());
 		stateName.setText("name: " + currState.getName());
-		
-		StringBuffer str = new StringBuffer();
-		int[] costs = ((CompositeState) currState).getCompositeCosts();
-		for (int i=0; i<costs.length-1; i++)
-			str.append(costs[i] + "  ");
-		str.append(costs[costs.length-1] + "");
-		compositeCosts.setText("composite costs = [" + str + "]");
+	
+		if (currState instanceof CompositeState) 
+		{
+			StringBuffer str = new StringBuffer();
+			int[] costs = ((CompositeState) currState).getCompositeCosts();
+			for (int i=0; i<costs.length-1; i++)
+				str.append(costs[i] + "  ");
+			str.append(costs[costs.length-1] + "");
+			compositeCosts.setText("composite costs = [" + str + "]");
+		}
 	}
 }
 
@@ -803,7 +809,7 @@ class ExplorerController
 			ActionMan.findStates.execute(theProject, theAutomata);
 		}
 		catch (Exception ex)
-		{
+		{			
 			logger.error(ex.toString());
 			logger.debug(ex.getStackTrace());
 		}
