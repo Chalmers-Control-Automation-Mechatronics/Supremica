@@ -8,7 +8,7 @@ import java.lang.reflect.*;
 import java.text.*;
 
 /**
- * Schedule a task that executes once every 100ms.
+ * Schedule a task that executes once every x ms.
  */
 public class Shell
 {
@@ -34,43 +34,51 @@ public class Shell
 
     public Shell(String io, String il)
     {
-	Class IOClass;
 
-	try
-	    {
-		System.out.println("IO Class: " + io);
+	if (io.length() > 0 && il.length() > 0) {
+	    Class IOClass;
+	    
+	    try
+		{
+		    System.out.println("IO Class: " + io);
+		    
+		    IOClass = Class.forName(io);
+		    driver = (DigitalIODriver) IOClass.newInstance();
+		    nr_Of_Signals_In = driver.getNrOfSignalsIn();
+		    nr_Of_Signals_Out = driver.getNrOfSignalsOut();
+		}
+	    catch (Exception e)
+		{
+		    e.printStackTrace();
+		    System.err.println("3: " + e);
+		    System.exit(-1);
+		}
+	    
+	    ILShell(il);
+	}
+	else if (io.length() > 0 && il.length() == 0) {
 
-		IOClass = Class.forName(io);
-		driver = (DigitalIODriver) IOClass.newInstance();
-		nr_Of_Signals_In = driver.getNrOfSignalsIn();
-		nr_Of_Signals_Out = driver.getNrOfSignalsOut();
+	    try {
+		DigitalIODisplayView frame = new DigitalIODisplayView(io);
+		frame.pack();
+		frame.setVisible(true);
 	    }
-	catch (Exception e)
-	    {
-		e.printStackTrace();
-		System.err.println("3: " + e);
-		System.exit(-1);
-	    }
+	    catch (Exception e) { System.err.println(e); }
 
-	// new Shell(il);
-	ILShell(il);
+	}
+
     }
+
 
     public void ILShell(String dynClass)
     {
 	try
 	    {
-		System.out.println("***********************");
-		System.out.println(dynClass);
-
 		ILClass = Class.forName(dynClass);
 		classConstructor = ILClass.getConstructor(constructorArgumentTypes);
 	    }
 	catch (Exception e)
 	    {
-		System.out.println("***********************");
-		System.out.println(dynClass);
-		System.out.println("***********************");
 		System.err.println("1: " + e);
 		System.exit(-1);
 	    }
