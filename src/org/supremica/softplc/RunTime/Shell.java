@@ -16,8 +16,8 @@ public class Shell
     public IEC_Program il_program;
     public static String ioclass = new String();
     public static String ilclass = new String();
-    public boolean[] inSignals = new boolean[32];
-    public boolean[] outSignals = new boolean[32];
+    public boolean[] inSignals;
+    public boolean[] outSignals;
     public static short nr_Of_Signals_In;
     public static short nr_Of_Signals_Out;
     public static DigitalIODriver driver;
@@ -37,15 +37,17 @@ public class Shell
 
 	if (io.length() > 0 && il.length() > 0) {
 	    Class IOClass;
-	    
+
 	    try
 		{
 		    System.out.println("IO Class: " + io);
-		    
+
 		    IOClass = Class.forName(io);
 		    driver = (DigitalIODriver) IOClass.newInstance();
 		    nr_Of_Signals_In = driver.getNrOfSignalsIn();
 		    nr_Of_Signals_Out = driver.getNrOfSignalsOut();
+            inSignals = new boolean[nr_Of_Signals_In];
+            outSignals = new boolean[nr_Of_Signals_Out];
 		}
 	    catch (Exception e)
 		{
@@ -53,7 +55,7 @@ public class Shell
 		    System.err.println("3: " + e);
 		    System.exit(-1);
 		}
-	    
+
 	    ILShell(il);
 	}
 	else if (io.length() > 0 && il.length() == 0) {
