@@ -139,11 +139,21 @@ class MainPopupMenu
 			menuHandler.add(automatonSplit, 1);
 		}
 
+		// De följande två Schedule-knapparna borde bli till ett inom en viss (snar?) framtid
+		menuHandler.addSeparator();
+		
 		if (SupremicaProperties.includeExperimentalAlgorithms())
 		{
 			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
 			menuHandler.add(automataScheduler, 1);
 		}
+		
+		if (SupremicaProperties.includeExperimentalAlgorithms())
+		{
+			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction2());
+			menuHandler.add(automataScheduler, 1);
+		}
+
 
 		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 		//menuHandler.add(interfaceItem, 1);

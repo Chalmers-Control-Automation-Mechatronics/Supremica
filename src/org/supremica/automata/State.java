@@ -90,9 +90,22 @@ public class State
 	
 	// private StateNode stateNode = null;
 	private LinkedList incomingArcs = new LinkedList();
-	private LinkedList outgoingArcs = new LinkedList();
+	//private LinkedList outgoingArcs = new LinkedList();
+	protected LinkedList outgoingArcs = new LinkedList();
 	private List outgoingArcSets = new LinkedList();
 	private Listeners listeners = null;
+	
+	/**
+	 * Stores the parent to this State. Null by default unless the path to this 
+	 * state is tracked.
+	 */
+	protected State parent = null; 
+	
+	/** 
+	 * Stores the cost accumulated from the initial state until this one.
+	 * The value depends normally (if synchronized automaton) on the path to this state.
+	 */
+	protected int accumulatedCost = UNDEF_COST;
 
 	protected State() {}
 
@@ -138,6 +151,7 @@ public class State
 		x = otherState.x;
 		y = otherState.y;
 		radius = otherState.radius;
+		outgoingArcs = otherState.outgoingArcs;
 	}
 
 	// These two should be, and will be, private
@@ -499,14 +513,20 @@ public class State
 		return new ArcIterator(incomingArcs.iterator());
 	}
 
+	// Varför har man outgoingArcSet istället för helt enkelt outgoingArcs??
 	public StateIterator nextStateIterator()
 	{
 		StateSet nextStates = new StateSet();
-		for (Iterator arcSetIt = outgoingArcSetIterator(); arcSetIt.hasNext(); )
+		ArcIterator arcIt = outgoingArcsIterator();
+		
+		//for (Iterator arcSetIt = outgoingArcSetIterator(); arcSetIt.hasNext(); )
+		while (arcIt.hasNext())
 		{
-			ArcSet currArcSet = (ArcSet)arcSetIt.next();
-			nextStates.add(currArcSet.getToState());
+			//ArcSet currArcSet = (ArcSet)arcSetIt.next();
+			//nextStates.add(currArcSet.getToState());
+			nextStates.add(((Arc) arcIt.next()).getToState());
 		}
+		
 		return nextStates.iterator();
 	}
 
@@ -695,5 +715,45 @@ public class State
 		{
 			listeners.notifyListeners();
 		}
+	}
+	
+	/**
+	 *	Returns the preceding State in a path.
+	 */
+	public State getParent() { return parent; }
+	
+	/**
+	 *	Sets the preceding State in a path.
+	 */
+	public void setParent(State parent) {
+		this.parent = parent;
+	} 
+	
+	/**
+	 *	Returns the cost accumulated when this state is reached. Note that the 
+	 *	path to the state is of importance. 
+	 */
+	public int getAccumulatedCost() { return accumulatedCost; }
+	
+	/**
+	 *	Updates the accumulated cost. This method is overloaded in CompositeState.
+	 */
+	public void updateCosts(State prevState) {
+		accumulatedCost = prevState.getAccumulatedCost() + prevState.getCost(); 
+	}
+
+		
+	/**
+	 *	Returns an exact copy of this State. 
+	 */
+	public State copy() {
+		State copiedState = new State(this);
+		
+		if (isInitial())
+			copiedState.accumulatedCost = MIN_COST;
+		else
+			copiedState.accumulatedCost = UNDEF_COST;	
+			
+		return copiedState;
 	}
 }

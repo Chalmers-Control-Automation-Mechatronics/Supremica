@@ -54,6 +54,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.automata.Automata;
+import org.supremica.automata.CompositeState;
 
 public class AutomataStateViewer
 	extends JPanel
@@ -69,6 +70,7 @@ public class AutomataStateViewer
 	private JSplitPane stateEventSplitter;
 	private LinkedList prevStates = new LinkedList();
 	private LinkedList nextStates = new LinkedList();
+	
 
 	public AutomataStateViewer(AutomataSynchronizerHelper helper)
 	{

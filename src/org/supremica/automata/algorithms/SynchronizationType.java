@@ -65,7 +65,7 @@ public class SynchronizationType
 	}
 
 	private SynchronizationType(String description, boolean selectable)
-	{
+	{		
 		if (selectable)
 		{
 			types.add(this);
@@ -85,7 +85,7 @@ public class SynchronizationType
 	}
 
 	public static SynchronizationType toType(String type)
-	{
+	{	
 		if (type.equals(Prioritized.toString()))
 		{
 			return Prioritized;

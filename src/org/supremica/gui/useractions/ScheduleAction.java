@@ -32,6 +32,7 @@ public class ScheduleAction
 	public void actionPerformed(ActionEvent e)
 	{
 		ScheduleDialog dlg = new ScheduleDialog();
+
 		dlg.show();
 
 /*		Automata automata = ActionMan.getGui().getSelectedAutomata();

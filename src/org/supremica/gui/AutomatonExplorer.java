@@ -358,7 +358,7 @@ class StateViewer
 			if (newState.isInitial())
 				((CompositeState) newState).initCosts();
 			else
-				((CompositeState) newState).updateCosts((CompositeState) currState);
+				((CompositeState) newState).updateCosts(currState);
 		}
 	}
 }

@@ -179,6 +179,9 @@ public class ModifiedAstar
 
 				// If we've not already seen it (same logical state)...
 				boolean onopen = open.contains(nextState);
+				
+				// Man kan nog lägga till if(!onopen) else onclosed = false
+				// Det kanske är lite snabbare 
 				boolean onclosed = closed.contains(nextState);
 				
 				// begin debug *****

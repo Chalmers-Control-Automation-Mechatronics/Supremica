@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -59,9 +58,6 @@ public class CompositeState extends State
 
 	private static Logger logger = LoggerFactory.createLogger(CompositeState.class);
 	
-	/** The indices of the underlying states */
-//rivate int[] compositeIndices = null;
-	
 	/** The costs corresponding to the underlying states */
 	private int[] compositeCosts = null;
 
@@ -72,20 +68,11 @@ public class CompositeState extends State
 	 */
 	private int[] currentCosts = null;
 	
-	/** 
-	 * Stores the cost accumulated from the initial state until this one.
-	 * The value depends normally (if synchronized automaton) on the path to this state.
+	/**
+	 * The underlying states.
 	 */
-	private int accumulatedCost = -1;
-	
 	private ArrayList composingStates;
 	
-	// Behövs den??? )(och theStates också...)
-/*	public CompositeState(int capacity)
-	{
-		theStates = new ArrayList(capacity);
-	}
-*/	
 	public CompositeState(State state) 
 	{
 		super(state);	
@@ -93,6 +80,10 @@ public class CompositeState extends State
 	
 	public CompositeState(String id) {
 		super(id);	
+	}
+	
+	public CompositeState(int[] indices, Automata compositeAutomata) {
+		this("non_def", indices, compositeAutomata);
 	}
 	
 	public CompositeState(String id, int[] indices, Automata compositeAutomata) 
@@ -104,7 +95,7 @@ public class CompositeState extends State
 	}
 	
 	public void initialize(int[] indices, Automata theAutomata) 
-	{
+	{		
 		composingStates = new ArrayList();
 		
 		// -2 since the last two indices correspond to something funny, not the nbrs of the underlying states. 	
@@ -146,50 +137,49 @@ public class CompositeState extends State
 			if (isInitial()) 
 				currentCosts[i] = compositeCosts[i];
 			else
-				currentCosts[i] = -1;
+				currentCosts[i] = UNDEF_COST;
 		}
 				
 		accumulatedCost = 0;
 	}
-
-/*	public State getStateAt(int index)
-	{
-		return (State) theStates.get(index);
-	}
-
-	public void setStateAt(int index, State state)
-	{
-		theStates.add(index, state);
-	}
-*/	
-	/**
-	 *	Returns the indices of the underlying states.
-	 */
-//	public int[] getCompositeIndices() { return compositeIndices; }
 	
 	/**
-	 *	Stores the indices of the constituting states. 
+	 *	Copies this state and its variables, 
+	 *	setting the costs undefined (i.e. equal to -1 or 0). 
 	 */
-/*	protected void setCompositeIndices(int[] indices) 
-	{
-		if (compositeIndices == null) 
-			initialize(indices);
+	public State copy() {
+		int size = this.composingStates.size();
 		
-		for (int i=0; i<compositeIndices.length; i++) 
-			compositeIndices[i] = indices[i];
+		CompositeState copiedState = new CompositeState(this);
+		
+		copiedState.composingStates = new ArrayList(size);
+		copiedState.compositeCosts = new int[size];
+		copiedState.currentCosts = new int[size];
+		
+		for (int i=0; i<size; i++) {
+			copiedState.compositeCosts[i] = this.compositeCosts[i];
+			
+			if (isInitial())
+				copiedState.currentCosts[i] = this.currentCosts[i];
+			else
+				copiedState.currentCosts[i] = UNDEF_COST;
+		}
+		
+		if (isTimed()) 
+			copiedState.accumulatedCost = MIN_COST;
+		else
+			copiedState.accumulatedCost = UNDEF_COST;
+			
+		copiedState.composingStates.addAll(0, this.composingStates);
+		
+		return copiedState;
 	}
-*/	
+
 	/** 
 	 *	Returns the costs corresponding to the underlying states. Overrides 
 	 *	the @link getCost() method in org.supremica.automata.State.java. 
 	 */
 	public int[] getCompositeCosts() { return compositeCosts; }
-	
-	/**
-	 *	Returns the cost accumulated when this state is reached. Note that the 
-	 *	path to the state is of importance. 
-	 */
-	public int getAccumulatedCost() { return accumulatedCost; }
 	
 	/**
 	 *	Returns the current costs associated to this state (keeping in mind the 
@@ -236,28 +226,34 @@ public class CompositeState extends State
 	 *	Calculates the firing automata and other necessary parameters and calls 
 	 *	updateCosts(int[], boolean[], int);
 	 */
-	public void updateCosts(CompositeState prevState) 
+	public void updateCosts(State state) 
 	{
-		if (prevState.isUpdatingCosts()) 
-		{
-			if (prevState.isTimed())
+		if (state instanceof CompositeState) {
+			CompositeState prevState = (CompositeState) state;
+			
+			if (prevState.isUpdatingCosts()) 
 			{
-				boolean[] firingAutomata = new boolean[composingStates.size()];
-				ArrayList prevComposingStates = prevState.getComposingStates();
-				
-				for (int i=0; i<firingAutomata.length; i++) 
+				if (prevState.isTimed())
 				{
-					if (composingStates.get(i).equals(prevComposingStates.get(i)))
-						firingAutomata[i] = false;
-					else
-						firingAutomata[i] = true;
-				}	
-				
-				updateCosts(prevState.getCurrentCosts(), firingAutomata, prevState.getAccumulatedCost());
+					boolean[] firingAutomata = new boolean[composingStates.size()];
+					ArrayList prevComposingStates = prevState.getComposingStates();
+					
+					for (int i=0; i<firingAutomata.length; i++) 
+					{
+						if (composingStates.get(i).equals(prevComposingStates.get(i)))
+							firingAutomata[i] = false;
+						else
+							firingAutomata[i] = true;
+					}	
+					
+					updateCosts(prevState.getCurrentCosts(), firingAutomata, prevState.getAccumulatedCost());
+				}
+				else
+					accumulatedCost = prevState.getAccumulatedCost();
 			}
-			else
-				accumulatedCost = prevState.getAccumulatedCost();
 		}
+		else 
+			super.updateCosts(state);
 	}
 	
 	/**
@@ -331,4 +327,6 @@ public class CompositeState extends State
 */
 
 	public ArrayList getComposingStates() { return composingStates; }
+	
+	
 }

@@ -268,6 +268,7 @@ public final class AutomataOnlineSynchronizer
 				// This is the index of the "next" event in the current automaton
 				currAutEventIndex = currOutgoingEvents[currAutIndex][currOutgoingEventsIndex[currAutIndex]];
 
+logger.warn("syncType = " + syncType);
 				if (syncType == SynchronizationType.Prioritized)
 				{
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])

@@ -1,5 +1,7 @@
 /***************** DefaultExpander.java ******************/
-// The default expander expands all children and returns a list
+/** 
+ *	The default expander expands all children and returns a list
+ */
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
