@@ -52,23 +52,15 @@ package org.supremica.log;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.StringTokenizer;
-import java.util.Hashtable;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JTextPane;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.TabSet;
-import javax.swing.text.TabStop;
+import java.util.*;
+
+import javax.swing.*;
+
+import javax.swing.text.*;
+
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.Loader;
@@ -84,6 +76,7 @@ public class LogDisplay
 	private JScrollPane theTextPaneScrollPane;
 	private JTextPane textpane;
 	private StyledDocument doc;
+	private LoggerPopupMenu popup = new LoggerPopupMenu();
 
 	// private TracerPrintWriter tp;
 	private StringWriter sw;
@@ -107,7 +100,6 @@ public class LogDisplay
 	{
 		super();
 
-		// layout = new PatternLayout("%-5p %d [%t]:  %m%n");
 		layout = new PatternLayout("%-5p %m%n");
 		name = "Debug";
 
@@ -124,6 +116,36 @@ public class LogDisplay
 
 		// this.tp = new TracerPrintWriter(qw);
 		this.fancy = true;
+
+
+		// This code used to be in the popup menu -------------
+		textpane.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+
+				// This is needed for the Linux platform
+				// where isPopupTrigger is true only on mousePressed.
+				maybeShowPopup(e);
+			}
+
+			public void mouseReleased(MouseEvent e)
+			{
+
+				// This is for triggering the popup on Windows platforms
+				maybeShowPopup(e);
+			}
+
+			private void maybeShowPopup(MouseEvent e)
+			{
+				if (e.isPopupTrigger())
+				{
+					popup.show(textpane, e.getX(), e.getY());
+				}
+			}
+		});
+
+		// --------------------------------------//
 	}
 
 	public synchronized static LogDisplay getInstance()
@@ -136,14 +158,6 @@ public class LogDisplay
 		return theLogDisplay;
 	}
 
-	public synchronized static Category createCategory(String name)
-	{
-		Category thisCategory = Category.getInstance(name);
-
-		thisCategory.addAppender(getInstance());
-
-		return thisCategory;
-	}
 
 	private void createAttributes()
 	{
@@ -166,6 +180,22 @@ public class LogDisplay
 	}
 
 	public void close() {}
+
+	public void clear()
+	{
+		textpane.setText("");
+	}
+
+
+	public void cut()
+	{
+		textpane.cut();
+	}
+
+	public void copy()
+	{
+		textpane.copy();
+	}
 
 	private void createIcons()
 	{
@@ -387,5 +417,53 @@ public class LogDisplay
 	public boolean requiresLayout()
 	{
 		return true;
+	}
+
+
+
+	class LoggerPopupMenu
+		extends JPopupMenu
+	{
+		// except for access, these are copied straight from gui.Supremica
+		private void initPopups()
+		{
+			JMenuItem cutItem = new JMenuItem("Cut");
+			cutItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					clear();
+				}
+			});
+			add(cutItem);
+
+			JMenuItem copyItem = new JMenuItem("Copy");
+			copyItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					copy();
+				}
+			});
+			add(copyItem);
+
+			addSeparator();
+
+			JMenuItem clearItem = new JMenuItem("Clear");
+			clearItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					clear();
+				}
+			});
+			add(clearItem);
+
+		}
+
+		public LoggerPopupMenu()
+		{
+			initPopups();
+		}
 	}
 }
