@@ -308,8 +308,8 @@ class InterfaceAutomataPanel
 	extends WhiteScrollPane
 	implements UpdateInterfaceTab
 {
-	private final String title = "Interface Automata";
-	private final String tip = "Select the automata dependencies for this interface";
+	private static final String title = "Interface Automata";
+	private static final String tip = "Select the automata dependencies for this interface";
 	UpdateInterfaceTable table = null;
 
 	InterfaceAutomataPanel(UpdateInterfaceTable t)

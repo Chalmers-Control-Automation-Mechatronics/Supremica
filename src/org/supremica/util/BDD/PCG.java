@@ -5,7 +5,7 @@ import java.util.*;
 // Process Transition Graphs (PCG) in java
 public class PCG
 {
-	final int NOT_CONNECTED = -1;
+	static final int NOT_CONNECTED = -1;
 
 	private class Node
 	{

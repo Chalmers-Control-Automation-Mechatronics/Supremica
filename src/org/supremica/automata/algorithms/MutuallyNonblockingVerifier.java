@@ -70,9 +70,9 @@ public class MutuallyNonblockingVerifier
 	private boolean stopRequested = false;
 
 	// Array with results
-	private final int MUTUALLY_NONBLOCKING_YES = 0;
-	private final int MUTUALLY_NONBLOCKING_MAYBE = 1;
-	private final int MUTUALLY_NONBLOCKING_NO = 2;
+	private static final int MUTUALLY_NONBLOCKING_YES = 0;
+	private static final int MUTUALLY_NONBLOCKING_MAYBE = 1;
+	private static final int MUTUALLY_NONBLOCKING_NO = 2;
 	private int[] automatonIsMutuallyNonblocking;
 
 	// SynchronizationOptions

@@ -23,7 +23,7 @@ public class TestAlgo {
 	 * co-reachability test only if size != -1
 	 * non-blocking test only if can do reachability and co-reachability
 	 */
-	private final String [] TEST_FILES = {
+	private static final String [] TEST_FILES = {
 		"../examples/includeInJarFile/OtherExamples/agv.xml" ,
 		"../examples/includeInJarFile/OtherExamples/catmouse.xml",
 		"../examples/includeInJarFile/OtherExamples/circularTable.xml",
@@ -33,10 +33,10 @@ public class TestAlgo {
 		"../examples/c3.xml"
 
 		};
-	private final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, 1.101504E7, -1};
-	private final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1, -1};
-	private final boolean controllable[] = { false, false, false, true, true, false, true};
-	private final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */, true /* dont know */};
+	private static final double reachables[] = { 25731072, 18, 199, 2274519862886400.0, 10000000, 1.101504E7, -1};
+	private static final double coreachables[] = { 343692864, 20, 432, 2274519862886400.0, 10000000, -1, -1};
+	private static final boolean controllable[] = { false, false, false, true, true, false, true};
+	private static final boolean nonblocking[] = { true, true, false, false, true, true /* dont know */, true /* dont know */};
 
 
 	// ----------------------------------------------------------------------------------
@@ -301,6 +301,14 @@ public class TestAlgo {
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.10  2004/04/26 08:35:44  torda
+ Removed all(?) unused import statements (hundreds) for the following reasons:
+ 
+ - Unused imports can be confusing
+ - They give unnessesary dependencies
+ - Eclipse marked out everyone so it was easily done
+ - It felt good to remove them
+
  Revision 1.9  2004/04/08 11:10:20  vahidi
  encoding bug originated from IntQueue fixed. more tests added to discover all such stupid problems in future :(
 

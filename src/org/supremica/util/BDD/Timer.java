@@ -2,7 +2,7 @@ package org.supremica.util.BDD;
 
 public class Timer
 {
-	private final long MUL_SEC = 1000, MUL_MIN = MUL_SEC * 60,
+	private static final long MUL_SEC = 1000, MUL_MIN = MUL_SEC * 60,
 					   MUL_HOUR = MUL_MIN * 60, MUL_DAY = MUL_HOUR * 24,
 					   MAX_MILLISEC = 50000, MAX_SEC = 360, MAX_MIN = 80, MAX_HOUR = 36
 	;

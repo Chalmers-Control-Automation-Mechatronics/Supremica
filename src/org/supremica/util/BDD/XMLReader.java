@@ -8,7 +8,7 @@ import javax.xml.parsers.*;
 class XMLReader
 	extends DefaultHandler
 {
-	private final String TYPE_AUTOMATA = "Automata",
+	private static final String TYPE_AUTOMATA = "Automata",
 						 TYPE_AUTOMATON = "Automaton", TYPE_EVENT = "Event",
 						 TYPE_STATE = "State", TYPE_ARC = "Transition",
 						 VALUE_NAME = "name", VALUE_ID = "id",

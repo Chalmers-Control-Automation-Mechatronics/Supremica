@@ -614,13 +614,13 @@ public class DotViewer
 	static class ExportDialog
 	//	extends JDialog
 	{
-		private final String epsString = "eps";
-		private final String mifString = "mif";
-		private final String dotString = "dot";
-		private final String pngString = "png";
-		private final String svgString = "svg";
+		private static final String epsString = "eps";
+		private static final String mifString = "mif";
+		private static final String dotString = "dot";
+		private static final String pngString = "png";
+		private static final String svgString = "svg";
 
-		private final Object[] possibleValues =
+		private static final Object[] possibleValues =
 		{
 			epsString, mifString, dotString, pngString, svgString
 		};

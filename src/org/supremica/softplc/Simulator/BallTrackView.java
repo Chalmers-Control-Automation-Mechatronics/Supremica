@@ -25,14 +25,14 @@ public class BallTrackView
 
     /**Background image*/
     MediaTracker bildsLaddningKontroll = new MediaTracker(this);
-    private final String imageFileWithText    = "backgroundtext.gif";
-    private final String imageFileWithoutText = "background.gif";
+    private static final String imageFileWithText    = "backgroundtext.gif";
+    private static final String imageFileWithoutText = "background.gif";
     private boolean imageWithText = true; //Because bgImage will contain this image from the beginning
     private Image bgImage = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithText));
     private Image bgImageTemp = Toolkit.getDefaultToolkit().getImage(BallTrackView.class.getResource("/labprocess/" + imageFileWithoutText));
 
     /**Maximum number of balls allowed*/
-    final int maxNrOfBalls = 20;
+    static final int maxNrOfBalls = 20;
 
     /**size of window*/
     private int size;

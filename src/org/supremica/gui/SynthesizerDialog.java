@@ -133,7 +133,7 @@ class SynthesizerDialogStandardPanel
 	class NonblockNote
 		extends JTextArea
 	{
-		private final int transparent = 0;
+		private static final int transparent = 0;
 
 		public NonblockNote()
 		{

@@ -486,7 +486,7 @@ class SanchezPanel
 {
 	IntegerField int_blocks = null;
 	JComboBox choice = null;
-	final String [] choice_items =  {"#1: Async prod",  "#2: Synch prod", "#3: SupC"};
+	static final String [] choice_items =  {"#1: Async prod",  "#2: Synch prod", "#3: SupC"};
 	public SanchezPanel()
 	{
 		JPanel panel  = new JPanel(new GridLayout(3,2));

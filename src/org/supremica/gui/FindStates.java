@@ -865,8 +865,8 @@ class FixedFormPanel
 	extends WhiteScrollPane
 	implements FindStatesTab
 {
-	private final String title = "Fixed Form";
-	private final String tip = "Search with state specific content";
+	private static final String title = "Fixed Form";
+	private static final String tip = "Search with state specific content";
 	FindStatesTable table = null;
 
 	FixedFormPanel(FindStatesTable t)

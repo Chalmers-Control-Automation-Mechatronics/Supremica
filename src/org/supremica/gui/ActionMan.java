@@ -670,16 +670,16 @@ public class ActionMan
 	static class ExportDialog
 	//	extends JDialog
 	{
-		private final String xmlString = "xml";
-		private final String spString = "sp";
-		private final String dotString = "dot";
-		private final String dsxString = "dsx";
-		private final String htmlString ="html";
-		private final String fsmString = "fsm";
-		private final String pcgString = "pcg";
-		private final String sspcString = "sspc";
+		private static final String xmlString = "xml";
+		private static final String spString = "sp";
+		private static final String dotString = "dot";
+		private static final String dsxString = "dsx";
+		private static final String htmlString ="html";
+		private static final String fsmString = "fsm";
+		private static final String pcgString = "pcg";
+		private static final String sspcString = "sspc";
 
-		private final Object[] possibleValues =
+		private static final Object[] possibleValues =
 		{
 			xmlString, spString, dotString, dsxString, fsmString, htmlString, pcgString, sspcString
 		};

@@ -9,7 +9,7 @@ import org.supremica.util.BDD.*;
  */
 
 public class NDAS_Choice {
-	private final int
+	private static final int
 		ADD_REWARD = +2,
 		ADD_PUNISH = -1,	// tabu search magic number?
 		ADD_REWARD_FADING = +5;
