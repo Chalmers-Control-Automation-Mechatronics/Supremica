@@ -419,6 +419,7 @@ public class Automata
 
 			if (!automaton.isDeterministic())
 			{
+				logger.info("Automaton " + automaton + " is not deterministic");
 				return false;
 			}
 		}
@@ -673,7 +674,7 @@ public class Automata
 			change = false;
 			AutomatonIterator autIt = this.iterator();
 			autIt.nextAutomaton(); // The first is already taken care of
-			
+
 			// Loop and compare alphabets
 			while(autIt.hasNext())
 			{
@@ -683,12 +684,12 @@ public class Automata
 					continue;
 				}
 				Alphabet alpha = theAut.getAlphabet();
-				
+
 				// Compare the alphabets!
-				Alphabet diff = Alphabet.minus(alpha, unionAlpha);			
+				Alphabet diff = Alphabet.minus(alpha, unionAlpha);
 				if (diff.size() == alpha.size())
 				{   // Disjoint (so far)
-					
+
 				}
 				else if (diff.size() > 0)
 				{   // Not disjoint, new events in unionAlpha!
@@ -700,9 +701,9 @@ public class Automata
 				{   // Not disjoint, no change!
 					autA.addAutomaton(theAut);
 				}
-			}		
+			}
 		}
-		
+
 		// What's the result?
 		if (unionAlpha.size() < this.getUnionAlphabet().size())
 		{
@@ -1293,7 +1294,8 @@ public class Automata
 		// Warns if there are events with equal (lowercase) names.
 		isEventNamesSafe();
 
-		// Warns if the system has disjoint modules (the system can be divided into at least two sets 
+
+		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
 		isSeveralSystems();
 
@@ -1358,7 +1360,7 @@ public class Automata
 				}
 			}
 		}
-	   
+
 		// Examines the type of each automaton
 		if (mustHaveValidType && (size() > 1))
 		{
