@@ -130,15 +130,11 @@ public class AutomataVerifier
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
 		// Modular algorithms demand systems with more than one module...
-		/*
-		if (((theAutomata.size() <= 1) && 
-			 !(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)) &&
-			(verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular))
+		if ((verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular) && (theAutomata.size() < 2))
 		{
 			logger.warn("Using monolithic algorithm instead, since the system is not modular.");
 			verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
 		}
-		*/
 
 		// Check IDD
 		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
@@ -1811,7 +1807,7 @@ public class AutomataVerifier
 		try
 		{
 			// Minimizer
-		 	AutomataMinimizer minimizer= new AutomataMinimizer(theAutomata);
+		 	AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
 			threadToStop = minimizer;
 			if (executionDialog != null)
 			{

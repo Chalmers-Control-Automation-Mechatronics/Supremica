@@ -97,23 +97,6 @@ public class AutomatonExplorer
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		setTitle(theAutomaton.getName());
 
-//              setSize(400, 500);
-//
-//              // Center the window
-//              Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//              Dimension frameSize = getSize();
-//
-//              if (frameSize.height > screenSize.height)
-//              {
-//                      frameSize.height = screenSize.height;
-//              }
-//
-//              if (frameSize.width > screenSize.width)
-//              {
-//                      frameSize.width = screenSize.width;
-//              }
-//
-//              setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		Utility.setupFrame(this, 400, 500);
 		addWindowListener(new WindowAdapter()
 		{
@@ -124,10 +107,8 @@ public class AutomatonExplorer
 				//dispose();
 			}
 		});
-		initMenubar();
 
 		State currState = theAutomaton.getInitialState();
-
 		if (currState == null)
 		{
 			throw new SupremicaException("No initial state");
@@ -142,6 +123,8 @@ public class AutomatonExplorer
 		contentPane.add(controller, BorderLayout.SOUTH);
 		stateViewer.setController(controller);
 		stateViewer.goToInitialState();
+
+		initMenubar();
 	}
 
 	public void initialize()
@@ -156,16 +139,13 @@ public class AutomatonExplorer
 
 		// File
 		JMenu menuFile = new JMenu();
-
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(menuFile);
 
 		// File.Close
-		JMenuItem menuFileClose = new JMenuItem();
-
-		menuFileClose.setText("Close");
+		JMenuItem menuFileClose = new JMenuItem("Close");
 		menuFile.add(menuFileClose);
-		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -173,6 +153,51 @@ public class AutomatonExplorer
 				setVisible(false);
 
 				//dispose();
+			}
+		});
+
+		// View
+		JMenu menuView = new JMenu();
+		menuView.setText("View");
+		menuView.setMnemonic(KeyEvent.VK_V);
+		menuBar.add(menuView);
+
+		// View.EpsilonClosure
+		JCheckBoxMenuItem menuViewEpsilonClosure = new JCheckBoxMenuItem("Consider Epsilon Closure");
+		menuViewEpsilonClosure.setSelected(stateViewer.getConsiderEpsilonClosure());
+		menuView.add(menuViewEpsilonClosure);
+		menuViewEpsilonClosure.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				stateViewer.setConsiderEpsilonClosure(!stateViewer.getConsiderEpsilonClosure());
+				stateViewer.update();
+			}
+		});
+
+		// View.OutgoingStateNames
+		JCheckBoxMenuItem menuViewOutgoingStateNames = new JCheckBoxMenuItem("Show Outgoing State Names");
+		menuViewOutgoingStateNames.setSelected(stateViewer.getShowOutgoingStateNames());
+		menuView.add(menuViewOutgoingStateNames);
+		menuViewOutgoingStateNames.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				stateViewer.setShowOutgoingStateNames(!stateViewer.getShowOutgoingStateNames());
+				stateViewer.update();
+			}
+		});
+
+		// View.IncomingStateNames
+		JCheckBoxMenuItem menuViewIncomingStateNames = new JCheckBoxMenuItem("Show Incoming State Names");
+		menuViewIncomingStateNames.setSelected(stateViewer.getShowIncomingStateNames());
+		menuView.add(menuViewIncomingStateNames);
+		menuViewIncomingStateNames.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				stateViewer.setShowIncomingStateNames(!stateViewer.getShowIncomingStateNames());
+				stateViewer.update();
 			}
 		});
 	}
@@ -244,9 +269,10 @@ class StateViewer
 		this.theAutomaton = theAutomaton;
 		forwardEvents = new EventList(this, theAutomaton, true);
 		backwardEvents = new EventList(this, theAutomaton, false);
-
-		backwardEvents.setShowStateId(true);
-
+		
+		forwardEvents.setShowStateName(false);
+		backwardEvents.setShowStateName(true);
+		
 		eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
 		stateDisplayer = new StateDisplayer(this, theAutomaton);
 		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
@@ -352,10 +378,10 @@ class StateViewer
 	}
 
 	/**
-	 *      Performs any action only if the current automaton is composite (otherwise
-	 *      it is not necessary). Updates the current costs (see also CompositeState)
-	 *      if the current state is not initial. Otherwise, the method initializes the
-	 *      current and accumulated costs.
+	 *  Performs any action only if the current automaton is composite (otherwise
+	 *  it is not necessary). Updates the current costs (see also CompositeState)
+	 *  if the current state is not initial. Otherwise, the method initializes the
+	 *  current and accumulated costs.
 	 */
 	public void updateCosts(State currState, State newState)
 	{
@@ -370,6 +396,35 @@ class StateViewer
 				((CompositeState) newState).updateCosts(currState);
 			}
 		}
+	}
+
+	public boolean getConsiderEpsilonClosure()
+	{
+		// Should be the same forward and backwards... should be static, that is... well, well.
+		return forwardEvents.getConsiderEpsilonClosure();
+	}
+	public void setConsiderEpsilonClosure(boolean bool)
+	{
+		forwardEvents.setConsiderEpsilonClosure(bool);
+		backwardEvents.setConsiderEpsilonClosure(bool);
+	}
+
+	public boolean getShowOutgoingStateNames()
+	{
+		return forwardEvents.getShowStateName();
+	}
+	public void setShowOutgoingStateNames(boolean bool)
+	{
+		forwardEvents.setShowStateName(bool);
+	}
+
+	public boolean getShowIncomingStateNames()
+	{
+		return backwardEvents.getShowStateName();
+	}
+	public void setShowIncomingStateNames(boolean bool)
+	{
+		backwardEvents.setShowStateName(bool);
 	}
 }
 
@@ -435,9 +490,22 @@ class EventList
 		});
 	}
 
-	public void setShowStateId(boolean showStateId)
+	public boolean getShowStateName()
 	{
-		eventsList.setShowStateId(showStateId);
+		return eventsList.getShowStateName();
+	}
+	public void setShowStateName(boolean showState)
+	{
+		eventsList.setShowStateName(showState);
+	}
+
+	public boolean getConsiderEpsilonClosure()
+	{
+		return eventsList.getConsiderEpsilonClosure();
+	}
+	public void setConsiderEpsilonClosure(boolean bool)
+	{
+		eventsList.setConsiderEpsilonClosure(bool);
 	}
 
 	public void setCurrState(State currState)
@@ -465,11 +533,15 @@ class EventListModel
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(EventListModel.class);
 	private State currState;
-	private ArrayList currArcs = new ArrayList();
+	//private ArrayList currArcs = new ArrayList();
+
+	/** Sorts the arcs in a TreeMap with the same key for equivalent arcs (epsilon closure) */
+	private TreeMap currArcs = new TreeMap();
 	private boolean forward;
 	private Automaton theAutomaton;
 	private Alphabet theAlphabet;
 	private boolean showState = false;
+	private boolean considerEpsilonClosure = false;
 
 	public EventListModel(Automaton theAutomaton, boolean forward)
 	{
@@ -485,9 +557,22 @@ class EventListModel
 		update();
 	}
 
-	public void setShowStateId(boolean showState)
+	public boolean getShowStateName()
+	{
+		return showState;
+	}
+	public void setShowStateName(boolean showState)
 	{
 		this.showState = showState;
+	}
+
+	public boolean getConsiderEpsilonClosure()
+	{
+		return considerEpsilonClosure;
+	}
+	public void setConsiderEpsilonClosure(boolean bool)
+	{
+		this.considerEpsilonClosure = bool;
 	}
 
 	public void update()
@@ -496,11 +581,25 @@ class EventListModel
 
 		if (forward)
 		{
-			arcIt = currState.outgoingArcsIterator();
+			if (considerEpsilonClosure)
+			{
+				arcIt = currState.epsilonClosure().outgoingArcsIterator();
+			}
+			else
+			{
+				arcIt = currState.outgoingArcsIterator();
+			}
 		}
 		else
 		{
-			arcIt = currState.incomingArcsIterator();
+			if (considerEpsilonClosure)
+			{
+				arcIt = currState.epsilonClosure().incomingArcsIterator();
+			}
+			else
+			{
+				arcIt = currState.incomingArcsIterator();
+			}
 		}
 
 		currArcs.clear();
@@ -509,7 +608,19 @@ class EventListModel
 		{
 			Arc currArc = (Arc) arcIt.next();
 
-			currArcs.add(currArc);
+			//currArcs.add(currArc);
+			if (forward)
+			{
+				// Sort on event and target state for forward
+				currArcs.put(currArc.getEvent().getLabel() + " " + 
+							 currArc.getToState().getName(), currArc);
+			}
+			else
+			{
+				// Sort on event and start state for backward
+				currArcs.put(currArc.getEvent().getLabel() + " " + 
+							 currArc.getFromState().getName(), currArc);
+			}
 		}
 
 		fireContentsChanged(this, 0, currArcs.size() - 1);
@@ -522,23 +633,12 @@ class EventListModel
 
 	public Object getElementAt(int index)
 	{
-		Arc currArc = (Arc) currArcs.get(index);
+		//Arc currArc = (Arc) currArcs.get(index);
+		Arc currArc = (Arc) currArcs.values().toArray()[index];
 
 		// String eventId = currArc.getEventId();
 		org.supremica.automata.LabeledEvent currEvent = currArc.getEvent();
 
-/** Can this exception ever occur? Arc::getEvent does not throw anything
-				try
-				{
-						currEvent = currArc.getEvent(); // theAlphabet.getEventWithId(eventId);
-				}
-				catch (Exception e)
-				{
-						System.err.println("Error: Could not find " + eventId + " in alphabet!\n");
-
-						return null;
-				}
-**/
 		StringBuffer responseString = new StringBuffer();
 		boolean terminateFont = false;
 
@@ -608,7 +708,8 @@ class EventListModel
 
 	public State getStateAt(int index)
 	{
-		Arc currArc = (Arc) currArcs.get(index);
+		//Arc currArc = (Arc) currArcs.get(index);
+		Arc currArc = (Arc) currArcs.values().toArray()[index];
 		State newState;
 
 		if (forward)
@@ -717,8 +818,8 @@ class StateDisplayer
 	}
 
 	/**
-	 *      This method sets the values of the graphical components building up the
-	 *      stateDisplayer.
+	 * This method sets the values of the graphical components building up the
+	 * stateDisplayer.
 	 */
 	public void setCurrState(State currState)
 	{

@@ -58,7 +58,6 @@ class EventNodeRenderer
 class EventSelectionModel
 	extends DefaultTreeSelectionModel
 {
-
 	private static final long serialVersionUID = 1L;
 }
 
@@ -96,14 +95,18 @@ class EventsViewerPanel    // compare AlphabetsViewerPanel
 		add(scrollPanel, BorderLayout.CENTER);
 	}
 
-	// In this panel, the EventSubTrees are at level 1 (root is at 0) with the AlphabetViewerSubTrees at level 2
-	// The AlphabetViewerSubTrees are only there to show what automata the event belongs to
-	// Shold make an effort to cache the AlphabetViewerSubTrees and not calc and store the same subtree several times
+	// In this panel, the EventSubTrees are at level 1 (root is 
+	// at 0) with the AlphabetViewerSubTrees at level 2
+	// The AlphabetViewerSubTrees are only there to show what
+	// automata the event belongs to should make an effort to 
+	// cache the AlphabetViewerSubTrees and not calc and store 
+	// the same subtree several times
 	public void build(boolean showroot)
 	{
-
-		// Was a good idea, but subtrees cannot be shared, I guess this has to do with requiring a single parent
-		// DefaultMutableTreeNode::add() says "Removes newChild from its parent and makes it a child of this node"
+		// Was a good idea, but subtrees cannot be shared, I 
+		// guess this has to do with requiring a single parent
+		// DefaultMutableTreeNode::add() says "Removes newChild 
+		// from its parent and makes it a child of this node"
 		// So, we have to create over and oper again -- bummer.
 		// EventTreeCache eventTreeCache = new EventTreeCache();
 		// AutomatonTreeCache automatonTreeCache = new AutomatonTreeCache();
@@ -262,7 +265,6 @@ class RestrictEventsViewerPanel
 
 	public RestrictEventsViewerPanel()
 	{
-
 		// this.root = new AutomatonSubTree(automaton, true, false);
 		// this.root = new SupremicaTreeNode("Erase These Events");
 		this.root = new AlphabetSubTree(alpha);
@@ -360,7 +362,6 @@ class RestrictEventsViewerPanel
 
 	public Alphabet getAlphabet()
 	{
-
 		// return automaton.getAlphabet();
 		return alpha;
 	}

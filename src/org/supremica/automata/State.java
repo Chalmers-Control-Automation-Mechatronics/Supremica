@@ -703,36 +703,50 @@ public class State
 		removeIncomingArcs();
 	}
 
-	public void removeOutgoingArcs()
+	/**
+	 * Removes all outgoing arcs from this state.
+	 * @return the number of removed arcs.
+	 */
+	public int removeOutgoingArcs()
 	{
-		LinkedList outArcs = (LinkedList) outgoingArcs.clone();
+		int count = 0;
 
+		LinkedList outArcs = (LinkedList) outgoingArcs.clone();
 		Iterator arcIt = outArcs.iterator();
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();
-
 			currArc.clear();
+			count++;
 		}
 
 		outgoingArcs.clear();
 		outArcs.clear();
+
+		return count;
 	}
 
-	public void removeIncomingArcs()
+	/**
+	 * Removes all incoming arcs from this state.
+	 * @return the number of removed arcs.
+	 */
+	public int removeIncomingArcs()
 	{
-		LinkedList inArcs = (LinkedList) incomingArcs.clone();
+		int count = 0;
 
+		LinkedList inArcs = (LinkedList) incomingArcs.clone();
 		Iterator arcIt = inArcs.iterator();
 		while (arcIt.hasNext())
 		{
 			Arc currArc = (Arc) arcIt.next();
-
 			currArc.clear();
+			count++;
 		}
 
 		incomingArcs.clear();
 		inArcs.clear();
+
+		return count;
 	}
 	
 	public boolean isSafe()

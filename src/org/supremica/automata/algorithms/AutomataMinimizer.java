@@ -110,16 +110,10 @@ public class AutomataMinimizer
 		int nbrOfAutomata = theAutomata.size();
 
 		// Initialize execution dialog
-		java.awt.EventQueue.invokeLater(new Runnable()
+		if (executionDialog != null)
 		{
-			public void run()
-			{
-				if (executionDialog != null)
-				{
-					executionDialog.initProgressBar(0, theAutomata.size()-1);
-				}
-			}
-		});
+			executionDialog.initProgressBar(0, theAutomata.size()-1);
+		}
 
 		// While there are more than two automata, compose and minimize!
 		while (theAutomata.size() >= 2)
@@ -273,7 +267,6 @@ public class AutomataMinimizer
 			
 			}
 			*/
-
 			
 			if (AutomatonMinimizer.debug)
 			{
@@ -336,17 +329,9 @@ public class AutomataMinimizer
 			largestAutomatonSize = aut.nbrOfStates();
 		}
 
-		// Message
-		int before = aut.nbrOfStates();
-		int epsilons = aut.nbrOfEpsilonTransitions();
-		int total = aut.nbrOfTransitions();
-		logger.verbose("Minimizing " + aut + " with " + before +
-					   " states and " + epsilons + " epsilon transitions (" + 
-					   ((double) epsilons)*100/total + "%).");
-		
 		// Is it at all possible to minimize? (It may actually be possible even
 		// if there are no epsilons.)
-		if (epsilons > 0)
+		if (aut.nbrOfEpsilonTransitions() > 0)
 		{
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
 			minimizer.useShortStateNames(true);
@@ -358,12 +343,6 @@ public class AutomataMinimizer
 			{
 				return null;
 			}
-
-			// Message
-			int after = aut.nbrOfStates();
-			logger.verbose("There were " + before + " states before and " + after + 
-						   " states after the minimization. Reduction: " + 
-						   ((double) (before-after))*100/before + "%.");
 		}
 
 		return aut;

@@ -143,7 +143,7 @@ public final class MinimizationOptions
 				return message;
 			}
 		}
-
+		
 		if (compositionalMinimization)
 		{
 			if (targetAlphabet == null)

@@ -74,13 +74,9 @@ public final class ExecutionDialog
 	private JPanel currCenterPanel = null;
 	private JButton stopButton = null;
 
-	// private int progressMin = -1;
-	// private int progressMax = -1;
 	private int progressValue = -1;
 	private int value = -1;
 
-	// -- MF -- Changed to use a Gui instead
-	// -- MF --      private Supremica workbench;
 	private ExecutionDialogMode currentMode = null;
 	private int nbrOfFoundStates = -1;
 	private boolean newMode = true;
@@ -94,128 +90,51 @@ public final class ExecutionDialog
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = getSize();
-
 		if (frameSize.height > screenSize.height)
 		{
 			frameSize.height = screenSize.height;
 		}
-
 		if (frameSize.width > screenSize.width)
 		{
 			frameSize.width = screenSize.width;
 		}
-
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
-		contentPanel = (JPanel) getContentPane();
-
 		JPanel operationPanel = new JPanel(new GridLayout(2, 1));
-
 		operationLabel = new JLabel();
-
 		operationLabel.setHorizontalAlignment(JLabel.LEFT);
-
-		operationHeader = new JLabel();
-
-		operationHeader.setHorizontalAlignment(JLabel.CENTER);
 		operationPanel.add(operationLabel);
+		operationHeader = new JLabel();
+		operationHeader.setHorizontalAlignment(JLabel.CENTER);
 		operationPanel.add(operationHeader);
-		contentPanel.add(operationPanel, BorderLayout.NORTH);
 
 		// We have two panels that we switch between, infoPanel and progressPanel
+
 		// The infoPanel
-		//infoPanel = new JPanel(new GridLayout(2, 1));
 		infoPanel = new JPanel();
-
-		//JPanel operationHeaderPanel = new JPanel();
-		//operationHeader = new JLabel();
-		//operationHeaderPanel.add(operationHeader, BorderLayout.CENTER);
-		//JPanel infoValuePanel = new JPanel();
 		infoValue = new JLabel();
-
-		//infoValuePanel.add(infoValue, BorderLayout.CENTER);
-		//infoPanel.add(operationHeaderPanel);
-		//infoPanel.add(infoValuePanel);
 		infoPanel.add(infoValue, BorderLayout.CENTER);
 
 		// The progressPanel
 		progressPanel = new JPanel();
 		progressBar = new JProgressBar();
-
 		progressBar.setStringPainted(true);
-
-		//JPanel progressHeaderPanel = new JPanel();
-		//progressHeaderPanel.add(operationHeader, BorderLayout.CENTER);
-		//progressPanel.add(progressHeaderPanel);
 		progressPanel.add(progressBar, BorderLayout.CENTER);
 
-		// And there are some buttons (one)
+		// And there is a button
 		JPanel buttonPanel = new JPanel();
 		stopButton = new JButton("Abort");
 		stopButton.addActionListener(this);
 		buttonPanel.add(stopButton);
+
+		// And all is shown in one panel, the contentPanel
+		contentPanel = (JPanel) getContentPane();
+		contentPanel.add(operationPanel, BorderLayout.NORTH);
 		contentPanel.add(buttonPanel, BorderLayout.SOUTH);
 
 		// Hit it!
 		setMode(ExecutionDialogMode.uninitialized);
 		show();
-
-		/*
-		setTitle(title);
-		setSize(new Dimension(250, 120));
-		setResizable(false);
-
-		// Center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension frameSize = getSize();
-
-		if (frameSize.height > screenSize.height)
-		{
-				frameSize.height = screenSize.height;
-		}
-
-		if (frameSize.width > screenSize.width)
-		{
-				frameSize.width = screenSize.width;
-		}
-
-		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-
-		contentPanel = (JPanel) getContentPane();
-		operationLabel = new JLabel();
-
-		contentPanel.add(operationLabel, BorderLayout.NORTH);
-
-		// We have two panels that we switch between
-		infoPanel = new JPanel(new GridLayout(2, 1));
-		operationHeader = new JLabel();
-
-		JPanel operationHeaderPanel = new JPanel();
-
-		infoValue = new JLabel();
-
-		JPanel infoValuePanel = new JPanel();
-
-		operationHeaderPanel.add(operationHeader, BorderLayout.CENTER);
-		infoValuePanel.add(infoValue, BorderLayout.CENTER);
-		infoPanel.add(operationHeaderPanel);
-		infoPanel.add(infoValuePanel);
-
-		progressPanel = new JPanel();
-		progressBar = new JProgressBar();
-
-		progressPanel.add(progressBar, BorderLayout.CENTER);
-
-		JPanel buttonPanel = new JPanel();
-
-		stopButton = new JButton("Abort");
-
-		stopButton.addActionListener(this);
-		buttonPanel.add(stopButton);
-		contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-		setMode(ExecutionDialogMode.uninitialized);
-		show();
-		*/
 	}
 
 	/**

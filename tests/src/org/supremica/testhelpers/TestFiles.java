@@ -60,7 +60,10 @@ import java.io.*;
 public class TestFiles
 {
 	private static List collection = new LinkedList();
+
+	// Sorted alphabetically (for convenience), please comply.  :o)
 	public static final TestFiles AGV = new TestFiles("agv.xml");
+	public static final TestFiles AutomaticCarParkGate = new TestFiles("AutomaticCarParkGate.xml");
 	public static final TestFiles BallProcess = new TestFiles("ballProcess.xml");
 	public static final TestFiles BallProcessJava = new TestFiles("BallProcess.java");
 	public static final TestFiles Bisimulation = new TestFiles("bisimulation.xml");
@@ -68,22 +71,22 @@ public class TestFiles
 	public static final TestFiles CatMouseJava = new TestFiles("CatAndMouse.java");
 	public static final TestFiles CentralLocking3Doors = new TestFiles("centralLocking3Doors.xml");
 	public static final TestFiles CircularTable = new TestFiles("circularTable.xml");
+	public static final TestFiles ConflictEquivalence = new TestFiles("ConflictEquivalenceExamples.xml");
+	public static final TestFiles Ex4_5_a = new TestFiles("ex4_5_a.xml");
+	public static final TestFiles Ex4_5_b = new TestFiles("ex4_5_b.xml");
 	public static final TestFiles FlexibleManufacturingCell = new TestFiles("flexibleManufacturingCell.xml");
 	public static final TestFiles FlexibleManufacturingSystem = new TestFiles("flexibleManufacturingSystem.xml");
-	public static final TestFiles robotAssemblyCell = new TestFiles("robotAssemblyCell.xml");
+	public static final TestFiles MachineBufferMachine = new TestFiles("MachineBufferMachine.xml");
+	public static final TestFiles NondeterministicComposition = new TestFiles("NondeterministicComposition.xml");
+	public static final TestFiles RobotAssemblyCell = new TestFiles("robotAssemblyCell.xml");
 	public static final TestFiles Verriegel3 = new TestFiles("verriegel3.xml");
 	public static final TestFiles Verriegel3LanguageInclusion = new TestFiles("verriegel3_language_inclusion.xml");
 	public static final TestFiles Verriegel3LanguageExclusion = new TestFiles("verriegel3_language_exclusion.xml");
 	public static final TestFiles Verriegel3Uncontrollable = new TestFiles("verriegel3_uncontrollable.xml");
-	public static final TestFiles AutomaticCarParkGate = new TestFiles("AutomaticCarParkGate.xml");
 	public static final TestFiles SimpleManufacturingExample = new TestFiles("SimpleManufacturingExample.xml");
-	public static final TestFiles Ex4_5_a = new TestFiles("ex4_5_a.xml");
-	public static final TestFiles Ex4_5_b = new TestFiles("ex4_5_b.xml");
+	public static final TestFiles Split = new TestFiles("split.xml");
 	public static final TestFiles UMDES_1 = new TestFiles("umdes_test1.fsm");
 	public static final TestFiles UMDES_2 = new TestFiles("umdes_test2.fsm");
-	public static final TestFiles Split = new TestFiles("split.xml");
-	public static final TestFiles MachineBufferMachine = new TestFiles("MachineBufferMachine.xml");
-	public static final TestFiles NondeterministicComposition = new TestFiles("NondeterministicComposition.xml");
 
 	private static final String testFilePrefix = "./tests/testfiles/";
 

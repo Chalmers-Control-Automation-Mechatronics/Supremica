@@ -1346,6 +1346,7 @@ public class Automata
 	 * @param mustHaveType Test requires that the automata are not of undefined type.
 	 * @param mustBeControllabilityConsistent Test requires that an event has the same
 	 * controllability status in all automata.
+	 * @param examineStructure Test examines whether there are disjoint parts in the system.
 	 * @param explicitly Examines and warns if there are disjoint sets of automata
 	 * (considering shared events)
 	 *
@@ -1382,6 +1383,7 @@ public class Automata
 			}
 		}
 
+		/*
 		// Warns if the system has disjoint modules (the system can be divided into at least two sets
 		// of modules whose union alphabets are disjoint)
 		if (examineStructure)
@@ -1391,6 +1393,7 @@ public class Automata
 				// Warning has been written in the log window by isSeveralSystems.
 			}
 		}
+		*/
 
 		// Examines each automaton for an initial state
 		if (mustHaveInitial)

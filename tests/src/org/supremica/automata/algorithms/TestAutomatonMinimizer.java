@@ -172,4 +172,55 @@ public class TestAutomatonMinimizer
 			assertTrue(false);
 		}
 	}
+
+	public void testConflictEquivalenceMinimization()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.ConflictEquivalence));
+			
+			Automata tests = theProject.getPlantAutomata();
+			Automata min = new Automata();
+			Automata key = theProject.getSpecificationAutomata();
+
+			// Iterate over tests and minimize each individually
+			AutomatonIterator autIt = tests.iterator();
+			while (autIt.hasNext())
+			{
+				Automaton currAutomaton = autIt.nextAutomaton();
+
+				// Minimize this one
+				AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
+				MinimizationOptions options = new MinimizationOptions();
+				options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+				options.setCompositionalMinimization(false);
+				options.setAlsoTransitions(true);
+				options.setKeepOriginal(true);
+				Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
+				min.addAutomaton(newAutomaton);
+			}
+
+			// Compare the minimized automata with the correct solution
+			for (int i=0; i<min.size(); i++)
+			{
+				Automaton currMin = min.getAutomatonAt(i);
+				Automaton currKey = key.getAutomatonAt(i);
+
+				// System.err.println(currMin + " vs. " + currKey);
+
+				assertTrue(currMin.nbrOfStates() == currKey.nbrOfStates());
+				assertTrue(currMin.getAlphabet().equals(currKey.getAlphabet()));
+				assertTrue(currMin.nbrOfTransitions() == currKey.nbrOfTransitions());
+				assertTrue(currMin.nbrOfEpsilonTransitions() == currKey.nbrOfEpsilonTransitions());
+				assertTrue(currMin.getInitialState().nbrOfOutgoingArcs() == currKey.getInitialState().nbrOfOutgoingArcs());
+				assertTrue(currMin.getInitialState().nbrOfIncomingArcs() == currKey.getInitialState().nbrOfIncomingArcs());
+			}
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}		
+	}
 }

@@ -1818,7 +1818,8 @@ public class Automaton
 			newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
 		}
 		addState(newState);
-		
+
+		// Set markings
 		if (one.isAccepting() || two.isAccepting())
 		{
 			newState.setAccepting(true);
@@ -1884,6 +1885,10 @@ public class Automaton
 		{
 			// Add if not already there
 			Arc arc = (Arc) toBeAdded.remove(0);
+			if (arc.getEvent().isEpsilon() && arc.isSelfLoop())
+			{
+				continue;
+			}
 			if (!arc.getFromState().containsOutgoingArc(arc))
 			{
 				addArc(arc);
