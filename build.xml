@@ -769,7 +769,7 @@
 		source="1.4"
 		maxmemory="512m"
 		windowtitle="Supremica API"
-		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson. All Rights Reserved.">
+		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson, Goran Cengic, Martin Fabin, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
 		<doctitle><![CDATA[<h1>Supremica and Waters API Documentation</h1>]]></doctitle>
 		<packageset dir="${src}">
 			<include name="org/supremica/**/*"/>
