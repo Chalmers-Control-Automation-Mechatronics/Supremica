@@ -221,7 +221,10 @@ public class PetriNetSupervisor
 			}
 			break;
 
-		case Options.ES_HEURISTIC_MOST_FOLLOWERS :
+/*
+		// currently removed, becuase these names are rembed from automata H1 heurtsics
+		// and we dont want to duplicate everything now
+		case Options.ES_PN_HEURISTIC_MOST_FOLLOWERS :
 			best = 0;
 
 			for (int i = 0; i < size; i++)
@@ -246,7 +249,7 @@ public class PetriNetSupervisor
 			}
 			break;
 
-		case Options.ES_HEURISTIC_LEAST_FOLLOWERS :
+		case Options.ES_PN_HEURISTIC_LEAST_FOLLOWERS :
 			best = Integer.MAX_VALUE;
 
 			for (int i = 0; i < size; i++)
@@ -270,6 +273,7 @@ public class PetriNetSupervisor
 				}
 			}
 			break;
+		*/
 
 		case Options.ES_HEURISTIC_MOST_MEMBERS :
 			best = 0;
