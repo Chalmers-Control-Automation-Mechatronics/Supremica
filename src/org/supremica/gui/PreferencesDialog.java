@@ -975,7 +975,7 @@ class BDDPanel2
 
 		pLeft.add(pTopLeft, BorderLayout.NORTH);
 
-		BDDPanel1.addCaption(pLeft, "Automata to BDD conversion");
+		BDDPanel1.addCaption(pTopLeft, "Automata to BDD conversion");
 		orderingAlgorithm = BDDPanel1.addCombo(pTopLeft,"Automaton ordering", Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
 		encodingAlgorithm = BDDPanel1.addCombo(pTopLeft,"State encoding", Options.ENCODING_NAMES, Options.encoding_algorithm);
 
