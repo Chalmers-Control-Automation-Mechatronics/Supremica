@@ -727,9 +727,8 @@ public class JavaBytecodeGenerator
 		Node[] children = n.getChildren();
 		IlCallOperator op = (IlCallOperator) ((SimpleNode) children[0]).visit(this, null);    // get operator
 		String fbName = (String) ((SimpleNode) children[1]).visit(this, null);
-		String fbTypeName = "Delayer";
-
-		// ((ASTfb_name)children[1]).getTypeName();
+		String fbTypeName = ((ASTfb_name)children[1]).getTypeName();
+		// = "Delayer";
 		Object[] args = null;
 
 		if (children.length == 3 /* is there any arguments */)
