@@ -72,7 +72,7 @@ public final class AutomataIDDForm
 
 		Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, true, true); // theAutomata.getUnionAlphabet();
 
-		theAutomaton.setAlphabet(theAlphabet);
+		theAutomaton.getAlphabet().union(theAlphabet);
 
 		theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
 		nbrOfEvents = theAlphabet.size();

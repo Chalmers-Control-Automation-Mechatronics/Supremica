@@ -72,6 +72,8 @@ public class TestPackageAutomata
 	{
 		TestSuite suite = new TestSuite();
 		suite.addTest(TestAutomaton.suite());
+		suite.addTest(TestAlphabet.suite());
+		suite.addTest(TestAutomata.suite());
 		suite.addTest(TestStateSet.suite());
 		suite.addTest(TestPackageAlgorithms.suite());
 		return suite;

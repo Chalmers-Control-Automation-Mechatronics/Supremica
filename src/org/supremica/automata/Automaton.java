@@ -58,11 +58,11 @@ public class Automaton
 {
 	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
 
-	private Alphabet alphabet;
+	private final Alphabet alphabet;
 	private String name;
 	private String comment;
 	// private List theStates = new LinkedList();
-	private StateSet theStates = new StateSet();
+	private final StateSet theStates = new StateSet();
 
 	private int index = -1;
 	private Map idStateMap;	// Want fast lookup on both id and index (but not name?)
@@ -107,12 +107,11 @@ public class Automaton
 		this();
 
 		Alphabet orgAlphabet = orgAut.getAlphabet();
-		Alphabet newAlphabet = new Alphabet(orgAlphabet);
+		alphabet.union(orgAlphabet);
 
 		type = orgAut.type;
 
 		setName(orgAut.getName());
-		setAlphabet(newAlphabet);
 
 		// Create all states
 		for(StateIterator states = orgAut.stateIterator(); states.hasNext();)
@@ -137,7 +136,7 @@ public class Automaton
 					State orgDestState = orgArc.getToState();
 					State newDestState = getStateWithId(orgDestState.getId());
 
-					LabeledEvent currEvent = newAlphabet.getEvent(orgArc.getEvent());
+					LabeledEvent currEvent = alphabet.getEvent(orgArc.getEvent());
 
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
@@ -501,6 +500,41 @@ public class Automaton
 		return (State) idStateMap.get(state.getId());
 	}
 
+	/**
+	 * True if a state with the name exists, otherwise false.
+	 */
+	public boolean containsStateWithName(String name)
+		throws IllegalArgumentException
+	{
+		if (name == null)
+		{
+			throw new IllegalArgumentException("Name must be non-null");
+		}
+		State theState = getStateWithName(name);
+		return theState != null;
+	}
+
+	/**
+	 * Returns the state with the asked for name if it exists, otherwise null.
+	 */
+	public State getStateWithName(String name)
+		throws IllegalArgumentException
+	{
+		if (name == null)
+		{
+			throw new IllegalArgumentException("Name must be non-null");
+		}
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			if (currState.getName().equals(name))
+			{
+				return currState;
+			}
+		}
+		return null;
+	}
+
 	private boolean containsStateWithId(String id)
 	{
 		return idStateMap.containsKey(id);
@@ -806,6 +840,7 @@ public class Automaton
 		return alphabet;
 	}
 
+/*
 	public void setAlphabet(Alphabet alphabet)
 		throws IllegalArgumentException
 	{
@@ -814,6 +849,31 @@ public class Automaton
 			throw new IllegalArgumentException("Alphabet must be non-null");
 		}
 		this.alphabet = alphabet;
+	}
+*/
+
+	public void setIndicies(int automatonIndex)
+	{
+		index = automatonIndex;
+		alphabet.setIndicies();
+		setStateIndicies();
+	}
+
+	public void setIndicies(int automatonIndex, Alphabet otherAlphabet)
+	{
+		index = automatonIndex;
+		alphabet.setIndicies(otherAlphabet);
+		setStateIndicies();
+	}
+
+	private void setStateIndicies()
+	{
+		int i = 0;
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
+		{
+			State currState = stateIt.nextState();
+			currState.setIndex(i++);
+		}
 	}
 
 	public void setIndex(int index)
@@ -1020,7 +1080,7 @@ public class Automaton
 		idStateMap.clear();
 		indexStateMap.clear();
 		theStates.clear();
-
+		theArcs.clear();
 		initialState = null;
 
 		if (listeners != null)

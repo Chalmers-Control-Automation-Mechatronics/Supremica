@@ -60,25 +60,23 @@ public class AutomataToNQC
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToNQC.class);
 	private Automata theAutomata;
-	private SynchronizationOptions syncOptions;
+	//private SynchronizationOptions syncOptions;
 	private AutomataSynchronizerHelper syncHelper;
-	private SynchronizationType syncType;
+	private SynchronizationType syncType = SynchronizationType.Prioritized;
 	private Alphabet allEvents;
 
 	public AutomataToNQC(Automata theAutomata)
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
-		this.syncOptions = new SynchronizationOptions();
-		this.syncType = syncOptions.getSynchronizationType();
+		//this.syncOptions = new SynchronizationOptions();
+		//this.syncType = syncOptions.getSynchronizationType();
 	}
 
 
 	private void initialize()
-		throws Exception
 	{
-		syncHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
-		allEvents = syncHelper.getUnionAlphabet();
+		allEvents = theAutomata.setIndicies();
 	}
 
 

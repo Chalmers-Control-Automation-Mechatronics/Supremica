@@ -61,9 +61,9 @@ public class AutomataToIEC1131
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToIEC1131.class);
 	private Automata theAutomata;
-	private SynchronizationOptions syncOptions;
-	private AutomataSynchronizerHelper syncHelper;
-	private SynchronizationType syncType;
+	//private SynchronizationOptions syncOptions;
+	//private AutomataSynchronizerHelper syncHelper;
+	private SynchronizationType syncType = SynchronizationType.Prioritized;
 	private Alphabet allEvents;
 	private IEC61131Helper theHelper;
 
@@ -77,16 +77,14 @@ public class AutomataToIEC1131
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
-		this.syncOptions = new SynchronizationOptions();
-		this.syncType = syncOptions.getSynchronizationType();
+		//this.syncOptions = new SynchronizationOptions();
+		//this.syncType = syncOptions.getSynchronizationType();
 		this.theHelper = theHelper;
 	}
 
 	private void initialize()
-		throws Exception
 	{
-		syncHelper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
-		allEvents = syncHelper.getUnionAlphabet();
+		allEvents = theAutomata.setIndicies();
 	}
 
 

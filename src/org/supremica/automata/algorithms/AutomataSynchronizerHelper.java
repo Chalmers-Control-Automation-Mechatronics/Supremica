@@ -139,9 +139,9 @@ public final class AutomataSynchronizerHelper
 		theAutomaton = new Automaton();
 
 		// Alphabet theAlphabet = theAutomata.getUnionAlphabet(syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
-		Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
+		//Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, syncOptions.requireConsistentControllability(), syncOptions.requireConsistentImmediate());
 
-		theAutomaton.setAlphabet(theAlphabet);
+		//theAutomaton.getAlphabet().union(theAlphabet);
 
 		try
 		{

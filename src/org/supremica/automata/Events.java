@@ -133,14 +133,22 @@ public class Events
 	}
 
 	public void removeEvent(LabeledEvent ev)
-		throws Exception
+		throws IllegalArgumentException
 	{
+		if (!includes(ev))
+		{
+			throw new IllegalArgumentException("The event is not included in this alphabet");
+		}
 		removeEvent(ev.getLabel());
 	}
 
 	public void removeEvent(String label)
-		throws Exception
+		throws IllegalArgumentException
 	{
+		if (!containsEventWithLabel(label))
+		{
+			throw new IllegalArgumentException("The event is not included in this alphabet");
+		}
 		theEvents.remove(label);
 	}
 
@@ -284,6 +292,11 @@ public class Events
 	public Collection values()
 	{
 		return theEvents.values();
+	}
+
+	public void clear()
+	{
+		theEvents.clear();
 	}
 
 	/** Must be called after an event label or id is modified. */

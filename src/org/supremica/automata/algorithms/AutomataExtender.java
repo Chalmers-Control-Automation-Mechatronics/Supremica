@@ -98,8 +98,8 @@ public class AutomataExtender
 
 		newAut.setName(orgAut.getName());
 
-		Alphabet orgAlphabet = orgAut.getAlphabet();
-		Alphabet newAlphabet = new Alphabet(orgAlphabet);
+		//Alphabet orgAlphabet = orgAut.getAlphabet();
+		Alphabet newAlphabet = new Alphabet(orgAut.getAlphabet());
 		// String passEventId = orgAlphabet.getUniqueId(newAut.getName());
 		LabeledEvent passEvent = new LabeledEvent("pass", "3.1415926");
 		newAlphabet.addEvent(passEvent);
@@ -113,7 +113,7 @@ public class AutomataExtender
 			newAlphabet.addEvent(passEvent);
 		}
 
-		newAut.setAlphabet(newAlphabet);
+		newAut.getAlphabet().union(newAlphabet);
 
 		HashMap stateMap = new HashMap(orgAut.nbrOfStates());
 		int nbrOfStateCopies = Math.max(2, k + 1);

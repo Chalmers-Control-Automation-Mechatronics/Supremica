@@ -90,6 +90,7 @@ public class LabeledEvent
 		controllable = e.controllable;
 		prioritized = e.prioritized;
 		immediate = e.immediate;
+		synchIndex = e.synchIndex;
 	}
 
 	public String toString()
@@ -109,7 +110,7 @@ public class LabeledEvent
 	 *  notifyExceutionListeners();
 	 *  }
 	 */
-	 
+
 	// get/setId are now _only_ used by Alphabet
 	String getId() // default access, accessible within package, not outside (poor java mans friend declaration)
 	{
@@ -171,12 +172,12 @@ public class LabeledEvent
 		return expansionPriority;
 	}
 
-	// This method must exist and work, since every map from event to something-else calls this one		
+	// This method must exist and work, since every map from event to something-else calls this one
 	public boolean equals(Object obj)
 	{
 		return equals((LabeledEvent)obj);
 		// throw new RuntimeException("LabeledEvent::equals(Object), not expected to be called!");
-		
+
 		// System.err.println("equalsObject");
 		// return this.label.equals(((LabeledEvent) obj).label);
 	}
@@ -188,7 +189,7 @@ public class LabeledEvent
 		// return getId().equals(event.getId());
 		return getLabel().equals(event.getLabel());
 	}
-	
+
 	public boolean equals(String label)
 	{
 
@@ -200,17 +201,17 @@ public class LabeledEvent
 	{
 		return this.label.equals(ev.label); // should also check priority & controllability?
 	}
-	
+
 	public boolean isEpsilon()
 	{
 		return epsilon;
 	}
-	
+
 	public void setEpsilon(boolean b)
 	{
 		epsilon = b;
 	}
-	
+
 	private boolean equalId(Object obj)
 	{
 		return this.id.equals(((LabeledEvent) obj).id);

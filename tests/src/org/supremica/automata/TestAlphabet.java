@@ -57,11 +57,11 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.testhelpers.*;
 
 
-public class TestAutomaton
+public class TestAlphabet
 	extends TestCase
 {
 
-	public TestAutomaton(String name)
+	public TestAlphabet(String name)
 	{
 		super(name);
 	}
@@ -88,8 +88,72 @@ public class TestAutomaton
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestAutomaton.class);
+		TestSuite suite = new TestSuite(TestAlphabet.class);
 		return suite;
+	}
+
+
+	public void testSimpleOperations()
+	{
+		Alphabet alph1 = new Alphabet();
+		assertTrue(alph1.size() == 0);
+		{
+			LabeledEvent e1 = new LabeledEvent("e1");
+			alph1.addEvent(e1);
+			assertTrue(alph1.size() == 1);
+			LabeledEvent e2 = new LabeledEvent("e2");
+			alph1.addEvent(e2);
+			assertTrue(alph1.size() == 2);
+			LabeledEvent e3 = new LabeledEvent("e3");
+			alph1.addEvent(e3);
+			assertTrue(alph1.size() == 3);
+		}
+
+
+		Alphabet alph2 = new Alphabet();
+		assertTrue(alph2.size() == 0);
+		{
+			LabeledEvent e1 = new LabeledEvent("e1");
+			alph2.addEvent(e1);
+			assertTrue(alph2.size() == 1);
+			LabeledEvent e2 = new LabeledEvent("e2");
+			alph2.addEvent(e2);
+			assertTrue(alph2.size() == 2);
+			LabeledEvent e3 = new LabeledEvent("e3");
+			alph2.addEvent(e3);
+			assertTrue(alph2.size() == 3);
+		}
+
+		Alphabet alph3 = new Alphabet(alph1);
+		assertTrue(alph3.size() == 3);
+		alph3.union(alph2);
+		assertTrue(alph3.size() == 3);
+		alph3.intersect(alph2);
+		assertTrue(alph3.size() == 3);
+		alph3.minus(alph2);
+		assertTrue(alph3.size() == 0);
+
+		Alphabet alph4 = new Alphabet(alph1);
+		{
+			LabeledEvent e2 = alph4.getEventWithLabel("e2");
+			alph4.removeEvent(e2);
+			assertTrue(alph4.size() == 2);
+			alph2.minus(alph4);
+			assertTrue(alph2.size() == 1);
+			alph2.union(alph1);
+			assertTrue(alph2.size() == 3);
+		}
+
+		alph1.setIndicies();
+		int minIndex = 0;
+		int maxIndex = alph1.size() - 1;
+		for (EventIterator evIt = alph1.eventIterator(); evIt.hasNext(); )
+		{
+			LabeledEvent currEvent = evIt.nextEvent();
+			int currIndex = currEvent.getSynchIndex();
+			assertTrue(currIndex >= minIndex);
+			assertTrue(currIndex <= maxIndex);
+		}
 	}
 
 	public void testAddState()
@@ -106,68 +170,6 @@ public class TestAutomaton
 		assertTrue(theAutomaton.nbrOfStates() == 1);
 		theAutomaton.addState(q2);
 		assertTrue(theAutomaton.nbrOfStates() == 2);
-	}
-
-	public void testCopyConstructor()
-	{
-		try
-		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
-			Automaton spec = theProject.getAutomaton("Spec");
-			assertTrue(spec != null);
-			Automaton specCopy = new Automaton(spec);
-			assertTrue(spec.equalAutomaton(specCopy));
-			spec.removeAllStates();
-			assertTrue(spec.nbrOfStates() == 0);
-			assertTrue(spec.nbrOfTransitions() == 0);
-			assertTrue(spec.nbrOfEvents() == 3);
-			assertTrue(specCopy.nbrOfStates() == 3);
-			assertTrue(specCopy.nbrOfTransitions() == 3);
-			assertTrue(specCopy.nbrOfEvents() == 3);
-			Alphabet orgAlphabet = spec.getAlphabet();
-			Alphabet copyAlphabet = specCopy.getAlphabet();
-			assertTrue(orgAlphabet.nbrOfEvents() == 3);
-			assertTrue(copyAlphabet.nbrOfEvents() == 3);
-			orgAlphabet.clear();
-			assertTrue(orgAlphabet.nbrOfEvents() == 0);
-			assertTrue(copyAlphabet.nbrOfEvents() == 3);
-			copyAlphabet.clear();
-			assertTrue(orgAlphabet.nbrOfEvents() == 0);
-			assertTrue(copyAlphabet.nbrOfEvents() == 0);
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
-
-	public void testRemove()
-	{
-		try
-		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
-			Automaton spec = theProject.getAutomaton("Spec");
-			assertTrue(spec != null);
-			State s1 = spec.getStateWithName("s1");
-			assertTrue(s1 != null);
-			State initialState = spec.getInitialState();
-			assertTrue(s1 == initialState);
-			assertTrue(s1.equalState(initialState));
-			spec.removeState(s1);
-			assertTrue(spec.nbrOfStates() == 2);
-			assertTrue(spec.nbrOfEvents() == 3);
-			assertTrue(spec.nbrOfTransitions() == 1);
-			assertTrue(!spec.hasInitialState());
-			assertTrue(spec.isNullAutomaton());
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
 	}
 
 }

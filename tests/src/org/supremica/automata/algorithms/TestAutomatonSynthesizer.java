@@ -62,6 +62,7 @@ import java.util.*;
 public class TestAutomatonSynthesizer
 	extends TestCase
 {
+
 	public TestAutomatonSynthesizer(String name)
 	{
 		super(name);
@@ -107,6 +108,14 @@ public class TestAutomatonSynthesizer
 			synchronizer.execute();
 			assertTrue(synchronizer.getNumberOfStates() == 8);
 			Automaton theAutomaton = synchronizer.getAutomaton();
+
+			Automaton theAutomaton1 = new Automaton(theAutomaton);
+
+			SynthesizerOptions synthOptions = new SynthesizerOptions();
+			synthOptions.setSynthesisType(SynthesisType.Controllable);
+
+			AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
+			synthesizer.synthesize();
 
 
 /*

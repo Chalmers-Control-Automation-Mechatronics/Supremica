@@ -135,6 +135,10 @@ public class State
 
 	public String getId()
 	{
+		if (id == null)
+		{
+			return "";
+		}
 		return id;
 	}
 
@@ -192,6 +196,10 @@ public class State
 
 	public String getName()
 	{
+		if (name == null)
+		{
+			return "";
+		}
 		return name;
 	}
 
@@ -202,7 +210,7 @@ public class State
 
 	public String toString()
 	{
-		return name;
+		return getName();
 	}
 
 	public boolean isInitial()
@@ -326,6 +334,47 @@ public class State
 	public boolean equals(Object state)
 	{
 		return id.equals(((State) state).id);
+	}
+
+	public boolean equalState(State otherState)
+	{
+		if (!getName().equals(otherState.getName()))
+		{
+			return false;
+		}
+		if (initial != otherState.initial)
+		{
+			return false;
+		}
+		if (accepting != otherState.accepting)
+		{
+			return false;
+		}
+		if (forbidden != otherState.forbidden)
+		{
+			return false;
+		}
+		if (active != otherState.active)
+		{
+			return false;
+		}
+		if (first != otherState.first)
+		{
+			return false;
+		}
+		if (last != otherState.last)
+		{
+			return false;
+		}
+		if (cost != otherState.cost)
+		{
+			return false;
+		}
+		if (visited != otherState.visited)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	public int hashCode()

@@ -102,7 +102,7 @@ public final class AutomataIDDHelper
 		try
 		{
 			Alphabet theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets); //, "a");
-			theAutomaton.setAlphabet(theAlphabet);
+			theAutomaton.getAlphabet().union(theAlphabet);
 		}
 		catch (Exception e)
 		{

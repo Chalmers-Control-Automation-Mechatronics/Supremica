@@ -75,14 +75,14 @@ class EqClassFactory
 public class AutomatonMinimizer
 {
 	private Automaton theAutomaton;
-	private Alphabet theAlphabet;
+	//private Alphabet theAlphabet;
 
 	private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
-	
+
 	public AutomatonMinimizer(Automaton theAutomaton)
 	{
 		this.theAutomaton = theAutomaton;
-		this.theAlphabet = theAutomaton.getAlphabet();
+		//this.theAlphabet = theAutomaton.getAlphabet();
 	}
 
 	public Automaton getMinimizedAutomaton()
@@ -194,7 +194,7 @@ public class AutomatonMinimizer
 		Automaton newAutomaton = new Automaton();
 
 		newAutomaton.setType(theAutomaton.getType());
-		newAutomaton.setAlphabet(theAlphabet);
+		newAutomaton.getAlphabet().union(theAutomaton.getAlphabet());
 		newAutomaton.setName("min" + theAutomaton.getName());
 
 		// Associate one state with each equivalence class
@@ -257,7 +257,7 @@ public class AutomatonMinimizer
 	private boolean doMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
 	{
 		boolean refined = false;
-		Iterator eventIt = theAlphabet.eventIterator();
+		Iterator eventIt = theAutomaton.getAlphabet().eventIterator();
 
 		while (eventIt.hasNext())
 		{
@@ -310,20 +310,20 @@ public class AutomatonMinimizer
 			return false;
 		}
 	}
-	
+
 	public static void main(String[] args)
 	{
 		logger.setLogToConsole(true);
 
 		Automaton automaton = new Automaton("Minimizer Test");
-		
+
 		State q0 = new State("q0"); automaton.addState(q0); automaton.setInitialState(q0);
 		State q1 = new State("q1"); automaton.addState(q1);
 		State q2 = new State("q2"); automaton.addState(q2);
 		State q3 = new State("q3"); automaton.addState(q3);
 		State q4 = new State("q4"); automaton.addState(q4);
 		State q5 = new State("q5"); automaton.addState(q5);
-		
+
 		LabeledEvent a = new LabeledEvent("a"); automaton.getAlphabet().addEvent(a, false);
 		LabeledEvent b = new LabeledEvent("b"); automaton.getAlphabet().addEvent(b, false);
 		LabeledEvent c = new LabeledEvent("c"); automaton.getAlphabet().addEvent(c, false);
@@ -334,8 +334,8 @@ public class AutomatonMinimizer
 		automaton.addArc(new Arc(q1, q2, b));
 		automaton.addArc(new Arc(q1, q3, c));
 		automaton.addArc(new Arc(q2, q4, d));
-		automaton.addArc(new Arc(q3, q5, d));	
-		
+		automaton.addArc(new Arc(q3, q5, d));
+
 		AutomatonMinimizer minimizer = new AutomatonMinimizer(automaton);
 		try
 		{

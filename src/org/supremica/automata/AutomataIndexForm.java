@@ -108,6 +108,12 @@ public final class AutomataIndexForm
 	public AutomataIndexForm(Automata theAutomata, Automaton theAutomaton)
 		throws Exception
 	{
+		//Automata newAutomata = new Automata(theAutomata);
+		//newAutomata.addAutomaton(theAutomaton);
+		Alphabet unionAlphabet = theAutomata.setIndicies();
+		theAutomaton.getAlphabet().union(unionAlphabet);
+		//theAutomaton.setIndicies();
+
 		generateAutomataIndices(theAutomata);
 
 		try
@@ -175,19 +181,19 @@ public final class AutomataIndexForm
 		typeIsPlantTable = new boolean[theAutomata.size()];
 		automataSize = new int[theAutomata.size()];
 
-		int i = 0;
-		Iterator autIt = theAutomata.iterator();
+//		int i = 0;
 
-		while (autIt.hasNext())
+
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 
-			currAutomaton.setIndex(i);
+			int i = currAutomaton.getIndex();
 
 			typeIsPlantTable[i] = currAutomaton.getType() == AutomatonType.Plant;
 			automataSize[i] = currAutomaton.nbrOfStates();
 
-			i++;
+			//i++;
 		}
 	}
 
@@ -197,10 +203,15 @@ public final class AutomataIndexForm
 		Alphabet theAlphabet = theAutomaton.getAlphabet();
 
 		// Generate a synchIndex for each event
-		Collection eventCollection = theAlphabet.values();
+		//Collection eventCollection = theAlphabet.values();
 
-		eventPriority = new int[eventCollection.size()];
+		eventPriority = new int[theAlphabet.size()];
+		for (int i = 0; i < eventPriority.length; i++)
+		{
+			eventPriority[i] = 1;
+		}
 
+		/*
 		Iterator eventCollectionIt = eventCollection.iterator();
 		int i = 0;
 
@@ -210,10 +221,12 @@ public final class AutomataIndexForm
 
 			((LabeledEvent) (eventCollectionIt.next())).setSynchIndex(i++);
 		}
+		*/
 
 		// Put the synchIndex into all the automata.
 		// We do this because we want to have the same
 		// index for the same event in all automata.
+/*
 		Iterator autIt = theAutomata.iterator();
 
 		while (autIt.hasNext())
@@ -231,23 +244,23 @@ public final class AutomataIndexForm
 				currEvent.setSynchIndex(newEvent.getSynchIndex());
 			}
 		}
-
+*/
 		// Build tables from where it fast can be concluded
 		// if a certain event is included or prioritized in a given automaton
 		int nbrOfAutomata = theAutomata.size();
+		//System.err.println("Nbr of automata: " + nbrOfAutomata);
+		//System.err.println("Union alphabet size: " + theAlphabet.size());
 
 		alphabetEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
 		prioritizedEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
 
-		Iterator theAlphabetIt = theAlphabet.iterator();
-
-		while (theAlphabetIt.hasNext())
+		for (Iterator theAlphabetIt = theAlphabet.iterator(); theAlphabetIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();
 			String currLabel = currEvent.getLabel();
 			int currEventSynchIndex = currEvent.getSynchIndex();
 
-			for (i = 0; i < nbrOfAutomata; i++)
+			for (int i = 0; i < nbrOfAutomata; i++)
 			{
 				Alphabet currAutAlphabet = theAutomata.getAutomatonAt(i).getAlphabet();
 
@@ -261,6 +274,7 @@ public final class AutomataIndexForm
 				}
 				else
 				{
+					//System.err.println("i: " + i + " currEventSynchIndex: " + currEventSynchIndex);
 					alphabetEventsTable[i][currEventSynchIndex] = false;
 					prioritizedEventsTable[i][currEventSynchIndex] = false;
 				}
@@ -281,9 +295,7 @@ public final class AutomataIndexForm
 		stateTable = new State[theAutomata.size()][];
 		stateStatusTable = new int[theAutomata.size()][];
 
-		Iterator autIt = theAutomata.iterator();
-
-		while (autIt.hasNext())
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			int currAutomatonIndex = currAutomaton.getIndex();
@@ -292,19 +304,16 @@ public final class AutomataIndexForm
 			stateTable[currAutomatonIndex] = new State[currNbrOfStates];
 			stateStatusTable[currAutomatonIndex] = new int[currNbrOfStates];
 
-			Iterator stateIt = currAutomaton.stateIterator();
-			int currIndex = 0;
-
-			while (stateIt.hasNext())
+			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
 			{
-				State currState = (State) stateIt.next();
+				State currState = stateIt.nextState();
 
-				currState.setIndex(currIndex);
+				int currIndex = currState.getIndex();
 
 				stateTable[currAutomatonIndex][currIndex] = currState;
 				stateStatusTable[currAutomatonIndex][currIndex] = AutomataIndexFormHelper.createStatus(currState);
 
-				currIndex++;
+				//currIndex++;
 			}
 		}
 	}

@@ -68,7 +68,7 @@ public class AutomataBuildFromVALID
 	// mappings between id and state/event
 	private Map idStateMap = new HashMap();
 	private Map idEventMap = new HashMap();
-	
+
 	public AutomataBuildFromVALID(ProjectFactory theProjectFactory)
 	{
 		this.theProjectFactory = theProjectFactory;
@@ -363,13 +363,13 @@ public class AutomataBuildFromVALID
 			LabeledEvent currEvent = new LabeledEvent(eventName);
 			currEvent.setControllable(element.getAttributeValue("controllable").equals("1"));
 			currEvent.setPrioritized(true);
-			
+
 			idEventMap.put(eventName, currEvent);
-			
+
 			currAlphabet.addEvent(currEvent);
 		}
 
-		currAutomaton.setAlphabet(currAlphabet);
+		currAutomaton.getAlphabet().union(currAlphabet);
 
 		// Build states
 		List stateList = root.getChild("nodes").getChildren("node");
@@ -387,9 +387,9 @@ public class AutomataBuildFromVALID
 			State currState = new State(stateName);
 			currState.setInitial(element.getAttributeValue("initial").equals("1"));
 			currState.setAccepting(element.getAttributeValue("marked").equals("1"));
-			
+
 			idStateMap.put(stateName, currState);
-			
+
 			currAutomaton.addState(currState);
 		}
 
@@ -437,13 +437,13 @@ public class AutomataBuildFromVALID
 				element = (Element) j.next();
 				String eventId = element.getAttributeValue("name");
 				LabeledEvent event = (LabeledEvent)idEventMap.get(eventId);
-				
+
 				Iterator k = stateList.iterator();
 
 				while (k.hasNext())
 				{
 					element = (Element) k.next();
-					
+
 					State sourceState = (State)idStateMap.get(element.getAttributeValue("name"));
 					// sourceState = currAutomaton.getStateWithId(element.getAttributeValue("name"));
 

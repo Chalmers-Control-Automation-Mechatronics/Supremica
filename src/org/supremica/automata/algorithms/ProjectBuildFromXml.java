@@ -341,7 +341,7 @@ public class ProjectBuildFromXml
 		throws SAXException
 	{
 		currAutomaton = new Automaton();
-		currAlphabet = new Alphabet();
+		currAlphabet = currAutomaton.getAlphabet();
 
 		String name = attributes.getValue("name");
 
@@ -359,7 +359,7 @@ public class ProjectBuildFromXml
 		}
 		currAutomaton.setType(currType);
 
-		currAutomaton.setAlphabet(currAlphabet);
+		//currAutomaton.setAlphabet(currAlphabet);
 		currProject.addAutomaton(currAutomaton);
 	}
 
