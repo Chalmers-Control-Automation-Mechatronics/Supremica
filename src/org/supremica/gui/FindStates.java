@@ -213,7 +213,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 	private Automata automata = null;
 	
 	private static Category thisCategory = LogDisplay.createCategory(FindStatesFrame.class.getName());
-	private void Debug(String s) { thisCategory.debug(s); }
+	private static void debug(String s) { thisCategory.debug(s); }
 
 	private Automata getAutomata() { return automata; }
 	private Pattern[] getRegexpPatterns() { return table.getRegexpPatterns(); }
@@ -254,7 +254,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 			catch(Exception excp)
 			{
 				// Let it silently die, how the f*** do get these excp specs to work?
-				Debug("FindButton - " + excp);
+				debug("FindButton - " + excp);
 				excp.printStackTrace();
 			}
 		}
@@ -283,7 +283,7 @@ class FindStatesFrame extends JFrame /* CenteredFrame */
 
 		void action(ActionEvent e)
 		{
-			Debug("QuitButton disposing");
+			debug("QuitButton disposing");
 			dispose();
 		}
 	}

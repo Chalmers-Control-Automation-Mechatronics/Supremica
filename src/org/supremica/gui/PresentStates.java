@@ -69,8 +69,8 @@ class PresentStatesTable extends JTable
 
 class PresentStatesFrame extends JFrame
 {
-	private static Category thisCategory = LogDisplay.createCategory(FindStatesFrame.class.getName());
-	private void Debug(String s) { thisCategory.debug(s); }
+	private static Category thisCategory = LogDisplay.createCategory(PresentStatesFrame.class.getName());
+	private static void debug(String s) { thisCategory.debug(s); }
 
 	private JButton setDefaultButton(JButton b) { getRootPane().setDefaultButton(b); return b; }
 
@@ -92,7 +92,7 @@ class PresentStatesFrame extends JFrame
 
 		void action(ActionEvent e)
 		{
-			Debug("FineButton disposing");
+			debug("FineButton disposing");
 			dispose();
 		}
 	}
