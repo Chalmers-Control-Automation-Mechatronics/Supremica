@@ -9,8 +9,7 @@ import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 
 public class EditorAddEventAction
-	extends AbstractAction
-	implements IDEAction
+	extends IDEAction
 {
 	private IDE ide;
 

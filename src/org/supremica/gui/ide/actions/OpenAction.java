@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.5 2005-02-24 09:04:13 robi Exp $
+//# $Id: OpenAction.java,v 1.6 2005-03-02 11:39:21 knut Exp $
 //###########################################################################
 
 
@@ -34,8 +34,7 @@ import org.supremica.gui.ide.ModuleContainer;
 
 
 public class OpenAction
-	extends AbstractAction
-	implements IDEAction
+	extends IDEAction
 {
 	private IDE ide;
 
@@ -84,9 +83,9 @@ public class OpenAction
 			final String lowername = filename.toLowerCase();
 			if (lowername.endsWith(FileDialogs.WMOD_EXT)) {
 				openFileWmod(file);
-			} else if (lowername.endsWith(FileDialogs.MAINVMOD_EXT)) { 
+			} else if (lowername.endsWith(FileDialogs.MAINVMOD_EXT)) {
 				openFileVmod(file);
-			} else if (filename.endsWith(FileDialogs.VPRJ_EXT)) { 
+			} else if (filename.endsWith(FileDialogs.VPRJ_EXT)) {
 				openFileVprj(file);
 			}
 		}

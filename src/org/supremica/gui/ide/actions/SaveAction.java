@@ -10,8 +10,7 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.IDE;
 
 public class SaveAction
-	extends AbstractAction
-	implements IDEAction
+	extends IDEAction
 {
 	private IDE ide;
 

@@ -42,7 +42,7 @@ public class AnalyzerPanel
 	}
 
 
-	public void addToolBarEntries(JToolBar toolBar)
+	public void addToolBarEntries(IDEToolBar toolBar)
 	{
 	}
 }

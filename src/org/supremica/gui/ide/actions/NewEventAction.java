@@ -11,8 +11,7 @@ import org.supremica.gui.ide.EventEditorDialog;
 
 
 public class NewEventAction
-	extends AbstractAction
-	implements IDEAction
+	extends IDEAction
 {
 	private IDE ide;
 

@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.IDE;
 
 public class ExitAction
-	extends AbstractAction
+	extends IDEAction
 {
 	private IDE ide;
 

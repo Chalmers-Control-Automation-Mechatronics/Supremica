@@ -4,6 +4,8 @@ package org.supremica.gui.ide;
 import java.awt.Insets;
 import javax.swing.*;
 import java.util.*;
+import org.supremica.gui.ide.actions.IDEAction;
+
 
 public class IDEToolBar
 	extends JToolBar
@@ -33,15 +35,43 @@ public class IDEToolBar
 			}
 			else
 			{
-				add(currAction);
+				if (currAction instanceof IDEAction)
+				{
+					add(((IDEAction)currAction).getButton());
+				}
+				else
+				{
+					add(currAction);
+				}
 			}
 		}
+	}
+
+	public JToggleButton add(Action theAction, ButtonGroup theButtonGroup)
+	{
+		JToggleButton theButton = new JToggleButton(theAction);
+		theButton.setText("");
+		add(theButton);
+		theButtonGroup.add(theButton);
+		collection.add(theAction);
+		if (theAction instanceof IDEAction)
+		{
+			((IDEAction)theAction).setButton(theButton);
+		}
+		theButton.setMargin(theInsets);
+
+		return theButton;
 	}
 
 	public JButton add(Action theAction)
 	{
 		JButton theButton = super.add(theAction);
 		collection.add(theAction);
+
+		if (theAction instanceof IDEAction)
+		{
+			((IDEAction)theAction).setButton(theButton);
+		}
 		theButton.setMargin(theInsets);
 
 		return theButton;

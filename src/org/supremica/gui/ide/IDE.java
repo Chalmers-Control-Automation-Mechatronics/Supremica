@@ -12,11 +12,23 @@ import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.automata.IO.FileFormats;
+import org.supremica.properties.SupremicaProperties;
+import org.supremica.log.*;
 
 public class IDE
     extends JFrame
     implements ChangeListener
 {
+	static
+	{
+		SupremicaProperties.setUseSecurity(false);
+		SupremicaProperties.setXmlRpcActive(false);
+		SupremicaProperties.setAllowSuperUserLogin(false);
+		SupremicaProperties.setUseDot(true);
+		SupremicaProperties.setLogToConsole(false);
+		SupremicaProperties.setLogToGUI(true);
+	}
+	private static Logger logger = LoggerFactory.createLogger(IDE.class);
 	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
 
 	private Actions theActions;
@@ -215,6 +227,8 @@ public class IDE
 
 	public static void main(String args[])
 	{
+		SupremicaProperties.loadProperties(args);
+
 		IDE ide = new IDE();
 		ide.setVisible(true);
 	}

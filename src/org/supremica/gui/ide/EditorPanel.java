@@ -15,6 +15,7 @@ public class EditorPanel
 	private EditorEventsPanel eventsPanel;
 	private EditorAliasesPanel aliasesPanel;
 	private EditorComponentsPanel componentsPanel;
+	private EditorButtonGroup editorButtonGroup;
 
 	public EditorPanel(ModuleContainer moduleContainer, String name)
 	{
@@ -59,14 +60,15 @@ public class EditorPanel
 	}
 
 
-	public void addToolBarEntries(JToolBar toolBar)
+	public void addToolBarEntries(IDEToolBar toolBar)
 	{
+		editorButtonGroup = new EditorButtonGroup();
 		toolBar.addSeparator();
-		toolBar.add(getActions().editorSelectAction);
-		toolBar.add(getActions().editorAddNodeAction);
-		toolBar.add(getActions().editorAddNodeGroupAction);
-		toolBar.add(getActions().editorAddEdgeAction);
-		toolBar.add(getActions().editorAddEventAction);
+		toolBar.add(getActions().editorSelectAction, editorButtonGroup);
+		toolBar.add(getActions().editorAddNodeAction, editorButtonGroup);
+		toolBar.add(getActions().editorAddNodeGroupAction, editorButtonGroup);
+		toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);
+		toolBar.add(getActions().editorAddEventAction, editorButtonGroup);
 	}
 
 }

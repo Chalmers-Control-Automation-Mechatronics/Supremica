@@ -2,8 +2,23 @@
 package org.supremica.gui.ide.actions;
 
 import org.supremica.gui.ide.IDE;
+import javax.swing.AbstractButton;
+import javax.swing.AbstractAction;
 
-public interface IDEAction
+public abstract class IDEAction
+	extends AbstractAction
 {
-	public void doAction();
+	private AbstractButton theButton = null;
+
+	public abstract void doAction();
+
+	public void setButton(AbstractButton theButton)
+	{
+		this.theButton = theButton;
+	}
+
+	public AbstractButton getButton()
+	{
+		return theButton;
+	}
 }

@@ -59,7 +59,7 @@ class MainPanel
 		return constraints;
 	}
 
-	public void addToolBarEntries(JToolBar toolbar)
+	public void addToolBarEntries(IDEToolBar toolbar)
 	{
 		return; //Default is to do nothing
 	}
