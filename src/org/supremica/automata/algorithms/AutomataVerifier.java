@@ -149,9 +149,9 @@ public class AutomataVerifier
 		}
 	}
 
-
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
+		// Check IDD
 		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 		{
 			return "The IDD Algorithm is not fully implemented yet";
@@ -186,18 +186,19 @@ public class AutomataVerifier
 				return "Modular nonblocking option not yet implemented.";
 			}
 		}
+
+		// Everything seems OK!
 		return null;
 	}
 
 	/**
 	 * Method called from external class stopping AutomataVerifier as soon as possible.
 	 *
-	 *@see  CancelDialog
+	 *@see  ExecutionDialog
 	 */
 	public void requestStop()
 	{
-
-		// System.out.println("Verifier requested to stop.");
+		logger.debug("AutomataVerifier requested to stop.");
 		stopRequested = true;
 
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
@@ -238,9 +239,10 @@ public class AutomataVerifier
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
+					// This algorithm is under implementation!!
+					return modularNonBlockingVerification();
 					// This algorithm only verifies pairwise nonblocking!!!
-					// return modularNonBlockingVerification();
-					return pairwiseNonblockingVerification();
+					// return pairwiseNonblockingVerification();
 				}
 				else
 				{
@@ -1157,13 +1159,29 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Examines non-blocking modularily by examining language 
-	 *  inclusion of all automata, respectively
+	 * Examines non-blocking modularily... not fully implemented yet!
 	 */
 	private boolean modularNonBlockingVerification()
 		throws Exception
 	{
+		// Ensure individual nonblocking
+		boolean allIndividuallyNonblocking = true;
+		Iterator autIt = theAutomata.iterator();
+		Automaton currAut;
+		while (autIt.hasNext())
+		{
+			currAut = new Automaton((Automaton) autIt.next());
+			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAut);
+			if (!allIndividuallyNonblocking)
+			{
+				logger.error("The automaton " + currAut.getName() + " (among others?) is individually blocking!");
+				return false;
+			}
+		}		
+		logger.error("This system has no individually blocking automata! That's about everything I can tell at the moment, though...");
 		return false;
+		
+		// Ensure global nonblocking...
 	}
 
 	/**

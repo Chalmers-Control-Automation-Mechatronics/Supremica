@@ -183,6 +183,7 @@ public final class AutomataSynchronizerHelper
 		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
 		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), syncOptions.expandHashtable());
+		executerRendezvous = orgHelper.getExecuterRendezvous();
 	}
 
 	public void clear()

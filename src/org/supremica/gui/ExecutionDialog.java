@@ -162,12 +162,18 @@ public class ExecutionDialog
 	// -- MF -- Special case when you've got only one thread to watch
 	public ExecutionDialog(JFrame frame, String title, Stoppable thread)
 	{
-		super(frame);
-
-		this.executers = new ArrayList();
-
+		// Nicer? /Hugo.
+		this(frame, title, new ArrayList());
 		executers.add(thread);
-		Init(title);
+
+		/* 
+		  super(frame);
+		  
+		  this.executers = new ArrayList();
+		  
+		  executers.add(thread);
+		  Init(title);
+		*/
 	}
 
 	public void setMode(ExecutionDialogMode mode)

@@ -650,14 +650,14 @@ public final class AutomataSynchronizerExecuter
 					try
 					{
 						helper.addState(currState, nextState, currEventIndex);
-						if(numberOfAddedStates++ % 10000 == 0)
-						{
-							// KA: What the heck is this?? Extremly ugly.
-							for (int j = 0; j < 10; j++)
-							{
-								yield();
-							}
-						}
+						//if(numberOfAddedStates++ % 10000 == 0)
+						//{
+							// KA: What the heck is this?? Extremely ugly.
+							//for (int j = 0; j < 10; j++)
+							//{
+							//	yield();
+							//}
+						//}
 
 					}
 					catch (Exception e)

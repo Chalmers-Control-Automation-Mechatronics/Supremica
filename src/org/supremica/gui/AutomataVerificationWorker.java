@@ -76,7 +76,6 @@ public class AutomataVerificationWorker
 	extends Thread
 	implements Stoppable
 {
-
 	private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
 	// -- MF --      private Supremica workbench = null;
 	private Gui workbench = null;
@@ -95,58 +94,86 @@ public class AutomataVerificationWorker
 	private static final int MODULAR = 1;
 	private static final int MONOLITHIC = 0;
 	private static final int IDD = 2;
-
+	
 	public AutomataVerificationWorker(Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
 		theVisualProjectContainer = workbench.getVisualProjectContainer();
-
+		
 		// this.newAutomatonName = newAutomatonName;
 		this.synchronizationOptions = synchronizationOptions;
 		this.verificationOptions = verificationOptions;
 
 		this.start();
 	}
-
+	
 	public void run()
 	{
+		final AutomataVerifier automataVerifier;
 		Date startDate;
 		Date endDate;
-		final AutomataVerifier automataVerifier;
 
-		// Cancel dialog initialization...
+		boolean verificationSuccess;
+		String successMessage;
+		String failureMessage;
+
+		// Initialize the ExecutionDialog 
 		final ArrayList threadsToStop = new ArrayList();
-
 		threadsToStop.add(this);
 		eventQueue.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
-
 				executionDialog.setMode(ExecutionDialogMode.verifying);
 			}
 		});
+		
+		// Crap! LanguageInclusion is somewhat special since we have to use another theAutomata so this won't work!
+		/*
+		  // Initialize the AutomataVerifier
+		  try
+		  {
+		  automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+		  eventQueue.invokeLater(new Runnable()
+		  {
+		  public void run()
+		  {
+		  automataVerifier.getHelper().setExecutionDialog(executionDialog);
+		  }
+		  });
+		  threadsToStop.add(automataVerifier);
+		  }
+		  catch (Exception ex)
+		  {
+		  requestStop();
+		  JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		  logger.error(ex.getMessage());
+		  logger.debug(ex.getStackTrace());
+		  return;
+		  }
+		*/
 
+		// Examine the chosen options
+		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
+		if (errorMessage != null)
+		{
+			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
+			requestStop();
+			return;
+		}
+		
 		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
 		{
-
 			// Controllability verification...
-			boolean isControllable;
-
-			if (theAutomata.size() < 2)
-			{
-				JOptionPane.showMessageDialog(workbench.getFrame(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-				requestStop();
-
-				return;
-			}
-
+			successMessage = "The system is controllable!";
+			failureMessage = "The system is NOT controllable!";
+			
+			// Initialize the AutomataVerifier
 			try
 			{
 				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
-
 				eventQueue.invokeLater(new Runnable()
 				{
 					public void run()
@@ -154,93 +181,108 @@ public class AutomataVerificationWorker
 						automataVerifier.getHelper().setExecutionDialog(executionDialog);
 					}
 				});
-
-				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
-			catch (Exception ex)
+			catch (Exception ex) 
 			{
 				requestStop();
 				JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
 				logger.error(ex.getMessage());
 				logger.debug(ex.getStackTrace());
-
 				return;
 			}
+			
+			/* 
+			   if (theAutomata.size() < 2)
+			   {
+			   JOptionPane.showMessageDialog(workbench.getFrame(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			   requestStop();
+			   
+			   return;
+			   }
+			*/
 
-			startDate = new Date();
+			/*
+			  startDate = new Date();
+			  
+			  verificationSuccess = automataVerifier.verify();
+			*/
 
-			try
-			{
-				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
-				{
-					// Modular...
-					isControllable = automataVerifier.verify();
-				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
-				{
-					// Monolithic...
-					isControllable = automataVerifier.verify();
-				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
-				{
-					// IDD...
-					requestStop();
-					logger.error("IDD option not yet implemented...");
-					return;
-				}
-				else
-				{
-					// Error...
-					requestStop();
-					logger.error("Unavailable controllability option chosen.");
-					return;
-				}
-			}
-			catch (Exception ex)
-			{
-				requestStop();
-				logger.error("Error in AutomataVerificationWorker when verifying controllability. " + ex);
-				logger.debug(ex.getStackTrace());
-				return;
-			}
+			/*
+			  try
+			  {
+			  if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			  {
+			  // Modular...
+			  verificationSuccess = automataVerifier.verify();
+			  }
+			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+			  {
+			  // Monolithic...
+			  verificationSuccess = automataVerifier.verify();
+			  }
+			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
+			  {
+			  // IDD...
+			  requestStop();
+			  logger.error("IDD option not yet implemented...");
+			  return;
+			  }
+			  else
+			  {
+			  // Error...
+			  requestStop();
+			  logger.error("Unavailable controllability option chosen.");
+			  return;
+			  }
+			  }
+			  catch (Exception ex)
+			  {
+			  requestStop();
+			  logger.error("Error in AutomataVerificationWorker when verifying controllability. " + ex);
+			  logger.debug(ex.getStackTrace());
+			  return;
+			  }
+			*/
 
-			endDate = new Date();
+			/*
+			  endDate = new Date();
+			*/
 
-			// Present result...
-			if (!stopRequested)
-			{
-				if (isControllable)
-				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is controllable!", "Good news", JOptionPane.INFORMATION_MESSAGE);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is NOT controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
-				}
-			}
+			/*
+			  // Present result...
+			  if (!stopRequested)
+			  {
+			  if (verificationSuccess)
+			  {
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is controllable!", "Good news", JOptionPane.INFORMATION_MESSAGE);
+			  }
+			  else
+			  {
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is NOT controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
+			  }
+			  }
+			*/
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
 		{
 			// Non-blocking verification...
-			// requestStop();
-			// logger.error("Option not implemented...");
-			// workbench.error("Option not implemented...");
-			// return;
-			boolean isNonBlocking;
-
-			if (theAutomata.size() < 1)
-			{
-				JOptionPane.showMessageDialog(workbench.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-				requestStop();
-				return;
-			}
-
+			successMessage = "The system is non-blocking!";
+			failureMessage = "The system is blocking!";
+			
+			/*
+			  if (theAutomata.size() < 1)
+			  {
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			  requestStop();
+			  return;
+			  }
+			*/
+			
 			try
 			{
 				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
-
+				
 				eventQueue.invokeLater(new Runnable()
 				{
 					public void run()
@@ -248,7 +290,7 @@ public class AutomataVerificationWorker
 						automataVerifier.getHelper().setExecutionDialog(executionDialog);
 					}
 				});
-
+				
 				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
@@ -260,68 +302,80 @@ public class AutomataVerificationWorker
 				logger.debug(ex.getStackTrace());
 				return;
 			}
+			
+			/*
+			  startDate = new Date();
+			  
+			  verificationSuccess = automataVerifier.verify();
+			*/			
 
-			startDate = new Date();
+			/*
+			  try
+			  {
+			  if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			  {
+			  // Modular...
+			  // requestStop();
+			  // logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead!");
+			  // return;				
+			  
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "This algorithm is intentionally designed \n not to give you the answer you want.", "Mind you!", JOptionPane.INFORMATION_MESSAGE);
+			  verificationSuccess = automataVerifier.verify();					
+			  }
+			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+			  {
+			  // Monolithic...
+			  verificationSuccess = automataVerifier.verify();
+			  }
+			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
+			  {
+			  // IDD...
+			  requestStop();
+			  logger.error("Sorry. Nonblocking IDD verifictaion not yet implemented...");
+			  return;
+			  }
+			  else
+			  {
+			  // Error...
+			  requestStop();
+			  logger.error("Unavailable nonblocking option chosen.");
+			  return;
+			  }
+			  }
+			  catch (Exception ex)
+			  {
+			  requestStop();
+			  logger.error("Error in AutomataVerificationWorker when verifying non-blocking. " + ex);
+			  logger.debug(ex.getStackTrace());
+			  return;
+			  }
+			*/
 
-			try
-			{
-				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
-				{
-					// Modular...
-					// requestStop();
-					// logger.error("Modular nonblocking option not yet implemented... try the monolithic algorithm instead!");
-					// return;				
-					
-					JOptionPane.showMessageDialog(workbench.getFrame(), "This algorithm is intentionally designed \n not to give you the answer you want.", "Mind you!", JOptionPane.INFORMATION_MESSAGE);
-					isNonBlocking = automataVerifier.verify();					
-				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
-				{
-					// Monolithic...
-					isNonBlocking = automataVerifier.verify();
-				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
-				{
-					// IDD...
-					requestStop();
-					logger.error("Sorry. Nonblocking IDD verifictaion not yet implemented...");
-					return;
-				}
-				else
-				{
-					// Error...
-					requestStop();
-					logger.error("Unavailable nonblocking option chosen.");
-					return;
-				}
+			/*
+			  endDate = new Date();
+			*/
+			
+			/*
+			  // Present result...
+			  if (!stopRequested)
+			  {
+			  if (verificationSuccess)
+			  {
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is non-blocking!", "Good news", JOptionPane.INFORMATION_MESSAGE);
+			  }
+			  else
+			  {
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "The system is blocking!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
+			  }
 			}
-			catch (Exception ex)
-			{
-				requestStop();
-				logger.error("Error in AutomataVerificationWorker when verifying non-blocking. " + ex);
-				logger.debug(ex.getStackTrace());
-				return;
-			}
-
-			endDate = new Date();
-
-			// Present result...
-			if (!stopRequested)
-			{
-				if (isNonBlocking)
-				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is non-blocking!", "Good news", JOptionPane.INFORMATION_MESSAGE);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The system is blocking!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
-				}
-			}
+			*/
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Language inclusion
-			boolean isIncluded;
+			successMessage = "The language of the unselected automata is included in the language of the selected automata.";
+			failureMessage = "The language of the unselected automata is NOT included in the language of the selected automata.";
+			
 			Collection selectedAutomata = workbench.getSelectedAutomataAsCollection();
 			Automata automataA = new Automata();
 			Automata automataB = new Automata();
@@ -447,11 +501,11 @@ public class AutomataVerificationWorker
 			// After the above preparations, the language inclusion check
 			// can be performed as a controllability check...
 			automataA.addAutomata(automataB);
-
+			
 			try
 			{
 				automataVerifier = new AutomataVerifier(automataA, synchronizationOptions, verificationOptions);
-
+				
 				eventQueue.invokeLater(new Runnable()
 				{
 					public void run()
@@ -459,7 +513,7 @@ public class AutomataVerificationWorker
 						automataVerifier.getHelper().setExecutionDialog(executionDialog);
 					}
 				});
-
+				
 				// automataVerifier.getHelper().setExecutionDialog(executionDialog);
 				threadsToStop.add(automataVerifier);
 			}
@@ -472,83 +526,112 @@ public class AutomataVerificationWorker
 				return;
 			}
 
-			startDate = new Date();
+			/*
+			  startDate = new Date();
+			  
+			  verificationSuccess = automataVerifier.verify();
+			*/
 
-			try
-			{
-				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
-				{
-					// Modular...
-					isIncluded = automataVerifier.verify();
-				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
-				{
-					// Monolithic...
-					isIncluded = automataVerifier.verify();
-				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
-				{
-					// IDD...
-					requestStop();
-					logger.error("Language Inclusion IDD option not yet implemented...");
-					return;
-				}
-				else
-				{
-					// Error...
-					requestStop();
-					logger.error("Language Inclusion, unavailable option chosen.");
-					return;
-				}
-			}
-			catch (Exception ex)
-			{
-				requestStop();
-				logger.error("Error in AutomataVerificationWorker when verifying language inclusion. ", ex);
-				logger.debug(ex.getStackTrace());
-				return;
-			}
+			/*
+			  try
+			  {
+			  if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			  {
+			  // Modular...
+			  verificationSuccess = automataVerifier.verify();
+			  }
+			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+			  {
+			  // Monolithic...
+			  verificationSuccess = automataVerifier.verify();
+			  }
+			  else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
+			  {
+			  // IDD...
+			  requestStop();
+			  logger.error("Language Inclusion IDD option not yet implemented...");
+			  return;
+			  }
+			  else
+			  {
+			  // Error...
+			  requestStop();
+			  logger.error("Language Inclusion, unavailable option chosen.");
+			  return;
+			  }
+			  }
+			  catch (Exception ex)
+			  {
+			  requestStop();
+			  logger.error("Error in AutomataVerificationWorker when verifying language inclusion. ", ex);
+			  logger.debug(ex.getStackTrace());
+			  return;
+			  }
+			*/
+			
+			/*
+			  endDate = new Date();
+			*/
 
-			endDate = new Date();
-
-			// Present result...
-			if (!stopRequested)
-			{
-				if (isIncluded)
-				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is included in the language of the selected automata.", "Good news", JOptionPane.INFORMATION_MESSAGE);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is NOT included in the language of the selected automata.", "Bad news", JOptionPane.INFORMATION_MESSAGE);
-				}
-			}
+			/*
+			  // Present result...
+			  if (!stopRequested)
+			  {
+			  if (verificationSuccess)
+			  {
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is included in the language of the selected automata.", "Good news", JOptionPane.INFORMATION_MESSAGE);
+			  }
+			  else
+			  {
+			  JOptionPane.showMessageDialog(workbench.getFrame(), "The language of the unselected automata is NOT included in the language of the selected automata.", "Bad news", JOptionPane.INFORMATION_MESSAGE);
+			  }
+			  }
+			*/
 		}
 		else
 		{
-			// Error...
+			// Error... this can't happen!
 			requestStop();
-			logger.error("Unavailable option chosen.");
+			logger.error("Unavailable option chosen... this can't happen.");
 			return;
 		}
 
-		// Present result...
-		automataVerifier.getHelper().displayInfo();
+		startDate = new Date();
+		verificationSuccess = automataVerifier.verify();		
+		endDate = new Date();
 
+		// Present result...
 		if (!stopRequested)
 		{
+			if (verificationSuccess)
+			{
+				JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", JOptionPane.INFORMATION_MESSAGE);
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.INFORMATION_MESSAGE);
+			}
+			automataVerifier.getHelper().displayInfo();
 			logger.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
 		else
 		{
+			automataVerifier.getHelper().displayInfo();
 			logger.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 		}
-
+		
+		// We're finished! Stop everything!
 		requestStop();
 	}
 
+	/**
+	 * Method called from external class stopping AutomataVerifier as soon as possible.
+	 *
+	 *@see  ExecutionDialog
+	 */
 	public void requestStop()
 	{
+		logger.debug("AutomataVerificationWorker requested to stop.");
 		if (executionDialog != null)
 		{
 			executionDialog.setMode(ExecutionDialogMode.hide);

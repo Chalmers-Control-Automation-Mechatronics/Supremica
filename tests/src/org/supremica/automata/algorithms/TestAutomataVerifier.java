@@ -134,15 +134,40 @@ public class TestAutomataVerifier
 
 	public void testModularLanguageInclusion()
 	{
+		// Note that the TestFiles have been altered... so that language 
+		// inclusion is simply verified as controllability. This is really
+		// just another controllability test...
 		try
 		{
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3Language));
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageInclusion));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
 			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
 			assertTrue(theVerifier.verify());
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}		
+	}
+
+	public void testModularLanguageExclusion()
+	{
+		// Note that the TestFiles have been altered... so that language 
+		// inclusion is simply verified as controllability. This is really
+		// just another controllability test...
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageExclusion));
+			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+			VerificationOptions verificationOptions = new VerificationOptions();
+			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
+			AutomataVerifier theVerifier = new AutomataVerifier(theProject, synchronizationOptions, verificationOptions);
+			assertTrue(!theVerifier.verify());
 		}
 		catch (Exception ex)
 		{
