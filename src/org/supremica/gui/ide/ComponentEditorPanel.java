@@ -71,7 +71,7 @@ public class ComponentEditorPanel
 			(JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
 		viewevents.setBackground(Color.WHITE);
 		split.setResizeWeight(0.0);
-		split.setDividerLocation(500);
+		split.setDividerLocation(0.2);
 
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.BOTH;

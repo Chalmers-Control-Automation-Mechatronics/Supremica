@@ -18,7 +18,7 @@ public class EditorPrintAction
 
 		putValue(Action.NAME, "Print...");
 		putValue(Action.SHORT_DESCRIPTION, "Print");
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
+//		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)

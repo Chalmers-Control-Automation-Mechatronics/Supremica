@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ParameterListCell
 //###########################################################################
-//# $Id: ParameterListCell.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: ParameterListCell.java,v 1.3 2005-03-04 09:20:13 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.module.*;
 import java.util.ArrayList;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-class ParameterListCell
+public class ParameterListCell
 	extends JLabel
 	implements ListCellRenderer
 {

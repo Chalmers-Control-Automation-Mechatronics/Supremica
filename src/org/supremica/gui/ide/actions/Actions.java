@@ -15,6 +15,11 @@ public class Actions
 	public OpenAction openAction;
 	public CloseAction closeAction;
 	public SaveAction saveAction;
+
+	public PrintAction printAction;
+	public EditorPrintAction editorPrintAction;
+	public EditorPrintPDFAction editorPrintPDFAction;
+
 	public ExitAction exitAction;
 
 	public EditorCopyAction editorCopyAction;
@@ -41,6 +46,15 @@ public class Actions
 		openAction = new OpenAction(ide);
 		closeAction = new CloseAction(ide);
 		saveAction = new SaveAction(ide);
+
+		printAction = new PrintAction(ide);
+
+		editorPrintAction = new EditorPrintAction(ide);
+		editorActions.add(editorPrintAction);
+
+		editorPrintPDFAction = new EditorPrintPDFAction(ide);
+		editorActions.add(editorPrintPDFAction);
+
 		exitAction = new ExitAction(ide);
 
 		editorCopyAction = new EditorCopyAction(ide);

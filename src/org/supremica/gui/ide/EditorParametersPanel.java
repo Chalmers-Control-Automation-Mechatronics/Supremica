@@ -2,6 +2,11 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import org.supremica.gui.WhiteScrollPane;
+import java.util.*;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.gui.ParameterListCell;
+
 
 class EditorParametersPanel
 	extends WhiteScrollPane
@@ -13,6 +18,11 @@ class EditorParametersPanel
 	{
 		this.moduleContainer = moduleContainer;
 		this.name = name;
+
+		createContentPane();
+
+		setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+		setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 	}
 
 	public String getName()
@@ -20,4 +30,23 @@ class EditorParametersPanel
 		return name;
 	}
 
+	private void createContentPane()
+	{
+		ModuleProxy module = moduleContainer.getModuleProxy();
+		DefaultListModel paramData = new DefaultListModel();
+
+		if (module != null)
+		{
+			for (int i = 0; i < module.getParameterList().size(); i++)
+			{
+				paramData.addElement(((ParameterProxy) (module.getParameterList().get(i))));
+			}
+		}
+
+		JList paramdataList = new JList(paramData);
+		paramdataList.setCellRenderer(new ParameterListCell());
+		getViewport().add(paramdataList);
+
+	}
 }
+
