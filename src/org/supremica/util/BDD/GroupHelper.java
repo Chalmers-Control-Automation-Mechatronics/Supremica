@@ -137,7 +137,11 @@ public class GroupHelper {
 		// This one is tricky:
 		// if spec is empty, then we cant assume that all events in P are marked
 		// because then everything is marked (there is no spec, remember?)
-		int m_all = spec.isEmpty() ? plant.getM() : spec.getM();
+		// int m_all = spec.isEmpty() ? plant.getM() : spec.getM();
+
+		// or do it as usual
+		int m_all = m.and( spec.getM(), plant.getM() );
+
 		m.ref(m_all);
 		return m_all;
     }
