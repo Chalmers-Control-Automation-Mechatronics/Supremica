@@ -1796,7 +1796,7 @@ public class ActionMan
 							 currAutomaton.getName() + " " + ex);
 				logger.debug(ex.getStackTrace());
 			}
-
+			
 			if (!options.getKeepOriginal())
 			{
 				gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomaton);

@@ -358,7 +358,7 @@ public class Automaton
 
 		// We start by computing the set of explicitly
 		// forbidden events
-		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
 
@@ -393,7 +393,7 @@ public class Automaton
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
 
-		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
 
@@ -437,7 +437,7 @@ public class Automaton
 
 		// We start by computing the set of explicitly
 		// forbidden events
-		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
 
@@ -473,7 +473,7 @@ public class Automaton
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
 
-		for (StateIterator stateIt = stateset.iterator(); stateIt.hasNext(); )
+		for (StateIterator stateIt = stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = stateIt.nextState();
 
@@ -1808,6 +1808,18 @@ public class Automaton
 		// Remove the states
 		removeState(one);
 		removeState(two);
+
+		// Adjust the index of the new state (see the "Här blir det fel" discussion in AutomataIndexForm)
+		if (one.getIndex() < two.getIndex())
+		{
+			// Take over the index of state one
+			newState.setIndex(one.getIndex());
+		}
+		else
+		{
+			// Take over the index of state two
+			newState.setIndex(two.getIndex());
+		}
 
 		// Return the new state
 		return newState;

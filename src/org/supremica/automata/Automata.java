@@ -1110,11 +1110,9 @@ public class Automata
 
 	void notifyListeners(int mode, Automaton a)
 	{
-
 		// logger.debug("Automata.notifyListeners Start");
 		if (listeners != null)
 		{
-
 			// logger.debug("Automata.notifyListeners");
 			listeners.notifyListeners(mode, a);
 		}

@@ -74,6 +74,7 @@ public class TestPackageAlgorithms
 		suite.addTest(TestAutomataSynthesizer.suite());
 		suite.addTest(TestAutomataVerifier.suite());
 		suite.addTest(TestAutomatonSplit.suite());
+		suite.addTest(TestAutomatonMinimizer.suite());
 		// suite.addTest(TestAutomataToXml.suite());
 		// suite.addTest(TestProjectToSP.suite());
 		return suite;

@@ -194,15 +194,11 @@ public class LabeledEvent
 	// The Java people have messed it all up with inheriting equals(Object)
 	public boolean equals(LabeledEvent event)
 	{
-
-		// return getId().equals(event.getId());
 		return getLabel().equals(event.getLabel());
 	}
 
 	public boolean equals(String label)
 	{
-
-		// System.err.println("equalsString");
 		return this.label.equals(label);
 	}
 

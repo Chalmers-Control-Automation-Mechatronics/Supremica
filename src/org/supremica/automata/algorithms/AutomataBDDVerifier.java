@@ -150,7 +150,7 @@ public class AutomataBDDVerifier
 	 *
 	 * @return TRUE if the system is non-blocking
 	 */
-	public boolean isNonBlocking()
+	public boolean isNonblocking()
 	{
 		boolean is_nonblocking = true;
 		int r = sup.getReachables();

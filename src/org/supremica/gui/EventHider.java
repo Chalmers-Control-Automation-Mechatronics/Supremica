@@ -159,7 +159,7 @@ public class EventHider
 		{
 			if (!tau.isEpsilon())
 			{
-				logger.error("The event 'tau' is reserved and must be unbservable!");
+				logger.error("The event name 'tau' is reserved and must be unobservable!");
 				return;
 			}
 		}

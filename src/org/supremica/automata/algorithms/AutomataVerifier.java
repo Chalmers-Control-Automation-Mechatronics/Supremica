@@ -279,13 +279,13 @@ public class AutomataVerifier
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				{
-					return BDDNonBlockingVerification();
+					return BDDNonblockingVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
 
 					// This algorithm is under implementation!!
-					return modularNonBlockingVerification();
+					return modularNonblockingVerification();
 
 					// This algorithm only verifies pairwise nonblocking!!!
 					// return pairwiseNonblockingVerification();
@@ -398,7 +398,7 @@ public class AutomataVerifier
 	{
 
 		// Ensure individual nonblocking
-		if (!isIndividuallyNonBlocking())
+		if (!isIndividuallyNonblocking())
 		{
 			return false;
 		}
@@ -1383,13 +1383,13 @@ public class AutomataVerifier
 	 *@return  true if the system is non-blocking
 	 *@see  BDDAutomata, AutomataBDDVerifier
 	 */
-	private boolean BDDNonBlockingVerification()
+	private boolean BDDNonblockingVerification()
 		throws Exception
 	{
 
 		// timer.start();
 		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, synchHelper.getHelperData());
-		boolean ret = abf.isNonBlocking();
+		boolean ret = abf.isNonblocking();
 
 		abf.cleanup();
 
@@ -1514,7 +1514,7 @@ public class AutomataVerifier
 		return moduleIsNonblocking(theAutomaton, true);
 	}
 
-	private boolean isIndividuallyNonBlocking()
+	private boolean isIndividuallyNonblocking()
 		throws Exception
 	{
 		boolean allIndividuallyNonblocking = true;
@@ -1550,10 +1550,9 @@ public class AutomataVerifier
 	/**
 	 * Examines non-blocking modularily... not fully implemented yet!
 	 */
-	private boolean modularNonBlockingVerification()
+	private boolean modularNonblockingVerification()
 		throws Exception
 	{
-
 		// Is this really a modular system?
 		if (theAutomata.size() == 1)
 		{
@@ -1563,7 +1562,7 @@ public class AutomataVerifier
 		}
 
 		// Ensure individual nonblocking
-		if (!isIndividuallyNonBlocking())
+		if (!isIndividuallyNonblocking())
 		{
 			return false;
 		}
@@ -1576,7 +1575,6 @@ public class AutomataVerifier
 
 		while (targetIt.hasNext())
 		{
-
 			// Iterate over theAutomata
 			Automaton targetAutomaton = new Automaton((Automaton) targetIt.next());
 			Alphabet targetAlphabet = targetAutomaton.getAlphabet();
@@ -1620,10 +1618,9 @@ public class AutomataVerifier
 	/**
 	 * Examines non-blocking modularily... not fully implemented yet!
 	 */
-	private boolean modularNonBlockingVerification2()
+	private boolean modularNonblockingVerification2()
 		throws Exception
 	{
-
 		// Is this really a modular system?
 		if (theAutomata.size() == 1)
 		{
@@ -1780,6 +1777,40 @@ public class AutomataVerifier
 		*/
 	}
 
+	private boolean compositionalNonblockingVerification()
+	{
+		// Make a copy that we can fiddle with
+		//Automata theAutomata = new Automata(theAutomata); 
+		
+		//composeAndMinimize(automata, hideThese);
+		
+		return false;
+	}
+
+	private Automaton composeAndMinimize(Automata automata, Alphabet hideThese)
+	{
+		Automaton aut;
+
+		try
+		{
+			aut = AutomataSynchronizer.synchronizeAutomata(automata);
+			EventHider.hide(aut, hideThese);
+			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
+			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+			options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
+			options.setAlsoTransitions(true);
+			options.setKeepOriginal(false);
+			aut = minimizer.getMinimizedAutomaton(options);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+			return null;
+		}
+
+		return aut;
+	}
+
 	private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)
 		throws Exception
 	{
@@ -1805,7 +1836,6 @@ public class AutomataVerifier
 	 *
 	 * This method presupposes that all events are uncontrollable!... very not intuitive! //Hguo.
 	 */
-
 	/*
 	private boolean behaviouralInclusionVerification(Automata automataA, Automata automataB)
 			throws Exception

@@ -1351,7 +1351,7 @@ public class MutuallyNonblockingVerifier
 		throws Exception
 	{
 		AutomataBDDVerifier abf = new AutomataBDDVerifier(automata, alphabet, null);
-		boolean ret = abf.isNonBlocking();
+		boolean ret = abf.isNonblocking();
 
 		abf.cleanup();
 

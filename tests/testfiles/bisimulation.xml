@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Bisimulation">
+<Automaton name="viii.b" type="Plant">
+	<Events>
+		<Event id="a"/>
+		<Event id="b"/>
+		<Event id="c"/>
+		<Event id="d"/>
+		<Event id="tau" epsilon="true"/>
+	</Events>
+	<States>
+		<State id="0" initial="true"/>
+		<State id="1"/>
+		<State id="2"/>
+		<State id="3"/>
+		<State id="4"/>
+		<State id="5"/>
+		<State id="6"/>
+		<State id="7"/>
+		<State id="8"/>
+		<State id="9"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
+		<Transition source="0" dest="2" event="a"/>
+		<Transition source="0" dest="3" event="a"/>
+		<Transition source="1" dest="4" event="b"/>
+		<Transition source="1" dest="5" event="c"/>
+		<Transition source="1" dest="6" event="d"/>
+		<Transition source="2" dest="7" event="c"/>
+		<Transition source="2" dest="8" event="d"/>
+		<Transition source="3" dest="9" event="d"/>
+	</Transitions>
+</Automaton>
+<Automaton name="P1F1F2" type="Specification">
+	<Events>
+		<Event id="0" label="tau" epsilon="true"/>
+		<Event id="2" label="put2.2" controllable="false"/>
+		<Event id="3" label="put5.1" controllable="false"/>
+		<Event id="7" label="take2.2"/>
+		<Event id="8" label="take5.1"/>
+	</Events>
+	<States>
+		<State id="0" name="eat.2.2"/>
+		<State id="1" name="ld.0.2"/>
+		<State id="2" name="ld.1.2"/>
+		<State id="3" name="lu.2.0"/>
+		<State id="4" name="lu.2.1"/>
+		<State id="5" name="rd.2.0"/>
+		<State id="6" name="rd.2.1"/>
+		<State id="7" name="ready.2.2"/>
+		<State id="8" name="ru.0.2"/>
+		<State id="9" name="ru.1.2"/>
+		<State id="10" name="think.0.0" initial="true" accepting="true"/>
+		<State id="11" name="think.0.1"/>
+		<State id="12" name="think.1.0"/>
+		<State id="13" name="think.1.1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="5" event="0"/>
+		<Transition source="1" dest="10" event="0"/>
+		<Transition source="1" dest="2" event="8"/>
+		<Transition source="2" dest="12" event="0"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="3" dest="7" event="0"/>
+		<Transition source="3" dest="4" event="7"/>
+		<Transition source="4" dest="3" event="2"/>
+		<Transition source="5" dest="10" event="0"/>
+		<Transition source="5" dest="6" event="7"/>
+		<Transition source="6" dest="11" event="0"/>
+		<Transition source="6" dest="5" event="2"/>
+		<Transition source="7" dest="0" event="0"/>
+		<Transition source="8" dest="7" event="0"/>
+		<Transition source="8" dest="9" event="8"/>
+		<Transition source="9" dest="8" event="3"/>
+		<Transition source="10" dest="3" event="0"/>
+		<Transition source="10" dest="8" event="0"/>
+		<Transition source="10" dest="11" event="7"/>
+		<Transition source="10" dest="12" event="8"/>
+		<Transition source="11" dest="10" event="2"/>
+		<Transition source="11" dest="4" event="0"/>
+		<Transition source="11" dest="13" event="8"/>
+		<Transition source="12" dest="10" event="3"/>
+		<Transition source="12" dest="9" event="0"/>
+		<Transition source="12" dest="13" event="7"/>
+		<Transition source="13" dest="12" event="2"/>
+		<Transition source="13" dest="11" event="3"/>
+	</Transitions>
+</Automaton>
+</Automata>

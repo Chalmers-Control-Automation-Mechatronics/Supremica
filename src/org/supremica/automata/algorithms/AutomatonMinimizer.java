@@ -75,7 +75,7 @@ public class AutomatonMinimizer
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
 
-	/** The "original" automaton (possible saturated). */
+	/** The automaton being minimized (may be a copy of the original). */
 	private Automaton theAutomaton;
 
 	/** The supplied options. */
@@ -90,15 +90,19 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * Returns minimized automaton, minimized with respect to the supplied equivalence relation
+	 * Returns minimized automaton, minimized with respect to the supplied options.
 	 */
 	public Automaton getMinimizedAutomaton(MinimizationOptions options)
 		throws Exception
 	{
 		this.options = options;
 				
-		// We need a copy since we must make the system reachable (and maybe deterministic) first!
-		theAutomaton = new Automaton(theAutomaton);
+		// Do we have to care about the original?
+		if (options.getKeepOriginal())
+		{
+			// We need a copy since we must make the system reachable (and maybe deterministic) first!
+			theAutomaton = new Automaton(theAutomaton);
+		}
 
 		// Make reachable
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, SynthesizerOptions.getDefaultSynthesizerOptions());
@@ -144,7 +148,7 @@ public class AutomatonMinimizer
 
 				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
 				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));			
-
+				
 				// Saturate
 				doTransitiveClosure(theAutomaton);
 
@@ -173,6 +177,7 @@ public class AutomatonMinimizer
 			throw ex;
 		}
 
+		// Build the minimized automaton
 		Automaton newAutomaton = buildAutomaton(equivClasses);
 
 		// Should we remove redundant transitions to minimize also with respect to transitions?
@@ -180,6 +185,16 @@ public class AutomatonMinimizer
 		{
 			removeRedundantTransitions(newAutomaton);
 		}
+
+		// How did it go?
+		if (!isMinimal(newAutomaton))
+		{
+			// The minimization sometimes misses stuff that is easy to see (for the trained eye)
+			mergeSilentLoops(newAutomaton);
+		}
+
+		// Remove from alphabet epsilon events that are never used
+		removeUnusedEpsilonEvents(newAutomaton);
 
 		// Return the result of the minimization!
 		return newAutomaton;
@@ -378,38 +393,61 @@ public class AutomatonMinimizer
 	}
 	
 	/**
-	 * Merges all states in loops of silent transitions
+	 * Merges all states in loops of silent transitions and "single-outgoing-epsilon-transition-states"
 	 */
 	public void mergeSilentLoops(Automaton aut)
 	{
 		StateSet statesToExamine = new StateSet(aut.getStateSet());
-		
+
+		int count = 0;
 		while (statesToExamine.size() != 0)
 		{
 			// Get and remove arbitrary state
 			State one = statesToExamine.get();			
 			statesToExamine.remove(one);
+
+			// If there is only one transition out of this state, and it is an epsilon-transition
+			// merge this and next state.
+			if (one.nbrOfOutgoingArcs() == 1)
+			{
+				Arc arc = one.outgoingArcsIterator().nextArc();
+				State two = arc.getToState();
+				
+				// If 1!=2 etc.
+				if ((!one.equals(two)) && arc.getEvent().isEpsilon())
+				{
+					count++;
+					aut.removeArc(arc); // We can remove this one, it will be an epsilon self-loop!
+					statesToExamine.remove(two);
+					statesToExamine.add(aut.mergeStates(one, two));
+					continue;
+				}
+			}
 			
 			// Find epsilon-closure for this state
 			one.setStateSet(null); // This is unfortunately necessary!!
 			Determinizer determinizer = new Determinizer(aut);
 			StateSet closureOne = determinizer.epsilonClosure(one);
-			
+			closureOne.remove(one); // Don't examine 
+
 			// Find, in closure, if there is a state which has the first state in its closure
 			for (StateIterator closureIt = closureOne.iterator(); closureIt.hasNext(); )
 			{
 				State two = closureIt.nextState();
 				two.setStateSet(null);
 				StateSet closureTwo = determinizer.epsilonClosure(two);
-				closureTwo.remove(two);
 				if (closureTwo.contains(one))
 				{
-					// Merge and add to stack, take next state to examine
+					count++;
+					
+					// Remove the other state from stack, merge and add 
+					// new state to stack
+					statesToExamine.remove(two);
 					statesToExamine.add(aut.mergeStates(one, two));
 					break;
 				}
-			}		
-		}	
+			}
+		}
 	}
 	
 	/**
@@ -485,8 +523,8 @@ public class AutomatonMinimizer
 			}
 			toBeAdded.add(new Arc(currState, currState, tau));
 		}
-		// Add the new arcs!
-		logger.info("Added " + toBeAdded.size() + " transitions to " + aut + ".");
+		// Add the new 
+		logger.debug("Added " + toBeAdded.size() + " transitions to " + aut + ".");
 		while (toBeAdded.size() != 0)
 		{
 			// Add if not already there
@@ -607,10 +645,17 @@ public class AutomatonMinimizer
 		{
 			aut.removeArc((Arc) toBeRemoved.remove(0));
 		}
+	}
 
-		// Remove epsilon transitions that are never used
+	/**
+	 * Removes epsilon events that are never used from alphabet.
+	 */
+	public void removeUnusedEpsilonEvents(Automaton aut)
+	{
 		Alphabet alpha = aut.getAlphabet();
-		toBeRemoved.clear();
+
+		// Put them in a list, remove afterwards
+		LinkedList toBeRemoved = new LinkedList();
 		loop: for (EventIterator evIt = alpha.iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent event = evIt.nextEvent();
@@ -637,33 +682,35 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * Splits equivClasses with respect to observation equivalence.
+	 * Examines (not very well!!!) if there are any obvious places where more
+	 * minimization could have been done.
 	 */
-	private void doObservationEquivalenceMinimization(EquivalenceClasses equivClasses)
+	private boolean isMinimal(Automaton aut)
 	{
-		/*
-		// The same notation as in "An Implementation of an Efficient 
-		// Algorithm for Bisimulation Equivalence". 
-		EquivalenceClasses W = (EquivalenceClasses) equivClasses.clone();
-		EquivalenceClasses q = equivClasses;
-		
-		// The alphabet, used several times below
-		Alphabet A = theAutomaton.getAlphabet();
-		
-		// The main loop
-		while (W.size() != 0)
+		int count = 0;
+
+		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 		{
-		    // Get and remove a StateSet from W
-		    StateSet splitter = W.getFirst();
-		    W.remove((EquivalenceClass) splitter);
-		
-			// Loop over the "actions"
-			for (EventIterator evIt = A.iterator(); evIt.hasNext();)
+			State state = stateIt.nextState();
+			
+			if (state.nbrOfOutgoingArcs() == 1 && state.outgoingArcsIterator().nextArc().getEvent().isEpsilon())
 			{
-				LabeledEvent a = evIt.nextEvent();
+				logger.debug("Minimization missed minimizing state " + state + ".");
+				
+				// Could have done better!
+				count++;
 			}
 		}
-		*/
+
+		if (count != 0)
+		{
+			logger.debug("Automaton is not minimal. At least " + count + " states more could be removed.");
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	public static void main(String[] args)
