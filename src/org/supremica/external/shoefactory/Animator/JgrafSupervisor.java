@@ -23,7 +23,7 @@ public class JgrafSupervisor
 	private static String[] getEventsB = {"get_T6","get_T7","get_T8","get_T9","get_T10L","get_T10R","get_T11","get_T12"};
 	private static String[] getEventsC = {"get_T6_S0","get_T6_S1","get_T6_S2","get_T6_S3","get_T6_S4","get_T7_S5","get_T7_S6","get_T7_S7","get_T7_S8","get_T8_S9","get_T8_S10","get_T8_S11","get_T9_S12","get_T9_S13","get_T9_S14","get_T9_S15","get_T12_S16","get_T12_S17","get_T12_S18","get_T12_S19","get_T10_S20","get_T11_S21","get_T11_S22","get_T11_S23"};
 	
-	private String actionString = "S getRot=\"Shoe\"+index+\".nrOfRot\";\nS currTable = \"Shoe\"+index+\".currentTable\";\nS gotoString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".goto\";\n";
+	private String actionString = "S getRot=\"Shoe\"+index+\".nrOfRot\";\nS currTable = \"Shoe\"+index+\".currentTable\";\nS gotoString = \"Shoe\"+index+\".ShoeControl.moveFromTable\"+currTable^+\".goto\";\nS errorEvent = random()<0.01 & applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Error\"+index);\n";
 	private String conditionString = "";
 	
 	public JgrafSupervisor(GCDocument doc, int nr)
@@ -38,22 +38,19 @@ public class JgrafSupervisor
 		BooleanVariable[] bv1 = new BooleanVariable[putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length+getEventsB.length+getEventsC.length];
 		
 		BooleanVariable suc = jgSupervisor.createBooleanVariable(300,50,"success","0");
-		BooleanVariable err = jgSupervisor.createBooleanVariable(1100,50,"Error","0");
-		IntegerVariable rand = jgSupervisor.createIntegerVariable(1000,50,"rand","0");
 		StringVariable sup = jgSupervisor.createStringVariable(400,50,"supervisor","theSupervisor");
 		StringVariable curS = jgSupervisor.createStringVariable(500,50,"currStation","");
 		StringVariable gotS = jgSupervisor.createStringVariable(600,50,"gotoString","");
 		IntegerVariable nrO = jgSupervisor.createIntegerVariable(700,50,"nrOfShoes","0");
 		IntegerVariable sho = jgSupervisor.createIntegerVariable(800,50,"index","0");
 		StringVariable curE = jgSupervisor.createStringVariable(900,50,"currEvent","");
+		StringVariable from12 = jgSupervisor.createStringVariable(1000,50,"from12","");
 		StringVariable getR = jgSupervisor.createStringVariable(300,150,"getRot","");
 		StringVariable stepS = jgSupervisor.createStringVariable(400,150,"stepString","");
 		StringVariable curT = jgSupervisor.createStringVariable(500,150,"currTable","");
 		StringVariable agvS = jgSupervisor.createStringVariable(600,150,"agvString","");
 		BooleanVariable turn = jgSupervisor.createBooleanVariable(700,150,"turn","0");
-		StringVariable from12 = jgSupervisor.createStringVariable(900,50,"from12","");
-		StringVariable erstr = jgSupervisor.createStringVariable(1100,50,"erstr","");
-		StringVariable tstr = jgSupervisor.createStringVariable(1300,50,"tstr","");
+		BooleanVariable errorEv = jgSupervisor.createBooleanVariable(800,150,"errorEvent","0");
 		
 		// Create Grafcet
 		GCStepInitial initialStep = supervisor.createInitialStep(100,yPos,"Start","S nrOfShoes = applyStaticMethod(\"org.supremica.external.shoefactory.Executor.FactoryExecutor\",\"getSValue\",\"int\");\nS success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"initializeSupervisor\",\"boolean\",\"string\",supervisor);");
@@ -114,17 +111,22 @@ public class JgrafSupervisor
 			supervisor.connect(tr,sC);
 		}
 		
+		GCTransition trEr1 = supervisor.createTransition(9100,yPos,"errorEvent");
+		GCStep sEr = supervisor.createStep(9100,yPos+50,"Error","S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Error\"+index);\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Error\"+index);\nS currEvent = \"Shoe\"+index+\".Events.error\";\nS currEvent^=1;");
+		GCTransition trEr2 = supervisor.createTransition(9100,yPos+150,"Error.T>1");
 		
-				
-		
-		trC.setConditionText("!("+conditionString+"0)");
+		trC.setConditionText("!("+conditionString+"errorEvent)");
 		sB.setActionText(actionString);
 		
 		supervisor.connect(initialStep,trA);
 		supervisor.connect(trA,sA);
 		supervisor.connect(sA,trB);
 		supervisor.connect(trB,sB);
+		supervisor.connect(sB,trEr1);
+		supervisor.connect(trEr1,sEr);
+		supervisor.connect(sEr,trEr2);
 		supervisor.connect(sB,trC);
+		supervisor.connect(trEr2,sC);
 		supervisor.connect(trC,sC);
 		supervisor.connect(sC,trDa);
 		supervisor.connect(sC,trDb);
@@ -220,11 +222,9 @@ public class JgrafSupervisor
 			tNr=10;
 		else
 			tNr=11;
-		
-	
-			actionString = actionString+"S stepString = \"Shoe\"+index+\".ShoeControl.onTable"+tNr+".Station"+index+".x\";\nS "+putEventsC[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\") & !Shoefactory.tables.table"+tNr+".fullSlot.get(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table"+tNr+".rot,\"int\","+Shoe.getStationRot(index)+")) & Shoefactory.stations.station"+index+".S1.s>Shoefactory.stations.station"+index+".workTime & stepString^ &!Error;\n";
+			
+		actionString = actionString+"S stepString = \"Shoe\"+index+\".ShoeControl.onTable"+tNr+".Station"+index+".x\";\nS "+putEventsC[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\") & !Shoefactory.tables.table"+tNr+".fullSlot.get(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table"+tNr+".rot,\"int\","+Shoe.getStationRot(index)+")) & Shoefactory.stations.station"+index+".S1.s>Shoefactory.stations.station"+index+".workTime & stepString^ & !errorEvent;\n";
 
-							
 		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,putEventsC[index]);
 		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Station_"+tNr+"_"+index+"\",\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr +"\",\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+putEventsC[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+putEventsC[index]+"\";\nS currEvent^=1;");
 		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
@@ -334,7 +334,7 @@ public class JgrafSupervisor
 	{
 		int tNr, xPos=300+100*(index+putEventsA.length+putEventsB.length+putEventsC.length+getEventsA.length+getEventsB.length);;
 		conditionString = conditionString+getEventsC[index]+" | ";
-		
+
 		if(index<5)
 			tNr=6;
 		else if(index>=5 && index<9)
@@ -356,53 +356,14 @@ public class JgrafSupervisor
 			actionString = actionString+"S currStation=\"Shoe\"+index+\".station"+index+"\";\nS stepString = \"Shoe\"+index+\".ShoeControl.onTable"+tNr+".S0.x\";\nS "+getEventsC[index]+" = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"isEventEnabled\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\") & applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"checkRotationsToStation\",\"boolean\",\"int\",Shoefactory.tables.table"+tNr+".rot,\"int\",getRot^,\"int\","+Shoe.getStationRot(index)+") & currStation^ & stepString^;\n";
 		
 		GCTransition trEn1 = supervisor.createTransition(xPos,yPos,getEventsC[index]);
-		
-	
-		GCStep s1 =supervisor.createStep(xPos,yPos+400,"Step"+stepID,";");
-		
+		GCStep s1 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Station_"+tNr+"_"+index+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+getEventsC[index]+"\";\nS currEvent^=1;");
+		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+150,"Step"+stepID+".T>1");
 		stepID++;
-		
-		
-		GCTransition T12 =supervisor.createTransition(xPos,yPos+350,"!Error");
-		GCTransition T22 =supervisor.createTransition(xPos+100,yPos+350,"Error");
-		
-		GCStep s0;
-		if(tNr==10)
-			s0 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Station_"+tNr+"_"+index+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+getEventsC[index]+"\";\nS currEvent^=1;");
-		else
-			s0 = supervisor.createStep(xPos,yPos+50,"Step"+stepID,"S Error=random()<0.0;\nS success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Station_"+tNr+"_"+index+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"Table"+tNr+"\",\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Shoe_\"+index+\""+getEventsC[index]+"\");\nS currEvent = \"Shoe\"+index+\".Events."+getEventsC[index]+"\";\nS currEvent^=1;");
-		
-		stepID++;
-		
-		GCStep s12 = supervisor.createStep(xPos+100,yPos+400,"Step"+stepID,"S writeMessage(\"Error with shoe "+shoeNr+" in station "+index+" at table "+tNr+"\");\nS success = applyStaticMethod(\"org.supremica.external.jgrafchart.Supervisor\",\"executeEvent\",\"boolean\",\"string\",supervisor,\"string\",\"Error\"+index);\nS success = applyStaticMethod(\"org.supremica.external.shoefactory.Animator.JgrafSupervisor\",\"moveInitial\",\"boolean\",\"string\",\"shoeSpec\"+index,\"string\",\"Error\"+index);\nS erstr=\"Shoe\"+index+\".Events.error\";\nN erstr^;\nS println(\"kdmjfdkmf\");\nS tstr = \"Shoe\"+index+\".Errorhandler.currentStation\";\nP tstr^ ="+index+";\nS currEvent = \"Shoe\"+index+\".station20\";\nS currEvent^=1;") ;
-		
-			
-		
-		GCTransition trEn2 = supervisor.createTransition(xPos,yPos+500,"1");
-		GCTransition trEn12 = supervisor.createTransition(xPos,yPos+500,"Step"+stepID+".t>2");
-		stepID++;
-		
-		GCStep s2 = supervisor.createStep(xPos,yPos+550,"Step"+stepID,"S Error=0;");
-	
-		GCTransition trEn3 = supervisor.createTransition(xPos,yPos+650,"Step"+stepID+".t>1");
-		stepID++;
-		
 		supervisor.connect(in,trEn1);
-		supervisor.connect(trEn1,s0);
-		supervisor.connect(s0,T12);
-		supervisor.connect(s0,T22);
-		supervisor.connect(T12,s1);
-		supervisor.connect(T22,s12);
+		supervisor.connect(trEn1,s1);
+		supervisor.connect(s1,trEn2);
 		
-		supervisor.connect(s1,trEn2);		
-		supervisor.connect(s12,trEn12);
-		supervisor.connect(trEn2,s2);		
-		supervisor.connect(trEn12,s2);
-		
-		supervisor.connect(s2,trEn3);		
-		
-		
-		return trEn3;
+		return trEn2;
 	}
 	
 	public static boolean moveInitial(String supervisor, String event)

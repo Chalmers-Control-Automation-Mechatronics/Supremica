@@ -31,11 +31,11 @@ public class Shoe
 		IntegerVariable iv0 = shoe.createIntegerVariable(300,250,"choice","0");
 		IntegerVariable iv1 = shoe.createIntegerVariable(300,50,"nrOfRot","0");
 		IntegerVariable iv2 = shoe.createIntegerVariable(400,50,"currentTable","0");
-		
+		IntegerVariable iv3 = shoe.createIntegerVariable(400,150,"currentStation","0");
 		BooleanVariable bv0 = shoe.createBooleanVariable(300,150,"done","0");
-		StringVariable sv = shoe.createStringVariable(400,150,"pointerString","");
+		StringVariable sv = shoe.createStringVariable(400,250,"pointerString","");
 		
-		//Change to boolean list when possible
+		//Change to boolean list when list stringpointers are supported
 		BooleanVariable[] bv = new BooleanVariable[24];
 		for(int i=0; i<12;i++)
 		{
@@ -48,8 +48,10 @@ public class Shoe
 				s="1";
 			bv[i+12] = shoe.createBooleanVariable(500+100*i,150,"station"+(i+12),s);
 		}
-		
-//------- Can be changed -----------------------------------------------------------
+
+	/*---- From here down to row 406 changes can be made if production path needs to be changed ------------
+	  ---- The values below all depend on the settings in ConfigitConverter.java -------------------------*/
+	
 		int stationA=0, stationB=0, stationC=0;
 
 		if(stationVisit[0] && stationVisit[5] && stationVisit[9])
@@ -147,13 +149,13 @@ public class Shoe
 		GCTransition shoeTR1b = shoe.createTransition(300,yPos,"ShoeControl.onTable7.Station"+stationB+".x");
 		GCTransition shoeTR1c = shoe.createTransition(500,yPos,"ShoeControl.onTable8.Station"+stationC+".x");
 		yPos+=50;
-		GCStep shoeS2a = shoe.createStep(100,yPos,"station"+stationA+"b",";");
-		GCStep shoeS2b = shoe.createStep(300,yPos,"station"+stationB+"b",";");
-		GCStep shoeS2c = shoe.createStep(500,yPos,"station"+stationC+"b",";");
+		GCStep shoeS2a = shoe.createStep(100,yPos,"station"+stationA+"b","S currentStation="+stationA+";");
+		GCStep shoeS2b = shoe.createStep(300,yPos,"station"+stationB+"b","S currentStation="+stationB+";");
+		GCStep shoeS2c = shoe.createStep(500,yPos,"station"+stationC+"b","S currentStation="+stationC+";");
 		yPos+=100;
-		GCTransition shoeTR2a = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.err");
-		GCTransition shoeTR2b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationB+".leaveStation & !Events.err");
-		GCTransition shoeTR2c = shoe.createTransition(500,yPos,"Shoefactory.stations.station"+stationC+".leaveStation & !Events.err");
+		GCTransition shoeTR2a = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.error");
+		GCTransition shoeTR2b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationB+".leaveStation & !Events.error");
+		GCTransition shoeTR2c = shoe.createTransition(500,yPos,"Shoefactory.stations.station"+stationC+".leaveStation & !Events.error");
 		yPos+=50;
 		GCStep shoeS3 = shoe.createStep(100,yPos,"goto9","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=9;");
 		yPos+=100;
@@ -199,24 +201,23 @@ public class Shoe
 		yPos+=100;
 		GCTransition shoeTR4 = shoe.createTransition(100,yPos,"ShoeControl.onTable9.Station"+stationA+".x");
 		yPos+=50;
-		GCStep shoeS5 = shoe.createStep(100,yPos,"station"+stationA+"a1",";");
+		GCStep shoeS5 = shoe.createStep(100,yPos,"station"+stationA+"a1","S currentStation="+stationA+";");
 		yPos+=100;
-		GCTransition shoeTR5 = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.err");
+		GCTransition shoeTR5 = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.error");
 		yPos+=50;
+		GCStep shoeS6 = shoe.createStep(100,yPos+300,"goto12","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=12;");
 		
 		shoe.connect(shoeS3,shoeTR3);
 		shoe.connect(shoeTR3,shoeS4);
 		shoe.connect(shoeS4,shoeTR4);
 		shoe.connect(shoeTR4,shoeS5);
 		shoe.connect(shoeS5,shoeTR5);
-			
-		GCStep shoeS6 = shoe.createStep(100,yPos+300,"goto12","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=12;");
-		
+	
 		if(stationVisit[14])
 		{			
 			GCTransition shoeTR4b = shoe.createTransition(300,yPos-200,"ShoeControl.onTable9.Station14.x");
-			GCStep shoeS5b = shoe.createStep(300,yPos-150,"station14b1",";");
-			GCTransition shoeTR5b = shoe.createTransition(300,yPos-50,"Shoefactory.stations.station14.leaveStation & !Events.err");
+			GCStep shoeS5b = shoe.createStep(300,yPos-150,"station14b1","S currentStation=14;");
+			GCTransition shoeTR5b = shoe.createTransition(300,yPos-50,"Shoefactory.stations.station14.leaveStation & !Events.error");
 			
 			GCStep shoeS6a = shoe.createStep(100,yPos,"station14a2",";");
 			GCStep shoeS6b = shoe.createStep(300,yPos,"station"+stationA+"b2",";");
@@ -224,11 +225,11 @@ public class Shoe
 			GCTransition shoeTR6a = shoe.createTransition(100,yPos,"ShoeControl.onTable9.Station14.x");
 			GCTransition shoeTR6b = shoe.createTransition(300,yPos,"ShoeControl.onTable9.Station"+stationA+".x");
 			yPos+=50;
-			GCStep shoeS7a = shoe.createStep(100,yPos,"station14a3",";");
-			GCStep shoeS7b = shoe.createStep(300,yPos,"station"+stationA+"b3",";");
+			GCStep shoeS7a = shoe.createStep(100,yPos,"station14a3","S currentStation=14;");
+			GCStep shoeS7b = shoe.createStep(300,yPos,"station"+stationA+"b3","S currentStation="+stationA+";");
 			yPos+=100;
-			GCTransition shoeTR7a = shoe.createTransition(100,yPos,"Shoefactory.stations.station14.leaveStation & !Events.err");
-			GCTransition shoeTR7b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.err");
+			GCTransition shoeTR7a = shoe.createTransition(100,yPos,"Shoefactory.stations.station14.leaveStation & !Events.error");
+			GCTransition shoeTR7b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.error");
 			yPos+=50;				
 			
 			shoe.connect(shoeS4,shoeTR4b);
@@ -248,8 +249,8 @@ public class Shoe
 		else if(stationVisit[15])
 		{
 			GCTransition shoeTR4b = shoe.createTransition(300,yPos-200,"ShoeControl.onTable9.Station15.x");
-			GCStep shoeS5b = shoe.createStep(300,yPos-150,"station15b1",";");
-			GCTransition shoeTR5b = shoe.createTransition(300,yPos-50,"Shoefactory.stations.station15.leaveStation & !Events.err");
+			GCStep shoeS5b = shoe.createStep(300,yPos-150,"station15b1","S currentStation=15;");
+			GCTransition shoeTR5b = shoe.createTransition(300,yPos-50,"Shoefactory.stations.station15.leaveStation & !Events.error");
 			
 			GCStep shoeS6a = shoe.createStep(100,yPos,"station15a2",";");
 			GCStep shoeS6b = shoe.createStep(300,yPos,"station"+stationA+"b2",";");
@@ -257,11 +258,11 @@ public class Shoe
 			GCTransition shoeTR6a = shoe.createTransition(100,yPos,"ShoeControl.onTable9.Station15.x");
 			GCTransition shoeTR6b = shoe.createTransition(300,yPos,"ShoeControl.onTable9.Station"+stationA+".x");
 			yPos+=50;
-			GCStep shoeS7a = shoe.createStep(100,yPos,"station15a3",";");
-			GCStep shoeS7b = shoe.createStep(300,yPos,"station"+stationA+"b3",";");
+			GCStep shoeS7a = shoe.createStep(100,yPos,"station15a3","S currentStation=15;");
+			GCStep shoeS7b = shoe.createStep(300,yPos,"station"+stationA+"b3","S currentStation="+stationA+";");
 			yPos+=100;
-			GCTransition shoeTR7a = shoe.createTransition(100,yPos,"Shoefactory.stations.station15.leaveStation & !Events.err");
-			GCTransition shoeTR7b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.err");
+			GCTransition shoeTR7a = shoe.createTransition(100,yPos,"Shoefactory.stations.station15.leaveStation & !Events.error");
+			GCTransition shoeTR7b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.error");
 			yPos+=50;				
 			
 			shoe.connect(shoeS4,shoeTR4b);
@@ -307,47 +308,18 @@ public class Shoe
 		yPos+=100;
 		GCTransition shoeTR7 = shoe.createTransition(100,yPos,"ShoeControl.onTable12.Station"+stationA+".x");
 		yPos+=50;
-		GCStep shoeS8 = shoe.createStep(100,yPos,"station"+stationA+"b",";");
+		GCStep shoeS8 = shoe.createStep(100,yPos,"station"+stationA+"b","S currentStation="+stationA+";");
 		yPos+=100;
-		GCTransition shoeTR8 = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.err");
+		GCTransition shoeTR8 = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.error");
 		yPos+=50;
-		GCStep shoeS9;
+		GCStep shoeS9 = shoe.createStep(100,yPos,"goto11","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=11;");
 		
 		shoe.connect(shoeS6,shoeTR6);
 		shoe.connect(shoeTR6,shoeS7);
 		shoe.connect(shoeS7,shoeTR7);
 		shoe.connect(shoeTR7,shoeS8);
 		shoe.connect(shoeS8,shoeTR8);
-		
-	/*	if(stationVisit[20])
-		{
-			GCStep shoeSa= shoe.createStep(100,yPos,"goto10","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=10;");
-			yPos+=100;
-			GCTransition shoeTRb = shoe.createTransition(100,yPos,"currentTable==10");
-			yPos+=50;
-			GCStep shoeSc = shoe.createStep(100,yPos,"station20a",";");
-			yPos+=100;
-			GCTransition shoeTRd = shoe.createTransition(100,yPos,"ShoeControl.onTable10.Station20.x");
-			yPos+=50;
-			GCStep shoeSe = shoe.createStep(100,yPos,"station20b",";");
-			yPos+=100;
-			GCTransition shoeTRf = shoe.createTransition(100,yPos,"Shoefactory.stations.station20.leaveStation & !Events.err");
-			yPos+=50;
-			shoeS9 = shoe.createStep(100,yPos,"goto11","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=11;");
-			
-			shoe.connect(shoeTR8,shoeSa);
-			shoe.connect(shoeSa,shoeTRb);
-			shoe.connect(shoeTRb,shoeSc);
-			shoe.connect(shoeSc,shoeTRd);
-			shoe.connect(shoeTRd,shoeSe);
-			shoe.connect(shoeSe,shoeTRf);
-			shoe.connect(shoeTRf,shoeS9);
-		}
-		else
-		{*/
-			shoeS9 = shoe.createStep(100,yPos,"goto11","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=11;");
-			shoe.connect(shoeTR8,shoeS9);
-		//}
+		shoe.connect(shoeTR8,shoeS9);
 		
 		if(stationVisit[21])
 		{
@@ -366,11 +338,11 @@ public class Shoe
 		GCTransition shoeTR10a = shoe.createTransition(100,yPos,"ShoeControl.onTable11.Station23.x");
 		GCTransition shoeTR10b = shoe.createTransition(300,yPos,"ShoeControl.onTable11.Station"+stationA+".x");
 		yPos+=50;
-		GCStep shoeS11a = shoe.createStep(100,yPos,"station23a1",";");
-		GCStep shoeS11b = shoe.createStep(300,yPos,"station"+stationA+"b1",";");
+		GCStep shoeS11a = shoe.createStep(100,yPos,"station23a1","S currentStation=23;");
+		GCStep shoeS11b = shoe.createStep(300,yPos,"station"+stationA+"b1","S currentStation="+stationA+";");
 		yPos+=100;
-		GCTransition shoeTR11a = shoe.createTransition(100,yPos,"Shoefactory.stations.station23.leaveStation & !Events.err");
-		GCTransition shoeTR11b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.err");
+		GCTransition shoeTR11a = shoe.createTransition(100,yPos,"Shoefactory.stations.station23.leaveStation & !Events.error");
+		GCTransition shoeTR11b = shoe.createTransition(300,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.error");
 		yPos+=50;
 		GCStep shoeS12a = shoe.createStep(100,yPos,"station"+stationA+"a2",";");
 		GCStep shoeS12b = shoe.createStep(300,yPos,"station23b2",";");
@@ -378,11 +350,11 @@ public class Shoe
 		GCTransition shoeTR12a = shoe.createTransition(100,yPos,"ShoeControl.onTable11.Station"+stationA+".x");
 		GCTransition shoeTR12b = shoe.createTransition(300,yPos,"ShoeControl.onTable11.Station23.x");
 		yPos+=50;
-		GCStep shoeS13a = shoe.createStep(100,yPos,"station"+stationA+"a3",";");
-		GCStep shoeS13b = shoe.createStep(300,yPos,"station23b3",";");
+		GCStep shoeS13a = shoe.createStep(100,yPos,"station"+stationA+"a3","S currentStation="+stationA+";");
+		GCStep shoeS13b = shoe.createStep(300,yPos,"station23b3","S currentStation=23;");
 		yPos+=100;
-		GCTransition shoeTR13a = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.err");
-		GCTransition shoeTR13b = shoe.createTransition(300,yPos,"Shoefactory.stations.station23.leaveStation & !Events.err");
+		GCTransition shoeTR13a = shoe.createTransition(100,yPos,"Shoefactory.stations.station"+stationA+".leaveStation & !Events.error");
+		GCTransition shoeTR13b = shoe.createTransition(300,yPos,"Shoefactory.stations.station23.leaveStation & !Events.error");
 		yPos+=50;
 		GCStep shoeS14= shoe.createStep(100,yPos,"goto0","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=0;");
 		yPos+=100;
@@ -405,24 +377,60 @@ public class Shoe
 		shoe.connect(shoeS13b,shoeTR13b);
 		shoe.connect(shoeTR13a,shoeS14);
 		shoe.connect(shoeTR13b,shoeS14);
-//----- No changes needed -----------------------------------------------------------		
-		yPos=0;
-		WorkspaceObject woSC = shoe.createWorkspaceObject(200,50,"ShoeControl");
-		GCDocument shoeCtrl = woSC.getSubWorkspace();
-				
+		
+		
+	/*------------ Create Errorhandler --------------------------------------------------------------------
+	 *------------ Moves the shoe to station 20 and then back to table 0 ---------------------------------*/
 		WorkspaceObject eh = shoe.createWorkspaceObject(200,150,"Errorhandler");
 		GCDocument errorHandler = eh.getSubWorkspace();
 		
+		StringVariable esv = errorHandler.createStringVariable(400,50,"eventConditionString","");
+		BooleanVariable ebv = errorHandler.createBooleanVariable(400,150,"eventCondition","0");
+		
+		yPos=50;
+		GCStepInitial errorInitialStep = errorHandler.createInitialStep(200,yPos,"Start",";");
+		yPos+=100;
+		GCTransition errortr0 = errorHandler.createTransition(200,yPos,"Events.error");
+		yPos+=50;
+		GCStep errorStep0 = errorHandler.createStep(200,yPos,"errorhandler0","S station20=1;\nS station0=0;\nS station1=0;\nS station2=0;\nS station3=0;\nS station4=0;\nS station5=0;\nS station6=0;\nS station7=0;\nS station8=0;\nS station9=0;\nS station10=0;\nS station11=0;\nS station12=0;\nS station13=0;\nS station14=0;\nS station15=0;\nS station16=0;\nS station17=0;\nS station18=0;\nS station19=0;\nS station21=0;\nS station22=0;\nS station23=0;\nS writeMessage(\"Error with shoe "+shoeNr+" in station \"+currentStation+\" at table \"+currentTable+\".\");S eventConditionString = \"Shoe"+shoeNr+".Events.put_T\"+currentTable+\"_S\"+currentStation;\nP eventCondition = eventConditionString^;");
+		yPos+=100;
+		GCTransition errortr1 = errorHandler.createTransition(200,yPos,"eventCondition");
+		yPos+=50;
+		GCStep errorStep1 = errorHandler.createStep(200,yPos,"errorhandler1","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=10;");
+		yPos+=100;
+		GCTransition errortr2 = errorHandler.createTransition(200,yPos,"ShoeControl.onTable10.Station20.x");
+		yPos+=50;
+		GCStep errorStep2 = errorHandler.createStep(200,yPos,"errorhandler2","S currentStation=20;");
+		yPos+=100;
+		GCTransition errortr3 = errorHandler.createTransition(200,yPos,"Shoefactory.stations.station20.leaveStation");
+		yPos+=50;
+		GCStep errorStep3 = errorHandler.createStep(200,yPos,"errorhandler3","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=0;");
+		
+		errorHandler.connect(errorInitialStep, errortr0);
+		errorHandler.connect(errortr0, errorStep0);
+		errorHandler.connect(errorStep0, errortr1);
+		errorHandler.connect(errortr1, errorStep1);
+		errorHandler.connect(errorStep1, errortr2);
+		errorHandler.connect(errortr2, errorStep2);
+		errorHandler.connect(errorStep2, errortr3);
+		errorHandler.connect(errortr3, errorStep3);
+
+	
+	//------ No changes should be necessary beyond this point ---------------------------------
+	
+		yPos=0;
+		WorkspaceObject woSC = shoe.createWorkspaceObject(200,50,"ShoeControl");
+		GCDocument shoeCtrl = woSC.getSubWorkspace();
+		
 		WorkspaceObject ev = shoe.createWorkspaceObject(200,250,"Events");
-		GCDocument Even = ev.getSubWorkspace();
+		GCDocument Events = ev.getSubWorkspace();
 		
-		BooleanVariable[] bolval =new BooleanVariable[events.length];
-				
+		BooleanVariable[] bolval = new BooleanVariable[events.length];
+		
 		for(int i=0;i<events.length;i++)
-			bolval[i]=Even.createBooleanVariable(100+100*(i%10),50+100*(i/10),events[i],"0");
-		Even.createBooleanVariable(0,0,"err","0");
-		Even.createBooleanVariable(0,100,"error","0");
+			bolval[i]=Events.createBooleanVariable(100+100*(i%10),50+100*(i/10),events[i],"0");
 		
+		Events.createBooleanVariable(0,100,"error","0");
 
 		// Create Grafcet
 		GCStepInitial initialStep = shoeCtrl.createInitialStep(100,yPos,"Start","S JgrafSupervisor.nrOfShoes = JgrafSupervisor.nrOfShoes+1;");
@@ -458,8 +466,7 @@ public class Shoe
 		GCDocument moveFromTable0 = wo0.getSubWorkspace();
 		createSubdoc(moveFromTable0, 0);
 
-		if(stationVisit[0] || stationVisit[1] || stationVisit[2] || stationVisit[3] || stationVisit[4])
-		{
+		// Create moveFromTable6 and onTable6 workspace
 			GCTransition tr2b = shoeCtrl.createTransition(400,yPos,"currentTable==6");
 			GCStep sON6 = shoeCtrl.createStep(400,yPos+50,"on_table6","S onTable6.start=1;");
 			GCTransition trON6 = shoeCtrl.createTransition(400,yPos+150,"onTable6.leavetable");
@@ -473,17 +480,16 @@ public class Shoe
 			shoeCtrl.connect(s2b,tr3b);
 			shoeCtrl.connect(tr3b,s1);
 
-			WorkspaceObject wo1 = shoeCtrl.createWorkspaceObject(500,50,"moveFromTable6");
-			GCDocument moveToTable6 = wo1.getSubWorkspace();
+			WorkspaceObject wo1b = shoeCtrl.createWorkspaceObject(500,50,"moveFromTable6");
+			GCDocument moveToTable6 = wo1b.getSubWorkspace();
 			createSubdoc(moveToTable6, 6);
 
-			WorkspaceObject wo2 = shoeCtrl.createWorkspaceObject(500,150,"onTable6");
-			GCDocument onTable6 = wo2.getSubWorkspace();
+			WorkspaceObject wo2b = shoeCtrl.createWorkspaceObject(500,150,"onTable6");
+			GCDocument onTable6 = wo2b.getSubWorkspace();
 			createonTable(onTable6, 6);
-		}
-
-		if(stationVisit[5] || stationVisit[6] || stationVisit[7] || stationVisit[8])
-		{
+			
+			
+		// Create moveFromTable7 and onTable7 workspace
 			GCTransition tr2c = shoeCtrl.createTransition(700,yPos,"currentTable==7");
 			GCStep sON7 = shoeCtrl.createStep(700,yPos+50,"on_table7","S onTable7.start=1;");
 			GCTransition trON7 = shoeCtrl.createTransition(700,yPos+150,"onTable7.leavetable");
@@ -497,17 +503,15 @@ public class Shoe
 			shoeCtrl.connect(s2c,tr3c);
 			shoeCtrl.connect(tr3c,s1);
 
-			WorkspaceObject wo = shoeCtrl.createWorkspaceObject(600,50,"moveFromTable7");
-			GCDocument moveToTable7 = wo.getSubWorkspace();
+			WorkspaceObject woc = shoeCtrl.createWorkspaceObject(600,50,"moveFromTable7");
+			GCDocument moveToTable7 = woc.getSubWorkspace();
 			createSubdoc(moveToTable7, 7);
 
-			WorkspaceObject wo2 = shoeCtrl.createWorkspaceObject(600,150,"onTable7");
-			GCDocument onTable7 = wo2.getSubWorkspace();
+			WorkspaceObject wo2c = shoeCtrl.createWorkspaceObject(600,150,"onTable7");
+			GCDocument onTable7 = wo2c.getSubWorkspace();
 			createonTable(onTable7, 7);
-		}
-
-		if(stationVisit[9] || stationVisit[10] || stationVisit[11])
-		{
+		
+		// Create moveFromTable8 and onTable8 workspace
 			GCTransition tr2d = shoeCtrl.createTransition(1000,yPos,"currentTable==8");
 			GCStep sON8 = shoeCtrl.createStep(1000,yPos+50,"on_table8","S onTable8.start=1;");
 			GCTransition trON8 = shoeCtrl.createTransition(1000,yPos+150,"onTable8.leavetable");
@@ -521,17 +525,15 @@ public class Shoe
 			shoeCtrl.connect(s2d,tr3d);
 			shoeCtrl.connect(tr3d,s1);
 
-			WorkspaceObject wo = shoeCtrl.createWorkspaceObject(700,50,"moveFromTable8");
-			GCDocument moveToTable8 = wo.getSubWorkspace();
+			WorkspaceObject wod = shoeCtrl.createWorkspaceObject(700,50,"moveFromTable8");
+			GCDocument moveToTable8 = wod.getSubWorkspace();
 			createSubdoc(moveToTable8, 8);
 
-			WorkspaceObject wo2 = shoeCtrl.createWorkspaceObject(700,150,"onTable8");
-			GCDocument onTable8 = wo2.getSubWorkspace();
+			WorkspaceObject wo2d = shoeCtrl.createWorkspaceObject(700,150,"onTable8");
+			GCDocument onTable8 = wo2d.getSubWorkspace();
 			createonTable(onTable8, 8);
-		}
-
-		if(stationVisit[12] || stationVisit[13] || stationVisit[14] || stationVisit[15])
-		{
+		
+		// Create moveFromTable9 and onTable9 workspace
 			GCTransition tr2e = shoeCtrl.createTransition(1300,yPos,"currentTable==9");
 			GCStep sON9 = shoeCtrl.createStep(1300,yPos+50,"on_table9","S onTable9.start=1;");
 			GCTransition trON9 = shoeCtrl.createTransition(1300,yPos+150,"onTable9.leavetable");
@@ -545,16 +547,15 @@ public class Shoe
 			shoeCtrl.connect(s2e,tr3e);
 			shoeCtrl.connect(tr3e,s1);
 
-			WorkspaceObject wo = shoeCtrl.createWorkspaceObject(800,50,"moveFromTable9");
-			GCDocument moveToTable9 = wo.getSubWorkspace();
+			WorkspaceObject woe = shoeCtrl.createWorkspaceObject(800,50,"moveFromTable9");
+			GCDocument moveToTable9 = woe.getSubWorkspace();
 			createSubdoc(moveToTable9, 9);
 
-			WorkspaceObject wo2 = shoeCtrl.createWorkspaceObject(800,150,"onTable9");
-			GCDocument onTable9 = wo2.getSubWorkspace();
+			WorkspaceObject wo2e = shoeCtrl.createWorkspaceObject(800,150,"onTable9");
+			GCDocument onTable9 = wo2e.getSubWorkspace();
 			createonTable(onTable9, 9);
-		}
-		//if(stationVisit[20])
-		//{
+		
+		// Create moveFromTable10 and onTable10 workspace
 			GCTransition tr2f = shoeCtrl.createTransition(1600,yPos,"currentTable==10");
 			GCStep sON10 = shoeCtrl.createStep(1600,yPos+50,"on_table10","S onTable10.start=1;");
 			GCTransition trON10 = shoeCtrl.createTransition(1600,yPos+150,"onTable10.leavetable");
@@ -568,16 +569,15 @@ public class Shoe
 			shoeCtrl.connect(s2f,tr3f);
 			shoeCtrl.connect(tr3f,s1);
 
-			WorkspaceObject wo2b = shoeCtrl.createWorkspaceObject(900,50,"moveFromTable10");
-			GCDocument moveToTable10 = wo2b.getSubWorkspace();
+			WorkspaceObject wof = shoeCtrl.createWorkspaceObject(900,50,"moveFromTable10");
+			GCDocument moveToTable10 = wof.getSubWorkspace();
 			createSubdoc(moveToTable10, 10);
 
-			WorkspaceObject wo2c = shoeCtrl.createWorkspaceObject(900,150,"onTable10");
-			GCDocument onTable10 = wo2c.getSubWorkspace();
+			WorkspaceObject wo2f = shoeCtrl.createWorkspaceObject(900,150,"onTable10");
+			GCDocument onTable10 = wo2f.getSubWorkspace();
 			createonTable(onTable10, 10);
-		//}
-		if(stationVisit[21] || stationVisit[22] || stationVisit[23])
-		{
+		
+		// Create moveFromTable11 and onTable11 workspace
 			GCTransition tr2g = shoeCtrl.createTransition(1900,yPos,"currentTable==11");
 			GCStep sON11 = shoeCtrl.createStep(1900,yPos+50,"on_table11","S onTable11.start=1;");
 			GCTransition trON11 = shoeCtrl.createTransition(1900,yPos+150,"onTable11.leavetable");
@@ -591,16 +591,15 @@ public class Shoe
 			shoeCtrl.connect(s2g,tr3g);
 			shoeCtrl.connect(tr3g,s1);
 
-			WorkspaceObject wo = shoeCtrl.createWorkspaceObject(1000,50,"moveFromTable11");
-			GCDocument moveToTable11 = wo.getSubWorkspace();
+			WorkspaceObject wog = shoeCtrl.createWorkspaceObject(1000,50,"moveFromTable11");
+			GCDocument moveToTable11 = wog.getSubWorkspace();
 			createSubdoc(moveToTable11, 11);
 
-			WorkspaceObject wo2 = shoeCtrl.createWorkspaceObject(1000,150,"onTable11");
-			GCDocument onTable11 = wo2.getSubWorkspace();
+			WorkspaceObject wo2g = shoeCtrl.createWorkspaceObject(1000,150,"onTable11");
+			GCDocument onTable11 = wo2g.getSubWorkspace();
 			createonTable(onTable11, 11);
-		}
-		if(stationVisit[16] || stationVisit[17] || stationVisit[18] || stationVisit[19])
-		{
+		
+		// Create moveFromTable12 and onTable12 workspace
 			GCTransition tr2h = shoeCtrl.createTransition(2200,yPos,"currentTable==12");
 			GCStep sON12 = shoeCtrl.createStep(2200,yPos+50,"on_table12","S onTable12.start=1;");
 			GCTransition trON12 = shoeCtrl.createTransition(2200,yPos+150,"onTable12.leavetable");
@@ -614,47 +613,13 @@ public class Shoe
 			shoeCtrl.connect(s2h,tr3h);
 			shoeCtrl.connect(tr3h,s1);
 
-			WorkspaceObject wo = shoeCtrl.createWorkspaceObject(1100,50,"moveFromTable12");
-			GCDocument moveToTable12 = wo.getSubWorkspace();
+			WorkspaceObject woh = shoeCtrl.createWorkspaceObject(1100,50,"moveFromTable12");
+			GCDocument moveToTable12 = woh.getSubWorkspace();
 			createSubdoc(moveToTable12,12);
 
-			WorkspaceObject wo2 = shoeCtrl.createWorkspaceObject(1100,150,"onTable12");
-			GCDocument onTable12 = wo2.getSubWorkspace();
+			WorkspaceObject wo2h = shoeCtrl.createWorkspaceObject(1100,150,"onTable12");
+			GCDocument onTable12 = wo2h.getSubWorkspace();
 			createonTable(onTable12,12);
-			
-	//-------------Create Errorhandler--------------------------------------------------------------------
-			StringVariable esv = errorHandler.createStringVariable(400,50,"eventConditionString","");
-			BooleanVariable ebv = errorHandler.createBooleanVariable(400,150,"eventCondition","0");
-			IntegerVariable eiv = errorHandler.createIntegerVariable(400,250,"currentStation","0");
-			
-			yPos=50;
-			GCStepInitial errorInitialStep = errorHandler.createInitialStep(200,yPos,"Start",";");
-			yPos+=100;
-			GCTransition errortr0 = errorHandler.createTransition(200,yPos,"Events.error");
-			yPos+=50;
-			GCStep errorStep0 = errorHandler.createStep(200,yPos,"errorhandler0","S eventConditionString = \"Shoe"+shoeNr+".Events.put_T\"+currentTable+\"_S\"+currentStation;\nP eventCondition = eventConditionString^;\nS Events.err=1;");
-			yPos+=100;
-			GCTransition errortr1 = errorHandler.createTransition(200,yPos,"eventCondition");
-			yPos+=50;
-			GCStep errorStep1 = errorHandler.createStep(200,yPos,"errorhandler1","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=10;");
-			yPos+=100;
-			GCTransition errortr2 = errorHandler.createTransition(200,yPos,"ShoeControl.onTable10.Station20.x");
-			yPos+=50;
-			GCStep errorStep2 = errorHandler.createStep(200,yPos,"errorhandler2","S station0=0;\nS station1=0;\nS station2=0;\nS station3=0;\nS station4=0;\nS station5=0;\nS station6=0;\nS station7=0;\nS station8=0;\nS station9=0;\nS station10=0;\nS station11=0;\nS station12=0;\nS station13=0;\nS station14=0;\nS station15=0;\nS station16=0;\nS station17=0;\nS station18=0;\nS station19=0;\nS station20=0;\nS station21=0;\nS station22=0;\nS station23=0;");
-			yPos+=100;
-			GCTransition errortr3 = errorHandler.createTransition(200,yPos,"Shoefactory.stations.station20.leaveStation");
-			yPos+=50;
-			GCStep errorStep3 = errorHandler.createStep(200,yPos,"errorhandler3","S pointerString = \"ShoeControl.moveFromTable\"+currentTable+\".goto\";\nS pointerString^=0;");
-			
-			errorHandler.connect(errorInitialStep, errortr0);
-			errorHandler.connect(errortr0, errorStep0);
-			errorHandler.connect(errorStep0, errortr1);
-			errorHandler.connect(errortr1, errorStep1);
-			errorHandler.connect(errorStep1, errortr2);
-			errorHandler.connect(errortr2, errorStep2);
-			errorHandler.connect(errorStep2, errortr3);
-			errorHandler.connect(errortr3, errorStep3);
-		}
 	}
 
 	public GCStep createTableSFC(GCDocument doc, GCTransition in, int tableNr, int x, int y, int dir,int fromTable)
@@ -750,38 +715,27 @@ public class Shoe
 		BooleanVariable start = doc.createBooleanVariable(400,150,"start","0");
 		BooleanVariable leave = doc.createBooleanVariable(500,150,"leavetable","0");
 
-		IntegerVariable rotations = doc.createIntegerVariable(600,150,"rotations","0");
-		IntegerVariable syncTabrot = doc.createIntegerVariable(700,150,"syncTabrot","0");
-
 		if(currentTable==6)
 		{
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table6.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=Shoefactory.tables.table6.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"(rotations!="+stationRot[0] +"| rotations!="+stationRot[1] +" | rotations!="+stationRot[2] +"| rotations!="+stationRot[3] +" | rotations!="+stationRot[4] +") & syncTabrot!=Shoefactory.tables.table6.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
 			GCTransition tr2a = doc.createTransition(100,y,"!station0 & !station1 & !station2 & !station3 & !station4");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T6_S0 &station0");
-			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T6_S1 &station1");
-			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T6_S2 &station2");
-			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T6_S3 &station3");
-			GCTransition tr2f = doc.createTransition(1100,y,"Events.get_T6_S4 &station4");
-			GCTransition tr2g = doc.createTransition(1300,y,"rotations>23");
+			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T6_S0 & station0");
+			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T6_S1 & station1");
+			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T6_S2 & station2");
+			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T6_S3 & station3");
+			GCTransition tr2f = doc.createTransition(1100,y,"Events.get_T6_S4 & station4");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations=0;\nS leavetable=1;");
+			GCStep s1a = doc.createStep(100,y,"S1a","S leavetable=1;");
 			GCStep s1b = doc.createStep(300,y,"Station0","S Shoefactory.stations.station0.enterStation=1;\nS Shoefactory.tables.table6.fullSlot.set(nrOfRot,0);");
 			GCStep s1c = doc.createStep(500,y,"Station1","S Shoefactory.stations.station1.enterStation=1;\nS Shoefactory.tables.table6.fullSlot.set(nrOfRot,0);");
 			GCStep s1d = doc.createStep(700,y,"Station2","S Shoefactory.stations.station2.enterStation=1;\nS Shoefactory.tables.table6.fullSlot.set(nrOfRot,0);");
 			GCStep s1e = doc.createStep(900,y,"Station3","S Shoefactory.stations.station3.enterStation=1;\nS Shoefactory.tables.table6.fullSlot.set(nrOfRot,0);");
 			GCStep s1f = doc.createStep(1100,y,"Station4","S Shoefactory.stations.station4.enterStation=1;\nS Shoefactory.tables.table6.fullSlot.set(nrOfRot,0);");
-			GCStep s1g = doc.createStep(1300,y,"S1g","S rotations =0;");
 			y+=100;
 			GCTransition tr3a = doc.createTransition(100,y,"1");
 			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T6_S0");
@@ -789,7 +743,6 @@ public class Shoe
 			GCTransition tr3d = doc.createTransition(700,y,"Events.put_T6_S2");
 			GCTransition tr3e = doc.createTransition(900,y,"Events.put_T6_S3");
 			GCTransition tr3f = doc.createTransition(1100,y,"Events.put_T6_S4");
-			GCTransition tr3g = doc.createTransition(1300,y,"1");
 			y+=50;
 			GCStep s2b = doc.createStep(300,y,"S2b","S Shoefactory.stations.station0.leaveStation=1;\nS station0=0;\nS Shoefactory.tables.table6.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table6.rot,\"int\","+stationRot[0] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table6.rot,\"int\","+stationRot[0] +");");
 			GCStep s2c = doc.createStep(500,y,"S2c","S Shoefactory.stations.station1.leaveStation=1;\nS station1=0;\nS Shoefactory.tables.table6.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table6.rot,\"int\","+stationRot[1] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table6.rot,\"int\","+stationRot[1] +");");
@@ -803,14 +756,16 @@ public class Shoe
 			GCTransition tr4e = doc.createTransition(900,y,"1");
 			GCTransition tr4f = doc.createTransition(1100,y,"1");
 			y+=50;
-
+			
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
+			
 			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2b);
 			doc.connect(s0,tr2c);
 			doc.connect(s0,tr2d);
 			doc.connect(s0,tr2e);
 			doc.connect(s0,tr2f);
-			doc.connect(s0,tr2g);
 			
 			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
@@ -818,7 +773,6 @@ public class Shoe
 			doc.connect(tr2d,s1d);
 			doc.connect(tr2e,s1e);
 			doc.connect(tr2f,s1f);
-			doc.connect(tr2g,s1g);
 			
 			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
@@ -826,7 +780,6 @@ public class Shoe
 			doc.connect(s1d,tr3d);
 			doc.connect(s1e,tr3e);
 			doc.connect(s1f,tr3f);
-			doc.connect(s1g,tr3g);
 			
 			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
@@ -834,7 +787,6 @@ public class Shoe
 			doc.connect(tr3d,s2d);
 			doc.connect(tr3e,s2e);
 			doc.connect(tr3f,s2f);
-			doc.connect(tr3g,s0);
 			
 			doc.connect(s2b,tr4b);
 			doc.connect(s2c,tr4c);
@@ -851,38 +803,29 @@ public class Shoe
 
 		if(currentTable==7)
 		{
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table7.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=Shoefactory.tables.table7.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"(rotations!="+stationRot[5] +"| rotations!="+stationRot[6] +" | rotations!="+stationRot[7] +"| rotations!="+stationRot[8] +") & syncTabrot!=Shoefactory.tables.table7.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
 			GCTransition tr2a = doc.createTransition(100,y,"!station5 & !station6 & !station7 & !station8");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T7_S5 &station5");
-			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T7_S6 &station6");
-			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T7_S7 &station7");
-			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T7_S8 &station8");
-			GCTransition tr2f = doc.createTransition(1100,y,"rotations>23");
+			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T7_S5 & station5");
+			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T7_S6 & station6");
+			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T7_S7 & station7");
+			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T7_S8 & station8");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations =0;\nS leavetable=1;");
+			GCStep s1a = doc.createStep(100,y,"S1a","S leavetable=1;");
 			GCStep s1b = doc.createStep(300,y,"Station5","S Shoefactory.stations.station5.enterStation=1;\nS Shoefactory.tables.table7.fullSlot.set(nrOfRot,0);");
 			GCStep s1c = doc.createStep(500,y,"Station6","S Shoefactory.stations.station6.enterStation=1;\nS Shoefactory.tables.table7.fullSlot.set(nrOfRot,0);");
 			GCStep s1d = doc.createStep(700,y,"Station7","S Shoefactory.stations.station7.enterStation=1;\nS Shoefactory.tables.table7.fullSlot.set(nrOfRot,0);");
 			GCStep s1e = doc.createStep(900,y,"Station8","S Shoefactory.stations.station8.enterStation=1;\nS Shoefactory.tables.table7.fullSlot.set(nrOfRot,0);");
-			GCStep s1f = doc.createStep(1100,y,"S1f","S rotations =0;");
 			y+=100;
 			GCTransition tr3a = doc.createTransition(100,y,"1");
 			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T7_S5");
 			GCTransition tr3c = doc.createTransition(500,y,"Events.put_T7_S6");
 			GCTransition tr3d = doc.createTransition(700,y,"Events.put_T7_S7");
 			GCTransition tr3e = doc.createTransition(900,y,"Events.put_T7_S8");
-			GCTransition tr3f = doc.createTransition(1100,y,"1");
 			y+=50;
 			GCStep s2b = doc.createStep(300,y,"S2b","S Shoefactory.stations.station5.leaveStation=1;\nS station5=0;\nS Shoefactory.tables.table7.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table7.rot,\"int\","+stationRot[5] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table7.rot,\"int\","+stationRot[5] +");");
 			GCStep s2c = doc.createStep(500,y,"S2c","S Shoefactory.stations.station6.leaveStation=1;\nS station6=0;\nS Shoefactory.tables.table7.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table7.rot,\"int\","+stationRot[6] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table7.rot,\"int\","+stationRot[6] +");");
@@ -894,34 +837,33 @@ public class Shoe
 			GCTransition tr4d = doc.createTransition(700,y,"1");
 			GCTransition tr4e = doc.createTransition(900,y,"1");
 			y+=50;
-
+			
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
+			
 			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2b);
 			doc.connect(s0,tr2c);
 			doc.connect(s0,tr2d);
 			doc.connect(s0,tr2e);
-			doc.connect(s0,tr2f);
 			
 			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
 			doc.connect(tr2c,s1c);
 			doc.connect(tr2d,s1d);
 			doc.connect(tr2e,s1e);
-			doc.connect(tr2f,s1f);
 			
 			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
 			doc.connect(s1c,tr3c);
 			doc.connect(s1d,tr3d);
 			doc.connect(s1e,tr3e);
-			doc.connect(s1f,tr3f);
 			
 			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
 			doc.connect(tr3c,s2c);
 			doc.connect(tr3d,s2d);
 			doc.connect(tr3e,s2e);
-			doc.connect(tr3f,s0);
 			
 			doc.connect(s2b,tr4b);
 			doc.connect(s2c,tr4c);
@@ -936,35 +878,26 @@ public class Shoe
 
 		if(currentTable==8)
 		{
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table8.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=Shoefactory.tables.table8.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"(rotations!="+stationRot[9] +" | rotations!="+stationRot[10] +" | rotations!="+stationRot[11] +") & syncTabrot!=Shoefactory.tables.table8.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
 			GCTransition tr2a = doc.createTransition(100,y,"!station9 & !station10 & !station11");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T8_S9 &station9");
-			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T8_S10 &station10 ");
-			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T8_S11 &station11");
-			GCTransition tr2e = doc.createTransition(900,y,"rotations>23");
+			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T8_S9 & station9");
+			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T8_S10 & station10 ");
+			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T8_S11 & station11");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations =0;\nS leavetable=1;");
+			GCStep s1a = doc.createStep(100,y,"S1a","S leavetable=1;");
 			GCStep s1b = doc.createStep(300,y,"Station9","S Shoefactory.stations.station9.enterStation=1;\nS Shoefactory.tables.table8.fullSlot.set(nrOfRot,0);");
 			GCStep s1c = doc.createStep(500,y,"Station10","S Shoefactory.stations.station10.enterStation=1;\nS Shoefactory.tables.table8.fullSlot.set(nrOfRot,0);");
 			GCStep s1d = doc.createStep(700,y,"Station11","S Shoefactory.stations.station11.enterStation=1;\nS Shoefactory.tables.table8.fullSlot.set(nrOfRot,0);");
-			GCStep s1e = doc.createStep(900,y,"S1e","S rotations =0;");
 			y+=100;
 			GCTransition tr3a = doc.createTransition(100,y,"1");
 			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T8_S9");
 			GCTransition tr3c = doc.createTransition(500,y,"Events.put_T8_S10");
 			GCTransition tr3d = doc.createTransition(700,y,"Events.put_T8_S11");
-			GCTransition tr3e = doc.createTransition(900,y,"1");
 			y+=50;
 			GCStep s2b = doc.createStep(300,y,"S2b","S Shoefactory.stations.station9.leaveStation=1;\nS station9=0;\nS Shoefactory.tables.table8.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table8.rot,\"int\","+stationRot[9] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table8.rot,\"int\","+stationRot[9] +");");
 			GCStep s2c = doc.createStep(500,y,"S2c","S Shoefactory.stations.station10.leaveStation=1;\nS station10=0;\nS Shoefactory.tables.table8.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table8.rot,\"int\","+stationRot[10] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table8.rot,\"int\","+stationRot[10] +");");
@@ -975,29 +908,28 @@ public class Shoe
 			GCTransition tr4d = doc.createTransition(700,y,"1");
 			y+=50;
 
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
+			
 			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2b);
 			doc.connect(s0,tr2c);
 			doc.connect(s0,tr2d);
-			doc.connect(s0,tr2e);
 			
 			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
 			doc.connect(tr2c,s1c);
 			doc.connect(tr2d,s1d);
-			doc.connect(tr2e,s1e);
 			
 			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
 			doc.connect(s1c,tr3c);
 			doc.connect(s1d,tr3d);
-			doc.connect(s1e,tr3e);
 			
 			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
 			doc.connect(tr3c,s2c);
 			doc.connect(tr3d,s2d);
-			doc.connect(tr3e,s0);
 			
 			doc.connect(s2b,tr4b);
 			doc.connect(s2c,tr4c);
@@ -1010,38 +942,29 @@ public class Shoe
 
 		if(currentTable==9)
 		{
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table9.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=Shoefactory.tables.table9.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"(rotations!="+stationRot[12] +" | rotations!="+stationRot[13] +" | rotations!="+stationRot[14] +" | rotations!="+stationRot[15] +") & syncTabrot!=Shoefactory.tables.table9.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
 			GCTransition tr2a = doc.createTransition(100,y,"!station12 & !station13 & !station14 & !station15");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T9_S12 &station12");
-			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T9_S13 &station13");
-			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T9_S14 &station14");
-			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T9_S15 &station15");
-			GCTransition tr2f = doc.createTransition(1100,y,"rotations >23");
+			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T9_S12 & station12");
+			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T9_S13 & station13");
+			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T9_S14 & station14");
+			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T9_S15 & station15");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations =0;\nS leavetable=1;");
+			GCStep s1a = doc.createStep(100,y,"S1a","S leavetable=1;");
 			GCStep s1b = doc.createStep(300,y,"Station12","S Shoefactory.stations.station12.enterStation=1;\nS Shoefactory.tables.table9.fullSlot.set(nrOfRot,0);");
 			GCStep s1c = doc.createStep(500,y,"Station13","S Shoefactory.stations.station13.enterStation=1;\nS Shoefactory.tables.table9.fullSlot.set(nrOfRot,0);");
 			GCStep s1d = doc.createStep(700,y,"Station14","S Shoefactory.stations.station14.enterStation=1;\nS Shoefactory.tables.table9.fullSlot.set(nrOfRot,0);");
 			GCStep s1e = doc.createStep(900,y,"Station15","S Shoefactory.stations.station15.enterStation=1;\nS Shoefactory.tables.table9.fullSlot.set(nrOfRot,0);");
-			GCStep s1f = doc.createStep(1100,y,"S1f","S rotations =0;");
 			y+=100;
 			GCTransition tr3a = doc.createTransition(100,y,"1");
 			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T9_S12");
 			GCTransition tr3c = doc.createTransition(500,y,"Events.put_T9_S13");
 			GCTransition tr3d = doc.createTransition(700,y,"Events.put_T9_S14");
 			GCTransition tr3e = doc.createTransition(900,y,"Events.put_T9_S15");
-			GCTransition tr3f = doc.createTransition(1100,y,"1");
 			y+=50;
 			GCStep s2b = doc.createStep(300,y,"S2b","S Shoefactory.stations.station12.leaveStation=1;\nS station12=0;\nS Shoefactory.tables.table9.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table9.rot,\"int\","+stationRot[12] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table9.rot,\"int\","+stationRot[12] +");");
 			GCStep s2c = doc.createStep(500,y,"S2c","S Shoefactory.stations.station13.leaveStation=1;\nS station13=0;\nS Shoefactory.tables.table9.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table9.rot,\"int\","+stationRot[13] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table9.rot,\"int\","+stationRot[13] +");");
@@ -1054,33 +977,32 @@ public class Shoe
 			GCTransition tr4e = doc.createTransition(900,y,"1");
 			y+=50;
 
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
+			
 			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2b);
 			doc.connect(s0,tr2c);
 			doc.connect(s0,tr2d);
 			doc.connect(s0,tr2e);
-			doc.connect(s0,tr2f);
 			
 			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
 			doc.connect(tr2c,s1c);
 			doc.connect(tr2d,s1d);
 			doc.connect(tr2e,s1e);
-			doc.connect(tr2f,s1f);
 			
 			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
 			doc.connect(s1c,tr3c);
 			doc.connect(s1d,tr3d);
 			doc.connect(s1e,tr3e);
-			doc.connect(s1f,tr3f);
 			
 			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
 			doc.connect(tr3c,s2c);
 			doc.connect(tr3d,s2d);
 			doc.connect(tr3e,s2e);
-			doc.connect(tr3f,s0);
 			
 			doc.connect(s2b,tr4b);
 			doc.connect(s2c,tr4c);
@@ -1097,50 +1019,40 @@ public class Shoe
 		{
 			IntegerVariable iv1 = doc.createIntegerVariable(400,50,"from12","0");
 
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table10.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=Shoefactory.tables.table10.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"(rotations!=("+stationRot[20]+"-from12)" +") & syncTabrot!=Shoefactory.tables.table10.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
 			GCTransition tr2a = doc.createTransition(100,y,"!station20");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T10_S20 &station20");
-			GCTransition tr2c = doc.createTransition(500,y,"rotations>23");
+			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T10_S20 & station20");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations =0;\nS leavetable=1;");
+			GCStep s1a = doc.createStep(100,y,"S1a","S leavetable=1;");
 			GCStep s1b = doc.createStep(300,y,"Station20","S Shoefactory.stations.station20.enterStation=1;\nS Shoefactory.tables.table10.fullSlot.set(nrOfRot,0);");
-			GCStep s1c = doc.createStep(500,y,"S1c","S rotations =0;");
 			y+=100;
 			GCTransition tr3a = doc.createTransition(100,y,"1");
 			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T10_S20");
-			GCTransition tr3c = doc.createTransition(500,y,"1");
 			y+=50;
 			GCStep s2b = doc.createStep(300,y,"S2b","S Shoefactory.stations.station20.leaveStation=1;\n S from12 =0;\nS station20=0;\nS Shoefactory.tables.table10.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table10.rot,\"int\","+stationRot[20] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table10.rot,\"int\","+stationRot[20] +");");
 			y+=100;
 			GCTransition tr4b = doc.createTransition(300,y,"1");
 			y+=50;
-
+			
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
+			
 			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2b);
-			doc.connect(s0,tr2c);
 
 			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
-			doc.connect(tr2c,s1c);
 
 			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
-			doc.connect(s1c,tr3c);
 
 			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
-			doc.connect(tr3c,s0);
 
 			doc.connect(s2b,tr4b);
 
@@ -1149,35 +1061,26 @@ public class Shoe
 
 		if(currentTable==11)
 		{
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table11.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=Shoefactory.tables.table11.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"(rotations!="+stationRot[21] +" | rotations!="+stationRot[22] +" | rotations!="+stationRot[23] +") & syncTabrot!=Shoefactory.tables.table11.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
 			GCTransition tr2a = doc.createTransition(100,y,"!station21 & !station22 & !station23");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T11_S21 &station21");
-			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T11_S22 &station22");
-			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T11_S23 &station23");
-			GCTransition tr2e = doc.createTransition(900,y,"rotations>23");
+			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T11_S21 & station21");
+			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T11_S22 & station22");
+			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T11_S23 & station23");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations =0;\nS leavetable=1;");
+			GCStep s1a = doc.createStep(100,y,"S1a","S leavetable=1;");
 			GCStep s1b = doc.createStep(300,y,"Station21","S Shoefactory.stations.station21.enterStation=1;\nS Shoefactory.tables.table11.fullSlot.set(nrOfRot,0);");
 			GCStep s1c = doc.createStep(500,y,"Station22","S Shoefactory.stations.station22.enterStation=1;\nS Shoefactory.tables.table11.fullSlot.set(nrOfRot,0);");
 			GCStep s1d = doc.createStep(700,y,"Station23","S Shoefactory.stations.station23.enterStation=1;\nS Shoefactory.tables.table11.fullSlot.set(nrOfRot,0);");
-			GCStep s1e = doc.createStep(900,y,"S1e","S rotations =0;");
 			y+=100;
 			GCTransition tr3a = doc.createTransition(100,y,"1");
 			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T11_S21");
 			GCTransition tr3c = doc.createTransition(500,y,"Events.put_T11_S22");
 			GCTransition tr3d = doc.createTransition(700,y,"Events.put_T11_S23");
-			GCTransition tr3e = doc.createTransition(900,y,"1");
 			y+=50;
 			GCStep s2b = doc.createStep(300,y,"S2b","S Shoefactory.stations.station21.leaveStation=1;\nS station21=0;\nS Shoefactory.tables.table11.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table11.rot,\"int\","+stationRot[21] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table11.rot,\"int\","+stationRot[21] +");");
 			GCStep s2c = doc.createStep(500,y,"S2c","S Shoefactory.stations.station22.leaveStation=1;\nS station22=0;\nS Shoefactory.tables.table11.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table11.rot,\"int\","+stationRot[22] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table11.rot,\"int\","+stationRot[22] +");");
@@ -1188,29 +1091,28 @@ public class Shoe
 			GCTransition tr4d = doc.createTransition(700,y,"1");
 			y+=50;
 
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
+			
 			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2b);
 			doc.connect(s0,tr2c);
 			doc.connect(s0,tr2d);
-			doc.connect(s0,tr2e);
 			
 			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
 			doc.connect(tr2c,s1c);
 			doc.connect(tr2d,s1d);
-			doc.connect(tr2e,s1e);
 			
 			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
 			doc.connect(s1c,tr3c);
 			doc.connect(s1d,tr3d);
-			doc.connect(s1e,tr3e);
 			
 			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
 			doc.connect(tr3c,s2c);
 			doc.connect(tr3d,s2d);
-			doc.connect(tr3e,s0);
 			
 			doc.connect(s2b,tr4b);
 			doc.connect(s2c,tr4c);
@@ -1223,38 +1125,29 @@ public class Shoe
 
 		if(currentTable==12)
 		{
-			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start","P syncTabrot=Shoefactory.tables.table12.rot;");
+			GCStepInitial initialStep = doc.createInitialStep(100,y,"Start",";");
 			y+=100;
 			GCTransition tr0 = doc.createTransition(100,y,"start");
 			y+=50;
-			GCStep s0 = doc.createStep(100,y,"S0","S start=0;\nS rotations=rotations+1;\nS syncTabrot=Shoefactory.tables.table12.rot;");
-			GCTransition tr1 = doc.createTransition(300,y+40,"(rotations!="+stationRot[16] +" | rotations!="+stationRot[17] +" | rotations!="+stationRot[18] +" | rotations!="+stationRot[19] +") & syncTabrot!=Shoefactory.tables.table12.rot");
+			GCStep s0 = doc.createStep(100,y,"S0","S start=0;");
 			y+=100;
-			doc.connect(initialStep,tr0);
-			doc.connect(tr0,s0);
-			doc.connect(s0,tr1);
-			doc.connect(tr1,s0);
-
 			GCTransition tr2a = doc.createTransition(100,y,"!station16 & !station17 & !station18 & !station19");
-			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T12_S16 &station16");
-			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T12_S17 &station17");
-			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T12_S18 &station18");
-			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T12_S19 &station19");
-			GCTransition tr2f = doc.createTransition(1100,y,"rotations>23");
+			GCTransition tr2b = doc.createTransition(300,y,"Events.get_T12_S16 & station16");
+			GCTransition tr2c = doc.createTransition(500,y,"Events.get_T12_S17 & station17");
+			GCTransition tr2d = doc.createTransition(700,y,"Events.get_T12_S18 & station18");
+			GCTransition tr2e = doc.createTransition(900,y,"Events.get_T12_S19 & station19");
 			y+=50;
-			GCStep s1a = doc.createStep(100,y,"S1a","S rotations =0;\nS leavetable=1;");
+			GCStep s1a = doc.createStep(100,y,"S1a","S leavetable=1;");
 			GCStep s1b = doc.createStep(300,y,"Station16","S Shoefactory.stations.station16.enterStation=1;\nS Shoefactory.tables.table12.fullSlot.set(nrOfRot,0);");
 			GCStep s1c = doc.createStep(500,y,"Station17","S Shoefactory.stations.station17.enterStation=1;\nS Shoefactory.tables.table12.fullSlot.set(nrOfRot,0);");
 			GCStep s1d = doc.createStep(700,y,"Station18","S Shoefactory.stations.station18.enterStation=1;\nS Shoefactory.tables.table12.fullSlot.set(nrOfRot,0);");
 			GCStep s1e = doc.createStep(900,y,"Station19","S Shoefactory.stations.station19.enterStation=1;\nS Shoefactory.tables.table12.fullSlot.set(nrOfRot,0);");
-			GCStep s1f = doc.createStep(1100,y,"S1f","S rotations =0;");
 			y+=100;
 			GCTransition tr3a = doc.createTransition(100,y,"1");
 			GCTransition tr3b = doc.createTransition(300,y,"Events.put_T12_S16");
 			GCTransition tr3c = doc.createTransition(500,y,"Events.put_T12_S17");
 			GCTransition tr3d = doc.createTransition(700,y,"Events.put_T12_S18");
 			GCTransition tr3e = doc.createTransition(900,y,"Events.put_T12_S19");
-			GCTransition tr3f = doc.createTransition(1100,y,"1");
 			y+=50;
 			GCStep s2b = doc.createStep(300,y,"S2b","S Shoefactory.stations.station16.leaveStation=1;\nS station16=0;\nS Shoefactory.tables.table12.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table12.rot,\"int\","+stationRot[16] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table12.rot,\"int\","+stationRot[16] +");");
 			GCStep s2c = doc.createStep(500,y,"S2c","S Shoefactory.stations.station17.leaveStation=1;\nS station17=0;\nS Shoefactory.tables.table12.fullSlot.set(applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table12.rot,\"int\","+stationRot[17] +"),1);\nS nrOfRot=applyStaticMethod(\"org.supremica.external.shoefactory.Animator.Shoe\",\"getIndex\",\"int\",\"int\",Shoefactory.tables.table12.rot,\"int\","+stationRot[17] +");");
@@ -1267,33 +1160,32 @@ public class Shoe
 			GCTransition tr4e = doc.createTransition(900,y,"1");
 			y+=50;
 
+			doc.connect(initialStep,tr0);
+			doc.connect(tr0,s0);
+			
 			doc.connect(s0,tr2a);
 			doc.connect(s0,tr2b);
 			doc.connect(s0,tr2c);
 			doc.connect(s0,tr2d);
 			doc.connect(s0,tr2e);
-			doc.connect(s0,tr2f);
 
 			doc.connect(tr2a,s1a);
 			doc.connect(tr2b,s1b);
 			doc.connect(tr2c,s1c);
 			doc.connect(tr2d,s1d);
 			doc.connect(tr2e,s1e);
-			doc.connect(tr2f,s1f);
 
 			doc.connect(s1a,tr3a);
 			doc.connect(s1b,tr3b);
 			doc.connect(s1c,tr3c);
 			doc.connect(s1d,tr3d);
 			doc.connect(s1e,tr3e);
-			doc.connect(s1f,tr3f);
 
 			doc.connect(tr3a,initialStep);
 			doc.connect(tr3b,s2b);
 			doc.connect(tr3c,s2c);
 			doc.connect(tr3d,s2d);
 			doc.connect(tr3e,s2e);
-			doc.connect(tr3f,s0);
 
 			doc.connect(s2b,tr4b);
 			doc.connect(s2c,tr4c);
@@ -2983,9 +2875,8 @@ public class Shoe
 	//Ask user if multiple stations are available
 	public static int askUser(int stA, int stB, int stC)
 	{
-		//kolla isEventEnabled flera steg framåt antagligen
-		
-		return stA;	//tillsvidare
+		//Currently not implemented. Simply returns the first station for now.
+		return stA;	
 	}
 
 	
