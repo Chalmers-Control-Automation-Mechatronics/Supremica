@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.3 2005-02-20 23:32:54 robi Exp $
+//# $Id: EventTableModel.java,v 1.4 2005-02-22 22:38:42 robi Exp $
 //###########################################################################
 
 
@@ -160,6 +160,30 @@ class EventTableModel
 		mEvents.add(entry);
 		fireTableRowsInserted(row, row);
 		return row;		
+	}
+
+
+	String getToolTipText(final int row)
+	{
+		final IdentifierProxy event = getEvent(row);
+		final String name = event.toString();
+		final int len = name.length();
+		final StringBuffer buffer = new StringBuffer(len + 22);
+		final EventKind kind = guessEventKind(event);
+		if (kind == null) {
+			buffer.append("Event");
+		} else if (kind.equals(EventKind.CONTROLLABLE)) {
+			buffer.append("Controllable event");
+		} else if (kind.equals(EventKind.PROPOSITION)) {
+			buffer.append("Proposition");
+		} else if (kind.equals(EventKind.UNCONTROLLABLE)) {
+			buffer.append("Uncontrollable event");
+		} else {
+			buffer.append("Event");
+		}
+		buffer.append(' ');
+		buffer.append(name);
+		return buffer.toString();
 	}
 
 

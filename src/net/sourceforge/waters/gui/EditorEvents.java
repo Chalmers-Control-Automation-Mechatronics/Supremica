@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.8 2005-02-22 21:24:31 robi Exp $
+//# $Id: EditorEvents.java,v 1.9 2005-02-22 22:38:42 robi Exp $
 //###########################################################################
 
 
@@ -12,7 +12,9 @@ package net.sourceforge.waters.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
@@ -61,11 +63,10 @@ public class EditorEvents
 	public EditorEvents(final ModuleProxy module,
 						final GraphProxy graph)
 	{
-		mModel = new EventTableModel(graph, module);
-
+		final TableModel model = new EventTableModel(graph, module);
 		final Dimension ispacing = new Dimension(0, 0);
 
-		setModel(mModel);
+		setModel(model);
 		setTableHeader(null);
 		setRowHeight(22);
 		setShowGrid(false);
@@ -93,7 +94,8 @@ public class EditorEvents
 	}
 
 
-
+	//#######################################################################
+	//# Overrides for Base Class javax.swing.JTable
 	public void tableChanged(final TableModelEvent event)
 	{
 		super.tableChanged(event);
@@ -117,6 +119,15 @@ public class EditorEvents
 	}
 
 
+	public String getToolTipText(final MouseEvent event)
+	{
+        final Point point = event.getPoint();
+        final int row = rowAtPoint(point);
+		final EventTableModel model = (EventTableModel) getModel();
+		return model.getToolTipText(row);
+	}
+
+   
 
 	//#######################################################################
 	//# Editing
@@ -134,7 +145,8 @@ public class EditorEvents
 				return;
 			}
 		}
-		final int row = mModel.createEvent();
+		final EventTableModel model = (EventTableModel) getModel();
+		final int row = model.createEvent();
 		if (editCellAt(row, 1)) {
 			final Component comp = getEditorComponent();
 			final Rectangle bounds = comp.getBounds();
@@ -196,11 +208,12 @@ public class EditorEvents
 
 	private int calculateWidth1()
 	{
+		final TableModel model = getModel();
 		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
 		final int rows = getRowCount();
 		int maxwidth = COLUMNWIDTH1;
 		for (int row = 0; row < rows; row++) {
-			final Object value = mModel.getValueAt(row, 1);
+			final Object value = model.getValueAt(row, 1);
 			final Component comp =
 				renderer.getTableCellRendererComponent
 				(this, value, false, false, row, 1);
@@ -334,8 +347,9 @@ public class EditorEvents
 			} else if (selmodel.isSelectionEmpty()) {
 				mBuffer = null;
 			} else {
+				final EventTableModel model = (EventTableModel) getModel();
 				final int row = selmodel.getMinSelectionIndex();
-				mBuffer = mModel.getEvent(row);
+				mBuffer = model.getEvent(row);
 			}
 		}
 
@@ -345,8 +359,6 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Data Members
-	private final EventTableModel mModel;
-
 	private IdentifierProxy mBuffer;
 
 
