@@ -88,11 +88,11 @@ public class AutomatonMinimizer
 	/** The supplied options. */
 	private MinimizationOptions options;
 
-	// Debug flag... 
+	// Local debug flag... 
 	public static final boolean debug = false;
 
 	// Use short names
-	private boolean shortNames = false;
+	private boolean useShortNames = false;
 
 	/**
 	 * Basic constructor.
@@ -180,20 +180,25 @@ public class AutomatonMinimizer
 				preMinimizationTimer.stop();
 				logger.fatal("Determinization: " + preMinimizationTimer);
 				Thread.sleep(0);
+				partitioningTimer.start();
 			}
 
-			// Now we're ready for minimization!
+			// Now we're ready for partitioning!
 		}
-		else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
+		else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence || 
+				 equivalenceRelation == EquivalenceRelation.ConflictEquivalence)  
 		{
 			// Merge silent loops and other obvious OE stuff (to save computation later)...
 			// This is actually NOT entirely OE, considering the marked states!! 
-			int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
-			if (count > 0)
+			if (theAutomaton.getAlphabet().size() > 1)
 			{
-				logger.debug("Removed " + count + " conflict equivalent states " +
-							 "before running the partitioning.");
-		}
+				int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
+				if (count > 0 && debug)
+				{
+					logger.fatal("Removed " + count + " conflict equivalent states " +
+								 "before running the partitioning.");
+				}
+			}
 
 			if (debug)
 			{
@@ -204,61 +209,51 @@ public class AutomatonMinimizer
 			}
 
 			// Saturate
-			int transitions = doTransitiveClosure(theAutomaton);
+			int transitions = 0;
+			//int transitions = doTransitiveClosure(theAutomaton);
 
 			if (debug)
 			{
 				saturationTimer.stop();	
-				logger.fatal("Saturation: " + saturationTimer + 
-							 " (added " + transitions + " new transitions)");
+				//logger.fatal("Saturation: " + saturationTimer + 
+				//		  	   " (added " + transitions + " new transitions)");
 				Thread.sleep(0);
 			}
 			
-			// Now we're ready for minimization!
-		}
-		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
-		{
-			// Merge silent loops and other obvious OE stuff (to save computation later)
-			// This is actually NOT entirely OE!!
-			int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
-			if (count > 0)
+			// Some stuff that are unique to the conflict equivalence
+			if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)  
 			{
-				logger.debug("Removed " + count + " observation equivalent states " +
-							 "before running partitioning.");
-			}
+				if (stopRequested)
+				{
+					return null;
+				}
+
+				////////////
+				// RULE D //
+				////////////
 				
-			if (debug)
-			{
-				preMinimizationTimer.stop();
-				logger.fatal("Pre partitioning: " + preMinimizationTimer);
-				Thread.sleep(0);
-				saturationTimer.start();
-			}
-		
-			// Saturate
-			int transitions = doTransitiveClosure(theAutomaton);
+				if (debug)
+				{
+					adjustMarkingTimer.start();	
+				}
 
-			if (debug)
-			{
-				saturationTimer.stop();	
-				logger.fatal("Saturation: " + saturationTimer + 
-							 " (added " + transitions + " new transitions)");
-				Thread.sleep(0);
-				adjustMarkingTimer.start();
+				// Adjust marking based on epsilon transitions 
+				adjustMarking(theAutomaton); // Not OE
+				
+				if (debug)
+				{
+					adjustMarkingTimer.stop();	
+					logger.fatal("Adjust markings: " + adjustMarkingTimer);
+					Thread.sleep(0);
+				}
 			}
 			
-			// Adjust marking based on epsilon transitions (it IS ok and actually necessary
-			// to do this AFTER doTransitiveClosure). This is not an expensive computation.
-			adjustMarking(theAutomaton); // Not OE
-
 			if (debug)
 			{
-				adjustMarkingTimer.stop();	
-				logger.fatal("Adjust markings: " + adjustMarkingTimer);
-				Thread.sleep(0);
+				partitioningTimer.start();
 			}
 			
-			// Now we're ready for minimization!
+			// Now we're ready for partitioning!
 		}
 		else
 		{
@@ -270,13 +265,8 @@ public class AutomatonMinimizer
 			return null;
 		}
 
-		if (debug)
-		{
-			partitioningTimer.start();
-		}
-
 		// After the above preparations, we can do the minimization 
-		// in the same way for all cases!
+		// in the same way for all cases! 
 	
 		// Find the coarsest partitioning
 		EquivalenceClasses equivClasses = new EquivalenceClasses();
@@ -309,7 +299,7 @@ public class AutomatonMinimizer
 			automataBuildTimer.start();
 		}
 
-		// Build the minimized automaton
+		// Build the minimized automaton based on the partitioning in equivClasses
 		Automaton newAutomaton = buildAutomaton(equivClasses);
 
 		if (stopRequested)
@@ -328,6 +318,7 @@ public class AutomatonMinimizer
 		// Should we remove redundant transitions to minimize also with respect to transitions?
 		if (options.getAlsoTransitions())
 		{
+			doTransitiveClosure(newAutomaton);
 			removeRedundantTransitions(newAutomaton);
 		}
 
@@ -432,7 +423,7 @@ public class AutomatonMinimizer
 	 */
 	public void useShortStateNames(boolean bool)
 	{
-		shortNames = bool;
+		useShortNames = bool;
 	}
 
 	/**
@@ -456,14 +447,14 @@ public class AutomatonMinimizer
 			if (currEquivClass.hasInitialState())
 			{
 				currState.setInitial(true);
-				if (shortNames)
+				if (useShortNames)
 				{
 					currState.setName("q" + 0);
 				}
 			}
 			else
 			{
-				if (shortNames)
+				if (useShortNames)
 				{
 					currState.setName("q" + stateNumber++);
 				}
@@ -481,25 +472,31 @@ public class AutomatonMinimizer
 			}
 
 			EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
-			//State fromState = currEquivClass.getState(newAutomaton);
 			State fromState = currEquivClass.getSingleStateRepresentation();
-			Iterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
 
+			// Note that the below only returns an iterator to SOME of the outgoing arc
+			// from the EquivalenceClass (from one state only). This is OK, though, since 
+			// all states in the equivalence class should have the same outgoing transitions 
+			// (with respect to equivalence classes), otherwise they are not really equivalent! 
+			//Iterator outgoingArcsIt = currEquivClass.get().outgoingArcsIterator();
+
+			// Since the automaton isn't saturated, we have to loop through all arcs!
+			Iterator outgoingArcsIt = currEquivClass.outgoingArcsIterator();
 			while (outgoingArcsIt.hasNext())
 			{
 				Arc currArc = (Arc) outgoingArcsIt.next();
-
 				LabeledEvent currEvent = currArc.getEvent();
 				State oldToState = currArc.getToState();
-				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateSet();
-				//State toState = nextEquivalenceClass.getState(newAutomaton);
-				State toState = nextEquivalenceClass.getSingleStateRepresentation();
 
+				// Add the new arc!
+				EquivalenceClass nextEquivalenceClass = (EquivalenceClass) oldToState.getStateSet();
+				State toState = nextEquivalenceClass.getSingleStateRepresentation();
 				Arc newArc = new Arc(fromState, toState, currEvent);
 
 				// If we should minimize the number of transitions, make sure a transition is never
 				// present more than once (this is performed in an ugly way below)
-				if (!(options.getAlsoTransitions() && newArc.getFromState().containsOutgoingArc(newArc)))
+				//if (!(options.getAlsoTransitions() && newArc.getFromState().containsOutgoingArc(newArc)))
+				if (!newArc.getFromState().containsOutgoingArc(newArc))
 				{
 					// Add arc
 					newAutomaton.addArc(newArc);
@@ -516,7 +513,7 @@ public class AutomatonMinimizer
 
 	/**
 	 * Finds the coarsest partitioning of the supplied equivalence classes.
-	 * In each partition, the states have corresponding outgoing arcs. Based
+	 * In each partition, all states have corresponding outgoing arcs. Based
 	 * on this, an automaton with a minimal number of states can be generated...
 	 */
 	private void findCoarsestPartitioning(EquivalenceClasses equivClasses)
@@ -564,7 +561,7 @@ public class AutomatonMinimizer
 	}
 	private boolean partition(EquivalenceClasses equivClasses, EquivalenceClass equivClass, LabeledEvent e)
 	{
-		// "Split" class on event 'e' where do 'e'-transitions lead
+		// "Split" class on event 'e', i.e. based on where the 'e'-transitions lead
 		EquivalenceClassHolder newEquivClassHolder = equivClass.split(e);
 
 		// Do the states in equivClass have different behaviour on 'e'?
@@ -724,7 +721,7 @@ public class AutomatonMinimizer
 						count++;
 						aut.removeArc(arc); // We can remove this one, it will become an epsilon self-loop!
 						statesToExamine.remove(two);
-						State mergeState = aut.mergeStates(two, one);
+						State mergeState = aut.mergeStates(two, one, useShortNames);
 						statesToExamine.add(mergeState);
 						// Add states that may have changed to stack
 						for (ArcIterator arcIt = mergeState.outgoingArcsIterator(); arcIt.hasNext(); )
@@ -756,10 +753,13 @@ public class AutomatonMinimizer
 
 		// Count the removed states
 		int count = 0;
+		int count2 = 0;
 
 		// Do the merging
 		while (statesToExamine.size() != 0)
 		{
+			count2++;
+
 			if (stopRequested)
 			{
 				aut = null;
@@ -767,67 +767,224 @@ public class AutomatonMinimizer
 			}
 
 			// Get and remove arbitrary state
-			State one = statesToExamine.get();
-			statesToExamine.remove(one);
+			State one = statesToExamine.remove();
 
 			// If there is only one transition out of this state AND it is an epsilon-transition
 			// merge this and next state.
-			if (one.nbrOfOutgoingArcs() == 1)
+			ArcIterator arcIt = one.outgoingArcsIterator();
+			if (arcIt.hasNext())
 			{
-				Arc arc = one.outgoingArcsIterator().nextArc();
+				// So this arc may be OK, just check that there are no more arcs in the iterator!
+				Arc arc = arcIt.nextArc();
 				State two = arc.getToState();
-
-				// If 1!=2 etc.
+				boolean arcOK = !arcIt.hasNext() && arc.getEvent().isEpsilon() && !arc.isSelfLoop();
 				boolean markingOK = options.getIgnoreMarking() || one.hasEqualMarking(two);
-				if (!one.equals(two) && arc.getEvent().isEpsilon() && markingOK)
+				arcIt = null;
+				if (arcOK && markingOK)
 				{
+					// We can remove this arc, it will become an epsilon self-loop!
+					aut.removeArc(arc); 
+
+					// Merge!
 					count++;
-					aut.removeArc(arc); // We can remove this one, it will be an epsilon self-loop!
 					statesToExamine.remove(two);
-					//statesToExamine.add(aut.mergeStates(one, two));
-					State mergeState = aut.mergeStates(one, two);
+					State mergeState = aut.mergeStates(one, two, useShortNames);
 					statesToExamine.add(mergeState);
 					// Add states that may have changed to stack
-					for (ArcIterator arcIt = mergeState.incomingArcsIterator(); arcIt.hasNext(); )
+					for (ArcIterator it = mergeState.incomingArcsIterator(); it.hasNext(); )
 					{
-						Arc epsilonArc = arcIt.nextArc();
+						Arc epsilonArc = it.nextArc();
 						if (epsilonArc.getEvent().isEpsilon())
 						{
 							statesToExamine.add(epsilonArc.getFromState());
 						}
 					}
-					//logger.info("I merged " + one + " and " + two + " since I thought they were OE.");
+					//logger.info("I merged " + one + " and " + two + 
+					//            " since I thought they were OE.");
 					continue; // Get next "one" from stack
 				}
 			}
 
 			// Merge loops
 
+			// Find forwards and backwards closures
+			StateSet forwardsClosure = one.epsilonClosure();
+			StateSet backwardsClosure = one.backwardsEpsilonClosure();
+			int forwSize = forwardsClosure.size();
+
+			// Merge all states in the intersection!
+			forwardsClosure.remove(one); // Skip self
+			while (forwardsClosure.size() != 0)
+			{
+				State two = forwardsClosure.remove();
+
+				if (backwardsClosure.contains(two))
+				{
+					// Merge!
+					count++;
+					statesToExamine.remove(two);
+					one = aut.mergeStates(one, two, useShortNames);
+					//logger.info(one);
+				}
+			}
+
+			/*
+			// Remove statesToExamine based on this...
+			StateSet search = new StateSet();
+			search.add(one);
+			int count3 = 0;
+			while (search.size() != 0)
+			{
+				State current = search.remove();
+				ArcIterator outIt = current.outgoingArcsIterator();
+				while (outIt.hasNext())
+				{
+					Arc arc = outIt.nextArc();
+					if (arc.getEvent().isEpsilon())
+					{
+						State target = arc.getToState();
+						
+						// If there are no incoming epsilons here except for "arc" there can be
+						// no other loops where "target" is involved
+						boolean fail = false;
+						ArcIterator inIt = target.incomingArcsIterator();
+						while (inIt.hasNext())
+						{
+							Arc incoming = inIt.nextArc();
+							if (arc.getEvent().isEpsilon() && !arc.equals(incoming))
+							{
+								fail = true;
+								break;
+							}
+						}
+						if (!fail)
+						{
+							// This state does not have to be examined later!
+							count3++;
+							statesToExamine.remove(target);
+							search.add(target);
+						}
+					}
+				}
+			}
+			search.add(one);
+			while (search.size() != 0)
+			{
+				State current = search.remove();
+				ArcIterator outIt = current.incomingArcsIterator();
+				while (outIt.hasNext())
+				{
+					Arc arc = outIt.nextArc();
+					if (arc.getEvent().isEpsilon())
+					{
+						State target = arc.getFromState();
+						
+						// If there are no outgoing epsilons here except for "arc" there can be
+						// no other loops where "target" is involved
+						boolean fail = false;
+						ArcIterator inIt = target.outgoingArcsIterator();
+						while (inIt.hasNext())
+						{
+							Arc incoming = inIt.nextArc();
+							if (arc.getEvent().isEpsilon() && !arc.equals(incoming))
+							{
+								fail = true;
+								break;
+							}
+						}
+						if (!fail)
+						{
+							// This state does not have to be examined later!
+							count3++;
+							statesToExamine.remove(target);
+							search.add(target);
+						}
+					}
+				}
+			}
+			logger.info("Forw: " + forwSize + " back: " + backwardsClosure.size() + " Count3: " + count3);
+			*/
+			
+			/*
+			StateSet closureOne = one.epsilonClosure();
+			closureOne.remove(one); // Don't examine self
+
+			boolean change = true;
+			boolean newOne = false;
+			while (change)
+			{
+				if (stopRequested)
+				{
+					return 0;
+				}
+				
+				change = false;
+				StateSet previousStates = new StateSet();
+				ArcIterator it = one.incomingArcsIterator();
+				while (it.hasNext())
+				{
+					Arc arc = it.nextArc();
+					if (arc.getEvent().isEpsilon())
+					{
+						previousStates.add(arc.getFromState());
+					}
+				}
+				while (previousStates.size() != 0)
+				{
+					State two = previousStates.remove();
+					
+					// If a state in the epsilonclosure can reach one by an epsilon transition... 
+					if (closureOne.contains(two))
+					{
+						// Merge! 
+						count++;
+						statesToExamine.remove(two);
+						one = aut.mergeStates(one, two, useShortNames);
+						change = true;
+					}
+				}
+				if (change)
+				{
+					newOne = true;
+				}
+			}
+			if (newOne)
+			{
+				statesToExamine.add(one);
+			}
+			*/
+
+			/*
 			// Find epsilon-closure for this state
-			StateSet closureOne = epsilonClosure(one);
+			StateSet closureOne = one.epsilonClosure();
 			closureOne.remove(one); // Don't examine self
 
 			// Find, in closure, if there is a state which has the first state in its closure
 			for (StateIterator closureIt = closureOne.iterator(); closureIt.hasNext(); )
 			{
 				State two = closureIt.nextState();
-				StateSet closureTwo = epsilonClosure(two);
+				StateSet closureTwo = two.epsilonClosure();
 
 				// Good to merge?
-				boolean markingOK = options.getIgnoreMarking() || one.hasEqualMarking(two);
+				//boolean markingOK = options.getIgnoreMarking() || one.hasEqualMarking(two);
 				//if (closureTwo.contains(one) && markingOK)
-				if (closureTwo.contains(one))
-				{
-					count++;
-
+				if (closureTwo.contains(one)) 
+				{	   			
 					// Remove the other state from stack, merge and add
 					// new state to stack
+					count++;
 					statesToExamine.remove(two);
-					statesToExamine.add(aut.mergeStates(one, two));
+					State merge = aut.mergeStates(one, two, useShortNames);
+					statesToExamine.add(merge);
+
+					//one = merge;
 					break; // Get next "one" from stack
 				}
 			}
-			/* // Alternative implementation, appears to suck
+			*/
+
+			/*
+			// Alternative implementation, appears to suck
 			// Find, in closure, if there is a state which has the first state in its closure
 			State mergeState = null;
 			for (StateIterator closureIt = closureOne.iterator(); closureIt.hasNext(); )
@@ -862,6 +1019,9 @@ public class AutomatonMinimizer
 			*/
 		}
 
+		if (debug)
+			logger.error("Prepartitioning turns in loop: " + count2);
+
 		return count;
 	}
 
@@ -889,7 +1049,7 @@ public class AutomatonMinimizer
 			State currState = stateIt.nextState();
 
 			// Find closure, associate it with this state
-			StateSet closure = epsilonClosure(currState);
+			StateSet closure = currState.epsilonClosure();
 			currState.setStateSet(closure);
 		}
 
@@ -978,52 +1138,18 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * Calculates and returns epsilon closure.
-	 */
-	public static StateSet epsilonClosure(State state)
-	{
-		StateSet result = new StateSet();
-		result.add(state);
-
-		LinkedList statesToExamine = new LinkedList();
-		statesToExamine.add(state);
-		while (statesToExamine.size() != 0)
-		{
-			State currState = (State) statesToExamine.removeFirst();
-
-			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
-			{
-				Arc currArc = arcIt.nextArc();
-
-				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
-					!result.contains(currArc.getToState()))
-				{
-					statesToExamine.add(currArc.getToState());
-					result.add(currArc.getToState());
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
 	 * All states that can reach marked states by epsilon events are also considered marked.
-	 *
-	 * NOTE: This method assumes that the epsilon-closure of each state is already calculated
-	 * and that the closure is returned by each state's getStateSet-method. (This is true if
-	 * doTransitiveClosure was called previously.)
 	 */
 	private void adjustMarking(Automaton aut)
 	{
-		if (aut == null)
+		if (aut == null || stopRequested)
 		{
 			return;
 		}
 
-		LinkedList toBeMarked = new LinkedList();
 		/*
 		// States in epsilon loops where there are at least one marked state can be considered marked
+		LinkedList toBeMarked = new LinkedList();
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
 			State markedState = stateIt.nextState();
@@ -1048,7 +1174,13 @@ public class AutomatonMinimizer
 		}
 		*/
 
+		/*
+		*
+		* NOTE: This method assumes that the epsilon-closure of each state is already calculated
+		* and that the closure is returned by each state's getStateSet-method. (This is true if
+	    * doTransitiveClosure was called previously.)
 		// States that can reach marked states by epsilon events only can be considered marked
+		LinkedList toBeMarked = new LinkedList();
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
 			State currState = stateIt.nextState();
@@ -1064,6 +1196,27 @@ public class AutomatonMinimizer
 					aut = null;
 					return;
 				}
+				for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
+				{
+					State otherState = closureIt.nextState();
+					if (otherState.isAccepting())
+					{
+						toBeMarked.add(currState);
+						break;
+					}
+				}
+			}
+		}
+		*/
+
+		// States that can reach marked states by epsilon events only can be considered marked
+		LinkedList toBeMarked = new LinkedList();
+		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
+		{
+			State currState = stateIt.nextState();
+			if (!currState.isAccepting())
+			{
+				StateSet closure = currState.epsilonClosure();
 				for (StateIterator closureIt = closure.iterator(); closureIt.hasNext(); )
 				{
 					State otherState = closureIt.nextState();
@@ -1349,28 +1502,11 @@ class EquivalenceClasses
 class EquivalenceClass
 	extends StateSet
 {
-	public EquivalenceClass()
-	{
-	}
-
-	/**
-	 * Note that this method only returns an iterator to SOME of the outgoing arc
-	 * frm the underlying StateSet. This is OK, though, since all states in the
-	 * equivalence class should have the same outgoing transitions, otherwise
-	 * they are not equivalent! (Maybe that should be examined to be safe...)
-	 */
-	public Iterator outgoingArcsIterator()
-	{
-		State currState = get();    // (State) states.getFirst();
-		Iterator currIt = currState.outgoingArcsIterator();
-
-		return currIt;
-	}
-
 	/**
 	 * Split the equivalence class according to what can be reached on this event
 	 * Return all new equivalence classes in the holder
-	 * If the holder contains only one entry, all reached states have the same eq class (at this point)
+	 * If the holder contains only one entry, all reached states have the same eq class 
+	 * (at this point)
 	 */
 	public EquivalenceClassHolder split(LabeledEvent e)
 	{
@@ -1384,7 +1520,7 @@ class EquivalenceClass
 			// from each of the states in this eq-class
 			// Note, for each state there is only one successor state 
 			// for this event (determinism)
-			// NOOOOOOOOOOOOOOOOO! NOT DETERMINISTIC!!
+			// NOOOOOOOOOOOOOOOOO! NOT IT'S NOT DETERMINISTIC!!
 			Iterator stateIt = iterator();
 			while (stateIt.hasNext())
 			{
@@ -1412,7 +1548,7 @@ class EquivalenceClass
 			while (stateIt.hasNext())
 			{
 				State currState = (State) stateIt.next();
-				StateSet nextStates = currState.nextStateSet(e);
+				StateSet nextStates = currState.nextStateSet(e, true);
 				EquivalenceClass nextClass = new EquivalenceClass();
 				for (StateIterator nextIt = nextStates.iterator(); nextIt.hasNext(); )
 				{

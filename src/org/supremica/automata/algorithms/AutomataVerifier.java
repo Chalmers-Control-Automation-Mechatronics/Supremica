@@ -1821,10 +1821,11 @@ public class AutomataVerifier
 			// Choose options
 			MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
 			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
-			options.setAlsoTransitions(true);
-			//options.setAlsoTransitions(false);
+			//options.setAlsoTransitions(true);
+			options.setAlsoTransitions(false);
 			options.setKeepOriginal(false);
 			options.setCompositionalMinimization(true);
+			options.setSkipLast(true);
 			options.setTargetAlphabet(new Alphabet()); // Empty alphabet!
 
 			result = minimizer.getCompositionalMinimization(options);

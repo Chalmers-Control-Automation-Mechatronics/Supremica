@@ -185,7 +185,7 @@ class MinimizationDialogAdvancedPanel
 	private JCheckBox compositionalMinimization;
 	private Alphabet unionAlphabet;
 	private Alphabet targetAlphabet;
-	private List targetAlphabetSelector;
+	private JList targetAlphabetSelector;
 
 	//private JTextArea note;
 
@@ -196,7 +196,9 @@ class MinimizationDialogAdvancedPanel
 
 		compositionalMinimization = new JCheckBox("Compositional minimization");
 		compositionalMinimization.addActionListener(this);
-		targetAlphabetSelector = new List(8, true);
+		
+		/*
+		targetAlphabetSelector = new List(7, true);
 		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent event = evIt.nextEvent();
@@ -207,18 +209,27 @@ class MinimizationDialogAdvancedPanel
 				targetAlphabetSelector.add(event.getLabel());
 			}
 		}
+		*/
+
+		DefaultListModel list = new DefaultListModel();
+		for (EventIterator evIt = unionAlphabet.iterator(); evIt.hasNext(); )
+		{
+			LabeledEvent event = evIt.nextEvent();
+
+			// Only non-epsilon events!
+			if (!event.isEpsilon())
+			{
+				list.addElement(event.getLabel());
+			}
+		}
+		targetAlphabetSelector = new JList(list);
+		targetAlphabetSelector.setVisibleRowCount(10);
+		JScrollPane scrollPane = new JScrollPane(targetAlphabetSelector);
 
 		//note = new JTextArea("Note:\n" + "I have nothing to say.");
 		//note.setBackground(this.getBackground());
 
-		//Box advancedBox = Box.createHorizontalBox();
-		//advancedBox.add(new Label("         ")); // Ugly fix to get stuff centered
-		//advancedBox.add(compositionalMinimization);
-		//advancedBox.add(new Label("         ")); // Ugly fix to get stuff centered
-		//Box anotherBox = Box.createVerticalBox();
-		//anotherBox.add(targetAlphabetSelector);
-
-		// NEW TRY
+		// Add components
 		this.setLayout(new BorderLayout());
 
 		JPanel choicePanel = new JPanel();
@@ -229,7 +240,8 @@ class MinimizationDialogAdvancedPanel
 
 		JPanel alphaPanel = new JPanel();
 		alphaPanel.setLayout(new FlowLayout());
-		alphaPanel.add(targetAlphabetSelector);
+		//alphaPanel.add(targetAlphabetSelector);
+		alphaPanel.add(scrollPane);
 		targetAlphabetSelector.setEnabled(false);
 		this.add("Center", alphaPanel);
 	}
@@ -248,10 +260,18 @@ class MinimizationDialogAdvancedPanel
 		if (compositionalMinimization.isSelected())
 		{
 			targetAlphabet = new Alphabet();
-			int[] selected = targetAlphabetSelector.getSelectedIndexes();
+			//int[] selected = targetAlphabetSelector.getSelectedIndexes();
+			int[] selected = targetAlphabetSelector.getSelectedIndices();
+			//String[] selected = (String[]) targetAlphabetSelector.getSelectedValues();
+			//String[] selected = targetAlphabetSelector.getModel();
+			ListModel list = targetAlphabetSelector.getModel();
 			for (int i=0; i<selected.length; i++)
 			{
-				targetAlphabet.addEvent(unionAlphabet.getEvent(targetAlphabetSelector.getItem(selected[i])));
+				//targetAlphabet.addEvent(unionAlphabet.getEvent(targetAlphabetSelector.getItem(selected[i])));
+				//System.err.println("Seleceted: " + (String) selected[i]);
+				//targetAlphabet.addEvent(unionAlphabet.getEvent(selected[i]));
+				String label = (String) list.getElementAt(selected[i]);
+				targetAlphabet.addEvent(unionAlphabet.getEvent(label));
 			}
 		}
 		else
@@ -313,7 +333,7 @@ public class MinimizationDialog
 		if (automata.size() > 1)
 		{
 			tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
-			tabbedPane.setSelectedComponent(advancedPanel);
+			//tabbedPane.setSelectedComponent(advancedPanel);
 		}
 
 		// buttonPanel;

@@ -3696,8 +3696,8 @@ public class ActionMan
 	}
 
 	// Generate IEC-61499 Function Block
-	public static void ProjectToIEC61499(Gui gui) {
-
+	public static void ProjectToIEC61499(Gui gui) 
+	{
 		// Automata selectedProject = gui.getselectedProject();
 		Project selectedProject = gui.getSelectedProject();
 
@@ -3747,7 +3747,6 @@ public class ActionMan
 	// Generate 1131 Structured Text
 	public static void ProjectTo1131ST(Gui gui)
 	{
-
 		// Automata selectedProject = gui.getselectedProject();
 		Project selectedProject = gui.getSelectedProject();
 
@@ -3929,15 +3928,15 @@ public class ActionMan
 			File tmpFile = File.createTempFile("softplc", ".il");
 
 			tmpFile.deleteOnExit();
-
+			
 			AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
 			PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
-
+			
 			exporter.serializeInstructionList(theWriter);
 			theWriter.close();
-
+			
 			tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
-
+			
 			new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), tmpdir.getAbsolutePath());
 			new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
 		}
@@ -3945,7 +3944,7 @@ public class ActionMan
 		{
 			logger.error("Exception while generating Java Bytecode to file");
 			logger.debug(ex.getStackTrace());
-
+			
 			return;
 		}
 
@@ -3976,186 +3975,20 @@ public class ActionMan
 		{
 			VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
 			VisualProject theProject = (VisualProject) projectContainer.getActiveProject();
-
+			
 			theProject.getCellEditor();
 		}
 		catch (Exception ex)
 		{
 			logger.error("Exception while getting Recipe Editor");
 			logger.debug(ex.getStackTrace());
-
+			
 			return;
 		}
 	}
-
-	/**
-	 * Examines automata size and, optionally, if all automata
-	 * has initial states and/or a defined type.
-	 *
-	 * @param theAutomata The automata.
-	 * @param minSize Minimum size of the automata.
-	 * @param mustHaveInitial Test requires automata to have initial states.
-	 * @param mustHaveType Test requires that the automata are not of undefined type.
-	 */
-
-	/* This method now resides in automata.Automata
-	private static boolean sanityCheck(Automata theAutomata, int minSize, boolean mustHaveInitial,
-																					   boolean mustHaveType)
-	{
-			if (mustHaveInitial)
-			{
-					// All automata must have initial states.
-					// There is another method for this, Automata.hasInitialState(),
-					// but it doesn't tell which automaton breaks the test...
-					Iterator autIt = theAutomata.iterator();
-					while (autIt.hasNext())
-					{
-							Automaton currAutomaton = (Automaton) autIt.next();
-
-							// Does this automaton have an initial state?
-							if (!currAutomaton.hasInitialState())
-							{
-									String message = "The automaton \"" + currAutomaton.getName() +
-											"\" does not have an initial state.\n" +
-											"Skip this automaton or Cancel the whole operation?";
-									Object[] options = { "Skip", "Cancel" };
-									int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																													JOptionPane.OK_CANCEL_OPTION,
-																													JOptionPane.WARNING_MESSAGE, null,
-																													options, options[1]);
-
-									if(cont == JOptionPane.OK_OPTION)
-									{   // Skip
-											// Unselect the automaton
-											gui.unselectAutomaton(theAutomata.getAutomatonIndex(currAutomaton));
-											// Skip this automaton (remove it from this)
-											autIt.remove();
-									}
-									else // JOptionPane.CANCEL_OPTION
-									{   // Cancel
-											// This is iNsanE!
-											return false;
-									}
-							}
-					}
-			}
-
-			if (mustHaveType)
-			{
-					// All automata must have a defined type, i.e. must not be of type "Undefined".
-					Iterator autIt = theAutomata.iterator();
-					while (autIt.hasNext())
-					{
-							Automaton currAutomaton = (Automaton) autIt.next();
-
-							// Is this Automaton's type AutomatonType.Undefined?
-							if(currAutomaton.getType() == AutomatonType.Undefined)
-							{
-									String message = "The automaton \"" + currAutomaton.getName() +
-											"\" is of type \"Undefined\".\n" +
-											"Skip this automaton or Cancel the whole operation?";
-									Object[] options = { "Skip", "Cancel" };
-									int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																													JOptionPane.OK_CANCEL_OPTION,
-																													JOptionPane.WARNING_MESSAGE, null,
-																													options, options[1]);
-
-									if(cont == JOptionPane.OK_OPTION)
-									{   // Skip
-											// Unselect the automaton
-											gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
-											// Skip this automaton (remove it from this)
-											autIt.remove();
-									}
-									else // JOptionPane.CANCEL_OPTION
-									{   // Cancel
-											// This is iNsaNe!
-											return false;
-									}
-							}
-					}
-			}
-
-			// Make sure the automata has the right size!
-			if (minSize > 0 && theAutomata.size() < minSize)
-			{
-					String size;
-					if (minSize == 1)
-							size = "one automaton";
-					else if (minSize == 2)
-							size = "two automata";
-					else
-							size = minSize + " automata";
-					JOptionPane.showMessageDialog(gui.getFrame(), "At least " +
-																			  size + " must be selected!",
-																			  "Alert", JOptionPane.ERROR_MESSAGE);
-					// This is inSaNe!
-					return false;
-			}
-
-			// Sane!
-			return true;
-	}
-	*/
-
-	// BDD developer stuff: these are disabled if org.supremica.util.BDD.Options.dev_mode == false
-	public static void DoBDDReachability()
-	{
-		org.supremica.util.BDD.test.DeveloperTest.DoReachability(gui.getSelectedAutomata());
-	}
-
-	public static void DoBDDCoReachability()
-	{
-		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
-	}
-
-	public static void DoBDDUnderConstruction()
-	{
-			org.supremica.util.BDD.test.DeveloperTest.DoUnderConstruction(gui.getSelectedAutomata());
-	}
-
-	// ------------------------------------------------------------------
-
-	/**
-	 * Mark (select) automata in the dependency group of the selected automata.
-	 */
-	public static void markDependencySet()
-	{
-		try
-		{
-			Automata all = gui.getVisualProjectContainer().getActiveProject();
-			Collection v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
-
-			gui.selectAutomata(v);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
-	}
-
-	/**
-	 * select the maximal component the current selection is a part of
-	 * (the current selection must be connected!)
-	 */
-	public static void markMaximalComponent()
-	{
-		try
-		{
-			Automata all = gui.getVisualProjectContainer().getActiveProject();
-			Collection v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
-
-			gui.selectAutomata(v);
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
-	}
-
+	
 	/**
 	 * Simplify the Supremica project.
-	 *
 	 */
 	public static void simplifyProject()
 	{
@@ -4170,6 +4003,63 @@ public class ActionMan
 
 			// insert the new project
 			gui.addAutomata(new_);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+	}
+
+	///////////////
+	// BDD STUFF //
+	///////////////
+	
+	// BDD developer stuff: these are disabled if org.supremica.util.BDD.Options.dev_mode == false
+	public static void DoBDDReachability()
+	{
+		org.supremica.util.BDD.test.DeveloperTest.DoReachability(gui.getSelectedAutomata());
+	}
+	
+	public static void DoBDDCoReachability()
+	{
+		org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
+	}
+	
+	public static void DoBDDUnderConstruction()
+	{
+		org.supremica.util.BDD.test.DeveloperTest.DoUnderConstruction(gui.getSelectedAutomata());
+	}
+	
+	/**
+	 * Mark (select) automata in the dependency group of the selected automata.
+	 */
+	public static void markDependencySet()
+	{
+		try
+		{
+			Automata all = gui.getVisualProjectContainer().getActiveProject();
+			Collection v = AutomataCommunicationHelper.getDependencyGroup(gui.getSelectedAutomata(), all);
+			
+			gui.selectAutomata(v);
+		}
+		catch (Exception ex)
+		{
+			logger.error(ex);
+		}
+	}
+	
+	/**
+	 * select the maximal component the current selection is a part of
+	 * (the current selection must be connected!)
+	 */
+	public static void markMaximalComponent()
+	{
+		try
+		{
+			Automata all = gui.getVisualProjectContainer().getActiveProject();
+			Collection v = AutomataCommunicationHelper.getMaximalComponent(gui.getSelectedAutomata(), all);
+
+			gui.selectAutomata(v);
 		}
 		catch (Exception ex)
 		{

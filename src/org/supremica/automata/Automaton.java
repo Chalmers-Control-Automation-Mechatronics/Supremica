@@ -95,6 +95,9 @@ public class Automaton
 	private Automata slaveAutomata = null;
 	private AutomatonListeners listeners = null;
 
+	/**
+	 * Creates an empty automaton.
+	 */
 	public Automaton()
 	{
 		alphabet = new Alphabet();
@@ -105,6 +108,9 @@ public class Automaton
 		slaveAutomata = new Automata();
 	}
 
+	/**
+	 * Creates an empty automaton with a specified name.
+	 */
 	public Automaton(String name)
 	{
 		this();
@@ -112,6 +118,9 @@ public class Automaton
 		setName(name);
 	}
 
+	/**
+	 * Creates an automaton that is a copy of another.
+	 */
 	public Automaton(Automaton orgAut)
 	{
 		this();
@@ -168,6 +177,10 @@ public class Automaton
 		}
 	}
 
+	/**
+	 * Sets the type of this automaton (e.g. AutomatonType.Plant, AutomatonType.Specification).
+	 * @see AutomatonType
+	 */
 	public void setType(AutomatonType type)
 		throws IllegalArgumentException
 	{
@@ -179,6 +192,9 @@ public class Automaton
 		this.type = type;
 	}
 
+	/**
+	 * Returns the type of this automaton.
+	 */
 	public AutomatonType getType()
 	{
 		if (type == null)
@@ -214,6 +230,9 @@ public class Automaton
 		return type == AutomatonType.Undefined;
 	}
 
+	/**
+	 * Sets the name of this automaton.
+	 */
 	public void setName(String name)
 		throws IllegalArgumentException
 	{
@@ -231,7 +250,7 @@ public class Automaton
 	}
 
 	/**
-	 * Returns the name of the automaton, or, if there is no name, returns the comment
+	 * Returns the name of the automaton, or, if there is no name, returns the comment.
 	 */
 	public String getName()
 	{
@@ -275,6 +294,9 @@ public class Automaton
 		return comment;
 	}
 
+	/**
+	 * Sets the comment of the automaton.
+	 */
 	public void setComment(String comment)
 		throws IllegalArgumentException
 	{
@@ -316,6 +338,10 @@ public class Automaton
 		}
 	}
 
+	/**
+	 * Adds a state to this automaton. If this is supposed to be the initial state, make
+	 * sure that the state is set to be initial BEFORE adding it with this method.
+	 */ 
 	public void addState(State state)
 		throws IllegalArgumentException
 	{
@@ -608,7 +634,7 @@ public class Automaton
 
 		if ((prefix == null) || prefix.equals(""))
 		{
-			name = new StringBuffer("q" + uniqueStateIndex++);
+			name = new StringBuffer("q");
 		}
 		else
 		{
@@ -621,6 +647,10 @@ public class Automaton
 		}
 
 		return new State(name.toString());
+	}
+	public State createUniqueState()
+	{
+		return createUniqueState("q");
 	}
 
 	/**
@@ -800,10 +830,11 @@ public class Automaton
 		return (State) idStateMap.get(state.getId());
 	}
 
-	// Given this state, which belongs to this stateset, return a unique id-string
+	/**
+	 * Given this state, which belongs to this stateset, return a unique id-string
+	 */
 	public String getUniqueStateId(State state)
 	{
-
 		// prereq: state is in theStates:
 		return state.getId();    // at the moment do the simplest thing
 	}
@@ -1373,7 +1404,9 @@ public class Automaton
 		return getIndex();
 	}
 
-	// Don't do this in public
+	/**
+	 * Don't do this in public
+	 */
 	private String getUniqueStateId()
 	{
 		String newId;
@@ -1387,7 +1420,9 @@ public class Automaton
 		return newId;
 	}
 
-	// Don't do this in public
+	/**
+	 * Don't do this in public
+	 */
 	private int getUniqueStateIndex()
 	{
 		while (containsStateWithIndex(uniqueStateIndex))
@@ -1788,6 +1823,10 @@ public class Automaton
 	 */
 	public State mergeStates(State one, State two)
 	{
+		return mergeStates(one, two, false);
+	}
+	public State mergeStates(State one, State two, boolean useShortNames)
+	{
 		// Don't merge if equal
 		if (one.equals(two))
 		{
@@ -1795,15 +1834,17 @@ public class Automaton
 		}
 
 		// Make new state
-		State newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
+		State newState;
+		if (useShortNames)
+		{
+			newState = createUniqueState();
+		}
+		else
+		{
+			newState = new State(one.getName() + SupremicaProperties.getStateSeparator() + two.getName());
+		}
 		addState(newState);
 		
-		// Adjust name length
-		if (newState.getName().length() > 201804)
-		{
-			newState.setName(newState.getName().substring(0,10) + Math.random());
-		}
-
 		if (one.isAccepting() || two.isAccepting())
 		{
 			newState.setAccepting(true);

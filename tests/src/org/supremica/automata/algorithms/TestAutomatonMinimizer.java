@@ -150,18 +150,21 @@ public class TestAutomatonMinimizer
 			options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
 			options.setAlsoTransitions(true);
 			options.setKeepOriginal(true);
-
+			
 			// Test observation equivalence minimization
 			AutomatonMinimizer minimizer = new AutomatonMinimizer(theProject.getAutomaton("viii.b"));
 			Automaton observationMin = minimizer.getMinimizedAutomaton(options);
-			assertTrue((observationMin.nbrOfStates() == 5) && (observationMin.nbrOfTransitions() == 9) && 
+			assertTrue((observationMin.nbrOfStates() == 5) && 
+					   (observationMin.nbrOfTransitions() == 9) && 
 					   (observationMin.getStateWithName("0").nbrOfOutgoingArcs() == 3));
-
+			
 			// Test a part of the dining philosophers example (observation equivalence minimization)
 			minimizer = new AutomatonMinimizer(theProject.getAutomaton("P1F1F2"));
+			//options.setIgnoreMarking(true);
 			observationMin = minimizer.getMinimizedAutomaton(options);
 			assertTrue(observationMin.nbrOfStates() == 6);
 			assertTrue(observationMin.nbrOfTransitions() == 10);
+			assertTrue(observationMin.nbrOfEpsilonTransitions() == 2);
 		}
 		catch (Exception ex)
 		{

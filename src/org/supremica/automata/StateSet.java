@@ -108,6 +108,12 @@ public class StateSet
 		return theSet.add(state);
 	}
 
+	public boolean add(StateSet stateSet)
+	{
+		modified();
+		return theSet.addAll(stateSet.theSet);
+	}
+
 	public boolean add(Collection collection)
 	{
 		modified();
@@ -141,27 +147,25 @@ public class StateSet
 		return new StateIterator(theSet.iterator());
 	}
 
-	/*
 	public ArcIterator outgoingArcsIterator()
 	{
-		LinkedList arcs = new LinkedList();
-
-		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
-		{
-			for (ArcIterator arcIt = stateIt.nextState().outgoingArcsIterator(); arcIt.hasNext(); )
-			{
-				arcs.add(arcIt.nextArc());
-			}
-		}
-
-		return new ArcIterator(arcs.iterator());
+		return new ArcIterator(new StateSetOutgoingArcsIterator(this));
 	}
-	*/
 
 	public boolean remove(State state)
 	{
 		modified();
 		return theSet.remove(state);
+	}
+
+	/**
+	 * Removes and returns an arbitrary state from the set.
+	 */
+	public State remove()
+	{
+		State state = get();
+		remove(state);
+		return state;
 	}
 
 	public int size()
@@ -378,5 +382,77 @@ public class StateSet
 	private void modified()
 	{
 		singleStateRepresentation = null;
+	}
+
+	private class StateSetOutgoingArcsIterator
+		implements Iterator
+	{
+		private StateIterator stateIterator = null;
+		private ArcIterator currArcIterator = null;
+
+		public StateSetOutgoingArcsIterator(StateSet stateSet)
+		{
+			stateIterator = stateSet.iterator();
+			
+			// Find a state that has outgoing arcs
+			while (stateIterator.hasNext())
+			{
+				ArcIterator arcIt = stateIterator.nextState().outgoingArcsIterator();
+				
+				// If there are arcs in this iterator, we're done!
+				if (arcIt.hasNext())
+				{
+					currArcIterator = arcIt;
+					break;
+				}
+			}
+		}
+
+		public boolean hasNext()
+		{
+			if (currArcIterator == null)
+			{
+				return false;
+			}
+
+			return currArcIterator.hasNext();
+		}
+		
+		public Object next()
+			throws NoSuchElementException
+		{
+			return nextArc();
+		}
+		
+		public Arc nextArc()
+			throws NoSuchElementException
+		{
+			Arc arc = currArcIterator.nextArc();
+			
+			// Jump to the next state?
+			if (!currArcIterator.hasNext())
+			{
+				// Find a state that has outgoing arcs
+				while (stateIterator.hasNext())
+				{
+					ArcIterator arcIt = stateIterator.nextState().outgoingArcsIterator();
+
+					// If there are arcs in this iterator, we're done!
+					if (arcIt.hasNext())
+					{
+						currArcIterator = arcIt;
+						break;
+					}
+				}
+			}
+
+			return arc;
+		}
+		
+		public void remove()
+			throws UnsupportedOperationException, IllegalStateException
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 }

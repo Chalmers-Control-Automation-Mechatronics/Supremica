@@ -231,10 +231,24 @@ public class AutomataMinimizer
 			}
 			// */
 			
-			// Compose and minimize!
 			//logger.info("Hiding " + hideThese);
 			//logger.info("Target " + options.getTargetAlphabet());
-			Automaton min = monolithicMinimization(automata, hideThese);
+
+			// Perform the minimization, unless of course this is the last step 
+			// and it should be skipped...
+			Automaton min;
+ 			if (options.getSkipLast() && theAutomata.size() == 2)
+			{
+				// Just synch and hide
+				min = AutomataSynchronizer.synchronizeAutomata(automata);
+				min.hide(hideThese);
+			}
+			else
+			{
+				// Compose and minimize!
+				min = monolithicMinimization(automata, hideThese);
+			}
+
 			if (stopRequested)
 			{
 				return null;
@@ -260,6 +274,13 @@ public class AutomataMinimizer
 			}
 			*/
 
+			
+			if (AutomatonMinimizer.debug)
+			{
+				logger.error("---------------------------------------------------------------------");
+				logger.fatal("Automaton: " + (nbrOfAutomata-1-theAutomata.size())*100/(nbrOfAutomata-1));
+			}
+			
 			// Update execution dialog
 			if (executionDialog != null)
 			{
@@ -293,15 +314,19 @@ public class AutomataMinimizer
 		throws Exception
 	{
 		ActionTimer synchTimer = new ActionTimer();
-		synchTimer.start();
+
+		if (AutomatonMinimizer.debug)
+		{
+			synchTimer.start();
+		}
 
 		// Synch and hide
 		Automaton aut = AutomataSynchronizer.synchronizeAutomata(automata);
 		aut.hide(hideThese);
 
-		synchTimer.stop();
 		if (AutomatonMinimizer.debug)
 		{
+			synchTimer.stop();
 			logger.fatal("Synchronization: " + synchTimer);
 		}
 
@@ -328,7 +353,7 @@ public class AutomataMinimizer
 			threadToStop = minimizer;
 			aut = minimizer.getMinimizedAutomaton(options);
 			threadToStop = null;
-
+			
 			if (stopRequested)
 			{
 				return null;

@@ -58,15 +58,45 @@ public final class MinimizationOptions
 	private static Logger logger = LoggerFactory.createLogger(MinimizationOptions.class);
 
 	private boolean dialogOK = false;
+	/**
+	 * The equivalence relation that the minimization should be performed with respect to.
+	 */
 	private EquivalenceRelation equivalenceRelation;
+	/**
+	 * When set, the number of transitions is minimized as well.
+	 */
 	private boolean alsoTransitions;
+	/**
+	 * When set, the automata that are supplied to the minimization are kept and
+	 * the (destructive) minimization is performed on a copy instead. 
+	 */
 	private boolean keepOriginal;
+	/**
+	 * With this option set, marking is ignored, i.e. marked and nonmarked states are
+	 * not considered any different.
+	 */
 	private boolean ignoreMarking;
+	/**
+	 * When skipLast is set, in compositional minimization, the last minimization step
+	 * is skipped and a non-minimized automaton is returned. This is good for for example
+	 * for verification of nonblocking when the minimal result is not really of interest,
+	 * only the nonblocking status of the end result.
+	 */
+	private boolean skipLast;
+	/**
+	 * If many automata are present, when this option is set, they are composed and minimized
+	 * rather than being minimized individually.
+	 */
 	private boolean compositionalMinimization;
+	/**
+	 * The target alphabet, the events that are not in this alphabet will be hidden in the
+	 * final result.
+	 */
 	private Alphabet targetAlphabet;
 
 	/**
-	 * This constructor returns the options previously chosen by the user as per the state SupremicaProperties.
+	 * This constructor returns the options previously chosen by the user as per the 
+	 * current state of SupremicaProperties.
 	 */
 	public MinimizationOptions()
 	{
@@ -130,7 +160,6 @@ public final class MinimizationOptions
 	{
 		dialogOK = bool;
 	}
-
 	public boolean getDialogOK()
 	{
 		return dialogOK;
@@ -140,7 +169,6 @@ public final class MinimizationOptions
 	{
 		equivalenceRelation = rel;
 	}
-
 	public EquivalenceRelation getMinimizationType()
 	{
 		return equivalenceRelation;
@@ -150,7 +178,6 @@ public final class MinimizationOptions
 	{
 		alsoTransitions = bool;
 	}
-
 	public boolean getAlsoTransitions()
 	{
 		return alsoTransitions;
@@ -160,7 +187,6 @@ public final class MinimizationOptions
 	{
 		keepOriginal = bool;
 	}
-
 	public boolean getKeepOriginal()
 	{
 		return keepOriginal;
@@ -170,7 +196,6 @@ public final class MinimizationOptions
 	{
 		ignoreMarking = bool;
 	}
-
 	public boolean getIgnoreMarking()
 	{
 		return ignoreMarking;
@@ -180,17 +205,24 @@ public final class MinimizationOptions
 	{
 		compositionalMinimization = bool;
 	}
-
 	public boolean getCompositionalMinimization()
 	{
 		return compositionalMinimization;
+	}
+
+	public void setSkipLast(boolean bool)
+	{
+		skipLast = bool;
+	}
+	public boolean getSkipLast()
+	{
+		return skipLast;
 	}
 
 	public void setTargetAlphabet(Alphabet alpha)
 	{
 		targetAlphabet = alpha;
 	}
-
 	public Alphabet getTargetAlphabet()
 	{
 		return targetAlphabet;

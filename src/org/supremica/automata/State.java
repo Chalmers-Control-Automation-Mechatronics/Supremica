@@ -566,23 +566,10 @@ public class State
 		return new ArcIterator(incomingArcs.iterator());
 	}
 
-/*      public StateIterator nextStateIterator()
-		{
-				StateSet nextStates = new StateSet();
-				for (Iterator arcSetIt = outgoingArcSetIterator(); arcSetIt.hasNext(); )
-				{
-						ArcSet currArcSet = (ArcSet)arcSetIt.next();
-						nextStates.add(currArcSet.getToState());
-				}
-				return nextStates.iterator();
-		}
-*/
-
-	// Varför har man outgoingArcSet istället för helt enkelt outgoingArcs??
 	public StateIterator nextStateIterator()
 	{
 		StateSet nextStates = new StateSet();
-		ArcIterator arcIt = safeOutgoingArcsIterator();
+		ArcIterator arcIt = outgoingArcsIterator();
 
 		while (arcIt.hasNext())
 		{
@@ -753,20 +740,21 @@ public class State
 	}
 
 	/**
-	 * Follow the event e and return the next state.
-	 * If e is not active then return null.
+	 * Follow the label "theEvent" and return the next state (only one if many.
+	 * If "theEvent" is not active then return null.
 	 *
-	 *@param  event The event
+	 *@param  theEvent Description of the Parameter
+	 *@return  Description of the Return Value
 	 */
-	public State nextState(LabeledEvent event)
+	public State nextState(String theEvent)
 	{
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
+
 		while (outgoingArcsIt.hasNext())
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
 
-			// if (currArc.getEventId().equals(eventId))
-			if (currArc.getEvent().equals(event))
+			if (currArc.getEvent().getLabel().equals(theEvent))
 			{
 				return currArc.getToState();
 			}
@@ -776,23 +764,144 @@ public class State
 	}
 
 	/**
-	 * Follow the event "event" and return the set of states that may be reached
+	 * Follow the event "theEvent" and return the next state (only one if many).
+	 * If "theEvent" is not enabled then return null.
+	 *
+	 *@param theEvent The event
 	 */
-	public StateSet nextStateSet(LabeledEvent event)
+	public State nextState(LabeledEvent theEvent)
 	{
-		StateSet states = new StateSet();
-
+		return nextState(theEvent.getLabel());
+		/*
 		Iterator outgoingArcsIt = outgoingArcs.iterator();
 		while (outgoingArcsIt.hasNext())
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
-			if (currArc.getEvent().equals(event))
+
+			// if (currArc.getEventId().equals(eventId))
+			if (currArc.getEvent().equals(theEvent))
 			{
-				states.add(currArc.getToState());
+				return currArc.getToState();
 			}
 		}
 
+		return null;
+		*/
+	}
+
+	/**
+	 * Follow the event "theEvent" and return the set of states that may be reached.
+	 */
+	public StateSet nextStateSet(LabeledEvent theEvent)
+	{
+		return nextStateSet(theEvent, false);
+	}
+
+	/**
+	 * Follow the event "theEvent" and return the set of states that may be reached. 
+	 * Optionally also consider the states reachable also after any number of
+	 * epsilon events before and/or after "theEvent".
+	 */
+	public StateSet nextStateSet(LabeledEvent theEvent, boolean considerEpsilonClosure)
+	{
+		StateSet states = new StateSet();
+		
+		ArcIterator outgoingArcsIt;
+		if (considerEpsilonClosure)
+		{
+			outgoingArcsIt = epsilonClosure().outgoingArcsIterator();
+		}
+		else
+		{
+			outgoingArcsIt = outgoingArcsIterator();
+		}
+		while (outgoingArcsIt.hasNext())
+		{			
+			Arc currArc = outgoingArcsIt.nextArc();
+			if (currArc.getEvent().equals(theEvent))
+			{
+				if (considerEpsilonClosure)
+				{
+					states.add(currArc.getToState().epsilonClosure());
+				}
+				else
+				{
+					states.add(currArc.getToState());
+				}
+			}
+		}
+
+		// If it's an epsilon event, this state has to be in the set!!!
+		if (theEvent.isEpsilon())
+		{
+			states.add(this);
+		}
+		
 		return states;
+	}
+
+	/**
+	 * Calculates and returns epsilon closure as a StateSet. The closure includes the 
+	 * state from which the closure is calculated.
+	 */
+	public StateSet epsilonClosure()
+	{
+		StateSet result = new StateSet();
+		result.add(this);
+
+		LinkedList statesToExamine = new LinkedList();
+		statesToExamine.add(this);
+		while (statesToExamine.size() != 0)
+		{
+			State currState = (State) statesToExamine.removeFirst();
+
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+				State state = currArc.getToState();
+				
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
+					!result.contains(state))
+				{
+					statesToExamine.add(state);
+					result.add(state);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Calculates and returns backwards epsilon closure as a StateSet. The closure includes the 
+	 * state from which the closure is calculated.
+	 */
+	public StateSet backwardsEpsilonClosure()
+	{
+		StateSet result = new StateSet();
+		result.add(this);
+
+		LinkedList statesToExamine = new LinkedList();
+		statesToExamine.add(this);
+		while (statesToExamine.size() != 0)
+		{
+			State currState = (State) statesToExamine.removeFirst();
+
+			for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+				State state = currArc.getFromState();
+
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && 
+					!result.contains(state))
+				{
+					statesToExamine.add(state);
+					result.add(state);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -807,7 +916,7 @@ public class State
 		{
 			Arc currArc = (Arc) outgoingArcsIt.next();
 
-			if (currArc.getEvent().equals(label))
+			if (currArc.getEvent().getLabel().equals(label))
 			{
 				return true;
 			}
@@ -815,31 +924,9 @@ public class State
 
 		return false;
 	}
-
-	/**
-	 * Follow the label e and return the next state.
-	 * If e is not active then return null.
-	 *
-	 *@param  e Description of the Parameter
-	 *@return  Description of the Return Value
-	 */
-	public State nextState(String event)
+	public boolean isEnabled(LabeledEvent event)
 	{
-		Iterator outgoingArcsIt = outgoingArcs.iterator();
-
-		// String eventId = e.getId();
-		while (outgoingArcsIt.hasNext())
-		{
-			Arc currArc = (Arc) outgoingArcsIt.next();
-
-			// if (currArc.getEventId().equals(eventId))
-			if (currArc.getEvent().getLabel().equals(event))
-			{
-				return currArc.getToState();
-			}
-		}
-
-		return null;
+		return isEnabled(event.getLabel());
 	}
 
 	public boolean contains(int x1, int y1)

@@ -55,7 +55,7 @@ import java.util.NoSuchElementException;
 public class ArcIterator
 	implements Iterator
 {
-	private final Iterator theIterator;
+	private Iterator theIterator;
 
 	public ArcIterator(Iterator theIterator)
 	{
