@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ValidTest.java,v 1.2 2005-02-18 01:32:42 robi Exp $
 //###########################################################################
 
 
@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerConfigurationException;
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -29,7 +28,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 
 
-public class ValidTest extends TestCase
+public class ValidTest extends WatersTestCase
 {
 
   //#########################################################################
@@ -192,8 +191,8 @@ public class ValidTest extends TestCase
     mUnmarshaller = new ValidUnmarshaller();
     mDESMarshaller = new ProductDESMarshaller();
     mModuleMarshaller = new ModuleMarshaller();
-    mInputDirectory = new File("examples", "valid");
-    mOutputDirectory = new File("logs", "valid");
+    mInputDirectory = new File(getInputRoot(), "valid");
+    mOutputDirectory = new File(getOutputRoot(), "valid");
     mDocumentManager = new DocumentManager();
     mDocumentManager.register(mDESMarshaller);
     mDocumentManager.register(mModuleMarshaller);

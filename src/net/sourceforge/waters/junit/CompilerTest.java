@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: CompilerTest.java,v 1.2 2005-02-18 01:32:42 robi Exp $
 //###########################################################################
 
 
@@ -12,7 +12,6 @@ package net.sourceforge.waters.junit;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.bind.JAXBException;
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -29,7 +28,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 
 
 public class CompilerTest
-  extends TestCase
+  extends WatersTestCase
 {
 
   //#########################################################################
@@ -174,8 +173,8 @@ public class CompilerTest
   protected void setUp()
     throws JAXBException
   { 
-    mInputDirectory = new File("examples", "handwritten");
-    mOutputDirectory = new File("logs", "compiler");
+    mInputDirectory = new File(getInputRoot(), "handwritten");
+    mOutputDirectory = new File(getOutputRoot(), "compiler");
     mModuleMarshaller = new ModuleMarshaller();
     mDESMarshaller = new ProductDESMarshaller();
     mDocumentManager = new DocumentManager();

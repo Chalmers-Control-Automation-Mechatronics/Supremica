@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: AlgorithmsTest.java,v 1.2 2005-02-18 01:32:42 robi Exp $
 //###########################################################################
 
 
@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerConfigurationException;
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
@@ -34,7 +33,7 @@ import net.sourceforge.waters.samples.algorithms.Hiding;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 
 
-public class AlgorithmsTest extends TestCase
+public class AlgorithmsTest extends WatersTestCase
 {
 
   //#########################################################################
@@ -83,23 +82,20 @@ public class AlgorithmsTest extends TestCase
     testExpected(reduced2, expected);
   }
 
-  public void testHide_linwon90_projsystem_synth1()
+  /*
+  public void testHide_linwon90_projsystem1a_1()
     throws IOException, JAXBException, WatersException,
 	   TransformerConfigurationException
   {
     final String subdirname = "linwon90";
-    final String[] events = {"tau"};
-    final ProductDESProxy des = compileValid(subdirname, "projsystem_synth1");
-    final AutomatonProxy hidden = hide(des, "synth1_vhide", events, true);
-    //save(des, hidden);
-    //final ProductDESProxy expected = getExpectedValid(subdirname, hidden);
-    //testExpected(hidden, expected);
+    final String[] events = {"load[1]", "load[2]", "load[3]", "load[4]"};
+    final ProductDESProxy des = compileValid(subdirname, "projsystem1a");
+    final AutomatonProxy hidden = hide(des, "projsystem1a", events, true);
     final AutomatonProxy reduced = iterativeReduce(hidden);
-    //save(des, hidden);
-    //testExpected(reduced, expected);
-
   }
+  */
 
+  /*
   public void testHide_linwon90_projsystem1()
     throws IOException, JAXBException, WatersException,
 	   TransformerConfigurationException
@@ -115,6 +111,7 @@ public class AlgorithmsTest extends TestCase
     //save(des, hidden);
     //testExpected(reduced, expected);
   }
+  */
 
   /*
   public void testHide_linwon90_projsystem()
@@ -254,7 +251,8 @@ public class AlgorithmsTest extends TestCase
     } else {
       name = des.getName();
     }
-    final String outextname = name + mDESMarshaller.getDefaultExtension();
+    final String filename = eliminateStrangeCharacters(name);
+    final String outextname = filename + mDESMarshaller.getDefaultExtension();
     final File outfilename = new File(mOutputDirectory, outextname);
     mDESMarshaller.marshal(des, outfilename);
   }			
@@ -276,7 +274,8 @@ public class AlgorithmsTest extends TestCase
     throws IOException, JAXBException, WatersException
   {
     final String name = aut.getName();
-    final String extname = name + mDESMarshaller.getDefaultExtension();
+    final String filename = eliminateStrangeCharacters(name);
+    final String extname = filename + mDESMarshaller.getDefaultExtension();
     final File testfilename = new File(mWatersInputDirectory, extname);
     return (ProductDESProxy) mDESMarshaller.unmarshal(testfilename);
   }
@@ -286,7 +285,8 @@ public class AlgorithmsTest extends TestCase
     throws IOException, JAXBException, WatersException
   {
     final String name = aut.getName();
-    final String extname = name + mDESMarshaller.getDefaultExtension();
+    final String filename = eliminateStrangeCharacters(name);
+    final String extname = filename + mDESMarshaller.getDefaultExtension();
     final File indirname = new File(mValidInputDirectory, subdirname);
     final File testfilename = new File(indirname, extname);
     return (ProductDESProxy) mDESMarshaller.unmarshal(testfilename);
@@ -302,6 +302,19 @@ public class AlgorithmsTest extends TestCase
     assertTrue("Unexpected result!", expectedaut.equals(aut));
   }
 
+  private String eliminateStrangeCharacters(final String name)
+  {
+    final StringBuffer buffer = new StringBuffer(name);
+    final int len = buffer.length();
+    for (int i = 0; i < len; i++) {
+      final char ch = buffer.charAt(i);
+      if (!Character.isJavaIdentifierPart(ch)) {
+	buffer.setCharAt(i, '_');
+      }
+    }
+    return buffer.toString();
+  }
+
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
@@ -314,8 +327,8 @@ public class AlgorithmsTest extends TestCase
     mDocumentManager = new DocumentManager();
     mDocumentManager.register(mModuleMarshaller);
     mDocumentManager.register(mDESMarshaller);
-    mWatersInputDirectory = new File("examples", "handwritten");
-    mValidInputDirectory = new File("examples", "valid");
+    mWatersInputDirectory = new File(getInputRoot(), "handwritten");
+    mValidInputDirectory = new File(getInputRoot(), "valid");
     mOutputDirectory = new File("logs", "algorithms");
   }
 

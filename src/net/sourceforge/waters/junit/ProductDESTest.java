@@ -3,7 +3,7 @@
 //# PACKAGE: waters.junit
 //# CLASS:   ProductDESTest
 //###########################################################################
-//# $Id: ProductDESTest.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: ProductDESTest.java,v 1.2 2005-02-18 01:32:42 robi Exp $
 //###########################################################################
 
 
@@ -74,8 +74,8 @@ public class ProductDESTest extends JAXBTestCase
   { 
     super.setUp();
     mMarshaller = new ProductDESMarshaller();
-    mInputDirectory = new File("examples", "handwritten");
-    mOutputDirectory = new File("logs", "des");
+    mInputDirectory = new File(getInputRoot(), "handwritten");
+    mOutputDirectory = new File(getOutputRoot(), "des");
   }
 
   protected void tearDown()
