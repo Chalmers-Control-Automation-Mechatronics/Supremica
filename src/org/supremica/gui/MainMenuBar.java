@@ -769,7 +769,7 @@ public class MainMenuBar
 
 		JMenuItem menuToolsCodeGenerationSMV = new JMenuItem();
 
-		menuToolsCodeGenerationSMV.setText("NuSMV...");
+		menuToolsCodeGenerationSMV.setText("SMV...");
 		menuToolsCodeGeneration.add(menuToolsCodeGenerationSMV);
 		menuToolsCodeGenerationSMV.addActionListener(new ActionListener()
 		{
