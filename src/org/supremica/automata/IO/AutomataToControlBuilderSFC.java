@@ -51,6 +51,7 @@ package org.supremica.automata.IO;
 
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.*;
 import java.io.*;
 import java.util.*;
 
@@ -207,6 +208,8 @@ public class AutomataToControlBuilderSFC
 
 	protected void automatonConverter(Project theProject, PrintWriter pw)
 	{
+		EnumerateStates enumer = new EnumerateStates(theProject, "q");
+		enumer.execute();
 		for (Iterator automataIt = theProject.iterator(); automataIt.hasNext(); )
 		{
 
