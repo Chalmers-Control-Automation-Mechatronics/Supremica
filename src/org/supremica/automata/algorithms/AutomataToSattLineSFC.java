@@ -65,7 +65,16 @@ public class AutomataToSattLineSFC
 	public AutomataToSattLineSFC(Automata automata)
 	{
 		this.automata = automata;
-		canonical = false;
+	}
+
+	public void serialize(String filename)
+	{ // Empty
+
+	}
+
+	public void serialize(PrintWriter pw)
+	{ // Empty
+
 	}
 
 	public void serialize_s(PrintWriter pw)
