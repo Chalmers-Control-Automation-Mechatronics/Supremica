@@ -312,7 +312,7 @@ public class RobotCellExaminer
 						Position to = (Position) positions.get(j);
 
 						// Examine path for collisions
-						logger.debug("Examining collisions from " + from + " to " + to + " for " + robot + ".");
+						logger.info("Examining the motion from " + from + " to " + to + " for " + robot + ".");
 						cell.examineCollisions(robot, from, to);
 					}
 				}
