@@ -54,14 +54,18 @@ import java.util.*;
 public class AutomatonType
 {
 	private static List collection = new LinkedList();
-	public static final AutomatonType Undefined = new AutomatonType();
-	public static final AutomatonType Plant = new AutomatonType();
-	public static final AutomatonType Specification = new AutomatonType();
-	public static final AutomatonType Supervisor = new AutomatonType();
+	public static final AutomatonType Undefined = new AutomatonType("Undefined");
+	public static final AutomatonType Plant = new AutomatonType("Plant");
+	public static final AutomatonType Specification = new AutomatonType("Specification");
+	public static final AutomatonType Supervisor = new AutomatonType("Supervisor");
+	public static final AutomatonType Interface = new AutomatonType("Interface");
 
-	private AutomatonType()
+	private String identifier;
+
+	private AutomatonType(String identifier)
 	{
 		collection.add(this);
+		this.identifier = identifier;
 	}
 
 	public static Iterator iterator()
@@ -69,58 +73,48 @@ public class AutomatonType
 		return collection.iterator();
 	}
 
-	public static AutomatonType toType(String value)
+	public String toString()
 	{
-		if (value == null)
-		{
-			return null;
-		}
+		return identifier;
+	}
 
-		if (value.equals("Undefined"))
-		{
-			return Undefined;
-		}
-
-		if (value.equals("Plant"))
+	public static AutomatonType toType(String type)
+	{
+		if (equalType(Plant, type))
 		{
 			return Plant;
 		}
 
-		if (value.equals("Specification"))
+		if (equalType(Specification, type))
 		{
 			return Specification;
 		}
 
-		if (value.equals("Supervisor"))
+		if (equalType(Supervisor, type))
 		{
 			return Supervisor;
+		}
+
+		if (equalType(Interface, type))
+		{
+			return Interface;
 		}
 
 		return Undefined;
 	}
 
-	public String toString()
+	public static Object[] toArray()
 	{
-		if (this == Undefined)
-		{
-			return "Undefined";
-		}
-
-		if (this == Plant)
-		{
-			return "Plant";
-		}
-
-		if (this == Specification)
-		{
-			return "Specification";
-		}
-
-		if (this == Supervisor)
-		{
-			return "Supervisor";
-		}
-
-		return "Unknown type";
+		return collection.toArray();
 	}
+
+	private static boolean equalType(AutomatonType type, String ident)
+	{
+		if (type == null || ident == null)
+		{
+			return false;
+		}
+		return ident.toLowerCase().equals(type.toString().toLowerCase());
+	}
+
 }

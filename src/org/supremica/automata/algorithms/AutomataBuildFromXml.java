@@ -284,31 +284,12 @@ public class AutomataBuildFromXml
 
 		String type = attributes.getValue("type");
 
+		AutomatonType currType = AutomatonType.Undefined;
 		if (type != null)
 		{
-			String lowerCaseType = type.toLowerCase();
-			String plantLowerCase = AutomatonType.Plant.toString().toLowerCase();
-			String specificationLowerCase = AutomatonType.Specification.toString().toLowerCase();
-			String supervisorLowerCase = AutomatonType.Supervisor.toString().toLowerCase();
-			AutomatonType currType = AutomatonType.Undefined;
-
-			if (lowerCaseType.equals(plantLowerCase))
-			{
-				currType = AutomatonType.Plant;
-			}
-
-			if (lowerCaseType.equals(specificationLowerCase))
-			{
-				currType = AutomatonType.Specification;
-			}
-
-			if (lowerCaseType.equals(supervisorLowerCase))
-			{
-				currType = AutomatonType.Supervisor;
-			}
-
-			currAutomaton.setType(currType);
+			currType = AutomatonType.toType(type);
 		}
+		currAutomaton.setType(currType);
 
 		currAutomaton.setName(name);
 		currAutomaton.setAlphabet(currAlphabet);

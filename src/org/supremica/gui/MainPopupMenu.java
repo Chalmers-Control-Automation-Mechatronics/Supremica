@@ -182,21 +182,6 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
-		
-		//-- MF Route --
-		JMenuItem routeItem = new JMenuItem("Route...");
-		
-		menuHandler.add(routeItem, 1);
-		routeItem.addActionListener(new ActionListener()
-		{
-
-			// anonymous class (is this a good thing?)
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.routeAction(getGui());
-				getGui().repaint();
-			}
-		});
 
 		menuHandler.addSeparator();
 		// ----------------------------------------------
