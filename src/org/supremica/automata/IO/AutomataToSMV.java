@@ -92,14 +92,10 @@ public class AutomataToSMV
 			pw.println("--    Automaton: " + currAutomaton.getName());
 		}
 
-		pw.println("\ntask main()");
-		pw.println("{");
+		//pw.println("\ntask main()");
+		//pw.println("{");
 	}
 
-	void printEndProgram(PrintWriter pw)
-	{
-		pw.println("}");
-	}
 
 	void printEventVariables(PrintWriter pw)
 	{
@@ -114,9 +110,11 @@ public class AutomataToSMV
 
 	}
 
-	void printStateVariables(PrintWriter pw)
+	void printStateModule(PrintWriter pw)
 		throws Exception
 	{
+		pw.println("MODULE state");
+		pw.println("VAR");
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
@@ -126,11 +124,51 @@ public class AutomataToSMV
 				throw new Exception("AutomataToSMV.printStateVariables: all automata must have an initial state");
 			}
 			int currAutomatonIndex = currAutomaton.getSynchIndex();
-			int currStateIndex = initialState.getSynchIndex();
-			printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex, initialState.getName() + " in " + currAutomaton.getName(), Integer.toString(currStateIndex));
+
+			//printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex, initialState.getName() + " in " + currAutomaton.getName(), Integer.toString(currStateIndex));
+
+			pw.print("\tq_" + currAutomatonIndex + " : {" );
+			for (StateIterator stateIt = currAutomaton.stateIterator(); stateIt.hasNext(); )
+			{
+				State currState = stateIt.nextState();
+				int currStateIndex = currState.getSynchIndex();
+				pw.print("q_" + currAutomatonIndex + "_" + currStateIndex);
+				if (stateIt.hasNext())
+				{
+					pw.print(", ");
+				}
+			}
+
+			pw.println("};" + " -- " + currAutomaton.getName());
 		}
 	}
 
+
+	void printInitialStates(PrintWriter pw)
+		throws Exception
+	{
+		pw.println("INIT");
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			State initialState = currAutomaton.getInitialState();
+			if (initialState == null)
+			{
+				throw new Exception("AutomataToSMV.printStateModule: all automata must have an initial state");
+			}
+			int currAutomatonIndex = currAutomaton.getSynchIndex();
+			int initialStateIndex = initialState.getSynchIndex();
+
+			pw.print("\tq_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + initialStateIndex + " ");
+			if (autIt.hasNext())
+			{
+				pw.print("& ");
+			}
+			pw.println(" -- " + initialState.getName() + " in " + currAutomaton.getName() + "\n");
+		}
+	}
+
+	// Remove this
 	private void printBooleanVariableDeclaration(PrintWriter pw, String variableName, String comment, String initvalue)
 	{
 		pw.print("\tint " + variableName);
@@ -500,18 +538,19 @@ public class AutomataToSMV
 	{
 		initialize();
 		printBeginProgram(pw);
-		printEventVariables(pw);
-		printStateVariables(pw);
-		printBeginScanCycle(pw);
-		printComputeEnabledEvents(pw);
-		printComputeExternalEnabledEvents(pw);
-		printComputeSingleEnabledEvent(pw);
-		printChangeStateTransitions(pw);
-		printEndScanCycle(pw);
-		printEndProgram(pw);
-		printInitializationFunction(pw);
-		printComputeExternalEnabledEventsFunctions(pw);
-		printDoEnabledEventsFunctions(pw);
+		printInitialStates(pw);
+		//printEventVariables(pw);
+		printStateModule(pw);
+		//printBeginScanCycle(pw);
+		//printComputeEnabledEvents(pw);
+		//printComputeExternalEnabledEvents(pw);
+		//printComputeSingleEnabledEvent(pw);
+		//printChangeStateTransitions(pw);
+		//printEndScanCycle(pw);
+		//printEndProgram(pw);
+		//printInitializationFunction(pw);
+		//printComputeExternalEnabledEventsFunctions(pw);
+		//printDoEnabledEventsFunctions(pw);
 	}
 
 }
