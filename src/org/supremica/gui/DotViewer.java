@@ -63,6 +63,7 @@ import java.awt.geom.Rectangle2D;
 
 public class DotViewer
 	extends JFrame
+	implements DotViewerInterface
 {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
@@ -87,7 +88,7 @@ public class DotViewer
 								MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
 	private double scaleFactor = SCALE_RESET;
 	private Process dotProcess;
-	private Builder builder;
+	private DotBuilder builder;
 	private String objectName = "";
 	private GraphicsToClipboard toClipboard = null;
 
@@ -462,7 +463,7 @@ public class DotViewer
 	public void build()
 		throws Exception
 	{
-		builder = new Builder(this);
+		builder = new DotBuilder(this);
 
 		builder.start();
 	}
@@ -513,7 +514,7 @@ public class DotViewer
 	}
 
 	public void internalBuild()
-		throws Exception
+//		throws Exception
 	{
 		AutomataSerializer serializer = getSerializer();
 
@@ -525,8 +526,8 @@ public class DotViewer
 		{
 			toDotWriter.close();
 			logger.debug(ex.getStackTrace());
-
-			throw ex;
+			return;
+			//throw ex;
 		}
 
 		// Send the file to dot
@@ -550,7 +551,7 @@ public class DotViewer
 	}
 
 	private void parseResponse(InputStream inputStream)
-		throws Exception
+//		throws Exception
 	{
 
 		// Parse the response from dot
@@ -564,12 +565,21 @@ public class DotViewer
 		{
 			logger.error("Exception while parsing dot file", ex);
 			logger.debug(ex.getStackTrace());
-
-			throw ex;
+			return;
+//			throw ex;
 		}
 		finally
 		{
-			inputStream.close();
+			try
+			{
+				inputStream.close();
+			}
+			catch (IOException ex)
+			{
+				logger.error("Exception while closing input stream", ex);
+				logger.debug(ex.getStackTrace());
+				return;
+			}
 		}
 
 		try
@@ -580,8 +590,8 @@ public class DotViewer
 		{
 			logger.error("Exception while getting dot graph", ex);
 			logger.debug(ex.getStackTrace());
-
-			throw ex;
+			return;
+//			throw ex;
 		}
 	}
 
@@ -961,7 +971,8 @@ public class DotViewer
 
 }
 
-class Builder
+/*
+public class Builder
 	extends Thread
 {
 	private DotViewer theViewer = null;
@@ -1016,3 +1027,4 @@ class Builder
 		}
 	}
 }
+*/
