@@ -582,8 +582,6 @@ public class RouteController
 	    }
 	}
 
-	//System.out.println( "getBgStatus: " + view.getBgImageStatus() + "     Efter");
-	//System.out.println( "initialized: " + initialized() + "       Efter" );
 	if ( view.getBgImageStatus() )
 	    view.repaint();
 
