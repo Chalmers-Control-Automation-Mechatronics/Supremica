@@ -91,7 +91,6 @@ public class AutomatonMinimizer
 	private MinimizationOptions options;
 
 	// Local debug stuff... to be erased when things are stable!
-	public static final boolean debug = false;
 	private static int totalA = 0;
 	private static int totalB = 0;
 	private static int totalC = 0;
@@ -196,12 +195,9 @@ public class AutomatonMinimizer
 			theAutomaton.removeState((State) toBeRemoved.remove(0));
 		}
 
-		if (debug)
-		{
-			Thread.sleep(0);
-			preMinimizationTimer.start();
-		}
-
+		// Debug
+		preMinimizationTimer.start();
+			
 		// Find out what to do
 		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
 		if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
@@ -215,13 +211,10 @@ public class AutomatonMinimizer
 				theAutomaton = determinizer.getNewAutomaton();
 			}
 
-			if (debug)
-			{
-				preMinimizationTimer.stop();
-				logger.fatal("Determinization: " + preMinimizationTimer);
-				Thread.sleep(0);
-				partitioningTimer.start();
-			}
+			// Debug
+			preMinimizationTimer.stop();
+			logger.debug("Determinization: " + preMinimizationTimer);
+			partitioningTimer.start();
 
 			// Now we're ready for partitioning!
 		}
@@ -242,13 +235,10 @@ public class AutomatonMinimizer
 							   "before running the partitioning.");
 			}
 
-			if (debug)
-			{
-				preMinimizationTimer.stop();
-				logger.fatal("Pre partitioning: " + preMinimizationTimer);
-				Thread.sleep(0);
-				partitioningTimer.start();
-			}
+			// Debug
+			preMinimizationTimer.stop();
+			logger.debug("Pre partitioning: " + preMinimizationTimer);
+			partitioningTimer.start();
 
 			// Now we're ready for partitioning!
 		}
@@ -280,13 +270,10 @@ public class AutomatonMinimizer
 				return newAutomaton;
 			}
 
-			if (debug)
-			{
-				preMinimizationTimer.stop();
-				logger.fatal("Merge loops: " + preMinimizationTimer);
-				Thread.sleep(0);
-				adjustMarkingTimer.start();	
-			}
+			// Debug
+			preMinimizationTimer.stop();
+			logger.debug("Merge loops: " + preMinimizationTimer);
+			adjustMarkingTimer.start();	
 			
 			////////////
 			// RULE D //
@@ -296,14 +283,16 @@ public class AutomatonMinimizer
 			int countD = ruleD(theAutomaton); // Not OE
 			totalD += countD;
 			
-			if (debug)
-			{
-				adjustMarkingTimer.stop();	
-				logger.fatal("Adjust markings: " + adjustMarkingTimer);
-				Thread.sleep(0);
-				rulesTimer.start();
-			}
+			// Debug
+			adjustMarkingTimer.stop();	
+			logger.debug("Adjust markings: " + adjustMarkingTimer);
+			rulesTimer.start();
 	
+			if (stopRequested)
+			{
+				return null;
+			}
+
 			//////////////////////
 			// RULES A, B, C, F //
 			//////////////////////
@@ -315,13 +304,10 @@ public class AutomatonMinimizer
 							   "before running partitioning.");
 			}
 			
-			if (debug)
-			{
-				rulesTimer.stop();	
-				logger.fatal("Rules A, B, C and F: " + rulesTimer);
-				Thread.sleep(0);
-				partitioningTimer.start();
-			}
+			// Debug
+			rulesTimer.stop();	
+			logger.debug("Rules A, B, C and F: " + rulesTimer);
+			partitioningTimer.start();
 			
 			// Now we're ready for partitioning!
 		}
@@ -358,13 +344,10 @@ public class AutomatonMinimizer
 			throw ex;
 		}
 		
-		if (debug)
-		{
-			partitioningTimer.stop();	
-			logger.fatal("Partitioning: " + partitioningTimer);
-			Thread.sleep(0);
-			automataBuildTimer.start();
-		}
+		// Debug
+		partitioningTimer.stop();	
+		logger.debug("Partitioning: " + partitioningTimer);
+		automataBuildTimer.start();
 
 		// Build the minimized automaton based on the partitioning in equivClasses
 		Automaton newAutomaton = buildAutomaton(equivClasses);
@@ -381,13 +364,10 @@ public class AutomatonMinimizer
 			return null;
 		}
 
-		if (debug)
-		{
-			automataBuildTimer.stop();
-			logger.fatal("Automaton build: " + automataBuildTimer);
-			Thread.sleep(0);
-			postMinimizationTimer.start();
-		}
+		// Debug
+		automataBuildTimer.stop();
+		logger.debug("Automaton build: " + automataBuildTimer);
+		postMinimizationTimer.start();
 		
 		// Apply rules
 		if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
@@ -404,13 +384,10 @@ public class AutomatonMinimizer
 			}
 		}
 
-		if (debug)
-		{
-			postMinimizationTimer.stop();
-			logger.fatal("Conflict equivalence rules: " + postMinimizationTimer);
-			Thread.sleep(0);
-			removeTransitionsTimer.start();
-		}
+		// Debug
+		postMinimizationTimer.stop();
+		logger.debug("Conflict equivalence rules: " + postMinimizationTimer);
+		removeTransitionsTimer.start();
 
 		// Should we remove redundant transitions to minimize also with respect to transitions?
 		int transitionCount = 0;
@@ -422,13 +399,10 @@ public class AutomatonMinimizer
 			totalArcs += countArcs;
 		}
 
-   		if (debug)
-		{
-			removeTransitionsTimer.stop();
-			if (options.getAlsoTransitions())
-				logger.fatal("Remove transitions: " + removeTransitionsTimer.toString().trim() + ", peak number of transitions: " + transitionCount);
-			Thread.sleep(0);
-		}
+		// Debug
+		removeTransitionsTimer.stop();
+		if (options.getAlsoTransitions())
+			logger.debug("Remove transitions: " + removeTransitionsTimer.toString().trim() + ", peak number of transitions: " + transitionCount);
 
 		// Remove from alphabet epsilon events that are never used
 		removeUnusedEpsilonEvents(newAutomaton);
@@ -1000,14 +974,13 @@ public class AutomatonMinimizer
 				}
 
 				totalArcs += countArcs;
-				if (debug && countArcs > 0)
+				if (countArcs > 0)
 				{
-					logger.verbose("Removed " + countArcs + " redundant transitions.");
+					logger.debug("Removed " + countArcs + " redundant transitions.");
 				}
 				
-				if (debug)
-					logger.warn("Rule A: " + countA + ", rule B: " + countB + 
-								", rule C: " + countC + ", rule F: " + countF);
+				logger.debug("Rule A: " + countA + ", rule B: " + countB + 
+							 ", rule C: " + countC + ", rule F: " + countF);
 				count = countA+countB+countC+countF;
 				total += count;
 			} while (count > 0);
@@ -1433,10 +1406,7 @@ public class AutomatonMinimizer
 		while (toBeRemoved.size() != 0)
 		{
 			State remove = (State) toBeRemoved.remove(0);
-			if (debug)
-			{
-				logger.fatal("Nonreachable state: " + remove);
-			}
+			logger.debug("Nonreachable state: " + remove);
 
 			aut.removeState(remove);
 			countC++;

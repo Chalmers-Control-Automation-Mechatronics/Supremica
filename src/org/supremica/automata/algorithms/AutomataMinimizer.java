@@ -184,11 +184,9 @@ public class AutomataMinimizer
 			// Dispose of originals
 			automata.clear();
 
-			if (AutomatonMinimizer.debug)
-			{
-				logger.error("---------------------------------------------------------------------");
-				logger.fatal("Progress: " + (nbrOfAutomata-theAutomata.size())*100/(nbrOfAutomata-1) + "%");
-			}
+			// Debug
+			logger.debug("---------------------------------------------------------------------");
+			logger.debug("Progress: " + (nbrOfAutomata-theAutomata.size())*100/(nbrOfAutomata-1) + "%");
 			
 			// Update execution dialog
 			if (executionDialog != null)
@@ -472,10 +470,8 @@ public class AutomataMinimizer
 	{
 		ActionTimer synchTimer = new ActionTimer();
 
-		if (AutomatonMinimizer.debug)
-		{
-			synchTimer.start();
-		}
+		// Debug
+		synchTimer.start();
 
 		// We don't really care about the state names, keep them short!
 		boolean useShortStateNames = true;
@@ -510,11 +506,9 @@ public class AutomataMinimizer
 		// Hide the events!
 		aut.hide(hideThese);
 
- 		if (AutomatonMinimizer.debug)
-		{
-			synchTimer.stop();
-			logger.fatal("Synchronization: " + synchTimer);
-		}
+		// Debug
+		synchTimer.stop();
+		logger.debug("Synchronization: " + synchTimer);
 
 		// Examine for largest automaton size
 		if (aut.nbrOfStates() > largestAutomatonSize)
