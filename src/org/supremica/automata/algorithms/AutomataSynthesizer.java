@@ -544,7 +544,7 @@ public class AutomataSynthesizer
 
 		// We need to synthesize even if the result above is controllable
 		// Nonblocking may ruin controllability
-		// ARASH: choose between tripple and the single fixpoint algorithms:
+		// ARASH: choose between triple and the single fixpoint algorithms:
 		AutomatonSynthesizer synthesizer = singleFixpoint
 										   ? new AutomatonSynthesizerSingleFixpoint(retval.automaton, synthesizerOptions)
 										   : new AutomatonSynthesizer(retval.automaton, synthesizerOptions);
