@@ -75,7 +75,6 @@ public class ExampleAnimations
 		AnimationGroup thisGroup = MageeKramerExamples;
 
 		allGroups.add(thisGroup);
-
 		thisGroup.addItem(new AnimationItem("Bridge", prefix + "bridge.xml"));
 		thisGroup.addItem(new AnimationItem("Channel", prefix + "channel.xml"));
 		thisGroup.addItem(new AnimationItem("Dining philosophers", prefix + "diners.xml"));
@@ -87,7 +86,6 @@ public class ExampleAnimations
 		thisGroup.addItem(new AnimationItem("Tic Tac Toe", prefix + "tictactoe.xml"));
 		thisGroup.addItem(new AnimationItem("Window", prefix + "window.xml"));
 	}
-
 
 	public synchronized static ExampleAnimations getInstance()
 	{

@@ -93,9 +93,7 @@ public class AnimationItem
 	{
 		try
 		{
-
 			final Animator view = new Animator(description + " path: " + path);
-
 			URL url = AnimationItem.class.getResource(path);
 			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
 
@@ -103,9 +101,9 @@ public class AnimationItem
 
 			return view;
 
-			//URL url = AnimationItem.class.getResource(path);
-			//InputStream stream = url.openStream();
-			//Automata theAutomata = AutomataBuildFromXml.build(stream);
+			// URL url = AnimationItem.class.getResource(path);
+			// InputStream stream = url.openStream();
+			// Automata theAutomata = AutomataBuildFromXml.build(stream);
 			// return theAutomata;
 		}
 		catch (Exception ex)

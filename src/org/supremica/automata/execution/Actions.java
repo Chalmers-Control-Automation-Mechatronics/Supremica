@@ -81,7 +81,7 @@ public class Actions
 
 	public Action getAction(String label)
 	{
-		return (Action)labelToActionMap.get(label);
+		return (Action) labelToActionMap.get(label);
 	}
 
 	public Iterator iterator()

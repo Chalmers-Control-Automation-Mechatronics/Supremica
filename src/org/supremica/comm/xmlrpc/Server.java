@@ -128,7 +128,9 @@ public class Server
 
 		try
 		{
-			theAutomata = AutomataBuildFromXml.build(reader);
+			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+
+			theAutomata = builder.build(reader);
 		}
 		catch (Exception e)
 		{

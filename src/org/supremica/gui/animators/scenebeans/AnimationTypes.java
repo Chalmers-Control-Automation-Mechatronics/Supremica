@@ -56,7 +56,6 @@ public class AnimationTypes
 	private static List collection = new LinkedList();
 	public static final AnimationTypes Undefined = new AnimationTypes("Undefined");
 	public static final AnimationTypes MageeKramerExample = new AnimationTypes("Magee & Kramer Examples");
-
 	private String description;
 
 	private AnimationTypes(String description)

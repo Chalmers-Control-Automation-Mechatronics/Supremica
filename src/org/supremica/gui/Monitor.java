@@ -12,73 +12,73 @@ import org.supremica.gui.Monitorable;
 
 /*
 class Task
-		extends Thread
-		implements Measurable
+				extends Thread
+				implements Measurable
 {
-		private int p;
-		private int i = 0;
-		private boolean mode = false;    // false is "no progressbar"
-		private boolean requestStop = false;
+				private int p;
+				private int i = 0;
+				private boolean mode = false;    // false is "no progressbar"
+				private boolean requestStop = false;
 
-		public void run()
-		{
-				try
+				public void run()
 				{
-						while ((i < 100) &&!requestStop)
-						{
-								sleep(750);
+								try
+								{
+												while ((i < 100) &&!requestStop)
+												{
+																sleep(750);
 
-								i += (int) (Math.random() * 20);
-						}
+																i += (int) (Math.random() * 20);
+												}
 
-						mode = !mode;
+												mode = !mode;
 
-						while ((p < 100) &&!requestStop)
-						{
-								p += (int) (Math.random() * 20);
+												while ((p < 100) &&!requestStop)
+												{
+																p += (int) (Math.random() * 20);
 
-								sleep(500);
-						}
+																sleep(500);
+												}
+								}
+								catch (InterruptedException iexcp)
+								{
+												return;
+								}
 				}
-				catch (InterruptedException iexcp)
+
+				public int getProgress()
 				{
-						return;
+								if (mode)
+								{
+												return p;
+								}
+								else
+								{
+												return 1;    // no progress
+								}
 				}
-		}
 
-		public int getProgress()
-		{
-				if (mode)
+				public String getActivity()
 				{
-						return p;
+								if (mode)
+								{
+												return ("Building transitions: " + p + "% complete");
+								}
+								else
+								{
+												return ("Synchronizing: " + i + " number of states");
+								}
 				}
-				else
-				{
-						return 1;    // no progress
-				}
-		}
 
-		public String getActivity()
-		{
-				if (mode)
+				public void stopTask()
 				{
-						return ("Building transitions: " + p + "% complete");
+								requestStop = true;
 				}
-				else
+
+				public boolean getMode()
 				{
-						return ("Synchronizing: " + i + " number of states");
+								return mode;
 				}
-		}
-
-		public void stopTask()
-		{
-				requestStop = true;
-		}
-
-		public boolean getMode()
-		{
-				return mode;
-		}
 }
 */
 public class Monitor
@@ -146,32 +146,32 @@ public class Monitor
 	}
 
 	/*
-					public static void main(String[] args)    // demo
-					{
-									JFrame frame = new JFrame("Monitor Demo");
-
-									frame.setSize(200, 200);
-									frame.setVisible(true);
-
-									Task task = new Task();
-
-									task.start();
-
-									Monitor monitor = new Monitor(task);
-
-									// task.start();
-									monitor.spawn(frame);
-
-									// task.start();
-									frame.setTitle("Back in main thread");
-
-									try
+									public static void main(String[] args)    // demo
 									{
-													task.join();
-									}
-									catch (InterruptedException iexcp) {}
+																	JFrame frame = new JFrame("Monitor Demo");
 
-									System.exit(0);
-					}
+																	frame.setSize(200, 200);
+																	frame.setVisible(true);
+
+																	Task task = new Task();
+
+																	task.start();
+
+																	Monitor monitor = new Monitor(task);
+
+																	// task.start();
+																	monitor.spawn(frame);
+
+																	// task.start();
+																	frame.setTitle("Back in main thread");
+
+																	try
+																	{
+																									task.join();
+																	}
+																	catch (InterruptedException iexcp) {}
+
+																	System.exit(0);
+									}
 	*/
 }

@@ -76,7 +76,9 @@ public class Control
 		{
 			return false;
 		}
-		Control otherControl = (Control)other;
+
+		Control otherControl = (Control) other;
+
 		return label.equals(otherControl.label) && condition.equals(otherControl.condition);
 	}
 

@@ -84,45 +84,44 @@ public class AutomataBuildFromXml
 	private final static String immediateStr = "immediate";
 	private final static String owner = "owner";
 	private final static String hash = "hash";
-	private static AutomataBuildFromXml builder = null;
 	private Automata currAutomata = null;
 	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
 	private Locator locator = null;
 
-	private AutomataBuildFromXml() {}
+	public AutomataBuildFromXml() {}
 
-	public static Automata build(File file)
+	public Automata build(File file)
 		throws Exception
 	{
 		return build(file, false);
 	}
 
-	public static Automata build(File file, boolean validate)
+	public Automata build(File file, boolean validate)
 		throws Exception
 	{
 		return build(file.getCanonicalPath(), validate);
 	}
 
-	public static Automata build(String fileName)
+	public Automata build(String fileName)
 		throws Exception
 	{
 		return build(fileName, false);
 	}
 
-	public static Automata build(InputStream is)
+	public Automata build(InputStream is)
 		throws Exception
 	{
 		return build(is, false);
 	}
 
-	public static Automata build(Reader r)
+	public Automata build(Reader r)
 		throws Exception
 	{
 		return build(r, false);
 	}
 
-	public static Automata build(InputStream is, boolean validate)
+	public Automata build(InputStream is, boolean validate)
 		throws Exception
 	{
 		InputSource source = new InputSource(is);
@@ -130,7 +129,7 @@ public class AutomataBuildFromXml
 		return build(source, validate);
 	}
 
-	public static Automata build(Reader r, boolean validate)
+	public Automata build(Reader r, boolean validate)
 		throws Exception
 	{
 		InputSource source = new InputSource(r);
@@ -138,56 +137,46 @@ public class AutomataBuildFromXml
 		return build(source, validate);
 	}
 
-	public static Automata build(String fileName, boolean validate)
+	public Automata build(String fileName, boolean validate)
 		throws Exception
 	{
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 
 		parserFactory.setValidating(validate);
 
-		if (builder == null)
-		{
-			builder = new AutomataBuildFromXml();
-		}
-
 		SAXParser parser = parserFactory.newSAXParser();
 
 		try
 		{
-			parser.parse(new File(fileName), builder);
+			parser.parse(new File(fileName), this);
 		}
 		catch (SAXException ex)
 		{
 			throw new Exception(ex.getMessage());
 		}
 
-		return builder.currAutomata;
+		return currAutomata;
 	}
 
-	public static Automata build(InputSource is, boolean validate)
+	public Automata build(InputSource is, boolean validate)
 		throws Exception
 	{
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 
 		parserFactory.setValidating(validate);
 
-		if (builder == null)
-		{
-			builder = new AutomataBuildFromXml();
-		}
-
 		SAXParser parser = parserFactory.newSAXParser();
 
 		try
 		{
-			parser.parse(is, builder);
+			parser.parse(is, this);
 		}
 		catch (SAXException ex)
 		{
 			throw new Exception(ex.getMessage());
 		}
 
-		return builder.currAutomata;
+		return currAutomata;
 	}
 
 	public void setDocumentLocator(Locator locator)

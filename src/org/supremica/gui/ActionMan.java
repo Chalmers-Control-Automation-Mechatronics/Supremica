@@ -1453,7 +1453,9 @@ public class ActionMan
 
 		try
 		{
-			currAutomata = AutomataBuildFromXml.build(file);
+			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+
+			currAutomata = builder.build(file);
 		}
 		catch (Exception e)
 		{
@@ -1693,7 +1695,7 @@ public class ActionMan
 		gui.selectAll();
 	}
 
-	//
+	// 
 	public static void findStates_action(Gui gui)
 	{
 		FindStates find_states = new FindStates(gui);
@@ -1737,10 +1739,10 @@ public class ActionMan
 	// Animations
 	public static void animator(Gui gui, AnimationItem item)
 	{
-
 		try
 		{
 			Animator animator = item.createInstance();
+
 			animator.setVisible(true);
 		}
 		catch (Exception ex)

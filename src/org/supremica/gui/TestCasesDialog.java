@@ -48,7 +48,7 @@ class UsersPanel
 
 	public UsersPanel()
 	{
-	    super(new GridLayout(2,1,10,10) );
+		super(new GridLayout(2, 1, 10, 10));
 
 		JPanel cont = new JPanel();
 
@@ -63,7 +63,6 @@ class UsersPanel
 		num_users.add(int_num = new IntegerField("3", 6));
 		add("North", cont);
 		add("South", num_users);
-	       
 	}
 
 	public Automata doIt()
@@ -87,21 +86,22 @@ class PhilosPanel
 
 	public PhilosPanel()
 	{
-	    super(new GridLayout(2,1,10,10) );
-	    JPanel cont = new JPanel();
-	    
-	    cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
-	    cont.add(l_take);
-	    cont.add(r_take);
-	    cont.add(l_put);
-	    cont.add(r_put);
-	    
-	    JPanel num_users = new JPanel();
-	    
-	    num_users.add(new JLabel("Number of philosophers and forks: "));
-	    num_users.add(int_num);
-	    add( cont, BorderLayout.NORTH);
-	    add( num_users, BorderLayout.SOUTH);
+		super(new GridLayout(2, 1, 10, 10));
+
+		JPanel cont = new JPanel();
+
+		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
+		cont.add(l_take);
+		cont.add(r_take);
+		cont.add(l_put);
+		cont.add(r_put);
+
+		JPanel num_users = new JPanel();
+
+		num_users.add(new JLabel("Number of philosophers and forks: "));
+		num_users.add(int_num);
+		add(cont, BorderLayout.NORTH);
+		add(num_users, BorderLayout.SOUTH);
 	}
 
 	public Automata doIt()
@@ -154,7 +154,8 @@ class AllocationBatchPanel
 
 	AllocationBatchPanel()
 	{
-	    super( new BorderLayout(10,10) );
+		super(new BorderLayout(10, 10));
+
 		JPanel pCenter = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 		pCenter.add(new JLabel("batch file:  "));
@@ -311,31 +312,29 @@ public class TestCasesDialog
 	TestCasesDialog(JFrame frame)
 	{
 		super(frame, "Example Generator", true);    // modal dialog with frame as parent
-		
+
 		Container pane = getContentPane();
-		pane.setLayout( new BorderLayout(10,10));
+
+		pane.setLayout(new BorderLayout(10, 10));
 
 		// Utility.setupFrame(this, 400, 200);
 		// Dimension size = new Dimension(400, 200);
 		// Point point = Utility.getPosForCenter(size);
-
 		// setSize(size);
 		// setLocation(point);
-
-		JPanel buttons = new JPanel(new FlowLayout( FlowLayout.RIGHT));
+		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JButton tmp;
+
 		buttons.add(tmp = new DoitButton());
 		buttons.add(new CancelButton());
 		buttons.add(new HelpButton());
 		pane.add(extab, BorderLayout.CENTER);
-		pane.add( buttons, BorderLayout.SOUTH); 
-
-		getRootPane().setDefaultButton( tmp); // :)
-
+		pane.add(buttons, BorderLayout.SOUTH);
+		getRootPane().setDefaultButton(tmp);    // :)
 		pack();
-				
-		Point point = Utility.getPosForCenter( getSize() );
-		setLocation(point);
 
+		Point point = Utility.getPosForCenter(getSize());
+
+		setLocation(point);
 	}
 }

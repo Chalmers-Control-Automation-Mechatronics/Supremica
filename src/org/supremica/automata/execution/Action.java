@@ -76,7 +76,9 @@ public class Action
 		{
 			return false;
 		}
-		Action otherAction = (Action)other;
+
+		Action otherAction = (Action) other;
+
 		return label.equals(otherAction.label) && command.equals(otherAction.command);
 	}
 

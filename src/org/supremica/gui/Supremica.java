@@ -88,7 +88,6 @@ public class Supremica
 	private TableModel fullTableModel;
 	private JScrollPane theAutomatonTableScrollPane;
 	private MenuHandler menuHandler;
-
 	private static Logger logger = LoggerFactory.createLogger(Supremica.class);
 	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JSplitPane splitPaneVertical;
@@ -96,6 +95,7 @@ public class Supremica
 	private ContentHelp help = null;
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
 	private FileSecurity fileSecurity = new FileSecurity();
+
 	// MF -- made publically available
 	public static int TABLE_IDENTITY_COLUMN = 0;
 	public static int TABLE_TYPE_COLUMN = 1;
@@ -1164,7 +1164,9 @@ public class Supremica
 
 		try
 		{
-			currAutomata = AutomataBuildFromXml.build(file);
+			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+
+			currAutomata = builder.build(file);
 		}
 		catch (Exception e)
 		{

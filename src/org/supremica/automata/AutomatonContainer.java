@@ -246,7 +246,7 @@ public class AutomatonContainer
 
 		int autIndex = theAutomatonNames.indexOf(oldName);
 
-		theAutomatonNames.set(autIndex,automaton.getName() );
+		theAutomatonNames.set(autIndex, automaton.getName());
 		add(automaton, automaton.getName(), true);
 		update();
 		notifyListeners(AutomatonContainerListeners.MODE_AUTOMATON_RENAMED, automaton);
@@ -723,6 +723,7 @@ public class AutomatonContainer
 		}
 		catch (Exception e)
 		{
+
 			// Fix this
 		}
 	}

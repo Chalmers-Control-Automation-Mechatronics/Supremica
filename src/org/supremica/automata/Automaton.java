@@ -151,7 +151,9 @@ public class Automaton
 	public void setName(String name)
 	{
 		String oldName = this.name;
+
 		this.name = name;
+
 		notifyListeners(AutomatonListeners.MODE_AUTOMATON_RENAMED, oldName);
 	}
 

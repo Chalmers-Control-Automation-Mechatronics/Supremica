@@ -38,7 +38,9 @@ public class ConsoleUI
 
 		try
 		{
-			aut = AutomataBuildFromXml.build(new File(name));
+			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+
+			aut = builder.build(new File(name));
 
 			addAutomata(aut);
 		}

@@ -158,14 +158,15 @@ class AutomataExporter
 
 		// AutomataBuildFromXml builder = new AutomataBuildFromXml();
 		Automata theAutomata;
+		AutomataBuildFromXml builder = new AutomataBuildFromXml();
 
 		if (inputMedia == FILE)
 		{
-			theAutomata = AutomataBuildFromXml.build(inputFileName, validate);
+			theAutomata = builder.build(inputFileName, validate);
 		}
 		else
 		{
-			theAutomata = AutomataBuildFromXml.build(new FileInputStream(FileDescriptor.in), validate);
+			theAutomata = builder.build(new FileInputStream(FileDescriptor.in), validate);
 		}
 
 		PrintWriter pw;

@@ -31,7 +31,9 @@ public class Animator
 		throws Exception
 	{
 		super("Supremica Animator - " + detail);
-		contentPane = (JPanel)getContentPane();
+
+		contentPane = (JPanel) getContentPane();
+
 		setIconImage(Supremica.cornerImage);
 		contentPane.setLayout(new GridBagLayout());
 
@@ -156,7 +158,6 @@ public class Animator
 		_dispatcher = new MouseDispatcher(_canvas.getSceneGraph(), _canvas);
 
 		_dispatcher.attachTo(_canvas);
-
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent ev)
@@ -164,9 +165,7 @@ public class Animator
 				dispose();
 			}
 
-			public void windowClosed(WindowEvent ev)
-			{
-			}
+			public void windowClosed(WindowEvent ev) {}
 		});
 	}
 

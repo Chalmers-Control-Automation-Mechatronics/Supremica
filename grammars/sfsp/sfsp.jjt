@@ -114,8 +114,7 @@ void BParallelComposition() :
 {}
 {
 	(BCompositeBody())
-	| (
-	ParallelComposition() "||" BCompositeBody())
+	| (ParallelComposition() "||" BCompositeBody())
 }
 
 

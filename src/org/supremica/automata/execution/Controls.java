@@ -81,7 +81,7 @@ public class Controls
 
 	public Control getControl(String label)
 	{
-		return (Control)labelToControlMap.get(label);
+		return (Control) labelToControlMap.get(label);
 	}
 
 	public Iterator iterator()

@@ -367,6 +367,7 @@ public class AutomatonViewer
 			{
 				build();
 				setTitle(theAutomaton.getName());
+
 				updateNeeded = false;
 			}
 			catch (Exception e)

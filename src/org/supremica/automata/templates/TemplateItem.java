@@ -83,7 +83,8 @@ public class TemplateItem
 		{
 			URL url = TemplateItem.class.getResource(path);
 			InputStream stream = url.openStream();
-			Automata theAutomata = AutomataBuildFromXml.build(stream);
+			AutomataBuildFromXml builder = new AutomataBuildFromXml();
+			Automata theAutomata = builder.build(stream);
 
 			return theAutomata;
 		}
