@@ -44,7 +44,7 @@ public class TestAlgo
 		"../examples/includeInJarFile/OtherExamples/dosingUnit.xml",
 		"../examples/includeInJarFile/OtherExamples/telecommunicationsNetwork.xml",
 		"../examples/benchmark/simple1.xml",
-		"../examples/includeInJarFile/OtherExamples/agv.xml" // FAILS !!
+		"../examples/includeInJarFile/OtherExamples/agv.xml"
 	};
 
 	// XXX:         these number probably haev double-floating-point  overflows, so if we count them in some other way we might not
@@ -70,6 +70,18 @@ public class TestAlgo
 	};
 
 
+	// ----------------------------------------------------------------------------------
+	private static int find_AGV()
+	{
+		for(int i = 0; i < TEST_FILES.length; i++)
+		{
+			if(TEST_FILES[i].indexOf("agv.xml") != -1)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
 	// ----------------------------------------------------------------------------------
 	private int fail, pass;
 	private ProjectBuildFromXml builder;
@@ -374,6 +386,7 @@ public class TestAlgo
 	{
 		fail = pass = 0;
 
+
 		for (int k = 0; k < 4; k++)
 		{
 			System.out.println("\nTarget #" + k + " is " + TEST_FILES[k]);
@@ -460,6 +473,52 @@ public class TestAlgo
 
 
 
+		// We also test the H1/H2 heuristics. note that we dont test performance here
+		System.out.println("\n***** Testing H1 and H2 heuristics");
+		int oldh1 = Options.es_heuristics;
+		int oldh2 = Options.ndas_heuristics;
+		int oldalgo = Options.algo_family;
+		int agv = find_AGV(); // we will use AGV in this experiment
+
+		for(int r = 0; r < 2; r++) {
+			// H1 and H2 works only with workset and mono workset
+			Options.algo_family = (r == 0) ? Options.ALGO_DISJUNCTIVE_WORKSET : Options.ALGO_SMOOTHED_MONO_WORKSET;
+			System.err.println("Reachability Algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+
+			// test H1:
+			Options.ndas_heuristics = Options.NDAS_RANDOM; // fix H2 to random
+			for(int i = 1; i < Options.ES_HEURISTIC_NAMES.length; i++) // first one is interactive!
+			{
+				announce("  H1=" + Options.ES_HEURISTIC_NAMES[i]);
+				Options.es_heuristics = i;
+				load(TEST_FILES[agv]);
+				testR(reachables[agv]);
+				testCR(coreachables[agv]);
+				verifier.cleanup();
+				System.out.println();
+			}
+
+			// test H2:
+			Options.es_heuristics = Options.ES_HEURISTIC_ANY; // fix H1 to all-pass
+			for(int i = 0; i < Options.NDAS_HEURISTIC_NAMES.length; i++)
+			{
+				announce("  H2=" + Options.NDAS_HEURISTIC_NAMES[i]);
+				Options.ndas_heuristics = i;
+				load(TEST_FILES[agv]);
+				testR(reachables[agv]);
+				testCR(coreachables[agv]);
+				verifier.cleanup();
+				System.out.println();
+			}
+		}
+		// cleanup:
+		Options.es_heuristics = oldh1 ;
+		Options.ndas_heuristics = oldh2;
+		Options.algo_family = oldalgo;
+
+
+
+		// the supervisor synthesis
 		System.out.println("\n***** Testing DES and SCT/verification algorithms");
 		for (int i = 0; i < TEST_FILES.length; i++)
 		{
@@ -476,6 +535,7 @@ public class TestAlgo
 			modularC(controllable[i]);
 			System.out.println();
 		}
+
 
 		// ------------------------- testing safe state supervisor synthesis:
 		System.out.println("\n***** Testing SCT/synthesis algorithms");
@@ -544,6 +604,10 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.18  2004/07/22 11:50:39  vahidi
+ 1. cleaned up in the BDD panels in PreferencesDialog.
+ 2. supNBC can now choose level of reachability (non, uc only, total) [TestAlgo updated for this]
+
  Revision 1.17  2004/07/21 12:47:08  vahidi
  the test algo is more sane when it coes to supNBC tests.
 
