@@ -78,7 +78,7 @@
   <param name="point" index="1" value="(517,315)" /> 
   <param name="duration" index="1" value="1" />  
   <param name="event" index="1" value="robot_3.end" />     
-  <param name="point" index="2" value="(624,169)" /> 
+  <param name="point" index="2" value="(584,153)" /> 
   <param name="duration" index="2" value="1" />
   <param name="point" index="3" value="(600,118)" /> 
   <param name="duration" index="3" value="1" />
