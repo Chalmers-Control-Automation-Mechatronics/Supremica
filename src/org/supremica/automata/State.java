@@ -83,6 +83,8 @@ public class State
 	private LinkedList incomingArcs = new LinkedList();
 	private LinkedList outgoingArcs = new LinkedList();
 
+	private List outgoingArcSet = new LinkedList();
+
 	private Listeners listeners = null;
 
 	public State()
@@ -115,15 +117,15 @@ public class State
 		this();
 		index = otherState.index;
   		id = otherState.id;
-    	name = otherState.name;
-     	initial = otherState.initial;
-      	accepting = otherState.accepting;
-    	forbidden = otherState.forbidden;
-     	first = otherState.first;
-      	last = otherState.last;
-      	cost = otherState.cost;
-      	equivClass = otherState.equivClass;
-      	visited = otherState.visited;
+	    	name = otherState.name;
+     		initial = otherState.initial;
+	      	accepting = otherState.accepting;
+    		forbidden = otherState.forbidden;
+	     	first = otherState.first;
+	      	last = otherState.last;
+	      	cost = otherState.cost;
+	      	equivClass = otherState.equivClass;
+      		visited = otherState.visited;
 		x = otherState.x;
 		y = otherState.y;
 		radius = otherState.radius;
@@ -287,6 +289,16 @@ public class State
 	public void addOutgoingArc(Arc theArc)
 	{
 		outgoingArcs.addLast(theArc);
+/*
+		State toState = theArc.getToState();
+		ArcSet currArcSet = (ArcSet)stateToArcSetMap.get(toState);
+		if (currArcSet == null)
+		{
+			currArcSet = new ArcSet();
+			stateToArcSetMap.put(toState, currArcSet);
+		}
+		currArcSet.addArc(theArc);
+*/
 	}
 
 	public void removeIncomingArc(Arc theArc)
@@ -297,12 +309,42 @@ public class State
 	public void removeOutgoingArc(Arc theArc)
 	{
 		outgoingArcs.remove(theArc);
+/*
+		State toState = theArc.getToState();
+		ArcSet currArcSet = (ArcSet)stateToArcSetMap.get(toState);
+		if (currArcSet != null)
+		{
+			currArcSet.removeArc(theArc);
+		}
+*/
 	}
-
+/*
+	private ArcSet getArcSet(State toState)
+	{
+		Iterator arcSetIt = outgoingArcSet.iterator();
+		while (arcSetIt.hasNext())
+		{
+			ArcSet currArcSet = (ArcSet)currArcSet.next();
+			if (currArcSet.getToState() == toState)
+			{
+				return currArcSet;
+			}
+		}
+		// Couldn't find an arcset
+		ArcSet newArcSet = new ArcSet(this, toState);
+	}
+*/
 	public Iterator outgoingArcsIterator()
 	{
 		return outgoingArcs.iterator();
 	}
+
+/*
+	public Iterator outgoingArcSetIterator()
+	{
+		return 
+	}
+*/
 
 	public Iterator safeOutgoingArcsIterator()
 	{
@@ -434,5 +476,31 @@ public class State
 			listeners.notifyListeners();
 		}
 	}
+/*
+	private class ArcSetIterator
+		implements Iterator
+	{
+		private Iterator it;
+
+		public ArcSetIterator()
+		{
+			it = stateToArcSet.iterator();
+		}
+
+		public boolean hasNext()
+		{
+
+		}
+
+		public Object next()
+		{
+
+		}
+
+		public void remove()
+		{
+			throw new UnsupportedOperationException(); 
+		}
+	}*/
 }
 

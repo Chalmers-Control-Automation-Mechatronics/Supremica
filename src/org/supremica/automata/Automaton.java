@@ -60,7 +60,7 @@ public class Automaton
 	private int index = -1;
 	private Map idStateMap;
  	private Map indexStateMap;
- 	private List theArcs;
+ 	private ArcSet theArcs;
  	private State initialState;
  	private boolean isDisabled = false;
  	private AutomatonType type = AutomatonType.Undefined;
@@ -75,7 +75,7 @@ public class Automaton
 		idStateMap = new HashMap();
   		indexStateMap = new HashMap();
 		theStates = new LinkedList();
-		theArcs = new LinkedList();
+		theArcs = new ArcSet();
 	}
 
 	public Automaton(String name)
@@ -87,12 +87,12 @@ public class Automaton
 	public Automaton(Automaton orgAut)
 	{
 		this();
-        Alphabet orgAlphabet = orgAut.getAlphabet();
-        Alphabet newAlphabet = new Alphabet(orgAlphabet);
-        type = orgAut.type;
+        	Alphabet orgAlphabet = orgAut.getAlphabet();
+	        Alphabet newAlphabet = new Alphabet(orgAlphabet);
+        	type = orgAut.type;
 
 		setName(orgAut.getName());
-        setAlphabet(newAlphabet);
+	        setAlphabet(newAlphabet);
 
 		// Create all states
 		Iterator states = orgAut.stateIterator();
@@ -100,7 +100,7 @@ public class Automaton
 		{
 			State orgState = (State)states.next();
 			State newState = new State(orgState);
-      		addState(newState);
+      			addState(newState);
 		}
 
 		try
@@ -201,15 +201,15 @@ public class Automaton
 	public void addArc(Arc arc)
 	{
 		arc.getListeners().addListener(this);
-		theArcs.add(arc);
-    	notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
+		theArcs.addArc(arc);
+	    	notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
 	}
 
 	public void removeArc(Arc arc)
 	{
-		theArcs.remove(arc);
+		theArcs.removeArc(arc);
 		arc.clear();
-    	notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
+    		notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
 	}
 
 	public boolean containsState(State state)
@@ -337,8 +337,18 @@ public class Automaton
 
 	public Iterator safeArcIterator()
 	{
-		return (new LinkedList(theArcs)).iterator();
+		return (new ArcSet(theArcs)).iterator();
 	}
+
+
+	/**
+	 *
+	 **/
+	public Iterator groupedArcIterator()
+	{
+		return null;
+	}
+
 
 	public Iterator eventIterator()
 	{
@@ -552,7 +562,7 @@ public class Automaton
 
 	public void arcRemoved(Arc arc)
 	{
-		theArcs.remove(arc);
+		theArcs.removeArc(arc);
 	}
 
 	public int hashCode()

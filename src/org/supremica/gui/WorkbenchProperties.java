@@ -54,6 +54,17 @@ import java.io.*;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
+/**
+ * To compile a student version with copy protected files set
+ * GeneralUseSecurity to true.
+ * If allowSuperUserLogin is set to true then it is possible to login in as "ESS
+ */
+
+
+/**
+ * Properties for Supremica.
+ *
+ **/
 public final class WorkbenchProperties
 	extends Properties
 {
@@ -73,6 +84,7 @@ public final class WorkbenchProperties
 	private static final String INCLUDE_EDITOR = "includeEditor";
 	private static final String INCLUDE_BOUNDED_UNCON_TOOLS = "includeBoundedUnconTools";
 	private static final String VERBOSE_MODE = "verboseMode";
+	private static final String SUPERUSER_IDENTITY = "superuserIdentity";
 	private static final String ALLOW_SUPERUSER_LOGIN = "allowSuperUserLogin";
 
 	// SynchronizationOptions
@@ -117,6 +129,7 @@ public final class WorkbenchProperties
 		setProperty(INCLUDE_EDITOR, "true");
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false");
 		setProperty(VERBOSE_MODE, "false");
+		setProperty(SUPERUSER_IDENTITY, "ESS030");
 		setProperty(ALLOW_SUPERUSER_LOGIN, "true");
 		setProperty(SYNC_FORBID_UNCON_STATES, "true");
 		setProperty(SYNC_EXPAND_FORBIDDEN_STATES, "true");
@@ -294,6 +307,11 @@ public final class WorkbenchProperties
 	public static void setVerboseMode(boolean mode)
 	{
 		wp.setProperty(VERBOSE_MODE, toString(mode));
+	}
+
+	public static String getSuperuserIdentity()
+	{
+		return wp.getProperty(SUPERUSER_IDENTITY);
 	}
 
 	public static boolean allowSuperUserLogin()
