@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Single Visual Project"  major="0"  minor="9" >
+<Automata name="Manufacturing cell" comment="This example is from 'Synthesis and Implementation of a Local Modular Supervisory Control for a Manufacturing Cell' by Max H. de Queiroz and J. E. R. Cury. The system is blocking and uncontrollable.">
 <Automaton name="G0" type="Plant">
 	<Events>
 		<Event id="a0" label="a0"/>
