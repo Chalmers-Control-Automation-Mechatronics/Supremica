@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata>
-
-<!-- Path flow model -->
-<Automaton name="a">
+<Automata name="Single Visual Project"  major="0"  minor="9" >
+<Automaton name="Path Flow" type="Plant">
 	<Events>
-		<Event id="e1" label="part_ent" controllable="true" prioritized="true"/>
-		<Event id="e2" label="part_arr1" controllable="false" prioritized="true"/>
-		<Event id="e3" label="part_lv1" controllable="true" prioritized="true"/>
-		<Event id="e4" label="str_exit" controllable="true" prioritized="true"/>
-		<Event id="e5" label="fin_exit" controllable="false" prioritized="true"/>
-		<Event id="e6" label="partLvExit" controllable="true" prioritized="true"/>
-		<Event id="e7" label="part_arr2" controllable="false" prioritized="true"/>
-		<Event id="e8" label="recog_A" controllable="false" prioritized="true"/>
-		<Event id="e9" label="recog_B" controllable="false" prioritized="true"/>
-		<Event id="e10" label="part_lv2" controllable="true" prioritized="true"/>
-		<Event id="e11" label="part_arr3" controllable="false" prioritized="true"/>
-		<Event id="e12" label="part_lv3" controllable="true" prioritized="true"/>
+		<Event id="e5" label="fin_exit" controllable="false"/>
+		<Event id="e6" label="partLvExit"/>
+		<Event id="e2" label="part_arr1" controllable="false"/>
+		<Event id="e7" label="part_arr2" controllable="false"/>
+		<Event id="e11" label="part_arr3" controllable="false"/>
+		<Event id="e1" label="part_ent"/>
+		<Event id="e3" label="part_lv1"/>
+		<Event id="e10" label="part_lv2"/>
+		<Event id="e12" label="part_lv3"/>
+		<Event id="e8" label="recog_A" controllable="false"/>
+		<Event id="e9" label="recog_B" controllable="false"/>
+		<Event id="e4" label="str_exit"/>
 	</Events>
 	<States>
 		<State id="a0" initial="true" accepting="true"/>
@@ -27,7 +25,7 @@
 		<State id="a6"/>
 		<State id="a7"/>
 		<State id="a8"/>
-		<State id="a9"/>		
+		<State id="a9"/>
 	</States>
 	<Transitions>
 		<Transition source="a0" dest="a1" event="e1"/>
@@ -35,38 +33,37 @@
 		<Transition source="a2" dest="a3" event="e3"/>
 		<Transition source="a3" dest="a4" event="e4"/>
 		<Transition source="a3" dest="a5" event="e6"/>
-		<Transition source="a4" dest="a0" event="e5"/>	
+		<Transition source="a4" dest="a0" event="e5"/>
 		<Transition source="a5" dest="a6" event="e7"/>
 		<Transition source="a6" dest="a7" event="e8"/>
 		<Transition source="a6" dest="a7" event="e9"/>
 		<Transition source="a7" dest="a8" event="e10"/>
 		<Transition source="a8" dest="a9" event="e11"/>
-		<Transition source="a9" dest="a1" event="e12"/>	
+		<Transition source="a9" dest="a1" event="e12"/>
 	</Transitions>
 </Automaton>
-<!-- Sequence tasks -->
-<Automaton name="b">
+<Automaton name="Sequence Tasks" type="Specification">
 	<Events>
-		<Event id="e1" label="fin_exit" controllable="false" prioritized="true"/>
-		<Event id="e2" label="part_ent" controllable="true" prioritized="true"/>
-		<Event id="e3" label="part_arr1" controllable="false" prioritized="true"/>
-		<Event id="e4" label="start_pol" controllable="true" prioritized="true"/>
-		<Event id="e5" label="compl_pol" controllable="false" prioritized="true"/>
-		<Event id="e6" label="part_lv1" controllable="true" prioritized="true"/>
-		<Event id="e7" label="partLvExit" controllable="true" prioritized="true"/>
-		<Event id="e8" label="part_arr2" controllable="false" prioritized="true"/>
-		<Event id="e9" label="recog_A" controllable="false" prioritized="true"/>
-		<Event id="e10" label="recog_B" controllable="false" prioritized="true"/>
-		<Event id="e11" label="attch_ptA" controllable="true" prioritized="true"/>
-		<Event id="e12" label="attch_ptB" controllable="true" prioritized="true"/>
-		<Event id="e13" label="finA_attch" controllable="true" prioritized="true"/>
-		<Event id="e14" label="finB_attch" controllable="true" prioritized="true"/>
-		<Event id="e15" label="part_lv2" controllable="true" prioritized="true"/>
-		<Event id="e16" label="part_arr3" controllable="false" prioritized="true"/>
-		<Event id="e17" label="start_case" controllable="true" prioritized="true"/>
-		<Event id="e18" label="compl_case" controllable="false" prioritized="true"/>		
-		<Event id="e19" label="part_lv3" controllable="true" prioritized="true"/>
-		<Event id="e20" label="str_exit" controllable="true" prioritized="true"/>
+		<Event id="e11" label="attch_ptA"/>
+		<Event id="e12" label="attch_ptB"/>
+		<Event id="e18" label="compl_case" controllable="false"/>
+		<Event id="e5" label="compl_pol" controllable="false"/>
+		<Event id="e13" label="finA_attch"/>
+		<Event id="e14" label="finB_attch"/>
+		<Event id="e1" label="fin_exit" controllable="false"/>
+		<Event id="e7" label="partLvExit"/>
+		<Event id="e3" label="part_arr1" controllable="false"/>
+		<Event id="e8" label="part_arr2" controllable="false"/>
+		<Event id="e16" label="part_arr3" controllable="false"/>
+		<Event id="e2" label="part_ent"/>
+		<Event id="e6" label="part_lv1"/>
+		<Event id="e15" label="part_lv2"/>
+		<Event id="e19" label="part_lv3"/>
+		<Event id="e9" label="recog_A" controllable="false"/>
+		<Event id="e10" label="recog_B" controllable="false"/>
+		<Event id="e17" label="start_case"/>
+		<Event id="e4" label="start_pol"/>
+		<Event id="e20" label="str_exit"/>
 	</Events>
 	<States>
 		<State id="b0" initial="true" accepting="true"/>
@@ -78,7 +75,7 @@
 		<State id="b6"/>
 		<State id="b7"/>
 		<State id="b8"/>
-		<State id="b9"/>		
+		<State id="b9"/>
 		<State id="b10"/>
 		<State id="b11"/>
 		<State id="b12"/>
@@ -112,12 +109,11 @@
 		<Transition source="b16" dest="b0" event="e20"/>
 	</Transitions>
 </Automaton>
-<!-- Packaging system c -->
-<Automaton name="c">
+<Automaton name="Packaging" type="Plant">
 	<Events>
-		<Event id="e1" label="take_item" controllable="true" prioritized="true"/>
-		<Event id="e2" label="package" controllable="false" prioritized="true"/>
-		<Event id="e3" label="allow_exit" controllable="true" prioritized="true"/>
+		<Event id="e3" label="allow_exit"/>
+		<Event id="e2" label="package" controllable="false"/>
+		<Event id="e1" label="take_item"/>
 	</Events>
 	<States>
 		<State id="c0" initial="true" accepting="true"/>
@@ -130,12 +126,11 @@
 		<Transition source="c2" dest="c0" event="e3"/>
 	</Transitions>
 </Automaton>
-<!-- Exit Buffer d -->
-<Automaton name="d">
+<Automaton name="Exit Buffer" type="Specification">
 	<Events>
-		<Event id="e1" label="str_exit" controllable="true" prioritized="true"/>
-		<Event id="e2" label="fin_exit" controllable="false" prioritized="true"/>
-		<Event id="e3" label="take_item" controllable="true" prioritized="true"/>
+		<Event id="e2" label="fin_exit" controllable="false"/>
+		<Event id="e1" label="str_exit"/>
+		<Event id="e3" label="take_item"/>
 	</Events>
 	<States>
 		<State id="d0" initial="true" accepting="true"/>
@@ -151,50 +146,14 @@
 		<Transition source="d2" dest="d1" event="e3"/>
 	</Transitions>
 </Automaton>
-
-<!-- Interface l -->
-<!--
-
-<Automaton name="l">
+<Automaton name="Attach Part to Assembly" type="Plant">
 	<Events>
-		<Event id="e1" label="start_pol" controllable="true" prioritized="true"/>
-		<Event id="e2" label="compl_pol" controllable="false" prioritized="true"/>
-		<Event id="e3" label="attch_ptA" controllable="true" prioritized="true"/>
-		<Event id="e4" label="finA_attch" controllable="true" prioritized="true"/>
-		<Event id="e5" label="attch_ptB" controllable="true" prioritized="true"/>
-		<Event id="e6" label="finB_attch" controllable="true" prioritized="true"/>
-		<Event id="e7" label="start_case" controllable="true" prioritized="true"/>
-		<Event id="e8" label="compl_case" controllable="false" prioritized="true"/>		
-	</Events>
-	<States>
-		<State id="l0" initial="true" accepting="true"/>
-		<State id="l1"/>
-		<State id="l2"/>
-		<State id="l3"/>
-		<State id="l4"/>
-	</States>
-	<Transitions>
-		<Transition source="l0" dest="l1" event="e1"/>
-		<Transition source="l1" dest="l0" event="e2"/>
-		<Transition source="l0" dest="l2" event="e3"/>
-		<Transition source="l2" dest="l0" event="e4"/>
-		<Transition source="l0" dest="l3" event="e5"/>
-		<Transition source="l3" dest="l0" event="e6"/>
-		<Transition source="l0" dest="l4" event="e7"/>
-		<Transition source="l4" dest="l0" event="e8"/>		
-	</Transitions>
-</Automaton>
--->
-
-<!-- Attach part to Assembly e -->
-<Automaton name="e">
-	<Events>
-		<Event id="e1" label="take_pt" controllable="true" prioritized="true"/>
-		<Event id="e2" label="str_ptA" controllable="true" prioritized="true"/>
-		<Event id="e3" label="str_ptB" controllable="true" prioritized="true"/>
-		<Event id="e4" label="cmpl_A" controllable="false" prioritized="true"/>
-		<Event id="e5" label="cmpl_B" controllable="false" prioritized="true"/>
-		<Event id="e6" label="ret_pt" controllable="false" prioritized="true"/>	
+		<Event id="e4" label="cmpl_A" controllable="false"/>
+		<Event id="e5" label="cmpl_B" controllable="false"/>
+		<Event id="e6" label="ret_pt" controllable="false"/>
+		<Event id="e2" label="str_ptA"/>
+		<Event id="e3" label="str_ptB"/>
+		<Event id="e1" label="take_pt"/>
 	</Events>
 	<States>
 		<State id="e0" initial="true" accepting="true"/>
@@ -212,14 +171,13 @@
 		<Transition source="e4" dest="e0" event="e6"/>
 	</Transitions>
 </Automaton>
-<!-- Polish part f -->
-<Automaton name="f">
+<Automaton name="Polish Part" type="Plant">
 	<Events>
-		<Event id="e1" label="start_pol" controllable="true" prioritized="true"/>
-		<Event id="e2" label="dip_acid" controllable="true" prioritized="true"/>
-		<Event id="e3" label="polish" controllable="true" prioritized="true"/>
-		<Event id="e4" label="str_rlse" controllable="true" prioritized="true"/>
-		<Event id="e5" label="compl_pol" controllable="false" prioritized="true"/>
+		<Event id="e5" label="compl_pol" controllable="false"/>
+		<Event id="e2" label="dip_acid"/>
+		<Event id="e3" label="polish"/>
+		<Event id="e1" label="start_pol"/>
+		<Event id="e4" label="str_rlse"/>
 	</Events>
 	<States>
 		<State id="f0" initial="true" accepting="true"/>
@@ -230,16 +188,15 @@
 		<Transition source="f0" dest="f1" event="e1"/>
 		<Transition source="f1" dest="f1" event="e2"/>
 		<Transition source="f1" dest="f1" event="e3"/>
-		<Transition source="f1" dest="f2" event="e4"/>		
+		<Transition source="f1" dest="f2" event="e4"/>
 		<Transition source="f2" dest="f0" event="e5"/>
 	</Transitions>
 </Automaton>
-<!-- Attach case to assembly g -->
-<Automaton name="g">
+<Automaton name="Attach Case to Assembly" type="Plant">
 	<Events>
-		<Event id="e1" label="start_case" controllable="true" prioritized="true"/>
-		<Event id="e2" label="attch_case" controllable="false" prioritized="true"/>
-		<Event id="e3" label="compl_case" controllable="false" prioritized="true"/>
+		<Event id="e2" label="attch_case" controllable="false"/>
+		<Event id="e3" label="compl_case" controllable="false"/>
+		<Event id="e1" label="start_case"/>
 	</Events>
 	<States>
 		<State id="g0" initial="true" accepting="true"/>
@@ -252,13 +209,12 @@
 		<Transition source="g2" dest="g0" event="e3"/>
 	</Transitions>
 </Automaton>
-<!-- Polishing sequence h -->
-<Automaton name="h">
+<Automaton name="Polishing Sequence" type="Specification">
 	<Events>
-		<Event id="e1" label="start_pol" controllable="true" prioritized="true"/>
-		<Event id="e2" label="dip_acid" controllable="true" prioritized="true"/>
-		<Event id="e3" label="polish" controllable="true" prioritized="true"/>
-		<Event id="e4" label="str_rlse" controllable="true" prioritized="true"/>
+		<Event id="e2" label="dip_acid"/>
+		<Event id="e3" label="polish"/>
+		<Event id="e1" label="start_pol"/>
+		<Event id="e4" label="str_rlse"/>
 	</Events>
 	<States>
 		<State id="h0" initial="true" accepting="true"/>
@@ -277,20 +233,18 @@
 		<Transition source="h5" dest="h0" event="e4"/>
 	</Transitions>
 </Automaton>
-<!-- Affix part i -->
-<Automaton name="i">
+<Automaton name="Affix Part" type="Specification">
 	<Events>
-		<Event id="e1" label="attch_ptA" controllable="true" prioritized="true"/>
-		<Event id="e2" label="take_pt" controllable="true" prioritized="true"/>
-		<Event id="e3" label="str_ptA" controllable="true" prioritized="true"/>
-		<Event id="e4" label="cmpl_A" controllable="false" prioritized="true"/>
-		<Event id="e5" label="ret_pt" controllable="false" prioritized="true"/>
-		<Event id="e6" label="finA_attch" controllable="true" prioritized="true"/>
-		<Event id="e7" label="attch_ptB" controllable="true" prioritized="true"/>
-		<Event id="e8" label="str_ptB" controllable="true" prioritized="true"/>
-		<Event id="e9" label="cmpl_B" controllable="false" prioritized="true"/>
-		<Event id="e10" label="ret_pt" controllable="false" prioritized="true"/>
-		<Event id="e11" label="finB_attch" controllable="true" prioritized="true"/>		
+		<Event id="e1" label="attch_ptA"/>
+		<Event id="e7" label="attch_ptB"/>
+		<Event id="e4" label="cmpl_A" controllable="false"/>
+		<Event id="e9" label="cmpl_B" controllable="false"/>
+		<Event id="e6" label="finA_attch"/>
+		<Event id="e11" label="finB_attch"/>
+		<Event id="e10" label="ret_pt" controllable="false"/>
+		<Event id="e3" label="str_ptA"/>
+		<Event id="e8" label="str_ptB"/>
+		<Event id="e2" label="take_pt"/>
 	</Events>
 	<States>
 		<State id="i0" initial="true" accepting="true"/>
@@ -307,12 +261,12 @@
 	</States>
 	<Transitions>
 		<Transition source="i0" dest="i1" event="e1"/>
+		<Transition source="i0" dest="i6" event="e7"/>
 		<Transition source="i1" dest="i2" event="e2"/>
 		<Transition source="i2" dest="i3" event="e3"/>
 		<Transition source="i3" dest="i4" event="e4"/>
 		<Transition source="i4" dest="i5" event="e5"/>
 		<Transition source="i5" dest="i0" event="e6"/>
-		<Transition source="i0" dest="i6" event="e7"/>
 		<Transition source="i6" dest="i7" event="e2"/>
 		<Transition source="i7" dest="i8" event="e8"/>
 		<Transition source="i8" dest="i9" event="e9"/>

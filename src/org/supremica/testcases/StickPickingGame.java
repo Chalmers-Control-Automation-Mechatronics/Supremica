@@ -164,7 +164,6 @@ public class StickPickingGame
 	{
 		try
 		{
-			System.err.println("StickPickingGame::construct");
 			automata.addAutomaton(new Players(players));
 			automata.addAutomaton(new Sticks(sticks, players)); 
 		}
@@ -177,7 +176,6 @@ public class StickPickingGame
 	
 	public Automata getAutomata()
 	{
-		// System.err.println("StickPickingGame::getAutomata()");
 		return automata;
 	}
 

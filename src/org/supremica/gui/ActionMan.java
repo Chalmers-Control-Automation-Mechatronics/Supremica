@@ -1177,7 +1177,7 @@ public class ActionMan
 			StringBuffer statusStr = new StringBuffer();
 
 			statusStr.append("Status for automaton: " + currAutomaton.getName());
-			if(currAutomaton.getComment() != null || !currAutomaton.getComment().equals(""))
+			if(currAutomaton.getComment() != null && !currAutomaton.getComment().equals(""))
 			{
 				statusStr.append("\nComment: \"" + currAutomaton.getComment() + "\"");
 			}

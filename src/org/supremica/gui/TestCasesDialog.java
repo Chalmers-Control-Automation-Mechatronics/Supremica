@@ -239,11 +239,8 @@ class ExampleTab
 		addTab("Users", null, new UsersPanel(), "Mutual exclusion users");
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
-		addTab("Game", null, new StickGamePanel(), "Stick picking game");
-		if (SupremicaProperties.generalUseRCP())
-		{
-			addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
-		}
+		addTab("Sticks Game", null, new StickGamePanel(), "Stick picking game");
+		addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
 }
 
