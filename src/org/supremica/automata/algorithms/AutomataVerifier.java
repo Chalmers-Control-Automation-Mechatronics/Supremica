@@ -681,7 +681,7 @@ public class AutomataVerifier
 				else
 					states = potentiallyUncontrollableStates.size(automataIndices) + " states";
 
-				logger.info("\"" + automataNames + "\" has " + states + 
+				logger.info("\"" + automataNames + "\" has " + states +
 							 " that might be uncontrollable...");
 			}
 
@@ -1272,6 +1272,8 @@ public class AutomataVerifier
 
 
 		boolean ret  = false;
+		org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDLanguageInclusionVerification");
+
 		switch(Options.inclsuion_algorithm) {
 			case Options.INCLUSION_ALGO_MONOLITHIC:
 				AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected, synchHelper.getHelperData() );
@@ -1293,6 +1295,11 @@ public class AutomataVerifier
 				throw new Exception("Unknown BDD/language containment algorithm!");
 		}
 
+		if(Options.profile_on)
+		{
+			timer.report("total execution time", true);
+		}
+
 		Options.out.flush();
 		return ret;
     }
@@ -1312,7 +1319,11 @@ public class AutomataVerifier
 
 		// why compute when we already know the answer: L(P) = \Sigma^*   ?
 		if( theAutomata.isNoAutomataPlants() )
-					return true;
+		{
+			return true;
+		}
+
+		org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDControllabilityVerification");
 
 		switch(Options.inclsuion_algorithm) {
 			case Options.INCLUSION_ALGO_MONOLITHIC:
@@ -1335,6 +1346,11 @@ public class AutomataVerifier
 				throw new Exception("Unknown BDD/language containment algorithm!");
 		}
 
+
+		if(Options.profile_on)
+		{
+			timer.report("total execution time", true);
+		}
 
 		Options.out.flush();
 

@@ -72,7 +72,7 @@ public class Options
     public static int algo_family = ALGO_SMOOTHED_MONO;
     public static int count_algo  = COUNT_TREE;
     public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
-    public static int inclsuion_algorithm = INCLUSION_ALGO_MODULAR;
+    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;
 	public static int as_heuristics  = AS_HEURISTIC_MOST_COMMON_UC_ARCS;
 
     // out own out stream, might be changed to point to a file

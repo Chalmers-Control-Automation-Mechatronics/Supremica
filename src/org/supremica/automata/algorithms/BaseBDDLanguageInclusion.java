@@ -1,7 +1,5 @@
 
 
-
-
 package org.supremica.automata.algorithms;
 
 
@@ -43,6 +41,10 @@ public abstract class BaseBDDLanguageInclusion {
 
 
 
+	// statistic stuff
+	protected int num_specs_tested = 0;
+	protected int num_syncs_done = 0;
+	protected int max_sync_depth = 0;
 
 	// local event stuff:
 	protected boolean [] local_events;	/** true if an event is local, valid only after a call to register_automaton_addition() */
@@ -125,6 +127,8 @@ public abstract class BaseBDDLanguageInclusion {
      *
      */
     public void cleanup() {
+		if(Options.profile_on)	showStatistics();
+
 		if(work1 != null) work1.cleanup();
 		if(work2 != null) work2.cleanup();
 		if(L1 != null) L1.cleanup();
@@ -204,7 +208,13 @@ public abstract class BaseBDDLanguageInclusion {
 		{
 			BDDAutomaton k =  l1[i];
 
+			num_specs_tested++;
+			int old_syncs = num_syncs_done;
 			result = check(k, ac);
+
+			int syncs_done = num_syncs_done - old_syncs;
+			if(syncs_done > max_sync_depth) max_sync_depth = syncs_done;
+
 			if(!result)
 			{
 				if(Options.debug_on) Options.out.println(k.getName() + " FAILED language containment test.\n");
@@ -345,8 +355,6 @@ public abstract class BaseBDDLanguageInclusion {
 			int tmp_bdd = ba.and(bdd_uc, local_r);
 			boolean not_exist = (tmp_bdd == ba.getZero());
 
-
-
 			ba.deref(local_r);
 
 			if(not_exist) {
@@ -360,6 +368,7 @@ public abstract class BaseBDDLanguageInclusion {
 				// no need to proceed, we now we are screwed ;(
 				if(Options.debug_on)
 					Options.out.println("A 'bad' state was proved to be reachable by _local events_. we are done!");
+
 
 				// XXX: looks like this gives an error.
 				// this is since when tracing back, show_trace will try _any_ way back to
@@ -376,6 +385,19 @@ public abstract class BaseBDDLanguageInclusion {
 
 	// ---------------------------------------------------------------------------------------
 
+	/** show some stats, make everyone happy etc... */
+	public void showStatistics() {
+		Options.out.println(
+			"Algorithm statistics: " +
+			num_syncs_done  + " syncs, " +
+			num_specs_tested + " tests, maximum sync depth = " +
+			max_sync_depth
+		);
+	}
+	// ---------------------------------------------------------------------------------------
+
 	/** this is where all the action will be... */
 	protected abstract boolean check(BDDAutomaton k, AutomataConfiguration ac);
+
+
 }

@@ -2,7 +2,11 @@
 package org.supremica.automata.algorithms;
 
 
-// TODO: remove the early-termination test if no more automata exists to be added
+// TODO:
+// for some reason i cant understand, incremental algo is much slower than the modular one.
+// there are two possible reasons (that i can think of)
+//  1. event_included() is too expensive
+//  2. when we remove the "solved" events, this confuses the herusitics for some reason
 
 
 
@@ -117,6 +121,8 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		sup = null;
 
 		for(;;) {
+			num_syncs_done++; // statistic stuffs
+
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null)
 				break;
@@ -153,9 +159,15 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				// ok, we now it might exists. we can proov that it _does_ exists if
 				// we can show that is reachable using local events only!!
 				// no idea doing this if we have added all automaton that can be added :(
-				else if(ac.moreToGo() && try_local_reachability(sup, next, bdd_theta)) {
-					cleanup_bdds();
-					return false;
+				else if(ac.moreToGo()) {
+					// those damn self-loops!!
+					int bdd_theta_relevant = ba.and(bdd_theta, work2.getSigma() );
+					if(try_local_reachability(sup, next, bdd_theta_relevant)) {
+						ba.deref(bdd_theta_relevant);
+						cleanup_bdds();
+						return false;
+					}
+					ba.deref(bdd_theta_relevant);
 				}
 
 
@@ -236,6 +248,8 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		sup = null;
 
 		for(;;) {
+			num_syncs_done++; // statistic stuffs
+
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
@@ -274,9 +288,15 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 				// ok, we now it might exists. we can proov that it _does_ exists if
 				// we can show that is reachable using local events only!!
 				// no idea doing this if we have added all automaton that can be added :(
-				else if(ac.moreToGo() && try_local_reachability(sup, next, bdd_theta)) {
-					cleanup_bdds();
-					return false;
+				else if(ac.moreToGo()) {
+					// those damn self-loops!!
+					int bdd_theta_relevant = ba.and(bdd_theta, work2.getSigma() );
+					if(try_local_reachability(sup, next, bdd_theta_relevant)) {
+						ba.deref(bdd_theta_relevant);
+						cleanup_bdds();
+						return false;
+					}
+					ba.deref(bdd_theta_relevant);
 				}
 
 				// *** see if some events are proved to be unrachable and can be removed
@@ -315,7 +335,9 @@ public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		return work2.isEmpty();
 	}
 
+
 	// ----- [ all common code goes here ] -------------------------------------------------------
+
 	private void cleanup_bdds() {
 		if(bdd_theta != -1) {
 			ba.deref(bdd_theta);

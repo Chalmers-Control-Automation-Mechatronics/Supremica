@@ -88,6 +88,8 @@ public class ModularBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 		sup = null; // you never know ...
 
 		for(;;) {
+			num_syncs_done++; // statistic stuffs
+
 			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 
