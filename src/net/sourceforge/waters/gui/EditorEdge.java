@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.4 2005-02-21 11:13:33 flordal Exp $
+//# $Id: EditorEdge.java,v 1.5 2005-02-22 03:05:08 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -78,6 +78,7 @@ public class EditorEdge
 		proxy.getStartPoint().setPoint(start);
 		proxy.getEndPoint().setPoint(endNode.getPosition());
 
+		// Create new geometry if there is none
 		if (proxy.getGeometry() == null)
 		{
 			if (startNode != endNode)
@@ -370,7 +371,8 @@ public class EditorEdge
 		return dragC;
 	}
 
-	/** Get the X coordinate of the turning point of the curve
+	/** 
+	 * Get the X coordinate of the turning point of the curve
 	 * returns The X coordinate of the curve turning point
 	 */
 	public double getTPointX()
@@ -385,7 +387,8 @@ public class EditorEdge
 		}
 	}
 
-	/** Get the Y coordinate of the turning point of the curve
+	/** 
+	 * Get the Y coordinate of the turning point of the curve
 	 * returns The Y coordinate of the curve turning point
 	 */
 	public double getTPointY()
@@ -400,7 +403,8 @@ public class EditorEdge
 		}
 	}
 
-	/** A synonym for getTPointX()
+	/** 
+	 * A synonym for getTPointX()
 	 * Returns the X coordinate of the curve turning point
 	 */
 	public int getX()
@@ -408,7 +412,8 @@ public class EditorEdge
 		return (int) getTPointX();
 	}
 
-	/** A synonym for getTPointY()
+	/** 
+	 * A synonym for getTPointY()
 	 * Returns the Y coordinate of the curve turning point
 	 */
 	public int getY()
@@ -416,7 +421,8 @@ public class EditorEdge
 		return (int) getTPointY();
 	}
 
-	/* Set the screen coordinates of the turning point of the edge.
+	/* 
+	 * Set the screen coordinates of the turning point of the edge.
 	 */
 	public void setTPoint(double x, double y)
 	{

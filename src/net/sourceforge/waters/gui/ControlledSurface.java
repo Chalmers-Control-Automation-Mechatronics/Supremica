@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.6 2005-02-21 21:33:30 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.7 2005-02-22 03:05:08 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -524,7 +524,7 @@ public class ControlledSurface
 					// Is it a nodegroup?
 					else if (object.getType() == EditorObject.NODEGROUP)
 					{
-						EditorNodeGroup nodeGroup = (EditorNodeGroup) selectedObjects.get(0);
+						EditorNodeGroup nodeGroup = (EditorNodeGroup) object;
 						
 						Rectangle2D.Double b = new Rectangle2D.Double();
 						
@@ -570,7 +570,7 @@ public class ControlledSurface
 						edge.setTPoint(edge.getTPointX() + dx, edge.getTPointY() + dy);
 					}
 
-					// DONT MOVE LABELS IN MULTI MODE, WITH THE OFFSETS IT'S NO FUN TO TRY TO GET IT RIGHT...
+					// DONT MOVE LABELS IN MULTI MODE, (WITH THE OFFSETS IT'S NO FUN TO TRY TO GET IT RIGHT...)
 					if (selectedObjects.size() == 1)
 					{
 						// Is it a label?
