@@ -621,7 +621,7 @@ public class PerEventTransition implements WeightedObject
 		// return members;
 		double s1 = next_event.length;
 		double s2 = automata_cover.length;
-		return (next_events + prev_events) / s1 + (members) / s2;
+		return (next_events + prev_events) / (2 * s1) + (members) / s2;
 	}
 
 }

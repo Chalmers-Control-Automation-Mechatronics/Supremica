@@ -20,7 +20,7 @@ public class TransitionOptimizer {
 
 		private final static int
 			MAX_AUTOMATA_COVER = 40, // the largest automata cover
-			MAX_PARTITION_NODECOUNT = 10000; // the largest local T
+			MAX_PARTITION_NODECOUNT = 30000; // the largest local T
 
 	private PerEventTransition [] org, optimized;
 	private BDDAutomaton [] all;
@@ -107,12 +107,19 @@ public class TransitionOptimizer {
 		// sort it, largest one first
 		QuickSort.sort(copy, true);
 
+		// the first one is the largest. lets save this value for now
+		double max_weight =  copy[0].weight();
+
 		for(int i = 0; i < n; i++)
 		{
 			if(copy[i] == null) continue;
 
 			// we wont let the weight get bigger than this!
-			double max = copy[i].weight() * 1.5; // XXX: but what if the weight is already very large, say 100% ?
+
+			// NOTE: we stop when the weight becomes to be more than twice as before
+			//       ... or, when it gets at least 10% more than the largest one
+			double max = Math.min( max_weight * 1.1, copy[i].weight() * 2.0);
+
 			boolean done = false;
 			do {
 
