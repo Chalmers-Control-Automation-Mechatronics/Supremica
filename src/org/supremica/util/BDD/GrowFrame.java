@@ -240,7 +240,7 @@ public class GrowFrame
 	{
 		public GrowCanvas()
 		{
-			this.resize(400, 300);
+			this.setSize(400, 300);
 		}
 
 
@@ -271,7 +271,7 @@ public class GrowFrame
 			}
 
 
-			Dimension dims = this.size();
+			Dimension dims = this.getSize();
 			int size_x = vars.getSize();
 			int size_y = (max - min);
 			int marg_y = (dims.height * 1) / 10;

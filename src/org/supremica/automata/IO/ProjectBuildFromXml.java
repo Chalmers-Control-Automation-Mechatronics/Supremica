@@ -178,7 +178,6 @@ public class ProjectBuildFromXml
 		return build(file.toURL());
 	}
 
-	// changed to public by Arash, we need to load from streams in XML-RPC interface!
 	public Project build(InputStream is)
 		throws Exception
 	{
@@ -206,7 +205,8 @@ public class ProjectBuildFromXml
 		return build(fileName, false);
 	}
 
-	private Project build(Reader r)
+	// changed to public by Arash, we need to load from streams in XML-RPC interface!
+	public Project build(Reader r)
 		throws Exception
 	{
 		return build(r, false);

@@ -48,7 +48,7 @@ public class SizeWatch
 	Dimension dim = getPreferredSize();
 	dim.width = Math.max(dim.width, 400);
 	dim.height = Math.max(dim.height, 600);
-	resize(dim);
+	setSize(dim);
 
 
 	add( list = new List(30), BorderLayout.CENTER);

@@ -1141,7 +1141,7 @@ public class AutomataEditor
 
 	public void fileClose()
 	{
-		this.show(false);
+		this.setVisible(false);
 	}
 
 	// State

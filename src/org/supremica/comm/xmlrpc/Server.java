@@ -245,13 +245,13 @@ public class Server
 			// System.out.println("automatonXmlEncoding = " + automatonXmlEncoding);
 
 
-			StringBufferInputStream sbis = new StringBufferInputStream(automatonXmlEncoding);
+			StringReader reader = new StringReader(automatonXmlEncoding);
 			Project project = null;
 
 			try
 			{
 				ProjectBuildFromXml builder = new ProjectBuildFromXml();
-				project = builder.build(sbis);
+				project = builder.build(reader);
 			}
 			catch (Exception e)
 			{
@@ -272,13 +272,14 @@ public class Server
 		public int addAutomata(String automataXmlEncoding)
 				throws XmlRpcException
 		{
-			StringBufferInputStream sbis = new StringBufferInputStream(automataXmlEncoding);
+			StringReader reader = new StringReader(automataXmlEncoding);
+			
 			Project project;
 
 			try
 			{
 				ProjectBuildFromXml builder = new ProjectBuildFromXml();
-				project = builder.build(sbis);
+				project = builder.build(reader);
 			}
 			catch (Exception e)
 			{

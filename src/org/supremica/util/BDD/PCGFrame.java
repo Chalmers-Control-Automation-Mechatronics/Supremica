@@ -141,7 +141,7 @@ public class PCGFrame
 
 	private void build_list()
 	{
-		order.clear();
+		order.removeAll();
 
 		for (int i = 0; i < size; i++)
 		{
