@@ -12,9 +12,10 @@ import org.supremica.automata.Automata;
 import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;
 import org.supremica.testcases.DiningPhilosophers;
+import org.supremica.testcases.StickPickingGame;
 import org.supremica.testcases.AllocationBatch;
 
-// performs integer validation - see Horstmann
+// should perform integer validation - see Horstmann
 class IntegerField
 	extends JTextField
 {
@@ -61,8 +62,8 @@ class UsersPanel
 
 		num_users.add(new JLabel("Number of users: "));
 		num_users.add(int_num = new IntegerField("3", 6));
-		add("North", cont);
-		add("South", num_users);
+		add(BorderLayout.NORTH, cont);
+		add(BorderLayout.SOUTH, num_users);
 	}
 
 	public Automata doIt()
@@ -123,16 +124,15 @@ class BricksPanel
 	BricksPanel()
 	{
 		JPanel rows = new JPanel();
-
 		rows.add(new JLabel("Number of rows: "));
 		rows.add(num_rows);
 
 		JPanel cols = new JPanel();
-
 		cols.add(new JLabel("Number of cols: "));
 		cols.add(num_cols);
-		add("North", rows);
-		add("South", cols);
+		
+		add(BorderLayout.NORTH, rows);
+		add(BorderLayout.SOUTH, cols);
 	}
 
 	public Automata doIt()
@@ -141,6 +141,36 @@ class BricksPanel
 		BricksGame bg = new BricksGame(num_rows.get(), num_cols.get());
 
 		return bg.getAutomata();
+	}
+}
+
+class StickGamePanel
+	extends JPanel
+	implements TestCase
+{
+	IntegerField num_players = new IntegerField("2", 6);
+	IntegerField num_sticks = new IntegerField("5", 6);
+	
+	StickGamePanel()
+	{
+		JPanel players = new JPanel();
+		players.add(new JLabel("Number of players: "));
+		players.add(num_players);
+		
+		JPanel sticks = new JPanel();
+		sticks.add(new JLabel("Number of sticks: "));
+		sticks.add(num_sticks);
+		
+		add(players, BorderLayout.NORTH);
+		add(sticks, BorderLayout.SOUTH);
+		
+	}
+	public Automata doIt()
+		throws Exception
+	{
+		// System.err.println("SticksGamePanel::doIt()");
+		StickPickingGame spg = new StickPickingGame(num_players.get(), num_sticks.get());
+		return spg.getAutomata();
 	}
 }
 
@@ -163,7 +193,7 @@ class AllocationBatchPanel
 		pCenter.add(browse = new JButton("..."));
 		browse.addActionListener(this);
 		add(pCenter, BorderLayout.CENTER);
-		add(new JLabel("Exprimental serialized allocation batch"), BorderLayout.NORTH);
+		add(new JLabel("Experimental serialized allocation batch"), BorderLayout.NORTH);
 	}
 
 	public Automata doIt()
@@ -210,6 +240,7 @@ class ExampleTab
 		addTab("Users", null, new UsersPanel(), "Mutual exclusion users");
 		addTab("Philos", null, new PhilosPanel(), "Dininig Philosophers");
 		addTab("Bricks", null, new BricksPanel(), "n-by-m bricks game");
+		addTab("Game", null, new StickGamePanel(), "Stick picking game");
 		addTab("Allocation Batch", null, new AllocationBatchPanel(), "Serialized Allocation Batch");
 	}
 }
@@ -300,7 +331,7 @@ public class TestCasesDialog
 		TestCase tc = (TestCase) comp;
 
 		automata = tc.doIt();    // Should return a Project (named)
-
+	System.err.println("Done it!");
 		dispose();
 	}
 

@@ -69,6 +69,37 @@ class SynthesizerDialogStandardPanel
 	private JComboBox algorithmTypeBox;
 	private JCheckBox purgeBox;
 	private JCheckBox optimizeBox;
+	private NonblockNote nbNote;
+	
+	class NonblockNote
+		extends JPanel
+	{
+		boolean enabled = false;
+		
+		public void enable()
+		{
+			if(!enabled)
+			{
+				super.setLayout(new GridLayout(5,1));
+				super.add(new JLabel("Note:"));
+				super.add(new JLabel("Currently, the modular nonblocking algorithm"));
+				super.add(new JLabel("does not gurantee global nonblocking. The only"));
+				super.add(new JLabel("gurantee is that each supervisor is nonblockng"));
+				super.add(new JLabel("with respect to the plants that it controls"));
+				super.revalidate();
+				enabled = true;
+			}
+		}
+		public void disable()
+		{
+			if(enabled)
+			{
+				super.removeAll();
+				super.revalidate();
+				enabled = false;
+			}
+		}
+	}
 
 	public SynthesizerDialogStandardPanel(int num)
 	{
@@ -84,22 +115,29 @@ class SynthesizerDialogStandardPanel
 			algorithmTypeBox.addItem(SynthesisAlgorithm.Monolithic);
 		}
 		algorithmTypeBox.addActionListener(this);
+		
 		synthesisTypeBox = new JComboBox(SynthesisType.toArray());
+		synthesisTypeBox.addActionListener(this);
 		
 		purgeBox = new JCheckBox("Purge result");
 		purgeBox.setToolTipText("Remove all forbidden states");
 		
 		optimizeBox = new JCheckBox("Optimize result");
 		optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
+		
+		nbNote = new NonblockNote();
+		
 		if(num == 1)
 		{		
 			optimizeBox.setEnabled(false);
+			nbNote.disable();
 		}
 		
 		standardBox.add(synthesisTypeBox);
 		standardBox.add(algorithmTypeBox);
 		standardBox.add(purgeBox);
 		standardBox.add(optimizeBox);
+		standardBox.add(nbNote);
 		this.add(standardBox);
 	}
 
@@ -124,10 +162,19 @@ class SynthesizerDialogStandardPanel
 		if((SynthesisAlgorithm) algorithmTypeBox.getSelectedItem() == SynthesisAlgorithm.Monolithic)
 		{
 			optimizeBox.setEnabled(false);
+			nbNote.disable();
 		}
-		else
+		else // modular
 		{
 			optimizeBox.setEnabled(true);
+			if((SynthesisType) synthesisTypeBox.getSelectedItem() == SynthesisType.Controllable)
+			{
+				nbNote.disable();
+			}
+			else // some type of nb, show the sign
+			{
+				nbNote.enable();
+			}
 		}
 	}
 }
