@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Example from Moody/Antsaklis "Superviory Control of 
-	Discrete Event Systems Using Petri Nets", p.120
--->
-<SupremicaProject name="AGV"  major="0"  minor="9" >
+<SupremicaProject name="AGV" comment="Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120.">
 <!-- Input stations -->
 <Automaton name="Input1" type="Plant">
 	<Events>

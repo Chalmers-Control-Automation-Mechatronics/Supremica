@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="FlexibleManufacturingSystem" major="0" minor="9">
+<Automata name="FlexibleManufacturingSystem" comment="Example from 'Smart TCT: An Efficient Algorithm for Supervisory Control Design' by Z. Zhang. But... something is seriously wrong with this system... check the hierarchy...">
 <Automaton name="blocks_on_conveyor4" type="Specification">
 	<Events>
 		<Event id="0" label="r1_p_bl_c4"/>
@@ -233,7 +233,7 @@
 </Automaton>
 <Automaton name="lathe" type="Plant">
 	<Events>
-		<Event id="0" label="L_f_b1"/>
+		<Event id="0" label="L_f_bl"/>
 		<Event id="1" label="r3_g_blf"/>
 		<Event id="2" label="r3_p_bl"/>
 	</Events>
@@ -443,14 +443,14 @@
 </Automaton>
 <Automaton name="r1" type="Plant">
 	<Events>
-		<Event id="0" label="r1_g_b1"/>
+		<Event id="0" label="r1_g_bl"/>
 		<Event id="1" label="r1_g_blf"/>
 		<Event id="2" label="r1_g_pa"/>
 		<Event id="3" label="r1_g_paf"/>
 		<Event id="4" label="r1_g_pe"/>
 		<Event id="5" label="r1_g_pef"/>
 		<Event id="6" label="r1_g_prd"/>
-		<Event id="7" label="r1_p_b1"/>
+		<Event id="7" label="r1_p_bl"/>
 		<Event id="8" label="r1_p_blf"/>
 		<Event id="9" label="r1_p_pa"/>
 		<Event id="10" label="r1_p_paf"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>  
- <SupremicaProject name="Robot" major="0" minor="9">
- <Automaton name="robot_1" type="Plant">
+<SupremicaProject name="Welding Robots" comment="This example is a result of the Master Thesis 'Optimal coordination of a multi-robot cell' by E. Green and A. Johansson.">
+<Automaton name="Robot_1" type="Plant">
  <Events>
   <Event id="0" label="robot_1_start" /> 
   <Event id="1" label="b1_1" /> 
@@ -21,9 +21,9 @@
   <Transition source="2" dest="3" event="2" /> 
   <Transition source="3" dest="4" event="3" /> 
   <Transition source="4" dest="0" event="4" /> 
-  </Transitions>
-  </Automaton>
- <Automaton name="robot_2" type="Plant">
+ </Transitions>
+</Automaton>
+<Automaton name="Robot_2" type="Plant">
  <Events>
   <Event id="0" label="robot_2_start" /> 
   <Event id="1" label="b2_1" /> 
@@ -54,8 +54,8 @@
   <Transition source="6" dest="7" event="6" /> 
   <Transition source="7" dest="0" event="7" /> 
   </Transitions>
-  </Automaton>
- <Automaton name="robot_3" type="Plant">
+</Automaton>
+<Automaton name="Robot_3" type="Plant">
  <Events>
   <Event id="0" label="robot_3_start" /> 
   <Event id="1" label="b3_1" /> 
@@ -63,7 +63,7 @@
   <Event id="3" label="u3_2" controllable="false" /> 
   <Event id="4" label="u3_3" controllable="false" /> 
   <Event id="5" label="robot_3_home" controllable="false" /> 
-  </Events>
+ </Events>
  <States>
   <State id="0" name="q_0" cost="0" initial="true" /> 
   <State id="1" name="q_1" cost="3" /> 
@@ -71,7 +71,7 @@
   <State id="3" name="q_3" cost="2" /> 
   <State id="4" name="q_4" cost="2" /> 
   <State id="5" name="q_5" cost="0" accepting="true" /> 
-  </States>
+ </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="1" dest="2" event="1" /> 
@@ -79,93 +79,93 @@
   <Transition source="3" dest="4" event="3" /> 
   <Transition source="4" dest="5" event="4" /> 
   <Transition source="5" dest="0" event="5" /> 
-  </Transitions>
-  </Automaton>
- <Automaton name="Spec_1" type="Specification">
+ </Transitions>
+</Automaton>
+<Automaton name="Spec_1" type="Specification">
  <Events>
   <Event id="0" label="b3_1" /> 
   <Event id="1" label="u3_2" controllable="false" /> 
   <Event id="2" label="b2_2" /> 
   <Event id="3" label="u2_2" controllable="false" /> 
-  </Events>
+ </Events>
  <States>
   <State id="0" name="q_0" initial="true" accepting="true" /> 
   <State id="1" name="q_1" /> 
   <State id="2" name="q_2" /> 
-  </States>
+ </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="0" dest="2" event="2" /> 
   <Transition source="1" dest="0" event="1" /> 
   <Transition source="2" dest="0" event="3" /> 
-  </Transitions>
-  </Automaton>
- <Automaton name="Spec_2" type="Specification">
+ </Transitions>
+</Automaton>
+<Automaton name="Spec_2" type="Specification">
  <Events>
   <Event id="0" label="b3_1" /> 
   <Event id="1" label="u3_3" controllable="false" /> 
-  </Events>
+ </Events>
  <States>
   <State id="0" name="q_0" initial="true" accepting="true" /> 
   <State id="1" name="q_1" /> 
-  </States>
+ </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="1" dest="0" event="1" /> 
   </Transitions>
-  </Automaton>
- <Automaton name="Spec_3" type="Specification">
+ </Automaton>
+<Automaton name="Spec_3" type="Specification">
  <Events>
   <Event id="0" label="b2_1" /> 
   <Event id="1" label="u2_1" controllable="false" /> 
   <Event id="2" label="b1_1" /> 
   <Event id="3" label="u1_1" controllable="false" /> 
-  </Events>
+ </Events>
  <States>
   <State id="0" name="q_0" initial="true" accepting="true" /> 
   <State id="1" name="q_1" /> 
   <State id="2" name="q_2" /> 
-  </States>
+ </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="0" dest="2" event="2" /> 
   <Transition source="1" dest="0" event="1" /> 
   <Transition source="2" dest="0" event="3" /> 
-  </Transitions>
-  </Automaton>
- <Automaton name="Spec_4" type="Specification">
+ </Transitions>
+</Automaton>
+<Automaton name="Spec_4" type="Specification">
  <Events>
   <Event id="0" label="b3_1" /> 
   <Event id="1" label="u3_1" controllable="false" /> 
-  </Events>
+ </Events>
  <States>
   <State id="0" name="q_0" initial="true" accepting="true" /> 
   <State id="1" name="q_1" /> 
-  </States>
+ </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="1" dest="0" event="1" /> 
-  </Transitions>
-  </Automaton>
- <Automaton name="Spec_5" type="Specification">
+ </Transitions>
+</Automaton>
+<Automaton name="Spec_5" type="Specification">
  <Events>
   <Event id="0" label="b2_3" /> 
   <Event id="1" label="u2_3" controllable="false" /> 
   <Event id="2" label="b1_1" /> 
   <Event id="3" label="u1_2" controllable="false" /> 
-  </Events>
+ </Events>
  <States>
   <State id="0" name="q_0" initial="true" accepting="true" /> 
   <State id="1" name="q_1" /> 
   <State id="2" name="q_2" /> 
-  </States>
+ </States>
  <Transitions>
   <Transition source="0" dest="1" event="0" /> 
   <Transition source="0" dest="2" event="2" /> 
   <Transition source="1" dest="0" event="1" /> 
   <Transition source="2" dest="0" event="3" /> 
-  </Transitions>
-  </Automaton>
+ </Transitions>
+</Automaton>
   <!--/Automata-->
 
 <Execution>
@@ -236,8 +236,8 @@
   </Action>
 
 </Actions>
- <Controls>
 
+ <Controls>
 
  <!--  robot_1   --> 
  <Control label="robot_1_home">

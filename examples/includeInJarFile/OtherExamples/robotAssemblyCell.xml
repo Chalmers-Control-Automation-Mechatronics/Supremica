@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="RobotAssemblyCell"  major="0"  minor="9" >
+<Automata name="RobotAssemblyCell" comment="The 'Luisa example', adapted from 'An Architecture for Flexible Manufacturing Systems Applied to an Assembly Cell' by M. Losito.">
 <Automaton name="Zone8" type="Plant">
 	<Events>
 		<Event id="e_3_48" label="e_3_48"/>

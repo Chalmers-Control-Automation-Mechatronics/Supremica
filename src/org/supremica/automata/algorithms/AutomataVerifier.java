@@ -1388,7 +1388,7 @@ public class AutomataVerifier
 		Automaton currAutomaton;
 		while (autIt.hasNext())
 		{
-			currAutomaton = new Automaton((Automaton) autIt.next());
+			currAutomaton = (Automaton) autIt.next();
 			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
 			if (stopRequested)
 			{
@@ -1484,7 +1484,7 @@ public class AutomataVerifier
 		Automaton currAutomaton;
 		while (autIt.hasNext())
 		{
-			currAutomaton = new Automaton((Automaton) autIt.next());
+			currAutomaton = (Automaton) autIt.next();
 			allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
 			if (stopRequested)
 			{

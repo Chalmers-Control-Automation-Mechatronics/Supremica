@@ -159,7 +159,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Robot assembly cell", prefix + "robotAssemblyCell.xml"));
 		thisGroup.addItem(new TemplateItem("Flexible manufacuring cell", prefix + "flexibleManufacturingCell.xml"));
 		//thisGroup.addItem(new TemplateItem("Cat and mouse", prefix + "catmouse.xml")); // A variant of this one is included in the CCSBookExercises above
-		thisGroup.addItem(new TemplateItem("Automated Guided Vehicle", prefix + "agv.xml"));
+		thisGroup.addItem(new TemplateItem("Automated Guided Vehicles", prefix + "agv.xml"));
 		//thisGroup.addItem(new TemplateItem("Automated Guided Vehicle, immediate events", prefix + "agvImmediate.xml"));
 		thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml"));
 		thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
