@@ -55,6 +55,8 @@ import org.apache.log4j.*;
 import org.supremica.gui.*;
 import java.awt.*;
 
+import org.jgrafchart.*;
+
 public class Supremica
 {
 	private static Category thisCategory = LogDisplay.createCategory(org.supremica.gui.Supremica.class.getName());
@@ -62,19 +64,17 @@ public class Supremica
 	private Supremica()
 	{
 	}
-
-	// Main method
-	public static void main(String[] args)
+	
+	public static void startSupremica()
 	{
-
-                SplashWindow splash = new SplashWindow();
-                splash.setVisible(true);
+		SplashWindow splash = new SplashWindow();
+		splash.setVisible(true);
 
 		org.supremica.gui.Supremica workbench = new org.supremica.gui.Supremica();
-		if (args.length >= 1)
-		{
-			workbench.openAutomataXMLFile(new File(args[0]));
-		}
+//		if (args.length >= 1)
+//		{
+//			workbench.openAutomataXMLFile(new File(args[0]));
+//		}
 		// workbench.setupMainFrame();
 
 		boolean packFrame = false;
@@ -104,6 +104,38 @@ public class Supremica
        	splash.setVisible(false);
 		workbench.setVisible(true);
 
-		PreLoader preLoader = PreLoader.getPreLoader();
+		PreLoader preLoader = PreLoader.getPreLoader();	
+	}
+	
+	public static void startJGrafChart()
+	{
+    	Basic2GC app = new Basic2GC();
+    	app.updateActions();;	
+	}
+
+	// Main method
+	public static void main(String[] args)
+	{
+
+		if (args.length > 0)
+		{
+			if (args[0].equalsIgnoreCase("Supremica"))
+			{
+				startSupremica();
+			}
+			else if (args[0].equalsIgnoreCase("JGrafChart"))
+			{
+				startJGrafChart();
+			}
+			else
+			{
+				startSupremica();			
+			}
+		}
+		else
+		{
+			startSupremica();
+		}
+
 	}
 }
