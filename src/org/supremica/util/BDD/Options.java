@@ -21,7 +21,7 @@ public class Options
     public static boolean debug_on = false;
     public static boolean sanity_check_on = false;
     public static boolean user_alters_PCG = false;
-    public static boolean show_grow = true;
+    public static boolean show_grow = false;
     public static boolean trace_on = false;
     public static int algo_family = ALGO_SMOOTHED;
     public static int count_algo  = COUNT_TREE;

@@ -16,9 +16,9 @@ public class ConjSupervisor
 
 
     
-    private GroupHelper gh;
-    private int [] tpri;
-    private int size;
+    protected GroupHelper gh;
+    protected int [] tpri;
+    protected int size;
 
     /** Constructor, passes to the base-class */
     public ConjSupervisor(BDDAutomata manager, Group plant, Group spec) {

@@ -4,10 +4,8 @@ package org.supremica.util.BDD;
 
 import java.util.*;
 
-public class DisjSupervisor extends Supervisor {
-    protected GroupHelper gh;
+public class DisjSupervisor extends ConjSupervisor {
     protected int [] twave;
-    protected int size;
 
     /** Constructor, passes to the base-class */
     public DisjSupervisor(BDDAutomata manager, BDDAutomaton [] as) {
@@ -24,9 +22,7 @@ public class DisjSupervisor extends Supervisor {
 
     // --------------------------------------------------------
     private void init_disj() {
-	gh    = new GroupHelper(plant, spec);
 	twave = gh.getTwave();
-	size  = gh.getSize();
     }
 
     // --------------------------------------------------------
@@ -114,8 +110,5 @@ public class DisjSupervisor extends Supervisor {
 	if(gf != null) gf.stopTimer();
 	// SizeWatch.report(bdd_coreachables,"Coreachables");
     }
-
-
-
  
 }
