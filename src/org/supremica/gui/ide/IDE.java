@@ -66,6 +66,7 @@ public class IDE
 		splitPanelVertical.setContinuousLayout(false);
 		splitPanelVertical.setOneTouchExpandable(false);
 		splitPanelVertical.setDividerLocation(0.8);
+		splitPanelVertical.setResizeWeight(1.0);
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
