@@ -66,6 +66,10 @@ public class Supremica
 	// Main method
 	public static void main(String[] args)
 	{
+
+                SplashWindow splash = new SplashWindow();
+                splash.setVisible(true);
+
 		org.supremica.gui.Supremica workbench = new org.supremica.gui.Supremica();
 		if (args.length >= 1)
 		{
@@ -97,6 +101,7 @@ public class Supremica
 		}
 		workbench.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		workbench.initialize();
+                splash.setVisible(false);
 		workbench.setVisible(true);
 
 		PreLoader preLoader = PreLoader.getPreLoader();
