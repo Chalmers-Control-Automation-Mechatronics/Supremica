@@ -17,6 +17,7 @@ class EditorEventsPanel
 
 	public String getTitle()
 	{
+		System.err.println("getTitle: " + title);
 		return title;
 	}
 

@@ -23,17 +23,19 @@ class EditorPanel
 
 		tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
 
-		parametersPanel = new EditorParametersPanel(moduleContainer, "Parameters");
-		tabPanel.add(parametersPanel.getTitle(), parametersPanel);
-
-		eventsPanel = new EditorEventsPanel(moduleContainer, "Events");
-		tabPanel.add(eventsPanel.getTitle(), eventsPanel);
-
-		aliasesPanel = new EditorAliasesPanel(moduleContainer, "Events");
+		aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
 		tabPanel.add(aliasesPanel.getTitle(), aliasesPanel);
 
 		componentsPanel = new EditorComponentsPanel(moduleContainer, "Components");
 		tabPanel.add(componentsPanel.getTitle(), componentsPanel);
+
+		eventsPanel = new EditorEventsPanel(moduleContainer, "Events");
+		tabPanel.add(eventsPanel.getTitle(), eventsPanel);
+
+		parametersPanel = new EditorParametersPanel(moduleContainer, "Parameters");
+		tabPanel.add(parametersPanel.getTitle(), parametersPanel);
+
+		tabPanel.setSelectedComponent(componentsPanel);
 
 		splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, new JPanel());
 		splitPanelHorizontal.setContinuousLayout(false);

@@ -29,8 +29,6 @@ public class IDE
 	private JTabbedPane tabPanel;
 	private JSplitPane splitPanelVertical;
 
-	private boolean panelsInitialized = false;
-
 	private final String ideName = "Supremica with Waters";
 
     public IDE()
@@ -52,7 +50,11 @@ public class IDE
     	contentPanel.add(toolBar, BorderLayout.NORTH);
 
 		tabPanel = new JTabbedPane();
-		setActive(moduleContainers.getActiveModuleContainer());
+
+		ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
+		tabPanel.add(currModuleContainer.getEditorPanel());
+		tabPanel.add(currModuleContainer.getAnalyzerPanel());
+		tabPanel.add(currModuleContainer.getSimulatorPanel());
 
 		logPanel = new LogPanel(this, "Logger");
 
@@ -63,13 +65,18 @@ public class IDE
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
-		pack();
+//		pack();
 
     }
 
 	public Actions getActions()
 	{
 		return theActions;
+	}
+
+	public Iterator moduleContainerIterator()
+	{
+		return moduleContainers.iterator();
 	}
 
 	public void add(ModuleContainer moduleContainer)
@@ -93,27 +100,17 @@ public class IDE
 	public void setActive(ModuleContainer moduleContainer)
 	{
 		ModuleContainer oldModuleContainer = getActiveModuleContainer();
-
-		if (!panelsInitialized || (moduleContainer != oldModuleContainer))
+		if (moduleContainer != oldModuleContainer)
 		{
-			if (panelsInitialized)
-			{
-				EditorPanel currEditorPanel = oldModuleContainer.getEditorPanel();
-				tabPanel.remove(currEditorPanel);
-
-				AnalyzerPanel currAnalyzerPanel = oldModuleContainer.getAnalyzerPanel();
-				tabPanel.remove(currAnalyzerPanel);
-
-				SimulatorPanel currSimulatorPanel = oldModuleContainer.getSimulatorPanel();
-				tabPanel.remove(currSimulatorPanel);
-			}
+			tabPanel.remove(oldModuleContainer.getEditorPanel());
+			tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
+			tabPanel.remove(oldModuleContainer.getSimulatorPanel());
 
 			moduleContainers.setActive(moduleContainer);
+
 			tabPanel.add(moduleContainer.getEditorPanel());
 			tabPanel.add(moduleContainer.getAnalyzerPanel());
 			tabPanel.add(moduleContainer.getSimulatorPanel());
-
-			panelsInitialized = true;
 		}
 	}
 
