@@ -116,6 +116,9 @@ public class Project
 		return animationPath;
 	}
 
+	/**
+	 * Set an absolute path
+	 **/
 	public void setAnimationPath(String path)
 	{
 		animationPath = path;

@@ -82,9 +82,9 @@ public class TemplateItem
 		try
 		{
 			URL url = TemplateItem.class.getResource(path);
-			InputStream stream = url.openStream();
+			//InputStream stream = url.openStream();
 			ProjectBuildFromXml builder = new ProjectBuildFromXml(theFactory);
-			Project theProject = builder.build(stream);
+			Project theProject = builder.build(url);
 
 			return theProject;
 		}

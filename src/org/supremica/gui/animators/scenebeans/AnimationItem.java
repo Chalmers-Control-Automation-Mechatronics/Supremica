@@ -91,30 +91,7 @@ public class AnimationItem
 	public Animator createInstance()
 		throws Exception
 	{
-		try
-		{
-			// final Animator view = new Animator(description + " path: " + path);
-			final Animator view = new Animator(description);
-			URL url = AnimationItem.class.getResource(path);
-
-			if (url == null)
-			{ // The class loader could not find the file
-
-			}
-
-			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
-
-			view.setAnimation(parser.parseAnimation());
-
-			return view;
-		}
-		catch (Exception ex)
-		{
-			System.err.println(ex);
-			ex.printStackTrace();
-
-			throw ex;
-		}
+		return AnimationItem.createInstance(path);
 	}
 
 	public static Animator createInstance(String path)
@@ -122,8 +99,14 @@ public class AnimationItem
 	{
 		try
 		{
-			final Animator view = new Animator("Path: " + path);
+			final Animator view = new Animator(" Path: " + path);
 			URL url = AnimationItem.class.getResource(path);
+
+			if (url == null)
+			{ // The class loader could not find the file
+
+			}
+
 			XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
 
 			view.setAnimation(parser.parseAnimation());

@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 import java.io.*;
+import java.net.URL;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import org.xml.sax.*;
@@ -116,37 +117,32 @@ public class ProjectBuildFromXml
 		this.theProjectFactory = theProjectFactory;
 	}
 
+	public Project build(URL url)
+		throws Exception
+	{
+		InputStream stream = url.openStream();
+		return build(stream);
+	}
+
 	public Project build(File file)
 		throws Exception
 	{
 		return build(file, false);
 	}
 
-	public Project build(File file, boolean validate)
-		throws Exception
-	{
-		return build(file.getCanonicalPath(), validate);
-	}
-
-	public Project build(String fileName)
-		throws Exception
-	{
-		return build(fileName, false);
-	}
-
-	public Project build(InputStream is)
+	private Project build(InputStream is)
 		throws Exception
 	{
 		return build(is, false);
 	}
 
-	public Project build(Reader r)
+	private Project build(File file, boolean validate)
 		throws Exception
 	{
-		return build(r, false);
+		return build(file.getCanonicalPath(), validate);
 	}
 
-	public Project build(InputStream is, boolean validate)
+	private Project build(InputStream is, boolean validate)
 		throws Exception
 	{
 		InputSource source = new InputSource(is);
@@ -154,7 +150,22 @@ public class ProjectBuildFromXml
 		return build(source, validate);
 	}
 
-	public Project build(Reader r, boolean validate)
+
+	private Project build(String fileName)
+		throws Exception
+	{
+		return build(fileName, false);
+	}
+
+	private Project build(Reader r)
+		throws Exception
+	{
+		return build(r, false);
+	}
+
+
+
+	private  Project build(Reader r, boolean validate)
 		throws Exception
 	{
 		InputSource source = new InputSource(r);
@@ -162,7 +173,7 @@ public class ProjectBuildFromXml
 		return build(source, validate);
 	}
 
-	public Project build(String fileName, boolean validate)
+	private Project build(String fileName, boolean validate)
 		throws Exception
 	{
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -183,7 +194,7 @@ public class ProjectBuildFromXml
 		return currProject;
 	}
 
-	public Project build(InputSource is, boolean validate)
+	private Project build(InputSource is, boolean validate)
 		throws Exception
 	{
 		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
