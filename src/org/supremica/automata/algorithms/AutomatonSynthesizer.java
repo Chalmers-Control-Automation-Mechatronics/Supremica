@@ -68,6 +68,8 @@ public class AutomatonSynthesizer
 	{
 		boolean newUnsafeStates;
 
+		System.err.println("AutomatonSynthesizer");
+
 		LinkedList stateList = new LinkedList();
 
 		theAutomaton.beginTransaction();
@@ -164,7 +166,7 @@ public class AutomatonSynthesizer
 
 		*/
 		doReachable();
-		
+
 		// Set MIN_COST to all safe states
 		// Forbid the rest
 		stateIt = theAutomaton.stateIterator();
@@ -220,7 +222,7 @@ public class AutomatonSynthesizer
 			}
 		}
 
-		
+
 		theAutomaton.setType(AutomatonType.Supervisor);
 
 		theAutomaton.invalidate();

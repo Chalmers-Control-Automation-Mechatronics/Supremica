@@ -34,6 +34,11 @@ public class GrafchartStorage {
     return store;
   }
 
+  public Iterator iterator()
+  {
+		return store.iterator();
+  }
+
   public void printOutNames() {
     GCDocument doc;
     for (Iterator i = store.iterator(); i.hasNext();) {

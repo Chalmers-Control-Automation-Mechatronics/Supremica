@@ -76,7 +76,7 @@ public class AutomataSynthesizer
 	private AutomatonContainer theAutomatonContainer;
 
 	private Gui workbench;
-	
+
 	// For the optimization...
 	private Automata newAutomata = new Automata();
 	private boolean maximallyPermissive;
@@ -86,6 +86,8 @@ public class AutomataSynthesizer
     {
 		Automaton currAutomaton;
 		State currInitialState;
+
+		workbench.error("AutomataSynthesizer");
 
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
@@ -163,10 +165,12 @@ public class AutomataSynthesizer
 								if (!selectedAutomata.contains(currPlantAutomaton))
 								{
 									selectedAutomata.add(currPlantAutomaton);
-									// If we want a maximally permissive result, we need to add plants with 
+									// If we want a maximally permissive result, we need to add plants with
 									// uncontrollable events common to the already added plants too...
 									if (maximallyPermissive)
+									{
 										eventList.addAll(currPlantAutomaton.eventCollection());
+									}
 								}
 							}
 						}
@@ -206,7 +210,9 @@ public class AutomataSynthesizer
 						Object[] automatonArray = selectedAutomata.toArray();
 						String automataNames = ((Automaton) automatonArray[0]).getName();
 						for (int i = 1; i < automatonArray.length; i++)
+						{
 							automataNames = automataNames + " || " + ((Automaton) automatonArray[i]).getName();
+						}
 						//-- MF -- thisCategory.info(automataNames);
 						workbench.info(automataNames);
 
@@ -222,7 +228,7 @@ public class AutomataSynthesizer
 							theAutomaton.setAlphabet(unionAlphabet(selectedAutomata));
 
 							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton);
-							
+
 							if (synthesizerOptions.getSynthesisType() == SynthesizerOptions.CONTROLLABLE)
 							{
 								synthesizer.synthesizeControllable();
@@ -312,9 +318,9 @@ public class AutomataSynthesizer
 		return theAlphabet;
 	}
 
-	/** 
+	/**
 	 * Removes unnecessary automata, i.e. synthesized supervisors that don't affect the controllability.
-	 * @param newAutomata the Automata-object containing the new supervisors. 
+	 * @param newAutomata the Automata-object containing the new supervisors.
 	 */
  	private void optimize(Automata theAutomata, Automata newAutomata)
 	{
