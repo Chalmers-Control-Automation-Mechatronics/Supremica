@@ -49,6 +49,7 @@
  */
 package org.supremica.apps;
 
+import org.supremica.gui.InterfaceManager;
 import org.supremica.properties.SupremicaProperties;
 
 public class Supremica

@@ -19,7 +19,7 @@ public class VPopupMenu
 		InterfaceManager interfaceManager = InterfaceManager.getInstance();
 	}
 
-/**Displays the popUpMenu at a specified position*/
+	/**Displays the popUpMenu at a specified position*/
 	public void show(Component invoker, int x, int y)
 	{
 		Point p = getPopupMenuOrigin(invoker, x, y);
@@ -27,7 +27,7 @@ public class VPopupMenu
 		super.show(invoker, p.x, p.y);
 	}
 
-/**Figures out the sizes needed to calculate the menu position*/
+	/**Figures out the sizes needed to calculate the menu position*/
 	protected Point getPopupMenuOrigin(Component invoker, int x, int y)
 	{
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

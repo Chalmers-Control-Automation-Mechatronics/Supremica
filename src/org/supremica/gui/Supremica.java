@@ -70,7 +70,6 @@ public class Supremica
 	extends JFrame
 	implements TableModelListener, Gui, VisualProjectContainerListener
 {
-	private final static InterfaceManager theInterfaceManager = InterfaceManager.getInstance();
 	private static Logger logger = LoggerFactory.createLogger(Supremica.class);
 	private LogDisplay theLogDisplay = LogDisplay.getInstance();
 	private JPanel contentPane;

@@ -206,7 +206,6 @@ public class LogDisplay
 	public synchronized static LogDisplay getInstance()
 	{
 		InterfaceManager interfaceManager = InterfaceManager.getInstance();
-
 		if (theLogDisplay == null)
 		{
 			theLogDisplay = new LogDisplay();

@@ -55,7 +55,7 @@ import org.supremica.properties.*;
 
 public class InterfaceManager
 {
-	private static Logger logger = LoggerFactory.createLogger(InterfaceManager.class);
+//	private static Logger logger = LoggerFactory.createLogger(InterfaceManager.class);
 	private static InterfaceManager instance = null;
 
 	private InterfaceManager()
@@ -79,8 +79,9 @@ public class InterfaceManager
 		}
 		catch (Exception ex)
 		{
-			logger.fatal("Error while setting LookAndFeel");
-			logger.debug(ex.getStackTrace());
+//			logger.fatal("Error while setting LookAndFeel");
+//			logger.debug(ex.getStackTrace());
+			System.err.println(ex);
 			System.exit(0);
 		}
 	}
