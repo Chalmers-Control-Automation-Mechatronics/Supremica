@@ -1532,6 +1532,7 @@ public class Automaton
 
 	public void beginTransaction()
 	{
+		// System.err.println("beginTransaction");
 		if (listeners != null)
 		{
 			listeners.beginTransaction();
@@ -1540,6 +1541,8 @@ public class Automaton
 
 	public void endTransaction()
 	{
+		// System.err.println("endTransaction");
+
 		if (listeners != null)
 		{
 			listeners.endTransaction();

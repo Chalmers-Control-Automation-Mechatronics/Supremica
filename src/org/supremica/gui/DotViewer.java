@@ -116,7 +116,7 @@ public class DotViewer
 		updateNeeded = true;
 	}
 
-	public void initialize() 
+	public void initialize()
 	{
 	}
 
@@ -137,10 +137,11 @@ public class DotViewer
 
 	public void updated(Object o)
 	{
+		update();
 	}
 
 	public void setObjectName(String name)
-	{		
+	{
 		setTitle(name);
 		objectName = name;
 	}
@@ -412,6 +413,7 @@ public class DotViewer
 
 	public void updated(Object update, Object original)
 	{
+		//System.err.println("updated");
 		if (update == original)
 		{
 			try
@@ -635,7 +637,7 @@ public class DotViewer
 
 		private String dotArgument = null;
 		private JFileChooser fileExporter = null;
-		
+
 		ExportDialog(Frame comp)
 		{
 			this.pane = new JOptionPane("Export as::",
@@ -657,7 +659,7 @@ public class DotViewer
 			// int style = styleFromMessageType(JOptionPane.INFORMATION_MESSAGE);
 			dialog = pane.createDialog(comp, "Export");
 		}
-		
+
 		public void show()
 		{
 			dialog.show();
@@ -668,9 +670,9 @@ public class DotViewer
 	        {
 	        	return;
 	        }
-	        
+
 	        selectedValue = pane.getInputValue();
-	        
+
 			if(selectedValue == epsString)
 			{
 				fileExporter = FileDialogs.getEPSFileExporter();
@@ -700,8 +702,8 @@ public class DotViewer
 			{
 				fileExporter = null;
 				dotArgument = null;
-			}	
-			// System.out.println("selectedValue == " + selectedValue.toString());	
+			}
+			// System.out.println("selectedValue == " + selectedValue.toString());
 		}
 
 		public boolean wasCancelled()
@@ -725,7 +727,7 @@ public class DotViewer
 			return (String)selectedValue;
 		}
 	}
-	
+
 	public AutomataSerializer getSerializer()
 	{
 		return null;
@@ -748,25 +750,25 @@ public class DotViewer
 			{
 				AutomataSerializer serializer = getSerializer();
 				initializeStreams(dlg.getDotArgument());
-	
+
 				// Send the file to dot
 				serializer.serialize(toDotWriter);
 				toDotWriter.close();
-	
+
 				// Send the response to the debugview
 				BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
 				TextFrame debugview = new TextFrame("Dot debug output");
 				Writer writer = debugview.getPrintWriter();
-				
+
 				int currChar = buffInStream.read();
-	
+
 				while (currChar != -1)
 				{
 					writer.write(currChar);
-	
+
 					currChar = buffInStream.read();
 				}
-	
+
 				buffInStream.close();
 			}
 			catch(Exception excp)
@@ -784,7 +786,7 @@ public class DotViewer
 		if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = fileExporter.getSelectedFile();
-		
+
 			if (currFile != null)
 			{
 				if (!currFile.isDirectory())
@@ -799,20 +801,20 @@ public class DotViewer
 						serializer.serialize(toDotWriter);
 						toDotWriter.close();
 
-						// Send the response to a file 						
+						// Send the response to a file
 						BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
 						FileOutputStream fw = new FileOutputStream(currFile);
 						BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
-						
+
 						int currChar = buffInStream.read();
-	
+
 						while (currChar != -1)
 						{
 							buffOutStream.write(currChar);
-	
+
 							currChar = buffInStream.read();
 						}
-	
+
 						buffInStream.close();
 						buffOutStream.close();
 					}
