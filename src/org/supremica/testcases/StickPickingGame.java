@@ -197,7 +197,7 @@ public class StickPickingGame
 	public StickPickingGame(int players, int sticks)
 		throws Exception
 	{
-		project.setComment("Two players alternatingly take one, two or three sticks. The player who takes the last stick loses. If you take the first turn, can you guarantee that you will not lose (the system must not reach a blocking state)? Try to synthesize a controllable and nonblocking supervisor!");
+		project.setComment("A number of players alternatingly take one, two or three sticks. The player who takes the last stick loses. If you take the first turn, can you guarantee that you will not lose? In this model, not losing is equivalent to reaching a marked state, and only your own moves are controllable. Try to synthesize a controllable and nonblocking supervisor!");
 
 		try
 		{

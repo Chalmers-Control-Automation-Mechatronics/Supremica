@@ -137,7 +137,7 @@ public class ActionMan
 		while (!finished)
 		{
 			theInteger = JOptionPane.showInputDialog(parent, text);
-
+			
 			try
 			{
 				theIntValue = Integer.parseInt(theInteger);
@@ -159,16 +159,15 @@ public class ActionMan
 	// File.NewFromTemplate action performed
 	public static void fileNewFromTemplate(Gui gui, TemplateItem item)
 	{
-
 		// logger.debug("ActionMan.fileNewFromTemplate Start");
 		Automata newAutomata;
-
+		
 		try
 		{
 			newAutomata = item.createInstance(new VisualProjectFactory());
-
+			
 			gui.addProject((Project) newAutomata);
-
+			
 			// logger.debug("ActionMan.fileNewFromTemplate");
 		}
 		catch (Exception ex)
@@ -2277,19 +2276,21 @@ public class ActionMan
 
 		if (!currProject.isDeterministic())
 		{
-			// JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
-			// return;
+			/*
 			Object[] options = { "Continue", "Abort" };
 			int conf = JOptionPane.showOptionDialog(gui.getComponent(), "All automata are not determinstic. Abort?", "Non-determinism Found", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 
 			if (conf == JOptionPane.YES_OPTION)
 			{
-				logger.warn("Non-deterministic automaton loaded. Some algorithms are not guaranteed to work. You're on your own.");
+				logger.warn("Non-deterministic automaton loaded. Some algorithms are not guaranteed to work.");
 			}
 			else    // NO_OPTION
 			{
 				return;
 			}
+			*/
+
+			logger.warn("Non-deterministic automaton loaded. Some algorithms are not guaranteed to work.");
 		}
 
 		// We should always check owner and hash when it is present
@@ -2486,7 +2487,7 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error while importing " + file.getAbsolutePath() + ". ", ex);
+			logger.error("Error while importing " + file.getAbsolutePath() + ". " + ex);
 			logger.debug(ex.getStackTrace());
 
 			return;

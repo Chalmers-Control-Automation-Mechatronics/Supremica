@@ -56,6 +56,7 @@ import org.jdom.*;
 import org.jdom.input.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
+import java.util.regex.Pattern;
 
 public class AutomataBuildFromVALID
 {
@@ -74,7 +75,7 @@ public class AutomataBuildFromVALID
 	{
 		this.theProjectFactory = theProjectFactory;
 	}
-
+	
 	public Automata build(File file)
 		throws Exception
 	{
@@ -89,41 +90,36 @@ public class AutomataBuildFromVALID
 
 		try
 		{
-
 			// Find SAXparser using JAXP, validation optional
 			docBuilder = new SAXBuilder(validate);
-
+			
 			// Create the document
 			Document doc = docBuilder.build(file);
 			Element root = doc.getRootElement();
-
+			
 			if (root.getName() == "graph")
 			{
-
 				// DGRF-file
 				automatonFromDGRF(root, "", "Undefined");
 			}
 			else if (root.getName() == "module")
 			{
-
 				// VMOD-file
 				automataFromVMOD(root, "");
 			}
 			else if (root.getName() == "project")
 			{
-
 				// VPRJ-file
 				automataFromVPRJ(root);
 			}
 			else
 			{
-				throw new SupremicaException("Not a valid VALID file: " + file.getName());
+				throw new SupremicaException("Not a valid VALID file: " + file.getName() + 
+											 ", root name not recognised.");
 			}
 		}
 		catch (Exception ex)
 		{
-
-			// throw new SupremicaException(ex.getMessage()); // why not simply throw ex;?
 			throw ex;
 		}
 
@@ -133,18 +129,24 @@ public class AutomataBuildFromVALID
 	private void automataFromVPRJ(Element root)
 		throws Exception
 	{
-		Document subDoc = docBuilder.build(new File(filePath + File.separator + root.getChild("uses").getAttributeValue("module") + ".vmod"));
+		logger.debug("Build automataFromVPRJ. " + root);
+		Document subDoc = docBuilder.build(new File(filePath + File.separator + 
+								root.getChild("uses").getAttributeValue("module") + 
+								".vmod"));
 		Element subRoot = subDoc.getRootElement();
 
 		automataFromVMOD(subRoot, "");
 	}
 
-	// Builds automata in currAutomata
-	// Brasklapp: I'm not quite pleased with this name-argument
-	// everywhere... but it works (it's needed in the recursion)
+	/**
+	 * Builds automata in currAutomata
+	 * Brasklapp: I'm not quite pleased with this name-argument
+	 * everywhere... but it works (it's needed in the recursion)
+	 */
 	private void automataFromVMOD(Element root, String name)
 		throws Exception
 	{
+		logger.debug("Build automataFromVMOD. " + root);
 		HashMap definitionHash = new HashMap();
 		Element element;
 
@@ -155,30 +157,20 @@ public class AutomataBuildFromVALID
 		if (root.getChild("definitions") != null)
 		{
 			List definitionList = root.getChild("definitions").getChildren("typeDefinition");
-
 			i = definitionList.iterator();
-
 			while (i.hasNext())
 			{
 				element = (Element) i.next();
 
-				StringTokenizer st = new StringTokenizer(element.getAttributeValue("expression"), "{ }");
-				List stringList = new ArrayList();
-
-				while (st.hasMoreTokens())
-				{
-					stringList.add(st.nextToken());
-				}
-
+				// Build range list
+				List stringList = buildRangeList(element.getAttributeValue("expression"));
 				definitionHash.put(element.getAttributeValue("name"), stringList);
 			}
 		}
 
 		// Loop over DGRF-files ("component"s)
 		List componentList = root.getChild("parts").getChildren("component");
-
 		i = componentList.iterator();
-
 		while (i.hasNext())
 		{
 			element = (Element) i.next();
@@ -191,88 +183,64 @@ public class AutomataBuildFromVALID
 
 		// LOOP over VMOD-files ("instance"s)
 		List instanceList = root.getChild("parts").getChildren("foreach-instance");
-		Document subDoc;
-		Element subRoot;
-
-		// Here we need to examine two files at the same time (for renaming events)
-		List modificationList;
-		StringTokenizer st;
-
-		// Used on several occasions
-		String oldAutomatonName;
-		String newAutomatonName;
-		String oldEventName;
-		String newEventName;
-		String dummyVariable;
-
 		i = instanceList.iterator();
-
 		while (i.hasNext())
 		{
 			element = (Element) i.next();
-			subDoc = docBuilder.build(new File(filePath + File.separator + element.getChild("instance").getAttributeValue("module") + ".vmod"));
-			subRoot = subDoc.getRootElement();
-			dummyVariable = element.getAttributeValue("dummy");
+
+			// Here we need to examine two files at the same time (for renaming events)
+			Document subDoc = docBuilder.build(new File(filePath + File.separator + 
+								element.getChild("instance").getAttributeValue("module") + ".vmod"));
+			Element subRoot = subDoc.getRootElement();
+			String dummyVariable = element.getAttributeValue("dummy");
 
 			// Get the list from the HashMap OR from the range-attribute in some cases!!
+			List modificationList;
 			if (element.getAttributeValue("range").startsWith("$"))
 			{
 				modificationList = (List) definitionHash.get(element.getAttributeValue("range").substring(1));
 			}
 			else
 			{
-				st = new StringTokenizer(element.getAttributeValue("range"), "{ }");
-				modificationList = new ArrayList();
-
-				while (st.hasMoreTokens())
-				{
-					modificationList.add(st.nextToken());
-				}
+				modificationList = buildRangeList(element.getAttributeValue("range"));
 			}
 
 			// Get first part of the instance name for renaming later
-			st = new StringTokenizer(element.getChild("instance").getAttributeValue("name"), "[$]");
-			oldAutomatonName = st.nextToken();
-
+			StringTokenizer st = new StringTokenizer(element.getChild("instance").getAttributeValue("name"), "[$]");
+			String oldAutomatonName = st.nextToken();
+			
 			if (!dummyVariable.equals(st.nextToken()))
 			{
-				throw new SupremicaException("Something is wrong with the dummy variables in " + root.getAttributeValue("module") + ".vmod.");
+				throw new SupremicaException("Something is wrong with the dummy variables in " + 
+											 root.getAttributeValue("module") + ".vmod.");
 			}
 
 			// Expand templates (build automata and modify names)
 			Iterator j = modificationList.iterator();
-
 			while (j.hasNext())
 			{
 				String modification = (String) j.next();
 
-				newAutomatonName = oldAutomatonName + "." + modification;
+				String newAutomatonName = oldAutomatonName + "." + modification;
 
-				// Builds automaton for each value in "range"... modifies name
+				// Builds automaton for this template name
 				automataFromVMOD(subRoot, newAutomatonName);
 
-				// Change event names (the thing is you only have to change the "label",
-				// since the ID is only user internally in the automaton)
+				// Change event names
 				List nameParamList = element.getChild("instance").getChildren("nameParam");
-				Element nameParamElement;
 				Iterator k = nameParamList.iterator();
-				String appendix;
-
 				while (k.hasNext())
 				{
-					nameParamElement = (Element) k.next();
-
-					Element alias;
-
+					Element nameParamElement = (Element) k.next();
+					
+					// The second token (if existing) after this tokenization should be the dummy 
+					// if it is to be replaced!
 					st = new StringTokenizer(nameParamElement.getAttributeValue("value"), "[$]");
-					newEventName = st.nextToken();
-
+					String newEventName = st.nextToken();
 					if (st.hasMoreTokens())
 					{
-
 						// Find out what the new name should be
-						appendix = st.nextToken();
-
+						String appendix = st.nextToken();
 						if (appendix.equals(dummyVariable))
 						{
 							newEventName = newEventName + "." + modification;
@@ -284,15 +252,15 @@ public class AutomataBuildFromVALID
 
 						// Find out what the event name really is (not as straightforward as one might think)
 						Iterator l = subRoot.getChild("local").getChildren("alias").iterator();
-
+						String oldEventName;
 						while (true)
 						{
-							alias = (Element) l.next();
+							Element alias = (Element) l.next();
 
 							if (alias.getAttributeValue("new").equals(nameParamElement.getAttributeValue("name")))
 							{
 								oldEventName = alias.getAttributeValue("old");
-
+								 
 								break;
 							}
 
@@ -303,75 +271,133 @@ public class AutomataBuildFromVALID
 						}
 
 						// Change name on the label in the automaton
-						// currAutomata.getAutomaton(newAutomatonName).getEventWithLabel(oldEventName).setLabel(new String(newEventName));
+						// currAutomata.getAutomaton(newAutomatonName).getEvent(oldEventName).setLabel(newEventName);
+
+						// Nowadays it's more complicated than the above. Oh woe!
 						Automaton currAutomaton = currAutomata.getAutomaton(newAutomatonName);
 						LabeledEvent currEvent = currAutomaton.getEvent(oldEventName);
-						Alphabet currAlphabet = currAutomaton.getAlphabet();
 
+						// Make the new event a copy of the old one but with new label
+						LabeledEvent newEvent = new LabeledEvent(currEvent);
+						newEvent.setLabel(newEventName);
+
+						// Modify each arc that has this event (in the good old days nothing like this
+						// was necessary, it was enough to change the label (and leave the id untouched))
+						ArcIterator arcIt = currAutomaton.arcIterator();
+						while (arcIt.hasNext())
+						{
+							Arc currArc = arcIt.nextArc();
+
+							if (currArc.getEvent().equals(currEvent))
+							{
+								currArc.setEvent(newEvent);
+							}
+						}
+
+						Alphabet currAlphabet = currAutomaton.getAlphabet();
 						currAlphabet.removeEvent(currEvent);
-						currEvent.setLabel(new String(newEventName));
-						currAlphabet.addEvent(currEvent);
+						currAlphabet.addEvent(newEvent);
 					}
 				}
 			}
 		}
 	}
 
-	// Builds one automaton and returns it
+	/**
+	 * Parses VALID's range lists. They appear to be either of the type "[A B C D]", i.e. an enumeration
+	 * or of the type "[1..4]", i.e. a range of integers. May there also be ranges of characters?
+	 */
+	private List buildRangeList(String string)
+	{
+		StringTokenizer st = new StringTokenizer(string, "{ }");
+		
+		List stringList = new ArrayList();
+		
+		while (st.hasMoreTokens())
+		{
+			String token = st.nextToken();
+			
+			// Is this a simple token or a range (e.g. "1..4")?
+			if (token.matches("\\d+\\.\\.\\d+"))
+			{
+				String[] limits = token.split("\\.\\.", 2);
+				int a = Integer.parseInt(limits[0]);
+				int b = Integer.parseInt(limits[1]);
+				
+				for (int index=a; index<=b; index++)
+				{
+					stringList.add(index + "");
+				}
+			}
+			else
+			{
+				// Add the simple token
+				stringList.add(token);
+			}
+		}
+
+		return stringList;
+	}
+
+	/**
+	 * Builds one automaton and returns it
+	 * @param name Suggestion for the automaton's name
+	 */
 	private void automatonFromDGRF(Element root, String name, String type)
 		throws Exception
 	{
+		logger.debug("Build automatonFromDGRF. " + root);
 		Automaton currAutomaton = new Automaton();
 		Alphabet currAlphabet = new Alphabet();
 		Element element;
 
-		/* Name automaton and set type
+		// Name automaton, primarily with supplied name, otherwise with name attribute from file
 		if (name.equals(""))
 		{
-				// Fix here to handle no-named graphs
-				name = root.getAttributeValue("name");
-				if(name == null || name.equals(""))
-				{
-						name = "Automaton " + ++autonum;
-				}
-				//currAutomaton.setName();
-		}
-		else*/
-		{
-			currAutomaton.setName(name);
-		}
+			// Fix here to handle no-named graphs
+			name = root.getAttributeValue("name");
 
+			/*
+			if(name == null || name.equals(""))
+			{
+				name = "Automaton " + ++autonum;
+			}
+			*/
+		}
+		currAutomaton.setName(name);
+
+		// Set automaton type
 		if (type.toLowerCase().equals("plant"))
 		{
-			currAutomaton.setType(AutomatonType.toType("Plant"));
+			currAutomaton.setType(AutomatonType.Plant);
 		}
 		else if (type.toLowerCase().equals("spec"))
 		{
-			currAutomaton.setType(AutomatonType.toType("Specification"));
+			currAutomaton.setType(AutomatonType.Specification);
 		}
 		else if (type.toLowerCase().equals("sup"))
 		{
-			currAutomaton.setType(AutomatonType.toType("Supervisor"));
+			currAutomaton.setType(AutomatonType.Supervisor);
 		}
 		else
 		{
-			currAutomaton.setType(AutomatonType.toType("Undefined"));
+			currAutomaton.setType(AutomatonType.Undefined);
 		}
 
 		// Build alphabet
 		List eventList = root.getChild("events").getChildren("event");
 		Iterator i = eventList.iterator();
-
+		
 		while (i.hasNext())
 		{
 			element = (Element) i.next();
-
+			
 			String eventName = element.getAttributeValue("name");
+			
+			// currEvent.setId(eventName);
+			// currEvent.setLabel(eventName);
 
-//                      currEvent.setId(eventName);
-//                      currEvent.setLabel(eventName);
 			LabeledEvent currEvent = new LabeledEvent(eventName);
-
 			currEvent.setControllable(element.getAttributeValue("controllable").equals("1"));
 			currEvent.setPrioritized(true);
 			idEventMap.put(eventName, currEvent);
@@ -382,17 +408,15 @@ public class AutomataBuildFromVALID
 
 		// Build states
 		List stateList = root.getChild("nodes").getChildren("node");
-
 		i = stateList.iterator();
-
 		while (i.hasNext())
 		{
 			element = (Element) i.next();
 
 			String stateName = element.getChild("label").getAttributeValue("name");
 
-//                      currState.setId(stateName);
-//                      currState.setName(stateName);   // id and name, always the same
+			// currState.setId(stateName);
+			// currState.setName(stateName);   // id and name, always the same
 			State currState = new State(stateName);
 
 			currState.setInitial(element.getAttributeValue("initial").equals("1"));
@@ -403,12 +427,9 @@ public class AutomataBuildFromVALID
 
 		// Build arcs
 		List arcList = root.getChild("edges").getChildren("edge");
-
 		i = arcList.iterator();
-
 		while (i.hasNext())
 		{
-
 			// State sourceState = null; // new State();
 			State destState = null;    // new State();
 
@@ -429,20 +450,15 @@ public class AutomataBuildFromVALID
 			if ((element.getAttributeValue("isLoop") != null) && (element.getAttributeValue("isLoop").equals("1")))
 			{
 				destState = (State) idStateMap.get(element.getChild("source").getAttributeValue("name"));
-
-				// destState = currAutomaton.getStateWithId(element.getChild("source").getAttributeValue("name"));
 			}
 			else
 			{
 				destState = (State) idStateMap.get(element.getChild("target").getAttributeValue("name"));
-
-				// destState = currAutomaton.getStateWithId(element.getChild("target").getAttributeValue("name"));
 			}
 
 			eventList = element.getChild("labelGroup").getChildren("label");
 
 			Iterator j = eventList.iterator();
-
 			while (j.hasNext())
 			{
 				element = (Element) j.next();

@@ -53,28 +53,28 @@ import java.util.*;
 
 public class TemplateGroup
 {
-	private List items = new LinkedList();
-	private TemplateTypes type;
-	private String description;
-
-	public TemplateGroup(TemplateTypes type)
-	{
-		this.type = type;
-		this.description = type.getDescription();
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
-
-	public void addItem(TemplateItem item)
-	{
-		items.add(item);
-	}
-
-	public Iterator iterator()
-	{
-		return items.iterator();
-	}
+    private List items = new LinkedList();
+    private TemplateTypes type;
+    private String description;
+    
+    public TemplateGroup(TemplateTypes type)
+    {
+	this.type = type;
+	this.description = type.getDescription();
+    }
+    
+    public String getDescription()
+    {
+	return description;
+    }
+    
+    public void addItem(TemplateItem item)
+    {
+	items.add(item);
+    }
+    
+    public Iterator iterator()
+    {
+	return items.iterator();
+    }
 }

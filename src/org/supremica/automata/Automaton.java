@@ -2139,7 +2139,6 @@ public class Automaton
 
 	public long checksum()
 	{
-
 		// Ad-hoc checksum algorithm
 		long checksum = 0;
 
@@ -2244,7 +2243,6 @@ public class Automaton
 
 	public void beginTransaction()
 	{
-
 		// System.err.println("beginTransaction");
 		if (listeners != null)
 		{
@@ -2254,7 +2252,6 @@ public class Automaton
 
 	public void endTransaction()
 	{
-
 		// System.err.println("endTransaction");
 		if (listeners != null)
 		{
@@ -2273,7 +2270,6 @@ public class Automaton
 
 	public int hashCode()
 	{
-
 		// Generate hascode from name, or if that's null, from the comment
 		if (name != null)
 		{

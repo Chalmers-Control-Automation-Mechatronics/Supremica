@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="Bisimulation" comment="From an exercise by Milner in 'A Calculus of Communicating Systems' (LNCS 92, Springer 1980). Four of the pairs of processes are observation equivalent. The question is which...">
+<!-- i, iv, vi, vii -->
 <Automaton name="i.a" type="Plant">
 	<Events>
 		<Event id="a"/>

@@ -335,21 +335,9 @@ public class AutomatonMinimizer
 			Thread.sleep(0);
 			postMinimizationTimer.start();
 		}
-
+		
 		// Post minimization adjustments
-		if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
-		{
-			// The minimization sometimes misses stuff that is easy to see (for the trained eye...)?
-			// Not any more? The message is now fatal!
-			// (This is a BUG!)
-			int count = preMinimizationMergeObservationEquivalentStates(newAutomaton);
-			if (count > 0)
-			{
-				logger.fatal("Removed " + count + " observation equivalent states " +
-							"after running the minimization (it didn't work properly).");
-			}
-		}
-		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+		if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 		{
 			// Merge conflict equivalent states and stuff...
 			// (This is a FEATURE!)
@@ -357,10 +345,10 @@ public class AutomatonMinimizer
 			if (count > 0)
 			{
 				logger.debug("Removed " + count + " conflict equivalent states after " +
-							"running observation equivalence minimization.");
+							 "running observation equivalence minimization.");
 			}
 		}
-
+		
 		// Remove from alphabet epsilon events that are never used
 		removeUnusedEpsilonEvents(newAutomaton);
 
