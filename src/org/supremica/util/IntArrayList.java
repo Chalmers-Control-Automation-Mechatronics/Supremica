@@ -71,7 +71,7 @@ public final class IntArrayList
 
     public IntArrayList()
     {
-		this(200);
+		this(1024);
     }
 
     public IntArrayList(int blockSize)
@@ -131,6 +131,11 @@ public final class IntArrayList
 		{
 			maxSize = size;
 		}
+
+		//System.out.println("currMinBlockIndex: " + currMinBlockIndex);
+		//System.out.println("currMaxBlockIndex: " + currMaxBlockIndex);
+		//System.out.println("firstBlock: " + firstBlock);
+		//System.out.println("lastBlock: " + lastBlock);
 	}
 
 	/**
@@ -238,7 +243,79 @@ public final class IntArrayList
 		for (Iterator it = iterator(); it.hasNext();)
 		{
 			int[] currEntry = (int[]) it.next();
-			sb.append(currEntry);
+			if (currEntry != null)
+			{
+				sb.append("[");
+				for (int i = 0; i < currEntry.length; i++)
+				{
+					if (i > 0)
+					{
+						sb.append(" ");
+					}
+					sb.append(currEntry[i]);
+				}
+				sb.append("]");
+			}
+			else
+			{
+				sb.append("[null]");
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
+	public String blocksToString()
+	{
+		StringBuffer sb = new StringBuffer("blocks: \n");
+		for (Iterator it = blocks.iterator(); it.hasNext();)
+		{
+			int[][] currBlock = (int[][])it.next();
+			sb.append(toString(currBlock));
+		}
+		return sb.toString();
+	}
+
+	private static String toString(int[][] theArray)
+	{
+		StringBuffer sb = new StringBuffer("int[][]=");
+		if (theArray == null)
+		{
+			sb.append("[[null]]");
+			return sb.toString();
+		}
+		for (int i = 0; i < theArray.length; i++)
+		{
+			int[] currEntry = (int[])theArray[i];
+			if (currEntry != null)
+			{
+				sb.append("[");
+				sb.append(toString(currEntry));
+				sb.append("]");
+			}
+			else
+			{
+				sb.append("[null]");
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
+
+	private static String toString(int[] theArray)
+	{
+		StringBuffer sb = new StringBuffer("int[]=");
+		if (theArray == null)
+		{
+			sb.append("[null]");
+			return sb.toString();
+		}
+
+		for (int i = 0; i < theArray.length; i++)
+		{
+			int currEntry = theArray[i];
+			sb.append(currEntry + " ");
 			sb.append("\n");
 		}
 		return sb.toString();
@@ -250,21 +327,21 @@ public final class IntArrayList
 		private int[][] currBlock = null;
 		private int currIndex = 0;
 		private Iterator blockIterator = null;
+		private int currSize;
+		private int currElement;
 
 		public IntArrayListIterator()
 		{
 			currBlock = firstBlock;
 			currIndex = currMinBlockIndex;
 			blockIterator = blocks.iterator();
+			currSize = size();
+			currElement = 0;
 		}
 
 		public boolean hasNext()
 		{
-			if (currIndex < currMaxBlockIndex)
-			{
-				return true;
-			}
-			if (currBlock != lastBlock)
+			if (currElement < currSize)
 			{
 				return true;
 			}
@@ -273,6 +350,10 @@ public final class IntArrayList
 
 		public Object next()
 		{
+			Object theObject = (Object)currBlock[currIndex];
+
+			currElement++;
+
 			currIndex++;
 			if (currIndex >= blockSize)
 			{
@@ -286,7 +367,8 @@ public final class IntArrayList
 					throw new NoSuchElementException();
 				}
 			}
-			return (Object)currBlock[currIndex];
+
+			return theObject;
 		}
 
 		public void remove()
@@ -296,5 +378,32 @@ public final class IntArrayList
 
 	}
 
+
+	public static void main(String[] args)
+	{
+		IntArrayList theList = new IntArrayList(3);
+
+		int[] dummy0 = new int[]{0};
+		int[] dummy1 = new int[]{1};
+		int[] dummy2 = new int[]{2};
+		int[] dummy3 = new int[]{3};
+
+		theList.add(dummy0);
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+		// System.out.println(theList.blocksToString());
+
+		theList.add(dummy1);
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+
+		theList.add(dummy2);
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+
+		System.out.println(theList.blocksToString());
+
+		theList.add(dummy3);
+		System.out.println("*** Size: " + theList.size() + "\n" + theList.toString());
+
+		System.out.println(theList.blocksToString());
+	}
 
 }
