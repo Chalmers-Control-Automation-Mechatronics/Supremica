@@ -1,327 +1,180 @@
 <?xml version="1.0"?>
 
-<animation width="550" height="350">
+<animation width="360" height="435">
+
+	<behaviour id="truckX" algorithm="constantSpeedMove" event="truckX.end">
+		<param name="from" value = "103" />
+		<param name="speed" value="0.02" />
+	</behaviour>
+
+	<behaviour id="truckY" algorithm="constantSpeedMove" event="truckY.end">
+		<param name="from" value = "403" />
+		<param name="speed" value="0.02"/>
+	</behaviour>
+
+	<behaviour id="agvX" algorithm="constantSpeedMove" event="agvX.end">
+		<param name="from" value = "307" />
+		<param name="speed" value="0.02"/>
+	</behaviour>
+
+	<behaviour id="agvY" algorithm="constantSpeedMove" event="agvY.end">
+		<param name="from" value = "103" />
+		<param name="speed" value="0.02"/>
+	</behaviour>
+	
+
+	<define id="truck_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/truck.gif"/>
+			<param name = "hotspot" value = "(16,23)"/>
+		</primitive>
+	</define>
 
 
+	<define id="agv_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value = "image/agv.gif"/>
+			<param name = "hotspot" value = "(16,23)"/>
+		</primitive>
+	</define>
 
-<behaviour id="head" algorithm="constantSpeedMove" event="head.end">
-  <param name="from" value = "-133" />
-  <param name="speed" value="0.02"/>
-</behaviour>
-
-
-
-<behaviour id="gantry" algorithm="constantSpeedMove" event="gantry.end">
-  <param name="from" value = "100" />
-  <param name="speed" value="0.02"/>
-</behaviour>
-
-<!-- connect crane behaviour to blanks -->
-
-<forall var = "j" values = "a b c">
-<behaviour id="move_${j}" algorithm="copyPoint">
-  <animate param="x" behaviour="gantry"/>
-  <animate param="y" behaviour="head"/>
-</behaviour>
-</forall>
-
-<!-- conveyor segment 1 -->
+	<define id="background_primitive">
+		<primitive type = "sprite">
+			<param name = "src" value ="image/plant.gif"/>
+			<param name="hotspot" value="(0,0)"/>
+		</primitive>
+	</define>
 
 
-<behaviour id = "seg.1" algorithm = "move" event= "seg.1.end">
-     <param name="from" value = "-25" />
-     <param name="to"   value="0"/>
-     <param name="duration"  value = "1"/>
- </behaviour>
+	<draw>
+		<transform type = "translate">
+			<animate param = "x" behaviour = "agvX"/>
+			<animate param = "y" behaviour = "agvY"/>
+			<param name = "x" value = "307"/>
+			<param name = "y" value = "103"/>
+			<paste object = "agv_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<animate param = "x" behaviour = "truckX"/>
+			<animate param = "y" behaviour = "truckY"/>
+			<param name = "x" value = "103"/>
+			<param name = "y" value = "403"/>
+			<paste object = "truck_primitive" /> 
+		</transform>
+		<paste object="background_primitive"/>
+	</draw>
+	
+	<!-- The commands -->
 
-<!-- conveyor segment 2 -->
+	<forall var = "i" values = "0">
+		<command name="agv.goX.${i}">
+			<announce event = "~agvX.end"/>
+			<reset behaviour="agvX"/>
+			<set object="agvX" param="to" value="23"/>
+			<start behaviour="agvX"/>
+		</command>
+	</forall>
 
- 
-<behaviour id = "seg.2" algorithm = "move" event= "seg.2.end">
-     <param name="from" value = "0" />
-     <param name="to"   value="50"/>
-     <param name="duration"  value = "2"/>
- </behaviour>
-  
-<!-- conveyor segment 3 -->
+	<forall var = "i" values = "1 2 3 4">
+		<command name="agv.goX.${i}">
+			<announce event = "~agvX.end"/>
+			<reset behaviour="agvX"/>
+			<set object="agvX" param="to" value="40+68*${i}"/>
+			<start behaviour="agvX"/>
+		</command>
+	</forall>
 
- 
-<behaviour id = "seg.3" algorithm = "move" event= "seg.3.end">
-     <param name="from" value = "50" />
-     <param name="to"   value="100"/>
-     <param name="duration"  value = "2"/>
- </behaviour>
-  
- 
- <!-- conveyor segment 4 = output segment -->
- 
-  
- <behaviour id = "seg.4" algorithm = "move" event= "seg.4.end">
-      <param name="from" value = "450" />
-      <param name="to"   value="575"/>
-      <param name="duration"  value = "3"/>
-  </behaviour>
-     
-  
-  <!-- conveyor segment to balnk control behaviours -->
-  
-  <forall var = "i" values = "1 2 3 4">
-  <forall var = "j" values = "a b c">
-  <behaviour id = "seg.${i}.${j}" algorithm = "copyPoint">
-       <animate param="x" behaviour="seg.${i}"/>
-   </behaviour>
-  </forall>
-  </forall>
- 
-   
-
-<!-- drill & oven timers -->
-
- 
- <behaviour id = "drill.timer" algorithm = "timer" event= "drill.timer.end">
-       <param name="duration"  value = "6"/>
-  </behaviour>
- 
-
- 
- <behaviour id = "oven.timer" algorithm = "timer" event= "oven.timer.end">
-       <param name="duration"  value = "6"/>
-  </behaviour>
- 
+	<forall var = "i" values = "0 1 2">
+		<command name="agv.goY.${i}">
+			<announce event = "~agvY.end"/>
+			<reset behaviour="agvY"/>
+			<set object="agvY" param="to" value="45+68*${i}"/>
+			<start behaviour="agvY"/>
+		</command>
+	</forall>
 
 
+	<forall var = "i" values = "3">
+		<command name="agv.goY.${i}">
+			<announce event = "~agvY.end"/>
+			<reset behaviour="agvY"/>
+			<set object="agvY" param="to" value="23+68*${i}"/>
+			<start behaviour="agvY"/>
+		</command>
+	</forall>
+	
+	<forall var = "i" values = "4 5 6">
+		<command name="agv.goY.${i}">
+			<announce event = "~agvY.end"/>
+			<reset behaviour="agvY"/>
+			<set object="agvY" param="to" value="5+68*${i}"/>
+			<start behaviour="agvY"/>
+		</command>
+	</forall>	
 
- 
-  <define id="cranehead">
-    <compose id ="magnet" type = "switch">
-	   <primitive type = "sprite">
-         <param name =  "src" value = "image/cranehead.gif"/>
-		 <param name =  "hotspot" value = "(16,23)"/>
-	   </primitive>
-	   <primitive type = "sprite">
-	     <param name =  "src" value = "image/magnet.gif"/>
-		 <param name =  "hotspot" value = "(16,23)"/>
-	   </primitive>
-	 </compose>
-  </define>
- 
+	<event object="agvX" event="agvX.end">
+		<announce event="agvX.end"/>
+		<stop behaviour = "agvX"/>
+	</event>
 
- 
-  <define id="background">
-    <primitive type = "sprite">
-      <param name = "src" value ="image/plant.gif"/>
-      <param name="hotspot" value="(0,0)"/>
-    </primitive>
-  </define>
- 
+	<event object="agvY" event="agvY.end">
+		<announce event="agvY.end"/>
+		<stop behaviour = "agvY"/>
+	</event>
 
- <define id ="a_blank">
-	<transform type="translate">
-	   <param name ="y" value ="175"/>   
-	   <transform type="translate">
-	     <param name ="x" value ="-25"/>
-	     <animate param = "translation" behaviour = "seg.1.a"/>
-	     <animate param = "translation" behaviour = "seg.2.a"/>
-	     <animate param = "translation" behaviour = "seg.3.a"/>
-	     <animate param = "translation" behaviour = "seg.4.a"/>
-	     <animate param="translation" behaviour="move_a"/>
-		 <primitive type = "sprite">
-	       <param name = "src" value="image/ablank.gif" />
-		   <param name = "hotspot" value = "(23,14)" />
-		 </primitive>
-	   </transform>
-    </transform>
-</define> 
+	<forall var = "i" values = "0">
+		<command name="truck.goX.${i}">
+			<announce event = "~truckX.end"/>
+			<reset behaviour="truckX"/>
+			<set object="truckX" param="to" value="25"/>
+			<start behaviour="truckX"/>
+		</command>
+	</forall>
 
- <define id ="b_blank">
-	<transform type="translate">
-	   <param name ="y" value ="175"/>   
-	   <transform type="translate">
-	     <param name ="x" value ="-25"/>
-         <animate param = "translation" behaviour = "seg.1.b"/>
-		 <animate param = "translation" behaviour = "seg.2.b"/>
-		 <animate param = "translation" behaviour = "seg.3.b"/>
-		 <animate param = "translation" behaviour = "seg.4.b"/>
-	     <animate param="translation" behaviour="move_b"/>
-		 <primitive type = "sprite">
-			   <param name = "src" value="image/bblank.gif" />
-			   <param name = "hotspot" value = "(23,14)" />
-	    </primitive>
-	   </transform>
-    </transform>
-</define> 
+	<forall var = "i" values = "1 2 3 4">
+		<command name="truck.goX.${i}">
+			<announce event = "~truckX.end"/>
+			<reset behaviour="truckX"/>
+			<set object="truckX" param="to" value="40+68*${i}"/>
+			<start behaviour="truckX"/>
+		</command>
+	</forall>
 
- <define id ="c_blank">
-	<transform type="translate">
-	   <param name ="y" value ="175"/>   
-	   <transform type="translate">
-	     <param name ="x" value ="-25"/>
-         <animate param = "translation" behaviour = "seg.1.c"/>
-		 <animate param = "translation" behaviour = "seg.2.c"/>
-		 <animate param = "translation" behaviour = "seg.3.c"/>
-		 <animate param = "translation" behaviour = "seg.4.c"/>
-	     <animate param="translation" behaviour="move_c"/>
-		 <primitive type = "sprite">
-	       <param name = "src" value="image/cblank.gif" />
-		   <param name = "hotspot" value = "(23,14)" />
-		 </primitive>
-	   </transform>
-    </transform>
-</define> 
+	<forall var = "i" values = "0 1 2">
+		<command name="truck.goY.${i}">
+			<announce event = "~truckY.end"/>
+			<reset behaviour="truckY"/>
+			<set object="truckY" param="to" value="35+68*${i}"/>
+			<start behaviour="truckY"/>
+		</command>
+	</forall>
 
+	<forall var = "i" values = "3">
+		<command name="truck.goY.${i}">
+			<announce event = "~truckY.end"/>
+			<reset behaviour="truckY"/>
+			<set object="truckY" param="to" value="13+68*${i}"/>
+			<start behaviour="truckY"/>
+		</command>
+	</forall>
+	
+	<forall var = "i" values = "4 5 6">
+		<command name="truck.goY.${i}">
+			<announce event = "~truckY.end"/>
+			<reset behaviour="truckY"/>
+			<set object="truckY" param="to" value="-5+68*${i}"/>
+			<start behaviour="truckY"/>
+		</command>
+	</forall>	
 
+	<event object="truckX" event="truckX.end">
+		<announce event="truckX.end"/>
+		<stop behaviour = "truckX"/>
+	</event>
 
- 
-  <define id="drill">
-    <transform type="translate">
-	  <param name ="translation" value = "(275,92)"/>
-	  <compose id = "drill.on" type = "switch">
-	      <primitive type = "null" />
-		  <style type="RGBAColor">
-			  <param name="red" value="1" />
-			  <param name="green" value="0" />
-			  <param name="blue" value="0" />     
-			  <primitive type="circle">
-				<param name="radius" value="30" />
-			  </primitive>
-		  </style>
-		</compose>
-	</transform>
-  </define>
- 
-
- 
-  <define id="oven">
-    <transform type="translate">
-	  <param name ="translation" value = "(275,255)"/>
-	  <compose id = "oven.on"  type = "switch">
-	      <primitive type = "null" />
-		  <style type="RGBAColor">
-			  <param name="red" value="1" />
-			  <param name="green" value="0" />
-			  <param name="blue" value="0" />     
-			  <primitive type="circle">
-				<param name="radius" value="30" />
-			  </primitive>
-		  </style>
-	   </compose>
-	</transform>
-  </define>
- 
-
-
-<draw>
-	<transform type="translate">
-	  <animate param="x" behaviour="gantry"/>
-	  <param name ="y" value ="175"/>
-	  <param name ="x" value ="100"/>
-	  <primitive type = "sprite">
-	     <param name = "src" value ="image/gantry.gif"/>
-		 <param name = "hotspot" value = "(6,175)"/>
-	  </primitive>
-	  <transform type="translate">
-	      <param name ="y" value ="-133"/>
-	      <animate param="y" behaviour="head"/>
-	      <paste object="cranehead" /> 
-	  </transform>
-	</transform>
-	<paste object = "a_blank"/>
-	<paste object = "b_blank"/>
-	<paste object = "c_blank"/>
-	<paste object = "drill"/>
-	<paste object = "oven"/>
-        <paste object="background"/>
-</draw>
-
-<forall var = "i" values = "0 1 2 3 4">
-<command name="gantry.go.${i}">
-  <announce event = "~gantry.end"/>
-  <reset behaviour="gantry"/>
-  <set object="gantry" param="to" value="100+${i}*85"/>
-  <start behaviour="gantry"/>
-</command>
-</forall>
-
-<event object="gantry" event="gantry.end">
-  <announce event="gantry.end"/>
-  <stop behaviour = "gantry"/>
-</event>
-
-<forall var = "i" values = "0 1 2 3 4">
-<command name="head.go.${i}">
-  <announce event = "~head.end"/>
-  <reset behaviour="head"/>
-  <set object="head" param="to" value="-160+80*${i}"/>
-  <start behaviour="head"/>
-</command>
-</forall>
-
-<event object="head" event="head.end">
-  <announce event="head.end"/>
-  <stop behaviour = "head"/>
-</event>
-
-<!-- magnet on & off commands -->
-
-<forall var = "m" values = "a b c">
-<command name="magnet.on.${m}">
-  <start behaviour = "move_${m}"/>
-  <set object="magnet" param="current" value="1" />
-</command>
-
-<command name="magnet.off.${m}">
-  <stop behaviour = "move_${m}"/>
-  <set object="magnet" param="current" value="0" />
-</command>
-</forall>
-
-<!-- conveyor segment 1..4 commands & events -->
-
-<forall var = "i" values = "1 2 3 4">
-
-<forall var = "j" values = "a b c">
-<command name="seg.${i}.${j}.begin">
-  <announce event = "~seg.${i}.end"/>
-  <reset behaviour = "seg.${i}"/>
-  <start behaviour = "seg.${i}"/>
-  <start behaviour = "seg.${i}.${j}"/>
-</command>
-</forall>
-
-<event object = "seg.${i}" event = "seg.${i}.end">
-  <stop behaviour = "seg.${i}"/>
-  <stop behaviour = "seg.${i}.a"/>
-  <stop behaviour = "seg.${i}.b"/>
-  <stop behaviour = "seg.${i}.c"/>
-  <announce event = "seg.${i}.end"/>
-</event>
-
-</forall>
-
-<command name="drill.begin">
-  <announce event = "~drill.end"/>
-  <set object="drill.on" param="current" value="1" />
-  <reset behaviour = "drill.timer"/>
-  <start behaviour = "drill.timer"/>
-</command>
-
-<event object = "drill.timer" event = "drill.timer.end">
-  <stop behaviour = "drill.timer"/>
-  <set object="drill.on" param="current" value="0" />
-  <announce event = "drill.end"/>
-</event>
-
-<command name="oven.begin">
-  <announce event = "~oven.end"/>
-  <set object="oven.on" param="current" value="1" />
-  <reset behaviour = "oven.timer"/>
-  <start behaviour = "oven.timer"/>
-</command>
-
-<event object = "oven.timer" event = "oven.timer.end">
-  <stop behaviour = "oven.timer"/>
-  <set object="oven.on" param="current" value="0" />
-  <announce event = "oven.end"/>
-</event>
+	<event object="truckY" event="truckY.end">
+		<announce event="truckY.end"/>
+		<stop behaviour = "truckY"/>
+	</event>
 
 </animation>
