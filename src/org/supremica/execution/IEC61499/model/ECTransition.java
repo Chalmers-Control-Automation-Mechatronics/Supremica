@@ -71,8 +71,8 @@ public class ECTransition
 	String condition;
 
 	String comment = null;
-	int x;
-	int y;
+	float x;
+	float y;
 
 	public ECTransition(ECState source, ECState destination, String condition)
 	{

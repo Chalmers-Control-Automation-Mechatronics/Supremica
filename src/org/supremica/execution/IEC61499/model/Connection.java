@@ -68,9 +68,9 @@ public class Connection
 	String source;
 	String destination;
 	String comment;
-	int dx1;
-	int dx2;
-	int dy;
+	float dx1;
+	float dx2;
+	float dy;
 
 	private Connection()
 	{

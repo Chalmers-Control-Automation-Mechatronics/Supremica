@@ -66,8 +66,8 @@ public class ECState
 	List ecActions = new LinkedList();
 	String name;
 	String comment = null;
-	int x;
-	int y;
+	float x;
+	float y;
 
 	public ECState(String name)
 	{

@@ -74,8 +74,8 @@ public class FBNetwork
 	String name;
 	String type;
 	String comment;
-	int x;
-	int y;
+	float x;
+	float y;
 
 	private FBNetwork()
 	{
