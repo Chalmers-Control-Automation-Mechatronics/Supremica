@@ -203,17 +203,17 @@
  </Automaton>
  <Automaton name="gantry" type="Plant">
   <Events>
-   <Event id="p1.gantry_drill_get" label="p1.gantry_drill_get" controllable="true" prioritized="true" />
+   <Event id="p1.gantry_go_drill_2" label="p1.gantry_go_drill_2" controllable="true" prioritized="true" />
    <Event id="p1.b_oven" label="p1.b_oven" controllable="true" prioritized="true" />
-   <Event id="p1.gantry_seg3_get" label="p1.gantry_seg3_get" controllable="true" prioritized="true" />
+   <Event id="p1.gantry_go_seg3" label="p1.gantry_go_seg3" controllable="true" prioritized="true" />
    <Event id="p1.b_drill" label="p1.b_drill" controllable="true" prioritized="true" />
-   <Event id="p1.gantry_oven_get" label="p1.gantry_oven_get" controllable="true" prioritized="true" />
+   <Event id="p1.gantry_go_oven_2" label="p1.gantry_go_oven_2" controllable="true" prioritized="true" />
    <Event id="p1.b_seg4" label="p1.b_seg4" controllable="true" prioritized="true" />
-   <Event id="p2.gantry_drill_get" label="p2.gantry_drill_get" controllable="true" prioritized="true" />
+   <Event id="p2.gantry_go_drill_2" label="p2.gantry_go_drill_2" controllable="true" prioritized="true" />
    <Event id="p2.b_seg4" label="p2.b_seg4" controllable="true" prioritized="true" />
-   <Event id="p2.gantry_oven_get" label="p2.gantry_oven_get" controllable="true" prioritized="true" />
+   <Event id="p2.gantry_go_oven_2" label="p2.gantry_go_oven_2" controllable="true" prioritized="true" />
    <Event id="p2.b_drill" label="p2.b_drill" controllable="true" prioritized="true" />
-   <Event id="p2.gantry_seg3_get" label="p2.gantry_seg3_get" controllable="true" prioritized="true" />
+   <Event id="p2.gantry_go_seg3" label="p2.gantry_go_seg3" controllable="true" prioritized="true" />
    <Event id="p2.b_oven" label="p2.b_oven" controllable="true" prioritized="true" />
   </Events>
   <States>
@@ -226,20 +226,20 @@
    <State id="q_6" />
   </States>
   <Transitions>
-   <Transition event="p1.gantry_drill_get" source="q_0" dest="q_2" />
+   <Transition event="p1.gantry_go_drill_2" source="q_0" dest="q_2" />
    <Transition event="p1.b_oven" source="q_2" dest="q_0" />
-   <Transition event="p1.gantry_seg3_get" source="q_0" dest="q_1" />
+   <Transition event="p1.gantry_go_seg3" source="q_0" dest="q_1" />
    <Transition event="p1.b_drill" source="q_1" dest="q_0" />
-   <Transition event="p1.gantry_oven_get" source="q_0" dest="q_3" />
+   <Transition event="p1.gantry_go_oven_2" source="q_0" dest="q_3" />
    <Transition event="p1.b_seg4" source="q_3" dest="q_0" />
-   <Transition event="p2.gantry_drill_get" source="q_0" dest="q_6" />
+   <Transition event="p2.gantry_go_drill_2" source="q_0" dest="q_6" />
    <Transition event="p2.b_seg4" source="q_6" dest="q_0" />
-   <Transition event="p2.gantry_oven_get" source="q_0" dest="q_5" />
+   <Transition event="p2.gantry_go_oven_2" source="q_0" dest="q_5" />
    <Transition event="p2.b_drill" source="q_5" dest="q_0" />
-   <Transition event="p2.gantry_seg3_get" source="q_0" dest="q_4" />
+   <Transition event="p2.gantry_go_seg3" source="q_0" dest="q_4" />
    <Transition event="p2.b_oven" source="q_4" dest="q_0" />
   </Transitions>
- </Automaton> 
+ </Automaton>
 <Execution>
 	<Actions>
 		<Action label="p1.b_seg1">
