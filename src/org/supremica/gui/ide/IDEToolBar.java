@@ -3,11 +3,14 @@ package org.supremica.gui.ide;
 
 import java.awt.Insets;
 import javax.swing.*;
+import java.util.*;
 
 public class IDEToolBar
 	extends JToolBar
 {
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
+
+	private List collection = new LinkedList();
 
 	private IDE ide;
 
@@ -16,19 +19,43 @@ public class IDEToolBar
 		this.ide = ide;
 		setRollover(true);
 		setFloatable(false);
-
-		add(ide.getActions().newAction);
-		add(ide.getActions().openAction);
-		add(ide.getActions().saveAction);
-
 	}
 
+	public IDEToolBar(IDEToolBar toolBar)
+	{
+		this(toolBar.ide);
+		for (Iterator actIt = toolBar.collection.iterator(); actIt.hasNext(); )
+		{
+			Action currAction = (Action)actIt.next();
+			if (currAction == null)
+			{
+				addSeparator();
+			}
+			else
+			{
+				add(currAction);
+			}
+		}
+	}
 
 	public JButton add(Action theAction)
 	{
 		JButton theButton = super.add(theAction);
+		collection.add(theAction);
 		theButton.setMargin(theInsets);
 
 		return theButton;
 	}
+
+	public void addSeparator()
+	{
+		collection.add(null);
+		super.addSeparator();
+	}
+
+	public int nbrOfActions()
+	{
+		return collection.size();
+	}
+
 }

@@ -25,7 +25,8 @@ public class IDE
 	private BorderLayout contentLayout;
 
 	private IDEMenuBar menuBar;
-	private IDEToolBar toolBar;
+	private JToolBar ideToolBar;
+	private JToolBar currToolBar = null;
 
 	private ModuleContainers moduleContainers;
 
@@ -54,8 +55,15 @@ public class IDE
     	menuBar = new IDEMenuBar(this);
     	setJMenuBar(menuBar);
 
-    	toolBar = new IDEToolBar(this);
-    	contentPanel.add(toolBar, BorderLayout.NORTH);
+
+    	ideToolBar = new IDEToolBar(this);
+
+		// Set standard actions
+		ideToolBar.add(getActions().newAction);
+		ideToolBar.add(getActions().openAction);
+		ideToolBar.add(getActions().saveAction);
+
+    	setToolBar(ideToolBar);
 
 		tabPanel = new JTabbedPane();
 		tabPanel.addChangeListener(this);
@@ -160,6 +168,25 @@ public class IDE
 		return this;
 	}
 
+	private void setToolBar(JToolBar toolBar)
+	{
+		System.err.println("setToolBar");
+		if (toolBar == null)
+		{
+			return;
+		}
+		if (toolBar == currToolBar)
+		{
+			return;
+		}
+		if (currToolBar != null)
+		{
+			contentPanel.remove(currToolBar);
+		}
+    	contentPanel.add(toolBar, BorderLayout.NORTH);
+    	currToolBar = toolBar;
+	}
+
 	// Overridden so we can exit when window is closed
 	protected void processWindowEvent(WindowEvent e)
 	{
@@ -176,8 +203,15 @@ public class IDE
 		Component currTab = tabPanel.getSelectedComponent();
 		if (currTab == getActiveModuleContainer().getAnalyzerPanel())
 		{
+			setToolBar(getActiveModuleContainer().getAnalyzerPanel().getToolBar(ideToolBar));
 			getActiveModuleContainer().updateAutomata();
 		}
+		if (currTab == getActiveModuleContainer().getEditorPanel())
+		{
+			setToolBar(getActiveModuleContainer().getEditorPanel().getToolBar(ideToolBar));
+		}
+		validate();
+		repaint();
 	}
 
 	public static void main(String args[])

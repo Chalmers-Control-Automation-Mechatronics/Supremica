@@ -3,6 +3,7 @@ package org.supremica.gui.ide;
 import java.util.*;
 import java.awt.Component;
 import javax.swing.JFrame;
+import javax.swing.JToolBar;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
@@ -36,6 +37,16 @@ public class ModuleContainer
 	public ModuleProxy getModuleProxy()
 	{
 		return module;
+	}
+
+	public JToolBar getEditorToolBar(JToolBar mainToolBar)
+	{
+		return getEditorPanel().getToolBar(mainToolBar);
+	}
+
+	public JToolBar getAnalyzerPanel(JToolBar mainToolBar)
+	{
+		return getAnalyzerPanel().getToolBar(mainToolBar);
 	}
 
 	public EditorPanel getEditorPanel()

@@ -13,6 +13,8 @@ class EditorPanel
 {
 	private ModuleContainer moduleContainer;
 	private String name;
+	private IDEToolBar editorToolBar = null;
+	private IDEToolBar currParentToolBar = null;
 	private JTabbedPane tabPanel;
 	private JPanel componentEditorPanel;
 	private JPanel emptyComponentEditorPanel;
@@ -122,6 +124,22 @@ class EditorPanel
 
 		validate();
 
+	}
+
+	public JToolBar getToolBar(JToolBar parentToolBar)
+	{
+		if (parentToolBar instanceof IDEToolBar)
+		{
+			if (parentToolBar == currParentToolBar)
+			{
+				return editorToolBar;
+			}
+			editorToolBar = new IDEToolBar((IDEToolBar)parentToolBar);
+			editorToolBar.addSeparator();
+			currParentToolBar = (IDEToolBar)parentToolBar;
+			return editorToolBar;
+		}
+		return null;
 	}
 
  	class EmptyComponentEditorPanel

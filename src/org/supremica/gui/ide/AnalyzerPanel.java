@@ -109,6 +109,11 @@ class AnalyzerPanel
 
 	}
 
+	public JToolBar getToolBar(JToolBar parentToolBar)
+	{
+		return parentToolBar;
+	}
+
  	class EmptyAutomatonViewerPanel
  		extends JPanel
  	{
