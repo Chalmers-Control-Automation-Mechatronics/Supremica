@@ -140,7 +140,7 @@ public final class SupremicaProperties
 		setProperty(DOT_USE_COLORS, "true", true);
 		setProperty(DOT_USE_MULTI_LABELS, "true", true);
 		setProperty(DOT_AUTOMATIC_UPDATE, "true", true);
-		setProperty(GENERAL_REDIRECT_STDOUT, "false", true);
+		setProperty(GENERAL_REDIRECT_STDOUT, "true", true);
 		setProperty(GENERAL_REDIRECT_STDERR, "true", true);
 		setProperty(INCLUDE_EDITOR, "true", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);

@@ -668,7 +668,7 @@ public class LogDisplay
 				if (pin.available()!=0)
 				{
 					String input=this.readLine(pin);
-					logger.error(input);
+					logger.info("Stdout: " + input);
 				}
 				if (quit) return;
 			}
@@ -679,7 +679,7 @@ public class LogDisplay
 				if (pin2.available()!=0)
 				{
 					String input=this.readLine(pin2);
-					logger.error(input);
+					logger.error("Stderr: " + input);
 				}
 				if (quit) return;
 			}

@@ -69,6 +69,7 @@ import org.supremica.automata.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.gui.animators.scenebeans.*;
+import java.beans.*;
 
 public class Supremica
 	extends JFrame
@@ -144,7 +145,7 @@ public class Supremica
 		layout = new BorderLayout();
 		fullTableModel = getActiveProject().getFullTableModel();
 		theTableSorter = new TableSorter(fullTableModel);
-		theAutomatonTable = new JTable(theTableSorter);
+		theAutomatonTable = new JEditingTable(theTableSorter);
 
 		theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
 
@@ -1367,3 +1368,360 @@ public class Supremica
 
 	public void updated(Object theObject) {}
 }
+
+//
+//
+// Temporary workaround bug class
+// http://developer.java.sun.com/developer/bugParade/bugs/4503845.html
+//
+//
+class JEditingTable extends JTable implements Editing {
+	public final static String EDIT_ENDING_ACTION = "editEndingAction";
+
+	protected transient EditingTerminator editingTerminator;
+	protected boolean preMerlin;
+
+	public JEditingTable(int row, int col) {
+		super(row, col);
+		initEditingTerminator();
+	}
+
+	public JEditingTable(TableModel dm) {
+		super(dm);
+		initEditingTerminator();
+	}
+
+//---------------------------Editable
+
+	public Container getControllingAncestor() {
+		return this;
+	}
+
+	/** the component that's installed by the editor.
+	 *	PRE: isEditing();
+	 *	NOTE: might return null even while editing (because not
+	 *	all widget's that use Editors have direct access to their comps.
+	 */
+	public Component getEditingComponent() {
+		return getEditorComponent();
+	}
+
+//  implemented by JTable
+//	public boolean isEditing();
+
+	/** cancel edits: changes are discarded.
+	 *	PRE: isEditing()
+	 */
+	public void cancelEditing() {
+		getCellEditor().cancelCellEditing();
+	}
+
+	/** stops Editing: changes are saved.
+	 *	PRE: isEditing()
+	 */
+	public boolean stopEditing() {
+		return getCellEditor().stopCellEditing();
+	}
+
+	/** returns action to be invoked is edits should be ended from
+	 *	"outside".
+	 *	Could be null.
+	 */
+	public Action getEditEndingAction() {
+		return (Action) getClientProperty(EDIT_ENDING_ACTION);
+	}
+
+	/** sets action to be invoked is edits should be ended from
+	 *	"outside".
+	 *	Could be null.
+	 */
+	public void setEditEndingAction(Action action){
+		putClientProperty(EDIT_ENDING_ACTION, action);
+	}
+
+//---------------------------overwriting super
+
+	public boolean editCellAt(int row, int column, EventObject e) {
+		if ((isEditing() && !stopEditing()) || !isCellEditable(row, column)){
+			return false;
+		}
+		boolean result = super.editCellAt(row, column, e);
+		if (result) {
+			hackFocusForEditorComponent();
+			editingTerminator.startListening();
+			// Hmm, caution DIRT
+			// want to be sure that whatever crappy remover does not
+			// interfere
+			uninstallSuperEditorRemover();
+		}
+		return result;
+	}
+
+	public void removeEditor() {
+		editingTerminator.stopListening();
+		super.removeEditor();
+	}
+
+//---------------------------hacking
+
+	/** PRE: isEditing();
+	 */
+	protected void hackFocusForEditorComponent() {
+		if (preMerlin) {
+			// preMerlin always needs focus in cell
+			// if we want any at least partial certainty for edits to
+			// be stopped
+			getEditorComponent().requestFocus();
+		} else {
+			// ****merlin beta 2
+			// for some reason the editorComp is not repainted in the
+			// following situation:
+			// - editable combo
+			// - terminator has previously ended edit
+			// - click into same cell
+			// similar to #4482128S
+			// fixed in merlin beta3
+//			getEditorComponent().repaint();
+			// **** end merlin beta 2
+			// **** merlin beta 3
+			// hack around submitted bug (review ID 135159)
+			if (getEditorComponent() instanceof JComboBox) {
+				JComboBox box = (JComboBox) getEditorComponent();
+				if (box.isEditable()) {
+					((JComponent) box.getEditor().getEditorComponent()).setNextFocusableComponent(this);
+				}
+			}
+		}
+	}
+
+	// will compile with 1.4 only
+	protected void uninstallSuperEditorRemover() {
+		if (!preMerlin) {
+			// We don't really want to do this, do we?
+			KeyboardFocusManager focusManager = KeyboardFocusManager.
+			getCurrentKeyboardFocusManager();
+			PropertyChangeListener[] listeners = focusManager.getPropertyChangeListeners("focusOwner");
+			for (int i = 0; i < listeners.length; i++) {
+				if (isSuperEditorRemover(listeners[i])) {
+					focusManager.removePropertyChangeListener("focusOwner",
+						listeners[i]);
+					break;
+				}
+			}
+		}
+	}
+
+	protected boolean isSuperEditorRemover(PropertyChangeListener l) {
+		return l.getClass().getName().indexOf("javax.swing.JTable$") >= 0;
+	}
+
+//---------------------------init
+
+
+	protected void initJavaVersion() {
+		String version = System.getProperty("java.vm.version");
+		preMerlin = !version.startsWith("1.4");
+	}
+
+	protected void initEditingTerminator() {
+		initJavaVersion();
+		// lazy init not possible if we want 1.3 terminators:
+		// as they may listen automatically to changes in cellEditorProp
+		editingTerminator = createEditingTerminator();
+	}
+
+
+//---------------------------factory
+
+	protected EditingTerminator createEditingTerminator() {
+		if (preMerlin) {
+		//	return new EditingTerminator13(this);
+		// return an empty implemtation
+		// you can put your favorite focuslistening
+		// workaround for preMerlin here
+			return new EditingTerminator() {
+				public void startListening() {}
+				public void stopListening() {}
+			};
+		} else {
+			return new EditingTerminator14(this);
+		}
+	}
+
+}
+/**
+ *	notion of "edit in process".
+ *	defines an "inside": everything below and including
+ *		getControllingAncestor
+ *	methods to terminate edit (stop, cancel, and some composite
+ *		wrapped into action that "outside" controllers should
+ *		always use first, if provided)
+ */
+ interface Editing {
+
+	/** returns container that describes "inside".
+	 *	PRE: none
+	 *	POST: != null
+	 */
+	public Container getControllingAncestor();
+
+	/** the component that's installed by the editor.
+	 *	PRE: isEditing();
+	 *	NOTE: might return null even while editing (because not
+	 *	all widget's that use Editors have direct access to their comps.
+	 */
+	public Component getEditingComponent();
+
+	/** returns true is currently editing.
+	 */
+	public boolean isEditing();
+
+	/** cancel edits: changes are discarded.
+	 *	PRE: isEditing()
+	 */
+	public void cancelEditing();
+
+	/** stops Editing: changes are saved.
+	 *	PRE: isEditing()
+	 */
+	public boolean stopEditing();
+
+	/** returns action to be invoked if edits should be ended from
+	 *	"outside".
+	 *	Could be null.
+	 *	PRE: isEditing()
+	 * 	NOTE: the precondition is set here to primarily to prevent
+	 *		it to be _performed_ if not editing (every termination is
+	 *		is allowed only if actually editing)
+	 */
+	public Action getEditEndingAction();
+
+}
+/**
+ *	Controls edit-termination "outside" of Editing between calls
+ *	to start/stopListening.
+ *	What exactly "outside" means is left to the implementation.
+ *
+ *	@author (C) 2001 Jeanette Winzenburg
+ *	@version	7. November 2001
+ *
+ */
+interface EditingTerminator {
+
+	public void startListening();
+
+	public void stopListening();
+
+}
+
+/**
+ * 	Implementation of EditingTerminator for Merlin (beta3).
+ *	controls edit-ending "outside" of Editing.
+ *	Note: outside meaning in same window as controllingAncestor but
+ *		not below
+ *	Could/Should be changed to everywhere except inside of editing?
+ *
+ *	@author (C) 2001 Jeanette Winzenburg
+ *	@version	7. November 2001
+ *
+ */
+class EditingTerminator14
+	implements PropertyChangeListener, EditingTerminator {
+
+	protected KeyboardFocusManager focusManager;
+	protected Editing editing;
+	protected Action defaultAction;
+
+	public EditingTerminator14(Editing editing) {
+		this.editing = editing;
+	}
+
+	public void startListening() {
+		focusManager =
+		  KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		focusManager.addPropertyChangeListener(getProperty(), this);
+	}
+
+	public void stopListening() {
+		if (focusManager != null) {
+			focusManager.removePropertyChangeListener(getProperty(), this);
+			focusManager = null;
+		}
+	}
+
+	public String getProperty() {
+		return "focusOwner";
+	}
+
+	public void propertyChange(PropertyChangeEvent ev) {
+		if (!editing.isEditing()) {
+		  return;
+		}
+		Component c = focusManager.getFocusOwner();
+		// refactoring
+		if (!isInsideControllingAncestor(c) && shouldTerminate(c)) {
+			doTerminate();
+		}
+	}
+
+	/**
+	 * 	PRE: none!
+	 *	NOTE: we allow the null here for symmetry reasons as to
+	 *	shouldTerminate.
+	 */
+	protected boolean isInsideControllingAncestor(Component focused) {
+		if (focused == null) return false;
+		Container controller = editing.getControllingAncestor();
+		return (focused == controller) ||
+			(SwingUtilities.isDescendingFrom(focused, controller));
+	}
+
+	/**
+	 * 	PRE: none!
+	 *	NOTE: we allow the null as it might decide to handle the null
+	 *	(== focus is in some unknown window) as a condition to terminate
+	 *	Here: don't care
+	 */
+	protected boolean shouldTerminate(Component focused) {
+//		if (focused == null) return false;
+		Component topLevel = SwingUtilities.getRoot(editing.getControllingAncestor());
+		Component focusedTopLevel = SwingUtilities.getRoot(focused);
+		return topLevel == focusedTopLevel;
+	}
+
+	/** terminates editing
+	 *	PRE: editing.isEditing
+	 */
+	protected void doTerminate() {
+		Action finish = editing.getEditEndingAction();
+		if (finish == null) {
+			finish = getDefaultEditEndingAction();
+		}
+		finish.actionPerformed(createActionEvent());
+	}
+
+	protected Action getDefaultEditEndingAction() {
+		if (defaultAction == null) {
+			defaultAction = createDefaultEditEndingAction();
+		}
+		return defaultAction;
+	}
+
+//---------------------------factory
+
+	protected ActionEvent createActionEvent() {
+		return null;
+	}
+
+ 	protected Action createDefaultEditEndingAction() {
+ 		Action action = new AbstractAction() {
+ 			public void actionPerformed(ActionEvent e) {
+				if (!editing.stopEditing()) {
+					editing.cancelEditing();
+				}
+ 			}
+ 		};
+ 		return action;
+ 	}
+
+}	// end class EditingTerminator14
