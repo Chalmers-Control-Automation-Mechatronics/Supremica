@@ -53,7 +53,7 @@ public class IDE
 	private JTabbedPane tabPanel;
 	private JSplitPane splitPanelVertical;
 
-	private final String ideName = "Supremica with Waters";
+	private final String ideName = "Supremica";
 
     public IDE()
     {

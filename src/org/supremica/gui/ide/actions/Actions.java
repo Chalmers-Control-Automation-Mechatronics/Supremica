@@ -38,6 +38,9 @@ public class Actions
 	public EditorAddInstanceAction editorAddInstanceAction;
 	public EditorAddBindingAction editorAddBindingAction;
 
+	public HelpWebAction helpWebAction;
+	public HelpAboutAction helpAboutAction;
+
 	public Actions(IDEActionInterface ide)
 	{
 		this.ide = ide;
@@ -88,6 +91,9 @@ public class Actions
 
 		editorAddBindingAction = new EditorAddBindingAction(ide);
 		editorActions.add(editorAddBindingAction);
+
+		helpWebAction = new HelpWebAction(ide);
+		helpAboutAction = new HelpAboutAction(ide);
 
 	}
 

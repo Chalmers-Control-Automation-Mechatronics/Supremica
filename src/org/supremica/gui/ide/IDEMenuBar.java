@@ -114,6 +114,21 @@ public class IDEMenuBar
 				}
 			}
 		);
+
+
+		//
+		// Help
+		//
+
+		JMenu menuHelp = new JMenu();
+		menuHelp.setText("Help");
+		menuHelp.setMnemonic(KeyEvent.VK_H);
+		add(menuHelp);
+
+		menuHelp.add(new JMenuItem(ide.getActions().helpWebAction));
+		menuHelp.addSeparator();
+		menuHelp.add(new JMenuItem(ide.getActions().helpAboutAction));
+
 	}
 
 	public void createModuleList(MenuEvent ev)
