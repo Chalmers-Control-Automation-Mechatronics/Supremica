@@ -11,25 +11,76 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.properties.SupremicaProperties;
 
-class Element // this is what populates the Open and Closed lists
+// this is what populates the Open and Closed lists
+// Implements the Comparable interface and wraps the int[] "states"
+class Element 
+	implements Comparable
 {
-	public int f;		// the sum of g(n) and h(n)
-	public int g;		// the price to get here, g(n)
-	// public Vector Tv;	// vector of remaining processing time for each product in its current resource
-	public int Tv[]; 
-	// public Vector Qv;	// vector representing the current logical product state
+	int f;		// the sum of g(n) and h(n)
+	int g;		// the price to get here, g(n)
+	int[] Tv;	// remaining processing time for each product in its current resource
+	int[] state;// logical state
 	public int EB[];	// used for limiting the node expansion
 	public Element p;	// ptr to predecessor element
 	
-	public CompositeState state;	// the logical state, called Qv on page 50
-
-	Element(int numProds)
+	public Element(int[] s, int tvlen)
 	{
-		this.Tv = new int[numProds];
-		this.EB = new int[numProds];
+		this.state = s;
+		this.Tv = new int[tvlen];
 	}
-}
-
+	
+	int[] getArray()
+	{
+		return state;
+	}
+	
+	// Must really fix this int[] state madness - why no useful class?
+	public String toString()
+	{
+		StringBuffer sbuf = new StringBuffer("[");
+		for(int i = 0; i < state.length; ++i)
+		{
+			sbuf.append(state[i]);
+			sbuf.append(".");
+		}
+		sbuf.append("] g = ");
+		sbuf.append(g);
+		sbuf.append(" Tv = [");
+		for(int i = 0; i < Tv.length; ++i)
+		{
+			sbuf.append(Tv[i]);
+			sbuf.append(".");
+		}
+		sbuf.append("]");
+		
+		return sbuf.toString();
+	}
+	
+	public int compareTo(final Element cs)
+		throws ClassCastException
+	{
+		if(cs.getArray().length != state.length)
+		{
+			throw new ClassCastException("Non-equal lengths");
+		}
+		
+		for(int i = 0; i < state.length; ++i)
+		{
+			if(cs.getArray()[i] != state[i])
+			{
+				return cs.getArray()[i] - state[i];
+			}
+		}
+		return 0;
+	}
+	
+	public int compareTo(Object obj)
+	{
+		return compareTo((Element)obj);
+	}
+	
+}	
+/*
 // For each set of problems, you need a singleton instance of ElementUpdater
 // This object keeps track of all the autoamat and their indices etc
 // This is so that Element does not have to have a ref to the automata to carry around
@@ -51,7 +102,7 @@ class ElementUpdater
 	// Take a step in this direction and crate a new updated Element
 	Element newElement(Element e, int direction)
 	{
-		Element element = new Element(numProds);
+		Element element = new Element();
 		
 		for(int j = 0; j < numProds; ++j)
 		{
@@ -65,7 +116,7 @@ class ElementUpdater
 //		element.Tv[direction] = cost(element, direction);
 		return element;
 	}
-	
+*/	
 	/* From this composite state, take a step in this direction
 	private CompositeState step(CompositeState state, int direction)
 	{
@@ -80,7 +131,7 @@ class ElementUpdater
 		
 	}
 	*/
-}
+// }
 
 class ElementComparator
 	implements Comparator
@@ -155,80 +206,20 @@ public class ModifiedAstar
 {
 	private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
 
-	private Estimator estimator = null;
+	// Open and Closed are sorted sets of CompositeStates
+	private TreeSet open = null;
+	private TreeSet closed = null;
+	// private Automata theAutomata;
+	private Automata specAutomata;
+	private AutomataOnlineSynchronizer onlineSynchronizer;
 	
-	// Open and Closed are sorted sets of Elements, sorted on smallest f.
-	private Set open = null;
-	private Set closed = null;
-	
-	public ModifiedAstar(Estimator estimator, Comparator comparator)
-	{
-		this.estimator = estimator;
-		this.open = new TreeSet(comparator);
-		this.closed = new TreeSet(comparator);
-	}
-	
-	// Testclass that implements the Comparable interface and wraps the int[] "states"
-	// This is what we put into the lists
-	private static class CompositeState
-		implements Comparable
-	{
-		int[] state;
-		
-		public CompositeState(int[] s)
-		{
-			this.state = s;
-		}
-		
-		int[] getArray()
-		{
-			return state;
-		}
-		
-		// Must really fix this int[] state madness - why no useful class?
-		public String toString()
-		{
-			StringBuffer sbuf = new StringBuffer("[");
-			for(int i = 0; i < state.length; ++i)
-			{
-				sbuf.append(state[i]);
-				sbuf.append(".");
-			}
-			sbuf.append("]");
-			return sbuf.toString();
-		}
-		
-		public int compareTo(final CompositeState cs)
-			throws ClassCastException
-		{
-			if(cs.getArray().length != state.length)
-			{
-				throw new ClassCastException("Non-equal lengths");
-			}
-			
-			for(int i = 0; i < state.length; ++i)
-			{
-				if(cs.getArray()[i] != state[i])
-				{
-					return cs.getArray()[i] - state[i];
-				}
-			}
-			return 0;
-		}
-		
-		public int compareTo(Object obj)
-		{
-			return compareTo((CompositeState)obj);
-		}
-		
-	}
-	// This one's for testing, it calcs the g() values and puts'em on the open list
-	// Each state (except the initial and final ones) have a cost.
-	// g is updated as (se p.47) 
-	static void walk(Automata theAutomata)
+	public ModifiedAstar(Automata theAutomata)
 		throws Exception
 	{
-		int debugNum = 1;
+		this.open = new TreeSet();
+		this.closed = new TreeSet();	// store the managed states here
+		// this.theAutomata = theAutomata;
+		this.specAutomata = new Automata(); // is filled in below
 		
 		// Let's see if this is the way to do it, modeled after AutomataExplorer
 
@@ -244,55 +235,56 @@ public class ModifiedAstar
 			State currInitialState = automaton.getInitialState();
 			initialState[automaton.getIndex()] = currInitialState.getIndex();
 			automaton.remapStateIndices();		// Rebuild the maps to have the indices match up - why the f***??
+			if(automaton.getType() == AutomatonType.Specification)
+			{
+				specAutomata.addAutomaton(automaton);
+			}
 		}
 
-		AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+		this.onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
 
 		onlineSynchronizer.initialize();
 		onlineSynchronizer.setCurrState(initialState);
 		helper.setCoExecuter(onlineSynchronizer);
 
-		/* These are From AutomataVerifier, not in AutomataExplorer, is it necessary?
-		onlineSynchronizer.selectAllAutomata(); 
-		helper.addState(initialState);
-		helper.setCoExecute(true);
-		helper.setCoExecuter(onlineSynchronizer);
-		helper.setExhaustiveSearch(true);
-		*/
-		
-		// Initialization done, now what...
-		
-		/* Rebuild the maps to have the indices match up
-		for(Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-		{
-			Automaton automaton = (Automaton) autIt.next();
-			automaton.remapStateIndices();
-			
-		}*/
-		
-		
-		// Put the initial state on a list
-		TreeSet open = new TreeSet();
-		CompositeState cs = new CompositeState(initialState);
-		open.add(cs);
-		
-		/**/ System.out.println("Initial state: " + cs.toString());
-		
-		TreeSet closed = new TreeSet(); // store the managed states here
+		// Put the initial state on open
+		Element ini = new Element(initialState, specAutomata.size());
+		open.add(ini);	
+
+		/**/ System.out.println("Initial state: " + ini.toString());
+	}
+	
+
+	// This one walks the system like:
+	//
+	//	foreach spec automaton Ai
+	//		foreach event e enbled in the local state of Ai
+	//			if e is globally enabled
+	//				move in direction Ai
+	//			end if
+	//		end foreach
+	//	end foreach
+
+	// Potentially, there can be a lot of locally enabled events that are not globally enabled.
+	void walk1()
+		throws Exception
+	{
+		int debugNum = 1;
 		
 		while(!open.isEmpty())
 		{
-			CompositeState state = (CompositeState)open.first();
+			Element state = (Element)open.first();
 			
 			/**/ System.out.println("\n(" + debugNum++ + ") Glob State: " + state.toString());
 			
 			// From this state, move in all directions one step
 			// First we need to find the events enabled in automaton i
-			for(Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+			for(Iterator autIt = specAutomata.iterator(); autIt.hasNext(); )
 			{
 				onlineSynchronizer.setCurrState(state.getArray());	// we operate from this state
 				Automaton currAutomaton = (Automaton) autIt.next();
-				if(currAutomaton.isSpecification())	// only do this for specs, plants/resources are not "directions"
+				// We only look through specAutomata
+				// if(currAutomaton.isSpecification())	// only do this for specs, plants/resources are not "directions"
 				{
 					int stateIndex = state.getArray()[currAutomaton.getIndex()];
 					// Now we need to find the state with this index in currAutomaton
@@ -300,28 +292,33 @@ public class ModifiedAstar
 					
 					/**/ System.out.println("Part State: " + currAutomaton.getName() + "[" + stateIndex + ":" + s.getIndex() + "]::" + s.toString());
 					
-					// Now, let us iterate over all events enabled in this state
+					// Now, let us iterate over all events (locally) enabled in this state
 					EventIterator evit = currAutomaton.outgoingEventsIterator(s);
 					while(evit.hasNext())
 					{
 						LabeledEvent event = evit.nextEvent();
 						
-						/**/ System.out.print("Event: " + currAutomaton.getName() + "::" + event.toString());
-	
-						if(onlineSynchronizer.isEnabled(event))
+						/* System.out.print("Event: " + currAutomaton.getName() + "::" + event.toString());
+	*/
+						if(onlineSynchronizer.isEnabled(event))	// if the event is globally enabled
 						{
-							/**/ System.out.print(" is globally enabled");
+							/* System.out.println(" is globally enabled");
+							*/
+							// Move in direction Ai
+							Element nextState = new Element(onlineSynchronizer.doTransition(event), specAutomata.size());
+							// Here we should update g and Tv (and whatnot)
+							move(state, nextState, currAutomaton);
+							//
 							
-							CompositeState nextState = new CompositeState(onlineSynchronizer.doTransition(event));
-		
 							// If we've not already seen it...
 							if(!open.contains(nextState) && !closed.contains(nextState))
 							{
 								// ...put it on the list
 								open.add(nextState);
-								// And show it to the public
+								/* And show it to the public
 								System.out.println();
 								System.out.print(state.toString() + " - " + event.toString() + " -> " + nextState.toString());
+								*/
 							}
 						}
 						
@@ -336,6 +333,52 @@ public class ModifiedAstar
 		}
 	}
 	
+	// This one walks the system like:
+	//
+	//	foreach globally enabled event e
+	//		foreach spec automaton Ai
+	//			if e belongs to Ai.alpha
+	//				move in direction Ai
+	//				break foreach
+	//			end if
+	//		end foreach
+	//	end foreach
+	public void walk2()
+	{
+		int debugNum = 1;
+		
+		while(!open.isEmpty())
+		{
+			Element state = (Element)open.first();
+			
+			/**/ System.out.println("\n(" + debugNum++ + ") Glob State: " + state.toString());
+			
+			// foreach event enabled in this state
+			int[] events = onlineSynchronizer.getOutgoingEvents(state.getArray());
+			for(int i = 0; i < events.length; ++i)
+			{
+				// What do we do now?
+			}
+		}		
+	}
+
+	// g and Tv are updated as (see p.47) 
+	private void move(Element state, Element nxtstate, Automaton aut)
+	{
+		int direction = aut.getIndex();
+		for(Iterator autit = specAutomata.iterator(); autit.hasNext(); )
+		{
+			Automaton automaton = (Automaton)autit.next();
+			int autidx = automaton.getIndex();
+			if(autidx != direction)
+			{
+				nxtstate.Tv[autidx] = Math.max(0, state.Tv[autidx] - state.Tv[direction]);
+				/**/ System.out.println("Tv[" + autidx + "] = max(0, " + state.Tv[autidx] + " - " + state.Tv[direction] + ")");
+			}
+		}
+		nxtstate.g = state.g + state.Tv[direction];
+		nxtstate.Tv[direction] = aut.getStateWithIndex(nxtstate.getArray()[direction]).getCost();
+	}
 	
 	public static void main(String args[])
 	{
@@ -394,9 +437,35 @@ public class ModifiedAstar
 		automata.addAutomaton(m1);
 		automata.addAutomaton(m2);
 		
+		// This one guarantees that only the route shown on p 47 is followed
+		// Note that without route we will not get the shown g and Tv results 
+		Automaton route = new Automaton("route");		route.setType(AutomatonType.Plant);
+		State r0 = new State("r0");			route.addState(r0);	route.setInitialState(r0);
+		State r1 = new State("r1");			route.addState(r1);
+		State r2 = new State("r2");			route.addState(r2);
+		State r3 = new State("r3");			route.addState(r3);
+		State r4 = new State("r4");			route.addState(r4);
+		State r5 = new State("r5");			route.addState(r5);
+		State r6 = new State("r6");			route.addState(r6);
+		LabeledEvent er1 = new LabeledEvent("p2 in i m1");			route.getAlphabet().addEvent(er1);
+		LabeledEvent er2 = new LabeledEvent("p2 ut ur m1 in i m2");	route.getAlphabet().addEvent(er2);
+		LabeledEvent er3 = new LabeledEvent("p1 in i m1");			route.getAlphabet().addEvent(er3);
+		LabeledEvent er4 = new LabeledEvent("p2 ut ur m2");			route.getAlphabet().addEvent(er4);
+		LabeledEvent er5 = new LabeledEvent("p1 ut ur m1 in i m2");	route.getAlphabet().addEvent(er5);
+		LabeledEvent er6 = new LabeledEvent("p1 ut ur m2");			route.getAlphabet().addEvent(er6);
+		route.addArc(new Arc(r0, r1, er1));
+		route.addArc(new Arc(r1, r2, er2));
+		route.addArc(new Arc(r2, r3, er3));
+		route.addArc(new Arc(r3, r4, er4));
+		route.addArc(new Arc(r4, r5, er5));
+		route.addArc(new Arc(r5, r6, er6));
+		
+		automata.addAutomaton(route);
+		
 		try
 		{
-			walk(automata);
+			ModifiedAstar mastar = new ModifiedAstar(automata);
+			mastar.walk1();
 		}
 		catch(Exception excp)
 		{
