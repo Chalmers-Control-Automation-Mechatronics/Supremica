@@ -19,4 +19,10 @@ public class SoftplcInterface
 	{
 		return super.getName();
 	}
+
+	/** Why do I need to implement this method!!!? */
+	public int compareTo(Object object)
+	{
+		return super.compareTo((File) object);
+	}
 }

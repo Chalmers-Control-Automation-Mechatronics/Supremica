@@ -1007,7 +1007,7 @@ public final class AutomataSynchronizerExecuter
 				if (currStateTable[k] != null)
 				{
 					int[] currState = currStateTable[k];
-					State thisState = theAutomaton.getStateWithIndex(k);
+					org.supremica.automata.State thisState = theAutomaton.getStateWithIndex(k);
 
 					// Expand state? Otherwise the transitions will not be shown.
 					if (thisState.isForbidden() && !expandForbiddenStates)
@@ -1158,8 +1158,8 @@ public final class AutomataSynchronizerExecuter
 				{
 					// Get fromState (from currState) and toState (from nextState) and the event
 					Automaton theAutomaton = helper.getAutomaton();
-					State fromState = theAutomaton.getStateWithIndex(helper.getStateIndex(currState));
-					State toState = theAutomaton.getStateWithIndex(nextIndex);
+					org.supremica.automata.State fromState = theAutomaton.getStateWithIndex(helper.getStateIndex(currState));
+					org.supremica.automata.State toState = theAutomaton.getStateWithIndex(nextIndex);
 					LabeledEvent theEvent = theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
 
 					// Create new arc

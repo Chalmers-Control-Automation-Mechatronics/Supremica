@@ -713,6 +713,7 @@ public class RobotStudioInterface
 		}
 
 		// DAppEvents interface methods
+
 		public void selectionChanged()
 		{
 			//logger.info("Selection changed.");
