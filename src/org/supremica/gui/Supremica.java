@@ -1309,7 +1309,7 @@ public class Supremica
 		// Force the user to enter a new name if it has no name
 		if (currAutomaton.getName() == null || currAutomaton.getName().equals(""))
 		{
-			String autName = getNewAutomatonName("Enter a new name", "");
+			String autName = getNewAutomatonName("Enter a new name", currAutomaton.getComment());
 
 			if (autName == null)
 			{

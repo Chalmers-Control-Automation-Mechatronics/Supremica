@@ -56,6 +56,7 @@ public class Automaton
 {
 	private Alphabet alphabet;
 	private String name;
+	private String comment; //-- MF -- To be shown as tooltip, should also be editable
 	private List theStates;
 	private int index = -1;
 	private Map idStateMap;
@@ -190,7 +191,10 @@ public class Automaton
 	{
 		return name;
 	}
-
+	public String getComment()
+	{
+		return comment;
+	}
 	public void setDisabled(boolean isDisabled)
 	{
 		this.isDisabled = isDisabled;

@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.log.*;
 import org.supremica.gui.*;
 import java.util.*;
 import org.supremica.automata.Arc;
@@ -65,6 +66,8 @@ import org.supremica.automata.LabeledEvent;
  */
 public class AutomatonSynthesizer
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomatonSynthesizer.class);
+
 	private Automaton theAutomaton;
 	private LinkedList acceptingStates = new LinkedList();
 	private Gui workbench;
@@ -88,11 +91,13 @@ public class AutomatonSynthesizer
 	public boolean synthesize()
 		throws Exception
 	{
+		logger.debug("AutomatonSynthesizer::synthesize()");
+		
 		theAutomaton.beginTransaction();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
 		
-		boolean didSomething = false; //-- MF -- records whether we actually did anything
+		boolean didSomething = false; // records whether we actually did anything
 		
 		if (synthesisType == SynthesisType.Controllable)
 		{

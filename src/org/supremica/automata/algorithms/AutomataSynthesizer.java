@@ -66,14 +66,16 @@ import org.supremica.automata.EventsSet;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 
-//-- MF -- Pass AutomatSelector a set of specs/sups/plants, 
-//-- MF -- For each spec/sup it returns that automaton together with the plants with which it shares uc-events
-//-- MF -- If closedSet == true the returned set is closed in that all plants that share uc-events with any plant in the set is also included
+// ass AutomatSelector a set of specs/sups/plants, 
+// For each spec/sup it returns that automaton together with the plants with which it shares uc-events
+// If closedSet == true the returned set is closed in that all plants that share uc-events with any plant in the set is also included
 class AutomataSelector
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomataSelector.class);
+
 	private boolean closedSet;
 	private Automata globalSet;
-	private Automata partialSet;
+	private Automata partialSet = new Automata();
 	private Iterator specIterator;
 	private HashMap eventToAutomataMap = new HashMap();
 
@@ -100,7 +102,8 @@ class AutomataSelector
 			{
 				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				partialSet.addAutomaton(currSupervisorAutomaton);
-
+				logger.debug("AutomataSelector::Added spec/sup " + currSupervisorAutomaton.getName());
+				
 				ArrayList eventList = new ArrayList(currSupervisorAutomaton.eventCollection());
 
 				while (!eventList.isEmpty())
@@ -122,6 +125,7 @@ class AutomataSelector
 								if (!partialSet.containsAutomaton(currPlantAutomaton))
 								{
 									partialSet.addAutomaton(currPlantAutomaton);
+									logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
 
 									// If we want a closed set, we need to add plants with
 									// uncontrollable events common to the already added plants too...
@@ -134,11 +138,18 @@ class AutomataSelector
 						}
 					}
 				}
+				break; // Note, we break out of the while loop here
 			}
 		}
-		
-		return partialSet; // empty, only when we're done. For a spec with no matching plants, this spec will be included	}
+		return partialSet; // empty, only when we're done. For a spec with no matching plants, this spec will be included
 	}
+		
+}
+// This one is used for doMonolithic to return two values
+class MonolithicReturnValue
+{
+	public Automaton automaton;
+	public boolean didSomething;
 }
 
 public class AutomataSynthesizer
@@ -214,7 +225,7 @@ public class AutomataSynthesizer
 			// e.printStackTrace();
 		}
 	}
-
+	
 	public static boolean validOptions(SynthesisType type, SynthesisAlgorithm algorithm)
 	{
 		if (type == SynthesisType.Unknown)
@@ -230,7 +241,7 @@ public class AutomataSynthesizer
 		{
 			return false; // Not implemented (yet)
 		}
-		else if (algorithm == SynthesisAlgorithm.Modular)
+/*		else if (algorithm == SynthesisAlgorithm.Modular)
 		{
 			if (type == SynthesisType.Controllable)
 			{
@@ -238,26 +249,26 @@ public class AutomataSynthesizer
 			}
 			else if(type == SynthesisType.Nonblocking)
 			{
-				return false; // modular AND nonblocking not ok (at the moment)
+				return true; // modular AND nonblocking ok (in some sense)
 			}
 			else if(type == SynthesisType.Both)
 			{
-				return false; // modular AND nonblocking AND controllable not ok (at the moment)
+				return true; // modular AND nonblocking AND controllable ok (in some sense)
 			}
 			
-			return false;
+			return true;
 		}
-		else // it can only be monolithic (at the moment?)
+*/		else // it can only be monolithic (at the moment?)
 		{
 			return true;	// and monolithic we can do everything - right?
 		}
 	}
 
-	// Synthesizes controllable supervisors
+	// Synthesizes supervisors
 	public void execute()
 		throws Exception
 	{
-		/* -- MF -- Old stuff (slightly refactored) */
+		/* -- MF -- Old stuff (slightly refactored) *
 		if(modularControllability()) // only add if something has been synthesized
 		{
 			if (synthesizerOptions.getOptimize())
@@ -273,43 +284,78 @@ public class AutomataSynthesizer
 			logger.info("No uncontrollabilities found, the specifications can be used as supervisors, as is");
 		}
 		
-		/* -- MF -- new stuff
+		*///* -- MF -- new stuff
 		
 		if(synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
 			// monolithic case, just whack the entire stuff into the monolithic algo	
-			Automaton automaton = new Automaton();
-			doMonolithic(theAutomata, automaton); // we always do something, at least we synch
-			// if purge, it's already been done
-			if(automaton == null)
-				logger.debug("Something fishy here (anAutomaton == null)");
-			else
-				logger.debug("anAutomaton != null");
-			gui.addAutomaton(automaton); // let the user choose the name
+			Boolean didSomething = new Boolean(false);
+			MonolithicReturnValue retval = doMonolithic(theAutomata); // we always do something, at least we synch
+			// if purge, that's already been done
+			gui.addAutomaton(retval.automaton); // let the user choose the name
 			
 		}
 		else // modular case
 		{
 			Automata modSupervisors = new Automata(); // collects the calculated supervisors
-			Automaton automaton = new Automaton(); // "out" value for doMonolithic
 			
 			AutomataSelector selector = new AutomataSelector(theAutomata, synthesizerOptions.getMaximallyPermissive());
 			for(Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
 			{
 				if(automata.size() > 1) // no need to do anything for a singleton spec
 				{
-					if(doMonolithic(automata, automaton))
+					MonolithicReturnValue retval = doMonolithic(automata);
+					if(retval.didSomething)
 					{
-						modSupervisors.addAutomaton(automaton);
+						modSupervisors.addAutomaton(retval.automaton);
 					}
 				}
 			}
-		}*/
+			if(synthesizerOptions.getOptimize())
+			{
+				optimize(theAutomata, new Automata(modSupervisors));
+			}
+			if(modSupervisors.size() > 0)
+			{
+				gui.addAutomata(modSupervisors);
+			}
+			else
+			{
+				logger.info("No problems found, the specifications can be used as supervisors, as is");
+			}
+			if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking || synthesizerOptions.getSynthesisType() == SynthesisType.Both)
+			{
+				logger.info("NOTE! Currently global nonblocking is NOT guaranteed. The only guarantee is that each supervisor is individually nonblocking with respect to the plants it controls");
+			}
+		}
 	}
 	
-	//-- MF -- This synthesizes modular controllable supervisors (no non-blocking, that is)
-	//-- MF -- Thsi is the original one
-	//-- MF -- Returns whether anything has been synthesized
+	// This is the engine, synchronizes the given automata, and calcs the forbidden states
+	// Returns true if states have been forbidden
+	// anAutomaton is an out-parameter, the synched result
+	private MonolithicReturnValue doMonolithic(Automata automata)
+		throws Exception // simply throws everything upwards
+	{
+		MonolithicReturnValue retval = new MonolithicReturnValue();
+		retval.didSomething = false;
+		
+		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
+		syncher.execute(); // should be able to interrupt this one, just not now...
+		retval.automaton = syncher.getAutomaton();
+		retval.didSomething |= syncher.getHelper().getAutomataIsControllable();
+		
+		// We need to synthesize even if the result above is controllable
+		// Nonblocking may ruin controllability 
+				
+		AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(gui, retval.automaton, synthesizerOptions);
+		retval.didSomething |= synthesizer.synthesize(); // should also be able to interrupt this one....
+		
+		return retval;
+	}
+	
+	// This synthesizes modular controllable supervisors (no non-blocking, that is)
+	// This is the original one
+	// Returns whether anything has been synthesized
 	private boolean modularControllability()
 		throws Exception
 	{
@@ -468,28 +514,6 @@ public class AutomataSynthesizer
 		}
 */
 		return foundUncontrollable;
-	}
-
-	//-- MF -- This is the engine, synchronizes the given automata, and calcs the forbidden states
-	//-- MF -- Returns true if states have been forbidden
-	//-- MF -- anAutomaton is an out-parameter, the synched result
-	private boolean doMonolithic(Automata automata, Automaton anAutomaton)
-		throws Exception // simply throws everything upwards
-	{
-		boolean didSomething = false;
-		
-		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
-		syncher.execute(); // should be able to interrupt this one, just not now...
-		anAutomaton = syncher.getAutomaton();
-		didSomething |= syncher.getHelper().getAutomataIsControllable();
-		
-		// We need to synthesize even if the result above is controllable
-		// Nonblocking may ruin this 
-				
-		AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(gui, anAutomaton, synthesizerOptions);
-		didSomething |= synthesizer.synthesize(); // should also be able to interrupt this one....
-		
-		return didSomething;
 	}
 	
 	/**
