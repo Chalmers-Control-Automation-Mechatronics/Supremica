@@ -135,9 +135,13 @@ public class ExecutionDialog
 		// We have two panels that we switch between
 		infoPanel = new JPanel(new GridLayout(2,1));
 		infoHeader = new JLabel();
+		JPanel infoHeaderPanel = new JPanel();
 		infoValue = new JLabel();
-		infoPanel.add(infoHeader);
-		infoPanel.add(infoValue);
+		JPanel infoValuePanel = new JPanel();
+		infoHeaderPanel.add(infoHeader, BorderLayout.CENTER);
+		infoValuePanel.add(infoValue, BorderLayout.CENTER);
+		infoPanel.add(infoHeaderPanel);
+		infoPanel.add(infoValuePanel);
 
 		progressPanel = new JPanel();
 		progressBar = new JProgressBar();
