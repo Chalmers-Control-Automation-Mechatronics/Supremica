@@ -51,7 +51,6 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.Stoppable;
-import org.supremica.gui.*;
 import org.supremica.log.*;
 import java.util.*;
 import java.io.PrintWriter;

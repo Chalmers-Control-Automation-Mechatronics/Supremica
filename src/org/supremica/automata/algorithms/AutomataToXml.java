@@ -49,7 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.gui.*;
 import java.io.*;
 import java.util.*;
 import org.supremica.properties.SupremicaProperties;

@@ -50,7 +50,6 @@
 package org.supremica.automata;
 
 import java.util.*;
-import org.supremica.gui.*;
 import org.supremica.log.*;
 
 public class ProjectContainer
@@ -125,6 +124,6 @@ public class ProjectContainer
 
 	public String getUniqueProjectName()
 	{ // Implement this
-		return "Untiled";
+		return "Untitled";
 	}
 }
