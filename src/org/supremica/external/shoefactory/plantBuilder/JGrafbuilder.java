@@ -1,4 +1,4 @@
-package org.supremica.external.shoeFactory.plantBuilder;
+package org.supremica.external.shoefactory.plantBuilder;
 
 import org.jgrafchart.*;
 import java.applet.*;

@@ -46,7 +46,7 @@
 *
 * Supremica is owned and represented by KA.
 */
-package org.supremica.external.shoeFactory.Animator;
+package org.supremica.external.shoefactory.Animator;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -46,7 +46,7 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.external.shoeFactory.plantBuilder;
+package org.supremica.external.shoefactory.plantBuilder;
 
 import org.supremica.automata.*;
 

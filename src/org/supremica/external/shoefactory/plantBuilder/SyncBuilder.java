@@ -46,7 +46,7 @@
 *
 * Supremica is owned and represented by KA.
 */
-package org.supremica.external.shoeFactory.plantBuilder;
+package org.supremica.external.shoefactory.plantBuilder;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -69,8 +69,8 @@ import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.external.robotCoordination.AutomataBuilder;
-import org.supremica.external.shoeFactory.plantBuilder.*;
-import org.supremica.external.shoeFactory.Animator.*;
+import org.supremica.external.shoefactory.plantBuilder.*;
+import org.supremica.external.shoefactory.Animator.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.IO.*;
