@@ -1,8 +1,8 @@
 \chapter{Automation Objects}
 \label{automationobjects}
 
-%% Background
-With function blocks the main technological problem of
+%% Intro
+With the function blocks the main technological problem of
 distributed automation has been solved. A general framework
 for development and deployment of distributed automation
 system has been developed and established. What is still
@@ -11,23 +11,23 @@ with the data about their properties and, more importantly,
 their functionality in a way that will enable diminishing of
 the time to market and facilitate effective rapid object
 oriented development of automation systems.
-%% Why automation objects? What do we want to do?
-After considering the following arguments it will become
-clear why such encapsulation is needed and how it can help
-in achieving the afore mentioned goal.
+
+\section{Background}
+%% Background. Why automation objects? What do we want to do?
+Considering the following arguments it is clear why such
+encapsulation is needed and how it can help in achieving the
+afore mentioned goal.
 
 %%     effective reuse of software
-Object oriented system development as presented in
-\cite{iec:614991:2000} is not enough for achieving
-\textit{effective reuse of software} in automation systems
-development. This is the case because effective software
-reuse demands efficient exchange of information about how
-the software that is supposed to be reused is used and what
-it does. In other words, interfaces of the software objects
-have to be well specified and well documented. The
-\cite{iec:614991:2000} makes sure that the interfaces are
-well specified but it does not provide anything that will
-assure that they are well documented.
+Object oriented system development as presented in the
+IEC~61499 standard is ideal for the purpose that is is
+designed for but not enough for achieving {\it effective
+  software reuse} in automation systems development.
+
+% grouping software objects in functional units (encapsulation)
+% abstraction of functionality (views)
+% properties of the functional unit (attributes)
+
 
 %%     effective decentralization of software development
 Effective software reuse facilitates \textit{effective
@@ -73,29 +73,34 @@ support in Supremica that is planned for such data objects.
 
 
 
-
+\section{Definition}
 %% Definition. 
 %%     multi view objects
-%%     view is the interface exposed for different purposes.
-An \textbf{automation object} is defined as a set of
-applications, subapplications and function blocks (as
-defined in \cite{iec:614991:2000}) encapsulated with a
-declaration of \textit{attributes} and \textit{views} of
-these.
+An \textbf{automation object} is defined as \textit{a set of
+  software objects} encapsulated with a declaration of
+\textit{services}, \textit{attributes} and \textit{views} of
+the set.
 
-An \textbf{attribute} is user defined and specified data that
+The \textbf{set} specifies the applications, subapplications
+and function blocks, as defined in \cite{iec:614991:2000},
+contained within the automation object. Only one set per
+automation object is defined and it contains \textit{all} of
+the software objects required for the functionality of the
+automation object.
+% less dependency problems at the cost of storage, more on
+% this after the definition
+
+An \textbf{attribute} is a user defined and specified data that
 describes some significant property of the automation
 object. 
 
-A \textbf{view} is a description of a certain aspect of the
-automation object and information about how that aspect is
-used in the automation system.
-% view is functional description and its name should only
-% contain what is needed to understand its function
-% eg elevator, pump, oven, sensor
-% all the information about what hardware this automation
-% block is for should be in the attributes
-% eg attribute hardware='abb robot N25'
+A \textbf{view} is an interface to the object. Every
+interface has at least one implementation.
+
+
+A \textbf{service} 
+
+
 
 %% How this definition supports the arguments above
 
@@ -108,7 +113,7 @@ used in the automation system.
 
 
 
-
+\section{Implementation and Support in Supremica}
 % Support in Supremica
 
 %% implementation of automation objects

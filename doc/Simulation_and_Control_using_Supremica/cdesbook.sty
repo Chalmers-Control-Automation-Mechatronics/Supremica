@@ -154,14 +154,16 @@
 \RequirePackage[latin1]{inputenc}
 \RequirePackage{makeidx}
 %\RequirePackage{chicago}
-\RequirePackage{amsmath}
+%\RequirePackage{amsmath}
 
 
 %% 
 %% Font settings
 %%
-\RequirePackage{euler}           % Math:       euler
+%\RequirePackage{euler}           % Math:       euler
 \renewcommand{\rmdefault}{ppl}   % Roman:      palatino
+\renewcommand{\rmdefault}{ppl}   % Roman:      palatino
+
 %\renewcommand{\sfdefault}{cmss} % Sansserif:  computer modern
 \renewcommand{\sfdefault}{pag}   % Sansserif:  avantgarde
 \renewcommand{\ttdefault}{pcr}   % Typewriter: courier
@@ -308,7 +310,8 @@
   %%
   \long\def\@makechapterhead#1{%
     \vspace*{14mm}
-    \vbox to 80\p@{
+    \vbox{
+    %\vbox to 80\p@{
       \vfil
       \ifnum \c@secnumdepth >\m@ne
       \if@mainmatter
@@ -336,12 +339,14 @@
 
   \long\def\@makeschapterhead#1{%
     \vspace*{14mm}
-    \vbox to 80\p@{
+    \vbox{
+    %\vbox to 80\p@{
       \vfil
       \hrule width \textwidth height 1.2pt\vspace*{1.0pt}
       \hrule width \textwidth height 0.3pt \par\bigskip
       }
-    \vbox to 100\p@{
+    \vbox{
+    %\vbox to 100\p@{
       \begin{flushright}
         \textsf{\huge\textbf{#1}}
       \end{flushright}
