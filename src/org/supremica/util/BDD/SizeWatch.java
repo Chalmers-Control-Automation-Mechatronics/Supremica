@@ -18,7 +18,7 @@ public class SizeWatch
     private static SizeWatch instance_ = null;
     private static JBDD manager = null;
 
-    private Button bClose, bQuit, bClear;
+    private Button bClose, bQuit, bClear, bDump;
     private List list;
     private SizeWatch() {
 	super("BDD node counts");
@@ -33,9 +33,11 @@ public class SizeWatch
 	add(pNorth, BorderLayout.NORTH);
 	pNorth.add(bClose = new Button("Close") );
 	pNorth.add(bClear = new Button("Clear") );
+	pNorth.add(bDump = new Button("Dump to stdout") );
 	pNorth.add(bQuit  = new Button("Quit"));
 	bQuit.addActionListener(this);
 	bClear.addActionListener(this);
+	bDump.addActionListener(this);
 	bClose.addActionListener(this);
 
 
@@ -103,14 +105,23 @@ public class SizeWatch
 	list.add(str);
     }
 
+	private void onDump()
+	{
+		Options.out.println("------ [ SizeWatch dump] ---------------\n");
+		int len = list.getItemCount();
+		for(int i = 0; i < len; i++) {
+			Options.out.println(list.getItem(i));
+		}
+		Options.out.println();
+	}
 
     // --------------------------------------
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
         if(src == bClose) dispose();
 	else if(src == bClear) list.removeAll();
+	else if(src == bDump) onDump();
 	else if(src == bQuit) System.exit(0);
-
     }
 
 }

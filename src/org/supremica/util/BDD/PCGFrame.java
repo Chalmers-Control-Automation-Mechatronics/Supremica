@@ -5,69 +5,66 @@ import java.awt.event.*;
 import java.util.*;
 
 public class PCGFrame
-	extends Frame
+	extends Dialog
 	implements ActionListener
 {
 	private PCGNode[] nodes;
 	private int[] perm;
 	private int size;
-	private Button bUp, bDown, bDone;
+	private Button bUp, bDown, bDone, bDump;
 	private java.awt.List order;
-	private Object lock = new Object();
 
     public PCGFrame(int [] perm, Vector all) {
-	super("[PCGFrame]");
-	PCGNode [] nods = new PCGNode[perm.length];
-	for(int i = 0; i < perm.length; i++) nods[i] = (PCGNode) all.elementAt( i);
-	init(perm, nods);
+		super(new Frame(), "[PCGFrame]", true);
+		PCGNode [] nods = new PCGNode[perm.length];
+		for(int i = 0; i < perm.length; i++) nods[i] = (PCGNode) all.elementAt( i);
+		init(perm, nods);
     }
     public PCGFrame(int[] perm, PCGNode[] nodes) {
-	super("[PCGFrame]");
-	init(perm, nodes);
+		super(new Frame(), "[PCGFrame]", true);
+		init(perm, nodes);
     }
 
     private void init(int [] perm, PCGNode [] nodes) {
-	
-	this.perm = perm;
-	this.nodes = nodes;
-	this.size = perm.length;
-	
-	Panel pNorth = new Panel();
-	
-	add(pNorth, BorderLayout.NORTH);
-	pNorth.add(bDone = new Button("Done"));
-	
-	Panel pEast = new Panel(new GridLayout(6, 1));
-	
-	add(pEast, BorderLayout.EAST);
-	pEast.add(new Label());
-	pEast.add(new Label());
-	pEast.add(bUp = new Button("Up"));
-	pEast.add(bDown = new Button("Down"));
-	pEast.add(new Label());
-	pEast.add(new Label());
-	add(order = new java.awt.List(25, false));
-	build_list();
-	bUp.addActionListener(this);
-	bDown.addActionListener(this);
-	bDone.addActionListener(this);
-	add(new Label("reorder PCG, then press done"), BorderLayout.SOUTH);
+
+		this.perm = perm;
+		this.nodes = nodes;
+		this.size = perm.length;
+
+		Panel pNorth = new Panel(new FlowLayout( FlowLayout.LEFT) );
+
+		add(pNorth, BorderLayout.NORTH);
+		pNorth.add(bDone = new Button("Done"));
+		pNorth.add(bDump = new Button("Dump to stdout"));
+
+		Panel pEast = new Panel(new GridLayout(6, 1));
+
+		add(pEast, BorderLayout.EAST);
+		pEast.add(new Label());
+		pEast.add(new Label());
+		pEast.add(bUp = new Button("Up"));
+		pEast.add(bDown = new Button("Down"));
+		pEast.add(new Label());
+		pEast.add(new Label());
+		add(order = new java.awt.List(25, false));
+		build_list();
+
+		bUp.addActionListener(this);
+		bDown.addActionListener(this);
+		bDone.addActionListener(this);
+		bDump.addActionListener(this);
+
+		add(new Label("reorder PCG, then press done"), BorderLayout.SOUTH);
+		pack();
     }
+
 
 	public void getUserPermutation()
 	{
-		pack();
-		setVisible(true);
 
-		synchronized (lock)
-		{
-			try
-			{
-				lock.wait();
-			}
-			catch (InterruptedException ignored) {}
-		}
+		show();
 	}
+
 
 	public void actionPerformed(ActionEvent e)
 	{
@@ -84,6 +81,10 @@ public class PCGFrame
 		else if (src == bDone)
 		{
 			onDone();
+		}
+		else if(src == bDump)
+		{
+			onDump();
 		}
 	}
 
@@ -123,11 +124,20 @@ public class PCGFrame
 	{
 		dispose();
 
-		synchronized (lock)
-		{
-			lock.notify();
-		}
 	}
+
+	private void onDump()
+	{
+		Options.out.println("Automata order in the BDDs:");
+		int len = order.getItemCount();
+		for(int i = 0; i < len; i++) {
+			if(i != 0) Options.out.print(" < ");
+			Options.out.print(order.getItem(i));
+		}
+		Options.out.println();
+	}
+
+	// --------------------------------------
 
 	private void build_list()
 	{

@@ -90,11 +90,8 @@ public class OrderingSolver {
     private Node [] getShortestPath(Node [] nods) {
 		Solver sol = null;
 		switch(Options.ordering_algorithm) {
-		case Options.ORDERING_ALGO_NEW_TSP:
+		case Options.AS_HEURISTIC_TSP:
 			sol = new TSPSolver(nods);
-			break;
-		case Options.ORDERING_ALGO_RANDOM:
-			sol = new RandomSolver(nods);
 			break;
 		default:
 			System.err.println("[INTERNAL] unknown ordering-solver!");
@@ -131,33 +128,6 @@ public class OrderingSolver {
 		}
 		public Node [] getShortestPath() { return solved; }
 		public abstract void solve();
-    }
-
-
-
-
-
-
-
-
-    /** Random group ordering, just to show how bad it can get :( */
-    class RandomSolver extends Solver {
-		public RandomSolver(Node [] org_ ) {  super(org_); }
-		public void solve() {
-			int len = org.length;
-
-			// copy
-			solved = new Node[len];
-			for(int i = 0; i < len; i++) solved[i] = org[i];
-
-			// permute
-			for(int i = 0; i < len; i++) {
-			int pos = (int)(Math.random() * len);
-			Node tmp = solved[i];
-			solved[i] = solved[pos];
-			solved[pos] = tmp;
-			}
-		}
     }
 
 

@@ -1,5 +1,7 @@
 package org.supremica.util.BDD;
 
+import org.supremica.util.BDD.heuristics.*;
+
 import java.util.*;
 import java.io.*;
 
@@ -96,42 +98,9 @@ public class Automata
 
 		// --[ Automata ordering which affects the BDD variable ordering starts HERE ] --
 		Timer timer = new Timer(); // This times the ordering procedure
-		components = automata.size(); // number of automata to be ordered
 
-
-		if(Options.ordering_algorithm == Options.ORDERING_ALGO_OLD_PCG) {
-		    // OLD ordering technique: PCG graph search
-		    PCG pcg = new PCG(automata);
-
-		    for (int i = 0; i < components; i++)
-			{    // get weights
-			    Automaton a1 = (Automaton) automata.elementAt(i);
-
-			    for (int j = 0; j < i; j++)
-				{
-				    Automaton a2 = (Automaton) automata.elementAt(j);
-				    int cc = a1.getCommunicationComplexity(a2);
-
-				    if (cc != 0)
-					{
-					    pcg.connect(a1, a2, cc);
-					}
-				}
-			}
-
-		    // pcg.dump();
-		    grupp_ordering = pcg.getShortestPath();
-		} else {
-		    // TESTING THE NEW ORDERING-SOLVER ALGO:
-		    int [][]weightMatrix = getCommunicationMatrix();
-		    OrderingSolver os = new OrderingSolver(components);
-		    for(int i = 0; i < components; i++) {
-			Automaton a1 = (Automaton) automata.elementAt(i);
-			os.addNode(a1, weightMatrix[i], i-1);
-		    }
-		    grupp_ordering = os.getGoodOrder();
-		}
-
+		AutomataOrderingHeuristic aoh = AutomataOrderingHeuristicFactory.createInstance(this);
+		grupp_ordering = aoh.ordering();
 
 		// maybe the user needs to change something ?
 		if (Options.user_alters_PCG) {
@@ -140,15 +109,14 @@ public class Automata
 		}
 
 		// now, use the new ordering to re-order the list:
+		components = automata.size();
 		Vector tmp = new Vector();
-
 		for (int i = 0; i < components; i++)
 		{
 			tmp.addElement(automata.elementAt(grupp_ordering[i]));
 		}
 
 		automata.removeAllElements();    // just for fun
-
 		automata = tmp;
 
 		timer.report("PCG reodering done");
