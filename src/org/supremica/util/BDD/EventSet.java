@@ -149,7 +149,7 @@ public class EventSet
 	{
 		boolean [] es = new boolean[total];
 		for(int t = 0; t < total; t++) {
-		    es[t] = (events[t] != null && (!uncontrollable_events_only || events[t].c));
+		    es[t] = (events[t] != null && !(uncontrollable_events_only && events[t].c));
 		}
 		return es;
 	}

@@ -1255,22 +1255,45 @@ public class AutomataVerifier
 	throws Exception
     {
 
-		boolean ret  = false;
+
+
+
 
 		Automata unselected = ActionMan.getGui().getUnselectedAutomata();
+
+		// we already know the answer: L(P) = \Sigma^*
+		if( unselected.nbrOfAutomata() < 1)
+					return true;
+
+
 		Automata selected = new Automata(theAutomata, true); /* <-- MUST BE SHALLOW COPY ... */
 		selected.removeAutomata(unselected); /* .. OR THIS REMOVE WONT WORK !!! */
 
 
-		if(Options.bdd_modular) {
-			ModularBDDLanguageInclusion mli = new ModularBDDLanguageInclusion(selected, unselected, synchHelper.getHelperData(), false);
-			ret = mli.passLanguageInclusion();
-			mli.cleanup();
-		} else {
-			AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected, synchHelper.getHelperData() );
-			ret = abf.passLanguageInclusion();
-			abf.cleanup();
+
+		boolean ret  = false;
+		switch(Options.inclsuion_algorithm) {
+			case Options.INCLUSION_ALGO_MONOLITHIC:
+				AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected, synchHelper.getHelperData() );
+				ret = abf.passLanguageInclusion();
+				abf.cleanup();
+				break;
+			case Options.INCLUSION_ALGO_MODULAR:
+				ModularBDDLanguageInclusion mli = new ModularBDDLanguageInclusion(selected, unselected, synchHelper.getHelperData());
+				ret = mli.passLanguageInclusion();
+				mli.cleanup();
+
+				break;
+			case Options.INCLUSION_ALGO_INCREMENTAL:
+				IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(selected, unselected, synchHelper.getHelperData());
+				ret = ili.passLanguageInclusion();
+				ili.cleanup();
+				break;
+			default:
+				throw new Exception("Unknown BDD/language containment algorithm!");
 		}
+
+
 		return ret;
     }
 
@@ -1284,11 +1307,42 @@ public class AutomataVerifier
 		throws Exception
     {
 
+		boolean ret;
+
+
+		// why compute when we already know the answer: L(P) = \Sigma^*   ?
+		if( theAutomata.isNoAutomataPlants() )
+					return true;
+
+		switch(Options.inclsuion_algorithm) {
+			case Options.INCLUSION_ALGO_MONOLITHIC:
+				AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, synchHelper.getHelperData() );
+				ret = abf.isControllable();
+				abf.cleanup();
+				break;
+			case Options.INCLUSION_ALGO_MODULAR:
+				ModularBDDLanguageInclusion mli = new ModularBDDLanguageInclusion(theAutomata, synchHelper.getHelperData());
+				ret = mli.isControllable();
+				mli.cleanup();
+
+				break;
+			case Options.INCLUSION_ALGO_INCREMENTAL:
+				IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(theAutomata, synchHelper.getHelperData());
+				ret = ili.isControllable();
+				ili.cleanup();
+				break;
+			default:
+				throw new Exception("Unknown BDD/language containment algorithm!");
+		}
+
+
+		/*
     	// timer.start();
 		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
 		boolean ret = abf.isControllable();
 		abf.cleanup();
 		// timer.stop();
+		*/
 		return ret;
 
     }

@@ -19,7 +19,6 @@ public class EventManager
 	private Event addEvent(Event e)
 	{
 		e.id = size++;
-
 		eventv.addElement(e);
 
 		return e;
@@ -59,7 +58,6 @@ public class EventManager
 		}
 
 		e.id = old.id;    // copy the id (possibly just created)
-
 		old.owners++; // mark that this event has been used once
 
 		return old.id;
@@ -70,14 +68,14 @@ public class EventManager
 	{
 	    Vector ret = new Vector();
 	    BDDAssert.internalCheck(closed, "[EventManager.registerEvent] BAD function call");
-	
+
 	    for (int i = 0; i < size; i++) {
 		if(events[i].owners == 1 && events[i].automaton == owner) ret.add(events[i]);
 	    }
 	    return ret;
 
 	}
-	
+
 
 	// -----------------------------------------------------
 	public void close()
@@ -141,5 +139,18 @@ public class EventManager
 		}
 
 		return ret;
+	}
+
+	// --------------------------------------------------------------------
+	/** prints only a subset of the events. given by 'subset'
+	 */
+	public void dumpSubset(String what, boolean [] subset)
+	{
+		System.out.print(what + " {");
+		for(int i = 0; i < size; i++)
+			if(subset[i])
+				System.out.print(" " + events[i].getName());
+
+		System.out.println("};");
 	}
 }

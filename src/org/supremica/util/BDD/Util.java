@@ -36,6 +36,15 @@ public class Util
 		return ret;
 	}
 
+
+	// -------------------------------------------------
+	/** count trues in a vector of booleans */
+	public static int count(boolean [] x) {
+		int len = x.length;
+		int c = 0;
+		for(int i = 0; i < len; i++) if(x[i]) c++;
+		return c;
+	}
 	// -------------------------------------------------
 
 	public static int suggest_nodecount(Automata a)

@@ -271,7 +271,7 @@ public class BDDAutomaton
 	public int getTpri()
 	{
 		return bdd_t_pri;
-	}    // T prioritized, seeKnuts paper again
+	}    // T prioritized, see Knuts paper again
 
 	public int getM()
 	{

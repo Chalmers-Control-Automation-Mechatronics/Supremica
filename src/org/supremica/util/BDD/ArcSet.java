@@ -152,21 +152,21 @@ public class ArcSet
 
 		for (Enumeration e = elements(); e.hasMoreElements(); )
 		{
-			Arc ev = (Arc) e.nextElement();
-			Event event = es.getEventByName(ev.event);
+			Arc arc = (Arc) e.nextElement();
+			Event event = es.getEventByName(arc.event);
 
-			BDDAssert.bddAssert(event != null, "event not found:" + ev.event);
-			ev.e_code = event.id;
-			BDDAssert.bddAssert(ev.e_code != Automaton.FAILED, "event not found:" + ev.event);
+			BDDAssert.bddAssert(event != null, "event not found:" + arc.event);
+			arc.e_code = event.id;
+			BDDAssert.bddAssert(arc.e_code != Automaton.FAILED, "event not found:" + arc.event);
 
-			registerArc(ss,ev, event);
-			arcs[ev.id] = ev;
+			registerArc(ss,arc, event);
+			arcs[arc.id] = arc;
 
 			// mark that this event has been used one time in a transition
 			event.use++;
 
 			// and mark it localy too
-			event_count[ev.id]++;
+			event_count[event.id]++;
 
 		}
 

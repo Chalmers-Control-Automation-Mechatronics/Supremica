@@ -584,6 +584,9 @@ public class Supervisor
 		manager.deref(i_all);
 	}
 
+
+	// XXX: this algo uses all automata in the BDDAutomata, which is sometimes (in modular algorithms, for example)
+	//      far larger then the groups (plant and spec) given this supervisor...
 	public void trace(String what, int from, int to)
 	{
 		Vector frontiers = new Vector();

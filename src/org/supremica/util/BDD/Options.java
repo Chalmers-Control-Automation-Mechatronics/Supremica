@@ -14,8 +14,15 @@ public class Options
 	ALGO_SMOOTHED_PATH = 6,
 	ALGO_SMOOTHED_KEEP = 7,
 	ALGO_SMOOTHED_PART = 8
-
 	;
+
+	/** language controllability/inclusion algorithms */
+	public static final int
+		INCLUSION_ALGO_MONOLITHIC = 0,
+		INCLUSION_ALGO_MODULAR = 1,
+		INCLUSION_ALGO_INCREMENTAL = 2
+		;
+
 
     /** state counting algorithm */
     public static final int
@@ -46,7 +53,6 @@ public class Options
     public static boolean show_grow = true;
     public static boolean trace_on = false;
     public static boolean local_saturation = false;
-    public static boolean bdd_modular = true;
     public static boolean uc_optimistic = true;
     public static boolean nb_optimistic = true;
 
@@ -54,5 +60,6 @@ public class Options
     public static int algo_family = ALGO_SMOOTHED_MONO;
     public static int count_algo  = COUNT_TREE;
     public static int max_partition_size = DEFAULT_MAX_PARTITION_SIZE;
+    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;
 
 }

@@ -673,51 +673,87 @@ class BDDPanel
 {
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
-    private JCheckBox localSaturation, encodingFill, bddModular;
-    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm;
+    private JCheckBox localSaturation, encodingFill;
+    private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm;
 
     public BDDPanel(PreferencesDialog theDialog)
     {
 
-	this.theDialog = theDialog;
+		this.theDialog = theDialog;
+		JLabel tmp;
 
 
-	JPanel pWest  = new JPanel( new GridLayout(8,2));
+	JPanel pWest  = new JPanel( new GridLayout(10,1));
 	add(pWest, BorderLayout.WEST);
+
+
+
+	pWest.add( tmp = new JLabel("User interaction:", SwingConstants.LEFT));
+	tmp.setForeground(Color.blue);
+
+
 
 	pWest.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
 	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders",
 					     Options.user_alters_PCG) );
 	pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
+
+	pWest.add( new JSeparator() );
+
+	pWest.add( tmp = new JLabel("Computation options:"));
+	tmp.setForeground(Color.blue);
+
 	pWest.add( localSaturation = new JCheckBox("Locally saturate", Options.local_saturation) );
 
 	// pWest.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
 	// pWest.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
 
 	pWest.add( encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars) );
-	pWest.add( bddModular = new JCheckBox("Modular language inclusion/controllability", Options.bdd_modular) );
+
+
+
 
 
 	Box p = new Box(BoxLayout.Y_AXIS);
 	add(p, BorderLayout.EAST);
 
+	JPanel pLabel= new JPanel(new FlowLayout(FlowLayout.LEFT) );
+	p.add( pLabel);
+	pLabel.add( tmp = new JLabel("Algorithm selection:"));
+	tmp.setForeground(Color.blue);
 
-	JPanel pOrdering = new JPanel();
+
+
+	JPanel pOrdering = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 	p.add(pOrdering);
 
 	pOrdering.add( new JLabel("Automaton (not BDD) ordering"));
 	pOrdering.add( orderingAlgorithm = new JComboBox());
 
-	orderingAlgorithm.addItem("PCG search");
+	orderingAlgorithm.addItem("PCG search           ");
 	orderingAlgorithm.addItem("Random (!)");
 	orderingAlgorithm.addItem("modified TSP");
 	orderingAlgorithm.setSelectedIndex( Options.ordering_algorithm);
 
 
-	JPanel pFamily = new JPanel();
+
+
+	JPanel pInclusion = new JPanel( new FlowLayout(FlowLayout.RIGHT) );
+	p.add(pInclusion);
+
+	pInclusion.add( new JLabel("Language containment algorithm"));
+	pInclusion.add( inclusionAlgorithm = new JComboBox() );
+	inclusionAlgorithm.addItem("Monolithic      ");
+	inclusionAlgorithm.addItem("Modular");
+	inclusionAlgorithm.addItem("Incremental");
+	inclusionAlgorithm.setSelectedIndex( Options.inclsuion_algorithm);
+
+
+
+	JPanel pFamily = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 	p.add(pFamily);
-	pFamily.add( new JLabel("Favour algorithm family"));
+	pFamily.add( new JLabel("Favour reachability algorithm"));
 	pFamily.add( algorithmFamily = new JComboBox());
 
 	algorithmFamily.addItem("Monolithic");
@@ -731,18 +767,23 @@ class BDDPanel
 	algorithmFamily.addItem("Smoothed: Partitioned   (P1)");
 	algorithmFamily.setSelectedIndex(Options.algo_family);
 
+	p.add( new JSeparator() );
 
-	JPanel pCount = new JPanel();
+	pLabel= new JPanel(new FlowLayout(FlowLayout.LEFT) );
+	p.add( pLabel);
+	pLabel.add( tmp = new JLabel("Misc. options:"));
+	tmp.setForeground(Color.blue);
+
+	JPanel pCount = new JPanel(new FlowLayout(FlowLayout.RIGHT) );
 	p.add(pCount);
 
 	pCount.add( new JLabel("State-counting algorithm"));
 	pCount.add(countAlgorithm = new JComboBox());
 
-	countAlgorithm.addItem("No counting");
+	countAlgorithm.addItem("No counting         ");
 	countAlgorithm.addItem("Tree SAT");
 	countAlgorithm.addItem("Exact");
 
-	countAlgorithm.setSelectedIndex( Options.count_algo);
 
     }
 
@@ -751,6 +792,7 @@ class BDDPanel
 	Options.algo_family      = algorithmFamily.getSelectedIndex();
 	Options.count_algo       = countAlgorithm.getSelectedIndex();
 	Options.ordering_algorithm  = orderingAlgorithm.getSelectedIndex();
+	 Options.inclsuion_algorithm = inclusionAlgorithm.getSelectedIndex();
 
 	Options.show_grow        = showGrow.isSelected();
 	Options.user_alters_PCG  = alterPCG.isSelected();
@@ -760,7 +802,7 @@ class BDDPanel
 	Options.debug_on         = debugOn.isSelected();
 	Options.local_saturation = localSaturation.isSelected();
 	Options.fill_statevars   = encodingFill.isSelected();
-	Options.bdd_modular      = bddModular.isSelected();
+
 
 	SupremicaProperties.updateBDDOptions(true);
 	return true;

@@ -154,8 +154,14 @@ public class Automaton
 
 		care_set = eventSet.getEventCareSet(false);
 		care_set_uc = eventSet.getEventCareSet(true);
-
 		event_usage = arcSet.getEventUsageCount();
+
+
+
+		// DEBUG: dump careset
+		// alphabet.dumpSubset("  Regular events for " + getName(), care_set);
+		// alphabet.dumpSubset("  UC events for " + getName(), care_set_uc);
+
 
 	}
 
@@ -198,10 +204,10 @@ public class Automaton
 		return false;
     }
 
-    public void addEventCareSet(boolean [] events, boolean getEventCareSet)
+    public void addEventCareSet(boolean [] events, boolean uncontrollable_events_only)
     {
 		// eventSet.addEventCareSet(events, uncontrollable_events_only);
-		boolean [] es = getEventCareSet(getEventCareSet);
+		boolean [] es = getEventCareSet(uncontrollable_events_only);
 		int size= es.length;
 		for(int i = 0; i < size; i++)
 			events[i] |= es[i];
@@ -209,8 +215,7 @@ public class Automaton
 
 	public boolean [] getEventCareSet(boolean uncontrollable_events_only)
 	{
-		// return eventSet.getEventCareSet(uncontrollable_events_only);
-		return uncontrollable_events_only ? care_set : care_set_uc ;
+		return uncontrollable_events_only ? care_set_uc : care_set;
 	}
 
 

@@ -177,6 +177,7 @@ public class BDDAutomata
 		size_all = 2 * size_states + size_events;
 	}
 
+	// -------------------------------------------------------------------------------------
 
     public BDDAutomaton [] getAutomataVector()
     {
@@ -240,6 +241,27 @@ public class BDDAutomata
 		return original_events;
 	}
 
+	public EventManager getEventManager()
+	{
+		return original_automata.getAlphabeth();
+	}
+
+	/** get a BDD for a subset of alphabet */
+	public int getAlphabetSubsetAsBDD(boolean [] subset)
+	{
+		int bdd_subset = ref( getZero() );
+
+		for(int i = 0; i < subset.length; i++)
+		{
+			if(subset[i])
+			bdd_subset = orTo(bdd_subset ,	original_events[i].bdd);
+		}
+		return bdd_subset;
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	public void cleanup()
 	{
 
@@ -264,6 +286,8 @@ public class BDDAutomata
 		ps.println("BDD Variables: " + size_events + ", " + events_size + " events");
 		ps.println("BDD Sigma_u: " + nodeCount(bdd_events_u) + " nodes, SAT-count = " + satCount(bdd_events_u, size_events));
 	}
+
+
 
     // ------------------------------------------------------------------------------
     public static boolean BDDPackageIsBusy() {

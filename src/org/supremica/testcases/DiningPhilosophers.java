@@ -358,7 +358,7 @@ class Chopstick
 
 		fork = new Automaton("Fork template");
 
-		fork.setType(AutomatonType.Plant);
+		fork.setType(AutomatonType.Specification);
 
 		// First the states
 		states[0].setInitial(true);

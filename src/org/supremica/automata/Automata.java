@@ -457,6 +457,48 @@ public class Automata
 		return true;
 	}
 
+
+
+	/**
+	 * True if NONE of the automata are plants.
+	 */
+	public boolean isNoAutomataPlants()
+	{
+		for (Iterator autIt = iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+
+			if (currAutomaton.getType() == AutomatonType.Plant)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * True if no automaton is  either specification OR supervisor.
+	 * This is good to for early termination in algorithms :)
+	 */
+	public boolean isNoAutomataSpecificationsOrSupervisors()
+	{
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+
+			if (currAutomaton.getType() == AutomatonType.Specification
+			 	|| currAutomaton.getType() == AutomatonType.Supervisor)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
+
 	/**
 	 * Returns true if at least one automaton has the event as prioritized.
 	 * Returns false if the event is not included in any alphabet or
