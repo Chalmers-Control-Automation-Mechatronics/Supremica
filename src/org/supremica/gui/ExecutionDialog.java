@@ -312,7 +312,7 @@ public class ExecutionDialog
 		else if (currentMode == ExecutionDialogMode.hide)
 		{
 			setVisible(false);
-			dispose();
+			//dispose();
 		}
 	}
 

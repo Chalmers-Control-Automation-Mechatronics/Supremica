@@ -114,7 +114,7 @@ public class AutomatonExplorer
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
-				dispose();
+				//dispose();
 			}
 		});
 		initMenubar();
@@ -164,7 +164,7 @@ public class AutomatonExplorer
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
-				dispose();
+				//dispose();
 			}
 		});
 	}

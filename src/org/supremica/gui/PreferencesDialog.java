@@ -127,7 +127,7 @@ public class PreferencesDialog
 	public void doCancel()
 	{
 		setVisible(false);
-		dispose();
+		//dispose();
 	}
 
 	public void doApply()

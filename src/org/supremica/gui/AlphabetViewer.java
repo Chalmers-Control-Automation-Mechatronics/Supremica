@@ -79,7 +79,7 @@ public class AlphabetViewer
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
-				dispose();
+				//dispose();
 			}
 		});
 
@@ -124,7 +124,7 @@ public class AlphabetViewer
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
-				dispose();
+				//dispose();
 			}
 		});
 	}

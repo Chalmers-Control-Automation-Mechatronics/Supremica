@@ -81,7 +81,7 @@ public class ActionAndControlViewer
 			public void windowClosing(WindowEvent e)
 			{
 				setVisible(false);
-				dispose();
+				//dispose();
 			}
 		});
 
@@ -126,7 +126,7 @@ public class ActionAndControlViewer
 			public void actionPerformed(ActionEvent e)
 			{
 				setVisible(false);
-				dispose();
+				//dispose();
 			}
 		});
 

@@ -125,7 +125,7 @@ public class AutomatonViewer
 			{
 				setVisible(false);
 				terminateProcesses();
-				dispose();
+				//dispose();
 			}
 		});
 		setIconImage(Supremica.cornerImage);
@@ -299,7 +299,7 @@ public class AutomatonViewer
 			{
 				setVisible(false);
 				terminateProcesses();
-				dispose();
+				//dispose();
 			}
 		});
 		leftToRightCheckBox.addActionListener(new ActionListener()

@@ -274,6 +274,23 @@ public class Automata
 	}
 
 	/**
+	 * Returns true if the controllability is consistent through all the automata.
+	 */
+	public boolean isEventControllabilityConsistent()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+
+			if(!automaton.isAllEventsPrioritized())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Returns true if any automaton has a self loop
 	 */
 	public boolean hasSelfLoop()
