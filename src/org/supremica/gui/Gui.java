@@ -27,6 +27,8 @@ public interface Gui
 	public void clearSelection();
 	public void selectAll();
 	
+	public void addAutomata(Automata a) throws Exception;
+	
 	public Component getComponent(); 	// Do we need this one?
 	public JFrame getFrame(); // this should be the main frame
 	public AutomatonContainer getAutomatonContainer();

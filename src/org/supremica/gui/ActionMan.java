@@ -18,6 +18,7 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.Gui;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
+import org.supremica.gui.TestCasesDialog;
 
 public class ActionMan
 {
@@ -1285,5 +1286,18 @@ public class ActionMan
 		gui.getAutomatonContainer().setProjectFile(null);
 	}
 
+	// TestCases... - open the test cases dialog, and add the result to the current set of automata
+	public static void testCases(Gui gui) 
+		throws Exception
+	{
+		TestCasesDialog tc_dlg = new TestCasesDialog(gui.getFrame());
+		tc_dlg.show();
+		Automata automata = tc_dlg.getAutomata();
+		if(automata != null)
+		{
+			gui.addAutomata(automata);
+		}
+	}
+	
 } // ActionMan
 	

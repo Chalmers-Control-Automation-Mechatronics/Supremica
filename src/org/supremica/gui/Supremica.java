@@ -474,15 +474,29 @@ public class Supremica
 				}
 			});
 
+		// Tools
+		JMenu menuTools = new JMenu();
+		menuTools.setText("Tools");
+		menuTools.setMnemonic(KeyEvent.VK_T);
+		menuBar.add(menuTools);
+		
+		JMenuItem test_cases = new JMenuItem();
+		test_cases.setText("Test Cases ...");
+		menuTools.add(test_cases);
+		test_cases.addActionListener(new ActionListener()
+			{
+					public void actionPerformed(ActionEvent e)
+					{
+						// throw new RuntimeException("Something TODO here! Hint: exercisegenerator");
+						ActionMan.testCases(getGui());
+					}
+				});
+						
 		// Tools.AutomataEditor
 		if (WorkbenchProperties.includeEditor())
 		{
-			// Tools
-			JMenu menuTools = new JMenu();
-			menuTools.setText("Tools");
-			menuTools.setMnemonic(KeyEvent.VK_T);
-			menuBar.add(menuTools);
-
+			menuTools.add(new JSeparator());
+			
 			JMenuItem menuToolsAutomataEditor = new JMenuItem();
 			menuToolsAutomataEditor.setText("Editor");
 			menuTools.add(menuToolsAutomataEditor);
@@ -528,6 +542,7 @@ public class Supremica
 				});
 		}
 
+		
 		// Configure
 		JMenu menuConfigure = new JMenu();
 		menuConfigure.setText("Configure");
@@ -1031,6 +1046,55 @@ public class Supremica
 		return mainPopupMenu;
 	}
 
+	public void addAutomata(Automata currAutomata)
+		throws Exception
+	{
+		// Note - this is copied from importValidFile above!!
+		int nbrOfAddedAutomata = 0;
+		Iterator autIt = currAutomata.iterator();
+		
+		while (autIt.hasNext())
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			boolean add = true;
+			if (currAutomaton.getName().equals(""))
+			{
+				String autName = getNewAutomatonName("Enter a new name", "");
+				if (autName == null)
+				{
+					add = false;
+					return; // It's not ok to cancel!
+				}
+				else
+				{
+					currAutomaton.setName(autName);
+				}
+			}
+
+			if (theAutomatonContainer.containsAutomaton(currAutomaton.getName()))
+			{
+				String autName = currAutomaton.getName();
+
+				JOptionPane.showMessageDialog(this, autName + " already exists", "Alert",
+											  JOptionPane.ERROR_MESSAGE);
+
+				autName = getNewAutomatonName("Enter a new name", autName + "(2)");
+				if (autName == null)
+				{
+					add = false; // It's not ok to cancel!
+				}
+				else
+				{
+					currAutomaton.setName(autName);
+				}
+			}
+			if (add)
+			{
+				nbrOfAddedAutomata++;
+				theAutomatonContainer.add(currAutomaton);
+			}
+		}	
+	}
 }
 
 

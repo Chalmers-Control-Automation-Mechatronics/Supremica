@@ -71,7 +71,15 @@ public class Events
 
 	public Events(Events orgEvents)
 	{
-		theEvents = new TreeMap(orgEvents.theEvents);
+		this();
+		// theEvents = new TreeMap(orgEvents.theEvents);
+		// Deep copy
+		for(Iterator it = orgEvents.iterator(); it.hasNext(); )
+		{
+
+			Event newEvent = new Event((Event)it.next());
+			theEvents.put(newEvent.getLabel(), newEvent);
+		}
 	}
 
 	/**

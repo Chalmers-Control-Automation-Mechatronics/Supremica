@@ -301,7 +301,7 @@ public class AutomataSynthesizer
 			currEvent = (Event) eventIt.next();
 			currEvent.setId(unionAlphabet.getEventWithLabel(currEvent.getLabel()).getId());
 		}
-		theAlphabet.reHash();
+		theAlphabet.rehash();
 
 		return theAlphabet;
 	}

@@ -71,10 +71,13 @@ public class Alphabet
 	public Alphabet(Alphabet orgAlphabet)
 	{
 		super(orgAlphabet);
-		idMap = new HashMap(orgAlphabet.idMap);
-		idIndex = idIndex;
+		
+		idMap = new HashMap();
+		idIndex = orgAlphabet.idIndex;
 		// theEvents = new TreeMap(orgAlphabet.theEvents);
-		setEvents(orgAlphabet.getEvents());
+		// setEvents(orgAlphabet.getEvents());
+		
+		rehash();
 	}
 
 	/**
@@ -167,7 +170,7 @@ public class Alphabet
 		}
 	}
 
-	public void reHash()
+	public void rehash()
 	{
 		Event event;
 		Iterator eventIt = iterator();
