@@ -13,7 +13,7 @@ import java.util.*;
 
 import org.supremica.automata.State;
 import org.supremica.automata.Automaton;
-// 
+//
 public class RegexpDialog
 	extends JDialog    /* implements ActionListener */
 {
@@ -80,7 +80,7 @@ public class RegexpDialog
 			doRepaint();
 		}
 	}
-	
+
 	class RegexpMenuBar
 		extends JMenuBar
 	{
@@ -111,20 +111,20 @@ public class RegexpDialog
 			help.add(new JMenuItem("About..."));
 			return help;
 		}
-		
+
 		public RegexpMenuBar()
 		{
 			this.add(makeExpressionMenu());
-			this.add(makeHelpMenu());
+			//this.add(makeHelpMenu());
 
 		}
 		public RegexpMenuBar(Automaton automaton)
 		{
 			this.add(makeExpressionMenu());
 			this.add(makeStatesMenu(automaton));
-			this.add(makeHelpMenu());
+			//this.add(makeHelpMenu());
 
-			
+
 		}
 	}
 
@@ -190,7 +190,7 @@ public class RegexpDialog
 		content_pane.add(BorderLayout.SOUTH, p2);
 
 	}
-	
+
 	private void goAhead(String txt)
 	{
 		pack();
@@ -220,12 +220,12 @@ public class RegexpDialog
 	public RegexpDialog(JFrame parent, Automaton a, String txt)
 	{
 		super(parent, "Enter regular expression for " + a.getName(), true); // modal
-		
+
 		setup(txt);
 		setJMenuBar(new RegexpMenuBar(a));
 		goAhead(txt);
 	}
-	
+
 	public boolean isOk()
 	{
 		return ok;

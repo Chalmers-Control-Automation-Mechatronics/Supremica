@@ -85,6 +85,7 @@ public class AlphabetAnalyzer
 	 *@return  HashMap mapping uncontrollable Event-object to Set of plant-type Automaton-objects.
 	 */
 	public HashMap getUncontrollableEventToPlantMap()
+		throws Exception
 	{
 		try
 		{
@@ -92,8 +93,8 @@ public class AlphabetAnalyzer
 		}
 		catch (Exception e)
 		{
-			System.err.println("Error in AlphabetAnalyzer. " + e);
-			System.exit(0);
+			logger.error("Error in AlphabetAnalyzer. " + e);
+			throw e;
 		}
 
 		return eventToAutomataMap;

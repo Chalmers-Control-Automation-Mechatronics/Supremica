@@ -67,32 +67,34 @@ import org.supremica.automata.Automaton;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
 
-class TypeCellEditor
+abstract class StateMatcherTypeCellEditor
 	implements CellEditorListener
 {
+	private static Logger logger = LoggerFactory.createLogger(StateMatcherTypeCellEditor.class);
+
 	private JTable theTable;
 	private TableSorter theTableSorter;
-	private JComboBox automatonTypeCombo;
+	private JComboBox stateMatcherTypeCombo;
 	private VisualProjectContainer theVisualProjectContainer;
-	private static Logger logger = LoggerFactory.createLogger(TypeCellEditor.class);
 
-	public TypeCellEditor(JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
+
+	StateMatcherTypeCellEditor(JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
 	{
 		this.theTable = theTable;
 		this.theVisualProjectContainer = theVisualProjectContainer;
 		this.theTableSorter = theTableSorter;
-		automatonTypeCombo = new JComboBox();
+		stateMatcherTypeCombo = new JComboBox();
 
-		Iterator typeIt = AutomatonType.iterator();
+		Iterator typeIt = StateMatcherOptions.Accepting.iterator();
 
 		while (typeIt.hasNext())
 		{
-			automatonTypeCombo.addItem(typeIt.next());
+			stateMatcherTypeCombo.addItem(typeIt.next());
 		}
 
 		TableColumnModel columnModel = theTable.getColumnModel();
 		TableColumn typeColumn = columnModel.getColumn(Supremica.TABLE_TYPE_COLUMN);
-		DefaultCellEditor cellEditor = new DefaultCellEditor(automatonTypeCombo);
+		DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
 
 		cellEditor.setClickCountToStart(1);
 		typeColumn.setCellEditor(cellEditor);
@@ -103,9 +105,9 @@ class TypeCellEditor
 
 	public void editingStopped(ChangeEvent e)
 	{
-		if (automatonTypeCombo.getSelectedIndex() >= 0)
+		if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
 		{
-			AutomatonType selectedValue = (AutomatonType) automatonTypeCombo.getSelectedItem();
+			AutomatonType selectedValue = (AutomatonType) stateMatcherTypeCombo.getSelectedItem();
 
 			if (selectedValue != null)
 			{
@@ -131,5 +133,39 @@ class TypeCellEditor
 				}
 			}
 		}
+	}
+}
+
+class StateMatcherAcceptingCellEditor
+	extends StateMatcherTypeCellEditor
+{
+	private StateMatcherOptions.Accepting theAcceptingCondition;
+
+	public StateMatcherAcceptingCellEditor(StateMatcherOptions.Accepting theAcceptingCondition, JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
+	{
+		super(theTable, theTableSorter, theVisualProjectContainer);
+		this.theAcceptingCondition = theAcceptingCondition;
+	}
+
+
+	public Iterator iterator()
+	{
+		return theAcceptingCondition.iterator();
+	}
+}
+
+class StateMatcherForbiddenCellEditor
+	extends StateMatcherTypeCellEditor
+{
+	private StateMatcherOptions.Forbidden theForbiddenCondition;
+
+	public StateMatcherForbiddenCellEditor(StateMatcherOptions.Forbidden theForbiddenCondition, JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
+	{
+		super(theTable, theTableSorter, theVisualProjectContainer);
+	}
+
+	public Iterator iterator()
+	{
+		return theForbiddenCondition.iterator();
 	}
 }

@@ -79,8 +79,9 @@ class AutomataSelector
 	private Iterator specIterator;
 	private HashMap eventToAutomataMap = new HashMap();
 	private boolean seenSpec = false; // keep track of wether no spec exists, may need to do some job anyway
-	
+
 	public AutomataSelector(Automata globalSet, boolean closedSet)
+		throws Exception
 	{
 		this.globalSet = globalSet;
 		this.closedSet = closedSet;
@@ -102,7 +103,7 @@ class AutomataSelector
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			{
 				seenSpec = true; // yes, we've found a spec/sup
-				
+
 				// Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
 				partialSet.addAutomaton(currSupervisorAutomaton);
 				logger.debug("AutomataSelector::Added spec/sup " + currSupervisorAutomaton.getName());
@@ -356,7 +357,7 @@ public class AutomataSynthesizer
 		throws Exception // simply throws everything upwards
 	{
 		logger.debug("AutomataSynthesizer::doMonolithic");
-		
+
 		MonolithicReturnValue retval = new MonolithicReturnValue();
 		retval.didSomething = false;
 

@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.TreeSet;
 import org.supremica.gui.*;
+import org.supremica.log.*;
 import uk.ac.ic.doc.scenebeans.*;
 import uk.ac.ic.doc.scenebeans.activity.*;
 import uk.ac.ic.doc.scenebeans.behaviour.*;
@@ -21,6 +22,8 @@ public class Animator
 	extends JFrame
 	implements ActionListener
 {
+	private static Logger logger = LoggerFactory.createLogger(Animator.class);
+
 	AnimationCanvas _canvas;
 	private MouseDispatcher _dispatcher;
 	private List _commands, _events, _announced;
@@ -226,8 +229,8 @@ public class Animator
 
 	static void usageError()
 	{
-		System.err.println("usage: Animator <xml-file> [<name> <value>]*");
-		System.exit(1);
+		logger.error("usage: Animator <xml-file> [<name> <value>]*");
+		return;
 	}
 
 	public static void main(String[] args)

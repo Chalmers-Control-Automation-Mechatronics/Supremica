@@ -61,11 +61,14 @@ import java.beans.*;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
+import org.supremica.log.*;
 
 public class AutomataEditor
 	extends JFrame
 	implements TableModelListener
 {
+	private static Logger logger = LoggerFactory.createLogger(AutomataEditor.class);
+
 	private VisualProject theVisualProject = null;
 	private JPanel contentPane;
 	private JToolBar toolBar = new JToolBar();
@@ -710,9 +713,9 @@ public class AutomataEditor
 		}
 		catch (Throwable t)
 		{
-			System.err.println(t);
+			logger.error(t);
 			t.printStackTrace();
-			System.exit(1);
+			return;
 		}
 
 		// close the application when the main window closes

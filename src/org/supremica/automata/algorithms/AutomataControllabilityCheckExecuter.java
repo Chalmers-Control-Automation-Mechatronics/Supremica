@@ -329,8 +329,8 @@ public final class AutomataControllabilityCheckExecuter
 					}
 					catch (Exception e)
 					{
-						System.err.println(e);
-						System.exit(0);
+						logger.error(e + " Execution aborted");
+						return;
 					}
 
 					currEventIndex = currEnabledEvents[++i];
@@ -454,8 +454,8 @@ public final class AutomataControllabilityCheckExecuter
 					}
 					catch (Exception e)
 					{
-						System.err.println(e);
-						System.exit(0);
+						logger.error(e + " The result is not valid");
+						return;
 					}
 
 					currEventIndex = currEnabledEvents[++i];

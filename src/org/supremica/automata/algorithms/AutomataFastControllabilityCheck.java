@@ -97,7 +97,7 @@ public class AutomataFastControllabilityCheck
 
 	// Initial state flag cache
 	boolean hasInitialState;
-	
+
 	/**
 	 * Determines if more detailed information on the progress of things should be displayed.
 	 *
@@ -106,14 +106,14 @@ public class AutomataFastControllabilityCheck
 	private boolean verboseMode;
 
 	public AutomataFastControllabilityCheck(Automata theAutomata, SynchronizationOptions syncOptions)
-		throws IllegalArgumentException
+		throws Exception
 	{
 		Automaton currAutomaton;
 		State currInitialState;
 
 		this.theAutomata = theAutomata;
 		this.hasInitialState = theAutomata.hasInitialState();
-		
+
 		nbrOfExecuters = syncOptions.getNbrOfExecuters();
 		verboseMode = syncOptions.verboseMode();
 
@@ -123,10 +123,8 @@ public class AutomataFastControllabilityCheck
 		}
 		catch (Exception e)
 		{
-			System.err.println("Error while initializing synchronization helper. " + e);
-
-			// e.printStackTrace();
-			System.exit(0);
+			logger.error("Error while initializing synchronization helper. " + e);
+			throw e;
 		}
 
 		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
@@ -139,10 +137,10 @@ public class AutomataFastControllabilityCheck
 		{
 			// Build the initial state
 			initialState = new int[theAutomata.size() + 1];
-		
+
 			// + 1 status field
 			Iterator autIt = theAutomata.iterator();
-		
+
 			while (autIt.hasNext())
 			{
 				currAutomaton = (Automaton) autIt.next();
@@ -164,7 +162,7 @@ public class AutomataFastControllabilityCheck
 	{
 		if(!hasInitialState) // yes, the null automaton is controllable (it may have states, but if there's no initial state...)
 			return true;
-	
+
 		LabeledEvent currEvent;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;

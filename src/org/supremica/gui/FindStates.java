@@ -94,7 +94,7 @@ class FindStatesTableModel
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
 	// private Pattern[] patterns = null;
 	// private PatternCompiler comp = null;
-	private String[] columnNames = { "Automaton", "Type", "Regular Expression" };
+	private String[] columnNames = { "Automaton", "Type", "Regular Expression", "Accepting", "Forbidden" };
 	// private Object[][] cells = null;
 	private Automata automata;
 	private HashMap hashmap = new HashMap();
@@ -102,6 +102,8 @@ class FindStatesTableModel
 	public final static int AUTOMATON_COL = 0;
 	public final static int TYPE_COL = AUTOMATON_COL + 1;
 	public final static int REGEXP_COL = TYPE_COL + 1;
+	public final static int ACCEPTING_COL = REGEXP_COL + 1;
+	public final static int FORBIDDEN_COL = ACCEPTING_COL + 1;
 
 	public FindStatesTableModel(Automata a)
 	{
@@ -155,6 +157,9 @@ class FindStatesTableModel
 			case AUTOMATON_COL: return automaton.getName();
 			case TYPE_COL: return automaton.getType();
 			case REGEXP_COL: return ((Pattern)hashmap.get(automaton)).pattern();
+			case ACCEPTING_COL: return StateMatcherOptions.Accepting.DontCare;
+			case FORBIDDEN_COL: return StateMatcherOptions.Forbidden.DontCare;
+
 		}
 		return null;
 		// return cells[row][col];
@@ -483,12 +488,12 @@ class FreeFormPanel
 			menu.add(new RegexpMenuItem("any digit", "[0-9]"));
 			this.add(menu);
 
-			JMenu help = new JMenu("Help");
+			//JMenu help = new JMenu("Help");
 
-			help.add(new JMenuItem("Help Topics"));
-			help.add(new JSeparator());
-			help.add(new JMenuItem("About..."));
-			this.add(help);
+			//help.add(new JMenuItem("Help Topics"));
+			//help.add(new JSeparator());
+			//help.add(new JMenuItem("About..."));
+			//this.add(help);
 		}
 	}
 

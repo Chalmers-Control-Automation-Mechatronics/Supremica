@@ -57,6 +57,8 @@ import java.awt.event.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.log.*;
+
 
 public class SelectEventDialog
 	extends JDialog
@@ -67,6 +69,7 @@ public class SelectEventDialog
 	private Automaton theAutomaton = null;
 
 	public SelectEventDialog(Frame owner, Automaton theAutomaton)
+		throws Exception
 	{
 		super(owner, "Select event", true);
 
@@ -168,6 +171,8 @@ class AlphabetPanel
 class CreateEventPanel
 	extends JPanel
 {
+	private static Logger logger = LoggerFactory.createLogger(CreateEventPanel.class);
+
 	private Alphabet theAlphabet;
 	private JTextField labelField;
 	private JCheckBox controllableCheckBox;
@@ -175,6 +180,7 @@ class CreateEventPanel
 	private JButton createEventButton;
 
 	public CreateEventPanel(Alphabet theAlphabet)
+		throws Exception
 	{
 		this.theAlphabet = theAlphabet;
 
@@ -228,8 +234,8 @@ class CreateEventPanel
 					}
 					catch (Exception ex)
 					{
-						System.err.println("Exception in Alphabet.addEvent");
-						System.exit(0);
+						logger.error("Exception in Alphabet.addEvent");
+						return;
 					}
 				}
 			}
