@@ -26,44 +26,70 @@ public class EditorNode
 	protected int hash = 0;
 	protected Point2D.Double position;
 	private SimpleNodeProxy proxy;
+
+	// Constants
 	public static int WIDTH = 12;
 	public static int RADIUS = WIDTH/2;
+	public static double INITARROWANGLE = 3*Math.PI/4 + Math.PI/2; // 135 degrees plus correction
+	public static int INITARROWLENGTH = 15; 
+
+	/* Maximum number of colors shown in a node */
+	private static int maxDrawnMarkings = 4;
+
 	private EditorPropGroup propGroup;
 
+	/*
 	public EditorNode(int x, int y, EditorShade s, SimpleNodeProxy np, EditorSurface e)
 	{
-		position = new Point2D.Double(x, y);
+		// This is a node
 		type = NODE;
+
 		shade = s;
 		proxy = np;
 
-		proxy.setInitial(false);
+		// Set position
+		position = new Point2D.Double(x, y);
 		proxy.setPointGeometry(new PointGeometryProxy(position));
 
+		// Not initial by default
+		proxy.setInitial(false);
+
 		propGroup = new EditorPropGroup(this, e);
+	}
+	*/
+
+	public EditorNode(int x, int y, EditorShade s, SimpleNodeProxy np, EditorSurface e)
+	{
+		this(s, np, e);
+
+		// Override position
+		position = new Point2D.Double(x, y);
+		proxy.setPointGeometry(new PointGeometryProxy(position));
 	}
 
 	public EditorNode(EditorShade s, SimpleNodeProxy np, EditorSurface e)
 	{
+		// This is a node
 		type = NODE;
+
+		// Variables
 		shade = s;
 		proxy = np;
 
-		//setHash(np.hashCode());
-
+		// Find position
 		if (proxy.getPointGeometry() == null)
 		{
 			position = new Point2D.Double(1000, 1000);
-
 			proxy.setPointGeometry(new PointGeometryProxy(position));
 		}
 		else
 		{
-			position = new Point2D.Double(proxy.getPointGeometry().getPoint().getX(), proxy.getPointGeometry().getPoint().getY());
-
+			position = new Point2D.Double(proxy.getPointGeometry().getPoint().getX(), 
+										  proxy.getPointGeometry().getPoint().getY());
 			proxy.getPointGeometry().setPoint(position);
 		}
 
+		// Init propositions
 		propGroup = new EditorPropGroup(this, e);
 	}
 
@@ -138,9 +164,16 @@ public class EditorNode
 		return position;
 	}
 
-	public boolean wasClicked(int Cxposition, int Cyposition)
+	/**
+	 * Returns true if the position (x, y) is above the drawn node (approximately).
+	 */
+	public boolean wasClicked(int x, int y)
 	{
-		return (((getX() - RADIUS) <= Cxposition) && (Cxposition <= (getX() + RADIUS)) && ((getY() - RADIUS) <= Cyposition) && (Cyposition <= (getY() + RADIUS)));
+		// Within the square? Why not circle?
+		return (((getX() - RADIUS) <= x) && 
+				(x <= (getX() + RADIUS)) && 
+				((getY() - RADIUS) <= y) && 
+				(y <= (getY() + RADIUS)));
 	}
 
 	public void setShade(EditorShade s)
@@ -257,14 +290,14 @@ public class EditorNode
 			g2d.setColor(Color.WHITE);
 			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 		}
-		else if (colours.size() <= 4)
+		else if (colours.size() <= maxDrawnMarkings)
 		{
 			Arc2D.Double a = new Arc2D.Double();
 			double startAngle = 0;
 			double deltaAngle = (double) (360/colours.size());
 			while (i.hasNext())
 			{
-				// There are markings but they are fewer than 5! 
+				// There are markings but they are fewer than maxDrawnMarkings+1! 
 				// Draw nice colored pies!!
 				a.setArcByCenter(getX(), getY(), RADIUS, startAngle, deltaAngle, Arc2D.PIE);
 				startAngle += deltaAngle;
@@ -276,7 +309,7 @@ public class EditorNode
 		}
 		else
 		{
-			// More than four markings! Use the default marking color and draw a cross on top!
+			// More than maxDrawnMarkings markings! Use the default marking color and draw a cross on top!
 			g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
 			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);
 			
@@ -294,7 +327,7 @@ public class EditorNode
 			drawInitialStateArrow(g2d);
 
 			// Draw it thicker!
-			g2d.setStroke(DOUBLESTROKE);
+			//g2d.setStroke(DOUBLESTROKE);
 		}
 		g2d.drawOval(getX() - RADIUS, getY() - RADIUS, WIDTH, WIDTH);			
 		g2d.setStroke(BASICSTROKE);
@@ -302,27 +335,25 @@ public class EditorNode
 
 	private void drawInitialStateArrow(Graphics2D g2d)
 	{
-		double angle = 3*Math.PI/4; // 135 degrees
-		angle += Math.PI/2;
-		
 		// Draw line
-		int length = 15; // Line length
-		int borderX = getX() + (int) (RADIUS * Math.sin(angle));
-		int borderY = getY() + (int) (RADIUS * Math.cos(angle));
-		int endX = borderX + (int) (length * Math.sin(angle));
-		int endY = borderY + (int) (length * Math.cos(angle));
-		g2d.drawLine(borderX, borderY, endX, endY);
+		int borderX = getX() + (int) ((RADIUS+4) * Math.sin(INITARROWANGLE));
+		int borderY = getY() + (int) ((RADIUS+4) * Math.cos(INITARROWANGLE));
+		int outerX = borderX + (int) (INITARROWLENGTH * Math.sin(INITARROWANGLE));
+		int outerY = borderY + (int) (INITARROWLENGTH * Math.cos(INITARROWANGLE));
+		g2d.drawLine(borderX, borderY, outerX, outerY);
 		
 		// Draw triangle
 		int height = 8; // Triangle height
 		int[] xcoords = new int[3];
 		int[] ycoords = new int[3];
-		xcoords[0] = borderX;
-		ycoords[0] = borderY;
-		xcoords[1] = xcoords[0] + (int) (height * Math.sin(angle - Math.PI / 6));
-		ycoords[1] = ycoords[0] + (int) (height * Math.cos(angle - Math.PI / 6));
-		xcoords[2] = xcoords[0] + (int) (height * Math.cos(Math.PI / 2 - (angle + Math.PI / 6)));
-		ycoords[2] = ycoords[0] + (int) (height * Math.sin(Math.PI / 2 - (angle + Math.PI / 6)));
+		//xcoords[0] = borderX;
+		//ycoords[0] = borderY;
+		xcoords[0] = getX() + (int) ((RADIUS+1) * Math.sin(INITARROWANGLE));
+		ycoords[0] = getY() + (int) ((RADIUS+1) * Math.cos(INITARROWANGLE));
+		xcoords[1] = xcoords[0] + (int) (height * Math.sin(INITARROWANGLE - Math.PI / 6));
+		ycoords[1] = ycoords[0] + (int) (height * Math.cos(INITARROWANGLE - Math.PI / 6));
+		xcoords[2] = xcoords[0] + (int) (height * Math.cos(Math.PI / 2 - (INITARROWANGLE + Math.PI / 6)));
+		ycoords[2] = ycoords[0] + (int) (height * Math.sin(Math.PI / 2 - (INITARROWANGLE + Math.PI / 6)));
 		g2d.fillPolygon(xcoords, ycoords, 3);
 	}
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorNodeGroup
 //###########################################################################
-//# $Id: EditorNodeGroup.java,v 1.11 2005-03-16 08:15:25 flordal Exp $
+//# $Id: EditorNodeGroup.java,v 1.12 2005-03-18 00:58:08 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -42,6 +42,9 @@ public class EditorNodeGroup
 
 	public EditorNodeGroup(GroupNodeProxy gn)
 	{
+		// This is a nodegroup
+		type = NODEGROUP;
+
 		proxy = gn;
 
 		if (gn.getGeometry() == null)
@@ -64,10 +67,6 @@ public class EditorNodeGroup
 		}
 
 		setCorners();
-
-		type = NODEGROUP;
-
-		//setHash(gn.hashCode());
 	}
 
 	public int hashCode()

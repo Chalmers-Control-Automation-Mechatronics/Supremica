@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorEdge
 //###########################################################################
-//# $Id: EditorEdge.java,v 1.18 2005-03-16 08:15:25 flordal Exp $
+//# $Id: EditorEdge.java,v 1.19 2005-03-18 00:58:08 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -58,6 +58,9 @@ public class EditorEdge
 
 	public EditorEdge(EditorObject iStartNode, EditorNode iEndNode, int x, int y, EdgeProxy e)
 	{
+		// This is an edge
+		type = EDGE;
+
 		startNode = iStartNode;
 		endNode = iEndNode;
 		proxy = e;
@@ -137,8 +140,6 @@ public class EditorEdge
 
 		// Initialize the edge (somehow this strange call does exactly what we want)
 		setTPoint(getTPointX(), getTPointY());
-
-		type = EDGE;
 	}
 
 	public double getCPointX()

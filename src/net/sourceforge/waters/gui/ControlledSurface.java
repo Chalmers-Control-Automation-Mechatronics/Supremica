@@ -332,7 +332,7 @@ public class ControlledSurface
 
 		}
 
-		repaint();
+		repaint(false);
 	}
 
 	private void maybeShowPopup(MouseEvent e)
@@ -493,7 +493,7 @@ public class ControlledSurface
 					}
 				}
 
-				repaint();
+				repaint(false);
 
 				return;
 			}
@@ -781,7 +781,7 @@ public class ControlledSurface
 			}
 		}
 
-		repaint();
+		repaint(false);
 	}
 
 	public void mouseReleased(MouseEvent e)
@@ -941,12 +941,12 @@ public class ControlledSurface
 			}
 
 			lines.clear();
-
-			dragSelect = false;
-			hasDragged = false;
 		}
 
-		repaint();
+		repaint(hasDragged);
+
+		dragSelect = false;
+		hasDragged = false;
 	}
 
 	public void mouseMoved(MouseEvent e)
@@ -982,7 +982,7 @@ public class ControlledSurface
 		}
 
 		// Highlight stuff in focus!
-		if (o != null)
+		if (o != null && !o.equals(highlightedObject))
 		{
 			o.setHighlighted(true);
 			highlightedObject = o;
@@ -1000,7 +1000,7 @@ public class ControlledSurface
 		// Need repaint?
 		if (needRepaint)
 		{
-			repaint();
+			repaint(false);
 		}
     }
 

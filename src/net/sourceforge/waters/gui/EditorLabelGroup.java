@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabelGroup
 //###########################################################################
-//# $Id: EditorLabelGroup.java,v 1.9 2005-03-15 05:32:34 flordal Exp $
+//# $Id: EditorLabelGroup.java,v 1.10 2005-03-18 00:58:08 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -337,6 +337,9 @@ public class EditorLabelGroup
 
 	public EditorLabelGroup(EditorEdge par, EditorSurface e)
 	{
+		// This is a labelgroup
+		type = LABELGROUP;
+
 		proxy = par.getProxy().getLabelBlock();
 		parent = par;
 		events = new ArrayList();
@@ -376,8 +379,6 @@ public class EditorLabelGroup
 		*/
 		e.add(panel);
 		setPanelLocation();
-
-		type = LABELGROUP;
 
 		panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "up");
 		panel.getActionMap().put("up", new AbstractAction()

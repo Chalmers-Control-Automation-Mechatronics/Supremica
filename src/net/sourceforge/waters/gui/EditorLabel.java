@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorLabel.java,v 1.12 2005-03-15 05:32:34 flordal Exp $
+//# $Id: EditorLabel.java,v 1.13 2005-03-18 00:58:08 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -233,6 +233,9 @@ public class EditorLabel
 
 	public EditorLabel(EditorNode par, String t, EditorSurface e)
 	{
+		// This is a label
+		type = LABEL;
+
 		if (par.getName() == null)
 		{
 			text = new JTextField(t);
@@ -274,7 +277,6 @@ public class EditorLabel
 		*/
 
 		parent = par;
-		type = LABEL;
 
 		text.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enter");
 		text.getActionMap().put("enter", new AbstractAction()

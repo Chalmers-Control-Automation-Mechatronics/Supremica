@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.21 2005-03-17 01:52:05 flordal Exp $
+//# $Id: EditorSurface.java,v 1.22 2005-03-18 00:58:08 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -60,6 +60,7 @@ public class EditorSurface
 	protected boolean dragSelect = false;
 	protected EditorShade shade;
 	protected GraphProxy graph;
+	private Rectangle drawnAreaBounds = null;
 	
 	public int getGridSize()
 	{
@@ -126,8 +127,6 @@ public class EditorSurface
 
 	private void paintComponent(Graphics g, boolean printing)
 	{
-		minimizeSize();
-
 		// Only paint the grid if we're not printing!
 		if (!printing)
 		{
@@ -328,7 +327,6 @@ public class EditorSurface
 	{
 		nodes.add(n);
 		addLabel(n, n.getName());
-		minimizeSize();
 		repaint();
 	}
 
@@ -455,7 +453,6 @@ public class EditorSurface
 		EditorEdge e = new EditorEdge(n1, n2, x, y, ep);
         edges.add(e);
 		addLabelGroup(e);
-		minimizeSize();
         repaint();
 
 		return e;
@@ -476,7 +473,6 @@ public class EditorSurface
 
 		edges.add(e);
 		addLabelGroup(e);
-		minimizeSize();
 		repaint();
 
 		return e;
@@ -779,27 +775,28 @@ public class EditorSurface
 	 */
 	public LinkedList getDragSelection()
 	{
-		Rectangle r = getDragRectangle();
-
 		LinkedList selection = new LinkedList();
 
+		// The bounds of the drag
+		Rectangle bounds = getDragRectangle().getBounds();
+		
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
-			EditorNodeGroup n = (EditorNodeGroup) nodeGroups.get(i);
+			EditorNodeGroup ng = (EditorNodeGroup) nodeGroups.get(i);
 
-			if (r.getBounds().contains(n.getBounds()))
+			if (bounds.contains(ng.getBounds()))
 			{
-				selection.add(n);
+				selection.add(ng);
 			}
 		}
 
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			EditorNode ng = (EditorNode) nodes.get(i);
+			EditorNode n = (EditorNode) nodes.get(i);
 			
-			if (r.getBounds().contains(ng.getRectangularOutline()))
+			if (bounds.contains(n.getRectangularOutline()))
 			{
-				selection.add(ng);
+				selection.add(n);
 			}
 		}
 		
@@ -807,7 +804,6 @@ public class EditorSurface
 		{
 			EditorEdge e = (EditorEdge) edges.get(i);
 			
-			Rectangle bounds = r.getBounds();
 			if (bounds.contains(e.getSourceHandle()) && bounds.contains(e.getCenterHandle()) && bounds.contains(e.getTargetHandle()))
 			{
 				selection.add(e);
@@ -1130,8 +1126,17 @@ public class EditorSurface
 		setPreferredSize(new Dimension(width + gridSize * 10, height + gridSize * 10));
 	}
 
+	/**
+	 * Calculates and returns a rectangle that includes everything drawn on the surface.
+	 */
 	public Rectangle getDrawnAreaBounds()
 	{
+		// If we don't need to recalculate, don't!
+		if (drawnAreaBounds != null)
+		{
+			return drawnAreaBounds;
+		}
+
 		// How much spacing should there be
 		int SPACING = 0;
 
@@ -1149,30 +1154,59 @@ public class EditorSurface
 		// Nodes...
 		for (int i = 0; i < nodes.size(); i++)
 		{
-			x = ((EditorNode) nodes.get(i)).getX();
+			EditorNode node = (EditorNode) nodes.get(i);
+			
+			x = node.getX();
 			mod = EditorNode.RADIUS + 2 + SPACING;
 			if (x + mod > maxX)
 			{
 				maxX = x + mod;
 			}
-
+			
 			if (x - mod < minX)
 			{
 				minX = x - mod;
 			}
-
-			y = ((EditorNode) nodes.get(i)).getY();
+			
+			y = node.getY();
 			if (y + mod > maxY)
 			{
 				maxY = y + mod;
 			}
-
+			
 			if (y - mod < minY)
 			{
 				minY = y - mod;
 			}
+			
+			// For the initial state, the arrow needs to be considered!
+			if (node.isInitial())
+			{
+				x = x + (int) (EditorNode.INITARROWLENGTH * Math.sin(EditorNode.INITARROWANGLE));
+				y = y + (int) (EditorNode.INITARROWLENGTH * Math.cos(EditorNode.INITARROWANGLE));
+				
+				if (x + mod > maxX)
+				{
+					maxX = x + mod;
+				}
+				
+				if (x - mod < minX)
+				{
+					minX = x - mod;
+				}
+				
+				if (y + mod > maxY)
+				{
+					maxY = y + mod;
+				}
+				
+				if (y - mod < minY)
+				{
+					minY = y - mod;
+				}
+			}
 		}
-
+		
 		// Nodegroups...
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
@@ -1269,6 +1303,7 @@ public class EditorSurface
 			}
 			else
 			{
+				// Approximate curve
 				QuadCurve2D.Double curve = edge.getCurve();
 				FlatteningPathIterator it = 
 					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 2.0, 25);
@@ -1366,7 +1401,8 @@ public class EditorSurface
 			}
 		}
 
-		return new Rectangle((int) minX, (int) minY, (int) (maxX-minX),(int) (maxY-minY));
+		drawnAreaBounds = new Rectangle((int) minX, (int) minY, (int) (maxX-minX),(int) (maxY-minY));
+		return drawnAreaBounds;
 	}
 
 	public boolean nodeGroupIsColliding(EditorNodeGroup ng)
@@ -1457,13 +1493,14 @@ public class EditorSurface
 				Line2D.Double line = new Line2D.Double ();
 				int i;
 				g2d.setColor(Color.ORANGE);
-				// Print the vertical lines
+
+				// Draw the vertical lines
 				line.setLine (0, 0, 0, pageFormat.getHeight());
 				g2d.draw (line);
 				line.setLine (pageFormat.getImageableWidth(), 0, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 				g2d.draw (line);
 				
-				// Print the horizontal lines
+				// Draw the horizontal lines
 				line.setLine (0, 0, pageFormat.getImageableWidth(), 0);
 				g2d.draw (line);
 				line.setLine (0, pageFormat.getImageableHeight(), pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
@@ -1477,15 +1514,7 @@ public class EditorSurface
 			// This is the place to do rescaling if the figure won't fit on the page!
 			double scaleX = pageFormat.getImageableWidth() / (area.getWidth());
 			double scaleY = pageFormat.getImageableHeight() / (area.getHeight());
-			double scale;
-			if (scaleX < scaleY)
-			{
-				scale = scaleX;
-			}
-			else
-			{
-				scale = scaleY;  
-			}
+			double scale = scaleX < scaleY ? scaleX : scaleY;
 			if (scale < 1)
 			{
 				System.out.println("Rescaling figure to fit page. Scale: " + scale);
@@ -1516,9 +1545,19 @@ public class EditorSurface
 		}
 	}
 
+	public void repaint(boolean boundsMaybeChanged)
+	{
+		if (boundsMaybeChanged)
+		{
+			minimizeSize();
+			drawnAreaBounds = null;
+		}
+
+		super.repaint();
+	}
+
 	public void repaint()
 	{
-		//System.err.println("Repaint!");
-		super.repaint();
+		repaint(true);
 	}
 }
