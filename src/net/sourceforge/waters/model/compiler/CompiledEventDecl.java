@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledEventDecl
 //###########################################################################
-//# $Id: CompiledEventDecl.java,v 1.2 2005-02-21 19:19:51 robi Exp $
+//# $Id: CompiledEventDecl.java,v 1.3 2005-02-28 19:16:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -85,7 +85,8 @@ class CompiledEventDecl
   //# Value Creation
   EventValue getValue()
   {
-    return getValue(kEmptyList);
+    final List empty = Collections.EMPTY_LIST;
+    return getValue(empty);
   }
 
   EventValue getValue(final List indexes)
@@ -138,11 +139,5 @@ class CompiledEventDecl
   private final ColorGeometryProxy mGeometry;
   private final Map mIndexValueMap;
   private final ModuleCompiler mEnvironment;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final List kEmptyList =
-    Collections.unmodifiableList(new ArrayList(0));
 
 }

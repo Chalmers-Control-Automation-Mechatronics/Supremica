@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.module
 //# CLASS:   SimpleNodeProxy
 //###########################################################################
-//# $Id: SimpleNodeProxy.java,v 1.2 2005-02-19 03:26:56 flordal Exp $
+//# $Id: SimpleNodeProxy.java,v 1.3 2005-02-28 19:16:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.base.EmptyIterator;
 import net.sourceforge.waters.model.base.ModelException;
 import net.sourceforge.waters.model.base.ModelPrinter;
 import net.sourceforge.waters.xsd.base.ElementType;
@@ -195,7 +194,7 @@ public class SimpleNodeProxy extends NodeProxy {
 
   public Iterator getImmediateChildNodeIterator()
   {
-    return EmptyIterator.getInstance();
+    return Collections.EMPTY_SET.iterator();
   }
 
   public Iterator getChildNodeIterator()

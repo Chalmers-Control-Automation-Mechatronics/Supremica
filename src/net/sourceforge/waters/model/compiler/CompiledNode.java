@@ -3,18 +3,18 @@
 //# PACKAGE: waters.model.compiler
 //# CLASS:   CompiledNode
 //###########################################################################
-//# $Id: CompiledNode.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: CompiledNode.java,v 1.2 2005-02-28 19:16:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.EmptyIterator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -72,7 +72,7 @@ class CompiledNode
   {
     final Collection list = (Collection) mTransitions.get(event);
     if (list == null) {
-      return EmptyIterator.getInstance();
+      return Collections.EMPTY_LIST.iterator();
     } else {
       return list.iterator();
     }
