@@ -21,8 +21,8 @@ class BrickBuilder
 	private void addRight(int r, int c, int num, boolean reverse)
 		throws Exception
 	{
-		State source = automaton.getState(shared_states[r][c]);
-		State dest = automaton.getState(shared_states[r][c + 1]);
+		State source = automaton.getStateWithName((shared_states[r][c]).getName());
+		State dest = automaton.getStateWithName((shared_states[r][c + 1]).getName());
 		LabeledEvent src_dst = reverse
 							   ? new LabeledEvent(dest.getName() + source.getName() + num)
 							   : new LabeledEvent(source.getName() + dest.getName() + num);
@@ -42,8 +42,8 @@ class BrickBuilder
 	private void addDown(int r, int c, int num, boolean reverse)
 		throws Exception
 	{
-		State source = automaton.getState(shared_states[r][c]);
-		State dest = automaton.getState(shared_states[r + 1][c]);
+		State source = automaton.getStateWithName((shared_states[r][c]).getName());
+		State dest = automaton.getStateWithName((shared_states[r + 1][c]).getName());
 		LabeledEvent src_dst = reverse
 							   ? new LabeledEvent(dest.getName() + source.getName() + num)
 							   : new LabeledEvent(source.getName() + dest.getName() + num);

@@ -120,14 +120,14 @@ public class ModifiedAstar2
 	 */
 	private boolean insertIntoClosedList(Node node)
 	{
-		String key = node.getId();
+		String key = node.getName();
 		int cursor = 0;
 
-		while ((cursor < closedList.size()) && (key.compareTo(((Node) closedList.get(cursor)).getId()) > -1))
+		while ((cursor < closedList.size()) && (key.compareTo(((Node) closedList.get(cursor)).getName()) > -1))
 		{
 			Node currListNode = (Node) closedList.get(cursor);
 
-			if (key.compareTo(currListNode.getId()) == 0)
+			if (key.compareTo(currListNode.getName()) == 0)
 			{
 				if (isCheaper(node, currListNode))
 				{
@@ -183,7 +183,7 @@ public class ModifiedAstar2
 			}
 			catch (NullPointerException ex)
 			{
-				logger.error("ModifiedAstar2::buildScheduleAutomaton() --> Could not find the arc between " + currNode.getId() + " and " + currNode.getParent().getId());
+				logger.error("ModifiedAstar2::buildScheduleAutomaton() --> Could not find the arc between " + currNode + " and " + currNode.getParent());
 				logger.debug(ex.getStackTrace());
 			}
 		}
@@ -205,11 +205,14 @@ public class ModifiedAstar2
 		{
 			Arc currArc = it.nextArc();
 
-			if (currArc.getToState().getId().equals(child.getId()))
+			//if (currArc.getToState().getId().equals(child.getId()))
+			if (currArc.getToState().equals(child))
 			{
 				return currArc;
 			}
 		}
+
+		assert(false);
 
 		return null;
 	}

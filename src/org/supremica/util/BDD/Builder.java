@@ -96,7 +96,9 @@ public class Builder
 			{
 				org.supremica.automata.State s_st = (org.supremica.automata.State) sit.next();
 				String name = s_st.getName();
-				String name_id = s_st.getId();
+
+				//String name_id = s_st.getId(); // Sorry, this is private info!
+				String name_id = name;
 
 				if ((name == null) || (name.length() == 0))
 				{

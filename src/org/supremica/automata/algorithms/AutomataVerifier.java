@@ -1108,7 +1108,6 @@ public class AutomataVerifier
 
 				// Print result
 				int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
-
 				if (SupremicaProperties.verboseMode())
 				{
 					String message = "";

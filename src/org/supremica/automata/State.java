@@ -98,22 +98,22 @@ public class State
 	 */
 	protected int accumulatedCost = UNDEF_COST;
 
-	protected State() {}
-
-	public State(String id)
+	/**
+	 * Creates a new state with a specified name.
+	 */
+	public State(String name)
 	{
-		this();
-
-		setId(id);
-		setName(id);
+		// Use name as id
+		this(name, name);
 	}
 
-	private State(String id, String name)
+	/**
+	 * Creates a new state with a specified name and id.
+	 */
+	private State(String name, String id)
 	{
-		this();
-
-		setId(id);
-		setId(name);
+		this.name = name;
+		this.id = id;
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class State
 	 */
 	public State(State otherState)
 	{
-		this();
+		this(otherState.name, otherState.id);
 
 		index = otherState.index;
 		id = otherState.id;
@@ -149,8 +149,7 @@ public class State
 		//              outgoingArcs = otherState.outgoingArcs;
 	}
 
-	// These two should be, and will be, private
-	public String getId()
+	private String getId()
 	{
 		if (id == null)
 		{
@@ -160,10 +159,12 @@ public class State
 		return id;
 	}
 
+	/*
 	public void setId(String id)
 	{
 		this.id = id;
 	}
+	*/
 
 	/**
 	 * This is an ugly method that only are needed when dealing
@@ -222,6 +223,9 @@ public class State
 		this.last = last;
 	}
 
+	/**
+	 * Returns the name of this state.
+	 */
 	public String getName()
 	{
 		if (name == null)
@@ -231,7 +235,7 @@ public class State
 
 		return name;
 	}
-
+	
 	public void setName(String name)
 	{
 		this.name = name;
@@ -259,7 +263,6 @@ public class State
 
 	public boolean isMutuallyAccepting()
 	{
-
 		// return mutuallyAccepting;
 		return mutuallyAccepting || accepting;
 	}

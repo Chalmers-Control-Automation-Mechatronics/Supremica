@@ -85,8 +85,13 @@ public class Node
 		return theState.isAccepting();
 	}
 
-	public String getId()
+	public String getName()
 	{
-		return theState.getId();
+		return theState.getName();
+	}
+
+	public String toString()
+	{
+		return theState.toString();
 	}
 }

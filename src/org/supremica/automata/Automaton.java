@@ -76,7 +76,7 @@ public class Automaton
 	// private List theStates = new LinkedList();
 	private final StateSet theStates = new StateSet();
 	private int index = -1;
-	private Map idStateMap;    // Want fast lookup on both id and index (but not name?)
+	//private Map idStateMap;    // Want fast lookup on both id and index (but not name?)
 	private Map indexStateMap;
 	private ArcSet theArcs;
 	private State initialState;
@@ -101,7 +101,7 @@ public class Automaton
 	public Automaton()
 	{
 		alphabet = new Alphabet();
-		idStateMap = new HashMap();
+		//idStateMap = new HashMap();
 		indexStateMap = new HashMap();
 		theArcs = new ArcSet();
 		masterAutomata = new Automata();
@@ -147,14 +147,14 @@ public class Automaton
 					states.hasNext(); )
 			{
 				State orgSourceState = (State) states.next();
-				State newSourceState = getStateWithId(orgSourceState.getId());
+				State newSourceState = getStateWithName(orgSourceState.getName());
 
 				for (ArcIterator outgoingArcs = orgSourceState.safeOutgoingArcsIterator();
-						outgoingArcs.hasNext(); )
+					 outgoingArcs.hasNext(); )
 				{
 					Arc orgArc = outgoingArcs.nextArc();
 					State orgDestState = orgArc.getToState();
-					State newDestState = getStateWithId(orgDestState.getId());
+					State newDestState = getStateWithName(orgDestState.getName());
 					LabeledEvent currEvent = alphabet.getEvent(orgArc.getEvent());
 					Arc newArc = new Arc(newSourceState, newDestState, currEvent);
 
@@ -320,27 +320,34 @@ public class Automaton
 	public void remapStateIndices()
 	{
 		indexStateMap.clear();
-		idStateMap.clear();
+		//idStateMap.clear();
 
 		for (StateIterator stit = stateIterator(); stit.hasNext(); )
 		{
 			State state = stit.nextState();
 
 			indexStateMap.put(new Integer(state.getIndex()), state);
-			idStateMap.put(state.getId(), state);
+			//idStateMap.put(state.getId(), state);
 		}
 	}
 
 	/**
 	 * Adds a state to this automaton. If this is supposed to be the initial state, make
 	 * sure that the state is set to be initial BEFORE adding it with this method.
+	 *
+	 * @return 1 if the state is already in the automaton, otherwise returns 0.
 	 */ 
-	public void addState(State state)
+	public int addState(State state)
 		throws IllegalArgumentException
 	{
 		if (state == null)
 		{
 			throw new IllegalArgumentException("State must be non-null");
+		}
+
+		if (theStates.contains(state))
+		{
+			return 1;
 		}
 
 		theStates.add(state);
@@ -350,7 +357,7 @@ public class Automaton
 			state.setIndex(getUniqueStateIndex());
 		}
 
-		idStateMap.put(state.getId(), state);
+		//idStateMap.put(state.getId(), state);
 		indexStateMap.put(new Integer(state.getIndex()), state);
 
 		if (state.isInitial())
@@ -359,6 +366,8 @@ public class Automaton
 		}
 
 		notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
+
+		return 0;
 	}
 
 	/**
@@ -539,8 +548,7 @@ public class Automaton
 			throw new IllegalArgumentException("State must be non-null");
 		}
 
-		State existing = (State) idStateMap.get(state.getId());
-
+		State existing = getStateWithName(state.getName());
 		if (existing != null)
 		{
 			return existing;
@@ -567,8 +575,8 @@ public class Automaton
 
 		theStates.remove(state);
 		state.removeArcs();
-		String id = state.getId();
-		idStateMap.remove(id);
+		//String id = state.getId();
+		//idStateMap.remove(id);
 		int index = state.getIndex();
 		indexStateMap.remove(new Integer(index));
 		notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
@@ -619,11 +627,11 @@ public class Automaton
 		}
 
 		State oldinit = getInitialState();
-		State newinit = getState(state);
+		State newinit = getStateWithName(state.getName());
 
 		if (newinit == null)
 		{
-			throw new IllegalStateException("No such state. id = " + state.getId());
+			throw new IllegalStateException("No such state, " + state);
 		}
 
 		newinit.setInitial(true);
@@ -654,7 +662,7 @@ public class Automaton
 			name = new StringBuffer(prefix);
 		}
 
-		while (containsStateWithId(name.toString()))
+		while (containsStateWithName(name.toString()))
 		{
 			name.append(uniqueStateIndex++);
 		}
@@ -821,7 +829,8 @@ public class Automaton
 			throw new IllegalArgumentException("State must be non-null");
 		}
 
-		return idStateMap.containsKey(state.getId());
+		//return idStateMap.containsKey(state.getId());
+		return theStates.contains(state);
 	}
 
 	public StateSet getStateSet()
@@ -830,6 +839,7 @@ public class Automaton
 	}
 
 	// Note, searches on id - only call this with states in this automaton
+	/*
 	public State getState(State state)
 		throws IllegalArgumentException
 	{
@@ -838,17 +848,20 @@ public class Automaton
 			throw new IllegalArgumentException("State must be non-null");
 		}
 
-		return (State) idStateMap.get(state.getId());
+		//return (State) idStateMap.get(state.getId());
 	}
+	*/
 
 	/**
 	 * Given this state, which belongs to this stateset, return a unique id-string
 	 */
+	/*
 	public String getUniqueStateId(State state)
 	{
 		// prereq: state is in theStates:
 		return state.getId();    // at the moment do the simplest thing
 	}
+	*/
 
 	/**
 	 * True if a state with the name exists, otherwise false.
@@ -890,15 +903,19 @@ public class Automaton
 		return null;
 	}
 
+	/*
 	private boolean containsStateWithId(String id)
 	{
 		return idStateMap.containsKey(id);
 	}
+	*/
 
+	/*
 	private State getStateWithId(String id)
 	{
 		return (State) idStateMap.get(id);
 	}
+	*/
 
 	// The index stuff should be exclusive to AutomataIndexForm, but how to manage that?
 
@@ -970,7 +987,7 @@ public class Automaton
 
 	public int nbrOfStates()
 	{
-		return idStateMap.size();
+		return theStates.size();
 	}
 
 	public int nbrOfEvents()
@@ -1342,7 +1359,7 @@ public class Automaton
 		{
 			State currState = stateIt.nextState();
 
-			currState.setId("q_" + currState.getIndex());
+			currState.setName("q_" + currState.getIndex());
 		}
 
 		remapStateIndices();
@@ -1399,6 +1416,7 @@ public class Automaton
 	/**
 	 * Don't do this in public
 	 */
+	/*
 	private String getUniqueStateId()
 	{
 		String newId;
@@ -1411,6 +1429,7 @@ public class Automaton
 
 		return newId;
 	}
+	*/
 
 	/**
 	 * Don't do this in public
@@ -1928,7 +1947,7 @@ public class Automaton
 	public void removeAllStates()
 	{
 		beginTransaction();
-		idStateMap.clear();
+		theStates.clear();
 		indexStateMap.clear();
 		theStates.clear();
 		theArcs.clear();
@@ -2173,14 +2192,7 @@ public class Automaton
 		for (StateIterator sIt = stateIterator(); sIt.hasNext(); )
 		{
 			State currState = sIt.nextState();
-			int part1 = 1;
 			int part2 = 2;
-			String id = currState.getId();
-
-			if (id != null)
-			{
-				part1 = id.hashCode();
-			}
 
 			String name = currState.getName();
 
@@ -2192,7 +2204,7 @@ public class Automaton
 			int part3 = currState.nbrOfIncomingArcs();
 			int part4 = currState.nbrOfOutgoingArcs();
 
-			checksum = part1 + part2 + part3 + part4;
+			checksum = part2 + part3 + part4;
 		}
 
 		int part5 = nbrOfStates();

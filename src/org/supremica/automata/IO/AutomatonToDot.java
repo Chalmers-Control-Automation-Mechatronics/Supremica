@@ -222,31 +222,31 @@ public class AutomatonToDot
 			if (state.isInitial())
 			{
 				initialStates.addElement(state);
-				pw.println("\t{node [shape = plaintext, style=invis] \"" + initPrefix + state.getId() + "\"};");
+				pw.println("\t{node [shape = plaintext, style=invis] \"" + initPrefix + state.getName() + "\"};");
 			}
 
 			if (state.isAccepting() &&!state.isForbidden())
 			{
-				pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getId() + "\"};");
+				pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getName() + "\"};");
 			}
 
 			if (state.isMutuallyAccepting() &&!state.isForbidden())
 			{
-				pw.println("\t{node [shape = " + mutuallyAcceptingShape + "] \"" + state.getId() + "\"};");
+				pw.println("\t{node [shape = " + mutuallyAcceptingShape + "] \"" + state.getName() + "\"};");
 			}
 			else if (state.isForbidden())
 			{
-				pw.println("\t{node [shape = " + forbiddenShape + "] \"" + state.getId() + "\"};");
+				pw.println("\t{node [shape = " + forbiddenShape + "] \"" + state.getName() + "\"};");
 			}
 			else
 			{
-				pw.println("\t{node [shape = " + standardShape + "] \"" + state.getId() + "\"};");
+				pw.println("\t{node [shape = " + standardShape + "] \"" + state.getName() + "\"};");
 			}
 		}
 
 		for (int i = 0; i < initialStates.size(); i++)
 		{
-			String stateId = ((State) initialStates.elementAt(i)).getId();
+			String stateId = ((State) initialStates.elementAt(i)).getName();
 
 			// pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
 			// pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
@@ -259,7 +259,7 @@ public class AutomatonToDot
 		{
 			State sourceState = (State) states.next();
 
-			pw.print("\t\"" + sourceState.getId() + "\" [label = \"");
+			pw.print("\t\"" + sourceState.getName() + "\" [label = \"");
 
 			if (withLabel)
 			{
@@ -282,7 +282,7 @@ public class AutomatonToDot
 				State fromState = currArcSet.getFromState();
 				State toState = currArcSet.getToState();
 
-				pw.print("\t\"" + fromState.getId() + "\" -> \"" + toState.getId());
+				pw.print("\t\"" + fromState.getName() + "\" -> \"" + toState.getName());
 
 				pw.print("\" [ label = \"");
 
@@ -356,8 +356,8 @@ public class AutomatonToDot
 			State currState = (State) stateIt.next();
 
 			pw.println("\t{ rank = min ;");
-			pw.println("\t\t\"" + initPrefix + currState.getId() + "\";");
-			pw.println("\t\t\"" + currState.getId() + "\";");
+			pw.println("\t\t\"" + initPrefix + currState.getName() + "\";");
+			pw.println("\t\t\"" + currState.getName() + "\";");
 			pw.println("\t}");
 		}
 

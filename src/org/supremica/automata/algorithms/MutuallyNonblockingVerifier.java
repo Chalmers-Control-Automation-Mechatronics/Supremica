@@ -923,7 +923,8 @@ public class MutuallyNonblockingVerifier
 		for (StateIterator stateIt = theAutomaton.stateIterator();
 				stateIt.hasNext(); )
 		{
-			State currState = automatonCopy.getState(stateIt.nextState());
+			// Get the state in the copy that has the same name
+			State currState = automatonCopy.getStateWithName(stateIt.nextState().getName());
 
 			if (!currState.isMutuallyAccepting())
 			{
@@ -1312,7 +1313,6 @@ public class MutuallyNonblockingVerifier
 	 */
 	private void projectAcceptingStatus(Automaton currAutomaton, Automaton currSynchautomaton)
 	{
-
 		// Set all states in currAutomaton as accepting
 		AutomatonAllMutuallyAccepting allAccepting = new AutomatonAllMutuallyAccepting(currAutomaton);
 

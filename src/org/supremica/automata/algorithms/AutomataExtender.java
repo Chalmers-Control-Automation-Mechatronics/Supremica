@@ -162,7 +162,7 @@ public class AutomataExtender
 				State newState = new State(orgState);
 
 				assert(false); // Fiddling with id is not recommended!
-				newState.setId(orgState.getId() + "_" + i);
+				//newState.setId(orgState.getId() + "_" + i);
 
 				StringBuffer labelExt = new StringBuffer("");
 

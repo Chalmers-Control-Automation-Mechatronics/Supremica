@@ -61,6 +61,11 @@ public class TimedMarking
 	private static PetriNet pn;
 	/* Use one-product relaxation for this estimate */
 
+	public TimedMarking(String name) 
+	{
+		super(name);
+	}
+
 	/*
 	 *      public int value()
 	 *       {

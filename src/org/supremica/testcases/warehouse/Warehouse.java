@@ -377,13 +377,13 @@ class User
 				}
 
 				//System.err.println("sourceState: " + sourceState + " destState: " + destState);
-				if (theAutomaton.getState(sourceState) == null)
+				if (theAutomaton.getStateWithName(sourceState.getName()) == null)
 				{
 					System.err.println("source state is null");
 					System.exit(0);
 				}
 
-				if (theAutomaton.getState(destState) == null)
+				if (theAutomaton.getStateWithName(destState.getName()) == null)
 				{
 					System.err.println("dest state is null");
 					System.exit(0);

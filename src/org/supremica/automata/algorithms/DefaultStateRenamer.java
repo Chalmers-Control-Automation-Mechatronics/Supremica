@@ -60,7 +60,7 @@ public class DefaultStateRenamer
 	implements StateRenamer
 {
 	protected Automata theAutomata;
-	protected String prefixString = "q_";
+	protected String prefixString = "q";
 	protected String postfixString = "";
 	protected int currIndex = 0;
 	protected boolean uniqueNames = false;

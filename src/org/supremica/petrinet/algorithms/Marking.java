@@ -56,7 +56,10 @@ public class Marking
 {
 	private int[] marking;
 
-	public Marking() {}
+	public Marking(String name) 
+	{
+		super(name);
+	}
 
 	/*
 	 *  public boolean equals(Object marking)

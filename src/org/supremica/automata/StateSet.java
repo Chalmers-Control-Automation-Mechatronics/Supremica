@@ -19,6 +19,7 @@ class StateComparator
 	private int compare(State a, State b)
 	{
 		return a.getName().compareTo(b.getName());
+		//return a.getId().compareTo(b.getId());
 	}
 
 	public int compare(Object a, Object b)

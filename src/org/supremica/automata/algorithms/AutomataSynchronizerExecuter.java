@@ -960,7 +960,7 @@ public final class AutomataSynchronizerExecuter
 
 					// Set some attributes of the state
 					newState.setAutomataSynchronizerExecutorIndex(i);
-					newState.setName(newState.getId());
+					newState.setName(newState.getName());
 					newState.setInitial(AutomataIndexFormHelper.isInitial(currState));
 					newState.setAccepting(AutomataIndexFormHelper.isAccepting(currState));
 					newState.setForbidden(AutomataIndexFormHelper.isForbidden(currState));

@@ -987,7 +987,7 @@ public class Supremica
 		{
 			JOptionPane.showMessageDialog(this, EncodingHelper.linebreakAdjust(theProject.getComment()), "Project information", JOptionPane.INFORMATION_MESSAGE);
 		}
-
+		
 		if (theProject.hasAnimation())
 		{
 			JOptionPane.showMessageDialog(this, "This project includes an animation.", "Project information", JOptionPane.INFORMATION_MESSAGE);

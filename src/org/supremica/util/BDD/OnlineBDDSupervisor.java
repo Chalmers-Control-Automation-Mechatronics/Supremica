@@ -129,7 +129,7 @@ public class OnlineBDDSupervisor
 			for (StateIterator si = ss1.iterator(); si.hasNext(); )
 			{
 				org.supremica.automata.State state1 = si.nextState();
-				org.supremica.util.BDD.State state2 = ss2.getByName(state1.getId());
+				org.supremica.util.BDD.State state2 = ss2.getByName(state1.getName());
 
 				smap.put(state1, state2);
 			}
