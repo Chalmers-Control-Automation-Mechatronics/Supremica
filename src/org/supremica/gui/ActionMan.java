@@ -71,6 +71,7 @@ import org.supremica.gui.animators.scenebeans.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.log.*;
+import org.supremica.automata.IO.FileFormats;
 
 import org.supremica.gui.texteditor.TextFrame;
 
@@ -804,23 +805,23 @@ public class ActionMan
 
 		if (exportMode == FORMAT_XML)
 		{
-			fileExporter = FileDialogs.getXMLFileExporter();
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.XML);
 		}
 		else if (exportMode == FORMAT_DOT)
 		{
-			fileExporter = FileDialogs.getDOTFileExporter();
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.DOT);
 		}
 		else if (exportMode == FORMAT_DSX)
 		{
-			fileExporter = FileDialogs.getDSXFileExporter();
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.DSX);
 		}
 		else if (exportMode == FORMAT_RCP)
 		{
-			fileExporter = FileDialogs.getRCPFileExporter();
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.RCP);
 		}
 		else if (exportMode == FORMAT_SP)
 		{
-			fileExporter = FileDialogs.getSPFileExporter();
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
 		}
 		else
 		{

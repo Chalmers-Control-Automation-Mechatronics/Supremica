@@ -50,6 +50,7 @@
 package org.supremica.gui;
 
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.automata.IO.FileFormats;
 import javax.swing.filechooser.*;
 import javax.swing.*;
 
@@ -82,6 +83,38 @@ public class FileDialogs
 	private static FileDialogs fd = new FileDialogs();
 
 	private FileDialogs() {}
+
+
+	public static JFileChooser getSaveAsFileChooser(FileFormats fileType)
+	{
+		JFileChooser fileSaveAs = fd.getFileSaveAs();
+
+		fileSaveAs.resetChoosableFileFilters();
+		fileSaveAs.setFileFilter(fd.getFilter(fileType));
+
+		return fileSaveAs;
+	}
+
+	public static JFileChooser getExportFileChooser(FileFormats fileType)
+	{
+		JFileChooser fileExport = fd.getFileExporter();
+
+		fileExport.resetChoosableFileFilters();
+		fileExport.setFileFilter(fd.getFilter(fileType));
+
+		return fileExport;
+	}
+
+	public static JFileChooser getImportFileChooser(FileFormats fileType)
+	{
+		JFileChooser fileImport = fd.getFileImporter();
+
+		fileImport.resetChoosableFileFilters();
+		fileImport.setFileFilter(fd.getFilter(fileType));
+
+		return fileImport;
+	}
+
 
 	public static JFileChooser getXMLFileSaveAs()
 	{
@@ -342,6 +375,11 @@ public class FileDialogs
 	private FileFilter makeFileFilter(final String ext, final String description)
 	{
 		return new StandardExtensionFileFilter(ext, description);
+	}
+
+	private FileFilter getFilter(FileFormats fileType)
+	{
+		return makeFileFilter(fileType.getExtension(), fileType.getDescription());
 	}
 
 	private FileFilter getRCPFilter()
