@@ -218,7 +218,7 @@ public class AutomataVerifier
 					synchHelper.addState(initialState);
 
 					// Initialize the synchronizationExecuters
-					// synchronizationExecuters.clear();
+					synchronizationExecuters.clear();
 					for (int i = 0; i < nbrOfExecuters; i++)
 					{
 						AutomataSynchronizerExecuter currSynchronizationExecuter =

@@ -286,7 +286,7 @@ public final class AutomataSynchronizerHelper
 		}
   		if (++nbrOfCheckedStates % 1000 == 0)
 		{
-			if (cancelDialog != null)
+			if ((nbrOfCheckedStates >= 10000) && cancelDialog != null)
 			{
 				cancelDialog.updateCounter(nbrOfCheckedStates);
 			}

@@ -289,7 +289,7 @@ public class AutomataFastControllabilityCheck
 			if (verboseMode)
 				thisCategory.info("Can't proove either controllability or uncontrollability. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes theese automata uncontrollable.");
 		}
-		if (verboseMode)
+		// if (verboseMode)
 			synchHelper.displayInfo();
 		return allSupervisorsControllable;
 	}
