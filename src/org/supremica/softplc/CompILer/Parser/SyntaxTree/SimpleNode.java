@@ -58,7 +58,7 @@ public class SimpleNode
 
 	public void jjtInsertChild(Node n, int i){
 		{
-			Node c[] = new Node[children.length];
+			Node c[] = new Node[children.length+1];
 
 			if (i == 0) {
 				System.arraycopy(children, 0, c, 1, children.length);
@@ -72,6 +72,27 @@ public class SimpleNode
 		children[i] = n;
 	};
 
+
+	public void jjtDeleteChild(int i){
+		if (children.length<=1) {
+			children = null;
+		} else {
+			Node c[] = new Node[children.length-1];
+
+			if (i == children.length-1) {
+				//Sista barnet tas bort
+				System.arraycopy(children, 0, c, 0, children.length-1);
+			} else if (i == 0) {
+				//Första barnet tas bort
+				System.arraycopy(children, 1, c, 0, children.length-1);
+			} else {
+				System.arraycopy(children, 0, c, 0, i);
+				System.arraycopy(children, i+1, c, i, children.length-i-1);
+			}
+
+			children = c;
+		}
+	}
 
 	public Node jjtGetChild(int i)
 	{

@@ -33,4 +33,6 @@ public interface Node
 	int jjtGetNumChildren();
 
 	void jjtInsertChild(Node n, int i);
+
+	void jjtDeleteChild(int i);
 }

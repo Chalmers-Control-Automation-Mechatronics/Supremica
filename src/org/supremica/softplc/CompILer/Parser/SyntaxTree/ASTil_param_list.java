@@ -2,6 +2,7 @@
 package org.supremica.softplc.CompILer.Parser.SyntaxTree;
 
 import org.supremica.softplc.CompILer.Parser.*;
+import java.util.LinkedList;
 
 public class ASTil_param_list
 	extends SimpleNode
@@ -15,4 +16,31 @@ public class ASTil_param_list
 	{
 		super(p, id);
 	}
+
+	// Appended
+	private LinkedList in = new LinkedList();
+	private LinkedList out = new LinkedList();
+
+	public void addParameter(Param p) {
+		if (p.type == "in") {
+			in.add(p);
+		} else {
+			out.add(p);
+		}
+	}
+
+	public LinkedList getInParameters() {
+		return in;
+	}
+
+	public LinkedList getOutParameters() {
+		return out;
+	}
+
+	public Object visit(SimpleNodeVisitor v, Object o)
+	{
+		return v.visitIL_PARAM_LIST(this, o);
+	}
+
+
 }

@@ -10,6 +10,9 @@ package org.supremica.softplc.CompILer.Parser.SyntaxTree;
 import java.io.*;
 import org.supremica.softplc.CompILer.Parser.*;
 import java.util.StringTokenizer;
+
+
+
 public class parser
 {
 
@@ -110,16 +113,26 @@ void library_element_declaration() #void :
  *  ===============
  */
 
-void constant() #void :
-{}
+Operand constant() #void :
 {
-    numeric_literal() |
-    character_string()
+	String s;
+	Operand o = new Operand();
+}
+{
+	(
+      s = numeric_literal() {o.type = "numeric_literal";}
+	  | s = character_string() {o.type = "character_string";}
         //                | <time_literal>
         //                | <bit_string_literal>
-        | boolean_literal()
-        }
+	  | s = boolean_literal() {o.type = "boolean_literal";}
+	)
 
+	{
+		o.value = s;
+		return o;
+	}
+
+}
 
 
 /*
@@ -128,7 +141,7 @@ void constant() #void :
  *  ==========================
  */
 
-void numeric_literal() :
+String numeric_literal() :
 {
 	Token t = null;
 }
@@ -136,6 +149,7 @@ void numeric_literal() :
 	(t = <integer_literal>  | t= <real_literal>)
 		{
 			jjtThis.setName(t.image);
+			return t.image;
 		}
 }
 
@@ -202,7 +216,7 @@ TOKEN: /* bit_string_literal */
 }
 
 
-void boolean_literal() :
+String boolean_literal() :
 {
 	Token t;
 }
@@ -210,6 +224,7 @@ void boolean_literal() :
     t = <bool_literal>
     {
         jjtThis.setName(t.image);
+		return t.image;
     }
 }
 
@@ -226,7 +241,7 @@ TOKEN: /* bool_literal */
  */
 
 
-void character_string() :
+String character_string() :
 {
 	Token t;
 }
@@ -234,6 +249,7 @@ void character_string() :
 	t = <single_byte_character_string> | t = <double_byte_character_string>
 	{
         jjtThis.setName(t.image);
+		return t.image;
     }
 }
 
@@ -491,11 +507,15 @@ Token elementary_type_name() :
 
 
 Token numeric_type_name() #void :
-{Token t;}
+{
+	Token t;
+}
 {
 	//	integer_type_name() | <real_type_name>
     (t = <integer_type_name> | t = <real_type_name>)
-        {return t;}
+        {
+			return t;
+		}
 }
 
 TOKEN: /*integer_type_name*/
@@ -576,10 +596,15 @@ void subrange_type_name() :
 	<identifier>
 }
 
-void enumerated_type_name() :
-{}
+Token enumerated_type_name() :
 {
-	<identifier>
+	Token t;
+}
+{
+	t = <identifier>
+	{
+		return t;
+	}
 }
 
 void array_type_name() :
@@ -691,10 +716,25 @@ void enumerated_specification() :
 	| enumerated_type_name()
 }
 
-void enumerated_value() :
-{}
+Operand enumerated_value() :
 {
-	(LOOKAHEAD(2) enumerated_type_name() "#")? <identifier>
+	Token t1 = null;
+	Token t2;
+	Operand o = new Operand();
+}
+{
+	((LOOKAHEAD(2) t1=enumerated_type_name() "#")? t2=<identifier>)
+	{
+		//		return (t1==null ? t2.image : t1.image + "#" + t2.image);
+		if (t1==null) {
+			o.value = t2.image;
+		} else {
+			o.value = t1.image + "#" + t2.image;
+		}
+		o.type = "enumerated_value";
+		return o;
+
+	}
 }
 
 void array_type_declaration() :
@@ -817,12 +857,11 @@ void string_type_declaration() :
  */
 
 
-void variable() : //#void :
+Operand variable() : //#void :
 {
 	Token  d = null;
 	String s = null;
-	String variable_name;
-	String field_selector;
+	Operand o = new Operand();
 }
 {
 	(d = <direct_variable> | s = symbolic_variable())
@@ -830,6 +869,9 @@ void variable() : //#void :
 		if (d != null){
 			jjtThis.setIsDirectVariable(true);
 			jjtThis.setName(d.image);
+
+			o.type = "direct_variable";
+			o.value = d.image;
 		}
 		else {
 			jjtThis.setIsDirectVariable(false);
@@ -838,7 +880,13 @@ void variable() : //#void :
 			if (st.hasMoreTokens()) {
 				jjtThis.setFieldSelector(st.nextToken());
 			}
+
+			o.type = "symbolic_variable";
+			o.value = s;
 		}
+
+		//		return (d!=null ? d.image : s);
+		return o;
 	}
 }
 
@@ -1859,10 +1907,19 @@ void il_fb_call() :
 //}
 
 
-void il_operand() #void :
-{}
+Operand il_operand() #void :
 {
-	 constant() | LOOKAHEAD(2) variable() | enumerated_value()
+	String s;
+	Operand o = new Operand();
+}
+{
+	(  o = constant()
+     | LOOKAHEAD(2) o = variable()
+     | o = enumerated_value()
+    )
+	 {
+		 return o;
+	 }
 }
 
 
@@ -1891,42 +1948,83 @@ void il_simple_instruction() :
 
 
 void il_param_list() :
-{}
 {
-	 ( LOOKAHEAD(4) il_param_instruction())* il_param_last_instruction()
+	Param p;
+}
+{
+	 (   LOOKAHEAD(4) p = il_param_instruction()
+	  		 {jjtThis.addParameter(p);}
+     )*
+		 p = il_param_last_instruction()
+	 {
+		 jjtThis.addParameter(p);
+	 }
 }
 
 
-void il_param_instruction() :
-{}
+Param il_param_instruction() :
 {
-	(  LOOKAHEAD(2) il_param_assignment() | il_param_out_assignment()) ","
+	Param p;
+}
+{
+	(  LOOKAHEAD(2) p = il_param_assignment() | p = il_param_out_assignment()) ","
+		{
+			return p;
+		}
 }
 
 
-void il_param_last_instruction() :
-{}
+Param il_param_last_instruction() :
 {
-	 (  LOOKAHEAD(2) il_param_assignment() | il_param_out_assignment())
+	Param p;
+}
+{
+	 (  LOOKAHEAD(2) p = il_param_assignment() | p = il_param_out_assignment())
+		 {
+			 return p;
+		 }
 }
 
 
-void il_param_assignment() :
-{}
+Param il_param_assignment() :
 {
-	il_assign_operator()
-		(  il_operand()
+	String a;
+	Operand o = null;
+	Param p = new Param();
+}
+{
+	a = il_assign_operator()
+		(  o = il_operand()
 		   | ("("
 			  simple_instr_list()
 			  ")"
 			  )
 		   )
+	{ p.type = "in";
+	  p.parameter = a;
+	  p.value = o.value;
+	  p.parameterType = o.type;
+	  return p;
+	}
 }
 
-void il_param_out_assignment() :
-{}
+
+Param il_param_out_assignment() :
 {
-	il_assign_out_operator() variable()
+	String a;
+	Operand o;
+	Param p = new Param();
+}
+{
+	a = il_assign_out_operator() o = variable()
+	{
+		p.type = "out";
+		p.parameter = a;
+		p.value = o.value;
+		p.parameterType = o.type;
+
+		return p;
+	}
 }
 
 
@@ -1939,17 +2037,28 @@ void il_param_out_assignment() :
 
 
 
-void il_assign_operator() :
-{}
+String il_assign_operator() :
 {
-	variable_name() ":="
+	Token t;
+}
+{
+	t = variable_name() ":="
+	{
+		return t.image;
+	}
 }
 
 
-void il_assign_out_operator() :
-{}
+String il_assign_out_operator() :
 {
-	("NOT")? variable_name() "=>"
+	Token t;
+}
+{
+	(("NOT")? t = variable_name() "=>")
+
+		{
+			return t.image;
+		}
 }
 
 
@@ -2094,3 +2203,4 @@ TOKEN: /* identifier */
      | < #letter: ["A"-"Z", "a"-"z"] >
 
 }
+

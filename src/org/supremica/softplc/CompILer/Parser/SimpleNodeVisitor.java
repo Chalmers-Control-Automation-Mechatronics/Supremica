@@ -37,6 +37,8 @@ public interface SimpleNodeVisitor
 
 	Object visitIL_OPERAND_LIST(ASTil_operand_list n, Object o);
 
+	Object visitIL_PARAM_LIST(ASTil_param_list n, Object o);
+
 	Object visitIL_SIMPLE_INSTRUCTION(ASTil_simple_instruction n, Object o);
 
 	Object visitIL_SIMPLE_OPERATION(ASTil_simple_operation n, Object o);

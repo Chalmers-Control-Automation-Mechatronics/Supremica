@@ -9,6 +9,9 @@ package org.supremica.softplc.CompILer.Parser.SyntaxTree;
 import java.io.*;
 import org.supremica.softplc.CompILer.Parser.*;
 import java.util.StringTokenizer;
+
+
+
 public class parser/*@bgen(jjtree)*/implements parserTreeConstants/*@egen*/
 {/*@bgen(jjtree)*/
   protected static JJTparserState jjtree = new JJTparserState();
@@ -143,16 +146,26 @@ void library_element_declaration()       :
  *  ===============
  */
 
-void constant()       :
-{}
+Operand constant()       :
 {
-    numeric_literal() |
-    character_string()
+	String s;
+	Operand o = new Operand();
+}
+{
+	(
+      s = numeric_literal() {o.type = "numeric_literal";}
+	  | s = character_string() {o.type = "character_string";}
         //                | <time_literal>
         //                | <bit_string_literal>
-        | boolean_literal()
-        }
+	  | s = boolean_literal() {o.type = "boolean_literal";}
+	)
 
+	{
+		o.value = s;
+		return o;
+	}
+
+}
 
 
 /*
@@ -161,7 +174,7 @@ void constant()       :
  *  ==========================
  */
 
-void numeric_literal() :
+String numeric_literal() :
 {/*@bgen(jjtree) numeric_literal */
         ASTnumeric_literal jjtn000 = new ASTnumeric_literal(JJTNUMERIC_LITERAL);
         boolean jjtc000 = true;
@@ -180,6 +193,7 @@ void numeric_literal() :
 /*@egen*/
 		{
 			jjtn000.setName(t.image);
+			return t.image;
 		}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
@@ -252,7 +266,7 @@ TOKEN: /* bit_string_literal */
 }
 
 
-void boolean_literal() :
+String boolean_literal() :
 {/*@bgen(jjtree) boolean_literal */
         ASTboolean_literal jjtn000 = new ASTboolean_literal(JJTBOOLEAN_LITERAL);
         boolean jjtc000 = true;
@@ -271,6 +285,7 @@ void boolean_literal() :
 /*@egen*/
     {
         jjtn000.setName(t.image);
+		return t.image;
     }/*@bgen(jjtree)*/
     } finally {
       if (jjtc000) {
@@ -293,7 +308,7 @@ TOKEN: /* bool_literal */
  */
 
 
-void character_string() :
+String character_string() :
 {/*@bgen(jjtree) character_string */
         ASTcharacter_string jjtn000 = new ASTcharacter_string(JJTCHARACTER_STRING);
         boolean jjtc000 = true;
@@ -312,6 +327,7 @@ void character_string() :
 /*@egen*/
 	{
         jjtn000.setName(t.image);
+		return t.image;
     }/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
@@ -1094,11 +1110,15 @@ Token elementary_type_name() :
 
 
 Token numeric_type_name()       :
-{Token t;}
+{
+	Token t;
+}
 {
 	//	integer_type_name() | <real_type_name>
     (t = <integer_type_name> | t = <real_type_name>)
-        {return t;}
+        {
+			return t;
+		}
 }
 
 TOKEN: /*integer_type_name*/
@@ -1260,16 +1280,26 @@ void subrange_type_name() :
 /*@egen*/
 }
 
-void enumerated_type_name() :
+Token enumerated_type_name() :
 {/*@bgen(jjtree) enumerated_type_name */
-  ASTenumerated_type_name jjtn000 = new ASTenumerated_type_name(JJTENUMERATED_TYPE_NAME);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTenumerated_type_name jjtn000 = new ASTenumerated_type_name(JJTENUMERATED_TYPE_NAME);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
 {/*@bgen(jjtree) enumerated_type_name */
         try {
 /*@egen*/
-	<identifier>/*@bgen(jjtree)*/
+	t = <identifier>/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		return t;
+	}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -1745,16 +1775,36 @@ void enumerated_specification() :
 /*@egen*/
 }
 
-void enumerated_value() :
+Operand enumerated_value() :
 {/*@bgen(jjtree) enumerated_value */
-  ASTenumerated_value jjtn000 = new ASTenumerated_value(JJTENUMERATED_VALUE);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTenumerated_value jjtn000 = new ASTenumerated_value(JJTENUMERATED_VALUE);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t1 = null;
+	Token t2;
+	Operand o = new Operand();
+}
 {/*@bgen(jjtree) enumerated_value */
         try {
 /*@egen*/
-	(LOOKAHEAD(2) enumerated_type_name() "#")? <identifier>/*@bgen(jjtree)*/
+	((LOOKAHEAD(2) t1=enumerated_type_name() "#")? t2=<identifier>)/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		//		return (t1==null ? t2.image : t1.image + "#" + t2.image);
+		if (t1==null) {
+			o.value = t2.image;
+		} else {
+			o.value = t1.image + "#" + t2.image;
+		}
+		o.type = "enumerated_value";
+		return o;
+
+	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -2285,7 +2335,7 @@ void string_type_declaration() :
  */
 
 
-void variable() : //#void :
+Operand variable() : //#void :
 {/*@bgen(jjtree) variable */
         ASTvariable jjtn000 = new ASTvariable(JJTVARIABLE);
         boolean jjtc000 = true;
@@ -2293,8 +2343,7 @@ void variable() : //#void :
 /*@egen*/
 	Token  d = null;
 	String s = null;
-	String variable_name;
-	String field_selector;
+	Operand o = new Operand();
 }
 {/*@bgen(jjtree) variable */
         try {
@@ -2309,6 +2358,9 @@ void variable() : //#void :
 		if (d != null){
 			jjtn000.setIsDirectVariable(true);
 			jjtn000.setName(d.image);
+
+			o.type = "direct_variable";
+			o.value = d.image;
 		}
 		else {
 			jjtn000.setIsDirectVariable(false);
@@ -2317,7 +2369,13 @@ void variable() : //#void :
 			if (st.hasMoreTokens()) {
 				jjtn000.setFieldSelector(st.nextToken());
 			}
+
+			o.type = "symbolic_variable";
+			o.value = s;
 		}
+
+		//		return (d!=null ? d.image : s);
+		return o;
 	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -5729,10 +5787,19 @@ void il_fb_call() :
 //}
 
 
-void il_operand()       :
-{}
+Operand il_operand()       :
 {
-	 constant() | LOOKAHEAD(2) variable() | enumerated_value()
+	String s;
+	Operand o = new Operand();
+}
+{
+	(  o = constant()
+     | LOOKAHEAD(2) o = variable()
+     | o = enumerated_value()
+    )
+	 {
+		 return o;
+	 }
 }
 
 
@@ -5840,14 +5907,27 @@ void il_simple_instruction() :
 
 void il_param_list() :
 {/*@bgen(jjtree) il_param_list */
-  ASTil_param_list jjtn000 = new ASTil_param_list(JJTIL_PARAM_LIST);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_param_list jjtn000 = new ASTil_param_list(JJTIL_PARAM_LIST);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Param p;
+}
 {/*@bgen(jjtree) il_param_list */
          try {
 /*@egen*/
-	 ( LOOKAHEAD(4) il_param_instruction())* il_param_last_instruction()/*@bgen(jjtree)*/
+	 (   LOOKAHEAD(4) p = il_param_instruction()
+	  		 {jjtn000.addParameter(p);}
+     )*
+		 p = il_param_last_instruction()/*@bgen(jjtree)*/
+         {
+           jjtree.closeNodeScope(jjtn000, true);
+           jjtc000 = false;
+         }
+/*@egen*/
+	 {
+		 jjtn000.addParameter(p);
+	 }/*@bgen(jjtree)*/
          } catch (Throwable jjte000) {
            if (jjtc000) {
              jjtree.clearNodeScope(jjtn000);
@@ -5871,16 +5951,26 @@ void il_param_list() :
 }
 
 
-void il_param_instruction() :
+Param il_param_instruction() :
 {/*@bgen(jjtree) il_param_instruction */
-  ASTil_param_instruction jjtn000 = new ASTil_param_instruction(JJTIL_PARAM_INSTRUCTION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_param_instruction jjtn000 = new ASTil_param_instruction(JJTIL_PARAM_INSTRUCTION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Param p;
+}
 {/*@bgen(jjtree) il_param_instruction */
         try {
 /*@egen*/
-	(  LOOKAHEAD(2) il_param_assignment() | il_param_out_assignment()) ","/*@bgen(jjtree)*/
+	(  LOOKAHEAD(2) p = il_param_assignment() | p = il_param_out_assignment()) ","/*@bgen(jjtree)*/
+                {
+                  jjtree.closeNodeScope(jjtn000, true);
+                  jjtc000 = false;
+                }
+/*@egen*/
+		{
+			return p;
+		}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -5904,16 +5994,26 @@ void il_param_instruction() :
 }
 
 
-void il_param_last_instruction() :
+Param il_param_last_instruction() :
 {/*@bgen(jjtree) il_param_last_instruction */
-  ASTil_param_last_instruction jjtn000 = new ASTil_param_last_instruction(JJTIL_PARAM_LAST_INSTRUCTION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_param_last_instruction jjtn000 = new ASTil_param_last_instruction(JJTIL_PARAM_LAST_INSTRUCTION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Param p;
+}
 {/*@bgen(jjtree) il_param_last_instruction */
          try {
 /*@egen*/
-	 (  LOOKAHEAD(2) il_param_assignment() | il_param_out_assignment())/*@bgen(jjtree)*/
+	 (  LOOKAHEAD(2) p = il_param_assignment() | p = il_param_out_assignment())/*@bgen(jjtree)*/
+                 {
+                   jjtree.closeNodeScope(jjtn000, true);
+                   jjtc000 = false;
+                 }
+/*@egen*/
+		 {
+			 return p;
+		 }/*@bgen(jjtree)*/
          } catch (Throwable jjte000) {
            if (jjtc000) {
              jjtree.clearNodeScope(jjtn000);
@@ -5937,22 +6037,37 @@ void il_param_last_instruction() :
 }
 
 
-void il_param_assignment() :
+Param il_param_assignment() :
 {/*@bgen(jjtree) il_param_assignment */
-  ASTil_param_assignment jjtn000 = new ASTil_param_assignment(JJTIL_PARAM_ASSIGNMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_param_assignment jjtn000 = new ASTil_param_assignment(JJTIL_PARAM_ASSIGNMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	String a;
+	Operand o = null;
+	Param p = new Param();
+}
 {/*@bgen(jjtree) il_param_assignment */
         try {
 /*@egen*/
-	il_assign_operator()
-		(  il_operand()
+	a = il_assign_operator()
+		(  o = il_operand()
 		   | ("("
 			  simple_instr_list()
 			  ")"
 			  )
 		   )/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{ p.type = "in";
+	  p.parameter = a;
+	  p.value = o.value;
+	  p.parameterType = o.type;
+	  return p;
+	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -5975,16 +6090,34 @@ void il_param_assignment() :
 /*@egen*/
 }
 
-void il_param_out_assignment() :
+
+Param il_param_out_assignment() :
 {/*@bgen(jjtree) il_param_out_assignment */
-  ASTil_param_out_assignment jjtn000 = new ASTil_param_out_assignment(JJTIL_PARAM_OUT_ASSIGNMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_param_out_assignment jjtn000 = new ASTil_param_out_assignment(JJTIL_PARAM_OUT_ASSIGNMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	String a;
+	Operand o;
+	Param p = new Param();
+}
 {/*@bgen(jjtree) il_param_out_assignment */
         try {
 /*@egen*/
-	il_assign_out_operator() variable()/*@bgen(jjtree)*/
+	a = il_assign_out_operator() o = variable()/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		p.type = "out";
+		p.parameter = a;
+		p.value = o.value;
+		p.parameterType = o.type;
+
+		return p;
+	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -6017,16 +6150,26 @@ void il_param_out_assignment() :
 
 
 
-void il_assign_operator() :
+String il_assign_operator() :
 {/*@bgen(jjtree) il_assign_operator */
-  ASTil_assign_operator jjtn000 = new ASTil_assign_operator(JJTIL_ASSIGN_OPERATOR);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_assign_operator jjtn000 = new ASTil_assign_operator(JJTIL_ASSIGN_OPERATOR);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
 {/*@bgen(jjtree) il_assign_operator */
         try {
 /*@egen*/
-	variable_name() ":="/*@bgen(jjtree)*/
+	t = variable_name() ":="/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		return t.image;
+	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -6050,16 +6193,27 @@ void il_assign_operator() :
 }
 
 
-void il_assign_out_operator() :
+String il_assign_out_operator() :
 {/*@bgen(jjtree) il_assign_out_operator */
-  ASTil_assign_out_operator jjtn000 = new ASTil_assign_out_operator(JJTIL_ASSIGN_OUT_OPERATOR);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTil_assign_out_operator jjtn000 = new ASTil_assign_out_operator(JJTIL_ASSIGN_OUT_OPERATOR);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+}
 {/*@bgen(jjtree) il_assign_out_operator */
         try {
 /*@egen*/
-	("NOT")? variable_name() "=>"/*@bgen(jjtree)*/
+	(("NOT")? t = variable_name() "=>")/*@bgen(jjtree)*/
+                {
+                  jjtree.closeNodeScope(jjtn000, true);
+                  jjtc000 = false;
+                }
+/*@egen*/
+
+		{
+			return t.image;
+		}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -6287,3 +6441,4 @@ TOKEN: /* identifier */
      | < #letter: ["A"-"Z", "a"-"z"] >
 
 }
+
