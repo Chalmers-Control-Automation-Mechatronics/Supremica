@@ -127,12 +127,16 @@
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/interfaceRobotStudio3_0.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
+	
+	<!-- Ant 1.6.0 is not able to unjar empty jar files -->
+	<!--
 	<mkdir dir="${lib}/licensed"/>
 	<touch file="${lib}/licensed/JGo.jar"/>	
 	<touch file="${lib}/licensed/JGoLayout.jar"/>
 	<unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
-	
+	-->	
+
 	<mkdir dir="${lib}/${unjared}/META-INF"/>
 	<delete includeEmptyDirs="true">
 		<fileset dir="${lib}/${unjared}/META-INF"/>
