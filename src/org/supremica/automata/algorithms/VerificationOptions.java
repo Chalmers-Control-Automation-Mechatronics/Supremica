@@ -58,21 +58,24 @@ public final class VerificationOptions
 	private int algorithmType;
 	private int stateLimit;
 	private boolean oneEventAtATime;
+	private boolean skipUncontrollabilityCheck;
 
 	public VerificationOptions()
 	{
 		this(WorkbenchProperties.verifyVerificationType(), 
 			 WorkbenchProperties.verifyAlgorithmType(),
 			 WorkbenchProperties.verifyStateLimit(),
-			 WorkbenchProperties.verifyOneEventAtATime());
+			 WorkbenchProperties.verifyOneEventAtATime(),
+			 WorkbenchProperties.verifySkipUncontrollabilityCheck());
 	}
 
-	public VerificationOptions(int verificationType, int algorithmType, int stateLimit, boolean oneEventAtATime)
+	public VerificationOptions(int verificationType, int algorithmType, int stateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
 	{
 		this.verificationType = verificationType;
 		this.algorithmType = algorithmType; 
 		this.stateLimit = stateLimit;
 		this.oneEventAtATime = oneEventAtATime;
+		this.skipUncontrollabilityCheck = skipUncontrollabilityCheck;
 	}
 
 	public void setDialogOK(boolean bool)
@@ -127,5 +130,16 @@ public final class VerificationOptions
 	public boolean getOneEventAtATime()
 	{
 		return oneEventAtATime;
+	}
+
+	public void setSkipUncontrollabilityCheck(boolean bool)
+	{
+		skipUncontrollabilityCheck = bool;
+		WorkbenchProperties.setVerifySkipUncontrollabilityCheck(bool);
+	}
+
+	public boolean getSkipUncontrollabilityCheck()
+	{
+		return skipUncontrollabilityCheck;
 	}
 }

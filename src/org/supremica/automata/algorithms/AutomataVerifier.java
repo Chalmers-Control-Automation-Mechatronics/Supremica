@@ -164,7 +164,7 @@ public class AutomataVerifier
 	 */
  	public void requestStop()
 	{
-		System.out.println("Verifier requested to stop.");
+		// System.out.println("Verifier requested to stop.");
 		stopRequested = true;
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
@@ -400,19 +400,27 @@ public class AutomataVerifier
 				{
 					if (verboseMode)
 						thisCategory.info("Couldn't proove controllability, trying to proove uncontrollability...");
-					
-					// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
-					if (findUncontrollableStates(automataIndices))
-					{   // Uncontrollable state found! 
-						if (verboseMode)
-						{	// Print the uncontrollable state(s)...
-							synchHelper.printUncontrollableStates();
-							// Print event trace reaching uncontrollable state
-							synchHelper.displayTrace();
-							// Print info on amount of states examined
-							// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
+
+					if (!verificationOptions.getSkipUncontrollabilityCheck())
+					{
+						// Try to prove remaining states in the stateMemorizer as beeing uncontrollable
+						if (findUncontrollableStates(automataIndices))
+						{   // Uncontrollable state found! 
+							if (verboseMode)
+							{	// Print the uncontrollable state(s)...
+								synchHelper.printUncontrollableStates();
+								// Print event trace reaching uncontrollable state
+								synchHelper.displayTrace();
+								// Print info on amount of states examined
+								// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
+							}
+							return false;
 						}
-						return false;
+					}
+					else
+					{
+						if (verboseMode)
+							thisCategory.info("Skipped uncontrollability check!");
 					}
 				}
 				else

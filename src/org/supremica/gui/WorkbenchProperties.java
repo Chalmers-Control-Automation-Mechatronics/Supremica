@@ -82,6 +82,7 @@ public final class WorkbenchProperties
 	private static final String VERIFY_ALGORITHM_TYPE = "verifyAlgorithmType";
 	private static final String VERIFY_STATE_LIMIT = "verifyStateLimit";
 	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
+	private static final String VERIFY_SKIP_UNCONTROLLABILITY_CHECK = "skipUncontrollabilityCheck";
 	// SynthesizerOptions
 	private static final String SYNTHESIS_SYNTHESIS_TYPE = "synthesisSynthesisType";
 	private static final String SYNTHESIS_ALGORITHM_TYPE = "synthesisAlgorithmType";
@@ -118,6 +119,7 @@ public final class WorkbenchProperties
 		setProperty(VERIFY_ALGORITHM_TYPE, "0");
 		setProperty(VERIFY_STATE_LIMIT, "1000");
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false");
+		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false");
 		setProperty(SYNTHESIS_SYNTHESIS_TYPE, "0");
 		setProperty(SYNTHESIS_ALGORITHM_TYPE, "0");
 		setProperty(SYNTHESIS_PURGE, "true");
@@ -376,6 +378,16 @@ public final class WorkbenchProperties
 		wp.setProperty(VERIFY_ONE_EVENT_AT_A_TIME, toString(bool));
 	}
 
+	public static boolean verifySkipUncontrollabilityCheck()
+	{
+		return toBoolean(wp.getProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK));
+	}
+
+	public static void setVerifySkipUncontrollabilityCheck(boolean bool)
+	{
+		wp.setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, toString(bool));
+	}
+	
 	// Synthesis...
 	public static int synthesisSynthesisType()
 	{
