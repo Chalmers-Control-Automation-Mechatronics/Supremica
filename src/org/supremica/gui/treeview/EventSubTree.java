@@ -31,9 +31,13 @@ public class EventSubTree
 
 		add(currObservableNode);
 
-		SupremicaTreeNode currOperatorNode = new SupremicaTreeNode("operator: " + event.isOperator());
+		SupremicaTreeNode currOperatorIncreaseNode = new SupremicaTreeNode("operatorIncrease: " + event.isOperatorIncrease());
 
-		add(currOperatorNode);
+		add(currOperatorIncreaseNode);
+
+		SupremicaTreeNode currOperatorResetNode = new SupremicaTreeNode("operatorReset: " + event.isOperatorReset());
+
+		add(currOperatorResetNode);
 
 		SupremicaTreeNode isEpsilonNode = new SupremicaTreeNode("epsilon: " + event.isEpsilon());
 

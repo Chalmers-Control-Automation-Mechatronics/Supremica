@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -47,78 +46,34 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.gui;
 
-import org.supremica.automata.IO.*;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomatonListener;
-import org.supremica.automata.State;
-import org.supremica.automata.Arc;
+package org.supremica.util;
 
-public class AutomatonViewer
-	extends DotViewer
-	implements AutomatonListener
+import org.supremica.log.*;
+import java.net.URL;
+
+/**
+ * This is used to load xml files that can either be in a jar file or on disk
+ **/
+public class ResourceClassLoader
+	extends ClassLoader
 {
-	private Automaton theAutomaton;
+	private static Logger logger = LoggerFactory.createLogger(ResourceClassLoader.class);
 
-	public AutomatonViewer(Automaton theAutomaton)
-		throws Exception
+	public ResourceClassLoader()
 	{
-		this.theAutomaton = theAutomaton;
-
-		super.setObjectName(theAutomaton.getName());
-		theAutomaton.getListeners().addListener(this);
+		super();
 	}
 
-	// Implementation of AutomatonListener interface
-	public void stateAdded(Automaton aut, State q)
+	public ResourceClassLoader(ClassLoader parent)
 	{
-		updated(aut, theAutomaton);
+		super(parent);
 	}
 
-	public void stateRemoved(Automaton aut, State q)
+
+	public URL getResource(String resource)
 	{
-		updated(aut, theAutomaton);
-	}
-
-	public void arcAdded(Automaton aut, Arc a)
-	{
-		updated(aut, theAutomaton);
-	}
-
-	public void arcRemoved(Automaton aut, Arc a)
-	{
-		updated(aut, theAutomaton);
-	}
-
-	public void attributeChanged(Automaton aut)
-	{
-		updated(aut, theAutomaton);
-	}
-
-	public void automatonRenamed(Automaton aut, String oldName)
-	{
-		setObjectName(aut.getName());
-		updated(aut, theAutomaton);
-	}
-
-	// End of interface implementation
-	public AutomataSerializer getSerializer()
-	{
-		AutomatonToDot serializer = new AutomatonToDot(theAutomaton);
-
-		serializer.setLeftToRight(leftToRightCheckBox.isSelected());
-		serializer.setWithLabels(withLabelsCheckBox.isSelected());
-		serializer.setWithEventLabels(withEventLabelsCheckBox.isSelected());
-		serializer.setWithCircles(withCirclesCheckBox.isSelected());
-		serializer.setUseStateColors(useStateColorsCheckBox.isSelected());
-		serializer.setUseArcColors(useArcColorsCheckBox.isSelected());
-
-		return serializer;
-	}
-
-	public Automaton getAutomaton()
-	{
-		return theAutomaton;
+		logger.info("getResource: " + resource);
+		return super.getResource(resource);
 	}
 }

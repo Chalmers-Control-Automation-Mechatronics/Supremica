@@ -56,33 +56,39 @@ public class ComputerHumanExtender
 {
 	protected static Logger logger = LoggerFactory.createLogger(ComputerHumanExtender.class);
 	protected Alphabet theAlphabet;
-	protected Alphabet controllableEvents;
-	protected Alphabet operatorEvents;
+	protected Alphabet operatorResetEvents;
+	protected Alphabet operatorIncreaseEvents;
 	protected Automaton newAutomaton;
 	protected int k = 1;
+	protected int m = 1;
 
-	public ComputerHumanExtender(Automata theAutomata, int k)
+	public static final LabeledEvent passEvent = new LabeledEvent("pass");
+
+	public ComputerHumanExtender(Automata theAutomata, int k, int m)
 	{
-		constructor(theAutomata, k);
+		constructor(theAutomata, k, m);
 	}
 
-	public ComputerHumanExtender(Alphabet theAlphabet, int k)
+	public ComputerHumanExtender(Alphabet theAlphabet, int k, int m)
 	{
-		constructor(theAlphabet, k);
+		constructor(theAlphabet, k, m);
 	}
 
-	private void constructor(Automata theAutomata, int k)
+	private void constructor(Automata theAutomata, int k, int m)
 	{
-		if (k < 0)
+		if (k < 1)
 		{
-			throw new IllegalArgumentException("k must be >= 0");
+			throw new IllegalArgumentException("k must be >= 1");
 		}
-
+		if (m < 1)
+		{
+			throw new IllegalArgumentException("m must be >= 1");
+		}
 		try
 		{
 			Alphabet inputAlphabet = AlphabetHelpers.getUnionAlphabet(theAutomata, true, true);
 
-			constructor(inputAlphabet, k);
+			constructor(inputAlphabet, k, m);
 		}
 		catch (Exception e)
 		{
@@ -92,10 +98,11 @@ public class ComputerHumanExtender
 		}
 	}
 
-	private void constructor(Alphabet theAlphabet, int k)
+	private void constructor(Alphabet theAlphabet, int k, int m)
 	{
 		this.theAlphabet = theAlphabet;
 		this.k = k;
+		this.m = m;
 
 		buildAlphabets(theAlphabet);
 	}
@@ -105,8 +112,8 @@ public class ComputerHumanExtender
 
 		// The best way to deal with the inherently uncontrollable events
 		// is to not include them in the alphabet of this automaton at all
-		controllableEvents = new Alphabet();
-		operatorEvents = new Alphabet();
+		operatorResetEvents = new Alphabet();
+		operatorIncreaseEvents = new Alphabet();
 
 		for (EventIterator evIt = theAlphabet.iterator(); evIt.hasNext(); )
 		{
@@ -119,17 +126,17 @@ public class ComputerHumanExtender
 
 			LabeledEvent newEvent = new LabeledEvent(currEvent);
 
-			if (currEvent.isControllable())
+			if (currEvent.isOperatorReset())
 			{
-				controllableEvents.addEvent(newEvent);
+				operatorResetEvents.addEvent(newEvent);
 			}
 			else
 			{    // The event is uncontrollable
-				if (currEvent.isOperator())
+				if (currEvent.isOperatorIncrease())
 				{
 
 					//System.err.println("found operator event");
-					operatorEvents.addEvent(newEvent);
+					operatorIncreaseEvents.addEvent(newEvent);
 				}
 
 				// do nothing for the inherently uncontrollable events
@@ -147,31 +154,51 @@ public class ComputerHumanExtender
 		return k;
 	}
 
+	public void setM(int m)
+	{
+		this.m = m;
+	}
+
+	public int getM()
+	{
+		return m;
+	}
+
 	public void execute()
 		throws Exception
 	{
+		if (k < 1)
+		{
+			throw new IllegalStateException("k must be >= 1");
+		}
+		if (m < 1)
+		{
+			throw new IllegalStateException("m must be >= 1");
+		}
+
 		newAutomaton = new Automaton();
 
-		newAutomaton.setName("Lifting, k = " + k);
+		newAutomaton.setName("E^{k=" + k + ", m=" + m +"}");
 		newAutomaton.setType(AutomatonType.Plant);
 
 		Alphabet newAutAlphabet = newAutomaton.getAlphabet();
 
-		newAutAlphabet.addEvents(controllableEvents);
-		newAutAlphabet.addEvents(operatorEvents);
+		newAutAlphabet.addEvents(operatorResetEvents);
+		newAutAlphabet.addEvents(operatorIncreaseEvents);
 
-		LabeledEvent passEvent = new LabeledEvent("pass");
+//		LabeledEvent passEvent = new LabeledEvent("pass");
 
-		newAutAlphabet.addEvent(passEvent);
+		newAutAlphabet.addEvent(ComputerHumanExtender.passEvent);
 
-		State initialState = newAutomaton.createUniqueState("qi");
+		State initialState = newAutomaton.createUniqueState("qe_0_1");
 
 		initialState.setInitial(true);
 		initialState.setAccepting(true);
 		newAutomaton.addState(initialState);
 
-		// Add all controllable events as self loops to the initial state
-		for (EventIterator evIt = controllableEvents.iterator();
+/*
+		// Add all reset events (controllable events) as self loops to the initial state
+		for (EventIterator evIt = operatorResetEvents.iterator();
 				evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.nextEvent();
@@ -179,49 +206,118 @@ public class ComputerHumanExtender
 
 			newAutomaton.addArc(newArc);
 		}
+*/
+		State prevUpperState = null;
 
-		State prevState = initialState;
+		State[] higherMStates = new State[k+1];
 
-		for (int i = 1; i <= k; i++)
+		// Create E^{k,m} backwards
+		for (int im = m; im >= 1; im--)
 		{
-			State newState = newAutomaton.createAndAddUniqueState("q_" + i);
+			// logger.info("im: " + im);
 
-			newState.setAccepting(true);
-
-			// Add all controllable events to the initial state
-			for (EventIterator evIt = controllableEvents.iterator();
-					evIt.hasNext(); )
+			for (int ik = k; ik >= 0; ik--)
 			{
-				LabeledEvent currEvent = evIt.nextEvent();
-				Arc newArc = new Arc(newState, initialState, currEvent);
+				//logger.info("ik: " + ik);
 
-				newAutomaton.addArc(newArc);
+				State newState = null;
+
+				if (!(ik == 0 && im == 1))
+				{
+					// logger.info("creating state ik: " + ik + " im: " + im);
+					newState = newAutomaton.createAndAddUniqueState("qe_" + ik + "_" + im);
+
+					newState.setAccepting(true);
+				}
+				else
+				{
+					newState = initialState;
+				}
+
+/*
+				// Add all controllable events to the initial state
+				for (EventIterator evIt = operatorResetEvents.iterator();
+						evIt.hasNext(); )
+				{
+					LabeledEvent currEvent = evIt.nextEvent();
+					Arc newArc = new Arc(newState, initialState, currEvent);
+
+					newAutomaton.addArc(newArc);
+				}
+*/
+
+				//
+				// First add the operator increase events
+				//
+
+				if (ik < k)
+				{
+					// Add all operator to the next upper level (in this case the current level)
+					for (EventIterator evIt = operatorIncreaseEvents.iterator();
+							evIt.hasNext(); )
+					{
+
+						// System.err.println("added operator arc");
+						LabeledEvent currEvent = evIt.nextEvent();
+						Arc newArc = new Arc(newState, prevUpperState, currEvent);
+
+						newAutomaton.addArc(newArc);
+					}
+
+					if (ik == k-1)
+					{
+						// Add the pass event between level k and k-1
+						Arc newArc = new Arc(prevUpperState, newState, passEvent);
+
+						newAutomaton.addArc(newArc);
+
+					}
+				}
+				if (ik == k)
+				{    // The top level state
+
+					newState.setAccepting(true);
+					//newState.setAccepting(false);
+				}
+
+				//
+				// Then add the operator reset events
+				//
+
+				if (im < m)
+				{
+					State higherMState = higherMStates[ik];
+
+					// Add all operator reset events to the corresponding level in m+1
+					for (EventIterator evIt = operatorResetEvents.iterator();
+							evIt.hasNext(); )
+					{
+						// System.err.println("added operator arc");
+						LabeledEvent currEvent = evIt.nextEvent();
+						Arc newArc = new Arc(newState, higherMState, currEvent);
+
+						newAutomaton.addArc(newArc);
+					}
+				}
+				else if (im == m)
+				{
+					// Add all operator reset events to the initial state
+					for (EventIterator evIt = operatorResetEvents.iterator();
+							evIt.hasNext(); )
+					{
+						LabeledEvent currEvent = evIt.nextEvent();
+						Arc newArc = new Arc(newState, initialState, currEvent);
+
+						newAutomaton.addArc(newArc);
+					}
+				}
+
+				higherMStates[ik] = newState;
+				prevUpperState = newState;
+
 			}
-
-			// Add all operator to the next upper level (in this case the current level)
-			for (EventIterator evIt = operatorEvents.iterator();
-					evIt.hasNext(); )
-			{
-
-				// System.err.println("added operator arc");
-				LabeledEvent currEvent = evIt.nextEvent();
-				Arc newArc = new Arc(prevState, newState, currEvent);
-
-				newAutomaton.addArc(newArc);
-			}
-
-			if (i == k)
-			{    // The top level state
-
-				// Add the pass event to the lower level
-				Arc newArc = new Arc(newState, prevState, passEvent);
-
-				newAutomaton.addArc(newArc);
-				newState.setAccepting(false);
-			}
-
-			prevState = newState;
 		}
+
 	}
 
 	public Automaton getNewAutomaton()

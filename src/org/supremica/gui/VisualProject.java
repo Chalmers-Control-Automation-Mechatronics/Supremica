@@ -64,7 +64,9 @@ import org.supremica.gui.recipeEditor.RecipeEditor;
 import org.supremica.gui.cellEditor.CellEditor;
 import grafchart.sfc.JGrafchartSupremicaEditor;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.util.ResourceClassLoader;
 import org.swixml.SwingEngine;
+//import org.swixml.Localizer;
 import org.supremica.util.SupremicaException;
 
 /**
@@ -528,6 +530,10 @@ public class VisualProject
 			try
 			{
 				theSwingEngine = new SwingEngine();
+				ResourceClassLoader resourceClassLoader = new ResourceClassLoader(ClassLoader.getSystemClassLoader());
+				theSwingEngine.setClassLoader(resourceClassLoader);
+				//Localizer localizer = theSwingEngine.getLocalizer();
+				//localizer.setClassLoader(resourceClassLoader);
 				theUserInterface = theSwingEngine.render(getUserInterfaceURL());
 				if (theUserInterface instanceof JDialog)
 				{

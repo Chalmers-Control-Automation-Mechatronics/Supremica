@@ -111,7 +111,8 @@ public class EventHelpers
 		String label = tmpEvent.getLabel();
 		boolean controllable = tmpEvent.isControllable();
 		boolean prioritized = tmpEvent.isPrioritized();
-		boolean operator = tmpEvent.isOperator();
+		boolean operatorIncrease = tmpEvent.isOperatorIncrease();
+		boolean operatorReset = tmpEvent.isOperatorReset();
 		boolean observable = tmpEvent.isObservable();
 		boolean immediate = tmpEvent.isImmediate();
 
@@ -138,9 +139,16 @@ public class EventHelpers
 				throw new SupremicaException(errorMsg);
 			}
 
-			if (operator != tmpEvent.isOperator())
+			if (operatorIncrease != tmpEvent.isOperatorIncrease())
 			{
-				String errorMsg = "Operator of an event must be the same in all automata. Operator of " + label + " is not consistent.";
+				String errorMsg = "OperatorIncrease of an event must be the same in all automata. Operator of " + label + " is not consistent.";
+
+				throw new SupremicaException(errorMsg);
+			}
+
+			if (operatorReset != tmpEvent.isOperatorReset())
+			{
+				String errorMsg = "OperatorReset of an event must be the same in all automata. Operator of " + label + " is not consistent.";
 
 				throw new SupremicaException(errorMsg);
 			}
@@ -162,7 +170,8 @@ public class EventHelpers
 		theEvent.setControllable(controllable);
 		theEvent.setPrioritized(prioritized);
 		theEvent.setImmediate(immediate);
-		theEvent.setOperator(operator);
+		theEvent.setOperatorIncrease(operatorIncrease);
+		theEvent.setOperatorReset(operatorReset);
 		theEvent.setObservable(observable);
 
 		return theEvent;

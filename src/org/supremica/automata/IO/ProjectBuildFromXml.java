@@ -84,7 +84,8 @@ public class ProjectBuildFromXml
 	private final static String controllableStr = "controllable";
 	private final static String prioritizedStr = "prioritized";
 	private final static String observableStr = "observable";
-	private final static String operatorStr = "operator";
+	private final static String operatorIncreaseStr = "operatorIncrease";
+	private final static String operatorResetStr = "operatorReset";
 	private final static String immediateStr = "immediate";
 	private final static String epsilonStr = "epsilon";
 	private final static String owner = "owner";
@@ -442,7 +443,8 @@ public class ProjectBuildFromXml
 		boolean controllable = true;
 		boolean prioritized = true;
 		boolean observable = true;
-		boolean operator = false;
+		boolean operatorIncrease = false;
+		boolean operatorReset = false;
 		boolean immediate = false;
 		boolean epsilon = false;
 		int length = attributes.getLength();
@@ -472,9 +474,13 @@ public class ProjectBuildFromXml
 			{
 				observable = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
 			}
-			else if (operatorStr.equals(currName))
+			else if (operatorIncreaseStr.equals(currName))
 			{
-				operator = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
+				operatorIncrease = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
+			}
+			else if (operatorResetStr.equals(currName))
+			{
+				operatorReset = Boolean.valueOf(attributes.getValue(i)) == Boolean.TRUE;
 			}
 			else if (immediateStr.equals(currName))
 			{
@@ -504,7 +510,8 @@ public class ProjectBuildFromXml
 		currEvent.setControllable(controllable);
 		currEvent.setPrioritized(prioritized);
 		currEvent.setObservable(observable);
-		currEvent.setOperator(operator);
+		currEvent.setOperatorIncrease(operatorIncrease);
+		currEvent.setOperatorReset(operatorReset);
 		currEvent.setImmediate(immediate);
 		currEvent.setEpsilon(epsilon);
 

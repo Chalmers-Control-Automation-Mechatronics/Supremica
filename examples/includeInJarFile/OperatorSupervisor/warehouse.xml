@@ -2,29 +2,29 @@
 <SupremicaProject name=""  major="0"  minor="10" >
 <Automaton name="agv" type="Plant">
 	<Events>
-		<Event id="0" label="agv00"/>
-		<Event id="1" label="agv03"/>
-		<Event id="2" label="agv06"/>
-		<Event id="3" label="agv10"/>
-		<Event id="4" label="agv11"/>
-		<Event id="5" label="agv12"/>
-		<Event id="6" label="agv14"/>
-		<Event id="7" label="agv15"/>
-		<Event id="8" label="agv16"/>
-		<Event id="9" label="agv20"/>
-		<Event id="10" label="agv21"/>
-		<Event id="11" label="agv22"/>
-		<Event id="12" label="agv24"/>
-		<Event id="13" label="agv25"/>
-		<Event id="14" label="agv26"/>
-		<Event id="15" label="agv30"/>
-		<Event id="16" label="agv31"/>
-		<Event id="17" label="agv32"/>
-		<Event id="18" label="agv34"/>
-		<Event id="19" label="agv35"/>
-		<Event id="20" label="agv36"/>
-		<Event id="21" label="agv41"/>
-		<Event id="22" label="agv45"/>
+		<Event id="0" label="agv00" operatorReset="true"/>
+		<Event id="1" label="agv03" operatorReset="true"/>
+		<Event id="2" label="agv06" operatorReset="true"/>
+		<Event id="3" label="agv10" operatorReset="true"/>
+		<Event id="4" label="agv11" operatorReset="true"/>
+		<Event id="5" label="agv12" operatorReset="true"/>
+		<Event id="6" label="agv14" operatorReset="true"/>
+		<Event id="7" label="agv15" operatorReset="true"/>
+		<Event id="8" label="agv16" operatorReset="true"/>
+		<Event id="9" label="agv20" operatorReset="true"/>
+		<Event id="10" label="agv21" operatorReset="true"/>
+		<Event id="11" label="agv22" operatorReset="true"/>
+		<Event id="12" label="agv24" operatorReset="true"/>
+		<Event id="13" label="agv25" operatorReset="true"/>
+		<Event id="14" label="agv26" operatorReset="true"/>
+		<Event id="15" label="agv30" operatorReset="true"/>
+		<Event id="16" label="agv31" operatorReset="true"/>
+		<Event id="17" label="agv32" operatorReset="true"/>
+		<Event id="18" label="agv34" operatorReset="true"/>
+		<Event id="19" label="agv35" operatorReset="true"/>
+		<Event id="20" label="agv36" operatorReset="true"/>
+		<Event id="21" label="agv41" operatorReset="true"/>
+		<Event id="22" label="agv45" operatorReset="true"/>
 	</Events>
 	<States>
 		<State id="0" name="00"/>
@@ -108,26 +108,26 @@
 </Automaton>
 <Automaton name="truck" type="Plant">
 	<Events>
-		<Event id="0" label="truck00" controllable="false" operator="true"/>
-		<Event id="1" label="truck03" controllable="false" operator="true"/>
-		<Event id="2" label="truck06" controllable="false" operator="true"/>
-		<Event id="3" label="truck10" controllable="false" operator="true"/>
-		<Event id="4" label="truck11" controllable="false" operator="true"/>
-		<Event id="5" label="truck12" controllable="false" operator="true"/>
-		<Event id="6" label="truck14" controllable="false" operator="true"/>
-		<Event id="7" label="truck15" controllable="false" operator="true"/>
-		<Event id="8" label="truck16" controllable="false" operator="true"/>
-		<Event id="9" label="truck20" controllable="false" operator="true"/>
-		<Event id="10" label="truck21" controllable="false" operator="true"/>
-		<Event id="11" label="truck22" controllable="false" operator="true"/>
-		<Event id="12" label="truck24" controllable="false" operator="true"/>
-		<Event id="13" label="truck25" controllable="false" operator="true"/>
-		<Event id="14" label="truck30" controllable="false" operator="true"/>
-		<Event id="15" label="truck31" controllable="false" operator="true"/>
-		<Event id="16" label="truck32" controllable="false" operator="true"/>
-		<Event id="17" label="truck34" controllable="false" operator="true"/>
-		<Event id="18" label="truck35" controllable="false" operator="true"/>
-		<Event id="19" label="truck36" controllable="false" operator="true"/>
+		<Event id="0" label="truck00" controllable="false" operatorIncrease="true"/>
+		<Event id="1" label="truck03" controllable="false" operatorIncrease="true"/>
+		<Event id="2" label="truck06" controllable="false" operatorIncrease="true"/>
+		<Event id="3" label="truck10" controllable="false" operatorIncrease="true"/>
+		<Event id="4" label="truck11" controllable="false" operatorIncrease="true"/>
+		<Event id="5" label="truck12" controllable="false" operatorIncrease="true"/>
+		<Event id="6" label="truck14" controllable="false" operatorIncrease="true"/>
+		<Event id="7" label="truck15" controllable="false" operatorIncrease="true"/>
+		<Event id="8" label="truck16" controllable="false" operatorIncrease="true"/>
+		<Event id="9" label="truck20" controllable="false" operatorIncrease="true"/>
+		<Event id="10" label="truck21" controllable="false" operatorIncrease="true"/>
+		<Event id="11" label="truck22" controllable="false" operatorIncrease="true"/>
+		<Event id="12" label="truck24" controllable="false" operatorIncrease="true"/>
+		<Event id="13" label="truck25" controllable="false" operatorIncrease="true"/>
+		<Event id="14" label="truck30" controllable="false" operatorIncrease="true"/>
+		<Event id="15" label="truck31" controllable="false" operatorIncrease="true"/>
+		<Event id="16" label="truck32" controllable="false" operatorIncrease="true"/>
+		<Event id="17" label="truck34" controllable="false" operatorIncrease="true"/>
+		<Event id="18" label="truck35" controllable="false" operatorIncrease="true"/>
+		<Event id="19" label="truck36" controllable="false" operatorIncrease="true"/>
 	</Events>
 	<States>
 		<State id="0" name="00"/>

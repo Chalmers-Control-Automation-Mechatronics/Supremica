@@ -53,55 +53,35 @@ public class LabeledEvent
 	implements Comparable
 {
 
-	// The id is the local identifier of an event, should be
-	// different from any other id:s in the same automaton
-	// private String id = "";
 	// The label is what shows in the dot-figures, this is the
 	// global identifier of an event, appearing in the alphabet
 	private String label = "";
 	private boolean controllable = true;
 	private boolean prioritized = true;
 	private boolean observable = true;
-	private boolean operator = false;
+	private boolean operatorIncrease = false;
+	private boolean operatorReset = false;
 	private boolean immediate = false;
 	private boolean epsilon = false;
 	private int expansionPriority = -1;
 	private int synchIndex = -1;
 
-	/**
-	 * extra variable used to speed up algorithms.
-	 * dont store your stuff here, it may be changed by other algos
-	 */
-
-//      public int extra1;
-	// private Action theAction = null;
 	public LabeledEvent() {}
 
 	public LabeledEvent(String label)
 	{
 		this.label = label;
-
-		// ** MF ** if I instantiate with only a label, I (probably) want the id to be the same (not?)
-		// ** MF ** adding this cannot break any code, can it?
-//              this.id = label;
 	}
 
-/*
-		public LabeledEvent(String label, String id)
-		{
-				setLabel(label);
-				setId(id);
-		}
-*/
 	public LabeledEvent(LabeledEvent e)
 	{
 
-//              id = e.id;
 		label = e.label;
 		controllable = e.controllable;
 		prioritized = e.prioritized;
 		observable = e.observable;
-		operator = e.operator;
+		operatorIncrease = e.operatorIncrease;
+		operatorReset = e.operatorReset;
 		immediate = e.immediate;
 		epsilon = e.epsilon;
 		synchIndex = e.synchIndex;
@@ -109,35 +89,9 @@ public class LabeledEvent
 
 	public String toString()
 	{
-		return "'" + label + "'";    //  + " (" + id + ")";
+		return "'" + label + "'";
 	}
 
-	/**
-	 * Calls update in all execution listeners.
-	 *
-	 *@return  The id value
-	 */
-
-	/*
-	 *  public void execute()
-	 *  {
-	 *      notifyExceutionListeners();
-	 *  }
-	 */
-
-	// get/setId are now _only_ used by Alphabet
-
-/*
-		String getId() // default access, accessible within package, not outside (poor java mans friend declaration)
-		{
-				return id;
-		}
-
-		void setId(String id)
-		{
-				this.id = id;
-		}
-*/
 	public String getLabel()
 	{
 		return label;
@@ -168,14 +122,24 @@ public class LabeledEvent
 		this.observable = observable;
 	}
 
-	public boolean isOperator()
+	public boolean isOperatorIncrease()
 	{
-		return operator;
+		return operatorIncrease;
 	}
 
-	public void setOperator(boolean operator)
+	public void setOperatorIncrease(boolean operatorIncrease)
 	{
-		this.operator = operator;
+		this.operatorIncrease = operatorIncrease;
+	}
+
+	public boolean isOperatorReset()
+	{
+		return operatorReset;
+	}
+
+	public void setOperatorReset(boolean operatorReset)
+	{
+		this.operatorReset = operatorReset;
 	}
 
 	public boolean isImmediate()
@@ -249,17 +213,6 @@ public class LabeledEvent
 		return this.label.equals(ev.label);    // should also check priority & controllability?
 	}
 
-/*
-		private boolean equalId(Object obj)
-		{
-				return this.id.equals(((LabeledEvent) obj).id);
-		}
-
-		private boolean equalId(String id)
-		{
-				return this.id.equals(id);
-		}
-*/
 	public int hashCode()
 	{
 		return label.hashCode();
@@ -277,27 +230,7 @@ public class LabeledEvent
 
 	public int compareTo(Object event)
 	{
-
-		// System.err.println("CompareTo");
 		return label.compareTo(((LabeledEvent) event).label);
 	}
 
-	/*
-	 *  public Listeners getExceutionListeners()
-	 *  {
-	 *  if (listeners == null)
-	 *  {
-	 *  listeners = new AutomatonListeners(this);
-	 *  }
-	 *  return listeners;
-	 *  }
-	 *
-	 *  private void notifyExceutionListeners()
-	 *  {
-	 *  if (listeners != null)
-	 *  {
-	 *  listeners.notifyListeners();
-	 *  }
-	 *  }
-	 */
 }

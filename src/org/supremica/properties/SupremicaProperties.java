@@ -85,6 +85,7 @@ public final class SupremicaProperties
 	private static final String DOT_MAX_NBR_OF_STATES = "dotMaxNbrOfStatesWithoutWarning";
 	private static final String DOT_LEFT_TO_RIGHT = "dotLeftToRight";
 	private static final String DOT_WITH_STATE_LABELS = "dotWithStateLabels";
+	private static final String DOT_WITH_EVENT_LABELS = "dotWithEventLabels";
 	private static final String DOT_WITH_CIRCLES = "dotWithCircles";
 	private static final String DOT_USE_STATE_COLORS = "dotUseStateColors";
 	private static final String DOT_USE_ARC_COLORS = "dotUseArcColors";
@@ -235,6 +236,7 @@ public final class SupremicaProperties
 		setProperty(DOT_MAX_NBR_OF_STATES, "40", true);
 		setProperty(DOT_LEFT_TO_RIGHT, "false", true);
 		setProperty(DOT_WITH_STATE_LABELS, "true", true);
+		setProperty(DOT_WITH_EVENT_LABELS, "true", true);
 		setProperty(DOT_WITH_CIRCLES, "false", true);
 		setProperty(DOT_USE_STATE_COLORS, "true", true);
 		setProperty(DOT_USE_ARC_COLORS, "false", true);
@@ -479,124 +481,124 @@ public final class SupremicaProperties
 	}
 
 
-/**
- * @return <code>true</code>, if the application is running on Mac OS 8/9, <code>false</code> otherwise
- */
+	/**
+	 * @return <code>true</code>, if the application is running on Mac OS 8/9, <code>false</code> otherwise
+	 */
 
-public static boolean isMacOS()
-{
-	return com.muchsoft.util.Sys.isMacOS();
-}
-
-
-
-/**
- * @return <code>true</code>, if the application is running on Mac OS X, <code>false</code> otherwise
- */
-
-public static boolean isMacOSX()
-{
-	return com.muchsoft.util.Sys.isMacOSX();
-}
+	public static boolean isMacOS()
+	{
+		return com.muchsoft.util.Sys.isMacOS();
+	}
 
 
 
-/**
- * @return <code>true</code>, if the application is running on a Mac (OS 8, 9 or X), <code>false</code> otherwise
- */
+	/**
+	 * @return <code>true</code>, if the application is running on Mac OS X, <code>false</code> otherwise
+	 */
 
-public static boolean isAMac()
-{
-	return com.muchsoft.util.Sys.isAMac();
-}
-
-
-
-/**
- * @return <code>true</code>, if the application is running on Linux, <code>false</code> otherwise
- */
-
-public static boolean isLinux()
-{
-	return com.muchsoft.util.Sys.isLinux();
-}
+	public static boolean isMacOSX()
+	{
+		return com.muchsoft.util.Sys.isMacOSX();
+	}
 
 
 
-/**
- * @return <code>true</code>, if the application is running on Windows, <code>false</code> otherwise
- */
+	/**
+	 * @return <code>true</code>, if the application is running on a Mac (OS 8, 9 or X), <code>false</code> otherwise
+	 */
 
-public static boolean isWindows()
-{
-	return com.muchsoft.util.Sys.isWindows();
-}
-
-
-
-/**
- * @return <code>true</code>, if the application is running on OS/2, <code>false</code> otherwise
- */
-
-public static boolean isOS2()
-{
-	return com.muchsoft.util.Sys.isOS2();
-}
+	public static boolean isAMac()
+	{
+		return com.muchsoft.util.Sys.isAMac();
+	}
 
 
 
-/**
- * The home directory contains the user's data and applications. On UNIX systems this directory is denoted
- * by <code>~</code> and can be queried through the system property <code>user.home</code>.
- * @return the user's home directory without a trailing path separator
- */
+	/**
+	 * @return <code>true</code>, if the application is running on Linux, <code>false</code> otherwise
+	 */
 
-public static String getHomeDirectory()
-{
-
-	return com.muchsoft.util.Sys.getHomeDirectory();
-}
+	public static boolean isLinux()
+	{
+		return com.muchsoft.util.Sys.isLinux();
+	}
 
 
 
-/**
- * The directory from which the application was launched is called the working directory. Its path can
- * be queried through the system property <code>user.dir</code>.
- * @return the application's working directory without a trailing path separator
- */
+	/**
+	 * @return <code>true</code>, if the application is running on Windows, <code>false</code> otherwise
+	 */
 
-public static String getWorkingDirectory()
-{
-	return com.muchsoft.util.Sys.getWorkingDirectory();
-}
+	public static boolean isWindows()
+	{
+		return com.muchsoft.util.Sys.isWindows();
+	}
 
 
 
-/**
- * The preferences directory contains the user's configuration files. On Mac OS X, this method returns
- * <code>~/Library/Preferences</code>, on all other systems the user's home directory is used.
- * @return the user's preferences directory without a trailing path separator
- */
+	/**
+	 * @return <code>true</code>, if the application is running on OS/2, <code>false</code> otherwise
+	 */
 
-public static String getPrefsDirectory()
-{
-		return com.muchsoft.util.Sys.getPrefsDirectory();
-}
+	public static boolean isOS2()
+	{
+		return com.muchsoft.util.Sys.isOS2();
+	}
 
 
 
-/**
- * The local preferences directory contains configuration files that are shared by all users on the computer.
- * On Mac OS X, this method returns <code>/Library/Preferences</code>, on Linux <code>/etc</code>. On all
- * other systems the application's working directory is used.
- * <i>Please note: There is no guarantee that your application has permission to use this directory!</i>
- * @return the shared preferences directory (without a trailing path separator) of all users on a local computer
- */
+	/**
+	 * The home directory contains the user's data and applications. On UNIX systems this directory is denoted
+	 * by <code>~</code> and can be queried through the system property <code>user.home</code>.
+	 * @return the user's home directory without a trailing path separator
+	 */
 
-public static String getLocalPrefsDirectory()
-{
-		return com.muchsoft.util.Sys.getLocalPrefsDirectory();
-}
+	public static String getHomeDirectory()
+	{
+
+		return com.muchsoft.util.Sys.getHomeDirectory();
+	}
+
+
+
+	/**
+	 * The directory from which the application was launched is called the working directory. Its path can
+	 * be queried through the system property <code>user.dir</code>.
+	 * @return the application's working directory without a trailing path separator
+	 */
+
+	public static String getWorkingDirectory()
+	{
+		return com.muchsoft.util.Sys.getWorkingDirectory();
+	}
+
+
+
+	/**
+	 * The preferences directory contains the user's configuration files. On Mac OS X, this method returns
+	 * <code>~/Library/Preferences</code>, on all other systems the user's home directory is used.
+	 * @return the user's preferences directory without a trailing path separator
+	 */
+
+	public static String getPrefsDirectory()
+	{
+			return com.muchsoft.util.Sys.getPrefsDirectory();
+	}
+
+
+
+	/**
+	 * The local preferences directory contains configuration files that are shared by all users on the computer.
+	 * On Mac OS X, this method returns <code>/Library/Preferences</code>, on Linux <code>/etc</code>. On all
+	 * other systems the application's working directory is used.
+	 * <i>Please note: There is no guarantee that your application has permission to use this directory!</i>
+	 * @return the shared preferences directory (without a trailing path separator) of all users on a local computer
+	 */
+
+	public static String getLocalPrefsDirectory()
+	{
+			return com.muchsoft.util.Sys.getLocalPrefsDirectory();
+	}
 
 
 
@@ -947,6 +949,16 @@ public static String getLocalPrefsDirectory()
 	public static void setDotWithStateLabels(boolean withStateLabels)
 	{
 		wp.setProperty(DOT_WITH_STATE_LABELS, toString(withStateLabels));
+	}
+
+	public static boolean isDotWithEventLabels()
+	{
+		return toBoolean(wp.getProperty(DOT_WITH_EVENT_LABELS));
+	}
+
+	public static void setDotWithEventLabels(boolean withEventLabels)
+	{
+		wp.setProperty(DOT_WITH_EVENT_LABELS, toString(withEventLabels));
 	}
 
 	public static boolean isDotWithCircles()

@@ -155,9 +155,14 @@ public class ProjectToSP
 					pw.print(" observable=\"false\"");
 				}
 
-				if (event.isOperator())
+				if (event.isOperatorIncrease())
 				{
-					pw.print(" operator=\"true\"");
+					pw.print(" operatorIncrease=\"true\"");
+				}
+
+				if (event.isOperatorReset())
+				{
+					pw.print(" operatorReset=\"true\"");
 				}
 
 				if (event.isImmediate())

@@ -1240,9 +1240,11 @@ public class ActionMan
 			}
 
 			int k = getIntegerInDialogWindow("Select k", gui.getComponent());
+//			int m = getIntegerInDialogWindow("Select m", gui.getComponent());
 			AutomataExtender extender = new AutomataExtender(currAutomaton);
 
 			extender.setK(k);
+//			extender.setM(m);
 
 			try
 			{
@@ -1272,7 +1274,19 @@ public class ActionMan
 		}
 
 		int k = getIntegerInDialogWindow("Select k", gui.getComponent());
-		ComputerHumanExtender extender = new ComputerHumanExtender(selectedAutomata, k);
+		int m = getIntegerInDialogWindow("Select m", gui.getComponent());
+
+		if (k < 1)
+		{
+			logger.info("k must >= 1. Try again.");
+			return;
+		}
+		if (m < 1)
+		{
+			logger.info("m must >= 1. Try again.");
+			return;
+		}
+		ComputerHumanExtender extender = new ComputerHumanExtender(selectedAutomata, k, m);
 
 		try
 		{
@@ -1284,7 +1298,7 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-			logger.error("Error in ComputerHumanExtender");
+			logger.error("Error in ComputerHumanExtender.");
 			logger.debug(ex.getStackTrace());
 		}
 	}

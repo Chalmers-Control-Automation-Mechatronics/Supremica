@@ -678,14 +678,7 @@ class SelectOperatorEventsDialog
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
 
-				if (operatorEvents.contains(currEvent.getLabel()))
-				{
-					currEvent.setOperator(true);
-				}
-				else
-				{
-					currEvent.setOperator(false);
-				}
+				currEvent.setOperatorIncrease(operatorEvents.contains(currEvent.getLabel()));
 			}
 		}
 		else if (selectUnobservableEvents)
@@ -694,14 +687,7 @@ class SelectOperatorEventsDialog
 			{
 				LabeledEvent currEvent = evIt.nextEvent();
 
-				if (operatorEvents.contains(currEvent.getLabel()))
-				{
-					currEvent.setObservable(false);
-				}
-				else
-				{
-					currEvent.setObservable(true);
-				}
+				currEvent.setObservable(!operatorEvents.contains(currEvent.getLabel()));
 			}
 		}
 

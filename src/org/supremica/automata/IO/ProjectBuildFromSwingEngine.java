@@ -84,11 +84,11 @@ public class ProjectBuildFromSwingEngine
 			Automaton currAutomaton = new Automaton(currId);
 			currAutomaton.setType(AutomatonType.Plant);
 
-			State initialState = new State("currId" + "_initial");
+			State initialState = new State(currId + "_initial");
 			initialState.setInitial(true);
 			initialState.setAccepting(true);
 
-			LabeledEvent currEvent = new LabeledEvent("currId" + "_isEnabled");
+			LabeledEvent currEvent = new LabeledEvent(currId + "_isEnabled");
 
 			currAutomaton.getAlphabet().addEvent(currEvent);
 

@@ -78,6 +78,7 @@ public class DotViewer
 	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout left to right", SupremicaProperties.isDotLeftToRight());
 	protected JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", SupremicaProperties.isDotWithCircles());
 	protected JCheckBoxMenuItem withLabelsCheckBox = new JCheckBoxMenuItem("Draw state names", SupremicaProperties.isDotWithStateLabels());
+	protected JCheckBoxMenuItem withEventLabelsCheckBox = new JCheckBoxMenuItem("Draw event labels", SupremicaProperties.isDotWithEventLabels());
 	protected JCheckBoxMenuItem useStateColorsCheckBox = new JCheckBoxMenuItem("Draw state colors", SupremicaProperties.isDotUseStateColors());
 	protected JCheckBoxMenuItem useArcColorsCheckBox = new JCheckBoxMenuItem("Draw arc colors", SupremicaProperties.isDotUseArcColors());
 	protected JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem("Automatic update", SupremicaProperties.isDotAutomaticUpdate());
@@ -221,6 +222,7 @@ public class DotViewer
 		menuBar.add(menuLayout);
 		menuLayout.add(leftToRightCheckBox);
 		menuLayout.add(withLabelsCheckBox);
+		menuLayout.add(withEventLabelsCheckBox);
 		menuLayout.add(withCirclesCheckBox);
 		menuLayout.add(useStateColorsCheckBox);
 		menuLayout.add(useArcColorsCheckBox);
@@ -317,6 +319,18 @@ public class DotViewer
 				}
 			}
 		});
+
+		withEventLabelsCheckBox.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (automaticUpdateCheckBox.isSelected())
+				{
+					update();
+				}
+			}
+		});
+
 		withCirclesCheckBox.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

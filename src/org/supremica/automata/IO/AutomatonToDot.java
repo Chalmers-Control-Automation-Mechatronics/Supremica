@@ -70,6 +70,7 @@ public class AutomatonToDot
 	private boolean withCircles = false;
 	private boolean useStateColors = false;
 	private boolean useArcColors = false;
+	private boolean writeEventLabels = true;
 
 	public AutomatonToDot(Automaton aut)
 	{
@@ -90,6 +91,12 @@ public class AutomatonToDot
 	{
 		this.withLabel = withLabel;
 	}
+
+	public void setWithEventLabels(boolean withLabel)
+	{
+		this.writeEventLabels = withLabel;
+	}
+
 
 	public void setWithCircles(boolean withCircles)
 	{
@@ -255,6 +262,7 @@ public class AutomatonToDot
 
 			pw.println("\"" + getStateColor(sourceState) + "]; ");
 
+
 			for (Iterator arcSets = sourceState.outgoingArcSetIterator();
 					arcSets.hasNext(); )
 			{
@@ -268,53 +276,57 @@ public class AutomatonToDot
 				State toState = currArcSet.getToState();
 
 				pw.print("\t\"" + fromState.getId() + "\" -> \"" + toState.getId());
+
 				pw.print("\" [ label = \"");
 
-				for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
+				if (writeEventLabels)
 				{
-					Arc currArc = (Arc) arcIt.next();
-					LabeledEvent thisEvent = currArc.getEvent();    // theAlphabet.getEventWithId(currArc.getEventId());
-
-					if (!thisEvent.isControllable())
+					for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
 					{
-						pw.print("!");
+						Arc currArc = (Arc) arcIt.next();
+						LabeledEvent thisEvent = currArc.getEvent();
 
-						is_ctrl = false;
-					}
+						if (!thisEvent.isControllable())
+						{
+							pw.print("!");
 
-					if (!thisEvent.isPrioritized())
-					{
-						pw.print("?");
+							is_ctrl = false;
+						}
 
-						is_prio = true;
-					}
+						if (!thisEvent.isPrioritized())
+						{
+							pw.print("?");
 
-					if (thisEvent.isImmediate())
-					{
-						pw.print("#");
+							is_prio = true;
+						}
 
-						is_imm = true;
-					}
+						if (thisEvent.isImmediate())
+						{
+							pw.print("#");
 
-					if (thisEvent.isEpsilon())
-					{
-						pw.print("@");
+							is_imm = true;
+						}
 
-						is_eps = true;
-					}
+						if (thisEvent.isEpsilon())
+						{
+							pw.print("@");
 
-					if (!thisEvent.isObservable())
-					{
-						pw.print("$");
+							is_eps = true;
+						}
 
-						is_obs = true;
-					}
+						if (!thisEvent.isObservable())
+						{
+							pw.print("$");
 
-					pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
+							is_obs = true;
+						}
 
-					if (arcIt.hasNext())
-					{
-						pw.print("\\n");
+						pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
+
+						if (arcIt.hasNext())
+						{
+							pw.print("\\n");
+						}
 					}
 				}
 

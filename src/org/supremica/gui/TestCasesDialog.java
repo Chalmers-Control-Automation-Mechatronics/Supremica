@@ -185,7 +185,7 @@ class WarehousePanel
 {
 	Warehouse warehouse = new Warehouse();
 	IntegerField nbr_events_k = new IntegerField("3", 6);
-	IntegerField nbr_events_l = new IntegerField("1", 6);
+	IntegerField nbr_events_m = new IntegerField("1", 6);
 	SelectEventsWindow selectOperatorEventsWindow = null;
 	SelectEventsWindow selectUnobservableEventsWindow = null;
 
@@ -196,8 +196,8 @@ class WarehousePanel
 		add(panel, BorderLayout.WEST);
 		panel.add(new JLabel("Number of operator events (k): "));
 		panel.add(nbr_events_k);
-		panel.add(new JLabel("Number of supervisor events (l): "));
-		panel.add(nbr_events_l);
+		panel.add(new JLabel("Number of supervisor events (m): "));
+		panel.add(nbr_events_m);
 
 		JButton selectOperatorEventsButton = new JButton("Select operator events");
 
@@ -242,7 +242,7 @@ class WarehousePanel
 		throws Exception
 	{
 		warehouse.setK(nbr_events_k.get());
-		warehouse.setL(nbr_events_l.get());
+		warehouse.setM(nbr_events_m.get());
 
 		//System.err.println("Warehouse doIt");
 		return warehouse.getProject();

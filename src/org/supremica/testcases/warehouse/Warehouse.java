@@ -117,6 +117,7 @@ class Resource
 			// Add agv allocation event
 			LabeledEvent agvAllocationEvent = agvAlphabet.getEvent("agv" + getIdentity());
 			LabeledEvent thisAGVAllocationEvent = new LabeledEvent(agvAllocationEvent);
+			thisAGVAllocationEvent.setOperatorReset(true);
 
 			thisAlphabet.addEvent(thisAGVAllocationEvent);
 
@@ -144,6 +145,8 @@ class Resource
 				LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
 
 				thisAGVDeallocationEvent.setPrioritized(false);
+				thisAGVDeallocationEvent.setOperatorReset(true);
+
 				thisAlphabet.addEvent(thisAGVDeallocationEvent);
 
 				Arc agvDeallocationArc = new Arc(usedByAGV, orgInitialState, thisAGVDeallocationEvent);
@@ -172,6 +175,7 @@ class Resource
 			else
 			{
 				LabeledEvent thisTruckAllocationEvent = new LabeledEvent(truckAllocationEvent);
+				truckAllocationEvent.setOperatorIncrease(true);
 
 				thisAlphabet.addEvent(thisTruckAllocationEvent);
 
@@ -198,6 +202,7 @@ class Resource
 				String nextIdentity = nextResource.getIdentity();
 				LabeledEvent truckDeallocationEvent = truckAlphabet.getEvent("truck" + nextIdentity);
 				LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
+				truckDeallocationEvent.setOperatorIncrease(true);
 
 				thisTruckDeallocationEvent.setPrioritized(false);
 				thisAlphabet.addEvent(thisTruckDeallocationEvent);
@@ -320,6 +325,17 @@ class User
 			if (!controllable)
 			{
 				currEvent.setControllable(false);
+				//currEvent.setOperatorIncrease(true);
+			}
+
+			if (identity.equalsIgnoreCase("agv"))
+			{
+				currEvent.setOperatorReset(true);
+			}
+
+			if (identity.equalsIgnoreCase("truck"))
+			{
+				currEvent.setOperatorIncrease(true);
 			}
 
 			theAlphabet.addEvent(currEvent);
@@ -391,7 +407,7 @@ public class Warehouse
 	private static Logger logger = LoggerFactory.createLogger(Warehouse.class);
 	protected Project theProject = null;
 	protected int k = 3;
-	protected int l = 1;
+	protected int m = 1;
 	protected Automaton agvAutomaton = null;
 	protected Automaton truckAutomaton = null;
 	Resource r11 = null;
@@ -423,10 +439,10 @@ public class Warehouse
 		this(3, 1);
 	}
 
-	public Warehouse(int k, int l)
+	public Warehouse(int k, int m)
 	{
 		this.k = k;
-		this.l = l;
+		this.m = m;
 		theProject = new Project("Warehouse");
 
 		User u1 = new User("agv", true, theProject);
@@ -520,14 +536,14 @@ public class Warehouse
 		return k;
 	}
 
-	public void setL(int l)
+	public void setM(int m)
 	{
-		this.l = l;
+		this.m = m;
 	}
 
-	public int getL()
+	public int getM()
 	{
-		return l;
+		return m;
 	}
 
 	public Alphabet getAGVAlphabet()
@@ -570,7 +586,7 @@ public class Warehouse
 		theProject.addAutomaton(r41.getAutomaton());
 		theProject.addAutomaton(r42.getAutomaton());
 
-		ComputerHumanExtender extender = new ComputerHumanExtender(theProject, k);
+		ComputerHumanExtender extender = new ComputerHumanExtender(theProject, k, m);
 
 		try
 		{
@@ -578,7 +594,7 @@ public class Warehouse
 
 			Automaton newAutomaton = extender.getNewAutomaton();
 
-			newAutomaton.setName("Extender");
+			//newAutomaton.setName("Extender");
 			theProject.addAutomaton(newAutomaton);
 		}
 		catch (Exception ex)
@@ -586,6 +602,7 @@ public class Warehouse
 			logger.error("Error in ComputerHumanExtender");
 			logger.debug(ex.getStackTrace());
 		}
+
 	}
 
 	public Project getProject()

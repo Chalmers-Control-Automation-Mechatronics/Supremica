@@ -88,7 +88,7 @@ public class RemovePassEvent
 				// String currEventId = currArc.getEventId();
 				LabeledEvent currEvent = currArc.getEvent();    // theAlphabet.getEventWithId(currEventId);
 
-				if (currEvent.getLabel().equals("pass"))
+				if (currEvent.equals(ComputerHumanExtender.passEvent))
 				{
 
 					// A state with outgoing pass event is found
@@ -121,9 +121,9 @@ public class RemovePassEvent
 			}
 		}
 
-		if (theAlphabet.contains("pass"))
+		if (theAlphabet.contains(ComputerHumanExtender.passEvent))
 		{
-			LabeledEvent passEvent = theAlphabet.getEvent("pass");
+			LabeledEvent passEvent = theAlphabet.getEvent(ComputerHumanExtender.passEvent);
 
 			theAlphabet.removeEvent(passEvent);
 		}
