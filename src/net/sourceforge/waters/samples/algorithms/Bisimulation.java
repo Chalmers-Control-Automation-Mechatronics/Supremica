@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   Bisimulation
 //###########################################################################
-//# $Id: Bisimulation.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: Bisimulation.java,v 1.2 2005-02-20 23:28:46 robi Exp $
 //###########################################################################
 
 
@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -204,7 +204,7 @@ public class Bisimulation {
       mCode = code;
       mName = new StringBuffer();
       mInitial = false;
-      mPropositions = new LinkedList();
+      mPropositions = new TreeSet();
     }
 
     //#######################################################################
@@ -247,9 +247,9 @@ public class Bisimulation {
     //#######################################################################
     //# Data Members
     private final int mCode;
+    private final Set mPropositions;
     private StringBuffer mName;
     private boolean mInitial;
-    private Collection mPropositions;
   }
 
 
