@@ -65,9 +65,11 @@ abstract class SynchronizationPanel
 class SynchronizationDialogStandardPanel
 	extends SynchronizationPanel
 {
+	private static final long serialVersionUID = 1L;
 	private JCheckBox forbidUnconStatesBox;
 	private JCheckBox buildAutomatonBox;
 	private JCheckBox useShortStateNamesBox;
+	private JTextField stateNameSeparator;
 
 	public SynchronizationDialogStandardPanel()
 	{
@@ -81,9 +83,15 @@ class SynchronizationDialogStandardPanel
 		useShortStateNamesBox = new JCheckBox("Use short state names");
 		useShortStateNamesBox.setToolTipText("Give the states in the composition short, abstract names instead of keeping the original state names");
 
+		JLabel stateNameSeparatorLabel = new JLabel("State name separator");
+		stateNameSeparator = new JTextField();
+		stateNameSeparator.setToolTipText("The name of the synchronized state is a concatenation of the names of the states, separated by this string.");
+
 		standardBox.add(forbidUnconStatesBox);
 		standardBox.add(buildAutomatonBox);
 		standardBox.add(useShortStateNamesBox);
+		standardBox.add(stateNameSeparatorLabel);
+		standardBox.add(stateNameSeparator);
 		this.add(standardBox);
 	}
 
@@ -92,6 +100,7 @@ class SynchronizationDialogStandardPanel
 		forbidUnconStatesBox.setSelected(synchronizationOptions.forbidUncontrollableStates());
 		buildAutomatonBox.setSelected(synchronizationOptions.buildAutomaton());
 		useShortStateNamesBox.setSelected(synchronizationOptions.useShortStateNames());
+		stateNameSeparator.setText(synchronizationOptions.getStateNameSeparator());
 	}
 
 	public void regain(SynchronizationOptions synchronizationOptions)
@@ -99,6 +108,7 @@ class SynchronizationDialogStandardPanel
 		synchronizationOptions.setForbidUncontrollableStates(forbidUnconStatesBox.isSelected());
 		synchronizationOptions.setBuildAutomaton(buildAutomatonBox.isSelected());
 		synchronizationOptions.setUseShortStateNames(useShortStateNamesBox.isSelected());
+		synchronizationOptions.setStateNameSeparator(stateNameSeparator.getText());
 	}
 }
 
@@ -106,6 +116,7 @@ class SynchronizationDialogAdvancedPanel
 	extends SynchronizationPanel
 	implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	private JComboBox synchronizationTypeBox;
 	private JCheckBox expandForbiddenStatesBox;
 	private JCheckBox rememberDisabledEventsBox;
