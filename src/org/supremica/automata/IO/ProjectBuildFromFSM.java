@@ -375,6 +375,7 @@ public class ProjectBuildFromFSM
 						{
 							logger.warn(currEvent + " is already defined");
 						}
+						System.err.println("extra events - read: " + currEvent);
 
 						boolean currEventControllable = true;
 						boolean currEventObservable = true;
@@ -382,6 +383,7 @@ public class ProjectBuildFromFSM
 						while (tokenizer.hasMoreTokens())
 						{
 							String optionalParameter = tokenizer.nextToken();
+							System.err.println("extra events - more tokens: " + optionalParameter);
 							if (optionalParameter.equalsIgnoreCase("c"))
 							{
 								currEventControllable = true;
