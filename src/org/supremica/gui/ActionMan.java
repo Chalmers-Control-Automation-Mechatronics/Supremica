@@ -2087,7 +2087,7 @@ public class ActionMan
 				return;
 			}
 		}
-			
+
 		if (!currProject.isDeterministic())
 		{
 			// JOptionPane.showMessageDialog(gui.getComponent(), "All automata are not determinstic. Operation aborted", "alert", JOptionPane.ERROR_MESSAGE);
@@ -2911,51 +2911,19 @@ public class ActionMan
 	}
 
 
-	//shoeFactory - animate
+	//open JgrafchartEditor
 	public static void openJGrafchartEditor(Gui gui)
 	{
 		String[] args = new String[1];
-		args[0] = "";
+		args[0]="";
 		EditorAPI e = new EditorAPI(args);
 		Editor.singleton = e;
-/*
-		e.removePaletteAction();
-		// Create Top-level Workspace
-		GCDocument top = e.newWorkspace();
-		top.setWorkspaceName("Nisse");
-		top.setFrameRectangle(new Rectangle(300,500,400,400));
-		// Create WorkspaceObject
-		WorkspaceObject wo = top.createWorkspaceObject(300,50,"Vars");
-		GCDocument vars = wo.getSubWorkspace();
-		// Create variables inside workspace object
-		IntegerVariable iv = vars.createIntegerVariable(50,50,"Int1","99");
-		BooleanVariable bv = vars.createBooleanVariable(50,120,"Bool1","1");
-		StringVariable sv = vars.createStringVariable(50,190,"String1","Hello");
-		// Create Grafcet
-		GCStepInitial initialStep = top.createInitialStep(100,50,"",";");
-		initialStep.setActionText("S println(\"Hej\");");
-		GCTransition tr1 = top.createTransition(100,130,"1");
-		GCStep s1 = top.createStep(100,180,"myStep","S Vars.Int1 = Vars.Int1 + 1;");
-		GCTransition tr2 = top.createTransition(100,260,"myStep.s > 4");
-		tr2.setConditionText("myStep.s > 5");
-		// Connect together
-		top.connect(initialStep,tr1);
-		top.connect(tr1,s1);
-		top.connect(s1,tr2);
-		top.connect(tr2,initialStep);
-		// Compile and run
-		boolean OK = e.compileWorkspace(top);
-		if (OK)
-		{
-			e.startWorkspace(top);
-		}
-*/
-    }
+	}
 
 	//shoeFactory - Config
 	public static void shoeFactoryConfigurator()
 	{
-		Configit con = new Configit();
+		Configit con = new Configit(gui);
 		con.setLocationRelativeTo(null);
 		con.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		try
@@ -2971,23 +2939,13 @@ public class ActionMan
 	//shoeFactory - animate
 	public static void shoeFactoryAnimator(Gui gui)
 	{
-		JFrame frame = new Factory();
-		frame.setLocationRelativeTo(null);
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			try
-			{
-				frame.show();
-			}
-			catch (Exception ex)
-			{
-				logger.error("shoeFactoryBuildPlant: " + ex.getMessage());
-			}
+
 	}
 
 	// shoeFactory - build plant
 	public static void shoeFactoryBuildPlant(Gui gui)
 	{
-//		Project selectedProject = gui.getSelectedProject();
+		//Project selectedProject = gui.getSelectedProject();
 		Plant newPlant = new Plant();
 		Project newProject = newPlant.getPlant();
 		try
@@ -2999,17 +2957,18 @@ public class ActionMan
 		{
 			logger.error("shoeFactoryBuildPlant: " + ex.getMessage());
 		}
-		int[] syncAutomata = {0,1};
+		int[] syncAutomata = {0,1,2,3};
 		SyncBuilder syncPlant = new SyncBuilder(gui, newProject, syncAutomata);
 		//syncPlant.synchronizePlants("Synchronized");
-	//	syncPlant.synthesizePlants("Synthesized");
+		syncPlant.synthesizePlants("theSupervisor");
 	}
 
-	//shoeFactory - SFC
+	//shoeFactory - build SFC
 	public static void shoeFactorySFC()
 	{
-		JGrafbuilder JGR = new JGrafbuilder();
+
 	}
+
 
 	// Generate ABB Control Builder IL
 	public static void ProjectToControlBuilderIL(Gui gui)
