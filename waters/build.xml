@@ -1,4 +1,4 @@
-<project name="waters" default="jar">
+<project name="waters" default="waters-jar">
   <description>
   </description>
 
