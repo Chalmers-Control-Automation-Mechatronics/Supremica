@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -193,6 +192,7 @@ class AutomataSelector
 		return seenSpec;
 	}
 }
+
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
 {
@@ -466,7 +466,7 @@ public class AutomataSynthesizer
 			}
 			else
 			{
-				logger.info("No problems found, the specifications can be used as supervisors, as is");
+				logger.info("No problems found, the specifications can be used as supervisors, as is.");
 			}
 			if(synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking || synthesizerOptions.getSynthesisType() == SynthesisType.Both)
 			{
@@ -583,10 +583,10 @@ public class AutomataSynthesizer
 
 	/**
 	 * Removes unnecessary automata, i.e. synthesized supervisors that don't affect the controllability.
-	 * Note: At the moment, only controllability checked, no nonblocking.
+	 * Note: At the moment, only controllability is checked, no non-blocking.
 	 *
-	 *@param  theAutomata contains the originally given specs/sups and plants
-	 *@param  newAutomata the Automata-object containing the new supervisors, is altered!
+	 * @param  theAutomata contains the originally given specs/sups and plants
+	 * @param  newAutomata the Automata-object containing the new supervisors, is altered!
 	 */
 	private void optimize(Automata theAutomata, Automata newAutomata)
 	{
@@ -621,10 +621,11 @@ public class AutomataSynthesizer
 		currAutomata.addAutomata(theAutomata);
 		currAutomata.addAutomata(tempAutomata);
 
-		// AutomataFastControllabilityCheck theFastControllabilityCheck;
 		AutomataVerifier theVerifier;
 		VerificationOptions theVerificationOptions = new VerificationOptions();
-		theVerificationOptions.setVerificationType(VerificationType.Controllability);
+		theVerificationOptions.setVerificationType(VerificationType.Controllability); // Is this the only necessary option?
+
+		// Remove the new automata one by one and examine if it had impact on the result.
 		for (int i = tempAutomata.size() - 1; i >= 0; i--)
 		{
 			currAutomata.removeAutomaton(tempAutomata.getAutomatonAt(i));

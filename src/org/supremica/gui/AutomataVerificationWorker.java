@@ -221,22 +221,22 @@ public class AutomataVerificationWorker
 		timer.start();
 		verificationSuccess = automataVerifier.verify();
 		timer.stop();
-
+		
+		// Make sure(?) the ExecutionDialog is hidden!
+		// I thought this wouldn't work... but it seems
+		// it does!! /hguo
+		eventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					if (executionDialog != null)
+						executionDialog.setMode(ExecutionDialogMode.hide);
+				}
+			});
+		
 		// Present the result
 		if (!stopRequested)
 		{
-			// Make sure(?) the ExecutionDialog is hidden!
-			// I thought this wouldn't work... but it seems
-			// it does!! /hguo
-			eventQueue.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						if (executionDialog != null)
-							executionDialog.setMode(ExecutionDialogMode.hide);
-					}
-				});
-
 			// Show message dialog with result
 			if (verificationSuccess)
 			{
@@ -253,10 +253,13 @@ public class AutomataVerificationWorker
 		}
 		else
 		{
+			JOptionPane.showMessageDialog(workbench.getFrame(), "Execution stopped after " + 
+										  timer.toString(), "Execution stopped", 
+										  JOptionPane.INFORMATION_MESSAGE);
 			automataVerifier.getHelper().displayInfo();
 			logger.info("Execution stopped after " + timer.toString());
 		}
-
+		
 		// We're finished! Bail out! Make sure to kill the ExecutionDialog!
 		if (executionDialog != null)
 		{

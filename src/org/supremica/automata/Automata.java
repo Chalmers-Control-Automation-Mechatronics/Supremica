@@ -51,6 +51,8 @@ package org.supremica.automata;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.gui.Gui;
+import javax.swing.JOptionPane;
 
 /**
  * An ordered set of Automaton-objects.
@@ -595,6 +597,7 @@ public class Automata
 		Alphabet theAlphabet;
 		try
 		{
+			// Why "this, false, false"?!? Shouldn't it be "this, true, true"?  /hugo
 			theAlphabet = AlphabetHelpers.getUnionAlphabet(this, false, false);
 		}
 		catch (Exception ex)
@@ -609,6 +612,21 @@ public class Automata
 			currAutomaton.setIndicies(i++, theAlphabet);
 		}
 		return theAlphabet;
+	}
+
+	/**
+	 * Returns the union alphabet of all represented automata.
+	 */
+	public Alphabet getUnionAlphabet()
+	{
+		try
+		{
+			return AlphabetHelpers.getUnionAlphabet(this);
+		}
+		catch (Exception ex)
+		{
+			throw new RuntimeException(ex);
+		}
 	}
 
 	public Automaton getAutomaton(String name)
@@ -927,4 +945,131 @@ public class Automata
 		return sbuf.toString();
 	}
 
+	/**
+	 * Examines automata size and, optionally, if all automata
+	 * has initial states and/or a defined type.
+	 *
+	 * @param gui If gui != null, a JOptionPane shows the results and guides the user.
+	 * @param minSize Minimum size of the automata.
+	 * @param mustHaveInitial Test requires automata to have initial states.
+	 * @param mustHaveType Test requires that the automata are not of undefined type.
+	 *
+	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
+	 */
+	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, 
+											   boolean mustHaveType)
+	{
+		if (mustHaveInitial)
+		{
+			// All automata must have initial states.
+			// There is another method for this, Automata.hasInitialState(),
+			// but it doesn't tell which automaton breaks the test...
+			Iterator autIt = iterator();
+			while (autIt.hasNext())
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+
+				// Does this automaton have an initial state?
+				if (!currAutomaton.hasInitialState())
+				{
+					if (gui != null)
+					{
+						String message = "The automaton \"" + currAutomaton.getName() + 
+							"\" does not have an initial state.\n" +
+							"Skip this automaton or Cancel the whole operation?";
+						Object[] options = { "Skip", "Cancel" };
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
+																JOptionPane.OK_CANCEL_OPTION, 
+																JOptionPane.WARNING_MESSAGE, null, 
+																options, options[1]);
+						
+						if(cont == JOptionPane.OK_OPTION)
+						{   // Skip
+							// Unselect the automaton
+							gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
+							// Skip this automaton (remove it from this)
+							autIt.remove();
+						}
+						else // JOptionPane.CANCEL_OPTION
+						{   // Cancel
+							// This is iNsanE!
+							return false;
+						}
+					}
+					else
+					{
+						// This is iNsaNe!
+						return false;
+					}
+				}
+			}
+		}
+
+		if (mustHaveType)
+		{
+			// All automata must have a defined type, i.e. must not be of type "Undefined".
+			Iterator autIt = iterator();
+			while (autIt.hasNext())
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+
+				// Is this Automaton's type AutomatonType.Undefined?
+				if(currAutomaton.getType() == AutomatonType.Undefined)
+				{
+					if (gui != null)
+					{
+						String message = "The automaton \"" + currAutomaton.getName() +
+							"\" is of type \"Undefined\".\n" +
+							"Skip this automaton or Cancel the whole operation?";
+						Object[] options = { "Skip", "Cancel" };
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
+																JOptionPane.OK_CANCEL_OPTION, 
+																JOptionPane.WARNING_MESSAGE, null, 
+																options, options[1]);
+						
+						if(cont == JOptionPane.OK_OPTION)
+						{   // Skip
+							// Unselect the automaton
+							gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
+							// Skip this automaton (remove it from this)
+							autIt.remove();
+						}
+						else // JOptionPane.CANCEL_OPTION
+						{   // Cancel
+							// This is iNsaNe!
+							return false;
+						}
+					}
+					else
+					{
+						// This is iNsaNe!
+						return false;
+					}
+				}
+			}
+		}
+
+		// Make sure the automata has the right size!
+		if (minSize > 0 && size() < minSize)
+		{
+			if (gui != null)
+			{
+				String size;
+				if (minSize == 1)
+					size = "one automaton";
+				else if (minSize == 2)
+					size = "two automata";
+				else
+					size = minSize + " automata";
+				JOptionPane.showMessageDialog(gui.getFrame(), "At least " +
+											  size + " must be selected!",
+											  "Alert", JOptionPane.ERROR_MESSAGE);
+			}
+			// This is inSaNe!
+			return false;
+		}
+
+		// Sane!
+		return true;
+	}
 }

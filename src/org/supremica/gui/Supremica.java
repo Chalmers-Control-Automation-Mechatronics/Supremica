@@ -211,7 +211,6 @@ public class Supremica
 				}
 			}
 
-
 			public void mousePressed(MouseEvent e)
 			{
 

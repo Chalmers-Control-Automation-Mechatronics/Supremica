@@ -168,7 +168,6 @@ public class ActionMan
 	// File.NewFromTemplate action performed
 	public static void fileNewFromTemplate(Gui gui, TemplateItem item)
 	{
-
 		// logger.debug("ActionMan.fileNewFromTemplate Start");
 		Automata newAutomata;
 
@@ -233,6 +232,27 @@ public class ActionMan
 	// Automata.AlphabetAnalyzer action performed
 	public static void alphabetAnalyzer_actionPerformed(Gui gui)
 	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 2, false, false))
+		{
+			return;
+		}
+
+		// Analyze the alphabets
+		AlphabetAnalyzer theAnalyzer = new AlphabetAnalyzer(selectedAutomata);
+		try
+		{
+			theAnalyzer.execute();
+		}
+		catch (Exception ex)
+		{
+			logger.error("Exception in AlphabetAnalyzer ", ex);
+			logger.debug(ex.getStackTrace());
+		}
+
+		gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
+	
+		/*
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() >= 2)
@@ -243,12 +263,10 @@ public class ActionMan
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
-
 				currAutomata.addAutomaton(currAutomaton);
 			}
 
 			AlphabetAnalyzer theAnalyzer = new AlphabetAnalyzer(currAutomata);
-
 			try
 			{
 				theAnalyzer.execute();
@@ -263,9 +281,12 @@ public class ActionMan
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 		}
+		*/
 	}
 
 	// Automaton.UpdateInterface action performed
+	//
+	// What is this method used for? When? /Hguo.
 	public static void automatonUpdateInterface_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
@@ -311,6 +332,13 @@ public class ActionMan
 	// Automata.AddSelfLoopArcs action performed
 	public static void automataAddSelfLoopArcs_actionPerformed(Gui gui)
 	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		{
+			return;
+		}
+		
+		/*
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -319,9 +347,9 @@ public class ActionMan
 
 			return;
 		}
+		*/
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -341,6 +369,13 @@ public class ActionMan
 	// Automaton.AllAccepting action performed
 	public static void automataAllAccepting_actionPerformed(Gui gui)
 	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		{
+			return;
+		}
+
+		/*
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -349,9 +384,9 @@ public class ActionMan
 
 			return;
 		}
+		*/
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -372,6 +407,13 @@ public class ActionMan
 	// Automaton.Complement action performed
 	public static void automataComplement_actionPerformed(Gui gui)
 	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		{
+			return;
+		}
+
+		/*
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
@@ -380,9 +422,9 @@ public class ActionMan
 
 			return;
 		}
+		*/
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -412,7 +454,14 @@ public class ActionMan
 	// Automata.Copy action performed
 	public static void automataCopy_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		{
+			return;
+		}
+
+		/*
+		  Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
 		{
@@ -420,9 +469,9 @@ public class ActionMan
 
 			return;
 		}
+		*/
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -453,6 +502,13 @@ public class ActionMan
 	public static void automataDelete_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		{
+			return;
+		}
+
+		/*
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
 		{
@@ -460,6 +516,7 @@ public class ActionMan
 
 			return;
 		}
+		*/
 
 		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
@@ -499,23 +556,21 @@ public class ActionMan
 	public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		int[] selectionIndices = new int[selectedAutomata.size()];
-		int index = 0;
-		Project theProject = gui.getVisualProjectContainer().getActiveProject();
-
-		if (selectedAutomata.size() < 1)
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
+		Project theProject = gui.getVisualProjectContainer().getActiveProject();
 		if (selectedAutomata.size() == theProject.size())
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "No point in moving all automata, right?", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
+
+		int[] selectionIndices = new int[selectedAutomata.size()];
+		int index = 0;
 
 		// Avoid automata that can't move any further
 		Iterator autIt;
@@ -693,14 +748,9 @@ public class ActionMan
 	// it is now (ARASH)
 	public static void automataExport(Gui gui)
 	{
-		// this one comes back in the next function. we need to have duplicates otherwise we would
-		// ask for the type and first then complain if nonthing is selected
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
@@ -726,6 +776,13 @@ public class ActionMan
 	public static void automataExport(Gui gui, int exportMode)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
+		{
+			return;
+		}
+
+		/*
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
 		{
@@ -733,6 +790,7 @@ public class ActionMan
 
 			return;
 		}
+		*/
 
 		// Take care of the new debug stuff first. This is really silly.
 		// Proper design would have solved this problem
@@ -1001,7 +1059,7 @@ public class ActionMan
 	public static void automataExtend_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1043,7 +1101,7 @@ public class ActionMan
 	public static void automataPurge_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1070,7 +1128,7 @@ public class ActionMan
 	public static void automataRemovePass_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1097,7 +1155,7 @@ public class ActionMan
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1123,7 +1181,7 @@ public class ActionMan
 	public static void automataRename_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1156,7 +1214,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 2, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 2, true, false))
 		{
 			return;
 		}
@@ -1215,7 +1273,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, true, true))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, true))
 		{
 			return;
 		}
@@ -1402,7 +1460,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, false))
 		{
 			return;
 		}
@@ -1474,7 +1532,7 @@ public class ActionMan
 		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1535,7 +1593,7 @@ public class ActionMan
 	{
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, false))
 		{
 			return;
 		}
@@ -1663,7 +1721,7 @@ public class ActionMan
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1704,11 +1762,13 @@ public class ActionMan
 		gui.info("Number of automata: " + gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata());
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
 		gui.info("Number of selected automata: " + selectedAutomata.size());
+
+		gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
 		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 		{
@@ -1758,7 +1818,7 @@ public class ActionMan
 	public static void hierarchyView_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -1786,7 +1846,7 @@ public class ActionMan
 
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, true, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, true, false))
 		{
 			return;
 		}
@@ -2284,7 +2344,7 @@ public class ActionMan
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -2412,7 +2472,7 @@ public class ActionMan
 	public static void evoCompSynchTable(Gui gui, boolean append)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -2476,7 +2536,7 @@ public class ActionMan
 	public static void evoCompPredictSize(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		if (!selectedAutomata.sanityCheck(gui, 1, false, false))
 		{
 			return;
 		}
@@ -3415,13 +3475,14 @@ public class ActionMan
 	 * Examines automata size and, optionally, if all automata
 	 * has initial states and/or a defined type.
 	 *
-	 * @param theAutomata The automata to be tested for sanity.
-	 * @param minSize Minimum size of theAutomata.
+	 * @param theAutomata The automata.
+	 * @param minSize Minimum size of the automata.
 	 * @param mustHaveInitial Test requires automata to have initial states.
 	 * @param mustHaveType Test requires that the automata are not of undefined type.
 	 */
-	private static boolean automataSanityCheck(Automata theAutomata, int minSize,
-											   boolean mustHaveInitial, boolean mustHaveType)
+	/* This method now resides in automata.Automata
+	private static boolean sanityCheck(Automata theAutomata, int minSize, boolean mustHaveInitial, 
+											   boolean mustHaveType)
 	{
 		if (mustHaveInitial)
 		{
@@ -3436,28 +3497,24 @@ public class ActionMan
 				// Does this automaton have an initial state?
 				if (!currAutomaton.hasInitialState())
 				{
-					/*
-					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomaton.getName() +
-												  " does not have an initial state!", "Alert",
-												  JOptionPane.ERROR_MESSAGE);
-					// This is iNsanE!
-					return false;
-					*/
-
-					String message = "The automaton " + currAutomaton.getName() + " does not have an initial state.\n" +
+					String message = "The automaton \"" + currAutomaton.getName() + 
+						"\" does not have an initial state.\n" +
 						"Skip this automaton or Cancel the whole operation?";
 					Object[] options = { "Skip", "Cancel" };
-					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
+															JOptionPane.OK_CANCEL_OPTION, 
+															JOptionPane.WARNING_MESSAGE, null, 
+															options, options[1]);
 
 					if(cont == JOptionPane.OK_OPTION)
-					{
+					{   // Skip
 						// Unselect the automaton
 						gui.unselectAutomaton(theAutomata.getAutomatonIndex(currAutomaton));
-						// Skip this automaton (remove it from theAutomata)
+						// Skip this automaton (remove it from this)
 						autIt.remove();
 					}
 					else // JOptionPane.CANCEL_OPTION
-					{
+					{   // Cancel
 						// This is iNsanE!
 						return false;
 					}
@@ -3476,22 +3533,25 @@ public class ActionMan
 				// Is this Automaton's type AutomatonType.Undefined?
 				if(currAutomaton.getType() == AutomatonType.Undefined)
 				{
-					String message = "The automaton " + currAutomaton.getName() +
-						" is of 'Undefined' type.\n" +
+					String message = "The automaton \"" + currAutomaton.getName() +
+						"\" is of type \"Undefined\".\n" +
 						"Skip this automaton or Cancel the whole operation?";
 					Object[] options = { "Skip", "Cancel" };
-					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
+															JOptionPane.OK_CANCEL_OPTION, 
+															JOptionPane.WARNING_MESSAGE, null, 
+															options, options[1]);
 
 					if(cont == JOptionPane.OK_OPTION)
-					{
+					{   // Skip
 						// Unselect the automaton
-						gui.unselectAutomaton(theAutomata.getAutomatonIndex(currAutomaton));
-						// Skip this automaton (remove it from theAutomata)
+						gui.unselectAutomaton(getAutomatonIndex(currAutomaton));
+						// Skip this automaton (remove it from this)
 						autIt.remove();
 					}
 					else // JOptionPane.CANCEL_OPTION
-					{
-						// This is iNsanE!
+					{   // Cancel
+						// This is iNsaNe!
 						return false;
 					}
 				}
@@ -3518,6 +3578,7 @@ public class ActionMan
 		// Sane!
 		return true;
 	}
+	*/
 }
 
 // ActionMan
