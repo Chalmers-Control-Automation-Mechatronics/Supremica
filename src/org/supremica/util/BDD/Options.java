@@ -93,19 +93,22 @@ public class Options
 
 	/** (PN) transition optimization algorithm */
 	public static final String [] TRANSITION_OPTIMIZER_NAMES = {
-			"none", "random"
+			"none", "random", "Knap-Sack", "safe Knap-Sack", "automaton"
 			};
 
 	public static final int
 		TRANSITION_OPTIMIZER_NONE = 0,
-		TRANSITION_OPTIMIZER_RANDOM = 1
+		TRANSITION_OPTIMIZER_RANDOM = 1,
+		TRANSITION_OPTIMIZER_KNAPSACK = 2,
+		TRANSITION_OPTIMIZER_KNAPSACK_SAFE = 3,
+		TRANSITION_OPTIMIZER_AUTOMATON = 4
 		;
 
-	public static int transition_optimizer_algo = TRANSITION_OPTIMIZER_NONE;
+	public static int transition_optimizer_algo = TRANSITION_OPTIMIZER_KNAPSACK_SAFE;
 
 
 	/** language controllability/inclusion algorithms */
-	public static final String[] INCLUSION_ALGORITHM_NAMES = { "Monolithic      ",
+	public static final String[] INCLUSION_ALGORITHM_NAMES = { "Monolithic",
 															   "Modular",
 															   "Incremental" };
 	public static final int INCLUSION_ALGO_MONOLITHIC = 0,
@@ -116,7 +119,7 @@ public class Options
 	/** C/LI algorithm */
 
 	/** state counting algorithm */
-	public static final String[] COUNT_ALGO_NAMES = { "No counting         ",
+	public static final String[] COUNT_ALGO_NAMES = { "No counting",
 													  "Tree SAT",
 													  "Exact (slow!)" };
 	public static final int COUNT_NONE = 0, COUNT_TREE = 1, COUNT_EXACT = 2;
@@ -124,7 +127,7 @@ public class Options
 
 	/** the cost function in the FORCE heuristic */
 	public static final String[] FORCE_TYPE_NAMES = {
-			"Max Cut     ", "Total Span", "Max Span"
+			"Max Cut", "Total Span", "Max Span"
 	};
 
 	public static final int FORCE_TYPE_MAXCUT = 0,
@@ -136,9 +139,9 @@ public class Options
 	public static final String[] ORDERING_ALGORITHM_NAMES = { "Random (!)",
 															  "PCG search",
 															  "modified TSP",
-															  "Topological sort (DFS) ",
-															  "Topological sort (BFS) ",
-															  "STCT: simulated annealing  ",
+															  "Topological sort (DFS)",
+															  "Topological sort (BFS)",
+															  "STCT: simulated annealing",
 															  "TSP + STCT:SA ",
 															  "TSP + sifting",
 															  "Aloul's FORCE",
@@ -175,7 +178,7 @@ public class Options
 	public static int as_heuristics = AS_HEURISTIC_HYBRID;
 
 	/** The choice between R and frontier set in image computation */
-	public static final String[] FRONTIER_STRATEGY_NAMES = { "Random R/front  ",
+	public static final String[] FRONTIER_STRATEGY_NAMES = { "Random R/front",
 															 "R", "front",
 															 "front \\ R",
 															 "min[front, R]" };
@@ -219,7 +222,7 @@ public class Options
 	/** BDD grow graph */
 	public static final String SHOW_GROW_NAMES[] = {
 														"None", "Simple statistics", "Node count",
-													 "logNode (log scale)   ",
+													 "logNode (log scale)",
 													 "Node delta",
 													 "SAT count", "logSAT",
 													 "SAT delta",
@@ -237,7 +240,7 @@ public class Options
 	/** type of the BDD graph shown by GrowFrame */
 
 	/** insertation heuristic for Delayed* smoothing algorithm */
-	public static final String[] DSSI_HEURISTIC_NAMES = { "Random          ",
+	public static final String[] DSSI_HEURISTIC_NAMES = { "Random",
 														  "Stack", "FIFO",
 														  "Smallest BDD",
 														  "Largest BDD" };
@@ -246,7 +249,7 @@ public class Options
 	public static int dssi_heuristics = DSSI_STACK;
 
 	/** H2: Non-deteministic Automata Selection: how to use between equally expensive automata ? (see for example Workset.java) */
-	public static final String[] NDAS_HEURISTIC_NAMES = { "Random          ",
+	public static final String[] NDAS_HEURISTIC_NAMES = { "Random",
 														  "Topologically first",
 														  "Topologically last",
 														  "Ring",

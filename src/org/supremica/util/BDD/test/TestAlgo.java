@@ -145,6 +145,9 @@ public class TestAlgo
 		System.err.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 		System.err.println("Encoding algo: " + Options.ENCODING_NAMES[Options.encoding_algorithm]);
 		System.err.println("Ordering algo: " + Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
+		System.err.println("Partition optimization: " + Options.DISJ_OPTIMIZER_NAMES[Options.disj_optimizer_algo]);
+		System.err.println("Transition optimization: " + Options.TRANSITION_OPTIMIZER_NAMES[Options.transition_optimizer_algo]);
+
 		if(!Options.interleaved_variables)	System.err.println("Using SEPARATED ordering!");
 		System.err.println();
 		System.exit(20);    // comment out to allow ALL tests to run before stopped
@@ -410,6 +413,7 @@ public class TestAlgo
 	{
 		Options.test_integrity = true; // enable extra runtime tests!
 		fail = pass = 0;
+		int oldalgo, oldopt;
 
 		// find the small models that we will use in some expreiments
 		int agv = find("agv.xml");
@@ -419,6 +423,7 @@ public class TestAlgo
 		SMALL_MODELS = new int[2];
 		SMALL_MODELS[0] = agv;
 		SMALL_MODELS[1] = catmouse;
+
 
 		for (int k = 0; k < 4; k++)
 		{
@@ -532,8 +537,8 @@ public class TestAlgo
 
 
 		// test the disjunctive optimization:
-		int oldalgo = Options.algo_family;
-		int oldopt = Options.disj_optimizer_algo;
+		oldalgo = Options.algo_family;
+		oldopt = Options.disj_optimizer_algo;
 		for(int m = 0; m < SMALL_MODELS.length; m++) {
 			int model = SMALL_MODELS[m];
 			System.out.println("\n***** Testing disjunctive optimization, using " + TEST_FILES[ model] );
@@ -570,9 +575,12 @@ public class TestAlgo
 
 
 
+
 		// test the transition optimization:
 		oldalgo = Options.algo_family;
 		oldopt = Options.transition_optimizer_algo;
+
+
 		for(int m = 0; m < SMALL_MODELS.length; m++) {
 			int model = SMALL_MODELS[m];
 
@@ -600,9 +608,9 @@ public class TestAlgo
 
 			}
 		}
+
 		Options.algo_family = oldalgo;
 		Options.transition_optimizer_algo = oldopt;
-
 
 
 
@@ -699,6 +707,7 @@ public class TestAlgo
 		}
 
 
+
 		System.out.println("\n\n");
 		if (fail == 0)
 		{
@@ -758,6 +767,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.27  2004/10/28 16:44:31  flordal
+ *** empty log message ***
+
  Revision 1.26  2004/10/25 15:24:30  vahidi
  *** empty log message ***
 

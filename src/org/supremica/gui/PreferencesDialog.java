@@ -1011,11 +1011,20 @@ class BDDPanel1
 		insert(ret, choices, default_);
 		return ret;
 	}
+
 	public static void insert(JComboBox cb, String[] names, int def)
 	{
+		// we add an extra space to the largest text so that everything can fit
+		int max_size = 0;
 		for (int i = 0; i < names.length; i++)
 		{
-			cb.addItem(names[i]);
+			max_size = Math.max( max_size, names[i].length() );
+		}
+
+		for (int i = 0; i < names.length; i++)
+		{
+			if(names[i].length() == max_size) cb.addItem(names[i] + "      ");
+			else			cb.addItem(names[i]);
 		}
 
 		cb.setSelectedIndex(def);

@@ -113,6 +113,8 @@ public class SizeWatch
 				buf.append(' ');
 			}
 
+			buf.append("  "); // extra space in case we are larger than 40
+
 			buf.append(size);
 			me.addString(buf.toString());
 		}

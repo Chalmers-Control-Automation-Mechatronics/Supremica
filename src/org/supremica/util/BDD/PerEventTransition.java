@@ -12,7 +12,7 @@ package org.supremica.util.BDD;
  * we can also join two such objects, and then it represents more than a single transitions
  */
 
-public class PerEventTransition
+public class PerEventTransition implements WeightedObject
 {
 	private BDDAutomata manager;
 	private int bdd_t, bdd_keep; /** the generated T and keep BDDs */
@@ -21,8 +21,50 @@ public class PerEventTransition
 	private boolean[] automata_cover;
 	private int[] next_event, prev_event;
 	private int[] event_list; /** list of events associated with this transition, usually a singlton */
+	private int [] others_s, others_sp; // The "keep" varaibes
 	private String name;
 
+
+	// -----------------------------------------------------------------------------------
+
+	/**
+	 * copy constructor
+	 *
+	 */
+	public PerEventTransition(PerEventTransition clone)
+	{
+		this.name        = clone.name;
+		this.manager     = clone.manager;
+
+		this.bdd_t       = manager.ref( clone.bdd_t);
+		this.bdd_keep    = manager.ref( clone.bdd_keep);
+
+
+		this.members     = clone.members;
+		this.next_events = clone.next_events;
+		this.prev_events = clone.prev_events;
+		this.events_used = clone.events_used;
+
+
+		// we could actually do a shallow copy of vectors since they are read-only and
+		// Java has garbage-collection, but we copy them just to be safe
+		this.automata_cover = Util.duplicate( clone.automata_cover) ;
+		this.next_event     = Util.duplicate( clone.next_event) ;
+		this.prev_event     = Util.duplicate( clone.prev_event) ;
+		this.event_list     = Util.duplicate( clone.event_list) ;
+
+
+
+
+
+
+		// permutation that does the same job as "keep"
+		others_s  = Util.duplicate( clone.others_s);
+		others_sp = Util.duplicate( clone.others_sp);
+		others_s2sp = manager.createPair(others_s, others_sp);
+		others_sp2s = manager.createPair(others_sp, others_s);
+
+	}
 
 	// -----------------------------------------------------------------------------------
 
@@ -128,7 +170,8 @@ public class PerEventTransition
 
 
 		// permutation that does the same job as "keep"
-		int[] others_s = ia1.copy(), others_sp = ia2.copy();
+		others_s = ia1.copy();
+		others_sp = ia2.copy();
 
 		others_s2sp = manager.createPair(others_s, others_sp);
 		others_sp2s = manager.createPair(others_sp, others_s);
@@ -137,14 +180,14 @@ public class PerEventTransition
 		next_events = ec - Util.countEQ(next_event, 0);
 		prev_events = ec - Util.countEQ(prev_event, 0);
 
-		/*
+
 		// DEBUG:
 		p1.dump();
 		p2.dump();
 		Options.out.println("GIVES ==>");
 		this.dump();
 		Options.out.println();
-		*/
+
 	}
 
 
@@ -238,7 +281,8 @@ public class PerEventTransition
 		manager.deref(tmp);
 
 		// permutation that does the same job as "keep"
-		int[] others_s = ia1.copy(), others_sp = ia2.copy();
+		others_s  = ia1.copy();
+		others_sp = ia2.copy();
 
 		others_s2sp = manager.createPair(others_s, others_sp);
 		others_sp2s = manager.createPair(others_sp, others_s);
@@ -320,6 +364,16 @@ public class PerEventTransition
 	public int[] getPrevEventCount()
 	{
 		return prev_event;
+	}
+
+	public int [] getEventList()
+	{
+		return event_list;
+	}
+
+	public int getNumberOfIncludedEvents()
+	{
+			return events_used;
 	}
 
 	public String toString()
@@ -480,41 +534,60 @@ public class PerEventTransition
 	 *
 	 * <p>
 	 * how we do it is not well-defined yet.
-	 * for now, we just focus on the size of the automata-cover
 	 *
 	 */
 	public static double estimateJoinCost(PerEventTransition p1, PerEventTransition p2)
 	{
-		double ret = 0.0;
 
+
+		/*
+		double ret = 0.0;
 		int size = p1.automata_cover.length;
 		for(int i = 0; i <  size; i++)
 		{
 			if( p1.automata_cover[i] || p2.automata_cover[i]) ret += 1.0;
 		}
-
-
 		// this finds out the ADDITIONs to the cover
 		ret = 2 * ret - (p1.members + p2.members);
-
 		return ret;
+		*/
+
+
+		int ret_next = 0, ret_prev = 0;
+		for(int i = 0; i < p1.next_event.length; i++) {
+			if(p1.next_event[i] + p2.next_event[i] > 0) ret_next ++;
+			if(p1.prev_event[i] + p2.prev_event[i] > 0) ret_prev ++;
+		}
+
+		ret_next = 2 * ret_next - ( p1.next_events + p2.next_events);
+		ret_prev = 2 * ret_prev - ( p1.prev_events + p2.prev_events);
+
+		return Math.max(ret_next, ret_prev);
+
 	}
 
 	/**
 	 * estimate the cost of ADDING p2 when p1 already exists.
-	 * <p> this is a bit different from estimateJoinCost()
-	 * sometimes, a cover is subset of another cover and then adding it wont cost anything (in theory)
+	 * @see #estimateJoinCost
 	 */
-	public static double estimateaddCost(PerEventTransition have, PerEventTransition add)
+	public static double estimateAddCost(PerEventTransition have, PerEventTransition add)
 	{
+		/*
 		double ret = 0.0;
-
 		for(int i = 0; i < have.automata_cover.length; i++)
 		{
 			if( !have.automata_cover[i] && add.automata_cover[i]) ret += 1.0;
 		}
-
 		return ret;
+		*/
+
+		int ret_next = 0, ret_prev = 0;
+		for(int i = 0; i < have.next_event.length; i++) {
+			if(have.next_event[i] == 0 && add.next_event[i] > 0) ret_next ++;
+			if(have.prev_event[i] == 0 && add.prev_event[i] > 0) ret_prev ++;
+		}
+
+		return Math.max(ret_next, ret_prev);
 	}
 
 	// ------------------------------------------------------------------------------------
@@ -540,6 +613,23 @@ public class PerEventTransition
 		Options.out.println();
 
 		Options.out.println();
+	}
+	// -----------------------------------------------------
+	// for the WeightedObject interface:
+	public Object object()
+	{
+		return this;
+	}
+
+	public double weight()
+	{
+		// XXX: should we use number of next/prev-events or the cover size ???
+
+		// return next_events + prev_events;
+		// return members;
+		double s1 = next_event.length;
+		double s2 = automata_cover.length;
+		return (next_events + prev_events) / s1 + (members) / s2;
 	}
 
 }

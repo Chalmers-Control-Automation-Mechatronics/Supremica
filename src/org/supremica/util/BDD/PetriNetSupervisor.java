@@ -83,7 +83,7 @@ public class PetriNetSupervisor
 		}
 
 		// optimze it!
-		pet = TransitionOptimizer.optimize(pet, all);
+		pet = TransitionOptimizer.optimize(pet, manager, all);
 		size = pet.length; // may have changed!
 
 		// DEBUG:
