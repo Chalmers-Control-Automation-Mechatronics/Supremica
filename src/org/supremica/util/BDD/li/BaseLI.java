@@ -21,7 +21,6 @@ public class BaseLI
 	public static int num_syncs_done;
 	public static int max_sync_automata;
 	protected int num_automata_added;
-	protected AutomataSynchronizerHelper.HelperData hd;
 	protected org.supremica.automata.Automata theAutomata;
 	/* package */
 	boolean[] considred_events;
@@ -55,10 +54,9 @@ public class BaseLI
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
 	 * @see cleanup()
  */
-	public BaseLI(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected, AutomataSynchronizerHelper.HelperData hd)
+	public BaseLI(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected)
 		throws Exception
 	{
-		this.hd = hd;
 		this.controllaibilty_test = false;
 		theAutomata = new org.supremica.automata.Automata();
 
@@ -102,11 +100,10 @@ public class BaseLI
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
 	 * @see cleanup()
 	 */
-	public BaseLI(org.supremica.automata.Automata theAutomata, AutomataSynchronizerHelper.HelperData hd)
+	public BaseLI(org.supremica.automata.Automata theAutomata)
 		throws Exception
 	{
 		this.ba = null; // for safety
-		this.hd = hd;
 		this.controllaibilty_test = true;
 		this.theAutomata = theAutomata;
 

@@ -123,7 +123,7 @@ public class TestAlgo
 		throws Exception
 	{
 		automata1 = builder.build(new File(name));
-		verifier = new AutomataBDDVerifier(automata1, null);
+		verifier = new AutomataBDDVerifier(automata1);
 		automata2 = verifier.getBDDAutomata();
 		supervisor = verifier.getSupervisor();
 	}
@@ -179,7 +179,7 @@ public class TestAlgo
 
 			for(int i = 0; i < SUP_ALGOS.length; i++) {
 				Options.algo_family = SUP_ALGOS[i];
-				verifier = new AutomataBDDVerifier(automata1, null);
+				verifier = new AutomataBDDVerifier(automata1);
 				automata2 = verifier.getBDDAutomata();
 				supervisor = verifier.getSupervisor();
 
@@ -332,7 +332,7 @@ public class TestAlgo
 		System.out.print("incrC ");
 
 		// IncrementalBDDLanguageInclusion ili = new IncrementalBDDLanguageInclusion(automata1, null);
-		IncrementalLI ili = new IncrementalLI(automata1, null);
+		IncrementalLI ili = new IncrementalLI(automata1);
 		boolean is_controllable = ili.isControllable();
 
 		ili.cleanup();
@@ -360,7 +360,7 @@ public class TestAlgo
 
 		System.out.print("modC ");
 
-		ModularLI mli = new ModularLI(automata1, null);
+		ModularLI mli = new ModularLI(automata1);
 		boolean is_controllable = mli.isControllable();
 
 		mli.cleanup();
@@ -767,6 +767,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.30  2004/11/12 19:51:57  flordal
+ *** empty log message ***
+
  Revision 1.29  2004/11/12 14:20:56  vahidi
  damn typo!
 

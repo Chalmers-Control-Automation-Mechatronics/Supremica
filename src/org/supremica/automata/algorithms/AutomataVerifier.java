@@ -130,7 +130,7 @@ public class AutomataVerifier
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
 		// Modular algorithms demand system with more than one module...
-		if ((theAutomata.size() <= 1) && 
+		if ((theAutomata.size() <= 1) &&
 			(verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular))
 		{
 			logger.warn("Using monolithic algorithm instead, since the system is not modular.");
@@ -208,7 +208,7 @@ public class AutomataVerifier
 				return "At least one automaton must be selected.";
 			}
 
-			if ((verificationOptions.getInclusionAutomata() != null) && 
+			if ((verificationOptions.getInclusionAutomata() != null) &&
 				(verificationOptions.getInclusionAutomata().size() < 1))
 			{
 				return "At least one automaton must be unselected.";
@@ -239,7 +239,7 @@ public class AutomataVerifier
 			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
 			 	(verificationOptions.getVerificationType() == VerificationType.InverseControllability) ||
 				(verificationOptions.getVerificationType() == VerificationType.LanguageInclusion))
-			{ 
+			{
 				// We're gonna do some serious synchronization! Initialize a synchronization helper!
 				synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 				synchHelper.setExecutionDialog(executionDialog);
@@ -337,7 +337,7 @@ public class AutomataVerifier
 			}
 			else
 			{
-				throw new UnsupportedOperationException("The selected type of verification " + 
+				throw new UnsupportedOperationException("The selected type of verification " +
 														"is not implemented");
 			}
 		}
@@ -603,7 +603,7 @@ public class AutomataVerifier
 
 		for (int i = 0; i < synchronizationOptions.getNbrOfExecuters(); i++)
 		{
-			AutomataSynchronizerExecuter currSynchronizationExecuter = 
+			AutomataSynchronizerExecuter currSynchronizationExecuter =
 				new AutomataSynchronizerExecuter(synchHelper);
 
 			synchronizationExecuters.add(currSynchronizationExecuter);
@@ -613,7 +613,7 @@ public class AutomataVerifier
 		// For the moment we assume that we only have one thread
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
-			AutomataSynchronizerExecuter currExec = 
+			AutomataSynchronizerExecuter currExec =
 				(AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
 
 			currExec.selectAutomata(selectedAutomata);
@@ -739,9 +739,9 @@ public class AutomataVerifier
 					{
 						if (SupremicaProperties.verboseMode())
 						{
-							logger.info("All similar automata are already added, " + 
+							logger.info("All similar automata are already added, " +
 										"no chance for controllability.");
-							
+
 							// Print the uncontrollable state(s)...
 							synchHelper.printUncontrollableStates();
 
@@ -767,7 +767,7 @@ public class AutomataVerifier
 				{
 					if (!verificationOptions.getSkipUncontrollabilityCheck())
 					{
-						logger.verbose("Couldn't prove controllability, " + 
+						logger.verbose("Couldn't prove controllability, " +
 									   "trying to prove uncontrollability...");
 
 						// Try to prove remaining states in the stateMemorizer as being uncontrollable
@@ -1066,7 +1066,7 @@ public class AutomataVerifier
 				while (stateIt.hasNext())
 				{
 					int[] currState = (int[]) stateIt.next();
-					
+
 					// Look for the state among the potentially uncontrollable states
 					potentiallyUncontrollableStates.find(automataIndices, currState);
 
@@ -1278,7 +1278,7 @@ public class AutomataVerifier
 		{
 
 		case Options.INCLUSION_ALGO_MONOLITHIC :
-			AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected, synchHelper.getHelperData());
+			AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected);
 
 			ret = abf.passLanguageInclusion();
 
@@ -1286,7 +1286,7 @@ public class AutomataVerifier
 			break;
 
 		case Options.INCLUSION_ALGO_MODULAR :
-			org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(selected, unselected, synchHelper.getHelperData());
+			org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(selected, unselected);
 
 			ret = mli.passLanguageInclusion();
 
@@ -1294,7 +1294,7 @@ public class AutomataVerifier
 			break;
 
 		case Options.INCLUSION_ALGO_INCREMENTAL :
-			org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(selected, unselected, synchHelper.getHelperData());
+			org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(selected, unselected);
 
 			ret = ili.passLanguageInclusion();
 
@@ -1338,7 +1338,7 @@ public class AutomataVerifier
 		{
 
 		case Options.INCLUSION_ALGO_MONOLITHIC :
-			AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, synchHelper.getHelperData());
+			AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
 
 			ret = abf.isControllable();
 
@@ -1346,7 +1346,7 @@ public class AutomataVerifier
 			break;
 
 		case Options.INCLUSION_ALGO_MODULAR :
-			org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(theAutomata, synchHelper.getHelperData());
+			org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(theAutomata);
 
 			ret = mli.isControllable();
 
@@ -1354,7 +1354,7 @@ public class AutomataVerifier
 			break;
 
 		case Options.INCLUSION_ALGO_INCREMENTAL :
-			org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(theAutomata, synchHelper.getHelperData());
+			org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(theAutomata);
 
 			ret = ili.isControllable();
 
@@ -1386,7 +1386,7 @@ public class AutomataVerifier
 	{
 
 		// timer.start();
-		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata, synchHelper.getHelperData());
+		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
 		boolean ret = abf.isNonblocking();
 
 		abf.cleanup();
@@ -1926,7 +1926,7 @@ public class AutomataVerifier
 			aut = original;
 		}
 		else
-		{	
+		{
 			aut = new Automaton(original);
 		}
 
@@ -1974,9 +1974,9 @@ public class AutomataVerifier
 			while (stateIterator.hasNext())
 			{
 				currState = (State) stateIterator.next();
-				
+
 				logger.info("Blocking state: " + currState.getName());
-				
+
 				// If we did a copy of theAutomata before we destroyed it we could display the trace...
 				if (!destructive)
 				{
@@ -2030,7 +2030,7 @@ public class AutomataVerifier
 		logger.debug("AutomataVerifier requested to stop.");
 
 		stopRequested = true;
-		
+
 		// Stop everything!
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
@@ -2067,7 +2067,7 @@ public class AutomataVerifier
 		verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
 
 		AutomataVerifier verifier = new AutomataVerifier(automata, synchronizationOptions, verificationOptions);
-		
+
 		return verifier.verify();
 	}
 

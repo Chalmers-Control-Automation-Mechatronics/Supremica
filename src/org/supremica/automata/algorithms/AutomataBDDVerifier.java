@@ -8,7 +8,6 @@ import org.supremica.util.BDD.*;
  */
 public class AutomataBDDVerifier
 {
-	private AutomataSynchronizerHelper.HelperData hd;
 	private org.supremica.automata.Automata theAutomata;
 	private BDDAutomata ba = null;
 	private Supervisor sup = null;
@@ -19,11 +18,10 @@ public class AutomataBDDVerifier
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
 	 * @see cleanup()
 	 */
-	public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata, AutomataSynchronizerHelper.HelperData hd)
+	public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata)
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
-		this.hd = hd;
 
 		try
 		{
@@ -48,11 +46,10 @@ public class AutomataBDDVerifier
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
 	 * @see cleanup()
 	 */
-	public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata, org.supremica.automata.Alphabet alphabet, AutomataSynchronizerHelper.HelperData hd)
+	public AutomataBDDVerifier(org.supremica.automata.Automata theAutomata, org.supremica.automata.Alphabet alphabet)
 		throws Exception
 	{
 		this.theAutomata = theAutomata;
-		this.hd = hd;
 
 		try
 		{
@@ -75,10 +72,9 @@ public class AutomataBDDVerifier
 	 * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
 	 * @see cleanup()
 	 */
-	public AutomataBDDVerifier(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected, AutomataSynchronizerHelper.HelperData hd)
+	public AutomataBDDVerifier(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected)
 		throws Exception
 	{
-		this.hd = hd;
 		theAutomata = new org.supremica.automata.Automata();
 
 		theAutomata.addAutomata(selected);
@@ -155,20 +151,9 @@ public class AutomataBDDVerifier
 		boolean is_nonblocking = true;
 		int r = sup.getReachables();
 
-		if (hd != null)
-		{
-			hd.setNumberOfReachableStates((long) ba.count_states(r));
-		}
-
 		int c = sup.getCoReachables();
 		int not_c = ba.not(c);
 		int intersection = ba.and(r, not_c);
-
-		if (hd != null)
-		{
-			hd.setNumberOfDeadlockedStates((long) ba.count_states(not_c));
-			hd.setNumberOfCheckedStates((long) ba.count_states(intersection));
-		}
 
 		if (intersection != ba.getZero())
 		{
@@ -202,7 +187,6 @@ public class AutomataBDDVerifier
 	{
 		int Q_u = sup.getSomeReachableUncontrollables();
 		// int Q_u = sup.getReachableUncontrollables();
-		// hd.setNumberOfForbiddenStates(ba.count_states(Q_u));
 		boolean is_controllable = ba.getZero() == Q_u;
 
 		if (!is_controllable)
@@ -241,11 +225,6 @@ public class AutomataBDDVerifier
 		// get statistics
 		int Q_r = sup.getReachables();
 
-		if (hd != null)
-		{
-			hd.setNumberOfCheckedStates((long) ba.count_states(states));
-			hd.setNumberOfReachableStates((long) ba.count_states(Q_r));
-		}
 
 		if (!ret && Options.trace_on)
 		{

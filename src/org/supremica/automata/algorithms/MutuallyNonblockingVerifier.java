@@ -1347,7 +1347,7 @@ public class MutuallyNonblockingVerifier
 	public boolean isMutuallyCoaccessibleBDD(Automata automata, Alphabet alphabet)
 		throws Exception
 	{
-		AutomataBDDVerifier abf = new AutomataBDDVerifier(automata, alphabet, null);
+		AutomataBDDVerifier abf = new AutomataBDDVerifier(automata, alphabet);
 		boolean ret = abf.isNonblocking();
 
 		abf.cleanup();

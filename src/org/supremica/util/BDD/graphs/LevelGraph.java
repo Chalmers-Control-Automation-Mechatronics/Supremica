@@ -159,7 +159,7 @@ class LevelCanvas extends Canvas {
 
 		if(title != null) {
 			g.setColor( Color.red);
-			g.drawString(title,W_GAP,20); // NOTE: hard-coded coordinates!
+			g.drawString(title,W_GAP + 3,20); // NOTE: hard-coded coordinates!
 		}
 	}
 

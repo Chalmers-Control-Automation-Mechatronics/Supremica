@@ -8,16 +8,16 @@ import org.supremica.automata.algorithms.*;
 public class IncrementalLI
 	extends BaseLI
 {
-	public IncrementalLI(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected, AutomataSynchronizerHelper.HelperData hd)
+	public IncrementalLI(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected)
 		throws Exception
 	{
-		super(selected, unselected, hd);
+		super(selected, unselected);
 	}
 
-	public IncrementalLI(org.supremica.automata.Automata automata, AutomataSynchronizerHelper.HelperData hd)
+	public IncrementalLI(org.supremica.automata.Automata automata)
 		throws Exception
 	{
-		super(automata, hd);
+		super(automata);
 	}
 
 	// -----------------------------------------------------------------------------------
@@ -442,6 +442,9 @@ public class IncrementalLI
 
 /*
 $Log: not supported by cvs2svn $
+Revision 1.8  2004/10/08 13:36:58  vahidi
+bug fixes :(
+
 Revision 1.7  2004/07/05 14:42:30  vahidi
 stupid bug fixed in the incremental language inclusion test (can understand that we didnt saw that earlier)
 

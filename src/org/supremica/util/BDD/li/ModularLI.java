@@ -19,16 +19,16 @@ public class ModularLI
 	private Group Ip = null;
 	private Group Jp = null;
 
-	public ModularLI(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected, AutomataSynchronizerHelper.HelperData hd)
+	public ModularLI(org.supremica.automata.Automata selected, org.supremica.automata.Automata unselected)
 		throws Exception
 	{
-		super(selected, unselected, hd);
+		super(selected, unselected);
 	}
 
-	public ModularLI(org.supremica.automata.Automata automata, AutomataSynchronizerHelper.HelperData hd)
+	public ModularLI(org.supremica.automata.Automata automata)
 		throws Exception
 	{
-		super(automata, hd);
+		super(automata);
 	}
 
 	public void cleanup()
