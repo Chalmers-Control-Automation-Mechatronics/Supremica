@@ -11,6 +11,7 @@ import java.io.*;
 
 public class ilc
 {
+	private static parser p;
     public static void main(String[] args) {
 	if (args.length != 2)
 	    {
@@ -27,18 +28,25 @@ public class ilc
     public ilc(String ilFile, String outDir, Logger logger, boolean debug) {
 	try {
 	    BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
-	    
+
 	    if (logger != null)
 		logger.info("Compiling " + ilFile + "...");
 	    else
 		System.out.println("Compiling " + ilFile + "...");
-	    parser p = new parser(ilReader);
-	    
+	    if (p == null)
+	    {
+	    	p = new parser(ilReader);
+		}
+		else
+		{
+			p.ReInit(ilReader);
+		}
+
 	    try {
 		SimpleNode n = p.Start();
-		
+
 		VariableChecker v = new VariableChecker(n);
-		
+
 		//XXX new VaribleChecker(n,logger);
 		if (v.check()) {
 		    JavaBytecodeGenerator jb = new JavaBytecodeGenerator(n, outDir, logger, debug);

@@ -2658,6 +2658,10 @@ public class ActionMan
 					}
 					logger.info("Java Bytecode file successfully generated at " + currFile.getAbsolutePath());
 				}
+				else
+				{
+					logger.info("Select a directory to export bytecode to.");
+				}
 			}
 		}
 	}
