@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.2 2005-02-21 03:14:14 robi Exp $
+//# $Id: CompilerTest.java,v 1.3 2005-03-03 02:16:50 robi Exp $
 //###########################################################################
 
 
@@ -33,6 +33,20 @@ public class CompilerTest
 
   //#########################################################################
   //# Test Cases
+  public void testCompile_empty()
+    throws JAXBException, WatersException, IOException
+  {
+    final String name = "empty";
+    final ModuleProxy module = new ModuleProxy(name);
+    final ModuleCompiler compiler =
+      new ModuleCompiler(module, mDocumentManager);
+    final ProductDESProxy des = compiler.compile();
+    assertTrue("Unexpected name!", des.getName().equals(name));
+    assertTrue("Unexpected location!", des.getLocation() == null);
+    assertTrue("Unexpected event!", des.getEvents().isEmpty());
+    assertTrue("Unexpected automata!", des.getAutomata().isEmpty());
+  }
+
   public void testCompile_buffer_sf1()
     throws JAXBException, WatersException, IOException
   {

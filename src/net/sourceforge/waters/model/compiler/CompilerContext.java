@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.compiler
 //# CLASS:   CompilerContext
 //###########################################################################
-//# $Id: CompilerContext.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: CompilerContext.java,v 1.2 2005-03-03 02:16:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -33,8 +33,9 @@ class CompilerContext implements Context
   public CompilerContext(final ModuleProxy module,
 			 final String prefix)
   {
+    final File location = module.getLocation();
     mPrefix = prefix;
-    mPath = module.getLocation().getParentFile();
+    mPath = (location == null ? null : location.getParentFile());
     mSymbolTable = new HashMap();
   }
 
