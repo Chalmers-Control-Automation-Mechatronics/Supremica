@@ -84,13 +84,13 @@ class JBDD {
     /** Create the BDD object using the default number
 	if variables and node-count	*/
     public JBDD() { this(DEFAULT_VAR_COUNT, DEFAULT_NODE_COUNT); }
-    
-    
+
+
     /** Create the BDD object using the default node count and the given number of variables
 	@param vars maximum number of BDD variables to be used */
     public JBDD(int vars) { this(vars, DEFAULT_NODE_COUNT); }
-    
-    
+
+
     /** Create the BDD object using the given number of variables and node count
 	@param vars maximum number of BDD variables to be used
 	@param nodes the initial number of BDD nodes
@@ -101,9 +101,9 @@ class JBDD {
 	medium sized examples    100000
 	large examples           1000000
 	</pre>
-	
+
     */
-    
+
     public JBDD(int vars, int nodes) {
 	init(vars, nodes);
 	one = getOne();
@@ -498,25 +498,25 @@ class JBDD {
 		int v4 = jbdd.createBDD();
 
 
-		System.out.println("v1.refs = " + jbdd.internal_refcount(v1));
+		Options.out.println("v1.refs = " + jbdd.internal_refcount(v1));
 		jbdd.ref(v1);
-		System.out.println("v1.refs = " + jbdd.internal_refcount(v1));
+		Options.out.println("v1.refs = " + jbdd.internal_refcount(v1));
 		jbdd.deref(v1);
-		System.out.println("v1.refs = " + jbdd.internal_refcount(v1));
+		Options.out.println("v1.refs = " + jbdd.internal_refcount(v1));
 
 
-		System.out.print("v1 = ");	jbdd.printSet(v1);
-		System.out.print("v2 = ");	jbdd.printSet(v2);
-		System.out.print("v3 = ");	jbdd.printSet(v3);
-		System.out.print("v4 = ");	jbdd.printSet(v4);
+		Options.out.print("v1 = ");	jbdd.printSet(v1);
+		Options.out.print("v2 = ");	jbdd.printSet(v2);
+		Options.out.print("v3 = ");	jbdd.printSet(v3);
+		Options.out.print("v4 = ");	jbdd.printSet(v4);
 
 		jbdd.gc();
 		jbdd.checkPackage();
 
 		int v1andv2 = jbdd.and(v1,v2);
 		int v1orv2 = jbdd.or(v1,v2);
-		System.out.print("v1 & v2 = ");	jbdd.printSet(v1andv2);
-		System.out.print("v1 | v2 = ");	jbdd.printSet(v1orv2);
+		Options.out.print("v1 & v2 = ");	jbdd.printSet(v1andv2);
+		Options.out.print("v1 | v2 = ");	jbdd.printSet(v1orv2);
 
 		jbdd.gc();
 		jbdd.checkPackage();
@@ -526,7 +526,7 @@ class JBDD {
 		set[1] = 1;
 		int x = jbdd.makeSet(set,2);
 
-		System.out.print("X = ");
+		Options.out.print("X = ");
 		jbdd.printSet(x);
 		jbdd.debugBDD(x);
 		jbdd.debugBDD(0);

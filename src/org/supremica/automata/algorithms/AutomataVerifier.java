@@ -126,7 +126,7 @@ public class AutomataVerifier
 	public AutomataVerifier(Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 		throws IllegalArgumentException, Exception
 	{
-		System.out.println("DEBUG.......... " + theAutomata.size() ); // ARASH: DEBUG
+		/// System.out.println("DEBUG.......... " + theAutomata.size() ); // ARASH: DEBUG
 
 		Automaton currAutomaton;
 		State currInitialState;
@@ -1257,8 +1257,6 @@ public class AutomataVerifier
 
 
 
-
-
 		Automata unselected = ActionMan.getGui().getUnselectedAutomata();
 
 		// we already know the answer: L(P) = \Sigma^*
@@ -1293,7 +1291,7 @@ public class AutomataVerifier
 				throw new Exception("Unknown BDD/language containment algorithm!");
 		}
 
-
+		Options.out.flush();
 		return ret;
     }
 
@@ -1336,13 +1334,8 @@ public class AutomataVerifier
 		}
 
 
-		/*
-    	// timer.start();
-		AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata,synchHelper.getHelperData() );
-		boolean ret = abf.isControllable();
-		abf.cleanup();
-		// timer.stop();
-		*/
+		Options.out.flush();
+
 		return ret;
 
     }
@@ -1360,6 +1353,8 @@ public class AutomataVerifier
 		boolean ret = abf.isNonBlocking();
 		abf.cleanup();
 		// timer.stop();
+
+		Options.out.flush();
 		return ret;
 
     }

@@ -38,14 +38,6 @@ public class Util
 
 
 	// -------------------------------------------------
-	/** count trues in a vector of booleans */
-	public static int count(boolean [] x) {
-		int len = x.length;
-		int c = 0;
-		for(int i = 0; i < len; i++) if(x[i]) c++;
-		return c;
-	}
-	// -------------------------------------------------
 
 	public static int suggest_nodecount(Automata a)
 	{
@@ -102,18 +94,18 @@ public class Util
 									 : manager.not(vars[i]));
 
 			/*
-			 * System.out.println(i + " --> " + manager.internal_refcount(ret) +
+			 * Options.out.println(i + " --> " + manager.internal_refcount(ret) +
 			 *                  " / " + manager.internal_refcount(vars[i]));
 			 *
 			 * if( manager.internal_refcount(ret) == 0) {
-			 *   System.out.println("(number & (1 << i)) == " +
+			 *   Options.out.println("(number & (1 << i)) == " +
 			 *                      (number & (1 << i)));
 			 *
 			 *   int not = manager.not(vars[i]);
 			 *
 			 *   manager.print(vars[i]);
 			 *   manager.print(not);
-			 *   System.out.println("ID: " + vars[i] + " / " + not + " -- " +
+			 *   Options.out.println("ID: " + vars[i] + " / " + not + " -- " +
 			 *                      "REFS: " +
 			 *                      manager.internal_refcount(vars[i]) + " / " +
 			 *                      manager.internal_refcount(not));
@@ -141,7 +133,7 @@ public class Util
 			if(manager.internal_index(list[j])<= x) {
 				i++;
 				// SWAP I <-> J
-				// System.out.println("SWAP "+i+" <-> "+j);
+				// Options.out.println("SWAP "+i+" <-> "+j);
 				tmp = list[i];
 				list[i] = list[j];
 				list[j] = tmp;
@@ -150,7 +142,7 @@ public class Util
 
 		// SWAP I+1 <-> r
 		i++;
-		// System.out.println("SWAP2 "+i+" <-> "+r);
+		// Options.out.println("SWAP2 "+i+" <-> "+r);
 		tmp = list[i];
 		list[i] = list[r];
 		list[r] = tmp;
@@ -194,6 +186,17 @@ public class Util
 		for(int j = 0; j < size / 2; j++) {
 			int i = size - j -1;
 			int tmp = variables[i];
+			variables[i] = variables[j];
+			variables[j] =  tmp;
+		}
+	}
+
+
+	/** reverse some doube-array */
+	public static void reverse(double [] variables, int size) {
+		for(int j = 0; j < size / 2; j++) {
+			int i = size - j -1;
+			double tmp = variables[i];
 			variables[i] = variables[j];
 			variables[j] =  tmp;
 		}

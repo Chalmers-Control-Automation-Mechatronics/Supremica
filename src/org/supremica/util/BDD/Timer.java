@@ -50,24 +50,24 @@ public class Timer
 			return;
 		}
 
-		System.out.print("--> ");
+		Options.out.print("--> ");
 
 		if (name != null)
 		{
-			System.out.print('[' + name + "] ");
+			Options.out.print('[' + name + "] ");
 		}
 
-		System.out.print(str);
+		Options.out.print(str);
 
 		if (t > 0)
 		{
-			System.out.print(" in ");
+			Options.out.print(" in ");
 			showTime(t);
-			System.out.println();
+			Options.out.println();
 		}
 		else
 		{
-			System.out.println(" (not measureable)");
+			Options.out.println(" (not measureable)");
 		}
 	}
 
@@ -75,23 +75,23 @@ public class Timer
 	{
 		if (t > MUL_HOUR * MAX_HOUR)
 		{
-			System.out.print(t / MUL_DAY + " days");
+			Options.out.print(t / MUL_DAY + " days");
 		}
 		else if (t > MUL_MIN * MAX_MIN)
 		{
-			System.out.print(t / MUL_HOUR + " hours");
+			Options.out.print(t / MUL_HOUR + " hours");
 		}
 		else if (t > MUL_SEC * MAX_SEC)
 		{
-			System.out.print(t / MUL_MIN + " minutes");
+			Options.out.print(t / MUL_MIN + " minutes");
 		}
 		else if (t > MAX_MILLISEC)
 		{
-			System.out.print(t / MUL_SEC + " seconds");
+			Options.out.print(t / MUL_SEC + " seconds");
 		}
 		else
 		{
-			System.out.print(t + " milliseconds");
+			Options.out.print(t + " milliseconds");
 		}
 	}
 }

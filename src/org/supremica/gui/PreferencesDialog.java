@@ -71,10 +71,12 @@ public class PreferencesDialog
 	private SynchronizationPropertiesPanel theSynchronizationPanel = null;
 	private SoftPLCPanel theSoftPLCPanel = null;
 	private PreferencesControllerPanel theControllerPanel = null;
+	private Frame owner;
 
 	public PreferencesDialog(Frame owner)
 	{
 		super(owner, "Preferences", true);
+		this.owner = owner;
 
 		contentPane = (JPanel) getContentPane();
 		theTabbedPanel = new JTabbedPane();
@@ -146,6 +148,10 @@ public class PreferencesDialog
 
 	}
 
+	public Frame getOwnerFrame()
+	{
+		return owner;
+	}
 	public void doCancel()
 	{
 		setVisible(false);
@@ -670,11 +676,13 @@ class SoftPLCPanel
 
 class BDDPanel
     extends JPanel
+    implements ActionListener
 {
     private PreferencesDialog theDialog = null;
     private JCheckBox showGrow, alterPCG, debugOn,  traceOn, ucOptimistic, nbOptimistic;
-    private JCheckBox localSaturation, encodingFill;
+    private JCheckBox localSaturation, encodingFill, sizeWatch;
     private JComboBox algorithmFamily, countAlgorithm, orderingAlgorithm, inclusionAlgorithm;
+	private JButton bProofFile;
 
     public BDDPanel(PreferencesDialog theDialog)
     {
@@ -694,10 +702,11 @@ class BDDPanel
 
 
 	pWest.add( showGrow = new JCheckBox("Show BDD growth", Options.show_grow) );
-	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders",
-					     Options.user_alters_PCG) );
+	pWest.add( alterPCG = new JCheckBox("User is allowed to alter PCG orders", Options.user_alters_PCG) );
 	pWest.add( traceOn = new JCheckBox("Dump execution trace ", Options.trace_on) );
 	pWest.add( debugOn = new JCheckBox("Verbose", Options.debug_on) );
+	pWest.add( sizeWatch = new JCheckBox("report nodcount", Options.size_watch) );
+
 
 	pWest.add( new JSeparator() );
 
@@ -783,7 +792,15 @@ class BDDPanel
 	countAlgorithm.addItem("No counting         ");
 	countAlgorithm.addItem("Tree SAT");
 	countAlgorithm.addItem("Exact");
+	countAlgorithm.setSelectedIndex(Options.count_algo);
 
+
+	JPanel pProof = new JPanel(new FlowLayout(FlowLayout.LEFT) );
+	p.add(pProof);
+
+	pProof.add( bProofFile = new JButton("Set proof file") );
+	pProof.add( new JLabel(" (verbose and slow!)"));
+	bProofFile.addActionListener( this);
 
     }
 
@@ -800,6 +817,7 @@ class BDDPanel
 	// Options.nb_optimistic    = nbOptimistic.isSelected();
 	Options.trace_on         = traceOn.isSelected();
 	Options.debug_on         = debugOn.isSelected();
+	Options.size_watch       = sizeWatch.isSelected();
 	Options.local_saturation = localSaturation.isSelected();
 	Options.fill_statevars   = encodingFill.isSelected();
 
@@ -813,6 +831,36 @@ class BDDPanel
     {
 	// fuck it
     }
+
+
+    public void actionPerformed(ActionEvent e) {
+		Object src = e.getSource();
+		if(src == bProofFile) onSetProofFile();
+	}
+
+	private void onSetProofFile() {
+
+		// AWT is mych better than Swing
+		FileDialog fd = new FileDialog(theDialog.getOwnerFrame(), "Choose a proof file", FileDialog.SAVE);
+		fd.show();
+		if(fd.getFile() != null) {
+			String path = fd.getDirectory()+fd.getFile();
+			try {
+				FileOutputStream fos = new FileOutputStream(path, true);
+				PrintStream ps = new PrintStream(fos);
+				Options.out = ps;
+				debugOn.setSelected( true); // enable debug!
+
+				Date now = new Date();
+				Options.out.println("\n Proof file opened at " + now);
+				System.out.println("Proof file: " + path);
+			} catch(IOException exx) {
+				System.err.println("Unable to set proof file: " + exx);
+			}
+
+		}
+
+	}
 }
 
 

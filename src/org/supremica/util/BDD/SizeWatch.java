@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class SizeWatch
-     extends Frame 
+     extends Frame
     implements ActionListener
 
 {
@@ -20,10 +20,10 @@ public class SizeWatch
 
     private Button bClose, bQuit, bClear;
     private List list;
-    private SizeWatch() { 
+    private SizeWatch() {
 	super("BDD node counts");
 	if(manager == null) {
-	    System.out.println("[SizeWatch.SizeWatch] you should set the BDD manager first");
+	    Options.out.println("[SizeWatch.SizeWatch] you should set the BDD manager first");
 	    System.exit(20);
 	}
 
@@ -51,15 +51,15 @@ public class SizeWatch
 
 
 	add( list = new List(30), BorderLayout.CENTER);
-	
+
 	setVisible(true);
     }
-    
+
     private static SizeWatch getInstance() {
-	if(!Options.debug_on) 
+	if(!Options.size_watch)
 	    return null;
 
-	if(instance_ == null) 
+	if(instance_ == null)
 	    instance_ = new SizeWatch();
 	return instance_;
     }
@@ -99,7 +99,7 @@ public class SizeWatch
     }
 
     private void addString(String str) {
-	// System.out.println(str);
+	// Options.out.println(str);
 	list.add(str);
     }
 
@@ -110,7 +110,7 @@ public class SizeWatch
         if(src == bClose) dispose();
 	else if(src == bClear) list.removeAll();
 	else if(src == bQuit) System.exit(0);
-	    
+
     }
 
 }

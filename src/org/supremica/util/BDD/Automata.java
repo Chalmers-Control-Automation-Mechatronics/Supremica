@@ -173,7 +173,7 @@ public class Automata
 		variable_count = variable_count * 2 + Util.log2ceil(alphabet.getSize());
 
 
-		System.out.println("The theoretical number of states is " + Util.showHugeNumber( total_size));
+		Options.out.println("The theoretical number of states is " + Util.showHugeNumber( total_size));
 
 		// .... and, we are done
 		closed = true;

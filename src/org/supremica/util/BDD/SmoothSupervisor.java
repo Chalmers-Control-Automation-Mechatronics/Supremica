@@ -95,7 +95,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 			if(remaining[a]) {
 				remaining[a] = false;
 				dp.add(clusters[a].twave);
-				// System.out.println("Forward-Adding: " + clusters[a].toString() ); // DEBUG
+				// Options.out.println("Forward-Adding: " + clusters[a].toString() ); // DEBUG
 			}
 			int r_all_pp, front_s, front_sp;
 
@@ -166,7 +166,7 @@ public class SmoothSupervisor extends DisjSupervisor {
 			if(remaining[a]) {
 				remaining[a] = false;
 				dp.add(clusters[a].twave);
-				// System.out.println("Backward-Adding: " + clusters[a].toString() ); // DEBUG
+				// Options.out.println("Backward-Adding: " + clusters[a].toString() ); // DEBUG
 			}
 			int r_all_pp, front_s, front_sp;
 

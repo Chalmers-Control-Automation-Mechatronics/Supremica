@@ -146,11 +146,15 @@ public class EventManager
 	 */
 	public void dumpSubset(String what, boolean [] subset)
 	{
-		System.out.print(what + " {");
+		int count = 0;
+		Options.out.print(what + " {");
 		for(int i = 0; i < size; i++)
-			if(subset[i])
-				System.out.print(" " + events[i].getName());
+			if(subset[i]) {
+				if(count > 0) Options.out.print(", ");
+				Options.out.print(events[i].getName());
+				count++;
+			}
 
-		System.out.println("};");
+		Options.out.println("};");
 	}
 }

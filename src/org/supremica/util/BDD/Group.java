@@ -228,12 +228,12 @@ public class Group
 	{
 		int t = getT();
 
-		// System.out.print("t = "); manager.printSet(t);
+		// Options.out.print("t = "); manager.printSet(t);
 		bdd_tu = manager.and(t, bdd_sigma_u);
 
-		// System.out.print("tmp = "); manager.printSet(tmp);
+		// Options.out.print("tmp = "); manager.printSet(tmp);
 		// bdd_tu = manager.exists( tmp, manager.getEventCube());
-		// System.out.print("bd_tu = "); manager.printSet(bdd_tu);
+		// Options.out.print("bd_tu = "); manager.printSet(bdd_tu);
 		// manager.deref(tmp);
 		has_tu = true;
 	}
@@ -348,35 +348,35 @@ public class Group
 	// -------------------------------------- diagnostics ------------------------------
 	public void dump()
 	{
-		System.out.print("Group " + name + " = {");
+		Options.out.print("Group " + name + " = {");
 
 		for (int i = 0; i < size; i++)
 		{
 			if (i != 0)
 			{
-				System.out.print(", ");
+				Options.out.print(", ");
 			}
 
-			System.out.print(members[i].getName());
+			Options.out.print(members[i].getName());
 		}
 
-		System.out.println("};");
+		Options.out.println("};");
 	}
 
 	public void show_states(int bdd)
 	{
 		String[] states = new String[size];
 
-		System.out.println("S_" + name + " = {");
+		Options.out.println("S_" + name + " = {");
 		show_states_rec(states, bdd, 0);
-		System.out.println("};");
+		Options.out.println("};");
 	}
 
 	private void show_states_rec(String[] saved, int bdd, int level)
 	{
 		if (level >= size)
 		{
-			System.out.print(" <");
+			Options.out.print(" <");
 
 			for (int i = 0; i < size; i++)
 			{
@@ -384,14 +384,14 @@ public class Group
 				{
 					if (i != 0)
 					{
-						System.out.print(", ");
+						Options.out.print(", ");
 					}
 
-					System.out.print(saved[i]);
+					Options.out.print(saved[i]);
 				}
 			}
 
-			System.out.println(">");
+			Options.out.println(">");
 
 			return;
 		}

@@ -112,7 +112,7 @@ public class WorksetSupervisor extends DisjSupervisor
 		while(!workset.empty()) {
 			int p = workset.pickOne();
 			int r_all_org = r_all;
-			// System.out.println("-->" + p);
+			// Options.out.println("-->" + p);
 			do {
 				r_all_p = r_all;
 				int tmp = manager.relProd(clusters[p].getTwave() , r_all, cube);

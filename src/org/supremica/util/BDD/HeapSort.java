@@ -49,14 +49,14 @@ public class HeapSort {
 		for(int i = 0; i < x.length; i++) {
 			double r = 100 * Math.random();
 			x[i] = new WeightedObject( "" + i, r);
-			System.out.println( "" + x[i].object()  + " --> " + r);
+			Options.out.println( "" + x[i].object()  + " --> " + r);
 		}
 
 		HeapSort.sort(x, x.length);
 
 		for(int i = 0; i < x.length; i++) {
 			String s= (String) x[i].object();
-			System.out.println(s);
+			Options.out.println(s);
 		}
 	}
 

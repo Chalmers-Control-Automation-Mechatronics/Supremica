@@ -107,7 +107,7 @@ public class BDDAutomata
 		check("Automata initilized");
 
 		// gc();
-		// System.out.println("CheckPackage returned " + checkPackage());
+		// Options.out.println("CheckPackage returned " + checkPackage());
 	}
 
 	private void createEvents()
@@ -304,26 +304,26 @@ public class BDDAutomata
 	{
 		String[] states = new String[components];
 
-		System.out.println("S = {");
+		Options.out.println("S = {");
 		show_states_rec(states, cares, bdd, 0);
-		System.out.println("};");
+		Options.out.println("};");
 	}
 
 	private void show_states_rec(String[] saved, boolean[] cares, int bdd, int level)
 	{
 		if (level >= components)
 		{
-			System.out.print(" < ");
+			Options.out.print(" < ");
 
 			for (int i = 0; i < components; i++)
 			{
 				if (saved[i] != null)
 				{
-					System.out.print(saved[i] + "  ");
+					Options.out.print(saved[i] + "  ");
 				}
 			}
 
-			System.out.println(">");
+			Options.out.println(">");
 
 			return;
 		}
@@ -358,19 +358,19 @@ public class BDDAutomata
 	// ------------------------------------------------------------------------------
 	public void printAutomatonVector()
 	{
-		System.out.print(" ");
+		Options.out.print(" ");
 
 		for (int i = 0; i < components; i++)
 		{
 			if (i != 0)
 			{
-				System.out.print(" x ");
+				Options.out.print(" x ");
 			}
 
-			System.out.print(automata[i].getName());
+			Options.out.print(automata[i].getName());
 		}
 
-		System.out.println("");
+		Options.out.println("");
 	}
 
 	public void printStateVector(String[] states)
@@ -382,24 +382,24 @@ public class BDDAutomata
 	{
 		if (what != null)
 		{
-			System.out.print(what);
+			Options.out.print(what);
 		}
 
-		System.out.print(" <");
+		Options.out.print(" <");
 
 		for (int i = 0; i < states.length; i++)
 		{
 			if (i != 0)
 			{
-				System.out.print(", ");
+				Options.out.print(", ");
 			}
 
-			System.out.print((states[i] == null)
+			Options.out.print((states[i] == null)
 							 ? "-"
 							 : states[i]);
 		}
 
-		System.out.println(">");
+		Options.out.println(">");
 	}
 
 	// -----------------------------------------------------------------------------
@@ -452,7 +452,7 @@ public class BDDAutomata
 	// ------------------------------------------------------------------------------
 	public void count_states(String name, int bdd)
     {
-	System.out.println(name + " " + count_states(bdd));
+	Options.out.println(name + " " + count_states(bdd));
     }
 
     public long count_states(int bdd)
@@ -512,7 +512,7 @@ public class BDDAutomata
 	// -----------------------------------------------------------
 	public void show_events(int bdd, String name)
 	{
-		System.out.print("Events_" + name + " = { ");
+		Options.out.print("Events_" + name + " = { ");
 
 		int zero = getZero();
 
@@ -522,13 +522,13 @@ public class BDDAutomata
 
 			if (tmp != zero)
 			{
-				System.out.print(original_events[i].label + " ");
+				Options.out.print(original_events[i].label + " ");
 			}
 
 			deref(tmp);
 		}
 
-		System.out.println("};");
+		Options.out.println("};");
 	}
 
 	// ------------------------------------------------------------------
@@ -538,7 +538,7 @@ public class BDDAutomata
 
 		if (bdd == zero)
 		{
-			System.out.println("EVENT IS ZERO");
+			Options.out.println("EVENT IS ZERO");
 
 			name = null;
 
@@ -655,9 +655,9 @@ public class BDDAutomata
 			names[i] = null;
 		}
 
-		System.out.println("T = {");
+		Options.out.println("T = {");
 		show_transitions_rec0(names, bdd, 0);
-		System.out.println("};");
+		Options.out.println("};");
 	}
 
 	private void show_transitions_rec0(String[] names, int bdd, int level)
@@ -738,22 +738,22 @@ public class BDDAutomata
 	{    // pretty printer for the transition list
 		int i;
 
-		System.out.print("  ( <");
+		Options.out.print("  ( <");
 
 		for (i = 0; i < components; i++)
 		{
 			if (i != 0)
 			{
-				System.out.print(",");
+				Options.out.print(",");
 			}
 
 			if (list[i] != null)
 			{
-				System.out.print(list[i]);
+				Options.out.print(list[i]);
 			}
 		}
 
-		System.out.print(">, ");
+		Options.out.print(">, ");
 
 		String event = list[components * 2];
 
@@ -762,22 +762,22 @@ public class BDDAutomata
 			event = "??";
 		}
 
-		System.out.print(event + "  -> <");
+		Options.out.print(event + "  -> <");
 
 		for (i = 0; i < components; i++)
 		{
 			if (i != 0)
 			{
-				System.out.print(",");
+				Options.out.print(",");
 			}
 
 			if (list[components + i] != null)
 			{
-				System.out.print(list[components + i]);
+				Options.out.print(list[components + i]);
 			}
 		}
 
-		System.out.println("> ), ");
+		Options.out.println("> ), ");
 	}
 
 	// -----------------------------------------------------------------------------
@@ -786,7 +786,7 @@ public class BDDAutomata
 		if (Options.sanity_check_on)
 		{
 		    // DEBUG: in case checkPackage crashes before it exists and prints 'name'
-		    System.out.println("Checking : " + name);
+		    Options.out.println("Checking : " + name);
 		    BDDAssert.internalCheck(super.checkPackage(), name + ": checkPackage() failed");
 		}
 	}
@@ -864,7 +864,7 @@ public class BDDAutomata
 	// ------------------------------------------------ work in progress stuffs
 	public void internal_test()
 	{
-		System.out.println(" ---------------- internal_test ---------------");
+		Options.out.println(" ---------------- internal_test ---------------");
 
 		Timer timer = new Timer();
 
@@ -880,8 +880,8 @@ public class BDDAutomata
 		int safe = sup.getSafeStates();    // gc();
 
 		// DEBUG:
-		// System.out.print("Deadlocks: ");     show_states(d);
-		System.out.println("-------- All done, counting states now -----------");
+		// Options.out.print("Deadlocks: ");     show_states(d);
+		Options.out.println("-------- All done, counting states now -----------");
 		count_states("reachables", r);
 		count_states("co-reachaboes", c);
 		count_states("uncontrollable (reachable)", u);
@@ -912,15 +912,15 @@ public class BDDAutomata
 		 * t_all = andTo(t_all, a.getTpri() );
 		 *
 		 *
-		 * // System.out.print("t_all="); printSet(t_all);
-		 * System.out.print((100 * i / components) + "% left ...         \r");
+		 * // Options.out.print("t_all="); printSet(t_all);
+		 * Options.out.print((100 * i / components) + "% left ...         \r");
 		 * }
 		 *
 		 * timer.report("Prioritized composition done");
 		 * int cube = and(bdd_total_cube, events_cube); ref(cube);
 		 *
 		 * BDDAssert.debug("Prioritized composition");
-		 * // System.out.println("T-all = "); printSet(t_all);
+		 * // Options.out.println("T-all = "); printSet(t_all);
 		 * // show_states(t_all, null);
 		 * BDDAssert.debug("|prioritizied T-all| = " + nodeCount(t_all));
 		 *

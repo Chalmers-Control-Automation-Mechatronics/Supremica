@@ -62,9 +62,9 @@ public class OrderingSolver {
     public void dump() {
 		mec.dump();
 		if(order != null ){
-			System.out.println("Group ordering: ");
-			for(int i = 0; i < order.length; i++) System.out.print(" " + nodes[order[i]].org.getName());
-			System.out.println();
+			Options.out.println("Group ordering: ");
+			for(int i = 0; i < order.length; i++) Options.out.print(" " + nodes[order[i]].org.getName());
+			Options.out.println();
 		}
     }
 
@@ -263,9 +263,9 @@ public class OrderingSolver {
 			}
 
 			// DEBUG
-			// System.out.print("tour = ");
-			// for(int i = 0; i < size; i++) System.out.print(" " + org[tour[i]].org.getName());
-			// System.out.println();
+			// Options.out.print("tour = ");
+			// for(int i = 0; i < size; i++) Options.out.print(" " + org[tour[i]].org.getName());
+			// Options.out.println();
 
 			return tour;
 		}
@@ -412,20 +412,20 @@ public class OrderingSolver {
 
 		public void dump() {
 			if(localnodes == null) {
-			System.out.println("INTERNAL: you must build localnodes first!");
+			Options.out.println("INTERNAL: you must build localnodes first!");
 			return;
 			}
-			System.out.print("Automata classes : { ");
+			Options.out.print("Automata classes : { ");
 			for(int i = 0; i < localnodes.length; i++) {
-			System.out.print("{ ");
+			Options.out.print("{ ");
 			for(int j = 0; j <localnodes[i].length; j++) {
-				if(j != 0) System.out.print(",");
-				System.out.print("" + localnodes[i][j].org.getName());
+				if(j != 0) Options.out.print(",");
+				Options.out.print("" + localnodes[i][j].org.getName());
 			}
-			System.out.print("}");
-			if(i != 0)  System.out.print(", ");
+			Options.out.print("}");
+			if(i != 0)  Options.out.print(", ");
 			}
-			System.out.println("}");
+			Options.out.println("}");
 		}
     }
 

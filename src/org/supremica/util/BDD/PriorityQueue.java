@@ -124,7 +124,7 @@ public class PriorityQueue {
 
 
 		while(!pq.empty()) {
-			System.out.println("--> " + pq.next() + "/" + pq.cost());
+			Options.out.println("--> " + pq.next() + "/" + pq.cost());
 		}
 	}
 }

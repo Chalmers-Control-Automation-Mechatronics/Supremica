@@ -550,7 +550,7 @@ public class Supervisor
 			return;
 		}
 
-		System.out.println("---------------------------- Tracing '" + what + "' (max " + max + ")");
+		Options.out.println("---------------------------- Tracing '" + what + "' (max " + max + ")");
 
 		int zero = manager.getZero();
 
@@ -604,7 +604,7 @@ public class Supervisor
 			int t_all = manager.and(plant.getT(), spec.getT());
 			int here = manager.replace(to, permute1);
 
-			System.out.println("\n*** " + what + " (backward trace)");
+			Options.out.println("\n*** " + what + " (backward trace)");
 			manager.printAutomatonVector();
 
 			// show the last state:
@@ -653,7 +653,7 @@ public class Supervisor
 			manager.deref(t_all);
 
 			// ------------------- Show event trace
-			System.out.println("\n*** Events leading to " + what + ":");
+			Options.out.println("\n*** Events leading to " + what + ":");
 
 			int line_size = 0;
 
@@ -661,7 +661,7 @@ public class Supervisor
 			{
 				if (j != 0)
 				{
-					System.out.print("-->");
+					Options.out.print("-->");
 
 					line_size += 3;
 				}
@@ -670,7 +670,7 @@ public class Supervisor
 				{
 					line_size = 0;
 
-					System.out.println();
+					Options.out.println();
 				}
 
 				String e = (String) enames.get(trace_len - j - 1);
@@ -680,14 +680,14 @@ public class Supervisor
 					line_size += e.length();
 				}
 
-				System.out.print(e);
+				Options.out.print(e);
 			}
 
-			System.out.println("\n");
+			Options.out.println("\n");
 		}
 		else
 		{
-			System.out.println("Trace failed for '" + what + "'");
+			Options.out.println("Trace failed for '" + what + "'");
 		}
 	}
 
@@ -810,7 +810,7 @@ public class Supervisor
 
 			manager.deref(tmp2);
 
-			// System.out.print("2"); System.out.flush();
+			// Options.out.print("2"); Options.out.flush();
 		}
 		while (r_all_p != r_all);
 
@@ -839,8 +839,8 @@ public class Supervisor
 		int bad_statesp = manager.replace(bad_states, s2sp);
 
 		// DEBUG:
-		// System.out.println("BAD states are: "); manager.show_states(bad_states);
-		// System.out.println("GOOD states are: "); manager.show_states(good_states);
+		// Options.out.println("BAD states are: "); manager.show_states(bad_states);
+		// Options.out.println("GOOD states are: "); manager.show_states(good_states);
 
 		manager.deref(bad_states);
 
@@ -924,17 +924,17 @@ public class Supervisor
 
 		manager.ref(x);
 
-		// System.out.println("marked = "); manager.show_states(marked); // DEBUG
+		// Options.out.println("marked = "); manager.show_states(marked); // DEBUG
 		do
 		{
 			xp = x;
 
-			// System.out.println("x = "); manager.show_states(x); // DEBUG
+			// Options.out.println("x = "); manager.show_states(x); // DEBUG
 
 			int qp_k = getBR1(marked, x);
 			int not_qp_k = manager.not(qp_k);
 
-			// System.out.println("qp_k = "); manager.show_states(qp_k); // DEBUG
+			// Options.out.println("qp_k = "); manager.show_states(qp_k); // DEBUG
 
 			manager.deref(qp_k);
 
@@ -942,7 +942,7 @@ public class Supervisor
 
 			int qpp_k = getBR2(not_qp_k);
 
-			//System.out.println("qpp_k = "); manager.show_states(qpp_k); // DEBUG
+			//Options.out.println("qpp_k = "); manager.show_states(qpp_k); // DEBUG
 
 			x = manager.orTo(x, qpp_k);
 

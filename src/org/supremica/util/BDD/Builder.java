@@ -7,10 +7,10 @@ public class Builder {
     private org.supremica.automata.Automata s_automata;
     private Automata automata;
     private BDDAutomata bddautomata = null;
-    
+
     private int convertType(AutomatonType t) {
 	String name = t.toString().toLowerCase();
-	
+
 	if (name == null) {
 	    return Automaton.TYPE_UNKNOWN;
 	}
@@ -55,7 +55,7 @@ public class Builder {
 
 		// insert events
 		for(EventIterator ei = s_a.eventIterator(); ei.hasNext(); ) {
-		    LabeledEvent le = (LabeledEvent) ei.next();	
+		    LabeledEvent le = (LabeledEvent) ei.next();
 		    String id = le.getLabel(); // le.getId() has DEFAULT ACCESS, why??
 		    String label = le.getLabel();
 		    if(label == null) label = id;
@@ -103,23 +103,23 @@ public class Builder {
 		a.close();
 	    }
 
-	// close automata	
+	// close automata
 	automata.close();
 
 	// DEBUG:
-	// automata.dump(System.out);
+	// automata.dump(Options.out);
     }
-    
-    public BDDAutomata getBDDAutomata() 
+
+    public BDDAutomata getBDDAutomata()
 	throws BDDException
     {
 	if (bddautomata == null) {
-	    if(BDDAutomata.BDDPackageIsBusy()) 
+	    if(BDDAutomata.BDDPackageIsBusy())
 		throw new BDDException("The BDD packages is used by another task!");
 
 	    bddautomata = new BDDAutomata(automata);
 	}
-	
+
 	return bddautomata;
     }
 }

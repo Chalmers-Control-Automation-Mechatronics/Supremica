@@ -18,7 +18,7 @@ public class StateSet
 
 			if (s.name.equals(name))
 			{
-				System.out.println("Found state " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
+				Options.out.println("Found state " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
 
 				return true;
 			}
@@ -63,7 +63,7 @@ public class StateSet
 		// BDDAssert.bddAssert(!in(name), "Duplicate state: " + name);
 		if (in(name))
 		{
-			System.out.println("Duplicate state: " + name + "/" + id + " " + (count + 1));
+			Options.out.println("Duplicate state: " + name + "/" + id + " " + (count + 1));
 
 			int c = 0;
 
@@ -71,7 +71,7 @@ public class StateSet
 			{
 				State s = (State) e.nextElement();
 
-				System.out.println("state " + (c++) + " " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
+				Options.out.println("state " + (c++) + " " + s.name + "/" + s.name_id + " " + s.id + "/" + s.code);
 			}
 
 			System.exit(20);
@@ -89,8 +89,8 @@ public class StateSet
 
 		addElement(state);
 
-		// if(count == 1) System.out.println();
-		// System.out.print("\r " + count + "   ");
+		// if(count == 1) Options.out.println();
+		// Options.out.print("\r " + count + "   ");
 	}
 
 	// -------------------------------------------- AFTER CLOSING

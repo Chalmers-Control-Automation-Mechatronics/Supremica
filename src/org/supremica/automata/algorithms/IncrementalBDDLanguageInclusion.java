@@ -12,182 +12,46 @@ import java.util.*;
  *
  */
 
-public class IncrementalBDDLanguageInclusion {
-    private AutomataSynchronizerHelper.HelperData hd;
-    private org.supremica.automata.Automata theAutomata;
-
-	private boolean [] considred_events, events;
-	private boolean controllaibilty_test;
-    private BDDAutomata ba = null;
-    private BDDAutomaton [] all = null;
-  	private Group L1 = null;
-  	private Group L2 = null;
-  	private Group work1 = null, work2 = null;
+public class IncrementalBDDLanguageInclusion extends BaseBDDLanguageInclusion {
 
 
+	// ---[ interface to the base class ]-----------------------------------------------
 
 
-    /**
-     * creates a verification object for LANGUAGE INCLUSION test.
-     * depeding one the type of algorithm used, this call might take a while
-     * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
-     * @see cleanup()
-     */
     public IncrementalBDDLanguageInclusion(org.supremica.automata.Automata selected,
 			       org.supremica.automata.Automata unselected,
 			       AutomataSynchronizerHelper.HelperData hd)
 	throws Exception
     {
-		this.hd     = hd;
-		this.controllaibilty_test = false;
-
-		theAutomata = new org.supremica.automata.Automata();
-		theAutomata.addAutomata(selected);
-		theAutomata.addAutomata(unselected);
-
-
-		try {
-			Builder bu = new Builder(theAutomata);
-			ba = bu.getBDDAutomata();
-			all = ba.getAutomataVector();
-
-			L1 = new Group(ba, all, new AutomatonMembership(selected), "Selected");
-			L2 = new Group(ba, all, new AutomatonMembership(unselected), "Unselected");
-			init();
-
-		} catch(Exception pass) {
-			cleanup();
-			throw pass;
-		}
-    }
-
-
-    /**
-     * creates a verification object for CONTROLLABILITY test.
-     * depeding one the type of algorithm used, this call might take a while
-     * <b>DONT FORGET TO CALL cleanup() AFTERWARDS!!!</b>
-     * @see cleanup()
-     */
-    public IncrementalBDDLanguageInclusion(org.supremica.automata.Automata theAutomata,
+		super(selected, unselected, hd);
+	}
+	public IncrementalBDDLanguageInclusion(org.supremica.automata.Automata theAutomata,
 			       AutomataSynchronizerHelper.HelperData hd)
 	throws Exception
     {
-		this.hd     = hd;
-		this.controllaibilty_test = true;
-		this.theAutomata = theAutomata;
+		super(theAutomata, hd);
+	}
 
-		try {
-			Builder bu = new Builder(theAutomata);
-			ba = bu.getBDDAutomata();
-			all = ba.getAutomataVector();
+	protected boolean check(BDDAutomaton k, AutomataConfiguration ac)
+	{
 
-			L1 = new Group(ba, all, new AutomatonTypeMembership(false), "Spec");
-			L2 = new Group(ba, all, new AutomatonTypeMembership(true), "Plant");
+		// events that are intresting for this automata
+		boolean [] k_events = k.getEventCareSet(controllaibilty_test);
+		IndexedSet.intersection(k_events, considred_events, workset_events);
 
-
-			init();
-
-		} catch(Exception pass) {
-			cleanup();
-			throw pass;
+		if(Options.debug_on) {
+			ba.getEventManager().dumpSubset(
+				"\n*** Verifiying " + k.getName()  + ", considred events", workset_events);
+			Options.out.println("\n");
 		}
-    }
 
-
-	// internal init for both constructors common code
-	private void init() {
-		// get our working sets
-		work1 = new Group(ba, all.length, "work1");
-		work2 = new Group(ba, all.length, "work2");
-		// tell the Supervisor classes they shouldnt clean them up when they are done:
-		work1.setCleanup(false);
-		work2.setCleanup(false);
-
-		// get the intersection of the considred events
-		// *** I DONT KNOW IF THIS IS CORRECT!! ***
-		// must duplicate since we will change its value just velow
-		considred_events = Util.duplicate(L2.getEventCareSet(controllaibilty_test));
-
-		boolean [] tmp = L1.getEventCareSet(controllaibilty_test);
-		for(int i = 0; i < tmp.length; i++) considred_events[i] &= tmp[i];
-
-		if(Options.debug_on)
-			System.err.println("Incremental language containment test considreing " + Util.count(considred_events) + " events.");
-
-		// temporary vector for the current considred events in our current automata set
-		events = new boolean[considred_events.length];
+		if(controllaibilty_test)	return control_check(k, ac, workset_events);
+		else						return inclusion_check(k, ac, workset_events);
 	}
 
 
-    /**
-     * C++ style destructor.
-     * <b>This function MUST be called before creating any new AutomataBDDVerifier obejcts</b>
-     *
-     */
-    public void cleanup() {
-		if(work1 != null) work1.cleanup();
-		if(work2 != null) work2.cleanup();
-		if(L1 != null) L1.cleanup();
-		if(L2 != null) L2.cleanup();
-		if(ba != null) ba.cleanup();
 
-    }
-
-
-
-
-   /**
-     * Modular controllability check
-     * @return TRUE if the system is controllable
-     */
-
-	public boolean isControllable() {
-		BDDAssert.internalCheck(controllaibilty_test, "INTERNAL ERROR, someone fucked up...");
-		return passLanguageInclusion(); // almost same shity code...
-	}
-
-
-   /**
-     * Modular language inclusion check
-     *
-     * @return TRUE if the system a1 in a1
-     */
-    public boolean passLanguageInclusion() {
-
-		boolean save_show_grow = Options.show_grow;
-		Options.show_grow = false;
-
-		Event[] alphabet = ba.getEvents();
-		BDDAutomaton[] l1 = L1.getMembers();
-		int count = L1.getSize();
-		boolean result = true;
-
-
-		// IMPORTANT OPTIMIZATION:
-		// only if [Sigma' - (SigmaL1 \cap SigmaL2)] is not empty we need to add from L1 too
-		// this is not the case if we are doing a language inclusion test!
-		AutomataConfiguration ac = new AutomataConfiguration (L1, L2, !controllaibilty_test);
-
-		for(int i = 0; i < count; i++)
-		{
-			BDDAutomaton k =  l1[i];
-
-			if(controllaibilty_test)
-				result &= control_check(k, ac);
-			else
-				result &= inclusion_check(k, ac);
-			if(!result)
-			{
-				break;
-			}
-		}
-
-		Options.show_grow = save_show_grow;
-		return result;
-    }
-
-
-
+	// ---[ the actual code ]---------------------------------------------------------
 
 	/**
 	 * Check if languake of K is included in the language of the rest of automata?
@@ -196,18 +60,19 @@ public class IncrementalBDDLanguageInclusion {
 	 *   check if L(w1) \Sigma \cap L(w2) \subseteq L(w1).
 	 */
 	 // XXX: I think we have already showed that we dont _need_ to include additional plants (???)
-    private boolean inclusion_check(BDDAutomaton k, AutomataConfiguration ac)
+    private boolean inclusion_check(BDDAutomaton k, AutomataConfiguration ac, boolean [] workset_events)
     {
 
-		ac.reset(k, considred_events, events); // get events that are considred and in k
-		if(Options.debug_on)	System.out.println("Verifiying " + ac.toString() );
+		// get events that are considred and in k
+		boolean sane = ac.reset(k, considred_events, workset_events);
+		if(!sane) return true; // nothing to check
 
 		work1.empty(); // start with w1 = { k } ...
 		work1.add(k);
 		work2.empty(); // and w2 = \emptyset, that is L(w2) = \Sigma^* ??
 
 		int bdd_cube_sp = ba.getStatepCube();
-		int bdd_events = ba.getAlphabetSubsetAsBDD(events);
+		int bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
 
 
 		// get first round theta:
@@ -221,11 +86,14 @@ public class IncrementalBDDLanguageInclusion {
 
 		Supervisor sup = null;
 		for(;;) {
-			BDDAutomaton next = ac.addone(events, work1, work2, true);
+			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null)
 				break;
 
-			if(Options.debug_on)	System.out.println("Adding " + next.getName() );
+			if(Options.debug_on) {
+				Options.out.println("\n -----------------------------------------------------------\n");
+				Options.out.println("Check L(" + work1.toString() + ") subseteq L(" + work2.toString()  + ") ?");
+			}
 
 			int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
 			bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
@@ -240,13 +108,34 @@ public class IncrementalBDDLanguageInclusion {
 				bdd_theta= ba.andTo(bdd_theta, r); // see how much of uc was reachable
 				boolean ret = (bdd_theta == ba.getZero());
 
+
+
 				if(ret) {
+					// show that all and nc-arcs where unreachable
+					if(Options.debug_on)
+						ba.getEventManager().dumpSubset("*** Removed events", workset_events);
+
 					ba.deref(bdd_theta);
 					ba.deref(bdd_events);
 					sup.cleanup();	// do the delayed cleanup!
 					return true;
-
 				}
+				// else...
+
+				// *** see if some events are proved to be unrachable and can be removed
+				if(event_included(bdd_theta, workset_events, changes) > 0) {
+
+					if(Options.debug_on)
+						ba.getEventManager().dumpSubset("*** Removed events", changes);
+
+					// and remove the targets in the queue waiting to be added
+					ac.removeTargets(workset_events, changes);
+
+					ba.deref(bdd_events);
+					bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
+				}
+
+
 			} catch(Exception exx) {
 				exx.printStackTrace();
 
@@ -287,18 +176,20 @@ public class IncrementalBDDLanguageInclusion {
 	 * Check if an automaton is controllable against a set of plants and specs...
 	 */
 
-	private boolean control_check(BDDAutomaton k, AutomataConfiguration ac)
+	private boolean control_check(BDDAutomaton k, AutomataConfiguration ac, boolean [] workset_events)
 	{
 
-		ac.reset(k, considred_events, events); // get events that are considred and in k
-		if(Options.debug_on)	System.out.println("\n*** Verifiying " + ac.toString() );
+
+		// get events that are considred and in k
+		boolean sane = ac.reset(k, considred_events,  workset_events);
+		if(!sane) return true; // nothing to check
 
 		work1.empty(); // start with w1 = { k } ...
 		work1.add(k);
 		work2.empty(); // and w2 = \emptyset, that is L(w2) = \Sigma^* ??
 
 		int bdd_cube_sp = ba.getStatepCube();
-		int bdd_events = ba.getAlphabetSubsetAsBDD(events);
+		int bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
 
 
 		// get first round theta:
@@ -313,11 +204,15 @@ public class IncrementalBDDLanguageInclusion {
 		Supervisor sup = null;
 		int num_plants = 0;
 		for(;;) {
-			BDDAutomaton next = ac.addone(events, work1, work2, true);
+			BDDAutomaton next = ac.addone(work1, work2, true);
 			if(next == null) break;
 			if(next.getType() == org.supremica.util.BDD.Automaton.TYPE_PLANT) num_plants++;
 
-			if(Options.debug_on)	System.out.println("Check C(" + work2.toString() + ", " + work1.toString()  + ") ?");
+			if(Options.debug_on) {
+				Options.out.println("\n -----------------------------------------------------------\n");
+				Options.out.println("Check C(" + work2.toString() + ", " + work1.toString()  + ") ?");
+			}
+
 
 			int bdd_theta_delta = ba.relProd(next.getTpri(), bdd_events, bdd_cube_sp);
 			bdd_theta = ba.andTo(bdd_theta, bdd_theta_delta);
@@ -329,6 +224,7 @@ public class IncrementalBDDLanguageInclusion {
 					sup = null;
 				}
 
+
 				sup = SupervisorFactory.createSupervisor(ba, work1, work2);
 				int r = sup.getReachables();
 
@@ -336,12 +232,35 @@ public class IncrementalBDDLanguageInclusion {
 				boolean ret = (bdd_theta == ba.getZero());
 
 				if(ret) {
+					// show that all and nc-arcs where unreachable
+					if(Options.debug_on)
+						ba.getEventManager().dumpSubset("*** Removed events", workset_events);
+
+					// clean up before returning
 					ba.deref(bdd_theta);
 					ba.deref(bdd_events);
 					sup.cleanup();	// do the delayed cleanup!
 					return true;
-
 				}
+				// else ...
+
+
+				// *** see if some events are proved to be unrachable and can be removed
+				if(event_included(bdd_theta, workset_events, changes) > 0) {
+
+					if(Options.debug_on)
+						ba.getEventManager().dumpSubset("*** Removed events", changes);
+
+					// and remove the targets in the queue waiting to be added
+					ac.removeTargets(workset_events, changes);
+
+					ba.deref(bdd_events);
+					bdd_events = ba.getAlphabetSubsetAsBDD(workset_events);
+				}
+
+
+
+
 			} catch(Exception exx) {
 				exx.printStackTrace();
 				// clean up the mess we made ...

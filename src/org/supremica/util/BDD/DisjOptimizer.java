@@ -114,20 +114,20 @@ public class DisjOptimizer {
 		int s0 = manager.nodeCount(l); // old size
 		int s1 = manager.nodeCount(f); // new size
 
-		System.out.println("s0 = " + s0 + ", s1 = " + s1);
+		Options.out.println("s0 = " + s0 + ", s1 = " + s1);
 		if(f == manager.getZero()) {
-		    System.out.println("f == 0");
+		    Options.out.println("f == 0");
 		    return;
 		} else if(f == manager.getOne()) {
-		    System.out.println("f == 1");
+		    Options.out.println("f == 1");
 		} else if(s1 < s0) {
-		    System.out.println("|f| < |l|");
+		    Options.out.println("|f| < |l|");
 
 
 		    // START OF DEBUG CODE
 		    int less = manager.and(l,f);
 		    if(less != l) {
-			System.out.println("f is less than l");
+			Options.out.println("f is less than l");
 			int add = manager.not(f);
 			add = manager.andTo(l, f);
 			Util.showBDD(manager,add,"add"+i);
@@ -137,7 +137,7 @@ public class DisjOptimizer {
 		    int both = manager.or(u,l);
 		    int more = manager.or(both,f);
 		    if(more != both) {
-			System.out.println("f is more than u");
+			Options.out.println("f is more than u");
 			int notboth = manager.not(both);
 			int extra = manager.and(f, both);
 			manager.printSet(extra);

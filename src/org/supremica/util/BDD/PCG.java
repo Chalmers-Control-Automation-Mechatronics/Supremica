@@ -136,14 +136,14 @@ public class PCG
 
 		if (Options.debug_on)
 		{
-			System.out.print("PCG group ordering: ");
+			Options.out.print("PCG group ordering: ");
 
 			for (int j = 0; j < size; j++)
 			{
-				System.out.print(nodes[perm[j]].id.getName() + "  ");
+				Options.out.print(nodes[perm[j]].id.getName() + "  ");
 			}
 
-			System.out.println("  (score=" + perm[size] + ")");
+			Options.out.println("  (score=" + perm[size] + ")");
 		}
 
 		// we dont want the last element (score) any more
@@ -194,10 +194,10 @@ public class PCG
 			{
 
 				/*
-				 * System.out.println("path changed: " +cost + "  > " +perm[size]);
+				 * Options.out.println("path changed: " +cost + "  > " +perm[size]);
 				 * for(int j = 0; j < size; j++)
-				 * System.out.print( nodes[path[j]].id.getName() + "  ");
-				 * System.out.println();
+				 * Options.out.print( nodes[path[j]].id.getName() + "  ");
+				 * Options.out.println();
 				 */
 				for (int i = 0; i < size; i++)
 				{
@@ -265,7 +265,7 @@ public class PCG
 
 		if (Options.debug_on)
 		{
-			System.out.println("First node in PCG : node_" + best_index);
+			Options.out.println("First node in PCG : node_" + best_index);
 		}
 
 		return all_perm[best_index];
@@ -275,7 +275,7 @@ public class PCG
 	    throws BDDException
 	{
 
-		// System.out.println("Im " + me + " size " + size + "  left " + left);
+		// Options.out.println("Im " + me + " size " + size + "  left " + left);
 		int level = size - left;
 
 		if (left == 0)
@@ -405,7 +405,7 @@ public class PCG
     //
     // 1. chose a cycle C of length 3
     // 2. if V=V(C) then stop (C is a tour)
-    // 3. Find a city p \in V - V(C) such there there exists a q \in V(C) satisfying    
+    // 3. Find a city p \in V - V(C) such there there exists a q \in V(C) satisfying
     //             c_pq   = min { min { c_ij | j \in V(C)} | i \in V - V(C)
     // 4. Determine an edge uv \in C such that
     //             c_up + c_pv - c_uv = {main c_ip + c_pj-c_ij| ic \in C }
@@ -414,20 +414,20 @@ public class PCG
 	// TODO
 	return null;
     }
-    
+
 
 	// -----------------------------------------------------------------------------
 	public void dump()
 	{
 		for (int i = 0; i < size; i++)
 		{
-			System.out.println("Node_" + i + "  (" + nodes[i].id + ")");
+			Options.out.println("Node_" + i + "  (" + nodes[i].id + ")");
 
 			for (int j = 0; j < size; j++)
 			{
 				if (nodes[i].weights[j] != NOT_CONNECTED)
 				{
-					System.out.println("\t --> " + j + "    (weight = " + 
+					Options.out.println("\t --> " + j + "    (weight = " +
 							   nodes[i].weights[j] + ")");
 				}
 			}

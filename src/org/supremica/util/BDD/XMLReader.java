@@ -152,12 +152,12 @@ class XMLReader
 		{
 			automata.getCurrent().close();
 
-			// System.out.println("read automaton " + automata.getCurrent().getName() );
+			// Options.out.println("read automaton " + automata.getCurrent().getName() );
 		}
 		else if (qName.equals(TYPE_AUTOMATA))
 		{
 			automata.close();
-		}			
+		}
 	    } catch(BDDException e) {
 		throw new SAXException(e.toString());
 	    }

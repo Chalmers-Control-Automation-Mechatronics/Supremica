@@ -19,4 +19,6 @@ public class Event
     public String getName() { return name_id; }
     public boolean isControllable() { return c; }
     public boolean isPrioritized() { return p; }
+
+    public int getBDD() { return bdd; }
 }

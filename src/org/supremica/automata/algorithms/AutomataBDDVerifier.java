@@ -177,7 +177,6 @@ public class AutomataBDDVerifier {
 
 
 		ba.deref(states);
-
 		return ret;
 
     }

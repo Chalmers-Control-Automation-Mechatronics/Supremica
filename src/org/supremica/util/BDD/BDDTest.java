@@ -35,14 +35,14 @@ public class BDDTest
 
 	private void show_refs(int[] bdds)
 	{
-		System.out.print("BDD refs:\t");
+		Options.out.print("BDD refs:\t");
 
 		for (int i = 0; i < bdds.length; i++)
 		{
-			System.out.print("   v" + (i + 1) + ": " + internal_refcount(bdds[i]));
+			Options.out.print("   v" + (i + 1) + ": " + internal_refcount(bdds[i]));
 		}
 
-		System.out.println();
+		Options.out.println();
 	}
 
 	public BDDTest()
@@ -153,7 +153,7 @@ public class BDDTest
 
 		if (ch != 0)
 		{
-			System.out.println("" + ch + " refs changed after Exist");
+			Options.out.println("" + ch + " refs changed after Exist");
 		}
 
 		deref(e1);
@@ -167,7 +167,7 @@ public class BDDTest
 
 		if (ch != 0)
 		{
-			System.out.println("" + ch + " refs changed after not");
+			Options.out.println("" + ch + " refs changed after not");
 		}
 
 		deref(not1);

@@ -125,12 +125,12 @@ public class BinaryHeap {
 			double x = 100 * Math.random();
 			TestWO n = new TestWO("wo"+i, x);
 			bh.insert(n);
-			System.out.println( "" + n.object()  + " --> " + x);
+			Options.out.println( "" + n.object()  + " --> " + x);
 		}
 
 		while(!bh.empty()) {
 			String x= (String) ((TestWO)bh.deleteMin()).object();
-			System.out.println(x);
+			Options.out.println(x);
 		}
 	}
 */

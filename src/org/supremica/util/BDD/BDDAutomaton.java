@@ -198,8 +198,8 @@ public class BDDAutomaton
 		/*
 		 * String name =  "/tmp/dot/" + automaton.getName() + ".dot";
 		 * manager.printDot(bdd_tu, name);
-		 * System.out.println("dot -Tps " + name + " -o " + name + ".ps");
-		 * System.out.println("ghostview "+ name + ".ps &");
+		 * Options.out.println("dot -Tps " + name + " -o " + name + ".ps");
+		 * Options.out.println("ghostview "+ name + ".ps &");
 		 */
 	}
 
@@ -344,8 +344,9 @@ public class BDDAutomaton
 	}
     public int getIndex()
     {
-	return index;
+		return index;
     }
+
 	public Automaton getModel()
 	{
 		return automaton;
@@ -366,6 +367,11 @@ public class BDDAutomaton
 		return num_bits;
 	}
 
+	public int getNumArcs() {
+		return num_arcs;
+	}
+	// --------------------------------------------------------
+
     public boolean interact(BDDAutomaton ba) {
 		return automaton.interact(ba.automaton);
     }
@@ -377,6 +383,19 @@ public class BDDAutomaton
     public boolean interact(boolean [] careSet) {
 		return automaton.interact(careSet);
     }
+
+
+
+	/** returns the number of events that overlapp */
+	public int eventOverlapCount(boolean [] events) {
+		return automaton.eventOverlapCount(events);
+	}
+
+	/** returns the number of events that overlapp in ARCS */
+	public int arcOverlapCount(boolean [] events) {
+		return automaton.arcOverlapCount(events);
+	}
+
 
 	/**
 	 * maps event -> number of times that event was used in a transition

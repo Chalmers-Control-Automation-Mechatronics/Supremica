@@ -148,9 +148,9 @@ public class Automaton
 		// EventManager.close() has been called and we can proceed
 		eventSet.close(alphabet);
 
-		// System.out.println("closing " + name);
+		// Options.out.println("closing " + name);
 		// arcSet.close(stateSet, eventSet);
-		// System.out.println("done!");
+		// Options.out.println("done!");
 
 		care_set = eventSet.getEventCareSet(false);
 		care_set_uc = eventSet.getEventCareSet(true);
@@ -204,6 +204,30 @@ public class Automaton
 		return false;
     }
 
+	/** returns the number of events that overlapp */
+	public int eventOverlapCount(boolean [] events) {
+		int count = 0;
+		int es = events.length;
+		for(int i = 0; i < es; i++)
+			if(events[i] && care_set[i])
+				count++;
+		return count;
+	}
+
+
+	/** returns the number of ARCS that overlapp  with these events*/
+		public int arcOverlapCount(boolean [] events) {
+			int [] usage = arcSet.getEventUsageCount();
+			int count = 0;
+			int es = events.length;
+			for(int i = 0; i < es; i++)
+				if(events[i] && care_set[i])
+					count += usage[i];
+			return count;
+	}
+
+	// ---------------------------------------------------------------
+
     public void addEventCareSet(boolean [] events, boolean uncontrollable_events_only)
     {
 		// eventSet.addEventCareSet(events, uncontrollable_events_only);
@@ -218,6 +242,8 @@ public class Automaton
 		return uncontrollable_events_only ? care_set_uc : care_set;
 	}
 
+
+	// ----------------------------------------------------------------------
 
 	public String getName()
 	{
