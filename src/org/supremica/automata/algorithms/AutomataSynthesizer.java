@@ -83,7 +83,7 @@ public class AutomataSynthesizer
 
     public AutomataSynthesizer(/* Supremica workbench */Gui workbench, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws IllegalArgumentException
-    {
+	{
 		Automaton currAutomaton;
 		State currInitialState;
 
@@ -92,7 +92,7 @@ public class AutomataSynthesizer
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
 		this.synthesizerOptions = synthesizerOptions;
-	    initialState = new int[this.theAutomata.size() + 1]; // + 1 status field
+		initialState = new int[this.theAutomata.size() + 1]; // + 1 status field
 		nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
 
 		this.workbench = workbench;
@@ -116,12 +116,11 @@ public class AutomataSynthesizer
 			}
 		}
 		catch (Exception e)
-	    {
-         	//-- MF -- System.err.println("Error while initializing synchronization helper. " + e);
-         	workbench.error("Error while initializing synchronization helper. " + e);
+		{
+			//-- MF -- System.err.println("Error while initializing synchronization helper. " + e);
+			workbench.error("Error while initializing synchronization helper. " + e);
 			// e.printStackTrace();
-          	System.exit(0);
-	    }
+		}
 	}
 
 	// Synthesizes controllable supervisors
@@ -229,17 +228,17 @@ public class AutomataSynthesizer
 
 							AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton);
 
-							if (synthesizerOptions.getSynthesisType() == SynthesizerOptions.CONTROLLABLE)
+							if (synthesizerOptions.getSynthesisType() == SynthesisType.Controllable)
 							{
 								synthesizer.synthesizeControllable();
 							}
-							else if (synthesizerOptions.getSynthesisType() == SynthesizerOptions.NONBLOCKING)
+							else if (synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking)
 							{
 								synthesizer.synthesizeNonblocking();
 								//-- MF -- thisCategory.error("Option not implemented...");
 								// workbench.error("Option not implemented...");
 							}
-							else if (synthesizerOptions.getSynthesisType() == SynthesizerOptions.BOTH)
+							else if (synthesizerOptions.getSynthesisType() == SynthesisType.Both)
 							{
 								synthesizer.synthesize();
 								//-- MF -- thisCategory.error("Option not implemented...");
@@ -293,16 +292,16 @@ public class AutomataSynthesizer
 		}
 
 		try
-  		{
+		{
 			theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
 		}
-  		catch (Exception e)
-    	{
+		catch (Exception e)
+		{
 			// System.err.println("Error while generating union alphabet: " + e);
- 			//-- MF -- thisCategory.error("Error while generating union alphabet: " + e);
- 			workbench.error("Error while generating union alphabet: " + e);
-        	throw e;
-     	}
+			//-- MF -- thisCategory.error("Error while generating union alphabet: " + e);
+			workbench.error("Error while generating union alphabet: " + e);
+			throw e;
+		}
 
 		// Correct the id:s on the events...
 		Alphabet unionAlphabet = synchHelper.getAutomaton().getAlphabet();

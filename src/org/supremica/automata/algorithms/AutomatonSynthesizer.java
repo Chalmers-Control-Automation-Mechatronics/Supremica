@@ -188,7 +188,7 @@ public class AutomatonSynthesizer
 		theAutomaton.endTransaction();
 	}
 
-//-- MF -- My try for doing only nonbloicking (even more duplicate code!!)
+//-- MF -- My try for doing only nonblocking (even more duplicate code!!)
 	public void synthesizeNonblocking()
 		throws Exception
 	{

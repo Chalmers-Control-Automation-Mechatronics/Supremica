@@ -51,37 +51,29 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.gui.WorkbenchProperties;
 
-public final class SynthesizerOptions 
+public final class SynthesizerOptions
 {
 	private boolean dialogOK = false;
-	private int synthesisType;
-	private int algorithmType;
+	private SynthesisType synthesisType;
+	private SynthesisAlgorithm algorithmType;
 	private boolean purge;
 	private boolean optimize;
 	private boolean maximallyPermissive;
 
-	// Fixx for more convenient synthesis type handling (give me enums!)
-	public static int CONTROLLABLE = 0;
-	public static int NONBLOCKING = 1;
-	public static int BOTH = 2;
-	// And agorithm type
-	public static int MODULAR = 0;
-	public static int MONOLITHIC = 1;
-	public static int IDD = 2;
-	
+
 	public SynthesizerOptions()
 	{
-		this(WorkbenchProperties.synthesisSynthesisType(), 
+		this(WorkbenchProperties.synthesisSynthesisType(),
 			 WorkbenchProperties.synthesisAlgorithmType(),
-			 WorkbenchProperties.synthesisPurge(), 
+			 WorkbenchProperties.synthesisPurge(),
 			 WorkbenchProperties.synthesisOptimize(),
 			 WorkbenchProperties.synthesisMaximallyPermissive());
 	}
 
-	public SynthesizerOptions(int synthesisType, int algorithmType, boolean purge, boolean optimize, boolean maximallyPermissive)
+	public SynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm algorithmType, boolean purge, boolean optimize, boolean maximallyPermissive)
 	{
 		this.synthesisType = synthesisType;
-		this.algorithmType = algorithmType; 
+		this.algorithmType = algorithmType;
 		this.purge = purge;
 		this.optimize = optimize;
 		this.maximallyPermissive = maximallyPermissive;
@@ -97,24 +89,24 @@ public final class SynthesizerOptions
 		return dialogOK;
 	}
 
-	public void setSynthesisType(int index)
+	public void setSynthesisType(SynthesisType type)
 	{
-	    synthesisType = index;
-		WorkbenchProperties.setSynthesisSynthesisType(index);
+	    synthesisType = type;
+		WorkbenchProperties.setSynthesisSynthesisType(type);
 	}
 
-	public int getSynthesisType()
+	public SynthesisType getSynthesisType()
 	{
 		return synthesisType;
 	}
 
-	public void setAlgorithmType(int index)
+	public void setAlgorithmType(SynthesisAlgorithm algorithm)
 	{
-	    algorithmType = index;
-		WorkbenchProperties.setSynthesisAlgorithmType(index);
+	    algorithmType = algorithm;
+		WorkbenchProperties.setSynthesisAlgorithmType(algorithm);
 	}
 
-	public int getAlgorithmType()
+	public SynthesisAlgorithm getAlgorithmType()
 	{
 		return algorithmType;
 	}
