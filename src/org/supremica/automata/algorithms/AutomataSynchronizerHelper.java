@@ -759,7 +759,6 @@ public final class AutomataSynchronizerHelper
 		throws Exception
 	{
 		int[] automataIndices = new int[theAutomata.size()];
-
 		for (int i = 0; i < theAutomata.size(); i++)
 		{
 			automataIndices[i] = i;
@@ -791,7 +790,6 @@ public final class AutomataSynchronizerHelper
 
 			for (int i = 0; i < currState.length; i++)
 			{
-
 				// Only print states that are not initial if we are looking at a full state
 				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || (automataIndices.length < theAutomata.size()))
 				{
@@ -810,9 +808,9 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 
-			String reason = "the uncontrollable event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + " in the plant " + problemAutomaton.getName() + " is enabled.";
+			String reason = "the uncontrollable event \"" + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).getLabel() + "\" is enabled in the plant \"" + problemAutomaton.getName() + "\"";
 
-			logger.error("The state: " + state.toString() + " is uncontrollable since " + reason);
+			logger.info("The state \"" + state.toString() + "\" is uncontrollable since " + reason + ".");
 		}
 	}
 

@@ -1603,6 +1603,8 @@ public class ActionMan
 
 			try
 			{
+				JOptionPane.showMessageDialog(gui.getComponent(), "The automata explorer only works in the \"forward\" direction!", "Alert", JOptionPane.INFORMATION_MESSAGE);
+
 				AutomataExplorer explorer = new AutomataExplorer(selectedAutomata);
 				explorer.setVisible(true);
 				explorer.initialize();
@@ -1750,11 +1752,21 @@ public class ActionMan
 
 			gui.info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
 		}
+	}
+
+	// View hierarchy action performed
+	public static void hierarchyView_actionPerformed(Gui gui)
+	{
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
+		{
+			return;
+		}
 
 		try
 		{
 			AutomataHierarchyViewer viewer = new AutomataHierarchyViewer(selectedAutomata);
-
+			
 			viewer.setVisible(true);
 			//viewer.setState(Frame.NORMAL);
 		}
@@ -1762,11 +1774,11 @@ public class ActionMan
 		{
 			logger.error("Exception in AutomataHierarchyViewer.", ex);
 			logger.debug(ex.getStackTrace());
-
+			
 			return;
 		}
 	}
-
+	
 	// Automaton.View action performed
 	public static void automatonView_actionPerformed(Gui gui)
 	{

@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -61,7 +60,8 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 
 /**
- * Used in the "Automata Explorer" (an early version that is on ice since way back and therefore not completed).
+ * Used in the "Automata Explorer" (an early version that is on ice since way 
+ * back and therefore not completed).
  * Also used in AutomataVerifier.findUncontrollableStates.
  *
  *@author  ka

@@ -49,6 +49,10 @@ class MainPopupMenu
 
 		menuHandler.add(exploreItem, 1);
 
+		JMenuItem hierarchyItem = new JMenuItem("View hierarchy");
+
+		menuHandler.add(hierarchyItem, 1);
+
 		JMenuItem alphabetItem = new JMenuItem("View alphabet");
 
 		menuHandler.add(alphabetItem, 1);
@@ -287,6 +291,14 @@ class MainPopupMenu
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automatonExplore_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
+		hierarchyItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.hierarchyView_actionPerformed(getGui());
 				getGui().repaint();
 			}
 		});

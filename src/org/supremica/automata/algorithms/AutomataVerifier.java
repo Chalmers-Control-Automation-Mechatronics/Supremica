@@ -627,7 +627,6 @@ public class AutomataVerifier
 
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();
-
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
@@ -658,7 +657,8 @@ public class AutomataVerifier
 			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 			{
 				automataNames = automataNames.append(((Automaton) autIt.next()).getName());
-				automataNames = automataNames.append(" ");
+				if (autIt.hasNext())
+					automataNames = automataNames.append("||");
 			}
 		}
 
@@ -675,9 +675,14 @@ public class AutomataVerifier
 
 			if (verboseMode)
 			{
-				logger.error(automataNames + "has " +
-							 potentiallyUncontrollableStates.size(automataIndices) +
-							 " states that might be uncontrollable...");
+				String states = "";
+				if (potentiallyUncontrollableStates.size(automataIndices) == 1)
+					states = "one state";
+				else
+					states = potentiallyUncontrollableStates.size(automataIndices) + "states";
+
+				logger.info("\"" + automataNames + "\" has " + states + 
+							 " that might be uncontrollable...");
 			}
 
 			// Set a sorted array of indexes of automata with similar alphabets
@@ -688,7 +693,7 @@ public class AutomataVerifier
 				if (verboseMode)
 				{
 					// Print the uncontrollable state(s)...
-					synchHelper.printUncontrollableStates();
+					synchHelper.printUncontrollableStates(automataIndices);
 				}
 
 				return false;
@@ -708,7 +713,7 @@ public class AutomataVerifier
 			{
 				if (verboseMode)
 				{
-					logger.info("Attempt number " + attempt + ".");
+					logger.debug("Attempt number " + attempt + ".");
 				}
 
 				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
@@ -1162,14 +1167,13 @@ public class AutomataVerifier
 		if (uncontrollabilityCheckHelper == null)
 		{
 			AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
-
 			onlineSynchronizer.selectAutomata(automataIndices);
 			onlineSynchronizer.initialize();
 
 			uncontrollabilityCheckHelper = new AutomataSynchronizerHelper(synchHelper);
 
 			if (verboseMode)
-			{	// It's important that setRememberTrace occurs before addState!
+			{	// It's important that setRememberTrace occurs before addState(initialState)!
 				uncontrollabilityCheckHelper.setRememberTrace(true);
 			}
 			uncontrollabilityCheckHelper.addState(initialState);
@@ -1200,7 +1204,6 @@ public class AutomataVerifier
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
-
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
 
 		return !uncontrollabilityCheckHelper.getAutomataIsControllable();

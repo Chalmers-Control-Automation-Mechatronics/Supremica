@@ -153,7 +153,7 @@ public class AutomataVerificationWorker
 		}
 		else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
 		{
-			// Non-blocking verification...
+			// Mutual non-blocking verification...
 			successMessage = "The system is mutually non-blocking!";
 			failureMessage = "The system might be mutually blocking.";
 		}
@@ -162,8 +162,8 @@ public class AutomataVerificationWorker
 			// Language inclusion verification...
 			successMessage = "The language of the unselected automata is \n" +
 				             "included in the language of the selected automata.";
-			failureMessage = "The language of the unselected automata is \n" +
-				             "NOT included in the language of the selected automata.";
+			failureMessage = "The language of the unselected automata is NOT\n" +
+				             "included in the language of the selected automata.";
 
 			// In language inclusion, not only the currently selected automata are used!
 			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
@@ -172,7 +172,8 @@ public class AutomataVerificationWorker
 		{	// Error... this can't happen!
 			requestStop();
 			logger.error("Unavailable option chosen... this can't happen...\n" +
-						 "don't ever do whatever you just did again, please.");
+						 "don't ever do whatever you just did again, please.\n" +
+						 "Please send bug report to bugs@supremica.org.");
 			return;
 		}
 
@@ -224,6 +225,19 @@ public class AutomataVerificationWorker
 		// Present the result
 		if (!stopRequested)
 		{
+			// Make sure(?) the ExecutionDialog is hidden!
+			// I thought this wouldn't work... but it seems
+			// it does!! /hguo
+			eventQueue.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						if (executionDialog != null)
+							executionDialog.setMode(ExecutionDialogMode.hide);
+					}
+				});
+
+			// Show message dialog with result
 			if (verificationSuccess)
 			{
 				JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", 

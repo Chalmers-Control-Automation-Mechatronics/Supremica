@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -281,8 +280,9 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/**
-	 * Calculates what events are enabled from the state <tt>currState</tt>, if the state turns out
-	 * uncontrollable the boolean controllableState is set false.
+	 * Calculates what events are enabled from the state <tt>currState</tt>, 
+	 * if the state turns out uncontrollable, the boolean controllableState 
+	 * is set false.
 	 *
 	 *@param  currState the (full) state to be examined.
 	 */
@@ -519,13 +519,14 @@ public final class AutomataSynchronizerExecuter
 
 		if (coExecute)
 		{
-
 			// In co-execution mode, an enabledEvents-method in another executer
 			// follows the automaton we're suspecting has uncontrollable states.
 			int insertionIndex = 0;
 			int i = 0;
 			int currEvent = currEnabledEvents[i++];
 
+			// If an event is enabled in the coexecuter, put it first in the 
+			// currEnabledEvents array!
 			while (currEvent != Integer.MAX_VALUE)
 			{
 				if (coExecuter.isEnabled(currEvent))
@@ -538,7 +539,6 @@ public final class AutomataSynchronizerExecuter
 
 			if (insertionIndex == 0)
 			{
-
 				// Found no corresponding transitions in the suspect automaton...
 				// /*
 				if (verboseMode)
@@ -547,13 +547,13 @@ public final class AutomataSynchronizerExecuter
 				}
 
 				// */
-				// Here, the insertionIndex sets the maximium amount of states that are examined...
+				// Here, the insertionIndex sets the maximium amount of states 
+				// that are examined...
 				// insertionIndex = 2;
 				insertionIndex = currEnabledEvents.length - 1;
 			}
 			else
 			{
-
 				// There are transitions in the suspect automaton...
 				// /*
 				if (verboseMode)
