@@ -54,7 +54,8 @@ import org.supremica.gui.*;
 import org.apache.log4j.*;
 
 /**
- * A collection of automata.
+ * A collection of Automaton-objects.
+ * @see Automaton
  */
 public class Automata
 {

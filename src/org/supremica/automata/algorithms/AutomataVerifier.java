@@ -93,6 +93,7 @@ public class AutomataVerifier
 	private VerificationOptions verificationOptions;
 	private SynchronizationOptions synchronizationOptions;
 
+	/** For stopping execution. */
 	private boolean stopRequested = false;
 
     public AutomataVerifier(Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
@@ -125,6 +126,7 @@ public class AutomataVerifier
 
 	/**
 	 * Performs verification using the AutomataSynchronizerExecuter.
+	 * @deprecated this is done in AutomataVerificationWorker.
 	 * @return true if controllable, false if not or false if don't know.
 	 * @see AutomataSynchronizerExecuter
 	 */
@@ -150,14 +152,21 @@ public class AutomataVerifier
 		}
 	}
 
-	public void requestStop()
+	/** 
+	 * Method called from external class stopping AutomataVerifier as soon as possible. 
+	 * @see CancelDialog
+	 */
+ 	public void requestStop()
 	{
 		stopRequested = true;
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 			((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
 	}
 
-	private boolean modularControllabilityVerification()
+	/** 
+	 * Performs the modular verification of controllability. 
+	 */
+	public boolean modularControllabilityVerification()
 		throws Exception
 	{
 		potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
@@ -285,7 +294,7 @@ public class AutomataVerifier
 										// Print event trace reaching uncontrollable state
 										synchHelper.displayTrace();
 										// Print info on amount of states examined
-										synchHelper.displayInfo();
+										// synchHelper.displayInfo(); // This is done always in AutomataVerificationWorker
 									}
 									return false;
 								}
@@ -628,7 +637,7 @@ public class AutomataVerifier
 		return !synchHelper.getAutomataIsControllable();
 	}
 
-	private boolean monolithicControllabilityVerification()
+	public boolean monolithicControllabilityVerification()
 		throws Exception
 	{
 		synchHelper.addState(initialState);

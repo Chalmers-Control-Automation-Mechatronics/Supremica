@@ -81,6 +81,8 @@ public class CancelDialog
 	private JProgressBar progressBar;
 	private Supremica workbench;
 
+	private boolean stopRequested = false;
+
 	/**
 	 * Creates (modal?) dialog box for canceling the threads in the supplied ArrayList
 	 */
@@ -91,16 +93,10 @@ public class CancelDialog
 		this.workbench = workbench;
 		this.executers = executers;
 
-		run();
-	}
-
-	public void run()
-	{
 		setTitle("Stop execution");
 		setSize(new Dimension(250, 120));
 		// dialog.setLocation(200,100);
 		setResizable(false);
-
 
 		// Center the window
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -218,9 +214,12 @@ public class CancelDialog
 
 	public void destroy()
 	{
-		executers = null; // Helping the garbage collector...
-		// workbench = null; // Helping the garbage collector...
-		setVisible(false);
+		if (!stopRequested)
+		{
+			executers = null; // Helping the garbage collector...
+			// workbench = null; // Helping the garbage collector...
+			setVisible(false);
+		}
 	}
 
 	public void actionPerformed(ActionEvent event)
@@ -228,8 +227,11 @@ public class CancelDialog
 		Object source = event.getSource();
 		if (source == stopButton)
 		{
+			stopRequested = true;
 			for (int i = 0; i < executers.size(); i++)
+			{
 			    ((Stoppable) executers.get(i)).requestStop();
+			}
 			executers = null; // Helping the garbage collector...
 			// workbench = null; // Helping the garbage collector...
 			setVisible(false);

@@ -69,9 +69,6 @@ public class LanguageInclusionCheck
 	public LanguageInclusionCheck(Automata AutomataA, Automata AutomataB, SynchronizationOptions syncOptions)
 		throws IllegalArgumentException
     {
-		// FIXA! Borde göra kopior av AutomataA och B istället.
-		// this.AutomataA = AutomataA;
-		// this.AutomataB = AutomataB;
 		this.AutomataA = new Automata(AutomataA);
 	    this.AutomataB = new Automata(AutomataB);
 		this.syncOptions = syncOptions;
@@ -83,9 +80,6 @@ public class LanguageInclusionCheck
 	public boolean execute()
 		throws Exception
     {
-		// if (true)
-		// return true;
-		
 		Automaton currAutomaton;
 		Iterator eventIteratorA;
 		Iterator eventIteratorB;

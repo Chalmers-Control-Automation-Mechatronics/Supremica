@@ -77,7 +77,7 @@ public class SynthesizerDialog
 		dialog = new JDialog(parentFrame, true); //modal		
 		this.synthesizerOptions = synthesizerOptions;
 		dialog.setTitle("Synthesizer options");
-		dialog.setSize(new Dimension(500, 400));
+		dialog.setSize(new Dimension(400, 300));
 		dialog.setResizable(false);
 		Container contentPane = dialog.getContentPane();
 

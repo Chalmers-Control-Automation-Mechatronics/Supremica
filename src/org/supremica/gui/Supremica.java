@@ -646,24 +646,28 @@ public class Supremica
 		JMenuItem verifyItem = new JMenuItem("Verify");
 		menuHandler.add(verifyItem, 1);
 
+		/*
 		JMenuItem controllabilityCheckItem = new JMenuItem("Controllability check");
 		menuHandler.add(controllabilityCheckItem, 2);
 
 		JMenuItem fastControllabilityCheckItem = new JMenuItem("Fast controllability check");
 		menuHandler.add(fastControllabilityCheckItem, 2);
+		*/
 
 		/*
 		JMenuItem pairwiseCheckItem = new JMenuItem("Pairwise controllability check");
 		menuHandler.add(pairwiseCheckItem, 2);
 		*/
 
+		/*
 		JMenuItem languageInclusionCheckItem = new JMenuItem("Language inclusion check");
 		menuHandler.add(languageInclusionCheckItem, 1);
-
-		menuHandler.addSeparator();
+		*/
 
 		JMenuItem synthesizeItem = new JMenuItem("Synthesize");
 		menuHandler.add(synthesizeItem, 1);
+
+		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
 		menuHandler.add(purgeItem, 1);
@@ -833,6 +837,7 @@ public class Supremica
 				}
 			});
 
+		/*
 		controllabilityCheckItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -850,6 +855,7 @@ public class Supremica
 					repaint();
 				}
 			});
+		*/
 
 		/*
 		pairwiseCheckItem.addActionListener(new ActionListener()
@@ -862,6 +868,7 @@ public class Supremica
 			});
 		*/
 
+		/*
 		languageInclusionCheckItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -870,6 +877,7 @@ public class Supremica
 					repaint();
 				}
 			});
+		*/
 
 		synthesizeItem.addActionListener(new ActionListener()
 			{
@@ -1008,7 +1016,7 @@ public class Supremica
 			});
 	}
 
-	private Collection getSelectedAutomata()
+	public Collection getSelectedAutomata()
 	{
 		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
 		LinkedList selectedAutomata = new LinkedList();
@@ -1400,6 +1408,7 @@ public class Supremica
 
 		Automata currAutomata = new Automata();
 
+		// The Automata must have initial states.
 		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
 		{
@@ -1512,9 +1521,12 @@ public class Supremica
 		  }
 
 	}
-
 */
+
 	// Automaton.ControllabilityCheck action performed
+	/**
+	 * @deprecated use AutomataVerifier instead.
+	 */
 	public void automataControllabilityCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
@@ -1571,7 +1583,10 @@ public class Supremica
 			JOptionPane.showMessageDialog(this, "The automata is not controllable!", "Bad news", JOptionPane.INFORMATION_MESSAGE);
 		}
 	 }
-
+	
+	/**
+	 * @deprecated use AutomataVerifier instead.
+	 */
 	public void automataFastControllabilityCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
@@ -1688,6 +1703,9 @@ public class Supremica
 	*/
 
 	// Automaton.LanguageInclusionCheck action performed
+	/**
+	 * @deprecated use AutomataVerifier instead.
+	 */
 	public void languageInclusionCheck_actionPerformed(ActionEvent e)
 	{
 		Date startDate = new Date();
@@ -2764,7 +2782,6 @@ class TypeCellEditor
 			}
 		}
 	}
-
 }
 
 

@@ -60,6 +60,9 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 
+/**
+ * Thread dealing with verification.
+ */
 public class AutomataVerificationWorker
 	extends Thread
 	implements Stoppable
@@ -68,15 +71,12 @@ public class AutomataVerificationWorker
 
 	private Supremica workbench = null;
 	private Automata theAutomata = null;
-	private AutomatonContainer container = null;
-	private String newAutomatonName = null;
-	private static final int MODE_SYNC = 1;
-	private static final int MODE_UPDATE = 2;
-	private int mode = MODE_SYNC;
-	private Automaton theAutomaton = null;
+	private AutomatonContainer theAutomatonContainer = null;
+	// private String newAutomatonName = null;
+	// private Automaton theAutomaton = null;
 	private SynchronizationOptions synchronizationOptions;
 	private VerificationOptions verificationOptions;
-
+	private CancelDialog cancelDialog;
 	private boolean stopRequested = false;
 
 	public AutomataVerificationWorker(Supremica workbench,
@@ -86,8 +86,8 @@ public class AutomataVerificationWorker
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
-		container = workbench.getAutomatonContainer();
-		this.newAutomatonName = newAutomatonName;
+		theAutomatonContainer = workbench.getAutomatonContainer();
+		// this.newAutomatonName = newAutomatonName;
 		this.synchronizationOptions = synchronizationOptions;
 		this.verificationOptions = verificationOptions;
 		this.start();
@@ -95,49 +95,76 @@ public class AutomataVerificationWorker
 
 	public void run()
 	{
+		Date startDate;
+		Date endDate;
+		AutomataVerifier automataVerifier = null;
+		
+		// Cancel dialog initialization...
+		ArrayList threadsToStop = new ArrayList();
+		threadsToStop.add(this);
+		cancelDialog = new CancelDialog(workbench, threadsToStop);
+		cancelDialog.updateHeader("Verifying...");
+		
 		if (verificationOptions.getVerificationType() == 0)
 		{   // Controllability verification...
+			boolean isControllable;
 
-			AutomataVerifier automataVerifier = null;
+			if (theAutomata.size() < 2)
+			{
+				requestStop();
+				JOptionPane.showMessageDialog(workbench, "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
 			try
 			{
 				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+				automataVerifier.getHelper().setCancelDialog(cancelDialog);
+				threadsToStop.add(automataVerifier);
 			}
 			catch (Exception e)
 			{
+				requestStop();
 				JOptionPane.showMessageDialog(workbench, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				thisCategory.error(e.getMessage());
 				return;
 			}
-
-			ArrayList threadsToStop = new ArrayList();
-			threadsToStop.add(automataVerifier);
-			threadsToStop.add(this);
-			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop);
-			automataVerifier.getHelper().setCancelDialog(cancelDialog);
-			cancelDialog.updateHeader("Verifying...");
-			boolean isControllable;
-
-			// Verify controllability...
-			Date startDate = new Date();
+			
+			startDate = new Date();
 			try
 			{
-				isControllable = automataVerifier.execute();
+				if (verificationOptions.getAlgorithmType() == 0)
+				{   // Modular...
+					isControllable = automataVerifier.modularControllabilityVerification();
+				}
+				else if (verificationOptions.getAlgorithmType() == 1)
+				{	// Monolithic...
+					isControllable = automataVerifier.monolithicControllabilityVerification();
+				}
+				else if (verificationOptions.getAlgorithmType() == 2)
+				{   // IDD...
+					requestStop();
+					thisCategory.error("Option not implemented...");
+					return;
+				}
+				else
+				{   // Error...
+					requestStop();
+					thisCategory.error("Unavailable option chosen.");
+					return;
+				}
 			}
 			catch (Exception e)
 			{
+				requestStop();
 				thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
 				return;
 			}
-			Date endDate = new Date();
+			endDate = new Date();
 
 			// Present result...
 			if (!stopRequested)
 			{
-				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 +
-								  " seconds.");
-				cancelDialog.destroy();
-
 				if (isControllable)
 				{
 					JOptionPane.showMessageDialog(workbench, "The automata is controllable!",
@@ -149,49 +176,201 @@ public class AutomataVerificationWorker
 												  "Bad news", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
-			else
-			{
-				thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 +
-								  " seconds.");
-				cancelDialog.destroy();
-			}
-
 		}
 		else if (verificationOptions.getVerificationType() == 1)
 		{	// Non-blocking verification...
+			requestStop();
 			thisCategory.error("Option not implemented...");
 			return;
 		}
 		else if (verificationOptions.getVerificationType() == 2)
 		{	// Language inclusion
-			if (verificationOptions.getAlgorithmType() == 0)
-			{   // Modular...
+			boolean isIncluded;
+			
+			Collection selectedAutomata = workbench.getSelectedAutomata();
+			Automata automataA = new Automata();
+			Automata automataB = new Automata();
+			Automaton currAutomaton;
+			String currAutomatonName;
+			
+			// The automata must have an initial state
+			// Put selected automata in automataB and unselected in automataA
+			for (int i = 0; i < theAutomatonContainer.getSize(); i++)
+			{
+				try
+				{
+					currAutomaton = theAutomatonContainer.getAutomatonAt(i);
+				}
+				catch (Exception ex)
+				{
+					requestStop();
+					thisCategory.error("Exception in AutomatonContainer.");
+					return;
+				}
+				currAutomatonName = currAutomaton.getName();
+				if (currAutomaton.getInitialState() == null)
+				{
+					requestStop();
+					JOptionPane.showMessageDialog(workbench, "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (selectedAutomata.contains(currAutomaton))
+					automataB.addAutomaton(new Automaton(currAutomaton));
+				else
+					automataA.addAutomaton(new Automaton(currAutomaton));
 			}
-			else if (verificationOptions.getAlgorithmType() == 1)
-			{	// Monolithic...
-				thisCategory.error("Option not implemented...");
+			
+			if (automataA.size() < 1 || automataB.size() < 1)
+			{
+				requestStop();
+				thisCategory.error("At least one automaton must be unselected.");
 				return;
 			}
-			else if (verificationOptions.getAlgorithmType() == 2)
-			{   // IDD...
-				thisCategory.error("Option not implemented...");
-				return;
+
+			// Compute the union alphabet of the events in automataA, mark all
+			// events in automataA as uncontrollable and the automata as plants
+			EventsSet theAlphabets = new EventsSet();
+			Alphabet unionAlphabet;
+			Iterator automatonIteratorA = automataA.iterator();
+			Iterator eventIteratorA;
+			Iterator eventIteratorB;
+			while (automatonIteratorA.hasNext())
+			{
+				currAutomaton = (Automaton) automatonIteratorA.next();
+				Alphabet currAlphabet = currAutomaton.getAlphabet();
+				theAlphabets.add(currAlphabet);
+				currAutomaton.setType(AutomatonType.Plant);
+				eventIteratorA = currAutomaton.eventIterator();
+				while(eventIteratorA.hasNext())
+				{
+					((org.supremica.automata.Event) eventIteratorA.next()).setControllable(false);
+				}
 			}
+			if (theAlphabets.size() == 1)
+				unionAlphabet = (Alphabet) theAlphabets.get(0);
 			else
-			{   // Error...
-				thisCategory.error("Unavailable option chosen.");
+			{
+				try
+				{
+					unionAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "");
+				}
+				catch (Exception e)
+				{
+					requestStop();
+					thisCategory.error("Error when calculation union alphabet. " + e);
+					return;
+				}
+			}			
+
+			// Change events in the automata in automataB to uncontrollable if they
+			// are included in the union alphabet found above, mark the automata as
+			// specifications
+			Iterator automatonIteratorB = automataB.iterator();
+			org.supremica.automata.Event currEvent;
+			while (automatonIteratorB.hasNext())
+			{
+				currAutomaton = (Automaton) automatonIteratorB.next();
+				currAutomaton.setType(AutomatonType.Supervisor);
+				eventIteratorB = currAutomaton.eventIterator();
+				while(eventIteratorB.hasNext())
+				{
+					currEvent = (org.supremica.automata.Event) eventIteratorB.next();
+					if (unionAlphabet.containsEventWithLabel(currEvent.getLabel()))
+						currEvent.setControllable(false);
+					else
+						currEvent.setControllable(true);
+				}
+			}
+			
+			// After the above preparations, the language inclusion check
+			// can be performed as a controllability check...
+			automataA.addAutomata(automataB);
+			
+			try
+			{
+				automataVerifier = new AutomataVerifier(automataA, synchronizationOptions, verificationOptions);
+				automataVerifier.getHelper().setCancelDialog(cancelDialog);
+				threadsToStop.add(automataVerifier);
+			}
+			catch (Exception e)
+			{
+				requestStop();
+				JOptionPane.showMessageDialog(workbench, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				thisCategory.error(e.getMessage());
 				return;
+			}
+			
+			startDate = new Date();
+			try
+			{
+				if (verificationOptions.getAlgorithmType() == 0)
+				{   // Modular...
+					isIncluded = automataVerifier.modularControllabilityVerification();
+				}
+				else if (verificationOptions.getAlgorithmType() == 1)
+				{	// Monolithic...
+					isIncluded = automataVerifier.monolithicControllabilityVerification();
+				}
+				else if (verificationOptions.getAlgorithmType() == 2)
+				{   // IDD...
+					requestStop();
+					thisCategory.error("Option not implemented...");
+					return;
+				}
+				else
+				{   // Error...
+					requestStop();
+					thisCategory.error("Unavailable option chosen.");
+					return;
+				}
+			}
+			catch (Exception e)
+			{
+				requestStop();
+				thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				return;
+			}
+			endDate = new Date();
+			
+			// Present result...
+			if (!stopRequested)
+			{
+				if (isIncluded)
+				{
+					JOptionPane.showMessageDialog(workbench, "The language of the unselected automata is included in the language of the selected automata.", "Good news", JOptionPane.INFORMATION_MESSAGE);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(workbench, "The language of the unselected automata is NOT included in the language of the selected automata.", "Bad news", JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
 		}
 		else
 		{   // Error...
+			requestStop();
 			thisCategory.error("Unavailable option chosen.");
 			return;
 		}
+		
+		// Present result...
+		automataVerifier.getHelper().displayInfo();
+		if (!stopRequested)
+		{
+			thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 +
+							  " seconds.");
+		}
+		else
+		{
+			thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 +
+							  " seconds.");
+		}
+		requestStop();
 	}
 
 	public void requestStop()
 	{
+		if (cancelDialog != null)
+			cancelDialog.destroy();
 		stopRequested = true;
 	}
 }
