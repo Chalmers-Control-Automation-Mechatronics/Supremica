@@ -186,6 +186,17 @@ public class Supervisor
 			sb.append("DisjOPtimizer: " + Options.DISJ_OPTIMIZER_NAMES[Options.disj_optimizer_algo]);
 		}
 
+		// variabe ordering
+		sb.append(" Order: " + Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
+
+		if(Options.ordering_algorithm == Options.AO_HEURISTIC_FORCE ||
+			Options.ordering_algorithm == Options.AO_HEURISTIC_FORCE_WIN4)
+		{
+			sb.append("/" + Options.FORCE_TYPE_NAMES[Options.ordering_force_cost]);
+		}
+
+
+
 		return sb.toString();
 	}
 

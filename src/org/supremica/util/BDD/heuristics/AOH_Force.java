@@ -39,11 +39,12 @@ public class AOH_Force
 
 
 
-	private int[] order;
-	private int size;
+	private int[] order, cutcount;
+	private int size, cost_type;
 	private Node [] nodes;
 	private double [] weights, window_tmp;
-	private double best_span; // best span so far
+	private double lowest_cost; // lowest cost so far
+	private double edge_start, edge_end; // internal variables, do not use
 	private int dfs_count; // class global variable for labelling
 	private boolean use_win4; // are we useing the window4 methods or not?
 
@@ -57,6 +58,7 @@ public class AOH_Force
 
 	public AOH_Force(boolean use_win4) {
 		this.use_win4 = use_win4;
+		this.cost_type = Options.ordering_force_cost;
 	}
 
 	public void init(Automata a)
@@ -68,6 +70,7 @@ public class AOH_Force
 		size = gf.numOfNodes();
 		nodes = new Node[size];
 		order = new int[size];
+		cutcount = new int[size];
 		weights = new double[size];
 		window_tmp = new double[4]; // size of the window
 
@@ -93,7 +96,7 @@ public class AOH_Force
 
 
 		// iterate
-		best_span = Double.MAX_VALUE;
+		lowest_cost = Double.MAX_VALUE;
 
 
 		for(int rounds = 0; rounds < TOTAL_ROUNDS; rounds ++) {
@@ -109,15 +112,15 @@ public class AOH_Force
 			double span = iterate(max_itr);
 
 			// see how good it was
-			if(span < best_span) {
-				best_span = span;
+			if(span < lowest_cost) {
+				lowest_cost = span;
 				extract_order();
 			}
 		}
 
 		if(Options.profile_on)
 		{
-			Options.out.println("--> [AOH_Force] lowest total span = " + best_span);
+			Options.out.println("--> [AOH_Force] lowest cost = " + lowest_cost);
 		}
 
 
@@ -136,8 +139,8 @@ public class AOH_Force
 		if(size < 4) return false;
 
 
-		if(best_span == Double.MAX_VALUE) return true;
-		if(best_span * 2.0 < span) return false; // see if it is so bad we dont wnat to wast any time on it
+		if(lowest_cost == Double.MAX_VALUE) return true;
+		if(lowest_cost * 2.0 < span) return false; // see if it is so bad we dont wnat to wast any time on it
 
 		return true;
 	}
@@ -149,7 +152,7 @@ public class AOH_Force
 	 */
 	private double iterate(int max_itr) {
 
-		// stop_conv is the number of time we can allow the same total_span before we terminate
+		// stop_conv is the number of time we can allow the same ordering_cost before we terminate
 		int stop_cong = max_itr / 3;
 		if(stop_cong < 5) stop_cong = 5;
 
@@ -159,7 +162,7 @@ public class AOH_Force
 		for(int itr = 0; itr < max_itr; itr++) {
 			force();
 
-			double tmp = total_span();
+			double tmp = ordering_cost();
 
 			// dont keep one forever if we have already converged!
 			if(tmp == last) {
@@ -252,7 +255,7 @@ public class AOH_Force
 		if(len < 1) return current_span; // nothing can be done :(
 
 
-		// Options.out.println("STARTING WITH : " + total_span() ); // DEBUG
+		// Options.out.println("STARTING WITH : " + ordering_cost() ); // DEBUG
 
 
 		int save1, save2, save3, save4; // the best permutation is saved here
@@ -285,7 +288,7 @@ public class AOH_Force
 							nodes[ i + 2].lv = window_tmp[i3];
 							nodes[ i + 3].lv = window_tmp[i4];
 
-							double span = total_span();
+							double span = ordering_cost();
 							if(best > span) {
 								best = span;
 								save1 = i1;
@@ -341,10 +344,64 @@ public class AOH_Force
 		}
 	}
 
-
+	// -----------------------------------------------------------------------
+	/**
+	 * compute some type of "COST" (lower is better) for the current ordering.
+	 *
+	 */
+	private double ordering_cost() {
+		switch(cost_type) {
+			case Options.FORCE_TYPE_MAXCUT: return max_cut();
+			case Options.FORCE_TYPE_TOTALSPAN: return total_span();
+			case Options.FORCE_TYPE_MAXSPAN: return max_span();
+			default:
+			// should not happen!
+			return 0;
+		}
+	}
 
 	/**
-	 *  compute the toal span.
+	 * max cut is the size of the largest cut in the graph.
+	 * the i:th cut is the number of connections across level i + 0.5,
+	 */
+	private double max_cut() {
+
+		// XXX: i am sure that there is a better way for doing so, but im am too tired to figure that out right now
+
+		for(int i = 0; i < size; i++) cutcount[i] = 0;
+
+		for(int i = 0; i < size; i++) {
+
+			// find the end points of this hyperedge
+			find_hyperedge_ends(nodes[i]);
+
+			for(int j = (int)edge_start; j < (int)edge_end; j++) cutcount[j]++;
+		}
+
+
+		int max = 0;
+		for(int i = 0; i < size; i++) max = Math.max( max, cutcount[i]);
+
+		return (double) max;
+
+	}
+
+	/**
+	 * max span is the size of the ongest hyper-edge
+	 *
+	 */
+	private double max_span() {
+		double span = 0;
+
+		for(int i = 0; i < size; i++) {
+			find_hyperedge_ends(nodes[i]);
+			span = Math.max(span, (edge_end - edge_start));
+		}
+		return span;
+	}
+
+	/**
+	 *  compute the total span.
 	 *
 	 * Span of hyperedge:
 	 * difference between the greatest and smallest vertices connected by the same hyperedge
@@ -354,34 +411,40 @@ public class AOH_Force
 		double span = 0;
 
 		for(int i = 0; i < size; i++) {
-			Node n1 = nodes[i];
-
-			double min = n1.lv;
-			double max = n1.lv;
-
-			n1.lvp = n1.cog;
-
-			Edge e = n1.firstOut;
-			while(e != null) {
-				min = Math.min( min, e.n2.lv);
-				max = Math.max( max, e.n2.lv);
-				e = e.next;
-			}
-
-			e = n1.firstIn;
-			while(e != null) {
-				min = Math.min( min, e.n1.lv);
-				max = Math.max( max, e.n1.lv);
-				e = e.prev;
-			}
-
-			span += (max - min);
+			find_hyperedge_ends(nodes[i]);
+			span += (edge_end - edge_start);
 		}
 
 		return span;
-
 	}
 
+
+	/**
+	 * internal function to find the edges of an hyperedge :)
+	 * stores the results in edge_start and edge_end.
+	 */
+	private void find_hyperedge_ends(Node n1) {
+		// find the end points of this hyperedge
+		double min = n1.lv;
+		double max = n1.lv;
+
+		Edge e = n1.firstOut;
+		while(e != null) {
+			min = Math.min( min, e.n2.lv);
+			max = Math.max( max, e.n2.lv);
+			e = e.next;
+		}
+
+		e = n1.firstIn;
+		while(e != null) {
+			min = Math.min( min, e.n1.lv);
+			max = Math.max( max, e.n1.lv);
+			e = e.prev;
+		}
+
+		edge_start = min;
+		edge_end = max;
+	}
 
 	// -- [ code to generate an initial ordering ] ---------------------
 

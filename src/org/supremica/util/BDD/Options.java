@@ -122,7 +122,15 @@ public class Options
 	public static final int COUNT_NONE = 0, COUNT_TREE = 1, COUNT_EXACT = 2;
 	public static int count_algo = COUNT_TREE;
 
-	/** state counting, nothing important ... */
+	/** the cost function in the FORCE heuristic */
+	public static final String[] FORCE_TYPE_NAMES = {
+			"Max Cut     ", "Total Span", "Max Span"
+	};
+
+	public static final int FORCE_TYPE_MAXCUT = 0,
+		FORCE_TYPE_TOTALSPAN = 1,
+		FORCE_TYPE_MAXSPAN = 2;
+	public static int ordering_force_cost = FORCE_TYPE_TOTALSPAN;
 
 	/** Automaton ordering algorithm */
 	public static final String[] ORDERING_ALGORITHM_NAMES = { "Random (!)",

@@ -1037,7 +1037,7 @@ class BDDPanel2
 {
 	private PreferencesDialog theDialog = null;
 	private JComboBox cbReordering, countAlgorithm,
-					  orderingAlgorithm, encodingAlgorithm;
+					  orderingAlgorithm, encodingAlgorithm, forceCostFunction;
 	private JCheckBox cReorderDynamic, cReorderBuild, cReorderGroup;
 	private JCheckBox localSaturation, encodingFill,  cReorderGroupFree;
 	private JCheckBox burstMode, cInterleavedVariables;
@@ -1059,21 +1059,27 @@ class BDDPanel2
 
 		BDDPanel1.addCaption(pTopLeft, "Static variable ordering");
 		orderingAlgorithm = BDDPanel1.addCombo(pTopLeft,"Automaton ordering", Options.ORDERING_ALGORITHM_NAMES, Options.ordering_algorithm);
+		forceCostFunction = BDDPanel1.addCombo(pTopLeft,"FORCE cost function", Options.FORCE_TYPE_NAMES, Options.ordering_force_cost);
+
 		encodingAlgorithm = BDDPanel1.addCombo(pTopLeft,"State encoding", Options.ENCODING_NAMES, Options.encoding_algorithm);
 		pTopLeft.add(cInterleavedVariables = new JCheckBox("Interleaved ordering (separated otherwise, SLOW!)", Options.interleaved_variables));
 
 
-		BDDPanel1.addCaption(pTopLeft, "Dynamic variable ordering (NOT recommended)");
-		cbReordering = BDDPanel1.addCombo(pTopLeft, "Dynamic reordering method", Options.REORDER_ALGO_NAMES, Options.reorder_algo);
 
 		// CENTER LEFT
 		JPanel pLeftLeft = new JPanel(new GridLayout(4, 1));
-
 		pLeft.add(pLeftLeft, BorderLayout.CENTER);
-		pLeftLeft.add(cReorderDynamic = new JCheckBox("Enable dymanic reordering", Options.reorder_dyanmic));
-		pLeftLeft.add(cReorderBuild = new JCheckBox("Reorder after build", Options.reorder_after_build));
-		pLeftLeft.add(cReorderGroup = new JCheckBox("Don't reorder between automata", Options.reorder_with_groups));
-		pLeftLeft.add(cReorderGroupFree = new JCheckBox("Don't reorder inside automata", Options.reorder_within_group));
+
+
+		BDDPanel1.addCaption(pLeftLeft, "Computation options:");
+		// pBottomRight.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
+		// pBottomRight.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
+		pLeftLeft.add(localSaturation = new JCheckBox("Locally saturate", Options.local_saturation));
+		localSaturation.setEnabled(false);
+		pLeftLeft.add(encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars));
+		encodingFill.setEnabled(false);
+		pLeftLeft.add(burstMode = new JCheckBox("Burst-mode workset", Options.burst_mode));
+
 
 		// -------------------------------- RIGHT
 		JPanel pRight = new JPanel(new BorderLayout());
@@ -1081,7 +1087,7 @@ class BDDPanel2
 		add(pRight, BorderLayout.EAST);
 
 		// TOP RIGHT
-		JPanel pTopRight = new JPanel(new GridLayout(4, 1));
+		JPanel pTopRight = new JPanel(new GridLayout(5, 1));
 
 		pRight.add(pTopRight, BorderLayout.NORTH);
 		BDDPanel1.addCaption( pTopRight, "Misc. options:");
@@ -1096,18 +1102,20 @@ class BDDPanel2
 		pExtraLib.add(extraLibDir = new JTextField("" + Options.extraLibPath, 15));
 		pTopRight.add(pExtraLib);
 
+
+		BDDPanel1.addCaption(pTopRight, "Dynamic variable ordering (NOT recommended)");
+		cbReordering = BDDPanel1.addCombo(pTopRight, "Dynamic reordering method", Options.REORDER_ALGO_NAMES, Options.reorder_algo);
+
+
 		// BOTTOM RIGHT
 		JPanel pBottomRight = new JPanel(new GridLayout(5, 1));
 		pRight.add(pBottomRight, BorderLayout.SOUTH);
 
-		BDDPanel1.addCaption(pBottomRight, "Computation options:");
-		// pBottomRight.add( ucOptimistic = new JCheckBox("Optimisitc on controllability", Options.uc_optimistic));
-		// pBottomRight.add( nbOptimistic = new JCheckBox("Optimisitc on liveness", Options.nb_optimistic));
-		pBottomRight.add(localSaturation = new JCheckBox("Locally saturate", Options.local_saturation));
-		localSaturation.setEnabled(false);
-		pBottomRight.add(encodingFill = new JCheckBox("Full encoding of S", Options.fill_statevars));
-		encodingFill.setEnabled(false);
-		pBottomRight.add(burstMode = new JCheckBox("Burst-mode workset", Options.burst_mode));
+		pBottomRight.add(cReorderDynamic = new JCheckBox("Enable dymanic reordering", Options.reorder_dyanmic));
+		pBottomRight.add(cReorderBuild = new JCheckBox("Reorder after build", Options.reorder_after_build));
+		pBottomRight.add(cReorderGroup = new JCheckBox("Don't reorder between automata", Options.reorder_with_groups));
+		pBottomRight.add(cReorderGroupFree = new JCheckBox("Don't reorder inside automata", Options.reorder_within_group));
+
 
 	}
 
@@ -1122,6 +1130,7 @@ class BDDPanel2
 		Options.reorder_with_groups = cReorderGroup.isSelected();
 		Options.reorder_within_group = cReorderGroupFree.isSelected();
 		Options.ordering_algorithm = orderingAlgorithm.getSelectedIndex();
+		Options.ordering_force_cost = forceCostFunction.getSelectedIndex();
 		Options.encoding_algorithm = encodingAlgorithm.getSelectedIndex();
 		Options.count_algo = countAlgorithm.getSelectedIndex();
 		Options.local_saturation = localSaturation.isSelected();

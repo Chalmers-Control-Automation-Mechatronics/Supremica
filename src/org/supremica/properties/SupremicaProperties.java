@@ -169,6 +169,7 @@ public final class SupremicaProperties
 	private static final String BDD_LIB_PATH = "bddLibPath";
 	private static final String BDD_LI_ALGO = "bddLanguageInclusionAlgorithm";    // inclsuion_algorithm
 	private static final String BDD_ORDER_ALGO = "bddAutomataOrderingAlgorithm";    // ordering_algorithm
+	private static final String BDD_ORDERING_FORCE_COST = "bddOrderingForceCost";    // ordering_force_cost
 	private static final String BDD_AS_HEURISTIC = "bddAutomataSelectionHeuristics";    // as_heuristics
 	private static final String BDD_FRONTIER_TYPE = "bddFrontierType";    // frontier_strategy
 	private static final String BDD_H1 = "bddH1";    // es_heuristics
@@ -1351,6 +1352,7 @@ public final class SupremicaProperties
 			setOption(BDD_COUNT_ALGO, Options.count_algo);
 			setOption(BDD_LI_ALGO, Options.inclsuion_algorithm);
 			setOption(BDD_ORDER_ALGO, Options.ordering_algorithm);
+			setOption(BDD_ORDERING_FORCE_COST, Options.ordering_force_cost);
 			setOption(BDD_AS_HEURISTIC, Options.as_heuristics);
 			setOption(BDD_FRONTIER_TYPE, Options.frontier_strategy);
 			setOption(BDD_H1, Options.es_heuristics);
@@ -1382,6 +1384,7 @@ public final class SupremicaProperties
 			Options.count_algo = optionAsInt(BDD_COUNT_ALGO, Options.count_algo);
 			Options.inclsuion_algorithm = optionAsInt(BDD_LI_ALGO, Options.inclsuion_algorithm);
 			Options.ordering_algorithm = optionAsInt(BDD_ORDER_ALGO, Options.ordering_algorithm);
+			Options.ordering_force_cost = optionAsInt(BDD_ORDERING_FORCE_COST, Options.ordering_force_cost);
 			Options.as_heuristics = optionAsInt(BDD_AS_HEURISTIC, Options.as_heuristics);
 			Options.frontier_strategy = optionAsInt(BDD_FRONTIER_TYPE, Options.frontier_strategy);
 			Options.es_heuristics = optionAsInt(BDD_H1, Options.es_heuristics);
