@@ -191,13 +191,11 @@ public class AutomataVerifier
 		loop:
 		while (supervisorIterator.hasNext())
 		{
-
 			// Iterate over supervisors/specifications
 			currSupervisorAutomaton = (Automaton) supervisorIterator.next();
 
 			if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
 			{
-
 				// Examine uncontrollable events in currSupervisorAutomaton and select plants containing these events
 				selectedAutomata.add(currSupervisorAutomaton);
 
@@ -206,7 +204,6 @@ public class AutomataVerifier
 				while (eventIterator.hasNext())
 				{
 					currEvent = (LabeledEvent) eventIterator.next();
-
 					if (!currEvent.isControllable())
 					{
 						if (uncontrollableEventToPlantMap.get(currEvent) != null)
@@ -239,8 +236,10 @@ public class AutomataVerifier
 									// Stop if uncontrollable
 									if (!allModulesControllable)
 									{
-										System.out.println("Uncontrollable state found.");
-
+										if (verboseMode)
+										{
+											logger.info("Uncontrollable state found.");
+										}
 										break loop;
 									}
 
@@ -264,7 +263,6 @@ public class AutomataVerifier
 
 					if (selectedAutomata.size() > 1)
 					{
-
 						// Check module
 						allModulesControllable = allModulesControllable && moduleIsControllable(selectedAutomata);
 
@@ -342,7 +340,6 @@ public class AutomataVerifier
 
 		if (verboseMode)
 		{
-
 			// For printing the names of the automata in selectedAutomata
 			// Object[] automatonArray = selectedAutomata.toArray();
 			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -354,7 +351,6 @@ public class AutomataVerifier
 
 		if (!synchHelper.getAutomataIsControllable())
 		{
-
 			// Try to add some more automata
 			// Make array with indices of selected automata to remember which were originally selected
 			int[] automataIndices = new int[selectedAutomata.size()];
@@ -374,11 +370,9 @@ public class AutomataVerifier
 
 			if (similarAutomata == null)
 			{
-
 				// There are no similar automata, this module must be uncontrollable
 				if (verboseMode)
 				{
-
 					// Print the uncontrollable state(s)...
 					synchHelper.printUncontrollableStates();
 
