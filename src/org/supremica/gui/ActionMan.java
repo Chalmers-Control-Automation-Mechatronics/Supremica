@@ -2495,6 +2495,7 @@ public class ActionMan
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating 1131 Structured text code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getMessage());
 						logger.debug(ex.getStackTrace());
 						return;
 					}
@@ -2543,6 +2544,7 @@ public class ActionMan
 					catch (Exception ex)
 					{
 						logger.error("Exception while generating 1131 Instruction list code to file " + currFile.getAbsolutePath());
+						logger.debug(ex.getMessage());
 						logger.debug(ex.getStackTrace());
 						return;
 					}

@@ -80,7 +80,7 @@
 	<Controls>
 		<Control label="enter_ball">
 			<Condition condition="ManuellStart" invert="true"/>			
-			<Condition condition="KulaPortVakt" invert="true"/>	
+			<Condition condition="KulaPortvakt" invert="true"/>	
 		</Control>
 		<Control label="ball_in">
 			<Condition condition="KulaPortvakt"/>
@@ -89,7 +89,7 @@
 			<Condition condition="MatlyftNere"/>		
 		</Control>
 		<Control label="ball_out">
-			<Condition condition="KulaMatLyft"/>
+			<Condition condition="KulaMatlyft"/>
 		</Control>
 	</Controls>
 </Execution>

@@ -335,6 +335,5 @@ public class IEC61131Helper
 		pw.println("\tST jblock.output");
 		pw.println("\tCAL jblock");
 		pw.println("END_FUNCTION_BLOCK");
-		pw.println("\t}");
 	}
 }

@@ -847,7 +847,7 @@ public class AutomataToIEC1131
 			theHelper.printILComment(pw, "Condition for event " + currEvent.getLabel());
 
 			theHelper.printILCommand(pw, "LD",  "e_" + currEventIndex);
-			theHelper.printILCommand(pw, "JMPNC",  "after_check_e_" + currEventIndex);
+			theHelper.printILCommand(pw, "JMPCN",  "after_check_e_" + currEventIndex);
 			if (theControls.hasControl(currEvent.getLabel()))
 			{
 				Control currControl = theControls.getControl(currEvent.getLabel());
@@ -864,7 +864,7 @@ public class AutomataToIEC1131
 					theHelper.printILCommand(pw, "LD",  "si_" + currSignal.getPort());
 					if (currCondition.doInvert())
 					{
-						theHelper.printILCommand(pw, "JMPNC",  "check_e_" + currEventIndex + "_" + i);
+						theHelper.printILCommand(pw, "JMPCN",  "check_e_" + currEventIndex + "_" + i);
 						theHelper.printILCommand(pw, "LD",  "FALSE");
 						theHelper.printILCommand(pw, "ST",  "e_" + currEventIndex);
 						theHelper.printILCommand(pw, "JMP",  "after_check_e_" + currEventIndex);
@@ -957,6 +957,8 @@ public class AutomataToIEC1131
 		printBeginProgram(pw);
 		printBeginVariables(pw);
 		printSignalVariables(pw);
+		printEndVariables(pw);
+		printBeginVariables(pw);
 		printEventVariables(pw);
 		printStateVariables(pw);
 		printEndVariables(pw);
