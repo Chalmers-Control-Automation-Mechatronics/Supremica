@@ -107,7 +107,7 @@ public final class AutomataSynchronizerHelper
 
 	// Verbose mode
 	private boolean verboseMode;
-	
+
  	public AutomataSynchronizerHelper(Automata theAutomata, SynchronizationOptions syncOptions)
  		throws Exception
     {
@@ -140,8 +140,9 @@ public final class AutomataSynchronizerHelper
 			theAlphabets.add(currAlphabet);
 		}
 		*/
-  		Alphabet theAlphabet = theAutomata.createUnionAlphabet();
-  		theAutomaton.setAlphabet(theAlphabet);
+
+		Alphabet theAlphabet = theAutomata.createUnionAlphabet();
+		theAutomaton.setAlphabet(theAlphabet);
 
 		/*
 		try
@@ -631,7 +632,7 @@ public final class AutomataSynchronizerHelper
 			activeAutomata = new boolean[theAutomata.size()];
 		else
 			for (int i = 0; i < activeAutomata.length; i++)
-				activeAutomata[i] = false;	
+				activeAutomata[i] = false;
 		for (int i = 0; i < automataIndices.length; i++)
 			activeAutomata[automataIndices[i]] = true;
 	}
@@ -641,7 +642,7 @@ public final class AutomataSynchronizerHelper
 		throws Exception
 	{   // Used by automataaSynthesizer (essential when building more than one automata)
   		theAutomaton = new Automaton();
-		
+
   		// Compute the new alphabet
 		EventsSet theAlphabets = new EventsSet();
 		Iterator autIt = selectedAutomata.iterator();

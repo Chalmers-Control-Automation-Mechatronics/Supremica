@@ -50,6 +50,8 @@
 package org.supremica.automata;
 
 import java.util.*;
+import org.supremica.gui.*;
+import org.apache.log4j.*;
 
 /**
  * A collection of useful methods for manipulating Event.
@@ -57,11 +59,13 @@ import java.util.*;
  */
 public class EventHelpers
 {
+	private static Category thisCategory = LogDisplay.createCategory(EventHelpers.class.getName());
+
 	/**
 	* Creates a new event from a set of events
 	*/
 	public static Event createEvent(EventsSet eventSet, String prefix)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, Exception
 	{
 		if (eventSet.size() <= 0)
 			throw new IllegalArgumentException("At least one event in the set is necessary");
@@ -79,8 +83,12 @@ public class EventHelpers
 		{
 			tmpEvent = (Event)eventIt.next();
 			if (!label.equals(tmpEvent.getLabel()))
-				throw new IllegalArgumentException("All events must have the same label");
-			controllable = controllable || tmpEvent.isControllable();
+				throw new Exception("All events must have the same label");
+			if (controllable != tmpEvent.isControllable())
+			{
+				String errorMsg = "Controllability of an event must be the same in all automata. Controllability of " + label + " is not consistent.";
+				throw new Exception(errorMsg);
+			}
 			prioritized = prioritized || tmpEvent.isPrioritized();
 		}
 

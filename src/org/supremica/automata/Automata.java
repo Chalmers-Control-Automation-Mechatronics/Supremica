@@ -122,15 +122,8 @@ public class Automata
 			theAlphabets.add(currAlphabet);
 		}
 		Alphabet theAlphabet = null;
-		try
-  		{
-			theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
-		}
-  		catch (Exception e)
-    	{
- 			thisCategory.error("Error while generating union alphabet: " + e);
-        	throw e;
-     	}
+
+		theAlphabet = AlphabetHelpers.getUnionAlphabet(theAlphabets, "a");
      	return theAlphabet;
 	}
 

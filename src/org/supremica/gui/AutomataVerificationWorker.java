@@ -81,7 +81,7 @@ public class AutomataVerificationWorker
 
 	public AutomataVerificationWorker(Supremica workbench,
 									  Automata theAutomata,
-									  SynchronizationOptions synchronizationOptions, 
+									  SynchronizationOptions synchronizationOptions,
 									  VerificationOptions verificationOptions)
 	{
 		this.workbench = workbench;
@@ -95,90 +95,103 @@ public class AutomataVerificationWorker
 
 	public void run()
 	{
-			if (verificationOptions.getVerificationType() == 0)
-			{   // Controllability verification...
-				AutomataVerifier automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+		if (verificationOptions.getVerificationType() == 0)
+		{   // Controllability verification...
 
-				ArrayList threadsToStop = new ArrayList();
-				threadsToStop.add(automataVerifier);				
-				threadsToStop.add(this);
-				CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop);
-				automataVerifier.getHelper().setCancelDialog(cancelDialog);
-				cancelDialog.updateHeader("Verifying...");
-				boolean isControllable;
+			AutomataVerifier automataVerifier = null;
+			try
+			{
+				automataVerifier = new AutomataVerifier(theAutomata, synchronizationOptions, verificationOptions);
+			}
+			catch (Exception e)
+			{
+				JOptionPane.showMessageDialog(workbench, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				thisCategory.error(e.getMessage());
+				return;
+			}
 
-				// Verify controllability...
-				Date startDate = new Date();
-				try 
+			ArrayList threadsToStop = new ArrayList();
+			threadsToStop.add(automataVerifier);
+			threadsToStop.add(this);
+			CancelDialog cancelDialog = new CancelDialog(workbench, threadsToStop);
+			automataVerifier.getHelper().setCancelDialog(cancelDialog);
+			cancelDialog.updateHeader("Verifying...");
+			boolean isControllable;
+
+			// Verify controllability...
+			Date startDate = new Date();
+			try
+			{
+				isControllable = automataVerifier.execute();
+			}
+			catch (Exception e)
+			{
+				thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
+				return;
+			}
+			Date endDate = new Date();
+
+			// Present result...
+			if (!stopRequested)
+			{
+				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 +
+								  " seconds.");
+				cancelDialog.destroy();
+
+				if (isControllable)
 				{
-				    isControllable = automataVerifier.execute();
-				}
-				catch (Exception e)
-				{	
-					thisCategory.error("Error in AutomataVerificationWorker when verifying automata. " + e);
-					return;
-				}		
-				Date endDate = new Date();
-
-				// Present result...
-				if (!stopRequested)
-				{
-					thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + 
-									  " seconds.");	
-					if (isControllable)
-					{
-						JOptionPane.showMessageDialog(workbench, "The automata is controllable!", 
-													  "Good news", JOptionPane.INFORMATION_MESSAGE);
-					}
-					else
-					{
-						JOptionPane.showMessageDialog(workbench, "The automata is NOT controllable!", 
-													  "Bad news", JOptionPane.INFORMATION_MESSAGE);
-					}
+					JOptionPane.showMessageDialog(workbench, "The automata is controllable!",
+												  "Good news", JOptionPane.INFORMATION_MESSAGE);
 				}
 				else
 				{
-					thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 + 
-									  " seconds.");	
-				}				
-
+					JOptionPane.showMessageDialog(workbench, "The automata is NOT controllable!",
+												  "Bad news", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+			else
+			{
+				thisCategory.info("Execution stopped after " + (endDate.getTime()-startDate.getTime())/1000.0 +
+								  " seconds.");
 				cancelDialog.destroy();
 			}
-			else if (verificationOptions.getVerificationType() == 1)
-			{	// Non-blocking verification...
+
+		}
+		else if (verificationOptions.getVerificationType() == 1)
+		{	// Non-blocking verification...
+			thisCategory.error("Option not implemented...");
+			return;
+		}
+		else if (verificationOptions.getVerificationType() == 2)
+		{	// Language inclusion
+			if (verificationOptions.getAlgorithmType() == 0)
+			{   // Modular...
+			}
+			else if (verificationOptions.getAlgorithmType() == 1)
+			{	// Monolithic...
 				thisCategory.error("Option not implemented...");
 				return;
-			}				
-			else if (verificationOptions.getVerificationType() == 2)
-			{	// Language inclusion
-				if (verificationOptions.getAlgorithmType() == 0)				
-				{   // Modular...
-				}
-				else if (verificationOptions.getAlgorithmType() == 1)				
-				{	// Monolithic...
-					thisCategory.error("Option not implemented...");
-					return;
-				}
-				else if (verificationOptions.getAlgorithmType() == 2)
-				{   // IDD...
-					thisCategory.error("Option not implemented...");
-					return;
-				}				
-				else
-				{   // Error...
-					thisCategory.error("Unavailable option chosen.");
-					return;
-				}
+			}
+			else if (verificationOptions.getAlgorithmType() == 2)
+			{   // IDD...
+				thisCategory.error("Option not implemented...");
+				return;
 			}
 			else
 			{   // Error...
 				thisCategory.error("Unavailable option chosen.");
 				return;
 			}
+		}
+		else
+		{   // Error...
+			thisCategory.error("Unavailable option chosen.");
+			return;
+		}
 	}
 
 	public void requestStop()
 	{
-		stopRequested = true;		
+		stopRequested = true;
 	}
 }

@@ -103,9 +103,10 @@ public class AutomataSynchronizerWorker
 				theSynchronizer =
 					new AutomataSynchronizer(theAutomata, syncOptions);
 			}
-			catch (Exception ex)
+			catch (Exception e)
 			{
-				thisCategory.error("Exception while constructing AutomataSynchronizer");
+				JOptionPane.showMessageDialog(workbench, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				thisCategory.error(e.getMessage());
 				return;
 			}
 
@@ -125,7 +126,7 @@ public class AutomataSynchronizerWorker
 				thisCategory.error("Exception while executing AutomataSynchronizer");
 				return;
 			}
-			
+
 			// Build automaton
 			if (!stopRequested)
 			{
@@ -146,11 +147,11 @@ public class AutomataSynchronizerWorker
 				theAutomaton.setName(newAutomatonName);
 				mode = MODE_UPDATE;
 				java.awt.EventQueue.invokeLater(this);
-				
+
 				cancelDialog.destroy();
-				
+
 				Date endDate = new Date();
-				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");	
+				thisCategory.info("Execution completed after " + (endDate.getTime()-startDate.getTime())/1000.0 + " seconds.");
 			}
 			else
 			{
@@ -179,6 +180,6 @@ public class AutomataSynchronizerWorker
 
 	public void requestStop()
 	{
-		stopRequested = true;		
+		stopRequested = true;
 	}
 }

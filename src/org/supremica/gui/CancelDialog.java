@@ -62,13 +62,14 @@ import javax.swing.*;
 // import javax.swing.event.*;
 // import javax.swing.table.*;
 
-public class CancelDialog 
+public class CancelDialog
+	extends JDialog
 	implements ActionListener
 	// extends JOptionPane
 	// implements Runnable
 {
 	//private JButton cancelButton;
-	private JDialog dialog;
+	//private JDialog dialog;
 	// private Thread[] executers;
 	private ArrayList executers;
 	private JOptionPane optionPane = new JOptionPane();
@@ -79,26 +80,42 @@ public class CancelDialog
 	private JLabel headerLabel;
 	private JProgressBar progressBar;
 	private Supremica workbench;
-	
+
 	/**
 	 * Creates (modal?) dialog box for canceling the threads in the supplied ArrayList
 	 */
 	public CancelDialog(Supremica workbench, ArrayList executers)
 	{
+		super(workbench);
+
 		this.workbench = workbench;
 		this.executers = executers;
-		
+
 		run();
 	}
 
 	public void run()
 	{
-		dialog = new JDialog(workbench); 
-		dialog.setTitle("Stop execution");
-		dialog.setSize(new Dimension(250, 120));
+		setTitle("Stop execution");
+		setSize(new Dimension(250, 120));
 		// dialog.setLocation(200,100);
-		dialog.setResizable(false);
-		Container contentPane = dialog.getContentPane();
+		setResizable(false);
+
+
+		// Center the window
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension frameSize = getSize();
+		if (frameSize.height > screenSize.height)
+		{
+			frameSize.height = screenSize.height;
+		}
+		if (frameSize.width > screenSize.width)
+		{
+			frameSize.width = screenSize.width;
+		}
+		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+
+		Container contentPane = getContentPane();
 
 		// JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		// JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -107,7 +124,7 @@ public class CancelDialog
 		// standardPanel.setLayout(new GridLayout(1,2));
 		// standardPanel.add(leftPanel);
 		// standardPanel.add(rightPanel);
-		
+
 		// advancedPanel
 		// null...
 
@@ -128,9 +145,9 @@ public class CancelDialog
 		// counterLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		headerPanel.add(headerLabel, "South");
 		counterPanel.add(counterLabel, "North");
-		
+
 	    contentPane.add(messagePanel, "Center");
-		contentPane.add(buttonPanel, "South");		
+		contentPane.add(buttonPanel, "South");
 
 		show();
 	}
@@ -175,7 +192,7 @@ public class CancelDialog
 			catch (Exception e)
 			{
 				System.out.println("Error when updating progress bar.");
-			}			
+			}
 		}
 	}
 
@@ -199,18 +216,13 @@ public class CancelDialog
 		return button;
 	}
 
-	public void show()
-	{
-		dialog.show();
-	}
-
 	public void destroy()
 	{
 		executers = null; // Helping the garbage collector...
 		// workbench = null; // Helping the garbage collector...
-		dialog.setVisible(false);
+		setVisible(false);
 	}
-    
+
 	public void actionPerformed(ActionEvent event)
 	{
 		Object source = event.getSource();
@@ -220,7 +232,7 @@ public class CancelDialog
 			    ((Stoppable) executers.get(i)).requestStop();
 			executers = null; // Helping the garbage collector...
 			// workbench = null; // Helping the garbage collector...
-			dialog.setVisible(false);
+			setVisible(false);
 		}
 		else
  		{
