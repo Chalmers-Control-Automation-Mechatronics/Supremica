@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.junit
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.1 2005-02-21 02:51:15 knut Exp $
+//# $Id: ExpressionTest.java,v 1.2 2005-02-21 02:53:48 robi Exp $
 //###########################################################################
 
 
@@ -159,6 +160,16 @@ public class ExpressionTest extends TestCase
 		   SimpleExpressionProxy.TYPE_NAME);
   }
 
+  public void testExpression_1_multi()
+    throws ParseException
+  {
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+    testExpression("1", mExpr_1, SimpleExpressionProxy.TYPE_INT);
+  }
+
 
   //#########################################################################
   //# Unsuccessful Parse Tests
@@ -172,6 +183,16 @@ public class ExpressionTest extends TestCase
     throws ParseException
   {
     testExpression("event[1] + event[2]", "'event[1]'");
+  }
+
+  public void testError_eq_s_multi()
+    throws ParseException
+  {
+    testExpression("=s", "'='");
+    testExpression("=s", "'='");
+    testExpression("=s", "'='");
+    testExpression("=s", "'='");
+    testExpression("=s", "'='");
   }
 
 
@@ -193,7 +214,7 @@ public class ExpressionTest extends TestCase
       final SimpleExpressionProxy parsed = mParser.parse(text, mask);
       assertTrue("Unexpected result!", parsed.equals(expr));
     } catch (final ParseException exception) {
-      final int pos = exception.getPosition();
+      final int pos = exception.getErrorOffset();
       System.out.println(text);
       for (int i = 0; i < pos; i++) {
 	System.out.print(' ');

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.1 2005-02-21 02:51:15 knut Exp $
+//# $Id: AlgorithmsTest.java,v 1.2 2005-02-21 02:53:48 robi Exp $
 //###########################################################################
 
 
@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerConfigurationException;
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.DocumentManager;
 import net.sourceforge.waters.model.base.ProxyMarshaller;
@@ -34,7 +33,7 @@ import net.sourceforge.waters.samples.algorithms.Hiding;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 
 
-public class AlgorithmsTest extends TestCase
+public class AlgorithmsTest extends WatersTestCase
 {
 
   //#########################################################################
@@ -83,21 +82,34 @@ public class AlgorithmsTest extends TestCase
     testExpected(reduced2, expected);
   }
 
-  /*
-  public void testHide_linwon90_projsystem_synth1()
+  public void testHide_linwon90_hugo11()
     throws IOException, JAXBException, WatersException,
 	   TransformerConfigurationException
   {
     final String subdirname = "linwon90";
-    final String[] events = {"tau"};
-    final ProductDESProxy des = compileValid(subdirname, "projsystem_synth1");
-    final AutomatonProxy hidden = hide(des, "synth1_vhide", events, true);
-    //save(des, hidden);
-    //final ProductDESProxy expected = getExpectedValid(subdirname, hidden);
-    //testExpected(hidden, expected);
+    final String[] events = {"tau1", "tau2"};
+    final ProductDESProxy des = compileValid(subdirname, "hugo11");
+    final AutomatonProxy hidden = hide(des, "hugo11", events, false);
+    save(des, hidden);
+    final ProductDESProxy expected = getExpectedValid(subdirname, hidden);
+    testExpected(hidden, expected);
+    final AutomatonProxy reduced1 = reduce(des, hidden, ":reduced");
+    save(des, hidden);
+    testExpected(reduced1, expected);
+    final AutomatonProxy reduced2 = reduce(reduced1);
+    testExpected(reduced2, expected);
+  }
+
+  /*
+  public void testHide_linwon90_projsystem1a_1()
+    throws IOException, JAXBException, WatersException,
+	   TransformerConfigurationException
+  {
+    final String subdirname = "linwon90";
+    final String[] events = {"load[1]", "load[2]", "load[3]", "load[4]"};
+    final ProductDESProxy des = compileValid(subdirname, "projsystem1a");
+    final AutomatonProxy hidden = hide(des, "projsystem1a", events, true);
     final AutomatonProxy reduced = iterativeReduce(hidden);
-    //save(des, hidden);
-    //testExpected(reduced, expected);
   }
   */
 
@@ -333,8 +345,8 @@ public class AlgorithmsTest extends TestCase
     mDocumentManager = new DocumentManager();
     mDocumentManager.register(mModuleMarshaller);
     mDocumentManager.register(mDESMarshaller);
-    mWatersInputDirectory = new File("examples", "handwritten");
-    mValidInputDirectory = new File("examples", "valid");
+    mWatersInputDirectory = new File(getInputRoot(), "handwritten");
+    mValidInputDirectory = new File(getInputRoot(), "valid");
     mOutputDirectory = new File("logs", "algorithms");
   }
 
