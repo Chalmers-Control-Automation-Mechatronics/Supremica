@@ -1,0 +1,42 @@
+/******************** EventSubTree.java *******************/
+// An EventSubTree is a tree node with the event name as root and the event properties as children
+
+package org.supremica.gui;
+
+import org.supremica.automata.algorithms.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.tree.*;
+import java.util.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonListener;
+import org.supremica.automata.State;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.log.*;
+
+public class EventSubTree
+	extends SupremicaTreeNode
+{
+	public EventSubTree(LabeledEvent event)
+	{
+		super(event);	// Note that this also caches the event for quick access
+
+		SupremicaTreeNode currControllableNode = new SupremicaTreeNode("controllable: " + event.isControllable());
+		add(currControllableNode);
+
+		SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
+		add(currPrioritizedNode);
+	}
+	
+	// Change this to reflect the correct number of children
+	// Could this be calculated from sizeof(LabeledEvent)?
+	public static int numChildren()
+	{
+		return 2;
+	}
+}
+	

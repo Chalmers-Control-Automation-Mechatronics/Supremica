@@ -65,69 +65,7 @@ import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.log.*;
 
-class SupremicaTreeNode
-	extends DefaultMutableTreeNode
-{
-	boolean enabled = true;
-	
-	public SupremicaTreeNode()
-	{
-		super();
-	}
-	
-	public SupremicaTreeNode(Object obj)
-	{
-		super(obj);
-	}
-	
-	public boolean isEnabled()
-	{
-		return enabled;
-	}
-	
-	public void setEnabled(boolean b)
-	{
-		enabled = b;
-	}
-}
 
-// An EventSubTree is a tree node with the event name as root and the event properties as children
-class EventSubTree
-	extends SupremicaTreeNode
-{
-	public EventSubTree(LabeledEvent event)
-	{
-		super(event);	// Note that this also caches the event for quick access
-
-		SupremicaTreeNode currControllableNode = new SupremicaTreeNode("controllable: " + event.isControllable());
-		add(currControllableNode);
-
-		SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
-		add(currPrioritizedNode);
-	}
-	
-	// Change this to reflect the correct number of children
-	public static int numChildren()
-	{
-		return 2;
-	}
-}
-// An AlphabetViewerSubTree is a tree node with the automaton name as root and the events as children
-class AlphabetViewerSubTree	
-	extends SupremicaTreeNode
-{
-	public AlphabetViewerSubTree(Automaton automaton)
-	{
-		super(automaton.getName());
-
-		Iterator eventIt = automaton.getAlphabet().iterator();
-		while (eventIt.hasNext())
-		{
-			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-			add(new EventSubTree(currEvent));
-		}	
-	}
-}
 // I changed AlphabetViewer to accept Automata objects and to show the alphabets 
 // of all selected Automaton in the same window. That's probably what you want if 
 // you select more than one and request Alphabet viewing. Previously, one 
