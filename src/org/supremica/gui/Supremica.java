@@ -1207,6 +1207,36 @@ public class Supremica
 		return selectedAutomata;
 	}
 
+	// Same as getSelected automata but include execution information
+	public Project getSelectedProject()
+	{
+		int[] selectedRowIndicies = theAutomatonTable.getSelectedRows();
+		Project selectedProject = new Project();
+
+		for (int i = 0; i < selectedRowIndicies.length; i++)
+		{
+			try
+			{
+				int currIndex = selectedRowIndicies[i];
+				int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+				Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
+				selectedProject.addAutomaton(currAutomaton);
+			}
+			catch (Exception ex)
+			{
+				logger.error("Trying to get an automaton that does not exist. Index: " + i);
+			}
+		}
+		Project activeProject = getActiveProject();
+		if (activeProject != null)
+		{
+			selectedProject.addActions(activeProject.getActions());
+			selectedProject.addControls(activeProject.getControls());
+		}
+		return selectedProject;
+	}
+
 	// Tools.AutomataEditor
 	public void toolsAutomataEditor()
 	{

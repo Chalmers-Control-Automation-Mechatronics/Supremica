@@ -545,7 +545,7 @@ public class ProjectBuildFromXml
 			throw new SAXException("Unsupported file format.");
 		}
 
-		if (minorVersion > 9)
+		if (minorVersion > 10)
 		{
 			throw new SAXException("Unsupported file format.");
 		}

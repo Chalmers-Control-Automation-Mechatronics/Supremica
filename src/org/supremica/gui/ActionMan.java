@@ -103,7 +103,7 @@ public class ActionMan
 {
 	private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
 	private static final int    // instead of using constants later below :)
-		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4;
+		FORMAT_UNKNOWN = -1, FORMAT_XML = 1, FORMAT_DOT = 2, FORMAT_DSX = 3, FORMAT_RCP = 4, FORMAT_SP = 5;
 
 	private static int getIntegerInDialogWindow(String text, Component parent)
 	{
@@ -470,12 +470,13 @@ public class ActionMan
 		}
 
 		String xmlString = "xml";
+		String spString = "sp";
 		String dotString = "dot";
 		String dsxString = "dsx";
 		String rcpString = "rcp";                         // ++ ARASH
 		Object[] possibleValues =
 		{
-			xmlString, dotString, dsxString
+			xmlString, spString, dotString, dsxString
 		};
 		Object selectedValue = JOptionPane.showInputDialog(gui.getComponent(), "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 
@@ -502,6 +503,10 @@ public class ActionMan
 		{
 			exportMode = FORMAT_RCP;
 		}
+		else if (selectedValue == spString)
+		{
+			exportMode = FORMAT_SP;
+		}
 		else
 		{
 			return;
@@ -514,7 +519,7 @@ public class ActionMan
 	// Add new export functions here and to the function above
 	public static void automataExport(Gui gui, int exportMode)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() < 1)
 		{
@@ -523,36 +528,34 @@ public class ActionMan
 			return;
 		}
 
-		Iterator autIt = selectedAutomata.iterator();
-
-		while (autIt.hasNext())
+		if (exportMode == FORMAT_DOT || exportMode == FORMAT_DSX || exportMode == FORMAT_RCP)
 		{
-			Automaton currAutomaton = (Automaton) autIt.next();
+			for(Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				automatonExport(gui, exportMode, currAutomaton);
+			}
+		}
+		else
+		{
 			JFileChooser fileExporter = null;
 
 			if (exportMode == FORMAT_XML)
 			{
 				fileExporter = FileDialogs.getXMLFileExporter();
 			}
-			else if (exportMode == FORMAT_DOT)
+			else if (exportMode == FORMAT_SP)
 			{
-				fileExporter = FileDialogs.getDOTFileExporter();
-			}
-			else if (exportMode == FORMAT_DSX)
-			{
-				fileExporter = FileDialogs.getDSXFileExporter();
-			}
-			else if (exportMode == FORMAT_RCP)
-			{
-				fileExporter = FileDialogs.getRCPFileExporter();
+				fileExporter = FileDialogs.getSPFileExporter();
 			}
 			else
 			{
 				return;
 			}
 
-			// ARASH: ain't it good to see what we're doin' ??
-			fileExporter.setDialogTitle("Save " + currAutomaton.getName() + " as ...");
+			Project selectedProject = gui.getSelectedProject();
+
+			fileExporter.setDialogTitle("Save Project as ...");
 
 			if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
 			{
@@ -566,37 +569,114 @@ public class ActionMan
 						{
 							if (exportMode == FORMAT_XML)
 							{
-								Automata currAutomata = new Automata();
+								AutomataToXml exporter = new AutomataToXml(selectedProject);
 
-								currAutomata.addAutomaton(currAutomaton);
-
-								AutomataToXml exporter = new AutomataToXml(currAutomata);
-
-								exporter.serialize(currFile.getAbsolutePath());
+								exporter.serialize(currFile);
 							}
-							else if (exportMode == FORMAT_DOT)
+							else if (exportMode == FORMAT_SP)
 							{
-								AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
+								ProjectToSP exporter = new ProjectToSP(selectedProject);
 
-								exporter.serialize(currFile.getAbsolutePath());
-							}
-							else if (exportMode == FORMAT_DSX)
-							{
-								AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
-
-								exporter.serialize(currFile.getAbsolutePath());
-							}
-							else if (exportMode == FORMAT_RCP)
-							{
-								AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
-
-								exporter.serialize(currFile.getAbsolutePath());
+								exporter.serialize(currFile);
 							}
 						}
 						catch (Exception ex)
 						{
 							gui.error("Exception while exporting " + currFile.getAbsolutePath() + " : " + ex.toString());
 						}
+					}
+				}
+			}
+		}
+	}
+
+	// Exporter when the type is already known
+	// Add new export functions here and to the function above
+	public static void automatonExport(Gui gui, int exportMode, Automaton currAutomaton)
+	{
+		JFileChooser fileExporter = null;
+
+		if (exportMode == FORMAT_XML)
+		{
+			fileExporter = FileDialogs.getXMLFileExporter();
+		}
+		else if (exportMode == FORMAT_DOT)
+		{
+			fileExporter = FileDialogs.getDOTFileExporter();
+		}
+		else if (exportMode == FORMAT_DSX)
+		{
+			fileExporter = FileDialogs.getDSXFileExporter();
+		}
+		else if (exportMode == FORMAT_RCP)
+		{
+			fileExporter = FileDialogs.getRCPFileExporter();
+		}
+		else if (exportMode == FORMAT_SP)
+		{
+			fileExporter = FileDialogs.getSPFileExporter();
+		}
+		else
+		{
+			return;
+		}
+
+		// ARASH: ain't it good to see what we're doin' ??
+		fileExporter.setDialogTitle("Save " + currAutomaton.getName() + " as ...");
+
+		if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
+		{
+			File currFile = fileExporter.getSelectedFile();
+
+			if (currFile != null)
+			{
+				if (!currFile.isDirectory())
+				{
+					try
+					{
+						if (exportMode == FORMAT_XML)
+						{
+							Automata currAutomata = new Automata();
+
+							currAutomata.addAutomaton(currAutomaton);
+
+							AutomataToXml exporter = new AutomataToXml(currAutomata);
+
+							exporter.serialize(currFile);
+						}
+						else if (exportMode == FORMAT_DOT)
+						{
+							AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
+
+							exporter.serialize(currFile.getAbsolutePath());
+						}
+						else if (exportMode == FORMAT_DSX)
+						{
+							AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
+
+							exporter.serialize(currFile.getAbsolutePath());
+						}
+						else if (exportMode == FORMAT_RCP)
+						{
+							AutomatonToRcp exporter = new AutomatonToRcp(currAutomaton);
+
+							exporter.serialize(currFile.getAbsolutePath());
+						}
+						else if (exportMode == FORMAT_SP)
+						{
+							Project selectedProject = gui.getSelectedProject();
+							Project newProject = new Project();
+							newProject.addActions(selectedProject.getActions());
+							newProject.addControls(selectedProject.getControls());
+
+							ProjectToSP exporter = new ProjectToSP(newProject);
+
+							exporter.serialize(currFile);
+						}
+					}
+					catch (Exception ex)
+					{
+						gui.error("Exception while exporting " + currFile.getAbsolutePath() + " : " + ex.toString());
 					}
 				}
 			}

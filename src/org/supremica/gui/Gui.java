@@ -13,6 +13,7 @@ import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.editor.*;
 import org.supremica.gui.help.*;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.execution.Actions;
 import org.supremica.automata.execution.Controls;
@@ -62,6 +63,8 @@ public interface Gui
 	public Collection getSelectedAutomataAsCollection();
 
 	public Automata getSelectedAutomata();
+
+	public Project getSelectedProject();
 
 	public FileSecurity getFileSecurity();
 }

@@ -270,58 +270,62 @@ public class ProjectToSP
 
 		if (includeExecution)
 		{
-			for (Iterator projectIt = project.iterator(); projectIt.hasNext(); )
+			pw.println("<Execution>");
+			pw.println("\t<Actions>");
+
+			Actions theActions = project.getActions();
+
+			if (theActions != null)
 			{
-				Automaton aut = (Automaton) projectIt.next();
-
-				pw.println("<Execution>");
-				pw.println("\t<Actions>");
-
-				Actions theActions = project.getActions();
-
-				if (theActions != null)
+				for (Iterator actionIt = theActions.iterator(); actionIt.hasNext(); )
 				{
-					for (Iterator actionIt = theActions.iterator(); actionIt.hasNext(); )
+					Action currAction = (Action) actionIt.next();
+
+					pw.println("\t\t<Action label=\"" + normalize(currAction.getLabel()) + "\">");
+
+					for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
 					{
-						Action currAction = (Action) actionIt.next();
+						String currCommand = (String) cmdIt.next();
 
-						pw.println("\t\t<Action label=\"" + normalize(currAction.getLabel()) + "\">");
-
-						for (Iterator cmdIt = currAction.commandIterator(); cmdIt.hasNext(); )
-						{
-							String currCommand = (String) cmdIt.next();
-
-							pw.println("\t\t\t<Command>" + normalize(currCommand) + "</Command>");
-						}
-
-						pw.println("\t\t</Action>");
+						pw.println("\t\t\t<Command command=\"" + normalize(currCommand) + "\"/>");
 					}
+
+					pw.println("\t\t</Action>");
 				}
-
-				pw.println("\t</Actions>");
-				pw.println("\t<Controls>");
-
-				Controls theControls = project.getControls();
-
-				if (theControls != null)
-				{
-					for (Iterator controlIt = theControls.iterator(); controlIt.hasNext(); )
-					{
-						Control currControl = (Control) controlIt.next();
-
-						pw.println("\t\t<Control label=\"" + normalize(currControl.getLabel()) + "\">");
-						pw.println("\t\t\t<Condition>" + normalize(currControl.getCondition()) + "</Condition>");
-						pw.println("\t\t</Action>");
-					}
-				}
-
-				pw.println("\t</Controls>");
-				pw.println("</Execution>");
 			}
+
+			pw.println("\t</Actions>");
+			pw.println("\t<Controls>");
+
+			Controls theControls = project.getControls();
+
+			if (theControls != null)
+			{
+				for (Iterator controlIt = theControls.iterator(); controlIt.hasNext(); )
+				{
+					Control currControl = (Control) controlIt.next();
+
+					pw.println("\t\t<Control label=\"" + normalize(currControl.getLabel()) + "\">");
+					if (currControl.getCondition() != null && !currControl.getCondition().equals(""))
+					{
+						pw.println("\t\t\t<Condition condition=\"" + normalize(currControl.getCondition()) + "\"/>");
+					}
+					pw.println("\t\t</Control>");
+				}
+			}
+
+			pw.println("\t</Controls>");
+			pw.println("</Execution>");
 		}
 
 		pw.println("</SupremicaProject>");
 		pw.flush();
+	}
+
+	public void serialize(File theFile)
+		throws IOException
+	{
+		serialize(theFile.getAbsolutePath());
 	}
 
 	public void serialize(String fileName)

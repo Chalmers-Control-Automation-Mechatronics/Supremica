@@ -237,6 +237,13 @@ public class AutomataToXml
 		serialize(new PrintWriter(new FileWriter(fileName)));
 	}
 
+	public void serialize(File theFile)
+		throws IOException
+	{
+		serialize(theFile.getAbsolutePath());
+	}
+
+
 	private String normalize(String s)
 	{
 		StringBuffer str = new StringBuffer();

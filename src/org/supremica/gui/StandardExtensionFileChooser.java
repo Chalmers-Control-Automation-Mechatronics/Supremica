@@ -71,6 +71,7 @@ public class StandardExtensionFileChooser
 
 	public File getSelectedFile()
 	{
+		//System.err.println("getSelectedFile");
 		File orgFile = super.getSelectedFile();
 		if (getDialogType() != JFileChooser.SAVE_DIALOG)
 		{
@@ -89,9 +90,22 @@ public class StandardExtensionFileChooser
 		{
 			return orgFile;
 		}
+		//System.err.println("all files pre");
 		StandardExtensionFileFilter standardFileFilter = (StandardExtensionFileFilter)theFilter;
 		if ("All Files".equals(theFilter.getDescription()))
-		{
+		{ // For some reason this does not work
+			//System.err.println("all files");
+			String fileName = getName(orgFile);
+			if (fileName == null)
+			{
+				return orgFile;
+			}
+			if (fileName.startsWith("\"") && fileName.endsWith("\""))
+			{
+				//System.err.println("all files with fnuttar");
+				File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
+				return newFile;
+			}
 			return orgFile;
 		}
 		String fileName = getName(orgFile);

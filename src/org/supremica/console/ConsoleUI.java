@@ -163,6 +163,11 @@ public class ConsoleUI
 
 	}
 
+	public Project getSelectedProject()
+	{ // Implement this
+		return null;
+	}
+
 
 	// -------------------------------------------------------
 	private boolean handleCommand(String cmd, StringTokenizer args)
