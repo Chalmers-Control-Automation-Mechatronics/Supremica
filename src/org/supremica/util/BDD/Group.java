@@ -8,7 +8,7 @@ public class Group
 	private BDDAutomata manager;
 	private String name;
 	private int bdd_i, bdd_cube, bdd_cubep, bdd_sigma, bdd_sigma_u, bdd_t, bdd_m, bdd_tu;
-	private boolean has_t, has_tu;
+	private boolean has_t, has_tu, has_m;
 
 
     public Group(BDDAutomata manager, BDDAutomaton [] automata, String name) 
@@ -19,11 +19,12 @@ public class Group
     public Group(BDDAutomata manager, BDDAutomaton [] automata, GroupMembership member, String name) 
     {
 	this(manager, automata.length, name);
-	
+	init();
 	for(int i = 0; i < automata.length; i++)
 	    if(member == null || member.shouldInclude(automata[i]))
 		add(automata[i]);
     }
+
 	public Group(BDDAutomata manager, int max_capacity, String name)
 	{
 		this.manager = manager;
@@ -50,15 +51,22 @@ public class Group
 		bdd_sigma = manager.getZero();
 		manager.ref(bdd_sigma);
 
-		// no pre-calculations are valid
-		has_t = false;
+		init();
+
 	}
 
+
+    private void init() {	
+    	// no pre-calculations are valid
+	has_t = false;
+	has_tu = false;
+	has_m = false;
+    }
 	// Note: strange things will happen if you try to use this object _after_ calling cleanup :)
 	public void cleanup()
 	{
 		reset();
-		manager.recursiveDeref(bdd_m);
+
 		manager.recursiveDeref(bdd_i);
 		manager.recursiveDeref(bdd_cube);
 		manager.recursiveDeref(bdd_cubep);
@@ -74,8 +82,7 @@ public class Group
 
 		size++;
 
-		bdd_i = manager.andTo(bdd_i, a.getI());
-		bdd_m = manager.andTo(bdd_m, a.getM());
+		bdd_i = manager.andTo(bdd_i, a.getI());	
 		bdd_cube = manager.andTo(bdd_cube, a.getCube());
 		bdd_cubep = manager.andTo(bdd_cubep, a.getCubep());
 		bdd_sigma   = manager.orTo(bdd_sigma, a.getSigma());
@@ -91,16 +98,20 @@ public class Group
 		if (has_t)
 		{
 			manager.recursiveDeref(bdd_t);
-
 			has_t = false;
 		}
 
 		if (has_tu)
 		{
 			manager.recursiveDeref(bdd_tu);
-
 			has_tu = false;
 		}
+
+		if(has_m) 
+		    {
+			manager.recursiveDeref(bdd_m);
+			has_m = false;
+		    }
 	}
 
     public boolean isEmpty() 
@@ -127,10 +138,7 @@ public class Group
 		return bdd_i;
 	}
 
-	public int getM()
-	{
-		return bdd_m;
-	}
+
 
 	public int getSigma()
 	{
@@ -152,6 +160,24 @@ public class Group
 		return bdd_cubep;
 	}
 
+    // --------------------------------------------------------------------------
+	public int getM()
+	{
+	    if(!has_m)
+		{
+		    computeM();
+		}
+	    
+		return bdd_m;
+	}
+    private void computeM() {
+	bdd_m = manager.getOne();
+
+	for (int i = size - 1; i >= 0; --i)
+	    bdd_m = manager.andTo(bdd_m, members[i].getM());
+
+	has_m = true;
+    }
 	// -------------------------------------------------------------------
 	public int getTu()
 	{

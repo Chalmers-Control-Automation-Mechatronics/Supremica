@@ -368,11 +368,8 @@ public class Supervisor
 		int permute1 = manager.getPermuteS2Sp();
 		int permute2 = manager.getPermuteSp2S();
 		int t_all = manager.relProd(plant.getT(), spec.getT(), manager.getEventCube());
+		int m_all = GroupHelper.getM(manager,spec, plant);
 
-		// This one is tricky:
-		// if spec is empty, then we cant assume that all events in P are marked
-		// because then everything is marked (there is no spec, remember?)
-		int m_all = spec.isEmpty() ? plant.getM() : spec.getM();
 
 
 		// gets derefed in first orTo ??
@@ -401,9 +398,9 @@ public class Supervisor
 		while (r_all_p != r_all);
 
 		manager.recursiveDeref(t_all);
+		manager.recursiveDeref(m_all);
 
 		int ret = manager.replace(r_all, permute2);
-
 		manager.recursiveDeref(r_all);
 
 		

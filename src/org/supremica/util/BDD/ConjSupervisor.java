@@ -27,8 +27,6 @@ public class ConjSupervisor
     // TODO
 
     // protected int computeLanguageDifference(int considred_events) 
-    // protected void computeCoReachables()
-    // protected void computeReachables()
     //	public int getBR1(int marked, int forbidden)
     // public int getBR2(int forbidden)
     // public int getDeadlocks()
@@ -141,5 +139,82 @@ public class ConjSupervisor
 	
 	timer.report("[Conjunctive] forward reachables found");
     }
+
+
+
+    	protected void computeCoReachables()
+	{
+		GrowFrame gf = null;;
+
+		if (Options.show_grow)
+		{
+			gf = new GrowFrame("[Conjunctive] backward reachability");
+		}
+
+		timer.reset();
+
+		int cube = manager.and(manager.getStatepCube(), manager.getEventCube());
+		int permute1 = manager.getPermuteS2Sp();
+		int permute2 = manager.getPermuteSp2S();
+
+
+		
+		// get the ordred automata list!
+		GroupHelper gh = new GroupHelper(plant, spec);
+		int [] tpri = gh.getTpri();
+		int size = gh.getSize();
+
+
+		int m_all = GroupHelper.getM(manager, spec, plant);
+
+		// gets derefed in first orTo ??
+		int r_all_p, r_all = manager.replace(m_all, permute1);    
+
+		int front = r_all;
+		manager.ref(front);
+
+		do
+		{
+			r_all_p = r_all;
+			
+			for(int i = size-1; i >= 0; --i) 
+			    front = manager.andTo( front, tpri[i]);
+			
+			int tmp = manager.exists(front, cube);
+			manager.recursiveDeref(front);
+
+			int tmp2 = manager.replace(tmp, permute1);
+			manager.recursiveDeref(tmp);
+			
+			r_all = manager.orTo(r_all, tmp2);
+			front = tmp2;
+
+
+			if (gf != null)
+			{
+				gf.add(manager.nodeCount(r_all));
+			}
+		}
+		while (r_all_p != r_all);
+
+		manager.recursiveDeref(m_all);
+		manager.recursiveDeref(cube);
+
+		int ret = manager.replace(r_all, permute2);
+
+		manager.recursiveDeref(r_all);
+
+		
+		has_coreachables = true;
+		bdd_coreachables = ret;
+
+		timer.report("[Conjunctive] Co-reachables found");
+
+		if (gf != null)
+		{
+			gf.stopTimer();
+		}
+	}
+
 }
                    

@@ -78,4 +78,13 @@ public class GroupHelper {
 	all.removeElement(s);
 	return s;
     }
+
+    public static int getM(JBDD m, Group spec, Group plant) {
+	// This one is tricky:
+	// if spec is empty, then we cant assume that all events in P are marked
+	// because then everything is marked (there is no spec, remember?)
+	int m_all = spec.isEmpty() ? plant.getM() : spec.getM();
+	m.ref(m_all);
+	return m_all;
+    }
 }
