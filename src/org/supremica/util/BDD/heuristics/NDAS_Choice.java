@@ -62,6 +62,11 @@ public class NDAS_Choice
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * choose between the <tt>size</tt> elements in the queue.
+	 *
+	 * this is where the actuall NDAS choice is made
+	 */
 	public int choose(int[] queue, int size)
 	{
 		if (size <= 0)
@@ -97,7 +102,13 @@ public class NDAS_Choice
 		return -1;    // ERROR: unknown option
 	}
 
-	public void advance(int automaton, boolean changed)
+
+	/**
+	 * register a movement with an element (automaton, transition, whatever).
+	 *
+	 * we need to know if it actually did any good to get the heuristics right
+	 */
+	public void advance(int element, boolean changed)
 	{
 		num_access++;
 
@@ -112,18 +123,18 @@ public class NDAS_Choice
 			{
 
 				// reward and punish
-				activity[automaton] += (changed)
+				activity[element] += (changed)
 									   ? ADD_REWARD
 									   : ADD_PUNISH;
 
 				// dont let it grow more than we can handle...
-				if (activity[automaton] > max_activity)
+				if (activity[element] > max_activity)
 				{
-					activity[automaton] = max_activity;
+					activity[element] = max_activity;
 				}
-				else if (activity[automaton] < -max_activity)
+				else if (activity[element] < -max_activity)
 				{
-					activity[automaton] = -max_activity;
+					activity[element] = -max_activity;
 				}
 			}
 			else
@@ -137,7 +148,7 @@ public class NDAS_Choice
 
 				if (changed)
 				{
-					activity[automaton] += ADD_REWARD_FADING;
+					activity[element] += ADD_REWARD_FADING;
 				}
 			}
 		}

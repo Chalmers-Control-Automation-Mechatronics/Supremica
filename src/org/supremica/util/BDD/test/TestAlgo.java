@@ -595,6 +595,13 @@ public class TestAlgo
 
 		// the supervisor synthesis
 		System.out.println("\n***** Testing DES and SCT/verification algorithms");
+
+
+		// XXX: for reasons i haven't figured out (might have to do with the selection heuristics),
+		//      modular code perform very bad will the default FORCE ordering heuristics
+		int save_ordering = Options.ordering_algorithm;
+		Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
+		System.out.println("   (note: temporarily switched to '" + Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm] + "' ordering)");
 		for (int i = 0; i < TEST_FILES.length; i++)
 		{
 			announce(TEST_FILES[i]);
@@ -610,6 +617,9 @@ public class TestAlgo
 			modularC(controllable[i]);
 			System.out.println();
 		}
+
+		// cleanup
+		Options.ordering_algorithm = save_ordering;
 
 
 		// ------------------------- testing safe state supervisor synthesis:
@@ -679,6 +689,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.22  2004/09/29 12:40:17  vahidi
+ minor or major changed related to ordering
+
  Revision 1.21  2004/08/20 14:48:42  vahidi
  the ordering algorithms now use quick-sort if needed.
 

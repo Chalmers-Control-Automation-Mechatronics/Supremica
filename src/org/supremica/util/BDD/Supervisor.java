@@ -166,7 +166,7 @@ public class Supervisor
 
 		// event-selection
 		if ((Options.algo_family == Options.ALGO_PETRINET) || (Options.algo_family == Options.ALGO_DISJUNCTIVE_WORKSET)
-			|| (Options.algo_family == Options.ALGO_SMOOTHED_MONO_WORKSET) || (Options.algo_family == Options.ALGO_DISJUNCTIVE_STEPSTONE))
+			|| (Options.algo_family == Options.ALGO_SMOOTHED_MONO_WORKSET) || (Options.algo_family == Options.ALGO_DISJUNCTIVE_STEPSTONE)	)
 		{
 			sb.append(Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
 			sb.append(" + NDAS:");
