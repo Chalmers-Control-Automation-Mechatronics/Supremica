@@ -208,6 +208,10 @@ public class Automaton
 	public void addState(State state)
 	{
 		theStates.add(state);
+		if (state.getIndex() == -1)
+		{
+			state.setIndex(getUniqueStateIndex());
+		}
 		idStateMap.put(state.getId(), state);
 		indexStateMap.put(new Integer(state.getIndex()), state);
 
@@ -489,6 +493,16 @@ public class Automaton
 		return newId;
 	}
 
+	public int getUniqueStateIndex()
+	{
+		while (containsStateWithIndex(uniqueStateIndex))
+		{
+			uniqueStateIndex++;
+		}
+		uniqueStateIndex++;
+		return uniqueStateIndex - 1;
+	}
+
 	public void clearVisitedStates()
 	{
 		Iterator stateIt = stateIterator();
@@ -716,5 +730,19 @@ public class Automaton
 	public int hashCode()
 	{
 		return name.hashCode();
+	}
+
+	public static void main(String[] args)
+	{
+				Automaton theAutomaton = new Automaton();
+
+                State stateZero = new State("zero");
+                theAutomaton.addState(stateZero);
+
+                State st = theAutomaton.getStateWithIndex(0); // should be stateZero (not?)
+                if(st == null)
+                        System.err.println("st == null");
+                else
+                        System.err.println("st != null");
 	}
 }
