@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -130,7 +129,7 @@ public class Arc
 	}
 
 	/**
-	 * True if the from and the to state are the same, otherwise false.
+	 * True if the from- and the to-state are the same, otherwise false.
 	 */
 	public boolean isSelfLoop()
 	{

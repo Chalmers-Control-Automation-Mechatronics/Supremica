@@ -247,7 +247,8 @@ End Sub
 			return;
 
 		// Create mutex zones
-		createMutexZones();
+		// createMutexZones();
+		createMutexZonesFromSpan();
 
 		// Wait for user
 		int n = JOptionPane.showConfirmDialog(gui.getComponent(), "Extract automata?", "Extract automata", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -641,7 +642,7 @@ End Sub
 	 * Creates mutex zones that supposedly guarantees no collisions between
 	 * robots. Generates span for each robot and then calculates the intersection.
      */
-	public static void NEWcreateMutexZones()
+	public static void createMutexZonesFromSpan()
 	{
 		try
 		{
@@ -1862,12 +1863,12 @@ End Sub
 			IPart upperArm = robot.getLinks().item(var("Link4")).getParts().item(var(1));
 			activeStation.setUCS(upperArm);
 			ITransform cylinderTransform = ruu.wCSToUCS(upperArm.getTransform());
-			cylinderTransform.setZ(cylinderTransform.getZ()+1.195-margin);
-			cylinderTransform.setRy(cylinderTransform.getRy()+Math.PI/2-margin);
+			cylinderTransform.setZ(cylinderTransform.getZ()+1.195);
+			cylinderTransform.setRy(cylinderTransform.getRy()+Math.PI/2);
 			cylinderTransform = ruu.uCSToWCS(cylinderTransform);
 
 			// Create cylinder around the arm
-			spanPart.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+2*margin);
+			spanPart.createSolidCylinder(cylinderTransform,cylinderRadius+margin,cylinderLength+margin);
 
 			// Create box around the tooltip
 			spanPart.createSolidBox(boxTransform,boxSize+2*margin,boxSize+2*margin,boxSize+2*margin);

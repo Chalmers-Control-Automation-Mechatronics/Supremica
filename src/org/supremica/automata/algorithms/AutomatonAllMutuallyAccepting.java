@@ -46,49 +46,42 @@
  *
  *  Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.algorithms;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.State;
 
-
-public class ArcIterator
-	implements Iterator
+public class AutomatonAllMutuallyAccepting
 {
-	private final Iterator theIterator;
+	private Automaton theAutomaton;
+	private boolean accepting;
 
-	public ArcIterator(Iterator theIterator)
+	public AutomatonAllMutuallyAccepting(Automaton theAutomaton, boolean accepting)
 	{
-		this.theIterator = theIterator;
+		this.theAutomaton = theAutomaton;
+		this.accepting = accepting;
 	}
 
-	public boolean hasNext()
+	public AutomatonAllMutuallyAccepting(Automaton theAutomaton)
 	{
-		return theIterator.hasNext();
+		this(theAutomaton, true);
 	}
 
-	public Object next()
-		throws NoSuchElementException
+	public void execute()
 	{
-		return theIterator.next();
-	}
+		theAutomaton.beginTransaction();
 
-	public Arc nextArc()
-		throws NoSuchElementException
-	{
-		return (Arc)next();
-	}
+		Iterator stateIt = theAutomaton.stateIterator();
 
-	public LabeledEvent nextEvent()
-		throws NoSuchElementException
-	{
-		return (LabeledEvent)nextArc().getEvent();
-	}
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
 
-	public void remove()
-		throws UnsupportedOperationException, IllegalStateException
-	{
-		throw new UnsupportedOperationException();
-	}
+			currState.setMutuallyAccepting(accepting);
+		}
 
+		theAutomaton.invalidate();
+		theAutomaton.endTransaction();
+	}
 }

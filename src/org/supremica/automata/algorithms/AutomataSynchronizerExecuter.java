@@ -853,7 +853,6 @@ public final class AutomataSynchronizerExecuter
 					// Handle all events
 					while (currEventIndex != Integer.MAX_VALUE)
 					{
-
 						// Generate an array that contains the indicies of each state
 						System.arraycopy(currState, 0, nextState, 0, currState.length);
 

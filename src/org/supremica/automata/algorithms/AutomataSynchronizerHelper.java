@@ -459,12 +459,14 @@ public final class AutomataSynchronizerHelper
 
 	public void setDeadlocked(int[] state, boolean deadlocked)
 	{
+		/*
 		if (logger.isDebugEnabled())
 		{
 			logger.debug("Deadlocked state:\n" + 
 						 AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
 			logger.debug(displayTrace(state));
 		}
+		*/
 
 		int currStatus = state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END];
 

@@ -70,6 +70,9 @@ public class MutuallyNonblockingVerifier
 	private AutomataVerifier theVerifier = null;	
 	private boolean stopRequested = false;
 
+	// The resulting synchs
+	private Automata resultAutomata = new Automata();
+	
 	public MutuallyNonblockingVerifier(Automata theAutomata)
 	{
 		this.theAutomata = theAutomata;
@@ -84,6 +87,8 @@ public class MutuallyNonblockingVerifier
 	
 	public boolean isMutuallyNonblocking()
 	{
+		/*
+		// Pointless crap
 		theAlphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
 		theAlphabetAnalyzer.execute();
 
@@ -104,38 +109,14 @@ public class MutuallyNonblockingVerifier
 
 		logger.info(unsynchronizedEvents + " unsynchronized events.");
 		logger.info(synchronizedEvents + " synchronized events.");
+		*/
 
-		java.awt.EventQueue.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					executionDialog = synchHelper.getExecutionDialog();
-					executionDialog.setMode(ExecutionDialogMode.verifyingMutualNonblocking);
-					executionDialog.initProgressBar(0, theAutomata.size());
-				}
-			});
+		// Do the work!
+		// synchTest();
+		// safeEventsTest();
+		work();
 
-		// return synchTest();
-		return safeEventsTest();
-	}
-
-	private boolean safeEventsTest()
-	{
-		// Find safe events in the respective automata
-		buildSafeEvents();
-		logger.debug(safeEventsMap.toString());
-					
-		if (stopRequested)
-			return false;
-
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton)autIt.next();
-			Events currEvents = safeEventsMap.getEvents(currAutomaton);
-			// System.out.println("Automaton: " + currAutomaton.getName() + "\nEvents: " + currEvents + "\n");
-			currAutomaton.extendMutuallyAccepting(currEvents);
-		}
-
+		// Analyze and present result
 		boolean allMutuallyNonblocking = true;
 		int nbrMutuallyNonblocking = 0;
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
@@ -152,14 +133,311 @@ public class MutuallyNonblockingVerifier
 				logger.info("Automaton " + currAutomaton + " is mutually nonblocking!");
 				nbrMutuallyNonblocking++;
 			}
-			logger.info("Safe events: " + safeEventsMap.getEvents(currAutomaton));
+			// logger.info("Safe events: " + safeEventsMap.getEvents(currAutomaton));
 		}
 		logger.info("At least " + nbrMutuallyNonblocking + " out of the total " + 
-					theAutomata.size() + " automata were mutually nonblocking.");
+					theAutomata.size() + " automata are mutually nonblocking.");
 		return allMutuallyNonblocking;
 	}
 
-	private boolean synchTest()
+	/**
+	 * Tests the automata individually, trying to find safe events. Makes no further attempts if
+	 * this does not work.
+	 */
+	private void safeEventsTest()
+	{
+		// Find safe events in the respective automata
+		buildSafeEvents();
+		logger.debug(safeEventsMap.toString());
+					
+		if (stopRequested)
+			return;
+
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			Events currEvents = safeEventsMap.getEvents(currAutomaton);
+			// System.out.println("Automaton: " + currAutomaton.getName() + "\nEvents: " + currEvents + "\n");
+			currAutomaton.extendMutuallyAccepting(currEvents);
+		}
+	}
+
+	/**
+	 * Does work. Seemingly very well, actually.
+	 */
+	private void work()
+	{
+		// A copy that we can do what we like with.
+		Automata theAutomataCopy = new Automata(theAutomata);
+
+		// Initialize ExecutionDialog
+		java.awt.EventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					executionDialog = synchHelper.getExecutionDialog();
+					executionDialog.setMode(ExecutionDialogMode.verifyingMutualNonblockingFirstRun);
+					executionDialog.initProgressBar(0, theAutomata.size());
+				}
+			});
+
+		// First run, a simple try for each automaton
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			logger.info("Building safe events for automaton " + currAutomaton + "...");
+			buildSafeEvents(currAutomaton, theAutomataCopy);
+			currAutomaton.extendMutuallyAccepting(safeEventsMap.getEvents(currAutomaton));
+
+			if (executionDialog != null)
+			{
+				executionDialog.setProgress(currAutomaton.getIndex());
+			}
+
+			if (stopRequested)
+				return;
+		}
+
+		// Initialize ExecutionDialog
+		java.awt.EventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					executionDialog.setMode(ExecutionDialogMode.verifyingMutualNonblockingSecondRun);
+					executionDialog.initProgressBar(0, theAutomata.size());
+				}
+			});
+
+		// Second run, for each automaton, try and prove mutual nonblocking by adding automata if necessary
+		int count = 0;
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			Automaton currSynchAutomaton = new Automaton(currAutomaton);
+			Automata currSynchAutomata = new Automata(currAutomaton);
+			Events currEvents = new Events(safeEventsMap.getEvents(currAutomaton));
+
+			// As long as we haven't established mutual nonblocking, we loop infinitely...
+			currSynchAutomaton.extendMutuallyAccepting(currEvents);
+			boolean ok = currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates();
+			while (!ok)
+			{
+				if (stopRequested)
+					return;
+				
+				// Find the automaton predicted to give the best improvement!
+				Automaton interestingAutomaton = getInterestingAutomaton(currSynchAutomata, currSynchAutomaton);
+				currSynchAutomata.addAutomaton(interestingAutomaton);
+				
+				// Add the interesting automaton
+				try
+				{
+					// If there were safe events in the added automaton, they are safe here too!
+					currEvents.addEvents(safeEventsMap.getEvents(interestingAutomaton));
+					
+					// Synchronize!
+					currSynchAutomaton = AutomataSynchronizer.synchronizeAutomata(currSynchAutomata);
+				}
+				catch (Exception ex)
+				{
+					logger.error(ex);
+					requestStop();
+					return;
+				}
+				
+				// Did there appear new safe events?
+				//addSafeEvents(currEvents, currSynchAutomaton, theAutomataCopy);
+				addSafeEvents(currEvents, currSynchAutomaton.getAlphabet(), currSynchAutomata, theAutomataCopy);
+				logger.info("Checking " + currSynchAutomata + ". \nSafeEvents " + currEvents + ".");				
+				currSynchAutomaton.extendMutuallyAccepting(currEvents);
+
+				Gui gui = ActionMan.getGui();
+				currSynchAutomaton.setName(currSynchAutomaton.getComment());
+				gui.getVisualProjectContainer().getActiveProject().addAutomaton(currSynchAutomaton);
+
+				// ok = (currSynchAutomaton.nbrOfStates() == currSynchAutomaton.nbrOfMutuallyAcceptingStates());
+				// Ignore all uncontrollable (forbidden) states!!
+				ok = (currSynchAutomaton.nbrOfStates()-currSynchAutomaton.nbrOfForbiddenStates() == currSynchAutomaton.nbrOfMutuallyAcceptingNotForbiddenStates());
+			}
+
+			// It worked! Set all states as mutually accepting in currAutomaton
+			AutomatonAllMutuallyAccepting allAccepting = new AutomatonAllMutuallyAccepting(currAutomaton);
+			allAccepting.execute();
+
+			// Show the progress!
+			if (executionDialog != null)
+			{
+				//executionDialog.setProgress(currAutomaton.getIndex());
+				executionDialog.setProgress(++count);
+			}
+		}
+
+		// Add to project the result
+		//ActionMan.getGui().addAutomata(newSynchAutomata);
+		//theAutomata.addAutomata(newSynchAutomata);
+		//currSynchAutomaton.setName(currSynchAutomaton.getComment());
+		/*
+		Gui gui = ActionMan.getGui();
+		gui.getVisualProjectContainer().getActiveProject().addAutomata(newSynchAutomata);
+		*/
+	}
+	
+	/**
+	 * Adds the most interesting automaton in theAutomata to theAutomata and 
+	 * synchronizes it with theSynch, returning the resulting automaton.
+	 */
+	private Automaton getInterestingAutomaton(Automata synchAutomata, Automaton synchAutomaton)
+	{
+		// Get the most interesting events
+		Vector interestingEvents = interestingEvents(synchAutomaton);
+		
+		Alphabet synchAlphabet = synchAutomaton.getAlphabet();
+		Automaton bestAutomaton = null;
+		LabeledEvent bestEvent = null;
+		boolean safeInBest = false;
+		int nbrNewEvents = Integer.MAX_VALUE;
+		for (int i = 0; i < interestingEvents.size(); i++)
+		{
+			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				Alphabet currAlphabet = currAutomaton.getAlphabet();
+				LabeledEvent currEvent = (LabeledEvent) interestingEvents.elementAt(i);
+
+				// Already in the synch?
+				if (synchAutomata.containsAutomaton(currAutomaton.getName()))
+				{
+					continue;
+				}
+				
+				// Does not contain the most interesting event?
+				if (!currAlphabet.containsEventWithLabel(currEvent))
+				{
+					continue;
+				}
+
+				// The most interesting event is safe in the automaton?
+				if (safeEventsMap.getEvents(currAutomaton).containsEventWithLabel(currEvent))
+				{
+					// Is this the first automaton where the event is safe? Then we override the earlier results.
+					if (safeInBest == false)
+					{
+						bestAutomaton = currAutomaton;
+						bestEvent = currEvent;
+						nbrNewEvents = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
+						safeInBest = true;
+						continue;
+					}
+				}
+				else
+				{
+					// Perhaps the best is much more interesting?
+					if (safeInBest == true)
+					{
+						continue;
+					}
+				}
+
+				// We now know this automaton is quite interesting, but we want as few new events as possible!
+				int newEvents = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
+				if (newEvents < nbrNewEvents)
+				{
+					bestAutomaton = currAutomaton;
+					bestEvent = currEvent;
+					nbrNewEvents = newEvents;
+				}
+			}
+		}
+		
+		// Have we a winner?
+		if (bestAutomaton != null)
+		{
+			logger.info("Adding " + bestAutomaton + ", most important event: " + bestEvent + ".");
+			
+			// The automaton we add should be accepting in all states!
+				Automaton allAcceptingAutomaton = new Automaton(bestAutomaton);
+				AutomatonAllAccepting allAccepting = new AutomatonAllAccepting(allAcceptingAutomaton);
+				allAccepting.execute();
+				
+				//return bestAutomaton;
+				return allAcceptingAutomaton;
+		}
+		
+		logger.error("It didn't work. I'm giving up... but there may still be hope!");
+		logger.error("This can't happen, right? " + interestingEvents.size());
+	
+		return null;
+
+
+
+		/*
+		// Get the most interesting events
+		Vector interestingEvents = interestingEvents(synchAutomaton);
+		
+		Alphabet synchAlphabet = synchAutomaton.getAlphabet();
+		Automaton bestMatch = null;
+		int bestNewEvents = Integer.MAX_VALUE;
+		for (int i = 0; i < interestingEvents.size(); i++)
+		//for (int i = interestingEvents.size()-1; i < interestingEvents.size(); i++)
+		{
+			if (i == 1)
+				logger.fatal("MutuallyNonblockingVerifier: This can't happen, right?");
+			
+			for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				Alphabet currAlphabet = currAutomaton.getAlphabet();
+
+				// Already in the synch?
+				if (synchAutomata.containsAutomaton(currAutomaton.getName()))
+				{
+					continue;
+				}
+				
+				// Does not contain the most interesting event?
+				if (!currAlphabet.containsEventWithLabel((LabeledEvent) interestingEvents.elementAt(i)))
+				{
+					continue;
+				}
+
+				// The most interesting event is safe in the automaton?
+				if (safeEventsMap.getEvents(currAutomaton).containsEventWithLabel((LabeledEvent) interestingEvents.elementAt(i)))
+				{
+					bestMatch = currAutomaton;
+					break; // Terminate immediately
+				}
+
+				// We want as few new events as possible!
+				int newEvents = currAutomaton.nbrOfEvents() - synchAlphabet.nbrOfCommonEvents(currAlphabet);
+				if (newEvents < bestNewEvents)
+				{
+					bestMatch = currAutomaton;
+					bestNewEvents = newEvents;
+				}
+			}
+		
+			// Have we a winner?
+			if (bestMatch != null)
+			{
+				logger.info("Adding " + bestMatch + ", most important event: " + interestingEvents.elementAt(i) + ".");
+				
+				// The automaton we add should be accepting in all states!
+				Automaton allAcceptingAutomaton = new Automaton(bestMatch);
+				AutomatonAllAccepting allAccepting = new AutomatonAllAccepting(allAcceptingAutomaton);
+				allAccepting.execute();
+				
+				//return bestMatch;
+				return allAcceptingAutomaton;
+			}
+		}
+
+		logger.error("It didn't work. I'm giving up... but there may still be hope!");
+
+		return null;
+		*/
+	}
+
+	private void synchTest()
 	{
 		Automata newAutomata = new Automata();
 		for (Iterator autItOne = theAutomata.iterator(); autItOne.hasNext(); )
@@ -195,8 +473,6 @@ public class MutuallyNonblockingVerifier
 		}
 
 		theAutomata.addAutomata(newAutomata);
-
-		return false;
 	}
 
 	/**
@@ -209,35 +485,207 @@ public class MutuallyNonblockingVerifier
 	 */
 	protected void buildSafeEvents()
 	{
-		Automata newAutomata = new Automata(theAutomata);
+		Automata theAutomataCopy = new Automata(theAutomata);
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton currAutomaton = (Automaton)autIt.next();
 			logger.info("Building safe events for automaton " + currAutomaton + "...");
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-			for (Iterator evIt = currAlphabet.iterator(); evIt.hasNext(); )
-			{
-				LabeledEvent currEvent = (LabeledEvent)evIt.next();
-				logger.info("Event: " + currEvent + " (" + (currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
-
-				if (stopRequested)
-					return;
-
-				boolean isSafe = checkSafeness(newAutomata, currAutomaton, currEvent);
-				if (isSafe)
-				{
-					safeEventsMap.addEvent(currAutomaton, currEvent);
-				}
-
-				if (stopRequested)
-					return;
-			}
+			buildSafeEvents(currAutomaton, theAutomataCopy);
 
 			if (executionDialog != null)
 			{
 				executionDialog.setProgress(currAutomaton.getIndex());
 			}
+
+			if (stopRequested)
+				return;
+		}
+	}
+
+	/**
+	 * Finds the safe events for currAutomaton. theAutomataCopy is a (deep) copy of 
+	 * theAutomata that this method will fiddle with a lot, you should NOT pass 
+	 * theAutomata as an argument instead of theAutomataCopy (a deep copy of theAutomata).
+	 *
+	 * @see buildSafeEvents()
+	 */
+	private void buildSafeEvents(Automaton currAutomaton, Automata theAutomataCopy)
+	{
+		Events theSafeEvents = safeEventsMap.getEvents(currAutomaton);
+		addSafeEvents(theSafeEvents, currAutomaton, theAutomataCopy);
+
+		/*
+		Alphabet currAlphabet = currAutomaton.getAlphabet();
+		for (Iterator evIt = currAlphabet.iterator(); evIt.hasNext(); )
+		{
+			// This test should be here because of the 'continue' statements below.
+			if (stopRequested)
+				return;
+
+			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			logger.info("Event: " + currEvent + " (" + 
+						(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
+			
+			// Perhaps we have already added this event?
+			if (safeEventsMap.containsEvent(currAutomaton, currEvent))
+			{
+				logger.info("Already established to be safe!");
+				continue;
+			}
+			
+			// We assume that the system is controllable (which we can NOT do in general).
+			// If the event is uncontrollable and we're examining a plant, we know that the 
+			// event is safe (if the plant alphabets are disjoint!)... I assume this for now.
+			// This should be commented out... really... 
+			//if (!currEvent.isControllable() && currAutomaton.isPlant())
+			//{
+			//	logger.info("Uncontrollable event in controllable plant => safe!");
+			//	safeEventsMap.addEvent(currAutomaton, currEvent);
+			//	continue;
+		    //}
+
+			// Otherwise make a safeness check
+			boolean isSafe = checkSafeness(theAutomataCopy, currAutomaton, currEvent);
+			if (isSafe)
+			{
+				logger.info("The event was found to be safe!");
+				safeEventsMap.addEvent(currAutomaton, currEvent);
+			}
+			else
+			{
+				logger.info("The event is unsafe!");
+			}
+			
+			if (stopRequested)
+				return;
+		}
+     	*/
+	}
+
+	/**
+	 * Add safe events to theSafeEvents according to the safeness of the events in theAutomaton.
+	 */
+	private void addSafeEvents(Events theSafeEvents, Automaton theAutomaton, Automata theAutomataCopy)
+	{
+		Alphabet theAlphabet = theAutomaton.getAlphabet();
+		for (Iterator evIt = theAlphabet.iterator(); evIt.hasNext(); )
+		{
+			// This test should be here because of the 'continue' statements below.
+			if (stopRequested)
+				return;
+
+			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			logger.info("Event: " + currEvent + " (" + 
+						(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
+			
+			// Perhaps we have already added this event?
+			//if (safeEventsMap.containsEvent(theAutomaton, currEvent))
+			if (theSafeEvents.containsEventWithLabel(currEvent))
+			{
+				logger.info("Already established to be safe!");
+				continue;
+			}
+			
+			// We assume that the system is controllable (which we can NOT do in general).
+			// If the event is uncontrollable and we're examining a plant, we know that the 
+			// event is safe (if the plant alphabets are disjoint!)... I assume this for now.
+			// This should be commented out... really... 
+			/*
+			if (!currEvent.isControllable() && theAutomaton.isPlant())
+			{
+				logger.info("Uncontrollable event in controllable plant => safe!");
+				safeEventsMap.addEvent(theAutomaton, currEvent);
+				continue;
+			}
+			*/
+
+			// Otherwise make a safeness check
+			boolean isSafe = checkSafeness(theAutomataCopy, theAutomaton, currEvent);
+			if (isSafe)
+			{
+				logger.info("The event is safe.");
+				
+				try
+				{
+					theSafeEvents.addEvent(currEvent);
+				}
+				catch (Exception ex)
+				{
+					logger.error(ex);
+					requestStop();
+				}
+			}
+			else
+			{
+				logger.info("The event is unsafe.");
+			}
+			
+			if (stopRequested)
+				return;
+		}
+	}
+
+	/**
+	 * Add safe events to theSafeEvents according to the safeness of the events in theAutomaton.
+	 */
+	private void addSafeEvents(Events theSafeEvents, Alphabet theAlphabet, Automata selectedAutomata, Automata theAutomataCopy)
+	{
+		//Alphabet theAlphabet = theAutomaton.getAlphabet();
+		for (Iterator evIt = theAlphabet.iterator(); evIt.hasNext(); )
+		{
+			// This test should be here because of the 'continue' statements below.
+			if (stopRequested)
+				return;
+
+			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			logger.info("Event: " + currEvent + " (" + 
+						(currEvent.isControllable() ? "controllable" : "uncontrollable") + ")...");
+			
+			// Perhaps we have already added this event?
+			//if (safeEventsMap.containsEvent(theAutomaton, currEvent))
+			if (theSafeEvents.containsEventWithLabel(currEvent))
+			{
+				logger.info("Already established to be safe!");
+				continue;
+			}
+			
+			// We assume that the system is controllable (which we can NOT do in general).
+			// If the event is uncontrollable and we're examining a plant, we know that the 
+			// event is safe (if the plant alphabets are disjoint!)... I assume this for now.
+			// This should be commented out... really... 
+			/*
+			if (!currEvent.isControllable() && theAutomaton.isPlant())
+			{
+				logger.info("Uncontrollable event in controllable plant => safe!");
+				safeEventsMap.addEvent(theAutomaton, currEvent);
+				continue;
+			}
+			*/
+
+			// Otherwise make a safeness check
+			boolean isSafe = checkSafeness(theAutomataCopy, selectedAutomata, currEvent);
+			if (isSafe)
+			{
+				logger.info("The event is safe.");
+				
+				try
+				{
+					theSafeEvents.addEvent(currEvent);
+				}
+				catch (Exception ex)
+				{
+					logger.error(ex);
+					requestStop();
+				}
+			}
+			else
+			{
+				logger.info("The event is unsafe.");
+			}
+			
+			if (stopRequested)
+				return;
 		}
 	}
 
@@ -270,12 +718,50 @@ public class MutuallyNonblockingVerifier
 	}
 
 	/**
+	 * Sets the AutomatonType of the automata and the controllability of the events to 
+	 * make way for the controllability check in checkSafeness().
+	 */
+	private void setAttributes(Automata totalSystem, Automata thePlantAutomata, LabeledEvent unconEvent)
+	{
+		for (Iterator autIt = totalSystem.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			//if (currAutomaton.getName() == thePlantAutomaton.getName()) // Equal name? Is this enough?
+			if (thePlantAutomata.containsAutomaton(currAutomaton.getName())) // Equal name? Is this enough?
+			{
+				currAutomaton.setType(AutomatonType.Plant);
+			}
+			else
+			{
+				currAutomaton.setType(AutomatonType.Specification);
+			}
+
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
+			for (Iterator eventIt = currAlphabet.iterator(); eventIt.hasNext();)
+			{
+				// Make all events controllable except for the chosen one (unconEvent)
+				LabeledEvent currEvent = (LabeledEvent)eventIt.next();
+				currEvent.setControllable(!currEvent.getLabel().equals(unconEvent.getLabel()));
+			}
+		}
+	}
+
+	/**
 	 * Examines if the event currEvent is always enabled in totalSystem if
-	 * it is enabled in thePlantAutomaton (it is never disabled by totalSystem).
+	 * it is enabled in thePlantAutomata (it is never disabled by totalSystem).
 	 */
 	private boolean checkSafeness(Automata totalSystem, Automaton thePlantAutomaton, LabeledEvent currEvent)
 	{
-		setAttributes(totalSystem, thePlantAutomaton, currEvent);
+		return checkSafeness(totalSystem, new Automata(thePlantAutomaton), currEvent);
+	}
+
+	/**
+	 * Examines if the event currEvent is always enabled in totalSystem if
+	 * it is enabled in thePlantAutomata (it is never disabled by totalSystem).
+	 */
+	private boolean checkSafeness(Automata totalSystem, Automata thePlantAutomata, LabeledEvent currEvent)
+	{
+		setAttributes(totalSystem, thePlantAutomata, currEvent);
 		SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 		VerificationOptions verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
 		/*
@@ -302,6 +788,81 @@ public class MutuallyNonblockingVerifier
 			// logger.debug(ex);
 		}
 		return isSafe;
+	}
+
+	/**
+	 * Finds the most relevant events and returns them ordered by level of interest.
+	 * This is of course just a heuristic. 
+	 *   It measures the frequence of appearance of transitions starting in a non-mutually
+	 * accepting state and ending in a mutually accepting state.
+	 */
+	private Vector interestingEvents(Automaton theAutomaton)
+	{
+		int[] value = new int[theAutomaton.nbrOfEvents()];
+		Alphabet theAlphabet = new Alphabet(theAutomaton.getAlphabet());
+		theAlphabet.setIndicies();
+
+		// Give score to interesting events
+		for (ArcIterator arcIt = theAutomaton.arcIterator(); arcIt.hasNext(); )
+		{
+			Arc currArc = arcIt.nextArc();
+
+			// Self-loops are not interesting
+			if (currArc.isSelfLoop())
+			{
+				continue;
+			}
+
+			int index = theAlphabet.getEventWithLabel(currArc.getEvent().getLabel()).getSynchIndex();
+			if (currArc.getToState().isMutuallyAccepting() && !currArc.getToState().isForbidden() && !currArc.getFromState().isMutuallyAccepting())
+			{
+				value[index]++;
+			}
+
+			/*
+			// The from-state should be unacceptable.  :o)  Not funny. 
+			int index = theAlphabet.getEventWithLabel(currArc.getEvent().getLabel()).getSynchIndex();
+			if (!currArc.getFromState().isMutuallyAccepting())
+			{
+				value[index] = value[index] + 1;
+			}
+			else
+			{
+				continue;
+			}
+
+			// If the to-state is mutually accepting - add a bonus!
+			if (currArc.getToState().isMutuallyAccepting())
+			{
+				value[index] = value[index] + value.length*value.length;
+			}
+			*/
+		}
+
+		// Sort the result
+		Vector result = new Vector(value.length, 0);		
+		for (int i = 0; i < value.length; i++)
+		{
+			int high = 0;
+			for (int j = 1; j < value.length; j++)
+			{
+				if (value[high] < value[j])
+				{
+					high = j;
+				}
+			}
+
+			// If the best event had value 0, there's no point in continuing.
+			if (value[high] == 0)
+				return result;
+
+			// Add the best event to the result
+			result.add(i, theAlphabet.getEventWithIndex(high));
+			//logger.debug("Event: " + result.elementAt(i) + ", " + value[high] + ".");
+			value[high] = -1;
+		}
+
+		return result;
 	}
 
 	/**
@@ -353,7 +914,7 @@ class AutomataToEventMap
 		return theEvents.size();
 	}
 
-	public Iterator eventIterator(Automaton theAutomaton)
+	public EventIterator eventIterator(Automaton theAutomaton)
 	{
 		return getEvents(theAutomaton).iterator();
 	}
@@ -373,6 +934,13 @@ class AutomataToEventMap
 			logger.error("addEvent: " + ex.getMessage());
 			logger.debug(ex);
 		}
+	}
+
+	public boolean containsEvent(Automaton theAutomaton, LabeledEvent theEvent)
+	{
+		Events theEvents = getEvents(theAutomaton);
+
+		return theEvents.containsEventWithLabel(theEvent.getLabel());
 	}
 
 	public String toString()

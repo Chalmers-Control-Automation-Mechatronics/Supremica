@@ -605,7 +605,6 @@ public class Automaton
 	// end index stuff
 
 	// What the f*** are these doing here?
-
 	private LabeledEvent getEvent(String eventId)
 		throws Exception
 	{
@@ -768,6 +767,24 @@ public class Automaton
 			State currState = (State) stateIt.next();
 
 			if (currState.isMutuallyAccepting())
+			{
+				nbrOfAcceptingStates++;
+			}
+		}
+
+		return nbrOfAcceptingStates;
+	}
+
+	public int nbrOfMutuallyAcceptingNotForbiddenStates()
+	{
+		int nbrOfAcceptingStates = 0;
+		Iterator stateIt = stateIterator();
+
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.isMutuallyAccepting() && !currState.isForbidden())
 			{
 				nbrOfAcceptingStates++;
 			}
@@ -1199,6 +1216,20 @@ public class Automaton
 		currState.setAssociatedState(nextState);
 	}
 
+	/**
+	 * Removes mutually accepting status from all states.
+	 */
+	/*
+	public void setMutuallyAcceptingStatus(boolean status)
+	{
+		
+	}
+	*/
+
+	/**
+	 * Backwards extend accepting and mutually accepting states along transitions with safeEvents.
+	 * some kind of "coreachability along a subset of the alphabet".
+	 */
 	public void extendMutuallyAccepting(Events safeEvents)
 	{
 		boolean changes = true;
@@ -1227,7 +1258,6 @@ public class Automaton
 					}
 				}
 			}
-
 		}
 	}
 

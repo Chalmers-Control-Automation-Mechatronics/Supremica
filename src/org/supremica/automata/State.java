@@ -245,7 +245,8 @@ public class State
 
 	public boolean isMutuallyAccepting()
 	{
-		return mutuallyAccepting;
+		// return mutuallyAccepting;
+		return mutuallyAccepting || accepting;
 	}
 
 	public void setAccepting(boolean accepting)
@@ -254,6 +255,8 @@ public class State
 		this.mutuallyAccepting = accepting;
 	}
 
+	// Should it really be possible to have accepting but NOT mutually accepting states!?
+	// I think not... see isMutuallyAccepting above... /hugo
 	public void setMutuallyAccepting(boolean accepting)
 	{
 		this.mutuallyAccepting = accepting;

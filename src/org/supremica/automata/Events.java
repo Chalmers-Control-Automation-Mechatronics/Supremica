@@ -150,6 +150,24 @@ public class Events
 	{
 		theEvents.put(ev.getLabel(), ev);
 	}
+	
+	/**
+	 * Adds all events in another Events to this Events. 
+	 * Makes sure they are not already included!
+	 */
+	public void addEvents(Events otherEvents)
+		throws Exception
+	{
+		for (EventIterator eventIt = otherEvents.iterator(); eventIt.hasNext(); )
+		{
+			LabeledEvent currEvent = eventIt.nextEvent();
+			if (!containsEventWithLabel(currEvent))
+			{
+				addEvent(currEvent);
+				System.err.println("HAHA! THIS ONE IS SAFE! " + currEvent);
+			}
+		}
+	}
 
 	public void removeEvent(LabeledEvent ev)
 		throws IllegalArgumentException

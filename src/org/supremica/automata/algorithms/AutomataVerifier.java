@@ -848,7 +848,7 @@ public class AutomataVerifier
 		// Nothing bad has happened. Very nice!
 		if (verboseMode)
 		{
-			logger.info("\"" + automataNames + "\" is controllable.");
+			logger.info("'" + automataNames + "' is controllable.");
 		}
 
 		return true;
@@ -902,6 +902,7 @@ public class AutomataVerifier
 		{
 			currAutomaton = (Automaton) automataIterator.next();
 			arraySortValue[count] = compareAlphabets(currAutomaton.getAlphabet(), synchAlphabet);
+			// arraySortValue[count] = compareAlphabets(synchAlphabet, currAutomaton.getAlphabet());
 
 			if (arraySortValue[count] > 0)
 			{
@@ -969,7 +970,8 @@ public class AutomataVerifier
 	 *
 	 *@param  leftAlphabet the alphabet to compare.
 	 *@param  rightAlphabet the alphabet to compare to.
-	 *@return  double representing how similar the two alphabets are. Returns quota between common events in the alphabets and unique events in rightAlphabet.
+	 *@return  double representing how similar the two alphabets are. Returns quota between common 
+	 * events in the alphabets and unique events in rightAlphabet.
 	 */
 	private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
 	{
@@ -1043,7 +1045,7 @@ public class AutomataVerifier
 			// Been here before, already added some automata
 			for (int i = 0; i < start; i++)
 			{
-				addedAutomata = addedAutomata + " \"" + theAutomata.getAutomatonAt(similarAutomata[i]).getName() + "\"";
+				addedAutomata = addedAutomata + theAutomata.getAutomatonAt(similarAutomata[i]).toString();
 			}
 
 			// Increase the limit each time

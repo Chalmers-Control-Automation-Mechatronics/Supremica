@@ -77,7 +77,7 @@ public class Automata
 	}
 
 	/**
-	 * Copy constructor that also makes a copy of all the automata
+	 * Copy constructor that also makes a (deep) copy of all the automata
 	 * contained in oldAutomata. Calling this is equal to calling
 	 * Automata(oldAutomata, false)
 	 **/
@@ -1013,7 +1013,7 @@ public class Automata
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
 	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, 
-											   boolean mustHaveType)
+											   boolean mustHaveValidType)
 	{
 		if (mustHaveInitial)
 		{
@@ -1030,8 +1030,8 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton \"" + currAutomaton.getName() + 
-							"\" does not have an initial state.\n" +
+						String message = "The automaton " + currAutomaton + 
+							" does not have an initial state.\n" +
 							"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
 						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
@@ -1061,7 +1061,7 @@ public class Automata
 			}
 		}
 
-		if (mustHaveType)
+		if (mustHaveValidType && (size() > 1))
 		{
 			// All automata must have a defined type, i.e. must not be of type "Undefined".
 			Iterator autIt = iterator();
@@ -1074,8 +1074,20 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton \"" + currAutomaton.getName() +
-							"\" is of type \"Undefined\".\n" +
+						String message = "The automaton " + currAutomaton +
+							" is of type 'Undefined'.\n" +
+							"Please specify a type.";
+						Object[] options = { "Cancel" };
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
+																JOptionPane.OK_OPTION, 
+																JOptionPane.WARNING_MESSAGE, null, 
+																options, options[0]);
+						
+						return false;
+						
+						/*
+						String message = "The automaton " + currAutomaton. +
+						    " is of type 'Undefined'.\n" +
 							"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
 						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
@@ -1095,6 +1107,7 @@ public class Automata
 							// This is iNsaNe!
 							return false;
 						}
+						*/
 					}
 					else
 					{

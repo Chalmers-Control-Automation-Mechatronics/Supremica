@@ -888,7 +888,6 @@ public class Supremica
 			}
 			else
 			{
-
 				// Must have a way to say, "cancel all"?
 			}
 		}

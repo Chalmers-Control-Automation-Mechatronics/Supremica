@@ -1855,16 +1855,24 @@ public class ActionMan
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
-			String currAutomatonName = currAutomaton.getName();
+			//String currAutomatonName = currAutomaton.getName();
 			int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
 
 			if (maxNbrOfStates < currAutomaton.nbrOfStates())
 			{
+				/*
 				StringBuffer msg = new StringBuffer();
 
-				msg.append(currAutomatonName + " has " + currAutomaton.nbrOfStates() + " states. ");
+				msg.append(currAutomaton + " has " + currAutomaton.nbrOfStates() + " states. ");
 				msg.append("It is not recommended to display an automaton with more than ");
 				msg.append(maxNbrOfStates + " states.\n" + "Do you want to abort viewing?");
+				*/
+				
+				String msg = currAutomaton + " has " + currAutomaton.nbrOfStates() + 
+					" states. It is not recommended to display an automaton with more than " + 
+					maxNbrOfStates + " states. Do you want to abort viewing?";
+					
+				msg = EncodingHelper.linebreakAdjust(msg);
 
 				int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 
@@ -1885,11 +1893,11 @@ public class ActionMan
 
 			try
 			{
-				AutomatonViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomatonName);
+				AutomatonViewer viewer = gui.getVisualProjectContainer().getActiveProject().getAutomatonViewer(currAutomaton.getName());
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton.getName(), ex);
+				logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton, ex);
 				logger.debug(ex.getStackTrace());
 
 				return;
@@ -2592,7 +2600,7 @@ public class ActionMan
 		{
 			public void run()
 			{
-				RobotStudioLink.NEWcreateMutexZones();
+				RobotStudioLink.createMutexZonesFromSpan();
 			}
 		});
 		thread.start();

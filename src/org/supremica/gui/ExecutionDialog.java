@@ -69,7 +69,7 @@ public class ExecutionDialog
 	private JLabel operationLabel = null;
 	private JPanel infoPanel = null;
 	private JPanel progressPanel = null;
-	private JLabel infoHeader = null;
+	private JLabel operationHeader = null;
 	private JLabel infoValue = null;
 	private JProgressBar progressBar = null;
 	private JPanel currCenterPanel = null;
@@ -109,23 +109,89 @@ public class ExecutionDialog
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 
 		contentPanel = (JPanel) getContentPane();
+
+		JPanel operationPanel = new JPanel(new GridLayout(2,1));
+		operationLabel = new JLabel();
+		operationLabel.setHorizontalAlignment(JLabel.LEFT);
+		operationHeader = new JLabel();
+		operationHeader.setHorizontalAlignment(JLabel.CENTER);
+		operationPanel.add(operationLabel);
+		operationPanel.add(operationHeader);
+		contentPanel.add(operationPanel, BorderLayout.NORTH);
+
+		// We have two panels that we switch between, infoPanel and progressPanel
+		// The infoPanel
+		//infoPanel = new JPanel(new GridLayout(2, 1));
+		infoPanel = new JPanel();
+		//JPanel operationHeaderPanel = new JPanel();
+		//operationHeader = new JLabel();
+		//operationHeaderPanel.add(operationHeader, BorderLayout.CENTER);
+		//JPanel infoValuePanel = new JPanel();
+		infoValue = new JLabel();
+		//infoValuePanel.add(infoValue, BorderLayout.CENTER);
+		//infoPanel.add(operationHeaderPanel);
+		//infoPanel.add(infoValuePanel);
+		infoPanel.add(infoValue, BorderLayout.CENTER);
+
+		// The progressPanel
+		progressPanel = new JPanel();
+		progressBar = new JProgressBar();
+		progressBar.setStringPainted(true);
+		//JPanel progressHeaderPanel = new JPanel();
+		//progressHeaderPanel.add(operationHeader, BorderLayout.CENTER);
+		//progressPanel.add(progressHeaderPanel);
+		progressPanel.add(progressBar, BorderLayout.CENTER);
+
+		// And there are some buttons (one)
+		JPanel buttonPanel = new JPanel();
+		stopButton = new JButton("Abort");
+		stopButton.addActionListener(this);
+		buttonPanel.add(stopButton);
+		contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+		// Hit it!
+		setMode(ExecutionDialogMode.uninitialized);
+		show();
+
+		/*
+		setTitle(title);
+		setSize(new Dimension(250, 120));
+		setResizable(false);
+
+		// Center the window
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension frameSize = getSize();
+
+		if (frameSize.height > screenSize.height)
+		{
+			frameSize.height = screenSize.height;
+		}
+
+		if (frameSize.width > screenSize.width)
+		{
+			frameSize.width = screenSize.width;
+		}
+
+		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+
+		contentPanel = (JPanel) getContentPane();
 		operationLabel = new JLabel();
 
 		contentPanel.add(operationLabel, BorderLayout.NORTH);
 
 		// We have two panels that we switch between
 		infoPanel = new JPanel(new GridLayout(2, 1));
-		infoHeader = new JLabel();
+		operationHeader = new JLabel();
 
-		JPanel infoHeaderPanel = new JPanel();
+		JPanel operationHeaderPanel = new JPanel();
 
 		infoValue = new JLabel();
 
 		JPanel infoValuePanel = new JPanel();
 
-		infoHeaderPanel.add(infoHeader, BorderLayout.CENTER);
+		operationHeaderPanel.add(operationHeader, BorderLayout.CENTER);
 		infoValuePanel.add(infoValue, BorderLayout.CENTER);
-		infoPanel.add(infoHeaderPanel);
+		infoPanel.add(operationHeaderPanel);
 		infoPanel.add(infoValuePanel);
 
 		progressPanel = new JPanel();
@@ -142,6 +208,7 @@ public class ExecutionDialog
 		contentPanel.add(buttonPanel, BorderLayout.SOUTH);
 		setMode(ExecutionDialogMode.uninitialized);
 		show();
+		*/
 	}
 
 	/**
@@ -233,15 +300,31 @@ public class ExecutionDialog
 				setVisible(true);
 			}
 
+			// Should we replace the "value panel"
 			if (currCenterPanel != null)
 			{
 				contentPanel.remove(currCenterPanel);
 			}
 
+			// Update the dialog with the current mode
+			operationLabel.setText(currentMode.getId());
+			operationHeader.setText(currentMode.getText());
+			if (currentMode.showValue())
+			{
+				contentPanel.add(infoPanel, BorderLayout.CENTER);
+				currCenterPanel = infoPanel;
+			}
+			else if (currentMode.showProgress())
+			{
+				contentPanel.add(progressPanel, BorderLayout.CENTER);
+				currCenterPanel = progressPanel;
+			}
+
+			/*
 			if (currentMode == ExecutionDialogMode.synchronizing)
 			{
 				operationLabel.setText(currentMode.getId());    // "Synchronizing...");
-				infoHeader.setText(currentMode.getText());    // "Number of states:");
+				operationHeader.setText(currentMode.getText());    // "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
@@ -249,7 +332,7 @@ public class ExecutionDialog
 			else if (currentMode == ExecutionDialogMode.verifying)
 			{
 				operationLabel.setText(currentMode.getId());    // "Verifying...");
-				infoHeader.setText(currentMode.getText());    // "Number of states:");
+				operationHeader.setText(currentMode.getText());    // "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
@@ -257,7 +340,7 @@ public class ExecutionDialog
 			else if (currentMode == ExecutionDialogMode.synthesizing)
 			{
 				operationLabel.setText(currentMode.getId());    // "Synthesizing...");
-				infoHeader.setText(currentMode.getText());    // "Number of states:");
+				operationHeader.setText(currentMode.getText());    // "Number of states:");
 				contentPanel.add(infoPanel, BorderLayout.CENTER);
 
 				currCenterPanel = infoPanel;
@@ -265,38 +348,52 @@ public class ExecutionDialog
 			else if (currentMode == ExecutionDialogMode.buildingStates)
 			{
 				operationLabel.setText(currentMode.getId());    // "Building states...");
+				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
-				currCenterPanel = infoPanel;
+				currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.buildingTransitions)
 			{
 				operationLabel.setText(currentMode.getId());    // "Building transitions...");
+				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
-				currCenterPanel = infoPanel;
+				currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.matchingStates)
 			{
 				operationLabel.setText(currentMode.getId());    // "Matching states...");
+				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 
-				currCenterPanel = infoPanel;
+				currCenterPanel = progressPanel;
 			}
 			else if (currentMode == ExecutionDialogMode.verifyingNonblocking)
 			{
 				operationLabel.setText(currentMode.getId());    // "Verifying nonblocking...");
+				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 				
-				currCenterPanel = infoPanel;
+				currCenterPanel = progressPanel;
 			}
-			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblocking)
+			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingFirstRun)
 			{
 				operationLabel.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
+				operationHeader.setText(currentMode.getText());    // "");
 				contentPanel.add(progressPanel, BorderLayout.CENTER);
 				
-				currCenterPanel = infoPanel;
+				currCenterPanel = progressPanel;
 			}
+			else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingSecondRun)
+			{
+				operationLabel.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
+				operationHeader.setText(currentMode.getText());    // "");
+				contentPanel.add(progressPanel, BorderLayout.CENTER);
+				
+				currCenterPanel = progressPanel;
+			}
+			*/
 
 			/*
 			 * This is what it should look like - let the mode keep track of itself
@@ -317,7 +414,7 @@ public class ExecutionDialog
 
 		if (showValues)
 		{
-			// It was incredibly ugly when -1 appeared in the dialog  //Hguo.
+			// Don't show negative values in the dialog
 			if (value >= 0)
 				infoValue.setText(String.valueOf(value));
 			else
@@ -326,6 +423,8 @@ public class ExecutionDialog
 		else if (showProgress)
 		{
 			progressBar.setValue(progressValue);
+			//progressBar.setString(String.valueOf(Math.round(progressBar.getPercentComplete()*1000)/10.0) + "%");
+			progressBar.setString(String.valueOf(Math.round(progressBar.getPercentComplete()*100)) + "%");
 		}
 	}
 
