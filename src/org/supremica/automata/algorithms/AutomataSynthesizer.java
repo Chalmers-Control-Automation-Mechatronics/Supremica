@@ -629,9 +629,15 @@ public class AutomataSynthesizer
 					currAutomata.addAutomaton(tempAutomata.getAutomatonAt(i));
 				}
 			}
+			catch(IllegalArgumentException ex)
+			{
+				logger.error("AutomataSynthesizer.optimize: Illegal argument " + ex);
+				return;
+			}
 			catch (Exception ex)
 			{
 				logger.error("Exception in AutomataSynthesizer.optimize. " + ex);
+				ex.printStackTrace();
 
 				return;
 			}

@@ -62,28 +62,38 @@ interface VerificationPanel
 }
 
 
-class VD_StandardPanel
+class VerificationDialogStandardPanel
 	extends JPanel
-	implements VerificationPanel
+	implements VerificationPanel, ActionListener
 {
 	private JComboBox verificationTypeBox;
 	private JComboBox algorithmTypeBox;
-
-	public VD_StandardPanel()
+	private JTextArea nbNote;
+	
+	final String[] verificationData = { "controllability",	// keep them in this order, for God's sake!
+										"non-blocking",
+										"language inclusion" };
+	
+	final String[] algorithmData = { "modular", "monolithic" /*, "IDD" */ };
+	
+	public VerificationDialogStandardPanel()
 	{
-		Box standardBox = Box.createVerticalBox();
-		String[] verificationData = { "controllability", "non-blocking",
-									  "language inclusion" };
-
 		verificationTypeBox = new JComboBox(verificationData);
-
-		String[] algorithmData = { "modular", "monolithic", "IDD" };
-
+		verificationTypeBox.addActionListener(this);
+		
 		algorithmTypeBox = new JComboBox(algorithmData);
-
+		
+		nbNote = new JTextArea("Note:\n" + 
+								"Currently, modular non-blocking\n" +
+								"verification is not supported");
+		nbNote.setBackground(new Color(0,0,0,0)); // transparent
+	
+		Box standardBox = Box.createVerticalBox();
 		standardBox.add(verificationTypeBox);
 		standardBox.add(algorithmTypeBox);
-		this.add(standardBox);
+		this.add(standardBox, BorderLayout.CENTER);
+		this.add(nbNote, BorderLayout.SOUTH);
+		
 	}
 
 	public void update(VerificationOptions verificationOptions)
@@ -97,9 +107,28 @@ class VD_StandardPanel
 		verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
 		verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
 	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		if(((String)verificationTypeBox.getSelectedItem()) == verificationData[1]) // non-blocking
+		{
+			// force the monolithic algorithm
+			algorithmTypeBox.removeAllItems();
+			algorithmTypeBox.addItem(algorithmData[1]); // monolithic
+			nbNote.setVisible(true);
+		}
+		else // either controllability or language inclusion selected
+		{
+			algorithmTypeBox.removeAllItems();
+			algorithmTypeBox.addItem(algorithmData[0]);
+			algorithmTypeBox.addItem(algorithmData[1]);
+			nbNote.setVisible(false);
+		}
+	}
+
 }
 
-class VD_AdvancedPanel
+class VerificationDialogAdvancedPanel
 	extends JPanel
 	implements VerificationPanel
 {
@@ -108,7 +137,7 @@ class VD_AdvancedPanel
 	private JCheckBox oneEventAtATimeBox;
 	private JCheckBox skipUncontrollabilityBox;
 
-	public VD_AdvancedPanel()
+	public VerificationDialogAdvancedPanel()
 	{
 		Box advancedBox = Box.createVerticalBox();
 		JLabel exclusionStateLimitText = new JLabel("Initial state limit for state exclusion");
@@ -153,8 +182,8 @@ public class VerificationDialog
 	private JButton okButton;
 	private JButton cancelButton;
 	private VerificationOptions verificationOptions;
-	private VD_StandardPanel standardPanel;
-	private VD_AdvancedPanel advancedPanel;
+	private VerificationDialogStandardPanel standardPanel;
+	private VerificationDialogAdvancedPanel advancedPanel;
 	private JDialog dialog;
 
 	/**
@@ -171,8 +200,8 @@ public class VerificationDialog
 		// dialog.setResizable(false);
 		Container contentPane = dialog.getContentPane();
 
-		standardPanel = new VD_StandardPanel();
-		advancedPanel = new VD_AdvancedPanel();
+		standardPanel = new VerificationDialogStandardPanel();
+		advancedPanel = new VerificationDialogAdvancedPanel();
 
 		JTabbedPane tabbedPane = new JTabbedPane();
 

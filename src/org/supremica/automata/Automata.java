@@ -204,6 +204,41 @@ public class Automata
 		return theAutomata.iterator();
 	}
 
+	/**
+	 * Returns true if all automata have initial states
+	 */
+	public boolean hasInitialState()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+			
+			if(!automaton.hasInitialState())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns true if each automaton has at least one accepting state
+	 * Note, this is no guarantee that the composition will have an accepting state.
+	 */
+	public boolean hasAcceptingState()
+	{
+		for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
+		{
+			Automaton automaton = (Automaton) automataIterator.next();
+			
+			if(!automaton.hasAcceptingState())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public int size()
 	{
 		return theAutomata.size();

@@ -83,7 +83,7 @@ public final class AutomataSynchronizerHelper
 	private Object gettingFromStatesToProcessLock = new Object();
 	private Object addingToStatesToProcessLock = new Object();
 	private Automata theAutomata;
-	private Automaton theAutomaton;
+	private Automaton theAutomaton; // the result
 	private boolean automataIsControllable = true;
 
 	// Keeps information common to helpers.
@@ -337,6 +337,10 @@ public final class AutomataSynchronizerHelper
 		}
 	}
 
+	public void addComment(String comment)
+	{
+		theAutomaton.setComment(comment);
+	}
 	public void setExecutionDialog(ExecutionDialog executionDialog)
 	{
 		this.executionDialog = executionDialog;

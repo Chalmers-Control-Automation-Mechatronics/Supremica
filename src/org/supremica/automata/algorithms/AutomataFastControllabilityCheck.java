@@ -95,6 +95,9 @@ public class AutomataFastControllabilityCheck
 	private int stateAmount = 1;
 	private int stateAmountLimit = 1000;
 
+	// Initial state flag cache
+	boolean hasInitialState;
+	
 	/**
 	 * Determines if more detailed information on the progress of things should be displayed.
 	 *
@@ -109,6 +112,8 @@ public class AutomataFastControllabilityCheck
 		State currInitialState;
 
 		this.theAutomata = theAutomata;
+		this.hasInitialState = theAutomata.hasInitialState();
+		
 		nbrOfExecuters = syncOptions.getNbrOfExecuters();
 		verboseMode = syncOptions.verboseMode();
 
@@ -130,17 +135,20 @@ public class AutomataFastControllabilityCheck
 
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getUncontrollableEventToPlantMap();
 
-		// Build the initial state
-		initialState = new int[theAutomata.size() + 1];
-
-		// + 1 status field
-		Iterator autIt = theAutomata.iterator();
-
-		while (autIt.hasNext())
+		if(hasInitialState)
 		{
-			currAutomaton = (Automaton) autIt.next();
-			currInitialState = currAutomaton.getInitialState();
-			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+			// Build the initial state
+			initialState = new int[theAutomata.size() + 1];
+		
+			// + 1 status field
+			Iterator autIt = theAutomata.iterator();
+		
+			while (autIt.hasNext())
+			{
+				currAutomaton = (Automaton) autIt.next();
+				currInitialState = currAutomaton.getInitialState();
+				initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+			}
 		}
 	}
 
@@ -154,6 +162,9 @@ public class AutomataFastControllabilityCheck
 	public boolean execute()
 		throws Exception
 	{
+		if(!hasInitialState) // yes, the null automaton is controllable (it may have states, but if there's no initial state...)
+			return true;
+	
 		LabeledEvent currEvent;
 		Automaton currPlantAutomaton;
 		Automaton currSupervisorAutomaton;

@@ -65,58 +65,104 @@ abstract class SynthesizerPanel
 class SynthesizerDialogStandardPanel
 	extends SynthesizerPanel implements ActionListener
 {
-	private JComboBox synthesisTypeBox;
-	private JComboBox algorithmTypeBox;
+	private SynthesisSelector synthesisTypeBox;
+	private AlgorithmSelector algorithmTypeBox;
 	private JCheckBox purgeBox;
 	private JCheckBox optimizeBox;
 	private NonblockNote nbNote;
 	
-	class NonblockNote
-		extends JPanel
+	static class AlgorithmSelector
+		extends JComboBox
 	{
-		boolean enabled = false;
-		
-		public void enable()
+		private AlgorithmSelector(Object [] array)
 		{
-			if(!enabled)
+			super(array);
+		}
+
+		private AlgorithmSelector(SynthesisAlgorithm algo)
+		{
+			addItem(algo);
+		}
+		public SynthesisAlgorithm getAlgorithm()
+		{
+			return (SynthesisAlgorithm) getSelectedItem();
+		}
+		public void setAlgorithm(SynthesisAlgorithm algo)
+		{
+			setSelectedItem(algo);
+		}
+		public static AlgorithmSelector create(int num)
+		{
+			if(num == 1)
 			{
-				super.setLayout(new GridLayout(5,1));
-				super.add(new JLabel("Note:"));
-				super.add(new JLabel("Currently, the modular nonblocking algorithm"));
-				super.add(new JLabel("does not gurantee global nonblocking. The only"));
-				super.add(new JLabel("gurantee is that each supervisor is nonblockng"));
-				super.add(new JLabel("with respect to the plants that it controls"));
-				super.revalidate();
-				enabled = true;
+				return new AlgorithmSelector(SynthesisAlgorithm.Monolithic);
+			}
+			else
+			{
+				return new AlgorithmSelector(SynthesisAlgorithm.toArray());
 			}
 		}
-		public void disable()
+		
+	}
+	
+	static class SynthesisSelector
+		extends JComboBox
+	{
+		private SynthesisSelector()
 		{
-			if(enabled)
-			{
-				super.removeAll();
-				super.revalidate();
-				enabled = false;
-			}
+			super(SynthesisType.toArray());
+		}
+		
+		public SynthesisType getType()
+		{
+			return (SynthesisType) getSelectedItem();
+		}
+		public void setType(SynthesisType type)
+		{
+			setSelectedItem(type);
+		}
+		public static SynthesisSelector create()
+		{
+			return new SynthesisSelector();
+		}
+	}
+	
+	class NonblockNote
+/*		extends JPanel
+	{
+		public NonblockNote()
+		{
+			super.setLayout(new GridLayout(5,1));
+			super.add(new JLabel("Note:"));
+			super.add(new JLabel("Currently, the modular nonblocking algorithm"));
+			super.add(new JLabel("does not gurantee global nonblocking. The only"));
+			super.add(new JLabel("gurantee is that each supervisor is nonblockng"));
+			super.add(new JLabel("with respect to the plants that it controls"));
+		}
+		
+	}*/ // Just showing off the power of correct structuring
+		extends JTextArea
+	{
+		private final int transparent = 0;
+		
+		public NonblockNote()
+		{
+			super("Note:\n" +
+				"Currently, the modular nonblocking algorithm\n" +
+				"does not gurantee global nonblocking. The only\n" +
+				"gurantee is that each supervisor is nonblockng\n" +
+				"with respect to the plants that it controls");
+			super.setBackground(new Color(0,0,0,transparent));  
 		}
 	}
 
 	public SynthesizerDialogStandardPanel(int num)
 	{
-		Box standardBox = Box.createVerticalBox();
 		
-		if(num > 1)
-		{
-			algorithmTypeBox = new JComboBox(SynthesisAlgorithm.toArray());
-		}
-		else
-		{
-			algorithmTypeBox = new JComboBox();
-			algorithmTypeBox.addItem(SynthesisAlgorithm.Monolithic);
-		}
+		algorithmTypeBox = AlgorithmSelector.create(num);
 		algorithmTypeBox.addActionListener(this);
 		
-		synthesisTypeBox = new JComboBox(SynthesisType.toArray());
+		synthesisTypeBox = SynthesisSelector.create();
 		synthesisTypeBox.addActionListener(this);
 		
 		purgeBox = new JCheckBox("Purge result");
@@ -130,50 +176,51 @@ class SynthesizerDialogStandardPanel
 		if(num == 1)
 		{		
 			optimizeBox.setEnabled(false);
-			nbNote.disable();
+			nbNote.setVisible(false);
 		}
 		
+		Box standardBox = Box.createVerticalBox();
 		standardBox.add(synthesisTypeBox);
 		standardBox.add(algorithmTypeBox);
 		standardBox.add(purgeBox);
 		standardBox.add(optimizeBox);
-		standardBox.add(nbNote);
-		this.add(standardBox);
+		this.add(standardBox, BorderLayout.CENTER);
+		this.add(nbNote, BorderLayout.SOUTH);
 	}
 
 	public void update(SynthesizerOptions synthesizerOptions)
 	{
-		synthesisTypeBox.setSelectedItem(synthesizerOptions.getSynthesisType());
-		algorithmTypeBox.setSelectedItem(synthesizerOptions.getSynthesisAlgorithm());
+		synthesisTypeBox.setType(synthesizerOptions.getSynthesisType());
+		algorithmTypeBox.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
 		purgeBox.setSelected(synthesizerOptions.doPurge());
 		optimizeBox.setSelected(synthesizerOptions.getOptimize());
 	}
 
 	public void regain(SynthesizerOptions synthesizerOptions)
 	{
-		synthesizerOptions.setSynthesisType((SynthesisType) synthesisTypeBox.getSelectedItem());
-		synthesizerOptions.setSynthesisAlgorithm((SynthesisAlgorithm) algorithmTypeBox.getSelectedItem());
+		synthesizerOptions.setSynthesisType(synthesisTypeBox.getType());
+		synthesizerOptions.setSynthesisAlgorithm(algorithmTypeBox.getAlgorithm());
 		synthesizerOptions.setPurge(purgeBox.isSelected());
 		synthesizerOptions.setOptimize(optimizeBox.isSelected());
 	}
 	
 	public void actionPerformed(ActionEvent e)
 	{
-		if((SynthesisAlgorithm) algorithmTypeBox.getSelectedItem() == SynthesisAlgorithm.Monolithic)
+		if(algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
 			optimizeBox.setEnabled(false);
-			nbNote.disable();
+			nbNote.setVisible(false);
 		}
 		else // modular
 		{
 			optimizeBox.setEnabled(true);
-			if((SynthesisType) synthesisTypeBox.getSelectedItem() == SynthesisType.Controllable)
+			if(synthesisTypeBox.getType() == SynthesisType.Controllable)
 			{
-				nbNote.disable();
+				nbNote.setVisible(false);
 			}
 			else // some type of nb, show the sign
 			{
-				nbNote.enable();
+				nbNote.setVisible(true);
 			}
 		}
 	}

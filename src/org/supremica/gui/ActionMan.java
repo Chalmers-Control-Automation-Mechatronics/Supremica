@@ -1169,23 +1169,7 @@ public class ActionMan
 			return;
 		}
 
-		StringBuffer infoStr = new StringBuffer();
-
-		infoStr.append("Number of selected automata: " + selectedAutomata.size());
-
-		double potentialNumberOfStates = 1.0;
-
-		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-
-			potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
-		}
-
-		infoStr.append("\n\tNumber of potential states: " + potentialNumberOfStates);
-
-		// logger.info(infoStr.toString());
-		gui.info(infoStr.toString());
+		gui.info("Number of selected automata: " + selectedAutomata.size());
 
 		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 		{
@@ -1193,6 +1177,10 @@ public class ActionMan
 			StringBuffer statusStr = new StringBuffer();
 
 			statusStr.append("Status for automaton: " + currAutomaton.getName());
+			if(currAutomaton.getComment() != null || !currAutomaton.getComment().equals(""))
+			{
+				statusStr.append("\nComment: \"" + currAutomaton.getComment() + "\"");
+			}
 			statusStr.append("\n\tNumber of states: " + currAutomaton.nbrOfStates());
 			statusStr.append("\n\tNumber of events: " + currAutomaton.nbrOfEvents());
 			statusStr.append("\n\tNumber of accepting states: " + currAutomaton.nbrOfAcceptingStates());
@@ -1207,6 +1195,20 @@ public class ActionMan
 
 			// logger.info(statusStr.toString());
 			gui.info(statusStr.toString());
+		}
+		
+		if(selectedAutomata.size() > 1)
+		{
+			double potentialNumberOfStates = 1.0;
+	
+			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+	
+				potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
+			}
+	
+			gui.info("\n\tNumber of potential states: " + new Double(potentialNumberOfStates).longValue());
 		}
 	}
 

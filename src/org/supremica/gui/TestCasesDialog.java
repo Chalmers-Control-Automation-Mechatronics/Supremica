@@ -331,7 +331,6 @@ public class TestCasesDialog
 		TestCase tc = (TestCase) comp;
 
 		automata = tc.doIt();    // Should return a Project (named)
-	System.err.println("Done it!");
 		dispose();
 	}
 

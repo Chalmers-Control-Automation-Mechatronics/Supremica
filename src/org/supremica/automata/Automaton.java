@@ -195,6 +195,10 @@ public class Automaton
 	{
 		return comment;
 	}
+	public void setComment(String comment)
+	{
+		this.comment = comment;
+	}
 	public void setDisabled(boolean isDisabled)
 	{
 		this.isDisabled = isDisabled;
@@ -247,7 +251,27 @@ public class Automaton
 		return initialState;
 	}
 
+	/**
+	 * Returns true if it finds one accepting state, else returns false
+	 * Iterates over all states _only_if_ no accepting states exist (or only
+	 * the last one is accepting)
+	 */
+	public boolean hasAcceptingState()
+	{
+		Iterator stateIt = stateIterator();
 
+		while (stateIt.hasNext())
+		{
+			State currState = (State) stateIt.next();
+
+			if (currState.isAccepting())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * When adding an arc, both the two states associated with the
 	 * arc _must_ already be contained in the automaton, otherwise the
