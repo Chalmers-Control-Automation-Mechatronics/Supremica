@@ -49,6 +49,7 @@
  */
 package org.supremica.automata;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.log.*;
 
@@ -120,35 +121,35 @@ public class EventHelpers
 
 			if (!label.equals(tmpEvent.getLabel()))
 			{
-				throw new Exception("All events must have the same label");
+				throw new SupremicaException("All events must have the same label");
 			}
 
 			if (requireConsistentControllability && (controllable != tmpEvent.isControllable()))
 			{
 				String errorMsg = "Controllability of an event must be the same in all automata. Controllability of " + label + " is not consistent.";
 
-				throw new Exception(errorMsg);
+				throw new SupremicaException(errorMsg);
 			}
 
 			if (requireConsistentImmediate && (immediate != tmpEvent.isImmediate()))
 			{
 				String errorMsg = "Immediate of an event must be the same in all automata. Immediate of " + label + " is not consistent.";
 
-				throw new Exception(errorMsg);
+				throw new SupremicaException(errorMsg);
 			}
 
 			if (operator != tmpEvent.isOperator())
 			{
 				String errorMsg = "Operator of an event must be the same in all automata. Operator of " + label + " is not consistent.";
 
-				throw new Exception(errorMsg);
+				throw new SupremicaException(errorMsg);
 			}
 
 			if (observable != tmpEvent.isObservable())
 			{
 				String errorMsg = "Observability of an event must be the same in all automata. Observability of " + label + " is not consistent.";
 
-				throw new Exception(errorMsg);
+				throw new SupremicaException(errorMsg);
 			}
 
 			prioritized = prioritized || tmpEvent.isPrioritized();

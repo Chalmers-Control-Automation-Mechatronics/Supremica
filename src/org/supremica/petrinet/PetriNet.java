@@ -49,6 +49,7 @@
  */
 package org.supremica.petrinet;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 
 /**
@@ -110,12 +111,12 @@ public class PetriNet
 
 		if (id == null)
 		{
-			throw new Exception("Identity must be non null");
+			throw new SupremicaException("Identity must be non null");
 		}
 
 		if (places.containsKey(id))
 		{
-			throw new Exception(id + " already exists");
+			throw new SupremicaException(id + " already exists");
 		}
 
 		places.put(id, place);
@@ -130,12 +131,12 @@ public class PetriNet
 
 		if (id == null)
 		{
-			throw new Exception("Identity must be non null");
+			throw new SupremicaException("Identity must be non null");
 		}
 
 		if (transitions.containsKey(id))
 		{
-			throw new Exception(id + " already exists");
+			throw new SupremicaException(id + " already exists");
 		}
 
 		transitions.put(id, transition);

@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.util.SupremicaException;
 import org.supremica.util.IDD.*;
 import org.supremica.log.*;
 import java.util.*;
@@ -58,6 +59,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.EventsSet;
+
 
 public final class AutomataIDDHelper
 {
@@ -73,12 +75,12 @@ public final class AutomataIDDHelper
 	{
 		if (theAutomata == null)
 		{
-			throw new Exception("theAutomata must be non-null");
+			throw new SupremicaException("theAutomata must be non-null");
 		}
 
 		if (iddOptions == null)
 		{
-			throw new Exception("IDDOptions must be non-null");
+			throw new SupremicaException("IDDOptions must be non-null");
 		}
 
 		this.theAutomata = theAutomata;

@@ -54,6 +54,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.log.*;
+import org.supremica.util.SupremicaException;
 
 // For the automata selection methods
 import java.util.ArrayList;
@@ -178,7 +179,7 @@ public final class AutomataOnlineSynchronizer
 
 		if (exhaustiveSearch)
 		{
-			throw new Exception("Exhaustive search used wrong way!");
+			throw new SupremicaException("Exhaustive search used wrong way!");
 		}
 	}
 
@@ -190,7 +191,7 @@ public final class AutomataOnlineSynchronizer
 
 		if (exhaustiveSearch)
 		{
-			throw new Exception("Exhaustive search used wrong way!");
+			throw new SupremicaException("Exhaustive search used wrong way!");
 		}
 	}
 
@@ -323,7 +324,7 @@ public final class AutomataOnlineSynchronizer
 				{
 					logger.error("Unknown SynchronizationType");
 
-					// throw new Exception("Unknown SynchronizationType");
+					// throw new SupremicaException("Unknown SynchronizationType");
 				}
 
 				// Check if this can be executed in a plant

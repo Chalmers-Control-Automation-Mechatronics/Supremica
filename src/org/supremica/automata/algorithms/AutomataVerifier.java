@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
@@ -1303,7 +1304,7 @@ public class AutomataVerifier
 			break;
 
 		default :
-			throw new Exception("Unknown BDD/language containment algorithm!");
+			throw new SupremicaException("Unknown BDD/language containment algorithm!");
 		}
 
 		if (Options.profile_on)
@@ -1363,7 +1364,7 @@ public class AutomataVerifier
 			break;
 
 		default :
-			throw new Exception("Unknown BDD/language containment algorithm!");
+			throw new SupremicaException("Unknown BDD/language containment algorithm!");
 		}
 
 		if (Options.profile_on)

@@ -1,5 +1,7 @@
 package org.supremica.softplc.Drivers;
 
+import org.supremica.util.SupremicaException;
+
 /**
  *  IO-driver for our Adlink card
  *
@@ -48,14 +50,14 @@ public class AdlinkPCI7432
 	{
 		if (cardNumber > Short.MAX_VALUE)
 		{
-			throw new Exception("Illegal argument");
+			throw new SupremicaException("Illegal argument");
 		}
 
 		card = AdlinkPCI7432.RegisterCard(PCI_7432, (short) cardNumber);
 
 		if (card < 0)
 		{
-			throw new Exception("RegisterCard failed");
+			throw new SupremicaException("RegisterCard failed");
 		}
 
 		initialized = true;
@@ -90,17 +92,17 @@ public class AdlinkPCI7432
 	{
 		if (outputs == null)
 		{
-			throw new Exception("outputs must be non-null");
+			throw new SupremicaException("outputs must be non-null");
 		}
 
 		if (outputs.length > nrOfDigitalOutputs)
 		{
-			throw new Exception("The card has " + nrOfDigitalOutputs + " outputs");
+			throw new SupremicaException("The card has " + nrOfDigitalOutputs + " outputs");
 		}
 
 		if (!initialized)
 		{
-			throw new Exception("The card is not initialized");
+			throw new SupremicaException("The card is not initialized");
 		}
 
 		int value = toInt(outputs, invertOutputs);
@@ -116,7 +118,7 @@ public class AdlinkPCI7432
 	{
 		if (!initialized)
 		{
-			throw new Exception("The card is not initialized");
+			throw new SupremicaException("The card is not initialized");
 		}
 
 		int value = AdlinkPCI7432.ReadPort(card, (short) 0);

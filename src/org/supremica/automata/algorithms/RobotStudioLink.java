@@ -53,6 +53,7 @@ package org.supremica.automata.algorithms;
   javac -classpath c:\programs\supremica\build;c:\programs\supremica\lib/unjared RobotStudioLink.java
   java -classpath .;c:\programs\supremica\build;c:\programs\supremica\lib/unjared RobotStudioLink
 */
+import org.supremica.util.SupremicaException;
 import org.supremica.external.robotCoordinationABB.CreateXml;
 import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.*;
 import org.supremica.external.comInterfaces.robotstudio_3_0.RobotStudio.enum.RsKinematicRole;
@@ -230,7 +231,7 @@ End Sub
 			IABBS4Procedure main = getMainProcedure(mechanism);
 
 			//if (main == null || main.getProcedureCalls().getCount() == 0)
-			//      throw new Exception("No main procedure in program.");
+			//      throw new SupremicaException("No main procedure in program.");
 			// Loop through the subprodecures of the main procedure in the ABBS4Controller program
 			IABBS4ProcedureCalls calls = main.getProcedureCalls();
 
@@ -590,7 +591,7 @@ End Sub
 		IABBS4Procedure main = getMainProcedure(mechanism);
 
 		//if (main == null || main.getProcedureCalls().getCount() == 0)
-		//      throw new Exception("No main procedure in program.");
+		//      throw new SupremicaException("No main procedure in program.");
 		// Create automaton of plant type and with the mechanism's name
 		Automaton automaton = new Automaton(mechanism.getName());
 
@@ -697,7 +698,7 @@ End Sub
 				{
 					if (procedure.getProcedureCalls().getCount() == 0)
 					{
-						throw new Exception("Main procedure empty. Robot program not loaded?");
+						throw new SupremicaException("Main procedure empty. Robot program not loaded?");
 					}
 
 					return procedure;
@@ -708,7 +709,7 @@ End Sub
 		// There is no main procedure!! The program isn't properly loaded?
 		logger.error("No main procedure found. Robot program not loaded?");
 
-		throw new Exception("No main procedure found. Robot program not loaded?");
+		throw new SupremicaException("No main procedure found. Robot program not loaded?");
 	}
 
 	/**
@@ -1071,7 +1072,7 @@ End Sub
 		// Test if this is a (controllable) "path-starting" event
 		if (!eventName.endsWith("_start"))
 		{
-			throw new Exception("Could not execute event. Event not controllable?");
+			throw new SupremicaException("Could not execute event. Event not controllable?");
 		}
 
 		// Find path name and the IPath
@@ -1194,7 +1195,7 @@ End Sub
 
 		if (!frameName.endsWith(">Elements"))
 		{
-			throw new Exception("Path " + path.getName() + " is member of an illegal frame, \"" + frameName + "\".");
+			throw new SupremicaException("Path " + path.getName() + " is member of an illegal frame, \"" + frameName + "\".");
 		}
 
 		// Get the name of the mechanism, leave out the "<" and the ">Elements".

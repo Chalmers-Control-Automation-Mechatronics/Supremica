@@ -50,6 +50,7 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.log.*;
+import org.supremica.util.SupremicaException;
 import org.supremica.gui.*;
 
 // For the automata selection methods
@@ -244,7 +245,7 @@ public final class AutomataSynchronizerExecuter
 		// FIXA!
 		if (exhaustiveSearch)
 		{
-			throw new Exception("Exhaustive search used in the wrong way!");
+			throw new SupremicaException("Exhaustive search used in the wrong way!");
 		}
 	}
 
@@ -269,7 +270,7 @@ public final class AutomataSynchronizerExecuter
 		// FIXA!
 		if (exhaustiveSearch)
 		{
-			throw new Exception("Exhaustive search used in the wrong way!");
+			throw new SupremicaException("Exhaustive search used in the wrong way!");
 		}
 	}
 
@@ -286,7 +287,7 @@ public final class AutomataSynchronizerExecuter
 
 		if (exhaustiveSearch)
 		{
-			throw new Exception("Exhaustive search used in the wrong way!");
+			throw new SupremicaException("Exhaustive search used in the wrong way!");
 		}
 	}
 
@@ -447,7 +448,7 @@ public final class AutomataSynchronizerExecuter
 				{
 					logger.error("Unknown SynchronizationType");
 
-					// throw new Exception("Unknown SynchronizationType");
+					// throw new SupremicaException("Unknown SynchronizationType");
 				}
 
 				// Check if this can be executed in a plant
@@ -1041,7 +1042,7 @@ public final class AutomataSynchronizerExecuter
 		}
 		catch (OutOfMemoryError ex)
 		{
-			throw new Exception("Out of memory. Try to increase the JVM heap.");    // why not throw new Exception(ex)?
+			throw new SupremicaException("Out of memory. Try to increase the JVM heap.");    // why not throw new SupremicaException(ex)?
 		}
 	}
 

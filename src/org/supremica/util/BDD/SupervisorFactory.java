@@ -6,6 +6,8 @@
  */
 package org.supremica.util.BDD;
 
+import org.supremica.util.SupremicaException;
+
 public class SupervisorFactory
 {
 
@@ -63,7 +65,7 @@ public class SupervisorFactory
 		}
 
 		// the type is not supported:
-		throw new Exception("Current BDD algorithm family not implemented");
+		throw new SupremicaException("Current BDD algorithm family not implemented");
 	}
 
 	// ----------------------------------------------------------------------------------
@@ -120,7 +122,7 @@ public class SupervisorFactory
 		}
 
 		// the type is not supported:
-		throw new Exception("Current BDD algorithm family not implemented");
+		throw new SupremicaException("Current BDD algorithm family not implemented");
 	}
 
 	/**

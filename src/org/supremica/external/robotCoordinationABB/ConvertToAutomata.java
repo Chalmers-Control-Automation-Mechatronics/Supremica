@@ -49,6 +49,7 @@
  */
 package org.supremica.external.robotCoordinationABB;
 
+import org.supremica.util.SupremicaException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -434,7 +435,7 @@ public class ConvertToAutomata
 
 			return;
 
-			// throw new Exception("Initial state not free");
+			// throw new SupremicaException("Initial state not free");
 		}
 
 		Alphabet alphabet = a.getAlphabet();
@@ -462,7 +463,7 @@ public class ConvertToAutomata
 				{
 					if (synchroAutomaton == null)
 					{
-						throw new Exception();
+						throw new SupremicaException();
 					}
 				}
 				catch (Exception e)

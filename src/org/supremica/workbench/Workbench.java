@@ -16,6 +16,7 @@ import org.supremica.util.VerticalFlowLayout;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomataSerializer;
+import org.supremica.util.SupremicaException;
 
 // For debug
 import org.supremica.testcases.StickPickingGame;
@@ -666,7 +667,7 @@ public class Workbench
 			// dispose(); // cannot dispose itself! What then?
 			logger.error("Sanity check not passed, see log window");
 
-			throw new Exception("Sanity check not passed, see log window");
+			throw new SupremicaException("Sanity check not passed, see log window");
 		}
 	}
 

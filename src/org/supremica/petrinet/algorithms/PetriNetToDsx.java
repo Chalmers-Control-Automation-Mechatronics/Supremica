@@ -49,6 +49,7 @@
  */
 package org.supremica.petrinet.algorithms;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 import java.io.*;
 import org.supremica.petrinet.*;
@@ -64,7 +65,7 @@ public class PetriNetToDsx
 
 		if (pn.hasInhibitorArcs())
 		{
-			throw new Exception("PetriNets with inhibitor arcs are not supported");
+			throw new SupremicaException("PetriNets with inhibitor arcs are not supported");
 		}
 	}
 

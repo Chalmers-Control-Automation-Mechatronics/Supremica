@@ -21,6 +21,7 @@ import org.supremica.testcases.RoundRobin;
 import org.supremica.testcases.Arbiter;
 import org.supremica.testcases.warehouse.Warehouse;
 import org.supremica.testcases.warehouse.SelectEventsWindow;
+import org.supremica.util.SupremicaException;
 
 // should perform integer validation - see Horstmann
 class IntegerField
@@ -311,7 +312,7 @@ class AllocationBatchPanel
 			return ab.getProject();
 		}    // else...
 
-		throw new Exception("you must choose a filename");
+		throw new SupremicaException("you must choose a filename");
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -425,7 +426,7 @@ class TransferLinePanel
 
 		if ((cap1 < 1) || (cap2 < 1))
 		{
-			throw new Exception("Buffer capacity must be at least 1");
+			throw new SupremicaException("Buffer capacity must be at least 1");
 		}
 
 		TransferLine tl = new TransferLine(int_cells.get(), cap1, cap2, false);
@@ -469,7 +470,7 @@ class PigeonHolePanel
 
 		if ((p < 1) || (h < 1))
 		{
-			throw new Exception("Weird configuration...");
+			throw new SupremicaException("Weird configuration...");
 		}
 
 		PigeonHole ph = new PigeonHole(p, h);
@@ -581,7 +582,7 @@ class ArbiterPanel
 		// At least two users!!
 		if (num_users.get() < 2)
 		{
-			throw new Exception("The arbiter tree must have at least two users.");
+			throw new SupremicaException("The arbiter tree must have at least two users.");
 		}
 
 		//Arbiter arb = new Arbiter(users, synchronize.isSelected());

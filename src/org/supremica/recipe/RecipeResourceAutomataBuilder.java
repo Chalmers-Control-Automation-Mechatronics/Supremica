@@ -49,6 +49,7 @@
  */
 package org.supremica.recipe;
 
+import org.supremica.util.SupremicaException;
 // Remove this class
 class PlantConnections
 {
@@ -155,7 +156,7 @@ class PlantConnections
  *  {
  *  if (!theRecipe.hasValidStructure())
  *  {
- *  throw new Exception("the InternalOperationRecipe does not have a valid structure");
+ *  throw new SupremicaException("the InternalOperationRecipe does not have a valid structure");
  *  }
  *
  *  InternalOperationRecipeState currState;

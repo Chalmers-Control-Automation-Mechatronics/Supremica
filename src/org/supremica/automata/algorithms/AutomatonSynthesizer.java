@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.util.SupremicaException;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 import java.util.*;
@@ -81,7 +82,7 @@ public class AutomatonSynthesizer
 	{
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.Unknown)
 		{
-			throw new Exception("Invalid synthesis type: " + SynthesisType.Unknown.toString());
+			throw new SupremicaException("Invalid synthesis type: " + SynthesisType.Unknown.toString());
 		}
 
 		this.theAutomaton = theAutomaton;

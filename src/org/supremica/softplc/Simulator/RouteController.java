@@ -2,6 +2,7 @@ package org.supremica.softplc.Simulator;
 
 import java.util.*;
 import javax.swing.*;
+import org.supremica.util.SupremicaException;
 
 /**
  * @author Anders Röding
@@ -65,7 +66,7 @@ public class RouteController
 	// outputs from simulator [27] -- 4 signals are not used ([8],[9],[18],[19])
 	private boolean[] outSignals = new boolean[27];
 
-	//used when buttons are pressed on the simulator (manual start, auto start etc) 
+	//used when buttons are pressed on the simulator (manual start, auto start etc)
 	public void setOutSignals(int signal, boolean value)
 	{
 		outSignals[signal] = value;
@@ -403,7 +404,7 @@ public class RouteController
 				else if (armAngle == armHoriLength) {}    //Not yeat possible to deliver back the ball!
 				else
 				{
-					Exception e = new Exception("Ball dropped (11)");
+					Exception e = new SupremicaException("Ball dropped (11)");
 
 					System.err.println(e);
 					JOptionPane.showMessageDialog(null, "Ball dropped (11), Program Will be ended");
@@ -455,7 +456,7 @@ public class RouteController
 			//UtVån 1 eller Hissen på väg upp, nära UtVån2 samt att UtVån2
 			if (inSignals[7] || ((inSignals[5] && inSignals[6]) && inSignals[11] && (hissLevel == (hissLength - 7))) && (hissLevel != hissLength))
 			{
-				Exception e = new Exception("Error in handling of UtVån1 UtVån2 (5)");
+				Exception e = new SupremicaException("Error in handling of UtVån1 UtVån2 (5)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Error in handling of UtVån1 UtVån2 (5), Program Will be ended");
@@ -490,7 +491,7 @@ public class RouteController
 				//hissen nära UtVån1 när UtVån satt
 				if (inSignals[7] && inSignals[5] && (hissLevel > (hissVan1Length - 7)))
 				{
-					Exception e = new Exception("Error in handling of UtVån1 (4)");
+					Exception e = new SupremicaException("Error in handling of UtVån1 (4)");
 
 					System.err.println(e);
 					JOptionPane.showMessageDialog(null, "Error in handling of UtVån1 (4), Program Will be ended");
@@ -514,7 +515,7 @@ public class RouteController
 				//UtVån 1 eller Hissen på väg upp, nära UtVån2 samt att UtVån2 satt
 				if (inSignals[7] || (inSignals[5] && inSignals[6] && inSignals[11] && (hissLevel == (hissLength - 8))))
 				{
-					Exception e = new Exception("Error in handling of UtVån1 or UtVån2 (5)");
+					Exception e = new SupremicaException("Error in handling of UtVån1 or UtVån2 (5)");
 
 					System.err.println(e);
 					JOptionPane.showMessageDialog(null, "Error in handling of UtVån1 or UtVån2 (5)Program Will be ended");
@@ -558,7 +559,7 @@ public class RouteController
 			//The ball will hit the measureHead
 			((matlyftLevel == (movements[2].parts - 2)) && inSignals[2] && inSignals[4]))
 			{
-				Exception e = new Exception("Error in handling top of matLyft (2)");
+				Exception e = new SupremicaException("Error in handling top of matLyft (2)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Error in handling top of matLyft (2), program will be ended!");
@@ -716,13 +717,13 @@ public class RouteController
 
 		if (matlyftLevel != 0)
 		{
-			Exception e = new Exception("Elevator not down (1-2)");
+			Exception e = new SupremicaException("Elevator not down (1-2)");
 
 			System.err.println(e);
 			JOptionPane.showMessageDialog(null, "Elevator not down (1-2)");
 			System.exit(-1);
 
-			//throw new Exception("Elevator not down (1-2)");
+			//throw new SupremicaException("Elevator not down (1-2)");
 		}
 
 		return false;
@@ -735,13 +736,13 @@ public class RouteController
 		{
 			if (inSignals[4])
 			{
-				Exception e = new Exception("Error using Mät (2)");
+				Exception e = new SupremicaException("Error using Mät (2)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Error using Mät (2)");
 				System.exit(-1);
 
-				//throw new Exception("Error using Mät (2)");
+				//throw new SupremicaException("Error using Mät (2)");
 			}
 
 			legBallList[3].add(((LinkedList) legBallList[2]).removeFirst());
@@ -767,7 +768,7 @@ public class RouteController
 
 		if (hissLevel != 0)
 		{
-			Exception e = new Exception("Elevator not down (3-4)");
+			Exception e = new SupremicaException("Elevator not down (3-4)");
 
 			System.err.println(e);
 			JOptionPane.showMessageDialog(null, "Elevator not down (3-4)");
@@ -814,7 +815,7 @@ public class RouteController
 		{
 			if (outSignals[22])
 			{
-				Exception e = new Exception("Never two balls in the arm (6)");
+				Exception e = new SupremicaException("Never two balls in the arm (6)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Never two balls in the arm (6)");
@@ -838,7 +839,7 @@ public class RouteController
 		{
 			if (outSignals[22])
 			{
-				Exception e = new Exception("Never two balls in the arm (7)");
+				Exception e = new SupremicaException("Never two balls in the arm (7)");
 
 				System.err.println(e);
 				JOptionPane.showMessageDialog(null, "Never two balls in the arm (7)");

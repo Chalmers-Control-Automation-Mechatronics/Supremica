@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.util.SupremicaException;
 import org.supremica.util.*;
 import org.supremica.gui.*;
 import org.supremica.log.*;
@@ -127,12 +128,12 @@ public final class AutomataSynchronizerHelper
 	{
 		if (theAutomata == null)
 		{
-			throw new Exception("theAutomata must be non-null");
+			throw new SupremicaException("theAutomata must be non-null");
 		}
 
 		if (syncOptions == null)
 		{
-			throw new Exception("syncOptions must be non-null");
+			throw new SupremicaException("syncOptions must be non-null");
 		}
 
 		this.theAutomata = theAutomata;

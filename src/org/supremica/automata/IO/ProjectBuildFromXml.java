@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.IO;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
@@ -240,7 +241,7 @@ public class ProjectBuildFromXml
 		{
 			logger.error(ex.getMessage());
 
-			throw new Exception(ex.getMessage());
+			throw new SupremicaException(ex.getMessage());
 		}
 
 		return currProject;
@@ -263,7 +264,7 @@ public class ProjectBuildFromXml
 		{
 			logger.error(ex.getMessage());
 
-			throw new Exception(ex.getMessage());
+			throw new SupremicaException(ex.getMessage());
 		}
 
 		return currProject;

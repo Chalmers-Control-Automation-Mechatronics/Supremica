@@ -69,6 +69,7 @@ import uk.ac.ic.doc.scenebeans.event.AnimationListener;
 import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
 import uk.ac.ic.doc.scenebeans.animation.Animation;
 import uk.ac.ic.doc.scenebeans.animation.CommandException;
+import org.supremica.util.SupremicaException;
 
 public class SimulatorExecuter
 	extends JFrame
@@ -106,7 +107,7 @@ public class SimulatorExecuter
 
 			logger.error(msg);
 
-			throw new Exception("Could not open animator: " + theProject.getAnimationURL());
+			throw new SupremicaException("Could not open animator: " + theProject.getAnimationURL());
 		}
 
 		theAnimation = theAnimator.getAnimation();

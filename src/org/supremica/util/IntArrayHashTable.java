@@ -49,6 +49,7 @@
  */
 package org.supremica.util;
 
+import org.supremica.util.SupremicaException;
 import org.supremica.automata.AutomataIndexFormHelper;
 import java.util.*;
 
@@ -135,7 +136,7 @@ public final class IntArrayHashTable
 					}
 					else
 					{
-						throw new Exception("HashTable is nearly full");
+						throw new SupremicaException("HashTable is nearly full");
 					}
 				}
 

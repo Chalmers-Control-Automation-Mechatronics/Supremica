@@ -49,6 +49,7 @@
  */
 package org.supremica.recipe;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 
 /**
@@ -86,12 +87,12 @@ public class InternalOperationRecipe
 
 		if (id == null)
 		{
-			throw new Exception("Identity must be non null");
+			throw new SupremicaException("Identity must be non null");
 		}
 
 		if (operations.containsKey(id))
 		{
-			throw new Exception(id + " already exists");
+			throw new SupremicaException(id + " already exists");
 		}
 
 		operations.put(id, operation);
@@ -106,12 +107,12 @@ public class InternalOperationRecipe
 
 		if (id == null)
 		{
-			throw new Exception("Identity must be non null");
+			throw new SupremicaException("Identity must be non null");
 		}
 
 		if (transitions.containsKey(id))
 		{
-			throw new Exception(id + " already exists");
+			throw new SupremicaException(id + " already exists");
 		}
 
 		transitions.put(id, transition);
@@ -123,12 +124,12 @@ public class InternalOperationRecipe
 	{
 		if (!transitions.containsKey(transition.getIdentity()))
 		{
-			throw new Exception(identity + " does not exist");
+			throw new SupremicaException(identity + " does not exist");
 		}
 
 		if (!operations.containsKey(operation.getIdentity()))
 		{
-			throw new Exception(identity + " does not exist");
+			throw new SupremicaException(identity + " does not exist");
 		}
 
 		operation.addNextTransition(transition);
@@ -140,12 +141,12 @@ public class InternalOperationRecipe
 	{
 		if (!transitions.containsKey(transition.getIdentity()))
 		{
-			throw new Exception(identity + " does not exist");
+			throw new SupremicaException(identity + " does not exist");
 		}
 
 		if (!operations.containsKey(operation.getIdentity()))
 		{
-			throw new Exception(identity + " does not exist");
+			throw new SupremicaException(identity + " does not exist");
 		}
 
 		operation.addPrevTransition(transition);
@@ -157,7 +158,7 @@ public class InternalOperationRecipe
 	{
 		if (!operations.containsKey(identity))
 		{
-			throw new Exception(identity + " does not exist");
+			throw new SupremicaException(identity + " does not exist");
 		}
 
 		return (InternalOperation) operations.get(identity);
@@ -168,7 +169,7 @@ public class InternalOperationRecipe
 	{
 		if (!transitions.containsKey(identity))
 		{
-			throw new Exception(identity + " does not exist");
+			throw new SupremicaException(identity + " does not exist");
 		}
 
 		return (InternalTransition) transitions.get(identity);
@@ -330,12 +331,12 @@ public class InternalOperationRecipe
 
 		if (status == InternalOperationRecipeStatus.Undetermined)
 		{
-			throw new Exception("Recipe status is undetermined");
+			throw new SupremicaException("Recipe status is undetermined");
 		}
 
 		if (status == InternalOperationRecipeStatus.Finished)
 		{
-			throw new Exception("Recipe status is finished");
+			throw new SupremicaException("Recipe status is finished");
 		}
 
 		if (status == InternalOperationRecipeStatus.NotStarted)
@@ -362,7 +363,7 @@ public class InternalOperationRecipe
 			return theState;
 		}
 
-		throw new Exception("Unknown status");
+		throw new SupremicaException("Unknown status");
 	}
 
 	/**

@@ -49,6 +49,7 @@
  */
 package org.supremica.recipe;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 
 /**
@@ -78,7 +79,7 @@ public class InternalOperationRecipes
 	{
 		if (!contains(recipeName))
 		{
-			throw new Exception(recipeName + " does not exists");
+			throw new SupremicaException(recipeName + " does not exists");
 		}
 
 		theRecipes.remove(recipeName);

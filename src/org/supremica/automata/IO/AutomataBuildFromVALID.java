@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.IO;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 import java.io.*;
 import org.jdom.*;
@@ -116,13 +117,13 @@ public class AutomataBuildFromVALID
 			}
 			else
 			{
-				throw new Exception("Not a valid VALID file: " + file.getName());
+				throw new SupremicaException("Not a valid VALID file: " + file.getName());
 			}
 		}
 		catch (Exception ex)
 		{
 
-			// throw new Exception(ex.getMessage()); // why not simply throw ex;?
+			// throw new SupremicaException(ex.getMessage()); // why not simply throw ex;?
 			throw ex;
 		}
 
@@ -235,7 +236,7 @@ public class AutomataBuildFromVALID
 
 			if (!dummyVariable.equals(st.nextToken()))
 			{
-				throw new Exception("Something is wrong with the dummy variables in " + root.getAttributeValue("module") + ".vmod.");
+				throw new SupremicaException("Something is wrong with the dummy variables in " + root.getAttributeValue("module") + ".vmod.");
 			}
 
 			// Expand templates (build automata and modify names)
@@ -297,7 +298,7 @@ public class AutomataBuildFromVALID
 
 							if (!l.hasNext())
 							{
-								throw new Exception("Something is wrong with the aliases in " + subRoot.getAttributeValue("name") + ".vmod.");
+								throw new SupremicaException("Something is wrong with the aliases in " + subRoot.getAttributeValue("name") + ".vmod.");
 							}
 						}
 

@@ -49,6 +49,7 @@
  */
 package org.supremica.recipe;
 
+import org.supremica.util.SupremicaException;
 import org.supremica.petrinet.*;
 import org.supremica.petrinet.algorithms.*;
 import java.util.*;
@@ -254,12 +255,12 @@ public class RecipeResourcePetriNetBuilder
 					// Check that we have a valid structure
 					if (intTransition.nbrOfPrevOperations() > 1)
 					{
-						throw new Exception("Only recipes with single prev operations are supported");
+						throw new SupremicaException("Only recipes with single prev operations are supported");
 					}
 
 					if (intTransition.nbrOfNextOperations() > 1)
 					{
-						throw new Exception("Only recipes with single next operations are supported");
+						throw new SupremicaException("Only recipes with single next operations are supported");
 					}
 
 					// First operation

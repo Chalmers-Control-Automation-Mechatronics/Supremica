@@ -65,6 +65,7 @@ import org.supremica.gui.cellEditor.CellEditor;
 import grafchart.sfc.JGrafchartSupremicaEditor;
 import org.supremica.properties.SupremicaProperties;
 import org.swixml.SwingEngine;
+import org.supremica.util.SupremicaException;
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -328,12 +329,12 @@ public class VisualProject
 				}
 				catch (Exception ex)
 				{
-					throw new Exception("Error while viewing: " + automatonName);
+					throw new SupremicaException("Error while viewing: " + automatonName);
 				}
 			}
 			else
 			{
-				throw new Exception(automatonName + " does not exist in VisualProjectContainer");
+				throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");
 			}
 		}
 	}
@@ -414,12 +415,12 @@ public class VisualProject
 				}
 				catch (Exception ex)
 				{
-					throw new Exception("Error while exploring: " + automaton);
+					throw new SupremicaException("Error while exploring: " + automaton);
 				}
 			}
 			else
 			{
-				throw new Exception(automaton + " does not exist in VisualProjectContainer");
+				throw new SupremicaException(automaton + " does not exist in VisualProjectContainer");
 			}
 		}
 	}
@@ -455,12 +456,12 @@ public class VisualProject
 				}
 				catch (Exception ex)
 				{
-					throw new Exception("Error while viewing: " + automaton);
+					throw new SupremicaException("Error while viewing: " + automaton);
 				}
 			}
 			else
 			{
-				throw new Exception(automaton + " does not exist in VisualProjectContainer");
+				throw new SupremicaException(automaton + " does not exist in VisualProjectContainer");
 			}
 		}
 	}

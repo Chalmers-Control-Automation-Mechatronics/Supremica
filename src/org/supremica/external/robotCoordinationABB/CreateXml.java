@@ -49,6 +49,8 @@
  */
 package org.supremica.external.robotCoordinationABB;
 
+
+import org.supremica.util.SupremicaException;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
@@ -243,7 +245,7 @@ public class CreateXml
 					{
 						logger.error("Error while storing the costs into the xml file " + xmlCost);
 
-						throw new Exception();
+						throw new SupremicaException();
 					}
 				}
 			}
@@ -256,7 +258,7 @@ public class CreateXml
 			{
 				logger.error("Error adding motions to the xml file.");
 
-				throw new Exception();
+				throw new SupremicaException();
 			}
 		}
 	}
@@ -925,7 +927,7 @@ public class CreateXml
 
 			return;
 
-			//throw new Exception();
+			//throw new SupremicaException();
 		}
 
 		logger.info("Intersection points and times stored");
@@ -1222,7 +1224,7 @@ public class CreateXml
 
 					if (indexZone <= 0)
 					{
-						throw new Exception();
+						throw new SupremicaException();
 					}
 
 					logger.info("a5");

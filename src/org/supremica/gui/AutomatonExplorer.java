@@ -49,6 +49,7 @@
  */
 package org.supremica.gui;
 
+import org.supremica.util.SupremicaException;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -128,7 +129,7 @@ public class AutomatonExplorer
 
 		if (currState == null)
 		{
-			throw new Exception("No initial state");
+			throw new SupremicaException("No initial state");
 		}
 
 		stateViewer = new StateViewer(theAutomaton);

@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.IO;
 
+import org.supremica.util.SupremicaException;
 import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
@@ -68,7 +69,7 @@ import org.supremica.automata.algorithms.SynchronizationType;
 public class AutomataToIEC61499
 	//implements AutomataSerializer
 {
-	
+
 	public class GenerationException extends Exception
 	{
 		public GenerationException() {
@@ -84,8 +85,8 @@ public class AutomataToIEC61499
 			super(cause);
 		}
 	}
-	
-	
+
+
 	private static Logger logger = LoggerFactory.createLogger(AutomataToIEC61499.class);
 	private Project theProject;
 	//private SynchronizationOptions syncOptions;
@@ -136,7 +137,7 @@ public class AutomataToIEC61499
 	{
 		pw.println("(* This file was automatically generated from Supremica *)");
 		pw.println("(* Supremica version: " + org.supremica.Version.version());
-		pw.println("(* Time of generation: " 
+		pw.println("(* Time of generation: "
 						+ DateFormat.getDateTimeInstance().format(new Date()) +" *)");
 		pw.println("FUNCTION_BLOCK AUTOGEN_FUNCTION_BLOCK");
 	}
@@ -341,7 +342,7 @@ public class AutomataToIEC61499
 //			{
 //				String errMessage = "AutomataTOIEC61499.printInitializationStructure: " + "all automata must have an initial state";
 //				logger.error(errMessage);
-//				throw new Exception(errMessage);
+//				throw new SupremicaException(errMessage);
 //			}
 //			int currStateIndex = initialState.getSynchIndex();
 //			theHelper.printILCommand(pw, "S", "q_" + currAutomatonIndex + "_" + currStateIndex);
@@ -748,7 +749,7 @@ public class AutomataToIEC61499
 //						LabeledEvent currAutomatonEvent = currAutomaton.getEvent(currEvent.getLabel());
 //						if (currAutomatonEvent == null)
 //						{
-//							throw new Exception("AutomataToIEC61499.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+//							throw new SupremicaException("AutomataToIEC61499.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 //						}
 //
 //						pw.println("\n\t\t(* Transitions in " + currAutomaton.getName() + " *)");
@@ -761,7 +762,7 @@ public class AutomataToIEC61499
 //							State toState = currState.nextState(currAutomatonEvent);
 //							if (toState == null)
 //							{
-//								throw new Exception("AutomataToIEC61499.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+//								throw new SupremicaException("AutomataToIEC61499.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 //							}
 //							int toStateIndex = toState.getSynchIndex();
 //							if (currState != toState)
@@ -973,7 +974,7 @@ public class AutomataToIEC61499
 //					}
 //					if (!outputSignals.hasSignal(currCommand.getLabel()))
 //					{
-//						throw new Exception("Could not find output signal " + currCommand.getLabel());
+//						throw new SupremicaException("Could not find output signal " + currCommand.getLabel());
 //					}
 //					Signal currSignal = outputSignals.getSignal(currCommand.getLabel());
 //					theHelper.printILCommand(pw, "ST",  "so_" + currSignal.getPort());

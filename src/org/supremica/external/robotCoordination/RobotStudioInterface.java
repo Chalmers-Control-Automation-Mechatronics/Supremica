@@ -346,7 +346,7 @@ public class RobotStudioInterface
 
 				return;
 
-				//throw new Exception();
+				//throw new SupremicaException();
 			}
 
 			logger.debug("Intersection points and times stored");
@@ -677,7 +677,7 @@ public class RobotStudioInterface
 
 						return 0;
 
-						//throw new Exception("Collision with object in station detected!");
+						//throw new SupremicaException("Collision with object in station detected!");
 					}
 
 					// Have we collided with this fellow before?

@@ -49,6 +49,7 @@
  */
 package org.supremica.petrinet;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 
 /**
@@ -78,7 +79,7 @@ public class PetriNets
 	{
 		if (!contains(petriNetName))
 		{
-			throw new Exception(petriNetName + " does not exists");
+			throw new SupremicaException(petriNetName + " does not exists");
 		}
 
 		thePetriNets.remove(petriNetName);

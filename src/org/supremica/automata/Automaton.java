@@ -49,6 +49,7 @@
  */
 package org.supremica.automata;
 
+import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaIterator;
@@ -1452,7 +1453,7 @@ public class Automaton
 
 			if (currEvent == null)
 			{
-				throw new Exception("Could not find an arc from " + prevState.getName() + " to " + thisState.getName());
+				throw new SupremicaException("Could not find an arc from " + prevState.getName() + " to " + thisState.getName());
 			}
 
 			theTrace.addFirst(currEvent.getLabel());

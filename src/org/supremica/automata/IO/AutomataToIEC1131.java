@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.IO;
 
+import org.supremica.util.SupremicaException;
 import java.io.*;
 import java.util.*;
 import org.supremica.log.*;
@@ -305,7 +306,7 @@ public class AutomataToIEC1131
 
 				logger.error(errMessage);
 
-				throw new Exception(errMessage);
+				throw new SupremicaException(errMessage);
 			}
 
 			int currStateIndex = initialState.getSynchIndex();
@@ -752,7 +753,7 @@ public class AutomataToIEC1131
 
 						if (currAutomatonEvent == null)
 						{
-							throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+							throw new SupremicaException("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 						}
 
 						pw.println("\n\t\t(* Transitions in " + currAutomaton.getName() + " *)");
@@ -768,7 +769,7 @@ public class AutomataToIEC1131
 
 							if (toState == null)
 							{
-								throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+								throw new SupremicaException("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 							}
 
 							int toStateIndex = toState.getSynchIndex();
@@ -1012,7 +1013,7 @@ public class AutomataToIEC1131
 
 					if (!outputSignals.hasSignal(currCommand.getLabel()))
 					{
-						throw new Exception("Could not find output signal " + currCommand.getLabel());
+						throw new SupremicaException("Could not find output signal " + currCommand.getLabel());
 					}
 
 					Signal currSignal = outputSignals.getSignal(currCommand.getLabel());

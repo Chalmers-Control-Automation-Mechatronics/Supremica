@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.IO;
 
+import org.supremica.util.SupremicaException;
 import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
@@ -126,7 +127,7 @@ public class AutomataToNQC
 
 			if (initialState == null)
 			{
-				throw new Exception("AutomataToNQC.printStateVariables: all automata must have an initial state");
+				throw new SupremicaException("AutomataToNQC.printStateVariables: all automata must have an initial state");
 			}
 
 			int currAutomatonIndex = currAutomaton.getSynchIndex();
@@ -265,7 +266,7 @@ public class AutomataToNQC
 				}
 				else
 				{
-					throw new Exception("Unsupported SynchronizationType");
+					throw new SupremicaException("Unsupported SynchronizationType");
 				}
 			}
 
@@ -478,7 +479,7 @@ public class AutomataToNQC
 
 					if (currAutomatonEvent == null)
 					{
-						throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+						throw new SupremicaException("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 					}
 
 					pw.println("\n\t\t\t// Transitions in " + currAutomaton.getName());
@@ -494,7 +495,7 @@ public class AutomataToNQC
 
 						if (toState == null)
 						{
-							throw new Exception("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+							throw new SupremicaException("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 						}
 
 						int toStateIndex = toState.getSynchIndex();
