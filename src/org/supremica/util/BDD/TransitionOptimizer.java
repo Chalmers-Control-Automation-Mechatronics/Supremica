@@ -11,33 +11,31 @@ package org.supremica.util.BDD;
  */
 
 
+// TODO: add more join heuristics:
+// 1. greedy
+// 2. free [add as long as the cover does not grow]
+// 3. some cover heuristc??
+
 public class TransitionOptimizer {
 
 	private PerEventTransition [] org, optimized;
+	private BDDAutomaton [] all;
 
-	private TransitionOptimizer(PerEventTransition [] org, BDDAutomaton [] all) {
+	private TransitionOptimizer(PerEventTransition [] org, BDDAutomaton [] all)
+		throws Exception
+		{
 		this.org = org;
+		this.all = all;
 
 
-		// simple pair-wise join
-		int n = org.length;
-		int k = n / 2;
-		if( (n % 2) != 0) k++;
+		switch(Options.transition_optimizer_algo) {
+			case Options.TRANSITION_OPTIMIZER_RANDOM:
+				do_random();
+				break;
+			default:
+				throw new Exception("[TransitionOptimizer] UNKNOWN optimization method.");
 
-		optimized = new PerEventTransition[k];
-
-
-		for(int i = 0; i < n-1; i += 2)
-			optimized[i/2] = new PerEventTransition(org[i], org[i+1], all);
-
-
-		// the last one if any:
-		if((n % 2) != 0) {
-			optimized[k-1]  = org[n-1];
-			org[n-1] = null; // IMPORTANT: so we dont clean it up!!
 		}
-
-
 
 		// MUST ALWAYS DO THIS!!!
 		update_labels(); // XXX: should we move this to the static caller function??
@@ -59,6 +57,31 @@ public class TransitionOptimizer {
 
 	}
 
+	// ---------------------------------------------------------
+	/** OPTIMZE: join randomly, just for fun ... */
+	private void do_random() {
+
+		// simple pair-wise join
+		int n = org.length;
+		int k = n / 2;
+		if( (n % 2) != 0) k++;
+
+		int [] p = Util.permutate(n);
+
+		optimized = new PerEventTransition[k];
+
+
+		for(int i = 0; i < n-1; i += 2)
+			optimized[i/2] = new PerEventTransition(org[ p[i] ], org[ p[i+1] ], all);
+
+
+		// the last one if any:
+		if((n % 2) != 0) {
+
+			optimized[k-1]  = org[ p[n-1] ];
+			org[p[n-1] ] = null; // IMPORTANT: so we dont clean it up!!
+		}
+	}
 	// ---------------------------------------------------------
 
 
@@ -99,6 +122,10 @@ public class TransitionOptimizer {
 	}
 
 	// ---------------------------------------------------------
+	/**
+	 * return the optimized transition systems...
+	 *
+	 */
 	private PerEventTransition [] getAnswer()
 	{
 		return optimized;
@@ -116,19 +143,26 @@ public class TransitionOptimizer {
 		}
 
 
-		// optimize it and free the original
-		TransitionOptimizer top = new TransitionOptimizer(org, all);
-		PerEventTransition [] ret = top.getAnswer();
-		top.cleanup();
+		try {
+			// optimize it and free the original
+			TransitionOptimizer top = new TransitionOptimizer(org, all);
+			PerEventTransition [] ret = top.getAnswer();
+			top.cleanup();
 
 
-		// show some stats
-		SizeWatch.setOwner("TransitionOptimizer");
-		for (int i = 0; i < ret.length; i++)
-		{
-			SizeWatch.report(ret[i].getLocalT(), ret[i].toString() );
+			// show some stats
+			SizeWatch.setOwner("TransitionOptimizer");
+			for (int i = 0; i < ret.length; i++)
+			{
+				SizeWatch.report(ret[i].getLocalT(), ret[i].toString() );
+			}
+
+			return ret;
+
+
+		} catch(Exception exx) {
+			System.err.println(exx);
+			return org; // use the original if optimization failed
 		}
-
-		return ret;
 	}
 }

@@ -37,6 +37,11 @@ public class TestAlgo
 												 "../examples/c3.xml" };
 
 	/**
+	 * when we dont have time for larger models
+	 */
+	private static int [] SMALL_MODELS;
+
+	/**
 	 * Same as TEST_FILES, but for supNBC only. small enough for supNBC algo
 	 */
 	private static final String[] TEST_FILES_SUP = {
@@ -406,10 +411,14 @@ public class TestAlgo
 		Options.test_integrity = true; // enable extra runtime tests!
 		fail = pass = 0;
 
-		// we will use AGV in this experiment
+		// find the small models that we will use in some expreiments
 		int agv = find("agv.xml");
 		int catmouse = find("catmouse.xml");
 
+		// small models
+		SMALL_MODELS = new int[2];
+		SMALL_MODELS[0] = agv;
+		SMALL_MODELS[1] = catmouse;
 
 		for (int k = 0; k < 4; k++)
 		{
@@ -523,22 +532,63 @@ public class TestAlgo
 
 
 		// test the disjunctive optimization:
-		System.out.println("\n***** Testing disjunctive optimization, using AGV");
 		int oldalgo = Options.algo_family;
 		int oldopt = Options.disj_optimizer_algo;
-		for(int i = 0; i < DISJ_OPT_ALGOS.length; i++)
-		{
-			Options.algo_family = DISJ_OPT_ALGOS[i];
+		for(int m = 0; m < SMALL_MODELS.length; m++) {
+			int model = SMALL_MODELS[m];
+			System.out.println("\n***** Testing disjunctive optimization, using " + TEST_FILES[ model] );
+
+
+			for(int i = 0; i < DISJ_OPT_ALGOS.length; i++)
+			{
+				Options.algo_family = DISJ_OPT_ALGOS[i];
+				System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
+
+				for(int k = 0; k < Options.DISJ_OPTIMIZER_NAMES.length; k++)
+				{
+
+					Options.disj_optimizer_algo = k;
+					announce("  optimizer " + Options.DISJ_OPTIMIZER_NAMES[k] );
+
+					load(TEST_FILES[model]);
+					testR(reachables[model]);
+					testCR(coreachables[model]);
+
+					if (k == oldopt)
+					{
+						System.out.print(" (DEFAULT) ");
+					}
+
+					verifier.cleanup();
+					System.out.println();
+
+				}
+			}
+		}
+		Options.algo_family = oldalgo;
+		Options.disj_optimizer_algo = oldopt;
+
+
+
+		// test the transition optimization:
+		oldalgo = Options.algo_family;
+		oldopt = Options.transition_optimizer_algo;
+		for(int m = 0; m < SMALL_MODELS.length; m++) {
+			int model = SMALL_MODELS[m];
+
+			System.out.println("\n***** Testing transition optimization, using " + TEST_FILES[ model]);
+
+			Options.algo_family = Options.ALGO_PETRINET;
 			System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 
-			for(int k = 0; k < Options.DISJ_OPTIMIZER_NAMES.length; k++)
+			for(int k = 0; k < Options.TRANSITION_OPTIMIZER_NAMES.length; k++)
 			{
-				Options.disj_optimizer_algo = k;
-				announce("  optimizer " + Options.DISJ_OPTIMIZER_NAMES[k] );
+				Options.transition_optimizer_algo = k;
+				announce("  optimizer " + Options.TRANSITION_OPTIMIZER_NAMES[k] );
 
-				load(TEST_FILES[agv]);
-				testR(reachables[agv]);
-				testCR(coreachables[agv]);
+				load(TEST_FILES[model]);
+				testR(reachables[model]);
+				testCR(coreachables[model]);
 
 				if (k == oldopt)
 				{
@@ -551,37 +601,6 @@ public class TestAlgo
 			}
 		}
 		Options.algo_family = oldalgo;
-		Options.disj_optimizer_algo = oldopt;
-
-
-
-		// test the transition optimization:
-		System.out.println("\n***** Testing transition optimization, using AGV");
-		oldalgo = Options.algo_family;
-		oldopt = Options.transition_optimizer_algo;
-
-		Options.algo_family = Options.ALGO_PETRINET;
-		System.out.println("Reachability family: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
-
-		for(int k = 0; k < Options.TRANSITION_OPTIMIZER_NAMES.length; k++)
-		{
-			Options.transition_optimizer_algo = k;
-			announce("  optimizer " + Options.TRANSITION_OPTIMIZER_NAMES[k] );
-
-			load(TEST_FILES[agv]);
-			testR(reachables[agv]);
-			testCR(coreachables[agv]);
-
-			if (k == oldopt)
-			{
-				System.out.print(" (DEFAULT) ");
-			}
-
-			verifier.cleanup();
-			System.out.println();
-
-		}
-		Options.algo_family = oldalgo;
 		Options.transition_optimizer_algo = oldopt;
 
 
@@ -589,41 +608,45 @@ public class TestAlgo
 
 
 		// We also test the H1/H2 heuristics. note that we dont test performance here
-		System.out.println("\n***** Testing H1 and H2 heuristics, using AGV");
 		int oldh1 = Options.es_heuristics;
 		int oldh2 = Options.ndas_heuristics;
 		oldalgo = Options.algo_family;
+		for(int m = 0; m < SMALL_MODELS.length; m++) {
+			int model = SMALL_MODELS[m];
+			System.out.println("\n***** Testing H1 and H2 heuristics, using " + TEST_FILES[ model]);
 
-		for(int r = 0; r < H1H2_HEURISTIC_ALGOS.length; r++) {
-			// H1 and H2 works only with workset and mono workset
-			Options.algo_family = H1H2_HEURISTIC_ALGOS[r];
-			System.out.println("Reachability Algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 
-			// test H1:
-			Options.ndas_heuristics = Options.NDAS_RANDOM; // fix H2 to random
+			for(int r = 0; r < H1H2_HEURISTIC_ALGOS.length; r++) {
+				// H1 and H2 works only with workset and mono workset
+				Options.algo_family = H1H2_HEURISTIC_ALGOS[r];
+				System.out.println("Reachability Algorithm: " + Options.REACH_ALGO_NAMES[Options.algo_family]);
 
-			for(int i = 1; i < Options.ES_HEURISTIC_NAMES.length; i++) // first one is interactive!
-			{
-				announce("  H1=" + Options.ES_HEURISTIC_NAMES[i]);
-				Options.es_heuristics = i;
-				load(TEST_FILES[agv]);
-				testR(reachables[agv]);
-				testCR(coreachables[agv]);
-				verifier.cleanup();
-				System.out.println();
-			}
+				// test H1:
+				Options.ndas_heuristics = Options.NDAS_RANDOM; // fix H2 to random
 
-			// test H2:
-			Options.es_heuristics = Options.ES_HEURISTIC_ANY; // fix H1 to all-pass
-			for(int i = 0; i < Options.NDAS_HEURISTIC_NAMES.length; i++)
-			{
-				announce("  H2=" + Options.NDAS_HEURISTIC_NAMES[i]);
-				Options.ndas_heuristics = i;
-				load(TEST_FILES[agv]);
-				testR(reachables[agv]);
-				testCR(coreachables[agv]);
-				verifier.cleanup();
-				System.out.println();
+				for(int i = 1; i < Options.ES_HEURISTIC_NAMES.length; i++) // first one is interactive!
+				{
+					announce("  H1=" + Options.ES_HEURISTIC_NAMES[i]);
+					Options.es_heuristics = i;
+					load(TEST_FILES[model]);
+					testR(reachables[model]);
+					testCR(coreachables[model]);
+					verifier.cleanup();
+					System.out.println();
+				}
+
+				// test H2:
+				Options.es_heuristics = Options.ES_HEURISTIC_ANY; // fix H1 to all-pass
+				for(int i = 0; i < Options.NDAS_HEURISTIC_NAMES.length; i++)
+				{
+					announce("  H2=" + Options.NDAS_HEURISTIC_NAMES[i]);
+					Options.ndas_heuristics = i;
+					load(TEST_FILES[model]);
+					testR(reachables[model]);
+					testCR(coreachables[model]);
+					verifier.cleanup();
+					System.out.println();
+				}
 			}
 		}
 		// cleanup:
@@ -735,6 +758,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.25  2004/10/20 15:33:42  vahidi
+ *** empty log message ***
+
  Revision 1.24  2004/10/19 11:29:35  vahidi
  *** empty log message ***
 

@@ -470,6 +470,15 @@ public class BDDAutomaton
 	}
 
 	/**
+	 * get event flow matrix.
+	 * m(e1,e2)  is the number of times e1 is followed by e2 in the automata
+	 */
+	public int[][] getEventFlowMatrix()
+	{
+		return automaton.getEventFlowMatrix();
+	}
+
+	/**
 	 * See Automaton.getEventFlow() for more info :(
 	 * After which events just fired, we may do a transition ?
 	 *
