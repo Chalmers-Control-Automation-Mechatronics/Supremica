@@ -70,7 +70,7 @@ public class AutomataEditor
 	implements TableModelListener
 {
 	private JPanel contentPane;
-// 	private Supremica workbench = null;
+
 	private Gui workbench = null;
 	private AutomatonContainer theAutomatonContainer = null;
 
@@ -84,19 +84,19 @@ public class AutomataEditor
 
 	private EditorActions theActions;
 
-  public AutomataEditor(/* Supremica */ Gui workbench)
+  public AutomataEditor(Gui workbench)
   {
 	this.workbench = workbench;
 	this.theAutomatonContainer = workbench.getAutomatonContainer();
 
 	theActions = new EditorActions(this);
 
-    initMenus();
+	initMenus();
 	initToolbar();
 
-    contentPane = (JPanel)getContentPane();
+    	contentPane = (JPanel)getContentPane();
 
-    contentPane.setLayout(new BorderLayout());
+    	contentPane.setLayout(new BorderLayout());
 
 	contentPane.add(toolBar, BorderLayout.NORTH);
 

@@ -133,6 +133,17 @@ public class AutomatonDocument
 		return ll;
 	}
 
+	public JGoLink newLink(StateNode from, StateNode to, String label)
+	{
+		JGoLabeledLink ll = new JGoLabeledLink(from.getPort(), to.getPort());
+		JGoText textLabel = new JGoText(label);
+		ll.setMidLabel(textLabel);
+		ll.setPen(getLinkPen());
+		addObjectAtHead(ll);
+		ll.setArrowHeads(false, true);
+		return ll;
+	}
+
 	// creating a new link between layout nodes.
 	public JGoLink newLink(JGoPort from, JGoPort to)
 	{
@@ -249,7 +260,16 @@ public class AutomatonDocument
 				Arc currArc = (Arc)arcIt.next();
 				State toState = currArc.getToState();
 				StateNode toStateNode = (StateNode)stateToStateNodeMap.get(toState);
-				newLink(fromStateNode, toStateNode);
+				org.supremica.automata.Event currEvent = null;
+				try
+				{
+					currEvent = theAutomaton.getEvent(currArc.getEventId());
+				}
+				catch (Exception ex)
+				{
+					System.err.println("Event not found");
+				}
+				newLink(fromStateNode, toStateNode, currEvent.getLabel());
 			}
 		}
 

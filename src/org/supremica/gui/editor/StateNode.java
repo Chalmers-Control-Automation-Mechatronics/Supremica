@@ -270,6 +270,7 @@ public class StateNode
 		setPen(JGoPen.makeStockPen(c));
 	}
 
+/*
 	public void colorChange()
 	{
 		Color c = getColor();
@@ -286,7 +287,7 @@ public class StateNode
 			setColor(Color.red);
 		}
 	}
-
+*/
 	public JGoPort getPort()
 	{
 		return thePort;
