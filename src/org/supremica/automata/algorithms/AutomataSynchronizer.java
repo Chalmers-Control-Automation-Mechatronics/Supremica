@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -82,7 +81,6 @@ public class AutomataSynchronizer
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-			
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 	}
@@ -193,6 +191,7 @@ public class AutomataSynchronizer
 
 	/**
 	 * Standard method for synchronizing automata with default options.
+	 * @returns Automaton object representing the synchronous composition.
 	 */
 	public static Automaton synchronizeAutomata(Automata theAutomata)
 		throws Exception

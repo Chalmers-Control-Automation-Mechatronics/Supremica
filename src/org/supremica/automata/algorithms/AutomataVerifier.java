@@ -642,7 +642,6 @@ public class AutomataVerifier
 		if (verboseMode)
 		{
 			// For printing the names of the automata in selectedAutomata
-			// Object[] automatonArray = selectedAutomata.toArray();
 			for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
 			{
 				automataNames = automataNames.append(((Automaton) autIt.next()).getName());

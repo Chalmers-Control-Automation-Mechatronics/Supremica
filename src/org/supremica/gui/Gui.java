@@ -44,6 +44,8 @@ public interface Gui
 
 	void selectAutomata(int[] a);
 
+	void unselectAutomaton(int s);
+
 	void close();
 
 	int addAutomata(Automata a)

@@ -421,6 +421,18 @@ public class Supremica
 	}
 
 	/**
+	 * Unselects automaton indicated by automaton index
+	 *
+	 * @param index The relative index of the automaton among the other 
+	 * selected automata. (Should be Automata.getAutomatonIndex)
+	 */
+	public void unselectAutomaton(int index)
+	{
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+		theAutomatonTable.changeSelection(selectedRowIndices[index],0,true,false);		
+	}
+
+	/**
 	  Inverts the selection in theAutomatonTable.
 	 */
 	public void invertSelection()
@@ -430,7 +442,7 @@ public class Supremica
 		boolean autoscrolls = theAutomatonTable.getAutoscrolls();
 		theAutomatonTable.setAutoscrolls(false);
 		for (int i=0; i<theAutomatonTable.getRowCount(); i++)
-			theAutomatonTable.changeSelection(i,1,true,false);
+			theAutomatonTable.changeSelection(i,0,true,false);
 		theAutomatonTable.setAutoscrolls(autoscrolls);
 	}
 

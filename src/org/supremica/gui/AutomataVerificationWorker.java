@@ -121,14 +121,14 @@ public class AutomataVerificationWorker
 		final ArrayList threadsToStop = new ArrayList();
 		threadsToStop.add(this);
 		eventQueue.invokeLater(new Runnable()
-		{
-			public void run()
 			{
-				executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
-				executionDialog.setMode(ExecutionDialogMode.hide);
-			}
-		});
-
+				public void run()
+				{
+					executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
+					executionDialog.setMode(ExecutionDialogMode.hide);
+				}
+			});
+		
 		// Examine the validity of the chosen options
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
 		if (errorMessage != null)

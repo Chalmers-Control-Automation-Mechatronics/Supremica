@@ -990,17 +990,13 @@ public class ActionMan
 	// ** Extend
 	public static void automataExtend_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1036,17 +1032,13 @@ public class ActionMan
 	// ** Purge
 	public static void automataPurge_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1067,17 +1059,13 @@ public class ActionMan
 	// ** RemovePass - removes all pass events
 	public static void automataRemovePass_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1097,17 +1085,14 @@ public class ActionMan
 	// ** RemoveSelfLoopArcs
 	public static void automataRemoveSelfLoopArcs_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (selectedAutomata.size() < 1)
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1127,17 +1112,13 @@ public class ActionMan
 	// ** Rename
 	public static void automataRename_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1163,15 +1144,36 @@ public class ActionMan
 	// ** Synchronize - Threaded version
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
-		// Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 2, true, false))
+		{
+			return;
+		}
 
+		/*
 		if (selectedAutomata.size() < 2)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "At least two automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
+
+		// Do a sanity check, does all automata have initial states?
+		// There is a method for this, Automata.hasInitialState(), but 
+		// it doesn't tell which automaton breaks the test...
+		Iterator autIt = selectedAutomata.iterator();
+		while (autIt.hasNext())
+		{
+			Automaton currAutomaton = (Automaton) autIt.next();
+			String currAutomatonName = currAutomaton.getName();
+			if (!currAutomaton.hasInitialState())
+			{
+				JOptionPane.showMessageDialog(gui.getComponent(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+		*/
 
 		// Get the default options
 		SynchronizationOptions synchronizationOptions;
@@ -1194,37 +1196,6 @@ public class ActionMan
 			return;
 		}
 
-		//-- MF - Isn't this "wrong". An automaton can exist without a name.
-		//-- MF - The name is a gui-thing, and should be handled there
-		//-- MF - When an unnamed automatan is added, the gui should ask for a name
-		/** Yes, it's wrong, let it be handled elsewhere -- But where?? **/ /* Below, that's where
-		String newAutomatonName = "Dummy";
-
-		if (synchronizationOptions.buildAutomaton())
-		{
-			newAutomatonName = gui.getNewAutomatonName("Please enter a new name", "");
-
-			if (newAutomatonName == null)
-			{
-				return;
-			}
-		} */
-
-		// Do a sanity check, does all automata have initial states?
-		// There is a method for this, Automata.hasInitialState(), but 
-		// it doesn't tell which automaton breaks the test...
-		Iterator autIt = selectedAutomata.iterator();
-		while (autIt.hasNext())
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-			String currAutomatonName = currAutomaton.getName();
-			if (currAutomaton.getInitialState() == null)
-			{
-				JOptionPane.showMessageDialog(gui.getComponent(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-		}
-
 		// Start worker thread - perform the task.
 		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, selectedAutomata, "" /* newAutomatonName */, synchronizationOptions);
 	}
@@ -1232,27 +1203,34 @@ public class ActionMan
 	// ** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		// Retrieve the selected automata and make a sanity check
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, true, true))
+		{
+			return;
+		}
 
+		/*
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
+		*/
 
+		// Get the default options and allow the user to change them...
 		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), synthesizerOptions);
-
+		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), 
+																	synthesizerOptions);
 		synthesizerDialog.show();
-
-		// long elapsedTime = -1;
-		ActionTimer timer = null;
-
 		if (!synthesizerOptions.getDialogOK())
 		{
 			return;
 		}
+		
+		// long elapsedTime = -1;
+		ActionTimer timer = null;
 
 		if (selectedAutomata.size() > 1)
 		{
@@ -1282,6 +1260,7 @@ public class ActionMan
 				return;
 			}
 
+			/*
 			Automata currAutomata = new Automata();
 			Iterator autIt = selectedAutomata.iterator();
 
@@ -1291,10 +1270,11 @@ public class ActionMan
 				String currAutomatonName = currAutomaton.getName();
 
 				// No initial state -- remove from synthesis (or cancel entirely)
-				if (currAutomaton.getInitialState() == null)
+				if (!currAutomaton.hasInitialState())
 				{
 					int cont = JOptionPane.showConfirmDialog(gui.getComponent(),
-												"The automaton " + currAutomatonName + " does not have an initial state.\nSkip it or cancel...",
+												"The automaton " + currAutomatonName + 
+												" does not have an initial state.\nSkip it or cancel...",
 												"Alert",
 												JOptionPane.OK_CANCEL_OPTION,
 												JOptionPane.WARNING_MESSAGE);
@@ -1327,11 +1307,12 @@ public class ActionMan
 				}
 				currAutomata.addAutomaton(currAutomaton);
 			}
+			*/
 
 			try
 			{
-				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, currAutomata, syncOptions, synthesizerOptions);
-
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions, 
+																		  synthesizerOptions);
 				synthesizer.execute();
 
 				// elapsedTime = synthesizer.elapsedTime();
@@ -1345,6 +1326,21 @@ public class ActionMan
 		}
 		else // single automaton selected
 		{
+			Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
+			
+			try
+			{
+				AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, 
+																			synthesizerOptions);
+				synthesizer.synthesize();
+			}
+			catch (Exception ex)
+			{
+				logger.error("Exception in AutomatonSynthesizer. Automaton: " + theAutomaton.getName(), ex);
+				logger.debug(ex.getStackTrace());
+			}
+		
+			/*
 			Iterator autIt = selectedAutomata.iterator();
 
 			while (autIt.hasNext())
@@ -1366,7 +1362,6 @@ public class ActionMan
 				try
 				{
 					synthesizer.synthesize();
-					// elapsedTime = synthesizer.elapsedTime();
 				}
 				catch (Exception ex)
 				{
@@ -1374,6 +1369,7 @@ public class ActionMan
 					logger.debug(ex.getStackTrace());
 				}
 			}
+			*/
 		}
 
 		if (timer != null)
@@ -1386,38 +1382,33 @@ public class ActionMan
 	// Threaded version
 	public static void automataVerify_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		// Retrieve the selected automata and make a sanity check
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, true, false))
+		{
+			return;
+		}
 
-		/* This is tested in AutomataVerificationWorker (via AutomataVerifier.validOptions()).
-		   if (selectedAutomata.size() < 1)  // This can't happen.
-		   {
-		       JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-		       return;
-		   }
-		*/
-
+		// Get the default options and allow the user to change them...
 		VerificationOptions verificationOptions = new VerificationOptions();
 		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), verificationOptions);
-
 		verificationDialog.show();
-
 		if (!verificationOptions.getDialogOK())
 		{
 			return;
 		}
 
+		/*
 		Automata currAutomata = new Automata();
 
-		// The Automata must have initial states.
+		// The automata must have initial states.
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
 
-			if (currAutomaton.getInitialState() == null)
+			if (!currAutomaton.hasInitialState())
 			{
 				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
 				return;
@@ -1425,9 +1416,10 @@ public class ActionMan
 
 			currAutomata.addAutomaton(currAutomaton);
 		}
+		*/
+
 
 		SynchronizationOptions syncOptions;
-
 		try
 		{
 			syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
@@ -1454,20 +1446,18 @@ public class ActionMan
 			return;
 		}
 
-		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, currAutomata, syncOptions, verificationOptions);
+		AutomataVerificationWorker worker = new AutomataVerificationWorker(gui, selectedAutomata, 
+																		   syncOptions, verificationOptions);
 	}
 
 	// Automaton.Alphabet action performed
 	public static void automatonAlphabet_actionPerformed(Gui gui)
 	{
-		logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
+		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
-
-		if (selectedAutomata.size() < 1)
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
@@ -1525,41 +1515,55 @@ public class ActionMan
 	// Automaton.Explore action performed
 	public static void automatonExplore_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		// Retrieve the selected automata and make a sanity check
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, true, false))
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
-		Iterator autIt = selectedAutomata.iterator();
+		/*
+		if (selectedAutomata.size() < 1)
+		{
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", 
+										  "Alert", JOptionPane.ERROR_MESSAGE);
+
+			return;
+		}
+		*/
 
 		if (selectedAutomata.size() == 1)
-		{
+		{	// One automaton selected
+
+			/*
 			// One automaton selected
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
 
-			if (currAutomaton.getInitialState() == null)
+			if (!currAutomaton.hasInitialState())
 			{
-				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + 
+				" does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
+			*/
+
+			Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
+			String currAutomatonName = theAutomaton.getName();
 
 			try
 			{
-				AutomatonExplorer explorer = gui.getVisualProjectContainer().getActiveProject().getAutomatonExplorer(currAutomatonName);
+				AutomatonExplorer explorer = gui.getVisualProjectContainer().
+					getActiveProject().getAutomatonExplorer(currAutomatonName);
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomatonExplorer. Automaton: " + currAutomaton.getName(), ex);
+				logger.error("Exception in AutomatonExplorer. Automaton: " + theAutomaton.getName(), ex);
 				logger.debug(ex.getStackTrace());
 			}
 		}
 		else
-		{
-
+		{   // Many automata selected
+			/*
 			// Many automata selected
 			Automata currAutomata = new Automata();
 
@@ -1568,7 +1572,7 @@ public class ActionMan
 				Automaton currAutomaton = (Automaton) autIt.next();
 				String currAutomatonName = currAutomaton.getName();
 
-				if (currAutomaton.getInitialState() == null)
+				if (!currAutomaton.hasInitialState())
 				{
 					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomatonName + " does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
 
@@ -1577,11 +1581,11 @@ public class ActionMan
 
 				currAutomata.addAutomaton(currAutomaton);
 			}
+			*/
 
 			try
 			{
-				AutomataExplorer explorer = new AutomataExplorer(currAutomata);
-
+				AutomataExplorer explorer = new AutomataExplorer(selectedAutomata);
 				explorer.setVisible(true);
 				explorer.initialize();
 			}
@@ -1638,17 +1642,13 @@ public class ActionMan
 	// Automaton.Minimization action performed
 	public static void automatonMinimize_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -1681,16 +1681,13 @@ public class ActionMan
 	// Automaton.Status action performed
 	public static void automatonStatus_actionPerformed(Gui gui)
 	{
-		// logger.info("Number of automata: " + gui.getVisualProjectContainer().getSize());
 		gui.info("Number of automata: " + gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata());
 
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
 			return;
 		}
-
 		gui.info("Number of selected automata: " + selectedAutomata.size());
 
 		for (Iterator autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -1741,13 +1738,21 @@ public class ActionMan
 	public static void automatonView_actionPerformed(Gui gui)
 	{
 		// gui.debug("ActionMan to the rescue!");
-		Automata selectedAutomata = gui.getSelectedAutomata();
 
+		// Retrieve the selected automata and make a sanity check
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, true, false))
+		{
+			return;
+		}
+
+		/*
 		if (selectedAutomata.size() < 1)
 		{
 			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		*/
 
 		Iterator autIt = selectedAutomata.iterator();
 		while (autIt.hasNext())
@@ -1761,8 +1766,8 @@ public class ActionMan
 				StringBuffer msg = new StringBuffer();
 
 				msg.append(currAutomatonName + " has " + currAutomaton.nbrOfStates() + " states. ");
-				msg.append("It is not recommended to display an automaton with more than " + maxNbrOfStates + " states.\n");
-				msg.append("Do you want to abort viewing?");
+				msg.append("It is not recommended to display an automaton with more than ");
+				msg.append(maxNbrOfStates + " states.\n" + "Do you want to abort viewing?");
 
 				int res = JOptionPane.showOptionDialog(gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 
@@ -1773,11 +1778,13 @@ public class ActionMan
 				}
 			}
 
+			/*
 			if (!currAutomaton.hasInitialState())
 			{
 				JOptionPane.showMessageDialog(gui.getFrame(), "The automaton does not have an initial state!", "Alert", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			*/
 
 			try
 			{
@@ -1978,11 +1985,11 @@ public class ActionMan
 													options,
 													options[1]);
 
-			if(conf == 0)
+			if(conf == JOptionPane.YES_OPTION)
 			{
-				logger.warn("Non-deterministic automaton loaded. You're on your own");
+				logger.warn("Non-deterministic automaton loaded. You're on your own.");
 			}
-			else
+			else // NO_OPTION
 			{
 				return;
 			}
@@ -2202,17 +2209,13 @@ public class ActionMan
 	// Automata.AlphabetNormalize action performed
 	public static void normalizeAlphabet_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
 		Iterator autIt = selectedAutomata.iterator();
-
 		while (autIt.hasNext())
 		{
 			Automaton currAutomaton = (Automaton) autIt.next();
@@ -2269,7 +2272,8 @@ public class ActionMan
 	// Crop to selection - delete all unselected automata
 	public static void automataCrop_actionPerformed(Gui gui)
 	{
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		//Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		if (selectedAutomata.size() == 0)
 		{
@@ -2296,7 +2300,7 @@ public class ActionMan
 
 			currAutomatonName = currAutomaton.getName();
 
-			if (!selectedAutomata.contains(currAutomaton))
+			if (!selectedAutomata.containsAutomaton(currAutomaton))
 			{
 				try
 				{
@@ -2334,11 +2338,8 @@ public class ActionMan
 	public static void evoCompSynchTable(Gui gui, boolean append)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-
-		if (selectedAutomata.size() < 1)
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!",
-										  "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -2401,11 +2402,8 @@ public class ActionMan
 	public static void evoCompPredictSize(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-
-		if (selectedAutomata.size() < 1)
+		if (!automataSanityCheck(selectedAutomata, 1, false, false))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!",
-										  "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -2506,7 +2504,6 @@ public class ActionMan
 	public static void robotStudioExecuteRobot(Gui gui)
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
-
 		if (selectedAutomata.size() != 1)
 		{
 			JOptionPane.showMessageDialog(gui.getComponent(), "Exactly one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -3180,6 +3177,112 @@ public class ActionMan
 			logger.debug(ex.getStackTrace());
 			return;
 		}
+	}
+
+	/**
+	 * Examines automata size and, optionally, if all automata 
+	 * has initial states and/or a defined type.
+	 *
+	 * @param theAutomata The automata to be tested for sanity.
+	 * @param minSize Minimum size of theAutomata.
+	 * @param mustHaveInitial Test requires automata to have initial states.
+	 * @param mustHaveType Test requires that the automata are not of undefined type.
+	 */
+	private static boolean automataSanityCheck(Automata theAutomata, int minSize, 
+											   boolean mustHaveInitial, boolean mustHaveType)
+	{
+		if (mustHaveInitial)
+		{
+			// All automata must have initial states.
+			// There is another method for this, Automata.hasInitialState(), 
+			// but it doesn't tell which automaton breaks the test...
+			Iterator autIt = theAutomata.iterator();
+			while (autIt.hasNext())
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+				
+				// Does this automaton have an initial state?
+				if (!currAutomaton.hasInitialState())
+				{
+					/*
+					JOptionPane.showMessageDialog(gui.getFrame(), "The automaton " + currAutomaton.getName() + 
+												  " does not have an initial state!", "Alert", 
+												  JOptionPane.ERROR_MESSAGE);
+					// This is iNsanE!
+					return false;
+					*/
+
+					String message = "The automaton " + currAutomaton.getName() + " does not have an initial state.\n" + 
+						"Skip this automaton or Cancel the whole operation?";
+					Object[] options = { "Skip", "Cancel" };
+					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+
+					if(cont == JOptionPane.OK_OPTION)
+					{
+						// Unselect the automaton
+						gui.unselectAutomaton(theAutomata.getAutomatonIndex(currAutomaton));
+						// Skip this automaton (remove it from theAutomata)
+						autIt.remove();
+					}
+					else // JOptionPane.CANCEL_OPTION
+					{ 
+						// This is iNsanE! 
+						return false;	
+					}
+				}
+			}
+		}
+
+		if (mustHaveType)
+		{
+			// All automata must have a defined type, i.e. must not be of type "Undefined".
+			Iterator autIt = theAutomata.iterator();
+			while (autIt.hasNext())
+			{
+				Automaton currAutomaton = (Automaton) autIt.next();
+
+				// Is this Automaton's type AutomatonType.Undefined?
+				if(currAutomaton.getType() == AutomatonType.Undefined)
+				{
+					String message = "The automaton " + currAutomaton.getName() + " is of 'Undefined' type.\n" + 
+						"Skip this automaton or Cancel the whole operation?";
+					Object[] options = { "Skip", "Cancel" };
+					int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+
+					if(cont == JOptionPane.OK_OPTION)
+					{
+						// Unselect the automaton
+						gui.unselectAutomaton(theAutomata.getAutomatonIndex(currAutomaton));
+						// Skip this automaton (remove it from theAutomata)
+						autIt.remove();
+					}
+					else // JOptionPane.CANCEL_OPTION
+					{ 
+						// This is iNsanE! 
+						return false;	
+					}
+				}
+			}
+		}
+
+		// Make sure the automata has the right size!
+		if (minSize > 0 && theAutomata.size() < minSize)
+		{
+			String size;
+			if (minSize == 1)
+				size = "one automaton";
+			else if (minSize == 2)
+				size = "two automata";
+			else
+				size = minSize + " automata";
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least " + size + " must be selected!", 
+										  "Alert", JOptionPane.ERROR_MESSAGE);
+			// This is inSaNe!
+			return false;
+		}
+
+		// Sane!
+		return true;
 	}
 }
 
