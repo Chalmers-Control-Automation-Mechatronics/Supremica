@@ -61,10 +61,10 @@ public class RouteController
 	}
 
 	// inputs to simulator [16]
-	private boolean[] inSignals = new boolean[16];
+	private boolean[] inSignals = new boolean[18];
 
 	// outputs from simulator [23]
-	private boolean[] outSignals = new boolean[23];
+	private boolean[] outSignals = new boolean[27];
 
 	// keeps track of which balls are in each leg
 	private List[] legBallList = new List[nrOfLegs];
@@ -439,7 +439,7 @@ public class RouteController
 				//throw new Exception("Error in handling of UtVån1 UtVån2 (5)");
 			}
 
-			System.out.println("I leg 5");
+			//System.out.println("I leg 5");
 			Ball b = (Ball) legBallList[5].get(0);
 			int  x = movements[4].startPos[0];
 			int  y = movements[4].startPos[1] - hissLevel;
@@ -849,5 +849,9 @@ public class RouteController
 		outSignals[20] = false;                                     // ManuellStart
 		outSignals[21] = false;                                    // NödStopp
 		outSignals[22] = false;                                   // LarmKvittering
+		outSignals[23] = false;
+		outSignals[24] = false;
+		outSignals[25] = false;
+		outSignals[26] = false;
 	}
 }
