@@ -235,7 +235,7 @@ public class DigitalIODisplayView
 	    }
 	catch (Exception exc)
 	    {
-		System.err.println(exc);
+		exc.printStackTrace();
 	    }
 
 	// get signals
@@ -245,7 +245,7 @@ public class DigitalIODisplayView
 	    }
 	catch (Exception exc)
 	    {
-			System.err.println(exc);
+			exc.printStackTrace();
 	    }
 
 	for (i = 0; i < signalsIn.length; i++)
