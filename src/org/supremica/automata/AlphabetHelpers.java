@@ -54,6 +54,19 @@ import java.util.*;
 public class AlphabetHelpers
 {
 
+	public static Alphabet getUnionAlphabet(Automata theAutomata)
+		throws Exception
+	{
+		EventsSet eventsSet = new EventsSet();
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			Alphabet currAlphabet = currAutomaton.getAlphabet();
+			eventsSet.add(currAlphabet);
+		}
+		return getUnionAlphabet(eventsSet, "a");
+	}
+
 	/**
 	 * Compute a new alphabet as the union of a set of alphabets.
 	 * Adjust the Event attributes properly.
@@ -63,13 +76,13 @@ public class AlphabetHelpers
 	{
 		if (alphabets.size() < 1)
 			throw new IllegalArgumentException("At least one alphabet is necessary");
-		
+
 		EventsSet eventSet = new EventsSet();
-		
+
 		Events unionEvents = EventsHelpers.union(alphabets);
-		
+
         Alphabet newAlphabet = new Alphabet();
-		
+
 		// Iterate over all events
         Iterator eventsIt = unionEvents.iterator();
 		while(eventsIt.hasNext())

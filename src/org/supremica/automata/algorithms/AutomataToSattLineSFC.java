@@ -50,13 +50,16 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.automata.*;
+import org.supremica.gui.*;
 
 import java.io.*;
 import java.util.*;
+import org.apache.log4j.*;
 
 public class AutomataToSattLineSFC
 	implements AutomataSerializer
 {
+	private static Category thisCategory = LogDisplay.createCategory(AutomataToSattLineSFC.class.getName());
 	private Automata automata;
 	private Automaton automaton;
 	private boolean debugMode = false;
@@ -105,111 +108,182 @@ public class AutomataToSattLineSFC
 		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896"); // Don't know importance of DateCode
 		pw.println("\n");
 
-		// End of basePicture Invocation
+		pw.println("LOCALVARIABLES");
+		Alphabet unionAlphabet = null;
+		try
+		{
+			unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
+		}
+		catch (Exception ex)
+		{
+			thisCategory.error("Failed getting union of alphabets of the selected automata. Code generation aborted.");
+			return;
+		}
+		boolean firstEvent = true;
+		for (Iterator alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
+		{
+			Event currEvent = (Event)alphaIt.next();
+			if (firstEvent)
+			{
+				firstEvent = false;
+				pw.print(currEvent.getLabel());
+			}
+			else
+			{
+				pw.print(", " + currEvent.getLabel());
+			}
+		}
+		pw.println(": boolean;\n");
 
 		// Start of Module definition.
 
 		pw.println("ModuleDef");
 		pw.println("ClippingBounds = ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
-		pw.println("ZoomLimits = 0.0 0.01");
+		pw.println("ZoomLimits = 0.0 0.01\n");
 
 		//End of Module definition
 
 		// Start of Module code.
+
+		pw.println("ModuleCode\n");
+
 		// Here comes the automata, the tricky part.
 
-		Iterator automataIt = automata.iterator();
-		while (automataIt.hasNext())
-		{
-			Automaton aut = (Automaton)automataIt.next();
 
+
+		for (Iterator automataIt = automata.iterator(); automataIt.hasNext(); )
+		{
 			// Each automaton is translated into a SattLine Sequence.
 			// A sequence has the following structure. Step - Transition - Step - Transition ...
+
 			// A step may be followed by an ALTERNATIVSEQuence which has ALTERNATIVEBRANCHes.
 			// This is the case if there is more than one transition from a state.
+			// The difficulty is to know when the alternative branches merge, and if they do it the "SattLine way".
+
 			// A transition may be followed by a PARALLELSEQuence which has PARALLELBRANCHes.
 			// This cannot happen for an automaton.
 
+
+			Automaton aut = (Automaton)automataIt.next();
+
 			// If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
 			// Won't check that for now ...
-
 			// Might want to parameterise COORD so that sequences are not drawn on top of each other.
-			pw.println("SEQUENCE" + aut.getName() + " COORD -0.3, 0.5 OBJSIZE 0.5, 0.5\"");
+			pw.println("SEQUENCE " + aut.getName() + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
 
-			Iterator eventIt = aut.eventIterator();
-			while (eventIt.hasNext())
+
+			State initState = aut.getInitialState();
+			straightSequenceOutput(aut, initState, pw);
+
+/*			State destState = null;
+			State currState = initState;
+			int level = 0;
+			pw.println("SEQINITSTEP " + aut.getName() + "_" + initState.getName());
+			while (destState != initState && level == 0)
 			{
-				Event event = (Event)eventIt.next();
-				//pw.print("\t\t<Event id=\"" + normalize(event.getId()) + "\" label=\"" + normalize(event.getLabel()) + "\"");
-				if (!event.isControllable())
-					pw.print(" controllable=\"false\"");
-				if (!event.isPrioritized())
-					pw.print(" prioritized=\"false\"");
-				if (event.isImmediate())
-					pw.print(" immediate=\"true\"");
-				if (debugMode)
-					pw.print(" synchIndex=" + event.getSynchIndex());
-				pw.println("/>");
+				if (currState.nbrOfOutgoingArcs() > 1)
+				{
+					pw.println("ALTERNATIVESEQ");
+					level = level + 1;
+				}
+
+				boolean firstArc = true;
+
+				for (Iterator outgoingArcsIt = currState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
+				{
+					if (firstArc)
+					{
+						firstArc = false;
+					}
+					else
+					{
+						pw.println("ALTERNATIVEBRANCH");
+					}
+
+					Arc arc = (Arc)outgoingArcsIt.next();
+					Alphabet alpha = aut.getAlphabet();
+					try
+					{
+						Event event = alpha.getEventWithId(arc.getEventId());
+						pw.println("SEQTRANSITION " + aut.getName() + "_" + arc.getEventId() + " WAIT_FOR " + event.getLabel());
+					}
+					catch (Exception ex)
+					{
+						thisCategory.error("Failed getting event label. Code generation aborted.");
+						return;
+					}
+					// Depth first, should get next state here?
+					destState = arc.getToState();
+					if (destState != initState)
+					{
+						pw.println("SEQSTEP " + aut.getName() + "_" + destState.getName());
+					}
+				}
+				// temporary workaround
+				if (currState.nbrOfOutgoingArcs() > 1)
+				{
+					pw.println("ENDALTERNATIVE");
+					level = level - 1;
+				}
+
 			}
-			pw.println("\t</Events>");
-
-			// Print all states
-			pw.println("\t<States>");
-			Iterator stateIt2 = aut.stateIterator();
-			while (stateIt2.hasNext())
-			{
-				State state = (State)stateIt2.next();
-				//pw.print("\t\t<State id=\"" + normalize(state.getId()) + "\"");
-				if (!state.getId().equals(state.getName()))
-				//	pw.print(" name=\"" + normalize(state.getName()) + "\"");
-				if (state.isInitial())
-					pw.print(" initial=\"true\"");
-				if (state.isAccepting())
-					pw.print(" accepting=\"true\"");
-				if (state.isForbidden())
-					pw.print(" forbidden=\"true\"");
-				int value = state.getCost();
-				if (value != State.UNDEF_COST)
-					pw.print(" cost=\"" + value + "\"");
-				if (debugMode)
-					pw.print(" synchIndex=" + state.getIndex());
-     			// printIntArray(pw, ((StateRegular)state).getOutgoingEventsIndicies());
-				pw.println("/>");
-			}
-			pw.println("\t</States>");
-
-
-			// Print all transitions
-			pw.println("\t<Transitions>");
-			// stateIt = aut.stateIterator();
-			// while (stateIt.hasNext())
-			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
+*/
+/*			for (Iterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 			{
 				State sourceState = (State)stateIt.next();
-				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
-				while (outgoingArcsIt.hasNext())
+				if (sourceState.isInitial())
+				{
+					pw.println("SEQINITSTEP " + aut.getName() + "_" + sourceState.getName());
+				}
+				else
+				{
+					pw.println("SEQSTEP " + aut.getName() + "_" + sourceState.getName());
+				}
+
+				for (Iterator outgoingArcsIt = sourceState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
 				{
 					Arc arc = (Arc)outgoingArcsIt.next();
-					State destState = arc.getToState();
-				//	pw.print("\t\t<Transition source=\"" + normalize(sourceState.getId()));
-				//	pw.print("\" dest=\"" + normalize(destState.getId()));
-				//	pw.println("\" event=\"" + normalize(arc.getEventId()) + "\"/>");
+					if (sourceState.nbrOfOutgoingArcs() == 1)
+					{
+						Alphabet alpha = aut.getAlphabet();
+						try
+						{
+							Event event = alpha.getEventWithId(arc.getEventId());
+							pw.println("SEQTRANSITION " + aut.getName() + "_" + arc.getEventId() + " WAIT_FOR " + event.getLabel());
+						}
+						catch (Exception ex)
+						{
+							return;
+						}
+
+					}
+					else
+					{
+						// It is easy to know when ALT.. starts, but not when it ends.
+						// Easy way out is to fork. Ugly as hell, but will probably work.
+						/*
+						pw.println("ALTERNATIVESEQ");
+						pw.println("ENDALTERNATIVE");
+						State destState = arc.getToState();
+
+					}
 				}
 			}
-			pw.println("\t</Transitions>");
-			pw.println("</Automaton>");
+*/
+			pw.println("ENDSEQUENCE\n\n");
 		}
 
-		pw.flush();
-		pw.close();
+		// End of Module code
+
+		pw.println("ENDDEF (*BasePicture*);");
+
+		// End of BasePicture
 	}
 
 	public void serialize_g(PrintWriter pw)
 	{
 		pw.println("\" Syntax version 2.19, date: 2001-11-20-14:16:07.401 N \" ");
 
-		pw.flush();
-		pw.close();
 	}
 
 	public void serialize_p(PrintWriter pw)
@@ -221,19 +295,79 @@ public class AutomataToSattLineSFC
 		pw.println("ExecutingSystems");
 		pw.println(" (  )");
 
-		pw.flush();
-		pw.close();
 
 	}
 
 	public void serialize_l(PrintWriter pw)
 	{
-
+		pw.println("");
 	}
 
-	public void serialize_s(String fileName)
-		throws IOException
+	private void straightSequenceOutput(Automaton theAutomaton, State theState, PrintWriter pw)
 	{
-		serialize(new PrintWriter(new FileWriter(fileName)));
+
+		printStep(theAutomaton, theState, pw);
+
+		if (theState.nbrOfOutgoingArcs() > 1)
+		{
+			pw.println("ALTERNATIVESEQ");
+			//level = level + 1;
+		}
+
+		boolean firstArc = true;
+		for (Iterator outgoingArcsIt = theState.outgoingArcsIterator(); outgoingArcsIt.hasNext(); )
+		{
+			if (firstArc)
+			{
+				firstArc = false;
+			}
+			else
+			{
+				pw.println("ALTERNATIVEBRANCH");
+			}
+
+			Arc arc = (Arc)outgoingArcsIt.next();
+			printTransition(theAutomaton, arc, pw);
+
+			State nextState = arc.getToState();
+			// only straight sequences allowed as yet
+			if (!nextState.isInitial())
+			{
+				straightSequenceOutput(theAutomaton, nextState, pw);
+			}
+			else
+			{
+				// End of this subsequence
+			}
+		}
 	}
+
+	private void printStep(Automaton theAutomaton, State theState, PrintWriter pw)
+	{
+		if (theState.isInitial())
+		{
+			pw.println("SEQINITSTEP " + theAutomaton.getName() + "_" + theState.getName());
+		}
+		else
+		{
+			pw.println("SEQSTEP " + theAutomaton.getName() + "_" + theState.getName());
+		}
+	}
+
+	private void printTransition(Automaton theAutomaton, Arc theArc, PrintWriter pw)
+	{
+		Alphabet alpha = theAutomaton.getAlphabet();
+		try
+		{
+			Event event = alpha.getEventWithId(theArc.getEventId());
+			pw.println("SEQTRANSITION " + theAutomaton.getName() + "_" + theArc.getEventId() + " WAIT_FOR " + event.getLabel());
+		}
+		catch (Exception ex)
+		{
+			thisCategory.error("Failed getting event label. Code generation aborted.");
+			return;
+		}
+
+	}
+
 }

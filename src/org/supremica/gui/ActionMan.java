@@ -1539,7 +1539,7 @@ public class ActionMan
 		Automata selectedAutomata = gui.getSelectedAutomata();
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
