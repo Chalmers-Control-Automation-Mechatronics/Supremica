@@ -241,23 +241,23 @@ public class ProjectToSP
 					State sourceState = (State) stateIt.next();
 
 					/*
-																									for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
-																									{
-																													ArcSet currArcSet = (ArcSet) arcSets.next();
-																													State fromState = currArcSet.getFromState();
-																													State toState = currArcSet.getToState();
-																													pw.println("\t\t\t<ArcSet from=\"" + fromState.getId() + "\" to=\"" + toState.getId() + "\">");
+	for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
+	{
+					ArcSet currArcSet = (ArcSet) arcSets.next();
+					State fromState = currArcSet.getFromState();
+					State toState = currArcSet.getToState();
+					pw.println("\t\t\t<ArcSet from=\"" + fromState.getId() + "\" to=\"" + toState.getId() + "\">");
 
-																													for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
-																													{
-																																	Arc currArc = (Arc) arcIt.next();
-																																	LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
+					for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
+					{
+									Arc currArc = (Arc) arcIt.next();
+									LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
 
-																																	pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
-																													}
+									pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
+					}
 
-																													pw.println("\t\t\t</ArcSet>");
-																									}
+					pw.println("\t\t\t</ArcSet>");
+	}
 					*/
 					pw.println("\t\t</TransitionsLayout>");
 				}

@@ -76,17 +76,17 @@ public class TemplateItem
 		return path;
 	}
 
-	public Automata createInstance(ProjectFactory theFactory)
+	public Project createInstance(ProjectFactory theFactory)
 		throws Exception
 	{
 		try
 		{
 			URL url = TemplateItem.class.getResource(path);
 			InputStream stream = url.openStream();
-			AutomataBuildFromXml builder = new AutomataBuildFromXml(theFactory);
-			Automata theAutomata = builder.build(stream);
+			ProjectBuildFromXml builder = new ProjectBuildFromXml(theFactory);
+			Project theProject = builder.build(stream);
 
-			return theAutomata;
+			return theProject;
 		}
 		catch (Exception ex)
 		{

@@ -83,11 +83,11 @@ public class ConsoleUI
 	private void openFile(String name)
 		throws IOException
 	{
-		Automata aut = null;
+		Project aut = null;
 
 		try
 		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml(new DefaultProjectFactory());
+			ProjectBuildFromXml builder = new ProjectBuildFromXml(new DefaultProjectFactory());
 
 			aut = builder.build(new File(name));
 

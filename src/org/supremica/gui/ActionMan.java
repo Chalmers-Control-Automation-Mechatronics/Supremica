@@ -1332,7 +1332,7 @@ public class ActionMan
 		{
 			void openFile(Gui g, File f)
 			{
-				openAutomataXMLFile(g, f);
+				openProjectXMLFile(g, f);
 			}
 		};
 	}
@@ -1340,20 +1340,20 @@ public class ActionMan
 	// Why this indirection?
 	public static void openFile(Gui gui, File file)
 	{
-		openAutomataXMLFile(gui, file);
+		openProjectXMLFile(gui, file);
 	}
 
-	public static void openAutomataXMLFile(Gui gui, File file)
+	public static void openProjectXMLFile(Gui gui, File file)
 	{
-		Automata currAutomata = null;
+		Project currProject = null;
 
 		gui.info("Opening " + file.getAbsolutePath() + " ...");
 
 		try
 		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml(new VisualProjectFactory());
+			ProjectBuildFromXml builder = new ProjectBuildFromXml(new VisualProjectFactory());
 
-			currAutomata = builder.build(file);
+			currProject = builder.build(file);
 		}
 		catch (Exception e)
 		{
@@ -1368,7 +1368,7 @@ public class ActionMan
 
 		if (SupremicaProperties.generalUseSecurity())
 		{
-			if (!fileSecurity.allowOpening(currAutomata))
+			if (!fileSecurity.allowOpening(currProject))
 			{
 				JOptionPane.showMessageDialog(gui.getComponent(), "You are not allowed to open this file", "alert", JOptionPane.ERROR_MESSAGE);
 
@@ -1377,16 +1377,16 @@ public class ActionMan
 		}
 
 		// We should always check owner and hash when it is present
-		if (!((currAutomata.getOwner() == null) && (currAutomata.getHash() == null)) &&!fileSecurity.hasCorrectHash(currAutomata))
+		if (!((currProject.getOwner() == null) && (currProject.getHash() == null)) &&!fileSecurity.hasCorrectHash(currProject))
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "The automata has an invalid hash", "alert", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "The project has an invalid hash", "alert", JOptionPane.WARNING_MESSAGE);
 		}
 
 		int nbrOfAutomataBeforeOpening = gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata();
 
 		try
 		{
-			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+			int nbrOfAddedAutomata = gui.addAutomata(currProject);
 
 			gui.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
 		}
@@ -1399,7 +1399,7 @@ public class ActionMan
 
 		if (nbrOfAutomataBeforeOpening == 0)
 		{
-			String projectName = currAutomata.getName();
+			String projectName = currProject.getName();
 
 			if (projectName != null)
 			{

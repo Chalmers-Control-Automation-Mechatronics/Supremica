@@ -225,7 +225,7 @@ public class Supremica
 
 		if (arg != null)
 		{
-			openAutomataXMLFile(new File(arg));
+			openProjectXMLFile(new File(arg));
 		}
 	}
 
@@ -1182,7 +1182,7 @@ public class Supremica
 
 	void openFile(File file)
 	{
-		openAutomataXMLFile(file);
+		openProjectXMLFile(file);
 	}
 
 	public void valueChanged(ListSelectionEvent e)
@@ -1197,17 +1197,17 @@ public class Supremica
 		theAutomatonTable.revalidate();
 	}
 
-	public void openAutomataXMLFile(File file)
+	public void openProjectXMLFile(File file)
 	{
-		Automata currAutomata = null;
+		Project currProject = null;
 
 		logger.info("Opening " + file.getAbsolutePath() + " ...");
 
 		try
 		{
-			AutomataBuildFromXml builder = new AutomataBuildFromXml(new VisualProjectFactory());
+			ProjectBuildFromXml builder = new ProjectBuildFromXml(new VisualProjectFactory());
 
-			currAutomata = builder.build(file);
+			currProject = builder.build(file);
 		}
 		catch (Exception e)
 		{
@@ -1218,13 +1218,13 @@ public class Supremica
 			return;
 		}
 
-		int nbrOfAutomataBeforeOpening = getActiveProject().getNbrOfAutomata();
+		int nbrOfProjectBeforeOpening = getActiveProject().getNbrOfAutomata();
 
 		try
 		{
-			int nbrOfAddedAutomata = addAutomata(currAutomata);
+			int nbrOfAddedProject = addAutomata(currProject);
 
-			logger.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
+			logger.info("Successfully opened and added " + nbrOfAddedProject + " automata.");
 		}
 		catch (Exception excp)
 		{
@@ -1233,9 +1233,9 @@ public class Supremica
 			return;
 		}
 
-		if (nbrOfAutomataBeforeOpening == 0)
+		if (nbrOfProjectBeforeOpening == 0)
 		{
-			String projectName = currAutomata.getName();
+			String projectName = currProject.getName();
 
 			if (projectName != null)
 			{
@@ -1244,7 +1244,7 @@ public class Supremica
 			}
 		}
 
-		if (nbrOfAutomataBeforeOpening > 0)
+		if (nbrOfProjectBeforeOpening > 0)
 		{
 			File projectFile = getActiveProject().getProjectFile();
 

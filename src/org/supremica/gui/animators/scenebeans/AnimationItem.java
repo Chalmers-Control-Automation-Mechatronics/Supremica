@@ -100,11 +100,6 @@ public class AnimationItem
 			view.setAnimation(parser.parseAnimation());
 
 			return view;
-
-			// URL url = AnimationItem.class.getResource(path);
-			// InputStream stream = url.openStream();
-			// Automata theAutomata = AutomataBuildFromXml.build(stream);
-			// return theAutomata;
 		}
 		catch (Exception ex)
 		{
