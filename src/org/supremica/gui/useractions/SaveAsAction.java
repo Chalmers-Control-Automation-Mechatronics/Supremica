@@ -14,7 +14,7 @@ public class SaveAsAction
 	{
 		super("Save As...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/SaveAs16.gif")));
 
-		putValue(SHORT_DESCRIPTION, "Save this project");
+		putValue(SHORT_DESCRIPTION, "Save this project under a new name");
 	}
 
 	public void actionPerformed(ActionEvent e)

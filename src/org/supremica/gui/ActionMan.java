@@ -504,23 +504,6 @@ public class ActionMan
 	{
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-/* What the f*** is this doing here? Someone thought something...
-
-		if (!selectedAutomata.sanityCheck(gui, 1))
-		{
-			return;
-		}
-*/
-		/*
-		Automata selectedAutomata = gui.getSelectedAutomata();
-
-		if (selectedAutomata.size() < 1)
-		{
-				JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-				return;
-		}
-		*/
 		Iterator autIt = selectedAutomata.iterator();
 
 		while (autIt.hasNext())
@@ -539,16 +522,6 @@ public class ActionMan
 			}
 		}
 
-		/*
-		 *  And this "closes" the project, should it, really?
-		 *  if (theVisualProjectContainer.getSize() == 0)
-		 *  {
-		 *  theVisualProjectContainer.setProjectFile(null);
-		 *  }
-		 */
-
-		// and we should have no notion of a "table" here
-		// theAutomatonTable.clearSelection();
 		gui.clearSelection();
 	}
 
@@ -1425,7 +1398,6 @@ public class ActionMan
 	// ** Synchronize - Threaded version
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
-
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
@@ -2381,7 +2353,7 @@ public class ActionMan
 		{
 
 			// this exception is caught while opening
-			logger.error("Error while opening " + file.getAbsolutePath(), ex);
+			logger.error("Error while opening " + file.getAbsolutePath() + " .", ex);
 			logger.debug(ex.getStackTrace());
 
 			return;
@@ -2472,17 +2444,32 @@ public class ActionMan
 	// File.Save action performed
 	public static void fileSave(Gui gui)
 	{
+		// Get the file corresponding to the current project
 		File currFile = gui.getVisualProjectContainer().getActiveProject().getProjectFile();
-
+		// Was there no open project? Use fileSaveAs!
 		if (currFile == null)
 		{
 			fileSaveAs(gui);
 
 			return;
 		}
-
+		
+		// Get the current project
 		Project currProject = gui.getVisualProjectContainer().getActiveProject();
 
+		// Is this project empty? If so, maybe we shouldn't save it?
+		if (currProject.size() == 0)
+		{
+			//if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(gui.getComponent(), "This project is empty. Do you really want to save?", "Do you really want to save an empty project?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE))
+			//if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(gui.getComponent(), "This project is empty. Do you really want to save?", "Do you really want to save an empty project?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[]={"Yes", "No"}, "No"))
+			Object[] objects = {"Yes", "No"};
+			if (JOptionPane.NO_OPTION == JOptionPane.showOptionDialog(gui.getComponent(), "This project is empty. Do you really want to save?", "Do you really want to save an empty project?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, objects, objects[1]))
+			{
+				return;
+			}
+		}
+
+		// Go ahead!
 		if (currFile != null)
 		{
 			if (!currFile.isDirectory())
@@ -2722,7 +2709,6 @@ public class ActionMan
 	{
 		gui.getVisualProjectContainer().getActiveProject().clear();
 		gui.clearSelection();
-		gui.getVisualProjectContainer().getActiveProject().setProjectFile(null);
 	}
 
 	// Crop to selection - delete all unselected automata
@@ -2734,7 +2720,6 @@ public class ActionMan
 
 		if (selectedAutomata.size() == 0)
 		{
-
 			// Use DeleteAll instead
 			automataDeleteAll_actionPerformed(gui);
 
@@ -4263,7 +4248,6 @@ public class ActionMan
 			// clear the current automata
 			gui.getVisualProjectContainer().getActiveProject().clear();
 			gui.clearSelection();
-			gui.getVisualProjectContainer().getActiveProject().setProjectFile(null);
 
 			// insert the new project
 			gui.addAutomata(new_);

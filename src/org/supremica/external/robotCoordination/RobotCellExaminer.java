@@ -49,7 +49,15 @@ public class RobotCellExaminer
 					File f = fileOpener.getSelectedFile();
 					String cellName = f.getAbsolutePath();
 
-					openCell(cellName, RobotSimulatorType.RobotStudio);
+					if (cellName.endsWith(".stn"))
+					{
+						openCell(cellName, RobotSimulatorType.RobotStudio);
+					}
+					else
+					{						
+						logger.error("The file " + cellName + " is not a robot station or is " + 
+									 "not a of a type supported by Supremica.");
+					}
 				}
 				else
 				{
@@ -129,18 +137,21 @@ public class RobotCellExaminer
 	 */
 	private void openCell(String name, RobotSimulatorType simType)
 	{
-
 		// Which simulation software is used?
 		// This is the only "application specific" part of this class!
 		if (simType == RobotSimulatorType.RobotStudio)
-		{
-			cell = new RobotStudioInterface.RSRobotCell(name);
-		}
+			{
+				// Here, it would be a good thing to examine if RobotStudio is
+				// properly installed...
+
+				// Open cell
+				cell = new RobotStudioInterface.RSRobotCell(name);
+			}
 		else
 		{
 			logger.error("Unknown robot simulation environment specified.");
 		}
-
+		
 		// Initialize
 		init();
 	}

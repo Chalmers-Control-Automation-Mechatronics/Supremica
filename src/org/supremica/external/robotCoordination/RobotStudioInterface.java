@@ -55,7 +55,6 @@ public class RobotStudioInterface
 	public static class RSRobotCell
 		implements RobotCell, DAppEvents
 	{
-
 		/** The active RopbotStudio station. */
 		private static Station station = null;
 		private Part zones;
@@ -130,7 +129,7 @@ public class RobotStudioInterface
 			throws Exception
 		{
 			IStation iStation = app.getWorkspace().openStation(stationName, var(true), var(false));
-
+			
 			station = Station.getStationFromUnknown(iStation);
 		}
 

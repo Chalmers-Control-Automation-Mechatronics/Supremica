@@ -937,7 +937,8 @@ public class Alphabet
 				// Compare names ignoring case
 				if (eventA.getLabel().equalsIgnoreCase(eventB.getLabel()))
 				{
-					logger.warn("The events " + eventA + " and " + eventB + " have dangerously " + "similar names.");
+					logger.warn("The events " + eventA + " and " + eventB + " have very " + 
+								"similar names but will be treated as different events!");
 
 					found = true;
 				}

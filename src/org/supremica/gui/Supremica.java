@@ -762,7 +762,7 @@ public class Supremica
 
 		while (!finished)
 		{
-			newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+			newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
 
 			if (newName == null)
 			{
@@ -770,11 +770,11 @@ public class Supremica
 			}
 			else if (newName.equals(""))
 			{
-				JOptionPane.showMessageDialog(this, "An empty name is not allowed", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "An empty name is not allowed.", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else if (getActiveProject().containsAutomaton(newName))
 			{
-				JOptionPane.showMessageDialog(this, "'" + newName + "' already exists", "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "'" + newName + "' already exists.", "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else
 			{
@@ -840,7 +840,6 @@ public class Supremica
 		}
 		catch (Exception ex)
 		{
-
 			// this exception is caught while opening
 			logger.error("Error while opening " + file.getAbsolutePath() + " " + ex.getMessage());
 			logger.debug(ex.getStackTrace());

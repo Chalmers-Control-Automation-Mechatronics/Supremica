@@ -61,7 +61,6 @@ public final class SynchronizationOptions
 	private int initialHashtableSize;
 	private boolean expandHashtable;
 	private int nbrOfExecuters;
-	private boolean terminateIfUnconStates;    // don't stop just because an uc-state found
 	private boolean buildAutomaton;    // add also the arcs
 	private boolean expandEventsUsingPriority;    // ??
 	private boolean verboseMode;    // write stuff on debug window
@@ -73,7 +72,7 @@ public final class SynchronizationOptions
 	public SynchronizationOptions()
 		throws IllegalArgumentException
 	{
-		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false,    // terminate if uncontrollable state found
+		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), 
 			 false,    // expandEventsUsingPriority
 			 true,    // buildAutomaton
 			 SupremicaProperties.verboseMode(), true,    // requireConsistentControllability
@@ -82,12 +81,12 @@ public final class SynchronizationOptions
 	}
 
 	// This one's so we only have to care about "relevant" options
-	public SynchronizationOptions(SynchronizationType syncType, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
+	public SynchronizationOptions(SynchronizationType syncType, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
 	{
-		this(SupremicaProperties.syncNbrOfExecuters(), syncType, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), forbidUnconStates, expandForbiddenStates, terminateIfUnconState, expandEventsUsingPriority, buildAutomaton, verboseMode, requireConsistentControllability, requireConsistentImmediate, rememberDisabledEvents);
+		this(SupremicaProperties.syncNbrOfExecuters(), syncType, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), forbidUnconStates, expandForbiddenStates, expandEventsUsingPriority, buildAutomaton, verboseMode, requireConsistentControllability, requireConsistentImmediate, rememberDisabledEvents);
 	}
 
-	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean terminateIfUnconState, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
+	public SynchronizationOptions(int nbrOfExecuters, SynchronizationType syncType, int initialHashtableSize, boolean expandHashtable, boolean forbidUnconStates, boolean expandForbiddenStates, boolean expandEventsUsingPriority, boolean buildAutomaton, boolean verboseMode, boolean requireConsistentControllability, boolean requireConsistentImmediate, boolean rememberDisabledEvents)
 		throws IllegalArgumentException
 	{
 		if (syncType == null)
@@ -111,7 +110,6 @@ public final class SynchronizationOptions
 		this.expandHashtable = expandHashtable;
 		this.forbidUnconStates = forbidUnconStates;
 		this.expandForbiddenStates = expandForbiddenStates;
-		this.terminateIfUnconStates = terminateIfUnconState;
 		this.expandEventsUsingPriority = expandEventsUsingPriority;
 		this.buildAutomaton = buildAutomaton;
 		this.verboseMode = verboseMode;
@@ -174,17 +172,7 @@ public final class SynchronizationOptions
 	{
 		expandForbiddenStates = set;
 	}
-
-	public boolean terminateIfUncontrollableState()
-	{
-		return terminateIfUnconStates;
-	}
-
-	public void setTerminateIfUncontrollableState(boolean set)
-	{
-		terminateIfUnconStates = set;
-	}
-
+	
 	public boolean expandEventsUsingPriority()
 	{
 		return expandEventsUsingPriority;
@@ -272,7 +260,7 @@ public final class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultVerificationOptions()
 	{
-		return new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false,    // This is the only difference from default!
+		return new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false,    // This is the only difference from default!
 										  SupremicaProperties.verboseMode(), true, true, false);
 	}
 
@@ -282,6 +270,6 @@ public final class SynchronizationOptions
 	public static SynchronizationOptions getDefaultSynthesisOptions()
 	{
 		return new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), true,    // This is the only difference from default!
-										  SupremicaProperties.syncExpandForbiddenStates(), false, false, true, SupremicaProperties.verboseMode(), true, true, false);
+										  SupremicaProperties.syncExpandForbiddenStates(), false, true, SupremicaProperties.verboseMode(), true, true, false);
 	}
 }

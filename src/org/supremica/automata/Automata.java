@@ -1293,19 +1293,19 @@ public class Automata
 		// Warns if there are events with equal (lowercase) names.
 		isEventNamesSafe();
 
-		// Warns if the system has dsjoint modules (the system can be divided into at least two sets 
+		// Warns if the system has disjoint modules (the system can be divided into at least two sets 
 		// of modules whose union alphabets are disjoint)
 		isSeveralSystems();
 
-		// Examines controllability consitency
+		// Examines controllability consistency
 		if (mustBeControllabilityConsistent &&!isEventControllabilityConsistent())
 		{
 			return false;
 		}
 
+		// Examines each automaton for an initial state
 		if (mustHaveInitial)
 		{
-
 			// All automata must have initial states.
 			// There is another method for this, Automata.hasInitialState(),
 			// but it doesn't tell which automaton breaks the test...
@@ -1330,9 +1330,9 @@ public class Automata
 								"Skip this automaton or Cancel the whole operation?";
 						Object[] options = { "Skip", "Cancel" };
 						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
-																										JOptionPane.OK_CANCEL_OPTION,
-																										JOptionPane.WARNING_MESSAGE, null,
-																										options, options[1]);
+						OptionPane.OK_CANCEL_OPTION,
+						JOptionPane.WARNING_MESSAGE, null,
+						options, options[1]);
 
 						if(cont == JOptionPane.OK_OPTION)
 						{   // Skip
@@ -1358,10 +1358,10 @@ public class Automata
 				}
 			}
 		}
-
+	   
+		// Examines the type of each automaton
 		if (mustHaveValidType && (size() > 1))
 		{
-
 			// All automata must have a defined type, i.e. must not be of type "Undefined".
 			Iterator autIt = iterator();
 

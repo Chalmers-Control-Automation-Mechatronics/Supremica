@@ -150,19 +150,15 @@ class SynthesizerDialogStandardPanel
 	public SynthesizerDialogStandardPanel(int num)
 	{
 		algorithmTypeBox = AlgorithmSelector.create(num);
-
 		algorithmTypeBox.addActionListener(this);
 
 		synthesisTypeBox = SynthesisSelector.create();
-
 		synthesisTypeBox.addActionListener(this);
 
 		purgeBox = new JCheckBox("Purge result");
-
 		purgeBox.setToolTipText("Remove all forbidden states");
 
 		optimizeBox = new JCheckBox("Optimize result");
-
 		optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
 
 		nbNote = new NonblockNote();

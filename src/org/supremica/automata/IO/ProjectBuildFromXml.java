@@ -295,11 +295,10 @@ public class ProjectBuildFromXml
 		}
 		else if (automatonStr.equals(name))
 		{
-
 			// Reset the id maps when parsing a new automaton
 			idEventMap = new HashMap();
 			idStateMap = new HashMap();
-
+			
 			doAutomaton(attributes);
 		}
 		else if (projectStr.equals(name))
@@ -380,7 +379,7 @@ public class ProjectBuildFromXml
 		else if (statesLayoutStr.equals(name)) {}
 		else
 		{
-			throwException("Unknown element: " + name);
+			throwException("unknown element: " + name);
 		}
 	}
 
@@ -401,6 +400,11 @@ public class ProjectBuildFromXml
 		if (name == null)
 		{
 			throwException("name attribute is missing");
+		}
+
+		if (name.equals(""))
+		{
+			throwException("empty automata names are not allowed");
 		}
 
 		currAutomaton.setName(name);
@@ -583,6 +587,11 @@ public class ProjectBuildFromXml
 			name = id;
 		}
 
+		if (currAutomaton.containsStateWithName(name))
+		{
+			throwException("several states with the same name");
+		}
+
 		State currState = new State(name);
 
 		// currState.setId(id);
@@ -615,7 +624,7 @@ public class ProjectBuildFromXml
 		// State sourceState = currAutomaton.getStateWithId(sourceId);
 		if (sourceState == null)
 		{
-			throwException("Cannot find source state: " + sourceId);
+			throwException("cannot find source state: " + sourceId);
 		}
 
 		// Transition::dest
@@ -632,7 +641,7 @@ public class ProjectBuildFromXml
 		// State destState = currAutomaton.getStateWithId(destId);
 		if (destState == null)
 		{
-			throwException("Cannot find dest state: " + destId);
+			throwException("cannot find dest state: " + destId);
 		}
 
 		// Transition::event
@@ -646,7 +655,7 @@ public class ProjectBuildFromXml
 		// Get the event corresponding to this id
 		if (!idEventMap.containsKey(eventId))
 		{
-			throwException("event id '" + eventId + "' is not a valid event id.");
+			throwException("event id '" + eventId + "' is not a valid event id");
 		}
 
 		LabeledEvent event = (LabeledEvent) idEventMap.get(eventId);
@@ -670,7 +679,7 @@ public class ProjectBuildFromXml
 	{
 		int line = locator.getLineNumber();
 		int column = locator.getColumnNumber();
-		String exMsg = "Error while parsing at line: " + line + ". Reason: \"" + msg + "\"";
+		String exMsg = "Error while parsing at line: " + line + ". Reason: \"" + msg + "\".";
 
 		throw new SAXException(exMsg);
 	}
@@ -819,7 +828,7 @@ public class ProjectBuildFromXml
 
 		if (currSignals.hasSignal(label))
 		{
-			throwException("Multiple signals of " + label);
+			throwException("multiple signals of " + label);
 		}
 
 		String portStr = attributes.getValue("port");
@@ -841,7 +850,7 @@ public class ProjectBuildFromXml
 	{
 		if (currProject == null)
 		{
-			throwException("Project section is missing");
+			throwException("project section is missing");
 		}
 
 		currActions = currProject.getActions();
@@ -852,7 +861,7 @@ public class ProjectBuildFromXml
 	{
 		if (currActions == null)
 		{
-			throwException("Actions section is missing");
+			throwException("actions section is missing");
 		}
 
 		String label = attributes.getValue("label");
@@ -864,7 +873,7 @@ public class ProjectBuildFromXml
 
 		if (currActions.hasAction(label))
 		{
-			throwException("Multiple actions of " + label);
+			throwException("multiple actions of " + label);
 		}
 
 		currAction = new Action(label);
@@ -877,7 +886,7 @@ public class ProjectBuildFromXml
 	{
 		if (currProject == null)
 		{
-			throwException("Project section is missing");
+			throwException("project section is missing");
 		}
 
 		currControls = currProject.getControls();
@@ -888,7 +897,7 @@ public class ProjectBuildFromXml
 	{
 		if (currControls == null)
 		{
-			throwException("Controls section is missing");
+			throwException("controls section is missing");
 		}
 
 		String label = attributes.getValue("label");
@@ -911,7 +920,7 @@ public class ProjectBuildFromXml
 
 		if (currControls.hasControl(label))
 		{
-			throwException("Multiple controls of " + label);
+			throwException("multiple controls of " + label);
 		}
 
 		currControl = new Control(label, invert);
@@ -924,7 +933,7 @@ public class ProjectBuildFromXml
 	{
 		if (currProject == null)
 		{
-			throwException("Project section is missing");
+			throwException("project section is missing");
 		}
 
 		currTimers = currProject.getTimers();
@@ -935,7 +944,7 @@ public class ProjectBuildFromXml
 	{
 		if (currTimers == null)
 		{
-			throwException("Timers section is missing");
+			throwException("timers section is missing");
 		}
 
 		String name = attributes.getValue("name");
@@ -970,7 +979,7 @@ public class ProjectBuildFromXml
 
 		if (currTimers.hasTimer(name))
 		{
-			throwException("Multiple timers of " + name);
+			throwException("multiple timers of " + name);
 		}
 
 		EventTimer currTimer = new EventTimer(name, startEvent, timeoutEvent, delay);
@@ -983,7 +992,7 @@ public class ProjectBuildFromXml
 	{
 		if (currAction == null)
 		{
-			throwException("Action section is missing");
+			throwException("action section is missing");
 		}
 
 		String command = attributes.getValue("command");
@@ -1012,7 +1021,7 @@ public class ProjectBuildFromXml
 	{
 		if (currControl == null)
 		{
-			throwException("Control section is missing");
+			throwException("control section is missing");
 		}
 
 		String condition = attributes.getValue("condition");
@@ -1041,7 +1050,7 @@ public class ProjectBuildFromXml
 	{
 		if (currProject == null)
 		{
-			throwException("Project section is missing");
+			throwException("project section is missing");
 		}
 
 		String path = attributes.getValue("path");
@@ -1107,7 +1116,7 @@ public class ProjectBuildFromXml
 	{
 		if (currProject == null)
 		{
-			throwException("Project section is missing");
+			throwException("project section is missing");
 		}
 
 		String path = attributes.getValue("path");
@@ -1165,7 +1174,4 @@ public class ProjectBuildFromXml
 
 		currProject.setUserInterfaceURL(url);
 	}
-
-
-
 }

@@ -570,7 +570,9 @@ class GeneralPanel
 	extends JPanel
 {
 	private PreferencesDialog theDialog = null;
+	private JTextField nbrOfExecuters = null;
 	private JTextField stateSeparator = null;
+	private JCheckBox verboseMode = null;
 
 	public GeneralPanel(PreferencesDialog theDialog)
 	{
@@ -579,22 +581,44 @@ class GeneralPanel
 		Box propertiesBox = new Box(BoxLayout.Y_AXIS);
 		add(propertiesBox, BorderLayout.CENTER);
 
+		JLabel nbrOfExecutersLabel = new JLabel("Nbr of threads");
+		propertiesBox.add(nbrOfExecutersLabel);
+		nbrOfExecuters = new JTextField();
+		nbrOfExecuters.setToolTipText("The number of threads that can run in parallel " + 
+									  "(not fully implemented)");
+		propertiesBox.add(nbrOfExecuters);
+
 		JLabel stateSeparatorLabel = new JLabel("State separator");
 		propertiesBox.add(stateSeparatorLabel);
 		stateSeparator = new JTextField();
+		stateSeparator.setToolTipText("The symbol that separate state names for example " + 
+									  "after synchronization");
 		propertiesBox.add(stateSeparator);
+
+		verboseMode = new JCheckBox("Verbose mode");
+		verboseMode.setToolTipText("Display otherwise hidden comments and warnings in the log window");
+		propertiesBox.add(verboseMode);
 	}
 
 	public boolean doApply()
 	{
+		int nbrOfThreads = PreferencesDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
+		if (nbrOfThreads == Integer.MIN_VALUE) // What's this good for??
+		{
+			return false;
+		}
+		SupremicaProperties.setSyncNbrOfExecuters(nbrOfThreads);
 		SupremicaProperties.setStateSeparator(stateSeparator.getText());
+		SupremicaProperties.setVerboseMode(verboseMode.isSelected());
 
 		return true;
 	}
 
 	public void update()
 	{
+		nbrOfExecuters.setText(Integer.toString(SupremicaProperties.syncNbrOfExecuters()));
 		stateSeparator.setText(SupremicaProperties.getStateSeparator());
+		verboseMode.setSelected(SupremicaProperties.verboseMode());
 	}
 }
 
@@ -605,9 +629,9 @@ class SynchronizationPropertiesPanel
 	private JCheckBox forbidUncontrollableStates = null;
 	private JCheckBox expandForbiddenStates = null;
 	private JCheckBox expandHashtable = null;
-	private JCheckBox verboseMode = null;
+	//private JCheckBox verboseMode = null;
 	private JTextField hashtableSize = null;
-	private JTextField nbrOfExecuters = null;
+	//private JTextField nbrOfExecuters = null;
 
 	public SynchronizationPropertiesPanel(PreferencesDialog theDialog)
 	{
@@ -617,26 +641,38 @@ class SynchronizationPropertiesPanel
 		add(propertiesBox, BorderLayout.CENTER);
 
 		forbidUncontrollableStates = new JCheckBox("Forbid uncontrollable states");
+		forbidUncontrollableStates.setToolTipText("If cheched, uncontrollable states are marked as " + 
+												  "forbidden during synchronization");
 		propertiesBox.add(forbidUncontrollableStates);
 
 		expandForbiddenStates = new JCheckBox("Expand forbidden states");
+		expandForbiddenStates.setToolTipText("If this option is checked, forbidden states are expanded " + 
+											 "during synchronization, otherwise they are considered " + 
+											 "terminal");
 		propertiesBox.add(expandForbiddenStates);
 
 		expandHashtable = new JCheckBox("Expand hashtable");
+		expandHashtable.setToolTipText("If checked, the hashtable is expanded when it becomes full, " + 
+									   "for faster lookup but at a one-time cost for expanding the table");
 		propertiesBox.add(expandHashtable);
 
+		/* Moved to generalPanel
 		verboseMode = new JCheckBox("Verbose mode");
 		propertiesBox.add(verboseMode);
+		*/
 
 		JLabel hashtableSizeLabel = new JLabel("Initial size of the hashtable");
 		propertiesBox.add(hashtableSizeLabel);
 		hashtableSize = new JTextField();
+		hashtableSize.setToolTipText("The initial state of the hashtable, preferrably a large prime");
 		propertiesBox.add(hashtableSize);
 
+		/* Moved to generalPanel
 		JLabel nbrOfExecutersLabel = new JLabel("Nbr of threads");
 		propertiesBox.add(nbrOfExecutersLabel);
 		nbrOfExecuters = new JTextField();
 		propertiesBox.add(nbrOfExecuters);
+		*/
 	}
 
 	public boolean doApply()
@@ -644,7 +680,7 @@ class SynchronizationPropertiesPanel
 		SupremicaProperties.setSyncForbidUncontrollableStates(forbidUncontrollableStates.isSelected());
 		SupremicaProperties.setSyncExpandForbiddenStates(expandForbiddenStates.isSelected());
 		SupremicaProperties.setSyncExpandHashtable(expandHashtable.isSelected());
-		SupremicaProperties.setVerboseMode(verboseMode.isSelected());
+		//SupremicaProperties.setVerboseMode(verboseMode.isSelected());
 
 		int size = PreferencesDialog.getInt("Hashtable size", hashtableSize.getText(), 100);
 		if (size == Integer.MIN_VALUE)
@@ -652,13 +688,15 @@ class SynchronizationPropertiesPanel
 			return false;
 		}
 		SupremicaProperties.setSyncInitialHashtableSize(size);
-
+		
+		/*
 		int nbrOfThreads = PreferencesDialog.getInt("Nbr of threads", nbrOfExecuters.getText(), 1);
 		if (nbrOfThreads == Integer.MIN_VALUE)
 		{
 			return false;
 		}
 		SupremicaProperties.setSyncNbrOfExecuters(nbrOfThreads);
+		*/
 
 		return true;
 	}
@@ -668,9 +706,9 @@ class SynchronizationPropertiesPanel
 		forbidUncontrollableStates.setSelected(SupremicaProperties.syncForbidUncontrollableStates());
 		expandForbiddenStates.setSelected(SupremicaProperties.syncExpandForbiddenStates());
 		expandHashtable.setSelected(SupremicaProperties.syncExpandHashtable());
-		verboseMode.setSelected(SupremicaProperties.verboseMode());
+		//verboseMode.setSelected(SupremicaProperties.verboseMode());
 		hashtableSize.setText(Integer.toString(SupremicaProperties.syncInitialHashtableSize()));
-		nbrOfExecuters.setText(Integer.toString(SupremicaProperties.syncNbrOfExecuters()));
+		//nbrOfExecuters.setText(Integer.toString(SupremicaProperties.syncNbrOfExecuters()));
 	}
 }
 
@@ -688,7 +726,9 @@ class PreferencesControllerPanel
 		Box buttonBox = new Box(BoxLayout.X_AXIS);
 
 		applyButton = new JButton("Apply");
+		applyButton.setToolTipText("Saves the preferences and closes this dialog");
 		cancelButton = new JButton("Cancel");
+		cancelButton.setToolTipText("Cancel the dislog without saving the preferences");
 
 		add(applyButton, BorderLayout.CENTER);
 		add(cancelButton, BorderLayout.CENTER);

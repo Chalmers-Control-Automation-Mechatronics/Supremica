@@ -122,7 +122,6 @@ class SynchButton
 		SynchronizationOptions synch_ops = new SynchronizationOptions(SynchronizationType.Full,    // full synch
 			false,    // do *not* forbid uc-states
 			true,    // expand forbidden states (may be explicit ones)
-			false,    // do not terminate if one uc-state found
 			false,    // expandEventsUsingPriority??
 			true,    // build entire automaton
 			false,    // no verbose mode
@@ -192,7 +191,6 @@ class CompareButton
 			SynchronizationOptions synch_ops = new SynchronizationOptions(SynchronizationType.Full,    // full synch
 				true,    // *do* forbid uc-states
 				true,    // expand forbidden states (may be explicit ones)
-				false,    // do not terminate if one uc-state found
 				false,    // expandEventsUsingPriority??
 				true,    // build entire automaton
 				false,    // no verbose mode
@@ -225,7 +223,6 @@ class CompareButton
 			SynchronizationOptions synch_ops = new SynchronizationOptions(SynchronizationType.Full,    // full synch
 				true,    // *do* forbid uc-states
 				true,    // expand forbidden states (may be explicit ones)
-				false,    // do not terminate if one uc-state found
 				false,    // expandEventsUsingPriority??
 
 			// false,       // do *not* build entire automaton

@@ -68,7 +68,7 @@ class DefaultExpander
 			/* debug */
 		}
 
-		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, SupremicaProperties.verboseMode(), false, true, false);
+		SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, SupremicaProperties.verboseMode(), false, true, false);
 		AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(system, syncOptions);
 
 		//this.onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
