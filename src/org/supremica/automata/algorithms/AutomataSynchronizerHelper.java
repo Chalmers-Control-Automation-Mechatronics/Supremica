@@ -465,8 +465,12 @@ public final class AutomataSynchronizerHelper
 
 	public void setDeadlocked(int[] state, boolean deadlocked)
 	{
-		logger.debug("Deadlocked state:\n" + AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
-		logger.debug(displayTrace(state));
+		if (logger.isDebugEnabled())
+		{
+			logger.debug("Deadlocked state:\n" + AutomataIndexFormHelper.dumpVerboseState(state, theAutomataIndexForm));
+			logger.debug(displayTrace(state));
+		}
+
 		int currStatus = state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END];
 
 		if (deadlocked)
@@ -612,7 +616,7 @@ public final class AutomataSynchronizerHelper
 	}
 
 	/**
-	 * Displats the event-trace leading to the uncontrollable state.
+	 * Displays the event-trace leading to the uncontrollable state.
 	 *
 	 *@exception  Exception Description of the Exception
 	 */
@@ -625,14 +629,13 @@ public final class AutomataSynchronizerHelper
 		clear();
 
 		AutomataOnlineSynchronizer executer = new AutomataOnlineSynchronizer(this);
-
 		executer.initialize();
 
-		// This version does not remove shortcuts, add this later
+		// This version does not remove shortcuts, add this later. FIXA!
 		StringBuffer trace = new StringBuffer();
 		int[] prevState = null;
 
-		for (Iterator traceIt = stateTrace.iterator(); traceIt.hasNext(); )
+		for (Iterator traceIt = stateTrace.iterator(); traceIt.hasNext();)
 		{
 			int[] nextState = (int[]) traceIt.next();
 
@@ -648,7 +651,6 @@ public final class AutomataSynchronizerHelper
 		}
 
 		logger.info("The trace leading to the uncontrollable state is:" + trace.toString() + ".");
-
 	}
 
 /*

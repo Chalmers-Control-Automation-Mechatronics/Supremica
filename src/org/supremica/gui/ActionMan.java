@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -1189,17 +1188,17 @@ public class ActionMan
 			try
 			{
 				syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(),
-														SynchronizationType.Prioritized,
-														SupremicaProperties.syncInitialHashtableSize(),
-														SupremicaProperties.syncExpandHashtable(),
-														true,
-														SupremicaProperties.syncExpandForbiddenStates(),
-														false,
-														false,
-														true,
-														SupremicaProperties.verboseMode(),
-														true,
-														true);
+														 SynchronizationType.Prioritized,
+														 SupremicaProperties.syncInitialHashtableSize(),
+														 SupremicaProperties.syncExpandHashtable(),
+														 true, // This is the only difference from default!
+														 SupremicaProperties.syncExpandForbiddenStates(),
+														 false,
+														 false,
+														 true,
+														 SupremicaProperties.verboseMode(),
+														 true,
+														 true);
 			}
 			catch (Exception ex)
 			{
@@ -1311,6 +1310,17 @@ public class ActionMan
 	// Threaded version
 	public static void automataVerify_actionPerformed(Gui gui)
 	{
+		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
+
+		/* This is tested in AutomataVerificationWorker (via AutomataVerifier.validOptions()).
+		   if (selectedAutomata.size() < 1)  // This can't happen.
+		   {
+		       JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+		   
+		       return;
+		   }
+		*/
+
 		VerificationOptions verificationOptions = new VerificationOptions();
 		VerificationDialog verificationDialog = new VerificationDialog(gui.getFrame(), verificationOptions);
 
@@ -1318,15 +1328,6 @@ public class ActionMan
 
 		if (!verificationOptions.getDialogOK())
 		{
-			return;
-		}
-
-		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
-
-		if (selectedAutomata.size() < 1)
-		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
 			return;
 		}
 
@@ -1353,7 +1354,18 @@ public class ActionMan
 
 		try
 		{
-			syncOptions = new SynchronizationOptions();
+			syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), 
+													 SynchronizationType.Prioritized,
+													 SupremicaProperties.syncInitialHashtableSize(),
+													 SupremicaProperties.syncExpandHashtable(),
+													 SupremicaProperties.syncForbidUncontrollableStates(), 
+													 SupremicaProperties.syncExpandForbiddenStates(), 
+													 false,
+													 false,
+													 false, // This is the only difference from default!
+													 SupremicaProperties.verboseMode(), 
+													 true,
+													 true);
 		}
 		catch (Exception ex)
 		{

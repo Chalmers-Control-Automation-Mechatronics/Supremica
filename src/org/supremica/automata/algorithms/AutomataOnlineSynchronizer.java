@@ -449,10 +449,10 @@ public final class AutomataOnlineSynchronizer
 	}
 
 	/**
-	 * Searches for transtition in automata.
+	 * Searches for transition in automata.
 	 *
 	 *@param  fromState the state from which we want to know if there is a transition
-	 *@param  toState the state t0 which we want to know if there is a transition
+	 *@param  toState the state to which we want to know if there is a transition
 	 *@return  index of one (there may be more) transition between fromState and toState or -1 if none exists.
 	 */
 	public int findTransition(int[] fromState, int[] toState)
@@ -470,7 +470,6 @@ public final class AutomataOnlineSynchronizer
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
 		{
-
 			// Generate an array that contains the indicies of each state
 			System.arraycopy(fromState, 0, nextState, 0, fromState.length);
 
@@ -501,7 +500,6 @@ public final class AutomataOnlineSynchronizer
 	// Compares int arrays, except for the last elements (the status field)
 	private static boolean equalsIntArray(int[] firstArray, int[] secondArray)
 	{
-
 		// Assume that the last element is a status field
 		for (int i = 0; i < (firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA); i++)
 		{
@@ -510,7 +508,7 @@ public final class AutomataOnlineSynchronizer
 				return false;
 			}
 		}
-
+		
 		return true;
 	}
 	

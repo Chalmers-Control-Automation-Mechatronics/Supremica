@@ -441,7 +441,6 @@ public class Automata
 		return thisAutomaton == otherAutomaton;
 	}
 
-
 	/**
 	 * Set the synchronization indicies. The returned alphabet is the union alphabet
 	 * and contains the synchronization index of all the events in this automata.

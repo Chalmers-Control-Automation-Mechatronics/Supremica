@@ -585,7 +585,7 @@ public final class AutomataSynchronizerExecuter
 
 			enabledEvents(currState);
 
-			if (currEnabledEvents[0] == Integer.MAX_VALUE)
+			if (syncOptions.buildAutomaton() && currEnabledEvents[0] == Integer.MAX_VALUE)
 			{
 				helper.setDeadlocked(currState, true);
 			}
@@ -639,7 +639,7 @@ public final class AutomataSynchronizerExecuter
 							nextState[currAutomatonIndex] = currSingleNextState;
 						}
 					}
-
+					
 					// Add this state to the automaton
 					// and include it in the queue of states waiting for
 					// processing if it has not been processed before

@@ -98,7 +98,7 @@ public final class IntArrayHashTable
 
 	// Try to add theArray to the table.
 	// If there already exists an entry with the
-	// first theArray.length-1 first equals then return
+	// first theArray.length-2 first equals then return
 	// that entry. Otherwise add theArray
 	// and return null.
 	public int[] add(int[] theArray)
@@ -282,7 +282,7 @@ public final class IntArrayHashTable
 	}
 
 	private static int hashCodeIntArray(int[] theArray)
-	{    // Assume that the last element is a status field
+	{    // The two last elements are special!
 		int hashCode = 1;
 
 		for (int i = 0; i < theArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
@@ -294,7 +294,7 @@ public final class IntArrayHashTable
 	}
 
 	public static boolean equalsIntArray(int[] firstArray, int[] secondArray)
-	{    // Assume that the last element is a status field
+	{    // The two last elements are not to be compared!
 		for (int i = 0; i < firstArray.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; i++)
 		{
 			if (firstArray[i] != secondArray[i])

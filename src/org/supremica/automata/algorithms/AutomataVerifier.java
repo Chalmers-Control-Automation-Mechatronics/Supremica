@@ -135,10 +135,9 @@ public class AutomataVerifier
 		// Allocate the synchronizationExecuters
 		// synchronizationExecuters = new ArrayList(nbrOfExecuters);
 
-		// Build the initial state
+		// Build the initial state  (including 2 status fields)
 		initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
-		// + 1 status field
 		Iterator autIt = theAutomata.iterator();
 
 		while (autIt.hasNext())
@@ -323,7 +322,6 @@ public class AutomataVerifier
 						if (uncontrollableEventToPlantMap.get(currEvent) != null)
 						{
 							plantIterator = ((Set) uncontrollableEventToPlantMap.get(currEvent)).iterator();
-
 							while (plantIterator.hasNext())
 							{
 								currPlantAutomaton = (Automaton) plantIterator.next();
@@ -354,7 +352,7 @@ public class AutomataVerifier
 										}
 										break loop;
 									}
-
+									
 									// Clean selectedAutomata
 									while (selectedAutomata.size() > 1)
 									{
@@ -983,8 +981,7 @@ public class AutomataVerifier
 			uncontrollabilityCheckHelper = new AutomataSynchronizerHelper(synchHelper);
 
 			if (verboseMode)
-			{
-				// It's important that setRememberTrace occurs before addState!
+			{	// It's important that setRememberTrace occurs before addState!
 				uncontrollabilityCheckHelper.setRememberTrace(true);
 			}
 			uncontrollabilityCheckHelper.addState(initialState);
@@ -1119,7 +1116,6 @@ public class AutomataVerifier
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 
@@ -1127,13 +1123,11 @@ public class AutomataVerifier
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
 
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
-
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 		Automaton theAutomaton;
 
@@ -1374,11 +1368,9 @@ public class AutomataVerifier
 		{
 			currAutomata.addAutomaton((Automaton) selectedAutomata.remove(0));			
 		}
-		
-		// Build the initial state
-		int[] currInitialState = AutomataIndexFormHelper.createState(currAutomata.size());
 
-		// + 1 status field
+		// Build the initial state  (including 2 status fields)
+		int[] currInitialState = AutomataIndexFormHelper.createState(currAutomata.size());
 		Iterator autIt = currAutomata.iterator();
 		State localInitialState;
 		Automaton currAutomaton;
@@ -1415,7 +1407,6 @@ public class AutomataVerifier
 		for (int i = 0; i < nbrOfExecuters; i++)
 		{
 			AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
-			
 			synchronizationExecuters.add(currSynchronizationExecuter);
 		}
 		
@@ -1424,13 +1415,11 @@ public class AutomataVerifier
 		for (int i = 0; i < synchronizationExecuters.size(); i++)
 		{
 			AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(i);
-			
 			currExec.selectAllAutomata();
 			currExec.start();
 		}
 		
 		((AutomataSynchronizerExecuter) synchronizationExecuters.get(0)).join();
-		
 		AutomataSynchronizerExecuter currExec = (AutomataSynchronizerExecuter) synchronizationExecuters.get(0);
 		
 		// Build automaton
