@@ -76,7 +76,7 @@ public class LogDisplay
 	private JScrollPane theTextPaneScrollPane;
 	private JTextPane textpane;
 	private StyledDocument doc;
-	private LoggerPopupMenu popup = new LoggerPopupMenu();
+	private LoggerPopupMenu popup = new LoggerPopupMenu(LoggerFactory.getLoggerFilter());
 
 	// private TracerPrintWriter tp;
 	private StringWriter sw;
@@ -153,6 +153,7 @@ public class LogDisplay
 		if (theLogDisplay == null)
 		{
 			theLogDisplay = new LogDisplay();
+			theLogDisplay.addFilter(LoggerFactory.getLoggerFilter());
 		}
 
 		return theLogDisplay;
@@ -424,6 +425,14 @@ public class LogDisplay
 	class LoggerPopupMenu
 		extends JPopupMenu
 	{
+		private LoggerFilter filter = null;
+
+		private JCheckBoxMenuItem fatalItem = null;
+		private JCheckBoxMenuItem errorItem = null;
+		private JCheckBoxMenuItem debugItem = null;
+		private JCheckBoxMenuItem warnItem = null;
+		private JCheckBoxMenuItem infoItem = null;
+
 		// except for access, these are copied straight from gui.Supremica
 		private void initPopups()
 		{
@@ -459,11 +468,124 @@ public class LogDisplay
 			});
 			add(clearItem);
 
+			addSeparator();
+
+			JMenu logProperties = new JMenu("Log Properties");
+			add(logProperties);
+
+			// FATAL, ERROR, WARN, INFO and DEBUG.
+
+			fatalItem = new JCheckBoxMenuItem("Log Fatal");
+			fatalItem.setSelected(filter.allowFatal());
+			fatalItem.addItemListener(new ItemListener()
+			{
+				public void itemStateChanged(ItemEvent e)
+				{
+					setAllowFatal(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+				}
+			});
+			logProperties.add(fatalItem);
+
+			errorItem = new JCheckBoxMenuItem("Log Error");
+			errorItem.setSelected(filter.allowError());
+			errorItem.addItemListener(new ItemListener()
+			{
+				public void itemStateChanged(ItemEvent e)
+				{
+					setAllowError(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+				}
+			});
+			logProperties.add(errorItem);
+
+			warnItem = new JCheckBoxMenuItem("Log Warning");
+			warnItem.setSelected(filter.allowWarn());
+			warnItem.addItemListener(new ItemListener()
+			{
+				public void itemStateChanged(ItemEvent e)
+				{
+					setAllowWarn(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+				}
+			});
+			logProperties.add(warnItem);
+
+			infoItem = new JCheckBoxMenuItem("Log Info");
+			infoItem.setSelected(filter.allowInfo());
+			infoItem.addItemListener(new ItemListener()
+			{
+				public void itemStateChanged(ItemEvent e)
+				{
+					setAllowInfo(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+				}
+			});
+			logProperties.add(infoItem);
+
+			debugItem = new JCheckBoxMenuItem("Log Debug");
+			debugItem.setSelected(filter.allowDebug());
+			debugItem.addItemListener(new ItemListener()
+			{
+				public void itemStateChanged(ItemEvent e)
+				{
+					setAllowDebug(e.getStateChange() == ItemEvent.SELECTED ? true : false);
+				}
+			});
+			logProperties.add(debugItem);
+
 		}
 
-		public LoggerPopupMenu()
+		public LoggerPopupMenu(LoggerFilter filter)
 		{
+			this.filter = filter;
 			initPopups();
+		}
+
+		public boolean allowInfo()
+		{
+			return filter.allowInfo();
+		}
+
+		public void setAllowInfo(boolean allow)
+		{
+			filter.setAllowInfo(allow);
+		}
+
+		public boolean allowDebug()
+		{
+			return filter.allowDebug();
+		}
+
+		public void setAllowDebug(boolean allow)
+		{
+			filter.setAllowDebug(allow);
+		}
+
+		public boolean allowWarn()
+		{
+			return filter.allowWarn();
+		}
+
+		public void setAllowWarn(boolean allow)
+		{
+			filter.setAllowWarn(allow);
+		}
+
+		public boolean allowError()
+		{
+			return filter.allowError();
+		}
+
+		public void setAllowError(boolean allow)
+		{
+			filter.setAllowError(allow);
+		}
+
+		public boolean allowFatal()
+		{
+			return filter.allowFatal();
+		}
+
+		public void setAllowFatal(boolean allow)
+		{
+			filter.setAllowFatal(allow);
 		}
 	}
 }

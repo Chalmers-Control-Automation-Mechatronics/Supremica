@@ -254,7 +254,7 @@ class FindStatesTable
 						setRowSelectionInterval(row, row);
 					}
 
-					// 
+					//
 					if (getStatesTableModel().isRegexpColumn(col))
 					{
 						RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row, col);
@@ -484,7 +484,7 @@ class FindStatesFrame
 	private Automata automata = null;
 	private JTabbedPane tabbedPane = null;
 	private JButton find_button = null;
-	private QuitButton quit_button = null;
+	private CancelButton quit_button = null;
 	private static Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
 
 	private static void debug(String s)
@@ -549,12 +549,12 @@ class FindStatesFrame
 		}
 	}
 
-	class QuitButton
+	class CancelButton
 		extends JButton
 	{
-		public QuitButton()
+		public CancelButton()
 		{
-			super("Quit");
+			super("Cancel");
 
 			setToolTipText("Enough of finding states");
 			addActionListener(new ActionListener()
@@ -569,7 +569,7 @@ class FindStatesFrame
 		void action(ActionEvent e)
 		{
 
-			// debug("QuitButton disposing");
+			// debug("CancelButton disposing");
 			dispose();
 		}
 	}
@@ -580,7 +580,7 @@ class FindStatesFrame
 		// synchronize the automata but don't build the new automaton (throw away the edges)
 		// just save the states (efficiently) and mark those that match as matching
 		// ** TODO ** Disable the Find button, enable the Break button, start a new thread for searching
-		// ** TODO ** If the Quit or Break buttons are pressed, break the search thread
+		// ** TODO ** If the Cancel or Break buttons are pressed, break the search thread
 		try
 		{
 
@@ -638,7 +638,7 @@ class FindStatesFrame
 		JPanel buttonPanel = new JPanel();
 
 		buttonPanel.add(find_button = setDefaultButton(new FindButton()));
-		buttonPanel.add(quit_button = new QuitButton());
+		buttonPanel.add(quit_button = new CancelButton());
 
 		Container contentPane = getContentPane();
 

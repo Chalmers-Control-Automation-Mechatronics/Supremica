@@ -51,56 +51,123 @@ package org.supremica.log;
 
 import java.lang.*;
 import org.apache.log4j.*;
+import org.apache.log4j.spi.*;
 import org.supremica.properties.*;
 
-public class LoggerFactory
+public class LoggerFilter
+	extends Filter
+
 {
-	private static LoggerFilter filter = new LoggerFilter();
-	private static boolean logToGui = SupremicaProperties.logToGUI();
-	private static boolean logToConsole = SupremicaProperties.logToConsole();
-	private static final PatternLayout layout = new PatternLayout("%-5p %m%n");
-	private static ConsoleAppender consoleAppender = null;
+	private boolean allowInfos = true;
+	private boolean allowWarns = true;
+	private boolean allowDebugs = false;
+	private boolean allowFatals = true;
+	private boolean allowErrors = true;
 
-	private LoggerFactory() {}
+	public LoggerFilter() {}
 
-	public static LoggerFilter getLoggerFilter()
-	{
-		return filter;
+	public void setOption(String option, String value)
+	{ // Not implemented
 	}
 
-	public synchronized static Logger createLogger(Class theClass)
+	public String[] getOptionStrings()
 	{
-		return createLogger(theClass.getName());
+		return new String[0];
 	}
 
-	public synchronized static Logger createLogger(String name)
+	public int decide(LoggingEvent event)
 	{
-		Category thisCategory = Category.getInstance(name);
-
-		if (logToConsole)
+		Priority prio = event.priority;
+		if (prio == Priority.DEBUG)
 		{
-			if (consoleAppender == null)
+			if (allowDebugs)
 			{
-				consoleAppender = new ConsoleAppender(layout);
-				consoleAppender.addFilter(filter);
+				return Filter.ACCEPT;
 			}
-
-			thisCategory.addAppender(consoleAppender);
+			return Filter.DENY;
 		}
-
-		if (logToGui)
+		if (prio == Priority.INFO)
 		{
-			thisCategory.addAppender(LogDisplay.getInstance());
+			if (allowInfos)
+			{
+				return Filter.ACCEPT;
+			}
+			return Filter.DENY;
 		}
-
-		SupremicaCategory supremicaCategory = new SupremicaCategory(thisCategory);
-
-		return supremicaCategory;
+		if (prio == Priority.WARN)
+		{
+			if (allowWarns)
+			{
+				return Filter.ACCEPT;
+			}
+			return Filter.DENY;
+		}
+		if (prio == Priority.ERROR)
+		{
+			if (allowErrors)
+			{
+				return Filter.ACCEPT;
+			}
+			return Filter.DENY;
+		}
+		if (prio == Priority.FATAL)
+		{
+			if (allowFatals)
+			{
+				return Filter.ACCEPT;
+			}
+			return Filter.DENY;
+		}
+		return Filter.NEUTRAL;
 	}
 
-	public synchronized static void updateLoggers()
+	public boolean allowInfo()
 	{
-		logToGui = SupremicaProperties.logToGUI();
-		logToConsole = SupremicaProperties.logToConsole();
+		return allowInfos;
+	}
+
+	public void setAllowInfo(boolean allow)
+	{
+		this.allowInfos = allow;
+	}
+
+	public boolean allowDebug()
+	{
+		return allowDebugs;
+	}
+
+	public void setAllowDebug(boolean allow)
+	{
+		this.allowDebugs = allow;
+	}
+
+	public boolean allowWarn()
+	{
+		return allowWarns;
+	}
+
+	public void setAllowWarn(boolean allow)
+	{
+		this.allowWarns = allow;
+	}
+
+	public boolean allowError()
+	{
+		return allowErrors;
+	}
+
+	public void setAllowError(boolean allow)
+	{
+		this.allowErrors = allow;
+	}
+
+	public boolean allowFatal()
+	{
+		return allowFatals;
+	}
+
+	public void setAllowFatal(boolean allow)
+	{
+		this.allowFatals = allow;
 	}
 }
