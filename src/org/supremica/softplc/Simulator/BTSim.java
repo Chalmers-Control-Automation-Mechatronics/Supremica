@@ -37,15 +37,6 @@ public class BTSim
     public synchronized void setSignalArray(boolean[] values)
 	throws Exception
     {
-	/*boolean[] temp = new boolean[values.length];
-	temp = values;
-	for (int i=8;i<15;i++)
-	{
-	    values[i] = false;
-	    values[i+2] = temp[i];
-	    }*/
-	
-	// när skall vi ge exception???
 	System.arraycopy(values, 0, inSignals, 0, inSignals.length);
     }
     
@@ -55,20 +46,6 @@ public class BTSim
     public void getSignalArray(boolean[] values)
 	throws Exception
     {
-	/*boolean[] temp = new boolean[values.length];
-	temp = values;
-	for (int i=8;i<15;i++)
-	{
-	    values[i] = false;
-	    values[i+2] = temp[i];
-	}
-	for (int j=18;j<24;j++)
-	{
-	    values[j] = false;
-	    values[j+2] = temp[j];
-	    }*/
-
-	// när skall vi ge exception???
 	System.arraycopy(outSignals, 0, values, 0, outSignals.length);
     }
     
@@ -81,19 +58,6 @@ public class BTSim
      */
     public synchronized void setOutSignals(boolean[] values)
     {
-	/*boolean[] temp = new boolean[values.length];
-	temp = values;
-	for (int i=8;i<15;i++)
-	{
-	values[i] = false;
-	values[i+2] = temp[i];
-	}
-	for (int j=18;j<25;j++)
-	{
-	values[j] = false;
-	values[j+2] = temp[j];
-	}*/
-
 	System.arraycopy(values, 0, outSignals, 0, outSignals.length);
     }
     
@@ -127,8 +91,8 @@ public class BTSim
     public String[] getInputDescriptions()
     {
 	String[] temp = new String[nrOfSignalsIn];
-	
-	temp[0] = new String("0 - KulaPortvakt"); //Names the signals in use
+	//Define the names for the signal being used
+	temp[0] = new String("0 - KulaPortvakt");
 	temp[1] = new String("1 - MätlyftNere");
 	temp[2] = new String("2 - KulaMätlyft");
 	temp[3] = new String("3 - MätLyftUppe");
@@ -156,20 +120,19 @@ public class BTSim
 	temp[25] = new String("25 - Nödstopp");
 	temp[26] = new String("26 - LarmKvittering");
 	
-	for (int i = 27; i < nrOfSignalsOut; i++) //names the signals NOT in use
+	//There are some signals not being used
+	for (int i = 27; i < nrOfSignalsOut; i++)
 	    {
-		
-		temp[i] = new String("Not in Use");//(Integer.toString(i));
+		temp[i] = new String("Not in Use");
 	    }
-	
 		return temp;
     }
     
     public String[] getOutputDescriptions()
     {
 	String[] temp = new String[nrOfSignalsOut];
-
-	temp[0] = new String("0 - InPortvakt"); //Names the signals in use
+	//Define the names for the signals being used
+	temp[0] = new String("0 - InPortvakt");
 	temp[1] = new String("1 - UrPortvakt");
 	temp[2] = new String("2 - UppMätlyft");
 	temp[3] = new String("3 - UrMätning");
@@ -187,10 +150,11 @@ public class BTSim
 	temp[15] = new String("15 - VridArmHöger");
 	temp[16] = new String("16 - Sug");
 	temp[17] = new String("17 - TändLampa");
-	
-	for (int i = 18; i < nrOfSignalsOut; i++) //Nubmers the signals NOT in use
+
+	//There is some signals not being used	
+	for (int i = 18; i < nrOfSignalsOut; i++) 
 	    {
-		temp[i] = new String("Not in Use");//Integer.toString(i));
+		temp[i] = new String("Not in Use");
 	    }
 	return temp;
     }
