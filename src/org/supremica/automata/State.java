@@ -232,9 +232,6 @@ public class State
 		return name;
 	}
 
-	/**
-	 * This method should be used with care! If the name is changed, 
-	 */
 	public void setName(String name)
 	{
 		this.name = name;

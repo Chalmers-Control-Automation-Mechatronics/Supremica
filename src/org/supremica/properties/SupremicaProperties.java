@@ -271,7 +271,6 @@ public final class SupremicaProperties
 		setProperty(INCLUDE_SHOE_FACTORY, "false", true);
 		setProperty(INCLUDE_SOFTPLC, "false", true);
 		setProperty(INCLUDE_JGRAFCHART, "false", true);
-		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(INCLUDE_EXPERIMENTAL_ALGORITHMS, "false", true);
 		setProperty(INCLUDE_BOUNDED_UNCON_TOOLS, "false", true);
 		setProperty(VERBOSE_MODE, "false", true);

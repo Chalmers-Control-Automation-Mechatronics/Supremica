@@ -1330,7 +1330,7 @@ public class Automaton
 
 	/**
 	 * In some situation, for example in the dot output
-	 * not all state identities can be accepeted. For examepl
+	 * not all state identities can be accepeted. For example
 	 * dot does not handle dots in the statename.
 	 * This method resets all state identities to valid names
 	 */

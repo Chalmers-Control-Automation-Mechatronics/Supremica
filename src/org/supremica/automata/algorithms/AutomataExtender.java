@@ -152,7 +152,6 @@ public class AutomataExtender
 
 		// Create all states
 		Iterator states = orgAut.stateIterator();
-
 		while (states.hasNext())
 		{
 			State orgState = (State) states.next();
@@ -162,13 +161,13 @@ public class AutomataExtender
 			{
 				State newState = new State(orgState);
 
+				assert(false); // Fiddling with id is not recommended!
 				newState.setId(orgState.getId() + "_" + i);
 
 				StringBuffer labelExt = new StringBuffer("");
 
 				for (int j = 0; j < i; j++)
 				{
-
 					// labelExt.append("'");
 					labelExt.append("p");
 				}

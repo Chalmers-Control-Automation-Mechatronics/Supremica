@@ -82,19 +82,60 @@ class MainPopupMenu
 		JMenuItem synchronizeItem = new JMenuItem("Synchronize...");
 		synchronizeItem.setToolTipText("Calculate the synchronous composition of the selected automata");
 		menuHandler.add(synchronizeItem, 2);
+		synchronizeItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automataSynchronize_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
 
 		JMenuItem verifyItem = new JMenuItem("Verify...");
-		verifyItem.setToolTipText("Verify different properties");
+		verifyItem.setToolTipText("Verify properties");
 		menuHandler.add(verifyItem, 1);
+		verifyItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automataVerify_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
 
 		JMenuItem synthesizeItem = new SupremicaMenuItem(ActionMan.synthesizeAction);
+		synthesizeItem.setToolTipText("Synthesize supervisor");
 		menuHandler.add(synthesizeItem, 1);
+		/* Taken care of by SynthesizeAction -- all in one place y'know.
+		synthesizeItem.addActionListener(new ActionListener()
+		{
+				public void actionPerformed(ActionEvent e)
+				{
+						ActionMan.automataSynthesize_actionPerformed(getGui());
+						getGui().repaint();
+				}
+		});
+		*/
+
+		JMenuItem minimizeItem = new JMenuItem("Minimize...");
+		minimizeItem.setToolTipText("Minimize automata");
+		menuHandler.add(minimizeItem, 1);
+		minimizeItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automatonMinimize_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
+
 		menuHandler.addSeparator();
 
 		JMenuItem workbench = new SupremicaMenuItem(new WorkbenchAction());
 		menuHandler.add(workbench, 1);
 		// JMenuItem testbench = new SupremicaMenuItem(new TestBenchAction());
 		// menuHandler.add(testbench, 1);
+
 		menuHandler.addSeparator();
 
 		JMenuItem purgeItem = new JMenuItem("Purge");
@@ -106,9 +147,6 @@ class MainPopupMenu
 		// ** This has to be reworked ** Use the Action concept instead **
 		// JMenu standardalgos = JMenu("Standard Algorithms");
 		// menuHandler.add(standardalgos, 0);
-		JMenuItem minimizeItem = new JMenuItem("Minimize...");
-		minimizeItem.setToolTipText("Minimize automata");
-		menuHandler.add(minimizeItem, 1);
 
 		JMenuItem allAcceptingItem = new JMenuItem("Set all states as accepting");
 		allAcceptingItem.setToolTipText("Make all states accepting (marked)");
@@ -138,33 +176,25 @@ class MainPopupMenu
 						getGui().repaint();
 				}
 		});*/
-		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
 
-		//menuHandler.add(interfaceItem, 1);
+		/*
+		JMenuItem interfaceItem = new JMenuItem("Interface Properties...");
+		menuHandler.add(interfaceItem, 1);
 		menuHandler.addSeparator();
+		interfaceItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				ActionMan.automatonUpdateInterface_actionPerformed(getGui());
+				getGui().repaint();
+			}
+		});
+		*/
 
 		if (SupremicaProperties.includeBoundedUnconTools())
 		{
 			JMenuItem extendItem = new JMenuItem("Extend");
 			menuHandler.add(extendItem, 1);
-
-			JMenuItem liftingItem = new JMenuItem("Compute lifting automaton");
-			menuHandler.add(liftingItem, 1);
-
-			JMenuItem removePassItem = new JMenuItem("Remove pass events");
-			menuHandler.add(removePassItem, 1);
-
-			JMenuItem addSelfLoopArcsItem = new JMenuItem("Add self-loop arcs");
-			addSelfLoopArcsItem.setToolTipText("Add self loops so that each state has the whole alphabet elabled");
-			menuHandler.add(addSelfLoopArcsItem, 1);
-
-			JMenuItem removeSelfLoopArcsItem = new JMenuItem("Remove self-loop arcs");
-			removeSelfLoopArcsItem.setToolTipText("Remove all self-loops");
-			menuHandler.add(removeSelfLoopArcsItem, 1);
-
-			JMenuItem normalizeAlphabetItem = new JMenuItem("Normalize alphabet");
-			menuHandler.add(normalizeAlphabetItem, 1);
-			menuHandler.addSeparator();
 			extendItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -173,6 +203,9 @@ class MainPopupMenu
 					getGui().repaint();
 				}
 			});
+
+			JMenuItem liftingItem = new JMenuItem("Compute lifting automaton");
+			menuHandler.add(liftingItem, 1);
 			liftingItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -181,6 +214,9 @@ class MainPopupMenu
 					getGui().repaint();
 				}
 			});
+
+			JMenuItem removePassItem = new JMenuItem("Remove pass events");
+			menuHandler.add(removePassItem, 1);
 			removePassItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -189,6 +225,10 @@ class MainPopupMenu
 					getGui().repaint();
 				}
 			});
+
+			JMenuItem addSelfLoopArcsItem = new JMenuItem("Add self-loop arcs");
+			addSelfLoopArcsItem.setToolTipText("Add self loops so that each state has the whole alphabet elabled");
+			menuHandler.add(addSelfLoopArcsItem, 1);
 			addSelfLoopArcsItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -197,6 +237,10 @@ class MainPopupMenu
 					getGui().repaint();
 				}
 			});
+
+			JMenuItem removeSelfLoopArcsItem = new JMenuItem("Remove self-loop arcs");
+			removeSelfLoopArcsItem.setToolTipText("Remove all self-loops");
+			menuHandler.add(removeSelfLoopArcsItem, 1);
 			removeSelfLoopArcsItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -205,6 +249,10 @@ class MainPopupMenu
 					getGui().repaint();
 				}
 			});
+
+			JMenuItem normalizeAlphabetItem = new JMenuItem("Normalize alphabet");
+			menuHandler.add(normalizeAlphabetItem, 1);
+			menuHandler.addSeparator();
 			normalizeAlphabetItem.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -313,7 +361,7 @@ class MainPopupMenu
 			JMenuItem automatonSplit = new SupremicaMenuItem(new SplitAction());			
 			expMenu.add(automatonSplit);
 
-			// De följande två Schedule-knapparna borde bli till ett inom en viss (snar?) framtid
+			// De följande två Schedule-knapparna borde bli till en inom en viss (snar?) framtid
 			expMenu.addSeparator();
 
 			JMenuItem automataScheduler = new SupremicaMenuItem(new ScheduleAction());
@@ -430,33 +478,6 @@ class MainPopupMenu
 				getGui().repaint();
 			}
 		});
-		synchronizeItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.automataSynchronize_actionPerformed(getGui());
-				getGui().repaint();
-			}
-		});
-		verifyItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.automataVerify_actionPerformed(getGui());
-				getGui().repaint();
-			}
-		});
-
-		/* Taken care of by SynthesizeAction -- all in one place y'know.
-		synthesizeItem.addActionListener(new ActionListener()
-		{
-				public void actionPerformed(ActionEvent e)
-				{
-						ActionMan.automataSynthesize_actionPerformed(getGui());
-						getGui().repaint();
-				}
-		});
-		*/
 		purgeItem.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -478,22 +499,6 @@ class MainPopupMenu
 			public void actionPerformed(ActionEvent e)
 			{
 				ActionMan.automataComplement_actionPerformed(getGui());
-				getGui().repaint();
-			}
-		});
-		minimizeItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.automatonMinimize_actionPerformed(getGui());
-				getGui().repaint();
-			}
-		});
-		interfaceItem.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				ActionMan.automatonUpdateInterface_actionPerformed(getGui());
 				getGui().repaint();
 			}
 		});

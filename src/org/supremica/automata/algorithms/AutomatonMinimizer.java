@@ -1074,6 +1074,8 @@ public class AutomatonMinimizer
 
 				if ((!one.equals(two)) && arc.getEvent().isEpsilon())
 				{
+					assert(!arc.isSelfLoop()); // No epsilon self-loops!
+
 					// Is there at least one epsilon outgoing?
 					boolean ok = false;
 					for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
@@ -1165,7 +1167,9 @@ public class AutomatonMinimizer
 				// "Copy" outgoing arcs from one to the previous states.
 				for (ArcIterator inIt = one.incomingArcsIterator(); inIt.hasNext(); )
 				{
-					State fromState = inIt.nextArc().getFromState();
+					Arc inArc = inIt.nextArc();
+					assert(!(inArc.getEvent().isEpsilon() && inArc.isSelfLoop())); // No epsilon selfloops!
+					State fromState = inArc.getFromState();
 					
 					for (ArcIterator outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
 					{
@@ -1328,7 +1332,7 @@ public class AutomatonMinimizer
 			State state = (State) it.next();
 			if ((state.getCost() == State.MAX_COST))
 			{
-				// This state can not be acepting if the coreachability worked!
+				// This state can not be accepting if the coreachability worked!
 				assert(!state.isAccepting());
 
 				// We will never want to propagate from here...
@@ -1568,6 +1572,7 @@ public class AutomatonMinimizer
 				{
 					continue loop;
 				}
+				assert(!arc.isSelfLoop());
 				hasMarkedDecessor |= arc.getToState().isAccepting();
 			}
 
@@ -1592,7 +1597,7 @@ public class AutomatonMinimizer
 					// StateSet:s that the state is involved in would need to be rebuilt since the 
 					// hashCode of the state is changed... not gooooood...
 					//   On the other hand... maybe we shouldn't give the state a new name at all? 
-					// After all, we don't merge states, we just remove a state.
+					// After all, we don't merge states, we just remove a state?
 					if (!useShortNames && false)
 					{
 						State toState = outArc.getToState();

@@ -73,10 +73,8 @@ public class RemoveSelfArcs
 			while (arcIt.hasNext())
 			{
 				Arc currArc = (Arc) arcIt.next();
-				State fromState = currArc.getFromState();
-				State toState = currArc.getToState();
 
-				if (fromState == toState)
+				if (currArc.isSelfLoop())
 				{
 					currArc.clear();
 				}
