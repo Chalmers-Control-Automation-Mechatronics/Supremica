@@ -805,26 +805,40 @@ public class State
 	}
 
 	/**
-	 * Follow the event "theEvent" and return the set of states that may be reached.
+	 * Follow the event "theEvent" and return the set of states that may be reached. ()
 	 */
-	public StateSet nextStateSet(LabeledEvent theEvent)
+	public StateSet nextStates(LabeledEvent theEvent)
 	{
-		return nextStateSet(theEvent, false);
+		return nextStates(theEvent, false);
 	}
 
 	/**
 	 * Follow the event "theEvent" and return the set of states that may be reached. 
 	 * Optionally also consider the states reachable also after any number of
-	 * epsilon events before and/or after "theEvent".
+	 * epsilon events before and/or after "theEvent". 
+	 *
+	 * Note that at least "theEvent" MUST be executed. 
+	 *
+	 * This method should not be called for epsilon events normally (it may be sensible
+	 * in some special case but remember that there may be many epsilon events in the same 
+	 * automaton and that the epsilon closure considers all of them as the same but this 
+	 * method may treat them as unique!
+	 *
+	 * @param theEvent the event that must be executed.
+	 * @param considerEpsilonClosure if true, an arbitrary number of epsilon events may be
+	 * executed before and after theEvent, otherwise, only theEvent is executed.
 	 */
-	public StateSet nextStateSet(LabeledEvent theEvent, boolean considerEpsilonClosure)
+	public StateSet nextStates(LabeledEvent theEvent, boolean considerEpsilonClosure)
 	{
 		StateSet states = new StateSet();
-		
+
+		assert(!theEvent.isEpsilon());
+
+		// Do the stuff
 		ArcIterator outgoingArcsIt;
 		if (considerEpsilonClosure)
 		{
-			outgoingArcsIt = epsilonClosure().outgoingArcsIterator();
+			outgoingArcsIt = epsilonClosure(true).outgoingArcsIterator();
 		}
 		else
 		{
@@ -837,7 +851,7 @@ public class State
 			{
 				if (considerEpsilonClosure)
 				{
-					states.add(currArc.getToState().epsilonClosure());
+					states.add(currArc.getToState().epsilonClosure(true));
 				}
 				else
 				{
@@ -847,23 +861,36 @@ public class State
 		}
 
 		// If it's an epsilon event, this state has to be in the set!!!
+		/* // NO! At least one occurrence of "theEvent" is implied?
 		if (theEvent.isEpsilon())
 		{
 			states.add(this);
 		}
+		*/
 		
 		return states;
 	}
 
 	/**
-	 * Calculates and returns epsilon closure as a StateSet. The closure includes the 
-	 * state from which the closure is calculated.
+	 * Calculates and returns epsilon closure as a StateSet. Optionally, the closure does or does not
+	 * necessarily include the state from which the closure is calculated.
+	 *
+	 * @param includeSelf if true, this State itself is included even if no epsilon transitions
+	 * leads to it (a loop), if false, at least one epsilon transition must be executed and this State 
+	 * itself may not be in the returned set (if there is no loop).
+	 * @return the states that can be reached by executing at least one epsilon transition.
 	 */
-	public StateSet epsilonClosure()
+	public StateSet epsilonClosure(boolean includeSelf)
 	{
 		StateSet result = new StateSet();
-		result.add(this);
+		
+		// Include self?
+		if (includeSelf)
+		{
+			result.add(this);
+		}
 
+		// Examine states 
 		LinkedList statesToExamine = new LinkedList();
 		statesToExamine.add(this);
 		while (statesToExamine.size() != 0)
@@ -936,7 +963,7 @@ public class State
 		ArcIterator arcIt;
 		if (considerEpsilonClosure)
 		{
-			arcIt = epsilonClosure().outgoingArcsIterator();
+			arcIt = epsilonClosure(true).outgoingArcsIterator();
 		}
 		else
 		{
@@ -983,7 +1010,7 @@ public class State
 		ArcIterator arcIt;
 		if (considerEpsilonClosure)
 		{
-			arcIt = epsilonClosure().outgoingArcsIterator();
+			arcIt = epsilonClosure(true).outgoingArcsIterator();
 		}
 		else
 		{

@@ -162,6 +162,15 @@ public class StateSet
 		return theSet.remove(state);
 	}
 
+	public void remove(StateSet set)
+	{
+		modified();
+		for (StateIterator it = set.iterator(); it.hasNext(); )
+		{
+			theSet.remove(it.nextState());
+		}
+	}
+
 	/**
 	 * Removes and returns an arbitrary state from the set.
 	 */
@@ -243,7 +252,45 @@ public class StateSet
 	}
 
 	/**
-	 * @return an arbitrary, not yet iterated element. Note, assumes that at least one exists
+	 * Returns the set of states that can be reached from the current state set by transitions
+	 * associated with "event".
+	 * @param considerEpsilonClosure If true, the epsilon closure before and after "event" is also condidered,
+	 * if false, only one step along transitions with event "event" is considered.
+	 */
+	public StateSet nextStates(LabeledEvent event, boolean considerEpsilonClosure)
+	{
+		StateSet nextStates = new StateSet();
+
+		// Find nextStatesSet of each state
+		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
+		{
+			State state = stateIt.nextState();
+			nextStates.add(state.nextStates(event, considerEpsilonClosure));
+		}
+
+		return nextStates;
+	}
+
+	/**
+	 * Works just as epsilonClosure in State.
+	 * @see State
+	 */
+	public StateSet epsilonClosure(boolean includeSelf)
+	{
+		StateSet closure = new StateSet();
+
+		// Find closure of each state
+		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
+		{
+			State state = stateIt.nextState();
+			closure.add(state.epsilonClosure(includeSelf));
+		}
+
+		return closure;		
+	}
+
+	/**
+	 * @return an arbitrary, not yet iterated element. Note, assumes that at least one exists.
 	 */
 	public State get()
 	{

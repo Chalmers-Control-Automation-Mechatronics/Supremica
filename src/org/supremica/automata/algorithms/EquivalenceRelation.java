@@ -60,8 +60,8 @@ public class EquivalenceRelation
 		new EquivalenceRelation("Observation equivalence", true);
 	public static final EquivalenceRelation ConflictEquivalence = 
 		new EquivalenceRelation("Conflict equivalence", true);
-	public static final EquivalenceRelation ApEquivalence = 
-		new EquivalenceRelation("Apa", AutomatonMinimizer.debug);
+	public static final EquivalenceRelation ConflictEquivalenceMinimizationRules = 
+		new EquivalenceRelation("Conflict equivalence minimization rules", AutomatonMinimizer.debug);
 	public static final EquivalenceRelation FailureEquivalence = 
 		new EquivalenceRelation("Failure equivalence", false);
 	public static final EquivalenceRelation Undefined = 

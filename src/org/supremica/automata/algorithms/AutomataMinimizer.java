@@ -271,7 +271,7 @@ public class AutomataMinimizer
 			if (AutomatonMinimizer.debug)
 			{
 				logger.error("---------------------------------------------------------------------");
-				logger.fatal("Automaton: " + (nbrOfAutomata-1-theAutomata.size())*100/(nbrOfAutomata-1));
+				logger.fatal("Progress: " + (nbrOfAutomata-1-theAutomata.size())*100/(nbrOfAutomata-1) + "%");
 			}
 			
 			// Update execution dialog

@@ -583,7 +583,7 @@ class EventListModel
 		{
 			if (considerEpsilonClosure)
 			{
-				arcIt = currState.epsilonClosure().outgoingArcsIterator();
+				arcIt = currState.epsilonClosure(true).outgoingArcsIterator();
 			}
 			else
 			{
@@ -594,7 +594,7 @@ class EventListModel
 		{
 			if (considerEpsilonClosure)
 			{
-				arcIt = currState.epsilonClosure().incomingArcsIterator();
+				arcIt = currState.epsilonClosure(true).incomingArcsIterator();
 			}
 			else
 			{

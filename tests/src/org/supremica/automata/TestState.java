@@ -111,11 +111,12 @@ public class TestState
 			assertTrue(state.enabledEvents(true).size() == 3);
 
 			LabeledEvent tau = aut.getAlphabet().getEvent("tau");
-			assertTrue(state.nextStateSet(tau, false).size() == 3);
-			assertTrue(state.nextStateSet(tau, true).size() == 7);			
+			assertTrue(state.nextStates(tau, false).size() == 2);
+			assertTrue(state.nextStates(tau, true).size() == 7);			
 
 			aut.addArc(new Arc(to, from, tau));
-			assertTrue(state.epsilonClosure().size() == 7);
+			assertTrue(state.epsilonClosure(true).size() == 7);
+			assertTrue(state.epsilonClosure(false).size() == 7);
 			assertTrue(state.backwardsEpsilonClosure().size() == 9);
 		}
 		catch (Exception ex)
