@@ -542,19 +542,21 @@ public class Automaton
 		return alphabet.getEvent(new LabeledEvent(eventId));
 	}
 
+/*
 	public LabeledEvent getEvent(Arc theArc)
 		throws Exception
 	{
 		// return getEvent(theArc.getEventId());
 		return theArc.getEvent();
 	}
-
+*/
+/*
 	public String getLabel(Arc theArc)
 		throws Exception
 	{
-		LabeledEvent theEvent = getEvent(theArc);
-		return theEvent.getLabel();
+		return theArc.getEvent().getLabel();
 	}
+*/
 	/** Room for improvement - our problem domain deals with states and events, not ids and labels!
 	 * Use isInAlphabet instead
 	 * @deprecated
@@ -731,12 +733,22 @@ public class Automaton
 	 * These are only valid if the automatonType is interface.
 	 */
 	public Automata getMasterAutomata()
+		throws IllegalStateException
 	{
+		if (!isInterface())
+		{
+			throw new IllegalStateException("This Automaton is not an interface");
+		}
 		return masterAutomata;
 	}
 
 	public Automata getSlaveAutomata()
+		throws IllegalStateException
 	{
+		if (!isInterface())
+		{
+			throw new IllegalStateException("This Automaton is not an interface");
+		}
 		return slaveAutomata;
 	}
 
@@ -1357,7 +1369,7 @@ public class Automaton
 	class InternalStateIterator
 		extends StateIterator
 	{
-		private final Iterator arcIt;
+		private final ArcIterator arcIt;
 		private State currState = null;
 		private String eventLabel;
 		private boolean outgoing;
@@ -1393,17 +1405,8 @@ public class Automaton
 		{
 			while (arcIt.hasNext())
 			{
-				Arc currArc = (Arc)arcIt.next();
-				String currLabel = null;
-				try
-				{
-					currLabel = getLabel(currArc);
-				}
-				catch (Exception ex)
-				{
-					logger.error("Automaton::InternalStateIterator.findNext: Error in getLabel", ex);
-					logger.debug(ex.getStackTrace());
-				}
+				Arc currArc = arcIt.nextArc();
+				String currLabel = currArc.getLabel();
 				if (eventLabel.equals(currLabel))
 				{
 					if (outgoing)

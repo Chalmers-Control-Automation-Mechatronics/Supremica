@@ -112,30 +112,4 @@ public class ArcSet
 		return new ArcIterator(theArcs.iterator());
 	}
 
-	/*
-	 *       public Listeners getListeners()
-	 *       {
-	 *               if (listeners == null)
-	 *               {
-	 *                       listeners = new ArcListeners(this);
-	 *               }
-	 *               return listeners;
-	 *       }
-	 *
-	 *       private void notifyListeners()
-	 *       {
-	 *               if (listeners != null)
-	 *               {
-	 *                       listeners.notifyListeners();
-	 *               }
-	 *       }
-	 *
-	 *       private void notifyListeners(int mode, Object o)
-	 *       {
-	 *               if (listeners != null)
-	 *               {
-	 *                       listeners.notifyListeners(mode, o);
-	 *               }
-	 *       }
-	 */
 }

@@ -53,29 +53,78 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.automata.algorithms.TestPackageAlgorithms;
-
-public class TestPackageAutomata
+public class TestStateSet
 	extends TestCase
 {
 
-	public TestPackageAutomata(String name)
+	public TestStateSet(String name)
 	{
 		super(name);
 	}
 
 	/**
+	 * Sets up the test fixture.
+	 * Called before every test case method.
+	 */
+	protected void setUp()
+	{
+	}
+
+	/**
+	 * Tears down the test fixture.
+	 * Called after every test case method.
+	 */
+	protected void tearDown()
+	{
+	}
+
+	/**
 	 * Assembles and returns a test suite
-	 * containing all known tests.
+	 * for all the test methods of this test case.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestAutomaton.suite());
-		suite.addTest(TestAutomataToXml.suite());
-		suite.addTest(TestProjectToSP.suite());
-		suite.addTest(TestPackageAlgorithms.suite());
-		suite.addTest(TestStateSet.suite());
+		TestSuite suite = new TestSuite(TestStateSet.class);
 		return suite;
 	}
+
+	public void testStateSets()
+	{
+		State q0 = new State("q0"); // id and name, set to the same
+		State q1 = new State("q1");
+		State q2 = new State("q2");
+		State q3 = new State("q3");
+
+		StateSet oneset = new StateSet();
+		assertTrue(oneset.size() == 0);
+		oneset.add(q0);
+		assertTrue(oneset.size() == 1);
+		oneset.add(q1);
+		assertTrue(oneset.size() == 2);
+		// oneset.add(q2);
+		// oneset.add(q3);
+
+		StateSet twoset = new StateSet();
+		assertTrue(twoset.size() == 0);
+		twoset.add(q0);
+		assertTrue(twoset.size() == 1);
+		twoset.add(q1);
+		assertTrue(twoset.size() == 2);
+		// twoset.add(q2);
+		// twoset.add(q3);
+
+		//System.out.println("oneset = " + oneset.toString());
+		//System.out.println("twoset = " + twoset.toString());
+
+		//System.out.println("[oneset == oneset] == " +  (oneset == oneset ? "true" : "false"));
+		//System.out.println("oneset.equals(oneset) == " + (oneset.equals(oneset) ? "true" : "false"));
+		//System.out.println("[oneset == twoset] == " +  (oneset == twoset ? "true" : "false"));
+		//System.out.println("oneset.equals(twoset) == " + (oneset.equals(twoset) ? "true" : "false")); // false here with default equals!
+
+		assertTrue(oneset == oneset);
+		assertTrue(oneset.equals(oneset));
+		assertTrue(!(oneset == twoset));
+		assertTrue(oneset.equals(twoset));
+	}
+
 }

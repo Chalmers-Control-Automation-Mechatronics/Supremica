@@ -17,19 +17,21 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.StateSet;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.State;
+import org.supremica.automata.StateIterator;
 import org.supremica.automata.Arc;
+import org.supremica.automata.ArcIterator;
 
 // Would this have any public use?
 class SetOfStateSets
 {
 	private HashSet theSet = null;
-	
+
 	// Private constructor for cloning
 	private SetOfStateSets(HashSet hashset)
 	{
 		this.theSet = new HashSet(hashset);
 	}
-	
+
 	// Create an empty set
 	public SetOfStateSets()
 	{
@@ -108,12 +110,12 @@ class SetOfStateSets
 	{
 		return theSet.size();
 	}
-	
+
 	// Return an arbitrary element. Note, assumes that at least one exists
 	public StateSet get()
 	{
 		return (StateSet)iterator().next();
-	}	
+	}
 }
 // Here we determine whether the passed event is epsilon or not
 // Depending on the way we want to interpret epsilon, instantiate diferent objects
@@ -136,7 +138,7 @@ class AlphaEpsilonTester
 {
 	Alphabet events;
 	boolean notin;
-	
+
 	public AlphaEpsilonTester(Alphabet events, boolean contains)
 	{
 		this.events = events;
@@ -162,14 +164,14 @@ public class Determinizer
 // extends InterruptableAlgorithm
 {
 	private static Logger logger = LoggerFactory.createLogger(Determinizer.class);
-	
+
 	private Automaton automaton;
 	private Automaton newAutomaton = null;
 	// private Alphabet epsilons = null;
 	private EpsilonTester epsilonTester = null;
 	private SetOfStateSets openStateSets = new SetOfStateSets();
 	private SetOfStateSets closedStateSets = new SetOfStateSets();
-	
+
 	private StateSet openStates = new StateSet();
 	private StateSet closedStates = new StateSet();
 
@@ -184,7 +186,7 @@ public class Determinizer
 	{
 	/*	if(enter)
 			++tabs;
-		
+
 		printTabs();
 		System.out.println(str);
 
@@ -205,27 +207,27 @@ public class Determinizer
 
 	// For this automaton, determinize with respect to the given events
 	// If contains == true, the events are considered to be epsilons
-	// If contains == false, the events are considered as non-epsilons (and all other epsilons) 
+	// If contains == false, the events are considered as non-epsilons (and all other epsilons)
 	public Determinizer(Automaton automaton, Alphabet events, boolean contains)
 	{
 		this.automaton = automaton;
 		this.epsilonTester = new AlphaEpsilonTester(events, contains);
 		this.newAutomaton = createNewAutomaton();
 	}
-	
+
 	public void execute()
 	{
 		logger.debug("Executing Determinizer(" + automaton.getName() + ")");
 
 		/* This is how it goes - a variant of van Noords
-		
+
 		let Qinit = epsilonClosure(initialState)
 		put Qinit on openStates
-		
+
 		while openStates is not empty
 		{
 			get Q1 from openStates
-			
+
 			for all non-epsilon events e
 			{
 				let Q2 = eventClosure(Q1, e) [the state set Q2 reached from Q1 via e, one-step]
@@ -236,23 +238,23 @@ public class Determinizer
 					add arc <Q1, e, Q2c>
 				}
 			}
-			
+
 			put Q1 on closedStates
 		}
-		
+
 		and that's how it goes */
-		
+
 		StateSet initset = epsilonClosure(automaton.getInitialState()); // This should be the one and only initial state!
 		add(initset);
 		State init = initset.createNewState();
 		newAutomaton.addState(init);
 		newAutomaton.setInitialState(init);
-		
+
 		while(!openStateSets.isEmpty())
 		{
 			StateSet Q1 = openStateSets.get(); // This is vanNoords T
 			State T = newAutomaton.addStateChecked(Q1.createNewState());
-			
+
 			// for each event not to be disregarded, calc the closure, create the arc
 			/* Alphabet */ Iterator it = automaton.getAlphabet().iterator();
 			while(it.hasNext())
@@ -271,17 +273,17 @@ public class Determinizer
 					}
 				}
 			}
-			
+
 			openStateSets.remove(Q1);
 			closedStateSets.add(Q1); // "mark" this set as done
-		}	
+		}
 	}
-	
+
 	public Automaton getNewAutomaton()
 	{
 		return newAutomaton;
 	}
-	
+
 	private Automaton createNewAutomaton()
 	{
 		Automaton newautomaton = new Automaton();
@@ -305,7 +307,7 @@ public class Determinizer
 		}
 		return newautomaton;
 	}
-	
+
 	private void add(StateSet states)
 	{
 		if(!openStateSets.contains(states) && !closedStateSets.contains(states))
@@ -325,31 +327,31 @@ public class Determinizer
 
 		StateSet closure = new StateSet();
 		// System.out.println("(evCSsE) closure instantiated");
-		
+
 		/* State */ Iterator stateit = states.iterator();
 		// System.out.println("(evCSsE) stateit created");
-		
+
 		while(stateit.hasNext())
 		{
 			// System.out.println("stateit hasNext(), yes");
 			State state = (State)stateit.next();
-			
+
 			// System.out.println("(evCSsE) Calling eventTransition(" + state.getName() + ", " + event.getLabel() + ")");
 			StateSet ss = eventTransition(state, event);
-			
+
 			// System.out.println("(evCSsE) Performing the union");
 			closure.union(ss);
 		}
 		debugPrint("(evCSsE) return closure " + closure.toString() + ")", false);
 		return closure;
 	}
-	
+
 	// For this state, calc the states reached in one step on the given events
 	// Note that the original state is _not_necessarily_ included (no implicit selfloops, that is)
 	private StateSet eventTransition(State state, Alphabet alpha)
 	{
 		debugPrint("(evTSA) eventTransition(" + state.getName() + ", " + alpha.toString() + ")", true);
-		
+
 		StateSet stateset = new StateSet();
 		/* LabeledEvent */ Iterator eventit = alpha.iterator();
 		while(eventit.hasNext())
@@ -359,80 +361,69 @@ public class Determinizer
 		debugPrint("(evTSA) return " + stateset.toString() + ")", false);
 		return stateset;
 	}
-	
+
 	// For this specific state, calc the states (might be more than one!) reached via this event
 	// Note that the original state is _not_necessarily_ included (no implicit selfloops, that is)
 	private StateSet eventTransition(State state, LabeledEvent event)
 	{
 		debugPrint("(evTSE) eventTransition(" + state.getName() + ", " + event.getLabel() + ")", true);
-		
+
 		StateSet stateset = new StateSet();
-		/* Arc */ Iterator it = state.outgoingArcsIterator();
-		while(it.hasNext())
+		for (ArcIterator it = state.outgoingArcsIterator(); it.hasNext(); )
 		{
-			Arc arc = (Arc)it.next();
-			try
+			Arc arc = it.nextArc();
+			if(arc.getEvent().isEqual(event))
 			{
-				if(automaton.getEvent(arc).isEqual(event))	// Can getEvent _really_ throw here?
-				{
-					stateset.add(arc.getToState());
-					// printTabs();
-					// System.out.println("(eTSE) Added state " + arc.getToState().getName() + ", stateset = " + stateset.toString());
-				}
-			}
-			// Note this is a (ugly?) workaround, since I know that getEvent _cannot_ throw above
-			// I just got the arc from a state of the automaton. Thus, getEvent must be able to 
-			// perform correctly, else the automaton is broken and we are lost anyway.
-			catch(Exception excp)
-			{
-				throw new RuntimeException(excp);
+				stateset.add(arc.getToState());
+				// printTabs();
+				// System.out.println("(eTSE) Added state " + arc.getToState().getName() + ", stateset = " + stateset.toString());
 			}
 		}
 		debugPrint("(evTSE) return " + stateset.toString() + ")", false);
 		return stateset;
 	}
-	
-	
-	
+
+
+
 	// Calc the epsilon closure for this set of states
 	// For each state, calc its closure and return teh union of the lot
 	private StateSet epsilonClosure(StateSet states)
 	{
 		debugPrint("(eCSS) epsilonClosure(" + states.toString() + ")", true);
-		
+
 		StateSet closure = new StateSet();
-		/* StateSet. */ Iterator stateit = states.iterator();
-		while(stateit.hasNext())
+		/* StateSet. */
+		for (StateIterator stateit = states.iterator(); stateit.hasNext(); )
 		{
-			closure.union(epsilonClosure((State)stateit.next()));
+			closure.union(epsilonClosure(stateit.nextState()));
 		}
 		debugPrint("(eCSS) return closure" + closure.toString() + ")", false);
 		return closure;
 	}
-	
+
 	// Calc the epsilon closure for this particular state
 	private StateSet epsilonClosure(State state)
 	{
 		debugPrint("(eCS) epsilonClosure(" + state.getName() + ")", true);
-		
+
 		if(state.getStateClass() != null) // if already calculated and cached, return it
 		{
 			StateSet closure = (StateSet)state.getStateClass();
 			debugPrint("(eCS) return cached closure" + closure.toString() + ")", false);
 			return (StateSet)state.getStateClass();
 		}
-		
+
 		StateSet closure = new StateSet();
 		StateSet tempset = new StateSet();
 		// The original state is always included in the closure
 		closure.add(state);
 		// And we begin calculating from that state
 		tempset.add(state);
-		
+
 		// No states are ever removed, so we can use the size to determine when fixpoint reached
 		int nextsize = closure.size(); 	// we use the size to determine fixpoint
 		int prevsize = 0;				// no states are removed, so same size means we're finished
-		
+
 		if(prevsize != nextsize)
 		{
 			do
@@ -441,18 +432,18 @@ public class Determinizer
 				closure.union(tempset);
 				nextsize = closure.size();
 
-			} while(prevsize != nextsize);			
+			} while(prevsize != nextsize);
 		}
-		
+
 		state.setStateClass(closure); // cache the result
-		
+
 		debugPrint("(eCS) return closure" + closure.toString() + ")", false);
-		
+
 		return closure;
 	}
-	
+
 	// Calc the one-step epsilon transitions for this set of states
-	// Note that the original states are _not_necessarily_ included, 
+	// Note that the original states are _not_necessarily_ included,
 	// That is, there are no implicit epilon moves to the same state,
 	// this has to be taken care of above this level
 	private StateSet epsilonTransition(StateSet states)
@@ -461,35 +452,33 @@ public class Determinizer
 
 		StateSet stateset = new StateSet(); // empty set
 		// Iterate over the states and create the union of their respective closures
-		/* StateSet. */ Iterator it = states.iterator();	// Should be typesafe iterator
-		while(it.hasNext())
+		for(StateIterator it = states.iterator(); it.hasNext(); )
 		{
-			stateset.union(epsilonTransition((State)it.next()));
+			stateset.union(epsilonTransition(it.nextState()));
 		}
-		
+
 		debugPrint("(eTSS) return " + stateset.toString() + ")", false);
 		return stateset;
 	}
-	
+
 	// calc the one-step epsilon transitions for this specific state
 	private StateSet epsilonTransition(State state)
 	{
 		debugPrint("(eTS) epsilonTransition(" + state.getName() + ")", true);
 
 		StateSet stateset = new StateSet();
-		/* Arc */ Iterator it = state.outgoingArcsIterator();
-		while(it.hasNext())
+		for(ArcIterator it = state.outgoingArcsIterator(); it.hasNext();)
 		{
 			try
 			{
-				Arc arc = (Arc)it.next();
-				if(epsilonTester.isThisEpsilon(automaton.getEvent(arc)))	// automaton.getEvent(arc).isEpsilon())
+				Arc arc = it.nextArc();
+				if(epsilonTester.isThisEpsilon(arc.getEvent()))	// automaton.getEvent(arc).isEpsilon())
 				{
 					stateset.add(arc.getToState());
 				}
 			}
 			// Note this is a (ugly?) workaround, since I know that getEvent _cannot_ throw above
-			// I just got the arc from a state of the automaton. Thus, getEvent must be able to 
+			// I just got the arc from a state of the automaton. Thus, getEvent must be able to
 			// perform correctly, else the automaton is broken and we are lost anyway.
 			catch(Exception excp)
 			{
@@ -505,23 +494,22 @@ public class Determinizer
 	// Walk the state of the automaton, and null out its stateclass (helps the GC)
 	public void cleanUp()
 	{
-		/* State */ Iterator stateit = automaton.stateIterator();
-		while(stateit.hasNext())
+		for(StateIterator stateit = automaton.stateIterator(); stateit.hasNext();)
 		{
-			State state = (State)stateit.next();
+			State state = stateit.nextState();
 			state.setStateClass(null);
 		}
 	}
-	
+
 	// Walk the state of the automaton, and null out its stateclass (helps the GC)
 	public void cleanUpDebug()
 	{
-		/* State */ Iterator stateit = automaton.stateIterator();
-		while(stateit.hasNext())
+		/* State */
+		for(Iterator stateit = automaton.stateIterator(); stateit.hasNext(); )
 		{
 			State state = (State)stateit.next();
 			// System.out.print(state.getName());
-			
+
 			StateSet stateset = (StateSet)state.getStateClass();
 			if(stateset != null)
 			{
@@ -530,7 +518,7 @@ public class Determinizer
 			else
 			{
 				System.out.println(": <null state class>");
-			} 
+			}
 			state.setStateClass(null);
 		}
 	}
@@ -538,16 +526,16 @@ public class Determinizer
 	public static void main(String[] args)
 	{
 		logger.setLogToConsole(true);
-		
+
 		Automaton automaton = new Automaton("Determinizer test");
-		
+
 		State q0 = new State("q0"); automaton.addState(q0); automaton.setInitialState(q0);
 		State q1 = new State("q1"); automaton.addState(q1);
 		State q2 = new State("q2"); automaton.addState(q2);
 		State q3 = new State("q3"); automaton.addState(q3);
 		State q4 = new State("q4"); automaton.addState(q4);
 		State q5 = new State("q5"); automaton.addState(q5); q5.setAccepting(true);
-		
+
 		LabeledEvent a = new LabeledEvent("a"); automaton.getAlphabet().addEvent(a, false);
 		LabeledEvent b = new LabeledEvent("b"); automaton.getAlphabet().addEvent(b, false); b.setEpsilon(true);
 		LabeledEvent c = new LabeledEvent("c"); automaton.getAlphabet().addEvent(c, false); c.setEpsilon(true);
@@ -556,7 +544,7 @@ public class Determinizer
 		Alphabet epsilons = new Alphabet();
 		epsilons.addEvent(b, false);
 		epsilons.addEvent(c, false);
-		
+
 		automaton.addArc(new Arc(q0, q1, a));
 		automaton.addArc(new Arc(q0, q1, b));
 		automaton.addArc(new Arc(q1, q2, b));
@@ -567,7 +555,7 @@ public class Determinizer
 		automaton.addArc(new Arc(q0, q0, a));
 		automaton.addArc(new Arc(q0, q1, c));
 		automaton.addArc(new Arc(q1, q2, a));
-				
+
 */		Determinizer detm = new Determinizer(automaton);
 		detm.execute();
 		detm.cleanUpDebug();

@@ -74,7 +74,7 @@ public class Alphabet
 	private int idIndex = 0;
 	private Listeners listeners = null;
 
-	public class IdExistsException 
+	public class IdExistsException
 		extends Exception
 	{
 		public IdExistsException(String str)
@@ -82,7 +82,7 @@ public class Alphabet
 			super(str);
 		}
 	}
-	
+
 	public Alphabet()
 	{
 		idMap = new HashMap();
@@ -158,7 +158,7 @@ public class Alphabet
 
 	/**
 	 * Given an event, returns an "equal" event from this alphabet
-	 * The def of "equal" is an internal matter. 
+	 * The def of "equal" is an internal matter.
 	 * Use this method instead of fiddling with event ids in user code
 	 */
 	public LabeledEvent getEvent(LabeledEvent event)
@@ -166,7 +166,7 @@ public class Alphabet
 	{
 		return getEventWithId(event.getId());
 	}
-	
+
 	/**
 	 * Add an event to the alphabet. Check with containsEventWithId to make
 	 * sure that an event with the id not already exists.
@@ -180,7 +180,7 @@ public class Alphabet
 	{
 		addEvent(event, true);
 	}
-	
+
 
 	/**
 	 * Add an event to the alphabet. If an event with the same id already exists
@@ -188,7 +188,7 @@ public class Alphabet
 	 * and really add it. Note, may throw an event, even for doThrow == false, if
 	 * Events::addEvent throws or if idMap::put throws. However, doThrow == false
 	 * means that no event will be thrown because of same id
-	 */ 
+	 */
 	public void addEvent(LabeledEvent event, boolean doThrow)
 	{
 		if (!containsEventWithId(event.getId()))
@@ -225,7 +225,7 @@ public class Alphabet
 			}
 		}
 	}
-		
+
 	/**
 	 * Computes A \ B (difference) where A is this alphabet and B is other
 	 *
@@ -257,7 +257,7 @@ public class Alphabet
 		result. minus(op2);
 		return result;
 	}
-	
+
 	/**
 	 * Computes A intersection B, where A is this alphabet and B is other
 	 *
@@ -289,7 +289,7 @@ public class Alphabet
 		result.intersect(op2);
 		return result;
 	}
-	
+
 	/**
 	 * Computes A union B, where A is this alphabet and B is other
 	 *
@@ -325,7 +325,7 @@ public class Alphabet
 		result.union(op2);
 		return result;
 	}
-	
+
 	public boolean isAllEventsPrioritized()
 	{
 		for (Iterator evIt = eventIterator(); evIt.hasNext(); )
@@ -371,9 +371,9 @@ public class Alphabet
 	 *
 	 *@return  Description of the Return Value
 	 */
-	public Iterator eventIterator()
+	public EventIterator eventIterator()
 	{
-		return idMap.values().iterator();
+		return new EventIterator(idMap.values().iterator());
 	}
 
 	public boolean equalAlphabet(Alphabet other)
@@ -454,20 +454,20 @@ public class Alphabet
 			idMap.put(event.getId(), event);
 		}
 	}
-	
+
 	public static void main(String[] args)
 	{
 		Alphabet sigma1 = new Alphabet();
 		sigma1.addEvent(new LabeledEvent("e1", "id1"), true);
 		sigma1.addEvent(new LabeledEvent("e2", "id2"), true);
-		
+
 		Alphabet sigma2 = new Alphabet();
 		sigma2.addEvent(new LabeledEvent("e2", "id2"), true);
 		sigma2.addEvent(new LabeledEvent("e3", "id3"), true);
-		
+
 		sigma1.union(sigma2);
 		System.out.println("sigma1 + sigma2 = " + sigma1.toString()); // no event with id == "id3" exists in sigma1
-		
+
 	}
-		
+
 }

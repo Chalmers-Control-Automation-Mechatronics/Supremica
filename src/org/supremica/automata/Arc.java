@@ -96,7 +96,7 @@ public class Arc
 		this(from, to);
 		this.event = event;
 	}
-/*	
+/*
 	private String getEventId()
 	{
 		return event.getId();
@@ -106,7 +106,7 @@ public class Arc
 	{
 		this.event = event;
 	}
-	
+
 	public State getToState()
 	{
 		return toState;
@@ -116,7 +116,12 @@ public class Arc
 	{
 		return event;
 	}
-	
+
+	public String getLabel()
+	{
+		return event.getLabel();
+	}
+
 	public State getFromState()
 	{
 		return fromState;
