@@ -70,6 +70,8 @@ public class LoggerFactory
 	public synchronized static Logger createLogger(Class theClass)
 	{
 		return createLogger(theClass.getName());
+
+//		return createLogger(theClass.getPackage().getName());
 	}
 
 	public synchronized static Logger createLogger(String name)

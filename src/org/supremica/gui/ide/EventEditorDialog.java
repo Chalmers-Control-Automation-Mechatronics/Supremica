@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.1 2005-02-21 11:01:59 knut Exp $
+//# $Id: EventEditorDialog.java,v 1.2 2005-03-03 01:46:03 knut Exp $
 //###########################################################################
 package org.supremica.gui.ide;
 
@@ -13,6 +13,7 @@ import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.gui.ErrorWindow;
 import net.sourceforge.waters.model.base.*;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.expr.IdentifierProxy;
@@ -26,11 +27,14 @@ import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Vector;
+import org.supremica.log.*;
 
 public class EventEditorDialog
 	extends JDialog
 	implements ActionListener
 {
+	private static Logger logger = LoggerFactory.createLogger(EventEditorDialog.class);
+
 	private final JTextField name = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
 	private ButtonGroup group = new ButtonGroup();
@@ -159,18 +163,20 @@ public class EventEditorDialog
 					parser = new ExpressionParser();
 
 					SimpleExpressionProxy expr = parser.parse(name.getText(), SimpleExpressionProxy.TYPE_NAME);
-
+					logger.debug("Event name passed validation: " + name.getText());
 					//ide.logEntry("Event name passed validation: " + name.getText());
 				}
 				else
 				{
 					JOptionPane.showMessageDialog(this, "Invalid identifier");
+					logger.debug("Event name was found to be invalid: " + name.getText());
 					//ide.logEntry("Event name was found to be invalid: " + name.getText());
 				}
 			}
 			catch (final ParseException exception)
 			{
-				//ErrorWindow.askRevert(exception,  name.getText());
+				logger.error("ParseException in event name: " + exception.getMessage(), exception);
+				ErrorWindow.askRevert(exception,  name.getText());
 				//ide.logEntry("ParseException in event name: " + exception.getMessage());
 
 				return;
@@ -190,9 +196,9 @@ public class EventEditorDialog
 				}
 				catch (final ParseException exception)
 				{
-					//ErrorWindow.askRevert(exception,  (String) data.get(i));
+					ErrorWindow.askRevert(exception,  (String) data.get(i));
 					//ide.logEntry("ParseException in event range: " + exception.getMessage());
-
+					logger.error("ParseException in event range: " + exception.getMessage(), exception);
 					return;
 				}
 			}
@@ -203,6 +209,7 @@ public class EventEditorDialog
 			}
 			catch (final net.sourceforge.waters.model.base.DuplicateNameException exn)
 			{
+				logger.debug("DuplicateNameException: " + exn.getMessage());
 				//ide.logEntry("DuplicateNameException: " + exn.getMessage());
 				JOptionPane.showMessageDialog(this, "Duplicate event");
 
@@ -238,18 +245,19 @@ public class EventEditorDialog
 
 					SimpleExpressionProxy expr = parser.parse(range, SimpleExpressionProxy.TYPE_RANGE);
 
-					//ide.logEntry("Event range passed validation: " + range);
+					logger.debug("Event range passed validation: " + range);
 				}
 				else
 				{
 					JOptionPane.showMessageDialog(this, "Invalid range");
-					//ide.logEntry("Event range was found to be invalid: " + range);
+					logger.debug("Event range was found to be invalid: " + range);
 				}
 			}
 			catch (final ParseException exception)
 			{
-				//ErrorWindow.askRevert(exception, range);
+				ErrorWindow.askRevert(exception, range);
 				//ide.logEntry("ParseException in event range: " + exception.getMessage());
+				logger.error("ParseException in event range: " + exception.getMessage(), exception);
 
 				return;
 			}

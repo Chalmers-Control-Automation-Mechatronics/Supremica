@@ -90,9 +90,14 @@ public final class SupremicaCategory
 
 	public void error(Object message, Throwable t)
 	{
-		category.error(message, t);
+		category.error(message + "\n" + t.toString());
+		category.debug(t.getStackTrace());
+	}
 
-		//category.error(t.getMessage());
+	public void error(Throwable t)
+	{
+		category.error(t.toString());
+		category.debug(t.getStackTrace());
 	}
 
 	/**

@@ -79,6 +79,10 @@ public class ProjectBuildFromWaters
 
 	public Project build(ModuleProxy module)
 	{
+		if (module == null)
+		{
+			throw new IllegalArgumentException("argument must be non null");
+		}
 		Project currProject = theProjectFactory.getProject();
 		currProject.setName(module.getName());
 

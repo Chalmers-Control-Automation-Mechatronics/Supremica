@@ -63,6 +63,8 @@ public interface Logger
 
 	void error(Object message, Throwable t);
 
+	void error(Throwable t);
+
 	void fatal(Object message);
 
 	void fatal(StackTraceElement[] stackTrace);
