@@ -57,6 +57,8 @@ public class IDE
 		splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
 		splitPanelVertical.setContinuousLayout(false);
 		splitPanelVertical.setOneTouchExpandable(false);
+		setVisible(true);
+		splitPanelVertical.setDividerLocation(0.8);
 
 		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
 
