@@ -63,7 +63,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
 
-import org.apache.oro.text.regex.*;
+import java.util.regex.*;
 
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
@@ -73,6 +73,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
 // ----------------------------------------------------------------------------------
 // compiler type should be adjustable, but as for now, we only support a single type
+/*
 class CompilerFactory
 {
 	public static PatternCompiler getCompiler()
@@ -80,61 +81,44 @@ class CompilerFactory
 		return new Perl5Compiler();
 	}
 }
-
+*/
 // The table model manages the input of the regexp patterns
 // It takes a compiler to be able to verify the correctness
 // of the patterns on-line
 class FindStatesTableModel
-	extends AbstractTableModel 
+	extends AbstractTableModel
 	implements AutomataListener // could usefully inherit from AutomataTableModel or something like that
 {
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
 	// private Pattern[] patterns = null;
-	private PatternCompiler comp = null;
+	// private PatternCompiler comp = null;
 	private String[] columnNames = { "Automaton", "Type", "Regular Expression" };
 	// private Object[][] cells = null;
 	private Automata automata;
 	private HashMap hashmap = new HashMap();
-	
+
 	public final static int AUTOMATON_COL = 0;
 	public final static int TYPE_COL = AUTOMATON_COL + 1;
 	public final static int REGEXP_COL = TYPE_COL + 1;
 
-	public FindStatesTableModel(Automata a, PatternCompiler c)
+	public FindStatesTableModel(Automata a)
 	{
-/*		final int size = a.size();
 
-		cells = new Object[size][REGEXP_COL + 1];
-
-		for (int i = 0; i < size; ++i)
-		{
-			cells[i][AUTOMATON_COL] = a.getAutomatonAt(i).getName();
-			cells[i][TYPE_COL] = a.getAutomatonAt(i).getType().toString();
-			cells[i][REGEXP_COL] = ".*";
-		}
-*/
 		this.automata = a;
-		this.comp = c;
+		//this.comp = c;
 		// this.patterns = new Pattern[a.size()];
-		
+
 		automata.addListener(this);
-		
+
 		try
 		{	// I know compile _cannot_ throw here, but Java requires me to catch this exception
 
 			for(Iterator it = a.iterator(); it.hasNext(); )
 			{
-				hashmap.put(it.next(), comp.compile(".*"));
+				hashmap.put(it.next(), Pattern.compile(".*"));
 			}
-			
-/*			Pattern any_string = comp.compile(".*");
-
-			for (int i = 0; i < patterns.length; ++i)
-			{
-				patterns[i] = any_string;
-			}*/
 		}
-		catch (MalformedPatternException excp)
+		catch (PatternSyntaxException excp)
 		{
 			System.err.println("This should never happen!");
 		}
@@ -168,7 +152,7 @@ class FindStatesTableModel
 		{
 			case AUTOMATON_COL: return automaton.getName();
 			case TYPE_COL: return automaton.getType();
-			case REGEXP_COL: return ((Pattern)hashmap.get(automaton)).getPattern();
+			case REGEXP_COL: return ((Pattern)hashmap.get(automaton)).pattern();
 		}
 		return null;
 		// return cells[row][col];
@@ -184,9 +168,9 @@ class FindStatesTableModel
 			{
 				Automaton automaton = automata.getAutomatonAt(row);
 				// patterns[row] = comp.compile((String) obj);
-				hashmap.put(automaton, comp.compile((String) obj));
+				hashmap.put(automaton, Pattern.compile((String) obj));
 			}
-			catch (MalformedPatternException excp)
+			catch (PatternSyntaxException excp)
 			{
 				logger.debug("FindStatesTable::Incorrect pattern \"" + (String) obj + "\"");
 				JOptionPane.showMessageDialog(null, "Incorrect pattern: " + (String) obj, "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
@@ -216,7 +200,7 @@ class FindStatesTableModel
 		}
 		return patterns;
 	}
-	
+
 	// implementation of AutomataListener interface
 	private void updateListeners()
 	{
@@ -249,13 +233,13 @@ class FindStatesTableModel
 
 // -----------------------------------
 class FindStatesTable
-	extends JTable 
+	extends JTable
 {
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
 
 	private Automata automata;
 	private JFrame frame;
-	
+
 	// local utility functions
 	private TableSorter getTableSorterModel()
 	{
@@ -273,8 +257,8 @@ class FindStatesTable
 	private void deleteAutomaton(int row)
 	{
 		automata.removeAutomaton(getAutomaton(row));
-		
-	}	
+
+	}
 	private void doRepaint()
 	{
 		repaint();
@@ -301,7 +285,7 @@ class FindStatesTable
 			this.add(new JSeparator());
 			JMenuItem delete_item = add("Delete");
 			JMenuItem quit_item = add("Cancel");
-			
+
 			edit_item.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e) // anonymous class
@@ -317,7 +301,7 @@ class FindStatesTable
 					doRepaint();
 				}
 			});
-			
+
 			delete_item.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e) // anonymous class
@@ -328,7 +312,7 @@ class FindStatesTable
 					doRepaint();
 				}
 			});
-			
+
 			quit_item.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e) // anonymous class
@@ -345,7 +329,7 @@ class FindStatesTable
 	{
 		TableSorter sorter = new TableSorter();
 
-		sorter.setModel(new FindStatesTableModel(a, CompilerFactory.getCompiler()));
+		sorter.setModel(new FindStatesTableModel(a));
 
 		return sorter;
 	}
@@ -353,15 +337,15 @@ class FindStatesTable
 	public FindStatesTable(Automata a, JFrame frame)
 	{
 		super(makeTableModel(a));
-		
+
 		this.automata = a;
 		this.frame = frame;
-		
+
 		getTableSorterModel().addMouseListenerToHeaderInTable(this);
 		getStatesTableModel().addTableModelListener(this);
-		
+
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);// no use allowing multirow selection here (is there?)
-		
+
 		// Note! This code is duplicated (almost) from Supremica.java
 		addMouseListener(new MouseAdapter()
 		{
@@ -432,7 +416,7 @@ interface FindStatesTab
 
 	public String getTip();
 
-	public Matcher getMatcher();
+	public StateMatcher getMatcher();
 }
 
 
@@ -530,15 +514,15 @@ class FreeFormPanel
 		return tip;
 	}
 
-	public Matcher getMatcher()
+	public StateMatcher getMatcher()
 	{
 		try
 		{
-			Pattern pattern = CompilerFactory.getCompiler().compile(reg_exp.getText());
+			Pattern pattern = Pattern.compile(reg_exp.getText());
 
-			return new FreeformMatcher(new Perl5Matcher(), pattern, sep_str.getText());
+			return new FreeformMatcher(pattern, sep_str.getText());
 		}
-		catch (MalformedPatternException excp)
+		catch (PatternSyntaxException excp)
 		{
 
 			// debug("FindStatesTable::Incorrect pattern \"" + reg_exp.getText() +"\"");
@@ -585,9 +569,9 @@ class FixedFormPanel
 		return tip;
 	}
 
-	public Matcher getMatcher()
+	public StateMatcher getMatcher()
 	{
-		return new FixedformMatcher(new Perl5Matcher(), table.getRegexpPatterns());
+		return new FixedformMatcher(table.getRegexpPatterns());
 	}
 }
 
@@ -680,7 +664,7 @@ class FindStatesFrame
 	{
 		try
 		{
-			Matcher matcher = ((FindStatesTab) getSelectedComponent()).getMatcher();
+			StateMatcher matcher = ((FindStatesTab) getSelectedComponent()).getMatcher();
 
 			if (matcher != null)
 			{

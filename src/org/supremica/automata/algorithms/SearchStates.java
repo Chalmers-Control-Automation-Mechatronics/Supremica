@@ -15,7 +15,7 @@ package org.supremica.automata.algorithms;
 import java.lang.Exception;
 import java.util.HashSet;
 import java.util.Iterator;
-import org.apache.oro.text.regex.*;
+import java.util.regex.*;
 
 import org.supremica.util.IntArrayList;
 import org.supremica.util.IntArrayVector;
@@ -23,7 +23,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.State;
 import org.supremica.gui.MonitorableThread;
 
-// 
+//
 public class SearchStates
 	extends MonitorableThread
 
@@ -31,7 +31,7 @@ public class SearchStates
 {
 	private AutomataSynchronizer syncher = null;
 	private IntArrayVector container = null;
-	private Matcher matcher = null;
+	private StateMatcher matcher = null;
 	protected /* volatile */ boolean stopRequested = false;
 	protected boolean mode = false;    // false means sychronization mode, true is matching mode
 	protected int progress = 1;
@@ -40,8 +40,8 @@ public class SearchStates
 	{
 		return new IntArrayVector();
 	}
-	
-	public SearchStates(Automata automata, Matcher m)
+
+	public SearchStates(Automata automata, StateMatcher m)
 		throws Exception
 	{
 		setPriority(Thread.MIN_PRIORITY);
@@ -198,10 +198,10 @@ public class SearchStates
 	public StateIterator getStateIterator(int[] composite_state)
 	{
 
-		// 
+		//
 		State[][] states = syncher.getHelper().getIndexFormStateTable();
 
-		// 
+		//
 		return new StateIterator(states, composite_state);
 	}
 

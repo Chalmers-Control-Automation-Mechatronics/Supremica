@@ -49,32 +49,11 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import org.supremica.automata.algorithms.StateMatcher;
 import org.supremica.automata.algorithms.SearchStates;
 
-public class FixedformMatcher
-	implements StateMatcher
+public interface StateMatcher
 {
-	private Pattern[] patterns;
-
-	public FixedformMatcher(Pattern[] p)
-	{
-		patterns = p;
-	}
-
-	public boolean matches(SearchStates.StateIterator it)
-	{
-		for (int i = 0; it.hasNext(); ++i, it.inc())
-		{
-			Matcher matcher = patterns[i].matcher(it.getState().getName());
-			if (!matcher.matches())
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
+	public boolean matches(SearchStates.StateIterator it);
 }
+
+//

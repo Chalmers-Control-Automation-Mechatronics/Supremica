@@ -413,7 +413,7 @@ public class AutomataEditor
 	public void initToolbar()
 	{
 		// Enables stylish rollover buttions - JDK 1.4 required
-		//toolBar.setRollover(true);
+		toolBar.setRollover(true);
 
 		Insets tmpInsets = new Insets(0, 0, 0, 0);
 		boolean separatorNeeded = false;
