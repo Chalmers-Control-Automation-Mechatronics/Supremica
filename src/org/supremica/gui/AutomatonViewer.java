@@ -66,15 +66,15 @@ public class AutomatonViewer
 	extends JFrame
 	implements AutomatonListener
 {
-	private Automaton theAutomaton;
-	private Graph theGraph;
-
-	private PrintWriter toDotWriter;
-	private InputStream fromDotStream;
-
+    private Automaton theAutomaton;
+    private Graph theGraph;
+    
+    private PrintWriter toDotWriter;
+    private InputStream fromDotStream;
+    
     private JScrollPane currScrollPanel = null;
-	private GrappaPanel automatonPanel;
-
+    private GrappaPanel automatonPanel;
+    
     private BorderLayout layout = new BorderLayout();
     private JPanel contentPane;
     private JMenuBar menuBar = new JMenuBar();
@@ -94,9 +94,15 @@ public class AutomatonViewer
     private JCheckBoxMenuItem automaticUpdateCheckBox = new JCheckBoxMenuItem(
     	"Automatic update", WorkbenchProperties.isDotAutomaticUpdate());
 
- 	private static Category thisCategory = LogDisplay.createCategory(AutomatonViewer.class.getName());
+    private static Category thisCategory = LogDisplay.createCategory(AutomatonViewer.class.getName());
 
-	public AutomatonViewer(Automaton theAutomaton)
+
+    private static final double SCALE_RESET = 1.0, SCALE_CHANGE = 1.5, MAX_SCALE = 64.0, MIN_SCALE = 1.0 / 64;
+    private double scaleFactor = SCALE_RESET;
+
+
+
+    public AutomatonViewer(Automaton theAutomaton)
 		throws Exception
 	{
 		this.theAutomaton = theAutomaton;
@@ -245,6 +251,46 @@ public class AutomatonViewer
 	    menuLayoutUpdate.setText("Update");
 		menuLayout.add(menuLayoutUpdate);
 		menuLayout.add(automaticUpdateCheckBox);
+
+	 // Zoom
+		JMenu menuZoom = new JMenu();
+		menuZoom.setText("Zoom");
+		menuLayout.setMnemonic(KeyEvent.VK_Z);
+		menuBar.add(menuZoom);
+		JMenuItem menuZoomIn    = new JMenuItem("Zoom In");
+		JMenuItem menuZoomOut   = new JMenuItem("Zoom Out");
+		JMenuItem menuZoomReset = new JMenuItem("Reset view");
+		menuZoom.add(menuZoomIn);
+		menuZoom.add(menuZoomOut);
+		menuZoom.add(menuZoomReset);
+		
+
+		menuZoomIn.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+			    scaleFactor *= SCALE_CHANGE;
+			    scaleFactor = Math.max(scaleFactor, MIN_SCALE);
+			    update();
+			}
+		    });		       
+
+		menuZoomOut.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+			    scaleFactor /= SCALE_CHANGE;
+			    scaleFactor = Math.min(scaleFactor, MAX_SCALE);
+			    update();
+			   
+			}
+		    });	
+		
+		menuZoomReset.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+			    if(scaleFactor != SCALE_RESET) {
+				scaleFactor = SCALE_RESET;
+				update();
+			    }
+			}
+		    });	
+
 
         menuFileExport.addActionListener(new ActionListener()
         {
@@ -425,6 +471,7 @@ public class AutomatonViewer
 		//theGraph.printGraph(System.err);
 	    automatonPanel = new GrappaPanel(theGraph);
 	    automatonPanel.setScaleToFit(false);
+	    automatonPanel.multiplyScaleFactor(scaleFactor);
 
 		//thisCategory.debug("After creating panel");
 
