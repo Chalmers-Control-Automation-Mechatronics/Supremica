@@ -52,15 +52,15 @@ import java.util.*;
 
 public abstract class FBType extends NamedObject
 {
-    String name;
-    String comment;
-    String identification = null;
-    List versionInfo = new LinkedList();
-    String compilerInfo = null;
-    InterfaceList interfaceList = new InterfaceList();
-    BasicFBInstance basicFB = null;
-    FBNetwork fbNetwork = null;
-    String service = null;
+    //String name;
+    //String comment;
+    //String identification = null;
+    //List versionInfo = new LinkedList();
+    //String compilerInfo = null;
+    //InterfaceList interfaceList = new InterfaceList();
+    //BasicFBInstance basicFB = null;
+    //FBNetwork fbNetwork = null;
+    //String service = null;
 
     public FBType()
     {
@@ -68,6 +68,6 @@ public abstract class FBType extends NamedObject
 
     public FBType(String name)
     {
-        this.name = name;
+        //this.name = name;
     }
 }
