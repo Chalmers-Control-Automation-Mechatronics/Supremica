@@ -253,7 +253,8 @@ public class AutomataSynthesizer
 						try
 						{
 							theAutomaton = new Automaton(synchHelper.getAutomaton());
-							theAutomaton.setName("Synth_" + ((Automaton) selectedAutomata.get(0)).getName());
+							String newName = theAutomatonContainer.getUniqueAutomatonName("Synth_" + ((Automaton)selectedAutomata.get(0)).getName());
+							theAutomaton.setName(newName);
 							theAutomaton.setType(AutomatonType.Supervisor);
 							theAutomaton.setAlphabet(unionAlphabet(selectedAutomata));
 

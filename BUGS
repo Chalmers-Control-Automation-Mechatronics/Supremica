@@ -7,4 +7,5 @@ doesn't stop the other executors!
 * The extra state for complement automata has a fix name. If an automaton
 already has a state with that name, bad things happen.
 
-* Synthesis also returns a fix name... almost... it could get wrong sometimes, anyway.
+* Synthesis also returns a fix name... almost... it could get wrong sometimes, anyway. // Fixed 2001-11-12 by ka
+

@@ -84,8 +84,6 @@ public class AutomatonContainer
 //			fileImporter.setCurrentDirectory(
 //				new java.io.File(WorkbenchProperties.getFileOpenPath()));
 
-	private int uniqueAutomatonIndex = 1;
-
 	public AutomatonContainer()
 	{
 	}
@@ -202,14 +200,25 @@ public class AutomatonContainer
 
 	public String getUniqueAutomatonName()
 	{
+		return getUniqueAutomatonName("Untitled");
+	}
+
+	public String getUniqueAutomatonName(String prefix)
+	{
+		if (!containsAutomaton(prefix))
+		{
+			return prefix;
+		}
+		int index = 1;
 		String newName;
 		do
 		{
-			newName = "Untitled" + uniqueAutomatonIndex++;
+			newName = prefix + "(" + index++ + ")";
 		}
 		while (containsAutomaton(newName));
 		return newName;
 	}
+
 
 	public AutomataEditor getAutomataEditor()
 	{
