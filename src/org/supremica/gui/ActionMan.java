@@ -259,7 +259,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -302,7 +302,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -332,7 +332,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -363,7 +363,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -396,14 +396,14 @@ public class ActionMan
 		}
 	}
 
-	// Automaton.Copy action performed
+	// Automata.Copy action performed
 	public static void automataCopy_actionPerformed(Gui gui)
 	{
 		Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -442,7 +442,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -487,7 +487,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 			
 			return;
 		}
@@ -673,7 +673,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -703,7 +703,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -978,7 +978,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1024,7 +1024,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1055,7 +1055,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1085,7 +1085,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1115,7 +1115,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1222,7 +1222,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1445,7 +1445,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1528,7 +1528,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1537,8 +1537,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() == 1)
 		{
-
-			// One automata selected
+			// One automaton selected
 			Automaton currAutomaton = (Automaton) autIt.next();
 			String currAutomatonName = currAutomaton.getName();
 
@@ -1642,7 +1641,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}
@@ -1679,7 +1678,6 @@ public class ActionMan
 	// Automaton.Status action performed
 	public static void automatonStatus_actionPerformed(Gui gui)
 	{
-
 		// logger.info("Number of automata: " + gui.getVisualProjectContainer().getSize());
 		gui.info("Number of automata: " + gui.getVisualProjectContainer().getActiveProject().getNbrOfAutomata());
 
@@ -1731,7 +1729,7 @@ public class ActionMan
 				potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
 			}
 
-			gui.info("\n\tNumber of potential states: " + new Double(potentialNumberOfStates).longValue());
+			gui.info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
 		}
 	}
 
@@ -2150,7 +2148,7 @@ public class ActionMan
 
 		if (selectedAutomata.size() < 1)
 		{
-			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automata must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(gui.getFrame(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
 
 			return;
 		}

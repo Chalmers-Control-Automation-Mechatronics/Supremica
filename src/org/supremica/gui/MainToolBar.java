@@ -23,9 +23,18 @@ public class MainToolBar
 	private static final OpenAction openAction = new OpenAction();
 	private static final SaveAction saveAction = new SaveAction();
 	private static final SaveAsAction saveAsAction = new SaveAsAction();
-	private static final PreferencesAction preferencesAction = new PreferencesAction();
+
+	private static final DeleteAction deleteAction = new DeleteAction();
+	private static final CopyAction copyAction = new CopyAction();
+
+	private static final ViewAction viewAction = new ViewAction();
+	private static final StatusAction statusAction = new StatusAction();
+
 	private static final MoveAutomataUpAction moveAutomataUpAction = new MoveAutomataUpAction();
 	private static final MoveAutomataDownAction moveAutomataDownAction = new MoveAutomataDownAction();
+
+	private static final PreferencesAction preferencesAction = new PreferencesAction();
+
 	private static final EditAction editAction = new EditAction(supremica);
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
 
@@ -51,6 +60,14 @@ public class MainToolBar
 			add(saveAsAction);
 			addSeparator();
 		}
+
+		add(deleteAction);
+		add(copyAction);
+		addSeparator();
+
+		add(viewAction);
+		// add(statusAction);
+		addSeparator();
 
 		add(moveAutomataUpAction);
 		add(moveAutomataDownAction);
