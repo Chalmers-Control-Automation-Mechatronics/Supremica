@@ -264,7 +264,7 @@ public class ScheduleDialog
 		}
 		catch(Exception excp)
 		{
-			logger.error("doit::"  + excp);
+			logger.error("ScheduleDialog::doit "  + excp);
 			logger.debug(excp.getStackTrace());
 		}
 

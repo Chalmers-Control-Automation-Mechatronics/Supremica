@@ -599,6 +599,12 @@ public class ActionMan
 			// this.selectedValue = JOptionPane.showInputDialog(comp, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 			dialog.show();
 	        dialog.dispose();
+			// Is this the right thing to do? It seems to work, but the manuals...
+	        if(((Integer)pane.getValue()).intValue() == JOptionPane.CANCEL_OPTION)
+	        {
+	        	selectedValue = null;
+	        	return;
+	        }
 
 	        selectedValue = pane.getInputValue();
 		}

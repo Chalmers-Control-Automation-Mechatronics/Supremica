@@ -63,6 +63,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
 import org.supremica.automata.IO.*;
+import org.supremica.gui.texteditor.TextFrame;
 
 public class AutomatonViewer
 	extends JFrame
@@ -648,89 +649,179 @@ public class AutomatonViewer
 			update();
 		}
 	}
+	// This class is almost identical to teh same named class in ActionMan
+	// Should really merge and fixx, but for now.... Should I bother?
+	static class ExportDialog
+	//	extends JDialog
+	{
+		private final String epsString = "eps";
+		private final String mifString = "mif";
+		private final String dotString = "dot";
+		private final String pngString = "png";
+		private final String svgString = "svg";
 
+		private final Object[] possibleValues =
+		{
+			epsString, mifString, dotString, pngString, svgString
+		};
+
+		private JOptionPane pane = null;
+		private JDialog dialog = null;
+		private JCheckBox checkbox = null;
+		private Object selectedValue = null;
+
+		private String dotArgument = null;
+		private JFileChooser fileExporter = null;
+		
+		ExportDialog(Frame comp)
+		{
+			this.pane = new JOptionPane("Export as::",
+										JOptionPane.INFORMATION_MESSAGE,
+										JOptionPane.OK_CANCEL_OPTION,
+										null,	// icon
+										null, 	// options
+										null);	// initialValue
+
+			pane.setWantsInput(true);
+			pane.setSelectionValues(possibleValues);
+			pane.setInitialSelectionValue(possibleValues[0]);
+			pane.setComponentOrientation(((comp == null) ? pane.getRootFrame() : comp).getComponentOrientation());
+			pane.selectInitialValue();
+
+			this.checkbox = new JCheckBox("Export to debugview");
+			pane.add(checkbox);
+
+			// int style = styleFromMessageType(JOptionPane.INFORMATION_MESSAGE);
+			dialog = pane.createDialog(comp, "Export");
+		}
+		
+		public void show()
+		{
+			dialog.show();
+	        dialog.dispose();
+
+			// Is this the right thing to do? It seems to work, but the manuals...
+	        if(((Integer)pane.getValue()).intValue() == JOptionPane.CANCEL_OPTION)
+	        {
+	        	return;
+	        }
+	        
+	        selectedValue = pane.getInputValue();
+	        
+			if(selectedValue == epsString)
+			{
+				fileExporter = FileDialogs.getEPSFileExporter();
+				dotArgument = "-Tps";
+			}
+			else if(selectedValue == mifString)
+			{
+				fileExporter = FileDialogs.getMIFFileExporter();
+				dotArgument = "-Tmif";
+			}
+			else if(selectedValue == dotString)
+			{
+				fileExporter = FileDialogs.getDOTFileExporter();
+				dotArgument = "";
+			}
+			else if(selectedValue == pngString)
+			{
+				fileExporter = FileDialogs.getPNGFileExporter();
+				dotArgument = "-Tpng";
+			}
+			else if(selectedValue == svgString)
+			{
+				fileExporter = FileDialogs.getSVGFileExporter();
+				dotArgument = "-Tsvg";
+			}
+			else
+			{
+				fileExporter = null;
+				dotArgument = null;
+			}	
+			// System.out.println("selectedValue == " + selectedValue.toString());	
+		}
+
+		public boolean wasCancelled()
+		{
+			return selectedValue == null;
+		}
+		public boolean toDebugView()
+		{
+			return checkbox.isSelected();
+		}
+		public String getDotArgument()
+		{
+			return dotArgument;
+		}
+		public JFileChooser getFileExporter()
+		{
+			return fileExporter;
+		}
+		public String getSelectedValue()
+		{
+			return (String)selectedValue;
+		}
+	}
+	
 	public void fileExport_actionPerformed(ActionEvent e)
 	{
-		final String epsString = "eps";
-		final String mifString = "mif";
-		final String dotString = "dot";
-		final String pngString = "png";
-		final String svgString = "svg";
-		// final String gifString = "gif";
 
-
-		Object[] possibleValues = { epsString, mifString, pngString, svgString, dotString };
-		Object selectedValue = JOptionPane.showInputDialog(null, "Export as", "Export", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
-
-		if (selectedValue == null)
+		ExportDialog dlg = new ExportDialog(this);
+		dlg.show();
+		if(dlg.wasCancelled())	// never mind...
 		{
 			return;
 		}
 
-/* Who the f@¤! wrote this convoluted code???
-		int exportMode = -1;
-
-		if (selectedValue == epsString)
+		// Ugly duplication of code here, but a man can only do so much...
+		// (the real reason is that there's no (obvious) conversion from Writer to OutputStream)
+		if(dlg.toDebugView())
 		{
-			exportMode = 1;
-		}
-		else if (selectedValue == mifString)
-		{
-			exportMode = 2;
-		}
-		else if (selectedValue == dotString)
-		{
-			exportMode = 3;
-		}
-		else if (selectedValue == pngString)
-		{
-			exportMode = 4;
-		}
-		else if (selectedValue == svgString)
-		{
-			exportMode = 5;
-		}
-*/
-		JFileChooser fileExporter = null;
-		String dotArgument = null;
-
-		if(selectedValue == epsString) // (exportMode == 1)
-		{
-			fileExporter = FileDialogs.getEPSFileExporter();
-			dotArgument = "-Tps";
-		}
-		else if(selectedValue == mifString) // (exportMode == 2)
-		{
-			fileExporter = FileDialogs.getMIFFileExporter();
-			dotArgument = "-Tmif";
-		}
-		else if(selectedValue == dotString) // (exportMode == 3)
-		{
-			fileExporter = FileDialogs.getDOTFileExporter();
-			dotArgument = "";
-		}
-		else if(selectedValue == pngString) // (exportMode == 4)
-		{
-			fileExporter = FileDialogs.getPNGFileExporter();
-			dotArgument = "-Tpng";
-		}
-		else if(selectedValue == svgString) // (exportMode == 5)
-		{
-			fileExporter = FileDialogs.getSVGFileExporter();
-			dotArgument = "-Tsvg";
-		}
-		else
-		{
+			try
+			{
+				AutomatonToDot exporter = new AutomatonToDot(theAutomaton);
+	
+				exporter.setLeftToRight(leftToRightCheckBox.isSelected());
+				exporter.setWithLabels(withLabelsCheckBox.isSelected());
+				exporter.setUseColors(useColorsCheckBox.isSelected());
+				initializeStreams(dlg.getDotArgument());
+	
+				// Send the file to dot
+				exporter.serialize(toDotWriter);
+				toDotWriter.close();
+	
+				// Send the response to the debugview
+				BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
+				TextFrame debugview = new TextFrame("Dot debug output");
+				Writer writer = debugview.getPrintWriter();
+				
+				int currChar = buffInStream.read();
+	
+				while (currChar != -1)
+				{
+					writer.write(currChar);
+	
+					currChar = buffInStream.read();
+				}
+	
+				buffInStream.close();
+			}
+			catch(Exception excp)
+			{
+				logger.error("Error while writing to the debugview", excp);
+				logger.debug(excp.getStackTrace());
+			}
 			return;
 		}
 
+		JFileChooser fileExporter = dlg.getFileExporter();
 		// Suggest a reasonable filename based on the name of the automaton...
-		fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" +  theAutomaton.getName() + "." + selectedValue));
+		fileExporter.setSelectedFile(new File(SupremicaProperties.getFileSavePath() + "/" +  theAutomaton.getName() + "." + dlg.getSelectedValue()));
 
 		if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 		{
 			File currFile = fileExporter.getSelectedFile();
-
+		
 			if (currFile != null)
 			{
 				if (!currFile.isDirectory())
@@ -742,25 +833,26 @@ public class AutomatonViewer
 						exporter.setLeftToRight(leftToRightCheckBox.isSelected());
 						exporter.setWithLabels(withLabelsCheckBox.isSelected());
 						exporter.setUseColors(useColorsCheckBox.isSelected());
-						initializeStreams(dotArgument);
+						initializeStreams(dlg.getDotArgument());
 
 						// Send the file to dot
 						exporter.serialize(toDotWriter);
 						toDotWriter.close();
 
-						// Send the response to a file
+						// Send the response to a file 						
+						BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
 						FileOutputStream fw = new FileOutputStream(currFile);
 						BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
-						BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
+						
 						int currChar = buffInStream.read();
-
+	
 						while (currChar != -1)
 						{
 							buffOutStream.write(currChar);
-
+	
 							currChar = buffInStream.read();
 						}
-
+	
 						buffInStream.close();
 						buffOutStream.close();
 					}
