@@ -211,45 +211,9 @@ public final class AutomataIndexForm
 			eventPriority[i] = 1;
 		}
 
-		/*
-		Iterator eventCollectionIt = eventCollection.iterator();
-		int i = 0;
-
-		while (eventCollectionIt.hasNext())
-		{
-			eventPriority[i] = 1;
-
-			((LabeledEvent) (eventCollectionIt.next())).setSynchIndex(i++);
-		}
-		*/
-
-		// Put the synchIndex into all the automata.
-		// We do this because we want to have the same
-		// index for the same event in all automata.
-/*
-		Iterator autIt = theAutomata.iterator();
-
-		while (autIt.hasNext())
-		{
-			Automaton thisAut = (Automaton) autIt.next();
-			Alphabet thisAlphabet = thisAut.getAlphabet();
-			Iterator eventIt = ((Collection) thisAlphabet.values()).iterator();
-
-			while (eventIt.hasNext())
-			{
-				LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-				String label = currEvent.getLabel();
-				LabeledEvent newEvent = theAlphabet.getEventWithLabel(label);
-
-				currEvent.setSynchIndex(newEvent.getSynchIndex());
-			}
-		}
-*/
 		// Build tables from where it fast can be concluded
 		// if a certain event is included or prioritized in a given automaton
 		int nbrOfAutomata = theAutomata.size();
-		//System.err.println("Nbr of automata: " + nbrOfAutomata);
-		//System.err.println("Union alphabet size: " + theAlphabet.size());
 
 		alphabetEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
 		prioritizedEventsTable = new boolean[nbrOfAutomata][theAlphabet.size()];
