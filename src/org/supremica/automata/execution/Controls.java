@@ -47,88 +47,41 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.execution;
 
-import java.util.*;
-import org.supremica.gui.*;
-import org.supremica.log.*;
-
-/**
- * A set of Automata with common actions and an AutomatonContainer.
- * @see org.supremica.gui.AutomatonContainer
- */
-public class Project
-	extends Automata
+public class Controls
 {
-	private static Logger logger = LoggerFactory.createLogger(Project.class);
-	private AutomatonContainer theContainer = null;
-	private Automata selectedAutomata = null;
-	private String name = null;
-	private Actions theActions = null;
-	private Controls theControls = null;
+	private Set theControls = null;
+	private Map labelToControlMap = null;
 
-	public Project()
+	public Controls()
 	{
-		this("");
+		theControls = new HashSet();
+		labelToControlMap = new HashMap();
 	}
 
-	public Project(String name)
+	public void addControl(Control theControl)
 	{
-		theContainer = new AutomatonContainer();
-		this.name = name;
+		theControls.add(theControl);
 	}
 
-	public Project(Project otherProject)
+	public void removeControl(Control theControl)
 	{
-		super(otherProject);
 
-		theContainer = new AutomatonContainer(otherProject.theContainer);
-
-		try
-		{
-			theContainer.add(otherProject);
-		}
-		catch (Exception e)
-		{
-			logger.error("Error while copying project");
-		}
 	}
 
-	public String getName()
+	public boolean hasControl(String label)
 	{
-		return name;
+		return labelToControlMap.contains(label);
 	}
 
-	public void setName(String name)
+	public Control getControl(String label)
 	{
-		this.name = name;
+		return (Control)labelToControlMap.get(label);
 	}
 
-	public AutomatonContainer getAutomatonContainer()
+	public Iterator iterator()
 	{
-		return theContainer;
+		return labelToControlMap.values().iterator();
 	}
-
-	public void setSelectedAutomata(Automata theAutomata)
-	{
-		this.selectedAutomata = theAutomata;
-	}
-
-	public Automata getSelectedAutomata()
-	{
-		return selectedAutomata;
-	}
-
-	public void clearSelection()
-	{
-		selectedAutomata = null;
-	}
-
-	public boolean containsAutomaton(String name)
-	{
-		return false;
-	}
-
-	// What is this supposed to do!!?
-	public void close() {}
 }

@@ -47,88 +47,27 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata;
+package org.supremica.automata.execution;
 
-import java.util.*;
-import org.supremica.gui.*;
-import org.supremica.log.*;
-
-/**
- * A set of Automata with common actions and an AutomatonContainer.
- * @see org.supremica.gui.AutomatonContainer
- */
-public class Project
-	extends Automata
+public class Action
 {
-	private static Logger logger = LoggerFactory.createLogger(Project.class);
-	private AutomatonContainer theContainer = null;
-	private Automata selectedAutomata = null;
-	private String name = null;
-	private Actions theActions = null;
-	private Controls theControls = null;
+	private String label = null;
+	private String command = null;
 
-	public Project()
+	public Action(String label, String command)
 	{
-		this("");
+		this.label = label;
+		this.command = command;
 	}
 
-	public Project(String name)
+	public String getLabel()
 	{
-		theContainer = new AutomatonContainer();
-		this.name = name;
+		return label;
 	}
 
-	public Project(Project otherProject)
+	public String getCommand()
 	{
-		super(otherProject);
-
-		theContainer = new AutomatonContainer(otherProject.theContainer);
-
-		try
-		{
-			theContainer.add(otherProject);
-		}
-		catch (Exception e)
-		{
-			logger.error("Error while copying project");
-		}
+		return command;
 	}
 
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public AutomatonContainer getAutomatonContainer()
-	{
-		return theContainer;
-	}
-
-	public void setSelectedAutomata(Automata theAutomata)
-	{
-		this.selectedAutomata = theAutomata;
-	}
-
-	public Automata getSelectedAutomata()
-	{
-		return selectedAutomata;
-	}
-
-	public void clearSelection()
-	{
-		selectedAutomata = null;
-	}
-
-	public boolean containsAutomaton(String name)
-	{
-		return false;
-	}
-
-	// What is this supposed to do!!?
-	public void close() {}
 }
