@@ -69,6 +69,7 @@ public class AutomataToSattLineSFC
 	private Automaton automaton;
 	private boolean debugMode = false;
 	private int transitionCounter = 0;
+	private int eventMonitorCounter = 0;
 
 	public AutomataToSattLineSFC(Automata automata)
 	{
@@ -107,8 +108,10 @@ public class AutomataToSattLineSFC
 		// Start of BasePicture Invocation
 		pw.println("BasePicture Invocation");
 		pw.println("   ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 ");
-		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896");    // Don't know importance of DateCode
-		pw.println("\n");
+		pw.println("    ) : MODULEDEFINITION DateCode_ 492916896 ( GroupConn = ProgStationData.");    // Don't know importance of DateCode
+		pw.println("GroupProgFast )\n");
+
+		// Start of variable declarations
 		pw.println("LOCALVARIABLES");
 
 		Alphabet unionAlphabet = null;
@@ -128,10 +131,15 @@ public class AutomataToSattLineSFC
 		// #"@|*: Max line length = 140, max identfier length (variable, step name etc) = 20.
 		// Too lazy to fix this now. Issue warning instead...
 		boolean firstEvent = true;
+		int lineLength = 0;
 
 		for (Iterator alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
 		{
 			EventLabel currEvent = (EventLabel) alphaIt.next();
+			if (currEvent.getLabel().length() > 20)
+			{
+				logger.warn("Event label " + currEvent.getLabel() + " too long. SattLine's maximum identifier length is 20. (Please rename event label yourself.)");
+			}
 
 			if (firstEvent)
 			{
@@ -143,14 +151,23 @@ public class AutomataToSattLineSFC
 			{
 				pw.print(", " + normalize(currEvent.getLabel()));
 			}
-
-			if (currEvent.getLabel().length() > 20)
+			lineLength = lineLength + currEvent.getLabel().length() + 2;
+			if (lineLength > 80)
 			{
-				logger.warn("Event label too long. SattLine's maximum identifier length is 20. (fix it yourself!)");
+				pw.print("\n");
+				lineLength = 0;
 			}
+
 		}
 
 		pw.println(": boolean;\n");
+		pw.println("ProgStationData: ProgStationData;");
+		// End of variable declarations.
+		// Start of submodule invocations
+		pw.println("SUBMODULES");
+		pw.println("ProgStationControl1 Invocation");
+		pw.println("( 1.18 , 0.72 , 0.0 , 0.1 , 0.1 ) : ProgStationControl;");
+		// End of submodule invocations
 
 		// Start of Module definition.
 		pw.println("ModuleDef");
@@ -221,7 +238,7 @@ public class AutomataToSattLineSFC
 
 	public void serialize_l(PrintWriter pw)
 	{
-		pw.println("");
+		pw.println("nucleuslib");
 	}
 
 	private void generateEventMonitors(Automata theAutomata, PrintWriter pw)
@@ -287,11 +304,9 @@ public class AutomataToSattLineSFC
 
 		boolean ready = false;
 
-		// int iterations = iteratorAlphabet.size();
-		while (!ready /* && iterations > -10 */)
+		while (!ready)
 		{
 
-			// iterations--;
 			// Step 2. Pick e in C \ D.
 			for (Iterator alphaIt = iteratorAlphabet.iterator(); alphaIt.hasNext(); )
 			{
@@ -437,13 +452,183 @@ public class AutomataToSattLineSFC
 
 	private void printEventMonitor(Automata theAutomata, Alphabet theAlphabet, PrintWriter pw)
 	{
-
 		// Step 1. Initialise. Create initial step
+		int stepCounter = 0;
+		boolean firstEvent = true;
+		transitionCounter = 1;
+		//eventMonitorCounter++;
+		pw.println("SEQUENCE EventMonitor_" + ++eventMonitorCounter + " COORD -0.5, 0.5 OBJSIZE 0.5, 0.5");
+		pw.println("SEQINITSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
 		// Step 2. For each event e in theAlphabet
-		// (a) Create transition t with t.C = preset()
-		// (b) Create step with action e
-		// (c) Create transition t' with t'.C = not preset()
-		logger.debug("Printing Event Monitor, not");
+		if (theAlphabet.size() > 1)
+		{
+			pw.println("ALTERNATIVESEQ");
+		}
+		for (Iterator eventIt = theAlphabet.iterator(); eventIt.hasNext(); )
+		{
+			EventLabel currEvent = (EventLabel)eventIt.next();
+			if (firstEvent)
+			{
+				firstEvent = false;
+			}
+			else
+			{
+				pw.println("ALTERNATIVEBRANCH");
+			}
+
+			// (a) Create transition t with t.C = preset()
+			String transitionCondition = computeGenerationCondition(theAutomata, currEvent);
+			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + " WAIT_FOR " + transitionCondition);
+
+			// (b) Create step with action e
+			pw.println("SEQSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
+			pw.println("ENTERCODE");
+			pw.println(normalize(currEvent.getLabel()) + " = True;");
+			pw.println("EXITCODE");
+			pw.println(normalize(currEvent.getLabel()) + " = False;");
+
+			// (c) Create transition t' with t'.C = not preset()
+			transitionCondition = computeCeaseCondition(theAutomata, currEvent);
+			pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + " WAIT_FOR " + transitionCondition);
+		}
+		if (theAlphabet.size() > 1)
+		{
+			pw.println("ENDALTERNATIVE");
+		}
+		pw.println("ENDSEQUENCE\n\n");
+		logger.debug("Printing Event Monitor");
+	}
+
+	private String computeGenerationCondition(Automata theAutomata, EventLabel theEvent)
+	{
+		StringBuffer theCondition = new StringBuffer();
+		boolean firstAutomaton = true;
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton aut = (Automaton)autIt.next();
+			if (aut.containsEventWithLabel(theEvent.getLabel()))
+			{
+				// The event exists in this automaton
+				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName());
+				boolean stateFound = false;
+				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				{
+					boolean firstState = true;
+					Arc anArc = (Arc) arcIt.next();
+					try
+					{
+						EventLabel arcEvent = (EventLabel) aut.getEvent(anArc.getEventId());
+						if (arcEvent.getLabel().equals(theEvent.getLabel()))
+						{
+							// The event labels this arc. Get preset (a singleton!).
+							logger.debug("The event labels arc");
+							stateFound = true;
+							State sourceState = (State) anArc.getFromState();
+							if (firstAutomaton)
+							{
+								firstAutomaton = false;
+							}
+							else
+							{
+								theCondition.append(" AND ");
+							}
+							if (firstState)
+							{
+								firstState = false;
+								theCondition.append("(" + aut.getName() + "_" + sourceState.getId() + ".X");
+								logger.debug("Current transition condition: " + theCondition);
+							}
+							else
+							{
+								theCondition.append(" OR " + aut.getName() + "_" + sourceState.getId() + ".X");
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						// This should not happen since the event exists in the automaton.
+						logger.error("Failed getting event label. Code generation erroneous.");
+						return theCondition.toString();
+					}
+				}
+				if (!stateFound)
+				{
+					return "False";
+				}
+				else
+				{
+					theCondition.append(")");
+				}
+			}
+		}
+		return theCondition.toString();
+	}
+
+	private String computeCeaseCondition(Automata theAutomata, EventLabel theEvent)
+	{
+		StringBuffer theCondition = new StringBuffer();
+		boolean firstAutomaton = true;
+		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+		{
+			Automaton aut = (Automaton)autIt.next();
+			if (aut.containsEventWithLabel(theEvent.getLabel()))
+			{
+				// The event exists in this automaton
+				logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName());
+				boolean stateFound = false;
+				for (Iterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				{
+					boolean firstState = true;
+					Arc anArc = (Arc) arcIt.next();
+					try
+					{
+						EventLabel arcEvent = (EventLabel) aut.getEvent(anArc.getEventId());
+						if (arcEvent.getLabel().equals(theEvent.getLabel()))
+						{
+							// The event labels this arc. Get preset (a singleton!).
+							logger.debug("The event labels arc");
+							stateFound = true;
+							State sourceState = (State) anArc.getFromState();
+							if (firstAutomaton)
+							{
+								firstAutomaton = false;
+								theCondition.append("NOT (");
+							}
+							else
+							{
+								theCondition.append(" OR ");
+							}
+							if (firstState)
+							{
+								firstState = false;
+								theCondition.append("(" + aut.getName() + "_" + sourceState.getId() + ".X");
+								logger.debug("Current transition condition: " + theCondition);
+							}
+							else
+							{
+								theCondition.append(" AND " + aut.getName() + "_" + sourceState.getId() + ".X");
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						// This should not happen since the event exists in the automaton.
+						logger.error("Failed getting event label. Code generation erroneous.");
+						return theCondition.toString();
+					}
+				}
+				if (!stateFound)
+				{
+					return "False";
+				}
+				else
+				{
+					theCondition.append(")");
+				}
+			}
+		}
+		theCondition.append(")");
+		return theCondition.toString();
 	}
 
 	private void printSequence(Automaton theAutomaton, State theState, PrintWriter pw)
