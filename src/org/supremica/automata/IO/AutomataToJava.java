@@ -272,14 +272,10 @@ public class AutomataToJava
 		pw.println("\tvoid execute() {");
 		pw.println("\t\t// The index of the event that is selected to be executed");
 		pw.println("\t\tint eventToBeExecuted = NO_EVENT_IS_SELECTED;");
-		pw.println("\t\t");
-		pw.println("\t\t// Set current state to the initial state");
-		pw.println("\t\tfor (int i = 0; i < currentState.length; ++i)");
-		pw.println("\t\t\tcurrentState[i] = 0;");
 		pw.println();
 		pw.println("\t\tlong timeOfLastScan = System.currentTimeMillis();");
 		pw.println("\t\tlong timeToSleep;");
-		pw.println("\t\t");
+		pw.println();
 		pw.println("\t\t// Main scancycle");
 		pw.println("\t\twhile (true) {");
 		pw.println("\t\t\ttry {");
@@ -728,9 +724,18 @@ public class AutomataToJava
 		pw.println("\t * This vector holds the current state.");
 		pw.println("\t * The indices corresponds to automata.");
 		pw.println("\t * The value of an element corresponds");
-		pw.println("\t * to the state of that automaton.");
+		pw.println("\t * to the state of that automaton. It is");
+		pw.println("\t * initiated to its' initial states.");
 		pw.println("\t */");
-		pw.println("\tint[] currentState = new int[NR_OF_AUTOMATA];");
+		pw.print("\tint[] currentState = {");
+		boolean initialStateForFirstAutomatonPrinted = false;
+		for (Iterator it = theProject.iterator(); it.hasNext(); ) {
+			if (initialStateForFirstAutomatonPrinted)
+				pw.print(",\n\t\t\t");
+			pw.print(((Automaton) it.next()).getInitialState().getSynchIndex());
+			initialStateForFirstAutomatonPrinted = true;
+		}
+		pw.println("};");
 		pw.println();
 		pw.println("\t/**");
 		pw.println("\t * This array holds the last read input signal values.");

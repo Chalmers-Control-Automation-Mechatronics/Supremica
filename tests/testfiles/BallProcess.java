@@ -348,9 +348,37 @@ public class BallProcess {
 	 * This vector holds the current state.
 	 * The indices corresponds to automata.
 	 * The value of an element corresponds
-	 * to the state of that automaton.
+	 * to the state of that automaton. It is
+	 * initiated to its' initial states.
 	 */
-	int[] currentState = new int[NR_OF_AUTOMATA];
+	int[] currentState = {0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0};
 
 	/**
 	 * This array holds the last read input signal values.
@@ -1768,14 +1796,10 @@ public class BallProcess {
 	void execute() {
 		// The index of the event that is selected to be executed
 		int eventToBeExecuted = NO_EVENT_IS_SELECTED;
-		
-		// Set current state to the initial state
-		for (int i = 0; i < currentState.length; ++i)
-			currentState[i] = 0;
 
 		long timeOfLastScan = System.currentTimeMillis();
 		long timeToSleep;
-		
+
 		// Main scancycle
 		while (true) {
 			try {
