@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="Automatic Car Park Gate" comment="From 'Designing Dependable Logic Controllers Using the Supervisory Control Theory' by J.M. Roussel and A. Giua. The system is controllable but blocking.">
+<Automaton name="Gate" type="Plant">
+	<Events>
+		<Event id="0" label="nf_GC" controllable="false"/>
+		<Event id="1" label="nf_GO" controllable="false"/>
+		<Event id="2" label="pf_GC" controllable="false"/>
+		<Event id="3" label="pf_GO" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="GC" initial="true" accepting="true"/>
+		<State id="1" name="GO" accepting="true"/>
+		<State id="2" name="GhO"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Vehicle" type="Plant">
+	<Events>
+		<Event id="0" label="nf_V" controllable="false"/>
+		<Event id="1" label="pf_V" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="V" accepting="true"/>
+		<State id="1" name="nV" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Remote" type="Plant">
+	<Events>
+		<Event id="0" label="nf_RC" controllable="false"/>
+		<Event id="1" label="pf_RC" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="RC" accepting="true"/>
+		<State id="1" name="nRC" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Motor" type="Plant">
+	<Events>
+		<Event id="0" label="nf_GC" controllable="false"/>
+		<Event id="1" label="nf_GO" controllable="false"/>
+		<Event id="2" label="nf_cl"/>
+		<Event id="3" label="nf_op"/>
+		<Event id="4" label="pf_GC" controllable="false"/>
+		<Event id="5" label="pf_GO" controllable="false"/>
+		<Event id="6" label="pf_cl"/>
+		<Event id="7" label="pf_op"/>
+	</Events>
+	<States>
+		<State id="0" name="close"/>
+		<State id="1" name="open"/>
+		<State id="2" name="stop" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="0" event="6"/>
+		<Transition source="2" dest="1" event="7"/>
+		<Transition source="2" dest="2" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Control unit" type="Plant">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_GC" controllable="false"/>
+		<Event id="2" label="nf_GO" controllable="false"/>
+		<Event id="3" label="nf_RC" controllable="false"/>
+		<Event id="4" label="nf_V" controllable="false"/>
+		<Event id="5" label="nf_cl"/>
+		<Event id="6" label="nf_op"/>
+		<Event id="7" label="pf_GC" controllable="false"/>
+		<Event id="8" label="pf_GO" controllable="false"/>
+		<Event id="9" label="pf_RC" controllable="false"/>
+		<Event id="10" label="pf_V" controllable="false"/>
+		<Event id="11" label="pf_cl"/>
+		<Event id="12" label="pf_op"/>
+	</Events>
+	<States>
+		<State id="0" name="Exe" initial="true"/>
+		<State id="1" name="Read" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="0" event="12"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="9"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="8"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Output close" type="Plant">
+	<Events>
+		<Event id="0" label="nf_cl"/>
+		<Event id="1" label="pf_cl"/>
+	</Events>
+	<States>
+		<State id="0" name="o2_0" initial="true" accepting="true"/>
+		<State id="1" name="o2_1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Output open" type="Plant">
+	<Events>
+		<Event id="0" label="nf_op"/>
+		<Event id="1" label="pf_op"/>
+	</Events>
+	<States>
+		<State id="0" name="o1_0" initial="true" accepting="true"/>
+		<State id="1" name="o1_1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Functional mode" type="Specification">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_GC" controllable="false"/>
+		<Event id="2" label="nf_GO" controllable="false"/>
+		<Event id="3" label="nf_cl"/>
+		<Event id="4" label="nf_op"/>
+		<Event id="5" label="pf_GC" controllable="false"/>
+		<Event id="6" label="pf_GO" controllable="false"/>
+		<Event id="7" label="pf_RC" controllable="false"/>
+		<Event id="8" label="pf_V" controllable="false"/>
+		<Event id="9" label="pf_op"/>
+	</Events>
+	<States>
+		<State id="0" name="F31" initial="true" accepting="true"/>
+		<State id="1" name="F32"/>
+		<State id="2" name="F32b"/>
+		<State id="3" name="F33" accepting="true"/>
+		<State id="4" name="F34"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="0" event="8"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="9"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="2" dest="2" event="7"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="6"/>
+		<Transition source="2" dest="2" event="8"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="3" dest="3" event="4"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="4" event="2"/>
+		<Transition source="3" dest="3" event="3"/>
+		<Transition source="4" dest="1" event="7"/>
+		<Transition source="4" dest="1" event="8"/>
+		<Transition source="4" dest="4" event="0"/>
+		<Transition source="4" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Closing stop" type="Specification">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_GC" controllable="false"/>
+		<Event id="2" label="nf_cl"/>
+		<Event id="3" label="pf_GC" controllable="false"/>
+		<Event id="4" label="pf_cl"/>
+	</Events>
+	<States>
+		<State id="0" name="S21" initial="true" accepting="true"/>
+		<State id="1" name="S22" accepting="true"/>
+		<State id="2" name="S23"/>
+		<State id="3" name="S24"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Opening stop" type="Specification">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_GO" controllable="false"/>
+		<Event id="2" label="nf_op"/>
+		<Event id="3" label="pf_GO" controllable="false"/>
+		<Event id="4" label="pf_op"/>
+	</Events>
+	<States>
+		<State id="0" name="S11" initial="true" accepting="true"/>
+		<State id="1" name="S12" accepting="true"/>
+		<State id="2" name="S13"/>
+		<State id="3" name="S14"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="3" dest="1" event="2"/>
+		<Transition source="3" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="No close and RC" type="Specification">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_RC" controllable="false"/>
+		<Event id="2" label="nf_cl"/>
+		<Event id="3" label="pf_RC" controllable="false"/>
+		<Event id="4" label="pf_cl"/>
+	</Events>
+	<States>
+		<State id="0" name="S31" initial="true" accepting="true"/>
+		<State id="1" name="S32" accepting="true"/>
+		<State id="2" name="S33"/>
+		<State id="3" name="S34"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="3" dest="2" event="3"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="No close and Vehicle" type="Specification">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_V" controllable="false"/>
+		<Event id="2" label="nf_cl"/>
+		<Event id="3" label="pf_V" controllable="false"/>
+		<Event id="4" label="pf_cl"/>
+	</Events>
+	<States>
+		<State id="0" name="S41" initial="true" accepting="true"/>
+		<State id="1" name="S42" accepting="true"/>
+		<State id="2" name="S43"/>
+		<State id="3" name="S44"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="3" dest="2" event="3"/>
+		<Transition source="3" dest="3" event="0"/>
+		<Transition source="3" dest="3" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="No close and open" type="Specification">
+	<Events>
+		<Event id="0" label="nf_cl"/>
+		<Event id="1" label="nf_op"/>
+		<Event id="2" label="pf_cl"/>
+		<Event id="3" label="pf_op"/>
+	</Events>
+	<States>
+		<State id="0" name="S01" initial="true" accepting="true"/>
+		<State id="1" name="S02"/>
+		<State id="2" name="S03"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Stability of close" type="Specification">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_cl"/>
+		<Event id="2" label="pf_cl"/>
+	</Events>
+	<States>
+		<State id="0" name="F11" initial="true" accepting="true"/>
+		<State id="1" name="F12"/>
+		<State id="2" name="F13"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Stability of open" type="Specification">
+	<Events>
+		<Event id="0" label="end"/>
+		<Event id="1" label="nf_op"/>
+		<Event id="2" label="pf_op"/>
+	</Events>
+	<States>
+		<State id="0" name="F21" initial="true" accepting="true"/>
+		<State id="1" name="F22"/>
+		<State id="2" name="F23"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+</Automata>

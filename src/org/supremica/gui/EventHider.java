@@ -27,9 +27,9 @@ import org.supremica.automata.ArcIterator;
 import org.supremica.automata.Arc;
 
 /**
- * Gaaaah! LanguageRestrictorDialog has lots of stuff in it that should be somewhere else. 
+ * Gaaaah! LanguageRestrictorDialog has lots of stuff in it that should be somewhere else.
  * There should be a "EventSelectorDialog" or something that should be used for the selection.
- * Other calsses may want to do this, you know. I didn't have the energy to do all that so this 
+ * Other calsses may want to do this, you know. I didn't have the energy to do all that so this
  * is an ugly fix using the LanguageRestrictorDialog.
  */
 class EventHiderDialog
@@ -70,7 +70,7 @@ class EventHiderDialog
 	{
 		// The set of new automata, based on the selected automata
 		Automata newAutomata = new Automata();
-		
+
 		// Get the events selected by the user (may be for keeping or for hiding)
 		Alphabet alpha = restrictEvents.getAlphabet();
 
@@ -87,21 +87,13 @@ class EventHiderDialog
 			{
 				alpha = Alphabet.minus(automaton.getAlphabet(), alpha);
 			}
-			
+
 			// Do the hiding
-			EventHider.hide(newAutomaton, alpha);
-			
+			newAutomaton.hide(alpha);
+
 			// Set appropriate comment
-			if (restrictEvents.toErase())
-			{
-				newAutomaton.setComment(automaton.getName() + "/" + 
-										Alphabet.intersect(automaton.getAlphabet(), alpha));
-			}
-			else
-			{
-				newAutomaton.setComment(automaton.getName() + "/" + 
-										Alphabet.minus(automaton.getAlphabet(), alpha));
-			}
+			newAutomaton.setComment(automaton.getName() + "/" +
+									Alphabet.intersect(automaton.getAlphabet(), alpha));
 
 			// Add automaton
 			newAutomata.addAutomaton(newAutomaton);
@@ -140,43 +132,5 @@ public class EventHider
 
 		// Throw up the dialog, let the user select the alphabet
 		EventHiderDialog dlg = new EventHiderDialog(automata);
-	}
-
-	/**
-	 * Hides the supplied alphabet alpha in the supplied automaton aut.
-	 */
-	public static void hide(Automaton aut, Alphabet alpha)
-	{
-		// Remove the hidden events
-		aut.getAlphabet().minus(alpha);
-
-		// Get/create silent event tau
-		LabeledEvent tau = aut.getAlphabet().getEvent("tau");
-		if (tau == null)
-		{
-			tau = new LabeledEvent("tau");
-			tau.setEpsilon(true);
-			aut.getAlphabet().addEvent(tau);
-		}
-		else
-		{
-			if (!tau.isEpsilon())
-			{
-				logger.error("The event name 'tau' is reserved and must be unobservable!");
-				return;
-			}
-		}
-
-		// Modify arcs
-		for (ArcIterator arcIt = aut.arcIterator(); arcIt.hasNext(); )
-		{
-			Arc arc = arcIt.nextArc();
-			
-			// Hide this one?
-			if (alpha.contains(arc.getEvent()))
-			{
-				arc.setEvent(tau);
-			}
-		}
 	}
 }

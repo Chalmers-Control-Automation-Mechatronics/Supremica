@@ -175,7 +175,9 @@ class SynthesizerDialogStandardPanel
 		Box anotherBox = Box.createVerticalBox();
 		anotherBox.add(purgeBox);
 		anotherBox.add(optimizeBox);
-		this.add(standardBox, BorderLayout.CENTER);
+		this.add(new Label("     "), BorderLayout.NORTH); // Ugly fix to get stuff centered
+		this.add(standardBox, BorderLayout.NORTH);
+		this.add(new Label("     "), BorderLayout.NORTH); // Ugly fix to get stuff centered
 		this.add(anotherBox, BorderLayout.CENTER);
 		this.add(nbNote, BorderLayout.SOUTH);
 	}

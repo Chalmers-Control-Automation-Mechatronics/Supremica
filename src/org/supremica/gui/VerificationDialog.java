@@ -73,8 +73,8 @@ class VerificationDialogStandardPanel
 	private JTextArea note;
 
 	//private JTextArea note;// = new JTextArea("Bananas...");
-	//final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake! 
-	//   "nonblocking",       // No! God has nothing to do with programming!! 
+	//final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake!
+	//   "nonblocking",       // No! God has nothing to do with programming!!
 	//   "Language inclusion"};// Programming is fate-driven!
 	static class AlgorithmSelector
 		extends JComboBox
@@ -160,8 +160,8 @@ class VerificationDialogStandardPanel
 			// Force the monolithic algorithm
 			//algorithmSelector.forceMonolithic();
 			//note.setText("Note:\n" + "Currently, modular nonblocking\n" + "verification is not supported.");
-			note.setText("Note:\n" + "This algorithm uses incremental\n" + 
-						 "composition and minimization with\n" + 
+			note.setText("Note:\n" + "This algorithm uses incremental\n" +
+						 "composition and minimization with\n" +
 						 "respect to conflict equivalence.");
 			note.setVisible(true);
 		}
@@ -323,7 +323,8 @@ public class VerificationDialog
 		Object source = event.getSource();
 
 		if (source == okButton)
-		{    // Remember the selections
+		{
+			// Remember the selections
 			standardPanel.regain(verificationOptions);
 			advancedPanel.regain(verificationOptions);
 			verificationOptions.saveOptions();

@@ -297,7 +297,7 @@ public class ProjectBuildFromXml
 			// Reset the id maps when parsing a new automaton
 			idEventMap = new HashMap();
 			idStateMap = new HashMap();
-			
+
 			doAutomaton(attributes);
 		}
 		else if (projectStr.equals(name))

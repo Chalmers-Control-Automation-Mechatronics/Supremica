@@ -50,9 +50,12 @@
 package org.supremica.automata.algorithms;
 
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.log.*;
 
 public final class SynthesizerOptions
 {
+	private static Logger logger = LoggerFactory.createLogger(SynthesizerOptions.class);
+
 	private boolean dialogOK = false;
 	private SynthesisType synthesisType;
 	private SynthesisAlgorithm synthesisAlgorithm;
@@ -72,8 +75,8 @@ public final class SynthesizerOptions
 	}
 
 	/**
-	 * This is not a good constructor so it is private, it is impossible to read in the code. 
-	 * Use the "getDefault..."-methods in this class instead or when they won't suit you, 
+	 * This is not a good constructor so it is private, it is impossible to read in the code.
+	 * Use the "getDefault..."-methods in this class instead or when they won't suit you,
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
 	 */
@@ -90,7 +93,33 @@ public final class SynthesizerOptions
 
 	public boolean isValid()
 	{
-		return AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm);
+		String errorMessage = validOptions();
+		if (errorMessage != null)
+		{
+			logger.error(errorMessage);
+			return false;
+		}
+
+		return true;
+	}
+
+	public String validOptions()
+	{
+		if (synthesisType == SynthesisType.Unknown)
+		{
+			return "Unknown synthesis type.";
+		}
+
+		if (synthesisAlgorithm == SynthesisAlgorithm.Unknown)
+		{
+			return "Unknown synthesis algorithm.";
+		}
+		else if (synthesisAlgorithm == SynthesisAlgorithm.IDD)
+		{
+			return "IDD synthesis is not implemented.";
+		}
+
+		return null;
 	}
 
 	public void setDialogOK(boolean bool)

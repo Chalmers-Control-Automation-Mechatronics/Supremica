@@ -55,6 +55,7 @@ public class VerificationType
 {
 	private static Collection types = new LinkedList();
 	public static final VerificationType Controllability = new VerificationType("Controllability");
+	public static final VerificationType InverseControllability = new VerificationType("Inverse Controllability");
 	public static final VerificationType Nonblocking = new VerificationType("Nonblocking");
 	public static final VerificationType MutuallyNonblocking = new VerificationType("Mutual Nonblocking");
 	public static final VerificationType LanguageInclusion = new VerificationType("Language Inclusion");

@@ -23,8 +23,8 @@ public class Determinizer
 
 	// private Alphabet epsilons = null;
 	private EpsilonTester epsilonTester = null;
-	private SetOfStateSets openStateSets = new SetOfStateSets();
-	private SetOfStateSets closedStateSets = new SetOfStateSets();
+	private StateSets openStateSets = new StateSets();
+	private StateSets closedStateSets = new StateSets();
 	private StateSet openStates = new StateSet();
 	private StateSet closedStates = new StateSet();
 	private boolean checkControlInconsistencies = false;
@@ -55,10 +55,10 @@ public class Determinizer
 		this.epsilonTester = new AlphaEpsilonTester(events, contains);
 		this.newAutomaton = createNewAutomaton();
 	}
-	
+
 	/**
-	 * Determinize using a supplied epsilonTester for deciding which (and when...) events are 
-	 * considered to be epsilons. 
+	 * Determinize using a supplied epsilonTester for deciding which (and when...) events are
+	 * considered to be epsilons.
 	 */
 	public Determinizer(Automaton automaton, EpsilonTester epsilonTester)
 	{
@@ -97,7 +97,7 @@ public class Determinizer
 				state_it.hasNext(); )
 		{
 			State state = (State) state_it.next();
-			
+
 			state.setStateSet(null);
 		}
 
@@ -107,7 +107,7 @@ public class Determinizer
 
 		let Qinit = epsilonClosure(initialState)
 		put Qinit on openStates
-		
+
 		while openStates is not empty
 		{
 			get Q1 from openStates
@@ -127,12 +127,12 @@ public class Determinizer
 		}
 
 		and that's how it goes */
-		
+
 		// This should be the one and only initial state!
-		StateSet initset = epsilonClosure(automaton.getInitialState());    
+		StateSet initset = epsilonClosure(automaton.getInitialState());
 
 		// put it on openStateSets (if not already seen)
-		add(initset);  
+		add(initset);
 
 		// Create initial state
 		State init = initset.getSingleStateRepresentation();
@@ -220,7 +220,6 @@ public class Determinizer
 
 		// Add all events except the epsilons
 		Iterator alphait = automaton.getAlphabet().iterator();
-
 		while (alphait.hasNext())
 		{
 			LabeledEvent event = (LabeledEvent) alphait.next();
@@ -246,7 +245,6 @@ public class Determinizer
 	{
 		if (!openStateSets.contains(states) &&!closedStateSets.contains(states))
 		{
-
 			// printTabs();
 			// System.out.println("adding " + states.toString());
 			openStateSets.add(states);
@@ -270,7 +268,6 @@ public class Determinizer
 		// System.out.println("(evCSsE) stateit created");
 		while (stateit.hasNext())
 		{
-
 			// System.out.println("stateit hasNext(), yes");
 			State state = (State) stateit.next();
 
@@ -379,7 +376,6 @@ public class Determinizer
 		// No states are ever removed, so we can use the size to determine when fixpoint reached
 		int nextsize = closure.size();    // we use the size to determine fixpoint
 		int prevsize = 0;    // no states are removed, so same size means we're finished
-
 		if (prevsize != nextsize)
 		{
 			do

@@ -4,11 +4,28 @@ import java.util.*;
 
 public class StateSets
 {
-	private LinkedList stateSets = new LinkedList();
+	private HashSet stateSets;
 
-	public void add(StateSet set)
+	// Private constructor for cloning
+	private StateSets(HashSet hashset)
 	{
-		stateSets.add(set);
+		stateSets = new HashSet(hashset);
+	}
+
+	public StateSets()
+	{
+		stateSets = new HashSet();
+	}
+
+	// Shallow copy (should it be deep?)
+	public StateSets(StateSets ss)
+	{
+		this(ss.stateSets);
+	}
+
+	public boolean add(StateSet set)
+	{
+		return stateSets.add(set);
 	}
 
 	public void add(StateSets sets)
@@ -25,40 +42,11 @@ public class StateSets
 	}
 
 	/**
-	 * Returns the first StateSet in this StateSets.
-	 */
-	public StateSet getFirst()
-	{
-		StateSet set = (StateSet) stateSets.getFirst();
-		return set;
-	}
-	
-	/**
 	 * Removes stateSet from this StateSets.
 	 */
 	public void remove(StateSet stateSet)
 	{
 		stateSets.remove(stateSet);
-	}
-
-	public Iterator iterator()
-	{
-		return stateSets.iterator();
-	}
-
-	public Iterator safeIterator()
-	{
-		return ((LinkedList) stateSets.clone()).iterator();
-	}
-
-	public void clear()
-	{
-		stateSets.clear();
-	}
-
-	public int size()
-	{
-		return stateSets.size();
 	}
 
 	public String toString()
@@ -86,5 +74,79 @@ public class StateSets
 		{
 			((StateSet) setIt.next()).update();
 		}
+	}
+
+	public static StateSets union(StateSets s1, StateSets s2)
+	{
+		StateSets ss = new StateSets(s1);
+
+		ss.union(s2);
+
+		return ss;
+	}
+
+	public static StateSets intersect(StateSets s1, StateSets s2)
+	{
+		StateSets ss = new StateSets(s1);
+
+		ss.intersect(s2);
+
+		return ss;
+	}
+
+	// Make me the union of myself and s2
+	public void union(StateSets s2)
+	{
+		stateSets.addAll(s2.stateSets);
+	}
+
+	// Make me the intersection of myself and s2
+	public void intersect(StateSets s2)
+	{
+		stateSets.retainAll(s2.stateSets);
+	}
+
+	public void clear()
+	{
+		stateSets.clear();
+	}
+
+	/*
+	// Shallow copy (is that what we mean by clone, really?)
+	public Object clone()
+	{
+		return new StateSets(((HashSet) stateSets.clone()));
+	}
+	*/
+
+	public boolean contains(StateSet states)
+	{
+		return stateSets.contains(states);
+	}
+
+	public boolean isEmpty()
+	{
+		return stateSets.isEmpty();
+	}
+
+	public Iterator iterator()
+	{
+		return stateSets.iterator();
+	}
+
+	public Object[] toArray()
+	{
+		return stateSets.toArray();
+	}
+
+	public int size()
+	{
+		return stateSets.size();
+	}
+
+	// Return an arbitrary element. Note, assumes that at least one exists
+	public StateSet get()
+	{
+		return (StateSet) iterator().next();
 	}
 }

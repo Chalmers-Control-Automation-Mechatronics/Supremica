@@ -47,6 +47,7 @@ public class AlphabetSubTree
 
 	public Icon getLeafIcon()
 	{
+		//return null;
 		return getOpenIcon();
 	}
 }

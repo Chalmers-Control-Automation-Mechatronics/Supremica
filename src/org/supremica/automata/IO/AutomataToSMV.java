@@ -343,7 +343,7 @@ public class AutomataToSMV
 		boolean previousUncontrollableEvent = false;
 
 		//Automata plantAutomata = theAutomata.getPlantAutomata();
-		Automata specSupAutomata = theAutomata.getSpecificationSupervisorAutomata();
+		Automata specSupAutomata = theAutomata.getSpecificationAndSupervisorAutomata();
 
 		// Iterate over all uncontrollable events and find conditions for controllability
 		for (EventIterator evIt = allEvents.iterator(); evIt.hasNext(); )

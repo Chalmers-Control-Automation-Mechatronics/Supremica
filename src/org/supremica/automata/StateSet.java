@@ -51,7 +51,7 @@ public class StateSet
 	public StateSet(Automaton aut)
 	{
 		this();
-		
+
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext(); )
 		{
 			this.add(stateIt.nextState());
@@ -145,7 +145,7 @@ public class StateSet
 	public ArcIterator outgoingArcsIterator()
 	{
 		LinkedList arcs = new LinkedList();
-		
+
 		for (StateIterator stateIt = iterator(); stateIt.hasNext(); )
 		{
 			for (ArcIterator arcIt = stateIt.nextState().outgoingArcsIterator(); arcIt.hasNext(); )
@@ -153,7 +153,7 @@ public class StateSet
 				arcs.add(arcIt.nextArc());
 			}
 		}
-		
+
 		return new ArcIterator(arcs.iterator());
 	}
 	*/
@@ -256,9 +256,9 @@ public class StateSet
 
 	/**
 	 * Creates a new state named as the composition of the states in this set
-	 * Should use the globally defined state separator 
+	 * Should use the globally defined state separator
 	 *
-	 * The "initial" attribute should be set in the automaton that this state 
+	 * The "initial" attribute should be set in the automaton that this state
 	 * should be long to, not here!
 	 */
 	public State createSingleStateRepresentation()
@@ -286,11 +286,16 @@ public class StateSet
 		}
 
 		// Create new state
-		State newstate = new State(buf.toString());
+		String newName = buf.toString();
+		if (newName.length() > 10)
+		{
+			newName = newName.substring(0,10) + Math.random() + "...";
+		}
+		State newstate = new State(newName);
 		// if(i) newstate.setInitial(true);
 		if (d) newstate.setAccepting(true);
 		if (x) newstate.setForbidden(true);
-		
+
 		return newstate;
 	}
 

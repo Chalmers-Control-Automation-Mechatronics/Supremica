@@ -138,11 +138,13 @@ class AutomataSelector
 
 				// Did we find any plants?
 				if (partialSet.size() > 1)
-				{    // Nice! Then we're ready
+				{
+					// Nice! Then we're ready
 					break;
 				}
 				else
-				{    // Have another go...
+				{
+					// Have another go...
 					partialSet.clear();
 				}
 			}

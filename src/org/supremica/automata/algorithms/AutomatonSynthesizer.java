@@ -51,7 +51,6 @@ package org.supremica.automata.algorithms;
 
 import org.supremica.util.SupremicaException;
 import org.supremica.log.*;
-import org.supremica.util.ActionTimer;
 import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.standard.ObserverBuilder;
@@ -63,6 +62,7 @@ import org.supremica.automata.algorithms.standard.ObserverBuilder;
  *@created  November 28, 2000
  */
 public class AutomatonSynthesizer
+	implements Stoppable
 {
 	protected static Logger logger = LoggerFactory.createLogger(AutomatonSynthesizer.class);
 	protected Automaton theAutomaton;
@@ -71,8 +71,9 @@ public class AutomatonSynthesizer
 	protected boolean rememberDisabledEvents = false;
 	protected Alphabet disabledEvents;
 	protected final static boolean debugMode = false;
-	protected final ActionTimer theTimer = new ActionTimer();
 	protected boolean forcedPurge = false;
+
+	private boolean stopRequested = false;
 
 	/**
 	 * theAutomaton will be changed!
@@ -89,27 +90,12 @@ public class AutomatonSynthesizer
 		this.synthesizerOptions = synthesizerOptions;
 	}
 
-	/**
-	 * Return the time required to run this algorithm. It is only valid to
-	 * call this method after the return of the execute method.
-	 */
-	public long elapsedTime()
-	{
-		return theTimer.elapsedTime();
-	}
-
-	public Automaton getAutomaton()
-	{
-		return theAutomaton;
-	}
-
 	// Synthesize a monolithic supervisor
 	public boolean synthesize()
 		throws Exception
 	{
 		logger.debug("AutomatonSynthesizer::synthesize()");
 		theAutomaton.beginTransaction();
-		theTimer.start();
 
 		SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
 		boolean didSomething = false;    // records whether we actually did anything
@@ -141,9 +127,11 @@ public class AutomatonSynthesizer
 			purge();
 		}
 
-		theTimer.stop();
 		theAutomaton.invalidate();
 		theAutomaton.endTransaction();
+
+		theAutomaton.setComment("sup(" + theAutomaton.getName() + ")");
+		theAutomaton.setName(null);
 
 		return didSomething;
 	}
@@ -178,6 +166,11 @@ public class AutomatonSynthesizer
 		while (!observable)
 		{
 			boolean changed = synthesizeControllableNonblocking();
+
+			if (stopRequested)
+			{
+				return false;
+			}
 
 			didSomething = didSomething || changed;
 
@@ -269,9 +262,7 @@ public class AutomatonSynthesizer
 
 		// Forbid the states with MAX_COST set
 		boolean didSomething = false;
-
-		for (StateIterator stateIt = theAutomaton.stateIterator();
-				stateIt.hasNext(); )
+		for (StateIterator stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
@@ -400,6 +391,11 @@ public class AutomatonSynthesizer
 		// Do propagate coreachability
 		while (stateStack.size() > 0)
 		{
+			if (stopRequested)
+			{
+				return new LinkedList();
+			}
+
 			State currState = (State) stateStack.removeLast();
 			currState.setVisited(true);
 
@@ -454,6 +450,11 @@ public class AutomatonSynthesizer
 		// Do propagate uncontrollability
 		while (stateStack.size() > 0)
 		{
+			if (stopRequested)
+			{
+				return false;
+			}
+
 			State currState = (State) stateStack.removeLast();
 
 /*
@@ -555,6 +556,11 @@ public class AutomatonSynthesizer
 		// Do propagate reachability
 		while (stateStack.size() > 0)
 		{
+			if (stopRequested)
+			{
+				return;
+			}
+
 			State currState = (State) stateStack.removeLast();
 
 			currState.setVisited(true);
@@ -656,5 +662,25 @@ public class AutomatonSynthesizer
 		}
 
 		stateList.clear();
+	}
+
+	/**
+	 * Return the previously computed result.
+	 */
+	public Automaton getAutomaton()
+	{
+		return theAutomaton;
+	}
+
+	/**
+	 * Method that stops the synthesizer as soon as possible.
+	 *
+	 * @see  ExecutionDialog
+	 */
+	public void requestStop()
+	{
+		stopRequested = true;
+
+		logger.debug("AutomatonSynthesizer requested to stop.");
 	}
 }

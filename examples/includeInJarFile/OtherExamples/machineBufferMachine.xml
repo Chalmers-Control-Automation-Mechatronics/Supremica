@@ -108,8 +108,8 @@
 </Automaton>
 <Automaton name="AltFinish" type="Specification">
 	<Events>
-		<Event id="s1" label="End1"/>
-		<Event id="s2" label="End2"/>
+		<Event id="s1" label="End1" controllable="false"/>
+		<Event id="s2" label="End2" controllable="false"/>
 	</Events>
 	<States>
 		<State id="s0" name="End1" initial="true" accepting="true"/>

@@ -132,14 +132,17 @@ class MinimizationDialogStandardPanel
 		// Should we display a note?
 		if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.ObservationEquivalence)
 		{
-			note.setText("Note:\n" + "This minimization algorithm is experimental! The\n" +
+			note.setText("Note:\n" +
+						 "This minimization algorithm is experimental! The\n" +
 						 "result may not be minimal but should at least be\n" +
-						 "observation equivalent to the input.");
+						 "observation equivalent to the input with the excep-\n" +
+						 "tion of epsilon loops where the marking is ignored.");
 			note.setVisible(true);
 		}
 		else if ((minimizationTypeBox.getSelectedItem()) == EquivalenceRelation.LanguageEquivalence)
 		{
-			note.setText("Note:\n" + "Returns an automaton representing the same language\n" +
+			note.setText("Note:\n" +
+			      	  	 "Returns an automaton representing the same language\n" +
 						 "using a minimal number of states and transitions.\n" +
 						 "  If the automaton is nondeterministic, it is first\n" +
 						 "made deterministic.");
@@ -190,7 +193,7 @@ class MinimizationDialogAdvancedPanel
 	{
 		unionAlphabet = automata.getUnionAlphabet();
 		targetAlphabet = null;
-		
+
 		compositionalMinimization = new JCheckBox("Compositional minimization");
 		compositionalMinimization.addActionListener(this);
 		targetAlphabetSelector = new List(8, true);
@@ -204,7 +207,7 @@ class MinimizationDialogAdvancedPanel
 				targetAlphabetSelector.add(event.getLabel());
 			}
 		}
-		
+
 		//note = new JTextArea("Note:\n" + "I have nothing to say.");
 		//note.setBackground(this.getBackground());
 
@@ -240,7 +243,7 @@ class MinimizationDialogAdvancedPanel
 	}
 
 	public void regain(MinimizationOptions options)
-	{	
+	{
 		// Update targetAlphabet
 		if (compositionalMinimization.isSelected())
 		{
@@ -255,7 +258,7 @@ class MinimizationDialogAdvancedPanel
 		{
 			targetAlphabet = null;
 		}
-		
+
 		options.setCompositionalMinimization(compositionalMinimization.isSelected());
 		options.setTargetAlphabet(targetAlphabet);
 	}
@@ -273,7 +276,7 @@ class MinimizationDialogAdvancedPanel
 		{
 			targetAlphabetSelector.setEnabled(false);
 			//targetAlphabetSelector.setVisible(false);
-			//note.setVisible(false);			
+			//note.setVisible(false);
 		}
 	}
 }

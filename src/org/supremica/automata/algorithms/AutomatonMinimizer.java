@@ -1,51 +1,51 @@
 
 /*
- *  Supremica Software License Agreement
+ * Supremica Software License Agreement
  *
- *  The Supremica software is not in the public domain
- *  However, it is freely available without fee for education,
- *  research, and non-profit purposes.  By obtaining copies of
- *  this and other files that comprise the Supremica software,
- *  you, the Licensee, agree to abide by the following
- *  conditions and understandings with respect to the
- *  copyrighted software:
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
  *
- *  The software is copyrighted in the name of Supremica,
- *  and ownership of the software remains with Supremica.
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
  *
- *  Permission to use, copy, and modify this software and its
- *  documentation for education, research, and non-profit
- *  purposes is hereby granted to Licensee, provided that the
- *  copyright notice, the original author's names and unit
- *  identification, and this permission notice appear on all
- *  such copies, and that no charge be made for such copies.
- *  Any entity desiring permission to incorporate this software
- *  into commercial products or to use it for commercial
- *  purposes should contact:
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
  *
- *  Knut Akesson (KA), knut@supremica.org
- *  Supremica,
- *  Haradsgatan 26A
- *  431 42 Molndal
- *  SWEDEN
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
  *
- *  to discuss license terms. No cost evaluation licenses are
- *  available.
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
  *
- *  Licensee may not use the name, logo, or any other symbol
- *  of Supremica nor the names of any of its employees nor
- *  any adaptation thereof in advertising or publicity
- *  pertaining to the software without specific prior written
- *  approval of the Supremica.
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
  *
- *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
  *
- *  Supremica is owned and represented by KA.
+ * Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
@@ -102,7 +102,7 @@ public class AutomatonMinimizer
 		throws Exception
 	{
 		this.options = options;
-		
+
 		// Are the options valid?
 		if (!options.isValid())
 		{
@@ -119,94 +119,110 @@ public class AutomatonMinimizer
 		// Make reachable
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, SynthesizerOptions.getDefaultSynthesizerOptions());
 		synth.doReachable();
-		for (Iterator it = theAutomaton.safeStateIterator(); it.hasNext(); )
+		LinkedList toBeRemoved = new LinkedList();
+		for (StateIterator it = theAutomaton.stateIterator(); it.hasNext(); )
 		{
-			State state = (State) it.next();
+			State state = it.nextState();
 			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
 			{
-				theAutomaton.removeState(state);
+				toBeRemoved.add(state);
 			}
 		}
+		while (toBeRemoved.size() != 0)
+		{
+			theAutomaton.removeState((State) toBeRemoved.remove(0));
+		}
 
-		// The current partitioning
-		EquivalenceClasses equivClasses = new EquivalenceClasses();
+		//logger.info("X");
 
 		// Find out what to do
 		EquivalenceRelation equivalenceRelation = options.getMinimizationType();
+		if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
+		{
+			// Is this automaton nondeterministic?
+			if (!theAutomaton.isDeterministic())
+			{
+				// Make deterministic
+				Determinizer determinizer = new Determinizer(theAutomaton);
+				determinizer.execute();
+				theAutomaton = determinizer.getNewAutomaton();
+			}
+
+			// Now we're ready for minimization!
+		}
+		else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
+		{
+			// Merge silent loops and other obvious OE stuff (to save computation later)
+			// (Almost like cheating.)
+			int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
+			if (count > 0)
+			{
+				logger.debug("Removed " + count + " observation equivalent states " +
+							 "before running the minimization.");
+			}
+
+			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
+			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
+
+			// Saturate
+			doTransitiveClosure(theAutomaton);
+
+			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
+			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
+
+			// Now we're ready for minimization!
+		}
+		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+		{
+			//logger.info("Z");
+
+			// Merge silent loops and other obvious OE stuff (to save computation later)
+			// (Almost like cheating.)
+			int count = preMinimizationMergeObservationEquivalentStates(theAutomaton);
+			if (count > 0)
+			{
+				logger.debug("Removed " + count + " observation equivalent states " +
+							 "before running minimization.");
+			}
+
+			//logger.info("A");
+
+			// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
+			//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
+
+			// Saturate
+			doTransitiveClosure(theAutomaton);
+
+			//logger.info("B");
+
+			// Adjust marking based on epsilon transitions (it IS ok (actually necessary)
+			// to do this AFTER doTransitiveClosure). This is not an expensive computation.
+			adjustMarking(theAutomaton); // Not OE
+
+			// Now we're ready for minimization!
+		}
+		else
+		{
+			throw new Exception("Unknown equivalence relation");
+		}
+
+		// After the above preparations, we can do the minimization in the same way for all cases!
+		// Find the coarsest partitioning
+		EquivalenceClasses equivClasses = new EquivalenceClasses();
 		try
 		{
-			if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
-			{
-				// Is this automaton nondeterministic?
-				if (!theAutomaton.isDeterministic())
-				{
-					// Make deterministic
-					Determinizer determinizer = new Determinizer(theAutomaton);
-					determinizer.execute();
-					theAutomaton = determinizer.getNewAutomaton();
-				}
-
-				// Now we're ready for minimization!
-			}
-			else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
-			{
-				// Merge silent loops and other obvious OE stuff (to save computation later)
-				int count = preMinimizationMergeObservationEquivalentStates(theAutomaton); 
-				if (count > 0)
-				{
-					logger.debug("Removed " + count + " observation equivalent states " + 
-								"before running the minimization.");
-				}
-
-				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
-				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
-				
-				// Saturate
-				doTransitiveClosure(theAutomaton);
-				
-				// Now... language equivalence minimization will yield the (considering states)
-				// minimal observation equivalent automaton
-			}
-			else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
-			{
-				// Merge silent loops and other obvious OE stuff (to save computation later)
-				int count = preMinimizationMergeObservationEquivalentStates(theAutomaton); 
-				if (count > 0)
-				{
-					logger.debug("Removed " + count + " observation equivalent states " + 
-								"before running minimization.");
-				}
-					
-				// Add automaton to gui (for debugging purposes! This should not be the standard procedure!!)
-				//ActionMan.getGui().addAutomaton(new Automaton(theAutomaton));
-
-				// Saturate
-				doTransitiveClosure(theAutomaton);
-
-				// Adjust marking based on epsilon transitions (it IS ok (actually necessary) 
-				// to do this AFTER doTransitiveClosure) this is not an expensive computation
-				adjustMarking(theAutomaton); // Not OE
-								
-				// Now... language equivalence minimization will yield a smaller (considering states)
-				// conflict equivalent automaton
-			}
-			else
-			{
-				throw new Exception("Unknown equivalence relation");
-			}
-
-			// After the above preparations, we can do the minimization in the same way for all cases!
-
 			// Find initial partitioning
 			equivClasses = findInitialPartitioning(theAutomaton);
-			
+
 			if (stopRequested)
 			{
 				return null;
 			}
-			
+
+			//logger.info("C");
+
 			// Minimize
-			doLanguageEquivalenceMinimization(equivClasses);
+			findCoarsestPartitioning(equivClasses);
 		}
 		catch (Exception ex)
 		{
@@ -223,38 +239,45 @@ public class AutomatonMinimizer
 			return null;
 		}
 
+		//logger.info("D");
+
 		// Should we remove redundant transitions to minimize also with respect to transitions?
 		if (options.getAlsoTransitions())
 		{
 			removeRedundantTransitions(newAutomaton);
 		}
 
+		//logger.info("E");
+
 		// Post minimization adjustments
 		if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence)
 		{
-			// The minimization sometimes misses stuff that is easy to see (for the trained eye...)
-			// (BUG!)
+			// The minimization sometimes misses stuff that is easy to see (for the trained eye...)?
+			// Not any more? The message is now fatal!
+			// (This is a BUG!)
 			int count = preMinimizationMergeObservationEquivalentStates(newAutomaton);
 			if (count > 0)
 			{
-				logger.debug("Removed " + count + " observation equivalent states " + 
+				logger.fatal("Removed " + count + " observation equivalent states " +
 							"after running the minimization (it didn't work properly).");
 			}
 		}
 		else if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
 		{
 			// Merge conflict equivalent states and stuff...
-			// (FEATURE!)
+			// (This is a FEATURE!)
 			int count = postMinimizationMergeConflictEquivalentStates(newAutomaton); // Not OE
 			if (count > 0)
 			{
-				logger.debug("Removed " + count + " conflict equivalent states after " + 
+				logger.debug("Removed " + count + " conflict equivalent states after " +
 							"running observation equivalence minimization.");
 			}
 		}
 
 		// Remove from alphabet epsilon events that are never used
 		removeUnusedEpsilonEvents(newAutomaton);
+
+		//logger.info("F");
 
 		// Return the result of the minimization!
 		return newAutomaton;
@@ -266,13 +289,15 @@ public class AutomatonMinimizer
 	 */
 	private EquivalenceClasses findInitialPartitioning(Automaton aut)
 	{
-		// Find the initial partitioning for the minimization
-		EquivalenceClasses equivClasses = new EquivalenceClasses();
+		if (aut == null)
+		{
+			return null;
+		}
 
 		// Divide the state space into three initial equivalence classes, based on markings
 		EquivalenceClass acceptingStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
 		EquivalenceClass forbiddenStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
-		EquivalenceClass rejectingStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
+		EquivalenceClass ordinaryStates = new EquivalenceClass(); //EqClassFactory.getEqClass();
 
 		// Examine each state for which class it fits into
 		StateIterator stateIt = aut.stateIterator();
@@ -288,25 +313,26 @@ public class AutomatonMinimizer
 			else if (currState.isAccepting() && !options.getIgnoreMarking())
 			{
 				currState.setStateSet(acceptingStates);
-					acceptingStates.add(currState);
+				acceptingStates.add(currState);
 			}
 			else
 			{
-				currState.setStateSet(rejectingStates);
-				rejectingStates.add(currState);
+				currState.setStateSet(ordinaryStates);
+				ordinaryStates.add(currState);
 			}
 		}
 
 		// Put these new classes into a single object
 		// Only if there are any states in the class...
+		EquivalenceClasses equivClasses = new EquivalenceClasses();
 		if (acceptingStates.size() > 0)
 		{
 			equivClasses.add(acceptingStates);
 		}
 
-		if (rejectingStates.size() > 0)
+		if (ordinaryStates.size() > 0)
 		{
-			equivClasses.add(rejectingStates);
+			equivClasses.add(ordinaryStates);
 		}
 
 		if (forbiddenStates.size() > 0)
@@ -388,74 +414,70 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * Splits the equivalence classes with respect to language equivalence, based
-	 * on this, an automaton with a minimal number of states can be generated from
-	 * the equivalence classes!
+	 * Finds the coarsest partitioning of the supplied equivalence classes.
+	 * In each partition, the states have corresponding outgoing arcs. Based
+	 * on this, an automaton with a minimal number of states can be generated...
 	 */
-	private void doLanguageEquivalenceMinimization(EquivalenceClasses equivClasses)
+	private void findCoarsestPartitioning(EquivalenceClasses equivClasses)
 	{
 		boolean refined;
 
+		// Repeat until no refinement occurs.
 		do
 		{
 			refined = false;
 
-			// Split all current equivClasses
-			Iterator classIt = equivClasses.safeIterator();
-			while (classIt.hasNext())
+			if (stopRequested)
 			{
-				EquivalenceClass currClass = (EquivalenceClass) classIt.next();
-				
-				refined = doLanguageEquivalenceMinimization(equivClasses, currClass) || refined;
+				return;
+			}
+
+			// Split all current equivClasses
+			Object[] array = equivClasses.toArray();
+			for (int i=0; i<array.length; i++)
+			{
+				EquivalenceClass currClass = (EquivalenceClass) array[i];
+				refined = partition(equivClasses, currClass) || refined;
 			}
 		}
 		while (refined);
 	}
-	private boolean doLanguageEquivalenceMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
+	private boolean partition(EquivalenceClasses equivClasses, EquivalenceClass equivClass)
 	{
 		boolean refined = false;
 
-		for (Iterator eventIt = theAutomaton.getAlphabet().iterator();
-				eventIt.hasNext(); )
+		for (Iterator eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-
-			refined = doLanguageEquivalenceMinimization(equivClasses, equivClass, currEvent) || refined;
+			refined = partition(equivClasses, equivClass, currEvent) || refined;
 		}
 
 		return refined;
 	}
-	private boolean doLanguageEquivalenceMinimization(EquivalenceClasses equivClasses, EquivalenceClass equivClass, LabeledEvent e)
+	private boolean partition(EquivalenceClasses equivClasses, EquivalenceClass equivClass, LabeledEvent e)
 	{
-		// System.err.println("A iteration in doMinimization <classes, class, event>");
+		// "Split" class on event 'e' where do 'e'-transitions lead
 		EquivalenceClassHolder newEquivClassHolder = equivClass.split(e);
 
-		// System.err.println(newEquivClassHolder.size() + " new equivalence classes");
+		// Do the states in equivClass have different behaviour on 'e'?
 		if (newEquivClassHolder.size() > 1)
 		{
-			// System.err.println("------------------");
-			// System.err.println("equivClasses" + equivClasses);
-			// System.err.println("newEquivClasses" + newEquivClassHolder);
-			// Remove the current class from all equivalenceClasses
-			// System.err.println("Before equivClasses" + equivClasses);
+			// Throw old class away!
 			equivClasses.remove(equivClass);
-
-			// System.err.println("After equivClasses" + equivClasses);
 			equivClass.clear();
 
-			// Set the new equivalence class in all states
-			// newEquivClassHolder.update();
 			// Add the new classes to equivClasses
 			equivClasses.addAll(newEquivClassHolder);
 
-			// System.err.println("equivClasses" + equivClasses);
-			// System.err.println("newEquivClasses" + newEquivClassHolder);
-			// System.err.println("------------------");
+			// Help garbage collector
+			newEquivClassHolder.clear();
+
 			return true;
 		}
 		else
 		{
-			// All classifies to the same class.
+			// All states in equivClass classifies to the same class
+			// (at this stage)
 			// No need to do anything except maybe helping
 			// the garbage collector
 			newEquivClassHolder.clear();
@@ -480,15 +502,21 @@ public class AutomatonMinimizer
 		// Mark noncoreachable states with State.MAX_COST
 		AutomatonSynthesizer synth = new AutomatonSynthesizer(aut, SynthesizerOptions.getDefaultSynthesizerOptions());
 		synth.doCoreachable();
+
+		// Remove all outgoing arcs from these states
 		for (Iterator it = aut.stateIterator(); it.hasNext(); )
 		{
 			State state = (State) it.next();
 			if ((state.getCost() == State.MAX_COST))
 			{
 				if (state.isAccepting())
-					logger.fatal("EEEEEEERRRRRRRRRRRROOOOOOOOOOOORRRRRRRRRRRRRRRRRRRR!");
-				
-				// We will never want to propagate from here... 
+				{
+					// How did this happen!? An accepting state is always coreachable!?!?
+					logger.fatal("The state " + state + " forb: " + state.isForbidden() + " accept: " + state.isAccepting() + " init: " + state.isInitial());
+					throw new Exception("Error in AutomatonMinimizer, coreachability failed!");
+				}
+
+				// We will never want to propagate from here...
 				// ... or from any state in the backwards epsilon closure!!
 				StateSet statesToModify = new StateSet();
 				statesToModify.add(state);
@@ -503,6 +531,7 @@ public class AutomatonMinimizer
 					{
 						if (currState.isInitial())
 						{
+							logger.info("The system was found to be blocking.");
 							// Do nothing...
 							continue;
 						}
@@ -513,9 +542,9 @@ public class AutomatonMinimizer
 					}
 
 					// We won't want to propagate from here
-					currState.removeOutgoingArcs();	
+					currState.removeOutgoingArcs();
 					//logger.info("I removed arcs from " + currState);
-					
+
 					// Follow all epsilon transitions backwards
 					for (ArcIterator arcIt = currState.incomingArcsIterator(); arcIt.hasNext(); )
 					{
@@ -526,7 +555,7 @@ public class AutomatonMinimizer
 						}
 					}
 				}
-				
+
 				// Reset cost...
 				if (!state.isForbidden())
 				{
@@ -536,13 +565,19 @@ public class AutomatonMinimizer
 		}
 		// Make reachable
 		synth.doReachable();
-		for (Iterator it = aut.safeStateIterator(); it.hasNext(); )
+		LinkedList toBeRemoved = new LinkedList();
+		for (StateIterator it = aut.stateIterator(); it.hasNext(); )
 		{
-			State state = (State) it.next();
+			State state = it.nextState();
 			if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
 			{
-				aut.removeState(state);
+				toBeRemoved.add(state);
 			}
+		}
+		while (toBeRemoved.size() != 0)
+		{
+			count++;
+			aut.removeState((State) toBeRemoved.remove(0));
 		}
 
 		// Do the merging
@@ -572,7 +607,7 @@ public class AutomatonMinimizer
 							break;
 						}
 					}
-					
+
 					// OK to merge?
 					if (ok)
 					{
@@ -595,7 +630,7 @@ public class AutomatonMinimizer
 					}
 				}
 			}
-		}		
+		}
 
 		return count;
 	}
@@ -641,7 +676,7 @@ public class AutomatonMinimizer
 					//statesToExamine.add(aut.mergeStates(one, two));
 					State mergeState = aut.mergeStates(one, two);
 					statesToExamine.add(mergeState);
-					// Add states that may have changed to stack 
+					// Add states that may have changed to stack
 					for (ArcIterator arcIt = mergeState.incomingArcsIterator(); arcIt.hasNext(); )
 					{
 						Arc epsilonArc = arcIt.nextArc();
@@ -658,17 +693,14 @@ public class AutomatonMinimizer
 			// Merge loops
 
 			// Find epsilon-closure for this state
-			one.setStateSet(null); // This is unfortunately necessary!!
-			Determinizer determinizer = new Determinizer(aut);
-			StateSet closureOne = determinizer.epsilonClosure(one);
-			closureOne.remove(one); // Don't examine
+			StateSet closureOne = epsilonClosure(one);
+			closureOne.remove(one); // Don't examine self
 
 			// Find, in closure, if there is a state which has the first state in its closure
 			for (StateIterator closureIt = closureOne.iterator(); closureIt.hasNext(); )
 			{
 				State two = closureIt.nextState();
-				two.setStateSet(null);
-				StateSet closureTwo = determinizer.epsilonClosure(two);
+				StateSet closureTwo = epsilonClosure(two);
 
 				// Good to merge?
 				boolean markingOK = options.getIgnoreMarking() || one.hasEqualMarking(two);
@@ -676,7 +708,7 @@ public class AutomatonMinimizer
 				if (closureTwo.contains(one))
 				{
 					count++;
-					
+
 					// Remove the other state from stack, merge and add
 					// new state to stack
 					statesToExamine.remove(two);
@@ -699,7 +731,7 @@ public class AutomatonMinimizer
 				{
 					count++;
 
-					// Remove the other state from stack, merge 
+					// Remove the other state from stack, merge
 					statesToExamine.remove(two);
 					if (mergeState == null)
 					{
@@ -723,19 +755,21 @@ public class AutomatonMinimizer
 	}
 
 	/**
-	 * Add transitions to cover for the epsilon events. More formally, each time there is a
-	 * transition "p =a=> q", after completing the transitive closure (or "saturation"),
-	 * there is also a transition "p -a-> q".
+	 * Add transitions to cover for the epsilon events (aka "saturate"). More formally, each
+	 * time there is a transition "p =a=> q", after completing the transitive closure (or
+	 * "saturation"), there is also a transition "p -a-> q".
 	 */
 	public void doTransitiveClosure(Automaton aut)
 	{
-		// For calculating the epsilon-closure, we need this
-		Determinizer determinizer = new Determinizer(aut);
+		if (aut == null)
+		{
+			return;
+		}
 
 		// Find epsilon-closure for each state, put this info in each state
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
-			if (stopRequested) 
+			if (stopRequested)
 			{
 				return;
 			}
@@ -743,8 +777,7 @@ public class AutomatonMinimizer
 			State currState = stateIt.nextState();
 
 			// Find closure, associate it with this state
-			currState.setStateSet(null); // This is unfortunately necessary!!
-			StateSet closure = determinizer.epsilonClosure(currState);
+			StateSet closure = epsilonClosure(currState);
 			currState.setStateSet(closure);
 		}
 
@@ -752,7 +785,7 @@ public class AutomatonMinimizer
 		LinkedList toBeAdded = new LinkedList();
 		for (StateIterator stateIt = aut.stateIterator(); stateIt.hasNext();)
 		{
-			if (stopRequested) 
+			if (stopRequested)
 			{
 				return;
 			}
@@ -819,16 +852,50 @@ public class AutomatonMinimizer
 	}
 
 	/**
+	 * Calculates and returns epsilon closure.
+	 */
+	public static StateSet epsilonClosure(State state)
+	{
+		StateSet result = new StateSet();
+		result.add(state);
+
+		LinkedList statesToExamine = new LinkedList();
+		statesToExamine.add(state);
+		while (statesToExamine.size() != 0)
+		{
+			State currState = (State) statesToExamine.removeFirst();
+
+			for (ArcIterator arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.nextArc();
+
+				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && !result.contains(currArc.getToState()))
+				{
+					statesToExamine.add(currArc.getToState());
+					result.add(currArc.getToState());
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * All states could as well be marked in an epsilon-loop where at least one state is marked.
 	 * This method adjusts this.
-	 *   States that can reach marked states by epsilon events are also considered marked
+	 *  States that can reach marked states by epsilon events are also considered marked
 	 *
-	 *   NOTE: This method assumes that the epsilon-closure of each state is already calculated
+	 *  NOTE: This method assumes that the epsilon-closure of each state is already calculated
 	 * and that the closure is returned by each state's getStateSet-method. (This is true if
 	 * doTransitiveClosure was called previously.)
 	 */
 	public void adjustMarking(Automaton aut)
 	{
+		if (aut == null)
+		{
+			return;
+		}
+
 		LinkedList toBeMarked = new LinkedList();
 		/*
 		// States in epsilon loops where there are at least one marked state can be considered marked
@@ -1145,16 +1212,16 @@ class EquivalenceClasses
 class EquivalenceClass
 	extends StateSet
 {
-	public EquivalenceClass() 
+	public EquivalenceClass()
 	{
 	}
 
 	/**
 	 * Note that this method only returns an iterator to SOME of the outgoing arc
 	 * frm the underlying StateSet. This is OK, though, since all states in the
-	 * equivalence class should have the same outgoing transitions, otherwise 
+	 * equivalence class should have the same outgoing transitions, otherwise
 	 * they are not equivalent! (Maybe that should be examined to be safe...)
-	 */ 
+	 */
 	public Iterator outgoingArcsIterator()
 	{
 		State currState = get();    // (State) states.getFirst();
@@ -1167,17 +1234,17 @@ class EquivalenceClass
 	 * Split the equivalence class according to what can be reached on this event
 	 * Return all new equivalence classes in the holder
 	 * If the holder contains only one entry, all reached states have the same eq class (at this point)
-	 */	
+	 */
 	public EquivalenceClassHolder split(LabeledEvent e)
 	{
-		boolean oldversion = true;
+		boolean oldversion = false;
 		if (oldversion)
 		{
 			// System.err.println("Splitting " + e.getLabel());
 			EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
-			
+
 			// Build a list of equivalance classes that e transfers to from each of the states in this eq-class
-			// Note, for each state there is only one successor state for this event (determinism) 
+			// Note, for each state there is only one successor state for this event (determinism)
 			Iterator stateIt = iterator();
 			while (stateIt.hasNext())
 			{
@@ -1190,39 +1257,38 @@ class EquivalenceClass
 				}
 				newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
 			}
-			
+
 			return newEquivalenceClassHolder;
 		}
 		else
 		{
-			// System.err.println("Splitting " + e.getLabel());
 			EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
-			
+
 			// Build a list of equivalence classes that e transfers to from each of the states in this eq-class
-			// Note, for each state there is only one successor state for this event (determinism) 
+			// Note, for each state there is only one successor state for this event (determinism)
 			// NOOOOOOOOOOOOOOOOO! NOT DETERMINISTIC!!
 			Iterator stateIt = iterator();
 			while (stateIt.hasNext())
 			{
 				State currState = (State) stateIt.next();
 				StateSet nextStates = currState.nextStateSet(e);
+				/*
 				if (nextStates.size() == 0)
 				{
-					/*
-					  EquivalenceClass nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet();
-					  newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
-					*/
 					newEquivalenceClassHolder.addState(currState, null);
 				}
 				System.err.println("nextStates " + nextStates.size());
+				*/
+				EquivalenceClass nextClass = new EquivalenceClass();
 				for (StateIterator nextIt = nextStates.iterator(); nextIt.hasNext(); )
 				{
 					State nextState = nextIt.nextState();
-					EquivalenceClass nextEquivalenceClass = (EquivalenceClass) nextState.getStateSet(); 
-					newEquivalenceClassHolder.addState(currState, nextEquivalenceClass);
+					EquivalenceClass thisNextClass = (EquivalenceClass) nextState.getStateSet();
+					nextClass.union(thisNextClass);
 				}
+				newEquivalenceClassHolder.addState(currState, nextClass);
 			}
-			
+
 			return newEquivalenceClassHolder;
 		}
 	}

@@ -14,8 +14,7 @@ import org.supremica.automata.Automaton;
 
 class AutomataViewerPanel
 	extends JPanel
-
-// implements AutomatonListener 
+// implements AutomatonListener
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataViewerPanel.class);
 	private Automata automata;
@@ -53,14 +52,16 @@ class AutomataViewerPanel
 		theTree.setRootVisible(false);
 		theTree.setShowsRootHandles(true);
 
-		// theTree.setExpanded(new TreePath(node));             
+		// theTree.setExpanded(new TreePath(node));
 		revalidate();
 	}
 
+	/*
 	public void setVisible(boolean toVisible)
 	{
 		super.setVisible(toVisible);
 	}
+	*/
 }
 
 public class AutomataViewer
@@ -116,15 +117,8 @@ public class AutomataViewer
 	{
 		setJMenuBar(menuBar);
 
-		// File
-		JMenu menuFile = new JMenu();
-
-		menuFile.setText("File");
-		menuFile.setMnemonic(KeyEvent.VK_F);
-
 		// File.Close
 		JMenuItem menuFileClose = new JMenuItem();
-
 		menuFileClose.setText("Close");
 		menuFileClose.addActionListener(new ActionListener()
 		{
@@ -135,17 +129,17 @@ public class AutomataViewer
 				//dispose();
 			}
 		});
+
+		// File menu
+		JMenu menuFile = new JMenu();
+		menuFile.setText("File");
+		menuFile.setMnemonic(KeyEvent.VK_F);
 		menuFile.add(menuFileClose);
 		menuBar.add(menuFile);
 
-		// View
-		JMenu viewMenu = new JMenu("View");
-
-		viewMenu.setMnemonic(KeyEvent.VK_V);
-
+		/*
 		// View.Union (default, therefore initially checked)
 		JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);
-
 		viewMenuUnion.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) {}
@@ -153,19 +147,23 @@ public class AutomataViewer
 
 		// View.Intersection
 		JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");
-
 		viewMenuIntersection.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) {}
 		});
 
+		// Radio button functionality?
 		ButtonGroup buttongroup = new ButtonGroup();
-
 		buttongroup.add(viewMenuUnion);
 		buttongroup.add(viewMenuIntersection);
+
+		// View menu
+		JMenu viewMenu = new JMenu("View");
+		viewMenu.setMnemonic(KeyEvent.VK_V);
 		viewMenu.add(viewMenuUnion);
 		viewMenu.add(viewMenuIntersection);
 		menuBar.add(viewMenu);
+		*/
 	}
 
 	public void initialize() {}

@@ -56,10 +56,10 @@ public class ExecutionDialogMode
 
 	//new ExecutionDialogMode("Verifying...", "Number of states:", true, false);
 	new ExecutionDialogMode("Verifying...", "", true, false);
-	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "Number of states:", true, false);
-	public static ExecutionDialogMode buildingStates = new ExecutionDialogMode("Building automaton...", "Building states", false, true);
-	public static ExecutionDialogMode buildingTransitions = new ExecutionDialogMode("Building automaton...", "Building transitions", false, true);
-	public static ExecutionDialogMode matchingStates = new ExecutionDialogMode("Matching States...", "", false, true);
+	public static ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "Number of states:", false, true);
+	public static ExecutionDialogMode synchronizingBuildingStates = new ExecutionDialogMode("Building automaton...", "Building states", false, true);
+	public static ExecutionDialogMode synchronizingBuildingTransitions = new ExecutionDialogMode("Building automaton...", "Building transitions", false, true);
+	public static ExecutionDialogMode synchronizingMatchingStates = new ExecutionDialogMode("Matching States...", "", false, true);
 	public static ExecutionDialogMode verifyingNonblocking = new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
 	public static ExecutionDialogMode verifyingMutualNonblockingFirstRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
 	public static ExecutionDialogMode verifyingMutualNonblockingSecondRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);

@@ -358,9 +358,9 @@ public class Automata
 	}
 
 	/**
-	 * Returns a new automata object with all specifications
+	 * Returns a new automata object with all supervisors
 	 * in this automata. Note that this reuses the references
-	 * to the specification automata.
+	 * to the supervisor automata.
 	 */
 	public Automata getSupervisorAutomata()
 	{
@@ -377,11 +377,11 @@ public class Automata
 	}
 
 	/**
-	 * Returns a new automata object with all specification and supervisor automata
-	 * in this automata. Note that this reuses the references
+	 * Returns a new automata object with all specification and supervisor
+	 * automata in this automata. Note that this reuses the references
 	 * to the plant automata.
 	 */
-	public Automata getSpecificationSupervisorAutomata()
+	public Automata getSpecificationAndSupervisorAutomata()
 	{
 		Automata newAutomata = new Automata();
 
@@ -690,17 +690,20 @@ public class Automata
 				// Compare the alphabets!
 				Alphabet diff = Alphabet.minus(alpha, unionAlpha);
 				if (diff.size() == alpha.size())
-				{   // Disjoint (so far)
+				{
+					// Disjoint (so far)
 
 				}
 				else if (diff.size() > 0)
-				{   // Not disjoint, new events in unionAlpha!
+				{
+					// Not disjoint, new events in unionAlpha!
 					autA.addAutomaton(theAut);
 					unionAlpha = autA.getUnionAlphabet();
 					change = true;
 				}
 				else
-				{   // Not disjoint, no change!
+				{
+					// Not disjoint, no change!
 					autA.addAutomaton(theAut);
 				}
 			}
@@ -917,7 +920,6 @@ public class Automata
 	 */
 	public boolean equalAutomata(Automata other)
 	{
-
 		//System.err.println("equalAutomata: " + getName() + " " + other.getName());
 		if (nbrOfAutomata() != other.nbrOfAutomata())
 		{
@@ -1284,12 +1286,12 @@ public class Automata
 	 * @param mustHaveType Test requires that the automata are not of undefined type.
 	 * @param mustBeControllabilityConsistent Test requires that an event has the same
 	 * controllability status in all automata.
-	 * @param explicitly Examines and warns if there are disjoint sets of automata 
+	 * @param explicitly Examines and warns if there are disjoint sets of automata
 	 * (considering shared events)
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType, 
+	public boolean sanityCheck(Gui gui, int minSize, boolean mustHaveInitial, boolean mustHaveValidType,
 							   boolean mustBeControllabilityConsistent, boolean examineStructure)
 	{
 		// Is this automata empty? If so, just bail out.
@@ -1299,7 +1301,7 @@ public class Automata
 			return false;
 		}
 
-		// Warns if there are events with equal (lowercase) names. 
+		// Warns if there are events with equal (lowercase) names.
 		// Always do this check (irritating? well yes... but those are really bad names!)
 		if (isEventNamesSafe())
 		{
@@ -1342,12 +1344,12 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton " + currAutomaton + 
+						String message = "The automaton " + currAutomaton +
 							" does not have an initial state.\n" + "Please specify an initial state.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
-																JOptionPane.OK_OPTION, 
-																JOptionPane.WARNING_MESSAGE, null, 
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																JOptionPane.OK_OPTION,
+																JOptionPane.WARNING_MESSAGE, null,
 																options, options[0]);
 					}
 					else
@@ -1375,17 +1377,17 @@ public class Automata
 				{
 					if (gui != null)
 					{
-						String message = "The automaton " + currAutomaton + " is of type 'Undefined'.\n" + 
+						String message = "The automaton " + currAutomaton + " is of type 'Undefined'.\n" +
 							"Please specify a type.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert", 
-																JOptionPane.OK_OPTION, 
-																JOptionPane.WARNING_MESSAGE, null, 
+						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+																JOptionPane.OK_OPTION,
+																JOptionPane.WARNING_MESSAGE, null,
 																options, options[0]);
 					}
 					else
 					{
-						logger.error("The automaton " + currAutomaton + 
+						logger.error("The automaton " + currAutomaton +
 									 " is of type 'Undefined'. Please specify a type.");
 					}
 

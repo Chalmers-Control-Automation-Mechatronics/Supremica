@@ -20,27 +20,21 @@ public class EventSubTree
 		super(event);    // Note that this also caches the event for quick access
 
 		SupremicaTreeNode currControllableNode = new SupremicaTreeNode("controllable: " + event.isControllable());
-
 		add(currControllableNode);
 
 		SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
-
 		add(currPrioritizedNode);
 
 		SupremicaTreeNode currObservableNode = new SupremicaTreeNode("observable: " + event.isObservable());
-
 		add(currObservableNode);
 
 		SupremicaTreeNode currOperatorIncreaseNode = new SupremicaTreeNode("operatorIncrease: " + event.isOperatorIncrease());
-
 		add(currOperatorIncreaseNode);
 
 		SupremicaTreeNode currOperatorResetNode = new SupremicaTreeNode("operatorReset: " + event.isOperatorReset());
-
 		add(currOperatorResetNode);
 
 		SupremicaTreeNode isEpsilonNode = new SupremicaTreeNode("epsilon: " + event.isEpsilon());
-
 		add(isEpsilonNode);
 	}
 
@@ -56,7 +50,6 @@ public class EventSubTree
 
 	public Icon getOpenIcon()
 	{
-
 		//return null;
 		if (((LabeledEvent) userObject).isControllable())
 		{
@@ -70,7 +63,6 @@ public class EventSubTree
 
 	public Icon getClosedIcon()
 	{
-
 		//return null;
 		return getOpenIcon();
 	}

@@ -1376,7 +1376,7 @@ public class ActionMan
 	public static void automataSynchronize_actionPerformed(Gui gui)
 	{
 		// Retrieve the selected automata and make a sanity check
-		Automata selectedAutomata = gui.getSelectedAutomata();		
+		Automata selectedAutomata = gui.getSelectedAutomata();
 		if (!selectedAutomata.sanityCheck(gui, 2, true, false, true, true))
 		{
 			return;
@@ -1411,6 +1411,30 @@ public class ActionMan
 		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, selectedAutomata, "" /* newAutomatonName */, synchronizationOptions);
 	}
 
+	/*
+	// Automaton.Minimization action performed
+	public static void automatonMinimize_actionPerformed(Gui gui)
+	{
+		// Retrieve the selected automata and make a sanity check
+		Automata selectedAutomata = gui.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(gui, 1))
+		{
+			return;
+		}
+
+		// Get the current options and allow the user to change them...
+		MinimizationOptions options = new MinimizationOptions();
+		MinimizationDialog dialog = new MinimizationDialog(gui.getFrame(), options, selectedAutomata);
+		dialog.show();
+		if (!options.getDialogOK())
+		{
+			return;
+		}
+
+		AutomataMinimizationWorker worker = new AutomataMinimizationWorker(gui, selectedAutomata, options);
+	}
+	*/
+
 	// ** Synthesize
 	public static void automataSynthesize_actionPerformed(Gui gui)
 	{
@@ -1423,28 +1447,30 @@ public class ActionMan
 		}
 
 		// Get the current options and allow the user to change them...
-		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), synthesizerOptions);
+		SynthesizerOptions options = new SynthesizerOptions();
+		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(gui.getFrame(), selectedAutomata.size(), options);
 		synthesizerDialog.show();
-
-		if (!synthesizerOptions.getDialogOK())
+		if (!options.getDialogOK())
 		{
 			return;
 		}
 
+		AutomataSynthesisWorker worker = new AutomataSynthesisWorker(gui, selectedAutomata, options);
+
+		/*
 		ActionTimer timer = null;
-		
+
 		// One or more automata selected?
 		if (selectedAutomata.size() > 1)
 		{
 			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-			
+
 			try
 			{
-				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions, 
+				AutomataSynthesizer synthesizer = new AutomataSynthesizer(gui, selectedAutomata, syncOptions,
 																		  synthesizerOptions);
 				synthesizer.execute();
-				
+
 				timer = synthesizer.getTimer();
 			}
 			catch (Exception ex)
@@ -1464,7 +1490,7 @@ public class ActionMan
 				AutomatonSynthesizer synthesizer = (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
 					? new AutomatonSynthesizerSingleFixpoint(theAutomaton, synthesizerOptions)
 					: new AutomatonSynthesizer(theAutomaton, synthesizerOptions);
-				
+
 				// AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
 				synthesizer.synthesize();
 			}
@@ -1479,6 +1505,7 @@ public class ActionMan
 		{
 			logger.info("Execution completed after " + timer.toString());
 		}
+		*/
 	}
 
 	// Automaton.Verify action performed
@@ -1623,7 +1650,7 @@ public class ActionMan
 
 		// How many selected?
 		if (selectedAutomata.size() == 1)
-		{    
+		{
 			// One automaton selected
 
 			// Get automaton
@@ -1647,7 +1674,7 @@ public class ActionMan
 			// The AutomataExplorer can not take care of nondeterministic processes...
 			if (!selectedAutomata.isDeterministic())
 			{
-				logger.error("The current project is nondeterministic. Exploration of nondeterministic automata " + 
+				logger.error("The current project is nondeterministic. Exploration of nondeterministic automata " +
 							 "is currently not supported.");
 			}
 
@@ -1757,7 +1784,7 @@ public class ActionMan
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
-				
+
 				// Minimize this one
 				try
 				{
@@ -1767,11 +1794,11 @@ public class ActionMan
 				}
 				catch (Exception ex)
 				{
-					logger.error("Exception in AutomatonMinimizer. Automaton: " + 
+					logger.error("Exception in AutomatonMinimizer. Automaton: " +
 								 currAutomaton.getName() + " " + ex);
 					logger.debug(ex.getStackTrace());
 				}
-				
+
 				if (!options.getKeepOriginal())
 				{
 					gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomaton);
@@ -1789,11 +1816,11 @@ public class ActionMan
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomatonMinimizer when compositionally minimizing " + 
+				logger.error("Exception in AutomatonMinimizer when compositionally minimizing " +
 							 selectedAutomata + " " + ex);
 				logger.debug(ex.getStackTrace());
 			}
-			
+
 			if (!options.getKeepOriginal())
 			{
 				gui.getVisualProjectContainer().getActiveProject().removeAutomata(selectedAutomata);
@@ -1892,18 +1919,18 @@ public class ActionMan
 		int maxNbrOfStates = SupremicaProperties.getDotMaxNbrOfStatesWithoutWarning();
 		if (maxNbrOfStates < selectedAutomata.size())
 		{
-			String msg = "You have selected " + selectedAutomata.size() + " automata. It is not " + 
-				"recommended to display the modular structure for more than " + maxNbrOfStates + 
+			String msg = "You have selected " + selectedAutomata.size() + " automata. It is not " +
+				"recommended to display the modular structure for more than " + maxNbrOfStates +
 				" automata.";
 			msg = EncodingHelper.linebreakAdjust(msg);
 
 			Object[] options = { "Continue", "Abort" };
-			int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning", 
+			int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning",
 				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 			if(response == JOptionPane.NO_OPTION)
 			{
 				return;
-			}	
+			}
 		}
 
 		// View
@@ -1942,7 +1969,6 @@ public class ActionMan
 		}
 		catch (Exception ex)
 		{
-
 			// logger.error("Exception in AlphabetViewer", ex);
 			logger.error("Exception in AutomataViewer: " + ex);
 			logger.debug(ex.getStackTrace());
@@ -1967,7 +1993,6 @@ public class ActionMan
 		// automata object?? Use AutomataViewer instead!
 		try
 		{
-
 			// AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
 			AutomataViewer alphabetViewer = new AutomataViewer(selectedAutomata, true, false);
 

@@ -1,7 +1,7 @@
 
 /********************* AutomatonSubTree.java *************/
 
-// An AutomatonSubTree is a tree node with the automaton name as root 
+// An AutomatonSubTree is a tree node with the automaton name as root
 // and the events as children and the states as children
 package org.supremica.gui.treeview;
 
@@ -18,7 +18,6 @@ public class AutomatonSubTree
 
 	public AutomatonSubTree(Automaton automaton, boolean includeAlphabet, boolean includeStates)
 	{
-
 		//super(automaton.getName());
 		super(automaton);
 
@@ -40,7 +39,6 @@ public class AutomatonSubTree
 
 	public Icon getOpenIcon()
 	{
-
 		//return null;
 		Automaton aut = (Automaton) userObject;
 
@@ -64,8 +62,7 @@ public class AutomatonSubTree
 
 	public Icon getClosedIcon()
 	{
-
-		//return null;
+		// Same icon as for open
 		return getOpenIcon();
 	}
 

@@ -1,51 +1,51 @@
 
 /*
- *  Supremica Software License Agreement
+ * Supremica Software License Agreement
  *
- *  The Supremica software is not in the public domain
- *  However, it is freely available without fee for education,
- *  research, and non-profit purposes.  By obtaining copies of
- *  this and other files that comprise the Supremica software,
- *  you, the Licensee, agree to abide by the following
- *  conditions and understandings with respect to the
- *  copyrighted software:
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
  *
- *  The software is copyrighted in the name of Supremica,
- *  and ownership of the software remains with Supremica.
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
  *
- *  Permission to use, copy, and modify this software and its
- *  documentation for education, research, and non-profit
- *  purposes is hereby granted to Licensee, provided that the
- *  copyright notice, the original author's names and unit
- *  identification, and this permission notice appear on all
- *  such copies, and that no charge be made for such copies.
- *  Any entity desiring permission to incorporate this software
- *  into commercial products or to use it for commercial
- *  purposes should contact:
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
  *
- *  Knut Akesson (KA), knut@supremica.org
- *  Supremica,
- *  Haradsgatan 26A
- *  431 42 Molndal
- *  SWEDEN
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
  *
- *  to discuss license terms. No cost evaluation licenses are
- *  available.
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
  *
- *  Licensee may not use the name, logo, or any other symbol
- *  of Supremica nor the names of any of its employees nor
- *  any adaptation thereof in advertising or publicity
- *  pertaining to the software without specific prior written
- *  approval of the Supremica.
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
  *
- *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
  *
- *  Supremica is owned and represented by KA.
+ * Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
@@ -124,7 +124,6 @@ public class AutomataVerifier
 	public AutomataVerifier(Automata theAutomata, SynchronizationOptions synchronizationOptions, VerificationOptions verificationOptions)
 		throws IllegalArgumentException, Exception
 	{
-
 		/// logger.debug("DEBUG.......... " + theAutomata.size() ); // ARASH: DEBUG
 		Automaton currAutomaton;
 		State currInitialState;
@@ -261,7 +260,8 @@ public class AutomataVerifier
 	{
 		try
 		{
-			if (verificationOptions.getVerificationType() == VerificationType.Controllability)
+			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
+			   	(verificationOptions.getVerificationType() == VerificationType.InverseControllability))
 			{
 				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
@@ -324,13 +324,11 @@ public class AutomataVerifier
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
 				{
-
 					// Language inclusion is performed as a controllability verification!
 					return monolithicControllabilityVerification();
 				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 				{
-
 					// Language inclusion is performed as a controllability verification!
 					return modularControllabilityVerification();
 				}
@@ -353,29 +351,47 @@ public class AutomataVerifier
 	}
 
 	/**
+	 * Prepares the helper and the automataindexform for inverse controllability...
+	 */
+	public void prepareForInverseControllability()
+	{
+		Automata specifications = theAutomata.getSpecificationAndSupervisorAutomata();
+
+		// Redefined plant status
+		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(specifications);
+		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
+		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(specifications);
+
+		// Invert controllability status in helper
+		synchHelper.invertControllability();
+	}
+
+	/**
 	 * Prepares the helper and the automataindexform for language inclusion...
 	 *
 	 *@param inclusionAutomata The automata that should be verified for inclusion
 	 */
 	public void prepareForLanguageInclusion(Automata inclusionAutomata)
 	{
+		// Maybe we should just make a copy of the whole project and modify what needs to
+		// be modified right there instead?
 
-		/* WHY WON'T THIS WORK!?!? GRRR. /hugo
+		/*
 		// Make sure the alphabets have the right relation
 		Automata exclusionAutomata = new Automata();
 		for (AutomatonIterator autIt = theAutomata.iterator(); autIt.hasNext();)
 		{
-				Automaton currAut = autIt.nextAutomaton();
-				if (!inclusionAutomata.containsAutomaton(currAut))
-				{
-						exclusionAutomata.addAutomaton(currAut);
-				}
+			Automaton currAut = autIt.nextAutomaton();
+			if (!inclusionAutomata.containsAutomaton(currAut))
+			{
+				exclusionAutomata.addAutomaton(currAut);
+			}
+		}
 
-				// The "exclusionAutomata"'s alphabet must be included in the "inclusionAutomata"
-				if (Alphabet.minus(exclusionAutomata.getUnionAlphabet(),inclusionAutomata.getUnionAlphabet()).size() > 0)
-				{
-						logger.warn("Warning, the alphabets are not well related for language inclusion.");
-				}
+		// The "exclusionAutomata"'s alphabet must be included in the "inclusionAutomata"
+		if (Alphabet.minus(exclusionAutomata.getUnionAlphabet(),inclusionAutomata.getUnionAlphabet()).size() > 0)
+		{
+			logger.warn("Warning, the alphabets are not well related for language inclusion.");
 		}
 		*/
 
@@ -383,7 +399,6 @@ public class AutomataVerifier
 		synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
 
 		AlphabetAnalyzer alphabetAnalyzer = new AlphabetAnalyzer(theAutomata);
-
 		uncontrollableEventToPlantMap = alphabetAnalyzer.getEventToAutomataMap(inclusionAutomata);
 
 		// This last one is not really good... we'd like to do this only once! Perhaps
@@ -550,9 +565,9 @@ public class AutomataVerifier
 		// Did the loop finish without failure?
 		if (failure)
 		{
-			logger.warn("Supremica's modular verification algorithm can't solve this " + 
-						"problem. Try the monolithic or BDD algorithm instead. There are " + 
-						potentiallyUncontrollableStates.size() + 
+			logger.warn("Supremica's modular verification algorithm can't solve this " +
+						"problem. Try the monolithic or BDD algorithm instead. There are " +
+						potentiallyUncontrollableStates.size() +
 						" states that perhaps makes this system uncontrollable.");
 
 			return false;
@@ -633,7 +648,6 @@ public class AutomataVerifier
 		// Was the result uncontrollable?
 		if (!synchHelper.getAutomataIsControllable())
 		{
-
 			// Try to add some more automata
 			// Make array with indices of selected automata to remember which were originally selected
 			int[] automataIndices = new int[selectedAutomata.size()];
@@ -671,11 +685,9 @@ public class AutomataVerifier
 
 			if (similarAutomata == null)
 			{
-
 				// There are no similar automata, this module must be uncontrollable
 				if (verboseMode)
 				{
-
 					// Print the uncontrollable state(s)...
 					synchHelper.printUncontrollableStates(automataIndices);
 				}
@@ -704,13 +716,11 @@ public class AutomataVerifier
 				// Have we already added all similar automata?
 				if (similarAutomata.length == selectedAutomata.size() - automataIndices.length)
 				{
-
 					// Try to find more similarities
 					int[] moreSimilarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
 
 					if (moreSimilarAutomata == null)
 					{
-
 						// There were no more automata to add this is monolithically uncontrollable!
 						return false;
 					}
@@ -770,7 +780,6 @@ public class AutomataVerifier
 						// Try to prove remaining states in the stateMemorizer as being uncontrollable
 						if (findUncontrollableStates(automataIndices))
 						{
-
 							// Uncontrollable state found!
 							if (verboseMode)
 							{    // Print the uncontrollable state(s)...
@@ -801,7 +810,6 @@ public class AutomataVerifier
 
 			if (potentiallyUncontrollableStates.size(automataIndices) > 0)
 			{
-
 				// There are still some uncontrollable states that we're not sure as of being either
 				// controllable or uncontrollable. We now have no idea what so ever on the
 				// controllability so... we chicken out and give up.
@@ -831,7 +839,7 @@ public class AutomataVerifier
 	 * Finds similar automata and sorts these automata in a smart way...
 	 *
 	 *@param  selectedAutomata the selected automata in the current "composition".
-	 *@param  theAutomata reference to the global variable with the same name... eh...
+	 *@param  theAuomata reference to the global variable with the same name... eh...
 	 *@return an int array with indexes of interesting automata in order of interesting interest.
 	 *@see  #compareAlphabets(org.supremica.automata.Alphabet, org.supremica.automata.Alphabet)
 	 *@see  #excludeUncontrollableStates(int[], java.util.ArrayList, int[])
@@ -937,10 +945,9 @@ public class AutomataVerifier
 	 */
 	private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
 	{
-
 		//
 		// USE Alphabet.nbrOfCommonEvents INSTEAD!!!!
-		// Naaaah... not the same thing, but this method should be in Alphabet.java
+		// Naaaah... that's not the same thing, but this method should be in Alphabet.java
 		//
 		int amountOfCommon = 0;
 		int amountOfUnique = 0;
@@ -1180,7 +1187,8 @@ public class AutomataVerifier
 			uncontrollabilityCheckHelper = new AutomataSynchronizerHelper(synchHelper);
 
 			if (verboseMode)
-			{    // It's important that setRememberTrace occurs before addState(initialState)!
+			{
+				// It's important that setRememberTrace occurs before addState(initialState)!
 				uncontrollabilityCheckHelper.setRememberTrace(true);
 			}
 
@@ -1218,42 +1226,42 @@ public class AutomataVerifier
 		return !uncontrollabilityCheckHelper.getAutomataIsControllable();
 
 		/*
-		 *  // This is the whole method as it was before...
-		 *  synchHelper.clear();
-		 *  AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
-		 *  onlineSynchronizer.selectAutomata(automataIndices);
-		 *  onlineSynchronizer.initialize();
+		 * // This is the whole method as it was before...
+		 * synchHelper.clear();
+		 * AutomataOnlineSynchronizer onlineSynchronizer = new AutomataOnlineSynchronizer(synchHelper);
+		 * onlineSynchronizer.selectAutomata(automataIndices);
+		 * onlineSynchronizer.initialize();
 		 *
-		 *  if (verboseMode)
-		 *  {       // It's important that setRememberTrace occurs before addState!
-		 *  synchHelper.setRememberTrace(true);
-		 *  }
-		 *  synchHelper.addState(initialState);
-		 *  synchHelper.setCoExecute(true);
-		 *  synchHelper.setCoExecuter(onlineSynchronizer);
-		 *  synchHelper.setExhaustiveSearch(true);
-		 *  synchHelper.setRememberUncontrollable(true);
+		 * if (verboseMode)
+		 * {       // It's important that setRememberTrace occurs before addState!
+		 * synchHelper.setRememberTrace(true);
+		 * }
+		 * synchHelper.addState(initialState);
+		 * synchHelper.setCoExecute(true);
+		 * synchHelper.setCoExecuter(onlineSynchronizer);
+		 * synchHelper.setExhaustiveSearch(true);
+		 * synchHelper.setRememberUncontrollable(true);
 		 *
-		 *  // Initialize the synchronizationExecuters
-		 *  synchronizationExecuters.clear();
-		 *  for (int i = 0; i < nbrOfExecuters; i++)
-		 *  {
-		 *  AutomataSynchronizerExecuter currSynchronizationExecuter =
-		 *  new AutomataSynchronizerExecuter(synchHelper);
-		 *  synchronizationExecuters.add(currSynchronizationExecuter);
-		 *  }
+		 * // Initialize the synchronizationExecuters
+		 * synchronizationExecuters.clear();
+		 * for (int i = 0; i < nbrOfExecuters; i++)
+		 * {
+		 * AutomataSynchronizerExecuter currSynchronizationExecuter =
+		 * new AutomataSynchronizerExecuter(synchHelper);
+		 * synchronizationExecuters.add(currSynchronizationExecuter);
+		 * }
 		 *
-		 *  // Start all the synchronization executers and wait for completion
-		 *  for (int i = 0; i < nbrOfExecuters; i++)
-		 *  {
-		 *  AutomataSynchronizerExecuter currExec =
-		 *  (AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
-		 *  currExec.selectAllAutomata();
-		 *  currExec.start();
-		 *  }
-		 *  ((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
+		 * // Start all the synchronization executers and wait for completion
+		 * for (int i = 0; i < nbrOfExecuters; i++)
+		 * {
+		 * AutomataSynchronizerExecuter currExec =
+		 * (AutomataSynchronizerExecuter)synchronizationExecuters.get(i);
+		 * currExec.selectAllAutomata();
+		 * currExec.start();
+		 * }
+		 * ((AutomataSynchronizerExecuter)synchronizationExecuters.get(0)).join();
 		 *
-		 *  return !synchHelper.getAutomataIsControllable();
+		 * return !synchHelper.getAutomataIsControllable();
 		 */
 	}
 
@@ -1332,7 +1340,7 @@ public class AutomataVerifier
 	{
 		boolean ret;
 
-		// why compute when we already know the answer: L(P) = \Sigma^*   ?
+		// why compute when we already know the answer: L(P) = \Sigma^*  ?
 		if (theAutomata.isNoAutomataPlants())
 		{
 			return true;
@@ -1793,19 +1801,19 @@ public class AutomataVerifier
 			public void run()
 			{
 				ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
-				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);				
+				executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
 			}
 		});
 
 		Automaton result;
-		try 
+		try
 		{
 			// Minimizer
 		 	AutomataMinimizer minimizer= new AutomataMinimizer(theAutomata);
 			threadToStop = minimizer;
 			ExecutionDialog executionDialog = synchHelper.getExecutionDialog();
 			if (executionDialog != null)
-			{			
+			{
 				minimizer.setExecutionDialog(executionDialog);
 			}
 
@@ -1816,7 +1824,7 @@ public class AutomataVerifier
 			options.setKeepOriginal(false);
 			options.setCompositionalMinimization(true);
 			options.setTargetAlphabet(new Alphabet()); // Empty alphabet!
-			
+
 			result = minimizer.getCompositionalMinimization(options);
 			threadToStop = null;
 		}
@@ -1848,7 +1856,7 @@ public class AutomataVerifier
 		try
 		{
 			aut = AutomataSynchronizer.synchronizeAutomata(automata);
-			EventHider.hide(aut, hideThese);
+			aut.hide(hideThese);
 
 			logger.info("Minimizing " + aut + " states: " + aut.nbrOfStates() + " epsilons: " + aut.nbrOfEpsilonTransitions());
 

@@ -1,56 +1,55 @@
 
 /*
- *  Supremica Software License Agreement
+ * Supremica Software License Agreement
  *
- *  The Supremica software is not in the public domain
- *  However, it is freely available without fee for education,
- *  research, and non-profit purposes.  By obtaining copies of
- *  this and other files that comprise the Supremica software,
- *  you, the Licensee, agree to abide by the following
- *  conditions and understandings with respect to the
- *  copyrighted software:
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
  *
- *  The software is copyrighted in the name of Supremica,
- *  and ownership of the software remains with Supremica.
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
  *
- *  Permission to use, copy, and modify this software and its
- *  documentation for education, research, and non-profit
- *  purposes is hereby granted to Licensee, provided that the
- *  copyright notice, the original author's names and unit
- *  identification, and this permission notice appear on all
- *  such copies, and that no charge be made for such copies.
- *  Any entity desiring permission to incorporate this software
- *  into commercial products or to use it for commercial
- *  purposes should contact:
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
  *
- *  Knut Akesson (KA), knut@supremica.org
- *  Supremica,
- *  Haradsgatan 26A
- *  431 42 Molndal
- *  SWEDEN
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
  *
- *  to discuss license terms. No cost evaluation licenses are
- *  available.
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
  *
- *  Licensee may not use the name, logo, or any other symbol
- *  of Supremica nor the names of any of its employees nor
- *  any adaptation thereof in advertising or publicity
- *  pertaining to the software without specific prior written
- *  approval of the Supremica.
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
  *
- *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
  *
- *  Supremica is owned and represented by KA.
+ * Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
 import java.util.*;
-import org.supremica.util.ActionTimer;
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.*;
@@ -68,6 +67,7 @@ class MonolithicReturnValue
  * uses AutomatonSynthesizer for monolithic problems
  */
 public class AutomataSynthesizer
+	implements Stoppable
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
 	private Automata theAutomata;
@@ -77,25 +77,25 @@ public class AutomataSynthesizer
 	private ArrayList synchronizationExecuters;
 	private SynchronizationOptions synchronizationOptions;
 	private SynthesizerOptions synthesizerOptions;
-	private VisualProjectContainer theVisualProjectContainer;
-	private ActionTimer theTimer = new ActionTimer();
-	private Gui gui;
+
+	private ExecutionDialog executionDialog;
+
+	// For the stopping
+	private boolean stopRequested = false;
+	private Stoppable threadToStop = null;
 
 	// For the optimization...
 	private Automata newAutomata = new Automata();
 	private boolean maximallyPermissive;
 
-	public AutomataSynthesizer(Gui gui, Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
+	public AutomataSynthesizer(Automata theAutomata, SynchronizationOptions synchronizationOptions, SynthesizerOptions synthesizerOptions)
 		throws Exception, IllegalArgumentException
 	{
-
 		// initialization stuff that need no computation
 		this.theAutomata = theAutomata;
 		this.synchronizationOptions = synchronizationOptions;
 		this.synthesizerOptions = synthesizerOptions;
-		this.gui = gui;
 		this.nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
-		this.theVisualProjectContainer = gui.getVisualProjectContainer();
 		this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
 
 		if (!theAutomata.isEventControllabilityConsistent())
@@ -130,12 +130,6 @@ public class AutomataSynthesizer
 		// Fix this later
 		synthesizerOptions.setRememberDisabledEvents(true);
 
-		//-- MF -- Should this be tested here? There should be no possibility selecting invalid combinations!
-		if (!AutomataSynthesizer.validOptions(synthesisType, synthesisAlgorithm))
-		{
-			throw new IllegalArgumentException("Illegal combination of synthesis type and algorithm");
-		}
-
 		try
 		{
 			synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
@@ -165,96 +159,40 @@ public class AutomataSynthesizer
 		}
 	}
 
-	public static boolean validOptions(SynthesisType type, SynthesisAlgorithm algorithm)
-	{
-		if (type == SynthesisType.Unknown)
-		{
-			return false;
-		}
-
-		if (algorithm == SynthesisAlgorithm.Unknown)
-		{
-			return false;
-		}
-		else if (algorithm == SynthesisAlgorithm.IDD)
-		{
-			return false;    // Not implemented
-		}
-		else if (algorithm == SynthesisAlgorithm.BDD)
-		{
-			return true;
-		}
-		else if (algorithm == SynthesisAlgorithm.MonolithicSingleFixpoint)
-		{
-			return true;
-		}
-		else if (algorithm == SynthesisAlgorithm.Modular)
-
-		// Was this really correct ? :
-		// else if (algorithm == SynthesisAlgorithm.Monolithic)
-		{
-
-			// same as monolithic. in fact, anything but the NBC uses the monolithic code :)
-			return true;
-		}
-		else if (algorithm == SynthesisAlgorithm.Monolithic)
-		{
-			return true;    // and monolithic we can do everything
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/**
-	 * Return the time required to run this algorithm. It is only valid to
-	 * call this method after the return of the execute method.
-	 */
-	public long elapsedTime()
-	{
-		return theTimer.elapsedTime();
-	}
-
-	// instead return the timer and let it do the time-to-string formatting
-	public ActionTimer getTimer()
-	{
-		return theTimer;
-	}
-
 	// Synthesizes supervisors
-	public void execute()
+	public Automata execute()
 		throws Exception
 	{
+		Automata result = new Automata();
+
 		if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
 		{
-			theTimer.start();
-
 			MonolithicReturnValue retval = doMonolithic(theAutomata, true);
 
-			theTimer.stop();
-			gui.addAutomaton(retval.automaton);    // let the user choose the name later
+			if (stopRequested)
+			{
+				return new Automata();
+			}
+
+			result.addAutomaton(retval.automaton);    // let the user choose the name later
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
 		{
-			theTimer.start();
-
 			// monolithic case, just whack the entire stuff into the monolithic algo
 			MonolithicReturnValue retval = doMonolithic(theAutomata, false);
 
-			theTimer.stop();
+			if (stopRequested)
+			{
+				return new Automata();
+			}
 
-			// retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
-			gui.addAutomaton(retval.automaton);    // let the user choose the name later
+			result.addAutomaton(retval.automaton);    // let the user choose the name later
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular)    // modular case
 		{
-			theTimer.start();
-
 			Automata newSupervisors = doModular(theAutomata);
 
-			theTimer.stop();
-			gui.addAutomata(newSupervisors);    // let the user choose the name later
+			result.addAutomata(newSupervisors);    // let the user choose the name later
 		}
 		else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)    // more BDD Stuff
 		{
@@ -262,18 +200,17 @@ public class AutomataSynthesizer
 			boolean do_c = (typ == SynthesisType.Both) | (typ == SynthesisType.Controllable);
 			boolean do_nb = (typ == SynthesisType.Both) | (typ == SynthesisType.Nonblocking);
 
-			theTimer.start();
-
 			AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata, do_nb, do_c);
 
 			bddSynthesizer.execute();
 			bddSynthesizer.cleanup();
-			theTimer.stop();
 		}
 		else
 		{
 			logger.error("Unknown synthesis algorithm");
 		}
+
+		return result;
 	}
 
 	// Removes from disabledEvents those events that are "insignificant"
@@ -284,7 +221,6 @@ public class AutomataSynthesizer
 		{
 			for (Iterator autIt = automata.iterator(); autIt.hasNext(); )
 			{
-
 				// disregard the uc-events of this spec/supervisor
 				Automaton currAutomaton = (Automaton) autIt.next();
 
@@ -344,41 +280,56 @@ public class AutomataSynthesizer
 	/**
 	 * Does modular synthesis...
 	 */
-	private Automata doModular(Automata theAutomata)
+	private Automata doModular(Automata aut)
 		throws Exception
 	{
 		Automata modSupervisors = new Automata();    // collects the calculated supervisors
-		AutomataSelector selector = new AutomataSelector(theAutomata);    // always start with non-max perm
+		AutomataSelector selector = new AutomataSelector(aut);    // always start with non-max perm
+
+		// Initialize execution dialog
+		java.awt.EventQueue.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				executionDialog.initProgressBar(0, theAutomata.getSpecificationAndSupervisorAutomata().size());
+			}
+		});
+		int i=0;
 
 		// Loop over specs/sups AND their corresponding plants (dealt with by the selector)
-		for (Automata automata = selector.next(); automata.size() > 0;
-				automata = selector.next())
+		for (Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
 		{
+			if (stopRequested)
+			{
+				return new Automata();
+			}
 
 			// In the non incremental approach, immediately add all plants that are related
 			// by uncontrollable events. Otherwise this is done incrementally below
-			if (synthesizerOptions.getMaximallyPermissive() &&!synthesizerOptions.getMaximallyPermissiveIncremental())
+			if (synthesizerOptions.getMaximallyPermissive() && !synthesizerOptions.getMaximallyPermissiveIncremental())
 			{
-				int previousSize = 0;
-				Alphabet uncontrollableEvents = automata.getUnionAlphabet().getUncontrollableAlphabet();
-
 				// Loop until no new uncontrollable events are found
+				Alphabet uncontrollableEvents = automata.getUnionAlphabet().getUncontrollableAlphabet();
+				int previousSize = 0;
 				while (uncontrollableEvents.size() > previousSize)
 				{
 					automata = selector.addPlants(uncontrollableEvents);
 					previousSize = uncontrollableEvents.size();
 					uncontrollableEvents = automata.getUnionAlphabet().getUncontrollableAlphabet();
 				}
-
-				logger.info("Alpha: " + uncontrollableEvents + " Aut: " + automata);
 			}
 
 			// Do monolithic synthesis on this subsystem
 			MonolithicReturnValue retval = doMonolithic(automata);
 
+			if (stopRequested)
+			{
+				return new Automata();
+			}
+
+			// Did anything happen?
 			if (retval.didSomething)
 			{
-
 				// retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 				Alphabet disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
 
@@ -387,49 +338,50 @@ public class AutomataSynthesizer
 				{
 					while (disabledEvents.size() > 0)    // ...then do so until we're known to be maximally permissive...
 					{
-
-						// Note that in the nonincremental approach, this will add no new plants!
+						// Note that in the nonincremental approach, this will add no new plants since they
+						// are already added!
 						automata = selector.addPlants(disabledEvents);
-						retval = doMonolithic(automata);    // now we're *guaranteed* max perm
+						retval = doMonolithic(automata);    // In this maner, we're *guaranteed* max perm
+
+						if (stopRequested)
+						{
+							return new Automata();
+						}
 
 						//retval.automaton.setComment("sup(" + retval.automaton.getComment() + ")");
 						disabledEvents = checkMaximallyPermissive(automata, retval.disabledEvents);
 					}
 				}
-				else    // we should not care about max perm, but should notify
+				else // We do not care about max perm, but could at least notify
 				{
-					if (disabledEvents.size() > 0)    // not guranteed to be max perm
+					if (disabledEvents.size() > 0) // Not guranteed to be max perm
 					{
-						logger.info("The synthesized supervisor '" + retval.automaton.getComment() + "' might not be maximally permissive since:");
+						logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
+									"' might not be maximally permissive since:");
 
 						for (Iterator evIt = disabledEvents.iterator();
 								evIt.hasNext(); )
 						{
 							LabeledEvent currEvent = (LabeledEvent) evIt.next();
 
-							logger.info(currEvent + " is included in the plant but not " + "in the supervisor.");
+							logger.info(currEvent + " is included in the plant but not " +
+										"in the supervisor.");
 						}
 					}
-					else    // it's max perm in any case
+					else  // It's max perm in any case
 					{
-						logger.info("The synthesized supervisor '" + retval.automaton.getComment() + "' is maximally permissive.");
+						logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
+									"' is maximally permissive.");
 					}
 				}
 
-				/*
-				// Should we reduce the supervisor?
-				if (synthesizerOptions.getReduceSupervisors())
-				{       // Add the reduced supervisor
-						Automaton supervisor = retval.automaton;
-						Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(supervisor, automata);
-						modSupervisors.addAutomaton(reducedSupervisor);
-				}
-				else
-				{       // Add the supervisor as is
-						modSupervisors.addAutomaton(retval.automaton);
-				}
-				*/
 				modSupervisors.addAutomaton(retval.automaton);
+			}
+
+			// Update execution dialog
+			if (executionDialog != null)
+			{
+				executionDialog.setProgress(++i);
 			}
 		}
 
@@ -438,7 +390,12 @@ public class AutomataSynthesizer
 		{
 			logger.debug("No spec/sup seen, doing monolithic synthesis on the entire set.");
 
-			MonolithicReturnValue retval = doMonolithic(theAutomata);
+			MonolithicReturnValue retval = doMonolithic(aut);
+
+			if (stopRequested)
+			{
+				return new Automata();
+			}
 
 			if (retval.didSomething)
 			{
@@ -449,21 +406,21 @@ public class AutomataSynthesizer
 		// Should we optimize the result (throw unnecessary supervisors away)
 		if (synthesizerOptions.getOptimize())
 		{
-			optimize(theAutomata, modSupervisors);
+			optimize(aut, modSupervisors);
 		}
 
 		// Did we do anything at all?
 		if (modSupervisors.size() == 0)
 		{
-			logger.info("No problems found, the current specifications and supervisors " + 
+			logger.info("No problems found, the current specifications and supervisors " +
 						"can be used to supervise the system.");
 		}
 
 		// Nonblocking synthesis is not implemented...
 		if ((synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking) || (synthesizerOptions.getSynthesisType() == SynthesisType.Both))
 		{
-			logger.warn("Currently global nonblocking is NOT guaranteed. The only guarantee " + 
-						"is that each supervisor is individually nonblocking with respect to the " + 
+			logger.warn("Currently global nonblocking is NOT guaranteed. The only guarantee " +
+						"is that each supervisor is individually nonblocking with respect to the " +
 						"plants it controls");
 		}
 
@@ -541,16 +498,16 @@ public class AutomataSynthesizer
 				}
 
 				StringBuffer sb = new StringBuffer();
-
-				for (EventIterator evIt = problemEvents.iterator();
-						evIt.hasNext(); )
+				for (EventIterator evIt = problemEvents.iterator(); evIt.hasNext(); )
 				{
 					LabeledEvent currEvent = evIt.nextEvent();
-
 					sb.append(currEvent + " ");
 				}
 
-				logger.warn(sb.toString() + "are controllable but not observable. This imply that a supremal supervisor may not exist. To guarantee existence of such a supervisor the events will be treated us uncontrollable from the supervisors point of view. However the supervisor does not have to be maximally permissive.");
+				logger.warn(sb.toString() + "are controllable but not observable. This imply that a supremal " +
+							"supervisor may not exist. To guarantee existence of such a supervisor the events " +
+							"will be treated us uncontrollable from the supervisors point of view. However the " +
+							"supervisor does not have to be maximally permissive.");
 
 				automata = newAutomata;
 			}
@@ -567,15 +524,20 @@ public class AutomataSynthesizer
 		}
 
 		AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
+		threadToStop = syncher;
+		syncher.execute();
+		threadToStop = null;
 
-		syncher.execute();    // should be able to interrupt this one, just not now...
+		if (stopRequested)
+		{
+			return null;
+		}
 
 		retval.automaton = syncher.getAutomaton();
 		retval.didSomething |= !syncher.getHelper().getAutomataIsControllable();
 
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
 		{
-
 			// Reset the synchronization type
 			synchronizationOptions.setRememberDisabledEvents(orgRememberDisabledEvents);
 		}
@@ -586,18 +548,26 @@ public class AutomataSynthesizer
 		AutomatonSynthesizer synthesizer = singleFixpoint
 										   ? new AutomatonSynthesizerSingleFixpoint(retval.automaton, synthesizerOptions)
 										   : new AutomatonSynthesizer(retval.automaton, synthesizerOptions);
+		threadToStop = synthesizer;
+		retval.didSomething |= synthesizer.synthesize();
+		threadToStop = null;
 
-		retval.didSomething |= synthesizer.synthesize();    // should also be able to interrupt this one....
+		if (stopRequested)
+		{
+			return null;
+		}
+
 		retval.disabledEvents = synthesizer.getDisabledEvents();
 		retval.automaton = synthesizer.getAutomaton();
 
 		// Set an apropriate name... (the name should be null afterwards)
-		retval.automaton.setComment("sup(" + retval.automaton.getName() + ")");
-		retval.automaton.setName(null);
+		//retval.automaton.setComment("sup(" + retval.automaton.getName() + ")");
+		//retval.automaton.setName(null);
 
 		// Shall we reduce the supervisor?
 		if (synthesizerOptions.getReduceSupervisors() && synthesizerOptions.doPurge())
-		{    // Add the reduced supervisor
+		{
+			// Add the reduced supervisor
 			Automaton supervisor = retval.automaton;
 			Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(supervisor, automata);
 
@@ -697,6 +667,29 @@ public class AutomataSynthesizer
 
 				return;
 			}
+		}
+	}
+
+	public void setExecutionDialog(ExecutionDialog dialog)
+	{
+		executionDialog = dialog;
+	}
+
+	/**
+	 * Method that stops the synthesizer as soon as possible.
+	 *
+	 * @see  ExecutionDialog
+	 */
+	public void requestStop()
+	{
+		stopRequested = true;
+
+		logger.debug("AutomataSynthesizer requested to stop.");
+
+		// Stop currently executing thread!
+		if (threadToStop != null)
+		{
+			threadToStop.requestStop();
 		}
 	}
 }

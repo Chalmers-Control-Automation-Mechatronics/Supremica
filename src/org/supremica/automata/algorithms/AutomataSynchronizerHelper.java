@@ -142,7 +142,7 @@ public final class AutomataSynchronizerHelper
 		helperData = new HelperData();
 		statesToProcess = new IntArrayList();
 		nbrOfStatesToProcess = 0;
-		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(), 
+		theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(),
 										  syncOptions.expandHashtable());
 		theAutomaton = new Automaton();
 		executerRendezvous = new Rendezvous(syncOptions.getNbrOfExecuters(), new ExecuterRendezvous());
@@ -162,7 +162,7 @@ public final class AutomataSynchronizerHelper
 	}
 
 	/**
-	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and 
+	 * Constructs new helper but keeps the same AutomataIndexForm-, Automata-, HelperData and
 	 * Automaton-Objects.
 	 *
 	 *@param  orgHelper The old helper to collect information from
@@ -343,7 +343,7 @@ public final class AutomataSynchronizerHelper
 		}
 
 		if (true)    // What? /Hguo.
-		{			
+		{
 			int prevStateIndex = theStates.getIndex(fromState);
 
 			if (prevStateIndex >= 0)
@@ -812,7 +812,6 @@ public final class AutomataSynchronizerHelper
 
 			for (int i = 0; i < currState.length; i++)
 			{
-
 				// Only print states that are not initial if we are looking at a full state
 				if (!stateTable[automataIndices[i]][currState[i]].isInitial() || (automataIndices.length < theAutomata.size()))
 				{
@@ -831,9 +830,20 @@ public final class AutomataSynchronizerHelper
 				}
 			}
 
-			String reason = "the uncontrollable event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent).toString() + " is enabled in the plant " + problemAutomaton.toString();
+			String reason = "the event " +
+							 theAutomaton.getAlphabet().getEventWithIndex(problemEvent).toString() +
+							 " is enabled in " +
+							 problemAutomaton.toString();
 
-			logger.info("The state '" + state.toString() + "' is uncontrollable since " + reason + ".");
+			// Log the message
+			if (!state.toString().equals(""))
+			{
+				logger.info("The state '" + state.toString() + "' is uncontrollable since " + reason + ".");
+			}
+			else
+			{
+				logger.info("The initial state is uncontrollable since " + reason + ".");
+			}
 		}
 	}
 
@@ -918,6 +928,18 @@ public final class AutomataSynchronizerHelper
 		for (int i = 0; i < controllableEventsTable.length; i++)
 		{
 			controllableEventsTable[i] = false;
+		}
+	}
+
+	/**
+	 * Inverts the values of the controllableEventsTable.
+	 */
+	public void invertControllability()
+	{
+		boolean[] controllableEventsTable = theAutomataIndexForm.getControllableEventsTable();
+		for (int i = 0; i < controllableEventsTable.length; i++)
+		{
+			controllableEventsTable[i] = !controllableEventsTable[i];
 		}
 	}
 

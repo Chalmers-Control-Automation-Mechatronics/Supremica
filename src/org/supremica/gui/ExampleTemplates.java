@@ -190,6 +190,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Telecommunications Network", prefix + "telecommunicationsNetwork.xml"));
 		thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
 		thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
+		thisGroup.addItem(new TemplateItem("Automatic Car Park Gate", prefix + "AutomaticCarParkGate.xml"));
 	}
 
 	private void initializeAIPExamples()

@@ -1,51 +1,51 @@
 
 /*
- *  Supremica Software License Agreement
+ * Supremica Software License Agreement
  *
- *  The Supremica software is not in the public domain
- *  However, it is freely available without fee for education,
- *  research, and non-profit purposes.  By obtaining copies of
- *  this and other files that comprise the Supremica software,
- *  you, the Licensee, agree to abide by the following
- *  conditions and understandings with respect to the
- *  copyrighted software:
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
  *
- *  The software is copyrighted in the name of Supremica,
- *  and ownership of the software remains with Supremica.
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
  *
- *  Permission to use, copy, and modify this software and its
- *  documentation for education, research, and non-profit
- *  purposes is hereby granted to Licensee, provided that the
- *  copyright notice, the original author's names and unit
- *  identification, and this permission notice appear on all
- *  such copies, and that no charge be made for such copies.
- *  Any entity desiring permission to incorporate this software
- *  into commercial products or to use it for commercial
- *  purposes should contact:
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
  *
- *  Knut Akesson (KA), knut@supremica.org
- *  Supremica,
- *  Haradsgatan 26A
- *  431 42 Molndal
- *  SWEDEN
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
  *
- *  to discuss license terms. No cost evaluation licenses are
- *  available.
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
  *
- *  Licensee may not use the name, logo, or any other symbol
- *  of Supremica nor the names of any of its employees nor
- *  any adaptation thereof in advertising or publicity
- *  pertaining to the software without specific prior written
- *  approval of the Supremica.
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
  *
- *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
  *
- *  Supremica is owned and represented by KA.
+ * Supremica is owned and represented by KA.
  */
 package org.supremica.gui;
 
@@ -112,7 +112,7 @@ public class AutomataVerificationWorker
 		String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
 		if (errorMessage != null)
 		{
-			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage, 
+			JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage,
 										  "Alert", JOptionPane.ERROR_MESSAGE);
 			requestStop();
 
@@ -120,7 +120,8 @@ public class AutomataVerificationWorker
 		}
 
 		// Perform verification according to the VerificationType.
-		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
+		if ((verificationOptions.getVerificationType() == VerificationType.Controllability)
+			|| (verificationOptions.getVerificationType() == VerificationType.InverseControllability))
 		{
 			// Controllability verification...
 			successMessage = "The system is controllable!";
@@ -143,9 +144,9 @@ public class AutomataVerificationWorker
 		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Language inclusion verification...
-			successMessage = "The language of the unselected automata is \n" + 
+			successMessage = "The language of the unselected automata is \n" +
 				"included in the language of the selected automata.";
-			failureMessage = "The language of the unselected automata is NOT\n" + 
+			failureMessage = "The language of the unselected automata is NOT\n" +
 				"included in the language of the selected automata.";
 
 			// In language inclusion, not only the currently selected automata are used!
@@ -154,8 +155,7 @@ public class AutomataVerificationWorker
 		else
 		{    // Error... this can't happen!
 			requestStop();
-			logger.error("Unavailable option chosen... this can't happen...\n" + 
-						 "don't ever do whatever you just did again, please.\n" + 
+			logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... this can't happen.\n" +
 						 "Please send bug report to bugs@supremica.org.");
 
 			return;
@@ -175,7 +175,7 @@ public class AutomataVerificationWorker
 		catch (Exception ex)
 		{
 			requestStop();
-			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(), 
+			JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(),
 										  "Error", JOptionPane.ERROR_MESSAGE);
 			logger.error(ex.getMessage());
 			logger.debug(ex.getStackTrace());
@@ -184,16 +184,21 @@ public class AutomataVerificationWorker
 		}
 
 		// Are further preparations needed?
-		// This can't be done earlier, since the helper must be initialized! Ugly.
+		// This can't be done earlier, since the helper must be initialized!
+		// Can't be done much later either, since we need to know which automata are
+		// selected. Ugly.
 		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
 		{
 			// Treat the unselected automata as plants (and the rest as supervisors, implicitly)
 			automataVerifier.prepareForLanguageInclusion(workbench.getUnselectedAutomata());
 		}
+		if (verificationOptions.getVerificationType() == VerificationType.InverseControllability)
+		{
+			automataVerifier.prepareForInverseControllability();
+		}
 
 		// Initialize the ExecutionDialog
 		final ArrayList threadsToStop = new ArrayList();
-
 		threadsToStop.add(this);
 		threadsToStop.add(automataVerifier);
 		executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
@@ -205,6 +210,8 @@ public class AutomataVerificationWorker
 		timer.start();
 		verificationSuccess = automataVerifier.verify();
 		timer.stop();
+
+		threadsToStop.clear();
 
 		// Make sure(?) the ExecutionDialog is hidden!
 		// I thought this wouldn't work... but it seems
@@ -247,6 +254,7 @@ public class AutomataVerificationWorker
 		if (executionDialog != null)
 		{
 			executionDialog.setMode(ExecutionDialogMode.hide);
+			executionDialog = null;
 		}
 	}
 

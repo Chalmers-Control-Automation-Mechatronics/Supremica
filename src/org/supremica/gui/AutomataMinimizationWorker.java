@@ -91,8 +91,8 @@ public class AutomataMinimizationWorker
 	public void run()
 	{
 		// Initialize the ExecutionDialog
-		final ArrayList threadsToStop = new ArrayList();
-		threadsToStop.add(this);		
+		ArrayList threadsToStop = new ArrayList();
+		threadsToStop.add(this);
 		executionDialog = new ExecutionDialog(gui.getFrame(), "Minimizing", threadsToStop);
 		executionDialog.setMode(ExecutionDialogMode.minimizing);
 
@@ -111,7 +111,7 @@ public class AutomataMinimizationWorker
 
 		// The result...
 		Automata result = new Automata();
-		
+
 		// Minimize!
 		if (!options.getCompositionalMinimization())
 		{
@@ -124,13 +124,13 @@ public class AutomataMinimizationWorker
 				}
 			});
 			int i = 0;
-			
+
 			// Iterate over automata and minimize each on itself
 			Iterator autIt = theAutomata.iterator();
 			while (autIt.hasNext())
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
-				
+
 				// Minimize this one
 				try
 				{
@@ -138,21 +138,27 @@ public class AutomataMinimizationWorker
 					threadsToStop.add(minimizer);
 					Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
 					threadsToStop.remove(minimizer);
-					result.addAutomaton(newAutomaton);
+
+					if (stopRequested)
+					{
+						break;
+					}
 
 					// Update execution dialog
 					if (executionDialog != null)
 					{
 						executionDialog.setProgress(++i);
 					}
+
+					result.addAutomaton(newAutomaton);
 				}
 				catch (Exception ex)
 				{
-					logger.error("Exception in AutomatonMinimizer. Automaton: " + 
+					logger.error("Exception in AutomatonMinimizer. Automaton: " +
 								 currAutomaton.getName() + " " + ex);
 					logger.debug(ex.getStackTrace());
 				}
-				
+
 				if (!options.getKeepOriginal())
 				{
 					gui.getVisualProjectContainer().getActiveProject().removeAutomaton(currAutomaton);
@@ -182,11 +188,11 @@ public class AutomataMinimizationWorker
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomatonMinimizer when compositionally minimizing " + 
+				logger.error("Exception in AutomatonMinimizer when compositionally minimizing " +
 							 theAutomata + " " + ex);
 				logger.debug(ex.getStackTrace());
 			}
-			
+
 			if (!options.getKeepOriginal())
 			{
 				gui.getVisualProjectContainer().getActiveProject().removeAutomata(theAutomata);
@@ -196,17 +202,23 @@ public class AutomataMinimizationWorker
 		// Timer
 		timer.stop();
 
-		// We're finished! Make sure to kill the ExecutionDialog!
-		if (executionDialog != null)
+		// Hide execution dialog
+		EventQueue.invokeLater(new Runnable()
 		{
-			executionDialog.setMode(ExecutionDialogMode.hide);
-		}
+			public void run()
+			{
+				if (executionDialog != null)
+				{
+					executionDialog.setMode(ExecutionDialogMode.hide);
+				}
+			}
+		});
 
 		// How did it go?
 		if (!stopRequested)
 		{
 			logger.info("Execution completed after " + timer.toString());
-			
+
 			// Add new automata
 			try
 			{
@@ -220,6 +232,13 @@ public class AutomataMinimizationWorker
 		else
 		{
 			logger.info("Execution stopped after " + timer.toString());
+		}
+
+		// We're finished! Make sure to kill the ExecutionDialog!
+		if (executionDialog != null)
+		{
+			executionDialog.setMode(ExecutionDialogMode.hide);
+			executionDialog = null;
 		}
 	}
 

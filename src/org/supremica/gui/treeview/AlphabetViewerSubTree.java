@@ -11,7 +11,6 @@ import org.supremica.automata.LabeledEvent;
 public class AlphabetViewerSubTree
 	extends SupremicaTreeNode
 {
-
 	/**
 	 * DEPRECATED! Use AlphabetSubTree instead!!
 	 */

@@ -107,13 +107,11 @@ public class AutomataSynchronizerWorker
 				return;
 			}
 
+			// Initialize execution dialog
 			ArrayList threadsToStop = new ArrayList();
-
 			threadsToStop.add(theSynchronizer);
 			threadsToStop.add(this);
-
 			ExecutionDialog executionDialog = new ExecutionDialog(workbench.getFrame(), "Synchronizing", threadsToStop);
-
 			theSynchronizer.getHelper().setExecutionDialog(executionDialog);
 			executionDialog.setMode(ExecutionDialogMode.synchronizing);
 
@@ -158,7 +156,6 @@ public class AutomataSynchronizerWorker
 				/*-- MF -- Removed the name-fiddling let the project handle this -- But who, where?? */
 				if (theAutomaton != null)
 				{
-
 					//theAutomaton.setName(newAutomatonName);
 					StringBuffer buf = new StringBuffer();
 
@@ -186,7 +183,6 @@ public class AutomataSynchronizerWorker
 			}
 			else
 			{
-
 				// Date endDate = new Date();
 				timer.stop();
 
@@ -200,13 +196,11 @@ public class AutomataSynchronizerWorker
 		}
 		else if (mode == MODE_UPDATE)
 		{
-
 			// Display automaton
 			try
 			{
 				if (theAutomaton != null)
 				{
-
 					// -- MF -- container.add(theAutomaton);
 					// workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
 					workbench.addAutomaton(theAutomaton);
@@ -214,7 +208,6 @@ public class AutomataSynchronizerWorker
 			}
 			catch (Exception ex)
 			{
-
 				// logger.error("Could not add the new automaton after synchronization");
 				// logger.debug(ex.getStackTrace());
 				workbench.error("Could not add the new automaton after synchronization");

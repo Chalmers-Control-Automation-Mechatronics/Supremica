@@ -70,18 +70,18 @@ public final class MinimizationOptions
 	 */
 	public MinimizationOptions()
 	{
-		this(SupremicaProperties.minimizationMinimizationType(), 
-			 SupremicaProperties.minimizationAlsoTransitions(), 
-			 SupremicaProperties.minimizationKeepOriginal(), 
+		this(SupremicaProperties.minimizationMinimizationType(),
+			 SupremicaProperties.minimizationAlsoTransitions(),
+			 SupremicaProperties.minimizationKeepOriginal(),
 			 SupremicaProperties.minimizationIgnoreMarking());
 	}
 
 	/**
 	 * This constructor lets you choose exactly what options you want. This is not recommended and is
-	 * therefore private. It is better to first use the "getDefault..."-methods and then 
+	 * therefore private. It is better to first use the "getDefault..."-methods and then
 	 * modify the options you want (perhaps all of them).
 	 */
-	private MinimizationOptions(EquivalenceRelation equivalenceRelation, boolean alsoTransitions, 
+	private MinimizationOptions(EquivalenceRelation equivalenceRelation, boolean alsoTransitions,
 							   boolean keepOriginal, boolean ignoreMarking)
 	{
 		this.equivalenceRelation = equivalenceRelation;
@@ -98,7 +98,7 @@ public final class MinimizationOptions
 			logger.error(errorMessage);
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -108,7 +108,7 @@ public final class MinimizationOptions
 		{
 			if (ignoreMarking)
 			{
-				String message = "Invalid minimization options chosen. Conflict equivalence " + 
+				String message = "Invalid minimization options chosen. Conflict equivalence " +
 					"implies that the marking must not be ignored.";
 				return message;
 			}
@@ -204,7 +204,7 @@ public final class MinimizationOptions
 		SupremicaProperties.setMinimizationMinimizationType(equivalenceRelation);
 		SupremicaProperties.setMinimizationAlsoTransitions(alsoTransitions);
 		SupremicaProperties.setMinimizationKeepOriginal(keepOriginal);
-		SupremicaProperties.setMinimizationIgnoreMarking(ignoreMarking);		
+		SupremicaProperties.setMinimizationIgnoreMarking(ignoreMarking);
 	}
 
 	/**
@@ -212,6 +212,11 @@ public final class MinimizationOptions
 	 */
 	public static MinimizationOptions getDefaultMinimizationOptions()
 	{
-		return new MinimizationOptions(EquivalenceRelation.ObservationEquivalence, true, true, false);
+		MinimizationOptions options = new MinimizationOptions();
+		options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
+		options.setAlsoTransitions(true);
+		options.setKeepOriginal(true);
+		options.setIgnoreMarking(false);
+		return options;
 	}
 }

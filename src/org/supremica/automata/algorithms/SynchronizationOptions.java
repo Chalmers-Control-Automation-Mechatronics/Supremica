@@ -75,7 +75,7 @@ public final class SynchronizationOptions
 	public SynchronizationOptions()
 		throws IllegalArgumentException
 	{
-		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), 
+		this(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(),
 			 false,                                   // expandEventsUsingPriority
 			 true,                                    // buildAutomaton
 			 SupremicaProperties.verboseMode(),       // Should always be decided by user! Doesn't belong here?
@@ -85,8 +85,8 @@ public final class SynchronizationOptions
 	}
 
 	/**
-	 * This is not a good constructor so it is private, it is impossible to read in the code. 
-	 * Use the "getDefault..."-methods in this class instead or when they won't suit you, 
+	 * This is not a good constructor so it is private, it is impossible to read in the code.
+	 * Use the "getDefault..."-methods in this class instead or when they won't suit you,
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
 	 */
@@ -181,7 +181,7 @@ public final class SynchronizationOptions
 	{
 		expandForbiddenStates = set;
 	}
-	
+
 	public void setExpandEventsUsingPriority(boolean set)
 	{
 		expandEventsUsingPriority = set;
@@ -273,20 +273,22 @@ public final class SynchronizationOptions
 	{
 		SynchronizationOptions options = new SynchronizationOptions();
 		options.setSynchronizationType(SynchronizationType.Prioritized);
-		options.setForbidUncontrollableStates(true);  // This is controversial!
+		//options.setForbidUncontrollableStates(true);  // This is controversial!
+		options.setForbidUncontrollableStates(false);   // So why was it like that?
 		options.setExpandForbiddenStates(true);
 		options.setExpandHashtable(true);
 		return new SynchronizationOptions();
 	}
 
 	/**
-	 * Returns the default options for verification. For example, when performing verification, we do 
-	 * not want to build the full automaton model. The abstract indexForm representation is enough. 
+	 * Returns the default options for verification. For example, when performing verification, we do
+	 * not want to build the full automaton model. The abstract indexForm representation is enough.
 	 * That is why buildAutomaton is set to be false.
 	 */
 	public static SynchronizationOptions getDefaultVerificationOptions()
 	{
 		SynchronizationOptions options = getDefaultSynchronizationOptions();
+		options.setForbidUncontrollableStates(true); // Doesn't really matter, this is not how controllability is decided
 		options.setBuildAutomaton(false);        // We don't want to see the stuff, anyway...
 		options.setExpandForbiddenStates(false); // Don't need to do that, then...
 		return options;
@@ -298,7 +300,7 @@ public final class SynchronizationOptions
 	public static SynchronizationOptions getDefaultSynthesisOptions()
 	{
 		SynchronizationOptions options = getDefaultSynchronizationOptions();
-		options.setForbidUncontrollableStates(true);
+		options.setForbidUncontrollableStates(true); // This is important!
 		options.setExpandForbiddenStates(false); // Don't need to do that if we're not using it anyway...
 		return options;
 	}

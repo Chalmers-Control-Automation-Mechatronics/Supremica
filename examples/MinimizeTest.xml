@@ -43,12 +43,12 @@
 		<Event id="epsilon" label="epsilon"/>
 	</Events>
 	<States>
-		<State id="q0" name="" initial="true"/>
-		<State id="q1" name="" accepting="true"/>
-		<State id="q2" name=""/>
-		<State id="q3" name=""/>
-		<State id="q4" name=""/>
-		<State id="q5" name=""/>
+		<State id="q0" initial="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+		<State id="q5"/>
 	</States>
 	<Transitions>
 		<Transition source="q0" dest="q3" event="b"/>

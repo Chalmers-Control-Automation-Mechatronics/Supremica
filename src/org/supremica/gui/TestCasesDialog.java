@@ -110,19 +110,14 @@ class PhilosPanel
 	JCheckBox l_put = new JCheckBox("put left fork", false);
 	JCheckBox r_put = new JCheckBox("put right fork", false);
 	JCheckBox animation = new JCheckBox("Include animation (5 philos)", false);
+	JCheckBox memory = new JCheckBox("Forks have memory", false);
 
 	public PhilosPanel()
 	{
-
 		// super(new GridLayout(2, 1, 10, 10));
 		super();
 
-		Box theBox = Box.createVerticalBox();
-
-		add(theBox, BorderLayout.NORTH);
-
 		JPanel cont = new JPanel();
-
 		//cont.setLayout(new BoxLayout());
 		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
 		cont.add(l_take);
@@ -131,22 +126,24 @@ class PhilosPanel
 		cont.add(r_put);
 
 		JPanel num_users = new JPanel();
-
 		num_users.add(new JLabel("Number of philosophers and forks: "), BorderLayout.NORTH);
 		num_users.add(int_num, BorderLayout.NORTH);
 
 		JPanel animationPanel = new JPanel();
+		animationPanel.add(animation);
+		animationPanel.add(memory);
 
-		animationPanel.add(animation, BorderLayout.NORTH);
+		Box theBox = Box.createVerticalBox();
 		theBox.add(cont);
 		theBox.add(num_users);
 		theBox.add(animationPanel);
+		add(theBox, BorderLayout.NORTH);
 	}
 
 	public Project doIt()
 		throws Exception
 	{
-		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected());
+		DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected(), memory.isSelected());
 
 		return dp.getProject();
 	}

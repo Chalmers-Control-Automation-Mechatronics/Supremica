@@ -1,51 +1,51 @@
 
 /*
- *  Supremica Software License Agreement
+ * Supremica Software License Agreement
  *
- *  The Supremica software is not in the public domain
- *  However, it is freely available without fee for education,
- *  research, and non-profit purposes.  By obtaining copies of
- *  this and other files that comprise the Supremica software,
- *  you, the Licensee, agree to abide by the following
- *  conditions and understandings with respect to the
- *  copyrighted software:
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
  *
- *  The software is copyrighted in the name of Supremica,
- *  and ownership of the software remains with Supremica.
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
  *
- *  Permission to use, copy, and modify this software and its
- *  documentation for education, research, and non-profit
- *  purposes is hereby granted to Licensee, provided that the
- *  copyright notice, the original author's names and unit
- *  identification, and this permission notice appear on all
- *  such copies, and that no charge be made for such copies.
- *  Any entity desiring permission to incorporate this software
- *  into commercial products or to use it for commercial
- *  purposes should contact:
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
  *
- *  Knut Akesson (KA), knut@supremica.org
- *  Supremica,
- *  Haradsgatan 26A
- *  431 42 Molndal
- *  SWEDEN
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
  *
- *  to discuss license terms. No cost evaluation licenses are
- *  available.
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
  *
- *  Licensee may not use the name, logo, or any other symbol
- *  of Supremica nor the names of any of its employees nor
- *  any adaptation thereof in advertising or publicity
- *  pertaining to the software without specific prior written
- *  approval of the Supremica.
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
  *
- *  SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- *  SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
- *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
  *
- *  Supremica is owned and represented by KA.
+ * Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
 
@@ -373,7 +373,7 @@ public final class AutomataSynchronizerExecuter
 
 		controllableState = true;
 		immediateEvent = IMMEDIATE_NOT_AVAILABLE;
-		
+
 		while (currMinEventIndex < Integer.MAX_VALUE)
 		{
 			int currEventIndex = currMinEventIndex;
@@ -406,7 +406,7 @@ public final class AutomataSynchronizerExecuter
 							//... this event should not be executed
 							thisEventOk = false;
 
-							// For controllability we need to know whether the event was 
+							// For controllability we need to know whether the event was
 							// disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
 							{
@@ -426,7 +426,7 @@ public final class AutomataSynchronizerExecuter
 							//... this event should not be executed
 							thisEventOk = false;
 
-							// For controllability we need to know whether the 
+							// For controllability we need to know whether the
 							// event was disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
 							{
@@ -484,7 +484,7 @@ public final class AutomataSynchronizerExecuter
 					currMinEventIndex = currAutEventIndex;
 				}
 			}
-			
+
 			// If everything is ok, or the event is epsilon, it is enabled!
 			// (If the event is epsilon, a lot of the above could have been ignored...)
 			if (thisEventOk || epsilonEventsTable[currEventIndex])
@@ -674,7 +674,7 @@ public final class AutomataSynchronizerExecuter
 					helper.setForbidden(currState, true);
 				}
 
-				// We now know that there is an uncontrollable state, if this was all we wanted to know, 
+				// We now know that there is an uncontrollable state, if this was all we wanted to know,
 				// we can return now. (If there are multiple executer threads, we have to tell them too...)
 				if (exhaustiveSearch)
 				{
@@ -693,7 +693,7 @@ public final class AutomataSynchronizerExecuter
 				while (currEventIndex != Integer.MAX_VALUE)
 				{
 					/* **CHANGE FOR NONDETERMINISM**
-					// Generate an array that contains the indicies of each state. 
+					// Generate an array that contains the indicies of each state.
 					// Copy the old state, some parts won't change!
 					//System.arraycopy(currState, 0, nextState, 0, currState.length);
 					int[] nextState = AutomataIndexFormHelper.createCopyOfState(currState);
@@ -705,7 +705,7 @@ public final class AutomataSynchronizerExecuter
 					{
  						int currAutomatonIndex = automataIndices[j];
 	 					int currSingleNextState = nextStateTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex];
-						
+
 						// Jump in all automata that have this event defined.
 		 				if (currSingleNextState != Integer.MAX_VALUE)
 			 			{
@@ -730,10 +730,10 @@ public final class AutomataSynchronizerExecuter
 						return;
 					}
 					*/
-					
+
 					// Find new permutations (recursion)
 					addNondeterministicStatePermutations(currState, currEventIndex);
-					
+
 					// Get next enabled event
 					currEventIndex = currEnabledEvents[++i];
 				}
@@ -813,15 +813,15 @@ public final class AutomataSynchronizerExecuter
 				logger.error("Error in AutomataSynchronizerExecuter");
 				logger.debug(e.getStackTrace());
 			}
-			
+
 			return;
 		}
 
-		// Find the local constants 
+		// Find the local constants
 		int currAutomatonIndex = automataIndices[index];
 		int i = 0;
 		int currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][i];
-		// Let nextIndex be the index (for automataIndices) of the next automaton that has this 
+		// Let nextIndex be the index (for automataIndices) of the next automaton that has this
 		// event enabled at least once
 		int nextIndex;
 		for (nextIndex = index+1; nextIndex <= automataIndices.length; nextIndex++)
@@ -838,13 +838,13 @@ public final class AutomataSynchronizerExecuter
 			}
 		}
 
-		// It is assumed that this method is only called for viable 
+		// It is assumed that this method is only called for viable
 		// indices (where there really are enabled events)!
 		while (currSingleNextState != Integer.MAX_VALUE)
-		{			
+		{
 			// Update the nextState array
 			nextState[currAutomatonIndex] = currSingleNextState;
-			
+
 			// If the event is an epsilon event, there is no synchronization!
 			// A jump in one automaton is enough!
 			if (epsilonEventsTable[currEventIndex])
@@ -858,7 +858,7 @@ public final class AutomataSynchronizerExecuter
 			{
 				// Next depth of the recursion
 				addNextStatePermutation(currState, nextState, currEventIndex, nextIndex);
-			}		
+			}
 
 			// Update the current substate for this automaton
 			currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][++i];
@@ -926,7 +926,7 @@ public final class AutomataSynchronizerExecuter
 			if (executionDialog != null)
 			{
 				executionDialog.initProgressBar(0, currStateTable.length);
-				executionDialog.setMode(ExecutionDialogMode.buildingStates);
+				executionDialog.setMode(ExecutionDialogMode.synchronizingBuildingStates);
 			}
 
 			// Create all states
@@ -969,7 +969,7 @@ public final class AutomataSynchronizerExecuter
 
 						// Remove last separator string element
 						sb.setLength(sb.length() - SEPARATOR_LENGTH);
-						
+
 						// Create state
 						newState = new CompositeState(sb.toString(), currState, helper.getAutomata());
 					}
@@ -977,7 +977,7 @@ public final class AutomataSynchronizerExecuter
 					{
 						newState = new CompositeState("q" + stateNumber++, currState, helper.getAutomata());
 					}
-					
+
 					// Set some attributes of the state
 					newState.setAutomataSynchronizerExecutorIndex(i);
 					newState.setName(newState.getId());
@@ -994,7 +994,7 @@ public final class AutomataSynchronizerExecuter
 			if (executionDialog != null)
 			{
 				executionDialog.initProgressBar(0, currStateTable.length);
-				executionDialog.setMode(ExecutionDialogMode.buildingTransitions);
+				executionDialog.setMode(ExecutionDialogMode.synchronizingBuildingTransitions);
 			}
 
 			// Create all transitions
@@ -1070,7 +1070,7 @@ public final class AutomataSynchronizerExecuter
 							}
 						}
 						catch (Exception e)
-						{	
+						{
 							logger.error("Exception when checking next state. " + e);
 							logger.debug(e.getStackTrace());
 						}
@@ -1078,7 +1078,7 @@ public final class AutomataSynchronizerExecuter
 
 						// Recursion for adding arcs, also nondeterministic
 						addNondeterministicArcPermutations(currState, currEventIndex);
-						
+
 						// Next event
 						currEventIndex = currEnabledEvents[++i];
 					}
@@ -1116,7 +1116,7 @@ public final class AutomataSynchronizerExecuter
 				theAutomaton.setType(AutomatonType.Specification);
 			}
 			else
-			{	
+			{
 				// theAutomaton.setType(AutomatonType.Undefined);
 				// Changed the default type to specification
 				theAutomaton.setType(AutomatonType.Specification);
@@ -1165,7 +1165,7 @@ public final class AutomataSynchronizerExecuter
 			{
 				// Check if nextState exists
 				int nextIndex = helper.getStateIndex(nextState);
-				
+
 				if (nextIndex >= 0)
 				{
 					// Get fromState (from currState) and toState (from nextState) and the event
@@ -1181,7 +1181,7 @@ public final class AutomataSynchronizerExecuter
 				}
 			}
 			catch (Exception e)
-			{	
+			{
 				logger.error("Exception when checking next state. " + e);
 				logger.debug(e.getStackTrace());
 			}
@@ -1189,11 +1189,11 @@ public final class AutomataSynchronizerExecuter
 			return;
 		}
 
-		// Find the local constants 
+		// Find the local constants
 		int currAutomatonIndex = automataIndices[index];
 		int i = 0;
 		int currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][i];
-		// Let nextIndex be the index (for automataIndices) of the next automaton that has this 
+		// Let nextIndex be the index (for automataIndices) of the next automaton that has this
 		// event enabled at least once
 		int nextIndex;
 		for (nextIndex = index+1; nextIndex <= automataIndices.length; nextIndex++)
@@ -1210,13 +1210,13 @@ public final class AutomataSynchronizerExecuter
 			}
 		}
 
-		// It is assumed that this method is only called for viable 
+		// It is assumed that this method is only called for viable
 		// indices (where there really are enabled events)!
 		while (currSingleNextState != Integer.MAX_VALUE)
-		{			
+		{
 			// Update the nextState array
 			nextState[currAutomatonIndex] = currSingleNextState;
-			
+
 			// If the event is an epsilon event, there is no synchronization!
 			// A jump in one automaton is enough!
 			if (epsilonEventsTable[currEventIndex])
@@ -1230,7 +1230,7 @@ public final class AutomataSynchronizerExecuter
 			{
 				// Next depth of the recursion
 				addNextArcPermutation(currState, nextState, currEventIndex, nextIndex);
-			}		
+			}
 
 			// Update the current substate for this automaton
 			currSingleNextState = nextStatesTable[currAutomatonIndex][currState[currAutomatonIndex]][currEventIndex][++i];
@@ -1276,57 +1276,57 @@ public final class AutomataSynchronizerExecuter
 	}
 
 	/*
-	 *  public int[][] previousStates(int[] state, int currEventIndex)
-	 *  {
-	 *  int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
-	 *  int[] nbrOfPrevStates = int[nbrOfAutomata];
-	 *  int[] currIndexOfPrevStates = int[nbrOfAutomata];
-	 *  int[] currPrevState = int[nbrOfAutomata + 1];
+	 * public int[][] previousStates(int[] state, int currEventIndex)
+	 * {
+	 * int[][][][] prevStatesTable = theAutomataIndexForm.getPrevStatesTable();
+	 * int[] nbrOfPrevStates = int[nbrOfAutomata];
+	 * int[] currIndexOfPrevStates = int[nbrOfAutomata];
+	 * int[] currPrevState = int[nbrOfAutomata + 1];
 	 *
-	 *  // First compute the maximum nbr of previous states
-	 *  int maxNbrOfPreviousStates = 1;
-	 *  for (int i = 1; i < state.length - 1; i++)
-	 *  {
-	 *  // ToDo Check if this automaton is among the selected
+	 * // First compute the maximum nbr of previous states
+	 * int maxNbrOfPreviousStates = 1;
+	 * for (int i = 1; i < state.length - 1; i++)
+	 * {
+	 * // ToDo Check if this automaton is among the selected
 	 *
-	 *  int currAutomatonIndex = i;
-	 *  int currStateIndex = state[currAutomatonIndex];
-	 *  int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
-	 *  if (prevStates != null)
-	 *  {
-	 *  int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
-	 *  nbrOfPrevStates[i] = currNbrOfPreviousStates;
-	 *  if (currNbrOfPreviousStates > 0)
-	 *  {
-	 *  currIndexOfPrevStates
-	 *  }
-	 *  else
-	 *  {
-	 *  currIndexOfPreviousState[i] = 0;
-	 *  }
-	 *  maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
-	 *  }
-	 *  }
+	 * int currAutomatonIndex = i;
+	 * int currStateIndex = state[currAutomatonIndex];
+	 * int[] prevStates = prevStatesTable[currAutomatonIndex][currStateIndex][currEventIndex];
+	 * if (prevStates != null)
+	 * {
+	 * int currNbrOfPreviousStates = prevStates[prevStates.length - 1];
+	 * nbrOfPrevStates[i] = currNbrOfPreviousStates;
+	 * if (currNbrOfPreviousStates > 0)
+	 * {
+	 * currIndexOfPrevStates
+	 * }
+	 * else
+	 * {
+	 * currIndexOfPreviousState[i] = 0;
+	 * }
+	 * maxNbrOfPreviousStates = maxNbrOfPreviousStates * currNbrOfPreviousStates;
+	 * }
+	 * }
 	 *
-	 *  int[][] previousStates = new int[maxNbrOfPreviousState][];
-	 *  for (int i = 1; i < state.length - 2; i++)
-	 *  {
-	 *  for(int j = i + 1; j < )
+	 * int[][] previousStates = new int[maxNbrOfPreviousState][];
+	 * for (int i = 1; i < state.length - 2; i++)
+	 * {
+	 * for(int j = i + 1; j < )
 	 *
-	 *  }
+	 * }
 	 *
-	 *  // Check if this event is included
-	 *  int[] existingPrevState = theStates.get(currPrevState);
-	 *  if (existingPrevState != null)
-	 *  {
-	 *  // Check if the event is really possible
-	 *  if (isValidTransition(existingPrevState, state, currEventIndex))
-	 *  {
-	 *  previousStates[xx] = existingPrevState;
-	 *  }
-	 *  }
+	 * // Check if this event is included
+	 * int[] existingPrevState = theStates.get(currPrevState);
+	 * if (existingPrevState != null)
+	 * {
+	 * // Check if the event is really possible
+	 * if (isValidTransition(existingPrevState, state, currEventIndex))
+	 * {
+	 * previousStates[xx] = existingPrevState;
+	 * }
+	 * }
 	 *
-	 *  }
+	 * }
 	 */
 
 	/**
@@ -1340,20 +1340,20 @@ public final class AutomataSynchronizerExecuter
 	 */
 
 	/*
-	 *  public boolean isValidTransition(int[] fromState, int[] toState, int event)
-	 *  {
-	 *  if (prioritizedEventInResultAutomaton[event])
-	 *  { // Check that event is possible from all automata that have
-	 *  // this event as prioritized.
+	 * public boolean isValidTransition(int[] fromState, int[] toState, int event)
+	 * {
+	 * if (prioritizedEventInResultAutomaton[event])
+	 * { // Check that event is possible from all automata that have
+	 * // this event as prioritized.
 	 *
-	 *  // To do
-	 *  }
-	 *  else
-	 *  { // We assume that the event is possible in at least one of the
-	 *  // original automata.
-	 *  return true;
-	 *  }
-	 *  }
+	 * // To do
+	 * }
+	 * else
+	 * { // We assume that the event is possible in at least one of the
+	 * // original automata.
+	 * return true;
+	 * }
+	 * }
 	 */
 
 	/**
@@ -1374,7 +1374,7 @@ public final class AutomataSynchronizerExecuter
 
 		// Handle all events
 		while (currEventIndex != Integer.MAX_VALUE)
-		{    
+		{
 			// Generate an array that contains the indicies of each state, nextstate, initialize
 			// it with the values of toState, to get the correct status values in the end!
 			// System.arraycopy(toState, 0, nextState, 0, fromState.length);
