@@ -1,0 +1,207 @@
+/*
+ * Supremica Software License Agreement
+ *
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
+ *
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
+ *
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
+ *
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
+ *
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
+ *
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
+ *
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
+ *
+ * Supremica is owned and represented by KA.
+ */
+
+package org.supremica.automata;
+
+import java.util.*;
+
+public class Event
+    implements Comparable
+{
+	private String id = "";
+	private String label = "";
+	private boolean controllable = true;
+	private boolean prioritized = true;
+	private int expansionPriority = -1;
+	private int synchIndex = -1;
+//	private Action theAction = null;
+
+	public Event()
+	{
+	}
+
+	public Event(String label)
+	{
+		this.label = label;
+	}
+
+	public Event(Event e)
+	{
+		id = e.id;
+		label = e.label;
+		controllable = e.controllable;
+		prioritized = e.prioritized;
+	}
+
+	public String toString()
+	{
+		return label + " (" + id + ")";
+	}
+
+	/**
+	 * Calls update in all execution listeners.
+	 */
+	/*
+	public void execute()
+	{
+		notifyExceutionListeners();
+	}
+	*/
+
+	public String getId()
+	{
+		return id;
+	}
+
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+
+	public String getLabel()
+	{
+		return label;
+	}
+
+	public void setLabel(String label)
+	{
+		this.label = label;
+	}
+
+	public boolean isControllable()
+	{
+		return controllable;
+	}
+
+	public void setControllable(boolean controllable)
+	{
+		this.controllable = controllable;
+	}
+
+	public boolean isPrioritized()
+	{
+		return prioritized;
+	}
+
+	public void setPrioritized(boolean prioritized)
+	{
+		this.prioritized = prioritized;
+	}
+
+	public void setExpansionPriority(int expansionPriority)
+	{
+		this.expansionPriority = expansionPriority;
+	}
+
+	public int getExpansionPriority()
+	{
+		return expansionPriority;
+	}
+
+	public boolean equals(Object obj)
+	{
+		// System.err.println("equalsObject");
+		return this.label.equals(((Event)obj).label);
+	}
+
+	public boolean equals(String label)
+	{
+		// System.err.println("equalsString");
+		return this.label.equals(label);
+	}
+
+	public boolean equalId(Object obj)
+	{
+		return this.id.equals(((Event)obj).id);
+	}
+
+	public boolean equalId(String id)
+	{
+		return this.id.equals(id);
+	}
+
+	public int hashCode()
+	{
+		return label.hashCode();
+	}
+
+	public int getSynchIndex()
+	{
+		return synchIndex;
+	}
+
+	public void setSynchIndex(int synchIndex)
+	{
+		this.synchIndex = synchIndex;
+	}
+
+    public int compareTo(Object event)
+    {
+        // System.err.println("CompareTo");
+        return label.compareTo(((Event)event).label);
+    }
+/*
+	public Listeners getExceutionListeners()
+	{
+		if (listeners == null)
+		{
+			listeners = new AutomatonListeners(this);
+		}
+		return listeners;
+	}
+
+	private void notifyExceutionListeners()
+	{
+		if (listeners != null)
+		{
+			listeners.notifyListeners();
+		}
+	}
+*/
+}

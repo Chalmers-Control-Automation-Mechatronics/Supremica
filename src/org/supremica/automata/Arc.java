@@ -1,0 +1,217 @@
+/*
+ * Supremica Software License Agreement
+ *
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
+ *
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
+ *
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
+ *
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
+ *
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
+ *
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
+ *
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
+ *
+ * Supremica is owned and represented by KA.
+ */
+
+package org.supremica.automata;
+
+import java.util.*;
+
+public class Arc
+{
+	private String eventId;
+	private State fromState;
+	private State toState;
+	private ArcListeners listeners = null;
+
+	// Internal use for graphical representation
+	private double outgoingAngle = 0;
+	private double incomingAngle = 0;
+	private int dxControlPointBegin = 0;
+	private int dyControlPointBegin = 0;
+	private int dxControlPointEnd = 0;
+	private int dyControlPointEnd = 0;
+	private int beginX = -1;
+	private int beginY = -1;
+	private int endX = -1;
+	private int endY = -1;
+
+	public Arc(State from, State to, String eventId)
+	{
+		fromState = from;
+		toState = to;
+		this.eventId = eventId;
+		from.addOutgoingArc(this);
+		to.addIncomingArc(this);
+	}
+
+	public String getEventId()
+	{
+		return eventId;
+	}
+
+	public void setEvent(String eventId)
+	{
+		this.eventId = eventId;
+	}
+
+	public State getToState()
+	{
+		return toState;
+	}
+
+	public State getFromState()
+	{
+		return fromState;
+	}
+
+	public void clear()
+	{
+		if (fromState != null)
+			fromState.removeOutgoingArc(this);
+		if (toState != null)
+			toState.removeIncomingArc(this);
+		eventId = null;
+		fromState = null;
+		toState = null;
+
+		notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
+	}
+
+	public void computeDefaultDisplayParameters()
+	{
+		int x1 = fromState.getX();
+		int y1 = fromState.getY();
+
+		int x2 = toState.getX();
+		int y2 = toState.getY();
+
+		outgoingAngle = angle(x1, y1, x2, y2);
+		incomingAngle = angle(x2, y2, x1, y1);
+	}
+
+	public void computeStartAndEndParameters()
+	{
+		int x1 = fromState.getX();
+		int y1 = fromState.getY();
+		int r1 = fromState.getRadius();
+
+		int x2 = toState.getX();
+		int y2 = toState.getY();
+		int r2 = toState.getRadius();
+
+		beginX = x1 + (int)(r1*Math.cos(outgoingAngle));
+		beginY = y1 + (int)(r1*Math.sin(outgoingAngle));
+
+		endX = x2 + (int)(r2*Math.cos(incomingAngle));
+		endY = y2 + (int)(r2*Math.sin(incomingAngle));
+	}
+
+	public int getBeginX()
+	{
+		return beginX;
+	}
+
+	public int getBeginY()
+	{
+		return beginY;
+	}
+
+	public int getEndX()
+	{
+		return endX;
+	}
+
+	public int getEndY()
+	{
+		return endY;
+	}
+
+	public Listeners getListeners()
+	{
+		if (listeners == null)
+		{
+			listeners = new ArcListeners(this);
+		}
+		return listeners;
+	}
+
+	private void notifyListeners()
+	{
+		if (listeners != null)
+		{
+			listeners.notifyListeners();
+		}
+	}
+
+	private void notifyListeners(int mode, Object o)
+	{
+		if (listeners != null)
+		{
+			listeners.notifyListeners(mode, o);
+		}
+	}
+
+	public static double angle(int x0, int y0, int x1, int y1)
+	{
+		double angle = 0;
+		double xDist = x1 - x0;
+		double yDist = y1 - y0;
+		if (xDist == 0)
+		{
+			if (yDist >= 0)
+				angle = Math.PI / 2;
+			else
+				angle = -1*Math.PI / 2;
+		}
+		else if (xDist > 0)
+		{
+			angle = Math.atan(yDist / xDist);
+			if (yDist < 0)
+			{
+				angle = 2*Math.PI + angle;
+			}
+		}
+		else
+		{
+			xDist = -1*xDist;
+			angle = Math.PI - Math.atan(yDist / xDist);
+
+		}
+		return angle;
+	}
+}

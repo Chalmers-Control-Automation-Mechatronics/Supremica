@@ -1,0 +1,88 @@
+README
+======
+
+To run Supremica you need a Java 2 compliant JVM.
+All development is done with Sun's JDK 1.3. For best
+performance you should use IBM JDK 1.3.
+
+To report problems or ask questions
+send email to knut@supremica.org
+
+A short tutorial of how to compile and run
+Supremica is following.
+
+1. Checkout
+	Enter a directory where you want to store
+	the Supremica files, e.g. "H:\projects". The checkout the
+	sources, write:
+	> cvs checkout Supremica
+
+2. Compiling
+	The first time you compile after a checkout you should write:
+	> ant initialize
+	
+	You should also run the previous command as soon
+	as a there is a new or updated file in Supremica/lib.
+
+	For compiling the sources there are three main
+	alternatives.
+	
+	i. Compile all files changed since last compilation
+	> ant compile
+	
+	ii. Compile all files changed since last compilation and
+	build a jar file.
+	> ant build
+	
+	iii. Compile all files and build a jar file.
+	> ant rebuild
+	First all existing class files are deleted, then
+	a compilation of all java files are done.
+	
+	Alternative iii, is the preferred alternative, and is
+	also the one executed if you run ant without arguments.
+	Note that alternative i, can be fast if you only want
+	to check that some change you done is going though the
+	compiler.
+	
+3. Run
+	Two alternatives:
+	
+	i. Enter Supremica/dist, write:
+	> Supremica    (for Windows)
+	> ./Supremica  (for Unix)
+		
+	ii. Run Supremica through Ant. Enter Supremica and write
+	> ant run
+	
+	For Windows: If you have everything set up correctly you should also
+	be able to double-click on Supremica/dist/Supremica.jar
+	in the Explorer.
+
+4. Update
+	Enter the Supremica directory, write:
+	> cvs update -d
+
+5. Commit changes
+ 	Enter the Supremica directory, write:
+	> cvs commit
+
+6. Add a new file into cvs
+	Enter the directory where the file resides, write:
+	cvs add filename.java
+
+
+More information
+----------------
+
+Ant - the build systems
+http://jakarta.apache.org/ant/
+
+Cvs - the 
+http://www.cvshome.org/
+
+Sun Java JDK
+http://java.sun.com/
+
+IBM Java JDK
+http://www.ibm.com/java

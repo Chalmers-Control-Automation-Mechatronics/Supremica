@@ -1,0 +1,2 @@
+@java -jar Supremica.jar
+

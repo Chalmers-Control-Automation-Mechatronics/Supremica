@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Automata>
+<Automaton name="Robot_all_con" type="Plant">
+	<Events>
+		<Event id="a" label="a" controllable="true" prioritized="true"/>
+		<Event id="b" label="b" controllable="true" prioritized="true"/>
+		<Event id="c" label="b" controllable="false" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="r1" name="r1" initial="true" accepting="true"/>
+		<State id="r2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="r1" dest="r2" event="a"/>
+		<Transition source="r2" dest="r1" event="b"/>
+		<Transition source="r2" dest="r1" event="c"/>
+
+	</Transitions>
+</Automaton>
+<Automaton name="Machine_all_con" type="Plant">
+	<Events>
+		<Event id="c" label="c" controllable="true" prioritized="true"/>
+		<Event id="d" label="d" controllable="true" prioritized="true"/>
+		<Event id="e" label="e" controllable="true" prioritized="true"/>		
+	</Events>
+	<States>
+		<State id="m1" initial="true" accepting="true"/>
+		<State id="m2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="m1" dest="m2" event="c"/>
+		<Transition source="m2" dest="m1" event="d"/>
+		<Transition source="m2" dest="m1" event="e"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Spec_all_con" type="Specification">
+	<Events>
+		<Event id="b" label="b" controllable="true" prioritized="true"/>
+		<Event id="c" label="c" controllable="true" prioritized="true"/>
+		<Event id="d" label="d" controllable="true" prioritized="true"/>		
+	</Events>
+	<States>
+		<State id="s1" initial="true" accepting="true"/>
+		<State id="s2"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s1" dest="s2" event="b"/>
+		<Transition source="s2" dest="s3" event="c"/>
+		<Transition source="s3" dest="s1" event="d"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Robot_b_uncon" type="Plant">
+	<Events>
+		<Event id="a" label="a" controllable="true" prioritized="true"/>
+		<Event id="b" label="b" controllable="false" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="r1" name="r1" initial="true" accepting="true"/>
+		<State id="r2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="r1" dest="r2" event="a"/>
+		<Transition source="r2" dest="r1" event="b"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Machine_b_uncon" type="Plant">
+	<Events>
+		<Event id="c" label="c" controllable="true" prioritized="true"/>
+		<Event id="d" label="d" controllable="true" prioritized="true"/>
+		<Event id="e" label="e" controllable="true" prioritized="true"/>		
+	</Events>
+	<States>
+		<State id="m1" initial="true" accepting="true"/>
+		<State id="m2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="m1" dest="m2" event="c"/>
+		<Transition source="m2" dest="m1" event="d"/>
+		<Transition source="m2" dest="m1" event="e"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Spec_b_uncon" type="Specification">
+	<Events>
+		<Event id="b" label="b" controllable="false" prioritized="true"/>
+		<Event id="c" label="c" controllable="true" prioritized="true"/>
+		<Event id="d" label="d" controllable="true" prioritized="true"/>		
+	</Events>
+	<States>
+		<State id="s1" initial="true" accepting="true"/>
+		<State id="s2"/>
+		<State id="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="s1" dest="s2" event="b"/>
+		<Transition source="s2" dest="s3" event="c"/>
+		<Transition source="s3" dest="s1" event="d"/>
+	</Transitions>
+</Automaton>
+<Automaton name="No_Marked" type="Plant">
+	<Events>
+		<Event id="a" label="a" controllable="true" prioritized="true"/>
+		<Event id="b" label="b" controllable="true" prioritized="true"/>
+	</Events>
+	<States>
+		<State id="r1" name="r1" initial="true"/>
+		<State id="r2"/>
+	</States>
+	<Transitions>
+		<Transition source="r1" dest="r2" event="a"/>
+		<Transition source="r2" dest="r1" event="b"/>
+	</Transitions>
+</Automaton>
+</Automata>

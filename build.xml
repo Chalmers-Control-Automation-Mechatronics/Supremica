@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project name="Supremica" default="rebuild" basedir=".">
+
+<property name="src" value="src"/>
+<property name="build" value="build"/>
+<property name="dist"  value="dist"/>
+<property name="doc" value="doc"/>
+<property name="examples" value="examples"/>
+<property name="templates" value="templates"/>
+<property name="images" value="images"/>
+<property name="help" value="help"/>
+<property name="lib" value="lib"/>
+<property name="unjared" value="unjared"/>
+
+<property name="my_basepackage" value="org.supremica"/>
+<property name="my_basedir" value="org/supremica"/>
+
+<property name="project.name" value="Supremica"/>
+<property name="backup.dir" value="../backup"/>
+<property name="javalibs.dir" value="lib/unjared"/>
+
+<!--
+*	If you for some reason prefer javac instead of jikes,
+*	just change "jikes" to "modern" on the next line.
+-->
+<property name="build.compiler" value="jikes"/>
+
+<!-- 
+*	Run this script after checking out the sources for the
+*	first time. 
+*	You should also run everytime one of jar files below
+*	has been updated.
+-->
+<target name="initialize" depends="clean">
+
+	<mkdir dir="${lib}/${unjared}"/>
+	<delete includeEmptyDirs="true" >
+		<fileset dir="${lib}/${unjared}" />
+	</delete>
+  
+	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/crimson.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jaxp.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/log4j-core.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
+	
+	<mkdir dir="${lib}/${unjared}/META-INF"/>
+	<delete includeEmptyDirs="true">
+		<fileset dir="${lib}/${unjared}/META-INF"/>
+	</delete>	
+
+</target>
+
+<target name="init">
+	<tstamp/>
+</target>
+
+<target name="clean">
+	<mkdir dir="${build}"/>
+	<delete dir="${build}" includeEmptyDirs="true"/>
+	<mkdir dir="${build}"/>
+
+	<mkdir dir="${dist}"/>	
+	<delete>
+		<fileset dir="${dist}">
+			<patternset id="cleandistfiles">
+				<include name="**"/>
+			</patternset>
+		</fileset>
+	</delete>		
+
+	<mkdir dir="${doc}"/>
+	<delete dir="${doc}"/>
+	<mkdir dir="${doc}"/>
+	<mkdir dir="${doc}/api"/>	
+</target>
+
+<target name="build_jni">
+	<exec executable="javah">
+		<arg value="-jni -o ${src}/${my_basedir}/sattline/openmms/JOpenMMS.h ${my_packagedir}.sattline.openmms.JOpenMMS"/>
+	</exec>
+</target>
+
+<target name="backup" depends="init,clean">
+	<tar tarfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar" 
+		basedir="../${project.name}"
+		excludes="rsync/**,put,get"/>
+	<gzip zipfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar.gz"
+		src="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
+	<delete file="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
+</target>
+
+<target name="version" depends="init">
+	<delete file="${src}/${my_basedir}/Version.java"/>
+	<copy file="${templates}/Version.tmpl" tofile="${src}/${my_basedir}/Version.java"/>	
+	<replace file="${src}/${my_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
+</target>
+
+<!-- Compile:
+*	Reuses existing class files, but recompiles those
+*	source files that have changed.
+-->
+<target name="compile">
+	<javac
+		srcdir="${src}"
+		destdir="${build}"
+		classpath="${lib}/${unjared}"
+		includeJavaRuntime="yes"
+		excludes="
+			${my_basedir}/sattline/**,
+			${my_basedir}/supervisor/**"	
+	/>
+
+</target>
+
+<!-- Build:
+*	A standard compilation followed by packaging
+*	all files into a jar file. 
+-->
+<target name="build" depends="compile">
+	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/MANIFEST.MF"> 
+		<fileset dir="${build}"/>
+		<fileset dir="${images}"/>
+		<fileset dir="${javalibs.dir}"/>
+	</jar>
+	<copy file="${templates}/Supremica" todir="${dist}"/>	
+	<chmod file="${dist}/Supremica" perm="555"/>	
+	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/Supremica.cmd" perm="444"/>		
+</target>
+
+<!-- Rebuild:
+*	Deletes all existing class files, recompiles all files,
+*	and packages all files into a jar file that can
+*	be executed without any other dependencies. 
+-->
+<target name="rebuild" depends="clean,version,compile">
+	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/MANIFEST.MF"> 
+		<fileset dir="${build}"/>
+		<fileset dir="${images}"/>
+		<fileset dir="${javalibs.dir}"/>
+	</jar>
+	<copy file="${templates}/Supremica" todir="${dist}"/>	
+	<chmod file="${dist}/Supremica" perm="555"/>	
+	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/Supremica.cmd" perm="444"/>		
+</target>
+
+<target name="doc">
+	<javadoc
+		sourcepath="${src}"
+		destdir="${doc}/api"
+		packagenames="${my_basepackage}.automata.*,${my_basepackage}.gui.*,${my_basepackage}.util.*,${my_basepackage}.apps.*"
+		author="true"
+		version="true"
+		use="true"
+		private="true"
+		windowtitle="Supremica API"
+		doctitle="Test"
+		bottom="Copyright &#169; 2001 Supremica and Knut Akesson. All Rights Reserved.">
+	</javadoc>
+</target>
+
+<target name="run">
+	<java classname="${my_basepackage}.apps.Supremica" fork="yes">
+		<classpath>
+			<pathelement location="${dist}/Supremica.jar" />
+			<pathelement path="${java.class.path}" />
+		</classpath>		 
+	</java>
+</target>
+
+
+<target name="deploy">
+	<java classname="${my_basepackage}.apps.Supremica" fork="yes">
+		<classpath>
+			<pathelement location="${dist}/Supremica.jar" />
+			<pathelement path="${java.class.path}" />
+		</classpath>		 
+	</java>
+</target>
+
+</project>
+       

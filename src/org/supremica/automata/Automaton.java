@@ -1,0 +1,499 @@
+/*
+ * Supremica Software License Agreement
+ *
+ * The Supremica software is not in the public domain
+ * However, it is freely available without fee for education,
+ * research, and non-profit purposes.  By obtaining copies of
+ * this and other files that comprise the Supremica software,
+ * you, the Licensee, agree to abide by the following
+ * conditions and understandings with respect to the
+ * copyrighted software:
+ *
+ * The software is copyrighted in the name of Supremica,
+ * and ownership of the software remains with Supremica.
+ *
+ * Permission to use, copy, and modify this software and its
+ * documentation for education, research, and non-profit
+ * purposes is hereby granted to Licensee, provided that the
+ * copyright notice, the original author's names and unit
+ * identification, and this permission notice appear on all
+ * such copies, and that no charge be made for such copies.
+ * Any entity desiring permission to incorporate this software
+ * into commercial products or to use it for commercial
+ * purposes should contact:
+ *
+ * Knut Akesson (KA), knut@supremica.org
+ * Supremica,
+ * Haradsgatan 26A
+ * 431 42 Molndal
+ * SWEDEN
+ *
+ * to discuss license terms. No cost evaluation licenses are
+ * available.
+ *
+ * Licensee may not use the name, logo, or any other symbol
+ * of Supremica nor the names of any of its employees nor
+ * any adaptation thereof in advertising or publicity
+ * pertaining to the software without specific prior written
+ * approval of the Supremica.
+ *
+ * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
+ * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
+ * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
+ *
+ * Supremica or KA shall not be liable for any damages
+ * suffered by Licensee from the use of this software.
+ *
+ * Supremica is owned and represented by KA.
+ */
+
+package org.supremica.automata;
+
+import java.util.*;
+
+public class Automaton
+	implements ArcListener
+{
+	private Alphabet alphabet;
+	private String name;
+ 	private List theStates;
+	private int index = -1;
+	private Map idStateMap;
+ 	private Map indexStateMap;
+ 	private List theArcs;
+ 	private State initialState;
+ 	private boolean isDisabled = false;
+ 	private AutomatonType type = AutomatonType.Undefined;
+ 	private int uniqueStateIndex = 0;
+ 	private boolean hasLayout = false;
+
+ 	private AutomatonListeners listeners = null;
+
+	public Automaton()
+	{
+		alphabet = new Alphabet();
+		idStateMap = new HashMap();
+  		indexStateMap = new HashMap();
+		theStates = new LinkedList();
+		theArcs = new LinkedList();
+	}
+
+	public Automaton(String name)
+	{
+		this();
+		setName(name);
+	}
+
+	public Automaton(Automaton orgAut)
+	{
+		this();
+        Alphabet orgAlphabet = orgAut.getAlphabet();
+        Alphabet newAlphabet = new Alphabet(orgAlphabet);
+        type = orgAut.type;
+
+		setName(orgAut.getName());
+        setAlphabet(newAlphabet);
+
+		// Create all states
+		Iterator states = orgAut.stateIterator();
+		while (states.hasNext())
+		{
+			State orgState = (State)states.next();
+			State newState = new State(orgState);
+      		addState(newState);
+		}
+
+		try
+		{	// Create all transitions
+			states = orgAut.stateIterator();
+			while (states.hasNext())
+			{
+				State orgSourceState = (State)states.next();
+				State newSourceState = getStateWithId(orgSourceState.getId());
+
+				Iterator outgoingArcs = orgSourceState.outgoingArcsIterator();
+				while (outgoingArcs.hasNext())
+				{
+					Arc orgArc = (Arc)outgoingArcs.next();
+					State orgDestState = orgArc.getToState();
+
+					Event currEvent = orgAlphabet.getEventWithId(orgArc.getEventId());
+					State newDestState = getStateWithId(orgDestState.getId());
+					Arc newArc = new Arc(newSourceState, newDestState, currEvent.getId());
+					addArc(newArc);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			System.err.println("Error while copying transitions");
+			System.exit(0);
+		}
+	}
+
+	public void setType(AutomatonType type)
+	{
+		this.type = type;
+	}
+
+	public AutomatonType getType()
+	{
+		return type;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setDisabled(boolean isDisabled)
+	{
+		this.isDisabled = isDisabled;
+	}
+
+	public boolean isDisabled()
+	{
+		return isDisabled;
+	}
+
+	public void addState(State state)
+	{
+		theStates.add(state);
+		idStateMap.put(state.getId(), state);
+  		indexStateMap.put(new Integer(state.getIndex()), state);
+  		if (state.isInitial())
+  		{
+    		this.initialState = state;
+    	}
+
+    	notifyListeners(AutomatonListeners.MODE_STATE_ADDED, state);
+	}
+
+	public void removeState(State state)
+	{
+		if (state == initialState)
+		{
+			initialState = null;
+		}
+		theStates.remove(state);
+		state.removeArcs();
+		idStateMap.remove(state.getId());
+		indexStateMap.remove(new Integer(state.getIndex()));
+
+    	notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
+	}
+
+	public boolean hasInitialState()
+	{
+		return initialState != null;
+	}
+
+ 	public State getInitialState()
+  	{
+		return initialState;
+	}
+
+	public void addArc(Arc arc)
+	{
+		arc.getListeners().addListener(this);
+		theArcs.add(arc);
+    	notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
+	}
+
+	public void removeArc(Arc arc)
+	{
+		theArcs.remove(arc);
+		arc.clear();
+    	notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
+	}
+
+	public boolean containsState(State state)
+	{
+		return idStateMap.containsKey(state.getId());
+	}
+
+	public State getState(State state)
+	{
+		return (State)idStateMap.get(state.getId());
+	}
+
+	public boolean containsStateWithId(String id)
+	{
+		return idStateMap.containsKey(id);
+	}
+
+	public State getStateWithId(String id)
+	{
+		return (State)idStateMap.get(id);
+	}
+
+ 	public boolean containsStateWithIndex(int index)
+	{
+		return indexStateMap.containsKey(new Integer(index));
+	}
+
+	public State getStateWithIndex(int index)
+	{
+		return (State)indexStateMap.get(new Integer(index));
+	}
+
+	public String getStateNameWithIndex(int index)
+	{
+		return (((State) (indexStateMap.get(new Integer(index)))).getName());
+	}
+
+	public Event getEvent(String eventId)
+		throws Exception
+	{
+		return alphabet.getEventWithId(eventId);
+	}
+
+	// FIXA: används inte?
+	public Event getEventWithLabel(String eventLabel)
+		throws Exception
+	{
+		return alphabet.getEventWithId(eventLabel);
+	}
+
+	public int nbrOfStates()
+	{
+		return idStateMap.size();
+	}
+
+	public int nbrOfEvents()
+	{
+		return alphabet.size();
+	}
+
+	public int nbrOfAcceptingStates()
+	{
+		int nbrOfAcceptingStates = 0;
+		Iterator stateIt = stateIterator();
+		while (stateIt.hasNext())
+		{
+			State currState = (State)stateIt.next();
+			if (currState.isAccepting())
+			{
+				nbrOfAcceptingStates++;
+			}
+		}
+		return nbrOfAcceptingStates;
+	}
+
+	public int nbrOfForbiddenStates()
+	{
+		int nbrOfForbiddenStates = 0;
+		Iterator stateIt = stateIterator();
+		while (stateIt.hasNext())
+		{
+			State currState = (State)stateIt.next();
+			if (currState.isForbidden())
+			{
+				nbrOfForbiddenStates++;
+			}
+		}
+		return nbrOfForbiddenStates;
+	}
+
+	public int nbrOfAcceptingAndForbiddenStates()
+	{
+		int nbrOfAcceptingAndForbiddenStates = 0;
+		Iterator stateIt = stateIterator();
+		while (stateIt.hasNext())
+		{
+			State currState = (State)stateIt.next();
+			if (currState.isAccepting() && currState.isForbidden())
+			{
+				nbrOfAcceptingAndForbiddenStates++;
+			}
+		}
+		return nbrOfAcceptingAndForbiddenStates;
+	}
+
+	public Iterator stateIterator()
+	{
+		return theStates.iterator();
+	}
+
+	public Iterator safeStateIterator()
+	{
+		return (new LinkedList(theStates)).iterator();
+	}
+
+	public Iterator arcIterator()
+	{
+		return theArcs.iterator();
+	}
+
+	public Iterator safeArcIterator()
+	{
+		return (new LinkedList(theArcs)).iterator();
+	}
+
+	public Iterator eventIterator()
+	{
+		return alphabet.iterator();
+	}
+
+	public Collection eventCollection()
+	{
+		return alphabet.values();
+	}
+
+	public Alphabet getAlphabet()
+	{
+		return alphabet;
+	}
+
+	public void setAlphabet(Alphabet alphabet)
+	{
+		this.alphabet = alphabet;
+	}
+
+	public void setIndex(int index)
+	{
+		this.index = index;
+	}
+
+	public int getIndex()
+	{
+		return index;
+	}
+
+	public String getUniqueStateId()
+	{
+		String newId;
+		do
+		{
+			newId = "q" + uniqueStateIndex++;
+		}
+		while (containsStateWithId(newId));
+		return newId;
+	}
+
+	public void clearVisitedStates()
+	{
+		Iterator stateIt = stateIterator();
+		while (stateIt.hasNext())
+		{
+			State currState = (State)stateIt.next();
+			currState.setVisited(false);
+		}
+	}
+
+	public void removeAllStates()
+	{
+		beginTransaction();
+
+		idStateMap.clear();
+		indexStateMap.clear();
+		theStates.clear();
+		initialState = null;
+
+		if (listeners != null)
+		{
+			listeners.setUpdateNeeded(true);
+		}
+
+		endTransaction();
+	}
+
+
+	public State getState(int x, int y)
+	{
+		Iterator stateIt = stateIterator();
+		while (stateIt.hasNext())
+		{
+			State currState = (State)stateIt.next();
+			if (currState.contains(x, y))
+			{
+				return currState;
+			}
+		}
+		return null;
+	}
+
+	public boolean hasLayout()
+	{
+		return hasLayout;
+	}
+
+	public void setHasLayout(boolean hasLayout)
+	{
+		this.hasLayout = hasLayout;
+	}
+
+	public Listeners getListeners()
+	{
+		if (listeners == null)
+		{
+			listeners = new AutomatonListeners(this);
+		}
+		return listeners;
+	}
+
+	private void notifyListeners(int mode, Object o)
+	{
+		if (listeners != null)
+		{
+			listeners.notifyListeners(mode, o);
+		}
+	}
+
+	private void notifyListeners()
+	{
+		if (listeners != null)
+		{
+			listeners.notifyListeners();
+		}
+	}
+
+	public void invalidate()
+	{
+		if (listeners != null)
+		{
+			listeners.notifyListeners();
+		}
+	}
+
+	public void beginTransaction()
+	{
+		if (listeners != null)
+		{
+			listeners.beginTransaction();
+		}
+	}
+
+	public void endTransaction()
+	{
+		if (listeners != null)
+		{
+			listeners.endTransaction();
+		}
+	}
+
+	public void updated(Object o)
+	{
+
+	}
+
+	public void arcAdded(Arc arc)
+	{
+
+	}
+
+	public void arcRemoved(Arc arc)
+	{
+		theArcs.remove(arc);
+	}
+
+	public int hashCode()
+	{
+		return name.hashCode();
+	}
+}
