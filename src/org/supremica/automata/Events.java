@@ -115,9 +115,9 @@ public class Events
 	 *
 	 *@return  Description of the Return Value
 	 */
-	public Iterator iterator()
+	public EventIterator iterator()
 	{
-		return theEvents.values().iterator();
+		return new EventIterator(theEvents.values().iterator());
 	}
 
 	/**
@@ -151,7 +151,12 @@ public class Events
 	 *@return  Description of the Return Value
 	 */
 	public boolean containsEventWithLabel(String label)
+		throws IllegalArgumentException
 	{
+		if (label == null)
+		{
+			throw new IllegalArgumentException("label must be non-null");
+		}
 		return theEvents.containsKey(label);
 	}
 
@@ -164,18 +169,13 @@ public class Events
 	 *@exception  Exception Description of the Exception
 	 */
 	public LabeledEvent getEventWithLabel(String label)
-		throws Exception
+		throws IllegalArgumentException
 	{
-
-		// System.err.println(label);
-		if (containsEventWithLabel(label))
+		if (label == null)
 		{
-			return (LabeledEvent) theEvents.get(label);
+			throw new IllegalArgumentException("EventLabel must be non-null");
 		}
-		else
-		{
-			throw new Exception("The event '" + label + "' does not exist.");
-		}
+		return (LabeledEvent) theEvents.get(label);
 	}
 
 	public LabeledEvent getEventWithIndex(int index)
@@ -204,9 +204,9 @@ public class Events
 	public int nbrOfControllableEvents()
 	{
 		int nbrOfFoundEvents = 0;
-		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			LabeledEvent currEvent = evIt.nextEvent();
 			if (currEvent.isControllable())
 			{
 				nbrOfFoundEvents++;
@@ -218,9 +218,9 @@ public class Events
 	public int nbrOfPrioritizedEvents()
 	{
 		int nbrOfFoundEvents = 0;
-		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			LabeledEvent currEvent = evIt.nextEvent();
 			if (currEvent.isPrioritized())
 			{
 				nbrOfFoundEvents++;
@@ -232,9 +232,9 @@ public class Events
 	public int nbrOfImmediateEvents()
 	{
 		int nbrOfFoundEvents = 0;
-		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			LabeledEvent currEvent = evIt.nextEvent();
 			if (currEvent.isImmediate())
 			{
 				nbrOfFoundEvents++;
@@ -246,9 +246,9 @@ public class Events
 	public int nbrOfEpsilonEvents()
 	{
 		int nbrOfFoundEvents = 0;
-		for (Iterator evIt = iterator(); evIt.hasNext(); )
+		for (EventIterator evIt = iterator(); evIt.hasNext(); )
 		{
-			LabeledEvent currEvent = (LabeledEvent)evIt.next();
+			LabeledEvent currEvent = evIt.nextEvent();
 			if (currEvent.isEpsilon())
 			{
 				nbrOfFoundEvents++;
@@ -304,5 +304,5 @@ public class Events
 
 		theEvents = newEvents;
 	}
-	
+
 }

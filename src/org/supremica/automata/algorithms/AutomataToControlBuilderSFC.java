@@ -390,10 +390,11 @@ public class AutomataToControlBuilderSFC
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
+			Alphabet theAlphabet = aut.getAlphabet();
 
 			logger.debug(aut.getName().replace('.', '_'));
 
-			if (aut.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
 			{
 				logger.debug("The event " + theEvent.getLabel() + " exsits in the automaton " + aut.getName().replace('.', '_'));
 
@@ -432,7 +433,7 @@ public class AutomataToControlBuilderSFC
 										{
 											dummyAlphabet.addEvent(currArcEvent);
 											logger.debug("Event " + currArcEvent.getLabel() + " is in conflict with " + theEvent.getLabel());
-											
+
 											confAlphabet.union(dummyAlphabet);
 										}
 										catch (Exception ex)
@@ -537,8 +538,9 @@ public class AutomataToControlBuilderSFC
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
+			Alphabet theAlphabet = aut.getAlphabet();
 
-			if (aut.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
 			{
 
 				// The event exists in this automaton
@@ -624,8 +626,9 @@ public class AutomataToControlBuilderSFC
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
 		{
 			Automaton aut = (Automaton) autIt.next();
+			Alphabet theAlphabet = aut.getAlphabet();
 
-			if (aut.containsEventWithLabel(theEvent.getLabel()))
+			if (theAlphabet.containsEventWithLabel(theEvent.getLabel()))
 			{
 
 				// The event exists in this automaton

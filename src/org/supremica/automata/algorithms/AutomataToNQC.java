@@ -215,12 +215,13 @@ public class AutomataToNQC
 				for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 				{
 					Automaton currAutomaton = (Automaton)autIt.next();
+					Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 					int currAutomatonIndex = currAutomaton.getSynchIndex();
 
 					if (syncType == SynchronizationType.Prioritized)
 					{ // All automata that has this event as prioritized must be able to execute it
-						if (currAutomaton.isEventPrioritized(currEvent.getLabel()))
+						if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
 						{ // Find all states that enables this event
 						  // Use OR between states in the same automaton.
 						  // Use AND between states in different automata.
@@ -362,9 +363,10 @@ public class AutomataToNQC
 				for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();)
 				{
 					Automaton currAutomaton = (Automaton)autIt.next();
+					Alphabet currAlphabet = currAutomaton.getAlphabet();
 					int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-					if (currAutomaton.hasEventInAlphabet(currEvent.getLabel()))
+					if (currAlphabet.containsEventWithLabel(currEvent.getLabel()))
 					{
 						LabeledEvent currAutomatonEvent = currAutomaton.getEventWithLabel(currEvent.getLabel());
 						if (currAutomatonEvent == null)

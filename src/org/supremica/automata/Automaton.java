@@ -790,7 +790,7 @@ public class Automaton
 		return null;
 	}
 
-	public Iterator eventIterator()
+	public EventIterator eventIterator()
 	{
 		return alphabet.iterator();
 	}
