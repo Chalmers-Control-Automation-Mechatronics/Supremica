@@ -536,11 +536,19 @@
 			<primitive type="null"/>
 		</compose>
 	</define>
-	<define id="output_primitive">
-	<!-- Add part1 too -->
-		<compose id ="output_primitive_switch" type = "switch">
+	<define id="output_part2_primitive">
+		<compose id ="output_part2_primitive_switch" type = "switch">
 			<primitive type = "sprite">
 				<param name =  "src" value = "image/agv_part2.gif"/>
+				<param name =  "hotspot" value = "(13,8)"/>
+			</primitive>
+			<primitive type="null"/>
+		</compose>
+	</define>
+	<define id="output_part1_primitive">
+		<compose id ="output_part1_primitive_switch" type = "switch">
+			<primitive type = "sprite">
+				<param name =  "src" value = "image/agv_part1.gif"/>
 				<param name =  "hotspot" value = "(13,4)"/>
 			</primitive>
 			<primitive type="null"/>
@@ -653,7 +661,13 @@
 			<param name ="x" value ="379"/>
 			<param name ="y" value ="659"/>
 			<animate param = "translation" behaviour = "output.go"/>
-			<paste object = "output_primitive" /> 
+			<paste object = "output_part1_primitive" /> 
+		</transform>
+		<transform type = "translate">
+			<param name ="x" value ="379"/>
+			<param name ="y" value ="659"/>
+			<animate param = "translation" behaviour = "output.go"/>
+			<paste object = "output_part2_primitive" /> 
 		</transform>
 		<transform type = "translate">
 			<param name ="x" value ="44"/>
@@ -771,12 +785,12 @@
 	<command name="input3.addpart">
 		<announce event = "~input3.end"/>
 		<set object="input3_primitive_switch" param="current" value="1" />
+		<reset behaviour="input3.go"/>
 		<start behaviour="input3.go"/>
 	</command>
 	<command name="input3.removepart">
 		<announce event = "~input3.end"/>
 		<set object="input3_primitive_switch" param="current" value="0" />
-		<reset behaviour="input3.go"/>
 		<start behaviour="input3.go"/>
 	</command>	
 	<event object="input3.go" event="input3.end">
@@ -881,12 +895,14 @@
 	<!-- Output Commands -->
 	<command name="output.addpart">
 		<announce event = "~output.end"/>
-		<set object="output_primitive_switch" param="current" value="0" />
+		<set object="output_part1_primitive_switch" param="current" value="0" />
+		<set object="output_part2_primitive_switch" param="current" value="0" />		
 		<start behaviour="output.go"/>
 	</command>
 	<command name="output.removepart">
 		<announce event = "~output.end"/>
-		<set object="output_primitive_switch" param="current" value="1" />
+		<set object="output_part1_primitive_switch" param="current" value="1" />
+		<set object="output_part2_primitive_switch" param="current" value="1" />
 		<reset behaviour="output.go"/>
 		<start behaviour="output.go"/>
 	</command>	

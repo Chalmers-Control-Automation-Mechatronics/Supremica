@@ -12,12 +12,12 @@ import org.supremica.log.*;
  */
 
 class EventExecuter
-//	extends Thread
-	implements ListDataListener
+	extends Thread
+//	implements ListDataListener
 {
 	private static Logger logger = LoggerFactory.createLogger(EventExecuter.class);
 	
-//	private long sleepTime = 1000;
+	private long sleepTime = 100;
 	private boolean doRun = true;	
 	private boolean executeControllableEvents = false;
 	private boolean executeUncontrollableEvents = false;
@@ -29,24 +29,24 @@ class EventExecuter
 //		this.sleepTime = sleepTime;	
 		this.eventModel = eventModel;
 		this.theExecuter = theExecuter;
-		eventModel.addListDataListener(this);
+//		eventModel.addListDataListener(this);
 	}	
 	
-//	public void run()
-//	{
-//		while (doRun)
-//		{
-//			try 
-//			{
-//				Thread.sleep(sleepTime);
-//			} 
-//			catch (InterruptedException e) 
-//			{
-//			
-//			}		
-//			tryExecuteEvent();
-//		}	
-//	}
+	public void run()
+	{
+		while (doRun)
+		{
+			try 
+			{
+				Thread.sleep(sleepTime);
+			} 
+			catch (InterruptedException e) 
+			{
+			
+			}		
+			tryExecuteEvent();
+		}	
+	}
 //	
 	public void executeControllableEvents(boolean executeControllableEvents)
 	{

@@ -267,7 +267,7 @@ public class SimulatorExecuter
 		//logger.info("AnimationEvent: " + ev.getName());
 	}
 	
-	public synchronized int[] getCurrentState()
+	public int[] getCurrentState()
 	{
 		return currState;
 	}

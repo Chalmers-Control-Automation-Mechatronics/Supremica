@@ -117,7 +117,7 @@ public class SimulatorEventListModel
 		this.showState = showState;
 	}
 
-	public synchronized void update()
+	public void update()
 	{
 		//logger.info("SimulatorEventListModel.update");
 		AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
@@ -177,8 +177,10 @@ public class SimulatorEventListModel
 		{
 			eventAmount++;
 		}
-
+	
+		//logger.error("Before fireContentsChanged");
 		fireContentsChanged(this, 0, eventAmount - 1);
+		//logger.error("After fireContentsChanged");
 	}
 
 	public int getSize()
@@ -250,3 +252,5 @@ public class SimulatorEventListModel
 		update();		
 	}
 }
+
+

@@ -112,6 +112,7 @@ public class SimulatorStateViewer
 	{
 //		eventSplitter.setDividerLocation(0.5);
 		stateEventSplitter.setDividerLocation(0.6);
+		theExecuter.start();
 	}
 
 //	public void setCurrState(int[] newState)

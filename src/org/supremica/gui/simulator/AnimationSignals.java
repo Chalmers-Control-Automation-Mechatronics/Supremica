@@ -33,7 +33,7 @@ class AnimationSignals
 		observers.add(observer);
 	}
 
-	public void animationEvent(AnimationEvent ev)
+	public synchronized void animationEvent(AnimationEvent ev)
 	{
 		logger.info("AnimationEvent: " + ev.getName());
 		String currEvent = ev.getName();
@@ -48,8 +48,9 @@ class AnimationSignals
 			logger.info("Setting " + currEvent + " to TRUE");
 			theSignals.put(currEvent, Boolean.TRUE);
 		}
+		//logger.error("Calling notifyObservers");
 		notifyObservers();
-
+		//logger.error("Finished Calling notifyObservers");
 	}
 
 	public void notifyObservers()
