@@ -65,7 +65,8 @@ public class VerificationDialog
 	private VerificationOptions verificationOptions;
 	private JComboBox verificationTypeBox;
 	private JComboBox algorithmTypeBox;
-	private JTextField stateLimit;
+	private JTextField exclusionStateLimit;
+	private JTextField reachabilityStateLimit;
 	private JCheckBox oneEventAtATimeBox;
 	private JCheckBox skipUncontrollabilityBox;
 	private JDialog dialog;
@@ -114,14 +115,19 @@ public class VerificationDialog
 		
 		// advancedPanel
 		Box advancedBox = Box.createVerticalBox();
-		JLabel stateLimitText =
-			new JLabel("Initial state limit for uncontrollability check");
-		stateLimit = new JTextField();
+		JLabel exclusionStateLimitText =
+			new JLabel("Initial state limit for state exclusion");
+		exclusionStateLimit = new JTextField();
+		JLabel reachabilityStateLimitText =
+			new JLabel("Initial state limit for reachability verification");
+		reachabilityStateLimit = new JTextField();
 		oneEventAtATimeBox = new JCheckBox("Verify one uncontrollable event at a time");
 		skipUncontrollabilityBox = new JCheckBox("Skip uncontrollability check");
 		
-		advancedBox.add(stateLimitText);
-		advancedBox.add(stateLimit);
+		advancedBox.add(exclusionStateLimitText);
+		advancedBox.add(exclusionStateLimit);
+		advancedBox.add(reachabilityStateLimitText);
+		advancedBox.add(reachabilityStateLimit);
 		advancedBox.add(oneEventAtATimeBox);
 		advancedBox.add(skipUncontrollabilityBox);
 
@@ -146,7 +152,8 @@ public class VerificationDialog
 	{
 		verificationTypeBox.setSelectedIndex(verificationOptions.getVerificationType());
 		algorithmTypeBox.setSelectedIndex(verificationOptions.getAlgorithmType());
-		stateLimit.setText(Integer.toString(verificationOptions.getStateLimit()));
+		exclusionStateLimit.setText(Integer.toString(verificationOptions.getExclusionStateLimit()));
+		reachabilityStateLimit.setText(Integer.toString(verificationOptions.getReachabilityStateLimit()));
 		oneEventAtATimeBox.setSelected(verificationOptions.getOneEventAtATime());
 		skipUncontrollabilityBox.setSelected(verificationOptions.getSkipUncontrollabilityCheck());
 	}
@@ -172,7 +179,8 @@ public class VerificationDialog
 			verificationOptions.setDialogOK(true);
 			verificationOptions.setVerificationType(verificationTypeBox.getSelectedIndex());
 			verificationOptions.setAlgorithmType(algorithmTypeBox.getSelectedIndex());
-			verificationOptions.setStateLimit(PreferencesDialog.getInt("State limit", stateLimit.getText(), 10));
+			verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("State limit", exclusionStateLimit.getText(), 10));
+			verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("State limit", reachabilityStateLimit.getText(), 10));
 			verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
 			verificationOptions.setSkipUncontrollabilityCheck(skipUncontrollabilityBox.isSelected());
 			dialog.setVisible(false);

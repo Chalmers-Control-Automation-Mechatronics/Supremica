@@ -56,7 +56,8 @@ public final class VerificationOptions
 	private boolean dialogOK = false;
 	private int verificationType;
 	private int algorithmType;
-	private int stateLimit;
+	private int exclusionStateLimit;
+	private int reachabilityStateLimit;
 	private boolean oneEventAtATime;
 	private boolean skipUncontrollabilityCheck;
 
@@ -64,16 +65,18 @@ public final class VerificationOptions
 	{
 		this(WorkbenchProperties.verifyVerificationType(), 
 			 WorkbenchProperties.verifyAlgorithmType(),
-			 WorkbenchProperties.verifyStateLimit(),
+			 WorkbenchProperties.verifyExclusionStateLimit(),
+			 WorkbenchProperties.verifyReachabilityStateLimit(),
 			 WorkbenchProperties.verifyOneEventAtATime(),
 			 WorkbenchProperties.verifySkipUncontrollabilityCheck());
 	}
 
-	public VerificationOptions(int verificationType, int algorithmType, int stateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
+	public VerificationOptions(int verificationType, int algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck)
 	{
 		this.verificationType = verificationType;
 		this.algorithmType = algorithmType; 
-		this.stateLimit = stateLimit;
+		this.exclusionStateLimit = exclusionStateLimit;
+		this.reachabilityStateLimit = reachabilityStateLimit;
 		this.oneEventAtATime = oneEventAtATime;
 		this.skipUncontrollabilityCheck = skipUncontrollabilityCheck;
 	}
@@ -110,15 +113,26 @@ public final class VerificationOptions
 		return algorithmType;
 	}
 
-	public void setStateLimit(int limit)
+	public void setExclusionStateLimit(int limit)
 	{
-	    stateLimit = limit;
-		WorkbenchProperties.setVerifyStateLimit(limit);
+	    exclusionStateLimit = limit;
+		WorkbenchProperties.setVerifyExclusionStateLimit(limit);
 	}
 
-	public int getStateLimit()
+	public int getExclusionStateLimit()
 	{
-		return stateLimit;
+		return exclusionStateLimit;
+	}
+
+	public void setReachabilityStateLimit(int limit)
+	{
+	    reachabilityStateLimit = limit;
+		WorkbenchProperties.setVerifyReachabilityStateLimit(limit);
+	}
+
+	public int getReachabilityStateLimit()
+	{
+		return reachabilityStateLimit;
 	}
 
 	public void setOneEventAtATime(boolean bool)

@@ -115,7 +115,6 @@ public class AutomataVerifier
 		this.synchronizationOptions = synchronizationOptions;
 		nbrOfExecuters = synchronizationOptions.getNbrOfExecuters();
 		verboseMode = synchronizationOptions.verboseMode();
-		// stateAmountLimit = verificationOptions.getStateLimit(); // Done later...
 		oneEventAtATime = verificationOptions.getOneEventAtATime();
 
 		synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
@@ -268,7 +267,7 @@ public class AutomataVerifier
 		// loop finished.
 		if (failure)
 		{
-			thisCategory.error("Supremicas modular verification algorithm can't solve this problem. Try the monolithic algorithm instead. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this system uncontrollable.");
+			thisCategory.error("Supremica's modular verification algorithm can't solve this problem. Try the monolithic algorithm instead. There are " + potentiallyUncontrollableStates.size() + " states that perhaps makes this system uncontrollable.");
 		}
 		
 		return allModulesControllable;
@@ -587,7 +586,7 @@ public class AutomataVerifier
 
 		if (attempt == 1)
 		{   // First attempt
-			stateAmountLimit = verificationOptions.getStateLimit();
+			stateAmountLimit = verificationOptions.getExclusionStateLimit();
 			for (int i = 0; i < automataIndices.length; i++)
 				stateAmount = stateAmount * theAutomata.getAutomatonAt(automataIndices[i]).nbrOfStates();
 		}
@@ -667,7 +666,7 @@ public class AutomataVerifier
 				if  (statesLeft == 0)
 				{
 					if (verboseMode)
-						thisCategory.info("No uncontrollable states left after adding" + addedAutomata + ", the automata is controllable.");
+						thisCategory.info("No uncontrollable states left after adding" + addedAutomata + ", this subsystem is controllable.");
 					return;
 				}
 				else if (statesLeft == 1)
@@ -704,7 +703,7 @@ public class AutomataVerifier
 	private boolean findUncontrollableStates(int[] automataIndices)
 		throws Exception
 	{
-		// WOHOOBS! Eventuellt är det listigt att göra ny onlinesynchronizer, 
+		// WOHOOPS! Eventuellt är det listigt att göra ny onlinesynchronizer, 
 		// med den nya automataIndices varje gång... tänk på det. FIXA!
 		if (uncontrollabilityCheckHelper == null)
 		{
@@ -725,7 +724,7 @@ public class AutomataVerifier
 		}
 		
 		// Stop after having found a suitable amount of new states
-		uncontrollabilityCheckHelper.stopExecutionAfter(100*attempt);
+		uncontrollabilityCheckHelper.stopExecutionAfter(verificationOptions.getReachabilityStateLimit()*attempt);
 
 		// Initialize the synchronizationExecuters
 		synchronizationExecuters.clear();

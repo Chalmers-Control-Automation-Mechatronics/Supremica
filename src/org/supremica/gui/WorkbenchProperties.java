@@ -80,7 +80,8 @@ public final class WorkbenchProperties
 	// VerificationOptions
 	private static final String VERIFY_VERIFICATION_TYPE = "verifyVerificationType";
 	private static final String VERIFY_ALGORITHM_TYPE = "verifyAlgorithmType";
-	private static final String VERIFY_STATE_LIMIT = "verifyStateLimit";
+	private static final String VERIFY_EXCLUSION_STATE_LIMIT = "verifyExclusionStateLimit";
+	private static final String VERIFY_REACHABILITY_STATE_LIMIT = "verifyReachabilityStateLimit";
 	private static final String VERIFY_ONE_EVENT_AT_A_TIME = "verifyOneEventAtATime";
 	private static final String VERIFY_SKIP_UNCONTROLLABILITY_CHECK = "skipUncontrollabilityCheck";
 	// SynthesizerOptions
@@ -119,7 +120,8 @@ public final class WorkbenchProperties
 		setProperty(SYNC_NBR_OF_EXECUTERS, "1");
 		setProperty(VERIFY_VERIFICATION_TYPE, "0");
 		setProperty(VERIFY_ALGORITHM_TYPE, "0");
-		setProperty(VERIFY_STATE_LIMIT, "1000");
+		setProperty(VERIFY_EXCLUSION_STATE_LIMIT, "1000");
+		setProperty(VERIFY_REACHABILITY_STATE_LIMIT, "1000");
 		setProperty(VERIFY_ONE_EVENT_AT_A_TIME, "false");
 		setProperty(VERIFY_SKIP_UNCONTROLLABILITY_CHECK, "false");
 		setProperty(SYNTHESIS_SYNTHESIS_TYPE, "0");
@@ -362,14 +364,24 @@ public final class WorkbenchProperties
 		wp.setProperty(VERIFY_ALGORITHM_TYPE, toString(type));
 	}
 
-	public static int verifyStateLimit()
+	public static int verifyExclusionStateLimit()
 	{
-		return toInt(wp.getProperty(VERIFY_STATE_LIMIT));
+		return toInt(wp.getProperty(VERIFY_EXCLUSION_STATE_LIMIT));
 	}
 
-	public static void setVerifyStateLimit(int limit)
+	public static void setVerifyExclusionStateLimit(int limit)
 	{
-		wp.setProperty(VERIFY_STATE_LIMIT, toString(limit));
+		wp.setProperty(VERIFY_EXCLUSION_STATE_LIMIT, toString(limit));
+	}
+
+	public static int verifyReachabilityStateLimit()
+	{
+		return toInt(wp.getProperty(VERIFY_REACHABILITY_STATE_LIMIT));
+	}
+
+	public static void setVerifyReachabilityStateLimit(int limit)
+	{
+		wp.setProperty(VERIFY_REACHABILITY_STATE_LIMIT, toString(limit));
 	}
 
 	public static boolean verifyOneEventAtATime()
