@@ -96,6 +96,58 @@ public class VisualProject
 		addListener(fullTableModel);
 	}
 
+	public void clear()
+	{
+		super.clear();
+		if (theAutomataEditor != null)
+		{
+			theAutomataEditor.setVisible(false);
+			theAutomataEditor.dispose();
+			theAutomataEditor = null;
+		}
+		projectFile = null;
+	}
+
+	public void removeAutomaton(Automaton aut)
+	{
+		super.removeAutomaton(aut);
+		AutomatonViewer theViewer = (AutomatonViewer)theAutomatonViewerContainer.get(aut.getName());
+		if (theViewer != null)
+		{
+			theViewer.setVisible(false);
+			theViewer.dispose();
+			theAutomatonViewerContainer.remove(aut.getName());
+		}
+		AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(aut.getName());
+		if (theExplorer != null)
+		{
+			theExplorer.setVisible(false);
+			theExplorer.dispose();
+			theAutomatonExplorerContainer.remove(aut.getName());
+		}
+		JInternalFrame theFrame = (JInternalFrame) theAutomatonFrameContainer.get(aut.getName());
+		if (theFrame != null)
+		{
+			theFrame.setVisible(false);
+			theFrame.dispose();
+			theAutomatonFrameContainer.remove(aut.getName());
+		}
+		AutomatonDocument theDocument = (AutomatonDocument) theAutomatonDocumentContainer.get(aut.getName());
+		if (theDocument != null)
+		{
+			//theDocument.setVisible(false); // Are these necessary
+			//theDocument.dispose();
+			theAutomatonDocumentContainer.remove(aut.getName());
+		}
+		AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAutomatonDocumentContainer.get(aut.getName());
+		if (theAlphabetViewer != null)
+		{
+			theAlphabetViewer.setVisible(false);
+			theAlphabetViewer.dispose();
+			theAutomatonDocumentContainer.remove(aut.getName());
+		}
+	}
+
 	public void setSelectedAutomata(Automata theAutomata)
 	{
 		this.selectedAutomata = theAutomata;

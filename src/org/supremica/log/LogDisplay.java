@@ -411,7 +411,6 @@ public class LogDisplay
 			StyleConstants.setFontFamily((MutableAttributeSet) e.nextElement(), name);
 		}
 
-		return;
 	}
 
 	public void setOption(String option, String value)

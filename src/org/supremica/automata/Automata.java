@@ -265,6 +265,12 @@ public class Automata
 
 	public void clear()
 	{
+		ArrayList theAutomataCopy = new ArrayList(theAutomata);
+		for (Iterator autIt = theAutomataCopy.iterator(); autIt.hasNext();)
+		{
+			Automaton currAutomaton = (Automaton)autIt.next();
+			removeAutomaton(currAutomaton.getName());
+		}
 		theAutomata.clear();
 		nameMap.clear();
 	}
