@@ -68,6 +68,7 @@
 	<unjar src="${lib}/log4j-core.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/jakarta-oro.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
 
  	<mkdir dir="${lib}/licensed"/>
  	<touch file="${lib}/licensed/JGo.jar"/>	
