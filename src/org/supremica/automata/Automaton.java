@@ -1351,7 +1351,6 @@ public class Automaton
 	 * dot does not handle dots in the statename.
 	 * This method resets all state identities to valid names
 	 */
-	/*
 	public void normalizeStateIdentities()
 	{
 		setStateIndicies();
@@ -1365,7 +1364,6 @@ public class Automaton
 
 		remapStateIndices();
 	}
-	*/
 
 	public void setIndicies()
 	{
