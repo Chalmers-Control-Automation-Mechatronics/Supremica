@@ -76,6 +76,7 @@ public class AutomatonViewer
 	private BorderLayout layout = new BorderLayout();
 	private JPanel contentPane;
 	private JMenuBar menuBar = new JMenuBar();
+	private JToolBar toolBar = new JToolBar();
 	private boolean updateNeeded = false;
 	private JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout Left to right", SupremicaProperties.isDotLeftToRight());
 	private JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", SupremicaProperties.isDotWithCircles());
@@ -125,6 +126,7 @@ public class AutomatonViewer
 		});
 		setIconImage(Supremica.cornerImage);
 		initMenubar();
+		initToolbar();
 
 		updateNeeded = true;
 	}
@@ -263,32 +265,21 @@ public class AutomatonViewer
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				scaleFactor *= SCALE_CHANGE;
-				scaleFactor = Math.max(scaleFactor, MIN_SCALE);
-
-				update();
+				zoomin_actionPerformed(e);
 			}
 		});
 		menuZoomOut.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				scaleFactor /= SCALE_CHANGE;
-				scaleFactor = Math.min(scaleFactor, MAX_SCALE);
-
-				update();
+				zoomout_actionPerformed(e);
 			}
 		});
 		menuZoomReset.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if (scaleFactor != SCALE_RESET)
-				{
-					scaleFactor = SCALE_RESET;
-
-					update();
-				}
+				resetzoom_actionPerformed(e);
 			}
 		});
 		menuFileExport.addActionListener(new ActionListener()
@@ -353,6 +344,85 @@ public class AutomatonViewer
 				update();
 			}
 		});
+	}
+
+	private void initToolbar()
+	{
+		toolBar.setRollover(true);
+		contentPane.add(toolBar, BorderLayout.NORTH);
+
+		Insets tmpInsets = new Insets(0, 0, 0, 0);
+
+		// Create buttons
+		JButton exportButton = new JButton();
+
+		exportButton.setToolTipText("Export");
+
+		ImageIcon export16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Export16.gif"));
+
+		exportButton.setIcon(export16Img);
+		exportButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				fileExport_actionPerformed(e);
+			}
+		});
+		exportButton.setMargin(tmpInsets);
+		toolBar.add(exportButton, "WEST");
+
+		toolBar.addSeparator();
+
+		JButton zoominButton = new JButton();
+
+		zoominButton.setToolTipText("Zoom In");
+
+		ImageIcon zoomin16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomIn16.gif"));
+
+		zoominButton.setIcon(zoomin16Img);
+		zoominButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				zoomin_actionPerformed(e);
+			}
+		});
+		zoominButton.setMargin(tmpInsets);
+		toolBar.add(zoominButton, "WEST");
+
+		JButton zoomoutButton = new JButton();
+
+		zoomoutButton.setToolTipText("Zoom Out");
+
+		ImageIcon zoomout16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomOut16.gif"));
+
+		zoomoutButton.setIcon(zoomout16Img);
+		zoomoutButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				zoomout_actionPerformed(e);
+			}
+		});
+		zoomoutButton.setMargin(tmpInsets);
+		toolBar.add(zoomoutButton, "WEST");
+
+		JButton resetzoomButton = new JButton();
+
+		resetzoomButton.setToolTipText("Reset Zoom");
+
+		ImageIcon resetzoom16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif"));
+
+		resetzoomButton.setIcon(resetzoom16Img);
+		resetzoomButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				resetzoom_actionPerformed(e);
+			}
+		});
+		resetzoomButton.setMargin(tmpInsets);
+		toolBar.add(resetzoomButton, "WEST");
 	}
 
 	public void update()
@@ -505,14 +575,43 @@ public class AutomatonViewer
 		fromDotStream = dotProcess.getInputStream();
 	}
 
+	public void zoomin_actionPerformed(ActionEvent e)
+	{
+		scaleFactor *= SCALE_CHANGE;
+		scaleFactor = Math.max(scaleFactor, MIN_SCALE);
+
+		update();
+	}
+
+	public void zoomout_actionPerformed(ActionEvent e)
+	{
+		scaleFactor /= SCALE_CHANGE;
+		scaleFactor = Math.min(scaleFactor, MAX_SCALE);
+
+		update();
+	}
+
+	public void resetzoom_actionPerformed(ActionEvent e)
+	{
+		if (scaleFactor != SCALE_RESET)
+		{
+			scaleFactor = SCALE_RESET;
+
+			update();
+		}
+	}
+
 	public void fileExport_actionPerformed(ActionEvent e)
 	{
 		String epsString = "eps";
 		String mifString = "mif";
 		String dotString = "dot";
+		String pngString = "png";
+		String svgString = "svg";
+
 
 		// String gifString = "gif";
-		Object[] possibleValues = { epsString, mifString, dotString };
+		Object[] possibleValues = { epsString, mifString, pngString, svgString, dotString };
 		Object selectedValue = JOptionPane.showInputDialog(null, "Export as", "Input", JOptionPane.INFORMATION_MESSAGE, null, possibleValues, possibleValues[0]);
 
 		if (selectedValue == null)
@@ -534,6 +633,14 @@ public class AutomatonViewer
 		{
 			exportMode = 3;
 		}
+		else if (selectedValue == pngString)
+		{
+			exportMode = 4;
+		}
+		else if (selectedValue == svgString)
+		{
+			exportMode = 5;
+		}
 
 		JFileChooser fileExporter = null;
 		String dotArgument = null;
@@ -552,6 +659,16 @@ public class AutomatonViewer
 		{
 			fileExporter = FileDialogs.getDOTFileExporter();
 			dotArgument = "";
+		}
+		else if (exportMode == 4)
+		{
+			fileExporter = FileDialogs.getPNGFileExporter();
+			dotArgument = "-Tpng";
+		}
+		else if (exportMode == 5)
+		{
+			fileExporter = FileDialogs.getSVGFileExporter();
+			dotArgument = "-Tsvg";
 		}
 		else
 		{

@@ -67,6 +67,8 @@ public class FileDialogs
 	private FileFilter dsxFilter = null;
 	private FileFilter dotFilter = null;
 	private FileFilter epsFilter = null;
+	private FileFilter pngFilter = null;
+	private FileFilter svgFilter = null;
 	private FileFilter gifFilter = null;
 	private FileFilter mifFilter = null;
 	private FileFilter sFilter = null;
@@ -197,6 +199,26 @@ public class FileDialogs
 
 		fileExporter.resetChoosableFileFilters();
 		fileExporter.setFileFilter(fd.getMIFFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getPNGFileExporter()
+	{
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getPNGFilter());
+
+		return fileExporter;
+	}
+
+	public static JFileChooser getSVGFileExporter()
+	{
+		JFileChooser fileExporter = fd.getFileExporter();
+
+		fileExporter.resetChoosableFileFilters();
+		fileExporter.setFileFilter(fd.getSVGFilter());
 
 		return fileExporter;
 	}
@@ -418,6 +440,26 @@ public class FileDialogs
 		}
 
 		return mifFilter;
+	}
+
+	private FileFilter getPNGFilter()
+	{
+		if (pngFilter == null)
+		{
+			pngFilter = makeFileFilter(".png", "PNG files (*.png)");
+		}
+
+		return pngFilter;
+	}
+
+	private FileFilter getSVGFilter()
+	{
+		if (svgFilter == null)
+		{
+			svgFilter = makeFileFilter(".svg", "SVG files (*.svg)");
+		}
+
+		return svgFilter;
 	}
 
 	private FileFilter getAutFilter()

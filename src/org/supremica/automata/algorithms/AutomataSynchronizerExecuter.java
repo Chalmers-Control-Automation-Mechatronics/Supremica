@@ -363,7 +363,7 @@ public final class AutomataSynchronizerExecuter
 						if (currEventIndex != currAutEventIndex)
 						{
 							//... this event should not be executed
-							thisEventOk = false; 
+							thisEventOk = false;
 
 							// For controllability we need to know whether the event was disabled by a plant or a spec
 							if (typeIsPlantTable[currAutIndex])
@@ -396,9 +396,6 @@ public final class AutomataSynchronizerExecuter
 				{
 					if (typeIsPlantTable[currAutIndex])
 					{
-
-						// Then currIndex (the event) must also be the
-						// current event in this automaton
 						thisPlantEventOk = false;
 					}
 				}
