@@ -785,6 +785,14 @@
 	</event>
 
 	<!-- WS 1 Commands -->
+	<command name="ws1_part1.go">
+		<announce event = "~ws1_part1.end"/>
+		<start behaviour="ws1_part1.go"/>
+	</command>
+	<command name="ws1_part2.go">
+		<announce event = "~ws1_part2.end"/>
+		<start behaviour="ws1_part2.go"/>
+	</command>
 	<command name="ws1.addpart1">
 		<announce event = "~ws1_part1.end"/>
 		<set object="ws1_part1_primitive_switch" param="current" value="0" />

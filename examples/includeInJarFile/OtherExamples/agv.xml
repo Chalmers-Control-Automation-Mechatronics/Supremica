@@ -451,6 +451,11 @@
 		<Action label="e31">
 			<Command command="input3.addpart"/>
 		</Action>
+
+		<!-- Output -->
+		<Action label="e21">
+			<Command command="output.removepart"/>
+		</Action>
 		
 		<!-- AGV 1 -->
 		<Action label="u11">
@@ -604,6 +609,32 @@
 			<Command command="agv5.removepart"/>
 			<Command command="output.addpart"/>
 		</Action>
+
+		<!-- WS1 -->
+		<Action label="w11">
+			<Command command="ws1_part1.go"/>
+			<Command command="ws1_part2.go"/>
+		</Action>
+		<Action label="w12">
+			<Command command="ws1_part1.go"/>
+			<Command command="ws1_part2.go"/>
+		</Action>
+
+		<!-- WS2 -->
+		<Action label="w24">
+			<Command command="ws2.go"/>
+		</Action>
+		<Action label="w21">
+			<Command command="ws2.go"/>
+		</Action>
+
+		<!-- WS3 -->
+		<Action label="w33">
+			<Command command="ws3.go"/>
+		</Action>
+		<Action label="w34">
+			<Command command="ws3.go"/>
+		</Action>
 	</Actions>
 	<Controls>
 
@@ -615,6 +646,11 @@
 		<!-- Input 3 -->
 		<Control label="e31">
 			<Condition condition="input3.end"/>			
+		</Control>
+
+		<!-- Output -->
+		<Control label="e21">
+			<Condition condition="output.end"/>			
 		</Control>
 		
 		<!-- AGV 1 -->
@@ -633,6 +669,7 @@
 		</Control>
 		<Control label="w23">
 			<Condition condition="agv1.end"/>
+			<Condition condition="ws2.end"/>			
 		</Control>	
 		<Control label="c2">
 			<Condition condition="agv1.end"/>
@@ -644,6 +681,7 @@
 		</Control>
 		<Control label="w22">
 			<Condition condition="agv2.end"/>
+			<Condition condition="ws2.end"/>
 		</Control>
 		<Control label="c6">
 			<Condition condition="agv2.end"/>
@@ -653,6 +691,7 @@
 		</Control>
 		<Control label="w14">
 			<Condition condition="agv2.end"/>
+			<Condition condition="ws1_part1.end"/>			
 		</Control>	
 		<Control label="c5">
 			<Condition condition="agv2.end"/>
@@ -679,6 +718,7 @@
 		</Control>
 		<Control label="e30">
 			<Condition condition="agv3.end"/>
+			<Condition condition="input3.end"/>
 		</Control>
 		<Control label="c3">
 			<Condition condition="agv3.end"/>
@@ -700,6 +740,7 @@
 		</Control>
 		<Control label="w32">
 			<Condition condition="agv3.end"/>
+			<Condition condition="ws3.end"/>			
 		</Control>
 		
 		<!-- AGV 4 -->
@@ -717,6 +758,7 @@
 		</Control>
 		<Control label="w37">
 			<Condition condition="agv4.end"/>
+			<Condition condition="ws3.end"/>
 		</Control>	
 		<Control label="c8">
 			<Condition condition="agv4.end"/>
@@ -732,6 +774,7 @@
 		</Control>
 		<Control label="w15">
 			<Condition condition="agv4.end"/>
+			<Condition condition="ws1_part2.end"/>
 		</Control>	
 		
 		<!-- AGV 5 -->
@@ -746,6 +789,8 @@
 		</Control>
 		<Control label="w13">
 			<Condition condition="agv5.end"/>
+			<Condition condition="ws1_part1.end"/>
+			<Condition condition="ws1_part2.end"/>
 		</Control>
 		<Control label="c9">
 			<Condition condition="agv5.end"/>
@@ -758,6 +803,33 @@
 		</Control>
 		<Control label="e20">
 			<Condition condition="agv5.end"/>
+			<Condition condition="output.end"/>
+		</Control>
+
+		<!-- WS1 -->
+		<Control label="w11">
+			<Condition condition="ws1_part1.end"/>
+			<Condition condition="ws1_part2.end"/>
+		</Control>
+		<Control label="w12">
+			<Condition condition="ws1_part1.end"/>
+			<Condition condition="ws1_part2.end"/>
+		</Control>
+
+		<!-- WS2 -->
+		<Control label="w24">
+			<Condition condition="ws2.end"/>
+		</Control>
+		<Control label="w21">
+			<Condition condition="ws2.end"/>
+		</Control>
+
+		<!-- WS3 -->
+		<Control label="w33">
+			<Condition condition="ws3.end"/>
+		</Control>
+		<Control label="w34">
+			<Condition condition="ws3.end"/>
 		</Control>
 	</Controls>
 	<Animation path="/scenebeans/agv/agv.xml"/>
