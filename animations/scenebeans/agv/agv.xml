@@ -829,6 +829,11 @@
 		<announce event = "~ws2.end"/>
 		<start behaviour="ws2.go"/>
 	</command>
+	<command name="ws2.reset">
+		<announce event = "~ws2.end"/>
+		<reset behaviour="ws2.go"/>
+		<start behaviour="ws2.go"/>
+	</command>
 	<command name="ws2.addpart">
 		<announce event = "~ws2.end"/>
 		<set object="ws2_primitive_switch" param="current" value="0" />
@@ -837,7 +842,6 @@
 	<command name="ws2.removepart">
 		<announce event = "~ws2.end"/>
 		<set object="ws2_primitive_switch" param="current" value="1" />
-		<reset behaviour="ws2.go"/>
 		<start behaviour="ws2.go"/>
 	</command>	
 	<event object="ws2.go" event="ws2.end">

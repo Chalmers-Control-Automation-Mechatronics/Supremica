@@ -625,7 +625,7 @@
 			<Command command="ws2.go"/>
 		</Action>
 		<Action label="w21">
-			<Command command="ws2.go"/>
+			<Command command="ws2.reset"/>
 		</Action>
 
 		<!-- WS3 -->
