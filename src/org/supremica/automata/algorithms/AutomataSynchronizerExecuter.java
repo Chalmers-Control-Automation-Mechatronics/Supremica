@@ -61,7 +61,6 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomatonIterator;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.State;
 import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabeledEvent;
 import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
@@ -806,7 +805,7 @@ public final class AutomataSynchronizerExecuter
 			int stateNumber = 0;
 			ExecutionDialog executionDialog = helper.getExecutionDialog();
 
-			State rememberDisabledEventsState = null;
+			org.supremica.automata.State rememberDisabledEventsState = null;
 
 			if (rememberDisabledEvents)
 			{
@@ -845,7 +844,7 @@ public final class AutomataSynchronizerExecuter
 
 					if (longformId)
 					{
-						State[][] stateTable = indexForm.getStateTable();
+						org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
 						StringBuffer sb = new StringBuffer();
 
 						for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
@@ -905,7 +904,7 @@ public final class AutomataSynchronizerExecuter
 				if (currStateTable[k] != null)
 				{
 					int[] currState = currStateTable[k];
-					State thisState = theAutomaton.getStateWithIndex(k);
+					org.supremica.automata.State thisState = theAutomaton.getStateWithIndex(k);
 
 					enabledEvents(currState);
 
@@ -938,7 +937,7 @@ public final class AutomataSynchronizerExecuter
 
 							if (nextIndex >= 0)
 							{
-								State nextState = theAutomaton.getStateWithIndex(nextIndex);
+								org.supremica.automata.State nextState = theAutomaton.getStateWithIndex(nextIndex);
 								LabeledEvent theEvent = theAlphabet.getEventWithIndex(currEventIndex);
 								// Arc newArc = new Arc(thisState, nextState, theEvent.getId());
 								Arc newArc = new Arc(thisState, nextState, theEvent);
