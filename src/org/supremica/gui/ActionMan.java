@@ -2406,9 +2406,19 @@ public class ActionMan
 
 	public static void robotStudioTest(Gui gui)
 	{
-		// Start thread
-		RobotStudioLink robotStudioLink = new RobotStudioLink(gui);
-		robotStudioLink.start();
+		new FileImporter(FileDialogs.getRobotStudioStationFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				String stationName;
+				stationName = f.getAbsolutePath();
+
+				// Start thread
+				RobotStudioLink robotStudioLink = new RobotStudioLink(g, stationName);
+				robotStudioLink.start();
+			}
+		};
+
 	}
 
 	// TestCases... - open the test cases dialog, and add the result to the current set of automata

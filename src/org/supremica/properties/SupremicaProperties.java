@@ -210,7 +210,7 @@ public final class SupremicaProperties
 		setProperty(SOFTPLC_CYCLE_TIME, "40", true);
 		setProperty(SHOW_GENETIC_ALGORITHMS, "false", false);
 		setProperty(SHOW_ROBOTSTUDIO_LINK, "true", false);
-		setProperty(USE_ACTIVEX_BRIDGE, "false", false);
+		setProperty(USE_ACTIVEX_BRIDGE, "true", false);
 
 		softplcInterfaces.add(new org.supremica.gui.SoftplcInterface("org.supremica.softplc.Simulator.BTSim"));
 

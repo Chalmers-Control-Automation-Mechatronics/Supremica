@@ -78,7 +78,7 @@ public class FileDialogs
 	private FileFilter stFilter = null;
 	private FileFilter ilFilter = null;
 	private FileFilter nqcFilter = null;
-
+	private FileFilter stnFilter = null;
 
 	private static FileDialogs fd = new FileDialogs();
 
@@ -328,6 +328,16 @@ public class FileDialogs
 		return autFileImporter;
 	}
 
+	public static JFileChooser getRobotStudioStationFileImporter()
+	{
+		JFileChooser stationFileImporter = fd.getFileImporter();
+
+		stationFileImporter.resetChoosableFileFilters();
+		stationFileImporter.setFileFilter(fd.getSTNFilter());
+
+		return stationFileImporter;
+	}
+
 	private JFileChooser getFileImporter()
 	{
 		if (fileImporter == null)
@@ -570,5 +580,15 @@ public class FileDialogs
 		}
 
 		return nqcFilter;
+	}
+
+	private FileFilter getSTNFilter()
+	{
+		if (stnFilter == null)
+		{
+			stnFilter = makeFileFilter(".stn", "RobotStudio Station file (*.stn)");
+		}
+
+		return stnFilter;
 	}
 }

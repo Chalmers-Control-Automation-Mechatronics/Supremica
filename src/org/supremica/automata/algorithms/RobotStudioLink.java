@@ -82,11 +82,12 @@ public class RobotStudioLink
 	private static Logger logger = LoggerFactory.createLogger(RobotStudioLink.class);
 	private static Application app = null;
 	private Gui gui;
+	private String stationName;
 	private IStation activeStation;
 
 	// Generated automata
-	Automata robotAutomata;
-	Automata mutexAutomata;
+	private Automata robotAutomata;
+	private Automata mutexAutomata;
 
 	/*
 	public RobotStudioLink()
@@ -95,9 +96,10 @@ public class RobotStudioLink
 	}
 	*/
 
-	public RobotStudioLink(Gui gui)
+	public RobotStudioLink(Gui gui, String stationName)
 	{
 		this.gui = gui;
+		this.stationName = stationName;
 		robotAutomata = new Automata();
 		mutexAutomata = new Automata();
 	}
@@ -134,7 +136,7 @@ public class RobotStudioLink
 
 				// Load a certain station
 				//activeStation = app.getActiveStation();
-				String stationName = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
+				//String stationName = "C:/temp/RobSuprTestStation/RobSuprTest.stn";
 				//String stationName = "C:/Program Files/ABB Robotics/Stations/rsFlexArcR.stn";
 				activeStation = app.getWorkspace().openStation(stationName,var(true),var(false));
 			}
